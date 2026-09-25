@@ -33,6 +33,35 @@ class CRM_Event_Form_SelfSvcTransferTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test transferring a participant whose line items have no linked contribution
+   * (e.g. a payment-suppressed waitlist registration) does not fatal.
+   *
+   * https://lab.civicrm.org/dev/core/-/work_items/6691
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testTransferUnlinkedLineItem(): void {
+    $participantID = $this->participantCreate(['status_id.name' => 'Registered']);
+    $this->createTestEntity('LineItem', [
+      'entity_table' => 'civicrm_participant',
+      'entity_id' => $participantID,
+      'qty' => 1,
+      'unit_price' => 0,
+      'line_total' => 0,
+    ]);
+    $this->individualCreate(['email' => 'new@example.org']);
+    $this->getTestForm('CRM_Event_Form_SelfSvcTransfer', [
+      'email' => 'new@example.org',
+    ], [
+      'pid' => $this->ids['Participant']['default'],
+      'cs' => CRM_Contact_BAO_Contact_Utils::generateChecksum($this->ids['Contact']['individual_0']),
+      'is_backoffice' => 1,
+    ])->processForm();
+
+    $this->assertMailSentContainingString('Your Event Registration has been Transferred', 1);
+  }
+
+  /**
    * Test Transfer as anonymous
    *
    * @throws \CRM_Core_Exception

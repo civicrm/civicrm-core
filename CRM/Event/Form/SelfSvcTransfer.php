@@ -465,12 +465,15 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
       $toLineItem = LineItem::create(FALSE)
         ->setValues($lineItem)
         ->execute()->first();
-
-      //Update Financial Item for previous line item row.
-      $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemID);
-      $prevFinancialItem['contact_id'] = $toContactID;
-      $prevFinancialItem['entity_id'] = $toLineItem['id'];
-      CRM_Financial_BAO_FinancialItem::create($prevFinancialItem);
+      if (!empty($lineItem['contribution_id'])) {
+        // Update Financial Item for previous line item row.
+        // This smells a bit - it feels like we don't want to create another entityFinancialTrxn
+        // and should instead call writeItem.
+        $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemID);
+        $prevFinancialItem['contact_id'] = $toContactID;
+        $prevFinancialItem['entity_id'] = $toLineItem['id'];
+        CRM_Financial_BAO_FinancialItem::create($prevFinancialItem);
+      }
     }
     //send a confirmation email to the new participant
     $this->participantTransfer((array) $participant);
