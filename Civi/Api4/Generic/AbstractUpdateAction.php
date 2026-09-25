@@ -85,6 +85,12 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
       throw new \CRM_Core_Exception('Parameter "where" is required unless primary keys are supplied in values.');
     }
 
+    // Add facade conditions
+    $this->injectFacadeCondition();
+
+    // Prevent updating facade field to wrong value
+    $this->validateFacadeFieldInUpdate();
+
     // Update a single record by primary key (if this entity has a single primary key)
     if (count($this->where) === 1 && count($primaryKeys) === 1 && $primaryKeys === $this->getSelect() && $this->where[0][0] === $id && $this->where[0][1] === '=' && !empty($this->where[0][2])) {
       $this->values[$id] = $this->where[0][2];
@@ -108,6 +114,36 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
 
     $this->validateValues();
     $result->exchangeArray($this->updateRecords($items));
+  }
+
+  /**
+   * Inject facade WHERE condition
+   *
+   * @return void
+   */
+  protected function injectFacadeCondition() {
+    $facadeConfig = $this->getFacadeConfig();
+    if (!$facadeConfig) {
+      return;
+    }
+    $this->addWhere($facadeConfig['field'], '=', $facadeConfig['value']);
+  }
+
+  /**
+   * Prevent changing facade field value in update
+   */
+  protected function validateFacadeFieldInUpdate() {
+    $facadeConfig = $this->getFacadeConfig();
+    if (!$facadeConfig) {
+      return;
+    }
+    $field = $facadeConfig['field'];
+    $value = $facadeConfig['value'];
+    if (isset($this->values[$field]) && $this->values[$field] !== $value) {
+      throw new \CRM_Core_Exception(
+        "Cannot update facade field '{$field}' on {$this->getEntityName()} facade"
+      );
+    }
   }
 
   /**
