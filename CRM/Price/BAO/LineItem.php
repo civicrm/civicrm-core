@@ -400,6 +400,13 @@ WHERE li.contribution_id = %1";
       return;
     }
 
+    $financialTrxnID = NULL;
+    if (!$update && $contributionDetails) {
+      // Resolved once rather than per line item - this preserves the behaviour of the
+      // fallback FinancialItem::add() used to apply to each line individually.
+      $financialTrxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionDetails->id, 'ASC', TRUE)['financialTrxnId'];
+    }
+
     foreach ($lineItems as &$values) {
 
       foreach ($values as &$line) {
@@ -423,10 +430,10 @@ WHERE li.contribution_id = %1";
         }
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
         if (!$update && $contributionDetails) {
-          $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails);
+          $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails, FALSE, $financialTrxnID);
           $line['financial_item_id'] = $financialItem->id;
           if (!empty($line['tax_amount'])) {
-            CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails, TRUE);
+            CRM_Financial_BAO_FinancialItem::add($createdLineItem, $contributionDetails, TRUE, $financialTrxnID);
           }
         }
       }
