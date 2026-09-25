@@ -13,6 +13,8 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Api4\Payment;
+use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
  * This class generates form components for processing Event.
@@ -555,7 +557,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
           $participantRecord = array_merge($participantRecord, $preApprovalParams);
         }
-        $doPaymentResult = NULL;
 
         if (!empty($participantRecord['is_pay_later']) ||
           $participantRecord['amount'] == 0 ||
@@ -577,24 +578,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           if (empty($participantRecord['email'])) {
             $participantRecord['email'] = CRM_Utils_Array::valueByRegexKey('/^email-/', $participantRecord);
           }
-
-          if (is_object($payment)) {
-            // If registering from waitlist participant_id is set but contact_id is not.
-            // We need a contact ID to process the payment so set the "primary" contact ID.
-            $participantRecord['contactID'] = empty($participantRecord['contact_id']) ? (int) $contactID : (int) $participantRecord['contact_id'];
-            // contactID is the correct parameter to pass to the processor.
-            // However, we still pass contact_id as the same value as was previously being assigned,
-            // in case some processors are expecting that.
-            // (especially since this was recently not passing the correct value).
-            // https://docs.civicrm.org/dev/en/latest/extensions/payment-processors/create/#getpaymentformfields
-            if (empty($participantRecord['contact_id'])) {
-              $participantRecord['contact_id'] = $participantRecord['contactID'];
-            }
-            [$doPaymentResult, $participantRecord] = $this->processPayment($payment, $participantRecord);
-          }
-          else {
-            throw new CRM_Core_Exception($paymentObjError);
-          }
         }
 
         $participantRecord['receive_date'] = $now;
@@ -613,15 +596,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
 
           //passing contribution id is already registered.
-          $contribution = $this->processContribution($participantRecord, $doPaymentResult, $contactID, $pending);
-          $participantRecord['contributionID'] = $contribution->id;
-          $participantRecord['receive_date'] = $contribution->receive_date;
-          $participantRecord['trxn_id'] = $contribution->trxn_id;
+          $contribution = $this->processContribution($participantRecord, $contactID);
           $participantRecord['contributionID'] = $contribution->id;
         }
         $participantRecord['contactID'] = $contactID;
-        $participantRecord['eventID'] = $this->getEventID();
-        $participantRecord['item_name'] = $participantRecord['description'];
       }
 
       if (!empty($participantRecord['contributionID'])) {
@@ -694,6 +672,34 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
     //otherwise send mail Confirmation/Receipt
     $primaryContactId = $this->get('primaryContactId');
+    if ($this->getOrderTotalAmount() > 0 && !$this->isPayLater() && is_object($payment) && !$this->getPaymentProcessorObject()->supports('noReturn')) {
+      $participantRecord = $primaryParticipant;
+      // https://docs.civicrm.org/dev/en/latest/extensions/payment-processors/create/#getpaymentformfields
+      $participantRecord['contributionID'] = $contribution->id;
+      // If registering from waitlist participant_id is set but contact_id is not.
+      // We need a contact ID to process the payment so set the "primary" contact ID.
+      $participantRecord['contactID'] = $participantRecord['contact_id'] = $contactID;
+      try {
+        [$result] = $this->processPayment($payment, $participantRecord);
+        if ($result['payment_status'] == 'Completed') {
+          Payment::create(FALSE)
+            ->setNotificationForPayment(FALSE)
+            ->addValue('contribution_id', $contribution->id)
+            ->addValue('total_amount', $this->getOrder()->getTotalAmount())
+            ->addValue('payment_processor_id', $this->getPaymentProcessorID())
+            ->addValue('trxn_id', $result['trxn_id'])
+            ->addValue('fee_amount', $result['fee_amount'] ?? NULL)
+            ->addValue('card_type_id', $this->getCardTypeID())
+            ->addValue('pan_truncation', $this->getPanTruncation())
+            ->addValue('trxn_date', date('Y-m-d H:i:s'))
+            ->execute();
+        }
+      }
+      catch (PaymentProcessorException $e) {
+        CRM_Contribute_BAO_Contribution::failPayment($contribution->id,
+          $this->getContactID(), $e->getMessage());
+      }
+    }
 
     // for Transfer checkout.
     // The concept of contributeMode is deprecated.
@@ -702,6 +708,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->isProcessRegistrationInRealTime() &&
       $this->_totalAmount > 0
     ) {
+      // @todo - we pass a whole lot of parameters to the processor here that are not passed by contribution
+      // pages / this page with other processor types / webforms / afforms etc. It was added in 2014 for one
+      // use case & should probably be removed with a release notes update. It includes calls to legacy code
+      // patterns and practices.
 
       //build an array of custom profile and assigning it to template
       $customProfile = CRM_Event_BAO_Event::buildCustomProfile($registerByID, $this->_values, NULL, $this->isTest());
@@ -846,18 +856,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * Process the contribution.
    *
    * @param array $params
-   * @param array $result
    * @param int $contactID
-   * @param bool $pending
    *
    * @return \CRM_Contribute_BAO_Contribution
    *
    * @throws \CRM_Core_Exception
    */
-  private function processContribution(
-    $params, $result, $contactID,
-    $pending = FALSE
-  ) {
+  private function processContribution($params, $contactID): CRM_Contribute_BAO_Contribution {
     // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
     $transaction = new CRM_Core_Transaction();
 
@@ -887,19 +892,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
     ];
 
-    if (!$pending && $result) {
-      $contribParams += [
-        'fee_amount' => $result['fee_amount'] ?? NULL,
-        'trxn_id' => $result['trxn_id'],
-        'receipt_date' => $this->getReceiptDate(),
-      ];
-    }
-
-    $allStatuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
-    $contribParams['contribution_status_id'] = array_search('Completed', $allStatuses);
-    if ($pending) {
-      $contribParams['contribution_status_id'] = array_search('Pending', $allStatuses);
-    }
+    $contribParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id',
+      $contribParams['total_amount'] == 0 ? 'Completed' : 'Pending'
+    );
 
     $contribParams['is_test'] = $this->isTest();
 
@@ -1221,10 +1216,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   private function processPayment(\CRM_Core_Payment $payment, array $value): array {
     try {
       $params = $this->prepareParamsForPaymentProcessor($value);
+      $params['eventID'] = $this->getEventID();
       $doPaymentResult = $payment->doPayment($params, 'event');
       return [$doPaymentResult, $value];
     }
-    catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+    catch (PaymentProcessorException $e) {
       Civi::log()->error('Payment processor exception: ' . $e->getMessage());
       CRM_Core_Session::singleton()->setStatus($e->getMessage());
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->getEventID()}"));
