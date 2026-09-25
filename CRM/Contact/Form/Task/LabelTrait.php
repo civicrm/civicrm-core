@@ -91,14 +91,15 @@ trait CRM_Contact_Form_Task_LabelTrait {
 
     // format the addresses according to CIVICRM_ADDRESS_FORMAT (CRM-1327)
     // Iterate contact IDs not rows to get original sort order.
+    $reorderedRows = [];
     foreach ($this->getContactIDs() as $id) {
       if (isset($rows[$id])) {
-        $rows[$id] = [CRM_Utils_Address::formatMailingLabel($rows[$id])];
+        $reorderedRows[$id] = [CRM_Utils_Address::formatMailingLabel($rows[$id])];
       }
     }
 
     //call function to create labels
-    $this->createLabel($rows, $this->getSubmittedValue('label_name'));
+    $this->createLabel($reorderedRows, $this->getSubmittedValue('label_name'));
   }
 
   /**
