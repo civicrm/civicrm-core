@@ -21,6 +21,16 @@ namespace Civi\Api4;
 class PaymentProcessor extends Generic\DAOEntity {
 
   /**
+   * @see \Civi\Api4\Action\PaymentProcessor\Refund
+   * @return array
+   */
+  public static function permissions(): array {
+    return [
+      'refund' => ['refund contributions'],
+    ] + parent::permissions();
+  }
+
+  /**
    * @param bool $checkPermissions
    *
    * @return Action\PaymentProcessor\Refund
