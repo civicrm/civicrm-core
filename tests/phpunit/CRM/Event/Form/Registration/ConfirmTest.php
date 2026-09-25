@@ -85,7 +85,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $paymentProcessorID = $this->processorCreate();
     /** @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
-    $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
+    $processor->setDoDirectPaymentResult(['payment_status_id' => 1, 'payment_status' => 'Completed', 'fee_amount' => 1.67]);
     $event = $this->eventCreatePaid([
       'payment_processor' => [$paymentProcessorID],
       'selfcancelxfer_time' => 72,
