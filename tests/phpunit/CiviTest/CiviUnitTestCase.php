@@ -387,7 +387,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
     $this->renameLabels();
     $this->ensureMySQLMode(['IGNORE_SPACE', 'ERROR_FOR_DIVISION_BY_ZERO', 'STRICT_TRANS_TABLES']);
-    putenv('CIVICRM_DEDUPE_OPTIMIZER=TRUE');
     $this->originalSettings = \Civi::settings()->exportValues();
 
     // There doesn't seem to be a better way to get the current error handler.
