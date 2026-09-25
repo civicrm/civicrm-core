@@ -72,10 +72,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     if (!$contributionIsTemplate && $lineItemBAO->entity_table === 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
       CRM_Member_BAO_MembershipPayment::legacyMembershipPaymentCreateIfNotExist($lineItemBAO->entity_id, $lineItemBAO->contribution_id, TRUE);
     }
-    if ($lineItemBAO->entity_table === 'civicrm_participant' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
+    if ($lineItemBAO->entity_table === 'civicrm_participant' && !empty($params['contribution_id']) && $lineItemBAO->entity_id) {
       $participantPaymentParams = [
         'participant_id' => $lineItemBAO->entity_id,
-        'contribution_id' => $lineItemBAO->contribution_id,
+        'contribution_id' => $params['contribution_id'],
       ];
       if (!civicrm_api3('ParticipantPayment', 'getcount', $participantPaymentParams)) {
         civicrm_api3('ParticipantPayment', 'create', $participantPaymentParams);
