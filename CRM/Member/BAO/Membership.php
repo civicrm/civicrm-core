@@ -313,29 +313,28 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // we will deprecate this stuff into the v3 api.
     // API4 doesn't pass in "version" - we explicitly pass it in for API4 Membership - see MembershipSaveTrait
     if (($params['version'] ?? 0) !== 4) {
-      if (isset($ids['membership'])) {
-        $latestContributionID = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($membership->id);
-        if (empty($params['contribution_id']) && !empty($latestContributionID)) {
-          $params['contribution_id'] = $latestContributionID;
+      $hasContributionLineItem = LineItem::get(FALSE)
+        ->addWhere('entity_table', '=', 'civicrm_membership')
+        ->addWhere('entity_id', '=', $membership->id)
+        ->addWhere('contribution_id', 'IS NOT NULL')
+        ->execute()->count();
+
+      if (!$hasContributionLineItem) {
+        // This code ensures a line item is created but it is recommended you pass in 'skipLineItem' or 'line_item'
+        if (empty($params['line_item']) && !empty($params['membership_type_id']) && empty($params['skipLineItem'])) {
+          CRM_Price_BAO_LineItem::getLineItemArray($params, NULL, 'membership', $params['membership_type_id']);
         }
-      }
+        $params['skipLineItem'] = TRUE;
 
-      // This code ensures a line item is created but it is recommended you pass in 'skipLineItem' or 'line_item'
-      if (empty($params['line_item']) && !empty($params['membership_type_id']) && empty($params['skipLineItem'])) {
-        CRM_Price_BAO_LineItem::getLineItemArray($params, NULL, 'membership', $params['membership_type_id']);
-      }
-      $params['skipLineItem'] = TRUE;
+        // Record contribution for this membership and create a MembershipPayment
+        // @todo deprecate this.
+        if (!empty($params['contribution_status_id'])) {
+          CRM_Core_Error::deprecatedWarning('creating a contribution via membership BAO is no longer possible');
+        }
 
-      // Record contribution for this membership and create a MembershipPayment
-      // @todo deprecate this.
-      if (!empty($params['contribution_status_id'])) {
-        CRM_Core_Error::deprecatedWarning('creating a contribution via membership BAO is no longer possible');
-      }
-
-      // If the membership has no associated contribution then we ensure
-      // the line items are 'correct' here. This is a lazy legacy
-      // hack whereby they are deleted and recreated
-      if (empty($latestContributionID)) {
+        // If the membership has no associated contribution then we ensure
+        // the line items are 'correct' here. This is a lazy legacy
+        // hack whereby they are deleted and recreated
         if (!empty($params['lineItems'])) {
           CRM_Core_Error::deprecatedWarning('do not pass in lineItems');
           $params['line_item'] = $params['lineItems'];
