@@ -237,9 +237,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
         //   we need to explicitly create the lineItems.
         foreach ($params['line_item'] ?? [] as $lineItems) {
           foreach ($lineItems as $lineItem) {
-            // is_template stops the legacy MembershipPayment record from being created for the template.
-            $lineItem['is_template'] = TRUE;
-            CRM_Price_BAO_LineItem::create($lineItem);
+            CRM_Price_BAO_LineItem::writeRecord($lineItem);
           }
         }
       }
