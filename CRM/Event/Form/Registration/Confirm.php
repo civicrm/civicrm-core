@@ -865,8 +865,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     $now = date('YmdHis');
 
-    // CRM-20264: fetch CC type ID and number (last 4 digit) and assign it back to $params
-    CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
     // @todo - this should come from the order
     $financialTypeID = !empty($this->getEventValue('financial_type_id')) ? $this->getEventValue('financial_type_id') : $params['financial_type_id'];
 
@@ -882,8 +880,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
       'is_pay_later' => $params['is_pay_later'] ?? 0,
       'campaign_id' => $params['campaign_id'] ?? NULL,
-      'card_type_id' => $params['card_type_id'] ?? NULL,
-      'pan_truncation' => $params['pan_truncation'] ?? NULL,
+      'card_type_id' => $this->getCardTypeID(),
+      'pan_truncation' => $this->getPanTruncation(),
       // The ternary is probably redundant - paymentProcessor should always be set.
       // For pay-later contributions it will be the pay-later processor.
       'payment_processor' => $this->_paymentProcessor ? $this->_paymentProcessor['id'] : NULL,
@@ -927,6 +925,23 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $transaction->commit();
 
     return $contribution;
+  }
+
+  protected function getPanTruncation(): string {
+    return substr((string) $this->getSubmittedValue('credit_card_number'), -4);
+  }
+
+  /**
+   * Get the card_type_id.
+   *
+   * This value is the integer representing the option value for
+   * the credit card type (visa, mastercard). It is stored as part of the
+   * payment record in civicrm_financial_trxn.
+   *
+   * @return int|null
+   */
+  protected function getCardTypeID(): ?int {
+    return CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type'));
   }
 
   /**
