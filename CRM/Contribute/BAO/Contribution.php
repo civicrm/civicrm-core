@@ -303,8 +303,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
         $params['line_item'] = [$order->getLineItems()];
       }
       else {
-        // getLineItemArray() mutates $params['line_item'] by reference rather than returning it.
-        CRM_Price_BAO_LineItem::getLineItemArray($params);
+        $order = new CRM_Financial_BAO_Order();
+        $order->setDefaultFinancialTypeID($params['financial_type_id'] ?? NULL);
+        $order->setPriceSetToDefault('contribution');
+        $order->setOverrideTotalAmount((float) ($params['total_amount'] ?? 0));
+        $order->setLineItem([], 0);
+        $params['line_item'] = [$order->getLineItems()];
       }
     }
     if (!empty($params['membership_id'])) {
