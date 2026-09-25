@@ -199,6 +199,40 @@ trait CRM_Queue_Queue_SqlTrait {
     $this->releaseItems($items);
   }
 
+  /**
+   * Try to claim a specific candidate row via a guarded UPDATE.
+   *
+   * This allows claiming of items without table-level locking:
+   * the UPDATE only succeeds if the row's run_count still matches what
+   * the caller's SELECT returned and the release_time is still eligible,
+   * so two processes can't both successfully claim the same row if they
+   * select it concurrently.
+   *
+   * @param object $dao
+   *   The candidate row.
+   * @param int $lease_time
+   *
+   * @return bool
+   *   TRUE if claimed; FALSE if another process has claimed the item (run
+   *   count incremented) or release time is now in the future.
+   */
+  protected function attemptClaim($dao, int $lease_time): bool {
+    $result = CRM_Core_DAO::executeQuery('
+        UPDATE civicrm_queue_item
+        SET release_time = from_unixtime(unix_timestamp() + %1), run_count = %2
+        WHERE id = %3
+          AND run_count = %4
+          AND (release_time IS NULL OR UNIX_TIMESTAMP(release_time) < %5)
+      ', [
+        1 => [CRM_Utils_Time::delta() + $lease_time, 'Integer'],
+        2 => [$dao->run_count + 1, 'Integer'],
+        3 => [$dao->id, 'Integer'],
+        4 => [$dao->run_count, 'Integer'],
+        5 => [CRM_Utils_Time::time(), 'Integer'],
+      ]);
+    return (bool) $result->affectedRows();
+  }
+
   protected function freeDAOs($mixed) {
     $mixed = (array) $mixed;
     foreach ($mixed as $item) {
