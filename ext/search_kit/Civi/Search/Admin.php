@@ -474,6 +474,10 @@ class Admin {
       $joins += [$contactType => []];
       $joins[$contactType] = array_merge($joins[$contactType], $joins['Contact']);
     }
+
+    \Civi::dispatcher()->dispatch('civi.searchkit.joins', \Civi\Core\Event\GenericHookEvent::create([
+      'joins' => &$joins,
+    ]));
     return $joins;
   }
 
