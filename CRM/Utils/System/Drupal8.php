@@ -176,6 +176,20 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
   /**
    * @inheritDoc
+   *
+   * Redirect to Drupal's own user.logout route rather than tearing the session
+   * down directly, so that modules decorating that route run — most importantly
+   * openid_connect, which turns logout into an OIDC end_session redirect to the
+   * identity provider. Calling user_logout() here would end the session but skip
+   * that. The generated URL carries the CSRF token, so it does not hit the
+   * logout confirmation form. See dev/core#6783.
+   */
+  public function logout() {
+    CRM_Utils_System::redirect(\Drupal\Core\Url::fromRoute('user.logout')->toString());
+  }
+
+  /**
+   * @inheritDoc
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
