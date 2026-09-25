@@ -587,6 +587,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * @return bool
+   */
+  protected function isProcessRegistrationInRealTime(): bool {
+    return !$this->_allowWaitlist && !$this->_requireApproval;
+  }
+
+  /**
    * Assign the minimal set of variables to the template.
    */
   public function assignToTemplate() {
@@ -804,6 +811,19 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * @param int $participantNum
+   *
+   * @return float|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getFeeAmountForParticipant(int $participantNum): ?float {
+    if (!$this->getPriceSetID()) {
+      return NULL;
+    }
+    return $this->getOrder()->getTotalAmountForIdentifier($participantNum);
+  }
+
+  /**
    * This is a throw-away object to calculate values, to allow it to validate
    * input values during submission.
    *
@@ -850,13 +870,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function confirmPostProcess($contactID, $participantRecord, int $participantNum = 0): void {
-    //get the amount of primary participant
-    if (!empty($participantRecord['is_primary'])) {
-      $participantRecord['fee_amount'] = $this->get('primaryParticipantAmount');
-    }
-
     // add participant record
-    $participant = $this->addParticipant($participantRecord, $contactID);
+    $participant = $this->addParticipant($participantRecord, $contactID, $participantNum);
     $this->_participantIDS[$participantNum] = $participant->id;
 
     //setting register_by_id field and primaryContactId
@@ -912,13 +927,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @param array $params
    * @param int $contactID
+   * @param $participantNumber
    *
    * @return \CRM_Event_BAO_Participant
    * @throws \CRM_Core_Exception
    */
-  private function addParticipant($params, $contactID): CRM_Event_BAO_Participant {
+  private function addParticipant($params, $contactID, $participantNumber): CRM_Event_BAO_Participant {
     $transaction = new CRM_Core_Transaction();
-
     // handle register date CRM-4320
     $registerDate = NULL;
     if (!empty($this->_allowConfirmation) && $this->_participantId) {
@@ -944,7 +959,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       ),
       'fee_level' => $params['amount_level'] ?? NULL,
       'is_pay_later' => $params['is_pay_later'] ?? 0,
-      'fee_amount' => $params['fee_amount'] ?? NULL,
+      'fee_amount' => $this->getFeeAmountForParticipant($participantNumber),
       'registered_by_id' => $params['registered_by_id'] ?? NULL,
       'discount_id' => $params['discount_id'] ?? NULL,
       'fee_currency' => $this->getCurrency(),
@@ -2121,8 +2136,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function getLineItems(): array {
     if (!isset($this->lineItems)) {
-      $this->resetOrder();
-      $this->lineItems = $this->getOrder()->getLineItems();
+      $this->lineItems = [];
+      if ($this->getPriceSetID()) {
+        $this->resetOrder();
+        $this->lineItems = $this->getOrder()->getLineItems();
+      }
     }
     return $this->lineItems;
   }

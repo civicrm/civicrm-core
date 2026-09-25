@@ -344,35 +344,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
     // record line items and financial items
     if (empty($params['skipLineItem'])) {
-      if (!empty($params['membership_id'])) {
-        CRM_Core_Error::deprecatedWarning('pass in correct line items, do not pass in membership_id');
-        $entityId = $params['membership_id'];
-        $entityTable = 'civicrm_membership';
-      }
-      else {
-        $entityId = $this->getContributionID();
-        $entityTable = 'civicrm_contribution';
-      }
-      foreach ($params['line_item'] as &$values) {
-        foreach ($values as &$line) {
-          if (empty($line['entity_table'])) {
-            $line['entity_table'] = $entityTable;
-          }
-          if (empty($line['entity_id'])) {
-            $line['entity_id'] = $entityId;
-          }
-          $line['contribution_id'] = $this->getContributionID();
-          if ($line['entity_table'] === 'civicrm_contribution') {
-            $line['entity_id'] = $this->getContributionID();
-          }
-
-          // if financial type is not set and if price field value is NOT NULL
-          // get financial type id of price field value
-          if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
-            $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
-          }
-        }
-      }
       $this->createLineItems($params['line_item']);
     }
 

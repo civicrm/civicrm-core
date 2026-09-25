@@ -146,36 +146,6 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Create individual pledge payment.
-   *
-   * @param array $params
-   *
-   * @return CRM_Pledge_DAO_PledgePayment
-   * @throws \CRM_Core_Exception
-   * @deprecated
-   */
-  public static function create(array $params): CRM_Pledge_DAO_PledgePayment {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
-   * Add pledge payment.
-   *
-   * @deprecated
-   *
-   * @param array $params
-   *   Fields in line with the database entity.
-   *
-   * @return CRM_Pledge_DAO_PledgePayment
-   * @throws \CRM_Core_Exception
-   */
-  public static function add(array $params): CRM_Pledge_DAO_PledgePayment {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * @deprecated
    * @param array $params
    * @param array $defaults
@@ -183,18 +153,6 @@ WHERE     pledge_id = %1
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
-   * Delete pledge payment.
-   *
-   * @param int $id
-   * @deprecated
-   * @return bool
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) self::deleteRecord(['id' => $id]);
   }
 
   /**

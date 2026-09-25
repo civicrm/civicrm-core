@@ -24,6 +24,7 @@ trait CustomFieldSaveTrait {
     foreach ($items as &$field) {
       if (empty($field['id'])) {
         self::formatOptionValues($field);
+        self::setHtmlType($field);
       }
     }
     return parent::write($items);
@@ -57,6 +58,18 @@ trait CustomFieldSaveTrait {
         $field['option_description'][] = $value['description'] ?? NULL;
         $field['option_icon'][] = $value['icon'] ?? NULL;
       }
+    }
+  }
+
+  /**
+   * If html_type is omitted, supply the first valid option for given data_type
+   */
+  private static function setHtmlType(array &$field): void {
+    if (!isset($field['html_type'])) {
+      // This is the default per CustomFieldCreationSpecProvider
+      $dataType = $field['data_type'] ?? 'String';
+      $options = \Civi::entity('CustomField')->getOptions('html_type', ['data_type' => $dataType]);
+      $field['html_type'] = $options[0]['id'];
     }
   }
 

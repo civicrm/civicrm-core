@@ -45,6 +45,7 @@ return [
       'localizable' => TRUE,
       'description' => ts('Friendly Name.'),
       'add' => '4.2',
+      'usage' => ['import'],
     ],
     'description' => [
       'title' => ts('Batch Description'),
@@ -57,6 +58,7 @@ return [
         'rows' => 4,
         'cols' => 80,
       ],
+      'usage' => ['import'],
     ],
     'created_id' => [
       'title' => ts('Created By Contact ID'),
@@ -138,6 +140,7 @@ return [
       'pseudoconstant' => [
         'option_group_name' => 'batch_status',
       ],
+      'usage' => ['import'],
     ],
     'type_id' => [
       'title' => ts('Batch Type'),
@@ -148,6 +151,7 @@ return [
       'pseudoconstant' => [
         'option_group_name' => 'batch_type',
       ],
+      'usage' => ['import'],
     ],
     'mode_id' => [
       'title' => ts('Batch Mode'),
@@ -158,6 +162,7 @@ return [
       'pseudoconstant' => [
         'option_group_name' => 'batch_mode',
       ],
+      'usage' => ['import'],
     ],
     'total' => [
       'title' => ts('Batch Total'),
@@ -165,6 +170,7 @@ return [
       'input_type' => 'Text',
       'description' => ts('Total amount for this batch.'),
       'add' => '4.2',
+      'usage' => ['import'],
     ],
     'item_count' => [
       'title' => ts('Batch Number of Items'),
@@ -172,6 +178,7 @@ return [
       'input_type' => 'Text',
       'description' => ts('Number of items in a batch.'),
       'add' => '4.2',
+      'usage' => ['import'],
     ],
     'payment_instrument_id' => [
       'title' => ts('Batch Payment Method'),

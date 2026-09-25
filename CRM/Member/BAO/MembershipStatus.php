@@ -17,28 +17,6 @@
 class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus implements \Civi\Core\HookInterface {
 
   /**
-   * @deprecated
-   * @param array $params
-   * @param array $defaults
-   * @return self|null
-   */
-  public static function retrieve($params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipStatus', $id, 'is_active', $is_active);
-  }
-
-  /**
    * Takes an associative array and creates a membership status object.
    *
    * @param array $params
@@ -132,18 +110,6 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus im
       CRM_Core_DAO::storeValues($membershipStatus, $statusDetails);
     }
     return $statusDetails;
-  }
-
-  /**
-   * Delete membership status.
-   *
-   * @param int $membershipStatusId
-   * @deprecated
-   * @throws CRM_Core_Exception
-   */
-  public static function del($membershipStatusId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    static::deleteRecord(['id' => $membershipStatusId]);
   }
 
   /**

@@ -57,7 +57,9 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->set('context', 'advanced');
+    if ($this->_context !== 'amtg') {
+      $this->set('context', 'advanced');
+    }
 
     $this->_searchPane = $_GET['searchPane'] ?? NULL;
 

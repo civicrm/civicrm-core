@@ -38,17 +38,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Member_DAO_MembershipType', $id, 'is_active', $is_active);
-  }
-
-  /**
    * Add the membership types.
    *
    * @param array $params
@@ -95,26 +84,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
     civicrm_api3('membership', 'getfields', ['cache_clear' => 1, 'fieldname' => 'membership_type_id']);
     civicrm_api3('profile', 'getfields', ['action' => 'submit', 'cache_clear' => 1]);
     Civi::cache('metadata')->clear();
-  }
-
-  /**
-   * Delete membership Types.
-   *
-   * @param int $membershipTypeId
-   *
-   * @deprecated
-   * @throws CRM_Core_Exception
-   * @return bool
-   */
-  public static function del($membershipTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    try {
-      static::deleteRecord(['id' => $membershipTypeId]);
-      return TRUE;
-    }
-    catch (CRM_Core_Exception $e) {
-      return FALSE;
-    }
   }
 
   /**
@@ -247,31 +216,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
       $membershipTypes[$membershipType->id] = $membershipType->name;
     }
     return $membershipTypes;
-  }
-
-  /**
-   * Get membership Type Details (cached).
-   *
-   * @deprecated use getMembershipType.
-   *
-   * @param int $membershipTypeId
-   *
-   * @return array|null
-   */
-  public static function getMembershipTypeDetails($membershipTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('getMembershipType');
-    $membershipTypeDetails = [];
-
-    $membershipType = new CRM_Member_DAO_MembershipType();
-    $membershipType->is_active = 1;
-    $membershipType->id = $membershipTypeId;
-    if ($membershipType->find(TRUE)) {
-      CRM_Core_DAO::storeValues($membershipType, $membershipTypeDetails);
-      return $membershipTypeDetails;
-    }
-    else {
-      return NULL;
-    }
   }
 
   /**

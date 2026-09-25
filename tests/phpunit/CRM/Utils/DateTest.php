@@ -2773,4 +2773,15 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     ];
   }
 
+  public function testDatePluginToSetting(): void {
+    foreach (CRM_Core_SelectValues::getDatePluginInputFormats() as $format => $label) {
+      $setting = CRM_Utils_Date::datePluginToSetting($format, NULL);
+      $this->assertNotEmpty($setting, "Format $format should map to a setting");
+      $this->assertStringStartsWith('dateformat', $setting);
+    }
+    // Check with time
+    $setting = CRM_Utils_Date::datePluginToSetting($format, 1);
+    $this->assertSame('dateformatDatetime', $setting);
+  }
+
 }

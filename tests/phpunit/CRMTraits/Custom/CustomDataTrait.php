@@ -358,7 +358,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return array
    */
   protected function createMultiCountryCustomField(array $params = []): array {
-    $params = array_merge($this->getFieldsValuesByType('Country', 'Multi-Select Country'), $params);
+    $params = array_merge($this->getFieldsValuesByType('Country'), ['serialize' => 1, 'label' => 'Country-multi'], $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
 
@@ -384,7 +384,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return array
    */
   protected function createMultiStateCustomField(array $params = []): array {
-    $params = array_merge($this->getFieldsValuesByType('StateProvince', 'Multi-Select State/Province'), $params);
+    $params = array_merge($this->getFieldsValuesByType('StateProvince'), ['serialize' => 1, 'label' => 'State-multi'], $params);
     return $this->callAPISuccess('custom_field', 'create', $params)['values'][0];
   }
 
@@ -619,7 +619,8 @@ trait CRMTraits_Custom_CustomDataTrait {
         ],
         'Multi-Select' => [
           'label' => 'Pick Color',
-          'html_type' => 'Multi-Select',
+          'html_type' => 'Select',
+          'serialize' => 1,
           'data_type' => 'String',
           'text_length' => '',
           'default_value' => '',
@@ -843,25 +844,16 @@ trait CRMTraits_Custom_CustomDataTrait {
       'StateProvince' => [
         'default' => [
           'data_type' => 'StateProvince',
-          'html_type' => 'Select State/Province',
+          'html_type' => 'Select',
           'label' => 'State',
           'option_type' => 0,
-        ],
-        'Multi-Select State/Province' => [
-          'html_type' => 'Multi-Select State/Province',
-          'label' => 'State-multi',
         ],
       ],
       'Country' => [
         'default' => [
           'data_type' => 'Country',
-          'html_type' => 'Select Country',
+          'html_type' => 'Select',
           'label' => 'Country',
-          'option_type' => 0,
-        ],
-        'Multi-Select Country' => [
-          'html_type' => 'Multi-Select Country',
-          'label' => 'Country-multi',
           'option_type' => 0,
         ],
       ],

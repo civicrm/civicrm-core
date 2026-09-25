@@ -33,7 +33,7 @@ class CRM_Contact_Form_Edit_Phone {
    * @deprecated since 6.3 will be removed around 6.10
    */
   public static function buildQuickForm(&$form, $addressBlockCount = NULL, $blockEdit = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     // passing this via the session is AWFUL. we need to fix this
     if (!$addressBlockCount) {
       CRM_Core_Error::deprecatedWarning('pass in blockCount');

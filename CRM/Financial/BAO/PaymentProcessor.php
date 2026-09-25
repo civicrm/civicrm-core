@@ -73,17 +73,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_PaymentProcessor', $id, 'is_active', $is_active);
-  }
-
-  /**
    * Retrieve the default payment processor.
    *
    * @return CRM_Financial_DAO_PaymentProcessor|null
@@ -97,17 +86,6 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       self::$_defaultPaymentProcessor = self::retrieve($params, $defaults);
     }
     return self::$_defaultPaymentProcessor;
-  }
-
-  /**
-   * Delete payment processor.
-   *
-   * @param int $paymentProcessorID
-   * @deprecated
-   */
-  public static function del($paymentProcessorID) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    static::deleteRecord(['id' => $paymentProcessorID]);
   }
 
   /**

@@ -117,14 +117,14 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
     CustomField::create()
       ->addValue('label', 'Custom1')
       ->addValue('custom_group_id', $customGroup['id'])
-      ->addValue('html_type', 'String')
+      ->addValue('html_type', 'Text')
       ->addValue('data_type', 'String')
       ->execute();
 
     CustomField::create(FALSE)
       ->addValue('label', 'Custom2')
       ->addValue('custom_group_id', $customGroup['id'])
-      ->addValue('html_type', 'String')
+      ->addValue('html_type', 'Text')
       ->addValue('data_type', 'String')
       ->execute();
 

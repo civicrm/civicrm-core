@@ -24,15 +24,6 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP implements \Civi\Core\HookInterfac
   public static $_pcpLinks = NULL;
 
   /**
-   * @deprecated
-   * @return CRM_PCP_DAO_PCP
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    *
    * @param \Civi\Core\Event\PreEvent $event
@@ -343,15 +334,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
       CRM_Utils_Hook::links('pcp.user.actions.all', 'Pcp', $pcpId, self::$_pcpLinks['all']);
     }
     return self::$_pcpLinks;
-  }
-
-  /**
-   * @deprecated
-   * @param int $id
-   */
-  public static function deleteById($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return self::deleteRecord(['id' => $id]);
   }
 
   /**

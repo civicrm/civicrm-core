@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
   // Example usage: <af-form ctrl="afform">
   angular.module('af').component('afForm', {
@@ -217,7 +217,7 @@
 
         // If autosave enabled, save every ten seconds if changes have been made
         if (autoSaveEnabled) {
-          autoSave = _.debounce(ctrl.submitDraft, 10000);
+          autoSave = CRM.utils.debounce(ctrl.submitDraft, 10000);
         }
 
         cancelDraftWatcher = $scope.$watch(() => data, function (newVal, oldVal) {
@@ -606,7 +606,6 @@
           return null;
         }
         const tokens = new Set(message.match(/\[[a-zA-Z0-9_]+\.[0-9]+\.[^\]]+\]/g));
-
         return tokens.size ? tokens : null;
       };
 
@@ -631,10 +630,12 @@
 
       this.replaceTokens = (message) => {
         const tokens = this.identifyTokens(message);
-        const tokenValues = this.getTokenValues(tokens);
-        tokens.forEach((token) => message = message.replaceAll(token, tokenValues[token]));
+        if (tokens) {
+          const tokenValues = this.getTokenValues(tokens);
+          tokens.forEach((token) => message = message.replaceAll(token, tokenValues[token]));
+        }
         return message;
       };
     }
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

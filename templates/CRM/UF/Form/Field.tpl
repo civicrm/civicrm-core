@@ -14,42 +14,29 @@
     {ts}WARNING: Deleting this profile field will remove it from Profile forms and listings. If this field is used in any 'stand-alone' Profile forms, you will need to update those forms to remove this field.{/ts} {ts}Do you want to continue?{/ts}
   </div>
 {else}
-  <table class="form-layout-compressed">
-    <tr class="crm-uf-field-form-block-field_name">
-      <td class="label">{$form.field_name.label} {help id='field_name'}</td>
-      <td>{$form.field_name.html nofilter}<br />
-        <span class="description">&nbsp;{ts}Select the type of CiviCRM record and the field you want to include in this Profile.{/ts}</span></td>
-    </tr>
-    <tr class="crm-uf-field-form-block-label">
-      <td class="label">{$form.label.label} {help id='label'}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_field' field='label' id=$fieldId}{/if}</td>
-      <td>{$form.label.html}</td>
-    </tr>
-    <tr class="crm-uf-field-form-block-is_multi">
-      <td class="label">{$form.is_multi_summary.label}{help id='is_multi_summary'}</td>
-      <td>{$form.is_multi_summary.html}<br />
-    </tr>
-    <tr class="crm-uf-field-form-block-is_required">
-      <td class="label">{$form.is_required.label} {help id='is_required'}</td>
-      <td>{$form.is_required.html}</td>
-    </tr>
-    <tr class="crm-uf-field-form-block-is_view">
-      <td class="label">{$form.is_view.label} {help id='is_view'}</td>
-      <td>{$form.is_view.html}</td>
-    </tr>
-    {if $legacyprofiles}
-      <tr  id="profile_visibility" class="crm-uf-field-form-block-visibility">
-        <td class="label">{$form.visibility.label} {help id='visibility'}</td>
-        <td>{$form.visibility.html}</td>
+  {crmRegion name='profile-field-form'}
+    <table class="form-layout-compressed">
+      <tr class="crm-uf-field-form-block-field_name">
+        <td class="label">{$form.field_name.label} {help id='field_name'}</td>
+        <td>{$form.field_name.html nofilter}<br />
+          <span class="description">&nbsp;{ts}Select the type of CiviCRM record and the field you want to include in this Profile.{/ts}</span></td>
       </tr>
-      <tr class="crm-uf-field-form-block-is_searchable">
-        <td class="label"><div id="is_search_label">{$form.is_searchable.label} {help id='is_searchable'}</div></td>
-        <td><div id="is_search_html">{$form.is_searchable.html}</td>
+      <tr class="crm-uf-field-form-block-label">
+        <td class="label">{$form.label.label} {help id='label'}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_field' field='label' id=$fieldId}{/if}</td>
+        <td>{$form.label.html}</td>
       </tr>
-      <tr class="crm-uf-field-form-block-in_selector">
-        <td class="label"><div id="in_selector_label">{$form.in_selector.label}{help id='in_selector'}</div></td>
-        <td><div id="in_selector_html">{$form.in_selector.html}</div></td>
+      <tr class="crm-uf-field-form-block-is_multi">
+        <td class="label">{$form.is_multi_summary.label}{help id='is_multi_summary'}</td>
+        <td>{$form.is_multi_summary.html}<br />
       </tr>
-    {/if}
+      <tr class="crm-uf-field-form-block-is_required">
+        <td class="label">{$form.is_required.label} {help id='is_required'}</td>
+        <td>{$form.is_required.html}</td>
+      </tr>
+      <tr class="crm-uf-field-form-block-is_view">
+        <td class="label">{$form.is_view.label} {help id='is_view'}</td>
+        <td>{$form.is_view.html}</td>
+      </tr>
     <tr class="crm-uf-field-form-block-help_pre">
       <td class="label">{$form.help_pre.label}{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_uf_field' field='help_pre' id=$fieldId}{/if} {help id='help_pre'}</td>
       <td>{$form.help_pre.html}</td>
@@ -67,6 +54,7 @@
       <td>{$form.is_active.html}</td>
     </tr>
   </table>
+  {/crmRegion}
 {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

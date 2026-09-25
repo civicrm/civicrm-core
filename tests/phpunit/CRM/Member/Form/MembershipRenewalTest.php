@@ -568,6 +568,37 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that the renewal contribution gets the membership start date as its revenue recognition date.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitWithDeferredRecognition(): void {
+    Civi::settings()->set('deferred_revenue_enabled', TRUE);
+    $this->createLoggedInUser();
+    $this->getTestForm('CRM_Member_Form_MembershipRenewal', [
+      'contact_id' => $this->ids['Contact']['individual'],
+      'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['annual_fixed']],
+      'num_terms' => '1',
+      'total_amount' => '50.00',
+      'financial_type_id' => '2',
+      'payment_instrument_id' => 4,
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'record_contribution' => TRUE,
+      'contribution_status_id' => 1,
+    ], ['cid' => $this->ids['Contact']['individual'], 'id' => $this->ids['Membership']['default']])
+      ->processForm();
+    $membership = Membership::get(FALSE)
+      ->addSelect('start_date')
+      ->addWhere('id', '=', $this->ids['Membership']['default'])
+      ->execute()->single();
+    $contribution = Contribution::get(FALSE)
+      ->addSelect('revenue_recognition_date')
+      ->addWhere('contact_id', '=', $this->ids['Contact']['individual'])
+      ->execute()->single();
+    $this->assertEquals($membership['start_date'], substr($contribution['revenue_recognition_date'], 0, 10));
+  }
+
+  /**
    * Test the submit function of the membership form.
    * Expected behaviour: Membership is renewed with 2 terms, ignoring renewal_date
    *

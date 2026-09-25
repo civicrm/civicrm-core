@@ -840,16 +840,4 @@ AND    record_type_id = {$targetRecordID}
     return $result;
   }
 
-  /**
-   * Delete the mailing job.
-   *
-   * @param int $id
-   * @deprecated
-   * @return bool
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) self::deleteRecord(['id' => $id]);
-  }
-
 }

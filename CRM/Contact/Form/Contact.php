@@ -35,6 +35,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    */
   protected bool $isContactSummaryEdit = TRUE;
 
+  /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
 
   /**
    * The contact type of the form.

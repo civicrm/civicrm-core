@@ -127,7 +127,6 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     $searchName = $group['search_name'];
     $displayName = $group['entity_name'] . '_Tab';
     $displayLabel = $group['title'];
-    $description = E::ts('Tab display for %1', [1 => $group['title']]);
 
     return [
       'module' => E::LONG_NAME,
@@ -145,7 +144,6 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
           'settings' => [
             'placeholder' => 5,
             'columns' => $columns,
-            'description' => $description,
             'pager' => [
               'show_count' => TRUE,
               'expose_limit' => TRUE,
@@ -210,6 +208,11 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
       $column['link'] = [
         'path' => "[$alias.url]",
       ];
+    }
+    elseif ($field['data_type'] === 'Date') {
+      if (!empty($field['date_format']) || !empty($field['time_format'])) {
+        $column['format'] = \CRM_Utils_Date::datePluginToSetting($field['date_format'] ?? '', $field['time_format'] ?? NULL);
+      }
     }
 
     return $column;

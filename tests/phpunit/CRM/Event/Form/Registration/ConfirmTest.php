@@ -165,7 +165,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_alterPaymentProcessorParams', [$this, 'checkPaymentParameters']);
     $paymentProcessorID = $this->processorCreate();
     $event = $this->eventCreatePaid(['payment_processor' => [$paymentProcessorID]]);
-    $_REQUEST['mode'] = 'live';
     // Add someone to the waitlist.
     $waitlistContactID = $this->individualCreate();
     $waitlistParticipantID = $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContactID, 'status_id.name' => 'On waitlist']);
@@ -198,7 +197,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'billing_state_province-5' => 'AP',
       'billing_country-5' => 'US',
       'hidden_processor' => 1,
-    ]);
+    ], 'live');
     $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantID, 'return' => ['participant_status']]);
     $this->assertEquals('Registered', $waitlistParticipant['participant_status'], 'Invalid participant status. Expecting: Registered');
   }
@@ -671,9 +670,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    *
    * @param int $eventID
    * @param array $submittedValues Submitted Values
+   * @param string $mode
    */
-  protected function submitForm(int $eventID, array $submittedValues): void {
-    $form = $this->getFormWrapper($submittedValues, $eventID);
+  protected function submitForm(int $eventID, array $submittedValues, string $mode = ''): void {
+    $form = $this->getFormWrapper($submittedValues, $eventID, $mode);
     $form->processForm();
   }
 
@@ -780,13 +780,18 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   /**
    * @param array $submittedValues
    * @param int $eventID
+   * @param string $mode
    *
    * @return \Civi\Test\FormWrappers\EventFormOnline
    */
-  public function getFormWrapper(array $submittedValues, int $eventID) {
+  public function getFormWrapper(array $submittedValues, int $eventID, string $mode = '') {
+    $urlParameters = ['id' => $eventID];
+    if ($mode !== '') {
+      $urlParameters['mode'] = $mode;
+    }
     return $this->getTestForm('CRM_Event_Form_Registration_Register',
       $submittedValues,
-      ['id' => $eventID])
+      $urlParameters)
       ->addSubsequentForm('CRM_Event_Form_Registration_Confirm');
   }
 

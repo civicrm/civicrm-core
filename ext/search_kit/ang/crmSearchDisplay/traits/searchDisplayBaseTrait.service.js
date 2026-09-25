@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Trait provides base methods and properties common to all search display types
@@ -63,10 +63,10 @@
 
         ctrl.onInitialize.forEach(callback => callback.call(ctrl, $scope, $element));
 
-        // _.debounce used here to trigger the initial search immediately but prevent subsequent launches within 300ms
-        this.getResultsPronto = _.debounce(ctrl.runSearch, 300, {leading: true, trailing: false});
-        // _.debounce used here to schedule a search if nothing else happens for 600ms: useful for auto-searching on typing
-        this.getResultsSoon = _.debounce(function() {
+        // Leading edge only: run the initial search immediately but prevent subsequent launches within 300ms
+        this.getResultsPronto = CRM.utils.debounce(ctrl.runSearch, 300, {leading: true, trailing: false});
+        // Trailing edge: schedule a search if nothing else happens for 600ms, useful for auto-searching on typing
+        this.getResultsSoon = CRM.utils.debounce(function() {
           $scope.$apply(function() {
             ctrl.runSearch();
           });
@@ -379,4 +379,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

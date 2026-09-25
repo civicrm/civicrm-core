@@ -350,10 +350,15 @@ class CRM_Search_Import_Parser extends CRM_Import_Parser {
   }
 
   public function validateRow(?array $values): bool {
-    $params = $this->getMappedRow($values);
-    \CRM_Utils_Hook::importAlterMappedRow('validate', strtolower($this->baseEntity) . '_import_searchkit', $params, $values, $this->getUserJobID());
-    // TODO
-    return TRUE;
+    try {
+      $params = $this->getMappedRow($values);
+      \CRM_Utils_Hook::importAlterMappedRow('validate', strtolower($this->baseEntity) . '_import_searchkit', $params, $values, $this->getUserJobID());
+      return TRUE;
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->setImportStatus($values['_id'], 'ERROR', $e->getMessage());
+      return FALSE;
+    }
   }
 
   private function extractEntityFromFieldName(string &$fieldName): string {

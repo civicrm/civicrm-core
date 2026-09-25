@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // Declare a list of dependencies.
   angular.module('crmCiviimport', CRM.angRequires('crmCiviimport'));
 
@@ -117,7 +117,7 @@
             // The $scope.data.entities has the selected data (but the fields are already filtered)
             var selected = $scope.data.entities[entity.entity_name].selected;
             if (selected.action !== 'ignore') {
-              const availableEntity = _.clone(entity);
+              const availableEntity = Object.assign({}, entity);
               availableEntity.children = filterEntityFields(entity.entity_type, entity.children, selected, entity.entity_name + '.');
               fields.push(availableEntity);
             }
@@ -454,4 +454,4 @@
       entity.selected.dedupe_rule = [];
     });
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

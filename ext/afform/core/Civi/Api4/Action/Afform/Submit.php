@@ -10,6 +10,7 @@ use Civi\Afform\FormDataModel;
 use Civi\Api4\AfformSubmission;
 use Civi\Api4\RelationshipType;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Exception\DBQueryException;
 
 /**
  * Class Submit
@@ -571,6 +572,13 @@ class Submit extends AbstractProcessor {
         $event->setEntityId($index, $saved[$idField]);
         $event->setSaved($index, $saved);
         self::saveJoins($event, $index, $saved[$idField], $record['joins'] ?? []);
+      }
+      catch (DBQueryException $e) {
+        // The database rejected the statement, so data the user entered was not stored. That
+        // is never the "optional entity left blank" case handled below, and reporting success
+        // for it leaves the submitter believing their data is safe.
+        \Civi::log('afform')->error('Afform: ' . $event->getAfform()['name'] . ': Database error on submit in processGenericEntity call for "' . $event->getEntityName() . '". Message: ' . $e->getMessage());
+        throw $e;
       }
       catch (\CRM_Core_Exception $e) {
         // What to do here? Sometimes we should silently ignore errors, e.g. an optional entity

@@ -179,14 +179,14 @@
   CRM.$(function($) {
     const
       $form = $('form.{/literal}{$form.formClass}{literal}'),
-      dataToHTML = {/literal}{$dataToHTML|json}{literal},
       originalHtmlType = '{/literal}{$originalHtmlType}{literal}',
       existingMultiValueCount = {/literal}{if empty($existingMultiValueCount)}null{else}{$existingMultiValueCount}{/if}{literal},
       originalSerialize = {/literal}{if empty($originalSerialize)}false{else}true{/if}{literal},
-      htmlTypes = CRM.utils.getOptions($('#html_type', $form)),
-      htmlTypesWithOptionalSerialize = {/literal}{$htmlTypesWithOptionalSerialize|json}{literal},
-      htmlTypesWithMandatorySerialize = {/literal}{$htmlTypesWithMandatorySerialize|json}{literal},
-      dataTypesWithoutSerialize = {/literal}{$dataTypesWithoutSerialize|json}{literal};
+      htmlTypes = {/literal}{$htmlTypes|json}{literal},
+      htmlTypesById = Object.fromEntries(htmlTypes.map(t => {
+        t.text = t.label;
+        return [t.id, t];
+      }));
 
     // Vars used by makeDefaultValueField()
     let oldDataType = null,
@@ -195,13 +195,11 @@
       oldOptionGroupId = null;
 
     function onChangeDataType() {
-      const dataType = $('#data_type', $form).val();
-      const allowedHtmlTypes = htmlTypes.filter(type =>
-        dataToHTML[dataType].includes(type.key)
-      );
-      CRM.utils.setOptions($('#html_type', $form), allowedHtmlTypes);
-      if (!$('#html_type', $form).val()) {
-        $('#html_type', $form).val(dataToHTML[dataType][0]).change();
+      const dataType = $('[name=data_type]', $form).val();
+      const allowedHtmlTypes = htmlTypes.filter(type => dataType in type.data_types);
+      $('#html_type', $form).select2({data: allowedHtmlTypes});
+      if (!allowedHtmlTypes.some(type => type.id === $('[name=html_type]', $form).val())) {
+        $('#html_type', $form).select2('val', allowedHtmlTypes[0]?.id || '', true);
       }
       // Hide html_type if there is only one option
       $('.crm-custom-field-form-block-html_type').toggle(allowedHtmlTypes.length > 1);
@@ -220,13 +218,14 @@
     }
 
     function onChangeHtmlType() {
-      const htmlType = $('#html_type', $form).val();
-      const dataType = $('#data_type', $form).val();
+      const htmlType = $('[name=html_type]', $form).val();
+      const dataType = $('[name=data_type]', $form).val();
+      const serializeSetting = htmlTypesById[htmlType]?.data_types[dataType]?.serialize || 'never';
 
-      if (htmlTypesWithMandatorySerialize.includes(htmlType)) {
+      if (serializeSetting === 'always') {
         $('#serialize', $form).prop('checked', true);
       }
-      else if (!htmlTypesWithOptionalSerialize.includes(htmlType)) {
+      else if (serializeSetting === 'never') {
         $('#serialize', $form).prop('checked', false);
       }
 
@@ -262,14 +261,14 @@
     $('.toggle-contact-ref-mode', $form).click(toggleContactRefFilter);
 
     function hasOptionGroup() {
-      const dataType = $("#data_type", $form).val();
-      const htmlType = $("#html_type", $form).val();
-      return (['String', 'Int', 'Float', 'Money'].includes(dataType)) && !['Text', 'Hidden'].includes(htmlType);
+      const dataType = $("[name=data_type]", $form).val();
+      const htmlType = $("[name=html_type]", $form).val();
+      return Boolean(htmlTypesById[htmlType]?.data_types[dataType]?.option_group);
     }
 
     function customOptionHtmlType() {
-      const dataType = $("#data_type", $form).val();
-      const htmlType = $("#html_type", $form).val();
+      const dataType = $("[name=data_type]", $form).val();
+      const htmlType = $("[name=html_type]", $form).val();
       const serialize = $("#serialize", $form).is(':checked');
 
       if (!htmlType) {
@@ -305,7 +304,7 @@
         }
       }
 
-      if (['String', 'Int', 'Float', 'Money'].includes(dataType) && !['Text', 'Hidden'].includes(htmlType)) {
+      if (hasOptionGroup()) {
         if (serialize) {
           $('div[id^=checkbox]', '#optionField').show();
           $('div[id^=radio]', '#optionField').hide();
@@ -323,7 +322,7 @@
 
       $("#noteColumns, #noteRows, #noteLength", $form).toggle(dataType === 'Memo');
 
-      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlTypesWithOptionalSerialize.includes(htmlType) && !dataTypesWithoutSerialize.includes(dataType));
+      $(".crm-custom-field-form-block-serialize", $form).toggle(htmlTypesById[htmlType]?.data_types[dataType]?.serialize === 'optional');
 
       makeDefaultValueField(dataType);
     }
@@ -398,15 +397,15 @@
     });
 
     $form.submit(function() {
-      const htmlType = $('#html_type', $form).val();
+      const htmlType = $('[name=html_type]', $form).val();
       const serialize = $("#serialize", $form).is(':checked');
-      let htmlTypeLabel = (serialize && ['Select', 'Autocomplete-Select'].includes(htmlType)) ? ts('Multi-Select') : htmlTypes.find(item => item.key === htmlType).value;
+      let htmlTypeLabel = (serialize && ['Select', 'Autocomplete-Select'].includes(htmlType)) ? ts('Multi-Select') : (htmlTypesById[htmlType]?.label || htmlType);
       if (originalHtmlType && (originalHtmlType !== htmlType || originalSerialize !== serialize)) {
-        let origHtmlTypeLabel = (originalSerialize && originalHtmlType === 'Select') ? ts('Multi-Select') : htmlTypes.find(item => item.key === originalHtmlType).value;
+        let origHtmlTypeLabel = (originalSerialize && ['Select', 'Autocomplete-Select'].includes(originalHtmlType)) ? ts('Multi-Select') : (htmlTypesById[originalHtmlType]?.label || originalHtmlType);
         if (originalSerialize && !serialize && existingMultiValueCount) {
           return confirm(ts('WARNING: Changing this multivalued field to singular will result in the loss of data!')
             + "\n" + ts('%1 existing records contain multiple values - the data in each of these fields will be truncated to a single value.', {1: existingMultiValueCount})
-          )
+          );
         } else {
           return confirm(ts('Change this field from %1 to %2? Existing data will be preserved.', {1: origHtmlTypeLabel, 2: htmlTypeLabel}));
         }

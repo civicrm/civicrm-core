@@ -340,6 +340,62 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   /**
+   * Returns a function that postpones calling `fn` until `wait` milliseconds have gone by
+   * without another call. The postponed call gets the arguments and `this` of the most
+   * recent one.
+   *
+   * The returned function carries a `.cancel()` which drops any call still pending.
+   *
+   * @param {function} fn
+   * @param {int} wait milliseconds
+   * @param {object} [options]
+   *   leading: also call `fn` up front, when no wait is already in progress. Default false.
+   *   trailing: call `fn` once the wait elapses. Default true. With `leading` set as well,
+   *     the trailing call only happens if there was more than one call during the wait.
+   * @return {function}
+   */
+  CRM.utils.debounce = function(fn, wait, options) {
+    const leading = !!(options && options.leading),
+      trailing = !options || options.trailing !== false;
+    let timer = null,
+      lastArgs = null,
+      lastThis = null,
+      repeated = false;
+
+    const elapsed = () => {
+      timer = null;
+      if (trailing && (!leading || repeated)) {
+        fn.apply(lastThis, lastArgs);
+      }
+      repeated = false;
+      lastArgs = lastThis = null;
+    };
+
+    function debounced(...args) {
+      const starting = timer === null;
+      lastArgs = args;
+      lastThis = this;
+      if (!starting) {
+        repeated = true;
+        clearTimeout(timer);
+      }
+      timer = setTimeout(elapsed, wait);
+      if (leading && starting) {
+        fn.apply(this, args);
+      }
+    }
+
+    debounced.cancel = () => {
+      clearTimeout(timer);
+      timer = null;
+      repeated = false;
+      lastArgs = lastThis = null;
+    };
+
+    return debounced;
+  };
+
+  /**
    * Render an option list
    * @param options {array}
    * @param val {string} default value
@@ -408,7 +464,8 @@ if (!CRM.vars) CRM.vars = {};
         initialValue = $(this).data('crm-initial-value'),
         currentValue = $(this).is(':checkbox, :radio') ? $(this).prop('checked') : $(this).val();
       // skip change of value for submit buttons
-      if (initialValue !== undefined && !_.isEqual(initialValue, currentValue)) {
+      // A multi-select yields a fresh array on every read, so the two are compared by content
+      if (initialValue !== undefined && JSON.stringify(initialValue) !== JSON.stringify(currentValue)) {
         isDirty = true;
       }
     });
@@ -1459,7 +1516,9 @@ if (!CRM.vars) CRM.vars = {};
     var ajax = typeof params !== 'string';
     if (helpDisplay && helpDisplay.close) {
       // If the same link is clicked twice, just close the display
-      if (helpDisplay.isOpen && _.isEqual(helpPrevious, params)) {
+      // `params` is a string, or a flat object the next line is about to structuredClone,
+      // so it always serialises, and both sides are built by the same caller
+      if (helpDisplay.isOpen && JSON.stringify(helpPrevious) === JSON.stringify(params)) {
         helpDisplay.close();
         return;
       }

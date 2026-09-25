@@ -3700,7 +3700,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       'records' => [
         ['html_type' => 'Text', 'name' => 'float', 'data_type' => 'Float'],
         ['html_type' => 'Text', 'name' => 'money', 'data_type' => 'Money'],
-        ['html_type' => 'Text', 'name' => 'bool', 'data_type' => 'Boolean'],
+        ['html_type' => 'Radio', 'name' => 'bool', 'data_type' => 'Boolean'],
         ['html_type' => 'Select', 'name' => 'floatopts', 'data_type' => 'Float', 'option_values' => ['1' => 'One', '2' => 'Two']],
       ],
     ]);

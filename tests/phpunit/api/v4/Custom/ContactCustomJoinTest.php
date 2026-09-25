@@ -175,7 +175,7 @@ class ContactCustomJoinTest extends Api4TestBase {
       'name' => 'Org',
       'label' => 'Org',
       'custom_group_id.name' => 'Activity_fields',
-      'html_type' => 'EntityRef',
+      'html_type' => 'Autocomplete-Select',
       'data_type' => 'EntityReference',
       'fk_entity' => 'Organization',
     ]);

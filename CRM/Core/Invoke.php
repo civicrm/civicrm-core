@@ -225,9 +225,9 @@ class CRM_Core_Invoke {
         self::statusCheck($template);
       }
 
-      if (isset($item['return_url'])) {
+      if (!empty($item['return_url'])) {
         $session = CRM_Core_Session::singleton();
-        $args = $item['return_url_args'] ?? 'reset=1';
+        $args = !empty($item['return_url_args']) ? $item['return_url_args'] : 'reset=1';
         $session->pushUserContext(CRM_Utils_System::url($item['return_url'], $args));
       }
 
@@ -241,7 +241,10 @@ class CRM_Core_Invoke {
       return $result;
     }
 
-    CRM_Core_Menu::store();
+    // TODO: remove this handling, it is already happening in
+    // CRM_Core_Menu::get
+    CRM_Core_Menu::clear();
+    CRM_Core_Menu::rebuild();
     CRM_Core_Session::setStatus(ts('Menu has been rebuilt'), ts('Complete'), 'success');
     return CRM_Utils_System::redirect();
   }

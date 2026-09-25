@@ -650,7 +650,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public function setLineItems($lineItems): void {
     $this->order->setLineItems($lineItems);
-    $this->set('_lineItem', $lineItems);
   }
 
   /**
@@ -1448,6 +1447,27 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
     return $this->_membershipBlock;
+  }
+
+  /**
+   * Bounce if the page supports separate contribution/membership payments but the
+   * currently-selected processor can't actually process more than one payment at once.
+   *
+   * Only contribution pages have a membership block, so this lives here rather than in
+   * the payment-processor setup code shared with event registration and the backoffice
+   * payment form.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateSeparateMembershipPaymentSupport(): void {
+    if (!empty($this->getMembershipBlock()['is_separate_payment'])
+      && $this->getPaymentProcessorObject()
+      && !$this->getPaymentProcessorObject()->supports('MultipleConcurrentPayments')
+    ) {
+      CRM_Core_Error::statusBounce(ts('This contribution page is configured to support separate contribution and membership payments. This %1 plugin does not currently support multiple simultaneous payments, or the option to "Execute real-time monetary transactions" is disabled. Please contact the site administrator and notify them of this error',
+        [1 => $this->getPaymentProcessorValue('frontend_title')]
+      ));
+    }
   }
 
   /**

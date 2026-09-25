@@ -34,17 +34,4 @@ class CRM_Core_BAO_ActionLog extends CRM_Core_DAO_ActionLog implements HookInter
     }
   }
 
-  /**
-   * Create or update an action log entry.
-   *
-   * @param array $params
-   *
-   * @return CRM_Core_DAO_ActionLog
-   * @deprecated
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
 }

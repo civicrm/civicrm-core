@@ -46,32 +46,12 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_OptionGroup', $id, 'is_active', $is_active);
-  }
-
-  /**
    * @deprecated
    * @return CRM_Core_DAO_OptionGroup
    */
   public static function add($params) {
     CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     return self::writeRecord($params);
-  }
-
-  /**
-   * @deprecated
-   * @param int $optionGroupId
-   */
-  public static function del($optionGroupId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    static::deleteRecord(['id' => $optionGroupId]);
   }
 
   /**

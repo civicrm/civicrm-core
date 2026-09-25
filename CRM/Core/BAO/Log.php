@@ -52,19 +52,6 @@ class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
   }
 
   /**
-   * Add log to civicrm_log table.
-   *
-   * @param array $params
-   *   Array of name-value pairs of log table.
-   * @return CRM_Core_DAO_Log
-   * @deprecated
-   */
-  public static function add(&$params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * @param int $contactID
    * @param string $tableName
    * @param int $tableID

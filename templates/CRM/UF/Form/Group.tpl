@@ -24,6 +24,7 @@
            {$message}
     </div>
 {else}
+  {crmRegion name='profile-settings-form'}
     <table class="form-layout">
       {foreach from=$entityFields item=fieldSpec}
         {if not in_array($fieldSpec.name, $advancedFieldsConverted)}
@@ -56,6 +57,7 @@
     </table>
     {* adding advance setting tab *}
     {include file='CRM/UF/Form/AdvanceSetting.tpl'}
+  {/crmRegion}
 {/if}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

@@ -456,42 +456,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   }
 
   /**
-   * @deprecated
-   */
-  public function addressSequence() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_Address::sequence(Civi::settings()->get(\'address_format\')');
-    return CRM_Utils_Address::sequence(Civi::settings()->get('address_format'));
-  }
-
-  /**
-   * @deprecated
-   */
-  public function defaultContactCountry() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultContactCountry');
-    return CRM_Core_BAO_Country::defaultContactCountry();
-  }
-
-  /**
-   * @deprecated
-   */
-  public function defaultContactCountryName() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultContactCountryName');
-    return CRM_Core_BAO_Country::defaultContactCountryName();
-  }
-
-  /**
-   * @deprecated
-   *
-   * @param string $defaultCurrency
-   *
-   * @return string
-   */
-  public function defaultCurrencySymbol($defaultCurrency = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultCurrencySymbol');
-    return CRM_Core_BAO_Country::defaultCurrencySymbol($defaultCurrency);
-  }
-
-  /**
    * Resets the singleton, so that the next call to CRM_Core_Config::singleton()
    * reloads completely.
    *

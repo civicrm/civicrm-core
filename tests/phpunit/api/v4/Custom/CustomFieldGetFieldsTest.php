@@ -59,12 +59,12 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
         [
           'name' => 'int',
           'data_type' => 'Int',
-          'html_type' => 'Number',
+          'html_type' => 'Text',
         ],
         [
           'name' => 'float',
           'data_type' => 'Float',
-          'html_type' => 'Number',
+          'html_type' => 'Text',
         ],
         [
           'name' => 'currency_field',
@@ -74,7 +74,7 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
         [
           'name' => 'money',
           'data_type' => 'Money',
-          'html_type' => 'Number',
+          'html_type' => 'Text',
           'control_field' => __FUNCTION__ . '.currency_field',
         ],
         [
@@ -207,6 +207,8 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertSame(4, $field['input_attrs']['rows']);
     $this->assertSame(55, $field['input_attrs']['cols']);
     $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    // Memo columns are `text`, so there is no length to advertise
+    $this->assertArrayNotHasKey('maxlength', $field['input_attrs']);
     $this->assertFalse($field['options']);
     $this->assertNull($field['operators']);
     $this->assertNull($field['serialize']);
@@ -232,6 +234,8 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertArrayNotHasKey('step', $field['input_attrs']);
     $this->assertArrayNotHasKey('rows', $field['input_attrs']);
     $this->assertArrayNotHasKey('cols', $field['input_attrs']);
+    // Serialized values are stored in a `text` column, so there is no length to advertise
+    $this->assertArrayNotHasKey('maxlength', $field['input_attrs']);
     $this->assertTrue($field['options']);
     $this->assertNull($field['operators']);
     $this->assertSame(1, $field['serialize']);

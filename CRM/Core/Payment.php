@@ -1265,31 +1265,18 @@ abstract class CRM_Core_Payment {
    * Get URL to return the browser to on success.
    *
    * @param string $qfKey
-   * @param int|null $participantID
-   * @param int|null $entityID
    *
    * @return string
    */
-  protected function getReturnSuccessUrl($qfKey, $participantID = NULL, $entityID = NULL) {
+  protected function getReturnSuccessUrl($qfKey) {
     if (isset($this->successUrl)) {
       return $this->successUrl;
     }
 
-    $params = [
+    return CRM_Utils_System::url($this->getBaseReturnUrl(), [
       '_qf_ThankYou_display' => 1,
       'qfKey' => $qfKey,
-    ];
-
-    if ($this->_component == 'event' && !$entityID && $participantID) {
-      $entityID = \Civi\Api4\Participant::get(FALSE)->addWhere('id', '=', $participantID)
-        ->addSelect('event_id')->execute()->single()['event_id'] ?? NULL;
-    }
-
-    if ($entityID) {
-      $params['id'] = (int) $entityID;
-    }
-
-    return CRM_Utils_System::url($this->getBaseReturnUrl(), $params,
+    ],
       TRUE, NULL, FALSE
     );
   }

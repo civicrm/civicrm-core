@@ -242,8 +242,9 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
         if (empty($customField['is_view'])) {
           $field['usage'][] = 'import';
         }
-        if ($field['input_type'] == 'Text' && $customField['text_length']) {
-          $field['input_attrs']['maxlength'] = (int) $customField['text_length'];
+        // The column length is a hard limit regardless of input type.
+        if (str_contains($field['sql_type'], 'char(')) {
+          $field['input_attrs']['maxlength'] = (int) \CRM_Core_BAO_SchemaHandler::getFieldLength($field['sql_type']);
         }
         if ($field['input_type'] == 'TextArea') {
           $field['input_attrs']['rows'] = (int) ($customField['note_rows'] ?? 4);
@@ -257,10 +258,10 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
           $field['input_attrs']['end_date_years'] = isset($customField['end_date_years']) ? (int) $customField['end_date_years'] : NULL;
         }
         // Number input for numeric fields
-        if ($field['input_type'] === 'Text' && in_array($customField['data_type'], ['Int', 'Float'], TRUE)) {
+        if ($field['input_type'] === 'Text' && in_array($customField['data_type'], ['Int', 'Float', 'Money'], TRUE)) {
           $field['input_type'] = 'Number';
           // Todo: make 'step' configurable for the custom field
-          $field['input_attrs']['step'] = $customField['data_type'] === 'Int' ? 1 : .01;
+          $field['input_attrs']['step'] = $customField['data_type'] === 'Int' ? 1 : 'any';
         }
         // Unserialize filters from url-arg-style string
         if (!empty($customField['filter'])) {

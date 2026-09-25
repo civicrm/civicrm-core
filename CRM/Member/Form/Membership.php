@@ -1373,6 +1373,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $contributionParams['source'] = $params['contribution_source'] ?? NULL;
     $contributionParams['non_deductible_amount'] = 'null';
     $contributionParams['skipCleanMoney'] = TRUE;
+    $contributionParams['revenue_recognition_date'] = $this->getDeferredRevenueRecognitionDate();
     $contributionParams['payment_processor'] = $params['payment_processor_id'] ?? NULL;
     $contributionSoftParams = $params['soft_credit'] ?? NULL;
     $recordContribution = [
@@ -1707,9 +1708,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($this->_mode) {
       // @todo move this outside shared code as Batch entry just doesn't
       $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
-
-      $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($this->_params);
-      $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
+      $this->assign('credit_card_number', $this->getMungedPanTruncation());
+      $this->assign('credit_card_exp_date', $this->getCreditCardExpiryDate());
+      $this->assign('credit_card_type', $this->getCreditCardType());
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
     }

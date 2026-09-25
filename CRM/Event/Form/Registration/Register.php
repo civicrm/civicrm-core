@@ -47,22 +47,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_paymentProcessorID;
 
   /**
-   * Show fee block or not.
-   *
-   * @var bool
-   *
-   * @deprecated
-   */
-  public $_noFees;
-
-  /**
-   * Fee Block.
-   *
-   * @var array
-   */
-  public $_feeBlock;
-
-  /**
    * Get the contact id for the registration.
    *
    * @param array $fields
@@ -125,7 +109,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $eventFull = CRM_Event_BAO_Participant::eventFull($this->_eventId, FALSE, $this->_values['event']['has_waitlist'] ?? NULL);
 
     // Get payment processors if appropriate for this event
-    $this->_noFees = $suppressPayment = $this->isSuppressPayment();
+    $suppressPayment = $this->isSuppressPayment();
     $this->_paymentProcessors = $suppressPayment ? [] : $this->get('paymentProcessors');
     $this->assign('suppressPaymentBlock', $suppressPayment);
     $this->preProcessPaymentOptions();

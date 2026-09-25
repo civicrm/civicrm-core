@@ -72,10 +72,10 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     if (!$contributionIsTemplate && $lineItemBAO->entity_table === 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
       CRM_Member_BAO_MembershipPayment::legacyMembershipPaymentCreateIfNotExist($lineItemBAO->entity_id, $lineItemBAO->contribution_id, TRUE);
     }
-    if ($lineItemBAO->entity_table === 'civicrm_participant' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
+    if ($lineItemBAO->entity_table === 'civicrm_participant' && !empty($params['contribution_id']) && $lineItemBAO->entity_id) {
       $participantPaymentParams = [
         'participant_id' => $lineItemBAO->entity_id,
-        'contribution_id' => $lineItemBAO->contribution_id,
+        'contribution_id' => $params['contribution_id'],
       ];
       if (!civicrm_api3('ParticipantPayment', 'getcount', $participantPaymentParams)) {
         civicrm_api3('ParticipantPayment', 'create', $participantPaymentParams);
@@ -596,26 +596,6 @@ WHERE li.contribution_id = %1";
     $updatedContribution->find(TRUE);
     $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor(NULL, $updatedContribution, $previousLineItems, $submittedLineItems);
     $financialProcessor->changeFeeSelections($submittedLineItems, $contributionId, $taxAmount);
-  }
-
-  /**
-   * Helper function to retrieve submitted line items from form values $inputParams and used $feeBlock
-   *
-   * @param array $inputParams
-   * @param array $feeBlock
-   *
-   * @deprecated since 6.9 will be removed around 6.15
-   * @return array
-   *   List of submitted line items
-   */
-  protected function getSubmittedLineItems($inputParams, $feeBlock) {
-    $submittedLineItems = [];
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
-    foreach ($feeBlock as $id => $values) {
-      CRM_Price_BAO_LineItem::format($id, $inputParams, $values, $submittedLineItems);
-    }
-
-    return $submittedLineItems;
   }
 
   /**

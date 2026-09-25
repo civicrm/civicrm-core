@@ -11,6 +11,8 @@
 
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\UserJob;
+use Civi\Test\FormTrait;
+use Civi\Test\FormWrapper;
 
 /**
  * Trait ParserTrait
@@ -18,6 +20,8 @@ use Civi\Api4\UserJob;
  * Trait for testing imports.
  */
 trait CRMTraits_Import_ParserTrait {
+
+  use FormTrait;
 
   /**
    * @var int
@@ -48,8 +52,6 @@ trait CRMTraits_Import_ParserTrait {
       'groups' => [],
     ], $submittedValues);
     $this->submitDataSourceForm($csv, $submittedValues);
-    $form = $this->getMapFieldForm($submittedValues);
-    $form->setUserJobID($this->userJobID);
     $userJobMetadata = UserJob::get()
       ->addWhere('id', '=', $this->userJobID)
       ->execute()->first()['metadata'];
@@ -79,9 +81,10 @@ trait CRMTraits_Import_ParserTrait {
         'metadata' => $userJobMetadata,
       ])
       ->execute();
-    $form->buildForm();
-    $this->assertTrue($form->validate(), 'Form failed to validate that the fields submitted met the form / dedupe rule requirements ' . print_r($form->_errors, TRUE));
-    $form->postProcess();
+    $wrapper = $this->getMapFieldForm($submittedValues);
+    $wrapper->processForm(FormWrapper::VALIDATED);
+    $this->assertEquals([], $wrapper->getValidationOutput(), 'Form failed to validate that the fields submitted met the form / dedupe rule requirements ' . print_r($wrapper->getValidationOutput(), TRUE));
+    $wrapper->postProcess();
     $this->submitPreviewForm($submittedValues);
   }
 
@@ -91,31 +94,26 @@ trait CRMTraits_Import_ParserTrait {
    * @param array $submittedValues
    */
   protected function submitPreviewForm(array $submittedValues): void {
-    $form = $this->getPreviewForm($submittedValues);
-    $form->setUserJobID($this->userJobID);
-    $form->buildForm();
-    $this->assertTrue($form->validate());
+    $wrapper = $this->getPreviewForm($submittedValues);
+    $wrapper->processForm(FormWrapper::VALIDATED);
+    $this->assertEquals([], $wrapper->getValidationOutput());
+    $wrapper->postProcess();
+    $this->assertInstanceOf(CRM_Core_Exception_PrematureExitException::class, $wrapper->getException(), 'Expected a redirect');
 
-    try {
-      $form->postProcess();
-      $this->fail('Expected a redirect');
+    $queue = Civi::queue('user_job_' . $this->userJobID);
+    if (CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_queue_item')) {
+      $item = $queue->claimItem(0);
+      $this->assertEquals(['contactId' => CRM_Core_Session::getLoggedInContactID(), 'domainId' => CRM_Core_Config::domainID()], $item->data->runAs);
+      $queue->releaseItem($item);
+      $runner = new CRM_Queue_Runner([
+        'queue' => $queue,
+        'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
+      ]);
+      $result = $runner->runAll();
+      $this->assertEquals(TRUE, $result, $result === TRUE ? '' : CRM_Core_Error::formatTextException($result['exception']));
     }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $queue = Civi::queue('user_job_' . $this->userJobID);
-      if (CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_queue_item')) {
-        $item = $queue->claimItem(0);
-        $this->assertEquals(['contactId' => CRM_Core_Session::getLoggedInContactID(), 'domainId' => CRM_Core_Config::domainID()], $item->data->runAs);
-        $queue->releaseItem($item);
-        $runner = new CRM_Queue_Runner([
-          'queue' => $queue,
-          'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-        ]);
-        $result = $runner->runAll();
-        $this->assertEquals(TRUE, $result, $result === TRUE ? '' : CRM_Core_Error::formatTextException($result['exception']));
-      }
-      else {
-        throw new CRM_Core_Exception('nothing queued');
-      }
+    else {
+      throw new CRM_Core_Exception('nothing queued');
     }
   }
 
@@ -150,6 +148,10 @@ trait CRMTraits_Import_ParserTrait {
    * @param array $submittedValues
    */
   protected function submitDataSourceForm(string $csv, array $submittedValues = []): void {
+    // A prior getMapFieldForm()/getPreviewForm() call in the same test may have left
+    // a job id in $_REQUEST/$_GET (via FormWrapper's urlParameters); submitting the
+    // DataSource form always creates a fresh job and must not inherit that.
+    unset($_GET['id'], $_REQUEST['id']);
     $reflector = new ReflectionClass(get_class($this));
     $directory = dirname($reflector->getFileName());
     $submittedValues = array_merge([
@@ -161,13 +163,9 @@ trait CRMTraits_Import_ParserTrait {
       'dateFormats' => CRM_Utils_Date::DATE_yyyy_mm_dd,
       'groups' => [],
     ], $submittedValues);
-    $form = $this->getDataSourceForm($submittedValues);
-    $values = $_SESSION['_' . $form->controller->_name . '_container']['values'];
-    $form->buildForm();
-    $form->postProcess();
-    $this->userJobID = $form->getUserJobID();
-    // This gets reset in DataSource so re-do....
-    $_SESSION['_' . $form->controller->_name . '_container']['values'] = $values;
+    $wrapper = $this->getDataSourceForm($submittedValues);
+    $wrapper->processForm();
+    $this->userJobID = $wrapper->getValueSetOnForm('user_job_id');
   }
 
   /**

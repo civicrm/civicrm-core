@@ -1,6 +1,6 @@
 // https://civicrm.org/licensing
 /* global CKEDITOR, ToolbarConfigurator */
-(function($, _) {
+(function($) {
   'use strict';
   /* jshint validthis: true */
 
@@ -51,13 +51,12 @@
   }
 
   function getOptionList() {
-    var list = [];
-    _.forEach(options, function(option) {
+    var list = options.map((option) => {
       var opt = structuredClone(option);
       if ($('[name="config_' + opt.id + '"]').length) {
         opt.disabled = true;
       }
-      list.push(opt);
+      return opt;
     });
     return {results: list, text: 'id'};
   }
@@ -84,14 +83,14 @@
     multiple: true,
     closeOnSelect: false,
     data: CRM.vars.ckConfig.plugins,
-    escapeMarkup: _.identity,
+    escapeMarkup: (markup) => markup,
     formatResult: format,
     formatSelection: format
   });
 
   var toolbarModifier = new ToolbarConfigurator.ToolbarModifier( 'editor-basic' );
 
-  toolbarModifier.init(_.noop);
+  toolbarModifier.init(() => {});
 
   CKEDITOR.document.getById( 'toolbarModifierWrapper' ).append( toolbarModifier.mainContainer );
 
@@ -127,4 +126,4 @@
     $.getJSON(CRM.config.resourceBase + 'ext/ckeditor4/js/ck-options.json', null, initOptions);
   });
 
-})(CRM.$, CRM._);
+})(CRM.$);

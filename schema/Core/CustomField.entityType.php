@@ -98,6 +98,11 @@ return [
       ],
       'pseudoconstant' => [
         'callback' => ['CRM_Core_BAO_CustomField', 'dataType'],
+        'suffixes' => [
+          'name',
+          'label',
+          'description',
+        ],
       ],
     ],
     'html_type' => [
@@ -109,9 +114,16 @@ return [
       'add' => '1.1',
       'input_attrs' => [
         'label' => ts('Field Input Type'),
+        'control_field' => 'data_type',
       ],
       'pseudoconstant' => [
         'callback' => ['CRM_Core_SelectValues', 'customHtmlType'],
+        'suffixes' => [
+          'name',
+          'label',
+          'description',
+          'icon',
+        ],
       ],
     ],
     'default_value' => [

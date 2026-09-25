@@ -1404,10 +1404,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
    * @param array $ids
    *   Deprecated array.
    *
-   *
+   * @deprecated
    * @return object
    */
   public static function add(&$params, $ids = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if (empty($params['id']) && !empty($ids['ufgroup'])) {
       $params['id'] = $ids['ufgroup'];
       CRM_Core_Error::deprecatedWarning('ids parameter is deprecated');
@@ -2538,8 +2539,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * make a copy of a profile, including
-   * all the fields in the profile
+   * @deprecated since 6.20 will be removed around 6.26
    *
    * @param int $id
    *   The profile id to copy.
@@ -2547,6 +2547,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return \CRM_Core_DAO
    */
   public static function copy($id) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $maxId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_uf_group");
 
     $title = ts('[Copy id %1]', [1 => $maxId + 1]);
@@ -2985,7 +2986,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @deprecated in CiviCRM 6.6
    */
   public static function encodeGroupType($coreTypes, $subTypes, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     $groupTypeExpr = '';
     if ($coreTypes) {
       $groupTypeExpr .= implode(',', $coreTypes);

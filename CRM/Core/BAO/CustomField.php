@@ -28,77 +28,91 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    * @return array
    *   Data type => Description
    */
-  public static function dataType() {
+  public static function dataType(): array {
     return [
       [
         'id' => 'String',
         'name' => 'Alphanumeric',
         'label' => ts('Alphanumeric'),
+        'description' => ts('Text, numbers, and symbols'),
       ],
       [
         'id' => 'Int',
         'name' => 'Integer',
         'label' => ts('Integer'),
+        'description' => ts('Whole numbers (positive or negative)'),
       ],
       [
         'id' => 'Float',
         'name' => 'Number',
         'label' => ts('Number'),
+        'description' => ts('Numbers with or without decimals'),
       ],
       [
         'id' => 'Money',
         'name' => 'Money',
         'label' => ts('Money'),
+        'description' => ts('Monetary amounts formatted with currency symbol'),
       ],
       [
         'id' => 'Memo',
         'name' => 'Note',
         'label' => ts('Note'),
+        'description' => ts('Long text or notes allowing multiple lines'),
       ],
       [
         'id' => 'Date',
         'name' => 'Date',
         'label' => ts('Date'),
+        'description' => ts('Calendar date and optional time'),
       ],
       [
         'id' => 'Boolean',
         'name' => 'Yes or No',
         'label' => ts('Yes or No'),
+        'description' => ts('Yes or No (true or false) values'),
       ],
       [
         'id' => 'StateProvince',
         'name' => 'State/Province',
         'label' => ts('State/Province'),
+        'description' => ts('Select from configured states and provinces'),
       ],
       [
         'id' => 'Country',
         'name' => 'Country',
         'label' => ts('Country'),
+        'description' => ts('Select from configured countries'),
       ],
       [
         'id' => 'Currency',
         'name' => 'Currency',
         'label' => ts('Currency'),
+        'description' => ts('Select from available currencies (e.g. USD, EUR)'),
       ],
       [
         'id' => 'File',
         'name' => 'File',
         'label' => ts('File'),
+        'description' => ts('Uploaded file or document'),
       ],
       [
         'id' => 'Link',
         'name' => 'Link',
         'label' => ts('Link'),
+        'description' => ts('Website address or URL'),
       ],
       [
         'id' => 'ContactReference',
         'name' => 'Contact Reference',
         'label' => ts('Contact Reference'),
+        'description' => ts('Reference to an existing contact record'),
       ],
       [
         'id' => 'EntityReference',
         'name' => 'Entity Reference',
         'label' => ts('Entity Reference'),
+        'description' => ts('Reference to another record (e.g. Event, Activity)'),
       ],
     ];
   }
@@ -2081,6 +2095,8 @@ WHERE  id IN ( %1, %2 )
    * @return array
    */
   protected static function prepareCreate($params) {
+    $htmlTypes = array_column(Civi::entity('CustomField')->getOptions('html_type'), NULL, 'id');
+
     $op = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($op, 'CustomField', $params['id'] ?? NULL, $params);
     $params['is_append_field_id_to_column_name'] = !isset($params['column_name']);
@@ -2100,14 +2116,31 @@ WHERE  id IN ( %1, %2 )
 
     $htmlType = $params['html_type'] ?? NULL;
     $dataType = $params['data_type'] ?? NULL;
+    if (!empty($params['id'])) {
+      $dataType = $dataType ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'data_type');
+      $htmlType = $htmlType ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'html_type');
+    }
+    if (!$htmlType || !isset($htmlTypes[$htmlType])) {
+      throw new CRM_Core_Exception(sprintf('Invalid html_type "%s".', $htmlType ?? 'null'));
+    }
+    if (!$dataType || !isset($htmlTypes[$htmlType]['data_types'][$dataType])) {
+      throw new CRM_Core_Exception(sprintf('Incompatible html_type "%s" with data_type "%s".', $htmlType, $dataType ?? 'null'));
+    }
 
     if ($htmlType === 'Select Date' && empty($params['date_format'])) {
       $params['date_format'] = Civi::settings()->get('dateInputFormat');
     }
 
     // Checkboxes are always serialized in current schema
-    if ($htmlType == 'CheckBox') {
+    if (($htmlTypes[$htmlType]['data_types'][$dataType]['serialize'] ?? NULL) === 'always') {
       $params['serialize'] = CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND;
+    }
+    // Input type does not support serialization
+    if (($htmlTypes[$htmlType]['data_types'][$dataType]['serialize'] ?? NULL) === 'never') {
+      if (!empty($params['serialize'])) {
+        throw new CRM_Core_Exception(sprintf('A custom field type %s+%s cannot be serialized.', $dataType, $htmlType));
+      }
+      $params['serialize'] = '';
     }
 
     if (!empty($params['serialize'])) {
@@ -2132,8 +2165,7 @@ WHERE  id IN ( %1, %2 )
     }
 
     // create any option group & values if required
-    $allowedOptionTypes = ['String', 'Int', 'Float', 'Money'];
-    if (!in_array($htmlType, ['Text', 'Hidden'], TRUE) && in_array($dataType, $allowedOptionTypes, TRUE)) {
+    if ($htmlType && self::hasOptionGroup($htmlType, $dataType)) {
       //CRM-16659: if option_value then create an option group for this custom field.
       // An option_type of 2 would be a 'message' from the form layer not to handle
       // the option_values key. If not set then it is not ignored.
@@ -2160,8 +2192,8 @@ WHERE  id IN ( %1, %2 )
       }
     }
 
-    // Remove option group IDs from fields changed to Text html_type.
-    if ($htmlType == 'Text') {
+    // Remove option group IDs from fields that do not support option groups.
+    if ($htmlType && !self::hasOptionGroup($htmlType, $dataType)) {
       $params['option_group_id'] = '';
     }
 
@@ -2707,6 +2739,29 @@ WHERE      f.id IN ($ids)";
     }
     $customGroup = self::getField((int) $customId)['custom_group'] ?? NULL;
     return empty($customGroup['is_multiple']) ? FALSE : $customGroup['id'];
+  }
+
+  /**
+   * Determine if an HTML type (optionally for a specific data type) supports option groups.
+   *
+   * @param string $htmlType
+   * @param string|null $dataType
+   * @return bool
+   */
+  public static function hasOptionGroup(string $htmlType, ?string $dataType = NULL): bool {
+    $htmlTypes = array_column(Civi::entity('CustomField')->getOptions('html_type'), NULL, 'id');
+    if (!isset($htmlTypes[$htmlType])) {
+      return FALSE;
+    }
+    if ($dataType) {
+      return !empty($htmlTypes[$htmlType]['data_types'][$dataType]['option_group']);
+    }
+    foreach ($htmlTypes[$htmlType]['data_types'] as $meta) {
+      if (!empty($meta['option_group'])) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**

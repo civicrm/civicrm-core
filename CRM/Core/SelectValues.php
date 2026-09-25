@@ -185,73 +185,163 @@ class CRM_Core_SelectValues {
   }
 
   /**
-   * Custom form field types.
+   * Pseudoconstant callback for CustomField.html_type
    *
+   * Do not call this function directly; use `Civi::entity('CustomField')->getOptions('html_type')`
+   * so that `hook_civicrm_fieldOptions()` is invoked.
+   *
+   * @internal
    * @return array
    */
-  public static function customHtmlType() {
-    return [
+  public static function customHtmlType(?string $fieldName = NULL, ?array $data = NULL): array {
+    $htmlTypes = [
       [
         'id' => 'Text',
         'name' => 'Single-line input field (text or numeric)',
-        'label' => ts('Single-line input field (text or numeric)'),
+        'label' => ts('Text'),
+        'description' => ts('Single-line input field (text or numeric)'),
+        'icon' => 'fa-i-cursor',
+        'data_types' => [
+          'String' => ['serialize' => 'never', 'option_group' => FALSE],
+          'Int' => ['serialize' => 'never', 'option_group' => FALSE],
+          'Float' => ['serialize' => 'never', 'option_group' => FALSE],
+          'Money' => ['serialize' => 'never', 'option_group' => FALSE],
+        ],
       ],
       [
         'id' => 'TextArea',
         'name' => 'Multi-line text box (textarea)',
-        'label' => ts('Multi-line text box (textarea)'),
+        'label' => ts('TextArea'),
+        'description' => ts('Multi-line text box (textarea)'),
+        'icon' => 'fa-align-left',
+        'data_types' => [
+          'Memo' => ['serialize' => 'never', 'option_group' => FALSE],
+        ],
       ],
       [
         'id' => 'Select',
         'name' => 'Drop-down (select list)',
-        'label' => ts('Drop-down (select list)'),
+        'label' => ts('Select'),
+        'description' => ts('Drop-down (select list)'),
+        'icon' => 'fa-list',
+        'data_types' => [
+          'String' => ['serialize' => 'optional', 'option_group' => TRUE],
+          'Int' => ['serialize' => 'optional', 'option_group' => TRUE],
+          'Float' => ['serialize' => 'optional', 'option_group' => TRUE],
+          'Money' => ['serialize' => 'optional', 'option_group' => TRUE],
+          'StateProvince' => ['serialize' => 'optional', 'option_group' => FALSE],
+          'Country' => ['serialize' => 'optional', 'option_group' => FALSE],
+          'Currency' => ['serialize' => 'never', 'option_group' => FALSE],
+        ],
       ],
       [
         'id' => 'Toggle',
         'name' => 'Toggle',
         'label' => ts('Toggle Switch'),
+        'description' => ts('Toggle switch for yes/no values'),
+        'icon' => 'fa-toggle-on',
+        'data_types' => [
+          'Boolean' => ['serialize' => 'never', 'option_group' => FALSE],
+        ],
       ],
       [
         'id' => 'Radio',
         'name' => 'Radio buttons',
         'label' => ts('Radio buttons'),
+        'description' => ts('List of options where only one can be selected'),
+        'icon' => 'fa-dot-circle-o',
+        'data_types' => [
+          'String' => ['serialize' => 'never', 'option_group' => TRUE],
+          'Int' => ['serialize' => 'never', 'option_group' => TRUE],
+          'Float' => ['serialize' => 'never', 'option_group' => TRUE],
+          'Money' => ['serialize' => 'never', 'option_group' => TRUE],
+          'Boolean' => ['serialize' => 'never', 'option_group' => FALSE],
+        ],
       ],
       [
         'id' => 'CheckBox',
         'name' => 'Checkbox(es)',
         'label' => ts('Checkbox(es)'),
+        'description' => ts('List of options that allows multiple selections'),
+        'icon' => 'fa-check-square-o',
+        'data_types' => [
+          'String' => ['serialize' => 'always', 'option_group' => TRUE],
+          'Int' => ['serialize' => 'always', 'option_group' => TRUE],
+        ],
       ],
       [
         'id' => 'Select Date',
         'name' => 'Select Date',
         'label' => ts('Select Date'),
+        'description' => ts('Date and optional time picker'),
+        'icon' => 'fa-calendar',
+        'data_types' => [
+          'Date' => ['serialize' => 'never', 'option_group' => FALSE],
+        ],
       ],
       [
         'id' => 'File',
         'name' => 'File',
         'label' => ts('File'),
+        'description' => ts('File upload field (documents, images, etc.)'),
+        'icon' => 'fa-file-o',
+        'data_types' => [
+          'File' => ['serialize' => 'never', 'option_group' => FALSE],
+        ],
       ],
       [
         'id' => 'RichTextEditor',
         'name' => 'Rich Text Editor',
         'label' => ts('Rich Text Editor'),
+        'description' => ts('Multi-line text box with WYSIWYG editor'),
+        'icon' => 'fa-pencil-square-o',
+        'data_types' => [
+          'Memo' => ['serialize' => 'never', 'option_group' => FALSE],
+        ],
       ],
       [
         'id' => 'Autocomplete-Select',
         'name' => 'Autocomplete-Select',
         'label' => ts('Autocomplete-Select'),
+        'description' => ts('Autocomplete drop-down (select list)'),
+        'icon' => 'fa-search',
+        'data_types' => [
+          'String' => ['serialize' => 'optional', 'option_group' => TRUE],
+          'Int' => ['serialize' => 'optional', 'option_group' => TRUE],
+          'ContactReference' => ['serialize' => 'optional', 'option_group' => FALSE],
+          'EntityReference' => ['serialize' => 'never', 'option_group' => FALSE],
+        ],
       ],
       [
         'id' => 'Link',
         'name' => 'Link',
         'label' => ts('Link'),
+        'description' => ts('Clickable hyperlink (URL)'),
+        'icon' => 'fa-link',
+        'data_types' => [
+          'Link' => ['serialize' => 'never', 'option_group' => FALSE],
+        ],
       ],
       [
         'id' => 'Hidden',
         'name' => 'Hidden',
         'label' => ts('Hidden'),
+        'description' => ts('Hidden field (not displayed on forms)'),
+        'icon' => 'fa-eye-slash',
+        'data_types' => [
+          'String' => ['serialize' => 'never', 'option_group' => FALSE],
+          'Int' => ['serialize' => 'never', 'option_group' => FALSE],
+          'Float' => ['serialize' => 'never', 'option_group' => FALSE],
+          'Money' => ['serialize' => 'never', 'option_group' => FALSE],
+        ],
       ],
     ];
+    if (isset($data['values']['data_type'])) {
+      return array_filter($htmlTypes, function ($htmlType) use ($data) {
+        return array_key_exists($data['values']['data_type'], $htmlType['data_types']);
+      });
+    }
+    return $htmlTypes;
   }
 
   /**

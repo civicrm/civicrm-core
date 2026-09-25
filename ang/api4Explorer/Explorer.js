@@ -1429,6 +1429,23 @@ apiCalls.${results} = [${jsCall}];
   });
 
   angular.module('api4Explorer').directive('api4ExpValue', function($routeParams, crmApi4) {
+    const dynamicFieldOptions = {};
+
+    function loadDynamicFieldOptions(entity, action, fieldName, controlField, controlVal) {
+      const cacheKey = JSON.stringify({entity, action, fieldName, controlField, controlVal});
+      if (!dynamicFieldOptions[cacheKey]) {
+        const values = (controlVal !== undefined && controlVal !== '') ? {[controlField]: controlVal} : {};
+        dynamicFieldOptions[cacheKey] = crmApi4(entity, 'getFields', {
+          loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
+          action: action,
+          where: [['name', '=', fieldName]],
+          values: values,
+          select: ['options']
+        }, 'name');
+      }
+      return dynamicFieldOptions[cacheKey];
+    }
+
     return {
       scope: {
         data: '=api4ExpValue'
@@ -1439,8 +1456,14 @@ apiCalls.${results} = [${jsCall}];
           entity = $routeParams.api4entity,
           action = scope.data.action || $routeParams.api4action;
         let multi = ['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'].includes(scope.data.op);
+        let unwatchControl;
+        let requestId = 0;
 
         function destroyWidget() {
+          if (unwatchControl) {
+            unwatchControl();
+            unwatchControl = null;
+          }
           let $el = $(element);
           if ($el.is('.crm-form-date-wrapper .crm-hidden-date')) {
             $el.crmDatepicker('destroy');
@@ -1453,6 +1476,49 @@ apiCalls.${results} = [${jsCall}];
 
         function isSelect2() {
           return $(element).is('.select2-container + input');
+        }
+
+        function getControlClause(controlFieldName, values) {
+          if (!values) {
+            return null;
+          }
+          return values.find((c) => {
+            if (!c || !c[0]) {
+              return false;
+            }
+            if (c[0] === controlFieldName) {
+              return true;
+            }
+            if (scope.data.field && scope.data.field.includes('.')) {
+              const prefix = scope.data.field.slice(0, scope.data.field.lastIndexOf('.') + 1);
+              if (c[0] === prefix + controlFieldName) {
+                return true;
+              }
+            }
+            return false;
+          });
+        }
+
+        function validateCurrentValue($el, options) {
+          const currentVal = ctrl.$modelValue ?? ctrl.$viewValue;
+          if (multi) {
+            if (Array.isArray(currentVal)) {
+              const valid = currentVal.filter((v) => options.some((opt) => opt.id === v || String(opt.id) === String(v)));
+              if (valid.length !== currentVal.length) {
+                ctrl.$setViewValue(valid.length ? valid : null);
+                if (isSelect2()) {
+                  $el.select2('val', valid);
+                }
+              }
+            }
+          } else {
+            if (currentVal && !options.some((opt) => opt.id === currentVal || String(opt.id) === String(currentVal))) {
+              ctrl.$setViewValue('');
+              if (isSelect2()) {
+                $el.select2('val', '');
+              }
+            }
+          }
         }
 
         function makeWidget(field, op) {
@@ -1475,18 +1541,47 @@ apiCalls.${results} = [${jsCall}];
             }
           } else if (['=', '!=', '<>', 'IN', 'NOT IN'].includes(op) && (field.fk_entity || field.options || dataType === 'Boolean')) {
            if (field.options) {
-              let id = field.pseudoconstant || 'id';
+              const id = field.pseudoconstant || 'id';
+              const controlField = field.input_attrs?.control_field;
+              const valuesArray = scope.data.values || (params && params.values);
+
               $el.addClass('loading').attr('placeholder', ts('- select -')).crmSelect2({multiple: multi, separator: "\u0001", data: [{id: '', text: ''}]});
-              loadFieldOptions(field.entity || entity).then(function(data) {
-                let options = Object.values(data[field.name].options || {}).map(opt => ({
-                  id: opt[id],
-                  text: opt.label,
-                  description: opt.description,
-                  color: opt.color,
-                  icon: opt.icon
-                }));
-                $el.removeClass('loading').crmSelect2({data: options, multiple: multi, separator: "\u0001"});
-              });
+
+              if (controlField && valuesArray) {
+                unwatchControl = scope.$watch(() => {
+                  const values = scope.data.values || (params && params.values);
+                  const clause = getControlClause(controlField, values);
+                  return clause ? clause[1] : undefined;
+                }, (controlVal) => {
+                  const thisRequestId = ++requestId;
+                  $el.addClass('loading');
+                  loadDynamicFieldOptions(field.entity || entity, action, field.name, controlField, controlVal).then((data) => {
+                    if (thisRequestId !== requestId) {
+                      return;
+                    }
+                    const options = Object.values(data[field.name]?.options || {}).map((opt) => ({
+                      id: opt[id],
+                      text: opt.label,
+                      description: opt.description,
+                      color: opt.color,
+                      icon: opt.icon
+                    }));
+                    $el.removeClass('loading').crmSelect2({data: options, multiple: multi, separator: "\u0001"});
+                    validateCurrentValue($el, options);
+                  });
+                });
+              } else {
+                loadFieldOptions(field.entity || entity).then((data) => {
+                  const options = Object.values(data[field.name]?.options || {}).map((opt) => ({
+                    id: opt[id],
+                    text: opt.label,
+                    description: opt.description,
+                    color: opt.color,
+                    icon: opt.icon
+                  }));
+                  $el.removeClass('loading').crmSelect2({data: options, multiple: multi, separator: "\u0001"});
+                });
+              }
             } else if (field.fk_entity) {
               $el.crmAutocomplete(field.fk_entity, {fieldName: field.entity + '.' + field.name, key: field.id_field || null}, {
                 multiple: multi,
@@ -1555,6 +1650,8 @@ apiCalls.${results} = [${jsCall}];
             makeWidget(field, data.op);
           }
         });
+
+        scope.$on('$destroy', destroyWidget);
       }
     };
   });

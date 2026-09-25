@@ -634,7 +634,7 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
    * @param int $targetContributionId
    */
   public static function copyCustomValues($recurId, $targetContributionId) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     if ($recurId && $targetContributionId) {
       // get the initial contribution id of recur id
       $sourceContributionId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
@@ -855,6 +855,7 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
    * @param string $effectiveDate
    *
    * @throws \CRM_Core_Exception
+   * @internal
    */
   public static function updateOnNewPayment($recurringContributionID, string $paymentStatus, string $effectiveDate = 'now') {
     if (!in_array($paymentStatus, ['Completed', 'Failed'])) {
@@ -874,7 +875,7 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
       $updatedRecurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'In Progress');
     }
     if ($paymentStatus == 'Failed') {
-      $updatedRecurParams['failure_count'] = $existingRecur['failure_count'];
+      $updatedRecurParams['failure_count'] = (int) $existingRecur['failure_count'] + 1;
     }
     $updatedRecurParams['modified_date'] = date('Y-m-d H:i:s');
 

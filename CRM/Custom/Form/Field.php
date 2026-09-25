@@ -46,43 +46,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   protected $_values;
 
   /**
-   * Array for valid combinations of data_type & html_type
-   *
-   * @var array
-   */
-  public static $htmlTypesWithOptions = ['Select', 'Radio', 'CheckBox', 'Autocomplete-Select'];
-
-  private static $htmlTypesWithOptionalSerialize = ['Select', 'Autocomplete-Select'];
-
-  private static $htmlTypesWithMandatorySerialize = ['CheckBox'];
-
-  private static $dataTypesWithoutSerialize = ['EntityReference', 'Currency'];
-
-  private static $dataTypesWithoutOptionGroup = ['Boolean', 'Country', 'StateProvince', 'ContactReference', 'EntityReference', 'Currency'];
-
-  /**
-   * Maps each data_type to allowed html_type options
-   *
-   * @var array[]
-   */
-  public static $_dataToHTML = [
-    'String' => ['Text', 'Select', 'Radio', 'CheckBox', 'Autocomplete-Select', 'Hidden'],
-    'Int' => ['Text', 'Select', 'Radio', 'CheckBox', 'Autocomplete-Select', 'Hidden'],
-    'Float' => ['Text', 'Select', 'Radio', 'Hidden'],
-    'Money' => ['Text', 'Select', 'Radio', 'Hidden'],
-    'Memo' => ['TextArea', 'RichTextEditor'],
-    'Date' => ['Select Date'],
-    'Boolean' => ['Toggle', 'Radio'],
-    'StateProvince' => ['Select'],
-    'Country' => ['Select'],
-    'Currency' => ['Select'],
-    'File' => ['File'],
-    'Link' => ['Link'],
-    'ContactReference' => ['Autocomplete-Select'],
-    'EntityReference' => ['Autocomplete-Select'],
-  ];
-
-  /**
    * Set variables up before form is built.
    *
    * @return void
@@ -90,11 +53,6 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->setAction($this->_id ? CRM_Core_Action::UPDATE : CRM_Core_Action::ADD);
-
-    $this->assign('dataToHTML', self::$_dataToHTML);
-    $this->assign('htmlTypesWithOptionalSerialize', self::$htmlTypesWithOptionalSerialize);
-    $this->assign('htmlTypesWithMandatorySerialize', self::$htmlTypesWithMandatorySerialize);
-    $this->assign('dataTypesWithoutSerialize', self::$dataTypesWithoutSerialize);
 
     $this->_values = [];
     //get the values form db if update.
@@ -220,6 +178,9 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_CustomField');
 
+    $htmlTypes = Civi::entity('CustomField')->getOptions('html_type');
+    $this->assign('htmlTypes', $htmlTypes);
+
     // label
     $this->add('text',
       'label',
@@ -228,11 +189,13 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       TRUE
     );
 
-    // FIXME: Switch addField to use APIv4 so we don't get those legacy options from v3
-    $htmlOptions = CRM_Core_BAO_CustomField::buildOptions('html_type', 'create');
+    $fieldInfo = Civi\Api4\CustomField::getFields(FALSE)
+      ->addWhere('name', 'IN', ['data_type'])
+      ->setLoadOptions(['id', 'label', 'description'])
+      ->execute()->indexBy('name');
 
-    $this->addField('data_type', ['class' => 'twenty'], TRUE);
-    $this->addField('html_type', ['class' => 'twenty', 'options' => $htmlOptions], TRUE);
+    $this->add('select2', 'data_type', $fieldInfo['data_type']['label'], $fieldInfo['data_type']['options']);
+    $this->add('select2', 'html_type', ts('Field Input Type'), $htmlTypes);
 
     if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $this->_gid, 'is_multiple')) {
       $this->addToggle('in_selector', ts('Display in Table?'));
@@ -278,7 +241,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     if ($isUpdateAction) {
       $this->freeze('data_type');
       if (!empty($this->_values['option_group_id'])) {
-        $this->assign('hasOptionGroup', in_array($this->_values['html_type'], self::$htmlTypesWithOptions));
+        $this->assign('hasOptionGroup', CRM_Core_BAO_CustomField::hasOptionGroup($this->_values['html_type'], $this->_values['data_type'] ?? NULL));
         $this->assign('optionGroupId', $this->_values['option_group_id']);
         // Before dev/core#155 we didn't set the is_reserved flag properly, which should be handled by the upgrade script...
         //  but it is still possible that existing installs may have optiongroups linked to custom fields that are marked reserved.
@@ -788,9 +751,7 @@ SELECT count(*)
         $_flagOption = $_emptyRow = 0;
       }
     }
-    elseif (in_array($htmlType, self::$htmlTypesWithOptions, TRUE) &&
-      !in_array($dataType, self::$dataTypesWithoutOptionGroup, TRUE)
-    ) {
+    elseif (CRM_Core_BAO_CustomField::hasOptionGroup($htmlType, $dataType)) {
       if (!$fields['option_group_id']) {
         $errors['option_group_id'] = ts('You must select a Multiple Choice Option set if you chose Reuse an existing set.');
       }
@@ -848,10 +809,8 @@ AND    option_group_id = %2";
     if (!empty($fields['is_required']) && !empty($fields['is_view'])) {
       $errors['is_view'] = ts('Can not set this field Required and View Only at the same time.');
     }
-
     // If switching to a new option list, validate existing data
-    if (empty($errors) && $self->_id && in_array($htmlType, self::$htmlTypesWithOptions) &&
-      !in_array($dataType, self::$dataTypesWithoutOptionGroup, TRUE)) {
+    if (empty($errors) && $self->_id && CRM_Core_BAO_CustomField::hasOptionGroup($htmlType, $dataType)) {
       $oldHtmlType = $self->_values['html_type'];
       $oldOptionGroup = $self->_values['option_group_id'];
       if ($oldHtmlType === 'Text' || $oldOptionGroup != $fields['option_group_id'] || $fields['option_type'] == 1) {
@@ -1028,11 +987,21 @@ AND    option_group_id = %2";
    * @return int
    *   The serialize type - CRM_Core_DAO::SERIALIZE_XXX or 0
    */
-  public static function determineSerializeType($params) {
-    if (in_array($params['html_type'], self::$htmlTypesWithOptionalSerialize)) {
-      return !empty($params['serialize']) ? CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND : 0;
+  public static function determineSerializeType(array $params): int {
+    $htmlTypes = array_column(Civi::entity('CustomField')->getOptions('html_type'), NULL, 'id');
+    $htmlType = $htmlTypes[$params['html_type'] ?? ''] ?? NULL;
+    if (!$htmlType) {
+      return 0;
     }
-    elseif (in_array($params['html_type'], self::$htmlTypesWithMandatorySerialize)) {
+    if (!empty($params['data_type']) && isset($htmlType['data_types'][$params['data_type']])) {
+      $serialize = $htmlType['data_types'][$params['data_type']]['serialize'];
+      if ($serialize === 'always' || ($serialize === 'optional' && !empty($params['serialize']))) {
+        return CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND;
+      }
+      return 0;
+    }
+    $serializeOptions = array_column($htmlType['data_types'], 'serialize');
+    if (in_array('always', $serializeOptions, TRUE) || (in_array('optional', $serializeOptions, TRUE) && !empty($params['serialize']))) {
       return CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND;
     }
     return 0;
