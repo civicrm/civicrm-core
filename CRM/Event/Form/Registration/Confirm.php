@@ -907,14 +907,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     $contribParams['is_test'] = $this->isTest();
 
-    if (!empty($contribParams['invoice_id'])) {
-      $contribParams['id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
-        $contribParams['invoice_id'],
-        'id',
-        'invoice_id'
-      );
-    }
-
     $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params);
 
     $contribParams['skipLineItem'] = 1;
