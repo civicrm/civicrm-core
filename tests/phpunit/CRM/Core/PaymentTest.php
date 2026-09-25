@@ -74,6 +74,61 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
     $this->assertStringContainsString('id=456', $urlContrib);
   }
 
+  /**
+   * For an event, the id can be resolved from the participant.
+   */
+  public function testGetReturnSuccessUrlResolvesEventFromParticipant(): void {
+    $eventID = $this->createTestEntity('Event', [
+      'title' => 'Event with a payment url',
+      'event_type_id:name' => 'Conference',
+      'start_date' => '2026-01-01',
+    ])['id'];
+    $contactID = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'last_name' => 'Payment',
+    ])['id'];
+    $participantID = $this->createTestEntity('Participant', [
+      'contact_id' => $contactID,
+      'event_id' => $eventID,
+    ])['id'];
+    /** @var CRM_Core_Payment_Dummy $processor */
+    $processor = \Civi\Payment\System::singleton()->getById($this->processorCreate(['name' => 'DummyParticipantUrl']));
+    Invasive::set([$processor, '_component'], 'event');
+
+    $url = Invasive::call([$processor, 'getReturnSuccessUrl'], ['test_qf_key', $participantID]);
+
+    $this->assertStringContainsString('id=' . $eventID, $url);
+  }
+
+  /**
+   * A participant that no longer exists leaves the id off the url, rather than
+   * throwing on the way back from the payment processor.
+   */
+  public function testGetReturnSuccessUrlWithMissingParticipant(): void {
+    /** @var CRM_Core_Payment_Dummy $processor */
+    $processor = \Civi\Payment\System::singleton()->getById($this->processorCreate(['name' => 'DummyMissingParticipant']));
+    Invasive::set([$processor, '_component'], 'event');
+
+    $url = Invasive::call([$processor, 'getReturnSuccessUrl'], ['test_qf_key', 999999999]);
+
+    $this->assertStringContainsString('qfKey=test_qf_key', $url);
+    $this->assertStringNotContainsString('&id=', $url);
+  }
+
+  /**
+   * The cancel url resolves the event the same way, and has the same problem
+   * when the participant is gone.
+   */
+  public function testGetCancelUrlWithMissingParticipant(): void {
+    /** @var CRM_Core_Payment_Dummy $processor */
+    $processor = \Civi\Payment\System::singleton()->getById($this->processorCreate(['name' => 'DummyMissingCancel']));
+    Invasive::set([$processor, '_component'], 'event');
+
+    $url = $processor->getCancelUrl('test_qf_key', 999999999);
+
+    $this->assertStringContainsString('cc=fail', $url);
+  }
+
   public function testSettingUrl(): void {
     /** @var CRM_Core_Payment_Dummy $processor */
     $processor = \Civi\Payment\System::singleton()->getById($this->processorCreate());

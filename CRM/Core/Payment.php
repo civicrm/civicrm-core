@@ -1240,7 +1240,7 @@ abstract class CRM_Core_Payment {
       $eventID = NULL;
       if ($participantID) {
         $eventID = Participant::get(FALSE)->addWhere('id', '=', $participantID)
-          ->addSelect('event_id')->execute()->single()['event_id'];
+          ->addSelect('event_id')->execute()->first()['event_id'] ?? NULL;
       }
       return CRM_Utils_System::url($this->getBaseReturnUrl(), [
         'reset' => 1,
@@ -1282,7 +1282,7 @@ abstract class CRM_Core_Payment {
 
     if ($this->_component == 'event' && !$entityID && $participantID) {
       $entityID = \Civi\Api4\Participant::get(FALSE)->addWhere('id', '=', $participantID)
-        ->addSelect('event_id')->execute()->single()['event_id'] ?? NULL;
+        ->addSelect('event_id')->execute()->first()['event_id'] ?? NULL;
     }
 
     if ($entityID) {
