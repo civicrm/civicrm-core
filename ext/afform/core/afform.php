@@ -239,7 +239,9 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   $moduleName = _afform_angular_module_name($params['name'], 'camel');
   $formMetaData = (array) civicrm_api4('Afform', 'get', [
     'checkPermissions' => FALSE,
-    'select' => ['redirect', 'name', 'title', 'autosave_draft', 'confirmation_type', 'confirmation_message'],
+    'select' => ['redirect', 'name', 'title', 'autosave_draft', 'confirmation_type', 'confirmation_message',
+      'verification_confirmation_type', 'verification_confirmation_message',
+    ],
     'where' => [['name', '=', $params['name']]],
   ], 0);
 

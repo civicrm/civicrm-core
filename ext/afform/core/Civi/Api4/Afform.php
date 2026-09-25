@@ -273,6 +273,10 @@ class Afform extends Generic\AbstractEntity {
           'title' => E::ts('Post-Submit Page'),
         ],
         [
+          'name' => 'verification_redirect',
+          'title' => E::ts('Post-Verification Page'),
+        ],
+        [
           'name' => 'submit_enabled',
           'title' => E::ts('Allow Submissions'),
           'data_type' => 'Boolean',
@@ -340,8 +344,19 @@ class Afform extends Generic\AbstractEntity {
           'default_value' => 'redirect_to_url',
         ],
         [
+          'name' => 'verification_confirmation_type',
+          'title' => E::ts('Verification Confirmation Type'),
+          'pseudoconstant' => ['optionGroupName' => 'afform_confirmation_type'],
+          'default_value' => 'redirect_to_url',
+        ],
+        [
           'name' => 'confirmation_message',
           'title' => E::ts('Confirmation Message'),
+          'input_type' => 'Text',
+        ],
+        [
+          'name' => 'verification_confirmation_message',
+          'title' => E::ts('Verification Confirmation Message'),
           'input_type' => 'Text',
         ],
         [
