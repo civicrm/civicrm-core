@@ -248,7 +248,7 @@
   --crm-input-large-padding: var(--crm-l-small) var(--crm-l-medium-1);
   --crm-input-height: var(--crm-l-large);
   --crm-input-width: 15em;
-  --crm-input-large-width: 25em;
+  --crm-input-large-width: 95%;
   --crm-input-font-size: var(--crm-l-medium-3);
   --crm-input-label-weight: bold;
   --crm-input-label-font: var(--crm-font);
