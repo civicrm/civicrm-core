@@ -321,15 +321,18 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     foreach ($params['line_item'] as &$values) {
       foreach ($values as &$line) {
         if (empty($line['entity_table'])) {
+          CRM_Core_Error::deprecatedWarning('not passing in entity_table is deprecated - calling function should pass correct items');
           $line['entity_table'] = $entityTable;
         }
-        if (empty($line['entity_id'])) {
+        if (empty($line['entity_id']) && $entityId) {
+          CRM_Core_Error::deprecatedWarning('not passing in entity_id is deprecated - calling function should pass correct items');
           $line['entity_id'] = $entityId;
         }
 
         // if financial type is not set and if price field value is NOT NULL
         // get financial type id of price field value
         if (!empty($line['price_field_value_id']) && empty($line['financial_type_id'])) {
+          CRM_Core_Error::deprecatedWarning('not passing in line item financial_type_id is deprecated - calling function should pass correct items');
           $line['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $line['price_field_value_id'], 'financial_type_id');
         }
       }
