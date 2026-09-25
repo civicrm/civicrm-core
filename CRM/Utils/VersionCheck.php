@@ -184,7 +184,7 @@ class CRM_Utils_VersionCheck {
   private function getEntityStats() {
     // FIXME hardcoded list = bad
     $tables = [
-      'CRM_Activity_DAO_Activity' => 'is_test = 0',
+      'CRM_Activity_DAO_Activity' => NULL,
       'CRM_Case_DAO_Case' => 'is_deleted = 0',
       'CRM_Contact_DAO_Contact' => 'is_deleted = 0',
       'CRM_Contact_DAO_Relationship' => NULL,
@@ -211,16 +211,24 @@ class CRM_Utils_VersionCheck {
     $compat = ['MailingEventDelivered' => 'Delivered'];
     foreach ($tables as $daoName => $where) {
       if (class_exists($daoName)) {
-        /** @var \CRM_Core_DAO $dao */
-        $dao = new $daoName();
-        if ($where) {
-          $dao->whereAdd($where);
-        }
         $short_name = substr($daoName, strrpos($daoName, '_') + 1);
-        $this->stats['entities'][] = [
-          'name' => $compat[$short_name] ?? $short_name,
-          'size' => $dao->count(),
-        ];
+        if (empty($where)) {
+          $this->stats['entities'][] = [
+            'name' => $compat[$short_name] ?? $short_name,
+            'count' => CRM_Core_BAO_SchemaHandler::getRowCountForTable(CRM_Core_DAO_AllCoreTables::getTableForClass($daoName)),
+          ];
+        }
+        else {
+          /** @var \CRM_Core_DAO $dao */
+          $dao = new $daoName();
+          if ($where) {
+            $dao->whereAdd($where);
+          }
+          $this->stats['entities'][] = [
+            'name' => $compat[$short_name] ?? $short_name,
+            'size' => $dao->count(),
+          ];
+        }
       }
     }
   }
