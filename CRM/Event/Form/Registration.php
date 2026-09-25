@@ -587,6 +587,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * @return bool
+   */
+  protected function isProcessRegistrationInRealTime(): bool {
+    return !$this->_allowWaitlist && !$this->_requireApproval;
+  }
+
+  /**
    * Assign the minimal set of variables to the template.
    */
   public function assignToTemplate() {
@@ -2129,8 +2136,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function getLineItems(): array {
     if (!isset($this->lineItems)) {
-      $this->resetOrder();
-      $this->lineItems = $this->getOrder()->getLineItems();
+      $this->lineItems = [];
+      if ($this->getPriceSetID()) {
+        $this->resetOrder();
+        $this->lineItems = $this->getOrder()->getLineItems();
+      }
     }
     return $this->lineItems;
   }

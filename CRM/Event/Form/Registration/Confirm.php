@@ -604,16 +604,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $participantRecord['participant_register_date'] = $this->_values['participant']['register_date'];
         }
 
-        $createContrib = $participantRecord['amount'] != 0;
-        // force to create zero amount contribution, CRM-5095
-        if (!$createContrib && ($participantRecord['amount'] == 0)
-          && $this->_priceSetId && $this->_lineItem
-        ) {
-          $createContrib = TRUE;
-        }
-
-        if ($createContrib && !empty($participantRecord['is_primary']) &&
-          !$this->_allowWaitlist && !$this->_requireApproval
+        if ($this->getLineItems() && !empty($participantRecord['is_primary']) &&
+          $this->isProcessRegistrationInRealTime()
         ) {
           // if paid event add a contribution record
           //if primary participant contributing additional amount
@@ -641,7 +633,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // CRM-11182 - Confirmation page might not be monetary
       if ($this->isPaidEvent()) {
         if (!$pending && !empty($participantRecord['is_primary']) &&
-          !$this->_allowWaitlist && !$this->_requireApproval
+          $this->isProcessRegistrationInRealTime()
         ) {
           $this->set('receiveDate', $participantRecord['receive_date'] ?? NULL);
           $this->set('trxnId', $participantRecord['trxn_id'] ?? NULL);
@@ -709,7 +701,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     // The concept of contributeMode is deprecated.
     if (($this->getPaymentProcessorObject()->supports('noReturn')
       ) && empty($params[0]['is_pay_later']) &&
-      !$this->_allowWaitlist && !$this->_requireApproval &&
+      $this->isProcessRegistrationInRealTime() &&
       $this->_totalAmount > 0
     ) {
 

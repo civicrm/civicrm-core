@@ -2149,6 +2149,12 @@ class CRM_Financial_BAO_Order {
 
     switch ($priceField['html_type']) {
       case 'Text':
+        // special case if the user entered a zero amount/qty - nothing was really selected.
+        // Negative amounts are legitimate here (e.g. a refund/adjustment), unlike the
+        // Select/Radio case below where a non-positive value can only mean "-none-".
+        if ($priceSelection["price_{$priceFieldID}"] == 0) {
+          break;
+        }
         $firstOption = reset($priceField['options']);
         $params = [
           "price_{$priceFieldID}" => [$firstOption['id'] => $priceSelection["price_{$priceFieldID}"]],
