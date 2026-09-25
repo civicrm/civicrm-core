@@ -472,7 +472,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemID);
         $prevFinancialItem['contact_id'] = $toContactID;
         $prevFinancialItem['entity_id'] = $toLineItem['id'];
-        CRM_Financial_BAO_FinancialItem::create($prevFinancialItem);
+        CRM_Financial_BAO_FinancialItem::writeRecord($prevFinancialItem);
       }
     }
     //send a confirmation email to the new participant
