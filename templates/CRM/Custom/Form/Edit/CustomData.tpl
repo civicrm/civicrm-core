@@ -29,13 +29,13 @@
   {if $skipTitle}
     {* We don't yet support adding new records in inline-edit forms *}
     <div class="messages help">
-      <em>{ts escape='html' 1=$cd_edit.title}Click "Edit Contact" to add more %1 records{/ts}</em>
+      <em>{ts escape='htmlattribute' 1=$cd_edit.title}Click "Edit Contact" to add more %1 records{/ts}</em>
     </div>
   {else}
     <div id="add-more-link-{$cgCount}" class="add-more-link-{$group_id} add-more-link-{$group_id}-{$cgCount}">
       <a href="#" class="crm-hover-button" onclick="CRM.buildCustomData('{$cd_edit.extends}',{if $cd_edit.subtype}'{$cd_edit.subtype}'{else}'{$cd_edit.extends_entity_column_id}'{/if}, '', {$cgCount}, {$group_id}, true ); return false;">
         <i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i>
-        {ts escape='html' 1=$cd_edit.title}Another %1 record{/ts}
+        {ts escape='htmlattribute' 1=$cd_edit.title}Another %1 record{/ts}
       </a>
     </div>
   {/if}
