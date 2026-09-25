@@ -17,6 +17,8 @@ use Civi\Api4\OrderCompletionMetadata;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
+use Civi\Order\Event\OrderValidateEvent;
+use Civi\Order\Event\OrderSaveEvent;
 
 /**
  *
@@ -1415,14 +1417,14 @@ class CRM_Financial_BAO_Order {
    * specified the price_field_id and price_value_id will be determined.
    *
    * @param array $lineItem
-   * @param int|string $index
+   * @param int|string|null $index
    *
    * @throws \CRM_Core_Exception
    * @internal tested core code usage only.
    * @internal use in tested core code only.
    *
    */
-  public function setLineItem(array $lineItem, $index): void {
+  public function setLineItem(array $lineItem, $index = NULL): void {
     if (!isset($this->priceSetID)) {
       if (!empty($lineItem['price_field_id'])) {
         $this->setPriceSetIDFromSelectedField($lineItem['price_field_id']);
@@ -1505,7 +1507,28 @@ class CRM_Financial_BAO_Order {
     if (empty($lineItem['title'])) {
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
     }
-    $this->lineItems[$index] = $lineItem;
+    if ($index) {
+      $this->lineItems[$index] = $lineItem;
+    }
+    else {
+      $this->lineItems[] = $lineItem;
+    }
+  }
+
+  /**
+   * Remove the line item.
+   *
+   * This function removes the line item
+   *
+   * @param int|string $index
+   *
+   * @throws \CRM_Core_Exception
+   * @internal tested core code usage only.
+   * @internal use in tested core code only.
+   *
+   */
+  public function removeLineItem($index): void {
+    unset($this->lineItems[$index]);
   }
 
   /**
@@ -1851,6 +1874,25 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Used with Order::Modify to calculate updated Contribution parameters
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function calculateUpdatedContributionValues(): void {
+    $existingContribution = Contribution::get(FALSE)
+      ->addSelect('id', 'contribution_status_id:name')
+      ->addWhere('id', '=', $this->getExistingContributionID())
+      ->execute();
+    if ($existingContribution['contribution_status_id:name'] !== 'Pending') {
+      throw new CRM_Core_Exception('Order: Cannot modify contributionID: ' . $existingContribution['id'] . ' because status is not Pending');
+    }
+    $this->contributionValues['total_amount'] = $this->getTotalAmount();
+    $this->contributionValues['tax_amount'] = $this->getTotalTaxAmount();
+  }
+
+  /**
    * @return $this
    *
    * @internal Access through apiv4 Order api only. Signature subject to change.
@@ -1864,6 +1906,14 @@ class CRM_Financial_BAO_Order {
     $this->calculateContributionValues();
     // Then we get/calculate the lineitems - they won't have related entity IDs Membership/Participant etc. for new records.
     $this->getLineItems();
+    $event = new OrderValidateEvent($this);
+    \Civi::dispatcher()->dispatch('civi.order.validate', $event);
+    $errors = $event->getErrors();
+    if ($errors) {
+      \Civi::log('order')->error('Order Validation errors: ' . print_r($errors, TRUE));
+      throw new \CRM_Core_Exception(implode("\n", $errors), 0, ['show_detailed_error' => TRUE]);
+    }
+
     return $this;
   }
 
@@ -1875,6 +1925,10 @@ class CRM_Financial_BAO_Order {
    * @throws \CRM_Core_Exception
    */
   public function save(): Result {
+    // Trigger the preSave event
+    $event = new OrderSaveEvent($this, 'create');
+    \Civi::dispatcher()->dispatch('civi.order.preSave', $event);
+
     // Now we must save/create a ContributionRecur before we create related entity IDs because ContributionRecurID is
     //   linked to some related entities, eg. Membership.
     $this->saveContributionRecur();
@@ -1930,6 +1984,11 @@ class CRM_Financial_BAO_Order {
     $result = Contribution::create(FALSE)
       ->setValues($this->contributionValues)->execute();
     $this->saveOrderCompletionMetadata((int) $result->first()['id']);
+
+    // Trigger the postSave event
+    $event = new OrderSaveEvent($this, 'create', (int) $result->first()['id']);
+    \Civi::dispatcher()->dispatch('civi.order.postSave', $event);
+
     return $result;
   }
 
@@ -2098,6 +2157,58 @@ class CRM_Financial_BAO_Order {
       'records' => [$entityValues],
       'checkPermissions' => FALSE,
     ])->first()['id'];
+  }
+
+  /**
+   * @return array
+   *
+   * @internal Access through apiv4 Order api only. Signature subject to change.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function update(): array {
+    // @todo this is a proof of concept / work in progress and does not work yet!
+
+    // Get the existing ContributionRecur if we have one
+    if (!$this->getExistingContributionRecurID()) {
+      $contribution = Contribution::get(FALSE)
+        ->addSelect('contribution_recur_id')
+        ->addWhere('id', '=', $this->getExistingContributionID())
+        ->execute()
+        ->first();
+      if (!empty($contribution['contribution_recur_id'])) {
+        $this->setExistingContributionRecurID($contribution['contribution_recur_id']);
+      }
+    }
+
+    // Trigger the preSave event
+    $event = new OrderSaveEvent($this, 'edit', $this->getExistingContributionID());
+    \Civi::dispatcher()->dispatch('civi.order.preSave', $event);
+
+    // Either we do the add/remove/update lineItems here or in the Order::Modify API action
+
+    // Then we check/update related entities as necessary
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      // Save entities first, so we can get the Entity ID.
+      if ($lineItem['entity_table'] !== 'civicrm_contribution') {
+        $this->setLineItemValue('entity_id', $this->saveLineItemEntity($lineItem), $index);
+      }
+    }
+
+    // @todo: Check we have accurate list of lineItems to calculate from
+    $this->calculateUpdatedContributionValues();
+    // @todo: We probably should not pass in lineItems here because they already got updated via API?
+    $this->contributionValues['line_item'] = [$this->getLineItems()];
+
+    // At this point we'll have calculated updated contribution values (eg. total_amount, tax_amount)
+    $result = Contribution::update(FALSE)
+      ->setValues($this->contributionValues)->execute()->first();
+
+    // Trigger the postSave event
+    $event = new OrderSaveEvent($this, 'edit', $result['id']);
+    \Civi::dispatcher()->dispatch('civi.order.postSave', $event);
+
+    return $result;
   }
 
   /**
