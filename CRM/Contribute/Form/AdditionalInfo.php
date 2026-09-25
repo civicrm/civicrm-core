@@ -174,8 +174,6 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @throws \CRM_Core_Exception
    */
   public static function emailReceipt($form, &$params) {
-    $form->assign('receiptType', 'contribution');
-
     // retrieve individual prefix value for honoree
     if (isset($params['soft_credit'])) {
       $softCreditTypes = $softCredits = [];
@@ -190,33 +188,9 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->assign('softCredits', $softCredits);
     }
 
-    // retrieve premium product name and assigned fulfilled
-    // date to template
-    if (!empty($params['hidden_Premium'])) {
-      if (isset($params['product_name']) &&
-        is_array($params['product_name']) &&
-        !empty($params['product_name'])
-      ) {
-        $productDAO = new CRM_Contribute_DAO_Product();
-        $productDAO->id = $params['product_name'][0];
-        $productOptionID = $params['product_name'][1];
-        $productDAO->find(TRUE);
-        $params['product_name'] = $productDAO->name;
-        $params['product_sku'] = $productDAO->sku;
-
-        if (empty($params['product_option']) && !empty($form->_options[$productDAO->id])) {
-          $params['product_option'] = $form->_options[$productDAO->id][$productOptionID];
-        }
-      }
-      if (!empty($params['fulfilled_date'])) {
-        $form->assign('fulfilled_date', $params['fulfilled_date']);
-      }
-    }
-
     $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
     $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
 
-    $form->assign('formValues', $params);
     list($contributorDisplayName,
       $contributorEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
