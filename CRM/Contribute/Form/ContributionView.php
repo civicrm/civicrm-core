@@ -220,6 +220,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $this->assign('totalTaxAmount', $values['tax_amount']);
     }
 
+    $associatedEntities = CRM_Contribute_BAO_Contribution::getContributionAssociatedEntities($values['id'], $values['contact_id']);
+    $this->assign('entity', $associatedEntities['label'] ?? '');
+    $this->assign('entityURL', $associatedEntities['url'] ?? '');
+
     // omitting contactImage from title for now since the summary overlay css doesn't work outside of our crm-container
     $displayName = CRM_Contact_BAO_Contact::displayName($values['contact_id']);
     $this->assign('displayName', $displayName);

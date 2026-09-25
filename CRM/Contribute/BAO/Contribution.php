@@ -3443,6 +3443,93 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
+   * Get entities associated with a contribution.
+   *
+   * @param int $contributionId
+   * @param int $contactId
+   *
+   * @return array
+   *   Associated entities with label and URL.
+   */
+  public static function getContributionAssociatedEntities(int $contributionId, int $contactId): array {
+    $entities = [];
+
+    // Pledge association.
+    $result = civicrm_api3('PledgePayment', 'get', [
+      'sequential' => 1,
+      'return' => ['pledge_id'],
+      'contribution_id' => $contributionId,
+    ]);
+
+    foreach ($result['values'] as $pledge) {
+      if (!empty($pledge['pledge_id'])) {
+        $entities = [
+          'label' => ts('Pledge'),
+          'url' => CRM_Utils_System::url(
+            'civicrm/contact/view/pledge',
+            [
+              'action' => 'view',
+              'reset' => 1,
+              'id' => $pledge['pledge_id'],
+              'cid' => $contactId,
+            ]
+          ),
+        ];
+      }
+    }
+
+    // Membership association.
+    $result = civicrm_api3('MembershipPayment', 'get', [
+      'sequential' => 1,
+      'return' => ['membership_id'],
+      'contribution_id' => $contributionId,
+    ]);
+
+    foreach ($result['values'] as $membership) {
+      if (!empty($membership['membership_id'])) {
+        $entities = [
+          'label' => ts('Membership'),
+          'url' => CRM_Utils_System::url(
+            'civicrm/contact/view/membership',
+            [
+              'action' => 'view',
+              'reset' => 1,
+              'id' => $membership['membership_id'],
+              'cid' => $contactId,
+            ]
+          ),
+        ];
+      }
+    }
+
+    // Participant association.
+    $result = civicrm_api3('ParticipantPayment', 'get', [
+      'sequential' => 1,
+      'return' => ['participant_id'],
+      'contribution_id' => $contributionId,
+    ]);
+
+    foreach ($result['values'] as $participant) {
+      if (!empty($participant['participant_id'])) {
+        $entities = [
+          'label' => ts('Participant'),
+          'url' => CRM_Utils_System::url(
+            'civicrm/contact/view/participant',
+            [
+              'action' => 'view',
+              'reset' => 1,
+              'id' => $participant['participant_id'],
+              'cid' => $contactId,
+            ]
+          ),
+        ];
+      }
+    }
+
+    return $entities;
+  }
+
+  /**
    * Get the unit label with the plural option
    *
    * @param string $unit
