@@ -54,9 +54,11 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
           $record['layout'] = $this->convertHtmlToOutput($record['layout']);
         }
       }
-      // Purify markup in confirmation_message
-      if (isset($record['confirmation_message']) && str_contains($record['confirmation_message'], '<')) {
-        $record['confirmation_message'] = \CRM_Utils_String::purifyHTML($record['confirmation_message']);
+      // Purify markup in messages
+      foreach (['confirmation_message', 'verification_confirmation_message'] as $message) {
+        if (isset($record[$message]) && str_contains($record[$message], '<')) {
+          $record[$message] = \CRM_Utils_String::purifyHTML($record[$message]);
+        }
       }
     }
     unset($record);
