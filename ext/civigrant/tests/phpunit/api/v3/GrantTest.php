@@ -174,6 +174,29 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
     $this->assertEquals('NZD', $contribution['currency']);
   }
 
+  /**
+   * Explicitly returning a field whose column name is shared with civicrm_grant
+   * must still read it from civicrm_contribution.
+   */
+  public function testContributionGetExplicitReturnOfSharedFieldName(): void {
+    $financialTypeID = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
+    $contributionID = $this->createTestEntity('Contribution', [
+      'contact_id' => $this->individualCreate(),
+      'currency' => 'NZD',
+      'total_amount' => 5,
+      'financial_type_id' => $financialTypeID,
+    ])['id'];
+
+    $this->assertEquals($financialTypeID, $this->callAPISuccessGetValue('Contribution', [
+      'id' => $contributionID,
+      'return' => 'financial_type_id',
+    ]));
+    $this->assertEquals('NZD', $this->callAPISuccessGetValue('Contribution', [
+      'id' => $contributionID,
+      'return' => 'currency',
+    ]));
+  }
+
   public function testDeleteGrant(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
