@@ -611,21 +611,39 @@
 
       this.getTokenValues = (tokens) => {
         const values = {};
-
-        tokens.forEach((token) => {
-          const parts = token.slice(1, -1).split('.');
-          const entity = parts[0];
-          const index = parts[1];
-          const fieldName = parts.slice(2).join('.');
-          if (!data || !data[entity] || !data[entity][index] || !data[entity][index].fields || (data[entity][index].fields[fieldName] === undefined) ) {
-            values[token] = '';
-          }
-          else {
-            values[token] = data[entity][index].fields[fieldName];
-          }
-        });
-
+        tokens.forEach((token) => values[token] = this.getTokenValue(token));
         return values;
+      };
+
+      this.getTokenValue = (token) => {
+        const parts = token.slice(1, -1).split('.');
+        const entity = parts[0];
+        const index = parts[1];
+        if (!data || !data[entity] || !data[entity][index]) {
+          return '';
+        }
+        // remember: custom field fieldnames contain `.`
+        const fieldName = parts.slice(2).join('.');
+
+        if (data[entity][index].fields && (data[entity][index].fields[fieldName] !== undefined) ) {
+          return data[entity][index].fields[fieldName];
+        }
+
+        const joinParts = fieldName.split('.');
+        const joinEntity = joinParts[0];
+        const joinIndex = joinParts[1];
+        const joinFieldName = joinParts.slice(2).join('.');
+
+        if (
+          data[entity][index].joins &&
+          data[entity][index].joins[joinEntity] &&
+          data[entity][index].joins[joinEntity][joinIndex] &&
+          (data[entity][index].joins[joinEntity][joinIndex][joinFieldName] !== undefined)
+        ) {
+          return data[entity][index].joins[joinEntity][joinIndex][joinFieldName];
+        }
+
+        return '';
       };
 
       this.replaceTokens = (message) => {
