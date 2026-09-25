@@ -885,7 +885,7 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
       $updatedRecurParams['next_sched_contribution_date'] = NULL;
       $updatedRecurParams['end_date'] = 'now';
     }
-    else {
+    elseif ($paymentStatus === 'Completed') {
       // Only update next sched date if it's empty or up to 48 hours away because payment processors may be managing
       // the scheduled date themselves as core did not previously provide any help. This check can possibly be removed
       // as it's unclear if it actually is helpful...
