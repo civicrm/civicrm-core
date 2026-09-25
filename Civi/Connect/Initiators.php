@@ -26,9 +26,11 @@ class Initiators {
    *   Some combination of:
    *     - for: string (REQUIRED), a symbol that identifies the kind of context. Possible values:
    *         - "PaymentProcessor" (v6.7+): Add or reset the API key for a PaymentProcessor
+   *         - "MailSettings" (v6.19+): Add or reset the credentials for a Mail Account
    *     - payment_processor_type: string (OPTIONAL), a symbol like "PayPal" or "Stripe" which identifies the type of payment-processor
    *     - payment_processor_id: int (OPTIONAL), unique id for the PaymentProcessor record
    *     - is_test: bool (OPTIONAL), whether this payproc is for testing
+   *     - mail_settings_id: int (OPTIONAL), unique id for the MailSettings record
    * @readonly
    */
   public array $context;
@@ -48,6 +50,12 @@ class Initiators {
    *     - title: string
    *     - render: callback to generate the UI widget
    *        Signature: function(CRM_Core_Region $region, array $context, array $initiator):
+   *     - is_connected: bool (OPTIONAL), whether the subject record is currently connected via this initiator
+   *     - status_message: string (OPTIONAL), describes the current connection, e.g. "Connected as foo@example.org"
+   *     - status_severity: string (OPTIONAL), one of 'success', 'warning', 'danger'
+   *     - manage_url: string (OPTIONAL), address of the screen which administers this connection
+   *     - managed_fields: string[] (OPTIONAL), fields supplied by this connection at runtime, which
+   *        the consuming form should hide and leave untouched on save
    *     - name: string (COMPUTED; same as array-key)
    *     - url: string (COMPUTED; HTTP address for this initiator)
    *     - is_default: bool (COMPUTED)
@@ -79,6 +87,29 @@ class Initiators {
 
   public function get(string $name): ?array {
     return $this->available[$name] ?? NULL;
+  }
+
+  /**
+   * Find the initiator (if any) which reports an active connection for the subject record.
+   *
+   * @return array|null
+   */
+  public function getConnected(): ?array {
+    foreach ($this->available as $initiator) {
+      if (!empty($initiator['is_connected'])) {
+        return $initiator;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Fields which the active connection supplies at runtime.
+   *
+   * @return string[]
+   */
+  public function getManagedFields(): array {
+    return $this->getConnected()['managed_fields'] ?? [];
   }
 
 }
