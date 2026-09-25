@@ -967,7 +967,7 @@ class CRM_Utils_String {
    * @return mixed
    */
   public static function unserialize($string) {
-    if (!is_string($string)) {
+    if (!is_string($string) || $string === '') {
       return FALSE;
     }
     try {
