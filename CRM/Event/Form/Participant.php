@@ -1102,12 +1102,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Process the participant.
    *
+   * This is used when there is no contribution involved.
+   *
    * @param int $contactID
    *
-   * @return \CRM_Event_BAO_Participant
+   * @return int
    * @throws \CRM_Core_Exception
    */
-  protected function addParticipant($contactID): CRM_Event_BAO_Participant {
+  protected function addParticipant(int $contactID): int {
     $transaction = new CRM_Core_Transaction();
     $participantParams = [
       'id' => $this->getParticipantID(),
@@ -1153,7 +1155,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     );
     $transaction->commit();
     $this->_id = $participant->id;
-    return $participant;
+    return $participant->id;
   }
 
   /**
@@ -1314,13 +1316,16 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * Add activity.
    *
-   * @param \CRM_Event_BAO_Participant $participant
+   * @param int $participantID
+   * @param int $contactID
+   *
+   * @throws \CRM_Core_Exception
    */
-  private function addActivity($participant) {
+  private function addActivity(int $participantID, int $contactID): void {
     $activityParams = [
-      'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ?: $participant->contact_id,
-      'target_contact_id' => $participant->contact_id,
-      'source_record_id' => $participant->id,
+      'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ?: $contactID,
+      'target_contact_id' => $contactID,
+      'source_record_id' => $participantID,
       'activity_type_id:name' => 'Email',
       'activity_date_time' => 'now',
       'is_test' => $this->isTest(),
@@ -1717,7 +1722,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     $transaction->commit();
 
-    return ['contribution' => $contribution, 'participant' => $participant];
+    return ['contribution_id' => $contribution->id, 'participant_id' => $participant->id];
   }
 
   /**
@@ -1752,14 +1757,18 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   }
 
   /**
-   * @param \CRM_Event_BAO_Participant $participant
+   * @param array $modelProps
+   *   Model properties for Message Template
+   *   - contactID
+   *   - participantID
+   *   - contributionID
    *
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  protected function sendEmail(CRM_Event_BAO_Participant $participant): bool {
-    $participantID = $participant->id;
-    $contactID = $participant->contact_id;
+  protected function sendEmail(array $modelProps): bool {
+
+    $contactID = $modelProps['contactID'];
     $key = 'contact_' . $contactID;
 
     $this->define('Contact', $key, ['id' => $contactID]);
@@ -1769,20 +1778,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       return FALSE;
     }
 
-    $contributionID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-      $participantID, 'contribution_id', 'participant_id'
-    );
-
     $sendTemplateParams = [
       'workflow' => 'event_offline_receipt',
       'contactId' => $contactID,
       'isTest' => $this->isTest(),
       'PDFFilename' => ts('confirmation') . '.pdf',
-      'modelProps' => [
-        'participantID' => $participantID,
+      'modelProps' => $modelProps + [
         'userEnteredHTML' => $this->getSubmittedValue('receipt_text'),
         'eventID' => $this->getEventID(),
-        'contributionID' => $contributionID,
       ],
     ];
 
@@ -1795,17 +1798,17 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     //send email with pdf invoice
     if (Civi::settings()->get('invoice_is_email_pdf')) {
       $sendTemplateParams['isEmailPdf'] = TRUE;
-      $sendTemplateParams['contributionId'] = $contributionID;
     }
     [$mailSent] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     if ($mailSent) {
+      $contributionID = $modelProps['contributionID'];
       if ($contributionID) {
         Contribution::update(FALSE)
           ->addWhere('id', '=', $contributionID)
           ->setValues(['receipt_date' => 'now'])
           ->execute();
       }
-      $this->addActivity($participant);
+      $this->addActivity($modelProps['participantID'], $contactID);
     }
     return $mailSent;
   }
@@ -1822,8 +1825,8 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $contributionParams = $this->getContributionValues();
       $contributionParams['contact_id'] = $contactID;
       $saved = $this->saveOrder($contributionParams);
-      $participant = $saved['participant'];
-      $contributionID = $saved['contribution']->id;
+      $participantID = $saved['participant_id'];
+      $contributionID = $saved['contribution_id'];
 
       $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'));
       if ($this->isSubmitProcessorPayment()) {
@@ -1843,7 +1846,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
       if ($contributionStatus == 'Completed') {
         $paymentAmount = $this->isRecordContributionBeingUsedToRecordAPartialPayment() ? $this->getSubmittedValue('total_amount') : $this->getContributionTotalAmount();
-        Payment::create(FALSE)
+        $financialTrxn = Payment::create(FALSE)
           ->setNotificationForCompleteOrder(FALSE)
           ->setNotificationForPayment(FALSE)
           ->addValue('contribution_id', $contributionID)
@@ -1860,13 +1863,19 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
     }
     else {
-      $participant = $this->addParticipant($contactID);
+      $participantID = $this->addParticipant($contactID);
     }
     if ($this->getSubmittedValue('send_receipt')) {
       $this->assign('credit_card_number', $this->getMungedPanTruncation());
       $this->assign('credit_card_exp_date', $this->getCreditCardExpiryDate());
       $this->assign('credit_card_type', $this->getCreditCardType());
-      return (int) $this->sendEmail($participant);
+      return (int) $this->sendEmail([
+        'participantID' => $participantID,
+        'contributionID' => $contributionID ?? NULL,
+        'contactID' => $contactID,
+        'financialTrxnID' => isset($financialTrxn) ? $financialTrxn->first()['id'] : NULL,
+        'eventID' => $this->getEventID(),
+      ]);
     }
     return 0;
   }
