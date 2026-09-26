@@ -18,6 +18,60 @@ use Civi\Test\Invasive;
 class CRM_Mailing_BAO_MailingJobTest extends CiviUnitTestCase {
   use \Civi\Test\Api4TestTrait;
 
+  protected function tearDown(): void {
+    $this->quickCleanup(['civicrm_mailing', 'civicrm_activity', 'civicrm_activity_contact']);
+    Civi::settings()->revert('write_activity_record');
+    Civi::settings()->revert('civimail_multiple_bulk_emails');
+    parent::tearDown();
+  }
+
+  /**
+   * Tests writeToDB() records each target once on the Bulk Email activity.
+   *
+   * @dataProvider getBooleanDataProvider
+   */
+  public function testWriteToDBActivityTargets(bool $isMultipleBulkMail): void {
+    Civi::settings()->set('write_activity_record', TRUE);
+    Civi::settings()->set('civimail_multiple_bulk_emails', $isMultipleBulkMail);
+
+    $contactIDs = [];
+    foreach ([1, 2, 3] as $i) {
+      $contactIDs[] = $this->createTestEntity('Contact', ['first_name' => 'Target' . $i], 'target' . $i)['id'];
+    }
+    $mailingID = $this->createTestEntity('Mailing', [
+      'subject' => 'Test Subject',
+      'scheduled_id' => $contactIDs[0],
+    ])['id'];
+
+    $job = new CRM_Mailing_BAO_MailingJob();
+    $job->mailing_id = $mailingID;
+    $mailing = new CRM_Mailing_BAO_Mailing();
+    $mailing->id = $mailingID;
+    $mailing->find(TRUE);
+
+    $deliveredParams = [];
+    $targetParams = array_slice($contactIDs, 0, 2);
+    $this->assertTrue($job->writeToDB($deliveredParams, $targetParams, $mailing, date('YmdHis')));
+    $this->assertEquals([], $targetParams);
+
+    // The second batch repeats a target already recorded by the first.
+    $targetParams = array_slice($contactIDs, 1, 2);
+    $this->assertTrue($job->writeToDB($deliveredParams, $targetParams, $mailing, date('YmdHis')));
+
+    $activity = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('source_record_id', '=', $mailingID)
+      ->addWhere('activity_type_id:name', '=', 'Bulk Email')
+      ->addSelect('id')
+      ->execute()->single();
+    $targets = \Civi\Api4\ActivityContact::get(FALSE)
+      ->addWhere('activity_id', '=', $activity['id'])
+      ->addWhere('record_type_id:name', '=', 'Activity Targets')
+      ->addSelect('contact_id')
+      ->execute()->column('contact_id');
+    sort($targets);
+    $this->assertEquals($contactIDs, $targets);
+  }
+
   /**
    * Tests CRM_Mailing_BAO_MailingJob::isTemporaryError() method.
    */
