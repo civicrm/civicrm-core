@@ -1,0 +1,4 @@
+title,description,status_id,total,item_count
+Batch One,First test batch,Open,100.00,10
+Batch Two,Second test batch,Closed,50.00,5
+Batch Three,Bad batch,NotAStatus,20.00,2
