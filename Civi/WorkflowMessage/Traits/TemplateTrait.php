@@ -91,15 +91,17 @@ trait TemplateTrait {
     $apiCall = MessageTemplate::get(FALSE)
       ->setLanguage($language)
       ->setTranslationMode('fuzzy')
-      ->addSelect('msg_subject', 'msg_text', 'msg_html', 'pdf_format_id', 'id')
-      ->addWhere('is_default', '=', 1);
+      ->addSelect('msg_subject', 'msg_text', 'msg_html', 'pdf_format_id', 'id');
 
     if ($messageTemplateID) {
+      // An explicit id is the caller's choice; is_default only decides which
+      // of a workflow's templates to use when picking one by workflow name.
       $apiCall->addWhere('id', '=', (int) $messageTemplateID);
       $result = $apiCall->execute();
     }
     elseif ($workflowName) {
       $apiCall->addWhere('workflow_name', '=', $workflowName);
+      $apiCall->addWhere('is_default', '=', 1);
       $result = $apiCall->execute();
     }
     else {
