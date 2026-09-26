@@ -164,23 +164,36 @@ trait CRM_Custom_Form_CustomDataTrait {
   /**
    * Get the submitted custom fields.
    *
-   * This is returned apiv3 style.
-   * @see getSubmittedCustomFieldsForApi4()
+   * A submitted 'custom_<id>' value only exists at all because
+   * addCustomDataFieldsToForm() already decided that field was eligible and
+   * registered it with QuickForm, so there's no need to re-derive eligibility
+   * here.
+   *
+   * @param int $version
+   *   3 for 'custom_<id>' keys, 4 for 'GroupName.FieldName' keys.
+   * @param string|null $entity
+   *   If given (eg 'Participant'), only fields whose custom group extends
+   *   this entity are returned - otherwise all submitted custom fields are
+   *   returned, regardless of which entity they belong to. Only useful for a
+   *   form that carries custom fields for more than one entity.
    *
    * @return array
    */
-  protected function getSubmittedCustomFields($version = 3): array {
+  protected function getSubmittedCustomFields(int $version = 4, ?string $entity = NULL): array {
     $fields = [];
     foreach ($this->getSubmittedValues() as $label => $field) {
-      if ($version === 3) {
-        if (CRM_Core_BAO_CustomField::getKeyID($label)) {
-          $fields[$label] = $field;
-        }
+      $fieldID = CRM_Core_BAO_CustomField::getKeyID($label);
+      if (!$fieldID) {
+        continue;
       }
-      else {
-        if (CRM_Core_BAO_CustomField::getKeyID($label)) {
-          $fields[CRM_Core_BAO_CustomField::getLongNameFromShortName($label)] = $field;
-        }
+      if ($entity !== NULL && CRM_Core_BAO_CustomField::getField($fieldID)['custom_group']['extends'] !== $entity) {
+        continue;
+      }
+      if ($version === 3) {
+        $fields[$label] = $field;
+      }
+      elseif ($new = CRM_Core_BAO_CustomField::getLongNameFromShortName($label)) {
+        $fields[$new] = $field;
       }
     }
     return $fields;
@@ -189,18 +202,16 @@ trait CRM_Custom_Form_CustomDataTrait {
   /**
    * Get the submitted custom fields in Api4 format.
    *
+   * @deprecated since 6.20 will be removed around 6.36. Use
+   *   getSubmittedCustomFields() instead - it defaults to Api4 format.
+   *
+   * @param string|null $entity
+   *
    * @return array
    */
-  protected function getSubmittedCustomFieldsForApi4(): array {
-    $fields = [];
-    foreach ($this->getSubmittedValues() as $label => $field) {
-      if (CRM_Core_BAO_CustomField::getKeyID($label)) {
-        if ($new = CRM_Core_BAO_CustomField::getLongNameFromShortName($label)) {
-          $fields[$new] = $field;
-        }
-      }
-    }
-    return $fields;
+  protected function getSubmittedCustomFieldsForApi4(?string $entity = NULL): array {
+    CRM_Core_Error::deprecatedFunctionWarning('getSubmittedCustomFields');
+    return $this->getSubmittedCustomFields(4, $entity);
   }
 
 }
