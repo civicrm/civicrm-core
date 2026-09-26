@@ -169,3 +169,44 @@ af-search-param-sets dl > div > dt {
 .crm-container ul.crm-checkbox-list.checkbox-plain li {
   background-color: inherit;
 }
+
+/* Vertical tabsets: nav sits alongside the panel rather than above it. */
+.crm-tabset-vertical {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--crm-flex-gap, 0.5rem);
+}
+.crm-tabset-vertical > .crm-tab-list {
+  flex: 0 0 var(--crm-side-tabs-width, 15rem);
+  max-width: 100%;
+}
+/* min-width:0 stops wide content (tables, iframes) forcing the flex item wider than its track. */
+.crm-tabset-vertical > .crm-tab-panel {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.crm-tabset-vertical > .crm-buttons {
+  flex: 0 0 100%;
+}
+/* A theme that styles `.nav-pills` active state already wins here on specificity; this is
+   for one that does not, so the current item is always distinguishable. The values come
+   from the shared tab variables, so a theme restyles side tabs by setting those alone.
+   `--crm-tab-radius` is deliberately not among them: some themes give it top-corners-only
+   values, which are meaningful for a row of tabs and wrong for a stacked one. */
+.crm-tabset-vertical > .crm-tab-list > .crm-tab-button.active > a,
+.crm-tabset-vertical > .crm-tab-list > .crm-tab-button.active > a:hover,
+.crm-tabset-vertical > .crm-tab-list > .crm-tab-button.active > a:focus {
+  background-color: var(--crm-tab-bg-active, #ffffff);
+  color: var(--crm-tab-color, inherit);
+  border: var(--crm-tab-active-border, 1px solid transparent);
+}
+.crm-tabset-vertical > .crm-tab-list > .crm-tab-button:not(.active) > a:hover,
+.crm-tabset-vertical > .crm-tab-list > .crm-tab-button:not(.active) > a:focus {
+  background-color: var(--crm-tab-hover-bg-color, transparent);
+}
+@media (max-width: 768px) {
+  .crm-tabset-vertical > .crm-tab-list {
+    flex-basis: 100%;
+  }
+}

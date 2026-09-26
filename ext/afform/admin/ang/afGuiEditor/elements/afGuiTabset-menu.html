@@ -1,5 +1,12 @@
 <li>
   <a href ng-click="$ctrl.addTab()"><i class="crm-i fa-plus-square" role="img" aria-hidden="true"></i> {{:: $ctrl.isPages() ? ts('Add Page') : ts('Add Tab') }}</a>
 </li>
+<li ng-if="!$ctrl.isPages()">
+  <form ng-click="$event.stopPropagation()" class="af-gui-field-select-in-dropdown form-inline">
+    <label for="af-gui-tabset-orientation">{{:: ts('Orientation:') }}</label>
+    <select id="af-gui-tabset-orientation" class="form-control" ng-model="$ctrl.getSetOrientation" ng-model-options="{getterSetter: true}" ng-options="o.id as o.label for o in $ctrl.orientations">
+    </select>
+  </form>
+</li>
 <li role="separator" class="divider"></li>
 <li><a href ng-click="$ctrl.deleteThis()"><span class="text-danger"><i class="crm-i fa-trash" role="img" aria-hidden="true"></i> {{:: $ctrl.isPages() ? ts('Delete Pages') : ts('Delete Tabset') }}</span></a></li>
