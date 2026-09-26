@@ -171,7 +171,8 @@ class CRM_Utils_Url {
   public static function isChildOf($child, $parent): bool {
     $childRel = static::toRelative((string) $child);
     $parentRel = static::toRelative((string) $parent);
-    return str_starts_with($childRel, $parentRel);
+    $parentPath = strtok($parentRel, '?');
+    return str_starts_with($childRel, $parentPath);
   }
 
 }
