@@ -1000,32 +1000,19 @@ class CRM_Contribute_BAO_FinancialProcessor {
         continue;
       }
       $eftParams['entity_id'] = $financialItemIds[$lineItem['price_field_value_id']];
-      $entityParams['line_item_amount'] = $lineItem['line_total'];
-      $this->createProportionalEntry($entityParams, $eftParams);
+      $eftParams['amount'] = 0;
+      if ($entityParams['contribution_total_amount'] != 0) {
+        $eftParams['amount'] = $lineItem['line_total'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
+      }
+      EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
       if (array_key_exists($lineItem['price_field_value_id'], $taxItems)) {
-        $entityParams['line_item_amount'] = $taxItems[$lineItem['price_field_value_id']]['amount'];
         $eftParams['entity_id'] = $taxItems[$lineItem['price_field_value_id']]['financial_item_id'];
-        $this->createProportionalEntry($entityParams, $eftParams);
+        if ($entityParams['contribution_total_amount'] != 0) {
+          $eftParams['amount'] = $taxItems[$lineItem['price_field_value_id']]['amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
+        }
+        EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
       }
     }
-  }
-
-  /**
-   * Create tax entry in civicrm_entity_financial_trxn table.
-   *
-   * @param array $entityParams
-   *
-   * @param array $eftParams
-   *
-   * @throws \CRM_Core_Exception
-   */
-  private function createProportionalEntry(array $entityParams, array $eftParams): void {
-    $eftParams['amount'] = 0;
-    if ($entityParams['contribution_total_amount'] != 0) {
-      $eftParams['amount'] = $entityParams['line_item_amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
-    }
-    // Record Entity Financial Trxn; CRM-20145
-    EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
   }
 
   /**
