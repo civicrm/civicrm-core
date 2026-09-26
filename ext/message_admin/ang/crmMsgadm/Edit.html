@@ -39,7 +39,7 @@
               {{:: ts('Draft') }}
             </a>
           </li>
-          <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'original'}">
+          <li role="presentation" class="navitem" ng-class="{active: $ctrl.tab == 'original'}" ng-if="$ctrl.hasRevType('original')">
             <a crm-icon="fa-file-text-o" class="nav-link" ng-click="$ctrl.tab = 'original'">
               {{:: ts('Original') }}
             </a>
