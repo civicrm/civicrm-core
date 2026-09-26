@@ -1,0 +1,40 @@
+<div id="bootstrap-theme" crm-dialog="crmSearchTask">
+  <form name="crmMsgadmAddTranslationForm" ng-controller="crmMsgadmAddTranslation as $ctrl">
+
+    <div class="form-group">
+      <label>{{:: ts('Message Template')}}</label>
+      <input class="form-control" ng-model="$ctrl.msgTitle" disabled>
+    </div>
+
+    <label>{{:: ts('Locale')}} <span class="crm-marker">*</span></label>
+
+    <div class="radio" ng-repeat="lang in $ctrl.langs | filter:{is_encouraged: true} | orderBy:['label']">
+      <label ng-class="{disabled: !lang.is_allowed}">
+        <input type="radio" ng-model="$ctrl.selected" ng-value="lang.name" name="lang" ng-disabled="!lang.is_allowed"/>
+        {{:: lang.label}}
+        <span ng-if="!lang.is_allowed"><em>({{:: ts('existing')}})</em></span>
+      </label>
+    </div>
+
+    <div class="radio" ng-if="$ctrl.langs.length">
+      <label>
+        <input type="radio" ng-model="$ctrl.selected" value="other" name="lang"/>
+        <select
+          class="form-control"
+          style="min-width: 200px"
+          crm-ui-select="{dropdownAutoWidth : true, allowClear: true, placeholder: ts('Other')}"
+          name="selectedOther"
+          ng-model="$ctrl.selectedOther"
+          ng-change="$ctrl.selected='other'">
+          <option value=""></option>
+          <option ng-repeat="item in $ctrl.langs | orderBy:'label'" value="{{item.name}}" ng-disabled="!item.is_allowed">{{item.label}}</option>
+        </select>
+      </label>
+    </div>
+
+    <span ng-model="placeholder" crm-ui-validate="!($ctrl.selected === 'other' && $ctrl.selectedOther === '')"></span>
+
+    <crm-dialog-button text="ts('Cancel')" icons="{primary: 'fa-times'}" on-click="$ctrl.cancel()"></crm-dialog-button>
+    <crm-dialog-button text="ts('Add')" icons="{primary: 'fa-plus'}" on-click="$ctrl.add()" disabled="!$ctrl.selected || !crmMsgadmAddTranslationForm.$valid"></crm-dialog-button>
+  </form>
+</div>
