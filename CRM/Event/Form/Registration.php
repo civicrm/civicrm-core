@@ -654,7 +654,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $this->assign('is_email_confirm', $this->_values['event']['is_email_confirm'] ?? NULL);
     // assign pay later stuff
-    $isPayLater = empty($this->getSubmittedValue('payment_processor_id')) && !empty($this->getSubmittedValue('priceSetId'));
+    $isPayLater = $this->isPayLater();
     $this->assign('is_pay_later', $isPayLater);
     $this->assign('pay_later_text', $isPayLater ? $this->getPayLaterLabel() : FALSE);
     $this->assign('pay_later_receipt', $isPayLater ? $this->_values['event']['pay_later_receipt'] : NULL);
@@ -1630,7 +1630,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return mixed|null
    */
   public function getSubmittedValue(string $fieldName) {
-    if (in_array($this->getName(), ['Register', 'Confirm', 'ThankYou'], TRUE)) {
+    // Fields that describe the registration as a whole, not a specific
+    // participant - only ever collected on Register or Confirm, but every
+    // page of the wizard (including AdditionalParticipant) needs to be able
+    // to ask for them (e.g. isPayLater() resolving payment_processor_id).
+    $mainFormOnlyFields = ['payment_processor_id'];
+    if (in_array($this->getName(), ['Register', 'Confirm', 'ThankYou'], TRUE)
+      || in_array($fieldName, $mainFormOnlyFields, TRUE)
+    ) {
       // Register, Confirm & ThankYou together describe the overall
       // registration / the primary participant - treat them as one combined
       // 'Main' submission rather than three separate ones. This also covers
@@ -2114,6 +2121,21 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Is this registration being processed as pay-later.
+   *
+   * Computed from the event's pay-later configuration and the resolved
+   * payment_processor_id - always FALSE for a non-monetary event, since
+   * payment_processor_id is never submitted there and the event's
+   * is_pay_later flag can be left stale if the event was made free after
+   * being monetary.
+   *
+   * @return bool
+   */
+  public function isPayLater(): bool {
+    return $this->isPaidEvent() && $this->getEventValue('is_pay_later') && empty($this->getSubmittedValue('payment_processor_id'));
+  }
+
+  /**
    * @return bool
    * @throws \CRM_Core_Exception
    */
@@ -2143,6 +2165,42 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
     return $this->lineItems;
+  }
+
+  /**
+   * Get the total amount for the order, computed from the actual submitted
+   * price selection.
+   *
+   * Events with no price set at all (getPriceSetID() returns NULL) have
+   * nothing to total and return 0.
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getOrderTotalAmount(): float {
+    if (!$this->getPriceSetID()) {
+      return 0;
+    }
+    return $this->getOrder()->getTotalAmount();
+  }
+
+  /**
+   * Get the total tax amount for the order, computed from the actual submitted
+   * price selection.
+   *
+   * Events with no price set at all (getPriceSetID() returns NULL) have
+   * nothing to total and return 0.
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getOrderTotalTaxAmount(): float {
+    if (!$this->getPriceSetID()) {
+      return 0;
+    }
+    return $this->getOrder()->getTotalTaxAmount();
   }
 
 }
