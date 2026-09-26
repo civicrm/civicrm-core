@@ -1,0 +1,130 @@
+<?php
+use CRM_CivicrmAdminUi_ExtensionUtil as E;
+
+return [
+  [
+    'name' => 'SavedSearch_Settings_Inspector',
+    'entity' => 'SavedSearch',
+    'cleanup' => 'unused',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'name' => 'Settings_Inspector',
+        'label' => E::ts('Settings Inspector'),
+        'api_entity' => 'SettingEntry',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'title',
+            'name',
+            'description',
+            'group_name',
+            'is_constant',
+            'is_env_loadable',
+            'global_name',
+            'current_value',
+            'current_layer:label',
+          ],
+          'orderBy' => [],
+          'where' => [],
+        ],
+      ],
+      'match' => ['name'],
+    ],
+  ],
+  [
+    'name' => 'SavedSearch_Settings_Inspector_SearchDisplay_Settings_Inspector',
+    'entity' => 'SearchDisplay',
+    'cleanup' => 'unused',
+    'update' => 'unmodified',
+    'params' => [
+      'version' => 4,
+      'values' => [
+        'name' => 'Settings_Inspector',
+        'label' => E::ts('Settings Inspector'),
+        'saved_search_id.name' => 'Settings_Inspector',
+        'type' => 'table',
+        'settings' => [
+          'description' => E::ts(NULL),
+          'sort' => [],
+          'limit' => 50,
+          'pager' => [],
+          'placeholder' => 5,
+          'columns' => [
+            [
+              'type' => 'field',
+              'key' => 'group_name',
+              'dataType' => 'String',
+              'label' => E::ts('Group'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'title',
+              'dataType' => 'String',
+              'label' => E::ts('Setting'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'name',
+              'dataType' => 'String',
+              'label' => E::ts('Machine-name'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'description',
+              'dataType' => 'String',
+              'label' => E::ts('Description'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'is_constant',
+              'dataType' => 'Boolean',
+              'label' => E::ts('PHP Constant?'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'is_env_loadable',
+              'dataType' => 'Boolean',
+              'label' => E::ts('Environment Variable?'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'global_name',
+              'dataType' => 'String',
+              'label' => E::ts('Global Name'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'current_layer:label',
+              'dataType' => 'String',
+              'label' => E::ts('Current layer'),
+              'sortable' => TRUE,
+            ],
+            [
+              'type' => 'field',
+              'key' => 'current_value',
+              'dataType' => 'String',
+              'label' => E::ts('Current value'),
+              'sortable' => TRUE,
+            ],
+          ],
+          'actions' => TRUE,
+          'classes' => ['table', 'table-striped'],
+          'actions_display_mode' => 'menu',
+        ],
+      ],
+      'match' => [
+        'saved_search_id',
+        'name',
+      ],
+    ],
+  ],
+];
