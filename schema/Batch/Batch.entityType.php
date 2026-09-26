@@ -30,6 +30,7 @@ return [
       'add' => '3.3',
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
+      'usage' => ['import'],
     ],
     'name' => [
       'title' => ts('Batch Name'),
