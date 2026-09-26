@@ -319,7 +319,7 @@
       };
 
       this.getFieldId = function(fieldName) {
-        return _.kebabCase(ctrl.entity.name + '-' + fieldName);
+        return CRM.utils.dashCase(ctrl.entity.name + '-' + fieldName);
       };
 
       this.$onInit = function() {
