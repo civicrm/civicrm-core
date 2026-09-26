@@ -574,7 +574,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     // note that I have started removing the use of isBillingAddressRequiredForPayLater in favour of letting
     // the CRM_Core_Payment_Manual class handle it - but there are ~300 references to it in the code base so only
     // removing in very limited cases.
-    if (!empty($this->_values['event']['is_pay_later'])) {
+    if ($this->getEventValue('is_pay_later')) {
       $this->_isBillingAddressRequiredForPayLater = $this->_values['event']['is_billing_required'] ?? NULL;
       $this->assign('isBillingAddressRequiredForPayLater', $this->_isBillingAddressRequiredForPayLater);
     }
