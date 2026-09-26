@@ -32,11 +32,13 @@ class CRM_Contact_BAO_Contact_Utils {
    *   If profile overlay class should be added.
    * @param string $contactUrl
    *   URL to the contact page. Defaults to civicrm/contact/view
+   * @param bool $includeAriaLabelBy
+   *   Whether to include the aria-labeled-by string
    *
    * @return string
    * @throws \CRM_Core_Exception
    */
-  public static function getImage($contactTypes, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE, $contactUrl = NULL) {
+  public static function getImage($contactTypes, $urlOnly = FALSE, $contactId = NULL, $addProfileOverlay = TRUE, $contactUrl = NULL, $includeAriaLabelBy = TRUE) {
     // Ensure string data is unserialized
     $contactTypes = CRM_Utils_Array::explodePadded($contactTypes);
 
@@ -88,7 +90,7 @@ class CRM_Contact_BAO_Contact_Utils {
         "reset=1&gid={$summaryOverlayProfileId}&id={$contactId}&snippet=4&is_show_email_task=1"
       );
 
-      $imageInfo['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link" aria-labelledby="crm-contactname-content">' . $imageInfo['image'] . '</a>';
+      $imageInfo['summary-link'] = '<a href="' . $contactURL . '" data-tooltip-url="' . $profileURL . '" class="crm-summary-link"' . ($includeAriaLabelBy ? ' aria-labelledby="crm-contactname-content">' : 'aria-label="contact icon">') . $imageInfo['image'] . '</a>';
     }
     else {
       $imageInfo['summary-link'] = $imageInfo['image'];
