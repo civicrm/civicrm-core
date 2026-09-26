@@ -1217,6 +1217,11 @@ class CRM_Financial_BAO_Order {
         $lineItem['entity_table'] = 'civicrm_membership';
         $lineItem['membership_num_terms'] = $lineItem['membership_num_terms'] ?:1;
       }
+      elseif (empty($lineItem['entity_table']) && !isset($lineItem['identifier'])) {
+        // Lines carrying an 'identifier' belong to a multi-form (e.g. event) group whose
+        // entity_table is declared separately by the caller - see Order::save().
+        $lineItem['entity_table'] = 'civicrm_contribution';
+      }
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
       $lineItem['tax_rate'] = $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
       if ($this->getOverrideTotalAmount() !== FALSE) {
