@@ -264,8 +264,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       (!$this->_requireApproval || ($this->getEventValue('is_pay_later') && Civi::settings()->get('allow_price_selection_during_approval_registration')))
     ) {
 
-      [$taxAmount, $participantDetails, $individual, $amountArray] = $this->calculateAmounts();
-      $this->assign('totalTaxAmount', $taxAmount);
+      [$participantDetails, $individual, $amountArray] = $this->calculateAmounts();
+      $this->assign('totalTaxAmount', $this->getOrderTotalTaxAmount());
       $this->_amount = $amountArray;
       $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
       if (\Civi::settings()->get('invoicing')) {
@@ -277,8 +277,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->assign('part', $participantDetails);
       $this->set('part', $participantDetails);
       $this->assign('amounts', $amountArray);
-      $this->assign('totalAmount', $this->_totalAmount);
-      $this->set('totalAmount', $this->_totalAmount);
+      $this->assign('totalAmount', $this->getOrderTotalAmount());
+      $this->set('totalAmount', $this->getOrderTotalAmount());
 
       $this->assign('showPaymentOnConfirm', $this->isShowPaymentOnConfirm());
       if ($this->isShowPaymentOnConfirm()) {
@@ -465,7 +465,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->set('finalAmount', $this->_amount);
     }
     $participantCount = [];
-    $totalTaxAmount = 0;
 
     if ($this->isShowPaymentOnConfirm()) {
       // Set the payment processor so that we can submit the payment
@@ -483,10 +482,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       elseif ($participantNum) {
         $participantCount[$participantNum] = 'participant';
       }
-      $totalTaxAmount += $participantRecord['tax_amount'] ?? 0;
-      if (!empty($participantRecord['is_primary'])) {
-        $taxAmount = &$params[$participantNum]['tax_amount'];
-      }
       //lets get additional participant id to cancel.
       if ($this->_allowConfirmation && is_array($cancelledIds)) {
         $additionalId = $participantRecord['participant_id'] ?? NULL;
@@ -500,7 +495,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $params[$participantNum]['is_pay_later'] = $this->_values['event']['is_pay_later'] = empty($this->getSubmittedValue('payment_processor_id'));
       }
     }
-    $taxAmount = $totalTaxAmount;
+
     $payment = $registerByID = $contribution = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
@@ -664,7 +659,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $allParticipantIds = array_merge([$registerByID], $this->_additionalParticipantIds);
       }
 
-      $totalTaxAmount = 0;
       foreach ($this->_lineItem as $key => $value) {
         if ($value == 'skip') {
           continue;
@@ -873,7 +867,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'financial_type_id' => $financialTypeID,
       'receive_date' => $now,
       'total_amount' => $this->getOrder()->getTotalAmount(),
-      'tax_amount' => $params['tax_amount'],
+      'tax_amount' => $this->getOrderTotalTaxAmount(),
       'amount_level' => $params['amount_level'],
       'invoice_id' => $params['invoiceID'],
       'currency' => $this->getCurrency(),
@@ -1258,7 +1252,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @return array
    */
   private function calculateAmounts(): array {
-    $taxAmount = 0;
     $amountArray = [];
     foreach ($this->_params as $k => $v) {
       if ($v === 'skip') {
@@ -1266,8 +1259,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
       $individualTaxAmount = 0;
       $append = '';
-      //display tax amount on confirmation page
-      $taxAmount += $v['tax_amount'];
       if (is_array($v)) {
         $this->cleanMoneyFields($v);
         foreach (['first_name', 'last_name'] as $name) {
@@ -1307,7 +1298,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $this->_totalAmount = $this->_totalAmount + $amountArray[$k]['amount'];
       }
     }
-    return [$taxAmount, $participantDetails, $individual, $amountArray];
+    return [$participantDetails, $individual, $amountArray];
   }
 
   /**
