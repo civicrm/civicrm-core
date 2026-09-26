@@ -121,7 +121,6 @@ class CRM_Utils_AutoClean {
     $ac = new CRM_Utils_AutoClean();
     $ac->args = [$originalTimeLimit];
     $ac->callback = ['CRM_Core_DAO', 'setMaxExecutionTime'];
-    CRM_Core_DAO::setMaxExecutionTime($newTime);
     return $ac;
   }
 
