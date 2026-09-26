@@ -167,6 +167,11 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * Test verify that a disabled mailing group doesn't prevent access to the mailing generated with the group.
    */
   public function testGetMailingDisabledGroup(): void {
+    // Create extra groups to auto-increment the id a bit;
+    // we don't want the test to accidentally pass just because the id of every entity happens to be the same
+    $this->groupCreate(['name' => uniqid(), 'title' => uniqid()]);
+    $this->groupCreate(['name' => uniqid(), 'title' => uniqid()]);
+
     $this->prepareForACLs();
     $this->createLoggedInUser();
     // create hook to build ACL where clause which choses $this->allowedContactId as the only contact to be considered as mail recipient
