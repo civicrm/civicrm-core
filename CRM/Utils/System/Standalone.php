@@ -774,6 +774,15 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
     }
     $session_handler = new SessionHandler();
     session_set_save_handler($session_handler);
+
+    // pass garbage collection settings to php if set to a value between 0 and 1
+    $gcProbability = Civi::settings()->get('standalone_session_gc_probability');
+    if (0 <= $gcProbability && $gcProbability <= 1) {
+      // php settings expect numerator and divisor
+      $gcPercent = (int) ($gcProbability * 100);
+      ini_set('session.gc_probability', $gcPercent);
+      ini_set('session.gc_divisor', 100);
+    }
   }
 
   protected function getSessionStartParams() {

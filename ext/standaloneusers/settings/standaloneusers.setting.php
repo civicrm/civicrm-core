@@ -25,6 +25,22 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
   ],
+  'standalone_session_gc_probability' => [
+    'name' => 'standalone_session_gc_probability',
+    'group' => 'standaloneusers',
+    'type' => 'Integer',
+    'title' => E::ts('Session Garbage Collection'),
+    'description' => E::ts('How often should session garbage collection run? 1 = always, 0 = never, -1 = use system default'),
+    'default' => 0.5,
+    'html_type' => 'number',
+    'html_attributes' => [
+      'step' => 0.1,
+    ],
+    'is_domain' => 1,
+    'is_contact' => 0,
+    // show lower down the page - most admins wont need to change this
+    'settings_pages' => ['standaloneusers' => ['weight' => 5000]],
+  ],
   // Example value: 'TOTP', not 'Civi\Standalone\MFA\TOTP'
   'standalone_mfa_enabled' => [
     'name' => 'standalone_mfa_enabled',
