@@ -57,49 +57,6 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   }
 
   /**
-   * Creates the entry in the civicrm_loc_block.
-   *
-   * @param array $location
-   * @param array $entityElements
-   *
-   * @return int
-   */
-  public static function createLocBlock($location, $entityElements) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use LocBlock api');
-    $locId = self::findExisting($entityElements);
-    $locBlock = [];
-
-    if ($locId) {
-      $locBlock['id'] = $locId;
-    }
-
-    foreach ([
-      'phone',
-      'email',
-      'im',
-      'address',
-    ] as $loc) {
-      $locBlock["{$loc}_id"] = !empty($location["$loc"][0]) ? $location["$loc"][0]->id : NULL;
-      $locBlock["{$loc}_2_id"] = !empty($location["$loc"][1]) ? $location["$loc"][1]->id : NULL;
-    }
-
-    $countNull = 0;
-    foreach ($locBlock as $key => $block) {
-      if (empty($locBlock[$key])) {
-        $locBlock[$key] = 'null';
-        $countNull++;
-      }
-    }
-
-    if (count($locBlock) == $countNull) {
-      // implies nothing is set.
-      return NULL;
-    }
-
-    return self::addLocBlock($locBlock)->id;
-  }
-
-  /**
    * Takes an entity array and finds the existing location block.
    *
    * @param array $entityElements
