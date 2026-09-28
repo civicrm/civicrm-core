@@ -49,16 +49,6 @@ class Refund extends \Civi\Api4\Generic\AbstractAction {
    */
   protected ?string $transactionID = NULL;
 
-  /**
-   * @see \Civi\Api4\Generic\AbstractEntity::permissions()
-   * @return array
-   */
-  public static function permissions() {
-    return [
-      'refund' => ['refund contributions'],
-    ];
-  }
-
   public function _run(\Civi\Api4\Generic\Result $result) {
     /** @var \CRM_Core_Payment $processor */
     $processor = \Civi\Payment\System::singleton()->getById($this->paymentProcessorID);
