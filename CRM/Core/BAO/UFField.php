@@ -236,25 +236,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField implements \Civi\Core\Ho
   }
 
   /**
-   * Delete profile field given a custom field.
-   *
-   * @param int $customFieldId
-   * @deprecated
-   */
-  public static function delUFField($customFieldId) {
-    CRM_Core_Error::deprecatedFunctionWarning('Api');
-    //find the profile id given custom field id
-    $ufField = new CRM_Core_DAO_UFField();
-    $ufField->field_name = "custom_" . $customFieldId;
-
-    $ufField->find();
-    while ($ufField->fetch()) {
-      //enable/ disable profile
-      CRM_Core_BAO_UFField::deleteRecord(['id' => $ufField->id]);
-    }
-  }
-
-  /**
    * Enable/disable profile field given a custom group id
    *
    * @param int $customGroupId
