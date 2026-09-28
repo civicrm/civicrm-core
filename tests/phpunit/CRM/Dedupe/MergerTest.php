@@ -2139,6 +2139,41 @@ WHERE
   }
 
   /**
+   * The payment-mode delete should find contributions linked by line item.
+   */
+  public function testOperationSqlPaymentModeUsesLineItems(): void {
+    // The SQL under test deletes contributions outright, leaving their financial
+    // records behind, so the financial consistency checks cannot pass.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
+    [$mainID, $otherID] = $this->createMergePair();
+    $membershipTypeID = $this->membershipTypeCreate();
+    $mainMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $mainID,
+      'membership_type_id' => $membershipTypeID,
+    ]);
+    $this->contactMembershipCreate([
+      'contact_id' => $otherID,
+      'membership_type_id' => $membershipTypeID,
+    ]);
+    $contributionID = $this->createMembershipContribution($mainID, $mainMembershipID);
+    CRM_Core_DAO::executeQuery(
+      "UPDATE civicrm_line_item SET entity_table = 'civicrm_membership', entity_id = %1 WHERE contribution_id = %2",
+      [1 => [$mainMembershipID, 'Integer'], 2 => [$contributionID, 'Integer']]
+    );
+    // A site that no longer writes the legacy records is linked by line item alone.
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_membership_payment WHERE contribution_id = %1', [1 => [$contributionID, 'Integer']]);
+
+    foreach (CRM_Dedupe_Merger::operationSql($mainID, $otherID, 'civicrm_membership', [], 'payment') as $sql) {
+      CRM_Core_DAO::executeQuery($sql);
+    }
+
+    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery(
+      'SELECT COUNT(*) FROM civicrm_contribution WHERE id = %1',
+      [1 => [$contributionID, 'Integer']]
+    ));
+  }
+
+  /**
    * Returns [mainId, otherId] – two fresh individuals to use for a merge.
    */
   private function createMergePair(): array {
