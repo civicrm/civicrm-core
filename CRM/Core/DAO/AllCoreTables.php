@@ -20,18 +20,6 @@ use Civi\Schema\EntityRepository;
 class CRM_Core_DAO_AllCoreTables {
 
   /**
-   * @deprecated in 5.73 will be removed in 5.90
-   *
-   * @param bool $fresh Deprecated parameter, use flush() to flush.
-   */
-  public static function init(bool $fresh = FALSE): void {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::flush()');
-    if ($fresh) {
-      EntityRepository::flush();
-    }
-  }
-
-  /**
    * Flush class cache.
    */
   public static function flush(): void {
