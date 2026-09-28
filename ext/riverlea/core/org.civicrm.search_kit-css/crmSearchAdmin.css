@@ -12,13 +12,9 @@
 }
 .crm-search-listing .panel-body {
   background: var(--crm-tab-bg-active);
-}
-.crm-search-listing .crm-search-display.crm-search-display-table {
-  background: var(--crm-tab-bg-active);
-  border-radius: 0 0 var(--crm-l-radius) var(--crm-l-radius);
+  padding: var(--crm-tab-padding);
 }
 .crm-search-listing .crm-search-display-table table {
-  border-width: 1px 0 0 0;
   box-shadow: none;
   margin-bottom: 0;
 }

@@ -62,28 +62,33 @@
     </div>
 
     <div role="tabpanel" ng-repeat="tab in $ctrl.tabs" ng-show="$ctrl.tab === tab.name" ng-if="tab.name !== 'segment'">
-      <div class="panel-body form-inline">
-        <input class="form-control" type="search" ng-model="tab.filters.label.CONTAINS" title="{{:: ts('Filter by label') }}" placeholder="{{:: ts('Filter by label...') }}">
-        <input class="form-control" type="search" ng-if="tab.name === 'custom'" ng-model="tab.filters['created_id.display_name,modified_id.display_name'].CONTAINS" title="{{:: ts('Filter by author') }}" placeholder="{{:: ts('Filter by author...') }}">
-        <span ng-if="['packaged','template'].includes(tab.name)">
-          <label for="filter-package-{{tab.name}}" class="sr-only">{{:: ts('Filter by package')}}</label>
-          <input id="filter-package-{{tab.name}}" class="form-control" ng-model="tab.filters.base_module" ng-list crm-ui-select="{multiple: true, data: $ctrl.modules, placeholder: ts('Filter by package...')}">
-        </span>
-        <label for="filter-api-entity-{{tab.name}}" class="sr-only">{{:: ts('Filter by entity')}}</label>
-        <input id="filter-api-entity-{{tab.name}}" class="form-control collapsible-optgroups" ng-model="tab.filters.api_entity" ng-list crm-ui-select="{multiple: true, data: $ctrl.entitySelect, placeholder: ts('Filter by entity...')}">
-        <span ng-if="$ctrl.getTags().results.length">
-          <label for="filter-tags-{{tab.name}}" class="sr-only">{{:: ts('Filter by tags') }}</label>
-          <input id="filter-tags-{{tab.name}}" class="form-control" ng-model="tab.filters.tags" ng-list crm-ui-select="{multiple: true, data: $ctrl.getTags, placeholder: ts('Filter by tags...')}">
-        </span>
-        <a class="btn btn-secondary btn-sm pull-right" ng-if="tab.name === 'custom'" href crm-dialog-popup="crmSearchAdminImport" popup-tpl="~/crmSearchAdmin/searchListing/import.html">
-          <i class="crm-i fa-upload" role="img" aria-hidden="true"></i>
-          {{:: ts('Import') }}
-        </a>
+      <div class="panel-body">
+        <!-- The Import button floats, and the listing below establishes its own formatting context, so the row has to contain the float or the table lays out beside it. -->
+        <div class="form-inline clearfix">
+          <input class="form-control" type="search" ng-model="tab.filters.label.CONTAINS" title="{{:: ts('Filter by label') }}" placeholder="{{:: ts('Filter by label...') }}">
+          <input class="form-control" type="search" ng-if="tab.name === 'custom'" ng-model="tab.filters['created_id.display_name,modified_id.display_name'].CONTAINS" title="{{:: ts('Filter by author') }}" placeholder="{{:: ts('Filter by author...') }}">
+          <span ng-if="['packaged','template'].includes(tab.name)">
+            <label for="filter-package-{{tab.name}}" class="sr-only">{{:: ts('Filter by package')}}</label>
+            <input id="filter-package-{{tab.name}}" class="form-control" ng-model="tab.filters.base_module" ng-list crm-ui-select="{multiple: true, data: $ctrl.modules, placeholder: ts('Filter by package...')}">
+          </span>
+          <label for="filter-api-entity-{{tab.name}}" class="sr-only">{{:: ts('Filter by entity')}}</label>
+          <input id="filter-api-entity-{{tab.name}}" class="form-control collapsible-optgroups" ng-model="tab.filters.api_entity" ng-list crm-ui-select="{multiple: true, data: $ctrl.entitySelect, placeholder: ts('Filter by entity...')}">
+          <span ng-if="$ctrl.getTags().results.length">
+            <label for="filter-tags-{{tab.name}}" class="sr-only">{{:: ts('Filter by tags') }}</label>
+            <input id="filter-tags-{{tab.name}}" class="form-control" ng-model="tab.filters.tags" ng-list crm-ui-select="{multiple: true, data: $ctrl.getTags, placeholder: ts('Filter by tags...')}">
+          </span>
+          <a class="btn btn-secondary btn-sm pull-right" ng-if="tab.name === 'custom'" href crm-dialog-popup="crmSearchAdminImport" popup-tpl="~/crmSearchAdmin/searchListing/import.html">
+            <i class="crm-i fa-upload" role="img" aria-hidden="true"></i>
+            {{:: ts('Import') }}
+          </a>
+        </div>
+        <crm-search-admin-search-listing filters="tab.filters" tab-count="tab.rowCount"></crm-search-admin-search-listing>
       </div>
-      <crm-search-admin-search-listing filters="tab.filters" tab-count="tab.rowCount"></crm-search-admin-search-listing>
     </div>
     <div ng-show="$ctrl.tab === 'segment'">
-      <crm-search-admin-segment-listing total-count="$ctrl.searchSegmentTab.rowCount"></crm-search-admin-segment-listing>
+      <div class="panel-body">
+        <crm-search-admin-segment-listing total-count="$ctrl.searchSegmentTab.rowCount"></crm-search-admin-segment-listing>
+      </div>
     </div>
   </div>
 </form>
