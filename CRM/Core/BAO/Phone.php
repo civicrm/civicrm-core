@@ -215,20 +215,6 @@ ORDER BY ph.is_primary DESC, phone_id ASC ";
   }
 
   /**
-   * Call common delete function.
-   *
-   * @see \CRM_Contact_BAO_Contact::on_hook_civicrm_post
-   *
-   * @param int $id
-   * @deprecated
-   * @return bool
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) self::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Customize search criteria for SMS autocompletes
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
