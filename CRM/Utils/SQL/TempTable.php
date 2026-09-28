@@ -250,15 +250,6 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
-   * @deprecated
-   * @return bool
-   */
-  public function isUtf8() {
-    CRM_Core_Error::deprecatedFunctionWarning('your own charset/collation per column with createWithColumns if you really need latin1');
-    return $this->utf8;
-  }
-
-  /**
    * @param bool $autodrop
    * @return CRM_Utils_SQL_TempTable
    */
