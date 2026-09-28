@@ -490,16 +490,6 @@ AND    domain_id    = %4
   }
 
   /**
-   * @deprecated
-   * @return bool
-   */
-  public static function isEmptyTable() {
-    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
-    $sql = "SELECT count(id) FROM civicrm_uf_match";
-    return CRM_Core_DAO::singleValueQuery($sql) > 0 ? FALSE : TRUE;
-  }
-
-  /**
    * Get the list of contact_id.
    *
    * @deprecated
