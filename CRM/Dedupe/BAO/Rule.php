@@ -14,14 +14,5 @@
  */
 class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_BAO_DedupeRule {
 
-  /**
-   * @param array $params
-   * @deprecated
-   * @return array
-   */
-  public static function dedupeRuleFields($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields');
-    return parent::dedupeRuleFields($params);
-  }
 
 }
