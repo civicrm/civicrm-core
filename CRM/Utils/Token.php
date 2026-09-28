@@ -1136,24 +1136,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Get all custom field tokens of $entity
-   *
-   * @deprecated
-   *
-   * @param string $entity
-   * @return array
-   *   return custom field tokens in array('custom_N' => 'label') format
-   */
-  public static function getCustomFieldTokens($entity) {
-    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
-    $customTokens = [];
-    foreach (CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
-      $customTokens['custom_' . $id] = $info['label'] . ' :: ' . $info['groupTitle'];
-    }
-    return $customTokens;
-  }
-
-  /**
    * Formats a token list for the select2 widget
    *
    * @param $tokens
