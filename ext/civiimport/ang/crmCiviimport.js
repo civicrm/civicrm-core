@@ -205,7 +205,7 @@
           const action = selection.action;
           const rules = $scope.data.dedupeRules;
           const dedupeRules = Object.keys(rules)
-            .filter(key => selection.dedupe_rule.includes(key))
+            .filter(key => selection.dedupe_rule?.includes(key))
             .map(key => rules[key]);
           fields = fields.filter((function (field) {
             // Using replace here is safe ... for now... cos only soft credits have a prefix
@@ -268,7 +268,7 @@
           const dedupeRules = [
             {contact_type: null, text: ts('Universal'), icon: 'fa-star', children: []},
           ];
-          ($scope.data.dedupeRules || []).forEach((rule) => {
+          Object.values($scope.data.dedupeRules).forEach((rule) => {
             if (!selectedEntity || !rule.contact_type || rule.contact_type === selectedEntity) {
               let optGroup = dedupeRules.find(group => group.contact_type === rule.contact_type);
               if (!optGroup) {
