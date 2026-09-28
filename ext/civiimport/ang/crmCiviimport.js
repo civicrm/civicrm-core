@@ -268,7 +268,7 @@
           const dedupeRules = [
             {contact_type: null, text: ts('Universal'), icon: 'fa-star', children: []},
           ];
-          for (const [,rule] of Object.entries($scope.data.dedupeRules)) {
+          for (const rule of Object.values($scope.data.dedupeRules)) {
             if (!selectedEntity || !rule.contact_type || rule.contact_type === selectedEntity) {
               let optGroup = dedupeRules.find(group => group.contact_type === rule.contact_type);
               if (!optGroup) {
