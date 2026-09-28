@@ -435,8 +435,8 @@ DELETE membership1.* FROM civicrm_membership membership1
         if ($mode === 'payment') {
           $sqls[] = "
 DELETE contribution.* FROM civicrm_contribution contribution
-INNER JOIN  civicrm_membership_payment payment ON payment.contribution_id = contribution.id
-INNER JOIN  civicrm_membership membership1 ON membership1.id = payment.membership_id
+INNER JOIN  civicrm_line_item line ON ( line.contribution_id = contribution.id AND line.entity_table = 'civicrm_membership' )
+INNER JOIN  civicrm_membership membership1 ON membership1.id = line.entity_id
             AND membership1.contact_id = {$mainId}
 INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = membership2.membership_type_id
             AND membership2.contact_id = {$otherId}";
