@@ -22,18 +22,6 @@ class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID implements Civi\Core\HookI
   use CRM_Contact_AccessTrait;
 
   /**
-   * @deprecated
-   *
-   * @param array $params
-   * @return CRM_Core_DAO_OpenID
-   * @throws CRM_Core_Exception
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Event fired before modifying an OpenID.
    * @param \Civi\Core\Event\PreEvent $event
    */
