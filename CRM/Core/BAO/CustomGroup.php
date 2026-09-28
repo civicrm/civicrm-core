@@ -1759,22 +1759,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
   }
 
   /**
-   * @return array
-   */
-  public static function getMultipleFieldGroup() {
-    CRM_Core_Error::deprecatedFunctionWarning('api');
-    $multipleGroup = [];
-    $dao = new CRM_Core_DAO_CustomGroup();
-    $dao->is_multiple = 1;
-    $dao->is_active = 1;
-    $dao->find();
-    while ($dao->fetch()) {
-      $multipleGroup[$dao->id] = $dao->title;
-    }
-    return $multipleGroup;
-  }
-
-  /**
    * Use APIv4 getFields (or self::getExtendsEntityColumnValueOptions) instead of this beast.
    * @deprecated as of 5.72 use getExtendsEntityColumnValueOptions - will be removed by 5.78
    * @return array
