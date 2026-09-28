@@ -264,15 +264,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       (!$this->_requireApproval || ($this->getEventValue('is_pay_later') && Civi::settings()->get('allow_price_selection_during_approval_registration')))
     ) {
 
-      [$participantDetails, $individual, $amountArray] = $this->calculateAmounts();
+      [$participantDetails, $amountArray] = $this->calculateAmounts();
       $this->assign('totalTaxAmount', $this->getOrderTotalTaxAmount());
       $this->_amount = $amountArray;
       $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
-      if (\Civi::settings()->get('invoicing')) {
-        // @todo - remove this - used to be for online event template but no longer used.
-        $this->assign('individual', $individual);
-        $this->set('individual', $individual);
-      }
 
       $this->assign('part', $participantDetails);
       $this->set('part', $participantDetails);
@@ -1245,7 +1240,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if ($v === 'skip') {
         continue;
       }
-      $individualTaxAmount = 0;
       $append = '';
       if (is_array($v)) {
         $this->cleanMoneyFields($v);
@@ -1281,12 +1275,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
 
         /*CRM-16320 */
-        $individual[$k]['totalAmtWithTax'] = $amountArray[$k]['amount'];
-        $individual[$k]['totalTaxAmt'] = $individualTaxAmount + $v['tax_amount'];
         $this->_totalAmount = $this->_totalAmount + $amountArray[$k]['amount'];
       }
     }
-    return [$participantDetails, $individual, $amountArray];
+    return [$participantDetails, $amountArray];
   }
 
   /**
