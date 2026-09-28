@@ -393,26 +393,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    // reset the cache
-    Civi::cache('fields')->flush();
-    // reset ACL and system caches.
-    Civi::rebuild(['system' => TRUE])->execute();
-
-    if (!$is_active) {
-      CRM_Core_BAO_UFField::setUFFieldStatus($id, $is_active);
-    }
-
-    return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_CustomGroup', $id, 'is_active', $is_active);
-  }
-
-  /**
    * @deprecated since 5.71 will be removed around 5.85.
    *
    * @param string $extends
