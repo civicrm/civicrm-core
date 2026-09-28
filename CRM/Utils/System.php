@@ -1561,33 +1561,6 @@ class CRM_Utils_System {
   }
 
   /**
-   * Given a URL, return a relative URL if possible.
-   *
-   * @param string $url
-   * @deprecated
-   * @return string
-   */
-  public static function relativeURL($url) {
-    CRM_Core_Error::deprecatedFunctionWarning('url');
-    // check if url is relative, if so return immediately
-    if (substr($url, 0, 4) != 'http') {
-      return $url;
-    }
-
-    // make everything relative from the baseFilePath
-    $baseURL = self::baseCMSURL();
-
-    // check if baseURL is a substr of $url, if so
-    // return rest of string
-    if (substr($url, 0, strlen($baseURL)) == $baseURL) {
-      return substr($url, strlen($baseURL));
-    }
-
-    // return the original value
-    return $url;
-  }
-
-  /**
    * Produce an absolute URL from a possibly-relative URL.
    *
    * @param string $url
