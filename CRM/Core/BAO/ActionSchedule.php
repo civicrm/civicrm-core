@@ -507,14 +507,6 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * @deprecated
-   */
-  public static function getRecipientListing($mappingID, $recipientType) {
-    CRM_Core_Error::deprecatedFunctionWarning('getRecipientListingOptions');
-    return self::getRecipientListingOptions('recipient_listing', ['values' => ['mapping_id' => $mappingID, 'recipient' => $recipientType]]);
-  }
-
-  /**
    * @param string|null $communication_language
    * @param string|null $preferred_language
    * @return string
