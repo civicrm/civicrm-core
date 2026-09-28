@@ -54,6 +54,56 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
+   * Searching contributions by membership should follow the line items.
+   */
+  public function testContributionMembershipSearchUsesLineItems(): void {
+    // The second line item added below is deliberately not reflected in the
+    // financial records.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
+    $contactID = $this->individualCreate();
+    $membershipID = $this->contactMembershipCreate(['contact_id' => $contactID]);
+    $contributionID = $this->contributionCreate([
+      'contact_id' => $contactID,
+      'financial_type_id' => 'Member Dues',
+    ]);
+    CRM_Core_DAO::executeQuery(
+      "UPDATE civicrm_line_item SET entity_table = 'civicrm_membership', entity_id = %1 WHERE contribution_id = %2",
+      [1 => [$membershipID, 'Integer'], 2 => [$contributionID, 'Integer']]
+    );
+    // A site that no longer writes the legacy records is linked by line item alone.
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_membership_payment WHERE contribution_id = %1', [1 => [$contributionID, 'Integer']]);
+
+    $this->assertEquals([$contributionID], $this->searchContributionsByMembership($membershipID));
+
+    // A membership can hold more than one line item on the same contribution,
+    // which must not duplicate the contribution in the results.
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO civicrm_line_item (entity_table, entity_id, contribution_id, label, qty, unit_price, line_total, financial_type_id)
+       SELECT entity_table, entity_id, contribution_id, label, qty, unit_price, line_total, financial_type_id
+       FROM civicrm_line_item WHERE contribution_id = %1",
+      [1 => [$contributionID, 'Integer']]
+    );
+
+    $this->assertEquals([$contributionID], $this->searchContributionsByMembership($membershipID));
+  }
+
+  /**
+   * Returns the contributions the contribution search finds for a membership.
+   */
+  private function searchContributionsByMembership(int $membershipID): array {
+    $queryObj = new CRM_Contact_BAO_Query([['contribution_membership_id', '=', $membershipID, 0, 0]], NULL, NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTRIBUTE);
+    // Mirrors what CRM_Contribute_Selector_Search sets up.
+    $queryObj->_distinctComponentClause = ' civicrm_contribution.id';
+    $queryObj->_groupByComponentClause = ' GROUP BY civicrm_contribution.id ';
+    $dao = CRM_Core_DAO::executeQuery($queryObj->getSearchSQL());
+    $found = [];
+    while ($dao->fetch()) {
+      $found[] = (int) $dao->contribution_id;
+    }
+    return $found;
+  }
+
+  /**
    * Data provider for sort fields
    */
   public static function getSortFields() {
