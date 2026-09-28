@@ -490,27 +490,6 @@ AND    domain_id    = %4
   }
 
   /**
-   * Is duplicate user
-   *
-   * @param string $email
-   * @deprecated
-   * @return bool
-   */
-  public static function isDuplicateUser($email) {
-    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
-    $session = CRM_Core_Session::singleton();
-    $contactID = $session->get('userID');
-    if (!empty($email) && isset($contactID)) {
-      $dao = new CRM_Core_DAO_UFMatch();
-      $dao->uf_name = $email;
-      if ($dao->find(TRUE) && $contactID != $dao->contact_id) {
-        return TRUE;
-      }
-    }
-    return FALSE;
-  }
-
-  /**
    * Get uf match values for given uf id or logged in user.
    *
    * @param int $ufID
