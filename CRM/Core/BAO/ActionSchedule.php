@@ -803,15 +803,4 @@ FROM civicrm_action_schedule cas
     return NULL;
   }
 
-  /**
-   * @deprecated
-   */
-  public static function getAdditionalRecipients(): array {
-    CRM_Core_Error::deprecatedFunctionWarning('APIv4 getFields');
-    return [
-      'manual' => ts('Choose Recipient(s)'),
-      'group' => ts('Select Group'),
-    ];
-  }
-
 }
