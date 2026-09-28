@@ -67,6 +67,17 @@
 
         fieldOptions = this.defn.options || null;
 
+        // Datepickers read these once when linking, so they must be set before the template renders
+        if (this.defn.search_range && this.defn.is_date) {
+          this.inputAttrs = [this.defn.input_attrs || {}];
+          for (let i = 1; i <= 2; ++i) {
+            const attrs = structuredClone(this.defn.input_attrs || {});
+            attrs.placeholder = attrs['placeholder' + i];
+            attrs.timePlaceholder = attrs['timePlaceholder' + i];
+            this.inputAttrs.push(attrs);
+          }
+        }
+
         // Ensure boolean options are truly boolean
         if (this.defn.data_type === 'Boolean') {
           if (Array.isArray(fieldOptions)) {
@@ -241,16 +252,6 @@
               (ctrl.defn.input_type !== 'Select' || !ctrl.defn.is_date || initialVal === '{}')
             ) {
               $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
-            }
-            // Initialize inputAttrs (only used for datePickers at the moment)
-            if (ctrl.defn.is_date) {
-              ctrl.inputAttrs.push(ctrl.defn.input_attrs || {});
-              for (let i = 1; i <= 2; ++i) {
-                const attrs = structuredClone(ctrl.defn.input_attrs || {});
-                attrs.placeholder = attrs['placeholder' + i];
-                attrs.timePlaceholder = attrs['timePlaceholder' + i];
-                ctrl.inputAttrs.push(attrs);
-              }
             }
           }
         }
