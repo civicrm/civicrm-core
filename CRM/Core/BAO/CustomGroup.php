@@ -393,16 +393,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
   }
 
   /**
-   * @deprecated Function moved
-   *
-   * @param int $activityTypeId
-   */
-  public static function autoCreateByActivityType($activityTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Campaign_Form_Survey_Questions::autoCreateCustomGroup');
-    return CRM_Campaign_Form_Survey_Questions::autoCreateCustomGroup($activityTypeId);
-  }
-
-  /**
    * @deprecated Function demonstrates just how bad code can get from 20 years of entropy.
    *
    * This function takes an overcomplicated set of params and returns an overcomplicated
