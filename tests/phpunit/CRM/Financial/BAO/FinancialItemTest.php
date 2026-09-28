@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\FinancialItem;
 
@@ -179,7 +180,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
   public function testGetPreviousFinancialItem(): void {
     $contactId = $this->individualCreate();
 
-    $params = [
+    $contribution = $this->createTestEntity('Contribution', [
       'contact_id' => $contactId,
       'currency' => 'USD',
       'financial_type_id' => 1,
@@ -192,20 +193,19 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'total_amount' => 100.00,
       'trxn_id' => '22333444444',
       'invoice_id' => 'abc',
-    ];
+    ]);
 
-    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->setValues(['total_amount' => 300.00])
+      ->execute();
 
-    $params = [
-      'id' => $contribution['id'],
-      'total_amount' => 300.00,
-    ];
-
-    $contribution = $this->callAPISuccess('Contribution', 'create', $params);
     $financialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
-    $params = ['id' => $financialItem['id']];
-    $financialItem = $this->callAPISuccess('FinancialItem', 'get', $params);
-    $this->assertEquals(200.00, $financialItem['values'][$financialItem['id']]['amount'], 'The amounts do not match.');
+    $result = FinancialItem::get(FALSE)
+      ->addWhere('id', '=', $financialItem['id'])
+      ->addSelect('amount')
+      ->execute()->single();
+    $this->assertEquals(200.00, $result['amount'], 'The amounts do not match.');
   }
 
   /**
@@ -224,39 +224,26 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate();
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType(1);
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
+    $this->getTestForm('CRM_Contribute_Form_Contribution', [
       'total_amount' => 100,
       'financial_type_id' => 1,
       'contact_id' => $contactId,
       'contribution_status_id' => 1,
       'price_set_id' => 0,
-    ]);
-    $form->buildForm();
-    $form->postProcess();
-    $contribution = $this->callAPISuccessGetSingle('Contribution',
-      [
-        'contact_id' => $contactId,
-        'return' => ['id'],
-      ]
-    );
+    ])->processForm();
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('contact_id', '=', $contactId)
+      ->addSelect('id')
+      ->execute()->single();
     $financialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
-    $params = [
-      'id' => $financialItem['id'],
-      'return' => [
-        'description',
-        'status_id',
-        'amount',
-        'financial_account_id',
-      ],
-    ];
-    $checkAgainst = [
-      'id' => $financialItem['id'],
-      'description' => 'Contribution Amount',
-      'status_id' => '1',
-      'amount' => '100.00',
-      'financial_account_id' => '1',
-    ];
-    $this->callAPISuccessGetSingle('FinancialItem', $params, $checkAgainst);
+    $result = FinancialItem::get(FALSE)
+      ->addWhere('id', '=', $financialItem['id'])
+      ->addSelect('description', 'status_id', 'amount', 'financial_account_id')
+      ->execute()->single();
+    $this->assertEquals('Contribution Amount', $result['description']);
+    $this->assertEquals(1, $result['status_id']);
+    $this->assertEquals(100.00, $result['amount']);
+    $this->assertEquals(1, $result['financial_account_id']);
   }
 
 }
