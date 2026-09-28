@@ -490,26 +490,6 @@ AND    domain_id    = %4
   }
 
   /**
-   * See if this user exists, and if so, if they're allowed to login
-   *
-   * @deprecated
-   * @param int $openId
-   *
-   * @return bool
-   *   true if allowed to login, false otherwise
-   */
-  public static function getAllowedToLogin($openId) {
-    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
-    $ufmatch = new CRM_Core_DAO_UFMatch();
-    $ufmatch->uf_name = $openId;
-    $ufmatch->allowed_to_login = 1;
-    if ($ufmatch->find(TRUE)) {
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
    * Get the next unused uf_id value
    *
    * @deprecated
