@@ -24,20 +24,6 @@ class CRM_Core_BAO_Email extends CRM_Core_DAO_Email implements Civi\Core\HookInt
   use CRM_Contact_AccessTrait;
 
   /**
-   * @deprecated
-   *
-   * @param array $params
-   * @return CRM_Core_BAO_Email
-   * @throws CRM_Core_Exception
-   */
-  public static function create($params) {
-    // FIXME: switch CRM_Core_BAO_Block::create to call writeRecord (once Address, IM, Phone create functions go through it)
-    // then this can be uncommented:
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Event fired before modifying an Email.
    * @param \Civi\Core\Event\PreEvent $event
    */
