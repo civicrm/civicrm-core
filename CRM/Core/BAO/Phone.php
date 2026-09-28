@@ -22,18 +22,6 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone implements Civi\Core\HookInt
   use CRM_Contact_AccessTrait;
 
   /**
-   * @deprecated
-   *
-   * @param array $params
-   * @return CRM_Core_DAO_Phone
-   * @throws CRM_Core_Exception
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Event fired before modifying a Phone.
    * @param \Civi\Core\Event\PreEvent $event
    */
