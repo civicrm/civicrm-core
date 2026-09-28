@@ -1,5 +1,7 @@
 # CiviCRM core — AI contributor notes
 
+Please note: the name, use and role of the agent must be clearly declared in commits, PRs, etc. This is because an agent bears no responsibility for its output, which is important context for CiviCRM's human maintainers who are responsible for building a trusted CRM from community contributions.
+
 ## Writing PHPUnit tests
 
 When adding new test methods, use APIv4 rather than APIv3:
