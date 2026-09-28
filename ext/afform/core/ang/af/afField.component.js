@@ -145,11 +145,20 @@
               };
               crmApi4('Afform', 'getOptions', params)
                 .then((data) => {
-                  $('input[crm-ui-select]', $element).removeClass('loading').prop('disabled', !data.length);
+                  $('input[crm-ui-select]', $element)
+                    .removeClass('loading')
+                    .attr('placeholder', data.length ? ts('Select') : ts('None Found'))
+                    .prop('disabled', !data.length);
                   fieldOptions = data;
                 });
             } else {
               fieldOptions = null;
+              // When control field is deselected, disable this field and set appropriate placeholder
+              const ctrlFieldCtrl = $element.closest('[af-repeat-item], [af-join], [af-fieldset], form')
+                .find(`af-field[name="${controlField}"]`).controller('afField');
+              $('input[crm-ui-select]', $element)
+                .attr('placeholder', ts('Choose %1 first', {1: ctrlFieldCtrl?.defn?.label}))
+                .prop('disabled', true);
             }
           }, true);
         }
@@ -469,18 +478,18 @@
         if (Array.isArray(current)) {
           // Remove any invalid options from value array
           const valid = current.filter((v) => options.includes(v));
-          // If any options were removed, update the model and input
+          // If any options were removed, update the model
           if (valid.length < current.length) {
             $scope.dataProvider.getFieldData()[this.fieldName] = valid;
-            $('input[crm-ui-select]', $element).val(valid).change();
           }
         } else {
           // Unset single value if invalid
           if (!options.includes(current)) {
-            $('input[crm-ui-select]', $element).val('').change();
             delete $scope.dataProvider.getFieldData()[this.fieldName];
           }
         }
+        // Re-render Select2 with the current valid selection
+        $element.find('input[crm-ui-select]').controller('ngModel')?.$render();
       };
 
       $scope.select2Options = function() {
