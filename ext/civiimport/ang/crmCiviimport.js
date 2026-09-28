@@ -205,7 +205,7 @@
           const action = selection.action;
           const rules = $scope.data.dedupeRules;
           const dedupeRules = Object.keys(rules)
-            .filter(key => selection.dedupe_rule.includes(key))
+            .filter(key => selection.dedupe_rule?.includes(key))
             .map(key => rules[key]);
           fields = fields.filter((function (field) {
             // Using replace here is safe ... for now... cos only soft credits have a prefix
