@@ -307,18 +307,6 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * Delete a Reminder.
-   *
-   * @param int $id
-   * @deprecated
-   * @throws CRM_Core_Exception
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    self::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * @deprecated - this bypasses hooks.
    * @param int $id
    * @param bool $is_active
