@@ -393,58 +393,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    // reset the cache
-    Civi::cache('fields')->flush();
-    // reset ACL and system caches.
-    Civi::rebuild(['system' => TRUE])->execute();
-
-    if (!$is_active) {
-      CRM_Core_BAO_UFField::setUFFieldStatus($id, $is_active);
-    }
-
-    return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_CustomGroup', $id, 'is_active', $is_active);
-  }
-
-  /**
-   * @deprecated since 5.71 will be removed around 5.85.
-   *
-   * @param string $extends
-   *   E.g. "Individual", "Activity".
-   * @param int $columnId
-   *   E.g. custom-group matching mechanism (usu NULL for matching on sub type-id); see extends_entity_column_id.
-   * @param string $columnValue
-   *   E.g. "Student" or "3" or "3\05"; see extends_entity_column_value.
-   *
-   * @return bool
-   */
-  public static function hasCustomGroup($extends, $columnId, $columnValue) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getAll');
-    $dao = new CRM_Core_DAO_CustomGroup();
-    $dao->extends = $extends;
-    $dao->extends_entity_column_id = $columnId;
-    $escapedValue = CRM_Core_DAO::VALUE_SEPARATOR . CRM_Core_DAO::escapeString($columnValue) . CRM_Core_DAO::VALUE_SEPARATOR;
-    $dao->whereAdd("extends_entity_column_value LIKE \"%$escapedValue%\"");
-    return (bool) $dao->find();
-  }
-
-  /**
-   * @deprecated Function moved
-   *
-   * @param int $activityTypeId
-   */
-  public static function autoCreateByActivityType($activityTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Campaign_Form_Survey_Questions::autoCreateCustomGroup');
-    return CRM_Campaign_Form_Survey_Questions::autoCreateCustomGroup($activityTypeId);
-  }
-
-  /**
    * @deprecated Function demonstrates just how bad code can get from 20 years of entropy.
    *
    * This function takes an overcomplicated set of params and returns an overcomplicated
@@ -1808,60 +1756,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
       return $count >= $maxMultiple;
     }
     return FALSE;
-  }
-
-  /**
-   * @return array
-   */
-  public static function getMultipleFieldGroup() {
-    CRM_Core_Error::deprecatedFunctionWarning('api');
-    $multipleGroup = [];
-    $dao = new CRM_Core_DAO_CustomGroup();
-    $dao->is_multiple = 1;
-    $dao->is_active = 1;
-    $dao->find();
-    while ($dao->fetch()) {
-      $multipleGroup[$dao->id] = $dao->title;
-    }
-    return $multipleGroup;
-  }
-
-  /**
-   * Use APIv4 getFields (or self::getExtendsEntityColumnValueOptions) instead of this beast.
-   * @deprecated as of 5.72 use getExtendsEntityColumnValueOptions - will be removed by 5.78
-   * @return array
-   */
-  public static function getSubTypes(): array {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions');
-    $sel2 = [];
-    $activityType = CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'search');
-
-    $eventType = CRM_Core_OptionGroup::values('event_type');
-    $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
-    $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypes(FALSE);
-    $participantRole = CRM_Core_OptionGroup::values('participant_role');
-
-    asort($activityType);
-    asort($eventType);
-    asort($membershipType);
-    asort($participantRole);
-
-    $sel2['Event'] = $eventType;
-    $sel2['Activity'] = $activityType;
-    $sel2['Campaign'] = $campaignTypes;
-    $sel2['Membership'] = $membershipType;
-    $sel2['ParticipantRole'] = $participantRole;
-    $sel2['ParticipantEventName'] = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template != 1 )");
-    $sel2['ParticipantEventType'] = $eventType;
-    $sel2['Contribution'] = CRM_Contribute_PseudoConstant::financialType();
-    $sel2['Relationship'] = CRM_Custom_Form_Group::getRelationshipTypes();
-
-    $sel2['Individual'] = CRM_Contact_BAO_ContactType::subTypePairs('Individual', FALSE, NULL);
-    $sel2['Household'] = CRM_Contact_BAO_ContactType::subTypePairs('Household', FALSE, NULL);
-    $sel2['Organization'] = CRM_Contact_BAO_ContactType::subTypePairs('Organization', FALSE, NULL);
-
-    CRM_Core_BAO_CustomGroup::getExtendedObjectTypes($sel2);
-    return $sel2;
   }
 
   /**

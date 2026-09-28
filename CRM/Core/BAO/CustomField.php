@@ -207,26 +207,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
   }
 
   /**
-   * Save multiple fields, now deprecated in favor of self::writeRecords.
-   * https://lab.civicrm.org/dev/core/issues/1093
-   * @deprecated
-   *
-   * @param array $bulkParams
-   *   Array of arrays as would be passed into create
-   * @param array $defaults
-   *  Default parameters to be be merged into each of the params.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public static function bulkSave($bulkParams, $defaults = []) {
-    CRM_Core_Error::deprecatedFunctionWarning(__CLASS__ . '::writeRecords');
-    foreach ($bulkParams as $index => $fieldParams) {
-      $bulkParams[$index] = array_merge($defaults, $fieldParams);
-    }
-    self::writeRecords($bulkParams);
-  }
-
-  /**
    * Create/update several fields at once in a mysql efficient way.
    *
    * @param array $records
@@ -298,21 +278,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    Civi::rebuild(['system' => TRUE])->execute();
-
-    //enable-disable CustomField
-    CRM_Core_BAO_UFField::setUFField($id, $is_active);
-    return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_CustomField', $id, 'is_active', $is_active);
   }
 
   /**
