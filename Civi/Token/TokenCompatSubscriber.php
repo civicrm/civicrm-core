@@ -62,6 +62,10 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         // Treat an unknown token as false-y.
         return 0;
       }
+      // If a token with default was missed (e.g. contact.first_name, but there is no contact) use the default.
+      if ($filterParams && $filterParams[0] === 'default') {
+        return $filterParams[1];
+      }
       // For historical consistency, we filter out unrecognized tokens.
       return '';
     });
