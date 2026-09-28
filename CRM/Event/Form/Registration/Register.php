@@ -669,19 +669,9 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     //set as Primary participant
     $params['is_primary'] = 1;
 
-    if ($this->_values['event']['is_pay_later']
-      && (!array_key_exists('hidden_processor', $params) || $params['payment_processor_id'] == 0)
-    ) {
-      $params['is_pay_later'] = 1;
-    }
-    else {
-      $params['is_pay_later'] = 0;
-    }
-
-    $this->set('is_pay_later', $params['is_pay_later']);
+    $params['is_pay_later'] = (int) $this->isPayLater();
 
     // assign pay later stuff
-    $this->_params['is_pay_later'] = $params['is_pay_later'] ?? FALSE;
     $this->assign('is_pay_later', $params['is_pay_later']);
     $this->assign('pay_later_text', $params['is_pay_later'] ? $this->_values['event']['pay_later_text'] : NULL);
     $this->assign('pay_later_receipt', $params['is_pay_later'] ? $this->_values['event']['pay_later_receipt'] : NULL);

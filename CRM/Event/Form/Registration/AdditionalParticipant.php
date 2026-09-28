@@ -271,10 +271,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       }
 
       //lets allow to become a part of runtime waiting list, if primary selected pay later.
-      $realPayLater = FALSE;
-      if ($this->isPaidEvent() && !empty($this->_values['event']['is_pay_later'])) {
-        $realPayLater = $this->_params[0]['is_pay_later'] ?? NULL;
-      }
+      $realPayLater = $this->isPayLater();
 
       //truly spaces are less than required.
       if (is_numeric($spaces) && $spaces <= ($processedCnt + $currentPageMaxCount)) {
@@ -430,10 +427,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     //get the button name.
     $button = substr($self->controller->getButtonName($self->_name), -4);
 
-    $realPayLater = FALSE;
-    if ($self->isPaidEvent() && !empty($self->_values['event']['is_pay_later'])) {
-      $realPayLater = $self->_params[0]['is_pay_later'] ?? NULL;
-    }
+    $realPayLater = $self->isPayLater();
 
     if ($button !== 'skip') {
       //Check that either an email or firstname+lastname is included in the form(CRM-9587)
@@ -731,7 +725,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         $params['participant_role_id'] = $this->_values['event']['default_role_id'];
       }
 
-      if (!empty($this->_params[0]['is_pay_later'])) {
+      if ($this->isPayLater()) {
         $params['is_pay_later'] = 1;
       }
 

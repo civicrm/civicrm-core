@@ -78,7 +78,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->_params = $this->get('params');
     $this->_params[0]['tax_amount'] = $this->get('tax_amount');
 
-    $this->_params[0]['is_pay_later'] = $this->get('is_pay_later');
+    $this->_params[0]['is_pay_later'] = $this->isPayLater();
     $this->assign('is_pay_later', $this->_params[0]['is_pay_later']);
     $this->assign('pay_later_receipt', $this->_params[0]['is_pay_later'] ? $this->_values['event']['pay_later_receipt'] : NULL);
     $this->assign('confirm_text', $this->getEventValue('confirm_text'));
@@ -495,9 +495,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
       if ($this->isShowPaymentOnConfirm()) {
-        // If payment_processor_id is 0 or unset we are pay later.
-        // Otherwise we are using a payment processor
-        $params[$participantNum]['is_pay_later'] = $this->_values['event']['is_pay_later'] = empty($this->getSubmittedValue('payment_processor_id'));
+        $params[$participantNum]['is_pay_later'] = $this->isPayLater();
       }
     }
     $taxAmount = $totalTaxAmount;
