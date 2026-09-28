@@ -1,0 +1,29 @@
+<af-tabset url-arg="selectedChild" remember-selection="true">
+
+  <af-tab name="user" title="{{:: ts('User-Driven Messages') }}">
+    <div af-fieldset="">
+      <div class="help">
+        <p>{{:: ts('Message templates allow you to easily create similar emails or letters on a recurring basis. Messages used for membership renewal reminders, as well as event and activity related reminders should be created via Schedule Reminders.') }}</p>
+      </div>
+      <div class="af-container af-layout-inline">
+        <af-field name="msg_title" defn="{label: false, search_operator: 'CONTAINS', input_attrs: {placeholder: 'Filter by title'}}" />
+        <af-field name="is_active" defn="{input_type: 'Radio', label: 'Enabled'}" />
+      </div>
+      <crm-search-display-table search-name="Message_Templates_User" display-name="Message_Templates_User_Table" total-count="$parent.count"></crm-search-display-table>
+    </div>
+  </af-tab>
+
+  <af-tab name="workflow" title="{{:: ts('System Workflow Messages') }}">
+    <div af-fieldset="">
+      <div class="help">
+        <p>{{:: ts('System workflow message templates are used to generate the emails sent to constituents and administrators for contribution receipts, event confirmations and many other workflows. You can customize the style and wording of these messages here.') }}</p>
+      </div>
+      <div class="af-container af-layout-inline">
+        <af-field name="msg_title" defn="{label: false, search_operator: 'CONTAINS', input_attrs: {placeholder: 'Filter by title'}}" />
+        <af-field name="tx.language" defn="{label: false, required: false, input_attrs: {multiple: true, placeholder: 'Filter by language'}}" />
+      </div>
+      <crm-search-display-table search-name="Message_Templates_Workflow" display-name="Message_Templates_Workflow_Table" total-count="$parent.count"></crm-search-display-table>
+    </div>
+  </af-tab>
+
+</af-tabset>
