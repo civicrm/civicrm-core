@@ -490,24 +490,6 @@ AND    domain_id    = %4
   }
 
   /**
-   * Get the list of contact_id.
-   *
-   * @deprecated
-   * @return int
-   *   contact_id on success, null otherwise.
-   */
-  public static function getContactIDs() {
-    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
-    $id = [];
-    $dao = new CRM_Core_DAO_UFMatch();
-    $dao->find();
-    while ($dao->fetch()) {
-      $id[] = $dao->contact_id;
-    }
-    return $id;
-  }
-
-  /**
    * See if this user exists, and if so, if they're allowed to login
    *
    * @deprecated
