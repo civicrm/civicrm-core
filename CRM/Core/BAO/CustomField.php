@@ -281,21 +281,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    Civi::rebuild(['system' => TRUE])->execute();
-
-    //enable-disable CustomField
-    CRM_Core_BAO_UFField::setUFField($id, $is_active);
-    return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_CustomField', $id, 'is_active', $is_active);
-  }
-
-  /**
    * Get the field title.
    *
    * @param int $id
