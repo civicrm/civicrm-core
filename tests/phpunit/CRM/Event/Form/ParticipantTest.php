@@ -113,6 +113,25 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that custom data submitted with a paid, record-contribution
+   * registration is saved against the participant - this goes through
+   * saveOrder() rather than the addParticipant() path testSubmitWithCustomData()
+   * covers.
+   */
+  public function testSubmitWithCustomDataAndRecordContribution(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant', 'extends_entity_column_id' => 1, 'extends_entity_column_value' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')]);
+    $this->getForm(['is_monetary' => TRUE], [
+      $this->getCustomFieldName() => 'Random thing',
+    ])->postProcess();
+    $participant = \Civi\Api4\Participant::get()
+      ->addSelect($this->getCustomFieldName('text', 4))
+      ->addOrderBy('id', 'DESC')
+      ->execute()
+      ->first();
+    $this->assertEquals('Random thing', $participant[$this->getCustomFieldName('text', 4)]);
+  }
+
+  /**
    * Test that a contribution custom token does not cause a crash when there is no contribution.
    *
    * @throws \CRM_Core_Exception

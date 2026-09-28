@@ -20,6 +20,7 @@ use Civi\API\EntityLookupTrait;
 use Civi\Api4\Activity;
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
+use Civi\Api4\Participant;
 use Civi\Api4\Payment;
 use Civi\Payment\Exception\PaymentProcessorException;
 
@@ -1124,7 +1125,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'note' => $this->getSubmittedValue('note'),
       'is_test' => $this->isTest(),
-    ];
+    ] + $this->getSubmittedCustomFields(4, 'Participant');
 
     if (!$this->getParticipantID() || $this->isReplaceLineItems()) {
       // For new registrations, or existing ones with no contribution,
@@ -1137,25 +1138,18 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->getSubmittedValue('discount_id')) {
       $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
     }
-    $participant = CRM_Event_BAO_Participant::create($participantParams);
+    $participantID = (int) Participant::save(FALSE)->addRecord($participantParams)->execute()->single()['id'];
     if (!$this->getParticipantID() || $this->isReplaceLineItems()) {
       foreach ($this->getLineItems() as $lineItem) {
         $lineItem['entity_table'] = 'civicrm_participant';
-        $lineItem['entity_id'] = $participant->id;
+        $lineItem['entity_id'] = $participantID;
         LineItem::save(FALSE)->addRecord($lineItem)->execute();
       }
     }
 
-    // Add custom data for participant
-    $submittedValues = $this->getSubmittedValues();
-    CRM_Core_BAO_CustomValueTable::postProcess($submittedValues,
-      'civicrm_participant',
-      $participant->id,
-      'Participant'
-    );
     $transaction->commit();
-    $this->_id = $participant->id;
-    return $participant->id;
+    $this->_id = $participantID;
+    return $participantID;
   }
 
   /**
@@ -1668,7 +1662,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * @param array $contributionValues
    *
-   * @return array{contribution: \CRM_Contribute_BAO_Contribution, participant: \CRM_Event_BAO_Participant}
+   * @return array{contribution_id: int, participant_id: int}
    * @throws \CRM_Core_Exception
    */
   private function saveOrder(array $contributionValues): array {
@@ -1686,7 +1680,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'note' => $this->getSubmittedValue('note'),
       'is_test' => $this->isTest(),
-    ];
+    ] + $this->getSubmittedCustomFields(4, 'Participant');
     if (!$this->getParticipantID() || !$this->getContributionID()) {
       // For new registrations, or existing ones with no contribution,
       // fill in fee detail. For existing
@@ -1701,20 +1695,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     if ($this->getSubmittedValue('discount_id')) {
       $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
     }
-    $participant = CRM_Event_BAO_Participant::create($participantParams);
-
-    // Add custom data for participant
-    $submittedValues = $this->getSubmittedValues();
-    CRM_Core_BAO_CustomValueTable::postProcess($submittedValues,
-      'civicrm_participant',
-      $participant->id,
-      'Participant'
-    );
-    $this->_id = $participant->id;
+    $participantID = (int) Participant::save(FALSE)->addRecord($participantParams)->execute()->single()['id'];
+    $this->_id = $participantID;
     // create contribution record
     $contributionValues['skipLineItem'] = TRUE;
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionValues);
-    CRM_Price_BAO_LineItem::processPriceSet($participant->id, [$this->getPriceSetID() => $this->getLineItems()], $contribution, 'civicrm_participant');
+    CRM_Price_BAO_LineItem::processPriceSet($participantID, [$this->getPriceSetID() => $this->getLineItems()], $contribution, 'civicrm_participant');
     // CRM-11124
     if ($this->getSubmittedValue('discount_id')) {
       $firstLine = array_values($this->getLineItems())[0];
@@ -1722,7 +1708,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
     $transaction->commit();
 
-    return ['contribution_id' => $contribution->id, 'participant_id' => $participant->id];
+    return ['contribution_id' => $contribution->id, 'participant_id' => $participantID];
   }
 
   /**

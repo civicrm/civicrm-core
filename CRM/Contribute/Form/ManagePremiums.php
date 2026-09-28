@@ -308,7 +308,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $this->_processImages($params);
 
-    $params += $this->getSubmittedCustomFieldsForApi4();
+    $params += $this->getSubmittedCustomFields();
 
     if (is_string($params['options'])) {
       // In setDefaultValues(), we loaded the serialized `options` string to present
