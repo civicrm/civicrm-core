@@ -490,27 +490,6 @@ AND    domain_id    = %4
   }
 
   /**
-   * Get the next unused uf_id value
-   *
-   * @deprecated
-   * @return int
-   *   Next highest unused value for uf_id.
-   */
-  public static function getNextUfIdValue() {
-    CRM_Core_Error::deprecatedFunctionWarning('unused function to be removed');
-    $query = "SELECT MAX(uf_id)+1 AS next_uf_id FROM civicrm_uf_match";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    if ($dao->fetch()) {
-      $ufID = $dao->next_uf_id;
-    }
-
-    if (!isset($ufID)) {
-      $ufID = 1;
-    }
-    return $ufID;
-  }
-
-  /**
    * Is duplicate user
    *
    * @param string $email
