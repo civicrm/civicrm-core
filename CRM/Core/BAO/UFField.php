@@ -140,18 +140,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField implements \Civi\Core\Ho
   }
 
   /**
-   * Delete the profile Field.
-   *
-   * @param int $id
-   * @deprecated
-   * @return bool
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) self::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Check duplicate for duplicate field in a group.
    *
    * @param array $params
@@ -244,49 +232,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField implements \Civi\Core\Ho
     while ($ufField->fetch()) {
       // Enable/ disable profile.
       CRM_Core_BAO_UFField::setIsActive($ufField->id, $is_active);
-    }
-  }
-
-  /**
-   * Copy existing profile fields to
-   * new profile from the already built profile
-   *
-   * @deprecated
-   *
-   * @param int $old_id
-   *   From which we need to copy.
-   * @param bool $new_id
-   *   In which to copy.
-   */
-  public static function copy($old_id, $new_id) {
-    CRM_Core_Error::deprecatedFunctionWarning('');
-    $ufField = new CRM_Core_DAO_UFField();
-    $ufField->uf_group_id = $old_id;
-    $ufField->find();
-    while ($ufField->fetch()) {
-      //copy the field records as it is on new ufgroup id
-      $ufField->uf_group_id = $new_id;
-      $ufField->id = NULL;
-      $ufField->save();
-    }
-  }
-
-  /**
-   * Delete profile field given a custom field.
-   *
-   * @param int $customFieldId
-   * @deprecated
-   */
-  public static function delUFField($customFieldId) {
-    CRM_Core_Error::deprecatedFunctionWarning('Api');
-    //find the profile id given custom field id
-    $ufField = new CRM_Core_DAO_UFField();
-    $ufField->field_name = "custom_" . $customFieldId;
-
-    $ufField->find();
-    while ($ufField->fetch()) {
-      //enable/ disable profile
-      CRM_Core_BAO_UFField::deleteRecord(['id' => $ufField->id]);
     }
   }
 

@@ -569,18 +569,6 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
   }
 
   /**
-   * Function to process rename action for tree.
-   *
-   * @param int $nodeID
-   * @param $label
-   * @deprecated  - use API
-   */
-  public static function processRename($nodeID, $label) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    self::writeRecord(['id' => $nodeID, 'label' => $label]);
-  }
-
-  /**
    * Process delete action for tree.
    *
    * @param int $nodeID
