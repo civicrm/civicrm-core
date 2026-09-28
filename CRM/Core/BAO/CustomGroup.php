@@ -393,28 +393,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
   }
 
   /**
-   * @deprecated since 5.71 will be removed around 5.85.
-   *
-   * @param string $extends
-   *   E.g. "Individual", "Activity".
-   * @param int $columnId
-   *   E.g. custom-group matching mechanism (usu NULL for matching on sub type-id); see extends_entity_column_id.
-   * @param string $columnValue
-   *   E.g. "Student" or "3" or "3\05"; see extends_entity_column_value.
-   *
-   * @return bool
-   */
-  public static function hasCustomGroup($extends, $columnId, $columnValue) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomGroup::getAll');
-    $dao = new CRM_Core_DAO_CustomGroup();
-    $dao->extends = $extends;
-    $dao->extends_entity_column_id = $columnId;
-    $escapedValue = CRM_Core_DAO::VALUE_SEPARATOR . CRM_Core_DAO::escapeString($columnValue) . CRM_Core_DAO::VALUE_SEPARATOR;
-    $dao->whereAdd("extends_entity_column_value LIKE \"%$escapedValue%\"");
-    return (bool) $dao->find();
-  }
-
-  /**
    * @deprecated Function moved
    *
    * @param int $activityTypeId
