@@ -57,22 +57,6 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
-   * @deprecated in 5.72 will be removed in 5.90.
-   */
-  public static function get() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::getEntities');
-    $entities = [];
-    foreach (self::getEntities() as $name => $entity) {
-      $entities[$name] = $entity + [
-        'name' => $name,
-        'fields_callback' => $entity['fields_callback'] ?? NULL,
-        'links_callback' => $entity['links_callback'] ?? NULL,
-      ];
-    }
-    return $entities;
-  }
-
-  /**
    * Mapping from table-names to class-names.
    * @return string[]
    *   [table_name => CRM_DAO_ClassName]
