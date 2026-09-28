@@ -1075,44 +1075,6 @@ class CRM_Utils_System {
   }
 
   /**
-   * Encode url.
-   *
-   * @param string $url
-   * @deprecated
-   * @return null|string
-   */
-  public static function urlEncode($url) {
-    CRM_Core_Error::deprecatedFunctionWarning('urlEncode');
-    $items = parse_url($url);
-    if ($items === FALSE) {
-      return NULL;
-    }
-
-    if (empty($items['query'])) {
-      return $url;
-    }
-
-    $items['query'] = urlencode($items['query']);
-
-    $url = $items['scheme'] . '://';
-    if (!empty($items['user'])) {
-      $url .= "{$items['user']}:{$items['pass']}@";
-    }
-
-    $url .= $items['host'];
-    if (!empty($items['port'])) {
-      $url .= ":{$items['port']}";
-    }
-
-    $url .= "{$items['path']}?{$items['query']}";
-    if (!empty($items['fragment'])) {
-      $url .= "#{$items['fragment']}";
-    }
-
-    return $url;
-  }
-
-  /**
    * Return the running civicrm version.
    *
    * @return string
