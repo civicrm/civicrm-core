@@ -115,41 +115,6 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
   }
 
   /**
-   * Add new mail Settings.
-   *
-   * @param array $params
-   *   Reference array contains the values submitted by the form.
-   * @deprecated since 5.72 will be removed around 5.82
-   *
-   * @return CRM_Core_DAO_MailSettings
-   */
-  public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('use apiv4');
-    $result = NULL;
-    if (empty($params)) {
-      return $result;
-    }
-
-    if (empty($params['id'])) {
-      $params['is_ssl'] ??= FALSE;
-      $params['is_default'] ??= FALSE;
-    }
-
-    //handle is_default.
-    if (!empty($params['is_default'])) {
-      $query = 'UPDATE civicrm_mail_settings SET is_default = 0 WHERE domain_id = %1';
-      $queryParams = [1 => [CRM_Core_Config::domainID(), 'Integer']];
-      CRM_Core_DAO::executeQuery($query, $queryParams);
-    }
-
-    $mailSettings = new CRM_Core_DAO_MailSettings();
-    $mailSettings->copyValues($params);
-    $result = $mailSettings->save();
-
-    return $result;
-  }
-
-  /**
    * Takes an associative array and creates a mail settings object.
    *
    * @param array $params
