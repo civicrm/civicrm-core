@@ -268,7 +268,7 @@
           const dedupeRules = [
             {contact_type: null, text: ts('Universal'), icon: 'fa-star', children: []},
           ];
-          ($scope.data.dedupeRules || []).forEach((rule) => {
+          for (const [,rule] of Object.entries($scope.data.dedupeRules)) {
             if (!selectedEntity || !rule.contact_type || rule.contact_type === selectedEntity) {
               let optGroup = dedupeRules.find(group => group.contact_type === rule.contact_type);
               if (!optGroup) {
@@ -282,7 +282,7 @@
               }
               optGroup.children.push({id: rule.name, text: rule.title, is_default: rule.used === 'Unsupervised'});
             }
-          });
+          }
           return dedupeRules;
         };
 
