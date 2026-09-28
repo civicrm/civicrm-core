@@ -908,20 +908,6 @@ class CRM_Utils_String {
   }
 
   /**
-   * @deprecated
-   *
-   * @param string $string
-   *   The long string.
-   * @param string $fragment
-   *   The fragment to look for.
-   * @return bool
-   */
-  public static function endsWith($string, $fragment) {
-    CRM_Core_Error::deprecatedFunctionWarning('str_ends_with');
-    return str_ends_with((string) $string, (string) $fragment);
-  }
-
-  /**
    * @param string|array $patterns
    * @param array $allStrings
    * @param bool $allowNew
