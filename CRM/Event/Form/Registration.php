@@ -2167,4 +2167,40 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     return $this->lineItems;
   }
 
+  /**
+   * Get the total amount for the order, computed from the actual submitted
+   * price selection.
+   *
+   * Events with no price set at all (getPriceSetID() returns NULL) have
+   * nothing to total and return 0.
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getOrderTotalAmount(): float {
+    if (!$this->getPriceSetID()) {
+      return 0;
+    }
+    return $this->getOrder()->getTotalAmount();
+  }
+
+  /**
+   * Get the total tax amount for the order, computed from the actual submitted
+   * price selection.
+   *
+   * Events with no price set at all (getPriceSetID() returns NULL) have
+   * nothing to total and return 0.
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getOrderTotalTaxAmount(): float {
+    if (!$this->getPriceSetID()) {
+      return 0;
+    }
+    return $this->getOrder()->getTotalTaxAmount();
+  }
+
 }
