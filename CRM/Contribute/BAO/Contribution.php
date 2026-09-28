@@ -1796,12 +1796,14 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       return 0;
     }
     $financialTypes = CRM_Financial_BAO_FinancialType::getAllAvailableFinancialTypes();
+    $domain_id = CRM_Core_Config::domainID();
     $additionalWhere = " AND contribution.financial_type_id IN (0)";
     $liWhere = " AND i.financial_type_id IN (0)";
     if (!empty($financialTypes)) {
       $additionalWhere = " AND contribution.financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
       $liWhere = " AND i.financial_type_id NOT IN (" . implode(',', array_keys($financialTypes)) . ")";
     }
+    $additionalWhere .= " AND (domain_id IS NULL OR domain_id = {$domain_id}) ";
     $contactContributionsSQL = "
       SELECT contribution.id AS id
       FROM civicrm_contribution contribution
