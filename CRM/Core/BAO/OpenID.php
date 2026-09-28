@@ -108,18 +108,4 @@ ORDER BY
     return $openids;
   }
 
-  /**
-   * Call common delete function.
-   *
-   * @see \CRM_Contact_BAO_Contact::on_hook_civicrm_post
-   *
-   * @param int $id
-   * @deprecated
-   * @return bool
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) self::deleteRecord(['id' => $id]);
-  }
-
 }
