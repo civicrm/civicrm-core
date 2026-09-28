@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\EntityFinancialTrxn;
+
 /**
  *
  * @package CRM
@@ -297,54 +299,54 @@ WHERE ceft.entity_id = %1";
    *
    * @param array $params
    *   To create trxn entries.
+   * @param int|float $amount
+   * @param int $contributionId
+   * @param int $financialTypeId
    *
    * @throws \CRM_Core_Exception
    */
-  public static function recordFees($params) {
-    $amount = 0;
-    if (!empty($params['prevContribution'])) {
-      $amount = $params['prevContribution']->fee_amount;
-    }
-    $amount = $params['fee_amount'] - $amount;
-    if (!$amount) {
-      return;
-    }
-    $contributionId = $params['contribution']->id ?? $params['contribution_id'];
-    if (empty($params['financial_type_id'])) {
-      $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'financial_type_id', 'id');
-    }
-    else {
-      $financialTypeId = $params['financial_type_id'];
-    }
+  public static function recordFees($params, $amount, $contributionId, $financialTypeId) {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($financialTypeId, 'Expense Account is');
+    $trxnParams = $params['trxnParams'];
+    $trxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
+    $trxnParams['to_financial_account_id'] = $financialAccount;
+    $trxnParams['total_amount'] = $amount;
+    $trxnParams['fee_amount'] = $trxnParams['net_amount'] = 0;
+    $trxnParams['status_id'] = $params['contribution_status_id'];
+    $trxnParams['contribution_id'] = $contributionId;
+    $trxnParams['is_payment'] = FALSE;
+    $trxn = CRM_Core_BAO_FinancialTrxn::writeRecord($trxnParams);
 
-    $params['trxnParams']['from_financial_account_id'] = $params['to_financial_account_id'];
-    $params['trxnParams']['to_financial_account_id'] = $financialAccount;
-    $params['trxnParams']['total_amount'] = $amount;
-    $params['trxnParams']['fee_amount'] = $params['trxnParams']['net_amount'] = 0;
-    $params['trxnParams']['status_id'] = $params['contribution_status_id'];
-    $params['trxnParams']['contribution_id'] = $contributionId;
-    $params['trxnParams']['is_payment'] = FALSE;
-    $trxn = self::create($params['trxnParams']);
-    if (empty($params['entity_id'])) {
-      $financialTrxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($params['trxnParams']['contribution_id'], 'DESC');
-      $params['entity_id'] = $financialTrxnID['financialTrxnId'];
+    EntityFinancialTrxn::save(FALSE)
+      ->addRecord([
+        'entity_table' => $params['entity_table'] ?? 'civicrm_contribution',
+        'entity_id' => $trxnParams['entity_id'] ?? $contributionId,
+        'financial_trxn_id' => $trxn->id,
+        'amount' => $trxnParams['total_amount'],
+      ])->execute();
+
+    $financialTrxnID = $params['entity_id'] ?? NULL;
+    if (!$financialTrxnID) {
+      $financialTrxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($trxnParams['contribution_id'], 'DESC')['financialTrxnId'];
     }
-    $fItemParams
-      = [
-        'financial_account_id' => $financialAccount,
-        'contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
-        'created_date' => date('YmdHis'),
-        'transaction_date' => $params['trxnParams']['trxn_date'],
-        'amount' => $amount,
-        'description' => 'Fee',
-        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
-        'entity_table' => 'civicrm_financial_trxn',
-        'entity_id' => $params['entity_id'],
-        'currency' => $params['trxnParams']['currency'],
-      ];
-    $trxnIDS['id'] = $trxn->id;
-    CRM_Financial_BAO_FinancialItem::create($fItemParams, NULL, $trxnIDS);
+    $financialItem = CRM_Financial_BAO_FinancialItem::writeRecord([
+      'financial_account_id' => $financialAccount,
+      'contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
+      'created_date' => date('YmdHis'),
+      'transaction_date' => $trxnParams['trxn_date'],
+      'amount' => $amount,
+      'description' => 'Fee',
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
+      'entity_table' => 'civicrm_financial_trxn',
+      'entity_id' => $financialTrxnID,
+      'currency' => $trxnParams['currency'],
+    ]);
+    EntityFinancialTrxn::save(FALSE)->addRecord([
+      'entity_table' => "civicrm_financial_item",
+      'entity_id' => $financialItem->id,
+      'financial_trxn_id' => $trxn->id,
+      'amount' => $amount,
+    ])->execute();
   }
 
   /**

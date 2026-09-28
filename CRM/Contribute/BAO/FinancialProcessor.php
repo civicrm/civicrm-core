@@ -360,7 +360,16 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     // when a fee is charged
     if (!empty($params['fee_amount']) && (empty($params['prevContribution']) || $params['contribution']->fee_amount != $params['prevContribution']->fee_amount) && $skipRecords) {
-      CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)]);
+      $amount = $params['fee_amount'] - ($this->getOriginalContributionValue('fee_amount') ?: 0);
+      if ($amount) {
+        if (empty($params['financial_type_id'])) {
+          $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->getContributionID(), 'financial_type_id', 'id');
+        }
+        else {
+          $financialTypeId = $params['financial_type_id'];
+        }
+        CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)], $amount, $this->getContributionID(), $financialTypeId);
+      }
     }
 
     unset($params['line_item']);
