@@ -1008,7 +1008,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function isAPIError($error, $type = CRM_Core_Error::FATAL_ERROR) {
     if (is_array($error) && !empty($error['is_error'])) {
-      $code = $error['error_message']['code'];
+      $code = $error['error_message']['code'] ?? NULL;
       if ($code == $type) {
         return TRUE;
       }
