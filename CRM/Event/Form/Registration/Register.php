@@ -183,7 +183,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     //if event is monetary and pay later is enabled and payment
     //processor is not available then freeze the pay later checkbox with
     //default check
-    if (!empty($this->_values['event']['is_pay_later']) &&
+    if ($this->getEventValue('is_pay_later') &&
       !is_array($this->_paymentProcessor)
     ) {
       $this->_defaults['is_pay_later'] = 1;
@@ -447,7 +447,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $allAreBillingModeProcessors = FALSE;
     }
 
-    if (!$allAreBillingModeProcessors || !empty($this->_values['event']['is_pay_later']) || $bypassPayment
+    if (!$allAreBillingModeProcessors || $this->getEventValue('is_pay_later') || $bypassPayment
     ) {
       //freeze button to avoid multiple calls.
       $this->submitOnce = TRUE;
