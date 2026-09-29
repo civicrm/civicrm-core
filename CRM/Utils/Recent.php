@@ -328,17 +328,6 @@ class CRM_Utils_Recent {
   }
 
   /**
-   * Delete an item from the recent stack.
-   *
-   * @param string $id
-   * @deprecated
-   */
-  public static function delContact($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('del');
-    self::del(['contact_id' => $id]);
-  }
-
-  /**
    * Check if a provider is allowed to add stuff.
    * If corresponding setting is empty, all are allowed
    *
