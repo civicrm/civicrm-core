@@ -2,19 +2,22 @@
   <form name="crmSearchTaskRelationshipForm" ng-controller="crmSearchTaskRelationship as $ctrl">
     <div class="crm-form-block">
       <div class="crm-section">
-        <label class="label" for="crm-search-task-relationship-relationship_type">{{:: ts('Relationship Type') }} <i class="crm-marker">*</i></label>
+        <label class="label" for="crm-search-task-relationship-relationship_type">{{:: ts('Relationship Type') }} <span class="crm-marker" title="{{:: ts('This field is required.') }}">*</span></label>
         <div class="content">
           <input id="crm-search-task-relationship-relationship_type" class="form-control" ng-disabled="values.disableRelationshipSelect" ng-model="values.relationship_type" required crm-ui-select="{data: $ctrl.task.relationshipTypes, allowClear: false}" ng-change="$ctrl.onChangeRelationship()">
         </div>
+        <div class="clear"></div>
       </div>
       <div class="crm-section">
-        <label class="label" for="crm-search-task-relationship-contact_id">{{:: ts('Contact') }} <i class="crm-marker">*</i></label>
+        <label class="label" for="crm-search-task-relationship-contact_id">{{:: ts('Contact') }} <span class="crm-marker" title="{{:: ts('This field is required.') }}">*</span></label>
         <div class="content">
           <input id="crm-search-task-relationship-contact_id" class="form-control" ng-disabled="!values.relationship_type" ng-model="values.contact_id" crm-autocomplete="$ctrl.relationshipInfo[values.relationship_type].contact_type" crm-autocomplete-params="$ctrl.autocompleteParams" required>
         </div>
+        <div class="clear"></div>
       </div>
       <div class="crm-section" ng-repeat="field in $ctrl.relationshipFields">
         <crm-search-input ng-model="values[field.name]" field="field" show-label="true"></crm-search-input>
+        <div class="clear"></div>
       </div>
     </div>
     <div ng-if="$ctrl.run" class="crm-search-task-progress">
