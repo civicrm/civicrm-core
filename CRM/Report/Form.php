@@ -4821,6 +4821,26 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
   }
 
   /**
+   * Get a derived table linking memberships to the contributions that paid for them.
+   *
+   * Each (membership_id, contribution_id) pair appears once: a contribution can
+   * hold several line items for the same membership, so joining line items
+   * directly would count that contribution more than once.
+   *
+   * @return string
+   *   A parenthesised subquery with columns membership_id and contribution_id.
+   */
+  protected function getMembershipContributionTableSql(): string {
+    $lineItems = "FROM civicrm_line_item WHERE entity_table = 'civicrm_membership' AND contribution_id IS NOT NULL";
+    if (CRM_Price_BAO_LineItem::siteHasMembershipPaymentRecordsNotReflectedInLineItems()) {
+      // UNION also removes the duplicates within each half.
+      return "(SELECT entity_id AS membership_id, contribution_id $lineItems
+        UNION SELECT membership_id, contribution_id FROM civicrm_membership_payment)";
+    }
+    return "(SELECT DISTINCT entity_id AS membership_id, contribution_id $lineItems)";
+  }
+
+  /**
    * Add Financial Transaction into From Table if required.
    */
   public function addFinancialTrxnFromClause() {
