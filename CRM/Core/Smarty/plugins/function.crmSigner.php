@@ -34,7 +34,7 @@
 function smarty_function_crmSigner($params, &$smarty) {
   $var = $params['var'];
   unset($params['var']);
-  $params['ts'] = CRM_Utils_Time::getTimeRaw();
+  $params['ts'] = CRM_Utils_Time::time();
 
   $fields = array_keys($params);
   sort($fields);

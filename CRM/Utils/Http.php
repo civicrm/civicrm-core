@@ -31,7 +31,7 @@ class CRM_Utils_Http {
     if (!empty($headers['cache-control'])) {
       $cc = self::parseCacheControl($headers['cache-control']);
       if ($cc['max-age'] && is_numeric($cc['max-age'])) {
-        return CRM_Utils_Time::getTimeRaw() + $cc['max-age'];
+        return CRM_Utils_Time::time() + $cc['max-age'];
       }
     }
 
