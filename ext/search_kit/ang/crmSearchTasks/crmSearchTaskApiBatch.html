@@ -1,9 +1,9 @@
 <div id="bootstrap-theme" crm-dialog="crmSearchTask">
   <form name="crmSearchTaskApiBatchForm" ng-controller="crmSearchTaskApiBatch as $ctrl">
     <p><strong ng-if="apiBatch.confirmMsg">{{:: ts(apiBatch.confirmMsg, {1: $ctrl.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
-    <div class="crm-search-task-fields">
-      <div class="form-inline" ng-repeat="field in apiBatch.fields">
-        <crm-search-input class="form-group" ng-model="apiBatch.params.values[field.name]" field="field" show-label="true"></crm-search-input>
+    <div class="crm-form-block" ng-if="apiBatch.fields">
+      <div class="crm-section" ng-repeat="field in apiBatch.fields">
+        <crm-search-input ng-model="apiBatch.params.values[field.name]" field="field" show-label="true"></crm-search-input>
       </div>
     </div>
     <hr />
