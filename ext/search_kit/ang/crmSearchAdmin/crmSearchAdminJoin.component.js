@@ -117,7 +117,7 @@
       const joinLabelGetters = {};
       this.getSetJoinLabel = (joinName) => {
         if (!joinLabelGetters[joinName]) {
-          joinLabelGetters[joinName] = (joinName) => (...args) => getSetJoinLabel(joinName, ...args);
+          joinLabelGetters[joinName] = (...args) => getSetJoinLabel(joinName, ...args);
         }
         return joinLabelGetters[joinName];
       };
