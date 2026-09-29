@@ -23,8 +23,10 @@
 
       this.$onInit = function() {
 
-        $scope.$watch('$ctrl.value', function() {
-          ctrl.ngModel.$setViewValue(ctrl.value);
+        // Use $watchCollection so changes to individual items (e.g. BETWEEN inputs bound to value[0] & value[1]) propagate.
+        // Pass a shallow copy because ngModel ignores $setViewValue() calls with an unchanged reference.
+        $scope.$watchCollection('$ctrl.value', () => {
+          ctrl.ngModel.$setViewValue(angular.copy(ctrl.value));
         });
 
         // For the ON clause, string values must be quoted
