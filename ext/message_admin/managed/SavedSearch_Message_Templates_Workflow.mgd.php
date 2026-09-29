@@ -24,8 +24,8 @@ return [
             // Each pair concatenates the same raw column in the same order, so `:label` is
             // applied per value afterwards and the two arrays stay index-aligned for the
             // per-language link.
-            'GROUP_CONCAT(DISTINCT tx.language:label ORDER BY tx.language ASC) AS translation_languages',
-            'GROUP_CONCAT(DISTINCT tx.language ORDER BY tx.language ASC) AS translation_codes',
+            'GROUP_CONCAT(DISTINCT active.language:label ORDER BY active.language ASC) AS translation_languages',
+            'GROUP_CONCAT(DISTINCT active.language ORDER BY active.language ASC) AS translation_codes',
             'GROUP_CONCAT(DISTINCT draft.language:label ORDER BY draft.language ASC) AS draft_languages',
             'GROUP_CONCAT(DISTINCT draft.language ORDER BY draft.language ASC) AS draft_codes',
           ],
@@ -36,12 +36,22 @@ return [
           ],
           'groupBy' => ['id'],
           'join' => [
+            // Only the language filter reads `tx`, so filtering matches drafts as well as active
+            // translations without narrowing the languages the columns list.
             [
               'Translation AS tx',
               'LEFT',
               NULL,
               ['tx.entity_table', '=', "'civicrm_msg_template'"],
               ['tx.entity_id', '=', 'id'],
+            ],
+            [
+              'Translation AS active',
+              'LEFT',
+              NULL,
+              ['active.entity_table', '=', "'civicrm_msg_template'"],
+              ['active.entity_id', '=', 'id'],
+              ['active.status_id:name', '=', "'active'"],
             ],
             [
               'Translation AS draft',
