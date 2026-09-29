@@ -51,32 +51,30 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
 
     // Single field preview
     if ($this->_fieldId) {
-      $defaults = [];
-      $params = ['id' => $this->_fieldId];
-      CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $defaults);
-      $this->_groupId = $defaults['custom_group_id'];
+      $field = CRM_Core_BAO_CustomField::getField($this->_fieldId);
+      $this->_groupId = $field['custom_group_id'];
 
-      if (!empty($defaults['is_view'])) {
+      if (!empty($field['is_view'])) {
         CRM_Core_Error::statusBounce(ts('This field is view only so it will not display on edit form.'));
       }
-      elseif (empty($defaults['is_active'])) {
+      elseif (empty($field['is_active'])) {
         CRM_Core_Error::statusBounce(ts('This field is inactive so it will not display on edit form.'));
       }
 
-      $groupTree = [];
-      $groupTree[$this->_groupId]['id'] = 0;
-      $groupTree[$this->_groupId]['fields'] = [];
-      $groupTree[$this->_groupId]['fields'][$this->_fieldId] = $defaults;
-      $this->_groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $this);
+      $customGroup = $field['custom_group'];
+      // Don't show group-level help on single field display
+      unset($customGroup['help_pre'], $customGroup['help_post']);
+      unset($field['custom_group']);
+      $customGroup['fields'] = [$field['id'] => $field];
       $this->assign('preview_type', 'field');
     }
     // Group preview
     else {
       $this->_groupId = CRM_Utils_Request::retrieve('gid', 'Positive', $this, TRUE);
-      $groupTree = CRM_Core_BAO_CustomGroup::getCustomGroupDetail($this->_groupId);
-      $this->_groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, TRUE, $this);
+      $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['id' => $this->_groupId]);
       $this->assign('preview_type', 'group');
     }
+    $this->_groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree([$customGroup['id'] => $customGroup], 1, $this);
   }
 
   /**
