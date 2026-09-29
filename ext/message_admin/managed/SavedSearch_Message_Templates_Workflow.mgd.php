@@ -21,10 +21,13 @@ return [
             // `master_id` is a correlated subquery, which MySQL rejects alongside GROUP BY
             // under ONLY_FULL_GROUP_BY. It also cannot be aliased back to its own field name.
             'MAX(master_id) AS customized',
-            // Both aggregates concatenate the same raw column, so `:label` is applied per
-            // value afterwards and the two arrays stay index-aligned for the per-language link.
-            'GROUP_CONCAT(DISTINCT tx.language:label) AS translation_languages',
-            'GROUP_CONCAT(DISTINCT tx.language) AS translation_codes',
+            // Each pair concatenates the same raw column in the same order, so `:label` is
+            // applied per value afterwards and the two arrays stay index-aligned for the
+            // per-language link.
+            'GROUP_CONCAT(DISTINCT tx.language:label ORDER BY tx.language ASC) AS translation_languages',
+            'GROUP_CONCAT(DISTINCT tx.language ORDER BY tx.language ASC) AS translation_codes',
+            'GROUP_CONCAT(DISTINCT draft.language:label ORDER BY draft.language ASC) AS draft_languages',
+            'GROUP_CONCAT(DISTINCT draft.language ORDER BY draft.language ASC) AS draft_codes',
           ],
           'orderBy' => [],
           'where' => [
@@ -39,6 +42,14 @@ return [
               NULL,
               ['tx.entity_table', '=', "'civicrm_msg_template'"],
               ['tx.entity_id', '=', 'id'],
+            ],
+            [
+              'Translation AS draft',
+              'LEFT',
+              NULL,
+              ['draft.entity_table', '=', "'civicrm_msg_template'"],
+              ['draft.entity_id', '=', 'id'],
+              ['draft.status_id:name', '=', "'draft'"],
             ],
           ],
         ],
@@ -83,6 +94,21 @@ return [
               // its own translation rather than one link naming every language at once.
               'link' => [
                 'path' => 'civicrm/admin/messageTemplates/edit#/edit?id=[id]&lang=[translation_codes]',
+              ],
+            ],
+            [
+              'type' => 'field',
+              'key' => 'draft_languages',
+              'label' => E::ts('Drafts'),
+              'title' => E::ts('Languages with an unpublished draft'),
+              'link' => [
+                'path' => 'civicrm/admin/messageTemplates/edit#/edit?id=[id]&lang=[draft_codes]&status=draft',
+              ],
+              'icons' => [
+                ['icon' => 'fa-file-text-o', 'side' => 'left', 'if' => ['draft_languages', 'IS NOT EMPTY']],
+              ],
+              'cssRules' => [
+                ['text-warning', 'draft_languages', 'IS NOT EMPTY'],
               ],
             ],
             [
