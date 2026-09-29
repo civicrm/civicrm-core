@@ -72,9 +72,11 @@ class Kcfinder extends AutoService implements EventSubscriberInterface {
     $imageBaseUrl = (string) \Civi::url('[civicrm.packages]/kcfinder/themes/default/img')->setPreferFormat('absolute');
     //$dynamicAssetUrl = \Civi::url('civicrm/kcfinder/asset');
 
+    $browseUrl = (string) \Civi::url('civicrm/kcfinder/browse');
+
     $replacements = [
       # php routes
-      'browse.php' => (string) \Civi::url('civicrm/kcfinder/browse'),
+      'browse.php?' => $browseUrl . (str_contains($browseUrl, '?') ? '&' : '?'),
       #static images
       'themes/default/img/loading.gif' => "img/loading.gif",
       'img/loading.gif' => "{$imageBaseUrl}/loading.gif",
