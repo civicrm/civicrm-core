@@ -166,11 +166,20 @@ class DbUtil {
    * The ':' between host and port stays literal. PEAR::DB decodes the server
    * before it splits on ':', so an encoded '%3A' would become a port separator.
    *
+   * A socket is left alone entirely: PEAR::DB recognises the 'unix(...)' form
+   * by matching the raw string, before any decoding, so encoding the brackets
+   * or the path turns it into an ordinary hostname. This means a socket path
+   * containing '(' or ')' cannot be expressed in a DSN at all.
+   *
    * @param string $server
    *   Ex: 'localhost:3306'.
+   *   Ex: 'unix(/var/lib/mysql/mysql.sock)'.
    * @return string
    */
   public static function encodeServer($server) {
+    if (preg_match('/^unix\(([^)]+)\)$/', $server) === 1) {
+      return $server;
+    }
     return implode(':', array_map('rawurlencode', explode(':', $server)));
   }
 

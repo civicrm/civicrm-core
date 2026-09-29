@@ -77,6 +77,22 @@ class SettingsUtilTest extends \CiviUnitTestCase {
   }
 
   /**
+   * A socket install must give PEAR::DB something it reads back as a socket,
+   * not as an ordinary hostname that happens to look like one.
+   */
+  public function testSocketSurvivesSettingsFile() {
+    $model = $this->makeModel('civicrm', 'secret', 'civicrm', 'unix(/var/lib/mysql/mysql.sock)');
+    $settings = SettingsUtil::evaluate($this->getTemplatePath(), SettingsUtil::createParams($model));
+
+    $this->assertSame(1, preg_match("/^\s*define\('CIVICRM_DSN', '(.*)'\);/m", $settings, $matches));
+    $parsed = \DB::parseDSN(stripslashes($matches[1]));
+
+    $this->assertSame('unix', $parsed['protocol']);
+    $this->assertSame('/var/lib/mysql/mysql.sock', $parsed['socket']);
+    $this->assertSame('civicrm', $parsed['database']);
+  }
+
+  /**
    * @return string
    */
   private function getTemplatePath(): string {
@@ -87,11 +103,12 @@ class SettingsUtilTest extends \CiviUnitTestCase {
    * @param string $username
    * @param string $password
    * @param string $database
+   * @param string $server
    * @return \Civi\Setup\Model
    */
-  private function makeModel(string $username, string $password, string $database): Model {
+  private function makeModel(string $username, string $password, string $database, string $server = 'db.example.org:3306'): Model {
     $db = [
-      'server' => 'db.example.org:3306',
+      'server' => $server,
       'username' => $username,
       'password' => $password,
       'database' => $database,
