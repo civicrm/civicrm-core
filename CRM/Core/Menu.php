@@ -332,6 +332,9 @@ class CRM_Core_Menu {
     return FALSE;
   }
 
+  /**
+   * @internal
+   */
   public static function clear() {
     // Take the rebuild lock: TRUNCATE is a writer too, and clearing the table out from under an
     // in-flight self::rebuild() would leave it holding only the rows that store() inserts after the
@@ -360,21 +363,19 @@ class CRM_Core_Menu {
   }
 
   /**
-   * @deprecated most callers should switch to self::clear()
+   * @deprecated most callers should switch to Civi::router()->clear()
    * and allow the rebuild to happen when next needed
    *
-   * for strictly equivalent behaviour use self::clear(); then self::rebuild();
+   * for strictly equivalent behaviour use clear() then rebuild()
    */
   public static function store($truncate = TRUE) {
     if ($truncate) {
-      // TODO: deprecate once removed from civicrm-backdrop
-      // \CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_Menu::clear(); and then if immediately necessary CRM_Core_Menu::rebuild();');
+      \CRM_Core_Error::deprecatedFunctionWarning('Civi::router()->clear(); or if absolutely necessary Civi::router()->clear()->rebuild();');
       self::clear();
       self::rebuild();
     }
     else {
-      // TODO: deprecate once removed from civicrm-backdrop
-      // \CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_Menu::rebuild();');
+      \CRM_Core_Error::deprecatedFunctionWarning('Civi::router()->rebuild();');
       self::rebuild();
     }
   }
@@ -383,6 +384,8 @@ class CRM_Core_Menu {
    * Rebuild the routing table
    *
    * NOTE: this saves routes for the current domain - routes across multidomains are rebuilt lazily
+   *
+   * @internal prefer Civi::router()->rebuild()
    */
   public static function rebuild() {
     // Take the rebuild lock: without it, concurrent rebuilds collide on the (path, domain_id)
@@ -653,6 +656,7 @@ class CRM_Core_Menu {
   }
 
   /**
+   * @internal
    * @param string $path
    *   Path of menu item to retrieve.
    *
