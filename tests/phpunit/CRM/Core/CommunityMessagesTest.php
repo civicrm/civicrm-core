@@ -223,7 +223,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     );
     $doc1 = $communityMessages->getDocument();
     $this->assertEquals([], $doc1['messages']);
-    $this->assertTrue($doc1['expires'] > CRM_Utils_Time::getTimeRaw());
+    $this->assertTrue($doc1['expires'] > CRM_Utils_Time::time());
 
     // second try, $doc1 hasn't expired yet, so still use it
     CRM_Utils_Time::setTime('2013-03-01 10:09:00');
@@ -244,7 +244,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     );
     $doc3 = $communityMessages->getDocument();
     $this->assertEquals('<h1>First valid response</h1>', $doc3['messages'][0]['markup']);
-    $this->assertTrue($doc3['expires'] > CRM_Utils_Time::getTimeRaw());
+    $this->assertTrue($doc3['expires'] > CRM_Utils_Time::time());
   }
 
   /**
@@ -280,7 +280,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     );
     $doc2 = $communityMessages->getDocument();
     $this->assertEquals('<h1>First valid response</h1>', $doc2['messages'][0]['markup']);
-    $this->assertTrue($doc2['expires'] > CRM_Utils_Time::getTimeRaw());
+    $this->assertTrue($doc2['expires'] > CRM_Utils_Time::time());
 
     // third try, $doc2 hasn't expired yet; no request; keep old data
     CRM_Utils_Time::setTime('2013-03-01 12:09:00');

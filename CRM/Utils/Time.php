@@ -107,6 +107,7 @@ class CRM_Utils_Time {
    *   Prefer CRM_Utils_Time::time(), whose name looks similar to the stdlib work-a-like.
    */
   public static function getTimeRaw() {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_Time::time()');
     return self::time();
   }
 

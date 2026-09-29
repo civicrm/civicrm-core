@@ -155,7 +155,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
 
     // foreach hits the items in order -- but we short-circuit after the first
     foreach ($this->items as $id => $data) {
-      $nowEpoch = CRM_Utils_Time::getTimeRaw();
+      $nowEpoch = CRM_Utils_Time::time();
       if (empty($this->releaseTimes[$id]) || $this->releaseTimes[$id] < $nowEpoch) {
         $this->releaseTimes[$id] = $nowEpoch + $leaseTime;
         $this->runCounts[$id]++;
@@ -189,7 +189,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
 
     // foreach hits the items in order -- but we short-circuit after the first
     foreach ($this->items as $id => $data) {
-      $nowEpoch = CRM_Utils_Time::getTimeRaw();
+      $nowEpoch = CRM_Utils_Time::time();
       $this->releaseTimes[$id] = $nowEpoch + $leaseTime;
       $this->runCounts[$id]++;
 
@@ -239,7 +239,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
       unset($this->releaseTimes[$item->id]);
     }
     else {
-      $nowEpoch = CRM_Utils_Time::getTimeRaw();
+      $nowEpoch = CRM_Utils_Time::time();
       $this->releaseTimes[$item->id] = $nowEpoch + $this->queueSpec['retry_interval'];
     }
   }

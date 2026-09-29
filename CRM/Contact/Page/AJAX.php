@@ -308,7 +308,7 @@ class CRM_Contact_Page_AJAX {
     $sig = CRM_Utils_Request::retrieve('sig', 'String');
     $for = CRM_Utils_Request::retrieve('for', 'String');
     if (
-      CRM_Utils_Time::getTimeRaw() > $_REQUEST['ts'] + self::CHECK_USERNAME_TTL
+      CRM_Utils_Time::time() > $_REQUEST['ts'] + self::CHECK_USERNAME_TTL
       || $for != 'civicrm/ajax/cmsuser'
       || !$signer->validate($sig, $_REQUEST)
     ) {

@@ -137,7 +137,7 @@ class CRM_Core_Page_AJAX_Attachment {
    */
   public static function createToken() {
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), ['for', 'ts']);
-    $ts = CRM_Utils_Time::getTimeRaw();
+    $ts = CRM_Utils_Time::time();
     return $signer->sign([
       'for' => 'crmAttachment',
       'ts' => $ts,
@@ -154,7 +154,7 @@ class CRM_Core_Page_AJAX_Attachment {
   public static function checkToken($token) {
     list ($signature, $ts) = explode(';;;', $token);
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), ['for', 'ts']);
-    if (!is_numeric($ts) || CRM_Utils_Time::getTimeRaw() > $ts + self::ATTACHMENT_TOKEN_TTL) {
+    if (!is_numeric($ts) || CRM_Utils_Time::time() > $ts + self::ATTACHMENT_TOKEN_TTL) {
       return FALSE;
     }
     return $signer->validate($signature, [
