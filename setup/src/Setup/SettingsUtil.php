@@ -18,7 +18,7 @@ class SettingsUtil {
     // so a '+' here would mean a literal '+', not a space.
     $params['dbUser'] = addslashes(rawurlencode($m->db['username']));
     $params['dbPass'] = addslashes(rawurlencode($m->db['password'] ?? ''));
-    $params['dbHost'] = addslashes(implode(':', array_map('rawurlencode', explode(':', $m->db['server']))));
+    $params['dbHost'] = addslashes(DbUtil::encodeServer($m->db['server']));
     $params['dbName'] = addslashes(rawurlencode($m->db['database']));
     // The '&' prefix is awkward, but we don't know what's already in the file.
     // At the time of writing, it has ?new_link=true. If that is removed,
@@ -30,7 +30,7 @@ class SettingsUtil {
     $params['cms'] = addslashes($m->cms);
     $params['CMSdbUser'] = addslashes(rawurlencode($m->cmsDb['username']));
     $params['CMSdbPass'] = addslashes(rawurlencode($m->cmsDb['password']));
-    $params['CMSdbHost'] = addslashes(implode(':', array_map('rawurlencode', explode(':', $m->cmsDb['server']))));
+    $params['CMSdbHost'] = addslashes(DbUtil::encodeServer($m->cmsDb['server']));
     $params['CMSdbName'] = addslashes(rawurlencode($m->cmsDb['database']));
     // The '&' prefix is awkward, but we don't know what's already in the file.
     // At the time of writing, it has ?new_link=true. If that is removed,

@@ -52,7 +52,7 @@ class DbUtil {
    * @return string
    */
   public static function encodeDsn($db) {
-    $escapedHostPort = implode(':', array_map('rawurlencode', explode(':', $db['server'])));
+    $escapedHostPort = self::encodeServer($db['server']);
     return sprintf('mysql://%s:%s@%s/%s',
       rawurlencode($db['username']),
       rawurlencode($db['password']),
@@ -158,6 +158,20 @@ class DbUtil {
    */
   public static function encodeHostPort($host, $port) {
     return $host . ($port ? (':' . $port) : '');
+  }
+
+  /**
+   * Percent-encode a server for inclusion in a DSN.
+   *
+   * The ':' between host and port stays literal. PEAR::DB decodes the server
+   * before it splits on ':', so an encoded '%3A' would become a port separator.
+   *
+   * @param string $server
+   *   Ex: 'localhost:3306'.
+   * @return string
+   */
+  public static function encodeServer($server) {
+    return implode(':', array_map('rawurlencode', explode(':', $server)));
   }
 
   /**
