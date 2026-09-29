@@ -33,4 +33,18 @@ class TokenCompatSubscriberTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Test an unevaluated token renders its default filter value.
+   */
+  public function testMissingTokenDefault(): void {
+    $rendered = \CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'messageTemplate' => [
+        'msg_subject' => 'Dear {contact.first_name|default:"donor"}',
+        'msg_html' => '<p>Dear {contact.first_name|default:"donor"}</p>',
+      ],
+    ]);
+    $this->assertEquals('Dear donor', $rendered['subject']);
+    $this->assertEquals('<p>Dear donor</p>', $rendered['html']);
+  }
+
 }
