@@ -13,7 +13,7 @@
     {icon icon="fa-info-circle"}{/icon} {ts 1=$currentClientName}This is case is currently assigned to %1.{/ts}
   </div>
   <div class="crm-form-block">
-    <table class="form-layout-compressed">
+    <table class="form-layout">
       <tr class="crm-case-editclient-form-block-change_client_id">
         <td class="label">
           {$form.reassign_contact_id.label}
