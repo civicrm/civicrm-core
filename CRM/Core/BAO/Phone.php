@@ -32,14 +32,15 @@ class CRM_Core_BAO_Phone extends CRM_Core_DAO_Phone implements Civi\Core\HookInt
   }
 
   /**
-   * @deprecated
+   * @deprecated in 6.20 will be removed around 6.32
    *
    * @param array $params
    * @return CRM_Core_DAO_Phone
    * @throws \CRM_Core_Exception
    */
   public static function add($params) {
-    return self::create($params);
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
