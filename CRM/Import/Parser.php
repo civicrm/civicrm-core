@@ -1008,6 +1008,10 @@ abstract class CRM_Import_Parser implements UserJobInterface {
       }
       return $this->importableFieldsMetadata[$fieldMapName];
     }
+    if (!is_array($fieldMetadata)) {
+      CRM_Core_Session::setStatus(ts('Field not found for import %1', [1 => $fieldName]));
+      return [];
+    }
     return $fieldMetadata;
   }
 
