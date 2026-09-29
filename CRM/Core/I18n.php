@@ -788,11 +788,15 @@ class CRM_Core_I18n {
     if (defined('CIVI_SETUP') || isset(Civi\Test::$statics['testPreInstall'])) {
       return [];
     }
+    // Standalone translates settings metadata during boot, before the DSN exists: don't cache that.
+    if (!defined('CIVICRM_DSN')) {
+      return [];
+    }
 
     // FIXME: Is there a constant we can reference instead of hardcoding en_US?
     $replacementsLocale = $this->locale ?: 'en_US';
     if ((!isset(Civi::$statics[__CLASS__]) || !array_key_exists($replacementsLocale, Civi::$statics[__CLASS__]))) {
-      if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode()) {
+      if (!CRM_Core_Config::isUpgradeMode()) {
         Civi::$statics[__CLASS__][$replacementsLocale] = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($replacementsLocale);
       }
       else {
@@ -806,13 +810,17 @@ class CRM_Core_I18n {
     if (defined('CIVI_SETUP') || isset(Civi\Test::$statics['testPreInstall'])) {
       return [];
     }
+    // Standalone translates settings metadata during boot, before the DSN exists: don't cache that.
+    if (!defined('CIVICRM_DSN')) {
+      return [];
+    }
 
     // FIXME: Is there a constant we can reference instead of hardcoding en_US?
     $replacementsLocale = $this->locale ?: 'en_US';
     // temporary to avoid collision with word replacements
     $translationReplacement = 'tr-' . $replacementsLocale;
     if ((!isset(Civi::$statics[__CLASS__]) || !array_key_exists($translationReplacement, Civi::$statics[__CLASS__]))) {
-      if (defined('CIVICRM_DSN') && !CRM_Core_Config::isUpgradeMode() && CRM_Core_BAO_Domain::isDBVersionAtLeast('6.7.beta')) {
+      if (!CRM_Core_Config::isUpgradeMode() && CRM_Core_BAO_Domain::isDBVersionAtLeast('6.7.beta')) {
         Civi::$statics[__CLASS__][$translationReplacement] = CRM_Core_BAO_TranslationSource::getTranslationSources($replacementsLocale);
       }
       else {
