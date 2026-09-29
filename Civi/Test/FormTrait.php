@@ -46,12 +46,12 @@ trait FormTrait {
   }
 
   /**
-   * Assert that the sent mail included the supplied string.
+   * Assert that the form validation errors are as expected.
    *
    * @param array $errors
    */
   protected function assertValidationError(array $errors): void {
-    $this->assertEquals($errors, $this->form->getValidationOutput());
+    $this->assertEquals($errors, $this->form->getValidationOutput(), print_r($this->form->getValidationOutput(), TRUE));
   }
 
   /**
