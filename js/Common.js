@@ -897,7 +897,7 @@ if (!CRM.vars) CRM.vars = {};
         var entity = $(this).data('api-entity') || '';
         $(this)
           .off('.crmEntity')
-          .removeClass('crm-form-entityref crm-' + _.kebabCase(entity) + '-ref')
+          .removeClass('crm-form-entityref crm-' + CRM.utils.dashCase(entity) + '-ref')
           .crmSelect2('destroy');
       });
     }
@@ -910,14 +910,14 @@ if (!CRM.vars) CRM.vars = {};
         selectParams = {};
       // Legacy: fix entity name if passed in as snake case
       if (entity.charAt(0).toUpperCase() !== entity.charAt(0)) {
-        entity = _.capitalize(_.camelCase(entity));
+        entity = CRM.utils.pascalCase(entity);
       }
       $el.data('api-entity', entity);
       $el.data('select-params', $.extend({}, $el.data('select-params') || {}, options.select));
       $el.data('api-params', $.extend(true, {}, $el.data('api-params') || {}, options.api));
       $el.data('create-links', options.create || $el.data('create-links'));
 
-      $el.addClass('crm-form-entityref crm-' + _.kebabCase(entity) + '-ref');
+      $el.addClass('crm-form-entityref crm-' + CRM.utils.dashCase(entity) + '-ref');
       var settings = {
         // Use select2 ajax helper instead of CRM.api3 because it provides more value
         ajax: {
@@ -2191,6 +2191,25 @@ if (!CRM.vars) CRM.vars = {};
     }
     return len ? name.substring(0, len) : name;
   };
+
+  // Latin-1 letters that deburr to more than one ASCII letter.
+  const DEBURRED_LETTERS = {'\u00c6': 'Ae', '\u00e6': 'ae', '\u00d0': 'D', '\u00f0': 'd', '\u00d8': 'O', '\u00f8': 'o', '\u00de': 'Th', '\u00fe': 'th', '\u00df': 'ss'};
+  // An uppercase run only ends a word when at least two uppercase letters precede a capitalised word,
+  // so 'LKvt' splits as 'LK' + 'vt' rather than 'L' + 'Kvt'.
+  const WORD_PATTERN = /[A-Z]{2,}(?=[A-Z][a-z]+)|[A-Z]?[a-z]+|[A-Z]+|[0-9]+/g;
+
+  // Accents are folded rather than dropped, so an accented word still yields its ASCII letters.
+  function splitWords(str) {
+    return String(str ?? '')
+      .replace(/[\u00c0-\u00ff]/g, (chr) => DEBURRED_LETTERS[chr] || chr.normalize('NFD').replace(/[\u0300-\u036f]/g, ''))
+      .match(WORD_PATTERN) || [];
+  }
+
+  // 'ContributionRecur' or 'contribution_recur' => 'contribution-recur'
+  CRM.utils.dashCase = (str) => splitWords(str).join('-').toLowerCase();
+
+  // 'contribution_recur' or 'contributionRecur' => 'ContributionRecur'
+  CRM.utils.pascalCase = (str) => splitWords(str).map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join('');
 
   CRM.utils.syncFields = function (sourceSelector, targetSelector) {
     // Ensure selectors are valid

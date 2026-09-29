@@ -4,6 +4,10 @@
   // Ensures each display gets a unique form name
   let displayInstance = 0;
 
+  // Control names are split back apart on '-' to recover the row number and the field,
+  // so the field portion must not contain one.
+  const controlFieldKey = (key) => CRM.utils.dashCase(key).replaceAll('-', '_');
+
   angular.module('crmSearchDisplayBatch').component('crmSearchDisplayBatch', {
     bindings: {
       apiEntity: '@',
@@ -194,7 +198,7 @@
 
       this.getFieldName = function(index, key) {
         const rowIndex = ((this.page - 1) * this.limit) + index;
-        return 'batch-row-' + rowIndex + '-' + _.snakeCase(key);
+        return 'batch-row-' + rowIndex + '-' + controlFieldKey(key);
       };
 
       this.isValid = function() {
@@ -250,7 +254,7 @@
           if (key.startsWith('batch-row-') && formCtrl[key].$invalid) {
             const rowNum = 1 + parseInt(key.split('-')[2], 10);
             const fieldKey = key.split('-')[3];
-            const col = this.settings.columns.find(col => _.snakeCase(col.key) === fieldKey);
+            const col = this.settings.columns.find(col => controlFieldKey(col.key) === fieldKey);
             invalidRows[rowNum] = invalidRows[rowNum] || [];
             invalidRows[rowNum].push(col.label);
           }

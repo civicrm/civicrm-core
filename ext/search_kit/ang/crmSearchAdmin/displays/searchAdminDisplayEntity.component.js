@@ -80,7 +80,7 @@
           newVal = ctrl.display.label;
         }
         if (newVal !== oldVal) {
-          ctrl.display.name = _.capitalize(_.camelCase(newVal));
+          ctrl.display.name = CRM.utils.pascalCase(newVal);
         }
       });
 
