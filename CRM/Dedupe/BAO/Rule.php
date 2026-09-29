@@ -14,25 +14,5 @@
  */
 class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_BAO_DedupeRule {
 
-  /**
-   * @param int $cid
-   * @param int $oid
-   * @deprecated
-   * @return bool
-   */
-  public static function validateContacts($cid, $oid) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Dedupe_BAO_DedupeRule::validateContacts');
-    return parent::validateContacts($cid, $oid);
-  }
-
-  /**
-   * @param array $params
-   * @deprecated
-   * @return array
-   */
-  public static function dedupeRuleFields($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Dedupe_BAO_DedupeRule::dedupeRuleFields');
-    return parent::dedupeRuleFields($params);
-  }
 
 }

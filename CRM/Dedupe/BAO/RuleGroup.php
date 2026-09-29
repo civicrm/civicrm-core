@@ -14,14 +14,5 @@
  */
 class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_BAO_DedupeRuleGroup {
 
-  /**
-   * @deprecated
-   * @param string $contactType
-   * @return array|string[]
-   */
-  public static function getByType($contactType = NULL): array {
-    CRM_Core_Error::deprecatedFunctionWarning('APIv4 DedupeRuleGroup::get');
-    return parent::getByType($contactType);
-  }
 
 }

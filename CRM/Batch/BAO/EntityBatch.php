@@ -57,20 +57,6 @@ class CRM_Batch_BAO_EntityBatch extends CRM_Batch_DAO_EntityBatch {
   }
 
   /**
-   * Remove entries from entity batch.
-   * @param array|int $params
-   * @deprecated
-   * @return CRM_Batch_DAO_EntityBatch
-   */
-  public static function del($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    if (!is_array($params)) {
-      $params = ['id' => $params];
-    }
-    return self::deleteRecord($params);
-  }
-
-  /**
    * Get the currency associated with a batch (if any).
    *
    * @param int $batchId
