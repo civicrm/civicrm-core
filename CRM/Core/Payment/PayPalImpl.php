@@ -1265,10 +1265,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $response = (string) $this->getGuzzleClient()->post($url, [
       'body' => $nvpreq,
-      'curl' => [
-        CURLOPT_RETURNTRANSFER => TRUE,
-        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-      ],
+      'verify' => (bool) Civi::settings()->get('verifySSL'),
     ])->getBody();
 
     $result = self::deformat($response);

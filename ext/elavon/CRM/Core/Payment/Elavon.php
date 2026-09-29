@@ -165,20 +165,13 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
     // Convert to XML using function below
     $xml = $this->buildXML($requestFields);
 
-    // Send to the payment processor using cURL
+    // Send to the payment processor.
 
     $chHost = $host . '?xmldata=' . $xml;
-    $curlParams = [
-      CURLOPT_RETURNTRANSFER => TRUE,
-      CURLOPT_TIMEOUT => 36000,
-      CURLOPT_SSL_VERIFYHOST => Civi::settings()->get('verifySSL') ? 2 : 0,
-      CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-    ];
-    if (ini_get('open_basedir') == '') {
-      $curlParams[CURLOPT_FOLLOWLOCATION] = 1;
-    }
     $responseData = $this->getGuzzleClient()->post($chHost, [
-      'curl' => $curlParams,
+      'allow_redirects' => TRUE,
+      'timeout' => 36000,
+      'verify' => (bool) Civi::settings()->get('verifySSL'),
     ])->getBody();
 
     // If gateway returned no data - tell 'em and bail out
