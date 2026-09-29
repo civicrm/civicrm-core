@@ -128,6 +128,28 @@ class DbUtilTest extends \CiviUnitTestCase {
           'ssl_params' => [],
         ],
       ],
+      // A literal '+' in a hand-typed DSN means a '+', not a space. parseDsn()
+      // decodes with rawurldecode() to match how PEAR::DB reads it back later.
+      'literal plus in password' => [
+        'mysql://user:pa+ss@host:3306/db',
+        [
+          'server' => 'host:3306',
+          'username' => 'user',
+          'password' => 'pa+ss',
+          'database' => 'db',
+          'ssl_params' => [],
+        ],
+      ],
+      'encoded space in password' => [
+        'mysql://user:pa%20ss@host:3306/db',
+        [
+          'server' => 'host:3306',
+          'username' => 'user',
+          'password' => 'pa ss',
+          'database' => 'db',
+          'ssl_params' => [],
+        ],
+      ],
       'unix socket' => [
         'mysql://user:pass@unix(/var/lib/mysql/mysql.sock)/db',
         [
