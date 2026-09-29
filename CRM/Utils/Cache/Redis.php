@@ -16,10 +16,11 @@
  */
 class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
 
-  // TODO Consider native implementation.
+  // has(), getMultiple() and deleteMultiple() are native (below). setMultiple() is
+  // deliberately left naive: Redis has no multi-key set with a TTL, so a native version
+  // would need a pipeline/transaction of SETEX calls, with new partial-failure semantics
+  // to reconcile with set()'s throw-on-failure behaviour. Writes are also far rarer than reads.
   use CRM_Utils_Cache_NaiveMultipleTrait;
-  // TODO Native implementation
-  use CRM_Utils_Cache_NaiveHasTrait;
 
   const DEFAULT_HOST    = 'localhost';
   const DEFAULT_PORT    = 6379;
@@ -162,7 +163,38 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   }
 
   /**
-   * @param $key
+   * @param string $key
+   *
+   * @return bool
+   */
+  public function has($key) {
+    CRM_Utils_Cache::assertValidKey($key);
+    // EXISTS avoids transferring and unserializing the payload just to test presence.
+    return (bool) $this->_cache->exists($this->_prefix . $key);
+  }
+
+  /**
+   * @param iterable $keys
+   * @param mixed $default
+   *
+   * @return array
+   */
+  public function getMultiple($keys, $default = NULL) {
+    $keys = $this->prepareKeys('getMultiple', $keys);
+    if (!$keys) {
+      return [];
+    }
+    $raw = $this->_cache->mget($this->prefixKeys($keys));
+    $result = [];
+    foreach ($keys as $i => $key) {
+      // Like get(), a FALSE reply (missing key, or a failed command) yields the default.
+      $result[$key] = (!is_array($raw) || $raw[$i] === FALSE) ? $default : unserialize($raw[$i]);
+    }
+    return $result;
+  }
+
+  /**
+   * @param string $key
    *
    * @return bool
    */
@@ -170,6 +202,47 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
     CRM_Utils_Cache::assertValidKey($key);
     $this->_cache->del($this->_prefix . $key);
     return TRUE;
+  }
+
+  /**
+   * @param iterable $keys
+   *
+   * @return bool
+   */
+  public function deleteMultiple($keys) {
+    $keys = $this->prepareKeys('deleteMultiple', $keys);
+    if ($keys) {
+      $this->_cache->del($this->prefixKeys($keys));
+    }
+    return TRUE;
+  }
+
+  /**
+   * Check that $keys is an iterable of valid keys, and return them as a list.
+   *
+   * @param string $func
+   * @param iterable $keys
+   *
+   * @return string[]|int[]
+   * @throws \CRM_Utils_Cache_InvalidArgumentException
+   */
+  private function prepareKeys($func, $keys): array {
+    $this->assertIterable($func, $keys);
+    // Not preserving keys: a generator may yield the same key more than once.
+    $keys = is_array($keys) ? array_values($keys) : iterator_to_array($keys, FALSE);
+    foreach ($keys as $key) {
+      CRM_Utils_Cache::assertValidKey($key);
+    }
+    return $keys;
+  }
+
+  /**
+   * @param string[] $keys
+   *
+   * @return string[]
+   */
+  private function prefixKeys(array $keys): array {
+    return array_map(fn($key) => $this->_prefix . $key, $keys);
   }
 
   /**
