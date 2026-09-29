@@ -493,7 +493,10 @@
 
       $scope.select2Options = function() {
         return {
-          results: $scope.getOptions().map((opt) => ({id: opt.id, text: opt.label}))
+          // color/icon/description are what crmSelect2's default formatCrmSelect2 renderer
+          // looks for on each result - carrying them through here is what lets e.g. a tags
+          // filter show the same colored swatches as everywhere else tags are picked.
+          results: $scope.getOptions().map((opt) => ({id: opt.id, text: opt.label, color: opt.color, icon: opt.icon, description: opt.description}))
         };
       };
 
