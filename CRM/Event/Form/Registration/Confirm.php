@@ -586,9 +586,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
 
         $participantRecord['receive_date'] = $now;
-        if ($this->_allowConfirmation) {
-          $participantRecord['participant_register_date'] = $this->_values['participant']['register_date'];
-        }
 
         if ($this->getLineItems() && !empty($participantRecord['is_primary']) &&
           $this->isProcessRegistrationInRealTime()
