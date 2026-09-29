@@ -14,8 +14,8 @@ class SettingsUtil {
     // ??why is frontEnd=0??
     $params['frontEnd'] = 0;
     $params['baseURL'] = addslashes(rtrim($m->cmsBaseUrl, '/'));
-    // rawurlencode() rather than urlencode(): PEAR::DB reads these back with
-    // rawurldecode(), which takes a '+' literally instead of as a space.
+    // These are read back with PEAR::DB, which decodes using rawurldecode() -
+    // so a '+' here would mean a literal '+', not a space.
     $params['dbUser'] = addslashes(rawurlencode($m->db['username']));
     $params['dbPass'] = addslashes(rawurlencode($m->db['password'] ?? ''));
     $params['dbHost'] = addslashes(implode(':', array_map('rawurlencode', explode(':', $m->db['server']))));

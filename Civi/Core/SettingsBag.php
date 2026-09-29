@@ -622,8 +622,8 @@ class SettingsBag {
         // Compared strictly: '0' is a usable password, not a missing one.
         return [];
       }
-      // rawurlencode() rather than urlencode(): this DSN is read back with
-      // DB::parseDSN(), which takes a '+' literally instead of as a space.
+      // This DSN is read back with DB::parseDSN(), which decodes using
+      // rawurldecode() - so a '+' here would mean a literal '+', not a space.
       $componentValues[$componentKey] = rawurlencode($value);
     }
 
