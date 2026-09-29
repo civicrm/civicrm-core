@@ -519,7 +519,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           FROM civicrm_contribution contribution
           INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                 ON {$this->_aliases['civicrm_contact']}.id = contribution.contact_id AND contribution.is_test = 0 AND contribution.is_template = 0
-          LEFT JOIN civicrm_membership_payment mp
+          LEFT JOIN " . $this->getMembershipContributionTableSql() . " mp
                 ON contribution.id = mp.contribution_id
           LEFT JOIN civicrm_membership m
                 ON mp.membership_id = m.id AND m.is_test = 0 ";
