@@ -168,7 +168,7 @@ AND    co.id IN ( $contribIDs )";
       if ((str_contains($name, 'check_number_')) && $value) {
         $contribID = substr($name, 13);
 
-        if ($fields["payment_instrument_id_{$contribID}"] != CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check')) {
+        if (!in_array('check_number', CRM_Contribute_BAO_Contribution::getPaymentInstrumentFields($fields["payment_instrument_id_{$contribID}"] ?? NULL), TRUE)) {
           $errors["payment_instrument_id_{$contribID}"] = ts('Payment Method should be Check when a check number is entered for a contribution.');
         }
       }
