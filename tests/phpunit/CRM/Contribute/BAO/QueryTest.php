@@ -85,6 +85,8 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
     );
 
     $this->assertEquals([$contributionID], $this->searchContributionsByMembership($membershipID));
+
+    CRM_Core_DAO::reenableFullGroupByMode();
   }
 
   /**
