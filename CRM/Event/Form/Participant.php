@@ -727,7 +727,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->getOrder()->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
     }
     if ($this->getContactID()) {
-      $this->processBillingAddress($this->getContactID(), $this->getContactValue('email_primary.email'));
+      $this->processBillingAddress($this->getContactID(), (string) $this->getContactValue('email_primary.email'));
     }
     $priorStatusID = $this->getParticipantValue('status_id');
 
