@@ -62,8 +62,21 @@
         return key && !CRM.crmSearchAdmin.pseudoFields.find((field) => field.name === key);
       };
 
-      // FK columns are always indexed via FK constraints; the 'index' cannot be disabled.
-      this.isFkColumn = (col) => !!searchMeta.getField(col.key, this.parent.savedSearch)?.fk_entity;
+      // FK columns and primary key columns are always indexed; the 'index' cannot be disabled.
+      this.isFkColumn = (col) => {
+        if (col.spec?.entity_reference?.entity) {
+          return true;
+        }
+        const field = searchMeta.getField(col.key, this.parent.savedSearch);
+        if (!field) {
+          return false;
+        }
+        if (field.fk_entity) {
+          return true;
+        }
+        const entity = searchMeta.getEntity(field.baseEntity);
+        return !!entity?.primary_key?.includes(field.name);
+      };
 
       this.onChangeEntityPermission = function() {
         if (ctrl.display.settings.entity_permission.length > 1) {

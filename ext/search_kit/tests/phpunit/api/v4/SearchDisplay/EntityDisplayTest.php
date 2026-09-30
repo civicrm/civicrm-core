@@ -139,6 +139,10 @@ class EntityDisplayTest extends Api4TestBase {
       $this->assertEmpty($schema[5]['Default']);
       $this->assertEmpty($schema[5]['Extra']);
       $this->assertEquals('YES', $schema[5]['Null']);
+
+      $createTableDao = \CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_sk_my_new_entity');
+      $createTableDao->fetch();
+      $this->assertStringContainsString('FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`)', $createTableDao->Create_Table);
     }
 
     if ($dataMode === 'table') {

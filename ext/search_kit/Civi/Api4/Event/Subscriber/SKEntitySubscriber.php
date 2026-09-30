@@ -201,9 +201,10 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       'searchable' => !empty($column['index']),
     ];
     // Add FK indexes
-    if ($expr['expr']->getType() === 'SqlField' && !empty($field['fk_entity'])) {
-      $defn['fk_table_name'] = CoreUtil::getTableName($field['fk_entity']);
-      $defn['fk_field_name'] = $field['fk_column'];
+    $fkEntity = $column['spec']['entity_reference']['entity'] ?? NULL;
+    if ($fkEntity) {
+      $defn['fk_table_name'] = CoreUtil::getTableName($fkEntity);
+      $defn['fk_field_name'] = $column['spec']['entity_reference']['key'] ?? CoreUtil::getIdFieldName($fkEntity);
       $defn['fk_attributes'] = ' ON DELETE SET NULL';
     }
     return $defn;
