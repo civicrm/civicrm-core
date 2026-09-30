@@ -12,6 +12,13 @@ return [
       'values' => [
         'name' => 'Message_Templates_Workflow',
         'label' => E::ts('System Workflow Messages'),
+        'form_values' => [
+          'join' => [
+            'MessageTemplate_Translation_entity_id_01' => E::ts('Any Translation'),
+            'MessageTemplate_Translation_entity_id_02' => E::ts('Active Translation'),
+            'MessageTemplate_Translation_entity_id_03' => E::ts('Draft Translation'),
+          ],
+        ],
         'api_entity' => 'MessageTemplate',
         'api_params' => [
           'version' => 4,
@@ -24,10 +31,10 @@ return [
             // Each pair concatenates the same raw column in the same order, so `:label` is
             // applied per value afterwards and the two arrays stay index-aligned for the
             // per-language link.
-            'GROUP_CONCAT(DISTINCT active.language:label ORDER BY active.language ASC) AS translation_languages',
-            'GROUP_CONCAT(DISTINCT active.language ORDER BY active.language ASC) AS translation_codes',
-            'GROUP_CONCAT(DISTINCT draft.language:label ORDER BY draft.language ASC) AS draft_languages',
-            'GROUP_CONCAT(DISTINCT draft.language ORDER BY draft.language ASC) AS draft_codes',
+            'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_02.language:label ORDER BY MessageTemplate_Translation_entity_id_02.language ASC) AS translation_languages',
+            'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_02.language ORDER BY MessageTemplate_Translation_entity_id_02.language ASC) AS translation_codes',
+            'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_03.language:label ORDER BY MessageTemplate_Translation_entity_id_03.language ASC) AS draft_languages',
+            'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_03.language ORDER BY MessageTemplate_Translation_entity_id_03.language ASC) AS draft_codes',
           ],
           'orderBy' => [],
           'where' => [
@@ -36,30 +43,32 @@ return [
           ],
           'groupBy' => ['id'],
           'join' => [
-            // Only the language filter reads `tx`, so filtering matches drafts as well as active
-            // translations without narrowing the languages the columns list.
+            // The SearchKit editor only recognises join aliases in its own `<join>_NN` form, and
+            // expects condition values JSON-quoted. _01 is read only by the language filter, so
+            // filtering matches drafts as well as active translations without narrowing the
+            // languages the columns list; _02 feeds Translations and _03 Drafts.
             [
-              'Translation AS tx',
+              'Translation AS MessageTemplate_Translation_entity_id_01',
               'LEFT',
               NULL,
-              ['tx.entity_table', '=', "'civicrm_msg_template'"],
-              ['tx.entity_id', '=', 'id'],
+              ['MessageTemplate_Translation_entity_id_01.entity_table', '=', "'civicrm_msg_template'"],
+              ['MessageTemplate_Translation_entity_id_01.entity_id', '=', 'id'],
             ],
             [
-              'Translation AS active',
+              'Translation AS MessageTemplate_Translation_entity_id_02',
               'LEFT',
               NULL,
-              ['active.entity_table', '=', "'civicrm_msg_template'"],
-              ['active.entity_id', '=', 'id'],
-              ['active.status_id:name', '=', "'active'"],
+              ['MessageTemplate_Translation_entity_id_02.entity_table', '=', "'civicrm_msg_template'"],
+              ['MessageTemplate_Translation_entity_id_02.entity_id', '=', 'id'],
+              ['MessageTemplate_Translation_entity_id_02.status_id:name', '=', '"active"'],
             ],
             [
-              'Translation AS draft',
+              'Translation AS MessageTemplate_Translation_entity_id_03',
               'LEFT',
               NULL,
-              ['draft.entity_table', '=', "'civicrm_msg_template'"],
-              ['draft.entity_id', '=', 'id'],
-              ['draft.status_id:name', '=', "'draft'"],
+              ['MessageTemplate_Translation_entity_id_03.entity_table', '=', "'civicrm_msg_template'"],
+              ['MessageTemplate_Translation_entity_id_03.entity_id', '=', 'id'],
+              ['MessageTemplate_Translation_entity_id_03.status_id:name', '=', '"draft"'],
             ],
           ],
         ],
