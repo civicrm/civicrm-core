@@ -51,7 +51,7 @@
         <td colspan="2">
     {/if}
     {* End block for change status, case type and start date. *}
-            <table class="form-layout-compressed">
+            <table class="form-layout">
               <tbody>
                 <tr id="with-clients" class="crm-case-activity-form-block-client_name">
                   <td class="label">{ts}Client{/ts}</td>
