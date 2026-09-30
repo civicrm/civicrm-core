@@ -285,15 +285,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
           // Set amounts to create a reversal transaction.
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = -$this->getOriginalContribution()->total_amount;
           $params['trxnParams']['fee_amount'] = 0 - $this->getOriginalContribution()->fee_amount;
-          $lineItems = $this->updateFinancialAccounts($params, 'changeFinancialType');
-          $this->createDeferredTrxn($lineItems, TRUE, 'changeFinancialType');
+          $this->updateFinancialAccounts($params, 'changeFinancialType');
           /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
           $params['financial_account_id'] = $this->getUpdatedFinancialAccount();
           // Set the amounts back to the original value for creating the new positive financial trxn.
           $params['total_amount'] = $params['trxnParams']['net_amount'] = $params['trxnParams']['total_amount'] = $this->getUpdatedContribution()->total_amount;
           $params['trxnParams']['fee_amount'] = $this->getUpdatedContribution()->fee_amount;
-          $lineItems = $this->updateFinancialAccounts($params);
-          $this->createDeferredTrxn($lineItems, TRUE);
+          $this->updateFinancialAccounts($params);
           $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
           $updated = TRUE;
           $params['deferred_financial_account_id'] = $this->getUpdatedFinancialAccount();
@@ -337,8 +335,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
-          $lineItems = $this->updateFinancialAccounts($params, 'changedAmount');
-          $this->createDeferredTrxn($lineItems, TRUE, 'changedAmount');
+          $this->updateFinancialAccounts($params, 'changedAmount');
           $updated = TRUE;
         }
 
@@ -420,7 +417,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @return array
    */
   private function createFinancialItemsForLine($params, $context, $fields, $trxnIds, $fieldId): array {
-    $postUpdateContribution = $params['contribution'];
+    $postUpdateContribution = $this->getUpdatedContribution();
     foreach ($fields as $fieldValueId => $lineItemDetails) {
       $previousLineItem = $this->originalLineItems[$lineItemDetails['id'] ?? NULL] ?? [];
       $prevFinancialItem = $this->getExistingFinancialItemForLine($lineItemDetails['id'], FALSE);
@@ -652,6 +649,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     foreach ($params['line_item'] as $fieldId => $fields) {
       $params = $this->createFinancialItemsForLine($params, $context, $fields, $trxnIds, $fieldId);
     }
+    $this->createDeferredTrxn($params['line_item'], TRUE, $context);
     return $params['line_item'];
   }
 
@@ -785,8 +783,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
       return;
     }
-    $lineItems = $this->updateFinancialAccounts($params, 'changedStatus');
-    $this->createDeferredTrxn($lineItems, TRUE, 'changedStatus');
+    $this->updateFinancialAccounts($params, 'changedStatus');
   }
 
   /**
