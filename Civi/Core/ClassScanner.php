@@ -278,7 +278,7 @@ class ClassScanner {
             'name' => 'classes',
             'scope' => 'version',
             'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
-            'fastArray' => TRUE,
+            'withArray' => 'fast',
           ]);
           break;
 
