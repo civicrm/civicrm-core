@@ -23,6 +23,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   use CRM_Financial_Form_FrontEndPaymentFormTrait;
   use CRM_Event_Form_EventFormTrait;
   use CRM_Financial_Form_PaymentProcessorFormTrait;
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * The id of the event we are processing.
@@ -63,7 +64,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   protected function getAllSubmittedValues(): array {
     $moneyFieldNames = $this->getPriceMoneyFieldNames();
     $allSubmittedValues = ['Register' => $this->getMainFormValues()];
-    foreach (array_keys($this->controller->getStateMachine()->getPages()) as $pageKey) {
+    foreach (array_keys($this->controller->getStateMachine()->getPages() ?? []) as $pageKey) {
       $pageName = str_replace('CRM_Event_Form_Registration_', '', $pageKey);
       if (str_starts_with($pageName, 'Participant_')) {
         // The 'Skip Participant' button is built with type 'next', subName
@@ -88,6 +89,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           $values[$moneyFieldName] = CRM_Utils_Rule::cleanMoney($values[$moneyFieldName]);
         }
       }
+      $values = $this->cleanSubmittedCustomFieldValues($values);
     }
     return $allSubmittedValues;
   }
@@ -136,6 +138,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getPriceMoneyFieldNames(): array {
+    if (!$this->getPriceSetID()) {
+      return [];
+    }
     $fieldNames = [];
     foreach ($this->getPriceFieldMetaData() as $priceField) {
       if ($priceField['html_type'] === 'Text') {
@@ -201,7 +206,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if (!empty($this->_priceSet['fields'])) {
       return $this->_priceSet['fields'];
     }
-    return $this->order->getPriceFieldsMetadata();
+    return $this->getOrder()->getPriceFieldsMetadata();
   }
 
   /**
@@ -960,11 +965,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $participantParams['register_date'] = date('YmdHis');
     }
 
-    if (!empty($params['note'])) {
-      $participantParams['note'] = $params['note'];
-    }
-    elseif (!empty($params['participant_note'])) {
-      $participantParams['note'] = $params['participant_note'];
+    $note = $this->getSubmittedParticipantValue('note', $participantNumber) ?: $this->getSubmittedParticipantValue('participant_note', $participantNumber);
+    if (!empty($note)) {
+      $participantParams['note'] = $note;
     }
 
     // reuse id if one already exists for this one (can happen
@@ -1659,6 +1662,37 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
     }
     return $value;
+  }
+
+  /**
+   * Get a submitted value for a specific participant.
+   *
+   * @param string $fieldName
+   * @param int $participantIndex
+   *   0 for the primary participant (Register/Confirm/ThankYou), 1+ for an
+   *   additional participant (the Nth AdditionalParticipant page).
+   *
+   * @return mixed|null
+   */
+  public function getSubmittedParticipantValue(string $fieldName, int $participantIndex = 0) {
+    return $this->getSubmittedParticipantValues($participantIndex)[$fieldName] ?? NULL;
+  }
+
+  /**
+   * Get all submitted values for a specific participant.
+   *
+   * @param int $participantIndex
+   *   0 for the primary participant (Register/Confirm/ThankYou), 1+ for an
+   *   additional participant (the Nth AdditionalParticipant page).
+   *
+   * @return array
+   */
+  protected function getSubmittedParticipantValues(int $participantIndex = 0): array {
+    $pageName = $participantIndex === 0 ? 'Register' : 'Participant_' . $participantIndex;
+    if ($participantIndex !== 0 && $this->getName() === $pageName) {
+      return $this->getSubmittedValues();
+    }
+    return $this->getAllSubmittedValues()[$pageName] ?? [];
   }
 
   /**
