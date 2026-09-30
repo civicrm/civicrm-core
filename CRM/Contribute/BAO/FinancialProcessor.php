@@ -31,10 +31,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
   private ?CRM_Contribute_BAO_Contribution $originalContribution;
 
   private array $originalLineItems;
+  private array $updatedLineItems;
   private array $inputValues;
   private array $previousFinancialItems = [];
 
-  public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution, array $originalLineItems, array $inputValues) {
+  public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution, array $originalLineItems, array $updatedLineItems, array $inputValues = []) {
     // Deal with slopping typing first.
     if ($originalContribution) {
       $originalContribution->contribution_status_id = (int) $originalContribution->contribution_status_id;
@@ -43,11 +44,16 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $this->originalContribution = $originalContribution;
     $this->updatedContribution = $updatedContribution;
     $this->originalLineItems = $originalLineItems;
+    $this->updatedLineItems = $updatedLineItems;
     $this->inputValues = $inputValues;
   }
 
   private function getUpdatedContribution(): CRM_Contribute_DAO_Contribution {
     return $this->updatedContribution;
+  }
+
+  private function getUpdatedLineItems(): array {
+    return $this->updatedLineItems;
   }
 
   private function getOriginalContribution(): ?CRM_Contribute_BAO_Contribution {
