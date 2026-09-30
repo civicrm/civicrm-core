@@ -536,6 +536,29 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that importing with a merged contact's ID updates the kept contact.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportParserWithMergedContactID(): void {
+    $deletedContactID = $this->individualCreate();
+    $keptContactID = $this->individualCreate();
+    Contact::mergeDuplicates()
+      ->setContactId($keptContactID)
+      ->setDuplicateId($deletedContactID)
+      ->execute();
+    $this->runImport(['id' => $deletedContactID, 'nick_name' => 'Old Bill'], CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $this->assertEquals('Old Bill', Contact::get()->addWhere('id', '=', $keptContactID)->addSelect('nick_name')->execute()->single()['nick_name']);
+
+    Contact::delete(FALSE)
+      ->setUseTrash(FALSE)
+      ->addWhere('id', '=', $deletedContactID)
+      ->execute();
+    $this->runImport(['id' => $deletedContactID, 'nick_name' => 'Older Bill'], CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID);
+    $this->assertEquals('Older Bill', Contact::get()->addWhere('id', '=', $keptContactID)->addSelect('nick_name')->execute()->single()['nick_name']);
+  }
+
+  /**
    * Test that the import parser adds the external identifier where none is set.
    *
    * @throws \Exception
