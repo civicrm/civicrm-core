@@ -250,8 +250,13 @@
       .on('click', '.crm-delete-inline', function(e) {
         var row = $(this).closest('tr');
         var form = $(this).closest('form');
-        row.hide();
         var blockNumber = row.data('block-number');
+        // If it's the last block, use visibility instead of hide to prevent the table collapsing
+        if ($('tr[id*="_Block_"]:visible', form).length === 1) {
+          row.css('visibility', 'hidden');
+        } else {
+          row.hide();
+        }
         if (blockNumber) {
           $('.crm-block-entity-' + row.data('entity') + '-' + blockNumber).addClass('hiddenElement');
           $('input', '.crm-block-entity-' + row.data('entity') + '-' + blockNumber).val('');
@@ -261,14 +266,8 @@
         //unset and set first as primary
         if ($('[class$=is_primary] input:checked', row).length > 0) {
           $('[class$=is_primary] input', row).prop('checked', false);
-          $('[class$=is_primary] input:visible:first', form).prop('checked', true );
+          $('[class$=is_primary] input:visible:first', form).prop('checked', true);
         }
-        $('.add-more-inline', form).show();
-        if ($('[class$=is_primary] input:visible', form).length == 0) {
-          $('.add-more-inline', form).click();
-          $('[class$=is_primary] input:visible:first', form).prop('checked', true );
-        }
-
         e.preventDefault();
       })
       // Delete an address
@@ -290,6 +289,14 @@
         var form = $(this).closest('form');
         var row = $('tr[class="hiddenElement"]:first', form);
         row.removeClass('hiddenElement');
+        // Hide placeholder empty row
+        $('tr[id*="_Block_"]', form)
+          .filter(function() {return $(this).css('visibility') === 'hidden';})
+          .css('visibility', '')
+          .hide();
+        if ($('tr[id*="_Block_"]:visible', form).length === 1) {
+          $('[class$=is_primary] input:visible:first', form).prop('checked', true );
+        }
         var blockNumber = row.data('block-number');
         if (blockNumber) {
           $('.crm-block-entity-' + row.data('entity') + '-' + blockNumber).removeClass('hiddenElement');
