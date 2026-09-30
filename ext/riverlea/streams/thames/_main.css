@@ -718,15 +718,6 @@ html.crm-standalone  nav.breadcrumb>ol {
   background: #ead2ce;
 }
 
-/* e.g. search buttons followed by count of matches on SK screen */
-.crm-search-display .form-inline:not(th,td) {
-  padding: var(--crm-padding-reg) 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--crm-l-medium);
-}
-
 /* Spinner. Replace the fa icon with something nicer. */
 .fa-spinner::before {
   content: "";
