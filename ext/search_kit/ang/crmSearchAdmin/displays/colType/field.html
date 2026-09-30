@@ -19,10 +19,16 @@
 </div>
 <div class="form-inline" ng-if="$ctrl.parent.isDate(col.key)">
   <label for="crm-search-admin-edit-date-format-{{ $index }}">{{:: ts('Format') }}</label>
-  <select id="crm-search-admin-edit-date-format-{{ $index }}" class="form-control" ng-model="col.format" title="{{:: ts('Date Format') }}">
+  <select id="crm-search-admin-edit-date-format-{{ $index }}" class="form-control" ng-model="$ctrl.parent.getSetDateFormat(col)" ng-model-options="{getterSetter: true}" title="{{:: ts('Date Format') }}">
     <option value="">{{:: ts('Date Format: Default') }}</option>
     <option ng-repeat="(k, v) in $ctrl.parent.dateFormats" value="{{k}}">{{ v }}</option>
+    <option value="other">{{:: ts('Other...') }}</option>
   </select>
+  <span class="form-group" ng-if="$ctrl.parent.isCustomDateFormat(col)" >
+    <label for="crm-search-admin-edit-date-custom-{{ $index }}" class="sr-only">{{:: ts('Custom date format') }}</label>
+    <input id="crm-search-admin-edit-date-custom-{{ $index }}" type="text" class="form-control" ng-model="col.format" placeholder="{{:: ts('Date Format') }}" title="{{:: ts('Custom date format') }}">
+    <a crm-ui-help="hs({id: 'date-format', title: ts('Date Format'), file: 'CRM/Admin/Form/Setting/Date'})"></a>
+  </span>
 </div>
 <div class="form-inline" ng-if="$ctrl.parent.isMoney(col.key)">
   <label for="crm-search-admin-edit-money-format-{{ $index }}">{{:: ts('Format') }}</label>

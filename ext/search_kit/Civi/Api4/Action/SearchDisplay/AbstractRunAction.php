@@ -1487,7 +1487,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       case 'Date':
       case 'Timestamp':
         if ($format) {
-          $dateFormat = \Civi::settings()->get($format);
+          $dateFormat = str_starts_with($format, 'dateformat') ? \Civi::settings()->get($format) : $format;
         }
         $formatted = \CRM_Utils_Date::customFormat($rawValue, $dateFormat ?? NULL);
     }
