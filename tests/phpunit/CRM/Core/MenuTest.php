@@ -87,6 +87,15 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check that null database fields (such as 'title' for routes without explicit title)
+   * are omitted from the route array rather than set to empty string.
+   */
+  public function testNullValuesOmittedFromRoute(): void {
+    $item = CRM_Core_Menu::get('civicrm/search');
+    $this->assertArrayNotHasKey('title', $item);
+  }
+
+  /**
    * @return array
    */
   public static function pathArguments() {
