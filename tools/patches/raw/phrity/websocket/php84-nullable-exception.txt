@@ -1,0 +1,1 @@
+Fix PHP syntax for exceptions on PHP 8.4+

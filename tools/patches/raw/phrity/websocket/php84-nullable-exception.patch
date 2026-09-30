@@ -1,0 +1,26 @@
+diff --git a/lib/BadOpcodeException.php b/lib/BadOpcodeException.php
+index 1705891..607af05 100644
+--- a/lib/BadOpcodeException.php
++++ b/lib/BadOpcodeException.php
+@@ -15,7 +15,7 @@ namespace WebSocket;
+  */
+ class BadOpcodeException extends Exception
+ {
+-    public function __construct(string $message, int $code = self::BAD_OPCODE, Throwable $prev = null)
++    public function __construct(string $message, int $code = self::BAD_OPCODE, ?Throwable $prev = null)
+     {
+         parent::__construct($message, $code, $prev);
+     }
+diff --git a/lib/ConnectionException.php b/lib/ConnectionException.php
+index 2bde1ba..5d9fe15 100644
+--- a/lib/ConnectionException.php
++++ b/lib/ConnectionException.php
+@@ -19,7 +19,7 @@ class ConnectionException extends Exception
+ {
+     private $data;
+ 
+-    public function __construct(string $message, int $code = 0, array $data = [], Throwable $prev = null)
++    public function __construct(string $message, int $code = 0, array $data = [], ?Throwable $prev = null)
+     {
+         parent::__construct($message, $code, $prev);
+         $this->data = $data;
