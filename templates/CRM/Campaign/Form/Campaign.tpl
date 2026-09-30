@@ -14,9 +14,9 @@
     {ts}Are you sure you want to delete this Campaign?{/ts}
   </div>
 {else}
-  <table class="form-layout-compressed">
+  <table class="form-layout">
   <tr class="crm-campaign-form-block-title">
-      <td class="label">{$form.title.label}</td>
+      <td class="label">{$form.title.label} {help id="title"}</td>
       <td class="view-value">{$form.title.html}</td>
   </tr>
   <tr class="crm-campaign-form-block-campaign_type_id">
@@ -28,7 +28,7 @@
       <td class="view-value">{$form.description.html}</td>
   </tr>
   <tr class="crm-campaign-form-block-includeGroups">
-      <td class="label">{$form.includeGroups.label}</td>
+      <td class="label">{$form.includeGroups.label} {help id="include_groups"}</td>
       <td>{$form.includeGroups.html}</td>
   </tr>
   <tr class="crm-campaign-form-block-start_date">
@@ -36,7 +36,7 @@
       <td class="view-value">{$form.start_date.html}</td>
   </tr>
   <tr class="crm-campaign-form-block-end_date">
-      <td class="label">{$form.end_date.label}</td>
+      <td class="label">{$form.end_date.label} {help id="end_date"}</td>
       <td class="view-value">{$form.end_date.html}</td>
   </tr>
   <tr class="crm-campaign-form-block-status_id">
@@ -52,25 +52,15 @@
       <td class="view-value">{$form.goal_revenue.html}</td>
   </tr>
   <tr class="crm-campaign-form-block-external_identifier">
-      <td class="label">{$form.external_identifier.label}</td>
+      <td class="label">{$form.external_identifier.label} {help id="external_identifier"}</td>
       <td class="view-value">{$form.external_identifier.html}</td>
   </tr>
-
-  {* Suppress parent-child feature for now. dgg *}
-  {*
-  <tr class="crm-campaign-form-block-parent_id">
-      <td class="label">{$form.parent_id.label}</td>
-      <td class="view-value">{$form.parent_id.html}</td>
-  </tr> *}
-
   <tr class="crm-campaign-form-block-is_active">
-      <td class="label">{$form.is_active.label}</td>
+      <td class="label">{$form.is_active.label} {help id="is_active"}</td>
       <td class="view-value">{$form.is_active.html}</td>
   </tr>
   </table>
-
   {include file="CRM/common/customDataBlock.tpl" groupID='' customDataType='Campaign' cid=false}
-
 {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
