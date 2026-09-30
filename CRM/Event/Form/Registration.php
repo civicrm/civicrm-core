@@ -934,17 +934,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   private function addParticipant($params, $contactID, $participantNumber): CRM_Event_BAO_Participant {
     $transaction = new CRM_Core_Transaction();
-    // handle register date CRM-4320
-    $registerDate = NULL;
-    if (!empty($this->_allowConfirmation) && $this->_participantId) {
-      $registerDate = $params['participant_register_date'];
-    }
-    elseif (!empty($params['participant_register_date']) &&
-      is_array($params['participant_register_date']) &&
-      !empty($params['participant_register_date'])
-    ) {
-      $registerDate = CRM_Utils_Date::format($params['participant_register_date']);
-    }
 
     $participantFields = CRM_Event_DAO_Participant::fields();
     $participantParams = [
@@ -953,7 +942,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       'event_id' => $this->getEventID(),
       'status_id' => $params['participant_status'] ?? 1,
       'role_id' => $params['participant_role_id'] ?? CRM_Event_BAO_Participant::getDefaultRoleID(),
-      'register_date' => ($registerDate) ? $registerDate : date('YmdHis'),
       'source' => CRM_Utils_String::ellipsify($params['participant_source'] ?? $params['description'] ?? '',
         $participantFields['participant_source']['maxlength']
       ),
@@ -966,6 +954,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       'campaign_id' => $params['campaign_id'] ?? NULL,
       'is_test' => $this->isTest(),
     ];
+    // On a fresh registration there is no existing participant row to preserve
+    // register_date from, and the field has no db-level default.
+    if (empty($participantParams['id'])) {
+      $participantParams['register_date'] = date('YmdHis');
+    }
 
     if (!empty($params['note'])) {
       $participantParams['note'] = $params['note'];
