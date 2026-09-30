@@ -66,4 +66,39 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
+  /**
+   * Test saveIMs deletes IMs when cleared.
+   */
+  public function testSaveIMsDeleteAll(): void {
+    $contactId = $this->individualCreate();
+    $im = IM::create(FALSE)->setValues([
+      'name' => 'jane.doe',
+      'provider_id' => 1,
+      'is_primary' => 1,
+      'location_type_id' => 1,
+      'contact_id' => $contactId,
+    ])->execute()->first();
+
+    $form = new class($contactId) {
+      use CRM_Contact_Form_Edit_IMBlockTrait;
+      private int $contactId;
+
+      public function __construct(int $contactId) {
+        $this->contactId = $contactId;
+      }
+
+      public function getContactID(): int {
+        return $this->contactId;
+      }
+
+    };
+
+    $form->saveIMs([['id' => $im['id'], 'name' => '']]);
+
+    $count = IM::get(FALSE)->addWhere('contact_id', '=', $contactId)->execute()->count();
+    $this->assertEquals(0, $count);
+
+    $this->contactDelete($contactId);
+  }
+
 }
