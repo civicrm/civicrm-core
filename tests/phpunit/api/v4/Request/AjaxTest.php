@@ -129,6 +129,30 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString('SECURITY', $response['error_message']);
   }
 
+  /**
+   * Check that malformed json is rejected rather than causing a fatal error
+   */
+  public function testMalformedJson(): void {
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'add contacts'];
+    [$response, $code] = $this->runAjax([
+      'path' => 'civicrm/ajax/api4/Contact/create',
+      'post' => [
+        'params' => '{"values": {"first_name": "Hel',
+      ],
+    ]);
+    $this->assertEquals(400, $code);
+    $this->assertStringContainsString("'params'", $response['error_message']);
+
+    [$response, $code] = $this->runAjax([
+      'path' => 'civicrm/ajax/api4',
+      'post' => [
+        'calls' => '[["Contact", "get"], ["Activ',
+      ],
+    ]);
+    $this->assertEquals(400, $code);
+    $this->assertStringContainsString("'calls'", $response['error_message']);
+  }
+
   public function testContactGetAndCreatePermissions(): void {
     $firstName = uniqid();
 
