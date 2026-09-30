@@ -139,6 +139,10 @@ class EntityDisplayTest extends Api4TestBase {
       $this->assertEmpty($schema[5]['Default']);
       $this->assertEmpty($schema[5]['Extra']);
       $this->assertEquals('YES', $schema[5]['Null']);
+
+      $createTableDao = \CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_sk_my_new_entity');
+      $createTableDao->fetch();
+      $this->assertStringContainsString('FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact` (`id`)', $createTableDao->Create_Table);
     }
 
     if ($dataMode === 'table') {
@@ -715,6 +719,8 @@ class EntityDisplayTest extends Api4TestBase {
       'name' => 'TestColumnIndex',
       'settings' => [
         'columns' => [
+          // Entity primary key column: foreign key constraint to civicrm_contact creates an index regardless of 'index' => FALSE.
+          ['key' => 'id', 'label' => 'Contact ID', 'type' => 'field', 'index' => FALSE],
           // Explicitly opted in.
           ['key' => 'first_name', 'label' => 'First Name', 'type' => 'field', 'index' => TRUE],
           // Explicitly opted out.
@@ -735,6 +741,7 @@ class EntityDisplayTest extends Api4TestBase {
       ->addWhere('id', '=', $display['id'])
       ->execute()->single();
     $columnsByKey = array_column($savedDisplay['settings']['columns'], NULL, 'key');
+    $this->assertFalse($columnsByKey['id']['index']);
     $this->assertTrue($columnsByKey['first_name']['index']);
     $this->assertFalse($columnsByKey['last_name']['index']);
     $this->assertTrue($columnsByKey['middle_name']['index']);
@@ -744,6 +751,8 @@ class EntityDisplayTest extends Api4TestBase {
     $allIndexes = \CRM_Core_DAO::executeQuery('SHOW INDEX FROM civicrm_sk_test_column_index')->fetchAll();
     $indexedColumns = array_column($allIndexes, 'Column_name');
 
+    // id: entity primary key references source entity, so FK constraint ensures an index exists despite 'index' => FALSE.
+    $this->assertContains('id', $indexedColumns);
     // first_name: explicitly indexed.
     $this->assertContains('first_name', $indexedColumns);
     // middle_name: no 'index' key → defaults to TRUE.

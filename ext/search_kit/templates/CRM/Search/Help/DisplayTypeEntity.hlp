@@ -5,7 +5,7 @@
 {htxt id="entity_display_column_index"}
   <p>{ts}Adding an index will greatly speed up searches that filter on this field.{/ts}</p>
   <p>{ts}Omit the index if this field will be displayed but not searched for (for slightly faster table rebuilds and reduced disk space).{/ts}</p>
-  <p>{ts}Note: Foreign key fields that contain the id of another entity will always be indexed.{/ts}</p>
+  <p>{ts}Note: Entity ID and foreign key fields will always be indexed.{/ts}</p>
 {/htxt}
 {htxt id="data_mode"}
   <p>{ts}Determine which data-storage features to use when generating this entity.{/ts}</p>
