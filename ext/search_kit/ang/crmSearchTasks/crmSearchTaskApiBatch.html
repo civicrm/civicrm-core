@@ -7,7 +7,6 @@
         <div class="clear"></div>
       </div>
     </div>
-    <hr />
     <div ng-if="$ctrl.run" class="crm-search-task-progress">
       <h5 ng-if="apiBatch.runMsg">{{:: ts(apiBatch.runMsg, {1: $ctrl.ids.length, 2: $ctrl.entityTitle}) }}</h5>
       <crm-search-batch-runner entity="apiBatch.entity" action="{{:: apiBatch.action }}" params="$ctrl.run" ids="$ctrl.ids" success="$ctrl.onSuccess(result)" error="$ctrl.onError(error)" id-field="{{:: apiBatch.idField }}" display-ctrl="$ctrl.displayCtrl" is-link="$ctrl.isLink"></crm-search-batch-runner>
