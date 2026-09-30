@@ -691,7 +691,7 @@ class CRM_Core_Menu {
    *   Path of menu item to retrieve.
    *
    * @return array
-   *   Menu entry array.
+   *   Menu entry array. NULL values will be omitted.
    */
   protected static function fetch(string $path) {
     $args = explode('/', $path);
@@ -713,9 +713,17 @@ class CRM_Core_Menu {
       ORDER BY length(path) DESC
       LIMIT 1";
 
-    $records = CRM_Core_Dao::executeQuery($query)->fetchAll();
+    $dao = CRM_Core_DAO::executeQuery($query);
+    $dao->fetch();
 
-    $route = $records[0] ?? NULL;
+    $route = [];
+
+    // Exclude NULL values (so don't use $dao->fetchAll or $dao->toArray which cast NULL to '')
+    foreach (Civi::entity('Menu')->getFields() as $fieldName => $fieldDefn) {
+      if (isset($dao->{$fieldName})) {
+        $route[$fieldName] = $dao->{$fieldName};
+      }
+    }
 
     if ($route && str_contains($path, $route['path'])) {
       // Move module_data into main item.
@@ -727,7 +735,9 @@ class CRM_Core_Menu {
 
       // Unserialize other fields
       foreach (self::$_serializedElements as $field) {
-        $route[$field] = CRM_Utils_String::unserialize($route[$field]);
+        if (isset($route[$field])) {
+          $route[$field] = CRM_Utils_String::unserialize($route[$field]);
+        }
       }
     }
 
