@@ -54,6 +54,9 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       // Received multi-call format
       $calls = CRM_Utils_Request::retrieve('calls', 'String', NULL, TRUE, NULL, 'POST');
       $calls = json_decode($calls, TRUE);
+      if (!is_array($calls)) {
+        $this->sendMalformedJsonResponse('calls');
+      }
       foreach ($calls as $index => $call) {
         $response[$index] = call_user_func_array([$this, 'execute'], $call);
       }
@@ -74,6 +77,9 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     $config = CRM_Core_Config::singleton();
     $params = CRM_Utils_Request::retrieve('params', 'String');
     $params = $params ? json_decode($params, TRUE) : [];
+    if (!is_array($params)) {
+      $this->sendMalformedJsonResponse('params');
+    }
 
     // Add query params if they are not in the params json and if they are allowed by the api action
     $queryParams = array_diff_key($_GET, $params);
@@ -90,6 +96,17 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       }
     }
     return $params;
+  }
+
+  /**
+   * A body cut short (e.g. the browser navigating away mid-upload) decodes to NULL.
+   */
+  private function sendMalformedJsonResponse(string $name): void {
+    $this->httpResponseCode = 400;
+    CRM_Utils_System::sendJSONResponse([
+      'error_code' => 400,
+      'error_message' => "Malformed JSON in '$name'.",
+    ], $this->httpResponseCode);
   }
 
   /**
