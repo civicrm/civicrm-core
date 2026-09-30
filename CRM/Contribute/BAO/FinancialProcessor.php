@@ -912,7 +912,38 @@ class CRM_Contribute_BAO_FinancialProcessor {
         'total_amount' => $trxn->total_amount,
         'contribution_id' => $this->getContributionID(),
       ];
-      $this->assignProportionalLineItems($trxnParams, $trxn->id, $prevContribution->total_amount);
+      $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->getContributionID());
+      if (!empty($lineItems)) {
+        // get financial item
+        [$financialItemIds, $taxItems] = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($this->getContributionID());
+        $entityParams = [
+          'contribution_total_amount' => $prevContribution->total_amount,
+          'trxn_total_amount' => $trxnParams['total_amount'],
+          'trxn_id' => $trxn->id,
+        ];
+        $eftParams = [
+          'entity_table' => 'civicrm_financial_item',
+          'financial_trxn_id' => $entityParams['trxn_id'],
+        ];
+        foreach ($lineItems as $lineItem) {
+          if ($lineItem['qty'] == 0) {
+            continue;
+          }
+          $eftParams['entity_id'] = $financialItemIds[$lineItem['price_field_value_id']];
+          $eftParams['amount'] = 0;
+          if ($entityParams['contribution_total_amount'] != 0) {
+            $eftParams['amount'] = $lineItem['line_total'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
+          }
+          EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
+          if (array_key_exists($lineItem['price_field_value_id'], $taxItems)) {
+            $eftParams['entity_id'] = $taxItems[$lineItem['price_field_value_id']]['financial_item_id'];
+            if ($entityParams['contribution_total_amount'] != 0) {
+              $eftParams['amount'] = $taxItems[$lineItem['price_field_value_id']]['amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
+            }
+            EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
+          }
+        }
+      }
     }
 
     $this->createDeferredTrxn($inputParams['line_item'] ?? NULL, TRUE, 'changePaymentInstrument');
@@ -1007,52 +1038,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
             'financial_trxn_id' => $financialTxn->id,
           ];
           civicrm_api3('EntityFinancialTrxn', 'create', $entityParams);
-        }
-      }
-    }
-  }
-
-  /**
-   * Function use to store line item proportionally in in entity financial trxn table
-   *
-   * @param array $trxnParams
-   *
-   * @param int $trxnId
-   *
-   * @param float $contributionTotalAmount
-   *
-   * @throws \CRM_Core_Exception
-   */
-  private function assignProportionalLineItems($trxnParams, $trxnId, $contributionTotalAmount) {
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->getContributionID());
-    if (!empty($lineItems)) {
-      // get financial item
-      [$financialItemIds, $taxItems] = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($this->getContributionID());
-      $entityParams = [
-        'contribution_total_amount' => $contributionTotalAmount,
-        'trxn_total_amount' => $trxnParams['total_amount'],
-        'trxn_id' => $trxnId,
-      ];
-      $eftParams = [
-        'entity_table' => 'civicrm_financial_item',
-        'financial_trxn_id' => $entityParams['trxn_id'],
-      ];
-      foreach ($lineItems as $lineItem) {
-        if ($lineItem['qty'] == 0) {
-          continue;
-        }
-        $eftParams['entity_id'] = $financialItemIds[$lineItem['price_field_value_id']];
-        $eftParams['amount'] = 0;
-        if ($entityParams['contribution_total_amount'] != 0) {
-          $eftParams['amount'] = $lineItem['line_total'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
-        }
-        EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
-        if (array_key_exists($lineItem['price_field_value_id'], $taxItems)) {
-          $eftParams['entity_id'] = $taxItems[$lineItem['price_field_value_id']]['financial_item_id'];
-          if ($entityParams['contribution_total_amount'] != 0) {
-            $eftParams['amount'] = $taxItems[$lineItem['price_field_value_id']]['amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
-          }
-          EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
         }
       }
     }
