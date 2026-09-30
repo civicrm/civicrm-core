@@ -85,14 +85,15 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
       return [];
     }
 
-    $paymentInstrument = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $this->getPaymentInstrumentID());
-    if ($paymentInstrument === 'Credit Card') {
-      return ['credit_card_type', 'pan_truncation'];
+    $fields = CRM_Contribute_BAO_Contribution::getPaymentInstrumentFields($this->getPaymentInstrumentID());
+
+    foreach ($fields as &$field) {
+      // getPaymentFormFieldsMetadata() calls this 'credit_card_type', not 'card_type_id'.
+      if ($field === 'card_type_id') {
+        $field = 'credit_card_type';
+      }
     }
-    elseif ($paymentInstrument === 'Check') {
-      return ['check_number'];
-    }
-    return [];
+    return $fields;
   }
 
   /**

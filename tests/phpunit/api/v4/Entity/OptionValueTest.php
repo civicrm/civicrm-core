@@ -190,4 +190,44 @@ class OptionValueTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('"Updated Test1" <my@new.email>', $result['label']);
   }
 
+  /**
+   * Tests the computed 'payment_instrument_fields' field, which decodes a payment_instrument
+   * option value's 'grouping' column into the list of back-office payment fields it should show.
+   *
+   * @see \Civi\Api4\Service\Spec\Provider\OptionValueGetSpecProvider
+   */
+  public function testPaymentInstrumentFields(): void {
+    $checkInstrument = OptionValue::create(FALSE)
+      ->addValue('option_group_id:name', 'payment_instrument')
+      ->addValue('label', 'International Check')
+      ->addValue('name', 'International Check')
+      ->addValue('value', 90)
+      ->addValue('grouping', json_encode(['check_number']))
+      ->execute()->single();
+
+    $cardInstrument = OptionValue::create(FALSE)
+      ->addValue('option_group_id:name', 'payment_instrument')
+      ->addValue('label', 'Store Card')
+      ->addValue('name', 'Store Card')
+      ->addValue('value', 91)
+      ->addValue('grouping', json_encode(['card_type_id', 'pan_truncation']))
+      ->execute()->single();
+
+    $ungroupedInstrument = OptionValue::create(FALSE)
+      ->addValue('option_group_id:name', 'payment_instrument')
+      ->addValue('label', 'Money Order')
+      ->addValue('name', 'Money Order')
+      ->addValue('value', 92)
+      ->execute()->single();
+
+    $fieldsByID = OptionValue::get(FALSE)
+      ->addSelect('value', 'payment_instrument_fields')
+      ->addWhere('option_group_id:name', '=', 'payment_instrument')
+      ->execute()->column('payment_instrument_fields', 'value');
+
+    $this->assertEquals(['check_number'], $fieldsByID[$checkInstrument['value']]);
+    $this->assertEquals(['card_type_id', 'pan_truncation'], $fieldsByID[$cardInstrument['value']]);
+    $this->assertEquals([], $fieldsByID[$ungroupedInstrument['value']]);
+  }
+
 }

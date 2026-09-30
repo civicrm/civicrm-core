@@ -11,6 +11,7 @@ return CRM_Core_CodeGen_OptionGroup::create('payment_instrument', 'a/0010')
       'value' => 1,
       'name' => 'Credit Card',
       'is_reserved' => 1,
+      'grouping' => '["card_type_id","pan_truncation"]',
     ],
     [
       'label' => ts('Debit Card'),
@@ -29,6 +30,7 @@ return CRM_Core_CodeGen_OptionGroup::create('payment_instrument', 'a/0010')
       'name' => 'Check',
       'is_default' => 1,
       'is_reserved' => 1,
+      'grouping' => '["check_number"]',
     ],
     [
       'label' => ts('EFT'),
