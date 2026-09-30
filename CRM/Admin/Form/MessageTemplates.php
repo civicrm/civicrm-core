@@ -221,7 +221,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
       ] + CRM_Core_BAO_PdfFormat::getList(TRUE), FALSE
     );
 
-    $this->add('advcheckbox', 'is_active', ts('Enabled?'));
+    $this->addToggle('is_active', ts('Enabled'));
     $this->addFormRule([__CLASS__, 'formRule'], $this);
 
     if ($this->_action & CRM_Core_Action::VIEW) {
