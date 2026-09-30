@@ -1015,10 +1015,30 @@
             // when for messages we probably want gender_id:label
             // though that value won't be immediately available from
             // the form submission, so we'd need to ensure it was fetched
-            this.getEntityFields(entity.name).fields.forEach((field) => {
+            const entityFields = this.getEntityFields(entity.name);
+
+            entityFields.fields.forEach((field) => {
               entityTokens.push({
-                id: entity.name + '.0.' + field.name,
+                // NOTE: the tags pick the first record from a repeating entity
+                // though you can see and change that in the token, e.g.
+                // change [Individual1.0.first_name] to [Individual1.4.first_name]
+                id: `${entity.name}.0.${field.name}`,
                 text: field.label,
+              });
+            });
+
+            entityFields.joins.forEach((join) => {
+              entityTokens.push({
+                text: afGui.getEntity(join.entity).label,
+                children: join.fields.filter(Boolean).map((field) => {
+                  // NOTE: the tags pick the first record from a repeating entity
+                  // though you can see and change that in the token, e.g.
+                  // change [Individual1.0.Email.0.email] to [Individual1.4.Email.2.email]
+                  return {
+                    id: `${entity.name}.0.${join.entity}.0.${field.name}`,
+                    text: field.label || field.input_attrs.label
+                  };
+                })
               });
             });
           }
