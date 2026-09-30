@@ -134,6 +134,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
   }
 
+  /**
+   * @return bool
+   */
+  private function isRecordAccountsReceivable(): bool {
+    return Civi::settings()
+        ->get('always_post_to_accounts_receivable') && $this->isCompletedTransaction();
+  }
+
   private function isStatusChange(): bool {
     return $this->originalContribution->contribution_status_id !== $this->updatedContribution->contribution_status_id;
   }
@@ -814,7 +822,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @return null|int
    */
   private function recordAlwaysAccountsReceivable(&$trxnParams, $contributionParams) {
-    if (!Civi::settings()->get('always_post_to_accounts_receivable') || !$this->isCompletedTransaction()) {
+    if (!$this->isRecordAccountsReceivable()) {
       return NULL;
     }
 
