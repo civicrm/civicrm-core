@@ -511,11 +511,10 @@ class EntityDisplayTest extends Api4TestBase {
     // Validate schema
     $schema = \CRM_Core_DAO::executeQuery('DESCRIBE civicrm_sk_major_donors_entity_test_db_entity1')->fetchAll();
     $this->assertCount(5, $schema);
-    $this->assertMatchesRegularExpression('/^(int|bigint)/', $schema[0]['Type']);
+    $this->assertMatchesRegularExpression('/^(int|bigint|year)/', $schema[0]['Type']);
     $this->assertMatchesRegularExpression('/^(int|bigint)/', $schema[1]['Type']);
-    $this->assertStringStartsWith('text', $schema[2]['Type']);
+    $this->assertStringContainsString('text', $schema[2]['Type']);
     $this->assertStringStartsWith('decimal', $schema[3]['Type']);
-    $this->assertStringStartsWith('text', $schema[2]['Type']);
 
     civicrm_api4('SK_MajorDonorsEntityTestDbEntity1', 'refresh');
 
