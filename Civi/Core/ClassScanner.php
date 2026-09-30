@@ -265,14 +265,22 @@ class ClassScanner {
             return new \CRM_Utils_Cache_ArrayCache([]);
           }
 
+          // Only static cache during upgrades and for tests.
+          if (defined('CIVICRM_TEST') || CIVICRM_UF === 'UnitTests' || \CRM_Core_Config::isUpgradeMode()) {
+            static::$caches[$name] = new \CRM_Utils_Cache_ArrayCache([]);
+            break;
+          }
+
           // The index-cache is similar to the extension-cache, except in the prefetch policy.
           // (We need the full list of extensions on every page-load, but we don't need the full list
           // of interfaces on every page-load.)
           static::$caches[$name] = \CRM_Utils_Cache::create([
             'name' => 'classes',
+            'scope' => 'version',
             'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
             'fastArray' => TRUE,
           ]);
+          break;
 
         case 'structure':
           static::$caches[$name] = new \CRM_Utils_Cache_ArrayCache([]);
