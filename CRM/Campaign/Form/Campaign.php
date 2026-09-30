@@ -217,10 +217,11 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
         ['class' => 'crm-select2']
       );
     }
+
+    // Campaign groups
     $groups = CRM_Core_PseudoConstant::nestedGroup(textFormat: 'plain');
-    //get the campaign groups.
     $this->add('select', 'includeGroups',
-      ts('Include Group(s)'),
+      ts('Include Groups'),
       $groups,
       FALSE,
       [
@@ -237,7 +238,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     ), 'money');
 
     // is this Campaign active
-    $this->addElement('checkbox', 'is_active', ts('Is Active?'));
+    $this->addToggle('is_active', ts('Enable'));
 
     $buttons = [
       [
