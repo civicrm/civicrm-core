@@ -116,7 +116,7 @@ trait CRM_Contact_Form_Edit_IMBlockTrait {
         ->execute();
     }
 
-    if (!empty($ims)) {
+    if (!empty($existingIMs)) {
       IM::delete()->addWhere('id', 'IN', array_keys($existingIMs))
         ->execute();
     }
