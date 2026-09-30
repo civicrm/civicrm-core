@@ -25,7 +25,7 @@
       ];
       ctrl.isDataMode = (m) => (m == (ctrl.display.settings.data_mode || 'table'));
 
-      this.$onInit = function () {
+      this.$onInit = () => {
         ctrl.jobFrequency = CRM.crmSearchAdmin.jobFrequency;
         if (!ctrl.display.settings) {
           ctrl.display.settings = {
@@ -50,14 +50,20 @@
         if (!ctrl.display.id && !ctrl.display._job) {
           ctrl.display._job = defaultJobParams();
         }
-        this.parent.initColumns({label: true});
+        this.parent.initColumns({label: true, index: true});
         this.display.settings.columns = this.display.settings.columns.filter((col) => this.isColumnAllowed(col.key));
+        this.display.settings.columns.forEach((col) => {
+          if (!('index' in col) || this.isFkColumn(col)) col.index = true;
+        });
       };
 
       // Do not allow pseudo-fields to be used as columns.
       this.isColumnAllowed = (key) => {
         return key && !CRM.crmSearchAdmin.pseudoFields.find((field) => field.name === key);
       };
+
+      // FK columns are always indexed via FK constraints; the 'index' cannot be disabled.
+      this.isFkColumn = (col) => !!searchMeta.getField(col.key, this.parent.savedSearch)?.fk_entity;
 
       this.onChangeEntityPermission = function() {
         if (ctrl.display.settings.entity_permission.length > 1) {

@@ -677,6 +677,112 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertEquals(['thing 1', 'thing 2'], $result[0][$columnName]);
   }
 
+  /**
+   * Test that the per-column 'index' setting controls MySQL index creation on table-mode displays.
+   * - index: TRUE  → column gets an index
+   * - index: FALSE → column gets no index
+   * - index absent → defaults to TRUE (backward-compatible behaviour)
+   * - Joined FK columns are indexed via FK constraints regardless of the 'index' setting.
+   * - View mode displays strip 'index' from column settings.
+   */
+  public function testEntityDisplayColumnIndex(): void {
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'label' => __FUNCTION__,
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'id',
+          'first_name',
+          'last_name',
+          'middle_name',
+          'Contact_Participant_contact_id_01.event_id',
+          'Contact_Participant_contact_id_01.source',
+        ],
+        'join' => [
+          ['Participant AS Contact_Participant_contact_id_01', 'LEFT', ['id', '=', 'Contact_Participant_contact_id_01.contact_id']],
+        ],
+      ],
+    ]);
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['all CiviCRM permissions and ACLs'];
+
+    $display = $this->createTestRecord('SearchDisplay', [
+      'saved_search_id' => $savedSearch['id'],
+      'type' => 'entity',
+      'label' => __FUNCTION__,
+      'name' => 'TestColumnIndex',
+      'settings' => [
+        'columns' => [
+          // Entity primary key column: foreign key constraint to civicrm_contact creates an index regardless of 'index' => FALSE.
+          ['key' => 'id', 'label' => 'Contact ID', 'type' => 'field', 'index' => FALSE],
+          // Explicitly opted in.
+          ['key' => 'first_name', 'label' => 'First Name', 'type' => 'field', 'index' => TRUE],
+          // Explicitly opted out.
+          ['key' => 'last_name', 'label' => 'Last Name', 'type' => 'field', 'index' => FALSE],
+          // No 'index' key: backward-compatible default should produce an index and populate 'index' => TRUE.
+          ['key' => 'middle_name', 'label' => 'Middle Name', 'type' => 'field'],
+          // Joined FK column: foreign key constraint creates an index regardless of 'index' => FALSE.
+          ['key' => 'Contact_Participant_contact_id_01.event_id', 'name' => 'event_id', 'label' => 'Event ID', 'type' => 'field', 'index' => FALSE],
+          // Joined non-FK column: explicitly opted out.
+          ['key' => 'Contact_Participant_contact_id_01.source', 'name' => 'participant_source', 'label' => 'Participant Source', 'type' => 'field', 'index' => FALSE],
+        ],
+        'sort' => [['id', 'ASC']],
+      ],
+    ]);
+
+    // Verify settings stored 'index' correctly, including the default for middle_name
+    $savedDisplay = SearchDisplay::get(FALSE)
+      ->addWhere('id', '=', $display['id'])
+      ->execute()->single();
+    $columnsByKey = array_column($savedDisplay['settings']['columns'], NULL, 'key');
+    $this->assertFalse($columnsByKey['id']['index']);
+    $this->assertTrue($columnsByKey['first_name']['index']);
+    $this->assertFalse($columnsByKey['last_name']['index']);
+    $this->assertTrue($columnsByKey['middle_name']['index']);
+    $this->assertFalse($columnsByKey['Contact_Participant_contact_id_01.event_id']['index']);
+    $this->assertFalse($columnsByKey['Contact_Participant_contact_id_01.source']['index']);
+
+    $allIndexes = \CRM_Core_DAO::executeQuery('SHOW INDEX FROM civicrm_sk_test_column_index')->fetchAll();
+    $indexedColumns = array_column($allIndexes, 'Column_name');
+
+    // id: entity primary key references source entity, so FK constraint ensures an index exists despite 'index' => FALSE.
+    $this->assertContains('id', $indexedColumns);
+    // first_name: explicitly indexed.
+    $this->assertContains('first_name', $indexedColumns);
+    // middle_name: no 'index' key → defaults to TRUE.
+    $this->assertContains('middle_name', $indexedColumns);
+    // event_id: FK constraint ensures an index exists despite 'index' => FALSE.
+    $this->assertContains('event_id', $indexedColumns);
+    // last_name: explicitly not indexed.
+    $this->assertNotContains('last_name', $indexedColumns);
+    // participant_source: joined non-FK column explicitly not indexed.
+    $this->assertNotContains('participant_source', $indexedColumns);
+
+    // View-mode displays should strip the 'index' setting
+    $viewDisplay = $this->createTestRecord('SearchDisplay', [
+      'saved_search_id' => $savedSearch['id'],
+      'type' => 'entity',
+      'label' => __FUNCTION__ . ' View',
+      'name' => 'TestColumnIndexView',
+      'settings' => [
+        'data_mode' => 'view',
+        'columns' => [
+          ['key' => 'first_name', 'label' => 'First Name', 'type' => 'field', 'index' => TRUE],
+          ['key' => 'last_name', 'label' => 'Last Name', 'type' => 'field', 'index' => FALSE],
+        ],
+      ],
+    ]);
+
+    $this->assertEquals('VIEW', \CRM_Core_BAO_SchemaHandler::getTableType('civicrm_sk_test_column_index_view'));
+    $savedViewDisplay = SearchDisplay::get(FALSE)
+      ->addWhere('id', '=', $viewDisplay['id'])
+      ->execute()->single();
+    foreach ($savedViewDisplay['settings']['columns'] as $col) {
+      $this->assertArrayNotHasKey('index', $col);
+    }
+  }
+
   public function testEntityDisplayWithRelativeDates(): void {
     $lastName = uniqid(__FUNCTION__);
 
