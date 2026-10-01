@@ -151,6 +151,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       'configReset' => CRM_Utils_Request::retrieveValue('configReset', 'Integer'),
     ]);
     $this->assign('snippet_type', CRM_Utils_Request::retrieveValue('snippet', 'String'));
+    $this->assign('mainContentWrapperClasses', []);
 
     $tsLocale = CRM_Core_I18n::getLocale();
     $this->assign('tsLocale', $tsLocale);
@@ -434,6 +435,24 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
       }
     }
     return $this;
+  }
+
+  /**
+   * Adds a css class to the crm-main-content-wrapper div
+   */
+  public function addContentWrapperClass(string $class): void {
+    $classes = $this->getTemplateVars('mainContentWrapperClasses') ?: [];
+    $classes = array_unique(array_merge($classes, [$class]));
+    $this->assign('mainContentWrapperClasses', $classes);
+  }
+
+  /**
+   * Removes a class from the crm-main-content-wrapper div
+   */
+  public function removeContentWrapperClass(string $class): void {
+    $classes = $this->getTemplateVars('mainContentWrapperClasses') ?: [];
+    $classes = array_diff($classes, [$class]);
+    $this->assign('mainContentWrapperClasses', $classes);
   }
 
   /**
