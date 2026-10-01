@@ -147,7 +147,7 @@ class CRM_Case_Page_AJAX {
     CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $caseId = CRM_Utils_Type::escape($_POST['case_id'], 'Positive');
     $cid = CRM_Utils_Type::escape($_POST['cid'], 'Positive');
-    $relType = CRM_Utils_Request::retrieve('rel_type', 'String', CRM_Core_DAO::$_nullObject, TRUE);
+    $relType = CRM_Utils_Request::retrieve('rel_type', 'String', NULL, TRUE);
 
     if (!$cid || !CRM_Case_BAO_Case::accessCase($caseId)) {
       CRM_Utils_System::permissionDenied();

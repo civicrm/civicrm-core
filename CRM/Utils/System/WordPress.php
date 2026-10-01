@@ -263,7 +263,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         if (stripos($crumbs['url'], 'id%%')) {
           $args = ['cid', 'mid'];
           foreach ($args as $a) {
-            $val = CRM_Utils_Request::retrieve($a, 'Positive', CRM_Core_DAO::$_nullObject,
+            $val = CRM_Utils_Request::retrieve($a, 'Positive', NULL,
               FALSE, NULL, $_GET
             );
             if ($val) {

@@ -90,7 +90,7 @@ class CRM_Campaign_Page_AJAX {
 
   public static function loadOptionGroupDetails() {
 
-    $id = CRM_Utils_Request::retrieve('option_group_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $id = CRM_Utils_Request::retrieve('option_group_id', 'Integer', NULL, FALSE, NULL, 'POST');
     $status = 'fail';
 
     if ($id) {
@@ -117,7 +117,7 @@ class CRM_Campaign_Page_AJAX {
 
   public static function voterList() {
     //get the search criteria params.
-    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', NULL, FALSE, NULL, 'POST');
     $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = [];
@@ -464,7 +464,7 @@ class CRM_Campaign_Page_AJAX {
 
   public static function campaignGroups() {
     $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Positive',
-      CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST'
+      NULL, FALSE, NULL, 'POST'
     );
     $campGroups = [];
     if ($surveyId) {

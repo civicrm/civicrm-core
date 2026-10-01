@@ -114,8 +114,8 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
     $this->assign('displayName', $displayName);
 
     if ($this->_action == CRM_Core_Action::DELETE) {
-      $groupContactId = CRM_Utils_Request::retrieve('gcid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
-      $status = CRM_Utils_Request::retrieve('st', 'String', CRM_Core_DAO::$_nullObject, TRUE);
+      $groupContactId = CRM_Utils_Request::retrieve('gcid', 'Positive', NULL, TRUE);
+      $status = CRM_Utils_Request::retrieve('st', 'String', NULL, TRUE);
       if (is_numeric($groupContactId) && $status) {
         $this->del($groupContactId, $status, $this->_contactId);
       }

@@ -2967,7 +2967,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       = CRM_Utils_Request::retrieve(
         'sendmail',
         'Boolean',
-        CRM_Core_DAO::$_nullObject
+        NULL
       );
 
     if ($this->_sendmail && !$this->_outputMode) {
@@ -5141,7 +5141,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     $this->_outputMode = str_replace('report_instance.', '', (CRM_Utils_Request::retrieve(
       'output',
       'String',
-      CRM_Core_DAO::$_nullObject,
+      NULL,
       FALSE,
       $this->_params['task'] ?? NULL
     ) ?? ''));

@@ -212,11 +212,11 @@ class CRM_Contact_Page_AJAX {
 
   public static function relationship() {
     CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $relType = CRM_Utils_Request::retrieve('rel_type', 'String', CRM_Core_DAO::$_nullObject, TRUE);
-    $relContactID = CRM_Utils_Request::retrieve('rel_contact', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
+    $relType = CRM_Utils_Request::retrieve('rel_type', 'String', NULL, TRUE);
+    $relContactID = CRM_Utils_Request::retrieve('rel_contact', 'Positive', NULL, TRUE);
     $originalCid = CRM_Utils_Request::retrieve('cid', 'Positive');
     $relationshipID = CRM_Utils_Request::retrieve('rel_id', 'Positive');
-    $caseID = CRM_Utils_Request::retrieve('case_id', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
+    $caseID = CRM_Utils_Request::retrieve('case_id', 'Positive', NULL, TRUE);
 
     if (!CRM_Case_BAO_Case::accessCase($caseID)) {
       CRM_Utils_System::permissionDenied();

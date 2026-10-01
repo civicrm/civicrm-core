@@ -32,12 +32,11 @@ class CRM_Core_Page_AJAX_Location {
    */
   public static function getPermissionedLocation() {
     CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $cid = CRM_Utils_Request::retrieve('cid', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
-    $ufID = CRM_Utils_Request::retrieve('ufID', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
+    $cid = CRM_Utils_Request::retrieve('cid', 'Integer', NULL, TRUE);
+    $ufID = CRM_Utils_Request::retrieve('ufID', 'Integer', NULL, TRUE);
 
     // Verify user id
-    $user = CRM_Utils_Request::retrieve('uid', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, CRM_Core_Session::singleton()
-      ->get('userID'));
+    $user = CRM_Utils_Request::retrieve('uid', 'Integer', NULL, FALSE, CRM_Core_Session::getLoggedInContactID());
     if (empty($user) || (CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE) && !CRM_Contact_BAO_Contact_Permission::validateChecksumContact($user, CRM_Core_DAO::$_nullObject, FALSE))
     ) {
       CRM_Utils_System::civiExit();

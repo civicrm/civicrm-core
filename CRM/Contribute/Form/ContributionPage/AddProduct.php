@@ -97,7 +97,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       $url = CRM_Utils_System::url($urlParams, 'reset=1&action=update&id=' . $this->_id);
       $session->pushUserContext($url);
       if (CRM_Utils_Request::retrieve('confirmed', 'Boolean',
-        CRM_Core_DAO::$_nullObject, '', '', 'GET'
+        NULL, '', '', 'GET'
       )
       ) {
         $dao = new CRM_Contribute_DAO_PremiumsProduct();

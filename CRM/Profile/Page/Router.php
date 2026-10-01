@@ -42,7 +42,7 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
         NULL, FALSE, FALSE, TRUE
       );
 
-      $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
+      $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', NULL, FALSE, 0, 'GET'));
 
       if (count($gids) > 1) {
         foreach ($gids as $pfId) {

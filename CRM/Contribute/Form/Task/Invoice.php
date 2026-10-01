@@ -657,9 +657,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * Callback to perform action on Print Invoice button.
    */
   public static function getPrintPDF() {
-    $contributionId = CRM_Utils_Request::retrieve('id', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);
+    $contributionId = CRM_Utils_Request::retrieve('id', 'Positive', NULL, FALSE);
     $contributionIDs = [$contributionId];
-    $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, FALSE);
+    $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', NULL, FALSE);
     $params = ['output' => 'pdf_invoice'];
     CRM_Contribute_Form_Task_Invoice::printPDF($contributionIDs, $params, $contactId);
   }

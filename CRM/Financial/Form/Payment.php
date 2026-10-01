@@ -67,9 +67,9 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
     $this->_values['custom_pre_id'] = CRM_Utils_Request::retrieve('pre_profile_id', 'Integer', $this);
     // These properties are set because it is how CRM_Core_Payment_ProcessorForm::preProcess
     // accesses them. Passing them in as properties might be more transparent.
-    $this->_paymentProcessorID = CRM_Utils_Request::retrieve('processor_id', 'Integer', CRM_Core_DAO::$_nullObject,
+    $this->_paymentProcessorID = CRM_Utils_Request::retrieve('processor_id', 'Integer', NULL,
       TRUE);
-    $this->currency = CRM_Utils_Request::retrieve('currency', 'String', CRM_Core_DAO::$_nullObject,
+    $this->currency = CRM_Utils_Request::retrieve('currency', 'String', NULL,
       TRUE);
     $this->paymentInstrumentID = CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer') ? (int) CRM_Utils_Request::retrieve('payment_instrument_id', 'Integer') : NULL;
     $this->isBackOffice = CRM_Utils_Request::retrieve('is_back_office', 'Integer');

@@ -109,7 +109,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
       $userId = $session->get('userID');
       // get interviewer id
       $cid = CRM_Utils_Request::retrieve('cid', 'Positive',
-        CRM_Core_DAO::$_nullObject, FALSE, $userId
+        NULL, FALSE, $userId
       );
 
       $defaults['survey_interviewer_id'] = $cid;
