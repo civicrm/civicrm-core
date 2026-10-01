@@ -173,7 +173,7 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form_Mailing_Base {
     $groupBys = [];
     // Do not use group by clause if distinct = 0 mentioned in url params. flag is used in mailing report screen, default value is TRUE
     // this report is used to show total opened and unique opened
-    if (CRM_Utils_Request::retrieve('distinct', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, TRUE)) {
+    if (CRM_Utils_Request::retrieve('distinct', 'Boolean', NULL, FALSE, TRUE)) {
       $groupBys = empty($this->_params['charts']) ? ["civicrm_mailing_event_queue.email_id"] : ["{$this->_aliases['civicrm_mailing']}.id"];
       if (!empty($this->_params['unique_opens_value'])) {
         $groupBys[] = "civicrm_mailing_event_queue.id";

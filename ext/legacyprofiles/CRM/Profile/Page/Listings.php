@@ -88,7 +88,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     $this->_gid = $this->get('gid');
     $this->_profileIds = $this->get('profileIds');
 
-    $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
+    $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', NULL, FALSE, 0, 'GET'));
 
     if ((count($gids) > 1) && !$this->_profileIds && empty($this->_profileIds)) {
       if (!empty($gids)) {

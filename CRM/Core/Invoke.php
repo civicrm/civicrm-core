@@ -96,8 +96,8 @@ class CRM_Core_Invoke {
       if (CRM_Core_Permission::check('administer CiviCRM')) {
         Civi::rebuild([
           '*' => TRUE,
-          'triggers' => CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'),
-          'sessions' => CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'),
+          'triggers' => CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', NULL, FALSE, 0, 'GET'),
+          'sessions' => CRM_Utils_Request::retrieve('sessionReset', 'Boolean', NULL, FALSE, 0, 'GET'),
         ])->execute();
         CRM_Core_Session::setStatus(ts('Cleared all CiviCRM caches (database, menu, templates)'), ts('Complete'), 'success');
         // exits
@@ -291,7 +291,7 @@ class CRM_Core_Invoke {
       'ext' => TRUE,
       'files' => TRUE,
       'tables' => TRUE,
-      'sessions' => $sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'),
+      'sessions' => $sessionReset || CRM_Utils_Request::retrieve('sessionReset', 'Boolean', NULL, FALSE, 0, 'GET'),
       'metadata' => TRUE,
       'navigation' => TRUE,
       'router' => TRUE,
@@ -301,7 +301,7 @@ class CRM_Core_Invoke {
       'strings' => TRUE,
       'settings' => TRUE,
       'cases' => TRUE,
-      'triggers' => $triggerRebuild || CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'),
+      'triggers' => $triggerRebuild || CRM_Utils_Request::retrieve('triggerRebuild', 'Boolean', NULL, FALSE, 0, 'GET'),
       'entities' => TRUE,
     ])->execute();
 

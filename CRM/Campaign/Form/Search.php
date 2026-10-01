@@ -360,7 +360,7 @@ class CRM_Campaign_Form_Search extends CRM_Core_Form_Search {
 
     // get interviewer id
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive',
-      CRM_Core_DAO::$_nullObject, FALSE, $userId
+      NULL, FALSE, $userId
     );
     //to force other contact as interviewer, user should be admin.
     if ($cid != $userId &&

@@ -72,13 +72,13 @@ class CRM_Contact_Page_View_UserDashBoard_GroupContact extends CRM_Contact_Page_
     }
 
     $action = CRM_Utils_Request::retrieve('action', 'String',
-      CRM_Core_DAO::$_nullObject,
+      NULL,
       FALSE, 'browse'
     );
 
     if ($action == CRM_Core_Action::DELETE) {
-      $groupContactId = CRM_Utils_Request::retrieve('gcid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
-      $status = CRM_Utils_Request::retrieve('st', 'String', CRM_Core_DAO::$_nullObject, TRUE);
+      $groupContactId = CRM_Utils_Request::retrieve('gcid', 'Positive', NULL, TRUE);
+      $status = CRM_Utils_Request::retrieve('st', 'String', NULL, TRUE);
       if (is_numeric($groupContactId) && $status) {
         CRM_Contact_Page_View_GroupContact::del($groupContactId, $status, $this->_contactId);
       }

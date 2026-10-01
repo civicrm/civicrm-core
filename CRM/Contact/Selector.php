@@ -908,7 +908,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
       $session->set('previousSortID', $currentSortID);
     }
 
-    $pageSize = CRM_Utils_Request::retrieve('crmRowCount', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, 50);
+    $pageSize = CRM_Utils_Request::retrieve('crmRowCount', 'Integer', NULL, FALSE, 50);
     $firstRecord = ($pageNum - 1) * $pageSize;
 
     //for alphabetic pagination selection save

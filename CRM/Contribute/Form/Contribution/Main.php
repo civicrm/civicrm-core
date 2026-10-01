@@ -127,7 +127,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $this->assign('reset', CRM_Utils_Request::retrieve('reset', 'Boolean'));
     $this->assign('mainDisplay', CRM_Utils_Request::retrieve('_qf_Main_display', 'Boolean',
-      CRM_Core_DAO::$_nullObject));
+      NULL));
 
     if (!empty($this->_pcpInfo['id']) && !empty($this->_pcpInfo['intro_text'])) {
       $this->assign('intro_text', $this->_pcpInfo['intro_text']);
