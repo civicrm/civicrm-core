@@ -568,6 +568,38 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test renewing a membership that has no line item recorded against a contribution.
+   *
+   * Only the renewal contribution's line item should be created.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitCompleteNoExistingLineItem(): void {
+    $this->createLoggedInUser();
+    $this->getTestForm('CRM_Member_Form_MembershipRenewal', [
+      'contact_id' => $this->ids['Contact']['individual'],
+      'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['annual_fixed']],
+      'num_terms' => '1',
+      'total_amount' => '50.00',
+      'financial_type_id' => $this->financialTypeID,
+      'payment_instrument_id' => 4,
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'record_contribution' => TRUE,
+      'contribution_status_id' => 1,
+    ], ['cid' => $this->ids['Contact']['individual'], 'id' => $this->ids['Membership']['default']])
+      ->processForm();
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['individual'])
+      ->execute()->single();
+    $lineItems = LineItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addWhere('entity_id', '=', $this->ids['Membership']['default'])
+      ->execute();
+    $this->assertCount(1, $lineItems);
+    $this->assertEquals($contribution['id'], $lineItems->first()['contribution_id']);
+  }
+
+  /**
    * Test that the renewal contribution gets the membership start date as its revenue recognition date.
    *
    * @throws \CRM_Core_Exception
