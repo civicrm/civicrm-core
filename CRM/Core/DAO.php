@@ -144,6 +144,15 @@ class CRM_Core_DAO extends DB_DataObject {
   protected $_options = [];
 
   /**
+   * Custom data passed to writeRecord().
+   *
+   * Stored by save() so it is in the database before post-save events fire.
+   *
+   * @var array
+   */
+  private $_customParams = [];
+
+  /**
    * Class constructor.
    *
    * @return static
@@ -815,6 +824,7 @@ class CRM_Core_DAO extends DB_DataObject {
       }
 
       $result = $this->update();
+      $this->saveCustomParams('edit');
 
       if ($hook) {
         $event = new PostUpdate($this, $result);
@@ -831,6 +841,7 @@ class CRM_Core_DAO extends DB_DataObject {
       }
 
       $result = $this->insert();
+      $this->saveCustomParams('create');
 
       if ($hook) {
         $event = new PostUpdate($this, $result);
@@ -844,6 +855,17 @@ class CRM_Core_DAO extends DB_DataObject {
     }
 
     return $this;
+  }
+
+  /**
+   * @param string $op
+   *   'create' or 'edit'.
+   */
+  private function saveCustomParams(string $op): void {
+    if ($this->_customParams) {
+      CRM_Core_BAO_CustomValueTable::store($this->_customParams, $this->tableName(), $this->{$this->getFirstPrimaryKey()}, $op);
+      $this->_customParams = [];
+    }
   }
 
   /**
@@ -1142,11 +1164,10 @@ class CRM_Core_DAO extends DB_DataObject {
     if (empty($values[$idField]) && array_key_exists('name', $fields) && empty($values['name'])) {
       $instance->makeNameFromLabel();
     }
-    $instance->save();
-
     if (!empty($record['custom']) && is_array($record['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($record['custom'], static::getTableName(), $instance->$idField, $op);
+      $instance->_customParams = $record['custom'];
     }
+    $instance->save();
 
     \CRM_Utils_Hook::post($op, $entityName, $instance->$idField, $instance, $record);
 
