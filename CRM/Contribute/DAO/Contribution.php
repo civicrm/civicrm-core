@@ -41,6 +41,7 @@
  * @property bool|string $is_template
  * @property string|null $created_date
  * @property string|null $modified_date
+ * @property int|string|null $domain_id
  */
 class CRM_Contribute_DAO_Contribution extends CRM_Core_DAO_Base {
 }
