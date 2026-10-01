@@ -383,23 +383,35 @@ class CRM_Core_Menu {
    * Rebuild the routing table
    *
    * NOTE: this saves routes for the current domain - routes across multidomains are rebuilt lazily
+   *
+   * @param bool $onlyIfEmpty
+   *   Skip the rebuild if another process filled the table while we waited for REBUILD_LOCK.
    */
-  public static function rebuild() {
+  public static function rebuild(bool $onlyIfEmpty = FALSE) {
     // Take the rebuild lock: without it, concurrent rebuilds collide on the (path, domain_id)
     // unique key and can leave the table partially populated. On lock-wait timeout, rebuild anyway (best
-    // effort) rather than skip: an unlocked rebuild is the historical behaviour, so the worst case
-    // is no worse than before, and skipping would leave the empty-table caller in self::get() with
-    // no route table. release() no-ops if the lock is not held.
+    // effort) rather than skip, unless $onlyIfEmpty is TRUE and the table isn't empty: an unlocked
+    // rebuild is the historical behaviour, so the worst case is no worse than before, and skipping would
+    // leave the empty-table caller in self::get() with no route table. release() no-ops if the lock is
+    // not held.
     $lock = Civi::lockManager()->acquire(self::REBUILD_LOCK, self::REBUILD_LOCK_TIMEOUT);
-    if (!$lock->isAcquired()) {
-      Civi::log()->warning('CRM_Core_Menu::rebuild() is rebuilding civicrm_menu without the ' . self::REBUILD_LOCK . ' lock after waiting ' . self::REBUILD_LOCK_TIMEOUT . 's; a concurrent rebuild may be in progress.');
-    }
     try {
+      if ($onlyIfEmpty && self::hasRoutes()) {
+        return;
+      }
+      if (!$lock->isAcquired()) {
+        Civi::log()->warning('CRM_Core_Menu::rebuild() is rebuilding civicrm_menu without the ' . self::REBUILD_LOCK . ' lock after waiting ' . self::REBUILD_LOCK_TIMEOUT . 's; a concurrent rebuild may be in progress.');
+      }
       self::save();
     }
     finally {
       $lock->release();
     }
+  }
+
+  private static function hasRoutes(): bool {
+    $domainId = CRM_Core_BAO_Domain::getDomainID();
+    return (bool) CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_menu WHERE domain_id = %1 LIMIT 1', [1 => [$domainId, 'Integer']]);
   }
 
   /**
@@ -671,15 +683,13 @@ class CRM_Core_Menu {
     if (!$item) {
       // if nothing is returned it might just be that the routing table has been
       // cleared and we need to rebuild it...
-      $domainId = \CRM_Core_BAO_Domain::getDomainID();
-      $anyRoutes = \CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_menu WHERE domain_id = %1 LIMIT 1', [1 => [$domainId, 'Integer']])->fetch();
-      if ($anyRoutes) {
+      if (self::hasRoutes()) {
         // actual not found
         return $item;
       }
       else {
         // rebuild and try again
-        self::rebuild();
+        self::rebuild(TRUE);
         $item = self::fetch($path);
       }
     }
