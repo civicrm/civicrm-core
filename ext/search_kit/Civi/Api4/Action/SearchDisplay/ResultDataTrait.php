@@ -149,11 +149,13 @@ trait ResultDataTrait {
           $cell->getStyle()->getNumberFormat()->setFormatCode(new Currency($currencySymbol, locale: $numberFormatter->getLocale()));
         }
         elseif ($value['dataType'] === 'Date') {
-          $format = \Civi::settings()->get(($col['format'] ?? NULL) ?: 'dateformatFull');
+          $format = ($col['format'] ?? NULL) ?: 'dateformatFull';
+          $format = str_starts_with($format, 'dateformat') ? \Civi::settings()->get($format) : $format;
           $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
         }
         elseif ($value['dataType'] === 'Timestamp') {
-          $format = \Civi::settings()->get(($col['format'] ?? NULL) ?: 'dateformatDatetime');
+          $format = ($col['format'] ?? NULL) ?: 'dateformatDatetime';
+          $format = str_starts_with($format, 'dateformat') ? \Civi::settings()->get($format) : $format;
           $cell->getStyle()->getNumberFormat()->setFormatCode(PhpSpreadsheetUtil::crmDateFormatToFormatCode($format));
         }
       }

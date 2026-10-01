@@ -11,11 +11,12 @@
   <p>{ts}Date display settings use standard POSIX specifiers. Available specifiers and the values produced will vary based on your operating system and locale.{/ts}</p>
   <p><strong>{ts}Commonly Used Specifiers{/ts}</strong></p>
   <ul>
-    {capture assign="abbrevJan"}{"2026-01-01"|crmDate:'%b'}{/capture}
-    {capture assign="abbrevDec"}{"2026-12-01"|crmDate:'%b'}{/capture}
+    {capture assign="currentYear"}{$smarty.now|crmDate:'%Y'}{/capture}
+    {capture assign="abbrevJan"}{"`$currentYear`-01-01"|crmDate:'%b'}{/capture}
+    {capture assign="abbrevDec"}{"`$currentYear`-12-01"|crmDate:'%b'}{/capture}
     <li>%b - {ts 1=$abbrevJan 2=$abbrevDec}abbreviated month name (%1 to %2){/ts}</li>
-    {capture assign="fullJan"}{"2026-01-01"|crmDate:'%B'}{/capture}
-    {capture assign="fullDec"}{"2026-12-01"|crmDate:'%B'}{/capture}
+    {capture assign="fullJan"}{"`$currentYear`-01-01"|crmDate:'%B'}{/capture}
+    {capture assign="fullDec"}{"`$currentYear`-12-01"|crmDate:'%B'}{/capture}
     <li>%B - {ts 1=$fullJan 2=$fullDec}full month name (%1 to %2){/ts}</li>
     <li>%d - {ts}day of the month as a decimal number, 0-padded ('01'..'31'){/ts}</li>
     <li>%e - {ts}day of the month as a decimal number, blank-padded (' 1'..'31'){/ts}</li>
@@ -29,6 +30,6 @@
     <li>%M - {ts}minute, 0-padded ('00'..'60'){/ts}</li>
     <li>%p - {ts}lowercase ante/post meridiem ('am', 'pm'){/ts}</li>
     <li>%P - {ts}uppercase ante/post meridiem ('AM', 'PM'){/ts}</li>
-    <li>%Y - {ts}year as a decimal number including the century ('2015'){/ts}</li>
+    <li>%Y - {ts 1=$currentYear}year as a decimal number including the century ('%1'){/ts}</li>
   </ul>
 {/htxt}

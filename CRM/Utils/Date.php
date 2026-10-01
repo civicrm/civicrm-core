@@ -1035,44 +1035,48 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Map date plugin format to the closest CiviCRM dateformat setting name.
+   * Map date plugin format to strftime format.
    *
-   * Mapping is imperfect but better than nothing. Used by SearchKit to format columns for custom Date fields.
-   *
-   * @param string $format
+   * @param string|null $format
    *   Date plugin input format (e.g. 'mm/dd/yy', 'yy', 'M yy', 'DD, d MM yy')
    * @param int|null $timeFormat
    *   Time format (1 for 12hr, 2 for 24hr, 0/NULL for none)
    * @return string|null
-   *   Setting name (e.g. 'dateformatshortdate', 'dateformatFull', 'dateformatPartial', 'dateformatYear', 'dateformatDatetime')
+   *   strftime format (e.g. '%Y', '%m/%d/%Y', '%b %E, %Y %l:%M %P')
    */
-  public static function datePluginToSetting(string $format, ?int $timeFormat): ?string {
-    if (!empty($timeFormat)) {
-      return 'dateformatDatetime';
+  public static function datePluginToStrftime(?string $format, ?int $timeFormat = NULL): ?string {
+    if (!$format && !$timeFormat) {
+      return NULL;
     }
-    if (str_starts_with($format, 'dateformat')) {
-      return $format;
+    $strftime = '';
+    if ($format) {
+      if (str_starts_with($format, '%') || str_starts_with($format, 'dateformat')) {
+        $strftime = $format;
+      }
+      else {
+        $tokenMap = [
+          'DD' => '%A',
+          'MM' => '%B',
+          'yy' => '%Y',
+          'dd' => '%d',
+          'd' => '%E',
+          'mm' => '%m',
+          'M' => '%b',
+          'D' => '%a',
+          'y' => '%y',
+          'Y' => '%Y',
+        ];
+        $strftime = strtr($format, $tokenMap);
+      }
     }
-    $map = [
-      'yy' => 'dateformatYear',
-      'yy-mm' => 'dateformatPartial',
-      'M yy' => 'dateformatPartial',
-      'M Y' => 'dateformatPartial',
-      'M d' => 'dateformatFull',
-      'M d, yy' => 'dateformatFull',
-      'd M yy' => 'dateformatFull',
-      'MM d, yy' => 'dateformatFull',
-      'd MM yy' => 'dateformatFull',
-      'DD, d MM yy' => 'dateformatFull',
-      'mm/dd/yy' => 'dateformatshortdate',
-      'dd/mm/yy' => 'dateformatshortdate',
-      'yy-mm-dd' => 'dateformatshortdate',
-      'dd-mm-yy' => 'dateformatshortdate',
-      'dd.mm.yy' => 'dateformatshortdate',
-      'mm/dd' => 'dateformatshortdate',
-      'dd-mm' => 'dateformatshortdate',
-    ];
-    return $map[$format] ?? (str_contains($format, 'm') ? 'dateformatPartial' : 'dateformatFull');
+    if ($timeFormat === 1) {
+      $timeStr = \Civi::settings()->get('dateformatTime') ?: '%l:%M %P';
+      $strftime = trim($strftime . ' ' . $timeStr);
+    }
+    elseif ($timeFormat === 2) {
+      $strftime = trim($strftime . ' %H:%M');
+    }
+    return $strftime ?: NULL;
   }
 
   /**

@@ -113,7 +113,7 @@ class CustomGroupDisplaysTest extends \PHPUnit\Framework\TestCase implements Hea
 
     $dateCol = array_values(array_filter($mgd[1]['params']['values']['settings']['columns'], fn($col) => ($col['key'] ?? NULL) === 'date_col'))[0] ?? NULL;
     $this->assertNotNull($dateCol);
-    $this->assertEquals('dateformatYear', $dateCol['format']);
+    $this->assertEquals('%Y', $dateCol['format']);
   }
 
 }

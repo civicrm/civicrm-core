@@ -211,7 +211,7 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     }
     elseif ($field['data_type'] === 'Date') {
       if (!empty($field['date_format']) || !empty($field['time_format'])) {
-        $column['format'] = \CRM_Utils_Date::datePluginToSetting($field['date_format'] ?? '', $field['time_format'] ?? NULL);
+        $column['format'] = \CRM_Utils_Date::datePluginToStrftime($field['date_format'] ?? '', $field['time_format'] ?? NULL);
       }
     }
 
