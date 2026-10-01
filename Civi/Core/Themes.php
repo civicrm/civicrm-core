@@ -215,6 +215,7 @@ class Themes extends \Civi\Core\Service\AutoService {
         'excludes' => [
           "css/civicrm.css",
           "css/bootstrap.css",
+          "css/crm-i.css",
         ],
       ],
       self::FALLBACK_THEME => [
