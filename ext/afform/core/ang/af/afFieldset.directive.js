@@ -14,7 +14,7 @@
         self.afFormCtrl = ctrls[1];
         self.afRepeatCtrl = ctrls[2];
       },
-      controller: function($scope, $element, crmApi4) {
+      controller: function($scope, $element, $timeout, crmApi4, afDuplicateContacts) {
         const ctrl = this;
         const localData = [];
         const joinOffsets = {};
@@ -91,6 +91,31 @@
           return this.reloadedStoredValues[fieldName];
         };
 
+        // Values to compare against existing contacts, or null when the check
+        // does not apply: not a contact entity, or an existing record.
+        const duplicateCheckValues = () => {
+          const entity = ctrl.getEntity();
+          if (!afDuplicateContacts.enabled() || !entity || entity.id || !(CRM.af.contactEntityTypes || []).includes(entity.type)) {
+            return null;
+          }
+          const item = ctrl.getData()[0] || {};
+          const fields = item.fields || {};
+          const values = {};
+          (CRM.af.checkSimilarContactFields || []).forEach((name) => {
+            if (fields[name]) {
+              values[name] = fields[name];
+            }
+          });
+          const email = (item.joins?.Email?.[0] || {}).email;
+          if (email) {
+            values.email = email;
+          }
+          return {
+            contactType: entity.type === 'Contact' ? (entity.data || {}).contact_type : entity.type,
+            values: values
+          };
+        };
+
         this.$onInit = () => {
           if (typeof this.fieldData === 'object') {
             localData.push({
@@ -108,6 +133,16 @@
           }, true);
 
           $scope.$watch(this.getSearchParamSetId, () => this.fetchSearchParamSetValues());
+
+          const checkDuplicates = afDuplicateContacts.createChecker();
+          let duplicateCheckTimer;
+          $scope.$watch(duplicateCheckValues, (check) => {
+            if (!check) {
+              return;
+            }
+            $timeout.cancel(duplicateCheckTimer);
+            duplicateCheckTimer = $timeout(() => checkDuplicates(check.contactType, check.values), 500);
+          }, true);
         };
 
         /**
