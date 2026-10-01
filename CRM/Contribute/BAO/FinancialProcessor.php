@@ -139,7 +139,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function isRecordAccountsReceivable(): bool {
     return Civi::settings()
-        ->get('always_post_to_accounts_receivable') && $this->isCompletedTransaction();
+      ->get('always_post_to_accounts_receivable') && $this->isCompletedTransaction();
   }
 
   private function isStatusChange(): bool {
