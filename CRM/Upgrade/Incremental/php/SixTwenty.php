@@ -84,6 +84,7 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
     ], 'AFTER `thankyou_mode`');
 
     $this->addTask('Register Events as taggable', 'registerEventTagUsedFor');
+    $this->addTask('Register Message Templates as taggable', 'registerMessageTemplateTagUsedFor');
   }
 
   /**
@@ -95,6 +96,19 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
       'name' => 'Event',
       'label' => ts('Events'),
       'value' => 'civicrm_event',
+    ]);
+    return TRUE;
+  }
+
+  /**
+   * Allow Message Templates to be tagged (dev/core#XXXX).
+   */
+  public static function registerMessageTemplateTagUsedFor(): bool {
+    \CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'tag_used_for',
+      'name' => 'MessageTemplate',
+      'label' => ts('Message Templates'),
+      'value' => 'civicrm_msg_template',
     ]);
     return TRUE;
   }

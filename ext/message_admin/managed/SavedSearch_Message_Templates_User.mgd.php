@@ -20,11 +20,25 @@ return [
             'msg_title',
             'msg_subject',
             'is_active',
+            // A document-upload template (.docx/.odt) has no on-screen editor yet, so it keeps
+            // using the classic edit form - this is non-empty only for those rows.
+            'MAX(MessageTemplate_EntityFile_File_01.id) AS has_document',
+            // Raw tag ids, not labels - the crm-entity-tags widget looks up label/color
+            // itself and needs the ids to know which tags are already applied.
+            'GROUP_CONCAT(DISTINCT MessageTemplate_EntityTag_Tag_01.id) AS tag_ids',
           ],
           'orderBy' => [],
           'where' => [
             ['workflow_name', 'IS EMPTY'],
             ['is_reserved', '=', FALSE],
+          ],
+          'groupBy' => ['id'],
+          // No explicit ON conditions needed on either join below - with no conditions given,
+          // API4's bridge-join handling links the bridge row to this entity automatically
+          // (entity_id/entity_table), same as the generic `tags` virtual field does elsewhere.
+          'join' => [
+            ['File AS MessageTemplate_EntityFile_File_01', 'LEFT', 'EntityFile'],
+            ['Tag AS MessageTemplate_EntityTag_Tag_01', 'LEFT', 'EntityTag'],
           ],
         ],
       ],
@@ -43,6 +57,11 @@ return [
         'label' => E::ts('User-Driven Messages'),
         'saved_search_id.name' => 'Message_Templates_User',
         'type' => 'table',
+        // The `has_document` join is a bridge entity (EntityFile) with no ACL delegate
+        // registered for civicrm_msg_template, so it denies access under normal permission
+        // checking. Visibility of this listing is already gated by the page's own
+        // 'edit message templates' permission, so bypassing ACLs here exposes nothing new.
+        'acl_bypass' => TRUE,
         'settings' => [
           'limit' => 50,
           'sort' => [['msg_title', 'ASC']],
@@ -50,15 +69,24 @@ return [
           'placeholder' => 5,
           // `revert` restores a template from the packaged original it was copied from, which
           // a user-driven template does not have, so it would report reverting nothing.
-          'actions' => ['add_translation', 'delete', 'disable', 'download', 'enable', 'update'],
+          // `tag` becomes available once MessageTemplate is registered in `tag_used_for`
+          // (see CRM_Upgrade_Incremental_php_SixTwenty::registerMessageTemplateTagUsedFor()).
+          'actions' => ['add_translation', 'delete', 'disable', 'download', 'enable', 'tag', 'update'],
           'classes' => ['table', 'table-striped'],
           'toolbar' => [
             [
-              'entity' => 'MessageTemplate',
-              'action' => 'add',
+              'path' => 'civicrm/admin/messageTemplates/edit#/edit',
               'style' => 'primary',
-              'text' => E::ts('Add Message Template'),
+              'text' => E::ts('Add template'),
               'icon' => 'fa-plus',
+            ],
+            [
+              // Same as MessageTemplate's declared `add` path, plus `docOnly=1` to hide the
+              // now-redundant Source radio - see CRM_Admin_Form_MessageTemplates::preProcess().
+              'path' => 'civicrm/admin/messageTemplates/add?action=add&reset=1&docOnly=1',
+              'style' => 'default',
+              'text' => E::ts('Create template from document'),
+              'icon' => 'fa-file-word-o',
             ],
           ],
           'columns' => [
@@ -81,6 +109,11 @@ return [
               'sortable' => TRUE,
             ],
             [
+              'type' => 'include',
+              'path' => '~/crmMsgadm/tagsColumn.html',
+              'label' => E::ts('Tags'),
+            ],
+            [
               'type' => 'menu',
               'alignment' => 'text-right',
               'text' => '',
@@ -89,11 +122,21 @@ return [
               'size' => 'btn-xs',
               'links' => [
                 [
+                  // Document-upload templates have no on-screen editor, so they keep using
+                  // the classic edit form - see MessageTemplate's own declared `update` path.
                   'entity' => 'MessageTemplate',
                   'action' => 'update',
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
+                  'conditions' => [['has_document', 'IS NOT EMPTY']],
+                ],
+                [
+                  'path' => 'civicrm/admin/messageTemplates/edit#/edit?id=[id]',
+                  'icon' => 'fa-pencil',
+                  'text' => E::ts('Edit'),
+                  'style' => 'default',
+                  'conditions' => [['has_document', 'IS EMPTY']],
                 ],
                 [
                   'task' => 'enable',

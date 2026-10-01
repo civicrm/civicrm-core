@@ -35,6 +35,9 @@ return [
             'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_02.language ORDER BY MessageTemplate_Translation_entity_id_02.language ASC) AS translation_codes',
             'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_03.language:label ORDER BY MessageTemplate_Translation_entity_id_03.language ASC) AS draft_languages',
             'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_03.language ORDER BY MessageTemplate_Translation_entity_id_03.language ASC) AS draft_codes',
+            // A document-upload template (.docx/.odt) has no on-screen editor yet, so it keeps
+            // using the classic edit form - this is non-empty only for those rows.
+            'MAX(MessageTemplate_EntityFile_File_01.id) AS has_document',
           ],
           'orderBy' => [],
           'where' => [
@@ -70,6 +73,9 @@ return [
               ['MessageTemplate_Translation_entity_id_03.entity_id', '=', 'id'],
               ['MessageTemplate_Translation_entity_id_03.status_id:name', '=', '"draft"'],
             ],
+            // No explicit ON conditions needed - with no conditions given, API4's bridge-join
+            // handling links the bridge row to this entity automatically (entity_id/entity_table).
+            ['File AS MessageTemplate_EntityFile_File_01', 'LEFT', 'EntityFile'],
           ],
         ],
       ],
@@ -88,6 +94,12 @@ return [
         'label' => E::ts('System Workflow Messages'),
         'saved_search_id.name' => 'Message_Templates_Workflow',
         'type' => 'table',
+        // The `has_document` join is a bridge entity (EntityFile) with no ACL delegate
+        // registered for civicrm_msg_template, so it denies access under normal permission
+        // checking. Visibility of this listing is already gated by the page's own
+        // 'edit system workflow message templates' permission, so bypassing ACLs here
+        // exposes nothing new.
+        'acl_bypass' => TRUE,
         'settings' => [
           'limit' => 50,
           'sort' => [['msg_title', 'ASC']],
@@ -161,10 +173,21 @@ return [
                   'conditions' => [['check user permission', '=', ['translate CiviCRM']]],
                 ],
                 [
+                  // Document-upload templates have no on-screen editor, so they keep using
+                  // the classic edit form - see MessageTemplate's own declared `update` path.
+                  'entity' => 'MessageTemplate',
+                  'action' => 'update',
+                  'icon' => 'fa-pencil',
+                  'text' => E::ts('Edit'),
+                  'style' => 'default',
+                  'conditions' => [['has_document', 'IS NOT EMPTY']],
+                ],
+                [
                   'path' => 'civicrm/admin/messageTemplates/edit#/edit?id=[id]',
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
+                  'conditions' => [['has_document', 'IS EMPTY']],
                 ],
                 [
                   'task' => 'revert',

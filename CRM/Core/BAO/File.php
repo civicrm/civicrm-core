@@ -890,6 +890,7 @@ HEREDOC;
       'civicrm_case' => ts('Case'),
       'civicrm_note' => ts('Note'),
       'civicrm_saved_search' => ts('Saved Search'),
+      'civicrm_msg_template' => ts('Message Template'),
     ];
   }
 
