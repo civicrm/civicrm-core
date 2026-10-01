@@ -615,10 +615,11 @@ class SettingsBag {
 
     foreach (['host', 'name', 'user', 'password', 'port'] as $componentKey) {
       $value = $this->get($prefix . '_db_' . $componentKey);
-      if (!$value) {
+      if ($value === NULL || $value === '') {
         // if missing a required key to compose the dsn, give up trying to interpolate
         // (we have defaults for all keys but password, so this is likely to be unset password
         // (but could be one of the other components has been explicitly nulled))
+        // Compared strictly: '0' is a usable password, not a missing one.
         return [];
       }
       $componentValues[$componentKey] = urlencode($value);
