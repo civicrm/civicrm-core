@@ -564,12 +564,9 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function flush() {
-    // CiviCRM and Drupal both provide (different versions of) Symfony (and possibly share other classes too).
-    // If we call drupal_flush_all_caches(), Drupal will attempt to rediscover all of its classes, use Civicrm's
-    // alternatives instead and then die. Instead, we only clear cache bins and no more.
-    foreach (Drupal\Core\Cache\Cache::getBins() as $service_id => $cache_backend) {
-      $cache_backend->deleteAll();
-    }
+    // All Drupal content touched by CiviCRM has a `civicrm` cache tag. When flushing from CiviCRM
+    // we just invalidate this tag
+    \Drupal::service('cache_tags.invalidator')->invalidateTags(['civicrm']);
   }
 
   /**
