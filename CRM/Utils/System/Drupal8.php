@@ -308,6 +308,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
         'query' => $url['query'],
         'fragment' => $fragment,
         'absolute' => $absolute,
+        // Required for i18n suffixes, ex: example.org/fr/civicrm/example
+        'path_processing' => TRUE,
       ])->toString();
       // Decode %% for better readability, e.g., %%cid%%.
       $url = str_replace('%25%25', '%%', $url);
