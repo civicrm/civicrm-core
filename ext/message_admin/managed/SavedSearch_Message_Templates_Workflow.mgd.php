@@ -12,6 +12,13 @@ return [
       'values' => [
         'name' => 'Message_Templates_Workflow',
         'label' => E::ts('System Workflow Messages'),
+        'form_values' => [
+          'join' => [
+            'MessageTemplate_Translation_entity_id_01' => E::ts('Any Translation'),
+            'MessageTemplate_Translation_entity_id_02' => E::ts('Active Translation'),
+            'MessageTemplate_Translation_entity_id_03' => E::ts('Draft Translation'),
+          ],
+        ],
         'api_entity' => 'MessageTemplate',
         'api_params' => [
           'version' => 4,
@@ -21,10 +28,13 @@ return [
             // `master_id` is a correlated subquery, which MySQL rejects alongside GROUP BY
             // under ONLY_FULL_GROUP_BY. It also cannot be aliased back to its own field name.
             'MAX(master_id) AS customized',
-            // Both aggregates concatenate the same raw column, so `:label` is applied per
-            // value afterwards and the two arrays stay index-aligned for the per-language link.
-            'GROUP_CONCAT(DISTINCT tx.language:label) AS translation_languages',
-            'GROUP_CONCAT(DISTINCT tx.language) AS translation_codes',
+            // Each pair concatenates the same raw column in the same order, so `:label` is
+            // applied per value afterwards and the two arrays stay index-aligned for the
+            // per-language link.
+            'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_02.language:label ORDER BY MessageTemplate_Translation_entity_id_02.language ASC) AS translation_languages',
+            'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_02.language ORDER BY MessageTemplate_Translation_entity_id_02.language ASC) AS translation_codes',
+            'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_03.language:label ORDER BY MessageTemplate_Translation_entity_id_03.language ASC) AS draft_languages',
+            'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_03.language ORDER BY MessageTemplate_Translation_entity_id_03.language ASC) AS draft_codes',
           ],
           'orderBy' => [],
           'where' => [
@@ -33,12 +43,32 @@ return [
           ],
           'groupBy' => ['id'],
           'join' => [
+            // The SearchKit editor only recognises join aliases in its own `<join>_NN` form, and
+            // expects condition values JSON-quoted. _01 is read only by the language filter, so
+            // filtering matches drafts as well as active translations without narrowing the
+            // languages the columns list; _02 feeds Translations and _03 Drafts.
             [
-              'Translation AS tx',
+              'Translation AS MessageTemplate_Translation_entity_id_01',
               'LEFT',
               NULL,
-              ['tx.entity_table', '=', "'civicrm_msg_template'"],
-              ['tx.entity_id', '=', 'id'],
+              ['MessageTemplate_Translation_entity_id_01.entity_table', '=', "'civicrm_msg_template'"],
+              ['MessageTemplate_Translation_entity_id_01.entity_id', '=', 'id'],
+            ],
+            [
+              'Translation AS MessageTemplate_Translation_entity_id_02',
+              'LEFT',
+              NULL,
+              ['MessageTemplate_Translation_entity_id_02.entity_table', '=', "'civicrm_msg_template'"],
+              ['MessageTemplate_Translation_entity_id_02.entity_id', '=', 'id'],
+              ['MessageTemplate_Translation_entity_id_02.status_id:name', '=', '"active"'],
+            ],
+            [
+              'Translation AS MessageTemplate_Translation_entity_id_03',
+              'LEFT',
+              NULL,
+              ['MessageTemplate_Translation_entity_id_03.entity_table', '=', "'civicrm_msg_template'"],
+              ['MessageTemplate_Translation_entity_id_03.entity_id', '=', 'id'],
+              ['MessageTemplate_Translation_entity_id_03.status_id:name', '=', '"draft"'],
             ],
           ],
         ],
@@ -83,6 +113,21 @@ return [
               // its own translation rather than one link naming every language at once.
               'link' => [
                 'path' => 'civicrm/admin/messageTemplates/edit#/edit?id=[id]&lang=[translation_codes]',
+              ],
+            ],
+            [
+              'type' => 'field',
+              'key' => 'draft_languages',
+              'label' => E::ts('Drafts'),
+              'title' => E::ts('Languages with an unpublished draft'),
+              'link' => [
+                'path' => 'civicrm/admin/messageTemplates/edit#/edit?id=[id]&lang=[draft_codes]&status=draft',
+              ],
+              'icons' => [
+                ['icon' => 'fa-file-text-o', 'side' => 'left', 'if' => ['draft_languages', 'IS NOT EMPTY']],
+              ],
+              'cssRules' => [
+                ['text-warning', 'draft_languages', 'IS NOT EMPTY'],
               ],
             ],
             [
