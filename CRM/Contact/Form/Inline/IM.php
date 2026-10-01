@@ -95,6 +95,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
    */
   public static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = [];
+    $primaryID = NULL;
     if (!empty($fields['im']) && is_array($fields['im'])) {
       foreach ($fields['im'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
