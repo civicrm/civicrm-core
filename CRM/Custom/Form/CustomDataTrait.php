@@ -214,4 +214,28 @@ trait CRM_Custom_Form_CustomDataTrait {
     return $this->getSubmittedCustomFields(4, $entity);
   }
 
+  /**
+   * Clean any Money/Float/Int custom field values in a submitted-values array.
+   *
+   * For values not sourced from $this->getSubmittedValue() - that already
+   * cleans money fields via the rules registered on the current form. A
+   * values array read from a different page (eg. another page's own export)
+   * carries no such rules on the current form, so custom fields there need
+   * their data type looked up directly instead.
+   *
+   * @param array $values
+   *
+   * @return array
+   */
+  protected function cleanSubmittedCustomFieldValues(array $values): array {
+    foreach ($values as $key => $value) {
+      $customFieldID = CRM_Core_BAO_CustomField::getKeyID($key);
+      $dataType = $customFieldID ? CRM_Core_BAO_CustomField::getField($customFieldID)['data_type'] ?? NULL : NULL;
+      if (in_array($dataType, ['Money', 'Float', 'Int'], TRUE)) {
+        $values[$key] = CRM_Utils_Rule::cleanMoney($value);
+      }
+    }
+    return $values;
+  }
+
 }
