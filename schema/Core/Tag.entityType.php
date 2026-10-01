@@ -13,6 +13,11 @@ return [
     'icon' => 'fa-tag',
     'label_field' => 'label',
   ],
+  'getPaths' => fn() => [
+    'add' => 'civicrm/tag/edit?action=add&reset=1',
+    'update' => 'civicrm/tag/edit?action=update&reset=1&id=[id]',
+    'browse' => 'civicrm/tag',
+  ],
   'getIndices' => fn() => [
     'UI_name' => [
       'fields' => [
