@@ -707,30 +707,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
-   * Submit the confirm form.
-   *
-   * @deprecated use SubmitForm
-   *
-   * @param int $eventID
-   * @param array $submittedValues Submitted Values
-   */
-  protected function submitFormLegacy(int $eventID, array $submittedValues): void {
-    $_REQUEST['id'] = $eventID;
-    /* @var CRM_Event_Form_Registration_Register $form */
-    $form = $this->getFormObject('CRM_Event_Form_Registration_Register', $submittedValues[0] ?? $submittedValues);
-    $form->preProcess();
-    $form->buildForm();
-    $form->postProcess();
-    /* @var CRM_Event_Form_Registration_Confirm $form */
-    $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm');
-    $form->preProcess();
-    $form->buildForm();
-    $form->postProcess();
-    // This allows us to rinse & repeat form submission in the same test, without leakage.
-    $this->formController = NULL;
-  }
-
-  /**
    * Submit a paid event with some default values.
    *
    * @param array $eventParams
@@ -776,7 +752,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   public function testRegistrationWithoutCiviContributeEnabled(): void {
-    $mut = new CiviMailUtils($this, TRUE);
     $event = $this->eventCreateUnpaid([
       'has_waitlist' => 1,
       'max_participants' => 1,
@@ -785,24 +760,18 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'registration_end_date' => 20351015,
     ]);
     CRM_Core_BAO_ConfigSetting::disableComponent('CiviContribute');
-    $this->submitFormLegacy(
-      $event['id'], [
-        [
-          'first_name' => 'Bruce No Contribute',
-          'last_name' => 'Wayne',
-          'email-Primary' => 'bruce@gotham.com',
-          'is_primary' => 1,
-          'is_pay_later' => 0,
-        ],
-      ]
-    );
-    $mut->checkMailLog([
+    $this->submitForm($event['id'], [
+      'first_name' => 'Bruce No Contribute',
+      'last_name' => 'Wayne',
+      'email-Primary' => 'bruce@gotham.com',
+      'is_primary' => 1,
+      'is_pay_later' => 0,
+    ]);
+    $this->assertMailSentContainingStrings([
       'Dear Bruce No Contribute,',
       'Thank you for your registration.',
       'This is a confirmation that your registration has been received and your status has been updated to Registered.',
     ]);
-    $mut->stop();
-    $mut->clearMessages();
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
   }
 
