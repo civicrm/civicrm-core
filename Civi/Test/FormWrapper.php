@@ -286,10 +286,10 @@ class FormWrapper {
    */
   private function setFormObject(string $class, array $formValues = [], array $urlParameters = []): void {
     $_POST = $formValues;
-    $this->form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $_REQUEST = $urlParameters;
     $_GET = $urlParameters;
+    $this->form = new $class();
     switch ($class) {
       case 'CRM_Event_Cart_Form_Checkout_Payment':
       case 'CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices':

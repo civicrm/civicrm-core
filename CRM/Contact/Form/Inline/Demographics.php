@@ -32,23 +32,7 @@ class CRM_Contact_Form_Inline_Demographics extends CRM_Contact_Form_Inline {
    * Process the form.
    */
   public function postProcess() {
-    $params = $this->exportValues();
-
-    // Process / save demographics
-    if (empty($params['is_deceased'])) {
-      $params['is_deceased'] = FALSE;
-      $params['deceased_date'] = '';
-    }
-
-    $params['contact_type'] = 'Individual';
-    $params['contact_id'] = $this->_contactId;
-
-    if (!empty($this->_contactSubType)) {
-      $params['contact_sub_type'] = $this->_contactSubType;
-    }
-
-    CRM_Contact_BAO_Contact::create($params);
-
+    $this->saveContact();
     $this->response();
   }
 

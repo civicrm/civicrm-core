@@ -9,13 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-use Civi\Api4\IM;
 use Civi\Api4\Generic\Result;
 
 /**
@@ -25,41 +18,27 @@ use Civi\Api4\Generic\Result;
  *  code has adequate unit test cover.
  */
 trait CRM_Contact_Form_Edit_IMBlockTrait {
-  use CRM_Contact_Form_Edit_BlockCustomDataTrait;
 
-  /**
-   * @var \Civi\Api4\Generic\Result
-   */
-  private Result $existingIMs;
+  use CRM_Contact_Form_Edit_BlockTrait;
 
   /**
    * @return \Civi\Api4\Generic\Result
    * @throws CRM_Core_Exception
    */
-  public function getExistingIMs() : Result {
-    if (!isset($this->existingIMs)) {
-      $this->existingIMs = IM::get()
-        ->addSelect('*', 'custom.*')
-        ->addOrderBy('is_primary', 'DESC')
-        ->addWhere('contact_id', '=', $this->getContactID())
-        ->execute();
-    }
-    return $this->existingIMs;
+  public function getExistingIMs(): Result {
+    return $this->getExistingBlocks('IM');
   }
 
   /**
-   * Get the open ids indexed numerically from 1.
+   * Get the IMs indexed numerically from 1.
    *
    * This reflects historical form requirements.
    *
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function getExistingIMsReIndexed() : array {
-    $result = array_merge([0 => 1], (array) $this->getExistingIMs());
-    unset($result[0]);
-    return $result;
+  public function getExistingIMsReIndexed(): array {
+    return $this->getExistingBlocks('IM', 1);
   }
 
   /**
@@ -87,40 +66,7 @@ trait CRM_Contact_Form_Edit_IMBlockTrait {
    * @throws CRM_Core_Exception
    */
   public function saveIMs(array $ims): void {
-    $existingIMs = (array) $this->getExistingIMs()->indexBy('id');
-    foreach ($ims as $index => $im) {
-      $id = $im['id'] ?? NULL;
-      $dataExists = !CRM_Utils_System::isNull($im['name']);
-      if (!$dataExists) {
-        unset($ims[$index]);
-        continue;
-      }
-      if (!array_key_exists('contact_id', $im)) {
-        $ims[$index]['contact_id'] = $this->getContactID();
-      }
-      if ($id) {
-        if (array_key_exists($id, $existingIMs)) {
-          // We unset this here because we are going to delete any existing
-          // emails that were not in the incoming array.
-          unset($existingIMs[$id]);
-        }
-        else {
-          // The id is not valid, this becomes a create.
-          unset($im['id']);
-        }
-      }
-    }
-    if ($ims) {
-      IM::save()
-        ->setRecords($ims)
-        ->execute();
-    }
-
-    if (!empty($existingIMs)) {
-      IM::delete()->addWhere('id', 'IN', array_keys($existingIMs))
-        ->execute();
-    }
-
+    $this->saveBlocks('IM', $ims);
   }
 
 }

@@ -59,22 +59,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
   public function buildQuickForm(): void {
     parent::buildQuickForm();
 
-    $totalBlocks = $this->_blockCount;
-    $actualBlockCount = 1;
-    if (count($this->_ims) > 1) {
-      $actualBlockCount = $totalBlocks = count($this->_ims);
-      if ($totalBlocks < $this->_blockCount) {
-        $additionalBlocks = $this->_blockCount - $totalBlocks;
-        $totalBlocks += $additionalBlocks;
-      }
-      else {
-        $actualBlockCount++;
-        $totalBlocks++;
-      }
-    }
-
-    $this->assign('actualBlockCount', $actualBlockCount);
-    $this->assign('totalBlocks', $totalBlocks);
+    $totalBlocks = $this->calculateAndAssignBlockCounts(count($this->_ims), $this->_blockCount);
 
     for ($blockId = 1; $blockId < $totalBlocks; $blockId++) {
       $this->addIMBlockFields($blockId);
@@ -94,31 +79,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
    * @return array
    */
   public static function formRule($fields, $errors) {
-    $hasData = $hasPrimary = $errors = [];
-    if (!empty($fields['im']) && is_array($fields['im'])) {
-      foreach ($fields['im'] as $instance => $blockValues) {
-        $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
-
-        if ($dataExists) {
-          $hasData[] = $instance;
-          if (!empty($blockValues['is_primary'])) {
-            $hasPrimary[] = $instance;
-            if (!$primaryID && !empty($blockValues['im'])) {
-              $primaryID = $blockValues['im'];
-            }
-          }
-        }
-      }
-
-      if (empty($hasPrimary) && !empty($hasData)) {
-        $errors["im[1][is_primary]"] = ts('One IM should be marked as primary.');
-      }
-
-      if (count($hasPrimary) > 1) {
-        $errors["im[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one IM can be marked as primary.');
-      }
-    }
-    return $errors;
+    return self::validatePrimaryBlock($fields, 'im');
   }
 
   /**
@@ -137,11 +98,7 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
    */
   public function postProcess(): void {
     $params = $this->getSubmittedValues();
-    foreach ($this->_ims as $count => $value) {
-      if (!empty($value['id']) && isset($params['im'][$count])) {
-        $params['im'][$count]['id'] = $value['id'];
-      }
-    }
+    $this->mergeExistingBlockIds($params, $this->_ims, 'im');
     $this->saveIMs($params['im']);
 
     $this->log();
