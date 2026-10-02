@@ -1289,7 +1289,10 @@ class CRM_Utils_Date {
     }
 
     if (trim($date ?? '')) {
-      $mysqlDate = date($format, strtotime($date . ' ' . $time));
+      if ($time) {
+        $date .= ' ' . $time;
+      }
+      $mysqlDate = date($format, strtotime($date));
     }
 
     return $mysqlDate;
