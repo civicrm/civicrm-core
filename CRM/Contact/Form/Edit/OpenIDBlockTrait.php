@@ -88,7 +88,7 @@ trait CRM_Contact_Form_Edit_OpenIDBlockTrait {
   /**
    * @throws CRM_Core_Exception
    */
-  public function saveOpenIDss(array $openIDs): void {
+  public function saveOpenIDs(array $openIDs): void {
     $existingOpenIDs = (array) $this->getExistingOpenIDs()->indexBy('id');
     foreach ($openIDs as $index => $openID) {
       $id = $openID['id'] ?? NULL;
@@ -103,7 +103,7 @@ trait CRM_Contact_Form_Edit_OpenIDBlockTrait {
       if ($id) {
         if (array_key_exists($id, $existingOpenIDs)) {
           // We unset this here because we are going to delete any existing
-          // emails that were not in the incoming array.
+          // openIDs that were not in the incoming array.
           unset($existingOpenIDs[$id]);
         }
         else {

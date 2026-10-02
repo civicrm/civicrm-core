@@ -96,7 +96,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
     $params = $this->getSubmittedValues();
 
     $this->mergeExistingBlockIds($params, $this->_openids, 'openid');
-    $this->saveOpenIDss($params['openid']);
+    $this->saveOpenIDs($params['openid']);
 
     $this->log();
     $this->response();
