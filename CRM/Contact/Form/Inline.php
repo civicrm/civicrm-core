@@ -247,6 +247,37 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   }
 
   /**
+   * Get parameters for updating contact fields from submitted form values.
+   *
+   * @return array
+   */
+  protected function getContactUpdateParams(): array {
+    $params = $this->getSubmittedValues();
+    $params['contact_type'] = $this->_contactType ?? 'Individual';
+    $params['contact_id'] = $this->getContactID();
+    if (!empty($this->_contactSubType)) {
+      $params['contact_sub_type'] = $this->_contactSubType;
+    }
+    if ($this->elementExists('is_deceased') && empty($params['is_deceased'])) {
+      $params['is_deceased'] = FALSE;
+      $params['deceased_date'] = '';
+    }
+    return $params;
+  }
+
+  /**
+   * Save contact using parameters from the submitted form.
+   *
+   * @param array $params Optional parameters to override or augment.
+   *
+   * @return CRM_Contact_DAO_Contact
+   */
+  protected function saveContact(array $params = []): CRM_Contact_DAO_Contact {
+    $params = array_merge($this->getContactUpdateParams(), $params);
+    return CRM_Contact_BAO_Contact::create($params);
+  }
+
+  /**
    * Add entry to log table.
    */
   protected function log() {

@@ -615,6 +615,42 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $updated = $this->getForContact('Contact')->first();
     $this->assertEquals('Software Director', $updated['job_title']);
+
+    // Test ContactInfo for Organization (organization closed / is_deceased)
+    $org = $this->createTestEntity('Contact', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'Acme Corp',
+    ], 'org_contact');
+    $orgId = $org['id'];
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_ContactInfo', [
+      'oplock_ts' => $this->getOplockTs($orgId),
+      'legal_name' => 'Acme Corporation LLC',
+      'is_deceased' => 1,
+      'deceased_date' => '2021-01-01',
+    ], ['cid' => $orgId]);
+    $formWrapper->processForm();
+
+    $orgRecord = civicrm_api4('Contact', 'get', [
+      'checkPermissions' => FALSE,
+      'where' => [['id', '=', $orgId]],
+    ])->first();
+    $this->assertEquals('Acme Corporation LLC', $orgRecord['legal_name']);
+    $this->assertTrue((bool) $orgRecord['is_deceased']);
+
+    // Uncheck is_deceased (Organization is Closed unchecked)
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_ContactInfo', [
+      'oplock_ts' => $this->getOplockTs($orgId),
+      'legal_name' => 'Acme Corporation LLC',
+    ], ['cid' => $orgId]);
+    $formWrapper->processForm();
+
+    $orgRecord = civicrm_api4('Contact', 'get', [
+      'checkPermissions' => FALSE,
+      'where' => [['id', '=', $orgId]],
+    ])->first();
+    $this->assertFalse((bool) $orgRecord['is_deceased']);
+    $this->assertEmpty($orgRecord['deceased_date']);
   }
 
   /**
@@ -623,18 +659,33 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
   public function testDemographicsForm(): void {
     $contactId = $this->getTestEntityID('Contact');
 
+    // Mark as deceased
     $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Demographics', [
       'oplock_ts' => $this->getOplockTs(),
       'gender_id' => 1,
       'birth_date' => '1951-01-01',
-      'is_deceased' => 0,
+      'is_deceased' => 1,
+      'deceased_date' => '2020-05-15',
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
     $updated = $this->getForContact('Contact')->first();
     $this->assertEquals(1, $updated['gender_id']);
     $this->assertEquals('1951-01-01', $updated['birth_date']);
+    $this->assertTrue((bool) $updated['is_deceased']);
+    $this->assertEquals('2020-05-15', $updated['deceased_date']);
+
+    // Uncheck is_deceased (simulating unchecked checkbox where is_deceased is omitted)
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Demographics', [
+      'oplock_ts' => $this->getOplockTs(),
+      'gender_id' => 1,
+      'birth_date' => '1951-01-01',
+    ], ['cid' => $contactId]);
+    $formWrapper->processForm();
+
+    $updated = $this->getForContact('Contact')->first();
     $this->assertFalse((bool) $updated['is_deceased']);
+    $this->assertEmpty($updated['deceased_date']);
   }
 
   /**
