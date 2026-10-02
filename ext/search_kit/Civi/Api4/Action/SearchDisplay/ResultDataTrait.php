@@ -112,8 +112,8 @@ trait ResultDataTrait {
       }
       $csv->insertOne($row);
     }
-    // Echo headers and content directly to browser
-    $csv->download($fileName);
+    // Echo content directly to browser (headers are sent by Download::sendHeaders())
+    $csv->download();
   }
 
   /**
