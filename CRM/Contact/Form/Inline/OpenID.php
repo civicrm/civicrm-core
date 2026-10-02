@@ -57,22 +57,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $totalBlocks = $this->_blockCount;
-    $actualBlockCount = 1;
-    if (count($this->_openids) > 1) {
-      $actualBlockCount = $totalBlocks = count($this->_openids);
-      if ($totalBlocks < $this->_blockCount) {
-        $additionalBlocks = $this->_blockCount - $totalBlocks;
-        $totalBlocks += $additionalBlocks;
-      }
-      else {
-        $actualBlockCount++;
-        $totalBlocks++;
-      }
-    }
-
-    $this->assign('actualBlockCount', $actualBlockCount);
-    $this->assign('totalBlocks', $totalBlocks);
+    $totalBlocks = $this->calculateAndAssignBlockCounts(count($this->_openids), $this->_blockCount);
 
     for ($blockId = 1; $blockId < $totalBlocks; $blockId++) {
       $this->addOpenIDBlockFields($blockId);
@@ -92,32 +77,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
    * @return array
    */
   public static function formRule($fields, $errors) {
-    $hasData = $hasPrimary = $errors = [];
-    $primaryID = NULL;
-    if (!empty($fields['openid']) && is_array($fields['openid'])) {
-      foreach ($fields['openid'] as $instance => $blockValues) {
-        $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
-
-        if ($dataExists) {
-          $hasData[] = $instance;
-          if (!empty($blockValues['is_primary'])) {
-            $hasPrimary[] = $instance;
-            if (!$primaryID && !empty($blockValues['openid'])) {
-              $primaryID = $blockValues['openid'];
-            }
-          }
-        }
-      }
-
-      if (empty($hasPrimary) && !empty($hasData)) {
-        $errors["openid[1][is_primary]"] = ts('One OpenID should be marked as primary.');
-      }
-
-      if (count($hasPrimary) > 1) {
-        $errors["openid[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one OpenID can be marked as primary.');
-      }
-    }
-    return $errors;
+    return self::validatePrimaryBlock($fields, 'openid');
   }
 
   /**
@@ -135,12 +95,7 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
   public function postProcess(): void {
     $params = $this->getSubmittedValues();
 
-    // Process / save openID
-    foreach ($this->_openids as $count => $value) {
-      if (!empty($value['id']) && isset($params['openid'][$count])) {
-        $params['openid'][$count]['id'] = $value['id'];
-      }
-    }
+    $this->mergeExistingBlockIds($params, $this->_openids, 'openid');
     $this->saveOpenIDss($params['openid']);
 
     $this->log();

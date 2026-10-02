@@ -162,6 +162,91 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   }
 
   /**
+   * Calculate and assign total and actual block counts for repeated block forms.
+   *
+   * @param int $existingCount Number of existing saved blocks.
+   * @param int $blockCount Target / maximum block count.
+   *
+   * @return int Total number of blocks.
+   */
+  protected function calculateAndAssignBlockCounts(int $existingCount, int $blockCount): int {
+    $totalBlocks = $blockCount;
+    $actualBlockCount = 1;
+    if ($existingCount > 1) {
+      $actualBlockCount = $totalBlocks = $existingCount;
+      if ($totalBlocks < $blockCount) {
+        $totalBlocks += ($blockCount - $totalBlocks);
+      }
+      else {
+        $actualBlockCount++;
+        $totalBlocks++;
+      }
+    }
+    $this->assign('actualBlockCount', $actualBlockCount);
+    $this->assign('totalBlocks', $totalBlocks);
+    return $totalBlocks;
+  }
+
+  /**
+   * Merge IDs of existing blocks into submitted values prior to saving.
+   *
+   * @param array $submittedValues Form submitted values (modified in-place).
+   * @param array $existingBlocks Existing blocks keyed by index.
+   * @param string $key Block field key (e.g. 'email', 'phone', 'im', 'openid', 'website').
+   */
+  protected function mergeExistingBlockIds(array &$submittedValues, array $existingBlocks, string $key): void {
+    foreach ($existingBlocks as $count => $value) {
+      if (!empty($value['id']) && isset($submittedValues[$key][$count])) {
+        $submittedValues[$key][$count]['id'] = $value['id'];
+      }
+    }
+  }
+
+  /**
+   * Validate that at most one block is marked as primary.
+   *
+   * @param array $fields Submitted form fields.
+   * @param string $key Block field key (e.g. 'email', 'phone', 'im', 'openid').
+   *
+   * @return array Array of validation errors.
+   */
+  public static function validatePrimaryBlock(array $fields, string $key): array {
+    $errors = [];
+    $hasPrimary = [];
+    foreach ($fields[$key] ?? [] as $blockId => $blockValues) {
+      if (CRM_Contact_Form_Contact::blockDataExists($blockValues) && !empty($blockValues['is_primary'])) {
+        $hasPrimary[] = $blockId;
+      }
+    }
+
+    if (count($hasPrimary) > 1) {
+      // Set error on last block marked primary
+      $lastBlockId = end($hasPrimary);
+      $errors["{$key}[$lastBlockId][is_primary]"] = ts('Only one can be marked as primary.');
+    }
+    return $errors;
+  }
+
+  /**
+   * Check if any submitted blocks for the given key contain actual data.
+   *
+   * @param array $fields Submitted form fields.
+   * @param string $key Block field key (e.g. 'email', 'phone', 'im', 'openid', 'website').
+   *
+   * @return bool
+   */
+  public static function hasBlockData(array $fields, string $key): bool {
+    if (!empty($fields[$key]) && is_array($fields[$key])) {
+      foreach ($fields[$key] as $blockValues) {
+        if (CRM_Contact_Form_Contact::blockDataExists($blockValues)) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Add entry to log table.
    */
   protected function log() {

@@ -72,61 +72,67 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
   public function testSubmitEmailForm(): void {
     $contactId = $this->getTestEntityID('Contact');
 
-    // Add email via inline form
+    // Add 2 emails with no primary specified
     $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Email', [
       'oplock_ts' => $this->getOplockTs(),
       'email' => [
         1 => [
           'email' => 'lobo@example.org',
           'location_type_id' => 1,
-          'is_primary' => 1,
-        ],
-        2 => ['email' => ''],
-        3 => ['email' => ''],
-        4 => ['email' => ''],
-        5 => ['email' => ''],
-      ],
-    ], ['cid' => $contactId]);
-    $formWrapper->processForm();
-
-    $emails = $this->getForContact('Email');
-    $this->assertCount(1, $emails);
-    $this->assertEquals('lobo@example.org', $emails->first()['email']);
-    $this->assertEquals(1, $emails->first()['is_primary']);
-    $emailId = $emails->first()['id'];
-
-    // Update existing email and add second email
-    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Email', [
-      'oplock_ts' => $this->getOplockTs(),
-      'email' => [
-        1 => [
-          'id' => $emailId,
-          'email' => 'lobo.updated@example.org',
-          'location_type_id' => 1,
-          'is_primary' => 1,
+          'is_primary' => 0,
         ],
         2 => [
           'email' => 'lobo.secondary@example.org',
           'location_type_id' => 2,
           'is_primary' => 0,
         ],
-        3 => ['email' => ''],
-        4 => ['email' => ''],
-        5 => ['email' => ''],
       ],
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
-    $emails = $this->getForContact('Email', ['is_primary' => 'DESC']);
+    $emails = $this->getForContact('Email', ['id' => 'ASC']);
     $this->assertCount(2, $emails);
-    $this->assertEquals('lobo.updated@example.org', $emails->first()['email']);
+    $this->assertEquals('lobo@example.org', $emails->first()['email']);
+    // No records were set to primary so the first one should have been automatically picked.
+    $this->assertSame(TRUE, $emails->first()['is_primary']);
+    $this->assertSame(FALSE, $emails->last()['is_primary']);
+    $emailId = $emails->first()['id'];
+
+    // Update existing email, make the 2nd email primary, and add a 3rd email
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Email', [
+      'oplock_ts' => $this->getOplockTs(),
+      'email' => [
+        1 => [
+          'email' => 'lobo.updated@example.org',
+          'location_type_id' => 1,
+          'is_primary' => 0,
+        ],
+        2 => [
+          'email' => 'lobo.secondary@example.org',
+          'location_type_id' => 2,
+          'is_primary' => 1,
+        ],
+        3 => [
+          'email' => 'lobo.work@example.org',
+          'location_type_id' => 1,
+          'is_primary' => 0,
+        ],
+      ],
+    ], ['cid' => $contactId]);
+    $formWrapper->processForm();
+
+    $emails = $this->getForContact('Email', ['is_primary' => 'DESC', 'id' => 'ASC']);
+    $this->assertCount(3, $emails);
+    $this->assertEquals('lobo.secondary@example.org', $emails->first()['email']);
+    $this->assertSame(TRUE, $emails->first()['is_primary']);
+    $this->assertEquals($emailId, $emails->column('id', 'email')['lobo.updated@example.org']);
 
     // Delete all emails by clearing values
     $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Email', [
       'oplock_ts' => $this->getOplockTs(),
       'email' => [
-        1 => ['email' => '', 'location_type_id' => 1, 'is_primary' => 1],
-        2 => ['email' => '', 'location_type_id' => 2, 'is_primary' => 0],
+        1 => ['email' => ''],
+        2 => ['email' => ''],
         3 => ['email' => ''],
         4 => ['email' => ''],
         5 => ['email' => ''],
@@ -186,7 +192,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $formWrapper->processForm(FormWrapper::VALIDATED);
 
     $this->assertEquals(
-      ['email[2][is_primary]' => ts('Only one email can be marked as primary.')],
+      ['email[2][is_primary]' => ts('Only one can be marked as primary.')],
       $formWrapper->getValidationOutput()
     );
   }
@@ -216,7 +222,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $formWrapper->processForm(FormWrapper::VALIDATED);
 
     $this->assertEquals(
-      ['phone[2][is_primary]' => ts('Only one phone can be marked as primary.')],
+      ['phone[2][is_primary]' => ts('Only one can be marked as primary.')],
       $formWrapper->getValidationOutput()
     );
 
@@ -237,6 +243,35 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $phones = $this->getForContact('Phone');
     $this->assertCount(1, $phones);
     $this->assertEquals('555-0100', $phones->first()['phone']);
+    $phoneId = $phones->first()['id'];
+
+    // Delete existing phone and add 2 more
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Phone', [
+      'oplock_ts' => $this->getOplockTs(),
+      'phone' => [
+        1 => ['phone' => ''],
+        2 => [
+          'phone' => '555-0199',
+          'location_type_id' => 1,
+          'phone_type_id' => 1,
+          'is_primary' => 0,
+        ],
+        3 => [
+          'phone' => '555-9876',
+          'location_type_id' => 2,
+          'phone_type_id' => 1,
+          'is_primary' => 0,
+        ],
+      ],
+    ], ['cid' => $contactId]);
+    $formWrapper->processForm();
+
+    $phones = $this->getForContact('Phone');
+    $this->assertCount(2, $phones);
+    $this->assertEquals('555-0199', $phones->first()['phone']);
+    $this->assertArrayNotHasKey($phoneId, $phones->column(NULL, 'id'));
+    // No records were set to primary so the first one should have been automatically picked.
+    $this->assertSame(TRUE, $phones->first()['is_primary']);
 
     // Delete all phones by clearing values
     $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Phone', [
@@ -264,6 +299,32 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
   public function testIMForm(): void {
     $contactId = $this->getTestEntityID('Contact');
 
+    // Test multiple primaries validation
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_IM', [
+      'oplock_ts' => $this->getOplockTs(),
+      'im' => [
+        1 => [
+          'name' => 'user1',
+          'location_type_id' => 1,
+          'provider_id' => 1,
+          'is_primary' => 1,
+        ],
+        2 => [
+          'name' => 'user2',
+          'location_type_id' => 2,
+          'provider_id' => 1,
+          'is_primary' => 1,
+        ],
+      ],
+    ], ['cid' => $contactId]);
+    $formWrapper->processForm(FormWrapper::VALIDATED);
+
+    $this->assertEquals(
+      ['im[2][is_primary]' => ts('Only one can be marked as primary.')],
+      $formWrapper->getValidationOutput()
+    );
+
+    // Initially create 1 IM with no primary specified
     $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_IM', [
       'oplock_ts' => $this->getOplockTs(),
       'im' => [
@@ -271,7 +332,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
           'name' => 'ghopper',
           'location_type_id' => 1,
           'provider_id' => 1,
-          'is_primary' => 1,
+          'is_primary' => 0,
         ],
       ],
     ], ['cid' => $contactId]);
@@ -280,17 +341,47 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $ims = $this->getForContact('Im');
     $this->assertCount(1, $ims);
     $this->assertEquals('ghopper', $ims->first()['name']);
+    // No primary was specified so it should automatically be primary
+    $this->assertSame(TRUE, $ims->first()['is_primary']);
+    $imId = $ims->first()['id'];
+
+    // Update existing IM, and add 2nd and 3rd IMs with the 3rd one specified as primary
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_IM', [
+      'oplock_ts' => $this->getOplockTs(),
+      'im' => [
+        1 => [
+          'name' => 'ghopper_updated',
+          'location_type_id' => 1,
+          'provider_id' => 1,
+          'is_primary' => 0,
+        ],
+        2 => [
+          'name' => 'alovelace',
+          'location_type_id' => 2,
+          'provider_id' => 1,
+          'is_primary' => 0,
+        ],
+        3 => [
+          'name' => 'aturing',
+          'location_type_id' => 1,
+          'provider_id' => 2,
+          'is_primary' => 1,
+        ],
+      ],
+    ], ['cid' => $contactId]);
+    $formWrapper->processForm();
+
+    $ims = $this->getForContact('Im', ['is_primary' => 'DESC', 'id' => 'ASC']);
+    $this->assertCount(3, $ims);
+    $this->assertEquals('aturing', $ims->first()['name']);
+    $this->assertSame(TRUE, $ims->first()['is_primary']);
+    $this->assertEquals($imId, $ims->column('id', 'name')['ghopper_updated']);
 
     // Delete all IMs by clearing values
     $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_IM', [
       'oplock_ts' => $this->getOplockTs(),
       'im' => [
-        1 => [
-          'name' => '',
-          'location_type_id' => 1,
-          'provider_id' => 1,
-          'is_primary' => 0,
-        ],
+        1 => ['name' => ''],
         2 => ['name' => ''],
         3 => ['name' => ''],
         4 => ['name' => ''],
@@ -308,11 +399,63 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
   public function testOpenIDForm(): void {
     $contactId = $this->getTestEntityID('Contact');
 
+    // Test multiple primaries validation
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_OpenID', [
+      'oplock_ts' => $this->getOplockTs(),
+      'openid' => [
+        1 => [
+          'openid' => 'https://user1.openid.example.org',
+          'location_type_id' => 1,
+          'is_primary' => 1,
+        ],
+        2 => [
+          'openid' => 'https://user2.openid.example.org',
+          'location_type_id' => 2,
+          'is_primary' => 1,
+        ],
+      ],
+    ], ['cid' => $contactId]);
+    $formWrapper->processForm(FormWrapper::VALIDATED);
+
+    $this->assertEquals(
+      ['openid[2][is_primary]' => ts('Only one can be marked as primary.')],
+      $formWrapper->getValidationOutput()
+    );
+
+    // Initially create 2 OpenIDs specifying the 2nd one as primary
     $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_OpenID', [
       'oplock_ts' => $this->getOplockTs(),
       'openid' => [
         1 => [
           'openid' => 'https://timbl.openid.example.org',
+          'location_type_id' => 1,
+          'is_primary' => 0,
+        ],
+        2 => [
+          'openid' => 'https://w3c.openid.example.org',
+          'location_type_id' => 2,
+          'is_primary' => 1,
+        ],
+      ],
+    ], ['cid' => $contactId]);
+    $formWrapper->processForm();
+
+    $openids = $this->getForContact('OpenID', ['is_primary' => 'DESC']);
+    $this->assertCount(2, $openids);
+    $this->assertEquals('https://w3c.openid.example.org', $openids->first()['openid']);
+    $this->assertSame(TRUE, $openids->first()['is_primary']);
+
+    // Update existing OpenIDs switching primary to the other one
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_OpenID', [
+      'oplock_ts' => $this->getOplockTs(),
+      'openid' => [
+        1 => [
+          'openid' => 'https://w3c.updated.openid.example.org',
+          'location_type_id' => 2,
+          'is_primary' => 0,
+        ],
+        2 => [
+          'openid' => 'https://timbl.updated.openid.example.org',
           'location_type_id' => 1,
           'is_primary' => 1,
         ],
@@ -320,19 +463,16 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
-    $openids = $this->getForContact('OpenID');
-    $this->assertCount(1, $openids);
-    $this->assertEquals('https://timbl.openid.example.org', $openids->first()['openid']);
+    $openids = $this->getForContact('OpenID', ['is_primary' => 'DESC']);
+    $this->assertCount(2, $openids);
+    $this->assertEquals('https://timbl.updated.openid.example.org', $openids->first()['openid']);
+    $this->assertSame(TRUE, $openids->first()['is_primary']);
 
     // Delete all OpenIDs by clearing values
     $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_OpenID', [
       'oplock_ts' => $this->getOplockTs(),
       'openid' => [
-        1 => [
-          'openid' => '',
-          'location_type_id' => 1,
-          'is_primary' => 0,
-        ],
+        1 => ['openid' => ''],
         2 => ['openid' => ''],
         3 => ['openid' => ''],
         4 => ['openid' => ''],
@@ -386,15 +526,35 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $websites = $this->getForContact('Website');
     $this->assertCount(1, $websites);
     $this->assertEquals('https://example.com', $websites->first()['url']);
+    $websiteId = $websites->first()['id'];
+
+    // Update existing website and add a second website of different type
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Website', [
+      'oplock_ts' => $this->getOplockTs(),
+      'website' => [
+        1 => [
+          'url' => 'https://example-updated.com',
+          'website_type_id' => 1,
+        ],
+        2 => [
+          'url' => 'https://work.example.com',
+          'website_type_id' => 2,
+        ],
+      ],
+    ], ['cid' => $contactId]);
+    $formWrapper->processForm();
+
+    $websites = $this->getForContact('Website');
+    $this->assertCount(2, $websites);
+    $this->assertEquals('https://example-updated.com', $websites->first()['url']);
+    $this->assertEquals($websiteId, $websites->first()['id']);
 
     // Delete all websites by clearing values
     $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Website', [
       'oplock_ts' => $this->getOplockTs(),
       'website' => [
-        1 => [
-          'url' => '',
-          'website_type_id' => 1,
-        ],
+        1 => ['url' => ''],
+        2 => ['url' => ''],
       ],
     ], ['cid' => $contactId]);
     $formWrapper->processForm();

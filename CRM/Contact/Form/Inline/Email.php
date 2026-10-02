@@ -70,22 +70,7 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
   public function buildQuickForm(): void {
     parent::buildQuickForm();
 
-    $totalBlocks = $this->_blockCount;
-    $actualBlockCount = 1;
-    if (count($this->_emails) > 1) {
-      $actualBlockCount = $totalBlocks = count($this->_emails);
-      if ($totalBlocks < $this->_blockCount) {
-        $additionalBlocks = $this->_blockCount - $totalBlocks;
-        $totalBlocks += $additionalBlocks;
-      }
-      else {
-        $actualBlockCount++;
-        $totalBlocks++;
-      }
-    }
-
-    $this->assign('actualBlockCount', $actualBlockCount);
-    $this->assign('totalBlocks', $totalBlocks);
+    $totalBlocks = $this->calculateAndAssignBlockCounts(count($this->_emails), $this->_blockCount);
 
     for ($blockId = 1; $blockId < $totalBlocks; $blockId++) {
       $this->addEmailBlockFields($blockId);
@@ -106,29 +91,9 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
    * @return array
    */
   public static function formRule($fields, $errors, $form) {
-    $hasData = $hasPrimary = $errors = [];
-    if (!empty($fields['email']) && is_array($fields['email'])) {
-      foreach ($fields['email'] as $instance => $blockValues) {
-        $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
-
-        if ($dataExists) {
-          $hasData[] = $instance;
-          if (!empty($blockValues['is_primary'])) {
-            $hasPrimary[] = $instance;
-          }
-        }
-      }
-
-      if (empty($hasPrimary) && !empty($hasData)) {
-        $errors["email[1][is_primary]"] = ts('One email should be marked as primary.');
-      }
-
-      if (count($hasPrimary) > 1) {
-        $errors["email[" . array_pop($hasPrimary) . "][is_primary]"] = ts('Only one email can be marked as primary.');
-      }
-    }
-    if (!$hasData && !$form->contactHasName) {
-      $errors["email[1][email]"] = ts('Contact with no name must have an email.');
+    $errors = self::validatePrimaryBlock($fields, 'email');
+    if (!$form->contactHasName && !self::hasBlockData($fields, 'email')) {
+      $errors['email[1][email]'] = ts('Contact with no name must have an email.');
     }
     return $errors;
   }
@@ -148,14 +113,9 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
    * @throws CRM_Core_Exception
    */
   public function postProcess(): void {
-    $params = $this->exportValues();
+    $params = $this->getSubmittedValues();
 
-    // Process / save emails
-    foreach ($this->_emails as $count => $value) {
-      if (!empty($value['id']) && isset($params['email'][$count])) {
-        $params['email'][$count]['id'] = $value['id'];
-      }
-    }
+    $this->mergeExistingBlockIds($params, $this->_emails, 'email');
     $this->saveEmails($params['email']);
 
     // Changing email might change a contact's display_name so refresh name block content
