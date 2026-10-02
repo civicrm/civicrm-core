@@ -19,9 +19,10 @@
  * Form helper class for an Website object,
  */
 class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
+  use CRM_Contact_Form_Edit_WebsiteBlockTrait;
 
   /**
-   * Websitess of the contact that is been viewed.
+   * Websites of the contact that is being viewed.
    * @var array
    */
   private $_websites = [];
@@ -38,10 +39,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
   public function preProcess() {
     parent::preProcess();
 
-    //get all the existing websites
-    $params = ['contact_id' => $this->getContactID()];
-    $values = [];
-    $this->_websites = CRM_Core_BAO_Website::getValues($params, $values);
+    $this->_websites = $this->getExistingWebsitesReIndexed();
   }
 
   /**
@@ -53,7 +51,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
     $totalBlocks = $this->calculateAndAssignBlockCounts(count($this->_websites), $this->_blockCount);
 
     for ($blockId = 1; $blockId < $totalBlocks; $blockId++) {
-      CRM_Contact_Form_Edit_Website::buildQuickForm($this, $blockId, TRUE);
+      $this->addWebsiteBlockFields($blockId);
     }
 
     $this->addFormRule(['CRM_Contact_Form_Inline_Website', 'formRule'], $this);
@@ -77,8 +75,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
     $params = $this->getSubmittedValues();
 
     $this->mergeExistingBlockIds($params, $this->_websites, 'website');
-    // Process / save websites
-    CRM_Core_BAO_Website::process($params['website'], $this->getContactID(), TRUE);
+    $this->saveWebsites($params['website']);
 
     $this->log();
     $this->response();

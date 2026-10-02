@@ -27,8 +27,11 @@ class CRM_Contact_Form_Edit_Website {
    *   Reference to the form object.
    * @param int $blockCount
    *   Block number to build.
+   *
+   * @deprecated since 6.20 will be removed around 6.26
    */
   public static function buildQuickForm(&$form, $blockCount = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('addWebsiteBlockFields');
     if (!$blockCount) {
       $blockId = ($form->get('Website_Block_Count')) ? $form->get('Website_Block_Count') : 1;
     }
