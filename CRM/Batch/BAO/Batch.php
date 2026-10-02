@@ -738,10 +738,7 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
           $from .= " LEFT JOIN civicrm_group_contact `civicrm_group_contact-{$params[$field]}` ON contact_a.id = `civicrm_group_contact-{$params[$field]}`.contact_id ";
         }
         if ($field == 'receive_date_relative') {
-          $relativeDate = explode('.', $params[$field]);
-          $date = CRM_Utils_Date::relativeToAbsolute($relativeDate[0], $relativeDate[1]);
-          $values['receive_date_low'] = $date['from'];
-          $values['receive_date_high'] = $date['to'];
+          [$values['receive_date_low'], $values['receive_date_high']] = CRM_Utils_Date::getFromTo($params[$field]);
         }
 
         // Add left joins as they're needed to consider
