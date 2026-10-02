@@ -1,0 +1,10 @@
+<af-form ctrl="afform">
+  <af-entity type="Contact" data="{contact_type: 'Individual'}" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-repeat="Add" af-copy="Copy" max="2">
+    <af-field name="first_name" />
+    <div class="af-container" af-if="([[&quot;Individual1[0][fields][first_name]&quot;,&quot;=&quot;,&quot;\&quot;Ada\&quot;&quot;]])">
+      <af-field name="last_name" defn="{afform_default: 'Default'}" />
+    </div>
+    <af-field name="nick_name" defn="{afform_default: 'Default'}" />
+  </fieldset>
+</af-form>
