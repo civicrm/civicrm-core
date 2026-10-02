@@ -17,6 +17,8 @@ use Civi\Api4\OrderCompletionMetadata;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
+use Civi\Order\Event\OrderValidateEvent;
+use Civi\Order\Event\OrderSaveEvent;
 
 /**
  *
@@ -1864,6 +1866,14 @@ class CRM_Financial_BAO_Order {
     $this->calculateContributionValues();
     // Then we get/calculate the lineitems - they won't have related entity IDs Membership/Participant etc. for new records.
     $this->getLineItems();
+    $event = new OrderValidateEvent($this, 'create');
+    \Civi::dispatcher()->dispatch('civi.order.validate', $event);
+    $errors = $event->getErrors();
+    if ($errors) {
+      \Civi::log('order')->error('Order Validation errors', ['errors' => $errors]);
+      throw new \CRM_Core_Exception(implode("\n", $errors), 0, ['show_detailed_error' => TRUE]);
+    }
+
     return $this;
   }
 
@@ -1875,6 +1885,10 @@ class CRM_Financial_BAO_Order {
    * @throws \CRM_Core_Exception
    */
   public function save(): Result {
+    // Trigger the preSave event
+    $event = new OrderSaveEvent($this, 'create');
+    \Civi::dispatcher()->dispatch('civi.order.preSave', $event);
+
     // Now we must save/create a ContributionRecur before we create related entity IDs because ContributionRecurID is
     //   linked to some related entities, eg. Membership.
     $this->saveContributionRecur();
@@ -1930,6 +1944,11 @@ class CRM_Financial_BAO_Order {
     $result = Contribution::create(FALSE)
       ->setValues($this->contributionValues)->execute();
     $this->saveOrderCompletionMetadata((int) $result->first()['id']);
+
+    // Trigger the postSave event
+    $event = new OrderSaveEvent($this, 'create', (int) $result->first()['id']);
+    \Civi::dispatcher()->dispatch('civi.order.postSave', $event);
+
     return $result;
   }
 
