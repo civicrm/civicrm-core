@@ -810,7 +810,7 @@ class CRM_Utils_Date {
     if ($relative) {
       $dateRange = CRM_Utils_Hook::relativeDate($relative);
       if (!is_array($dateRange) || (empty($dateRange['from']) && empty($dateRange['to']))) {
-        [$term, $unit] = explode('.', $relative, 2);
+        [$term, $unit] = array_pad(explode('.', $relative, 2), 2, NULL);
         $dateRange = self::relativeToAbsolute($term, $unit);
       }
       $from = substr(($dateRange['from'] ?? ''), 0, 8);
@@ -1089,6 +1089,14 @@ class CRM_Utils_Date {
     if ($unit === NULL && str_contains($relativeTerm, '.')) {
       [$relativeTerm, $unit] = explode('.', $relativeTerm, 2);
     }
+
+    // Allow extensions to customize relative dates
+    $hookSql = ['from' => NULL, 'to' => NULL];
+    CRM_Utils_Hook::relativeDateSql($relativeTerm, $unit, $hookSql);
+    if (array_filter($hookSql)) {
+      return $hookSql;
+    }
+
     $unit = strtolower($unit ?? '');
     $intervalUnit = match ($unit) {
       'day' => 'DAY',
@@ -1194,13 +1202,13 @@ class CRM_Utils_Date {
   /**
    * @param string $relativeTerm
    *   Relative time frame: this, previous, previous_1.
-   * @param string $unit
+   * @param string|null $unit
    *   Frequency unit like year, month, week etc.
    *
    * @return array
    *   start date and end date for the relative time frame
    */
-  public static function relativeToAbsolute($relativeTerm, $unit) {
+  public static function relativeToAbsolute($relativeTerm, ?string $unit = NULL) {
     $sql = self::relativeToSql($relativeTerm, $unit);
     if (!$sql) {
       return [];

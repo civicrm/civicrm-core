@@ -3329,13 +3329,41 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * Extensions can define new formats for relative date filter "tokens".
-   * @param string $filter - the filter token, stored in civicrm_option_value
+   * @deprecated since 6.20 will be removed around 6.32. Use hook_civicrm_relativeDateSql instead.
+   *
+   * @param string $filter
    * @return array|false
    *   An array with two elements: $dates['from'] and $dates['to'], or FALSE if the hook isn't in use.
    */
   public static function relativeDate($filter) {
-    return self::singleton()->invoke(['filter'], $filter, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_relativeDate');
+    $result = self::singleton()->invoke(['filter'], $filter, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_relativeDate');
+    if (is_array($result) && !empty(array_filter($result))) {
+      CRM_Core_Error::deprecatedWarning('hook_civicrm_relativeDate is deprecated since 6.20 and will be removed around 6.32. Use hook_civicrm_relativeDateSql instead.');
+    }
+    return $result;
+  }
+
+  /**
+   * Evaluate custom relative date filter formats.
+   *
+   * Extensions can define new formats by adding values to the relative_date_filters,
+   * then implement this hook to transform them into 'from' and 'to' SQL expressions.
+   *
+   * @param string $relativeTerm
+   *   The relative term, e.g. 'this', 'previous', 'previous_2', 'ending_30', 'starting'.
+   * @param string|null $unit
+   *   The date unit, e.g. 'day', 'week', 'month', 'quarter', 'year', 'fiscal_year'.
+   * @param array $sql
+   *   Output SQL expressions ['from' => startExpression, 'to' => endExpression] passed by reference.
+   */
+  public static function relativeDateSql(string $relativeTerm, ?string $unit, array &$sql): void {
+    $null = NULL;
+    self::singleton()->invoke(
+      ['relativeTerm', 'unit', 'sql'],
+      $relativeTerm, $unit, $sql,
+      $null, $null, $null,
+      'civicrm_relativeDateSql'
+    );
   }
 
 }

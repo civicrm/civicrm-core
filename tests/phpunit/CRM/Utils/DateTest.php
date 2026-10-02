@@ -85,16 +85,21 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test that getFromTo returns the correct dates.
+   * Test that getFromTo returns the correct dates and triggers deprecation for hook_civicrm_relativeDate.
    */
   public function testGetFromTo(): void {
     $this->hookClass->setHook('civicrm_relativeDate', [$this, 'hook_civicrm_relativeDate_q1']);
     $cases = $this->fromToData();
-    foreach ($cases as $caseDescription => $case) {
-      [$calculatedFrom, $calculatedTo] = CRM_Utils_Date::getFromTo($case['relative'], $case['from'], $case['to']);
-      $this->assertEquals($case['expectedFrom'], $calculatedFrom, "Expected From failed for case $caseDescription");
-      $this->assertEquals($case['expectedTo'], $calculatedTo, "Expected To failed for case $caseDescription");
-    }
+    $deprecations = self::captureErrors(E_USER_DEPRECATED, function () use ($cases) {
+      foreach ($cases as $caseDescription => $case) {
+        [$calculatedFrom, $calculatedTo] = CRM_Utils_Date::getFromTo($case['relative'], $case['from'], $case['to']);
+        $this->assertEquals($case['expectedFrom'], $calculatedFrom, "Expected From failed for case $caseDescription");
+        $this->assertEquals($case['expectedTo'], $calculatedTo, "Expected To failed for case $caseDescription");
+      }
+    });
+
+    $this->assertCount(1, $deprecations);
+    $this->assertStringContainsString('hook_civicrm_relativeDate is deprecated', $deprecations[0]);
   }
 
   public function hook_civicrm_relativeDate_q1($filter) {
@@ -105,6 +110,64 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       $dates['to'] = (new DateTime('March 31st'))->format('Ymd');
     }
     return $dates;
+  }
+
+  /**
+   * Test hook_civicrm_relativeDateSql.
+   */
+  public function testRelativeDateSqlHook(): void {
+    $this->hookClass->setHook('civicrm_relativeDateSql', [$this, 'hook_civicrm_relativeDateSql_custom']);
+
+    // 1. Custom token handled by hook (returns SQL expressions)
+    $sql = CRM_Utils_Date::relativeToSql('custom_q1');
+    $this->assertEquals([
+      'from' => "STR_TO_DATE('2026-01-01', '%Y-%m-%d')",
+      'to' => "STR_TO_DATE('2026-03-31 23:59:59', '%Y-%m-%d %H:%i:%s')",
+    ], $sql);
+
+    // 2. relativeToAbsolute evaluates the SQL expressions
+    $absolute = CRM_Utils_Date::relativeToAbsolute('custom_q1');
+    $this->assertEquals([
+      'from' => '20260101',
+      'to' => '20260331235959',
+    ], $absolute);
+
+    // 3. getFromTo delegates to relativeToAbsolute and formats 14-char dates
+    [$from, $to] = CRM_Utils_Date::getFromTo('custom_q1');
+    $this->assertEquals('20260101000000', $from);
+    $this->assertEquals('20260331235959', $to);
+
+    // 4. Custom term with a unit
+    $sqlUnit = CRM_Utils_Date::relativeToSql('custom_term', 'week');
+    $this->assertEquals([
+      'from' => "DATE_SUB(CURDATE(), INTERVAL 14 DAY)",
+      'to' => "CURDATE() + INTERVAL 1 DAY - INTERVAL 1 SECOND",
+    ], $sqlUnit);
+
+    // 5. Standard relative date is not affected when hook does not handle it
+    $standardSql = CRM_Utils_Date::relativeToSql('this', 'day');
+    $this->assertEquals([
+      'from' => 'CURDATE()',
+      'to' => 'DATE_ADD(CURDATE(), INTERVAL 1 DAY) - INTERVAL 1 SECOND',
+    ], $standardSql);
+
+    // 6. Unknown filter where hook does not modify $sql returns NULL
+    $this->assertNull(CRM_Utils_Date::relativeToSql('unhandled_token'));
+  }
+
+  public function hook_civicrm_relativeDateSql_custom(string $relativeTerm, ?string $unit, array &$sql): void {
+    if ($relativeTerm === 'custom_q1') {
+      $sql = [
+        'from' => "STR_TO_DATE('2026-01-01', '%Y-%m-%d')",
+        'to' => "STR_TO_DATE('2026-03-31 23:59:59', '%Y-%m-%d %H:%i:%s')",
+      ];
+    }
+    elseif ($relativeTerm === 'custom_term' && $unit === 'week') {
+      $sql = [
+        'from' => "DATE_SUB(CURDATE(), INTERVAL 14 DAY)",
+        'to' => "CURDATE() + INTERVAL 1 DAY - INTERVAL 1 SECOND",
+      ];
+    }
   }
 
   /**
@@ -2664,7 +2727,6 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       $this->assertTrue($result['from'] || $result['to'], "Filter $filter should return at least from or to");
     }
   }
-
 
   public function testLocalizeConstants(): void {
     // Depending on the local version of the system-library `icu`, abbreviations
