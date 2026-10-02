@@ -26,7 +26,8 @@ use Civi\Api4\Generic\Result;
  *  code has adequate unit test cover.
  */
 trait CRM_Contact_Form_Edit_EmailBlockTrait {
-  use CRM_Contact_Form_Edit_BlockCustomDataTrait;
+
+  use CRM_Contact_Form_Edit_BlockTrait;
   use EntityLookupTrait;
 
   /**
@@ -55,11 +56,7 @@ trait CRM_Contact_Form_Edit_EmailBlockTrait {
           ->execute();
       }
       elseif (!$nonContact && $this->getContactID()) {
-        $this->existingEmails = Email::get()
-          ->addSelect('*', 'custom.*')
-          ->addOrderBy('is_primary', 'DESC')
-          ->addWhere('contact_id', '=', $this->getContactID())
-          ->execute();
+        $this->existingEmails = $this->getExistingBlocks('Email');
       }
     }
     return isset($this->existingEmails) ? $this->existingEmails : new Result();
@@ -94,18 +91,15 @@ trait CRM_Contact_Form_Edit_EmailBlockTrait {
   }
 
   /**
-   * Get the open ids indexed numerically from 1.
+   * Get the emails indexed numerically from 1.
    *
    * This reflects historical form requirements.
    *
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function getExistingEmailsReIndexed() : array {
-    $result = array_merge([0 => 1], (array) $this->getExistingEmails());
-    unset($result[0]);
-    return $result;
+  public function getExistingEmailsReIndexed(): array {
+    return $this->getLocationBlockID() ? array_combine(range(1, count($this->getExistingEmails())), (array) $this->getExistingEmails()) : $this->getExistingBlocks('Email', 1);
   }
 
   /**
@@ -182,44 +176,10 @@ trait CRM_Contact_Form_Edit_EmailBlockTrait {
   }
 
   /**
-   * @throws UnauthorizedException
    * @throws CRM_Core_Exception
    */
   public function saveEmails(array $emails): void {
-    $existingEmails = (array) $this->getExistingEmails()->indexBy('id');
-    foreach ($emails as $index => $email) {
-      $id = $email['id'] ?? NULL;
-      $dataExists = !CRM_Utils_System::isNull($email['email']);
-      if (!$dataExists) {
-        unset($emails[$index]);
-        continue;
-      }
-      if (!array_key_exists('contact_id', $email)) {
-        $emails[$index]['contact_id'] = $this->getContactID();
-      }
-      if ($id) {
-        if (array_key_exists($id, $existingEmails)) {
-          // We unset this here because we are going to delete any existing
-          // emails that were not in the incoming array.
-          unset($existingEmails[$id]);
-        }
-        else {
-          // The id is not valid, this becomes a create.
-          unset($email['id']);
-        }
-      }
-    }
-    if ($emails) {
-      Email::save()
-        ->setRecords($emails)
-        ->execute();
-    }
-
-    if (!empty($existingEmails)) {
-      Email::delete()->addWhere('id', 'IN', array_keys($existingEmails))
-        ->execute();
-    }
-
+    $this->saveBlocks('Email', $emails);
   }
 
 }

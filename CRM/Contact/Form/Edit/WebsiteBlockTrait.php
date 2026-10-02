@@ -10,7 +10,6 @@
  */
 
 use Civi\Api4\Generic\Result;
-use Civi\Api4\Website;
 
 /**
  * Form helper trait for including websites in forms.
@@ -20,23 +19,14 @@ use Civi\Api4\Website;
  */
 trait CRM_Contact_Form_Edit_WebsiteBlockTrait {
 
-  /**
-   * @var \Civi\Api4\Generic\Result
-   */
-  private Result $existingWebsites;
+  use CRM_Contact_Form_Edit_BlockTrait;
 
   /**
    * @return \Civi\Api4\Generic\Result
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function getExistingWebsites(): Result {
-    if (!isset($this->existingWebsites)) {
-      $this->existingWebsites = Website::get(FALSE)
-        ->addWhere('contact_id', '=', $this->getContactID())
-        ->execute();
-    }
-    return $this->existingWebsites;
+    return $this->getExistingBlocks('Website');
   }
 
   /**
@@ -46,12 +36,9 @@ trait CRM_Contact_Form_Edit_WebsiteBlockTrait {
    *
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function getExistingWebsitesReIndexed(): array {
-    $result = array_merge([0 => 1], (array) $this->getExistingWebsites());
-    unset($result[0]);
-    return $result;
+    return $this->getExistingBlocks('Website', 1);
   }
 
   /**
@@ -80,40 +67,7 @@ trait CRM_Contact_Form_Edit_WebsiteBlockTrait {
    * @throws \CRM_Core_Exception
    */
   public function saveWebsites(array $websites): void {
-    $existingWebsites = (array) $this->getExistingWebsites()->indexBy('id');
-    foreach ($websites as $index => $website) {
-      $id = $website['id'] ?? NULL;
-      $dataExists = !CRM_Utils_System::isNull($website['url']);
-      if (!$dataExists) {
-        unset($websites[$index]);
-        continue;
-      }
-      if (!array_key_exists('contact_id', $website)) {
-        $websites[$index]['contact_id'] = $this->getContactID();
-      }
-      if ($id) {
-        if (array_key_exists($id, $existingWebsites)) {
-          // We unset this here because we are going to delete any existing
-          // websites that were not in the incoming array.
-          unset($existingWebsites[$id]);
-        }
-        else {
-          // The id is not valid, this becomes a create.
-          unset($website['id']);
-        }
-      }
-    }
-    if ($websites) {
-      Website::save(FALSE)
-        ->setRecords($websites)
-        ->execute();
-    }
-
-    if (!empty($existingWebsites)) {
-      Website::delete(FALSE)
-        ->addWhere('id', 'IN', array_keys($existingWebsites))
-        ->execute();
-    }
+    $this->saveBlocks('Website', $websites);
   }
 
 }

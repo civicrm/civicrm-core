@@ -9,13 +9,6 @@
  +--------------------------------------------------------------------+
  */
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC https://civicrm.org/licensing
- */
-
-use Civi\Api4\OpenID;
 use Civi\Api4\Generic\Result;
 
 /**
@@ -25,28 +18,15 @@ use Civi\Api4\Generic\Result;
  *  code has adequate unit test cover.
  */
 trait CRM_Contact_Form_Edit_OpenIDBlockTrait {
-  use CRM_Contact_Form_Edit_BlockCustomDataTrait;
+
+  use CRM_Contact_Form_Edit_BlockTrait;
 
   /**
-   * @var \Civi\Api4\Generic\Result
-   */
-  private Result $existingOpenIDs;
-
-  /**
-   *
    * @return \Civi\Api4\Generic\Result
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function getExistingOpenIDs() : Result {
-    if (!isset($this->existingOpenIDs)) {
-      $this->existingOpenIDs = OpenID::get()
-        ->addSelect('*', 'custom.*', 'location_type_id:label')
-        ->addOrderBy('is_primary', 'DESC')
-        ->addWhere('contact_id', '=', $this->getContactID())
-        ->execute();
-    }
-    return $this->existingOpenIDs;
+  public function getExistingOpenIDs(): Result {
+    return $this->getExistingBlocks('OpenID');
   }
 
   /**
@@ -56,12 +36,9 @@ trait CRM_Contact_Form_Edit_OpenIDBlockTrait {
    *
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function getExistingOpenIDsReIndexed() : array {
-    $result = array_merge([0 => 1], (array) $this->getExistingOpenIDs());
-    unset($result[0]);
-    return $result;
+  public function getExistingOpenIDsReIndexed(): array {
+    return $this->getExistingBlocks('OpenID', 1);
   }
 
   /**
@@ -89,40 +66,7 @@ trait CRM_Contact_Form_Edit_OpenIDBlockTrait {
    * @throws CRM_Core_Exception
    */
   public function saveOpenIDs(array $openIDs): void {
-    $existingOpenIDs = (array) $this->getExistingOpenIDs()->indexBy('id');
-    foreach ($openIDs as $index => $openID) {
-      $id = $openID['id'] ?? NULL;
-      $dataExists = !CRM_Utils_System::isNull($openID['openid']);
-      if (!$dataExists) {
-        unset($openIDs[$index]);
-        continue;
-      }
-      if (!array_key_exists('contact_id', $openID)) {
-        $openIDs[$index]['contact_id'] = $this->getContactID();
-      }
-      if ($id) {
-        if (array_key_exists($id, $existingOpenIDs)) {
-          // We unset this here because we are going to delete any existing
-          // openIDs that were not in the incoming array.
-          unset($existingOpenIDs[$id]);
-        }
-        else {
-          // The id is not valid, this becomes a create.
-          unset($openID['id']);
-        }
-      }
-    }
-    if ($openIDs) {
-      OpenID::save()
-        ->setRecords($openIDs)
-        ->execute();
-    }
-
-    if (!empty($existingOpenIDs)) {
-      OpenID::delete()->addWhere('id', 'IN', array_keys($existingOpenIDs))
-        ->execute();
-    }
-
+    $this->saveBlocks('OpenID', $openIDs);
   }
 
 }
