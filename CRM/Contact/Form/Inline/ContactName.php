@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Email;
+
 /**
  * Form helper class for contact name section.
  */
@@ -47,7 +49,10 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
     if (empty($fields['first_name']) && empty($fields['last_name'])
       && empty($fields['organization_name'])
       && empty($fields['household_name'])) {
-      $emails = civicrm_api3('Email', 'getcount', ['contact_id' => $form->_contactId]);
+      $emails = Email::get(FALSE)
+        ->addWhere('contact_id', '=', $form->getContactID())
+        ->selectRowCount()
+        ->execute()->count();
       if (!$emails) {
         $errorField = $form->_contactType == 'Individual' ? 'last' : strtolower($form->_contactType);
         $errors[$errorField . '_name'] = ts('Contact with no email must have a name.');
