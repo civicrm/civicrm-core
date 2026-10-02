@@ -221,8 +221,9 @@
           }
         }
 
+        // Value precedence, lowest first: afform_default, stored value (first load only),
+        // SearchParamSet, route params. On first load the routeParams watch applies the last two.
         function initializeValue(firstLoad) {
-          // Set default value if specified. Note that setValueFromUrl() will override this.
           if (firstLoad && ctrl.afFieldset?.getStoredValue(ctrl.fieldName) !== undefined) {
             setValue(ctrl.afFieldset.getStoredValue(ctrl.fieldName));
           }
@@ -254,6 +255,11 @@
                 ctrl.inputAttrs.push(attrs);
               }
             }
+          }
+
+          // On reset, a loaded SearchParamSet replaces the defaults, as its columns do in crmSearchDisplayTable
+          if (!firstLoad && ctrl.afFieldset?.selectedSearchParamSet?.filters) {
+            setValueFromRouteParams($scope.$parent.routeParams);
           }
         }
 
