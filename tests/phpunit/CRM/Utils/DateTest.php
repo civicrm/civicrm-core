@@ -2649,6 +2649,23 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     ], $date);
   }
 
+  /**
+   * Ensure relativeToAbsolute() executes cleanly for all defined option group filters.
+   */
+  public function testRelativeToAbsoluteAllOptionGroupFilters(): void {
+    $filters = \CRM_Core_OptionGroup::values('relative_date_filters');
+    $this->assertNotEmpty($filters);
+    foreach ($filters as $filter => $label) {
+      [$term, $unit] = explode('.', $filter, 2);
+      $result = \CRM_Utils_Date::relativeToAbsolute($term, $unit);
+      // Array keys 'from' and 'to' should exist and be a non-empty string or NULL
+      $this->assertTrue((is_string($result['from']) && strlen($result['from'])) || is_null($result['from']));
+      $this->assertTrue((is_string($result['to']) && strlen($result['to'])) || is_null($result['to']));
+      $this->assertTrue($result['from'] || $result['to'], "Filter $filter should return at least from or to");
+    }
+  }
+
+
   public function testLocalizeConstants(): void {
     // Depending on the local version of the system-library `icu`, abbreviations
     // -might- have a trailing dot. (Ex: icu@64 has trailing dot, but icu@73 does not.)
