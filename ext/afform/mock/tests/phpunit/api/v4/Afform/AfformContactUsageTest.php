@@ -504,19 +504,14 @@ EOHTML;
       ],
     ];
 
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues($values)
-        ->execute();
-      $this->fail('Should have thrown exception');
-    }
-    catch (\CRM_Core_Exception $e) {
-      // Should fail required fields missing
-      $this->assertStringContainsString('First Name is a required field', $e->getMessage());
-      $this->assertStringContainsString('Email is a required field', $e->getMessage());
-    }
-
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues($values)
+      ->execute();
+    // Should fail required fields missing
+    $msg = $this->getBlockingErrorMessages($result);
+    $this->assertStringContainsString('First Name is a required field', $msg);
+    $this->assertStringContainsString('Email is a required field', $msg);
   }
 
   public function testFormValidationMaxlength(): void {
@@ -541,17 +536,12 @@ EOHTML;
       ],
     ];
 
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues($values)
-        ->execute();
-      $this->fail('Should have thrown exception');
-    }
-    catch (\CRM_Core_Exception $e) {
-      // Should fail required fields missing
-      $this->assertEquals('Last Name has a max length of 20.', $e->getMessage());
-    }
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues($values)
+      ->execute();
+    // Should fail required fields missing
+    $this->assertEquals('Last Name has a max length of 20.', $this->getBlockingErrorMessages($result));
   }
 
   public function testFormValidationEntityJoinFields(): void {
@@ -574,18 +564,12 @@ EOHTML;
       ],
     ];
 
-    try {
-      Afform::submit()
-        ->setName($this->formName)
-        ->setValues($values)
-        ->execute();
-      $this->fail('Should have thrown exception');
-    }
-    catch (\CRM_Core_Exception $e) {
-      // Should fail required fields missing
-      $this->assertEquals('Email is a required field.', $e->getMessage());
-    }
-
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues($values)
+      ->execute();
+    // Should fail required fields missing
+    $this->assertEquals('Email is a required field.', $this->getBlockingErrorMessages($result));
   }
 
   public function testSubmissionLimit() {

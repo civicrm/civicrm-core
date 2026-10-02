@@ -58,7 +58,7 @@ class AfformReCaptcha2 extends AutoService implements EventSubscriberInterface {
     if (AHQ::getTags($layout, 'crm-recaptcha2')) {
       $response = $event->getApiRequest()->getValues()['extra']['recaptcha2'] ?? NULL;
       if (!isset($response) || !\CRM_Utils_ReCAPTCHA::checkResponse($response)) {
-        $event->addError(E::ts('Please go back and complete the CAPTCHA at the bottom of this form.'));
+        $event->getResult()->addError(E::ts('Please go back and complete the CAPTCHA at the bottom of this form.'));
       }
     }
   }
