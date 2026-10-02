@@ -94,8 +94,11 @@ trait ResultDataTrait {
    * @param string $fileName
    */
   private function outputCSV(array $rows, array $columns, string $fileName) {
+    $delimiter = \Civi::settings()->get('fieldSeparator');
+
     $csv = Writer::from(new \SplTempFileObject());
     $csv->setOutputBOM(Bom::Utf8);
+    $csv->setDelimiter($delimiter);
 
     // Header row
     $csv->insertOne(array_column($columns, 'label'));
