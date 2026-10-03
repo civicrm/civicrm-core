@@ -16,47 +16,47 @@
 
 {*CRM-4320*}
 {if $statusMessage}
-    <div class="messages status no-popup">
-        <p>{$statusMessage}</p>
-    </div>
-{/if}
-
-<div class="crm-public-form-item crm-section custom_pre-section">
-  {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre prefix=false hideFieldset=false}
-</div>
-
-{if $priceSet && $allowGroupOnWaitlist}
-    {include file="CRM/Price/Form/ParticipantCount.tpl"}
-    <div id="waiting-status" style="display:none;" class="messages status no-popup"></div>
-    <div class="messages status no-popup" style="width:25%"><span id="event_participant_status"></span></div>
+  <div class="messages status no-popup">
+    <p>{$statusMessage}</p>
+  </div>
 {/if}
 
 <div class="crm-event-id-{$event.id} crm-block crm-event-additionalparticipant-form-block">
-{if $priceSet}
-     <fieldset id="priceset" class="crm-public-form-item crm-group priceset-group"><legend>{$event.fee_label}</legend>
-        {include file="CRM/Price/Form/PriceSet.tpl" extends="Event" hideTotal=false isAdditionalParticipants=true}
+  <div class="crm-public-form-item crm-section custom_pre-section">
+    {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPre prefix=false hideFieldset=false}
+  </div>
+
+  {if $priceSet && $allowGroupOnWaitlist}
+    {include file="CRM/Price/Form/ParticipantCount.tpl"}
+    <div id="waiting-status" style="display:none;" class="messages status no-popup"></div>
+    <div class="messages status no-popup" style="width:25%"><span id="event_participant_status"></span></div>
+  {/if}
+
+  {if $priceSet}
+    <fieldset id="priceset" class="crm-public-form-item crm-group priceset-group"><legend>{$event.fee_label}</legend>
+      {include file="CRM/Price/Form/PriceSet.tpl" extends="Event" hideTotal=false isAdditionalParticipants=true}
     </fieldset>
-{else}
+  {else}
     {if $paidEvent}
-        <table class="form-layout-compressed">
-            <tr class="crm-event-additionalparticipant-form-block-amount">
-                <td class="label nowrap">{$event.fee_label} <span class="crm-marker">*</span></td>
-                <td>&nbsp;</td>
-                <td>{$form.amount.html}</td>
-            </tr>
-        </table>
+      <table class="form-layout-compressed">
+        <tr class="crm-event-additionalparticipant-form-block-amount">
+          <td class="label nowrap">{$event.fee_label} <span class="crm-marker">*</span></td>
+          <td>&nbsp;</td>
+          <td>{$form.amount.html}</td>
+        </tr>
+      </table>
     {/if}
-{/if}
+  {/if}
 
-<div class="crm-public-form-item crm-section custom_post-section">
-  {foreach from=$postPageProfiles item=additionalCustomPost}
-    {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost prefix=false hideFieldset=false}
-  {/foreach}
-</div>
+  <div class="crm-public-form-item crm-section custom_post-section">
+    {foreach from=$postPageProfiles item=additionalCustomPost}
+      {include file="CRM/UF/Form/Block.tpl" fields=$additionalCustomPost prefix=false hideFieldset=false}
+    {/foreach}
+  </div>
 
-<div id="crm-submit-buttons" class="crm-submit-buttons">
+  <div id="crm-submit-buttons" class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location=''}
-</div>
+  </div>
 </div>
 
 {if $priceSet && $allowGroupOnWaitlist}
