@@ -186,4 +186,42 @@ class Api4SelectQueryTest extends Api4TestBase {
     $this->assertArrayHasKey('dupe', $result[0]);
   }
 
+  /**
+   * Test parity between CRM_Utils_Date::getFromTo() and CRM_Utils_Date::relativeToSql()
+   */
+  public function testRelativeDateParity(): void {
+    $filters = \CRM_Core_OptionGroup::values('relative_date_filters');
+    $mismatches = [];
+
+    foreach ($filters as $filter => $label) {
+      [$phpFrom, $phpTo] = \CRM_Utils_Date::getFromTo($filter);
+      $sql = \CRM_Utils_Date::relativeToSql($filter);
+      if (!$sql) {
+        $mismatches[$filter] = 'relativeToSql returned NULL';
+        continue;
+      }
+      $sqlFrom = $sql['from'];
+      $sqlTo = $sql['to'];
+      $mysqlFrom = $sqlFrom ? \CRM_Core_DAO::singleValueQuery("SELECT DATE_FORMAT($sqlFrom, '%Y%m%d%H%i%s')") : NULL;
+      $mysqlTo = $sqlTo ? \CRM_Core_DAO::singleValueQuery("SELECT DATE_FORMAT($sqlTo, '%Y%m%d%H%i%s')") : NULL;
+
+      if ($phpFrom !== $mysqlFrom) {
+        $mismatches[$filter]['from'] = [
+          'php' => $phpFrom,
+          'mysql' => $mysqlFrom,
+          'sql' => $sqlFrom,
+        ];
+      }
+      if ($phpTo !== $mysqlTo) {
+        $mismatches[$filter]['to'] = [
+          'php' => $phpTo,
+          'mysql' => $mysqlTo,
+          'sql' => $sqlTo,
+        ];
+      }
+    }
+
+    $this->assertEmpty($mismatches, "Mismatched relative dates:\n" . print_r($mismatches, TRUE));
+  }
+
 }

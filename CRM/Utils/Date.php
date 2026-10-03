@@ -810,7 +810,7 @@ class CRM_Utils_Date {
     if ($relative) {
       $dateRange = CRM_Utils_Hook::relativeDate($relative);
       if (!is_array($dateRange) || (empty($dateRange['from']) && empty($dateRange['to']))) {
-        [$term, $unit] = explode('.', $relative, 2);
+        [$term, $unit] = array_pad(explode('.', $relative, 2), 2, NULL);
         $dateRange = self::relativeToAbsolute($term, $unit);
       }
       $from = substr(($dateRange['from'] ?? ''), 0, 8);
@@ -1076,753 +1076,162 @@ class CRM_Utils_Date {
   }
 
   /**
-   * Resolves the given relative time interval into finite time limits.
+   * Helper to convert CiviCRM relative date filters into MySQL expressions.
    *
    * @param string $relativeTerm
+   *   The relative term, e.g. 'this', 'previous', 'previous_2', 'ending_30', 'starting'.
+   * @param string|null $unit
+   *   The date unit, e.g. 'day', 'week', 'month', 'quarter', 'year', 'fiscal_year'.
+   * @return array|null
+   *   ['from' => startExpression, 'to' => endExpression] (elements may be NULL for open-ended ranges).
+   */
+  public static function relativeToSql(string $relativeTerm, ?string $unit = NULL): ?array {
+    if ($unit === NULL && str_contains($relativeTerm, '.')) {
+      [$relativeTerm, $unit] = explode('.', $relativeTerm, 2);
+    }
+
+    // Allow extensions to customize relative dates
+    $hookSql = ['from' => NULL, 'to' => NULL];
+    CRM_Utils_Hook::relativeDateSql($relativeTerm, $unit, $hookSql);
+    if (array_filter($hookSql)) {
+      return $hookSql;
+    }
+
+    $unit = strtolower($unit ?? '');
+    $intervalUnit = match ($unit) {
+      'day' => 'DAY',
+      'week' => 'WEEK',
+      'month' => 'MONTH',
+      'quarter' => 'QUARTER',
+      'year', 'fiscal_year' => 'YEAR',
+      default => NULL,
+    };
+    if (!$intervalUnit) {
+      return NULL;
+    }
+
+    $mysqlWeekStart = (\Civi::settings()->get('weekBegins') ?? 0) + 1;
+    $fyStartSetting = \CRM_Core_Config::singleton()->fiscalYearStart;
+    $fyMonth = (int) ($fyStartSetting['M'] ?? 1);
+    $fyDay = (int) ($fyStartSetting['d'] ?? 1);
+    $fyThisYear = "STR_TO_DATE(CONCAT(YEAR(CURDATE()), '-$fyMonth-$fyDay'), '%Y-%m-%d')";
+
+    $startExpr = match ($unit) {
+      'day' => 'CURDATE()',
+      'week' => "DATE_SUB(CURDATE(), INTERVAL MOD(DAYOFWEEK(CURDATE()) - $mysqlWeekStart + 7, 7) DAY)",
+      'month' => "DATE_FORMAT(CURDATE(), '%Y-%m-01')",
+      'quarter' => "DATE_ADD(MAKEDATE(YEAR(CURDATE()), 1), INTERVAL (QUARTER(CURDATE()) - 1) * 3 MONTH)",
+      'year' => "DATE_FORMAT(CURDATE(), '%Y-01-01')",
+      'fiscal_year' => "IF(CURDATE() >= $fyThisYear, $fyThisYear, STR_TO_DATE(CONCAT(YEAR(CURDATE()) - 1, '-$fyMonth-$fyDay'), '%Y-%m-%d'))",
+    };
+
+    $action = match ($relativeTerm) {
+      'previous_before' => 'previous_before',
+      default => preg_replace('/_\d+$/', '', $relativeTerm),
+    };
+    $count = match ($relativeTerm) {
+      'previous_before' => 1,
+      default => (int) (explode('_', $relativeTerm)[1] ?? 1),
+    };
+
+    $endingFrom = match (TRUE) {
+      $unit === 'day' => "DATE_SUB(CURDATE(), INTERVAL " . ($count - 1) . " DAY)",
+      $relativeTerm === 'ending' && $unit === 'month' => "DATE_SUB(CURDATE(), INTERVAL 29 DAY)",
+      $relativeTerm === 'ending' && $unit === 'quarter' => "DATE_SUB(CURDATE(), INTERVAL 89 DAY)",
+      $relativeTerm === 'ending' && $unit === 'week' => "DATE_SUB(CURDATE(), INTERVAL 6 DAY)",
+      default => "DATE_SUB(CURDATE() + INTERVAL 1 DAY, INTERVAL $count $intervalUnit)",
+    };
+
+    $startingTo = match (TRUE) {
+      $unit === 'day' => "CURDATE() + INTERVAL 2 DAY - INTERVAL 1 SECOND",
+      $unit === 'week' => "DATE_ADD(CURDATE(), INTERVAL " . ($count * 7) . " DAY) - INTERVAL 1 SECOND",
+      $unit === 'month' => "DATE_ADD(CURDATE(), INTERVAL " . ($count * 30) . " DAY) - INTERVAL 1 SECOND",
+      $unit === 'quarter' => "DATE_ADD(CURDATE(), INTERVAL " . ($count * 90) . " DAY) - INTERVAL 1 SECOND",
+      default => "DATE_ADD(CURDATE(), INTERVAL $count $intervalUnit) - INTERVAL 1 SECOND",
+    };
+
+    return match ($action) {
+      'this' => [
+        'from' => $count > 1 ? "DATE_SUB($startExpr, INTERVAL " . ($count - 1) . " $intervalUnit)" : $startExpr,
+        'to' => "DATE_ADD($startExpr, INTERVAL 1 $intervalUnit) - INTERVAL 1 SECOND",
+      ],
+      'previous' => [
+        'from' => "DATE_SUB($startExpr, INTERVAL $count $intervalUnit)",
+        'to' => "$startExpr - INTERVAL 1 SECOND",
+      ],
+      'previous_before' => [
+        'from' => "DATE_SUB($startExpr, INTERVAL 2 $intervalUnit)",
+        'to' => "DATE_SUB($startExpr, INTERVAL 1 $intervalUnit) - INTERVAL 1 SECOND",
+      ],
+      'next' => [
+        'from' => "DATE_ADD($startExpr, INTERVAL 1 $intervalUnit)",
+        'to' => "DATE_ADD($startExpr, INTERVAL " . ($count + 1) . " $intervalUnit) - INTERVAL 1 SECOND",
+      ],
+      'current' => [
+        'from' => $startExpr,
+        'to' => "CURDATE() + INTERVAL 1 DAY - INTERVAL 1 SECOND",
+      ],
+      'earlier' => [
+        'from' => NULL,
+        'to' => "DATE_SUB($startExpr, INTERVAL 1 SECOND)",
+      ],
+      'greater' => [
+        'from' => $startExpr,
+        'to' => NULL,
+      ],
+      'greater_previous' => [
+        'from' => "DATE_SUB($startExpr, INTERVAL 1 DAY)",
+        'to' => NULL,
+      ],
+      'less' => [
+        'from' => NULL,
+        'to' => "DATE_ADD($startExpr, INTERVAL 1 $intervalUnit) - INTERVAL 1 SECOND",
+      ],
+      'ending' => [
+        'from' => $endingFrom,
+        'to' => "CURDATE() + INTERVAL 1 DAY - INTERVAL 1 SECOND",
+      ],
+      'starting' => [
+        'from' => $unit === 'day' ? "CURDATE() + INTERVAL 1 DAY" : "CURDATE()",
+        'to' => $startingTo,
+      ],
+      default => NULL,
+    };
+  }
+
+  /**
+   * @param string $relativeTerm
    *   Relative time frame: this, previous, previous_1.
-   * @param int $unit
+   * @param string|null $unit
    *   Frequency unit like year, month, week etc.
    *
    * @return array
    *   start date and end date for the relative time frame
    */
-  public static function relativeToAbsolute($relativeTerm, $unit) {
-    $now = getdate(CRM_Utils_Time::time());
-    $from = $to = $dateRange = [];
-    $from['H'] = $from['i'] = $from['s'] = 0;
-    $to['H'] = 23;
-    $to['i'] = $to['s'] = 59;
-    $relativeTermParts = explode('_', $relativeTerm);
-    $relativeTermPrefix = $relativeTermParts[0];
-    $relativeTermSuffix = $relativeTermParts[1] ?? '';
-
-    switch ($unit) {
-      case 'year':
-        switch ($relativeTerm) {
-          case 'previous':
-            $from['M'] = $from['d'] = 1;
-            $to['d'] = 31;
-            $to['M'] = 12;
-            $to['Y'] = $from['Y'] = $now['year'] - 1;
-            break;
-
-          case 'previous_before':
-            $from['M'] = $from['d'] = 1;
-            $to['d'] = 31;
-            $to['M'] = 12;
-            $to['Y'] = $from['Y'] = $now['year'] - 2;
-            break;
-
-          case 'previous_2':
-            $from['M'] = $from['d'] = 1;
-            $to['d'] = 31;
-            $to['M'] = 12;
-            $from['Y'] = $now['year'] - 2;
-            $to['Y'] = $now['year'] - 1;
-            break;
-
-          case 'earlier':
-            $to['d'] = 31;
-            $to['M'] = 12;
-            $to['Y'] = $now['year'] - 1;
-            unset($from);
-            break;
-
-          case 'greater':
-            $from['M'] = $from['d'] = 1;
-            $from['Y'] = $now['year'];
-            unset($to);
-            break;
-
-          case 'greater_previous':
-            $from['d'] = 31;
-            $from['M'] = 12;
-            $from['Y'] = $now['year'] - 1;
-            unset($to);
-            break;
-
-          case 'ending':
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            $from = self::intervalAdd('year', -1, $to);
-            $from = self::intervalAdd('second', 1, $from);
-            break;
-
-          case 'current':
-            $from['M'] = $from['d'] = 1;
-            $from['Y'] = $now['year'];
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            break;
-
-          case 'ending_2':
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            $from = self::intervalAdd('year', -2, $to);
-            $from = self::intervalAdd('second', 1, $from);
-            break;
-
-          case 'ending_3':
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            $from = self::intervalAdd('year', -3, $to);
-            $from = self::intervalAdd('second', 1, $from);
-            break;
-
-          case 'less':
-            $to['d'] = 31;
-            $to['M'] = 12;
-            $to['Y'] = $now['year'];
-            unset($from);
-            break;
-
-          case 'next':
-            $from['M'] = $from['d'] = 1;
-            $to['d'] = 31;
-            $to['M'] = 12;
-            $to['Y'] = $from['Y'] = $now['year'] + 1;
-            break;
-
-          case 'starting':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $to['d'] = $now['mday'] - 1;
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'] + 1;
-            break;
-
-          default:
-            switch ($relativeTermPrefix) {
-
-              case 'ending':
-                $to['d'] = $now['mday'];
-                $to['M'] = $now['mon'];
-                $to['Y'] = $now['year'];
-                $from = self::intervalAdd('year', -$relativeTermSuffix, $to);
-                $from = self::intervalAdd('second', 1, $from);
-                break;
-
-              case 'this':
-                $from['d'] = $from['M'] = 1;
-                $to['d'] = 31;
-                $to['M'] = 12;
-                $to['Y'] = $from['Y'] = $now['year'];
-                if (is_numeric($relativeTermSuffix)) {
-                  $from['Y'] -= ($relativeTermSuffix - 1);
-                }
-                break;
-            }
-            break;
-        }
-        break;
-
-      case 'fiscal_year':
-        $config = CRM_Core_Config::singleton();
-        $from['d'] = $config->fiscalYearStart['d'];
-        $from['M'] = $config->fiscalYearStart['M'];
-        $fYear = self::calculateFiscalYear($from['d'], $from['M']);
-        switch ($relativeTermPrefix) {
-          case 'this':
-            $from['Y'] = $fYear;
-            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
-            $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
-            $to['d'] = $fiscalEnd['2'];
-            $to['M'] = $fiscalEnd['1'];
-            $to['Y'] = $fiscalEnd['0'];
-            if (is_numeric($relativeTermSuffix)) {
-              $from = self::intervalAdd('year', (-$relativeTermSuffix), $to);
-              $from = self::intervalAdd('second', 1, $from);
-            }
-            break;
-
-          case 'previous':
-            if (!is_numeric($relativeTermSuffix)) {
-              $from['Y'] = ($relativeTermSuffix === 'before') ? $fYear - 2 : $fYear - 1;
-              $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
-              $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
-              $to['d'] = $fiscalEnd['2'];
-              $to['M'] = $fiscalEnd['1'];
-              $to['Y'] = $fiscalEnd['0'];
-            }
-            else {
-              $from['Y'] = $fYear - $relativeTermSuffix;
-              $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + $relativeTermSuffix);
-              $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
-              $to['d'] = $fiscalEnd['2'];
-              $to['M'] = $fiscalEnd['1'];
-              // We need the year from FiscalEnd, instead of just fYear, because these differ if the FY starts on Jan 1
-              $to['Y'] = $fiscalEnd['0'];
-            }
-            break;
-
-          case 'next':
-            $from['Y'] = $fYear + 1;
-            $fiscalYear = mktime(0, 0, 0, $from['M'], $from['d'] - 1, $from['Y'] + 1);
-            $fiscalEnd = explode('-', date("Y-m-d", $fiscalYear));
-            $to['d'] = $fiscalEnd['2'];
-            $to['M'] = $fiscalEnd['1'];
-            $to['Y'] = $fiscalEnd['0'];
-            break;
-        }
-        break;
-
-      case 'quarter':
-        switch ($relativeTerm) {
-          case 'this':
-
-            $quarter = ceil($now['mon'] / 3);
-            $from['d'] = 1;
-            $from['M'] = (3 * $quarter) - 2;
-            $to['M'] = 3 * $quarter;
-            $to['Y'] = $from['Y'] = $now['year'];
-            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $now['year']));
-            break;
-
-          case 'previous':
-            $difference = 1;
-            $quarter = ceil($now['mon'] / 3);
-            $quarter = $quarter - $difference;
-            $subtractYear = 0;
-            if ($quarter <= 0) {
-              $subtractYear = 1;
-              $quarter += 4;
-            }
-            $from['d'] = 1;
-            $from['M'] = (3 * $quarter) - 2;
-            $to['M'] = 3 * $quarter;
-            $to['Y'] = $from['Y'] = $now['year'] - $subtractYear;
-            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
-            break;
-
-          case 'previous_before':
-            $difference = 2;
-            $quarter = ceil($now['mon'] / 3);
-            $quarter = $quarter - $difference;
-            $subtractYear = 0;
-            if ($quarter <= 0) {
-              $subtractYear = 1;
-              $quarter += 4;
-            }
-            $from['d'] = 1;
-            $from['M'] = (3 * $quarter) - 2;
-            $to['M'] = 3 * $quarter;
-            $to['Y'] = $from['Y'] = $now['year'] - $subtractYear;
-            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
-            break;
-
-          case 'previous_2':
-            $difference = 2;
-            $quarter = ceil($now['mon'] / 3);
-            $current_quarter = $quarter;
-            $quarter = $quarter - $difference;
-            $subtractYear = 0;
-            if ($quarter <= 0) {
-              $subtractYear = 1;
-              $quarter += 4;
-            }
-            $from['d'] = 1;
-            $from['M'] = (3 * $quarter) - 2;
-            switch ($current_quarter) {
-              case 1:
-                $to['M'] = (4 * $quarter);
-                break;
-
-              case 2:
-                $to['M'] = (4 * $quarter) + 3;
-                break;
-
-              case 3:
-                $to['M'] = (4 * $quarter) + 2;
-                break;
-
-              case 4:
-                $to['M'] = (4 * $quarter) + 1;
-                break;
-            }
-            $to['Y'] = $from['Y'] = $now['year'] - $subtractYear;
-            if ($to['M'] > 12) {
-              $to['M'] = 3 * ($quarter - 3);
-              $to['Y'] = $now['year'];
-            }
-            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
-            break;
-
-          case 'earlier':
-            $quarter = ceil($now['mon'] / 3) - 1;
-            $subtractYear = 0;
-            if ($quarter <= 0) {
-              $subtractYear = 1;
-              $quarter += 4;
-            }
-            $to['M'] = 3 * $quarter;
-            $to['Y'] = $from['Y'] = $now['year'] - $subtractYear;
-            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
-            unset($from);
-            break;
-
-          case 'greater':
-            $quarter = ceil($now['mon'] / 3);
-            $from['d'] = 1;
-            $from['M'] = (3 * $quarter) - 2;
-            $from['Y'] = $now['year'];
-            unset($to);
-            break;
-
-          case 'greater_previous':
-            $quarter = ceil($now['mon'] / 3) - 1;
-            $subtractYear = 0;
-            if ($quarter <= 0) {
-              $subtractYear = 1;
-              $quarter += 4;
-            }
-            $from['M'] = 3 * $quarter;
-            $from['Y'] = $from['Y'] = $now['year'] - $subtractYear;
-            $from['d'] = date('t', mktime(0, 0, 0, $from['M'], 1, $from['Y']));
-            unset($to);
-            break;
-
-          case 'ending':
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -90, $to);
-            $from = self::intervalAdd('second', 1, $from);
-            break;
-
-          case 'current':
-            $quarter = ceil($now['mon'] / 3);
-            $from['d'] = 1;
-            $from['M'] = (3 * $quarter) - 2;
-            $from['Y'] = $now['year'];
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            break;
-
-          case 'less':
-            $quarter = ceil($now['mon'] / 3);
-            $to['M'] = 3 * $quarter;
-            $to['Y'] = $now['year'];
-            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $now['year']));
-            unset($from);
-            break;
-
-          case 'next':
-            $difference = -1;
-            $subtractYear = 0;
-            $quarter = ceil($now['mon'] / 3);
-            $quarter = $quarter - $difference;
-            // CRM-14550 QA Fix
-            if ($quarter > 4) {
-              $now['year'] = $now['year'] + 1;
-              $quarter = 1;
-            }
-            if ($quarter <= 0) {
-              $subtractYear = 1;
-              $quarter += 4;
-            }
-            $from['d'] = 1;
-            $from['M'] = (3 * $quarter) - 2;
-            $to['M'] = 3 * $quarter;
-            $to['Y'] = $from['Y'] = $now['year'] - $subtractYear;
-            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
-            break;
-
-          case 'starting':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from['H'] = 00;
-            $from['i'] = $to['s'] = 00;
-            $to = self::intervalAdd('day', 90, $from);
-            $to = self::intervalAdd('second', -1, $to);
-            break;
-
-          default:
-            if ($relativeTermPrefix === 'ending') {
-              $to['d'] = $now['mday'];
-              $to['M'] = $now['mon'];
-              $to['Y'] = $now['year'];
-              $from = self::intervalAdd('month', -($relativeTermSuffix * 3), $to);
-              $from = self::intervalAdd('second', 1, $from);
-            }
-        }
-        break;
-
-      case 'month':
-        switch ($relativeTerm) {
-          case 'this':
-            $from['d'] = 1;
-            $to['d'] = date('t', mktime(0, 0, 0, $now['mon'], 1, $now['year']));
-            $from['M'] = $to['M'] = $now['mon'];
-            $from['Y'] = $to['Y'] = $now['year'];
-            break;
-
-          case 'previous':
-            $from['d'] = 1;
-            if ($now['mon'] == 1) {
-              $from['M'] = $to['M'] = 12;
-              $from['Y'] = $to['Y'] = $now['year'] - 1;
-            }
-            else {
-              $from['M'] = $to['M'] = $now['mon'] - 1;
-              $from['Y'] = $to['Y'] = $now['year'];
-            }
-            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
-            break;
-
-          case 'previous_before':
-            $from['d'] = 1;
-            if ($now['mon'] < 3) {
-              $from['M'] = $to['M'] = 10 + $now['mon'];
-              $from['Y'] = $to['Y'] = $now['year'] - 1;
-            }
-            else {
-              $from['M'] = $to['M'] = $now['mon'] - 2;
-              $from['Y'] = $to['Y'] = $now['year'];
-            }
-            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
-            break;
-
-          case 'previous_2':
-            $from['d'] = 1;
-            if ($now['mon'] < 3) {
-              $from['M'] = 10 + $now['mon'];
-              $from['Y'] = $now['year'] - 1;
-            }
-            else {
-              $from['M'] = $now['mon'] - 2;
-              $from['Y'] = $now['year'];
-            }
-
-            if ($now['mon'] == 1) {
-              $to['M'] = 12;
-              $to['Y'] = $now['year'] - 1;
-            }
-            else {
-              $to['M'] = $now['mon'] - 1;
-              $to['Y'] = $now['year'];
-            }
-
-            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
-            break;
-
-          case 'earlier':
-            // before end of past month
-            if ($now['mon'] == 1) {
-              $to['M'] = 12;
-              $to['Y'] = $now['year'] - 1;
-            }
-            else {
-              $to['M'] = $now['mon'] - 1;
-              $to['Y'] = $now['year'];
-            }
-
-            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
-            unset($from);
-            break;
-
-          case 'greater':
-            $from['d'] = 1;
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            unset($to);
-            break;
-
-          case 'greater_previous':
-            // from end of past month
-            if ($now['mon'] == 1) {
-              $from['M'] = 12;
-              $from['Y'] = $now['year'] - 1;
-            }
-            else {
-              $from['M'] = $now['mon'] - 1;
-              $from['Y'] = $now['year'];
-            }
-
-            $from['d'] = date('t', mktime(0, 0, 0, $from['M'], 1, $from['Y']));
-            unset($to);
-            break;
-
-          case 'ending_2':
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -60, $to);
-            $from = self::intervalAdd('second', 1, $from);
-            break;
-
-          case 'ending':
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -30, $to);
-            $from = self::intervalAdd('second', 1, $from);
-            break;
-
-          case 'current':
-            $from['d'] = 1;
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            break;
-
-          case 'less':
-            // CRM-14550 QA Fix
-            $to['Y'] = $now['year'];
-            $to['M'] = $now['mon'];
-            $to['d'] = date('t', mktime(0, 0, 0, $now['mon'], 1, $now['year']));
-            unset($from);
-            break;
-
-          case 'next':
-            $from['d'] = 1;
-            if ($now['mon'] == 12) {
-              $from['M'] = $to['M'] = 1;
-              $from['Y'] = $to['Y'] = $now['year'] + 1;
-            }
-            else {
-              $from['M'] = $to['M'] = $now['mon'] + 1;
-              $from['Y'] = $to['Y'] = $now['year'];
-            }
-            $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
-            break;
-
-          case 'starting':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from['H'] = 00;
-            $from['i'] = $to['s'] = 00;
-            $to = self::intervalAdd('day', 30, $from);
-            $to = self::intervalAdd('second', -1, $to);
-            break;
-
-          case 'starting_2':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from['H'] = 00;
-            $from['i'] = $to['s'] = 00;
-            $to = self::intervalAdd('day', 60, $from);
-            $to = self::intervalAdd('second', -1, $to);
-            break;
-
-          default:
-            if ($relativeTermPrefix === 'ending') {
-              $to['d'] = $now['mday'];
-              $to['M'] = $now['mon'];
-              $to['Y'] = $now['year'];
-              $from = self::intervalAdd($unit, -$relativeTermSuffix, $to);
-              $from = self::intervalAdd('second', 1, $from);
-            }
-        }
-        break;
-
-      case 'week':
-        $weekFirst = Civi::settings()->get('weekBegins');
-        $thisDay = $now['wday'];
-        if ($weekFirst > $thisDay) {
-          $diffDay = $thisDay - $weekFirst + 7;
-        }
-        else {
-          $diffDay = $thisDay - $weekFirst;
-        }
-        switch ($relativeTerm) {
-          case 'this':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($diffDay), $from);
-            $to = self::intervalAdd('day', 6, $from);
-            break;
-
-          case 'previous':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($diffDay) - 7, $from);
-            $to = self::intervalAdd('day', 6, $from);
-            break;
-
-          case 'previous_before':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($diffDay) - 14, $from);
-            $to = self::intervalAdd('day', 6, $from);
-            break;
-
-          case 'previous_2':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($diffDay) - 14, $from);
-            $to = self::intervalAdd('day', 13, $from);
-            break;
-
-          case 'earlier':
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            $to = self::intervalAdd('day', -1 * ($diffDay) - 1, $to);
-            unset($from);
-            break;
-
-          case 'greater':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($diffDay), $from);
-            unset($to);
-            break;
-
-          case 'greater_previous':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($diffDay) - 1, $from);
-            unset($to);
-            break;
-
-          case 'ending':
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -7, $to);
-            $from = self::intervalAdd('second', 1, $from);
-            break;
-
-          case 'current':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($diffDay), $from);
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            break;
-
-          case 'less':
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            // CRM-14550 QA Fix
-            $to = self::intervalAdd('day', -1 * ($diffDay) + 6, $to);
-            unset($from);
-            break;
-
-          case 'next':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1 * ($diffDay) + 7, $from);
-            $to = self::intervalAdd('day', 6, $from);
-            break;
-
-          case 'starting':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from['H'] = 00;
-            $from['i'] = $to['s'] = 00;
-            $to = self::intervalAdd('day', 7, $from);
-            $to = self::intervalAdd('second', -1, $to);
-            break;
-
-          default:
-            if ($relativeTermPrefix === 'ending') {
-              $to['d'] = $now['mday'];
-              $to['M'] = $now['mon'];
-              $to['Y'] = $now['year'];
-              $from = self::intervalAdd($unit, -$relativeTermSuffix, $to);
-              $from = self::intervalAdd('second', 1, $from);
-            }
-        }
-        break;
-
-      case 'day':
-        switch ($relativeTerm) {
-          case 'this':
-            $from['d'] = $to['d'] = $now['mday'];
-            $from['M'] = $to['M'] = $now['mon'];
-            $from['Y'] = $to['Y'] = $now['year'];
-            break;
-
-          case 'previous':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -1, $from);
-            $to['d'] = $from['d'];
-            $to['M'] = $from['M'];
-            $to['Y'] = $from['Y'];
-            break;
-
-          case 'previous_before':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -2, $from);
-            $to['d'] = $from['d'];
-            $to['M'] = $from['M'];
-            $to['Y'] = $from['Y'];
-            break;
-
-          case 'previous_2':
-            $from['d'] = $to['d'] = $now['mday'];
-            $from['M'] = $to['M'] = $now['mon'];
-            $from['Y'] = $to['Y'] = $now['year'];
-            $from = self::intervalAdd('day', -2, $from);
-            $to = self::intervalAdd('day', -1, $to);
-            break;
-
-          case 'earlier':
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            $to = self::intervalAdd('day', -1, $to);
-            unset($from);
-            break;
-
-          case 'greater':
-            $from['d'] = $now['mday'];
-            $from['M'] = $now['mon'];
-            $from['Y'] = $now['year'];
-            unset($to);
-            break;
-
-          case 'starting':
-            $to['d'] = $now['mday'];
-            $to['M'] = $now['mon'];
-            $to['Y'] = $now['year'];
-            $to = self::intervalAdd('day', 1, $to);
-            $from['d'] = $to['d'];
-            $from['M'] = $to['M'];
-            $from['Y'] = $to['Y'];
-            break;
-
-          default:
-            if ($relativeTermPrefix === 'ending') {
-              $to['d'] = $now['mday'];
-              $to['M'] = $now['mon'];
-              $to['Y'] = $now['year'];
-              $from = self::intervalAdd($unit, -$relativeTermSuffix, $to);
-              $from = self::intervalAdd('second', 1, $from);
-            }
-        }
-        break;
+  public static function relativeToAbsolute($relativeTerm, ?string $unit = NULL) {
+    $sql = self::relativeToSql($relativeTerm, $unit);
+    if (!$sql) {
+      return [];
     }
 
-    $dateRange['from'] = empty($from) ? NULL : self::format($from);
-    $dateRange['to'] = empty($to) ? NULL : self::format($to);
+    $selectFrom = $sql['from'] ? "DATE_FORMAT({$sql['from']}, '%Y%m%d%H%i%s')" : 'NULL';
+    $selectTo = $sql['to'] ? "DATE_FORMAT({$sql['to']}, '%Y%m%d%H%i%s')" : 'NULL';
+
+    $dao = \CRM_Core_DAO::executeQuery("SELECT $selectFrom AS from_date, $selectTo AS to_date");
+    $dao->fetch();
+
+    $dateRange = [
+      'from' => NULL,
+      'to' => $dao->to_date,
+    ];
+    if ($dao->from_date) {
+      if (str_starts_with($relativeTerm, 'ending') || str_starts_with($relativeTerm, 'starting') || ($relativeTerm === 'this_2' && $unit === 'fiscal_year')) {
+        $dateRange['from'] = $dao->from_date;
+      }
+      else {
+        $dateRange['from'] = substr($dao->from_date, 0, 8);
+      }
+    }
     return $dateRange;
   }
 
@@ -1880,7 +1289,10 @@ class CRM_Utils_Date {
     }
 
     if (trim($date ?? '')) {
-      $mysqlDate = date($format, strtotime($date . ' ' . $time));
+      if ($time) {
+        $date .= ' ' . $time;
+      }
+      $mysqlDate = date($format, strtotime($date));
     }
 
     return $mysqlDate;
