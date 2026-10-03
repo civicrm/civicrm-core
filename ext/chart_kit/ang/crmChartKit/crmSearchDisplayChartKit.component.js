@@ -15,6 +15,13 @@
       afFieldset: '?^^afFieldset'
     },
     templateUrl: '~/crmChartKit/chartKitCanvas.html',
-    controller: () => {}
+    controller: function($scope, $element) {
+      // The display reports its count through onTotalCount; pass it on to a bound total-count
+      this.$postLink = () => {
+        if (this.hasOwnProperty('totalCount')) {
+          $element.children()[0].onTotalCount.push((count) => $scope.$evalAsync(() => this.totalCount = count));
+        }
+      };
+    }
   });
 })(angular, CRM.$);
