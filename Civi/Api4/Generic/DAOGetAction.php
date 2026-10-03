@@ -90,8 +90,17 @@ class DAOGetAction extends AbstractGetAction {
     }
 
     $this->setDefaultWhereClause();
+    $this->injectFacadeCondition();
     $this->expandSelectClauseWildcards();
     $this->getObjects($result);
+  }
+
+  protected function injectFacadeCondition() {
+    $facadeConfig = $this->getFacadeConfig();
+    if (!$facadeConfig) {
+      return;
+    }
+    $this->addWhere($facadeConfig['field'], '=', $facadeConfig['value']);
   }
 
   /**
