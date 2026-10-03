@@ -4,6 +4,8 @@
 
     /* jshint ignore:start */
     static observedAttributes = ['filters', 'settings'];
+    // Charts aggregate their rows, so the row count is not what they show
+    static reportsRowCount = false;
     /* jshint ignore:end */
 
     constructor() {
