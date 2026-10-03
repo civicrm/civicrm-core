@@ -78,6 +78,7 @@ class CRM_Core_Invoke {
     self::hackMenuRebuild($args);
     self::init($args);
     Civi::dispatcher()->dispatch('civi.invoke.auth', \Civi\Core\Event\GenericHookEvent::create(['args' => $args]));
+    self::checkMaintenanceMode($args);
     $item = self::getItem($args);
     return self::runItem($item);
     // NOTE: runItem() may return HTML, or it may call print+exit.
@@ -269,8 +270,95 @@ class CRM_Core_Invoke {
     // to issue its own warning
     $coreMaintenanceMode = \Civi::settings()->get('core_maintenance_mode');
     if ($coreMaintenanceMode && ($coreMaintenanceMode !== 'inherit')) {
-      \CRM_Core_Session::setStatus(ts('CiviCRM is currently in maintenance mode. To deactivate, update the <code>core_maintenance_mode</code> setting.'), ts('Maintenance Mode'), 'warning');
+      \CRM_Core_Session::setStatus(self::getAdminMaintenanceWarning(), ts('Maintenance Mode'), 'warning');
     }
+  }
+
+  /**
+   * When in maintenance mode, block non-bypass users from accessing pages.
+   *
+   * @param array $args
+   */
+  protected static function checkMaintenanceMode(array $args): void {
+    if (!CRM_Utils_System::isMaintenanceMode()) {
+      return;
+    }
+    $path = implode('/', $args);
+    // The API4 AJAX handler has its own maintenance-mode gate (CRM_Api4_Page_AJAX::run());
+    // other civicrm/ajax/* pages (legacy CRM_*_Page_AJAX classes, REST) have none.
+    if (($args[1] ?? NULL) === 'ajax' && ($args[2] ?? NULL) === 'api4') {
+      return;
+    }
+    // The login page loads its Angular bundle from the asset builder.
+    if ($path === 'civicrm/asset/builder') {
+      return;
+    }
+
+    $maintenanceMessage = ts('Site is under maintenance. Please check back shortly.');
+
+    if (CRM_Core_Permission::check([['administer CiviCRM system', 'cms:bypass maintenance mode']])) {
+      // Administrators get the same text as statusCheck(), so the two collapse into one message.
+      $coreMaintenanceMode = \Civi::settings()->get('core_maintenance_mode');
+      $isExplicit = $coreMaintenanceMode && $coreMaintenanceMode !== 'inherit';
+      $notice = ($isExplicit && CRM_Core_Permission::check('administer CiviCRM')) ? self::getAdminMaintenanceWarning() : $maintenanceMessage;
+      CRM_Core_Session::setStatus($notice, ts('Maintenance Mode'), 'warning');
+      return;
+    }
+
+    // Auth paths remain accessible, as do routes where an anonymous user would be sent to the login form.
+    $loginPaths = [
+      'civicrm/login',
+      'civicrm/login/password',
+      'civicrm/logout',
+      'civicrm/mfa/totp',
+      'civicrm/mfa/totp-setup',
+    ];
+    if (in_array($path, $loginPaths) || self::isDeniedToAnonymous($args)) {
+      CRM_Core_Session::setStatus($maintenanceMessage, ts('Maintenance Mode'), 'warning');
+      return;
+    }
+
+    http_response_code(503);
+    CRM_Utils_System::setHttpHeader('Retry-After', '300');
+
+    if (!empty($_REQUEST['snippet'])) {
+      CRM_Utils_System::sendJSONResponse([
+        'status_code' => 503,
+        'status_message' => $maintenanceMessage,
+      ], 503);
+      CRM_Utils_System::civiExit();
+    }
+
+    $content = '<h2>' . ts('Maintenance Mode') . '</h2><p>' . htmlspecialchars($maintenanceMessage) . '</p>';
+    if (CRM_Core_Session::getLoggedInContactID()) {
+      $content .= '<p><a href="' . CRM_Utils_System::url('civicrm/logout') . '">' . ts('Log out') . '</a></p>';
+    }
+
+    CRM_Core_Config::singleton()->userSystem->renderMaintenanceMessage($content);
+    CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * @return string
+   */
+  protected static function getAdminMaintenanceWarning(): string {
+    return ts('CiviCRM is currently in maintenance mode. To deactivate, update the <code>core_maintenance_mode</code> setting.');
+  }
+
+  /**
+   * Would an anonymous user be denied access to this route?
+   *
+   * The normal flow then sends them to the login form, so there is nothing to protect.
+   *
+   * @param array $args
+   * @return bool
+   */
+  protected static function isDeniedToAnonymous(array $args): bool {
+    if (CRM_Core_Session::getLoggedInContactID()) {
+      return FALSE;
+    }
+    $item = self::getItem($args);
+    return $item && !CRM_Core_Permission::checkMenuItem($item);
   }
 
   /**
