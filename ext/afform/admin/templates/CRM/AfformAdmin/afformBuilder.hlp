@@ -90,6 +90,12 @@
   </p>
 {/htxt}
 
+{htxt id="verification_confirmation_type"}
+  <p>
+    {ts}Choose "Redirect to a URL" to take the user to another page or form after verification, otherwise enter a verification message.{/ts}
+  </p>
+{/htxt}
+
 {htxt id="entity-security"}
   <ul>
     <li>{ts}User-Based permission will use CiviCRM's access control for the current logged-in user. Use this option for forms intended for authenticated CiviCRM users.{/ts}</li>
