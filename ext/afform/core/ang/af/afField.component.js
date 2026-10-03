@@ -305,6 +305,20 @@
         );
       };
 
+      // A range such as "5-10", "-5-10" or "5-": a leading minus is a sign, an empty or invalid bound is left out
+      function parseNumberRange(text) {
+        const separator = text.indexOf('-', 1);
+        const bounds = separator < 0 ? [text, ''] : [text.slice(0, separator), text.slice(separator + 1)];
+        const range = {};
+        ['>=', '<='].forEach((op, index) => {
+          const bound = Number(bounds[index]);
+          if (bounds[index] !== '' && !isNaN(bound)) {
+            range[op] = bound;
+          }
+        });
+        return range;
+      }
+
       // Set default value; ensure data type matches input type
       function setValue(value) {
         // For values passed from the url, split
@@ -324,20 +338,18 @@
         if (ctrl.defn.input_type === 'EntityRef' && ['Contact', 'Individual'].includes(ctrl.fkEntity) && value === 'user_contact_id') {
           value = CRM.config.cid;
         }
+        const isNumberRange = ctrl.defn.input_type === 'Number' && ctrl.defn.search_range;
         // correct the value type
-        if (ctrl.defn.input_type !== 'DisplayOnly') {
+        if (ctrl.defn.input_type !== 'DisplayOnly' && !isNumberRange) {
           value = correctValueType(value, ctrl.defn.data_type);
         }
 
         if (ctrl.defn.input_type === 'Date' && typeof value === 'string' && value.startsWith('now')) {
           value = getRelativeDate(value, ctrl.defn.input_attrs.time);
         }
-        if (ctrl.defn.input_type === 'Number' && ctrl.defn.search_range) {
+        if (isNumberRange) {
           if (!isPlainObject(value)) {
-            value = {
-              '>=': +(('' + value).split('-')[0] || 0),
-              '<=': +(('' + value).split('-')[1] || 0),
-            };
+            value = parseNumberRange('' + value);
           }
         } else if (ctrl.defn.input_type === 'Number') {
           value = Number(value);
