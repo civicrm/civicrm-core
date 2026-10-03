@@ -57,6 +57,7 @@ module.exports = function(config) {
       'bower_components/angular-ui-sortable/sortable.js',
       'bower_components/angular-unsavedChanges/dist/unsavedChanges.js',
       'js/crm.ajax.js',
+      'ext/chart_kit/js/components/civi-search-display.js',
       'ang/*.js',
       'ang/**/*.js',
       'tests/karma/lib/*.js',
