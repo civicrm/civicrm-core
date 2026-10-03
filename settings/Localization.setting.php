@@ -369,7 +369,7 @@ return [
     'html_type' => 'text',
     'html_attributes' => [
       'size' => '2',
-      'maxlength' => '8',
+      'maxlength' => '1',
     ],
     'default' => ',',
     'title' => ts('Import / Export Field Separator'),

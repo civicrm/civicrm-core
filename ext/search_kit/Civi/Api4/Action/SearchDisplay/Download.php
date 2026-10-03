@@ -53,7 +53,7 @@ class Download extends AbstractRunAction {
     else {
       $this->processData($this->display['label'], $this->display['settings']['columns'], $rows, $fileName);
     }
-    $bypass_headers = ['array', 'csv'];
+    $bypass_headers = ['array'];
     if (!in_array($this->format, $bypass_headers)) {
       $this->sendHeaders($fileName);
     }
@@ -99,6 +99,9 @@ class Download extends AbstractRunAction {
    * @param string $fileName
    */
   protected function sendHeaders(string $fileName) {
+    if (headers_sent()) {
+      return;
+    }
     header('Content-Type: ' . $this->formats[$this->format]['mime']);
     header('Content-Transfer-Encoding: binary');
     header('Content-Description: File Transfer');

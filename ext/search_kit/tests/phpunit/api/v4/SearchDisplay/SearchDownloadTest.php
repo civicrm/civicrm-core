@@ -24,6 +24,11 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
       ->apply();
   }
 
+  public function tearDown(): void {
+    \Civi::settings()->revert('fieldSeparator');
+    parent::tearDown();
+  }
+
   /**
    * Test downloading array format.
    */
@@ -681,6 +686,84 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
     finally {
       unlink($tmpFile);
     }
+  }
+
+  /**
+   * Test that the fieldSeparator setting is used as the CSV delimiter.
+   */
+  public function testDownloadCSVWithSemicolonSeparator(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $sampleData = [
+      ['first_name' => 'Alpha', 'last_name' => $lastName],
+      ['first_name' => 'Beta', 'last_name' => $lastName],
+    ];
+    Contact::save(FALSE)->setRecords($sampleData)->execute();
+
+    \Civi::settings()->set('fieldSeparator', ';');
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'format' => 'csv',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['first_name', 'last_name'],
+          'where' => [],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'actions' => TRUE,
+          'pager' => [],
+          'columns' => [
+            [
+              'key' => 'first_name',
+              'label' => 'First Name',
+              'type' => 'field',
+            ],
+            [
+              'key' => 'last_name',
+              'label' => 'Last Name',
+              'type' => 'field',
+            ],
+          ],
+          'sort' => [
+            ['id', 'ASC'],
+          ],
+        ],
+      ],
+      'filters' => ['last_name' => $lastName],
+      'afform' => NULL,
+    ];
+
+    ob_start();
+    try {
+      civicrm_api4('SearchDisplay', 'download', $params);
+      $this->fail();
+    }
+    catch (\CRM_Core_Exception_PrematureExitException $e) {
+      // All good, we expected the api to exit
+    }
+    $csvOutput = ob_get_clean();
+
+    // Verify BOM prefix
+    $this->assertStringStartsWith("\xEF\xBB\xBF", $csvOutput);
+    $csvWithoutBom = substr($csvOutput, 3);
+    $lines = preg_split('/\r\n|\r|\n/', rtrim($csvWithoutBom));
+    $rows = array_map(fn($line) => str_getcsv($line, ';', '"', '\\'), $lines);
+
+    // Header + 2 data rows
+    $this->assertCount(3, $rows);
+    $this->assertSame(['First Name', 'Last Name'], $rows[0]);
+    $this->assertSame(['Alpha', $lastName], $rows[1]);
+    $this->assertSame(['Beta', $lastName], $rows[2]);
+
+    // Confirm the raw output actually uses ';' not ','
+    $this->assertStringContainsString(';', $lines[0]);
+    $this->assertStringNotContainsString(',', $lines[0]);
   }
 
 }
