@@ -496,13 +496,13 @@ VALUES
 
 SET @adminHelplastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, target )
 VALUES
-    ( @domainID, 'https://docs.civicrm.org/user/?src=iam',                                 '{ts escape="sql" skip="true"}User Guide{/ts}',         'User Guide',         NULL, 'AND', @adminHelplastID, '1', NULL, 1 ),
-    ( @domainID, 'https://civicrm.org/help?src=iam',                                       '{ts escape="sql" skip="true"}Get Help{/ts}',           'Get Help',           NULL, 'AND', @adminHelplastID, '1', NULL, 2 ),
-    ( @domainID, 'https://civicrm.org/about?src=iam', 		                                 '{ts escape="sql" skip="true"}About CiviCRM{/ts}',      'About CiviCRM',      NULL, 'AND', @adminHelplastID, '1', 1,    3 ),
-    ( @domainID, 'https://civicrm.org/register-your-site?src=iam&sid={ldelim}sid{rdelim}', '{ts escape="sql" skip="true"}Register Your Site{/ts}', 'Register Your Site', NULL, 'AND', @adminHelplastID, '1', NULL, 4 ),
-    ( @domainID, 'https://civicrm.org/become-a-member?src=iam&sid={ldelim}sid{rdelim}',    '{ts escape="sql" skip="true"}Join CiviCRM{/ts}',       'Join CiviCRM',       NULL, 'AND', @adminHelplastID, '1', NULL, 5 );
+    ( @domainID, 'https://docs.civicrm.org/user/?src=iam',                                 '{ts escape="sql" skip="true"}User Guide{/ts}',         'User Guide',         NULL, 'AND', @adminHelplastID, '1', NULL, 1, '_blank' ),
+    ( @domainID, 'https://civicrm.org/help?src=iam',                                       '{ts escape="sql" skip="true"}Get Help{/ts}',           'Get Help',           NULL, 'AND', @adminHelplastID, '1', NULL, 2, '_blank' ),
+    ( @domainID, 'https://civicrm.org/about?src=iam', 		                                 '{ts escape="sql" skip="true"}About CiviCRM{/ts}',      'About CiviCRM',      NULL, 'AND', @adminHelplastID, '1', 1,    3, '_blank' ),
+    ( @domainID, 'https://civicrm.org/register-your-site?src=iam&sid={ldelim}sid{rdelim}', '{ts escape="sql" skip="true"}Register Your Site{/ts}', 'Register Your Site', NULL, 'AND', @adminHelplastID, '1', NULL, 4, '_blank' ),
+    ( @domainID, 'https://civicrm.org/become-a-member?src=iam&sid={ldelim}sid{rdelim}',    '{ts escape="sql" skip="true"}Join CiviCRM{/ts}',       'Join CiviCRM',       NULL, 'AND', @adminHelplastID, '1', NULL, 5, '_blank' );
 
 INSERT INTO civicrm_navigation
 ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
@@ -511,11 +511,11 @@ VALUES
 
 SET @devellastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
-( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, target )
 VALUES
-( @domainID, 'civicrm/api3', '{ts escape="sql" skip="true"}Api Explorer v3{/ts}', 'API Explorer', 'administer CiviCRM', '', @devellastID, '1', NULL, 1 ),
-( @domainID, 'civicrm/api4#/explorer', '{ts escape="sql" skip="true"}Api Explorer v4{/ts}', 'Api Explorer v4', 'administer CiviCRM', '', @devellastID, '1', NULL, 2 ),
-( @domainID, 'https://civicrm.org/developer-documentation?src=iam', '{ts escape="sql" skip="true"}Developer Docs{/ts}', 'Developer Docs', 'administer CiviCRM', '', @devellastID, '1', NULL, 3 );
+( @domainID, 'civicrm/api3', '{ts escape="sql" skip="true"}Api Explorer v3{/ts}', 'API Explorer', 'administer CiviCRM', '', @devellastID, '1', NULL, 1, NULL ),
+( @domainID, 'civicrm/api4#/explorer', '{ts escape="sql" skip="true"}Api Explorer v4{/ts}', 'Api Explorer v4', 'administer CiviCRM', '', @devellastID, '1', NULL, 2, NULL ),
+( @domainID, 'https://civicrm.org/developer-documentation?src=iam', '{ts escape="sql" skip="true"}Developer Docs{/ts}', 'Developer Docs', 'administer CiviCRM', '', @devellastID, '1', NULL, 3, '_blank' );
 
 INSERT INTO civicrm_navigation
     ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight, icon )

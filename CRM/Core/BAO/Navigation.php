@@ -227,6 +227,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
           'permission' => $navigationMenu->permission,
           'operator' => $navigationMenu->permission_operator,
           'separator' => $navigationMenu->has_separator,
+          'target' => $navigationMenu->target,
           'parentID' => $navigationMenu->parent_id,
           'navID' => $navigationMenu->id,
           'active' => $navigationMenu->is_active,

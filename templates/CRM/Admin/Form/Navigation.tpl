@@ -53,6 +53,10 @@
         <td class="label">{$form.has_separator.label} {help id="has_separator" file="CRM/Admin/Form/Navigation.hlp"}</td>
         <td>{$form.has_separator.html} </td>
       </tr>
+      <tr class="crm-navigation-form-block-target">
+        <td class="label">{$form.target.label} {help id="target" file="CRM/Admin/Form/Navigation.hlp"}</td>
+        <td>{$form.target.html} </td>
+      </tr>
       <tr class="crm-navigation-form-block-permission">
         <td class="label">{$form.permission.label} {help id="permission" file="CRM/Admin/Form/Navigation.hlp"}</td>
         <td>{$form.permission.html} <span class="permission_operator_wrapper">{$form.permission_operator.html}  {help id="permission_operator" file="CRM/Admin/Form/Navigation.hlp"}</span></td>

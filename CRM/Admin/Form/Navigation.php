@@ -84,6 +84,12 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
     $separator = CRM_Core_SelectValues::navigationMenuSeparator();
     $this->add('select', 'has_separator', ts('Separator'), $separator, FALSE, ['class' => 'crm-select2']);
 
+    $target = CRM_Core_SelectValues::navigationMenuTarget();
+    $this->add('select', 'target', ts('Open Link as'), $target, FALSE, [
+      'class' => 'crm-select2',
+      'placeholder' => ts('Default'),
+    ]);
+
     $active = $this->add('advcheckbox', 'is_active', ts('Enabled'));
 
     if (($this->_defaults['name'] ?? NULL) == 'Home') {

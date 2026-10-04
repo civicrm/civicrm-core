@@ -1424,6 +1424,15 @@ class CRM_Core_SelectValues {
   /**
    * @return array
    */
+  public static function navigationMenuTarget(): array {
+    return [
+      '_blank' => ts('New tab'),
+    ];
+  }
+
+  /**
+   * @return array
+   */
   public static function relationshipOrientation() {
     return [
       'a_b' => ts('A to B'),
