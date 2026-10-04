@@ -214,11 +214,29 @@ class ActionObjectProvider extends AutoService implements EventSubscriberInterfa
       $event = GenericHookEvent::create(['entities' => &$entities]);
       \Civi::dispatcher()->dispatch('civi.api4.entityTypes', $event);
       $this->fillEntityDefaults($entities);
+      $this->updateFacades($entities);
       ksort($entities);
       $cache->set('api4.entities.info', $entities);
     }
 
     return $entities;
+  }
+
+  /**
+   * Update the info for facades
+   *
+   * Not sure why there is the duplication between this cache and the EntityRepository.
+   * The entity classes for facades exist in $entities but some of information returned
+   * from the previous $class:getinfo() calls is wrong so we update it here with info
+   * from EntityRepository.
+   *
+   * @param array $entities
+   * @return void
+   */
+  public function updateFacades(&$entities) {
+    foreach (\Civi\Schema\EntityRepository::getFacades() as $name => $facade) {
+      $entities[$name] = $facade['getInfo']() + $entities[$name];
+    }
   }
 
   public function fillEntityDefaults(array &$entities) {
