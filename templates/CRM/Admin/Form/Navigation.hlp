@@ -24,7 +24,7 @@
 
 
 {htxt id='has_separator'}
-{ts}Check this box to add a separator line between this menu item and the one below it.{/ts}
+{ts}Add a separator line above or below this menu item.{/ts}
 {/htxt}
 
 
