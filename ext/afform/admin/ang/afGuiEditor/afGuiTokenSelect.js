@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('afGuiEditor').component('afGuiTokenSelect', {
@@ -61,4 +61,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

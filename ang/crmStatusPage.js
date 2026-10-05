@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('crmStatusPage', CRM.angRequires('crmStatusPage'));
 
   // router
@@ -16,4 +16,4 @@
 
   }
 );
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

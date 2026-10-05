@@ -132,7 +132,12 @@ class Test {
       }, 'reset')
       ->callback(function ($ctx) {
         \Civi\Test::schema()->setAutoIncrement();
-      });
+      }, 'autoIncrement')
+      ->callback(function ($ctx) {
+        // FTS indices aren't create as part of regular schema -- because they are configurable (setting-dependent).
+        // Make sure that the actual SQL indices are sync'd up with the default settings.
+        \Civi\Schema\FullTextSearch::createOrDrop();
+      }, 'fts');
     $builder->install(['org.civicrm.search_kit', 'org.civicrm.afform', 'authx']);
     return $builder;
   }

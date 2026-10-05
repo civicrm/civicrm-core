@@ -702,7 +702,7 @@
 
 - github      : GuillaumeSorel
   name        : Guillaume Sorel
-  organization: All In Appli.com
+  organization: GESTAD - gestad.fr
 
 - github      : guyiac
   name        : Guy Iaccarino
@@ -855,6 +855,10 @@
 - github      : jeromelebleu
   name        : Jérôme Lebleu
 
+- github      : jfilter
+  name        : Johannes Filter
+  organization: civico GmbH
+
 - github      : JGaunt
   name        : Jade Gaunt
   organization: GMCVO Databases
@@ -890,6 +894,9 @@
 - github      : johntwyman
   name        : John Twyman
   organization: Australian Greens
+
+- github      : jonathandhn
+  name        : Jonathan Dahan
 
 - github      : jorich-2000
   name        : Jonathan Richardson
@@ -1498,6 +1505,9 @@
 - github      : RexAK
   name        : Rex Keal
 
+- github      : RyanMorash
+  name        : Ryan Morash
+
 - name        : Lutz Frommberger
 
 - github      : RhiCircle
@@ -1507,6 +1517,9 @@
 - github      : rgilman
   name        : Robert Gilman
   organization: Context Institute
+
+- github      : RisingOrange
+  name        : Jakub Fidler
 
 - github      : robbrandt
   name        : Rob Brandt
@@ -1645,6 +1658,10 @@
 
 - name        : Shira Miller
 
+- github      : Sinjinsmiley
+  name        : Simon East
+  organization: North Essex Heritage
+  
 - github      : spalmstr
   name        : Stephen Palmstrom
 
@@ -2034,3 +2051,7 @@
 - github      : yf-zhou
   name        : Yifei Zhou
   organization: JMA Consulting
+
+- github      : yorkshirerose
+  name        : Rose
+  organization: Ruza Solutions

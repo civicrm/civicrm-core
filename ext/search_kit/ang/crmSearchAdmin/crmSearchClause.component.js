@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchClause', {
@@ -14,7 +14,8 @@
       help: '@',
       hideLabel: '@',
       placeholder: '<',
-      deleteGroup: '&'
+      deleteGroup: '&',
+      savedSearch: '<?'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchClause.html',
     controller: function ($scope, $element, searchMeta, crmUiHelp) {
@@ -40,8 +41,8 @@
       // Gets the first arg of type "field"
       function getFirstArgFromExpr(expr) {
         if (!(expr in meta)) {
-          const args = searchMeta.parseExpr(expr).args;
-          meta[expr] = _.findWhere(args, {type: 'field'});
+          const args = searchMeta.parseExpr(expr, ctrl.savedSearch).args;
+          meta[expr] = args.find((arg) => arg.type === 'field');
         }
         return meta[expr] || {};
       }
@@ -63,7 +64,7 @@
           // This function has to return a reference to avoid angering angular
           // But we also can't alter the global `fn` variables returned by `parseExpr()`
           // So make a copy of the object and stash it locally to return by ref
-          let parsed = _.cloneDeep(searchMeta.parseExpr(expr));
+          let parsed = structuredClone(searchMeta.parseExpr(expr, ctrl.savedSearch));
           // Pass-thru data_type of expression if fn doesn't have a data_type
           parsed.fn.data_type = parsed.fn.data_type || parsed.data_type;
           return (functionCache[expr] = parsed.fn);
@@ -122,4 +123,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

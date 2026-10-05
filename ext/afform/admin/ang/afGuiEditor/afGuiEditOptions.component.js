@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('afGuiEditor').component('afGuiEditOptions', {
@@ -46,4 +46,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

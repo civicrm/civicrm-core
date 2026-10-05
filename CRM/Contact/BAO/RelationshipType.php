@@ -31,38 +31,6 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_RelationshipType', $id, 'is_active', $is_active);
-  }
-
-  /**
-   * @deprecated
-   * @param array $params
-   * @return CRM_Contact_DAO_RelationshipType
-   */
-  public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
-   * @deprecated
-   * @param int $relationshipTypeId
-   * @throws CRM_Core_Exception
-   * @return mixed
-   */
-  public static function del($relationshipTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return static::deleteRecord(['id' => $relationshipTypeId]);
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    *
    * @param \Civi\Core\Event\PreEvent $event

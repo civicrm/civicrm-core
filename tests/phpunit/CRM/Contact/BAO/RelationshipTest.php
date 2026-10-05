@@ -227,7 +227,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
 
     $startDate = date('Y-m') . '-19';
     $joinDate = date('Y-m', strtotime('1 month ago')) . '-19';
-    $this->callAPISuccess('Membership', 'create', [
+    $this->createTestEntity('Membership', [
       'membership_type_id' => $membershipType['id'],
       'contact_id' => $organisationID,
       'start_date' => $startDate,
@@ -372,6 +372,87 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
       ->addValue('is_active', FALSE)
       ->addWhere('id', '=', $relationship['id'])
       ->execute();
+  }
+
+  /**
+   * Test CRM_Contact_BAO_Relationship::createMultiple handling of valid, duplicate, and invalid relationships.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateMultiple(): void {
+    $relTypeId = $this->relationshipTypeCreate([
+      'name_a_b' => 'Individual_To_Individual_A_B',
+      'name_b_a' => 'Individual_To_Individual_B_A',
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Individual',
+    ]);
+
+    $individualA = $this->individualCreate(['display_name' => 'Primary Individual A']);
+    $individualBValid = $this->individualCreate(['display_name' => 'Secondary Individual Valid']);
+    $individualBDuplicate = $this->individualCreate(['display_name' => 'Secondary Individual Duplicate']);
+    $organizationBInvalid = $this->organizationCreate(['organization_name' => 'Secondary Org Invalid']);
+
+    // Create existing relationship for duplicate check
+    Relationship::create(FALSE)
+      ->addValue('contact_id_a', $individualA)
+      ->addValue('contact_id_b', $individualBDuplicate)
+      ->addValue('relationship_type_id', $relTypeId)
+      ->execute();
+
+    // Call createMultiple with primaryContactLetter = 'a'
+    $params = [
+      'contact_id_a' => $individualA,
+      'contact_id_b' => [$individualBValid, $individualBDuplicate, $organizationBInvalid],
+      'relationship_type_id' => $relTypeId,
+    ];
+
+    $result = CRM_Contact_BAO_Relationship::createMultiple($params, 'a');
+
+    $this->assertEquals(1, $result['valid']);
+    $this->assertEquals(1, $result['duplicate']);
+    $this->assertEquals(1, $result['invalid']);
+    $this->assertCount(1, $result['relationship_ids']);
+
+    // Verify created relationship in DB
+    $createdRel = Relationship::get(FALSE)
+      ->addWhere('id', '=', $result['relationship_ids'][0])
+      ->execute()
+      ->first();
+    $this->assertEquals($individualA, $createdRel['contact_id_a']);
+    $this->assertEquals($individualBValid, $createdRel['contact_id_b']);
+
+    // Call createMultiple with primaryContactLetter = 'b'
+    $individualB = $this->individualCreate(['display_name' => 'Primary Individual B']);
+    $individualAValid = $this->individualCreate(['display_name' => 'Secondary Individual A Valid']);
+    $individualADuplicate = $this->individualCreate(['display_name' => 'Secondary Individual A Duplicate']);
+    $organizationAInvalid = $this->organizationCreate(['organization_name' => 'Secondary Org A Invalid']);
+    $organizationBInvalid = $this->organizationCreate(['organization_name' => 'Secondary Org B Invalid']);
+
+    Relationship::create(FALSE)
+      ->addValue('contact_id_a', $individualADuplicate)
+      ->addValue('contact_id_b', $individualB)
+      ->addValue('relationship_type_id', $relTypeId)
+      ->execute();
+
+    $paramsB = [
+      'contact_id_a' => [$individualAValid, $individualADuplicate, $organizationAInvalid, $organizationBInvalid],
+      'contact_id_b' => $individualB,
+      'relationship_type_id' => $relTypeId,
+    ];
+
+    $resultB = CRM_Contact_BAO_Relationship::createMultiple($paramsB, 'b');
+
+    $this->assertEquals(1, $resultB['valid']);
+    $this->assertEquals(1, $resultB['duplicate']);
+    $this->assertEquals(2, $resultB['invalid']);
+    $this->assertCount(1, $resultB['relationship_ids']);
+
+    $createdRelB = Relationship::get(FALSE)
+      ->addWhere('id', '=', $resultB['relationship_ids'][0])
+      ->execute()
+      ->first();
+    $this->assertEquals($individualAValid, $createdRelB['contact_id_a']);
+    $this->assertEquals($individualB, $createdRelB['contact_id_b']);
   }
 
 }

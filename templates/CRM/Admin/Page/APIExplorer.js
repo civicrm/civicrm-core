@@ -67,9 +67,7 @@
    * @returns {{results: Array.<T>}}
    */
   function selectFields() {
-    var items = _.filter(fields, function(field) {
-      return params[field.id] === undefined;
-    });
+    var items = fields.filter((field) => params[field.id] === undefined);
     return {results: items.concat({id: '-', text: ts('Other') + '...', description: ts('Choose a field not in this list')})};
   }
 
@@ -82,7 +80,7 @@
    * @param required
    */
   function populateFields(fields, entity, action, prefix, required) {
-    _.each(getFieldsCache[entity+action].values, function(field) {
+    Object.values(getFieldsCache[entity+action].values).forEach((field) => {
       var name = prefix + field.name,
         pos = fields.length;
       fields.push({
@@ -110,12 +108,12 @@
   function getField(name) {
     var field = {};
     if (name && getFieldData[name]) {
-      field = _.cloneDeep(getFieldData[name]);
+      field = structuredClone(getFieldData[name]);
     } else if (name) {
       var ent = entity,
         act = action,
         prefix = '';
-      _.each(name.split('.'), function(piece) {
+      name.split('.').forEach((piece) => {
         if (joins[prefix]) {
           ent = joins[prefix];
           act = 'get';
@@ -124,7 +122,7 @@
         prefix += (prefix.length ? '.' : '') + piece;
       });
       if (getFieldsCache[ent+act].values[name]) {
-        field = _.cloneDeep(getFieldsCache[ent+act].values[name]);
+        field = structuredClone(getFieldsCache[ent+act].values[name]);
       }
     }
     addJoinInfo(field, name);
@@ -149,19 +147,19 @@
    * @param name string
    */
   function addField(name) {
-    $('#api-params').append($(fieldTpl({name: name || '', noOps: _.includes(NO_OPERATORS, action)})));
+    $('#api-params').append($(fieldTpl({name: name || '', noOps: NO_OPERATORS.includes(action)})));
     var $row = $('tr:last-child', '#api-params');
     $('input.api-param-name', $row).crmSelect2({
       data: selectFields,
       allowClear: false,
       formatSelection: function(field) {
-        return _.escape(field.text) +
+        return CRM.utils.escapeHtml(field.text) +
           (field.required ? ' <span class="crm-marker">*</span>' : '');
       },
       formatResult: function(field) {
-        return _.escape(field.text) +
+        return CRM.utils.escapeHtml(field.text) +
           (field.required ? ' <span class="crm-marker">*</span>' : '') +
-          '<div class="api-field-desc">' + _.escape(field.description) + '</div>';
+          '<div class="api-field-desc">' + CRM.utils.escapeHtml(field.description) + '</div>';
       }
     }).change();
   }
@@ -201,9 +199,9 @@
     $('.api-chain-entity', $row).crmSelect2({
       formatSelection: function(item) {
         return '<i class="crm-i fa-link" role="img" aria-hidden="true"></i> API ' +
-          ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + _.escape(item.text) + '</span>' : _.escape(item.text));
+          ($(item.element).hasClass('strikethrough') ? '<span class="strikethrough">' + CRM.utils.escapeHtml(item.text) + '</span>' : CRM.utils.escapeHtml(item.text));
       },
-      placeholder: '<i class="crm-i fa-link" role="img" aria-hidden="true"></i> ' + _.escape(ts('Entity')),
+      placeholder: '<i class="crm-i fa-link" role="img" aria-hidden="true"></i> ' + CRM.utils.escapeHtml(ts('Entity')),
       allowClear: false,
       escapeMarkup: function(m) {return m;}
     })
@@ -223,7 +221,7 @@
       getActions(entity)
         .then(function(actions) {
           $selector.prop('disabled', false);
-          CRM.utils.setOptions($('.api-chain-action', $row), _.transform(actions.values, function(ret, item) {ret.push({value: item, key: item});}));
+          CRM.utils.setOptions($('.api-chain-action', $row), actions.values.map((item) => ({value: item, key: item})));
         });
     }
   }
@@ -248,7 +246,7 @@
       }
       CRM.api3(apiCalls)
         .then(function(data) {
-          data.getfields.values = _.indexBy(data.getfields.values, 'name');
+          data.getfields.values = Object.fromEntries(Object.values(data.getfields.values).map((field) => [field.name, field]));
           getFieldsCache[entity+action] = data.getfields;
           getActionsCache[entity] = getActionsCache[entity] || data.getactions;
           response.resolve(getFieldsCache[entity+action]);
@@ -288,12 +286,9 @@
       });
       getFieldData.api_action = {
         name: 'api_action',
-        options: _.reduce(actions.values, function(ret, item) {
-          ret[item] = item;
-          return ret;
-        }, {})
+        options: Object.fromEntries(actions.values.map((item) => [item, item]))
       };
-      getFieldsCache[entity+action] = {values: _.cloneDeep(getFieldData)};
+      getFieldsCache[entity+action] = {values: structuredClone(getFieldData)};
       showFields(['api_action']);
       renderJoinSelector();
       return;
@@ -309,7 +304,7 @@
       populateFields(fields, entity, action, '', required);
       showFields(required);
       renderJoinSelector();
-      if (_.includes(['get', 'getsingle', 'getvalue', 'getstat', 'gettree'], action)) {
+      if (['get', 'getsingle', 'getvalue', 'getstat', 'gettree'].includes(action)) {
         showReturn();
       }
     });
@@ -336,7 +331,7 @@
         multiple: true,
         placeholder: ts('Leave blank for default'),
         formatResult: function(field) {
-          return _.escape(field.text) + '<div class="api-field-desc">' + _.escape(field.description) + '</div>';
+          return CRM.utils.escapeHtml(field.text) + '<div class="api-field-desc">' + CRM.utils.escapeHtml(field.description) + '</div>';
         }
       };
     if (action == 'getstat') {
@@ -371,7 +366,7 @@
    * @returns {string}
    */
   function renderAction(option) {
-    return isActionDeprecated(option.id) ? '<span class="strikethrough">' + _.escape(option.text) + '</span>' : _.escape(option.text);
+    return isActionDeprecated(option.id) ? '<span class="strikethrough">' + CRM.utils.escapeHtml(option.text) + '</span>' : CRM.utils.escapeHtml(option.text);
   }
 
   /**
@@ -380,13 +375,13 @@
   function populateActions() {
     var val = $('#api-action').val();
     $('#api-action').removeClass('loading').select2({
-      data: _.transform(actions.values, function(ret, item) {ret.push({text: item, id: item});}),
+      data: actions.values.map((item) => ({text: item, id: item})),
       formatSelection: renderAction,
       formatResult: renderAction
     });
     // If previously selected action is not available, set it to 'get' if possible
-    if (!_.includes(actions.values, val)) {
-      $('#api-action').select2('val', !_.includes(actions.values, 'get') ? actions.values[0] : 'get', true);
+    if (!actions.values.includes(val)) {
+      $('#api-action').select2('val', !actions.values.includes('get') ? actions.values[0] : 'get', true);
     }
   }
 
@@ -408,7 +403,7 @@
     $('#api-params').empty();
     $('#api-param-buttons').show();
     if (required.length) {
-      _.each(required, addField);
+      required.forEach(addField);
     } else {
       addField();
     }
@@ -427,7 +422,7 @@
    */
   function isSelect(fieldName, operator) {
     var fieldSpec = getField(fieldName);
-    return (isYesNo(fieldName) || fieldSpec.options || fieldSpec.FKApiName) && !_.includes(TEXT, operator);
+    return (isYesNo(fieldName) || fieldSpec.options || fieldSpec.FKApiName) && !TEXT.includes(operator);
   }
 
   /**
@@ -438,10 +433,10 @@
    * @returns boolean
    */
   function isMultiSelect(fieldName, operator) {
-    if (isYesNo(fieldName) || _.includes(NO_MULTI, action)) {
+    if (isYesNo(fieldName) || NO_MULTI.includes(action)) {
       return false;
     }
-    if (_.includes(MULTI, operator)) {
+    if (MULTI.includes(operator)) {
       return true;
     }
     // The = operator is ambiguous but all others can be safely assumed to be single
@@ -449,13 +444,6 @@
       return false;
     }
     return fieldName !== 'entity_table';
-    /*
-     * Attempt to resolve the ambiguity of the = operator using metadata
-     * commented out because there is not enough metadata in the api at this time
-     * to accurately figure it out.
-     */
-    // var field = fieldName && _.find(fields, 'id', fieldName);
-    // return field && field.multi;
   }
 
   /**
@@ -476,7 +464,7 @@
     }
     $valField.attr('placeholder', ts('Value'));
     // Boolean fields only have 1 possible value
-    if (_.includes(BOOL, operator)) {
+    if (BOOL.includes(operator)) {
       $valField.css('visibility', 'hidden').val('1');
       return;
     }
@@ -489,7 +477,8 @@
         $valField.val('');
       }
       // When switching from multi-select to single select
-      else if (!multiSelect && _.includes(currentVal, ',')) {
+      // $valField was a multi-select, so val() gives null when nothing was selected
+      else if (!multiSelect && (currentVal || '').includes(',')) {
         $valField.val(currentVal.split(',')[0]);
       }
       // Yes-No options
@@ -502,9 +491,7 @@
       else if (fieldSpec.options) {
         $valField.select2({
           multiple: multiSelect,
-          data: _.map(fieldSpec.options, function (value, key) {
-            return {id: key, text: value};
-          })
+          data: Object.entries(fieldSpec.options).map(([key, value]) => ({id: key, text: value}))
         });
       }
       // EntityRef
@@ -515,7 +502,7 @@
           entity: entity,
           select: {
             multiple: multiSelect,
-            minimumInputLength: _.includes(OPEN_IMMEDIATELY, entity) ? 0 : 1,
+            minimumInputLength: OPEN_IMMEDIATELY.includes(entity) ? 0 : 1,
             // If user types a numeric id, allow it as a choice
             createSearchChoice: function(input) {
               var match = /[1-9][0-9]*/.exec(input);
@@ -586,7 +573,7 @@
       });
       return '[' + ret + ']';
     }
-    if ($.isArray(val)) {
+    if (Array.isArray(val)) {
       $.each(val, function(k, v) {
         ret += (ret ? ', ' : '') + phpFormat(v);
       });
@@ -610,7 +597,7 @@
         op = $('select.api-param-op', $row).val() || '=',
         name = $('input.api-param-name', $row).val(),
         // Workaround for ambiguity of the = operator
-        makeArray = (op === '=' && isSelect(name, op)) ? _.includes(input, ',') : op !== '=' && isMultiSelect(name, op),
+        makeArray = (op === '=' && isSelect(name, op)) ? input.includes(',') : op !== '=' && isMultiSelect(name, op),
         val = evaluate(input, makeArray);
 
       // Ignore blank values for the return field
@@ -729,7 +716,7 @@
     q.php += ");";
     q.json += ").then(function(result) {\n  // do something with result\n}, function(error) {\n  // oops\n});";
     q.smarty += "}\n{foreach from=$result.values item=" + entity.toLowerCase() + "}\n  {$" + entity.toLowerCase() + ".some_field}\n{/foreach}";
-    if (!_.includes(action, 'get')) {
+    if (!action.includes('get')) {
       q.smarty = '{* Smarty API only works with get actions *}';
     }
     $('#api-rest').html(restTpl(http));
@@ -749,7 +736,7 @@
       alert(ts('Select an entity.'));
       return;
     }
-    if (!_.includes(action, 'get') && !_.includes(action, 'check')) {
+    if (!action.includes('get') && !action.includes('check')) {
       var msg = action === 'delete' ? ts('This will delete data from CiviCRM. Are you sure?') : ts('This will write to the database. Continue?');
       CRM.confirm({title: ts('Confirm %1', {1: action}), message: msg}).on('crmConfirm:yes', execute);
     } else {
@@ -771,7 +758,7 @@
         prettyprint: 1,
         json: JSON.stringify(params)
       },
-      type: _.includes(action, 'get') ? 'GET' : 'POST',
+      type: action.includes('get') ? 'GET' : 'POST',
       dataType: 'text'
     }).then(function(text) {
       $('#api-result').text(text);
@@ -833,10 +820,10 @@
    */
   function renderJoinSelector() {
     $('#api-join').hide();
-    if (!_.includes(NO_JOINS, entity) && _.includes(['get', 'getsingle', 'getcount'], action)) {
+    if (!NO_JOINS.includes(entity) && ['get', 'getsingle', 'getcount'].includes(action)) {
       var joinable = {};
       (function recurse(fields, joinable, prefix, depth, entities) {
-        _.each(fields, function(field) {
+        Object.values(fields).forEach((field) => {
           var name = prefix + field.name;
           addJoinInfo(field, name);
           var entity = field.FKApiName;
@@ -847,7 +834,7 @@
               checked: !!joins[name]
             };
             // Expose further joins if we are not over the limit or recursing onto the same entity multiple times
-            if (joins[name] && depth < CRM.vars.explorer.max_joins && !_.countBy(entities)[entity]) {
+            if (joins[name] && depth < CRM.vars.explorer.max_joins && !entities.includes(entity)) {
               joinable[name].children = {};
               recurse(getFieldsCache[entity+'get'].values, joinable[name].children, name + '.', depth+1, entities.concat(entity));
             }
@@ -859,8 +846,8 @@
             };
           }
         });
-      })(_.cloneDeep(getFieldData), joinable, '', 1, [entity]);
-      if (!_.isEmpty(joinable)) {
+      })(structuredClone(getFieldData), joinable, '', 1, [entity]);
+      if (Object.keys(joinable).length) {
         // Send joinTpl as a param so it can recursively call itself to render children
         $('#api-join').show().children('div').html(joinTpl({joins: joinable, tpl: joinTpl}));
       }
@@ -884,16 +871,14 @@
         $('input.api-param-name, #api-return-value').removeClass('loading');
       });
     } else {
-      joins = _.omit(joins, function(entity, n) {
-        return n.indexOf(name) === 0;
-      });
+      joins = Object.fromEntries(Object.entries(joins).filter(([n]) => !n.startsWith(name)));
       renderJoinSelector();
       populateFields(fields, entity, action, '');
     }
   }
 
   function handleAndOr() {
-    if (!_.includes(NO_JOINS, entity) && _.includes(['get', 'getsingle', 'getcount'], action)) {
+    if (!NO_JOINS.includes(entity) && ['get', 'getsingle', 'getcount'].includes(action)) {
       var or = [];
       $('tr.api-param-row').each(function() {
         if ($(this).next().is('tr.api-param-row') && $('input.api-param-name', this).val()) {
@@ -946,7 +931,7 @@
     $('#api-entity, #doc-entity').crmSelect2({
       // Add strikethough class to selection to indicate deprecated apis
       formatSelection: function(option) {
-        return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + _.escape(option.text) + '</span>' : _.escape(option.text);
+        return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + CRM.utils.escapeHtml(option.text) + '</span>' : CRM.utils.escapeHtml(option.text);
       }
     });
     $('form#api-explorer')

@@ -45,7 +45,7 @@ class None implements AuthxInterface {
    * @inheritDoc
    */
   public function getCurrentUserId() {
-    throw new \Exception("Cannot determine active user: Unrecognized user framework");
+    return NULL;
   }
 
   /**

@@ -4,6 +4,7 @@ return [
   'name' => 'Survey',
   'table' => 'civicrm_survey',
   'class' => 'CRM_Campaign_DAO_Survey',
+  'token_class' => 'CRM_Campaign_SurveyTokens',
   'getInfo' => fn() => [
     'title' => ts('Survey'),
     'title_plural' => ts('Surveys'),

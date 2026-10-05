@@ -341,14 +341,14 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $str = CRM_Core_TokenSmarty::render(['text' => $str], [
         'smarty' => FALSE,
         'contactId' => CRM_Core_Session::getLoggedInContactID(),
+        'mailingId' => $mailing->id,
       ])['text'];
       $tokens = $dummy_mail->getTokens();
 
-      $str = CRM_Utils_Token::replaceSubscribeInviteTokens($str);
-      $str = CRM_Utils_Token::replaceMailingTokens($str, $mailing, NULL, $tokens['text']);
+      $str = self::replaceSubscribeInviteTokens($str);
       $str = CRM_Utils_Token::replaceActionTokens($str, $verp, $urls, NULL, $tokens['text']);
 
-      $unmatched = CRM_Utils_Token::unmatchedTokens($str);
+      $unmatched = self::unmatchedTokens($str);
       $contentCheck = CRM_Utils_String::htmlToText($str);
 
       if (!empty($unmatched) && 0) {
@@ -375,6 +375,49 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   }
 
   /**
+   * Replace subscription-invitation tokens
+   *
+   * (legacy code - removed from other places)
+   *
+   * @param string $str
+   *   The string with tokens to be replaced.
+   *
+   * @return string
+   *   The processed string
+   */
+  private static function replaceSubscribeInviteTokens($str) {
+    if (preg_match('/\{action\.subscribeUrl\}/', $str)) {
+      $url = CRM_Utils_System::url('civicrm/mailing/subscribe',
+        'reset=1',
+        TRUE, NULL, FALSE, TRUE
+      );
+      $str = preg_replace('/\{action\.subscribeUrl\}/', $url, $str);
+    }
+
+    if (preg_match('/\{action\.subscribeUrl.\d+\}/', $str, $matches)) {
+      foreach ($matches as $key => $value) {
+        $gid = substr($value, 21, -1);
+        $url = CRM_Utils_System::url('civicrm/mailing/subscribe',
+          "reset=1&gid={$gid}",
+          TRUE, NULL, FALSE, TRUE
+        );
+        $str = preg_replace('/' . preg_quote($value) . '/', $url, $str);
+      }
+    }
+
+    if (preg_match('/\{action\.subscribe.\d+\}/', $str, $matches)) {
+      foreach ($matches as $key => $value) {
+        $gid = substr($value, 18, -1);
+        $domain = CRM_Core_BAO_MailSettings::defaultDomain();
+        $localpart = CRM_Core_BAO_MailSettings::defaultLocalpart();
+        // we add the 0.0000000000000000 part to make this match the other email patterns (with action, two ids and a hash)
+        $str = preg_replace('/' . preg_quote($value) . '/', "mailto:{$localpart}s.{$gid}.0.0000000000000000@$domain", $str);
+      }
+    }
+    return $str;
+  }
+
+  /**
    * Display Name of the form.
    *
    *
@@ -392,6 +435,21 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   public function listTokens() {
     $tokens = CRM_Core_SelectValues::contactTokens();
     return $tokens;
+  }
+
+  /**
+   * Find unprocessed tokens (call this last)
+   *
+   * @param string $str
+   *   The string to search.
+   *
+   * @return array
+   *   Array of tokens that weren't replaced
+   */
+  private static function unmatchedTokens($str) {
+    //preg_match_all('/[^\{\\\\]\{(\w+\.\w+)\}[^\}]/', $str, $match);
+    preg_match_all('/\{(\w+\.\w+)\}/', $str, $match);
+    return $match[1];
   }
 
 }

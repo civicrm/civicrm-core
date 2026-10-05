@@ -14,7 +14,7 @@
 <div class="crm-block crm-form-block crm-uf_group-form-block">
 {if ($action eq 2 or $action eq 4) and $snippet neq 'json'} {* Update or View*}
   <div class="action-link">
-    <a href="{crmURL p='civicrm/admin/uf/group/field' q="action=browse&reset=1&gid=$gid"}" class="button"><span>{ts}View or Edit Fields for this Profile{/ts}</a></span>
+    <a href="{crmURL p='civicrm/admin/uf/group/field' f='/?gid='|cat:$gid}" class="button"><span>{ts}View or Edit Fields for this Profile{/ts}</a></span>
     <div class="clear"></div>
   </div>
 {/if}
@@ -24,6 +24,7 @@
            {$message}
     </div>
 {else}
+  {crmRegion name='profile-settings-form'}
     <table class="form-layout">
       {foreach from=$entityFields item=fieldSpec}
         {if not in_array($fieldSpec.name, $advancedFieldsConverted)}
@@ -56,6 +57,7 @@
     </table>
     {* adding advance setting tab *}
     {include file='CRM/UF/Form/AdvanceSetting.tpl'}
+  {/crmRegion}
 {/if}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('searchAdminIcons', {
@@ -13,11 +13,13 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
-      this.getField = searchMeta.getField;
+      this.getField = (fieldName) => {
+        return searchMeta.getField(fieldName, ctrl.crmSearchAdmin.savedSearch);
+      };
 
       this.fields = function() {
-        let allFields = ctrl.crmSearchAdmin.getAllFields(':name', ['Field', 'Custom', 'Extra', 'Pseudo']);
-        let selectFields = ctrl.crmSearchAdmin.getSelectFields();
+        let allFields = ctrl.crmSearchAdmin.getAllFields(ctrl.crmSearchAdmin.savedSearch, ':name', ['Field', 'Custom', 'Extra', 'Pseudo']);
+        let selectFields = ctrl.crmSearchAdmin.getSelectFields(ctrl.crmSearchAdmin.savedSearch);
         // Use machine names not labels for option matching
         selectFields.forEach((field) => field.id = field.id.replace(':label', ':name'));
         return {
@@ -31,23 +33,24 @@
             ctrl.menuOpen = false;
           });
         });
-        const allFields = ctrl.crmSearchAdmin.getAllFields(':icon');
+        const allFields = ctrl.crmSearchAdmin.getAllFields(ctrl.crmSearchAdmin.savedSearch, ':icon');
         let entityLabel = searchMeta.getEntity(ctrl.crmSearchAdmin.savedSearch.api_entity).title;
         // Gather all fields with an icon
         function getIconFields(iconFields, group, i) {
           if (group.children) {
             // Use singular title for main entity
             entityLabel = i ? group.text : entityLabel;
-            _.transform(group.children, function(iconFields, field) {
-              if (field.id && _.endsWith(field.id, 'icon')) {
+            group.children.forEach((field) => {
+              if (field.id && field.id.endsWith('icon')) {
                 field.text = entityLabel + ' - ' + field.text;
                 iconFields.push(field);
               }
-            }, iconFields);
+            });
           }
         }
-        ctrl.iconFields = _.transform(allFields, getIconFields, []);
-        ctrl.iconFieldMap = _.indexBy(ctrl.iconFields, 'id');
+        ctrl.iconFields = [];
+        allFields.forEach((group, i) => getIconFields(ctrl.iconFields, group, i));
+        ctrl.iconFieldMap = Object.fromEntries(ctrl.iconFields.map((field) => [field.id, field]));
       };
 
       this.onSelectField = function(clause) {
@@ -94,4 +97,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

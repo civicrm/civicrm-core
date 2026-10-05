@@ -63,7 +63,6 @@
 </details>
 {literal}
 <script type="text/javascript">
-(function (_) {
   CRM.$(function($) {
     var $form = $('form.{/literal}{$form.formClass}{literal}'),
       defaultDate = null;
@@ -141,7 +140,7 @@
           $input
             .datepicker({
               beforeShow: function() {
-                var existingSelections = _.pluck($el.select2('data') || [], 'id');
+                var existingSelections = ($el.select2('data') || []).map((item) => item.id);
                 return {
                   changeMonth: true,
                   changeYear: true,
@@ -149,7 +148,7 @@
                   beforeShowDay: function(date) {
                     // Don't allow the same date to be selected twice
                     var dateStr = $.datepicker.formatDate('yy-mm-dd', date);
-                    if (_.includes(existingSelections, dateStr)) {
+                    if (existingSelections.includes(dateStr)) {
                       return [false, '', '{/literal}{ts escape='js'}Already selected{/ts}{literal}'];
                     }
                     return [true, '', ''];
@@ -233,6 +232,5 @@
     $('[name=repetition_frequency_interval]', $form).each(pluralizeUnits).change(pluralizeUnits);
 
   });
-})(CRM._);
 </script>
 {/literal}

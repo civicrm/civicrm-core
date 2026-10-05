@@ -19,17 +19,6 @@ use Civi\Api4\Event\AuthorizeRecordEvent;
 class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements \Civi\Core\HookInterface {
 
   /**
-   * @deprecated
-   * @param array $params
-   * @param array $defaults
-   * @return self|null
-   */
-  public static function retrieve($params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
    * Is this contact type active.
    *
    * @param string $contactType
@@ -381,28 +370,6 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
   }
 
   /**
-   * Delete Contact SubTypes.
-   *
-   * @param int $contactTypeId
-   *   ID of the Contact Subtype to be deleted.
-   * @deprecated
-   * @return bool
-   */
-  public static function del($contactTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    if (!$contactTypeId) {
-      return FALSE;
-    }
-    try {
-      static::deleteRecord(['id' => $contactTypeId]);
-      return TRUE;
-    }
-    catch (CRM_Core_Exception $e) {
-      return FALSE;
-    }
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
@@ -484,35 +451,6 @@ WHERE contact_sub_type LIKE '%{$subType}%'";
         ->execute();
     }
     Civi::cache('contactTypes')->clear();
-  }
-
-  /**
-   * @deprecated
-   * @return CRM_Contact_DAO_ContactType
-   * @throws \CRM_Core_Exception
-   */
-  public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    $params = ['id' => $id];
-    self::retrieve($params, $contactinfo);
-    $params = ['name' => "New $contactinfo[name]"];
-    $newParams = ['is_active' => $is_active];
-    CRM_Core_BAO_Navigation::processUpdate($params, $newParams);
-    CRM_Core_BAO_Navigation::resetNavigation();
-    return CRM_Core_DAO::setFieldValue('CRM_Contact_DAO_ContactType', $id,
-      'is_active', $is_active
-    );
   }
 
   /**

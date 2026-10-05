@@ -22,30 +22,6 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website implements Civi\Core\Hoo
   use CRM_Contact_AccessTrait;
 
   /**
-   * @deprecated
-   *
-   * @param array $params
-   * @return CRM_Core_DAO_Website
-   * @throws CRM_Core_Exception
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
-   * @deprecated
-   *
-   * @param array $params
-   * @return CRM_Core_DAO_Website
-   * @throws CRM_Core_Exception
-   */
-  public static function add($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Process website.
    *
    * @param array $params
@@ -84,20 +60,6 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website implements Civi\Core\Hoo
         static::deleteRecord($values);
       }
     }
-  }
-
-  /**
-   * Delete website.
-   *
-   * @param int $id
-   *
-   * @return bool
-   *
-   * @deprecated
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) static::deleteRecord(['id' => $id]);
   }
 
   /**

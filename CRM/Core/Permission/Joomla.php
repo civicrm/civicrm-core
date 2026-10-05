@@ -38,7 +38,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    */
   public function check($str, $userId = NULL) {
     $config = CRM_Core_Config::singleton();
-    // JFactory::getUser does strict type checking, so convert falesy values to NULL
+    // Joomla's UserFactory::loadUserById() does strict type checking, so convert falesy values to NULL
     if ($userId === 0 || $userId === '0') {
       $userId = 0;
     }
@@ -58,16 +58,11 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     // we've not yet figured out how to bootstrap joomla, so we should
     // not execute hooks if joomla is not loaded
     if (defined('_JEXEC')) {
-      if (version_compare(JVERSION, '4.0', 'lt')) {
-        $user = JFactory::getUser($userId);
+      if ($userId === NULL) {
+        $user = $config->userSystem->getCurrentJoomlaUser();
       }
       else {
-        if ($userId === NULL) {
-          $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
-        }
-        else {
-          $user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($userId);
-        }
+        $user = $config->userSystem->getJoomlaUserById($userId);
       }
       $api_key = CRM_Utils_Request::retrieve('api_key', 'String');
 
@@ -75,16 +70,11 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
       if ($user->id === 0 && !is_null($api_key)) {
         $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
         $uid = ($contact_id) ? CRM_Core_BAO_UFMatch::getUFId($contact_id) : NULL;
-        if (version_compare(JVERSION, '4.0', 'lt')) {
-          $user = JFactory::getUser($uid);
+        if ($uid === NULL) {
+          $user = $config->userSystem->getCurrentJoomlaUser();
         }
         else {
-          if ($uid === NULL) {
-            $user = \Joomla\CMS\Factory::getApplication()->getIdentity() ?? \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById(0);
-          }
-          else {
-            $user = \Joomla\CMS\Factory::getContainer()->get(\Joomla\CMS\User\UserFactoryInterface::class)->loadUserById($uid);
-          }
+          $user = $config->userSystem->getJoomlaUserById($uid);
         }
       }
 
@@ -139,6 +129,34 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    *   true if yes, else false
    */
   public function checkGroupRole($array) {
+    $user = CRM_Core_Config::singleton()->userSystem->getCurrentJoomlaUser();
+    if (version_compare(JVERSION, '4.0', 'lt')) {
+      $db = JFactory::getDbo();
+    }
+    else {
+      $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+    }
+    $query = $db->getQuery(TRUE);
+    $titles = '';
+    foreach ($array as $group) {
+      $titles .= $db->quoteName($group);
+      $titles .= ',';
+    }
+    $titles = rtrim($titles, ',');
+    $query
+      ->select($db->quoteName('*'))
+      ->from($db->quoteName('#__usergroups'))
+      ->where($db->quoteName('title') . ' IN (' . $titles . ')');
+
+    $db->setQuery($query);
+
+    $result = $db->loadObjectList('id');
+    $userGroups = $user->getAuthorisedGroups();
+    foreach (array_keys($result) as $groupID) {
+      if (array_key_exists($groupID, $userGroups)) {
+        return TRUE;
+      }
+    }
     return FALSE;
   }
 

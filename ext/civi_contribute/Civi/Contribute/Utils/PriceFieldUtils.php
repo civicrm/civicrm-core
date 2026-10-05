@@ -5,6 +5,14 @@ namespace Civi\Contribute\Utils;
 class PriceFieldUtils {
 
   /**
+   * Synthetic afform field that carries whether the current user may see
+   * admin-visibility (non-public) price options. Published per price-bearing
+   * entity by PriceOptionAvailabilityPublisher and referenced by the af-if
+   * that PriceOptionDefnInjector attaches to restricted options.
+   */
+  const RESTRICTED_OPTIONS_FLAG = 'has_all_price_options';
+
+  /**
    * @return string[] entities for which payments are enabled
    */
   public static function getEnabledEntities(): array {
@@ -42,6 +50,36 @@ class PriceFieldUtils {
     return self::getPriceFieldSpecs()[$entity] ?? [];
   }
 
+  /**
+   * IDs of active PriceFieldValues whose visibility is "admin".
+   *
+   * These are legitimate, selectable options that must only be offered to -
+   * and accepted from - users who may see admin price options. This mirrors
+   * the option-level gate core QuickForm applies in
+   * CRM_Contribute_Form_Contribution_Main::buildPriceSet() (which drops admin
+   * options for users lacking 'edit contributions').
+   *
+   * This is the authoritative server-side allow-list, used both to inject the
+   * client-side af-if that hides these options and to reject a crafted
+   * submission from an unprivileged user.
+   *
+   * @return int[]
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function getRestrictedPriceFieldValueIds(): array {
+    $cacheKey = __CLASS__ . '::restrictedPriceFieldValueIds';
+    if (!isset(\Civi::$statics[$cacheKey])) {
+      \Civi::$statics[$cacheKey] = array_map('intval', (array) \Civi\Api4\PriceFieldValue::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('is_active', '=', TRUE)
+        ->addWhere('visibility_id:name', '=', 'admin')
+        ->execute()
+        ->column('id'));
+    }
+    return \Civi::$statics[$cacheKey];
+  }
+
   public static function getPriceFieldSpecs(): array {
     if (!isset(\Civi::$statics[__CLASS__])) {
       \Civi::$statics[__CLASS__] = self::fetchPriceFieldSpecs();
@@ -49,6 +87,10 @@ class PriceFieldUtils {
     return \Civi::$statics[__CLASS__];
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
   protected static function fetchPriceFieldSpecs(): array {
     $priceFields = (array) \Civi\Api4\PriceField::get(FALSE)
       ->addSelect('id', 'name', 'label', 'html_type', 'is_enter_qty', 'is_display_amounts')
@@ -61,12 +103,18 @@ class PriceFieldUtils {
       // we also using price set name and label to create full names / labels for each field
       // if we flatten then we should enforce unique names on PriceField
       // and make sure labels are clear
+      // only show active values
       ->addSelect('price_set_id.extends', 'price_set_id.name', 'price_set_id.title')
       ->execute()
       ->indexBy('id');
 
     $fieldValues = (array) \Civi\Api4\PriceFieldValue::get(FALSE)
       ->addSelect('id', 'price_field_id', 'label', 'amount')
+      ->addWhere('is_active', '=', TRUE)
+      // we are only interested in PriceFieldValues for field types that accept options
+      // or fields which are `is_enter_qty` -- where the Field Value determines the unit amount
+      // this excludes the misleading PriceFieldValue for default_contribution_amount
+      ->addClause('OR', ['price_field_id.is_enter_qty', '=', TRUE], ['price_field_id.html_type', '!=', 'Text'])
       ->execute();
 
     // Add amount to each PriceFieldValue option label
@@ -104,22 +152,17 @@ class PriceFieldUtils {
         'is_enter_qty' => $priceField['is_enter_qty'],
       ];
 
-      if ($fieldSpec['price_field_id'] === 1) {
-        // price_field_id = 1 is the "magic" Default Contribution Amount,
-        // the schema has options but we ignore them as user will
-        // enter amount rather than option ID
-      }
-      else {
-        $options = array_filter($fieldValues, fn($value) => ($value['price_field_id'] === $priceField['id']));
+      $options = array_values(array_filter($fieldValues, fn($value) => ($value['price_field_id'] === $priceField['id'])));
 
-        if ($options) {
-          $fieldSpec['options'] = array_column($options, 'label', 'id');
-          // note: field value will be a PriceFieldValue id rather than an amount
-          $fieldSpec['data_type'] = 'Integer';
-          if ($fieldSpec['is_enter_qty']) {
-            $fieldSpec['amount'] = reset($options)['amount'];
-          }
-        }
+      if ($fieldSpec['is_enter_qty']) {
+        // for is_enter_qty fields we should have a single PriceFieldValue record
+        // representing the unit amount
+        $fieldSpec['amount'] = $options[0]['amount'];
+      }
+      elseif ($options) {
+        $fieldSpec['options'] = array_column($options, 'label', 'id');
+        // note: field value will be a PriceFieldValue id rather than an amount
+        $fieldSpec['data_type'] = 'Integer';
       }
 
       // add to sub array keyed by entity

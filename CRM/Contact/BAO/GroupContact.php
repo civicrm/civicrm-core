@@ -23,21 +23,6 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
   use CRM_Contact_AccessTrait;
 
   /**
-   * Deprecated add function
-   *
-   * @param array $params
-   *
-   * @return CRM_Contact_DAO_GroupContact
-   * @throws \CRM_Core_Exception
-   *
-   * @deprecated
-   */
-  public static function add(array $params): CRM_Contact_DAO_GroupContact {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Callback for hook_civicrm_post().
    *
    * @param \Civi\Core\Event\PostEvent $event
@@ -196,7 +181,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
           'date' => $date,
           'tracking' => $tracking,
         ];
-        CRM_Contact_BAO_SubscriptionHistory::create($historyParams);
+        CRM_Contact_BAO_SubscriptionHistory::writeRecord($historyParams);
         // Removing a row from civicrm_group_contact for a smart group may mean a contact
         // Is now back in a group based on criteria so we will invalidate the cache if it is there
         // So that accurate group cache is created next time it is needed.
@@ -227,7 +212,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact implemen
           'date' => $date,
           'tracking' => $tracking,
         ];
-        CRM_Contact_BAO_SubscriptionHistory::create($historyParams);
+        CRM_Contact_BAO_SubscriptionHistory::writeRecord($historyParams);
         $groupContact->status = $status;
         $groupContact->save();
         // Remove any rows from the group contact cache so it disappears straight away from smart groups.
@@ -508,23 +493,6 @@ SELECT    *
   }
 
   /**
-   * Deprecated create function.
-   *
-   * @deprecated
-   *
-   * @param array $params
-   *
-   * @return CRM_Contact_DAO_GroupContact
-   */
-  public static function create(array $params) {
-    // @fixme create was only called from CRM_Contact_BAO_Contact::createProfileContact
-    // As of Aug 2020 it's not called from anywhere so we can remove the below code after some time
-
-    CRM_Core_Error::deprecatedFunctionWarning('Use the GroupContact API');
-    return self::writeRecord($params);
-  }
-
-  /**
    * Function that doesn't do much.
    *
    * @param int $contactID
@@ -698,7 +666,7 @@ VALUES
 
       // lets check their current status
       $sql = "
-SELECT GROUP_CONCAT(contact_id) as contactStr
+SELECT contact_id
 FROM   civicrm_group_contact
 WHERE  group_id = %1
 AND    status = %2
@@ -711,9 +679,8 @@ AND    contact_id IN ( $contactStr )
 
       $presentIDs = [];
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
-      if ($dao->fetch()) {
-        $presentIDs = explode(',', ($dao->contactStr ?? ''));
-        $presentIDs = array_flip($presentIDs);
+      while ($dao->fetch()) {
+        $presentIDs[$dao->contact_id] = TRUE;
       }
 
       $gcValues = $shValues = [];

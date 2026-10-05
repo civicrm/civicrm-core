@@ -49,7 +49,7 @@ class SqlFunctionSUM extends SqlFunction {
    * As far as I can tell none of the suffix logic in parent will apply to SUM values
    * so is not needed here
    */
-  public function formatOutputValue(?string &$dataType, array &$values, string $key): void {
+  public function formatOutputValue(?string &$dataType, array &$values, string $key, ?Api4Query $query = NULL): void {
     if ($dataType === 'Boolean') {
       $dataType = 'Integer';
     }

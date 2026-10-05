@@ -29,12 +29,13 @@ class GetMarkup extends \Civi\Api4\Generic\BasicBatchAction {
     $module = \CRM_Utils_String::convertStringToCamel($display['type:name'], FALSE);
 
     // Note: Should be kept in-sync with \Civi\Search\AfformSearchMetadataInjector::preprocess
+    // (settings are normalized via Display::getClientSettings)
     $markup = sprintf('<%s search="%s" display="%s" api-entity="%s" settings="%s" filters="%s"></%s>',
       $display['type:name'],
       htmlspecialchars(\CRM_Utils_JS::encode($display['saved_search_id.name']), ENT_COMPAT),
       htmlspecialchars(\CRM_Utils_JS::encode($display['name']), ENT_COMPAT),
       htmlspecialchars($display['saved_search_id.api_entity'], ENT_COMPAT),
-      htmlspecialchars(\CRM_Utils_JS::encode($display['settings']), ENT_COMPAT),
+      htmlspecialchars(\CRM_Utils_JS::encode(\Civi\Search\Display::getClientSettings($display['settings'])), ENT_COMPAT),
       htmlspecialchars(\CRM_Utils_JS::encode($this->filters), ENT_COMPAT),
       $display['type:name']
     );

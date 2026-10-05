@@ -39,7 +39,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
 
     CRM_Event_BAO_ParticipantStatusType::deleteParticipantStatusType($statusType->id);
     // Checking for participant status type id after delete.
-    $statusTypeId = $this->assertDBNull('CRM_Event_DAO_ParticipantStatusType', $statusType->id, 'id',
+    $this->assertDBNull('CRM_Event_DAO_ParticipantStatusType', $statusType->id, 'id',
       'id', 'Check DB for status type id'
     );
   }
@@ -98,10 +98,13 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'visibility_id' => 1,
     ];
 
-    $statusType = CRM_Event_BAO_ParticipantStatusType::writeRecord($params);
+    $statusType = civicrm_api4('ParticipantStatusType', 'save', [
+      'records' => [$params],
+      'match' => ['name'],
+    ])->single();
 
     // retrieve status type
-    $retrieveParams = ['id' => $statusType->id];
+    $retrieveParams = ['id' => $statusType['id']];
     $default = [];
     $retrieveStatusType = CRM_Event_BAO_ParticipantStatusType::retrieve($retrieveParams, $default);
 

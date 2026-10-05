@@ -141,7 +141,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $contact2Params = is_array($dataSet['contacts'][1]) ? [$customFieldLabel => $dataSet['contacts'][1]] : [];
     $contactID = $this->individualCreate($contact1Params);
     $this->individualCreate($contact2Params);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => $dataSet['mode']]);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['mode' => $dataSet['mode']]);
     $this->assertCount($dataSet['merged'], $result['values']['merged']);
     $this->assertCount($dataSet['skipped'], $result['values']['skipped']);
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
@@ -217,7 +217,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $customFieldLabel = 'custom_' . $this->customFieldID;
     $contactID = $this->individualCreate();
     $this->individualCreate([$customFieldLabel => '2012-12-03']);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', []);
     $this->assertEquals(1, count($result['values']['merged']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
     $this->assertEquals('2012-12-03 00:00:00', $contact[$customFieldLabel]);
@@ -237,7 +237,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $customFieldLabel = 'custom_' . $this->customFieldID;
     $contactID = $this->individualCreate();
     $this->individualCreate([$customFieldLabel => '2012-11-03']);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', []);
     $this->assertEquals(1, count($result['values']['merged']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
     $this->assertEquals('2012-11-03 00:00:00', $contact[$customFieldLabel]);
@@ -250,7 +250,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $customFieldLabel = 'custom_' . $this->customFieldID;
     $contactID = $this->individualCreate([$customFieldLabel => '2012-11-03']);
     $this->individualCreate([$customFieldLabel => '2013-11-03']);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', []);
     $this->assertEquals(0, count($result['values']['merged']));
     $this->assertEquals(1, count($result['values']['skipped']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
@@ -264,7 +264,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $customFieldLabel = 'custom_' . $this->customFieldID;
     $contactID = $this->individualCreate([$customFieldLabel => '2012-11-03']);
     $this->individualCreate([$customFieldLabel => '2012-11-03']);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', []);
     $this->assertEquals(1, count($result['values']['merged']));
     $this->assertEquals(0, count($result['values']['skipped']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
@@ -278,7 +278,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $customFieldLabel = 'custom_' . $this->customIntFieldID;
     $contactID = $this->individualCreate([]);
     $this->individualCreate([$customFieldLabel => 20]);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', []);
     $this->assertEquals(1, count($result['values']['merged']));
     $this->assertEquals(0, count($result['values']['skipped']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
@@ -292,7 +292,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $customFieldLabel = 'custom_' . $this->customIntFieldID;
     $contactID = $this->individualCreate([$customFieldLabel => 20]);
     $this->individualCreate([$customFieldLabel => 1]);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', []);
     $this->assertEquals(0, count($result['values']['merged']));
     $this->assertEquals(1, count($result['values']['skipped']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
@@ -306,7 +306,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $customFieldLabel = 'custom_' . $this->customIntFieldID;
     $contactID = $this->individualCreate([$customFieldLabel => 0]);
     $this->individualCreate([$customFieldLabel => 20]);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', []);
     $this->assertEquals(0, count($result['values']['merged']));
     $this->assertEquals(1, count($result['values']['skipped']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
@@ -325,7 +325,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $customFieldLabel = 'custom_' . $this->customFieldID;
     $contactID = $this->individualCreate([$customFieldLabel => '2012-11-03']);
     $this->individualCreate([$customFieldLabel => '2013-11-03']);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0]);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0]);
     $this->assertEquals(0, count($result['values']['merged']));
     $this->assertEquals(1, count($result['values']['skipped']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
@@ -344,7 +344,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $customFieldLabel = 'custom_' . $this->customFieldID;
     $contactID = $this->individualCreate();
     $this->individualCreate([$customFieldLabel => '2013-11-03']);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0]);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0]);
     $this->assertEquals(1, count($result['values']['merged']));
     $this->assertEquals(0, count($result['values']['skipped']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
@@ -363,7 +363,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $customFieldLabel = 'custom_' . $this->customIntFieldID;
     $contactID = $this->individualCreate(['custom_' . $this->customBoolFieldID => 1]);
     $this->individualCreate([$customFieldLabel => 1, 'custom_' . $this->customBoolFieldID => 1]);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0]);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0]);
     $this->assertEquals(1, count($result['values']['merged']));
     $this->assertEquals(0, count($result['values']['skipped']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', [
@@ -380,7 +380,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   public function testBatchMergeCustomFieldConflicts(): void {
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 0]);
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 1]);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', []);
     $this->assertEquals(0, count($result['values']['merged']));
     $this->assertEquals(1, count($result['values']['skipped']));
   }
@@ -391,7 +391,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   public function testBatchMergeCustomFieldConflictsReverse(): void {
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 1]);
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 0]);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', []);
     $this->assertEquals(0, count($result['values']['merged']));
     $this->assertEquals(1, count($result['values']['skipped']));
   }
@@ -404,7 +404,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   public function testBatchMergeCustomFieldNoConflictsOneBlank(): void {
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 1]);
     $this->individualCreate();
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', []);
     $this->assertCount(1, $result['values']['merged']);
     $this->assertCount(0, $result['values']['skipped']);
   }
@@ -417,7 +417,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
   public function testBatchMergeCustomFieldNoConflictsOneBlankReverse(): void {
     $contactID = $this->individualCreate();
     $this->individualCreate(['custom_' . $this->customBoolFieldID => 1]);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', []);
     $this->assertCount(1, $result['values']['merged']);
     $this->assertCount(0, $result['values']['skipped']);
     $this->assertEquals(1, $this->callAPISuccessGetValue('Contact', ['id' => $contactID, 'return' => 'custom_' . $this->customBoolFieldID]));

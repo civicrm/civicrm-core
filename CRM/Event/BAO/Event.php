@@ -30,17 +30,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Event', $id, 'is_active', $is_active);
-  }
-
-  /**
    * Add the event.
    *
    * @param array $params
@@ -138,7 +127,7 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
       'modified_date' => date('Ymd'),
     ];
 
-    CRM_Core_BAO_Log::add($logParams);
+    CRM_Core_BAO_Log::writeRecord($logParams);
 
     if (!empty($params['custom']) &&
       is_array($params['custom'])
@@ -988,6 +977,14 @@ WHERE civicrm_event.is_active = 1
       ['replace' => ['target_entity_id' => $copyEvent->id]]
     );
 
+    CRM_Core_DAO::copyGeneric('CRM_Core_DAO_EntityTag',
+      [
+        'entity_id' => $id,
+        'entity_table' => 'civicrm_event',
+      ],
+      ['entity_id' => $copyEvent->id]
+    );
+
     $oldMapping = CRM_Core_BAO_ActionSchedule::getMapping($eventValues['is_template'] ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID);
     $copyMapping = CRM_Core_BAO_ActionSchedule::getMapping($copyEvent->is_template == 1 ? CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID : CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID);
     CRM_Core_DAO::copyGeneric('CRM_Core_DAO_ActionSchedule',
@@ -1093,7 +1090,7 @@ WHERE civicrm_event.is_active = 1
                 $contactID,
                 $template,
                 $participantId,
-                $isTest,
+                FALSE,
                 TRUE,
                 $participantParams
               );
@@ -1157,7 +1154,7 @@ WHERE civicrm_event.is_active = 1
 
           if (Civi::settings()->get('invoice_is_email_pdf') && !empty($values['contributionId'])) {
             $sendTemplateParams['isEmailPdf'] = TRUE;
-            $sendTemplateParams['contributionId'] = $values['contributionId'];
+            $sendTemplateParams['modelProps']['contributionID'] = $values['contributionId'];
           }
           CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         }
@@ -1204,7 +1201,7 @@ WHERE civicrm_event.is_active = 1
 
     $groups = $participantParams['group'] ?? NULL;
     $note = $participantParams['note'] ?? NULL;
-    $displayValues = self::getProfileDisplay($profileIds, $cid, $participantId, $note, $groups, $isTest);
+    $displayValues = self::getProfileDisplay($profileIds, $cid, $participantId, $note, $groups);
 
     $groupTitles = UFGroup::get(FALSE)
       ->addWhere('id', 'IN', $profileIds)
@@ -1432,7 +1429,11 @@ WHERE  id = $cfID
                 $values[$index] = CRM_Utils_File::getFileURL($path, $fileType);
               }
               else {
-                if ($dao->data_type == 'Int' ||
+                // For checkboxes, change array of [key => bool] to array of [idx => key]
+                if ($dao->html_type == 'CheckBox') {
+                  $customVal = is_array($params[$name]) ? array_keys(array_filter($params[$name])) : $params[$name];
+                }
+                elseif ($dao->data_type == 'Int' ||
                   $dao->data_type == 'Boolean'
                 ) {
                   $v = $params[$name];
@@ -1450,10 +1451,6 @@ WHERE  id = $cfID
                   $customVal = $displayValue = CRM_Utils_Date::customFormat(
                     CRM_Utils_Date::processDate($params[$name]), $config->dateformatFull);
                   $skip = TRUE;
-                }
-                // for checkboxes, change array of [key => bool] to array of [idx => key]
-                elseif ($dao->html_type == 'CheckBox') {
-                  $customVal = array_keys(array_filter($params[$name]));
                 }
                 else {
                   $customVal = $params[$name];
@@ -1583,7 +1580,7 @@ WHERE  id = $cfID
             $cId,
             $template,
             $pId,
-            $isTest,
+            FALSE,
             $isCustomProfile,
             $participantParams
           );
@@ -1601,7 +1598,7 @@ WHERE  id = $cfID
             $cId,
             $template,
             $pId,
-            $isTest,
+            FALSE,
             $isCustomProfile,
             $participantParams
           );
@@ -1649,16 +1646,12 @@ WHERE  id = $cfID
       'loc_block_id.address_id.state_province_id.name',
     ];
 
-    $result = civicrm_api3('Event', 'get', [
-      'check_permissions' => TRUE,
-      'return' => $ret,
-      'loc_block_id.address_id' => ['IS NOT NULL' => 1],
-      'options' => [
-        'limit' => 0,
-      ],
-    ]);
+    $result = \Civi\Api4\Event::get(TRUE)
+      ->setSelect($ret)
+      ->addWhere('loc_block_id.address_id', 'IS NOT NULL')
+      ->execute();
 
-    foreach ($result['values'] as $event) {
+    foreach ($result as $event) {
       $address = '';
       foreach ($ret as $field) {
         if ($field != 'loc_block_id' && !empty($event[$field])) {
@@ -2222,7 +2215,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @throws \CRM_Core_Exception
    * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function getProfileDisplay(array $profileIds, ?int $cid, int $participantId, ?string $note = NULL, ?array $groups = NULL, bool $isTest = FALSE): ?array {
+  public static function getProfileDisplay(array $profileIds, ?int $cid, int $participantId, ?string $note = NULL, ?array $groups = NULL): ?array {
     foreach ($profileIds as $gid) {
       if (CRM_Core_BAO_UFGroup::filterUFGroups($gid, $cid)) {
         $values = [];
@@ -2240,10 +2233,6 @@ WHERE  ce.loc_block_id = $locBlockId";
           'name' => 'participant_id',
           'title' => ts('Participant ID'),
         ];
-        //check whether its a text drive
-        if ($isTest) {
-          $params[] = ['participant_test', '=', 1, 0, 0];
-        }
 
         //display campaign on thankyou page.
         if (array_key_exists('participant_campaign_id', $fields)) {

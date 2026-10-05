@@ -1,10 +1,13 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchAdminSubsearch', {
     bindings: {
       display: '<',
       column: '<',
+    },
+    require: {
+      crmSearchAdmin: '^crmSearchAdmin'
     },
     templateUrl: '~/crmSearchAdmin/crmSearchAdminSubsearch.html',
     controller: function ($scope, searchMeta, crmApi4) {
@@ -23,7 +26,7 @@
         }
       };
 
-      this.getSubsearchField = (fieldName) => searchMeta.getField(fieldName, this.savedSearch.api_entity);
+      this.getSubsearchField = (fieldName) => searchMeta.getField(fieldName, this.savedSearch);
 
       const getSubsearchInfo = (searchName) => {
         this.searchDisplays = null;
@@ -75,7 +78,7 @@
 
             this.column.subsearch.display = result.searchDisplays[0]?.name || null;
             // Set default filter
-            const baseEntity = searchMeta.getBaseEntity();
+            const baseEntity = searchMeta.getEntity(this.crmSearchAdmin.savedSearch.api_entity);
             const baseKey = baseEntity.primary_key[0];
             this.savedSearch.api_params.select.forEach((fieldName) => {
               const field = this.getSubsearchField(fieldName);
@@ -108,4 +111,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

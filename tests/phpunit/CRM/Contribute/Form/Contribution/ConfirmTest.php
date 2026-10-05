@@ -9,21 +9,22 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipBlock;
 use Civi\Api4\Pledge;
+use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
 use Civi\Api4\PriceSetEntity;
 use Civi\Test\ContributionPageTestTrait;
 use Civi\Test\FormTrait;
 
 /**
- *  Test APIv3 civicrm_contribute_* functions
+ * Test Contribution forms.
  *
- * @package CiviCRM_APIv3
- * @subpackage API_Contribution
+ * @subpackage Contribution
  * @group headless
  */
 class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
@@ -39,6 +40,10 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_relationship']);
+    if (!empty($this->ids['UFJoin'])) {
+      \Civi\Api4\UFJoin::delete(FALSE)->addWhere('id', 'IN', $this->ids['UFJoin'])->execute();
+    }
     parent::tearDown();
   }
 
@@ -133,6 +138,115 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
   }
 
+  /**
+   * Test that paying an existing contribution online does not overwrite its
+   * receive_date with today's date.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPayNowPaymentDoesNotOverwriteReceiveDate(): void {
+    $originalReceiveDate = '2020-03-04 05:06:07';
+
+    $individualID = $this->createLoggedInUser();
+    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE], 'dummy');
+    $this->setDummyProcessorResult([
+      'payment_status_id' => 1,
+      'payment_status' => 'Completed',
+      'receive_date' => date('Y-m-d H:i:s'),
+      'trxn_id' => 'pay-now-preserves-date',
+    ]);
+
+    // The page the original (pending) contribution was created against.
+    $contributionPageID1 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
+
+    $contribution = $this->createTestEntity('Contribution', [
+      'contact_id' => $individualID,
+      'financial_type_id:name' => 'Campaign Contribution',
+      'currency' => 'USD',
+      'total_amount' => 100.00,
+      'receive_date' => $originalReceiveDate,
+      'contribution_status_id:name' => 'Pending',
+      'contribution_page_id' => $contributionPageID1,
+      'source' => 'backoffice pending contribution',
+    ]);
+
+    // Sanity check - the date we asked for is the date that got stored.
+    $this->assertEquals($originalReceiveDate, Contribution::get(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->addSelect('receive_date')
+      ->execute()->single()['receive_date']);
+
+    // A different page, used to take the payment.
+    $contributionPageID2 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
+
+    $this->submitOnlineContributionForm([
+      'credit_card_number' => 4111111111111111,
+      'cvv2' => 234,
+      'credit_card_exp_date' => [
+        'M' => 2,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+      $this->getPriceFieldLabelForContributionPage($contributionPageID2) => 100,
+      'credit_card_type' => 'Visa',
+      'email-5' => 'test@test.com',
+      'payment_processor_id' => $paymentProcessorID,
+    ], $contributionPageID2, ['ccid' => $contribution['id']]);
+
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->addSelect('receive_date', 'contribution_page_id', 'contribution_status_id:name', 'total_amount')
+      ->execute()->single();
+
+    // The whole point of this test - the historic date survives the payment.
+    $this->assertEquals($originalReceiveDate, $contribution['receive_date']);
+    // And the rest of the CRM-21200 protections still hold.
+    $this->assertEquals($contributionPageID1, $contribution['contribution_page_id']);
+    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+    $this->assertEquals(100.00, $contribution['total_amount']);
+
+    // The payment itself is recorded against today, not against the original
+    // receive_date - the money did arrive today.
+    $payment = $this->callAPISuccess('Payment', 'get', [
+      'contribution_id' => $contribution['id'],
+      'sequential' => 1,
+      'version' => 3,
+    ])['values'][0];
+    $this->assertEquals(date('Y-m-d'), substr($payment['trxn_date'], 0, 10));
+  }
+
+  /**
+   * Test that a brand new contribution created through a contribution page
+   * still gets receive_date = now.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testNewOnlineContributionReceiveDateIsToday(): void {
+    $this->createLoggedInUser();
+    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE], 'dummy');
+    $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
+
+    $this->submitOnlineContributionForm([
+      'credit_card_number' => 4111111111111111,
+      'cvv2' => 234,
+      'credit_card_exp_date' => [
+        'M' => 2,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+      $this->getPriceFieldLabelForContributionPage($contributionPageID) => 60,
+      'credit_card_type' => 'Visa',
+      'email-5' => 'test@test.com',
+      'payment_processor_id' => $paymentProcessorID,
+    ], $contributionPageID);
+
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('contribution_page_id', '=', $contributionPageID)
+      ->addSelect('receive_date', 'total_amount')
+      ->execute()->single();
+
+    $this->assertEquals(date('Y-m-d'), substr($contribution['receive_date'], 0, 10));
+    $this->assertEquals(60, $contribution['total_amount']);
+  }
+
   public function testOnBehalf(): void {
     $individualID = $this->individualCreate();
     // create a contribution page which is later used to make pay-later contribution
@@ -221,6 +335,83 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ];
 
     $this->submitOnlineContributionForm($submittedValues, $this->ids['ContributionPage']['QuickConfig']);
+  }
+
+  /**
+   * The 'existing organization' dropdown is always submitted by the browser,
+   * even when the contact chooses the 'Enter a new organization' radio
+   * instead - so it will hold whichever related organization is listed
+   * first. The membership being signed up for must still be attached to the
+   * newly-created organization, not hijacked onto that stale dropdown value.
+   */
+  public function testOnBehalfNewOrganizationMembershipIsNotStolenByExistingOrg(): void {
+    $individualID = $this->createLoggedInUser();
+    $existingOrgID = $this->organizationCreate([
+      'organization_name' => 'Existing Org',
+      'email_primary.email' => 'existing-org@example.org',
+    ]);
+    $this->createTestEntity('Relationship', [
+      'contact_id_a' => $individualID,
+      'contact_id_b' => $existingOrgID,
+      'relationship_type_id' => 5,
+      'is_current_employer' => 1,
+      'is_permission_a_b:name' => 'View and update',
+    ]);
+
+    $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, FALSE, FALSE);
+    $membershipTypeID = reset($this->ids['MembershipType']);
+
+    $existingMembership = $this->createTestEntity('Membership', [
+      'contact_id' => $existingOrgID,
+      'membership_type_id' => $membershipTypeID,
+    ], 'existingOrgMembership');
+
+    $this->createTestEntity('UFJoin', [
+      'module' => 'on_behalf',
+      'uf_group_id.name' => 'on_behalf_organization',
+      'entity_id' => $this->getContributionPageID('QuickConfig'),
+      'entity_table' => 'civicrm_contribution_page',
+      'weight' => 1,
+      'is_active' => 1,
+      // Note: this must be a plain array, not a pre-encoded JSON string - API4
+      // json-encodes 'serialize'-type fields itself, and will double-encode
+      // (wrapping in an array first) a value that isn't already an array.
+      'module_data' => ['on_behalf' => ['is_for_organization' => 2, 'default' => ['for_organization' => 'Organization']]],
+    ], 'on_behalf');
+
+    $this->submitOnlineContributionForm($this->getBillingSubmitValues() + [
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+      // The select always submits a value, regardless of which org_option radio is chosen.
+      'onbehalfof_id' => $existingOrgID,
+      'org_option' => 1,
+      'onbehalf' => [
+        'organization_name' => 'Brand New Org',
+        'phone-3-1' => '11122233',
+        'email-3' => 'brand-new-org@example.org',
+        'street_address-3' => '456 New Org Street',
+        'city-3' => 'Newville',
+        'postal_code-3' => '99999',
+        'country-3' => 1228,
+        'state_province-3' => 1021,
+      ],
+    ], $this->getContributionPageID('QuickConfig'));
+
+    $newOrgID = (int) Contact::get(FALSE)
+      ->addWhere('contact_type', '=', 'Organization')
+      ->addWhere('organization_name', '=', 'Brand New Org')
+      ->execute()->single()['id'];
+
+    $this->assertCount(1, Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $newOrgID)
+      ->addWhere('membership_type_id', '=', $membershipTypeID)
+      ->execute(), 'The membership should be created against the newly-created organization.');
+
+    // The pre-existing organization's membership must not have been renewed
+    // as a side effect of someone else signing up a different organization.
+    $refreshedExistingMembership = Membership::get(FALSE)
+      ->addWhere('id', '=', $existingMembership['id'])
+      ->execute()->single();
+    $this->assertEquals($existingMembership['end_date'], str_replace('-', '', $refreshedExistingMembership['end_date']));
   }
 
   /**
@@ -515,6 +706,37 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ]);
     $contribution = $this->getCreatedContribution();
     $this->assertEquals(5.00, $contribution['non_deductible_amount']);
+  }
+
+  /**
+   * Test that the non-deductible amount configured on a quantity-enabled
+   * price field value scales with the quantity entered, rather than being
+   * applied as a flat per-unit amount regardless of quantity.
+   *
+   * @see https://lab.civicrm.org/dev/core/-/work_items/6808
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitQuantityScalesNonDeductibleAmount(): void {
+    $this->contributionPageWithPriceSetCreate();
+    PriceFieldValue::update(FALSE)
+      ->addWhere('id', '=', $this->ids['PriceFieldValue']['text_field_2.95'])
+      ->setValues(['non_deductible_amount' => 1])
+      ->execute();
+
+    $this->submitOnlineContributionForm([
+      'id' => $this->getContributionPageID(),
+      'first_name' => 'J',
+      'last_name' => 'T',
+      'email-5' => 'JT@ohcanada.ca',
+      'receive_date' => date('Y-m-d H:i:s'),
+      'payment_processor_id' => 0,
+      'priceSetId' => $this->getPriceSetID('ContributionPage'),
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['free'],
+      'price_' . $this->ids['PriceField']['text_field_2.95'] => 3,
+    ]);
+    $contribution = $this->getCreatedContribution();
+    $this->assertEquals(3.00, $contribution['non_deductible_amount']);
   }
 
   /**
@@ -2207,6 +2429,30 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'Membership Fee',
       '$2.00',
     ], 1);
+  }
+
+  /**
+   * Test that emailed receipt for quick-config contribution page does not contain ASCII 0x01 (SOH) characters.
+   */
+  public function testQuickConfigEmailedReceiptNoASCII0x01(): void {
+    $this->contributionPageQuickConfigCreate(
+      ['is_email_receipt' => 1],
+      [],
+      FALSE,
+      FALSE,
+      TRUE,
+      FALSE
+    );
+
+    $this->submitOnlineContributionForm([
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'price_' . $this->ids['PriceField']['contribution_amount'] => $this->ids['PriceFieldValue']['contribution_amount_15'],
+      'id' => $this->getContributionPageID(),
+      'email-5' => 'donor@example.com',
+    ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
+
+    $this->assertMailSentCount(1);
+    $this->assertMailSentNotContainingString(CRM_Core_DAO::VALUE_SEPARATOR);
   }
 
 }

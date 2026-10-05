@@ -15,7 +15,7 @@
       <i class="crm-i fa-arrows crm-search-move-icon" role="img" aria-hidden="true"></i>
       <label for="crm-admin-autocomplete-search-field-{{$index}}">{{:: ts('Search by') }} <i class="crm-marker" ng-show="!$index">*</i></label>
       <input class="form-control" id="crm-admin-autocomplete-search-field-{{$index}}" ng-model="$ctrl.display.settings.searchFields[$index]" crm-ui-select="{data: $ctrl.parent.fieldsForSearch, allowClear: false}" />
-      <a href class="crm-hover-button" class="crm-hover-button" ng-show="$ctrl.display.settings.searchFields.length > 1" ng-click="$ctrl.display.settings.searchFields.splice($index, 1)" title="{{:: ts('Remove') }}">
+      <a href class="crm-hover-button" ng-show="$ctrl.display.settings.searchFields.length > 1" ng-click="$ctrl.display.settings.searchFields.splice($index, 1)" title="{{:: ts('Remove') }}">
         <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
       </a>
     </div>

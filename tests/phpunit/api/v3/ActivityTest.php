@@ -40,6 +40,7 @@
  * @group headless
  */
 class api_v3_ActivityTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   protected $_params;
   protected $_params2;
   protected $_entity = 'activity';

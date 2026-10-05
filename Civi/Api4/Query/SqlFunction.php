@@ -43,6 +43,18 @@ abstract class SqlFunction extends SqlExpression {
    */
   protected static $category;
 
+  /**
+   * Set to TRUE by aggregate functions (e.g. GROUP_FIRST, MIN, MAX) which are
+   * guaranteed to output one of the actual values of the field they wrap,
+   * as opposed to a computed value that doesn't correspond to any real row
+   * (e.g. SUM, AVG, COUNT). This allows the wrapped field's entity_reference
+   * (FK) to be preserved on the aggregated output, so it can still be used
+   * as a join key even though it's aggregated.
+   *
+   * @var bool
+   */
+  public $preservesEntityReference = FALSE;
+
   const CATEGORY_AGGREGATE = 'aggregate',
     CATEGORY_COMPARISON = 'comparison',
     CATEGORY_DATE = 'date',
@@ -119,19 +131,19 @@ abstract class SqlFunction extends SqlExpression {
    * @param string|null $dataType
    * @param array $values
    * @param string $key
+   * @param \Civi\Api4\Query\Api4Query|null $query
    * @see \Civi\Api4\Utils\FormattingUtil::formatOutputValues
    */
-  public function formatOutputValue(?string &$dataType, array &$values, string $key): void {
-    if (static::$dataType) {
-      $dataType = static::$dataType;
-    }
-    elseif (static::$category === self::CATEGORY_AGGREGATE) {
+  public function formatOutputValue(?string &$dataType, array &$values, string $key, ?Api4Query $query = NULL): void {
+    $dataType = $this->getRenderedDataType($query) ?? $dataType;
+    if (static::$category === self::CATEGORY_AGGREGATE) {
       $exprArgs = $this->getArgs();
       // If the first expression is a SqlFunction/SqlEquation, allow it to control the aggregate dataType
       if (method_exists($exprArgs[0]['expr'][0], 'formatOutputValue')) {
-        $exprArgs[0]['expr'][0]->formatOutputValue($dataType, $values, $key);
+        $exprArgs[0]['expr'][0]->formatOutputValue($dataType, $values, $key, $query);
       }
     }
+
     if (isset($values[$key]) && $this->suffix && $this->suffix !== 'id') {
       $dataType = 'String';
       $value =& $values[$key];

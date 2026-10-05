@@ -126,6 +126,23 @@ class MailingPreviewTest extends \CiviUnitTestCase {
   }
 
   /**
+   * The CiviMail editor posts every field it holds, and blanks nulls to '' on save.
+   */
+  public function testMailerPreviewWithoutIdEmptyLanguage(): void {
+    $contactID = $this->createLoggedInUser();
+    $displayName = $this->callAPISuccess('contact', 'get', ['id' => $contactID]);
+    $displayName = $displayName['values'][$contactID]['display_name'];
+    $params = $this->_params + ['language' => ''];
+
+    $maxIDs = $this->getMaxIds();
+    $previewResult = $this->callAPISuccess('mailing', 'preview', $params);
+    $this->assertMaxIds($maxIDs);
+
+    $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
+    $this->assertEquals('flexmailer', $previewResult['values']['_rendered_by_']);
+  }
+
+  /**
    * @return array
    *   Array(string $table => int $maxID).
    */

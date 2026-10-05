@@ -290,10 +290,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
 
     $responseData = (string) $this->getGuzzleClient()->post($this->_paymentProcessor['url_site'], [
       'body' => $requestxml,
-      'curl' => [
-        CURLOPT_RETURNTRANSFER => TRUE,
-        CURLOPT_SSL_VERIFYPEER => Civi::settings()->get('verifySSL'),
-      ],
+      'verify' => (bool) Civi::settings()->get('verifySSL'),
     ])->getBody();
 
     //----------------------------------------------------------------------------------------------------

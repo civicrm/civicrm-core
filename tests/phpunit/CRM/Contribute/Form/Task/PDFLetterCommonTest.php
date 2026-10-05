@@ -133,7 +133,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     ];
     $customField = $this->callAPISuccess('CustomField', 'create', $params);
     $customFieldKey = 'custom_' . $customField['id'];
-    $campaignTitle = 'Test Campaign ';
+    $campaignTitle = 'Test Campaign';
 
     $params = [
       'contact_id' => $this->_individualId,

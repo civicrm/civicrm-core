@@ -215,6 +215,17 @@ class Afform extends Generic\AbstractEntity {
           'data_type' => 'Integer',
         ],
         [
+          'name' => 'authx_timeout',
+          'title' => E::ts('Token Timeout'),
+          'data_type' => 'Integer',
+          'permission' => ['all CiviCRM permissions and ACLs'],
+        ],
+        [
+          'name' => 'authx_redirect',
+          'title' => E::ts('Token Redirect'),
+          'permission' => ['all CiviCRM permissions and ACLs'],
+        ],
+        [
           'name' => 'tags',
           'title' => E::ts('Tags'),
           'pseudoconstant' => [
@@ -460,6 +471,8 @@ class Afform extends Generic\AbstractEntity {
   public static function getInfo() {
     $info = parent::getInfo();
     $info['primary_key'] = ['name'];
+    $info['label_field'] = 'title';
+    $info['paths'] = ['update' => 'civicrm/admin/afform#/edit/[id]'];
     return $info;
   }
 

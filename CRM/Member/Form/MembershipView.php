@@ -73,12 +73,14 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=view&id=%%id%%&cid=%%cid%%&relAction=delete&mid=%%mid%%&reset=1' . $this->addContext(),
           'title' => ts('Cancel Related Membership'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
         CRM_Core_Action::ADD => [
           'name' => ts('Create'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=view&id=%%id%%&cid=%%cid%%&relAction=create&rid=%%rid%%&reset=1' . $this->addContext(),
           'title' => ts('Create Related Membership'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
         ],
       ];
     }
@@ -121,7 +123,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
           'skipStatusCal' => TRUE,
           'createActivity' => TRUE,
         ];
-        CRM_Member_BAO_Membership::create($params);
+        Membership::save(FALSE)->addRecord($params)->execute();
         $relatedDisplayName = CRM_Contact_BAO_Contact::displayName($params['contact_id']);
         CRM_Core_Session::setStatus(ts('Related membership for %1 has been created.', [1 => $relatedDisplayName]),
           ts('Membership Added'), 'success');

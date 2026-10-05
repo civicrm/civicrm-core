@@ -1,5 +1,14 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
+
+  // Copies over any keys the target hasn't got, leaving the ones it has alone
+  function applyDefaults(target, source) {
+    Object.entries(source).forEach(([key, value]) => {
+      if (target[key] === undefined) {
+        target[key] = value;
+      }
+    });
+  }
 
   // Trait shared by any search display controllers which allow sorting
   angular.module('crmSearchDisplay').factory('searchDisplayEditableTrait', function(crmApi4, crmStatus, $timeout) {
@@ -13,13 +22,16 @@
         this.cancelEditing();
       }],
 
-      startEditing: function(row, colIndex) {
+      startEditing: function(row, colIndex, $clickEvent) {
         if (this.editing === false && row.columns[colIndex].edit) {
           this.editValues = {};
           this.editing = row.key;
           row.columns.forEach((col, index) => {
             col.editing = (index === colIndex || (this.settings.editableRow && this.settings.editableRow.full));
             col.focused = index === colIndex;
+            if (col.editing) {
+              col.widthBeforeEdit = $clickEvent.target.offsetWidth;
+            }
           });
         }
       },
@@ -71,11 +83,11 @@
         if (result.length && rowIndex >= 0) {
           const row = this.results[rowIndex];
           // Preserve hierarchical info like _descendents and _depth which isn't returned by the refresh
-          _.defaults(result[0].data, row.data);
+          applyDefaults(result[0].data, row.data);
           // Ensure cssClass gets updated
           delete (row.cssClass);
           // Preserve top-leel items like collapsed
-          _.defaults(result[0], row);
+          applyDefaults(result[0], row);
           // Delete and re-insert the row.
           this.results.splice(rowIndex, 1);
           // Wait a tick to force Angular to update the DOM.
@@ -95,4 +107,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

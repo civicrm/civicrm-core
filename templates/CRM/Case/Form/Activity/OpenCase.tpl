@@ -53,9 +53,9 @@
         function updateCaseStatusOptions() {
           if ($('#case_type_id', $form).val()) {
             var definition = caseTypes[$('#case_type_id', $form).val()].definition;
-            var newOptions = CRM._.filter(caseStatusLabels, function(opt) {
-              return !definition.statuses || !definition.statuses.length || definition.statuses.indexOf(caseStatusNames[opt.key]) > -1;
-            });
+            var newOptions = (caseStatusLabels || []).filter((opt) =>
+              !definition.statuses || !definition.statuses.length || definition.statuses.indexOf(caseStatusNames[opt.key]) > -1
+            );
             CRM.utils.setOptions($('#status_id', $form), newOptions);
           }
         }

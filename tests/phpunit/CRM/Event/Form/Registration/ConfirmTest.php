@@ -21,6 +21,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   public function tearDown(): void {
     $this->revertTemplateToReservedTemplate();
     $this->quickCleanUpFinancialEntities();
+    Civi::settings()->set('event_show_payment_on_confirm', []);
     parent::tearDown();
   }
 
@@ -84,17 +85,20 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $paymentProcessorID = $this->processorCreate();
     /** @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
-    $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
+    $processor->setDoDirectPaymentResult(['payment_status_id' => 1, 'payment_status' => 'Completed', 'fee_amount' => 1.67]);
     $event = $this->eventCreatePaid([
       'payment_processor' => [$paymentProcessorID],
       'selfcancelxfer_time' => 72,
     ]);
-    $this->submitForm($event['id'], [
+    $form = $this->getFormWrapper([
       'first_name' => 'k',
       'last_name' => 'p',
       'email-Primary' => 'demo@example.com',
       'price_' . $this->getPriceFieldID('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_standard'],
-    ] + $this->getCreditCardParameters($paymentProcessorID));
+    ] + $this->getCreditCardParameters($paymentProcessorID), $event['id']);
+    $form->processForm();
+    $this->assertNotEmpty($form->getLineItems());
+    $this->assertEquals(300, $form->getTotalAmount());
     $this->callAPISuccessGetCount('Participant', [], 1);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(300, $contribution['total_amount']);
@@ -162,7 +166,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_alterPaymentProcessorParams', [$this, 'checkPaymentParameters']);
     $paymentProcessorID = $this->processorCreate();
     $event = $this->eventCreatePaid(['payment_processor' => [$paymentProcessorID]]);
-    $_REQUEST['mode'] = 'live';
     // Add someone to the waitlist.
     $waitlistContactID = $this->individualCreate();
     $waitlistParticipantID = $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContactID, 'status_id.name' => 'On waitlist']);
@@ -195,9 +198,32 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'billing_state_province-5' => 'AP',
       'billing_country-5' => 'US',
       'hidden_processor' => 1,
-    ]);
+    ], 'live');
     $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantID, 'return' => ['participant_status']]);
     $this->assertEquals('Registered', $waitlistParticipant['participant_status'], 'Invalid participant status. Expecting: Registered');
+  }
+
+  /**
+   * Test that a participant who is skipped part-way through registration
+   * does not have their price selection counted in the total.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testTaxMultipleParticipantSkippingSecond(): void {
+    $this->createLoggedInUser();
+    $this->createScenarioMultipleParticipantPendingWithTaxSkippingSecond();
+    $participants = Participant::get()
+      ->addWhere('event_id', '=', $this->getEventID())
+      ->addSelect('contact_id', 'contact_id.job_title')->execute();
+    $this->assertCount(2, $participants);
+    $contribution = $this->callAPISuccessGetSingle(
+      'Contribution',
+      [
+        'return' => ['tax_amount', 'total_amount', 'amount_level'],
+      ]
+    );
+    $this->assertEquals(50, $contribution['tax_amount'], 'Invalid Tax amount.');
+    $this->assertEquals(550, $contribution['total_amount'], 'Invalid Tax amount.');
   }
 
   public function checkPaymentParameters($paymentObject, $parameters): void {
@@ -289,6 +315,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $participantCount = [
       'standard' => 1,
       'student' => 4,
+      'free' => NULL,
       'student_plus' => 2,
     ];
     foreach ($participantCount as $key => $count) {
@@ -300,7 +327,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'first_name' => 'Participant1',
       'last_name' => 'LastName',
       'email-Primary' => 'participant1@example.com',
-      'additional_participants' => 2,
+      'additional_participants' => 3,
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
       'payment_processor_id' => 0,
       'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
@@ -312,6 +339,14 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         'email-Primary' => 'participant2@example.com',
         'priceSetId' => $this->getPriceSetID('PaidEvent'),
         'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant-free',
+        'last_name' => 'Free Loader',
+        'job_title' => 'hobo',
+        'email-Primary' => 'participant-free@example.com',
+        'priceSetId' => $this->getPriceSetID('PaidEvent'),
+        'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_free'],
       ])
       ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
         'first_name' => 'Participant3',
@@ -350,6 +385,77 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertStringContainsString('job_title	seer', $mailSent[0]['body']);
     $this->assertStringContainsString('job_title	wizard', $mailSent[0]['body']);
 
+  }
+
+  /**
+   * Test the additional participants' profile section headers use the
+   * public (frontend) title rather than the admin title.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailMultipleParticipantProfileTitleIsFrontEndTitle(): void {
+    $this->createScenarioMultipleParticipantPendingFreeEvent();
+    $mailSent = $this->sentMail;
+    $this->assertStringContainsString('Public Event Pre Profile (Additional)', $mailSent[0]['body']);
+    $this->assertStringNotContainsString('>Event Pre Profile (Additional)', $mailSent[0]['body']);
+  }
+
+  /**
+   * Test for https://lab.civicrm.org/dev/core/-/work_items/6744
+   *
+   * When the additional participant's own profile has a field that doesn't
+   * exist on the primary's profile (e.g. a 'relationship to primary' field),
+   * that field should appear in the additional participant's own
+   * confirmation email. Conversely a field that only exists on the
+   * primary's own profile should not appear in the additional participant's
+   * email at all.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailAdditionalParticipantOwnProfileFields(): void {
+    $this->eventCreateUnpaid();
+    // Only on the additional participant's own pre-profile - simulates a
+    // field like 'Relationship' that only makes sense for additional
+    // participants.
+    $this->createTestEntity('UFField', [
+      'uf_group_id' => $this->ids['UFGroup']['event_pre_additional_event'],
+      'field_name' => 'nick_name',
+      'label' => 'nick_name',
+    ], 'nick_name');
+    // Only on the primary's own pre-profile - simulates a field like
+    // 'Primary Address' that an additional participant never sees or fills in.
+    $this->createTestEntity('UFField', [
+      'uf_group_id' => $this->ids['UFGroup']['event_pre_event'],
+      'field_name' => 'middle_name',
+      'label' => 'middle_name',
+    ], 'middle_name');
+
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Participant1',
+      'last_name' => 'LastName',
+      'middle_name' => 'PrimaryOnlyField',
+      'email-Primary' => 'participant1@example.com',
+      'additional_participants' => 1,
+    ], ['id' => $this->getEventID()])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant2',
+        'last_name' => 'LastName',
+        'nick_name' => 'AdditionalOnlyField',
+        'email-Primary' => 'participant2@example.com',
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
+      ->processForm();
+    $mailSent = $form->getMail();
+
+    // Sanity check - the primary's own field shows up in the primary's own email.
+    $this->assertStringContainsString('middle_name	PrimaryOnlyField', $mailSent[0]['body']);
+
+    // The additional participant's own email should show their own answer
+    // for a field that only exists on their own profile ...
+    $this->assertStringContainsString('nick_name	AdditionalOnlyField', $mailSent[1]['body']);
+    // ... and should not show the primary-only field or its value at all.
+    $this->assertStringNotContainsString('middle_name', $mailSent[1]['body']);
+    $this->assertStringNotContainsString('PrimaryOnlyField', $mailSent[1]['body']);
   }
 
   /**
@@ -422,6 +528,34 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     );
     $contribution = $this->callAPISuccess('Contribution', 'get', ['invoice_id' => '57adc34957a29171948e8643ce906332']);
     $this->assertEquals('0', $contribution['count'], 'Contribution should not be created for zero fee event registration when no price field selected.');
+  }
+
+  /**
+   * Test that genuinely selecting a $0 price option does not require a
+   * payment method / billing details on the Confirm page, when the event
+   * is configured to show payment on confirm.
+   *
+   * https://lab.civicrm.org/dev/core/-/issues/6785
+   */
+  public function testOnlineRegistrationZeroFeeOptionShowPaymentOnConfirm(): void {
+    Civi::settings()->set('event_show_payment_on_confirm', ['all']);
+    $paymentProcessorID = $this->processorCreate(['is_default' => TRUE, 'user_name' => 'Test', 'is_test' => TRUE]);
+    $event = $this->eventCreatePaid(['payment_processor' => $paymentProcessorID]);
+
+    $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Bruce',
+      'last_name' => 'Wayne',
+      'email-Primary' => 'bruce@gotham.com',
+      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_free'],
+      'priceSetId' => $this->ids['PriceSet']['PaidEvent'],
+      'payment_processor_id' => $paymentProcessorID,
+      'button' => '_qf_Register_upload',
+    ], ['id' => $event['id']])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm', [
+        'payment_processor_id' => $paymentProcessorID,
+      ])->processForm();
+
+    $this->assertValidationError(['Confirm' => []]);
   }
 
   /**
@@ -565,34 +699,11 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    *
    * @param int $eventID
    * @param array $submittedValues Submitted Values
+   * @param string $mode
    */
-  protected function submitForm(int $eventID, array $submittedValues): void {
-    $form = $this->getFormWrapper($submittedValues, $eventID);
+  protected function submitForm(int $eventID, array $submittedValues, string $mode = ''): void {
+    $form = $this->getFormWrapper($submittedValues, $eventID, $mode);
     $form->processForm();
-  }
-
-  /**
-   * Submit the confirm form.
-   *
-   * @deprecated use SubmitForm
-   *
-   * @param int $eventID
-   * @param array $submittedValues Submitted Values
-   */
-  protected function submitFormLegacy(int $eventID, array $submittedValues): void {
-    $_REQUEST['id'] = $eventID;
-    /* @var CRM_Event_Form_Registration_Register $form */
-    $form = $this->getFormObject('CRM_Event_Form_Registration_Register', $submittedValues[0] ?? $submittedValues);
-    $form->preProcess();
-    $form->buildForm();
-    $form->postProcess();
-    /* @var CRM_Event_Form_Registration_Confirm $form */
-    $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm');
-    $form->preProcess();
-    $form->buildForm();
-    $form->postProcess();
-    // This allows us to rinse & repeat form submission in the same test, without leakage.
-    $this->formController = NULL;
   }
 
   /**
@@ -641,7 +752,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   public function testRegistrationWithoutCiviContributeEnabled(): void {
-    $mut = new CiviMailUtils($this, TRUE);
     $event = $this->eventCreateUnpaid([
       'has_waitlist' => 1,
       'max_participants' => 1,
@@ -650,37 +760,36 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'registration_end_date' => 20351015,
     ]);
     CRM_Core_BAO_ConfigSetting::disableComponent('CiviContribute');
-    $this->submitFormLegacy(
-      $event['id'], [
-        [
-          'first_name' => 'Bruce No Contribute',
-          'last_name' => 'Wayne',
-          'email-Primary' => 'bruce@gotham.com',
-          'is_primary' => 1,
-          'is_pay_later' => 0,
-        ],
-      ]
-    );
-    $mut->checkMailLog([
+    $this->submitForm($event['id'], [
+      'first_name' => 'Bruce No Contribute',
+      'last_name' => 'Wayne',
+      'email-Primary' => 'bruce@gotham.com',
+      'is_primary' => 1,
+      'is_pay_later' => 0,
+    ]);
+    $this->assertMailSentContainingStrings([
       'Dear Bruce No Contribute,',
       'Thank you for your registration.',
       'This is a confirmation that your registration has been received and your status has been updated to Registered.',
     ]);
-    $mut->stop();
-    $mut->clearMessages();
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
   }
 
   /**
    * @param array $submittedValues
    * @param int $eventID
+   * @param string $mode
    *
-   * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
+   * @return \Civi\Test\FormWrappers\EventFormOnline
    */
-  public function getFormWrapper(array $submittedValues, int $eventID) {
+  public function getFormWrapper(array $submittedValues, int $eventID, string $mode = '') {
+    $urlParameters = ['id' => $eventID];
+    if ($mode !== '') {
+      $urlParameters['mode'] = $mode;
+    }
     return $this->getTestForm('CRM_Event_Form_Registration_Register',
       $submittedValues,
-      ['id' => $eventID])
+      $urlParameters)
       ->addSubsequentForm('CRM_Event_Form_Registration_Confirm');
   }
 

@@ -65,7 +65,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
 
     if ($dao->fetch()) {
-      $nowEpoch = CRM_Utils_Time::getTimeRaw();
+      $nowEpoch = CRM_Utils_Time::time();
       $dao->run_count++;
       $sql = 'UPDATE civicrm_queue_item SET release_time = from_unixtime(unix_timestamp() + %1), run_count = %3 WHERE id = %2';
       $sqlParams = [
@@ -107,7 +107,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     ];
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
     if ($dao->fetch()) {
-      $nowEpoch = CRM_Utils_Time::getTimeRaw();
+      $nowEpoch = CRM_Utils_Time::time();
       $dao->run_count++;
       CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = from_unixtime(unix_timestamp() + %1) WHERE id = %2", [
         '1' => [CRM_Utils_Time::delta() + $lease_time, 'Integer'],

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   // example:
   //   scope.myAbtest = new CrmMailingAB();
@@ -6,7 +6,7 @@
   var simpleDirectives = {
     crmMailingAbBlockSetup: '~/crmMailingAB/BlockSetup.html'
   };
-  _.each(simpleDirectives, function(templateUrl, directiveName) {
+  Object.entries(simpleDirectives).forEach(([directiveName, templateUrl]) => {
     angular.module('crmMailingAB').directive(directiveName, function($parse, crmMailingABCriteria, crmUiHelp) {
       var scopeDesc = {crmAbtest: '@'};
       scopeDesc[directiveName] = '@';
@@ -29,4 +29,4 @@
     });
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

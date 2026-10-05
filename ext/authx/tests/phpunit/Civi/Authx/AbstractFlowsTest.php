@@ -42,7 +42,7 @@ class AbstractFlowsTest extends \PHPUnit\Framework\TestCase implements EndToEndI
 
     parent::setUp();
     $this->settingsBackup = [];
-    foreach (\Civi\Authx\Meta::getFlowTypes() as $flowType) {
+    foreach (\Civi\Authx\Meta::getFlowTypes() as $flowType => $label) {
       foreach (["authx_{$flowType}_cred", "authx_{$flowType}_user", "authx_guards"] as $setting) {
         $this->settingsBackup[$setting] = \Civi::settings()->get($setting);
       }

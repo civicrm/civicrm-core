@@ -11,7 +11,7 @@
 {crmStyle file='bower_components/jstree/dist/themes/default/style.min.css'}
 {literal}
 <script type="text/javascript">
-  (function($, _){{/literal}
+  (function($){{/literal}
     var entityID={$entityID},
       entityTable='{$entityTable}',
       $form = $('form.{$form.formClass}');
@@ -26,11 +26,11 @@
             selected = $("#tagtree").jstree(true).get_selected(true);
           $.each(selected, function (k, item) {
             var $tag = $(item.text);
-            tags.push('<span class="crm-tag-item" style="' + $tag.attr('style') + '" title="' + ($.parseHTML(_.escape($tag.attr('title'))) || '') + '">' + _.escape($tag.text()) + '</span>');
+            tags.push('<span class="crm-tag-item" style="' + $tag.attr('style') + '" title="' + ($.parseHTML(CRM.utils.escapeHtml($tag.attr('title'))) || '') + '">' + CRM.utils.escapeHtml($tag.text()) + '</span>');
           });
           $('input.crm-contact-tagset').each(function () {
             $.each($(this).select2('data'), function (i, tag) {
-              tags.push('<span class="crm-tag-item" title="' + ($.parseHTML(tag.description?.text) || '') + '"' + (tag.color ? 'style="color: ' + CRM.utils.colorContrast(tag.color) + '; background-color: ' + tag.color + ';"' : '') + '>' + _.escape(tag.label) + '</span>');
+              tags.push('<span class="crm-tag-item" title="' + ($.parseHTML(tag.description?.text) || '') + '"' + (tag.color ? 'style="color: ' + CRM.utils.colorContrast(tag.color) + '; background-color: ' + tag.color + ';"' : '') + '>' + CRM.utils.escapeHtml(tag.label) + '</span>');
             });
           });
           // contact summary tabs and search forms both listen for this event
@@ -74,7 +74,7 @@
         $("#tagtree").jstree(true).search($(this).val());
       });
     });
-  })(CRM.$, CRM._);
+  })(CRM.$);
   {/literal}
 </script>
 <div id="Tag" class="view-content">

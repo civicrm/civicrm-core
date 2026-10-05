@@ -60,6 +60,16 @@ class MailParams {
     unset($mailParams['toEmail']);
     $mailParams['To'] = "$toName <$toEmail>";
 
+    if (!empty($mailParams['cc'])) {
+      $mailParams['Cc'] = $mailParams['cc'];
+      unset($mailParams['cc']);
+    }
+
+    if (!empty($mailParams['bcc'])) {
+      $mailParams['Bcc'] = $mailParams['bcc'];
+      unset($mailParams['bcc']);
+    }
+
     // 2. Apply the other fields.
     foreach ($mailParams as $key => $value) {
       if (empty($value)) {

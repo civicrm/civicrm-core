@@ -13,6 +13,7 @@ use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\LineItem;
+use Civi\Api4\OrderCompletionMetadata;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
@@ -53,6 +54,24 @@ class CRM_Financial_BAO_Order {
    * @var array
    */
   protected $priceSelection = [];
+
+  /**
+   * Price selections from multiple forms, keyed by an identifier for each form.
+   *
+   * This supports the case where a single Order needs to be built up from more than
+   * one form's worth of submitted price selections (e.g. event registration, where
+   * the primary participant and each additional participant submit their price
+   * selections on separate pages/forms). Each entry is a full priceSelection array
+   * (as would otherwise be stored on $priceSelection) for one of those forms.
+   *
+   * When this is set, calculateLineItems() will calculate line items separately for
+   * each form's selection (so that identical price_field_value_id choices by different
+   * forms don't collide) and tag each resulting line item with 'identifier' set to the
+   * corresponding key from this array.
+   *
+   * @var array
+   */
+  protected $multiFormPriceSelection = [];
 
   /**
    * Override for financial type id.
@@ -142,6 +161,28 @@ class CRM_Financial_BAO_Order {
    * @var int
    */
   protected $defaultFinancialTypeID;
+
+  /**
+   * Free-form metadata to save against the contribution once it is created,
+   * to be consumed later when the order/payment completes.
+   *
+   * @var array|null
+   */
+  protected ?array $orderCompletionMetadata = NULL;
+
+  /**
+   * Set metadata to be saved against the contribution (not a specific line
+   * item) once it is created, for later consumption when the order/payment
+   * completes - eg. receipt/email overrides.
+   *
+   * Metadata for a specific line item is instead set via the line item's own
+   * 'order_completion_metadata' key, passed to setLineItem().
+   *
+   * @param array $orderCompletionMetadata
+   */
+  public function setOrderCompletionMetadata(array $orderCompletionMetadata): void {
+    $this->orderCompletionMetadata = $orderCompletionMetadata;
+  }
 
   /**
    * ID of a contribution to be used as a template.
@@ -422,7 +463,7 @@ class CRM_Financial_BAO_Order {
   public function getOverrideTotalAmount() {
     // The override amount is only valid for quick config price sets where more
     // than one field has not been selected.
-    if (!$this->overrideTotalAmount || $this->getLineItemCount() > 1) {
+    if ($this->overrideTotalAmount === NULL || $this->getLineItemCount() > 1) {
       return FALSE;
     }
     return $this->overrideTotalAmount;
@@ -809,9 +850,11 @@ class CRM_Financial_BAO_Order {
    *
    * @param array $input
    *
+   * @return self $this
+   *
    * @throws \CRM_Core_Exception
    */
-  public function setPriceSelectionFromUnfilteredInput(array $input): void {
+  public function setPriceSelectionFromUnfilteredInput(array $input): self {
     foreach ($input as $fieldName => $value) {
       if (str_starts_with($fieldName, 'price_')) {
         $fieldID = substr($fieldName, 6);
@@ -825,6 +868,35 @@ class CRM_Financial_BAO_Order {
       $this->priceSelection['price_' . $this->getDefaultPriceFieldID()] = $input['total_amount'];
       $this->setOverrideFinancialTypeID($input['financial_type_id']);
     }
+    return $this;
+  }
+
+  /**
+   * Set the price field selections from multiple forms' worth of unfiltered input.
+   *
+   * Each entry in $formInputs is filtered the same way as
+   * setPriceSelectionFromUnfilteredInput() and stored, keyed by whatever key it was
+   * passed in under, in $multiFormPriceSelection. calculateLineItems() will then
+   * calculate each form's line items separately (so identical price_field_value_id
+   * choices across forms don't collide) and tag each resulting line item with
+   * 'identifier' set to that same key.
+   *
+   * @param array $formInputs
+   *   An array of unfiltered input arrays, keyed by an identifier for each form
+   *   (e.g. a participant number).
+   *
+   * @return self $this
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function setPriceSelectionFromUnfilteredMultiFormInput(array $formInputs): self {
+    foreach ($formInputs as $formKey => $input) {
+      $this->priceSelection = [];
+      $this->setPriceSelectionFromUnfilteredInput($input);
+      $this->multiFormPriceSelection[$formKey] = $this->priceSelection;
+    }
+    $this->priceSelection = [];
+    return $this;
   }
 
   /**
@@ -869,10 +941,38 @@ class CRM_Financial_BAO_Order {
    * @throws \CRM_Core_Exception
    */
   public function getLineItems(): array {
+    return array_map([$this, 'stripIdentifier'], $this->getRawLineItems());
+  }
+
+  /**
+   * Get the line items without stripping the internal 'identifier' tag used
+   * to track which form/participant each line item came from (see
+   * setPriceSelectionFromUnfilteredMultiFormInput()).
+   *
+   * 'identifier' is not a real line item field - it must never reach code
+   * that creates/compares actual line items. This is only for internal use
+   * by code (getFilteredLineItems()) that needs to filter on it before
+   * stripping it via stripIdentifier().
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRawLineItems(): array {
     if (empty($this->lineItems)) {
       $this->lineItems = $this->calculateLineItems();
     }
     return $this->lineItems;
+  }
+
+  /**
+   * @param array $lineItem
+   *
+   * @return array
+   */
+  private function stripIdentifier(array $lineItem): array {
+    unset($lineItem['identifier']);
+    return $lineItem;
   }
 
   /**
@@ -947,19 +1047,60 @@ class CRM_Financial_BAO_Order {
   /**
    * Get line items that specifically relate to participants.
    *
-   * return array
+   * @return array
    *
    * @throws \CRM_Core_Exception
    */
   public function getParticipantLineItems():array {
-    $lines = $this->getLineItems();
-    foreach ($lines as $index => $line) {
-      if ($line['entity_table'] !== 'civicrm_participant') {
-        unset($lines[$index]);
-        continue;
+    return $this->getFilteredLineItems(['entity_table' => 'civicrm_participant']);
+  }
+
+  /**
+   * Get the line items submitted under a given form/participant identifier.
+   *
+   * Unlike getParticipantLineItems(), this is not restricted to
+   * entity_table === 'civicrm_participant' - a price set can mix participant
+   * and membership (or other) line items, and all of them belong to whichever
+   * form/participant actually submitted them. Only meaningful once
+   * setPriceSelectionFromUnfilteredMultiFormInput() has tagged line items with
+   * an 'identifier'.
+   *
+   * @param int|string $identifier
+   *   The key used for this form in setPriceSelectionFromUnfilteredMultiFormInput().
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getLineItemsForIdentifier($identifier): array {
+    return $this->getFilteredLineItems(['identifier' => $identifier]);
+  }
+
+  /**
+   * Get the identifiers (form/participant keys) passed to
+   * setPriceSelectionFromUnfilteredMultiFormInput(), if it was used.
+   *
+   * @return array
+   */
+  public function getIdentifiers(): array {
+    return array_keys($this->multiFormPriceSelection);
+  }
+
+  protected function getFilteredLineItems($filters):array {
+    $filteredLineItems = [];
+    foreach ($this->getRawLineItems() as $lineItem) {
+      $matches = TRUE;
+      foreach ($filters as $key => $filter) {
+        if (($lineItem[$key] ?? NULL) !== $filter) {
+          $matches = FALSE;
+          break;
+        }
+      }
+      if ($matches) {
+        $filteredLineItems[] = $this->stripIdentifier($lineItem);
       }
     }
-    return $lines;
+    return $filteredLineItems;
   }
 
   /**
@@ -1022,6 +1163,22 @@ class CRM_Financial_BAO_Order {
         $firstItem = reset($lineItems);
         $this->setPriceSetID($firstItem['price_field_id.price_set_id']);
       }
+    }
+    elseif (!empty($this->multiFormPriceSelection)) {
+      foreach ($this->multiFormPriceSelection as $formKey => $formSelection) {
+        $this->priceSelection = $formSelection;
+        foreach ($this->getPriceOptions() as $priceFieldID => $priceFieldValueID) {
+          if ($priceFieldValueID !== '') {
+            foreach ($this->getLine($priceFieldID) as $newLine) {
+              $newLine['identifier'] = $formKey;
+              // Push rather than key by price_field_value_id - the same price
+              // option can legitimately be chosen by more than one form.
+              $lineItems[] = $newLine;
+            }
+          }
+        }
+      }
+      $this->priceSelection = [];
     }
     else {
       foreach ($this->getPriceOptions() as $priceFieldID => $priceFieldValueID) {
@@ -1119,15 +1276,89 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get the non-deductible amount for the order, as configured on the
+   * price field values selected.
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getNonDeductibleAmount(): float {
+    $amount = 0.0;
+    foreach ($this->getLineItems() as $lineItem) {
+      $amount += $lineItem['non_deductible_amount'] ?? 0.0;
+    }
+    return $amount;
+  }
+
+  /**
+   * Get the total amount for the line items submitted under a given
+   * form/participant identifier (see setPriceSelectionFromUnfilteredMultiFormInput()).
+   *
+   * @param int|string $identifier
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getTotalAmountForIdentifier($identifier): float {
+    $amount = 0.0;
+    foreach ($this->getLineItemsForIdentifier($identifier) as $lineItem) {
+      $amount += ($lineItem['line_total'] ?? 0.0) + ($lineItem['tax_amount'] ?? 0.0);
+    }
+    return $amount;
+  }
+
+  /**
+   * Get the total tax amount for the line items submitted under a given
+   * form/participant identifier (see setPriceSelectionFromUnfilteredMultiFormInput()).
+   *
+   * @param int|string $identifier
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getTotalTaxAmountForIdentifier($identifier): float {
+    $amount = 0.0;
+    foreach ($this->getLineItemsForIdentifier($identifier) as $lineItem) {
+      $amount += $lineItem['tax_amount'] ?? 0.0;
+    }
+    return $amount;
+  }
+
+  /**
    * Get Amount Level text.
    *
    * @return string
    * @throws \CRM_Core_Exception
    */
   public function getAmountLevel() : string {
+    return $this->calculateAmountLevel($this->getLineItems());
+  }
+
+  /**
+   * Get Amount Level text for the line items submitted under a given
+   * form/participant identifier (see setPriceSelectionFromUnfilteredMultiFormInput()).
+   *
+   * @param int|string $identifier
+   *
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  public function getAmountLevelForIdentifier($identifier): string {
+    return $this->calculateAmountLevel($this->getLineItemsForIdentifier($identifier));
+  }
+
+  /**
+   * @param array $lineItems
+   *
+   * @return string
+   */
+  private function calculateAmountLevel(array $lineItems): string {
     $amount_level = [];
     $totalParticipant = 0;
-    foreach ($this->getLineItems() as $lineItem) {
+    foreach ($lineItems as $lineItem) {
       if ($lineItem['label'] !== ts('Contribution Amount')) {
         $amount_level[] = $lineItem['label'] . ' - ' . (float) $lineItem['qty'];
       }
@@ -1239,7 +1470,7 @@ class CRM_Financial_BAO_Order {
     if (!empty($lineItem['membership_type_id']) && !isset($lineItem['membership_num_terms'])) {
       $lineItem['membership_num_terms'] = 1;
     }
-    if ($this->getOverrideTotalAmount()) {
+    if ($this->getOverrideTotalAmount() !== FALSE) {
       $this->addTotalsToLineBasedOnOverrideTotal((int) $lineItem['financial_type_id'], $lineItem);
     }
     else {
@@ -1387,7 +1618,7 @@ class CRM_Financial_BAO_Order {
     if ($taxRate) {
       // Total is tax inclusive.
       $taxExclusiveAmount = $this->getOverrideTotalAmountTaxExclusive();
-      if ($taxExclusiveAmount) {
+      if ($taxExclusiveAmount !== NULL) {
         $lineItem['line_total'] = $taxExclusiveAmount;
         $lineItem['tax_amount'] = ($taxRate / 100) * $taxExclusiveAmount;
         // Set to 1 for consistency with historical behaviour on the only form that calls this section.
@@ -1400,7 +1631,7 @@ class CRM_Financial_BAO_Order {
       }
     }
     else {
-      $lineItem['line_total'] = $this->getOverrideTotalAmountTaxExclusive() ?: $this->getOverrideTotalAmount();
+      $lineItem['line_total'] = $this->getOverrideTotalAmountTaxExclusive() ?? $this->getOverrideTotalAmount();
       $lineItem['tax_amount'] = 0.0;
       $lineItem['line_total_inclusive'] = $lineItem['line_total'];
     }
@@ -1663,16 +1894,115 @@ class CRM_Financial_BAO_Order {
     // Now we must save/create a ContributionRecur before we create related entity IDs because ContributionRecurID is
     //   linked to some related entities, eg. Membership.
     $this->saveContributionRecur();
-    foreach ($this->getLineItems() as $index => $lineItem) {
+
+    // Lines sharing an 'identifier' belong to one entity (eg. two price
+    // fields selected for one registration, belonging to one Participant).
+    // The entity-creation fields (entity_id/entity_id.*) may be on any line
+    // in the group, but at least one line in the group must declare the real
+    // entity_table - it is not inferred, since nothing about an 'identifier'
+    // itself says what kind of entity it is. Two passes, so the result does
+    // not depend on which line in the array happens to carry which fields:
+    // first group line indexes by identifier, then save one entity per
+    // group (or per line, for lines with no identifier) and stamp the
+    // resulting entity_table/entity_id onto every line in the group.
+    $rawLineItems = $this->getRawLineItems();
+    $indexesByIdentifier = [];
+    foreach ($rawLineItems as $index => $lineItem) {
+      $identifier = $lineItem['identifier'] ?? NULL;
+      if ($identifier !== NULL) {
+        $indexesByIdentifier[$identifier][] = $index;
+      }
+    }
+
+    $processedIndexes = [];
+    foreach ($indexesByIdentifier as $indexes) {
+      $group = array_map(fn($i) => $rawLineItems[$i], $indexes);
+      $entityTable = NULL;
+      foreach ($group as $lineItem) {
+        if (!empty($lineItem['entity_table']) && $lineItem['entity_table'] !== 'civicrm_contribution') {
+          $entityTable = $lineItem['entity_table'];
+        }
+      }
+      if (!$entityTable) {
+        throw new CRM_Core_Exception('Line items sharing an identifier must declare entity_table on (at least) the line providing the entity_id/entity_id.* details.');
+      }
+      $group = array_map(fn($lineItem) => ['entity_table' => $entityTable] + $lineItem, $group);
+      $entityID = $this->saveLineItemEntity($group);
+      foreach ($indexes as $index) {
+        $this->setLineItemValue('entity_table', $entityTable, $index);
+        $this->setLineItemValue('entity_id', $entityID, $index);
+        $processedIndexes[$index] = TRUE;
+      }
+    }
+
+    foreach ($rawLineItems as $index => $lineItem) {
       // Save entities first, so we can get the Entity ID.
-      if ($lineItem['entity_table'] !== 'civicrm_contribution') {
-        $this->setLineItemValue('entity_id', $this->saveLineItemEntity($lineItem), $index);
+      if (!isset($processedIndexes[$index]) && ($lineItem['entity_table'] ?? 'civicrm_contribution') !== 'civicrm_contribution') {
+        $this->setLineItemValue('entity_id', $this->saveLineItemEntity([$lineItem]), $index);
       }
     }
     $this->contributionValues['line_item'] = [$this->getLineItems()];
 
-    return Contribution::create(FALSE)
+    $result = Contribution::create(FALSE)
       ->setValues($this->contributionValues)->execute();
+    $this->saveOrderCompletionMetadata((int) $result->first()['id']);
+    return $result;
+  }
+
+  /**
+   * Save any order completion metadata against the now-created contribution
+   * and/or its line items.
+   *
+   * 'order_completion_metadata' on a line item is not a real LineItem field -
+   * it rides through unused (and gets silently dropped at the DAO layer by
+   * CRM_Price_BAO_LineItem::create()) until here, where we read it back off
+   * $this->lineItems and save it properly now that the line items have real
+   * ids.
+   *
+   * @param int $contributionID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function saveOrderCompletionMetadata(int $contributionID): void {
+    $lineItemMetadataByIndex = [];
+    foreach ($this->getLineItems() as $index => $lineItem) {
+      if (!empty($lineItem['order_completion_metadata'])) {
+        $lineItemMetadataByIndex[$index] = $lineItem['order_completion_metadata'];
+      }
+    }
+    if (!$this->orderCompletionMetadata && !$lineItemMetadataByIndex) {
+      return;
+    }
+    if ($this->orderCompletionMetadata) {
+      OrderCompletionMetadata::create(FALSE)
+        ->setValues([
+          'contribution_id' => $contributionID,
+          'metadata' => $this->orderCompletionMetadata,
+        ])
+        ->execute();
+    }
+    if (!$lineItemMetadataByIndex) {
+      return;
+    }
+    // Line items are saved in the same order they were submitted, so match
+    // the ones with metadata to save against their real ids positionally.
+    $savedLineItemIDs = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contributionID)
+      ->addSelect('id')
+      ->addOrderBy('id')
+      ->execute()
+      ->column('id');
+    $submittedIndexes = array_keys($this->getLineItems());
+    foreach ($lineItemMetadataByIndex as $index => $metadata) {
+      $position = array_search($index, $submittedIndexes, TRUE);
+      OrderCompletionMetadata::create(FALSE)
+        ->setValues([
+          'contribution_id' => $contributionID,
+          'line_item_id' => $savedLineItemIDs[$position],
+          'metadata' => $metadata,
+        ])
+        ->execute();
+    }
   }
 
   /**
@@ -1698,19 +2028,31 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
-   * Save the entity related to a given line item.
+   * Save the entity related to a group of line items.
    *
-   * @param array $lineItem
+   * There is usually just one line item - the exception is lines tagged
+   * with a shared 'identifier' (eg. two price fields selected for one
+   * Participant), which are one entity split across several lines. The
+   * entity-defining fields (entity_id/entity_id.*, to create or target an
+   * existing record) may be on any line in the group.
+   *
+   * @param array $lineItems
    *
    * @return int
    * @throws \CRM_Core_Exception
    */
-  private function saveLineItemEntity(array $lineItem): int {
-    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($lineItem['entity_table']);
-    $entityValues = empty($lineItem['entity_id']) ? [] : ['id' => $lineItem['entity_id']];
-    foreach ($lineItem as $fieldName => $fieldValue) {
-      if (str_starts_with($fieldName, 'entity_id.')) {
-        $entityValues[substr($fieldName, 10)] = $fieldValue;
+  private function saveLineItemEntity(array $lineItems): int {
+    $firstLine = reset($lineItems);
+    $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($firstLine['entity_table']);
+    $entityValues = [];
+    foreach ($lineItems as $lineItem) {
+      if (!empty($lineItem['entity_id'])) {
+        $entityValues['id'] = $lineItem['entity_id'];
+      }
+      foreach ($lineItem as $fieldName => $fieldValue) {
+        if (str_starts_with($fieldName, 'entity_id.')) {
+          $entityValues[substr($fieldName, 10)] = $fieldValue;
+        }
       }
     }
     if (empty($entityValues['id'])) {
@@ -1719,7 +2061,10 @@ class CRM_Financial_BAO_Order {
       $fields = (array) civicrm_api4($entity, 'getfields', ['checkPermissions' => FALSE])->indexBy('name');
       $carryOverFields = array_intersect_key($this->contributionValues, $fields);
       if ($entity === 'Participant') {
-        $carryOverFields += array_filter(['fee_amount' => $lineItem['unit_price'], 'fee_level' => $lineItem['label']]);
+        $carryOverFields += array_filter([
+          'fee_amount' => array_sum(array_column($lineItems, 'line_total')),
+          'fee_level' => array_values(array_unique(array_column($lineItems, 'label'))),
+        ]);
       }
       $entityValues += $carryOverFields;
 
@@ -1733,13 +2078,13 @@ class CRM_Financial_BAO_Order {
         //   also pass in membership_type_id on the lineItem.
         // membership_type_id is a special-case because it has it's own field on PriceFieldValue.
         // If a membership_type_id pseudoconstant was passed in use that, otherwise fall back to membership_type_id on lineitem if set.
-        if (!empty($lineItem['membership_type_id'])) {
+        if (!empty($firstLine['membership_type_id'])) {
           $membershipTypeKeys = array_filter($entityValues, function($key) {
             return str_starts_with($key, 'membership_type_id');
           }, ARRAY_FILTER_USE_KEY);
           $membershipTypeKey = array_key_first($membershipTypeKeys);
           if (empty($membershipTypeKey)) {
-            $entityValues['membership_type_id'] = $lineItem['membership_type_id'];
+            $entityValues['membership_type_id'] = $firstLine['membership_type_id'];
           }
         }
 
@@ -1820,6 +2165,12 @@ class CRM_Financial_BAO_Order {
 
     switch ($priceField['html_type']) {
       case 'Text':
+        // special case if the user entered a zero amount/qty - nothing was really selected.
+        // Negative amounts are legitimate here (e.g. a refund/adjustment), unlike the
+        // Select/Radio case below where a non-positive value can only mean "-none-".
+        if ($priceSelection["price_{$priceFieldID}"] == 0) {
+          break;
+        }
         $firstOption = reset($priceField['options']);
         $params = [
           "price_{$priceFieldID}" => [$firstOption['id'] => $priceSelection["price_{$priceFieldID}"]],
@@ -1845,7 +2196,7 @@ class CRM_Financial_BAO_Order {
         // set up (which allows a free form field).
         // Can only override if there is only one priceField
         if (is_array($priceSelection["price_{$priceFieldID}"]) && count($priceSelection["price_{$priceFieldID}"]) === 1) {
-          $amountOverride = $this->getOverrideTotalAmount() ? $this->getOverrideTotalAmount() : NULL;
+          $amountOverride = $this->getOverrideTotalAmount() !== FALSE ? $this->getOverrideTotalAmount() : NULL;
         }
 
         $params = [

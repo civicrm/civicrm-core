@@ -191,9 +191,10 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * Reset the serialized array and recompute.
    * use with care
    *
-   * @deprecated
+   * @deprecated in 4.6 will be removed around 6.31
    */
   public function reset() {
+    CRM_Core_Error::deprecatedWarning('CRM_Core_Config::reset function is deprecated and does nothing.');
     // This is what it used to do. However, it hasn't meant anything since 4.6.
     // $query = "UPDATE civicrm_domain SET config_backend = null";
     // CRM_Core_DAO::executeQuery($query);
@@ -345,13 +346,17 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
       'TRUNCATE TABLE civicrm_prevnext_cache',
       'UPDATE civicrm_group SET cache_date = NULL',
       'TRUNCATE TABLE civicrm_group_contact_cache',
-      'TRUNCATE TABLE civicrm_menu',
       'UPDATE civicrm_setting SET value = NULL WHERE name="navigation" AND contact_id IS NOT NULL',
     ];
 
     foreach ($queries as $query) {
       CRM_Core_DAO::executeQuery($query);
     }
+
+    // Clear the route table through CRM_Core_Menu::clear() rather than a bare TRUNCATE, so it
+    // takes the data.core.menu lock and drops the derived route cache. Otherwise this cache clear
+    // can wipe civicrm_menu mid-rebuild. dev/core#6621.
+    CRM_Core_Menu::clear();
 
     // Clear the Redis prev-next cache, if there is one.
     // Since we truncated the civicrm_cache table it is logical to also remove
@@ -448,42 +453,6 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    */
   public static function isEnabledBackOfficeCreditCardPayments() {
     return CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(['BackOffice']);
-  }
-
-  /**
-   * @deprecated
-   */
-  public function addressSequence() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_Address::sequence(Civi::settings()->get(\'address_format\')');
-    return CRM_Utils_Address::sequence(Civi::settings()->get('address_format'));
-  }
-
-  /**
-   * @deprecated
-   */
-  public function defaultContactCountry() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultContactCountry');
-    return CRM_Core_BAO_Country::defaultContactCountry();
-  }
-
-  /**
-   * @deprecated
-   */
-  public function defaultContactCountryName() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultContactCountryName');
-    return CRM_Core_BAO_Country::defaultContactCountryName();
-  }
-
-  /**
-   * @deprecated
-   *
-   * @param string $defaultCurrency
-   *
-   * @return string
-   */
-  public function defaultCurrencySymbol($defaultCurrency = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultCurrencySymbol');
-    return CRM_Core_BAO_Country::defaultCurrencySymbol($defaultCurrency);
   }
 
   /**

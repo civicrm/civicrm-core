@@ -15,6 +15,7 @@
  */
 
 use Civi\Api4\UserJob;
+use Civi\Test\FormTrait;
 
 /**
  *  Test contact import datasource.
@@ -24,6 +25,8 @@ use Civi\Api4\UserJob;
  * @group import
  */
 class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
+
+  use FormTrait;
 
   /**
    * Post test cleanup.
@@ -64,8 +67,8 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
       'sqlQuery' => 'SELECT "bob" as first_name FROM civicrm_option_value LIMIT 5',
       'contactType' => 'Individual',
     ];
-    $form = $this->submitDataSourceForm($sqlFormValues);
-    $userJobID = $form->getUserJobID();
+    $wrapper = $this->getTestForm('CRM_Contact_Import_Form_DataSource', $sqlFormValues)->processForm();
+    $userJobID = $wrapper->getValueSetOnForm('user_job_id');
     // Load the user job, using TRUE so permissions apply.
     $userJob = UserJob::get(TRUE)
       ->addWhere('id', '=', $userJobID)
@@ -85,7 +88,10 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
     ));
 
     // Now we imitate the scenario where the user goes back and
-    // re-submits the form selecting the csv datasource.
+    // re-submits the form selecting the csv datasource. Passing the
+    // user_job_id as a url parameter mimics the real re-submission url,
+    // which carries the id so the form updates the existing job rather
+    // than creating a new one.
     $csvFormValues = [
       'dataSource' => 'CRM_Import_DataSource_CSV',
       'skipColumnHeader' => 1,
@@ -95,15 +101,12 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
         'type' => 'text/csv',
       ],
     ];
-    // Mimic form re-submission with new values.
-    $_SESSION['_' . $form->controller->_name . '_container']['values']['DataSource'] = $csvFormValues;
-    $form->buildForm();
-    $form->postProcess();
-    // The user job id should not have changed.
-    $this->assertEquals($userJobID, $form->getUserJobID());
+    $this->getTestForm('CRM_Contact_Import_Form_DataSource', $csvFormValues, ['id' => $userJobID])->processForm();
+    // Resubmission should have updated the existing job rather than creating a new one.
+    $this->assertCount(1, UserJob::get(FALSE)->addWhere('job_type', '=', 'contact_import')->execute());
 
     $userJob = UserJob::get(TRUE)
-      ->addWhere('id', '=', $form->getUserJobID())
+      ->addWhere('id', '=', $userJobID)
       ->addSelect('metadata')
       ->execute()->first();
     // Submitted values should be updated in the user job.
@@ -117,19 +120,58 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
   }
 
   /**
-   * Submit the dataSoure form with the provided form values.
+   * A contribution template named import_ must not attach to a contact import
+   * that has no saved mapping.
    *
-   * @param array $sqlFormValues
-   *
-   * @return CRM_Contact_Import_Form_DataSource
-   * @throws \CRM_Core_Exception
+   * Saving a contribution import template with a blank mapping name creates
+   * civicrm_user_job.name = 'import_'. Contact import then looked that up
+   * without filtering on job_type, copied the contribution mappings, and
+   * padded extra Match Fields rows until Preview crashed looking up
+   * Contribution.contact_id.
    */
-  private function submitDataSourceForm(array $sqlFormValues): CRM_Contact_Import_Form_DataSource {
-    /** @var CRM_Contact_Import_Form_DataSource $form */
-    $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource', $sqlFormValues);
-    $form->buildForm();
-    $form->postProcess();
-    return $form;
+  public function testNamelessContributionTemplateIsNotUsedForContactImport(): void {
+    $this->createLoggedInUser();
+    UserJob::create(FALSE)
+      ->setValues([
+        'is_template' => TRUE,
+        'job_type' => 'contribution_import',
+        'status_id:name' => 'draft',
+        'name' => 'import_',
+        'metadata' => [
+          'import_mappings' => [
+            ['name' => 'Contribution.contact_id', 'column_number' => 0],
+            ['name' => 'Contribution.total_amount', 'column_number' => 1],
+            ['name' => 'Contact.first_name', 'column_number' => 2],
+            ['name' => 'Contribution.financial_type_id', 'column_number' => 3],
+          ],
+          'entity_configuration' => [
+            'Contribution' => ['action' => 'create'],
+          ],
+        ],
+      ])
+      ->execute();
+
+    $wrapper = $this->getTestForm('CRM_Contact_Import_Form_DataSource', [
+      'dataSource' => 'CRM_Import_DataSource_CSV',
+      'skipColumnHeader' => 1,
+      'contactType' => 'Individual',
+      'uploadFile' => [
+        'name' => __DIR__ . '/data/yogi.csv',
+        'type' => 'text/csv',
+      ],
+    ])->processForm();
+    $userJob = UserJob::get(FALSE)
+      ->addWhere('id', '=', $wrapper->getValueSetOnForm('user_job_id'))
+      ->addSelect('metadata', 'job_type')
+      ->execute()
+      ->first();
+
+    $this->assertEquals('contact_import', $userJob['job_type']);
+    $this->assertEmpty($userJob['metadata']['import_mappings'] ?? []);
+    $this->assertEmpty($userJob['metadata']['template_id'] ?? NULL);
+    $this->assertEquals(3, $userJob['metadata']['DataSource']['number_of_columns']);
+    $this->assertCount(3, $userJob['metadata']['DataSource']['column_headers']);
+    $this->assertArrayNotHasKey('Contribution', $userJob['metadata']['entity_configuration'] ?? []);
   }
 
 }

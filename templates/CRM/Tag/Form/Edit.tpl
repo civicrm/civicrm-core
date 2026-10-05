@@ -38,7 +38,9 @@
       {if !empty($form.color.html)}
         <tr class="crm-tag-form-block-color">
           <td class="label">{$form.color.label}</td>
-          <td>{$form.color.html}</td>
+          <td>{$form.color.html}
+            <input type="text" id="color_hex" class="crm-form-text" placeholder="#rrggbb" pattern="^#[0-9a-fA-F]{ldelim}6{rdelim}$" style="width: 6.5em; display: inline-block; margin-left: 4px;" />
+          </td>
         </tr>
       {/if}
         <tr class="crm-tag-form-block-is_reserved">
@@ -51,6 +53,12 @@
              <td class="label">{$form.is_selectable.label}</td>
              <td>{$form.is_selectable.html}<br /><span class="description">{ts}Defines if you can select this tag.{/ts}
              </td>
+          </tr>
+        {/if}
+        {if $createdDate}
+          <tr class="crm-tag-form-block-created">
+             <td class="label">{ts}Created{/ts}</td>
+             <td>{$createdDate|crmDate}{if $createdByName} {ts 1=$createdByName}by %1{/ts}{/if}</td>
           </tr>
         {/if}
     </table>
@@ -71,6 +79,20 @@
       }
     }
     $('input[name=parent_id]', $form).change(toggleUsedFor).each(toggleUsedFor);
+
+    // Keep the native color picker and its hex text mirror in sync, matching the
+    // picker+hex combo SearchKit's bulk-edit/inline-edit inputs already use for Color fields.
+    var $colorPicker = $('input#color', $form),
+      $colorHex = $('#color_hex', $form);
+    $colorHex.val($colorPicker.val());
+    $colorPicker.on('input change', function() {
+      $colorHex.val(this.value);
+    });
+    $colorHex.on('input change', function() {
+      if (/^#[0-9a-fA-F]{6}$/.test(this.value)) {
+        $colorPicker.val(this.value);
+      }
+    });
   });
 </script>
 {/literal}

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchAdminSegment', {
@@ -62,9 +62,7 @@
       };
 
       function getDefaultField() {
-        const item = _.findLast(ctrl.segment.items, function(item) {
-          return item.when && item.when[0] && item.when[0][0];
-        });
+        const item = ctrl.segment.items.findLast((item) => item.when && item.when[0] && item.when[0][0]);
         return item ? item.when[0][0] : searchMeta.getEntity(ctrl.segment.entity_name).fields[0].name;
       }
 
@@ -83,9 +81,7 @@
       };
 
       this.hasDefault = function() {
-        return !!_.findLast(ctrl.segment.items, function(item) {
-          return !item.when || !item.when[0].length;
-        });
+        return !!ctrl.segment.items.findLast((item) => !item.when || !item.when[0].length);
       };
 
       this.getField = function(fieldName) {
@@ -95,9 +91,9 @@
       // Select2-formatted fields that can be used in "when" clause, including :name suffix if applicable
       this.selectFields = function() {
         const fields = {results: []};
-        _.each(searchMeta.getEntity(ctrl.segment.entity_name).fields, function(field) {
+        (searchMeta.getEntity(ctrl.segment.entity_name).fields || []).forEach((field) => {
           const item = {
-            id: field.name + (field.suffixes && _.includes(field.suffixes, 'name') ? ':name' : ''),
+            id: field.name + (field.suffixes && field.suffixes.includes('name') ? ':name' : ''),
             text: field.label,
             description: field.description
           };
@@ -138,4 +134,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -329,19 +329,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
   }
 
   /**
-   * @deprecated
-   * Create a new group.
-   *
-   * @param array $params
-   *
-   * @return CRM_Contact_BAO_Group|NULL
-   *   The new group BAO (if created)
-   */
-  public static function create(&$params) {
-    return self::writeRecord($params);
-  }
-
-  /**
    * Takes a sloppy mismash of params and creates two entities: a Group and a SavedSearch
    * Currently only used by unit tests.
    *
@@ -366,7 +353,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
       return NULL;
     }
 
-    return self::create($params);
+    return self::writeRecord($params);
   }
 
   /**
@@ -532,7 +519,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
         'saved_search_id' => $ssId,
       ];
 
-      $smartGroup = self::create($groupParams);
+      $smartGroup = self::writeRecord($groupParams);
       $smartGroupId = $smartGroup->id;
     }
 
@@ -751,6 +738,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
           $action -= CRM_Core_Action::DELETE;
           $action -= CRM_Core_Action::UPDATE;
           $action -= CRM_Core_Action::DISABLE;
+          $action -= CRM_Core_Action::ENABLE;
         }
       }
 

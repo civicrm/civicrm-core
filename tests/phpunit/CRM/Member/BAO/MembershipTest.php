@@ -9,9 +9,11 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipLog;
 use Civi\Api4\MembershipStatus;
+use Civi\Api4\Relationship;
 use Civi\Test\ContributionPageTestTrait;
 use Civi\Api4\Payment;
 
@@ -38,6 +40,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    */
   public function tearDown(): void {
+    Relationship::delete(FALSE)->addWhere('id', '>', 0)->execute();
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
@@ -403,6 +406,55 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Renew membership with change in membership type, where the membership id
+   * cannot coincidentally equal the id of the contribution the renewal creates.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenewMembershipIdsDoNotCollide(): void {
+    // Add a contribution & a couple of memberships so the id will not be 1 & will differ from membership id.
+    // This saves us from 'accidental success'.
+    $this->membershipTypeCreate(['title' => 'Student']);
+    $this->contributionCreate(['contact_id' => $this->individualCreate()]);
+    $this->contactMembershipCreate(['contact_id' => $this->ids['Contact']['individual_0']]);
+    $this->contactMembershipCreate(['contact_id' => $this->ids['Contact']['individual_0'], 'membership_type_id' => 'Student']);
+
+    $this->individualCreate([], 'renewer');
+    $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -6 month"));
+    $endDate = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
+    $params = [
+      'contact_id' => $this->ids['Contact']['renewer'],
+      'membership_type_id:name' => 'General',
+      'join_date' => $joinDate,
+      'start_date' => $startDate,
+      'end_date' => $endDate,
+      'source' => 'Payment',
+      'is_override' => 1,
+      'status_id:name' => 'Current',
+    ];
+
+    $this->createTestEntity('Membership', $params, 'membership');
+
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['renewer']]);
+
+    $this->contributionPageQuickConfigCreate();
+    $this->submitOnlineContributionForm([
+      'contact_id' => $this->ids['Contact']['renewer'],
+      'price_' . $this->ids['PriceField']['membership_amount'] => $this->ids['PriceFieldValue']['membership_general'],
+    ] + $this->getBillingSubmitValues());
+
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id.contact_id', '=', $this->ids['Contact']['renewer'])
+      ->execute()->single();
+    $this->assertEquals($this->ids['Membership']['membership'], $lineItem['entity_id'], 'Line item should be linked to the membership being renewed.');
+
+    $membershipRenewed = Membership::get()->addWhere('id', '=', $this->ids['Membership']['membership'])
+      ->execute()->single();
+    $endDate = date("Y-m-d", strtotime($membership['end_date'] . " +1 year"));
+    $this->assertEquals($endDate, $membershipRenewed['end_date'], 'Verify correct end date is calculated after membership renewal');
+  }
+
+  /**
    * Renew stale membership.
    *
    * @throws \CRM_Core_Exception
@@ -538,7 +590,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $createdMembershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
 
-    $this->callAPISuccess('Job', 'process_membership');
+    $this->callApiV3Success('Job', 'process_membership');
 
     $membershipAfterProcess = civicrm_api3('Membership', 'get', [
       'sequential' => 1,
@@ -809,7 +861,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
         'contact_id_a'         => $contactID,
         'contact_id_b'         => $employerId,
         'is_active'            => 1,
-      ]);
+      ], 'employee_' . $contactID);
     }
     $this->deleteRelatedMemberships($membership["id"]);
     $this->assertEquals(0, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 0.');
@@ -883,6 +935,70 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccess('Relationship', 'delete', ['id' => $this->ids['Relationship']['default']]);
     $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
     $this->assertEquals(0, $relatedMembershipsCount, 'Related membership count should be 0.');
+  }
+
+  /**
+   * Test done to verify bug dev/core#6702 remains fixed.
+   *
+   * Reactivating a relationship (e.g. 'Employee of') used to fatal with
+   * "Expected to find one Membership record, but there were multiple" if the
+   * owning contact (e.g. the employer) held more than one membership.
+   *
+   * This happened because CRM_Member_Utils_RelationshipProcessor::setMemberships()
+   * includes the joined field 'owner_membership_id.contact_id' (and a derived
+   * 'owner_contact_id') on every fetched membership row, and these keys were not
+   * filtered out before being passed to Membership::save() in
+   * CRM_Contact_BAO_Relationship::addInheritedMembership(). APIv4 then tried to
+   * resolve 'owner_membership_id' via a lookup on Membership.contact_id, which
+   * fatals if that contact has more than one membership.
+   *
+   * https://lab.civicrm.org/dev/core/-/issues/6702
+   */
+  public function testReactivatingRelationshipWithMultipleOwnerMembershipsDoesNotFatal(): void {
+    $membershipOrganizationId = $this->organizationCreate();
+    $employerId = $this->organizationCreate();
+
+    $membershipTypeWithRelationship = $this->createMembershipType($membershipOrganizationId, TRUE);
+    $membership = $this->createTestEntity('Membership', [
+      'membership_type_id' => $membershipTypeWithRelationship['id'],
+      'contact_id' => $employerId,
+      'status_id' => $this->_membershipStatusID,
+    ], 'owner');
+
+    // Give the employer a second, unrelated membership - this is what makes a
+    // lookup of "the Membership belonging to this contact" ambiguous.
+    $otherMembershipType = $this->createMembershipType($this->organizationCreate());
+    $this->createTestEntity('Membership', [
+      'membership_type_id' => $otherMembershipType['id'],
+      'contact_id' => $employerId,
+      'status_id' => $this->_membershipStatusID,
+    ], 'other');
+
+    $employeeId = $this->individualCreate();
+    $relationship = $this->createTestEntity('Relationship', [
+      'relationship_type_id:name' => 'Employee of',
+      'contact_id_a' => $employeeId,
+      'contact_id_b' => $employerId,
+      'is_active' => 1,
+    ]);
+    $this->assertEquals(1, $this->getRelatedMembershipsCount($membership['id']));
+
+    // Deactivate then reactivate the relationship - this is the flow that
+    // triggered the fatal error.
+    Relationship::update(FALSE)
+      ->addWhere('id', '=', $relationship['id'])
+      ->setValues(['is_active' => 0])
+      ->execute();
+    Relationship::update(FALSE)
+      ->addWhere('id', '=', $relationship['id'])
+      ->setValues(['is_active' => 1])
+      ->execute();
+
+    $relatedMembership = Membership::get(FALSE)
+      ->addWhere('contact_id', '=', $employeeId)
+      ->addWhere('owner_membership_id', '=', $membership['id'])
+      ->execute()->single();
+    $this->assertEquals($membership['id'], $relatedMembership['owner_membership_id']);
   }
 
   /**

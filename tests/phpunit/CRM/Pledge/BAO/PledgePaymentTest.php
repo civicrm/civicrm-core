@@ -39,7 +39,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     ];
 
     //do test for normal add.
-    $payment = CRM_Pledge_BAO_PledgePayment::add($params);
+    $payment = CRM_Pledge_BAO_PledgePayment::writeRecord($params);
     foreach ($params as $param => $value) {
       $this->assertEquals($value, $payment->$param);
     }
@@ -56,7 +56,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'status_id' => 2,
     ];
 
-    $payment = CRM_Pledge_BAO_PledgePayment::add($params);
+    $payment = CRM_Pledge_BAO_PledgePayment::writeRecord($params);
     foreach ($params as $param => $value) {
       $this->assertEquals($value, $payment->$param);
     }

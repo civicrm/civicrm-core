@@ -166,7 +166,7 @@ class CRM_Financial_Page_AJAX {
       }
     }
 
-    $entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', NULL, FALSE, NULL, 'POST');
     $methods = [
       'assign' => 'create',
       'remove' => 'del',

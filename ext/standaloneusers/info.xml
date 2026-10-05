@@ -30,11 +30,6 @@
   <smarty_compatibility>
     <ver>5</ver>
   </smarty_compatibility>
-  <requires>
-    <ext>org.civicrm.search_kit</ext>
-    <ext>authx</ext>
-    <ext>org.civicrm.afform</ext>
-  </requires>
   <comments>Don't enable this on a standard CMS-based install!</comments>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>

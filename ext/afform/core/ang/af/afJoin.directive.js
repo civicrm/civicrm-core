@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // Example usage: <div af-join="Email" min="1" max="3" add-label="Add email" ><div join-email-default /></div>
   angular.module('af')
     .directive('afJoin', function() {
@@ -39,6 +39,12 @@
             }
             return data.joins[self.entity];
           };
+
+          // Called by afRepeat
+          this.addRepeatItem = () => {
+            this.getData().push({});
+          };
+
           this.getFieldData = function() {
             const data = this.getData();
             if (!data[this.offset] || (Array.isArray(data[this.offset]) && !data[this.offset].length)) {
@@ -49,4 +55,4 @@
         }
       };
     });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

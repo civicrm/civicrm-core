@@ -100,9 +100,11 @@ class CRM_Core_CopyTest extends CiviUnitTestCase {
       'initial_amount_help_text',
     ];
 
-    // init in case it's not defined
+    // Supply initial values for localizable fields that have no schema default.
+    // Without these, concatenating " ({locale})" produces a leading-space-only
+    // string (e.g. " (en_US)"), which gets trimmed by DAO on write.
     foreach ($locParams as $field) {
-      $eventData[$field] ??= '';
+      $eventData[$field] = !empty($eventData[$field]) ? $eventData[$field] : $field;
     }
 
     // differencing the data in original content for each locales

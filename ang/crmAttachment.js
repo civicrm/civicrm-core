@@ -1,5 +1,5 @@
 /// crmFile: Manage file attachments
-(function (angular, $, _) {
+(function (angular, $) {
 
   angular.module('crmAttachment', CRM.angRequires('crmAttachment'));
 
@@ -46,7 +46,7 @@
             entity_id: target.entity_id
           };
           return crmApi('Attachment', 'get', params).then(function (apiResult) {
-            Attachment.files = _.values(apiResult.values);
+            Attachment.files = Object.values(apiResult.values);
             return Attachment;
           });
         }
@@ -65,7 +65,7 @@
           throw "Cannot save attachments: unknown entity_table or entity_id";
         }
 
-        var params = _.extend({}, target);
+        var params = Object.assign({}, target);
         params.values = crmAttachments.files;
         return crmApi('Attachment', 'replace', params)
           .then(function () {
@@ -73,8 +73,8 @@
 
             var newItems = crmAttachments.uploader.getNotUploadedItems();
             if (newItems.length > 0) {
-              _.each(newItems, function (item) {
-                item.formData = [_.extend({crm_attachment_token: CRM.crmAttachment.token}, target, item.crmData)];
+              newItems.forEach((item) => {
+                item.formData = [Object.assign({crm_attachment_token: CRM.crmAttachment.token}, target, item.crmData)];
               });
               crmAttachments.uploader.onCompleteAll = function onCompleteAll() {
                 delete crmAttachments.uploader.onCompleteAll;
@@ -107,13 +107,13 @@
         angular.forEach(this.trash, function(item) {
           sig.push({f: item.name.replace(/[^a-zA0-Z0-9\.]/, '_'), d: item.description});
         });
-        return _.sortBy(sig, 'name');
+        return sig;
       },
       // @param Object file APIv3 attachment record (e.g. id, entity_table, entity_id, description)
       deleteFile: function deleteFile(file) {
         var crmAttachments = this;
 
-        var idx = _.indexOf(this.files, file);
+        var idx = this.files.indexOf(file);
         if (idx != -1) {
           this.files.splice(idx, 1);
         }
@@ -129,7 +129,7 @@
               CRM.alert(msg, ts('Deletion failed'));
               crmAttachments.files.push(file);
 
-              var trashIdx = _.indexOf(crmAttachments.trash, file);
+              var trashIdx = crmAttachments.trash.indexOf(file);
               if (trashIdx != -1) {
                 crmAttachments.trash.splice(trashIdx, 1);
               }
@@ -165,4 +165,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -124,7 +124,7 @@ class CRM_Core_BAO_ConfigSetting {
    * The locale is set by updating the session and global variables.
    *
    * When there is a choice of permitted languages (set on the "Administer" ->
-   * "Localisation" -> "Languages, Currency, Locations" screen) the locale to
+   * "Localisation" -> "Language and Region" screen) the locale to
    * be applied can come from a variety of sources. The list below is the order
    * of priority for deciding which of the sources "wins":
    *

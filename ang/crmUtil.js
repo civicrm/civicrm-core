@@ -1,5 +1,5 @@
 /// crmUi: Sundry UI helpers
-(function (angular, $, _) {
+(function (angular, $) {
   angular.module('crmUtil', CRM.angRequires('crmUtil'));
 
   // Angular implementation of CRM.api3
@@ -21,7 +21,7 @@
         // and 'PARAGRAPH SEPARATOR' (U+2029) from the html if present.
         params.body_html = params.body_html.replace(/([\u2028]|[\u2029])/g, '\n');
       }
-      if (_.isObject(entity)) {
+      if (entity !== null && typeof entity === 'object') {
         // eval content is locally generated.
         /*jshint -W061 */
         p = backend(eval('('+angular.toJson(entity)+')'), action);
@@ -84,7 +84,7 @@
       // usage: $q.when(crmMetadata.getFields(['MyEntity', 'myaction'])).then(...);
       getFields: function getFields(entity) {
         var action = '', cacheKey;
-        if (_.isArray(entity)) {
+        if (Array.isArray(entity)) {
           action = entity[1];
           entity = entity[0];
           cacheKey = entity + '::' + action;
@@ -92,11 +92,11 @@
           cacheKey = entity;
         }
 
-        if (_.isObject(cache[cacheKey])) {
+        if (cache[cacheKey] !== null && typeof cache[cacheKey] === 'object') {
           return cache[cacheKey];
         }
 
-        var needFetch = _.isEmpty(deferreds[cacheKey]);
+        var needFetch = !(deferreds[cacheKey] || []).length;
         deferreds[cacheKey] = deferreds[cacheKey] || [];
         var deferred = $q.defer();
         deferreds[cacheKey].push(deferred);
@@ -106,7 +106,7 @@
             .then(
             // on success:
             function(fields) {
-              cache[cacheKey] = _.indexBy(fields.values, 'name');
+              cache[cacheKey] = Object.fromEntries(Object.values(fields.values).map((field) => [field.name, field]));
               angular.forEach(cache[cacheKey],function (field){
                 if (field.options) {
                   field.optionsMap = convertOptionsToMap(field.options);
@@ -296,7 +296,7 @@
 
       this.teardown = function(name) {
         if (!unwatches[name]) return;
-        _.each(unwatches[name], function(unwatch){
+        unwatches[name].forEach((unwatch) => {
           unwatch();
         });
         delete unwatches[name];
@@ -317,8 +317,10 @@
       var deferred = $q.defer();
 
       function checkResult(result, success) {
-        _.pull(executing, func);
-        if (_.includes(pending, func)) {
+        for (let pos = executing.indexOf(func); pos > -1; pos = executing.indexOf(func)) {
+          executing.splice(pos, 1);
+        }
+        if (pending.includes(func)) {
           runNext();
         } else if (success) {
           deferred.resolve(result);
@@ -329,7 +331,9 @@
 
       function runNext() {
         executing.push(func);
-        _.pull(pending, func);
+        for (let pos = pending.indexOf(func); pos > -1; pos = pending.indexOf(func)) {
+          pending.splice(pos, 1);
+        }
         func().then(function(result) {
           checkResult(result, true);
         }, function(result) {
@@ -337,9 +341,9 @@
         });
       }
 
-      if (!_.includes(executing, func)) {
+      if (!executing.includes(func)) {
         runNext();
-      } else if (!_.includes(pending, func)) {
+      } else if (!pending.includes(func)) {
         pending.push(func);
       }
       return deferred.promise;
@@ -365,4 +369,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

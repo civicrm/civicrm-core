@@ -1,9 +1,8 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
-  // Shared between router and searchMeta service
-  let searchEntity,
-    searchTasks = {};
+  // Cache search tasks metadata
+  const searchTasks = {};
 
   // Declare module and route/controller/services
   angular.module('crmSearchAdmin', CRM.angRequires('crmSearchAdmin'))
@@ -37,7 +36,7 @@
           savedSearch: function($route, crmApi4) {
             const params = $route.current.params;
             return crmApi4('SavedSearch', 'get', {
-              select: ['id', 'name', 'label', 'description', 'api_entity', 'api_params', 'form_values', 'is_template', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
+              select: ['id', 'name', 'label', 'description', 'api_entity', 'api_params', 'form_values', 'is_template', 'expires_date', 'timeout', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
               where: [['id', '=', params.id]],
               join: [
                 ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
@@ -65,7 +64,7 @@
           savedSearch: function($route, crmApi4) {
             const params = $route.current.params;
             return crmApi4('SavedSearch', 'get', {
-              select: ['label', 'description', 'api_entity', 'api_params', 'form_values', 'is_template', 'expires_date', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
+              select: ['label', 'description', 'api_entity', 'api_params', 'form_values', 'is_template', 'expires_date', 'timeout', 'GROUP_CONCAT(DISTINCT entity_tag.tag_id) AS tag_id'],
               where: [['id', '=', params.id]],
               join: [
                 ['EntityTag AS entity_tag', 'LEFT', ['entity_tag.entity_table', '=', '"civicrm_saved_search"'], ['id', '=', 'entity_tag.entity_id']],
@@ -87,7 +86,6 @@
     .controller('searchList', function($scope, $timeout, searchMeta, formatForSelect2) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = $scope.$ctrl = this;
-      searchEntity = 'SavedSearch';
 
       // Metadata needed for filters
       this.entitySelect = () => {
@@ -134,10 +132,9 @@
 
     // Controller for creating a new search
     .controller('searchCreate', function($scope, $routeParams, $location) {
-      searchEntity = $routeParams.entity;
       const ctrl = $scope.$ctrl = this;
       this.savedSearch = {
-        api_entity: searchEntity,
+        api_entity: $routeParams.entity,
         is_template: ($routeParams.is_template == '1'),
       };
       // Changing entity will refresh the angular page
@@ -150,7 +147,6 @@
 
     // Controller for editing a SavedSearch
     .controller('searchEdit', function($scope, savedSearch) {
-      searchEntity = savedSearch.api_entity;
       this.savedSearch = savedSearch;
       $scope.$ctrl = this;
     })
@@ -158,7 +154,6 @@
     // Controller for cloning a SavedSearch
     .controller('searchClone', function($scope, $routeParams, savedSearch) {
       const makeTemplate = ($routeParams.is_template == '1');
-      searchEntity = savedSearch.api_entity;
       // When cloning a search or a template as-is, append 'copy' to the label
       if (savedSearch.is_template === makeTemplate) {
         savedSearch.label += ' ' + ts('(copy)');
@@ -180,7 +175,7 @@
       $scope.$ctrl = this;
     })
 
-    .factory('searchMeta', function($q, crmApi4, formatForSelect2, md5) {
+    .factory('searchMeta', function($q, crmApi4, formatForSelect2, md5, $rootScope) {
       const localMetadataCacheName = 'searchMeta' + CRM.config.cid + CRM.config.lcMessages;
 
       function getEntity(entityName) {
@@ -188,17 +183,31 @@
           return CRM.crmSearchAdmin.schema.find(entity => entity.name === entityName);
         }
       }
+      function getSearchInfo(savedSearch) {
+        if (!savedSearch) {
+          return {api_entity: null, api_params: {}, form_values: {}};
+        }
+        if (typeof savedSearch === 'string') {
+          return {
+            api_entity: savedSearch,
+            api_params: {},
+            form_values: {}
+          };
+        }
+        return savedSearch;
+      }
       // Get join metadata matching a given expression like "Email AS Contact_Email_contact_id_01"
       function getJoin(savedSearch, fullNameOrAlias) {
         const alias = fullNameOrAlias.split(' AS ').at(-1);
         let path = alias;
-        let baseEntity = savedSearch?.api_entity || searchEntity;
+        const info = getSearchInfo(savedSearch);
+        let baseEntity = info.api_entity;
         const labels = [];
         let join;
         let result;
         while (path.length) {
           /* jshint -W083 */
-          join = CRM.crmSearchAdmin.joins[baseEntity].find(join =>
+          join = (CRM.crmSearchAdmin.joins[baseEntity] || []).find(join =>
             new RegExp('^' + join.alias + '_\\d\\d').test(path)
           );
           if (!join) {
@@ -213,7 +222,7 @@
           }
         }
         const defaultLabel = labels.join(' - ');
-        result = _.assign(_.cloneDeep(join), {
+        result = Object.assign(structuredClone(join), {
           label: (savedSearch && savedSearch.form_values && savedSearch.form_values.join && savedSearch.form_values.join[alias]) || defaultLabel,
           defaultLabel: defaultLabel,
           alias: alias,
@@ -227,9 +236,9 @@
           if (Array.isArray(condition)) {
             condition.forEach((ref, side) => {
               if (side !== 1 && typeof ref === 'string') {
-                if (ref.includes('.')) {
+                if (ref.includes(join.alias + '.')) {
                   condition[side] = ref.replace(join.alias + '.', alias + '.');
-                } else if (prefix.length && !ref.includes('"') && !ref.includes("'")) {
+                } else if (prefix.length && !ref.startsWith(prefix + '.') && !ref.includes('"') && !ref.includes("'")) {
                   condition[side] = prefix + '.' + ref;
                 }
               }
@@ -240,7 +249,9 @@
         (result.defaults ?? []).forEach(replaceRefs);
         return result;
       }
-      function getFieldAndJoin(fieldName, entityName) {
+      function getFieldAndJoin(fieldName, savedSearch) {
+        const info = getSearchInfo(savedSearch);
+        let entityName = info.api_entity;
         const fieldPath = fieldName.split(':')[0];
         const dotSplit = fieldPath.split('.');
         let name;
@@ -248,27 +259,27 @@
         let field;
         // If 2 or more segments, the first might be the name of a join
         if (dotSplit.length > 1) {
-          join = getJoin({api_entity: entityName}, dotSplit[0]);
+          join = getJoin(savedSearch, dotSplit[0]);
           if (join) {
             dotSplit.shift();
             entityName = join.entity;
           }
         }
         name = dotSplit.join('.');
-        field = getEntity(entityName).fields.find(f => f.name === name);
+        field = getEntity(entityName)?.fields.find(f => f && f.name === name);
         if (!field && join && join.bridge) {
-          field = getEntity(join.bridge).fields.find(f => f.name === name);
+          field = getEntity(join.bridge)?.fields.find(f => f && f.name === name);
         }
         // Might be a pseudoField
         if (!field) {
-          field = CRM.crmSearchAdmin.pseudoFields.find(f => f.name === name);
+          field = CRM.crmSearchAdmin.pseudoFields.find(f => f && f.name === name);
         }
         if (field) {
           field.baseEntity = entityName;
         }
         return {field: field, join: join};
       }
-      function parseFnArgs(info, expr) {
+      function parseFnArgs(info, expr, savedSearch) {
         const matches = /([_A-Z]*)\((.*)\)(:[a-z]+)?$/.exec(expr),
           fnName = matches[1];
         let argString = matches[2];
@@ -302,7 +313,7 @@
           }
           if (expr) {
             argString = argString.slice(expr.length).trim();
-            return parseArg(expr);
+            return parseArg(expr, savedSearch);
           }
         }
 
@@ -322,6 +333,17 @@
                 expr.param = param.name || index;
                 expr.flag_before = flagBefore;
                 expr.name = name;
+                if (expr.type === 'string' && !(param.must_be || []).includes('SqlString')) {
+                  if ((param.must_be || []).includes('SqlNumber')) {
+                    expr.type = 'number';
+                    expr.data_type = expr.value === '' || Number.isInteger(+expr.value) ? 'Integer' : 'Float';
+                    if (expr.value !== '' && !isNaN(expr.value)) {
+                      expr.value = +expr.value;
+                    }
+                  } else if ((param.must_be || []).includes('SqlField')) {
+                    expr.type = 'field';
+                  }
+                }
                 info.args.push(expr);
               }
               // Only continue if an expression was found and followed by a comma
@@ -348,7 +370,7 @@
         }
       }
       // @param {String} arg
-      function parseArg(arg) {
+      function parseArg(arg, savedSearch) {
         arg = arg.trim();
         if (arg && !isNaN(arg)) {
           return {
@@ -363,7 +385,7 @@
             value: arg.slice(1, -1)
           };
         } else if (arg) {
-          const fieldAndJoin = getFieldAndJoin(arg, searchEntity);
+          const fieldAndJoin = getFieldAndJoin(arg, savedSearch);
           if (fieldAndJoin.field) {
             const split = arg.split(':'),
               prefixPos = split[0].lastIndexOf(fieldAndJoin.field.name);
@@ -380,17 +402,17 @@
           }
         }
       }
-      function parseExpr(expr) {
+      function parseExpr(expr, savedSearch) {
         if (!expr) {
           return;
         }
         const splitAs = expr.split(' AS ', 2);
         const info = {fn: null, args: [], alias: splitAs[splitAs.length - 1], data_type: null};
         if (expr.includes('(') && !CRM.crmSearchAdmin.pseudoFields.find((field) => field.name === expr)) {
-          parseFnArgs(info, splitAs[0]);
+          parseFnArgs(info, splitAs[0], savedSearch);
           return info;
         }
-        const arg = parseArg(splitAs[0]);
+        const arg = parseArg(splitAs[0], savedSearch);
         if (arg) {
           arg.param = 0;
           info.data_type = arg.data_type;
@@ -399,7 +421,7 @@
         return info;
       }
       function getDefaultLabel(col, savedSearch) {
-        const info = parseExpr(col);
+        const info = parseExpr(col, savedSearch);
         let label = '';
         if (info.fn) {
           label = '(' + info.fn.title + ')';
@@ -418,7 +440,7 @@
         return label;
       }
       function fieldToColumn(fieldExpr, defaults, savedSearch) {
-        const info = parseExpr(fieldExpr);
+        const info = parseExpr(fieldExpr, savedSearch);
         const field = (info.args.find(arg => arg.type === 'field') || {}).field || {};
         const values = Object.assign({
           type: field.input_type === 'RichTextEditor' ? 'html' : 'field',
@@ -430,20 +452,47 @@
         if (defaults.sortable) {
           values.sortable = field.type && field.type !== 'Pseudo';
         }
+        if (values.type === 'field') {
+          const colorField = getColorField(fieldExpr, savedSearch);
+          if (colorField) {
+            values.colors = [{field: colorField}];
+          }
+        }
         return values;
+      }
+      // For a given field, returns the name of a companion field that supplies its color
+      // (either a `:color` suffix on the same pseudoconstant field, or a sibling `color`
+      // field on the same directly-joined entity), or null if no color is available.
+      function getColorField(fieldExpr, savedSearch) {
+        const field = getFieldAndJoin(fieldExpr, savedSearch).field;
+        if (!field) {
+          return null;
+        }
+        const pathPart = fieldExpr.split(':')[0];
+        const lastDot = pathPart.lastIndexOf('.');
+        const prefix = lastDot >= 0 ? pathPart.substring(0, lastDot + 1) : '';
+        const fieldName = lastDot >= 0 ? pathPart.substring(lastDot + 1) : pathPart;
+        if (fieldName === 'color') {
+          // A color field has no color field of its own
+          return null;
+        }
+        if ((field.suffixes || []).includes('color')) {
+          return prefix + fieldName + ':color';
+        }
+        const colorField = getFieldAndJoin(prefix + 'color', savedSearch).field;
+        return colorField ? prefix + 'color' : null;
       }
       return {
         getEntity: getEntity,
-        getBaseEntity: function() {
-          return getEntity(searchEntity);
-        },
-        getField: function(fieldName, entityName) {
-          return getFieldAndJoin(fieldName, entityName || searchEntity).field;
+        getSearchInfo: getSearchInfo,
+        getField: function(fieldName, savedSearch) {
+          return getFieldAndJoin(fieldName, savedSearch).field;
         },
         getJoin: getJoin,
         parseExpr: parseExpr,
         getDefaultLabel: getDefaultLabel,
         fieldToColumn: fieldToColumn,
+        getColorField: getColorField,
         getSearchTasks: function(entityName) {
           if (!(entityName in searchTasks)) {
             searchTasks[entityName] = crmApi4('SearchDisplay', 'getSearchTasks', {
@@ -463,15 +512,16 @@
           }
         },
         // Supply default aggregate function appropriate to the data_type
-        getDefaultAggregateFn: function(info, apiParams) {
+        getDefaultAggregateFn: function(info, savedSearch) {
           let arg = info.args[0] || {};
           if (arg.suffix) {
             return null;
           }
+          const apiParams = getSearchInfo(savedSearch).api_params;
           let groupByFn;
           if (apiParams.groupBy) {
             apiParams.groupBy.forEach(function(groupBy) {
-              let expr = parseExpr(groupBy);
+              let expr = parseExpr(groupBy, savedSearch);
               if (expr && expr.fn && expr.args) {
                 let paths = expr.args.map(ex => ex.path);
                 if (paths.includes(arg.path)) {
@@ -503,7 +553,7 @@
             const entity = getEntity(joinInfo.entity);
             const prefix = joinInfo.alias ? joinInfo.alias + '.' : '';
             entity?.fields?.forEach(field => {
-              if (['Contact', 'Individual', 'Household', 'Organization'].includes(entity.name) && field.name === 'id' || field.fk_entity === 'Contact') {
+              if (field && ((['Contact', 'Individual', 'Household', 'Organization'].includes(entity.name) && field.name === 'id') || field.fk_entity === 'Contact')) {
                 columns.push({
                   id: prefix + field.name,
                   text: (joinInfo.label ? joinInfo.label + ': ' : '') + field.label,
@@ -519,7 +569,7 @@
         loadFieldOptions: function(entities) {
           const entitiesToLoad = entities.reduce((entitiesToLoad, entityName) => {
             const entity = getEntity(entityName);
-            if (!('optionsLoaded' in entity)) {
+            if (!('optionsLoaded' in entity) && entity.fields.length) {
               entity.optionsLoaded = false;
               entitiesToLoad[entityName] = [entityName, 'getFields', {
                 loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
@@ -537,13 +587,14 @@
               Object.entries(results).forEach(([entityName, fields]) => {
                 const entity = getEntity(entityName);
                 Object.entries(fields).forEach(([fieldName, options]) => {
-                  const field = entity.fields.find(f => f.name === fieldName);
+                  const field = entity.fields.find(f => f && f.name === fieldName);
                   if (field) {
                     field.options = options;
                   }
                 });
                 entity.optionsLoaded = true;
               });
+              $rootScope.$broadcast('searchMetaFieldOptionsLoaded');
             });
           }
         },
@@ -566,9 +617,10 @@
           }
           return '';
         },
-        getPrimaryAndSecondaryEntitySelect: function() {
-          const primaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'primary');
-          const secondaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'secondary');
+        getPrimaryAndSecondaryEntitySelect: function(filter) {
+          filter = filter || (() => true);
+          const primaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'primary' && entity.fields.length).filter(filter);
+          const secondaryEntities = CRM.crmSearchAdmin.schema.filter(entity => entity.searchable === 'secondary' && entity.fields.length).filter(filter);
           const select = formatForSelect2(primaryEntities, 'name', 'title_plural', ['description', 'icon']);
           select.push({
             text: ts('More...'),
@@ -634,4 +686,4 @@
     });
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

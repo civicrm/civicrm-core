@@ -86,38 +86,7 @@ function civicrm_api3_membership_create($params) {
   $values = [];
   _civicrm_api3_custom_format_params($params, $values, 'Membership');
   $params = array_merge($params, $values);
-
-  // Calculate membership dates
-  // Fixme: This code belongs in the BAO
-  if (empty($params['id']) || !empty($params['num_terms'])) {
-    // If this is a new membership or we have a specified number of terms calculate membership dates.
-    if (empty($params['id'])) {
-      // This is a new membership, calculate the membership dates.
-      $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
-        $params['membership_type_id'],
-        $params['join_date'] ?? NULL,
-        $params['start_date'] ?? NULL,
-        $params['end_date'] ?? NULL,
-        $params['num_terms'] ?? 1
-      );
-    }
-    else {
-      // This is an existing membership, calculate the membership dates after renewal
-      // num_terms is treated as a 'special sauce' for is_renewal but this
-      // isn't really helpful for completing pendings.
-      $calcDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType(
-        $params['id'],
-        NULL,
-        $params['membership_type_id'] ?? NULL,
-        $params['num_terms']
-      );
-    }
-    foreach (['join_date', 'start_date', 'end_date'] as $date) {
-      if (empty($params[$date]) && isset($calcDates[$date])) {
-        $params[$date] = $calcDates[$date];
-      }
-    }
-  }
+  $params += CRM_Member_BAO_Membership::getCalculatedDates($params);
 
   // Fixme: This code belongs in the BAO
   $ids = [];

@@ -1,8 +1,13 @@
 // http://civicrm.org/licensing
-(function($, _) {
+(function($) {
   'use strict';
 
   /* jshint validthis: true */
+
+  // Returns a copy of an object without the named keys.
+  function omitKeys(object, keys) {
+    return Object.fromEntries(Object.entries(object).filter(([key]) => !keys.includes(key)));
+  }
   /**
    * Handle user input - field or operator selection.
    *
@@ -23,10 +28,10 @@
       var operators = CRM.searchBuilder.generalOperators;
       if ((field in CRM.searchBuilder.fieldTypes) === true) {
         if ($.inArray(CRM.searchBuilder.fieldTypes[field], ['Boolean', 'Int']) > -1) {
-          operators = _.omit(operators, ['IS NOT EMPTY', 'IS EMPTY']);
+          operators = omitKeys(operators, ['IS NOT EMPTY', 'IS EMPTY']);
         }
         else if (CRM.searchBuilder.fieldTypes[field] == 'String') {
-          operators = _.omit(operators, ['>', '<', '>=', '<=']);
+          operators = omitKeys(operators, ['>', '<', '>=', '<=']);
         }
       }
       buildOperator(operator, operators);
@@ -179,9 +184,7 @@
       multiple: multiSelect,
       placeholder: ts('Select'),
       allowClear: true,
-      data: _.transform(CRM.searchBuilder.fieldOptions[field], function(options, opt) {
-        options.push({id: opt.key, text: opt.value});
-      }, [])
+      data: CRM.searchBuilder.fieldOptions[field].map((opt) => ({id: opt.key, text: opt.value}))
     });
   }
 
@@ -364,4 +367,4 @@
       $('select[id^=mapper][id$="_1"]', '#Builder').each(handleUserInputField);
     }
   });
-})(CRM.$, CRM._);
+})(CRM.$);

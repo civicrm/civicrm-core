@@ -79,9 +79,6 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue implements \Civi
   public static function getDefaultValue($params) {
     $bao = new CRM_Core_BAO_OptionValue();
     $bao->option_group_id = $params['option_group_id'];
-    if (isset($params['domain_id'])) {
-      $bao->domain_id = $params['domain_id'];
-    }
     $bao->selectAdd();
     $bao->whereAdd("value REGEXP '^[0-9]+$'");
     $bao->selectAdd('(ROUND(COALESCE(MAX(CONVERT(value, UNSIGNED)),0)) +1) as nextvalue');

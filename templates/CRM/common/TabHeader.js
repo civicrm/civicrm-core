@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function($, _) {
+(function($) {
   /**
    * By default this simply loads tabs via ajax CRM.loadPage method
    * Tabs with class 'ajaxForm' will use CRM.loadForm instead, suitable for most forms
@@ -7,7 +7,7 @@
    */
   $(function($) {
     // CRM.tabSettings.active is the name of the tab which should open on page load
-    var tabSettings = CRM.tabSettings ? _.cloneDeep(CRM.tabSettings) : {};
+    var tabSettings = CRM.tabSettings ? structuredClone(CRM.tabSettings) : {};
     tabSettings.active = tabSettings.active ? $('#tab_' + tabSettings.active).prevAll().length : 0;
     $("#mainTabContainer")
       .on('tabsbeforeactivate', function(e, ui) {
@@ -191,4 +191,4 @@
     }
     window.history.replaceState("", "", newUrl);
   }
-})(CRM.$, CRM._);
+})(CRM.$);

@@ -64,7 +64,7 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
     $this->assertEquals('Test SMS Provider2', $provider['title']);
     $domain_id = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_SmsProvider', $provider['id'], 'domain_id');
     $this->assertNull($domain_id);
-    CRM_SMS_BAO_SmsProvider::del($provider['id']);
+    CRM_SMS_BAO_SmsProvider::deleteRecord(['id' => $provider['id']]);
   }
 
   /**

@@ -307,29 +307,6 @@ FROM civicrm_action_schedule cas
   }
 
   /**
-   * Delete a Reminder.
-   *
-   * @param int $id
-   * @deprecated
-   * @throws CRM_Core_Exception
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    self::deleteRecord(['id' => $id]);
-  }
-
-  /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_ActionSchedule', $id, 'is_active', $is_active);
-  }
-
-  /**
    * @param int $mappingID
    * @param $now
    *
@@ -412,7 +389,7 @@ FROM civicrm_action_schedule cas
             'message' => empty($errors) ? "null" : implode(' ', $errors),
             'action_date_time' => $now,
           ];
-          CRM_Core_BAO_ActionLog::create($logParams);
+          CRM_Core_BAO_ActionLog::writeRecord($logParams);
         }
       }
       catch (Throwable $e) {
@@ -527,14 +504,6 @@ FROM civicrm_action_schedule cas
       2 => [$id, 'Integer'],
     ];
     return CRM_Core_DAO::singleValueQuery($queryString, $params);
-  }
-
-  /**
-   * @deprecated
-   */
-  public static function getRecipientListing($mappingID, $recipientType) {
-    CRM_Core_Error::deprecatedFunctionWarning('getRecipientListingOptions');
-    return self::getRecipientListingOptions('recipient_listing', ['values' => ['mapping_id' => $mappingID, 'recipient' => $recipientType]]);
   }
 
   /**
@@ -832,17 +801,6 @@ FROM civicrm_action_schedule cas
       return $toPhoneNumber;
     }
     return NULL;
-  }
-
-  /**
-   * @deprecated
-   */
-  public static function getAdditionalRecipients(): array {
-    CRM_Core_Error::deprecatedFunctionWarning('APIv4 getFields');
-    return [
-      'manual' => ts('Choose Recipient(s)'),
-      'group' => ts('Select Group'),
-    ];
   }
 
 }

@@ -11,9 +11,9 @@ use CRM_Afform_ExtensionUtil as E;
  * @param array $params
  * @return array
  */
-function _afform_fields_filter($params) {
+function _afform_fields_filter($params, $checkPermissions = FALSE) {
   $result = [];
-  $fields = \Civi\Api4\Afform::getfields(FALSE)->setAction('create')->execute()->indexBy('name');
+  $fields = \Civi\Api4\Afform::getfields($checkPermissions)->setAction('create')->execute()->indexBy('name');
   foreach ($fields as $fieldName => $field) {
     if (array_key_exists($fieldName, $params)) {
       $result[$fieldName] = $params[$fieldName];
@@ -42,6 +42,7 @@ function afform_civicrm_config(&$config) {
   $dispatcher = Civi::dispatcher();
   $dispatcher->addListener('civi.afform.validate', ['\Civi\Api4\Action\Afform\Submit', 'validateFieldInput'], 50);
   $dispatcher->addListener('civi.afform.validate', ['\Civi\Api4\Action\Afform\Submit', 'validateEntityRefFields'], 45);
+  $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'preprocessDisabledFields'], 150);
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'processGenericEntity'], 0);
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'preprocessContact'], 10);
   $dispatcher->addListener('civi.afform.submit', ['\Civi\Api4\Action\Afform\Submit', 'preprocessParentFormValues'], 100);
@@ -238,7 +239,7 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   $moduleName = _afform_angular_module_name($params['name'], 'camel');
   $formMetaData = (array) civicrm_api4('Afform', 'get', [
     'checkPermissions' => FALSE,
-    'select' => ['redirect', 'name', 'title', 'autosave_draft', 'confirmation_type', 'confirmation_message'],
+    'select' => ['name', 'title', 'autosave_draft'],
     'where' => [['name', '=', $params['name']]],
   ], 0);
 
@@ -287,6 +288,31 @@ function afform_civicrm_alterMenu(&$items) {
       $items[$meta['server_route']] = $newMenuItem + $existingAttributes;
     }
   }
+}
+
+/**
+ * Implements hook_civicrm_alterNonDbTaggableEntities().
+ *
+ * Afform's `tags` field stores tag names, not tag IDs, so this callback has to
+ * resolve the tag ID it's given back to a name before it can match against it.
+ */
+function afform_civicrm_alterNonDbTaggableEntities(&$entities) {
+  $entities['Afform'] = function($tagId) {
+    $tagName = \Civi\Api4\Tag::get(FALSE)
+      ->addWhere('id', '=', $tagId)
+      ->addSelect('name')
+      ->execute()->first()['name'] ?? NULL;
+    if (!$tagName) {
+      return [];
+    }
+    $afforms = (array) \Civi\Api4\Afform::get(FALSE)
+      ->addWhere('tags', 'CONTAINS', $tagName)
+      ->addSelect('name')
+      ->execute();
+    // Afform's primary key column is called `name`, not `id` - normalize to the
+    // generic `id` key the TaggedEntity::get contract expects from every callback.
+    return array_map(fn($afform) => ['id' => $afform['name']], $afforms);
+  };
 }
 
 /**
@@ -571,6 +597,7 @@ function afform_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?i
     'icon' => 'fa-check-square-o',
     // The Afform.process API doesn't support batches so use get+chaining
     'apiBatch' => [
+      'entity' => 'AfformSubmission',
       'action' => 'get',
       'params' => [
         'select' => ['id', 'afform_name'],
@@ -592,6 +619,7 @@ function afform_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?i
     'title' => E::ts('Reject Submissions'),
     'icon' => 'fa-rectangle-xmark',
     'apiBatch' => [
+      'entity' => 'AfformSubmission',
       'action' => 'update',
       'params' => [
         'where' => [['status_id:name', '=', 'Pending']],
@@ -603,6 +631,20 @@ function afform_civicrm_searchKitTasks(array &$tasks, bool $checkPermissions, ?i
       'errorMsg' => E::ts('An error occurred while attempting to process %1 %2.'),
     ],
   ];
+  $tasks['AfformSubmissionData'] = $tasks['AfformSubmission'];
+  $tasks['AfformSubmissionData']['delete'] = [
+    'title' => E::ts('Delete Submissions'),
+    'icon' => 'fa-trash',
+    'apiBatch' => [
+      'entity' => 'AfformSubmission',
+      'action' => 'delete',
+      'confirmMsg' => E::ts('Are you sure you want to delete %1 %2? This cannot be undone.'),
+      'runMsg' => E::ts('Deleting %1 %2...'),
+      'successMsg' => E::ts('Deleted %1 %2.'),
+      'errorMsg' => E::ts('An error occurred while attempting to delete %1 %2.'),
+    ],
+  ];
+
   $tasks['Afform']['revert'] = [
     'title' => E::ts('Revert'),
     'icon' => 'fa-undo',

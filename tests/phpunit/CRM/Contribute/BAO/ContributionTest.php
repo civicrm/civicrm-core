@@ -78,6 +78,22 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
     $this->assertEquals($params['trxn_id'], $contribution['trxn_id'], 'Check for transaction id .');
     $this->assertEquals($params['net_amount'], $contribution['net_amount'], 'Check for Amount update.');
+
+    // The fee increase (5 -> 10) should have recorded its own financial_trxn, linked
+    // to the contribution itself rather than to whatever happened to be in the raw
+    // update params.
+    $feeTrxn = FinancialTrxn::get(FALSE)
+      ->addWhere('is_payment', '=', FALSE)
+      ->addWhere('total_amount', '=', 5)
+      ->addOrderBy('id', 'DESC')
+      ->execute()->first();
+    $this->assertNotEmpty($feeTrxn, 'The fee increase should create its own financial_trxn.');
+    $entityFinancialTrxn = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('financial_trxn_id', '=', $feeTrxn['id'])
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->execute()->single();
+    $this->assertEquals('civicrm_contribution', $entityFinancialTrxn['entity_table']);
+    $this->assertEquals($contribution['id'], $entityFinancialTrxn['entity_id']);
   }
 
   /**
@@ -1130,7 +1146,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * @throws \CRM_Core_Exception
    */
   public function testSendMailUpdateReceiptDate(): void {
-    $ids = $values = [];
     $contactId = $this->individualCreate();
     $params = [
       'contact_id' => $contactId,
@@ -1145,10 +1160,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $contributionId = $contribution['id'];
     $this->assertDBNull('CRM_Contribute_BAO_Contribution', $contributionId, 'receipt_date', 'id', 'After creating receipt date must be null');
     $input = ['receipt_update' => 0];
-    CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contributionId, $values);
+    CRM_Contribute_BAO_Contribution::sendMail($input, [], $contributionId);
     $this->assertDBNull('CRM_Contribute_BAO_Contribution', $contributionId, 'receipt_date', 'id', 'After sendMail, with the explicit instruction not to update receipt date stays null');
     $input = ['receipt_update' => 1];
-    CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contributionId, $values);
+    CRM_Contribute_BAO_Contribution::sendMail($input, [], $contributionId);
     $this->assertDBNotNull('CRM_Contribute_BAO_Contribution', $contributionId, 'receipt_date', 'id', 'After sendMail with the permission to allow update receipt date must be set');
 
     /* repeat the same scenario for downloading a pdf */
@@ -1157,10 +1172,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertDBNull('CRM_Contribute_BAO_Contribution', $contributionID, 'receipt_date', 'id', 'After creating receipt date must be null');
     $input = ['receipt_update' => 0];
     /* setting the last parameter (returnMessageText) to TRUE is done by the download of the pdf */
-    CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contributionID, $values, TRUE);
+    CRM_Contribute_BAO_Contribution::sendMail($input, [], $contributionID);
     $this->assertDBNull('CRM_Contribute_BAO_Contribution', $contributionID, 'receipt_date', 'id', 'After sendMail, with the explicit instruction not to update receipt date stays null');
     $input = ['receipt_update' => 1];
-    CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $contributionID, $values, TRUE);
+    CRM_Contribute_BAO_Contribution::sendMail($input, [], $contributionID);
     $this->assertDBNotNull('CRM_Contribute_BAO_Contribution', $contributionID, 'receipt_date', 'id', 'After sendMail with the permission to allow update receipt date must be set');
   }
 

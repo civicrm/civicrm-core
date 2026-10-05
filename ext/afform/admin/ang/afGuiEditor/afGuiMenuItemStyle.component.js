@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Menu item to control the border property of a node
@@ -12,17 +12,17 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
         ctrl = this;
 
-      this.styles = _.cloneDeep(afGui.meta.afform_container_style);
+      this.styles = structuredClone(afGui.meta.afform_container_style);
 
       $scope.getSetStyle = function(style) {
         const options = ctrl.styles.map(item => item.value);
         if (arguments.length) {
           afGui.modifyClasses(ctrl.node, options, style);
         }
-        return _.intersection(afGui.splitClass(ctrl.node['class']), options)[0] || '';
+        return afGui.splitClass(ctrl.node['class']).find((c) => options.includes(c)) || '';
       };
 
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

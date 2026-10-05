@@ -202,7 +202,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
     // The following code is exactly the same as runMailingSuccess() except that we store the ID of the mailing.
     $mailing_1 = $this->callAPISuccess('Mailing', 'create', $mailingParams);
     $mut->assertRecipients([]);
-    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+    $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $mut->getAllMessages('ezc');
     $this->assertCount(1, $allMessages);

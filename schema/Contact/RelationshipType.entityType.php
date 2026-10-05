@@ -157,5 +157,14 @@ return [
         'label' => ts('Enabled'),
       ],
     ],
+    'weight' => [
+      'title' => ts('Order'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'required' => TRUE,
+      'description' => ts('Ordering of the relationship types.'),
+      'add' => '6.18',
+      'default' => 0,
+    ],
   ],
 ];

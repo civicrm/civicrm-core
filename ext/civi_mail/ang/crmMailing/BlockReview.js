@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailing').directive('crmMailingBlockReview', function (crmMailingPreviewMgr) {
     return {
@@ -23,4 +23,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

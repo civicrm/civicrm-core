@@ -89,6 +89,29 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertFalse($customFieldModified->option_group_id ?? FALSE);
   }
 
+  public function testHasOptionGroup(): void {
+    $cases = [
+      ['Select', 'String', TRUE],
+      ['Radio', 'Int', TRUE],
+      ['CheckBox', 'String', TRUE],
+      ['Autocomplete-Select', 'String', TRUE],
+      ['Select', NULL, TRUE],
+      ['Radio', 'Money', TRUE],
+      ['Text', 'String', FALSE],
+      ['Text', NULL, FALSE],
+      ['Radio', 'Boolean', FALSE],
+      ['Select', 'Country', FALSE],
+      ['Select', 'StateProvince', FALSE],
+      ['Autocomplete-Select', 'ContactReference', FALSE],
+      ['Select Date', 'Date', FALSE],
+      ['File', 'File', FALSE],
+      ['Toggle', 'Boolean', FALSE],
+    ];
+    foreach ($cases as [$htmlType, $dataType, $expected]) {
+      $this->assertSame($expected, CRM_Core_BAO_CustomField::hasOptionGroup($htmlType, $dataType), "Testing hasOptionGroup({$htmlType}, " . ($dataType ?? 'NULL') . ")");
+    }
+  }
+
   /**
    * Test custom field create accepts passed column name.
    */
@@ -1004,6 +1027,44 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
         ],
       ],
+      $this->getCustomFieldName('float') => [
+        'name' => $this->getCustomFieldName('float'),
+        'custom_field_id' => $this->getCustomFieldID('float'),
+        'id' => $this->getCustomFieldID('float'),
+        'groupTitle' => 'Custom Group',
+        'default_value' => NULL,
+        'option_group_id' => $this->getOptionGroupID('float'),
+        'custom_group_id' => $customGroupID,
+        'extends' => 'Contact',
+        'extends_entity_column_value' => NULL,
+        'extends_entity_column_id' => '',
+        'is_view' => '0',
+        'is_multiple' => '0',
+        'date_format' => NULL,
+        'time_format' => NULL,
+        'is_required' => 0,
+        'table_name' => 'civicrm_value_custom_group_' . $customGroupID,
+        'column_name' => $this->getCustomFieldColumnName('float'),
+        'where' => 'civicrm_value_custom_group_' . $customGroupID . '.' . $this->getCustomFieldColumnName('float'),
+        'extends_table' => 'civicrm_contact',
+        'search_table' => 'contact_a',
+        'import' => 1,
+        'label' => 'Number select',
+        'headerPattern' => '//',
+        'title' => 'Number select',
+        'data_type' => 'Float',
+        'type' => 512,
+        'html_type' => 'Select',
+        'text_length' => NULL,
+        'options_per_line' => NULL,
+        'is_search_range' => 0,
+        'serialize' => '0',
+        'pseudoconstant' => [
+          'optionGroupName' => $this->getOptionGroupName('float'),
+          'optionEditPath' => 'civicrm/admin/options/' . $this->getOptionGroupName('float'),
+
+        ],
+      ],
     ];
     $this->assertEquals($expected, CRM_Core_BAO_CustomField::getFieldsForImport());
   }
@@ -1160,6 +1221,49 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       'return' => 'custom_' . $fieldId,
     ]);
     $this->assertEquals(array_keys($colors), $value);
+  }
+
+  /**
+   * @dataProvider attributesStringDataProvider
+   */
+  public function testAttributesFromStringRoundTrip(string $attrString, array $expected): void {
+    $parsed = CRM_Core_BAO_CustomField::attributesFromString($attrString);
+    $this->assertEquals($expected, $parsed);
+    // Re-encoding then re-parsing should be lossless, even for values containing spaces/quotes.
+    $reparsed = CRM_Core_BAO_CustomField::attributesFromString(CRM_Core_BAO_CustomField::attributesToString($parsed));
+    $this->assertEquals($parsed, $reparsed);
+  }
+
+  public static function attributesStringDataProvider(): array {
+    return [
+      'unquoted, single word' => ['rows=3 cols=40', ['rows' => '3', 'cols' => '40']],
+      'unquoted, no spaces needed' => ['placeholder=Select', ['placeholder' => 'Select']],
+      'double-quoted value with a space' => ['placeholder="Find sites"', ['placeholder' => 'Find sites']],
+      'single-quoted value with a space' => ["placeholder='Find sites'", ['placeholder' => 'Find sites']],
+      'mixed quoted and unquoted' => ['a=1 b="two words" c=3', ['a' => '1', 'b' => 'two words', 'c' => '3']],
+      'empty string' => ['', []],
+    ];
+  }
+
+  /**
+   * A placeholder set via `attributes` (e.g. `placeholder="Find sites"`) should reach the
+   * rendered form element for an EntityReference field exactly as entered, overriding the
+   * auto-generated "- select X -" default.
+   */
+  public function testEntityReferencePlaceholderFromAttributes(): void {
+    $customGroupId = $this->customGroupCreate(['extends' => 'Individual'])['id'];
+    $field = CustomField::create(FALSE)
+      ->addValue('custom_group_id', $customGroupId)
+      ->addValue('label', 'entity_ref_placeholder')
+      ->addValue('data_type', 'EntityReference')
+      ->addValue('html_type', 'Autocomplete-Select')
+      ->addValue('fk_entity', 'Activity')
+      ->addValue('attributes', 'placeholder="Find sites"')
+      ->execute()->single();
+
+    $form = new CRM_Core_Form();
+    $element = CRM_Core_BAO_CustomField::addQuickFormElement($form, 'custom_' . $field['id'], $field['id']);
+    $this->assertEquals('Find sites', $element->getAttribute('placeholder'));
   }
 
 }

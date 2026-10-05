@@ -76,18 +76,6 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
   }
 
   /**
-   * Delete membership Payments.
-   *
-   * @param int $id
-   * @deprecated
-   * @return bool
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) self::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Log a deprecated warning that there is a contribution with MembershipPayment records and missing LineItems
    *
    * @param int $contributionID

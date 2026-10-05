@@ -28,72 +28,91 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    * @return array
    *   Data type => Description
    */
-  public static function dataType() {
+  public static function dataType(): array {
     return [
       [
         'id' => 'String',
         'name' => 'Alphanumeric',
         'label' => ts('Alphanumeric'),
+        'description' => ts('Text, numbers, and symbols'),
       ],
       [
         'id' => 'Int',
         'name' => 'Integer',
         'label' => ts('Integer'),
+        'description' => ts('Whole numbers (positive or negative)'),
       ],
       [
         'id' => 'Float',
         'name' => 'Number',
         'label' => ts('Number'),
+        'description' => ts('Numbers with or without decimals'),
       ],
       [
         'id' => 'Money',
         'name' => 'Money',
         'label' => ts('Money'),
+        'description' => ts('Monetary amounts formatted with currency symbol'),
       ],
       [
         'id' => 'Memo',
         'name' => 'Note',
         'label' => ts('Note'),
+        'description' => ts('Long text or notes allowing multiple lines'),
       ],
       [
         'id' => 'Date',
         'name' => 'Date',
         'label' => ts('Date'),
+        'description' => ts('Calendar date and optional time'),
       ],
       [
         'id' => 'Boolean',
         'name' => 'Yes or No',
         'label' => ts('Yes or No'),
+        'description' => ts('Yes or No (true or false) values'),
       ],
       [
         'id' => 'StateProvince',
         'name' => 'State/Province',
         'label' => ts('State/Province'),
+        'description' => ts('Select from configured states and provinces'),
       ],
       [
         'id' => 'Country',
         'name' => 'Country',
         'label' => ts('Country'),
+        'description' => ts('Select from configured countries'),
+      ],
+      [
+        'id' => 'Currency',
+        'name' => 'Currency',
+        'label' => ts('Currency'),
+        'description' => ts('Select from available currencies (e.g. USD, EUR)'),
       ],
       [
         'id' => 'File',
         'name' => 'File',
         'label' => ts('File'),
+        'description' => ts('Uploaded file or document'),
       ],
       [
         'id' => 'Link',
         'name' => 'Link',
         'label' => ts('Link'),
+        'description' => ts('Website address or URL'),
       ],
       [
         'id' => 'ContactReference',
         'name' => 'Contact Reference',
         'label' => ts('Contact Reference'),
+        'description' => ts('Reference to an existing contact record'),
       ],
       [
         'id' => 'EntityReference',
         'name' => 'Entity Reference',
         'label' => ts('Entity Reference'),
+        'description' => ts('Reference to another record (e.g. Event, Activity)'),
       ],
     ];
   }
@@ -113,6 +132,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
       'Country' => 'Integer',
       'File' => 'Integer',
       'Link' => 'String',
+      'Currency' => 'String',
       'ContactReference' => 'Integer',
       'EntityReference' => 'Integer',
     ];
@@ -120,7 +140,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
     if ($dataType === 'Date' && !empty($customField['time_format'])) {
       $dataType = 'Timestamp';
     }
-    if (!empty($customField['fk_entity'])) {
+    if (!empty($customField['fk_entity']) && $customField['data_type'] !== 'Currency') {
       $dataType = CRM_Core_BAO_CustomValueTable::getDataTypeForPrimaryKey($customField['fk_entity']);
     }
 
@@ -146,6 +166,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
       'StateProvince' => CRM_Utils_Type::T_INT,
       'File' => CRM_Utils_Type::T_STRING,
       'Link' => CRM_Utils_Type::T_STRING,
+      'Currency' => CRM_Utils_Type::T_STRING,
       'ContactReference' => CRM_Utils_Type::T_INT,
       'EntityReference' => CRM_Utils_Type::T_INT,
       'Country' => CRM_Utils_Type::T_INT,
@@ -183,26 +204,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
     Civi::cache('metadata')->clear();
 
     return $customField;
-  }
-
-  /**
-   * Save multiple fields, now deprecated in favor of self::writeRecords.
-   * https://lab.civicrm.org/dev/core/issues/1093
-   * @deprecated
-   *
-   * @param array $bulkParams
-   *   Array of arrays as would be passed into create
-   * @param array $defaults
-   *  Default parameters to be be merged into each of the params.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public static function bulkSave($bulkParams, $defaults = []) {
-    CRM_Core_Error::deprecatedFunctionWarning(__CLASS__ . '::writeRecords');
-    foreach ($bulkParams as $index => $fieldParams) {
-      $bulkParams[$index] = array_merge($defaults, $fieldParams);
-    }
-    self::writeRecords($bulkParams);
   }
 
   /**
@@ -277,21 +278,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    Civi::rebuild(['system' => TRUE])->execute();
-
-    //enable-disable CustomField
-    CRM_Core_BAO_UFField::setUFField($id, $is_active);
-    return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_CustomField', $id, 'is_active', $is_active);
   }
 
   /**
@@ -1028,20 +1014,41 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    * array.
    *
    * @param string $attrString
-   *   The attributes as a string, e.g. `rows=3 cols=40`.
+   *   The attributes as a string, e.g. `rows=3 cols=40` or `placeholder="Find sites"`.
    *
    * @return array
    *   The attributes as an array, e.g. `['rows' => 3, 'cols' => 40]`.
    */
   public static function attributesFromString($attrString) {
     $attributes = [];
-    foreach (explode(' ', $attrString) as $at) {
-      if (strpos($at, '=')) {
-        [$k, $v] = explode('=', $at);
-        $attributes[$k] = trim($v, ' "');
-      }
+    // Values may be quoted (single or double) to allow spaces, e.g. placeholder="Find sites".
+    preg_match_all('/([\w-]+)=("[^"]*"|\'[^\']*\'|\S*)/', (string) $attrString, $matches, PREG_SET_ORDER);
+    foreach ($matches as [, $key, $value]) {
+      $attributes[$key] = html_entity_decode(trim($value, '"\''));
     }
     return $attributes;
+  }
+
+  /**
+   * Take an associative array of HTML element attributes and turn it into a string.
+   *
+   * Inverse of self::attributesFromString().
+   *
+   * @param array $attributes
+   *   The attributes as an array, e.g. `['rows' => 3, 'placeholder' => 'Find sites']`.
+   *
+   * @return string
+   *   The attributes as a string, e.g. `rows=3 placeholder="Find sites"`.
+   */
+  public static function attributesToString(array $attributes): string {
+    $parts = [];
+    foreach ($attributes as $key => $value) {
+      if ($value === NULL || $value === '') {
+        continue;
+      }
+      $parts[] = $key . '="' . htmlspecialchars((string) $value, ENT_QUOTES) . '"';
+    }
+    return implode(' ', $parts);
   }
 
   /**
@@ -1089,6 +1096,32 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
 
       CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_CustomField');
       Civi::cache('metadata')->clear();
+    }
+  }
+
+  /**
+   * Get the number of rows in the value table with a not NULL value for this field
+   * - this will prevent automatic cleanup of the CustomField if there is data for it
+   */
+  public static function on_hook_civicrm_referenceCounts($e) {
+    $dao = $e->dao;
+    if (!is_a($dao, \CRM_Core_DAO_CustomField::class)) {
+      return;
+    }
+    $dao->find(TRUE);
+    $columnName = $dao->column_name;
+
+    $customGroup = CRM_Core_DAO_CustomGroup::findById($dao->custom_group_id);
+
+    $tableName = $customGroup->table_name;
+    $rows = intval(\CRM_Core_DAO::singleValueQuery("SELECT COUNT(1) FROM {$tableName} WHERE {$columnName} IS NOT NULL;"));
+
+    if ($rows) {
+      $e->refCounts[] = [
+        'type' => 'sql',
+        'name' => 'custom_field_non_null_column_entries',
+        'count' => $rows,
+      ];
     }
   }
 
@@ -2027,6 +2060,8 @@ WHERE  id IN ( %1, %2 )
    * @return array
    */
   protected static function prepareCreate($params) {
+    $htmlTypes = array_column(Civi::entity('CustomField')->getOptions('html_type'), NULL, 'id');
+
     $op = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($op, 'CustomField', $params['id'] ?? NULL, $params);
     $params['is_append_field_id_to_column_name'] = !isset($params['column_name']);
@@ -2046,14 +2081,31 @@ WHERE  id IN ( %1, %2 )
 
     $htmlType = $params['html_type'] ?? NULL;
     $dataType = $params['data_type'] ?? NULL;
+    if (!empty($params['id'])) {
+      $dataType = $dataType ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'data_type');
+      $htmlType = $htmlType ?? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'html_type');
+    }
+    if (!$htmlType || !isset($htmlTypes[$htmlType])) {
+      throw new CRM_Core_Exception(sprintf('Invalid html_type "%s".', $htmlType ?? 'null'));
+    }
+    if (!$dataType || !isset($htmlTypes[$htmlType]['data_types'][$dataType])) {
+      throw new CRM_Core_Exception(sprintf('Incompatible html_type "%s" with data_type "%s".', $htmlType, $dataType ?? 'null'));
+    }
 
     if ($htmlType === 'Select Date' && empty($params['date_format'])) {
       $params['date_format'] = Civi::settings()->get('dateInputFormat');
     }
 
     // Checkboxes are always serialized in current schema
-    if ($htmlType == 'CheckBox') {
+    if (($htmlTypes[$htmlType]['data_types'][$dataType]['serialize'] ?? NULL) === 'always') {
       $params['serialize'] = CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND;
+    }
+    // Input type does not support serialization
+    if (($htmlTypes[$htmlType]['data_types'][$dataType]['serialize'] ?? NULL) === 'never') {
+      if (!empty($params['serialize'])) {
+        throw new CRM_Core_Exception(sprintf('A custom field type %s+%s cannot be serialized.', $dataType, $htmlType));
+      }
+      $params['serialize'] = '';
     }
 
     if (!empty($params['serialize'])) {
@@ -2078,8 +2130,7 @@ WHERE  id IN ( %1, %2 )
     }
 
     // create any option group & values if required
-    $allowedOptionTypes = ['String', 'Int', 'Float', 'Money'];
-    if (!in_array($htmlType, ['Text', 'Hidden'], TRUE) && in_array($dataType, $allowedOptionTypes, TRUE)) {
+    if ($htmlType && self::hasOptionGroup($htmlType, $dataType)) {
       //CRM-16659: if option_value then create an option group for this custom field.
       // An option_type of 2 would be a 'message' from the form layer not to handle
       // the option_values key. If not set then it is not ignored.
@@ -2106,8 +2157,8 @@ WHERE  id IN ( %1, %2 )
       }
     }
 
-    // Remove option group IDs from fields changed to Text html_type.
-    if ($htmlType == 'Text') {
+    // Remove option group IDs from fields that do not support option groups.
+    if ($htmlType && !self::hasOptionGroup($htmlType, $dataType)) {
       $params['option_group_id'] = '';
     }
 
@@ -2522,13 +2573,14 @@ AND      default_value IS NOT NULL";
   }
 
   /**
-   * @deprecated Old function only used by APIv3.
+   * @deprecated since 6.19 will be removed around 6.25
    *
    * @param array $ids
    *
    * @return array
    */
   public static function getNameFromID($ids) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_CustomField::getField');
     if (is_array($ids)) {
       $ids = implode(',', $ids);
     }
@@ -2655,6 +2707,29 @@ WHERE      f.id IN ($ids)";
   }
 
   /**
+   * Determine if an HTML type (optionally for a specific data type) supports option groups.
+   *
+   * @param string $htmlType
+   * @param string|null $dataType
+   * @return bool
+   */
+  public static function hasOptionGroup(string $htmlType, ?string $dataType = NULL): bool {
+    $htmlTypes = array_column(Civi::entity('CustomField')->getOptions('html_type'), NULL, 'id');
+    if (!isset($htmlTypes[$htmlType])) {
+      return FALSE;
+    }
+    if ($dataType) {
+      return !empty($htmlTypes[$htmlType]['data_types'][$dataType]['option_group']);
+    }
+    foreach ($htmlTypes[$htmlType]['data_types'] as $meta) {
+      if (!empty($meta['option_group'])) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
    * Does this field type have any select options?
    *
    * @param array $field
@@ -2702,6 +2777,7 @@ WHERE      f.id IN ($ids)";
     $dataTypeToFK = [
       'ContactReference' => 'Contact',
       'File' => 'File',
+      'Currency' => 'Currency',
     ];
     return $field['fk_entity'] ?? $dataTypeToFK[$field['data_type']] ?? NULL;
   }
@@ -2768,6 +2844,11 @@ WHERE      f.id IN ($ids)";
         'labelColumn' => 'name',
       ];
     }
+    elseif ($field['data_type'] == 'Currency') {
+      $field['pseudoconstant'] = [
+        'optionGroupName' => 'currencies_enabled',
+      ];
+    }
   }
 
   /**
@@ -2810,13 +2891,14 @@ WHERE      f.id IN ($ids)";
       'StateProvince' => 'civicrm_state_province',
       'ContactReference' => 'civicrm_contact',
       'File' => 'civicrm_file',
+      'Currency' => 'civicrm_currency',
       'EntityReference' => CoreUtil::getInfoItem((string) $field->fk_entity, 'table_name'),
     ];
     if (isset($fkFields[$field->data_type])) {
       // Serialized fields store value-separated strings which are incompatible with FK constraints
       if (!$field->serialize) {
         $params['fk_table_name'] = $fkFields[$field->data_type];
-        $params['fk_field_name'] = 'id';
+        $params['fk_field_name'] = $field->data_type === 'Currency' ? 'name' : 'id';
         $params['fk_attributes'] = 'ON DELETE SET NULL';
       }
     }
@@ -2846,6 +2928,9 @@ WHERE      f.id IN ($ids)";
       // This will hold the list of options in format key => label
       $options = [];
 
+      if ($dataType === 'Currency') {
+        $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'currencies_enabled', 'id', 'name');
+      }
       if ($optionGroupID) {
         $options = CRM_Core_OptionGroup::valuesByID(
           $optionGroupID, FALSE, FALSE, FALSE, $context === 'validate' ? 'name' : 'label', !($context === 'validate' || $context === 'get')

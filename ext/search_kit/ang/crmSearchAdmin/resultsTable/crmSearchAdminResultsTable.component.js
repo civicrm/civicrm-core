@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Specialized searchDisplay, only used by Admins
@@ -14,14 +14,14 @@
     controller: function($scope, $element, searchMeta, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplaySortableTrait) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
       // Mix in copies of traits to this controller
-      const ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplaySortableTrait));
+      const ctrl = angular.extend(this, CRM.utils.cloneDeep(searchDisplayBaseTrait), CRM.utils.cloneDeep(searchDisplayTasksTrait), CRM.utils.cloneDeep(searchDisplaySortableTrait));
 
       function buildSettings() {
         ctrl.apiEntity = ctrl.search.api_entity;
-        ctrl.settings = _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings);
+        ctrl.settings = structuredClone(CRM.crmSearchAdmin.defaultDisplay.settings);
         ctrl.settings.button = ts('Search');
         ctrl.settings.columns = ctrl.search.api_params.select
-          .map(fieldExpr => searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}));
+          .map(fieldExpr => searchMeta.fieldToColumn(fieldExpr, {label: true, sortable: true}, ctrl.search));
         // Add the links menu column (see DefaultDisplaySubscriber::fallbackDefault)
         ctrl.settings.columns.push({
           type: 'menu',
@@ -31,7 +31,7 @@
           alignment: 'text-right',
           links: [],
         });
-        ctrl.columns = _.cloneDeep(ctrl.settings.columns);
+        ctrl.columns = structuredClone(ctrl.settings.columns);
         ctrl.columns.forEach((col) => {
           col.enabled = true;
           col.fetched = true;
@@ -93,4 +93,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

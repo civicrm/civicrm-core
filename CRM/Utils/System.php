@@ -1075,44 +1075,6 @@ class CRM_Utils_System {
   }
 
   /**
-   * Encode url.
-   *
-   * @param string $url
-   * @deprecated
-   * @return null|string
-   */
-  public static function urlEncode($url) {
-    CRM_Core_Error::deprecatedFunctionWarning('urlEncode');
-    $items = parse_url($url);
-    if ($items === FALSE) {
-      return NULL;
-    }
-
-    if (empty($items['query'])) {
-      return $url;
-    }
-
-    $items['query'] = urlencode($items['query']);
-
-    $url = $items['scheme'] . '://';
-    if (!empty($items['user'])) {
-      $url .= "{$items['user']}:{$items['pass']}@";
-    }
-
-    $url .= $items['host'];
-    if (!empty($items['port'])) {
-      $url .= ":{$items['port']}";
-    }
-
-    $url .= "{$items['path']}?{$items['query']}";
-    if (!empty($items['fragment'])) {
-      $url .= "#{$items['fragment']}";
-    }
-
-    return $url;
-  }
-
-  /**
    * Return the running civicrm version.
    *
    * @return string
@@ -1558,33 +1520,6 @@ class CRM_Utils_System {
       }
     }
     return $_baseURL;
-  }
-
-  /**
-   * Given a URL, return a relative URL if possible.
-   *
-   * @param string $url
-   * @deprecated
-   * @return string
-   */
-  public static function relativeURL($url) {
-    CRM_Core_Error::deprecatedFunctionWarning('url');
-    // check if url is relative, if so return immediately
-    if (substr($url, 0, 4) != 'http') {
-      return $url;
-    }
-
-    // make everything relative from the baseFilePath
-    $baseURL = self::baseCMSURL();
-
-    // check if baseURL is a substr of $url, if so
-    // return rest of string
-    if (substr($url, 0, strlen($baseURL)) == $baseURL) {
-      return substr($url, strlen($baseURL));
-    }
-
-    // return the original value
-    return $url;
   }
 
   /**

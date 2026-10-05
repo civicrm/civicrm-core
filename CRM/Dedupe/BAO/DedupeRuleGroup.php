@@ -131,16 +131,6 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
   }
 
   /**
-   * Return the SQL query for dropping the temporary table.
-   *
-   * @deprecated since 6.1.0 will be removed around 6.7.0
-   */
-  public function tableDropQuery() {
-    CRM_Core_Error::deprecatedFunctionWarning('none');
-    return 'DROP TEMPORARY TABLE IF EXISTS dedupe';
-  }
-
-  /**
    * Find existing duplicates in the database for the given rule and limitations.
    *
    * @return void

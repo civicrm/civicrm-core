@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Menu item to control the border property of a node
@@ -34,10 +34,10 @@
       }
 
       function getBorder(node) {
-        const border = _.map((afGui.getStyles(node).border || '').split(' '), _.trim);
+        const border = (afGui.getStyles(node).border || '').split(' ').map((part) => part.trim());
         return border.length > 2 ? border : null;
       }
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

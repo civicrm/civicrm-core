@@ -121,7 +121,7 @@ class UpgradeSnapshotTest extends \PHPUnit\Framework\TestCase {
     $hasProblem = ($exit > 0) || !preg_match('/pending upgrade/', $stdout);
     if ($hasProblem) {
       echo ProcessHelper::formatOutput($cmd, $stdout, $stderr, $exit);
-      $this->fail(sprintf('Upgrade workflow bug: Cannot run sysadmin command (cv status) before upgrade', basename($snapshot)));
+      $this->fail('Upgrade workflow bug: Cannot run sysadmin command (cv status) before upgrade');
     }
 
     // Run the actual upgrade

@@ -193,21 +193,6 @@ if (!defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
 //}
 
 /**
- * Smarty escape on output.
- *
- * This does not currently work if you have a Smarty 3 path defined
- * (see above).
- *
- * This tells smarty to pass all variables through the escape function
- * unless they are marked with nofilter (eg. {$myScript nofilter}
- * At this stage it should only be enabled on development sites.
- * @see https://github.com/civicrm/civicrm-core/pull/21935
- */
-//if (!defined('CIVICRM_SMARTY_DEFAULT_ESCAPE')) {
-//  define('CIVICRM_SMARTY_DEFAULT_ESCAPE', TRUE);
-//}
-
-/**
  * Site URLs:
  *
  * This section defines absolute and relative URLs to access the host CMS resources.
@@ -235,13 +220,6 @@ if (!defined('CIVICRM_UF_BASEURL')) {
   define('CIVICRM_UF_BASEURL', '%%baseURL%%');
 }
 
-if (!defined('CIVICRM_DEDUPE_OPTIMIZER')) {
-  // This is a temporary define to allow us to phase in improved dedupe queries
-  // with some degree of caution. If you set this to TRUE
-  // then the queries used to dedupe contacts will be combined
-  // for better performance.
-  define('CIVICRM_DEDUPE_OPTIMIZER', FALSE);
-}
 /**
  * Define any CiviCRM Settings Overrides per https://docs.civicrm.org/sysadmin/en/latest/customize/settings/
  *
@@ -475,6 +453,14 @@ if (!defined('CIVICRM_DB_CACHE_SOCKET')) {
  */
 if (!defined('CIVICRM_DB_CACHE_PASSWORD')) {
   define('CIVICRM_DB_CACHE_PASSWORD', '');
+}
+
+/**
+ * Change this if you wish to use a specific database (currently only
+ * available with Redis).
+ */
+if (!defined('CIVICRM_DB_CACHE_BASE')) {
+   define('CIVICRM_DB_CACHE_BASE', '');
 }
 
 /**

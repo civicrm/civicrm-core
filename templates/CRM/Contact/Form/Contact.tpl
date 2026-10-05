@@ -333,7 +333,7 @@
     function openDupeAlert(data, iconType) {
       // Close msg if it exists
       matchMessage && matchMessage.close && matchMessage.close();
-      matchMessage = CRM.alert(dupeTpl(data), _.escape(data.title), iconType, {expires: false});
+      matchMessage = CRM.alert(dupeTpl(data), CRM.utils.escapeHtml(data.title), iconType, {expires: false});
       $('.matching-contacts-actions', '#crm-notification-container').on('click', 'a', function() {
         // No confirmation dialog on click
         $('[data-warn-changes=true]').attr('data-warn-changes', 'false');

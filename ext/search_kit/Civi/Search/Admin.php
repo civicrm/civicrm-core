@@ -86,6 +86,7 @@ class Admin {
         ->setLoadOptions(['id', 'label'])
         ->execute()->first()['options'],
       'dateFormats' => self::getDateFormats(),
+      'setOperations' => \CRM_Core_SelectValues::setOperations(),
       'numberAttributes' => [
         \NumberFormatter::MAX_FRACTION_DIGITS => E::ts('Max Decimal Places'),
         \NumberFormatter::MIN_FRACTION_DIGITS => E::ts('Min Decimal Places'),
@@ -160,11 +161,12 @@ class Admin {
       ->addWhere('searchable', '!=', 'none')
       ->addOrderBy('title_plural')
       ->setChain([
-        'get' => ['$name', 'getActions', ['where' => [['name', '=', 'get']]], ['params']],
+        'get' => ['$name', 'getActions', ['where' => [['name', '=', 'get']], 'select' => ['params', 'ui_params']]],
       ])->execute();
     foreach ($entities as $entity) {
       // Skip if entity doesn't have a 'get' action or the user doesn't have permission to use get
-      if ($entity['get']) {
+      if (!empty($entity['get'][0])) {
+        $getAction = $entity['get'][0];
         // Add links with translatable titles
         $links = Display::getEntityLinks($entity['name']);
         if ($links) {
@@ -181,6 +183,7 @@ class Admin {
           \Civi::log()->warning('Entity could not be loaded', ['entity' => $entity['name']]);
           continue;
         }
+        $entity['fields'] = [];
         foreach ($getFields as $field) {
           $field['fieldName'] = $field['name'];
           // Hack for RelationshipCache to make Relationship fields editable
@@ -191,16 +194,16 @@ class Admin {
           }
           $entity['fields'][] = $field;
         }
-        if (empty($entity['fields'])) {
-          continue;
-        }
         $entity['default_columns'] = self::getDefaultColumns($entity, $getFields);
-        $params = $entity['get'][0];
+        $params = $getAction['params'];
         // Entity must support at least these params or it is too weird for search kit
         if (!array_diff(['select', 'where', 'orderBy', 'limit', 'offset'], array_keys($params))) {
           \CRM_Utils_Array::remove($params, 'checkPermissions', 'debug', 'chain', 'language', 'select', 'where', 'orderBy', 'limit', 'offset');
+          foreach ($getAction['ui_params'] as $uiParam) {
+            $entity['ui_params'][] = $uiParam + $params[$uiParam['name']];
+          }
           unset($entity['get']);
-          $schema[$entity['name']] = ['params' => array_keys($params)] + array_filter($entity);
+          $schema[$entity['name']] = ['params' => array_keys($params)] + $entity;
         }
       }
     }
@@ -471,6 +474,10 @@ class Admin {
       $joins += [$contactType => []];
       $joins[$contactType] = array_merge($joins[$contactType], $joins['Contact']);
     }
+
+    \Civi::dispatcher()->dispatch('civi.searchkit.joins', \Civi\Core\Event\GenericHookEvent::create([
+      'joins' => &$joins,
+    ]));
     return $joins;
   }
 

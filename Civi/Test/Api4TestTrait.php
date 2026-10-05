@@ -454,8 +454,8 @@ trait Api4TestTrait {
    *   Contact ID of the created user.
    * @throws \CRM_Core_Exception
    */
-  public function createLoggedInUser(): int {
-    $contactID = $this->createTestRecord('Individual', [
+  public function createLoggedInUser(array $params = []): int {
+    $contactID = $this->createTestRecord('Individual', $params + [
       'first_name' => 'Logged In',
       'last_name' => 'User ' . mt_rand(),
     ])['id'];

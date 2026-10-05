@@ -571,8 +571,8 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         break;
 
       case 'contribution_membership':
-        $from = " $side  JOIN civicrm_membership_payment ON civicrm_membership_payment.contribution_id = civicrm_contribution.id";
-        $from .= " $side  JOIN civicrm_membership ON civicrm_membership_payment.membership_id = civicrm_membership.id ";
+        $from = " $side  JOIN civicrm_line_item ON civicrm_line_item.contribution_id = civicrm_contribution.id AND civicrm_line_item.entity_table = 'civicrm_membership'";
+        $from .= " $side  JOIN civicrm_membership ON civicrm_line_item.entity_id = civicrm_membership.id ";
         break;
 
       case 'civicrm_campaign':

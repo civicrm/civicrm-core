@@ -9,6 +9,7 @@
     <email>totten@civicrm.org</email>
   </maintainer>
   <urls>
+    <url desc="Documentation">https://docs.civicrm.org/user/en/latest/the-user-interface/formbuilder/what-is-formbuilder/</url>
     <url desc="Chat">https://chat.civicrm.org/civicrm/channels/dev-afform</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
@@ -29,10 +30,6 @@
     <ver>5</ver>
   </smarty_compatibility>
   <comments>FormBuilder provides a UI to administer and edit forms. It is an optional admin tool and not required for the forms to function.</comments>
-  <requires>
-    <ext>org.civicrm.afform</ext>
-    <ext>org.civicrm.search_kit</ext>
-  </requires>
   <civix>
     <namespace>CRM/AfformAdmin</namespace>
     <format>25.10.2</format>

@@ -863,6 +863,41 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function addUfRole(int $ufID, string $role): bool {
+    // The anonymous/authenticated roles are implicit and cannot be assigned;
+    // Drupal\user\Entity\User::addRole() throws for them.
+    if (in_array($role, [\Drupal\user\RoleInterface::ANONYMOUS_ID, \Drupal\user\RoleInterface::AUTHENTICATED_ID], TRUE)) {
+      return FALSE;
+    }
+    $user = \Drupal\user\Entity\User::load($ufID);
+    if (!$user || !\Drupal\user\Entity\Role::load($role)) {
+      return FALSE;
+    }
+    if (!$user->hasRole($role)) {
+      $user->addRole($role);
+      $user->save();
+    }
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeUfRole(int $ufID, string $role): bool {
+    $user = \Drupal\user\Entity\User::load($ufID);
+    if (!$user || !\Drupal\user\Entity\Role::load($role)) {
+      return FALSE;
+    }
+    if ($user->hasRole($role)) {
+      $user->removeRole($role);
+      $user->save();
+    }
+    return TRUE;
+  }
+
+  /**
    * Determine if the Views module exists.
    *
    * @return bool

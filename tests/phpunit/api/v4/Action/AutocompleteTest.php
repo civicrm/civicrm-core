@@ -23,6 +23,9 @@ use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Event\PrepareEvent;
 use Civi\Api4\Contact;
+use Civi\Api4\Event;
+use Civi\Api4\Group;
+use Civi\Api4\Mailing;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\EntitySet;
 use Civi\Api4\SavedSearch;
@@ -59,6 +62,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
   }
 
   public function setUp(): void {
+    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $this->hookCallback = NULL;
     $this->autocompleteRunCount = 0;
     // Ensure MockBasicEntity gets added via above listener
@@ -373,6 +377,41 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals('Donors contributed > $100', $result[0]['label']);
   }
 
+  public function testMailingRecipientsAutocomplete(): void {
+    Group::delete()->addWhere('id', '>', 0)->execute();
+    Mailing::delete()->addWhere('id', '>', 0)->execute();
+    $group = $this->createTestRecord('Group', [
+      'title' => 'Test Recipient Group',
+      'group_type:name' => 'Mailing List',
+    ]);
+    $mailing = $this->createTestRecord('Mailing', [
+      'name' => 'Test Newsletter',
+      'subject' => 'July Newsletter Subject',
+      'is_completed' => TRUE,
+    ]);
+
+    $result = EntitySet::autocomplete()
+      ->setInput('Test')
+      ->setFieldName('Mailing.recipients_include')
+      ->setFormName('crmMailing.0')
+      ->execute();
+
+    $this->assertCount(2, $result);
+
+    $rows = array_column((array) $result, NULL, 'id');
+
+    $groupRow = $rows['groups_' . $group['id']] ?? NULL;
+    $this->assertNotNull($groupRow);
+    $this->assertSame('Test Recipient Group', $groupRow['label']);
+    $this->assertSame('fa-group', $groupRow['icon']);
+
+    $mailingRow = $rows['mailings_' . $mailing['id']] ?? NULL;
+    $this->assertNotNull($mailingRow);
+    $this->assertSame('Test Newsletter', $mailingRow['label']);
+    $this->assertSame('fa-envelope', $mailingRow['icon']);
+    $this->assertStringContainsString('Sent Mailing', $mailingRow['description'][0]);
+  }
+
   /**
    * Emulates the behavior of `$.fn.crmAutocomplete` in Common.js
    *
@@ -524,6 +563,116 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertCount(1, $result);
     $this->assertEquals($lastName . ', Include', $result[0]['label']);
     $this->assertEquals($contacts[0]['id'], $result[0]['id']);
+  }
+
+  public function testCustomFieldMultiValueAdvancedFilter(): void {
+    $lastName = uniqid(__FUNCTION__);
+    // All Individuals sharing a last name, so the name search matches all three equally -
+    // only the gender filter should decide which ones come back.
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'IncludeMale', 'last_name' => $lastName, 'gender_id:name' => 'Male'],
+        ['first_name' => 'IncludeFemale', 'last_name' => $lastName, 'gender_id:name' => 'Female'],
+        ['first_name' => 'ExcludeOther', 'last_name' => $lastName, 'gender_id:name' => 'Other'],
+      ],
+    ]);
+
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => __FUNCTION__,
+    ]);
+    $customField = $this->createTestRecord('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'contact_ref',
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      // Multi-value "match any of these" filter, per the custom field's "Advanced Filter".
+      'filter' => 'gender_id:name=Male,Female',
+    ]);
+
+    $result = Contact::autocomplete()
+      ->setInput($lastName)
+      ->setFieldName('Activity.' . $customGroup['name'] . '.' . $customField['name'])
+      ->execute();
+
+    $this->assertEqualsCanonicalizing(
+      [$contacts[0]['id'], $contacts[1]['id']],
+      (array) $result->column('id')
+    );
+  }
+
+  public function testCustomFieldJsonWhereClauseAdvancedFilter(): void {
+    $lastName = uniqid(__FUNCTION__);
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'Include', 'last_name' => $lastName, 'is_deceased' => FALSE],
+        ['first_name' => 'Exclude', 'last_name' => $lastName, 'is_deceased' => TRUE],
+      ],
+    ]);
+
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => __FUNCTION__,
+    ]);
+    $customField = $this->createTestRecord('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'contact_ref',
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      // A pasted-in `where` clause, for filters the flat field=value syntax can't express.
+      'filter' => '[["is_deceased", "=", false]]',
+    ]);
+
+    $result = Contact::autocomplete()
+      ->setInput($lastName)
+      ->setFieldName('Activity.' . $customGroup['name'] . '.' . $customField['name'])
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals($contacts[0]['id'], $result[0]['id']);
+  }
+
+  /**
+   * Tests that event autocomplete sorts by start_date DESC and shows start_date instead of description.
+   */
+  public function testEventAutocomplete(): void {
+    $title = uniqid(__FUNCTION__);
+    $events = $this->saveTestRecords('Event', [
+      'records' => [
+        [
+          'title' => "$title Alpha",
+          'start_date' => '2026-01-15 10:00:00',
+          'description' => 'Alpha Description',
+        ],
+        [
+          'title' => "$title Beta",
+          'start_date' => '2026-06-20 14:00:00',
+          'description' => 'Beta Description',
+        ],
+      ],
+      'defaults' => [
+        'event_type_id:name' => 'Meeting',
+      ],
+    ]);
+
+    $result = Event::autocomplete()
+      ->setInput($title)
+      ->execute();
+
+    $this->assertCount(2, $result);
+
+    // Results should be ordered by start_date DESC (most recent first)
+    $this->assertEquals($events[1]['id'], $result[0]['id']);
+    $this->assertEquals("$title Beta", $result[0]['label']);
+    $this->assertEquals(\CRM_Utils_Date::customFormat('2026-06-20 14:00:00'), $result[0]['description'][1]);
+    $this->assertNotContains('Beta Description', $result[0]['description']);
+
+    $this->assertEquals($events[0]['id'], $result[1]['id']);
+    $this->assertEquals("$title Alpha", $result[1]['label']);
+    $this->assertEquals(\CRM_Utils_Date::customFormat('2026-01-15 10:00:00'), $result[1]['description'][1]);
+    $this->assertNotContains('Alpha Description', $result[1]['description']);
   }
 
 }

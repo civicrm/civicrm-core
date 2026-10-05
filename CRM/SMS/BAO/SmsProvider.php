@@ -9,12 +9,14 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Event\PreEvent;
+
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_SMS_BAO_SmsProvider extends CRM_SMS_DAO_SmsProvider {
+class CRM_SMS_BAO_SmsProvider extends CRM_SMS_DAO_SmsProvider implements \Civi\Core\HookInterface {
 
   /**
    * @return int
@@ -64,41 +66,22 @@ class CRM_SMS_BAO_SmsProvider extends CRM_SMS_DAO_SmsProvider {
     return $providers;
   }
 
+  public static function self_hook_civicrm_pre(PreEvent $event): void {
+    if ($event->action === 'create' && !array_key_exists('domain_id', $event->params)) {
+      $event->params['domain_id'] = CRM_Core_Config::domainID();
+    }
+  }
+
   /**
    * Create or Update an SMS provider
+   *
    * @param array $params
-   * @return array saved values
+   * @return CRM_SMS_BAO_SmsProvider
+   * @deprecated
    */
-  public static function create(&$params) {
-    $id = $params['id'] ?? NULL;
-
-    if ($id) {
-      CRM_Utils_Hook::pre('edit', 'SmsProvider', $id, $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'SmsProvider', NULL, $params);
-    }
-
-    $provider = new CRM_SMS_DAO_SmsProvider();
-    if ($id) {
-      $provider->id = $id;
-      $provider->find(TRUE);
-    }
-    if ($id) {
-      $provider->domain_id = $params['domain_id'] ?? $provider->domain_id;
-    }
-    else {
-      $provider->domain_id = $params['domain_id'] ?? CRM_Core_Config::domainID();
-    }
-    $provider->copyValues($params);
-    $result = $provider->save();
-    if ($id) {
-      CRM_Utils_Hook::post('edit', 'SmsProvider', $provider->id, $provider, $params);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'SmsProvider', NULL, $provider, $params);
-    }
-    return $result;
+  public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
@@ -115,24 +98,15 @@ class CRM_SMS_BAO_SmsProvider extends CRM_SMS_DAO_SmsProvider {
   /**
    * @param int $providerID
    *
-   * @return null
    * @throws CRM_Core_Exception
    *
    * @deprecated
    */
   public static function del($providerID) {
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
     if (!$providerID) {
       throw new CRM_Core_Exception(ts('Invalid value passed to delete function.'));
     }
-
-    $dao = new CRM_SMS_DAO_SmsProvider();
-    $dao->id = $providerID;
-    $dao->whereAdd = "(domain_id = " . CRM_Core_Config::domainID() . "OR domain_id IS NULL)";
-    if (!$dao->find(TRUE)) {
-      return NULL;
-    }
-    // The above just filters out attempts to delete for other domains
-    // Not sure it's needed, but preserves old behaviour and is deprecated.
     static::deleteRecord(['id' => $providerID]);
   }
 

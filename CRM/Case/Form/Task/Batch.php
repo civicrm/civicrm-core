@@ -124,7 +124,7 @@ class CRM_Case_Form_Task_Batch extends CRM_Core_Form_Task_Batch {
         $caseTypeId
       );
 
-      $case = CRM_Case_BAO_Case::add($value);
+      $case = CRM_Case_BAO_Case::writeRecord($value);
 
       // add custom field values
       if (!empty($value['custom']) && is_array($value['custom'])) {

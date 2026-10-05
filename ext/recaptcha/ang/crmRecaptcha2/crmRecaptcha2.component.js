@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('crmRecaptcha2').component('crmRecaptcha2', {
     templateUrl: '~/crmRecaptcha2/crmRecaptcha2.html',
     bindings: {
@@ -25,4 +25,4 @@
       };
     }
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

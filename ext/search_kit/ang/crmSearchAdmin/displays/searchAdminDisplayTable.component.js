@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('searchAdminDisplayTable', {
@@ -18,7 +18,8 @@
 
 
       // Check if array contains item
-      this.includes = _.includes;
+      // Guarded: the template calls this before settings.classes is necessarily set
+      this.includes = (collection, item) => !!collection && collection.includes(item);
 
       this.getColTypes = function() {
         return ctrl.parent.colTypes;
@@ -26,7 +27,7 @@
 
       this.$onInit = function () {
         if (!ctrl.display.settings) {
-          ctrl.display.settings = _.extend({}, _.cloneDeep(CRM.crmSearchAdmin.defaultDisplay.settings), {columns: null, pager: {}});
+          ctrl.display.settings = Object.assign({}, structuredClone(CRM.crmSearchAdmin.defaultDisplay.settings), {columns: null, pager: {}});
           ctrl.display.settings.sort = ctrl.parent.getDefaultSort();
         }
         // Displays created prior to 5.43 may not have this property
@@ -64,7 +65,7 @@
         }
       };
 
-      this.setColumnMode = (value) => {
+      this.setColumnMode = (value, setTallyDefaults) => {
         if (value === 'auto') {
           delete this.display.settings.columns;
         }
@@ -72,7 +73,7 @@
         // and populate or validate this.settings.columns
         else {
           this.parent.initColumns({label: true, sortable: true});
-          if (this.display.settings.tally) {
+          if (setTallyDefaults && this.display.settings.tally) {
             this.setTallyDefaults();
           }
         }
@@ -115,7 +116,7 @@
         const hasTally = !!this.display.settings.tally;
         if (!hasTally) {
           this.display.settings.tally = {label: ts('Totals'), header: false, footer: false};
-          this.setTallyDefaults();
+          this.setColumnMode('custom', true);
         }
         this.display.settings.tally[position] = !this.display.settings.tally[position];
         if (!this.display.settings.tally.header && !this.display.settings.tally.footer) {
@@ -128,7 +129,7 @@
         this.display.settings.columns?.forEach((col) => {
           if (col.type === 'field') {
             col.tally = {
-              fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(this.parent.getExprFromSelect(col.key)), this.apiParams)
+              fn: searchMeta.getDefaultAggregateFn(searchMeta.parseExpr(this.parent.getExprFromSelect(col.key), this.parent.savedSearch), this.parent.savedSearch)
             };
           }
         });
@@ -150,4 +151,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -88,7 +88,14 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
       $errors['style'] = ts("Display Style 'Tab with table' is only supported for multiple-record custom field sets.");
     }
 
-    //checks the given custom set doesnot start with digit
+    if (!empty($fields['extends_entity_column_id']) && empty($fields['extends_entity_column_value'])) {
+      $options = array_column(CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions(NULL, $fields), 'label', 'id');
+      if (isset($options[$fields['extends_entity_column_id']])) {
+        $errors['extends_entity_column_value'] = ts("Please select at least one %1.", [1 => $options[$fields['extends_entity_column_id']]]);
+      }
+    }
+
+    // Checks the given custom set does not start with digit
     $title = $fields['title'];
     if (!empty($title)) {
       // gives the ascii value
@@ -304,14 +311,12 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('Your custom field set \'%1 \' has been saved.', [1 => $group['title']]), ts('Saved'), 'success');
     }
     else {
-      // Jump directly to adding a field if popups are disabled
-      $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
-      $url = CRM_Utils_System::url("civicrm/admin/custom/group/field$action", 'reset=1&new=1&gid=' . $group['id']);
+      // Redirect to search display of fields
+      $url = Civi::url('civicrm/admin/custom/group/fields#/?gid=' . $group['id']);
       CRM_Core_Session::setStatus(ts("Your custom field set '%1' has been added. You can add custom fields now.",
         [1 => $group['title']]
       ), ts('Saved'), 'success');
-      $session = CRM_Core_Session::singleton();
-      $session->replaceUserContext($url);
+      CRM_Core_Session::singleton()->replaceUserContext((string) $url);
     }
 
     // prompt Drupal Views users to update $db_prefix in settings.php, if necessary

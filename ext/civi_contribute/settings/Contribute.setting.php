@@ -31,18 +31,6 @@ return [
     'help_text' => 'If set it back-office credit card transactions will required a cvv code. Leave as required unless you have a very strong reason to change',
     'settings_pages' => ['contribute' => ['weight' => 10]],
   ],
-  'contribution_invoice_settings' => [
-    // @todo our standard is to have a setting per item not to hide settings in an array with
-    // no useful metadata. Undo this setting.
-    'group_name' => 'Contribute Preferences',
-    'group' => 'contribute',
-    'name' => 'contribution_invoice_settings',
-    'type' => 'Array',
-    'add' => '4.7',
-    'title' => ts('Deprecated, virtualized setting'),
-    'is_domain' => 1,
-    'is_contact' => 0,
-  ],
   'invoicing' => [
     'group_name' => 'Contribute Preferences',
     'group' => 'contribute',

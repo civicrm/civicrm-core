@@ -16,6 +16,15 @@ return [
     'add' => 'civicrm/admin/role',
     'update' => 'civicrm/admin/role#?Role1=[id]',
   ],
+  'getIndices' => fn() => [
+    'UI_name' => [
+      'fields' => [
+        'name' => TRUE,
+      ],
+      'unique' => TRUE,
+      'add' => '6.18',
+    ],
+  ],
   'getFields' => fn() => [
     'id' => [
       'title' => E::ts('ID'),

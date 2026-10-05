@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // Ex: <crm-mailing-recipients-autocomplete crm-recipients="mymailing.recipients" crm-mailing-id="mymailing.id" mode="include">
   angular.module('crmMailing').component('crmMailingRecipientsAutocomplete', {
     bindings: {
@@ -36,18 +36,21 @@
         if (arguments.length) {
           ctrl.recipients.groups[ctrl.mode].length = 0;
           ctrl.recipients.mailings[ctrl.mode].length = 0;
-          _.each(val, function(munged) {
+          val.forEach((munged) => {
             var entityType = munged.split('_')[0],
               id = parseInt(munged.split('_')[1], 10),
               oppositeMode = ctrl.mode === 'include' ? 'exclude' : 'include';
             ctrl.recipients[entityType][ctrl.mode].push(id);
             // Items cannot be both include and exclude so remove from opposite collection
-            _.pull(ctrl.recipients[entityType][oppositeMode], id);
+            const opposite = ctrl.recipients[entityType][oppositeMode];
+            for (let pos = opposite.indexOf(id); pos > -1; pos = opposite.indexOf(id)) {
+              opposite.splice(pos, 1);
+            }
           });
         }
         else {
-          _.each(ctrl.recipients, function (items, entityType) {
-            _.each(items[ctrl.mode], function (id) {
+          Object.entries(ctrl.recipients).forEach(([entityType, items]) => {
+            items[ctrl.mode].forEach((id) => {
               selectValues += (selectValues.length ? ',' : '') + entityType + '_' + id;
             });
           });
@@ -58,4 +61,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

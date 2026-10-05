@@ -257,23 +257,4 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     return $clauses ? implode(' AND ', $clauses) : '(1)';
   }
 
-  /**
-   * Normalize a cache key.
-   *
-   * This bridges an impedance mismatch between our traditional caching
-   * and PSR-16 -- PSR-16 accepts a narrower range of cache keys.
-   *
-   * @param string $key
-   *   Ex: 'ab/cd:ef'
-   * @return string
-   *   Ex: '_abcd1234abcd1234' or 'ab_xx/cd_xxef'.
-   *   A similar key, but suitable for use with PSR-16-compliant cache providers.
-   * @deprecated
-   * @see CRM_Utils_Cache::cleanKey()
-   */
-  public static function cleanKey($key) {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_Cache::cleanKey');
-    return CRM_Utils_Cache::cleanKey($key);
-  }
-
 }

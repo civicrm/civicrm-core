@@ -23,7 +23,52 @@ return new class() implements SchemaHelperInterface {
   }
 
   public function install(): void {
-    $this->runSqls([$this->generateInstallSql()]);
+    $sqlGenerator = $this->getSqlGenerator();
+    $this->dropConflictingForeignKeys($sqlGenerator->getForeignKeyNames());
+    $this->runSqls([$sqlGenerator->getCreateTablesSql()]);
+  }
+
+  /**
+   * Drop any foreign keys which the install SQL is about to (re)create.
+   *
+   * "ALTER TABLE ... ADD CONSTRAINT" fails if the constraint already exists,
+   * which happens when installing on top of pre-existing tables.
+   *
+   * @param array $foreignKeys
+   *   Foreign key names, keyed by table name.
+   */
+  private function dropConflictingForeignKeys(array $foreignKeys): void {
+    if (!$foreignKeys) {
+      return;
+    }
+    $wanted = [];
+    foreach ($foreignKeys as $foreignKeyNames) {
+      foreach ($foreignKeyNames as $foreignKeyName) {
+        $wanted[strtolower($foreignKeyName)] = TRUE;
+      }
+    }
+    $placeholders = $params = [];
+    foreach (array_values(array_keys($foreignKeys)) as $index => $tableName) {
+      $placeholders[] = '%' . ($index + 1);
+      $params[$index + 1] = [$tableName, 'String'];
+    }
+    $dao = \CRM_Core_DAO::executeQuery(
+      "SELECT TABLE_NAME AS table_name, CONSTRAINT_NAME AS constraint_name
+         FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+         WHERE CONSTRAINT_SCHEMA = DATABASE()
+         AND CONSTRAINT_TYPE = 'FOREIGN KEY'
+         AND TABLE_NAME IN (" . implode(', ', $placeholders) . ")",
+      $params,
+      i18nRewrite: FALSE
+    );
+    while ($dao->fetch()) {
+      if (isset($wanted[strtolower($dao->constraint_name)])) {
+        \CRM_Core_DAO::executeQuery(
+          "ALTER TABLE `{$dao->table_name}` DROP FOREIGN KEY `{$dao->constraint_name}`",
+          i18nRewrite: FALSE
+        );
+      }
+    }
   }
 
   public function uninstall(): void {
@@ -162,6 +207,7 @@ return new class() implements SchemaHelperInterface {
     \CRM_Core_DAO::executeQuery($query, i18nRewrite: FALSE);
 
     // Add FK constraint if needed.
+    $this->dropForeignKeysForColumn($tableName, $fieldName);
     $this->createForeignKey($tableName, $fieldName, $fieldSpec);
 
     return TRUE;
@@ -170,6 +216,7 @@ return new class() implements SchemaHelperInterface {
   public function dropSchemaField(string $entityName, string $fieldName): bool {
     if ($this->schemaFieldExists($entityName, $fieldName)) {
       $tableName = $this->getTableName($entityName);
+      $this->dropForeignKeysForColumn($tableName, $fieldName);
       \CRM_Core_DAO::executeQuery("ALTER TABLE `$tableName` DROP COLUMN `$fieldName`", i18nRewrite: FALSE);
     }
     return TRUE;
@@ -230,6 +277,28 @@ return new class() implements SchemaHelperInterface {
 
   public function dropForeignKey(string $tableName, string $foreignKeyName): bool {
     return \CRM_Core_BAO_SchemaHandler::safeRemoveFK($tableName, $foreignKeyName);
+  }
+
+  /**
+   * @internal
+   */
+  public function dropForeignKeysForColumn(string $tableName, string $fieldName): void {
+    $dao = \CRM_Core_DAO::executeQuery(
+      "SELECT CONSTRAINT_NAME AS constraint_name
+         FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+         WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME = %1
+         AND COLUMN_NAME = %2
+         AND REFERENCED_TABLE_NAME IS NOT NULL",
+      [
+        1 => [$tableName, 'String'],
+        2 => [$fieldName, 'String'],
+      ],
+      i18nRewrite: FALSE
+    );
+    while ($dao->fetch()) {
+      $this->dropForeignKey($tableName, $dao->constraint_name);
+    }
   }
 
   /**

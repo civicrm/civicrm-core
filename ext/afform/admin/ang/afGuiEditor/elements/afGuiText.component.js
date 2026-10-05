@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('afGuiEditor').component('afGuiText', {
@@ -34,26 +34,24 @@
       };
 
       $scope.getAlign = function() {
-        return _.intersection(afGui.splitClass(ctrl.node['class']), Object.keys($scope.alignments))[0] || 'text-left';
+        return afGui.splitClass(ctrl.node['class']).find((c) => c in $scope.alignments) || 'text-left';
       };
 
       $scope.setAlign = function(val) {
         afGui.modifyClasses(ctrl.node, Object.keys($scope.alignments), val === 'text-left' ? null : val);
       };
 
-      $scope.styles = _.transform(CRM.afGuiEditor.styles, function(styles, val, key) {
-        styles['text-' + key] = val;
-      });
+      $scope.styles = Object.fromEntries(Object.entries(CRM.afGuiEditor.styles).map(([key, val]) => ['text-' + key, val]));
 
       // Getter/setter for ng-model
       $scope.getSetStyle = function(val) {
         if (arguments.length) {
           return afGui.modifyClasses(ctrl.node, Object.keys($scope.styles), val === 'text-default' ? null : val);
         }
-        return _.intersection(afGui.splitClass(ctrl.node['class']), Object.keys($scope.styles))[0] || 'text-default';
+        return afGui.splitClass(ctrl.node['class']).find((c) => c in $scope.styles) || 'text-default';
       };
 
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

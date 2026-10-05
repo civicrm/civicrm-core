@@ -147,8 +147,8 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       $submittedValues = array_merge($this->getSubmitParams(), [
         'price_' . $this->ids['PriceField']['membership'] => $this->getPriceFieldValue($this->ids['MembershipType']['test']),
       ], $submittedValues);
-      $submittedValues['id'] = $_REQUEST['id'] = (int) $contributionPage['id'];
-      $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues);
+      $submittedValues['id'] = (int) $contributionPage['id'];
+      $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', $submittedValues, ['id' => $submittedValues['id']]);
       $form->processForm($formState);
       return $form;
     }
@@ -252,6 +252,110 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       $this->assertEquals($value, $option[$key]);
     }
 
+  }
+
+  /**
+   * A contact holding several concurrent memberships, offered as CheckBox
+   * options on the renewal price set, should have every one of them
+   * pre-ticked - not just the last one encountered while building the
+   * price set.
+   */
+  public function testSetDefaultValuesPreTicksEveryRenewableMembership(): void {
+    $contactID = $this->createLoggedInUser();
+    $membershipTypeIDHeld1 = $this->membershipTypeCreate();
+    $membershipTypeIDHeld2 = $this->membershipTypeCreate(['title' => 'Student'], 'student');
+    $membershipTypeIDNotHeld = $this->membershipTypeCreate(['title' => 'Corporate'], 'corporate');
+
+    $priceSet = $this->createMembershipCheckBoxPriceSet([
+      $membershipTypeIDHeld1,
+      $membershipTypeIDHeld2,
+      $membershipTypeIDNotHeld,
+    ]);
+
+    $this->contactMembershipCreate(['contact_id' => $contactID, 'membership_type_id' => $membershipTypeIDHeld1]);
+    $this->contactMembershipCreate(['contact_id' => $contactID, 'membership_type_id' => $membershipTypeIDHeld2]);
+
+    $form = $this->getContributionForm([], ['priceSetID' => $priceSet['priceSetID']], FormWrapper::BUILT);
+    $defaults = $form->getDefaultValues();
+
+    $this->assertEquals([
+      $priceSet['priceFieldValueIDs'][$membershipTypeIDHeld1] => 1,
+      $priceSet['priceFieldValueIDs'][$membershipTypeIDHeld2] => 1,
+    ], $defaults['price_' . $priceSet['priceFieldID']]);
+  }
+
+  /**
+   * A lifetime membership can't be renewed, so it should not be pre-ticked
+   * even though the contact holds it - unlike a held membership with a
+   * fixed term, which should be.
+   */
+  public function testSetDefaultValuesExcludesLifetimeMembershipFromPreTick(): void {
+    $contactID = $this->createLoggedInUser();
+    $membershipTypeIDTerm = $this->membershipTypeCreate();
+    $membershipTypeIDLifetime = $this->membershipTypeCreate(['title' => 'Life', 'duration_unit' => 'lifetime'], 'lifetime');
+
+    $priceSet = $this->createMembershipCheckBoxPriceSet([
+      $membershipTypeIDTerm,
+      $membershipTypeIDLifetime,
+    ]);
+
+    $this->contactMembershipCreate(['contact_id' => $contactID, 'membership_type_id' => $membershipTypeIDTerm]);
+    $this->contactMembershipCreate(['contact_id' => $contactID, 'membership_type_id' => $membershipTypeIDLifetime]);
+
+    $form = $this->getContributionForm([], ['priceSetID' => $priceSet['priceSetID']], FormWrapper::BUILT);
+    $defaults = $form->getDefaultValues();
+
+    $this->assertEquals([
+      $priceSet['priceFieldValueIDs'][$membershipTypeIDTerm] => 1,
+    ], $defaults['price_' . $priceSet['priceFieldID']]);
+  }
+
+  /**
+   * Create a price set, extending CiviMember, with a single CheckBox price
+   * field offering the given membership types.
+   *
+   * @param int[] $membershipTypeIDs
+   *
+   * @return array
+   *   ['priceSetID' => int, 'priceFieldID' => int, 'priceFieldValueIDs' => [membershipTypeID => priceFieldValueID]]
+   */
+  private function createMembershipCheckBoxPriceSet(array $membershipTypeIDs): array {
+    $priceSet = $this->createTestEntity('PriceSet', [
+      'name' => 'checkbox_membership',
+      'title' => 'CheckBox Membership',
+      'is_active' => 1,
+      'extends' => CRM_Core_Component::getComponentID('CiviMember'),
+      'financial_type_id' => 2,
+    ], 'checkboxMembership');
+
+    $priceField = $this->createTestEntity('PriceField', [
+      'price_set_id' => $priceSet['id'],
+      'name' => 'membership_types',
+      'label' => 'Membership Types',
+      'html_type' => 'CheckBox',
+      'is_active' => 1,
+    ], 'checkboxMembership');
+
+    $priceFieldValueIDs = [];
+    foreach ($membershipTypeIDs as $membershipTypeID) {
+      $priceFieldValue = $this->createTestEntity('PriceFieldValue', [
+        'price_field_id' => $priceField['id'],
+        'name' => 'membership_type_' . $membershipTypeID,
+        'label' => 'Membership Type ' . $membershipTypeID,
+        'amount' => 100,
+        'membership_type_id' => $membershipTypeID,
+        'membership_num_terms' => 1,
+        'financial_type_id' => 2,
+        'is_active' => 1,
+      ], 'checkboxMembership_' . $membershipTypeID);
+      $priceFieldValueIDs[$membershipTypeID] = $priceFieldValue['id'];
+    }
+
+    return [
+      'priceSetID' => $priceSet['id'],
+      'priceFieldID' => $priceField['id'],
+      'priceFieldValueIDs' => $priceFieldValueIDs,
+    ];
   }
 
   /**

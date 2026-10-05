@@ -102,7 +102,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('receiptFromEmail', $this->_values['receipt_from_email'] ?? NULL);
 
     if ($this->getProductID()) {
-      $this->buildPremiumsBlock(FALSE, $option);
+      $this->buildPremiumsBlock(FALSE, $option, 'ThankYou');
     }
     else {
       $this->assign('products');

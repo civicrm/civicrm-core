@@ -17,6 +17,7 @@
  * @group msgtpl
  */
 class api_v3_MessageTemplateTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   protected $entity = 'MessageTemplate';
   protected $params;

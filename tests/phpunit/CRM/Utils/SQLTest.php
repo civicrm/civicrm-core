@@ -118,4 +118,19 @@ class CRM_Utils_SQLTest extends CiviUnitTestCase {
     $this->assertFalse($tempTable->isMemory());
   }
 
+  /**
+   * Test getSqlModes and setSqlModes.
+   */
+  public function testGetAndSetSqlModes(): void {
+    $originalModes = CRM_Utils_SQL::getSqlModes();
+    try {
+      CRM_Utils_SQL::setSqlModes(['STRICT_TRANS_TABLES', 'ERROR_FOR_DIVISION_BY_ZERO']);
+      $newModes = CRM_Utils_SQL::getSqlModes();
+      $this->assertEquals(['STRICT_TRANS_TABLES', 'ERROR_FOR_DIVISION_BY_ZERO'], $newModes);
+    }
+    finally {
+      CRM_Utils_SQL::setSqlModes($originalModes);
+    }
+  }
+
 }

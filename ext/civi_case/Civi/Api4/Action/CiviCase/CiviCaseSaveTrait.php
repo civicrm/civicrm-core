@@ -24,9 +24,12 @@ trait CiviCaseSaveTrait {
   protected function write(array $items) {
     $saved = [];
     foreach ($items as $case) {
-      $saved[] = $result = \CRM_Case_BAO_Case::create($case);
+      $saved[] = $result = \CRM_Case_BAO_Case::writeRecord($case);
       // If the case doesn't have an id, it's new & needs to be opened.
       if (empty($case['id'])) {
+        if (isset($result->end_date)) {
+          $case['end_date'] = $result->end_date;
+        }
         $this->openCase($case, $result->id);
       }
     }

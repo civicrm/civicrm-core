@@ -12,6 +12,7 @@
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
+use Civi\Api4\Membership;
 use Civi\Api4\Payment;
 
 /**
@@ -97,6 +98,79 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   public function testCancelRecur(): void {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
     CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution(['id' => $contributionRecur['id']]);
+  }
+
+  /**
+   * Test that a failed payment increments failure_count.
+   *
+   * https://lab.civicrm.org/dev/core/-/issues/6797
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testUpdateOnNewPaymentIncrementsFailureCount(): void {
+    $contributionRecur = $this->createTestEntity('ContributionRecur', [
+      'contact_id' => $this->individualCreate(),
+      'amount' => 3.00,
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+      'frequency_interval' => 1,
+      'failure_count' => 2,
+    ]);
+    $contribution = $this->createTestEntity('Contribution', [
+      'contact_id' => $contributionRecur['contact_id'],
+      'financial_type_id:name' => 'Donation',
+      'total_amount' => 3.00,
+      'currency' => 'USD',
+      'contribution_recur_id' => $contributionRecur['id'],
+      'contribution_status_id:name' => 'Pending',
+    ]);
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->addValue('contribution_status_id:name', 'Failed')
+      ->execute();
+
+    $updatedRecur = ContributionRecur::get(FALSE)
+      ->addSelect('failure_count')
+      ->addWhere('id', '=', $contributionRecur['id'])
+      ->execute()->first();
+    $this->assertEquals(3, $updatedRecur['failure_count']);
+  }
+
+  /**
+   * Test that a failed payment does not advance next_sched_contribution_date.
+   *
+   * https://lab.civicrm.org/dev/core/-/issues/6798
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testUpdateOnNewPaymentDoesNotAdvanceNextSchedDateOnFailure(): void {
+    $nextSchedDate = date('Y-m-d', strtotime('yesterday'));
+    $contributionRecur = $this->createTestEntity('ContributionRecur', [
+      'contact_id' => $this->individualCreate(),
+      'amount' => 3.00,
+      'currency' => 'USD',
+      'frequency_unit' => 'month',
+      'frequency_interval' => 1,
+      'next_sched_contribution_date' => $nextSchedDate,
+    ]);
+    $contribution = $this->createTestEntity('Contribution', [
+      'contact_id' => $contributionRecur['contact_id'],
+      'financial_type_id:name' => 'Donation',
+      'total_amount' => 3.00,
+      'currency' => 'USD',
+      'contribution_recur_id' => $contributionRecur['id'],
+      'contribution_status_id:name' => 'Pending',
+    ]);
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->addValue('contribution_status_id:name', 'Failed')
+      ->execute();
+
+    $updatedRecur = ContributionRecur::get(FALSE)
+      ->addSelect('next_sched_contribution_date')
+      ->addWhere('id', '=', $contributionRecur['id'])
+      ->execute()->first();
+    $this->assertEquals($nextSchedDate, date('Y-m-d', strtotime($updatedRecur['next_sched_contribution_date'])));
   }
 
   /**
@@ -598,10 +672,10 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     ]);
 
     // set membership recurring to null.
-    $this->callAPISuccess('Membership', 'create', [
-      'id' => $membershipId2,
-      'contribution_recur_id' => NULL,
-    ]);
+    Membership::update(FALSE)
+      ->addWhere('id', '=', $membershipId2)
+      ->addValue('contribution_recur_id', NULL)
+      ->execute();
 
     $this->callAPISuccess('Contribution', 'delete', ['id' => $contribution['id']]);
     unset($params['line_items'][1]);
@@ -662,6 +736,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
   public function validateAllCounts(int $membershipId, int $count): void {
     $memPayParams = [
       'membership_id' => $membershipId,
+      'version' => 3,
     ];
     $lineItemParams = [
       'entity_id' => $membershipId,

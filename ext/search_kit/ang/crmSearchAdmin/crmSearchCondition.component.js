@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchCondition', {
@@ -99,16 +99,14 @@
         }
         const opKey = allowedOps.join();
         if (!ctrl.operators[opKey]) {
-          ctrl.operators[opKey] = _.filter(CRM.crmSearchAdmin.operators, function(operator) {
-            return allowedOps.includes(operator.key);
-          });
+          ctrl.operators[opKey] = CRM.crmSearchAdmin.operators.filter((operator) => allowedOps.includes(operator.key));
         }
         return ctrl.operators[opKey];
       };
 
       // Ensures clause is using an operator that is allowed for the field
       function updateOperators() {
-        if ((!getOperator() || !_.includes(_.pluck(ctrl.getOperators(), 'key'), getOperator()))) {
+        if ((!getOperator() || !ctrl.getOperators().map((operator) => operator.key).includes(getOperator()))) {
           setOperator(ctrl.getOperators()[0].key);
         }
       }
@@ -142,4 +140,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

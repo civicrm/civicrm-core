@@ -31,7 +31,7 @@ return [
       'maxlength' => '64',
     ],
     'default' => NULL,
-    'title' => ts('Geo Provider Key'),
+    'title' => ts('Geocoding Provider Key'),
     'help_text' => ts('Enter the API key or Application ID associated with your geocoding provider.'),
     'settings_pages' => ['mapping' => ['weight' => 30]],
   ],
@@ -74,8 +74,11 @@ return [
       'maxlength' => '64',
     ],
     'default' => NULL,
-    'title' => ts('Map Provider Key'),
-    'help_text' => ts('Enter your API Key or Application ID. An API Key is required for the Google Maps API. Refer to developers.google.com for the latest information.'),
+    'title' => ts('Mapping Provider Key'),
+    'help_text' => ts('Enter your API Key or Application ID for the selected mapping provider. For Google Maps, refer to developers.google.com for the latest information. For OpenStreetMaps, a CARTO api key may be required.'),
+    'help_doc_url' => [
+      'page' => 'user/initial-set-up/mapping/',
+    ],
     'settings_pages' => ['mapping' => ['weight' => 10]],
   ],
   'mapProvider' => [

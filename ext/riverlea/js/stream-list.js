@@ -310,9 +310,6 @@
 
     setData(data) {
       this.data = data;
-      // flatten file path info
-      this.data.css_file = '[' + this.data.extension + ']/' + this.data.file_prefix + this.data.css_file;
-      this.data.css_file_dark = '[' + this.data.extension + ']/' + this.data.file_prefix + this.data.css_file_dark;
     }
 
     get streamName() {
@@ -323,7 +320,9 @@
       this.innerHTML = `
       <div class="panel panel-info">
         <div class="panel-heading">
-          <h3></h3>
+          <h3>
+            <i class="crm-i" role="img" aria-disabled="true"></i>
+          </h3>
           <div class="civi-riverlea-stream-header-tags"></div>
           <div class="civi-riverlea-stream-header-buttons crm-buttons"></div>
         </div>
@@ -342,7 +341,11 @@
       </div>
       `;
 
-      this.querySelector('h3').innerText = this.data.label;
+      // add icon for packaged vs custom stream
+      this.querySelector('.panel-heading .crm-i').classList.add(this.data.base_module ? 'fa-box' : 'fa-palette');
+
+      this.querySelector('h3').append(this.data.label);
+
       if (this.data.description) {
         this.querySelector('.panel-body p').innerText = this.data.description;
       }
@@ -373,16 +376,24 @@
 
 
       detailsFields.forEach((field) => {
-        const value = this.data[field.key] ?? null;
+        let value = this.data[field.key] ?? null;
 
         if (value) {
 
-          const renderedValue = (typeof value === 'string') ? value : JSON.stringify(value);
+          // render non-strings as JSON
+          if (typeof value !== 'string') {
+            value = JSON.stringify(value);
+          }
+
+          // render the effective pseudo file path for files
+          if (['css_file', 'css_file_dark'].includes(field.key)) {
+            value = '[' + this.data.extension + ']/' + (this.data.file_prefix ? this.data.file_prefix : '') + value;
+          }
 
           const detailItem = document.createElement('div');
           detailItem.innerHTML = `
             <label>${field.label}</label>
-            <code>${renderedValue}</code>
+            <code>${value}</code>
           `;
           container.append(detailItem);
         }
@@ -415,12 +426,9 @@
       if (this.state.is_frontend) {
         container.append(createTag(ts('Frontend')));
       }
-      // if a Stream is not package in a module, it is a custom
-      // stream
-      if (!this.data.base_module) {
-        container.append(createTag(ts('Custom'), 'label-info'));
-      }
-      else if (this.data.local_modified_date) {
+      // highlight local changes to packaged streams
+      // (not expected but can happen, e.g. with API)
+      if (this.data.local_modified_date) {
         container.append(createTag(ts('Local changes'), 'label-info'));
       }
     }

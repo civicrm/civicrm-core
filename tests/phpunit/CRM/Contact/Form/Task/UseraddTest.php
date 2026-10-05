@@ -21,16 +21,11 @@ class CRM_Contact_Form_Task_UseraddTest extends CiviUnitTestCase {
    * ok because that's what we're testing here.
    */
   public function testUserCreateFail(): void {
-    $form = new CRM_Contact_Form_Task_Useradd();
     // We don't need to set params or anything because we're testing fail,
     // which the user creation will do in unit tests no matter what we set.
     // But before the patch, the status messages were always success no
     // matter what.
-    try {
-      $form->postProcess();
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-    }
+    $this->getTestForm('CRM_Contact_Form_Task_Useradd', [])->postProcess();
     $statuses = CRM_Core_Session::singleton()->getStatus(TRUE);
     $this->assertEquals('alert', $statuses[0]['type']);
   }

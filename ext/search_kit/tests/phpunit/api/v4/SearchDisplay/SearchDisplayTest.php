@@ -181,4 +181,42 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertSame($expected, $result['markup']);
   }
 
+  /**
+   * The Angular client only renders a toolbar when settings.toolbar is set,
+   * so the legacy `addButton` setting must be normalized into `toolbar`
+   * before being passed to the client via the markup's `settings` attribute.
+   */
+  public function testGetMarkupNormalizesLegacyAddButtonToToolbar(): void {
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'label' => 'testGetMarkupAddButton',
+      'name' => 'testGetMarkupAddButton',
+      'api_entity' => 'Individual',
+      'api_params' => [
+        'version' => 4,
+      ],
+    ]);
+    $searchDisplay = $this->createTestRecord('SearchDisplay', [
+      'label' => 'testGetMarkupAddButtonDisplay',
+      'name' => 'testGetMarkupAddButtonDisplay',
+      'saved_search_id' => $savedSearch['id'],
+      'type' => 'list',
+      'settings' => [
+        'addButton' => [
+          'path' => 'civicrm/test/url',
+          'text' => 'Test',
+          'icon' => 'fa-plus',
+        ],
+      ],
+    ]);
+
+    $result = SearchDisplay::getMarkup(FALSE)
+      ->addWhere('id', '=', $searchDisplay['id'])
+      ->execute()->first();
+
+    $expected = <<<MARKUP
+    <crm-search-display-list search="'testGetMarkupAddButton'" display="'testGetMarkupAddButtonDisplay'" api-entity="Individual" settings="{addButton: {path: 'civicrm/test/url', text: 'Test', icon: 'fa-plus'}, toolbar: [{path: 'civicrm/test/url', text: 'Test', icon: 'fa-plus', style: 'primary', target: 'crm-popup'}]}" filters="{}"></crm-search-display-list>
+    MARKUP;
+    $this->assertSame($expected, $result['markup']);
+  }
+
 }

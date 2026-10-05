@@ -46,52 +46,12 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup implements \Civi
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_OptionGroup', $id, 'is_active', $is_active);
-  }
-
-  /**
-   * Add the Option Group.
-   *
-   * @param array $params
-   *
    * @deprecated
    * @return CRM_Core_DAO_OptionGroup
    */
   public static function add($params) {
-    // This is very similar to CRM_Core_DAO::makeNameFromLabel which would be
-    // called automatically via `self::writeRecord()`
-    // TODO: Check if the differences matter, then deprecate this function and switch to writeRecord.
-    if (empty($params['name']) && empty($params['id'])) {
-      $params['name'] = CRM_Utils_String::titleToVar(strtolower($params['title']));
-    }
-    elseif (!empty($params['name']) && strpos($params['name'], ' ')) {
-      $params['name'] = CRM_Utils_String::titleToVar(strtolower($params['name']));
-    }
-    elseif (!empty($params['name'])) {
-      $params['name'] = strtolower($params['name']);
-    }
-    $optionGroup = new CRM_Core_DAO_OptionGroup();
-    $optionGroup->copyValues($params);
-    $optionGroup->save();
-    return $optionGroup;
-  }
-
-  /**
-   * Delete Option Group.
-   *
-   * @deprecated
-   * @param int $optionGroupId
-   */
-  public static function del($optionGroupId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    static::deleteRecord(['id' => $optionGroupId]);
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**

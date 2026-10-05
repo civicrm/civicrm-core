@@ -14,6 +14,8 @@
  */
 class CRM_Core_InvokeTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   /**
    * Test that no php errors come up invoking dashboard url for non-admins
    * Motivation: This currently fails on php 7.4 because of IDS and magicquotes.
@@ -66,12 +68,12 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
   }
 
   public function testContactSummary(): void {
-    $cid = $this->individualCreate([
+    $cid = $this->createTestEntity('Contact', [
       'first_name' => 'ContactPage',
       'last_name' => 'Summary',
       'do_not_phone' => 1,
-      'gender_id' => 'Male',
-    ]);
+      'gender_id:name' => 'Male',
+    ])['id'];
     $_SERVER['REQUEST_URI'] = "civicrm/contact/view?cid={$cid}&reset=1";
     $_GET['q'] = 'civicrm/contact/view';
     $_GET['reset'] = $_REQUEST['reset'] = 1;

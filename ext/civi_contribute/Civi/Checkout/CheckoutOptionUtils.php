@@ -129,9 +129,92 @@ class CheckoutOptionUtils {
       if ($field['htmlType'] === 'select') {
         $field['options'] = array_map(fn ($key) => ['id' => $key, 'label' => $field['attributes'][$key]], array_keys($field['attributes']));
       }
+      elseif ($field['htmlType'] === 'date' && $field['name'] === 'credit_card_exp_date') {
+        $field['htmlType'] = 'expiryDate';
+      }
       unset($field['attributes'], $field['extra']);
       return $field;
     }, $allFields);
+  }
+
+  /**
+   * Optional helper function to map Afform's card fields to the equivalent
+   *   params expected by doPayment() and payment processors.
+   *
+   * Currently just handles expiry_month/expiry_year - Afform uses the
+   *   "expiry_" prefix rather than the plain "month"/"year" quickform uses,
+   *   since those would be ambiguous if the form had any other month or year
+   *   fields. Afform also collects the expiry year as 2 digits (matching
+   *   what's printed on a physical card) but doPayment() and payment
+   *   processors expect a 4 digit year, so it is expanded here (assuming the
+   *   current century).
+   *
+   * @param array $paramsToMap
+   *
+   * @return array
+   */
+  public static function mapCardParams(array $paramsToMap): array {
+    if (array_key_exists('expiry_month', $paramsToMap)) {
+      $paramsToMap['month'] = $paramsToMap['expiry_month'];
+    }
+    if (array_key_exists('expiry_year', $paramsToMap)) {
+      $paramsToMap['year'] = self::expandExpiryYear($paramsToMap['expiry_year']);
+    }
+    return $paramsToMap;
+  }
+
+  /**
+   * Optional helper function to validate a card expiry month/year submitted from Afform.
+   *
+   * A html5 pattern attribute can restrict the *format* of the month/year fields
+   *   (eg. 2 digits) but cannot check whether the resulting date is a sane one -
+   *   that requires comparing against today's date, so it's done here instead.
+   *
+   * @param string $month
+   *   2 digit month, eg. "04".
+   * @param string $year
+   *   2 digit year, eg. "27".
+   *
+   * @return bool
+   */
+  public static function validateExpiryDate(string $month, string $year): bool {
+    $fullYear = self::expandExpiryYear($year);
+
+    // Reject anything further out than the site's configured credit card expiry
+    //   offset (eg. current year + 10) - without this a mistyped 2 digit year
+    //   like "94" would otherwise be accepted as the (technically future) year 2094.
+    $maxYear = (int) date('Y') + self::getMaxCreditCardExpiryOffset();
+    if ($fullYear > $maxYear) {
+      return FALSE;
+    }
+
+    return \CRM_Utils_Rule::currentDate(['M' => $month, 'Y' => $fullYear]);
+  }
+
+  /**
+   * @param string $year
+   *   2 digit year, eg. "27".
+   *
+   * @return int
+   *   4 digit year, assuming the current century, eg. 2027.
+   */
+  private static function expandExpiryYear(string $year): int {
+    $currentCentury = ((int) floor(date('Y') / 100)) * 100;
+    return $currentCentury + (int) $year;
+  }
+
+  /**
+   * @return int
+   *   Number of years into the future a credit card is allowed to expire,
+   *   per the site's "creditCard" date preferences (falls back to 10).
+   */
+  private static function getMaxCreditCardExpiryOffset(): int {
+    $dao = new \CRM_Core_DAO_PreferencesDate();
+    $dao->name = 'creditCard';
+    if ($dao->find(TRUE) && $dao->end !== NULL) {
+      return (int) $dao->end;
+    }
+    return 10;
   }
 
   public static function getPaymentProcessorPairs(array $paymentProcessorTypeNames): array {

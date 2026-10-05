@@ -30,7 +30,7 @@
       .ajax({
         url: CRM.url("civicrm/profile-editor/schema"),
         data: {
-          'entityTypes': _.keys(CRM.civiSchema).join(',')
+          'entityTypes': Object.keys(CRM.civiSchema).join(',')
         },
         type: 'POST',
         dataType: 'json',

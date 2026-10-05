@@ -956,6 +956,26 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook lets extensions declare entities that can be tagged (their `tag_used_for`
+   * option value has `filter = 1`) but aren't rows in a physical table, so `EntityTag`
+   * can't reference them and a reverse "what's tagged X" lookup has nowhere to join.
+   *
+   * @param array $entities
+   *   Array keyed by the `tag_used_for` option value name (e.g. 'Afform'). Each entry is
+   *   a callable `function(int $tagId): array` returning the matching records - each an
+   *   array with at minimum an `id` key uniquely identifying that record within its entity.
+   *
+   * @return mixed
+   */
+  public static function alterNonDbTaggableEntities(&$entities) {
+    $null = NULL;
+    return self::singleton()->invoke(['entities'], $entities,
+      $null, $null, $null, $null, $null,
+      'civicrm_alterNonDbTaggableEntities'
+    );
+  }
+
+  /**
    * This hook is called when sending an email / printing labels to get the values for all the
    * tokens returned by the 'tokens' hook
    *
@@ -1722,12 +1742,12 @@ abstract class CRM_Utils_Hook {
    * @param array $mappedRow (reference) The rows that have been mapped to an array of params.
    * @param array $rowValues The row from the data source (non-associative array)
    * @param int $userJobID id from civicrm_user_job
+   * @param array|null $importEntities
    *
    * @return mixed
    */
-  public static function importAlterMappedRow(string $importType, string $context, array &$mappedRow, array $rowValues, int $userJobID) {
-    $null = NULL;
-    return self::singleton()->invoke(['importType', 'context', 'mappedRow', 'rowValues', 'userJobID', 'fieldMappings'], $context, $importType, $mappedRow, $rowValues, $userJobID, $null,
+  public static function importAlterMappedRow(string $importType, string $context, array &$mappedRow, array $rowValues, int $userJobID, ?array $importEntities = NULL) {
+    return self::singleton()->invoke(['importType', 'context', 'mappedRow', 'rowValues', 'userJobID', 'importEntities'], $context, $importType, $mappedRow, $rowValues, $userJobID, $importEntities,
       'civicrm_importAlterMappedRow'
     );
   }
@@ -1735,6 +1755,8 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called when API permissions are checked (cf. civicrm_api3_api_check_permission()
    * in api/v3/utils.php and _civicrm_api3_permissions() in CRM/Core/DAO/permissions.php).
+   *
+   * @deprecated - this hook only applies to APIv3
    *
    * @param string $entity
    *   The API entity (like contact).
@@ -1829,6 +1851,29 @@ abstract class CRM_Utils_Hook {
     return self::singleton()->invoke(['moduleName', 'ufGroups'], $moduleName, $ufGroups,
       $null, $null, $null, $null,
       'civicrm_buildUFGroupsForModule'
+    );
+  }
+
+  /**
+   * This hook is called when enumerating the ways a profile can be exposed.
+   *
+   * Each type is offered as a checkbox on the profile settings form, and ticking or unticking it
+   * creates or deletes the matching `civicrm_uf_join` record. Listeners may also relabel a type
+   * that core provides.
+   *
+   * @param array $ufGroupTypes
+   *   Labels keyed by the `civicrm_uf_join.module` they record,
+   *   e.g. 'Profile' => ts('Standalone Form').
+   *
+   * @return null
+   *   The return value is ignored
+   * @see CRM_Core_SelectValues::ufGroupTypes()
+   */
+  public static function ufGroupTypes(&$ufGroupTypes) {
+    $null = NULL;
+    return self::singleton()->invoke(['ufGroupTypes'], $ufGroupTypes,
+      $null, $null, $null, $null, $null,
+      'civicrm_ufGroupTypes'
     );
   }
 
@@ -3019,14 +3064,22 @@ abstract class CRM_Utils_Hook {
    *   Descriptor for the context/record wherein we want an API key. Some combination of:
    *   - for: string (REQUIRED), a symbol that identifies the kind of context, e.g.
    *      - "PaymentProcessor" (v6.10+): Add or reset the API key for a PaymentProcessor
+   *      - "MailSettings" (v6.20+): Add or reset the credentials for a Mail Account
    *   - payment_processor_type: string (OPTIONAL), a symbol like "Stripe" which identifies the type of payment-processor
    *   - payment_processor_id: int (OPTIONAL), unique id for the PaymentProcessor record
    *   - is_test: bool (OPTIONAL), whether this payproc is for testing
+   *   - mail_settings_id: int (OPTIONAL), unique id for the MailSettings record
    * @param array $available
    *   List of available actions. Each item has a symbolic-key, and it has the properties:
    *     - title: string
    *     - render: callable, the function which renders the initiator buttons
    *        Signature: function(CRM_Core_Region $region, array $context, array $initiator):
+   *     - is_connected: bool (OPTIONAL), whether this record is currently connected via this initiator
+   *     - status_message: string (OPTIONAL), describes the current connection, e.g. "Connected as foo@example.org"
+   *     - status_severity: string (OPTIONAL), one of 'success', 'warning', 'danger'
+   *     - manage_url: string (OPTIONAL), address of the screen which administers this connection
+   *     - managed_fields: string[] (OPTIONAL), form fields supplied by this connection at runtime.
+   *        The form hides these, and leaves their stored values untouched on save.
    * @param string|null $default
    *
    * @return mixed

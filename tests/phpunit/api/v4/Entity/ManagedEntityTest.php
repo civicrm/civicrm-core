@@ -935,6 +935,106 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     $this->assertEquals($expected, \CRM_Core_BAO_Managed::isAPi4ManagedType($entityName));
   }
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testReconcileSpecificDeclarations(): void {
+    $optionGroup = [
+      'module' => 'civicrm',
+      'name' => 'testManagedOptionGroup',
+      'entity' => 'OptionGroup',
+      'cleanup' => 'unused',
+      'update' => 'always',
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'name' => 'testManagedOptionGroup',
+          'title' => 'Test Managed Option Group',
+          'description' => 'Original state',
+          'is_active' => TRUE,
+          'is_locked' => FALSE,
+        ],
+      ],
+    ];
+    $optionValue1 = [
+      'module' => 'civicrm',
+      'name' => 'testManagedOptionValue1',
+      'entity' => 'OptionValue',
+      'cleanup' => 'unused',
+      'update' => 'always',
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'option_group_id.name' => 'testManagedOptionGroup',
+          'value' => 1,
+          'label' => 'Option Value 1',
+          'description' => 'Original state',
+          'is_active' => TRUE,
+          'is_reserved' => FALSE,
+          'weight' => 1,
+          'is_default' => 1,
+          'domain_id' => NULL,
+          'icon' => 'fa-test',
+        ],
+      ],
+    ];
+    $optionValue2 = [
+      'module' => 'civicrm',
+      'name' => 'testManagedOptionValue2',
+      'entity' => 'OptionValue',
+      'cleanup' => 'unused',
+      'update' => 'always',
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'option_group_id.name' => 'testManagedOptionGroup',
+          'value' => 2,
+          'label' => 'Option Value 2',
+          'description' => 'Original state',
+          'is_active' => TRUE,
+          'is_reserved' => FALSE,
+          'weight' => 2,
+          'icon' => 'fa-test',
+        ],
+      ],
+    ];
+    $this->_managedEntities[] = $optionGroup;
+    $this->_managedEntities[] = $optionValue1;
+    $this->_managedEntities[] = $optionValue2;
+
+    // run the initial reconciliation as normal
+    CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
+
+    $values = OptionValue::get(FALSE)
+      ->addWhere('option_group_id.name', '=', 'testManagedOptionGroup')
+      ->execute();
+
+    // check the values created
+    $this->assertCount(2, $values);
+
+    // lets update the declarations
+    $this->_managedEntities[1]['params']['values']['label'] = 'Updated Option Value 1';
+    $this->_managedEntities[2]['params']['values']['label'] = 'Updated Option Value 2';
+
+    // this time we'll reconcile just two declarations
+    $specificDeclarations = array_slice($this->_managedEntities, 0, 2);
+    CRM_Core_ManagedEntities::singleton(TRUE)->reconcileDeclarations($specificDeclarations);
+
+    $values = OptionValue::get(FALSE)
+      ->addWhere('option_group_id.name', '=', 'testManagedOptionGroup')
+      ->execute()
+      ->indexBy('value');
+
+    // check option value 1 got updated successfully
+    $this->assertEquals('Updated Option Value 1', $values[1]['label']);
+
+    // check option value 2 didn't get removed (because we didnt pass that declaration to the reconcile)
+    $this->assertCount(2, $values);
+
+    // check option value 2 didn't get updated
+    $this->assertEquals('Option Value 2', $values[2]['label']);
+  }
+
   public static function sampleEntityTypes() {
     $entityTypes = [
       // v3 pseudo-entity

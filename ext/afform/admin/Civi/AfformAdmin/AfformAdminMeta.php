@@ -99,7 +99,7 @@ class AfformAdminMeta {
         ...array_keys(\CRM_Core_SelectValues::optionAttributes()),
       ],
       'action' => 'create',
-      'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'help_pre', 'help_post', 'serialize', 'data_type', 'entity', 'fk_entity', 'readonly', 'operators'],
+      'select' => ['name', 'label', 'input_type', 'input_attrs', 'required', 'options', 'suffixes', 'help_pre', 'help_post', 'serialize', 'data_type', 'entity', 'fk_entity', 'dfk_entities', 'readonly', 'operators'],
       'where' => [['deprecated', '=', FALSE], ['input_type', 'IS NOT NULL']],
     ];
     if ($entityName === 'Address') {
@@ -254,6 +254,17 @@ class AfformAdminMeta {
               ['#tag' => 'af-tab', 'title' => E::ts('Tab 1'), '#children' => []],
               ['#tag' => 'af-tab', 'title' => E::ts('Tab 2'), '#children' => []],
             ],
+          ],
+        ],
+        'pages' => [
+          'title' => E::ts('Pages'),
+          'element' => [
+            '#tag' => 'af-tabset',
+            '#children' => [
+              ['#tag' => 'af-tab', 'title' => E::ts('Page 1'), '#children' => []],
+              ['#tag' => 'af-tab', 'title' => E::ts('Page 2'), '#children' => []],
+            ],
+            'page-nav-buttons' => TRUE,
           ],
         ],
         'search_param_sets' => [

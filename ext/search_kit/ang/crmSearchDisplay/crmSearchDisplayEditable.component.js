@@ -1,11 +1,12 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchDisplay').component('crmSearchDisplayEditable', {
     bindings: {
       row: '<?',
       display: '<',
+      colIndex: '<',
       colKey: '<',
       colData: '<?',
       isFullRowMode: '<',
@@ -24,8 +25,8 @@
         this.display.editValues = this.display.editValues || {};
         // Not applicable to create mode
         if (this.row) {
-          initialValue = JSON.parse(JSON.stringify(this.row.data[valuePath]));
-          this.display.editValues[this.colKey] = JSON.parse(JSON.stringify(this.row.data[valuePath]));
+          initialValue = structuredClone(this.row.data[valuePath]);
+          this.display.editValues[this.colKey] = structuredClone(this.row.data[valuePath]);
         }
 
         this.field = {
@@ -52,10 +53,19 @@
             $scope.$apply(() => ctrl.save());
           }
         });
+
+        const width = this.row.columns[this.colIndex].widthBeforeEdit ?? '';
+        if (width) {
+          const style = $('<style id="crm-search-display-editable">').appendTo('head');
+          style.text(`.form-inline.crm-search-display-editable-editing {
+            textarea, input.form-control[type="text"] { min-width: ${width}px; }
+          }`);
+        }
       };
 
       this.$onDestroy = function() {
         $(document).off('.crmSearchDisplayEditable');
+        $('style#crm-search-display-editable').remove();
       };
 
       this.save = function() {
@@ -87,4 +97,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

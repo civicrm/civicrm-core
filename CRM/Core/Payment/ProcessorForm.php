@@ -105,18 +105,6 @@ class CRM_Core_Payment_ProcessorForm {
     ) {
       CRM_Core_Error::statusBounce(ts('Payment processor is not set for this page'));
     }
-
-    if (!empty($form->_membershipBlock['is_separate_payment']) &&
-      (!empty($form->_paymentProcessor['class_name']) &&
-        !$paymentObject->supports('MultipleConcurrentPayments')
-      )
-    ) {
-
-      CRM_Core_Error::statusBounce(ts('This contribution page is configured to support separate contribution and membership payments. This %1 plugin does not currently support multiple simultaneous payments, or the option to "Execute real-time monetary transactions" is disabled. Please contact the site administrator and notify them of this error',
-          [1 => $form->_paymentProcessor['payment_processor_type']]
-        )
-      );
-    }
   }
 
   /**

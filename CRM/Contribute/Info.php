@@ -57,10 +57,12 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
       'access CiviContribute' => [
         'label' => ts('access CiviContribute'),
         'description' => ts('Record backend contributions (with edit contributions) and view all contributions (for visible contacts)'),
+        'implied_by' => ['edit contributions'],
       ],
       'edit contributions' => [
         'label' => ts('edit contributions'),
         'description' => ts('Record and update contributions'),
+        'implied_by' => ['delete in CiviContribute'],
       ],
       'refund contributions' => [
         'label' => ts('Refund contributions'),
@@ -189,9 +191,7 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    * @param $newCredit
    */
   public function creatNewShortcut(&$shortCuts, $newCredit) {
-    if (CRM_Core_Permission::check('access CiviContribute') &&
-      CRM_Core_Permission::check('edit contributions')
-    ) {
+    if (CRM_Core_Permission::check('edit contributions')) {
       $shortCut[] = [
         'path' => 'civicrm/contribute/add',
         'query' => "reset=1&action=add&context=standalone",

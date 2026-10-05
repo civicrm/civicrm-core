@@ -16,6 +16,7 @@
  * @group headless
  */
 class api_v3_UFMatchTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   public function tearDown(): void {
     $this->quickCleanup([

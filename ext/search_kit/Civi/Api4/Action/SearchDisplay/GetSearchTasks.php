@@ -178,6 +178,16 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       ];
     }
 
+    if ($entity['name'] === 'Tag' && array_key_exists('update', $actions) && array_key_exists('delete', $actions)) {
+      $tasks['Tag']['merge'] = [
+        'module' => 'crmSearchTasks',
+        'title' => E::ts('Merge Tags'),
+        'icon' => 'fa-compress',
+        'number' => '>= 2',
+        'uiDialog' => ['templateUrl' => '~/crmSearchTasks/crmSearchTaskTagMerge.html'],
+      ];
+    }
+
     if ($entity['name'] === 'Contribution') {
       $defaultSoftCreditTypeID = \CRM_Core_OptionGroup::getDefaultValue('soft_credit_type');
       $tasks['Contribution']['add_soft_credit'] = [

@@ -206,7 +206,7 @@ class CRM_Mailing_MailingUnsubscribeTest extends CiviUnitTestCase {
     ])['id'];
 
     // .. and send it
-    $ret = $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+    $ret = $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     // Check the mailing has the right groupIds
     $mailinggroupIds = \Civi\Api4\MailingGroup::get(FALSE)

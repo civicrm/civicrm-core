@@ -64,42 +64,15 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
     $this->_columns = [
       'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => [
-          'sort_name' => [
-            'title' => ts('Contact Name'),
-            'required' => TRUE,
-            'no_repeat' => TRUE,
-          ],
-          'first_name' => [
-            'title' => ts('First Name'),
-          ],
-          'middle_name' => [
-            'title' => ts('Middle Name'),
-          ],
-          'last_name' => [
-            'title' => ts('Last Name'),
-          ],
-          'id' => [
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ],
-          'gender_id' => [
-            'title' => ts('Gender'),
-          ],
-          'birth_date' => [
-            'title' => ts('Birth Date'),
-          ],
-          'age' => [
-            'title' => ts('Age'),
-            'dbAlias' => 'TIMESTAMPDIFF(YEAR, contact_civireport.birth_date, CURDATE())',
-          ],
-          'contact_type' => [
-            'title' => ts('Contact Type'),
-          ],
-          'contact_sub_type' => [
-            'title' => ts('Contact Subtype'),
-          ],
-        ],
+        'fields' => array_merge(
+          $this->getBasicContactFields(),
+          [
+            'modified_date' => [
+              'title' => ts('Modified Date'),
+              'default' => FALSE,
+            ],
+          ]
+        ),
         'filters' => $this->getBasicContactFilters(),
         'grouping' => 'contact-fields',
         'order_bys' => [

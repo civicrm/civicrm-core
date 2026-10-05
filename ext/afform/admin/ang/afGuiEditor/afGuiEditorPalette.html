@@ -1,34 +1,34 @@
 <div id="afGuiEditor-palette-config" class="panel panel-default">
   <div class="panel-heading">
     <ul id="afGuiEditor-palette-tabs" role="tablist" class="nav nav-tabs">
-      <li role="tab" class="fluid-width-tab" ng-class="{active: selectedEntityName === null}" title="{{:: ts('Form Settings') }}">
-        <a href ng-click="editor.selectEntity(null)">
+      <li role="presentation" class="fluid-width-tab" ng-class="{active: selectedEntityName === null}" title="{{:: ts('Form Settings') }}">
+        <a href role="tab" aria-selected="{{ selectedEntityName === null }}" ng-click="editor.selectEntity(null)">
           <i class="crm-i fa-gear" role="img" aria-hidden="true"></i>
           <span>{{:: ts('Settings') }}</span>
         </a>
       </li>
-      <li role="tab" class="fluid-width-tab" ng-class="{active: selectedEntityName === 'extra'}" title="{{:: ts('Elements') }}">
-        <a href ng-click="editor.selectEntity('extra')">
+      <li role="presentation" class="fluid-width-tab" ng-class="{active: selectedEntityName === 'extra'}" title="{{:: ts('Elements') }}">
+        <a href role="tab" aria-selected="{{ selectedEntityName === 'extra' }}" ng-click="editor.selectEntity('extra')">
           <i class="crm-i fa-rectangle-list" role="img" aria-hidden="true"></i>
           <span>{{:: ts('Elements') }}</span>
         </a>
       </li>
-      <li role="tab" ng-repeat="entity in entities" class="fluid-width-tab" ng-class="{active: selectedEntityName === entity.name}" title="{{ entity.label }}">
-        <a href ng-click="editor.selectEntity(entity.name); editor.scrollToEntity(entity.name);">
+      <li role="presentation" ng-repeat="entity in entities" class="fluid-width-tab" ng-class="{active: selectedEntityName === entity.name}" title="{{ entity.label }}">
+        <a href role="tab" aria-selected="{{ selectedEntityName === entity.name }}" ng-click="editor.selectEntity(entity.name); editor.scrollToEntity(entity.name);">
           <i class="crm-i {{:: editor.getEntityDefn(entity).icon }}" role="img" aria-hidden="true"></i>
           <span ng-if="!entity.loading && editor.allowEntityConfig && selectedEntityName === entity.name" crm-ui-editable ng-model="entity.label" ng-change="editor.adjustTabWidths()">{{ entity.label }}</span>
           <span ng-if="!entity.loading && !(editor.allowEntityConfig && selectedEntityName === entity.name)">{{ entity.label }}</span>
           <i ng-if="entity.loading" class="crm-i fa-spin fa-spinner" role="img" aria-hidden="true"></i>
         </a>
       </li>
-      <li role="tab" ng-repeat="(key, display) in editor.searchDisplays" class="fluid-width-tab" ng-class="{active: selectedEntityName === key}" title="{{ display.label }}">
-        <a href ng-click="display.settings && editor.selectEntity(key)">
+      <li role="presentation" ng-repeat="(key, display) in editor.searchDisplays" class="fluid-width-tab" ng-class="{active: selectedEntityName === key}" title="{{ display.label }}">
+        <a href role="tab" aria-selected="{{ selectedEntityName === key }}" ng-click="display.settings && editor.selectEntity(key)">
           <i ng-if="display.settings" class="crm-i {{:: display.settings['type:icon'] }}" role="img" aria-hidden="true"></i>
           <i ng-if="!display.settings" class="crm-i fa-spin fa-spinner" role="img" aria-hidden="true"></i>
           <span>{{ display.settings.label }}</span>
         </a>
       </li>
-      <li role="tab" class="dropdown" ng-if="editor.allowEntityConfig" title="{{:: ts('Add Entity') }}" af-gui-menu>
+      <li role="presentation" class="dropdown" ng-if="editor.allowEntityConfig" title="{{:: ts('Add Entity') }}" af-gui-menu>
         <a href class="dropdown-toggle" data-toggle="dropdown">
           <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
         </a>
@@ -41,7 +41,7 @@
           </li>
         </ul>
       </li>
-      <li role="tab" class="dropdown" ng-if="editor.getFormType() === 'search'" title="{{:: ts('Add Search') }}" af-gui-menu>
+      <li role="presentation" class="dropdown" ng-if="editor.getFormType() === 'search'" title="{{:: ts('Add Search') }}" af-gui-menu>
         <a href class="dropdown-toggle" data-toggle="dropdown" ng-click="editor.getSearchDisplaySelector();">
           <i class="crm-i fa-plus" role="img" aria-hidden="true"></i>
         </a>

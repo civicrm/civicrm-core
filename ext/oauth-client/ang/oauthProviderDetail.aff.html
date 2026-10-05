@@ -5,9 +5,9 @@
 <div ng-if="!theClients.loading">
   <div class="panel panel-info" ng-init="selected = {tab: theClients.result.length > 0 ? 'client_' + theClients.result[0].id : 'new'}">
     <ul class="panel-heading nav nav-tabs">
-      <li role="tab" ng-repeat="theClient in theClients.result" ng-class="{active: selected.tab === 'client_' + theClient.id}"><a ng-click="selected.tab = 'client_' + theClient.id">{{ts('Client #%1', {1: theClient.id})}}</a></li>
-      <li role="tab" ng-class="{active: selected.tab === 'new'}"><a ng-click="selected.tab = 'new'">{{ts('Register Client')}}</a></li>
-      <li role="tab" ng-class="{active: selected.tab === 'details'}"><a ng-click="selected.tab = 'details'">{{ts('Details')}}</a></li>
+      <li role="presentation" ng-repeat="theClient in theClients.result" ng-class="{active: selected.tab === 'client_' + theClient.id}"><a role="tab" aria-selected="{{ selected.tab === 'client_' + theClient.id }}" ng-click="selected.tab = 'client_' + theClient.id">{{ts('Client #%1', {1: theClient.id})}}</a></li>
+      <li role="presentation" ng-class="{active: selected.tab === 'new'}"><a role="tab" aria-selected="{{ selected.tab === 'new' }}" ng-click="selected.tab = 'new'">{{ts('Register Client')}}</a></li>
+      <li role="presentation" ng-class="{active: selected.tab === 'details'}"><a role="tab" aria-selected="{{ selected.tab === 'details' }}" ng-click="selected.tab = 'details'">{{ts('Details')}}</a></li>
     </ul>
 
     <div role="tabpanel" class="panel-body" ng-if="selected.tab === 'details'">

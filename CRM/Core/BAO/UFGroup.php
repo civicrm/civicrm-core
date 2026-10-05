@@ -482,7 +482,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
       'skipDisplay' => 0,
       'data_type' => CRM_Utils_Type::getDataTypeFromFieldMetadata($fieldMetaData),
       'bao' => $fieldMetaData['bao'] ?? NULL,
-      'html_type' => $fieldMetaData['html']['type'] ?? NULL,
+      'html_type' => $fieldMetaData['html']['type'] ?? $fieldMetaData['html_type'] ?? NULL,
     ];
 
     // "rule" used to come from the xml schema, but now we fall back to basing it on the html_type.
@@ -1350,21 +1350,6 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
   }
 
   /**
-   * Delete the profile Group.
-   *
-   * @param int $id
-   *   Profile Id.
-   *
-   * @return bool
-   *
-   * @deprecated
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) static::deleteRecord(['id' => $id]);
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
@@ -1404,10 +1389,11 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup implements \Civi\Core\Ho
    * @param array $ids
    *   Deprecated array.
    *
-   *
+   * @deprecated
    * @return object
    */
   public static function add(&$params, $ids = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
     if (empty($params['id']) && !empty($ids['ufgroup'])) {
       $params['id'] = $ids['ufgroup'];
       CRM_Core_Error::deprecatedWarning('ids parameter is deprecated');
@@ -2538,8 +2524,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
   }
 
   /**
-   * make a copy of a profile, including
-   * all the fields in the profile
+   * @deprecated since 6.20 will be removed around 6.26
    *
    * @param int $id
    *   The profile id to copy.
@@ -2547,6 +2532,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @return \CRM_Core_DAO
    */
   public static function copy($id) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $maxId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_uf_group");
 
     $title = ts('[Copy id %1]', [1 => $maxId + 1]);
@@ -2985,7 +2971,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @deprecated in CiviCRM 6.6
    */
   public static function encodeGroupType($coreTypes, $subTypes, $delim = CRM_Core_DAO::VALUE_SEPARATOR) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     $groupTypeExpr = '';
     if ($coreTypes) {
       $groupTypeExpr .= implode(',', $coreTypes);
@@ -2996,6 +2982,100 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       }
     }
     return $groupTypeExpr;
+  }
+
+  /**
+   * Extract group_type string into array format
+   *
+   * @param string $groupType
+   *
+   * @return array
+   */
+  public static function extractGroupTypes($groupType) {
+    $returnGroupTypes = [];
+    if (!$groupType) {
+      return $returnGroupTypes;
+    }
+
+    $groupTypeParts = explode(CRM_Core_DAO::VALUE_SEPARATOR, $groupType);
+    foreach (explode(',', $groupTypeParts[0]) as $type) {
+      $returnGroupTypes[$type] = $type;
+    }
+
+    if (!empty($groupTypeParts[1])) {
+      $pseudoSelectors = array_column(CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions(), NULL, 'name');
+      $extendsOptions = array_column(CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), NULL, 'id');
+
+      foreach (explode(',', $groupTypeParts[1]) as $typeValue) {
+        $groupTypeValues = $valueLabels = [];
+        $valueParts = explode(':', $typeValue);
+        $subType = $valueParts[0];
+        $typeName = NULL;
+
+        if (isset($pseudoSelectors[$subType])) {
+          $typeName = $pseudoSelectors[$subType]['extends'];
+          $options = CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions(NULL, [
+            'values' => ['extends_entity_column_id' => $pseudoSelectors[$subType]['id']],
+            'check_permissions' => FALSE,
+          ]);
+          $valueLabels = array_column($options, 'label', 'id');
+        }
+        else {
+          $baseType = str_ends_with($subType, 'Type') ? substr($subType, 0, -4) : $subType;
+          if (isset($extendsOptions[$baseType])) {
+            $typeName = $baseType;
+            $options = CRM_Core_BAO_CustomGroup::getExtendsEntityColumnValueOptions(NULL, [
+              'values' => ['extends' => $typeName],
+              'check_permissions' => FALSE,
+            ]);
+            $valueLabels = array_column($options, 'label', 'id');
+          }
+        }
+
+        if ($typeName) {
+          foreach ($valueParts as $val) {
+            if (CRM_Utils_Rule::integer($val)) {
+              $groupTypeValues[$val] = $valueLabels[$val] ?? NULL;
+            }
+          }
+
+          if (!is_array($returnGroupTypes[$typeName] ?? NULL)) {
+            $returnGroupTypes[$typeName] = [];
+          }
+          $returnGroupTypes[$typeName][$subType] = $groupTypeValues;
+        }
+      }
+    }
+    return $returnGroupTypes;
+  }
+
+  /**
+   * Format 'group_type' field as an array of labels for display
+   *
+   * @param array $groupTypes
+   *   output from self::extractGroupTypes
+   * @return array
+   */
+  public static function formatGroupTypeLabels($groupTypes) {
+    $groupTypesStrings = [];
+    if (!empty($groupTypes)) {
+      $pseudoSelectors = array_column(CRM_Core_BAO_CustomGroup::getExtendsEntityColumnIdOptions(), 'label', 'name');
+      $extendsOptions = array_column(CRM_Core_BAO_CustomGroup::getCustomGroupExtendsOptions(), 'label', 'id');
+
+      foreach ($groupTypes as $groupType => $typeValues) {
+        if (is_array($typeValues)) {
+          foreach ($typeValues as $subType => $subTypeValues) {
+            $baseType = str_ends_with($subType, 'Type') ? substr($subType, 0, -4) : $subType;
+            $label = $pseudoSelectors[$subType] ?? $extendsOptions[$baseType] ?? $extendsOptions[$groupType] ?? $subType;
+            $groupTypesStrings[] = $label . ': ' . implode(', ', $subTypeValues);
+          }
+        }
+        else {
+          $groupTypesStrings[] = $groupType;
+        }
+      }
+    }
+    return $groupTypesStrings;
   }
 
   /**

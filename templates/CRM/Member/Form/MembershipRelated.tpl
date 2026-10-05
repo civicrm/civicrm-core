@@ -27,7 +27,7 @@
                         </tr>
                         </thead>
                         {foreach from=$related item=rel}
-                        <tr id="rel_{$rel.id}" class="{cycle values="odd-row,even-row"} row-relationship {if $rel.membership_id}row-highlight{/if}">
+                        <tr id="rel_{$rel.id}" class="{cycle values="odd-row,even-row"} row-relationship {if array_key_exists('membership_id', $rel) && $rel.membership_id}row-highlight{/if}">
                             <td>
                                 <a href="{crmURL p='civicrm/contact/view/rel' q="action=view&reset=1&selectedChild=rel&cid=`$rel.cid`&id=`$rel.id`"}">{$rel.relation}</a>
                             </td>

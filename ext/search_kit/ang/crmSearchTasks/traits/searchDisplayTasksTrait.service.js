@@ -1,4 +1,4 @@
- (function(angular, $, _) {
+ (function(angular, $) {
   "use strict";
 
   // Trait shared by any search display controllers which use tasks
@@ -39,7 +39,7 @@
         return !displayCtrl.loading && displayCtrl.results && displayCtrl.results.length;
       };
       this.getTaskInfo = function(taskName) {
-        return _.findWhere(mngr.tasks, {name: taskName});
+        return mngr.tasks.find((task) => task.name === taskName);
       };
 
       this.doTask = function(task, ids, isLink) {
@@ -52,7 +52,7 @@
           taskManager: mngr,
           entityInfo: mngr.entityInfo,
           isLink: isLink,
-          task: _.cloneDeep(task),
+          task: structuredClone(task),
         };
         // If task uses a crmPopup form
         if (task.crmPopup) {
@@ -82,7 +82,7 @@
           });
           dialogService.open('crmSearchTask', (task.uiDialog && task.uiDialog.templateUrl) || '~/crmSearchTasks/crmSearchTaskApiBatch.html', data, options)
             // Reload results on success, do nothing on cancel
-            .then((result) => mngr.refreshAfterTask(result, ids), _.noop);
+            .then((result) => mngr.refreshAfterTask(result, ids), () => {});
         }
       };
 
@@ -112,20 +112,21 @@
         const params = ctrl.getApiParams('id');
         crmApi4('SearchDisplay', 'run', params).then(function(ids) {
           ctrl.loadingAllRows = false;
-          ctrl.selectedRows = _.uniq(_.toArray(ids));
+          ctrl.selectedRows = [...new Set(ids)];
         });
       },
 
       // Select all rows on the current page
       selectPage: function() {
         this.allRowsSelected = (this.rowCount <= this.results.length);
-        this.selectedRows = _.uniq(_.pluck(this.results, 'key'));
+        this.selectedRows = [...new Set(this.results.map((result) => result.key))];
       },
 
-      // Clear selection
+      // Clear any selected rows
       selectNone: function() {
         this.allRowsSelected = false;
-        this.selectedRows = [];
+        this.selectedRows = this.selectedRows ?? [];
+        this.selectedRows.length = 0;
       },
 
       // Toggle the "select all" checkbox
@@ -169,7 +170,7 @@
         if (index < 0) {
           // Shift-click - select range between clicked checkbox and the nearest selected row
           if (event.shiftKey && ctrl.selectedRows.length) {
-            const allRows = _.pluck(ctrl.results, 'key'),
+            const allRows = ctrl.results.map((result) => result.key),
               checkboxPosition = allRows.indexOf(row.key);
 
             const nearestBefore = checkRange(allRows, checkboxPosition, -1),
@@ -178,13 +179,13 @@
             // Select range between clicked box and the previous/next checked box
             // In the ambiguous situation where there are checked boxes both above AND below the clicked box,
             // choose the direction of the box which was most recently clicked.
-            if (nearestAfter !== undefined && (nearestBefore === undefined || nearestAfter === allRows.indexOf(_.last(ctrl.selectedRows)))) {
+            if (nearestAfter !== undefined && (nearestBefore === undefined || nearestAfter === allRows.indexOf(ctrl.selectedRows.at(-1)))) {
               selectRange(allRows, checkboxPosition + 1, nearestAfter - 1);
-            } else if (nearestBefore !== undefined && (nearestAfter === undefined || nearestBefore === allRows.indexOf(_.last(ctrl.selectedRows)))) {
+            } else if (nearestBefore !== undefined && (nearestAfter === undefined || nearestBefore === allRows.indexOf(ctrl.selectedRows.at(-1)))) {
               selectRange(allRows, nearestBefore + 1, checkboxPosition -1);
             }
           }
-          ctrl.selectedRows = _.uniq(ctrl.selectedRows.concat([row.key]));
+          ctrl.selectedRows = [...new Set(ctrl.selectedRows.concat([row.key]))];
           ctrl.allRowsSelected = (ctrl.rowCount === ctrl.selectedRows.length);
         } else {
           ctrl.allRowsSelected = false;
@@ -194,7 +195,7 @@
 
       // @return bool
       isRowSelected: function(row) {
-        return this.allRowsSelected || _.includes(this.selectedRows, row.key);
+        return this.allRowsSelected || this.selectedRows.includes(row.key);
       },
 
       isPageSelected: function() {
@@ -208,7 +209,7 @@
           const mngr = this.taskManager;
           event.preventDefault();
           mngr.getMetadata().then(function() {
-            mngr.doTask(_.extend({title: link.title}, mngr.getTaskInfo(link.task)), [id], true);
+            mngr.doTask(Object.assign({title: link.title}, mngr.getTaskInfo(link.task)), [id], true);
           });
         }
       },
@@ -233,7 +234,7 @@
         if (editedRow && status === 'success' && this.selectedRows) {
           // If edited row disappears (because edits cause it to not meet search criteria), deselect it
           const index = this.selectedRows.indexOf(editedRow.key);
-          if (index > -1 && !_.findWhere(apiResults.run, {key: editedRow.key})) {
+          if (index > -1 && !apiResults.run.find((row) => row.key === editedRow.key)) {
             this.selectedRows.splice(index, 1);
           }
         }
@@ -245,8 +246,8 @@
             return;
           }
           // If results contain a link to a task, prefetch task info to prevent latency when clicking the link
-          _.each(apiResults.run[0].columns, function(column) {
-            if ((column.link && column.link.task) || _.find(column.links || [], 'task')) {
+          apiResults.run[0].columns.forEach((column) => {
+            if ((column.link && column.link.task) || (column.links || []).some((link) => link.task)) {
               mngr.getMetadata();
             }
           });
@@ -256,4 +257,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

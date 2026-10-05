@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailing').controller('EditUnsubGroupCtrl', function EditUnsubGroupCtrl($scope, crmMailingLoader) {
     // CRM.crmMailing.groupNames is a global constant - since it doesn't change, we can digest & cache.
@@ -7,15 +7,15 @@
     $scope.isUnsubGroupRequired = function isUnsubGroupRequired(mailing) {
       crmMailingLoader.getGroupNames(mailing);
 
-      if (!_.isEmpty(CRM.crmMailing.groupNames)) {
-        _.each(CRM.crmMailing.groupNames, function(grp) {
+      if (CRM.crmMailing.groupNames.length) {
+        CRM.crmMailing.groupNames.forEach((grp) => {
           if (grp.is_hidden == "1") {
             mandatoryIds.push(parseInt(grp.id));
           }
         });
-        return _.intersection(mandatoryIds, mailing.recipients.groups.include).length > 0;
+        return mandatoryIds.some((id) => mailing.recipients.groups.include.includes(id));
       }
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

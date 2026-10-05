@@ -18,6 +18,15 @@ return [
     'update' => 'civicrm/admin/member/membershipStatus/add?action=update&id=[id]&reset=1',
     'delete' => 'civicrm/admin/member/membershipStatus/add?action=delete&id=[id]&reset=1',
   ],
+  'getIndices' => fn() => [
+    'UI_name' => [
+      'fields' => [
+        'name' => TRUE,
+      ],
+      'unique' => TRUE,
+      'add' => '6.18',
+    ],
+  ],
   'getFields' => fn() => [
     'id' => [
       'title' => ts('Membership Status ID'),

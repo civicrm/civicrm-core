@@ -40,6 +40,7 @@ use Civi\Api4\File;
  * @group headless
  */
 class api_v3_ContactTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   use CRMTraits_Custom_CustomDataTrait;
 
@@ -1979,7 +1980,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       ],
     ], $conflicts);
 
-    $this->callAPISuccess('Job', 'process_batch_merge');
+    $this->callApiV3Success('Job', 'process_batch_merge');
     $defaultRuleGroupID = $this->callAPISuccessGetValue('RuleGroup', [
       'contact_type' => 'Individual',
       'used' => 'Unsupervised',
@@ -2580,14 +2581,16 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testContactGetReturnValues(): void {
+    $contactID = $this->individualCreate([
+      'nick_name' => 'Bob',
+      'email_primary.email' => 'e@mail.com',
+      'phone_primary.phone' => '456',
+    ]);
     $extraParams = [
       'nick_name' => 'Bob',
-      'phone' => '456',
       'email' => 'e@mail.com',
+      'phone' => '456',
     ];
-    $contactID = $this->individualCreate($extraParams);
-    //actually it turns out the above doesn't create a phone
-    $this->callAPISuccess('phone', 'create', ['contact_id' => $contactID, 'phone' => '456']);
     $result = $this->callAPISuccess('contact', 'getsingle', ['id' => $contactID]);
     foreach ($extraParams as $key => $value) {
       $this->assertEquals($result[$key], $value);
@@ -3050,7 +3053,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('Justice League, The', $organization['sort_name']);
     $this->assertEquals('The Justice League', $organization['display_name']);
     $this->hookClass->setHook('civicrm_pre', [$this, 'killTheJusticeLeague']);
-    $this->organizationCreate(['id' => $organizationID, 'sort_name' => 'Justice League, The']);
+    $this->callAPISuccess('Contact', 'update', ['version' => 4, 'id' => $organizationID, 'sort_name' => 'Justice League, The']);
     $organization = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name', 'is_deceased'], 'id' => $organizationID]);
     $this->assertEquals('Steppenwolf wuz here', $organization['display_name']);
     $this->assertEquals('Steppenwolf wuz here', $organization['sort_name']);
@@ -3996,7 +3999,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // wind up being should be [1]
     $this->callAPISuccess('Contact', 'merge', ['to_remove_id' => $contactIDs[0], 'to_keep_id' => $contactIDs[3]]);
 
-    $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $this->callApiV3Success('Job', 'process_batch_merge', []);
     foreach ($contactIDs as $contactID) {
       if ($contactID === $contactIDs[1]) {
         continue;
@@ -4773,36 +4776,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test a lack of fatal errors when the where contains an emoji.
-   *
-   * By default our DBs are not 🦉 compliant. This test will age
-   * out when we are.
-   */
-  public function testEmojiInWhereClause(): void {
-    $schemaNeedsAlter = \CRM_Core_BAO_SchemaHandler::databaseSupportsUTF8MB4();
-    if ($schemaNeedsAlter) {
-      CRM_Core_DAO::executeQuery("
-        ALTER TABLE civicrm_contact MODIFY COLUMN
-        `first_name` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'First Name.',
-        CHARSET utf8 COLLATE utf8_unicode_ci
-      ");
-      Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
-    }
-    $this->callAPISuccess('Contact', 'get', [
-      'debug' => 1,
-      'first_name' => '🦉Claire',
-    ]);
-    if ($schemaNeedsAlter) {
-      CRM_Core_DAO::executeQuery("
-        ALTER TABLE civicrm_contact MODIFY COLUMN
-        `first_name` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'First Name.',
-        CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci
-      ");
-      Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
-    }
-  }
-
-  /**
    * @param string $fieldName
    * @param mixed $expected
    * @param int|null $contactID
@@ -4875,6 +4848,30 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         ]);
       }
     }
+  }
+
+  /**
+   * An operator array on street_address filters rather than fatals.
+   *
+   * API3 accepts filters such as ['LIKE' => '%x%'], and most handlers in
+   * CRM_Contact_BAO_Query unpack them. street_address, street_number and notes
+   * passed $value straight to trim(), which is a TypeError on PHP 8.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetWithOperatorArrayOnStreetAddress(): void {
+    $contactID = $this->callAPISuccess('Contact', 'create', $this->_params)['id'];
+    $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $contactID,
+      'location_type_id' => 1,
+      'street_address' => '42 Operator Array Lane',
+    ]);
+
+    $result = $this->callAPISuccess('Contact', 'get', [
+      'street_address' => ['LIKE' => '%Operator Array%'],
+    ]);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals($contactID, $result['id']);
   }
 
 }

@@ -51,22 +51,27 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
       'manage campaign' => [
         'label' => ts('manage campaign'),
         'description' => ts('Create new campaigns, surveys and petitions, reserve respondents'),
+        'implied_by' => ['administer CiviCampaign'],
       ],
       'reserve campaign contacts' => [
         'label' => ts('reserve campaign contacts'),
         'description' => ts('Reserve campaign contacts for surveys and petitions'),
+        'implied_by' => ['manage campaign'],
       ],
       'release campaign contacts' => [
         'label' => ts('release campaign contacts'),
         'description' => ts('Release reserved campaign contacts for surveys and petitions'),
+        'implied_by' => ['manage campaign'],
       ],
       'interview campaign contacts' => [
         'label' => ts('interview campaign contacts'),
         'description' => ts('Record survey and petition responses from their reserved contacts'),
+        'implied_by' => ['manage campaign'],
       ],
       'gotv campaign contacts' => [
         'label' => ts('GOTV campaign contacts'),
         'description' => ts('Record that contacts voted'),
+        'implied_by' => ['manage campaign'],
       ],
       'sign CiviCRM Petition' => [
         'label' => ts('sign CiviCRM Petition'),
@@ -130,9 +135,7 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
    * @param array $shortCuts
    */
   public function creatNewShortcut(&$shortCuts) {
-    if (CRM_Core_Permission::check('manage campaign') ||
-      CRM_Core_Permission::check('administer CiviCampaign')
-    ) {
+    if (CRM_Core_Permission::check('manage campaign')) {
       $shortCuts = array_merge($shortCuts, [
         [
           'path' => 'civicrm/campaign/add',

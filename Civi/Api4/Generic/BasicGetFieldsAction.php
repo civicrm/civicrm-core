@@ -27,8 +27,6 @@ use Civi\Api4\Utils\CoreUtil;
  * @method $this setLoadOptions(bool|array $value)
  * @method bool|array getLoadOptions()
  * @method $this setAction(string $value)
- * @method $this setValues(array $values)
- * @method array getValues()
  */
 class BasicGetFieldsAction extends BasicGetAction {
 
@@ -120,6 +118,8 @@ class BasicGetFieldsAction extends BasicGetAction {
   protected function formatResults(&$values, $isInternal) {
     $fieldDefaults = array_column($this->fields(), 'default_value', 'name') +
       array_fill_keys(array_column($this->fields(), 'name'), NULL);
+    // Add the default type if it is missing (e.g. Setting)
+    $fieldDefaults += ['type' => 'Field'];
     // Enforce field permissions
     if ($this->checkPermissions) {
       foreach ($values as $key => $field) {
@@ -289,6 +289,9 @@ class BasicGetFieldsAction extends BasicGetAction {
     $optionGroupId = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroupName, 'id', 'name');
     $select = CoreUtil::getOptionValueFields($optionGroupName);
     unset($select['id'], $select['value']);
+    // Quote the column names: an option group is free to declare a field whose name
+    // is a reserved word, e.g. `grouping`.
+    $select = array_map(fn($column) => "`$column`", $select);
     array_unshift($select, 'value AS id');
     $query = "SELECT " . implode(', ', $select) . " FROM civicrm_option_value WHERE option_group_id = %1 ORDER BY weight";
     return \CRM_Core_DAO::executeQuery($query, [1 => [$optionGroupId, 'Int']])->fetchAll();

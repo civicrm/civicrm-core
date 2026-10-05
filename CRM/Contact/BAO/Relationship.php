@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
+use Civi\Api4\Contact;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipType;
 use Civi\Api4\Relationship;
@@ -65,7 +66,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
     // Check if this is a "simple" disable relationship. If it is don't check the relationshipType
     $disableRelationship = !empty($params['id']) && array_key_exists('is_active', $params) && empty($params['is_active']);
     if (!$disableRelationship && !CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'], $params['relationship_type_id'])) {
-      throw new CRM_Core_Exception('Invalid Relationship');
+      throw new CRM_Core_Exception('Invalid Relationship', 'invalid_relationship');
     }
     $relationship = self::add($params);
     if (!empty($params['contact_id_a'])) {
@@ -114,38 +115,47 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
    */
   public static function createMultiple($params, $primaryContactLetter) {
     $secondaryContactLetter = ($primaryContactLetter == 'a') ? 'b' : 'a';
-    $secondaryContactIDs = $params['contact_id_' . $secondaryContactLetter];
-    $valid = $invalid = $duplicate = $saved = 0;
-    $relationshipIDs = [];
-    foreach ($secondaryContactIDs as $secondaryContactID) {
-      try {
-        $params['contact_id_' . $secondaryContactLetter] = $secondaryContactID;
-        $relationship = civicrm_api3('relationship', 'create', $params);
-        $relationshipIDs[] = $relationship['id'];
-        $valid++;
+    $secondaryContactIDs = (array) ($params['contact_id_' . $secondaryContactLetter] ?? []);
+    unset($params['contact_id_' . $secondaryContactLetter]);
+
+    // Convert custom data to api4-style params
+    foreach ($params as $fieldName => $param) {
+      $customFieldName = CRM_Core_BAO_CustomField::getLongNameFromShortName($fieldName);
+      if ($customFieldName) {
+        $params[$customFieldName] = $param;
+        unset($params[$fieldName]);
       }
-      catch (CRM_Core_Exception $e) {
-        switch ($e->getMessage()) {
-          case 'Duplicate Relationship':
-            $duplicate++;
-            break;
+    }
 
-          case 'Invalid Relationship':
-            $invalid++;
-            break;
+    $invalid = $duplicate = 0;
 
-          default:
-            throw new CRM_Core_Exception('unknown relationship create error ' . $e->getMessage());
-        }
+    $saveAction = Relationship::save(FALSE)
+      ->setDefaults($params);
+    foreach ($secondaryContactIDs as $secondaryContactID) {
+      $saveAction->addRecord(['contact_id_' . $secondaryContactLetter => $secondaryContactID]);
+    }
+    $saveResult = $saveAction->execute();
+
+    foreach ($saveResult->getErrors() as $error) {
+      switch ($error->getCode()) {
+        case 'duplicate':
+          $duplicate++;
+          break;
+
+        case 'invalid_relationship':
+          $invalid++;
+          break;
+
+        default:
+          throw new CRM_Core_Exception('unknown relationship create error ' . $error->getMessage());
       }
     }
 
     return [
-      'valid' => $valid,
+      'valid' => $saveResult->count(),
       'invalid' => $invalid,
       'duplicate' => $duplicate,
-      'saved' => $saved,
-      'relationship_ids' => $relationshipIDs,
+      'relationship_ids' => $saveResult->column('id'),
     ];
   }
 
@@ -352,19 +362,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
       'case_id' => NULL,
       'end_date' => 'NULL',
     ];
-  }
-
-  /**
-   * Check if there is data to create the object.
-   *
-   * @param array $params
-   *
-   * @deprecated
-   * @return bool
-   */
-  public static function dataExists($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('obsolete');
-    return (isset($params['contact_check']) && is_array($params['contact_check']));
   }
 
   /**
@@ -699,32 +696,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
       }
     }
     return FALSE;
-  }
-
-  /**
-   * This function does the validtion for valid relationship.
-   *
-   * @param array $params
-   *   This array contains the values there are subitted by the form.
-   * @param array $ids
-   *   The array that holds all the db ids.
-   * @param int $contactId
-   *   This is contact id for adding relationship.
-   *
-   * @deprecated
-   *
-   * @return string
-   */
-  public static function checkValidRelationship($params, $ids, $contactId) {
-    $errors = '';
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
-    // function to check if the relationship selected is correct
-    // i.e. employer relationship can exit between Individual and Organization (not between Individual and Individual)
-    if (!CRM_Contact_BAO_Relationship::checkRelationshipType($params['contact_id_a'], $params['contact_id_b'],
-      $params['relationship_type_id'])) {
-      $errors = 'Please select valid relationship between these two contacts.';
-    }
-    return $errors;
   }
 
   /**
@@ -1774,10 +1745,11 @@ AND cc.sort_name LIKE '%$name%'";
    * @throws \CRM_Core_Exception
    */
   public static function membershipTypeToRelationshipTypes(&$params, $direction = NULL) {
-    $membershipType = civicrm_api3('membership_type', 'getsingle', [
-      'id' => $params['membership_type_id'],
-      'return' => 'relationship_type_id, relationship_direction',
-    ]);
+    $membershipType = MembershipType::get(FALSE)
+      ->addSelect('relationship_type_id', 'relationship_direction')
+      ->addWhere('id', '=', $params['membership_type_id'])
+      ->execute()
+      ->single();
     $relationshipTypes = $membershipType['relationship_type_id'];
     if (empty($relationshipTypes)) {
       return NULL;
@@ -2047,7 +2019,11 @@ AND cc.sort_name LIKE '%$name%'";
   public static function isCurrentEmployerNeedingToBeCleared($params, $relationshipId, $updatedRelTypeID = NULL) {
     $existingTypeID = (int) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Relationship', $relationshipId, 'relationship_type_id');
     $updatedRelTypeID = $updatedRelTypeID ?: $existingTypeID;
-    $currentEmployerID = (int) civicrm_api3('Contact', 'getvalue', ['return' => 'current_employer_id', 'id' => $params['contact_id_a']]);
+    $currentEmployerID = Contact::get(FALSE)
+      ->addSelect('employer_id')
+      ->addWhere('id', '=', $params['contact_id_a'])
+      ->execute()
+      ->first()['employer_id'] ?? NULL;
 
     if ($currentEmployerID !== (int) $params['contact_id_b'] || !self::isRelationshipTypeCurrentEmployer($existingTypeID)) {
       return FALSE;
@@ -2062,13 +2038,15 @@ AND cc.sort_name LIKE '%$name%'";
       || ((isset($params['is_active']) && empty($params['is_active'])))
       || $existingTypeID != $updatedRelTypeID) {
       // If there are no other active employer relationships between the same 2 contacts...
-      if (!civicrm_api3('Relationship', 'getcount', [
-        'is_active' => 1,
-        'relationship_type_id' => $existingTypeID,
-        'id' => ['<>' => $params['id']],
-        'contact_id_a' => $params['contact_id_a'],
-        'contact_id_b' => $params['contact_id_b'],
-      ])) {
+      $relationships = Relationship::get(FALSE)
+        ->selectRowCount()
+        ->addWhere('is_active', '=', TRUE)
+        ->addWhere('relationship_type_id', '=', $existingTypeID)
+        ->addWhere('id', '!=', $params['id'])
+        ->addWhere('contact_id_a', '=', $params['contact_id_a'])
+        ->addWhere('contact_id_b', '=', $params['contact_id_b'])
+        ->execute();
+      if (!$relationships->count()) {
         return TRUE;
       }
     }
@@ -2214,6 +2192,8 @@ SELECT count(*)
       $extraneousIncomingKeys = [
         'membership_type_id.relationship_type_id',
         'membership_type_id.relationship_direction',
+        'owner_membership_id.contact_id',
+        'owner_contact_id',
         'inheriting_membership_ids',
         'inheriting_contact_ids',
         'relationship_type_ids',

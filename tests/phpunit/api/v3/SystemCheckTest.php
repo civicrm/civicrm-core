@@ -22,6 +22,7 @@ use Civi\Api4\StatusPreference;
  * @group headless
  */
 class api_v3_SystemCheckTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * @throws \CRM_Core_Exception

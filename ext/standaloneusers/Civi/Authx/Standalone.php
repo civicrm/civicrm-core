@@ -11,6 +11,8 @@
 
 namespace Civi\Authx;
 
+use Civi\Standalone\Event\LogoutEvent;
+
 class Standalone implements AuthxInterface {
 
   /**
@@ -55,6 +57,8 @@ class Standalone implements AuthxInterface {
    * @inheritDoc
    */
   public function logoutSession() {
+    $this->dispatchLogoutEvent();
+
     global $loggedInUserId;
     $loggedInUserId = NULL;
 
@@ -75,11 +79,18 @@ class Standalone implements AuthxInterface {
    * @inheritDoc
    */
   public function logoutStateless() {
+    $this->dispatchLogoutEvent();
+
     global $loggedInUserId;
     $loggedInUserId = NULL;
 
     \CRM_Core_Session::singleton()->reset();
     $_SESSION = [];
+  }
+
+  private function dispatchLogoutEvent(): void {
+    $event = new LogoutEvent($this->getCurrentUserId());
+    \Civi::dispatcher()->dispatch('civi.standalone.logout', $event);
   }
 
   /**
@@ -97,8 +108,15 @@ class Standalone implements AuthxInterface {
    * @inheritDoc
    */
   public function getUserIsBlocked($userId) {
-    // ToDo
-    return FALSE;
+    $user = \Civi\Api4\User::get(FALSE)
+      ->addSelect('is_active')
+      ->addWhere('id', '=', $userId)
+      ->execute()
+      ->first();
+
+    // An unknown user is handled by the normal invalid-principal checks, while
+    // an inactive Standalone user is blocked.
+    return $user !== NULL && !$user['is_active'];
   }
 
 }

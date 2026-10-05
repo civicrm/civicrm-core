@@ -57,7 +57,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   public function setUp(): void {
     parent::setUp();
     $this->createLoggedInUser();
-    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
+    $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
     $this->individualCreate([], 0);
     $this->_params = [
       'contact_id' => $this->ids['Contact'][0],

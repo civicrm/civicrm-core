@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\Email;
 use Civi\Api4\OptionValue;
 
 /**
@@ -463,36 +464,39 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up some data for us to do testing on.
    */
   public function setUpContactExportData(): void {
-    $this->contactIDs[] = $contactA = $this->individualCreate(['gender_id' => 'Female']);
+    $this->contactIDs[] = $contactA = $this->individualCreate(['gender_id:name' => 'Female']);
     // Create address for contact A.
     $params = [
       'contact_id' => $contactA,
-      'location_type_id' => 'Home',
+      'location_type_id:name' => 'Home',
       'street_address' => 'Ambachtstraat 23',
       'postal_code' => '6971 BN',
       'country_id' => '1152',
       'city' => 'Brummen',
       'is_primary' => 1,
     ];
-    $result = $this->callAPISuccess('address', 'create', $params);
+    $result = $this->createTestEntity('Address', $params);
     $addressId = $result['id'];
 
-    $this->callAPISuccess('email', 'create', [
-      'id' => $this->callAPISuccessGetValue('Email', ['contact_id' => $params['contact_id'], 'return' => 'id']),
-      'location_type_id' => 'Home',
-      'email' => 'home@example.com',
-      'is_primary' => 1,
-    ]);
-    $this->callAPISuccess('email', 'create', ['contact_id' => $params['contact_id'], 'location_type_id' => 'Work', 'email' => 'work@example.com', 'is_primary' => 0]);
+    Email::update()
+      ->addWhere('contact_id', '=', $params['contact_id'])
+      ->setValues([
+        'location_type_id:name' => 'Home',
+        'email' => 'home@example.com',
+        'is_primary' => 1,
+      ]
+     )->execute();
+
+    $this->createTestEntity('Email', ['contact_id' => $params['contact_id'], 'location_type_id:name' => 'Work', 'email' => 'work@example.com', 'is_primary' => 0]);
 
     $params['is_primary'] = 0;
     $params['location_type_id'] = 'Work';
     $this->callAPISuccess('address', 'create', $params);
     $this->contactIDs[] = $contactB = $this->individualCreate([], 1);
 
-    $this->callAPISuccess('address', 'create', [
+    $this->createTestEntity('Address', [
       'contact_id' => $contactB,
-      'location_type_id' => 'Home',
+      'location_type_id:name' => 'Home',
       'master_id' => $addressId,
     ]);
     $this->masterAddressID = $addressId;
@@ -564,8 +568,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function testExportPseudoFieldCampaign(): void {
     $this->setUpContributionExportData();
-    $campaign = $this->callAPISuccess('Campaign', 'create', ['title' => 'Big campaign and kinda long too']);
-    $this->callAPISuccess('Contribution', 'create', ['campaign_id' => $campaign['id'], 'id' => $this->contributionIDs[0]]);
+    $campaign = $this->campaignCreate(['title' => 'Big campaign and kinda long too']);
+    $this->callAPISuccess('Contribution', 'create', ['campaign_id' => $campaign, 'id' => $this->contributionIDs[0]]);
     $selectedFields = [
       ['contact_type' => 'Individual', 'name' => 'gender_id'],
       ['contact_type' => 'Contribution', 'name' => 'contribution_campaign_title'],
@@ -579,7 +583,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ]);
     $row = $this->csv->nth(0);
     $this->assertEquals('Big campaign and kinda long too', $row['Campaign Title']);
-    $this->assertEquals($campaign['id'], $row['Campaign ID']);
+    $this->assertEquals($campaign, $row['Campaign ID']);
   }
 
   /**
@@ -724,12 +728,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'select_string' => ['text_length' => strlen($longString)],
       'checkbox' => ['text_length' => 10],
       'radio' => ['text_length' => strlen($longString)],
+      'float' => ['text_length' => 5],
     ]);
     $this->addOptionToCustomField('select_string', ['label' => $longString, 'name' => 'blah']);
     $this->addOptionToCustomField('radio', ['label' => $longString, 'name' => 'blah', 'value' => 6]);
+    $this->addOptionToCustomField('float', ['label' => $longString . 'very', 'name' => 'blah2', 'value' => 10]);
     $longUrl = 'https://stage.example.org/system/files/webform/way_too_long_url_that_still_fits_in_a_link_custom_field_but_would_fail_to_export_with_html.jpg';
 
-    $this->callAPISuccess('Contact', 'create', [
+    $this->callAPIV3Success('Contact', 'create', [
       'id' => $this->contactIDs[1],
       $this->getCustomFieldName('text') => $longString,
       $this->getCustomFieldName('country') => 'LA',
@@ -738,6 +744,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $this->getCustomFieldName('link') => $longUrl,
       $this->getCustomFieldName('checkbox') => ['L', 'P', 'M', 'V'],
       $this->getCustomFieldName('radio') => 6,
+      $this->getCustomFieldName('float') => 10,
     ]);
     $selectedFields = [
       ['name' => 'city', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Billing')],
@@ -747,6 +754,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['name' => $this->getCustomFieldName('link')],
       ['name' => $this->getCustomFieldName('checkbox')],
       ['name' => $this->getCustomFieldName('radio')],
+      ['name' => $this->getCustomFieldName('float')],
     ];
     $this->doExportTest([
       'fields' => $selectedFields,
@@ -760,6 +768,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->assertEquals($longUrl, $row['test_link']);
     $this->assertEquals("Lilac, Purple, Mauve, Violet", $row['Pick Shade']);
     $this->assertEquals($longString, $row['Integer radio']);
+    $this->assertEquals($longString . 'very', $row['Number select']);
   }
 
   /**
@@ -1180,7 +1189,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->setUpContactSameAddressExportData();
     $this->callAPISuccess('OptionValue', 'create', [
       'option_group_id' => 'postal_greeting',
-      'label' => '{contact.individual_suffix} {contact.last_name} and first is {contact.first_name} ',
+      'label' => '{contact.individual_suffix} {contact.last_name} and first is {contact.first_name}',
       // This hard coded number makes it available for export use.
       'filter' => 4,
     ]);
@@ -1197,8 +1206,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ]);
     $this->assertExpectedOutput([
       'Addressee' => 'random string Mr. Anthony Anderson II, Mr. Joe Miller II',
-      'Email Greeting' => 'II Anderson and first is Anthony , II Miller Joe ',
-      'Postal Greeting' => 'II Anderson and first is Anthony , II Miller Joe ',
+      'Email Greeting' => 'II Anderson and first is Anthony, II Miller Joe',
+      'Postal Greeting' => 'II Anderson and first is Anthony, II Miller Joe',
     ], $this->csv->nth(0));
     // 3 contacts merged to 2.
     $this->assertCount(2, $this->csv);

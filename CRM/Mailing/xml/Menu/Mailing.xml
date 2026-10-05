@@ -177,7 +177,7 @@
     <path>civicrm/mailing/view</path>
     <title>View Mailing</title>
     <page_callback>CRM_Mailing_Page_View</page_callback>
-    <access_arguments>view public CiviMail content;access CiviMail;approve mailings</access_arguments>
+    <access_arguments>view public CiviMail content;approve mailings</access_arguments>
     <is_public>true</is_public>
     <weight>800</weight>
   </item>

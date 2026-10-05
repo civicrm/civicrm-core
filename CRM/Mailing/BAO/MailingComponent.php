@@ -21,28 +21,6 @@ use Civi\Core\Event\PostEvent;
 class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent implements Civi\Core\HookInterface {
 
   /**
-   * @deprecated
-   * @param array $params
-   * @param array $defaults
-   * @return self|null
-   */
-  public static function retrieve($params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Mailing_DAO_MailingComponent', $id, 'is_active', $is_active);
-  }
-
-  /**
    * Create and Update mailing component.
    *
    * @param array $params

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   let formTypes;
@@ -48,7 +48,7 @@
               });
             }
           });
-          this.formType.options = _.sortBy(links, 'Label');
+          this.formType.options = links;
         }
 
         if (ctrl.tab === 'block') {
@@ -61,9 +61,9 @@
               });
             }
           });
-          this.formType.options = _.sortBy(links, (item) => {
-            return item.url === '#create/block/*' ? '0' : item.label;
-          });
+          // The content block (*) sorts to the top; everything else by label
+          const sortKey = (item) => item.url === '#create/block/*' ? '0' : item.label;
+          this.formType.options = links.sort((a, b) => sortKey(a) < sortKey(b) ? -1 : (sortKey(a) > sortKey(b) ? 1 : 0));
           // Add divider after the * entity (content block)
           this.formType.options.splice(1, 0, {'class': 'divider', label: ''});
         }
@@ -77,4 +77,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

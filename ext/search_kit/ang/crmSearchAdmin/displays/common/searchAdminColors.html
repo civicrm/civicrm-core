@@ -1,0 +1,6 @@
+<div class="form-inline" ng-if="$ctrl.colorField">
+  <label title="{{:: ts('Display this field as a colored badge, using its associated color.') }}">
+    <input type="checkbox" ng-checked="$ctrl.item.colors && $ctrl.item.colors.length" ng-click="$ctrl.toggleColor()">
+    {{:: $ctrl.colorLabel }}
+  </label>
+</div>

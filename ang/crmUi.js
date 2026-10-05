@@ -1,5 +1,5 @@
 /// crmUi: Sundry UI helpers
-(function (angular, $, _) {
+(function (angular, $) {
 
   let uidCount = 0,
     pageTitleHTML = 'CiviCRM',
@@ -632,7 +632,7 @@
               $timeout(function () {
                 // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
                 // new item is added before selection is made
-                let newVal = _.cloneDeep(ngModel.$modelValue);
+                let newVal = structuredClone(ngModel.$modelValue);
                 // Fix possible data-type mismatch
                 if (typeof newVal === 'string' && element.select2('container').hasClass('select2-container-multi')) {
                   newVal = newVal.length ? newVal.split(scope.crmUiSelect.separator || ',') : [];
@@ -715,7 +715,7 @@
             $timeout(function () {
               // ex: msg_template_id adds new item then selects it; use $timeout to ensure that
               // new item is added before selection is made
-              let newVal = _.cloneDeep(ngModel.$modelValue);
+              let newVal = structuredClone(ngModel.$modelValue);
               // Fix possible data-type mismatch
               if (typeof newVal === 'string' && element.select2('container').hasClass('select2-container-multi')) {
                 newVal = newVal.length ? newVal.split(',') : [];
@@ -778,9 +778,9 @@
             const list = [];
 
             if (viewValue) {
-              _.each(viewValue.split(','), function(value) {
+              viewValue.split(',').forEach((value) => {
                 if (value) {
-                  list.push(_.trim(value));
+                  list.push(value.trim());
                 }
               });
             }
@@ -845,7 +845,7 @@
         link: function(scope, element, attrs, ctrl) {
           ctrl.$parsers.unshift(function(viewValue) {
             // if empty value provided simply bypass validation
-            if (_.isEmpty(viewValue)) {
+            if (!viewValue) {
               ctrl.$setValidity('crmMultipleEmail', true);
               return viewValue;
             }
@@ -1207,7 +1207,7 @@
               return;
             }
 
-            CRM.confirm(_.extend(defaults, options))
+            CRM.confirm(Object.assign(defaults, options))
               .on('crmConfirm:yes', function() { scope.$apply(attrs.onYes); })
               .on('crmConfirm:no', function() { scope.$apply(attrs.onNo); });
 
@@ -1369,4 +1369,4 @@
       // useful for debugging: $rootScope.log = console.log || function() {};
     });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

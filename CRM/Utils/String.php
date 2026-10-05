@@ -751,7 +751,7 @@ class CRM_Utils_String {
   }
 
   /**
-   * This function compares two strings.
+   * @deprecated in 6.19 will be removed around 6.25
    *
    * @param string $strOne
    *   String one.
@@ -764,6 +764,7 @@ class CRM_Utils_String {
    *   TRUE (string are identical); FALSE (strings are not identical)
    */
   public static function compareStr($strOne, $strTwo, $case) {
+    CRM_Core_Error::deprecatedFunctionWarning('strcasecmp');
     if ($case == TRUE) {
       // Convert to lowercase and trim white spaces
       if (strtolower(trim($strOne)) == strtolower(trim($strTwo))) {
@@ -907,20 +908,6 @@ class CRM_Utils_String {
   }
 
   /**
-   * @deprecated
-   *
-   * @param string $string
-   *   The long string.
-   * @param string $fragment
-   *   The fragment to look for.
-   * @return bool
-   */
-  public static function endsWith($string, $fragment) {
-    CRM_Core_Error::deprecatedFunctionWarning('str_ends_with');
-    return str_ends_with((string) $string, (string) $fragment);
-  }
-
-  /**
    * @param string|array $patterns
    * @param array $allStrings
    * @param bool $allowNew
@@ -966,7 +953,7 @@ class CRM_Utils_String {
    * @return mixed
    */
   public static function unserialize($string) {
-    if (!is_string($string)) {
+    if (!is_string($string) || $string === '') {
       return FALSE;
     }
     try {

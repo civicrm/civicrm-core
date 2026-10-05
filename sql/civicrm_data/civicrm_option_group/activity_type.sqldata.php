@@ -477,5 +477,14 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'component_id' => 7,
       'icon' => 'fa-trash',
     ],
+    [
+      'label' => ts('Pledge write-off'),
+      'value' => 56,
+      'name' => 'Pledge write-off',
+      'filter' => 1,
+      'description' => ts('Write-off Pledge.'),
+      'is_reserved' => 1,
+      'component_id' => 6,
+    ],
   ])
   ->syncColumns('fill', ['value' => 'weight']);

@@ -17,17 +17,6 @@
 class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\HookInterface {
 
   /**
-   * @deprecated
-   * @param array $params
-   * @param array $defaults
-   * @return self|null
-   */
-  public static function retrieve($params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
    * Get the list of mappings for a select or select2 element.
    *
    * @param string $mappingType
@@ -85,14 +74,12 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
       // it feels like there could be other instances so this is safer.
       $errorParams = $e->getExtraParams();
       if ($errorParams['error_field'] === 'mapping_type_id') {
-        $mappingValues = civicrm_api3('Mapping', 'getoptions', ['field' => 'mapping_type_id']);
-        civicrm_api3('OptionValue', 'create', [
-          'option_group_id' => 'mapping_type',
-          'label' => $mappingType,
-          'name' => $mappingType,
-          'value' => max(array_keys($mappingValues['values'])) + 1,
-          'is_reserved' => 1,
-        ]);
+        \Civi\Api4\OptionValue::create(FALSE)
+          ->addValue('option_group_id:name', 'mapping_type')
+          ->addValue('label', $mappingType)
+          ->addValue('name', $mappingType)
+          ->addValue('is_reserved', TRUE)
+          ->execute();
         return CRM_Core_BAO_Mapping::getMappings($mappingType);
       }
       throw $e;

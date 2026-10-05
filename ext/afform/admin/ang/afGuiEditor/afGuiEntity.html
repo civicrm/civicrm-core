@@ -13,11 +13,15 @@
                class="form-control"
                placeholder="{{:: ts('Pick Date') }}"
                ng-if="getField($ctrl.getEntityType(), fieldName)['input_type'] === 'Date' && $ctrl.entity.data[fieldName] === 'now'">
+        <input disabled
+               class="form-control"
+               ng-if="getUnsetControlField(fieldName)"
+               placeholder="{{ ts('Set %1 first', {1: getUnsetControlField(fieldName)}) }}" />
         <input required
-               ng-if="getField($ctrl.getEntityType(), fieldName)['input_type'] !== 'Date' || $ctrl.entity.data[fieldName] !== 'now'"
+               ng-if="!getUnsetControlField(fieldName) && (getField($ctrl.getEntityType(), fieldName)['input_type'] !== 'Date' || $ctrl.entity.data[fieldName] !== 'now')"
                id="{{ $ctrl.getFieldId(fieldName) }}"
                class="form-control"
-               af-gui-field-value="getField($ctrl.getEntityType(), getUnsuffixedName(fieldName))"
+               af-gui-field-value="getValueField(fieldName)"
                ng-model-options="{ getterSetter: true }"
                ng-model="entityDataGetterSetter(fieldName)" />
         <a href ng-click="removeValue($ctrl.entity, fieldName)">

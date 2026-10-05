@@ -61,8 +61,23 @@ class GetMergedTo extends \Civi\Api4\Generic\AbstractAction {
         ->addWhere('activity_id', '=', $deleteActivity['activity_id.parent_id'])
         ->addWhere('record_type_id:name', '=', 'Activity Targets')
         ->execute()
-        ->first()['contact_id'];
+        ->first()['contact_id'] ?? NULL;
     }
+    // If the original contact was deleted from trash, then the above ActivityContact
+    // will be gone, but we can get the new contact ID from the source_record_id on
+    // the Contact Merged activity that targets the new contact.
+    if (empty($returnId)) {
+      $returnId = \Civi\Api4\Activity::get($this->checkPermissions)
+        ->addSelect('target_contact_id')
+        ->addWhere('activity_type_id:name', '=', 'Contact Merged')
+        ->addWhere('source_record_id', '=', $this->contactId)
+        ->addWhere('is_deleted', '=', FALSE)
+        ->addWhere('is_test', '=', $this->isTest)
+        ->addOrderBy('activity_date_time', 'DESC')
+        ->setLimit(1)
+        ->execute()->first()['target_contact_id'][0] ?? NULL;
+    }
+
     $result[] = (empty($returnId) ? $returnId : ['id' => $returnId]);
   }
 

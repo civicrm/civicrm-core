@@ -239,7 +239,7 @@
     <path>civicrm/import/participant</path>
     <title>Import Participants</title>
     <page_callback>CRM_Import_Controller</page_callback>
-    <access_arguments>access CiviEvent,edit event participants</access_arguments>
+    <access_arguments>edit event participants</access_arguments>
     <page_type>1</page_type>
     <weight>840</weight>
   </item>

@@ -19,6 +19,7 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\Event\Subscriber\ValidateFieldsSubscriber;
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\MockBasicEntity;
@@ -120,6 +121,40 @@ class RequiredActionParameterTest extends Api4TestBase {
     $this->expectException(\CRM_Core_Exception::class);
     $this->expectExceptionMessage('Parameter "string" is required.');
     $action->setString('');
+    $action->execute();
+  }
+
+  public function testObjectNotAllowed(): void {
+    $object = new \stdClass();
+
+    static::assertFalse(ValidateFieldsSubscriber::checkType($object, ['mixed']));
+    static::assertFalse(ValidateFieldsSubscriber::checkType($object, ['string']));
+    static::assertFalse(ValidateFieldsSubscriber::checkType($object, ['array']));
+
+    $action = new class(MockBasicEntity::getEntityName(), 'mixed') extends AbstractAction {
+
+      /**
+       * @var mixed
+       */
+      protected $mixed;
+
+      public function setMixed($mixed) {
+        $this->mixed = $mixed;
+        return $this;
+      }
+
+      public function getMixed() {
+        return $this->mixed;
+      }
+
+      public function _run(Result $result) {
+      }
+
+    };
+
+    $action->setMixed($object);
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('Parameter "mixed" is not of the correct type.');
     $action->execute();
   }
 

@@ -26,6 +26,7 @@ use Civi\Api4\Membership;
  * @group headless
  */
 class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * Caches some reference dates
@@ -182,7 +183,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testByDefaultTestsAreExcluded(): void {
     $testId = $this->createTestMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership', []);
 
     $this->assertEquals('Grace', $this->getMembershipStatus($testId));
   }
@@ -192,7 +193,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
    */
   public function testByDefaultInactiveAreExcluded(): void {
     $oldId = $this->createOldMembershipThatShouldBeCurrent();
-    $this->callAPISuccess('job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership', []);
     $this->assertEquals('Grace', $this->getMembershipStatus($oldId));
   }
 
@@ -201,7 +202,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
    */
   public function testByDefaultGraceIsConsidered(): void {
     $graceID = $this->createGraceMembershipThatShouldBeCurrent();
-    $this->callAPISuccess('job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership', []);
     $this->assertEquals('Current', $this->getMembershipStatus($graceID));
   }
 
@@ -213,7 +214,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
    */
   public function testByDefaultPendingIsExcluded(): void {
     $pendingID = $this->createPendingMembershipThatShouldBeCurrent();
-    $this->callAPISuccess('job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership', []);
     $this->assertEquals('Pending', $this->getMembershipStatus($pendingID));
   }
 
@@ -222,7 +223,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
    */
   public function testByDefaultDeceasedIsExcluded(): void {
     $deceasedID = $this->createDeceasedMembershipThatShouldBeExpired();
-    $this->callAPISuccess('job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership', []);
     $this->assertEquals('Deceased', $this->getMembershipStatus($deceasedID));
   }
 
@@ -236,7 +237,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testIncludingTestMembershipsExcludesPending(): void {
     $pendingId = $this->createPendingMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'exclude_test_memberships' => FALSE,
     ]);
 
@@ -250,7 +251,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testIncludingTestMembershipsConsidersGrace(): void {
     $graceId = $this->createGraceMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'exclude_test_memberships' => FALSE,
     ]);
 
@@ -264,7 +265,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testIncludingTestMembershipsIgnoresInactive(): void {
     $oldId = $this->createOldMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'exclude_test_memberships' => FALSE,
     ]);
 
@@ -278,7 +279,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testIncludingTestMembershipsActuallyIncludesThem(): void {
     $testId = $this->createTestMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'exclude_test_memberships' => FALSE,
     ]);
 
@@ -292,7 +293,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testIncludingTestMembershipsStillIgnoresDeceased(): void {
     $deceasedId = $this->createDeceasedMembershipThatShouldBeExpired();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'exclude_test_memberships' => FALSE,
     ]);
 
@@ -309,7 +310,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testIncludingInactiveMembershipTypesStillExcludesPending(): void {
     $pendingId = $this->createPendingMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'only_active_membership_types' => FALSE,
     ]);
 
@@ -323,7 +324,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testIncludingInactiveMembershipTypesConsidersGrace(): void {
     $graceId = $this->createGraceMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'only_active_membership_types' => FALSE,
     ]);
 
@@ -337,7 +338,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testIncludingInactiveMembershipTypesConsidersInactive(): void {
     $oldId = $this->createOldMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'only_active_membership_types' => FALSE,
     ]);
 
@@ -351,7 +352,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testIncludingInactiveMembershipTypesStillIgnoresTests(): void {
     $testId = $this->createTestMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'only_active_membership_types' => FALSE,
     ]);
 
@@ -365,7 +366,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testMembershipTypeDeceasedIsExcluded(): void {
     $deceasedId = $this->createDeceasedMembershipThatShouldBeExpired();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'only_active_membership_types' => FALSE,
     ]);
 
@@ -379,7 +380,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testSpecifyingTheStatusIdsToExcludeStillExcludesDeceased(): void {
     $deceasedId = $this->createDeceasedMembershipThatShouldBeExpired();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'exclude_membership_status_ids' => [
         CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
       ],
@@ -395,7 +396,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testSpecifyingTheStatusIdsToExcludeStillExcludesTests(): void {
     $testId = $this->createTestMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'exclude_membership_status_ids' => [
         CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
       ],
@@ -411,7 +412,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testSpecifyingTheStatusIdsToExcludeStillExcludesInactive(): void {
     $oldId = $this->createOldMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'exclude_membership_status_ids' => [
         CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
       ],
@@ -427,7 +428,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testSpecifyingTheStatusIdsToExcludeGraceIsIncludedByDefault(): void {
     $graceId = $this->createGraceMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'exclude_membership_status_ids' => [
         CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
       ],
@@ -444,7 +445,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testSpecifyingTheStatusIdsToExcludePendingIsExcludedByDefault(): void {
     $pendingId = $this->createPendingMembershipThatShouldBeCurrent();
 
-    $this->callAPISuccess('job', 'process_membership', [
+    $this->callApiV3Success('Job', 'process_membership', [
       'exclude_membership_status_ids' => [
         CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
       ],

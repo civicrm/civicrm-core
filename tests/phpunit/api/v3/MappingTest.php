@@ -17,6 +17,7 @@
  * @group headless
  */
 class api_v3_MappingTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   protected $params;
   protected $id;

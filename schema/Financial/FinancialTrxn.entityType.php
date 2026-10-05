@@ -4,6 +4,7 @@ return [
   'name' => 'FinancialTrxn',
   'table' => 'civicrm_financial_trxn',
   'class' => 'CRM_Financial_DAO_FinancialTrxn',
+  'token_class' => 'CRM_Financial_FinancialTrxnTokens',
   'getInfo' => fn() => [
     'title' => ts('Financial Trxn'),
     'title_plural' => ts('Financial Trxns'),
@@ -93,6 +94,9 @@ return [
     'total_amount' => [
       'title' => ts('Financial Total Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => NULL,
       'required' => TRUE,
       'description' => ts('amount of transaction'),
@@ -101,6 +105,9 @@ return [
     'fee_amount' => [
       'title' => ts('Financial Fee Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => NULL,
       'description' => ts('actual processor fee if known - may be 0.'),
       'add' => '1.3',
@@ -108,6 +115,9 @@ return [
     'net_amount' => [
       'title' => ts('Financial Net Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => NULL,
       'description' => ts('actual funds transfer amount. total less fees. if processor does not report actual fee during transaction, this is set to total_amount.'),
       'add' => '1.3',
@@ -121,6 +131,11 @@ return [
       'default' => NULL,
       'usage' => [
         'export',
+      ],
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'SET NULL',
       ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('searchAdminDisplayAutocomplete', {
@@ -27,15 +27,15 @@
           searchFields.push('description');
           searchFields.forEach((field) => {
             if (ctrl.parent.savedSearch.api_params.select.includes(field)) {
-              ctrl.display.settings.columns.push(searchMeta.fieldToColumn(field, {}));
+              ctrl.display.settings.columns.push(searchMeta.fieldToColumn(field, {}, ctrl.parent.savedSearch));
             }
           });
         }
         ctrl.parent.initColumns({});
         ctrl.display.settings.searchFields = ctrl.display.settings.searchFields || [];
         if (!ctrl.display.settings.searchFields.length) {
-          const baseEntity = searchMeta.getBaseEntity();
-          if (searchMeta.getField('id')) {
+          const baseEntity = searchMeta.getEntity(ctrl.apiEntity);
+          if (searchMeta.getField('id', ctrl.apiEntity)) {
             ctrl.display.settings.searchFields.push('id');
           }
           if (baseEntity.search_fields && baseEntity.search_fields.length) {
@@ -43,10 +43,10 @@
           }
         }
         // Ensure array is unique
-        ctrl.display.settings.searchFields = _.uniq(ctrl.display.settings.searchFields);
+        ctrl.display.settings.searchFields = [...new Set(ctrl.display.settings.searchFields)];
       };
 
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

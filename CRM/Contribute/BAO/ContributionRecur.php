@@ -241,10 +241,11 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    *   pseudo processor used for pay-later.
    */
   public static function getPaymentProcessorID($recurID) {
-    $recur = civicrm_api3('ContributionRecur', 'getsingle', [
-      'id' => $recurID,
-      'return' => ['payment_processor_id'],
-    ]);
+    $recur = ContributionRecur::get(FALSE)
+      ->addSelect('payment_processor_id')
+      ->addWhere('id', '=', $recurID)
+      ->execute()
+      ->first();
     return (int) ($recur['payment_processor_id'] ?? 0);
   }
 
@@ -633,7 +634,7 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
    * @param int $targetContributionId
    */
   public static function copyCustomValues($recurId, $targetContributionId) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     if ($recurId && $targetContributionId) {
       // get the initial contribution id of recur id
       $sourceContributionId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
@@ -854,13 +855,14 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
    * @param string $effectiveDate
    *
    * @throws \CRM_Core_Exception
+   * @internal
    */
   public static function updateOnNewPayment($recurringContributionID, string $paymentStatus, string $effectiveDate = 'now') {
     if (!in_array($paymentStatus, ['Completed', 'Failed'])) {
       return;
     }
 
-    $existingRecur = \Civi\Api4\ContributionRecur::get(FALSE)
+    $existingRecur = ContributionRecur::get(FALSE)
       ->addSelect('contribution_status_id:name', 'next_sched_contribution_date', 'frequency_unit', 'frequency_interval', 'installments', 'failure_count')
       ->addWhere('id', '=', $recurringContributionID)
       ->execute()
@@ -873,17 +875,17 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
       $updatedRecurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'In Progress');
     }
     if ($paymentStatus == 'Failed') {
-      $updatedRecurParams['failure_count'] = $existingRecur['failure_count'];
+      $updatedRecurParams['failure_count'] = (int) $existingRecur['failure_count'] + 1;
     }
     $updatedRecurParams['modified_date'] = date('Y-m-d H:i:s');
 
     if (!empty($existingRecur['installments']) && self::isComplete($recurringContributionID, $existingRecur['installments'])) {
       // Update Recur to "Completed"
       $updatedRecurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Completed');
-      $updatedRecurParams['next_sched_contribution_date'] = 'null';
+      $updatedRecurParams['next_sched_contribution_date'] = NULL;
       $updatedRecurParams['end_date'] = 'now';
     }
-    else {
+    elseif ($paymentStatus === 'Completed') {
       // Only update next sched date if it's empty or up to 48 hours away because payment processors may be managing
       // the scheduled date themselves as core did not previously provide any help. This check can possibly be removed
       // as it's unclear if it actually is helpful...
@@ -896,7 +898,9 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
         $updatedRecurParams['next_sched_contribution_date'] = date('Y-m-d', strtotime('+' . $existingRecur['frequency_interval'] . ' ' . $existingRecur['frequency_unit'], strtotime($effectiveDate)));
       }
     }
-    civicrm_api3('ContributionRecur', 'create', $updatedRecurParams);
+    ContributionRecur::save(FALSE)
+      ->setRecords([$updatedRecurParams])
+      ->execute();
   }
 
   /**

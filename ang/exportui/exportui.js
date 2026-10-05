@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('exportui', CRM.angRequires('exportui'));
 
   angular.module('exportui', CRM.angular.modules)
@@ -14,11 +14,7 @@
       $scope.contact_types = CRM.vars.exportUi.contact_types;
       $scope.location_type_id = [{id: '', text: ts('Primary')}].concat(CRM.vars.exportUi.location_type_id);
       // Map of all fields keyed by name
-      $scope.fields = _.transform(CRM.vars.exportUi.fields, function (result, category) {
-        _.each(category.children, function (field) {
-          result[field.id] = field;
-        });
-      }, {});
+      $scope.fields = Object.fromEntries(CRM.vars.exportUi.fields.flatMap((category) => (category.children || []).map((field) => [field.id, field])));
       $scope.data = {
         preview: CRM.vars.exportUi.preview_data,
         contact_type: '',
@@ -26,18 +22,13 @@
       };
       // For the "add new field" dropdown
       $scope.new = {col: ''};
-      var contactTypes = _.transform($scope.contact_types, function (result, type) {
-        result.push(type.id);
-        _.each(type.children || [], function (subType) {
-          result.push(subType.id);
-        });
-      });
-      var cids = _.filter(_.map(CRM.vars.exportUi.preview_data, 'id'));
+      var contactTypes = $scope.contact_types.flatMap((type) => [type.id].concat((type.children || []).map((subType) => subType.id)));
+      var cids = CRM.vars.exportUi.preview_data.map((row) => row.id).filter(Boolean);
 
       // Get fields for performing the export or saving the field mapping
       function getSelectedColumns() {
         var map = [];
-        _.each($scope.data.columns, function (col, no) {
+        $scope.data.columns.forEach((col, no) => {
           // Make a copy of col without the extra angular props
           var item = JSON.parse(angular.toJson(col));
           delete item.select;
@@ -53,8 +44,8 @@
       function loadFieldMap(map) {
         $scope.data.columns = [];
         var mapContactTypes = [];
-        _.each(map, function (col) {
-          if (_.contains(contactTypes, col.contact_type)) {
+        map.forEach((col) => {
+          if (contactTypes.includes(col.contact_type)) {
             mapContactTypes.push(col.contact_type);
           }
           if (col.relationship_type_id && col.relationship_direction) {
@@ -65,7 +56,7 @@
           $scope.data.columns.push(col);
         });
         // If all the fields are for the same contact type, set it form-wide
-        if (!$scope.data.contact_type && _.unique(mapContactTypes).length === 1) {
+        if (!$scope.data.contact_type && new Set(mapContactTypes).size === 1) {
           $scope.data.contact_type = mapContactTypes[0];
         }
       }
@@ -73,13 +64,12 @@
       // Return fields relevant to a contact type
       // Filter out non-contact fields (for relationship selectors)
       function filterFields(contactType, onlyContact) {
-        return _.transform(CRM.vars.exportUi.fields, function (result, cat) {
+        const result = [];
+        CRM.vars.exportUi.fields.forEach((cat) => {
           if (!cat.is_contact && onlyContact) {
             return;
           }
-          var fields = _.filter(cat.children, function (field) {
-            return !field.contact_type || !contactType || _.contains(field.contact_type, contactType);
-          });
+          var fields = cat.children.filter((field) => !field.contact_type || !contactType || field.contact_type.includes(contactType));
           if (fields.length) {
             result.push({
               id: cat.id,
@@ -88,6 +78,7 @@
             });
           }
         });
+        return result;
       }
 
       $scope.getFields = function () {
@@ -125,10 +116,10 @@
           params['contact_' + a] = {'IN': cids};
           (function (field, params) {
             crmApi('Relationship', 'get', params).then(function (data) {
-              _.each(data.values, function (rel) {
+              (data.values || []).forEach((rel) => {
                 var row = cids.indexOf(rel['contact_id_' + a]);
                 if (row > -1) {
-                  _.each(rel["api.Contact.getsingle"], function (item, key) {
+                  Object.entries(rel["api.Contact.getsingle"] || {}).forEach(([key, item]) => {
                     $scope.data.preview[row][field.relationship_type_id + '_' + field.relationship_direction + '_' + key] = item;
                   });
                 }
@@ -145,9 +136,7 @@
           autoOpen: false,
           title: ts('Save Fields')
         });
-        var mappingNames = _.transform(CRM.vars.exportUi.mapping_names, function (result, n, key) {
-          result[key] = n.toLowerCase();
-        });
+        var mappingNames = Object.fromEntries(Object.entries(CRM.vars.exportUi.mapping_names).map(([key, n]) => [key, n.toLowerCase()]));
         var model = {
           ts: ts,
           saving: false,
@@ -158,7 +147,7 @@
           new_name: CRM.vars.exportUi.mapping_id ? CRM.vars.exportUi.mapping_names[CRM.vars.exportUi.mapping_id] : '',
           description: CRM.vars.exportUi.mapping_description,
           nameIsUnique: function () {
-            return !_.contains(mappingNames, this.new_name.toLowerCase()) || (this.overwrite === '1' && this.new_name.toLowerCase() === this.mapping_names[this.mapping_id].toLowerCase());
+            return !mappingNames.includes(this.new_name.toLowerCase()) || (this.overwrite === '1' && this.new_name.toLowerCase() === this.mapping_names[this.mapping_id].toLowerCase());
           },
           saveMapping: function () {
             this.saving = true;
@@ -171,7 +160,7 @@
               },
               mappingFields = getSelectedColumns();
             if (!mapping.id) {
-              _.each(mappingFields, function (field) {
+              mappingFields.forEach((field) => {
                 delete field.id;
               });
             }
@@ -217,7 +206,7 @@
 
         // When adding/removing columns
         $scope.$watch('data.columns', function (values) {
-          _.each(values, function (col, index) {
+          (values || []).forEach((col, index) => {
             // Remove empty values
             if (!col.select) {
               $scope.data.columns.splice(index, 1);
@@ -233,7 +222,7 @@
               }
               var field = col.name ? $scope.fields[col.name] : {};
               col.location_type_id = field.has_location ? col.location_type_id || '' : null;
-              _.each($scope.option_list, function (options, list) {
+              Object.entries($scope.option_list || {}).forEach(([list, options]) => {
                 col[list] = (col.location_type_id || !field.has_location) && field.option_list === list ? col[list] || options[0].id : null;
               });
             }
@@ -250,4 +239,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

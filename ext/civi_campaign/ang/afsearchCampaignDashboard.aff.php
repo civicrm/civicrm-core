@@ -6,8 +6,7 @@ return [
   'title' => E::ts('Campaign Dashboard'),
   'icon' => 'fa-table',
   'server_route' => 'civicrm/campaign',
-  'permission' => ['administer CiviCampaign', 'manage campaign'],
-  'permission_operator' => 'OR',
+  'permission' => ['manage campaign'],
   'navigation' => [
     'parent' => 'Campaigns',
     'label' => E::ts('Campaign Dashboard'),

@@ -156,7 +156,8 @@ class CRM_Admin_Form extends CRM_Core_Form {
     if (isset($this->_id) && CRM_Utils_Rule::positiveInteger($this->_id)) {
       if ($this->retrieveMethod === 'retrieve') {
         $params = ['id' => $this->_id];
-        if (!empty(ReflectionUtils::getCodeDocs((new \ReflectionMethod($this->_BAOName, 'retrieve')), 'Method')['deprecated'])) {
+        // A BAO whose retrieve() is deprecated or gone loads via commonRetrieve().
+        if (!method_exists($this->_BAOName, 'retrieve') || !empty(ReflectionUtils::getCodeDocs((new \ReflectionMethod($this->_BAOName, 'retrieve')), 'Method')['deprecated'])) {
           CRM_Core_DAO::commonRetrieve($this->_BAOName, $params, $this->_values);
         }
         else {

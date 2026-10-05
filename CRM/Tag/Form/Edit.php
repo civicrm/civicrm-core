@@ -122,6 +122,10 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
         $isReserved->freeze();
       }
       $this->assign('adminReservedTags', $adminReservedTags);
+
+      $createdId = $this->_id ? ($this->_values['created_id'] ?? NULL) : NULL;
+      $this->assign('createdDate', $this->_id ? ($this->_values['created_date'] ?? NULL) : NULL);
+      $this->assign('createdByName', $createdId ? CRM_Contact_BAO_Contact::displayName($createdId) : NULL);
     }
     $this->setPageTitle($this->_isTagSet ? ts('Tag Set') : ts('Tag'));
     parent::buildQuickForm();
@@ -145,7 +149,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       $defaults = $this->_values;
     }
     if (empty($defaults['color'])) {
-      $defaults['color'] = '#ffffff';
+      $defaults['color'] = $this->_action == CRM_Core_Action::ADD ? CRM_Utils_Color::getRandomColor() : '#ffffff';
     }
     if (empty($this->_id) && empty($defaults['used_for'])) {
       $defaults['used_for'] = 'civicrm_contact';

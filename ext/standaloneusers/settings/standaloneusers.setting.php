@@ -2,6 +2,17 @@
 use CRM_Standaloneusers_ExtensionUtil as E;
 
 return [
+  'standaloneusers_allow_public_registration' => [
+    'name' => 'standaloneusers_allow_public_registration',
+    'group' => 'standaloneusers',
+    'type' => 'Boolean',
+    'title' => E::ts('Users Can Register'),
+    'description' => E::ts('Allow public user registration.'),
+    'default' => FALSE,
+    'html_type' => 'toggle',
+    'is_domain' => 1,
+    'is_contact' => 0,
+  ],
   'standaloneusers_session_max_lifetime' => [
     'name' => 'standaloneusers_session_max_lifetime',
     'group' => 'standaloneusers',
@@ -62,5 +73,23 @@ return [
     'is_contact' => 0,
     'html_type' => 'file',
     'settings_pages' => ['display' => ['section' => 'theme', 'weight' => 120]],
+  ],
+  'standalone_timezone_default' => [
+    'name' => 'standalone_timezone_default',
+    'group' => 'standaloneusers',
+    'type' => 'String',
+    'default' => date_default_timezone_get(),
+    'html_type' => 'select',
+    'html_attributes' => [
+      'class' => 'huge crm-select2',
+    ],
+    'title' => E::ts('System Timezone'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => E::ts('Timezone for anonymous users and for user accounts using the default timezone.'),
+    'pseudoconstant' => [
+      'callback' => ['CRM_Standaloneusers_BAO_User', 'getTimeZones'],
+    ],
+    'settings_pages' => ['date' => ['section' => 'calendar', 'weight' => 0]],
   ],
 ];

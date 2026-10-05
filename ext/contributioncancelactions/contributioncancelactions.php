@@ -3,6 +3,7 @@
 require_once 'contributioncancelactions.civix.php';
 
 use Civi\Api4\LineItem;
+use Civi\Api4\Membership;
 use Civi\Api4\Participant;
 
 /**
@@ -80,6 +81,9 @@ function contributioncancelactions_cancel_related_pending_memberships(int $contr
     return;
   }
   foreach ($connectedMemberships as $membershipID) {
-    civicrm_api3('Membership', 'create', ['status_id' => 'Cancelled', 'id' => $membershipID, 'is_override' => 1, 'status_override_end_date' => 'null']);
+    Membership::update(FALSE)
+      ->addWhere('id', '=', $membershipID)
+      ->setValues(['status_id:name' => 'Cancelled', 'is_override' => 1, 'status_override_end_date' => NULL])
+      ->execute();
   }
 }

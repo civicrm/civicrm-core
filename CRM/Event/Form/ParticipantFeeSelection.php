@@ -37,8 +37,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   protected $_contributorEmail = NULL;
 
-  protected $_toDoNotEmail = NULL;
-
   protected $contributionID;
 
   protected $fromEmailId = NULL;
@@ -58,8 +56,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   protected $_paidAmount = NULL;
 
-  public $_isPaidEvent = NULL;
-
   protected $contributionAmt = NULL;
 
   private CRM_Financial_BAO_Order $order;
@@ -72,10 +68,6 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
 
   public function preProcess(): void {
     $this->_fromEmails = CRM_Event_BAO_Event::getFromEmailIds($this->getEventID());
-
-    if ($this->getContributionID()) {
-      $this->_isPaidEvent = TRUE;
-    }
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, TRUE);
 
     [$this->_contributorDisplayName, $this->_contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->getContactID());
@@ -550,18 +542,42 @@ SELECT  id, html_type
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    CRM_Price_BAO_LineItem::changeFeeSelections($params, $this->getParticipantID(), 'participant', $this->getContributionID(), $this);
-    $this->contributionAmt = CRM_Core_DAO::getFieldValue('CRM_Contribute_BAO_Contribution', $this->getContributionID(), 'total_amount');
+    $order = new CRM_Financial_BAO_Order();
+    $order->setPriceSelectionFromUnfilteredInput($params);
+    // This will cause the buildAmount hook to be called.
+    $order->setForm($this);
+
+    // The participant and contribution already exist (we are only ever
+    // changing the selections on an existing participant here), so these
+    // are form-level facts - stamp them onto each submitted line item as
+    // early as possible. Order::getLineItems() only sometimes sets
+    // entity_table (for memberships) and never sets entity_id or
+    // contribution_id (those are only assigned when Order creates a brand
+    // new entity/contribution, which doesn't happen here).
+    $submittedLineItems = $order->getLineItems();
+    foreach ($submittedLineItems as &$submittedLineItem) {
+      $submittedLineItem['entity_id'] = $this->getParticipantID();
+      $submittedLineItem['entity_table'] = 'civicrm_participant';
+      $submittedLineItem['contribution_id'] = $this->getContributionID();
+    }
+    unset($submittedLineItem);
+    // $submittedLineItems only ever covers this participant's own fields, but
+    // several participants can share one contribution (eg. a group
+    // registration) - bring in any other line item on the contribution
+    // unchanged, or changeFeeSelections() will treat it as deselected.
+    $this->addLineItemsNotYetRepresented($submittedLineItems, $this->getContributionID(), 'civicrm_participant', $this->getParticipantID());
+
+    CRM_Price_BAO_LineItem::changeFeeSelections($submittedLineItems, $this->getContributionID());
+    $this->updateEntityRecordOnChangeFeeSelection($order->getTotalAmount(), $this->getParticipantID());
     // email sending
-    if (!empty($params['send_receipt'])) {
-      $fetchParticipantVals = ['id' => $this->getParticipantID()];
-      CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails);
-      $participantParams = array_merge($params, $participantDetails[$this->getParticipantID()]);
-      $this->emailReceipt($participantParams);
+    if ($this->getSubmittedValue('send_receipt')) {
+      if (array_key_exists($this->getSubmittedValue('from_email_address'), $this->_fromEmails['from_email_id'])) {
+        $this->emailReceipt();
+      }
     }
 
     // update participant
-    CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Participant', $this->getParticipantID(), 'status_id', $params['status_id']);
+    CRM_Core_DAO::setFieldValue('CRM_Event_DAO_Participant', $this->getParticipantID(), 'status_id', $this->getSubmittedValue('status_id'));
     if (!empty($params['note'])) {
       $noteParams = [
         'entity_table' => 'civicrm_participant',
@@ -583,88 +599,102 @@ SELECT  id, html_type
   }
 
   /**
-   * @param array $params
+   * Merge in the contribution's other currently-active line items not already represented.
+   *
+   * changeFeeSelections() treats any of the contribution's price_field_value_ids
+   * absent from $submittedLineItems as having been deselected, and cancels it.
+   * $submittedLineItems here only ever covers this participant's own fields,
+   * but a contribution can cover several participants (eg. a group
+   * registration), so any line item belonging to a DIFFERENT participant on
+   * the same contribution has to be added here, unchanged, or it would be
+   * wrongly cancelled. Lines belonging to this same participant are
+   * deliberately left alone: the submission is already authoritative for
+   * them, and re-adding an old value here would stop a genuine fee-selection
+   * change from cancelling it.
+   *
+   * @param array $submittedLineItems
+   *   Line items already worked out for this participant, keyed by
+   *   price_field_value_id.
+   * @param int $contributionID
+   * @param string $entityTable
+   *   The entity_table the submission is authoritative for.
+   * @param int $entityID
+   *   The entity_id the submission is authoritative for.
+   *
+   * @throws \CRM_Core_Exception
    */
-  private function emailReceipt(array $params): void {
-    $updatedLineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant', FALSE, FALSE);
-    $lineItem = [];
-    if ($updatedLineItem) {
-      $lineItem[] = $updatedLineItem;
-    }
-    $this->assign('lineItem', empty($lineItem) ? FALSE : $lineItem);
-
-    // offline receipt sending
-    if (array_key_exists($params['from_email_address'], $this->_fromEmails['from_email_id'])) {
-      $receiptFrom = $params['from_email_address'];
-    }
-
-    $this->assign('module', 'Event Registration');
-    //use of the message template below requires variables in different format
-    $events = [];
-    $returnProperties = ['fee_label', 'start_date', 'end_date', 'is_show_location', 'title'];
-
-    //get all event details.
-    CRM_Core_DAO::commonRetrieveAll('CRM_Event_DAO_Event', 'id', $params['event_id'], $events, $returnProperties);
-    $event = $events[$params['event_id']];
-    unset($event['start_date'], $event['end_date']);
-
-    $role = CRM_Event_PseudoConstant::participantRole();
-    $participantRoles = $params['role_id'] ?? NULL;
-    if (is_array($participantRoles)) {
-      $selectedRoles = [];
-      foreach (array_keys($participantRoles) as $roleId) {
-        $selectedRoles[] = $role[$roleId];
+  private function addLineItemsNotYetRepresented(array &$submittedLineItems, int $contributionID, string $entityTable, int $entityID): void {
+    $templateOrder = new CRM_Financial_BAO_Order();
+    $templateOrder->setTemplateContributionID($contributionID);
+    foreach ($templateOrder->getLineItems() as $lineItem) {
+      if (($lineItem['entity_table'] ?? NULL) === $entityTable && (int) ($lineItem['entity_id'] ?? 0) === $entityID) {
+        continue;
       }
-      $event['participant_role'] = implode(', ', $selectedRoles);
+      if ($lineItem['qty'] == 0 && $lineItem['line_total'] == 0) {
+        // Already cancelled - nothing to preserve.
+        continue;
+      }
+      if (!isset($submittedLineItems[$lineItem['price_field_value_id']])) {
+        $submittedLineItems[$lineItem['price_field_value_id']] = $lineItem;
+      }
     }
-    else {
-      $event['participant_role'] = $role[$participantRoles] ?? NULL;
+  }
+
+  /**
+   * Update the participant's fee_amount and fee_level to reflect the new
+   * fee selection, and log the change as an activity.
+   *
+   * @param int|float $feeAmount
+   * @param int $participantID
+   */
+  private function updateEntityRecordOnChangeFeeSelection($feeAmount, $participantID): void {
+    $getUpdatedLineItems = "SELECT *
+      FROM civicrm_line_item
+      WHERE (entity_table = 'civicrm_participant' AND entity_id = {$participantID} AND qty > 0)";
+    $getUpdatedLineItemsDAO = CRM_Core_DAO::executeQuery($getUpdatedLineItems);
+    $line = [];
+    while ($getUpdatedLineItemsDAO->fetch()) {
+      $line[$getUpdatedLineItemsDAO->price_field_value_id] = $getUpdatedLineItemsDAO->label . ' - ' . (float) $getUpdatedLineItemsDAO->qty;
     }
-    $event['is_monetary'] = $this->_isPaidEvent;
 
-    if ($params['receipt_text']) {
-      $event['confirm_email_text'] = $params['receipt_text'];
-    }
+    CRM_Event_BAO_Participant::add([
+      'id' => $participantID,
+      'fee_level' => $line,
+      'fee_amount' => $feeAmount,
+    ]);
 
-    $this->assign('event', $event);
+    CRM_Event_BAO_Participant::addActivityForSelection($participantID, 'Change Registration');
+  }
 
-    if ($this->_isPaidEvent) {
-      $this->assign('totalAmount', $this->contributionAmt);
-      $this->assign('checkNumber', $params['check_number'] ?? NULL);
-    }
-
-    $this->assign('register_date', $params['register_date']);
-
+  /**
+   * Email the receipt.
+   */
+  private function emailReceipt(): void {
     // Retrieve the name and email of the contact - this will be the TO for receipt email
-    [$this->_contributorDisplayName, $this->_contributorEmail, $this->_toDoNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactId);
-
-    $this->_contributorDisplayName = ($this->_contributorDisplayName == ' ') ? $this->_contributorEmail : $this->_contributorDisplayName;
-
-    $waitStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
-    $this->assign('isOnWaitlist', (bool) in_array($params['status_id'], $waitStatus));
-    $this->assign('contactID', $this->_contactId);
+    [$contributorDisplayName, $contributorEmail, $doNotEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->getContactID());
+    if ($doNotEmail || !$contributorEmail) {
+      return;
+    }
+    $contributorDisplayName = ($contributorDisplayName == ' ') ? $contributorEmail : $contributorDisplayName;
 
     $sendTemplateParams = [
       'workflow' => 'event_offline_receipt',
-      'contactId' => $this->_contactId,
       'isTest' => FALSE,
       'PDFFilename' => ts('confirmation') . '.pdf',
       'modelProps' => [
-        'participantID' => $this->_participantId,
-        'eventID' => $params['event_id'],
+        'participantID' => $this->getParticipantID(),
+        'contactId' => $this->getContactID(),
+        'eventID' => $this->getEventID(),
         'contributionID' => $this->getContributionID(),
+        'userEnteredText' => $this->getSubmittedValue('receipt_text'),
       ],
     ];
 
-    // try to send emails only if email id is present
-    // and the do-not-email option is not checked for that contact
-    if ($this->_contributorEmail && !$this->_toDoNotEmail) {
-      $sendTemplateParams['from'] = $receiptFrom;
-      $sendTemplateParams['toName'] = $this->_contributorDisplayName;
-      $sendTemplateParams['toEmail'] = $this->_contributorEmail;
-      $sendTemplateParams['cc'] = $this->_fromEmails['cc'] ?? NULL;
-      $sendTemplateParams['bcc'] = $this->_fromEmails['bcc'] ?? NULL;
-    }
+    $sendTemplateParams['from'] = $this->getSubmittedValue('from_email_address');
+    $sendTemplateParams['toName'] = $contributorDisplayName;
+    $sendTemplateParams['toEmail'] = $contributorEmail;
+    $sendTemplateParams['cc'] = $this->_fromEmails['cc'] ?? NULL;
+    $sendTemplateParams['bcc'] = $this->_fromEmails['bcc'] ?? NULL;
 
     CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
   }

@@ -53,4 +53,18 @@ class CiviAfformAdminAfformAdminMetaTest extends \PHPUnit\Framework\TestCase imp
     $this->assertSame([], $adminSettings['locales']);
   }
 
+  /**
+   * A dynamic foreign key needs its table-to-entity map and the name of the field
+   * that controls it, so the form builder can resolve which entity it points to.
+   */
+  public function testDynamicForeignKeyMetadata():void {
+    $fields = \Civi\AfformAdmin\AfformAdminMeta::getFields('Note');
+
+    $this->assertEquals('entity_table', $fields['entity_id']['input_attrs']['control_field']);
+    $this->assertEquals('Contact', $fields['entity_id']['dfk_entities']['civicrm_contact']);
+    // A plain foreign key has no map to resolve
+    $this->assertEquals('Contact', $fields['contact_id']['fk_entity']);
+    $this->assertArrayNotHasKey('dfk_entities', array_filter($fields['contact_id']));
+  }
+
 }

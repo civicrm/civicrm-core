@@ -23,7 +23,7 @@
 </tr>
 <tr>
     <td><a href="{crmURL p="civicrm/admin/contribute/thankYou" q="reset=1&action=update&id=`$contributionPageID`"}" id="idThanks"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Thank-you and Receipting{/ts}</a></td>
-    <td>{ts}Use this form to configure the thank-you message and receipting options. Contributors will see a confirmation and thank-you page after whenever an online contribution is successfully processed. You provide the content and layout of the thank-you section below. You also control whether an electronic receipt is automatically emailed to each contributor, and you can add a custom message to that receipt.{/ts}</td>
+    <td>{ts}Use this form to configure the thank-you page and receipting options. Contributors will see a confirmation and thank-you page after whenever an online contribution is successfully processed. You provide the content and layout of the thank-you section below. You also control whether an electronic receipt is automatically emailed to each contributor, and you can add a custom message to that receipt.{/ts}</td>
 </tr>
 <tr>
     <td><a href="{crmURL p="civicrm/admin/contribute/friend" q="reset=1&action=update&id=`$contributionPageID`"}" id="idFriend"><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {ts}Tell a Friend{/ts}</a></td>

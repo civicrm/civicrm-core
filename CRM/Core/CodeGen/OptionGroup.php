@@ -27,7 +27,6 @@ class CRM_Core_CodeGen_OptionGroup extends CRM_Core_CodeGen_AbstractSqlData {
     'color' => NULL,
     'component_id' => NULL,
     'description' => NULL,
-    'domain_id' => NULL,
     'filter' => 0,
     'grouping' => NULL,
     'icon' => NULL,
@@ -90,7 +89,6 @@ class CRM_Core_CodeGen_OptionGroup extends CRM_Core_CodeGen_AbstractSqlData {
 
       $result .= CRM_Utils_SQL_Insert::into('civicrm_option_value')
         ->allowLiterals()
-        // ->columns(['option_group_id', 'label', 'value', 'name', 'grouping', 'filter', 'is_default', 'weight', 'description', 'is_optgroup', 'is_reserved', 'is_active', 'component_id', 'visibility_id'])
         ->rows($rows)
         ->toSQL() . ";\n";
     }

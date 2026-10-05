@@ -16,6 +16,7 @@
  * @group headless
  */
 class api_v3_PledgePaymentTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   protected $_individualId;
   protected $_pledgeID;
@@ -82,7 +83,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $this->assertEquals('Pending Label**', $checkStatus['pledge_status']);
 
     //Execute process_pledge job log.
-    $result = $this->callAPISuccess('Job', 'process_pledge', []);
+    $result = $this->callApiV3Success('Job', 'process_pledge', []);
     $this->assertEquals("Checking if status update is needed for Pledge Id: $this->_pledgeID (current status is Pending)\n\r- status updated to: Overdue\n\r1 records updated.", $result['values']);
 
     //Status should be 'Overdue' after processing.
@@ -185,6 +186,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $getIndPayment = $this->callAPISuccess('PledgePayment', 'get', $getParams);
     $this->assertEquals(1, $getIndPayment['count']);
     $this->assertEquals(20, $getIndPayment['values'][$result['id']]['actual_amount']);
+    $this->assertEquals('USD', $getIndPayment['values'][$result['id']]['currency']);
 
     //create a second pledge payment - need a contribution first &can't use the CiviUnitTest case function as invoice is hard-coded
     $contributionParams = [

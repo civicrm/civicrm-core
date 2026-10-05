@@ -24,6 +24,7 @@ use Civi\Api4\Entity;
  * @group headless
  */
 class api_v3_ACLPermissionTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   use Civi\Test\ACLPermissionTrait;
 
@@ -58,7 +59,13 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     parent::setUp();
     CRM_Core_BAO_ConfigSetting::enableAllComponents();
     CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_Pledge', [], 1, 0);
-    $this->callAPISuccess('Phone', 'create', ['id' => $this->individualCreate(['email' => '']), 'phone' => '911', 'location_type_id' => 'Home']);
+    $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Anthony',
+      'last_name' => 'Doe',
+      'phone_primary.phone' => 911,
+      'phone_primary.location_type_id:label' => 'Home',
+    ], 'test');
     $this->prepareForACLs();
   }
 

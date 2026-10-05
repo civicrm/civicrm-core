@@ -80,16 +80,94 @@ function civicrm_api3_contribution_page_delete($params) {
  * @param array $params
  *   Array per getfields metadata.
  *
+ * @deprecated this is not an approach we consider reliable.
+ *
  * @return array
  *   API result array
  */
 function civicrm_api3_contribution_page_submit($params) {
-  $result = CRM_Contribute_Form_Contribution_Confirm::submit($params);
+  $result = _civicrm_api3_contribution_page_submit_process($params);
   return civicrm_api3_create_success($result, $params, 'ContributionPage', 'submit');
 }
 
 /**
+ * Submit a contribution page by driving the real Main -> Confirm form flow.
+ *
+ * This simulates a browser submission (preProcess, buildForm, validate,
+ * postProcess on Main, then the same on Confirm) rather than hand-populating
+ * form internals, so the forms compute their state the same way they would
+ * for a real submission.
+ *
+ * @param array $params
+ *   Array per getfields metadata.
+ *
+ * @return array
+ *
+ * @throws \CRM_Core_Exception
+ */
+function _civicrm_api3_contribution_page_submit_process(array $params): array {
+  // A real submission always has some payment_processor_id, even 0 (pay
+  // later) - the form field always has a value. A caller omitting it
+  // entirely is taken to mean pay later too.
+  $params['payment_processor_id'] ??= 0;
+
+  $originalPost = $_POST;
+  $originalRequest = $_REQUEST;
+  $originalGet = $_GET;
+  $originalRequestMethod = $_SERVER['REQUEST_METHOD'] ?? NULL;
+  // It needs to be GET for long enough to get past the form constructors.
+  $_POST = $params;
+  // getContributionPageID() resolves 'id' via $_REQUEST, which manually
+  // reassigning $_POST does not retroactively populate.
+  $_REQUEST['id'] = $_GET['id'] = $params['id'];
+  $_SERVER['REQUEST_METHOD'] = 'GET';
+
+  CRM_Core_Smarty::singleton()->pushScope([]);
+  try {
+    $mainForm = new CRM_Contribute_Form_Contribution_Main();
+    $mainForm->controller = new CRM_Contribute_Controller_Contribution();
+    $mainForm->controller->setStateMachine(new CRM_Core_StateMachine($mainForm->controller));
+    $_SESSION['_' . $mainForm->controller->_name . '_container']['values']['Main'] = $params;
+
+    $mainForm->preProcess();
+    $mainForm->buildForm();
+    $mainForm->validate();
+
+    $confirmForm = new CRM_Contribute_Form_Contribution_Confirm();
+    $confirmForm->controller = $mainForm->controller;
+    $confirmForm->_submitValues = $params;
+    $mainForm->controller->addPage($confirmForm);
+    $_SESSION['_' . $mainForm->controller->_name . '_container']['values']['Confirm'] = $params;
+
+    // Main's postProcess() is what a real submission's redirect to Confirm
+    // stands in for; Confirm's own lifecycle then completes the order.
+    $mainForm->postProcess();
+    $confirmForm->preProcess();
+    $confirmForm->buildForm();
+    $confirmForm->validate();
+    $confirmForm->postProcess();
+  }
+  catch (CRM_Core_Exception_PrematureExitException $e) {
+    // Thrown in place of the redirect a browser submission would perform -
+    // e.g. on reaching the thank-you page, or via bounceOnError() on a
+    // payment or validation failure.
+  }
+  finally {
+    CRM_Core_Smarty::singleton()->popScope([]);
+    $_POST = $originalPost;
+    $_REQUEST = $originalRequest;
+    $_GET = $originalGet;
+    if ($originalRequestMethod) {
+      $_SERVER['REQUEST_METHOD'] = $originalRequestMethod;
+    }
+  }
+  return [];
+}
+
+/**
  * Validate ContributionPage submission parameters.
+ *
+ * @deprecated not recommended or considered reliable.
  *
  * @param array $params
  *   Array per getfields metadata.

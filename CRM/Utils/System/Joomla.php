@@ -121,29 +121,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   /**
    * @inheritdoc
    */
-  public function getEmailFieldName(CRM_Core_Form $form, array $fields):string {
-    $emailName = '';
-    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
-    if (array_key_exists("email-{$billingLocationTypeID}", $fields)) {
-      // this is a transaction related page
-      $emailName = 'email-' . $billingLocationTypeID;
-    }
-    else {
-      // find the email field in a profile page
-      foreach ($fields as $name => $dontCare) {
-        if (str_starts_with($name, 'email')) {
-          $emailName = $name;
-          break;
-        }
-      }
-    }
-
-    return $emailName;
-  }
-
-  /**
-   * @inheritdoc
-   */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
 
@@ -241,7 +218,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
         if (stripos($crumbs['url'], 'id%%')) {
           $args = ['cid', 'mid'];
           foreach ($args as $a) {
-            $val = CRM_Utils_Request::retrieve($a, 'Positive', CRM_Core_DAO::$_nullObject,
+            $val = CRM_Utils_Request::retrieve($a, 'Positive', NULL,
               FALSE, NULL, $_GET
             );
             if ($val) {
@@ -1247,6 +1224,69 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     $app->createExtensionNamespaceMap();
     // Set the application as global app
     \Joomla\CMS\Factory::$application = $app;
+  }
+
+  public function getRoleNames() {
+    $userGroups = \Joomla\CMS\Helper\UserGroupsHelper::getInstance()->loadAll()->getAll();
+    $roles = [];
+    foreach ($userGroups as $userGroup) {
+      $roles[$userGroup->title] = $userGroup->title;
+    }
+    return $roles;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function addUfRole(int $ufID, string $role): bool {
+    $groupID = $this->getUfRoleGroupId($role);
+    if (!$groupID || !$this->ufUserExists($ufID)) {
+      return FALSE;
+    }
+    return (bool) \Joomla\CMS\User\UserHelper::addUserToGroup($ufID, $groupID);
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeUfRole(int $ufID, string $role): bool {
+    $groupID = $this->getUfRoleGroupId($role);
+    if (!$groupID || !$this->ufUserExists($ufID)) {
+      return FALSE;
+    }
+    return (bool) \Joomla\CMS\User\UserHelper::removeUserFromGroup($ufID, $groupID);
+  }
+
+  /**
+   * Look up a Joomla user group ID by its title.
+   *
+   * @param string $role
+   *
+   * @return int|null
+   */
+  private function getUfRoleGroupId(string $role): ?int {
+    $userGroups = \Joomla\CMS\Helper\UserGroupsHelper::getInstance()->loadAll()->getAll();
+    foreach ($userGroups as $userGroup) {
+      if ($userGroup->title === $role) {
+        return (int) $userGroup->id;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Check that a Joomla user id exists.
+   *
+   * UserHelper::addUserToGroup()/removeUserFromGroup() do not report
+   * failure for an unknown user id, so this must be checked separately.
+   *
+   * @param int $ufID
+   *
+   * @return bool
+   */
+  private function ufUserExists($ufID) {
+    $user = new \Joomla\CMS\User\User((int) $ufID);
+    return (int) $user->id === (int) $ufID;
   }
 
 }

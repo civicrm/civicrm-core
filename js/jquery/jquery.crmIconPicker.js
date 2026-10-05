@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function($, _) {
+(function($) {
   "use strict";
   /* jshint validthis: true */
   const icons = [];
@@ -161,4 +161,4 @@
     .on('crmLoad', function(e) {
       $('.crm-icon-picker', e.target).not('.iconpicker-widget').crmIconPicker();
     });
-}(CRM.$, CRM._));
+}(CRM.$));

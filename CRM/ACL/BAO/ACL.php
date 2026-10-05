@@ -148,72 +148,6 @@ SELECT acl.*
   }
 
   /**
-   * @deprecated
-   * @param array $params
-   * @return CRM_ACL_DAO_ACL
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
-   * @deprecated
-   * @param array $params
-   * @param array $defaults
-   * @return self|null
-   */
-  public static function retrieve($params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_ACL_DAO_ACL', $id, 'is_active', $is_active);
-  }
-
-  /**
-   * @param string $str
-   * @param int $contactID
-   *
-   * @return bool
-   *
-   * @deprecated
-   */
-  public static function check($str, $contactID) {
-    \CRM_Core_Error::deprecatedWarning(__CLASS__ . '::' . __FUNCTION__ . ' is deprecated.');
-
-    $acls = CRM_ACL_BAO_Cache::build($contactID);
-
-    $aclKeys = array_keys($acls);
-    $aclKeys = implode(',', $aclKeys);
-
-    if (empty($aclKeys)) {
-      return FALSE;
-    }
-
-    $query = "
-SELECT count( a.id )
-  FROM civicrm_acl_cache c, civicrm_acl a
- WHERE c.acl_id       =  a.id
-   AND a.is_active    =  1
-   AND a.object_table =  %1
-   AND a.id           IN ( $aclKeys )
-";
-    $params = [1 => [$str, 'String']];
-
-    $count = CRM_Core_DAO::singleValueQuery($query, $params);
-    return (bool) $count;
-  }
-
-  /**
    * @param int $type
    * @param array $tables
    * @param array $whereTables
@@ -434,17 +368,6 @@ SELECT count( a.id )
         break;
     }
     return $typeCheck;
-  }
-
-  /**
-   * Delete ACL records.
-   *
-   * @param int $aclId
-   * @deprecated
-   */
-  public static function del($aclId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    self::deleteRecord(['id' => $aclId]);
   }
 
   /**

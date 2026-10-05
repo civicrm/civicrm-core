@@ -16,9 +16,17 @@
       {{:: ts('Repeat') }}
     </label>
     <span ng-style="{visibility: $ctrl.node['af-repeat'] || $ctrl.node['af-repeat'] === '' ? 'visible' : 'hidden'}">
-      <input type="number" class="form-control" ng-model="getSetMin" ng-model-options="{getterSetter: true}" placeholder="{{:: ts('min') }}" min="0" step="1" />
+      <input type="number" class="form-control" ng-model="getSetMin" ng-model-options="{getterSetter: true}" placeholder="0" min="0" step="1" />
       - <input type="number" class="form-control" ng-model="getSetMax" ng-model-options="{getterSetter: true}" placeholder="{{:: ts('max') }}" min="2" max="{{:: getRepeatMax() }}" step="1" />
     </span>
+  </div>
+</li>
+<li ng-if="$ctrl.node['af-repeat'] || $ctrl.node['af-repeat'] === ''">
+  <div class="af-gui-field-select-in-dropdown form-inline">
+    <label class="pull-right">
+      {{:: ts('Initially show:') }}
+      <input type="number" class="form-control" ng-model="getSetNumber('af-repeat-default')" ng-model-options="{getterSetter: true}" placeholder="{{ $node.min || 1 }}" min="0" step="1" />
+    </label>
   </div>
 </li>
 <li ng-click="$event.stopPropagation()" ng-if="!block">

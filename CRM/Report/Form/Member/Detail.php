@@ -413,9 +413,9 @@ HERESQL;
     //re-name IS NULL/IS NOT NULL for clarity
     if ($fieldName === 'owner_membership_id') {
       $result = [];
-      $result[''] = ts('Any');
       $result['nll'] = ts('Primary members only');
       $result['nnll'] = ts('Non-primary members only');
+      $result[''] = ts('Any');
     }
     else {
       $result = parent::getOperationPair($type, $fieldName);

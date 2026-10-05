@@ -35,13 +35,20 @@ trait AfformSaveTrait {
     \CRM_Utils_Hook::pre($orig ? 'edit' : 'create', 'Afform', NULL, $item);
 
     // FIXME validate all field data.
-    $item = _afform_fields_filter($item);
+    $item = _afform_fields_filter($item, $this->getCheckPermissions());
 
     // Create or update aff.html.
     if (isset($item['layout'])) {
       $layoutPath = $scanner->createSiteLocalPath($item['name'], 'aff.html');
       \CRM_Utils_File::createDir(dirname($layoutPath));
       $html = $this->convertInputToHtml($item['layout']);
+
+      $cycle = Utils::findEmbedCycle($item['name'], $html);
+      if ($cycle) {
+        throw new \CRM_Core_Exception(ts('A form cannot embed itself. This layout would form the loop: %1', [
+          1 => implode(' → ', $cycle),
+        ]));
+      }
 
       // Are we multilingual.
       if (\CRM_Core_I18n::isMultiLingual()) {

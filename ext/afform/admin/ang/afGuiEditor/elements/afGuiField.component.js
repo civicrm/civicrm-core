@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
   let afGuiFieldId = 0;
   angular.module('afGuiEditor').component('afGuiField', {
@@ -33,7 +33,8 @@
       this.$onInit = function() {
         ctrl.hasDefaultValue = !!getSet('afform_default');
         setFieldDefn();
-        ctrl.inputTypes = _.transform(_.cloneDeep(afGui.meta.inputTypes), function(inputTypes, type) {
+        ctrl.inputTypes = structuredClone(afGui.meta.inputTypes);
+        ctrl.inputTypes.forEach((type) => {
           type.enabled = inputTypeCanBe(type.name);
           // Change labels for EntityRef fields
           if (ctrl.getDefn().input_type === 'EntityRef') {
@@ -48,7 +49,6 @@
               type.label = ts('Select Form %1', {1: entity.label});
             }
           }
-          inputTypes.push(type);
         });
         // Quick-add links for autocompletes
         this.quickAddLinks = [];
@@ -66,7 +66,7 @@
         this.searchOperators = CRM.afAdmin.search_operators;
         // If field has limited operators, set appropriately
         if (ctrl.fieldDefn.operators && ctrl.fieldDefn.operators.length) {
-          this.searchOperators = _.pick(this.searchOperators, ctrl.fieldDefn.operators);
+          this.searchOperators = Object.fromEntries(Object.entries(this.searchOperators).filter(([op]) => ctrl.fieldDefn.operators.includes(op)));
         }
         this.isMultiFieldFilter = ctrl.node.name?.includes(',');
       };
@@ -88,8 +88,8 @@
             // Multiselects cannot use range search
             !ctrl.getDefn().input_attrs.multiple &&
             // DataType & inputType must make sense for a range
-            _.includes(['Date', 'Timestamp', 'Integer', 'Float', 'Money'], ctrl.getDefn().data_type) &&
-            _.includes(['Date', 'Number', 'Select'], $scope.getProp('input_type'))
+            ['Date', 'Timestamp', 'Integer', 'Float', 'Money'].includes(ctrl.getDefn().data_type) &&
+            ['Date', 'Number', 'Select'].includes($scope.getProp('input_type'))
         ));
       };
 
@@ -152,13 +152,13 @@
           // Calc fields are specific to a search display, not part of the schema
           if (!defn && ctrl.container.getSearchDisplay()) {
             const searchDisplay = ctrl.container.getSearchDisplay();
-            defn = _.findWhere(searchDisplay.calc_fields, {name: fieldName});
+            defn = searchDisplay.calc_fields.find((field) => field.name === fieldName);
           }
         } else if (ctrl.node.defn?.input_type) {
           // Extra (non-entity) field: seed from the inputType's extra_defn
           const inputType = afGui.meta.inputTypes.find((t) => t.name === ctrl.node.defn.input_type);
           if (inputType?.extra_defn) {
-            defn = _.cloneDeep(inputType.extra_defn);
+            defn = structuredClone(inputType.extra_defn);
           }
         }
         defn = defn || {
@@ -166,8 +166,8 @@
           required: false
         };
         // Clone to prevent mutating shared metadata objects
-        defn = _.cloneDeep(defn);
-        if (_.isEmpty(defn.input_attrs)) {
+        defn = structuredClone(defn);
+        if (!defn.input_attrs || !Object.keys(defn.input_attrs).length) {
           defn.input_attrs = {};
         }
         const suffix = this.getSuffix();
@@ -229,16 +229,18 @@
       this.getOriginalOptions = function () {
         if (ctrl.getDefn().input_type === 'EntityRef') {
           // Build a list of all entities in this form that can be referenced by this field.
-          const newOptions = _.map(ctrl.editor.getEntities({type: ctrl.getDefn().fk_entity}), (entity) => {
-            return {id: entity.name, label: entity.label};
-          }, []);
+          const fkEntity = ctrl.getDefn().fk_entity;
+          const allowedTypes = fkEntity === 'Contact' ? ['Individual', 'Household', 'Organization'] : [fkEntity];
+          const newOptions = ctrl.editor.getEntities()
+            .filter((entity) => allowedTypes.includes(entity.type))
+            .map((entity) => ({id: entity.name, label: entity.label}));
           // Store it in a stable variable for the sake of ng-repeat
           if (!angular.equals(newOptions, entityRefOptions)) {
             entityRefOptions = newOptions;
           }
           return entityRefOptions;
         }
-        if (_.includes(['Date', 'Timestamp'], $scope.getProp('data_type'))) {
+        if (['Date', 'Timestamp'].includes($scope.getProp('data_type'))) {
           ctrl.node.defn = ctrl.node.defn || {};
           return $scope.getProp('search_range') ? CRM.afGuiEditor.dateRanges : CRM.afGuiEditor.dateRanges.slice(1);
         }
@@ -397,24 +399,18 @@
         getSet(attr, !getSet(attr));
       };
 
-      $scope.toggleRequired = () => {
-        if (ctrl.node['af-required']) {
-          delete ctrl.node['af-required'];
-          getSet('required', false);
-        } else {
-          getSet('required', !getSet('required'));
-        }
-      };
-
-      $scope.makeAlwaysRequired = () => {
-        delete ctrl.node['af-required'];
-        getSet('required', true);
-      };
-
       $scope.deleteAttr = (name) => {
         delete ctrl.node[name];
-
       };
+
+      $scope.isDisplayOnly = () => {
+        return $scope.getProp('input_type') === 'DisplayOnly';
+      };
+
+      this.isReadOnly = () => {
+        return !!ctrl.getDefn().readonly || $scope.getProp('input_type') === 'DisplayOnly';
+      };
+      $scope.isReadOnly = this.isReadOnly;
 
       $scope.toggleHelp = function(position) {
         getSet('help_' + position, $scope.propIsset('help_' + position) ? null : (ctrl.getDefn()['help_' + position] || ts('Enter text')));
@@ -426,11 +422,14 @@
       };
 
       function setFieldDefn() {
+        const baseDefn = ctrl.getDefn();
         // Deeply merge defn to include nested settings e.g. `input_attrs.time`.
-        ctrl.fieldDefn = angular.merge({}, ctrl.getDefn(), ctrl.node.defn);
+        ctrl.fieldDefn = angular.merge({}, baseDefn, ctrl.node.defn);
+        // The most this field can store, if it declares a limit of its own.
+        ctrl.maxlengthLimit = baseDefn?.input_attrs?.maxlength;
         // Undo deep merge of options array.
         if (ctrl.node.defn && ctrl.node.defn.options) {
-          ctrl.fieldDefn.options = JSON.parse(JSON.stringify(ctrl.node.defn.options));
+          ctrl.fieldDefn.options = structuredClone(ctrl.node.defn.options);
         }
       }
 
@@ -508,7 +507,7 @@
       };
 
       this.getSearchFilterFields = function() {
-        return afGui.getSearchDisplayFields(ctrl.container.getSearchDisplay(), _.noop, [ctrl.getFieldName()]);
+        return afGui.getSearchDisplayFields(ctrl.container.getSearchDisplay(), () => {}, [ctrl.getFieldName()]);
       };
 
       this.showLabel = () => {
@@ -530,8 +529,8 @@
             ctrl.node.defn = ctrl.node.defn || {};
             ctrl.node.defn.afform_default = [];
           }
-          if (_.includes(ctrl.node.defn.afform_default, val)) {
-            const newVal = _.without(ctrl.node.defn.afform_default, val);
+          if (ctrl.node.defn.afform_default.includes(val)) {
+            const newVal = ctrl.node.defn.afform_default.filter((v) => v !== val);
             getSet('afform_default', newVal.length ? newVal : undefined);
             ctrl.hasDefaultValue = !!newVal.length;
           } else {
@@ -569,9 +568,13 @@
       };
 
       // Generic getter/setter for definition props
-      $scope.getSet = function(propName) {
-        return _.wrap(propName, getSet);
-      };
+      $scope.getSet = (propName) => (...args) => getSet(propName, ...args);
+
+      // A field's maxlength comes from its database column, so a form can ask for less but not more.
+      // Applied when reading too, so a layout already asking for more shows the limit that applies.
+      function capMaxlength(val) {
+        return (ctrl.maxlengthLimit && val > ctrl.maxlengthLimit) ? ctrl.maxlengthLimit : val;
+      }
 
       // Getter/setter callback
       function getSet(propName, val) {
@@ -580,6 +583,9 @@
             item = path.pop(),
             localDefn = drillDown(ctrl.node, ['defn'].concat(path)),
             fieldDefn = drillDown(ctrl.getDefn(), path);
+          if (propName === 'input_attrs.maxlength') {
+            val = capMaxlength(val);
+          }
           // Set the value if different than the field defn, otherwise unset it
           if (typeof val !== 'undefined' && (val !== fieldDefn[item] && !(!val && !fieldDefn[item]))) {
             localDefn[item] = val;
@@ -605,11 +611,11 @@
           setFieldDefn();
 
           // When changing the multiple property, force-reset the default value widget
-          if (ctrl.hasDefaultValue && _.includes(['input_type', 'input_attrs.multiple'], propName)) {
+          if (ctrl.hasDefaultValue && ['input_type', 'input_attrs.multiple'].includes(propName)) {
             ctrl.hasDefaultValue = false;
             if (!ctrl.isMultiSelect() && Array.isArray(getSet('afform_default'))) {
               ctrl.node.defn.afform_default = ctrl.node.defn.afform_default[0];
-            } else if (ctrl.isMultiSelect() && _.isString(getSet('afform_default')) && ctrl.node.defn.afform_default.length) {
+            } else if (ctrl.isMultiSelect() && typeof getSet('afform_default') === 'string' && ctrl.node.defn.afform_default.length) {
               ctrl.node.defn.afform_default = ctrl.node.defn.afform_default.split(',');
             }
             $timeout(() => {
@@ -618,7 +624,8 @@
           }
           return val;
         }
-        return $scope.getProp(propName) || '';
+        const value = $scope.getProp(propName) || '';
+        return propName === 'input_attrs.maxlength' ? capMaxlength(value) : value;
       }
       this.getSet = getSet;
 
@@ -671,13 +678,14 @@
 
       // Returns true only if value is [], {}, '', null, or undefined.
       function isEmpty(val) {
-        return typeof val !== 'boolean' && typeof val !== 'number' && _.isEmpty(val);
+        return val === null || val === undefined || val === '' ||
+          (typeof val === 'object' && !Object.keys(val).length);
       }
 
       // Recursively clears out empty arrays and objects
       function clearOut(parent, path) {
         let item;
-        while (path.length && _.every(drillDown(parent, path), isEmpty)) {
+        while (path.length && Object.values(drillDown(parent, path)).every(isEmpty)) {
           item = path.pop();
           delete drillDown(parent, path)[item];
         }
@@ -685,4 +693,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

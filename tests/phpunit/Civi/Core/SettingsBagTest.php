@@ -24,6 +24,60 @@ class SettingsBagTest extends \CiviUnitTestCase {
   }
 
   /**
+   * A '0' is a usable DSN component, not a missing one.
+   *
+   * @dataProvider zeroComponentProvider
+   * @param string $password
+   * @param string $database
+   */
+  public function testInterpolateDsnAcceptsZero(string $password, string $database): void {
+    $bag = $this->makeDsnBag($password, $database);
+
+    $parsed = \DB::parseDSN($bag->get('civicrm_db_dsn'));
+
+    $this->assertSame($password, $parsed['password']);
+    $this->assertSame($database, $parsed['database']);
+  }
+
+  /**
+   * Data provider for testInterpolateDsnAcceptsZero.
+   * @return array
+   */
+  public static function zeroComponentProvider(): array {
+    return [
+      'ordinary' => ['secret', 'civicrm'],
+      'password of zero' => ['0', 'civicrm'],
+      'database named zero' => ['secret', '0'],
+    ];
+  }
+
+  /**
+   * An unset component still means "don't compose a DSN" - the settings file is
+   * left to supply it. Only '0' stops counting as unset.
+   */
+  public function testInterpolateDsnSkippedWhenComponentUnset(): void {
+    $this->assertNull($this->makeDsnBag('', 'civicrm')->get('civicrm_db_dsn'));
+  }
+
+  /**
+   * @param string $password
+   * @param string $database
+   * @return \Civi\Core\SettingsBag
+   */
+  private function makeDsnBag(string $password, string $database): SettingsBag {
+    $bag = new SettingsBag(0, NULL);
+    $bag->loadDefaults([
+      'civicrm_db_host' => 'db.example.org',
+      'civicrm_db_port' => 3306,
+      'civicrm_db_name' => $database,
+      'civicrm_db_user' => 'civicrm',
+      'civicrm_db_password' => $password,
+    ]);
+    $bag->loadMandatory([]);
+    return $bag;
+  }
+
+  /**
    * CRM-19610 - Ensure InnoDb FTS doesn't break search preferenes when disabled.
    */
   public function testInnoDbFTS(): void {

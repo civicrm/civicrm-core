@@ -11,6 +11,8 @@
  */
 
 use Civi\Api4\MailingGroup;
+use Civi\Token\Event\TokenValueEvent;
+use Civi\Token\TokenRow;
 
 /**
  * Class CRM_Mailing_Tokens
@@ -20,28 +22,58 @@ use Civi\Api4\MailingGroup;
  * To activate these tokens, the TokenProcessor context must specify either
  * "mailingId" (int) or "mailing" (CRM_Mailing_BAO_Mailing).
  */
-class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
+class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
 
   /**
-   * Class constructor.
+   * Get the entity name for api v4 calls.
+   *
+   * @return string
    */
-  public function __construct() {
-    parent::__construct('mailing', [
-      'id' => ts('Mailing ID'),
-      'key' => ts('Mailing Key'),
-      'name' => ts('Mailing Name'),
-      'group' => ts('Mailing Group(s)'),
-      'subject' => ts('Mailing Subject'),
-      'viewUrl' => ts('Mailing URL (View)'),
-      'editUrl' => ts('Mailing URL (Edit)'),
-      'scheduleUrl' => ts('Mailing URL (Schedule)'),
-      'html' => ts('Mailing HTML'),
-      'approvalStatus' => ts('Mailing Approval Status'),
-      'approvalNote' => ts('Mailing Approval Note'),
-      'approveUrl' => ts('Mailing Approval URL'),
-      'creator' => ts('Mailing Creator (Name)'),
-      'creatorEmail' => ts('Mailing Creator (Email)'),
-    ]);
+  protected function getApiEntityName(): string {
+    return 'Mailing';
+  }
+
+  /**
+   * Get bespoke mailing tokens.
+   *
+   * @return array
+   */
+  protected function getBespokeTokens(): array {
+    return [
+      'key' => ['title' => ts('Mailing Key'), 'name' => 'key', 'type' => 'calculated', 'audience' => 'user'],
+      'group' => ['title' => ts('Mailing Group(s)'), 'name' => 'group', 'type' => 'calculated', 'audience' => 'user'],
+      'viewUrl' => ['title' => ts('Mailing URL (View)'), 'name' => 'viewUrl', 'type' => 'calculated', 'audience' => 'user'],
+      'editUrl' => ['title' => ts('Mailing URL (Edit)'), 'name' => 'editUrl', 'type' => 'calculated', 'audience' => 'user'],
+      'scheduleUrl' => ['title' => ts('Mailing URL (Schedule)'), 'name' => 'scheduleUrl', 'type' => 'calculated', 'audience' => 'user'],
+      'html' => ['title' => ts('Mailing HTML'), 'name' => 'html', 'type' => 'calculated', 'audience' => 'user'],
+      'approveUrl' => ['title' => ts('Mailing Approval URL'), 'name' => 'approveUrl', 'type' => 'calculated', 'audience' => 'user'],
+      'creator' => ['title' => ts('Mailing Creator (Name)'), 'name' => 'creator', 'type' => 'calculated', 'audience' => 'hidden'],
+      'creatorEmail' => ['title' => ts('Mailing Creator (Email)'), 'name' => 'creatorEmail', 'type' => 'calculated', 'audience' => 'hidden'],
+    ];
+  }
+
+  /**
+   * These tokens still work but we don't advertise them.
+   *
+   * @return string[]
+   *   Keys are deprecated tokens and values are their replacements.
+   */
+  protected function getDeprecatedTokens(): array {
+    return [
+      'approvalNote' => 'approval_note',
+      'approvalStatus' => 'approval_status_id:label',
+      'creator' => 'created_id.display_name',
+      'creatorEmail' => 'created_id.email_primary.email',
+    ];
+  }
+
+  /**
+   * Get fields which need to be returned to render another token.
+   *
+   * @return array
+   */
+  protected function getDependencies(): array {
+    return $this->getDeprecatedTokens();
   }
 
   /**
@@ -57,42 +89,55 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    *
    * @param \Civi\Token\Event\TokenValueEvent $e
    *
-   * @return array
+   * @return array|null
    * @throws \Exception
    */
-  public function prefetch(\Civi\Token\Event\TokenValueEvent $e) {
+  public function prefetch(TokenValueEvent $e): ?array {
     $processor = $e->getTokenProcessor();
-    $mailing = isset($processor->context['mailing'])
-      ? $processor->context['mailing']
-      : CRM_Mailing_BAO_Mailing::findById($processor->context['mailingId']);
+    if (!isset($processor->context['mailingId']) && isset($processor->context['mailing'])) {
+      $mailing = (array) $processor->context['mailing'];
+      $processor->context['mailingId'] = $mailing['id'];
+    }
+    $prefetch = parent::prefetch($e) ?? [];
+    return $prefetch;
+  }
 
-    return [
-      'mailing' => $mailing,
-    ];
+  /**
+   * Get related tokens related to membership e.g. recurring contribution tokens
+   */
+  protected function getRelatedTokens(): array {
+    $tokens = [];
+    $tokens += $this->getRelatedTokensForEntity('Contact', 'created_id', ['display_name', 'email_primary.email'], [], ts('Creator') . ' : ');
+    return $tokens;
   }
 
   /**
    * @inheritDoc
    */
-  public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
-    $row->format('text/plain')->tokens($entity, $field,
-      (string) $this->getMailingTokenReplacement($field, $prefetch['mailing']->id ?? NULL, $prefetch['mailing']));
+  public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL): void {
+    $bespokeTokens = array_keys($this->getBespokeTokens());
+    if (!empty($this->getDeprecatedTokens()[$field])) {
+      $realField = $this->getDeprecatedTokens()[$field];
+      parent::evaluateToken($row, $entity, $realField, $prefetch);
+      $row->format('text/plain')->tokens($entity, $field, (string) $row->tokens[$entity][$realField]);
+    }
+    elseif (in_array($field, $bespokeTokens, TRUE)) {
+      $row->format('text/plain')->tokens($entity, $field,
+        (string) $this->getMailingTokenReplacement($field, $this->getFieldValue($row, 'id')));
+    }
+    else {
+      parent::evaluateToken($row, $entity, $field, $prefetch);
+    }
   }
 
   /**
    * @param string $token
    * @param int|null $id
-   * @param \CRM_Mailing_BAO_Mailing $mailing
    *
    * @return string
    */
-  private function getMailingTokenReplacement($token, ?int $id, $mailing) {
+  private function getMailingTokenReplacement($token, ?int $id) {
     switch ($token) {
-      // CRM-7663
-
-      case 'id':
-        $value = $id ?: 'undefined';
-        break;
 
       // Key is the ID, or the hash when the hash URLs setting is enabled
       case 'key':
@@ -102,17 +147,9 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         }
         break;
 
-      case 'name':
-        $value = $mailing ? $mailing->name : 'Mailing Name';
-        break;
-
       case 'group':
         $groups = $id ? ($this->getGroupNames($id) ?? []) : ['Mailing Groups'];
         $value = implode(', ', $groups);
-        break;
-
-      case 'subject':
-        $value = $mailing->subject;
         break;
 
       case 'viewUrl':
@@ -141,14 +178,6 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         $value = $page->run($id, NULL, FALSE, TRUE);
         break;
 
-      case 'approvalStatus':
-        $value = CRM_Core_PseudoConstant::getLabel('CRM_Mailing_DAO_Mailing', 'approval_status_id', $mailing->approval_status_id);
-        break;
-
-      case 'approvalNote':
-        $value = $mailing->approval_note;
-        break;
-
       case 'approveUrl':
         $value = CRM_Utils_System::url('civicrm/mailing/approve',
           "reset=1&mid={$id}",
@@ -156,16 +185,7 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         );
         break;
 
-      case 'creator':
-        $value = CRM_Contact_BAO_Contact::displayName($mailing->created_id);
-        break;
-
-      case 'creatorEmail':
-        $value = CRM_Contact_BAO_Contact::getPrimaryEmail($mailing->created_id);
-        break;
-
       default:
-        $value = "{mailing.$token}";
         break;
     }
 

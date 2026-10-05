@@ -384,7 +384,7 @@ class CRM_Core_Form_RecurringEntity {
             'is_reserved' => 0,
             'is_active' => 1,
           ];
-          $opGroup = CRM_Core_BAO_OptionGroup::add($optionGroupParams);
+          $opGroup = CRM_Core_BAO_OptionGroup::writeRecord($optionGroupParams);
           if ($opGroup->id) {
             $oldWeight = NULL;
             $fieldValues = ['option_group_id' => $opGroup->id];

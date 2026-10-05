@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Generic element handler for element types supplied by 3rd-party extensions
@@ -17,7 +17,7 @@
       let elementType = {};
 
       this.$onInit = function() {
-        elementType = _.findWhere(afGui.meta.elements, {directive: ctrl.node['#tag']});
+        elementType = Object.values(afGui.meta.elements).find((element) => element.directive === ctrl.node['#tag']);
       };
 
       this.getTemplate = function() {
@@ -30,4 +30,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

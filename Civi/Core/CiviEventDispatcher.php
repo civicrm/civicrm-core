@@ -393,6 +393,8 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
       $this->dispatchPolicyRegex = NULL;
     }
 
+    \Civi\Schema\EntityRepository::flush();
+
     return $this;
   }
 

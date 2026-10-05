@@ -45,6 +45,22 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $this->registerPathVars();
   }
 
+  public function isFrontEndPage() {
+    // check to see if we are definitively on the WP backend
+    // NOTE: function is not always defined on CLI / Civi-only boots
+    if (function_exists('is_admin') && is_admin()) {
+      return FALSE;
+    }
+
+    $path = CRM_Utils_System::currentPath() ?? '';
+
+    // Get the menu for above URL.
+    $item = CRM_Core_Menu::get($path);
+
+    // frontend page have no path so empty item
+    return !isset($item) || (isset($item['is_public']) && $item['is_public']);
+  }
+
   /**
    * Specify the default computation for various paths/URLs.
    */
@@ -247,7 +263,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         if (stripos($crumbs['url'], 'id%%')) {
           $args = ['cid', 'mid'];
           foreach ($args as $a) {
-            $val = CRM_Utils_Request::retrieve($a, 'Positive', CRM_Core_DAO::$_nullObject,
+            $val = CRM_Utils_Request::retrieve($a, 'Positive', NULL,
               FALSE, NULL, $_GET
             );
             if ($val) {
@@ -1017,29 +1033,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * @inheritdoc
    */
-  public function getEmailFieldName(CRM_Core_Form $form, array $fields):string {
-    $emailName = '';
-    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
-    if (array_key_exists("email-{$billingLocationTypeID}", $fields)) {
-      // this is a transaction related page
-      $emailName = 'email-' . $billingLocationTypeID;
-    }
-    else {
-      // find the email field in a profile page
-      foreach ($fields as $name => $dontCare) {
-        if (str_starts_with($name, 'email')) {
-          $emailName = $name;
-          break;
-        }
-      }
-    }
-
-    return $emailName;
-  }
-
-  /**
-   * @inheritdoc
-   */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     if (!empty($params['name'])) {
       if (!validate_username($params['name'])) {
@@ -1383,6 +1376,36 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    */
   public function getRoleNames() {
     return wp_roles()->role_names;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function addUfRole(int $ufID, string $role): bool {
+    if (!wp_roles()->is_role($role)) {
+      return FALSE;
+    }
+    $user = get_userdata($ufID);
+    if (!$user) {
+      return FALSE;
+    }
+    $user->add_role($role);
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeUfRole(int $ufID, string $role): bool {
+    if (!wp_roles()->is_role($role)) {
+      return FALSE;
+    }
+    $user = get_userdata($ufID);
+    if (!$user) {
+      return FALSE;
+    }
+    $user->remove_role($role);
+    return TRUE;
   }
 
   /**

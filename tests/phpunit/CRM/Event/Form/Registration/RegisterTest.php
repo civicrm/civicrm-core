@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\PriceFieldValue;
 use Civi\Test\FormTrait;
 use Civi\Test\FormWrapper;
 
@@ -18,6 +19,12 @@ use Civi\Test\FormWrapper;
  */
 class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
   use FormTrait;
+  protected $_apiversion = 4;
+
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
 
   /**
    * CRM-19626 - Test minimum value configured for price set.
@@ -51,6 +58,31 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     $form->processForm(FormWrapper::VALIDATED);
     $expectedResult = [
       'additional_participants' => 'There is only enough space left on this event for 2 participant(s).',
+    ];
+    $this->assertValidationError($expectedResult);
+  }
+
+  /**
+   * dev/core#6670 A price option configured with a 'count' should count as
+   * that many participants towards the event's max_participants cap.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testValidateEventWithAvailableSpaceUsesPriceOptionCount(): void {
+    $this->eventCreatePaid(['max_participants' => 1]);
+    PriceFieldValue::update(FALSE)
+      ->addWhere('id', '=', $this->ids['PriceFieldValue']['PaidEvent_student'])
+      ->setValues(['count' => 2])
+      ->execute();
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'email-Primary' => 'someone@example.com',
+      'priceSetId' => $this->ids['PriceSet']['PaidEvent'],
+      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      'payment_processor_id' => 0,
+    ], ['id' => $this->getEventID()]);
+    $form->processForm(FormWrapper::VALIDATED);
+    $expectedResult = [
+      '_qf_default' => 'Only 1 Registrations available.',
     ];
     $this->assertValidationError($expectedResult);
   }
@@ -181,6 +213,121 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
         'message_date_format' => 'YmdHi',
       ],
     ];
+  }
+
+  /**
+   * Test concurrent registration when is_confirm_enabled is disabled.
+   */
+  public function testConcurrentRegistrationNoConfirm(): void {
+    // Create event with max 1 participant, confirmation screen disabled.
+    $event = $this->eventCreateUnpaid([
+      'max_participants' => 1,
+      'is_confirm_enabled' => 0,
+    ]);
+
+    // Construct form wrapper for User B (the one who should get blocked).
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'email-Primary' => 'user_b@example.com',
+    ], ['id' => $event['id']]);
+
+    // Process form up to BUILT state (runs preProcess and buildForm when event is empty)
+    $form->processForm(FormWrapper::BUILT);
+
+    // Use Invasive to get the protected 'form' property
+    /** @var \CRM_Event_Form_Registration_Register $innerForm */
+    $innerForm = \Civi\Test\Invasive::get([$form, 'form']);
+
+    // In the background, create a participant for the event (simulating User A completing registration first).
+    $this->participantCreate(['event_id' => $event['id']]);
+
+    // User B submits the form
+    $innerForm->validate();
+
+    // Verify if validation failed.
+    // If it did not fail, it proceeds to postProcess, which we simulate here.
+    if (empty($innerForm->_errors)) {
+      try {
+        $innerForm->postProcess();
+      }
+      catch (\CRM_Core_Exception_PrematureExitException $e) {
+        $this->fail('Registration should not be allowed; exceeds the max_participants limit.');
+      }
+    }
+
+    // Check how many participants are registered. Should remain 1.
+    $count = $this->callAPISuccessGetCount('Participant', ['event_id' => $event['id']]);
+    $this->assertEquals(1, $count, 'Should not exceed the max_participants limit.');
+
+    // Also verify that a validation error was present.
+    $this->assertNotEmpty($innerForm->_errors, 'Should have validation errors on the form.');
+  }
+
+  /**
+   * Test event registration with a participant custom field of html_type CheckBox.
+   */
+  public function testRegisterWithParticipantCustomCheckboxField(): void {
+    $customGroup = $this->customGroupCreate([
+      'title' => 'Participant Custom Group',
+      'extends' => 'Participant',
+    ]);
+    $customField = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Participant Checkbox Field',
+      'data_type' => 'Int',
+      'html_type' => 'CheckBox',
+      'option_values' => [
+        1 => 'Option A',
+        2 => 'Option B',
+      ],
+    ]);
+
+    $ufGroup = $this->callAPISuccess('UFGroup', 'create', [
+      'title' => 'Event Registration Profile',
+      'group_type' => 'Individual,Contact,Participant',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroup['id'],
+      'field_name' => 'email',
+      'field_type' => 'Contact',
+      'visibility' => 'Public Pages and Listings',
+      'weight' => 1,
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroup['id'],
+      'field_name' => 'first_name',
+      'field_type' => 'Contact',
+      'visibility' => 'Public Pages and Listings',
+      'weight' => 2,
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroup['id'],
+      'field_name' => 'last_name',
+      'field_type' => 'Contact',
+      'visibility' => 'Public Pages and Listings',
+      'weight' => 3,
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroup['id'],
+      'field_name' => 'custom_' . $customField['id'],
+      'field_type' => 'Participant',
+      'visibility' => 'Public Pages and Listings',
+      'weight' => 4,
+    ]);
+
+    $event = $this->eventCreateUnpaid();
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_uf_join SET uf_group_id = {$ufGroup['id']} WHERE entity_table = 'civicrm_event' AND entity_id = {$event['id']} AND weight = 1");
+
+    $customFieldName = 'custom_' . $customField['id'];
+    $submittedValues = [
+      'email-Primary' => 'participant@example.com',
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      $customFieldName => [1 => 1],
+    ];
+
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', $submittedValues, ['id' => $event['id']])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm');
+    $form->processForm();
   }
 
 }

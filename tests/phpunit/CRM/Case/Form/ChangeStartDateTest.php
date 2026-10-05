@@ -23,7 +23,7 @@ class CRM_Case_Form_ChangeStartDateTest extends CiviCaseTestCase {
     $_GET['action'] = $_REQUEST['action'] = 'add';
 
     // set new start date to 2 days ago
-    $new_start_date = date('Y-m-d', strtotime('2 days ago'));
+    $new_start_date = date('Y-m-d H:i:s', strtotime('2 days ago'));
 
     $form = $this->getFormObject('CRM_Case_Form_Activity', [
       'activity_type_id' => $activity_type_id,
@@ -64,7 +64,7 @@ class CRM_Case_Form_ChangeStartDateTest extends CiviCaseTestCase {
       'activity_type_id' => 'Open Case',
       'return' => ['activity_date_time'],
     ]);
-    $this->assertEquals($new_start_date . ' 00:00:00', $result['activity_date_time']);
+    $this->assertEquals($new_start_date, $result['activity_date_time']);
   }
 
 }

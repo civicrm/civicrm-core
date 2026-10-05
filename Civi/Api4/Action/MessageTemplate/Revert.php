@@ -22,16 +22,18 @@ class Revert extends \Civi\Api4\Generic\BasicBatchAction {
 
   protected function processBatch(Result $result, array $items) {
     $revertable = MessageTemplate::get($this->getCheckPermissions())
-      ->addSelect('id', 'master_id', 'master_id.msg_subject', 'master_id.msg_html')
+      ->addSelect('id', 'master_id', 'master_id.msg_subject', 'master_id.msg_text', 'master_id.msg_html')
       ->addWhere('id', 'IN', array_column($items, 'id'))
       ->execute();
     foreach ($revertable as $item) {
       if (!empty($item['master_id'])) {
-        MessageTemplate::update(FALSE)
+        $reverted = MessageTemplate::update(FALSE)
           ->addWhere('id', '=', $item['id'])
           ->addValue('msg_subject', $item['master_id.msg_subject'])
+          ->addValue('msg_text', $item['master_id.msg_text'])
           ->addValue('msg_html', $item['master_id.msg_html'])
           ->execute();
+        $result[] = $reverted->first();
       }
     }
   }

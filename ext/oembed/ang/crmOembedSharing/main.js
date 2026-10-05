@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // Example usage: <crm oembed-sharing page="https://example.com/foo/bar?id=123"></div>
   angular.module('crmOembedSharing').directive('crmOembedSharing', function() {
     return {
@@ -27,7 +27,7 @@
             return buf;
           },
           getIframeCode: function() {
-            var iframe = cj('<iframe/>');
+            var iframe = $('<iframe/>');
             iframe.attr('src', $scope.urls.iframe);
             if ($scope.options.maxwidth) iframe.attr('width', $scope.options.maxwidth);
             if ($scope.options.maxheight) iframe.attr('height', $scope.options.maxheight);
@@ -38,4 +38,4 @@
       }
     };
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

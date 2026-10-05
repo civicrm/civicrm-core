@@ -510,6 +510,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $defaults['payment_instrument_id'] = $this->getDefaultPaymentInstrumentId();
     }
 
+    if (!$this->_id && empty($defaults['contribution_status_id'])) {
+      $defaults['contribution_status_id'] = CRM_Core_OptionGroup::getDefaultValue('contribution_status') ?? CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    }
+
     $this->assign('is_test', !empty($defaults['is_test']));
     $this->assign('email', $this->getContactValue('email_primary.email'));
     $this->assign('is_pay_later', !empty($defaults['is_pay_later']));
@@ -985,16 +989,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Build the price set form.
    */
   private function buildPriceSet(): void {
-    $form = $this;
-    $this->_priceSet = $this->getOrder()->getPriceSetMetadata();
-    foreach ($this->getPriceFieldMetaData() as $id => $field) {
+    foreach ($this->getPriceFieldMetaData() as $field) {
       $options = $field['options'] ?? NULL;
       if (!is_array($options)) {
         continue;
       }
 
       if (!empty($options)) {
-        CRM_Price_BAO_PriceField::addQuickFormElement($form,
+        CRM_Price_BAO_PriceField::addQuickFormElement($this,
           'price_' . $field['id'],
           $field['id'],
           FALSE,
@@ -1004,7 +1006,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         );
       }
     }
-    $form->assign('priceSet', $form->_priceSet);
+    $this->assign('priceSet', $this->getOrder()->getPriceSetMetadata());
   }
 
   /**
@@ -1199,20 +1201,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @throws \CRM_Core_Exception
    */
   protected function processCreditCard($submittedValues, $contactID) {
-    $isTest = ($this->_mode === 'test') ? 1 : 0;
 
     $paymentObject = Civi\Payment\System::singleton()->getById($submittedValues['payment_processor_id']);
     $this->_paymentProcessor = $paymentObject->getPaymentProcessor();
-
-    // Set source if not set
-    if (empty($submittedValues['source'])) {
-      $userID = CRM_Core_Session::singleton()->get('userID');
-      $userSortName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID,
-        'sort_name'
-      );
-      $userSortName = htmlentities($userSortName);
-      $submittedValues['source'] = ts('Submit Credit Card Payment by: %1', [1 => $userSortName]);
-    }
 
     $params = $submittedValues;
     $this->_params = array_merge($this->_params, $submittedValues);
@@ -1222,15 +1213,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     $now = date('YmdHis');
 
-    $this->processBillingAddress($contactID, (string) $this->getContactValue('email_primary.email'));
-    if (!empty($params['source'])) {
-      unset($params['source']);
-    }
-
     $this->_params['amount'] = $this->_params['total_amount'];
     // @todo - stop setting amount level in this function - use $this->order->getAmountLevel()
     $this->_params['amount_level'] = 0;
-    $this->_params['description'] = ts("Contribution submitted by a staff person using contributor's credit card");
     $this->_params['currencyID'] = $this->_params['currency'] ?? CRM_Core_Config::singleton()->defaultCurrency;
 
     $this->_params['pcp_display_in_roll'] = $params['pcp_display_in_roll'] ?? NULL;
@@ -1250,7 +1235,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // At this point we've created a contact and stored its address etc
     // all the payment processors expect the name and address to be in the
     // so we copy stuff over to first_name etc.
-    $paymentParams = $this->_params;
+    $paymentParams = $this->prepareParamsForPaymentProcessor($this->_params);
     $paymentParams['contactID'] = $contactID;
     CRM_Core_Payment_Form::mapParams(NULL, $this->_params, $paymentParams, TRUE);
 
@@ -1282,16 +1267,16 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->set('is_deductible', TRUE);
     }
     $contributionParams = [
-      'id' => $this->_params['contribution_id'] ?? NULL,
-      'contact_id' => $contactID,
+      'id' => $this->getContributionID(),
+      'contact_id' => $this->getContactID(),
       'line_item' => [$this->getOrder()->getPriceSetID() => $this->getOrder()->getLineItems()],
-      'is_test' => $isTest,
-      'campaign_id' => $this->_params['campaign_id'] ?? NULL,
-      'contribution_page_id' => $this->_params['contribution_page_id'] ?? NULL,
-      'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
-      'thankyou_date' => $this->_params['thankyou_date'] ?? NULL,
+      'is_test' => $this->isTest(),
+      'campaign_id' => $this->getSubmittedValue('campaign_id'),
+      'contribution_page_id' => $this->getSubmittedValue('contribution_page_id'),
+      'source' => $this->getSource(),
+      'thankyou_date' => $this->getSubmittedValue('thankyou_date'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID(),
     ];
-    $contributionParams['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
 
     $contribution = $this->processFormContribution(
       $this->_params,
@@ -1332,8 +1317,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
               'payment_processor_id' => $this->_paymentProcessor['id'],
               'is_transactional' => FALSE,
               'fee_amount' => $result['fee_amount'] ?? NULL,
-              'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
-              'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
+              'card_type_id' => $this->getCreditCardType(),
+              'pan_truncation' => $this->getPanTruncation(),
               'is_email_receipt' => FALSE,
             ]);
             // This has now been set to 1 in the DB - declare it here also
@@ -1426,7 +1411,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
     // We may no longer need to set params['is_recur'] - it used to be used in processRecurringContribution
     $params['is_recur'] = $isRecur;
-    $params['payment_instrument_id'] = $contributionParams['payment_instrument_id'] ?? NULL;
+    $params['payment_instrument_id'] = $this->getPaymentInstrumentID();
     $recurringContributionID = !$isRecur ? NULL : $this->processRecurringContribution($form, $params, [
       'contact_id' => $contactID,
       'financial_type_id' => $financialType->id,
@@ -1459,7 +1444,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     CRM_Contribute_BAO_ContributionSoft::processSoftContribution($params, $contribution);
 
     if ($isPledge) {
-      $this->processPledge($params, $contributionParams, $pledgeID, $contribution, $isEmailReceipt);
+      $this->processPledge($params['pledge_amount'], $pledgeID, $contribution);
     }
 
     if ($contribution) {
@@ -1575,20 +1560,19 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   /**
    * Previously shared code. Probably handles an online-only workflow & that code can go.
    *
-   * @param $params
-   * @param $contributionParams
+   * @param array $pledgeAmounts
    * @param $pledgeID
    * @param $contribution
-   * @param $isEmailReceipt
+   *
+   * @throws \CRM_Core_Exception
    */
-  private function processPledge($params, $contributionParams, $pledgeID, $contribution, $isEmailReceipt): void {
-    $form = $this;
+  private function processPledge($pledgeAmounts, $pledgeID, $contribution): void {
+    $amount = $this->getOrder()->getTotalAmount();
     if ($pledgeID) {
       //when user doing pledge payments.
       //update the schedule when payment(s) are made
-      $amount = $params['amount'];
       $pledgePaymentParams = [];
-      foreach ($params['pledge_amount'] as $paymentId => $dontCare) {
+      foreach ($pledgeAmounts as $paymentId => $dontCare) {
         $scheduledAmount = CRM_Core_DAO::getFieldValue(
           'CRM_Pledge_DAO_PledgePayment',
           $paymentId,
@@ -1611,7 +1595,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $pledgePaymentParams[count($pledgePaymentParams) - 1]['actual_amount'] += $amount;
       }
       foreach ($pledgePaymentParams as $p) {
-        CRM_Pledge_BAO_PledgePayment::add($p);
+        CRM_Pledge_BAO_PledgePayment::writeRecord($p);
       }
 
       //update pledge status according to the new payment statuses
@@ -1705,15 +1689,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $recurParams['frequency_interval'] = $params['frequency_interval'] ?? NULL;
     $recurParams['installments'] = $params['installments'] ?? NULL;
     $recurParams['currency'] = $params['currency'] ?? NULL;
-    $recurParams['payment_instrument_id'] = $params['payment_instrument_id'];
+    $recurParams['payment_instrument_id'] = $this->getPaymentInstrumentID();
 
-    $recurParams['is_test'] = 0;
-    if (($form->_action & CRM_Core_Action::PREVIEW) ||
-      (isset($form->_mode) && ($form->_mode == 'test'))
-    ) {
-      $recurParams['is_test'] = 1;
-    }
-
+    $recurParams['is_test'] = $this->isTest();
     $recurParams['start_date'] = $recurParams['create_date'] = $recurParams['modified_date'] = date('YmdHis');
     if (!empty($params['receive_date'])) {
       $recurParams['start_date'] = date('YmdHis', strtotime($params['receive_date']));
@@ -1725,8 +1703,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     // We set trxn_id=invoiceID specifically for paypal IPN. It is reset this when paypal sends us the real trxn id, CRM-2991
     $recurParams['processor_id'] = $recurParams['trxn_id'] = ($params['trxn_id'] ?? $params['invoiceID']);
 
-    $campaignId = $params['campaign_id'] ?? $form->_values['campaign_id'] ?? NULL;
-    $recurParams['campaign_id'] = $campaignId;
+    $recurParams['campaign_id'] = $this->getSubmittedValue('campaign_id');
     $recurring = CRM_Contribute_BAO_ContributionRecur::add($recurParams);
     $form->_params['contributionRecurID'] = $recurring->id;
 
@@ -1756,13 +1733,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
       'is_pay_later' => $params['is_pay_later'] ?? 0,
-      //configure cancel reason, cancel date and thankyou date
-      //from 'contribution' type profile if included
-      'cancel_reason' => $params['cancel_reason'] ?? 0,
-      'cancel_date' => isset($params['cancel_date']) ? CRM_Utils_Date::format($params['cancel_date']) : NULL,
-      'thankyou_date' => isset($params['thankyou_date']) ? CRM_Utils_Date::format($params['thankyou_date']) : NULL,
-      //setting to make available to hook - although seems wrong to set on form for BAO hook availability
-      'skipLineItem' => $params['skipLineItem'] ?? 0,
+      'cancel_reason' => $this->getSubmittedValue('cancel_reason'),
+      'cancel_date' => $this->getSubmittedValue('cancel_date'),
+      'thankyou_date' => $this->getSubmittedValue('thankyou_date'),
     ];
 
     if (!empty($params["is_email_receipt"])) {
@@ -1776,15 +1749,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $contributionParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
-    if (isset($contributionParams['invoice_id'])) {
-      $contributionParams['id'] = CRM_Core_DAO::getFieldValue(
-        'CRM_Contribute_DAO_Contribution',
-        $contributionParams['invoice_id'],
-        'id',
-        'invoice_id'
-      );
-    }
-
     return $contributionParams;
   }
 
@@ -1976,12 +1940,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    // Process price set and get total amount and line items - @todo the following lines should be obsolete.
-    if ($this->isQuickConfig() && !$this->_id) {
-      // @todo - probably these lines are not required.
-      $this->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
-      $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-    }
     $submittedValues['total_amount'] = $this->getOrder()->getTotalAmount();
     // @todo - ideally do not set tax_level - it is not required lower down
     // if line items are provide appropriately. The BAO prefers to self-calculate tax.
@@ -2040,6 +1998,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $this->_contactID = $submittedValues['contact_id'];
     }
 
+    $this->processBillingAddress($this->_contactID, (string) $this->getContactValue('email_primary.email'));
+
     $formValues = $submittedValues;
 
     // Credit Card Contribution.
@@ -2068,11 +2028,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // get the required field value only.
 
       $params = [
-        'contact_id' => $this->_contactID,
+        'contact_id' => $this->getContactID(),
         'currency' => $this->getCurrency(),
         'skipCleanMoney' => TRUE,
-        'id' => $this->_id,
+        'id' => $this->getContributionID(),
         'financial_type_id' => $this->getFinancialTypeID(),
+        'source' => $this->getSource(),
       ];
 
       //format soft-credit/pcp param first
@@ -2083,14 +2044,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         'financial_type_id',
         'payment_instrument_id',
         'cancel_reason',
-        'source',
         'check_number',
-        'card_type_id',
         'pan_truncation',
       ];
       foreach ($fields as $f) {
         $params[$f] = $formValues[$f] ?? NULL;
       }
+      $params['card_type_id'] = $this->getCreditCardType();
       if ($this->_id && $action & CRM_Core_Action::UPDATE) {
         // @todo - should we remove all this - if it's going from Pending to Completed then
         // add payment handles that - what statuses CAN be changed here?
@@ -2770,6 +2730,21 @@ WHERE  contribution_id = {$id}
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * @return string
+   * @throws \CRM_Core_Exception
+   */
+  protected function getSource(): string {
+    $source = (string) $this->getSubmittedValue('source');
+    if (!$source) {
+      $user = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();
+      if ($this->isSubmitProcessorPayment()) {
+        $source = ts('Submit Credit Card Payment by: %1', [1 => $user]);
+      }
+    }
+    return $source;
   }
 
 }

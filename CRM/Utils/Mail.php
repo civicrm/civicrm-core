@@ -562,8 +562,29 @@ class CRM_Utils_Mail {
    * @return null|string
    */
   public static function formatRFC822Email($name, $email, $useQuote = FALSE) {
-    $result = NULL;
+    if (empty($email)) {
+      return NULL;
+    }
 
+    // Already formatted
+    if (str_contains($email, '<')) {
+      return $email;
+    }
+
+    // Split multiple emails
+    if (str_contains($email, ',') || str_contains($email, ';')) {
+      $emails = preg_split('/[,;]+/', $email);
+      $formatted = [];
+      foreach ($emails as $singleEmail) {
+        $singleEmail = trim($singleEmail);
+        if ($singleEmail !== '') {
+          $formatted[] = self::formatRFC822Email($name, $singleEmail, $useQuote);
+        }
+      }
+      return implode(', ', $formatted);
+    }
+
+    $email = trim($email);
     $name = trim($name ?? '');
 
     // strip out double quotes if present at the beginning AND end
@@ -587,11 +608,10 @@ class CRM_Utils_Mail {
         $name = '"' . $name . '"';
       }
 
-      $result = "$name ";
+      return "$name <{$email}>";
     }
 
-    $result .= "<{$email}>";
-    return $result;
+    return "<{$email}>";
   }
 
   /**

@@ -138,6 +138,11 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         ];
 
         [$defaults['additional_custom_pre_id'], $defaults['additional_custom_post']] = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinAddParams);
+        // No stored join for this event's additional participants can only mean the
+        // user explicitly chose 'none' - postProcess() always writes a join (either
+        // an inherited copy of the primary's profile or an explicit choice) for
+        // every other case.
+        $defaults['additional_custom_pre_id'] = $defaults['additional_custom_pre_id'] ?: 'none';
 
         if (isset($defaults['additional_custom_post']) && is_numeric($defaults['additional_custom_post'])) {
           $defaults['additional_custom_post_id'] = $defaults['additional_custom_post'];
@@ -152,6 +157,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
             $defaults["additional_custom_post_id_multiple[$key]"] = $value;
           }
         }
+        $defaults['additional_custom_post_id'] = $defaults['additional_custom_post_id'] ?? 'none';
         $this->assign('profilePostMultipleAdd', $defaults['additional_custom_post'] ?? []);
       }
       else {
@@ -161,6 +167,10 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     }
     else {
       $defaults['is_email_confirm'] = 0;
+      // For a brand-new event, default to inheriting the primary's profile
+      // choices, matching the traditional convenience default.
+      $defaults['additional_custom_pre_id'] = 'inherit';
+      $defaults['additional_custom_post_id'] = 'inherit';
     }
 
     // provide defaults for required fields if empty (and as a 'hint' for approval message field)
@@ -267,7 +277,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $this->addToggle('allow_selfcancelxfer', ts('Allow self-service cancellation or transfer?'));
     $this->add('text', 'selfcancelxfer_time', ts('Cancellation or transfer time limit (hours)'));
     $this->addRule('selfcancelxfer_time', ts('Please enter the number of hours (as an integer).'), 'integer');
-    self::buildRegistrationBlock($this);
+    $this->buildRegistrationBlock();
     self::buildConfirmationBlock($this);
     self::buildMailBlock($this);
     self::buildThankYouBlock($this);
@@ -277,20 +287,34 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
   /**
    * Build Registration Block.
-   *
-   * @param CRM_Core_Form $form
-   *
    */
-  public function buildRegistrationBlock(&$form) {
+  public function buildRegistrationBlock(): void {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'intro_text') + ['class' => 'collapsed', 'preset' => 'civievent'];
-    $form->add('wysiwyg', 'intro_text', ts('Introductory Text'), $attributes);
-    $form->add('wysiwyg', 'footer_text', ts('Footer Text'), $attributes);
+    $this->add('wysiwyg', 'intro_text', ts('Introductory Text'), $attributes);
+    $this->add('wysiwyg', 'footer_text', ts('Footer Text'), $attributes);
 
     extract(self::getProfileSelectorTypes());
-    $form->addProfileSelector('custom_pre_id', ts('Top Profile Fields'), $allowCoreTypes);
-    $form->addProfileSelector('custom_post_id', ts('Bottom Profile Fields'), $allowCoreTypes);
-    $form->addProfileSelector('additional_custom_pre_id', ts('Top Profile Fields for Additional Participants'), $allowCoreTypes);
-    $form->addProfileSelector('additional_custom_post_id', ts('Bottom Profile Fields for Additional Participants'), $allowCoreTypes);
+    $this->addProfileSelector('custom_pre_id', ts('Top Profile Fields'), $allowCoreTypes);
+    $this->addProfileSelector('custom_post_id', ts('Bottom Profile Fields'), $allowCoreTypes);
+    $this->addProfileSelector('additional_custom_pre_id', ts('Top Profile Fields for Additional Participants'), $allowCoreTypes, extraOptions: self::getAdditionalProfileExtraOptions());
+    $this->addProfileSelector('additional_custom_post_id', ts('Bottom Profile Fields for Additional Participants'), $allowCoreTypes, extraOptions: self::getAdditionalProfileExtraOptions());
+  }
+
+  /**
+   * Get the extra (non-profile) options for the additional-participant profile selectors.
+   *
+   * Unlike the primary participant's profile selectors, these have a concept of
+   * inheriting the primary's own choice, or being explicitly blank. Both are
+   * given explicit values here rather than relying on the blank/placeholder
+   * option, which has no consistent meaning at save time.
+   *
+   * @return array
+   */
+  private static function getAdditionalProfileExtraOptions(): array {
+    return [
+      'inherit' => ts('Same as primary participant'),
+      'none' => ts('- none -'),
+    ];
   }
 
   /**
@@ -488,7 +512,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
         //check for additional custom pre profile
         $additionalCustomPreId = $values['additional_custom_pre_id'] ?? NULL;
-        if (!empty($additionalCustomPreId)) {
+        if (!empty($additionalCustomPreId) && $additionalCustomPreId !== 'inherit') {
           if (!($additionalCustomPreId == 'none')) {
             $customPreId = $additionalCustomPreId;
           }
@@ -516,7 +540,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
         // We don't have required Individual fields in the pre-custom profile, so now check the post-custom profile
         if ($isPreError) {
           $additionalCustomPostId = $values['additional_custom_post_id'] ?? NULL;
-          if (!empty($additionalCustomPostId)) {
+          if (!empty($additionalCustomPostId) && $additionalCustomPostId !== 'inherit') {
             if (!($additionalCustomPostId == 'none')) {
               $customPostId = $additionalCustomPostId;
             }
@@ -828,26 +852,25 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
       $ufAdd = [];
       $wtAdd = 2;
 
+      // 'inherit' explicitly means copy the primary's profile; 'none' (or blank,
+      // for anything submitting outside the form's own select options) explicitly
+      // means no additional profile - leave $ufAdd unset for that slot.
       if (array_key_exists('additional_custom_pre_id', $params)) {
-        if (empty($params['additional_custom_pre_id'])) {
+        if (($params['additional_custom_pre_id'] ?? NULL) === 'inherit') {
           $ufAdd[1] = $params['custom_pre_id'];
           $wtAdd = 1;
         }
-        elseif (($params['additional_custom_pre_id'] ?? NULL) == 'none') {
-        }
-        else {
+        elseif (!empty($params['additional_custom_pre_id']) && $params['additional_custom_pre_id'] !== 'none') {
           $ufAdd[1] = $params['additional_custom_pre_id'];
           $wtAdd = 1;
         }
       }
 
       if (array_key_exists('additional_custom_post_id', $params)) {
-        if (empty($params['additional_custom_post_id'])) {
+        if (($params['additional_custom_post_id'] ?? NULL) === 'inherit') {
           $ufAdd[2] = $params['custom_post_id'];
         }
-        elseif (($params['additional_custom_post_id'] ?? NULL) == 'none') {
-        }
-        else {
+        elseif (!empty($params['additional_custom_post_id']) && $params['additional_custom_post_id'] !== 'none') {
           $ufAdd[2] = $params['additional_custom_post_id'];
         }
       }

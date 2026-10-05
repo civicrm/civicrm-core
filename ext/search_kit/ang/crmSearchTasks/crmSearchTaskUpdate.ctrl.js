@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchTasks').controller('crmSearchTaskUpdate', function ($scope, $timeout, crmApi4, searchTaskBaseTrait, searchTaskFieldsTrait) {
@@ -12,7 +12,7 @@
 
     this.save = function() {
       ctrl.start({
-        values: _.zipObject(ctrl.values)
+        values: Object.fromEntries(ctrl.values)
       });
     };
 
@@ -27,4 +27,4 @@
     };
 
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

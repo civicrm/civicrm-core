@@ -668,7 +668,7 @@
               }
               else {
                 relatable = '{/literal}{ts escape='js' 1='%1'}%1 contacts are currently eligible to inherit this relationship.{/ts}{literal}';
-                relatable = ts(relatable, {1: result});
+                relatable = ts(relatable, {1: result.result});
               }
               cj('#eligibleRelated').text(relatable);
             }

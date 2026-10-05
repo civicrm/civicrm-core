@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchDisplayTree').component('crmSearchDisplayTree', {
@@ -18,7 +18,7 @@
     controller: function($scope, $element, searchDisplayBaseTrait, searchDisplayTasksTrait, searchDisplayEditableTrait) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
       // Mix in required traits
-      const ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplayTasksTrait), _.cloneDeep(searchDisplayEditableTrait));
+      const ctrl = angular.extend(this, CRM.utils.cloneDeep(searchDisplayBaseTrait), CRM.utils.cloneDeep(searchDisplayTasksTrait), CRM.utils.cloneDeep(searchDisplayEditableTrait));
 
       this.tree = [];
 
@@ -62,4 +62,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

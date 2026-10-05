@@ -4,6 +4,7 @@ return [
   'name' => 'ContributionRecur',
   'table' => 'civicrm_contribution_recur',
   'class' => 'CRM_Contribute_DAO_ContributionRecur',
+  'token_class' => 'CRM_Contribute_RecurTokens',
   'getInfo' => fn() => [
     'title' => ts('Recurring Contribution'),
     'title_plural' => ts('Recurring Contributions'),
@@ -50,6 +51,9 @@ return [
       'unique_name' => 'contribution_recur_id',
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
+      'usage' => [
+        'token',
+      ],
     ],
     'contact_id' => [
       'title' => ts('Contact ID'),
@@ -70,6 +74,9 @@ return [
     'amount' => [
       'title' => ts('Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Amount to be collected (including any sales tax) by payment processor each recurrence.'),
@@ -82,6 +89,11 @@ return [
       'description' => ts('3 character string, value from config setting or input via user.'),
       'add' => '3.2',
       'default' => NULL,
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'SET NULL',
+      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',

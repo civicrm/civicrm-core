@@ -660,8 +660,11 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\C
    *
    * @return array
    *   reference to an assoc array
+   *
+   * @deprecated since 6.18 will be removed around 6.28
    */
   public function &getFlattenedTokens() {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (!$this->flattenedTokens) {
       $tokens = $this->getTokens();
 
@@ -846,8 +849,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
   /**
    * Get verp, urls and headers
    *
-   * @param int $job_id
-   *   ID of the Job associated with this message.
+   * @param int|null $job_id
+   *   (deprecated) ID of the Job associated with this message.
    * @param int $event_queue_id
    *   ID of the EventQueue.
    * @param string $hash
@@ -1058,7 +1061,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
         // load the default config settings for each
         // eg reply_id, unsubscribe_id need to use
         // correct template IDs here
-        'override_verp' => TRUE,
+        'override_verp' => !Civi::settings()->get('track_civimail_replies'),
         'forward_replies' => FALSE,
         'open_tracking' => Civi::settings()->get('open_tracking_default'),
         'url_tracking' => Civi::settings()->get('url_tracking_default'),
@@ -1107,7 +1110,13 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     $mailing = self::add($params);
 
     // update mailings with hash values
+    $newHash = empty($mailing->hash);
     CRM_Contact_BAO_Contact_Utils::generateChecksum($mailing->id, NULL, NULL, NULL, 'mailing', 16);
+    if ($newHash) {
+      // Writing the hash can move modified_date, which callers send back to detect a stale save.
+      $mailing->modified_date = CRM_Core_DAO::singleValueQuery('SELECT modified_date FROM civicrm_mailing WHERE id = %1',
+        [1 => [$mailing->id, 'Integer']]);
+    }
 
     $groupTableName = CRM_Contact_BAO_Group::getTableName();
 
@@ -1862,21 +1871,6 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    */
   public static function showEmailDetails($id) {
     return CRM_Utils_System::url('civicrm/mailing/report', "mid=$id");
-  }
-
-  /**
-   * Delete Mails and all its associated records.
-   *
-   * @param int $id
-   *   Id of the mail to delete.
-   *
-   * @return void
-   *
-   * @deprecated
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    static::deleteRecord(['id' => $id]);
   }
 
   /**

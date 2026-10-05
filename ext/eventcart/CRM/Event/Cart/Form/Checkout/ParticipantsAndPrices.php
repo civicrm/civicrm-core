@@ -195,19 +195,8 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
    * don't specifically need it & find a better way where we do.
    */
   private function processCartAmount($fields, &$params, &$lineItem = [], $priceSetID = NULL) {
-    // using price set
-    foreach ($fields as $id => $field) {
-      if (empty($params["price_{$id}"]) ||
-        (empty($params["price_{$id}"]) && $params["price_{$id}"] == NULL)
-      ) {
-        // skip if nothing was submitted for this field
-        continue;
-      }
-
-      [$params, $lineItem] = CRM_Price_BAO_PriceSet::getLine($params, $lineItem, $priceSetID, $field, $id);
-    }
     $order = new CRM_Financial_BAO_Order();
-    $order->setLineItems((array) $lineItem);
+    $order->setPriceSelectionFromUnfilteredInput($params);
     $params['amount_level'] = $order->getAmountLevel();
     $params['amount'] = $order->getTotalAmount();
     $params['tax_amount'] = $order->getTotalTaxAmount();

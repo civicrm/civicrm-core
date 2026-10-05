@@ -381,9 +381,12 @@ class CRM_Case_Form_Case extends CRM_Core_Form implements CRM_Case_Form_CaseForm
       // 'civicrm_case.details' is not used in core but is used in the CiviCase extension
       $params['details'] = $params['activity_details'];
     }
-    $caseObj = CRM_Case_BAO_Case::create($params);
+    $caseObj = CRM_Case_BAO_Case::writeRecord($params);
     $this->setCaseID($caseObj->id);
     $params['case_id'] = $this->getCaseID();
+    if (isset($caseObj->end_date)) {
+      $params['end_date'] = $caseObj->end_date;
+    }
     // unset any ids, custom data
     unset($params['id'], $params['custom']);
 

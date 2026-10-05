@@ -101,9 +101,9 @@ TODO
     * [x] Rename existing stuff to `ext/iframe`
     * [ ] Add the real `ext/oembed` (https://oembed.com/#section4)
         * [ ] End-point for `civicrm/share/` which outputs an oEmbed stub
-    * [ ] IFRAME sizing: setting
+    * [ ] IFRAME sizing: setting ? still necessary now we have dynamic ?
         * Setting for default (maybe width=480? width=720? https://mediag.com/blog/popular-screen-resolutions-designing-for-all/)
-    * [ ] IFRAME sizing: customizable (`civicrm/share?size=NNNxNNN`)
+    * [ ] IFRAME sizing: customizable (`civicrm/share?size=NNNxNNN`) ? still necessary now we have dynamic ?
 * [ ] March 5.72-RC Addendum Extension
     * [ ] JS or CSS to hide elements that we don't want to deal with yet ("Tell a Friend", "Create PCP")
 * [ ] March 5.72-RC Testing
@@ -123,11 +123,11 @@ TODO
 * [ ] Important but not ASAP
     * [ ] Stricter JWT: https://lab.civicrm.org/dev/core/-/issues/2994#note_156045
         * If referrer doesn't match our iframe setup, then reset or reject the session id; probably includes test
-    * [ ] Add entry-point for UF=Standalone (boot; invoke; X-Frame-Options; etc)
-    * [ ] Add entry-point for UF=WordPress (script-file)
+    * [x] Add entry-point for UF=Standalone (boot; invoke; X-Frame-Options; etc)
+    * [x] Add entry-point for UF=WordPress (~~script-file~~ using hooks)
     * [ ] Add entry-point for UF=Backdrop
 * [ ] Wishlist (Budget guided)
-    * [ ] Add entry-point for UF=WordPress (wp-rest)
+    * [ ] Add entry-point for UF=WordPress (wp-rest) ?is this still needed?
     * [ ] Share Workflow: Public Links (templates/CRM/common/SocialNetwork.tpl; crmRegion or hook)
     * [ ] Share Workflow: Admin Links (Contribution Page, Event Page, Petition?)
     * [ ] Share Workflow: Page Default/Singular/Standard/Built-in
@@ -139,6 +139,6 @@ TODO
       - Add some JS that filters all hyperlinks within a certain area? (`CRM.$('thankyoupage a).addSessionId('xyz')`)
       - Add some alterContent to do the same as above? Or add a filter to the regeion?
       - Define an attr for `<A HREF= SESSION=1`> or `<A HREF= CLASS="crm-session">`. But interpret client-side or server-side?
-    * [ ] IFRAME sizing: dynamic
+    * [x] IFRAME sizing: dynamic
 * [ ] Wishlist (Long term)
     * [ ] Add entry-point for UF=Joomla

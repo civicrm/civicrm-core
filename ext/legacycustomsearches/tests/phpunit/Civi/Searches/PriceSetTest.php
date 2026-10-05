@@ -64,7 +64,7 @@ class CRM_Contact_Form_Search_Custom_PriceSetTest extends TestCase implements He
   public function testRunSearch(): void {
     $this->eventCreatePaid();
     $contactID = $this->individualCreate();
-    $this->callAPISuccess('Order', 'create', [
+    $this->callApiV3Success('Order', 'create', [
       'total_amount' => 100,
       'currency' => 'USD',
       'contact_id' => $contactID,

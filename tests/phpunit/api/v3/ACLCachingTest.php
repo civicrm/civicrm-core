@@ -17,6 +17,7 @@
  * @group headless
  */
 class api_v3_ACLCachingTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   protected $_params;
 
   public function setUp(): void {

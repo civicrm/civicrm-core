@@ -11,7 +11,6 @@ return CRM_Core_CodeGen_OptionGroup::create('mail_approval_status', 'a/0054')
       'is_default' => 1,
       'is_reserved' => 1,
       'component_id' => 4,
-      'domain_id' => 1,
     ],
     [
       'label' => ts('Rejected'),
@@ -19,7 +18,6 @@ return CRM_Core_CodeGen_OptionGroup::create('mail_approval_status', 'a/0054')
       'name' => 'Rejected',
       'is_reserved' => 1,
       'component_id' => 4,
-      'domain_id' => 1,
     ],
     [
       'label' => ts('None'),
@@ -27,6 +25,5 @@ return CRM_Core_CodeGen_OptionGroup::create('mail_approval_status', 'a/0054')
       'name' => 'None',
       'is_reserved' => 1,
       'component_id' => 4,
-      'domain_id' => 1,
     ],
   ]);

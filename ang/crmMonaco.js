@@ -1,4 +1,5 @@
-(function(angular, $, _) {
+/* global require, monaco */
+(function(angular, $) {
   angular.module('crmMonaco', CRM.angRequires('crmMonaco'));
 
   // "crmMonaco" is a basic skeletal directive.
@@ -64,7 +65,7 @@
             editor.setModel({ original: originalModel, modified: modifiedModel });
 
             // Important -- how to propagate changes back to angular
-            editor.getModifiedEditor().onDidChangeModelContent(_.debounce(function () {
+            editor.getModifiedEditor().onDidChangeModelContent(CRM.utils.debounce(function () {
               $scope.$apply(function () {
                 ngModel.$setViewValue(modifiedModel.getValue());
               });
@@ -82,7 +83,7 @@
           else {
             editor = monaco.editor.create(editorEl[0], options);
 
-            editor.onDidChangeModelContent(_.debounce(function () {
+            editor.onDidChangeModelContent(CRM.utils.debounce(function () {
               $scope.$apply(function () {
                 ngModel.$setViewValue(editor.getValue());
               });
@@ -127,4 +128,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -13,7 +13,9 @@ use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\Order;
+use Civi\Api4\OrderCompletionMetadata;
 use Civi\Api4\Participant;
+use Civi\Api4\Payment;
 use Civi\Api4\PriceSet;
 use Civi\Test\EventTestTrait;
 
@@ -24,6 +26,8 @@ use Civi\Test\EventTestTrait;
  */
 class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   use EventTestTrait;
+
+  protected $_apiversion = 4;
 
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
@@ -63,6 +67,121 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $this->assertEquals($this->ids['Contact']['individual_0'], $participant['contact_id']);
     $this->assertEquals(50, $participant['fee_amount']);
     $this->assertEquals(['Student early bird'], $participant['fee_level']);
+  }
+
+  /**
+   * Test that several line items tagged with the same 'identifier' create
+   * one Participant, not one per line (dev/core#6773).
+   *
+   * The entity-creation fields (entity_id.*) are deliberately on the
+   * *second* line - this proves the grouping does not depend on them being
+   * on a particular line. That same line also declares entity_table, since
+   * it's the one providing the entity_id/entity_id.* details.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateOrderParticipantWithMultipleLineItems(): void {
+    $this->eventCreatePaid();
+    $this->individualCreate();
+    Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id' => 1,
+      ])
+      ->addLineItem([
+        'identifier' => 'participant_1',
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
+      ])
+      ->addLineItem([
+        'identifier' => 'participant_1',
+        'entity_table' => 'civicrm_participant',
+        'entity_id.event_id' => $this->getEventID(),
+        'entity_id.contact_id' => $this->ids['Contact']['individual_0'],
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      ])
+      ->execute();
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])
+      ->execute()->single();
+    $this->assertEquals(150, $contribution['total_amount']);
+    $lineItems = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(2, $lineItems);
+    $this->assertEquals($lineItems[0]['entity_id'], $lineItems[1]['entity_id']);
+    $this->assertEquals('civicrm_participant', $lineItems[1]['entity_table']);
+
+    $participant = Participant::get()
+      ->addWhere('id', '=', $lineItems[0]['entity_id'])
+      ->execute()->single();
+    $this->assertEquals($this->ids['Contact']['individual_0'], $participant['contact_id']);
+    $this->assertEquals(150, $participant['fee_amount']);
+    $this->assertEquals(['Student early bird', 'Student Rate'], $participant['fee_level']);
+  }
+
+  /**
+   * Test that a line item tagged with an identifier can target an existing
+   * entity via 'entity_id.id', rather than creating a new one (dev/core#6773).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateOrderLineItemForExistingParticipantByIdentifier(): void {
+    $this->eventCreatePaid();
+    $this->individualCreate();
+    $participant = $this->createTestEntity('Participant', [
+      'event_id' => $this->getEventID(),
+      'contact_id' => $this->ids['Contact']['individual_0'],
+    ]);
+    Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id' => 1,
+      ])
+      ->addLineItem([
+        'identifier' => 'participant_1',
+        'entity_table' => 'civicrm_participant',
+        'entity_id.id' => $participant['id'],
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
+      ])
+      ->execute();
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_participant')
+      ->addWhere('entity_id', '=', $participant['id'])
+      ->execute()->single();
+    $this->assertEquals(50, $lineItem['line_total']);
+    // No new Participant should have been created.
+    $this->assertCount(1, Participant::get(FALSE)->execute());
+  }
+
+  /**
+   * Test that line items sharing an identifier must have entity_table
+   * declared on (at least) one of them - it cannot be inferred from the
+   * identifier alone (dev/core#6773).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateOrderWithIdentifierButNoEntityTableThrows(): void {
+    $this->eventCreatePaid();
+    $this->individualCreate();
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('Line items sharing an identifier must declare entity_table');
+    Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id' => 1,
+      ])
+      ->addLineItem([
+        'identifier' => 'participant_1',
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
+      ])
+      ->addLineItem([
+        'identifier' => 'participant_1',
+        'entity_id.event_id' => $this->getEventID(),
+        'entity_id.contact_id' => $this->ids['Contact']['individual_0'],
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      ])
+      ->execute();
   }
 
   /**
@@ -107,7 +226,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->execute()->single();
     $this->assertEquals('2006-12-21', $membership['end_date']);
     // A membership payment should have been created for legacy compatibility.
-    $this->callAPISuccessGetSingle('MembershipPayment', ['membership_id' => $lineItem['entity_id'], 'contribution_id' => $contribution['id']]);
+    $this->callAPISuccessGetSingle('MembershipPayment', ['version' => 3, 'membership_id' => $lineItem['entity_id'], 'contribution_id' => $contribution['id']]);
   }
 
   /**
@@ -215,6 +334,127 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contributionRecur['frequency_interval']);
     $this->assertEquals($contribution['financial_type_id'], $contributionRecur['financial_type_id']);
     $this->assertEquals(0, $contributionRecur['is_email_receipt']);
+  }
+
+  /**
+   * OrderCompletionMetadata can be attached via the Order api at two levels:
+   * against a contribution alone (eg. receipt/email overrides), via
+   * Order::create()->setOrderCompletionMetadata(), or against a specific
+   * line item (eg. an explicit end date for the membership it represents,
+   * overriding whatever CiviCRM would otherwise calculate), via that line
+   * item's own 'order_completion_metadata' key.
+   *
+   * On payment completion, Civi\Membership\OrderCompleteSubscriber reads a
+   * line item's metadata 'entity' bag and merges it into the membership
+   * update params, so an explicit end_date wins over the calculated one.
+   * CRM_Contribute_BAO_Contribution::completeOrder() reads the
+   * contribution-level metadata's 'email' bag for the receipt's
+   * userMessageText, same as the 'receipt_text' param already supported by
+   * Contribution.sendconfirmation.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testOrderCompletionMetadata(): void {
+    $this->setUpMembershipPriceSet();
+    $endDate = '2027-01-01';
+
+    $contribution = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->setOrderCompletionMetadata(['email' => ['userMessageText' => 'Thanks for renewing!']])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        'entity_id.source' => 'Test',
+        'order_completion_metadata' => ['entity' => ['end_date' => $endDate]],
+      ])
+      ->execute()->single();
+
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+
+    $contributionLevelMetadata = OrderCompletionMetadata::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('line_item_id', 'IS NULL')
+      ->execute()->single();
+    $this->assertEquals(['email' => ['userMessageText' => 'Thanks for renewing!']], $contributionLevelMetadata['metadata']);
+
+    $lineItemLevelMetadata = OrderCompletionMetadata::get(FALSE)
+      ->addWhere('line_item_id', '=', $lineItem['id'])
+      ->execute()->single();
+    $this->assertEquals(['entity' => ['end_date' => $endDate]], $lineItemLevelMetadata['metadata']);
+
+    $mailUtil = new CiviMailUtils($this, TRUE);
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', $contribution['total_amount'])
+      ->execute();
+
+    // OrderCompleteSubscriber applied the metadata's
+    // end_date on payment completion, rather than calculating one.
+    $membership = Membership::get(FALSE)
+      ->addWhere('id', '=', $lineItem['entity_id'])
+      ->addSelect('end_date')
+      ->execute()->single();
+    $this->assertEquals($endDate, $membership['end_date']);
+
+    // CRM_Contribute_BAO_Contribution::completeOrder() should have picked
+    // up the contribution-level metadata's userMessageText for the receipt.
+    $mailUtil->checkMailLog(['Thanks for renewing!']);
+
+    // Both rows are consumed on completion (entity by OrderCompleteSubscriber,
+    // email by Contribution::completeOrder()) and should not linger.
+    $this->assertCount(0, OrderCompletionMetadata::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute());
+  }
+
+  /**
+   * OrderCompletionMetadataValidateSubscriber should reject any key we
+   * don't have a consumer for, at both the top level and within a known
+   * bag, so we don't go live able to silently accumulate data no upgrade
+   * script or reader knows how to handle.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testOrderCompletionMetadataRejectsUnknownKeys(): void {
+    $this->setUpMembershipPriceSet();
+    $contactID = $this->individualCreate();
+
+    try {
+      Order::create()
+        ->setContributionValues([
+          'contact_id' => $contactID,
+          'financial_type_id:name' => 'Member Dues',
+        ])
+        ->setOrderCompletionMetadata(['banana' => ['userMessageText' => 'Thanks for renewing!']])
+        ->addLineItem(['price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'], 'entity_id.source' => 'Test'])
+        ->execute();
+      $this->fail('Expected an exception for an unrecognised top-level metadata key.');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringContainsString("Unrecognised OrderCompletionMetadata key 'banana'", $e->getMessage());
+    }
+
+    try {
+      Order::create()
+        ->setContributionValues([
+          'contact_id' => $contactID,
+          'financial_type_id:name' => 'Member Dues',
+        ])
+        ->addLineItem([
+          'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+          'entity_id.source' => 'Test',
+          'order_completion_metadata' => ['entity' => ['favourite_colour' => 'blue']],
+        ])
+        ->execute();
+      $this->fail('Expected an exception for an unrecognised metadata sub-key.');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringContainsString("Unrecognised OrderCompletionMetadata['entity'] key(s): favourite_colour", $e->getMessage());
+    }
   }
 
   /**

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   // Controller for the "Save Message Template" dialog
   // Scope members:
@@ -14,7 +14,7 @@
     $scope.selected = null;
 
     $scope.save = function save() {
-      const tpl = _.extend({}, $scope.model.tpl);
+      const tpl = Object.assign({}, $scope.model.tpl);
       switch ($scope.saveOpt.mode) {
         case 'add':
           tpl.msg_title = $scope.saveOpt.newTitle;
@@ -80,4 +80,4 @@
     setTimeout(scopeApply(init), 0);
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

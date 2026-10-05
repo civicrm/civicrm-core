@@ -137,7 +137,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
       CRM_Core_DAO::executeQuery($sql, $args, TRUE, NULL, FALSE, FALSE);
     }
     else {
-      $sql = "INSERT INTO {$this->table} (group_name,path,data,created_date,expired_date) VALUES (%1,%2,%3,FROM_UNIXTIME(%4),FROM_UNIXTIME(%5))";
+      $sql = "INSERT IGNORE INTO {$this->table} (group_name,path,data,created_date,expired_date) VALUES (%1,%2,%3,FROM_UNIXTIME(%4),FROM_UNIXTIME(%5))";
       $args = [
         1 => [(string) $this->group, 'String'],
         2 => [$key, 'String'],

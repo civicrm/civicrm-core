@@ -424,6 +424,7 @@ class CRM_Upgrade_Incremental_Base {
     else {
       self::addColumn($ctx, $tableName, $fieldName, $fieldSql, !empty($fieldSpec['localizable']), $version, $triggerRebuild);
     }
+    Civi::schemaHelper()->dropForeignKeysForColumn($tableName, $fieldName);
     Civi::schemaHelper()->createForeignKey($tableName, $fieldName, $fieldSpec);
     return TRUE;
   }
@@ -640,6 +641,7 @@ class CRM_Upgrade_Incremental_Base {
    */
   public static function dropColumn($ctx, $table, $column) {
     if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column)) {
+      Civi::schemaHelper()->dropForeignKeysForColumn($table, $column);
       CRM_Core_DAO::executeQuery("ALTER TABLE `$table` DROP COLUMN `$column`",
         [], TRUE, NULL, FALSE, FALSE);
     }

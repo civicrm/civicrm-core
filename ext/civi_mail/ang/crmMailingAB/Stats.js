@@ -1,4 +1,4 @@
-(function (angular, $, _, d3) {
+(function (angular, $, d3) {
 
 
   // FIXME: This code is long and hasn't been fully working for me, but I've moved it into a spot
@@ -63,7 +63,7 @@
               var year = t[2];
               var day = t[1].substr(0, t[1].length - 3);
               var t1, hur, hour, min;
-              if (_.isEmpty(t[3])) {
+              if (!t[3]) {
                 t1 = t[4].split(":");
                 hur = t1[0];
                 if (t[5] == "AM") {
@@ -277,4 +277,4 @@
       } // link()
     };
   });
-})(angular, CRM.$, CRM._, CRM.visual.d3);
+})(angular, CRM.$, CRM.visual.d3);

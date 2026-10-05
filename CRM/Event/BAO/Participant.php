@@ -161,7 +161,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant implements \Ci
       'modified_date' => date('Ymd'),
     ];
 
-    CRM_Core_BAO_Log::add($logParams);
+    CRM_Core_BAO_Log::writeRecord($logParams);
 
     $params['participant_id'] = $participant->id;
 
@@ -1131,12 +1131,14 @@ WHERE  civicrm_participant.id = {$participantId}
    * @throws \CRM_Core_Exception
    */
   public static function getDefaultRoleID() {
-    return (int) civicrm_api3('OptionValue', 'getvalue', [
-      'return' => 'value',
-      'option_group_id' => 'participant_role',
-      'is_active' => 1,
-      'options' => ['limit' => 1, 'sort' => 'is_default DESC'],
-    ]);
+    return (int) \Civi\Api4\OptionValue::get(FALSE)
+      ->addSelect('value')
+      ->addWhere('option_group_id:name', '=', 'participant_role')
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('is_default', 'DESC')
+      ->setLimit(1)
+      ->execute()
+      ->first()['value'];
   }
 
   /**
@@ -1282,11 +1284,10 @@ WHERE cpf.price_set_id = %1 AND cpfv.label LIKE %2";
     if (!empty($cascadeAdditionalIds)) {
       try {
         foreach ($cascadeAdditionalIds as $id) {
-          $participantParams = [
-            'id' => $id,
-            'status_id' => $newStatusID,
-          ];
-          civicrm_api3('Participant', 'create', $participantParams);
+          \Civi\Api4\Participant::update(FALSE)
+            ->addValue('status_id', $newStatusID)
+            ->addWhere('id', '=', $id)
+            ->execute();
         }
         return TRUE;
       }

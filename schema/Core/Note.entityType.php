@@ -37,6 +37,9 @@ return [
       'add' => '1.1',
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
+      'usage' => [
+        'import',
+      ],
     ],
     'entity_table' => [
       'title' => ts('Note Entity'),
@@ -50,6 +53,9 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'note_used_for',
+      ],
+      'usage' => [
+        'import',
       ],
     ],
     'entity_id' => [
@@ -65,6 +71,9 @@ return [
       'entity_reference' => [
         'dynamic_entity' => 'entity_table',
         'key' => 'id',
+      ],
+      'usage' => [
+        'import',
       ],
     ],
     'note' => [
@@ -109,6 +118,9 @@ return [
       'input_attrs' => [
         'format_type' => 'activityDateTime',
       ],
+      'usage' => [
+        'import',
+      ],
     ],
     'created_date' => [
       'title' => ts('Created Date'),
@@ -146,6 +158,9 @@ return [
       'input_attrs' => [
         'size' => '60',
       ],
+      'usage' => [
+        'import',
+      ],
     ],
     'privacy' => [
       'title' => ts('Privacy'),
@@ -157,6 +172,9 @@ return [
       'default' => '0',
       'pseudoconstant' => [
         'option_group_name' => 'note_privacy',
+      ],
+      'usage' => [
+        'import',
       ],
     ],
   ],

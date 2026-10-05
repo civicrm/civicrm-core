@@ -1,12 +1,12 @@
 <span ng-if=":: !$ctrl.isArray(colData.val)">
   <i ng-if=":: colData.icons.left[0]" class="crm-i {{:: colData.icons.left[0] }}" role="img" aria-hidden="true"></i>
-  <span class="crm-search-field-value">{{:: colData.val }}</span>
+  <span ng-if=":: !colData.colors[0]" class="crm-search-field-value">{{:: colData.val }}</span>
+  <span ng-if=":: colData.colors[0]" class="crm-search-field-value badge" style="{{:: $ctrl.getColorStyle(colData.colors[0]) }}">{{:: colData.val }}</span>
   <i ng-if=":: colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}" role="img" aria-hidden="true"></i>
 </span>
 <span ng-if=":: $ctrl.isArray(colData.val)">
   <span ng-repeat="val in colData.val track by $index">
-    <i ng-if=":: colData.icons.left[$index]" class="crm-i {{:: colData.icons.left[$index] }}" role="img" aria-hidden="true"></i>
-      <span class="crm-search-field-value">{{:: val }}</span><i ng-if="colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}" role="img" aria-hidden="true"></i><span ng-if="!$last">,
+    <i ng-if=":: colData.icons.left[$index]" class="crm-i {{:: colData.icons.left[$index] }}" role="img" aria-hidden="true"></i><span ng-if=":: !colData.colors[$index]" class="crm-search-field-value">{{:: val }}</span><span ng-if=":: colData.colors[$index]" class="crm-search-field-value badge" style="{{:: $ctrl.getColorStyle(colData.colors[$index]) }}">{{:: val }}</span><i ng-if="colData.icons.right[$index]" class="crm-i {{:: colData.icons.right[$index] }}" role="img" aria-hidden="true"></i><span ng-if="!$last && !colData.colors[$index]">,
     </span>
   </span>
 </span>

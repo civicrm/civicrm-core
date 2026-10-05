@@ -1,16 +1,6 @@
 <div class="crm-clear crm-inline-block-content">
   <div class="crm-summary-row">
-    <div class="crm-label" id="tagLink">
-      <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId&selectedChild=tag"}"
-         title="{ts escape='htmlattribute'}Edit Tags{/ts}">{ts}Tags{/ts}</a>
-    </div>
-    <div class="crm-content" id="tags">
-      {foreach from=$contactTag item=tagName key=tagId}
-        <span class="crm-tag-item" {if !empty($allTags.$tagId.color)}style="background-color: {$allTags.$tagId.color}; color: {$allTags.$tagId.color|colorContrast};"{/if} title="{$allTags.$tagId.description|escape}">
-          {$tagName|escape}
-        </span>
-      {/foreach}
-    </div>
+    {include file="CRM/Contact/Page/Inline/Tags.tpl" tagsLabel="{ts}Tags{/ts}"}
   </div>
   <div class="crm-summary-row">
     <div class="crm-label">{ts}Contact Type{/ts}</div>

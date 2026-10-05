@@ -90,7 +90,7 @@ class CRM_Core_DAO extends DB_DataObject {
     DB_DAO_NOTNULL = 128,
     VALUE_SEPARATOR = "",
     BULK_INSERT_COUNT = 200,
-    BULK_INSERT_HIGH_COUNT = 200,
+    BULK_INSERT_HIGH_COUNT = 10000,
     QUERY_FORMAT_WILDCARD = 1,
     QUERY_FORMAT_NO_QUOTES = 2,
 
@@ -371,6 +371,7 @@ class CRM_Core_DAO extends DB_DataObject {
     $FKClassName = $fieldDef['FKClassName'] ?? NULL;
     $dbName = $fieldDef['name'];
     $daoName = str_replace('_BAO_', '_DAO_', get_class($this));
+    $fkColumnName = $fieldDef['FKColumnName'] ?? 'id';
 
     // skip the FK if it is not required
     // if it's contact id we should create even if not required
@@ -382,24 +383,24 @@ class CRM_Core_DAO extends DB_DataObject {
     if (!$required && $dbName != 'contact_id') {
       $fkDAO = new $FKClassName();
       if ($fkDAO->find(TRUE)) {
-        $this->$dbName = $fkDAO->id;
+        $this->$dbName = $fkDAO->$fkColumnName;
       }
     }
 
     elseif (in_array($FKClassName, CRM_Core_DAO::$_testEntitiesToSkip)) {
       $depObject = new $FKClassName();
       $depObject->find(TRUE);
-      $this->$dbName = $depObject->id;
+      $this->$dbName = $depObject->$fkColumnName;
     }
     elseif ($daoName == 'CRM_Member_DAO_MembershipType' && $fieldName == 'member_of_contact_id') {
       // FIXME: the fields() metadata is not specific enough
       $depObject = CRM_Core_DAO::createTestObject($FKClassName, ['contact_type' => 'Organization']);
-      $this->$dbName = $depObject->id;
+      $this->$dbName = $depObject->$fkColumnName;
     }
     else {
       //if it is required we need to generate the dependency object first
       $depObject = CRM_Core_DAO::createTestObject($FKClassName, $params[$dbName] ?? 1);
-      $this->$dbName = $depObject->id;
+      $this->$dbName = $depObject->$fkColumnName;
     }
   }
 
@@ -942,6 +943,11 @@ class CRM_Core_DAO extends DB_DataObject {
 
       // if there is no value then make the variable NULL
       if ($exists) {
+        // Trim string inputs
+        $inputType = $field['input_type'] ?? $field['html']['type'] ?? NULL;
+        if (in_array($inputType, ['Text', 'Email', 'Url'], TRUE) && is_string($value)) {
+          $value = mb_trim($value);
+        }
         if ($value === '') {
           if ($dbName === $primaryKey && $field['type'] === CRM_Utils_Type::T_INT) {
             // See also \Civi\Api4\Utils\FormattingUtil::formatWriteParams().
@@ -2463,7 +2469,9 @@ SELECT contact_id
     $config->backtrace = TRUE;
 
     $object = new $daoName();
-    $object->id = $params['id'] ?? NULL;
+    foreach ($params as $k => $v) {
+      $object->$k = $v;
+    }
 
     // array(array(0 => $daoName, 1 => $daoParams))
     $deletions = [];
@@ -2476,6 +2484,7 @@ SELECT contact_id
 
         $FKClassName = $value['FKClassName'] ?? NULL;
         $required = $value['required'] ?? NULL;
+        $fkColumnName = $value['FKColumnName'] ?? 'id';
         if ($FKClassName != NULL
           && $object->$dbName
           && !in_array($FKClassName, CRM_Core_DAO::$_testEntitiesToSkip)
@@ -2485,7 +2494,7 @@ SELECT contact_id
           && $dbName != 'member_of_contact_id'
         ) {
           // x
-          $deletions[] = [$FKClassName, ['id' => $object->$dbName]];
+          $deletions[] = [$FKClassName, [$fkColumnName => $object->$dbName]];
         }
       }
     }
@@ -3526,22 +3535,24 @@ SELECT contact_id
     $name = CRM_Utils_String::munge($label, '_', $maxLen - $maxSuffixLen);
 
     // Define an arbitrary limit on how many guesses we will perform before
-    // throwing an exception. This would occur only in some unanticipated use
-    // case.
-    $max_guesses = 36 ^ ($maxSuffixLen - 1);
+    // throwing an exception. Hitting this limit is extremely improbable.
+    $max_guesses = 1000;
 
     $guesses_per_loop = 5;
     $guess_count = 0;
+
+    // Start with the full, unsuffixed name as the first cantidate
+    $start = 1;
+    $candidates = [CRM_Utils_String::munge($label, '_', $maxLen)];
 
     do {
       // Make an initial attempt to guess a unique name by searching for
       // 5 candidates (the original $name plus $name with 4 random suffixes).
       // If all of these happen to exist in the table, we'll keep trying,
       // doubling the number of guesses each time through the loop.
-      for ($i = 0; $i < $guesses_per_loop; $i++, $guess_count++) {
-        $suffix = $guess_count == 0 ? '' :
-          '_' . CRM_Utils_String::createRandom($maxSuffixLen - 1, 'abcdefghijklmnopqrstuvwxyz0123456789');
-        $candidates[$i] = $name . $suffix;
+      for ($i = $start; $i < $guesses_per_loop; $i++, $guess_count++) {
+        $suffix = CRM_Utils_String::createRandom($maxSuffixLen - 1, 'abcdefghijklmnopqrstuvwxyz0123456789');
+        $candidates[$i] = $name . '_' . $suffix;
       }
 
       $sql = new CRM_Utils_SQL_Select($this::getTableName());
@@ -3575,15 +3586,16 @@ SELECT contact_id
           }
         }
       }
-      else {
-        // All candidates were found in the table. Try harder next time.
-        $guesses_per_loop = min(1000, $guesses_per_loop * 2);
+      // All candidates were found in the table. Try harder next time.
+      $guesses_per_loop = min(1000, $guesses_per_loop * 2);
 
-        if ($guess_count > $max_guesses) {
-          throw new CRM_Core_Exception("CRM_Core_DAO::makeNameFromLabel failed to generate a unique name for label $label.");
-        }
-      }
-    } while (1);
+      // No more special treatment of the first cantidate, from now on they'll all be suffixed
+      $start = 0;
+
+    } while ($max_guesses > $guess_count);
+
+    // Something is very wrong if we hit this line - the odds of matching this many random strings is infinitesimal
+    throw new CRM_Core_Exception("CRM_Core_DAO::makeNameFromLabel failed to generate a unique name for label $label.");
   }
 
   /**

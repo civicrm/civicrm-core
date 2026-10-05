@@ -745,10 +745,8 @@ class CRM_Report_Form extends CRM_Core_Form {
     $this->assign('criteriaForm', FALSE);
     // Will be overwritten in postProcess if TRUE.
     $this->assign('printOnly', FALSE);
-    // Display Report Criteria section if user has access Report Criteria OR administer Reports AND report instance is not reserved
-    if (CRM_Core_Permission::check('administer Reports') ||
-      CRM_Core_Permission::check('access Report Criteria')
-    ) {
+    // Display Report Criteria section if user has access Report Criteria AND report instance is not reserved
+    if (CRM_Core_Permission::check('access Report Criteria')) {
       if (empty($this->_instanceValues['is_reserved']) ||
         CRM_Core_Permission::check('administer reserved reports')
       ) {
@@ -2376,7 +2374,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     $customFields = [];
     $customFieldIds = [];
-    foreach ($this->_params['fields'] as $fieldAlias => $value) {
+    foreach ($this->_params['fields'] ?? [] as $fieldAlias => $value) {
       if ($fieldId = CRM_Core_BAO_CustomField::getKeyID($fieldAlias)) {
         $customFieldIds[$fieldAlias] = $fieldId;
       }
@@ -2969,7 +2967,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       = CRM_Utils_Request::retrieve(
         'sendmail',
         'Boolean',
-        CRM_Core_DAO::$_nullObject
+        NULL
       );
 
     if ($this->_sendmail && !$this->_outputMode) {
@@ -5143,7 +5141,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     $this->_outputMode = str_replace('report_instance.', '', (CRM_Utils_Request::retrieve(
       'output',
       'String',
-      CRM_Core_DAO::$_nullObject,
+      NULL,
       FALSE,
       $this->_params['task'] ?? NULL
     ) ?? ''));

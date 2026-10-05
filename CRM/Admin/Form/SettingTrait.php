@@ -206,6 +206,17 @@ trait CRM_Admin_Form_SettingTrait {
       // Disable input when values are overridden in civicrm.settings.php.
       $mandatory = Civi::settings()->getMandatory($settingName);
       if ($mandatory !== NULL) {
+        // Shape the value the same way setDefaultsForMetadataDefinedFields() shapes
+        // DB/API-sourced defaults for these field types. Without this,
+        // CRM_Core_Form::buildForm()'s merge of mandatory values over $this->_defaults
+        // clobbers a correctly-shaped default with one QuickForm's default-matching
+        // does not recognise, leaving the field looking empty/unchecked (dev/core#6699).
+        if ($quickFormType === 'CheckBoxes' && is_array($mandatory)) {
+          $mandatory = array_fill_keys($mandatory, 1);
+        }
+        elseif ($quickFormType === 'CheckBox') {
+          $mandatory = [$settingName => $mandatory];
+        }
         $this->mandatoryValues[$settingName] = $mandatory;
       }
 

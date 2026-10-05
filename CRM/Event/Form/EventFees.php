@@ -31,7 +31,7 @@ class CRM_Event_Form_EventFees {
    * @throws \CRM_Core_Exception
    */
   public static function preProcess(&$form) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     //as when call come from register.php
     if (!$form->_eventId) {
       $form->_eventId = CRM_Utils_Request::retrieve('eventId', 'Positive', $form);
@@ -178,22 +178,7 @@ class CRM_Event_Form_EventFees {
       $form->assign('currency', $defaults['participant_fee_currency']);
     }
 
-    // CRM-4395
-    if ($contriId = $form->get('onlinePendingContributionId')) {
-      $defaults['record_contribution'] = 1;
-      $contribution = new CRM_Contribute_DAO_Contribution();
-      $contribution->id = $contriId;
-      $contribution->find(TRUE);
-      foreach ([
-        'financial_type_id',
-        'payment_instrument_id',
-        'contribution_status_id',
-        'receive_date',
-        'total_amount',
-      ] as $f) {
-        $defaults[$f] = $contribution->$f;
-      }
-    }
+    $defaults['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     return $defaults;
   }
 

@@ -1,4 +1,4 @@
-(function($, CRM, _) {
+(function($, CRM) {
   "use strict";
 
   /**
@@ -20,7 +20,8 @@
       }
       var
         $dataField = $(this).wrap('<span class="crm-form-date-wrapper" />'),
-        settings = _.cloneDeep(options || {}),
+        // Not structuredClone(): jQuery UI datepicker options may include callbacks, which it can't clone
+        settings = CRM.utils.cloneDeep(options || {}),
         $dateField = $(),
         $timeField = $(),
         $clearLink = $(),
@@ -29,7 +30,7 @@
         type = hasDatepicker ? 'text' : 'number';
 
       if (settings.allowClear !== undefined ? settings.allowClear : !$dataField.is('.required, [required]')) {
-        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ _.escape(ts('Clear')) +'"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>')
+        $clearLink = $('<a class="crm-hover-button crm-clear-link" title="'+ CRM.utils.escapeHtml(ts('Clear')) +'"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>')
           .insertAfter($dataField);
       }
       if (settings.time !== false) {
@@ -71,8 +72,8 @@
           settings.minDate = settings.minDate ? CRM.utils.makeDate(settings.minDate) : null;
           settings.maxDate = settings.maxDate ? CRM.utils.makeDate(settings.maxDate) : null;
           settings.dateFormat = typeof settings.date === 'string' ? settings.date : CRM.config.dateInputFormat;
-          settings.changeMonth = _.includes(settings.dateFormat, 'm');
-          settings.changeYear = _.includes(settings.dateFormat, 'y');
+          settings.changeMonth = settings.dateFormat.includes('m');
+          settings.changeYear = settings.dateFormat.includes('y');
           if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
             settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
           }
@@ -128,7 +129,7 @@
           time = null;
         if (context !== 'userInput' && context !== 'crmClear') {
           if (hasDatepicker) {
-            $dateField.datepicker('setDate', _.includes(val, '-') ? $.datepicker.parseDate('yy-mm-dd', val) : null);
+            $dateField.datepicker('setDate', val.includes('-') ? $.datepicker.parseDate('yy-mm-dd', val) : null);
           } else if ($dateField.length) {
             $dateField.val(val.slice(0, 4));
           }
@@ -189,4 +190,4 @@
     return cls.split(/\s+/).filter(function(c) { return c.indexOf('ng-') === 0; }).join(' ');
   }
 
-})(jQuery, CRM, CRM._);
+})(jQuery, CRM);

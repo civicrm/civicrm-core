@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchAdminImport', {
@@ -9,7 +9,7 @@
 
       this.values = '';
 
-      const checkInput = _.debounce(function() {
+      const checkInput = CRM.utils.debounce(function() {
         $scope.$apply(function() {
           if (!ctrl.values) {
             ctrl.checking = false;
@@ -29,18 +29,18 @@
               }, 'name']
             };
             // Get count of existing matches for each import entity
-            _.each(apiCalls, function (apiCall) {
+            (apiCalls || []).forEach((apiCall) => {
               const entity = apiCall[0];
-              if (apiCall[1] !== 'save' || ('chain' in apiCall[2] && !_.isEmpty(apiCall[2].chain))) {
+              if (apiCall[1] !== 'save' || ('chain' in apiCall[2] && Object.keys(apiCall[2].chain).length)) {
                 throw ts('Unsupported API action: only "save" is allowed.');
               }
-              if (!_.includes(allowedEntities, entity)) {
+              if (!allowedEntities.includes(entity)) {
                 throw ts('Unsupported API entity "' + entity + '".');
               }
               if (entity in getCalls) {
                 throw ts('Duplicate API entity "' + entity + '".');
               }
-              const names = _.map(apiCall[2].records, 'name'),
+              const names = apiCall[2].records.map((record) => record.name),
                 where = [['name', 'IN', names]];
               if (entity === 'SearchDisplay') {
                 where.push(['saved_search_id.name', '=', apiCall[2].records[0]['saved_search_id.name']]);
@@ -49,7 +49,7 @@
                 getCalls[entity] = [entity, 'get', {select: ['row_count'], where: where}];
               }
             });
-            if (_.keys(getCalls).length < 2) {
+            if (Object.keys(getCalls).length < 2) {
               throw ts('No records to import.');
             }
             crmApi4(getCalls)
@@ -57,12 +57,12 @@
                 ctrl.checking = false;
                 ctrl.error = '';
                 ctrl.preview = '';
-                _.each(allowedEntities, function (entity) {
+                allowedEntities.forEach((entity) => {
                   if (results[entity]) {
                     const info = results.Entity[entity],
                       count = getCalls[entity][2].where[0][2].length,
                       existing = results[entity].count,
-                      saveCall = _.findWhere(apiCalls, {0: entity});
+                      saveCall = apiCalls.find((call) => call[0] === entity);
                     // Unless it's an afform, the api save params must include `match` or an update is not possible
                     if (existing && entity !== 'Afform' && (!saveCall[2].match || !saveCall[2].match.length)) {
                       ctrl.error += ' ' + ts('Cannot create %1 %2 because an existing one with the same name already exists.', {
@@ -125,4 +125,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -84,6 +84,43 @@
 
       $scope.getField = afGui.getField;
 
+      /**
+       * Field metadata for one of the entity's preset values.
+       *
+       * A dynamic foreign key only knows which entity it points to once its controlling
+       * field is set - e.g. ContactRole.entity_id is a Contact, an Event or whatever else
+       * entity_table names. Resolve it from the value alongside it so the input can offer
+       * the matching entities on this form.
+       */
+      // Resolved copies are cached so the object identity only changes when the target
+      // entity does; the input widget is rebuilt whenever it changes.
+      const dfkFields = {};
+
+      $scope.getValueField = function(fieldName) {
+        const field = afGui.getField(ctrl.getEntityType(), $scope.getUnsuffixedName(fieldName));
+        const controlField = field && field.input_attrs && field.input_attrs.control_field;
+        if (!field || !controlField || !field.dfk_entities) {
+          return field;
+        }
+        const fkEntity = field.dfk_entities[ctrl.entity.data[controlField]] || null;
+        if (!dfkFields[fieldName] || dfkFields[fieldName].fk_entity !== fkEntity) {
+          dfkFields[fieldName] = Object.assign({}, field, {fk_entity: fkEntity});
+        }
+        return dfkFields[fieldName];
+      };
+
+      /**
+       * A dynamic foreign key cannot be filled in until its controlling field has a value.
+       */
+      $scope.getUnsetControlField = function(fieldName) {
+        const field = afGui.getField(ctrl.getEntityType(), $scope.getUnsuffixedName(fieldName));
+        const controlField = field && field.input_attrs && field.input_attrs.control_field;
+        if (!controlField || !field.dfk_entities || ctrl.entity.data[controlField]) {
+          return null;
+        }
+        return $scope.getMeta().fields[controlField] ? $scope.getMeta().fields[controlField].label : controlField;
+      };
+
       $scope.valuesFields = () => {
         const fields = Object.values($scope.getMeta().fields).map(field => ({
           id: field.name,
@@ -136,9 +173,14 @@
         }
 
         function fieldDefaults(field) {
+          let name = field.name;
+          // Use :name suffix if available (improves form portability)
+          if (field.options && Array.isArray(field.suffixes) && field.suffixes.includes('name')) {
+            name += ':name';
+          }
           const tag = {
             "#tag": "af-field",
-            name: field.name
+            name: name
           };
           return tag;
         }
@@ -188,7 +230,7 @@
           ctrl.editor.allowEntityConfig &&
           (!search || fieldsetTitle.toLowerCase().includes(search))
         ) {
-          const fieldsetElement = _.cloneDeep(afGui.meta.elements.fieldset.element);
+          const fieldsetElement = structuredClone(afGui.meta.elements.fieldset.element);
           fieldsetElement['af-fieldset'] = ctrl.entity.name;
           $scope.elementList.push(fieldsetElement);
           $scope.elementTitles.push(fieldsetTitle);
@@ -245,7 +287,7 @@
         if (!found) {
           found = {};
         }
-        if (_.find(group, criteria)) {
+        if ((group || []).find(afGui.matches(criteria))) {
           found.match = true;
           return true;
         }
@@ -253,7 +295,7 @@
           if (found.match) {
             return false;
           }
-          if (_.isPlainObject(item)) {
+          if (afGui.isPlainObject(item)) {
             // Recurse through everything but skip fieldsets for other entities
             if (!item['af-join'] && (!item['af-fieldset'] || (item['af-fieldset'] === ctrl.entity.name)) && item['#children']) {
               check(item['#children'], criteria, found);
@@ -290,7 +332,7 @@
 
         const behaviorInfo = CRM.afGuiEditor.behaviors[ctrl.getEntityType()] || [];
         ctrl.behaviors = behaviorInfo.reduce((behaviors, behavior) => {
-          const item = _.cloneDeep(behavior);
+          const item = structuredClone(behavior);
           item.options = formatForSelect2(item.modes, 'name', 'label', ['description', 'icon']);
           behaviors.push(item);
           return behaviors;

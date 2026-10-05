@@ -17,6 +17,7 @@
  * @group headless
  */
 class api_v3_ImTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   public function setUp(): void {
     parent::setUp();

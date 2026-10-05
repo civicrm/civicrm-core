@@ -31,7 +31,10 @@ class Api4EntitySetQuery extends Api4Query {
     $isAggregate = $this->isAggregateQuery();
     $isDistinct = $this->isDistinctUnion();
 
-    foreach ($api->getSets() as $index => $set) {
+    $sets = $api->getSets();
+    $this->padSelectFields($sets);
+
+    foreach ($sets as $index => $set) {
       [$type, $entity, $action, $params] = $set + [NULL, NULL, 'get', []];
       $params['checkPermissions'] = $api->getCheckPermissions();
       $params['version'] = 4;
@@ -68,7 +71,7 @@ class Api4EntitySetQuery extends Api4Query {
     $results = $this->getResults();
     // Aggregated queries will have to make due with limited field info
     if (!isset($results[0]['_api_set_index'])) {
-      FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, 'get', $this->selectAliases);
+      FormattingUtil::formatOutputValues($results, $this->apiFieldSpec, 'get', $this->selectAliases, $this);
       return $results;
     }
     // Categorize rows by set, so each set can be formatted as a batch
@@ -81,11 +84,26 @@ class Api4EntitySetQuery extends Api4Query {
       $setResults[$index][] = &$result;
     }
     foreach ($setResults as $index => &$setResult) {
-      $fieldSpec = $this->getSubquery($index)->apiFieldSpec;
+      $fieldSpec = $this->getSubquery($index)->apiFieldSpec + $this->apiFieldSpec;
       $selectAliases = $this->getSubquery($index)->selectAliases;
-      FormattingUtil::formatOutputValues($setResult, $fieldSpec, 'get', $selectAliases);
+      FormattingUtil::formatOutputValues($setResult, $fieldSpec, 'get', $selectAliases, $this->getSubquery($index));
     }
     return $results;
+  }
+
+  /**
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  public function getCount(): int {
+    $this->buildSelectClause();
+    $this->buildWhereClause();
+    $this->buildGroupBy();
+    $this->buildHavingClause();
+    $subquery = $this->query->toSQL();
+    $sql = "SELECT count(*) AS `c` FROM ( $subquery ) AS `rows`";
+    $this->debug('sql', $sql);
+    return (int) \CRM_Core_DAO::singleValueQuery($sql);
   }
 
   private function getSubquery(int $index = 0): Api4SelectQuery {
@@ -97,7 +115,7 @@ class Api4EntitySetQuery extends Api4Query {
    */
   protected function buildSelectClause() {
     // Default is to SELECT * FROM (subqueries)
-    $select = $this->api->getSelect();
+    $select = array_diff($this->api->getSelect(), ['row_count']);
     if ($select === ['*']) {
       $select = [];
     }
@@ -115,30 +133,61 @@ class Api4EntitySetQuery extends Api4Query {
       }
       $expr = SqlExpression::convert($sql);
       $field = $expr->getType() === 'SqlField' ? $this->getSubquery()->getField($expr->getFields()[0]) : NULL;
-      $this->addSpecField($alias, [
+      $spec = [
         'sql_name' => "`$alias`",
+      ] + ($field ?: []) + [
         'entity' => $field['entity'] ?? NULL,
         'name' => $field['name'] ?? $alias,
         'data_type' => $field['data_type'] ?? $expr::getDataType(),
-      ]);
+      ];
+      $this->addSpecField($alias, $spec);
     }
     // Parse select clause if not using default of *
     foreach ($select as $item) {
-      $expr = SqlExpression::convert($item, TRUE);
-      $alias = $expr->getAlias();
-      $this->selectAliases[$alias] = $expr->getExpr();
-      $this->query->select($expr->render($this, TRUE));
+      if (!$this->addExprToSelectClause($item)) {
+        $select = array_diff($select, [$item]);
+      }
+    }
+    // An outer expression belongs to no subquery, so without its own spec it is returned unformatted.
+    foreach ($this->selectAliases as $alias => $sql) {
+      if (isset($this->apiFieldSpec[$alias])) {
+        continue;
+      }
+      $expr = SqlExpression::convert($sql);
+      // Plain fields are resolved by base name in formatOutputValues(), which is what finds the
+      // options for a suffixed alias like `parent_id:name`; a spec keyed by the alias masks them.
+      if ($expr->getType() === 'SqlField') {
+        continue;
+      }
+      $this->addSpecField($alias, [
+        'sql_name' => "`$alias`",
+        'data_type' => $expr->getRenderedDataType($this),
+      ]);
+    }
+    if ($select && !$this->isAggregateQuery()) {
+      $this->selectAliases['_api_set_index'] = '_api_set_index';
+      $this->query->select('`_api_set_index`');
     }
   }
 
   /**
    * @param string $expr
+   * @param bool $strict
    * @return array|null
    */
-  public function getField(string $expr):? array {
-    $col = strpos($expr, ':');
-    $fieldName = $col ? substr($expr, 0, $col) : $expr;
-    return $this->apiFieldSpec[$fieldName] ?? NULL;
+  public function getField(string $expr, bool $strict = FALSE):? array {
+    if (isset($this->apiFieldSpec[$expr])) {
+      $field = $this->apiFieldSpec[$expr];
+    }
+    else {
+      $col = strpos($expr, ':');
+      $fieldName = $col ? substr($expr, 0, $col) : $expr;
+      $field = $this->apiFieldSpec[$fieldName] ?? NULL;
+    }
+    if ($strict && $field === NULL) {
+      throw new \CRM_Core_Exception("Invalid field '$expr'");
+    }
+    return $field ?: NULL;
   }
 
   protected function buildWhereClause() {
@@ -161,6 +210,30 @@ class Api4EntitySetQuery extends Api4Query {
       if ($sql) {
         $this->query->having($sql);
       }
+    }
+  }
+
+  /**
+   * Ensure all sets have the same number of select fields and convert NULL to SQL NULL.
+   *
+   * @param array $sets
+   */
+  public function padSelectFields(array &$sets): void {
+    $maxSelectCount = 0;
+    foreach ($sets as $set) {
+      $maxSelectCount = max($maxSelectCount, count($set[3]['select'] ?? []));
+    }
+    foreach ($sets as &$set) {
+      $select = $set[3]['select'] ?? [];
+      // Pad select if not the same length as the longer sets
+      if ($select && !in_array('*', $select, TRUE)) {
+        $select = array_pad($select ?? [], $maxSelectCount, NULL);
+      }
+      // Convert NULL to SQL NULL, giving each a unique alias
+      $nullCount = 0;
+      $set[3]['select'] = array_map(function($item) use (&$nullCount) {
+        return $item === NULL ? 'NULL AS `_null_' . ($nullCount++) . '`' : $item;
+      }, $select);
     }
   }
 

@@ -22,6 +22,10 @@ class SqlNumber extends SqlExpression {
     \CRM_Utils_Type::validate($this->expr, 'Float');
   }
 
+  public function getRenderedDataType(?Api4Query $query): ?string {
+    return is_numeric($this->expr) && !str_contains((string) $this->expr, '.') ? 'Integer' : 'Float';
+  }
+
   public static function getTitle(): string {
     return ts('Number');
   }

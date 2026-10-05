@@ -17,17 +17,6 @@
 class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
 
   /**
-   * @deprecated
-   * @param array $params
-   * @param array $defaults
-   * @return self|null
-   */
-  public static function retrieve($params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
    * Update the is_active flag in the db.
    *
    * @param int $id

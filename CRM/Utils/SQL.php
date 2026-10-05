@@ -113,12 +113,20 @@ class CRM_Utils_SQL {
   }
 
   /**
-   * Get current sqlModes of the session
+   * Get current sql_mode of the session
    * @return array
    */
-  public static function getSqlModes() {
-    $sqlModes = explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode'));
-    return $sqlModes;
+  public static function getSqlModes(): array {
+    return explode(',', CRM_Core_DAO::singleValueQuery('SELECT @@sql_mode')) ?: [];
+  }
+
+  /**
+   * Set sql_mode for the session.
+   *
+   * @param array $sqlModes
+   */
+  public static function setSqlModes(array $sqlModes): void {
+    CRM_Core_DAO::executeQuery('SET SESSION sql_mode = %1', [1 => [implode(',', $sqlModes), 'String']]);
   }
 
   /**
@@ -178,7 +186,8 @@ class CRM_Utils_SQL {
    * @return string
    */
   public static function getDatabaseVersion() {
-    return CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    \Civi::$statics[__METHOD__] ??= CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    return \Civi::$statics[__METHOD__];
   }
 
   public static function connect($dsn) {

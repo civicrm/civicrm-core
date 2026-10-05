@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // Declare a list of dependencies.
   angular.module('crmCiviimport', CRM.angRequires('crmCiviimport'));
 
@@ -42,7 +42,7 @@
           // Available entities is entityMetadata mapped to a form-friendly format
           $scope.entitySelection = [];
           const entityConfiguration = $scope.userJob.metadata.entity_configuration;
-          _.each($scope.data.entityMetadata, function (entityMetadata) {
+          ($scope.data.entityMetadata || []).forEach((entityMetadata) => {
             var selected = (Boolean(entityConfiguration) && Boolean(entityConfiguration[entityMetadata.entity_name])) ? entityConfiguration[entityMetadata.entity_name] : entityMetadata.selected;
             // If our selected action is not available then fall back to the entity default.
             // This would happen if we went back to the DataSource screen & made a change, as the
@@ -76,7 +76,7 @@
           function buildImportMappings() {
             $scope.data.importMappings = [];
             var importMappings = $scope.userJob.metadata.import_mappings;
-            _.each($scope.data.columnHeaders, function (header, index) {
+            ($scope.data.columnHeaders || []).forEach((header, index) => {
               let fieldName = $scope.data.defaults['mapper[' + index + ']'][0];
               if (Boolean(fieldName)) {
                 fieldName = fieldName.replace('__', '.');
@@ -113,11 +113,11 @@
           var fields = [];
           // The $scope.data.entityMetadata entity array has all available fields.
           // - for field filtering we have to start with the full array or it just gets smaller & smaller.
-          _.each($scope.data.entityMetadata, function (entity) {
+          ($scope.data.entityMetadata || []).forEach((entity) => {
             // The $scope.data.entities has the selected data (but the fields are already filtered)
             var selected = $scope.data.entities[entity.entity_name].selected;
             if (selected.action !== 'ignore') {
-              availableEntity = _.clone(entity);
+              const availableEntity = Object.assign({}, entity);
               availableEntity.children = filterEntityFields(entity.entity_type, entity.children, selected, entity.entity_name + '.');
               fields.push(availableEntity);
             }
@@ -127,7 +127,7 @@
 
         $scope.getEntitiesWithBundledActions = function() {
           const entities = [];
-          _.each($scope.data.entities, function(entity) {
+          Object.values($scope.data.entities || {}).forEach((entity) => {
             if ($scope.data.bundledActions[entity.entity_type]) {
               entities.push({id: entity.id, name: entity.id, text: entity.text});
             }
@@ -205,7 +205,7 @@
           const action = selection.action;
           const rules = $scope.data.dedupeRules;
           const dedupeRules = Object.keys(rules)
-            .filter(key => selection.dedupe_rule.includes(key))
+            .filter(key => selection.dedupe_rule?.includes(key))
             .map(key => rules[key]);
           fields = fields.filter((function (field) {
             // Using replace here is safe ... for now... cos only soft credits have a prefix
@@ -249,11 +249,9 @@
          */
         $scope.getEntityMetadata = function (selectedEntity) {
           let entityData = {};
-          _.each($scope.entitySelection, function (entityDetails) {
+          ($scope.entitySelection || []).forEach((entityDetails) => {
             if (entityDetails.id === selectedEntity) {
-
               entityData = entityDetails;
-              return false;
             }
           });
           return entityData;
@@ -270,7 +268,7 @@
           const dedupeRules = [
             {contact_type: null, text: ts('Universal'), icon: 'fa-star', children: []},
           ];
-          _.each($scope.data.dedupeRules, function (rule) {
+          Object.values($scope.data.dedupeRules).forEach((rule) => {
             if (!selectedEntity || !rule.contact_type || rule.contact_type === selectedEntity) {
               let optGroup = dedupeRules.find(group => group.contact_type === rule.contact_type);
               if (!optGroup) {
@@ -295,11 +293,10 @@
          */
         $scope.getEntityForField = (function (fieldName) {
           let entityName = '';
-          _.each($scope.data.entityMetadata, function (fields) {
-            _.each(fields.children, function (field) {
+          ($scope.data.entityMetadata || []).forEach((fields) => {
+            (fields.children || []).forEach((field) => {
               if (field.id === fieldName) {
                 entityName = fields.entity_name;
-                return false;
               }
             });
           });
@@ -353,10 +350,10 @@
           $event.preventDefault();
           $scope.userJob.metadata.entity_configuration = {};
           $scope.userJob.metadata.import_mappings = [];
-          _.each($scope.entitySelection, function (entity) {
+          ($scope.entitySelection || []).forEach((entity) => {
             $scope.userJob.metadata.entity_configuration[entity.id] = entity.selected;
           });
-          _.each($scope.data.importMappings, function (importRow, index) {
+          ($scope.data.importMappings || []).forEach((importRow, index) => {
 
             $scope.userJob.metadata.import_mappings.push({
               name: importRow.selectedField,
@@ -375,6 +372,11 @@
               'label' : $scope.userJob.label,
             };
             if ($scope.mappingSaving.newFieldMapping) {
+              if (!$scope.mappingSaving.newFieldMappingName) {
+                userJobs.push($scope.userJob);
+                $scope.saveJobs(userJobs);
+                return;
+              }
               templateJob.name = 'import_' + $scope.mappingSaving.newFieldMappingName;
               crmApi4('UserJob', 'get', {where: [['name', '=', templateJob.name]]})
                 .then(function(result) {
@@ -452,4 +454,4 @@
       entity.selected.dedupe_rule = [];
     });
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

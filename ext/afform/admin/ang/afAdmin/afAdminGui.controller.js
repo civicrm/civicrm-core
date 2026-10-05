@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('afAdmin').controller('afAdminGui', function($scope, $route, data) {
@@ -8,4 +8,4 @@
     this.data = data;
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

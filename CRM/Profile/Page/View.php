@@ -61,7 +61,7 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
     }
     $this->assign('cid', $this->_id);
 
-    $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
+    $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', NULL, FALSE, 0, 'GET'));
 
     $profileIds = [];
     if (count($gids) > 1) {

@@ -1,55 +1,86 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
-  angular.module('afGuiEditor').controller('AfGuiConditionalDialog', function($scope, $parse, afGui, dialogService) {
-    const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin'),
-      ctrl = $scope.$ctrl = this;
-    const rule = $scope.model.rule;
-    this.node = $scope.model.node;
-    this.editor = $scope.model.editor;
-    this.conditions = parseConditions();
-    loadAllFields();
+  angular.module('afGuiEditor').controller('AfGuiConditionalDialog', function ($scope, $parse, afGui, dialogService) {
+    const ts = $scope.ts = CRM.ts('org.civicrm.afform_admin');
+    $scope.$ctrl = this;
 
-    const helpText = {
-      'af-if': ts('Element will be shown if...'),
-      'af-required': ts('Element will be required if...')
+    this.fieldSelector = [];
+    this.fieldDefns = {};
+
+    this.applicableRules = {
+      'af-if': {
+        title: ts('Visibility'),
+        description: ts('Element will be shown if...')
+      },
+      'af-required': {
+        title: ts('Required'),
+        description: ts('Element will be required if...')
+      },
+      'af-disabled': {
+        title: ts('Disabled'),
+        description: ts('Element will be disabled if...')
+      }
     };
 
-    this.helpText = helpText[rule];
+    this.conditions = {};
 
-    this.save = function() {
-      if (!ctrl.conditions.length) {
-        delete ctrl.node[rule];
-      } else {
-        ctrl.node[rule] = '(' + JSON.stringify(ctrl.conditions).replace(/"/g, '&quot;') + ')';
-      }
+    this.selectRule = (ruleName) => {
+      this.activeRule = ruleName;
+    };
+
+
+    this.save = () => {
+      Object.keys(this.applicableRules).forEach(ruleName => {
+        if (!this.conditions[ruleName] || !this.conditions[ruleName].length) {
+          delete this.node[ruleName];
+        } else {
+          // Don't have e.g. `required` and `af-required`
+          const staticItem = ruleName.replace(/af-/, '');
+          if (staticItem !== ruleName && this.node.defn) {
+            delete this.node.defn[staticItem];
+          }
+          this.node[ruleName] = '(' + JSON.stringify(this.conditions[ruleName]).replace(/"/g, '&quot;') + ')';
+        }
+      });
       dialogService.close('afformGuiConditionalDialog');
     };
 
-    function parseConditions() {
-      if (!ctrl.node[rule]) {
+    this.parseConditions = (rule) => {
+      if (!this.node[rule]) {
         return [];
       }
-      const ngIf = _.trim(ctrl.node[rule].replace(/&quot;/g, '"'));
-      if (ngIf.charAt(0) !== '(') {
+      const raw = this.node[rule].replace(/&quot;/g, '"').trim();
+      if (raw.charAt(0) !== '(') {
         return [];
       }
-      return $parse(ngIf.slice(1, -1))();
-    }
+      return $parse(raw.slice(1, -1))();
+    };
 
-    function loadAllFields() {
-      ctrl.fieldSelector = [];
-      ctrl.fieldDefns = {};
+    this.$onInit = () => {
+      this.node = $scope.model.node;
+      this.editor = $scope.model.editor;
 
-      ctrl.editor.getEntities().forEach((entity) => {
-        const entityFields = ctrl.editor.getEntityFields(entity.name);
+      if (this.node['#tag'] !== 'af-field' || $scope.model.isReadOnly) {
+        delete this.applicableRules['af-required'];
+        delete this.applicableRules['af-disabled'];
+      }
+
+      Object.keys(this.applicableRules).forEach(ruleName => {
+        this.conditions[ruleName] = this.parseConditions(ruleName);
+      });
+
+      this.activeRule = $scope.model.rule in this.applicableRules ? $scope.model.rule : Object.keys(this.applicableRules)[0];
+
+      this.editor.getEntities().forEach((entity) => {
+        const entityFields = this.editor.getEntityFields(entity.name);
 
         const items = entityFields.fields.reduce((items, field) => {
           // Conditional in case field is missing
           if (field) {
             const key = entity.name + "[0][fields][" + field.name + "]";
-            ctrl.fieldDefns[key] = field;
+            this.fieldDefns[key] = field;
             items.push({id: key, text: field.label || field.input_attrs.label});
           }
           return items;
@@ -60,19 +91,19 @@
             text: afGui.getEntity(join.entity).label,
             children: join.fields.reduce((items, field) => {
               const key = entity.name + "[0][joins][" + join.entity + "][0][" + field.name + "]";
-              ctrl.fieldDefns[key] = field;
+              this.fieldDefns[key] = field;
               items.push({id: key, text: field.label || field.input_attrs.label});
               return items;
             }, [])
           });
         });
-        ctrl.fieldSelector.push({
+        this.fieldSelector.push({
           text: entity.label,
           children: items
         });
       });
-    }
+    };
 
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

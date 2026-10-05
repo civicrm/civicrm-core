@@ -22,7 +22,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
-  protected $_apiversion;
+  protected $_apiversion = 3;
   protected $_entity = 'Contribution';
   public $debug = 0;
   protected $_params;

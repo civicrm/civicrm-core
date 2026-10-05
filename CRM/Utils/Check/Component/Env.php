@@ -1220,6 +1220,46 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   }
 
   /**
+   * Check for legacy extension types.
+   *
+   * @return CRM_Utils_Check_Message[]
+   */
+  public function checkExtensionTypes(): array {
+    $messages = [];
+    $extensionSystem = CRM_Extension_System::singleton();
+    $mapper = $extensionSystem->getMapper();
+    $manager = $extensionSystem->getManager();
+    $statuses = $manager->getStatuses();
+
+    $enabled = array_keys(array_filter($statuses, function($status) {
+      return $status === CRM_Extension_Manager::STATUS_INSTALLED;
+    }));
+
+    foreach ($enabled as $key) {
+      try {
+        $info = $mapper->keyToInfo($key);
+        if ($info->type !== 'module') {
+          $messages[] = new CRM_Utils_Check_Message(
+            __FUNCTION__ . '_' . $key,
+            ts('The extension "%1" uses legacy type "%2" that has been abandoned. It must be deactivated or switched to type="module". Support for this type of extension will be dropped by 6.26.', [
+              1 => $key,
+              2 => $info->type,
+            ]),
+            ts('Legacy Extension Type'),
+            \Psr\Log\LogLevel::WARNING,
+            'fa-plug'
+          );
+        }
+      }
+      catch (CRM_Extension_Exception $ex) {
+        // Skip
+      }
+    }
+
+    return $messages;
+  }
+
+  /**
    * Avoid issues with trailing slashes and mixed separators on windows.
    *
    * @param string $path

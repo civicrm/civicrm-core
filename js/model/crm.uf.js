@@ -12,19 +12,13 @@
     {val: 'Public Pages and Listings', label: ts('Public Pages and Listings'), isInSelectorAllowed: true}
   ];
 
-  var LOCATION_TYPES = _.map(CRM.PseudoConstant.locationType, function(value, key) {
-    return {val: key, label: value};
-  });
+  var LOCATION_TYPES = Object.entries(CRM.PseudoConstant.locationType).map(([key, value]) => ({val: key, label: value}));
   LOCATION_TYPES.unshift({val: '', label: ts('Primary')});
   var DEFAULT_LOCATION_TYPE_ID = '';
 
-  var PHONE_TYPES = _.map(CRM.PseudoConstant.phoneType, function(value, key) {
-    return {val: key, label: value};
-  });
+  var PHONE_TYPES = Object.entries(CRM.PseudoConstant.phoneType).map(([key, value]) => ({val: key, label: value}));
 
-  var WEBSITE_TYPES = _.map(CRM.PseudoConstant.websiteType, function(value, key) {
-    return {val: key, label: value};
-  });
+  var WEBSITE_TYPES = Object.entries(CRM.PseudoConstant.websiteType).map(([key, value]) => ({val: key, label: value}));
   var DEFAULT_PHONE_TYPE_ID = PHONE_TYPES[0].val;
   var DEFAULT_WEBSITE_TYPE_ID = WEBSITE_TYPES[0].val;
 
@@ -49,7 +43,7 @@
   CRM.UF.parseTypeList = function(groupTypeExpr) {
     var typeList = {coreTypes: {}, subTypes:{}};
     // The API may have automatically converted a string with '\0' to an array
-    var parts = _.isArray(groupTypeExpr) ? groupTypeExpr : groupTypeExpr.replace(';;','\0').split('\0');
+    var parts = Array.isArray(groupTypeExpr) ? groupTypeExpr : groupTypeExpr.replace(';;','\0').split('\0');
     var coreTypesExpr = parts[0];
     var subTypesExpr = parts[1];
 
@@ -245,7 +239,7 @@
       }
     },
     isInSelectorAllowed: function() {
-      var visibility = _.first(_.where(VISIBILITY, {val: this.get('visibility')}));
+      var visibility = VISIBILITY.find((v) => v.val === this.get('visibility'));
       if (visibility) {
         return visibility.isInSelectorAllowed;
       }
@@ -309,9 +303,7 @@
       var fields = this.map(function(ufFieldModel){
         return ufFieldModel.toStrictJSON();
       });
-      return _.sortBy(fields, function(ufFieldJSON){
-        return parseInt(ufFieldJSON.weight);
-      });
+      return fields.sort((a, b) => parseInt(a.weight) - parseInt(b.weight));
     },
     isAddable: function(ufFieldModel) {
       var entity_name = ufFieldModel.get('entity_name'),
@@ -427,7 +419,7 @@
     },
     isSectionEnabled: function(section) {
       //CRM-15427
-      return (!section || !section.extends_entity_column_value || _.contains(section.extends_entity_column_value, this.get('entity_sub_type')) || this.get('entity_sub_type') == '*');
+      return (!section || !section.extends_entity_column_value || section.extends_entity_column_value.includes(this.get('entity_sub_type')) || this.get('entity_sub_type') == '*');
     },
     getSections: function() {
       var ufEntityModel = this;
@@ -781,7 +773,7 @@
       var profileType = ufGroupModel.get('group_type') || '';
 
       // check if selected profile have subtype defined eg: ["Individual,Contact,Case", "caseType:7"]
-      if (_.isArray(profileType) && profileType[0]) {
+      if (Array.isArray(profileType) && profileType[0]) {
         profileType = profileType[0];
       }
       profileType = profileType.split(',');

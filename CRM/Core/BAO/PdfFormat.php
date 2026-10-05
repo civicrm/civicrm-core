@@ -215,20 +215,6 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Get PDF Page Format by Name.
-   *
-   * @param int $name
-   *   PDF Page Format name. Empty = get default PDF Page Format.
-   *
-   * @return array
-   *   (reference) associative array of name/value pairs
-   */
-  public static function &getByName($name) {
-    CRM_Core_Error::deprecatedFunctionWarning('none');
-    return self::getPdfFormat('name', $name);
-  }
-
-  /**
    * Get PDF Page Format by ID.
    *
    * @param int $id

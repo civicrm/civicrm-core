@@ -50,8 +50,10 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
     $this->addRule('amount_granted', ts('Please enter a valid amount.'), 'money');
 
     $this->add('datepicker', 'decision_date', ts('Grant Decision'), [], FALSE, ['time' => FALSE]);
+    $this->add('datepicker', 'application_received_date', ts('Application Received'), [], FALSE, ['time' => FALSE]);
+    $this->add('datepicker', 'money_transfer_date', ts('Money Transferred'), [], TRUE, ['time' => FALSE]);
 
-    $this->assign('elements', ['status_id', 'amount_granted', 'decision_date']);
+    $this->assign('elements', ['status_id', 'amount_granted', 'decision_date', 'application_received_date', 'money_transfer_date']);
     $this->assign('totalSelectedGrants', count($this->_grantIds));
 
     $this->addDefaultButtons(ts('Update Grants'), 'done');

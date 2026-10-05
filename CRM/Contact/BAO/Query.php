@@ -1466,7 +1466,7 @@ class CRM_Contact_BAO_Query {
         // make sure there is only one element
         // this is used when we are running under smog and need to know
         // how the contact was added (CRM-1203)
-        $groups = (array) CRM_Utils_Array::value($this->_paramLookup['group'][0][1], $this->_paramLookup['group'][0][2], $this->_paramLookup['group'][0][2]);
+        $groups = (array) ($this->_paramLookup['group'][0][2][$this->_paramLookup['group'][0][1]] ?? $this->_paramLookup['group'][0][2]);
         if ((count($this->_paramLookup['group']) == 1) &&
           (count($groups) == 1)
         ) {
@@ -3244,36 +3244,40 @@ WHERE  $smartGroupClause
     // for entities other than contact
     if ($useAllTagTypes && $useAllTagTypes[2]) {
       $this->_tables[$etTable] = $this->_whereTables[$etTable]
-        = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id)
+        = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id AND {$etTable}.entity_table = 'civicrm_contact')
             LEFT JOIN civicrm_tag {$tTable} ON ( {$etTable}.tag_id = {$tTable}.id  )";
 
       // search tag in cases
+      $caseContactTable = '`civicrm_case_contact-' . uniqid() . '`';
+      $caseTable = '`civicrm_case-' . uniqid() . '`';
       $etCaseTable = '`civicrm_entity_case_tag-' . uniqid() . '`';
       $tCaseTable = '`civicrm_case_tag-' . uniqid() . '`';
       $this->_tables[$etCaseTable] = $this->_whereTables[$etCaseTable]
-        = " LEFT JOIN civicrm_case_contact ON civicrm_case_contact.contact_id = contact_a.id
-            LEFT JOIN civicrm_case
-            ON (civicrm_case_contact.case_id = civicrm_case.id
-                AND civicrm_case.is_deleted = 0 )
-            LEFT JOIN civicrm_entity_tag {$etCaseTable} ON ( {$etCaseTable}.entity_table = 'civicrm_case' AND {$etCaseTable}.entity_id = civicrm_case.id )
+        = " LEFT JOIN civicrm_case_contact {$caseContactTable} ON {$caseContactTable}.contact_id = contact_a.id
+            LEFT JOIN civicrm_case {$caseTable}
+            ON ({$caseContactTable}.case_id = {$caseTable}.id
+                AND {$caseTable}.is_deleted = 0 )
+            LEFT JOIN civicrm_entity_tag {$etCaseTable} ON ( {$etCaseTable}.entity_table = 'civicrm_case' AND {$etCaseTable}.entity_id = {$caseTable}.id )
             LEFT JOIN civicrm_tag {$tCaseTable} ON ( {$etCaseTable}.tag_id = {$tCaseTable}.id  )";
       // search tag in activities
+      $actContactTable = '`civicrm_activity_contact-' . uniqid() . '`';
+      $actTable = '`civicrm_activity-' . uniqid() . '`';
       $etActTable = '`civicrm_entity_act_tag-' . uniqid() . '`';
       $tActTable = '`civicrm_act_tag-' . uniqid() . '`';
       $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
       $this->_tables[$etActTable] = $this->_whereTables[$etActTable]
-        = " LEFT JOIN civicrm_activity_contact
-            ON ( civicrm_activity_contact.contact_id = contact_a.id AND civicrm_activity_contact.record_type_id = {$targetID} )
-            LEFT JOIN civicrm_activity
-            ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
-            AND civicrm_activity.is_deleted = 0 )
-            LEFT JOIN civicrm_entity_tag as {$etActTable} ON ( {$etActTable}.entity_table = 'civicrm_activity' AND {$etActTable}.entity_id = civicrm_activity.id )
+        = " LEFT JOIN civicrm_activity_contact {$actContactTable}
+            ON ( {$actContactTable}.contact_id = contact_a.id AND {$actContactTable}.record_type_id = {$targetID} )
+            LEFT JOIN civicrm_activity {$actTable}
+            ON ( {$actTable}.id = {$actContactTable}.activity_id
+            AND {$actTable}.is_deleted = 0 )
+            LEFT JOIN civicrm_entity_tag as {$etActTable} ON ( {$etActTable}.entity_table = 'civicrm_activity' AND {$etActTable}.entity_id = {$actTable}.id )
             LEFT JOIN civicrm_tag {$tActTable} ON ( {$etActTable}.tag_id = {$tActTable}.id  )";
 
       $this->_where[$grouping][] = "({$tTable}.name $op '" . $escapedValue . "' OR {$tCaseTable}.name $op '" . $escapedValue . "' OR {$tActTable}.name $op '" . $escapedValue . "')";
-      $this->_qill[$grouping][] = ts('Tag %1 %2', [1 => $tagTypesText[2], 2 => $op]) . ' ' . $value;
+      $this->_qill[$grouping][] = ts('Tag %1 %2', [1 => $tagTypesText[2] ?? '', 2 => $op]) . ' ' . $value;
     }
     else {
       $etTable = '`civicrm_entity_tag-' . uniqid() . "`";
@@ -3338,25 +3342,29 @@ WHERE  $smartGroupClause
         = " LEFT JOIN civicrm_entity_tag {$etTable} ON ( {$etTable}.entity_id = contact_a.id  AND {$etTable}.entity_table = 'civicrm_contact') ";
 
       // search tag in cases
+      $caseContactTable = "`civicrm_case_contact-" . uniqid() . "`";
+      $caseTable = "`civicrm_case-" . uniqid() . "`";
       $etCaseTable = "`civicrm_entity_case_tag-" . uniqid() . "`";
       $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
       $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
       $this->_tables[$etCaseTable] = $this->_whereTables[$etCaseTable]
-        = " LEFT JOIN civicrm_case_contact ON civicrm_case_contact.contact_id = contact_a.id
-            LEFT JOIN civicrm_case
-            ON (civicrm_case_contact.case_id = civicrm_case.id
-                AND civicrm_case.is_deleted = 0 )
-            LEFT JOIN civicrm_entity_tag {$etCaseTable} ON ( {$etCaseTable}.entity_table = 'civicrm_case' AND {$etCaseTable}.entity_id = civicrm_case.id ) ";
+        = " LEFT JOIN civicrm_case_contact {$caseContactTable} ON {$caseContactTable}.contact_id = contact_a.id
+            LEFT JOIN civicrm_case {$caseTable}
+            ON ({$caseContactTable}.case_id = {$caseTable}.id
+                AND {$caseTable}.is_deleted = 0 )
+            LEFT JOIN civicrm_entity_tag {$etCaseTable} ON ( {$etCaseTable}.entity_table = 'civicrm_case' AND {$etCaseTable}.entity_id = {$caseTable}.id ) ";
       // search tag in activities
+      $actContactTable = "`civicrm_activity_contact-" . uniqid() . "`";
+      $actTable = "`civicrm_activity-" . uniqid() . "`";
       $etActTable = "`civicrm_entity_act_tag-" . uniqid() . "`";
       $this->_tables[$etActTable] = $this->_whereTables[$etActTable]
-        = " LEFT JOIN civicrm_activity_contact
-            ON ( civicrm_activity_contact.contact_id = contact_a.id AND civicrm_activity_contact.record_type_id = {$targetID} )
-            LEFT JOIN civicrm_activity
-            ON ( civicrm_activity.id = civicrm_activity_contact.activity_id
-            AND civicrm_activity.is_deleted = 0 )
-            LEFT JOIN civicrm_entity_tag as {$etActTable} ON ( {$etActTable}.entity_table = 'civicrm_activity' AND {$etActTable}.entity_id = civicrm_activity.id ) ";
+        = " LEFT JOIN civicrm_activity_contact {$actContactTable}
+            ON ( {$actContactTable}.contact_id = contact_a.id AND {$actContactTable}.record_type_id = {$targetID} )
+            LEFT JOIN civicrm_activity {$actTable}
+            ON ( {$actTable}.id = {$actContactTable}.activity_id
+            AND {$actTable}.is_deleted = 0 )
+            LEFT JOIN civicrm_entity_tag as {$etActTable} ON ( {$etActTable}.entity_table = 'civicrm_activity' AND {$etActTable}.entity_id = {$actTable}.id ) ";
 
       // CRM-10338
       if (in_array($op, ['IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'])) {
@@ -3397,6 +3405,11 @@ WHERE  $smartGroupClause
    */
   public function notes(&$values) {
     [$name, $op, $value, $grouping, $wildcard] = $values;
+
+    if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($value);
+      $value = $value[$op];
+    }
 
     $noteOptionValues = $this->getWhereValues('note_option', $grouping);
     $noteOption = $noteOptionValues['2'] ?? '6';
@@ -3649,6 +3662,11 @@ WHERE  $smartGroupClause
   public function street_address(&$values) {
     [$name, $op, $value, $grouping] = $values;
 
+    if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($value);
+      $value = $value[$op];
+    }
+
     if (!$op) {
       $op = 'LIKE';
     }
@@ -3681,6 +3699,11 @@ WHERE  $smartGroupClause
    */
   public function street_number(&$values) {
     [$name, $op, $value, $grouping, $wildcard] = $values;
+
+    if (is_array($value) && in_array(key($value), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+      $op = key($value);
+      $value = $value[$op];
+    }
 
     if (!$op) {
       $op = '=';
@@ -6545,6 +6568,14 @@ AND   displayRelType.is_active = 1
     // Is this still required - the above goes off the unique name. Test with things like
     // communication_preferences & prefix_id.
     if (!empty($this->_returnProperties[$field['name']])) {
+      // When a different field is keyed by this non-unique name, that field owns the
+      // return property. A same-named column on another table (e.g.
+      // civicrm_grant.financial_type_id, unique name grant_financial_type_id) must not
+      // match it, or it overwrites the intended select clause with the wrong table.
+      // See dev/core#5344.
+      if ($fieldName !== $field['name'] && isset($this->_fields[$field['name']])) {
+        return FALSE;
+      }
       return TRUE;
     }
     return FALSE;
@@ -7027,7 +7058,11 @@ AND   displayRelType.is_active = 1
     if (substr($fieldName, -4, 4) !== '_low' && substr($fieldName, -5, 5) !== '_high') {
       return FALSE;
     }
-    return !empty($this->getFieldSpec($fieldName));
+    $fieldSpec = $this->getFieldSpec($fieldName);
+    if (empty($fieldSpec)) {
+      return FALSE;
+    }
+    return in_array($fieldSpec['type'] ?? NULL, [CRM_Utils_Type::T_DATE, CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME, CRM_Utils_Type::T_TIMESTAMP], TRUE);
   }
 
   /**
@@ -7063,6 +7098,11 @@ AND   displayRelType.is_active = 1
       // Hack this to fix regression https://lab.civicrm.org/dev/core/issues/1592
       // Not sure the  'right' fix.
       $this->_where[$grouping] = [self::getRelationshipActivePeriodClauses($dates[0], $dates[1], TRUE)];
+      return;
+    }
+
+    if ($fieldName === 'event') {
+      $this->_where[$grouping][] = CRM_Event_BAO_Query::getEventActiveOnClause($dates[0], $dates[1]);
       return;
     }
 

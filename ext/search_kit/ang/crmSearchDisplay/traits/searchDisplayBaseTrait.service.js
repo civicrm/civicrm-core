@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Trait provides base methods and properties common to all search display types
@@ -22,7 +22,7 @@
         const ctrl = this;
         this.$element = $element;
         this.limit = this.settings.limit;
-        this.sort = Array.isArray(this.settings.sort) ? _.cloneDeep(this.settings.sort) : [];
+        this.sort = Array.isArray(this.settings.sort) ? structuredClone(this.settings.sort) : [];
         // Used to make dom ids unique, and as a seed for ORDER BY RAND() to stabilize random results
         this.uniqueId = Math.floor(Math.random() * 10e10);
         this.placeholders = [];
@@ -57,16 +57,16 @@
         }
         else {
           // Break reference so original settings are preserved
-          this.columns = _.cloneDeep(this.settings.columns);
+          this.columns = structuredClone(this.settings.columns);
           this.columns.forEach(setColumnDefaults);
         }
 
         ctrl.onInitialize.forEach(callback => callback.call(ctrl, $scope, $element));
 
-        // _.debounce used here to trigger the initial search immediately but prevent subsequent launches within 300ms
-        this.getResultsPronto = _.debounce(ctrl.runSearch, 300, {leading: true, trailing: false});
-        // _.debounce used here to schedule a search if nothing else happens for 600ms: useful for auto-searching on typing
-        this.getResultsSoon = _.debounce(function() {
+        // Leading edge only: run the initial search immediately but prevent subsequent launches within 300ms
+        this.getResultsPronto = CRM.utils.debounce(ctrl.runSearch, 300, {leading: true, trailing: false});
+        // Trailing edge: schedule a search if nothing else happens for 600ms, useful for auto-searching on typing
+        this.getResultsSoon = CRM.utils.debounce(function() {
           $scope.$apply(function() {
             ctrl.runSearch();
           });
@@ -101,11 +101,13 @@
         }
 
         // Popup forms in this display or surrounding Afform trigger a refresh
+        const $closestForm = $element.closest('form');
+        const onFormSuccess = () => {
+          ctrl.rowCount = null;
+          ctrl.getResultsPronto();
+        };
         if (!isSubsearch) {
-          $element.closest('form').on('crmPopupFormSuccess crmFormSuccess', () => {
-            ctrl.rowCount = null;
-            ctrl.getResultsPronto();
-          });
+          $closestForm.on('crmPopupFormSuccess crmFormSuccess', onFormSuccess);
         }
 
         // When filters are changed, trigger callbacks and refresh search (if there's no search button)
@@ -176,12 +178,13 @@
         $element.css('display', 'block');
 
         // If the search display is visible, go ahead & run it
+        let checkVisibility;
         if ($element.is(':visible')) {
           setUpWatches();
         }
         // Wait until display is visible
         else {
-          let checkVisibility = $interval(() => {
+          checkVisibility = $interval(() => {
             if ($element.is(':visible')) {
               $interval.cancel(checkVisibility);
               setUpWatches();
@@ -204,6 +207,19 @@
             });
           }
         }, 900);
+
+        // Clean up the form handler, visibility poller and pending debounced
+        // searches, which are not released by the $scope itself
+        $scope.$on('$destroy', () => {
+          if (!isSubsearch) {
+            $closestForm.off('crmPopupFormSuccess crmFormSuccess', onFormSuccess);
+          }
+          if (checkVisibility) {
+            $interval.cancel(checkVisibility);
+          }
+          ctrl.getResultsPronto.cancel();
+          ctrl.getResultsSoon.cancel();
+        });
       },
 
       hasExtraFirstColumn: function() {
@@ -211,11 +227,30 @@
       },
 
       getFilters: function() {
-        return _.assign({}, this.getAfformFilters(), this.filters);
+        return Object.assign({}, this.getAfformFilters(), this.filters);
       },
 
       getAfformFilters: function() {
         return this.afFieldset ? this.afFieldset.getFilterValues() : {};
+      },
+
+      // Splits an already-sorted flat result set into section groups wherever `groupField`'s
+      // value changes between consecutive rows, returning an array of {value, rows} groups.
+      // This is a client-side grouping, not a real SQL GROUP BY - it depends entirely on
+      // the display's sort setting already ordering rows by groupField first. Used by any
+      // display type that supports `settings.section_group_by`.
+      groupRows: function(results, groupField) {
+        const groups = [];
+        let current = null;
+        results.forEach(function(row) {
+          const value = row.data[groupField];
+          if (!current || current.value !== value) {
+            current = {value: value, rows: []};
+            groups.push(current);
+          }
+          current.rows.push(row);
+        });
+        return groups;
       },
 
       // WARNING: Only to be used with trusted/sanitized markup.
@@ -274,6 +309,7 @@
           }
           ctrl.results = apiResults.run;
           ctrl.loading = false;
+          ctrl.serverError = null;
           // Update rowCount if running for the first time or during an update op
           if (!ctrl.rowCount || editedRow) {
             // No need to fetch count if on page 1 and result count is under the limit
@@ -297,7 +333,10 @@
             return; // Another request started after this one
           }
           ctrl.results = [];
+          ctrl.rowCount = null;
           ctrl.loading = false;
+          // Show error message if e.g. query timed out
+          ctrl.serverError = error?.run?.error_message ?? ts('Connection error');
           // Run all postRun callbacks on error
           ctrl.onPostRun.forEach(callback => callback.call(ctrl, error, 'error', editedRow));
         });
@@ -309,6 +348,12 @@
 
       getFieldClass: function(colIndex, colData) {
         return (colData.cssClass || '') + ' crm-search-col-type-' + this.columns[colIndex].type + (this.columns[colIndex].break ? '' : ' crm-inline-block');
+      },
+
+      // Returns an inline style string for a colored badge, using CRM.utils.colorContrast
+      // to pick readable text color. Used by colType/field.html for the `colors` column option.
+      getColorStyle: function(color) {
+        return color ? 'background-color: ' + color + '; color: ' + CRM.utils.colorContrast(color) + ';' : '';
       },
 
       getFieldTemplate: function(colIndex, colData) {
@@ -338,4 +383,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

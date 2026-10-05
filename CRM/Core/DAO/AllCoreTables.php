@@ -20,18 +20,6 @@ use Civi\Schema\EntityRepository;
 class CRM_Core_DAO_AllCoreTables {
 
   /**
-   * @deprecated in 5.73 will be removed in 5.90
-   *
-   * @param bool $fresh Deprecated parameter, use flush() to flush.
-   */
-  public static function init(bool $fresh = FALSE): void {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::flush()');
-    if ($fresh) {
-      EntityRepository::flush();
-    }
-  }
-
-  /**
    * Flush class cache.
    */
   public static function flush(): void {
@@ -69,40 +57,12 @@ class CRM_Core_DAO_AllCoreTables {
   }
 
   /**
-   * @deprecated in 5.72 will be removed in 5.90.
-   */
-  public static function get() {
-    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_DAO_AllCoreTables::getEntities');
-    $entities = [];
-    foreach (self::getEntities() as $name => $entity) {
-      $entities[$name] = $entity + [
-        'name' => $name,
-        'fields_callback' => $entity['fields_callback'] ?? NULL,
-        'links_callback' => $entity['links_callback'] ?? NULL,
-      ];
-    }
-    return $entities;
-  }
-
-  /**
    * Mapping from table-names to class-names.
    * @return string[]
    *   [table_name => CRM_DAO_ClassName]
    */
   public static function tables() {
     return array_column(self::getEntities(), 'class', 'table');
-  }
-
-  /**
-   * Get the declared token classes.
-   * @return string[]
-   *   [table_name => token class]
-   *
-   * @deprecated since 6.6 will be removed around 6.20.
-   */
-  public static function tokenClasses(): array {
-    CRM_Core_Error::deprecatedFunctionWarning('use getClassesByProperty');
-    return \CRM_Core_DAO_AllCoreTables::getClassesByProperty('token_class');
   }
 
   /**

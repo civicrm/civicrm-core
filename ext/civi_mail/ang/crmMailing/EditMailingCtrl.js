@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailing').controller('EditMailingCtrl', function EditMailingCtrl($scope, selectedMail, $location, crmMailingMgr, crmStatus, attachments, crmMailingPreviewMgr, crmBlocker, CrmAutosaveCtrl, $timeout, crmUiHelp, mailingFields) {
     var APPROVAL_STATUSES = {'Approved': 1, 'Rejected': 2, 'None': 3};
@@ -14,12 +14,12 @@
     const block = $scope.block = crmBlocker();
     let myAutosave = null;
 
-    const templateTypes = _.where(CRM.crmMailing.templateTypes, {name: selectedMail.template_type});
+    const templateTypes = CRM.crmMailing.templateTypes.filter((t) => t.name === selectedMail.template_type);
     if (!templateTypes[0]) throw 'Unrecognized template type: ' + selectedMail.template_type;
     $scope.mailingEditorUrl = templateTypes[0].editorUrl;
 
     $scope.isSubmitted = function isSubmitted() {
-      return _.size($scope.mailing.jobs) > 0;
+      return Object.keys($scope.mailing.jobs || {}).length > 0;
     };
 
     // usage: approve('Approved')
@@ -136,4 +136,4 @@
     $scope.$on('$destroy', myAutosave.stop);
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

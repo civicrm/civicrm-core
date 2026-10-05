@@ -1,7 +1,7 @@
 <label ng-repeat="opt in getOptions() track by opt.id" for="{{ fieldId + opt.id }}" ng-class="$ctrl.defn.input_style ? [$ctrl.defn.input_style, {'active': getSetValue() == opt.id}] : 'radio-inline'">
-  <input class="crm-form-radio" id="{{ fieldId + opt.id }}" name="{{:: fieldId }}" type="radio" ng-model="getSetValue" ng-required="$ctrl.defn.required" ng-model-options="{getterSetter: true}" ng-value="opt.id"  aria-label="{{opt.label}}" />
+  <input class="crm-form-radio" id="{{ fieldId + opt.id }}" name="{{:: fieldId }}" type="radio" ng-model="getSetValue" ng-required="$ctrl.defn.required" ng-disabled="$ctrl.isDisabled()" ng-model-options="{getterSetter: true}" ng-value="opt.id"  aria-label="{{opt.label}}" />
   {{:: opt.label }}
 </label>
-	<a ng-if="!$ctrl.defn.required" class="crm-hover-button" title="{{:: ts('Clear') }}" ng-show="!!dataProvider.getFieldData()[$ctrl.fieldName] || dataProvider.getFieldData()[$ctrl.fieldName] === false || dataProvider.getFieldData()[$ctrl.fieldName] === 0" ng-click="dataProvider.getFieldData()[$ctrl.fieldName] = null" aria-label="{{:: ts('Clear') }}">
+	<a ng-if="!$ctrl.defn.required && !$ctrl.isDisabled()" class="crm-hover-button" title="{{:: ts('Clear') }}" ng-show="!!dataProvider.getFieldData()[$ctrl.fieldName] || dataProvider.getFieldData()[$ctrl.fieldName] === false || dataProvider.getFieldData()[$ctrl.fieldName] === 0" ng-click="dataProvider.getFieldData()[$ctrl.fieldName] = null" aria-label="{{:: ts('Clear') }}">
   <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
 </a>

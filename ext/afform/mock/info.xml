@@ -30,9 +30,6 @@
   <smarty_compatibility>
     <ver>5</ver>
   </smarty_compatibility>
-  <requires>
-    <ext>org.civicrm.afform</ext>
-  </requires>
   <comments>Examples and tests for CiviCRM Afforms.</comments>
   <mixins>
     <mixin>ang-php@1.0.0</mixin>

@@ -17,21 +17,6 @@
 class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign implements Civi\Core\HookInterface {
 
   /**
-   * @deprecated
-   *
-   * @param array $params
-   *
-   * @return null|CRM_Campaign_DAO_Campaign
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    if (empty($params)) {
-      return NULL;
-    }
-    return self::writeRecord($params);
-  }
-
-  /**
    * Event fired prior to modifying a Campaign.
    * @param \Civi\Core\Event\PreEvent $event
    */
@@ -58,36 +43,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign implements Civ
         $dao->save();
       }
     }
-  }
-
-  /**
-   * Delete the campaign.
-   *
-   * @param int $id
-   *
-   * @deprecated
-   * @return bool|int
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    try {
-      self::deleteRecord(['id' => $id]);
-    }
-    catch (CRM_Core_Exception $e) {
-      return FALSE;
-    }
-    return 1;
-  }
-
-  /**
-   * @deprecated
-   * @param array $params
-   * @param array $defaults
-   * @return self|null
-   */
-  public static function retrieve($params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    return self::commonRetrieve(self::class, $params, $defaults);
   }
 
   /**
@@ -313,17 +268,6 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Campaign', $id, 'is_active', $is_active);
-  }
-
-  /**
    * @return bool
    */
   public static function accessCampaign() {
@@ -331,9 +275,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
 
     if (!isset($allow)) {
       $allow = FALSE;
-      if (CRM_Core_Permission::check('manage campaign') ||
-        CRM_Core_Permission::check('administer CiviCampaign')
-      ) {
+      if (CRM_Core_Permission::check('manage campaign')) {
         $allow = TRUE;
       }
     }
@@ -465,7 +407,7 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    * @return array|bool
    */
   public static function getEntityRefCreateLinks() {
-    if (CRM_Core_Permission::check([['administer CiviCampaign', 'manage campaign']])) {
+    if (CRM_Core_Permission::check('manage campaign')) {
       return [
         [
           'label' => ts('New Campaign'),

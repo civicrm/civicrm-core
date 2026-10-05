@@ -92,10 +92,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Generic {
         $attributes['disabled'] = 'disabled';
         $this->sections['multi']['description'] = ts("In order to use this functionality, the installation's database user must have privileges to create triggers and views (if binary logging is enabled – this means the SUPER privilege). This install does not have the required privilege(s) enabled.");
       }
-      elseif (Civi::settings()->get('logging')) {
-        $attributes['disabled'] = 'disabled';
-        $this->sections['multi']['description'] = ts("(Multilingual support currently cannot be enabled on installations with enabled logging.)");
-      }
       else {
         $this->sections['multi']['description'] = ts("Check this box and click 'Save' to switch this installation from single- to multi-language, then add further languages.");
       }
@@ -247,20 +243,22 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Generic {
    * @throws \CRM_Core_Exception
    */
   public static function updateEnabledCurrencies(array $currencies, string $default): void {
-
-    // sort so that when we display drop down, weights have right value
-    sort($currencies);
-    // get labels for all the currencies
     $options = [];
 
-    $currencySymbols = self::getCurrencySymbols();
-    foreach ($currencies as $i => $currency) {
+    $currencyDetails = \Civi\Api4\Currency::get(FALSE)
+      ->addWhere('name', 'IN', $currencies)
+      ->addSelect('name', 'full_name')
+      ->addSelect('IFNULL(CONCAT(name, " (", symbol, ")"), name) AS name_and_symbol')
+      ->addOrderBy('name', 'ASC')
+      ->execute();
+
+    foreach ($currencyDetails as $i => $currency) {
       $options[] = [
-        'label' => $currencySymbols[$currency],
-        'value' => $currency,
+        'label' => $currency['name_and_symbol'],
+        'value' => $currency['name'],
         'weight' => $i + 1,
-        'is_active' => 1,
-        'is_default' => $currency === $default,
+        'description' => $currency['full_name'],
+        'is_default' => $currency['name'] === $default,
       ];
     }
     $optionGroupID = OptionGroup::get(FALSE)->addSelect('id')
@@ -380,12 +378,16 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Generic {
    * @return array
    */
   public static function getDefaultLanguageOptions() {
-    $availableOptions = [
+    $languages = \Civi\Api4\OptionValue::get(FALSE)
+      ->addWhere('option_group_id.name', '=', 'languages')
+      ->execute()
+      ->indexBy('name')
+      ->column('label');
+
+    return array_merge([
       '*default*' => ts('Use default site language'),
       'current_site_language' => ts('Use language in use at the time'),
-    ];
-    $availableLanguages = array_merge($availableOptions, CRM_Admin_Form_Setting_Localization::getDefaultLocaleOptions());
-    return $availableLanguages;
+    ], $languages);
   }
 
   /**

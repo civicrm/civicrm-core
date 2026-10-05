@@ -14,6 +14,7 @@
  */
 class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
   protected $_individualID;
 
   /**

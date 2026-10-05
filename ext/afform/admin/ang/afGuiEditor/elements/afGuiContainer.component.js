@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('afGuiEditor').component('afGuiContainer', {
@@ -27,11 +27,7 @@
             ctrl.loading = true;
             crmApi4('Afform', 'loadAdminData', {
               definition: {name: afGui.meta.blocks[blockTag].name},
-              skipEntities: _.transform(afGui.meta.entities, function(result, entity, entityName) {
-                if (entity.fields) {
-                  result.push(entityName);
-                }
-              }, [])
+              skipEntities: Object.keys(afGui.meta.entities).filter((entityName) => afGui.meta.entities[entityName].fields)
             }, 0).then((data) => {
               afGui.addMeta(data);
               initializeBlockContainer();
@@ -181,6 +177,15 @@
         return ctrl.node.max ? parseInt(ctrl.node.max, 10) : null;
       };
 
+      $scope.getSetNumber = function(paramName) {
+        return function(val) {
+          if (arguments.length) {
+            ctrl.node[paramName] = typeof val === 'string' ? parseInt(val, 10) : val;
+          }
+          return typeof ctrl.node[paramName] === 'string' ? parseInt(ctrl.node[paramName], 10) : ctrl.node[paramName];
+        };
+      };
+
       // Returns the maximum number of repeats allowed if this is a joined entity with a limit
       // Value comes from civicrm_custom_group.max_multiple for custom entities,
       // or from afformEntity php file for core entities.
@@ -256,7 +261,7 @@
 
       $scope.selectBlockDirective = function() {
         if (block.directive) {
-          block.layout = _.cloneDeep(afGui.meta.blocks[block.directive].layout);
+          block.layout = structuredClone(afGui.meta.blocks[block.directive].layout);
           block.original = block.directive;
           setBlockDirective(block.directive);
         }
@@ -290,7 +295,7 @@
           listeners: []
         };
 
-        _.each(afGui.meta.blocks, function(blockInfo, directive) {
+        Object.entries(afGui.meta.blocks || {}).forEach(([directive, blockInfo]) => {
           if (directive === ctrl.node['#tag'] || (blockInfo.join_entity && blockInfo.join_entity === ctrl.getFieldEntityType())) {
             block.options.push({
               id: directive,
@@ -301,7 +306,7 @@
 
         if (getBlockNode() && getBlockNode()['#tag'] in afGui.meta.blocks) {
           block.directive = block.original = getBlockNode()['#tag'];
-          block.layout = _.cloneDeep(afGui.meta.blocks[block.directive].layout);
+          block.layout = structuredClone(afGui.meta.blocks[block.directive].layout);
         }
 
         block.listeners.push($scope.$watch('block.layout', function (layout, oldVal) {
@@ -452,9 +457,9 @@
         } else {
           const searchDisplay = ctrl.getSearchDisplay(),
             fieldName = fieldKey.substr(fieldKey.indexOf('.') + 1),
-            prefix = _.includes(fieldKey, '.') ? fieldKey.split('.')[0] : null;
+            prefix = fieldKey.includes('.') ? fieldKey.split('.')[0] : null;
           if (prefix) {
-            _.each(searchDisplay['saved_search_id.api_params'].join, function(join) {
+            (searchDisplay['saved_search_id.api_params'].join || []).forEach((join) => {
               const joinInfo = join[0].split(' AS ');
               if (prefix === joinInfo[1]) {
                 entityType = joinInfo[0];
@@ -462,7 +467,6 @@
                 if (!(fieldName in afGui.getEntity(entityType).fields)) {
                   entityType = join[2];
                 }
-                return false;
               }
             });
           }
@@ -477,4 +481,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

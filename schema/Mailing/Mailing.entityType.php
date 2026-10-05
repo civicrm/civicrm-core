@@ -4,6 +4,7 @@ return [
   'name' => 'Mailing',
   'table' => 'civicrm_mailing',
   'class' => 'CRM_Mailing_DAO_Mailing',
+  'token_class' => 'CRM_Mailing_Tokens',
   'getInfo' => fn() => [
     'title' => ts('Mailing'),
     'title_plural' => ts('Mailings'),
@@ -35,6 +36,9 @@ return [
       'required' => TRUE,
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
+      'usage' => [
+        'token',
+      ],
     ],
     'domain_id' => [
       'title' => ts('Domain ID'),
@@ -146,7 +150,7 @@ return [
     ],
     'name' => [
       'title' => ts('Mailing Name'),
-      'sql_type' => 'varchar(128)',
+      'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'description' => ts('Mailing Name.'),
       'unique_name' => 'mailing_name',

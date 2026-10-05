@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('afCore').directive('afApi4Action', function($parse, crmStatus, crmApi4) {
     return {
@@ -35,4 +35,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -72,20 +72,6 @@ class CRM_Financial_BAO_EntityFinancialAccount extends CRM_Financial_DAO_EntityF
   }
 
   /**
-   * Delete financial Types.
-   *
-   * @param int $financialTypeAccountId
-   * @param int $accountId  (not used)
-   *
-   * @throws \CRM_Core_Exception
-   * @deprecated
-   */
-  public static function del($financialTypeAccountId, $accountId = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('api');
-    static::deleteRecord(['id' => $financialTypeAccountId]);
-  }
-
-  /**
    * Callback for hook_civicrm_pre().
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception

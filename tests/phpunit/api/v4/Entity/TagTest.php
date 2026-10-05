@@ -18,17 +18,112 @@
 
 namespace api\v4\Entity;
 
+use Civi\Api4\Afform;
 use Civi\Api4\Contact;
 use api\v4\Api4TestBase;
 use Civi\Api4\EntityTag;
 use Civi\Api4\Individual;
 use Civi\Api4\Tag;
+use Civi\Api4\TaggedEntity;
 use Civi\Test\TransactionalInterface;
 
 /**
  * @group headless
  */
 class TagTest extends Api4TestBase implements TransactionalInterface {
+
+  private $afformName = 'apiv4TagTestForm';
+
+  public function tearDown(): void {
+    Afform::revert(FALSE)->addWhere('name', '=', $this->afformName)->execute();
+    parent::tearDown();
+  }
+
+  public function testTaggedEntityGet(): void {
+    // Scoped to both a real DB-table entity (Contact, via EntityTag) and Afform,
+    // which has no EntityTag rows and is only reachable via the alterNonDbTaggableEntities
+    // hook - this exercises both code paths through a single tag.
+    $tag = Tag::create(FALSE)
+      ->addValue('name', uniqid('mixed'))
+      ->addValue('used_for', ['civicrm_contact', 'Afform'])
+      ->execute()->single();
+
+    $contact = Contact::create(FALSE)->execute()->single();
+    EntityTag::create(FALSE)
+      ->addValue('entity_id', $contact['id'])
+      ->addValue('entity_table', 'civicrm_contact')
+      ->addValue('tag_id', $tag['id'])
+      ->execute();
+
+    Afform::create(FALSE)
+      ->addValue('name', $this->afformName)
+      ->addValue('title', 'Tag Test Form')
+      ->addValue('tags', [$tag['name']])
+      ->execute();
+
+    $tagged = TaggedEntity::get(FALSE)->addWhere('tag_id', '=', $tag['id'])->execute();
+    $this->assertCount(2, $tagged);
+    $byTable = $tagged->indexBy('entity_table');
+    $this->assertEquals($contact['id'], $byTable['civicrm_contact']['entity_id']);
+    $this->assertEquals($this->afformName, $byTable['Afform']['entity_id']);
+
+    // A tag scoped to Afform but with nothing actually tagged should come back empty,
+    // not error, and shouldn't pick up the other tag's Afform above.
+    $unusedTag = Tag::create(FALSE)
+      ->addValue('name', uniqid('unused'))
+      ->addValue('used_for', 'Afform')
+      ->execute()->single();
+    $this->assertCount(0, TaggedEntity::get(FALSE)->addWhere('tag_id', '=', $unusedTag['id'])->execute());
+
+    // A nonexistent tag ID is an empty result, not an error.
+    $this->assertCount(0, TaggedEntity::get(FALSE)->addWhere('tag_id', '=', $unusedTag['id'] + 999999)->execute());
+
+    // WHERE supports fetching more than one tag at once via IN, and applies additional
+    // filters (here entity_type) on top of the hook/EntityTag-sourced rows.
+    $multiTag = TaggedEntity::get(FALSE)
+      ->addWhere('tag_id', 'IN', [$tag['id'], $unusedTag['id']])
+      ->addWhere('entity_type', '=', 'Afform')
+      ->execute();
+    $this->assertCount(1, $multiTag);
+    $this->assertEquals($this->afformName, $multiTag->first()['entity_id']);
+  }
+
+  public function testTaggedEntityGetResolvesLabelAndUrl(): void {
+    // Same mixed scenario as testTaggedEntityGet, but this checks the display-ready
+    // fields (resolved label/url per row) that only get computed when asked for via
+    // `select` -- the plain `entity_table`/`entity_id` shape doesn't pay for them.
+    $tag = Tag::create(FALSE)
+      ->addValue('name', uniqid('summary'))
+      ->addValue('used_for', ['civicrm_contact', 'Afform'])
+      ->execute()->single();
+
+    $contact = Individual::create(FALSE)
+      ->addValue('first_name', 'Rev')
+      ->addValue('last_name', 'Lookup')
+      ->execute()->single();
+    EntityTag::create(FALSE)
+      ->addValue('entity_id', $contact['id'])
+      ->addValue('entity_table', 'civicrm_contact')
+      ->addValue('tag_id', $tag['id'])
+      ->execute();
+
+    Afform::create(FALSE)
+      ->addValue('name', $this->afformName)
+      ->addValue('title', 'Tag Test Form')
+      ->addValue('tags', [$tag['name']])
+      ->execute();
+
+    $tagged = TaggedEntity::get(FALSE)->addWhere('tag_id', '=', $tag['id'])->setSelect(['entity_type', 'label', 'url'])->execute();
+    $this->assertCount(2, $tagged);
+    $byType = $tagged->indexBy('entity_type');
+    $this->assertStringContainsString('Lookup', $byType['Contact']['label']);
+    $this->assertStringContainsString('cid=' . $contact['id'], $byType['Contact']['url']);
+    $this->assertEquals('Tag Test Form', $byType['Afform']['label']);
+    $this->assertStringContainsString('afform#/edit/' . $this->afformName, $byType['Afform']['url']);
+
+    // A nonexistent tag ID is an empty result, not an error.
+    $this->assertCount(0, TaggedEntity::get(FALSE)->addWhere('tag_id', '=', $tag['id'] + 999999)->setSelect(['label', 'url'])->execute());
+  }
 
   public function testTagFilter(): void {
     // Ensure bypassing permissions works correctly by giving none to the logged-in user
@@ -129,6 +224,137 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotContains('c-2', $options);
     $this->assertContains('a-1', $options);
     $this->assertNotContains('tagset', $options);
+  }
+
+  /**
+   * Test ordering tags by used_for:label (SERIALIZE_COMMA field)
+   */
+  public function testOrderByUsedForLabel(): void {
+    $tagData = [
+      ['name' => 'tag_savedSearch', 'label' => 'Tag SavedSearch', 'used_for:label' => ['Saved Searches', 'Attachments']],
+      ['name' => 'tag_contact', 'label' => 'Tag Contact', 'used_for:label' => ['Contacts']],
+      ['name' => 'tag_activity', 'label' => 'Tag Activity', 'used_for:label' => ['Activities', 'Contacts']],
+      ['name' => 'tag_file', 'label' => 'Tag File', 'used_for:label' => ['Attachments']],
+    ];
+
+    $this->saveTestRecords('Tag', ['records' => $tagData]);
+
+    $result = Tag::get(TRUE)
+      ->addSelect('id', 'name', 'label', 'used_for', 'used_for:label')
+      ->addWhere('name', 'LIKE', 'tag_%')
+      ->addOrderBy('used_for:label', 'ASC')
+      ->execute();
+
+    $expectedNames = ['tag_activity', 'tag_file', 'tag_contact', 'tag_savedSearch'];
+
+    $this->assertCount(4, $result);
+    foreach ($result as $index => $record) {
+      $this->assertEquals($expectedNames[$index], $record['name']);
+    }
+  }
+
+  public function testTagLongNameAndLabel(): void {
+    $longName = \CRM_Utils_String::createRandom(128, \CRM_Utils_String::ALPHANUMERIC);
+
+    $tag = Tag::create(FALSE)
+      ->addValue('label', $longName)
+      ->execute()->first();
+
+    $this->assertSame($longName, $tag['name']);
+    $this->assertSame($longName, $tag['label']);
+  }
+
+  public function testMergeTags(): void {
+    $this->createLoggedInUser();
+
+    $tagA = Tag::create(FALSE)
+      ->addValue('name', uniqid('tagA'))
+      ->addValue('used_for', 'civicrm_contact')
+      ->execute()->first();
+    $tagB = Tag::create(FALSE)
+      ->addValue('name', uniqid('tagB'))
+      ->addValue('used_for', 'civicrm_activity')
+      ->execute()->first();
+    $tagBChild = Tag::create(FALSE)
+      ->addValue('name', uniqid('tagBChild'))
+      ->addValue('parent_id', $tagB['id'])
+      ->execute()->first();
+
+    $contact = Contact::create(FALSE)->execute()->first();
+    EntityTag::create(FALSE)
+      ->addValue('entity_id', $contact['id'])
+      ->addValue('entity_table', 'civicrm_contact')
+      ->addValue('tag_id', $tagA['id'])
+      ->execute();
+    EntityTag::create(FALSE)
+      ->addValue('entity_id', $contact['id'])
+      ->addValue('entity_table', 'civicrm_contact')
+      ->addValue('tag_id', $tagB['id'])
+      ->execute();
+
+    $result = Tag::merge(FALSE)
+      ->setTargetId($tagA['id'])
+      ->setTagIds([$tagB['id']])
+      ->setLabel('Merged Label')
+      ->execute()->first();
+    $this->assertEquals($tagA['id'], $result['id']);
+    $this->assertEquals([$tagB['id']], $result['merged']);
+
+    $mergedTag = Tag::get(FALSE)
+      ->addWhere('id', '=', $tagA['id'])
+      ->addSelect('label', 'used_for')
+      ->execute()->first();
+    $this->assertEquals('Merged Label', $mergedTag['label']);
+    $this->assertEqualsCanonicalizing(['civicrm_contact', 'civicrm_activity'], $mergedTag['used_for']);
+
+    // Tag B no longer exists.
+    $this->assertCount(0, Tag::get(FALSE)->addWhere('id', '=', $tagB['id'])->execute());
+
+    // Tag B's child is reparented onto the target tag.
+    $child = Tag::get(FALSE)
+      ->addWhere('id', '=', $tagBChild['id'])
+      ->addSelect('parent_id')
+      ->execute()->first();
+    $this->assertEquals($tagA['id'], $child['parent_id']);
+
+    // The contact's two entity-tags are deduped down to one, pointing at the target.
+    $entityTags = EntityTag::get(FALSE)
+      ->addWhere('entity_id', '=', $contact['id'])
+      ->addWhere('entity_table', '=', 'civicrm_contact')
+      ->execute();
+    $this->assertCount(1, $entityTags);
+    $this->assertEquals($tagA['id'], $entityTags->first()['tag_id']);
+  }
+
+  public function testMergeReservedTagRequiresPermission(): void {
+    $this->createLoggedInUser();
+
+    $tagA = Tag::create(FALSE)->addValue('name', uniqid('tagA'))->execute()->first();
+    $reserved = Tag::create(FALSE)
+      ->addValue('name', uniqid('reserved'))
+      ->addValue('is_reserved', TRUE)
+      ->execute()->first();
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM'];
+
+    try {
+      Tag::merge()
+        ->setTargetId($tagA['id'])
+        ->setTagIds([$reserved['id']])
+        ->execute();
+      $this->fail('Expected UnauthorizedException merging a reserved tag without the "administer reserved tags" permission.');
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      // Expected.
+    }
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM', 'administer reserved tags'];
+
+    $result = Tag::merge()
+      ->setTargetId($tagA['id'])
+      ->setTagIds([$reserved['id']])
+      ->execute()->first();
+    $this->assertEquals($tagA['id'], $result['id']);
   }
 
 }

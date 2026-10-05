@@ -322,7 +322,7 @@
 
 <script type="text/javascript">
 {literal}
-(function($, _) {
+(function($) {
     $(".crm-submit-buttons button").click( function() {
       $(".dedupenotify .ui-notify-close").click();
     });
@@ -357,24 +357,6 @@
         $(e.target).closest('tr').hide().find('select').val('');
         $(e.target).closest('tbody').find('tr:visible:last .profile_bottom_link_main,tr:visible:last .profile_bottom_add_link, tr:visible:last .profile_bottom_link, tr:visible:last .profile_bottom_add_link_main').show();
     }
-
-    var
-      strSameAs = '{/literal}{ts escape='js'}- same as for main contact -{/ts}{literal}',
-      strSelect = '{/literal}{ts escape='js'}- select -{/ts}{literal}';
-
-    $('#crm-container').on('crmLoad', function() {
-        var $container = $("[id^='additional_profile_'],.additional_profile").not('.processed').addClass('processed');
-        $container.find(".crm-profile-selector-select select").each( function() {
-            var $select = $(this);
-            var selected = $select.find(':selected').val(); //cache the default
-            $select.find('option[value=""]').remove();
-            $select.prepend('<option value="">'+strSameAs+'</option>');
-            if ($select.closest('tr').is(':not([id*="_pre"])')) {
-               $select.prepend('<option value="">'+strSelect+'</option>');
-            }
-            $select.find('option[value="'+selected+'"]').attr('selected', 'selected'); //restore default
-        });
-    });
 
   $(function($) {
     var allow_multiple = $("#is_multiple_registrations");
@@ -411,18 +393,8 @@
 
     $('#registration_blocks').on('click', '.crm-button-add-profile', addBottomProfile);
     $('#registration_blocks').on('click', '.crm-button-rem-profile', removeBottomProfile);
-
-    $('#crm-container').on('crmLoad', function(e) {
-        $('tr[id^="additional_profile"] input[id^="additional_custom_"]').change(function(e) {
-            var $input = $(e.target);
-            if ( $input.val() == '') {
-                var $selected = $input.closest('tr').find('.crm-profile-selector-select :selected');
-                if ($selected.text() == strSelect) { $input.val('none'); }
-            }
-        });
-    });
   });
-}(CRM.$, CRM._));
+}(CRM.$));
 {/literal}
 </script>
 {/if}

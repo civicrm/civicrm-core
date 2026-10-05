@@ -196,6 +196,18 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
       ->execute();
   }
 
+  /**
+   * Create table civicrm_session
+   *
+   * @return TRUE on success
+   * @throws Exception
+   */
+  public function upgrade_5691(): bool {
+    $this->ctx->log->info('Applying update 5691');
+    $this->executeSqlFile('sql/upgrade_5691.sql');
+    return TRUE;
+  }
+
   public function upgrade_5692(): bool {
     CRM_Core_DAO::executeQuery(<<<SQL
       CREATE TABLE IF NOT EXISTS `civicrm_totp` (
@@ -211,92 +223,20 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
-  /**
-   * Example: Run a couple simple queries.
-   *
-   * @return TRUE on success
-   * @throws Exception
-   */
-  // public function upgrade_4200(): bool {
-  //   $this->ctx->log->info('Applying update 4200');
-  //   CRM_Core_DAO::executeQuery('UPDATE foo SET bar = "whiz"');
-  //   CRM_Core_DAO::executeQuery('DELETE FROM bang WHERE willy = wonka(2)');
-  //   return TRUE;
-  // }
-
-
-  /**
-   * Example: Run an external SQL script.
-   *
-   * @return TRUE on success
-   * @throws Exception
-   */
-  // public function upgrade_4201(): bool {
-  //   $this->ctx->log->info('Applying update 4201');
-  //   // this path is relative to the extension base dir
-  //   $this->executeSqlFile('sql/upgrade_4201.sql');
-  //   return TRUE;
-  // }
-
-
-  /**
-   * Example: Run a slow upgrade process by breaking it up into smaller chunk.
-   *
-   * @return TRUE on success
-   * @throws Exception
-   */
-  // public function upgrade_4202(): bool {
-  //   $this->ctx->log->info('Planning update 4202'); // PEAR Log interface
-
-  //   $this->addTask(E::ts('Process first step'), 'processPart1', $arg1, $arg2);
-  //   $this->addTask(E::ts('Process second step'), 'processPart2', $arg3, $arg4);
-  //   $this->addTask(E::ts('Process second step'), 'processPart3', $arg5);
-  //   return TRUE;
-  // }
-  // public function processPart1($arg1, $arg2) { sleep(10); return TRUE; }
-  // public function processPart2($arg3, $arg4) { sleep(10); return TRUE; }
-  // public function processPart3($arg5) { sleep(10); return TRUE; }
-
-  /**
-   * Example: Run an upgrade with a query that touches many (potentially
-   * millions) of records by breaking it up into smaller chunks.
-   *
-   * @return TRUE on success
-   * @throws Exception
-   */
-  // public function upgrade_4203(): bool {
-  //   $this->ctx->log->info('Planning update 4203'); // PEAR Log interface
-
-  //   $minId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_contribution');
-  //   $maxId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(max(id),0) FROM civicrm_contribution');
-  //   for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
-  //     $endId = $startId + self::BATCH_SIZE - 1;
-  //     $title = E::ts('Upgrade Batch (%1 => %2)', array(
-  //       1 => $startId,
-  //       2 => $endId,
-  //     ));
-  //     $sql = '
-  //       UPDATE civicrm_contribution SET foobar = whiz(wonky()+wanker)
-  //       WHERE id BETWEEN %1 and %2
-  //     ';
-  //     $params = array(
-  //       1 => array($startId, 'Integer'),
-  //       2 => array($endId, 'Integer'),
-  //     );
-  //     $this->addTask($title, 'executeSql', $sql, $params);
-  //   }
-  //   return TRUE;
-  // }
-
-  /**
-   * Create table civicrm_session
-   *
-   * @return TRUE on success
-   * @throws Exception
-   */
-  public function upgrade_5691(): bool {
-    $this->ctx->log->info('Applying update 5691');
-    $this->executeSqlFile('sql/upgrade_5691.sql');
+  public function upgrade_6180(): bool {
+    $this->ctx->log->info('Applying update 6180');
+    CRM_Core_DAO::executeQuery('
+      UPDATE civicrm_role r1, civicrm_role r2
+      SET r2.name = CONCAT(r2.name, "_", r2.id)
+      WHERE r2.name = r1.name AND r2.id > r1.id
+    ', i18nRewrite: FALSE);
+    E::schema()->createIndex('civicrm_role', 'UI_name', [
+      'fields' => [
+        'name' => TRUE,
+      ],
+      'unique' => TRUE,
+      'add' => '6.18',
+    ]);
     return TRUE;
   }
 

@@ -151,13 +151,28 @@ return new class() {
     foreach ($entity['getFields']() as $fieldName => $field) {
       [$fkName, $constraint] = $this->getFieldConstraint($entity['table'], $fieldName, $field);
       if ($constraint) {
-        // Make sure the FK does not already exist...
-        // TODO: This function is supposed to generate code not alter the database. Find a better place for this guard.
-        \CRM_Core_BAO_SchemaHandler::safeRemoveFK($entity['table'], $fkName);
         $constraints[$fkName] = $constraint;
       }
     }
     return $constraints;
+  }
+
+  /**
+   * List the foreign keys that this generator would create.
+   *
+   * @return array
+   *   Foreign key names, keyed by table name.
+   *   Ex: ['civicrm_foo' => ['FK_civicrm_foo_bar_id']]
+   */
+  public function getForeignKeyNames(): array {
+    $result = [];
+    foreach ($this->entities as $entity) {
+      $fkNames = array_keys($this->getTableConstraints($entity));
+      if ($fkNames) {
+        $result[$entity['table']] = array_merge($result[$entity['table']] ?? [], $fkNames);
+      }
+    }
+    return $result;
   }
 
   public function getFieldConstraint(string $tableName, string $fieldName, array $field): array {

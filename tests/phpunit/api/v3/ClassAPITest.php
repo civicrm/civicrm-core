@@ -16,6 +16,7 @@
  * @group headless
  */
 class class_api_test extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * Test that error doesn't occur for non-existent file.

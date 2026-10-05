@@ -108,6 +108,9 @@ class CachedDAOGetAction extends \Civi\Api4\Generic\DAOGetAction {
     $cachedFields = $this->getCachedFields();
 
     foreach ($this->select as $fieldName) {
+      if ($fieldName === 'row_count') {
+        continue;
+      }
       $fieldName = FormattingUtil::removeSuffix($fieldName);
       if (!isset($cachedFields[$fieldName])) {
         return TRUE;
@@ -153,8 +156,8 @@ class CachedDAOGetAction extends \Civi\Api4\Generic\DAOGetAction {
    */
   protected function getFromCache($result): void {
     $idField = CoreUtil::getIdFieldName($this->getEntityName());
-    // For parity with the DAO get action, always select ID.
-    if ($this->select && !in_array($idField, $this->select)) {
+    // For parity with the DAO get action, always select ID unless only row_count was requested.
+    if ($this->select && $this->select !== ['row_count'] && !in_array($idField, $this->select)) {
       $this->select[] = $idField;
     }
     $values = $this->getCachedRecords();

@@ -35,9 +35,7 @@
         <td>{$form.phone.$blockId.phone_type_id.html}</td>
         <td align="center" class="crm-phone-is_primary">{$form.phone.$blockId.is_primary.1.html}</td>
         <td>
-          {if $blockId gt 1}
-            <a class="crm-delete-inline crm-hover-button" href="#" title="{ts escape='htmlattribute'}Delete phone{/ts}"><span class="icon delete-icon"></span></a>
-          {/if}
+          <a class="crm-delete-inline crm-hover-button" href="#" title="{ts escape='htmlattribute'}Delete phone{/ts}"><span class="icon delete-icon"></span></a>
         </td>
         {include file="CRM/Contact/Form/Inline/BlockCustomData.tpl" entity=phone customFields=$custom_fields_phone blockId=$blockId actualBlockCount=$actualBlockCount}
     </tr>

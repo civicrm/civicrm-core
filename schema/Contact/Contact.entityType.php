@@ -4,6 +4,7 @@ return [
   'name' => 'Contact',
   'table' => 'civicrm_contact',
   'class' => 'CRM_Contact_DAO_Contact',
+  'token_class' => 'CRM_Contact_Tokens',
   'getInfo' => fn() => [
     'title' => ts('Contact'),
     'title_plural' => ts('Contacts'),

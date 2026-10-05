@@ -284,12 +284,17 @@ class Locale {
   }
 
   /**
+   * Get the full, ordered list of locales Civi would consider as fallbacks
+   * for a preferred locale - highest priority first.
+   *
+   * @internal
+   *
    * @param string|null $preferred
    *   ex: 'es_PR'
    * @return array
    *   Ex: ['es_PR', 'es_419', 'es_MX', 'es_ES', 'en_US', 'en_GB]
    */
-  private static function getAllFallbacks(?string $preferred): array {
+  public static function getAllFallbacks(?string $preferred): array {
     return array_merge(
     // We'd like to stay in the active locale (or something closely related)
       ($preferred ? static::getLocalePrecedence($preferred) : []),
@@ -309,18 +314,16 @@ class Locale {
   private static function getLocalePrecedence(string $preferred): array {
     [$lang] = explode('_', $preferred);
 
-    // (Eileen) In this situation we have multiple language options but no exact match.
-    // This might be, for example, a case where we have, for example, a US English and
-    // a British English, but no Kiwi English. In that case the best is arguable
-    // but I think we all agree that we want to avoid Aussie English here.
     $defaultLanguages = [
       'de' => ['de_DE'],
-      'en' => ['en_US', 'en_GB', 'en_AU', 'en_NZ'],
+      'en' => ['en_US', 'en_GB'],
       'fr' => ['fr_FR', 'fr_CA'],
-      'es' => ['es_419', 'es_MX', 'es_ES'],
+      // es_419 might make sense here, but it cannot be used
+      // because our language fields are all VARCHAR(5)
+      'es' => ['es_MX', 'es_ES'],
       'nl' => ['nl_NL'],
       'pt' => ['pt_PT', 'pt_BR'],
-      'zh' => ['zh_TW'],
+      'zh' => ['zh_CN', 'zh_TW'],
     ];
     $fallbacks = $defaultLanguages[$lang] ?? [];
     array_unshift($fallbacks, $preferred);

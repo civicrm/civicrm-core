@@ -98,7 +98,7 @@ class FileGetSpecProvider extends \Civi\Core\Service\AutoService implements Gene
   public static function formatFileContent(&$content, $file) {
     // Virtual field fetches the id and expects it to be transformed into file contents by this function
     $fileId = $content;
-    $uri = $file['uri'] ?? ($fileId ? \CRM_Core_DAO_File::getDbVal('is_public', $fileId) : NULL);
+    $uri = $file['uri'] ?? ($fileId ? \CRM_Core_DAO_File::getDbVal('uri', $fileId) : NULL);
     if ($uri && is_string($uri)) {
       $isPublic = $file['is_public'] ?? \CRM_Core_DAO_File::getDbVal('is_public', $fileId);
       $settingName = $isPublic ? 'imageUploadDir' : 'customFileUploadDir';

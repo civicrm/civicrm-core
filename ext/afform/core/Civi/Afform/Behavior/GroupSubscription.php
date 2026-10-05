@@ -80,7 +80,7 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     }
     $contact = $subscriptionEntity['data']['contact_id'];
     if ($contact === 'user_contact_id') {
-      $cid = \CRM_Core_Session::getLoggedInContactID();
+      $cid = $event->getApiRequest()->getSubmitterContactID();
     }
     elseif ($contact && \CRM_Utils_Rule::positiveInteger($contact)) {
       $cid = $contact;

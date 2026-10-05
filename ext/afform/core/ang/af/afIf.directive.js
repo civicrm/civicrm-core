@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // A modified version of ngIf to use afform.checkConditions
   angular.module('af').directive('afIf', function($compile, $animate, $parse) {
     return {
@@ -70,7 +70,7 @@
     for (var i = 1; node !== endNode && (node = node.nextSibling); i++) {
       if (blockNodes || nodes[i] !== node) {
         if (!blockNodes) {
-          blockNodes = $(slice.call(nodes, 0, i));
+          blockNodes = $(Array.from(nodes).slice(0, i));
         }
         blockNodes.push(node);
       }
@@ -79,4 +79,4 @@
     return blockNodes || nodes;
   }
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

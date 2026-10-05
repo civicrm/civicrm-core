@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchTasks').controller('crmSearchTaskMailing', function($scope, crmApi4, searchTaskBaseTrait, formatForSelect2) {
@@ -73,4 +73,4 @@
     };
 
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

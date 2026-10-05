@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function (angular, $, _) {
+(function (angular, $) {
   "use strict";
 
   /**
@@ -18,4 +18,4 @@
     }
   }));
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

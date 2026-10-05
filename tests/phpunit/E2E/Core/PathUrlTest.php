@@ -147,8 +147,12 @@ class PathUrlTest extends \CiviEndToEndTestCase {
     else {
       $this->assertEquals($front, $back, "On Drupal/Backdrop/Standalone, frontend and backend URLs should look the same.");
     }
-    $this->assertEquals($back, $current, "Within E2E tests, current routing style is backend.");
-    // For purposes of this test, it doesn't matter if "current" is frontend or backend - as long as it's consistent.
+    if (CIVICRM_UF === 'WordPress') {
+      $this->assertEquals($current, $front, "On WordPress, current scheme (unusually) defaults to frontend.");
+    }
+    else {
+      $this->assertEquals($current, $back, "On most systems, current scheme defaults to backend.");
+    }
   }
 
   public function testUrl_DefaultUI(): void {

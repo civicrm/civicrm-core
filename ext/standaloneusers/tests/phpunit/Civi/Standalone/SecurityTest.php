@@ -80,6 +80,28 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $this->assertFalse($security->checkPassword(['password' => 'some other password'], $user));
   }
 
+  public function testAuthxRecognizesInactiveUsers(): void {
+    [, $userID] = $this->createFixtureContactAndUser();
+    $authx = new \Civi\Authx\Standalone();
+
+    $this->assertFalse($authx->getUserIsBlocked($userID));
+
+    User::update(FALSE)
+      ->addValue('is_active', FALSE)
+      ->addWhere('id', '=', $userID)
+      ->execute();
+
+    $this->assertTrue($authx->getUserIsBlocked($userID));
+    $this->assertFalse($authx->getUserIsBlocked(999999999));
+
+    $this->expectException(\Civi\Authx\AuthxException::class);
+    $this->expectExceptionMessage('Cannot login. User is blocked.');
+    authx_login([
+      'useSession' => TRUE,
+      'principal' => ['userId' => $userID],
+    ]);
+  }
+
   public function testPerms() {
     [$contactID, $userID, $security] = $this->createFixtureContactAndUser();
     $ufID = \CRM_Core_BAO_UFMatch::getUFId($contactID);
@@ -136,8 +158,15 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
         'display_name' => 'Admin McDemo',
       ])->execute()->first()['id'];
 
-    $params = ['cms_name' => 'user_one', 'cms_pass' => 'secret1', 'notify' => FALSE, 'contact_id' => $contactID, 'email' => 'user_one@example.org'];
-    $userID = \CRM_Core_BAO_CMSUser::create($params, 'email');
+    $user = User::create(FALSE)
+      ->setValues([
+        'username' => 'user_one',
+        'password' => 'secret1',
+        'contact_id' => $contactID,
+        'uf_name' => 'user_one@example.org',
+      ])
+      ->execute()->first();
+    $userID = $user['id'];
     $this->assertGreaterThan(0, $userID);
     $this->contactID = $contactID;
     $this->userID = $userID;

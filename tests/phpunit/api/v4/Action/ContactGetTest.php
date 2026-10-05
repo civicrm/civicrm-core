@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
+use Civi\Api4\ContactType;
 use Civi\Api4\Email;
 use Civi\Api4\Individual;
 use Civi\Api4\Relationship;
@@ -30,6 +31,168 @@ use Civi\Test\TransactionalInterface;
  * @group headless
  */
 class ContactGetTest extends Api4TestBase implements TransactionalInterface {
+
+  /**
+   * A group filter whose value list resolves to nothing must return an empty
+   * result, not a database error.
+   *
+   * An unknown group name resolves to no id at all, which used to leave an
+   * empty `IN ()` in the group-nesting lookup.
+   */
+  public function testGetByEmptyGroupFilter(): void {
+    $lastName = uniqid('groupFilterTest');
+    $contact = $this->createTestRecord('Contact', ['last_name' => $lastName]);
+    $group = $this->createTestRecord('Group', ['name' => uniqid('grp'), 'title' => 'Group Filter Test']);
+    $this->createTestRecord('GroupContact', [
+      'group_id' => $group['id'],
+      'contact_id' => $contact['id'],
+      'status' => 'Added',
+    ]);
+
+    // Sanity check: the contact is found through the group it belongs to.
+    $inGroup = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('groups', 'IN', [$group['id']])
+      ->execute();
+    $this->assertCount(1, $inGroup);
+
+    // Nothing is a member of an empty group list.
+    $emptyList = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('groups', 'IN', [])
+      ->execute();
+    $this->assertCount(0, $emptyList);
+
+    // Everyone is outside an empty group list.
+    $notInEmptyList = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('groups', 'NOT IN', [])
+      ->execute();
+    $this->assertCount(1, $notInEmptyList);
+
+    // An unknown group name resolves to an empty list and behaves the same.
+    $unknownName = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('groups:name', 'IN', ['this_group_does_not_exist'])
+      ->execute();
+    $this->assertCount(0, $unknownName);
+
+    $notUnknownName = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('groups:name', 'NOT IN', ['this_group_does_not_exist'])
+      ->execute();
+    $this->assertCount(1, $notUnknownName);
+
+    // Nested in a NOT clause the empty list used to produce `NOT ()`.
+    $nested = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addClause('NOT', ['groups:name', 'IN', ['this_group_does_not_exist']])
+      ->execute();
+    $this->assertCount(1, $nested);
+  }
+
+  /**
+   * `IN` an empty list matches nothing and `NOT IN` an empty list matches
+   * everything, for regular fields as well as for `sql_filters` fields.
+   *
+   * An empty list used to be rewritten to `IN ("")`, whose negation
+   * `NOT IN ("")` is NULL for a NULL column and so dropped the row.
+   */
+  public function testGetByEmptyValueList(): void {
+    $lastName = uniqid('emptyListTest');
+    $contact = $this->createTestRecord('Contact', ['first_name' => NULL, 'last_name' => $lastName]);
+
+    $this->assertCount(0, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('id', 'IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('id', 'NOT IN', [])
+      ->execute());
+
+    // A NULL first_name is neither in nor excluded by an empty list.
+    $this->assertCount(0, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('first_name', 'IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('first_name', 'NOT IN', [])
+      ->execute());
+    $this->assertCount(0, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('tags', 'IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addWhere('tags', 'NOT IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addClause('NOT', ['tags', 'IN', []])
+      ->execute());
+
+    // A NULL value list behaves like an empty one.
+    foreach (['id', 'tags', 'groups'] as $fieldName) {
+      $this->assertCount(0, Contact::get(FALSE)
+        ->addWhere('last_name', '=', $lastName)
+        ->addWhere($fieldName, 'IN', NULL)
+        ->execute(), "$fieldName IN NULL");
+      $this->assertCount(1, Contact::get(FALSE)
+        ->addWhere('last_name', '=', $lastName)
+        ->addWhere($fieldName, 'NOT IN', NULL)
+        ->execute(), "$fieldName NOT IN NULL");
+    }
+
+    // HAVING clauses go through the same code path.
+    $this->assertCount(0, Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('last_name', '=', $lastName)
+      ->addHaving('id', 'IN', [])
+      ->execute());
+    $this->assertCount(1, Contact::get(FALSE)
+      ->addSelect('id')
+      ->addWhere('last_name', '=', $lastName)
+      ->addHaving('id', 'NOT IN', [])
+      ->execute());
+  }
+
+  /**
+   * Without permission checks, smart group members are found whatever the user may access.
+   */
+  public function testGetByGroupFilterWithoutPermissions(): void {
+    $lastName = uniqid('groupFilterPerms');
+    $smartMember = $this->createTestRecord('Contact', ['first_name' => 'Smart', 'last_name' => $lastName]);
+    $staticMember = $this->createTestRecord('Contact', ['first_name' => 'Static', 'last_name' => $lastName]);
+    $this->createTestRecord('Contact', ['first_name' => 'Outsider', 'last_name' => $lastName]);
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['id'],
+        'where' => [['id', '=', $smartMember['id']]],
+      ],
+    ]);
+    $smartGroup = $this->createTestRecord('Group', ['saved_search_id' => $savedSearch['id']]);
+    $staticGroup = $this->createTestRecord('Group');
+    $this->createTestRecord('GroupContact', [
+      'group_id' => $staticGroup['id'],
+      'contact_id' => $staticMember['id'],
+      'status' => 'Added',
+    ]);
+
+    foreach ([[], ['access CiviCRM']] as $permissions) {
+      \CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
+      \CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($smartGroup['id']);
+      $result = Contact::get(FALSE)
+        ->addWhere('last_name', '=', $lastName)
+        ->addWhere('groups', 'IN', [$smartGroup['id'], $staticGroup['id']])
+        ->execute()->column('id');
+      sort($result);
+      $this->assertEquals([$smartMember['id'], $staticMember['id']], $result, implode(',', $permissions));
+    }
+  }
 
   public function testGetDeletedContacts(): void {
     $last_name = uniqid('deleteContactTest');
@@ -59,6 +222,95 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     // Putting is_deleted anywhere in the where clause will disable the default
     $contacts = Contact::get()->addClause('OR', ['last_name', '=', $last_name], ['is_deleted', '=', 0])->addSelect('id')->execute();
     $this->assertContains($del['id'], $contacts->column('id'));
+  }
+
+  /**
+   * Test ordering of contact by contact_sub_type when field
+   * contains more than one type and contact_type label and name
+   * are different enough to get sorted in different order.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetWithOrderBy(): void {
+    $contactSubTypes = [
+      ['name' => 'Membre', 'label' => '1.Actif'],
+      ['name' => 'Proche', 'label' => '2.Proche'],
+      ['name' => 'Soutien', 'label' => '3.Soutien'],
+      ['name' => 'Employ_', 'label' => '5.Employé'],
+      ['name' => 'DCD', 'label' => '0.Décédé'],
+    ];
+
+    foreach ($contactSubTypes as $contactSubType) {
+      ContactType::create(FALSE)
+        ->setValues($contactSubType)
+        ->addValue('parent_id.name', 'Individual')
+        ->execute();
+    }
+
+    $contactSubTypesSortedByLabel = [
+      ['name' => 'DCD', 'label' => '0.Décédé'],
+      ['name' => 'Membre', 'label' => '1.Actif'],
+      ['name' => 'Proche', 'label' => '2.Proche'],
+      ['name' => 'Soutien', 'label' => '3.Soutien'],
+      ['name' => 'Employ_', 'label' => '5.Employé'],
+    ];
+
+    // Query Contact sub type, order by label
+    $retrievedContactTypes = ContactType::get(TRUE)
+      ->addSelect('name', 'label', 'parent_id.name')
+      ->addWhere('parent_id.name', '=', 'Individual')
+      ->addOrderBy('label', 'ASC')
+      ->setLimit(5)
+      ->execute();
+
+    $this->assertCount(5, $retrievedContactTypes);
+
+    // Assert sorted query results equals sorted dataset #1.
+    foreach ($retrievedContactTypes as $index => $contactType) {
+      $this->assertEquals($contactType['name'], $contactSubTypesSortedByLabel[$index]['name']);
+      $this->assertEquals($contactType['label'], $contactSubTypesSortedByLabel[$index]['label']);
+    }
+
+    // Test dataset #2 : Contact first_name, contact_sub_type:label
+    $contactData = [
+      ['first_name' => 'Bob', 'contact_sub_type:label' => ['1.Actif']],
+      ['first_name' => 'Jan', 'contact_sub_type:label' => ['2.Proche']],
+      ['first_name' => 'Dan', 'contact_sub_type:label' => ['3.Soutien']],
+      ['first_name' => 'Joe', 'contact_sub_type:label' => ['5.Employé', '1.Actif']],
+      ['first_name' => 'Eli', 'contact_sub_type:label' => ['0.Décédé', '1.Actif']],
+      ['first_name' => 'Yan', 'contact_sub_type:label' => []],
+    ];
+
+    // Creating contact using dataset #2.
+    foreach ($contactData as $contact) {
+      $this->createTestRecord('Contact',
+        $contact + ['last_name' => 'Series2']);
+    }
+
+    // Query contact, order by contact_sub_type:label
+    $result = Contact::get(TRUE)
+      ->addSelect('id', 'contact_type', 'contact_sub_type', 'contact_sub_type:label', 'first_name', 'last_name')
+      ->addWhere('contact_type', '=', 'Individual')
+      ->addWhere('last_name', '=', 'Series2')
+      ->addOrderBy('contact_sub_type:label', 'ASC')
+      ->setLimit(10)
+      ->execute();
+
+    $this->assertCount(6, $result);
+
+    $contactsSortedBySubtypeLabel = [
+      ['first_name' => 'Yan', 'contact_sub_type:label' => []],
+      ['first_name' => 'Eli', 'contact_sub_type:label' => ['0.Décédé', '1.Actif']],
+      ['first_name' => 'Bob', 'contact_sub_type:label' => ['1.Actif']],
+      ['first_name' => 'Jan', 'contact_sub_type:label' => ['2.Proche']],
+      ['first_name' => 'Dan', 'contact_sub_type:label' => ['3.Soutien']],
+      ['first_name' => 'Joe', 'contact_sub_type:label' => ['5.Employé', '1.Actif']],
+    ];
+
+    // Assert contact query results equals sorted dataset #2.
+    foreach ($result as $index => $contact) {
+      $this->assertEquals($contact['first_name'], $contactsSortedBySubtypeLabel[$index]['first_name']);
+    }
   }
 
   public function testGetWithLimit(): void {
@@ -146,38 +398,6 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString('LIKE "%Robert \\"Bob\\" O\\\'Connor%"', $result->debug['sql'][0]);
     // The sql should not include an IS NULL clause
     $this->assertStringNotContainsStringIgnoringCase('IS NULL', $result->debug['sql'][0]);
-  }
-
-  /**
-   * Test a lack of fatal errors when the where contains an emoji.
-   *
-   * By default our DBs are not 🦉 compliant. This test will age
-   * out when we are.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testEmoji(): void {
-    $schemaNeedsAlter = \CRM_Core_BAO_SchemaHandler::databaseSupportsUTF8MB4();
-    if ($schemaNeedsAlter) {
-      \CRM_Core_DAO::executeQuery("
-        ALTER TABLE civicrm_contact MODIFY COLUMN
-        `first_name` VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'First Name.',
-        CHARSET utf8 COLLATE utf8_unicode_ci
-      ");
-      \Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
-    }
-    \Civi::$statics['CRM_Core_BAO_SchemaHandler'] = [];
-    Contact::get()
-      ->setDebug(TRUE)
-      ->addWhere('first_name', '=', '🦉Claire')
-      ->execute();
-    if ($schemaNeedsAlter) {
-      \CRM_Core_DAO::executeQuery("
-        ALTER TABLE civicrm_contact MODIFY COLUMN
-        `first_name` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'First Name.',
-        CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci
-      ");
-    }
   }
 
   public function testEmptyAndNullOperators(): void {

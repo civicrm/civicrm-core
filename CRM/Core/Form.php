@@ -473,7 +473,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   For datepicker elements this is consistent with the data
    *   from CRM_Utils_Date::getDatePickerExtra
    *
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    *   Could be an error object
    *
    * @noinspection PhpDocMissingThrowsInspection
@@ -1462,7 +1462,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $title
    * @param array $attributes
    * @param bool $required
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addToggle(string $name, string $title, array $attributes = [], bool $required = FALSE) {
     $attributes += [
@@ -1631,7 +1631,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   protected function getApiAction() {
     $action = $this->getAction();
-    if ($action & (CRM_Core_Action::UPDATE + CRM_Core_Action::ADD)) {
+    if ($action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD | CRM_Core_Action::COPY)) {
       return 'create';
     }
     if ($action & (CRM_Core_Action::VIEW + CRM_Core_Action::BROWSE + CRM_Core_Action::BASIC + CRM_Core_Action::ADVANCED + CRM_Core_Action::PREVIEW)) {
@@ -1678,7 +1678,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - context - @see CRM_Core_DAO::buildOptionsContext
    * @param bool $required
    * @throws CRM_Core_Exception
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addSelect($name, $props = [], $required = FALSE) {
     if (!isset($props['entity'])) {
@@ -2000,8 +2000,12 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   Not used anymore.
    * @param string $usedFor
    *   Deprecated: not clear what this was usedFor.
+   * @param array $extraOptions
+   *   Additional select options to offer alongside the profile list, keyed by the
+   *   value that will be submitted - e.g. ['none' => ts('- none -')]. Use this rather
+   *   than overloading the blank/placeholder value with a non-obvious meaning.
    */
-  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes = NULL, $entities = NULL, $default = FALSE, $usedFor = NULL) {
+  public function addProfileSelector($name, $label, $allowCoreTypes, $allowSubTypes = NULL, $entities = NULL, $default = FALSE, $usedFor = NULL, array $extraOptions = []) {
     $query = \Civi\Api4\UFGroup::get(TRUE)
       ->addWhere('is_active', '=', 1);
     if (!empty($allowCoreTypes)) {
@@ -2012,7 +2016,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $query->addClause('OR', $clauses);
     }
     $profileGroups = $query->execute()->column('title', 'id');
-    $this->add('select', $name, $label, ['' => ts('- select profile -')] + $profileGroups, FALSE, ['class' => 'crm-select2 huge crm-form-select-profile']);
+    $options = $extraOptions + ['' => ts('- select profile -')] + $profileGroups;
+    $this->add('select', $name, $label, $options, FALSE, ['class' => 'crm-select2 huge crm-form-select-profile']);
     Civi::resources()->addScriptFile('civicrm', 'js/crm.openRelatedConfig.js');
   }
 
@@ -2116,7 +2121,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $defaultCurrency
    * @param bool $freezeCurrency
    *
-   * @return \HTML_QuickForm_Element
+   * @return \HTML_QuickForm_element
    */
   public function addMoney(
     $name,
@@ -2191,7 +2196,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $props
    * @param bool $required
    *
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addAutocomplete(string $name, string $label = '', array $props = [], bool $required = FALSE) {
     $props += [
@@ -2248,7 +2253,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *   - class, etc. - other html properties
    * @param bool $required
    *
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addEntityRef($name, $label = '', $props = [], $required = FALSE) {
     // Default properties
@@ -2628,7 +2633,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $elementName
    * @param array $settings
    *
-   * @return HTML_QuickForm_Element
+   * @return HTML_QuickForm_element
    */
   public function addChainSelect($elementName, $settings = []) {
     $required = $settings['required'] ?? FALSE;
@@ -2864,6 +2869,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     return in_array($this->_action, [
       CRM_Core_Action::UPDATE,
       CRM_Core_Action::ADD,
+      CRM_Core_Action::COPY,
       CRM_Core_Action::BROWSE,
       CRM_Core_Action::BASIC,
       CRM_Core_Action::ADVANCED,

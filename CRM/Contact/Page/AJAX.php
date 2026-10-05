@@ -212,11 +212,11 @@ class CRM_Contact_Page_AJAX {
 
   public static function relationship() {
     CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $relType = CRM_Utils_Request::retrieve('rel_type', 'String', CRM_Core_DAO::$_nullObject, TRUE);
-    $relContactID = CRM_Utils_Request::retrieve('rel_contact', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
+    $relType = CRM_Utils_Request::retrieve('rel_type', 'String', NULL, TRUE);
+    $relContactID = CRM_Utils_Request::retrieve('rel_contact', 'Positive', NULL, TRUE);
     $originalCid = CRM_Utils_Request::retrieve('cid', 'Positive');
     $relationshipID = CRM_Utils_Request::retrieve('rel_id', 'Positive');
-    $caseID = CRM_Utils_Request::retrieve('case_id', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
+    $caseID = CRM_Utils_Request::retrieve('case_id', 'Positive', NULL, TRUE);
 
     if (!CRM_Case_BAO_Case::accessCase($caseID)) {
       CRM_Utils_System::permissionDenied();
@@ -308,7 +308,7 @@ class CRM_Contact_Page_AJAX {
     $sig = CRM_Utils_Request::retrieve('sig', 'String');
     $for = CRM_Utils_Request::retrieve('for', 'String');
     if (
-      CRM_Utils_Time::getTimeRaw() > $_REQUEST['ts'] + self::CHECK_USERNAME_TTL
+      CRM_Utils_Time::time() > $_REQUEST['ts'] + self::CHECK_USERNAME_TTL
       || $for != 'civicrm/ajax/cmsuser'
       || !$signer->validate($sig, $_REQUEST)
     ) {

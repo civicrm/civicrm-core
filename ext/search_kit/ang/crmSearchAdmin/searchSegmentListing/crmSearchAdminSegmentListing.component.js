@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   // Specialized searchDisplay, only used by Admins
@@ -11,7 +11,7 @@
     controller: function($scope, $element, crmApi4, searchMeta, searchDisplayBaseTrait, searchDisplaySortableTrait) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         // Mix in traits to this controller
-        ctrl = angular.extend(this, _.cloneDeep(searchDisplayBaseTrait), _.cloneDeep(searchDisplaySortableTrait));
+        ctrl = angular.extend(this, CRM.utils.cloneDeep(searchDisplayBaseTrait), CRM.utils.cloneDeep(searchDisplaySortableTrait));
 
       this.apiEntity = 'SearchSegment';
       this.search = {
@@ -46,7 +46,11 @@
         );
         // Delete field from metadata
         const entity = searchMeta.getEntity(row.data.entity_name);
-        _.remove(entity.fields, {name: row.data.field_name});
+        for (let pos = entity.fields.length - 1; pos >= 0; pos--) {
+          if (entity.fields[pos].name === row.data.field_name) {
+            entity.fields.splice(pos, 1);
+          }
+        }
       };
 
       function buildDisplaySettings() {
@@ -98,4 +102,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
   // Example usage: <af-form ctrl="afform">
   angular.module('af').component('afForm', {
@@ -112,11 +112,11 @@
           return crmApi4('Afform', 'prefill', params)
             .then((result) => {
               result.forEach((item) => {
-                // Use _.each() because item.values could be cast as an object if array keys are not sequential
-                _.each(item.values, (values, index) => {
+                // Object.entries handles item.values whether an array or an object (if array keys are not sequential)
+                Object.entries(item.values || {}).forEach(([index, values]) => {
                   data[item.name][index] = data[item.name][index] || {};
                   data[item.name][index].joins = data[item.name][index].joins || {};
-                  angular.merge(data[item.name][index], values, {fields: _.cloneDeep(schema[item.name]?.data || {})});
+                  angular.merge(data[item.name][index], values, {fields: structuredClone(schema[item.name]?.data || {})});
                 });
               });
               $element.unblock();
@@ -134,7 +134,7 @@
           // Delete object keys without breaking object references
           Object.keys(data[selectedEntity][selectedIndex].fields).forEach((key) => delete data[selectedEntity][selectedIndex].fields[key]);
           // Fill pre-set values
-          angular.merge(data[selectedEntity][selectedIndex].fields, _.cloneDeep(schema[selectedEntity].data || {}));
+          angular.merge(data[selectedEntity][selectedIndex].fields, structuredClone(schema[selectedEntity].data || {}));
           data[selectedEntity][selectedIndex].joins = {};
         }
       };
@@ -217,7 +217,7 @@
 
         // If autosave enabled, save every ten seconds if changes have been made
         if (autoSaveEnabled) {
-          autoSave = _.debounce(ctrl.submitDraft, 10000);
+          autoSave = CRM.utils.debounce(ctrl.submitDraft, 10000);
         }
 
         cancelDraftWatcher = $scope.$watch(() => data, function (newVal, oldVal) {
@@ -241,7 +241,7 @@
         // NOT works identically to OR but gets flipped at the end
         let ret = op === 'AND',
           flip = !ret;
-        _.each(conditions, function(clause) {
+        (conditions || []).forEach((clause) => {
           // Recurse into nested group
           if (Array.isArray(clause[1])) {
             if (ctrl.checkConditions(clause[1], clause[0]) === flip) {
@@ -315,6 +315,13 @@
             }
             return angular.equals(val1, val2) === yes;
 
+          case 'BETWEEN':
+          case 'NOT BETWEEN':
+            if (Array.isArray(val2) && val2.length === 2) {
+              return (val1 >= val2[0] && val1 <= val2[1]) === yes;
+            }
+            return false;
+
           case 'LIKE':
           case 'NOT LIKE':
             if (typeof val1 === 'string' && typeof val2 === 'string') {
@@ -385,6 +392,21 @@
         return valid;
       }
 
+      // Give a more specific error than "check all answers are valid" for common,
+      // easily-identifiable failures (e.g. a minlength on a text field).
+      function getInvalidInputMessage(input) {
+        if (input.classList.contains('ng-invalid-required')) {
+          return ts('Please fill all required fields.');
+        }
+        if (input.classList.contains('ng-invalid-minlength') && input.minLength > 0) {
+          const label = input.id && document.querySelector('label[for="' + input.id + '"]');
+          return label ?
+            ts('%1 must be at least %2 characters.', {1: label.textContent.trim(), 2: input.minLength}) :
+            ts('One or more fields must have at least %1 characters.', {1: input.minLength});
+        }
+        return ts('Please check all answers are valid.');
+      }
+
       function disableForm(errorMsg) {
         $('af-form[ng-form="' + ctrl.getFormMeta().name + '"]')
           .addClass('disabled')
@@ -422,8 +444,7 @@
         if (!ctrl.ngForm.$valid || !validateFileFields()) {
           // check whether its missing required or just invalid
           const firstInvalidInput = $element[0].closest('af-form').querySelector('.ng-invalid');
-          const isRequired = firstInvalidInput.classList.contains('ng-invalid-required');
-          const message = isRequired ? ts('Please fill all required fields.') : ts('Please check all answers are valid.');
+          const message = getInvalidInputMessage(firstInvalidInput);
 
           // at this point we want the user to know to check the invalid fields
           //
@@ -458,6 +479,9 @@
           }
           return;
         }
+        // Give elements (e.g. captcha widgets) a chance to write their
+        // current value into `data` before it's read for the API call.
+        $scope.$parent.$broadcast('afFormPreSubmit', data);
         $element.block();
         if (cancelDraftWatcher) {
           cancelDraftWatcher();
@@ -470,9 +494,9 @@
         }).then((response) => {
           submissionResponse = response;
           if (ctrl.fileUploader.getNotUploadedItems().length) {
-            _.each(ctrl.fileUploader.getNotUploadedItems(), function(file) {
+            ctrl.fileUploader.getNotUploadedItems().forEach((file) => {
               file.formData.push({
-                params: JSON.stringify(_.extend({
+                params: JSON.stringify(Object.assign({
                   token: response[0].token,
                   name: ctrl.getFormMeta().name
                 }, file.crmApiParams()))
@@ -517,7 +541,7 @@
             uploadingDraftFiles = true;
             ctrl.fileUploader.getNotUploadedItems().forEach((file) => {
               file.formData.push({
-                params: JSON.stringify(_.extend({
+                params: JSON.stringify(Object.assign({
                   name: ctrl.getFormMeta().name
                 }, file.crmApiParams()))
               });
@@ -596,7 +620,6 @@
           return null;
         }
         const tokens = new Set(message.match(/\[[a-zA-Z0-9_]+\.[0-9]+\.[^\]]+\]/g));
-
         return tokens.size ? tokens : null;
       };
 
@@ -621,10 +644,12 @@
 
       this.replaceTokens = (message) => {
         const tokens = this.identifyTokens(message);
-        const tokenValues = this.getTokenValues(tokens);
-        tokens.forEach((token) => message = message.replaceAll(token, tokenValues[token]));
+        if (tokens) {
+          const tokenValues = this.getTokenValues(tokens);
+          tokens.forEach((token) => message = message.replaceAll(token, tokenValues[token]));
+        }
         return message;
       };
     }
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

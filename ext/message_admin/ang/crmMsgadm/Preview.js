@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMsgadm').controller('MsgtpluiPreviewCtrl', function($scope, crmUiHelp, crmStatus, crmApi4, crmUiAlert, $timeout, $q, dialogService, $location) {
     const ts = $scope.ts = CRM.ts('crmMsgadm');
@@ -10,9 +10,9 @@
       $ctrl.lang = args.lang;
     }
 
-    $ctrl.exampleId = parseInt(_.findKey(model.examples, {name: model.exampleName}));
-    $ctrl.revisionId = parseInt(_.findKey(model.revisions, {name: model.revisionName}));
-    $ctrl.formatId = parseInt(_.findKey(model.formats, {name: model.formatName}));
+    $ctrl.exampleId = model.examples.findIndex((item) => item.name === model.exampleName);
+    $ctrl.revisionId = model.revisions.findIndex((item) => item.name === model.revisionName);
+    $ctrl.formatId = model.formats.findIndex((item) => item.name === model.formatName);
     $ctrl.cycle = function(idFld, listFld, delta){
       $ctrl[idFld] = ($ctrl[idFld] + delta + model[listFld].length) % model[listFld].length;
     };
@@ -89,7 +89,9 @@
         const filteredData = model.filterData ? model.filterData(exampleData) : exampleData;
         return crmApi4('WorkflowMessage', 'render', {
           language: $ctrl.lang,
-          workflow: filteredData.workflow,
+          // The base "generic" example (Civi\WorkflowMessage\GenericWorkflowMessage\Alex) doesn't
+          // set a 'workflow' key on its own data, since it isn't tied to any specific workflow.
+          workflow: filteredData.workflow || 'generic',
           values: filteredData.modelProps,
           messageTemplate: model.revisions[$ctrl.revisionId].rec
         });
@@ -110,6 +112,22 @@
     $scope.$watch('$ctrl.formatId', update);
     $scope.$watch('$ctrl.exampleId', update);
     update();
+
+    this.sendTest = CRM.crmMsgadm.sendTestEnabled ? {
+      send: () => {
+        const subject = this.preview.subject;
+        const body = this.preview.html;
+        return crmStatus({start: ts('Sending...'), success: ts('Sent')}, crmApi4('EmailMessage', 'create', {
+          values: {
+            // TODO: enable selecting other contacts to receive test?
+            to_contact_id: 'user_contact_id',
+            subject: subject,
+            body: body,
+          }
+        }));
+      }
+    } : null;
+
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

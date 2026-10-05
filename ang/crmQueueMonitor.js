@@ -1,4 +1,4 @@
-(function (angular, $, _) {
+(function (angular, $) {
   "use strict";
 
   console.log('init crmQueueMonitor module');
@@ -24,4 +24,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

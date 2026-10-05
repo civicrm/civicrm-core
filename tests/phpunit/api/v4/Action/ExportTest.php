@@ -19,7 +19,11 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\ContributionPage;
+use Civi\Api4\Event;
 use Civi\Api4\Navigation;
+use Civi\Api4\PriceSet;
+use Civi\Api4\PriceSetEntity;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -41,6 +45,86 @@ class ExportTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayNotHasKey('id', $export['params']['values']);
     $this->assertArrayNotHasKey('domain_id', $export['params']['values']);
     $this->assertArrayHasKey('name', $export['params']['values']);
+  }
+
+  /**
+   * PriceSetEntity.entity_id is a dynamic FK (paired with entity_table).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testDynamicForeignKeyExport(): void {
+    // ContributionPage has a `name` field, so its dynamic FK should be portable.
+    $page = ContributionPage::create(FALSE)
+      ->addValue('title', 'Test Export Page')
+      ->addValue('name', 'test_export_page')
+      ->execute()->single();
+    // Event has no `name` field, so there's nothing portable to join on: this must not
+    // error, and must not regress to some other broken/incorrect representation.
+    $event = Event::create(FALSE)
+      ->addValue('title', 'Test Export Event')
+      ->addValue('event_type_id', 1)
+      ->addValue('start_date', 'now')
+      ->execute()->single();
+
+    $priceSet = PriceSet::create(FALSE)
+      ->addValue('name', 'test_export_pset')
+      ->addValue('title', 'Test Export PriceSet')
+      ->addValue('extends:name', ['CiviEvent'])
+      ->addValue('financial_type_id:name', 'Donation')
+      ->execute()->single();
+
+    [$pageLink, $eventLink] = PriceSetEntity::save(FALSE)
+      ->setRecords([
+        ['entity_table' => 'civicrm_contribution_page', 'entity_id' => $page['id']],
+        ['entity_table' => 'civicrm_event', 'entity_id' => $event['id']],
+      ])
+      ->setDefaults(['price_set_id' => $priceSet['id']])
+      ->execute();
+
+    $pageExport = PriceSetEntity::export(FALSE)
+      ->setId($pageLink['id'])
+      ->execute()->single();
+
+    $this->assertEquals('test_export_page', $pageExport['params']['values']['entity_id.name']);
+    $this->assertArrayNotHasKey('entity_id', $pageExport['params']['values']);
+    $this->assertArrayNotHasKey('entity_table', $pageExport['params']['values']);
+    $this->assertEquals('ContributionPage', $pageExport['params']['values']['entity_table:name']);
+
+    $eventExport = PriceSetEntity::export(FALSE)
+      ->setId($eventLink['id'])
+      ->execute()->single();
+
+    $this->assertEquals($event['id'], $eventExport['params']['values']['entity_id']);
+    $this->assertArrayNotHasKey('entity_id.name', $eventExport['params']['values']);
+  }
+
+  /**
+   * The write-side counterpart: `entity_id.name` should resolve back to the correct
+   * local id for whichever concrete entity `entity_table` points at, even though the
+   * field has no single fixed fk_entity.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testDynamicForeignKeyCreateResolvesNameToId(): void {
+    $page = ContributionPage::create(FALSE)
+      ->addValue('title', 'Test Import Page')
+      ->addValue('name', 'test_import_page')
+      ->execute()->single();
+
+    $priceSet = PriceSet::create(FALSE)
+      ->addValue('name', 'test_import_pset')
+      ->addValue('title', 'Test Import PriceSet')
+      ->addValue('extends:name', ['CiviEvent'])
+      ->addValue('financial_type_id:name', 'Donation')
+      ->execute()->single();
+
+    $priceSetEntity = PriceSetEntity::create(FALSE)
+      ->addValue('price_set_id', $priceSet['id'])
+      ->addValue('entity_table', 'civicrm_contribution_page')
+      ->addValue('entity_id.name', 'test_import_page')
+      ->execute()->single();
+
+    $this->assertEquals($page['id'], $priceSetEntity['entity_id']);
   }
 
 }

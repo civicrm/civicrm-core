@@ -6,6 +6,7 @@
  * @group headless
  */
 class api_v3_CaseContactTest extends CiviCaseTestCase {
+  protected $_apiversion = 3;
 
   /**
    * @var array

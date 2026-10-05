@@ -219,21 +219,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
   }
 
   /**
-   * Delete the notes.
-   *
-   * @param int $id
-   *
-   * @deprecated
-   * @return int
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    self::deleteRecord(['id' => $id]);
-
-    return 1;
-  }
-
-  /**
    * Delete all records for this contact id.
    *
    * @param int $id
@@ -475,6 +460,16 @@ WHERE participant.contact_id = %1 AND  note.entity_table = 'civicrm_participant'
     }
     CRM_Utils_Hook::selectWhereClause($this, $clauses, $userId, $conditions);
     return $clauses;
+  }
+
+  public static function getTopParent(int $id): CRM_Core_DAO_Note {
+    do {
+      $note = new CRM_Core_DAO_Note();
+      $note->id = $id;
+      $note->find(TRUE);
+      $id = $note->entity_id;
+    } while ($note->entity_table === 'civicrm_note');
+    return $note;
   }
 
 }

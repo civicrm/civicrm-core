@@ -39,7 +39,6 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $this->assign('participantInfo', $participantInfo);
     $customGroup = $this->get('customProfile');
     $this->assign('customProfile', $customGroup);
-    $this->assign('individual', $this->get('individual'));
 
     CRM_Event_Form_Registration_Confirm::assignProfiles($this);
 
@@ -77,26 +76,18 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
       }
     }
     $this->assign('email', $email ?? NULL);
-    $this->assign('eventConfirmText', $this->getEventValue('is_monetary') ? $this->getPaymentProcessorObject()->getText('eventConfirmText', []) : '');
-    $this->assign('eventConfirmEmailText', ($email && $this->getEventValue('is_monetary')) ? $this->getPaymentProcessorObject()->getText('eventConfirmEmailText', ['email' => $email]) : '');
+    $this->assign('eventConfirmText', $this->isPaidEvent() ? $this->getPaymentProcessorObject()->getText('eventConfirmText', []) : '');
+    $this->assign('eventConfirmEmailText', ($email && $this->isPaidEvent()) ? $this->getPaymentProcessorObject()->getText('eventConfirmEmailText', ['email' => $email]) : '');
 
     $this->assignToTemplate();
 
     $invoicing = \Civi::settings()->get('invoicing');
-    $taxAmount = 0;
 
     $lineItemForTemplate = [];
     if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
       foreach ($this->_lineItem as $key => $value) {
         if (!empty($value) && $value !== 'skip') {
           $lineItemForTemplate[$key] = $value;
-          if ($invoicing) {
-            foreach ($value as $v) {
-              if (isset($v['tax_amount']) || isset($v['tax_rate'])) {
-                $taxAmount += $v['tax_amount'];
-              }
-            }
-          }
         }
       }
     }
@@ -109,7 +100,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
 
     if ($invoicing) {
-      $this->assign('totalTaxAmount', $taxAmount);
+      $this->assign('totalTaxAmount', $this->getOrder()->getTotalTaxAmount());
     }
     $this->assign('totalAmount', $this->get('totalAmount'));
 
@@ -122,10 +113,6 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $this->assign('trxn_id', $this->get('trxnId'));
     $this->assign('isAmountzero', $this->get('totalAmount') <= 0);
 
-    $this->assign('defaultRole', FALSE);
-    if (($this->_params[0]['defaultRole'] ?? NULL) == 1) {
-      $this->assign('defaultRole', TRUE);
-    }
     $defaults = [];
     $fields = [];
     if (!empty($this->_fields)) {

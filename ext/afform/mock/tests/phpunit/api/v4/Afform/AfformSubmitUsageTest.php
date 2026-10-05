@@ -131,4 +131,129 @@ EOHTML;
       ->execute();
   }
 
+  public function testSubmitWithRepeatMinZero(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+  </fieldset>
+  <div af-join="Email" min="0" af-repeat="Add">
+    <af-field name="email" defn="{required: true}" />
+  </div>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Submit with zero items for the Email block: should succeed.
+    $submissionZeroItems = [
+      'Individual1' => [
+        [
+          'fields' => ['first_name' => 'Jane', 'last_name' => 'Doe'],
+          'joins' => [
+            'Email' => [],
+          ],
+        ],
+      ],
+    ];
+
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues($submissionZeroItems)
+      ->execute();
+
+    $this->assertNotEmpty($result[0]['Individual1'][0]['id']);
+
+    // Submit with 1 empty item for the Email block: should trigger validation error.
+    $submissionOneEmptyItem = [
+      'Individual1' => [
+        [
+          'fields' => ['first_name' => 'Jane', 'last_name' => 'Doe'],
+          'joins' => [
+            'Email' => [[]],
+          ],
+        ],
+      ],
+    ];
+
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues($submissionOneEmptyItem)
+        ->execute();
+      $this->fail('Should have thrown validation exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+    }
+    $this->assertEquals('Email is a required field.', $e->getMessage());
+  }
+
+  /**
+   * A database error during entity save must fail the submission rather than be reported
+   * as saved, while other errors stay silently ignored for optional entities left blank.
+   *
+   * Custom values are written by their own INSERT after the entity itself is saved, so a
+   * rejection there used to leave the submitter with a confirmation message and an entity
+   * whose custom fields were all empty.
+   */
+  public function testSubmitReportsDatabaseError(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" url-autofill="1" security="RBAC"  />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="last_name" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // A database error means data was lost, so it must reach the user.
+    $lastName = uniqid('DbError');
+    try {
+      $this->submitWhileFailing(new \Civi\Core\Exception\DBQueryException('Simulated database failure'), $lastName);
+      $this->fail('Should have thrown exception');
+    }
+    catch (\Civi\Core\Exception\DBQueryException $e) {
+      $this->assertEquals('Simulated database failure', $e->getMessage());
+    }
+    $this->assertCount(0, \Civi\Api4\Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute());
+
+    // Anything else is still ignored, so an optional entity left blank does not break the form.
+    $lastName = uniqid('Ignored');
+    $this->submitWhileFailing(new \CRM_Core_Exception('Simulated non-database failure'), $lastName);
+    $this->assertCount(0, \Civi\Api4\Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute());
+  }
+
+  /**
+   * Submit the form with the given exception thrown while the contact is being saved.
+   */
+  private function submitWhileFailing(\Throwable $failure, string $lastName): void {
+    $listen = function ($event) use ($failure) {
+      if ($event instanceof \Civi\Core\Event\PreEvent && $event->action === 'create') {
+        throw $failure;
+      }
+    };
+    try {
+      \Civi::dispatcher()->addListener('hook_civicrm_pre', $listen);
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => [['fields' => ['last_name' => $lastName]]]])
+        ->execute();
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('hook_civicrm_pre', $listen);
+    }
+  }
+
 }

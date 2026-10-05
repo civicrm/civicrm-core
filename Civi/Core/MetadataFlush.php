@@ -31,6 +31,11 @@ class MetadataFlush extends Service\AutoSubscriber {
    * as it's being deleted.
    */
   public static function onClearMetadata(): void {
+    // APIv3 getfields metadata is cached for the lifetime of the request.
+    // Keep it in sync with other metadata caches regardless of how the clear
+    // was initiated (APIv3, APIv4, BAO hooks, or direct cache access).
+    \Civi::$statics['civicrm_api3_generic_getfields'] = [];
+
     // This seems to cause problems during unit test setup
     if (CIVICRM_UF === 'UnitTests') {
       return;

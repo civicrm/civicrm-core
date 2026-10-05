@@ -1045,7 +1045,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function lookupContactID(array $params, bool $isMainContact): ?int {
-    $contactID = !empty($params['id']) ? (int) $params['id'] : NULL;
+    $contactID = !empty($params['id']) ? $this->getMergedToContactIfDeleted((int) $params['id']) : NULL;
     $extIDMatch = $this->lookupExternalIdentifier($params['external_identifier'] ?? NULL, $params['contact_type'], $contactID);
     if ($extIDMatch && $isMainContact && ($this->isSkipDuplicates() || $this->isIgnoreDuplicates())) {
       throw new CRM_Core_Exception(ts('External ID already exists in Database.'), CRM_Import_Parser::DUPLICATE);

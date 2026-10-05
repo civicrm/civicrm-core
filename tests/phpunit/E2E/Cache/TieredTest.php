@@ -93,7 +93,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
   }
 
   public function testTieredTimeout_default(): void {
-    $start = CRM_Utils_Time::getTimeRaw();
+    $start = CRM_Utils_Time::time();
     $this->cache = $this->createSimpleCache([100, 1000]);
 
     $this->cache->set('foo', 'bar');
@@ -112,7 +112,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
   }
 
   public function testTieredTimeout_explicitLow(): void {
-    $start = CRM_Utils_Time::getTimeRaw();
+    $start = CRM_Utils_Time::time();
     $this->cache = $this->createSimpleCache([100, 1000]);
 
     $this->cache->set('foo', 'bar', 50);
@@ -131,7 +131,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
   }
 
   public function testTieredTimeout_explicitMedium(): void {
-    $start = CRM_Utils_Time::getTimeRaw();
+    $start = CRM_Utils_Time::time();
     $this->cache = $this->createSimpleCache([100, 1000]);
 
     $this->cache->set('foo', 'bar', 500);
@@ -150,7 +150,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
   }
 
   public function testTieredTimeout_explicitHigh_lateReoad(): void {
-    $start = CRM_Utils_Time::getTimeRaw();
+    $start = CRM_Utils_Time::time();
     $this->cache = $this->createSimpleCache([100, 1000]);
 
     $this->cache->set('foo', 'bar', 5000);

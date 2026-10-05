@@ -120,7 +120,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
       'api.OptionValue.create' => [
         'label' => 'invalid entry',
         'value' => 35,
-        'domain_id' => 999,
+        'component_id' => 999,
         'is_active' => '0',
         'debug' => 0,
       ],

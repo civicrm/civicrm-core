@@ -48,19 +48,26 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInte
    *   (reference ) an assoc array of name/value pairs.
    *
    * @return CRM_Case_DAO_Case
+   * @deprecated
    */
   public static function add(&$params) {
-    $caseDAO = new CRM_Case_DAO_Case();
-    $caseDAO->copyValues($params);
-    $result = $caseDAO->save();
-    // Get other case values (required by XML processor), this adds to $result array
-    $caseDAO->find(TRUE);
-    return $result;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   public static function _on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $e) {
     if ($e->entity !== 'Case') {
       return;
+    }
+    // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
+    unset($e->params['created_date'], $e->params['modified_date']);
+    if (isset($e->params['case_status_id']) && !isset($e->params['status_id'])) {
+      $e->params['status_id'] = $e->params['case_status_id'];
+    }
+    $closedStatusId = array_search('Closed', CRM_Case_PseudoConstant::caseStatus('name'));
+    // for resolved case the end date should set to now
+    if (!empty($e->params['status_id']) && ($e->params['status_id'] == $closedStatusId || $e->params['status_id'] === 'Closed')) {
+      $e->params['end_date'] = empty($e->params['end_date']) ? date('Ymd') : $e->params['end_date'];
     }
     $moveToTrash = $e->action === 'edit' && !empty($e->params['is_deleted']) && !self::getDbVal('is_deleted', $e->id);
     // When trashing or deleting a case, do the same to the activities
@@ -128,50 +135,11 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInte
    *   (reference) an assoc array of name/value pairs.
    *
    * @return CRM_Case_DAO_Case
+   * @deprecated
    */
-  public static function &create(&$params) {
-    // CRM-20958 - These fields are managed by MySQL triggers. Watch out for clients resaving stale timestamps.
-    unset($params['created_date']);
-    unset($params['modified_date']);
-    $caseStatus = CRM_Case_PseudoConstant::caseStatus('name');
-    // for resolved case the end date should set to now
-    if (!empty($params['status_id']) && $params['status_id'] == array_search('Closed', $caseStatus)) {
-      $params['end_date'] = date("Ymd");
-    }
-
-    $transaction = new CRM_Core_Transaction();
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'Case', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Case', NULL, $params);
-    }
-
-    $case = self::add($params);
-
-    if (!empty($params['custom']) &&
-      is_array($params['custom'])
-    ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_case', $case->id);
-    }
-
-    if (is_a($case, 'CRM_Core_Error')) {
-      $transaction->rollback();
-      return $case;
-    }
-
-    if (!empty($params['id'])) {
-      CRM_Utils_Hook::post('edit', 'Case', $case->id, $case, $params);
-    }
-    else {
-      CRM_Utils_Hook::post('create', 'Case', $case->id, $case, $params);
-    }
-    $transaction->commit();
-
-    //we are not creating log for case
-    //since case log can be tracked using log for activity.
-    return $case;
+  public static function create($params) {
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
@@ -265,7 +233,7 @@ WHERE civicrm_case.id = %1";
     }
     else {
       $updateParams = ['id' => $caseId, 'is_deleted' => 1];
-      self::create($updateParams);
+      self::writeRecord($updateParams);
     }
 
     return TRUE;

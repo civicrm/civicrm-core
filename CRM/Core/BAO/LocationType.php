@@ -37,17 +37,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
   }
 
   /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_LocationType', $id, 'is_active', $is_active);
-  }
-
-  /**
    * Retrieve the default location_type.
    *
    * @return CRM_Core_DAO_LocationType|null
@@ -74,30 +63,6 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
       self::$_billingLocationType = array_search('Billing', $locationTypes);
     }
     return self::$_billingLocationType;
-  }
-
-  /**
-   * Add a Location Type.
-   *
-   * @param array $params
-   *
-   * @deprecated
-   * @return CRM_Core_DAO_LocationType
-   */
-  public static function create(&$params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
-   * Delete location Types.
-   *
-   * @param int $locationTypeId
-   * @deprecated
-   */
-  public static function del($locationTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    static::deleteRecord(['id' => $locationTypeId]);
   }
 
   /**

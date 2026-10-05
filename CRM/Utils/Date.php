@@ -1035,6 +1035,47 @@ class CRM_Utils_Date {
   }
 
   /**
+   * Map date plugin format to the closest CiviCRM dateformat setting name.
+   *
+   * Mapping is imperfect but better than nothing. Used by SearchKit to format columns for custom Date fields.
+   *
+   * @param string $format
+   *   Date plugin input format (e.g. 'mm/dd/yy', 'yy', 'M yy', 'DD, d MM yy')
+   * @param int|null $timeFormat
+   *   Time format (1 for 12hr, 2 for 24hr, 0/NULL for none)
+   * @return string|null
+   *   Setting name (e.g. 'dateformatshortdate', 'dateformatFull', 'dateformatPartial', 'dateformatYear', 'dateformatDatetime')
+   */
+  public static function datePluginToSetting(string $format, ?int $timeFormat): ?string {
+    if (!empty($timeFormat)) {
+      return 'dateformatDatetime';
+    }
+    if (str_starts_with($format, 'dateformat')) {
+      return $format;
+    }
+    $map = [
+      'yy' => 'dateformatYear',
+      'yy-mm' => 'dateformatPartial',
+      'M yy' => 'dateformatPartial',
+      'M Y' => 'dateformatPartial',
+      'M d' => 'dateformatFull',
+      'M d, yy' => 'dateformatFull',
+      'd M yy' => 'dateformatFull',
+      'MM d, yy' => 'dateformatFull',
+      'd MM yy' => 'dateformatFull',
+      'DD, d MM yy' => 'dateformatFull',
+      'mm/dd/yy' => 'dateformatshortdate',
+      'dd/mm/yy' => 'dateformatshortdate',
+      'yy-mm-dd' => 'dateformatshortdate',
+      'dd-mm-yy' => 'dateformatshortdate',
+      'dd.mm.yy' => 'dateformatshortdate',
+      'mm/dd' => 'dateformatshortdate',
+      'dd-mm' => 'dateformatshortdate',
+    ];
+    return $map[$format] ?? (str_contains($format, 'm') ? 'dateformatPartial' : 'dateformatFull');
+  }
+
+  /**
    * Resolves the given relative time interval into finite time limits.
    *
    * @param string $relativeTerm

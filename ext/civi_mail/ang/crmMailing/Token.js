@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // example: <input name="subject" /> <input crm-mailing-token on-select="doSomething(token.name)" />
   // WISHLIST: Instead of global CRM.crmMailing.mailTokens, accept token list as an input
   angular.module('crmMailing').directive('crmMailingToken', function() {
@@ -25,4 +25,4 @@
       }
     };
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

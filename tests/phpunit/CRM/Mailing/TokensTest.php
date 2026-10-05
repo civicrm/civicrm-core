@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Token\TokenProcessor;
+
 /**
  * @group headless
  */
@@ -12,12 +14,21 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
       ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
   }
 
-  public static function getExampleTokens() {
+  public static function getExampleTokens(): array {
     $cases = [];
 
-    $cases[] = ['text/plain', 'The {mailing.id}!', ';The [0-9]+!;'];
-    $cases[] = ['text/plain', 'The {mailing.name}!', ';The Example Name!;'];
-    $cases[] = ['text/plain', 'The {mailing.editUrl}!', ';The http.*civicrm/mailing/send.*!;'];
+    $cases['id'] = ['text/plain', 'The {mailing.id}!', ';The [0-9]+!;'];
+    $cases['name'] = ['text/plain', 'The {mailing.name}!', ';The Example Name!;'];
+    $cases['subject'] = ['text/plain', 'The {mailing.subject}!', ';The Mailing Subject!;'];
+    $cases['approval_note'] = ['text/plain', 'The {mailing.approval_note}!', ';I approve!;'];
+    $cases['approvalNote'] = ['text/plain', 'The {mailing.approvalNote}!', ';I approve!;'];
+    $cases['approvalStatus'] = ['text/plain', 'The {mailing.approvalStatus}!', ';Approved!;'];
+    $cases['approval_status_id:label'] = ['text/plain', 'The {mailing.approval_status_id:label}!', ';Approved!;'];
+    $cases['created_id.display_name'] = ['text/plain', 'The {mailing.created_id.display_name}!', ';Mr. Logged In User II!;'];
+    $cases['creator'] = ['text/plain', 'The {mailing.creator}!', ';Mr. Logged In User II!;'];
+    $cases['created_id.email_primary.email'] = ['text/plain', 'The {mailing.created_id.email_primary.email}!', ';user@example.org!;'];
+    $cases['creatorEmail'] = ['text/plain', 'The {mailing.creatorEmail}!', ';user@example.org!;'];
+    $cases['editUrl'] = ['text/plain', 'The {mailing.editUrl}!', ';The http.*civicrm/mailing/send.*!;'];
     $cases[] = ['text/plain', 'To subscribe: {action.subscribeUrl}!', ';To subscribe: http.*civicrm/mailing/subscribe.*!;'];
     $cases[] = ['text/plain', 'To optout: {action.optOutUrl}!', ';To optout: http.*civicrm/mailing/optout.*!;'];
     $cases[] = ['text/plain', 'To unsubscribe: {action.unsubscribe}!', ';To unsubscribe: u\.123\.456\.abcd1234@chaos.org!;'];
@@ -35,20 +46,24 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
    * @param string $inputTemplate
    *   Ex: 'Hello, {contact.first_name}'.
    * @param string $expectRegex
+   *
    * @dataProvider getExampleTokens
    */
-  public function testTokensWithMailingId($inputTemplateFormat, $inputTemplate, $expectRegex) {
-    $mailing = CRM_Core_DAO::createTestObject('CRM_Mailing_DAO_Mailing', [
+  public function testTokensWithMailingId(string $inputTemplateFormat, string $inputTemplate, string $expectRegex): void {
+    $this->createLoggedInUser(['last_name' => 'User', 'email_primary.email' => 'user@example.org']);
+    $mailing = $this->createTestEntity('Mailing', [
       'name' => 'Example Name',
+      'subject' => 'Mailing Subject',
+      'approval_note' => 'I approve',
+      'approval_status_id:label' => 'Approved',
     ]);
-    $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
-      'mailingId' => $mailing->id,
+    $p = new TokenProcessor(Civi::dispatcher(), [
+      'mailingId' => $mailing['id'],
     ]);
     $p->addMessage('example', $inputTemplate, $inputTemplateFormat);
     $p->addRow()->context([
-      'contactId' => $contact->id,
+      'contactId' => $this->individualCreate(),
       'mailingJobId' => 123,
       'mailingActionTarget' => [
         'id' => 456,
@@ -63,6 +78,18 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
       $count++;
     }
     $this->assertEquals(1, $count);
+  }
+
+  public function testListTokens() {
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+      'schema' => ['mailingId'],
+    ]);
+    $listedTokens = $tokenProcessor->listTokens();
+    $this->assertEquals('Mailing ID', $listedTokens['{mailing.id}']);
+    $this->assertEquals('Subject', $listedTokens['{mailing.subject}']);
+    $this->assertEquals('Approval Note', $listedTokens['{mailing.approval_note}']);
   }
 
   /**
@@ -80,7 +107,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     ]);
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
+    $p = new TokenProcessor(Civi::dispatcher(), [
       'mailing' => $mailing,
     ]);
     $p->addMessage('example', $inputTemplate, $inputTemplateFormat);
@@ -126,7 +153,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     ]);
     $contact = CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact');
 
-    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
+    $p = new TokenProcessor(Civi::dispatcher(), [
       'mailing' => $mailing,
     ]);
     $p->addMessage('example', $inputTemplateText, $inputTemplateFormat);
@@ -146,6 +173,77 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     // FIXME: For compatibility with
     $actual = $p->getRow(0)->render('example');
     $this->assertMatchesRegularExpression($expectRegex, $actual);
+  }
+
+  /**
+   * Test Api4-style custom field tokens, option labels, and chained entity reference tokens for mailings.
+   */
+  public function testApi4CustomFieldTokens(): void {
+    $targetContact = $this->callAPISuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Jane',
+      'last_name' => 'Author',
+    ]);
+
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', [
+      'title' => 'Mailing Extra Info',
+      'name' => 'mailing_extra_info',
+      'extends' => 'Mailing',
+    ]);
+
+    $this->callAPISuccess('CustomField', 'create', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Special Note',
+      'name' => 'special_note',
+      'html_type' => 'Text',
+      'data_type' => 'String',
+    ]);
+
+    $this->callAPISuccess('CustomField', 'create', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Priority Level',
+      'name' => 'priority_level',
+      'html_type' => 'Select',
+      'data_type' => 'String',
+      'option_values' => [
+        'high_prio' => 'High Priority',
+        'low_prio' => 'Low Priority',
+      ],
+    ]);
+
+    $this->callAPISuccess('CustomField', 'create', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Assigned Author',
+      'name' => 'assigned_author',
+      'html_type' => 'Autocomplete-Select',
+      'data_type' => 'ContactReference',
+    ]);
+
+    Civi::cache('metadata')->flush();
+
+    $mailing = \Civi\Api4\Mailing::create(FALSE)
+      ->setValues([
+        'name' => 'Custom Token Mailing',
+        'subject' => 'Test Subject',
+        'mailing_extra_info.special_note' => 'Custom Note Value',
+        'mailing_extra_info.priority_level' => 'high_prio',
+        'mailing_extra_info.assigned_author' => $targetContact['id'],
+      ])->execute()->first();
+
+    $p = new \Civi\Token\TokenProcessor(Civi::dispatcher(), [
+      'mailingId' => $mailing['id'],
+    ]);
+
+    $template = 'Note: {mailing.mailing_extra_info.special_note} | Code: {mailing.mailing_extra_info.priority_level} | Label: {mailing.mailing_extra_info.priority_level:label} | Author: {mailing.mailing_extra_info.assigned_author.display_name}';
+    $p->addMessage('test_msg', $template, 'text/plain');
+    $p->addRow()->context(['contactId' => $targetContact['id']]);
+    $p->evaluate();
+
+    $rendered = $p->getRow(0)->render('test_msg');
+    $this->assertEquals(
+      'Note: Custom Note Value | Code: high_prio | Label: High Priority | Author: Jane Author',
+      $rendered
+    );
   }
 
 }

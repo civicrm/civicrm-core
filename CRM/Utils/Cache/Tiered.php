@@ -111,11 +111,11 @@ class CRM_Utils_Cache_Tiered implements CRM_Utils_Cache_Interface {
     foreach ($this->tiers as $readTierNum => $tier) {
       /** @var CRM_Utils_Cache_Interface $tier */
       $wrapped = $tier->get($key, $nack);
-      if ($wrapped !== $nack && $wrapped[0] >= CRM_Utils_Time::getTimeRaw()) {
+      if ($wrapped !== $nack && $wrapped[0] >= CRM_Utils_Time::time()) {
         list ($parentExpires, $value) = $wrapped;
         // (Re)populate the faster caches; and then return the value we found.
         for ($i = 0; $i < $readTierNum; $i++) {
-          $now = CRM_Utils_Time::getTimeRaw();
+          $now = CRM_Utils_Time::time();
           $effExpires = min($parentExpires, $now + $this->maxTimeouts[$i]);
           $this->tiers[$i]->set($key, [0 => $effExpires, 1 => $value], $effExpires - $now);
         }
@@ -163,7 +163,7 @@ class CRM_Utils_Cache_Tiered implements CRM_Utils_Cache_Interface {
     foreach ($this->tiers as $tier) {
       /** @var CRM_Utils_Cache_Interface $tier */
       $wrapped = $tier->get($key, $nack);
-      if ($wrapped !== $nack && $wrapped[0] > CRM_Utils_Time::getTimeRaw()) {
+      if ($wrapped !== $nack && $wrapped[0] > CRM_Utils_Time::time()) {
         return TRUE;
       }
     }

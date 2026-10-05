@@ -51,6 +51,20 @@
     {include file="CRM/Campaign/Form/addCampaignToComponent.tpl"
     campaignTrClass="crm-event-manage-eventinfo-form-block-campaign_id"}
 
+    {if $form.tag}
+      <tr class="crm-event-manage-eventinfo-form-block-tag">
+        <td class="label">{$form.tag.label}</td>
+        <td>
+          <div class="crm-select-container">{$form.tag.html}</div>
+        </td>
+      </tr>
+    {/if}
+    {if $isTagset}
+      <tr class="crm-event-manage-eventinfo-form-block-tag_set">
+        {include file="CRM/common/Tagset.tpl" tagsetType='event' tableLayout=true}
+      </tr>
+    {/if}
+
     <tr class="crm-event-manage-eventinfo-form-block-summary">
       <td class="label">{$form.summary.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_event' field='summary' id=$eventID}{/if}</td>
       <td>{$form.summary.html}</td>

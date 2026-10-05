@@ -13,6 +13,10 @@
         </div>
         <div class="navbar-form navbar-right">
           <div class="form-group">
+            <button class="crm-button" ng-click="$ctrl.sendTest.send()" ng-if="!$ctrl.loading && $ctrl.sendTest">
+              <i class="crm-i fa-paper-plane" role="img" aria-disabled="true"></i>
+              {{:: ts('Send test') }}
+            </button>
             <button crm-icon="fa-times" type="button" class="btn btn-default" ng-click="previewMsgDlg.close()">
               {{::ts('Close')}}
             </button>

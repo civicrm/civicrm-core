@@ -103,7 +103,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
     file_put_contents(__DIR__ . '/data/mail/' . $mail, $file_contents);
 
     // run the job
-    $this->callAPISuccess('job', 'fetch_activities', []);
+    $this->callApiV3Success('Job', 'fetch_activities', []);
 
     // check that file was removed from mail dir
     $this->assertFalse(file_exists(__DIR__ . '/data/mail/' . $mail));
@@ -170,7 +170,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
       fclose($file);
     }
 
-    $this->callAPISuccess('Job', 'fetch_activities', []);
+    $this->callApiV3Success('Job', 'fetch_activities', []);
     $activities = ActivityContact::get()
       ->addSelect('contact_id.email_primary.email', 'activity_id.activity_type_id:name', 'activity_id.subject')
       ->addWhere('contact_id.email_primary.email', 'IN', array_keys($badEmails))
@@ -186,7 +186,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_emailProcessor', [$this, 'hookImplForEmailProcessor']);
 
     copy(__DIR__ . '/data/inbound/test_hook.eml', __DIR__ . '/data/mail/test_hook.eml');
-    $this->callAPISuccess('Job', 'fetch_activities', []);
+    $this->callApiV3Success('Job', 'fetch_activities', []);
 
     // The activity type should be changed.
     $activity = $this->callAPISuccess('Activity', 'getsingle', ['subject' => 'This is for hooks']);
@@ -197,7 +197,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
 
     // Now repeat with a different subject, and the type should be the default.
     copy(__DIR__ . '/data/inbound/test_non_cases_email.eml', __DIR__ . '/data/mail/test_non_cases_email.eml');
-    $this->callAPISuccess('Job', 'fetch_activities', []);
+    $this->callApiV3Success('Job', 'fetch_activities', []);
     $activity = $this->callAPISuccess('Activity', 'getsingle', ['subject' => 'Love letter']);
     $this->assertEquals(
       CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email'),
@@ -260,7 +260,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
     $this->callAPISuccess('EntityTag', 'create', ['entity_table' => 'civicrm_contact', 'entity_id' => $catchall_id, 'tag_id' => $tag['id']]);
 
     copy(__DIR__ . '/data/inbound/test_hook.eml', __DIR__ . '/data/mail/test_hook.eml');
-    $this->callAPISuccess('Job', 'fetch_activities', []);
+    $this->callApiV3Success('Job', 'fetch_activities', []);
 
     // The source contact should be our catchall not the original From contact.
     $activity = $this->callAPISuccess('Activity', 'getsingle', ['source_contact_id' => $catchall_id]);
@@ -282,7 +282,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
     $contact_id = $this->individualCreate(['email' => 'billing@paradox.biz']);
 
     copy(__DIR__ . '/data/inbound/test_hook.eml', __DIR__ . '/data/mail/test_hook.eml');
-    $this->callAPISuccess('Job', 'fetch_activities', []);
+    $this->callApiV3Success('Job', 'fetch_activities', []);
 
     // The source contact should be our individual not the catchall
     $activity = $this->callAPISuccess('Activity', 'getsingle', ['source_contact_id' => $contact_id]);
@@ -308,7 +308,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
     $contact_id = $this->individualCreate(['email' => 'billing@paradox.biz']);
 
     copy(__DIR__ . '/data/inbound/test_hook.eml', __DIR__ . '/data/mail/test_hook.eml');
-    $this->callAPISuccess('Job', 'fetch_activities', []);
+    $this->callApiV3Success('Job', 'fetch_activities', []);
 
     // The source contact should be the org not the individual
     $activity = $this->callAPISuccess('Activity', 'getsingle', ['source_contact_id' => $catchall_id]);

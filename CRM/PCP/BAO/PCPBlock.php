@@ -16,13 +16,5 @@
  */
 class CRM_PCP_BAO_PCPBlock extends CRM_PCP_DAO_PCPBlock {
 
-  /**
-   * @deprecated
-   * @return CRM_PCP_DAO_PCPBlock
-   */
-  public static function create($params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
 
 }

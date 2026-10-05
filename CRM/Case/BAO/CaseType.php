@@ -91,14 +91,15 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
     }
   }
 
-  public static function formatOutputDefinition(&$value, $row) {
-    if ($value) {
+  public static function formatOutputDefinition(&$value) {
+    // `definition` contains the xml string if stored in the database
+    if ($value && str_contains($value, '<CaseType>')) {
       [$xml] = CRM_Utils_XML::parseString($value);
       $value = $xml ? self::convertXmlToDefinition($xml) : [];
     }
-    elseif (!empty($row['id']) || !empty($row['name'])) {
-      $caseTypeName = $row['name'] ?? CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $row['id']);
-      $xml = CRM_Case_XMLRepository::singleton()->retrieve($caseTypeName);
+    // Fallback: when `definition` is null, $value contains CaseType name; lookup the file-based xml
+    elseif ($value) {
+      $xml = CRM_Case_XMLRepository::singleton()->retrieve($value);
       $value = $xml ? self::convertXmlToDefinition($xml) : [];
     }
   }
@@ -419,7 +420,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
 
     $transaction->commit();
 
-    CRM_Utils_Hook::post($action, 'CaseType', $caseType->id, $case, $params);
+    CRM_Utils_Hook::post($action, 'CaseType', $caseType->id, $caseType, $params);
 
     return $caseType;
   }
@@ -440,18 +441,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
   public static function retrieve(&$params, &$defaults) {
     $caseType = CRM_Case_BAO_CaseType::getValues($params, $defaults);
     return $caseType;
-  }
-
-  /**
-   * @param int $caseTypeId
-   *
-   * @deprecated
-   * @throws CRM_Core_Exception
-   * @return CRM_Case_DAO_CaseType
-   */
-  public static function del($caseTypeId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return static::deleteRecord(['id' => $caseTypeId]);
   }
 
   /**

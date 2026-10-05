@@ -5,7 +5,7 @@
     <input class="form-control" crm-ui-select="{data: $ctrl.permissions, multiple: true}" ng-model="condition[2]" ng-list>
   </div>
   <crm-search-condition class="form-group"
-    ng-if="condition[0] && condition[0] !== 'check user permission'"
+    ng-if="condition[0] && condition[0] !== 'check user permission' && condition[0] !== 'no results'"
     clause="condition"
     field="$ctrl.getField(condition[0])"
     offset="1"

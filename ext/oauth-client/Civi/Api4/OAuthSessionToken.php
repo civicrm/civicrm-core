@@ -7,6 +7,7 @@ namespace Civi\Api4;
  *
  * @see https://docs.civicrm.org/dev/en/latest/framework/oauth/#model-token
  *
+ * @method Action\OAuthSessionToken\Refresh refresh($checkPermissions)
  * @primaryKey cardinal
  * @searchable none
  * @since 5.67
@@ -30,6 +31,24 @@ class OAuthSessionToken extends Generic\AbstractEntity {
         $allTokens[$cardinal] = $item;
         $session->set('OAuthSessionTokens', $allTokens);
         $session->set('OAuthSessionTokenCount', $cardinal);
+        return $item;
+      });
+    return $action->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return \Civi\Api4\Generic\BasicUpdateAction
+   */
+  public static function update($checkPermissions = TRUE): Generic\BasicUpdateAction {
+    $action = new Generic\BasicUpdateAction(
+      static::getEntityName(),
+      __FUNCTION__,
+      function ($item) {
+        $session = \CRM_Core_Session::singleton();
+        $allTokens = $session->get('OAuthSessionTokens') ?? [];
+        $allTokens[$item['cardinal']] = array_merge($allTokens[$item['cardinal']], $item);
+        $session->set('OAuthSessionTokens', $allTokens);
         return $item;
       });
     return $action->setCheckPermissions($checkPermissions);

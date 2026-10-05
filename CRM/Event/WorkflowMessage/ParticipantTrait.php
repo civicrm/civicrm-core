@@ -104,6 +104,15 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    */
   protected $participantContacts;
 
+  /**
+   * Is the participant waitlisted?
+   *
+   * @var bool
+   *
+   * @scope tplParams
+   */
+  protected $isOnWaitlist;
+
   private function isCiviContributeEnabled(): bool {
     return array_key_exists('Contribution', \Civi::service('action_object_provider')->getEntities());
   }
@@ -168,6 +177,13 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    */
   public function getIsPrimary(): bool {
     return !$this->getParticipant()['registered_by_id'];
+  }
+
+  public function getIsOnWaitlist(): bool {
+    if (!isset($this->isOnWaitlist)) {
+      $this->isOnWaitlist = $this->participant['status_id.class'] === 'Waiting';
+    }
+    return $this->isOnWaitlist;
   }
 
   /**
@@ -249,7 +265,11 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    * Get the participant fields we need to load.
    */
   protected function getFieldsToLoadForParticipant(): array {
-    return ['registered_by_id', 'contact_id'];
+    return array_merge($this->getAdditionalFieldsToLoadForParticipant(), ['registered_by_id', 'role_id', 'event_id', 'event_id.event_type_id', 'contact_id', 'status_id.class']);
+  }
+
+  protected function getAdditionalFieldsToLoadForParticipant(): array {
+    return [];
   }
 
   /**

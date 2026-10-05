@@ -101,6 +101,13 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
 
     $paymentFields = $this->getPaymentFields();
     $this->assign('paymentFields', $paymentFields);
+
+    $this->assign('paymentInstrumentNames', CRM_Core_PseudoConstant::get(
+          'CRM_Financial_DAO_FinancialTrxn',
+          'payment_instrument_id',
+          ['labelColumn' => 'name', 'localize' => FALSE, 'onlyActive' => FALSE]
+    ));
+
     foreach ($paymentFields as $name => $paymentField) {
       if (!empty($paymentField['add_field'])) {
         $attributes = [
@@ -240,7 +247,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     }
     else {
       // simply update the financial trxn
-      civicrm_api3('FinancialTrxn', 'create', $submittedValues + $this->getSubmittedCustomFields());
+      civicrm_api3('FinancialTrxn', 'create', $submittedValues + $this->getSubmittedCustomFields(3));
       // Don't use api since it does too much.
       // But also what does payment method field on the contribution mean?
       CRM_Core_DAO::executeQuery("UPDATE civicrm_contribution SET payment_instrument_id = %1 WHERE id = %2", [

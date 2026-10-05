@@ -28,7 +28,7 @@ class CRM_Queue_Page_AJAX {
     $errorPolicy = new CRM_Queue_ErrorPolicy();
     $errorPolicy->call(function () {
       global $activeQueueRunner;
-      $qrid = CRM_Utils_Request::retrieve('qrid', 'String', CRM_Core_DAO::$_nullObject, TRUE, NULL, 'POST');
+      $qrid = CRM_Utils_Request::retrieve('qrid', 'String', NULL, TRUE, NULL, 'POST');
       $activeQueueRunner = CRM_Queue_Runner::instance($qrid);
       if (!is_object($activeQueueRunner)) {
         throw new Exception('Queue runner must be configured before execution.');
@@ -52,7 +52,7 @@ class CRM_Queue_Page_AJAX {
     $errorPolicy = new CRM_Queue_ErrorPolicy();
     $errorPolicy->call(function () {
       global $activeQueueRunner;
-      $qrid = CRM_Utils_Request::retrieve('qrid', 'String', CRM_Core_DAO::$_nullObject, TRUE, NULL, 'POST');
+      $qrid = CRM_Utils_Request::retrieve('qrid', 'String', NULL, TRUE, NULL, 'POST');
       $activeQueueRunner = CRM_Queue_Runner::instance($qrid);
       if (!is_object($activeQueueRunner)) {
         throw new Exception('Queue runner must be configured before execution.');
@@ -76,7 +76,7 @@ class CRM_Queue_Page_AJAX {
     $errorPolicy = new CRM_Queue_ErrorPolicy();
     $errorPolicy->call(function () {
       global $activeQueueRunner;
-      $qrid = CRM_Utils_Request::retrieve('qrid', 'String', CRM_Core_DAO::$_nullObject, TRUE, NULL, 'POST');
+      $qrid = CRM_Utils_Request::retrieve('qrid', 'String', NULL, TRUE, NULL, 'POST');
       $activeQueueRunner = CRM_Queue_Runner::instance($qrid);
       if (!is_object($activeQueueRunner)) {
         throw new Exception('Queue runner must be configured before execution. - onEnd');

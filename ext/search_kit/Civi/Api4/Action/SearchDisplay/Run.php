@@ -9,6 +9,7 @@ use Civi\Api4\Result\SearchDisplayRunResult;
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
+use CRM_Search_ExtensionUtil as E;
 
 /**
  * Load the results for rendering a SearchDisplay.
@@ -49,22 +50,32 @@ class Run extends AbstractRunAction {
     $apiParams =& $this->_apiParams;
 
     $page = $index = NULL;
-    $key = $this->return;
-    // Pager can operate in "page" mode for traditional pager, or "scroll" mode for infinite scrolling
-    $pagerMode = 'page';
+
+    $runMode = $this->return;
+    if (is_string($runMode) && str_contains($runMode, ':')) {
+      // e.g. `page:2`, `scroll:3`
+      [$runMode, $page] = explode(':', $runMode);
+    }
+
+    // This looks like an unused variable but is not.
+    // The CRM_Utils_AutoClean instance must be stored or it will be destoyed immediately.
+    $autoClean = $this->applyTimeout();
 
     $this->preprocessLinks();
     $this->augmentSelectClause($apiParams);
     $this->applyFilters();
 
-    switch ($this->return) {
+    switch ($runMode) {
       case 'id':
         $key = CoreUtil::getIdFieldName($entityName);
         $index = [$key];
+        // Fallthrough because row_count does the same processing
       case 'row_count':
         if (empty($apiParams['having'])) {
           $apiParams['select'] = [];
         }
+        // Add row_count to select clause (or `id` if fallthrough from 'id' mode)
+        $key ??= 'row_count';
         if (!in_array($key, $apiParams['select'], TRUE)) {
           $apiParams['select'][] = $key;
         }
@@ -87,33 +98,49 @@ class Run extends AbstractRunAction {
         $index = [$idField => $weightField];
         break;
 
-      default:
+      case 'page':
+      case 'scroll':
+      case NULL:
         // Pager mode: `page:n`
         // AJAX scroll mode: `scroll:n`
         // Or NULL for unlimited results
-        if (($this->display['settings']['pager'] ?? FALSE) !== FALSE && $key && preg_match('/^(page|scroll):\d+$/', $key)) {
-          [$pagerMode, $page] = explode(':', $key);
+        if (($this->display['settings']['pager'] ?? FALSE) !== FALSE && $runMode) {
           $limit = !empty($this->display['settings']['pager']['expose_limit']) && $this->limit ? $this->limit : NULL;
         }
         $apiParams['debug'] = $this->debug;
         $apiParams['limit'] = $limit ?? $this->display['settings']['limit'] ?? NULL;
         $apiParams['offset'] = $page ? $apiParams['limit'] * ($page - 1) : 0;
         // In scroll mode, add one extra to the limit as a lookahead to see if there are more results
-        if ($apiParams['limit'] && $pagerMode === 'scroll') {
+        if ($apiParams['limit'] && $runMode === 'scroll') {
           $apiParams['limit']++;
         }
         $apiParams['orderBy'] = $this->getOrderByFromSort();
         // Add metadata needed for inline-editing
-        if ($this->getActionName() === 'run' && $pagerMode === 'page') {
+        if ($this->getActionName() === 'run' && $runMode === 'page') {
           $this->addEditableInfo($result);
         }
         if ($this->getActionName() === 'run') {
           $this->addSubsearchDisplaySettings($result);
         }
+        break;
+
+      default:
+        throw new \CRM_Core_Exception("Unknown search mode '$runMode'");
     }
 
     try {
       $apiResult = civicrm_api4($entityName, 'get', $apiParams, $index);
+    }
+    catch (\Civi\Core\Exception\DBQueryException $e) {
+      // MySQL error 3024 = ER_QUERY_TIMEOUT; MariaDB error 1969 = ER_STATEMENT_TIMEOUT
+      if (in_array($e->getSQLErrorCode(), [3024, 1969], TRUE)) {
+        throw new \CRM_Core_Exception(
+          E::ts('The search query timed out. Try narrowing your search or contact your administrator.'),
+          'search_timeout'
+        );
+      }
+      \Civi::log()->error('SearchDisplay.Run error: ' . get_class($e) . ": {$entityName}.get: [display_id] " . ($this->display['id'] ?? 'null') . ' [saved_search_id] ' . ($this->display['saved_search_id'] ?? 'null') . ' [label] ' . ($this->display['label'] ?? '') . ' [error] ' . $e->getMessage());
+      throw $e;
     }
     catch (\Throwable $e) {
       \Civi::log()->error("SearchDisplay.Run error: " . get_class($e) . ": {$entityName}.get: [display_id] " . ($this->display['id'] ?? 'null') . ' [saved_search_id] ' . ($this->display['saved_search_id'] ?? 'null') . ' [label] ' . ($this->display['label'] ?? '') . ' [error] ' . $e->getMessage());
@@ -123,17 +150,17 @@ class Run extends AbstractRunAction {
     $result->rowCount = $apiResult->rowCount;
     $result->debug = $apiResult->debug;
 
-    if ($this->return === 'row_count' || $this->return === 'id' || $this->return === 'draggableWeight') {
+    if (in_array($runMode, ['row_count', 'id', 'draggableWeight'], TRUE)) {
       $result->exchangeArray($apiResult->getArrayCopy());
     }
     else {
-      if ($pagerMode === 'scroll') {
+      if ($runMode === 'scroll') {
         // Remove the extra result appended for the sake of infinite scrolling
         $result->setCountMatched($apiResult->countFetched());
         $apiResult = array_slice((array) $apiResult, 0, $apiParams['limit'] - 1);
       }
-      else {
-        $result->toolbar = $this->formatToolbar();
+      elseif ($runMode === 'page') {
+        $result->toolbar = $this->formatToolbar($result->rowCount);
       }
       $result->exchangeArray($this->formatResult($apiResult));
       $result->labels = $this->filterLabels;
@@ -231,7 +258,7 @@ class Run extends AbstractRunAction {
     }
   }
 
-  private function formatToolbar(): array {
+  private function formatToolbar(?int $rowCount): array {
     $toolbar = [];
     $settings = $this->display['settings'];
     // If no toolbar, early return
@@ -245,7 +272,7 @@ class Run extends AbstractRunAction {
       $settings['toolbar'][] = $settings['addButton'] + ['style' => 'primary', 'target' => 'crm-popup'];
     }
     foreach ($settings['toolbar'] ?? [] as $button) {
-      if (!$this->checkLinkConditions($button, $data)) {
+      if (!$this->checkLinkConditions($button, $data, $rowCount)) {
         continue;
       }
       $button = $this->formatLink($button, $data, TRUE);

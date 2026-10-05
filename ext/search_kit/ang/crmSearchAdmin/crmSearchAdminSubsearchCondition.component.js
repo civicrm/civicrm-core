@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchAdminSubsearchCondition', {
@@ -40,10 +40,10 @@
       };
 
       this.fieldsForFilter = () => ({
-        results: this.crmSearchAdmin.getAllFields('', ['Field', 'Custom', 'Extra']),
+        results: this.crmSearchAdmin.getAllFields(this.crmSearchAdmin.savedSearch, '', ['Field', 'Custom', 'Extra']),
       });
 
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

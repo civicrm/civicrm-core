@@ -173,7 +173,17 @@ class GenericParser extends ImportParser {
     try {
       $params = $this->getMappedRow($values);
       $this->removeEmptyValues($params);
-      \CRM_Utils_Hook::importAlterMappedRow('import', $this->getBaseEntity() . '_import', $params, $values, $this->getUserJobID());
+      $entities = [
+        '' => [
+          'entity' => $this->getBaseEntity(),
+          'join' => NULL,
+        ],
+        'Contact' => [
+          'entity' => 'Contact',
+          'join' => [],
+        ],
+      ];
+      \CRM_Utils_Hook::importAlterMappedRow('import', $this->getBaseEntity() . '_import', $params, $values, $this->getUserJobID(), $entities);
 
       $existing = !isset($params[$this->getBaseEntity()]['id']) ? [] : civicrm_api4($this->getBaseEntity(), 'get', [
         'where' => [

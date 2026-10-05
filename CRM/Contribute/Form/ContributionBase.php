@@ -650,7 +650,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   public function setLineItems($lineItems): void {
     $this->order->setLineItems($lineItems);
-    $this->set('_lineItem', $lineItems);
   }
 
   /**
@@ -1061,10 +1060,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    *
    * @param bool $formItems
    * @param string $selectedOption
+   * @param string $context
    *
    * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function buildPremiumsBlock(bool $formItems = FALSE, $selectedOption = NULL): void {
+  protected function buildPremiumsBlock(bool $formItems = FALSE, $selectedOption = NULL, $context = NULL): void {
     $selectedProductID = $this->getProductID();
     $this->add('hidden', 'selectProduct', $selectedProductID, ['id' => 'selectProduct']);
     $premiumProducts = PremiumsProduct::get()
@@ -1081,14 +1081,22 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     foreach ($premiumProducts as $premiumProduct) {
       $product = CRM_Utils_Array::filterByPrefix($premiumProduct, 'product_id.');
       $premium = CRM_Utils_Array::filterByPrefix($premiumProduct, 'premiums_id.');
-      if ($selectedProductID === $product['id'] && $selectedOption) {
-        // In this case we are on the thank you or confirm page so assign
-        // the selected option to the page for display.
-        $product['options'] = ts('Selected Option') . ': ' . $selectedOption;
-      }
-      elseif ($selectedOption) {
-        // We are on the thank you or confirm page, but this option wasn't selected.
-        continue;
+      if ($context == 'ThankYou' || $context == 'Confirm') {
+        // In this case we are on the thank you or confirm page
+        if ($selectedProductID === $product['id']) {
+          if ($selectedOption) {
+            // Assign the selected option to the page for display.
+            $product['options'] = ts('Selected Option') . ': ' . $selectedOption;
+          }
+          else {
+            // No options, but make it a string to avoid blowing up the template
+            $product['options'] = '';
+          }
+        }
+        else {
+          // We are on the thank you or confirm page, but this product wasn't selected.
+          continue;
+        }
       }
       $options = array_filter((array) $product['options']);
       $productOptions = [];
@@ -1439,6 +1447,27 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
     return $this->_membershipBlock;
+  }
+
+  /**
+   * Bounce if the page supports separate contribution/membership payments but the
+   * currently-selected processor can't actually process more than one payment at once.
+   *
+   * Only contribution pages have a membership block, so this lives here rather than in
+   * the payment-processor setup code shared with event registration and the backoffice
+   * payment form.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateSeparateMembershipPaymentSupport(): void {
+    if (!empty($this->getMembershipBlock()['is_separate_payment'])
+      && $this->getPaymentProcessorObject()
+      && !$this->getPaymentProcessorObject()->supports('MultipleConcurrentPayments')
+    ) {
+      CRM_Core_Error::statusBounce(ts('This contribution page is configured to support separate contribution and membership payments. This %1 plugin does not currently support multiple simultaneous payments, or the option to "Execute real-time monetary transactions" is disabled. Please contact the site administrator and notify them of this error',
+        [1 => $this->getPaymentProcessorValue('frontend_title')]
+      ));
+    }
   }
 
   /**

@@ -76,11 +76,9 @@ class SqlTriggers extends \Civi\Core\Service\AutoService {
     }
 
     $triggers = [];
-    $existingTables = [];
-    foreach (\CRM_Core_DAO::executeQuery('SHOW TABLES')->fetchAll() as $table) {
-      $tableName = reset($table);
-      $existingTables[$tableName] = $tableName;
-    };
+    // without the "AS" sometimes the DAO field is TABLE_NAME, and then fetchmap fails because $dao->table_name doesn't exist because php is case-sensitive
+    $query = "SELECT table_name AS table_name FROM information_schema.tables WHERE table_schema = DATABASE() AND table_type = 'BASE TABLE'";
+    $existingTables = \CRM_Core_DAO::executeQuery($query)->fetchMap('table_name', 'table_name');
 
     // now enumerate the tables and the events and collect the same set in a different format
     foreach ($info as $value) {
@@ -172,11 +170,11 @@ class SqlTriggers extends \Civi\Core\Service\AutoService {
       }
       foreach ($tables as $eventName => $events) {
         foreach ($events as $whenName => $parts) {
-          $varString = ' ' . implode("\n", $parts['variables']);
-          $sqlString = ' ' . implode("\n", $parts['sql']);
           $validName = \CRM_Core_DAO::shortenSQLName($tableName, 48, TRUE);
           $triggerName = "{$validName}_{$whenName}_{$eventName}";
-          $triggerSQL = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN{$varString}{$sqlString} END";
+          $body = implode("\n", $parts['variables']) . "\n" . implode("\n", $parts['sql']);
+          $body = trim($body);
+          $triggerSQL = "CREATE TRIGGER $triggerName $whenName $eventName ON $tableName FOR EACH ROW BEGIN\n$body\nEND";
 
           $this->enqueueQuery("DROP TRIGGER IF EXISTS $triggerName");
           $this->enqueueQuery($triggerSQL);

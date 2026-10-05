@@ -32,7 +32,12 @@ class CRM_Import_ParserTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
+    $extension = \Civi\Api4\Extension::get(FALSE)
+      ->addWhere('key', '=', 'civiimport')
+      ->execute()->first();
+    if (empty($extension['status']) || $extension['status'] !== 'installed') {
+      $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
+    }
   }
 
   /**
@@ -92,6 +97,172 @@ class CRM_Import_ParserTest extends CiviUnitTestCase {
     $activityParser = new ActivityParser();
     $result = Invasive::call([$activityParser, 'guessContactType'], [$values]);
     $this->assertEquals($expectedType, $result);
+  }
+
+  /**
+   * Test that importAlterMappedRow hook is called with the correct importEntities.
+   */
+  public function testImportAlterMappedRowEntitiesHook(): void {
+    $mockDataSource = $this->createMock(\CRM_Import_DataSource::class);
+
+    $parser = $this->getMockBuilder(\Civi\Import\GenericParser::class)
+      ->onlyMethods(['getDataSourceObject', 'getUserJob', 'getUserJobID'])
+      ->getMock();
+    $parser->method('getDataSourceObject')->willReturn($mockDataSource);
+    $parser->method('getUserJobID')->willReturn(123);
+    $parser->method('getUserJob')->willReturn([
+      'id' => 123,
+      'job_type' => 'activity_import',
+      'metadata' => [
+        'base_entity' => 'Activity',
+        'import_mappings' => [
+          ['name' => 'Activity.subject'],
+        ],
+        'DataSource' => [
+          'number_of_columns' => 1,
+        ],
+      ],
+    ]);
+
+    $parser->init();
+
+    $hookCalled = 0;
+    $hookEntities = [];
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_importAlterMappedRow', function($importType, $context, &$mappedRow, $rowValues, $userJobID, $importEntities = NULL) use (&$hookCalled, &$hookEntities) {
+      if ($context === 'import') {
+        $hookCalled++;
+        $hookEntities = $importEntities;
+      }
+    });
+
+    try {
+      $parser->import(['Subject of Activity', 1]);
+    }
+    catch (\Exception $e) {
+      // Ignored: we only care about the hook execution before save
+    }
+
+    $this->assertEquals(1, $hookCalled);
+    $expectedEntities = [
+      '' => [
+        'entity' => 'Activity',
+        'join' => NULL,
+      ],
+      'Contact' => [
+        'entity' => 'Contact',
+        'join' => [],
+      ],
+    ];
+    $this->assertEquals($expectedEntities, $hookEntities);
+  }
+
+  /**
+   * Test transformed field value handling for ambiguous import values.
+   *
+   * @dataProvider ambiguousFieldValueProvider
+   */
+  public function testAmbiguousFieldValueTransformation(string $fieldName, string $importedValue, $expectedResult): void {
+    $parser = new ActivityParser();
+    Invasive::set([$parser, 'ambiguousOptions'], [
+      $fieldName => [
+        strtolower($importedValue) => [1, 2],
+      ],
+    ]);
+    Invasive::set([$parser, 'importableFieldsMetadata'], [
+      $fieldName => [
+        'name' => $fieldName,
+        'type' => CRM_Utils_Type::T_INT,
+        'options' => [
+          strtolower($importedValue) => 1,
+        ],
+      ],
+    ]);
+
+    $result = Invasive::call([$parser, 'getTransformedFieldValue'], [$fieldName, $importedValue]);
+    $this->assertEquals($expectedResult, $result);
+  }
+
+  public function ambiguousFieldValueProvider(): array {
+    return [
+      'ambiguous financial_type_id' => [
+        'financial_type_id',
+        'Donation',
+        'invalid_import_value',
+      ],
+      'ambiguous gender_id' => [
+        'gender_id',
+        'Other',
+        'invalid_import_value',
+      ],
+      'ambiguous state_province_id' => [
+        'state_province_id',
+        'WA',
+        'WA',
+      ],
+      'ambiguous address_primary.state_province_id' => [
+        'address_primary.state_province_id',
+        'WA',
+        'WA',
+      ],
+      'ambiguous county_id' => [
+        'county_id',
+        'Washington',
+        'Washington',
+      ],
+      'ambiguous address_primary.county_id' => [
+        'address_primary.county_id',
+        'Washington',
+        'Washington',
+      ],
+    ];
+  }
+
+  /**
+   * Test that ambiguous financial type options return 'invalid_import_value'
+   * instead of passing through raw string.
+   */
+  public function testAmbiguousFinancialTypeImport(): void {
+    $ft1 = \Civi\Api4\FinancialType::get(FALSE)
+      ->addWhere('name', '=', 'Donation')
+      ->execute()->first();
+    $ft2ID = NULL;
+    if ($ft1) {
+      \Civi\Api4\FinancialType::update(FALSE)
+        ->addWhere('id', '=', $ft1['id'])
+        ->addValue('name', 'Coins')
+        ->execute();
+    }
+    try {
+      $ft2 = \Civi\Api4\FinancialType::create(FALSE)
+        ->addValue('name', 'Donation')
+        ->addValue('label', 'Donation 2')
+        ->execute()->first();
+      $ft2ID = $ft2['id'];
+
+      $parser = new \Civi\Import\ContributionParser();
+      $parser->setImportableFieldsMetadata([
+        'financial_type_id' => [
+          'name' => 'financial_type_id',
+          'title' => 'Financial Type',
+          'type' => CRM_Utils_Type::T_INT,
+          'entity' => 'Contribution',
+          'html' => ['type' => 'Select'],
+        ],
+      ]);
+      $result = Invasive::call([$parser, 'getTransformedFieldValue'], ['financial_type_id', 'Donation']);
+      $this->assertEquals('invalid_import_value', $result);
+    }
+    finally {
+      if ($ft2ID) {
+        \Civi\Api4\FinancialType::delete(FALSE)->addWhere('id', '=', $ft2ID)->execute();
+      }
+      if ($ft1) {
+        \Civi\Api4\FinancialType::update(FALSE)
+          ->addWhere('id', '=', $ft1['id'])
+          ->addValue('name', 'Donation')
+          ->execute();
+      }
+    }
   }
 
 }

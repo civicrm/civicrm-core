@@ -72,19 +72,6 @@ class CRM_Mailing_Event_BAO_MailingEventBounce extends CRM_Mailing_Event_DAO_Mai
   }
 
   /**
-   * Create function was renamed `recordBounce` because it's not a standard CRUD create function
-   *
-   * @param array $params
-   * @deprecated
-   *
-   * @return bool|null
-   */
-  public static function create(&$params) {
-    CRM_Core_Error::deprecatedFunctionWarning('recordBounce');
-    return self::recordBounce($params);
-  }
-
-  /**
    * Get row count for the event selector.
    *
    * @param int $mailing_id

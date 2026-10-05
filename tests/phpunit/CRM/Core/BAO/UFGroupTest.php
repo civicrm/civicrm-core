@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Api4\UFGroup;
+use Civi\Test\Invasive;
 
 /**
  * Class CRM_Core_BAO_UFGroupTest.
@@ -120,6 +121,50 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     $this->assertEquals(1, $systemLogCount, 'There should be one system log entry with message "CRM_Core_BAO_UFGroupTest::implementHookPost ' . $ufGroupID . '"');
   }
 
+  public function implementHookUFGroupTypes(&$ufGroupTypes): void {
+    $ufGroupTypes['Test Placement'] = 'Test Placement';
+  }
+
+  /**
+   * Test that a uf_join module registered by an extension is offered on the profile form
+   * and is created and deleted along with the types core declares itself.
+   */
+  public function testUFGroupTypesHook(): void {
+    $this->hookClass->setHook('civicrm_ufGroupTypes', [$this, 'implementHookUFGroupTypes']);
+
+    $this->assertArrayHasKey('Test Placement', CRM_Core_SelectValues::ufGroupTypes());
+
+    $ufGroupID = $this->createUFGroup([
+      'title' => 'testUFGroupTypesHook',
+      'is_active' => 1,
+    ])['id'];
+
+    // A join for a module nobody declares should survive being edited around, the way
+    // component-managed joins such as CiviEvent do.
+    $componentJoin = ['uf_group_id' => $ufGroupID, 'module' => 'CiviEvent'];
+    CRM_Core_BAO_UFGroup::addUFJoin($componentJoin);
+
+    CRM_Core_BAO_UFGroup::createUFJoin(1, ['Profile' => 1, 'Test Placement' => 1], $ufGroupID);
+    $this->assertEquals(['CiviEvent', 'Profile', 'Test Placement'], $this->getUFJoinModules($ufGroupID));
+
+    // This is what pre-ticks the checkbox when the form is reopened.
+    $this->assertContains('Test Placement', CRM_Core_BAO_UFGroup::getUFJoinRecord($ufGroupID));
+
+    CRM_Core_BAO_UFGroup::createUFJoin(1, ['Profile' => 1], $ufGroupID);
+    $this->assertEquals(['CiviEvent', 'Profile'], $this->getUFJoinModules($ufGroupID));
+  }
+
+  /**
+   * @return array
+   */
+  protected function getUFJoinModules(int $ufGroupID): array {
+    $modules = (array) \Civi\Api4\UFJoin::get(FALSE)
+      ->addWhere('uf_group_id', '=', $ufGroupID)
+      ->execute()->column('module');
+    sort($modules);
+    return $modules;
+  }
+
   /**
    * Create a UF Group.
    *
@@ -130,6 +175,57 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     $ufGroup = UFGroup::create()->setValues($values)->execute()->first();
     $this->ids['UFGroup'][] = $ufGroup['id'];
     return $ufGroup;
+  }
+
+  /**
+   * Test copying a profile using the form with action=copy and original=[id].
+   */
+  public function testCopyProfileForm(): void {
+    $originalProfile = $this->createTestEntity('UFGroup', [
+      'title' => 'Profile to Copy',
+      'frontend_title' => 'Profile to Copy Public',
+      'is_active' => 1,
+    ], 'original');
+
+    $this->createTestEntity('UFField', [
+      'uf_group_id' => $originalProfile['id'],
+      'field_name' => 'first_name',
+      'label' => 'First Name',
+      'is_active' => 1,
+    ], 'original_field');
+
+    $formWrapper = $this->getTestForm('CRM_UF_Form_Group', [], [
+      'action' => 'copy',
+      'original' => $originalProfile['id'],
+    ]);
+    $formWrapper->processForm(\Civi\Test\FormWrapper::PREPROCESSED);
+    $form = Invasive::get([$formWrapper, 'form']);
+    $defaults = $form->setDefaultValues();
+    $this->assertEquals('Profile to Copy (Copy)', $defaults['title']);
+    $this->assertEquals('Profile to Copy Public (Copy)', $defaults['frontend_title']);
+
+    $this->getTestForm('CRM_UF_Form_Group', [
+      'title' => 'Profile to Copy (Copy)',
+      'frontend_title' => 'Profile to Copy Public (Copy)',
+      'is_active' => 1,
+    ], [
+      'action' => 'copy',
+      'original' => $originalProfile['id'],
+    ])->processForm();
+
+    $copiedProfile = UFGroup::get(FALSE)
+      ->addWhere('title', '=', 'Profile to Copy (Copy)')
+      ->execute()
+      ->first();
+    $this->assertNotEmpty($copiedProfile);
+    $this->ids['UFGroup'][] = $copiedProfile['id'];
+
+    $copiedFields = \Civi\Api4\UFField::get(FALSE)
+      ->addWhere('uf_group_id', '=', $copiedProfile['id'])
+      ->execute();
+    $this->assertCount(1, $copiedFields);
+    $this->assertEquals('first_name', $copiedFields[0]['field_name']);
+    $this->assertEquals('First Name', $copiedFields[0]['label']);
   }
 
 }

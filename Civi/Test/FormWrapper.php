@@ -122,6 +122,20 @@ class FormWrapper {
     return $this->validation;
   }
 
+  /**
+   * @var array
+   */
+  private $defaults;
+
+  /**
+   * Get the default values calculated by the form's setDefaultValues().
+   *
+   * @return array
+   */
+  public function getDefaultValues(): array {
+    return $this->defaults;
+  }
+
   private $originalMailSetting;
 
   public const CONSTRUCTED = 0;
@@ -159,6 +173,7 @@ class FormWrapper {
     }
     if ($state > self::PREPROCESSED) {
       $this->form->buildForm();
+      $this->defaults = $this->form->_defaults;
     }
     if ($state > self::BUILT) {
       $this->form->validate();
@@ -182,7 +197,23 @@ class FormWrapper {
    */
   public function addSubsequentForm(string $formName, array $formValues = []): FormWrapper {
     /* @var \CRM_Core_Form $form */
-    $form = new $formName();
+    if ($formName === 'CRM_Event_Form_Registration_AdditionalParticipant') {
+      // Each additional participant page needs a distinct name matching the real
+      // wizard's convention (Participant_1, Participant_2, ...) - otherwise every
+      // instance defaults to the same class-derived name, and code that relies on
+      // that name (e.g. CRM_Event_Form_Registration_AdditionalParticipant::getParticipantIndex())
+      // can't tell them apart.
+      $participantNum = 1;
+      foreach ($this->subsequentForms as $existingForm) {
+        if ($existingForm instanceof \CRM_Event_Form_Registration_AdditionalParticipant) {
+          $participantNum++;
+        }
+      }
+      $form = new $formName(NULL, \CRM_Core_Action::NONE, 'post', 'Participant_' . $participantNum);
+    }
+    else {
+      $form = new $formName();
+    }
     $form->controller = $this->form->controller;
     $form->_submitValues = $formValues;
     $form->controller->addPage($form);
@@ -255,10 +286,10 @@ class FormWrapper {
    */
   private function setFormObject(string $class, array $formValues = [], array $urlParameters = []): void {
     $_POST = $formValues;
-    $this->form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
-    $_REQUEST = array_merge($_REQUEST, $urlParameters);
-    $_GET = array_merge($_GET, $urlParameters);
+    $_REQUEST = $urlParameters;
+    $_GET = $urlParameters;
+    $this->form = new $class();
     switch ($class) {
       case 'CRM_Event_Cart_Form_Checkout_Payment':
       case 'CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices':
@@ -267,7 +298,8 @@ class FormWrapper {
 
       case 'CRM_Event_Form_Registration_Register':
         $this->form->controller = $this->formController = new \CRM_Event_Controller_Registration();
-        break;
+        $_SESSION['_' . $this->form->controller->_name . '_container']['values'][$this->form->getName()] = $formValues;
+        return;
 
       case 'CRM_Event_Form_Registration_Confirm':
       case 'CRM_Event_Form_Registration_AdditionalParticipant':
@@ -278,7 +310,8 @@ class FormWrapper {
         else {
           $this->form->controller = $this->formController = new \CRM_Event_Controller_Registration();
         }
-        break;
+        $_SESSION['_' . $this->form->controller->_name . '_container']['values'][$this->form->getName()] = $formValues;
+        return;
 
       case 'CRM_Contribute_Form_Contribution_Main':
         $this->form->controller = new \CRM_Contribute_Controller_Contribution();

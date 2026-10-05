@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('searchAdminCssRules', {
@@ -15,21 +15,21 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit'),
         ctrl = this;
 
-      this.getField = searchMeta.getField;
+      this.getField = (fieldName) => {
+        return searchMeta.getField(fieldName, ctrl.crmSearchAdmin.savedSearch);
+      };
 
-      this.styles = _.transform(_.cloneDeep(CRM.crmSearchAdmin.styles), function(styles, style) {
-        if (style.key !== 'default' && style.key !== 'secondary') {
-          styles['bg-' + style.key] = style.value;
-        }
-      }, {});
+      this.styles = Object.fromEntries(structuredClone(CRM.crmSearchAdmin.styles)
+        .filter((style) => style.key !== 'default' && style.key !== 'secondary')
+        .map((style) => ['bg-' + style.key, style.value]));
       this.styles.disabled = ts('Disabled');
       this.styles['font-bold'] = ts('Bold');
       this.styles['font-italic'] = ts('Italic');
       this.styles.strikethrough = ts('Strikethrough');
 
       this.fields = function() {
-        let allFields = ctrl.crmSearchAdmin.getAllFields(':name', ['Field', 'Custom', 'Extra', 'Pseudo']);
-        let selectFields = ctrl.crmSearchAdmin.getSelectFields();
+        let allFields = ctrl.crmSearchAdmin.getAllFields(ctrl.crmSearchAdmin.savedSearch, ':name', ['Field', 'Custom', 'Extra', 'Pseudo']);
+        let selectFields = ctrl.crmSearchAdmin.getSelectFields(ctrl.crmSearchAdmin.savedSearch);
         // Use machine names not labels for option matching
         selectFields.forEach((field) => field.id = field.id.replace(':label', ':name'));
         return {
@@ -64,10 +64,10 @@
       };
 
       this.showMore = function() {
-        return !this.item.cssRules || !this.item.cssRules.length || _.last(this.item.cssRules)[1];
+        return !this.item.cssRules || !this.item.cssRules.length || this.item.cssRules.at(-1)[1];
       };
 
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

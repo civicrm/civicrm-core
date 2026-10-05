@@ -18,6 +18,7 @@ return [
       'fields' => [
         'domain_id' => TRUE,
         'find_word' => TRUE,
+        'language' => TRUE,
       ],
       'unique' => TRUE,
       'add' => '4.4',
@@ -92,6 +93,18 @@ return [
       'entity_reference' => [
         'entity' => 'Domain',
         'key' => 'id',
+      ],
+    ],
+    'language' => [
+      'title' => ts('Language'),
+      'sql_type' => 'varchar(5)',
+      'input_type' => 'Select',
+      'description' => ts('Word Replacement Language'),
+      'add' => '6.20',
+      'default_callback' => ['CRM_Core_I18n', 'getLocale'],
+      'pseudoconstant' => [
+        'option_group_name' => 'languages',
+        'key_column' => 'name',
       ],
     ],
   ],

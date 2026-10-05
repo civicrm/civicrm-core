@@ -27,7 +27,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    *   associated array
    */
   public static function contributionChartMonthly($param) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     if ($param) {
       $param = [1 => [$param, 'Integer']];
     }
@@ -69,7 +69,7 @@ INNER JOIN   civicrm_contact AS contact ON ( contact.id = contrib.contact_id )
    * @deprecated since 5.80 will be removed around 5.90
    */
   public static function contributionChartYearly() {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     $config = CRM_Core_Config::singleton();
     $yearClause = "year(contrib.receive_date) as contribYear";
     if (!empty($config->fiscalYearStart) && ($config->fiscalYearStart['M'] != 1 || $config->fiscalYearStart['d'] != 1)) {
@@ -229,7 +229,7 @@ LIMIT 1
    */
   public static function getContributionStatuses($usedFor = 'contribution', $name = NULL) {
     $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     if ($usedFor !== 'contribution') {
       return self::getPendingAndCompleteStatuses();
     }

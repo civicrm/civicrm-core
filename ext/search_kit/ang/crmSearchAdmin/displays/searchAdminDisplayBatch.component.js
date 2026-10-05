@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('searchAdminDisplayBatch', {
@@ -17,12 +17,15 @@
       const ctrl = this;
       $scope.hs = crmUiHelp({file: 'CRM/Search/Help/Display'});
 
-      this.includes = _.includes;
+      // Guarded: the template calls this before settings.classes is necessarily set
+      this.includes = (collection, item) => !!collection && collection.includes(item);
 
       // Add or remove an item from an array
       this.toggle = function(collection, item) {
-        if (_.includes(collection, item)) {
-          _.pull(collection, item);
+        if (collection.includes(item)) {
+          for (let pos = collection.indexOf(item); pos > -1; pos = collection.indexOf(item)) {
+            collection.splice(pos, 1);
+          }
         } else {
           collection.push(item);
         }
@@ -63,7 +66,7 @@
           ctrl.display.settings.tally = {};
           ctrl.display.settings.columns.forEach(function(col) {
             if (col.key) {
-              const arg = searchMeta.parseExpr(col.key).args[0];
+              const arg = searchMeta.parseExpr(col.key, {api_entity: ctrl.apiEntity, api_params: ctrl.apiParams}).args[0];
               if (!arg || !arg.field || arg.field.fk_entity || arg.field.options) {
                 return;
               }
@@ -82,7 +85,7 @@
         if (key in fieldSpecs) {
           return fieldSpecs[key];
         }
-        return (fieldSpecs[key] = searchMeta.getField(key));
+        return (fieldSpecs[key] = searchMeta.getField(key, {api_entity: ctrl.apiEntity, api_params: ctrl.apiParams}));
       };
 
       this.onChangeTallyFn = function(col) {
@@ -94,4 +97,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

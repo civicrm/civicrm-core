@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchTasks').component('crmSearchInputVal', {
@@ -33,13 +33,13 @@
         });
 
         function setDateType() {
-          if (_.findWhere(ctrl.dateRanges, {id: ctrl.value})) {
+          if (ctrl.dateRanges.find((dateRange) => dateRange.id === ctrl.value)) {
             ctrl.dateType = 'range';
           } else if (ctrl.value === 'now') {
             ctrl.dateType = 'now';
-          } else if (_.includes(ctrl.value, 'now -')) {
+          } else if (typeof ctrl.value === 'string' && ctrl.value.includes('now -')) {
             ctrl.dateType = 'now -';
-          } else if (_.includes(ctrl.value, 'now +')) {
+          } else if (typeof ctrl.value === 'string' && ctrl.value.includes('now +')) {
             ctrl.dateType = 'now +';
           } else {
             ctrl.dateType = 'fixed';
@@ -150,6 +150,10 @@
           return '~/crmSearchTasks/crmSearchInput/boolean.html';
         }
 
+        if (field.input_type === 'Color') {
+          return '~/crmSearchTasks/crmSearchInput/color.html';
+        }
+
         if (!['>', '<', '>=', '<='].includes(ctrl.op)) {
           // Only use option list if the field has a "name" suffix
           if (field.options && (!field.suffixes || field.suffixes.includes('name'))) {
@@ -196,4 +200,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

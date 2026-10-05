@@ -20,8 +20,10 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\API\Event\PrepareEvent;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Api4\Utils\FormattingUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Core\HookInterface;
@@ -34,6 +36,11 @@ use Civi\Test\TransactionalInterface;
 class BasicActionsTest extends Api4TestBase implements HookInterface, TransactionalInterface {
 
   /**
+   * @var int
+   */
+  private $getFieldsCallCount = 0;
+
+  /**
    * Listens for civi.api4.entityTypes event to manually add this nonstandard entity
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
@@ -42,10 +49,28 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $e->entities['MockBasicEntity'] = MockBasicEntity::getInfo();
   }
 
+  /**
+   * Counts MockBasicEntity::getFields calls so tests can assert caching.
+   *
+   * @param \Civi\API\Event\PrepareEvent $event
+   */
+  public function on_civi_api_prepare(PrepareEvent $event): void {
+    $request = $event->getApiRequest();
+    if (is_object($request) && $request->getEntityName() === 'MockBasicEntity' && $request->getActionName() === 'getFields') {
+      $this->getFieldsCallCount++;
+    }
+  }
+
   public function setUpHeadless(): CiviEnvBuilder {
     // Ensure MockBasicEntity gets added via above listener
     \Civi::cache('metadata')->clear();
     return parent::setUpHeadless();
+  }
+
+  public function tearDown(): void {
+    // Clear cached MockBasicEntity option lists
+    \Civi::cache('metadata')->clear();
+    parent::tearDown();
   }
 
   private function replaceRecords(&$records) {
@@ -254,6 +279,60 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     // Complex options should give all requested properties
     $this->assertEquals('Banana', $getFields['fruit']['options'][2]['label']);
     $this->assertEquals('yellow', $getFields['fruit']['options'][2]['color']);
+  }
+
+  public function testPseudoconstantFallbackIsCached(): void {
+    $field = ['name' => 'group', 'entity' => 'MockBasicEntity'];
+    \Civi::cache('metadata')->clear();
+    $this->getFieldsCallCount = 0;
+
+    $expected = ['one' => 'First', 'two' => 'Second'];
+    for ($i = 0; $i < 3; $i++) {
+      $options = FormattingUtil::getPseudoconstantList($field, 'group:label');
+      $this->assertEquals($expected, $options);
+    }
+
+    $this->assertEquals(1, $this->getFieldsCallCount);
+  }
+
+  public function testPseudoconstantFallbackDoesNotCacheMissingOptions(): void {
+    // The 'color' field has no option list.
+    $field = ['name' => 'color', 'entity' => 'MockBasicEntity'];
+    \Civi::cache('metadata')->clear();
+    $this->getFieldsCallCount = 0;
+
+    for ($i = 0; $i < 2; $i++) {
+      try {
+        FormattingUtil::getPseudoconstantList($field, 'color:label');
+        $this->fail('Expected a CRM_Core_Exception for a field with no option list');
+      }
+      catch (\CRM_Core_Exception $e) {
+        $this->assertStringContainsString('No option list found', $e->getMessage());
+      }
+    }
+
+    $this->assertEquals(2, $this->getFieldsCallCount);
+  }
+
+  public function testPseudoconstantFallbackIsLocaleScoped(): void {
+    global $tsLocale;
+    $field = ['name' => 'group', 'entity' => 'MockBasicEntity'];
+    \Civi::cache('metadata')->clear();
+    $this->getFieldsCallCount = 0;
+    $originalLocale = $tsLocale;
+
+    try {
+      $tsLocale = 'en_US';
+      FormattingUtil::getPseudoconstantList($field, 'group:label');
+      $this->assertEquals(1, $this->getFieldsCallCount);
+
+      $tsLocale = 'fr_FR';
+      FormattingUtil::getPseudoconstantList($field, 'group:label');
+      $this->assertEquals(2, $this->getFieldsCallCount);
+    }
+    finally {
+      $tsLocale = $originalLocale;
+    }
   }
 
   public function testItemsToGet(): void {

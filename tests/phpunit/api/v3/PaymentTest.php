@@ -20,6 +20,7 @@ use Civi\Api4\Order;
  * @group headless
  */
 class api_v3_PaymentTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * Clean up after each test.
@@ -131,6 +132,76 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     foreach ([50, 30, 20] as $key => $total_amount) {
       $this->assertEquals($total_amount, $payments['values'][$key]['total_amount']);
     }
+  }
+
+  /**
+   * Test that a custom field on FinancialTrxn is persisted when creating a Payment,
+   * via both APIv3 (custom_N) and APIv4 (GroupName.field_name) param styles.
+   *
+   * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateWithCustomField($apiVersion): void {
+    $this->_apiversion = $apiVersion;
+    // 'FinancialTrxn' isn't one of the entities core itself registers as a valid
+    // CustomGroup.extends target (mjwshared normally adds this via a managed
+    // OptionValue) - register it here so the group below can be created without
+    // that extension installed.
+    $financialTrxnExtendsOption = \Civi\Api4\OptionValue::get(FALSE)
+      ->addWhere('option_group_id:name', '=', 'cg_extend_objects')
+      ->addWhere('value', '=', 'FinancialTrxn')
+      ->execute()
+      ->first();
+    if (!$financialTrxnExtendsOption) {
+      \Civi\Api4\OptionValue::create(FALSE)
+        ->addValue('option_group_id.name', 'cg_extend_objects')
+        ->addValue('label', 'Financial Transaction (Payment)')
+        ->addValue('value', 'FinancialTrxn')
+        ->addValue('name', 'civicrm_financial_trxn')
+        ->addValue('is_active', TRUE)
+        ->execute();
+    }
+
+    $customGroup = $this->customGroupCreate([
+      'title' => 'Payment Custom Data',
+      'extends' => 'FinancialTrxn',
+    ]);
+    $customField = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Reference Note',
+    ]);
+    CRM_Core_PseudoConstant::flush();
+    $customFieldName = $customField['values'][$customField['id']]['name'];
+    $customGroupName = $customGroup['values'][$customGroup['id']]['name'];
+
+    $contributionID = $this->contributionCreate([
+      'contact_id' => $this->individualCreate(),
+      'total_amount' => 100,
+      'contribution_status_id' => 'Pending',
+    ]);
+
+    $paymentParams = [
+      'contribution_id' => $contributionID,
+      'total_amount' => 100,
+      'trxn_date' => date('Y-m-d'),
+    ];
+    $customFieldKey = $apiVersion === 3 ? ('custom_' . $customField['id']) : ($customGroupName . '.' . $customFieldName);
+    $paymentParams[$customFieldKey] = 'Some reference text';
+
+    $payment = $this->callAPISuccess('Payment', 'create', $paymentParams);
+
+    $trxn = \Civi\Api4\FinancialTrxn::get(FALSE)
+      ->addSelect('custom.*')
+      ->addWhere('id', '=', $payment['id'])
+      ->execute()
+      ->single();
+    $this->assertEquals('Some reference text', $trxn[$customGroupName . '.' . $customFieldName]);
+
+    // The custom group's table is DDL, not part of the per-test transaction rollback,
+    // so it has to be cleaned up explicitly (it would otherwise collide with the
+    // same-titled group created on the next dataProvider run).
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
   }
 
   /**
@@ -510,6 +581,64 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccessGetCount('ParticipantPayment', $paymentParticipant, 2);
     $this->callAPISuccessGetCount('Participant', ['status_id' => 'Registered'], 2);
+  }
+
+  /**
+   * Test allocation of a payment across line items when the proportional
+   * split creates a rounding remainder.
+   *
+   * A payment of 100 against 3 line items of 100 each works out at
+   * 33.333 recurring per line item. Allocations should be rounded to
+   * 2 decimal places with the leftover cent assigned to the last line item,
+   * so that the sum of the allocations always equals the payment total.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreatePaymentLineItemAllocationRounding(): void {
+    $order = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'financial_type_id:name' => 'Donation',
+      ])
+      ->addLineItem(['line_total_inclusive' => 100])
+      ->addLineItem(['line_total_inclusive' => 100])
+      ->addLineItem(['line_total_inclusive' => 100])
+      ->execute()->first();
+
+    // Pay 100 of 300. A third of each line item is 33.333 recurring so
+    // unrounded allocations would only add up to 99.99 once saved.
+    $payment = $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $order['id'],
+      'total_amount' => 100,
+    ]);
+    $this->checkPaymentIsValid($payment['id'], $order['id'], 100);
+
+    $allocations = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->addWhere('financial_trxn_id', '=', $payment['id'])
+      ->addOrderBy('amount')
+      ->execute()->column('amount');
+    $this->assertEquals([33.33, 33.33, 33.34], $allocations, 'Allocations should be rounded with the remainder assigned to the last line item');
+    $this->assertEquals(100.00, array_sum($allocations), 'Allocated amounts should add up to the payment total');
+
+    // Pay the remaining 200. As this payment completes the contribution each
+    // line item should be allocated its exact outstanding balance
+    // (66.67, 66.67 & 66.66 after the first payment above).
+    $payment = $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $order['id'],
+      'total_amount' => 200,
+    ]);
+
+    $allocations = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_financial_item')
+      ->addWhere('financial_trxn_id', '=', $payment['id'])
+      ->addOrderBy('amount')
+      ->execute()->column('amount');
+    $this->assertEquals([66.66, 66.67, 66.67], $allocations, 'Completing payment should allocate the outstanding balance of each line item');
+    $this->assertEquals(200.00, array_sum($allocations), 'Allocated amounts should add up to the payment total');
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $order['id']]);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
   }
 
   /**

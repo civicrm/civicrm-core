@@ -14,6 +14,7 @@
  * @group headless
  */
 class api_v3_CaseTypeTest extends CiviCaseTestCase {
+  protected $_apiversion = 3;
 
   const APPLICATION_WITH_DEFINITION_PARAMS = [
     'title' => 'Application with Definition',
@@ -148,6 +149,11 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
 
     $caseXml = CRM_Case_XMLRepository::singleton()->retrieve('Application_with_Definition');
     $this->assertTrue($caseXml instanceof SimpleXMLElement);
+
+    $dbDefinition = CRM_Core_DAO::singleValueQuery('SELECT definition FROM civicrm_case_type WHERE id = ' . $id);
+    $this->assertStringContainsString('<CaseType>', $dbDefinition);
+    $this->assertStringNotContainsString('&lt;', $dbDefinition);
+    $this->assertStringNotContainsString('&gt;', $dbDefinition);
   }
 
   /**

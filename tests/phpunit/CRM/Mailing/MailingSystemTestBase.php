@@ -490,7 +490,7 @@ United States
     $mailingParams = array_merge($this->defaultParams, $params);
     $this->callAPISuccess('Mailing', 'create', $mailingParams);
     $this->_mut->assertRecipients([]);
-    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+    $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $this->_mut->getAllMessages('ezc');
     // There are exactly two contacts produced by setUp().
@@ -527,7 +527,7 @@ United States
     ]);
     $this->callAPISuccess('Mailing', 'create', $mailingParams);
     $this->_mut->assertRecipients([]);
-    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+    $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
     $queueItems = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_mailing_event_queue")->fetchAll();
     $this->assertCount(3, $queueItems);
     $hooks->reset();

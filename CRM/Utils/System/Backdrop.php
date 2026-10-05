@@ -92,6 +92,37 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function addUfRole(int $ufID, string $role): bool {
+    $user = user_load($ufID);
+    if (!$user || !array_key_exists($role, user_roles())) {
+      return FALSE;
+    }
+    if (!in_array($role, $user->roles, TRUE)) {
+      $user->roles[] = $role;
+      $user->save();
+    }
+    return TRUE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function removeUfRole(int $ufID, string $role): bool {
+    $user = user_load($ufID);
+    if (!$user || !array_key_exists($role, user_roles())) {
+      return FALSE;
+    }
+    $key = array_search($role, $user->roles, TRUE);
+    if ($key !== FALSE) {
+      unset($user->roles[$key]);
+      $user->save();
+    }
+    return TRUE;
+  }
+
+  /**
    * @inheritdoc
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
@@ -161,7 +192,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
         if (stripos($crumbs['url'], 'id%%')) {
           $args = ['cid', 'mid'];
           foreach ($args as $a) {
-            $val = CRM_Utils_Request::retrieve($a, 'Positive', CRM_Core_DAO::$_nullObject,
+            $val = CRM_Utils_Request::retrieve($a, 'Positive', NULL,
               FALSE, NULL, $_GET
             );
             if ($val) {
@@ -696,6 +727,16 @@ AND    u.status = 1
   /**
    * @inheritDoc
    */
+  public function cmsSitePath() {
+    if (defined('BACKDROP_ROOT')) {
+      $cmsSitePath = realpath(BACKDROP_ROOT . '/' . conf_path());
+      return $cmsSitePath;
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function isUserLoggedIn() {
     $isloggedIn = FALSE;
     if (function_exists('user_is_logged_in')) {
@@ -781,24 +822,6 @@ AND    u.status = 1
     }
 
     return $url;
-  }
-
-  /**
-   * Find any users/roles/security-principals with the given permission
-   * and replace it with one or more permissions.
-   *
-   * @param string $oldPerm
-   * @param array $newPerms
-   *   Array, strings.
-   */
-  public function replacePermission($oldPerm, $newPerms) {
-    $roles = user_roles(FALSE, $oldPerm);
-    if (!empty($roles)) {
-      foreach (array_keys($roles) as $rid) {
-        user_role_revoke_permissions($rid, [$oldPerm]);
-        user_role_grant_permissions($rid, $newPerms);
-      }
-    }
   }
 
   /**

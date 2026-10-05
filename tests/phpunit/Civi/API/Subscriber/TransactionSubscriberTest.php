@@ -108,7 +108,7 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
   }
 
   public function testForceRollback(): void {
-    $result = $this->callAPISuccess('contact', 'create', [
+    $result = $this->callAPIV3Success('contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'Me',
       'last_name' => 'Myself',

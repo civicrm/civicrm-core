@@ -1,10 +1,10 @@
 // https://civicrm.org/licensing
-(function($, _) {
+/* global CKEDITOR, ToolbarConfigurator */
+(function($) {
   'use strict';
   /* jshint validthis: true */
 
-  var configRowTpl = _.template($('#config-row-tpl').html()),
-    options;
+  var options;
 
   // Weird conflict with drupal styles
   $('body').removeClass('toolbar');
@@ -18,9 +18,7 @@
   }
 
   function initOptions(data) {
-    options = _.filter(data, function(n) {
-      return $.inArray(n.id, CRM.vars.ckConfig.blacklist) < 0;
-    });
+    options = data.filter((n) => $.inArray(n.id, CRM.vars.ckConfig.blacklist) < 0);
     addOption();
     $.each(CRM.vars.ckConfig.settings, function(key, val) {
       if ($.inArray(key, CRM.vars.ckConfig.blacklist) < 0) {
@@ -53,13 +51,12 @@
   }
 
   function getOptionList() {
-    var list = [];
-    _.forEach(options, function(option) {
-      var opt = _.cloneDeep(option);
+    var list = options.map((option) => {
+      var opt = structuredClone(option);
       if ($('[name="config_' + opt.id + '"]').length) {
         opt.disabled = true;
       }
-      list.push(opt);
+      return opt;
     });
     return {results: list, text: 'id'};
   }
@@ -69,7 +66,7 @@
   }
 
   function addOption() {
-    $('#crm-custom-config-options').append($(configRowTpl({})));
+    $('#crm-custom-config-options').append($($('#config-row-tpl').html()));
     $('.crm-config-option-row:last input.crm-config-option-name', '#crm-custom-config-options').crmSelect2({
       data: getOptionList,
       formatSelection: function(field) {
@@ -86,14 +83,14 @@
     multiple: true,
     closeOnSelect: false,
     data: CRM.vars.ckConfig.plugins,
-    escapeMarkup: _.identity,
+    escapeMarkup: (markup) => markup,
     formatResult: format,
     formatSelection: format
   });
 
   var toolbarModifier = new ToolbarConfigurator.ToolbarModifier( 'editor-basic' );
 
-  toolbarModifier.init(_.noop);
+  toolbarModifier.init(() => {});
 
   CKEDITOR.document.getById( 'toolbarModifierWrapper' ).append( toolbarModifier.mainContainer );
 
@@ -129,4 +126,4 @@
     $.getJSON(CRM.config.resourceBase + 'ext/ckeditor4/js/ck-options.json', null, initOptions);
   });
 
-})(CRM.$, CRM._);
+})(CRM.$);

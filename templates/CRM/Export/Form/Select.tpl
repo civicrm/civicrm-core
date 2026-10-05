@@ -45,7 +45,7 @@
     <div class="content crm-content-mergeOptions">
       {$form.mergeOption.html}
     </div>
-    <div id='greetings' class="content crm-content-greetings class='hiddenElement'">
+    <div id='greetings' class="content crm-content-greetings hiddenElement">
       <table class="form-layout-compressed">
         <tr>
            <td>{$form.postal_greeting.label}</td>

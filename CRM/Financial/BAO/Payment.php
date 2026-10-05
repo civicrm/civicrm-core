@@ -19,11 +19,20 @@ use Civi\Api4\Contribution;
 use Civi\Api4\FinancialItem;
 use Civi\Api4\LineItem;
 use Civi\Api4\EntityFinancialTrxn;
+use Civi\Api4\Payment;
 
 /**
  * This class contains payment related functions.
  */
 class CRM_Financial_BAO_Payment {
+
+  /**
+   * Seconds to wait for the per-contribution lock in create() before giving up.
+   *
+   * Covers the slowest thing that can happen while held - completing an order can send a
+   * receipt email synchronously.
+   */
+  const PAYMENT_CREATE_LOCK_TIMEOUT = 15;
 
   /**
    * Function to process additional payment for partial and refund
@@ -44,6 +53,46 @@ class CRM_Financial_BAO_Payment {
    * @throws \CRM_Core_Exception
    */
   public static function create(array $params, $disableActionsOnCompleteOrder = FALSE): CRM_Financial_DAO_FinancialTrxn {
+    // Serialise payment-recording per contribution, and treat a repeated trxn_id as idempotent,
+    // to guard against a payment processor webhook racing a synchronous confirmation of the
+    // same charge (e.g. via CRM_Contribute_Form_Contribution_Confirm).
+    $lock = \Civi::lockManager()->acquire('data.contribute.paymentCreate.' . $params['contribution_id'], self::PAYMENT_CREATE_LOCK_TIMEOUT);
+    if (!$lock->isAcquired()) {
+      throw new CRM_Core_Exception(ts('Could not acquire a lock to record a payment for contribution %1. Another payment may currently be being recorded for the same contribution.', [
+        1 => $params['contribution_id'],
+      ]), 'payment_create_lock_failed');
+    }
+    try {
+      if (!empty($params['trxn_id'])) {
+        // Match total_amount too - a refund shares the payment's trxn_id but is a negative-amount
+        // payment (not a distinct is_payment=0 row), so trxn_id alone could match either.
+        $existingTrxnID = Payment::get(FALSE)
+          ->addWhere('contribution_id', '=', $params['contribution_id'])
+          ->addWhere('trxn_id', '=', $params['trxn_id'])
+          ->addWhere('total_amount', '=', $params['total_amount'])
+          ->addSelect('id')
+          ->execute()
+          ->first()['id'] ?? NULL;
+        if ($existingTrxnID) {
+          // Already recorded by a concurrent call - return it rather than duplicating it.
+          return CRM_Financial_DAO_FinancialTrxn::findById($existingTrxnID);
+        }
+      }
+      return self::completePayment($params, $disableActionsOnCompleteOrder);
+    }
+    finally {
+      $lock->release();
+    }
+  }
+
+  /**
+   * @param array $params
+   * @param bool $disableActionsOnCompleteOrder
+   *
+   * @return \CRM_Financial_DAO_FinancialTrxn
+   * @throws \CRM_Core_Exception
+   */
+  private static function completePayment(array $params, $disableActionsOnCompleteOrder): CRM_Financial_DAO_FinancialTrxn {
     $contribution = Contribution::get(FALSE)
       ->addWhere('id', '=', $params['contribution_id'])
       ->addSelect('*', 'contribution_status_id:name', 'balance_amount', 'paid_amount')
@@ -121,7 +170,22 @@ class CRM_Financial_BAO_Payment {
       ];
 
       $trxnParams = array_merge($paymentTrxnParams, $trxnParams);
-      CRM_Core_BAO_FinancialTrxn::recordFees($trxnParams);
+      $amount = 0;
+      if (!empty($trxnParams['prevContribution'])) {
+        // Presumably unreachable - from shared code.
+        $amount = $trxnParams['prevContribution']->fee_amount;
+      }
+      $amount = $trxnParams['fee_amount'] - $amount;
+      if ($amount) {
+        if (empty($params['financial_type_id'])) {
+          // probably get from above. Previously shared code.
+          $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'financial_type_id', 'id');
+        }
+        else {
+          $financialTypeId = $params['financial_type_id'];
+        }
+        CRM_Core_BAO_FinancialTrxn::recordFees($trxnParams, $amount, $params['contribution_id'], $financialTypeId);
+      }
     }
 
     if ($params['total_amount'] < 0 && !empty($params['cancelled_payment_id'])) {
@@ -232,7 +296,7 @@ class CRM_Financial_BAO_Payment {
     $contributionDAO->id = $contributionID;
     $contributionDAO->find(TRUE);
     if (isset($params['fee_amount'])) {
-      // Update contribution.fee_amount to be be the total of all fees
+      // Update contribution.fee_amount to be the total of all fees
       // since the payment is already saved the total here will be right.
       $payments = civicrm_api3('Payment', 'get', [
         'contribution_id' => $contributionID,
@@ -494,6 +558,8 @@ class CRM_Financial_BAO_Payment {
       $ratio = 0;
     }
 
+    $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount'], '');
+
     $items = LineItem::get(FALSE)
       ->addSelect('*', 'financial_item.status_id:name', 'financial_item.id', 'financial_item.financial_account_id', 'financial_item_id.currency', 'financial_item.financial_account_id.is_tax', 'financial_item.entity_id', 'financial_item.amount', 'allocated.amount')
       ->addJoin(
@@ -548,6 +614,7 @@ class CRM_Financial_BAO_Payment {
     }
 
     $payableItems = [];
+    $payableItemIndex = NULL;
 
     foreach ($items as $item) {
       $lineItemID = $item['id'];
@@ -591,13 +658,39 @@ class CRM_Financial_BAO_Payment {
       }
       else {
         if (empty($item['balance']) && !empty($ratio) && $params['total_amount'] < 0) {
-          $item['allocation'] = $item['item_total'] * $ratio;
+          $item['allocation'] = round($item['item_total'] * $ratio, 2);
+        }
+        elseif ($isPaymentCompletesContribution) {
+          $item['allocation'] = $item['balance'];
         }
         else {
-          $item['allocation'] = $item['balance'] * $ratio;
+          $item['allocation'] = round($item['balance'] * $ratio, 2);
         }
       }
       $payableItems[$payableItemIndex] = $item;
+    }
+
+    if (empty($lineItemAllocations) && !empty($ratio) && isset($payableItems[$payableItemIndex])) {
+      $totalTaxAllocation = 0;
+      $totalAllocation = 0;
+      $lastNonTaxKey = $payableItemIndex;
+
+      foreach ($payableItems as $key => $item) {
+        if ($item['financial_item.financial_account_id.is_tax']) {
+          $totalTaxAllocation += $item['allocation'];
+        }
+        else {
+          $totalAllocation += $item['allocation'];
+          $lastNonTaxKey = $key;
+        }
+      }
+
+      $total = $totalTaxAllocation + $totalAllocation;
+      $leftPayment = $params['total_amount'] - $total;
+
+      if ($lastNonTaxKey !== NULL && $leftPayment > 0) {
+        $payableItems[$lastNonTaxKey]['allocation'] += $leftPayment;
+      }
     }
 
     return $payableItems;

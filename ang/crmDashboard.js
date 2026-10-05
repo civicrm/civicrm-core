@@ -1,6 +1,6 @@
-(function(angular, $, _) {
+(function(angular, $) {
   angular.module('crmDashboard', CRM.angRequires('crmDashboard'));
 
   angular.module('crmDashboard', CRM.angular.modules);
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

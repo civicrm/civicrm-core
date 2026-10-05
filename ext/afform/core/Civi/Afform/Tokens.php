@@ -181,7 +181,7 @@ class Tokens extends AutoService implements EventSubscriberInterface {
     if (!isset(\Civi::$statics[__CLASS__]['tokenForms'])) {
       $tokenForms = (array) \Civi\Api4\Afform::get(FALSE)
         ->addWhere('placement', 'CONTAINS', static::$placement)
-        ->addSelect('name', 'title', 'server_route', 'is_public')
+        ->addSelect('name', 'title', 'server_route', 'is_public', 'authx_timeout', 'authx_redirect')
         ->execute()
         ->indexBy('name');
       \Civi::$statics[__CLASS__]['tokenForms'] = $tokenForms;
@@ -201,8 +201,8 @@ class Tokens extends AutoService implements EventSubscriberInterface {
    * @throws \Civi\Crypto\Exception\CryptoException
    */
   public static function createUrl($afform, $contactId, array $afformArgs = []): string {
-    $expires = \CRM_Utils_Time::time() +
-      (\Civi::settings()->get('checksum_timeout') * 24 * 60 * 60);
+    $timeout = !empty($afform['authx_timeout']) ? $afform['authx_timeout'] : \Civi::settings()->get('checksum_timeout');
+    $expires = \CRM_Utils_Time::time() + ($timeout * 24 * 60 * 60);
 
     /** @var \Civi\Crypto\CryptoJwt $jwt */
     $jwt = \Civi::service('crypto.jwt');
@@ -219,7 +219,11 @@ class Tokens extends AutoService implements EventSubscriberInterface {
       'afform' => $afform['name'],
       'afformArgs' => $afformArgs,
     ]);
-    return $url->addQuery(['_aff' => $bearerToken]);
+    $query = ['_aff' => $bearerToken];
+    if (!empty($afform['authx_redirect'])) {
+      $query['_authxRedir'] = $afform['authx_redirect'];
+    }
+    return $url->addQuery($query);
   }
 
   /**

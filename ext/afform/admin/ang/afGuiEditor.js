@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('afGuiEditor', CRM.angRequires('afGuiEditor'))
@@ -10,11 +10,11 @@
       const doNotEval = ['filters'];
 
       function evaluate(collection) {
-        _.each(collection, function(item) {
-          if (_.isPlainObject(item)) {
+        (collection || []).forEach((item) => {
+          if (isPlainObject(item)) {
             evaluate(item['#children']);
-            _.each(item, function(prop, key) {
-              if (_.isString(prop) && !_.includes(doNotEval, key)) {
+            Object.entries(item).forEach(([key, prop]) => {
+              if (typeof prop === 'string' && !doNotEval.includes(key)) {
                 if (looksLikeJs(prop)) {
                   try {
                     item[key] = $parse(prop)({ts: CRM.ts('afform')});
@@ -28,7 +28,7 @@
       }
 
       function looksLikeJs(str) {
-        str = _.trim(str);
+        str = str.trim();
         let firstChar = str.charAt(0);
         let lastChar = str.slice(-1);
         return (firstChar === '{' && lastChar === '}') ||
@@ -103,10 +103,11 @@
       function modifyClasses(node, toRemove, toAdd) {
         let classes = splitClass(node['class']);
         if (toRemove) {
-          classes = _.difference(classes, splitClass(toRemove));
+          const removing = splitClass(toRemove);
+          classes = classes.filter((c) => !removing.includes(c));
         }
         if (toAdd) {
-          classes = _.unique(classes.concat(splitClass(toAdd)));
+          classes = [...new Set(classes.concat(splitClass(toAdd)))];
         }
         if (classes.length) {
           node['class'] = classes.join(' ');
@@ -140,10 +141,28 @@
         return CRM.afGuiEditor.entities[entityName];
       }
 
+      // Turn a search criteria into a predicate; criteria may already be a callback,
+      // or an object of property values which must all match exactly.
+      // Form definitions are arrays of nodes, where a node is either a string of text or an object describing an element.
+      function isPlainObject(item) {
+        return item !== null && typeof item === 'object' &&
+          (Object.getPrototypeOf(item) === Object.prototype || Object.getPrototypeOf(item) === null);
+      }
+
+      function matches(criteria) {
+        if (typeof criteria === 'function') {
+          return criteria;
+        }
+        const keys = Object.keys(criteria);
+        return (item) => item != null && keys.every((key) => item[key] === criteria[key]);
+      }
+
       return {
+        matches: matches,
+        isPlainObject: isPlainObject,
         // Called when loading a new afform for editing - clears out stale metadata
         resetMeta: function() {
-          _.each(CRM.afGuiEditor.entities, function(entity, type) {
+          Object.entries(CRM.afGuiEditor.entities || {}).forEach(([type, entity]) => {
             // Skip the "*" pseudo-entity which should always have an empty list of fields
             if (entity.fields && type !== '*') {
               delete entity.fields;
@@ -162,7 +181,7 @@
             CRM.afGuiEditor.blocks[data.definition.directive_name] = data.definition;
           }
           // Add new or updated blocks
-          _.each(data.blocks, function(block) {
+          (data.blocks || []).forEach((block) => {
             // Avoid overwriting complete block record with an incomplete one
             if (!CRM.afGuiEditor.blocks[block.directive_name] || block.layout) {
               if (block.layout) {
@@ -173,25 +192,25 @@
           });
           // Add behavior data
           CRM.afGuiEditor.behaviors = CRM.afGuiEditor.behaviors || {};
-          _.extend(CRM.afGuiEditor.behaviors, data.behaviors);
+          Object.assign(CRM.afGuiEditor.behaviors, data.behaviors);
           // Add entities
-          _.each(data.entities, function(entity, entityName) {
+          Object.entries(data.entities || {}).forEach(([entityName, entity]) => {
             if (!CRM.afGuiEditor.entities[entityName]) {
               CRM.afGuiEditor.entities[entityName] = entity;
             }
           });
           // Combine entities with fields
-          _.each(data.fields, function(fields, entityName) {
+          Object.entries(data.fields || {}).forEach(([entityName, fields]) => {
             if (CRM.afGuiEditor.entities[entityName]) {
               CRM.afGuiEditor.entities[entityName].fields = fields;
             }
           });
-          _.each(data.search_displays, function(display) {
+          (data.search_displays || []).forEach((display) => {
             CRM.afGuiEditor.searchDisplays[display['saved_search_id.name'] + (display.name ? '.' + display.name : '')] = display;
           });
         },
 
-        meta: _.extend(CRM.afGuiEditor, CRM.afAdmin),
+        meta: Object.assign(CRM.afGuiEditor, CRM.afAdmin),
 
         getEntity: getEntity,
 
@@ -258,7 +277,7 @@
             fields: mainEntity.fields
           }];
 
-          _.each(display['saved_search_id.api_params'].join, function(join) {
+          (display['saved_search_id.api_params'].join || []).forEach((join) => {
             const joinInfo = join[0].split(' AS ');
             const entity = getEntity(joinInfo[0]);
             const bridgeEntity = getEntity(join[2]);
@@ -275,7 +294,7 @@
                 name: bridgeEntity.entity,
                 prefix: joinInfo[1] + '.',
                 label: formValues.join[joinInfo[1]] + ' ' + bridgeEntity.label,
-                fields: _.omit(bridgeEntity.fields, _.keys(entity.fields)),
+                fields: Object.fromEntries(Object.entries(bridgeEntity.fields || {}).filter(([name]) => !(name in (entity.fields || {})))),
               });
             }
           });
@@ -314,19 +333,19 @@
           return {results: fieldGroups};
         },
 
-        // Recursively searches a collection and its children using _.filter
+        // Recursively searches a collection and its children
         // Returns an array of all matches, or an object if the indexBy param is used
         findRecursive: function findRecursive(collection, predicate, indexBy) {
-          const items = _.filter(collection, predicate);
-          _.each(collection, function(item) {
-            if (_.isPlainObject(item) && item['#children']) {
+          const items = (collection || []).filter(matches(predicate));
+          (collection || []).forEach((item) => {
+            if (isPlainObject(item) && item['#children']) {
               const childMatches = findRecursive(item['#children'], predicate);
               if (childMatches.length) {
                 Array.prototype.push.apply(items, childMatches);
               }
             }
           });
-          return indexBy ? _.indexBy(items, indexBy) : items;
+          return indexBy ? Object.fromEntries(items.map((item) => [item[indexBy], item])) : items;
         },
 
         // Recursively searches part of a form and returns all elements matching predicate
@@ -334,14 +353,11 @@
         // Will stop recursing when it encounters an element matching 'exclude'
         getFormElements: function getFormElements(collection, predicate, exclude) {
           let childMatches = [];
-          let items = _.filter(collection, predicate);
-          let isExcluded = exclude ? (_.isFunction(exclude) ? exclude : _.matches(exclude)) : _.constant(false);
+          let items = (collection || []).filter(matches(predicate));
+          const isExcluded = exclude ? matches(exclude) : () => false;
 
-          function isIncluded(item) {
-            return !isExcluded(item);
-          }
-          _.each(_.filter(collection, isIncluded), function(item) {
-            if (_.isPlainObject(item) && item['#children']) {
+          (collection || []).filter((item) => !isExcluded(item)).forEach((item) => {
+            if (isPlainObject(item) && item['#children']) {
               childMatches = getFormElements(item['#children'], predicate, exclude);
             } else if (item['#tag'] && item['#tag'] in CRM.afGuiEditor.blocks) {
               childMatches = getFormElements(CRM.afGuiEditor.blocks[item['#tag']].layout, predicate, exclude);
@@ -353,11 +369,17 @@
           return items;
         },
 
-        // Applies _.remove() to an item and its children
+        // Removes every matching item from a collection and its children
         removeRecursive: function removeRecursive(collection, removeParams) {
-          _.remove(collection, removeParams);
-          _.each(collection, function(item) {
-            if (_.isPlainObject(item) && item['#children']) {
+          const isMatch = matches(removeParams);
+          // Walk backwards so splicing doesn't shift items yet to be checked
+          for (let i = (collection || []).length - 1; i >= 0; i--) {
+            if (isMatch(collection[i])) {
+              collection.splice(i, 1);
+            }
+          }
+          (collection || []).forEach((item) => {
+            if (isPlainObject(item) && item['#children']) {
               removeRecursive(item['#children'], removeParams);
             }
           });
@@ -402,9 +424,9 @@
             return [];
           }
           // Split contents by commas, ignoring commas inside quotes
-          const rawValues = _.trim(filterString, '{}').split(/,(?=(?:(?:[^']*'){2})*[^']*$)/);
+          const rawValues = filterString.replace(/^[{}]+|[{}]+$/g, '').split(/,(?=(?:(?:[^']*'){2})*[^']*$)/);
           return rawValues.map((raw) => {
-            raw = _.trim(raw);
+            raw = raw.trim();
             let split;
             if (raw.charAt(0) === '"') {
               split = raw.slice(1).split(/"[ ]*:/);
@@ -413,8 +435,8 @@
             } else {
               split = raw.split(':');
             }
-            const key = _.trim(split[0]);
-            const value = _.trim(split[1]);
+            const key = split[0].trim();
+            const value = (split[1] || '').trim();
             let mode = 'val';
             if (value.startsWith('routeParams')) {
               mode = 'routeParams';
@@ -506,4 +528,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

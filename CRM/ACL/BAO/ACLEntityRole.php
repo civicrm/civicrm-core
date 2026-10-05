@@ -32,49 +32,4 @@ class CRM_ACL_BAO_ACLEntityRole extends CRM_ACL_DAO_ACLEntityRole {
     ];
   }
 
-  /**
-   * @param array $params
-   *
-   * @deprecated
-   * @return CRM_ACL_BAO_ACLEntityRole
-   */
-  public static function create(&$params) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return self::writeRecord($params);
-  }
-
-  /**
-   * @deprecated
-   * @param array $params
-   * @param array $defaults
-   * @return self|null
-   */
-  public static function retrieve($params, &$defaults) {
-    CRM_Core_Error::deprecatedFunctionWarning('API');
-    return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
-   * @deprecated - this bypasses hooks.
-   * @param int $id
-   * @param bool $is_active
-   * @return bool
-   */
-  public static function setIsActive($id, $is_active) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
-    return CRM_Core_DAO::setFieldValue(__CLASS__, $id, 'is_active', $is_active);
-  }
-
-  /**
-   * Delete Dedupe Entity Role records.
-   *
-   * @param int $entityRoleId
-   *   ID of the EntityRole record to be deleted.
-   * @deprecated
-   */
-  public static function del($entityRoleId) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return self::deleteRecord(['id' => $entityRoleId]);
-  }
-
 }

@@ -32,7 +32,7 @@
             <br /><span class="description html-adjust">{ts}Descriptive title of message - used for template selection.{/ts}</span>
           </td>
         </tr>
-        <tr>
+        <tr {if $isDocumentOnly}style="display:none"{/if}>
           <td class="label-left">{$form.file_type.label}</td>
           <td>{$form.file_type.html}
             <br /><span class="description html-adjust">{ts}Compose a message on-screen for general use in emails or document output, or upload a pre-composed document for mail-merge.{/ts}</span>
@@ -75,15 +75,15 @@
           </div>
           <div class="clear"></div>
           <div class='html'>
-            {$form.msg_html.html|crmAddClass:huge}
+            {$form.msg_html.html}
           </div>
         </div>
       </details>
 
-      <details id="msg_text_section" class="crm-accordion-bold crm-plaint_text_email-accordion " open>
+      <details id="msg_text_section" class="crm-accordion-bold crm-plaint_text_email-accordion">
         <summary>
           {ts}Optional Plain-Text Format{/ts}
-          {help id="msg_text" file="CRM/Contact/Form/Task/Email.hlp" title=$form.msg_text.textLabel}
+          {help id="text_message" file="CRM/Contact/Form/Task/Email.hlp" title=$form.msg_text.textLabel}
         </summary>
         <div class="crm-accordion-body">
           <div class="helpIcon" id="helptext">
@@ -92,7 +92,7 @@
           </div>
           <div class="clear"></div>
           <div class='text'>
-            {$form.msg_text.html|crmAddClass:huge}
+            {$form.msg_text.html}
           </div>
         </div>
       </details>

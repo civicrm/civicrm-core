@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmDashboard').component('crmDashboard', {
     templateUrl: '~/crmDashboard/Dashboard.html',
@@ -126,7 +126,7 @@
         $element.find('.crm-inactive-dashlet-fieldset summary').off('click');
       };
 
-      const save = _.debounce(() => {
+      const save = CRM.utils.debounce(() => {
         $scope.$apply(() => {
           const toSave = [];
           // Include both resolved inactive dashlets and pending removals in deactivation
@@ -250,4 +250,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

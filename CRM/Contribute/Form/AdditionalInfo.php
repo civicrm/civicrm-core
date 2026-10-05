@@ -174,8 +174,6 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @throws \CRM_Core_Exception
    */
   public static function emailReceipt($form, &$params) {
-    $form->assign('receiptType', 'contribution');
-
     // retrieve individual prefix value for honoree
     if (isset($params['soft_credit'])) {
       $softCreditTypes = $softCredits = [];
@@ -190,66 +188,9 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->assign('softCredits', $softCredits);
     }
 
-    // retrieve premium product name and assigned fulfilled
-    // date to template
-    if (!empty($params['hidden_Premium'])) {
-      if (isset($params['product_name']) &&
-        is_array($params['product_name']) &&
-        !empty($params['product_name'])
-      ) {
-        $productDAO = new CRM_Contribute_DAO_Product();
-        $productDAO->id = $params['product_name'][0];
-        $productOptionID = $params['product_name'][1];
-        $productDAO->find(TRUE);
-        $params['product_name'] = $productDAO->name;
-        $params['product_sku'] = $productDAO->sku;
-
-        if (empty($params['product_option']) && !empty($form->_options[$productDAO->id])) {
-          $params['product_option'] = $form->_options[$productDAO->id][$productOptionID];
-        }
-      }
-      if (!empty($params['fulfilled_date'])) {
-        $form->assign('fulfilled_date', $params['fulfilled_date']);
-      }
-    }
-
     $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
     $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
 
-    //handle custom data
-    if (!empty($params['hidden_custom'])) {
-      $contribParams = [['contribution_id', '=', $params['contribution_id'], 0, 0]];
-      if ($form->_mode == 'test') {
-        $contribParams[] = ['contribution_test', '=', 1, 0, 0];
-      }
-
-      //retrieve custom data
-      $customGroup = [];
-
-      foreach ($form->_groupTree as $groupID => $group) {
-        $customFields = $customValues = [];
-        if ($groupID == 'info') {
-          continue;
-        }
-
-        $is_public = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupID, 'is_public');
-        if (!$is_public) {
-          continue;
-        }
-        foreach ($group['fields'] as $k => $field) {
-          $field['title'] = $field['label'];
-          $customFields["custom_{$k}"] = $field;
-        }
-
-        //build the array of customgroup contain customfields.
-        CRM_Core_BAO_UFGroup::getValues($params['contact_id'], $customFields, $customValues, FALSE, $contribParams);
-        $customGroup[$group['title']] = $customValues;
-      }
-      //assign all custom group and corresponding fields to template.
-      $form->assign('customGroup', $customGroup);
-    }
-
-    $form->assign('formValues', $params);
     list($contributorDisplayName,
       $contributorEmail
       ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);

@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MailingEventQueue;
 use Civi\Token\TokenProcessor;
 
 /**
@@ -35,9 +36,8 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
    * @return array|null
    *   $groups    Array of all groups to which the contact was added, or null if the queue event could not be found.
    */
-  public static function &resub_to_mailing($job_id, $queue_id, $hash) {
+  public static function resub_to_mailing($job_id, $queue_id, $hash) {
     // First make sure there's a matching queue event.
-
     $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
     $success = NULL;
     if (!$q) {
@@ -56,22 +56,17 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
 
     $transaction = new CRM_Core_Transaction();
     // We Need the mailing Id for the hook...
-    $mailing_id = CRM_Core_DAO::singleValueQuery("SELECT mailing_id as mailing_id
-                     FROM civicrm_mailing_job
-                     WHERE id = " . CRM_Utils_Type::escape($job_id, 'Integer'));
+    $mailing_id = (int) $q->mailing_id;
 
     $do = CRM_Core_DAO::executeQuery("
             SELECT      mailing_group.entity_table as entity_table,
                         mailing_group.entity_id as entity_id
             FROM        civicrm_mailing_group as mailing_group
-            INNER JOIN  civicrm_mailing_job as job
-                ON      job.mailing_id = mailing_group.mailing_id
             INNER JOIN  civicrm_group
                 ON      mailing_group.entity_id = civicrm_group.id
-            WHERE       job.id = " . CRM_Utils_Type::escape($job_id, 'Integer') . "
+            WHERE       mailing_group.mailing_id = %1
                 AND     mailing_group.group_type IN ( 'Include', 'Base' )
-                AND     civicrm_group.is_hidden = 0"
-    );
+                AND     civicrm_group.is_hidden = 0", [1 => [$mailing_id, 'Integer']]);
 
     // Make a list of groups and a list of prior mailings that received
     // this mailing.
@@ -135,7 +130,7 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
     foreach ($groups as $group_id => $group_name) {
       $notadded = 0;
       if ($group_name) {
-        list($total, $added, $notadded) = CRM_Contact_BAO_GroupContact::addContactsToGroup($contacts, $group_id, 'Email');
+        [$total, $added, $notadded] = CRM_Contact_BAO_GroupContact::addContactsToGroup($contacts, $group_id, 'Email');
       }
       if ($notadded) {
         unset($groups[$group_id]);
@@ -165,27 +160,17 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
    * @param int $job
    *   The job ID.
    */
-  public static function send_resub_response($queue_id, $groups, $job) {
-    // param is_domain is not supported as of now.
-
-    $jobTable = CRM_Mailing_BAO_MailingJob::getTableName();
-    $mailingTable = CRM_Mailing_DAO_Mailing::getTableName();
-    $contacts = CRM_Contact_DAO_Contact::getTableName();
-    $email = CRM_Core_DAO_Email::getTableName();
-    $queue = CRM_Mailing_Event_BAO_MailingEventQueue::getTableName();
-
+  public static function send_resub_response($queue_id, $groups, $job): void {
     //get the default domain email address.
-    list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
-    $dao = new CRM_Mailing_BAO_Mailing();
-    $dao->query("   SELECT * FROM $mailingTable
-                        INNER JOIN $jobTable ON
-                            $jobTable.mailing_id = $mailingTable.id
-                        WHERE $jobTable.id = $job");
-    $dao->fetch();
+    $mailingEvent = MailingEventQueue::get(FALSE)
+      ->addWhere('id', '=', $queue_id)
+      ->addSelect('mailing_id', 'mailing_id.resubscribe_id')
+      ->execute()->single();
 
     $component = new CRM_Mailing_BAO_MailingComponent();
-    $component->id = $dao->resubscribe_id;
+    $component->id = $mailingEvent['mailing_id.resubscribe_id'];
     $component->find(TRUE);
 
     $html = $component->body_html;
@@ -196,16 +181,15 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
       $text = CRM_Utils_String::htmlToText($component->body_html);
     }
 
-    $eq = new CRM_Core_DAO();
-    $eq->query(
+    $eq = CRM_Core_DAO::executeQuery(
       "SELECT
-                    $contacts.id as contact_id,
-                    $email.email as email,
-                    $queue.hash as hash
-        FROM        $contacts
-        INNER JOIN  $queue ON $queue.contact_id = $contacts.id
-        INNER JOIN  $email ON $queue.email_id = $email.id
-        WHERE       $queue.id = " . CRM_Utils_Type::escape($queue_id, 'Integer')
+                    contact.id as contact_id,
+                    email.email as email,
+                    queue.hash as hash
+        FROM        civicrm_contact contact
+        INNER JOIN  civicrm_mailing_event_queue queue ON queue.contact_id = contact.id
+        INNER JOIN  civicrm_email email ON queue.email_id = email.id
+        WHERE       queue.id = " . CRM_Utils_Type::escape($queue_id, 'Integer')
     );
     $eq->fetch();
     foreach ($groups as $key => $value) {
@@ -214,25 +198,21 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
       }
     }
 
-    list($addresses, $urls) = CRM_Mailing_BAO_Mailing::getVerpAndUrls($job, $queue_id, $eq->hash);
     $bao = new CRM_Mailing_BAO_Mailing();
     $bao->body_text = $text;
     $bao->body_html = $html;
-    $tokens = $bao->getTokens();
     $templates = $bao->getTemplates();
 
     $html = CRM_Utils_Token::replaceResubscribeTokens($templates['html'], NULL, $groups);
-    $html = CRM_Utils_Token::replaceActionTokens($html, $addresses, $urls, TRUE, $tokens['html']);
-    $html = CRM_Utils_Token::replaceMailingTokens($html, $dao, NULL, $tokens['html']);
 
     $text = CRM_Utils_Token::replaceResubscribeTokens($templates['text'], NULL, $groups);
-    $text = CRM_Utils_Token::replaceActionTokens($text, $addresses, $urls, FALSE, $tokens['text']);
-    $text = CRM_Utils_Token::replaceMailingTokens($text, $dao, NULL, $tokens['text']);
 
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,
       'schema' => ['contactId'],
+      'mailingId' => $mailingEvent['mailing_id'],
+      'mailingEventQueueId' => $queue_id,
     ]);
 
     $tokenProcessor->addMessage('body_html', $html, 'text/html');

@@ -95,7 +95,7 @@ class CRM_Core_CommunityMessages {
       $isChanged = TRUE;
     }
 
-    $refTime = CRM_Utils_Time::getTimeRaw();
+    $refTime = CRM_Utils_Time::time();
     if ($document['expires'] <= $refTime) {
       $newDocument = $this->fetchDocument();
       if ($newDocument && $this->validateDocument($newDocument)) {

@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Email;
+use Civi\Api4\MailingComponent;
+
 /**
  *  Test APIv3 civicrm_mailing_group_* functions
  *
@@ -16,6 +19,7 @@
  * @group headless
  */
 class api_v3_MailingGroupTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   public function setUp(): void {
     parent::setUp();
@@ -49,14 +53,24 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test civicrm_mailing_group_event_unsubscribe with wrong params.
+   * Test civicrm_mailing_event_unsubscribe.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testMailerGroupUnsubscribeWrongParams(): void {
-    $this->callAPIFailure('MailingEventUnsubscribe', 'create', [
-      'job_id' => 'Wrong ID',
-      'event_queue_id' => 'Wrong ID',
-      'hash' => 'Wrong Hash',
+  public function testMailerGroupUnsubscribe(): void {
+    $this->setupMailing();
+    $params = [
+      'event_queue_id' => $this->ids['MailingEventQueue']['default'],
+      'hash' => 'brown',
       'time_stamp' => '20101212121212',
+    ];
+    $mail = new CiviMailUtils($this);
+    $this->callAPISuccess('MailingEventUnsubscribe', 'create', $params);
+    $mail->checkMailLog([
+      'mailto:e..1.brown@EXAMPLE.ORG',
+      'You have been un-subscribed from the following groups',
+      'I approve',
+      'civicrm/mailing/resubscribe',
     ]);
   }
 
@@ -76,15 +90,22 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
   /**
    * Test civicrm_mailing_group_event_resubscribe with wrong params.
    */
-  public function testMailerGroupResubscribeWrongParams(): void {
+  public function testMailerGroupResubscribe(): void {
+    $this->setupMailing();
     $params = [
-      'job_id' => 'Wrong ID',
-      'event_queue_id' => 'Wrong ID',
-      'hash' => 'Wrong Hash',
-      'org_unsubscribe' => 'test',
+      'event_queue_id' => $this->ids['MailingEventQueue']['default'],
+      'hash' => 'brown',
       'time_stamp' => '20101212121212',
     ];
-    $this->callAPIFailure('mailing_event_resubscribe', 'create', $params);
+    $mail = new CiviMailUtils($this);
+    $this->callAPISuccess('MailingEventUnsubscribe', 'create', $params);
+    $this->callAPISuccess('MailingEventResubscribe', 'create', $params);
+    $mail->checkMailLog([
+      'mailto:u..' . $this->ids['MailingEventQueue']['default'] . '.brown@EXAMPLE.ORG',
+      'You have been re-subscribed to the following groups',
+      'I approve',
+      'civicrm/mailing/unsubscribe',
+    ]);
   }
 
   /**
@@ -144,6 +165,45 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $this->callAPISuccess('mailing_event_confirm', 'create', $params);
     $this->contactDelete($contactID);
     Civi::settings()->set('include_message_id', 0);
+  }
+
+  public function setupMailing(): void {
+    try {
+      MailingComponent::update(FALSE)
+        ->addWhere('name', '=', 'Unsubscribe Message')
+        ->setValues([
+          'body_html' => '{mailing.approvalNote} - You have been un-subscribed from the following groups: {unsubscribe.group}. You can re-subscribe by mailing {action.resubscribe} or clicking <a href="{action.resubscribeUrl}">here</a>.',
+          'body_text' => '{mailing.approvalNote} - You have been un-subscribed from the following groups: {unsubscribe.group}. You can re-subscribe by mailing {action.resubscribe} or clicking {action.resubscribeUrl}',
+        ])->execute();
+
+      MailingComponent::update(FALSE)
+        ->addWhere('name', '=', 'Resubscribe Message')
+        ->setValues([
+          'body_html' => '{mailing.approvalNote} - You have been re-subscribed to the following groups: {resubscribe.group}. You can un-subscribe by mailing {action.unsubscribe} or clicking <a href="{action.unsubscribeUrl}">here</a>.',
+          'body_text' => '{mailing.approvalNote} - You have been re-subscribed to the following groups: {resubscribe.group}. You can un-subscribe by mailing {action.unsubscribe} or clicking {action.unsubscribeUrl}',
+        ])->execute();
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->fail($e->getMessage());
+    }
+    $this->createTestEntity('Mailing', ['name' => 'mail', 'approval_note' => 'I approve']);
+    $this->createTestEntity('Group', ['name' => 'group', 'frontend_title' => 'group']);
+    $this->createTestEntity('MailingGroup', [
+      'mailing_id' => $this->ids['Mailing']['default'],
+      'group_type' => 'Include',
+      'entity_table' => 'civicrm_group',
+      'entity_id' => $this->ids['Group']['default'],
+    ]);
+    $this->createTestEntity('MailingEventQueue', [
+      'contact_id' => $this->individualCreate(),
+      'hash' => 'brown',
+      'email_id' => Email::get(FALSE)
+        ->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])
+        ->setLimit(1)
+        ->execute()
+        ->single(),
+      'mailing_id' => $this->ids['Mailing']['default'],
+    ]);
   }
 
 }

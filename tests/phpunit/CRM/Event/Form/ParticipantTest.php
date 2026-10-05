@@ -1,13 +1,19 @@
 <?php
 
 declare(strict_types = 1);
+use Civi\Api4\Activity;
 use Civi\Api4\Address;
+use Civi\Api4\Contribution;
 use Civi\Api4\Event;
+use Civi\Api4\FinancialItem;
 use Civi\Api4\LineItem;
 use Civi\Api4\LocBlock;
 use Civi\Api4\MessageTemplate;
 use Civi\Api4\Participant;
+use Civi\Api4\Payment;
 use Civi\Api4\Phone;
+use Civi\Api4\PriceFieldValue;
+use Civi\Payment\System;
 use Civi\Test\FormTrait;
 use Civi\Test\FormWrapper;
 use Civi\Test\FormWrappers\EventFormParticipant;
@@ -85,6 +91,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->execute()
       ->first();
     $this->assertEqualsCanonicalizing(['Volunteer', 'Speaker'], $participant['role_id:name']);
+
+    $activity = Activity::get(FALSE)
+      ->addWhere('activity_type_id:name', '=', 'Email')
+      ->addSelect('subject')
+      ->execute()->single();
+    $this->assertStringContainsString('Volunteer, Speaker', $activity['subject']);
+    $this->assertStringContainsString(CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'status_id', 1), $activity['subject']);
   }
 
   public function testSubmitWithCustomData(): void {
@@ -98,6 +111,25 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       $this->getCustomFieldName() => 'Random thing',
     ])->postProcess()->getFirstMailBody();
     $this->assertStringContainsStrings($email, ['Enter text here', 'Random thing', 'Group with field text']);
+  }
+
+  /**
+   * Test that custom data submitted with a paid, record-contribution
+   * registration is saved against the participant - this goes through
+   * saveOrder() rather than the addParticipant() path testSubmitWithCustomData()
+   * covers.
+   */
+  public function testSubmitWithCustomDataAndRecordContribution(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Participant', 'extends_entity_column_id' => 1, 'extends_entity_column_value' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')]);
+    $this->getForm(['is_monetary' => TRUE], [
+      $this->getCustomFieldName() => 'Random thing',
+    ])->postProcess();
+    $participant = \Civi\Api4\Participant::get()
+      ->addSelect($this->getCustomFieldName('text', 4))
+      ->addOrderBy('id', 'DESC')
+      ->execute()
+      ->first();
+    $this->assertEquals('Random thing', $participant[$this->getCustomFieldName('text', 4)]);
   }
 
   /**
@@ -130,8 +162,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   public function testSubmitUnpaidPriceChangeWhileStillPending(): void {
     $this->eventCreatePaid();
-    $_REQUEST['cid'] = $this->individualCreate();
-    $form = $this->getFormObject('CRM_Event_Form_Participant', [
+    $this->getTestForm('CRM_Event_Form_Participant', [
       'register_date' => date('Ymd'),
       'payment_processor_id' => 0,
       'record_contribution' => TRUE,
@@ -152,11 +183,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'source' => 'I wrote this',
       'note' => 'I wrote a note',
       'event_id' => $this->getEventID(),
-
-    ]);
-    $form->preProcess();
-    $form->buildForm();
-    $form->postProcess();
+    ], ['cid' => $this->individualCreate()])
+      ->postProcess();;
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['version' => 4]);
     $this->assertEquals(2, $contribution['contribution_status_id']);
@@ -177,8 +205,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $this->assertEquals(100, $participant['participant_fee_amount']);
 
-    $priceSetParams[$this->getPriceFieldKey()] = $this->ids['PriceFieldValue']['PaidEvent_family_package'];
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id']);
+    $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
+      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
+      'status_id' => $participant['participant_status_id'],
+    ], [
+      'id' => $participant['id'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
     // Check that no payment records have been created.
     // In https://lab.civicrm.org/dev/financial/issues/94 we had an issue where payments were created when none happened.
     $payments = $this->callAPISuccess('Payment', 'get', [])['values'];
@@ -198,6 +231,47 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       $sum += $financialItem['amount'];
     }
     $this->assertEquals(1550.55, $sum);
+  }
+
+  /**
+   * Test that a non-deductible amount configured on the selected price
+   * field value is copied onto the Contribution created for a paid,
+   * record-contribution registration.
+   *
+   * @see https://lab.civicrm.org/dev/core/-/work_items/6808
+   *
+   * @throws \Exception
+   */
+  public function testSubmitRecordContributionSetsNonDeductibleAmount(): void {
+    $this->eventCreatePaid();
+    PriceFieldValue::update(FALSE)
+      ->addWhere('id', '=', $this->ids['PriceFieldValue']['PaidEvent_student'])
+      ->setValues(['non_deductible_amount' => 30])
+      ->execute();
+
+    $this->getTestForm('CRM_Event_Form_Participant', [
+      'register_date' => date('Ymd'),
+      'payment_processor_id' => 0,
+      'record_contribution' => TRUE,
+      'financial_type_id' => 1,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      'check_number' => '879',
+      'receive_date' => '2020-01-31 00:51:00',
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'trxn_id' => '',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'total_amount' => '100',
+      'role_id' => [0 => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+      'source' => 'I wrote this',
+      'event_id' => $this->getEventID(),
+      '_qf_default' => '',
+    ], ['cid' => $this->individualCreate()])
+      ->processForm();
+
+    $contribution = Contribution::get(FALSE)->addSelect('non_deductible_amount')->execute()->single();
+    $this->assertEquals(30, $contribution['non_deductible_amount']);
   }
 
   /**
@@ -235,6 +309,100 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test registering for a paid event with price set options selected but
+   * 'Record Contribution' unchecked (no contribution recorded).
+   *
+   * The participant record gets fee_amount/fee_level set directly, and a
+   * LineItem row is written straight against the participant (no
+   * contribution exists to attach it to), with no FinancialItem created -
+   * only the saveOrder()/processPriceSet() path (record_contribution
+   * checked, or an online payment) creates FinancialItem rows.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitNoContributionDoesCreateLineItem(): void {
+    $this->eventCreatePaid([], ['is_quick_config' => TRUE]);
+    $params = [
+      'register_date' => date('Ymd'),
+      'record_contribution' => FALSE,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      'send_receipt' => FALSE,
+      'role_id' => [0 => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+      'source' => 'I wrote this',
+      'event_id' => $this->getEventID(),
+      'contact_id' => $this->individualCreate(),
+      '_qf_default' => '',
+    ];
+    $this->getTestForm('CRM_Event_Form_Participant', $params)->processForm();
+
+    $participant = Participant::get()->addWhere('event_id', '=', $this->getEventID())->execute()->single();
+    $this->assertEquals(100, $participant['fee_amount']);
+
+    $lineItems = LineItem::get()
+      ->addWhere('entity_id', '=', $participant['id'])
+      ->addWhere('entity_table', '=', 'civicrm_participant')
+      ->execute();
+    $this->assertCount(1, $lineItems);
+    $this->assertCount(0, FinancialItem::get()->addWhere('id', '>', 0)->execute());
+  }
+
+  /**
+   * Test that re-submitting an already-paid participant (e.g. to change
+   * status only, with no new payment/contribution) does not duplicate line
+   * items.
+   *
+   * The price fields are still submitted on this second pass (the form
+   * re-submits the current selection), which reaches addParticipant() again,
+   * but since the participant already has a contribution, isReplaceLineItems()
+   * is false there, so the existing contribution-linked line item must be
+   * left alone rather than duplicated.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitEditExistingContributionParticipantDoesNotDuplicateLineItem(): void {
+    $this->eventCreatePaid([], ['is_quick_config' => TRUE]);
+    $params = [
+      'register_date' => date('Ymd'),
+      'payment_processor_id' => 0,
+      'record_contribution' => TRUE,
+      'financial_type_id' => 1,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'check_number' => '879',
+      'trxn_id' => '',
+      'receive_date' => '2020-01-31 00:51:00',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+      'send_receipt' => FALSE,
+      'role_id' => [0 => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Pending from pay later'),
+      'source' => 'I wrote this',
+      'event_id' => $this->getEventID(),
+      'contact_id' => $this->individualCreate(),
+      '_qf_default' => '',
+    ];
+    $this->getTestForm('CRM_Event_Form_Participant', $params)->processForm();
+
+    $participant = Participant::get()->addWhere('event_id', '=', $this->getEventID())->execute()->single();
+    $this->assertCount(1, LineItem::get()
+      ->addWhere('entity_id', '=', $participant['id'])
+      ->addWhere('entity_table', '=', 'civicrm_participant')
+      ->execute());
+
+    $params['record_contribution'] = FALSE;
+    $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Attended');
+    $this->getTestForm('CRM_Event_Form_Participant', $params, ['id' => $participant['id']])->processForm();
+
+    $lineItems = LineItem::get()
+      ->addWhere('entity_id', '=', $participant['id'])
+      ->addWhere('entity_table', '=', 'civicrm_participant')
+      ->execute();
+    $this->assertCount(1, $lineItems);
+  }
+
+  /**
    * (dev/core#310) : Test to ensure payments are correctly allocated, when
    * an event fee is changed for a multi-line item event registration
    *
@@ -249,17 +417,17 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     // 5. Record the additional amount which $40 ($50-$10)
     // Expected : Check the amount of new Financial Item created is $40
     $this->createParticipantRecordsFromTwoFieldPriceSet();
-    $priceSetBlock = CRM_Price_BAO_PriceSet::getSetDetail($this->getPriceSetID('PaidEvent'))[$this->getPriceSetID('PaidEvent')]['fields'];
 
-    $priceSetParams = [
-      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+    $participant = $this->callAPISuccessGetSingle('Participant', []);
+    $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
       // The 1 & 5 refer to qty as they are text fields.
       'price_' . $this->ids['PriceField']['first_text_field'] => 5,
       'price_' . $this->ids['PriceField']['second_text_field'] => 1,
-    ];
-    $participant = $this->callAPISuccess('Participant', 'get', []);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['version' => 4]);
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id']);
+      'status_id' => $participant['participant_status_id'],
+    ], [
+      'id' => $participant['id'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
 
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', [])['values'];
     $sum = 0;
@@ -297,9 +465,8 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   public function testSubmitWithPayment(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
-    $_REQUEST['mode'] = 'live';
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
-    $form = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
+    $form = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
     $this->assertStringContainsStrings($form->getFirstMailBody(), [
       'Junko Adams<br/>',
       '790L Lincoln St S<br />
@@ -308,7 +475,7 @@ United States<br />',
     ]);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $this->assertEquals('2018-09-04 00:00:00', $participant['participant_register_date']);
-    $this->assertEquals('Offline Registration for Event: Annual CiviCRM meet by: ', $participant['participant_source']);
+    $this->assertEquals('Offline Registration for Event: Annual CiviCRM meet by:', $participant['participant_source']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(20, $contribution['total_amount']);
     $this->assertEquals(['Family Deal - 1'], $contribution['amount_level']);
@@ -348,10 +515,33 @@ United States<br />',
   public function testSubmitWithFailedPayment(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
-    $_REQUEST['mode'] = 'live';
-    \Civi\Payment\System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['payment_status_id' => 'failed']);
-    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE);
+    System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['payment_status_id' => 'failed']);
+    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
     $this->assertPrematureExit();
+  }
+
+  /**
+   * Test that a payment processor result that is not 'Completed' does not
+   * cause the contribution to be recorded as Completed.
+   *
+   * Not every declined or unsettled payment causes the payment processor to
+   * throw an exception - some (e.g. an e-check awaiting bank clearance) return
+   * a result with a payment_status of 'Pending' instead. The registration
+   * should not be recorded as paid in full in that case.
+   *
+   * See https://lab.civicrm.org/dev/core/-/work_items/6651
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitWithPendingProcessorPayment(): void {
+    $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
+    System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['message' => 'Awaiting bank clearance']);
+    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
+
+    $contribution = Contribution::get(FALSE)->addSelect('contribution_status_id:name')->execute()->single();
+    $this->assertEquals('Pending', $contribution['contribution_status_id:name']);
+    $payments = Payment::get(FALSE)->execute();
+    $this->assertCount(0, $payments);
   }
 
   /**
@@ -392,10 +582,9 @@ United States<br />',
     // Use the email created as the from email ensuring we are passing a numeric from to test dev/core#1069
     $this->setCurrencySeparators($thousandSeparator);
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
-    $_REQUEST['mode'] = 'Live';
     $submitParams = $this->getSubmitParamsForCreditCardPayment($paymentProcessorID);
     $submitParams['from_email_address'] = $email['id'];
-    $message = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1, 'pay_later_receipt' => 'pay us'], $submitParams, TRUE)->getFirstMail();
+    $message = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1, 'pay_later_receipt' => 'pay us'], $submitParams, TRUE, 'Live')->getFirstMail();
     $participantID = Participant::get()->addWhere('event_id', '=', $this->getEventID('PaidEvent'))->execute()->first()['id'];
     //Check if type is correctly populated in mails.
     //Also check the string email is present not numeric from.
@@ -445,13 +634,14 @@ London,',
    * @param array $eventParams
    * @param array $submittedValues
    * @param bool $isQuickConfig
+   * @param string $mode
    *
    * @return \Civi\Test\FormWrappers\EventFormParticipant
    *
    * @noinspection PhpDocMissingThrowsInspection
    * @noinspection PhpUnhandledExceptionInspection
    */
-  protected function getForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE): EventFormParticipant {
+  protected function getForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE, string $mode = ''): EventFormParticipant {
     $submittedValues['contact_id'] = $this->ids['Contact']['event'] = $this->individualCreate();
 
     if (!empty($eventParams['is_monetary'])) {
@@ -471,7 +661,11 @@ London,',
     $submittedValues['event_id'] = $event['id'];
     $submittedValues['_qf_default'] = 'Builder:refresh';
     $submittedValues['receipt_text'] = 'Contact the Development Department if you need to make any changes to your registration.';
-    return $this->getTestForm('CRM_Event_Form_Participant', $submittedValues, ['cid' => $submittedValues['contact_id']])->processForm(FormWrapper::BUILT);
+    $urlParameters = ['cid' => $submittedValues['contact_id']];
+    if ($mode !== '') {
+      $urlParameters['mode'] = $mode;
+    }
+    return $this->getTestForm('CRM_Event_Form_Participant', $submittedValues, $urlParameters)->processForm(FormWrapper::BUILT);
   }
 
   /**
@@ -480,11 +674,12 @@ London,',
    * @param array $eventParams
    * @param array $submittedValues
    * @param bool $isQuickConfig
+   * @param string $mode
    *
    * @return \Civi\Test\FormWrappers\EventFormParticipant
    */
-  protected function submitForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE): EventFormParticipant {
-    $form = $this->getForm($eventParams, $submittedValues, $isQuickConfig);
+  protected function submitForm(array $eventParams = [], array $submittedValues = [], bool $isQuickConfig = FALSE, string $mode = ''): EventFormParticipant {
+    $form = $this->getForm($eventParams, $submittedValues, $isQuickConfig, $mode);
     $form->processForm();
     return $form;
   }
@@ -588,7 +783,7 @@ London,',
    */
   public function testSubmitWithDeferredRecognition(): void {
     Civi::settings()->set('deferred_revenue_enabled', TRUE);
-    $futureDate = date('Y') + 1 . '-09-20';
+    $futureDate = ((int) date('Y')) + 1 . '-09-20';
     $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1, 'start_date' => $futureDate], [
       'record_contribution' => TRUE,
       'financial_type_id' => 1,

@@ -72,6 +72,57 @@ class Api4SelectQueryTest extends Api4TestBase {
   }
 
   /**
+   * Ensures autoJoinFK() does not fatal on an unresolvable base table.
+   *
+   * When the base table cannot be resolved to a string (e.g. getFrom()
+   * returns NULL because the entity's table mapping is unavailable),
+   * autoJoinFK() must bail out gracefully rather than pass NULL to the
+   * strictly-typed Joiner::getPath() and trigger an uncaught \TypeError. The
+   * select clause silently ignores unknown fields, so this path never throws.
+   */
+  public function testAutoJoinWithUnresolvedBaseTableDoesNotThrow(): void {
+    $api = Request::create('Contact', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['id'],
+    ]);
+    // A query whose base table cannot be resolved to a string. The constructor
+    // still resolves the (real) Contact table, so construction succeeds; only
+    // the later getFrom() lookup inside autoJoinFK() returns NULL.
+    $query = new class($api) extends Api4SelectQuery {
+
+      /**
+       * {@inheritdoc}
+       */
+      public function getFrom() {
+        return NULL;
+      }
+
+      /**
+       * Exposes the protected autoJoinFK() so the test can invoke it directly.
+       *
+       * @param string $key
+       *   The field path to auto-join.
+       */
+      public function callAutoJoin($key) {
+        $this->autoJoinFK($key);
+      }
+
+    };
+
+    $fieldSpecBefore = $query->apiFieldSpec;
+
+    // Before the fix this threw a \TypeError (Argument #1 ($baseTable) must
+    // be of type string, null given) that escaped the \CRM_Core_Exception
+    // handling below.
+    $query->callAutoJoin('some_fk_field.some_column');
+
+    // The unresolvable join is silently skipped, leaving the field spec
+    // untouched - not fatalled partway through.
+    $this->assertEquals($fieldSpecBefore, $query->apiFieldSpec);
+  }
+
+  /**
    * @throws \Civi\API\Exception\NotImplementedException
    */
   public function testInvalidSort(): void {
@@ -104,6 +155,35 @@ class Api4SelectQueryTest extends Api4TestBase {
     }
     catch (\CRM_Core_Exception $e) {
     }
+  }
+
+  public function testDuplicateSelectAlias(): void {
+    // Two different expressions may not share an alias; only one of them could
+    // be returned, and ORDER BY/HAVING would resolve the alias to the other.
+    $api = Request::create('Contact', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['ROUND(id) AS dupe', 'ROUND(0) AS dupe'],
+    ]);
+    $query = new Api4SelectQuery($api);
+    try {
+      $query->run();
+      $this->fail('An Exception Should have been raised');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString("Duplicate alias 'dupe'", $e->getMessage());
+    }
+
+    // The same expression repeated is harmless
+    $api = Request::create('Contact', 'get', [
+      'version' => 4,
+      'checkPermissions' => FALSE,
+      'select' => ['ROUND(id) AS dupe', 'ROUND(id) AS dupe'],
+      'limit' => 1,
+    ]);
+    $query = new Api4SelectQuery($api);
+    $result = $query->run();
+    $this->assertArrayHasKey('dupe', $result[0]);
   }
 
 }

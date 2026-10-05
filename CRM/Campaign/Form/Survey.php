@@ -75,8 +75,6 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add', 'REQUEST');
     if ($this->getSurveyID()) {
-      $this->_single = TRUE;
-
       $params = ['id' => $this->_surveyId];
       CRM_Campaign_BAO_Survey::retrieve($params, $surveyInfo);
       $this->_surveyTitle = $surveyInfo['title'];
@@ -96,12 +94,6 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
         'id' => $this->getSurveyID(),
       ]));
     }
-
-    // CRM-11480, CRM-11682
-    // Preload libraries required by the "Questions" tab
-    $this->assign('perm', (bool) CRM_Core_Permission::check('administer CiviCRM'));
-    CRM_UF_Page_ProfileEditor::registerProfileScripts();
-    CRM_UF_Page_ProfileEditor::registerSchemas(['IndividualModel', 'ActivityModel']);
 
     $this->build();
   }

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   var lastEmailTokenAlert = null;
   angular.module('crmMailing').controller('EmailBodyCtrl', function EmailBodyCtrl($scope, crmMailingMgr, crmUiAlert, $timeout) {
@@ -6,7 +6,7 @@
 
     // ex: if (!hasAllTokens(myMailing, 'body_text)) alert('Oh noes!');
     $scope.hasAllTokens = function hasAllTokens(mailing, field) {
-      return _.isEmpty(crmMailingMgr.findMissingTokens(mailing, field));
+      return !Object.keys(crmMailingMgr.findMissingTokens(mailing, field)).length;
     };
 
     // ex: checkTokens(myMailing, 'body_text', 'insert:body_text')
@@ -24,10 +24,10 @@
         );
       }
       else {
-        insertable = !_.isEmpty(insertEvent);
+        insertable = !!insertEvent;
         missing = crmMailingMgr.findMissingTokens(mailing, field);
       }
-      if (!_.isEmpty(missing)) {
+      if (Object.keys(missing).length) {
         lastEmailTokenAlert = crmUiAlert({
           type: 'error',
           title: ts('Required tokens'),
@@ -49,4 +49,4 @@
     };
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

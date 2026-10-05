@@ -44,8 +44,6 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    */
   public $_bltID;
 
-  public $_fields = [];
-
   /**
    * Current payment processor including a copy of the object in 'object' key.
    *
@@ -482,8 +480,9 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     }
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
 
-    $valuesForForm = self::formatCreditCardDetails($this->_params);
-    $this->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
+    $this->assign('credit_card_number', $this->getMungedPanTruncation());
+    $this->assign('credit_card_exp_date', $this->getCreditCardExpiryDate());
+    $this->assign('credit_card_type', $this->getCreditCardType());
 
     foreach ($this->submittableMoneyFields as $moneyField) {
       if (isset($this->_params[$moneyField])) {
@@ -505,6 +504,10 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @param array $params
    *
    * @return array An array of params suitable for assigning to the form/tpl
+   * @deprecated use
+   * $this->assign('credit_card_number', $this->getMungedPanTruncation());
+   * $this->assign('credit_card_exp_date', $this->getCreditCardExpiryDate());
+   * $this->assign('credit_card_type', $this->getCreditCardType());
    */
   public static function formatCreditCardDetails(&$params) {
     if (!empty($params['credit_card_exp_date'])) {
@@ -524,6 +527,18 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     return $tplParams;
   }
 
+  protected function getCreditCardExpiryDate(): string {
+    $date = $this->getSubmittedValue('credit_card_exp_date');
+    if (!$date) {
+      return '';
+    }
+    return CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($date));
+  }
+
+  protected function getCreditCardType(): ?string {
+    return CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->getSubmittedValue('credit_card_type'));
+  }
+
   /**
    * Add the billing address to the contact who paid.
    *
@@ -538,27 +553,13 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   protected function processBillingAddress(int $contactID, string $email): void {
-    $fields = [];
+    $submittedValues = $this->getSubmittedValues();
+    $submittedValues['email-5'] = $submittedValues['email-Primary'] = $email;
 
-    $fields['email-Primary'] = 1;
-    $this->_params['email-5'] = $this->_params['email-Primary'] = $email;
-    // now set the values for the billing location.
-    foreach (array_keys($this->_fields) as $name) {
-      $fields[$name] = 1;
-    }
-    $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
-    $fields["address_name-{$billingLocationID}"] = 1;
-
-    //ensure we don't over-write the payer's email with the member's email
-    if ($contactID == $this->_contactID) {
-      $fields["email-{$billingLocationID}"] = 1;
-    }
-
-    [$hasBillingField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params);
-    $fields = $this->formatParamsForPaymentProcessor($fields);
+    [$hasBillingField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($submittedValues);
 
     if ($hasBillingField) {
-      $addressParams = array_merge($this->_params, $addressParams);
+      $addressParams = array_merge($submittedValues, $addressParams);
       // CRM-18277 don't let this get passed in because we don't want contribution source to override contact source.
       // Ideally we wouldn't just randomly merge everything into addressParams but just pass in a relevant array.
       // Note this source field is covered by a unit test.
@@ -568,13 +569,11 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
       //here we are setting up the billing contact - if different from the member they are already created
       // but they will get billing details assigned
       $addressParams['contact_id'] = $contactID;
-      CRM_Contact_BAO_Contact::createProfileContact($addressParams, $fields,
+      CRM_Contact_BAO_Contact::createProfileContact($addressParams, [],
         $contactID, NULL, NULL,
         CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'contact_type')
       );
     }
-
-    $this->assignBillingName($this->_params);
   }
 
   /**
@@ -674,6 +673,57 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
     $this->assign('contactID', $this->getContactID());
     CRM_Core_Resources::singleton()
       ->addVars('coreForm', ['contact_id' => (int) $this->getContactID()]);
+  }
+
+  /**
+   * Get the relevant payment instrument id.
+   *
+   * @return int
+   */
+  protected function getPaymentInstrumentID(): int {
+    if ($this->isSubmitProcessorPayment()) {
+      if (isset($this->_paymentProcessor['object'])) {
+        return (int) $this->_paymentProcessor['object']->getPaymentInstrumentID();
+      }
+      return (int) $this->_paymentProcessor['payment_instrument_id'];
+    }
+    if ($this->getSubmittedValue('payment_instrument_id')) {
+      return (int) $this->getSubmittedValue('payment_instrument_id');
+    }
+    return (int) $this->_paymentProcessor['payment_instrument_id'];
+  }
+
+  protected function isPayLater(): bool {
+    if ($this->isSubmitProcessorPayment()) {
+      return FALSE;
+    }
+    $submittedStatus = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'));
+    return $submittedStatus === 'Pending';
+  }
+
+  protected function isSubmitProcessorPayment():bool {
+    return !empty($this->_mode);
+  }
+
+  /**
+   * @return bool
+   */
+  public function isTest(): bool {
+    return ($this->_mode === 'test');
+  }
+
+  /**
+   * Get the last 4 numbers of the card.
+   *
+   * @return int|null
+   */
+  protected function getPanTruncation(): ?int {
+    $card = $this->getSubmittedValue('credit_card_number');
+    return $card ? (int) substr($card, -4) : NULL;
+  }
+
+  protected function getMungedPanTruncation(): string {
+    return (string) CRM_Utils_System::mungeCreditCard($this->getSubmittedValue('credit_card_number'));
   }
 
 }

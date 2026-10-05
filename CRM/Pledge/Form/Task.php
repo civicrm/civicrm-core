@@ -28,6 +28,10 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form_Task {
    */
   protected $_pledgeIds;
 
+  public function getDefaultEntity(): string {
+    return 'Pledge';
+  }
+
   /**
    * Build all the data structures needed to build the form.
    */
@@ -84,30 +88,6 @@ class CRM_Pledge_Form_Task extends CRM_Core_Form_Task {
     $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_pledgeIds,
       'civicrm_pledge'
     );
-  }
-
-  /**
-   * Simple shell that derived classes can call to add buttons to
-   * the form with a customized title for the main Submit
-   *
-   * @param string $title
-   *   Title of the main button.
-   * @param string $nextType
-   * @param string $backType
-   * @param bool $submitOnce
-   */
-  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons([
-        [
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => $backType,
-          'name' => ts('Cancel'),
-        ],
-    ]);
   }
 
 }

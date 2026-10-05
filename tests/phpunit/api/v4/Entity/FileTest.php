@@ -117,6 +117,13 @@ class FileTest extends Api4TestBase {
     // Assert the url contains the file name (it's public)
     $this->assertStringContainsString($getResult['uri'], $getResult['url']);
 
+    // Assert we can get content without selecting uri
+    $getResult = \Civi\Api4\File::get(FALSE)
+      ->addSelect('content')
+      ->addWhere('id', '=', $create['id'])
+      ->execute()->single();
+    $this->assertEquals($fileContent, $getResult['content']);
+
     // Update file to is_public = FALSE
     \Civi\Api4\File::update(FALSE)
       ->addValue('is_public', FALSE)

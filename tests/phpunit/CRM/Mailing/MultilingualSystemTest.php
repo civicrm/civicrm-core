@@ -153,7 +153,7 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
     // The following code is exactly the same as runMailingSuccess() except that we store the ID of the mailing.
     $mailing_1 = $this->callAPISuccess('mailing', 'create', $mailingParams);
     $mut->assertRecipients([]);
-    $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+    $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $mut->getAllMessages('ezc');
     // There are exactly two contacts produced by setUp().
@@ -183,7 +183,7 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
       'body_text'      => 'Please just {action.unsubscribeUrl}',
     ];
     $this->callAPISuccess('mailing', 'create', $mailingParams);
-    $_ = $this->callAPISuccess('job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+    $_ = $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $mut->getAllMessages('ezc');
     // We should have 2+2 messages sent by the mail system now.

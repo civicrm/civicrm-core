@@ -852,7 +852,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     //Add Membership for the duplicate contact.
     $memTypeId = $this->membershipTypeCreate();
-    $this->callAPISuccess('Membership', 'create', [
+    $this->createTestEntity('Membership', [
       'membership_type_id' => $memTypeId,
       'contact_id' => $duplicateContactID,
     ]);
@@ -1906,6 +1906,352 @@ WHERE
       'is_current_employer' => TRUE,
     ], $params));
     return $contact2;
+  }
+
+  /**
+   * The generated SQL must include the payer-equality clause for every supported payment table.
+   *
+   * @dataProvider paymentSqlTableProvider
+   */
+  public function testPaymentSqlIncludesPayerEqualityClause(string $tableName): void {
+    $sqls = CRM_Dedupe_Merger::paymentSql($tableName, 1001, 2002);
+
+    $this->assertCount(1, $sqls, "paymentSql() should produce exactly one SQL for {$tableName}");
+    $this->assertStringContainsString(
+      'contribution.contact_id = 2002',
+      $sqls[0],
+      "paymentSql() for {$tableName} must restrict the rewrite to contributions paid by the deleted contact."
+    );
+  }
+
+  public function paymentSqlTableProvider(): array {
+    return [
+      'pledge'      => ['civicrm_pledge'],
+      'membership'  => ['civicrm_membership'],
+      'participant' => ['civicrm_participant'],
+    ];
+  }
+
+  /**
+   * Event-fee contribution paid by a third party.
+   */
+  public function testParticipantContributionStaysWithThirdPartyPayer(): void {
+    [$mainId, $otherId] = $this->createMergePair();
+    $employerId = $this->organizationCreate(['organization_name' => 'Acme Employer']);
+    $participantId = $this->participantCreate(['contact_id' => $otherId]);
+    $contributionId = $this->createParticipantContribution($employerId, $participantId);
+
+    $this->runPaymentSql('civicrm_participant', $mainId, $otherId);
+
+    $this->assertEquals($employerId, $this->getContributionContactId($contributionId));
+  }
+
+  /**
+   * Membership-fee contribution paid by a third-party.
+   */
+  public function testMembershipContributionStaysWithThirdPartyPayer(): void {
+    [$mainId, $otherId] = $this->createMergePair();
+    $thirdPartyId = $this->individualCreate([], 'parent');
+    $membershipId = $this->contactMembershipCreate(['contact_id' => $otherId]);
+    $contributionId = $this->createMembershipContribution($thirdPartyId, $membershipId);
+
+    $this->runPaymentSql('civicrm_membership', $mainId, $otherId);
+
+    $this->assertEquals($thirdPartyId, $this->getContributionContactId($contributionId));
+  }
+
+  /**
+   * Pledge-payment contribution paid by a third-party.
+   */
+  public function testPledgeContributionStaysWithThirdPartyPayer(): void {
+    [$mainId, $otherId] = $this->createMergePair();
+    $thirdPartyId = $this->individualCreate([], 'sibling');
+    $pledgeId = $this->pledgeCreate(['contact_id' => $otherId]);
+    $contributionId = $this->createPledgeContribution($thirdPartyId, $pledgeId);
+
+    $this->runPaymentSql('civicrm_pledge', $mainId, $otherId);
+
+    $this->assertEquals($thirdPartyId, $this->getContributionContactId($contributionId));
+  }
+
+  /**
+   * Merging two memberships of the same type should move the line items, not just
+   * the legacy MembershipPayment records, onto the surviving membership.
+   */
+  public function testMergeMembershipsMovesLineItems(): void {
+    [$mainID, $otherID] = $this->createMergePair();
+    $membershipTypeID = $this->membershipTypeCreate();
+    $mainMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $mainID,
+      'membership_type_id' => $membershipTypeID,
+      'end_date' => '2025-01-01',
+    ]);
+    $otherMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $otherID,
+      'membership_type_id' => $membershipTypeID,
+      'end_date' => '2035-01-01',
+    ]);
+    $contributionID = $this->createMembershipContribution($otherID, $otherMembershipID);
+    CRM_Core_DAO::executeQuery(
+      "UPDATE civicrm_line_item SET entity_table = 'civicrm_membership', entity_id = %1 WHERE contribution_id = %2",
+      [1 => [$otherMembershipID, 'Integer'], 2 => [$contributionID, 'Integer']]
+    );
+
+    $this->assertEquals($otherMembershipID, $this->getMembershipPaymentMembershipID($contributionID));
+    $this->assertEquals($otherMembershipID, $this->getMembershipLineItemEntityID($contributionID));
+
+    $sqlQueries = [];
+    CRM_Member_BAO_Membership::mergeMemberships($mainID, $otherID, $sqlQueries, ['civicrm_contribution'], []);
+    foreach ($sqlQueries as $sql) {
+      CRM_Core_DAO::executeQuery($sql);
+    }
+
+    $this->assertEquals($mainMembershipID, $this->getMembershipPaymentMembershipID($contributionID));
+    $this->assertEquals($mainMembershipID, $this->getMembershipLineItemEntityID($contributionID));
+  }
+
+  /**
+   * Merges the pair with memberships merged in place rather than added, and
+   * contributions moved across - the combination CRM_Member_BAO_Membership::mergeMemberships()
+   * handles. Permission checks are off so the duplicate is really trashed.
+   */
+  private function mergeContactsMergingMemberships(int $mainID, int $otherID): void {
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainID, $otherID);
+    CRM_Dedupe_Merger::moveAllBelongings($mainID, $otherID, [
+      'main_details' => $rowsElementsAndInfo['main_details'],
+      'other_details' => $rowsElementsAndInfo['other_details'],
+      'move_rel_table_memberships' => 1,
+      'move_rel_table_contributions' => 1,
+    ], FALSE);
+  }
+
+  /**
+   * Returns which of the given memberships still exist.
+   */
+  private function getMembershipIDs(array $membershipIDs): array {
+    return array_values(array_map('intval', CRM_Core_DAO::executeQuery(
+      'SELECT id FROM civicrm_membership WHERE id IN (%1) ORDER BY id',
+      [1 => [implode(',', $membershipIDs), 'CommaSeparatedIntegers']]
+    )->fetchMap('id', 'id')));
+  }
+
+  /**
+   * Returns the memberships the contribution is linked to by MembershipPayment.
+   */
+  private function getMembershipPaymentMembershipIDs(int $contributionID): array {
+    return array_values(array_map('intval', CRM_Core_DAO::executeQuery(
+      'SELECT membership_id FROM civicrm_membership_payment WHERE contribution_id = %1 ORDER BY membership_id',
+      [1 => [$contributionID, 'Integer']]
+    )->fetchMap('membership_id', 'membership_id')));
+  }
+
+  /**
+   * Returns the membership the contribution is linked to by MembershipPayment.
+   */
+  private function getMembershipPaymentMembershipID(int $contributionID): ?int {
+    $id = CRM_Core_DAO::singleValueQuery(
+      'SELECT membership_id FROM civicrm_membership_payment WHERE contribution_id = %1',
+      [1 => [$contributionID, 'Integer']]
+    );
+    return $id === NULL ? NULL : (int) $id;
+  }
+
+  /**
+   * Returns the membership the contribution is linked to by line item.
+   */
+  private function getMembershipLineItemEntityID(int $contributionID): ?int {
+    $id = CRM_Core_DAO::singleValueQuery(
+      "SELECT entity_id FROM civicrm_line_item WHERE contribution_id = %1 AND entity_table = 'civicrm_membership'",
+      [1 => [$contributionID, 'Integer']]
+    );
+    return $id === NULL ? NULL : (int) $id;
+  }
+
+  /**
+   * A contribution that paid for both memberships must not break the merge.
+   */
+  public function testMergeMembershipsWithSharedContribution(): void {
+    [$mainID, $otherID] = $this->createMergePair();
+    $membershipTypeID = $this->membershipTypeCreate();
+    $mainMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $mainID,
+      'membership_type_id' => $membershipTypeID,
+      'end_date' => '2025-01-01',
+    ]);
+    $otherMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $otherID,
+      'membership_type_id' => $membershipTypeID,
+      'end_date' => '2035-01-01',
+    ]);
+    $contributionID = $this->createMembershipContribution($mainID, $mainMembershipID);
+    $this->callApiV3Success('MembershipPayment', 'create', [
+      'contribution_id' => $contributionID,
+      'membership_id' => $otherMembershipID,
+    ]);
+
+    $this->mergeContactsMergingMemberships($mainID, $otherID);
+
+    $this->assertEquals([$mainMembershipID], $this->getMembershipPaymentMembershipIDs($contributionID));
+  }
+
+  /**
+   * The merged-away membership is removed even when its dates add nothing.
+   */
+  public function testMergeMembershipsWithIdenticalDates(): void {
+    [$mainID, $otherID] = $this->createMergePair();
+    $membershipTypeID = $this->membershipTypeCreate();
+    $dates = [
+      'join_date' => '2020-01-01',
+      'start_date' => '2020-01-01',
+      'end_date' => '2030-01-01',
+    ];
+    $mainMembershipID = $this->contactMembershipCreate(['contact_id' => $mainID, 'membership_type_id' => $membershipTypeID] + $dates);
+    $otherMembershipID = $this->contactMembershipCreate(['contact_id' => $otherID, 'membership_type_id' => $membershipTypeID] + $dates);
+    $contributionID = $this->createMembershipContribution($otherID, $otherMembershipID);
+
+    $this->mergeContactsMergingMemberships($mainID, $otherID);
+
+    $this->assertEquals([$mainMembershipID], $this->getMembershipPaymentMembershipIDs($contributionID));
+    $this->assertEquals([$mainMembershipID], $this->getMembershipIDs([$mainMembershipID, $otherMembershipID]));
+  }
+
+  /**
+   * A membership type the main contact does not hold is moved across, not dropped.
+   */
+  public function testMergeMembershipsMovesUnmatchedTypes(): void {
+    [$mainID, $otherID] = $this->createMergePair();
+    $mainMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $mainID,
+      'membership_type_id' => $this->membershipTypeCreate(['name' => 'Main Type']),
+    ]);
+    $otherMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $otherID,
+      'membership_type_id' => $this->membershipTypeCreate(['name' => 'Other Type']),
+    ]);
+
+    $this->mergeContactsMergingMemberships($mainID, $otherID);
+
+    $this->assertEquals([$mainMembershipID, $otherMembershipID], $this->getMembershipIDs([$mainMembershipID, $otherMembershipID]));
+    $this->assertEquals($mainID, CRM_Core_DAO::singleValueQuery(
+      'SELECT contact_id FROM civicrm_membership WHERE id = %1',
+      [1 => [$otherMembershipID, 'Integer']]
+    ));
+  }
+
+  /**
+   * The payment-mode delete should find contributions linked by line item.
+   */
+  public function testOperationSqlPaymentModeUsesLineItems(): void {
+    // The SQL under test deletes contributions outright, leaving their financial
+    // records behind, so the financial consistency checks cannot pass.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
+    [$mainID, $otherID] = $this->createMergePair();
+    $membershipTypeID = $this->membershipTypeCreate();
+    $mainMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $mainID,
+      'membership_type_id' => $membershipTypeID,
+    ]);
+    $this->contactMembershipCreate([
+      'contact_id' => $otherID,
+      'membership_type_id' => $membershipTypeID,
+    ]);
+    $contributionID = $this->createMembershipContribution($mainID, $mainMembershipID);
+    CRM_Core_DAO::executeQuery(
+      "UPDATE civicrm_line_item SET entity_table = 'civicrm_membership', entity_id = %1 WHERE contribution_id = %2",
+      [1 => [$mainMembershipID, 'Integer'], 2 => [$contributionID, 'Integer']]
+    );
+    // A site that no longer writes the legacy records is linked by line item alone.
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_membership_payment WHERE contribution_id = %1', [1 => [$contributionID, 'Integer']]);
+
+    foreach (CRM_Dedupe_Merger::operationSql($mainID, $otherID, 'civicrm_membership', [], 'payment') as $sql) {
+      CRM_Core_DAO::executeQuery($sql);
+    }
+
+    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery(
+      'SELECT COUNT(*) FROM civicrm_contribution WHERE id = %1',
+      [1 => [$contributionID, 'Integer']]
+    ));
+  }
+
+  /**
+   * Returns [mainId, otherId] – two fresh individuals to use for a merge.
+   */
+  private function createMergePair(): array {
+    return [
+      $this->individualCreate([], 'main'),
+      $this->individualCreate([], 'other'),
+    ];
+  }
+
+  /**
+   * Executes the SQL produced by paymentSql() for the given table. Mirrors
+   * what CRM_Dedupe_Merger::moveContactBelongings() does for the same table
+   * during a real merge, but stays focused on just the function under test.
+   */
+  private function runPaymentSql(string $tableName, int $mainId, int $otherId): void {
+    foreach (CRM_Dedupe_Merger::paymentSql($tableName, $mainId, $otherId) as $sql) {
+      CRM_Core_DAO::executeQuery($sql);
+    }
+  }
+
+  /**
+   * Returns the current contact_id of the given contribution.
+   */
+  private function getContributionContactId(int $contributionId): int {
+    return (int) CRM_Core_DAO::singleValueQuery(
+      'SELECT contact_id FROM civicrm_contribution WHERE id = %1',
+      [1 => [$contributionId, 'Integer']]
+    );
+  }
+
+  /**
+   * Creates a contribution belonging to $payerId and links it to the given
+   * participant via civicrm_participant_payment.
+   */
+  private function createParticipantContribution(int $payerId, int $participantId): int {
+    $contributionId = $this->contributionCreate([
+      'contact_id'        => $payerId,
+      'financial_type_id' => 'Event Fee',
+    ]);
+    $this->callAPISuccess('ParticipantPayment', 'create', [
+      'contribution_id' => $contributionId,
+      'participant_id'  => $participantId,
+    ]);
+    return $contributionId;
+  }
+
+  /**
+   * Creates a contribution belonging to $payerId and links it to the given
+   * membership via civicrm_membership_payment.
+   */
+  private function createMembershipContribution(int $payerId, int $membershipId): int {
+    $contributionId = $this->contributionCreate([
+      'contact_id'        => $payerId,
+      'financial_type_id' => 'Member Dues',
+    ]);
+    $this->callApiV3Success('MembershipPayment', 'create', [
+      'contribution_id' => $contributionId,
+      'membership_id'   => $membershipId,
+    ]);
+    return $contributionId;
+  }
+
+  /**
+   * Creates a contribution belonging to $payerId.
+   */
+  private function createPledgeContribution(int $payerId, int $pledgeId): int {
+    $contributionId = $this->contributionCreate([
+      'contact_id'        => $payerId,
+      'financial_type_id' => 'Donation',
+    ]);
+    CRM_Core_DAO::executeQuery(
+      'UPDATE civicrm_pledge_payment SET contribution_id = %1 WHERE pledge_id = %2 ORDER BY id LIMIT 1',
+      [
+        1 => [$contributionId, 'Integer'],
+        2 => [$pledgeId, 'Integer'],
+      ]
+    );
+    return $contributionId;
   }
 
 }

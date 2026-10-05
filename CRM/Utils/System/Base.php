@@ -1118,6 +1118,42 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Add a role to a CMS user.
+   *
+   * @param int $ufID
+   *   User ID in the CMS.
+   * @param string $role
+   *   Name of the role to add. This is a key from the array returned by
+   *   getRoleNames().
+   *
+   * @return bool
+   *   TRUE if the user now has the role (including if it was already
+   *   assigned). FALSE if the action could not be completed, e.g. because
+   *   the user or role does not exist.
+   */
+  public function addUfRole(int $ufID, string $role): bool {
+    return FALSE;
+  }
+
+  /**
+   * Remove a role from a CMS user.
+   *
+   * @param int $ufID
+   *   User ID in the CMS.
+   * @param string $role
+   *   Name of the role to remove. This is a key from the array returned by
+   *   getRoleNames().
+   *
+   * @return bool
+   *   TRUE if the user no longer has the role (including if it was never
+   *   assigned). FALSE if the action could not be completed, e.g. because
+   *   the user or role does not exist.
+   */
+  public function removeUfRole(int $ufID, string $role): bool {
+    return FALSE;
+  }
+
+  /**
    * Determine if the Views module exists.
    *
    * @return bool
@@ -1248,7 +1284,23 @@ abstract class CRM_Utils_System_Base {
    * @return string
    */
   public function getEmailFieldName(CRM_Core_Form $form, array $fields):string {
-    return 'email';
+    $emailName = '';
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
+    if (array_key_exists("email-{$billingLocationTypeID}", $fields)) {
+      // this is a transaction related page
+      $emailName = 'email-' . $billingLocationTypeID;
+    }
+    else {
+      // find the email field in a profile page
+      foreach ($fields as $name => $dontCare) {
+        if (str_starts_with($name, 'email')) {
+          $emailName = $name;
+          break;
+        }
+      }
+    }
+
+    return $emailName;
   }
 
   /**

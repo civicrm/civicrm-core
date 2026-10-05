@@ -103,31 +103,6 @@ WHERE  activity_id IN ( $IDs ) AND
   }
 
   /**
-   * Simple shell that derived classes can call to add buttons to
-   * the form with a customized title for the main Submit
-   *
-   * @param string $title
-   *   Title of the main button.
-   * @param string $nextType
-   *   Button type for the form after processing.
-   * @param string $backType
-   * @param bool $submitOnce
-   */
-  public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons([
-      [
-        'type' => $nextType,
-        'name' => $title,
-        'isDefault' => TRUE,
-      ],
-      [
-        'type' => $backType,
-        'name' => ts('Cancel'),
-      ],
-    ]);
-  }
-
-  /**
    * Get the token processor schema required to list any tokens for this task.
    *
    * @return array

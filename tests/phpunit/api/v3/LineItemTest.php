@@ -14,6 +14,7 @@
  * @group headless
  */
 class api_v3_LineItemTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
   use CRM_Financial_Form_SalesTaxTrait;
 
   protected $params;

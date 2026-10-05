@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('civiGrantTasks').controller('civiGrantTaskAddGrant', function($scope, crmApi4, searchTaskBaseTrait, searchTaskFieldsTrait) {
@@ -25,19 +25,19 @@
         ctrl.ids = ctrl.ids.filter(id => !ctrl.existingGrantContacts.includes(id));
       }
       if (!ctrl.ids.length) {
-        CRM.alert(_.escape(ts('No grants to add.')), _.escape(ts('All contacts skipped')));
+        CRM.alert(CRM.utils.escapeHtml(ts('No grants to add.')), CRM.utils.escapeHtml(ts('All contacts skipped')));
         ctrl.cancel();
       }
-      apiParams.records = [_.zipObject(ctrl.values)];
+      apiParams.records = [Object.fromEntries(ctrl.values)];
       ctrl.start(apiParams);
     };
 
     this.onSuccess = function(result) {
-      let msg = _.escape(ts('Successfully added 1 grant.', {plural: 'Successfully added %count grants.', count: result.length}));
+      let msg = CRM.utils.escapeHtml(ts('Successfully added 1 grant.', {plural: 'Successfully added %count grants.', count: result.length}));
       if (result.length === 1) {
         const viewLink = this.getUrl('view', result[0]);
         if (viewLink) {
-          msg += '<br><a href="' + viewLink + '" target="_blank"><i class="crm-i fa-external-link" role="img" aria-hidden="true"></i> ' + _.escape(ts('View grant')) + '</a>';
+          msg += '<br><a href="' + viewLink + '" target="_blank"><i class="crm-i fa-external-link" role="img" aria-hidden="true"></i> ' + CRM.utils.escapeHtml(ts('View grant')) + '</a>';
         }
       }
       CRM.alert(msg, ts('Saved'), 'success');
@@ -45,4 +45,4 @@
     };
 
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -77,28 +77,6 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
   }
 
   /**
-   * Given a roles array, check for access requirements
-   *
-   * @param array $array
-   *   The roles to check.
-   *
-   * @return bool
-   *   true if yes, else false
-   */
-  public function checkGroupRole($array) {
-    if (function_exists('user_load') && isset($array)) {
-      $user = user_load($GLOBALS['user']->uid);
-      //if giver roles found in user roles - return true
-      foreach ($array as $key => $value) {
-        if (in_array($value, $user->roles)) {
-          return TRUE;
-        }
-      }
-    }
-    return FALSE;
-  }
-
-  /**
    * @inheritDoc
    */
   public function getAvailablePermissions() {

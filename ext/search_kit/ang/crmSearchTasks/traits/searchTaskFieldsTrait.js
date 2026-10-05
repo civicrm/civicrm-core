@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   let paths = {};
@@ -20,15 +20,15 @@
         }
 
         apiCalls = apiCalls || {};
-        getFieldsParams = _.merge({
+        getFieldsParams = Object.assign({
             action: 'update',
             select: ['name', 'label', 'description', 'input_type', 'data_type', 'serialize', 'options', 'fk_entity', 'nullable', 'required', 'default_value'],
             loadOptions: ['id', 'name', 'label', 'description', 'color', 'icon'],
-            where: [],
           },
           getFieldsParams || {}
         );
-        getFieldsParams.where.push(['deprecated', '=', false], ['readonly', '=', false]);
+        // Built with concat rather than push, so a caller's own `where` array isn't appended to
+        getFieldsParams.where = (getFieldsParams.where || []).concat([['deprecated', '=', false], ['readonly', '=', false]]);
         apiCalls.getFields = [entityName, 'getFields', getFieldsParams];
 
         // Info used by getUrl function
@@ -114,4 +114,4 @@
     return ctrl;
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

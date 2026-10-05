@@ -34,7 +34,7 @@
           </div>
         </div>
         <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['bool'], true)">
-          <label>{{ name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
+          <label>{{:: param.title || name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
           <label class="radio-inline">
             <input type="radio" ng-model="params[name]" ng-value="true" />true
           </label>
@@ -89,17 +89,17 @@
           <input class="form-control" crm-ui-select="{data: actions, allowClear: true, placeholder: 'None'}" id="api4-param-action" ng-model="params.action"/>
         </div>
         <div class="api4-input form-inline" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['string', 'int', 'float'])">
-          <label for="api4-param-{{:: name }}">{{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
+          <label for="api4-param-{{:: name }}">{{:: param.title || name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
           <input class="form-control twelve" ng-if="::!param.options" type="{{:: (param.type[0] === 'int' || param.type[0] === 'float') && param.type.length === 1 ? 'number' : 'text' }}" id="api4-param-{{:: name }}" ng-model="params[name]"/>
-          <select class="form-control crm-auto-width" ng-if="::param.options" ng-options="o for o in ::param.options" id="api4-param-{{:: name }}" ng-model="params[name]"></select>
+          <select class="form-control crm-auto-width" ng-if="::param.options" ng-options="o.id as o.label for o in ::param.options" id="api4-param-{{:: name }}" ng-model="params[name]"></select>
           <a href class="crm-hover-button" title="Clear" ng-click="clearParam(name)" ng-show="!!params[name]"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
         </div>
         <div class="api4-input" ng-mouseenter="help(name, param)" ng-mouseleave="help()" ng-repeat="(name, param) in ::getGenericParams(['array', 'mixed'])">
-          <label for="api4-param-{{:: name }}">{{:: name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
+          <label for="api4-param-{{:: name }}">{{:: param.title || name }}<span class="crm-marker" ng-if="::param.required"> *</span></label>
           <textarea class="form-control" ng-if="::!param.options" id="api4-param-{{:: name }}" ng-model="params[name]">
           </textarea>
           <select multiple ng-if="::param.options" crm-ui-select class="form-control" id="api4-param-{{:: name }}" ng-model="params[name]">
-            <option ng-repeat="opt in param.options" value="{{ opt }}">{{ opt }}</option>
+            <option ng-repeat="opt in param.options" value="{{ opt.id }}">{{ opt.label }}</option>
           </select>
         </div>
         <fieldset ng-if="::availableParams.where" class="api4-clause-fieldset" ng-mouseenter="help('where', availableParams.where)" ng-mouseleave="help()">
@@ -109,7 +109,7 @@
           <legend>{{:: name }}<span class="crm-marker" ng-if="::availableParams[name].required"> *</span></legend>
           <div class="api4-input form-inline" ng-repeat="clause in params[name]" ng-mouseenter="help('value: ' + clause[0], fieldHelp(clause[0]))" ng-mouseleave="help(name, availableParams[name])">
             <input class="collapsible-optgroups form-control twenty" ng-model="clause[0]" crm-ui-select="{formatResult: formatSelect2Item, formatSelection: formatSelect2Item, data: fieldList(name), allowClear: true, placeholder: 'Field'}" />
-            <input class="form-control" ng-model="clause[1]" api4-exp-value="{field: clause[0], action: action === 'getFields' ? params.action || 'get' : action}" />
+            <input class="form-control" ng-model="clause[1]" api4-exp-value="{field: clause[0], action: action === 'getFields' ? params.action || 'get' : action, values: params[name]}" />
           </div>
           <div class="api4-input form-inline">
             <input class="collapsible-optgroups form-control twenty" ng-model="controls[name]" crm-ui-select="{formatResult: formatSelect2Item, formatSelection: formatSelect2Item, data: fieldList(name), placeholder: ts('Add %1', {1: name.slice(0, -1)})}"/>
@@ -202,8 +202,8 @@
     <div class="panel panel-info explorer-code-panel">
       <div class="panel-heading">
         <ul role="tablist" class="nav nav-tabs">
-          <li role="tab" ng-repeat="lang in ::langs" ng-class="{active: selectedTab.code === lang}">
-            <a href ng-click="selectLang(lang)">
+          <li role="presentation" ng-repeat="lang in ::langs" ng-class="{active: selectedTab.code === lang}">
+            <a href role="tab" aria-selected="{{ selectedTab.code === lang }}" ng-click="selectLang(lang)">
               {{:: lang }}
             </a>
           </li>
@@ -255,8 +255,8 @@
           </select>
         </div>
         <ul role="tablist" class="nav nav-tabs">
-          <li role="tab" ng-class="{active: selectedTab.result === 'result'}">
-            <a href ng-click="selectedTab.result = 'result'">
+          <li role="presentation" ng-class="{active: selectedTab.result === 'result'}">
+            <a href role="tab" aria-selected="{{ selectedTab.result === 'result' }}" ng-click="selectedTab.result = 'result'">
               <span ng-switch="status">
                 <i class="fa fa-fw fa-circle-o" ng-switch-when="default" role="img" aria-hidden="true"></i>
                 <i class="fa fa-fw fa-check-circle" ng-switch-when="success" role="img" aria-hidden="true"></i>
@@ -267,8 +267,8 @@
               <span>{{:: ts('Result') }}</span>
             </a>
           </li>
-          <li role="tab" ng-if="::perm.viewDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
-            <a href ng-click="selectedTab.result = 'debug'">
+          <li role="presentation" ng-if="::perm.viewDebugOutput" ng-class="{active: selectedTab.result === 'debug'}">
+            <a href role="tab" aria-selected="{{ selectedTab.result === 'debug' }}" ng-click="selectedTab.result = 'debug'">
               <i class="fa fa-fw fa-{{ debug ? (status === 'warning' || status === 'danger' ? 'warning' : 'bug') : 'circle-o' }}" role="img" aria-hidden="true"></i>
               <span>{{:: ts('Debug') }}</span>
             </a>

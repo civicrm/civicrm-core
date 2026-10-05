@@ -106,6 +106,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $this->_paymentProcessors = $this->get('paymentProcessors');
     $this->preProcessPaymentOptions();
+    $this->validateSeparateMembershipPaymentSupport();
     // If the in-use payment processor is the Dummy processor we assign the name so that a test warning is displayed.
     $this->assign('dummyTitle', $this->getPaymentProcessorValue('payment_processor_type_id.class') === 'CRM_Dummy' ? $this->getPaymentProcessorValue('payment_processor_type_id.front_end_title') : '');
 
@@ -126,7 +127,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $this->assign('reset', CRM_Utils_Request::retrieve('reset', 'Boolean'));
     $this->assign('mainDisplay', CRM_Utils_Request::retrieve('_qf_Main_display', 'Boolean',
-      CRM_Core_DAO::$_nullObject));
+      NULL));
 
     if (!empty($this->_pcpInfo['id']) && !empty($this->_pcpInfo['intro_text'])) {
       $this->assign('intro_text', $this->_pcpInfo['intro_text']);
@@ -233,6 +234,20 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if ($this->_priceSetId) {
       if ($this->getFormContext() === 'membership') {
         $existingMembershipTypeID = $this->getRenewableMembershipValue('membership_type_id');
+        // Every membership type the contact already holds, rather than only the
+        // one left in 'RenewableMembership' by buildMembershipBlock() - which
+        // define()s inside its loop over membership types, so the last existing
+        // membership overwrites the earlier ones.
+        //
+        // On a price set whose membership field is a CheckBox a contact can hold
+        // several memberships at once, and a renewal link should arrive with all
+        // of them ticked. Pre-ticking only one silently drops the rest: the
+        // member pays the reduced total and the memberships that were left off
+        // are never renewed.
+        //
+        // A Radio field can only carry one value, so the last match still wins
+        // there and the behaviour is unchanged.
+        $existingMembershipTypeIDs = $this->getRenewableMembershipTypeIDs();
         $selectedCurrentMemTypes = [];
         foreach ($this->_priceSet['fields'] as $key => $val) {
           foreach ($val['options'] as $keys => $priceFieldOption) {
@@ -247,7 +262,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               // The value sent via URL get's higher priority.
               break;
             }
-            if ($existingMembershipTypeID && $existingMembershipTypeID === $priceFieldOption['membership_type_id']
+            if ($opMemTypeId && in_array($opMemTypeId, $existingMembershipTypeIDs, TRUE)
               && !in_array($opMemTypeId, $selectedCurrentMemTypes)
             ) {
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
@@ -544,7 +559,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
         if (!empty($options)) {
-          $label = (!empty($this->_membershipBlock) && $field['name'] === 'contribution_amount') ? ts('Additional Contribution') : $field['label'];
           $extra = [];
           $fieldID = (int) $field['id'];
           if ($fieldID === $this->getPriceFieldOtherID()) {
@@ -575,7 +589,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
             $field['id'],
             FALSE,
             $field['is_required'] ?? FALSE,
-            $label,
+            $field['label'],
             $options,
             [],
             $extra
@@ -1167,7 +1181,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
    *
    * @throws \CRM_Core_Exception
    */
-  public function submit($params) {
+  private function submit($params) {
     //carry campaign from profile.
     if (array_key_exists('contribution_campaign_id', $params)) {
       $params['campaign_id'] = $params['contribution_campaign_id'];
@@ -1305,8 +1319,12 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $confirmForm->mainProcess();
     $qfKey = $this->controller->_key;
 
-    // redirect to thank you page
-    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE));
+    // redirect to specified thank you page if set, or default quickform thank you page
+    $redirectUrl = match ($this->_values['thankyou_mode']) {
+      'redirect' => $this->_values['thankyou_redirect_url'],
+      default => \CRM_Utils_System::url('civicrm/contribute/transact', "_qf_ThankYou_display=1&qfKey=$qfKey", TRUE, NULL, FALSE),
+    };
+    CRM_Utils_System::redirect($redirectUrl);
   }
 
   /**
@@ -1358,22 +1376,6 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       CRM_Core_Error::statusBounce(ts('Returning since contribution has already been handled.'));
     }
     return $paymentBalance;
-  }
-
-  /**
-   * Function for unit tests on the postProcess function.
-   *
-   * @deprecated - we are ditching this approach in favour of 'full form flow'
-   * = ie simulating postProcess.
-   *
-   * @param array $params
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testSubmit($params) {
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $this->controller = new CRM_Contribute_Controller_Contribution();
-    $this->submit($params);
   }
 
   /**
@@ -1802,6 +1804,27 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Get the membership type IDs of every membership the contact can renew here.
+   *
+   * Lifetime memberships are excluded because they are not renewable and
+   * buildMembershipBlock() removes them from the offered options, so pre-ticking
+   * one would select an option the form does not present.
+   *
+   * @return int[]
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function getRenewableMembershipTypeIDs(): array {
+    $membershipTypeIDs = [];
+    foreach ($this->getExistingMemberships() as $membership) {
+      if ($membership['membership_type_id.duration_unit:name'] !== 'lifetime') {
+        $membershipTypeIDs[] = (int) $membership['membership_type_id'];
+      }
+    }
+    return $membershipTypeIDs;
   }
 
   /**

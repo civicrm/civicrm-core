@@ -14,7 +14,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    $this->callAPISuccess('Extension', 'disable', ['keys' => 'legacydedupefinder']);
+    $this->callApiV3Success('Extension', 'disable', ['keys' => 'legacydedupefinder']);
   }
 
   /**
@@ -333,7 +333,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $this->individualCreate(['first_name' => 'Bob', 'last_name' => 'Smith', 'street_address' => '123 Main St']);
     $this->individualCreate(['first_name' => 'Bob', 'email' => 'bob@example.org']);
     $this->individualCreate(['first_name' => 'Bob', 'email' => 'bob@example.org']);
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general']])['values'];
+    $result = $this->callApiV3Success('Job', 'process_batch_merge', ['rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general']])['values'];
     $this->assertCount(2, $result['merged']);
     $queries = \Civi::$statics['CRM_Dedupe_FinderQueryOptimizer']['queries'];
     $this->assertEquals(['civicrm_email.email.8', 'civicrm_address.street_address.5', 'civicrm_contact.first_name.3'], array_keys($queries));
@@ -348,7 +348,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    */
   public function testCustomRule(): void {
     $this->setupForGroupDedupe();
-    $this->callAPISuccess('Extension', 'install', ['keys' => 'legacydedupefinder']);
+    $this->callApiV3Success('Extension', 'install', ['keys' => 'legacydedupefinder']);
 
     $ruleGroup = $this->createRuleGroup();
     foreach (['birth_date', 'first_name', 'last_name'] as $field) {
@@ -364,7 +364,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);
 
     // Make sure it is the same with the extension disabled.
-    $this->callAPISuccess('Extension', 'disable', ['keys' => 'legacydedupefinder']);
+    $this->callApiV3Success('Extension', 'disable', ['keys' => 'legacydedupefinder']);
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->ids['Group']['default']);
     $this->assertCount(4, $foundDupes);
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);

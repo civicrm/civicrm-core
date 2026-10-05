@@ -16,6 +16,7 @@
  * @group headless
  */
 class api_v3_ExceptionTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * Sets up the fixture, for example, opens a network connection.

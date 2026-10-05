@@ -104,13 +104,7 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
     $allTabs = [];
     foreach ($this->tabs as $name => $title) {
       // check for required permissions.
-      if (!CRM_Core_Permission::check([
-          [
-            'manage campaign',
-            'administer CiviCampaign',
-            "{$name} campaign contacts",
-          ],
-      ])) {
+      if (!CRM_Core_Permission::check("{$name} campaign contacts")) {
         continue;
       }
 

@@ -31,12 +31,10 @@
 
     {section name='i' start=1 loop=$totalBlocks}
     {assign var='blockId' value=$smarty.section.i.index}
-    <tr id="Website_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
+    <tr data-entity='website' data-block-number={$blockId} id="Website_Block_{$blockId}" {if $blockId gt $actualBlockCount}class="hiddenElement"{/if}>
       <td>{$form.website.$blockId.url.html|crmAddClass:url}&nbsp;</td>
       <td>{$form.website.$blockId.website_type_id.html}</td>
-      {if $blockId gt 1}
-        <td><a class="crm-delete-inline crm-hover-button action-item" href="#" title="{ts escape='htmlattribute'}Delete Website{/ts}"><span class="icon delete-icon"></span></a></td>
-      {/if}
+      <td><a class="crm-delete-inline crm-hover-button action-item" href="#" title="{ts escape='htmlattribute'}Delete Website{/ts}"><span class="icon delete-icon"></span></a></td>
     </tr>
     {/section}
 </table>

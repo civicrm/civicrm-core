@@ -20,6 +20,7 @@ use Civi\Api4\FinancialItem;
  * @group headless
  */
 class api_v3_OrderTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   use CRMTraits_Financial_TaxTrait;
 
@@ -233,7 +234,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ],
     ];
     $this->checkPaymentResult($order, $expectedResult);
-    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', $params);
+    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', $params + ['version' => 3]);
 
     $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['id']]);
     $this->callAPISuccess('Contribution', 'Delete', ['id' => $order['id']]);
@@ -264,7 +265,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     ];
     $order = $this->callAPISuccess('Order', 'get', $paymentMembership);
     $this->checkPaymentResult($order, $expectedResult);
-    $this->callAPISuccessGetCount('MembershipPayment', $paymentMembership, 2);
+    $this->callAPISuccessGetCount('MembershipPayment', $paymentMembership + ['version' => 3], 2);
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $order['id'],
       'payment_instrument_id' => 'Check',
@@ -310,7 +311,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
     if (isset($membershipExtraParams['renewalOf'])) {
       // Create a pre-existing membership
-      $originalMembershipID = $this->callAPISuccess('Membership', 'create',
+      $originalMembershipID = $this->createTestEntity('Membership',
         $membershipExtraParams['renewalOf']
         + [
           'contact_id'         => $this->ids['Contact']['individual_0'],
@@ -380,7 +381,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     }
 
     // Check membership details
-    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $order['id']]);
+    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $order['id'], 'version' => 3]);
     $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['id']]);
 
     if (isset($expectations['status_id'])) {

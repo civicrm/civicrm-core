@@ -16,6 +16,7 @@
  * @group headless
  */
 class api_v3_UFFieldTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * Set up for test.

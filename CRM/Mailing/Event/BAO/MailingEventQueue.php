@@ -295,31 +295,4 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
     return [];
   }
 
-  /**
-   * @deprecated
-   * @param array $params
-   * @param null $now
-   */
-  public static function bulkCreate($params, $now = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('writeRecords');
-    if (!$now) {
-      $now = time();
-    }
-
-    // construct a bulk insert statement
-    $values = [];
-    foreach ($params as $param) {
-      $hash = static::hash();
-      $values[] = "( {$param[0]}, {$param[1]}, {$param[2]}, {$param[3]}, '" . $hash . "' )";
-      // FIXME: This (non)escaping is valid as currently used but is not robust to change. This should use CRM_Utils_SQL_Insert...
-    }
-
-    while (!empty($values)) {
-      $input = array_splice($values, 0, CRM_Core_DAO::BULK_INSERT_COUNT);
-      $str = implode(',', $input);
-      $sql = "INSERT INTO civicrm_mailing_event_queue ( job_id, email_id, contact_id, phone_id, hash ) VALUES $str;";
-      CRM_Core_DAO::executeQuery($sql);
-    }
-  }
-
 }

@@ -419,6 +419,35 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag implements \Civi\Cor
   }
 
   /**
+   * Get the ids of entities tagged with a given tag, for any entity registered via the
+   * alterNonDbTaggableEntities hook (tag-able but not a physical table, e.g. Afform) - these
+   * have no `EntityTag` rows for a DB-based lookup to find.
+   *
+   * @param int $tagId
+   * @param array|null $onlyEntities
+   *   If given, only invoke the callback for these entity names - lets a caller who already
+   *   knows a tag's `used_for` skip the (often several-query) callback for entities it
+   *   doesn't apply to.
+   * @return array
+   *   Array keyed by entity name, each value an array of that entity's own id/primary-key values.
+   */
+  public static function getNonDbTaggedIds(int $tagId, ?array $onlyEntities = NULL): array {
+    $nonDbEntities = [];
+    CRM_Utils_Hook::alterNonDbTaggableEntities($nonDbEntities);
+    $result = [];
+    foreach ($nonDbEntities as $entityName => $callback) {
+      if ($onlyEntities !== NULL && !in_array($entityName, $onlyEntities, TRUE)) {
+        continue;
+      }
+      $ids = array_column($callback($tagId), 'id');
+      if ($ids) {
+        $result[$entityName] = $ids;
+      }
+    }
+    return $result;
+  }
+
+  /**
    * Pseudoconstant condition_provider for tag_id field.
    * @see \Civi\Schema\EntityMetadataBase::getConditionFromProvider
    */

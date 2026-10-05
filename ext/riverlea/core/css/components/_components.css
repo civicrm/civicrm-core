@@ -536,87 +536,89 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before {
   background-color: var(--crm-primary-color);
   color: var(--crm-primary-text-color);
 }
-#bootstrap-theme .bg-primary a {
+#bootstrap-theme li.bg-primary > a,
+#bootstrap-theme .bg-primary > span > a:not(.btn),
+#bootstrap-theme .dropdown-menu .bg-primary .crm-i::before {
   color: var(--crm-primary-text-color);
 }
-#bootstrap-theme a.bg-primary:hover,
-#bootstrap-theme a.bg-primary:focus {
+#bootstrap-theme a.bg-primary:is(:hover,:focus),
+#bootstrap-theme .dropdown-menu .bg-primary a:is(:hover,:focus) {
   background-color: var(--crm-primary-hover-color);
+  color: var(--crm-primary-hover-text-color);
 }
 #bootstrap-theme .bg-secondary {
   background-color: var(--crm-secondary-color);
   color: var(--crm-secondary-text-color);
 }
-#bootstrap-theme .bg-secondary a {
+#bootstrap-theme li.bg-secondary > a,
+#bootstrap-theme .bg-secondary > span > a:not(.btn),
+#bootstrap-theme .dropdown-menu .bg-secondary .crm-i::before {
   color: var(--crm-secondary-text-color);
 }
-#bootstrap-theme a.bg-secondary:hover,
-#bootstrap-theme a.bg-secondary:focus {
+#bootstrap-theme a.bg-secondary:is(:hover,:focus),
+#bootstrap-theme .dropdown-menu .bg-secondary a:is(:hover,:focus) {
   background-color: var(--crm-secondary-hover-color);
+  color: var(--crm-secondary-hover-text-color);
 }
-#bootstrap-theme .dropdown-menu .bg-success a,
-#bootstrap-theme .dropdown-menu a.bg-success,
 #bootstrap-theme .bg-success {
   background-color: var(--crm-success-color);
   color: var(--crm-success-text-color);
 }
-#bootstrap-theme a.bg-success:hover,
-#bootstrap-theme a.bg-success:focus,
-#bootstrap-theme .dropdown-menu a.bg-success:hover,
-#bootstrap-theme .dropdown-menu .bg-success a:hover {
+#bootstrap-theme li.bg-success > a,
+#bootstrap-theme .bg-success > span > a:not(.btn),
+#bootstrap-theme .dropdown-menu .bg-success .crm-i::before {
+  color: var(--crm-success-text-color);
+}
+#bootstrap-theme a.bg-success:is(:hover,:focus),
+#bootstrap-theme .dropdown-menu a.bg-success:is(:hover,:focus),
+#bootstrap-theme .dropdown-menu .bg-success a:is(:hover,:focus) {
   background: color-mix(in srgb, var(--crm-success-color) 87.5%, #000 12.5%);
   color: var(--crm-success-text-color);
 }
-#bootstrap-theme .dropdown-menu .bg-info a,
-#bootstrap-theme .dropdown-menu a.bg-info,
 #bootstrap-theme .bg-info {
   background-color: var(--crm-info-color);
   color: var(--crm-info-text-color);
 }
-#bootstrap-theme a.bg-info:hover,
-#bootstrap-theme a.bg-info:focus,
-#bootstrap-theme .dropdown-menu .bg-info a:hover,
-#bootstrap-theme .dropdown-menu a.bg-info:hover {
+#bootstrap-theme li.bg-info > a,
+#bootstrap-theme .bg-info > span > a:not(.btn),
+#bootstrap-theme .dropdown-menu .bg-info .crm-i::before {
+  color: var(--crm-info-text-color);
+}
+#bootstrap-theme a.bg-info:is(:hover,:focus),
+#bootstrap-theme .dropdown-menu .bg-info a:is(:hover,:focus),
+#bootstrap-theme .dropdown-menu a.bg-info:is(:hover,:focus) {
   background: color-mix(in srgb, var(--crm-info-color) 87.5%, #000 12.5%);
   color: var(--crm-info-text-color);
 }
-#bootstrap-theme .bg-warning,
-#bootstrap-theme .dropdown-menu .bg-warning a,
-#bootstrap-theme .dropdown-menu a.bg-warning {
+#bootstrap-theme .bg-warning {
   background-color: var(--crm-warning-color);
-  color: var(--crm-warning-text-color) !important /* FormBuilder vs .disabled */;
-}
-#bootstrap-theme a.bg-warning:hover,
-#bootstrap-theme a.bg-warning:focus,
-#bootstrap-theme .dropdown-menu .bg-warning a:hover,
-#bootstrap-theme .dropdown-menu a.bg-warning:hover {
-  background: color-mix(in srgb, var(--crm-warning-color) 87.5%, #000 12.5%);
   color: var(--crm-warning-text-color);
 }
-#bootstrap-theme .bg-danger,
-#bootstrap-theme .dropdown-menu .bg-danger a,
-#bootstrap-theme .dropdown-menu a.bg-danger {
-  background-color: var(--crm-danger-color);
-  color: var(--crm-danger-text-color);
-}
-#bootstrap-theme a.bg-danger:hover,
-#bootstrap-theme a.bg-danger:focus,
-#bootstrap-theme .dropdown-menu .bg-danger a:hover,
-#bootstrap-theme .dropdown-menu a.bg-danger:hover {
-  background: color-mix(in srgb, var(--crm-danger-color) 87.5%, #000 12.5%);
-  color: var(--crm-danger-text-color);
-}
-#bootstrap-theme .dropdown-menu .bg-danger .crm-i::before {
-  color: var(--crm-danger-text-color);
-}
+#bootstrap-theme li.bg-warning > a,
+#bootstrap-theme .bg-warning > span > a:not(.btn),
 #bootstrap-theme .dropdown-menu .bg-warning .crm-i::before {
   color: var(--crm-warning-text-color);
 }
-#bootstrap-theme .dropdown-menu .bg-success .crm-i::before {
-  color: var(--crm-success-text-color);
+#bootstrap-theme a.bg-warning:is(:hover,:focus),
+#bootstrap-theme .dropdown-menu .bg-warning a:is(:hover,:focus),
+#bootstrap-theme .dropdown-menu a.bg-warning:is(:hover,:focus) {
+  background: color-mix(in srgb, var(--crm-warning-color) 87.5%, #000 12.5%);
+  color: var(--crm-warning-text-color);
 }
-#bootstrap-theme .dropdown-menu .bg-info .crm-i::before {
-  color: var(--crm-info-text-color);
+#bootstrap-theme .bg-danger {
+  background-color: var(--crm-danger-color);
+  color: var(--crm-danger-text-color);
+}
+#bootstrap-theme li.bg-danger > a,
+#bootstrap-theme .bg-danger > span > a:not(.btn),
+#bootstrap-theme .dropdown-menu .bg-danger .crm-i::before {
+  color: var(--crm-danger-text-color);
+}
+#bootstrap-theme a.bg-danger:is(:hover,:focus),
+#bootstrap-theme .dropdown-menu .bg-danger a:is(:hover,:focus),
+#bootstrap-theme .dropdown-menu a.bg-danger:is(:hover,:focus) {
+  background: color-mix(in srgb, var(--crm-danger-color) 87.5%, #000 12.5%);
+  color: var(--crm-danger-text-color);
 }
 
 /* CKEditor Config */

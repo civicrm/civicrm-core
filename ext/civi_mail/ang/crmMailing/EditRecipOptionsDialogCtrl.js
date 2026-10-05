@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   // Controller for the "Recipients: Edit Options" dialog
   // Note: Expects $scope.model to be an object with properties:
@@ -9,4 +9,4 @@
     $scope.hs = crmUiHelp({file: 'CRM/Mailing/MailingUI'});
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

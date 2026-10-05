@@ -303,6 +303,56 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   }
 
   /**
+   * Set up managed Custom Group and Custom Field and check
+   * cleanup=>unused respects the custom getRefCount
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRemoveDeclaration_CleanupUnusedCustomData(): void {
+    $this->managedEntities = [
+      array_merge($this->fixtures['com.example.one-CustomGroup'], ['cleanup' => 'unused']),
+      array_merge($this->fixtures['com.example.one-CustomField'], ['cleanup' => 'unused']),
+    ];
+
+    // reconcile to create the Group and Field
+    $me = new CRM_Core_ManagedEntities($this->modules);
+    $me->reconcile();
+
+    // check Field is created
+    $getField = \Civi\Api4\CustomField::get(FALSE)->addWhere('name', '=', 'test_custom_field')->execute();
+    $this->assertEquals(1, count($getField));
+
+    // add some data to the field
+    $contactId = \Civi\Api4\Contact::get(FALSE)->setLimit(1)->addSelect('id')->execute()->single()['id'];
+    \Civi\Api4\Contact::update(FALSE)->addWhere('id', '=', $contactId)->addValue('test_custom_group.test_custom_field', 'test_value')->execute();
+
+    // Later on, entity definition disappears; but we should not cleanup while there is data in the field
+    $this->managedEntities = [];
+    $me = new CRM_Core_ManagedEntities($this->modules);
+    $me->reconcile();
+
+    // Check we can still read the value from the field
+    $value = \Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $contactId)->addSelect('test_custom_group.test_custom_field')->execute()->single()['test_custom_group.test_custom_field'];
+    $this->assertEquals('test_value', $value);
+
+    // Now delete the data
+    \Civi\Api4\Contact::update(FALSE)->addWhere('id', '=', $contactId)->addValue('test_custom_group.test_custom_field', NULL)->execute();
+
+    // Reconcile again -- now there is no data in the field, we expect it to be deleted
+    $this->managedEntities = [];
+    $me = new CRM_Core_ManagedEntities($this->modules);
+    $me->reconcile();
+
+    // check field has been deleted
+    $getField = \Civi\Api4\CustomField::get(FALSE)->addWhere('name', '=', 'test_custom_field')->execute();
+    $this->assertEquals(0, count($getField));
+
+    // check group has also been cleaned up
+    $getGroup = \Civi\Api4\CustomGroup::get(FALSE)->addWhere('name', '=', 'test_custom_group')->execute();
+    $this->assertEquals(0, count($getGroup));
+  }
+
+  /**
    * Set up an active module with one managed-entity using the
    * policy "cleanup=>unused". When the managed-entity goes away,
    * ensure that the policy is followed (ie the entity is conditionally

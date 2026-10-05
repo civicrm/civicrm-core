@@ -7,6 +7,7 @@
  * @group headless
  */
 class api_v3_ActivityCaseTest extends CiviCaseTestCase {
+  protected $_apiversion = 3;
   /**
    * @var array
    *  APIv3 Result (Case.create)

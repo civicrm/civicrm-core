@@ -52,7 +52,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     ]);
 
     // Calling it 'Expiiiired' is OK.
-    $this->callAPISuccess('job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership', []);
 
     $this->callAPISuccess('MembershipStatus', 'get', [
       'name' => 'Expired',
@@ -60,7 +60,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     ]);
 
     // Disabling 'Expired' is OK.
-    $this->callAPISuccess('job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership', []);
 
     $this->callAPISuccess('MembershipStatus', 'get', [
       'name' => 'Expired',
@@ -68,7 +68,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     ]);
 
     // Deleting 'Expired' is OK.
-    $this->callAPISuccess('job', 'process_membership', []);
+    $this->callApiV3Success('Job', 'process_membership', []);
 
     // Put things back like normal
     $this->callAPISuccess('MembershipStatus', 'create', [
@@ -90,7 +90,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
 
   public function testGetMembershipStatusByDate(): void {
     $params = [
-      'name' => 'Current',
+      'name' => uniqid('Current'),
       'is_active' => 1,
       'start_event' => 'start_date',
       'end_event' => 'end_date',
@@ -100,7 +100,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $toDate = date('Ymd');
 
     $result = CRM_Member_BAO_MembershipStatus::getMembershipStatusByDate($toDate, $toDate, $toDate, 'now', TRUE, NULL, $params);
-    $this->assertEquals($result['name'], 'Current', 'Verify membership status record.');
+    $this->assertEquals($params['name'], $result['name'], 'Verify membership status record.');
 
     $this->callAPISuccess('MembershipStatus', 'Delete', ['id' => $membershipStatus->id]);
   }
@@ -343,7 +343,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
 
   public function testgetMembershipStatusCurrent(): void {
     $params = [
-      'name' => 'Current',
+      'name' => uniqid('Current'),
       'is_active' => 1,
       'is_current_member' => 1,
     ];

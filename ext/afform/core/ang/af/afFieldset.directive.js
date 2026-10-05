@@ -1,16 +1,18 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // Example usage: <af-form><af-entity name="Person" type="Contact" /> ... <fieldset af-fieldset="Person> ... </fieldset></af-form>
   angular.module('af').directive('afFieldset', function() {
     return {
       restrict: 'A',
-      require: ['afFieldset', '?^^afForm'],
+      require: ['afFieldset', '?^^afForm', '?afRepeat'],
       bindToController: {
         modelName: '@afFieldset',
+        fieldData: '<',
         storeValues: '<'
       },
       link: function($scope, $el, $attr, ctrls) {
         const self = ctrls[0];
         self.afFormCtrl = ctrls[1];
+        self.afRepeatCtrl = ctrls[2];
       },
       controller: function($scope, $element, crmApi4) {
         const ctrl = this;
@@ -35,13 +37,26 @@
         };
         this.getFieldData = function() {
           const data = ctrl.getData();
-          if (!data.length) {
+          // afRepeat will handle adding items itself
+          if (!data.length && !ctrl.afRepeatCtrl) {
             data.push({fields: {}});
           }
-          return data[0].fields;
+          return data[0]?.fields;
         };
+
+        // Called by afRepeat
+        this.addRepeatItem = () => {
+          this.getData().push({fields: {}});
+        };
+
         this.getFormName = function() {
-          return ctrl.afFormCtrl ? ctrl.afFormCtrl.getFormMeta().name : $scope.meta.name;
+          if (ctrl.afFormCtrl) {
+            return ctrl.afFormCtrl.getFormMeta().name;
+          }
+          if ($scope.meta) {
+            return $scope.meta.name;
+          }
+          return $element.closest('form').attr('name');
         };
 
         this.getFieldMeta = () => {
@@ -76,8 +91,14 @@
           return this.reloadedStoredValues[fieldName];
         };
 
-        this.$onInit = function() {
-          $scope.$watch(ctrl.getFieldData, (newVal, oldVal) => {
+        this.$onInit = () => {
+          if (typeof this.fieldData === 'object') {
+            localData.push({
+              fields: this.fieldData,
+            });
+          }
+
+          $scope.$watch(this.getFieldData, (newVal, oldVal) => {
             $element[0].dispatchEvent(new Event('crmFormChangeFilters'));
             if (this.storeValues) {
               if (typeof newVal === 'object' && typeof oldVal === 'object' && Object.keys(newVal).length) {
@@ -112,7 +133,7 @@
           };
 
           // get a copy of the object
-          const data = _.cloneDeep(this.getFieldData());
+          const data = structuredClone(this.getFieldData());
 
           Object.keys(data).forEach((key) => {
             // first filter sub objects
@@ -180,4 +201,4 @@
       }
     };
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

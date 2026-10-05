@@ -69,7 +69,7 @@
 
 </div>
 {literal}<script type="text/javascript">
-  (function($, _) {
+  (function($) {
     $(function() {
       $('#civicrm-news-feed').tabs();
       var opened = CRM.cache.get('newsFeed', {});
@@ -100,12 +100,10 @@
             $tab.html($tab.text() + ' <em>' + count + '</em>');
           }
           // Remove items from localstorage that are no longer in the current feed
-          _.remove(opened[key], function(itemKey) {
-            return !$('a[href="' + itemKey + '"]', $content).length;
-          });
+          opened[key] = opened[key].filter(itemKey => $('a[href="' + itemKey + '"]', $content).length);
         }
       });
     });
-  })(CRM.$, CRM._);
+  })(CRM.$);
 </script>{/literal}
 {/strip}

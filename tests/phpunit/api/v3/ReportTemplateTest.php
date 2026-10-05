@@ -20,6 +20,7 @@ use Civi\Test\ACLPermissionTrait;
  * @group headless
  */
 class api_v3_ReportTemplateTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   use ACLPermissionTrait;
   use CRMTraits_PCP_PCPTestTrait;

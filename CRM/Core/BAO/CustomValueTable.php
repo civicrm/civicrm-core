@@ -75,6 +75,11 @@ class CRM_Core_BAO_CustomValueTable {
           $value = $serialize ? CRM_Core_DAO::serializeField($field['value'], $serialize) : $field['value'];
           $type = $field['type'];
 
+          // Trim string inputs
+          if (in_array($field['html_type'] ?? NULL, ['Text', 'Email', 'Link'], TRUE) && is_string($value)) {
+            $value = mb_trim($value);
+          }
+
           switch ($type) {
             case 'StateProvince':
             case 'Country':
@@ -146,6 +151,7 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'RichTextEditor':
+            case 'Currency':
               $type = 'String';
               break;
 
@@ -299,7 +305,7 @@ class CRM_Core_BAO_CustomValueTable {
    *   the mysql data store placeholder
    */
   public static function fieldToSQLType(string $type, $maxLength = NULL, bool $isSerialized = FALSE, ?string $fkEntity = NULL) {
-    if ($fkEntity) {
+    if ($fkEntity && $fkEntity !== 'Currency') {
       $type = self::getDataTypeForPrimaryKey($fkEntity);
     }
 
@@ -310,6 +316,10 @@ class CRM_Core_BAO_CustomValueTable {
     switch ($type) {
       case 'String':
         $maxLength = $maxLength ?: 255;
+        return "varchar($maxLength)";
+
+      case 'Currency':
+        $maxLength = $maxLength ?: 3;
         return "varchar($maxLength)";
 
       case 'Link':

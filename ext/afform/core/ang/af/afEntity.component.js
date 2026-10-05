@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // Whitelist of all allowed properties of an af-fieldset
   // (at least the ones we care about client-side - other's can be added for server-side processing and we'll just ignore them)
   const modelProps = {
@@ -29,4 +29,4 @@
     }
 
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

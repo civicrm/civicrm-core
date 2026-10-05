@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   angular.module('crmMailingAB').controller('CrmMailingABEditCtrl', function($scope, abtest, crmMailingABCriteria, crmMailingMgr, crmMailingPreviewMgr, crmStatus, $q, $location, crmBlocker, $interval, $timeout, CrmAutosaveCtrl, dialogService, mailingFields) {
     $scope.abtest = abtest;
@@ -12,7 +12,7 @@
     $scope.mailingFields = mailingFields;
 
     $scope.isSubmitted = function isSubmitted() {
-      return _.size(abtest.mailings.a.jobs) > 0 || _.size(abtest.mailings.b.jobs) > 0;
+      return Object.keys(abtest.mailings.a.jobs || {}).length > 0 || Object.keys(abtest.mailings.b.jobs || {}).length > 0;
     };
 
     $scope.sync = function sync() {
@@ -146,4 +146,4 @@
     $scope.$on('$destroy', myAutosave.stop);
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

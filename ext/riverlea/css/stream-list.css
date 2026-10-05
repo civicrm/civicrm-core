@@ -22,6 +22,9 @@ civi-riverlea-stream-card .panel-heading {
   justify-content: space-between;
   align-items: center;
 }
+civi-riverlea-stream-card .panel-heading h3 .crm-i {
+  margin-right: var(--crm-l-small);
+}
 civi-riverlea-stream-card .panel-heading .crm-buttons {
   justify-content: flex-end;
 }

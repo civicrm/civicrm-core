@@ -1,6 +1,4 @@
 // http://civicrm.org/licensing
-/*jslint indent: 2 */
-/*global CRM, cj */
 (function($) {
   'use strict';
 

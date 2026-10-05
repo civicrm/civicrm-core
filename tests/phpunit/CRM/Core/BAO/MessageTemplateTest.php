@@ -20,6 +20,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    * Post test cleanup.
    */
   public function tearDown(): void {
+    if (!empty($this->ids['MessageTemplate'])) {
+      MessageTemplate::delete(FALSE)->addWhere('id', 'IN', $this->ids['MessageTemplate'])->execute();
+    }
     $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_im', 'civicrm_website', 'civicrm_openid', 'civicrm_email', 'civicrm_translation'], TRUE);
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
@@ -53,6 +56,28 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $this->assertEquals('Hello testRenderTemplate Abba Baa!', $rendered['subject']);
     $this->assertEquals('Hello testRenderTemplate Abba Baa!', $rendered['text']);
     $this->assertStringContainsString('<p>Hello testRenderTemplate Abba Baa!</p>', $rendered['html']);
+  }
+
+  /**
+   * Test rendering a specific message template by its ID.
+   *
+   * The template is loaded purely from its ID, with no workflow. Only
+   * default templates can be loaded this way.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenderTemplateByID(): void {
+    $templateID = MessageTemplate::create(FALSE)->setValues([
+      'msg_html' => '<p>Rendered by ID</p>',
+      'workflow_name' => 'test_render_specific_template',
+      'is_active' => TRUE,
+      'is_default' => TRUE,
+    ])->execute()->first()['id'];
+
+    $rendered = CRM_Core_BAO_MessageTemplate::renderTemplate([
+      'messageTemplateID' => $templateID,
+    ]);
+    $this->assertStringContainsString('<p>Rendered by ID</p>', $rendered['html']);
   }
 
   /**
@@ -123,6 +148,51 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
    */
   public static function getLocaleTemplates(array $allTemplates, array $locales): array {
     return CRM_Utils_Array::subset($allTemplates, $locales);
+  }
+
+  /**
+   * Create a default, active message template for a given workflow.
+   *
+   * @param string $workflowName
+   * @param string $subject
+   * @param string $html
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  private function createMessageTemplateForTest(string $workflowName, string $subject, string $html): int {
+    $id = MessageTemplate::create(FALSE)->setValues([
+      'msg_subject' => $subject,
+      'msg_html' => $html,
+      'workflow_name' => $workflowName,
+      'is_active' => TRUE,
+      'is_default' => TRUE,
+    ])->execute()->first()['id'];
+    $this->ids['MessageTemplate'][] = $id;
+    return $id;
+  }
+
+  /**
+   * Save translation records for a message template.
+   *
+   * @param int $entityID
+   * @param array $records
+   * @param string|null $language
+   *   Default language to apply to any record that doesn't specify its own.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private function saveTranslationsForTest(int $entityID, array $records, ?string $language = NULL): void {
+    $defaults = [
+      'entity_table' => 'civicrm_msg_template',
+      'entity_id' => $entityID,
+      'status_id:name' => 'active',
+    ];
+    if ($language !== NULL) {
+      $defaults['language'] = $language;
+    }
+    Translation::save()->setRecords($records)->setDefaults($defaults)->execute();
   }
 
   /**
@@ -241,11 +311,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
         $records[] = ['entity_field' => 'msg_html', 'string' => 'html - Mexican', 'language' => 'es_MX'];
       }
 
-      Translation::save()->setRecords($records)->setDefaults([
-        'entity_table' => 'civicrm_msg_template',
-        'entity_id' => $messageTemplate['id'],
-        'status_id:name' => 'active',
-      ])->execute();
+      $this->saveTranslationsForTest($messageTemplate['id'], $records);
     }
     $translatedTemplate = MessageTemplate::get()
       ->addWhere('is_default', '=', 1)
@@ -256,6 +322,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->execute()->first();
     $this->assertEquals('subject - Mexican', $translatedTemplate['msg_subject']);
     $this->assertEquals('html - Mexican', $translatedTemplate['msg_html']);
+    $this->assertEquals('es_MX', $translatedTemplate['actual_language']);
 
     // This should fall back to Spanish...
     $translatedTemplate = MessageTemplate::get()
@@ -278,6 +345,302 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->execute()->first();
     $this->assertEquals('subject - site default translation', $translatedTemplate['msg_subject']);
     $this->assertEquals('html - site default translation', $translatedTemplate['msg_html']);
+  }
+
+  /**
+   * Test that a template without any translation of its own in the desired
+   * language falls back to its own site-default translation.
+   *
+   * We make sure of this even when some unrelated template happens to have
+   * a translation in that language because getTranslatedFieldsForRequest() looks
+   * up translations for the entity_table in general (not limited to the entity_id
+   * being rendered).
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testGetTemplateTranslationFallback(): void {
+    $targetTemplateID = $this->createMessageTemplateForTest('test_fallback_target', 'untranslated subject', 'untranslated');
+    $this->saveTranslationsForTest($targetTemplateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'site default subject'],
+      ['entity_field' => 'msg_html', 'string' => 'site default html'],
+    ], 'en_US');
+
+    $otherTemplateID = $this->createMessageTemplateForTest('test_fallback_other', 'other subject', 'other');
+    $this->saveTranslationsForTest($otherTemplateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'unrelated subject'],
+      ['entity_field' => 'msg_html', 'string' => 'unrelated html'],
+    ], 'es_MX');
+
+    $translated = MessageTemplate::get()
+      ->addWhere('id', '=', $targetTemplateID)
+      ->addSelect('msg_subject', 'msg_html')
+      ->setLanguage('es_MX')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+
+    $this->assertEquals('site default subject', $translated['msg_subject']);
+    $this->assertEquals('site default html', $translated['msg_html']);
+    $this->assertEquals('en_US', $translated['actual_language']);
+  }
+
+  /**
+   * Test that actual_language reflects the fields that were actually used,
+   * not just whichever field happened to be translated in the site-default
+   * language.
+   *
+   * A template may have some fields translated in the requested language and
+   * others only in the site-default language. In that case the requested-
+   * language content the user actually sees should determine actual_language.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testGetTemplateTranslationActualLanguagePartial(): void {
+    $templateID = $this->createMessageTemplateForTest('test_partial_translation', 'raw subject', 'raw html');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'site default subject'],
+    ], 'en_US');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_html', 'string' => 'es_MX html'],
+    ], 'es_MX');
+
+    $translated = MessageTemplate::get()
+      ->addWhere('id', '=', $templateID)
+      ->addSelect('msg_subject', 'msg_html')
+      ->setLanguage('es_MX')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+
+    $this->assertEquals('site default subject', $translated['msg_subject']);
+    $this->assertEquals('es_MX html', $translated['msg_html']);
+    $this->assertEquals('es_MX', $translated['actual_language']);
+  }
+
+  /**
+   * Test that a sibling language is preferred over the site-default language when
+   * the negotiated language falls back to the site default (any Norwegian in this case).
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testGetTemplateTranslationSiblingPreferredOverSiteDefaultNorwegian(): void {
+    $templateID = $this->createMessageTemplateForTest('test_norwegian_fallback', 'raw subject', 'raw html');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'site default subject'],
+      ['entity_field' => 'msg_html', 'string' => 'site default html'],
+    ], 'en_US');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'nynorsk subject'],
+      ['entity_field' => 'msg_html', 'string' => 'nynorsk html'],
+    ], 'nn_NO');
+
+    $translated = MessageTemplate::get()
+      ->addWhere('id', '=', $templateID)
+      ->addSelect('msg_subject', 'msg_html')
+      ->setLanguage('nb_NO')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+
+    $this->assertEquals('nynorsk subject', $translated['msg_subject']);
+    $this->assertEquals('nynorsk html', $translated['msg_html']);
+    $this->assertEquals('nn_NO', $translated['actual_language']);
+  }
+
+  /**
+   * Test that a sibling language is preferred over the site-default language
+   * when negotiation falls back to the site default (as above but with Spanish)
+   *
+   * Here the user asks for Argentine Spanish (es_AR), which isn't itself
+   * translated and isn't one of the handful of Spanish variants CiviCRM's
+   * locale negotiation specifically recognises (hardcoded array in
+   * getLocalePrecedence()) so negotiation falls back to the site default
+   * language. But a translation does exist in Uruguayan Spanish (es_UY) and
+   * it should be selected over the unrelated site-default language.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testGetTemplateTranslationSiblingPreferredOverSiteDefaultNonCurated(): void {
+    $templateID = $this->createMessageTemplateForTest('test_es_ar_fallback', 'raw subject', 'raw html');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'site default subject'],
+      ['entity_field' => 'msg_html', 'string' => 'site default html'],
+    ], 'en_US');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'uruguayan subject'],
+      ['entity_field' => 'msg_html', 'string' => 'uruguayan html'],
+    ], 'es_UY');
+
+    $translated = MessageTemplate::get()
+      ->addWhere('id', '=', $templateID)
+      ->addSelect('msg_subject', 'msg_html')
+      ->setLanguage('es_AR')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+
+    $this->assertEquals('uruguayan subject', $translated['msg_subject']);
+    $this->assertEquals('uruguayan html', $translated['msg_html']);
+    $this->assertEquals('es_UY', $translated['actual_language']);
+  }
+
+  /**
+   * Test that a sibling language is used even when there is no site-default
+   * translation at all to fall back to.
+   *
+   * Locale::renegotiate() returns NULL here, because nn_NO isn't itself in
+   * nb_NO's fallback precedence and there's no site-default translation for
+   * renegotiate() to land on either - but we still want any Norwegian.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testGetTemplateTranslationSiblingUsedWithoutSiteDefaultNorwegian(): void {
+    $templateID = $this->createMessageTemplateForTest('test_norwegian_no_default', 'raw subject', 'raw html');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'nynorsk subject'],
+      ['entity_field' => 'msg_html', 'string' => 'nynorsk html'],
+    ], 'nn_NO');
+
+    $translated = MessageTemplate::get()
+      ->addWhere('id', '=', $templateID)
+      ->addSelect('msg_subject', 'msg_html')
+      ->setLanguage('nb_NO')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+
+    $this->assertEquals('nynorsk subject', $translated['msg_subject']);
+    $this->assertEquals('nynorsk html', $translated['msg_html']);
+    $this->assertEquals('nn_NO', $translated['actual_language']);
+  }
+
+  /**
+   * Test that when the requested language is the site default it outranks a
+   * sibling variant that shares the same two-letter language prefix, in two ways:
+   *
+   * - msg_subject is translated by both languages, so the requested language
+   *   must win.
+   * - msg_html is translated only by the sibling language, so it's used as-is,
+   *   but actual_language should still be the requested language.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testGetTemplateTranslationSiteDefaultGenuineMatchNotClobberedBySibling(): void {
+    $cleanup = \CRM_Utils_AutoClean::swapSettings(['lcMessages' => 'en_GB']);
+
+    $templateID = $this->createMessageTemplateForTest('test_exact_site_default_match', 'raw subject', 'raw html');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'US subject'],
+      ['entity_field' => 'msg_html', 'string' => 'US html'],
+    ], 'en_US');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'GB subject'],
+    ], 'en_GB');
+
+    $translated = MessageTemplate::get()
+      ->addWhere('id', '=', $templateID)
+      ->addSelect('msg_subject', 'msg_html')
+      ->setLanguage('en_GB')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+
+    $this->assertEquals('GB subject', $translated['msg_subject']);
+    $this->assertEquals('US html', $translated['msg_html']);
+    $this->assertEquals('en_GB', $translated['actual_language']);
+
+    $cleanup->cleanup();
+  }
+
+  /**
+   * Test that a template with no translation at all - not in the negotiated
+   * language, not in any sibling variant, not even in the site-default
+   * language - is returned exactly as stored, untranslated, with no
+   * actual_language set.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testGetTemplateTranslationNoneAvailable(): void {
+    $templateID = $this->createMessageTemplateForTest('test_no_translation_at_all', 'raw subject', 'raw content');
+
+    $translated = MessageTemplate::get()
+      ->addWhere('id', '=', $templateID)
+      ->addSelect('msg_subject', 'msg_html')
+      ->setLanguage('es_MX')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+
+    $this->assertEquals('raw subject', $translated['msg_subject']);
+    $this->assertEquals('raw content', $translated['msg_html']);
+    $this->assertArrayNotHasKey('actual_language', $translated);
+  }
+
+  /**
+   * Test that actual_language is NULL when a translation exists for the
+   * entity but not for any of the fields actually selected in this request.
+   *
+   * Only msg_text is translated (into es_MX) here, but the request selects
+   * msg_subject/msg_html, which have no translation and are returned as
+   * raw/untranslated. actual_language must reflect that nothing shown was
+   * translated.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testGetTemplateTranslationActualLanguageNotSetFromUnselectedField(): void {
+    $templateID = $this->createMessageTemplateForTest('test_unselected_field_translated', 'raw subject', 'raw html');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_text', 'string' => 'es_MX text'],
+    ], 'es_MX');
+
+    $translated = MessageTemplate::get()
+      ->addWhere('id', '=', $templateID)
+      ->addSelect('msg_subject', 'msg_html')
+      ->setLanguage('es_MX')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+
+    $this->assertEquals('raw subject', $translated['msg_subject']);
+    $this->assertEquals('raw html', $translated['msg_html']);
+    $this->assertArrayHasKey('actual_language', $translated);
+    $this->assertNull($translated['actual_language']);
+  }
+
+  /**
+   * Test that among languages that are neither the site default nor the
+   * negotiated match, we pick the sibling with higher precendence, i.e.
+   * the more common / globally-used language.
+   *
+   * So here we want en_GB over en_AU when requesting en_CA, but en_GB's
+   * translation is saved first and en_AU's second, so that without
+   * ordering languages by precedence, we'd get en_AU.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function testGetTemplateTranslationOtherLanguagesOrderedByPrecedence(): void {
+    $templateID = $this->createMessageTemplateForTest('test_other_languages_precedence', 'raw subject', 'raw html');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_html', 'string' => 'en_CA html'],
+    ], 'en_CA');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'en_GB subject'],
+    ], 'en_GB');
+    $this->saveTranslationsForTest($templateID, [
+      ['entity_field' => 'msg_subject', 'string' => 'en_AU subject'],
+    ], 'en_AU');
+
+    $translated = MessageTemplate::get()
+      ->addWhere('id', '=', $templateID)
+      ->addSelect('msg_subject', 'msg_html')
+      ->setLanguage('en_CA')
+      ->setTranslationMode('fuzzy')
+      ->execute()->first();
+
+    $this->assertEquals('en_GB subject', $translated['msg_subject']);
+    $this->assertEquals('en_CA html', $translated['msg_html']);
+    $this->assertEquals('en_CA', $translated['actual_language']);
   }
 
   /**
@@ -812,18 +1175,10 @@ emo
     $this->setupContactFromTokeData($tokenData);
 
     $context = ['contactId' => $tokenData['contact_id']];
-    $render = static function (string $templateText) use ($context, $tokenData) {
-      try {
-        return CRM_Core_TokenSmarty::render(['text' => $templateText], $context)['text'];
-      }
-      catch (\Throwable $t) {
-        return 'EXCEPTION:' . $t->getMessage();
-      }
-    };
 
     // Build $tokenLines, a list of expressions like 'contact.display_name:{contact.display_name}'
     $tokenLines = [];
-    $tokenNames = array_keys($this->getAdvertisedTokens());
+    $tokenNames = array_keys(array_merge($this->getAdvertisedTokens(), $tokenData));
     foreach ($tokenNames as $tokenName) {
       $tokenLines[] = trim($tokenName, '{}') . ':' . $tokenName;
     }
@@ -834,12 +1189,17 @@ emo
     sort($tokenLines);
 
     // Evaluate all these token lines
-    $oneByOne = array_map($render, $tokenLines);
-    $allAtOnce = $render(implode("\n", $tokenLines));
+    $oneByOne = [];
+    foreach ($tokenLines as $tokenLine) {
+      $oneByOne[] = CRM_Core_TokenSmarty::render(['text' => $tokenLine], $context)['text'];
+    }
+    $allAtOnce = CRM_Core_TokenSmarty::render(['text' => implode("\n", $tokenLines)], $context)['text'];
     $this->assertEquals($allAtOnce, implode("\n", $oneByOne));
 
     $emptyLines = preg_grep('/:$/', $oneByOne);
     $this->assertEquals([
+      'contact.Custom_Group.My_file:',
+      'contact.Custom_Group.Number_select:label:',
       'contact.address_primary.county_id:label:',
       'contact.contact_is_deleted:',
       'contact.county:',
@@ -1051,25 +1411,26 @@ emo
       '{contact.im_primary.name}' => 'IM Screen Name',
       '{contact.address_primary.country_id.region_id:name}' => 'World Region',
       '{contact.website_first.url}' => 'Website',
-      '{contact.custom_9}' => 'Contact reference field :: Custom Group',
-      '{contact.custom_7}' => 'Country :: Custom Group',
-      '{contact.custom_8}' => 'Country-multi :: Custom Group',
-      '{contact.custom_4}' => 'Enter integer here :: Custom Group',
-      '{contact.custom_1}' => 'Enter text here :: Custom Group',
-      '{contact.custom_6}' => 'My file :: Custom Group',
-      '{contact.custom_2}' => 'Pick Color :: Custom Group',
-      '{contact.custom_13}' => 'Pick Shade :: Custom Group',
-      '{contact.custom_10}' => 'State :: Custom Group',
-      '{contact.custom_11}' => 'State-multi :: Custom Group',
-      '{contact.custom_5}' => 'test_link :: Custom Group',
-      '{contact.custom_12}' => 'Yes No :: Custom Group',
-      '{contact.custom_3}' => 'Test Date :: Custom Group',
+      '{contact.Custom_Group.Contact_reference_field.display_name}' => 'Contact reference field :: Custom Group',
+      '{contact.Custom_Group.Country:label}' => 'Custom Group: Country',
+      '{contact.Custom_Group.Country_multi:label}' => 'Custom Group: Country-multi',
+      '{contact.Custom_Group.Enter_integer_here}' => 'Enter integer here :: Custom Group',
+      '{contact.Custom_Group.Enter_text_here}' => 'Enter text here :: Custom Group',
+      '{contact.Custom_Group.My_file}' => 'My file :: Custom Group',
+      '{contact.Custom_Group.Pick_Color:label}' => 'Custom Group: Pick Color',
+      '{contact.Custom_Group.Pick_Shade:label}' => 'Custom Group: Pick Shade',
+      '{contact.Custom_Group.State:label}' => 'Custom Group: State',
+      '{contact.Custom_Group.State_multi:label}' => 'Custom Group: State-multi',
+      '{contact.Custom_Group.test_link}' => 'test_link :: Custom Group',
+      '{contact.Custom_Group.Yes_No:label}' => 'Yes No :: Custom Group',
+      '{contact.Custom_Group.test_date}' => 'Test Date :: Custom Group',
+      '{contact.Custom_Group.Integer_radio:label}' => 'Custom Group: Integer radio',
+      '{contact.Custom_Group.Number_select:label}' => 'Custom Group: Number select',
       '{contact.checksum}' => 'Checksum (with cs=)',
       '{contact.checksum_value}' => 'Checksum value',
       '{contact.id}' => 'Contact ID',
       '{important_stuff.favourite_emoticon}' => 'Best coolest emoticon',
       '{site.message_header}' => 'Message Header',
-      '{contact.custom_14}' => 'Integer radio :: Custom Group',
     ];
   }
 
@@ -1432,25 +1793,26 @@ im_primary.provider_id:label |Yahoo
 im_primary.name |IM Screen Name
 address_primary.country_id.region_id:name |America South, Central, North and Caribbean
 website_first.url |https://civicrm.org
-custom_9 |Mr. Spider Man II
-custom_7 |New Zealand
-custom_8 |France, Canada
-custom_4 |999
-custom_1 |Bobsled
-custom_6 |
-custom_2 |Red
-custom_13 |Purple
-custom_10 |Queensland
-custom_11 |Victoria, New South Wales
-custom_5 |<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
-custom_12 |Yes
-custom_3 |01/20/2021 12:00AM
+Custom_Group.Contact_reference_field.display_name |Mr. Spider Man II
+Custom_Group.Country:label |New Zealand
+Custom_Group.Country_multi:label |France, Canada
+Custom_Group.Enter_integer_here |999
+Custom_Group.Enter_text_here |Bobsled
+Custom_Group.My_file |
+Custom_Group.Pick_Color:label |Red
+Custom_Group.Pick_Shade:label |Purple
+Custom_Group.State:label |Queensland
+Custom_Group.State_multi:label |Victoria, New South Wales
+Custom_Group.test_link |https://civicrm.org
+Custom_Group.Yes_No:label |Yes
+Custom_Group.test_date |January 20th, 2021
+Custom_Group.Integer_radio:label |100
+Custom_Group.Number_select:label |
 checksum |cs=' . $checksum . '
 checksum_value |' . $checksum . '
 id |' . $tokenData['contact_id'] . '
 t_stuff.favourite_emoticon |
 sage_header |<div><!-- This content comes from the site message header token--></div>
-custom_14 |100
 ';
   }
 

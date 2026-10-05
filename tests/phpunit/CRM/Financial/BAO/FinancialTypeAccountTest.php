@@ -14,6 +14,7 @@
  * @group headless
  */
 class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
+  protected $_apiversion = 4;
 
   public function setUp(): void {
     parent::setUp();

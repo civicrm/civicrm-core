@@ -94,8 +94,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->customFieldID = $customField['id'];
 
     $customFieldDataType = array_column(CRM_Core_BAO_CustomField::dataType(), 'id');
-    $dataToHtmlTypes = CRM_Custom_Form_Field::$_dataToHTML;
-    $optionSupportingHTMLTypes = CRM_Custom_Form_Field::$htmlTypesWithOptions;
+    $customHtmlTypes = Civi::entity('CustomField')->getOptions('html_type');
 
     foreach ($customFieldDataType as $dataType) {
       switch ($dataType) {
@@ -139,11 +138,15 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           }
 
           //Create custom field of $dataType and html-type $html
-          foreach ($dataToHtmlTypes[$dataType] as $html) {
+          foreach ($customHtmlTypes as $htmlType) {
+            if (!isset($htmlType['data_types'][$dataType])) {
+              continue;
+            }
+            $html = $htmlType['id'];
             // per CRM-18568 the like operator does not currently work for fields with options.
             // the LIKE operator could potentially bypass ACLs (as could IS NOT NULL) and some thought needs to be given
             // to it.
-            if (in_array($html, $optionSupportingHTMLTypes)) {
+            if (!empty($htmlType['data_types'][$dataType]['option_group'])) {
               $validSQLOperators = array_diff($validSQLOperators, ['LIKE', 'NOT LIKE']);
             }
             $params = [

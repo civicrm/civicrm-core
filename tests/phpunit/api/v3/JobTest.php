@@ -26,6 +26,7 @@ use Civi\Api4\Contact;
  * @group headless
  */
 class api_v3_JobTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   /**
    * Entities to return to their original values during tearDown.
@@ -2466,6 +2467,39 @@ ENDSQLUPDATE;
       CRM_Report_Utils_Report::makeCsv($fakeForm, $rows),
       $parts[2]->text
     );
+
+    $mut->clearMessages();
+    $mut->stop();
+  }
+
+  /**
+   * Test that the mail_report job sends an email when multiple recipients are specified in email_to.
+   */
+  public function testMailReportMultipleRecipients(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    $reportInstance = $this->createReportInstance();
+    $this->callAPISuccess('ReportInstance', 'create', [
+      'id' => $reportInstance['id'],
+      'email_to' => 'person1@example.com, person2@example.com',
+    ]);
+
+    if (empty($_SERVER['QUERY_STRING'])) {
+      $_SERVER['QUERY_STRING'] = 'reset=1';
+    }
+
+    ob_start();
+    $this->callApiV3Success('Job', 'mail_report', [
+      'instanceId' => $reportInstance['id'],
+      'format' => 'pdf',
+    ]);
+    ob_end_clean();
+
+    $message = $mut->getMostRecentEmail('ezc');
+
+    $this->assertEquals('This is the email subject', $message->subject);
+    $this->assertCount(2, $message->to);
+    $this->assertEquals('person1@example.com', $message->to[0]->email);
+    $this->assertEquals('person2@example.com', $message->to[1]->email);
 
     $mut->clearMessages();
     $mut->stop();

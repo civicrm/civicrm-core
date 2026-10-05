@@ -20,6 +20,7 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\CustomField;
@@ -121,6 +122,37 @@ class ChainTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertEquals('Fav', $found['contact']['first_name']);
     $this->assertEquals('Fav', $found['contact2']['first_name']);
+  }
+
+  /**
+   * Ensure permission escalation is not possible via Api chaining
+   */
+  public function testChainedCheckPermissions(): void {
+    $contactId = $this->createTestRecord('Individual')['id'];
+
+    $config = \CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
+    $params = [
+      'checkPermissions' => TRUE,
+      'where' => [['id', '=', $contactId]],
+      'chain' => [
+        'malicious_update' => [
+          'Contact',
+          'update',
+          [
+            'checkPermissions' => FALSE,
+            'checkpermissions' => FALSE,
+            'Checkpermissions' => FALSE,
+            'ChEcKpErMiSSiOnS' => FALSE,
+            'where' => [['id', '=', '$id']],
+            'values' => ['first_name' => 'Malicious'],
+          ],
+        ],
+      ],
+    ];
+
+    $this->expectException(UnauthorizedException::class);
+    civicrm_api4('Contact', 'get', $params);
   }
 
 }

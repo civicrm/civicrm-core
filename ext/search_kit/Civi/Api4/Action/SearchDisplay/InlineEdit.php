@@ -236,6 +236,9 @@ class InlineEdit extends Run {
       throw new \CRM_Core_Exception('Cannot update draggable weight: no value provided.');
     }
     $entityName = $this->savedSearch['api_entity'];
+    if (!CoreUtil::isType($entityName, 'SortableEntity')) {
+      throw new \CRM_Core_Exception("Cannot drag-sort '$entityName': entity must declare itself a SortableEntity (see Civi\\Api4\\Generic\\Traits\\SortableEntity) for weights to be reordered correctly.");
+    }
     $keyName = CoreUtil::getIdFieldName($entityName);
     // For security, do not accept arbitrary values; only update weight.
     $values = [

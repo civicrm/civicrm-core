@@ -38,6 +38,7 @@
   <mixins>
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>smarty@1.0.3</mixin>
+    <mixin>scan-classes@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Ckeditor4</namespace>

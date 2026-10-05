@@ -27,16 +27,6 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   private static $visibilityOptionsKeys;
 
   /**
-   * Create or update a PriceField.
-   *
-   * @param array $params
-   * @return CRM_Price_DAO_PriceField
-   */
-  public static function add($params) {
-    return self::writeRecord($params);
-  }
-
-  /**
    * Takes an associative array and creates a price field object.
    *
    * This function is invoked from within the web form layer and also from the api layer
@@ -54,7 +44,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     }
     $transaction = new CRM_Core_Transaction();
 
-    $priceField = self::add($params);
+    $priceField = self::writeRecord($params);
 
     if (is_a($priceField, 'CRM_Core_Error')) {
       $transaction->rollback();

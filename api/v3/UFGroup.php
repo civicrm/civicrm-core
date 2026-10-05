@@ -30,6 +30,9 @@ function _civicrm_api3_uf_group_create_spec(&$params) {
   $params['created_date']['api.default'] = 'now';
   $params['post_url']['api.aliases'] = ['post_URL'];
   $params['cancel_url']['api.aliases'] = ['cancel_URL'];
+  // Legacy aliases from the CRM_Core_BAO_UFGroup::add function
+  $params['limit_listings_group_id']['api.aliases'] = ['group'];
+  $params['add_to_group_id']['api.aliases'] = ['add_contact_to_group'];
 }
 
 /**
@@ -119,8 +122,8 @@ function _civicrm_api3_uf_group_getlist_output($result, $request, $entity, $fiel
           if (!empty($row[$field])) {
             // Special formatting for group_type field
             if ($field == 'group_type') {
-              $groupTypes = CRM_UF_Page_Group::extractGroupTypes($row[$field]);
-              $data['description'][] = CRM_UF_Page_Group::formatGroupTypes($groupTypes);
+              $groupTypes = CRM_Core_BAO_UFGroup::extractGroupTypes($row[$field]);
+              $data['description'][] = implode(', ', CRM_Core_BAO_UFGroup::formatGroupTypeLabels($groupTypes));
               continue;
             }
             if (!isset($fields[$field]['pseudoconstant'])) {

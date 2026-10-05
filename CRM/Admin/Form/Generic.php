@@ -43,8 +43,9 @@ class CRM_Admin_Form_Generic extends CRM_Core_Form {
     $filter = $this->getSettingPageFilter();
     // Start with fully-resolved metadata for all settings; this allows callbacks to add/remove themselves from pages
     $allSettings = \Civi\Core\SettingsMetadata::getMetadata(NULL, NULL, TRUE, FALSE, TRUE);
+    // Filter by page filter, and also hide contact-specific settings
     $this->_settings = array_filter($allSettings, function ($setting) use ($filter) {
-      return !empty($setting['settings_pages'][$filter]);
+      return !empty($setting['settings_pages'][$filter]) && empty($setting['is_contact']);
     });
     // Add CSS for File CRUD form elements
     Civi::resources()->addStyleFile('civicrm', 'css/admin.css');

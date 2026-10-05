@@ -60,3 +60,9 @@ input[name=preview_test_email]::placeholder {
   opacity: .6;
   cursor: default;
 }
+
+.crmMailing-outdated-count {
+  color: var(--crm-warning-ink-color);
+  font-weight: bold;
+  cursor: help;
+}

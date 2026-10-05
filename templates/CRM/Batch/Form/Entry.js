@@ -1,5 +1,5 @@
 //@todo functions partially moved from tpl but still need an enclosure / cleanup
-// jslinting etc
+/* global cj */
 CRM.$(function($) {
   $('.selector-rows').change(function () {
     var options = {
@@ -16,12 +16,12 @@ CRM.$(function($) {
     // validate rows
     checkColumns($(this));
   });
-   $('.pledge-adjust-option').click(function(){
-	var blockNo = $(this).attr('id');
-	$('select[id="option_type_' + blockNo + '"]').show();
-	$('select[id="option_type_' + blockNo + '"]').removeAttr('disabled');
-	$('#field_' + blockNo + '_total_amount').removeAttr('readonly');
-    });
+  $('.pledge-adjust-option').click(function(){
+    var blockNo = $(this).attr('id');
+    $('select[id="option_type_' + blockNo + '"]').show();
+    $('select[id="option_type_' + blockNo + '"]').removeAttr('disabled');
+    $('#field_' + blockNo + '_total_amount').removeAttr('readonly');
+  });
   $('input[name^="soft_credit_contact_"]').on('change', function(){
     var rowNum = $(this).attr('id').replace('soft_credit_contact_id_','');
     var totalAmount = $('#field_'+rowNum+'_total_amount').val();
@@ -54,23 +54,21 @@ CRM.$(function($) {
         callback({id: $(el).val(), text: $('[name="'+thisMadeThroughName+'"]').val()});
       }
     })
-    // This is just a cheap trick to store the name when the form reloads
-    .on('change', function() {
-      var fieldNameVal = $(this).select2('data');
-      if (!fieldNameVal) {
-        fieldNameVal = '';
-      }
-      $('[name="'+thisMadeThroughName+'"]').val(fieldNameVal.text);
-    });
+      // This is just a cheap trick to store the name when the form reloads
+      .on('change', function() {
+        var fieldNameVal = $(this).select2('data');
+        if (!fieldNameVal) {
+          fieldNameVal = '';
+        }
+        $('[name="'+thisMadeThroughName+'"]').val(fieldNameVal.text);
+      });
   });
 
-  $('input[name^="pcp_display_in_roll"]').each(function() {
-    showHidePCPRoll(this);
-    $(this).change(function() {
-      showHidePCPRoll(this);
-    });
-  });
+  function showHidePCPRoll() {
+    $(this).parents('.crm-grid-cell').children('.pcp_roll_display').toggle($(this).prop('checked'));
+  }
 
+  $('input[name^="pcp_display_in_roll"]').each(showHidePCPRoll).change(showHidePCPRoll);
 
   // validate rows
   validateRow();
@@ -92,20 +90,20 @@ CRM.$(function($) {
     });
 
   }
-  else if (CRM.batch.type_id == 2){
-	$('select[id^="member_option_"]').each(function () {
-	    if ($(this).val() == 1) {
-		$(this).attr('disabled', true);
-	    }
-	});
+  else if (CRM.batch.type_id == 2) {
+    $('select[id^="member_option_"]').each(function () {
+      if ($(this).val() == 1) {
+        $(this).attr('disabled', true);
+      }
+    });
 
-  // set payment info accord to membership type
-  $('select[id*="_membership_type_0"]').change(function () {
-    setPaymentBlock($(this), null);
-  });
-  $('select[id*="_membership_type_1"]').change(function () {
-    setPaymentBlock($(this), $(this).val());
-  });
+    // set payment info accord to membership type
+    $('select[id*="_membership_type_0"]').change(function () {
+      setPaymentBlock($(this), null);
+    });
+    $('select[id*="_membership_type_1"]').change(function () {
+      setPaymentBlock($(this), $(this).val());
+    });
 
   }
 
@@ -116,17 +114,6 @@ CRM.$(function($) {
   //set the focus on first element
   $('#primary_contact_1').focus();
 });
-
-function showHidePCPRoll(elem) {
-  CRM.$(function($) {
-    if ($(elem).prop('checked')) {
-      $(elem).parents('.crm-grid-cell').children('.pcp_roll_display').show();
-    }
-    else {
-      $(elem).parents('.crm-grid-cell').children('.pcp_roll_display').hide();
-    }
-  });
-}
 
 function setPaymentBlock(form, memType) {
   var rowID = form.closest('div.crm-grid-row').attr('entity_id');

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   // Convert between a mailing "From Address" (mailing.from_name,mailing.from_email) and a unified label ("Name" <e@ma.il>)
   // example: <span crm-mailing-from-address="myPlaceholder" crm-mailing="myMailing"><select ng-model="myPlaceholder.label"></select></span>
   // NOTE: This really doesn't belong in a directive. I've tried (and failed) to make this work with a getterSetter binding, eg
@@ -27,4 +27,4 @@
       }
     };
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

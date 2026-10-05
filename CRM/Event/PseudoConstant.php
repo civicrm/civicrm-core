@@ -119,24 +119,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get all the participant listings.
-   *
-   * @deprecated
-   * @param int $id
-   * @return array|string
-   *   array reference of all participant listings if any
-   */
-  public static function participantListing($id = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('Function participantListing will be removed');
-    $options = CRM_Core_OptionGroup::values('participant_listing');
-
-    if ($id) {
-      return $options[$id];
-    }
-    return $options;
-  }
-
-  /**
    * Get all  event types.
    *
    *
@@ -154,32 +136,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   }
 
   /**
-   * Get event template titles.
-   *
-   * @param int $id
-   *
-   * @return array
-   *   Array of event id → template title pairs
-   *
-   * @deprecated Use the API instead
-   */
-  public static function eventTemplates($id = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('Use the api');
-    $options = [];
-    CRM_Core_PseudoConstant::populate($options,
-      'CRM_Event_DAO_Event',
-      FALSE,
-      'template_title',
-      'is_active',
-      'is_template = 1'
-    );
-    if ($id) {
-      return $options[$id];
-    }
-    return $options;
-  }
-
-  /**
    * Flush given pseudoconstant so it can be reread from db
    * next time it's requested.
    *
@@ -190,27 +146,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
     if (isset(self::$$name)) {
       self::$$name = NULL;
     }
-  }
-
-  /**
-   * Get all the Personal campaign pages.
-   *
-   * @deprecated
-   * @param int $id
-   * @return array
-   *   array reference of all pcp if any
-   */
-  public static function pcPage($id = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning('Function pcPage will be removed');
-    $options = [];
-    CRM_Core_PseudoConstant::populate($options,
-      'CRM_PCP_DAO_PCP',
-      FALSE, 'title'
-    );
-    if ($id) {
-      return $options[$id] ?? NULL;
-    }
-    return $options;
   }
 
 }

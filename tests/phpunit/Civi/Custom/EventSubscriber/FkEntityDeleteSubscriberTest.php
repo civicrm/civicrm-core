@@ -43,7 +43,7 @@ final class FkEntityDeleteSubscriberTest extends \CiviUnitTestCase {
         'data_type' => 'EntityReference',
         'fk_entity' => 'Contact',
         'label' => 'Contact',
-        'html_type' => 'Select',
+        'html_type' => 'Autocomplete-Select',
       ])->execute()->single();
 
     // Adding custom fields alters database schema and thus commits open transactions.

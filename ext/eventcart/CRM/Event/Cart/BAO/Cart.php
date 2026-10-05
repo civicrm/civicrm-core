@@ -12,15 +12,11 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   public $events_in_carts = [];
 
   /**
-   * @param array $params
-   *
-   * @return CRM_Event_Cart_BAO_Cart
+   * @deprecated
    */
   public static function add(&$params) {
-    $cart = new CRM_Event_Cart_BAO_Cart();
-    $cart->copyValues($params);
-    $result = $cart->save();
-    return $result;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
@@ -58,18 +54,11 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   }
 
   /**
-   * @param array $params
-   *
-   * @return CRM_Event_Cart_BAO_Cart
-   * @throws Exception
+   * @deprecated
    */
   public static function create($params) {
-    $transaction = new CRM_Core_Transaction();
-
-    $cart = self::add($params);
-    $transaction->commit();
-
-    return $cart;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**
@@ -124,12 +113,12 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     }
     if ($cart === FALSE) {
       if (is_null($userID)) {
-        $cart = self::create([]);
+        $cart = self::writeRecord([]);
       }
       else {
         $cart = self::find_uncompleted_by_user_id($userID);
         if ($cart === FALSE) {
-          $cart = self::create(['user_id' => $userID]);
+          $cart = self::writeRecord(['user_id' => $userID]);
         }
       }
       $session->set('event_cart_id', $cart->id);

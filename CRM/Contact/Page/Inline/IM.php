@@ -28,7 +28,7 @@ class CRM_Contact_Page_Inline_IM extends CRM_Core_Page {
    */
   public function run(): void {
     // get the emails for this contact
-    $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
+    $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', NULL, TRUE);
 
     $locationTypes = CRM_Core_BAO_Address::buildOptions('location_type_id');
     $IMProviders = CRM_Core_DAO_IM::buildOptions('provider_id');

@@ -4,6 +4,7 @@ return [
   'name' => 'Pledge',
   'table' => 'civicrm_pledge',
   'class' => 'CRM_Pledge_DAO_Pledge',
+  'token_class' => 'CRM_Pledge_Tokens',
   'getInfo' => fn() => [
     'title' => ts('Pledge'),
     'title_plural' => ts('Pledges'),
@@ -39,6 +40,7 @@ return [
         'import',
         'export',
         'duplicate_matching',
+        'token',
       ],
       'primary_key' => TRUE,
       'auto_increment' => TRUE,
@@ -104,6 +106,9 @@ return [
     'amount' => [
       'title' => ts('Total Pledged'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Total pledged amount.'),
@@ -118,6 +123,9 @@ return [
     'original_installment_amount' => [
       'title' => ts('Original Installment Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => 'Text',
       'required' => TRUE,
       'description' => ts('Original amount for each of the installments.'),
@@ -134,6 +142,11 @@ return [
       'description' => ts('3 character string, value from config setting or input via user.'),
       'add' => '3.2',
       'default' => NULL,
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'SET NULL',
+      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',

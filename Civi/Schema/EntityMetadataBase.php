@@ -242,8 +242,9 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
         if (empty($customField['is_view'])) {
           $field['usage'][] = 'import';
         }
-        if ($field['input_type'] == 'Text' && $customField['text_length']) {
-          $field['input_attrs']['maxlength'] = (int) $customField['text_length'];
+        // The column length is a hard limit regardless of input type.
+        if (str_contains($field['sql_type'], 'char(')) {
+          $field['input_attrs']['maxlength'] = (int) \CRM_Core_BAO_SchemaHandler::getFieldLength($field['sql_type']);
         }
         if ($field['input_type'] == 'TextArea') {
           $field['input_attrs']['rows'] = (int) ($customField['note_rows'] ?? 4);
@@ -257,25 +258,43 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
           $field['input_attrs']['end_date_years'] = isset($customField['end_date_years']) ? (int) $customField['end_date_years'] : NULL;
         }
         // Number input for numeric fields
-        if ($field['input_type'] === 'Text' && in_array($customField['data_type'], ['Int', 'Float'], TRUE)) {
+        if ($field['input_type'] === 'Text' && in_array($customField['data_type'], ['Int', 'Float', 'Money'], TRUE)) {
           $field['input_type'] = 'Number';
           // Todo: make 'step' configurable for the custom field
-          $field['input_attrs']['step'] = $customField['data_type'] === 'Int' ? 1 : .01;
+          $field['input_attrs']['step'] = $customField['data_type'] === 'Int' ? 1 : 'any';
         }
         // Unserialize filters from url-arg-style string
         if (!empty($customField['filter'])) {
-          $customGroupFilters = explode('&', $customField['filter']);
-          foreach ($customGroupFilters as $filter) {
-            if (str_contains($filter, '=')) {
-              [$filterKey, $filterValue] = explode('=', $filter, 2);
-              // Convert legacy ContactRef filter to EntityRef format
-              if ($customField['data_type'] === 'ContactReference') {
-                $filterKey = $filterKey === 'group' ? 'groups' : $filterKey;
-                if ($filterKey === 'action') {
-                  continue;
-                }
+          $filter = $customField['filter'];
+          // Also accept a raw APIv4 `where` clause (e.g. copy/pasted from the API Explorer)
+          // for filters more complex than a flat list of `field=value` pairs.
+          if (str_starts_with($filter, '[')) {
+            $where = json_decode($filter, TRUE);
+            if (is_array($where)) {
+              // Accept either a full list of clauses (`[["field", "op", "value"], ...]`)
+              // or a single bare clause (`["field", "op", "value"]`) pasted on its own.
+              if (isset($where[0]) && !is_array($where[0])) {
+                $where = [$where];
               }
-              $field['input_attrs']['filter'][$filterKey] = $filterValue;
+              $field['input_attrs']['where'] = $where;
+            }
+          }
+          else {
+            $customGroupFilters = explode('&', $filter);
+            foreach ($customGroupFilters as $filterPart) {
+              if (str_contains($filterPart, '=')) {
+                [$filterKey, $filterValue] = explode('=', $filterPart, 2);
+                // Convert legacy ContactRef filter to EntityRef format
+                if ($customField['data_type'] === 'ContactReference') {
+                  $filterKey = $filterKey === 'group' ? 'groups' : $filterKey;
+                  if ($filterKey === 'action') {
+                    continue;
+                  }
+                }
+                // A comma-separated value means "match any of these" - pass as an array so the
+                // query builder can use IN/CONTAINS instead of a literal (and always-failing) match.
+                $field['input_attrs']['filter'][$filterKey] = str_contains($filterValue, ',') ? explode(',', $filterValue) : $filterValue;
+              }
             }
           }
         }
@@ -285,15 +304,28 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
           $addressField = \Civi::entity('Address')->getField($addressFieldName);
           $field['pseudoconstant'] = $addressField['pseudoconstant'];
         }
+        if ($customField['data_type'] === 'Currency') {
+          $field['pseudoconstant'] = [
+            'option_group_name' => 'currencies_enabled',
+          ];
+        }
         // Set FK for EntityRef, ContactRef & File fields
         $fkEntity = \CRM_Core_BAO_CustomField::getFkEntity($customField);
         if ($fkEntity) {
           $onDelete = empty($customField['fk_entity_on_delete']) ? 'SET NULL' : strtoupper(str_replace('_', ' ', $customField['fk_entity_on_delete']));
           $field['entity_reference'] = [
             'entity' => $fkEntity,
-            'key' => 'id',
+            'key' => $fkEntity === 'Currency' ? 'name' : 'id',
             'on_delete' => $onDelete,
           ];
+        }
+        // A custom placeholder (from `attributes`) reaches the legacy QuickForm widget for free
+        // (parsed generically at the top of addQuickFormElement()) - do the same here for APIv4/Afform.
+        if ($customField['data_type'] === 'EntityReference' && !empty($customField['attributes'])) {
+          $placeholder = \CRM_Core_BAO_CustomField::attributesFromString($customField['attributes'])['placeholder'] ?? NULL;
+          if ($placeholder) {
+            $field['input_attrs']['placeholder'] = $placeholder;
+          }
         }
         if ($customField['option_group_id']) {
           // Options for Select, Radio, Checkbox
@@ -310,6 +342,10 @@ abstract class EntityMetadataBase implements EntityMetadataInterface {
             // Retain option list but don't prefetch since the widget is autocomplete
             $field['pseudoconstant']['prefetch'] = 'disabled';
           }
+        }
+        // Control field
+        if (isset($customField['control_field'])) {
+          $field['input_attrs']['control_field'] = $customField['control_field'];
         }
         $customFields[$fieldName] = $field;
       }

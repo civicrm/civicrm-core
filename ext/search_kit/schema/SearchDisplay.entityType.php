@@ -81,6 +81,7 @@ return [
       ],
       'pseudoconstant' => [
         'option_group_name' => 'search_display_type',
+        'export_as' => 'id',
       ],
     ],
     'settings' => [

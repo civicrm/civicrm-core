@@ -37,12 +37,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   protected $membership = [];
 
   /**
-   * Membership Type ID
-   * @var int
-   */
-  protected $_memType;
-
-  /**
    * IDs of relevant entities.
    *
    * @var array
@@ -216,7 +210,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     parent::preProcess();
     $params = [];
     $params['context'] = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'membership');
-    $params['id'] = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $params['id'] = $this->getMembershipID();
     $params['mode'] = CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this);
 
     $this->setContextVariables($params);
@@ -244,8 +238,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   public function setDefaultValues() {
     $defaults = [];
-    if (isset($this->_id)) {
-      $params = ['id' => $this->_id];
+    if ($this->getMembershipID()) {
+      $params = ['id' => $this->getMembershipID()];
       CRM_Member_BAO_Membership::retrieve($params, $defaults);
       if (isset($defaults['minimum_fee'])) {
         $defaults['minimum_fee'] = CRM_Utils_Money::formatLocaleNumericRoundedForDefaultCurrency($defaults['minimum_fee']);
@@ -274,20 +268,18 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
         $defaults['member_of_contact_id'], 'display_name'
       );
     }
-    if (!empty($defaults['membership_type_id'])) {
-      $this->_memType = $defaults['membership_type_id'];
-    }
-    if (is_numeric($this->_memType)) {
+    $membershipTypeID = $this->getMembershipValue('membership_type_id');
+    if ($membershipTypeID) {
       $defaults['membership_type_id'] = [];
       $defaults['membership_type_id'][0] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
-        $this->_memType,
+        $membershipTypeID,
         'member_of_contact_id',
         'id'
       );
-      $defaults['membership_type_id'][1] = $this->_memType;
+      $defaults['membership_type_id'][1] = $membershipTypeID;
     }
     else {
-      $defaults['membership_type_id'] = $this->_memType;
+      $defaults['membership_type_id'] = $membershipTypeID;
     }
     return $defaults;
   }
@@ -445,7 +437,60 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * is only given where there is specific test cover.
    */
   public function getMembershipID(): ?int {
-    return $this->_id;
+    if (!isset($this->_id)) {
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    }
+    return $this->_id ?: NULL;
+  }
+
+  /**
+   * Get the membership type id.
+   *
+   * This is the type submitted on the form if there is one, falling back to the
+   * type of the membership being edited/renewed (if any).
+   *
+   * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   */
+  public function getMembershipTypeID(): ?int {
+    return $this->getSubmittedValue('membership_type_id')[1] ?? $this->getMembershipValue('membership_type_id');
+  }
+
+  /**
+   * @return int
+   */
+  protected function getNumRenewTerms(): int {
+    return $this->getSubmittedValue('num_terms') ? (int) $this->getSubmittedValue('num_terms') : 1;
+  }
+
+  /**
+   * Get the revenue recognition date for the membership's contribution.
+   *
+   * @return string
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getDeferredRevenueRecognitionDate(): string {
+    if (Civi::settings()->get('deferred_revenue_enabled')) {
+      // Read fresh - the cached membership may pre-date the save that set the start date.
+      $startDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getMembershipID(), 'start_date');
+      if ($startDate) {
+        return date('Ymd', strtotime($startDate));
+      }
+    }
+    return '';
+  }
+
+  /**
+   * Get the payment processor ID.
+   *
+   * @return int
+   */
+  public function getPaymentProcessorID(): int {
+    return (int) ($this->getSubmittedValue('payment_processor_id') ?: $this->_paymentProcessor['id']);
   }
 
   /**
@@ -472,7 +517,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     }
 
     if ($this->_id) {
-      $this->_memType = $this->getMembershipValue('membership_type_id');
       $this->_membershipIDs[] = $this->_id;
     }
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
@@ -612,6 +656,14 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     if ($this->isQuickConfig() && $this->getSubmittedValue('financial_type_id')) {
       $this->order->setOverrideFinancialTypeID((int) $this->getSubmittedValue('financial_type_id'));
     }
+    if ($this->getMembershipID()) {
+      foreach ($this->order->getLineItems() as $index => $lineItem) {
+        if (($lineItem['membership_type_id'] ?? NULL) == $this->getMembershipTypeID()) {
+          $this->order->setLineItemValue('entity_id', $this->getMembershipID(), $index);
+          $this->order->setLineItemValue('membership_num_terms', $this->getNumRenewTerms(), $index);
+        }
+      }
+    }
 
     return $formValues;
   }
@@ -643,26 +695,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
-   * Wrapper function for unit tests.
-   *
-   * @param array $formValues
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function testSubmit(array $formValues = []): void {
-    if (empty($formValues)) {
-      // If getForm is used these will be set - this is now
-      // preferred.
-      $formValues = $this->controller->exportValues($this->_name);
-    }
-    $this->exportedValues = $formValues;
-    $this->setContextVariables($formValues);
-    $this->_memType = !empty($formValues['membership_type_id']) ? $formValues['membership_type_id'][1] : NULL;
-    $this->_params = $formValues;
-    $this->submit();
-  }
-
-  /**
    * Get order related params.
    *
    * In practice these are contribution params but later they cann be used with the Order api.
@@ -678,25 +710,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       'processPriceSet' => TRUE,
       'tax_amount' => $this->order->getTotalTaxAmount(),
     ];
-  }
-
-  /**
-   * Get the relevant payment instrument id.
-   *
-   * @return int
-   */
-  protected function getPaymentInstrumentID(): int {
-    return (int) $this->getSubmittedValue('payment_instrument_id') ?: $this->_paymentProcessor['object']->getPaymentInstrumentID();
-  }
-
-  /**
-   * Get the last 4 numbers of the card.
-   *
-   * @return int|null
-   */
-  protected function getPanTruncation(): ?int {
-    $card = $this->getSubmittedValue('credit_card_number');
-    return $card ? (int) substr($card, -4) : NULL;
   }
 
   /**

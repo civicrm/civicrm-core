@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
 
   // dev/core#1818 use angular 1.5 default of # instead of 1.6+ default of #!
   angular.module('ng')
@@ -6,4 +6,4 @@
       $locationProvider.hashPrefix('');
     }]);
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

@@ -257,6 +257,7 @@ return [
       'description' => ts('Minimum initial amount for partial payment'),
       'add' => '4.3',
       'input_attrs' => [
+        'control_field' => 'currency',
         'label' => ts('Min. Initial Amount'),
       ],
     ],
@@ -279,6 +280,9 @@ return [
     'min_amount' => [
       'title' => ts('Minimum Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => NULL,
       'description' => ts('if other amounts allowed, user can configure minimum allowed.'),
       'add' => '1.3',
@@ -286,6 +290,9 @@ return [
     'max_amount' => [
       'title' => ts('Maximum Amount'),
       'sql_type' => 'decimal(20,2)',
+      'input_attrs' => [
+        'control_field' => 'currency',
+      ],
       'input_type' => NULL,
       'description' => ts('if other amounts allowed, user can configure maximum allowed.'),
       'add' => '1.3',
@@ -298,7 +305,19 @@ return [
       'add' => '1.5',
       'input_attrs' => [
         'label' => ts('Goal Amount'),
+        'control_field' => 'currency',
       ],
+    ],
+    'thankyou_mode' => [
+      'title' => ts('Thank-You Mode'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Radio',
+      'description' => ts('Choose between a thank you page or redirect'),
+      'pseudoconstant' => [
+        'option_group_name' => 'thankyou_mode',
+      ],
+      'default' => 'page',
+      'add' => '6.20',
     ],
     'thankyou_title' => [
       'title' => ts('Thank-you Title'),
@@ -331,6 +350,13 @@ return [
         'rows' => 8,
         'cols' => 60,
       ],
+    ],
+    'thankyou_redirect_url' => [
+      'title' => ts('Thank-you Redirect URL'),
+      'sql_type' => 'text',
+      'input_type' => 'Url',
+      'description' => ts('Set a URL to redirect users to after completion, instead of a thank you page'),
+      'add' => '6.20',
     ],
     'is_email_receipt' => [
       'title' => ts('Send email Receipt'),
@@ -462,6 +488,11 @@ return [
       'description' => ts('3 character string, value from config setting or input via user.'),
       'add' => '3.3',
       'default' => NULL,
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'SET NULL',
+      ],
       'pseudoconstant' => [
         'table' => 'civicrm_currency',
         'key_column' => 'name',

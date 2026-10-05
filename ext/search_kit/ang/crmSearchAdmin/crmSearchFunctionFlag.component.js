@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchFunctionFlag', {
@@ -16,7 +16,7 @@
       this.getWidget = function() {
         if (!ctrl.param || !ctrl.param[ctrl.flag]) {
           return null;
-        } else if (_.keys(ctrl.param[ctrl.flag]).length === 2 && '' in ctrl.param[ctrl.flag]) {
+        } else if (Object.keys(ctrl.param[ctrl.flag]).length === 2 && '' in ctrl.param[ctrl.flag]) {
           return 'checkbox';
         } else {
           return 'select';
@@ -25,4 +25,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

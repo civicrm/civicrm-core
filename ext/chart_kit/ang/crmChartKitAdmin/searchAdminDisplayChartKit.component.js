@@ -1,4 +1,4 @@
-(function (angular, $, _, chartKitChartTypes, chartKitTypeBackends, chartKitColumnOptions, chartKitUtils) {
+(function (angular, $, chartKitChartTypes, chartKitTypeBackends, chartKitColumnOptions, chartKitUtils) {
   "use strict";
 
   angular.module('crmChartKitAdmin').component('searchAdminDisplayChartKit', {
@@ -43,8 +43,8 @@
 
       this.$onInit = () => {
         this.searchColumns = this.apiParams.select.map((select) => {
-          const info = searchMeta.parseExpr(select);
-          const field = (_.findWhere(info.args, {type: 'field'}) || {}).field || {};
+          const info = searchMeta.parseExpr(select, {api_entity: this.apiEntity, api_params: this.apiParams});
+          const field = (info.args.find((arg) => arg.type === 'field') || {}).field || {};
           let dataType = (info.fn && info.fn.data_type) || field.data_type;
           // hack: search kit reports option group columns as
           // "Integer" data type - but for our purposes they
@@ -56,7 +56,7 @@
             type: 'field',
             key: info.alias,
             dataType: dataType,
-            label: searchMeta.getDefaultLabel(select),
+            label: searchMeta.getDefaultLabel(select, {api_entity: this.apiEntity, api_params: this.apiParams}),
           };
         });
 
@@ -232,7 +232,7 @@
       this.getColumnSearchColumnOptions = (col) => {
         const allowedTypes = this.getColumnSourceDataTypes(col);
 
-        if (!allowedTypes && allowedTypes != []) {
+        if (!allowedTypes || !allowedTypes.length) {
           // all keys
           return this.searchColumns.map((searchCol) => searchCol.key);
         }
@@ -424,4 +424,4 @@
 
     }
   });
-})(angular, CRM.$, CRM._, CRM.chart_kit.chartTypes, CRM.chart_kit.typeBackends, CRM.chart_kit.columnOptions, CRM.chart_kit.utils);
+})(angular, CRM.$, CRM.chart_kit.chartTypes, CRM.chart_kit.typeBackends, CRM.chart_kit.columnOptions, CRM.chart_kit.utils);

@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
   angular.module('af').component('afLocationInput', {
     require: {
@@ -36,4 +36,4 @@
 
     }
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

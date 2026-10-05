@@ -74,10 +74,10 @@
   <div id='mainTabContainer'>
     <ul role="tablist">
       {if $canEditUserDrivenMessageTemplates or $canEditMessageTemplates}
-        <li id='tab_user' role="tab"><a href='#user' title='{ts escape='htmlattribute'}User-driven Messages{/ts}'>{ts}User-driven Messages{/ts}</a></li>
+        <li id='tab_user' role="tab" class="crm-tab-button"><a href='#user' title='{ts escape='htmlattribute'}User-driven Messages{/ts}'>{ts}User-driven Messages{/ts}</a></li>
       {/if}
       {if $canEditSystemTemplates or $canEditMessageTemplates}
-        <li id='tab_workflow' role="tab"><a href='#workflow' title='{ts escape='htmlattribute'}System Workflow Messages{/ts}'>{ts}System Workflow Messages{/ts}</a></li>
+        <li id='tab_workflow' role="tab" class="crm-tab-button"><a href='#workflow' title='{ts escape='htmlattribute'}System Workflow Messages{/ts}'>{ts}System Workflow Messages{/ts}</a></li>
       {/if}
     </ul>
 

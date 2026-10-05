@@ -250,15 +250,6 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
-   * @deprecated
-   * @return bool
-   */
-  public function isUtf8() {
-    CRM_Core_Error::deprecatedFunctionWarning('your own charset/collation per column with createWithColumns if you really need latin1');
-    return $this->utf8;
-  }
-
-  /**
    * @param bool $autodrop
    * @return CRM_Utils_SQL_TempTable
    */
@@ -321,23 +312,6 @@ class CRM_Utils_SQL_TempTable {
       $value = FALSE;
     }
     $this->memory = $value;
-    return $this;
-  }
-
-  /**
-   * Set table collation to UTF8.
-   *
-   * @deprecated This method is deprecated as tables should be assumed to have
-   * UTF-8 as the default character set and collation; some other character set
-   * or collation may be specified in the column definition.
-   *
-   * @param bool $value
-   *
-   * @return $this
-   */
-  public function setUtf8($value = TRUE) {
-    CRM_Core_Error::deprecatedFunctionWarning('your own charset/collation per column with createWithColumns if you really need latin1');
-    $this->utf8 = $value;
     return $this;
   }
 

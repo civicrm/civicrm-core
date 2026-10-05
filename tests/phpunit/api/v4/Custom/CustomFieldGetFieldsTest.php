@@ -67,9 +67,15 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
           'html_type' => 'Text',
         ],
         [
+          'name' => 'currency_field',
+          'data_type' => 'Currency',
+          'html_type' => 'Select',
+        ],
+        [
           'name' => 'money',
           'data_type' => 'Money',
           'html_type' => 'Text',
+          'control_field' => __FUNCTION__ . '.currency_field',
         ],
         [
           'name' => 'memo',
@@ -179,19 +185,20 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $field = $fields["$customGroupName.float"];
     $this->assertSame('Number', $field['input_type']);
     $this->assertSame('Float', $field['data_type']);
-    $this->assertSame(.01, $field['input_attrs']['step']);
+    $this->assertSame('any', $field['input_attrs']['step']);
     $this->assertFalse($field['options']);
     $this->assertNull($field['operators']);
     $this->assertNull($field['serialize']);
 
     // Check money field
     $field = $fields["$customGroupName.money"];
-    $this->assertSame('Text', $field['input_type']);
+    $this->assertSame('Number', $field['input_type']);
     $this->assertSame('Money', $field['data_type']);
-    $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    $this->assertSame('any', $field['input_attrs']['step']);
     $this->assertFalse($field['options']);
     $this->assertNull($field['operators']);
     $this->assertNull($field['serialize']);
+    $this->assertSame(__FUNCTION__ . '.currency_field', $field['input_attrs']['control_field']);
 
     // Check memo field
     $field = $fields["$customGroupName.memo"];
@@ -200,6 +207,8 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertSame(4, $field['input_attrs']['rows']);
     $this->assertSame(55, $field['input_attrs']['cols']);
     $this->assertArrayNotHasKey('step', $field['input_attrs']);
+    // Memo columns are `text`, so there is no length to advertise
+    $this->assertArrayNotHasKey('maxlength', $field['input_attrs']);
     $this->assertFalse($field['options']);
     $this->assertNull($field['operators']);
     $this->assertNull($field['serialize']);
@@ -225,6 +234,8 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertArrayNotHasKey('step', $field['input_attrs']);
     $this->assertArrayNotHasKey('rows', $field['input_attrs']);
     $this->assertArrayNotHasKey('cols', $field['input_attrs']);
+    // Serialized values are stored in a `text` column, so there is no length to advertise
+    $this->assertArrayNotHasKey('maxlength', $field['input_attrs']);
     $this->assertTrue($field['options']);
     $this->assertNull($field['operators']);
     $this->assertSame(1, $field['serialize']);
@@ -325,6 +336,24 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertNull($field['operators']);
     $this->assertNull($field['serialize']);
     $this->assertEquals(['groups' => 123], $field['input_attrs']['filter']);
+
+    // Check currency field
+    $field = $fields["$customGroupName.currency_field"];
+    $this->assertSame('Select', $field['input_type']);
+    $this->assertSame('String', $field['data_type']);
+    $this->assertEquals('Currency', $field['fk_entity']);
+    $this->assertEquals('name', $field['fk_column']);
+    $this->assertTrue($field['options']);
+    $this->assertNull($field['operators']);
+    $this->assertNull($field['serialize']);
+
+    // Ensure every applicable field actually has a FK index in the database table
+    $tableName = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupName, 'table_name', 'name');
+    foreach (['state', 'file', 'entityref', 'contactref', 'currency_field'] as $fieldName) {
+      $columnName = $customFields[$fieldName]['column_name'];
+      $fkName = 'FK_' . \CRM_Core_BAO_SchemaHandler::getIndexName($tableName, $columnName);
+      $this->assertTrue(\CRM_Core_BAO_SchemaHandler::checkFKExists($tableName, $fkName), "FK constraint $fkName should exist on table $tableName");
+    }
   }
 
   public function testDisabledAndHiddenFields(): void {
@@ -622,6 +651,84 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $this->assertFalse($getField['required']);
     $this->assertSame($grp['name'] . '.' . $field['name'], $getField['name']);
     $this->assertEquals(['contact_type' => 'Household', 'groups' => 2], $getField['input_attrs']['filter']);
+  }
+
+  public function testMultiValueEntityRefFiltersAreParsedAsArrays(): void {
+    $grp = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => 'act_test_grp3',
+    ]);
+    $field = $this->createTestRecord('CustomField', [
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      'custom_group_id' => $grp['id'],
+      // A comma-separated value means "match any of these".
+      'filter' => 'contact_type:name=Individual,Organization',
+    ]);
+    $getField = Activity::getFields(FALSE)
+      ->addWhere('custom_field_id', '=', $field['id'])
+      ->execute()->single();
+    $this->assertEquals(['contact_type:name' => ['Individual', 'Organization']], $getField['input_attrs']['filter']);
+  }
+
+  /**
+   * The custom placeholder must reach APIv4 getFields()'s input_attrs, not just the legacy
+   * QuickForm widget - this is what Afform (and anything else API4-driven) actually reads.
+   */
+  public function testCustomPlaceholderIsReturnedForEntityRefFields(): void {
+    $grp = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => 'act_test_grp5',
+    ]);
+    $field = $this->createTestRecord('CustomField', [
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      'custom_group_id' => $grp['id'],
+      'attributes' => 'placeholder="Find sites"',
+    ]);
+    $getField = Activity::getFields(FALSE)
+      ->addWhere('custom_field_id', '=', $field['id'])
+      ->execute()->single();
+    $this->assertSame('Find sites', $getField['input_attrs']['placeholder']);
+  }
+
+  public function testEntityRefFilterAcceptsJsonWhereClause(): void {
+    $grp = $this->createTestRecord('CustomGroup', [
+      'extends' => 'Activity',
+      'title' => 'act_test_grp4',
+    ]);
+    // A full list of where-clauses...
+    $fieldWithList = $this->createTestRecord('CustomField', [
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      'custom_group_id' => $grp['id'],
+      'filter' => '[["contact_type", "=", "Individual"], ["is_deceased", "=", false]]',
+    ]);
+    // ...or a single bare clause pasted on its own should both be accepted.
+    $fieldWithBareClause = $this->createTestRecord('CustomField', [
+      'data_type' => 'EntityReference',
+      'html_type' => 'Autocomplete-Select',
+      'fk_entity' => 'Contact',
+      'custom_group_id' => $grp['id'],
+      'filter' => '["contact_type", "=", "Individual"]',
+    ]);
+    $fields = Activity::getFields(FALSE)
+      ->addWhere('custom_field_id', 'IN', [$fieldWithList['id'], $fieldWithBareClause['id']])
+      ->execute()->indexBy('custom_field_id');
+
+    $this->assertEquals(
+      [['contact_type', '=', 'Individual'], ['is_deceased', '=', FALSE]],
+      $fields[$fieldWithList['id']]['input_attrs']['where']
+    );
+    $this->assertArrayNotHasKey('filter', $fields[$fieldWithList['id']]['input_attrs']);
+
+    $this->assertEquals(
+      [['contact_type', '=', 'Individual']],
+      $fields[$fieldWithBareClause['id']]['input_attrs']['where']
+    );
   }
 
 }

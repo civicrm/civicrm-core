@@ -31,16 +31,18 @@ use Civi\Api4\Participant;
  */
 class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
 
+  protected $_apiversion = 4;
+
   use CRM_Core_Payment_AuthorizeNetTrait;
 
   public function setUp(): void {
     parent::setUp();
-    $this->callAPISuccess('Extension', 'enable', ['keys' => ['eventcart']]);
+    $this->callApiV3Success('Extension', 'enable', ['keys' => ['eventcart']]);
   }
 
   public function tearDown(): void {
-    $this->callAPISuccess('Extension', 'disable', ['keys' => ['eventcart']]);
-    $this->callAPISuccess('Extension', 'uninstall', ['keys' => ['eventcart']]);
+    $this->callApiV3Success('Extension', 'disable', ['keys' => ['eventcart']]);
+    $this->callApiV3Success('Extension', 'uninstall', ['keys' => ['eventcart']]);
     parent::tearDown();
   }
 
@@ -50,7 +52,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testEventPaymentForms(): void {
-    $this->callAPISuccess('Extension', 'install', ['keys' => ['eventcart']]);
+    $this->callApiV3Success('Extension', 'install', ['keys' => ['eventcart']]);
     $this->createAuthorizeNetProcessor();
     $processors = [$this->ids['PaymentProcessor']['anet']];
     $eventID = $this->eventCreatePaid([

@@ -34,7 +34,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @deprecated
    */
   public static function preProcess(&$form) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
 
     $form->setTitle(ts('Print/Merge Document'));
   }
@@ -184,7 +184,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @deprecated
    */
   public static function setDefaultValues() {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     $defaultFormat = CRM_Core_BAO_PdfFormat::getDefaultValues();
     $defaultFormat['format_id'] = $defaultFormat['id'];
     return $defaultFormat;
@@ -266,7 +266,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function processTemplate(&$formValues) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
 
     $html_message = $formValues['html_message'] ?? NULL;
 
@@ -330,7 +330,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @param string $message
    */
   public static function formatMessage(&$message) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     $newLineOperators = [
       'p' => [
         'oper' => '<p>',
@@ -382,7 +382,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @deprecated
    */
   public static function renderFromRows($rows, $msgPart, $formValues): void {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     $html = [];
     foreach ($rows as $row) {
       $html[] = $row->render($msgPart);
@@ -400,7 +400,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @deprecated
    */
   public static function listTokens() {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     $class = get_called_class();
     if (method_exists($class, 'createTokenProcessor')) {
       return $class::createTokenProcessor()->listTokens();
@@ -416,7 +416,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * @param array $html
    */
   protected static function outputFromHtml($formValues, array $html) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     // Set the filename for the PDF using the Activity Subject, if defined. Remove unwanted characters and limit the length to 200 characters.
     if (!empty($formValues['subject'])) {
       $fileName = CRM_Utils_File::makeFilenameWithUnicode($formValues['subject'], '_', 200);

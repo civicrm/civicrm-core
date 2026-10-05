@@ -21,21 +21,21 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
    *  Test case for contact search: CRM-6706, CRM-6586 Parent Group search should return contacts from child groups too.
    */
   public function testContactSearchByParentGroup(): void {
-    $parentGroup = $this->callAPISuccess('Group', 'create', [
+    $parentGroup = $this->createTestEntity('Group', [
       'title' => 'Parent Group',
       'description' => 'Parent Group',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-    ]);
+    ], 'parent');
 
     // create a child group
-    $childGroup = $this->callAPISuccess('Group', 'create', [
+    $childGroup = $this->createTestEntity('Group', [
       'title' => 'Child Group',
       'description' => 'Child Group',
       'visibility' => 'User and User Admin Only',
       'parents' => $parentGroup['id'],
       'is_active' => 1,
-    ]);
+    ], 'child');
 
     // create smart group based on saved criteria Gender = Male
     $batch = $this->callAPISuccess('SavedSearch', 'create', [
@@ -43,7 +43,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     ]);
     // Create contact with Gender - Male
     $childSmartGroupContact = $this->individualCreate([
-      'gender_id' => 'Male',
+      'gender_id:name' => 'Male',
       'first_name' => 'C',
     ], 1);
     // then create smart group
@@ -60,20 +60,20 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $parentContactParams = [
       'first_name' => 'Parent1 First name',
       'last_name' => 'Parent1 Last name',
-      'group' => [$parentGroup['id'] => 1],
     ];
     $parentContact = $this->individualCreate($parentContactParams);
+    $this->createTestEntity('GroupContact', ['group_id' => $parentGroup['id'], 'contact_id' => $parentContact, 'status' => 'Added']);
 
     // Create a contact within child group.
     $childContactParams = [
       'first_name' => 'Child1 First name',
       'last_name' => 'Child2 Last name',
-      'group' => [$childGroup['id'] => 1],
     ];
     $childContact = $this->individualCreate($childContactParams);
+    $this->createTestEntity('GroupContact', ['group_id' => $childGroup['id'], 'contact_id' => $childContact, 'status' => 'Added']);
 
     // Check if searching by parent group  returns both parent and child group contacts.
-    $contacts = $this->callAPISuccess('Contact', 'get', [
+    $contacts = $this->callAPIV3Success('Contact', 'get', [
       'group' => $parentGroup['id'],
     ])['values'];
     $validContactIds = [$parentContact, $childContact];
@@ -85,7 +85,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $this->assertEquals([], array_diff($validContactIds, $resultContactIds), 'Check that the difference between two arrays should be blank array');
 
     // Check if searching by child group returns just child group contacts.
-    $contacts = $this->callAPISuccess('Contact', 'get', [
+    $contacts = $this->callAPIV3Success('Contact', 'get', [
       'group' => $childGroup['id'],
     ])['values'];
     $validChildContactIds = [$childContact];
@@ -97,7 +97,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $this->assertEquals([], array_diff($validChildContactIds, $resultChildContactIds), 'Check that the difference between two arrays should be blank array');
 
     // Check if searching by smart child group returns just smart child group contacts
-    $contacts = $this->callAPISuccess('Contact', 'get', [
+    $contacts = $this->callAPIV3Success('Contact', 'get', [
       'group' => $childSmartGroup['id'],
     ])['values'];
     $validChildContactIds = [$childSmartGroupContact];
@@ -107,11 +107,6 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     }
     $this->assertCount(1, $resultChildContactIds, 'Check the count of returned values');
     $this->assertEquals([], array_diff($validChildContactIds, $resultChildContactIds), 'Check that the difference between two arrays should be blank array');
-
-    //cleanup
-    $this->callAPISuccess('Contact', 'delete', ['id' => $parentContact]);
-    $this->callAPISuccess('Contact', 'delete', ['id' => $childContact]);
-    $this->callAPISuccess('Contact', 'delete', ['id' => $childSmartGroupContact]);
   }
 
   /**
@@ -131,23 +126,23 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
 
     // Create contact with Gender - Male
     $contact1 = $this->individualCreate([
-      'gender_id' => 'Male',
+      'gender_id:name' => 'Male',
       'first_name' => 'A',
     ]);
 
     // Create contact with Gender - Male and in regular group
     $contact2 = $this->individualCreate([
-      'group' => [$regularGroup['id'] => 1],
-      'gender_id' => 'Male',
+      'gender_id:name' => 'Male',
       'first_name' => 'B',
     ], 1);
+    $this->createTestEntity('GroupContact', ['group_id' => $regularGroup['id'], 'contact_id' => $contact2, 'status' => 'Added']);
 
     // Create contact with Gender - Female and in regular group
     $contact3 = $this->individualCreate([
-      'group' => [$regularGroup['id'] => 1],
-      'gender_id' => 'Female',
+      'gender_id:name' => 'Female',
       'first_name' => 'C',
     ], 1);
+    $this->createTestEntity('GroupContact', ['group_id' => $regularGroup['id'], 'contact_id' => $contact3, 'status' => 'Added']);
 
     // create smart group based on saved criteria Gender = Male
     $batch = $this->callAPISuccess('SavedSearch', 'create', [
@@ -262,6 +257,55 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       $this->assertCount($case['expected_count'], $groupContacts);
       $this->checkArrayEquals($case['expected_contact'], $groupContacts);
     }
+  }
+
+  /**
+   * Contacts already in a group must not be added again when the presence check
+   * cannot fit its result into group_concat_max_len.
+   *
+   * The check reads a GROUP_CONCAT of the batch it is about to write. MySQL
+   * truncates that at group_concat_max_len and only warns, so on a large enough
+   * site the ids past the cut look absent and get re-written on every call.
+   */
+  public function testBulkAddIsIdempotentWhenPresenceCheckTruncates(): void {
+    $groupID = (int) $this->callAPISuccess('Group', 'create', [
+      'title' => 'Presence check truncation',
+      'is_active' => 1,
+    ])['id'];
+
+    $contactIDs = [];
+    for ($i = 0; $i < 20; $i++) {
+      $contactIDs[] = (int) $this->individualCreate(['first_name' => 'Trunc' . $i]);
+    }
+
+    CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID);
+    $this->assertEquals(count($contactIDs), $this->getSubscriptionHistoryCount($groupID));
+
+    // Low enough that the presence string cannot hold the batch, whatever the ids are.
+    $originalMaxLen = (int) CRM_Core_DAO::singleValueQuery('SELECT @@session.group_concat_max_len');
+    CRM_Core_DAO::executeQuery('SET SESSION group_concat_max_len = 4');
+    try {
+      [, $added, $notAdded] = CRM_Contact_BAO_GroupContact::addContactsToGroup($contactIDs, $groupID);
+    }
+    finally {
+      CRM_Core_DAO::executeQuery('SET SESSION group_concat_max_len = ' . $originalMaxLen);
+    }
+
+    $this->assertEquals(0, $added, 'Contacts already in the group were added again.');
+    $this->assertEquals(count($contactIDs), $notAdded);
+    $this->assertEquals(count($contactIDs), $this->getSubscriptionHistoryCount($groupID),
+      'A truncated presence check appended duplicate subscription history.');
+  }
+
+  /**
+   * @param int $groupID
+   * @return int
+   */
+  private function getSubscriptionHistoryCount(int $groupID): int {
+    return (int) CRM_Core_DAO::singleValueQuery(
+      'SELECT COUNT(*) FROM civicrm_subscription_history WHERE group_id = %1',
+      [1 => [$groupID, 'Integer']]
+    );
   }
 
 }

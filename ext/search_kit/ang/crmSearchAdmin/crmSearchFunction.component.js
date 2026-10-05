@@ -1,10 +1,13 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('crmSearchFunction', {
     bindings: {
       mode: '@',
-      expr: '='
+      expr: '=',
+      apiEntity: '<',
+      apiParams: '<',
+      hideLabel: '<'
     },
     require: {
       crmSearchAdmin: '^crmSearchAdmin'
@@ -13,6 +16,25 @@
     controller: function($scope, formatForSelect2, searchMeta) {
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
       const ctrl = this;
+
+      Object.defineProperty(this, 'savedSearch', {
+        get: () => ({
+          api_entity: this.apiEntity,
+          api_params: this.apiParams
+        })
+      });
+
+      const canAggregate = (col) => {
+        const entityInfo = searchMeta.getEntity(this.savedSearch.api_entity);
+        if (!entityInfo?.params?.includes('groupBy')) {
+          return false;
+        }
+        // If the query does not use grouping, it's always allowed
+        if (!this.savedSearch.api_params.groupBy || !this.savedSearch.api_params.groupBy.length) {
+          return true;
+        }
+        return this.crmSearchAdmin.mustAggregate(col, this.savedSearch);
+      };
 
       const allTypes = {
         aggregate: ts('Aggregate'),
@@ -33,7 +55,7 @@
       this.exprTypesByName = this.sqlExprTypes.reduce((acc, item) => (acc[item.name] = item, acc), {});
 
       this.$onInit = function() {
-        const info = searchMeta.parseExpr(ctrl.expr);
+        const info = searchMeta.parseExpr(ctrl.expr, ctrl.savedSearch);
         ctrl.fieldArg = info.args.find(arg => arg.type === 'field');
         ctrl.args = info.args;
         ctrl.fn = info.fn;
@@ -52,8 +74,8 @@
         const param = ctrl.getParam(ctrl.args.length);
         ctrl.args.push({
           type: ctrl.exprTypesByType[sqlExprType].name,
-          flag_before: _.filter(_.keys(param.flag_before))[0],
-          flag_after: _.filter(_.keys(param.flag_after))[0],
+          flag_before: Object.keys(param.flag_before || {}).filter(Boolean)[0],
+          flag_after: Object.keys(param.flag_after || {}).filter(Boolean)[0],
           name: param.name,
           value: '',
           optional: optional,
@@ -66,7 +88,7 @@
           return;
         }
         // Push args to reach the minimum
-        _.each(ctrl.fn.params, function(param, index) {
+        (ctrl.fn.params || []).forEach((param, index) => {
           while (
             (ctrl.args.length - index < param.min_expr) &&
             // Exclude 'api_default' params (should not be changed by the user)
@@ -80,7 +102,7 @@
 
       this.getParam = function(index) {
         if (ctrl.fn) {
-          return ctrl.fn.params[index] || _.last(ctrl.fn.params);
+          return ctrl.fn.params[index] || ctrl.fn.params.at(-1);
         }
       };
 
@@ -114,13 +136,13 @@
           functions = [];
         if (ctrl.expr && ctrl.fieldArg) {
           // Field in select clause that can be aggregated
-          if (ctrl.mode !== 'groupBy' && ctrl.crmSearchAdmin.canAggregate(ctrl.expr)) {
+          if (ctrl.mode !== 'groupBy' && canAggregate(ctrl.expr)) {
             allowedTypes.push('aggregate');
             // In addition to aggregate functions, also permit a function used in the groupBy clause
-            (ctrl.crmSearchAdmin.savedSearch.api_params.groupBy || []).forEach(function(fieldStr) {
+            (ctrl.savedSearch.api_params.groupBy || []).forEach(function(fieldStr) {
               if (fieldStr.includes(ctrl.fieldArg.field.name) && fieldStr.includes('(')) {
-                let fieldExpr = searchMeta.parseExpr(fieldStr);
-                let field = _.findWhere(fieldExpr.args, {type: 'field'});
+                let fieldExpr = searchMeta.parseExpr(fieldStr, ctrl.savedSearch);
+                let field = fieldExpr.args.find((arg) => arg.type === 'field');
                 if (fieldExpr.fn && fieldExpr.fn.name !== 'e' && field && field.field.name === ctrl.fieldArg.field.name) {
                   functions.push({
                     text: allTypes[fieldExpr.fn.category],
@@ -131,7 +153,7 @@
             });
           }
           // Field in groupBy clause or field in select clause that isn't required to be aggregated
-          if (ctrl.mode === 'groupBy' || !ctrl.crmSearchAdmin.mustAggregate(ctrl.expr)) {
+          if (ctrl.mode === 'groupBy' || !ctrl.crmSearchAdmin.mustAggregate(ctrl.expr, ctrl.savedSearch)) {
             allowedTypes.push('comparison', 'string');
             if (['Integer', 'Float', 'Date', 'Timestamp', 'Money'].includes(ctrl.fieldArg.field.data_type)) {
               allowedTypes.push('math');
@@ -153,7 +175,7 @@
 
       this.getFields = function() {
         return {
-          results: ctrl.crmSearchAdmin.getAllFields(':label', ['Field', 'Custom', 'Extra'])
+          results: ctrl.crmSearchAdmin.getAllFields(ctrl.savedSearch, ':label', ['Field', 'Custom', 'Extra'])
         };
       };
 
@@ -164,12 +186,13 @@
           let exprType,
             pos = 0;
           // Add non-field args to the beginning if needed
-          while (!_.includes(ctrl.fn.params[pos].must_be, 'SqlField')) {
-            exprType = _.first(ctrl.fn.params[pos].must_be);
+          // Flag-only params (e.g. the unit of EXTRACT) have no must_be; the server strips the empty list
+          while (!(ctrl.fn.params[pos].must_be || []).includes('SqlField')) {
+            exprType = ctrl.fn.params[pos].must_be?.[0];
             ctrl.args.splice(pos, 0, {
               type: exprType ? ctrl.exprTypesByType[exprType].name : null,
-              flag_before: _.filter(_.keys(ctrl.fn.params[pos].flag_before))[0],
-              flag_after: _.filter(_.keys(ctrl.fn.params[pos].flag_after))[0],
+              flag_before: Object.keys(ctrl.fn.params[pos].flag_before || {}).filter(Boolean)[0],
+              flag_after: Object.keys(ctrl.fn.params[pos].flag_after || {}).filter(Boolean)[0],
               name: ctrl.fn.params[pos].name,
               value: exprType === 'SqlNumber' ? 0 : ''
             });
@@ -177,8 +200,9 @@
           }
           // Update fieldArg
           const fieldParam = ctrl.fn.params[pos];
-          ctrl.fieldArg.flag_before = _.keys(fieldParam.flag_before)[0];
-          ctrl.fieldArg.flag_after = _.keys(fieldParam.flag_after)[0];
+          // Empty flag lists are stripped from the metadata server-side, so these may be absent
+          ctrl.fieldArg.flag_before = Object.keys(fieldParam.flag_before || {})[0];
+          ctrl.fieldArg.flag_after = Object.keys(fieldParam.flag_after || {})[0];
           ctrl.fieldArg.name = fieldParam.name;
           initFunction();
         }
@@ -199,24 +223,15 @@
         ctrl.writeExpr();
       };
 
-      function safeStringAlias(value) {
-        const MAX_LEN = 20;
-        const cleaned = value
-          .toLowerCase()
-          .replace(/['"]/g, '')        // remove quotes
-          .replace(/[^a-z0-9]+/g, '_') // replace unsafe chars
-          .replace(/^_+|_+$/g, '');    // trim underscores
-
-        const short = cleaned.slice(0, MAX_LEN);
-        return `${short}_${hash}`;
-      }
-
-      // Make a sql-friendly alias for this expression
+      // Make a sql-friendly alias for this expression, using the same
+      // truncate-and-hash formula as the SQL column names it may become.
       function makeAlias() {
         const args = ctrl.args
           .filter(arg => arg.value && (arg.type === 'field' || arg.type === 'number' || arg.type === 'string'))
-          .map(arg => arg.type === 'string' ? safeStringAlias(arg.value) : arg.value);
-        return (ctrl.fnName + '_' + args.join('_')).replace(/[.:]/g, '_');
+          .map(arg => String(arg.value));
+        // Replace the pseudoconstant separator, which createSqlName would strip
+        const alias = (ctrl.fnName + '_' + args.join('_')).replace(/:/g, '_');
+        return searchMeta.createSqlName(alias);
       }
 
       this.writeExpr = function() {
@@ -262,4 +277,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

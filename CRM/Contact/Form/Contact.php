@@ -27,6 +27,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
   use CRM_Contact_Form_Edit_PhoneBlockTrait;
   use CRM_Contact_Form_Edit_IMBlockTrait;
   use CRM_Contact_Form_Edit_EmailBlockTrait;
+  use CRM_Contact_Form_Edit_WebsiteBlockTrait;
 
   /**
    * Is this the contact summary edit screen.
@@ -35,6 +36,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    */
   protected bool $isContactSummaryEdit = TRUE;
 
+  /**
+   * @var bool
+   */
+  public $submitOnce = TRUE;
 
   /**
    * The contact type of the form.
@@ -257,7 +262,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           $this->_values['openid'] = $this->getExistingOpenIDsReIndexed();
           $this->_values['phone'] = $this->getExistingPhonesReIndexed();
           $this->_values['address'] = CRM_Core_BAO_Address::getValues(['contact_id' => $this->_contactId], TRUE);
-          CRM_Core_BAO_Website::getValues(['contact_id' => $this->_contactId], $this->_values);
+          $this->_values['website'] = $this->getExistingWebsitesReIndexed();
           $this->set('values', $this->_values);
         }
       }
@@ -304,6 +309,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     $this->assign('editOptions', $this->_editOptions);
     $this->assign('contactType', $this->_contactType);
     $this->assign('contactSubType', $this->_contactSubType);
+
+    CRM_Core_Smarty::singleton()->addContentWrapperClass('crm-contact-type-' . strtolower($this->_contactType));
 
     // get the location blocks.
     $this->_blocks = $this->get('blocks');
@@ -682,12 +689,8 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
     }
 
     // street number should be digit + suffix, CRM-5450
-    $parseStreetAddress = CRM_Utils_Array::value('street_address_parsing',
-      CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-        'address_options'
-      )
-    );
-    if ($parseStreetAddress) {
+    $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'address_options');
+    if (!empty($addressOptions['street_address_parsing'])) {
       if (isset($fields['address']) &&
         is_array($fields['address'])
       ) {
@@ -1475,7 +1478,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       return;
     }
     if ($name === 'Website') {
-      CRM_Contact_Form_Edit_Website::buildQuickForm($this, $instance);
+      $this->addWebsiteBlockFields($instance);
       return;
     }
     if ($name === 'OpenID') {

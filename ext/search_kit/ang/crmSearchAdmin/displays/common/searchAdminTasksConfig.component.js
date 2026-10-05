@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchAdmin').component('searchAdminTasksConfig', {
@@ -37,11 +37,13 @@
         $timeout(function() {
           // Disabling one when all enabled, convert to array
           if (typeof ctrl.display.settings.actions === 'boolean') {
-            ctrl.display.settings.actions = _.map(ctrl.allTasks, 'name');
+            ctrl.display.settings.actions = ctrl.allTasks.map((task) => task.name);
           }
           // Remove enabled task
           if (ctrl.display.settings.actions.includes(name)) {
-            _.pull(ctrl.display.settings.actions, name);
+            for (let pos = ctrl.display.settings.actions.indexOf(name); pos > -1; pos = ctrl.display.settings.actions.indexOf(name)) {
+              ctrl.display.settings.actions.splice(pos, 1);
+            }
           }
           // Add disabled task
           else {
@@ -61,4 +63,4 @@
     }
   });
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

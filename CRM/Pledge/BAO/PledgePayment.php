@@ -125,7 +125,7 @@ WHERE     pledge_id = %1
       }
 
       $params['scheduled_date'] = $prevScheduledDate[$i];
-      $payment = self::add($params);
+      $payment = self::writeRecord($params);
       if (is_a($payment, 'CRM_Core_Error')) {
         $transaction->rollback();
         return $payment;
@@ -146,37 +146,6 @@ WHERE     pledge_id = %1
   }
 
   /**
-   * Create individual pledge payment.
-   *
-   * @param array $params
-   *
-   * @return CRM_Pledge_DAO_PledgePayment
-   * @throws \CRM_Core_Exception
-   */
-  public static function create(array $params): CRM_Pledge_DAO_PledgePayment {
-    // set currency for CRM-1496
-    if (empty($params['id']) && !isset($params['currency'])) {
-      $params['currency'] = CRM_Core_Config::singleton()->defaultCurrency;
-    }
-    return self::writeRecord($params);
-  }
-
-  /**
-   * Add pledge payment.
-   *
-   * @deprecated - use the api which will use create (soon).
-   *
-   * @param array $params
-   *   Fields in line with the database entity.
-   *
-   * @return CRM_Pledge_DAO_PledgePayment
-   * @throws \CRM_Core_Exception
-   */
-  public static function add(array $params): CRM_Pledge_DAO_PledgePayment {
-    return self::create($params);
-  }
-
-  /**
    * @deprecated
    * @param array $params
    * @param array $defaults
@@ -184,18 +153,6 @@ WHERE     pledge_id = %1
    */
   public static function retrieve($params, &$defaults) {
     return self::commonRetrieve(self::class, $params, $defaults);
-  }
-
-  /**
-   * Delete pledge payment.
-   *
-   * @param int $id
-   * @deprecated
-   * @return bool
-   */
-  public static function del($id) {
-    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
-    return (bool) self::deleteRecord(['id' => $id]);
   }
 
   /**
@@ -375,7 +332,7 @@ WHERE     pledge_id = %1
             'scheduled_amount' => ($pledgeScheduledAmount - $actualAmount),
             'scheduled_date' => $ScheduledDate,
           ];
-          $payment = self::add($pledgeParams);
+          $payment = self::writeRecord($pledgeParams);
           // while editing schedule,  after adding a new pledge payemnt update the scheduled amount of the current payment
           if (!$paymentContributionId) {
             CRM_Core_DAO::setFieldValue('CRM_Pledge_DAO_PledgePayment', $payments, 'scheduled_amount', $actualAmount);
@@ -756,7 +713,7 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
         'scheduled_amount' => $pledgeScheduledAmount,
         'scheduled_date' => $ScheduledDate,
       ];
-      $payment = self::add($pledgeParams);
+      $payment = self::writeRecord($pledgeParams);
     }
     else {
       $nextPledgeInstallmentDue = self::getOldestPledgePayment($pledgeID);

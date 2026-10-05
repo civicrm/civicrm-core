@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchTasks')
@@ -42,7 +42,7 @@
                 $input
                   .datepicker({
                     beforeShow: function() {
-                      const existingSelections = _.pluck($el.select2('data') || [], 'id');
+                      const existingSelections = ($el.select2('data') || []).map((selection) => selection.id);
                       return {
                         changeMonth: true,
                         changeYear: true,
@@ -50,7 +50,7 @@
                         beforeShowDay: function(date) {
                           // Don't allow the same date to be selected twice
                           const dateStr = $.datepicker.formatDate('yy-mm-dd', date);
-                          if (_.includes(existingSelections, dateStr)) {
+                          if (existingSelections.includes(dateStr)) {
                             return [false, '', ''];
                           }
                           return [true, '', ''];
@@ -86,4 +86,4 @@
         }
       };
     });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

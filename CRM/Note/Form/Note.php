@@ -152,6 +152,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
+      $this->setFormRedirect();
       CRM_Core_BAO_Note::deleteRecord(['id' => $this->_id]);
       $status = ts('Selected Note has been deleted successfully.');
       CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
@@ -175,6 +176,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $this->setEntityId($note->id);
 
     CRM_Core_Session::setStatus(ts('Your Note has been saved.'), ts('Saved'), 'success');
+    $this->setFormRedirect();
   }
 
   /**
@@ -195,6 +197,25 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     // add attachments part
     $currentAttachmentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_note', $this->_id);
     $this->assign('currentAttachmentInfo', $currentAttachmentInfo);
+  }
+
+  private function setFormRedirect() {
+    // Redirect to viewing the entity to which this note (or note parent) belongs
+    $parent = CRM_Core_BAO_Note::getTopParent($this->getEntityId());
+    $entityName = Civi::table($parent->entity_table)->getMeta('name');
+    $link = civicrm_api4($entityName, 'getLinks', [
+      'values' => ['id' => $parent->entity_id],
+      'where' => [['ui_action', '=', 'view']],
+    ])->first();
+    if ($link) {
+      $path = $link['path'];
+      // Select note tab on contact summary
+      if ($entityName === 'Contact') {
+        $path .= '&selectedChild=note';
+      }
+      $url = (string) Civi::url($path);
+      CRM_Core_Session::singleton()->pushUserContext($url);
+    }
   }
 
 }

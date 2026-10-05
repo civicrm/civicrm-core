@@ -6,4 +6,16 @@
     <page_callback>CRM_Ckeditor4_Form_CKEditorConfig</page_callback>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
+  <item>
+    <path>civicrm/kcfinder/browse</path>
+    <title>kcfinder browse</title>
+    <page_callback>Civi\Kcfinder\Page\Browse::run</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/kcfinder/upload</path>
+    <title>kcfinder upload</title>
+    <page_callback>Civi\Kcfinder\Page\Upload::run</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
 </menu>

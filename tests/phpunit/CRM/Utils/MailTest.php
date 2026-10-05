@@ -50,14 +50,50 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
         'result' => '"User, Test" <foo@bar.com>',
         'useQuote' => TRUE,
       ],
+      [
+        'name' => '',
+        'email' => 'foo@bar.com',
+        'result' => '<foo@bar.com>',
+      ],
+      [
+        'name' => NULL,
+        'email' => 'foo@bar.com',
+        'result' => '<foo@bar.com>',
+      ],
+      [
+        'name' => '',
+        'email' => 'foo@bar.com, baz@bar.com',
+        'result' => '<foo@bar.com>, <baz@bar.com>',
+      ],
+      [
+        'name' => NULL,
+        'email' => 'foo@bar.com, baz@bar.com',
+        'result' => '<foo@bar.com>, <baz@bar.com>',
+      ],
+      [
+        'name' => '',
+        'email' => 'foo@bar.com; baz@bar.com',
+        'result' => '<foo@bar.com>, <baz@bar.com>',
+      ],
     ];
     foreach ($values as $value) {
       $result = CRM_Utils_Mail::formatRFC822Email($value['name'],
         $value['email'],
         $value['useQuote'] ?? FALSE
       );
-      $this->assertEquals($result, $value['result'], 'Expected encoding does not match');
+      $this->assertEquals($value['result'], $result, 'Expected encoding does not match');
     }
+  }
+
+  public function testSetEmailHeadersMultipleRecipients(): void {
+    $params = [
+      'toEmail' => 'foo@bar.com, baz@bar.com',
+      'from' => 'admin@example.com',
+      'subject' => 'Test',
+      'text' => 'Hello',
+    ];
+    [$headers, $message] = CRM_Utils_Mail::setEmailHeaders($params);
+    $this->assertEquals('<foo@bar.com>, <baz@bar.com>', $headers['To']);
   }
 
   /**

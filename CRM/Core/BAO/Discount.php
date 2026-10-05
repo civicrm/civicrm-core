@@ -51,12 +51,11 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    *
    * @return object
    *   CRM_Core_DAO_Discount object on success, otherwise null
+   * @deprecated
    */
   public static function add(&$params) {
-    $discount = new CRM_Core_DAO_Discount();
-    $discount->copyValues($params);
-    $discount->save();
-    return $discount;
+    CRM_Core_Error::deprecatedFunctionWarning('writeRecord');
+    return self::writeRecord($params);
   }
 
   /**

@@ -1,9 +1,13 @@
 <?php
 
 use Civi\Api4\Contribution;
+use Civi\Api4\EntityFinancialTrxn;
+use Civi\Api4\FinancialItem;
 use Civi\Api4\LineItem;
-use Civi\Api4\PriceField;
-use Civi\Api4\PriceFieldValue;
+use Civi\Api4\Participant;
+use Civi\Api4\ParticipantStatusType;
+use Civi\Api4\Order;
+use Civi\Api4\Payment;
 
 /**
  * Class CRM_Event_BAO_AdditionalPaymentTest
@@ -36,6 +40,10 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    ParticipantStatusType::update()
+      ->addValue('is_active', FALSE)
+      ->addWhere('name', '=', 'On waitlist')
+      ->execute();
     parent::tearDown();
   }
 
@@ -112,7 +120,10 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'contribution_status_id' => 'Pending',
       'receive_date' => date('Y-m-d') . ' 00:00:00',
       'line_items' => [],
-      'api.Payment.create' => ['total_amount' => $actualPaidAmt],
+      'api.Payment.create' => [
+        'total_amount' => $actualPaidAmt,
+        'is_send_contribution_notification' => FALSE,
+      ],
     ];
     foreach ($lineItems as $lineItem) {
       $orderParams['line_items'][] = [
@@ -230,59 +241,48 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCRM21513(): void {
-    $textPriceFieldID = PriceField::create()->setValues([
+    $textPriceFieldID = $this->createTestEntity('PriceField', [
       'price_set_id' => $this->getPriceSetID('PaidEvent'),
       'label' => 'Text Price Field',
       'name' => 'text_price_field',
       'html_type' => 'Text',
       'is_enter_qty' => 1,
-    ])->execute()->first()['id'];
+    ], 'textPriceField')['id'];
 
-    PriceFieldValue::create()->setValues(['financial_type_id:name' => 'Event Fee', 'price_field_id' => $textPriceFieldID, 'amount' => 10, 'label' => 'ten'])->execute();
-    $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($this->getPriceSetID('PaidEvent'));
-    $priceSet = $priceSet[$this->getPriceSetID('PaidEvent')];
-    $feeBlock = $priceSet['fields'] ?? NULL;
-
-    $params = [
-      'send_receipt' => 1,
-      'is_test' => 0,
-      'is_pay_later' => 0,
-      'event_id' => $this->getEventID(),
-      'register_date' => date('Y-m-d') . ' 00:00:00',
-      'role_id' => 1,
-      'status_id' => 1,
-      'source' => 'Event_' . $this->getEventID(),
-      'contact_id' => $this->ids['Contact']['individual_0'],
-    ];
-    $participant = $this->callAPISuccess('Participant', 'create', $params);
-    $this->ids['Participant']['order'] = $participant['id'];
-    $contributionParams = [
-      'total_amount' => 10,
-      'source' => 'Test set with information',
-      'currency' => 'USD',
-      'receipt_date' => date('Y-m-d') . ' 00:00:00',
-      'contact_id' => $this->ids['Contact']['individual_0'],
-      'financial_type_id' => 4,
-      'payment_instrument_id' => 4,
-      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Pending'),
-      'receive_date' => date('Y-m-d') . ' 00:00:00',
-      'skipLineItem' => 1,
-    ];
-
-    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
-    $this->ids['Contribution']['order'] = $contribution['id'];
-
-    $this->callAPISuccess('ParticipantPayment', 'create', [
-      'participant_id' => $this->ids['Participant']['order'],
-      'contribution_id' => $this->ids['Contribution']['order'],
-    ]);
+    $textPriceFieldValueID = $this->createTestEntity('PriceFieldValue', [
+      'financial_type_id:name' => 'Event Fee',
+      'price_field_id' => $textPriceFieldID,
+      'amount' => 10,
+      'label' => 'ten',
+    ], 'textPriceFieldValue')['id'];
 
     // CASE 1: Choose text price qty 1 (x$10 = $10 amount)
-    $priceSetParams['price_' . $textPriceFieldID] = 1;
-    $lineItem = $this->getParticipantLineItems();
-    CRM_Price_BAO_PriceSet::processAmount($feeBlock, $priceSetParams, $lineItem);
-    $lineItemVal[$this->getPriceSetID('PaidEvent')] = $lineItem;
-    CRM_Price_BAO_LineItem::processPriceSet($this->ids['Participant']['order'], $lineItemVal, $this->getContributionObject($contribution['id']), 'civicrm_participant');
+    $contribution = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'currency' => 'USD',
+        'financial_type_id' => 4,
+        'payment_instrument_id' => 4,
+        'contribution_status_id:name' => 'Pending',
+        'source' => 'Test set with information',
+        'receive_date' => date('Y-m-d') . ' 00:00:00',
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id.event_id' => $this->getEventID(),
+        'entity_id.contact_id' => $this->ids['Contact']['individual_0'],
+        'entity_id.status_id' => 1,
+        'entity_id.role_id' => 1,
+        'entity_id.register_date' => date('Y-m-d') . ' 00:00:00',
+        'entity_id.source' => 'Event_' . $this->getEventID(),
+        'price_field_value_id' => $textPriceFieldValueID,
+        'qty' => 1,
+      ])
+      ->execute()->single();
+    $this->ids['Contribution']['order'] = $contribution['id'];
+    $this->ids['Participant']['order'] = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single()['entity_id'];
 
     // CASE 2: Choose text price qty 3 (x$10 = $30 amount)
     $lineItems = $this->getParticipantLineItems();
@@ -573,6 +573,401 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'id' => $this->ids['Participant']['order'],
       'action' => CRM_Core_Action::UPDATE,
     ])->processForm();
+  }
+
+  /**
+   * The "Confirmation Message" text entered on the back-office
+   * "Change Registration" screen should be included in the confirmation
+   * email when "Send Confirmation?" is ticked.
+   *
+   * https://lab.civicrm.org/dev/core/-/work_items/6731
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testChangeFeeSelectionEmailIncludesConfirmationMessage(): void {
+    $this->registerParticipantAndPay($this->_expensiveFee);
+    ParticipantStatusType::update()
+      ->addValue('is_active', TRUE)
+      ->addWhere('name', '=', 'On waitlist')
+      ->execute();
+    Participant::update()
+      ->addValue('status_id:name', 'On waitlist')
+      ->addWhere('id', '=', $this->ids['Participant']['order'])
+      ->execute();
+    $fromEmailAddress = array_key_first(CRM_Event_BAO_Event::getFromEmailIds($this->getEventID())['from_email_id']);
+    $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
+      $this->getPriceFieldFormLabel('PaidEvent') => $this->getCheapFeeID(),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'On waitlist'),
+      'send_receipt' => 1,
+      'from_email_address' => $fromEmailAddress,
+      'receipt_text' => 'This is my distinctive confirmation message',
+    ], [
+      'id' => $this->ids['Participant']['order'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
+    $this->assertMailSentContainingString('You have been added to the WAIT LIST for this event');
+    $this->assertMailSentContainingString('This is my distinctive confirmation message');
+  }
+
+  /**
+   * An unchanged submitted line item retains its financial item.
+   *
+   * When no line items need updating, changeFeeSelections() used to incorrectly
+   * reverse submitted, unchanged line items.
+   */
+  public function testUnchangedLineItemKeepsItsFinancialItem(): void {
+    $this->createPriceField('ten_euros', 'Ten euros', 10.00);
+    $this->createPriceField('thirty_five_euros', 'Thirty-five euros', 35.00);
+    $this->registerAndPayForPriceFieldValues(['ten_euros', 'thirty_five_euros'], 45.00);
+
+    $this->submitForm(NULL, [$this->getPriceFieldFormLabel('thirty_five_euros') => $this->ids['PriceFieldValue']['thirty_five_euros']]);
+
+    $lineItem = $this->getLineItemForPriceFieldValue($this->ids['PriceFieldValue']['thirty_five_euros']);
+    $amounts = $this->getFinancialItemAmountsForLineItem($lineItem['id']);
+    $this->assertEquals(1.0, (float) $lineItem['qty']);
+    $this->assertEqualsWithDelta(
+      (float) $lineItem['line_total'],
+      array_sum($amounts),
+      0.001,
+      'The submitted, unchanged line item should retain revenue equal to its line total.'
+    );
+    $this->assertEquals([35.00], $amounts, 'The unchanged line item should still have its single original financial item.');
+  }
+
+  /**
+   * An omitted line item is still zeroed and financially reversed.
+   */
+  public function testOmittedLineItemIsStillReversed(): void {
+    $this->createPriceField('ten_euros', 'Ten euros', 10.00);
+    $this->createPriceField('thirty_five_euros', 'Thirty-five euros', 35.00);
+    $this->registerAndPayForPriceFieldValues(['ten_euros', 'thirty_five_euros'], 45.00);
+
+    $this->submitForm(NULL, [$this->getPriceFieldFormLabel('thirty_five_euros') => $this->ids['PriceFieldValue']['thirty_five_euros']]);
+
+    $lineItem = $this->getLineItemForPriceFieldValue($this->ids['PriceFieldValue']['ten_euros']);
+    $this->assertEquals(0.0, (float) $lineItem['qty']);
+    $this->assertEquals(0.0, (float) $lineItem['line_total']);
+    $this->assertEquals(
+      [-10.00, 10.00],
+      $this->getFinancialItemAmountsForLineItem($lineItem['id']),
+      'The omitted line item should have its original item and exactly one reversal.'
+    );
+  }
+
+  /**
+   * An omitted line item with a negative amount is reversed as well.
+   *
+   * A discount line carries a negative financial item. Zeroing the line item
+   * without reversing that item leaves the discount on the revenue account
+   * forever, so the accounting side keeps a negative remainder that the
+   * contribution no longer accounts for.
+   */
+  public function testOmittedNegativeLineItemIsAlsoReversed(): void {
+    $this->createPriceField('ten_euros', 'Ten euros', 10.00);
+    $this->createPriceField('discount_five_euros', 'Five euro discount', -5.00);
+    $this->registerAndPayForPriceFieldValues(['ten_euros', 'discount_five_euros'], 5.00);
+
+    $this->submitForm(NULL, [$this->getPriceFieldFormLabel('ten_euros') => $this->ids['PriceFieldValue']['ten_euros']]);
+
+    $lineItem = $this->getLineItemForPriceFieldValue($this->ids['PriceFieldValue']['discount_five_euros']);
+    $this->assertEquals(0.0, (float) $lineItem['qty']);
+    $this->assertEquals(0.0, (float) $lineItem['line_total']);
+    $this->assertEquals(
+      [-5.00, 5.00],
+      $this->getFinancialItemAmountsForLineItem($lineItem['id']),
+      'The omitted discount line should have its negative item and exactly one reversal.'
+    );
+  }
+
+  /**
+   * A line item carrying sales tax has both of its financial items reversed.
+   *
+   * Revenue and tax are recorded as two financial items on one line item, each on
+   * its own financial account. Both have to be reversed when the line is omitted,
+   * and each on its own account: a single combined reversal would move the tax off
+   * the tax account and onto the revenue account.
+   */
+  public function testOmittedTaxedLineItemReversesBothItems(): void {
+    $this->enableTaxAndInvoicing();
+    $this->addTaxAccountToFinancialType((int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'));
+    $this->createPriceField('ten_euros', 'Ten euros', 10.00);
+    $this->createPriceField('thirty_five_euros', 'Thirty-five euros', 35.00);
+    $this->registerAndPayForPriceFieldValues(['ten_euros', 'thirty_five_euros'], 49.50);
+
+    $this->submitForm(NULL, [$this->getPriceFieldFormLabel('thirty_five_euros') => $this->ids['PriceFieldValue']['thirty_five_euros']]);
+
+    $lineItem = $this->getLineItemForPriceFieldValue($this->ids['PriceFieldValue']['ten_euros']);
+    $this->assertEquals(0.0, (float) $lineItem['qty']);
+    $this->assertEquals(0.0, (float) $lineItem['line_total']);
+    $this->assertEquals(
+      [-10.00, -1.00, 1.00, 10.00],
+      $this->getFinancialItemAmountsForLineItem($lineItem['id']),
+      'Both the revenue and the tax item of the omitted line should be reversed.'
+    );
+
+    // Each reversal belongs on the account of the item it reverses.
+    $perAccount = $this->getFinancialItemTotalsByAccount($lineItem['id']);
+    $this->assertCount(2, $perAccount, 'Expected items on a revenue and a tax account.');
+    foreach ($perAccount as $accountID => $total) {
+      $this->assertEqualsWithDelta(0.0, $total, 0.001, 'Financial account ' . $accountID . ' should net to zero after the reversal.');
+    }
+  }
+
+  /**
+   * Swapping a price option for one of the same price leaves the payment intact.
+   *
+   * This pins down behaviour that used to be at risk. changeFeeSelections() held a
+   * branch that reversed the financial transaction a financial item was linked to,
+   * and that transaction is the payment itself, not the line's share of it. The
+   * branch never executed because of a mismatch between the name it was called by
+   * and the name it was defined under, so the payment survived by accident rather
+   * than by design. With the branch removed the outcome is the same, and this test
+   * keeps it that way.
+   */
+  public function testSwappingEqualPricedOptionKeepsThePayment(): void {
+    // validatePayments() does not survive a fee change: the financial items of the
+    // line that comes in stay allocated to the original payment, so the allocated
+    // total ends up above the amount paid. That reproduces on unpatched core and is
+    // unrelated to what this test pins down, so it is skipped for the same reason
+    // testCRM19273() skips it, above.
+    $this->isValidateFinancialsOnPostAssert = FALSE;
+    $this->createPriceField('fifty_euros', 'Fifty euros', 50.00);
+    $this->createPriceField('thirty_five_euros', 'Thirty-five euros', 35.00);
+    $this->createPriceField('fifty_euros_again', 'Fifty euros again', 50.00);
+    $this->registerAndPayForPriceFieldValues(['fifty_euros', 'thirty_five_euros'], 85.00);
+
+    $this->submitForm(NULL, [
+      $this->getPriceFieldFormLabel('fifty_euros_again') => $this->ids['PriceFieldValue']['fifty_euros_again'],
+      $this->getPriceFieldFormLabel('thirty_five_euros') => $this->ids['PriceFieldValue']['thirty_five_euros'],
+    ]);
+
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $this->ids['Contribution']['order'])
+      ->addSelect('total_amount')
+      ->execute()->single();
+    $this->assertEquals(85.00, (float) $contribution['total_amount'], 'The swap should not change what is owed.');
+
+    $this->assertEquals(
+      [85.00],
+      $this->getContributionPaymentAmounts($this->ids['Contribution']['order']),
+      'The contribution should still carry exactly its original payment, with no reversal.'
+    );
+  }
+
+  /**
+   * A contribution can cover more than one participant - eg. a group
+   * registration paid for in one payment - and changing one participant's
+   * fee selection must not cancel another participant's line item on the
+   * same contribution.
+   *
+   * $submittedLineItems built by ParticipantFeeSelection::postProcess() only
+   * ever covers the participant being edited, and
+   * CRM_Contribute_BAO_FinancialProcessor::getLineItemsToAlter() treats any
+   * of the contribution's other price_field_value_ids as having been
+   * deselected. addLineItemsNotYetRepresented() is what keeps the other
+   * participant's line item intact.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testFeeChangeForOneParticipantDoesNotCancelAnothers(): void {
+    $participantA = $this->createTestEntity('Participant', [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'event_id' => $this->getEventID(),
+      'status_id:name' => 'Registered',
+      'role_id:name' => 'Attendee',
+    ], 'participantA');
+    $secondContactID = $this->individualCreate([], 'individual_1');
+    $participantB = $this->createTestEntity('Participant', [
+      'contact_id' => $secondContactID,
+      'event_id' => $this->getEventID(),
+      'status_id:name' => 'Registered',
+      'role_id:name' => 'Attendee',
+    ], 'participantB');
+
+    $contribution = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id:name' => 'Event Fee',
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participantA['id'],
+        'price_field_value_id' => $this->getCheapFeeID(),
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participantB['id'],
+        'price_field_value_id' => $this->getExpensiveValueID(),
+      ])
+      ->execute()->single();
+
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', (float) $this->_cheapFee + (float) $this->_expensiveFee)
+      ->execute();
+
+    $participantBLineBefore = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('entity_id', '=', $participantB['id'])
+      ->execute()->single();
+
+    // Change participant A's fee only.
+    $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
+      $this->getPriceFieldFormLabel('PaidEvent') => $this->getVeryExpensiveID(),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+    ], [
+      'id' => $participantA['id'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
+
+    $participantBLineAfter = $this->callAPISuccessGetSingle('LineItem', ['id' => $participantBLineBefore['id'], 'version' => 4]);
+    $this->assertEquals(
+      $participantBLineBefore['qty'],
+      $participantBLineAfter['qty'],
+      "Participant B's line item must survive a fee change made for participant A on the same contribution."
+    );
+    $this->assertGreaterThan(0, $participantBLineAfter['qty'], "Participant B's line item should not have been cancelled.");
+  }
+
+  /**
+   * Create one radio price field, with one value, on the PaidEvent price set.
+   *
+   * @param string $name
+   * @param string $label
+   * @param float $amount
+   */
+  private function createPriceField(string $name, string $label, float $amount): void {
+    $priceField = $this->createTestEntity('PriceField', [
+      'price_set_id' => $this->getPriceSetID('PaidEvent'),
+      'name' => $name,
+      'label' => $label,
+      'html_type' => 'Radio',
+      'is_required' => 0,
+      'financial_type_id:name' => 'Event Fee',
+    ], $name);
+    $this->createTestEntity('PriceFieldValue', [
+      'price_field_id' => $priceField['id'],
+      'name' => $name,
+      'label' => $label,
+      'amount' => $amount,
+      'financial_type_id:name' => 'Event Fee',
+    ], $name);
+  }
+
+  /**
+   * Register a participant against the given price field values and pay in full.
+   *
+   * All line items are attached to a single new participant, and their amounts
+   * (and tax, if enabled) are derived from their price field values.
+   *
+   * @param string[] $identifiers
+   *   Identifiers previously passed to createPriceField().
+   * @param float $totalAmount
+   */
+  private function registerAndPayForPriceFieldValues(array $identifiers, float $totalAmount): void {
+    $participant = $this->createTestEntity('Participant', [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'event_id' => $this->getEventID(),
+      'status_id:name' => 'Registered',
+      'role_id:name' => 'Attendee',
+    ], 'order');
+
+    $order = Order::create(FALSE)->setContributionValues([
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'financial_type_id:name' => 'Event Fee',
+    ]);
+    foreach ($identifiers as $identifier) {
+      $order->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participant['id'],
+        'price_field_value_id' => $this->ids['PriceFieldValue'][$identifier],
+      ]);
+    }
+    $contribution = $order->execute()->single();
+    $this->ids['Contribution']['order'] = $contribution['id'];
+
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', $totalAmount)
+      ->execute();
+  }
+
+  /**
+   * Get the qty, line_total and id of the line item for a price field value.
+   *
+   * @param int $priceFieldValueID
+   *
+   * @return array
+   */
+  private function getLineItemForPriceFieldValue(int $priceFieldValueID): array {
+    return LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $this->ids['Contribution']['order'])
+      ->addWhere('price_field_value_id', '=', $priceFieldValueID)
+      ->addSelect('id', 'qty', 'line_total')
+      ->execute()->single();
+  }
+
+  /**
+   * Get the individual financial item amounts of one line item, ascending.
+   *
+   * Asserting on the separate amounts rather than only on their sum makes a
+   * missing reversal and a duplicated one distinguishable: both leave a sum that
+   * a laxer assertion would accept.
+   *
+   * @param int $lineItemID
+   *
+   * @return float[]
+   */
+  private function getFinancialItemAmountsForLineItem(int $lineItemID): array {
+    $amounts = FinancialItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_line_item')
+      ->addWhere('entity_id', '=', $lineItemID)
+      ->addSelect('amount')
+      ->execute()
+      ->column('amount');
+    $amounts = array_map('floatval', $amounts);
+    sort($amounts);
+    return $amounts;
+  }
+
+  /**
+   * Get the payment transaction amounts recorded against a contribution, ascending.
+   *
+   * @param int $contributionID
+   *
+   * @return float[]
+   */
+  private function getContributionPaymentAmounts(int $contributionID): array {
+    $amounts = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->addWhere('entity_id', '=', $contributionID)
+      ->addWhere('financial_trxn_id.is_payment', '=', TRUE)
+      ->addSelect('amount')
+      ->addOrderBy('id')
+      ->execute()
+      ->column('amount');
+    return array_map('floatval', $amounts);
+  }
+
+  /**
+   * Get the net financial item total per financial account for one line item.
+   *
+   * @param int $lineItemID
+   *
+   * @return array
+   *   Financial account ID => net amount.
+   */
+  private function getFinancialItemTotalsByAccount(int $lineItemID): array {
+    $items = FinancialItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_line_item')
+      ->addWhere('entity_id', '=', $lineItemID)
+      ->addSelect('financial_account_id', 'amount')
+      ->execute();
+    $totals = [];
+    foreach ($items as $item) {
+      $totals[$item['financial_account_id']] = ($totals[$item['financial_account_id']] ?? 0) + (float) $item['amount'];
+    }
+    return $totals;
   }
 
 }

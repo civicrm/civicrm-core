@@ -76,6 +76,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
       ['geo_code_1' => 21, 'geo_code_2' => 21],
       ['geo_code_1' => 19, 'geo_code_2' => 19],
       ['geo_code_1' => 15, 'geo_code_2' => 15],
+      ['geo_code_1' => 8, 'geo_code_2' => 20],
     ];
     $addreses = $this->saveTestRecords('Address', [
       'records' => $sampleData,
@@ -92,6 +93,14 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $this->assertContains($addreses[1], $result);
     $this->assertContains($addreses[2], $result);
     $this->assertNotContains($addreses[3], $result);
+
+    // Regression test for dev/core#6715: identical coordinates can round above 1 before ACOS().
+    $exactResult = Address::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addWhere('proximity', '<=', ['distance' => 0, 'geo_code_1' => 8, 'geo_code_2' => 20])
+      ->execute()->column('id');
+
+    $this->assertContains($addreses[4], $exactResult);
   }
 
   public function testMasterAddressUpdate(): void {

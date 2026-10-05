@@ -189,8 +189,8 @@ return [
               'style' => 'primary',
               'condition' => [
                 'check user permission',
-                'CONTAINS',
-                ['administer CiviCampaign', 'manage campaign'],
+                '=',
+                'manage campaign',
               ],
             ],
           ],

@@ -1,4 +1,4 @@
-(function (angular, $, _) {
+(function (angular, $) {
 
   angular.module('crmMailing', CRM.angRequires('crmMailing'));
 
@@ -61,4 +61,4 @@
     }
   ]);
 
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

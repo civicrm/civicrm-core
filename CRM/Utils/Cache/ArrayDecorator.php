@@ -80,7 +80,7 @@ class CRM_Utils_Cache_ArrayDecorator implements CRM_Utils_Cache_Interface {
 
   public function get($key, $default = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
-    if (array_key_exists($key, $this->values) && $this->expires[$key] > CRM_Utils_Time::getTimeRaw()) {
+    if (array_key_exists($key, $this->values) && $this->expires[$key] > CRM_Utils_Time::time()) {
       return $this->reobjectify($this->values[$key]);
     }
 

@@ -163,7 +163,7 @@ class CRM_Utils_Token {
    * @return string
    *   The processed string
    *
-   * @deprecated
+   * @deprecated will be removed around 6.30
    */
   public static function &replaceMailingTokens(
     $str,
@@ -172,19 +172,18 @@ class CRM_Utils_Token {
     $knownTokens = NULL,
     $escapeSmarty = FALSE
   ) {
-    $key = 'mailing';
-    if (!$knownTokens || !isset($knownTokens[$key])) {
-      return $str;
-    }
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
+    $mailingContext = $mailing->id ? ['mailingId' => (int) $mailing->id] : [];
+    $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), $mailingContext + [
+      'controller' => __CLASS__,
+      'smarty' => FALSE,
+    ]);
 
-    $str = preg_replace_callback(
-      self::tokenRegex($key),
-      function ($matches) use (&$mailing, $escapeSmarty) {
-        return CRM_Utils_Token::getMailingTokenReplacement($matches[1], $mailing, $escapeSmarty);
-      },
-      $str
-    );
-    return $str;
+    $tokenProcessor->addMessage('string', $str, 'text/html');
+    $tokenProcessor->addRow();
+    $tokenProcessor->evaluate();
+    $string = $tokenProcessor->getRow(0)->render('string');
+    return $string;
   }
 
   /**
@@ -193,8 +192,11 @@ class CRM_Utils_Token {
    * @param bool $escapeSmarty
    *
    * @return string
+   *
+   * @deprecated since 6.18 will be removed around 6.24
    */
   public static function getMailingTokenReplacement($token, &$mailing, $escapeSmarty = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     $value = '';
     switch ($token) {
       // CRM-7663
@@ -646,36 +648,17 @@ class CRM_Utils_Token {
    *   The domain BAO.
    * @param array $groups
    *   The groups (if any) being unsubscribed.
-   * @param bool $html
-   *   Replace tokens with html or plain text.
-   * @param int $contact_id
-   *   The contact ID.
-   * @param string $hash The security hash of the unsub event
    *
    * @return string
    *   The processed string
    */
-  public static function &replaceUnsubscribeTokens(
+  public static function replaceUnsubscribeTokens(
     $str,
-    &$domain,
-    &$groups,
-    $html,
-    $contact_id,
-    $hash
+    $domain,
+    $groups
   ) {
     if (self::token_match('unsubscribe', 'group', $str)) {
       if (!empty($groups)) {
-        $config = CRM_Core_Config::singleton();
-        $base = CRM_Utils_System::baseURL();
-
-        // FIXME: an ugly hack for CRM-2035, to be dropped once CRM-1799 is implemented
-        $dao = new CRM_Contact_DAO_Group();
-        $dao->find();
-        while ($dao->fetch()) {
-          if (substr($dao->visibility, 0, 6) == 'Public') {
-            $visibleGroups[] = $dao->id;
-          }
-        }
         $value = implode(', ', $groups);
         self::token_replace('unsubscribe', 'group', $value, $str);
       }
@@ -715,8 +698,11 @@ class CRM_Utils_Token {
    *
    * @return string
    *   The processed string
+   *
+   * @deprecated since 6.18 will be removed around 6.24
    */
-  public static function &replaceSubscribeInviteTokens($str) {
+  public static function replaceSubscribeInviteTokens($str) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     if (preg_match('/\{action\.subscribeUrl\}/', $str)) {
       $url = CRM_Utils_System::url('civicrm/mailing/subscribe',
         'reset=1',
@@ -750,29 +736,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Replace welcome/confirmation tokens
-   *
-   * @deprecated since 5.65 will be removed around 5.71
-   *
-   * @param string $str
-   *   The string with tokens to be replaced.
-   * @param string $group
-   *   The name of the group being subscribed.
-   * @param bool $html
-   *   Replace tokens with html or plain text.
-   *
-   * @return string
-   *   The processed string
-   */
-  public static function &replaceWelcomeTokens($str, $group, $html) {
-    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
-    if (self::token_match('welcome', 'group', $str)) {
-      self::token_replace('welcome', 'group', $group, $str);
-    }
-    return $str;
-  }
-
-  /**
    * Find unprocessed tokens (call this last)
    *
    * @param string $str
@@ -780,8 +743,11 @@ class CRM_Utils_Token {
    *
    * @return array
    *   Array of tokens that weren't replaced
+   *
+   * @deprecated since 6.18 will be removed around 6.30
    */
   public static function &unmatchedTokens(&$str) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     //preg_match_all('/[^\{\\\\]\{(\w+\.\w+)\}[^\}]/', $str, $match);
     preg_match_all('/\{(\w+\.\w+)\}/', $str, $match);
     return $match[1];
@@ -850,46 +816,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Call hooks on tokens for anonymous users - contact id is set to 0 - this allows non-contact
-   * specific tokens to be rendered
-   *
-   * @param array $contactIDs
-   *   This should always be array(0) or its not anonymous - left to keep signature same.
-   *   as main fn
-   * @param string $returnProperties
-   * @param bool $skipOnHold
-   * @param bool $skipDeceased
-   * @param string $extraParams
-   * @param array $tokens
-   * @param string $className
-   *   Sent as context to the hook.
-   * @param string $jobID
-   * @return array
-   *   contactDetails with hooks swapped out
-   *
-   * @deprecated
-   */
-  public static function getAnonymousTokenDetails($contactIDs = [0],
-                                           $returnProperties = NULL,
-                                           $skipOnHold = TRUE,
-                                           $skipDeceased = TRUE,
-                                           $extraParams = NULL,
-                                           $tokens = [],
-                                           $className = NULL,
-                                           $jobID = NULL) {
-    $details = [0 => []];
-    CRM_Core_Error::deprecatedFunctionWarning('function no longer used - see flexmailer');
-    // also call a hook and get token details
-    CRM_Utils_Hook::tokenValues($details[0],
-      $contactIDs,
-      $jobID,
-      $tokens,
-      $className
-    );
-    return $details;
-  }
-
-  /**
    * Get Membership Token Details.
    * @param array $membershipIDs
    *   Array of membership IDS.
@@ -946,8 +872,11 @@ class CRM_Utils_Token {
    * @param $tokens
    *
    * @return array
+   *
+   * @deprecated since 6.18 will be removed around 6.28
    */
   public static function flattenTokens(&$tokens) {
+    CRM_Core_Error::deprecatedFunctionWarning('token processor');
     $flattenTokens = [];
 
     foreach (['html', 'text', 'subject'] as $prop) {
@@ -982,7 +911,7 @@ class CRM_Utils_Token {
    * @deprecated since 6.3 will be removed around 6.15
    */
   public static function replaceUserTokens($str, $knownTokens = NULL, $escapeSmarty = FALSE) {
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
     $key = 'user';
     if (!$knownTokens ||
       !isset($knownTokens[$key])
@@ -1008,17 +937,17 @@ class CRM_Utils_Token {
    */
   public static function getUserTokenReplacement($token, $escapeSmarty = FALSE) {
     $value = '';
-    CRM_Core_Error::deprecatedFunctionWarning('no alternative');
+    CRM_Core_Error::deprecatedFunctionWarning();
 
     [$objectName, $objectValue] = explode('-', $token, 2);
 
     switch ($objectName) {
       case 'permission':
-        $value = CRM_Core_Permission::permissionEmails($objectValue);
+        $value = CRM_Core_Config::singleton()->userPermissionClass->permissionEmails($objectValue);
         break;
 
       case 'role':
-        $value = CRM_Core_Permission::roleEmails($objectValue);
+        $value = CRM_Core_Config::singleton()->userRoleClass->roleEmails($objectValue);
         break;
     }
 
@@ -1207,24 +1136,6 @@ class CRM_Utils_Token {
   }
 
   /**
-   * Get all custom field tokens of $entity
-   *
-   * @deprecated
-   *
-   * @param string $entity
-   * @return array
-   *   return custom field tokens in array('custom_N' => 'label') format
-   */
-  public static function getCustomFieldTokens($entity) {
-    CRM_Core_Error::deprecatedFunctionWarning('use the token processor');
-    $customTokens = [];
-    foreach (CRM_Core_BAO_CustomField::getFields($entity) as $id => $info) {
-      $customTokens['custom_' . $id] = $info['label'] . ' :: ' . $info['groupTitle'];
-    }
-    return $customTokens;
-  }
-
-  /**
    * Formats a token list for the select2 widget
    *
    * @param $tokens
@@ -1354,6 +1265,12 @@ class CRM_Utils_Token {
           '$email' => 'contact.email_primary.email',
           '$address' => 'contribution.address_id.display',
           '$amount' => ts('see default template for how to show this'),
+          '$is_share' => 'event.is_share|bool',
+          '$thankyou_title' => 'event.thankyou_title',
+          '$contributionStatus' => 'contribution.contribution_status_id:label',
+          '$receipt_date' => 'contribution.receipt_date',
+          '$receiptFromEmail' => 'no longer used',
+          '$is_pay_later' => 'contribution.is_pay_later|bool',
         ],
         'membership_offline_receipt' => [
           // receipt_text_renewal appears to be long gone.
@@ -1370,6 +1287,7 @@ class CRM_Utils_Token {
           '$contributionStatus' => 'contribution.contribution_status_id:name',
           '$contributionStatusID' => 'contribution.contribution_status_id',
           '$receive_date' => 'contribution.receive_date',
+          '$receipt_date' => 'contribution.receipt_date',
           '$formValues' => 'use relevant token/s',
           '$module' => 'unknown',
           '$currency' => 'contribution.currency',
@@ -1420,8 +1338,11 @@ class CRM_Utils_Token {
           '$address' => 'contribution.address_id.display',
           '$selectPremium' => 'contribution_product.id|boolean',
           '$product_name' => 'contribution_product.product_id.name',
+          '$fulfilled_date' => 'contribution_product.fulfilled_date',
           '$option' => 'contribution_product.product_option:label',
           '$sku' => 'contribution_product.product_id.sku',
+          '$formValues' => 'use relevant token/s',
+          '$receiptType' => 'not relevant',
         ],
         'event_offline_receipt' => [
           '$contributeMode' => ts('no longer available / relevant'),
@@ -1439,6 +1360,7 @@ class CRM_Utils_Token {
           '$totalAmount' => 'contribution.total_amount',
           '$location' => 'event.location',
           '$isShowLocation' => 'event.is_show_location|boolean',
+          '$event.event_confirm_text' => 'UserEnteredText',
           '$event.participant_role' => 'participant.role_id:label',
           '$amount_level' => ts('see default template for how to show this'),
           'balanceAmount' => 'contribution.balance_amount',

@@ -61,20 +61,26 @@ class MembershipLinksProvider extends \Civi\Core\Service\AutoSubscriber {
         self::unsetLinks($links, ['update', 'delete', 'renew', 'followup', 'cancelrecur', 'changebilling']);
       }
       elseif ($membershipId) {
-        $membership = Membership::get(FALSE)
-          ->addWhere('id', '=', $membershipId)
-          ->addSelect('contribution_recur_id.payment_processor_id')
-          ->addSelect('contribution_recur_id.contribution_status_id:name')
-          ->addSelect('status_id:name')
-          ->execute()->first();
-        $paymentProcessorID = $membership['contribution_recur_id.payment_processor_id'] ?? NULL;
-        if ($paymentProcessorID) {
-          $paymentObject = System::singleton()->getById($paymentProcessorID);
-          if (!$paymentObject->supports('updateSubscriptionBillingInfo')) {
-            self::unsetLinks($links, ['changebilling']);
-          }
-          if ($membership['contribution_recur_id.contribution_status_id:name'] !== 'Cancelled' && !$paymentObject->supports('cancelRecurring')) {
-            self::unsetLinks($links, ['cancelrecur']);
+        // Billing links require CiviContribute
+        if (!\CRM_Extension_System::singleton()->getManager()->isEnabled('civi_contribute')) {
+          self::unsetLinks($links, ['cancelrecur', 'changebilling']);
+        }
+        else {
+          $membership = Membership::get(FALSE)
+            ->addWhere('id', '=', $membershipId)
+            ->addSelect('contribution_recur_id.payment_processor_id')
+            ->addSelect('contribution_recur_id.contribution_status_id:name')
+            ->addSelect('status_id:name')
+            ->execute()->first();
+          $paymentProcessorID = $membership['contribution_recur_id.payment_processor_id'] ?? NULL;
+          if ($paymentProcessorID) {
+            $paymentObject = System::singleton()->getById($paymentProcessorID);
+            if (!$paymentObject->supports('updateSubscriptionBillingInfo')) {
+              self::unsetLinks($links, ['changebilling']);
+            }
+            if ($membership['contribution_recur_id.contribution_status_id:name'] !== 'Cancelled' && !$paymentObject->supports('cancelRecurring')) {
+              self::unsetLinks($links, ['cancelrecur']);
+            }
           }
         }
       }

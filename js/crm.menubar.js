@@ -4,7 +4,7 @@
   var templates, initialized,
     ENTER_KEY = 13,
     SPACE_KEY = 32;
-  CRM.menubar = _.extend({
+  CRM.menubar = Object.assign({
     data: null,
     settings: {collapsibleBehavior: 'accordion'},
     position: 'over-cms-menu',
@@ -120,7 +120,7 @@
         .removeClass('crm-menubar-visible');
       document.documentElement.style.setProperty('--crm-menubar-bottom', '0px');
       if (showMessage === true && $('#crm-notification-container').length && initialized) {
-        var alert = CRM.alert('<a href="#" id="crm-restore-menu" >' + _.escape(ts('Restore CiviCRM Menu')) + '</a>', ts('Menu hidden'), 'none', {expires: 10000});
+        var alert = CRM.alert('<a href="#" id="crm-restore-menu" >' + CRM.utils.escapeHtml(ts('Restore CiviCRM Menu')) + '</a>', ts('Menu hidden'), 'none', {expires: 10000});
         $('#crm-restore-menu')
           .click(function(e) {
             e.preventDefault();
@@ -169,7 +169,7 @@
           throw targetName + ' not found';
         }
         var offset = position === 'before' ? 0 : 1;
-        position = offset + _.findIndex(list, {name: targetName});
+        position = offset + list.findIndex((item) => item.name === targetName);
         $ul = $('li[data-name="' + targetName + '"]', '#civicrm-menu').closest('ul');
       } else if (targetName) {
         container = traverse(CRM.menubar.data.menu, targetName, 'get');
@@ -218,7 +218,7 @@
       if (!menuItem) {
         throw item.name + ' not found';
       }
-      _.extend(menuItem, item);
+      Object.assign(menuItem, item);
       $('li[data-name="' + item.name + '"]', '#civicrm-menu').replaceWith(getTpl('branch')({items: [menuItem], branchTpl: getTpl('branch')}));
       CRM.menubar.refresh();
     },
@@ -299,9 +299,9 @@
                 filters: {},
               };
             if (option.val() === 'sort_name') {
-              params.input = _.trim(request.term);
+              params.input = request.term.trim();
             } else {
-              params.filters[option.val()] = _.trim(request.term);
+              params.filters[option.val()] = request.term.trim();
             }
             // Specialized Autocomplete SearchDisplay: @see ContactAutocompleteProvider
             CRM.api4('Contact', 'autocomplete', params).then(function(result) {
@@ -458,7 +458,7 @@
       $('#civicrm-menu').on('keyup', '#crm-menubar-drilldown', function() {
         var term = $(this).val(),
           results = term ? CRM.menubar.findItems(term).slice(0, 20) : [];
-        $(this).parent().next('ul').html(getTpl('branch')({items: results, branchTpl: getTpl('branch'), drillTpl: _.noop}));
+        $(this).parent().next('ul').html(getTpl('branch')({items: results, branchTpl: getTpl('branch'), drillTpl: () => ''}));
         $('#civicrm-menu').smartmenus('refresh').smartmenus('itemActivate', $(this).closest('a'));
       });
     },
@@ -489,18 +489,18 @@
           '</form>' +
         '</a>' +
         '<ul>' +
-          '<% _.forEach(items, function(item) { %>' +
+          '<% (items || []).forEach((item) => { %>' +
             '<li><a href="#" class="crm-quickSearchField"><label><input type="radio" value="<%= item.key %>" name="quickSearchField" data-adv-search-legacy="<%= item.adv_search_legacy %>"> <%- item.value %></label></a></li>' +
           '<% }) %>' +
         '</ul>' +
       '</li>',
     drillTpl:
       '<li class="crm-menu-border-bottom" data-name="MenubarDrillDown">' +
-        '<a href="#"><input type="text" id="crm-menubar-drilldown" placeholder="' + _.escape(ts('Find menu item...')) + '" aria-label="' + _.escape(ts('Find menu item...')) + '"><span class="sr-only">' + _.escape(ts('Find menu item...')) + '></span></a>' +
+        '<a href="#"><input type="text" id="crm-menubar-drilldown" placeholder="' + CRM.utils.escapeHtml(ts('Find menu item...')) + '" aria-label="' + CRM.utils.escapeHtml(ts('Find menu item...')) + '"><span class="sr-only">' + CRM.utils.escapeHtml(ts('Find menu item...')) + '></span></a>' +
         '<ul></ul>' +
       '</li>',
     branchTpl:
-      '<% _.forEach(items, function(item) { %>' +
+      '<% (items || []).forEach((item) => { %>' +
         '<li <%= attr("li", item) %>>' +
           '<a <%= attr("a", item) %>>' +
             '<% if (item.icon) { %>' +
@@ -550,30 +550,28 @@
 
   function traverse(items, itemName, op) {
     var found;
-    _.each(items, function(item, index) {
+    (items || []).forEach((item, index) => {
+      if (found) {
+        return;
+      }
       if (item.name === itemName) {
         found = (op === 'parent' ? items : item);
         if (op === 'delete') {
           items.splice(index, 1);
         }
-        return false;
+        return;
       }
       if (item.child) {
         found = traverse(item.child, itemName, op);
-        if (found) {
-          return false;
-        }
       }
     });
     return found;
   }
 
   function findRecursive(collection, searchTerm) {
-    var items = _.filter(collection, function(item) {
-      return item.label && _.includes(item.label.toLowerCase().replace(/ /g, ''), searchTerm);
-    });
-    _.each(collection, function(item) {
-      if (_.isPlainObject(item) && item.child) {
+    var items = (collection || []).filter((item) => item.label && item.label.toLowerCase().replace(/ /g, '').includes(searchTerm));
+    (collection || []).forEach((item) => {
+      if (item !== null && typeof item === 'object' && Object.getPrototypeOf(item) === Object.prototype && item.child) {
         var childMatches = findRecursive(item.child, searchTerm);
         if (childMatches.length) {
           Array.prototype.push.apply(items, childMatches);
@@ -584,18 +582,18 @@
   }
 
   function attr(el, item) {
-    var ret = [], attr = _.cloneDeep(item.attr || {}), a = ['rel', 'accesskey', 'target'];
+    var ret = [], attr = structuredClone(item.attr || {}), a = ['rel', 'accesskey', 'target'];
     if (el === 'a') {
-      attr = _.pick(attr, a);
+      attr = Object.fromEntries(Object.entries(attr).filter(([key]) => a.includes(key)));
       attr.href = item.url || "#";
     } else {
-      attr = _.omit(attr, a);
+      attr = Object.fromEntries(Object.entries(attr).filter(([key]) => !a.includes(key)));
       attr['data-name'] = item.name;
       if (item.separator) {
         attr.class = (attr.class ? attr.class + ' ' : '') + 'crm-menu-border-' + item.separator;
       }
     }
-    _.each(attr, function(val, name) {
+    Object.entries(attr).forEach(([name, val]) => {
       ret.push(name + '="' + val + '"');
     });
     return ret.join(' ');

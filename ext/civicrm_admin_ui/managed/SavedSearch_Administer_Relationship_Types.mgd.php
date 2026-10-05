@@ -19,6 +19,7 @@ return [
         'api_params' => [
           'version' => 4,
           'select' => [
+            'weight',
             'label_a_b',
             'label_b_a',
             'contact_type_a:label',
@@ -27,7 +28,9 @@ return [
             'contact_sub_type_b:label',
             'is_active',
           ],
-          'orderBy' => [],
+          'orderBy' => [
+            'weight' => 'ASC',
+          ],
           'where' => [],
           'groupBy' => [],
           'join' => [],
@@ -67,7 +70,12 @@ return [
             'hide_single' => TRUE,
           ],
           'placeholder' => 5,
-          'sort' => [],
+          'sort' => [
+            [
+              'weight',
+              'ASC',
+            ],
+          ],
           'columns' => [
             [
               'type' => 'field',
@@ -182,6 +190,7 @@ return [
               FALSE,
             ],
           ],
+          'draggable' => 'weight',
         ],
         'acl_bypass' => FALSE,
       ],

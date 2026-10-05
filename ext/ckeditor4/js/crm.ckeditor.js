@@ -1,5 +1,6 @@
 // https://civicrm.org/licensing
-(function($, _) {
+/* global CKEDITOR */
+(function($) {
 
   function getInstance(item) {
     var name = $(item).attr("name"),
@@ -32,7 +33,7 @@
       editor.on('insertText', function() {
         $(item).trigger("keypress");
       });
-      _.each(['key', 'pasteState'], function(evName) {
+      ['key', 'pasteState'].forEach((evName) => {
         editor.on(evName, function(evt) {
           if (debounce) clearTimeout(debounce);
           debounce = setTimeout(function() {
@@ -54,8 +55,8 @@
 
     function initialize() {
       var
-        browseUrl = CRM.config.packagesBase + "kcfinder/browse.php?cms=civicrm",
-        uploadUrl = CRM.config.packagesBase + "kcfinder/upload.php?cms=civicrm&format=json",
+        browseUrl = CRM.url('civicrm/kcfinder/browse?reset=1'),
+        uploadUrl = CRM.url('civicrm/kcfinder/upload?reset=1&format=json'),
         preset = $(item).data('preset') || 'default',
         // This variable is always an array but a legacy extension could be setting it as a string.
         customConfig = (typeof CRM.config.CKEditorCustomConfig === 'string') ? CRM.config.CKEditorCustomConfig :
@@ -144,4 +145,4 @@
     }
   };
 
-})(CRM.$, CRM._);
+})(CRM.$);

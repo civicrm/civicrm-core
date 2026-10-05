@@ -22,7 +22,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
 
   protected function setUp(): void {
     parent::setUp();
-    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport']);
+    $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
   }
 
   public function tearDown(): void {

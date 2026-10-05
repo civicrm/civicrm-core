@@ -98,6 +98,11 @@ return [
       ],
       'pseudoconstant' => [
         'callback' => ['CRM_Core_BAO_CustomField', 'dataType'],
+        'suffixes' => [
+          'name',
+          'label',
+          'description',
+        ],
       ],
     ],
     'html_type' => [
@@ -109,9 +114,16 @@ return [
       'add' => '1.1',
       'input_attrs' => [
         'label' => ts('Field Input Type'),
+        'control_field' => 'data_type',
       ],
       'pseudoconstant' => [
         'callback' => ['CRM_Core_SelectValues', 'customHtmlType'],
+        'suffixes' => [
+          'name',
+          'label',
+          'description',
+          'icon',
+        ],
       ],
     ],
     'default_value' => [
@@ -325,6 +337,14 @@ return [
       'description' => ts('Should the multi-record custom field values be displayed in tab table listing'),
       'add' => '4.5',
       'default' => FALSE,
+    ],
+    'control_field' => [
+      'title' => ts('Depends on'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Select',
+      'description' => ts('Name of the field that this field depends on.'),
+      'add' => '6.18',
+      'default' => NULL,
     ],
     'fk_entity' => [
       'title' => ts('Entity'),

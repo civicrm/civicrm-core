@@ -1,5 +1,5 @@
 // https://civicrm.org/licensing
-(function($, CRM, _, undefined) {
+(function($, CRM, undefined) {
 
   // Block access to the initators panel.
   // usage: $('.foo').obscureInitiator({message: 'Foo Bar'});
@@ -47,4 +47,4 @@
     }
   };
 
-}(CRM.$, CRM, CRM._));
+}(CRM.$, CRM));

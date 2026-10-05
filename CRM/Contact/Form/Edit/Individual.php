@@ -33,7 +33,6 @@ class CRM_Contact_Form_Edit_Individual {
    */
   public static function buildQuickForm($form, $inlineEditMode = NULL): void {
     $form->addOptionalQuickFormElement('formal_title');
-    $form->applyFilter('__ALL__', 'trim');
 
     if (!$inlineEditMode || $inlineEditMode == 1) {
       $nameFields = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,

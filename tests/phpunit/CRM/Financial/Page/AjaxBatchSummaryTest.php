@@ -14,6 +14,7 @@
  * @group headless
  */
 class CRM_Financial_Page_AjaxBatchSummaryTest extends CiviUnitTestCase {
+  protected $_apiversion = 4;
 
   /**
    * Test the makeBatchSummary function.

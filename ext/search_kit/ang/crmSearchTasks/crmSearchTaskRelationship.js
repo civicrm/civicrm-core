@@ -1,4 +1,4 @@
-(function(angular, $, _) {
+(function(angular, $) {
   "use strict";
 
   angular.module('crmSearchTasks').controller('crmSearchTaskRelationship', function($scope, crmApi4, searchTaskBaseTrait) {
@@ -47,7 +47,7 @@
     };
 
     this.submit = function() {
-      const apiValues = _.cloneDeep(values);
+      const apiValues = structuredClone(values);
       const relationshipType = values.relationship_type.split('_')[0];
       const a = values.relationship_type.split('_')[1];
       const b = values.relationship_type.split('_')[2];
@@ -72,13 +72,13 @@
           added++;
         }
       });
-      let msg = _.escape(ts('1 relationship added.', {plural: '%count relationships added.', count: added}));
+      let msg = CRM.utils.escapeHtml(ts('1 relationship added.', {plural: '%count relationships added.', count: added}));
       if (duplicate) {
-        msg += '<br>' + _.escape(ts('1 relationship already exists.', {plural: '%count relationships already exist.', count: duplicate}));
+        msg += '<br>' + CRM.utils.escapeHtml(ts('1 relationship already exists.', {plural: '%count relationships already exist.', count: duplicate}));
       }
       CRM.alert(msg, ts('Saved'), 'success');
       this.close(result);
     };
 
   });
-})(angular, CRM.$, CRM._);
+})(angular, CRM.$);

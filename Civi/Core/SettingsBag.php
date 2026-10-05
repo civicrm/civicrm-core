@@ -258,9 +258,6 @@ class SettingsBag {
    * @return SettingsBag
    */
   public function set($key, $value) {
-    if ($this->updateVirtual($key, $value)) {
-      return $this;
-    }
     $this->setDb($key, $value);
     return $this;
   }
@@ -284,10 +281,6 @@ class SettingsBag {
   public function importValues(array $newValues): void {
     $currentValues = $this->exportValues();
 
-    foreach ($this->getVirtualKeys() as $key) {
-      unset($newValues[$key], $currentValues[$key]);
-    }
-
     $revertKeys = array_diff(array_keys($currentValues), array_keys($newValues));
     foreach ($revertKeys as $key) {
       $this->revert($key);
@@ -298,39 +291,13 @@ class SettingsBag {
     }
   }
 
-  private function getVirtualKeys(): array {
-    return ['contribution_invoice_settings'];
-  }
-
   /**
-   * Update a virtualized/deprecated setting.
-   *
-   * Temporary handling for phasing out contribution_invoice_settings.
-   *
-   * Until we have transitioned we need to handle setting & retrieving
-   * contribution_invoice_settings.
-   *
-   * Once removed from core we will add deprecation notices & then remove this.
-   *
-   * https://lab.civicrm.org/dev/core/issues/1558
-   *
-   * @param string $key
-   * @param array $value
-   * @return bool
-   *   TRUE if $key is a virtualized setting. FALSE if it is a normal setting.
+   * Deprecated and does nothing
+   * Will be removed sometime after June 2027
+   * @deprecated
    */
-  public function updateVirtual($key, $value) {
-    if ($key === 'contribution_invoice_settings') {
-      \CRM_Core_Error::deprecatedWarning('Invoicing settings should be directly accessed - eg Civi::setting()->set("invoicing")');
-      foreach (SettingsBag::getContributionInvoiceSettingKeys() as $possibleKeyName => $settingName) {
-        $keyValue = $value[$possibleKeyName] ?? '';
-        if ($possibleKeyName === 'invoicing' && is_array($keyValue)) {
-          $keyValue = $keyValue['invoicing'];
-        }
-        $this->set($settingName, $keyValue);
-      }
-      return TRUE;
-    }
+  public function updateVirtual() {
+    \CRM_Core_Error::deprecatedWarning('Invoicing settings should be directly accessed - eg Civi::setting()->set("invoicing")');
     return FALSE;
   }
 
@@ -340,20 +307,7 @@ class SettingsBag {
    * @return array
    */
   public function computeVirtual() {
-    $contributionSettings = [];
-    foreach (SettingsBag::getContributionInvoiceSettingKeys() as $keyName => $settingName) {
-      switch ($keyName) {
-        case 'invoicing':
-          $contributionSettings[$keyName] = $this->get($settingName) ? [$keyName => 1] : 0;
-          break;
-
-        default:
-          $contributionSettings[$keyName] = $this->get($settingName);
-          break;
-      }
-    }
     return array_merge(
-        ['contribution_invoice_settings' => $contributionSettings],
         $this->interpolateDsnSettings('civicrm'),
         // TODO: provide equivalent component settings for CIVICRM_UF_DSN
         // $this->interpolateDsnSettings('civicrm_uf')
@@ -411,14 +365,12 @@ class SettingsBag {
    *   The new value of the setting.
    */
   protected function setDb($name, $value) {
-    $fields = [];
-    $fieldsToSet = \CRM_Core_BAO_Setting::validateSettingsInput([$name => $value], $fields);
-    //We haven't traditionally validated inputs to setItem, so this breaks things.
-    //foreach ($fieldsToSet as $settingField => &$settingValue) {
-    //  self::validateSetting($settingValue, $fields['values'][$settingField]);
-    //}
+    // NOTE: for better or worse, we haven't traditionally validated whether the setting actually exists here
+    $metadata = SettingsMetadata::getMetadata(['name' => $name])[$name] ?? [];
 
-    $metadata = $fields['values'][$name];
+    if (!$metadata) {
+      \Civi::log()->debug("undefined setting {$name} - please add metadata or encourage the extension author to do so :)");
+    }
 
     // this should probably be higher in the Setting api layer as well
     if ($metadata['is_constant'] ?? FALSE) {
@@ -521,10 +473,12 @@ class SettingsBag {
   }
 
   /**
+   * @deprecated Will be removed sometime after June 2027
    * @return array
    */
   public static function getContributionInvoiceSettingKeys(): array {
-    $convertedKeys = [
+    \CRM_Core_Error::deprecatedWarning('Invoicing settings should be directly accessed - eg Civi::setting()->set("invoicing")');
+    return [
       'credit_notes_prefix' => 'credit_notes_prefix',
       'invoice_prefix' => 'invoice_prefix',
       'due_date' => 'invoice_due_date',
@@ -535,7 +489,6 @@ class SettingsBag {
       'tax_display_settings' => 'tax_display_settings',
       'invoicing' => 'invoicing',
     ];
-    return $convertedKeys;
   }
 
   /**
@@ -617,10 +570,11 @@ class SettingsBag {
 
     foreach (['host', 'name', 'user', 'password', 'port'] as $componentKey) {
       $value = $this->get($prefix . '_db_' . $componentKey);
-      if (!$value) {
+      if ($value === NULL || $value === '') {
         // if missing a required key to compose the dsn, give up trying to interpolate
         // (we have defaults for all keys but password, so this is likely to be unset password
         // (but could be one of the other components has been explicitly nulled))
+        // Compared strictly: '0' is a usable password, not a missing one.
         return [];
       }
       $componentValues[$componentKey] = urlencode($value);
@@ -634,6 +588,38 @@ class SettingsBag {
     $computed[$prefix . '_db_dsn'] = $dsn;
 
     return $computed;
+  }
+
+  /**
+   * Sometimes settings correspond to paths - which then resolving
+   * to get the final usable value
+   *
+   * @param string $key the name of the setting e.g. extensionsDir
+   * @return ?string final path value with any variables resolved, or NULL if not set
+   */
+  public function getPath(string $key): ?string {
+    $rawValue = $this->get($key);
+    return \Civi::paths()->getPath($rawValue);
+  }
+
+  /**
+   * Sometimes settings correspond to URLs - which then need resolving
+   * to get the final usable value
+   *
+   * @param string $key the name of the setting e.g. extensionsURL
+   * @param string $preferFormat
+   *   The preferred format ('absolute', 'relative').
+   *   The result data may not meet the preference -- if the setting
+   *   refers to an external domain, then the result will be
+   *   absolute (regardless of preference).
+   * @param bool|null $ssl
+   *   NULL to autodetect. TRUE to force to SSL.
+   *
+   * @return ?string final value with any variables resolved
+   */
+  public function getUrl(string $key, string $preferFormat = 'relative', ?bool $ssl = NULL): ?string {
+    $rawValue = $this->get($key);
+    return \Civi::paths()->getUrl($rawValue, $preferFormat, $ssl);
   }
 
 }

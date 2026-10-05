@@ -16,7 +16,7 @@
  * @group headless
  */
 class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
-  protected $_apiversion;
+  protected $_apiversion = 3;
 
   /**
    * @var int

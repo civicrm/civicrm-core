@@ -229,15 +229,15 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
         if (!isset($tokens[$fieldName])) {
           if ($fieldSpec['type'] === 'Custom') {
             $this->prefetch[$eventID] = $event;
-            $value = $event[$fieldSpec['name']];
+            $value = $event[$fieldSpec['name']] ?? NULL;
             $tokens[$fieldName]['text/html'] = CRM_Core_BAO_CustomField::displayValue($value, $fieldSpec['custom_field_id']);
           }
           else {
             if ($this->isHTMLTextField($fieldName)) {
-              $tokens[$fieldName]['text/html'] = $event[$fieldName];
+              $tokens[$fieldName]['text/html'] = $event[$fieldName] ?? NULL;
             }
             else {
-              $tokens[$fieldName]['text/plain'] = $event[$fieldName];
+              $tokens[$fieldName]['text/plain'] = $event[$fieldName] ?? NULL;
             }
           }
         }

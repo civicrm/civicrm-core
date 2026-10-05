@@ -56,8 +56,23 @@ class CRM_Grant_Upgrader extends CRM_Extension_Upgrader_Base {
         AND dup_ov.option_group_id = %1';
     if ($optionGroupId) {
       CRM_Core_DAO::executeQuery($deleteDuplicates, [1 => [$optionGroupId, 'Integer']]);
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value SET domain_id = NULL WHERE option_group_id = %1", [1 => [$optionGroupId, 'Integer']]);
     }
+
+    return TRUE;
+  }
+
+  public function upgrade_1003(): bool {
+    $this->ctx->log->info('Applying Update 1003 - Adding FK to currency field');
+    $tableName = 'civicrm_grant';
+    $fieldName = 'currency';
+
+    E::schema()->createForeignKey($tableName, $fieldName, [
+      'entity_reference' => [
+        'entity' => 'Currency',
+        'key' => 'name',
+        'on_delete' => 'CASCADE',
+      ],
+    ]);
 
     return TRUE;
   }

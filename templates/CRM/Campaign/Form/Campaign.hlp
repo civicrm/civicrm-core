@@ -1,0 +1,15 @@
+{htxt id='title'}
+  {ts}Enter a unique name that describes your campaign. It can be helpful to establish a naming convention for new campaigns so they alphabetize in drop-down lists automatically and are easy to sort through when associating an activity with the campaign.{/ts}
+{/htxt}
+{htxt id='include_groups'}
+  {ts}If appropriate, select the group that contains the individuals you are targeting for this campaign.{/ts}
+{/htxt}
+{htxt id='end_date'}
+  {ts}The end date of the campaign. If these fields are empty, then the campaign will be considered ongoing.{/ts}
+{/htxt}
+{htxt id='external_identifier'}
+  {ts}If you want to cross-reference the campaign with the identifier from another system, you can enter it here.{/ts}
+{/htxt}
+{htxt id='is_active'}
+  {ts}If the campaign is enabled, it will be displayed in lists where a campaign can be selected, regardless of the start/end date.{/ts}
+{/htxt}

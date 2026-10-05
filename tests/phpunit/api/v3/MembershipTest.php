@@ -25,6 +25,7 @@ use Civi\Api4\RelationshipType;
  * @group headless
  */
 class api_v3_MembershipTest extends CiviUnitTestCase {
+  protected $_apiversion = 3;
 
   use CRMTraits_Financial_OrderTrait;
 
@@ -126,7 +127,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'contact_id' => $this->_params['contact_id'],
     ]);
-    $this->callAPISuccess('MembershipPayment', 'create', [
+    $this->callApiV3Success('MembershipPayment', 'create', [
       'sequential' => 1,
       'contribution_id' => $ContributionCreate['values'][0]['id'],
       'membership_id' => $membershipID,

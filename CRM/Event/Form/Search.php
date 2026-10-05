@@ -413,19 +413,25 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     $status = CRM_Utils_Request::retrieve('status', 'String');
     if (isset($status)) {
+      $statusTypes = [];
       if ($status === 'true') {
-        $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1");
+        $statusTypes = array_keys(CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1"));
       }
       elseif ($status === 'false') {
-        $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0");
+        $statusTypes = array_keys(CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 0"));
       }
       elseif (is_numeric($status)) {
-        $statusTypes = (int) $status;
+        $statusTypes = [(int) $status];
+      }
+      elseif (is_string($status) && str_contains($status, ',')) {
+        $statusTypes = array_map('intval', explode(',', $status));
       }
       elseif (is_array($status) && !array_key_exists('IN', $status)) {
         $statusTypes = array_keys($status);
       }
-      $this->_defaults['participant_status_id'] = is_array($statusTypes) ? array_keys($statusTypes) : $statusTypes;
+      if (!empty($statusTypes)) {
+        $this->_defaults['participant_status_id'] = $statusTypes;
+      }
     }
     return $this->_defaults;
   }

@@ -21,3 +21,8 @@
 .crm-search-display-grid-layout-5 {
   grid-template-columns: repeat(5, 1fr);
 }
+
+.crm-search-display-grid-container .crm-search-display-grid-header-item {
+  grid-column: 1 / -1;
+  justify-self: stretch;
+}

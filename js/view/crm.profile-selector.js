@@ -115,9 +115,9 @@
           CRM.api('UFGroup', 'getsingle', {id: ufID, "api.UFField.get": 1}, {
             success: function(formData) {
               // Note: With chaining, API returns some extraneous keys that aren't part of UFGroupModel
-              var ufGroupModel = new CRM.UF.UFGroupModel(_.pick(formData, _.keys(CRM.UF.UFGroupModel.prototype.schema)));
+              var ufGroupModel = new CRM.UF.UFGroupModel(_.pick(formData, Object.keys(CRM.UF.UFGroupModel.prototype.schema)));
               ufGroupModel.setUFGroupModel(ufGroupModel.calculateContactEntityType(), profileSelectorView.options.ufEntities);
-              ufGroupModel.getRel('ufFieldCollection').reset(_.values(formData["api.UFField.get"].values));
+              ufGroupModel.getRel('ufFieldCollection').reset(Object.values(formData["api.UFField.get"].values));
               options.onLoad(ufGroupModel);
             }
           });
@@ -137,9 +137,9 @@
           CRM.api('UFGroup', 'getsingle', {id: ufID, "api.UFField.get": 1}, {
             success: function(formData) {
               // Note: With chaining, API returns some extraneous keys that aren't part of UFGroupModel
-              var ufGroupModel = new CRM.UF.UFGroupModel(_.pick(formData, _.keys(CRM.UF.UFGroupModel.prototype.schema)));
+              var ufGroupModel = new CRM.UF.UFGroupModel(_.pick(formData, Object.keys(CRM.UF.UFGroupModel.prototype.schema)));
               ufGroupModel.setUFGroupModel(ufGroupModel.calculateContactEntityType(), profileSelectorView.options.ufEntities);
-              ufGroupModel.getRel('ufFieldCollection').reset(_.values(formData["api.UFField.get"].values));
+              ufGroupModel.getRel('ufFieldCollection').reset(Object.values(formData["api.UFField.get"].values));
               options.onLoad(ufGroupModel.deepCopy());
             }
           });
