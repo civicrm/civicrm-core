@@ -530,7 +530,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'contact_id' => $this->_contributorContactID,
           'amount' => $this->_params['total_amount'],
           'contribution_status_id' => 'Pending',
-          'payment_processor_id' => $this->_params['payment_processor_id'],
+          'payment_processor_id' => $this->getPaymentProcessorID(),
           'financial_type_id' => $this->_params['financial_type_id'],
           'is_email_receipt' => (bool) $this->getSubmittedValue('send_receipt'),
           'payment_instrument_id' => $this->_params['payment_instrument_id'],
@@ -640,7 +640,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $contributionParams['non_deductible_amount'] = 'null';
     $contributionParams['skipCleanMoney'] = TRUE;
     $contributionParams['revenue_recognition_date'] = $this->getDeferredRevenueRecognitionDate();
-    $contributionParams['payment_processor'] = $params['payment_processor_id'] ?? NULL;
+    $contributionParams['payment_processor'] = $this->getPaymentProcessorID();
     $contributionSoftParams = $params['soft_credit'] ?? NULL;
     $recordContribution = [
       'contact_id',
