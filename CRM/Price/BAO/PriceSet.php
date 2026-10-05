@@ -1225,7 +1225,7 @@ WHERE       ps.id = %1
     $nonDeductibleAmount = 0;
     if (!empty($lineItem[$priceSetId])) {
       foreach ($lineItem[$priceSetId] as $options) {
-        $nonDeductibleAmount += $options['non_deductible_amount'] * $options['qty'];
+        $nonDeductibleAmount += $options['non_deductible_amount'];
       }
     }
 

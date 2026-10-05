@@ -320,7 +320,7 @@ WHERE li.contribution_id = %1";
         'html_type' => $fields['html_type'],
         'financial_type_id' => $options[$oid]['financial_type_id'] ?? NULL,
         'tax_amount' => $options[$oid]['tax_amount'] ?? 0,
-        'non_deductible_amount' => $options[$oid]['non_deductible_amount'] ?? NULL,
+        'non_deductible_amount' => $qty * ($options[$oid]['non_deductible_amount'] ?? 0),
       ];
 
       if ($values[$oid]['membership_type_id'] && empty($values[$oid]['auto_renew'])) {
