@@ -379,7 +379,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $trxnParams = $params['trxnParams'] = $this->getTrxnParams($params);
         // records finanical trxn and entity financial trxn
         // also make it available as return value
-        $this->recordAlwaysAccountsReceivable($trxnParams, $params);
+        if ($this->isRecordAccountsReceivable()) {
+          $this->recordAlwaysAccountsReceivable($trxnParams, $params);
+        }
         $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
         $params['entity_id'] = $financialTxn->id;
       }
@@ -763,7 +765,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // This is an update so original currency if none passed in.
       $params['trxnParams']['currency'] = $params['currency'] ?? $params['prevContribution']->currency;
 
-      $financialTrxnIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams'], $params);
+      if ($this->isRecordAccountsReceivable() && !$this->getOriginalContributionValue('is_pay_later')) {
+        $financialTrxnIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams'], $params);
+      }
       $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['entity_id'] = $financialTrxnIDs[] = $trxn->id;
@@ -828,17 +832,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @return null|int
    */
   private function recordAlwaysAccountsReceivable(&$trxnParams, $contributionParams) {
-    if (!$this->isRecordAccountsReceivable()) {
-      return NULL;
-    }
-
-    $isNewOrFromUnpaidPending = !$this->getOriginalContributionStatus()
-      || ($this->getOriginalContributionStatus() === 'Pending' && !$this->getOriginalContributionValue('is_pay_later'));
-
-    if (!$isNewOrFromUnpaidPending) {
-      return NULL;
-    }
-
     $params = $trxnParams;
     $financialTypeID = !empty($contributionParams['financial_type_id']) ? $contributionParams['financial_type_id'] : $contributionParams['prevContribution']->financial_type_id;
     $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Accounts Receivable Account is');
