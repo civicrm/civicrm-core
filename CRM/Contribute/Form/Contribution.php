@@ -989,16 +989,14 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Build the price set form.
    */
   private function buildPriceSet(): void {
-    $form = $this;
-    $this->_priceSet = $this->getOrder()->getPriceSetMetadata();
-    foreach ($this->getPriceFieldMetaData() as $id => $field) {
+    foreach ($this->getPriceFieldMetaData() as $field) {
       $options = $field['options'] ?? NULL;
       if (!is_array($options)) {
         continue;
       }
 
       if (!empty($options)) {
-        CRM_Price_BAO_PriceField::addQuickFormElement($form,
+        CRM_Price_BAO_PriceField::addQuickFormElement($this,
           'price_' . $field['id'],
           $field['id'],
           FALSE,
@@ -1008,7 +1006,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         );
       }
     }
-    $form->assign('priceSet', $form->_priceSet);
+    $this->assign('priceSet', $this->getOrder()->getPriceSetMetadata());
   }
 
   /**
@@ -1942,12 +1940,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    // Process price set and get total amount and line items - @todo the following lines should be obsolete.
-    if ($this->isQuickConfig() && !$this->_id) {
-      // @todo - probably these lines are not required.
-      $this->_priceSetId = $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_contribution_amount', 'id', 'name');
-      $this->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSetId));
-    }
     $submittedValues['total_amount'] = $this->getOrder()->getTotalAmount();
     // @todo - ideally do not set tax_level - it is not required lower down
     // if line items are provide appropriately. The BAO prefers to self-calculate tax.
