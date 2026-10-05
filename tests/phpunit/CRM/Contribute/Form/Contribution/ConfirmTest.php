@@ -15,6 +15,7 @@ use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipBlock;
 use Civi\Api4\Pledge;
+use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
 use Civi\Api4\PriceSetEntity;
 use Civi\Test\ContributionPageTestTrait;
@@ -705,6 +706,37 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ]);
     $contribution = $this->getCreatedContribution();
     $this->assertEquals(5.00, $contribution['non_deductible_amount']);
+  }
+
+  /**
+   * Test that the non-deductible amount configured on a quantity-enabled
+   * price field value scales with the quantity entered, rather than being
+   * applied as a flat per-unit amount regardless of quantity.
+   *
+   * @see https://lab.civicrm.org/dev/core/-/work_items/6808
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitQuantityScalesNonDeductibleAmount(): void {
+    $this->contributionPageWithPriceSetCreate();
+    PriceFieldValue::update(FALSE)
+      ->addWhere('id', '=', $this->ids['PriceFieldValue']['text_field_2.95'])
+      ->setValues(['non_deductible_amount' => 1])
+      ->execute();
+
+    $this->submitOnlineContributionForm([
+      'id' => $this->getContributionPageID(),
+      'first_name' => 'J',
+      'last_name' => 'T',
+      'email-5' => 'JT@ohcanada.ca',
+      'receive_date' => date('Y-m-d H:i:s'),
+      'payment_processor_id' => 0,
+      'priceSetId' => $this->getPriceSetID('ContributionPage'),
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['free'],
+      'price_' . $this->ids['PriceField']['text_field_2.95'] => 3,
+    ]);
+    $contribution = $this->getCreatedContribution();
+    $this->assertEquals(3.00, $contribution['non_deductible_amount']);
   }
 
   /**
