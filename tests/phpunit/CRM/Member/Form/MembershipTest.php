@@ -34,6 +34,7 @@ use Civi\Test\FormTrait;
  */
 class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
   use CRMTraits_Financial_OrderTrait;
   use CRMTraits_Financial_PriceSetTrait;
   use FormTrait;
@@ -115,12 +116,15 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * Clean up after each test.
    */
   public function tearDown(): void {
+    $this->cleanupCustomGroups();
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(
       [
         'civicrm_relationship',
         'civicrm_uf_match',
         'civicrm_email',
+        'civicrm_custom_group',
+        'civicrm_custom_field',
       ]
     );
     $this->callAPISuccess('Contact', 'delete', ['id' => $this->ids['Contact']['organization'], 'skip_undelete' => TRUE]);
@@ -604,6 +608,83 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     // Check if Membership is set to New.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
+  }
+
+  /**
+   * Test that custom field data submitted for a back-office membership
+   * signup with no online payment processor is saved against the created
+   * membership.
+   *
+   * This goes through the direct CRM_Member_BAO_Membership::create() path
+   * in CRM_Member_Form_Membership::submit() (no $this->_mode).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitWithCustomDataNoPayment(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Membership']);
+    $this->createLoggedInUser();
+    $this->getTestForm('CRM_Member_Form_Membership', [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'join_date' => date('Y-m-d'),
+      'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['AnnualFixed']],
+      'total_amount' => 50,
+      'financial_type_id' => '',
+      $this->getCustomFieldName('text') => 'Back office signup custom value',
+    ])->processForm();
+
+    $membership = Membership::get(FALSE)
+      ->addSelect($this->getCustomFieldName('text', 4))
+      ->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])
+      ->execute()->single();
+    $this->assertEquals('Back office signup custom value', $membership[$this->getCustomFieldName('text', 4)]);
+  }
+
+  /**
+   * Test that custom field data submitted via an online-payment
+   * (processor) membership signup is saved against the created
+   * membership.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitWithCustomDataAndPayment(): void {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Membership']);
+    $this->createLoggedInUser();
+    $this->getTestForm('CRM_Member_Form_Membership', [
+      'cid' => $this->ids['Contact']['individual_0'],
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'join_date' => date('Y-m-d'),
+      'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['AnnualFixed']],
+      'auto_renew' => '0',
+      'max_related' => '',
+      'num_terms' => 1,
+      'source' => '',
+      'total_amount' => $this->formatMoneyInput(50),
+      'financial_type_id' => '2',
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '123',
+      'credit_card_exp_date' => [
+        'M' => '9',
+        'Y' => date('Y', strtotime('+2 years')),
+      ],
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'Test',
+      'billing_last_name' => 'Last',
+      'billing_street_address-5' => '10 Test St',
+      'billing_city-5' => 'Test',
+      'billing_state_province_id-5' => '1003',
+      'billing_postal_code-5' => '90210',
+      'billing_country_id-5' => '1228',
+      $this->getCustomFieldName('text') => 'Online signup custom value',
+    ], ['mode' => 'test'])->processForm();
+
+    $membership = Membership::get(FALSE)
+      ->addSelect($this->getCustomFieldName('text', 4))
+      ->addWhere('is_test', '=', TRUE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])
+      ->execute()->single();
+    $this->assertEquals('Online signup custom value', $membership[$this->getCustomFieldName('text', 4)]);
   }
 
   /**
