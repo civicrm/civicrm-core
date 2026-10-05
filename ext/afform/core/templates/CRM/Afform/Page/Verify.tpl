@@ -1,6 +1,6 @@
 {if $verified}
   {if $success_message}
-    {$success_message}
+    {$success_message|purify}
   {else}
     {ts}Thank you. Your email was verified successfully and your submission was processed.{/ts}
   {/if}
