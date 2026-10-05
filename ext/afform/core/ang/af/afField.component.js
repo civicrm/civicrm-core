@@ -43,9 +43,9 @@
           const closestController = $($element).closest('[af-fieldset],[af-join],[af-repeat-item]');
           $scope.dataProvider = closestController.is('[af-repeat-item]') ? this.afRepeatItem : this.afJoin || this.afFieldset;
         }
-        $scope.fieldId = _.kebabCase(this.fieldName) + '-' + afFieldId++;
+        $scope.fieldId = CRM.utils.dashCase(this.fieldName) + '-' + afFieldId++;
 
-        $element.addClass('af-field-type-' + _.kebabCase(this.defn.input_type));
+        $element.addClass('af-field-type-' + CRM.utils.dashCase(this.defn.input_type));
 
         if (this.defn.input_attrs && this.defn.input_attrs.multiple) {
           $element.addClass('af-field-type-multiple');
