@@ -717,14 +717,6 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         }
       }
 
-      if (array_key_exists('participant_role', $params)) {
-        $params['participant_role_id'] = $params['participant_role'];
-      }
-
-      if (empty($params['participant_role_id']) && $this->_values['event']['default_role_id']) {
-        $params['participant_role_id'] = $this->_values['event']['default_role_id'];
-      }
-
       if ($this->isPayLater()) {
         $params['is_pay_later'] = 1;
       }
