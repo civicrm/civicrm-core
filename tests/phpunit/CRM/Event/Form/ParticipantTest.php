@@ -12,6 +12,7 @@ use Civi\Api4\MessageTemplate;
 use Civi\Api4\Participant;
 use Civi\Api4\Payment;
 use Civi\Api4\Phone;
+use Civi\Api4\PriceFieldValue;
 use Civi\Payment\System;
 use Civi\Test\FormTrait;
 use Civi\Test\FormWrapper;
@@ -230,6 +231,47 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       $sum += $financialItem['amount'];
     }
     $this->assertEquals(1550.55, $sum);
+  }
+
+  /**
+   * Test that a non-deductible amount configured on the selected price
+   * field value is copied onto the Contribution created for a paid,
+   * record-contribution registration.
+   *
+   * @see https://lab.civicrm.org/dev/core/-/work_items/6808
+   *
+   * @throws \Exception
+   */
+  public function testSubmitRecordContributionSetsNonDeductibleAmount(): void {
+    $this->eventCreatePaid();
+    PriceFieldValue::update(FALSE)
+      ->addWhere('id', '=', $this->ids['PriceFieldValue']['PaidEvent_student'])
+      ->setValues(['non_deductible_amount' => 30])
+      ->execute();
+
+    $this->getTestForm('CRM_Event_Form_Participant', [
+      'register_date' => date('Ymd'),
+      'payment_processor_id' => 0,
+      'record_contribution' => TRUE,
+      'financial_type_id' => 1,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      'check_number' => '879',
+      'receive_date' => '2020-01-31 00:51:00',
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'trxn_id' => '',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'total_amount' => '100',
+      'role_id' => [0 => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+      'source' => 'I wrote this',
+      'event_id' => $this->getEventID(),
+      '_qf_default' => '',
+    ], ['cid' => $this->individualCreate()])
+      ->processForm();
+
+    $contribution = Contribution::get(FALSE)->addSelect('non_deductible_amount')->execute()->single();
+    $this->assertEquals(30, $contribution['non_deductible_amount']);
   }
 
   /**

@@ -1276,6 +1276,22 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Get the non-deductible amount for the order, as configured on the
+   * price field values selected.
+   *
+   * @return float
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function getNonDeductibleAmount(): float {
+    $amount = 0.0;
+    foreach ($this->getLineItems() as $lineItem) {
+      $amount += $lineItem['non_deductible_amount'] ?? 0.0;
+    }
+    return $amount;
+  }
+
+  /**
    * Get the total amount for the line items submitted under a given
    * form/participant identifier (see setPriceSelectionFromUnfilteredMultiFormInput()).
    *

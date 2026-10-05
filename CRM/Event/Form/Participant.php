@@ -1638,7 +1638,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'total_amount' => $this->getContributionTotalAmount(),
       'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
       'source' => $this->getSourceText(),
-      'non_deductible_amount' => NULL,
+      'non_deductible_amount' => $this->getOrder()->getNonDeductibleAmount(),
       'financial_type_id' => $this->getSubmittedValue('financial_type_id') ?: $this->getEventValue('financial_type_id'),
       'payment_instrument_id' => $this->getPaymentInstrumentID(),
       'is_test' => $this->isTest(),
