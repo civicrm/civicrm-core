@@ -203,6 +203,21 @@ $columns = array_merge($columns, [
         'target' => 'crm-popup',
       ],
       [
+        'path' => 'civicrm/mailing/action?action=revert&mid=[id]&reset=1',
+        'icon' => 'fa-undo',
+        'text' => 'Unschedule',
+        'style' => 'default',
+        'condition' => [
+          'status:name',
+          'IN',
+          ['Scheduled'],
+        ],
+        'entity' => '',
+        'action' => '',
+        'join' => '',
+        'target' => 'crm-popup',
+      ],
+      [
         'path' => 'civicrm/mailing/action?action=disable&mid=[id]&reset=1',
         'icon' => 'fa-ban',
         'text' => 'Cancel',
