@@ -715,16 +715,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $params['participant_id'] = $this->_participantId;
     }
 
-    if (array_key_exists('participant_role', $params)) {
-      $params['participant_role_id'] = $params['participant_role'];
-    }
-
-    if (empty($params['participant_role_id']) &&
-      $this->_values['event']['default_role_id']
-    ) {
-      $params['participant_role_id'] = $this->_values['event']['default_role_id'];
-    }
-
     $params['currencyID'] = $this->getCurrency();
 
     if ($this->isPaidEvent()) {

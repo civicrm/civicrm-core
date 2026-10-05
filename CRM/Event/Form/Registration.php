@@ -946,7 +946,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       'contact_id' => $contactID,
       'event_id' => $this->getEventID(),
       'status_id' => $params['participant_status'] ?? 1,
-      'role_id' => $params['participant_role_id'] ?? CRM_Event_BAO_Participant::getDefaultRoleID(),
+      'role_id' => $this->getRoleID($participantNumber),
       'source' => CRM_Utils_String::ellipsify($params['participant_source'] ?? $params['description'] ?? '',
         $participantFields['participant_source']['maxlength']
       ),
@@ -1693,6 +1693,19 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       return $this->getSubmittedValues();
     }
     return $this->getAllSubmittedValues()[$pageName] ?? [];
+  }
+
+  /**
+   * Get the role to register a participant with.
+   *
+   * @param int $participantNumber
+   *
+   * @return int
+   */
+  protected function getRoleID(int $participantNumber): int {
+    return $this->getSubmittedParticipantValue('participant_role', $participantNumber)
+      ?: $this->getEventValue('default_role_id')
+      ?: CRM_Event_BAO_Participant::getDefaultRoleID();
   }
 
   /**
