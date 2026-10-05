@@ -653,15 +653,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * method used is CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND.
    */
   protected static function getMultiValueCidRefs() {
-    $fields = \Civi\Api4\CustomField::get(FALSE)
-      ->addSelect('custom_group_id.table_name', 'column_name', 'serialize')
-      ->addWhere('data_type', '=', 'ContactReference')
-      ->addWhere('serialize', 'IS NOT EMPTY')
-      ->execute();
-
     $map = [];
-    foreach ($fields as $field) {
-      $map[$field['custom_group_id.table_name']][$field['column_name']] = $field['serialize'];
+    foreach (CRM_Core_BAO_CustomGroup::getAll() as $group) {
+      foreach ($group['fields'] as $field) {
+        if ($field['data_type'] === 'ContactReference' && !empty($field['serialize'])) {
+          $map[$group['table_name']][$field['column_name']] = $field['serialize'];
+        }
+      }
     }
     return $map;
   }
