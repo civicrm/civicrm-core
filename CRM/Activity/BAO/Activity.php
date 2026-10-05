@@ -388,7 +388,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
       // Delete all existing records for the types to be updated. Do a quick check to make sure there
       // is at least one to avoid a delete query if not necessary (delete queries are more likely to cause contention).
-      if (ActivityContact::get($params['check_permissions'] ?? FALSE)->setLimit(1)->setWhere($wheres)->selectRowCount()->execute()) {
+      if (ActivityContact::get($params['check_permissions'] ?? FALSE)->setLimit(1)->setWhere($wheres)->selectRowCount()->execute()->count()) {
         ActivityContact::delete($params['check_permissions'] ?? FALSE)->setWhere($wheres)->execute();
       }
     }
