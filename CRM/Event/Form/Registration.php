@@ -567,12 +567,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->assign('isShowLocation', $isShowLocation);
     CRM_Contribute_BAO_Contribution_Utils::overrideDefaultCurrency($this->_values['event']);
 
-    //lets allow user to override campaign.
-    $campID = CRM_Utils_Request::retrieve('campID', 'Positive', $this);
-    if ($campID && CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Campaign', $campID)) {
-      $this->_values['event']['campaign_id'] = $campID;
-    }
-
     // Set the same value for is_billing_required as contribution page so code can be shared.
     $this->_values['is_billing_required'] = $this->_values['event']['is_billing_required'] ?? NULL;
     // check if billing block is required for pay later
@@ -956,7 +950,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       'registered_by_id' => $params['registered_by_id'] ?? NULL,
       'discount_id' => $params['discount_id'] ?? NULL,
       'fee_currency' => $this->getCurrency(),
-      'campaign_id' => $params['campaign_id'] ?? NULL,
+      'campaign_id' => $this->getCampaignID($participantNumber),
       'is_test' => $this->isTest(),
     ];
     // On a fresh registration there is no existing participant row to preserve
@@ -1706,6 +1700,34 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     return $this->getSubmittedParticipantValue('participant_role', $participantNumber)
       ?: $this->getEventValue('default_role_id')
       ?: CRM_Event_BAO_Participant::getDefaultRoleID();
+  }
+
+  /**
+   * Get the campaign to record against a participant (and their contribution).
+   *
+   * Priority is given to any submitted value, then to a value passed in the url,
+   * then to the event default.
+   *
+   * @param int $participantNumber
+   *
+   * @return int|null
+   */
+  public function getCampaignID(int $participantNumber): ?int {
+    $submittedValues = $this->getSubmittedParticipantValues($participantNumber);
+    if (array_key_exists('participant_campaign_id', $submittedValues)) {
+      return $submittedValues['participant_campaign_id'];
+    }
+    if ($this->get('campID')) {
+      return $this->get('campID');
+    }
+    $campaignIDFromUrl = CRM_Utils_Request::retrieve('campID', 'Positive', $this);
+    if ($campaignIDFromUrl) {
+      if (CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Campaign', $campaignIDFromUrl)) {
+        return $campaignIDFromUrl;
+      }
+      $this->set('campID', NULL);
+    }
+    return $this->getEventValue('campaign_id');
   }
 
   /**

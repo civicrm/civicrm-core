@@ -863,7 +863,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'currency' => $this->getCurrency(),
       'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
       'is_pay_later' => $params['is_pay_later'] ?? 0,
-      'campaign_id' => $params['campaign_id'] ?? NULL,
+      'campaign_id' => $this->getCampaignID(0),
       'card_type_id' => $this->getCardTypeID(),
       'pan_truncation' => $this->getPanTruncation(),
       // The ternary is probably redundant - paymentProcessor should always be set.
