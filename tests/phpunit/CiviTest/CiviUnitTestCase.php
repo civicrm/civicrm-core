@@ -1659,8 +1659,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     ], $params);
 
     $result = $this->callAPISuccess('custom_field', 'create', $params);
-    // these 2 functions are called with force to flush static caches
-    CRM_Core_BAO_CustomField::getTableColumnGroup($result['id'], 1);
+    // Call getEnabledComponents with force to flush static caches
     CRM_Core_Component::getEnabledComponents(1);
     return $result;
   }

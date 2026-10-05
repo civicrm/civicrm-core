@@ -2321,29 +2321,11 @@ WHERE  id IN ( %1, %2 )
    * @throws \CRM_Core_Exception
    */
   public static function getTableColumnGroup($fieldID): array {
-    global $tsLocale;
-    // check if we can get the field values from the system cache
-    $cacheKey = "CRM_Core_DAO_CustomField_CustomGroup_TableColumn_{$fieldID}_$tsLocale";
-    if (Civi::cache('metadata')->has($cacheKey)) {
-      return Civi::cache('metadata')->get($cacheKey);
-    }
-
-    $query = '
-SELECT cg.table_name, cf.column_name, cg.id
-FROM   civicrm_custom_group cg,
-     civicrm_custom_field cf
-WHERE  cf.custom_group_id = cg.id
-AND    cf.id = %1';
-    $params = [1 => [$fieldID, 'Integer']];
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-
-    if (!$dao->fetch()) {
+    $field = self::getField($fieldID);
+    if (!$field) {
       throw new CRM_Core_Exception('Cannot find table and column information for Custom Field ' . $fieldID);
     }
-    $fieldValues = [$dao->table_name, $dao->column_name, $dao->id];
-    Civi::cache('metadata')->set($cacheKey, $fieldValues);
-
-    return $fieldValues;
+    return [$field['custom_group']['table_name'], $field['column_name'], $field['custom_group_id']];
   }
 
   /**
