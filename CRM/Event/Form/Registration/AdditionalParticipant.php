@@ -95,7 +95,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   public function preProcess() {
     parent::preProcess();
     $this->addExpectedSmartyVariable('additionalCustomPost');
-    $participantNo = substr($this->_name, 12);
+    $participantNo = $this->getParticipantIndex();
 
     //lets process in-queue participants.
     if ($this->_participantId && $this->_additionalParticipantIds) {
@@ -212,11 +212,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    * @return void
    */
   public function buildQuickForm() {
-
-    $button = substr($this->controller->getButtonName($this->_name), -4);
-
     if ($this->isPaidEvent()) {
-      $this->buildAmount(TRUE, NULL, $this->_priceSetId);
+      $this->buildAmount();
     }
     $this->assign('priceSet', $this->_priceSet);
 
@@ -445,7 +442,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       $params = $self->get('params');
 
       //take the participant instance.
-      $addParticipantNum = substr($self->_name, 12);
+      $addParticipantNum = $self->getParticipantIndex();
 
       if (is_array($params)) {
         foreach ($params as $key => $value) {
