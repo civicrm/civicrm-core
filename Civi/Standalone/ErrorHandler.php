@@ -25,6 +25,10 @@ class ErrorHandler {
     ?string $errfile,
     ?int $errline
   ) {
+    // Leave errors silenced with @ or excluded by error_reporting to PHP.
+    if (!(error_reporting() & $errno)) {
+      return FALSE;
+    }
     self::$messages[] = [
       'errno' => $errno,
       'errstr' => $errstr,
