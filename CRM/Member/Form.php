@@ -450,8 +450,12 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * type of the membership being edited/renewed (if any).
    *
    * @return int|null
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
    */
-  protected function getMembershipTypeID(): ?int {
+  public function getMembershipTypeID(): ?int {
     return $this->getSubmittedValue('membership_type_id')[1] ?? $this->getMembershipValue('membership_type_id');
   }
 
