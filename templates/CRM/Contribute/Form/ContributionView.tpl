@@ -71,7 +71,7 @@
     </tr>
   {/if}
   {if $isDeferred AND $revenue_recognition_date}
-    <tr>
+    <tr class="crm-contribution-form-block-revenue_recognition_date">
       <td class="label">{ts}Revenue Recognition Date{/ts}</td>
       <td>{$revenue_recognition_date|crmDate:"%B, %Y"}</td>
     </tr>
@@ -186,7 +186,7 @@
     <div class="crm-accordion-body">
       <table class="crm-info-panel crm-soft-credit-listing">
         {foreach from=$softContributions item="softCont"}
-          <tr>
+          <tr class="crm-contribution-form-block-soft_contribution">
             <td>
               <a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$softCont.contact_id`"}"
                  title="{ts escape='htmlattribute'}View contact record{/ts}">{$softCont.contact_name}
@@ -229,29 +229,29 @@
     </summary>
     <div class="crm-accordion-body">
       <table class="crm-info-panel">
-        <tr>
+        <tr class="crm-contribution-form-block-pcp_title">
           <td class="label">{ts}Personal Campaign Page{/ts}</td>
           <td><a href="{crmURL p="civicrm/pcp/info" q="reset=1&id=`$pcp_id`"}">{$pcp_title}</a><br/>
             <span class="description">{ts}Contribution was made through this personal campaign page.{/ts}</span>
           </td>
         </tr>
-        <tr>
+        <tr class="crm-contribution-form-block-soft_credit_to">
           <td class="label">{ts}Soft Credit To{/ts}</td>
           <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$pcp_soft_credit_to_id`"}" id="view_contact"
                  title="{ts escape='htmlattribute'}View contact record{/ts}">{$pcp_soft_credit_to_name}</a></td>
         </tr>
-        <tr>
+        <tr class="crm-contribution-form-block-pcp_display_in_roll">
           <td class="label">{ts}In Public Honor Roll?{/ts}</td>
           <td>{if $pcp_display_in_roll}{ts}Yes{/ts}{else}{ts}No{/ts}{/if}</td>
         </tr>
         {if $pcp_roll_nickname}
-          <tr>
+          <tr class="crm-contribution-form-block-pcp_roll_nickname">
             <td class="label">{ts}Honor Roll Name{/ts}</td>
             <td>{$pcp_roll_nickname}</td>
           </tr>
         {/if}
         {if $pcp_personal_note}
-          <tr>
+          <tr class="crm-contribution-form-block-pcp_personal_note">
             <td class="label">{ts}Personal Note{/ts}</td>
             <td>{$pcp_personal_note}</td>
           </tr>
