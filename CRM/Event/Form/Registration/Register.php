@@ -715,14 +715,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $params['participant_id'] = $this->_participantId;
     }
 
-    $params['defaultRole'] = 1;
     if (array_key_exists('participant_role', $params)) {
       $params['participant_role_id'] = $params['participant_role'];
     }
 
-    if (array_key_exists('participant_role_id', $params)) {
-      $params['defaultRole'] = 0;
-    }
     if (empty($params['participant_role_id']) &&
       $this->_values['event']['default_role_id']
     ) {

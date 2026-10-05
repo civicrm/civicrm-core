@@ -96,11 +96,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     if ($this->isPaidEvent()) {
       $this->_params[0]['invoiceID'] = $this->get('invoiceID');
     }
-    $this->assign('defaultRole', FALSE);
-    if (($this->_params[0]['defaultRole'] ?? NULL) == 1) {
-      $this->assign('defaultRole', TRUE);
-    }
-
     if (empty($this->_params[0]['participant_role_id']) &&
       $this->_values['event']['default_role_id']
     ) {
