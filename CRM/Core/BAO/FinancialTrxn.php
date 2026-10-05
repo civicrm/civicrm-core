@@ -319,8 +319,8 @@ WHERE ceft.entity_id = %1";
 
     EntityFinancialTrxn::save(FALSE)
       ->addRecord([
-        'entity_table' => $params['entity_table'] ?? 'civicrm_contribution',
-        'entity_id' => $trxnParams['entity_id'] ?? $contributionId,
+        'entity_table' => 'civicrm_contribution',
+        'entity_id' => $contributionId,
         'financial_trxn_id' => $trxn->id,
         'amount' => $trxnParams['total_amount'],
       ])->execute();
@@ -342,7 +342,7 @@ WHERE ceft.entity_id = %1";
       'currency' => $trxnParams['currency'],
     ]);
     EntityFinancialTrxn::save(FALSE)->addRecord([
-      'entity_table' => "civicrm_financial_item",
+      'entity_table' => 'civicrm_financial_item',
       'entity_id' => $financialItem->id,
       'financial_trxn_id' => $trxn->id,
       'amount' => $amount,

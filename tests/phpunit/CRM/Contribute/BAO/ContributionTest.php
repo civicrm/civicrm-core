@@ -78,6 +78,22 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
     $this->assertEquals($params['trxn_id'], $contribution['trxn_id'], 'Check for transaction id .');
     $this->assertEquals($params['net_amount'], $contribution['net_amount'], 'Check for Amount update.');
+
+    // The fee increase (5 -> 10) should have recorded its own financial_trxn, linked
+    // to the contribution itself rather than to whatever happened to be in the raw
+    // update params.
+    $feeTrxn = FinancialTrxn::get(FALSE)
+      ->addWhere('is_payment', '=', FALSE)
+      ->addWhere('total_amount', '=', 5)
+      ->addOrderBy('id', 'DESC')
+      ->execute()->first();
+    $this->assertNotEmpty($feeTrxn, 'The fee increase should create its own financial_trxn.');
+    $entityFinancialTrxn = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('financial_trxn_id', '=', $feeTrxn['id'])
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->execute()->single();
+    $this->assertEquals('civicrm_contribution', $entityFinancialTrxn['entity_table']);
+    $this->assertEquals($contribution['id'], $entityFinancialTrxn['entity_id']);
   }
 
   /**
