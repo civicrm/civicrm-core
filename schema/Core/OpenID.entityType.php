@@ -10,6 +10,7 @@ return [
     'description' => ts('OpenID information for a specific location.'),
     'icon' => 'fa-openid',
     'add' => '2.0',
+    'label_field' => 'openid',
   ],
   'getIndices' => fn() => [
     'index_location_type' => [

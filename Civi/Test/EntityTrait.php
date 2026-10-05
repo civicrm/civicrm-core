@@ -70,6 +70,17 @@ trait EntityTrait {
   }
 
   /**
+   * Get the stored ID of a created test entity.
+   *
+   * @param string $entity
+   * @param string $identifier
+   * @return int|null
+   */
+  protected function getTestEntityID(string $entity, string $identifier = 'default'): ?int {
+    return $this->ids[$entity][$identifier] ?? NULL;
+  }
+
+  /**
    * Set the test entity on the class for access.
    *
    * This follows the ids patter and also the api4TestTrait pattern.
