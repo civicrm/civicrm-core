@@ -36,6 +36,11 @@ class CRM_Extension_QueueTasks {
     // which should in turn source extension download urls from a trusted directory URL
     // TODO: keep track of the trust chain so we can verify the source one last time here
     $downloader = CRM_Extension_System::singleton()->getDownloader();
+    // The GUI already blocks this path when downloads are disabled
+    // but we need this because of cv.
+    if (!$downloader->isEnabled()) {
+      throw new CRM_Extension_Exception('The system administrator has disabled extension downloads.');
+    }
     if (!$downloader->fetch($url, $zipFile)) {
       throw new CRM_Extension_Exception("Failed to download: $url");
     }
