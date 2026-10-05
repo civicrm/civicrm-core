@@ -484,6 +484,26 @@ return [
         'condition_provider' => ['CRM_Contribute_BAO_Contribution', 'alterStatus'],
       ],
     ],
+    'domain_id' => [
+      'title' => ts('Domain ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'EntityRef',
+      'required' => FALSE,
+      'description' => ts('Which Domain is this match entry for'),
+      'add' => '6.19',
+      'input_attrs' => [
+        'label' => ts('Domain'),
+      ],
+      'pseudoconstant' => [
+        'table' => 'civicrm_domain',
+        'key_column' => 'id',
+        'label_column' => 'name',
+      ],
+      'entity_reference' => [
+        'entity' => 'Domain',
+        'key' => 'id',
+      ],
+    ],
     'address_id' => [
       'title' => ts('Address ID'),
       'sql_type' => 'int unsigned',
