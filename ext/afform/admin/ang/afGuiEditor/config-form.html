@@ -273,7 +273,7 @@
               {{:: editor.meta.afform_fields.verification_redirect.title }}
             </label>
             <div class="input-group">
-              <input ng-model="editor.afform.verification_redirect" name="verification_redirect" class="form-control" id="af_config_verification_redirect" title="{{:: ts('Post-Verification Page') }}" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Verification Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
+              <input ng-model="editor.afform.verification_redirect" name="verification_redirect" class="form-control" id="af_config_verification_redirect" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Verification Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
               <af-gui-token-select class="input-group-addon" model="editor.afform" field="verification_redirect"></af-gui-token-select>
             </div>
             <p class="help-block">{{:: ts('Enter a URL or path that the form should redirect to following successful verification.') }}</p>
