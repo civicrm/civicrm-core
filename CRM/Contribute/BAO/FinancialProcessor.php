@@ -420,84 +420,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
-   * Create the financial items for the line.
-   *
-   * @param array $params
-   * @param string $context
-   * @param array $lineItems
-   * @param array $trxnIds
-   *
-   * @return array
-   * @internal
-   */
-  private function createFinancialItemsForLine($params, $context, $lineItems, $trxnIds): array {
-    $postUpdateContribution = $this->getUpdatedContribution();
-    foreach ($lineItems as $fieldValueId => $lineItemDetails) {
-      $previousLineItem = $this->originalLineItems[$lineItemDetails['id'] ?? NULL] ?? [];
-      $prevFinancialItem = $this->getExistingFinancialItemForLine($lineItemDetails['id'], FALSE);
-      $financialAccount = $this->getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem['financial_account_id']);
-
-      $itemParams = [
-        'transaction_date' => CRM_Utils_Date::isoToMysql($postUpdateContribution->receive_date),
-        'contact_id' => $postUpdateContribution->contact_id,
-        'currency' => $postUpdateContribution->currency,
-        'amount' => $this->getFinancialItemAmountFromParams($context, $lineItemDetails),
-        'description' => $prevFinancialItem['description'] ?? NULL,
-        'status_id' => $prevFinancialItem['status_id'],
-        'financial_account_id' => $financialAccount,
-        'entity_table' => 'civicrm_line_item',
-        'entity_id' => $lineItemDetails['id'],
-      ];
-      $financialItem = CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
-      $lineItems[$fieldValueId]['deferred_line_total'] = $itemParams['amount'];
-      $lineItems[$fieldValueId]['financial_item_id'] = $financialItem->id;
-
-      // If changing the financial type we reverse & recreate but really we should do this
-      // a) if the line item financial type changes (not contribution) and
-      // b) if the currency changes....
-      $isReversePrior = $context === 'changeFinancialType';
-
-      // We have to create a new tax transaction if the last one was reversed OR the new one has tax
-      // and there was no last one to reverse.
-      $isTaxTransactionRequired = $lineItemDetails['tax_amount'] &&
-        // excluding changedAmount is a bit odd as the line could have changed amount and type
-        // without the contribution total having changed type - but we can only change the code
-        // so quickly.
-        (($this->isReversalRequired($lineItemDetails, TRUE) && $context !== 'changedAmount')
-        ||
-          (
-            !$this->getExistingFinancialItemForLine($lineItemDetails['id'], TRUE)
-            || !$this->getExistingFinancialItemForLine($lineItemDetails['id'], TRUE)['amount']
-          )
-        );
-
-      // Adjusting tax is a bit yuck - would be better to reverse & redo IMHO.
-      $isTaxAdjustmentRequired = ($lineItemDetails['tax_amount'] ?? NULL)
-        && $this->getOriginalLineItemAmount($lineItemDetails['id'], 'tax_amount') !== $lineItemDetails['tax_amount'];
-
-      if ($isReversePrior) {
-        // In this case we are on the first pass - reverse. Second pass will create new
-        // although would be better to restructure to a single pass.
-        $this->reverseLineFinancialItem($lineItemDetails, TRUE, $trxnIds['id']);
-      }
-      elseif ($isTaxTransactionRequired) {
-        // In this scenario we are on the second pass. We have done a reversal
-        // on the first pass and now we are doing a second pass to create the
-        // new correct new transaction (ideally we would not do as 2 passes
-        // but one after the other)
-        $taxAmount = $lineItemDetails['tax_amount'];
-        $this->createTaxFinancialItem($itemParams, $lineItemDetails['financial_type_id'], $taxAmount, $trxnIds['id']);
-      }
-      elseif ($isTaxAdjustmentRequired) {
-        $previousTaxAmount = $previousLineItem['tax_amount'] ?? 0;
-        $taxAmount = (float) $lineItemDetails['tax_amount'] - $previousTaxAmount;
-        $this->createTaxFinancialItem($itemParams, $lineItemDetails['financial_type_id'], $taxAmount, $trxnIds['id']);
-      }
-    }
-    return $lineItems;
-  }
-
-  /**
    * Get the multiplier for adjusting rows.
    *
    * If we are dealing with a refund or cancellation then it will be a negative
@@ -660,7 +582,70 @@ class CRM_Contribute_BAO_FinancialProcessor {
   private function updateFinancialAccounts($params, $context = NULL): array {
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
     $trxnIds['id'] = $trxn->id;
-    $lineItems = $this->createFinancialItemsForLine($params, $context, $this->getUpdatedLineItems(), $trxnIds);
+    $lineItems = $this->getUpdatedLineItems();
+    $postUpdateContribution = $this->getUpdatedContribution();
+    foreach ($lineItems as $fieldValueId => $lineItemDetails) {
+      $previousLineItem = $this->originalLineItems[$lineItemDetails['id'] ?? NULL] ?? [];
+      $prevFinancialItem = $this->getExistingFinancialItemForLine($lineItemDetails['id'], FALSE);
+      $financialAccount = $this->getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem['financial_account_id']);
+
+      $itemParams = [
+        'transaction_date' => CRM_Utils_Date::isoToMysql($postUpdateContribution->receive_date),
+        'contact_id' => $postUpdateContribution->contact_id,
+        'currency' => $postUpdateContribution->currency,
+        'amount' => $this->getFinancialItemAmountFromParams($context, $lineItemDetails),
+        'description' => $prevFinancialItem['description'] ?? NULL,
+        'status_id' => $prevFinancialItem['status_id'],
+        'financial_account_id' => $financialAccount,
+        'entity_table' => 'civicrm_line_item',
+        'entity_id' => $lineItemDetails['id'],
+      ];
+      $financialItem = CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
+      $lineItems[$fieldValueId]['deferred_line_total'] = $itemParams['amount'];
+      $lineItems[$fieldValueId]['financial_item_id'] = $financialItem->id;
+
+      // If changing the financial type we reverse & recreate but really we should do this
+      // a) if the line item financial type changes (not contribution) and
+      // b) if the currency changes....
+      $isReversePrior = $context === 'changeFinancialType';
+
+      // We have to create a new tax transaction if the last one was reversed OR the new one has tax
+      // and there was no last one to reverse.
+      $isTaxTransactionRequired = $lineItemDetails['tax_amount'] &&
+        // excluding changedAmount is a bit odd as the line could have changed amount and type
+        // without the contribution total having changed type - but we can only change the code
+        // so quickly.
+        (($this->isReversalRequired($lineItemDetails, TRUE) && $context !== 'changedAmount')
+          ||
+          (
+            !$this->getExistingFinancialItemForLine($lineItemDetails['id'], TRUE)
+            || !$this->getExistingFinancialItemForLine($lineItemDetails['id'], TRUE)['amount']
+          )
+        );
+
+      // Adjusting tax is a bit yuck - would be better to reverse & redo IMHO.
+      $isTaxAdjustmentRequired = ($lineItemDetails['tax_amount'] ?? NULL)
+        && $this->getOriginalLineItemAmount($lineItemDetails['id'], 'tax_amount') !== $lineItemDetails['tax_amount'];
+
+      if ($isReversePrior) {
+        // In this case we are on the first pass - reverse. Second pass will create new
+        // although would be better to restructure to a single pass.
+        $this->reverseLineFinancialItem($lineItemDetails, TRUE, $trxnIds['id']);
+      }
+      elseif ($isTaxTransactionRequired) {
+        // In this scenario we are on the second pass. We have done a reversal
+        // on the first pass and now we are doing a second pass to create the
+        // new correct new transaction (ideally we would not do as 2 passes
+        // but one after the other)
+        $taxAmount = $lineItemDetails['tax_amount'];
+        $this->createTaxFinancialItem($itemParams, $lineItemDetails['financial_type_id'], $taxAmount, $trxnIds['id']);
+      }
+      elseif ($isTaxAdjustmentRequired) {
+        $previousTaxAmount = $previousLineItem['tax_amount'] ?? 0;
+        $taxAmount = (float) $lineItemDetails['tax_amount'] - $previousTaxAmount;
+        $this->createTaxFinancialItem($itemParams, $lineItemDetails['financial_type_id'], $taxAmount, $trxnIds['id']);
+      }
+    }
     $this->createDeferredTrxn($lineItems, TRUE, $context);
     return $params['line_item'];
   }
