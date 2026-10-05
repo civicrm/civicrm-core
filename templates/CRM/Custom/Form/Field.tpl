@@ -140,11 +140,11 @@
     </tr>
     <tr class="crm-custom-field-form-block-help_pre">
       <td class="label">{$form.help_pre.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_field' field='help_pre' id=$id}{/if}</td>
-      <td class="html-adjust">{$form.help_pre.html|crmAddClass:huge}</td>
+      <td class="html-adjust">{$form.help_pre.html}</td>
     </tr>
     <tr class="crm-custom-field-form-block-help_post">
       <td class="label">{$form.help_post.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_field' field='help_post' id=$id}{/if}</td>
-      <td class="html-adjust">{$form.help_post.html|crmAddClass:huge}
+      <td class="html-adjust">{$form.help_post.html}
         {if $action neq 4}
           <br />
           <span class="description">{ts}Explanatory text displayed on back-end forms. Pre help is displayed inline on the form (above the field). Post help is displayed in a pop-up - users click the help balloon to view help text.{/ts}</span>

@@ -156,7 +156,7 @@
 
     <tr class="crm-price-field-form-block-help_pre">
       <td class="label">{$form.help_pre.label|smarty:nodefaults}</td>
-      <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field' field='help_pre' id=$fid}{/if}{$form.help_pre.html|crmAddClass:huge}&nbsp;
+      <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field' field='help_pre' id=$fid}{/if}{$form.help_pre.html}&nbsp;
       {if $action neq 4}
         <div class="description">{ts}Explanatory text displayed to users at the beginning of this field.{/ts}</div>
       {/if}
@@ -165,7 +165,7 @@
 
     <tr class="crm-price-field-form-block-help_post">
       <td class="label">{$form.help_post.label|smarty:nodefaults}</td>
-      <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field' field='help_post' id=$fid}{/if}{$form.help_post.html|crmAddClass:huge}&nbsp;
+      <td>{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_price_field' field='help_post' id=$fid}{/if}{$form.help_post.html}&nbsp;
       {if $action neq 4}
         <div class="description">{ts}Explanatory text displayed to users below this field.{/ts}</div>
       {/if}
