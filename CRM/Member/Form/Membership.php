@@ -1922,15 +1922,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
-   * Get the payment processor ID.
-   *
-   * @return int
-   */
-  public function getPaymentProcessorID(): int {
-    return (int) ($this->getSubmittedValue('payment_processor_id') ?: $this->_paymentProcessor['id']);
-  }
-
-  /**
    * Get memberships submitted through the form submission.
    * @return array
    *
