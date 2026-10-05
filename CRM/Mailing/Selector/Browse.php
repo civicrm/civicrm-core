@@ -236,6 +236,14 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           'title' => ts('Approve/Reject Mailing'),
           'weight' => -50,
         ],
+        CRM_Core_Action::REVERT => [
+          'name' => ts('Unschedule'),
+          'url' => 'civicrm/mailing/browse',
+          'qs' => 'action=revert&mid=%%mid%%&reset=1',
+          'extra' => 'onclick="if (confirm(\'' . $unscheduleExtra . '\')) this.href+=\'&amp;confirmed=1\'; else return false;"',
+          'title' => ts('Unschedule Mailing'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::REVERT),
+        ],
         CRM_Core_Action::VIEW => [
           'name' => ts('Report'),
           'url' => 'civicrm/mailing/report',
@@ -371,7 +379,12 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
         }
         if ($row['status'] !== 'Not scheduled') {
           if ($allAccess || $showCreateLinks) {
-            $actionMask = CRM_Core_Action::VIEW;
+            //we need Report only when mailing is in either of status
+            //'Complete', 'Running', 'Canceled', 'Paused'
+            //this mailing has been processed - show Report
+            if (in_array($row['status'], ['Complete', 'Running', 'Canceled', 'Paused'])) {
+              $actionMask = CRM_Core_Action::VIEW;
+            }
           }
         }
         else {
@@ -387,7 +400,9 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
               $actionMask |= CRM_Core_Action::REOPEN;
             }
             else {
-              $actionMask |= CRM_Core_Action::CLOSE;
+              if (!empty($row['start'])) {
+                $actionMask |= CRM_Core_Action::CLOSE;
+              }
             }
           }
           if ($row['status'] === 'Scheduled' &&
@@ -413,7 +428,13 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
 
         // check for delete permission.
         if ($allowToDelete) {
-          $actionMask |= CRM_Core_Action::DELETE;
+          if ($row['status'] != 'Running') {
+            $actionMask |= CRM_Core_Action::DELETE;
+          }
+        }
+
+        if ($row['status'] == 'Scheduled' && (empty($row['start']) && empty($row['end']))) {
+          $actionMask |= CRM_Core_Action::REVERT;
         }
 
         if ($actionMask == NULL) {

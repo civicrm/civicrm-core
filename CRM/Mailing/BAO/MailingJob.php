@@ -650,6 +650,22 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
   }
 
   /**
+   * Unschedule a mailing
+   *
+   * @param int $mailingID
+   *   The id of the mailing to be unscheduled.
+   */
+  public static function revert($mailingID) {
+    Mailing::update(FALSE)
+      ->setValues(['status:name' => 'Draft', 'scheduled_id' => NULL, 'scheduled_date' => NULL])
+      ->addWhere('id', '=', $mailingID)
+      ->execute();
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_mailing_job WHERE mailing_id = %1 ", [
+      1 => [$mailingID, 'Integer'],
+    ]);
+  }
+
+  /**
    * Resume a mailing
    *
    * @param int $mailingID

@@ -84,6 +84,7 @@ class CRM_Mailing_Form_Action extends CRM_Core_Form {
       CRM_Core_Action::REOPEN => ts('Resume Mailing'),
       CRM_Core_Action::RENEW => ts('Archive Mailing'),
       CRM_Core_Action::DELETE => ts('Delete Mailing'),
+      CRM_Core_Action::REVERT => ts('Unschedule Mailing'),
     ];
     $map_message = [
       CRM_Core_Action::DISABLE => ts('Are you sure you want to cancel this mailing?'),
@@ -91,6 +92,7 @@ class CRM_Mailing_Form_Action extends CRM_Core_Form {
       CRM_Core_Action::REOPEN => ts('Are you sure you want to resume this mailing?'),
       CRM_Core_Action::RENEW => ts('Are you sure you want to archive this mailing?'),
       CRM_Core_Action::DELETE => ts('Are you sure you want to delete this mailing?'),
+      CRM_Core_Action::REVERT => ts('Are you sure you want to unschedule this mailing?'),
     ];
 
     if (!empty($map_title[$this->_action])) {
@@ -121,6 +123,10 @@ class CRM_Mailing_Form_Action extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::CLOSE) {
       CRM_Mailing_BAO_MailingJob::pause($this->_mailingId);
       CRM_Core_Session::setStatus(ts('The mailing has been paused. Active message deliveries may continue for a few minutes, but CiviMail will not begin delivery of any more batches.'), ts('Paused'), 'success');
+    }
+    elseif ($this->_action & CRM_Core_Action::REVERT) {
+      CRM_Mailing_BAO_MailingJob::revert($this->_mailingId);
+      CRM_Core_Session::setStatus(ts('The mailing has been unscheduled.'), ts('Unscheduled'), 'success');
     }
     if ($this->_action & CRM_Core_Action::REOPEN) {
       CRM_Mailing_BAO_MailingJob::resume($this->_mailingId);
