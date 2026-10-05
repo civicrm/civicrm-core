@@ -10,6 +10,8 @@
  */
 
 use Civi\Api4\ContributionRecur;
+use Civi\Api4\LineItem;
+use Civi\Api4\Order;
 
 /**
  *
@@ -1108,26 +1110,23 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       $this->_params = $formValues;
       $contributionAddressID = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
-      $contribution = civicrm_api3('Order', 'create',
-        [
+      $contribution = Order::create(FALSE)
+        ->setContributionValues([
           'contact_id' => $this->_contributorContactID,
           'address_id' => $contributionAddressID,
-          'line_items' => $this->getLineItemForOrderApi(),
           'is_test' => $this->isTest(),
           'campaign_id' => $this->getSubmittedValue('campaign_id'),
           'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
           'payment_instrument_id' => $this->getPaymentInstrumentID(),
           'financial_type_id' => $this->getFinancialTypeID(),
           'receive_date' => $this->getReceiveDate(),
-          'tax_amount' => $this->order->getTotalTaxAmount(),
-          'total_amount' => $this->order->getTotalAmount(),
           'invoice_id' => $this->getInvoiceID(),
           'currency' => $this->getCurrency(),
           'receipt_date' => $this->getSubmittedValue('send_receipt') ? date('YmdHis') : NULL,
           'contribution_recur_id' => $this->getContributionRecurID(),
-          'skipCleanMoney' => TRUE,
-        ]
-      );
+        ])
+        ->setLineItems($this->getLineItemForOrderApi())
+        ->execute()->single();
       $this->ids['Contribution'] = $contribution['id'];
       $this->setMembershipIDsFromOrder($contribution);
 
@@ -1284,6 +1283,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         unset($membershipParams['contribution_status_id']);
         $membershipParams['skipLineItem'] = TRUE;
         unset($membershipParams['lineItems']);
+        $membershipParams['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'Membership');
         $this->setMembership((array) CRM_Member_BAO_Membership::create($membershipParams));
         $lineItem[$this->_priceSetId][$id]['entity_id'] = $this->membership['id'];
         $lineItem[$this->_priceSetId][$id]['entity_table'] = 'civicrm_membership';
@@ -1898,17 +1898,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       'is_override' => $this->getSubmittedValue('is_override'),
       'status_override_end_date' => $this->getSubmittedValue('status_override_end_date'),
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
-      'custom' => CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(),
-        $this->_id,
-        'Membership'
-      ),
       // fix for CRM-3724
       // when is_override false ignore is_admin statuses during membership
       // status calculation. similarly we did fix for import in CRM-3570.
       'exclude_is_admin' => !$this->getSubmittedValue('is_override'),
       'contribution_recur_id' => $this->getContributionRecurID(),
     ];
-    $params += $this->getSubmittedCustomFields(4);
     return $params;
   }
 
@@ -2073,14 +2068,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected function getLineItemForOrderApi(): array {
     $lineItems = [];
     foreach ($this->order->getLineItems() as $line) {
-      $params = [];
       if (!empty($line['membership_type_id'])) {
-        $params = $this->getMembershipParamsForType((int) $line['membership_type_id']);
+        $membershipParams = $this->getMembershipParamsForType((int) $line['membership_type_id']);
+        $line = CRM_Utils_Array::prefixKeys($membershipParams, 'entity_id.') + $line;
+        $line['entity_table'] = 'civicrm_membership';
       }
-      $lineItems[] = [
-        'line_item' => [$line['price_field_value_id'] => $line],
-        'params' => $params,
-      ];
+      $lineItems[] = $line;
     }
     return $lineItems;
   }
@@ -2094,20 +2087,21 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getMembershipParamsForType(int $membershipTypeID) {
-    return array_merge($this->getFormMembershipParams(), $this->getMembershipParameters()[$membershipTypeID]);
+    // Custom field values are passed in apiv4 format here since this feeds
+    // the Order api's entity_id.* line item params.
+    return array_merge($this->getFormMembershipParams(), $this->getSubmittedCustomFields(4), $this->getMembershipParameters()[$membershipTypeID]);
   }
 
   /**
    * @param array $contribution
    */
   protected function setMembershipIDsFromOrder(array $contribution): void {
-    $ids = [];
-    foreach ($contribution['values'][$contribution['id']]['line_item'] as $line) {
-      if ($line['entity_table'] ?? '' === 'civicrm_membership') {
-        $ids[] = (int) $line['entity_id'];
-      }
-    }
-    $this->setMembershipIDs($ids);
+    $ids = (array) LineItem::get(FALSE)
+      ->addSelect('entity_id')
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->execute()->column('entity_id');
+    $this->setMembershipIDs(array_map('intval', $ids));
   }
 
 }
