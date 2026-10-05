@@ -89,13 +89,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   protected $isMailSent = FALSE;
 
   /**
-   * The name of the renewed membership type.
-   *
-   * @var string
-   */
-  protected $membershipTypeName = '';
-
-  /**
    * Used in the wrangling of custom field data onto the form.
    *
    * There are known instances of extensions altering this array
@@ -124,7 +117,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * Set the renewal notification status message.
    */
   public function setRenewalMessage() {
-    $statusMsg = ts('%1 membership for %2 has been renewed.', [1 => $this->membershipTypeName, 2 => $this->_memberDisplayName]);
+    $statusMsg = ts('%1 membership for %2 has been renewed.', [1 => $this->getMembershipTypeValue('name'), 2 => $this->_memberDisplayName]);
 
     if ($this->isMailSent) {
       $statusMsg .= ' ' . ts('A renewal confirmation and receipt has been sent to %1.', [1 => $this->_contributorEmail]);
@@ -570,7 +563,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $membershipParams = [
       'id' => $this->getMembershipID(),
-      'membership_type_id' => $this->_params['membership_type_id'][1],
+      'membership_type_id' => $this->getMembershipTypeID(),
       'modified_id' => $this->_contactID,
       'custom' => $customFieldsFormatted,
       'membership_activity_status' => $pending ? 'Scheduled' : 'Completed',
@@ -597,10 +590,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if (!empty($this->_params['record_contribution']) || $this->_mode) {
       // set the source
       [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
-      $this->membershipTypeName = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipParams['membership_type_id'],
-        'name');
       $userName = htmlentities((string) $userName);
-      $this->_params['contribution_source'] = "{$this->membershipTypeName} Membership: Offline membership renewal (by {$userName})";
+      $this->_params['contribution_source'] = "{$this->getMembershipTypeValue('name')} Membership: Offline membership renewal (by {$userName})";
 
       //create line items
       $this->_params = $this->setPriceSetParameters($this->_params);
