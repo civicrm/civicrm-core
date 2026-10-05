@@ -190,6 +190,30 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
+   * @return array
+   */
+  protected function getContributionValues(): array {
+    return [
+      'currency' => $this->getCurrency(),
+      'is_test' => $this->isTest(),
+      'receipt_date' => $this->getSubmittedValue('send_receipt') ? date('YmdHis') : NULL,
+      'invoice_id' => $this->getInvoiceID(),
+      'campaign_id' => $this->getSubmittedValue('campaign_id'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID(),
+      'receive_date' => $this->getReceiveDate(),
+    ];
+  }
+
+  /**
+   * Get the receive date for the contribution.
+   *
+   * @return string $receive_date
+   */
+  protected function getReceiveDate(): string {
+    return $this->getSubmittedValue('receive_date') ?: date('YmdHis');
+  }
+
+  /**
    * Values submitted to the form, processed along the way.
    *
    * @var array
