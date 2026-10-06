@@ -508,7 +508,7 @@ class Admin {
         'description' => $entity['description'] ?? '',
         'entity' => $entity['name'],
         'conditions' => self::getJoinConditions('id', "$alias.{$field['name']}"),
-        'defaults' => [],
+        'defaults' => self::getJoinDefaults($alias, $entity),
         'alias' => $alias,
         'multi' => TRUE,
       ];
