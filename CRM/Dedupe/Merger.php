@@ -1542,115 +1542,123 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // Encapsulate in a transaction to avoid half-merges.
     $transaction = new CRM_Core_Transaction();
 
-    $contactType = $migrationInfo['main_details']['contact_type'];
-    $relTables = CRM_Dedupe_Merger::relTables();
-    $submittedCustomFields = $moveTables = $tableOperations = $removeTables = [];
+    try {
+      $contactType = $migrationInfo['main_details']['contact_type'];
+      $relTables = CRM_Dedupe_Merger::relTables();
+      $submittedCustomFields = $moveTables = $tableOperations = $removeTables = [];
 
-    self::swapOutFieldsAffectedByQFZeroBug($migrationInfo);
-    foreach ($migrationInfo as $key => $value) {
+      self::swapOutFieldsAffectedByQFZeroBug($migrationInfo);
+      foreach ($migrationInfo as $key => $value) {
 
-      if (substr($key, 0, 12) === 'move_custom_' && $value != NULL) {
-        $submitted[substr($key, 5)] = $value;
-        $submittedCustomFields[] = substr($key, 12);
-      }
-      elseif (in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) && $value != NULL) {
-        $submitted[substr($key, 5)] = $value;
-      }
-      elseif (substr($key, 0, 15) === 'move_rel_table_' and $value == '1') {
-        $moveTables = array_merge($moveTables, $relTables[substr($key, 5)]['tables']);
-        if (array_key_exists('operation', $migrationInfo)) {
-          foreach ($relTables[substr($key, 5)]['tables'] as $table) {
-            if (array_key_exists($key, $migrationInfo['operation'])) {
-              $tableOperations[$table] = $migrationInfo['operation'][$key];
+        if (substr($key, 0, 12) === 'move_custom_' && $value != NULL) {
+          $submitted[substr($key, 5)] = $value;
+          $submittedCustomFields[] = substr($key, 12);
+        }
+        elseif (in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) && $value != NULL) {
+          $submitted[substr($key, 5)] = $value;
+        }
+        elseif (substr($key, 0, 15) === 'move_rel_table_' and $value == '1') {
+          $moveTables = array_merge($moveTables, $relTables[substr($key, 5)]['tables']);
+          if (array_key_exists('operation', $migrationInfo)) {
+            foreach ($relTables[substr($key, 5)]['tables'] as $table) {
+              if (array_key_exists($key, $migrationInfo['operation'])) {
+                $tableOperations[$table] = $migrationInfo['operation'][$key];
+              }
             }
           }
         }
-      }
-      elseif (substr($key, 0, 15) === 'move_rel_table_' and $value == '0') {
-        $removeTables = array_merge($moveTables, $relTables[substr($key, 5)]['tables']);
-      }
-    }
-    $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainId, (int) $otherId);
-    $mergeHandler->setMigrationInfo($migrationInfo);
-    $mergeHandler->mergeLocations();
-
-    // **** Do contact related migrations
-    // @todo - move all custom field processing to the move class & eventually have an
-    // overridable DAO class for it.
-    $customFieldBAO = new CRM_Core_BAO_CustomField();
-    $customFieldBAO->move($otherId, $mainId, $submittedCustomFields);
-    // add the related tables and unset the ones that don't sport any of the duplicate contact's info
-
-    CRM_Dedupe_Merger::moveContactBelongings($mergeHandler, $moveTables, $tableOperations);
-    unset($moveTables, $tableOperations);
-
-    // **** Do table related removals
-    if (!empty($removeTables)) {
-      // **** CRM-20421
-      CRM_Dedupe_Merger::removeContactBelongings($otherId, $removeTables);
-      $removeTables = [];
-    }
-
-    if (!isset($submitted)) {
-      $submitted = [];
-    }
-
-    foreach ($submitted as $key => $value) {
-      if (str_starts_with($key, 'custom_')) {
-        $fieldID = (int) substr($key, 7);
-        $fieldMetadata = CRM_Core_BAO_CustomField::getField($fieldID);
-        if ($fieldMetadata) {
-          $htmlType = (string) $fieldMetadata['html_type'];
-          $isSerialized = $fieldMetadata['serialize'];
-          $isView = $fieldMetadata['is_view'];
-          $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
+        elseif (substr($key, 0, 15) === 'move_rel_table_' and $value == '0') {
+          $removeTables = array_merge($moveTables, $relTables[substr($key, 5)]['tables']);
         }
       }
-    }
+      $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainId, (int) $otherId);
+      $mergeHandler->setMigrationInfo($migrationInfo);
+      $mergeHandler->mergeLocations();
 
-    // dev/core#996 Ensure that the earliest created date is stored against the kept contact id
-    $mainCreatedDate = civicrm_api3('Contact', 'getsingle', [
-      'id' => $mainId,
-      'return' => ['created_date'],
-    ])['created_date'];
-    $otherCreatedDate = civicrm_api3('Contact', 'getsingle', [
-      'id' => $otherId,
-      'return' => ['created_date'],
-    ])['created_date'];
-    if ($otherCreatedDate < $mainCreatedDate && !empty($otherCreatedDate)) {
-      CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET created_date = %1 WHERE id = %2', [
-        1 => [$otherCreatedDate, 'String'],
-        2 => [$mainId, 'Positive'],
-      ]);
-    }
+      // **** Do contact related migrations
+      // @todo - move all custom field processing to the move class & eventually have an
+      // overridable DAO class for it.
+      $customFieldBAO = new CRM_Core_BAO_CustomField();
+      $customFieldBAO->move($otherId, $mainId, $submittedCustomFields);
+      // add the related tables and unset the ones that don't sport any of the duplicate contact's info
 
-    if (!$checkPermissions || (CRM_Core_Permission::check('merge duplicate contacts') &&
-        CRM_Core_Permission::check('delete contacts'))
-    ) {
-      // if ext id is submitted then set it null for contact to be deleted
-      if (!empty($submitted['external_identifier'])) {
-        $query = "UPDATE civicrm_contact SET external_identifier = null WHERE id = {$otherId}";
-        CRM_Core_DAO::executeQuery($query);
+      CRM_Dedupe_Merger::moveContactBelongings($mergeHandler, $moveTables, $tableOperations);
+      unset($moveTables, $tableOperations);
+
+      // **** Do table related removals
+      if (!empty($removeTables)) {
+        // **** CRM-20421
+        CRM_Dedupe_Merger::removeContactBelongings($otherId, $removeTables);
+        $removeTables = [];
       }
-      civicrm_api3('contact', 'delete', ['id' => $otherId]);
-    }
 
-    // CRM-15681 merge sub_types
-    $other_sub_types = $migrationInfo['other_details']['contact_sub_type'] ?? NULL;
-    $main_sub_types = $migrationInfo['main_details']['contact_sub_type'] ?? NULL;
-    if ($other_sub_types) {
-      if ($main_sub_types) {
-        $submitted['contact_sub_type'] = array_unique(array_merge($main_sub_types, $other_sub_types));
+      if (!isset($submitted)) {
+        $submitted = [];
       }
-      else {
-        $submitted['contact_sub_type'] = $other_sub_types;
+
+      foreach ($submitted as $key => $value) {
+        if (str_starts_with($key, 'custom_')) {
+          $fieldID = (int) substr($key, 7);
+          $fieldMetadata = CRM_Core_BAO_CustomField::getField($fieldID);
+          if ($fieldMetadata) {
+            $htmlType = (string) $fieldMetadata['html_type'];
+            $isSerialized = $fieldMetadata['serialize'];
+            $isView = $fieldMetadata['is_view'];
+            $submitted = self::processCustomFields($mainId, $key, $submitted, $value, $fieldID, $isView, $htmlType, $isSerialized);
+          }
+        }
+      }
+
+      // dev/core#996 Ensure that the earliest created date is stored against the kept contact id
+      $mainCreatedDate = civicrm_api3('Contact', 'getsingle', [
+        'id' => $mainId,
+        'return' => ['created_date'],
+      ])['created_date'];
+      $otherCreatedDate = civicrm_api3('Contact', 'getsingle', [
+        'id' => $otherId,
+        'return' => ['created_date'],
+      ])['created_date'];
+      if ($otherCreatedDate < $mainCreatedDate && !empty($otherCreatedDate)) {
+        CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET created_date = %1 WHERE id = %2', [
+          1 => [$otherCreatedDate, 'String'],
+          2 => [$mainId, 'Positive'],
+        ]);
+      }
+
+      if (!$checkPermissions || (CRM_Core_Permission::check('merge duplicate contacts') &&
+          CRM_Core_Permission::check('delete contacts'))
+      ) {
+        // if ext id is submitted then set it null for contact to be deleted
+        if (!empty($submitted['external_identifier'])) {
+          $query = "UPDATE civicrm_contact SET external_identifier = null WHERE id = {$otherId}";
+          CRM_Core_DAO::executeQuery($query);
+        }
+        civicrm_api3('contact', 'delete', ['id' => $otherId]);
+      }
+
+      // CRM-15681 merge sub_types
+      $other_sub_types = $migrationInfo['other_details']['contact_sub_type'] ?? NULL;
+      $main_sub_types = $migrationInfo['main_details']['contact_sub_type'] ?? NULL;
+      if ($other_sub_types) {
+        if ($main_sub_types) {
+          $submitted['contact_sub_type'] = array_unique(array_merge($main_sub_types, $other_sub_types));
+        }
+        else {
+          $submitted['contact_sub_type'] = $other_sub_types;
+        }
+      }
+
+      // **** Update contact related info for the main contact
+      if (!empty($submitted)) {
+        $submitted['id'] = $mainId;
+        self::updateContact($mainId, $submitted);
       }
     }
-
-    // **** Update contact related info for the main contact
-    if (!empty($submitted)) {
-      $submitted['id'] = $mainId;
-      self::updateContact($mainId, $submitted);
+    catch (\Throwable $e) {
+      // Without an explicit rollback the transaction is committed when it
+      // goes out of scope, keeping whatever was moved before the failure.
+      $transaction->rollback()->commit();
+      throw $e;
     }
     $transaction->commit();
     CRM_Utils_Hook::post('merge', 'Contact', $mainId);
