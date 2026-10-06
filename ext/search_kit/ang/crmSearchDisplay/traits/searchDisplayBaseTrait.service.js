@@ -318,8 +318,8 @@
             } else if (ctrl.settings.pager || ctrl.settings.headerCount) {
               const params = ctrl.getApiParams('row_count');
               crmApi4('SearchDisplay', apiCalls.run[1], params).then(function(result) {
-                if (requestId < ctrl._runCount) {
-                  return; // Another request started after this one
+                if (requestId < ctrl._runCount || !angular.equals(params.filters, ctrl.getFilters())) {
+                  return; // Another request started, or the filters changed, after this one
                 }
 
                 ctrl.rowCount = result.count;
