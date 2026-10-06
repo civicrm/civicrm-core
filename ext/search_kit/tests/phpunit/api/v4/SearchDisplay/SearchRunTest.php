@@ -4096,6 +4096,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // Column index 1 is the birth_date column.
     $this->assertEquals(1985, $result[0]['columns'][1]['val']);
     $this->assertEquals(2001, $result[1]['columns'][1]['val']);
+
+    // Test with custom strftime format
+    $params['display']['settings']['columns'][1]['format'] = '%Y-%m';
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertEquals('1985-03', $result[0]['columns'][1]['val']);
+    $this->assertEquals('2001-11', $result[1]['columns'][1]['val']);
   }
 
   /**

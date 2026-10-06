@@ -241,6 +241,26 @@
       // Provides getter/setter for the pseudoconstant suffix selector
       this.getSetSuffix = (index) => (...args) => getSetSuffix(index, ...args);
 
+      // Provides getter/setter for the date format selector
+      this.getSetDateFormat = (col) => (...args) => {
+        if (args.length) {
+          const val = args[0];
+          if (val === '') {
+            delete col.format;
+          } else if (val === 'other') {
+            col.format = col.format !== undefined && !(col.format in this.dateFormats) ? col.format : '%Y-%m-%d';
+          } else {
+            col.format = val;
+          }
+        }
+        if (col.format === undefined) {
+          return '';
+        }
+        return col.format in this.dateFormats ? col.format : 'other';
+      };
+
+      this.isCustomDateFormat = (col) => col.format !== undefined && !(col.format in this.dateFormats);
+
       this.canBeImage = function(col) {
         const expr = ctrl.getExprFromSelect(col.key),
           info = searchMeta.parseExpr(expr, ctrl.savedSearch);

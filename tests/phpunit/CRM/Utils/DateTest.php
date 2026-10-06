@@ -2852,15 +2852,33 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     ];
   }
 
-  public function testDatePluginToSetting(): void {
+  public function testDatePluginToStrftime(): void {
+    $this->assertNull(CRM_Utils_Date::datePluginToStrftime(NULL, NULL));
+    $this->assertSame('%Y', CRM_Utils_Date::datePluginToStrftime('yy'));
+    $this->assertSame('%Y-%m', CRM_Utils_Date::datePluginToStrftime('yy-mm'));
+    $this->assertSame('%m/%d/%Y', CRM_Utils_Date::datePluginToStrftime('mm/dd/yy'));
+    $this->assertSame('%b %E, %Y', CRM_Utils_Date::datePluginToStrftime('M d, yy'));
+    $this->assertSame('%A, %E %B %Y', CRM_Utils_Date::datePluginToStrftime('DD, d MM yy'));
+
     foreach (CRM_Core_SelectValues::getDatePluginInputFormats() as $format => $label) {
-      $setting = CRM_Utils_Date::datePluginToSetting($format, NULL);
-      $this->assertNotEmpty($setting, "Format $format should map to a setting");
-      $this->assertStringStartsWith('dateformat', $setting);
+      $strftime = CRM_Utils_Date::datePluginToStrftime($format, NULL);
+      $this->assertNotEmpty($strftime, "Format $format should map to a strftime string");
+      $this->assertStringContainsString('%', $strftime);
     }
-    // Check with time
-    $setting = CRM_Utils_Date::datePluginToSetting($format, 1);
-    $this->assertSame('dateformatDatetime', $setting);
+    // Check with 12-hour time
+    $setting = CRM_Utils_Date::datePluginToStrftime('yy-mm-dd', 1);
+    $this->assertStringStartsWith('%Y-%m-%d', $setting);
+    $this->assertStringContainsString('%M', $setting);
+
+    // Check with 24-hour time
+    $setting = CRM_Utils_Date::datePluginToStrftime('yy-mm-dd', 2);
+    $this->assertSame('%Y-%m-%d %H:%M', $setting);
+
+    // Check time only
+    $this->assertSame('%H:%M', CRM_Utils_Date::datePluginToStrftime(NULL, 2));
+
+    // Check passthrough for strftime format
+    $this->assertSame('%d/%m/%Y', CRM_Utils_Date::datePluginToStrftime('%d/%m/%Y'));
   }
 
 }
