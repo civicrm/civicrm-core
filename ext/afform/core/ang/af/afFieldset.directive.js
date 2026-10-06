@@ -17,6 +17,7 @@
       controller: function($scope, $element, $timeout, crmApi4, afDuplicateContacts) {
         const ctrl = this;
         const localData = [];
+        let duplicateCheckTimer;
         const joinOffsets = {};
         const ts = $scope.ts = CRM.ts('org.civicrm.afform');
 
@@ -136,7 +137,6 @@
           $scope.$watch(this.getSearchParamSetId, () => this.fetchSearchParamSetValues());
 
           const checkDuplicates = afDuplicateContacts.createChecker();
-          let duplicateCheckTimer;
           $scope.$watch(duplicateCheckValues, (check) => {
             if (!check) {
               return;
@@ -144,6 +144,10 @@
             $timeout.cancel(duplicateCheckTimer);
             duplicateCheckTimer = $timeout(() => checkDuplicates(check.contactType, check.values), 500);
           }, true);
+        };
+
+        this.$onDestroy = () => {
+          $timeout.cancel(duplicateCheckTimer);
         };
 
         /**
