@@ -30,17 +30,18 @@
 {literal}
 <script type="text/javascript">
 CRM.$(function ($) {
-  // Machine names keyed by option value. We must not compare the option label:
-  // it is translated and can be customised per-site.
-  var paymentInstrumentNames = {/literal}{$paymentInstrumentNames|@json_encode}{literal};
+  // The fields each option value needs, keyed by option value (see
+  // CRM_Contribute_BAO_Contribution::getPaymentInstrumentFields()). We must not
+  // compare the option label: it is translated and can be customised per-site.
+  var paymentInstrumentFields = {/literal}{$paymentInstrumentFields|@json_encode}{literal};
 
   showHideFieldsByPaymentInstrumentID();
   $('#payment_instrument_id').on('change', showHideFieldsByPaymentInstrumentID);
 
   function showHideFieldsByPaymentInstrumentID() {
-    var paymentInstrumentName = paymentInstrumentNames[$('#payment_instrument_id').val()];
-    $('.check_number-section').toggle(paymentInstrumentName === 'Check');
-    $('.card_type_id-section, .pan_truncation-section').toggle(paymentInstrumentName === 'Credit Card');
+    var fields = paymentInstrumentFields[$('#payment_instrument_id').val()] || [];
+    $('.check_number-section').toggle(fields.includes('check_number'));
+    $('.card_type_id-section, .pan_truncation-section').toggle(fields.includes('card_type_id'));
   }
 });
 </script>
