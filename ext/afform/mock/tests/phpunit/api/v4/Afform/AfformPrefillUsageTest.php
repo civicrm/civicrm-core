@@ -250,4 +250,52 @@ EOHTML;
     $this->assertContains($cid[0], array_column($parents, 'id'));
   }
 
+  public function testPrefillEventSetEntityId(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <div class="af-container">
+      <af-field name="id"></af-field>
+      <af-field name="first_name"></af-field>
+      <af-field name="last_name"></af-field>
+    </div>
+  </fieldset>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $cids = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'Custom', 'last_name' => 'ListenerTest'],
+      ],
+    ])->column('id');
+
+    $targetId = $cids[0];
+    $listenerCalled = FALSE;
+    \Civi::dispatcher()->addListener('civi.afform.prefill', function(\Civi\Afform\Event\AfformPrefillEvent $event) use ($targetId, &$listenerCalled) {
+      if ($event->getEntityName() === 'Individual1') {
+        $listenerCalled = TRUE;
+        $this->assertNull($event->getEntityId());
+        $event->setEntityId(0, $targetId);
+        $this->assertEquals($targetId, $event->getEntityId());
+      }
+    });
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('form')
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertTrue($listenerCalled);
+    $this->assertNotEmpty($prefill['Individual1']['values']);
+    $this->assertEquals('Custom', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('ListenerTest', $prefill['Individual1']['values'][0]['fields']['last_name']);
+  }
+
 }

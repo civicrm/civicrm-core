@@ -67,9 +67,13 @@ trait AfformEventEntityTrait {
    * @return $this
    */
   public function setEntityId($index, $entityId) {
-    $idField = CoreUtil::getIdFieldName($this->entityName);
+    $apiEntity = $this->entityType ?: ($this->getFormDataModel()->getEntity($this->entityName)['type'] ?? NULL);
+    $idField = $apiEntity ? CoreUtil::getIdFieldName($apiEntity) : 'id';
     $this->entityIds[$this->entityName][$index][$idField] = $entityId;
-    $this->records[$index]['fields'][$idField] = $entityId;
+    // Not all users of this trait have `records` property
+    if (isset($this->records)) {
+      $this->records[$index]['fields'][$idField] = $entityId;
+    }
     return $this;
   }
 

@@ -4,6 +4,7 @@ namespace Civi\Afform\Event;
 
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Action\Afform\AbstractProcessor;
+use Civi\Api4\Utils\CoreUtil;
 
 class AfformPrefillEvent extends AfformBaseEvent {
   use AfformEventEntityTrait;
@@ -23,6 +24,24 @@ class AfformPrefillEvent extends AfformBaseEvent {
     $this->entityType = $entityType;
     $this->entityName = $entityName;
     $this->entityIds =& $entityIds;
+  }
+
+  /**
+   * Sets the database ID for the entity instance at the specified index,
+   * causing its data to be loaded into the prefill processor.
+   *
+   * @param int $index
+   * @param int|string $entityId
+   * @return $this
+   */
+  public function setEntityId($index, $entityId) {
+    $entity = $this->getEntity();
+    $idField = !empty($entity['type']) ? CoreUtil::getIdFieldName($entity['type']) : 'id';
+    $this->entityIds[$this->entityName][$index][$idField] = $entityId;
+    /** @var \Civi\Api4\Action\Afform\Prefill $apiRequest */
+    $apiRequest = $this->getApiRequest();
+    $apiRequest->loadEntity($entity, [$index => [$idField => $entityId]]);
+    return $this;
   }
 
 }
