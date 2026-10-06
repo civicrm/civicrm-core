@@ -7,8 +7,6 @@
   class CiviRiverleaStreamList extends HTMLElement {
     constructor() {
       super();
-
-      this.streamData = {};
     }
 
     connectedCallback() {
@@ -54,19 +52,40 @@
     async fetchAndRender() {
       this.ul.innerHTML = '<div class="crm-loading-element"></div>';
 
-      return Promise.all([this.fetchRecords(), this.fetchSettingState()])
+      return Promise.all([this.fetchThemeOptions(), this.fetchSettingState()])
         .then(() => this.render());
     }
 
 
-    async fetchRecords() {
+    async fetchThemeOptions() {
       this.streams = {};
+
+      this.nonRiverleaThemes = {};
 
       return CRM.api4('RiverleaStream', 'getWithFileContent', {
         where: [['id', '!=', 0]],
         select: ['*', 'base_module', 'local_modified_date'],
       })
-      .then((streams) => streams.forEach((stream) => this.streams[stream.name] = stream));
+      .then((streams) => streams.forEach((stream) => this.streams[stream.name] = stream))
+      .then(() => CRM.api4('Setting', 'getFields', {
+        loadOptions: true,
+        // these should have the same options, but we get both and merge
+        // just in case
+        where: [['name', 'IN', ['theme_frontend', 'theme_backend']]]
+      }))
+      .then((fields) => fields.forEach((field) => {
+        Object.keys(field.options).forEach((themeKey) => {
+          if (this.streams[themeKey]) {
+            // ignore options which are streams
+            return;
+          }
+          if (themeKey === 'default') {
+            // ignore automatic -- it just means Greenwich
+            return;
+          }
+          this.nonRiverleaThemes[themeKey] = field.options[themeKey];
+        });
+      }));
     }
 
     fetchSettingState() {
@@ -171,6 +190,7 @@
       this.frontendSlot.innerHTML = '';
       this.ul.innerHTML = '';
 
+      // render streams
       Object.values(this.streams).forEach((stream) => {
         const card = document.createElement('civi-riverlea-stream-card');
         card.setData(stream);
@@ -203,6 +223,39 @@
       if (!this.frontendSlot.hasChildNodes()) {
         this.frontendSlot.innerText = ts('Frontend theme is currently set to non-Riverlea theme: %1', {1: this.settingState.frontend});
       }
+
+      // also render non-stream theme options
+      Object.keys(this.nonRiverleaThemes).forEach((themeKey) => {
+        const label = this.nonRiverleaThemes[themeKey];
+        const panel = document.createElement('div');
+        panel.classList.add('panel', 'panel-warning');
+
+        panel.innerHTML = `
+          <div class="panel-heading">
+            <h3>
+              <i class="crm-i fa-warning" role="img" aria-hidden="true"></i>
+            </h3>
+          </div>
+          <div class="panel-body">
+            <p></p>
+          </div>
+          <div class="panel-footer">
+            <div class="crm-buttons">
+            </div>
+          </div>
+        `;
+
+        panel.querySelector('h3').append(label);
+        panel.querySelector('p').append(ts('Non-Riverlea theme.'));
+
+        panel.querySelector('.crm-buttons').append(
+          CRM.utils.createButton(ts('Set for Backend'), 'btn-set-backend', 'fa-briefcase', () => this.confirmThenUpdate('backend', themeKey, label)),
+          CRM.utils.createButton(ts('Set for Frontend'), 'btn-set-frontend', 'fa-shop', () => this.confirmThenUpdate('frontend', themeKey, label)),
+        );
+
+        this.ul.append(panel);
+      });
+
     }
 
     openEditorDialog(streamName) {
@@ -241,27 +294,20 @@
           selected: streamName
         });
         CRM.riverlea.previewer().load();
+        return Promise.resolve();
       }
 
-      // send site setting to the server and then reload the page to reflect
-      // changes
-      if (targetSetting === 'backend') {
-        return CRM.api4('RiverleaStream', 'activate', {
-          where: [['name', '=', streamName]],
-          backOrFront: targetSetting
-        })
-        .then(() => window.location.reload());
-      }
-      // send site setting to the server and then update the card positions
-      else if (targetSetting === 'frontend') {
-        return CRM.api4('RiverleaStream', 'activate', {
-          where: [['name', '=', streamName]],
-          backOrFront: targetSetting
-        })
-        .then(() => this.render());
-      }
+      const settingName = (targetSetting === 'frontend') ? 'theme_frontend' : 'theme_backend';
+      // if we update the backend setting, refresh the page to reflect changes
+      // if we update the frontend, just rerender
+      const afterUpdate = (targetSetting === 'frontend') ? () => this.render() : () => window.location.reload();
 
-      return Promise.resolve();
+      return CRM.api4('Setting', 'set', {
+        values: {
+          [settingName]: streamName
+        }
+      })
+      .then(afterUpdate);
     }
 
     confirmThenUpdate(targetSetting, streamName, streamLabel) {
