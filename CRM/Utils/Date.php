@@ -973,12 +973,11 @@ class CRM_Utils_Date {
    */
   public static function getDateFieldViewFormat($format) {
     $supportableFormats = [
-      'mm/dd' => '%B %E%f',
-      'dd-mm' => '%E%f %B',
+      'mm/dd' => '%B %E',
+      'dd-mm' => '%E %B',
       'yy-mm' => '%Y %B',
       'M yy' => '%b %Y',
       'yy' => '%Y',
-      'dd/mm/yy' => '%E%f %B %Y',
     ];
 
     return array_key_exists($format, $supportableFormats) ? $supportableFormats[$format] : self::pickBestSmartyFormat($format);
