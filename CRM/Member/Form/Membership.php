@@ -1260,7 +1260,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
         unset($membershipParams['contribution_status_id']);
         $membershipParams['skipLineItem'] = TRUE;
-        unset($membershipParams['lineItems']);
+        unset($membershipParams['lineItems'], $membershipParams['total_amount'], $membershipParams['tax_amount']);
         $membershipParams['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'Membership');
         $this->setMembership((array) CRM_Member_BAO_Membership::create($membershipParams));
         $lineItem[$this->_priceSetId][$id]['entity_id'] = $this->membership['id'];
