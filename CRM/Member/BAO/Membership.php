@@ -49,13 +49,10 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    */
   public static function add(&$params) {
     $oldStatus = $oldType = NULL;
-    if ($params['id']) {
-      CRM_Utils_Hook::pre('edit', 'Membership', $params['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'Membership', NULL, $params);
-    }
-    $id = $params['id'];
+    $hook = !empty($params['id']) ? 'edit' : 'create';
+    CRM_Utils_Hook::pre($hook, 'Membership', $params['id'] ?? NULL, $params);
+    $id = $params['id'] ?? NULL;
+
     // we do this after the hooks are called in case it has been altered
     if ($id) {
       $membershipObj = new CRM_Member_DAO_Membership();
@@ -205,16 +202,14 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    * Takes an associative array and creates a membership object.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
-   * @param array $ids
-   *   Deprecated parameter The array that holds all the db ids.
+   *   array of name/value pairs.
    *
-   * @return CRM_Member_BAO_Membership|CRM_Core_Error
+   * @return CRM_Member_BAO_Membership
    * @throws \CRM_Core_Exception
    *
    * @throws CRM_Core_Exception
    */
-  public static function create(&$params, $ids = []) {
+  public static function create($params) {
     $isLifeTime = FALSE;
     if (!empty($params['membership_type_id'])) {
       $memTypeDetails = CRM_Member_BAO_MembershipType::getMembershipType($params['membership_type_id']);
@@ -299,7 +294,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     $transaction = new CRM_Core_Transaction();
 
-    $params['id'] ??= $ids['membership'] ?? NULL;
     $membership = self::add($params);
 
     $params['membership_id'] = $membership->id;
@@ -338,10 +332,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         if (!empty($params['lineItems'])) {
           CRM_Core_Error::deprecatedWarning('do not pass in lineItems');
           $params['line_item'] = $params['lineItems'];
-        }
-        // do cleanup line items if membership edit the Membership type.
-        if (!empty($ids['membership'])) {
-          CRM_Price_BAO_LineItem::deleteLineItems($ids['membership'], 'civicrm_membership');
         }
         // @todo - we should ONLY do the below if a contribution is created. Let's
         // get some deprecation notices in here & see where it's hit & work to eliminate.
