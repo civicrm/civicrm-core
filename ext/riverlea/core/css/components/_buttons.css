@@ -95,13 +95,13 @@
 .crm-container a.button.delete-button:link,
 .crm-container a.button.delete,
 .crm-container a.button.delete:link {
-  background: var(--crm-btn-cancel-bg-color);
+  background: var(--crm-btn-danger-bg-color);
   color: var(--crm-btn-cancel-text-color);
 }
 .crm-container a.button.delete-button:hover,
 .crm-container a.button.delete-button:focus,
 .crm-container a.button.delete:hover {
-  background: color-mix(in srgb, var(--crm-btn-cancel-bg-color) 87.5%, #000 12.5%);
+  background: color-mix(in srgb, var(--crm-btn-danger-bg-color) 87.5%, #000 12.5%);
 }
 .crm-container .crm-button-type-cancel:hover,
 .crm-container .crm-button-type-cancel:focus,

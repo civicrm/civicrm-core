@@ -34,8 +34,6 @@
   --crm-btn-height: 31px;
   --crm-btn-icon-spacing: var(--crm-l-medium-1);
   --crm-btn-icon-size: var(--crm-btn-height);
-  --crm-btn-cancel-bg-color: var(--crm-primary-color);
-  --crm-btn-cancel-text-color: var(--crm-primary-text-color);
   --crm-btn-info-bg-color: var(--crm-primary-color);
   --crm-btn-info-text-color: var(--crm-primary-text-color);
   --crm-btn-warning-bg-color: var(--crm-primary-color);
