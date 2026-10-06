@@ -15,6 +15,7 @@
  *
  * @package CiviCRM_APIv3
  */
+use Civi\Api4\LineItem;
 
 /**
  * Adjust Metadata for Delete action.
@@ -96,12 +97,14 @@ function civicrm_api3_membership_create($params) {
   else {
     // edit mode
     $params['action'] = CRM_Core_Action::UPDATE;
-    // @todo remove $ids['membership'] is required in CRM_Price_BAO_LineItem::processPriceSet
-    $ids['membership'] = $params['id'];
+    // do cleanup line items if membership edit the Membership type.
+    LineItem::delete(FALSE)
+      ->addWhere('contribution_id', 'IS NULL')
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addWhere('entity_id', '=', $params['id'])->execute();
   }
 
-  // @todo stop passing $ids (membership and userId may be set above)
-  $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids);
+  $membershipBAO = CRM_Member_BAO_Membership::create($params);
 
   if (property_exists($membershipBAO, 'is_error')) {
     // In case of no valid status for given dates, $membershipBAO
