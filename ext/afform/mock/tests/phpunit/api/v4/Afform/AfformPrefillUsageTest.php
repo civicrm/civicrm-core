@@ -298,4 +298,62 @@ EOHTML;
     $this->assertEquals('ListenerTest', $prefill['Individual1']['values'][0]['fields']['last_name']);
   }
 
+  public function testPrefillEventSetValuesDirectly(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <af-entity data="{contact_type: 'Organization'}" type="Contact" name="Organization1" label="Organization 1" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <div class="af-container">
+      <af-field name="first_name"></af-field>
+      <af-field name="last_name"></af-field>
+      <af-field name="job_title"></af-field>
+    </div>
+  </fieldset>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $listenerCalled = FALSE;
+    \Civi::dispatcher()->addListener('civi.afform.prefill', function(\Civi\Afform\Event\AfformPrefillEvent $event) use (&$listenerCalled) {
+      if ($event->getEntityName() === 'Individual1') {
+        $listenerCalled = TRUE;
+        $this->assertEmpty($event->getRecords());
+        $this->assertNull($event->getValue('first_name'));
+
+        // Set single value and multiple values
+        $event->setValue('first_name', 'DirectFirst');
+        $event->setValues(['last_name' => 'DirectLast', 'job_title' => 'DirectJob']);
+
+        $this->assertEquals('DirectFirst', $event->getValue('first_name'));
+        $this->assertEquals('DirectLast', $event->getValue('last_name'));
+        $this->assertEquals([
+          'first_name' => 'DirectFirst',
+          'last_name' => 'DirectLast',
+          'job_title' => 'DirectJob',
+        ], $event->getValues());
+      }
+      // Organization1 is deliberately untouched to verify it is omitted from output
+    });
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('form')
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertTrue($listenerCalled);
+    $this->assertArrayHasKey('Individual1', $prefill);
+    $this->assertArrayNotHasKey('Organization1', $prefill);
+
+    $fields = $prefill['Individual1']['values'][0]['fields'];
+    $this->assertEquals('DirectFirst', $fields['first_name']);
+    $this->assertEquals('DirectLast', $fields['last_name']);
+    $this->assertEquals('DirectJob', $fields['job_title']);
+  }
+
 }

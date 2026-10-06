@@ -248,8 +248,15 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           }
         }
       }
-      $event = new AfformPrefillEvent($this->_afform, $this->_formDataModel, $this, $entity['type'], $entityName, $this->_entityIds);
+      $this->_entityValues[$entityName] ??= [];
+      $event = new AfformPrefillEvent($this->_afform, $this->_formDataModel, $this, $entity['type'], $entityName, $this->_entityIds, $this->_entityValues[$entityName]);
       \Civi::dispatcher()->dispatch('civi.afform.prefill', $event);
+      if ($event->getRecords()) {
+        $this->_entityValues[$entityName] = $event->getRecords();
+      }
+      else {
+        unset($this->_entityValues[$entityName]);
+      }
     }
   }
 

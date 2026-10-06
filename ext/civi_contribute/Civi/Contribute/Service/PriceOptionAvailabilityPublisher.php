@@ -3,8 +3,6 @@
 namespace Civi\Contribute\Service;
 
 use Civi\Afform\Event\AfformPrefillEvent;
-use Civi\Api4\Action\Afform\Prefill;
-use Civi\Api4\Generic\Result;
 use Civi\Contribute\Utils\PriceFieldUtils;
 use Civi\Core\Service\AutoService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,12 +20,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * check is CreateContribution::getLineItemsForRecord, which re-checks the
  * permission and rejects a restricted value regardless.
  *
- * Two events:
- *   civi.afform.prefill (priority -10):
- *     Per price-bearing entity - stash the flag keyed by entity name.
- *   civi.api.respond (priority 0):
- *     Per API call - inject stashed facts into Afform.prefill responses.
- *
  * Synthetic facts don't survive Submit::preprocessSubmittedValues; the
  * server-side enforcement re-checks the permission directly.
  *
@@ -37,12 +29,9 @@ class PriceOptionAvailabilityPublisher extends AutoService implements EventSubsc
 
   private const FLAG = PriceFieldUtils::RESTRICTED_OPTIONS_FLAG;
 
-  private array $factsByRequest = [];
-
   public static function getSubscribedEvents(): array {
     return [
       'civi.afform.prefill' => ['onAfformPrefill', -10],
-      'civi.api.respond' => ['onApiRespond', 0],
     ];
   }
 
@@ -56,68 +45,7 @@ class PriceOptionAvailabilityPublisher extends AutoService implements EventSubsc
       return;
     }
 
-    $requestId = spl_object_id($event->getApiRequest());
-    $this->factsByRequest[$requestId][$event->getEntityName()] = [
-      self::FLAG => \CRM_Core_Permission::check('edit contributions'),
-    ];
-  }
-
-  public function onApiRespond($event): void {
-    $apiRequest = $event->getApiRequest();
-    if (!($apiRequest instanceof Prefill)) {
-      return;
-    }
-    $requestId = spl_object_id($apiRequest);
-    $facts = $this->factsByRequest[$requestId] ?? NULL;
-    unset($this->factsByRequest[$requestId]);
-
-    if (!$facts) {
-      return;
-    }
-    $response = $event->getResponse();
-    if (!$response instanceof Result) {
-      return;
-    }
-
-    // The Result is an ArrayObject - getArrayCopy + exchangeArray is the
-    // supported mutation pattern.
-    $values = $response->getArrayCopy();
-
-    // Index existing response entries by entity name for quick lookup.
-    // Entries are missing from the response when no record was loaded for
-    // that entity (e.g. a fresh "create" form has no autofill).
-    $indexByName = [];
-    foreach ($values as $i => $entry) {
-      if (isset($entry['name'])) {
-        $indexByName[$entry['name']] = $i;
-      }
-    }
-
-    foreach ($facts as $entityName => $entityFacts) {
-      if (!isset($indexByName[$entityName])) {
-        // Entity has no response entry - append one so the flag is present
-        // on the first (created-from-scratch) record.
-        $values[] = [
-          'name' => $entityName,
-          'values' => [['fields' => $entityFacts, 'joins' => []]],
-        ];
-        continue;
-      }
-
-      $i = $indexByName[$entityName];
-      if (empty($values[$i]['values'])) {
-        $values[$i]['values'] = [['fields' => [], 'joins' => []]];
-      }
-      foreach ($values[$i]['values'] as $idx => $record) {
-        if (!isset($values[$i]['values'][$idx]['fields'])) {
-          $values[$i]['values'][$idx]['fields'] = [];
-        }
-        foreach ($entityFacts as $field => $value) {
-          $values[$i]['values'][$idx]['fields'][$field] = $value;
-        }
-      }
-    }
-    $response->exchangeArray($values);
+    $event->setValue(self::FLAG, \CRM_Core_Permission::check('edit contributions'));
   }
 
 }
