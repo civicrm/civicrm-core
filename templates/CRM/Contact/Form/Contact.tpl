@@ -97,8 +97,7 @@
   CRM.$(function($) {
     var $form = $("form.{/literal}{$form.formClass}{literal}"),
       action = {/literal}{$action|string_format:"%d"}{literal},
-      cid = {/literal}{$contactId|string_format:"%d"}{literal},
-      _ = CRM._;
+      cid = {/literal}{$contactId|string_format:"%d"}{literal};
 
     $('.crm-accordion-body').each( function() {
       //remove tab which doesn't have any element
@@ -315,7 +314,7 @@
         params.match = match;
         params.exclude = cid ? [cid] : [];
       } else {
-        _.extend(params, match);
+        Object.assign(params, match);
       }
       CRM.api3('contact', action, params).done(function(data) {
         // If a new request has started running, cancel this one.

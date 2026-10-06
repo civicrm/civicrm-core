@@ -51,7 +51,7 @@
 {crmAPI entity="Contact" action="getsingle" var="user" return='display_name' id="user_contact_id"}
 {literal}
 <script type="text/javascript">
-  (function($, _) {
+  (function($) {
     $(function($) {
       var $window = $(window),
         renderedTabs = ['tree'],
@@ -193,15 +193,10 @@
 
       function formatTagSet(info) {
         info.date = CRM.utils.formatDate(info.created_date);
-        info.used_for_label = [];
-        if (undefined !== info.used_for) {
-          _.each(info.used_for.split(','), function(item) {
-            info.used_for_label.push(usedFor[item]);
-          });
-        }
+        info.used_for_label = info.used_for === undefined ? [] : info.used_for.split(',').map((item) => usedFor[item]);
       }
 
-      _.each(tagSets, formatTagSet);
+      Object.values(tagSets).forEach(formatTagSet);
 
       function renderTree($panel) {
         var plugins,
@@ -230,7 +225,7 @@
         function changeSelection(e, data) {
           var tplParams = {
             tagset: tagset,
-            tagsetCount: _.keys(tagSets).length,
+            tagsetCount: Object.keys(tagSets).length,
             adminReserved: CRM.checkPerm('administer reserved tags')
           },
             tree = $('.tag-tree', $panel).jstree(true),
@@ -248,7 +243,7 @@
           } else {
             tplParams.items = data.selected;
             tplParams.hasChildren = tplParams.reserved = tplParams.usages = 0;
-            _.each(data.selected, function(id) {
+            data.selected.forEach((id) => {
               var node = tree.get_node(id);
               tplParams.usages += node.data.usages;
               tplParams.reserved += node.data.is_reserved;
@@ -314,9 +309,7 @@
         function moveTagDialog(e) {
           e.preventDefault();
           var sets = [{key: '0', value: '{/literal}{ts escape='js'}Main Tag Tree{/ts}{literal}'}];
-          _.each(tagSets, function(tagSet) {
-            sets.push({key: tagSet.id, value: tagSet.label});
-          });
+          Object.values(tagSets).forEach((tagSet) => sets.push({key: tagSet.id, value: tagSet.label}));
           CRM.confirm({
             title: '{/literal}{ts escape='js'}Move to Tagset{/ts}{literal}',
             message: '<label for="select-tagset">{/literal}{ts escape='js'}Select Tagset{/ts}{literal}: '
@@ -327,10 +320,7 @@
             .on('crmConfirm:yes', function() {
               var chosen = parseInt($('#select-tagset').val());
               if (parseInt(tagset) !== chosen) {
-                var apiCalls = [];
-                _.each(selected, function(id) {
-                  apiCalls.push(['Tag', 'create', {id: id, parent_id: chosen || ''}]);
-                });
+                var apiCalls = selected.map((id) => ['Tag', 'create', {id: id, parent_id: chosen || ''}]);
                 $('#mainTabContainer').block();
                 CRM.api3(apiCalls, true)
                   .done(function() {
@@ -346,13 +336,7 @@
         }
 
         function isDraggable(nodes, event) {
-          var draggable = true;
-          _.each(nodes, function(node) {
-            if (node.data.is_reserved && !CRM.checkPerm('administer reserved tags')) {
-              draggable = false;
-            }
-          });
-          return draggable;
+          return !nodes.some((node) => node.data.is_reserved && !CRM.checkPerm('administer reserved tags'));
         }
 
         $panel
@@ -433,7 +417,7 @@
           else {
             if (this.timer) clearTimeout(this.timer);
             this.timer = setTimeout(function() {
-              if (_.isEmpty(window.searchedString) || window.searchedString !== searchString) {
+              if (!window.searchedString || window.searchedString !== searchString) {
                 window.searchedString = searchString;
                 element.trigger('change');
               }
@@ -491,7 +475,7 @@
       });
 
     });
-  })(CRM.$, CRM._);
+  })(CRM.$);
 </script>
 <style>
   div.tag-tree-wrapper {
