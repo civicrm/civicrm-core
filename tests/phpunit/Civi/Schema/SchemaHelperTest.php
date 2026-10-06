@@ -216,40 +216,4 @@ class SchemaHelperTest extends \CiviUnitTestCase {
     $this->assertTrue(\Civi::schemaHelper()->indexExists('civicrm_activity', 'index_status_id'));
   }
 
-  /**
-   * Execute a callback. Capture and return any PHP errors (which match the given filter).
-   *
-   * @param int $errorMask
-   *   Ex: E_USER_DEPRECATED|E_DEPRECATED
-   * @param callable $callback
-   * @return string[]
-   */
-  public static function captureErrors(int $errorMask, callable $callback): array {
-    $deprecations = [];
-
-    $previousHandler = set_error_handler(
-      function (int $errno, string $errstr, string $errfile = '', int $errline = 0) use (&$deprecations, &$previousHandler, $errorMask) {
-        if ($errno & $errorMask) {
-          $deprecations[] = $errstr;
-          return TRUE;
-        }
-        elseif ($previousHandler !== NULL) {
-          return (bool) $previousHandler($errno, $errstr, $errfile, $errline);
-        }
-        else {
-          return FALSE;
-        }
-      }
-    );
-
-    try {
-      $callback();
-    }
-    finally {
-      restore_error_handler();
-    }
-
-    return $deprecations;
-  }
-
 }
