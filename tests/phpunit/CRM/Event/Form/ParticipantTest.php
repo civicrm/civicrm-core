@@ -873,6 +873,55 @@ London,',
   }
 
   /**
+   * Editing a transferred registration should not require price fields to be
+   * re-submitted.
+   *
+   * Regression test for https://lab.civicrm.org/dev/core/-/work_items/6813 -
+   * getExistingContributionID() deferred to registered_by_id, which (after a
+   * transfer) points at the cancelled original participant whose line item no
+   * longer has a contribution_id, so it wrongly concluded there was no linked
+   * contribution and required price fields to be (re)selected.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testEditTransferredParticipantRegistrationDoesNotRequirePriceSetReselection(): void {
+    $this->createEventOrder();
+    Event::update()->addWhere('id', '=', $this->getEventID())->setValues([
+      'start_date' => 'next week',
+      'allow_selfcancelxfer' => TRUE,
+    ])->execute();
+    $participantId = $this->ids['Participant'][0];
+    $toContactID = $this->individualCreate([], 'to');
+
+    $this->getTestForm('CRM_Event_Form_SelfSvcTransfer', [
+      'contact_id' => $toContactID,
+    ], [
+      'pid' => $participantId,
+      'is_backoffice' => 1,
+    ])->processForm();
+
+    $toParticipant = Participant::get(FALSE)
+      ->addWhere('contact_id', '=', $toContactID)
+      ->execute()->single();
+
+    // Submit the Edit form with no price_* fields, as happens when clicking
+    // Save without changing anything on the (blank) Fees section.
+    $this->getTestForm('CRM_Event_Form_Participant', [
+      'event_id' => $this->getEventID(),
+      'register_date' => date('Ymd'),
+      'status_id' => $toParticipant['status_id'],
+      'role_id' => [$toParticipant['role_id']],
+      'contact_id' => $toParticipant['contact_id'],
+      'source' => 'test',
+    ], [
+      'id' => $toParticipant['id'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm(FormWrapper::VALIDATED);
+
+    $this->assertValidationError([]);
+  }
+
+  /**
    * Get created contact ID.
    *
    * @return int
