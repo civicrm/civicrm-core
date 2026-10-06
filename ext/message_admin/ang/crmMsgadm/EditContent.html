@@ -60,7 +60,7 @@
     </div>
     <div class="panel-body" uib-collapse="!accordions.msg_html">
       <div class="alert alert-warning" ng-if="!$ctrl.isWorkflow && $ctrl.isFullHtmlDocument">
-        {{:: ts('This content is a full HTML document (it has its own doctype/html/head/body). Switching to the rich text editor will discard that wrapper and keep only what is inside <body>. This is normally fine for a User-Driven message, since CiviMail sends it as the body between a separate Header and Footer. If anything in this document\'s <head> is required - for example a <style> block used for a responsive email layout - stay in Raw HTML mode instead, since that would be lost.') }}
+        {{:: ts('This content is a full HTML document (it has its own doctype/html/head/body). Switching to the rich text editor will discard that wrapper and keep only what is inside the body. This is normally fine for a User-Driven message, since CiviMail sends it as the body between a separate Header and Footer. If anything in this document\'s head is required - for example a style block used for a responsive email layout - stay in Raw HTML mode instead, since that would be lost.') }}
         <a href="https://docs.civicrm.org/user/en/latest/email/message-templates/#full-html-documents" target="_blank" class="crm-doc-link no-popup">{{:: ts('Learn more...') }}</a>
       </div>
       <civi-rich-text-input ng-if="$ctrl.isRichText('msg_html')"
