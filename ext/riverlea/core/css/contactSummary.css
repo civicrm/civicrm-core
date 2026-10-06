@@ -309,7 +309,7 @@ div.crm-inline-edit-form div.crm-clear {
 #crm-contact-actions-list a.delete:hover,
 #crm-contact-actions-list a.delete:focus {
   color: var(--crm-danger-text-color);
-  background: color-mix(in srgb, var(--crm-btn-cancel-bg-color) 87.5%, #000 12.5%);
+  background: color-mix(in srgb, var(--crm-dropdown-danger-bg-color) 87.5%, var(--crm-ink) 12.5%);
 }
 
 /* Tags */
