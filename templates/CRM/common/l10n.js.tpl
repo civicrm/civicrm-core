@@ -25,6 +25,7 @@
   CRM.config.allowAlertAutodismissal = {$allowAlertAutodismissal|@json_encode nofilter};
   CRM.config.resourceCacheCode = {$resourceCacheCode|@json_encode nofilter};
   CRM.config.quickAdd = {$quickAdd|@json_encode nofilter};
+  CRM.config.weekBegins = {$weekBegins};
 
   // Merge entityRef settings
   CRM.config.entityRef = $.extend({ldelim}{rdelim}, {$entityRef|@json_encode nofilter}, CRM.config.entityRef || {ldelim}{rdelim});

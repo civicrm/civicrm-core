@@ -77,6 +77,7 @@
           if (!settings.yearRange && settings.minDate !== null && settings.maxDate !== null) {
             settings.yearRange = '' + CRM.utils.formatDate(settings.minDate, 'yy') + ':' + CRM.utils.formatDate(settings.maxDate, 'yy');
           }
+          settings.firstDay = settings.firstDay ?? CRM.config.weekBegins;
           settings.onSelect = function (dateText, inst) {
             updateDataField();
             if (settings.time !== false) {
