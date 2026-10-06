@@ -208,24 +208,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
 
-    //fix for CRM-3088, default value for discount set.
-    $discountId = NULL;
-    if (!empty($this->_values['discount'])) {
-      $discountId = CRM_Core_BAO_Discount::findSet($this->_eventId, 'civicrm_event');
-      if ($discountId) {
-        if (isset($this->_values['event']['default_discount_fee_id'])) {
-          $discountKey = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue',
-            $this->_values['event']['default_discount_fee_id'],
-            'weight', 'id'
-          );
-
-          $this->_defaults['amount'] = key(array_slice($this->_values['discount'][$discountId],
-            $discountKey - 1, $discountKey, TRUE
-          ));
-        }
-      }
-    }
-
     // add this event's default participant role to defaults array
     // (for cases where participant_role field is included in form via profile)
     if ($this->_values['event']['default_role_id']) {
@@ -721,30 +703,22 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       // we first reset the confirm page so it accepts new values
       $this->controller->resetPage('Confirm');
 
-      //added for discount
-      $discountId = CRM_Core_BAO_Discount::findSet($this->_eventId, 'civicrm_event');
-      $params['amount_level'] = $this->getAmountLevel($params, $discountId);
-      if (!empty($this->_values['discount'][$discountId])) {
-        $params['discount_id'] = $discountId;
-        $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
+      $params['amount_level'] = $this->getAmountLevel($params);
+      $lineItem = [];
+      CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem);
+      if ($params['tax_amount']) {
+        $this->set('tax_amount', $params['tax_amount']);
+      }
+      $submittedLineItems = $this->get('lineItem');
+      if (!empty($submittedLineItems) && is_array($submittedLineItems)) {
+        $submittedLineItems[0] = $lineItem;
       }
       else {
-        $lineItem = [];
-        CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem);
-        if ($params['tax_amount']) {
-          $this->set('tax_amount', $params['tax_amount']);
-        }
-        $submittedLineItems = $this->get('lineItem');
-        if (!empty($submittedLineItems) && is_array($submittedLineItems)) {
-          $submittedLineItems[0] = $lineItem;
-        }
-        else {
-          $submittedLineItems = [$lineItem];
-        }
-        $submittedLineItems = array_filter($submittedLineItems);
-        $this->set('lineItem', $submittedLineItems);
-        $this->set('lineItemParticipantsCount', [$primaryParticipantCount]);
+        $submittedLineItems = [$lineItem];
       }
+      $submittedLineItems = array_filter($submittedLineItems);
+      $this->set('lineItem', $submittedLineItems);
+      $this->set('lineItemParticipantsCount', [$primaryParticipantCount]);
 
       $this->set('amount', $params['amount'] ?? 0);
       $this->set('amount_level', $params['amount_level']);

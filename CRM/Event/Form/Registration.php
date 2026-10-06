@@ -825,7 +825,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if (!$this->getPriceSetID()) {
       return NULL;
     }
-    return $this->getOrder()->getTotalAmountForIdentifier($participantNum);
+    return $this->getOrder()->getTotalAmountForIdentifier($this->getParticipantPageName($participantNum));
   }
 
   /**
@@ -1688,11 +1688,26 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return array
    */
   protected function getSubmittedParticipantValues(int $participantIndex = 0): array {
-    $pageName = $participantIndex === 0 ? 'Register' : 'Participant_' . $participantIndex;
+    $pageName = $this->getParticipantPageName($participantIndex);
     if ($participantIndex !== 0 && $this->getName() === $pageName) {
       return $this->getSubmittedValues();
     }
     return $this->getAllSubmittedValues()[$pageName] ?? [];
+  }
+
+  /**
+   * Get the name of the wizard page a participant's values are submitted
+   * on - 'Register' for the primary (0), 'Participant_N' for additional
+   * participants - matching the keys setPriceSelectionFromUnfilteredMultiFormInput()
+   * tags line items with via getAllSubmittedValues(), and what
+   * controller->exportValues() expects as a page name.
+   *
+   * @param int $participantNumber
+   *
+   * @return string
+   */
+  private function getParticipantPageName(int $participantNumber): string {
+    return $participantNumber === 0 ? 'Register' : 'Participant_' . $participantNumber;
   }
 
   /**
@@ -1758,16 +1773,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * The amount level is the string stored on the contribution record that describes the purchase.
    *
    * @param array $params
-   * @param int|null $discountID
    *
    * @return string
    */
-  protected function getAmountLevel($params, $discountID) {
-    // @todo move handling of discount ID to the BAO function - preferably by converting it to a price_set with
-    // time settings.
-    if (!empty($this->_values['discount'][$discountID])) {
-      return $this->_values['discount'][$discountID][$params['amount']]['label'];
-    }
+  protected function getAmountLevel($params) {
     if (empty($params['priceSetId'])) {
       // CRM-17509 An example of this is where the person is being waitlisted & there is no payment.
       // ideally we would have calculated amount first & only call this is there is an
@@ -2045,20 +2054,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   protected function buildAmount(): void {
     $form = $this;
-    $discountId = NULL;
     $feeFields = $this->getPriceFieldMetaData();
-
-    //check for discount.
-    $discountedFee = $form->_values['discount'] ?? NULL;
-    if (is_array($discountedFee) && !empty($discountedFee)) {
-      CRM_Core_Error::deprecatedWarning('code believed to be unreachable.');
-      if (!$discountId) {
-        $form->_discountId = $discountId = CRM_Core_BAO_Discount::findSet($form->_eventId, 'civicrm_event');
-      }
-      if ($discountId) {
-        $feeFields = &$form->_values['discount'][$discountId];
-      }
-    }
 
     //reset required if participant is skipped.
     $button = substr($form->controller->getButtonName(), -4);
