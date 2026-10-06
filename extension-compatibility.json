@@ -73,5 +73,9 @@
   "afform_payments": {
     "obsolete": "6.14",
     "force-uninstall": true
+  },
+  "checknumberpaymentmethod": {
+    "obsolete": "6.20",
+    "force-uninstall": true
   }
 }
