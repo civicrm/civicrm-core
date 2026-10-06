@@ -29,6 +29,8 @@ trait WriteTrait {
    * @throws \CRM_Core_Exception
    */
   protected function formatWriteValues(&$record, $entityName = NULL, $actionName = NULL) {
+    // start with canonical field values so checks don't need to deal with :pseudoconstants
+    parent::formatWriteValues($record, $entityName, $actionName);
 
     if ($this->getCheckPermissions()) {
       // We must have a logged in user if we're checking permissions.
@@ -61,7 +63,6 @@ trait WriteTrait {
         throw new \CRM_Core_Exception("Disallowing empty password.");
       }
     }
-    parent::formatWriteValues($record);
   }
 
   /**
