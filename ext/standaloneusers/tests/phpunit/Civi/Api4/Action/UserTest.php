@@ -666,11 +666,35 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->assertStringContainsString("Authorization failed", $e->getMessage());
     }
 
+    // ...via UserRole.create and pseudoconstant
+    try {
+      UserRole::create(TRUE)
+        ->addValue('user_id', $this->nonAdminUserID)
+        ->addValue('role_id.name', 'admin')
+        ->execute();
+      $this->fail("UserRole::create should have thrown exception");
+    }
+    catch (\Exception $e) {
+      $this->assertStringContainsString("Authorization failed", $e->getMessage());
+    }
+
     // ...via editing own user.
     try {
       User::update(TRUE)
         ->addWhere('id', '=', $this->nonAdminUserID)
         ->addValue('roles', [$adminRoleID])
+        ->execute();
+      $this->fail("User::update should have thrown exception");
+    }
+    catch (\Exception $e) {
+      $this->assertEquals("Not allowed to change roles", $e->getMessage());
+    }
+
+    // via editing own user and pseudoconstant suffix
+    try {
+      User::update(TRUE)
+        ->addWhere('id', '=', $this->nonAdminUserID)
+        ->addValue('roles:name', ['admin'])
         ->execute();
       $this->fail("User::update should have thrown exception");
     }
