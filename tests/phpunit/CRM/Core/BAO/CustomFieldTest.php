@@ -493,6 +493,30 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertNotEquals($fieldID, $otherFieldID);
   }
 
+  public function testGetTableColumnGroup(): void {
+    $group1 = $this->createCustomField('cg1');
+    $field1ID = $this->customFieldID;
+
+    $group2 = $this->createCustomField('cg2');
+    $field2ID = $this->customFieldID;
+
+    [$tableName, $columnName, $groupID] = CRM_Core_BAO_CustomField::getTableColumnGroup($field1ID);
+    $this->assertEquals($group1['table_name'], $tableName);
+    $this->assertEquals($group1['id'], $groupID);
+    $this->assertEquals("testfld_{$field1ID}", $columnName);
+
+    $this->customGroupDelete($group1['id']);
+
+    [$tableName, $columnName, $groupID] = CRM_Core_BAO_CustomField::getTableColumnGroup($field2ID);
+    $this->assertEquals($group2['table_name'], $tableName);
+    $this->assertEquals($group2['id'], $groupID);
+    $this->assertEquals("testfld_{$field2ID}", $columnName);
+
+    // Field1 has been deleted.
+    $this->expectException(CRM_Core_Exception::class);
+    CRM_Core_BAO_CustomField::getTableColumnGroup($field1ID);
+  }
+
   /**
    * Create a custom field
    *
@@ -513,7 +537,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     ];
     $field = CRM_Core_BAO_CustomField::create($fields);
     $this->customFieldID = $field->id;
-    return $customGroup;
+    return $customGroup['values'][$customGroup['id']];
   }
 
   /**

@@ -119,8 +119,6 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
 
     //refresh php cached variables
     CRM_Core_PseudoConstant::flush();
-    CRM_Core_BAO_CustomField::getTableColumnGroup($this->individualFieldID);
-    CRM_Core_BAO_CustomField::getTableColumnGroup($this->individualStudentFieldID);
   }
 
   public function tearDown(): void {
