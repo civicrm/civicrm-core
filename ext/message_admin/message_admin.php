@@ -56,9 +56,9 @@ function message_admin_civicrm_searchKitTasks(array &$tasks, bool $checkPermissi
     ];
   }
 
-  // `revert` has no entry in getEntityActionPermissions(), so it falls back to the
-  // stricter default rather than the permissions `update` uses. Ask the API which
-  // actions this user has rather than restating that fallback here.
+  // `revert` has its own entry in getEntityActionPermissions() - the permissions that
+  // can edit system workflow templates, the only ones with an original to revert to.
+  // Ask the API which actions this user has rather than restating that set here.
   $canRevert = civicrm_api4('MessageTemplate', 'getActions', [
     'checkPermissions' => $checkPermissions,
     'where' => [['name', '=', 'revert']],

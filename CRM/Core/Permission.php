@@ -1701,6 +1701,8 @@ class CRM_Core_Permission {
       'get' => ['access CiviCRM'],
       'create' => [['edit message templates', 'edit user-driven message templates', 'edit system workflow message templates']],
       'update' => [['edit message templates', 'edit user-driven message templates', 'edit system workflow message templates']],
+      // Only system workflow templates have a packaged original to revert to
+      'revert' => [['edit message templates', 'edit system workflow message templates']],
     ];
 
     $permissions['report_template']['update'] = 'save Report Criteria';

@@ -10,6 +10,8 @@ return [
   // not in this Afform's own layout HTML, so the usual element-scan dependency mapper
   // (AngularDependencyMapper) never sees it and never loads either module for us -
   // `crmMsgadm` for the partial's own path, `crmEntityTags` for the directive it uses.
+  // `crmMsgadm` also exports the template-editing permissions to CRM.checkPerm(), which
+  // the tabs' ng-if checks.
   'requires' => ['crmMsgadm', 'crmEntityTags'],
   'server_route' => 'civicrm/admin/messageTemplates',
   'permission' => [

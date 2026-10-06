@@ -27,7 +27,8 @@ return [
             'msg_title',
             // `master_id` is a correlated subquery, which MySQL rejects alongside GROUP BY
             // under ONLY_FULL_GROUP_BY. It also cannot be aliased back to its own field name.
-            'MAX(master_id) AS customized',
+            // Boolean, so the listing's "Modified" filter renders as Yes/No.
+            'ISNOTNULL(MAX(master_id)) AS customized',
             // Each pair concatenates the same raw column in the same order, so `:label` is
             // applied per value afterwards and the two arrays stay index-aligned for the
             // per-language link.
@@ -35,6 +36,8 @@ return [
             'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_02.language ORDER BY MessageTemplate_Translation_entity_id_02.language ASC) AS translation_codes',
             'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_03.language:label ORDER BY MessageTemplate_Translation_entity_id_03.language ASC) AS draft_languages',
             'GROUP_CONCAT(DISTINCT MessageTemplate_Translation_entity_id_03.language ORDER BY MessageTemplate_Translation_entity_id_03.language ASC) AS draft_codes',
+            // Read only by the listing's "Has drafts" boolean filter.
+            'ISNOTNULL(MAX(MessageTemplate_Translation_entity_id_03.id)) AS has_drafts',
             // A document-upload template (.docx/.odt) has no on-screen editor yet, so it keeps
             // using the classic edit form - this is non-empty only for those rows.
             'MAX(MessageTemplate_EntityFile_File_01.id) AS has_document',
@@ -94,11 +97,12 @@ return [
         'label' => E::ts('System Workflow Messages'),
         'saved_search_id.name' => 'Message_Templates_Workflow',
         'type' => 'table',
-        // The `has_document` join is a bridge entity (EntityFile) with no ACL delegate
-        // registered for civicrm_msg_template, so it denies access under normal permission
-        // checking. Visibility of this listing is already gated by the page's own
-        // 'edit system workflow message templates' permission, so bypassing ACLs here
-        // exposes nothing new.
+        // Permission checks would silently drop two of this search's joins: the File join
+        // behind `has_document` (which needs 'access uploaded files'),
+        // and the Translation joins (which need 'translate CiviCRM'). Skipping the checks is
+        // safe because this display only runs inside the Message Templates form, which needs
+        // a template-editing permission, although users without 'translate CiviCRM'
+        // can see which languages a template is translated into.
         'acl_bypass' => TRUE,
         'settings' => [
           'limit' => 50,
@@ -143,16 +147,23 @@ return [
               ],
             ],
             [
-              'type' => 'field',
-              'key' => 'customized',
+              'type' => 'buttons',
               'label' => E::ts('Modified'),
-              // The aggregate holds the id of the packaged original, which means nothing to a
-              // reader - `empty_value` covers the unmodified rows and `rewrite` the rest.
-              'empty_value' => E::ts('No'),
-              'rewrite' => E::ts('Yes'),
-              'title' => E::ts('Whether this template has been changed from the packaged default'),
-              'cssRules' => [
-                ['font-italic', 'customized', 'IS EMPTY'],
+              'size' => 'btn-xs',
+              'links' => [
+                [
+                  'task' => 'revert',
+                  'icon' => 'fa-undo',
+                  'text' => E::ts('Revert'),
+                  'title' => E::ts('Discard changes and restore the packaged default'),
+                  'style' => 'default',
+                  // Only a template that differs from its packaged original has anything to
+                  // revert to.
+                  'conditions' => [
+                    ['customized', 'IS NOT EMPTY'],
+                    ['check user permission', 'CONTAINS', ['edit message templates', 'edit system workflow message templates']],
+                  ],
+                ],
               ],
             ],
             [
@@ -188,18 +199,6 @@ return [
                   'text' => E::ts('Edit'),
                   'style' => 'default',
                   'conditions' => [['has_document', 'IS EMPTY']],
-                ],
-                [
-                  'task' => 'revert',
-                  'icon' => 'fa-undo',
-                  'text' => E::ts('Revert to Default'),
-                  'style' => 'default',
-                  // Only a template that differs from its packaged original has anything to
-                  // revert to, and `revert` falls back to the default permission.
-                  'conditions' => [
-                    ['customized', 'IS NOT EMPTY'],
-                    ['check user permission', '=', ['administer CiviCRM']],
-                  ],
                 ],
               ],
             ],
