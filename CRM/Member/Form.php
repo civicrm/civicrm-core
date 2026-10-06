@@ -469,14 +469,17 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   /**
    * Get the revenue recognition date for the membership's contribution.
    *
+   * @param string|null $startDate
+   *   The membership start date, if it has not been saved yet.
+   *
    * @return string
    *
    * @throws \CRM_Core_Exception
    */
-  protected function getDeferredRevenueRecognitionDate(): string {
+  protected function getDeferredRevenueRecognitionDate(?string $startDate = NULL): string {
     if (Civi::settings()->get('deferred_revenue_enabled')) {
       // Read fresh - the cached membership may pre-date the save that set the start date.
-      $startDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getMembershipID(), 'start_date');
+      $startDate ??= CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->getMembershipID(), 'start_date');
       if ($startDate) {
         return date('Ymd', strtotime($startDate));
       }
@@ -692,24 +695,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
         'membership_type_id' => $this->getSubmittedValue('membership_type_id'),
       ]));
     }
-  }
-
-  /**
-   * Get order related params.
-   *
-   * In practice these are contribution params but later they cann be used with the Order api.
-   *
-   * @return array
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function getOrderParams(): array {
-    return [
-      'lineItems' => [$this->_priceSetId => $this->order->getLineItems()],
-      // This is one of those weird & wonderful legacy params we aim to get rid of.
-      'processPriceSet' => TRUE,
-      'tax_amount' => $this->order->getTotalTaxAmount(),
-    ];
   }
 
   /**

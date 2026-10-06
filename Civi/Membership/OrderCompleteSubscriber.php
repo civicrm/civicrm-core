@@ -98,7 +98,6 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
         ->addWhere('contribution_id', '=', $contributionID)
         ->addWhere('entity_table', '=', 'civicrm_membership')
         ->addWhere('entity_id', '=', $membership['id'])
-        ->addWhere('contribution_id.contact_id', '=', $membershipParams['contact_id'])
         ->execute()
         ->first();
       if (!empty($membershipLineItem) && !empty($membershipLineItem['price_field_value.membership_type_id'])) {
