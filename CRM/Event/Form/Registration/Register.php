@@ -703,12 +703,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       // we first reset the confirm page so it accepts new values
       $this->controller->resetPage('Confirm');
 
-      $params['amount_level'] = $this->getAmountLevel($params);
       $lineItem = [];
       CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem);
-      if ($params['tax_amount']) {
-        $this->set('tax_amount', $params['tax_amount']);
-      }
       $submittedLineItems = $this->get('lineItem');
       if (!empty($submittedLineItems) && is_array($submittedLineItems)) {
         $submittedLineItems[0] = $lineItem;

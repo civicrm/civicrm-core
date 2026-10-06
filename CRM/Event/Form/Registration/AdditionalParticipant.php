@@ -683,7 +683,6 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
       if ($this->isPaidEvent()) {
 
-        $params['amount_level'] = $this->getAmountLevel($params);
         $lineItem = [];
         CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem);
 
