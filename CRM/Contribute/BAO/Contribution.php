@@ -82,6 +82,30 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
   public $trxn_result_code;
 
   /**
+   * Get the back-office payment fields (e.g. check_number, card_type_id) to show/save for a
+   * payment instrument, from the payment_instrument option value's 'grouping' column.
+   *
+   * This is for core's own use, leveraging CRM_Core_BAO_OptionValue::getOptionValuesArray()'s
+   * cache. Anything outside core should use the 'payment_instrument_fields' field on the
+   * OptionValue APIv4 entity instead.
+   *
+   * @param int|string $paymentInstrumentID
+   *
+   * @return array
+   *
+   * @internal
+   */
+  public static function getPaymentInstrumentFields($paymentInstrumentID): array {
+    $optionGroupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'payment_instrument', 'id', 'name');
+    foreach (CRM_Core_BAO_OptionValue::getOptionValuesArray($optionGroupID) as $optionValue) {
+      if ((string) $optionValue['value'] === (string) $paymentInstrumentID) {
+        return (array) json_decode((string) ($optionValue['grouping'] ?? ''), TRUE);
+      }
+    }
+    return [];
+  }
+
+  /**
    * Takes an associative array and creates a contribution object.
    *
    * the function extract all the params it needs to initialize the create a
@@ -135,8 +159,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     self::calculateMissingAmountParams($params, $contributionID);
 
     if (!empty($params['payment_instrument_id'])) {
-      $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument('name');
-      if ($params['payment_instrument_id'] != array_search('Check', $paymentInstruments)) {
+      if (!in_array('check_number', self::getPaymentInstrumentFields($params['payment_instrument_id']), TRUE)) {
         $params['check_number'] = 'null';
       }
     }
@@ -1098,7 +1121,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     while ($resultDAO->fetch()) {
       $paidByLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
-      $paidByName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $resultDAO->payment_instrument_id);
       if ($resultDAO->card_type_id) {
         $creditCardType = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $resultDAO->card_type_id);
         $pantruncation = '';
@@ -1149,7 +1171,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
         'currency' => $resultDAO->currency,
         'action' => $paymentEditLink,
       ];
-      if ($paidByName === 'Check') {
+      if (in_array('check_number', self::getPaymentInstrumentFields($resultDAO->payment_instrument_id), TRUE)) {
         $val['check_number'] = $resultDAO->check_number;
       }
       else {

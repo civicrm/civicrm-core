@@ -96,6 +96,58 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
 
     $this->addTask('Register Events as taggable', 'registerEventTagUsedFor');
     $this->addTask('Register Message Templates as taggable', 'registerMessageTemplateTagUsedFor');
+
+    $this->addTask('Set payment_instrument field-display groupings', 'setPaymentInstrumentGroupings');
+  }
+
+  /**
+   * Backfill the payment_instrument option values' 'grouping' column.
+   *
+   * Sites created before this column was code-managed have it empty on the reserved Check and
+   * Credit Card instruments. The 'payment_instrument_fields' computed field
+   * (Civi\Api4\Service\Spec\Provider\OptionValueGetSpecProvider) reads 'grouping' directly with
+   * no other fallback, so it needs to be set here for those instruments to keep showing their
+   * back-office fields (check_number, card_type_id, etc.). Debit Card is deliberately left out:
+   * the pre-existing CRM_Core_Payment_Manual::getPaymentFormFields() this replaces never showed
+   * these fields for Debit Card either.
+   *
+   * Sites using the 'checknumberpaymentmethod' extension
+   * (https://lab.civicrm.org/extensions/checknumberpaymentmethod) have configured additional,
+   * non-reserved payment instruments to show check_number via its 'check_payment_instrument_ids'
+   * setting instead. Carry that configuration over to 'grouping' too, so those instruments keep
+   * showing the field once core handles this natively.
+   */
+  public static function setPaymentInstrumentGroupings(): bool {
+    $groupings = [
+      'Check' => '["check_number"]',
+      'Credit Card' => '["card_type_id","pan_truncation"]',
+    ];
+    foreach ($groupings as $name => $grouping) {
+      CRM_Core_DAO::executeQuery("
+        UPDATE civicrm_option_value ov
+        INNER JOIN civicrm_option_group og ON og.id = ov.option_group_id AND og.name = 'payment_instrument'
+        SET ov.grouping = %1
+        WHERE ov.name = %2 AND (ov.grouping IS NULL OR ov.grouping = '')
+      ", [
+        1 => [$grouping, 'String'],
+        2 => [$name, 'String'],
+      ]);
+    }
+
+    if (CRM_Extension_System::singleton()->getManager()->isEnabled('checknumberpaymentmethod')) {
+      $checkInstrumentIDs = (array) Civi::settings()->get('check_payment_instrument_ids');
+      foreach ($checkInstrumentIDs as $checkInstrumentID) {
+        CRM_Core_DAO::executeQuery("
+          UPDATE civicrm_option_value ov
+          INNER JOIN civicrm_option_group og ON og.id = ov.option_group_id AND og.name = 'payment_instrument'
+          SET ov.grouping = '[\"check_number\"]'
+          WHERE ov.value = %1 AND (ov.grouping IS NULL OR ov.grouping = '')
+        ", [
+          1 => [$checkInstrumentID, 'Integer'],
+        ]);
+      }
+    }
+    return TRUE;
   }
 
   /**
