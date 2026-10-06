@@ -792,16 +792,6 @@ html.crm-standalone  nav.breadcrumb>ol {
   --crm-page-bg-color: transparent;
 }
 
-/* Override contactSummary.css */
-#crm-contact-actions-list a.delete {
-  --crm-danger-text-color: var(--crm-c-red-dark);
-}
-#crm-contact-actions-list a.delete:hover,
-#crm-contact-actions-list a.delete:focus {
-  /* the hover state gives crm-c-red-dark to the background */
-  --crm-danger-text-color: var(--crm-c-red-light);
-}
-
 /* Fix Mosaico wizard */
 .crm_wizard__tille {
   --crm-panel-bg-color: transparent;
