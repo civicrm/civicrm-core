@@ -95,21 +95,22 @@
         // does not apply: not a contact entity, or an existing record.
         const duplicateCheckValues = () => {
           const entity = ctrl.getEntity();
-          if (!afDuplicateContacts.enabled() || !entity || entity.id || !(CRM.af.contactEntityTypes || []).includes(entity.type)) {
+          if (!afDuplicateContacts.enabled() || !entity || entity.id || !entity.dupeCheckRule) {
             return null;
           }
           const item = ctrl.getData()[0] || {};
           const fields = item.fields || {};
+          const email = (item.joins?.Email?.[0] || {}).email;
           const values = {};
-          (CRM.af.checkSimilarContactFields || []).forEach((name) => {
-            if (fields[name]) {
+          // Fields named by the rule that this form doesn't collect are simply skipped.
+          (CRM.af.dedupeRuleFields[entity.dupeCheckRule] || []).forEach((name) => {
+            if (name === 'email' && email) {
+              values.email = email;
+            }
+            else if (fields[name]) {
               values[name] = fields[name];
             }
           });
-          const email = (item.joins?.Email?.[0] || {}).email;
-          if (email) {
-            values.email = email;
-          }
           return {
             contactType: entity.type === 'Contact' ? (entity.data || {}).contact_type : entity.type,
             values: values

@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Afform;
 
+use Civi\Afform\Behavior\ContactDupeCheck;
 use Civi\Test\HeadlessInterface;
 
 /**
@@ -16,37 +17,38 @@ class DuplicateContactCheckTest extends \PHPUnit\Framework\TestCase implements H
 
   public function tearDown(): void {
     $this->setPermissions(NULL);
-    \Civi::settings()->revert('contact_ajax_check_similar');
     parent::tearDown();
   }
 
-  public function testSettingsWhenEnabled(): void {
+  public function testSettingsWhenPermitted(): void {
     $this->setPermissions(['access CiviCRM']);
-    \Civi::settings()->set('contact_ajax_check_similar', 1);
 
     $settings = DuplicateContactCheck::getSettings();
 
     $this->assertTrue($settings['checkSimilarContacts']);
     $this->assertSame(DuplicateContactCheck::MIN_LENGTH, $settings['checkSimilarMinLength']);
-    $this->assertContains('first_name', $settings['checkSimilarContactFields']);
-    $this->assertContains('organization_name', $settings['checkSimilarContactFields']);
-    // An afform entity may be declared as `Contact` or as a specific contact type.
-    $this->assertContains('Contact', $settings['contactEntityTypes']);
-    $this->assertContains('Individual', $settings['contactEntityTypes']);
-  }
-
-  public function testSettingsWhenSettingDisabled(): void {
-    $this->setPermissions(['access CiviCRM']);
-    \Civi::settings()->set('contact_ajax_check_similar', 0);
-
-    $this->assertSame(['checkSimilarContacts' => FALSE], DuplicateContactCheck::getSettings());
+    // Fields come from the dedupe rules, so a form can watch whichever rule it selects.
+    $this->assertSame(['email'], $settings['dedupeRuleFields']['Individual.Unsupervised']);
+    $this->assertEqualsCanonicalizing(
+      ['first_name', 'last_name', 'email'],
+      $settings['dedupeRuleFields']['Individual.Supervised']
+    );
   }
 
   public function testSettingsWithoutPermission(): void {
     $this->setPermissions([]);
-    \Civi::settings()->set('contact_ajax_check_similar', 1);
 
     $this->assertSame(['checkSimilarContacts' => FALSE], DuplicateContactCheck::getSettings());
+  }
+
+  public function testBehaviorOffersARuleForEachContactType(): void {
+    $this->assertEqualsCanonicalizing(
+      ['Individual', 'Household', 'Organization'],
+      ContactDupeCheck::getEntities()
+    );
+    $modes = array_column(ContactDupeCheck::getModes('Individual'), 'name');
+    $this->assertContains('Individual.Supervised', $modes);
+    $this->assertContains('Individual.Unsupervised', $modes);
   }
 
   private function setPermissions(?array $permissions): void {
