@@ -23,3 +23,6 @@ WHERE NOT EXISTS (
   WHERE option_group_id = @option_group_id_activity_type
     AND name = 'Pledge write-off'
 );
+
+-- Add target _blank to offsite links
+UPDATE `civicrm_navigation` SET `target` = '_blank' WHERE `url` LIKE '%civicrm.org/%';

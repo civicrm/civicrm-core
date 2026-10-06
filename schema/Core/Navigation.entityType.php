@@ -148,5 +148,18 @@ return [
       'add' => '3.0',
       'default' => 0,
     ],
+    'target' => [
+      'title' => ts('Link Target'),
+      'sql_type' => 'varchar(16)',
+      'input_type' => 'Select',
+      'description' => ts('How to open the link.'),
+      'add' => '6.20',
+      'input_attrs' => [
+        'label' => ts('Open Link as'),
+      ],
+      'pseudoconstant' => [
+        'callback' => ['CRM_Core_SelectValues', 'navigationMenuTarget'],
+      ],
+    ],
   ],
 ];

@@ -28,6 +28,17 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
    *   The version number matching this function name
    */
   public function upgrade_6_20_alpha1($rev): void {
+    $this->addTask('Add Navigation.target', 'alterSchemaField', 'Navigation', 'target', [
+      'title' => ts('Link Target'),
+      'sql_type' => 'varchar(16)',
+      'input_type' => 'Select',
+      'description' => ts('How to open the link.'),
+      'add' => '6.20',
+      'pseudoconstant' => [
+        'callback' => ['CRM_Core_SelectValues', 'navigationMenuTarget'],
+      ],
+    ]);
+
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Install Order Completion Metadata entity', 'createEntityTable', '6.20.alpha1.OrderCompletionMetadata.entityType.php');
     $this->addTask('Change case start date from date to datetime', 'alterSchemaField', 'Case', 'start_date', [

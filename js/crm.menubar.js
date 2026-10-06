@@ -502,7 +502,7 @@
     branchTpl:
       '<% (items || []).forEach((item) => { %>' +
         '<li <%= attr("li", item) %>>' +
-          '<a <%= attr("a", item) %>>' +
+          '<a <%= attr("a", item) %> <% if (item.target) { %>target=<%- item.target %><% } %>>' +
             '<% if (item.icon) { %>' +
               '<i class="<%- item.icon %>" role="img" aria-hidden="true"></i>' +
             '<% } %>' +

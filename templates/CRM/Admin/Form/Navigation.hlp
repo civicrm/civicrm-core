@@ -24,7 +24,7 @@
 
 
 {htxt id='has_separator'}
-{ts}Check this box to add a separator line between this menu item and the one below it.{/ts}
+{ts}Add a separator line above or below this menu item.{/ts}
 {/htxt}
 
 
@@ -35,4 +35,8 @@
 
 {htxt id='permission_operator'}
 {ts}Set the Operator to "OR" if you've assigned multiple permissions and want access to be granted for any one of them. EXAMPLE: If you assign <em>access CiviContribute</em> and <em>administer CiviCRM</em> to a menu item, and set the Operator to "OR", users who have either of those permissions will have access.{/ts}
+{/htxt}
+
+{htxt id='target'}
+{ts}Select whether this link will open on the same page or in a new tab.{/ts}
 {/htxt}
