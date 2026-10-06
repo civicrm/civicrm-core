@@ -1703,6 +1703,8 @@ class CRM_Core_Permission {
       'update' => [['edit message templates', 'edit user-driven message templates', 'edit system workflow message templates']],
       // Only system workflow templates have a packaged original to revert to
       'revert' => [['edit message templates', 'edit system workflow message templates']],
+      'getTokenSchema' => [['edit message templates', 'edit user-driven message templates', 'edit system workflow message templates']],
+      'getTokens' => [['edit message templates', 'edit user-driven message templates', 'edit system workflow message templates']],
     ];
 
     $permissions['report_template']['update'] = 'save Report Criteria';
