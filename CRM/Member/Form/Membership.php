@@ -1026,11 +1026,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if (!empty($formValues['record_contribution'])) {
       $recordContribution = [
         'total_amount',
-        'payment_instrument_id',
         'trxn_id',
         'contribution_status_id',
         'check_number',
-        'receive_date',
         'card_type_id',
         'pan_truncation',
       ];
@@ -1039,7 +1037,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $params[$f] = $formValues[$f] ?? NULL;
       }
       $params['financial_type_id'] = $this->getFinancialTypeID();
-      $params['campaign_id'] = $this->getSubmittedValue('campaign_id');
 
       $params['contribution_source'] = $this->getContributionSource();
 
@@ -1051,10 +1048,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
         $params['is_pay_later'] = 1;
         $this->assign('is_pay_later', 1);
-      }
-
-      if ($this->getSubmittedValue('send_receipt')) {
-        $params['receipt_date'] = $formValues['receive_date'] ?? NULL;
       }
 
     }
@@ -1111,18 +1104,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->_params = $formValues;
       $contributionAddressID = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
       $contribution = Order::create(FALSE)
-        ->setContributionValues([
+        ->setContributionValues($this->getContributionValues() + [
           'contact_id' => $this->_contributorContactID,
           'address_id' => $contributionAddressID,
-          'is_test' => $this->isTest(),
-          'campaign_id' => $this->getSubmittedValue('campaign_id'),
           'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
-          'payment_instrument_id' => $this->getPaymentInstrumentID(),
           'financial_type_id' => $this->getFinancialTypeID(),
-          'receive_date' => $this->getReceiveDate(),
-          'invoice_id' => $this->getInvoiceID(),
-          'currency' => $this->getCurrency(),
-          'receipt_date' => $this->getSubmittedValue('send_receipt') ? date('YmdHis') : NULL,
           'contribution_recur_id' => $this->getContributionRecurID(),
         ])
         ->setLineItems($this->getLineItemForOrderApi())
@@ -1196,13 +1182,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
       $now = CRM_Utils_Time::date('YmdHis');
-      $params['receive_date'] = CRM_Utils_Time::date('Y-m-d H:i:s');
-      $params['invoice_id'] = $this->getInvoiceID();
       $params['contribution_source'] = $this->getContributionSource();
       $params['source'] = $formValues['source'] ?: $params['contribution_source'];
       $params['trxn_id'] = $result['trxn_id'] ?? NULL;
-      $params['is_test'] = $this->isTest();
-      $params['receipt_date'] = NULL;
       if ($this->getSubmittedValue('send_receipt') && $paymentStatus === 'Completed') {
         // @todo this should be updated by the send function once sent rather than
         // set here.
@@ -1245,10 +1227,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           continue;
         }
 
-        // @todo figure out why receive_date isn't being set right here.
-        if (empty($params['receive_date'])) {
-          $params['receive_date'] = CRM_Utils_Time::date('Y-m-d H:i:s');
-        }
         $membershipParams = array_merge($params, $membershipTypeValues[$lineItemValues['membership_type_id']]);
 
         // If is_override is empty then status_id="" (because it's a hidden field). That will trigger a recalculation in CRM_Member_BAO_Membership::create
@@ -1366,10 +1344,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @throws \CRM_Core_Exception
    */
   private function recordMembershipContribution($params) {
-    $contributionParams = [];
-    $config = CRM_Core_Config::singleton();
-    $contributionParams['currency'] = $config->defaultCurrency;
-    $contributionParams['receipt_date'] = !empty($params['receipt_date']) ? $params['receipt_date'] : 'null';
+    $contributionParams = $this->getContributionValues();
     $contributionParams['source'] = $params['contribution_source'] ?? NULL;
     $contributionParams['non_deductible_amount'] = 'null';
     $contributionParams['skipCleanMoney'] = TRUE;
@@ -1380,15 +1355,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       'contact_id',
       'fee_amount',
       'total_amount',
-      'receive_date',
       'financial_type_id',
-      'payment_instrument_id',
       'trxn_id',
-      'invoice_id',
-      'is_test',
       'contribution_status_id',
       'check_number',
-      'campaign_id',
       'is_pay_later',
       'membership_id',
       'tax_amount',
@@ -1991,15 +1961,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       1 => $this->getSelectedMembershipLabels(),
       2 => $userName,
     ]);
-  }
-
-  /**
-   * Get the receive date for the contribution.
-   *
-   * @return string $receive_date
-   */
-  protected function getReceiveDate(): string {
-    return $this->getSubmittedValue('receive_date') ?: date('YmdHis');
   }
 
   /**

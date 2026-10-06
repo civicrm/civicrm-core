@@ -507,8 +507,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->_params['register_date'] = $now;
       $this->_params['description'] = ts("Contribution submitted by a staff person using member's credit card for renewal");
       $this->_params['amount'] = $this->_params['total_amount'];
-      $this->_params['payment_instrument_id'] = $this->_paymentProcessor['payment_instrument_id'];
-      $this->_params['receive_date'] = $now;
 
       // at this point we've created a contact and stored its address etc
       // all the payment processors expect the name and address to be in the passed params
@@ -532,7 +530,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'payment_processor_id' => $this->getPaymentProcessorID(),
           'financial_type_id' => $this->_params['financial_type_id'],
           'is_email_receipt' => (bool) $this->getSubmittedValue('send_receipt'),
-          'payment_instrument_id' => $this->_params['payment_instrument_id'],
+          'payment_instrument_id' => $this->getPaymentInstrumentID(),
           'invoice_id' => $this->getInvoiceID(),
         ], $paymentParams['membership_type_id'][1]);
 
@@ -550,7 +548,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
       $this->_params['contribution_status_id'] = $result['payment_status_id'];
       $this->_params['trxn_id'] = $result['trxn_id'];
-      $this->_params['is_test'] = ($this->_mode === 'live') ? 0 : 1;
       $this->set('params', $this->_params);
       $this->assign('trxn_id', $result['trxn_id']);
     }
@@ -607,7 +604,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   private function saveOrder(array $membershipValues, array $renewalDates, bool $pending, ?int $contributionRecurID): int {
     [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
     $userName = htmlentities((string) $userName);
-    $receiveDate = ($this->_params['receive_date'] ?? NULL) ?: date('YmdHis');
 
     $this->_params = $this->setPriceSetParameters($this->_params);
     foreach ($this->order->getLineItems() as $index => $lineItem) {
@@ -626,18 +622,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     $contribution = Order::create(FALSE)
-      ->setContributionValues([
+      ->setContributionValues($this->getContributionValues() + [
         'contact_id' => $this->_contributorContactID,
         'financial_type_id' => $this->_params['financial_type_id'],
-        'payment_instrument_id' => $this->_params['payment_instrument_id'] ?? NULL,
-        'receive_date' => $receiveDate,
         'source' => "{$this->getMembershipTypeValue('name')} Membership: Offline membership renewal (by {$userName})",
-        'receipt_date' => $this->_params['receipt_date'] ?? NULL,
-        'invoice_id' => $this->getInvoiceID(),
-        'currency' => $this->getCurrency(),
-        'is_test' => !empty($this->_params['is_test']),
         'is_pay_later' => $pending,
-        'campaign_id' => $this->_params['campaign_id'] ?? NULL,
         'check_number' => $this->_params['check_number'] ?? NULL,
         'trxn_id' => $this->_params['trxn_id'] ?? NULL,
         'contribution_recur_id' => $contributionRecurID,
@@ -666,9 +655,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         ->setValues([
           'contribution_id' => $contribution['id'],
           'total_amount' => $contribution['total_amount'],
-          'trxn_date' => $receiveDate,
+          'trxn_date' => $this->getReceiveDate(),
           'payment_processor_id' => $this->_mode ? $this->getPaymentProcessorID() : NULL,
-          'payment_instrument_id' => $this->_params['payment_instrument_id'] ?? NULL,
+          'payment_instrument_id' => $this->getPaymentInstrumentID(),
           'trxn_id' => $this->_params['trxn_id'] ?? NULL,
           'fee_amount' => $this->_params['fee_amount'] ?? NULL,
           'check_number' => $this->_params['check_number'] ?? NULL,
