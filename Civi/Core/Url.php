@@ -696,13 +696,11 @@ final class Url implements \JsonSerializable {
       $result = \CRM_Utils_Url::toAbsolute($result);
     }
 
-    // TODO decide if the current default is good enough for future
+    // Upgrade to https on SSL requests, but never downgrade: CLI and cron runs have no
+    // request scheme to follow, and the configured base URL already says http or https.
     $ssl = $this->getSsl() ?: \CRM_Utils_System::isSSL();
     if ($ssl && str_starts_with($result, 'http:')) {
       $result = 'https:' . substr($result, 5);
-    }
-    elseif (!$ssl && str_starts_with($result, 'https:')) {
-      $result = 'http:' . substr($result, 6);
     }
 
     return $this->htmlEscape ? htmlentities($result) : $result;
