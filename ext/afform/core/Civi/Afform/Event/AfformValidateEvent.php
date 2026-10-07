@@ -112,7 +112,7 @@ class AfformValidateEvent extends AfformBaseEvent {
     // Merge base field defn with what's already in the form markup.
     $fieldDefn += $baseDefn;
     // Need a label for validation messages
-    $fieldDefn['label'] = $fieldDefn['label'] ?: $baseDefn['label'];
+    $fieldDefn['label'] = ($fieldDefn['label'] ?? NULL) ?: ($baseDefn['label'] ?? '');
     $fieldDefn['input_attrs'] = ($fieldDefn['input_attrs'] ?? []) + ($baseDefn['input_attrs'] ?? []);
     if (isset($fieldDefn['input_attrs']['maxlength'], $baseDefn['input_attrs']['maxlength'])) {
       $fieldDefn['input_attrs']['maxlength'] = Utils::capMaxlength($fieldDefn['input_attrs']['maxlength'], $baseDefn['input_attrs']['maxlength']);
