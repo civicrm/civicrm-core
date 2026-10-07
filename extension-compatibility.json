@@ -75,7 +75,6 @@
     "force-uninstall": true
   },
   "checknumberpaymentmethod": {
-    "obsolete": "6.20",
-    "force-uninstall": true
+    "obsolete": "6.20"
   }
 }
