@@ -11,6 +11,7 @@
 
 use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\FinancialItem;
+use Civi\Api4\LineItem;
 use Civi\Api4\PaymentProcessor;
 
 /**
@@ -480,7 +481,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $isContributionStatusNegative = CRM_Contribute_BAO_Contribution::isContributionStatusNegative($this->updatedContribution->contribution_status_id);
       return ($isContributionStatusNegative ? -1 : 1) * ((float) $lineItemDetails['line_total'] + (float) $cancelledTaxAmount);
     }
-    if ($context === NULL) {
+    if ($context === NULL || $context === 'changePaymentInstrument') {
       // erm, yes because? but, hey, it's tested.
       return $lineItemDetails['line_total'];
     }
@@ -600,9 +601,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         'entity_table' => 'civicrm_line_item',
         'entity_id' => $lineItemDetails['id'],
       ];
-      $financialItem = CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
-      $lineItems[$fieldValueId]['deferred_line_total'] = $itemParams['amount'];
-      $lineItems[$fieldValueId]['financial_item_id'] = $financialItem->id;
+      CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
 
       // If changing the financial type we reverse & recreate but really we should do this
       // a) if the line item financial type changes (not contribution) and
@@ -646,7 +645,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $this->createTaxFinancialItem($itemParams, $lineItemDetails['financial_type_id'], $taxAmount, $trxnIds['id']);
       }
     }
-    $this->createDeferredTrxn($lineItems, TRUE, $context);
+    $this->createDeferredTrxn(TRUE, $context);
     return $params['line_item'];
   }
 
@@ -931,7 +930,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
     }
 
-    $this->createDeferredTrxn($this->getUpdatedLineItems(), TRUE, 'changePaymentInstrument');
+    $this->createDeferredTrxn(TRUE, 'changePaymentInstrument');
 
     return TRUE;
   }
@@ -939,13 +938,18 @@ class CRM_Contribute_BAO_FinancialProcessor {
   /**
    * Create transaction for deferred revenue. Previously shared function being refactored
    *
-   * @param array $lineItems
    * @param bool $update
    * @param string $context
    *
    */
-  private function createDeferredTrxn($lineItems, $update = FALSE, $context = NULL) {
+  private function createDeferredTrxn($update = FALSE, $context = NULL) {
     $contributionDetails = $this->getUpdatedContribution();
+    // Load line items from the database (rather than relying on the construction-time
+    // updatedLineItems snapshot) so this works for lines that only got their id on this
+    // request, such as newly created contributions.
+    $lineItems = (array) LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $this->getContributionID())
+      ->execute()->indexBy('id');
     if (empty($lineItems) || CRM_Utils_System::isNull($this->getUpdatedContribution()->revenue_recognition_date)) {
       return;
     }
@@ -968,11 +972,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     $deferredRevenues = [];
     foreach ($lineItems as $key => $lineItem) {
-      $lineTotal = !empty($lineItem['deferred_line_total']) ? $lineItem['deferred_line_total'] : $lineItem['line_total'];
+      $lineTotal = $this->getFinancialItemAmountFromParams($context, $lineItem);
       if ($lineTotal <= 0 && !$update) {
         continue;
       }
       $deferredRevenues[$key] = $lineItem;
+      $deferredRevenues[$key]['financial_item_id'] = $this->getExistingFinancialItemForLine($lineItem['id'] ?? NULL, FALSE)['id'] ?? NULL;
       if (in_array($lineItem['entity_table'],
         ['civicrm_participant', 'civicrm_contribution'])
       ) {
@@ -1039,8 +1044,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
 
         if (!$this->isUpdate()) {
-          $financialItem = $this->addFinancialItem($createdLineItem, $this->getUpdatedContribution());
-          $line['financial_item_id'] = $financialItem->id;
+          $this->addFinancialItem($createdLineItem, $this->getUpdatedContribution());
           if (!empty($line['tax_amount'])) {
             $this->addFinancialItem($createdLineItem, $this->getUpdatedContribution(), TRUE);
           }
@@ -1048,7 +1052,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
     }
     if (!$this->isUpdate()) {
-      $this->createDeferredTrxn(reset($lineItems));
+      $this->createDeferredTrxn();
     }
   }
 
