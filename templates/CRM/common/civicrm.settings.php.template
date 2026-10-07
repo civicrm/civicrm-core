@@ -120,9 +120,9 @@ if (!defined('CIVICRM_DSN')) {
  * Used to point to a different database to use for logging (if desired). If unset defaults to equal CIVICRM_DSN.
  * The CIVICRM_DSN user needs to have the rights to modify the below database schema and be able to write to it.
  */
-if (!defined('CIVICRM_LOGGING_DSN')) {
-  define('CIVICRM_LOGGING_DSN', CIVICRM_DSN);
-}
+// if (!defined('CIVICRM_LOGGING_DSN')) {
+//   define('CIVICRM_LOGGING_DSN', CIVICRM_DSN);
+// }
 
 /**
  * File System Paths:
