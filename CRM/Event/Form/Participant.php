@@ -959,7 +959,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $form->add('select', 'payment_instrument_id',
           ts('Payment Method'),
           ['' => ts('- select -')] + CRM_Contribute_BAO_Contribution::buildOptions('payment_instrument_id', 'create'),
-          FALSE, ['onChange' => "return showHideByValue('payment_instrument_id','4','checkNumber','table-row','select',false);"]
+          FALSE
         );
         // don't show transaction id in batch update mode
         $path = CRM_Utils_System::currentPath();
