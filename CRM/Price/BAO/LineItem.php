@@ -449,8 +449,11 @@ WHERE li.contribution_id = %1";
    *   Entity Table.
    *
    * @param bool $isRelatedID
+   *
+   * @deprecated
    */
   public static function getLineItemArray(&$params, $entityId = NULL, $entityTable = 'contribution', $isRelatedID = FALSE) {
+    CRM_Core_Error::deprecatedWarning('getLineItemArray is deprecated - no core caller remains');
     if (!$entityId) {
       $priceSetDetails = CRM_Price_BAO_PriceSet::getDefaultPriceSet($entityTable);
       $totalAmount = $params['total_amount'] ?? 0;
