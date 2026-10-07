@@ -1790,25 +1790,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Get the amount level for the event payment.
-   *
-   * The amount level is the string stored on the contribution record that describes the purchase.
-   *
-   * @param array $params
-   *
-   * @return string
-   */
-  protected function getAmountLevel($params) {
-    if (empty($params['priceSetId'])) {
-      // CRM-17509 An example of this is where the person is being waitlisted & there is no payment.
-      // ideally we would have calculated amount first & only call this is there is an
-      // amount but the flow needs more changes for that.
-      return '';
-    }
-    return CRM_Price_BAO_PriceSet::getAmountLevelText($params);
-  }
-
-  /**
    * Process Registration of free event.
    *
    * @param array $params
