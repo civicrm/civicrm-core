@@ -26,3 +26,20 @@ WHERE NOT EXISTS (
 
 -- Add target _blank to offsite links
 UPDATE `civicrm_navigation` SET `target` = '_blank' WHERE `url` LIKE '%civicrm.org/%';
+
+-- Jamaica: use ISO 3166-2:JM codes as province abbreviations
+SELECT @country_id := id FROM civicrm_country WHERE name = 'Jamaica' AND iso_code = 'JM';
+UPDATE civicrm_state_province SET abbreviation = '01' WHERE country_id = @country_id AND name = 'Kingston';
+UPDATE civicrm_state_province SET abbreviation = '02' WHERE country_id = @country_id AND name = 'Saint Andrew';
+UPDATE civicrm_state_province SET abbreviation = '03' WHERE country_id = @country_id AND name = 'Saint Thomas';
+UPDATE civicrm_state_province SET abbreviation = '04' WHERE country_id = @country_id AND name = 'Portland';
+UPDATE civicrm_state_province SET abbreviation = '05' WHERE country_id = @country_id AND name = 'Saint Mary';
+UPDATE civicrm_state_province SET abbreviation = '06' WHERE country_id = @country_id AND name = 'Saint Ann';
+UPDATE civicrm_state_province SET abbreviation = '07' WHERE country_id = @country_id AND name = 'Trelawny';
+UPDATE civicrm_state_province SET abbreviation = '08' WHERE country_id = @country_id AND name = 'Saint James';
+UPDATE civicrm_state_province SET abbreviation = '09' WHERE country_id = @country_id AND name = 'Hanover';
+UPDATE civicrm_state_province SET abbreviation = '10' WHERE country_id = @country_id AND name = 'Westmoreland';
+UPDATE civicrm_state_province SET abbreviation = '11' WHERE country_id = @country_id AND name = 'Saint Elizabeth';
+UPDATE civicrm_state_province SET abbreviation = '12' WHERE country_id = @country_id AND name = 'Manchester';
+UPDATE civicrm_state_province SET abbreviation = '13' WHERE country_id = @country_id AND name = 'Clarendon';
+UPDATE civicrm_state_province SET abbreviation = '14' WHERE country_id = @country_id AND name = 'Saint Catherine';
