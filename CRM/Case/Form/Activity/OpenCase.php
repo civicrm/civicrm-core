@@ -61,6 +61,8 @@ class CRM_Case_Form_Activity_OpenCase {
     CRM_Core_BAO_File::buildAttachment($form, 'civicrm_activity', $form->_activityId);
     $session = CRM_Core_Session::singleton();
     $session->pushUserContext(CRM_Utils_System::url('civicrm/case', 'reset=1'));
+
+    self::setFields($form);
   }
 
   /**
@@ -184,7 +186,22 @@ class CRM_Case_Form_Activity_OpenCase {
       $csElement->freeze();
     }
 
-    $form->add('number', 'duration', ts('Activity Duration'), ['class' => 'four', 'min' => 1]);
+    foreach ($form->_fields as $field => $values) {
+      if (!empty($form->_fields[$field])) {
+        $attribute = $values['attributes'] ?? NULL;
+        $required = !empty($values['required']);
+
+        if ($values['type'] === 'select' && empty($attribute)) {
+          $form->addSelect($field, ['entity' => 'activity'], $required);
+        }
+        elseif ($values['type'] === 'entityRef') {
+          $form->addEntityRef($field, $values['label'], $attribute, $required);
+        }
+        else {
+          $form->add($values['type'], $field, $values['label'], $attribute, $required, $values['extra'] ?? NULL);
+        }
+      }
+    }
     $form->addRule('duration', ts('Please enter the duration as number of minutes (integers only).'), 'positiveInteger');
 
     if ($form->_currentlyViewedContactId) {
@@ -192,14 +209,7 @@ class CRM_Case_Form_Activity_OpenCase {
     }
     $form->assign('clientName', $displayName ?? NULL);
 
-    $form->add('datepicker', 'start_date', ts('Case Start Date'), [], TRUE);
-
     $form->addField('medium_id', ['entity' => 'activity', 'context' => 'create'], TRUE);
-
-    // calling this field activity_location to prevent conflict with contact location fields
-    $form->add('text', 'activity_location', ts('Location'), CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'location'));
-
-    $form->add('wysiwyg', 'activity_details', ts('Details'), ['rows' => 4, 'cols' => 60], FALSE);
 
     $form->addButtons([
       [
@@ -360,6 +370,41 @@ class CRM_Case_Form_Activity_OpenCase {
         ));
       }
     }
+  }
+
+  /**
+   * The _fields var can be modified via hook_civicrm_preProcess
+   * Based on CRM_Activity_Form_Activity
+   *
+   * @param CRM_Case_Form_Case $form
+   */
+  public static function setFields(&$form) {
+    $form->_fields = [
+      'duration' => [
+        'type' => 'number',
+        'label' => ts('Activity Duration'),
+        'attributes' => ['class' => 'four', 'min' => 1],
+        'required' => FALSE,
+      ],
+      'start_date' => [
+        'type' => 'datepicker',
+        'label' => ts('Case Start Date'),
+        'required' => TRUE,
+        'attributes' => ['formatType' => 'activityDateTime'],
+      ],
+      'activity_location' => [
+        'type' => 'text',
+        'label' => ts('Location'),
+        'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'location'),
+        'required' => FALSE,
+      ],
+      'activity_details' => [
+        'type' => 'wysiwyg',
+        'label' => ts('Details'),
+        'attributes' => ['rows' => 4, 'cols' => 60],
+        'required' => FALSE,
+      ],
+    ];
   }
 
 }
