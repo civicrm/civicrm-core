@@ -57,10 +57,10 @@ return [
         'label' => E::ts('User-Driven Messages'),
         'saved_search_id.name' => 'Message_Templates_User',
         'type' => 'table',
-        // The `has_document` join is a bridge entity (EntityFile) with no ACL delegate
-        // registered for civicrm_msg_template, so it denies access under normal permission
-        // checking. Visibility of this listing is already gated by the page's own
-        // 'edit message templates' permission, so bypassing ACLs here exposes nothing new.
+        // Permission checks would drop the File join behind `has_document`, which needs
+        // 'access uploaded files'. Skipping the checks is safe because this display
+        // only runs inside the Message Templates form, which needs a template-editing
+        // permission.
         'acl_bypass' => TRUE,
         'settings' => [
           'limit' => 50,
