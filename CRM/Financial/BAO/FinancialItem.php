@@ -29,6 +29,8 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param bool $taxTrxnID
    * @param array|null $trxnId
    *
+   * @deprecated only called from deprecated code path.
+   *
    * @return CRM_Financial_DAO_FinancialItem
    */
   public static function add($lineItem, $contribution, $taxTrxnID = FALSE, $trxnId = NULL) {

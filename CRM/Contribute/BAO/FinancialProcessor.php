@@ -1039,10 +1039,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
 
         if (!$this->isUpdate()) {
-          $financialItem = CRM_Financial_BAO_FinancialItem::add($createdLineItem, $this->getUpdatedContribution());
+          $financialItem = $this->addFinancialItem($createdLineItem, $this->getUpdatedContribution());
           $line['financial_item_id'] = $financialItem->id;
           if (!empty($line['tax_amount'])) {
-            CRM_Financial_BAO_FinancialItem::add($createdLineItem, $this->getUpdatedContribution(), TRUE);
+            $this->addFinancialItem($createdLineItem, $this->getUpdatedContribution(), TRUE);
           }
         }
       }
@@ -1050,6 +1050,69 @@ class CRM_Contribute_BAO_FinancialProcessor {
     if (!$this->isUpdate()) {
       $this->createDeferredTrxn(reset($lineItems));
     }
+  }
+
+  /**
+   * Add the financial items and financial trxn.
+   *
+   * @param object $lineItem
+   *   Line item object.
+   * @param object $contribution
+   *   Contribution object.
+   * @param bool $taxTrxnID
+   * @param array|null $trxnId
+   *
+   * @return CRM_Financial_DAO_FinancialItem
+   */
+  private function addFinancialItem($lineItem, $contribution, $taxTrxnID = FALSE, $trxnId = NULL) {
+    $financialItemStatus = array_column(\Civi::entity('FinancialItem')->getOptions('status_id'), 'id', 'name');
+    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
+    $itemStatus = NULL;
+    if ($contributionStatus === 'Completed' || $contributionStatus === 'Pending refund') {
+      $itemStatus = $financialItemStatus['Paid'];
+    }
+    elseif ($contributionStatus === 'Pending'
+      // In progress is no longer present on new installs unless extensions add it.
+      || $contributionStatus === 'In Progress'
+    ) {
+      $itemStatus = $financialItemStatus['Unpaid'];
+    }
+    elseif ($contributionStatus === 'Partially paid') {
+      $itemStatus = $financialItemStatus['Partially paid'];
+    }
+    $params = [
+      'transaction_date' => $contribution->receive_date,
+      'contact_id' => $contribution->contact_id,
+      'amount' => $lineItem->line_total,
+      'currency' => $contribution->currency,
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => $lineItem->id,
+      'description' => ($lineItem->qty != 1 ? $lineItem->qty . ' of ' : '') . $lineItem->label,
+      'status_id' => $itemStatus,
+    ];
+
+    if ($taxTrxnID) {
+      $params['amount'] = $lineItem->tax_amount;
+      $params['description'] = Civi::settings()->get('tax_term');
+      $accountRelName = 'Sales Tax Account is';
+    }
+    else {
+      $accountRelName = 'Income Account is';
+      if (property_exists($contribution, 'revenue_recognition_date') && !CRM_Utils_System::isNull($contribution->revenue_recognition_date)) {
+        $accountRelName = 'Deferred Revenue Account is';
+      }
+    }
+    if ($lineItem->financial_type_id) {
+      $params['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
+        $lineItem->financial_type_id,
+        $accountRelName
+      );
+    }
+    if (empty($trxnId)) {
+      $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
+      $trxnId['id'] = $trxn['financialTrxnId'];
+    }
+    return CRM_Financial_BAO_FinancialItem::create($params, NULL, $trxnId);
   }
 
   /**
@@ -1508,9 +1571,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
-      CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $trxnArray);
+      $this->addFinancialItem($lineObj, $updatedContribution, NULL, $trxnArray);
       if (isset($lineObj->tax_amount) && (float) $lineObj->tax_amount !== 0.00) {
-        CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, TRUE, $trxnArray);
+        $this->addFinancialItem($lineObj, $updatedContribution, TRUE, $trxnArray);
       }
     }
   }
