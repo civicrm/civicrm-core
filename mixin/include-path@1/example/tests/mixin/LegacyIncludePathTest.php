@@ -3,7 +3,7 @@
 namespace Civi\Shimmy\Mixins;
 
 /**
- * Assert that the 'legacy-include-path' mixin is working properly.
+ * Assert that the 'include-path' mixin is working properly.
  *
  * This class defines the assertions to run when installing or uninstalling the extension.
  * It is called as part of E2E_Shimmy_LifecycleTest.
