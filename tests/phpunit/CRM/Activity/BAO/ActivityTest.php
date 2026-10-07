@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Api4\Activity;
+use Civi\Api4\ActivityContact;
 use Civi\Api4\OptionValue;
 
 /**
@@ -1875,6 +1876,23 @@ $textValue
   }
 
   /**
+   * Get ActivityContact IDs keyed by "record_type_id:contact_id"
+   *
+   * @param int $activityId
+   *
+   * @return array
+   */
+  private function getActivityContactIds(int $activityId): array {
+    return ActivityContact::get(FALSE)
+      ->addSelect('id', 'CONCAT(record_type_id, ":", contact_id) AS record_key')
+      ->addWhere('activity_id', '=', $activityId)
+      ->addOrderBy('record_type_id')
+      ->addOrderBy('contact_id')
+      ->execute()
+      ->column('id', 'record_key');
+  }
+
+  /**
    * Test multiple variations of target and assignee contacts in create
    * and edit mode.
    *
@@ -1899,6 +1917,7 @@ $textValue
 
     // Create an activity first if specified.
     $activity = NULL;
+    $recordsAfterFirstSave = [];
     if (!empty($do_first)) {
       if (!empty($do_first['targets'])) {
         // e.g. if it is [1], then pick $someContacts[1]. If it's [1,2], then
@@ -1911,6 +1930,7 @@ $textValue
 
       $activity = CRM_Activity_BAO_Activity::create($params);
       $this->assertNotEmpty($activity->id);
+      $recordsAfterFirstSave = $this->getActivityContactIds($activity->id);
 
       $params['id'] = $activity->id;
     }
@@ -1926,14 +1946,21 @@ $textValue
       1 => [$activity->id, 'Integer'],
       2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'), 'Integer'],
     ];
-    $this->assertEquals($params['target_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+    $this->assertEqualsCanonicalizing($params['target_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
 
     // Check assignees
     $queryParams = [
       1 => [$activity->id, 'Integer'],
       2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees'), 'Integer'],
     ];
-    $this->assertEquals($params['assignee_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+    $this->assertEqualsCanonicalizing($params['assignee_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+
+    $recordsAfterSecondSave = $this->getActivityContactIds($activity->id);
+    $this->assertSame(
+      array_intersect_key($recordsAfterFirstSave, $recordsAfterSecondSave),
+      array_intersect_key($recordsAfterSecondSave, $recordsAfterFirstSave),
+      'Contacts kept between the two saves should keep their ActivityContact IDs'
+    );
 
     // Clean up
     foreach ($this->someContacts as $cid) {
@@ -2006,14 +2033,14 @@ $textValue
       1 => [$activity->id, 'Integer'],
       2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'), 'Integer'],
     ];
-    $this->assertEquals((array) $params['target_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+    $this->assertEqualsCanonicalizing((array) $params['target_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
 
     // Check assignees
     $queryParams = [
       1 => [$activity->id, 'Integer'],
       2 => [CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Assignees'), 'Integer'],
     ];
-    $this->assertEquals((array) $params['assignee_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
+    $this->assertEqualsCanonicalizing((array) $params['assignee_contact_id'], array_column(CRM_Core_DAO::executeQuery('SELECT contact_id FROM civicrm_activity_contact WHERE activity_id = %1 AND record_type_id = %2', $queryParams)->fetchAll(), 'contact_id'));
 
     // Clean up
     foreach ($this->someContacts as $cid) {
@@ -2536,6 +2563,39 @@ $textValue
         'do second' => [
           'targets' => [],
           'assignees' => [4],
+        ],
+      ],
+      // An existing assignee also becomes a target
+      52 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [1, 3],
+          'assignees' => [3],
+        ],
+      ],
+      // An existing target also becomes an assignee
+      53 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [1],
+          'assignees' => [1, 3],
+        ],
+      ],
+      // Target and assignee swap roles
+      54 => [
+        'do first' => [
+          'targets' => [1],
+          'assignees' => [3],
+        ],
+        'do second' => [
+          'targets' => [3],
+          'assignees' => [1],
         ],
       ],
     ];
