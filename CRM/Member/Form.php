@@ -323,19 +323,10 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     // The reason for showing it in update mode is not that clear.
     $this->assign('allowAutoRenew', $this->_mode && !empty($this->_recurPaymentProcessors));
     if ($this->_mode || ($this->_action & CRM_Core_Action::UPDATE)) {
-
-      $autoRenewElement = $this->addElement('checkbox', 'auto_renew', ts('Membership renewed automatically'),
-        NULL, ['onclick' => "showHideByValue('auto_renew','','send-receipt','table-row','radio',true); showHideNotice( );"]
-      );
+      $autoRenewElement = $this->addElement('checkbox', 'auto_renew', ts('Membership renewed automatically'));
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $autoRenewElement->freeze();
       }
-
-      $this->addElement('checkbox',
-        'auto_renew',
-        ts('Membership renewed automatically')
-      );
-
     }
     $this->assign('autoRenewOptions', json_encode($this->membershipTypeRenewalStatus));
 
