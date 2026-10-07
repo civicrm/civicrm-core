@@ -87,13 +87,18 @@
             ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);
             processedCount += result.countFetched;
             countMatched += ('countMatched' in result ? result.countMatched : result.count);
+
             // Gather all results into one super collection
             if (batchResult) {
               batchResult.push(...result);
             } else {
               batchResult = result;
             }
-            if (ctrl.last >= ctrl.ids.length) {
+
+            // Determine if we have an error
+            if (result.is_blocking_error) {
+              ctrl.error({error: batchResult});
+            } else if (ctrl.last >= ctrl.ids.length) {
               $timeout(function() {
                 // Return a complete record of all batches
                 batchResult.batchCount = processedCount;

@@ -44,7 +44,11 @@
       if (result.action === 'inlineEdit') {
         CRM.status(ts('Saved'));
       } else {
-        if (ctrl.apiBatch.successMsg) {
+        // Do we encounter issues?
+        if (result.errors !== undefined && result.errors.length > 0) {
+          this.processErrors(result);
+          CRM.alert(ts(ctrl.apiBatch.partialSuccessMsg || 'Completed (%1) with the following issues: %3', { 1: result.batchCount, 2: entityTitle, 3: result.error_message }), ts('%1 Complete', { 1: ctrl.task.title }), 'warning');
+        } else if (ctrl.apiBatch.successMsg) {
           CRM.alert(ts(ctrl.apiBatch.successMsg, { 1: result.batchCount, 2: entityTitle }), ts('%1 Complete', { 1: ctrl.task.title }), 'success');
         }
       }
@@ -52,8 +56,29 @@
     };
 
     this.onError = function(error) {
-      CRM.alert(ts(ctrl.apiBatch.errorMsg || error.error_message || '', {1: ctrl.ids.length, 2: ctrl.entityTitle}), ts('Error'), 'error');
+      if (error !== undefined && error.errors.length > 0) {
+        this.processErrors(error);
+        CRM.alert(ts(error.error_message || ctrl.apiBatch.errorMsg || '', {1: ctrl.ids.length, 2: ctrl.entityTitle}), error.error_title || ts('Error'), error.max_error_level || 'error');
+      } else {
+        CRM.alert(ts(ctrl.apiBatch.errorMsg || '', {1: ctrl.ids.length, 2: ctrl.entityTitle}), error.error_title || ts('Error'), error.level || 'error');
+      }
       this.cancel();
+    };
+
+    this.processErrors = function(result) {
+      result.error_message = '';
+      result.batchCount -= result.errors.length;
+      if (result.max_error_level == 'alert' || result.max_error_level == 'emergency') {
+        result.max_error_level = 'error';
+      }
+
+      result.errors.forEach((error) => {
+        if (result.error_message.length > 0) {
+          result.error_message += ' ';
+        }
+        result.error_message += error.message;
+        result.error_title = error.title;
+      });
     };
 
   });
