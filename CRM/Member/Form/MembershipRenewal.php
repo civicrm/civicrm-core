@@ -488,9 +488,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
     $this->processBillingAddress($this->getContributionContactID(), (string) $this->_contributorEmail);
     $this->_params['total_amount'] = $this->_params['total_amount'] ?? CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->getMembershipTypeID(), 'minimum_fee');
-    if (empty($this->_params['financial_type_id'])) {
-      $this->_params['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->getMembershipTypeID(), 'financial_type_id');
-    }
     $contributionRecurID = NULL;
     $this->assign('receiptType', 'membership renewal');
     $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
@@ -528,7 +525,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'amount' => $this->_params['total_amount'],
           'contribution_status_id' => 'Pending',
           'payment_processor_id' => $this->getPaymentProcessorID(),
-          'financial_type_id' => $this->_params['financial_type_id'],
+          'financial_type_id' => $this->getFinancialTypeID(),
           'is_email_receipt' => (bool) $this->getSubmittedValue('send_receipt'),
           'payment_instrument_id' => $this->getPaymentInstrumentID(),
           'invoice_id' => $this->getInvoiceID(),
@@ -605,8 +602,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
     $userName = htmlentities((string) $userName);
 
-    $this->_params = $this->setPriceSetParameters($this->_params);
-    foreach ($this->order->getLineItems() as $index => $lineItem) {
+    foreach ($this->getOrder()->getLineItems() as $index => $lineItem) {
       if (($lineItem['entity_id'] ?? NULL) != $this->getMembershipID()) {
         continue;
       }
@@ -624,7 +620,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $contribution = Order::create(FALSE)
       ->setContributionValues($this->getContributionValues() + [
         'contact_id' => $this->_contributorContactID,
-        'financial_type_id' => $this->_params['financial_type_id'],
+        'financial_type_id' => $this->getFinancialTypeID(),
         'source' => "{$this->getMembershipTypeValue('name')} Membership: Offline membership renewal (by {$userName})",
         'is_pay_later' => $pending,
         'check_number' => $this->_params['check_number'] ?? NULL,
