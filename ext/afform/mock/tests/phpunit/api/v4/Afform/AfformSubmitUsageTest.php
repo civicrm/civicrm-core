@@ -195,6 +195,56 @@ EOHTML;
   }
 
   /**
+   * A Hidden field's afform_default can be a relative date filter value (e.g. "this.day"
+   * for Today); the entity's create action needs the absolute date it represents, not
+   * the filter string itself.
+   */
+  public function testSubmitConvertsRelativeDateDefaultOnHiddenField(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC"  />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+    <af-field name="birth_date" defn="{input_type: 'Hidden', afform_default: 'this.day'}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $lastName = uniqid('RelativeDate');
+    $submission = [
+      'Individual1' => [
+        ['fields' => ['first_name' => 'Jane', 'last_name' => $lastName]],
+      ],
+    ];
+    // Pin the DB session's clock so CURDATE() (what relativeToSql() resolves "this.day"
+    // against) is deterministic, rather than racing a real midnight rollover.
+    \CRM_Core_DAO::executeQuery('SET @@session.timestamp = %1', [1 => [strtotime('2020-08-01 01:00:00'), 'Integer']]);
+    try {
+      $result = Afform::submit()
+        ->setName($this->formName)
+        ->setValues($submission)
+        ->execute();
+    }
+    finally {
+      \CRM_Core_DAO::executeQuery('SET @@session.timestamp = DEFAULT');
+    }
+
+    $contactId = $result[0]['Individual1'][0]['id'];
+    $birthDate = \Civi\Api4\Contact::get(FALSE)
+      ->addWhere('id', '=', $contactId)
+      ->addSelect('birth_date')
+      ->execute()->single()['birth_date'];
+    $this->assertEquals('2020-08-01', $birthDate);
+  }
+
+  /**
    * A database error during entity save must fail the submission rather than be reported
    * as saved, while other errors stay silently ignored for optional entities left blank.
    *
