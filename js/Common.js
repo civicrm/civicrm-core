@@ -199,7 +199,7 @@ if (!CRM.utils) CRM.utils = {};
 if (!CRM.strings) CRM.strings = {};
 if (!CRM.vars) CRM.vars = {};
 
-(function ($, _, undefined) {
+(function ($, undefined) {
   "use strict";
   /* jshint validthis: true */
 
@@ -1164,6 +1164,23 @@ if (!CRM.vars) CRM.vars = {};
     return markup;
   }
 
+  /**
+   * Does every param mentioned by the filter's condition agree with it?
+   * A condition value may be an array, which the param must contain in full but in any order.
+   */
+  function matchesCondition(params, condition) {
+    return Object.keys(params).every((key) => {
+      if (!(key in condition)) {
+        return true;
+      }
+      const want = condition[key], have = params[key];
+      if (Array.isArray(want)) {
+        return Array.isArray(have) && want.every((value) => have.includes(value));
+      }
+      return !Array.isArray(have) && have === want;
+    });
+  }
+
   function getEntityRefFilters($el) {
     var
       entity = $el.data('api-entity'),
@@ -1178,7 +1195,7 @@ if (!CRM.vars) CRM.vars = {};
       });
       if (!params[filter.key]) {
         // Filter out options if params don't match its condition
-        if (filter.condition && !_.isMatch(params, _.pick(filter.condition, Object.keys(params)))) {
+        if (filter.condition && !matchesCondition(params, filter.condition)) {
           return;
         }
         result.push(filter);
@@ -2365,4 +2382,4 @@ if (!CRM.vars) CRM.vars = {};
   };
 
 
-})(jQuery, _);
+})(jQuery);
