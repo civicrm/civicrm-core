@@ -24,6 +24,14 @@ class CRM_Event_Page_List extends CRM_Core_Page {
 
     $this->assign('events', $info);
 
+    // DataTables is only in the core bundle on back-office pages, but this
+    // front-end page renders a sortable table (CRM/common/jsortable.tpl).
+    // Weight 0 keeps it ahead of js/noconflict.js, as for jstree in
+    // CRM_Admin_Page_Navigation.
+    Civi::resources()
+      ->addScriptFile('civicrm', 'bower_components/datatables/media/js/jquery.dataTables.min.js', 0, 'html-header')
+      ->addStyleFile('civicrm', 'bower_components/datatables/media/css/jquery.dataTables.min.css');
+
     return parent::run();
   }
 
