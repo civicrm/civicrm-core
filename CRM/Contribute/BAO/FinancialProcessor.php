@@ -85,6 +85,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
     return $this->originalContribution->$key;
   }
 
+  private function getUpdatedContributionValue(string $key): mixed {
+    return $this->updatedContribution->$key;
+  }
+
   private function isNegativeTransaction(): bool {
     return in_array($this->getUpdatedContributionStatus(), ['Refunded', 'Chargeback', 'Cancelled'], TRUE);
   }
@@ -146,6 +150,15 @@ class CRM_Contribute_BAO_FinancialProcessor {
   private function isRecordAccountsReceivable(): bool {
     return Civi::settings()
       ->get('always_post_to_accounts_receivable') && $this->isCompletedTransaction();
+  }
+
+  /**
+   * @param int $financialTypeID
+   *
+   * @return int|null
+   */
+  private function getAccountsReceivableAccount(int $financialTypeID): ?int {
+    return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($financialTypeID, 'Accounts Receivable Account is');
   }
 
   private function isStatusChange(): bool {
@@ -719,8 +732,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     elseif (($previousContributionStatus === 'Pending'
         && $params['prevContribution']->is_pay_later) || $previousContributionStatus === 'In Progress'
     ) {
-      $financialTypeID = !empty($params['financial_type_id']) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
-      $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Accounts Receivable Account is');
+      $arAccountId = $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id'));
 
       if ($currentContributionStatus === 'Cancelled') {
         // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
@@ -814,8 +826,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function recordAlwaysAccountsReceivable(&$trxnParams, $contributionParams) {
     $params = $trxnParams;
-    $financialTypeID = !empty($contributionParams['financial_type_id']) ? $contributionParams['financial_type_id'] : $contributionParams['prevContribution']->financial_type_id;
-    $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Accounts Receivable Account is');
+    $arAccountId = $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id'));
     $params['to_financial_account_id'] = $arAccountId;
     $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $params['is_payment'] = FALSE;
@@ -1520,14 +1531,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * Relocated as-is from CRM_Price_BAO_LineItem::changeFeeSelections()'s support code.
    *
-   * @internal - will change.
-   *
    * @param int $updatedAmount
    * @param int $contributionId
    * @param int $taxAmount
    * @param bool $updateAmountLevel
    *
-   * @return bool|\CRM_Core_BAO_FinancialTrxn
+   * @return \CRM_Financial_DAO_FinancialTrxn|null
+   * @internal - will change.
+   *
    */
   private function recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
     $paidAmount = \Civi\Api4\Contribution::get(FALSE)
@@ -1540,7 +1551,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $contributionStatuses = array_column(\Civi::entity('Contribution')->getOptions('contribution_status_id'), 'id', 'name');
 
     $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
-    $adjustedTrxn = FALSE;
     if ($balanceAmt) {
       if ($paidAmount === 0.0) {
         //skip updating the contribution status if no payment is made
@@ -1562,23 +1572,19 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $updatedContributionDAO->amount_level = $updateAmountLevel;
       }
       $updatedContributionDAO->save();
-      // adjusted amount financial_trxn creation
-      $updatedContribution = CRM_Contribute_BAO_Contribution::getValues(
-        ['id' => $contributionId]
-      );
-      $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($updatedContribution->financial_type_id, 'Accounts Receivable Account is');
+
       $adjustedTrxnValues = [
         'from_financial_account_id' => NULL,
-        'to_financial_account_id' => $toFinancialAccount,
+        'to_financial_account_id' => $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id')),
         'total_amount' => $balanceAmt,
         'net_amount' => $balanceAmt,
-        'status_id' => $contributionStatuses['Completed'],
-        'payment_instrument_id' => $updatedContribution->payment_instrument_id,
-        'contribution_id' => $updatedContribution->id,
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+        'payment_instrument_id' => $this->getUpdatedContributionValue('payment_instrument_id'),
+        'contribution_id' => $this->getContributionID(),
         'trxn_date' => date('YmdHis'),
-        'currency' => $updatedContribution->currency,
+        'currency' => $this->getUpdatedContributionValue('currency'),
       ];
-      $adjustedTrxn = CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
+      return CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
     }
     // CRM-17151: Update the contribution status to completed if balance is zero,
     //  because due to sucessive fee change will leave the related contribution status incorrect
@@ -1586,7 +1592,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id', $contributionStatuses['Completed']);
     }
 
-    return $adjustedTrxn;
+    return NULL;
   }
 
 }
