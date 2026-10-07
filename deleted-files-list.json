@@ -1371,6 +1371,7 @@
     "managed/contactSummary/SavedSearch_Contact_Summary_Membership_Type.mgd.php",
     "managed/contactSummary/SavedSearch_Contact_Summary_Memberships.mgd.php",
     "mixin/entity-types-php@1/example/make-dao.php",
+    "mixin/legacy-include-path@1/*",
     "mixin/lib/civimix-schema/*",
     "mkdocs.yml",
     "packages/Archive/*",
