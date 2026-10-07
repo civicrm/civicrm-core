@@ -149,7 +149,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       'label' => ts('Price Set'),
       'onchange' => "showHideAmountBlock( this.value, 'price_set_id' );",
       'class' => 'crm-form-select-priceset',
-    ]);
+    ])->setOptionTextEscaped();
     Civi::resources()->addScriptFile('civicrm', 'js/crm.openRelatedConfig.js');
 
     //CiviPledge fields.

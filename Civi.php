@@ -260,6 +260,13 @@ class Civi {
   }
 
   /**
+   * @return Civi\Core\Router
+   */
+  public static function router() {
+    return \Civi::service('civi.router');
+  }
+
+  /**
    * Obtain the contact's personal settings.
    *
    * @param NULL|int $contactID

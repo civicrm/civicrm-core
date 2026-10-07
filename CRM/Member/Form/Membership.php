@@ -362,7 +362,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             '' => ts('Choose price set'),
           ] + $priceSets,
           NULL, ['onchange' => "buildAmount( this.value );"]
-        );
+        )->setOptionTextEscaped();
       }
     }
     $this->assign('hasPriceSets', $buildPriceSet ?? NULL);

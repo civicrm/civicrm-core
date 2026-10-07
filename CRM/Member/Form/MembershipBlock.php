@@ -175,7 +175,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
       'label' => ts('Membership Price Set'),
       'name' => 'price_set_id',
       'options' => $price,
-    ]);
+    ])->setOptionTextEscaped();
 
     $session = CRM_Core_Session::singleton();
     $single = $session->get('singleForm');
