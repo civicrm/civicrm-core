@@ -25,7 +25,7 @@
       ];
       ctrl.isDataMode = (m) => (m == (ctrl.display.settings.data_mode || 'table'));
 
-      this.$onInit = function () {
+      this.$onInit = () => {
         ctrl.jobFrequency = CRM.crmSearchAdmin.jobFrequency;
         if (!ctrl.display.settings) {
           ctrl.display.settings = {
@@ -50,13 +50,32 @@
         if (!ctrl.display.id && !ctrl.display._job) {
           ctrl.display._job = defaultJobParams();
         }
-        this.parent.initColumns({label: true});
+        this.parent.initColumns({label: true, index: true});
         this.display.settings.columns = this.display.settings.columns.filter((col) => this.isColumnAllowed(col.key));
+        this.display.settings.columns.forEach((col) => {
+          if (!('index' in col) || this.isFkColumn(col)) col.index = true;
+        });
       };
 
       // Do not allow pseudo-fields to be used as columns.
       this.isColumnAllowed = (key) => {
         return key && !CRM.crmSearchAdmin.pseudoFields.find((field) => field.name === key);
+      };
+
+      // FK columns and primary key columns are always indexed; the 'index' cannot be disabled.
+      this.isFkColumn = (col) => {
+        if (col.spec?.entity_reference?.entity) {
+          return true;
+        }
+        const field = searchMeta.getField(col.key, this.parent.savedSearch);
+        if (!field) {
+          return false;
+        }
+        if (field.fk_entity) {
+          return true;
+        }
+        const entity = searchMeta.getEntity(field.baseEntity);
+        return !!entity?.primary_key?.includes(field.name);
       };
 
       this.onChangeEntityPermission = function() {

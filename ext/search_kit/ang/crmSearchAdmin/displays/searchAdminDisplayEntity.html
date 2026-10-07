@@ -68,6 +68,13 @@
           <i class="crm-i fa-ban" role="img" aria-hidden="true"></i>
         </button>
       </div>
+      <div class="form-inline" ng-if="$ctrl.isDataMode('table')">
+        <label>
+          <input type="checkbox" ng-model="col.index" ng-disabled="$ctrl.isFkColumn(col)">
+          {{:: ts('Search Index') }}
+          <a crm-ui-help="hs({id: 'entity_display_column_index', title: ts('Search Index')})"></a>
+        </label>
+      </div>
     </fieldset>
   </fieldset>
 </fieldset>

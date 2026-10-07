@@ -98,6 +98,8 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
         ->execute();
       return;
     }
+    // Ensure data_mode is set; default to 'table'
+    $newSettings['data_mode'] = ($newSettings['data_mode'] ?? '') ?: 'table';
     // Build the new table
     $savedSearchID = $event->params['saved_search_id'] ?? \CRM_Core_DAO::getFieldValue('CRM_Search_DAO_SearchDisplay', $event->id, 'saved_search_id');
     $this->loadSavedSearch($savedSearchID);
@@ -116,6 +118,14 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
       if (!$expr) {
         continue;
       }
+      // Adds an index to non-fk fields; defaults TRUE to preserve behaviour for displays
+      // saved before per-column index configuration was introduced.
+      if ($newSettings['data_mode'] === 'table') {
+        $column['index'] ??= TRUE;
+      }
+      else {
+        unset($column['index']);
+      }
       // If saving for the first time and `spec` exists, it's probably coming fully-formed from hook_civicrm_managed/.mgd.php
       // Skip recalculating it in that case to prevent load-order issues. dev/core#6708
       if ($event->id || empty($column['spec'])) {
@@ -129,10 +139,8 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
     // Store new settings with added column spec
     $event->params['settings'] = $newSettings;
 
-    $mode = $event->params['settings']['data_mode'] ?? 'table';
-    switch ($mode) {
+    switch ($newSettings['data_mode']) {
       case 'table':
-      case '':
         $sql = \CRM_Core_BAO_SchemaHandler::buildTableSQL($table);
         // do not i18n-rewrite
         \CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
@@ -190,13 +198,13 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
     $defn = [
       'name' => $column['spec']['name'],
       'type' => $type,
-      // Adds an index to non-fk fields
-      'searchable' => TRUE,
+      'searchable' => !empty($column['index']),
     ];
     // Add FK indexes
-    if ($expr['expr']->getType() === 'SqlField' && !empty($field['fk_entity'])) {
-      $defn['fk_table_name'] = CoreUtil::getTableName($field['fk_entity']);
-      $defn['fk_field_name'] = $field['fk_column'];
+    $fkEntity = $column['spec']['entity_reference']['entity'] ?? NULL;
+    if ($fkEntity) {
+      $defn['fk_table_name'] = CoreUtil::getTableName($fkEntity);
+      $defn['fk_field_name'] = $column['spec']['entity_reference']['key'] ?? CoreUtil::getIdFieldName($fkEntity);
       $defn['fk_attributes'] = ' ON DELETE SET NULL';
     }
     return $defn;
