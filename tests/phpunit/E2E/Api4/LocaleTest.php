@@ -21,10 +21,7 @@ class LocaleTest extends \CiviEndToEndTestCase {
         break;
 
       case 'Drupal':
-        $results[] = ['de_DE', 'de_CH', 't', 'Yes', 'Ja'];
-        // That's weird... If you install Drupal's "de", and if you do `setUFLocale('de_DE')`, if
-        // you lookup `getUFLocale()`... then it reports back as 'de_CH'. Feels arbitrary.
-        // OTOH, D7 doesn't appear to distinguish national dialects, so `de_DE` and `de_CH` are the same thing...
+        $results[] = ['de_DE', 'de_DE', 't', 'Yes', 'Ja'];
         break;
 
       case 'Drupal8':
