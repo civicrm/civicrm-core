@@ -601,7 +601,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
     $form->assign('priceSet', $form->_priceSet);
-
     $checklifetime = FALSE;
     foreach ($this->getPriceFieldMetaData() as $id => $field) {
       $options = $field['options'] ?? NULL;
@@ -847,27 +846,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
-   * @return \CRM_Financial_BAO_Order
-   * @throws \CRM_Core_Exception
-   */
-  protected function getOrder(): CRM_Financial_BAO_Order {
-    if (!$this->order) {
-      $this->initializeOrder();
-    }
-    return $this->order;
-  }
-
-  /**
-   * @throws \CRM_Core_Exception
-   */
-  protected function initializeOrder(): void {
-    $this->order = new CRM_Financial_BAO_Order();
-    $this->order->setPriceSetID($this->getPriceSetID());
-    $this->order->setForm($this);
-    $this->order->setPriceSelectionFromUnfilteredInput($this->getSubmittedValues());
-  }
-
-  /**
    * Process the form submission.
    *
    * @throws \CRM_Core_Exception
@@ -983,7 +961,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $this->processBillingAddress($this->getContributionContactID(), (string) $this->_contributorEmail);
     $formValues = $this->_params;
-    $formValues = $this->setPriceSetParameters($formValues);
+    $formValues['financial_type_id'] = $this->getFinancialTypeID();
 
     if ($this->_id) {
       $params['id'] = $this->_id;
@@ -995,13 +973,18 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->setContextVariables($formValues);
     $originalMembershipType = $this->getMembershipValue('membership_type_id');
 
+    // Order::getPriceSetMetadata() deliberately strips 'fields' (it manages
+    // price-field metadata through its own accessor), so it is not a
+    // substitute for $this->_priceSet here - getPriceFieldIDs() needs that
+    // key to map submitted price_N checkbox values back to membership types
+    // when membership_type_id itself isn't submitted directly.
+    $this->getOrder();
     $selectedMemberships = $this->_memTypeSelected = self::getSelectedMemberships(
       $this->_priceSet,
       $formValues
     );
-    $formValues['financial_type_id'] = $this->getFinancialTypeID();
 
-    $isQuickConfig = $this->_priceSet['is_quick_config'];
+    $isQuickConfig = $this->isQuickConfig();
 
     $lineItem = [$this->order->getPriceSetID() => $this->order->getLineItems()];
 
@@ -1796,19 +1779,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $recurParams['trxn_id'] = $this->getInvoiceID();
     $recurParams['campaign_id'] = $this->getSubmittedValue('campaign_id');
     $this->ids['ContributionRecur'] = ContributionRecur::create(FALSE)->setValues($recurParams)->execute()->first()['id'];
-  }
-
-  /**
-   * Get the financial type id relevant to the contribution.
-   *
-   * Financial type id is optional when price sets are in use.
-   *
-   * Otherwise they are required for the form to submit.
-   *
-   * @return int
-   */
-  protected function getFinancialTypeID(): int {
-    return (int) $this->getSubmittedValue('financial_type_id') ?: $this->order->getFinancialTypeID();
   }
 
   /**

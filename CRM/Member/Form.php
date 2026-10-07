@@ -659,30 +659,46 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
-   * Store parameters relating to price sets.
+   * Get the order, building it from the submitted values if not yet built.
    *
-   * @param array $formValues
-   *
-   * @return array
+   * @return \CRM_Financial_BAO_Order
    * @throws \CRM_Core_Exception
    */
-  protected function setPriceSetParameters(array $formValues): array {
-    // process price set and get total amount and line items.
-    $this->getPriceSetID();
+  protected function getOrder(): CRM_Financial_BAO_Order {
+    if (!$this->order) {
+      $this->initializeOrder();
+    }
+    return $this->order;
+  }
+
+  /**
+   * Build the order from the submitted values.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function initializeOrder(): void {
+    $this->order = new CRM_Financial_BAO_Order();
+    $this->order->setPriceSetID($this->getPriceSetID());
+    $this->order->setForm($this);
+
+    $formValues = $this->getSubmittedValues();
     $this->ensurePriceParamsAreSet($formValues);
     $priceSetDetails = $this->getPriceSetDetails($formValues);
     $this->_priceSet = $priceSetDetails[$this->_priceSetId];
-    $this->order = new CRM_Financial_BAO_Order();
-    $this->order->setForm($this);
-    $this->order->setPriceSelectionFromUnfilteredInput($formValues);
 
     if ($this->getSubmittedValue('total_amount')) {
       $this->order->setOverrideTotalAmount((float) $this->getSubmittedValue('total_amount'));
     }
-
     if ($this->isQuickConfig() && $this->getSubmittedValue('financial_type_id')) {
       $this->order->setOverrideFinancialTypeID((int) $this->getSubmittedValue('financial_type_id'));
     }
+    foreach ($this->order->getPriceFieldsMetadata() as $priceField) {
+      if ($priceField['html_type'] === 'Text') {
+        $this->submittableMoneyFields[] = 'price_' . $priceField['id'];
+      }
+    }
+    $this->order->setPriceSelectionFromUnfilteredInput($formValues);
+
     if ($this->getMembershipID()) {
       foreach ($this->order->getLineItems() as $index => $lineItem) {
         if (($lineItem['membership_type_id'] ?? NULL) == $this->getMembershipTypeID()) {
@@ -691,8 +707,20 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
         }
       }
     }
+  }
 
-    return $formValues;
+  /**
+   * Get the financial type id relevant to the contribution.
+   *
+   * Financial type id is optional when price sets are in use.
+   *
+   * Otherwise they are required for the form to submit.
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  protected function getFinancialTypeID(): int {
+    return (int) $this->getSubmittedValue('financial_type_id') ?: $this->getOrder()->getFinancialTypeID();
   }
 
   /**
