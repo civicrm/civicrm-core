@@ -826,6 +826,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
           NULL,
           ['onchange' => 'buildAmount( this.value, ' . json_encode($financialTypeIds) . ');', 'class' => 'crm-select2']
         );
+        $element->setOptionTextEscaped();
         if ($this->_online && !($this->_action & CRM_Core_Action::UPDATE)) {
           $element->freeze();
         }
