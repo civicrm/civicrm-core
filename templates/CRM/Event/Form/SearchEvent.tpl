@@ -53,12 +53,13 @@
   </div>
 </details>
 
-{include file="CRM/common/showHide.tpl"}
-
 {literal}
 <script type="text/javascript">
-if ( document.getElementsByName('eventsByDates')[1].checked ) {
-  CRM.$('#id_fromToDates').show();
-}
+  CRM.$(function($) {
+    var $form = $('form.{/literal}{$form.formClass}{literal}');
+    $('[name="eventsByDates"]', $form).on('change', function() {
+      $('#id_fromToDates').toggle($(this).is(':checked'));
+    }).trigger('change');
+  });
 </script>
 {/literal}
