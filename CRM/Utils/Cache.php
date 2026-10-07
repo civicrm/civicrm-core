@@ -206,7 +206,7 @@ class CRM_Utils_Cache {
     foreach ($types as $type) {
       switch ($type) {
         case '*memory*':
-          if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, ['Memcache', 'Memcached', 'Redis', 'FileCache'])) {
+          if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, ['Memcache', 'Memcached', 'Redis', 'FileCache', 'APCucache'])) {
             $cache = static::createStandard(CIVICRM_DB_CACHE_CLASS, $scopeId, $params);
             break 2;
           }
