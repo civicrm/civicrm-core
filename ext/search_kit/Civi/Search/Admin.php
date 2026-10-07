@@ -174,7 +174,7 @@ class Admin {
         }
         try {
           $getFields = civicrm_api4($entity['name'], 'getFields', [
-            'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'readonly', 'operators', 'suffixes', 'nullable'],
+            'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'fk_column', 'readonly', 'operators', 'suffixes', 'nullable'],
             'where' => [['deprecated', '=', FALSE], ['name', 'NOT IN', ['api_key', 'hash']]],
             'orderBy' => ['label' => 'ASC'],
           ])->indexBy('name');
@@ -490,12 +490,13 @@ class Admin {
   public static function getEntityRefJoins(array $entity, array $field): array {
     $exploded = explode('.', $field['name']);
     $bareFieldName = array_reverse($exploded)[0];
+    $targetKey = $field['fk_column'] ?: 'id';
     $alias = "{$entity['name']}_{$field['fk_entity']}_$bareFieldName";
     $joins[$entity['name']] = [
       'label' => $entity['title'] . ' ' . $field['label'],
       'description' => $field['description'],
       'entity' => $field['fk_entity'],
-      'conditions' => self::getJoinConditions($field['name'], $alias . '.id'),
+      'conditions' => self::getJoinConditions($field['name'], $alias . '.' . $targetKey),
       'defaults' => [],
       'alias' => $alias,
       'multi' => FALSE,
@@ -507,8 +508,8 @@ class Admin {
         'label' => $entity['title_plural'],
         'description' => $entity['description'] ?? '',
         'entity' => $entity['name'],
-        'conditions' => self::getJoinConditions('id', "$alias.{$field['name']}"),
-        'defaults' => [],
+        'conditions' => self::getJoinConditions($targetKey, "$alias.{$field['name']}"),
+        'defaults' => self::getJoinDefaults($alias, $entity),
         'alias' => $alias,
         'multi' => TRUE,
       ];

@@ -280,4 +280,17 @@ class AdminTest extends Api4TestBase {
     $this->assertEquals([['id', '=', 'File_Contact_single_attached_file.SingleRecordFile.single_attached_file']], $singleReverseJoin['conditions']);
   }
 
+  public function testEntityRefGetJoinsDefaults(): void {
+    $schema = Admin::getSchema();
+    $addressEntity = $schema['Address'];
+    $contactIdField = array_column($addressEntity['fields'], NULL, 'name')['contact_id'];
+
+    $joins = Admin::getEntityRefJoins($addressEntity, $contactIdField);
+
+    $this->assertEquals(
+      [['Contact_Address_contact_id.is_primary', '=', TRUE]],
+      $joins['Contact']['defaults']
+    );
+  }
+
 }
