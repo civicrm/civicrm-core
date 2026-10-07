@@ -128,16 +128,6 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
    */
   public function setDefaultValues() {
     $defaults = $unsetSubmittedOptions = [];
-    $discountId = NULL;
-    //fix for CRM-3088, default value for discount set.
-    if (!empty($this->_values['discount'])) {
-      $discountId = CRM_Core_BAO_Discount::findSet($this->_eventId, 'civicrm_event');
-      if ($discountId && !empty($this->_values['event']['default_discount_fee_id'])) {
-        $discountKey = CRM_Core_DAO::getFieldValue("CRM_Core_DAO_OptionValue", $this->_values['event']['default_discount_fee_id'], 'weight', 'id'
-        );
-        $defaults['amount'] = key(array_slice($this->_values['discount'][$discountId], $discountKey - 1, $discountKey, TRUE));
-      }
-    }
     if ($this->_priceSetId) {
       foreach ($this->getPriceFieldMetaData() as $key => $val) {
         if (empty($val['options'])) {
@@ -693,25 +683,17 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
       if ($this->isPaidEvent()) {
 
-        //added for discount
-        $discountId = CRM_Core_BAO_Discount::findSet($this->getEventID(), 'civicrm_event');
-        $params['amount_level'] = $this->getAmountLevel($params, $discountId);
-        if (!empty($this->_values['discount'][$discountId])) {
-          $params['discount_id'] = $discountId;
-          $params['amount'] = $this->_values['discount'][$discountId][$params['amount']]['value'];
-        }
-        else {
-          $lineItem = [];
-          CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem);
+        $params['amount_level'] = $this->getAmountLevel($params);
+        $lineItem = [];
+        CRM_Price_BAO_PriceSet::processAmount($this->_values['fee'], $params, $lineItem);
 
-          //build line item array..
-          //if requireApproval/waitlist is enabled we hide fees for primary participant
-          // (and not for additional participant which might be is a bug)
-          //lineItem are not correctly build for primary participant
-          //this results in redundancy since now lineItems for additional participant will be build against primary participantNum
-          //therefore lineItems must always be build against current participant No
-          $this->_lineItem[$addParticipantNum] = $lineItem;
-        }
+        //build line item array..
+        //if requireApproval/waitlist is enabled we hide fees for primary participant
+        // (and not for additional participant which might be is a bug)
+        //lineItem are not correctly build for primary participant
+        //this results in redundancy since now lineItems for additional participant will be build against primary participantNum
+        //therefore lineItems must always be build against current participant No
+        $this->_lineItem[$addParticipantNum] = $lineItem;
       }
 
       if ($this->isPayLater()) {

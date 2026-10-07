@@ -158,6 +158,50 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * A live, date-windowed Discount record (see CRM_Core_BAO_Discount)
+   * redirects the whole registration onto its own price set -
+   * CRM_Event_Form_Registration::getPriceSetID() picks it up via
+   * getDiscountID(), ahead of the event's normal price set. Confirm the
+   * online registration flow actually follows that redirection and charges
+   * the discounted amount, not the event's normal one.
+   */
+  public function testSubmitWithDiscount(): void {
+    $event = $this->eventCreatePaid();
+    $this->addDiscountPriceSet();
+    $form = $this->getFormWrapper([
+      'first_name' => 'Kim',
+      'last_name' => 'Reality',
+      'email-Primary' => 'demo@example.com',
+      'priceSetId' => $this->ids['PriceSet']['discount'],
+      $this->getPriceFieldFormLabel('discount') => $this->ids['PriceFieldValue']['discount_standard'],
+      'payment_processor_id' => 0,
+    ], $event['id']);
+    $form->processForm();
+
+    $this->assertEquals(150.0, $form->getTotalAmount());
+    $participant = Participant::get(FALSE)
+      ->addSelect('fee_amount', 'fee_level', 'discount_id')
+      ->execute()->single();
+    $this->assertEquals(150.0, $participant['fee_amount']);
+    $this->assertEquals($this->ids['Discount']['discount'], $participant['discount_id']);
+    $this->assertStringContainsString('Standard Rate', implode(' ', $participant['fee_level']));
+  }
+
+  /**
+   * getPriceSetID() is the public getter through which the discount
+   * redirection is actually exposed (getDiscountID(), which it delegates
+   * to, is protected) - check it directly, independent of a full
+   * registration submission.
+   */
+  public function testGetPriceSetIDUsesDiscount(): void {
+    $event = $this->eventCreatePaid();
+    $this->addDiscountPriceSet();
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [], ['id' => $event['id']]);
+    $form->processForm($form::BUILT);
+    $this->assertEquals($this->ids['PriceSet']['discount'], $form->getPriceSetID());
+  }
+
+  /**
    * Tests payment processor receives contactID when registering for paid event from waitlist.
    *
    * https://github.com/civicrm/civicrm-core/pull/23358, https://lab.civicrm.org/extensions/stripe/-/issues/347
