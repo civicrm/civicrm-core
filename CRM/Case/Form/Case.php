@@ -100,6 +100,12 @@ class CRM_Case_Form_Case extends CRM_Core_Form implements CRM_Case_Form_CaseForm
   public $_caseStatusId;
 
   /**
+   * The array of form field attributes.
+   * @var array
+   */
+  public $_fields;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
