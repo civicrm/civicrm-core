@@ -11,7 +11,7 @@
 <div class="crm-content-block">
 {foreach from=$adminPanel key=groupName item=group}
 <div id="admin-section-{$groupName}">
-  <h3>{$group.title}</h3>
+  <h3 class="crm-header-shaded">{$group.title}</h3>
   <div class="admin-section-items">
     {foreach from=$group.fields item=panelItem  key=panelName}
     <dl>
