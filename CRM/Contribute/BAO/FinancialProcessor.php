@@ -146,6 +146,22 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
+   * @param array $params
+   *
+   * @return int
+   */
+  private function createFinancialTrxn(array $params): int {
+    $trxn = CRM_Core_BAO_FinancialTrxn::writeRecord($params);
+    CRM_Financial_DAO_EntityFinancialTrxn::writeRecord([
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $this->getContributionID(),
+      'financial_trxn_id' => $trxn->id,
+      'amount' => $params['total_amount'],
+    ]);
+    return $trxn->id;
+  }
+
+  /**
    * @return bool
    */
   private function isRecordAccountsReceivable(): bool {
@@ -396,8 +412,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
         if ($this->isRecordAccountsReceivable()) {
           $this->recordAlwaysAccountsReceivable($trxnParams, $params);
         }
-        $financialTxn = CRM_Core_BAO_FinancialTrxn::create($trxnParams);
-        $params['entity_id'] = $financialTxn->id;
+        $financialTxnID = $this->createFinancialTrxn($trxnParams);
+        $params['entity_id'] = $financialTxnID;
       }
     }
     // record line items and financial items
@@ -407,11 +423,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     // create batch entry if batch_id is passed and
     // ensure no batch entry is been made on 'Pending' or 'Failed' contribution, CRM-16611
-    if (!empty($params['batch_id']) && !empty($financialTxn)) {
+    if (!empty($params['batch_id']) && !empty($financialTxnID)) {
       $entityParams = [
         'batch_id' => $params['batch_id'],
         'entity_table' => 'civicrm_financial_trxn',
-        'entity_id' => $financialTxn->id,
+        'entity_id' => $financialTxnID,
       ];
       CRM_Batch_BAO_EntityBatch::create($entityParams);
     }
@@ -594,8 +610,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *   'deferred_line_total' & 'financial_item_id' added.
    */
   private function updateFinancialAccounts($params, $context = NULL): array {
-    $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
-    $trxnIds['id'] = $trxn->id;
+    $trxnIds['id'] = $this->createFinancialTrxn($params['trxnParams']);
     $lineItems = $this->getUpdatedLineItems();
     $postUpdateContribution = $this->getUpdatedContribution();
     foreach ($lineItems as $fieldValueId => $lineItemDetails) {
@@ -760,9 +775,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
       if ($this->isRecordAccountsReceivable() && !$this->getOriginalContributionValue('is_pay_later')) {
         $financialTrxnIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams'], $params);
       }
-      $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
+
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-      $params['entity_id'] = $financialTrxnIDs[] = $trxn->id;
+      $params['entity_id'] = $financialTrxnIDs[] = $this->createFinancialTrxn($params['trxnParams']);
 
       $entityFinancialTrxnRecord = [
         'entity_table' => 'civicrm_financial_item',
@@ -829,9 +844,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $params['to_financial_account_id'] = $arAccountId;
     $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $params['is_payment'] = FALSE;
-    $trxn = CRM_Core_BAO_FinancialTrxn::create($params);
+    $trxnID = $this->createFinancialTrxn($params);
     $trxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
-    return $trxn->id;
+    return $trxnID;
   }
 
   /**
@@ -902,10 +917,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $lastFinancialTrxn['fee_amount'] = -$inputParams['trxnParams']['fee_amount'];
     $lastFinancialTrxn['contribution_id'] = $this->getContributionID();
     foreach ([$lastFinancialTrxn, $inputParams['trxnParams']] as $financialTrxnParams) {
-      $trxn = CRM_Core_BAO_FinancialTrxn::create($financialTrxnParams);
+      $trxnID = $this->createFinancialTrxn($financialTrxnParams);
       $trxnParams = [
-        'total_amount' => $trxn->total_amount,
-        'contribution_id' => $this->getContributionID(),
+        'total_amount' => $financialTrxnParams['total_amount'],
       ];
       $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->getContributionID());
       if (!empty($lineItems)) {
@@ -914,7 +928,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $entityParams = [
           'contribution_total_amount' => $prevContribution->total_amount,
           'trxn_total_amount' => $trxnParams['total_amount'],
-          'trxn_id' => $trxn->id,
+          'trxn_id' => $trxnID,
         ];
         $eftParams = [
           'entity_table' => 'civicrm_financial_item',
@@ -1034,6 +1048,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
           'amount' => $revenue['amount'],
           'financial_trxn_id' => $financialTxn->id,
         ];
+        // @todo - this appears to result in 2 EntityFinancialTrxns rather than 1 - but if so
+        // it is long-time broken & evidence of long-disuse.
         civicrm_api3('EntityFinancialTrxn', 'create', $entityParams);
       }
     }
@@ -1405,16 +1421,16 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $updateAmountLevel = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
     }
     // $contributionId must not be NULL
-    $trxn = $this->recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount, $updateAmountLevel);
+    $trxnID = $this->recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount, $updateAmountLevel);
 
     if (!empty($financialItemsArray)) {
       foreach ($financialItemsArray as $updateFinancialItemInfoValues) {
-        $this->createFinancialItem($updateFinancialItemInfoValues, $trxn ? $trxn->id : NULL);
+        $this->createFinancialItem($updateFinancialItemInfoValues, $trxnID);
       }
     }
 
     // This won't work if there is no contribution
-    $this->addFinancialItemsOnLineItemsChange(array_merge($lineItemsToAdd, $requiredChanges['line_items_to_resurrect']), $contributionId, $trxn->id ?? NULL);
+    $this->addFinancialItemsOnLineItemsChange(array_merge($lineItemsToAdd, $requiredChanges['line_items_to_resurrect']), $contributionId, $trxnID);
   }
 
   /**
@@ -1603,9 +1619,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @param int $taxAmount
    * @param bool $updateAmountLevel
    *
-   * @return \CRM_Financial_DAO_FinancialTrxn|null
-   * @internal - will change.
-   *
+   * @return int|null
    */
   private function recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
     $paidAmount = \Civi\Api4\Contribution::get(FALSE)
@@ -1651,14 +1665,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
         'trxn_date' => date('YmdHis'),
         'currency' => $this->getUpdatedContributionValue('currency'),
       ];
-      return CRM_Core_BAO_FinancialTrxn::create($adjustedTrxnValues);
+      $adjustedTrxnID = $this->createFinancialTrxn($adjustedTrxnValues);
+      return $adjustedTrxnID;
     }
     // CRM-17151: Update the contribution status to completed if balance is zero,
     //  because due to sucessive fee change will leave the related contribution status incorrect
     else {
       CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id', $contributionStatuses['Completed']);
     }
-
     return NULL;
   }
 
