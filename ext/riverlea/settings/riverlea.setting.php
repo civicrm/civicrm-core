@@ -27,16 +27,15 @@ return [
     'name' => 'riverlea_user_controls_backend',
     'group' => 'riverlea',
     'type' => 'Array',
-    'default' => [],
+    //'default' => [],
     'html_type' => 'checkboxes',
     'title' => E::ts('Backend User Controls'),
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => E::ts('Enable users to tweak the theme to their preferences.'),
     'options' => [
-      // TODO: add other controls
+      'font-size' => E::ts('Font size'),
       'dark-mode' => E::ts('Dark-mode'),
-      //'font-size' => E::ts('Font size'),
     ],
     'settings_pages' => [
       'theme' => ['weight' => 210],

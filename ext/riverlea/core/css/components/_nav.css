@@ -47,3 +47,18 @@
 .crm-container .nav.nav-pills {
   gap: var(--crm-flex-gap);
 }
+
+#civicrm-menu > .civi-riverlea-user-controls {
+  float: right;
+  padding-left: var(--crm-padding-small);
+  padding-right: var(--crm-padding-small);
+  display: flex;
+  align-items: center;
+  height: 2.5rem;
+}
+
+@media (max-width: 991px) {
+  .civi-riverlea-user-controls {
+    padding-left: 12px;
+  }
+}
