@@ -191,4 +191,23 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     CRM_Core_Menu::rebuild();
   }
 
+  /**
+   * rebuild rebuilds an empty route table but leaves a populated one alone.
+   */
+  public function testRebuildOnlyIfEmpty(): void {
+    $rebuilt = FALSE;
+    // Flag if save() has run
+    CRM_Utils_Hook::singleton()->setHook('civicrm_alterMenu', function (&$items) use (&$rebuilt) {
+      $rebuilt = TRUE;
+    });
+
+    CRM_Core_Menu::clear();
+    CRM_Core_Menu::rebuild();
+    $this->assertTrue($rebuilt, 'rebuild() should rebuild an empty table');
+
+    $rebuilt = FALSE;
+    CRM_Core_Menu::rebuild();
+    $this->assertFalse($rebuilt, 'rebuild() should skip a populated table');
+  }
+
 }
