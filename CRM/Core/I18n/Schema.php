@@ -172,7 +172,7 @@ class CRM_Core_I18n_Schema {
     }
 
     // add original indices
-    $queries = array_merge($qRueries, self::createIndexQueries(NULL, $table));
+    $queries = array_merge($queries, self::createIndexQueries(NULL, $table));
 
     // execute the queries without i18n rewriting
     $dao = new CRM_Core_DAO();
