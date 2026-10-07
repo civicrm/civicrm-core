@@ -143,7 +143,7 @@
           </td>
         </tr>
         {if !$membershipMode}
-          <tr>
+          <tr class="crm-membership-form-block-is_override">
             <td class="label">{$form.is_override.label} {help id="is_override"}</td>
             <td>
               <span id="is-override">{$form.is_override.html}</span>
