@@ -1,14 +1,27 @@
 <?php
 
 /**
- * Add extension to PHP's include_path.
+ * Add the extension to PHP's `include_path`.
  *
- * Historically, civix added every extension to PHP's include_path via
- * `_civix_civicrm_config()`. This mixin provides backward compatibility
- * for extensions that still rely on include_path (e.g. for legacy PEAR-style
- * class loading, CiviCRM API v3, or relative require/include statements).
+ * The PHP `include_path` is an old-school way to load code from different packages,
+ * and it used to be central piece of glue in CiviCRM. At time of writing, you may find
+ * that `include_path` is still used/required for some features in CiviCRM:
  *
- * @mixinName legacy-include-path
+ *  - __APIv3 Loader__: Files like `api/v3/**.php` are loaded from the `include_path`.
+ *  - __Class Loader__: If your extension has PHP class-files but does NOT declare
+ *    them with `<psr0>`/`<psr4>`, then you probably rely on `include_path`.
+ *  - __Class Overrides__: If your extension overrides a class from civicrm-core,
+ *    then you probably rely on `include_path`.
+ *  - __PHP Require__: If you have literal calls to PHP's `require` or `require_once`,
+ *    then you may be reliant on `include_path`.
+ *
+ * These are mostly old patterns, and new CiviCRM extensions rarely require them.
+ *
+ * NOTE: Historically, `include_path` registration was handled by civix templates.
+ * Going forward, these templates are being simplified. If you still need the PHP
+ * `include_path`, then you should enable the mixin instead.
+ *
+ * @mixinName include-path
  * @mixinVersion 1.0.0
  * @since 6.19
  *
