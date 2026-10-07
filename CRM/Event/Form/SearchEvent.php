@@ -29,13 +29,6 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
   public function setDefaultValues() {
     $defaults = [];
     $defaults['eventsByDates'] = 0;
-
-    $showHide = new CRM_Core_ShowHideBlocks();
-    if (empty($defaults['eventsByDates'])) {
-      $showHide->addHide('id_fromToDates');
-    }
-
-    $showHide->addToTemplate();
     return $defaults;
   }
 
@@ -51,8 +44,7 @@ class CRM_Event_Form_SearchEvent extends CRM_Core_Form {
 
     $this->addSelect('event_type_id', ['multiple' => TRUE, 'context' => 'search']);
 
-    $searchOption = [ts('Show Current and Upcoming Events'), ts('Search All or by Date Range')];
-    $this->addToggle('eventsByDates', ts('Show Past Events'), ['onclick' => "return showHideByValue('eventsByDates','1','id_fromToDates','block','checkbox');"]);
+    $this->addToggle('eventsByDates', ts('Show Past Events'));
 
     $this->add('datepicker', 'start_date', ts('From'), [], FALSE, ['time' => FALSE]);
     $this->add('datepicker', 'end_date', ts('To'), [], FALSE, ['time' => FALSE]);
