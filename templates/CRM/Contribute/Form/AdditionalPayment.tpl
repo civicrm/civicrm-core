@@ -106,14 +106,6 @@
     </details>
 
     {include file="CRM/common/customDataBlock.tpl" customDataType='FinancialTrxn'}
-    {literal}
-    <script type="text/javascript">
-      CRM.$(function($) {
-        showHideByValue( 'is_email_receipt', '', 'notice', 'table-row', 'radio', false );
-        showHideByValue( 'is_email_receipt', '', 'fromEmail', 'table-row', 'radio', false );
-      });
-    {/literal}
-  </script>
 
 <br />
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
