@@ -98,6 +98,22 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
     $this->addTask('Register Message Templates as taggable', 'registerMessageTemplateTagUsedFor');
 
     $this->addTask('Set payment_instrument field-display groupings', 'setPaymentInstrumentGroupings');
+    $this->addTask('Preserve WordPress auto sign-in default', 'preserveWordPressAutoSignIn');
+
+  }
+
+  /**
+   * Preserve the previous default for WordPress "Automatically Sign In User".
+   *
+   */
+  public static function preserveWordPressAutoSignIn(CRM_Queue_TaskContext $ctx): bool {
+    if (CIVICRM_UF === 'WordPress' && function_exists('add_option')) {
+      // If Sign in User hasn't be set we set it to TRUE (all new install will be set to FALSE)
+      if (!get_option('civicrm_automatically_sign_in_user')) {
+        add_option('civicrm_automatically_sign_in_user', 1);
+      }
+    }
+    return TRUE;
   }
 
   /**
