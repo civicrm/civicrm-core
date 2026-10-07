@@ -1,6 +1,7 @@
 <?php
 
 use Civi\APi4\PaymentProcessor;
+use Civi\Test\FormWrapper;
 
 /**
  * @group headless
@@ -17,13 +18,13 @@ class CRM_Admin_Form_PaymentProcessorTest extends CiviUnitTestCase {
   public function testUpdateAcceptCreditCard(): void {
     $this->createAuthorizeNetProcessor();
     $this->paymentProcessorAuthorizeNetCreate();
-    $_REQUEST['id'] = $this->ids['PaymentProcessor']['anet'];
-    $form = new CRM_Admin_Form_PaymentProcessor(NULL, CRM_Core_Action::UPDATE);
-    $form->controller = new CRM_Core_Controller();
-    $pageName = $form->getName();
-    $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
-    $form->preProcess();
-    $paymentProcessor = $this->callAPISuccess('PaymentProcessor', 'getSingle', ['id' => $form->_id]);
+    $processorID = $this->ids['PaymentProcessor']['anet'];
+    $form = $this->getTestForm('CRM_Admin_Form_PaymentProcessor', [], [
+      'id' => $processorID,
+      'action' => 'update',
+    ]);
+    $form->processForm(FormWrapper::PREPROCESSED);
+    $paymentProcessor = $this->callAPISuccess('PaymentProcessor', 'getSingle', ['id' => $processorID]);
     $form->updatePaymentProcessor(array_merge($paymentProcessor, [
       'accept_credit_cards' => [
         'Visa' => 1,
@@ -34,7 +35,7 @@ class CRM_Admin_Form_PaymentProcessorTest extends CiviUnitTestCase {
     $this->assertEquals([
       'Visa' => 'Visa',
       'MasterCard' => 'MasterCard',
-    ], PaymentProcessor::get()->addWhere('id', '=', $form->_id)->execute()->first()['accepted_credit_cards']);
+    ], PaymentProcessor::get()->addWhere('id', '=', $processorID)->execute()->first()['accepted_credit_cards']);
   }
 
 }

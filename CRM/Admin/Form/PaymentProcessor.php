@@ -443,6 +443,9 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   /**
    * Save a payment processor.
    *
+   * @api This function will not change in a minor release and is supported for
+   * external use.
+   *
    * @param array $values
    * @param int $domainID
    * @param bool $test
