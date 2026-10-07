@@ -577,6 +577,7 @@ WHERE li.contribution_id = %1";
   ) {
     $order = new CRM_Financial_BAO_Order();
     $order->setPriceSelectionFromUnfilteredInput($params);
+
     if ($form) {
       // This will cause the buildAmount hook to be called.
       $order->setForm($form);
@@ -589,7 +590,12 @@ WHERE li.contribution_id = %1";
     // initialize empty Lineitem instance to call protected helper functions
     $lineItemObj = new CRM_Price_BAO_LineItem();
 
-    $requiredChanges = $lineItemObj->getLineItemsToAlter($submittedLineItems, $contributionId);
+    // GJ-PATCH-START: Event Selections Change Restriction to Participant to be changed
+    // A contribution can contain line items belonging to multiple participants.
+    // Restrict the comparison to the participant whose event selections are
+    // being changed.
+    $requiredChanges = $lineItemObj->getLineItemsToAlter($submittedLineItems, $contributionId, $entityID, $entityTable);
+    // GJ-PATCH-END: Event Selections Change Restriction to Participant to be changed
 
     // get financial information that need to be recorded on basis on submitted price field value IDs
     if (!empty($requiredChanges['line_items_to_cancel']) || !empty($requiredChanges['line_items_to_update'])) {
@@ -802,10 +808,63 @@ WHERE li.contribution_id = %1";
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  protected function getLineItemsToAlter(array $submittedLineItems, int $contributionID): array {
+
+  // GJ-PATCH-START: Event Selections Change Restriction to Participant to be changed
+  /**
+   * Determine which existing line items must be added, updated, cancelled,
+   * or resurrected when fee selections are changed.
+   *
+   * GJ PATCH: Event Selections Change Restriction to Participant to be changed
+   *
+   * Background:
+   * CiviCRM can associate multiple line items with the same contribution.
+   * This is particularly relevant for event registrations, where a
+   * contribution may contain line items belonging to different entities.
+   * The original implementation identified previous line items using only
+   * the contribution ID. As a result, changing the fee selections for one
+   * participant could cause line items belonging to another participant
+   * associated with the same contribution to be considered for alteration.
+   *
+   * Change:
+   * Restrict the set of previous line items to the specific entity being
+   * modified by additionally matching both entity_table and entity_id.
+   * For an event participant this means that only line items belonging to
+   * the current civicrm_participant record are considered.
+   *
+   * This preserves the existing add/update/cancel/resurrect logic while
+   * preventing fee changes for one participant from modifying line items
+   * belonging to another participant sharing the same contribution.
+   *
+   * The additional entity parameters are supplied by changeFeeSelections()
+   * and are intentionally used only to narrow the existing line-item query.
+   *
+   * @param array $submittedLineItems
+   *   Line items representing the newly submitted fee selections.
+   * @param int $contributionID
+   *   Contribution associated with the fee change.
+   * @param int $entityID
+   *   ID of the entity whose fee selections are being changed.
+   * @param string $entityTable
+   *   CiviCRM entity table containing the line items, for example
+   *   'civicrm_participant'.
+   *
+   * @return array
+   *   Array containing:
+   *   - line_items_to_add: New line items to create.
+   *   - line_items_to_update: Existing line items whose values changed.
+   *   - line_items_to_cancel: Existing line items that are no longer selected.
+   *   - line_items_to_resurrect: Previously cancelled line items to reactivate.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function getLineItemsToAlter(array $submittedLineItems, int $contributionID, int $entityID, string $entityTable): array {
     $previousLineItems = LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contributionID)
+      ->addWhere('entity_table', '=', $entityTable)
+      ->addWhere('entity_id', '=', $entityID)
       ->execute()->indexBy('id');
+  // GJ-PATCH-END: Event Selections Change Restriction to Participant to be changed
 
     $lineItemsToAdd = $submittedLineItems;
     $lineItemsToUpdate = [];
@@ -838,6 +897,7 @@ WHERE li.contribution_id = %1";
             $lineItemsToUpdate[$previousLineItem['price_field_value_id']] = $submittedLineItem;
             $lineItemsToUpdate[$previousLineItem['price_field_value_id']]['id'] = $id;
             // Format is actually '0.00'
+
             if ($previousLineItem['line_total'] == 0) {
               $lineItemsToAdd[$previousLineItem['price_field_value_id']]['id'] = $id;
               $lineItemsToResurrect[] = $lineItemsToAdd[$previousLineItem['price_field_value_id']];
@@ -934,6 +994,7 @@ WHERE li.contribution_id = %1";
         'contribution_id' => $contributionID,
       ]);
       $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
+
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
       CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $trxnArray);
@@ -967,6 +1028,7 @@ WHERE li.contribution_id = %1";
 
       $partUpdateFeeAmt['fee_level'] = $line;
       $partUpdateFeeAmt['fee_amount'] = $feeAmount;
+
       CRM_Event_BAO_Participant::add($partUpdateFeeAmt);
 
       //activity creation

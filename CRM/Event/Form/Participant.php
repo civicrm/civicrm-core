@@ -1531,17 +1531,42 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       'note' => $this->getSubmittedValue('note'),
       'is_test' => $this->isTest(),
     ];
-    if (!$this->getParticipantID() || !$this->getContributionID()) {
-      // For new registrations, or existing ones with no contribution,
-      // fill in fee detail. For existing
-      // registrations with a contribution the user will have the option to
-      // change the fees via a different form.
-      $order = $this->getOrder();
-      if ($order) {
-        $participantParams['fee_level'] = $order->getAmountLevel();
-        $participantParams['fee_amount'] = $order->getTotalAmount();
-      }
-    }
+
+
+    // GJ-PATCH-START
+		if (!$this->getParticipantID() || !$this->getContributionID()) {
+		  // For new registrations, or existing ones with no contribution,
+		  // fill in fee detail. For existing
+		  // registrations with a contribution the user will have the option to
+		  // change the fees via a different form.
+		  //
+		  // An existing participant may have a contribution linked through
+        // civicrm_participant_payment even when getContributionID() is empty.
+		  // The order total may include fees for multiple participants and therefore
+		  // must not be used as this participant's individual fee in that case.
+		  // So, do not overwrite participant.fee_amount with the shared order total
+		  // in that case.
+		  $hasParticipantContribution = FALSE;
+
+		  if ($this->getParticipantID()) {
+			 $hasParticipantContribution = (bool) CRM_Core_DAO::getFieldValue(
+				'CRM_Event_DAO_ParticipantPayment',
+				$this->getParticipantID(),
+				'contribution_id',
+				'participant_id'
+			 );
+		  }
+
+		  if (!$this->getParticipantID() || !$hasParticipantContribution) {
+			 $order = $this->getOrder();
+			 if ($order) {
+				$participantParams['fee_level'] = $order->getAmountLevel();
+				$participantParams['fee_amount'] = $order->getTotalAmount();
+			 }
+		  }
+		}
+	 // GJ-PATCH-STOP
+
     if ($this->getSubmittedValue('discount_id')) {
       $participantParams['discount_id'] = $this->getSubmittedValue('discount_id');
     }
