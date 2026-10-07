@@ -83,6 +83,9 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
 
     $f = [];
     \CRM_Utils_Hook::translateFields($f);
+    $f['civicrm_group']['title'] = TRUE;
+    $f['civicrm_group']['frontend_title'] = TRUE;
+    $f['civicrm_group']['frontend_description'] = TRUE;
 
     // Future: Assimilate defaults originating in XML (incl extension-entities)
     // e.g. CRM_Core_I18n_SchemaStructure::columns() will grab core fields

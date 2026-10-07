@@ -555,13 +555,13 @@ class CRM_Core_DAO extends DB_DataObject {
    */
   public static function getLocaleTableName($tableName = NULL) {
     $tableName ??= static::getTableName();
-    global $dbLocale;
+    /*global $dbLocale;
     if ($dbLocale) {
       $tables = CRM_Core_I18n_Schema::schemaStructureTables();
       if (in_array($tableName, $tables)) {
         return $tableName . $dbLocale;
       }
-    }
+    }*/
     return $tableName;
   }
 
@@ -577,6 +577,7 @@ class CRM_Core_DAO extends DB_DataObject {
    *   the current DAO object after the query execution
    */
   public function query($query, $i18nRewrite = TRUE) {
+
     // rewrite queries that should use $dbLocale-based views for multi-language installs
     global $dbLocale, $_DB_DATAOBJECT;
 

@@ -275,11 +275,13 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Generic {
       ");
     }
 
+    // [SV] this seems to bypass i18nrewrite somehow
+    /*
     OptionValue::save(FALSE)
       ->setRecords($options)
       ->setDefaults(['is_active' => 1, 'option_group_id' => $optionGroupID])
       ->setMatch(['option_group_id', 'value'])
-      ->execute();
+      ->execute();*/
   }
 
   /**

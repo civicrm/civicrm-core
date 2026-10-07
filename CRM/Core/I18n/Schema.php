@@ -172,7 +172,7 @@ class CRM_Core_I18n_Schema {
     }
 
     // add original indices
-    $queries = array_merge($queries, self::createIndexQueries(NULL, $table));
+    $queries = array_merge($qRueries, self::createIndexQueries(NULL, $table));
 
     // execute the queries without i18n rewriting
     $dao = new CRM_Core_DAO();
@@ -225,20 +225,20 @@ class CRM_Core_I18n_Schema {
     $queries = [];
     foreach ($columns as $table => $hash) {
       // add new columns
-      foreach ($hash as $column => $type) {
+      /*foreach ($hash as $column => $type) {
         // CRM-7854: skip existing columns
         if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, "{$column}_{$locale}", FALSE)) {
           continue;
         }
         $queries[] = "ALTER TABLE {$table} ADD {$column}_{$locale} {$type}";
         $queries[] = "UPDATE {$table} SET {$column}_{$locale} = {$column}_{$source}";
-      }
+      }*/
 
       // add view
       $queries[] = self::createViewQuery($locale, $table, $dao);
 
       // add new indices
-      $queries = array_merge($queries, array_values(self::createIndexQueries($locale, $table)));
+      //$queries = array_merge($queries, array_values(self::createIndexQueries($locale, $table)));
     }
 
     // execute the queries without i18n rewriting
@@ -316,14 +316,15 @@ class CRM_Core_I18n_Schema {
     }
 
     // rebuild triggers
-    $last = array_pop($locales);
+    // [SV] likely obsolete ?
+    /*$last = array_pop($locales);
 
     foreach ($queries as $query) {
       $dao->query($query, FALSE);
     }
 
     // invoke the meta trigger creation call
-    CRM_Core_DAO::triggerRebuild();
+    CRM_Core_DAO::triggerRebuild();*/
   }
 
   /**
@@ -336,6 +337,13 @@ class CRM_Core_I18n_Schema {
    *   the rewritten query
    */
   public static function rewriteQuery($query) {
+    // [SV] quickfix for now, don't work anymore except for select
+    $pattern = '/^(?:\s+|\/\*.*?\*\/|--[^\r\n]*|#[^\r\n]*)*\(?\s*(INSERT|UPDATE|REPLACE|DELETE)\b/is';
+    if (preg_match($pattern, $query) === 1) {
+      return $query;
+    }
+    $before = $query;
+
     global $dbLocale;
     $tables = self::schemaStructureTables();
     foreach ($tables as $table) {
@@ -346,6 +354,11 @@ class CRM_Core_I18n_Schema {
     }
     // uncomment the below to rewrite the civicrm_value_* queries
     // $query = preg_replace("/(civicrm_value_[a-z0-9_]+_\d+)([^_])/", "\\1{$dbLocale}\\2", $query);
+
+    //if ($query != $before) {
+      \Civi::log()->debug('REWRITEN TO ==> ' . $query);
+    //}
+
     return $query;
   }
 
@@ -487,10 +500,16 @@ class CRM_Core_I18n_Schema {
     // view internationalized columns through an alias
     foreach ($columns[$lookup_table] as $column => $_) {
       if (!$isUpgradeMode) {
-        $cols[] = "`{$column}_{$locale}` `{$column}`";
+        //$cols[] = "`{$column}_{$locale}` `{$column}`";
+        $cols[] = "COALESCE((SELECT tr.string FROM civicrm_translation tr
+            WHERE tr.entity_table = '{$lookup_table}'
+              AND tr.entity_field = '{$column}'
+              AND tr.language = '{$locale}'
+              AND tr.entity_id = `{$lookup_table}`.`id`), `{$lookup_table}`.`$column`) AS `$column`";
       }
       elseif (in_array("{$column}_{$locale}", $tableCols)) {
-        $cols[] = "`{$column}_{$locale}` `{$column}`";
+        // [SV] FIXME: it should not come to this anymore - deprecated ??
+        //$cols[] = "`{$column}_{$locale}` `{$column}`";
       }
     }
     return "CREATE OR REPLACE VIEW `{$db}`.{$table}_{$locale} AS SELECT " . implode(', ', $cols) . " FROM `{$db}`.{$table}";
@@ -585,6 +604,8 @@ class CRM_Core_I18n_Schema {
     $indices = CRM_Core_I18n_SchemaStructure::indices();
     $queries = [];
     foreach ($columns as $table => $hash) {
+      // removed, not needed
+      /*
       // drop old indices
       if (isset($indices[$table])) {
         foreach ($indices[$table] as $index) {
@@ -600,13 +621,13 @@ class CRM_Core_I18n_Schema {
           $queries[] = "UPDATE {$table} SET {$column}_{$locale} = {$column}";
           $queries[] = "ALTER TABLE {$table} DROP {$column}";
         }
-      }
+      }*/
 
       // add view
       $queries[] = self::createViewQuery($locale, $table, $dao);
 
       // add new indices
-      $queries = array_merge($queries, array_values(self::createIndexQueries($locale, $table)));
+      //$queries = array_merge($queries, array_values(self::createIndexQueries($locale, $table)));
     }
 
     // execute the queries without i18n rewriting
