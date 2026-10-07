@@ -446,17 +446,6 @@ class SettingsManager {
       }
     }
 
-    // we need to make an exceptional check for if we have a value for DSN that
-    // is composed from consituent parts *before* we load the settings
-    // file in order to ensure the env values take precedence over
-    // define('CIVICRM_DSN'...) in the settings file
-    if (!defined('CIVICRM_DSN')) {
-      $composedDsn = $bootSettingsManager->getBagByDomain(NULL)->get('civicrm_db_dsn');
-      if ($composedDsn) {
-        define('CIVICRM_DSN', $composedDsn);
-      }
-    }
-
     if (file_exists($settingsPath)) {
       if (!defined('CIVICRM_SETTINGS_PATH')) {
         define('CIVICRM_SETTINGS_PATH', $settingsPath);
