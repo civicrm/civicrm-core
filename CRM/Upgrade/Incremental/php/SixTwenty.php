@@ -131,7 +131,11 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
    * (https://lab.civicrm.org/extensions/checknumberpaymentmethod) have configured additional,
    * non-reserved payment instruments to show check_number via its 'check_payment_instrument_ids'
    * setting instead. Carry that configuration over to 'grouping' too, so those instruments keep
-   * showing the field once core handles this natively.
+   * showing the field once core handles this natively - then uninstall the now-redundant
+   * extension here, rather than via extension-compatibility.json's generic 'force-uninstall'.
+   * That mechanism runs at weight 0, before every versioned upgrade task including this one, so
+   * by the time this ran the extension would already be disabled and 'check_payment_instrument_ids'
+   * unreadable - losing the very configuration this is meant to carry over.
    */
   public static function setPaymentInstrumentGroupings(): bool {
     $groupings = [
@@ -150,7 +154,8 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
       ]);
     }
 
-    if (CRM_Extension_System::singleton()->getManager()->isEnabled('checknumberpaymentmethod')) {
+    $manager = CRM_Extension_System::singleton()->getManager();
+    if ($manager->isEnabled('checknumberpaymentmethod')) {
       $checkInstrumentIDs = (array) Civi::settings()->get('check_payment_instrument_ids');
       foreach ($checkInstrumentIDs as $checkInstrumentID) {
         CRM_Core_DAO::executeQuery("
@@ -161,6 +166,14 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
         ", [
           1 => [$checkInstrumentID, 'Integer'],
         ]);
+      }
+      try {
+        $manager->disable('checknumberpaymentmethod');
+        $manager->uninstall('checknumberpaymentmethod');
+      }
+      catch (CRM_Extension_Exception $e) {
+        // Don't block the rest of the upgrade over this, matching
+        // CRM_Upgrade_Form::disableOldExtensions()'s handling of failures.
       }
     }
     return TRUE;
