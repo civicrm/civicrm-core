@@ -177,7 +177,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     //load default campaign from page.
     if (array_key_exists('participant_campaign_id', $this->_fields)) {
-      $defaults['participant_campaign_id'] = $this->_values['event']['campaign_id'] ?? NULL;
+      $defaults['participant_campaign_id'] = $this->getCampaignID($this->getParticipantIndex());
     }
 
     //CRM-17865 set custom field defaults
@@ -624,14 +624,6 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
     }
-    //carry campaign to partcipants.
-    if (array_key_exists('participant_campaign_id', $params)) {
-      $params['campaign_id'] = $params['participant_campaign_id'];
-    }
-    else {
-      $params['campaign_id'] = $this->_values['event']['campaign_id'] ?? NULL;
-    }
-
     // if waiting is enabled
     if (!$this->_allowConfirmation &&
       is_numeric($this->_availableRegistrations)

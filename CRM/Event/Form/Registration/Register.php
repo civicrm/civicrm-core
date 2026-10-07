@@ -193,7 +193,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!empty($this->_fields)) {
       //load default campaign from page.
       if (array_key_exists('participant_campaign_id', $this->_fields)) {
-        $this->_defaults['participant_campaign_id'] = $this->_values['event']['campaign_id'] ?? NULL;
+        $this->_defaults['participant_campaign_id'] = $this->getCampaignID(0);
       }
 
       foreach ($this->_fields as $name => $field) {
@@ -667,14 +667,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     if (!empty($params['image_URL'])) {
       CRM_Contact_BAO_Contact::processImageParams($params);
-    }
-
-    //carry campaign to partcipants.
-    if (array_key_exists('participant_campaign_id', $params)) {
-      $params['campaign_id'] = $params['participant_campaign_id'];
-    }
-    else {
-      $params['campaign_id'] = $this->_values['event']['campaign_id'] ?? NULL;
     }
 
     //hack to allow group to register w/ waiting
