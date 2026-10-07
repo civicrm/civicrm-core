@@ -590,6 +590,9 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @param array $formValues
    */
   protected function ensurePriceParamsAreSet(array &$formValues): void {
+    if (!$this->isQuickConfig() || empty($formValues['membership_type_id'])) {
+      return;
+    }
     foreach ($formValues as $key => $value) {
       if ((str_starts_with($key, 'price_')) && is_numeric(substr($key, 6))) {
         return;
