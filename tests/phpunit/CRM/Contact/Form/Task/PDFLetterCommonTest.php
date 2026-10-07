@@ -35,6 +35,22 @@ class CRM_Contact_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  protected function tearDown(): void {
+    $this->quickCleanup([
+      'civicrm_activity',
+      'civicrm_activity_contact',
+      'civicrm_case',
+      'civicrm_case_activity',
+      'civicrm_case_contact',
+      'civicrm_case_type',
+    ], TRUE);
+
+    parent::tearDown();
+  }
+
+  /**
    * Test the pdf filename is assigned as expected.
    *
    * @param string|null $pdfFileName

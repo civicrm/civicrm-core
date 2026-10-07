@@ -47,7 +47,13 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
    * Post test cleanup.
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_case', 'civicrm_case_type'], TRUE);
+    $this->quickCleanup([
+      'civicrm_case',
+      'civicrm_case_activity',
+      'civicrm_case_contact',
+      'civicrm_case_type',
+    ], TRUE);
+
     $this->quickCleanUpFinancialEntities();
 
     // WORKAROUND: CRM_Event_Tokens copies `civicrm_event` data into metadata cache. That should probably change, but that's a different scope-of-work.
