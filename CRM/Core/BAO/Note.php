@@ -91,9 +91,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
       }
     }
 
-    $note = new CRM_Core_BAO_Note();
-    $note->copyValues($params);
-    $note->save();
+    $note = self::writeRecord($params);
 
     if ($note->entity_table == 'civicrm_contact') {
       CRM_Core_BAO_Log::register($note->entity_id,
