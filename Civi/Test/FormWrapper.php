@@ -255,10 +255,17 @@ class FormWrapper {
    */
   private function setFormObject(string $class, array $formValues = [], array $urlParameters = []): void {
     $_POST = $formValues;
-    $this->form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $_REQUEST = array_merge($_REQUEST, $urlParameters);
     $_GET = array_merge($_GET, $urlParameters);
+    // Some forms resolve their action-dependent state (eg. api getfields
+    // metadata) as early as their own constructor, before preProcess() runs
+    // and would otherwise pick 'action' up from $_GET - so it needs to be
+    // resolved and passed in here too, the same way CRM_Utils_Request does.
+    $action = isset($urlParameters['action']) && !is_numeric($urlParameters['action']) && is_string($urlParameters['action'])
+      ? \CRM_Core_Action::resolve($urlParameters['action'])
+      : (int) ($urlParameters['action'] ?? \CRM_Core_Action::NONE);
+    $this->form = new $class(NULL, $action);
     switch ($class) {
       case 'CRM_Event_Cart_Form_Checkout_Payment':
       case 'CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices':
