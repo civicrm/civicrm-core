@@ -934,16 +934,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   private function addParticipant($params, $contactID, $participantNumber): CRM_Event_BAO_Participant {
     $transaction = new CRM_Core_Transaction();
 
-    $participantFields = CRM_Event_DAO_Participant::fields();
     $participantParams = [
       'id' => $params['participant_id'] ?? NULL,
       'contact_id' => $contactID,
       'event_id' => $this->getEventID(),
       'status_id' => $params['participant_status'] ?? 1,
       'role_id' => $this->getRoleID($participantNumber),
-      'source' => CRM_Utils_String::ellipsify($params['participant_source'] ?? $params['description'] ?? '',
-        $participantFields['participant_source']['maxlength']
-      ),
+      'source' => $this->getSource($participantNumber),
       'fee_level' => $params['amount_level'] ?? NULL,
       'is_pay_later' => $params['is_pay_later'] ?? 0,
       'fee_amount' => $this->getFeeAmountForParticipant($participantNumber),
@@ -1743,6 +1740,23 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $this->set('campID', NULL);
     }
     return $this->getEventValue('campaign_id');
+  }
+
+  /**
+   * Get the source to record against a participant.
+   *
+   * 'participant_source' is an importable Participant field, so a site can
+   * add it to the registration profile and let registrants fill it in
+   * themselves - that submission takes precedence. Otherwise this falls
+   * back to the same system-generated description for every participant.
+   *
+   * @param int $participantNumber
+   *
+   * @return string
+   */
+  public function getSource(int $participantNumber): string {
+    return $this->getSubmittedParticipantValue('participant_source', $participantNumber)
+      ?: (ts('Online Event Registration') . ': ' . $this->getEventValue('title'));
   }
 
   /**
