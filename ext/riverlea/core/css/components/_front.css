@@ -357,8 +357,6 @@ af-form > fieldset > legend {
 @media (max-width: 479px) {
   .crm-container.crm-public {
     --crm-f-input-width: 100%;
-    --crm-page-padding: 0;
-    width: 100%;
   }
   .crm-container af-field {
     width: 100%;
