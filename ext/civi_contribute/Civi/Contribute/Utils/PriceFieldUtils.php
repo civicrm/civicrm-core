@@ -155,6 +155,12 @@ class PriceFieldUtils {
       $options = array_values(array_filter($fieldValues, fn($value) => ($value['price_field_id'] === $priceField['id'])));
 
       if ($fieldSpec['is_enter_qty']) {
+        if (!$options) {
+          // No active PriceFieldValue to supply the unit amount (e.g. the
+          // value was deactivated independently of the field) - this field
+          // can't be rendered or submitted, so skip it.
+          continue;
+        }
         // for is_enter_qty fields we should have a single PriceFieldValue record
         // representing the unit amount
         $fieldSpec['amount'] = $options[0]['amount'];
