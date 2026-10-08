@@ -157,9 +157,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCRM19273(): void {
-    // When a line item is 'resurrected' the financial_items attached to it are wrong.
-    // We have to skip validatePayments until fixed.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->registerParticipantAndPay();
 
     $this->submitForm($this->getCheapFeeID());
@@ -341,8 +338,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCRM17151(): void {
-    // @todo figure out the financial validation issue - likely a real bug.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->registerParticipantAndPay();
     $this->validateContribution($this->_expensiveFee, 'Completed');
     $lineItem = $this->getParticipantLineItems();
@@ -356,13 +351,11 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $this->assertEquals($this->_cheapFee, $lineItem[0]['line_total']);
 
     $this->submitForm($this->getExpensiveValueID());
-    $this->validateContribution($this->_cheapFee, 'Completed');
+    $this->validateContribution($this->_expensiveFee, 'Completed');
     $lineItem = $this->getParticipantLineItems();
     $this->assertEquals($this->_expensiveFee, $lineItem[1]['line_total']);
     $this->assertEquals('0.00', $lineItem[0]['line_total']);
 
-    // @todo this doesn't seem to work right even tho it should
-    //$this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->ids['Contribution']['order'], 'total_amount', 'id', $this->_expensiveFee, "Total Amount equals " . $this->_expensiveFee);
     $this->submitForm($this->getVeryExpensiveID());
     $lineItem = $this->getParticipantLineItems();
     $this->assertEquals('0.00', $lineItem[1]['line_total']);
@@ -725,12 +718,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    * keeps it that way.
    */
   public function testSwappingEqualPricedOptionKeepsThePayment(): void {
-    // validatePayments() does not survive a fee change: the financial items of the
-    // line that comes in stay allocated to the original payment, so the allocated
-    // total ends up above the amount paid. That reproduces on unpatched core and is
-    // unrelated to what this test pins down, so it is skipped for the same reason
-    // testCRM19273() skips it, above.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     $this->createPriceField('fifty_euros', 'Fifty euros', 50.00);
     $this->createPriceField('thirty_five_euros', 'Thirty-five euros', 35.00);
     $this->createPriceField('fifty_euros_again', 'Fifty euros again', 50.00);
