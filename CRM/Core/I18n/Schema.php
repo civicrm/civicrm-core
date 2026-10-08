@@ -342,7 +342,6 @@ class CRM_Core_I18n_Schema {
     if (preg_match($pattern, $query) === 1) {
       return $query;
     }
-    $before = $query;
 
     global $dbLocale;
     $tables = self::schemaStructureTables();
@@ -354,10 +353,6 @@ class CRM_Core_I18n_Schema {
     }
     // uncomment the below to rewrite the civicrm_value_* queries
     // $query = preg_replace("/(civicrm_value_[a-z0-9_]+_\d+)([^_])/", "\\1{$dbLocale}\\2", $query);
-
-    //if ($query != $before) {
-      \Civi::log()->debug('REWRITEN TO ==> ' . $query);
-    //}
 
     return $query;
   }
