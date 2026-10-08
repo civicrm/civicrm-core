@@ -1584,10 +1584,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @param array $lineItemsToAdd
    * @param int $contributionID
-   * @param int|null $trxnID
-   *   Transaction paying for the added items. NULL if the balance did not change.
+   * @param int $trxnID
+   *   Transaction paying for the added items.
    */
-  private function addFinancialItemsOnLineItemsChange($lineItemsToAdd, $contributionID, ?int $trxnID) {
+  private function addFinancialItemsOnLineItemsChange($lineItemsToAdd, $contributionID, int $trxnID) {
     $updatedContribution = new CRM_Contribute_BAO_Contribution();
     $updatedContribution->id = $contributionID;
     $updatedContribution->find(TRUE);
@@ -1614,9 +1614,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @param int $taxAmount
    * @param bool $updateAmountLevel
    *
-   * @return int|null
+   * @return int
+   *   The trxn recording the balance change, created even when the balance
+   *   is unchanged (total_amount 0) so every financial item touched by the
+   *   fee change has something to link to.
    */
-  private function recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL) {
+  private function recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL): int {
     $paidAmount = \Civi\Api4\Contribution::get(FALSE)
       ->addWhere('id', '=', $contributionId)
       ->addSelect('paid_amount')
@@ -1626,7 +1629,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     $contributionStatuses = array_column(\Civi::entity('Contribution')->getOptions('contribution_status_id'), 'id', 'name');
 
+    // update contribution status and total amount without trigger financial code
+    // as this is handled in current BAO function used for change selection
     $updatedContributionDAO = new CRM_Contribute_BAO_Contribution();
+    $updatedContributionDAO->id = $contributionId;
+
     if ($balanceAmt) {
       if ($paidAmount === 0.0) {
         //skip updating the contribution status if no payment is made
@@ -1636,39 +1643,33 @@ class CRM_Contribute_BAO_FinancialProcessor {
       else {
         $updatedContributionDAO->contribution_status_id = $balanceAmt > 0 ? $contributionStatuses['Partially paid'] : $contributionStatuses['Pending refund'];
       }
-
-      // update contribution status and total amount without trigger financial code
-      // as this is handled in current BAO function used for change selection
-      $updatedContributionDAO->id = $contributionId;
-
-      $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
-      $updatedContributionDAO->fee_amount = 0;
-      $updatedContributionDAO->tax_amount = $taxAmount;
-      if (!empty($updateAmountLevel)) {
-        $updatedContributionDAO->amount_level = $updateAmountLevel;
-      }
-      $updatedContributionDAO->save();
-
-      $adjustedTrxnValues = [
-        'from_financial_account_id' => NULL,
-        'to_financial_account_id' => $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id')),
-        'total_amount' => $balanceAmt,
-        'net_amount' => $balanceAmt,
-        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-        'payment_instrument_id' => $this->getUpdatedContributionValue('payment_instrument_id'),
-        'contribution_id' => $this->getContributionID(),
-        'trxn_date' => date('YmdHis'),
-        'currency' => $this->getUpdatedContributionValue('currency'),
-      ];
-      $adjustedTrxnID = $this->createFinancialTrxn($adjustedTrxnValues);
-      return $adjustedTrxnID;
     }
-    // CRM-17151: Update the contribution status to completed if balance is zero,
-    //  because due to sucessive fee change will leave the related contribution status incorrect
     else {
-      CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contributionId, 'contribution_status_id', $contributionStatuses['Completed']);
+      // CRM-17151: Update the contribution status to completed if balance is zero,
+      // because due to successive fee change will leave the related contribution status incorrect
+      $updatedContributionDAO->contribution_status_id = $contributionStatuses['Completed'];
     }
-    return NULL;
+
+    $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
+    $updatedContributionDAO->fee_amount = 0;
+    $updatedContributionDAO->tax_amount = $taxAmount;
+    if (!empty($updateAmountLevel)) {
+      $updatedContributionDAO->amount_level = $updateAmountLevel;
+    }
+    $updatedContributionDAO->save();
+
+    $adjustedTrxnValues = [
+      'from_financial_account_id' => NULL,
+      'to_financial_account_id' => $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id')),
+      'total_amount' => $balanceAmt,
+      'net_amount' => $balanceAmt,
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'payment_instrument_id' => $this->getUpdatedContributionValue('payment_instrument_id'),
+      'contribution_id' => $this->getContributionID(),
+      'trxn_date' => date('YmdHis'),
+      'currency' => $this->getUpdatedContributionValue('currency'),
+    ];
+    return $this->createFinancialTrxn($adjustedTrxnValues);
   }
 
 }
