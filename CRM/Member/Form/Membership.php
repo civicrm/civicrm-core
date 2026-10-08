@@ -1021,8 +1021,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
       $params['financial_type_id'] = $this->getFinancialTypeID();
 
-      $params['contribution_source'] = $this->getContributionSource();
-
       $completedContributionStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       if (($params['contribution_status_id'] ?? NULL) != $completedContributionStatusId) {
         if (empty($params['is_override'])) {
@@ -1090,7 +1088,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         ->setContributionValues($this->getContributionValues() + [
           'contact_id' => $this->_contributorContactID,
           'address_id' => $contributionAddressID,
-          'source' => $paymentParams['source'] ?? $paymentParams['description'] ?? NULL,
           'financial_type_id' => $this->getFinancialTypeID(),
           'contribution_recur_id' => $this->getContributionRecurID(),
         ])
@@ -1165,8 +1162,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
       $now = CRM_Utils_Time::date('YmdHis');
-      $params['contribution_source'] = $this->getContributionSource();
-      $params['source'] = $formValues['source'] ?: $params['contribution_source'];
       $params['trxn_id'] = $result['trxn_id'] ?? NULL;
       if ($this->getSubmittedValue('send_receipt') && $paymentStatus === 'Completed') {
         // @todo this should be updated by the send function once sent rather than
@@ -1327,7 +1322,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   private function recordMembershipContribution($params) {
     $contributionParams = $this->getContributionValues();
-    $contributionParams['source'] = $params['contribution_source'] ?? NULL;
     $contributionParams['non_deductible_amount'] = 'null';
     $contributionParams['skipCleanMoney'] = TRUE;
     $contributionParams['revenue_recognition_date'] = $this->getDeferredRevenueRecognitionDate();
@@ -1815,7 +1809,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected function getFormMembershipParams(): array {
     $params = [
       'status_id' => $this->getSubmittedValue('status_id'),
-      'source' => $this->getSubmittedValue('source') ?? $this->getContributionSource(),
+      'source' => $this->getSource(),
       'contact_id' => $this->getMembershipContactID(),
       'is_override' => $this->getSubmittedValue('is_override'),
       'status_override_end_date' => $this->getSubmittedValue('status_override_end_date'),
@@ -1894,20 +1888,20 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
-   * Get the value for the contribution source.
+   * Get the source to record against the membership and contribution.
    *
    * @return string
    */
-  protected function getContributionSource(): string {
+  protected function getSource(): string {
+    if ($this->getSubmittedValue('source')) {
+      return $this->getSubmittedValue('source');
+    }
     [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::getLoggedInContactID());
     $userName = htmlentities((string) $userName);
     if ($this->_mode) {
       return ts('%1 Membership Signup: Credit card or direct debit (by %2)',
         [1 => $this->getSelectedMembershipLabels(), 2 => $userName]
       );
-    }
-    if ($this->getSubmittedValue('source')) {
-      return $this->getSubmittedValue('source');
     }
     return ts('%1 Membership: Offline signup (by %2)', [
       1 => $this->getSelectedMembershipLabels(),
