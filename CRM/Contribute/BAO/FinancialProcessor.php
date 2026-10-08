@@ -418,7 +418,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
     // record line items and financial items
     if (empty($params['skipLineItem'])) {
-      $this->createLineItems($params['line_item']);
+      $this->createLineItems($params['line_item'], $financialTxnID ?? NULL);
     }
 
     // create batch entry if batch_id is passed and
@@ -610,7 +610,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *   'deferred_line_total' & 'financial_item_id' added.
    */
   private function updateFinancialAccounts($params, $context = NULL): array {
-    $trxnIds['id'] = $this->createFinancialTrxn($params['trxnParams']);
+    $trxnID = $this->createFinancialTrxn($params['trxnParams']);
     $lineItems = $this->getUpdatedLineItems();
     $postUpdateContribution = $this->getUpdatedContribution();
     foreach ($lineItems as $fieldValueId => $lineItemDetails) {
@@ -629,7 +629,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         'entity_table' => 'civicrm_line_item',
         'entity_id' => $lineItemDetails['id'],
       ];
-      CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
+      $this->createFinancialItem($itemParams, $trxnID);
 
       // If changing the financial type we reverse & recreate but really we should do this
       // a) if the line item financial type changes (not contribution) and
@@ -657,7 +657,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       if ($isReversePrior) {
         // In this case we are on the first pass - reverse. Second pass will create new
         // although would be better to restructure to a single pass.
-        $this->reverseLineFinancialItem($lineItemDetails, TRUE, $trxnIds['id']);
+        $this->reverseLineFinancialItem($lineItemDetails, TRUE, $trxnID);
       }
       elseif ($isTaxTransactionRequired) {
         // In this scenario we are on the second pass. We have done a reversal
@@ -665,12 +665,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
         // new correct new transaction (ideally we would not do as 2 passes
         // but one after the other)
         $taxAmount = $lineItemDetails['tax_amount'];
-        $this->createTaxFinancialItem($itemParams, $lineItemDetails['financial_type_id'], $taxAmount, $trxnIds['id']);
+        $this->createTaxFinancialItem($itemParams, $lineItemDetails['financial_type_id'], $taxAmount, $trxnID);
       }
       elseif ($isTaxAdjustmentRequired) {
         $previousTaxAmount = $previousLineItem['tax_amount'] ?? 0;
         $taxAmount = (float) $lineItemDetails['tax_amount'] - $previousTaxAmount;
-        $this->createTaxFinancialItem($itemParams, $lineItemDetails['financial_type_id'], $taxAmount, $trxnIds['id']);
+        $this->createTaxFinancialItem($itemParams, $lineItemDetails['financial_type_id'], $taxAmount, $trxnID);
       }
     }
     $this->createDeferredTrxn(TRUE, $context);
@@ -1062,18 +1062,19 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @param array $lineItems
    *   Line item array.
+   * @param int|null $financialTrxnID
    *
    * @throws \CRM_Core_Exception
    */
-  private function createLineItems($lineItems) {
+  private function createLineItems($lineItems, ?int $financialTrxnID = NULL) {
     foreach ($lineItems as &$values) {
       foreach ($values as &$line) {
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
 
         if (!$this->isUpdate()) {
-          $this->addFinancialItem($createdLineItem, $this->getUpdatedContribution());
+          $this->addFinancialItem($createdLineItem, $this->getUpdatedContribution(), FALSE, $financialTrxnID);
           if (!empty($line['tax_amount'])) {
-            $this->addFinancialItem($createdLineItem, $this->getUpdatedContribution(), TRUE);
+            $this->addFinancialItem($createdLineItem, $this->getUpdatedContribution(), TRUE, $financialTrxnID);
           }
         }
       }
@@ -1091,11 +1092,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @param object $contribution
    *   Contribution object.
    * @param bool $taxTrxnID
-   * @param array|null $trxnId
-   *
-   * @return CRM_Financial_DAO_FinancialItem
+   * @param int|null $trxnId
+   *   Transaction paying for this item. Pass NULL only when nothing has paid for it yet.
    */
-  private function addFinancialItem($lineItem, $contribution, $taxTrxnID = FALSE, $trxnId = NULL) {
+  private function addFinancialItem($lineItem, $contribution, $taxTrxnID = FALSE, ?int $trxnId = NULL): void {
     $financialItemStatus = array_column(\Civi::entity('FinancialItem')->getOptions('status_id'), 'id', 'name');
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
     $itemStatus = NULL;
@@ -1139,11 +1139,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $accountRelName
       );
     }
-    if (empty($trxnId)) {
-      $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
-      $trxnId['id'] = $trxn['financialTrxnId'];
-    }
-    return CRM_Financial_BAO_FinancialItem::create($params, NULL, $trxnId);
+    $this->createFinancialItem($params, $trxnId);
   }
 
   /**
@@ -1588,23 +1584,22 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @param array $lineItemsToAdd
    * @param int $contributionID
-   * @param bool $trxnID
-   *   Is there a change to the total balance requiring additional transactions to be created.
+   * @param int|null $trxnID
+   *   Transaction paying for the added items. NULL if the balance did not change.
    */
-  private function addFinancialItemsOnLineItemsChange($lineItemsToAdd, $contributionID, $trxnID) {
+  private function addFinancialItemsOnLineItemsChange($lineItemsToAdd, $contributionID, ?int $trxnID) {
     $updatedContribution = new CRM_Contribute_BAO_Contribution();
     $updatedContribution->id = $contributionID;
     $updatedContribution->find(TRUE);
-    $trxnArray = $trxnID ? ['id' => $trxnID] : NULL;
 
     foreach ($lineItemsToAdd as $priceFieldValueID => $lineParams) {
       $lineParams['contribution_id'] = $contributionID;
       $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
-      $this->addFinancialItem($lineObj, $updatedContribution, NULL, $trxnArray);
+      $this->addFinancialItem($lineObj, $updatedContribution, FALSE, $trxnID);
       if (isset($lineObj->tax_amount) && (float) $lineObj->tax_amount !== 0.00) {
-        $this->addFinancialItem($lineObj, $updatedContribution, TRUE, $trxnArray);
+        $this->addFinancialItem($lineObj, $updatedContribution, TRUE, $trxnID);
       }
     }
   }
