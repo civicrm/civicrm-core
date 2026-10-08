@@ -117,8 +117,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
           // inconsistencies described in https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_tokenValues/#example
           // in effect there is a suggestion that
           // Send an Email" and "CiviMail" send different parameters to the tokenValues hook
-          // As of now 'send an email' renders hooks through this class.
-          // CiviMail it depends on the use or otherwise of flexmailer.
+          // Both 'Send an Email' and CiviMail now render hooks through this class.
           $key = $value;
         }
         if (preg_match('/^\{([^\}]+)\}$/', $value, $matches)) {

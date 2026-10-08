@@ -442,8 +442,7 @@ class CRM_Utils_Token {
   /**
    * Do Not use.
    *
-   * Only core usage is from a deprecated unused function and
-   * from deprecated BAO_Mailing code (to be replaced by flexmailer).
+   * Only core usage is from a deprecated unused function.
    *
    * @deprecated
    *
