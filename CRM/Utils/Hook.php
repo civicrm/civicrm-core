@@ -3059,12 +3059,12 @@ abstract class CRM_Utils_Hook {
    *   - Formula: hook_civicrm_initiators::{$context['for']}
    *   - Example: hook_civicrm_initiators::PaymentProcessor
    *
-   * @since 6.10
+   * @since 6.17
    * @param array $context
    *   Descriptor for the context/record wherein we want an API key. Some combination of:
    *   - for: string (REQUIRED), a symbol that identifies the kind of context, e.g.
-   *      - "PaymentProcessor" (v6.10+): Add or reset the API key for a PaymentProcessor
-   *      - "MailSettings" (v6.20+): Add or reset the credentials for a Mail Account
+   *      - "PaymentProcessor" (v6.17+): Add or reset the API key for a PaymentProcessor
+   *      - "MailSettings" (v6.21+): Add or reset the credentials for a Mail Account
    *   - payment_processor_type: string (OPTIONAL), a symbol like "Stripe" which identifies the type of payment-processor
    *   - payment_processor_id: int (OPTIONAL), unique id for the PaymentProcessor record
    *   - is_test: bool (OPTIONAL), whether this payproc is for testing
