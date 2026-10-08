@@ -551,43 +551,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
   }
 
   /**
-   * Determine if an SMTP error is temporary or permanent.
-   *
-   * @param string $message
-   *   PEAR error message.
-   * @return bool
-   *   TRUE - Temporary/retriable error
-   *   FALSE - Permanent/non-retriable error
-   */
-  protected function isTemporaryError($message) {
-    // SMTP response code is buried in the message.
-    $code = preg_match('/ \(code: (.+), response: /', $message, $matches) ? $matches[1] : '';
-
-    if (str_contains($message, 'Failed to write to socket')) {
-      return TRUE;
-    }
-
-    // Register 5xx SMTP response code (permanent failure) as bounce.
-    if (isset($code[0]) && $code[0] === '5') {
-      return FALSE;
-    }
-
-    if (str_contains($message, 'Failed to set sender')) {
-      return TRUE;
-    }
-
-    if (str_contains($message, 'Failed to add recipient')) {
-      return TRUE;
-    }
-
-    if (str_contains($message, 'Failed to send data')) {
-      return TRUE;
-    }
-
-    return FALSE;
-  }
-
-  /**
    * Cancel a mailing.
    *
    * @param int $mailingId
