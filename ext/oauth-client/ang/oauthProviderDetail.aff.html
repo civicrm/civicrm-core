@@ -20,10 +20,6 @@
 
         <oauth-client-tokens options="{clientId: resultClient.id}"></oauth-client-tokens>
 
-        <div class="btn-group" oauth-util-grant-ctrl="granter">
-          <a class="btn btn-primary" ng-click="granter.authCode(resultClient.id)">{{ts('Add (Auth Code)')}}</a>
-        </div>
-
         <h4>{{ts('Properties')}}</h4>
 
         <oauth-client-editor options="{client: resultClient}"></oauth-client-editor>
