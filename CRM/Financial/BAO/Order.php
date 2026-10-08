@@ -1867,6 +1867,40 @@ class CRM_Financial_BAO_Order {
   }
 
   /**
+   * Reconcile the params a Contribution and its ContributionRecur must agree on
+   * ('currency', 'is_test'): copy a value supplied on only one side to the other,
+   * and reject a pair that disagree.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function calculateSharedValues(): void {
+    if (empty($this->contributionRecurValues)) {
+      // There is no ContributionRecur to reconcile with, and writing a shared value
+      // into contributionRecurValues here would make calculateContributionRecurValues()
+      // treat this as a request to create one.
+      return;
+    }
+    foreach (['currency', 'is_test'] as $field) {
+      $recurValue = $this->contributionRecurValues[$field] ?? NULL;
+      $contributionValue = $this->contributionValues[$field] ?? NULL;
+
+      if ($recurValue === NULL) {
+        if ($contributionValue !== NULL) {
+          $this->contributionRecurValues[$field] = $contributionValue;
+        }
+      }
+      elseif ($contributionValue === NULL) {
+        $this->contributionValues[$field] = $recurValue;
+      }
+      // Loose comparison because is_test reaches us as a bool, int or string
+      // depending on the caller.
+      elseif ($recurValue != $contributionValue) {
+        throw new CRM_Core_Exception("Order Create: '$field' must match between the Contribution and the ContributionRecur");
+      }
+    }
+  }
+
+  /**
    * @return $this
    *
    * @internal Access through apiv4 Order api only. Signature subject to change.
@@ -1875,7 +1909,10 @@ class CRM_Financial_BAO_Order {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function validate(): CRM_Financial_BAO_Order {
-    // First we calculate remaining parameters for Contribution/ContributionRecur
+    // Reconcile the values the Contribution & ContributionRecur must share, before
+    // either set of values is completed below.
+    $this->calculateSharedValues();
+    // Then we calculate remaining parameters for Contribution/ContributionRecur
     $this->calculateContributionRecurValues();
     $this->calculateContributionValues();
     // Then we get/calculate the lineitems - they won't have related entity IDs Membership/Participant etc. for new records.
