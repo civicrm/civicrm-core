@@ -1,5 +1,6 @@
 <?php
 use CRM_OAuth_ExtensionUtil as E;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
 class CRM_OAuth_Page_Return extends CRM_Core_Page {
 
@@ -15,35 +16,34 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
     }
 
     if (CRM_Utils_Request::retrieve('error', 'String')) {
-      CRM_Utils_System::setTitle(ts('OAuth Error'));
-      $error = CRM_Utils_Array::subset($_GET, ['error', 'error_description', 'error_uri']);
-      CRM_OAuth_Hook::oauthReturnError(
-        $error['error'] ?? NULL,
-        $error['description'] ?? NULL,
-        $error['uri'] ?? NULL,
-        $state,
-      );
-
-      Civi::log()->info('OAuth returned error', [
-        'error' => $error,
-        'state' => $state,
-      ]);
-
-      $this->assign('error', $error ?? NULL);
+      $this->showError(CRM_Utils_Array::subset($_GET, ['error', 'error_description', 'error_uri']), $state);
     }
     elseif ($authCode = CRM_Utils_Request::retrieve('code', 'String')) {
       $client = \Civi\Api4\OAuthClient::get(FALSE)->addWhere('id', '=', $state['clientId'])->execute()->single();
-      $tokenRecord = Civi::service('oauth2.token')->init([
-        'client' => $client,
-        'scope' => $state['scopes'],
-        'tag' => $state['tag'],
-        'storage' => $state['storage'],
-        'grant_type' => $state['grant_type'] ?? 'authorization_code',
-        'cred' => array_merge(
-          ['code' => $authCode],
-          empty($state['code_verifier']) ? [] : ['code_verifier' => $state['code_verifier']],
-        ),
-      ]);
+      try {
+        $tokenRecord = Civi::service('oauth2.token')->init([
+          'client' => $client,
+          'scope' => $state['scopes'],
+          'tag' => $state['tag'],
+          'storage' => $state['storage'],
+          'grant_type' => $state['grant_type'] ?? 'authorization_code',
+          'cred' => array_merge(
+            ['code' => $authCode],
+            empty($state['code_verifier']) ? [] : ['code_verifier' => $state['code_verifier']],
+          ),
+        ]);
+      }
+      catch (IdentityProviderException $e) {
+        // The provider accepted the sign-in but refused to issue a token, e.g. because the client secret has expired.
+        $body = $e->getResponseBody();
+        $this->showError([
+          'error' => $e->getMessage(),
+          'error_description' => is_array($body) ? ($body['error_description'] ?? NULL) : NULL,
+          'error_uri' => is_array($body) ? ($body['error_uri'] ?? NULL) : NULL,
+        ], $state);
+        parent::run();
+        return;
+      }
 
       $nextUrl = $state['landingUrl'] ?? NULL;
       CRM_OAuth_Hook::oauthReturn($tokenRecord, $nextUrl);
@@ -62,6 +62,19 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
     }
 
     parent::run();
+  }
+
+  private function showError(array $error, array $state): void {
+    $error += ['error' => NULL, 'error_description' => NULL, 'error_uri' => NULL];
+    CRM_Utils_System::setTitle(ts('OAuth Error'));
+    CRM_OAuth_Hook::oauthReturnError($error['error'], $error['error_description'], $error['error_uri'], $state);
+
+    Civi::log()->info('OAuth returned error', [
+      'error' => $error,
+      'state' => $state,
+    ]);
+
+    $this->assign('error', $error);
   }
 
   /**
