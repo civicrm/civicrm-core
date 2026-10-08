@@ -273,9 +273,18 @@ trait CRM_Core_Form_EntityFormTrait {
 
     if (!$this->isDeleteContext() &&
       $this->getEntityId()) {
-      $params = ['id' => $this->getEntityId()];
       $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $defaults);
+      if (method_exists($baoName, 'retrieve')) {
+        $params = ['id' => $this->getEntityId()];
+        $baoName::retrieve($params, $defaults);
+      }
+      else {
+        // Not every BAO implements the legacy `retrieve()` method.
+        $defaults = (array) civicrm_api4($this->getDefaultEntity(), 'get', [
+          'where' => [['id', '=', $this->getEntityId()]],
+          'checkPermissions' => FALSE,
+        ])->single();
+      }
     }
     foreach ($this->entityFields as $entityFieldName => $fieldSpec) {
       $value = CRM_Utils_Request::retrieveValue($fieldSpec['name'], $this->getValidationTypeForField($fieldSpec['name']));

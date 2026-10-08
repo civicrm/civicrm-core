@@ -173,7 +173,7 @@ class FormWrapper {
     }
     if ($state > self::PREPROCESSED) {
       $this->form->buildForm();
-      $this->defaults = $this->form->_defaults;
+      $this->defaults = $this->form->_defaultValues;
     }
     if ($state > self::BUILT) {
       $this->form->validate();
