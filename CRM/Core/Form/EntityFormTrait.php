@@ -275,7 +275,14 @@ trait CRM_Core_Form_EntityFormTrait {
       $this->getEntityId()) {
       $params = ['id' => $this->getEntityId()];
       $baoName = $this->_BAOName;
-      $baoName::retrieve($params, $defaults);
+      // A BAO whose retrieve() is deprecated or gone loads via commonRetrieve().
+      if (!method_exists($this->_BAOName, 'retrieve') || !empty(ReflectionUtils::getCodeDocs((new \ReflectionMethod($this->_BAOName, 'retrieve')), 'Method')['deprecated'])) {
+        CRM_Core_DAO::commonRetrieve($baoName, $params, $defaults);
+      }
+      else {
+        // Are there still some out there?
+        $baoName::retrieve($params, $defaults);
+      }
     }
     foreach ($this->entityFields as $entityFieldName => $fieldSpec) {
       $value = CRM_Utils_Request::retrieveValue($fieldSpec['name'], $this->getValidationTypeForField($fieldSpec['name']));
