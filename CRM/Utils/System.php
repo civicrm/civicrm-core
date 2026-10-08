@@ -37,11 +37,78 @@ use GuzzleHttp\Psr7\Response;
  * @method static int getLoggedInUfID() Get current logged in user id.
  * @method static void setHttpHeader(string $name, string $value) Set http header.
  * @method static array synchronizeUsers() Create CRM contacts for all existing CMS users.
- * @method static void appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_coreResourceList.
- * @method static void alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
  * @method static bool shouldExitAfterFatal() Should the current execution exit after a fatal error?
  * @method static string|null currentPath() Path of the current page e.g. 'civicrm/contact/view'
  * @method static \Psr\Http\Message\ServerRequestInterface createRequestFromGlobals()
+ * @method static mixed initialize()
+ * @method static mixed mapConfigToSSL() Rewrite various system urls to https.
+ * @method static mixed setMessage(string $message) Set a message in the CMS to display to a user.
+ * @method static bool loadUser(string $username) Load user into session.
+ * @method static string postLogoutUrl() Url to redirect users to after logging out, in the context of an HTTP session
+ * @method static void theme(string $content, bool $print = FALSE, bool $maintenance = FALSE)
+ * @method static void renderMaintenanceMessage(string $content) Print content to screen, wrapped in maintenance template if possible
+ * @method static string getDefaultBlockLocation()
+ * @method static bool|mixed|string getAbsoluteBaseURL() Get the absolute path to the site's base url.
+ * @method static string|false getRelativeBaseURL() Get the relative path to the sites base url.
+ * @method static string getVersion() Get CMS Version.
+ * @method static string|null cmsRootPath() Determine the location of the CMS root.
+ * @method static int|bool createUser(array &$params, string $mailParam) Create a user in the CMS.
+ * @method static mixed updateCMSName(int $ufID, string $email) Update a user's email address in the CMS.
+ * @method static bool isUserRegistrationPermitted() Check if user registration is permitted.
+ * @method static bool isPasswordUserGenerated() Check if user can create passwords or is initially assigned a system-generated one.
+ * @method static mixed verifyPassword(array $params, array &$errors) Verify password
+ * @method static bool isFrontEndPage() Is a front end page being accessed.
+ * @method static string getLoginURL(string $destination = '') Get user login URL for hosting CMS (method declared in each CMS system class)
+ * @method static string|null getLoginDestination(\CRM_Core_Form &$form) Get the login destination string.
+ * @method static mixed getUfId(string $username) Determine the native ID of the CMS user.
+ * @method static mixed setUserSession(array $data) Set a init session with user object.
+ * @method static mixed flush() Reset any system caches that may be required for proper CiviCRM integration.
+ * @method static mixed clearResourceCache() Flush css/js caches.
+ * @method static array getDefaultSiteSettings(string $dir) Return default Site Settings.
+ * @method static array getCiviSourceStorage() Determine the location of the CiviCRM source tree.
+ * @method static mixed userLoginFinalize(array $params = []) Perform any post login activities required by the CMS.
+ * @method static mixed setMySQLTimeZone(string|null $timeZone = NULL) Set MySQL timezone so that timestamp fields show the correct time.
+ * @method static mixed setPhpTimeZone(string|null $timeZone = NULL) Set PHP timezone.
+ * @method static mixed setTimeZone(string|null $timeZone = NULL) Set system timezone (both PHP + MySQL)
+ * @method static string getTimeZoneString() Get timezone from CMS as a string.
+ * @method static string|false|null getTimeZoneOffset() Get timezone offset from CMS
+ * @method static mixed getUniqueIdentifierFromUserObject(object $user) Get Unique Identifier from UserFramework system (CMS).
+ * @method static null|int getUserIDFromUserObject(object $user) Get User ID from UserFramework system (CMS).
+ * @method static array getUser(int $contactID) Get an array of user details for a contact, containing at minimum the user ID & name.
+ * @method static string|null getLoggedInUniqueIdentifier() Get currently logged in user unique identifier - this tends to be the email address or user name.
+ * @method static int getBestUFID(object $user = NULL) Return a UFID (user account ID from the UserFramework / CMS system.
+ * @method static string getBestUFUniqueIdentifier(object $user = NULL) Return a unique identifier (usually an email address or username) from the UserFramework / CMS system.
+ * @method static array getModules() List modules installed in the CMS, including enabled and disabled ones.
+ * @method static string|null getUserRecordUrl(int $contactID) Get Url to view user record.
+ * @method static bool checkPermissionAddUser() Is the current user permitted to add a user.
+ * @method static mixed outputError(string $content) Output code from error function.
+ * @method static mixed logger(string $message, string|null $priority = NULL) Log error to CMS.
+ * @method static bool allowSynchronizeUsers() Whether to allow access to CMS user sync action
+ * @method static array synchronizeUsersIfAllowed() Run CMS user sync if allowed, otherwise just returns empty array
+ * @method static mixed sessionStart() Start a new session.
+ * @method static mixed getSessionId() Get the session ID.
+ * @method static array|null getRoleNames() Get role names
+ * @method static bool addUfRole(int $ufID, string $role) Add a role to a CMS user.
+ * @method static bool removeUfRole(int $ufID, string $role) Remove a role from a CMS user.
+ * @method static bool viewsExists() Determine if the Views module exists.
+ * @method static string getCRMDatabasePrefix() Get the CRM database as a 'prefix'.
+ * @method static string getCMSDatabaseName() Get the CMS database name.
+ * @method static string getCRMDatabaseName() Get the CRM database name.
+ * @method static mixed showPasswordFieldWhenAdminCreatesUser() Should the admin be able to set the password when creating a user or does the CMS want it a different way.
+ * @method static array getUfGroupTypes() Return the CMS-specific UF Group Types for profiles.
+ * @method static mixed checkCleanurls()
+ * @method static bool suppressProfileFormErrors() Suppress profile form errors
+ * @method static string getEmailFieldName(\CRM_Core_Form $form, array $fields) Get email field name from form values
+ * @method static mixed checkUserNameEmailExists(array &$params, array &$errors, string $emailName = 'email') Check if username and email exists in the CMS.
+ * @method static bool hasUsersTable() Has CMS users table
+ * @method static string viewsIntegration() CiviCRM Table prefixes To display for CMS integration.
+ * @method static bool canSetBasePage() Can set base page for CiviCRM
+ * @method static bool mailingWorkflowIsEnabled() Check if mailing workflow is enabled
+ * @method static array getContactDetailsFromUser(array $uf_match) Get Contact details from User
+ * @method static string modifyStandaloneProfile(string $profile, array $params) Modify standalone profile
+ * @method static void postContainerBoot() Hook for further system boot once the main CiviCRM Container is up (only used in Standalone currently)
+ * @method static bool supportsUfLogging() Does this CMS / UF support a CMS specific logging mechanism?
+ * @method static mixed handleUnhandledException(\Throwable $e) Handle any caught Exceptions.
  */
 class CRM_Utils_System {
 
