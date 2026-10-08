@@ -20,7 +20,7 @@
     <div class="crm-setting-section crm-setting-section-{$sectionName}">
       {crmRegion name="crm-setting-$settingPageName-section-$sectionName"}
         {if !empty($section.title)}
-          <h3>
+          <h3 class="crm-header-shaded">
             {if !empty($section.icon)}<i class="crm-i {$section.icon}" role="img" aria-hidden="true"></i>&nbsp;{/if}
             {$section.title|escape}
           </h3>
