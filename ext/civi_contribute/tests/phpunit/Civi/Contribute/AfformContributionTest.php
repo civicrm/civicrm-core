@@ -149,12 +149,12 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
 
   public function tearDown(): void {
     \Civi\Api4\PriceFieldValue::delete(FALSE)
-      ->addWhere('name', 'IN', ['in_person', 'online', 'admin_only'])
+      ->addWhere('name', 'IN', ['in_person', 'online', 'admin_only', 'unit'])
       //->addWhere('id', '>', 0)
       ->execute();
 
     \Civi\Api4\PriceField::delete(FALSE)
-      ->addWhere('name', 'IN', ['ticket_option', 'additional_donation'])
+      ->addWhere('name', 'IN', ['ticket_option', 'additional_donation', 'donation_qty'])
       //->addWhere('id', '>', 0)
       ->execute();
 
@@ -337,6 +337,42 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
     $this->assertContains($adminPfvId, $restricted);
     // The public "In person" value must NOT be treated as restricted.
     $this->assertNotContains($this->inPersonPriceFieldValueId, $restricted);
+  }
+
+  /**
+   * An `is_enter_qty` field whose only PriceFieldValue has been deactivated
+   * (rather than never existing) must not break getPriceFieldSpecs() for
+   * every other field - the field itself is simply unusable without a unit
+   * amount, so it is excluded from the specs (dev/core#6838).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testEnterQtyFieldWithNoActiveValueIsSkipped(): void {
+    $qtyField = \Civi\Api4\PriceField::create(FALSE)
+      ->addValue('name', 'donation_qty')
+      ->addValue('label', 'Donation Qty')
+      ->addValue('html_type', 'Text')
+      ->addValue('is_enter_qty', TRUE)
+      ->addValue('price_set_id:name', 'donation_options')
+      ->execute()
+      ->single();
+
+    \Civi\Api4\PriceFieldValue::create(FALSE)
+      ->addValue('name', 'unit')
+      ->addValue('label', 'Unit')
+      ->addValue('amount', 1)
+      ->addValue('price_field_id', $qtyField['id'])
+      ->addValue('financial_type_id:name', 'Event Fee')
+      ->addValue('is_active', FALSE)
+      ->execute();
+
+    unset(\Civi::$statics[PriceFieldUtils::class]);
+
+    $specs = PriceFieldUtils::getPriceFieldSpecs();
+
+    $this->assertArrayNotHasKey('donation_options.donation_qty', $specs['Contribution']);
+    // The sibling field in the same PriceSet must still be present.
+    $this->assertArrayHasKey('donation_options.additional_donation', $specs['Contribution']);
   }
 
   /**
