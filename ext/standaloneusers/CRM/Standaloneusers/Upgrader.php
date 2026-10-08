@@ -1,6 +1,5 @@
 <?php
 use CRM_Standaloneusers_ExtensionUtil as E;
-use Civi\Api4\Navigation;
 
 /**
  * Collection of upgrade steps.
@@ -169,30 +168,6 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
           ],
         ],
       ])
-      ->execute();
-  }
-
-  /**
-   * On enable:
-   * - disable the user sync menu item
-   */
-  public function enable() {
-    // standaloneusers is incompatible with user sync, so disable this nav menu item
-    Navigation::update(FALSE)
-      ->addWhere('url', '=', 'civicrm/admin/synchUser?reset=1')
-      ->addValue('is_active', FALSE)
-      ->execute();
-  }
-
-  /**
-   * On disable:
-   * - re-enable the user sync menu item
-   */
-  public function disable() {
-    // reinstate user sync menu item
-    Navigation::update(FALSE)
-      ->addWhere('url', '=', 'civicrm/admin/synchUser?reset=1')
-      ->addValue('is_active', TRUE)
       ->execute();
   }
 

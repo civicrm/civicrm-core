@@ -108,6 +108,29 @@ function standaloneusers_civicrm_permission(&$permissions) {
 
 function standaloneusers_civicrm_navigationMenu(&$menu) {
   \Civi\Standalone\Utils::alterHomeMenuItems($menu);
+
+  // Disable menu items not relevant to standalone
+  $disableMenuItems = function (&$items) use (&$disableMenuItems) {
+    foreach ($items as &$item) {
+      if (in_array($item['attributes']['url'] ?? NULL, [
+        'civicrm/admin/setting/uf?reset=1',
+        'civicrm/admin/synchUser?reset=1',
+      ], TRUE)) {
+        $item['attributes']['active'] = FALSE;
+      }
+      if (!empty($item['child'])) {
+        $disableMenuItems($item['child']);
+      }
+    }
+  };
+  $disableMenuItems($menu);
+}
+
+/**
+ * Disable menu routes not relevant to standalone
+ */
+function standaloneusers_civicrm_alterMenu(&$items) {
+  unset($items['civicrm/admin/setting/uf'], $items['civicrm/admin/synchUser']);
 }
 
 /**
