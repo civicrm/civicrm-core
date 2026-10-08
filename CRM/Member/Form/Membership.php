@@ -998,15 +998,15 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     //CRM-13981, allow different person as a soft-contributor of chosen type
     if ($this->_contributorContactID != $this->_contactID) {
       $params['contribution_contact_id'] = $this->_contributorContactID;
-      if (!empty($formValues['soft_credit_type_id'])) {
-        $softParams['soft_credit_type_id'] = $formValues['soft_credit_type_id'];
+      if ($this->getSubmittedValue('soft_credit_type_id')) {
+        $softParams['soft_credit_type_id'] = $this->getSubmittedValue('soft_credit_type_id');
         $softParams['contact_id'] = $this->_contactID;
       }
     }
 
     $pendingMembershipStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
 
-    if (!empty($formValues['record_contribution'])) {
+    if ($this->getSubmittedValue('record_contribution')) {
       $recordContribution = [
         'total_amount',
         'trxn_id',
@@ -1017,7 +1017,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       ];
 
       foreach ($recordContribution as $f) {
-        $params[$f] = $formValues[$f] ?? NULL;
+        $params[$f] = $this->getSubmittedValue($f);
       }
       $params['financial_type_id'] = $this->getFinancialTypeID();
 
@@ -1044,21 +1044,18 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $params['financial_type_id'] = $this->getFinancialTypeID();
 
       //get the payment processor id as per mode. Try removing in favour of beginPostProcess.
-      $params['payment_processor_id'] = $formValues['payment_processor_id'] = $this->getPaymentProcessorID();
+      $params['payment_processor_id'] = $this->getPaymentProcessorID();
       $params['register_date'] = CRM_Utils_Time::date('YmdHis');
-
-      // add all the additional payment params we need
-      $formValues['amount'] = $this->order->getTotalAmount();
-      $formValues['currencyID'] = $this->getCurrency();
-      $formValues['description'] = ts("Contribution submitted by a staff person using member's credit card for signup");
-      $formValues['invoiceID'] = $this->getInvoiceID();
-      $formValues['financial_type_id'] = $this->getFinancialTypeID();
 
       // at this point we've created a contact and stored its address etc
       // all the payment processors expect the name and address to be in the
       // so we copy stuff over to first_name etc.
-      // @todo formValues might not need to be merged in.
-      $paymentParams = $this->prepareParamsForPaymentProcessor($this->getSubmittedValues()) + $formValues;
+      $paymentParams = $this->prepareParamsForPaymentProcessor($this->getSubmittedValues());
+      $paymentParams['amount'] = $this->order->getTotalAmount();
+      $paymentParams['currencyID'] = $this->getCurrency();
+      $paymentParams['description'] = ts("Contribution submitted by a staff person using member's credit card for signup");
+      $paymentParams['invoiceID'] = $this->getInvoiceID();
+      $paymentParams['financial_type_id'] = $this->getFinancialTypeID();
       $paymentParams['frequency_unit'] = $this->getFrequencyUnit();
       $paymentParams['frequency_interval'] = $this->getFrequencyInterval();
 
@@ -1066,9 +1063,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       //CRM-10377 if payment is by an alternate contact then we need to set that person
       // as the contact in the payment params
       if ($this->_contributorContactID != $this->_contactID) {
-        if (!empty($formValues['soft_credit_type_id'])) {
+        if ($this->getSubmittedValue('soft_credit_type_id')) {
           $softParams['contact_id'] = $params['contact_id'];
-          $softParams['soft_credit_type_id'] = $formValues['soft_credit_type_id'];
+          $softParams['soft_credit_type_id'] = $this->getSubmittedValue('soft_credit_type_id');
         }
       }
       if ($this->getSubmittedValue('send_receipt')) {
@@ -1243,7 +1240,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       }
       $params['lineItems'] = $lineItem;
-      if (!empty($formValues['record_contribution'])) {
+      if ($this->getSubmittedValue('record_contribution')) {
         $params['contribution_id'] = $this->recordMembershipContribution($params)->id;
       }
     }
@@ -1322,23 +1319,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $contributionParams['non_deductible_amount'] = 'null';
     $contributionParams['skipCleanMoney'] = TRUE;
     $contributionParams['revenue_recognition_date'] = $this->getDeferredRevenueRecognitionDate();
-    $contributionParams['payment_processor'] = $params['payment_processor_id'] ?? NULL;
     $contributionSoftParams = $params['soft_credit'] ?? NULL;
     $recordContribution = [
       'contact_id',
-      'fee_amount',
       'total_amount',
       'financial_type_id',
       'trxn_id',
       'contribution_status_id',
       'check_number',
       'is_pay_later',
-      'membership_id',
       'tax_amount',
-      'skipLineItem',
-      'contribution_recur_id',
-      'pan_truncation',
-      'card_type_id',
     ];
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = $params[$f] ?? NULL;
