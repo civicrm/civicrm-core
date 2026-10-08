@@ -20,6 +20,7 @@ use Civi\Api4\EntityFinancialAccount;
 class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType implements \Civi\Core\HookInterface {
 
   /**
+   * Note that this is still called for the Edit Financial Type form via CRM_Core_Form_EntityFormTrait::getEntityDefaults
    * @deprecated
    * @param array $params
    * @param array $defaults
