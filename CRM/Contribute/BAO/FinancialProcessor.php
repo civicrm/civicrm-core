@@ -916,39 +916,32 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $lastFinancialTrxn['net_amount'] = -$inputParams['trxnParams']['net_amount'];
     $lastFinancialTrxn['fee_amount'] = -$inputParams['trxnParams']['fee_amount'];
     $lastFinancialTrxn['contribution_id'] = $this->getContributionID();
-    foreach ([$lastFinancialTrxn, $inputParams['trxnParams']] as $financialTrxnParams) {
+    foreach ([$lastFinancialTrxn, $inputParams['trxnParams']] as $index => $financialTrxnParams) {
       $trxnID = $this->createFinancialTrxn($financialTrxnParams);
-      $trxnParams = [
-        'total_amount' => $financialTrxnParams['total_amount'],
-      ];
       $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->getContributionID());
       if (!empty($lineItems)) {
         // get financial item
         [$financialItemIds, $taxItems] = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($this->getContributionID());
-        $entityParams = [
-          'contribution_total_amount' => $prevContribution->total_amount,
-          'trxn_total_amount' => $trxnParams['total_amount'],
-          'trxn_id' => $trxnID,
-        ];
+        // This trxn always carries the contribution's full total - reversed on this
+        // first pass, then re-asserted on the second - so each line's share of it is
+        // just its own total, signed to match.
+        $isReversal = $index === 0;
         $eftParams = [
           'entity_table' => 'civicrm_financial_item',
-          'financial_trxn_id' => $entityParams['trxn_id'],
+          'financial_trxn_id' => $trxnID,
         ];
         foreach ($lineItems as $lineItem) {
           if ($lineItem['qty'] == 0) {
             continue;
           }
+          $lineItemAmount = $prevContribution->total_amount == 0.0 ? 0 : $lineItem['line_total'];
           $eftParams['entity_id'] = $financialItemIds[$lineItem['price_field_value_id']];
-          $eftParams['amount'] = 0;
-          if ($entityParams['contribution_total_amount'] != 0) {
-            $eftParams['amount'] = $lineItem['line_total'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
-          }
+          $eftParams['amount'] = $isReversal ? -$lineItemAmount : $lineItemAmount;
           EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
           if (array_key_exists($lineItem['price_field_value_id'], $taxItems)) {
+            $taxItemAmount = $prevContribution->total_amount == 0.0 ? 0 : $taxItems[$lineItem['price_field_value_id']]['amount'];
             $eftParams['entity_id'] = $taxItems[$lineItem['price_field_value_id']]['financial_item_id'];
-            if ($entityParams['contribution_total_amount'] != 0) {
-              $eftParams['amount'] = $taxItems[$lineItem['price_field_value_id']]['amount'] * ($entityParams['trxn_total_amount'] / $entityParams['contribution_total_amount']);
-            }
+            $eftParams['amount'] = $isReversal ? -$taxItemAmount : $taxItemAmount;
             EntityFinancialTrxn::create(FALSE)->setValues($eftParams)->execute();
           }
         }
