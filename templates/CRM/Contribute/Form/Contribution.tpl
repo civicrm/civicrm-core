@@ -393,8 +393,6 @@
               $("#email-receipt", $form).hide();
               $("#is_email_receipt", $form).removeAttr('checked');
             }
-          showHideByValue('is_email_receipt', '', 'receiptDate', 'table-row', 'radio', true);
-          showHideByValue('is_email_receipt', '', 'fromEmail', 'table-row', 'radio', false);
           }
         });
 
