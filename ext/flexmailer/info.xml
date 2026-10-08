@@ -9,7 +9,7 @@
     <email>totten@civicrm.org</email>
   </maintainer>
   <urls>
-    <url desc="Main Extension Page">https://github.com/civicrm/org.civicrm.flexmailer</url>
+    <url desc="Main Extension Page">https://github.com/civicrm/civicrm-core/tree/master/ext/flexmailer</url>
     <url desc="Documentation">https://docs.civicrm.org/flexmailer/en/latest/</url>
     <url desc="Support">http://civicrm.stackexchange.com/</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
@@ -18,9 +18,8 @@
   <version>[civicrm.version]</version>
   <develStage>stable</develStage>
   <comments>
-    FlexMailer is an email delivery engine which replaces the internal guts
-    of CiviMail.  It is a drop-in replacement which enables *other* extensions
-    to provide richer email features.
+    FlexMailer is CiviMail's email delivery engine. It provides events which
+    enable *other* extensions to provide richer email features.
   </comments>
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
@@ -40,12 +39,7 @@
   </tags>
   <classloader>
     <psr4 prefix="Civi\FlexMailer\" path="src"/>
-    <psr4 prefix="Civi\" path="Civi"/>
   </classloader>
-  <mixins>
-    <mixin>menu-xml@1.0.0</mixin>
-    <mixin>setting-php@1.0.0</mixin>
-  </mixins>
   <civix>
     <namespace>CRM/Flexmailer</namespace>
     <format>25.10.2</format>
