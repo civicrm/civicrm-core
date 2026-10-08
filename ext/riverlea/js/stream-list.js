@@ -82,6 +82,10 @@
         }));
     }
 
+    currentBackendIsRiverlea() {
+      return Object.keys(this.streams).includes(this.settingState.backend);
+    }
+
     createNew() {
       return CRM.api4('RiverleaStream', 'create', {
         values: {
@@ -410,7 +414,13 @@
       this.setBackend = CRM.utils.createButton(ts('Set for Backend'), 'btn-set-backend', 'fa-briefcase', () => this.streamList.confirmThenUpdate('backend', this.streamName, this.data.label));
       this.setFrontend = CRM.utils.createButton(ts('Set for Frontend'), 'btn-set-frontend', 'fa-shop', () => this.streamList.confirmThenUpdate('frontend', this.streamName, this.data.label));
 
-      container.append(this.setPreview, this.setBackend, this.setFrontend);
+      if (this.streamList.currentBackendIsRiverlea()) {
+        container.append(this.setPreview, this.setBackend, this.setFrontend);
+      }
+      else {
+        // preview buttons dont work without riverlea core
+        container.append(this.setBackend, this.setFrontend);
+      }
     }
 
     renderHeaderTags(container) {
