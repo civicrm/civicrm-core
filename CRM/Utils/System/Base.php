@@ -616,7 +616,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Add a script file.
    *
-   * Note: This function is not to be called directly
+   * @internal This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
    * @param string $url absolute path to file
@@ -633,7 +633,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Add an inline script.
    *
-   * Note: This function is not to be called directly
+   * @internal This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
    * @param string $code javascript code
@@ -650,7 +650,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Add a css file.
    *
-   * Note: This function is not to be called directly
+   * @internal This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
    * @param string $url absolute path to file
@@ -667,7 +667,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Add an inline style.
    *
-   * Note: This function is not to be called directly
+   * @internal This function is not to be called directly
    * @see CRM_Core_Region::render()
    *
    * @param string $code css code
@@ -717,6 +717,7 @@ abstract class CRM_Utils_System_Base {
    *  2. This would be easier to compute by a calling a CMS API, but
    *     for whatever reason Civi gets it from config data.
    *
+   * @internal
    * @return array
    *   - url: string. ex: "http://example.com/sites/foo.com/files/civicrm"
    *   - path: string. ex: "/var/www/sites/foo.com/files/civicrm"
@@ -986,6 +987,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Append to coreResourcesList.
    *
+   * @internal
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
   public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) {
@@ -994,6 +996,7 @@ abstract class CRM_Utils_System_Base {
   /**
    * Modify dynamic assets.
    *
+   * @internal
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
   public function alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) {
@@ -1231,6 +1234,7 @@ abstract class CRM_Utils_System_Base {
 
   /**
    * Invalidates the cache of dynamic routes and forces a rebuild.
+   * @internal
    */
   public function invalidateRouteCache() {
   }
