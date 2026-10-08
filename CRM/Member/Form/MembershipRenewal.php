@@ -599,9 +599,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @throws \CRM_Core_Exception
    */
   private function saveOrder(array $membershipValues, array $renewalDates, bool $pending, ?int $contributionRecurID): int {
-    [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
-    $userName = htmlentities((string) $userName);
-
     foreach ($this->getOrder()->getLineItems() as $index => $lineItem) {
       if (($lineItem['entity_id'] ?? NULL) != $this->getMembershipID()) {
         continue;
@@ -621,7 +618,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       ->setContributionValues($this->getContributionValues() + [
         'contact_id' => $this->_contributorContactID,
         'financial_type_id' => $this->getFinancialTypeID(),
-        'source' => "{$this->getMembershipTypeValue('name')} Membership: Offline membership renewal (by {$userName})",
         'is_pay_later' => $pending,
         'check_number' => $this->_params['check_number'] ?? NULL,
         'trxn_id' => $this->_params['trxn_id'] ?? NULL,
@@ -765,6 +761,20 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       'end_date' => $renewalDates['end_date'] ?? NULL,
       'start_date' => $currentMembership['status_id.is_current_member'] ? $currentMembership['start_date'] : ($renewalDates['start_date'] ?? NULL),
     ] + $dates;
+  }
+
+  /**
+   * Get the source to record against the contribution.
+   *
+   * @return string
+   */
+  protected function getSource(): string {
+    if ($this->getSubmittedValue('source')) {
+      return $this->getSubmittedValue('source');
+    }
+    [$userName] = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
+    $userName = htmlentities((string) $userName);
+    return "{$this->getMembershipTypeValue('name')} Membership: Offline membership renewal (by {$userName})";
   }
 
 }

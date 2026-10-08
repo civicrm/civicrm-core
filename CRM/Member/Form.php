@@ -201,7 +201,18 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
       'payment_instrument_id' => $this->getPaymentInstrumentID(),
       'receive_date' => $this->getReceiveDate(),
+      'source' => $this->getSource(),
     ];
+  }
+
+  /**
+   * Get the source to record against the contribution (and, where
+   * applicable, the membership).
+   *
+   * @noinspection PhpUnhandledExceptionInspection
+   */
+  protected function getSource(): string {
+    throw new CRM_Core_Exception('`getSource` must be implemented');
   }
 
   /**
