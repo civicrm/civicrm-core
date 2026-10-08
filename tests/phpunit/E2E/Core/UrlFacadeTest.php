@@ -17,6 +17,8 @@ use Civi\Test\RemoteTestFunction;
  */
 class UrlFacadeTest extends \CiviEndToEndTestCase {
 
+  private int $pushedGlobals = 0;
+
   public function setUp(): void {
     $parts = explode('/', CIVICRM_UF_BASEURL);
     $this->assertMatchesRegularExpression(';^[a-z0-9\.\-]+(:\d+)?$;', $parts[2], 'CIVICRM_UF_BASEURL should have domain name and/or port');
@@ -27,6 +29,9 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
   }
 
   protected function tearDown(): void {
+    for (; $this->pushedGlobals > 0; $this->pushedGlobals--) {
+      \CRM_Utils_GlobalStack::singleton()->pop();
+    }
     parent::tearDown();
     \CRM_Utils_GlobalStack::singleton()->pop();
   }
@@ -305,6 +310,35 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
     $this->assertEquals('https://example.com/dirty.jsp?q=foo', Civi::url('custom://foo')->__toString());
     $this->assertEquals('https://example.com/dirty.jsp?q=foo%2Fbar&x=1', Civi::url('custom://foo/bar?x=1')->__toString());
     $this->assertEquals('https://example.com/dirty.jsp?q=foo%2Fbar#whiz', Civi::url('custom://foo/bar#whiz')->__toString());
+  }
+
+  public function testNonSslRequestKeepsScheme(): void {
+    $this->addPlainRenderers();
+    $this->pushGlobals(['_SERVER' => ['HTTPS' => 'off', 'HTTP_X_FORWARDED_PROTO' => '']]);
+    $this->assertEquals('https://example.com/foo', (string) Civi::url('plainhttps://foo'));
+    $this->assertEquals('http://example.com/foo', (string) Civi::url('plainhttp://foo'));
+  }
+
+  public function testSslRequestUpgradesToHttps(): void {
+    $this->addPlainRenderers();
+    $this->pushGlobals(['_SERVER' => ['HTTPS' => 'on']]);
+    $this->assertEquals('https://example.com/foo', (string) Civi::url('plainhttp://foo'));
+  }
+
+  /**
+   * Register schemes that render to plain strings, so the SSL handling of __toString() applies.
+   */
+  protected function addPlainRenderers(): void {
+    foreach (['http', 'https'] as $proto) {
+      Civi::dispatcher()->addListener("&civi.url.render.plain$proto", function(Url $url, &$result) use ($proto) {
+        $result = "$proto://example.com/" . $url->getPath();
+      });
+    }
+  }
+
+  protected function pushGlobals(array $frame): void {
+    \CRM_Utils_GlobalStack::singleton()->push($frame);
+    $this->pushedGlobals++;
   }
 
   protected function assertUrlComponentContains($expectField, $expectValue, string $renderedUrl, string $message = ''): void {
