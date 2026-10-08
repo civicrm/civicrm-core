@@ -507,7 +507,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         CRM_Core_Session::singleton()->set('transaction.userID', $contactID);
       }
 
-      $participantRecord['description'] = ts('Online Event Registration') . ': ' . $this->_values['event']['title'];
       $participantRecord['accountingCode'] = $this->_values['event']['accountingCode'] ?? NULL;
 
       $pending = FALSE;
@@ -860,7 +859,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'amount_level' => $params['amount_level'],
       'invoice_id' => $params['invoiceID'],
       'currency' => $this->getCurrency(),
-      'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
+      'source' => $this->getSource(0),
       'is_pay_later' => $params['is_pay_later'] ?? 0,
       'campaign_id' => $this->getCampaignID(0),
       'card_type_id' => $this->getCardTypeID(),

@@ -785,8 +785,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
     }
     else {
-      $params['description'] = ts('Online Event Registration') . ' ' . $this->_values['event']['title'];
-
       $this->_params = [];
       $this->_params[] = $params;
       $this->set('params', $this->_params);

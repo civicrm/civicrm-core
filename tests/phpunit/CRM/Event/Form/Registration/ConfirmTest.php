@@ -1,8 +1,10 @@
 <?php
 
 declare(strict_types = 1);
+use Civi\Api4\Contribution;
 use Civi\Api4\Participant;
 use Civi\Api4\PriceFieldValue;
+use Civi\Api4\UFField;
 use Civi\Test\FormTrait;
 
 /**
@@ -199,6 +201,93 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [], ['id' => $event['id']]);
     $form->processForm($form::BUILT);
     $this->assertEquals($this->ids['PriceSet']['discount'], $form->getPriceSetID());
+  }
+
+  /**
+   * CRM_Event_Form_Registration::getSource() returns the same system-generated
+   * description for every participant in a registration, regardless of which
+   * one it is - confirm that's actually what gets saved for both the primary
+   * and an additional participant.
+   */
+  public function testSourceIsConsistentAcrossParticipants(): void {
+    $event = $this->eventCreatePaid();
+    $this->getFormWrapper([
+      'first_name' => 'Kim',
+      'last_name' => 'Reality',
+      'email-Primary' => 'demo@example.com',
+      'additional_participants' => 1,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      'payment_processor_id' => 0,
+      $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_free'],
+    ], $event['id'])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Pat',
+        'last_name' => 'Participant',
+        'email-Primary' => 'pat@example.com',
+        'priceSetId' => $this->getPriceSetID('PaidEvent'),
+        $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_free'],
+      ])
+      ->processForm();
+
+    $sources = array_unique(Participant::get(FALSE)->addSelect('source')->execute()->column('source'));
+    $this->assertEquals(['Online Event Registration: ' . $event['title']], $sources);
+
+    // processContribution() shares the same getSource() call for the contribution's own source.
+    $this->assertEquals(
+      'Online Event Registration: ' . $event['title'],
+      Contribution::get(FALSE)->addSelect('source')->execute()->single()['source']
+    );
+  }
+
+  /**
+   * The DAO save path truncates (and ellipsifies) over-long string fields
+   * itself - see CRM_Core_DAO::copyValues() - so getSource() does not need
+   * to do that itself.
+   */
+  public function testSourceIsTruncatedOnSaveWithoutExplicitEllipsify(): void {
+    $longTitle = str_repeat('Annual CiviCRM Meet ', 10);
+    $event = $this->eventCreatePaid(['title' => $longTitle]);
+    $this->submitForm($event['id'], [
+      'first_name' => 'Kim',
+      'last_name' => 'Reality',
+      'email-Primary' => 'demo@example.com',
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      'payment_processor_id' => 0,
+      $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_free'],
+    ]);
+
+    $maxLength = CRM_Event_DAO_Participant::fields()['participant_source']['maxlength'];
+    $source = Participant::get(FALSE)->addSelect('source')->execute()->single()['source'];
+    $this->assertEquals(CRM_Utils_String::ellipsify('Online Event Registration: ' . $longTitle, $maxLength), $source);
+    $this->assertLessThanOrEqual($maxLength, strlen($source));
+  }
+
+  /**
+   * 'participant_source' is an importable Participant field, so a site can
+   * add it to the registration profile - if they have, the registrant's
+   * own submitted value should be used instead of the system-generated
+   * description.
+   */
+  public function testSourceUsesSubmittedProfileValueWhenPresent(): void {
+    $event = $this->eventCreatePaid();
+    UFField::create(FALSE)->setValues([
+      'uf_group_id:name' => 'PaidEvent_post',
+      'field_name' => 'participant_source',
+      'label' => 'Source',
+    ])->execute();
+
+    $this->submitForm($event['id'], [
+      'first_name' => 'Kim',
+      'last_name' => 'Reality',
+      'email-Primary' => 'demo@example.com',
+      'participant_source' => 'Referred by a friend',
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      'payment_processor_id' => 0,
+      $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_free'],
+    ]);
+
+    $source = Participant::get(FALSE)->addSelect('source')->execute()->single()['source'];
+    $this->assertEquals('Referred by a friend', $source);
   }
 
   /**
