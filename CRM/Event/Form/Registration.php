@@ -14,6 +14,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 use Civi\Api4\LineItem;
+use Civi\Api4\Participant;
 
 /**
  * This class generates form components for processing Event.
@@ -870,20 +871,20 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function confirmPostProcess($contactID, $participantRecord, int $participantNum = 0): void {
     // add participant record
-    $participant = $this->addParticipant($participantRecord, $contactID, $participantNum);
-    $this->_participantIDS[$participantNum] = $participant->id;
+    $participantID = $this->addParticipant($participantRecord, $contactID, $participantNum);
+    $this->_participantIDS[$participantNum] = $participantID;
 
     //setting register_by_id field and primaryContactId
     if (!empty($participantRecord['is_primary'])) {
-      $this->set('registerByID', $participant->id);
+      $this->set('registerByID', $participantID);
       $this->set('primaryContactId', $contactID);
 
       // CRM-10032
-      $this->processFirstParticipant($participant->id);
+      $this->processFirstParticipant($participantID);
     }
 
     if (!empty($participantRecord['is_primary'])) {
-      $participantRecord['participantID'] = $participant->id;
+      $participantRecord['participantID'] = $participantID;
       $this->set('primaryParticipant', $participantRecord);
     }
 
@@ -928,10 +929,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $contactID
    * @param $participantNumber
    *
-   * @return \CRM_Event_BAO_Participant
+   * @return int
    * @throws \CRM_Core_Exception
    */
-  private function addParticipant($params, $contactID, $participantNumber): CRM_Event_BAO_Participant {
+  private function addParticipant($params, $contactID, $participantNumber): int {
     $transaction = new CRM_Core_Transaction();
 
     $participantParams = [
@@ -945,11 +946,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       'is_pay_later' => $params['is_pay_later'] ?? 0,
       'fee_amount' => $this->getFeeAmountForParticipant($participantNumber),
       'registered_by_id' => $params['registered_by_id'] ?? NULL,
-      'discount_id' => $params['discount_id'] ?? NULL,
       'fee_currency' => $this->getCurrency(),
       'campaign_id' => $this->getCampaignID($participantNumber),
       'is_test' => $this->isTest(),
-    ];
+    ] + $this->getSubmittedCustomFields(4, 'Participant', $this->getSubmittedParticipantValues($participantNumber));
     // On a fresh registration there is no existing participant row to preserve
     // register_date from, and the field has no db-level default.
     if (empty($participantParams['id'])) {
@@ -971,26 +971,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       );
       $participantParams['id'] = $pID;
     }
-    $participantParams['discount_id'] = CRM_Core_BAO_Discount::findSet($this->getEventID(), 'civicrm_event');
+    $participantParams['discount_id'] = $this->getDiscountID();
 
-    if (!$participantParams['discount_id']) {
-      $participantParams['discount_id'] = "null";
-    }
-
-    $participantParams['custom'] = [];
-    foreach ($params as $paramName => $paramValue) {
-      if (str_starts_with($paramName, 'custom_')) {
-        [$customFieldID, $customValueID] = CRM_Core_BAO_CustomField::getKeyID($paramName, TRUE);
-        CRM_Core_BAO_CustomField::formatCustomField($customFieldID, $participantParams['custom'], $paramValue, 'Participant', $customValueID);
-
-      }
-    }
-
-    $participant = CRM_Event_BAO_Participant::create($participantParams);
+    $participantID = (int) Participant::save(FALSE)->addRecord($participantParams)->execute()->single()['id'];
 
     $transaction->commit();
 
-    return $participant;
+    return $participantID;
   }
 
   /**
