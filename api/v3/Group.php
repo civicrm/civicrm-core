@@ -83,6 +83,6 @@ function civicrm_api3_group_delete($params) {
   if ($group['count'] == 0) {
     throw new CRM_Core_Exception('Could not delete group ' . $params['id']);
   }
-  CRM_Contact_BAO_Group::discard($params['id']);
+  CRM_Contact_BAO_Group::discard($params['id'], $params);
   return civicrm_api3_create_success(TRUE);
 }

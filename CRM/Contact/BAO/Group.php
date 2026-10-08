@@ -36,12 +36,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
    * Incredibly destructive.
    *
    * @param int $id Group id.
+   * @param array $params
    */
-  public static function discard($id) {
+  public static function discard($id, $params = []) {
     if (!$id || !is_numeric($id)) {
       throw new CRM_Core_Exception('Invalid group request attempted');
     }
-    CRM_Utils_Hook::pre('delete', 'Group', $id);
+    CRM_Utils_Hook::pre('delete', 'Group', $id, $params);
 
     $transaction = new CRM_Core_Transaction();
 
@@ -1291,12 +1292,35 @@ WHERE {$whereClause}";
   }
 
   /**
+   * Check if user has permission to create, edit, or delete a reserved group or change its reserved status.
+   *
+   * @param int|null $id
+   * @param bool|int|null $isReserved
+   * @param int|null $userID
+   * @return bool
+   */
+  public static function checkReservedGroupPermission(?int $id = NULL, $isReserved = NULL, ?int $userID = NULL): bool {
+    $wasReserved = $id ? (bool) self::getDbVal('is_reserved', $id) : FALSE;
+    if (($isReserved || $wasReserved) && !CRM_Core_Permission::check('administer reserved groups', $userID)) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
    * Check write access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $userID = $e->getUserID();
+
+    // Users without 'administer reserved groups' can neither change the is_reserved flag nor edit a reserved group.
+    if (!self::checkReservedGroupPermission($record['id'] ?? NULL, $record['is_reserved'] ?? NULL, $userID)) {
+      $e->setAuthorized(FALSE);
+      return;
+    }
+
     // Check create permission (all other actions just rely on gatekeeper permissions)
     if ($e->getActionName() === 'create') {
       $groupType = (array) ($record['group_type:name'] ?? []);
@@ -1410,6 +1434,14 @@ WHERE {$whereClause}";
    * @throws CRM_Core_Exception
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
+    if (!empty($event->params['check_permissions'])) {
+      $id = $event->id ?? $event->params['id'] ?? NULL;
+      $isReserved = $event->params['is_reserved'] ?? NULL;
+      if (!self::checkReservedGroupPermission($id, $isReserved)) {
+        throw new CRM_Core_Exception(ts('You do not have permission to alter reserved groups.'));
+      }
+    }
+
     if (in_array($event->action, ['create', 'edit'])) {
       $event->params += [
         'parents_param_provided' => array_key_exists('parents', $event->params),
