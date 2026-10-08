@@ -445,6 +445,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
       'dateInputFormat' => $settings->get('dateInputFormat'),
       'timeInputFormat' => $settings->get('timeInputFormat'),
       'moneyFormat' => CRM_Utils_Money::format(1234.56),
+      'weekBegins' => $settings->get('weekBegins'),
     ];
   }
 
