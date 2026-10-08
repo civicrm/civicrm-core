@@ -16,6 +16,9 @@ return new class() extends EventCheck implements HookInterface {
     'headers' => ['type' => 'array'],
     'attachments' => ['type' => 'array|NULL'],
     'isTest' => ['type' => 'bool|int'],
+    // Documented way for a listener to stop the message being sent. Honoured by
+    // CRM_Utils_Mail::send() and by FlexMailer's DefaultSender.
+    'abortMailSend' => ['type' => 'bool', 'for' => ['messageTemplate', 'singleEmail', 'flexmailer']],
 
     // ## Envelope: singleEmail/messageTemplate
 

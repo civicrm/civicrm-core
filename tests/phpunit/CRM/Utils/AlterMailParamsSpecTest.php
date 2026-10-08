@@ -45,4 +45,19 @@ class CRM_Utils_AlterMailParamsSpecTest extends CiviUnitTestCase {
     $mut->stop();
   }
 
+  /**
+   * abortMailSend is documented and CRM_Utils_Mail::send() honours it, so the
+   * spec has to recognise it. Note this only reaches the checker when the
+   * caller supplies it: extension listeners run at DEFAULT_HOOK_PRIORITY
+   * (-100), after the checker at 0, so the checker never sees what they add.
+   */
+  public function testAbortMailSendIsRecognised(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    $params = ['abortMailSend' => TRUE] + $this->mailParams();
+    $this->assertFalse(CRM_Utils_Mail::send($params));
+    $mut->assertMailLogEmpty();
+
+    $mut->stop();
+  }
+
 }
