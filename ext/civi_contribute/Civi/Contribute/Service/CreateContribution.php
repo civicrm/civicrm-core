@@ -199,8 +199,12 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
 
     $event->setEntityId(0, $savedContribution['id']);
 
-    if ($contribution['recur_period'] ?? NULL) {
-      $this->createContributionRecur($savedContribution['id'], $contribution['recur_period'], $contribution['checkout_option'] ?? NULL);
+    // Prior to 6.18 the form was configured to set recur_period,
+    // but after it sets the :name version. Therefore we need to check
+    // both for compatibility with forms create before 6.18.
+    $recurPeriodKey = array_first(array_intersect(array_keys($contribution), ['recur_period:name', 'recur_period']));
+    if ($recurPeriodKey && !empty($contribution[$recurPeriodKey])) {
+      $this->createContributionRecur($savedContribution['id'], $contribution[$recurPeriodKey], $contribution['checkout_option'] ?? NULL);
     }
 
   }
