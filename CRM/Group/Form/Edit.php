@@ -180,7 +180,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
     if (!$this->isPermitMailingGroupAccess()) {
       $groupTypes = CRM_Core_OptionGroup::values('group_type', TRUE);
-      if ($defaults['group_type'][$groupTypes['Mailing List']] == 1) {
+      if (!empty($defaults['group_type'][$groupTypes['Mailing List']])) {
         $this->assign('freezeMailingList', $groupTypes['Mailing List']);
       }
       else {
@@ -290,6 +290,10 @@ WHERE  title = %1
       if ($grpCnt) {
         $errors['title'] = ts('Group \'%1\' already exists.', [1 => $fields['title']]);
       }
+    }
+
+    if (!CRM_Contact_BAO_Group::checkReservedGroupPermission($self->_id, $fields['is_reserved'] ?? NULL)) {
+      $errors['is_reserved'] = ts('You do not have permission to alter reserved groups.');
     }
 
     return empty($errors) ? TRUE : $errors;
