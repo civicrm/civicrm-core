@@ -1315,7 +1315,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   /**
    * Record contribution record associated with membership.
-   * This will update an existing contribution if $params['contribution_id'] is passed in.
    * This will create a MembershipPayment to link the contribution and membership
    *
    * @param array $params
@@ -1354,14 +1353,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $contributionParams[$f] = $params[$f] ?? NULL;
     }
 
-    if (!empty($params['contribution_id'])) {
-      $contributionParams['id'] = $params['contribution_id'];
-    }
-    // make entry in batch entity batch table
-    if (!empty($params['batch_id'])) {
-      $contributionParams['batch_id'] = $params['batch_id'];
-    }
-
     if (!empty($params['contribution_contact_id'])) {
       // deal with possibility of a different person paying for contribution
       $contributionParams['contact_id'] = $params['contribution_contact_id'];
@@ -1377,19 +1368,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     //CRM-13981, create new soft-credit record as to record payment from different person for this membership
     if (!empty($contributionSoftParams)) {
-      if (!empty($params['batch_id'])) {
-        foreach ($contributionSoftParams as $contributionSoft) {
-          $contributionSoft['contribution_id'] = $contribution->id;
-          $contributionSoft['currency'] = $contribution->currency;
-          CRM_Contribute_BAO_ContributionSoft::add($contributionSoft);
-        }
-      }
-      else {
-        $contributionSoftParams['contribution_id'] = $contribution->id;
-        $contributionSoftParams['currency'] = $contribution->currency;
-        $contributionSoftParams['amount'] = $contribution->total_amount;
-        CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
-      }
+      $contributionSoftParams['contribution_id'] = $contribution->id;
+      $contributionSoftParams['currency'] = $contribution->currency;
+      $contributionSoftParams['amount'] = $contribution->total_amount;
+      CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
     }
 
     return $contribution;
