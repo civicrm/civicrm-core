@@ -5,7 +5,7 @@ return [
   'type' => 'search',
   'title' => E::ts('Administer Roles'),
   'description' => E::ts('List of roles defined on the system.'),
-  'icon' => 'fa-graduation-cap',
+  'icon' => 'fa-user-graduate',
   'server_route' => 'civicrm/admin/roles',
   'permission' => ['cms:administer users'],
   'navigation' => [

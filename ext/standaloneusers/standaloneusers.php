@@ -107,13 +107,6 @@ function standaloneusers_civicrm_permission(&$permissions) {
 }
 
 function standaloneusers_civicrm_navigationMenu(&$menu) {
-  _standaloneusers_civix_insert_navigation_menu($menu, 'Administer/Users and Permissions', [
-    'label' => E::ts('Login settings'),
-    'name' => 'standaloneusers_mfa',
-    'url' => 'civicrm/admin/setting/standaloneusers?reset=1',
-    'permission' => 'cms:administer users',
-  ]);
-
   \Civi\Standalone\Utils::alterHomeMenuItems($menu);
 }
 
