@@ -1689,10 +1689,15 @@ abstract class CRM_Core_Payment {
         continue;
       }
 
-      // Does PP implement this method, and can we call it?
-      if (!method_exists($processorInstance, $method) ||
+      // Does PP implement this method, and can we call it? A processor implementing
+      // Civi\Payment\PaymentProcessorWebhookInterface is trusted without the
+      // method_exists()/is_callable() check, which remains as a fallback for
+      // processors written before that interface existed.
+      $implementsWebhookInterface = $method === 'handlePaymentNotification'
+        && $processorInstance instanceof \Civi\Payment\PaymentProcessorWebhookInterface;
+      if (!$implementsWebhookInterface && (!method_exists($processorInstance, $method) ||
         !is_callable([$processorInstance, $method])
-      ) {
+      )) {
         // on the off chance there is a double implementation of this processor we should keep looking for another
         // note that passing processor_id is more reliable & we should work to deprecate processor_name
         continue;
