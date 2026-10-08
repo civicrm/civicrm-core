@@ -1,0 +1,11 @@
+#
+# Apache settings for the CiviCRM Standalone private directory.
+# Settings, logs, caches and private uploads live here: never serve any of it.
+#
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+  Order allow,deny
+  Deny from all
+</IfModule>
