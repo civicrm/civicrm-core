@@ -31,6 +31,7 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign implements Civ
    * @param \Civi\Core\Event\PostEvent $event
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
+    Civi::cache('metadata')->delete('campaign_hierarchy_tree');
     /* Create the campaign group record */
     $params = $event->params;
     if (in_array($event->action, ['create', 'edit']) && !empty($params['groups']['include']) && is_array($params['groups']['include'])) {
@@ -418,6 +419,68 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
       ];
     }
     return FALSE;
+  }
+
+  /**
+   * Returns the campaign hierarchy tree (parent_id => comma-separated child IDs).
+   *
+   * To maximize memory efficiency, only campaigns that have a parent_id are stored,
+   * and children are stored as a comma-separated string (e.g. "2,3") to eliminate
+   * hashtable overhead in PHP.
+   *
+   * @return array<int, string>
+   */
+  public static function getCampaignTree(): array {
+    $cache = Civi::cache('metadata');
+    $tree = $cache->get('campaign_hierarchy_tree');
+    if ($tree === NULL) {
+      $tree = [];
+      $dao = CRM_Core_DAO::executeQuery('SELECT id, parent_id FROM civicrm_campaign WHERE parent_id IS NOT NULL');
+      while ($dao->fetch()) {
+        $parentId = (int) $dao->parent_id;
+        $tree[$parentId] = isset($tree[$parentId]) ? $tree[$parentId] . ',' . $dao->id : $dao->id;
+      }
+      $cache->set('campaign_hierarchy_tree', $tree);
+    }
+    return $tree;
+  }
+
+  /**
+   * Returns array of campaign IDs of descendant campaigns of the specified campaign(s).
+   *
+   * @param int|int[] $campaignIds
+   * @param bool $includeSelf
+   *
+   * @return int[]
+   */
+  public static function getDescendantIds(array|int $campaignIds, bool $includeSelf = TRUE): array {
+    $campaignIds = array_values(array_filter(array_map('intval', (array) $campaignIds), fn($id) => $id > 0));
+    if (!$campaignIds) {
+      return [];
+    }
+    $tree = self::getCampaignTree();
+    $descendants = [];
+    $queue = $campaignIds;
+    $visited = array_flip($campaignIds);
+
+    while ($queue) {
+      $currentId = array_shift($queue);
+      if (isset($tree[$currentId])) {
+        foreach (explode(',', $tree[$currentId]) as $childId) {
+          $childId = (int) $childId;
+          if (!isset($visited[$childId])) {
+            $visited[$childId] = TRUE;
+            $descendants[] = $childId;
+            $queue[] = $childId;
+          }
+        }
+      }
+    }
+
+    if ($includeSelf) {
+      return array_values(array_unique(array_merge($campaignIds, $descendants)));
+    }
+    return array_values($descendants);
   }
 
 }
