@@ -32,4 +32,24 @@ class CRM_Ckeditor4_Upgrader extends CRM_Extension_Upgrader_Base {
     civicrm_api3('OptionValue', 'get', ['name' => 'CKEditor', 'api.option_value.delete' => ['id' => "\$value.id"]]);
   }
 
+  /**
+   * Add in Upgrade Step to Ensure that warning message about version doesn't show by default
+   *
+   * @see dev/core#6839
+   */
+  public function upgrade_1000(): bool {
+    $presets = CRM_Core_OptionGroup::values('wysiwyg_presets', FALSE, FALSE, FALSE, NULL, 'label', TRUE, FALSE, 'name');
+    foreach (array_keys($presets) as $name) {
+      $configName = CRM_Ckeditor4_Form_CKEditorConfig::getConfigFile($name);
+      if ($configName) {
+        $config = file_get_contents($configName);
+        if (!str_contains($config, 'config.versionCheck')) {
+          $config = $config = substr($config, 0, -3) . " config.versionCheck = false;\n};";
+          CRM_Ckeditor4_Form_CKEditorConfig::saveConfigFile($name, $config);
+        }
+      }
+    }
+    return TRUE;
+  }
+
 }
