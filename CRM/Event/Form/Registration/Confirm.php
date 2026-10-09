@@ -510,21 +510,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $participantRecord['accountingCode'] = $this->_values['event']['accountingCode'] ?? NULL;
 
       $pending = FALSE;
-      if ($this->_allowWaitlist || $this->_requireApproval) {
-        //get the participant statuses.
-        $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
-        if ($this->_allowWaitlist) {
-          $participantRecord['participant_status_id'] = $participantRecord['participant_status'] = array_search('On waitlist', $waitingStatuses);
-        }
-        else {
-          $participantRecord['participant_status_id'] = $participantRecord['participant_status'] = array_search('Awaiting approval', $waitingStatuses);
-        }
-
-        //there might be case user selected pay later and
-        //now becomes part of run time waiting list.
-        $participantRecord['is_pay_later'] = FALSE;
-      }
-      elseif ($this->isPaidEvent()) {
+      if (!($this->_allowWaitlist || $this->_requireApproval) && $this->isPaidEvent()) {
         // required only if paid event
         if (is_array($this->_paymentProcessor)) {
           $payment = $this->_paymentProcessor['object'];
@@ -541,10 +527,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         ) {
           if ($participantRecord['amount'] != 0) {
             $pending = TRUE;
-            //get the participant statuses.
-            $pendingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'");
-            $status = !empty($participantRecord['is_pay_later']) ? 'Pending from pay later' : 'Pending from incomplete transaction';
-            $participantRecord['participant_status_id'] = $participantRecord['participant_status'] = array_search($status, $pendingStatuses);
           }
         }
         elseif (!empty($participantRecord['is_primary'])) {
