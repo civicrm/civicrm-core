@@ -100,6 +100,15 @@
     });
   }
 
+  /**
+   * Resolve a template's token schema, then list its tokens in the format the token pickers use.
+   */
+  function fetchTokens(crmApi4, schemaParams) {
+    return crmApi4('MessageTemplate', 'getTokenSchema', schemaParams)
+      .then((schemaResult) => crmApi4('MessageTemplate', 'getTokens', {schema: schemaResult[0].schema}))
+      .then((tokensResult) => tokensResult[0].tokens);
+  }
+
   angular.module('crmMsgadm').config(function($routeProvider) {
       $routeProvider.when('/edit', {
         controller: 'MsgtpluiEdit',
@@ -160,15 +169,7 @@
               return result;
             }));
           },
-          tokenList: function (crmApi) {
-            // FIXME: Use an API that provides tokens more attuned to the particular template.
-            return crmApi('Mailing', 'gettokens', {
-              entity: ['contact', 'mailing'],
-              sequential: 1
-            }).then((r) => {
-              return r.values;
-            });
-          }
+          tokenList: (crmApi4, $location) => fetchTokens(crmApi4, {id: $location.search().id})
         }
       });
     }
@@ -182,9 +183,25 @@
     const args = $location.search();
 
     $ctrl.locales = CRM.crmMsgadm.allLanguages;
+    $ctrl.usageOptions = CRM.crmMsgadm.usageOptions;
     $ctrl.records = prefetch;
     $ctrl.tokenList = tokenList;
     $ctrl.tagIds = (($ctrl.records.main && $ctrl.records.main.tags) || []).map((tag) => tag.tag_id);
+
+    // select2 reads the token pickers' data array on every search, so refill it in place rather than replacing it.
+    let tokenRequest = 0;
+    $scope.$watchCollection('$ctrl.records.main.usage', (usage, oldUsage) => {
+      if (usage === oldUsage) {
+        return;
+      }
+      const request = ++tokenRequest;
+      fetchTokens(crmApi4, {id: $ctrl.records.main.id, usage: usage || []}).then((tokens) => {
+        if (request === tokenRequest) {
+          $ctrl.tokenList.splice(0, $ctrl.tokenList.length, ...tokens);
+        }
+      });
+    });
+
     if (args.lang) {
       $ctrl.lang = args.lang;
       $ctrl.tab = (args.status === 'draft' && $ctrl.records.txDraft && $ctrl.records.txDraft._exists) ? 'txDraft' : 'txActive';

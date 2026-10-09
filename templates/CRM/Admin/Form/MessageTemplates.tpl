@@ -113,6 +113,15 @@
 
       {if !$isWorkflow}
         <table class="form-layout-compressed">
+          {if !empty($form.usage)}
+            <tr>
+              <td class="label-left">{$form.usage.label}</td>
+              <td>
+                {$form.usage.html}
+                <div class="description">{ts}Which token categories to offer in the token pickers above. Leave blank to offer contact tokens only; otherwise include Contact if contact tokens are needed too.{/ts}</div>
+              </td>
+            </tr>
+          {/if}
           <tr>
             <td class="label-left">{$form.is_active.label}</td>
             <td>{$form.is_active.html}</td>
@@ -152,6 +161,20 @@
           $("#file_id").attr('accept', validType);
         }
       }
+
+      // The token pickers' select2 reads this array on every search, so refill it in place rather than replacing it.
+      var tokenRequest = 0;
+      $('#usage').on('change', (e) => {
+        var tokens = $(e.target).closest('form').data('tokens');
+        var request = ++tokenRequest;
+        CRM.api4('MessageTemplate', 'getTokenSchema', {usage: $(e.target).val() || []})
+          .then((schemaResult) => CRM.api4('MessageTemplate', 'getTokens', {schema: schemaResult[0].schema}))
+          .then((tokensResult) => {
+            if (request === tokenRequest) {
+              tokens.splice(0, tokens.length, ...tokensResult[0].tokens);
+            }
+          });
+      });
     });
   </script>
 {/literal}
