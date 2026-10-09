@@ -31,7 +31,7 @@ class CRM_Utils_AutoCleanTest extends CiviUnitTestCase {
    */
   public function testSwapLocaleRestoresUFLocale(): void {
     $this->originalUserSystem = CRM_Core_Config::singleton()->userSystem;
-    $userSystem = new class extends CRM_Utils_System_UnitTests {
+    $userSystem = new class() extends CRM_Utils_System_UnitTests {
 
       public $ufLocale = 'fr_FR';
 

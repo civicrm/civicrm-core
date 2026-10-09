@@ -32,7 +32,7 @@ class CRM_Core_SessionTest extends CiviUnitTestCase {
    */
   public function testUserContextIsLocalized(): void {
     $this->originalUserSystem = CRM_Core_Config::singleton()->userSystem;
-    CRM_Core_Config::singleton()->userSystem = new class extends CRM_Utils_System_UnitTests {
+    CRM_Core_Config::singleton()->userSystem = new class() extends CRM_Utils_System_UnitTests {
 
       public function localizeUrl(string $url): string {
         return 'localized:' . $url;

@@ -120,7 +120,7 @@ class RecentItemTest extends Api4TestBase implements TransactionalInterface {
     $storedUrl = \CRM_Utils_System::url('civicrm/contact/view?reset=1&cid=' . $cid);
 
     $this->originalUserSystem = \CRM_Core_Config::singleton()->userSystem;
-    \CRM_Core_Config::singleton()->userSystem = new class extends \CRM_Utils_System_UnitTests {
+    \CRM_Core_Config::singleton()->userSystem = new class() extends \CRM_Utils_System_UnitTests {
 
       public function localizeUrl(string $url): string {
         return 'localized:' . $url;
