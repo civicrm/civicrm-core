@@ -63,6 +63,7 @@ class CRM_Standaloneusers_Upgrader extends CRM_Extension_Upgrader_Base {
             'make online contributions',
             'view event info',
             'register for events',
+            'profile create',
             'access password resets',
             'authenticate with password',
           ],
