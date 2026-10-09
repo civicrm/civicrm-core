@@ -37,12 +37,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
   private array $previousFinancialItems = [];
 
   /**
-   * Caches for the changeFeeSelections() path's line-item classification -
-   * calculated once, on first use, via getAddedLineItems()/getChangedLineItems()/
-   * getRemovedLineItems()/getResurrectedLineItems().
+   * Added/changed/removed classification of the submitted line items against the
+   * contribution's current line items, for the changeFeeSelections() path - see
+   * classifyLineItemChanges(). Calculated once, in the constructor.
+   *
+   * @var array
    */
-  private ?array $calculatedAddedLineItems = NULL;
-  private ?array $calculatedLineItemAlterations = NULL;
+  private array $lineItemChanges;
 
   public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution, array $originalLineItems, array $updatedLineItems, array $inputValues = []) {
     // Deal with slopping typing first.
@@ -55,6 +56,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $this->originalLineItems = $originalLineItems;
     $this->updatedLineItems = $updatedLineItems;
     $this->inputValues = $inputValues;
+    $this->lineItemChanges = $this->classifyLineItemChanges();
   }
 
   private function getUpdatedContribution(): CRM_Contribute_DAO_Contribution {
@@ -1385,10 +1387,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $financialItemsArray = $this->getAdjustedFinancialItemsToRecord();
     }
 
-    // update line item with changed line total and other information
+    // update line item with changed line total and other information. A resurrected
+    // line counts here too, same as a changed one.
     $totalParticipant = 0;
     $amountLevel = [];
-    foreach ($this->getChangedLineItems() as $priceFieldValueID => $priceFieldValue) {
+    foreach (array_merge($this->getChangedLineItems(), $this->getResurrectedLineItems()) as $priceFieldValueID => $priceFieldValue) {
       $amountLevel[] = $priceFieldValue['label'] . ' - ' . (float) $priceFieldValue['qty'];
       if (($priceFieldValue['entity_table'] ?? NULL) === 'civicrm_participant' && isset($priceFieldValue['participant_count'])) {
         $totalParticipant += $priceFieldValue['participant_count'];
@@ -1424,147 +1427,153 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
-   * Get the submitted line items that have no previous counterpart at all - see
-   * getLineItemsToAdd(). Calculated once, on first use.
+   * Get the submitted line items with no active previous counterpart - see
+   * classifyLineItemChanges(). Includes both a genuinely new selection and one
+   * that was previously selected then cancelled (carrying the cancelled row's id
+   * forward) - see getNewLineItems()/getResurrectedLineItems() to split those two
+   * cases apart.
    */
   private function getAddedLineItems(): array {
-    return $this->calculatedAddedLineItems ??= $this->getLineItemsToAdd();
+    return $this->lineItemChanges['added'];
   }
 
   /**
-   * Get the submitted line items that match a previous line but differ in value -
-   * see getLineItemsToAlter(). Calculated once, on first use.
+   * Get the subset of getAddedLineItems() that is a genuinely new selection, with
+   * no previous line item of any kind to reuse - these need inserting.
    */
-  private function getChangedLineItems(): array {
-    return $this->getLineItemAlterations()['line_items_to_update'];
+  private function getNewLineItems(): array {
+    $newLineItems = [];
+    foreach ($this->getAddedLineItems() as $priceFieldValueID => $lineItem) {
+      if (!isset($lineItem['id'])) {
+        $newLineItems[$priceFieldValueID] = $lineItem;
+      }
+    }
+    return $newLineItems;
   }
 
   /**
-   * Get the previous line items with no submitted counterpart - see
-   * getLineItemsToAlter(). Calculated once, on first use.
-   */
-  private function getRemovedLineItems(): array {
-    return $this->getLineItemAlterations()['line_items_to_cancel'];
-  }
-
-  /**
-   * Get the previously-cancelled line items being re-enabled - see
-   * getLineItemsToAlter(). Calculated once, on first use. A subset of
-   * getChangedLineItems() - every resurrected line is also in that bucket - kept
-   * separate because it needs 'add' (not 'adjust') financial-item treatment.
+   * Get the subset of getAddedLineItems() that reuses a previously-cancelled line
+   * item's row - these need updating, not inserting.
    */
   private function getResurrectedLineItems(): array {
-    return $this->getLineItemAlterations()['line_items_to_resurrect'];
-  }
-
-  /**
-   * Get the getLineItemsToAlter() classification, calculating it on first use and
-   * caching it on $calculatedLineItemAlterations.
-   */
-  private function getLineItemAlterations(): array {
-    return $this->calculatedLineItemAlterations ??= $this->getLineItemsToAlter();
-  }
-
-  /**
-   * Get the submitted line items that do not correspond to any of the contribution's
-   * existing line items.
-   *
-   * Unlike updates, cancellations or resurrections these need no comparison against
-   * previous state - a submitted price field value with no matching previous line item
-   * is, by definition, a new one.
-   *
-   * Reads the submitted line items from the constructor's $updatedLineItems.
-   *
-   * @return array
-   */
-  private function getLineItemsToAdd(): array {
-    $submittedLineItems = $this->getUpdatedLineItems();
-    $previousPriceFieldValueIDs = array_column($this->originalLineItems, 'price_field_value_id');
-    return array_diff_key($submittedLineItems, array_flip($previousPriceFieldValueIDs));
-  }
-
-  /**
-   * Helper function to retrieve line items that need to be altered.
-   *
-   * We iterate through the previous line items for the given entity to determine
-   * what alterations to line items need to be made to reflect the new line items.
-   *
-   * There are 3 possible changes required - per the keys in the return array. (A fourth
-   * possible change, adding a line item with no previous counterpart at all, is handled
-   * separately by getLineItemsToAdd() as it needs no comparison against previous state.)
-   *
-   * Relocated as-is from CRM_Price_BAO_LineItem::changeFeeSelections()'s support code.
-   *
-   * Reads the submitted line items from the constructor's $updatedLineItems.
-   *
-   * @internal - will change.
-   *
-   * @return array
-   *   Array of line items to alter with the following keys
-   *   - line_items_to_update. If we have already been an active option and a change has
-   *     happened then it should be in this array.
-   *   - line_items_to_cancel. Line items currently selected but not selected in the new selection.
-   *     These need to be zero'd out.
-   *   - line_items_to_resurrect. Line items previously selected and then deselected. These need to be
-   *     re-enabled rather than a new one added.
-   * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
-   */
-  private function getLineItemsToAlter(): array {
-    $submittedLineItems = $this->getUpdatedLineItems();
-    $lineItemsToUpdate = [];
-    $submittedPriceFieldValueIDs = array_keys($submittedLineItems);
-    $lineItemsToCancel = $lineItemsToResurrect = [];
-
-    foreach ($this->originalLineItems as $id => $previousLineItem) {
-      if (in_array($previousLineItem['price_field_value_id'], $submittedPriceFieldValueIDs)) {
-        $submittedLineItem = $submittedLineItems[$previousLineItem['price_field_value_id']];
-        if (($submittedLineItem['html_type'] ?? NULL) == 'Text') {
-          // If a 'Text' price field was updated by changing qty value, then we are not adding new line-item but updating the existing one,
-          //  because unlike other kind of price-field, it's related price-field-value-id isn't changed and thats why we need to make an
-          //  exception here by adding financial item for updated line-item and will reverse any previous financial item entries.
-          $lineItemsToUpdate[$previousLineItem['price_field_value_id']] = array_merge($submittedLineItem, ['id' => $id]);
-        }
-        else {
-          // for updating the line items i.e. use-case - once deselect-option selecting again
-          if (($previousLineItem['line_total'] != $submittedLineItem['line_total'])
-            || (
-              // This would be a $0 line item - but why it should be catered to
-              // other than when the above condition is unclear.
-              $submittedLineItem['line_total'] == 0 && $submittedLineItem['qty'] == 1
-            )
-            || (
-              $previousLineItem['qty'] != $submittedLineItem['qty']
-            )
-          ) {
-            $lineItemsToUpdate[$previousLineItem['price_field_value_id']] = $submittedLineItem;
-            $lineItemsToUpdate[$previousLineItem['price_field_value_id']]['id'] = $id;
-            // Format is actually '0.00'
-            if ($previousLineItem['line_total'] == 0) {
-              $resurrectedLineItem = $submittedLineItem;
-              $resurrectedLineItem['id'] = $id;
-              $lineItemsToResurrect[] = $resurrectedLineItem;
-            }
-          }
-          // If there was previously a submitted line item for the same option value then there is
-          // either no change or a qty adjustment. In either case we are not doing an add + reversal.
-          unset($lineItemsToCancel[$previousLineItem['price_field_value_id']]);
-        }
+    $resurrectedLineItems = [];
+    foreach ($this->getAddedLineItems() as $priceFieldValueID => $lineItem) {
+      if (isset($lineItem['id'])) {
+        $resurrectedLineItems[$priceFieldValueID] = $lineItem;
       }
-      else {
-        if (!$this->isCancelled($previousLineItem)) {
-          $cancelParams = ['qty' => 0, 'line_total' => 0, 'tax_amount' => 0, 'participant_count' => 0, 'non_deductible_amount' => 0, 'id' => $id];
-          $lineItemsToCancel[$previousLineItem['price_field_value_id']] = array_merge($previousLineItem, $cancelParams);
+    }
+    return $resurrectedLineItems;
+  }
 
+  /**
+   * Get the submitted line items matching an active previous line whose value
+   * differs - see classifyLineItemChanges().
+   */
+  private function getChangedLineItems(): array {
+    return $this->lineItemChanges['changed'];
+  }
+
+  /**
+   * Get the active previous line items with no submitted counterpart - see
+   * classifyLineItemChanges().
+   */
+  private function getRemovedLineItems(): array {
+    return $this->lineItemChanges['removed'];
+  }
+
+  /**
+   * Classify the submitted line items (from the constructor's $updatedLineItems)
+   * against the contribution's currently-active line items into added/changed/
+   * removed buckets. Unchanged lines are simply omitted - nothing to do for them.
+   * Calculated once, in the constructor - see $lineItemChanges.
+   *
+   * Identity is price_field_value_id - safe to use as a 1:1 match today. If a price
+   * field value ever legitimately carries more than one line (eg. several free-text
+   * amount entries against the same text field), findActivePreviousLineItem() is the
+   * one place that would need to change - the rest of this classification doesn't
+   * care how a match was found.
+   *
+   * @return array
+   *   - added. Submitted lines with no active previous counterpart - this includes
+   *     both a genuinely new selection and one that was previously selected then
+   *     cancelled; the latter carries the cancelled row's id forward so it is
+   *     reused rather than inserted fresh.
+   *   - changed. Submitted lines matching an active previous line whose qty, unit
+   *     price, line total, tax or non-deductible amount differs.
+   *   - removed. Active previous lines with no submitted counterpart - zero'd out.
+   */
+  private function classifyLineItemChanges(): array {
+    $added = $changed = $removed = [];
+    $matchedIDs = [];
+
+    foreach ($this->getUpdatedLineItems() as $priceFieldValueID => $submittedLineItem) {
+      $previousLineItem = $this->findActivePreviousLineItem($priceFieldValueID);
+      if ($previousLineItem === NULL) {
+        $cancelledLineItem = $this->findCancelledPreviousLineItem($priceFieldValueID);
+        if ($cancelledLineItem !== NULL) {
+          $submittedLineItem['id'] = $cancelledLineItem['id'];
         }
+        $added[$priceFieldValueID] = $submittedLineItem;
+        continue;
+      }
+      $matchedIDs[] = $previousLineItem['id'];
+      if ($this->lineItemValueChanged($previousLineItem, $submittedLineItem)) {
+        $changed[$priceFieldValueID] = array_merge($submittedLineItem, ['id' => $previousLineItem['id']]);
       }
     }
 
-    return [
-      'line_items_to_update' => $lineItemsToUpdate,
-      'line_items_to_cancel' => $lineItemsToCancel,
-      'line_items_to_resurrect' => $lineItemsToResurrect,
-    ];
+    foreach ($this->originalLineItems as $id => $previousLineItem) {
+      if (!$this->isCancelled($previousLineItem) && !in_array($id, $matchedIDs)) {
+        $removed[$previousLineItem['price_field_value_id']] = array_merge($previousLineItem, [
+          'qty' => 0,
+          'line_total' => 0,
+          'tax_amount' => 0,
+          'participant_count' => 0,
+          'non_deductible_amount' => 0,
+          'id' => $id,
+        ]);
+      }
+    }
+
+    return ['added' => $added, 'changed' => $changed, 'removed' => $removed];
+  }
+
+  /**
+   * Find the contribution's currently-active (non-cancelled) previous line item for
+   * a price field value, if any.
+   */
+  private function findActivePreviousLineItem($priceFieldValueID): ?array {
+    foreach ($this->originalLineItems as $previousLineItem) {
+      if ($previousLineItem['price_field_value_id'] == $priceFieldValueID && !$this->isCancelled($previousLineItem)) {
+        return $previousLineItem;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Find a previously-cancelled line item for a price field value, if any - so a
+   * re-selected option reuses its row rather than inserting a fresh one.
+   */
+  private function findCancelledPreviousLineItem($priceFieldValueID): ?array {
+    foreach ($this->originalLineItems as $previousLineItem) {
+      if ($previousLineItem['price_field_value_id'] == $priceFieldValueID && $this->isCancelled($previousLineItem)) {
+        return $previousLineItem;
+      }
+    }
+    return NULL;
+  }
+
+  /**
+   * Has a line item's value changed, for fee-selection-change purposes.
+   */
+  private function lineItemValueChanged(array $previousLineItem, array $submittedLineItem): bool {
+    foreach (['qty', 'unit_price', 'line_total', 'tax_amount', 'non_deductible_amount'] as $field) {
+      if ((float) ($previousLineItem[$field] ?? 0) !== (float) ($submittedLineItem[$field] ?? 0)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -1592,13 +1601,15 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * Relocated as-is from CRM_Price_BAO_LineItem::changeFeeSelections()'s support code.
    *
-   * Reads the added line items from getAddedLineItems().
+   * Reads the genuinely-new line items from getNewLineItems() - a resurrected one
+   * (also in getAddedLineItems(), but carrying an id) already got its row updated
+   * via changeFeeSelections()'s own row-update loop.
    *
    * @internal - will change.
    */
   private function addLineItemOnChangeFeeSelection() {
     // insert financial items
-    foreach ($this->getAddedLineItems() as $priceFieldValueID => $lineParams) {
+    foreach ($this->getNewLineItems() as $priceFieldValueID => $lineParams) {
       if (!array_key_exists('skip', $lineParams)) {
         CRM_Price_BAO_LineItem::create($lineParams);
       }
@@ -1612,9 +1623,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * Relocated as-is from CRM_Price_BAO_LineItem::changeFeeSelections()'s support code.
    *
-   * Reads the added/resurrected line items from getAddedLineItems()/
-   * getResurrectedLineItems() - both need 'add' (not 'adjust') financial-item
-   * treatment.
+   * Reads getAddedLineItems() - both a genuinely new line and a resurrected one
+   * need 'add' (not 'adjust') financial-item treatment.
    *
    * @internal - will change.
    *
@@ -1622,8 +1632,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *   Transaction paying for the added items.
    */
   private function addFinancialItemsOnLineItemsChange(int $trxnID) {
-    $lineItemsToAdd = array_merge($this->getAddedLineItems(), $this->getResurrectedLineItems());
-    foreach ($lineItemsToAdd as $priceFieldValueID => $lineParams) {
+    foreach ($this->getAddedLineItems() as $priceFieldValueID => $lineParams) {
       $lineParams['contribution_id'] = $this->getContributionID();
       $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
       // insert financial items

@@ -925,7 +925,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * changeFeeSelections(). A contribution can carry other line items that
    * submission never touches - eg. an add-on "Contribution" price field on
    * the same price set - and
-   * CRM_Contribute_BAO_FinancialProcessor::getLineItemsToAlter() treats a
+   * CRM_Contribute_BAO_FinancialProcessor::classifyLineItemChanges() treats a
    * price field value absent from those values as having been deselected,
    * cancelling its line item even though nobody touched it.
    * addLineItemsNotYetRepresented() is what carries that untouched line item
