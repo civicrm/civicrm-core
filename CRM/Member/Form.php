@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ContributionSoft;
+
 /**
  *
  * @package CRM
@@ -600,6 +602,25 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $contributionRecur = civicrm_api3('ContributionRecur', 'create', $contributionRecurParams);
     $returnParams['contributionRecurID'] = $contributionRecur['id'];
     return $returnParams;
+  }
+
+  /**
+   * @param int $contributionID
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  protected function createSoftCredit(int $contributionID): void {
+    //create new soft-credit record, CRM-13981
+    if ($this->getContributionContactID() !== $this->getContactID() && $this->getSubmittedValue('soft_credit_type_id')) {
+      ContributionSoft::create(FALSE)->setValues([
+        'soft_credit_type_id' => $this->getSubmittedValue('soft_credit_type_id'),
+        'contact_id' => $this->getContactID(),
+        'contribution_id' => $contributionID,
+        'currency' => $this->getCurrency(),
+        'amount' => $this->getOrder()->getTotalAmount(),
+      ])->execute();
+    }
   }
 
   /**
