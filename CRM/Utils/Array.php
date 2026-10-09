@@ -1410,7 +1410,7 @@ class CRM_Utils_Array {
   /**
    * Build tree of elements.
    *
-   * @param array $elements
+   * @param iterable $elements
    * @param int|null $parentId
    *
    * @return array

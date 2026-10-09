@@ -149,6 +149,8 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
 
     if (!$this->getCampaignID()) {
+      // Allow parent_id from the url
+      $defaults['parent_id'] = CRM_Utils_Request::retrieve('parent_id', 'Positive');
       return $defaults;
     }
 
@@ -209,12 +211,16 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Campaign', 'external_identifier'), FALSE
     );
 
-    // add Campaign Parent Id
-    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns($this->getCampaignValue('parent_id'), $this->getCampaignID());
-    if (!empty($campaigns)) {
-      $this->addElement('select', 'parent_id', ts('Parent ID'),
-        ['' => ts('- select Parent -')] + $campaigns,
-        ['class' => 'crm-select2']
+    // add Parent selector with nested list of Campaigns
+    $campaigns = \Civi\Api4\Campaign::get()
+      ->addSelect('id', 'title', 'description', 'parent_id')
+      ->addWhere('is_active', '=', TRUE)
+      ->addWhere('id', '!=', $this->getCampaignID() ?: 0)
+      ->execute();
+    if ($campaigns->countFetched()) {
+      $campaigns = CRM_Utils_Array::buildTree($campaigns);
+      $this->add('select2', 'parent_id', ts('Parent Campaign'),
+        CRM_Utils_Array::formatForSelect2($campaigns, 'title')
       );
     }
 

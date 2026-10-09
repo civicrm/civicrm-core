@@ -12,14 +12,12 @@ return [
       'values' => [
         'name' => 'Administer_Campaigns',
         'label' => E::ts('Administer Campaigns'),
-        'form_values' => NULL,
-        'mapping_id' => NULL,
-        'search_custom_id' => NULL,
         'api_entity' => 'Campaign',
         'api_params' => [
           'version' => 4,
           'select' => [
             'id',
+            'external_identifier',
             'title',
             'description',
             'is_active',
@@ -34,12 +32,8 @@ return [
           'join' => [],
           'having' => [],
         ],
-        'expires_date' => NULL,
-        'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -55,12 +49,9 @@ return [
         'saved_search_id.name' => 'Administer_Campaigns',
         'type' => 'table',
         'settings' => [
-          'actions' => FALSE,
+          'actions' => TRUE,
           'limit' => 50,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
           'pager' => [
             'show_count' => FALSE,
             'expose_limit' => TRUE,
@@ -116,12 +107,16 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'is_active',
-              'label' => 'Enabled',
+              'key' => 'external_identifier',
+              'label' => 'External ID',
               'sortable' => TRUE,
             ],
             [
+              'style' => 'default',
               'size' => 'btn-xs',
+              'icon' => 'fa-bars',
+              'type' => 'menu',
+              'alignment' => 'text-right',
               'links' => [
                 [
                   'path' => '',
@@ -135,22 +130,48 @@ return [
                   'target' => 'crm-popup',
                 ],
                 [
+                  'style' => 'default',
+                  'text' => E::ts('Add Child'),
+                  'icon' => 'fa-folder-tree',
+                  'conditions' => [
+                    [
+                      'check user permission',
+                      '=',
+                      [
+                        'manage campaign',
+                      ],
+                    ],
+                  ],
+                  'path' => 'civicrm/campaign/add?reset=1&parent_id=[id]',
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                ],
+                [
+                  'text' => 'Enable',
+                  'icon' => 'fa-toggle-on',
                   'task' => 'enable',
                   'entity' => 'Campaign',
                   'target' => 'crm-popup',
-                  'icon' => 'fa-toggle-on',
-                  'text' => 'Enable',
+                  'join' => '',
                   'style' => 'default',
-                  'condition' => [],
+                  'path' => '',
+                  'action' => '',
+                  'conditions' => [],
                 ],
                 [
+                  'text' => 'Disable',
+                  'icon' => 'fa-toggle-off',
                   'task' => 'disable',
                   'entity' => 'Campaign',
                   'target' => 'crm-popup',
-                  'icon' => 'fa-toggle-off',
-                  'text' => 'Disable',
+                  'join' => '',
                   'style' => 'default',
-                  'condition' => [],
+                  'path' => '',
+                  'action' => '',
+                  'conditions' => [],
                 ],
                 [
                   'entity' => 'Campaign',
@@ -162,12 +183,15 @@ return [
                   'style' => 'danger small-popup',
                   'path' => '',
                   'condition' => [],
+                  'task' => '',
+                  'conditions' => [],
                 ],
               ],
-              'type' => 'buttons',
-              'alignment' => 'text-right',
             ],
           ],
+          'headerCount' => TRUE,
+          'columnMode' => 'custom',
+          'actions_display_mode' => 'menu',
           'toolbar' => [
             [
               'entity' => 'Campaign',
@@ -186,8 +210,9 @@ return [
               FALSE,
             ],
           ],
+          'hierarchical' => TRUE,
+          'collapsible' => 'open',
         ],
-        'acl_bypass' => FALSE,
       ],
       'match' => [
         'name',
