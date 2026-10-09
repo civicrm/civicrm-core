@@ -15,7 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use Civi\Api4\ContributionSoft;
 use Civi\Api4\Membership;
 use Civi\Api4\OptionValue;
 use Civi\Api4\Order;
@@ -630,18 +629,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       ])
       ->setLineItems($this->order->getLineItemsForV4OrderApi())
       ->execute()->single();
-
-    if ($this->_contributorContactID != $this->_contactID && !empty($this->_params['soft_credit_type_id'])) {
-      ContributionSoft::create(FALSE)
-        ->setValues([
-          'contribution_id' => $contribution['id'],
-          'contact_id' => $this->_contactID,
-          'soft_credit_type_id' => $this->_params['soft_credit_type_id'],
-          'amount' => $contribution['total_amount'],
-          'currency' => $contribution['currency'],
-        ])
-        ->execute();
-    }
+    $this->createSoftCredit($contribution['id']);
 
     if (!$pending) {
       Payment::create(FALSE)

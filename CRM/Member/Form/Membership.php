@@ -957,7 +957,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->storeContactFields($this->_params);
     $this->beginPostProcess();
 
-    $params = $softParams = [];
+    $params = [];
 
     $this->processBillingAddress($this->getContributionContactID(), (string) $this->_contributorEmail);
     $formValues = $this->_params;
@@ -998,10 +998,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     //CRM-13981, allow different person as a soft-contributor of chosen type
     if ($this->_contributorContactID != $this->_contactID) {
       $params['contribution_contact_id'] = $this->_contributorContactID;
-      if ($this->getSubmittedValue('soft_credit_type_id')) {
-        $softParams['soft_credit_type_id'] = $this->getSubmittedValue('soft_credit_type_id');
-        $softParams['contact_id'] = $this->_contactID;
-      }
     }
 
     $pendingMembershipStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
@@ -1055,14 +1051,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $paymentParams['frequency_interval'] = $this->getFrequencyInterval();
 
       $paymentParams['contactID'] = $this->_contributorContactID;
-      //CRM-10377 if payment is by an alternate contact then we need to set that person
-      // as the contact in the payment params
-      if ($this->_contributorContactID != $this->_contactID) {
-        if ($this->getSubmittedValue('soft_credit_type_id')) {
-          $softParams['contact_id'] = $params['contact_id'];
-          $softParams['soft_credit_type_id'] = $this->getSubmittedValue('soft_credit_type_id');
-        }
-      }
       if ($this->getSubmittedValue('send_receipt')) {
         $paymentParams['email'] = $this->_contributorEmail;
       }
@@ -1084,13 +1072,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->ids['Contribution'] = $contribution['id'];
       $this->setMembershipIDsFromOrder($contribution);
 
-      //create new soft-credit record, CRM-13981
-      if ($softParams) {
-        $softParams['contribution_id'] = $contribution['id'];
-        $softParams['currency'] = $this->getCurrency();
-        $softParams['amount'] = $this->order->getTotalAmount();
-        CRM_Contribute_BAO_ContributionSoft::add($softParams);
-      }
+      $this->createSoftCredit($contribution['id']);
 
       $paymentParams['contactID'] = $this->_contactID;
       $paymentParams['contributionID'] = $contribution['id'];
@@ -1296,7 +1278,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   private function recordMembershipContribution($params) {
     $contributionParams = $this->getContributionValues();
     $contributionParams['skipCleanMoney'] = TRUE;
-    $contributionSoftParams = $params['soft_credit'] ?? NULL;
     $recordContribution = [
       'contact_id',
       'contribution_status_id',
@@ -1313,15 +1294,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $contributionParams['line_item'] = $params['lineItems'];
 
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
-
-    //CRM-13981, create new soft-credit record as to record payment from different person for this membership
-    if (!empty($contributionSoftParams)) {
-      $contributionSoftParams['contribution_id'] = $contribution->id;
-      $contributionSoftParams['currency'] = $contribution->currency;
-      $contributionSoftParams['amount'] = $contribution->total_amount;
-      CRM_Contribute_BAO_ContributionSoft::add($contributionSoftParams);
-    }
-
+    $this->createSoftCredit($contribution->id);
     return $contribution;
   }
 
