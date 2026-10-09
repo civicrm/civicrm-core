@@ -538,6 +538,22 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Is CiviCRM currently rendering into a buffer that is embedded within a
+   * larger CMS-rendered page (e.g. a WordPress shortcode), as opposed to
+   * being the entire response for the current request.
+   *
+   * When this is TRUE, code should avoid CRM_Utils_System::redirect() /
+   * CRM_Core_Error::statusBounce(), since a hard HTTP redirect would bounce
+   * the visitor out of the embedding page rather than just changing what is
+   * shown inside the embedded block.
+   *
+   * @return bool
+   */
+  public function isPageEmbedded() {
+    return FALSE;
+  }
+
+  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination
