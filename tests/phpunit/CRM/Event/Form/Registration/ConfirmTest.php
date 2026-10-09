@@ -795,6 +795,32 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertMailSentContainingStrings(['Event']);
   }
 
+  /**
+   * Test that the ThankYou page does not fatal error for a free event
+   * (which has no price set at all) on a site with invoicing enabled.
+   *
+   * getOrder() requires a price set id (Order::setPriceSetID() takes a
+   * non-nullable int), so anything that calls it must check hasOrder()
+   * first on an event that might have no price set.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testFreeEventThankYouPageWithInvoicingEnabled(): void {
+    Civi::settings()->set('invoicing', TRUE);
+    $event = $this->eventCreateUnpaid();
+
+    $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Participant1',
+      'last_name' => 'LastName',
+      'email-Primary' => 'participant1@example.com',
+    ], ['id' => $event['id']])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
+      ->addSubsequentForm('CRM_Event_Form_Registration_ThankYou')
+      ->processForm();
+
+    $this->callAPISuccessGetCount('Participant', ['event_id' => $event['id']], 1);
+  }
+
   public function testRegistrationWithoutCiviContributeEnabled(): void {
     $event = $this->eventCreateUnpaid([
       'has_waitlist' => 1,
