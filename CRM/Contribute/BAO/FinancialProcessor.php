@@ -418,7 +418,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
     // record line items and financial items
     if (empty($params['skipLineItem'])) {
-      $this->createLineItems($params['line_item'], $financialTxnID ?? NULL);
+      $this->createLineItems($financialTxnID ?? NULL);
     }
 
     // create batch entry if batch_id is passed and
@@ -1051,24 +1051,22 @@ class CRM_Contribute_BAO_FinancialProcessor {
   /**
    * Process price set and line items.
    *
+   * Reads the line items from the constructor's $updatedLineItems.
+   *
    * @internal
    *
-   * @param array $lineItems
-   *   Line item array.
    * @param int|null $financialTrxnID
    *
    * @throws \CRM_Core_Exception
    */
-  private function createLineItems($lineItems, ?int $financialTrxnID = NULL) {
-    foreach ($lineItems as &$values) {
-      foreach ($values as &$line) {
-        $createdLineItem = CRM_Price_BAO_LineItem::create($line);
+  private function createLineItems(?int $financialTrxnID = NULL) {
+    foreach ($this->getUpdatedLineItems() as $line) {
+      $createdLineItem = CRM_Price_BAO_LineItem::create($line);
 
-        if (!$this->isUpdate()) {
-          $this->addFinancialItem($createdLineItem, FALSE, $financialTrxnID);
-          if (!empty($line['tax_amount'])) {
-            $this->addFinancialItem($createdLineItem, TRUE, $financialTrxnID);
-          }
+      if (!$this->isUpdate()) {
+        $this->addFinancialItem($createdLineItem, FALSE, $financialTrxnID);
+        if (!empty($line['tax_amount'])) {
+          $this->addFinancialItem($createdLineItem, TRUE, $financialTrxnID);
         }
       }
     }
