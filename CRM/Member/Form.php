@@ -202,6 +202,14 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       'payment_instrument_id' => $this->getPaymentInstrumentID(),
       'receive_date' => $this->getReceiveDate(),
       'source' => $this->getSource(),
+      'non_deductible_amount' => $this->getOrder()->getNonDeductibleAmount(),
+      'revenue_recognition_date' => $this->getDeferredRevenueRecognitionDate($this->getRevenueRecognitionStartDate()),
+      'total_amount' => $this->getOrder()->getTotalAmount(),
+      'tax_amount' => $this->getOrder()->getTotalTaxAmount(),
+      'trxn_id' => $this->getSubmittedValue('trxn_id'),
+      'check_number' => $this->getSubmittedValue('check_number'),
+      'financial_type_id' => $this->getFinancialTypeID(),
+      'is_pay_later' => $this->getSubmittedValue('contribution_status_id') == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
     ];
   }
 
@@ -511,6 +519,17 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       }
     }
     return '';
+  }
+
+  /**
+   * Get the membership start date to base deferred revenue recognition on,
+   * where it differs from the membership's currently-stored start_date -
+   * eg. a renewal's newly-calculated start date, not yet saved.
+   *
+   * @return string|null
+   */
+  protected function getRevenueRecognitionStartDate(): ?string {
+    return NULL;
   }
 
   /**

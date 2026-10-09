@@ -103,9 +103,21 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   public $_groupTree;
 
   /**
+   * The renewal's newly-calculated start date, set in submit() - not yet
+   * saved to the membership at the point the contribution is created.
+   *
+   * @var string|null
+   */
+  private ?string $renewalStartDate = NULL;
+
+  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {
+  }
+
+  protected function getRevenueRecognitionStartDate(): ?string {
+    return $this->renewalStartDate;
   }
 
   /**
@@ -549,9 +561,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $pending = ($this->_params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
 
-    // if contribution status is pending then set pay later
-    $this->_params['is_pay_later'] = $pending;
-
     $membershipValues = [
       'membership_type_id' => $this->getMembershipTypeID(),
       'modified_id' => $this->_contactID,
@@ -563,6 +572,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
     // Paylater/IPN renewals are renewed when the payment completes - CRM-4556.
     $renewalDates = $pending ? [] : $this->getRenewalDates();
+    $this->renewalStartDate = $renewalDates['start_date'] ?? NULL;
 
     if (!empty($this->_params['record_contribution']) || $this->_mode) {
       $this->setContributionID($this->saveOrder($membershipValues, $renewalDates, $pending, $contributionRecurID));
@@ -615,12 +625,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $contribution = Order::create(FALSE)
       ->setContributionValues($this->getContributionValues() + [
         'contact_id' => $this->_contributorContactID,
-        'financial_type_id' => $this->getFinancialTypeID(),
-        'is_pay_later' => $pending,
-        'check_number' => $this->_params['check_number'] ?? NULL,
-        'trxn_id' => $this->_params['trxn_id'] ?? NULL,
         'contribution_recur_id' => $contributionRecurID,
-        'revenue_recognition_date' => $this->getDeferredRevenueRecognitionDate($renewalDates['start_date'] ?? NULL) ?: NULL,
         'contribution_status_id:name' => 'Pending',
       ])
       ->setLineItems($this->order->getLineItemsForV4OrderApi())
@@ -650,7 +655,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'payment_instrument_id' => $this->getPaymentInstrumentID(),
           'trxn_id' => $this->_params['trxn_id'] ?? NULL,
           'fee_amount' => $this->_params['fee_amount'] ?? NULL,
-          'check_number' => $this->_params['check_number'] ?? NULL,
+          'check_number' => $this->getSubmittedValue('check_number'),
           'card_type_id' => $this->getCardTypeID(),
           'pan_truncation' => $this->getPanTruncation(),
         ])
