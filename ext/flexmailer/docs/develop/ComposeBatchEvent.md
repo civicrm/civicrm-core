@@ -12,7 +12,7 @@ The heavy-lifting of composing the message content is also handled by a listener
  * Reads email content from `$mailing->body_text` and `$mailing->body_html`.
  * Interprets tokens like `{contact.display_name}` and `{mailing.viewUrl}`.
  * Loads data in batches.
- * Post-processes the message with Smarty (if `CIVICRM_SMARTY` is enabled).
+ * Post-processes the message with Smarty (if `CIVICRM_MAIL_SMARTY` is enabled).
 
 The traditional CiviMail semantics have some problems -- e.g.  the Smarty post-processing is incompatible with Smarty's
 template cache, and it is difficult to securely post-process the message with Smarty.  However, changing the behavior
