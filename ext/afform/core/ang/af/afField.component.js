@@ -269,6 +269,10 @@
         $scope.$on('afFormReset', function() {
           delete $scope.dataProvider.getFieldData()[ctrl.fieldName];
           initializeValue(false);
+          // A loaded SearchParamSet replaces the defaults, as its columns do in crmSearchDisplayTable
+          if (ctrl.afFieldset?.selectedSearchParamSet?.filters) {
+            setValueFromRouteParams($scope.$parent.routeParams);
+          }
         });
       };
 
