@@ -824,6 +824,31 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get the fee level text to register a participant with.
+   *
+   * Does not reproduce any adjustment hook_civicrm_eventDiscount might have
+   * made to this - that hook is documented upstream as outdated and unused,
+   * and nothing in core ever sets the fields it would need to react to.
+   *
+   * @param int $participantNumber
+   *
+   * @return string|null
+   * @throws \CRM_Core_Exception
+   */
+  public function getAmountLevelForParticipant(int $participantNumber): ?string {
+    if (!$this->getPriceSetID()) {
+      return NULL;
+    }
+    $amountLevel = $this->getOrder()->getAmountLevelForIdentifier($this->getParticipantPageName($participantNumber));
+    if ($participantNumber === 0 && $this->getLineItems() && $this->isProcessRegistrationInRealTime()
+      && count($this->getAllSubmittedValues()) > 1
+    ) {
+      $amountLevel .= ' ' . ts('(multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
+    }
+    return $amountLevel;
+  }
+
+  /**
    * This is a throw-away object to calculate values, to allow it to validate
    * input values during submission.
    *
@@ -871,7 +896,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function confirmPostProcess($contactID, $participantRecord, int $participantNum = 0): void {
     // add participant record
-    $participantID = $this->addParticipant($participantRecord, $contactID, $participantNum);
+    $participantID = $this->addParticipant($contactID, $participantNum);
     $this->_participantIDS[$participantNum] = $participantID;
 
     //setting register_by_id field and primaryContactId
@@ -925,27 +950,26 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Process the participant.
    *
-   * @param array $params
    * @param int $contactID
    * @param $participantNumber
    *
    * @return int
    * @throws \CRM_Core_Exception
    */
-  private function addParticipant($params, $contactID, $participantNumber): int {
+  private function addParticipant($contactID, $participantNumber): int {
     $transaction = new CRM_Core_Transaction();
 
     $participantParams = [
-      'id' => $params['participant_id'] ?? NULL,
+      'id' => $this->getExistingParticipantID($participantNumber),
       'contact_id' => $contactID,
       'event_id' => $this->getEventID(),
       'status_id' => $this->getParticipantStatusID($participantNumber),
       'role_id' => $this->getRoleID($participantNumber),
       'source' => $this->getSource($participantNumber),
-      'fee_level' => $params['amount_level'] ?? NULL,
+      'fee_level' => $this->getAmountLevelForParticipant($participantNumber),
       'is_pay_later' => $this->getIsPayLaterForParticipant($participantNumber),
       'fee_amount' => $this->getFeeAmountForParticipant($participantNumber),
-      'registered_by_id' => $params['registered_by_id'] ?? NULL,
+      'registered_by_id' => $this->getRegisteredByID($participantNumber),
       'fee_currency' => $this->getCurrency(),
       'campaign_id' => $this->getCampaignID($participantNumber),
       'is_test' => $this->isTest(),
@@ -961,16 +985,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $participantParams['note'] = $note;
     }
 
-    // reuse id if one already exists for this one (can happen
-    // with back button being hit etc)
-    if (!$participantParams['id'] && !empty($params['contributionID'])) {
-      $pID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment',
-        $params['contributionID'],
-        'participant_id',
-        'contribution_id'
-      );
-      $participantParams['id'] = $pID;
-    }
     $participantParams['discount_id'] = $this->getDiscountID();
 
     $participantID = (int) Participant::save(FALSE)->addRecord($participantParams)->execute()->single()['id'];
@@ -1761,6 +1775,34 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       return $this->isPayLater();
     }
     return (bool) ($this->_params[$participantNumber]['is_pay_later'] ?? FALSE);
+  }
+
+  /**
+   * Get the id of an existing participant row to update for this slot,
+   * rather than creating a new one - set via Register.php/
+   * AdditionalParticipant.php when re-walking an already-confirmed
+   * registration (back button etc), or when the caller otherwise submitted
+   * an explicit participant_id for this slot.
+   *
+   * @param int $participantNumber
+   *
+   * @return int|null
+   */
+  protected function getExistingParticipantID(int $participantNumber): ?int {
+    return $this->_params[$participantNumber]['participant_id'] ?? NULL;
+  }
+
+  /**
+   * Get the id of the primary registrant, for an additional participant's
+   * registered_by_id - set via confirmPostProcess() once the primary has
+   * been created, before any additional participant is processed.
+   *
+   * @param int $participantNumber
+   *
+   * @return int|null
+   */
+  protected function getRegisteredByID(int $participantNumber): ?int {
+    return $participantNumber === 0 ? NULL : $this->get('registerByID');
   }
 
   /**
