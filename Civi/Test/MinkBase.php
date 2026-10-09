@@ -15,6 +15,7 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
 
   protected ?Mink $mink = NULL;
   protected bool $screenshotsEnabled = FALSE;
+  protected ?ChromeObserver $chromeObserver = NULL;
 
   protected function setUp(): void {
     parent::setUp();
@@ -30,8 +31,28 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
   }
 
   protected function tearDown(): void {
-    array_pop($GLOBALS['civicrm_url_defaults']);
-    parent::tearDown();
+    try {
+      // Printed output ends up next to the failure in the console, TAP and JUnit <system-out>.
+      if ($this->chromeObserver && $this->hasFailedSoFar()) {
+        echo "\n", $this->chromeObserver->report(getenv('MINK_OUTPUT_DIR') ?: NULL, static::class . '-' . $this->getTestName());
+      }
+    }
+    finally {
+      if ($this->chromeObserver) {
+        $this->chromeObserver->close();
+      }
+      array_pop($GLOBALS['civicrm_url_defaults']);
+      parent::tearDown();
+    }
+  }
+
+  private function hasFailedSoFar(): bool {
+    // PHPUnit 9 / PHPUnit 10+
+    return method_exists($this, 'hasFailed') ? $this->hasFailed() : ($this->status()->isFailure() || $this->status()->isError());
+  }
+
+  private function getTestName(): string {
+    return method_exists($this, 'nameWithDataSet') ? $this->nameWithDataSet() : $this->getName();
   }
 
   protected function assertSession(): WebAssert {
@@ -77,6 +98,7 @@ abstract class MinkBase extends \CiviEndToEndTestCase {
     $mink->setDefaultSessionName('browser');
 
     $mink->getSession()->start();
+    $this->chromeObserver = new ChromeObserver($chromeUrl, $driver->getWindowName());
     return $mink;
   }
 
