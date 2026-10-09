@@ -2,6 +2,7 @@
 namespace Civi\Api4\Action\OAuthSysToken;
 
 use Civi\Api4\Generic\BasicBatchAction;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 
 /**
  * Class Refresh
@@ -54,9 +55,17 @@ class Refresh extends BasicBatchAction {
     }
 
     $provider = $this->getProvider($row['client_id']);
-    $newToken = $provider->getAccessToken('refresh_token', [
-      'refresh_token' => $row['refresh_token'],
-    ]);
+    try {
+      $newToken = $provider->getAccessToken('refresh_token', [
+        'refresh_token' => $row['refresh_token'],
+      ]);
+    }
+    catch (IdentityProviderException $e) {
+      // The provider rejected the token (e.g. it was revoked). The batch logs the exception and leaves
+      // this record out of the result, so record why here for callers and screens to report.
+      $this->recordError($row['id'], $e);
+      throw $e;
+    }
 
     $raw = $newToken->jsonSerialize();
     $row['raw'] = $raw;
@@ -72,10 +81,25 @@ class Refresh extends BasicBatchAction {
       // You may have permission to refresh even if you can't inspect/update secrets directly.
       'checkPermissions' => FALSE,
       'where' => [['id', '=', $row['id']]],
-      'values' => \CRM_Utils_Array::subset($row, $this->writeFields),
+      'values' => \CRM_Utils_Array::subset($row, $this->writeFields) + ['error' => NULL],
     ])->single();
 
     return $this->filterReturn($row);
+  }
+
+  private function recordError(int $id, IdentityProviderException $e): void {
+    $body = $e->getResponseBody();
+    civicrm_api4($this->getEntityName(), 'update', [
+      'checkPermissions' => FALSE,
+      'where' => [['id', '=', $id]],
+      'values' => [
+        'error' => [
+          'error' => $e->getMessage(),
+          'error_description' => is_array($body) ? ($body['error_description'] ?? NULL) : NULL,
+          'time' => \CRM_Utils_Time::time(),
+        ],
+      ],
+    ]);
   }
 
   protected function getProvider($clientId) {
