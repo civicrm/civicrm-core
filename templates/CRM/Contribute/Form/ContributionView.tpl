@@ -22,6 +22,12 @@
     <td class="label">{ts}Financial Type{/ts}</td>
     <td>{$financial_type}{if $is_test} {ts}(test){/ts} {/if}</td>
   </tr>
+  {if $entity}
+    <tr class="crm-contribution-form-block-entity">
+      <td class="label">{ts}Entity{/ts}</td>
+      <td class="bold"><a href="{"$entityURL"}">{$entity}</a></td>
+    </tr>
+  {/if}
   <tr class="crm-contribution-form-block-source">
     <td class="label">{ts}Source{/ts}</td>
     <td>{$source|escape}</td>
