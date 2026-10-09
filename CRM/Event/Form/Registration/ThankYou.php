@@ -99,7 +99,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
       $this->assignLineItemsToTemplate($lineItemForTemplate);
     }
 
-    if ($invoicing) {
+    if ($invoicing && $this->hasOrder()) {
       $this->assign('totalTaxAmount', $this->getOrder()->getTotalTaxAmount());
     }
     $this->assign('totalAmount', $this->get('totalAmount'));
