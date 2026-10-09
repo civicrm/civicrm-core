@@ -6,12 +6,44 @@
  */
 class CRM_Core_SessionTest extends CiviUnitTestCase {
 
+  /**
+   * @var CRM_Utils_System_Base|null
+   */
+  private $originalUserSystem;
+
   public function setUp(): void {
     parent::setUp();
     // set null defaults
     foreach (['infoOptions', 'infoType', 'infoMessage', 'infoTitle'] as $info) {
       CRM_Core_Smarty::singleton()->assign($info);
     }
+  }
+
+  public function tearDown(): void {
+    if ($this->originalUserSystem) {
+      CRM_Core_Config::singleton()->userSystem = $this->originalUserSystem;
+    }
+    CRM_Core_Session::singleton()->resetScope(CRM_Core_Session::USER_CONTEXT);
+    parent::tearDown();
+  }
+
+  /**
+   * User contexts are adapted to the current CMS language when read.
+   */
+  public function testUserContextIsLocalized(): void {
+    $this->originalUserSystem = CRM_Core_Config::singleton()->userSystem;
+    CRM_Core_Config::singleton()->userSystem = new class extends CRM_Utils_System_UnitTests {
+
+      public function localizeUrl(string $url): string {
+        return 'localized:' . $url;
+      }
+
+    };
+    $session = CRM_Core_Session::singleton();
+    $session->pushUserContext('/civicrm/contact/view?reset=1&cid=1');
+
+    $this->assertEquals('localized:/civicrm/contact/view?reset=1&cid=1', $session->readUserContext());
+    $this->assertEquals('localized:/civicrm/contact/view?reset=1&cid=1', $session->popUserContext());
   }
 
   /**

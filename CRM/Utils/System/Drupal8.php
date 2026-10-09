@@ -810,6 +810,43 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * @inheritDoc
    */
+  public function localizeUrl(string $url): string {
+    if (!class_exists('Drupal') || !\Drupal::hasContainer() || !\Drupal::languageManager()->isMultilingual()) {
+      return $url;
+    }
+    $config = \Drupal::config('language.negotiation')->get('url');
+    $enabledMethods = \Drupal::config('language.types')->get('negotiation.language_interface.enabled') ?: [];
+    if (!isset($enabledMethods[\Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::METHOD_ID])
+      || ($config['source'] ?? NULL) !== \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::CONFIG_PATH_PREFIX
+    ) {
+      return $url;
+    }
+
+    // Same language as url().
+    $language = \Drupal::languageManager()->getConfigOverrideLanguage()?->getId();
+    $prefixes = array_intersect_key($config['prefixes'] ?? [], \Drupal::languageManager()->getLanguages());
+    if ($language === NULL || !isset($prefixes[$language])) {
+      return $url;
+    }
+
+    $basePath = '/';
+    $hosts = [];
+    if (defined('CIVICRM_UF_BASEURL')) {
+      $ufBase = parse_url(CIVICRM_UF_BASEURL);
+      $basePath = rtrim($ufBase['path'] ?? '', '/') . '/';
+      $hosts[] = ($ufBase['host'] ?? '') . (isset($ufBase['port']) ? ':' . $ufBase['port'] : '');
+    }
+    $request = \Drupal::requestStack()->getCurrentRequest();
+    if ($request) {
+      $basePath = $request->getBasePath() . '/';
+      $hosts[] = $request->getHttpHost();
+    }
+    return CRM_Utils_Url::replaceLanguagePrefix($url, $basePath, $prefixes, $prefixes[$language], $hosts);
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
       return $url;

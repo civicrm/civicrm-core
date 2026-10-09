@@ -33,6 +33,7 @@ use GuzzleHttp\Psr7\Response;
  * @method static string postURL(int $action) Determine the post URL for a form.
  * @method static string|null getUFLocale() Get the locale of the CMS.
  * @method static bool setUFLocale(string $civicrm_language) Set the locale of the CMS.
+ * @method static string localizeUrl(string $url) Adapt a previously generated URL to the current CMS language.
  * @method static bool isUserLoggedIn() Check if user is logged in.
  * @method static int getLoggedInUfID() Get current logged in user id.
  * @method static void setHttpHeader(string $name, string $value) Set http header.
