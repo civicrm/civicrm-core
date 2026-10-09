@@ -22,7 +22,9 @@ namespace api\v4\Action;
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
+use Civi\Api4\Dashboard;
 use Civi\Api4\Email;
+use Civi\Api4\Group;
 use Civi\Api4\Individual;
 use Civi\Api4\LocationType;
 use Civi\Api4\Organization;
@@ -188,6 +190,85 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertEquals(array_slice($email, 1), $locationTypeGet->column('email.id'));
     // ACL clause should have been inserted once
     $this->assertEquals(1, substr_count($locationTypeGet->debug['sql'][0], 'civicrm_acl_contact_cache'));
+  }
+
+  public function testContactAclBypassViaDashboardJoin(): void {
+    $firstDash = $this->createTestRecord('Dashboard')['id'];
+    $indId = 0;
+    $allInds = [];
+    while ($indId < $firstDash + 4 || count($allInds) < 4) {
+      $indId = $this->createTestRecord('Individual')['id'];
+      $allInds[] = $indId;
+    }
+    $cid = array_slice($allInds, -4);
+
+    $dashId = $firstDash;
+    while ($dashId < max($cid)) {
+      $dashId = $this->createTestRecord('Dashboard')['id'];
+    }
+
+    // Grant access to all but contact 0
+    $this->allowedContacts = array_slice($cid, 1);
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view debug output'];
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_aclWhereClause', [$this, 'aclWhereMultipleContacts']);
+
+    // Direct query on Contact should only return the 3 allowed contacts
+    $this->assertCount(3, Contact::get()->execute());
+
+    // Joining through Dashboard should NOT bypass contact ACLs
+    $dashboardGet = Dashboard::get()
+      ->setCheckPermissions(TRUE)
+      ->addSelect('id', 'c.id', 'c.display_name')
+      ->addJoin('Contact AS c', 'INNER', ['c.id', '=', 'id'])
+      ->addWhere('id', 'IN', $cid)
+      ->execute();
+
+    $this->assertCount(3, $dashboardGet);
+    $this->assertEquals($this->allowedContacts, $dashboardGet->column('c.id'));
+  }
+
+  public function testActivityAclBypassViaGroupJoin(): void {
+    $firstGroup = $this->createTestRecord('Group')['id'];
+    $actId = 0;
+    $allActs = [];
+    while ($actId < $firstGroup + 4 || count($allActs) < 4) {
+      $actId = $this->createTestRecord('Activity')['id'];
+      $allActs[] = $actId;
+    }
+    $activities = array_slice($allActs, -4);
+
+    $groupId = $firstGroup;
+    while ($groupId < max($activities)) {
+      $groupId = $this->createTestRecord('Group')['id'];
+    }
+
+    $allowedActivities = array_slice($activities, 0, 2);
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_selectWhereClause', function ($entity, &$clauses) use ($allowedActivities, $activities) {
+      $entityName = is_object($entity) ? \CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($entity)) : $entity;
+      if ($entityName === 'Activity') {
+        $clauses['id'][] = 'IN (' . implode(',', $allowedActivities) . ')';
+      }
+      elseif ($entityName === 'Group') {
+        $clauses['id'][] = 'IN (' . implode(',', $activities) . ')';
+      }
+    });
+
+    $actGet = Activity::get()
+      ->setCheckPermissions(TRUE)
+      ->addSelect('id')
+      ->addWhere('id', 'IN', $activities)
+      ->execute();
+    $this->assertCount(2, $actGet);
+    $this->assertEquals($allowedActivities, $actGet->column('id'));
+
+    $groupGet = Group::get()
+      ->setCheckPermissions(TRUE)
+      ->addSelect('act.id', 'act.subject')
+      ->addJoin('Activity AS act', 'INNER', ['act.id', '=', 'id'])
+      ->addWhere('id', 'IN', $activities)
+      ->execute();
+    $this->assertCount(2, $groupGet);
+    $this->assertEquals($allowedActivities, $groupGet->column('act.id'));
   }
 
   public function testAclCacheBuildDoubleChecksRetrieveUnderLock(): void {
