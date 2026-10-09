@@ -1065,9 +1065,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $createdLineItem = CRM_Price_BAO_LineItem::create($line);
 
         if (!$this->isUpdate()) {
-          $this->addFinancialItem($createdLineItem, $this->getUpdatedContribution(), FALSE, $financialTrxnID);
+          $this->addFinancialItem($createdLineItem, FALSE, $financialTrxnID);
           if (!empty($line['tax_amount'])) {
-            $this->addFinancialItem($createdLineItem, $this->getUpdatedContribution(), TRUE, $financialTrxnID);
+            $this->addFinancialItem($createdLineItem, TRUE, $financialTrxnID);
           }
         }
       }
@@ -1082,13 +1082,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @param object $lineItem
    *   Line item object.
-   * @param object $contribution
-   *   Contribution object.
    * @param bool $taxTrxnID
    * @param int|null $trxnId
    *   Transaction paying for this item. Pass NULL only when nothing has paid for it yet.
    */
-  private function addFinancialItem($lineItem, $contribution, $taxTrxnID = FALSE, ?int $trxnId = NULL): void {
+  private function addFinancialItem($lineItem, $taxTrxnID = FALSE, ?int $trxnId = NULL): void {
+    $contribution = $this->getUpdatedContribution();
     $financialItemStatus = array_column(\Civi::entity('FinancialItem')->getOptions('status_id'), 'id', 'name');
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
     $itemStatus = NULL;
@@ -1356,18 +1355,24 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * Update related contribution of an entity and add/update/cancel financial
    * records on a change of fee selection.
    *
-   * @param array $submittedLineItems
-   * @param int $contributionId
-   * @param float $taxAmount
+   * Reads the contribution id and submitted line items from the constructor's
+   * $updatedContribution/$updatedLineItems.
    *
    * @internal function is expected to change. Tests are in CRM_Event_BAO_ChangeFeeSelectionTest
    * and CRM_Member_Form_MembershipTest and should not directly call this.
    *
    * @throws \CRM_Core_Exception
    */
-  public function changeFeeSelections(array $submittedLineItems, int $contributionId, float $taxAmount): void {
-    $lineItemsToAdd = $this->getLineItemsToAdd($submittedLineItems);
-    $requiredChanges = $this->getLineItemsToAlter($submittedLineItems);
+  public function changeFeeSelections(): void {
+    $contributionId = $this->getContributionID();
+    $submittedLineItems = $this->getUpdatedLineItems();
+    $taxAmount = 0.0;
+    foreach ($submittedLineItems as $submittedLineItem) {
+      $taxAmount += $submittedLineItem['tax_amount'] ?? 0.0;
+    }
+
+    $lineItemsToAdd = $this->getLineItemsToAdd();
+    $requiredChanges = $this->getLineItemsToAlter();
 
     // get financial information that need to be recorded on basis on submitted price field value IDs
     if (!empty($requiredChanges['line_items_to_cancel']) || !empty($requiredChanges['line_items_to_update'])) {
@@ -1396,10 +1401,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
       CRM_Price_BAO_LineItem::create($lineItemToAlter);
     }
 
-    // $contributionId may be NULL here and will get written to LineItem, maybe we don't need to pass it in if empty?
     $this->addLineItemOnChangeFeeSelection($lineItemsToAdd);
 
-    // If $contributionId is NULL this will crash
     $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
     $displayParticipantCount = '';
     if ($totalParticipant > 0) {
@@ -1409,8 +1412,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     if (!empty($amountLevel)) {
       $updateAmountLevel = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
     }
-    // $contributionId must not be NULL
-    $trxnID = $this->recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount, $updateAmountLevel);
+    $trxnID = $this->recordAdjustedAmount($updatedAmount, $taxAmount, $updateAmountLevel);
 
     if (!empty($financialItemsArray)) {
       foreach ($financialItemsArray as $updateFinancialItemInfoValues) {
@@ -1419,7 +1421,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
 
     // This won't work if there is no contribution
-    $this->addFinancialItemsOnLineItemsChange(array_merge($lineItemsToAdd, $requiredChanges['line_items_to_resurrect']), $contributionId, $trxnID);
+    $this->addFinancialItemsOnLineItemsChange(array_merge($lineItemsToAdd, $requiredChanges['line_items_to_resurrect']), $trxnID);
   }
 
   /**
@@ -1430,12 +1432,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * previous state - a submitted price field value with no matching previous line item
    * is, by definition, a new one.
    *
-   * @param array $submittedLineItems
-   *   Line items, keyed by price_field_value_id, as currently submitted for the contribution.
+   * Reads the submitted line items from the constructor's $updatedLineItems.
    *
    * @return array
    */
-  private function getLineItemsToAdd(array $submittedLineItems): array {
+  private function getLineItemsToAdd(): array {
+    $submittedLineItems = $this->getUpdatedLineItems();
     $previousPriceFieldValueIDs = array_column($this->originalLineItems, 'price_field_value_id');
     return array_diff_key($submittedLineItems, array_flip($previousPriceFieldValueIDs));
   }
@@ -1452,9 +1454,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * Relocated as-is from CRM_Price_BAO_LineItem::changeFeeSelections()'s support code.
    *
-   * @internal - will change.
+   * Reads the submitted line items from the constructor's $updatedLineItems.
    *
-   * @param array $submittedLineItems
+   * @internal - will change.
    *
    * @return array
    *   Array of line items to alter with the following keys
@@ -1467,7 +1469,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  private function getLineItemsToAlter(array $submittedLineItems): array {
+  private function getLineItemsToAlter(): array {
+    $submittedLineItems = $this->getUpdatedLineItems();
     $lineItemsToUpdate = [];
     $submittedPriceFieldValueIDs = array_keys($submittedLineItems);
     $lineItemsToCancel = $lineItemsToResurrect = [];
@@ -1576,23 +1579,18 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @internal - will change.
    *
    * @param array $lineItemsToAdd
-   * @param int $contributionID
    * @param int $trxnID
    *   Transaction paying for the added items.
    */
-  private function addFinancialItemsOnLineItemsChange($lineItemsToAdd, $contributionID, int $trxnID) {
-    $updatedContribution = new CRM_Contribute_BAO_Contribution();
-    $updatedContribution->id = $contributionID;
-    $updatedContribution->find(TRUE);
-
+  private function addFinancialItemsOnLineItemsChange($lineItemsToAdd, int $trxnID) {
     foreach ($lineItemsToAdd as $priceFieldValueID => $lineParams) {
-      $lineParams['contribution_id'] = $contributionID;
+      $lineParams['contribution_id'] = $this->getContributionID();
       $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
       // insert financial items
       // ensure entity_financial_trxn table has a linking of it.
-      $this->addFinancialItem($lineObj, $updatedContribution, FALSE, $trxnID);
+      $this->addFinancialItem($lineObj, FALSE, $trxnID);
       if (isset($lineObj->tax_amount) && (float) $lineObj->tax_amount !== 0.00) {
-        $this->addFinancialItem($lineObj, $updatedContribution, TRUE, $trxnID);
+        $this->addFinancialItem($lineObj, TRUE, $trxnID);
       }
     }
   }
@@ -1603,7 +1601,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * Relocated as-is from CRM_Price_BAO_LineItem::changeFeeSelections()'s support code.
    *
    * @param int $updatedAmount
-   * @param int $contributionId
    * @param int $taxAmount
    * @param bool $updateAmountLevel
    *
@@ -1612,7 +1609,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *   is unchanged (total_amount 0) so every financial item touched by the
    *   fee change has something to link to.
    */
-  private function recordAdjustedAmount($updatedAmount, $contributionId, $taxAmount = NULL, $updateAmountLevel = NULL): int {
+  private function recordAdjustedAmount($updatedAmount, $taxAmount = NULL, $updateAmountLevel = NULL): int {
+    $contributionId = $this->getContributionID();
     $paidAmount = \Civi\Api4\Contribution::get(FALSE)
       ->addWhere('id', '=', $contributionId)
       ->addSelect('paid_amount')
