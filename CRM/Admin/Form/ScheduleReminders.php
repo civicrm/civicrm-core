@@ -419,13 +419,22 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
   /**
    * List available tokens for this form.
    *
+   * Narrowed to the selected mapping's entity when it has tokens of its own. 'actionMapping' is deliberately not
+   * passed: CRM_Core_EntityTokens::checkActive() treats any mapping as activating every entity's tokens.
+   *
    * @return array
    */
   public function listTokens(): array {
+    $schema = ['activityId', 'participantId', 'membershipId', 'contactId', 'eventId', 'contributionId'];
+    $mapping = !empty($this->_values['mapping_id']) ? CRM_Core_BAO_ActionSchedule::getMapping($this->_values['mapping_id']) : NULL;
+    $entityName = $mapping ? $mapping->getEntityName() : NULL;
+    if ($entityName && isset(CRM_Core_DAO_AllCoreTables::getClassesByProperty('token_class')[$entityName])) {
+      $schema = array_unique(['contactId', CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($entityName) . 'Id']);
+    }
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), [
       'controller' => __CLASS__,
       'smarty' => FALSE,
-      'schema' => ['activityId', 'participantId', 'membershipId', 'contactId', 'eventId', 'contributionId'],
+      'schema' => array_values($schema),
     ]);
     return $tokenProcessor->listTokens();
   }
