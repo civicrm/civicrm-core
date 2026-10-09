@@ -17,7 +17,7 @@ class DbUtil {
     if ($urlParts === FALSE || !isset($urlParts['host'])) {
       throw new \InvalidArgumentException('Failed to parse database connection string. It should look like "mysql://user:password@host:port/database", and any special characters in the user, password or database name must be percent-encoded (for example, "#" as "%23").');
     }
-    $parsed = array_map('urldecode', $urlParts);
+    $parsed = array_map('rawurldecode', $urlParts);
     // parse_url parses 'mysql://admin:secret@unix(/var/lib/mysql/mysql.sock)/otherdb' like:
     // [
     //   'host'   => 'unix(',
@@ -52,12 +52,12 @@ class DbUtil {
    * @return string
    */
   public static function encodeDsn($db) {
-    $escapedHostPort = implode(':', array_map('urlencode', explode(':', $db['server'])));
+    $escapedHostPort = self::encodeServer($db['server']);
     return sprintf('mysql://%s:%s@%s/%s',
-      urlencode($db['username']),
-      urlencode($db['password']),
+      rawurlencode($db['username']),
+      rawurlencode($db['password']),
       $escapedHostPort,
-      urlencode($db['database'])
+      rawurlencode($db['database'])
     );
   }
 
@@ -158,6 +158,29 @@ class DbUtil {
    */
   public static function encodeHostPort($host, $port) {
     return $host . ($port ? (':' . $port) : '');
+  }
+
+  /**
+   * Percent-encode a server for inclusion in a DSN.
+   *
+   * The ':' between host and port stays literal. PEAR::DB decodes the server
+   * before it splits on ':', so an encoded '%3A' would become a port separator.
+   *
+   * A socket is left alone entirely: PEAR::DB recognises the 'unix(...)' form
+   * by matching the raw string, before any decoding, so encoding the brackets
+   * or the path turns it into an ordinary hostname. This means a socket path
+   * containing '(' or ')' cannot be expressed in a DSN at all.
+   *
+   * @param string $server
+   *   Ex: 'localhost:3306'.
+   *   Ex: 'unix(/var/lib/mysql/mysql.sock)'.
+   * @return string
+   */
+  public static function encodeServer($server) {
+    if (preg_match('/^unix\(([^)]+)\)$/', $server) === 1) {
+      return $server;
+    }
+    return implode(':', array_map('rawurlencode', explode(':', $server)));
   }
 
   /**
