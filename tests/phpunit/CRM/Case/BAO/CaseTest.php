@@ -1373,4 +1373,73 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     $this->assertEquals(1, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'recent'], 'dashboard', TRUE));
   }
 
+  private function countCaseActivities(int $caseId, int $activityId): int {
+    return \Civi\Api4\CaseActivity::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('case_id', '=', $caseId)
+      ->addWhere('activity_id', '=', $activityId)
+      ->execute()
+      ->rowCount;
+  }
+
+  /**
+   * Test the (un)assignment of activities to cases
+   *
+   * @see CRM_Case_BAO_Case::updateCaseActivity()
+   */
+  public function testUpdateCaseActivity(): void {
+    $loggedInUserId = $this->createLoggedInUser();
+    $clientId = $this->individualCreate();
+    $firstCase = $this->createCase($clientId, $loggedInUserId);
+    $secondCase = $this->createCase($clientId, $loggedInUserId);
+
+    // Create an activity with no case_id
+    $activity = \Civi\Api4\Activity::create(FALSE)
+      ->addValue('source_contact_id', $loggedInUserId)
+      ->addValue('target_contact_id', [$clientId])
+      ->addValue('activity_type_id:name', 'Open Case')
+      ->addValue('case_id', '')
+      ->execute()
+      ->first();
+
+    $this->assertEquals(0, $this->countCaseActivities($firstCase->id, $activity['id']));
+    $this->assertEquals(0, $this->countCaseActivities($secondCase->id, $activity['id']));
+
+    // Link the activity to the first case
+    \Civi\Api4\Activity::update(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->addValue('case_id', $firstCase->id)
+      ->execute();
+
+    $this->assertEquals(1, $this->countCaseActivities($firstCase->id, $activity['id']));
+    $this->assertEquals(0, $this->countCaseActivities($secondCase->id, $activity['id']));
+
+    // Link the activity to the first case again
+    \Civi\Api4\Activity::update(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->addValue('case_id', $firstCase->id)
+      ->execute();
+
+    $this->assertEquals(1, $this->countCaseActivities($firstCase->id, $activity['id']));
+    $this->assertEquals(0, $this->countCaseActivities($secondCase->id, $activity['id']));
+
+    // Link the activity to the second case
+    \Civi\Api4\Activity::update(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->addValue('case_id', $secondCase->id)
+      ->execute();
+
+    $this->assertEquals(0, $this->countCaseActivities($firstCase->id, $activity['id']));
+    $this->assertEquals(1, $this->countCaseActivities($secondCase->id, $activity['id']));
+
+    // Unset the case_id of the activity
+    \Civi\Api4\Activity::update(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->addValue('case_id', NULL)
+      ->execute();
+
+    $this->assertEquals(0, $this->countCaseActivities($firstCase->id, $activity['id']));
+    $this->assertEquals(0, $this->countCaseActivities($secondCase->id, $activity['id']));
+  }
+
 }

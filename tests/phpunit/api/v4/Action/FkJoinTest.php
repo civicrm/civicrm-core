@@ -39,6 +39,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       'civicrm_phone',
       'civicrm_activity_contact',
       'civicrm_relationship',
+      'civicrm_case_activity',
       'civicrm_case_contact',
       'civicrm_case_type',
       'civicrm_case',

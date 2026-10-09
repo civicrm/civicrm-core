@@ -171,6 +171,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInte
       foreach ((array) $caseIds as $caseId) {
         $action->addRecord(['case_id' => $caseId]);
       }
+      $action->setMatch(['case_id', 'activity_id']);
     }
 
     $action->execute();

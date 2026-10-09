@@ -17,6 +17,7 @@ return [
         'case_id' => TRUE,
         'activity_id' => TRUE,
       ],
+      'unique' => TRUE,
       'add' => '2.0',
     ],
   ],
