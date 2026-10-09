@@ -227,6 +227,9 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   content: "\f1f8";
   color: var(--crm-icon-danger-color);
 }
+#bootstrap-theme [af-repeat-item] .af-repeat-remove-btn .crm-i.fa-ban::before {
+  content: var(--crm-icon-remove-block);
+}
 .crm-container .delete-icon:hover::before,
 .crm-container .delete-icon:focus::before {
   color: var(--crm-icon-danger-color);
