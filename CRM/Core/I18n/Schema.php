@@ -649,4 +649,55 @@ class CRM_Core_I18n_Schema {
     ])->execute();
   }
 
+  public static function extractForLocale(string $table, array &$record): array {
+    if (!CRM_Core_I18n::isMultilingual()) {
+      return [];
+    }
+    // only for edit, for initial saving, we don't care about locale (everything is the same)
+    if (empty($record['id'])) {
+      return [];
+    }
+    
+    // are we in the default locale, then no need for translation
+    $locale = CRM_Core_I18n::getLocale();
+    $defaultLocale = \Civi::settings()->get('lcMessages');
+    if (!$locale || $locale === $defaultLocale) {
+      return [];
+    }
+    $columns = CRM_Core_I18n_SchemaStructure::columns()[$table] ?? NULL;
+\Civi::log()->debug('columns -- ' . var_export($table,1));
+
+    if (!$columns) {
+      return [];
+    }
+
+    $columnsToExtract = array_intersect_key($record, $columns);
+    if (!$columnsToExtract) {
+      return [];
+    }
+
+    $record = array_diff_key($record, $columnsToExtract);
+
+    $rows = [];
+    foreach ($columnsToExtract as $field => $value) {
+      $rows[] = [
+        'entity_table' => $table,
+        'entity_field' => $field,
+        'language' => $locale,
+        'string' => $value,
+      ];
+    }
+    return $rows;
+  }
+
+  public static function saveExtracted(array $rows, $entityId): void {
+    foreach ($rows as &$row) {
+      $row['entity_id'] = $entityId;
+    }
+    \Civi\Api4\Translation::save(FALSE)
+      ->setRecords($rows)
+      ->setMatch(['entity_table', 'entity_field', 'entity_id', 'language'])
+      ->execute();
+  }
+
 }

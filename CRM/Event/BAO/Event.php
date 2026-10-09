@@ -49,10 +49,18 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event implements \Civi\Core\Hook
       CRM_Utils_Hook::pre('create', 'Event', NULL, $params);
     }
 
+    // ideally, we would replace the whole add with CRM_Core_DAO::addRecord but there seems to be specific logic
+    $translations = CRM_Core_I18n_Schema::extractForLocale(static::getTableName(), $params);
+
     $event = new CRM_Event_DAO_Event();
 
     $event->copyValues($params);
     $result = $event->save();
+
+    if ($translations) {
+      CRM_Core_I18n_Schema::saveExtracted($translations, $result->id);
+    }
+
 
     if (!empty($params['id'])) {
       CRM_Utils_Hook::post('edit', 'Event', $event->id, $event, $params);

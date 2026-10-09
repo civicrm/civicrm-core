@@ -127,19 +127,30 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
       CRM_Core_Error::statusBounce("$table.$field is not internationalized.");
     }
 
+    $defaultLocale = \Civi::settings()->get('lcMessages');
+
     $cols = [];
     $params = [
       1 => [$table, 'String'],
       2 => [$field, 'String'],
-      3 => [$values['id'], 'String'],
+      3 => [$values['id'], 'Integer'],
     ];
     foreach ($this->_locales as $locale) {
       $name = "{$field}_{$locale}";
-      $query = "REPLACE INTO `civicrm_translation` (entity_table, entity_field, entity_id, language, string) VALUES (%1, %2, %3, %4, %5)";
-      CRM_Core_DAO::executeQuery($query, $params + [
-        4 => [$locale, 'String'],
-        5 => [$values[$name], 'String']
-      ]);
+      if ($locale == $defaultLocale) {
+        $query = "UPDATE `{$table}` SET `{$field}` = %1 WHERE id = %2";
+        CRM_Core_DAO::executeQuery($query, [
+          1 => [$values[$name], 'String'],
+          2 => [$values['id'], 'Integer'],
+        ]);
+      }
+      else {
+        $query = "REPLACE INTO `civicrm_translation` (entity_table, entity_field, entity_id, language, string) VALUES (%1, %2, %3, %4, %5)";
+        CRM_Core_DAO::executeQuery($query, $params + [
+          4 => [$locale, 'String'],
+          5 => [$values[$name], 'String']
+        ]);
+      }
     }
   }
 

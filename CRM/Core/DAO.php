@@ -1133,6 +1133,9 @@ class CRM_Core_DAO extends DB_DataObject {
 
     \CRM_Utils_Hook::pre($op, $entityName, $record[$idField] ?? NULL, $record);
 
+    // should we save some information in civicrm_translation instead of the base table 
+    $translations = CRM_Core_I18n_Schema::extractForLocale(static::getTableName(), $record);
+
     // Fill defaults after pre hook to accept any hook modifications
     self::setDefaultsFromCallback($entityName, $record);
     $fields = static::getSupportedFields();
@@ -1144,6 +1147,11 @@ class CRM_Core_DAO extends DB_DataObject {
       $instance->makeNameFromLabel();
     }
     $instance->save();
+
+    // save any translations
+    if ($translations) {
+      CRM_Core_I18n_Schema::saveExtracted($translations, $instance->id);
+    }
 
     if (!empty($record['custom']) && is_array($record['custom'])) {
       CRM_Core_BAO_CustomValueTable::store($record['custom'], static::getTableName(), $instance->$idField, $op);
