@@ -1552,7 +1552,7 @@ class CRM_Utils_System {
    * @return mixed|string
    */
   public static function baseCMSURL() {
-    static $_baseURL = NULL;
+    $_baseURL = Civi::$statics[__CLASS__]['baseCMSURL'] ?? NULL;
     if (!$_baseURL) {
       $config = CRM_Core_Config::singleton();
       $_baseURL = $userFrameworkBaseURL = $config->userFrameworkBaseURL;
@@ -1585,8 +1585,20 @@ class CRM_Utils_System {
           }
         }
       }
+      Civi::$statics[__CLASS__]['baseCMSURL'] = $_baseURL;
     }
     return $_baseURL;
+  }
+
+  /**
+   * Forget the cached CMS base URLs, so they are recomputed for the current CMS language.
+   *
+   * @internal
+   */
+  public static function flushBaseURLCache(): void {
+    $config = CRM_Core_Config::singleton();
+    unset($config->userFrameworkBaseURL, $config->useFrameworkRelativeBase);
+    unset(Civi::$statics[__CLASS__]['baseCMSURL']);
   }
 
   /**

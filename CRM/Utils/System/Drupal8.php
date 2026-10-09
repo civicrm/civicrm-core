@@ -796,13 +796,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $languages = $languageManager->getLanguages();
 
     if (isset($languages[$langcode])) {
-      $languageManager->setConfigOverrideLanguage($languages[$langcode]);
-
-      // Config must be re-initialized to reset the base URL
-      // otherwise links will have the wrong language prefix/domain.
-      $domain = \CRM_Core_BAO_Domain::getDomain();
-      \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
-
+      if ($languageManager->getConfigOverrideLanguage()?->getId() !== $langcode) {
+        $languageManager->setConfigOverrideLanguage($languages[$langcode]);
+        // The cached base URLs carry the previous language's prefix.
+        CRM_Utils_System::flushBaseURLCache();
+      }
       return TRUE;
     }
 
