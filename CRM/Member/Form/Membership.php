@@ -1009,9 +1009,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($this->getSubmittedValue('record_contribution')) {
       $recordContribution = [
         'total_amount',
-        'trxn_id',
         'contribution_status_id',
-        'check_number',
         'card_type_id',
         'pan_truncation',
       ];
@@ -1019,7 +1017,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       foreach ($recordContribution as $f) {
         $params[$f] = $this->getSubmittedValue($f);
       }
-      $params['financial_type_id'] = $this->getFinancialTypeID();
 
       $completedContributionStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       if (($params['contribution_status_id'] ?? NULL) != $completedContributionStatusId) {
@@ -1027,8 +1024,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $params['status_id'] = $pendingMembershipStatusId;
           $params['skipStatusCal'] = TRUE;
         }
-        $params['is_pay_later'] = 1;
-        $this->assign('is_pay_later', 1);
       }
 
     }
@@ -1082,7 +1077,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         ->setContributionValues($this->getContributionValues() + [
           'contact_id' => $this->_contributorContactID,
           'address_id' => $contributionAddressID,
-          'financial_type_id' => $this->getFinancialTypeID(),
           'contribution_recur_id' => $this->getContributionRecurID(),
         ])
         ->setLineItems($this->getLineItemForOrderApi())
@@ -1316,19 +1310,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   private function recordMembershipContribution($params) {
     $contributionParams = $this->getContributionValues();
-    $contributionParams['non_deductible_amount'] = 'null';
     $contributionParams['skipCleanMoney'] = TRUE;
-    $contributionParams['revenue_recognition_date'] = $this->getDeferredRevenueRecognitionDate();
     $contributionSoftParams = $params['soft_credit'] ?? NULL;
     $recordContribution = [
       'contact_id',
-      'total_amount',
-      'financial_type_id',
-      'trxn_id',
       'contribution_status_id',
-      'check_number',
-      'is_pay_later',
-      'tax_amount',
     ];
     foreach ($recordContribution as $f) {
       $contributionParams[$f] = $params[$f] ?? NULL;
@@ -1339,11 +1325,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $contributionParams['contact_id'] = $params['contribution_contact_id'];
     }
 
-    if (!empty($params['processPriceSet']) &&
-      !empty($params['lineItems'])
-    ) {
-      $contributionParams['line_item'] = $params['lineItems'] ?? NULL;
-    }
+    $contributionParams['line_item'] = $params['lineItems'];
 
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
 
