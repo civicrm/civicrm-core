@@ -36,20 +36,18 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
             'edit own manual batches',
             'edit all manual batches',
           ],
-          'actionName' => 'edit',
         ],
         CRM_Core_Action::DELETE => [
           'permission' => [
             'delete own manual batches',
             'delete all manual batches',
           ],
-          'actionName' => 'delete',
         ],
       ];
 
       $createdID = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $this->_id, 'created_id');
       if (!empty($permissions[$this->_action])) {
-        $this->checkPermissions($this->_action, $permissions[$this->_action]['permission'], $createdID, CRM_Core_Session::getLoggedInContactID(), $permissions[$this->_action]['actionName']);
+        $this->checkPermissions($this->_action, $permissions[$this->_action]['permission'], $createdID, CRM_Core_Session::getLoggedInContactID());
       }
     }
   }
@@ -231,18 +229,17 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
    * @param $permissions
    * @param int $createdID
    * @param int $userContactID
-   * @param string $actionName
    *
    *   list of errors to be posted back to the form
    */
-  public function checkPermissions($action, $permissions, $createdID, $userContactID, $actionName) {
+  public function checkPermissions($action, $permissions, $createdID, $userContactID) {
     if ((CRM_Core_Permission::check($permissions[0]) || CRM_Core_Permission::check($permissions[1]))) {
       if (CRM_Core_Permission::check($permissions[0]) && $userContactID != $createdID && !CRM_Core_Permission::check($permissions[1])) {
-        CRM_Core_Error::statusBounce(ts('You dont have permission to %1 this batch'), [1 => $actionName]);
+        CRM_Core_Error::statusBounce(ts("You don't have permission to perform this action on this batch."));
       }
     }
     else {
-      CRM_Core_Error::statusBounce(ts('You dont have permission to %1 this batch'), [1 => $actionName]);
+      CRM_Core_Error::statusBounce(ts("You don't have permission to perform this action on this batch."));
     }
   }
 

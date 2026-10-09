@@ -116,7 +116,7 @@ class ParticipantParser extends ImportParser {
       if (!empty($participantParams['id'])) {
         $existingParticipant = $this->checkEntityExists('Participant', $participantParams['id']);
         if (!$this->isUpdateExisting()) {
-          throw new \CRM_Core_Exception(ts('%1 record found and update not selected', [1 => 'Participant']));
+          throw new \CRM_Core_Exception(ts('Participant record found and update not selected'));
         }
         $participantParams['contact_id'] = !empty($participantParams['contact_id']) ? (int) $participantParams['contact_id'] : $existingParticipant['contact_id'];
       }
@@ -129,7 +129,7 @@ class ParticipantParser extends ImportParser {
       if (!empty($participantParams['id'])) {
         $this->checkEntityExists('Participant', $participantParams['id']);
         if (!$this->isUpdateExisting()) {
-          throw new \CRM_Core_Exception(ts('% record found and update not selected', [1 => 'Participant']));
+          throw new \CRM_Core_Exception(ts('Participant record found and update not selected'));
         }
         $newParticipant = Participant::update(FALSE)
           ->setValues($participantParams)

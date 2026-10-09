@@ -119,7 +119,6 @@ class CRM_Utils_Check_Component_Cms extends CRM_Utils_Check_Component {
           $messageText[] = ts(
             'If you have an alternative base page, it can be set in the <a href="%2">WordPress integration settings</a>.',
             [
-              1 => $config->userFrameworkBaseURL,
               2 => $cmsSettings,
             ]
           );

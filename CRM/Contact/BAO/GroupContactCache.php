@@ -790,7 +790,7 @@ ORDER BY   gc.contact_id, g.children
         }
         elseif (!empty($savedSearch['search_custom_id'])) {
           Group::update(FALSE)->addWhere('id', '=', $groupID)->setValues(['is_active' => FALSE])->execute();
-          CRM_Core_Session::setStatus(ts('Invalid group %1 found and disabled'), [1 => $groupID]);
+          CRM_Core_Session::setStatus(ts('Invalid group %1 found and disabled', [1 => $groupID]));
           return;
         }
         else {
