@@ -8,6 +8,8 @@ use Civi\Api4\User;
 use Civi\Api4\Role;
 use Civi\Api4\UserRole;
 use Civi\Api4\Contact;
+use Civi\Api4\UFField;
+use Civi\Api4\UFGroup;
 
 /**
  * Test the Standaloneusers User Api4 actions
@@ -654,6 +656,33 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
         $this->assertStringContainsString("Authorization failed", $e->getMessage());
       }
     }
+  }
+
+  /**
+   * Public event registration and contribution pages load their profiles
+   * with CREATE permission, so anonymous visitors need 'profile create'.
+   */
+  public function testAnonymousCanUseProfileForms(): void {
+    $this->assertEmpty(\CRM_Utils_System::getLoggedInUfID());
+    $profileID = UFGroup::create(FALSE)
+      ->setValues([
+        'title' => 'Anonymous profile form',
+        'group_type' => 'Individual,Contact',
+        'is_active' => TRUE,
+      ])
+      ->addChain('field', UFField::create(FALSE)->setValues([
+        'uf_group_id' => '$id',
+        'field_name' => 'email',
+        'field_type' => 'Contact',
+        'label' => 'Email',
+        'is_active' => TRUE,
+      ]))
+      ->execute()->single()['id'];
+
+    $fields = \CRM_Core_BAO_UFGroup::getFields($profileID, FALSE, \CRM_Core_Action::ADD,
+      NULL, NULL, FALSE, NULL, FALSE, NULL, \CRM_Core_Permission::CREATE
+    );
+    $this->assertArrayHasKey('email-Primary', $fields);
   }
 
   public function testNonAdminCannotChangeRoles() {
