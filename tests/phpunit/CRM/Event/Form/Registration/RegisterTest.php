@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Participant;
 use Civi\Api4\PriceFieldValue;
 use Civi\Test\FormTrait;
 use Civi\Test\FormWrapper;
@@ -22,6 +23,7 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
   protected $_apiversion = 4;
 
   public function tearDown(): void {
+    $this->quickCleanup([], TRUE);
     $this->quickCleanUpFinancialEntities();
     parent::tearDown();
   }
@@ -328,6 +330,66 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
     $form = $this->getTestForm('CRM_Event_Form_Registration_Register', $submittedValues, ['id' => $event['id']])
       ->addSubsequentForm('CRM_Event_Form_Registration_Confirm');
     $form->processForm();
+  }
+
+  /**
+   * Test that a custom field only on the additional-participant profile is
+   * saved against the additional participant's own record, and not against
+   * the primary registrant's.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRegisterWithParticipantCustomFieldOnAdditionalParticipant(): void {
+    $this->eventCreateUnpaid();
+    $customGroup = $this->createTestEntity('CustomGroup', [
+      'title' => 'Participant Custom Group',
+      'name' => 'ParticipantCustomGroup',
+      'extends' => 'Participant',
+    ]);
+    $customField = $this->createTestEntity('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Favourite Colour',
+      'name' => 'favourite_colour',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ]);
+    $this->createTestEntity('UFField', [
+      'uf_group_id' => $this->ids['UFGroup']['event_pre_additional_event'],
+      'field_name' => 'custom_' . $customField['id'],
+      'field_type' => 'Participant',
+      'label' => 'favourite_colour',
+    ], 'favourite_colour');
+
+    $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Participant1',
+      'last_name' => 'LastName',
+      'email-Primary' => 'participant1@example.com',
+      'additional_participants' => 1,
+    ], ['id' => $this->getEventID()])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Participant2',
+        'last_name' => 'LastName',
+        'email-Primary' => 'participant2@example.com',
+        'custom_' . $customField['id'] => 'Green',
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
+      ->processForm();
+
+    $participants = Participant::get(FALSE)
+      ->addWhere('event_id', '=', $this->getEventID())
+      ->addSelect('registered_by_id', 'ParticipantCustomGroup.favourite_colour')
+      ->execute();
+
+    $this->assertCount(2, $participants, 'Should have a primary and an additional participant.');
+    foreach ($participants as $participant) {
+      if (empty($participant['registered_by_id'])) {
+        // The primary participant - registered_by_id is only set on additional participants.
+        $this->assertNull($participant['ParticipantCustomGroup.favourite_colour'], 'Primary participant should not have the additional-only custom field value.');
+      }
+      else {
+        $this->assertSame('Green', $participant['ParticipantCustomGroup.favourite_colour'], 'Additional participant should have their own submitted custom field value.');
+      }
+    }
   }
 
 }

@@ -176,12 +176,17 @@ trait CRM_Custom_Form_CustomDataTrait {
    *   this entity are returned - otherwise all submitted custom fields are
    *   returned, regardless of which entity they belong to. Only useful for a
    *   form that carries custom fields for more than one entity.
+   * @param array|null $values
+   *   Submitted values to scan, defaulting to $this->getSubmittedValues().
+   *   Pass this explicitly on a form where the relevant custom fields were
+   *   not submitted on the form's own page - e.g. one of several
+   *   participants on an event registration wizard.
    *
    * @return array
    */
-  protected function getSubmittedCustomFields(int $version = 4, ?string $entity = NULL): array {
+  protected function getSubmittedCustomFields(int $version = 4, ?string $entity = NULL, ?array $values = NULL): array {
     $fields = [];
-    foreach ($this->getSubmittedValues() as $label => $field) {
+    foreach ($values ?? $this->getSubmittedValues() as $label => $field) {
       $fieldID = CRM_Core_BAO_CustomField::getKeyID($label);
       if (!$fieldID) {
         continue;
