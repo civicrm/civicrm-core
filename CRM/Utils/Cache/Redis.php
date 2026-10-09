@@ -110,7 +110,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
    */
   public function __construct($config) {
     if (isset($config['timeout'])) {
-      $this->_timeout = $config['timeout'];
+      $this->_timeout = intval($config['timeout']);
     }
     if (isset($config['prefix'])) {
       $this->_prefix = $config['prefix'];
@@ -135,7 +135,7 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
     if (is_int($ttl) && $ttl <= 0) {
       return $this->delete($key);
     }
-    $ttl = CRM_Utils_Date::convertCacheTtl($ttl, self::DEFAULT_TIMEOUT);
+    $ttl = CRM_Utils_Date::convertCacheTtl($ttl, $this->_timeout);
     if (!$this->_cache->setex($this->_prefix . $key, $ttl, serialize($value))) {
       if (PHP_SAPI === 'cli' || (Civi\Core\Container::isContainerBooted() && CRM_Core_Permission::check('view debug output'))) {
         throw new CRM_Utils_Cache_CacheException("Redis set ($key) failed: " . $this->_cache->getLastError());

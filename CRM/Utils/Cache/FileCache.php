@@ -100,7 +100,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
       return $this->delete($key);
     }
 
-    $expires = CRM_Utils_Date::convertCacheTtlToExpires($ttl, self::DEFAULT_TIMEOUT);
+    $expires = CRM_Utils_Date::convertCacheTtlToExpires($ttl, $this->_timeout);
     $serialized = serialize([
       'created' => time(),
       'expires' => $expires,
