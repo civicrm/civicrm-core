@@ -16,6 +16,9 @@ return new class() extends EventCheck implements HookInterface {
     'headers' => ['type' => 'array'],
     'attachments' => ['type' => 'array|NULL'],
     'isTest' => ['type' => 'bool|int'],
+    // Documented way for a listener to stop the message being sent. Honoured by
+    // CRM_Utils_Mail::send() and by FlexMailer's DefaultSender.
+    'abortMailSend' => ['type' => 'bool', 'for' => ['messageTemplate', 'singleEmail', 'flexmailer']],
 
     // ## Envelope: singleEmail/messageTemplate
 
@@ -65,8 +68,8 @@ return new class() extends EventCheck implements HookInterface {
     ],
     'groupName' => [
       // This field is generally deprecated. Historically, this was tied to various option-groups (`msg_*`),
-      // but it also seems to have been used with a few long-form English names.
-      'regex' => '/^(msg_[a-zA-Z_]+|Scheduled Reminder Sender|Activity Email Sender|Report Email Sender|Mailing Event Welcome|CRM_Core_Config_MailerTest)$/',
+      // but it also seems to have been used with a few long-form English names. Nothing reads the value,
+      // so it is left unconstrained rather than enumerating every sender that might set one.
       'type' => 'string',
       'for' => ['messageTemplate', 'singleEmail'],
     ],
