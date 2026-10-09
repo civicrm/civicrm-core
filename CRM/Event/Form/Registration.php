@@ -58,6 +58,21 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Is there a price set to build an Order from.
+   *
+   * getOrder() requires a price set id (initializeOrder() passes
+   * getPriceSetID() to Order::setPriceSetID(), which takes a non-nullable
+   * int) - call this first wherever an event might not have one, e.g. a
+   * free event with no price set at all.
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  protected function hasOrder(): bool {
+    return (bool) $this->getPriceSetID();
+  }
+
+  /**
    * Get all the submitted values for all the forms in the sequence.
    *
    * @return array
@@ -817,7 +832,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function getFeeAmountForParticipant(int $participantNum): ?float {
-    if (!$this->getPriceSetID()) {
+    if (!$this->hasOrder()) {
       return NULL;
     }
     return $this->getOrder()->getTotalAmountForIdentifier($this->getParticipantPageName($participantNum));
