@@ -6,6 +6,12 @@
  */
 class CRM_Core_MenuTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->quickCleanup(['civicrm_word_replacement']);
+    CRM_Core_BAO_WordReplacement::rebuild();
+    parent::tearDown();
+  }
+
   public function testReadXML(): void {
     $xmlString = '<?xml version="1.0" encoding="iso-8859-1" ?>
     <menu>
@@ -217,6 +223,53 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     CRM_Core_Menu::rebuild();
     Civi::cache('long')->delete('AdminSiteMapLinks');
     $this->assertNotEmpty(CRM_Core_Menu::getAdminLinks()['Localization']['fields'] ?? NULL);
+  }
+
+  /**
+   * The cache holds paths; URLs are built for the current request.
+   */
+  public function testAdminLinksBuildUrlsPerRequest(): void {
+    $link = $this->getAdminLink('civicrm/admin/setting/localization');
+    $this->assertEquals(CRM_Utils_System::url('civicrm/admin/setting/localization', 'reset=1', FALSE, NULL, TRUE, FALSE, TRUE), $link['url']);
+
+    foreach (Civi::cache('long')->get('AdminSiteMapLinks') as $group) {
+      foreach ($group['fields'] as $cachedLink) {
+        $this->assertArrayNotHasKey('url', $cachedLink);
+        $this->assertArrayHasKey('path', $cachedLink);
+      }
+    }
+  }
+
+  /**
+   * Titles are translated per request, while ids stay the same.
+   */
+  public function testAdminLinksTitlesAreLocalized(): void {
+    $link = $this->getAdminLink('civicrm/admin/setting/localization');
+    $this->createTestEntity('WordReplacement', [
+      'find_word' => $link['title'],
+      'replace_word' => 'Languages and Formats',
+      'match_type' => 'exactMatch',
+    ]);
+    CRM_Core_BAO_WordReplacement::rebuild(FALSE);
+
+    $localizedLink = $this->getAdminLink('civicrm/admin/setting/localization');
+    $this->assertEquals('Languages and Formats', $localizedLink['title']);
+    $this->assertEquals($link['id'], $localizedLink['id']);
+  }
+
+  /**
+   * @param string $path
+   * @return array|null
+   */
+  private function getAdminLink(string $path): ?array {
+    foreach (CRM_Core_Menu::getAdminLinks() ?? [] as $group) {
+      foreach ($group['fields'] as $link) {
+        if ($link['path'] === $path) {
+          return $link;
+        }
+      }
+    }
+    return NULL;
   }
 
 }

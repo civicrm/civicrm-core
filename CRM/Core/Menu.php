@@ -501,14 +501,9 @@ class CRM_Core_Menu {
           ',' => '_',
           '/' => '_',
         ]),
-        'url' => CRM_Utils_System::url($path, $query,
-          FALSE,
-          NULL,
-          TRUE,
-          FALSE,
-          // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
-          TRUE
-        ),
+        // The URL is built by getAdminLinks(), as it can vary by request (e.g. a language prefix).
+        'path' => $path,
+        'query' => $query,
         'icon' => $item['icon'] ?? NULL,
         'extra' => $item['extra'] ?? NULL,
       ];
@@ -541,6 +536,24 @@ class CRM_Core_Menu {
       self::build($menu);
       $links = \Civi::cache('long')->get('AdminSiteMapLinks');
     }
+    if (!$links) {
+      return $links;
+    }
+    foreach ($links as $group => $groupLinks) {
+      foreach ($groupLinks['fields'] ?? [] as $key => $link) {
+        if (isset($link['path'])) {
+          $links[$group]['fields'][$key]['url'] = CRM_Utils_System::url($link['path'], $link['query'],
+            FALSE,
+            NULL,
+            TRUE,
+            FALSE,
+            // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
+            TRUE
+          );
+        }
+      }
+    }
+    CRM_Core_I18n::singleton()->localizeTitles($links);
     return $links;
   }
 
