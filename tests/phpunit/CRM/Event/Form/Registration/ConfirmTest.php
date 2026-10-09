@@ -337,6 +337,39 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that a new registration against a full, waitlist-enabled paid
+   * event is assigned 'On waitlist' status, and that is_pay_later is
+   * forced off even though pay-later (no payment processor) was selected.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testWaitlistStatusAndPayLaterOnNewPaidRegistration(): void {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_participant_status_type SET is_active = 1');
+    $this->eventCreatePaid(['has_waitlist' => 1, 'max_participants' => 1]);
+    $this->participantCreate(['event_id' => $this->getEventID()]);
+
+    $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Waitlisted',
+      'last_name' => 'Person',
+      'email-Primary' => 'waitlisted@example.com',
+      'payment_processor_id' => 0,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_standard'],
+    ], ['id' => $this->getEventID()])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
+      ->processForm();
+
+    $participant = Participant::get(FALSE)
+      ->addWhere('event_id', '=', $this->getEventID())
+      ->addWhere('contact_id.first_name', '=', 'Waitlisted')
+      ->addSelect('status_id:name', 'is_pay_later')
+      ->execute()->single();
+
+    $this->assertEquals('On waitlist', $participant['status_id:name']);
+    $this->assertEquals(0, $participant['is_pay_later']);
+  }
+
+  /**
    * Test that a participant who is skipped part-way through registration
    * does not have their price selection counted in the total.
    *
@@ -882,6 +915,38 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ], ['id' => $this->getEventID()]);
     $form->processForm();
     $this->assertMailSentContainingStrings(['Event']);
+  }
+
+  /**
+   * Test that a new registration against a full, waitlist-enabled free
+   * event with the confirmation screen disabled - so it is processed via
+   * processRegistration() rather than Confirm::postProcess() - is still
+   * assigned 'On waitlist' status.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testWaitlistStatusViaProcessRegistration(): void {
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_participant_status_type SET is_active = 1');
+    $event = $this->eventCreateUnpaid([
+      'is_confirm_enabled' => FALSE,
+      'has_waitlist' => 1,
+      'max_participants' => 1,
+    ]);
+    $this->participantCreate(['event_id' => $event['id']]);
+
+    $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Waitlisted',
+      'last_name' => 'Person',
+      'email-Primary' => 'waitlisted@example.com',
+    ], ['id' => $event['id']])->processForm();
+
+    $participant = Participant::get(FALSE)
+      ->addWhere('event_id', '=', $event['id'])
+      ->addWhere('contact_id.first_name', '=', 'Waitlisted')
+      ->addSelect('status_id:name')
+      ->execute()->single();
+
+    $this->assertEquals('On waitlist', $participant['status_id:name']);
   }
 
   public function testRegistrationWithoutCiviContributeEnabled(): void {

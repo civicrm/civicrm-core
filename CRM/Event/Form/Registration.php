@@ -939,11 +939,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       'id' => $params['participant_id'] ?? NULL,
       'contact_id' => $contactID,
       'event_id' => $this->getEventID(),
-      'status_id' => $params['participant_status'] ?? 1,
+      'status_id' => $this->getParticipantStatusID($participantNumber),
       'role_id' => $this->getRoleID($participantNumber),
       'source' => $this->getSource($participantNumber),
       'fee_level' => $params['amount_level'] ?? NULL,
-      'is_pay_later' => $params['is_pay_later'] ?? 0,
+      'is_pay_later' => $this->getIsPayLaterForParticipant($participantNumber),
       'fee_amount' => $this->getFeeAmountForParticipant($participantNumber),
       'registered_by_id' => $params['registered_by_id'] ?? NULL,
       'fee_currency' => $this->getCurrency(),
@@ -1689,6 +1689,81 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get the status to register a participant with.
+   *
+   * @param int $participantNumber
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  protected function getParticipantStatusID(int $participantNumber): int {
+    return $this->getWaitlistOrApprovalStatusID()
+      ?? $this->getPendingStatusID($participantNumber)
+      ?? CRM_Core_PseudoConstant::getKey('CRM_Event_DAO_Participant', 'status_id', 'Registered');
+  }
+
+  /**
+   * Get the status to register a participant with if the event is full
+   * (and has a waitlist) or requires approval - these take priority over
+   * any other status.
+   *
+   * @return int|null
+   */
+  protected function getWaitlistOrApprovalStatusID(): ?int {
+    if ($this->_allowWaitlist) {
+      return CRM_Core_PseudoConstant::getKey('CRM_Event_DAO_Participant', 'status_id', 'On waitlist');
+    }
+    if ($this->_requireApproval) {
+      return CRM_Core_PseudoConstant::getKey('CRM_Event_DAO_Participant', 'status_id', 'Awaiting approval');
+    }
+    return NULL;
+  }
+
+  /**
+   * Get the status to register a participant with if their registration
+   * is paid, the order has a non-zero total, and either is pay-later or is
+   * otherwise not resolved to a definite payment outcome within this
+   * request (a noReturn processor, which does not confirm payment
+   * synchronously).
+   *
+   * @param int $participantNumber
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPendingStatusID(int $participantNumber): ?int {
+    // Per historical behaviour - we do not put registrations to pending if
+    // the event has a cost (for ANY of the participants). In theory a primary
+    // participant with a cost of $0 would be pending if one of the later ones had
+    // a cost. Unclear if this is by design or oversight.
+    if (!$this->isPaidEvent() || $this->getOrder()->getTotalAmount() == 0) {
+      return NULL;
+    }
+    $isPayLater = $this->getIsPayLaterForParticipant($participantNumber);
+    if (!($isPayLater || $this->getPaymentProcessorObject()->supports('noReturn'))) {
+      return NULL;
+    }
+    return CRM_Core_PseudoConstant::getKey('CRM_Event_DAO_Participant', 'status_id', $isPayLater ? 'Pending from pay later' : 'Pending from incomplete transaction');
+  }
+
+  /**
+   * Is this participant's registration being processed as pay-later.
+   *
+   * @param int $participantNumber
+   *
+   * @return bool
+   */
+  protected function getIsPayLaterForParticipant(int $participantNumber): bool {
+    if ($this->_allowWaitlist || $this->_requireApproval) {
+      return FALSE;
+    }
+    if ($this->isShowPaymentOnConfirm()) {
+      return $this->isPayLater();
+    }
+    return (bool) ($this->_params[$participantNumber]['is_pay_later'] ?? FALSE);
+  }
+
+  /**
    * Get the role to register a participant with.
    *
    * @param int $participantNumber
@@ -1864,16 +1939,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         // for things like tell a friend
         if (!$this->getContactID() && !empty($value['is_primary'])) {
           $session->set('transaction.userID', $contactID);
-        }
-
-        //lets get the status if require approval or waiting.
-
-        $waitingStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Waiting'");
-        if ($this->_allowWaitlist && !$this->_allowConfirmation) {
-          $value['participant_status_id'] = $value['participant_status'] = array_search('On waitlist', $waitingStatuses);
-        }
-        elseif ($this->_requireApproval && !$this->_allowConfirmation) {
-          $value['participant_status_id'] = $value['participant_status'] = array_search('Awaiting approval', $waitingStatuses);
         }
 
         $this->confirmPostProcess($contactID, $value, $key);
