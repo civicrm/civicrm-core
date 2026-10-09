@@ -215,7 +215,7 @@ class CRM_Utils_VersionCheck {
         if (empty($where)) {
           $this->stats['entities'][] = [
             'name' => $compat[$short_name] ?? $short_name,
-            'count' => CRM_Core_BAO_SchemaHandler::getRowCountForTable(CRM_Core_DAO_AllCoreTables::getTableForClass($daoName)),
+            'size' => CRM_Core_BAO_SchemaHandler::getRowCountForTable(CRM_Core_DAO_AllCoreTables::getTableForClass($daoName)),
           ];
         }
         else {
