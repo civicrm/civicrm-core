@@ -39,6 +39,7 @@
     <namespace>CRM/Standaloneusers</namespace>
     <format>25.10.2</format>
     <angularModule>crmStandaloneusers</angularModule>
+    <setting-page-title>Login settings</setting-page-title>
   </civix>
   <mixins>
     <mixin>scan-classes@1.0.0</mixin>

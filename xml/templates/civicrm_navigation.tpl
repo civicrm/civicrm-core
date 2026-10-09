@@ -333,9 +333,9 @@ VALUES
 
 SET @usersPermslastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
-    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
+    ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, icon, weight )
 VALUES
-    ( @domainID, 'civicrm/admin/access?reset=1',       '{ts escape="sql" skip="true"}Access Control Lists{/ts}',    'Permissions (Access Control)',     'administer CiviCRM', '', @usersPermslastID, '1', NULL, 5 ),
+    ( @domainID, 'civicrm/admin/access?reset=1',       '{ts escape="sql" skip="true"}Access Control Lists{/ts}',    'Permissions (Access Control)',     'administer CiviCRM', '', @usersPermslastID, '1', 'crm-i fa-users-between-lines', 5 ),
     ( @domainID, 'civicrm/admin/synchUser?reset=1',    '{ts escape="sql" skip="true"}Synchronize Users to Contacts{/ts}',   'Synchronize Users to Contacts',    'administer CiviCRM', '', @usersPermslastID, '1', NULL, 10 );
 
 INSERT INTO civicrm_navigation
