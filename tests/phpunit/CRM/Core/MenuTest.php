@@ -210,4 +210,13 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $this->assertFalse($rebuilt, 'rebuild() should skip a populated table');
   }
 
+  /**
+   * The admin links come back when only their cache entry was flushed.
+   */
+  public function testAdminLinksRebuiltAfterCacheFlush(): void {
+    CRM_Core_Menu::rebuild();
+    Civi::cache('long')->delete('AdminSiteMapLinks');
+    $this->assertNotEmpty(CRM_Core_Menu::getAdminLinks()['Localization']['fields'] ?? NULL);
+  }
+
 }

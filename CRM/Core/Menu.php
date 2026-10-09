@@ -535,8 +535,10 @@ class CRM_Core_Menu {
   public static function getAdminLinks() {
     $links = \Civi::cache('long')->get('AdminSiteMapLinks');
     if (!$links) {
-      // cache may have expired
-      self::rebuild();
+      // The cache may have been flushed while the routes are still stored (so rebuild() would
+      // do nothing). The links only need the menu items, so build them directly.
+      $menu = self::items();
+      self::build($menu);
       $links = \Civi::cache('long')->get('AdminSiteMapLinks');
     }
     return $links;
