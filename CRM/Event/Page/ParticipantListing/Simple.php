@@ -101,7 +101,7 @@ LIMIT    $offset, $rowCount";
 
     $params = [];
 
-    $params['status'] = ts('Group') . ' %%StatusMessage%%';
+    $params['status'] = ts('Group %1', [1 => '%%StatusMessage%%']);
     $params['csvString'] = NULL;
     $params['buttonTop'] = 'PagerTopButton';
     $params['buttonBottom'] = 'PagerBottomButton';

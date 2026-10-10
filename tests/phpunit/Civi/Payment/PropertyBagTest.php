@@ -340,6 +340,23 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   /**
+   * Test the generic prefix is removed from the description when it is translated.
+   */
+  public function testSetDescriptionRemovesTranslatedPrefix(): void {
+    $replacement = \Civi\Api4\WordReplacement::create(FALSE)
+      ->setValues([
+        'find_word' => 'Online Contribution: %1',
+        'replace_word' => 'Online-Spende: %1',
+        'match_type' => 'exactMatch',
+      ])
+      ->execute()->single();
+    $propertyBag = new PropertyBag();
+    $propertyBag->setDescription(ts('Online Contribution: %1', [1 => 'Annual appeal']));
+    \Civi\Api4\WordReplacement::delete(FALSE)->addWhere('id', '=', $replacement['id'])->execute();
+    $this->assertEquals('Annual appeal', $propertyBag->getDescription());
+  }
+
+  /**
    * Test retrieves using CRM_Utils_Array::value still work.
    */
   public function testUtilsArray(): void {

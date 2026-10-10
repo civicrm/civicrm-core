@@ -409,10 +409,10 @@ trait CRM_Contact_Form_Task_EmailTrait {
       // creating more manually if desired.
       $followupStatus = $this->createFollowUpActivities($formValues, $activityIds[0]);
 
-      CRM_Core_Session::setStatus(ts('One message was sent successfully. ', [
-        'plural' => '%count messages were sent successfully. ',
+      CRM_Core_Session::setStatus(ts('One message was sent successfully.', [
+        'plural' => '%count messages were sent successfully.',
         'count' => $sent,
-      ]) . $followupStatus, ts('Message Sent', ['plural' => 'Messages Sent', 'count' => $sent]), 'success');
+      ]) . ' ' . $followupStatus, ts('Message Sent', ['plural' => 'Messages Sent', 'count' => $sent]), 'success');
     }
 
     if (!empty($this->suppressedEmails)) {

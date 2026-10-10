@@ -396,7 +396,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         }
         $query->_where[$grouping][] = "civicrm_line_item.price_field_value_id IN (" . implode(', ', $value) . ")";
         $query->_where[$grouping][] = "civicrm_line_item.qty > 0";
-        $query->_qill[$grouping][] = ts("Fee level") . " IN " . implode(', ', $labels);
+        $query->_qill[$grouping][] = ts('Fee level IN %1', [1 => implode(', ', $labels)]);
         $query->_tables['civicrm_participant'] = $query->_tables['civicrm_line_item'] = $query->_whereTables['civicrm_line_item'] = 1;
         return;
 

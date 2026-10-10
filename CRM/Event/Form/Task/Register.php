@@ -172,7 +172,7 @@ class CRM_Event_Form_Task_Register extends CRM_Event_Form_Participant {
 
     $statusMsg = ts('Total Participant(s) added to event: %1.', [1 => count($this->_contactIds)]);
     if (isset($params['send_receipt']) && $numberNotSent > 0) {
-      $statusMsg .= ' ' . ts('Email has NOT been sent to %1 contact(s) - communication preferences specify DO NOT EMAIL OR valid Email is NOT present. ', [1 => $numberNotSent]);
+      $statusMsg .= ' ' . ts('Email has NOT been sent to %1 contact(s) - communication preferences specify DO NOT EMAIL OR valid Email is NOT present.', [1 => $numberNotSent]);
     }
     elseif (isset($params['send_receipt'])) {
       $statusMsg .= ' ' . ts('A confirmation email has been sent to ALL participants');

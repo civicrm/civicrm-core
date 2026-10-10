@@ -3739,7 +3739,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       $params = [
         'total' => $this->_rowsFound,
         'rowCount' => $rowCount,
-        'status' => ts('Records') . ' %%StatusMessage%%',
+        'status' => ts('Records %1', [1 => '%%StatusMessage%%']),
         'buttonBottom' => 'PagerBottomButton',
         'buttonTop' => 'PagerTopButton',
       ];

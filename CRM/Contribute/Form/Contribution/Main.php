@@ -1250,7 +1250,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $this->set('invoiceID', $invoiceID);
     $params['invoiceID'] = $invoiceID;
     $title = !empty($this->_values['frontend_title']) ? $this->_values['frontend_title'] : $this->_values['title'];
-    $params['description'] = ts('Online Contribution') . ': ' . ((!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $title));
+    $params['description'] = ts('Online Contribution: %1', [1 => !empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $title]);
     $params['button'] = $this->controller->getButtonName();
     // required only if is_monetary and valid positive amount
     if ($this->_values['is_monetary'] &&

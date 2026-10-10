@@ -152,7 +152,7 @@ function _civicrm_api3_relationship_getoptions_spec(&$params) {
   $params['field']['options']['relationship_type_id'] = ts('Relationship Type ID');
 
   // Add parameters for limiting relationship type ID
-  $relationshipTypePrefix = ts('(For relationship_type_id only) ');
+  $relationshipTypePrefix = ts('(For relationship_type_id only)') . ' ';
   $params['contact_id'] = [
     'title' => ts('Contact ID'),
     'description' => $relationshipTypePrefix . ts('Limits options to those available to give contact'),

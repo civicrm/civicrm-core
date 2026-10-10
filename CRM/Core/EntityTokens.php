@@ -763,7 +763,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
         $tokensMetadata[$tokenName . ':name']['name'] = $field['name'] . ':name';
         $tokensMetadata[$tokenName . ':name']['audience'] = 'sysadmin';
         $tokensMetadata[$tokenName . ':label']['title'] = $fieldLabel;
-        $tokensMetadata[$tokenName . ':name']['title'] = ts('Machine name') . ': ' . $fieldLabel;
+        $tokensMetadata[$tokenName . ':name']['title'] = ts('Machine name: %1', [1 => $fieldLabel]);
         $field['audience'] = 'sysadmin';
       }
       if ($field['data_type'] === 'Boolean') {

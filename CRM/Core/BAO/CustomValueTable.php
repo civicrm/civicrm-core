@@ -748,7 +748,7 @@ class CRM_Core_BAO_CustomValueTable {
           }
         }
         else {
-          return CRM_Core_Error::createAPIError(ts('Invalid entity type') . ': "' . $type . '"');
+          return CRM_Core_Error::createAPIError(ts('Invalid entity type: "%1"', [1 => $type]));
         }
       }
     }

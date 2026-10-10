@@ -9,6 +9,13 @@
 class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
   use CRMTraits_Financial_OrderTrait;
 
+  protected function tearDown(): void {
+    \Civi\Api4\WordReplacement::delete(FALSE)->addWhere('id', '>', 0)->execute();
+    CRM_Core_BAO_WordReplacement::rebuild();
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
+
   /**
    * Test the the submit function on the event participant submit function.
    */
@@ -38,7 +45,32 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitCancel(): void {
-    $this->createEventOrder(['source' => 'Online Event Registration', 'is_pay_later' => 1]);
+    $this->submitCancelOnlineRegistration();
+  }
+
+  /**
+   * Test the online registration is still recognised when its source is translated.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitCancelTranslated(): void {
+    \Civi\Api4\WordReplacement::create(FALSE)
+      ->setValues([
+        'find_word' => 'Online Event Registration: %1',
+        'replace_word' => 'Anmeldung zu %1 (online)',
+        'match_type' => 'exactMatch',
+      ])
+      ->execute();
+    $this->submitCancelOnlineRegistration();
+  }
+
+  /**
+   * Cancel a pay-later participant registered online and check the contribution is cancelled too.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function submitCancelOnlineRegistration(): void {
+    $this->createEventOrder(['source' => ts('Online Event Registration: %1', [1 => 'Annual CiviCRM meet']), 'is_pay_later' => 1]);
     $participantCancelledStatusID = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Cancelled');
 
     /** @var CRM_Event_Form_Task_Batch $form */

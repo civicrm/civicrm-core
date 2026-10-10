@@ -1207,7 +1207,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
         $contactLinks = CRM_Contact_BAO_Contact_Utils::formatContactIDSToLinks($ids, TRUE, TRUE, $contactID);
 
         $duplicateContactsLinks = '<div class="matching-contacts-found">';
-        $duplicateContactsLinks .= ts('One matching contact was found. ', [
+        $duplicateContactsLinks .= ts('One matching contact was found.', [
           'count' => count($contactLinks['rows']),
           'plural' => '%count matching contacts were found.<br />',
         ]);

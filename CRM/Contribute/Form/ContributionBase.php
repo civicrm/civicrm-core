@@ -1086,7 +1086,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         if ($selectedProductID === $product['id']) {
           if ($selectedOption) {
             // Assign the selected option to the page for display.
-            $product['options'] = ts('Selected Option') . ': ' . $selectedOption;
+            $product['options'] = ts('Selected Option: %1', [1 => $selectedOption]);
           }
           else {
             // No options, but make it a string to avoid blowing up the template
