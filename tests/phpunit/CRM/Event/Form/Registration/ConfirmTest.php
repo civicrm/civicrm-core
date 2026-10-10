@@ -975,6 +975,37 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Participant', ['event_id' => $event['id']], 1);
   }
 
+  /**
+   * Test that getContributionID() returns the contribution created for a
+   * paid, real-time-processed registration, and that the ThankYou page's
+   * line items are sourced from it (via Order::setExistingContributionID())
+   * rather than reconstructed from resubmitted multi-page form data.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testThankYouPageLineItemsFromContribution(): void {
+    $paymentProcessorID = $this->processorCreate();
+    /** @var \CRM_Core_Payment_Dummy $processor */
+    $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
+    $processor->setDoDirectPaymentResult(['payment_status_id' => 1, 'payment_status' => 'Completed']);
+    $event = $this->eventCreatePaid(['payment_processor' => [$paymentProcessorID]]);
+
+    $form = $this->getFormWrapper([
+      'first_name' => 'k',
+      'last_name' => 'p',
+      'email-Primary' => 'demo@example.com',
+      'price_' . $this->getPriceFieldID('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_standard'],
+    ] + $this->getCreditCardParameters($paymentProcessorID), $event['id'])
+      ->addSubsequentForm('CRM_Event_Form_Registration_ThankYou');
+    $form->processForm();
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', []);
+    $this->assertEquals($contribution['id'], $form->getContributionID());
+
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
+    $this->assertEquals(300, $lineItem['line_total']);
+  }
+
   public function testRegistrationWithoutCiviContributeEnabled(): void {
     $event = $this->eventCreateUnpaid([
       'has_waitlist' => 1,

@@ -45,6 +45,11 @@ class EventFormOnline extends FormWrapper {
     return $form->getLineItems();
   }
 
+  public function getContributionID(): ?int {
+    $form = end($this->subsequentForms) ?: $this->form;
+    return $form->getContributionID();
+  }
+
   public function getTotalAmount() {
     $amount = 0;
     foreach ($this->getLineItems() as $lineItem) {
