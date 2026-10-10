@@ -45,10 +45,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_extension', 'INSERT IGNORE INTO
       'name' => 'reCAPTCHA',
     ],
     [
-      'full_name' => 'ckeditor4',
-      'name' => 'CKEditor4',
-    ],
-    [
       'full_name' => 'org.civicrm.flexmailer',
       'name' => 'FlexMailer',
       'file' => 'flexmailer',
