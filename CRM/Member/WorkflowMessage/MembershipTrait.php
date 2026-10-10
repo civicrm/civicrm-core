@@ -18,6 +18,7 @@ trait CRM_Member_WorkflowMessage_MembershipTrait {
   /**
    * @var int
    * @scope tokenContext as membershipId, tplParams as membershipID
+   * @fkEntity Membership
    */
   protected $membershipID;
 
