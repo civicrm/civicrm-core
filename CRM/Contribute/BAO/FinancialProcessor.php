@@ -1071,18 +1071,34 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function createLineItems(?int $financialTrxnID = NULL) {
     foreach ($this->getUpdatedLineItems() as $line) {
-      $createdLineItem = CRM_Price_BAO_LineItem::create($line);
-
-      if (!$this->isUpdate()) {
-        $this->addFinancialItem($createdLineItem, FALSE, $financialTrxnID);
-        if (!empty($line['tax_amount'])) {
-          $this->addFinancialItem($createdLineItem, TRUE, $financialTrxnID);
-        }
-      }
+      $this->createLineItem($line, $financialTrxnID);
     }
     if (!$this->isUpdate()) {
       $this->createDeferredTrxn();
     }
+  }
+
+  /**
+   * Create (or update) a line item's row, and its financial item(s) unless this
+   * is a contribution update - the update-specific branches elsewhere in
+   * recordFinancialAccounts() handle financial items for those already.
+   *
+   * @param array $line
+   * @param int|null $financialTrxnID
+   *   Transaction paying for this line. Only used when not an update.
+   *
+   * @return object
+   */
+  private function createLineItem(array $line, ?int $financialTrxnID): object {
+    $createdLineItem = CRM_Price_BAO_LineItem::create($line);
+
+    if (!$this->isUpdate()) {
+      $this->addFinancialItem($createdLineItem, FALSE, $financialTrxnID);
+      if (!empty($line['tax_amount'])) {
+        $this->addFinancialItem($createdLineItem, TRUE, $financialTrxnID);
+      }
+    }
+    return $createdLineItem;
   }
 
   /**
@@ -1184,6 +1200,51 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
+   * Save a line item's row, then reverse its existing financial item(s) -
+   * unconditionally, unlike reverseLineFinancialItem(), since a removed line's
+   * existing amount always needs reversing regardless of currency/contact.
+   *
+   * @param array $line
+   * @param int $trxnID
+   *
+   * @throws CRM_Core_Exception
+   */
+  private function reverseLineItem(array $line, int $trxnID): void {
+    CRM_Price_BAO_LineItem::create($line);
+    $this->reverseLineItemFinancialItem($line, FALSE, $trxnID);
+    if (!empty($line['tax_amount'])) {
+      $this->reverseLineItemFinancialItem($line, TRUE, $trxnID);
+    }
+  }
+
+  /**
+   * Reverse a line item's financial item for a given tax-or-not slot, if a
+   * previous one exists with a non-zero amount - see reverseLineItem().
+   *
+   * @param array $line
+   * @param bool $isTax
+   * @param int $trxnID
+   */
+  private function reverseLineItemFinancialItem(array $line, bool $isTax, int $trxnID): void {
+    $previousItem = $this->getExistingFinancialItemForLine($line['id'], $isTax);
+    if (empty($previousItem) || !$previousItem['amount']) {
+      return;
+    }
+    $itemParams = [
+      'transaction_date' => CRM_Utils_Date::isoToMysql($this->getUpdatedContribution()->receive_date),
+      'contact_id' => $this->getUpdatedContribution()->contact_id,
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => $line['id'],
+      'amount' => -$previousItem['amount'],
+      'financial_account_id' => $previousItem['financial_account_id'],
+      'currency' => $previousItem['currency'],
+      'description' => $previousItem['description'],
+      'status_id' => $previousItem['status_id'],
+    ];
+    $this->createFinancialItem($itemParams, $trxnID);
+  }
+
+  /**
    * @param array $newLineItem
    * @param bool $isTax
    * @param int $trxnID
@@ -1245,21 +1306,15 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
-   * Function to retrieve financial items that need to be recorded as result of changed fee.
+   * Record the surplus/deficit financial item for a changed 'Text' price field -
+   * its price_field_value_id (and so financial account) never changes, so there's
+   * an amount adjustment rather than anything to reverse.
    *
-   * Relocated as-is from CRM_Price_BAO_LineItem::changeFeeSelections()'s support code.
-   * This does the same job as isReversalRequired()/reverseLineFinancialItem() above -
-   * deciding whether a line item's previous financial item needs reversing - but as a
-   * bulk operation over a set of line items rather than per-line-item. Consolidating
-   * the two is a follow-up, not part of this move.
-   *
-   * Reads the removed/changed line items from getRemovedLineItems()/getChangedLineItems().
+   * Reads the changed line items from getChangedLineItems().
    *
    * @return array
-   *   List of formatted reverse Financial Items to be recorded
    */
   private function getAdjustedFinancialItemsToRecord(): array {
-    $priceFieldValueIDsToCancel = array_keys($this->getRemovedLineItems());
     $lineItemsToUpdate = $this->getChangedLineItems();
     $financialItemsArray = [];
     $financialItemResult = $this->getNonCancelledFinancialItems();
@@ -1271,21 +1326,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
       unset($updateFinancialItemInfoValues['id']);
       unset($updateFinancialItemInfoValues['created_date']);
 
-      // Reverse line items omitted from the submitted lines.
-      if (in_array($updateFinancialItemInfoValues['price_field_value_id'], $priceFieldValueIDsToCancel)
-        && $updateFinancialItemInfoValues['amount'] != 0
-      ) {
-
-        // INSERT negative financial_items
-        $updateFinancialItemInfoValues['amount'] = -$updateFinancialItemInfoValues['amount'];
-        // Append rather than key on entity_id: one line item can carry several
-        // financial items (revenue plus sales tax) and each needs its own reversal
-        // on its own financial account. The loop that consumes this array reads
-        // only the values, so the key carries no meaning.
-        $financialItemsArray[] = $updateFinancialItemInfoValues;
-      }
       // INSERT a financial item to record surplus/lesser amount when a text price fee is changed
-      elseif (
+      if (
         !empty($lineItemsToUpdate)
         && isset($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']])
         && $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['html_type'] == 'Text'
@@ -1381,9 +1423,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     // get financial information that need to be recorded on basis on submitted price field value IDs
     $financialItemsArray = [];
-    if (!empty($this->getRemovedLineItems()) || !empty($this->getChangedLineItems())) {
-      // @todo - this IF is to get this through PR merge but I suspect that it should not
-      // be necessary & is masking something else.
+    if (!empty($this->getChangedLineItems())) {
       $financialItemsArray = $this->getAdjustedFinancialItemsToRecord();
     }
 
@@ -1398,7 +1438,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
     }
 
-    foreach (array_merge($this->getResurrectedLineItems(), $this->getRemovedLineItems(), $this->getChangedLineItems()) as $lineItemToAlter) {
+    foreach (array_merge($this->getResurrectedLineItems(), $this->getChangedLineItems()) as $lineItemToAlter) {
       // Must use BAO rather than api because a bad line it in the api which we want to avoid.
       CRM_Price_BAO_LineItem::create($lineItemToAlter);
     }
@@ -1415,6 +1455,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $updateAmountLevel = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
     }
     $trxnID = $this->recordAdjustedAmount($updatedAmount, $taxAmount, $updateAmountLevel);
+
+    foreach ($this->getRemovedLineItems() as $line) {
+      $this->reverseLineItem($line, $trxnID);
+    }
 
     if (!empty($financialItemsArray)) {
       foreach ($financialItemsArray as $updateFinancialItemInfoValues) {
