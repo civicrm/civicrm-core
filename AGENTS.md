@@ -15,7 +15,7 @@ Use callAPIv3Success when the point of the test is testing the v3 api.
 
 When testing forms, use `Civi\Test\FormTrait::getTestForm($formName, $submittedValues, $urlParameters)` instead of hand-instantiating or mocking a QuickForm form.
 
-Cleanup belongs in `tearDown()`, not in the test method. Test fixtures should use unique strings to protect against poor cleanup.
+Cleanup belongs in `tearDown()`, not in the test method.
 
 Try to use methods and variable names to carry the meaning. Add comments if they genuinely add something. Don't use comments to explain the difference between WIP approaches that were tried along the way — comment the code as it stands.
 
