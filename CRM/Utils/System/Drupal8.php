@@ -300,25 +300,43 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $config = CRM_Core_Config::singleton();
     $base = $absolute ? $config->userFrameworkBaseURL : 'base:/';
 
-    $url = $this->parseURL("{$path}?{$query}");
+    $parts = $this->parseURL("{$path}?{$query}");
+
+    $options = [
+      'query' => $parts['query'],
+      'fragment' => $fragment,
+      'absolute' => $absolute,
+      // Relative URLs get the language prefix (e.g. /fr/civicrm/...) from Drupal's outbound path
+      // processing. Absolute URLs are external URIs to Drupal, so it doesn't apply to them; they
+      // get the prefix from userFrameworkBaseURL instead.
+      'path_processing' => TRUE,
+      // Only the language prefix is wanted. CiviCRM URLs are not aliased, and an alias lookup
+      // can suspend the current Fiber in the middle of rendering.
+      'alias' => TRUE,
+    ];
+    // Use the same language as userFrameworkBaseURL so relative and absolute URLs agree.
+    $language = \Drupal::languageManager()->getConfigOverrideLanguage();
+    if ($language) {
+      $options['language'] = $language;
+    }
 
     // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
-      $url = \Drupal\Core\Url::fromUri("{$base}{$url['path']}", [
-        'query' => $url['query'],
-        'fragment' => $fragment,
-        'absolute' => $absolute,
-        // Required for i18n suffixes, ex: example.org/fr/civicrm/example
-        'path_processing' => TRUE,
-      ])->toString();
-      // Decode %% for better readability, e.g., %%cid%%.
-      $url = str_replace('%25%25', '%%', $url);
+      $url = \Drupal\Core\Url::fromUri("{$base}{$parts['path']}", $options)->toString();
     }
     catch (Exception $e) {
       \Drupal::logger('civicrm')->error($e->getMessage());
+      $url = ($absolute ? $base : ($config->useFrameworkRelativeBase ?: '/')) . $parts['path'];
+      if ($parts['query']) {
+        $url .= '?' . http_build_query($parts['query']);
+      }
+      if ($fragment) {
+        $url .= '#' . $fragment;
+      }
     }
 
-    return $url;
+    // Decode %% for better readability, e.g., %%cid%%.
+    return str_replace('%25%25', '%%', $url);
   }
 
   /**
@@ -705,7 +723,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Function to return current language of Drupal8
    *
-   * @return string
+   * @return string|null
    */
   public function getCurrentLanguage() {
     // Drupal might not be bootstrapped if being called by the REST API.
@@ -713,7 +731,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       return NULL;
     }
 
-    return \Drupal::languageManager()->getConfigOverrideLanguage()->getId();
+    return \Drupal::languageManager()->getConfigOverrideLanguage()?->getId();
   }
 
   /**
@@ -786,17 +804,52 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $languages = $languageManager->getLanguages();
 
     if (isset($languages[$langcode])) {
-      $languageManager->setConfigOverrideLanguage($languages[$langcode]);
-
-      // Config must be re-initialized to reset the base URL
-      // otherwise links will have the wrong language prefix/domain.
-      $domain = \CRM_Core_BAO_Domain::getDomain();
-      \CRM_Core_BAO_ConfigSetting::applyLocale(\Civi::settings($domain->id), $domain->locales);
-
+      if ($languageManager->getConfigOverrideLanguage()?->getId() !== $langcode) {
+        $languageManager->setConfigOverrideLanguage($languages[$langcode]);
+        // The cached base URLs carry the previous language's prefix.
+        CRM_Utils_System::flushBaseURLCache();
+      }
       return TRUE;
     }
 
     return FALSE;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function localizeUrl(string $url): string {
+    if (!class_exists('Drupal') || !\Drupal::hasContainer() || !\Drupal::languageManager()->isMultilingual()) {
+      return $url;
+    }
+    $config = \Drupal::config('language.negotiation')->get('url');
+    $enabledMethods = \Drupal::config('language.types')->get('negotiation.language_interface.enabled') ?: [];
+    if (!isset($enabledMethods[\Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::METHOD_ID])
+      || ($config['source'] ?? NULL) !== \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl::CONFIG_PATH_PREFIX
+    ) {
+      return $url;
+    }
+
+    // Same language as url().
+    $language = \Drupal::languageManager()->getConfigOverrideLanguage()?->getId();
+    $prefixes = array_intersect_key($config['prefixes'] ?? [], \Drupal::languageManager()->getLanguages());
+    if ($language === NULL || !isset($prefixes[$language])) {
+      return $url;
+    }
+
+    $basePath = '/';
+    $hosts = [];
+    if (defined('CIVICRM_UF_BASEURL')) {
+      $ufBase = parse_url(CIVICRM_UF_BASEURL);
+      $basePath = rtrim($ufBase['path'] ?? '', '/') . '/';
+      $hosts[] = ($ufBase['host'] ?? '') . (isset($ufBase['port']) ? ':' . $ufBase['port'] : '');
+    }
+    $request = \Drupal::requestStack()->getCurrentRequest();
+    if ($request) {
+      $basePath = $request->getBasePath() . '/';
+      $hosts[] = $request->getHttpHost();
+    }
+    return CRM_Utils_Url::replaceLanguagePrefix($url, $basePath, $prefixes, $prefixes[$language], $hosts);
   }
 
   /**

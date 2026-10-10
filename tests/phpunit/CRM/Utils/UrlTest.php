@@ -203,4 +203,32 @@ class CRM_Utils_UrlTest extends CiviUnitTestCase {
     $this->assertEquals('http://local.example.com:8080', CRM_Utils_Url::toOrigin('http://local.example.com:8080/foo/bar/whiz'));
   }
 
+  public static function getReplaceLanguagePrefixExamples(): array {
+    // [$url, $basePath, $newPrefix, $expected]
+    return [
+      'swap prefix' => ['/fr/civicrm/contact/view?reset=1&amp;cid=2', '/', 'de', '/de/civicrm/contact/view?reset=1&amp;cid=2'],
+      'add prefix' => ['/civicrm/contact/view?reset=1#tab', '/', 'de', '/de/civicrm/contact/view?reset=1#tab'],
+      'remove prefix' => ['/fr/civicrm/contact/view?reset=1', '/', '', '/civicrm/contact/view?reset=1'],
+      'bare civicrm path' => ['/fr/civicrm', '/', 'de', '/de/civicrm'],
+      'absolute, local host' => ['https://example.org/fr/civicrm/a?x=1', '/', 'de', 'https://example.org/de/civicrm/a?x=1'],
+      'absolute, local host with port' => ['http://example.org:8080/civicrm/a', '/', 'fr', 'http://example.org:8080/fr/civicrm/a'],
+      'subdirectory' => ['/sub/fr/civicrm/a', '/sub/', 'de', '/sub/de/civicrm/a'],
+      'other host' => ['https://other.org/fr/civicrm/a', '/', 'de', 'https://other.org/fr/civicrm/a'],
+      'outside base path' => ['/other/fr/civicrm/a', '/sub/', 'de', '/other/fr/civicrm/a'],
+      'not a civicrm path' => ['/fr/a-propos', '/', 'de', '/fr/a-propos'],
+      'path starting with civicrm' => ['/fr/civicrmish', '/', 'de', '/fr/civicrmish'],
+      'token' => ['/fr/civicrm/contact/view?cid=%%cid%%', '/', 'de', '/fr/civicrm/contact/view?cid=%%cid%%'],
+      'not root-relative' => ['civicrm/a', '/', 'de', 'civicrm/a'],
+    ];
+  }
+
+  /**
+   * @dataProvider getReplaceLanguagePrefixExamples
+   */
+  public function testReplaceLanguagePrefix(string $url, string $basePath, string $newPrefix, string $expected): void {
+    $prefixes = ['en' => '', 'fr' => 'fr', 'de' => 'de'];
+    $localHosts = ['example.org', 'example.org:8080'];
+    $this->assertEquals($expected, CRM_Utils_Url::replaceLanguagePrefix($url, $basePath, $prefixes, $newPrefix, $localHosts));
+  }
+
 }

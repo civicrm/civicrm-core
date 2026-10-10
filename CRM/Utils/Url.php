@@ -78,6 +78,58 @@ class CRM_Utils_Url {
   }
 
   /**
+   * Change the CMS language prefix of a CiviCRM URL, e.g. /fr/civicrm/a?b=1 to /de/civicrm/a?b=1.
+   *
+   * @param string $url
+   *   A root-relative or absolute URL.
+   * @param string $basePath
+   *   The CMS base path, with leading and trailing slash, e.g. '/' or '/drupal/'.
+   * @param string[] $prefixes
+   *   All language prefixes used by the CMS.
+   * @param string $newPrefix
+   *   The prefix the URL should have, or '' for none.
+   * @param string[] $localHosts
+   *   Hosts (with port, if any) whose absolute URLs may be changed.
+   *
+   * @return string
+   *   The changed URL. URLs that aren't CiviCRM URLs on this site, or that contain %% tokens,
+   *   are returned unchanged.
+   */
+  public static function replaceLanguagePrefix(string $url, string $basePath, array $prefixes, string $newPrefix, array $localHosts): string {
+    if (str_contains($url, '%%')) {
+      return $url;
+    }
+    if (preg_match(';^((?:https?:)?//([^/?#]*))(.*)$;', $url, $matches)) {
+      if (!in_array($matches[2], $localHosts, TRUE)) {
+        return $url;
+      }
+      [, $origin, , $rest] = $matches;
+    }
+    elseif (str_starts_with($url, '/')) {
+      [$origin, $rest] = ['', $url];
+    }
+    else {
+      return $url;
+    }
+    if (!str_starts_with($rest, $basePath)) {
+      return $url;
+    }
+
+    $path = substr($rest, strlen($basePath));
+    foreach (array_filter($prefixes, 'strlen') as $prefix) {
+      if (str_starts_with($path, "$prefix/")) {
+        $path = substr($path, strlen($prefix) + 1);
+        break;
+      }
+    }
+    // Only CiviCRM paths: other paths may be aliases, which differ by language.
+    if (!preg_match(';^civicrm([/?#]|$);', $path)) {
+      return $url;
+    }
+    return $origin . $basePath . ($newPrefix === '' ? '' : "$newPrefix/") . $path;
+  }
+
+  /**
    * @param string $url
    *   Ex: 'http://local.example.com:8080/foo/bar/whiz'
    * @return string

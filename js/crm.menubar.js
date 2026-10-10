@@ -11,15 +11,17 @@
     toggleButton: (CRM.config.userFramework != 'Standalone'),
     attachTo: (CRM.menubar && CRM.menubar.position === 'above-crm-container') ? '#crm-container' : 'body',
     initialize: function() {
+      // The URL identifies this version of the menu, including any CMS language prefix in its links.
+      var url = CRM.url('civicrm/ajax/navmenu', {code: CRM.menubar.cacheCode, locale: CRM.config.locale, cid: CRM.config.cid});
       var cache = CRM.cache.get('menubar');
-      if (cache && cache.code === CRM.menubar.cacheCode && cache.locale === CRM.config.locale && cache.cid === CRM.config.cid && localStorage.civiMenubar) {
+      if (cache && cache.url === url && localStorage.civiMenubar) {
         CRM.menubar.data = cache.data;
         insert(localStorage.civiMenubar);
       } else {
-        $.getJSON(CRM.url('civicrm/ajax/navmenu', {code: CRM.menubar.cacheCode, locale: CRM.config.locale, cid: CRM.config.cid}))
-          .done(function(data) {
+        $.getJSON(url)
+          .done((data) => {
             var markup = treeTpl(data);
-            CRM.cache.set('menubar', {code: CRM.menubar.cacheCode, locale: CRM.config.locale, cid: CRM.config.cid, data: data});
+            CRM.cache.set('menubar', {url, data});
             CRM.menubar.data = data;
             localStorage.setItem('civiMenubar', markup);
             insert(markup);

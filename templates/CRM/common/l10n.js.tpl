@@ -31,7 +31,7 @@
   CRM.config.entityRef = $.extend({ldelim}{rdelim}, {$entityRef|@json_encode nofilter}, CRM.config.entityRef || {ldelim}{rdelim});
 
   // Initialize CRM.url and CRM.formatMoney
-  CRM.url({ldelim}back: '{crmURL p="civicrm/crmajax-placeholder-url-path" q="civicrm-placeholder-url-query=1" h=0 fb=1}', front: '{crmURL p="civicrm/crmajax-placeholder-url-path" q="civicrm-placeholder-url-query=1" h=0 fe=1}'{rdelim});
+  CRM.url({ldelim}back: {$urlBack|@json_encode nofilter}, front: {$urlFront|@json_encode nofilter}{rdelim});
   CRM.formatMoney('init', false, {$moneyFormat|@json_encode nofilter});
 
   // Localize select2
