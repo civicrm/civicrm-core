@@ -137,7 +137,9 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
       if ($dao->is_reserved) {
         unset($links[CRM_Core_Action::DELETE]);
       }
-
+      foreach ($links as $key => $link) {
+        $links[$key]['title'] = $links[$key]['title'] . ' - ' . $dao->contact_type . ' - ' . $dao->used . ' - ' . $dao->title;
+      }
       $ruleGroups[$dao->contact_type][$dao->id]['action'] = CRM_Core_Action::formLink(
         $links,
         $action,
