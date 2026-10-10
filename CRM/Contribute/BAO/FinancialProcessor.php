@@ -109,7 +109,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   private function isPendingTransaction(): bool {
-    return in_array($this->getUpdatedContributionStatus(), ['Pending', 'In Progress']);
+    return in_array($this->getUpdatedContributionStatus(), ['Pending', 'Pending (Processing)', 'In Progress'], TRUE);
   }
 
   private function isCompletedTransaction(): bool {
@@ -117,11 +117,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   private function isAccountsReceivableTransaction(): bool {
-    return $this->getUpdatedContributionStatus() === 'Pending' || $this->getUpdatedContributionStatus() === 'In Progress';
+    return in_array($this->getUpdatedContributionStatus(), ['Pending', 'Pending (Processing)', 'In Progress'], TRUE);
   }
 
   private function isOriginalStatusPending(): bool {
-    return in_array($this->getOriginalContributionStatus(), ['Pending', 'In Progress'], TRUE);
+    return in_array($this->getOriginalContributionStatus(), ['Pending', 'Pending (Processing)', 'In Progress'], TRUE);
   }
 
   /**
@@ -753,8 +753,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['trxnParams']['total_amount'] = -$params['total_amount'];
     }
-    elseif (($previousContributionStatus === 'Pending'
-        && $params['prevContribution']->is_pay_later) || $previousContributionStatus === 'In Progress'
+    elseif ((in_array($previousContributionStatus, ['Pending', 'Pending (Processing)'], TRUE)
+        && $params['prevContribution']->is_pay_later)
+      || $previousContributionStatus === 'In Progress'
     ) {
       $arAccountId = $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id'));
 
@@ -1102,7 +1103,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     if ($contributionStatus === 'Completed' || $contributionStatus === 'Pending refund') {
       $itemStatus = $financialItemStatus['Paid'];
     }
-    elseif ($contributionStatus === 'Pending'
+    elseif (in_array($contributionStatus, ['Pending', 'Pending (Processing)'], TRUE)
       // In progress is no longer present on new installs unless extensions add it.
       || $contributionStatus === 'In Progress'
     ) {
