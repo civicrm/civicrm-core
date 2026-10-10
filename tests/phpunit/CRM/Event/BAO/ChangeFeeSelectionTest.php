@@ -749,7 +749,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    *
    * $submittedLineItems built by ParticipantFeeSelection::postProcess() only
    * ever covers the participant being edited, and
-   * CRM_Contribute_BAO_FinancialProcessor::getLineItemsToAlter() treats any
+   * CRM_Contribute_BAO_FinancialProcessor::classifyLineItemChanges() treats any
    * of the contribution's other price_field_value_ids as having been
    * deselected. addLineItemsNotYetRepresented() is what keeps the other
    * participant's line item intact.

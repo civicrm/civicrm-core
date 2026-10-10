@@ -586,10 +586,6 @@ WHERE li.contribution_id = %1";
     array $submittedLineItems,
     int $contributionId
   ) {
-    $taxAmount = 0.0;
-    foreach ($submittedLineItems as $submittedLineItem) {
-      $taxAmount += $submittedLineItem['tax_amount'] ?? 0.0;
-    }
     $previousLineItems = (array) LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contributionId)
       ->execute()->indexBy('id');
@@ -598,7 +594,7 @@ WHERE li.contribution_id = %1";
     $updatedContribution->id = $contributionId;
     $updatedContribution->find(TRUE);
     $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor(NULL, $updatedContribution, $previousLineItems, $submittedLineItems);
-    $financialProcessor->changeFeeSelections($submittedLineItems, $contributionId, $taxAmount);
+    $financialProcessor->changeFeeSelections();
   }
 
   /**
