@@ -75,11 +75,11 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $count = Contribution::get(FALSE)
       ->setLimit(1)
       ->addSelect('id')
-      ->addWhere('contribution_status_id:name', 'NOT IN', ['Completed', 'Pending', 'Refunded', 'Partially paid'])
+      ->addWhere('contribution_status_id:name', 'NOT IN', ['Completed', 'Pending', 'Pending (Processing)', 'Refunded', 'Partially paid'])
       ->addWhere('id', 'IN', $this->getIDs())
       ->execute()->count();
     if ($count != 0) {
-      CRM_Core_Error::statusBounce(ts('Please select only contributions with Completed, Pending, Refunded, or Partially Paid status.'));
+      CRM_Core_Error::statusBounce(ts('Please select only contributions with Completed, Pending, Pending (Processing), Refunded, or Partially Paid status.'));
     }
 
     // we have all the contribution ids, so now we get the contact ids

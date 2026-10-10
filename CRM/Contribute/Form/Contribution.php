@@ -2105,7 +2105,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $previousStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->_values['contribution_status_id'] ?? NULL);
       // process associated membership / participant, CRM-4395
       if ($this->getContributionID() && $this->getAction() & CRM_Core_Action::UPDATE
-        && in_array($previousStatus, ['Pending', 'Partially paid'], TRUE)
+        && in_array($previousStatus, ['Pending', 'Pending (Processing)', 'Partially paid'], TRUE)
         && 'Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'))) {
         // @todo make users use add payment form.
         civicrm_api3('Payment', 'create', [
