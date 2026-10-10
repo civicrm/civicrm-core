@@ -357,7 +357,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
         $params = ['id' => $this->_activityId];
         $activityDelete = CRM_Activity_BAO_Activity::deleteActivity($params, TRUE);
         if ($activityDelete) {
-          $statusMsg = ts('The selected activity has been moved to the Trash. You can view and / or restore deleted activities by checking "Deleted Activities" from the Case Activities search filter (under Manage Case).<br />');
+          $statusMsg = ts('The selected activity has been moved to the Trash. You can view and / or restore deleted activities by checking "Deleted Activities" from the Case Activities search filter (under Manage Case).');
         }
       }
       else {
@@ -373,7 +373,7 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
       $params = ['id' => $this->_activityId];
       $activityRestore = CRM_Activity_BAO_Activity::restoreActivity($params);
       if ($activityRestore) {
-        $statusMsg = ts('The selected activity has been restored.<br />');
+        $statusMsg = ts('The selected activity has been restored.');
       }
       CRM_Core_Session::setStatus('', $statusMsg, 'info');
       return;
