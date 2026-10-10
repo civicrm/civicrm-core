@@ -6,6 +6,8 @@
 
     /* jshint ignore:start */
     static observedAttributes = ['filters'];
+    // Whether the row count is reported to a contact summary tab or `onTotalCount`
+    static reportsRowCount = true;
     /* jshint ignore:end */
 
     constructor() {
@@ -17,6 +19,7 @@
       this.onChangeFilters = [];
       this.onPreRun = [];
       this.onPostRun = [];
+      this.onTotalCount = [];
       this._runCount = 0;
       // Bound once: the listener runs on afFieldset, so a bare
       // _onChangeFilters loses `this`, and .bind() breaks removal.
@@ -91,10 +94,6 @@
       return this.getJsonAttribute('filters');
     }
 
-    get totalCount() {
-      return this.getAttribute('total-count');
-    }
-
     getResultsPronto() {
       if (this.justRun) {
         // if just run, dont run again
@@ -122,34 +121,30 @@
         this.placeholders.push({});
       }
 
-      // Update totalCount variable if used.
-      // Integrations can pass in `total-count="somevar" to keep track of the number of results returned
+      // Report the number of results if used.
+      // Integrations can push a callback to `onTotalCount` to keep track of the number of results returned
       // FIXME: Additional hack to directly update tabHeader for contact summary tab. It would be better to
-      // decouple the contactTab code into a separate directive that checks totalCount.
-      let contactTab = this.closest('.crm-contact-page .ui-tabs-panel');
-      // Only the first display in a tab gets to control the count
-      if (contactTab && (this === document.querySelector(contactTab.getAttribute('id') + ' [search][display]'))) {
-        contactTab = null;
-      }
-      let hasCounter = contactTab || this.hasOwnProperty('totalCount');
-
-  //  if (hasCounter) {
-  //    $scope.$watch('$ctrl.rowCount', function(rowCount) {
-  //      // Update totalCount only if no user filters are set
-  //      if (typeof rowCount === 'number' && angular.equals({}, this.getAfformFilters())) {
-  //        setTotalCount(rowCount);
-  //      }
-  //    });
-  //  }
+      // decouple the contactTab code into a separate directive that uses onTotalCount.
+      const tabPanel = this.closest('.crm-contact-page .ui-tabs-panel');
+      const firstDisplay = tabPanel ? tabPanel.querySelector('[search][display]') : null;
+      // Only the first display in a tab gets to control the count; its Angular wrapper element counts as this display
+      const contactTab = firstDisplay && (firstDisplay === this || firstDisplay === this.parentElement) ? tabPanel.id : null;
+      // Callbacks are added after the element connects, so this is checked when a count is due
+      const hasCounter = () => this.constructor.reportsRowCount && (contactTab || this.onTotalCount.length);
 
       const setTotalCount = (rowCount) => {
-        if (this.hasOwnProperty('totalCount')) {
-          this.totalCount = rowCount;
-        }
+        this.onTotalCount.forEach((callback) => callback(rowCount));
         if (contactTab) {
           CRM.tabHeader.updateCount(contactTab.replace('contact-', '#tab_'), rowCount);
         }
       };
+
+      this.onPostRun.push((apiResults, status) => {
+        // Update totalCount only if no user filters are set
+        if (status === 'success' && hasCounter() && typeof this.rowCount === 'number' && angular.equals({}, this.getAfformFilters())) {
+          setTotalCount(this.rowCount);
+        }
+      });
 
 
       // Popup forms in this display or surrounding Afform trigger a refresh
@@ -218,7 +213,7 @@
       // - or afform filters are present which would interfere with an accurate total
       // (wait a brief timeout to allow more important things to happen first)
       setTimeout(() => {
-        if (hasCounter && (!(this.loading || this.results) || !Object.keys(this.getAfformFilters()).length)) {
+        if (hasCounter() && (!(this.loading || this.results) || !angular.equals({}, this.getAfformFilters()))) {
           const params = this.getApiParams('row_count');
           // Exclude afform filters
           params.filters = this.filters;

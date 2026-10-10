@@ -8,8 +8,7 @@
       display: '<',
       apiParams: '<',
       settings: '<',
-      filters: '<',
-      totalCount: '=?'
+      filters: '<'
     },
     require: {
       afFieldset: '?^^afFieldset'
