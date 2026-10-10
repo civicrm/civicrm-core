@@ -127,7 +127,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * @return mixed|string
    */
   public function getMembershipSource(): mixed {
-    $membershipSource = $this->getSubmittedValue('membership_source') ?: (ts('Online Contribution:') . $this->getContributionPageValue('frontend_title'));
+    $membershipSource = $this->getSubmittedValue('membership_source') ?: ts('Online Contribution: %1', [1 => $this->getContributionPageValue('frontend_title')]);
     return $membershipSource;
   }
 

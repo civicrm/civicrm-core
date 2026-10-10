@@ -1778,7 +1778,8 @@ WHERE      $condition
     $idName = 'participant_id';
     $componentTable = 'civicrm_participant';
     $paymentTable = 'civicrm_participant_payment';
-    $source = ts('Online Event Registration');
+    // Sources are built as ts('Online Event Registration: %1'), so match the translated text around the title.
+    [$prefix, $suffix] = explode('%1', ts('Online Event Registration: %1', [1 => '%1']), 2) + [1 => ''];
     $pendingStatusId = array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'));
 
     $query = "
@@ -1798,7 +1799,8 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if ($dao->contribution_id &&
         $dao->is_pay_later &&
         $dao->contribution_status_id == $pendingStatusId &&
-        str_contains($dao->source, $source)
+        str_starts_with($dao->source, $prefix) &&
+        str_ends_with($dao->source, $suffix)
       ) {
         $contributionId = $dao->contribution_id;
       }
