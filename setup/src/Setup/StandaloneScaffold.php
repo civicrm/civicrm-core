@@ -66,6 +66,7 @@ class StandaloneScaffold {
       'civicrm.standalone.php.txt' => 'civicrm.standalone.php',
       'index.php.txt' => 'index.php',
       'htaccess.txt' => '.htaccess',
+      'htaccess-private.txt' => 'private/.htaccess',
     ];
     foreach ($files as $srcFile => $destFile) {
       switch ($mode) {
