@@ -2105,7 +2105,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $previousStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->_values['contribution_status_id'] ?? NULL);
       // process associated membership / participant, CRM-4395
       if ($this->getContributionID() && $this->getAction() & CRM_Core_Action::UPDATE
-        && in_array($previousStatus, ['Pending', 'Partially paid'], TRUE)
+        && in_array($previousStatus, ['Pending', 'Pending (Processing)', 'Partially paid'], TRUE)
         && 'Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'))) {
         // @todo make users use add payment form.
         civicrm_api3('Payment', 'create', [
@@ -2390,6 +2390,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         // [CRM-17498] Removing unsupported status change options.
         $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'Pending',
+          'Pending (Processing)',
           'Failed',
         ]);
         break;
@@ -2399,6 +2400,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       case 'Refunded':
         $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'Pending',
+          'Pending (Processing)',
           'Failed',
         ]);
         break;
@@ -2411,9 +2413,19 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         ]);
         break;
 
+      case 'Pending (Processing)':
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
+          'Pending',
+          'In Progress',
+          'Refunded',
+          'Chargeback',
+        ]);
+        break;
+
       case 'Failed':
         $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'Pending',
+          'Pending (Processing)',
           'Refunded',
           'Chargeback',
           'Completed',

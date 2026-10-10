@@ -4,7 +4,7 @@ return CRM_Core_CodeGen_OptionGroup::create('contribution_status', 'a/0011')
     'title' => ts('Contribution Status'),
     'is_locked' => 1,
   ])
-  ->addValueTable(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value', 'description'], [
     [ts('Completed'), 'Completed', 1],
     [ts('Pending'), 'Pending', 2],
     [ts('Cancelled'), 'Cancelled', 3],
@@ -15,6 +15,12 @@ return CRM_Core_CodeGen_OptionGroup::create('contribution_status', 'a/0011')
     [ts('Pending refund'), 'Pending refund', 9],
     [ts('Chargeback'), 'Chargeback', 10],
     [ts('Template'), 'Template', 11, 'description' => ts('Status for contribution records which represent a template for a recurring contribution rather than an actual contribution. This status is transitional, to ensure that said contributions don\\\'t appear in reports. The is_template field is the preferred way to find and filter these contributions.')],
+    [
+      ts('Pending (Processing)'),
+      'Pending (Processing)',
+      12,
+      ts('The payer has completed their action and the payment processor is still processing the payment.'),
+    ],
   ])
   ->addDefaults([
     'is_reserved' => 1,

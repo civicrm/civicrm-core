@@ -174,7 +174,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     $previousContributionStatus = ($contributionID && !empty($params['prevContribution'])) ? CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['prevContribution']->contribution_status_id) : NULL;
 
     if ($contributionID && !empty($params['revenue_recognition_date'])
-      && !($previousContributionStatus === 'Pending')
+      && !in_array($previousContributionStatus, ['Pending', 'Pending (Processing)'], TRUE)
       && !self::allowUpdateRevenueRecognitionDate($contributionID)
     ) {
       unset($params['revenue_recognition_date']);
@@ -380,7 +380,11 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     if (empty($params['contribution_recur_id']) && empty($params['prevContribution']->contribution_recur_id)) {
       return FALSE;
     }
-    if ($params['prevContribution']->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
+    $pendingStatusIDs = [
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending (Processing)'),
+    ];
+    if (in_array($params['prevContribution']->contribution_status_id, $pendingStatusIDs)) {
       return TRUE;
     }
     return FALSE;
@@ -2443,8 +2447,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $checkStatus = [
       'Cancelled' => ['Completed', 'Refunded'],
       'Completed' => ['Cancelled', 'Refunded', 'Chargeback', 'Partially paid', 'Pending refund'],
-      'Pending' => ['Cancelled', 'Completed', 'Failed', 'Partially paid'],
-      'In Progress' => ['Cancelled', 'Completed', 'Failed'],
+      'Pending' => ['Cancelled', 'Completed', 'Failed', 'Partially paid', 'Pending (Processing)'],
+      'Pending (Processing)' => ['Cancelled', 'Completed', 'Failed'],
+      'In Progress' => ['Cancelled', 'Completed', 'Failed', 'Pending (Processing)'],
       'Refunded' => ['Cancelled', 'Completed'],
       'Partially paid' => ['Completed', 'Refunded'],
       'Pending refund' => ['Completed', 'Refunded'],
@@ -3157,7 +3162,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'weight' => 0,
       ];
     }
-    if ($contributionStatus !== 'Pending' && CRM_Core_Permission::check('refund contributions')) {
+    if (!in_array($contributionStatus, ['Pending', 'Pending (Processing)'], TRUE)
+      && CRM_Core_Permission::check('refund contributions')
+    ) {
       $actionLinks[] = [
         'url' => 'civicrm/payment',
         'title' => ts('Record Refund'),
