@@ -11,8 +11,6 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'title' => E::ts('Enable Shutdown Dispatcher'),
-    'description' => E::ts('
-    By default postbox will use a post shutdown function to dispatch messages from the message queue. You can disable if you want
-      to dispatch messages differently - e.g. using coworker'),
+    'description' => E::ts('By default postbox will use a post shutdown function to dispatch messages from the message queue. You can disable if you want to dispatch messages differently - e.g. using coworker'),
   ],
 ];

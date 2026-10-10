@@ -62,29 +62,29 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
   private static function checkWorkflow(&$params) {
     // System Workflow Templates have a specific wodkflow_id in them but normal user end message templates don't
     // If we have an id check to see if we are update, and need to check if original is a system workflow or not.
-    $systemWorkflowPermissionDeniedMessage = 'Editing or creating system workflow messages requires edit system workflow message templates permission or the edit message templates permission';
-    $userWorkflowPermissionDeniedMessage = 'Editing or creating user driven workflow messages requires edit user-driven message templates or the edit message templates permission';
+    $systemWorkflowPermissionDeniedMessage = ts('Editing or creating system workflow messages requires edit system workflow message templates permission or the edit message templates permission');
+    $userWorkflowPermissionDeniedMessage = ts('Editing or creating user driven workflow messages requires edit user-driven message templates or the edit message templates permission');
     if (!empty($params['check_permissions'])) {
       if (!CRM_Core_Permission::check('edit message templates')) {
         if (!empty($params['id'])) {
           $details = civicrm_api3('MessageTemplate', 'getSingle', ['id' => $params['id']]);
           if (!empty($details['workflow_id']) || !empty($details['workflow_name'])) {
             if (!CRM_Core_Permission::check('edit system workflow message templates')) {
-              throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $systemWorkflowPermissionDeniedMessage]));
+              throw new \Civi\API\Exception\UnauthorizedException($systemWorkflowPermissionDeniedMessage);
             }
           }
           elseif (!CRM_Core_Permission::check('edit user-driven message templates')) {
-            throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $userWorkflowPermissionDeniedMessage]));
+            throw new \Civi\API\Exception\UnauthorizedException($userWorkflowPermissionDeniedMessage);
           }
         }
         else {
           if (!empty($params['workflow_id']) || !empty($params['workflow_name'])) {
             if (!CRM_Core_Permission::check('edit system workflow message templates')) {
-              throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $systemWorkflowPermissionDeniedMessage]));
+              throw new \Civi\API\Exception\UnauthorizedException($systemWorkflowPermissionDeniedMessage);
             }
           }
           elseif (!CRM_Core_Permission::check('edit user-driven message templates')) {
-            throw new \Civi\API\Exception\UnauthorizedException(ts('%1', [1 => $userWorkflowPermissionDeniedMessage]));
+            throw new \Civi\API\Exception\UnauthorizedException($userWorkflowPermissionDeniedMessage);
           }
         }
       }

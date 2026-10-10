@@ -162,7 +162,7 @@ class CRM_Utils_Chart {
           list($year, $month) = explode('-', $val);
           $dateKeys[] = $year;
         }
-        $legend = ts("%1", [1 => $label]);
+        $legend = $label;
         if (!empty($intervalLabels[$lcInterval])) {
           $legend = $intervalLabels[$lcInterval];
         }
