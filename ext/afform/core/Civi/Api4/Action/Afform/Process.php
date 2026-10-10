@@ -50,7 +50,24 @@ class Process extends AbstractProcessor {
       ->addValue('status_id:name', 'Processed')
       ->execute();
 
-    return $this->_entityIds;
+    // Return ids plus token for uploading files
+    foreach ($this->_entityIds as $key => $value) {
+      $this->setResponseItem($key, $value);
+    }
+
+    if (isset($this->_response['redirect']) || isset($this->_response['message'])) {
+      // redirect / message is already set, ignore defaults
+    }
+    elseif ($this->_afform['verification_confirmation_type'] === 'show_confirmation_message') {
+      $message = $this->replaceTokens($this->_afform['verification_confirmation_message']);
+      $this->setResponseItem('message', $message);
+    }
+    elseif ($this->_afform['verification_redirect']) {
+      $redirect = $this->replaceTokens($this->_afform['verification_redirect']);
+      $this->setResponseItem('redirect', $redirect);
+    }
+
+    return [$this->_response];
   }
 
 }
