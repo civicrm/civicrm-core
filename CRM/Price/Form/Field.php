@@ -573,7 +573,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
         }
 
         if ($visibilityOptions[$fields['visibility_id']] === 'admin' && $publicOptionCount > 0) {
-          $errors['visibility_id'] = ts('Field with \'Admin\' visibility should only contain \'Admin\' options.');
+          $errors['visibility_id'] = ts("Field with 'Admin' visibility should only contain 'Admin' options.");
 
           for ($index = 1; $index <= self::NUM_OPTION; $index++) {
 
@@ -581,7 +581,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
             $currentOptionVisibility = $visibilityOptions[$fields['option_visibility_id'][$index] ?? ''] ?? NULL;
 
             if ($isOptionSet && $currentOptionVisibility === 'public') {
-              $errors["option_visibility_id[{$index}]"] = ts('\'Admin\' field should only have \'Admin\' visibility options.');
+              $errors["option_visibility_id[{$index}]"] = ts("'Admin' field should only have 'Admin' visibility options.");
             }
           }
         }

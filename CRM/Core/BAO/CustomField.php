@@ -1000,7 +1000,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
 
       case 'Link':
         $element->setAttribute('class', "url");
-        $qf->addRule($elementName, ts('Enter a valid web address beginning with \'http://\' or \'https://\'.'), 'wikiURL');
+        $qf->addRule($elementName, ts("Enter a valid web address beginning with 'http://' or 'https://'."), 'wikiURL');
         break;
     }
     if ($field->is_view && !$search) {

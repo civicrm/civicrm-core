@@ -3,7 +3,7 @@ endif; ?>
 <h2 id="settings"><?php echo ts('Opt-in'); ?></h2>
 
 <p>
-  <?php echo ts('CiviCRM is provided for free -- built with donations and volunteerism. We don\'t have the marketing or data-analytics prowess of a large corporation, so we rely on users to keep us informed -- and to spread the word.'); ?>
+  <?php echo ts("CiviCRM is provided for free -- built with donations and volunteerism. We don't have the marketing or data-analytics prowess of a large corporation, so we rely on users to keep us informed -- and to spread the word."); ?>
   <?php echo ts('Of course, not everyone can help in these ways. But if you can, opt-in to help enrich the product and community.'); ?>
 </p>
 

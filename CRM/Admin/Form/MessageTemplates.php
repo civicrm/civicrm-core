@@ -348,7 +348,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
       $this->_id = $messageTemplate['id'];
       $this->postProcessHook();
 
-      CRM_Core_Session::setStatus(ts('The Message Template \'%1\' has been saved.', [1 => $messageTemplate['msg_title']]), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts("The Message Template '%1' has been saved.", [1 => $messageTemplate['msg_title']]), ts('Saved'), 'success');
 
       if (isset($this->_submitValues['_qf_MessageTemplates_upload'])) {
         // Save button was pressed

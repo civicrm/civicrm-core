@@ -202,7 +202,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
       ]);
       if ($grpCnt) {
         $invalidGroupName = TRUE;
-        $errors['newGroupName'] = ts('Group \'%1\' already exists.', [1 => $fields['newGroupName']]);
+        $errors['newGroupName'] = ts("Group '%1' already exists.", [1 => $fields['newGroupName']]);
       }
     }
     $self->assign('invalidGroupName', $invalidGroupName);

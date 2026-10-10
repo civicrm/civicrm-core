@@ -159,7 +159,7 @@ AND    co.id IN ( $contribIDs )";
       if (str_contains($name, 'trxn_id_')) {
         if ($fields[$name]) {
           if (array_key_exists($value, $seen)) {
-            $errors[$name] = ts('Transaction ID\'s must be unique. Include the account number for checks.');
+            $errors[$name] = ts("Transaction ID's must be unique. Include the account number for checks.");
           }
           $seen[$value] = 1;
         }

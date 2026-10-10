@@ -57,7 +57,7 @@ WHERE  n.child_group_id  = gc.id
     }
 
     if (self::checkCyclicGraph($tree)) {
-      throw new CRM_Core_Exception(ts('We detected a cycle which we can\'t handle. aborting'));
+      throw new CRM_Core_Exception(ts("We detected a cycle which we can't handle. aborting"));
     }
 
     // first reset the current cache entries

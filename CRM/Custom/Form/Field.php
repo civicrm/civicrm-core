@@ -520,7 +520,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
       4 => [$gId, 'Integer'],
     ]);
     if ($fldCnt) {
-      $errors['label'] = ts('Custom field \'%1\' already exists in Database.', [1 => $title]);
+      $errors['label'] = ts("Custom field '%1' already exists in Database.", [1 => $title]);
     }
 
     //checks the given custom field name doesnot start with digit
@@ -767,7 +767,7 @@ AND    option_group_id = %2";
         ];
         $count = CRM_Core_DAO::singleValueQuery($query, $params);
         if ($count > 0) {
-          $errors['option_group_id'] = ts('The data type of the multiple choice option set you\'ve selected does not match the data type assigned to this field.');
+          $errors['option_group_id'] = ts("The data type of the multiple choice option set you've selected does not match the data type assigned to this field.");
         }
       }
     }

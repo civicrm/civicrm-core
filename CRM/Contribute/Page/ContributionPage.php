@@ -340,7 +340,7 @@ AND         cp.page_type = 'contribute'
 ";
 
       if ($pageTitle = CRM_Core_DAO::singleValueQuery($query)) {
-        CRM_Core_Session::setStatus(ts('The \'%1\' cannot be deleted! You must Delete all Personal Campaign Page(s) related with this contribution page prior to deleting the page.', [1 => $pageTitle]), ts('Deletion Error'), 'error');
+        CRM_Core_Session::setStatus(ts("The '%1' cannot be deleted! You must Delete all Personal Campaign Page(s) related with this contribution page prior to deleting the page.", [1 => $pageTitle]), ts('Deletion Error'), 'error');
 
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1'));
       }

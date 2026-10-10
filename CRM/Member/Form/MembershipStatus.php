@@ -170,7 +170,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
       }
 
       $membershipStatus = CRM_Member_BAO_MembershipStatus::add($params);
-      CRM_Core_Session::setStatus(ts('The membership status \'%1\' has been saved.',
+      CRM_Core_Session::setStatus(ts("The membership status '%1' has been saved.",
         [1 => $membershipStatus->label]
       ), ts('Saved'), 'success');
     }

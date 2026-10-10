@@ -142,7 +142,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType implem
 
         if (in_array('MembershipBlock', $status)) {
           $deleteURL = CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1');
-          $message .= ts('%2. This Membership Type is used in an <a href=\'%1\'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.', [
+          $message .= ts("%2. This Membership Type is used in an <a href='%1'>Online Contribution page</a>. Uncheck this membership type in the Memberships tab.", [
             1 => $deleteURL,
             2 => $cnt,
           ]);

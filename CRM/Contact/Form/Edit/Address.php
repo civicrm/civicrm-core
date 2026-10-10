@@ -148,7 +148,7 @@ class CRM_Contact_Form_Edit_Address {
 
     if ($sharing) {
       // shared address
-      $form->addElement('checkbox', "address[$blockId][use_shared_address]", NULL, ts('Use another contact\'s address'));
+      $form->addElement('checkbox', "address[$blockId][use_shared_address]", NULL, ts("Use another contact's address"));
 
       // Override the default profile links to add address form
       $profileLinks = CRM_Contact_BAO_Contact::getEntityRefCreateLinks('shared_address');

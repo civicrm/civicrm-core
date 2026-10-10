@@ -209,7 +209,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     $this->petition = [];
     CRM_Campaign_BAO_Survey::retrieve($params, $this->petition);
     if (empty($this->petition)) {
-      CRM_Core_Error::statusBounce(ts('Petition doesn\'t exist.'));
+      CRM_Core_Error::statusBounce(ts("Petition doesn't exist."));
     }
     if ($this->petition['is_active'] == 0) {
       $this->assign('isActive', FALSE);
