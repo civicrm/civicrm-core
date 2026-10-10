@@ -1217,7 +1217,26 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
       $params['lineItems'] = $lineItem;
       if ($this->getSubmittedValue('record_contribution')) {
-        $params['contribution_id'] = $this->recordMembershipContribution($params)->id;
+        $contributionParams = $this->getContributionValues();
+        $contributionParams['skipCleanMoney'] = TRUE;
+        $recordContribution = [
+          'contact_id',
+          'contribution_status_id',
+        ];
+        foreach ($recordContribution as $f) {
+          $contributionParams[$f] = $params[$f] ?? NULL;
+        }
+
+        if (!empty($params['contribution_contact_id'])) {
+          // deal with possibility of a different person paying for contribution
+          $contributionParams['contact_id'] = $params['contribution_contact_id'];
+        }
+
+        $contributionParams['line_item'] = $params['lineItems'];
+
+        $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
+        $this->createSoftCredit($contribution->id);
+        $params['contribution_id'] = $contribution->id;
       }
     }
 
@@ -1261,41 +1280,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if (!$this->_id) {
       $this->_id = $this->getMembershipID();
     }
-  }
-
-  /**
-   * Record contribution record associated with membership.
-   * This will create a MembershipPayment to link the contribution and membership
-   *
-   * @param array $params
-   *   Array of submitted params.
-   *
-   * @deprecated use Order api
-   *
-   * @return CRM_Contribute_BAO_Contribution
-   * @throws \CRM_Core_Exception
-   */
-  private function recordMembershipContribution($params) {
-    $contributionParams = $this->getContributionValues();
-    $contributionParams['skipCleanMoney'] = TRUE;
-    $recordContribution = [
-      'contact_id',
-      'contribution_status_id',
-    ];
-    foreach ($recordContribution as $f) {
-      $contributionParams[$f] = $params[$f] ?? NULL;
-    }
-
-    if (!empty($params['contribution_contact_id'])) {
-      // deal with possibility of a different person paying for contribution
-      $contributionParams['contact_id'] = $params['contribution_contact_id'];
-    }
-
-    $contributionParams['line_item'] = $params['lineItems'];
-
-    $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
-    $this->createSoftCredit($contribution->id);
-    return $contribution;
   }
 
   /**
