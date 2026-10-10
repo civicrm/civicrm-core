@@ -93,7 +93,8 @@ class CRM_Upgrade_Incremental_General {
       ]);
       $preUpgradeMessage .= '</p>';
     }
-    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), self::MIN_RECOMMENDED_MYSQL_VER) < 0) {
+    $minRecommendedDbVer = CRM_Utils_SQL::isMariaDB() ? self::MIN_RECOMMENDED_MARIADB_VER : self::MIN_RECOMMENDED_MYSQL_VER;
+    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), $minRecommendedDbVer) < 0) {
       $preUpgradeMessage .= '<p>';
       $preUpgradeMessage .= ts('This system uses MySQL/MariaDB v%5. You may proceed with the upgrade, and CiviCRM v%1 will continue working normally. However, CiviCRM v%4 will require MySQL v%2 or MariaDB v%3.', [
         1 => $latestVer,

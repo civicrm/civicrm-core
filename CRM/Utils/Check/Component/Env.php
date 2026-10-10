@@ -1085,7 +1085,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     $minRecommendedVersion = CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MYSQL_VER;
     $mariaDbRecommendedVersion = CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MARIADB_VER;
     $upcomingCiviChangeVersion = '5.34';
-    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), $minRecommendedVersion, '<')) {
+    if (version_compare($version, CRM_Utils_SQL::isMariaDB() ? $mariaDbRecommendedVersion : $minRecommendedVersion, '<')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('To prepare for CiviCRM v%4, please upgrade MySQL. The recommended version will be MySQL v%2 or MariaDB v%3.', [
