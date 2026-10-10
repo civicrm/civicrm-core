@@ -27,6 +27,12 @@
       <td class="label">{$form.description.label}</td>
       <td class="view-value">{$form.description.html}</td>
   </tr>
+  {if !empty($form.parent_id)}
+    <tr class="crm-campaign-form-block-parent_id">
+      <td class="label">{$form.parent_id.label} {help id="parent_id"}</td>
+      <td>{$form.parent_id.html}</td>
+    </tr>
+  {/if}
   <tr class="crm-campaign-form-block-includeGroups">
       <td class="label">{$form.includeGroups.label} {help id="include_groups"}</td>
       <td>{$form.includeGroups.html}</td>

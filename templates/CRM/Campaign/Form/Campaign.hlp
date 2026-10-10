@@ -13,3 +13,6 @@
 {htxt id='is_active'}
   {ts}If the campaign is enabled, it will be displayed in lists where a campaign can be selected, regardless of the start/end date.{/ts}
 {/htxt}
+{htxt id='parent_id'}
+  {ts}Create a nested hierarchy of campaign parents and children.{/ts}
+{/htxt}
