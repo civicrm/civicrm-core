@@ -2,6 +2,7 @@
 namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
+use Civi\Api4\Email;
 use Civi\Api4\Event;
 use Civi\Test\TransactionalInterface;
 
@@ -193,6 +194,121 @@ EOHTML;
     // End date is readonly so should not have been modified.
     $event1Values = $this->getTestRecord('Event', $event1);
     $this->assertSame('2021-01-03 00:00:00', $event1Values['end_date']);
+  }
+
+  /**
+   * Ensure saveJoins() does not allow foreign forward join ids (e.g. LocBlock)
+   * to be passed in to update records that do not belong to the parent entity.
+   */
+  public function testSaveJoinsDoesNotAllowForeignForwardJoinIds(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity actions="{create: true, update: true}" type="Event" name="Event1" label="Event 1" security="FBAC" />
+  <fieldset af-fieldset="Event1" class="af-container" af-title="Event 1">
+    <af-field name="id" />
+    <af-field name="title" />
+    <af-field name="event_type_id" />
+    <div af-join="LocBlock">
+      <af-field name="id" />
+      <af-field name="email_id.email" />
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'is_public' => TRUE,
+      'permission' => ['*always allow*'],
+    ]);
+
+    // Create a victim LocBlock belonging to another event
+    $otherLocBlock = $this->createTestRecord('LocBlock', [
+      'email_id' => $this->createTestRecord('Email', ['email' => 'victim@example.com'])['id'],
+    ]);
+
+    // Create a test event with its own LocBlock
+    $myLocBlock = $this->createTestRecord('LocBlock', [
+      'email_id' => $this->createTestRecord('Email', ['email' => 'myevent@example.com'])['id'],
+    ]);
+    $myEvent = $this->createTestRecord('Event', [
+      'title' => 'My Event',
+      'event_type_id' => 1,
+      'loc_block_id' => $myLocBlock['id'],
+    ]);
+
+    // Try updating My Event while passing the foreign LocBlock id with modified email
+    $submission = [
+      'Event1' => [
+        [
+          'fields' => [
+            'id' => $myEvent['id'],
+            'title' => 'My Event Updated',
+          ],
+          'joins' => [
+            'LocBlock' => [
+              [
+                'id' => $otherLocBlock['id'],
+                'email_id.email' => 'hacked@example.com',
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues($submission)
+        ->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+    }
+
+    $victimEmail = Email::get(FALSE)
+      ->addWhere('id', '=', $otherLocBlock['email_id'])
+      ->execute()
+      ->first();
+
+    $this->assertEquals('victim@example.com', $victimEmail['email']);
+
+    // Try creating a new event passing the foreign LocBlock id with modified email
+    $submissionNewEvent = [
+      'Event1' => [
+        [
+          'fields' => [
+            'title' => 'New Event Attacker',
+            'event_type_id' => 1,
+          ],
+          'joins' => [
+            'LocBlock' => [
+              [
+                'id' => $otherLocBlock['id'],
+                'email_id.email' => 'hacked_again@example.com',
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues($submissionNewEvent)
+        ->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+    }
+
+    $victimEmail = Email::get(FALSE)
+      ->addWhere('id', '=', $otherLocBlock['email_id'])
+      ->execute()
+      ->first();
+
+    $this->assertEquals('victim@example.com', $victimEmail['email']);
   }
 
 }
