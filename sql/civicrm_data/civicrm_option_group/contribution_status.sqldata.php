@@ -4,7 +4,7 @@ return CRM_Core_CodeGen_OptionGroup::create('contribution_status', 'a/0011')
     'title' => ts('Contribution Status'),
     'is_locked' => 1,
   ])
-  ->addValueTable(['label', 'name', 'value'], [
+  ->addValueTable(['label', 'name', 'value', 'description'], [
     [ts('Completed'), 'Completed', 1],
     [ts('Pending'), 'Pending', 2],
     [ts('Cancelled'), 'Cancelled', 3],
@@ -19,7 +19,7 @@ return CRM_Core_CodeGen_OptionGroup::create('contribution_status', 'a/0011')
       ts('Pending (Processing)'),
       'Pending (Processing)',
       12,
-      'description' => ts('The payer has completed their action and the payment processor is still processing the payment.'),
+      ts('The payer has completed their action and the payment processor is still processing the payment.'),
     ],
   ])
   ->addDefaults([

@@ -739,6 +739,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $previousContributionStatus = $this->getOriginalContributionStatus();
     $currentContributionStatus = $this->getUpdatedContributionStatus();
 
+    // Moving between processor-controlled pending states does not represent
+    // any movement of money and must not create accounting transactions.
+    if ($currentContributionStatus === 'Pending (Processing)'
+      && in_array($previousContributionStatus, ['Pending', 'In Progress'], TRUE)
+    ) {
+      return;
+    }
+
     if ((($previousContributionStatus === 'Partially paid' && $this->isCompletedTransaction())
       || ($previousContributionStatus === 'Pending refund' && $this->isCompletedTransaction())
       // This concept of pay_later as different to any other sort of pending is deprecated & it's unclear
