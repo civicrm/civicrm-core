@@ -247,8 +247,7 @@ class CRM_Extension_QueueDownloader {
 
   private function quotedList(array $items) {
     // This can at least adapt to quotes and guillemets... we should probably have some more general helpers for lists and conjunctions...
-    $template = ts('"%1"');
-    return implode(', ', array_map(fn($item) => str_replace('%1', $item, $template), $items));
+    return implode(', ', array_map(fn($item) => ts('"%1"', [1 => $item]), $items));
   }
 
   /**

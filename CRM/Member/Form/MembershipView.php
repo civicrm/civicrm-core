@@ -343,7 +343,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
             $this->assign('related_text', ts('%1 available', [1 => $relatedRemaining]));
           }
           else {
-            $this->assign('related_text', ts('Unlimited', [1 => $relatedRemaining]));
+            $this->assign('related_text', ts('Unlimited'));
           }
         }
       }

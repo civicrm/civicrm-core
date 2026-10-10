@@ -319,7 +319,7 @@ function _civicrm_api3_job_update_greeting_spec(&$params) {
  */
 function civicrm_api3_job_process_pledge(array $params): array {
   if (!CRM_Core_Component::isEnabled('CiviPledge')) {
-    throw new CRM_Core_Exception(ts('%1 is not enabled'), [1 => ['CiviPledge']]);
+    throw new CRM_Core_Exception(ts('CiviPledge is not enabled'));
   }
   return civicrm_api3_create_success(implode("\n\r", CRM_Pledge_BAO_Pledge::updatePledgeStatus($params)));
 }

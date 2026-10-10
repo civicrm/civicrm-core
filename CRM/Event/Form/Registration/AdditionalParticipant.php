@@ -321,11 +321,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         (!$this->_allowWaitlist && ($processedCnt + $pricesetFieldsCount) > $this->_availableRegistrations)
       ) {
 
-        $waitingMsg = ts('It looks like you are registering more participants then there are spaces available. All participants will be added to the waiting list. You will be notified if spaces become available.');
+        $waitingMsg = ts('It looks like you are registering more participants than there are spaces available. All participants will be added to the waiting list. You will be notified if spaces become available.');
         $confirmedMsg = ts('It looks like there are enough spaces in this event for your group (you will not be wait listed).');
         if ($this->_requireApproval) {
-          $waitingMsg = ts('It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed). Registration for this event requires approval. You will receive an email once your registration has been reviewed.');
-          $confirmedMsg = ts('It looks there are enough spaces in this event for your group (you will not be wait listed). Registration for this event requires approval. You will receive an email once your registration has been reviewed.');
+          $confirmedMsg = ts('It looks like there are enough spaces in this event for your group (you will not be wait listed). Registration for this event requires approval. You will receive an email once your registration has been reviewed.');
         }
 
         $this->assign('waitingMsg', $waitingMsg);

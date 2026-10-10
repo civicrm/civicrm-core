@@ -201,9 +201,9 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form implements CRM_Case_Form_Case
     }
     $this->assign('hasRelatedCases', (bool) $relatedCases);
     if ($relatedCases) {
-      $this->assign('relatedCaseLabel', ts('%1 Related Case', [
+      $this->assign('relatedCaseLabel', ts('1 Related Case', [
         'count' => count($relatedCases),
-        'plural' => '%1 Related Cases',
+        'plural' => '%count Related Cases',
       ]));
       $this->assign('relatedCaseUrl', CRM_Utils_System::url('civicrm/contact/view/case', [
         'id' => $this->getCaseID(),
