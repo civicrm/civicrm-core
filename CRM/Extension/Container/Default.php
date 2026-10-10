@@ -35,7 +35,7 @@ class CRM_Extension_Container_Default extends CRM_Extension_Container_Basic {
       $url = CRM_Utils_System::url('civicrm/admin/setting/path', "reset=1&civicrmDestination={$civicrmDestination}");
       $errors[] = [
         'title' => ts('Invalid Base Directory'),
-        'message' => ts('The extensions directory is not properly set. Please go to the <a href="%1">path setting page</a> and correct it.<br/>',
+        'message' => ts('The extensions directory is not properly set. Please go to the <a href="%1">path setting page</a> and correct it.',
           [
             1 => $url,
           ]
@@ -47,7 +47,7 @@ class CRM_Extension_Container_Default extends CRM_Extension_Container_Basic {
       $url = CRM_Utils_System::url('civicrm/admin/setting/url', "reset=1&civicrmDestination={$civicrmDestination}");
       $errors[] = [
         'title' => ts('Invalid Base URL'),
-        'message' => ts('The extensions URL is not properly set. Please go to the <a href="%1">URL setting page</a> and correct it.<br/>',
+        'message' => ts('The extensions URL is not properly set. Please go to the <a href="%1">URL setting page</a> and correct it.',
           [
             1 => $url,
           ]

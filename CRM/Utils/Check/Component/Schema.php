@@ -188,7 +188,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts(
-          '<p>The table <code>%1</code> includes an incorrect constraint. <a %2>Learn how to fix this.</a>', [
+          'The table <code>%1</code> includes an incorrect constraint. <a %2>Learn how to fix this.</a>', [
             1 => 'civicrm_activity',
             2 => 'target="_blank" href="' . htmlentities($docUrl) . '"',
           ]
@@ -211,7 +211,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
       $msg = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts(
-          '<p>The Monetary Value Display format is a deprecated setting, and this site has a non-standard format. Please report your configuration on <a href="%1">this Gitlab issue</a>.',
+          'The Monetary Value Display format is a deprecated setting, and this site has a non-standard format. Please report your configuration on <a href="%1">this Gitlab issue</a>.',
           [1 => 'https://lab.civicrm.org/dev/core/-/issues/1494']
         ),
         ts('Deprecated monetary value display format configuration'),

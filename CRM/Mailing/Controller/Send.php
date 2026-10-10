@@ -71,10 +71,9 @@ class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
           ->addWhere('mailing_id', '=', $clone['id'])
           ->execute();
         CRM_Core_Session::setStatus(
-          ts('Remove %1 disabled group(s) while copying: <ul><li>%2</li></ul>Please check recipients.', [
-            1 => count($removeGroups),
-            2 => implode('</li><li>', $removeGroups),
-          ]),
+          ts('Remove %1 disabled group(s) while copying:', [1 => count($removeGroups)])
+            . '<ul><li>' . implode('</li><li>', $removeGroups) . '</li></ul>'
+            . ts('Please check recipients.'),
           ts('Removed disabled groups')
         );
       }

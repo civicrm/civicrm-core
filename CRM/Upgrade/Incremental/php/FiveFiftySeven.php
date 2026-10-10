@@ -34,7 +34,8 @@ class CRM_Upgrade_Incremental_php_FiveFiftySeven extends CRM_Upgrade_Incremental
       // The query on is_current_revision is slow if there's a lot of activities. So limit when it gets run.
       $activityCount = CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_activity');
       if ($activityCount < self::ACTIVITY_THRESHOLD && CRM_Core_DAO::singleValueQuery('SELECT COUNT(id) FROM civicrm_activity WHERE is_current_revision = 0')) {
-        $preUpgradeMessage .= '<p>' . ts('Your database contains CiviCase activity revisions which are deprecated and will begin to appear as duplicates in SearchKit/api4/etc.<ul><li>For further instructions see this <a %1>Lab Snippet</a>.</li></ul>', [1 => $docAnchor]) . '</p>';
+        $preUpgradeMessage .= '<p>' . ts('Your database contains CiviCase activity revisions which are deprecated and will begin to appear as duplicates in SearchKit/api4/etc.') . '</p>'
+          . '<ul><li>' . ts('For further instructions see this <a %1>Lab Snippet</a>.', [1 => $docAnchor]) . '</li></ul>';
       }
       // Similarly the original_id ON DELETE drop+recreate is slow, so if we
       // don't add the task farther down below, then tell people what to do at
