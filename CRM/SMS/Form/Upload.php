@@ -353,7 +353,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
       if (!empty($unmatched) && 0) {
         foreach ($unmatched as $token) {
-          $dataErrors[] = '<li>' . ts('Invalid token code') . ' {' . $token . '}</li>';
+          $dataErrors[] = '<li>' . ts('Invalid token code {%1}', [1 => $token]) . '</li>';
         }
       }
       if (strlen($contentCheck) > CRM_SMS_Provider::MAX_SMS_CHAR) {

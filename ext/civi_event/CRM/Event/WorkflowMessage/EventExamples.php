@@ -39,7 +39,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
       foreach ($priceSets as $priceSet) {
         yield [
           'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'],
-          'title' => ts('Completed Registration') . ($priceSet['is_multiple_registrations'] ? ' ' . ts('primary participant') : '') . ' : ' . $priceSet['title'],
+          'title' => $priceSet['is_multiple_registrations'] ? ts('Completed Registration (primary participant): %1', [1 => $priceSet['title']]) : ts('Completed Registration: %1', [1 => $priceSet['title']]),
           'tags' => ['preview'],
           'workflow' => $workflow,
           'is_show_line_items' => !$priceSet['is_quick_config'],
@@ -51,7 +51,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
         ];
         yield [
           'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'] . '_partially_paid',
-          'title' => ts('Partially Paid Registration') . ($priceSet['is_multiple_registrations'] ? ' ' . ts('primary participant') : '') . ' : ' . $priceSet['title'],
+          'title' => $priceSet['is_multiple_registrations'] ? ts('Partially Paid Registration (primary participant): %1', [1 => $priceSet['title']]) : ts('Partially Paid Registration: %1', [1 => $priceSet['title']]),
           'tags' => ['preview'],
           'workflow' => $workflow,
           'is_show_line_items' => !$priceSet['is_quick_config'],
@@ -64,7 +64,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
         if ($priceSet['is_multiple_registrations']) {
           yield [
             'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'] . '/' . 'additional',
-            'title' => ts('Completed Registration') . ' ' . ts('additional participant') . ' : ' . $priceSet['title'],
+            'title' => ts('Completed Registration (additional participant): %1', [1 => $priceSet['title']]),
             'tags' => ['preview'],
             'workflow' => $workflow,
             'is_show_line_items' => !$priceSet['is_quick_config'],

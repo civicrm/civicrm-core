@@ -52,7 +52,7 @@ class SKBatchSpecProvider extends AutoService implements SpecProviderInterface {
       // Depending on loading-order, spec may have already been defined by ImportSpecProvider
       $field = $spec->getFieldByName($name) ?: new FieldSpec($name, $spec->getEntity());
       $field->setDataType($column['data_type']);
-      $field->setTitle(ts('Import field') . ': ' . $column['label']);
+      $field->setTitle(ts('Import field: %1', [1 => $column['label']]));
       $field->setLabel($column['label']);
       $field->setType('Field');
       $field->setSerialize($column['serialize'] ?? NULL);

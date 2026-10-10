@@ -243,7 +243,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * @param array $params
    */
   public function getPagerParams($action, &$params) {
-    $params['status'] = ts('Event') . ' %%StatusMessage%%';
+    $params['status'] = ts('Event %1', [1 => '%%StatusMessage%%']);
     $params['csvString'] = NULL;
     if ($this->_limit) {
       $params['rowCount'] = $this->_limit;

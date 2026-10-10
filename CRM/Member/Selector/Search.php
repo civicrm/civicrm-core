@@ -262,7 +262,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * @param array $params
    */
   public function getPagerParams($action, &$params) {
-    $params['status'] = ts('Member') . ' %%StatusMessage%%';
+    $params['status'] = ts('Member %1', [1 => '%%StatusMessage%%']);
     $params['csvString'] = NULL;
     if ($this->_limit) {
       $params['rowCount'] = $this->_limit;
@@ -401,7 +401,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
             'cid' => $result->contact_id,
             'cxt' => $this->_context,
           ],
-          ts('Renew') . '...',
+          ts('Renew...'),
           FALSE,
           'membership.selector.row',
           'Membership',

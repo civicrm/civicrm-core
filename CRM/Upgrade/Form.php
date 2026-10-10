@@ -378,7 +378,7 @@ SET    version = '$version'
     }
 
     if (version_compare(phpversion(), CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER) < 0) {
-      $errors[] = ts('CiviCRM %3 requires PHP version %1 (or newer), but the current system uses %2 ',
+      $errors[] = ts('CiviCRM %3 requires PHP version %1 (or newer), but the current system uses %2.',
         [
           1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER,
           2 => phpversion(),
@@ -387,7 +387,7 @@ SET    version = '$version'
     }
 
     if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER) < 0) {
-      $errors[] = ts('CiviCRM %4 requires MySQL version v%1 or MariaDB v%3 (or newer), but the current system uses %2 ',
+      $errors[] = ts('CiviCRM %4 requires MySQL version v%1 or MariaDB v%3 (or newer), but the current system uses %2.',
         [
           1 => CRM_Upgrade_Incremental_General::MIN_INSTALL_MYSQL_VER,
           2 => CRM_Utils_SQL::getDatabaseVersion(),

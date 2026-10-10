@@ -151,7 +151,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
             'id' => $dao->id,
             'cid' => $this->_contactId,
           ],
-          ts('Renew') . '...',
+          ts('Renew...'),
           FALSE,
           'membership.tab.row',
           'Membership',

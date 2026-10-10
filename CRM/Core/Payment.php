@@ -639,13 +639,20 @@ abstract class CRM_Core_Payment {
           );
         }
         else {
-          $text = ts('Recurring Contribution Details: %1 every %2 %3', [
-            1 => CRM_Utils_Money::format($params['amount'], $params['currency']),
-            2 => $params['frequency_interval'],
-            3 => $params['frequency_unit'],
-          ]);
           if (!empty($params['installments'])) {
-            $text .= ' ' . ts('for %1 installments', [1 => $params['installments']]) . '.';
+            $text = ts('Recurring Contribution Details: %1 every %2 %3 for %4 installments.', [
+              1 => CRM_Utils_Money::format($params['amount'], $params['currency']),
+              2 => $params['frequency_interval'],
+              3 => $params['frequency_unit'],
+              4 => $params['installments'],
+            ]);
+          }
+          else {
+            $text = ts('Recurring Contribution Details: %1 every %2 %3', [
+              1 => CRM_Utils_Money::format($params['amount'], $params['currency']),
+              2 => $params['frequency_interval'],
+              3 => $params['frequency_unit'],
+            ]);
           }
           $text = "<strong>{$text}</strong><div class='content'>";
           $text .= ts('Click the button below to cancel this commitment and stop future transactions. This does not affect contributions which have already been completed.');

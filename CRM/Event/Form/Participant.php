@@ -676,7 +676,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     $errorMsg = [];
 
     if ($self->_mode && !$self->getEventValue('is_monetary')) {
-      $errorMsg['event_id'] = ts('Selected Event is not Paid Event ');
+      $errorMsg['event_id'] = ts('Selected Event is not Paid Event');
     }
 
     if (!empty($values['payment_processor_id'])) {

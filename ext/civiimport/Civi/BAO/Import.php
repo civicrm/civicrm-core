@@ -218,7 +218,7 @@ class Import extends CRM_Core_DAO {
     while ($result->fetch()) {
       $columns[$result->Field] = ['name' => $result->Field, 'table_name' => $tableName];
       if (!str_starts_with($result->Field, '_')) {
-        $columns[$result->Field]['label'] = ts('Import field') . ': ' . ($headers[$userFieldIndex] ?? $result->Field);
+        $columns[$result->Field]['label'] = ts('Import field: %1', [1 => $headers[$userFieldIndex] ?? $result->Field]);
         $columns[$result->Field]['data_type'] = 'String';
         $userFieldIndex++;
       }

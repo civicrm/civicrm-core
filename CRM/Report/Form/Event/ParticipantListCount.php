@@ -285,7 +285,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form {
         ],
         'group_bys' => [
           'event_type_id' => [
-            'title' => ts('Event Type '),
+            'title' => ts('Event Type'),
           ],
         ],
       ],

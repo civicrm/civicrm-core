@@ -109,8 +109,8 @@ class CRM_Utils_Mail_EmailProcessor {
       $store = CRM_Mailing_MailStore::getStore($dao->name);
     }
     catch (Exception $e) {
-      $message = ts('Could not connect to MailStore for ') . $dao->username . '@' . $dao->server . '<p>';
-      $message .= ts('Error message: ');
+      $message = ts('Could not connect to MailStore for %1', [1 => $dao->username . '@' . $dao->server]) . '<p>';
+      $message .= ts('Error message:');
       $message .= '<pre>' . $e->getMessage() . '</pre><p>';
       throw new CRM_Core_Exception($message);
     }

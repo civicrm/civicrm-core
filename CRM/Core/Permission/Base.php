@@ -313,17 +313,17 @@ class CRM_Core_Permission_Base {
     // EXCEPT in Standalone, where they are not needed
     return [
       'cms:view user account' => [
-        'title' => ts('CMS') . ': ' . ts('View user accounts'),
+        'title' => ts('CMS:') . ' ' . ts('View user accounts'),
         'description' => ts('View user accounts. (Synthetic permission - adapts to local CMS)'),
         'is_synthetic' => TRUE,
       ],
       'cms:administer users' => [
-        'title' => ts('CMS') . ': ' . ts('Administer user accounts'),
+        'title' => ts('CMS:') . ' ' . ts('Administer user accounts'),
         'description' => ts('Administer user accounts. (Synthetic permission - adapts to local CMS)'),
         'is_synthetic' => TRUE,
       ],
       'cms:bypass maintenance mode' => [
-        'title' => ts('CMS') . ': ' . ts('Bypass maintenance mode'),
+        'title' => ts('CMS:') . ' ' . ts('Bypass maintenance mode'),
         'description' => ts('Allow to bypass maintenance mode checks - e.g. when using AJAX API'),
         'is_synthetic' => TRUE,
       ],

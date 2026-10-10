@@ -297,9 +297,9 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    */
   public function getLastYearColumnTitle() {
     if ($this->getYearFilterType() == 'calendar') {
-      return ts('Total for ') . ($this->getCurrentYear() - 1);
+      return ts('Total for %1', [1 => $this->getCurrentYear() - 1]);
     }
-    return ts('Total for Fiscal Year ') . ($this->getCurrentYear() - 1) . '-' . ($this->getCurrentYear());
+    return ts('Total for Fiscal Year %1', [1 => ($this->getCurrentYear() - 1) . '-' . $this->getCurrentYear()]);
   }
 
   /**

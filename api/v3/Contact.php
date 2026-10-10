@@ -845,7 +845,7 @@ function _civicrm_api3_contact_get_merge_conflicts_spec(&$params) {
   ];
   $params['mode'] = [
     'title' => ts('Dedupe mode'),
-    'description' => ts("'safe' or 'aggressive'  - these modes map to the merge actions & may affect resolution done by hooks "),
+    'description' => ts("'safe' or 'aggressive'  - these modes map to the merge actions & may affect resolution done by hooks"),
     'api.default' => 'safe',
   ];
 }

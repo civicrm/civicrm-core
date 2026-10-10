@@ -207,7 +207,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    * @param array $params
    */
   public function getPagerParams($action, &$params) {
-    $params['status'] = ts('Mailing Recipient') . ' %%StatusMessage%%';
+    $params['status'] = ts('Mailing Recipient %1', [1 => '%%StatusMessage%%']);
     $params['csvString'] = NULL;
     if ($this->_limit) {
       $params['rowCount'] = $this->_limit;

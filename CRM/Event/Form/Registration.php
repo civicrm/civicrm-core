@@ -1833,7 +1833,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function getSource(int $participantNumber): string {
     return $this->getSubmittedParticipantValue('participant_source', $participantNumber)
-      ?: (ts('Online Event Registration') . ': ' . $this->getEventValue('title'));
+      ?: ts('Online Event Registration: %1', [1 => $this->getEventValue('title')]);
   }
 
   /**
