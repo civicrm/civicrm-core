@@ -250,10 +250,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
         $info = getdate($ts);
         if ($info['mday'] > 28) {
           CRM_Core_Session::setStatus(
-            ts('Relative month values are calculated based on the length of month(s) that they pass through.
-              The result will land on the same day of the month except for days 29-31 when the target month contains fewer days than the previous month.
-              For example, if a job is scheduled to run on August 31st, the following invocation will occur on October 1st, and then the 1st of every month thereafter.
-              To avoid this issue, please schedule Monthly and Quarterly jobs to run within the first 28 days of the month.'),
+            ts('Relative month values are calculated based on the length of month(s) that they pass through. The result will land on the same day of the month except for days 29-31 when the target month contains fewer days than the previous month. For example, if a job is scheduled to run on August 31st, the following invocation will occur on October 1st, and then the 1st of every month thereafter. To avoid this issue, please schedule Monthly and Quarterly jobs to run within the first 28 days of the month.'),
             ts('Warning'), 'info', ['expires' => 0]);
         }
       }

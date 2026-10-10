@@ -192,4 +192,25 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
     $this->callAPISuccess('MessageTemplate', 'create', ['id' => $this->ids['MessageTemplate']['user'], 'msg_subject' => 'test msg permission subject backwards compatibility', 'check_permissions' => TRUE]);
   }
 
+  /**
+   * Test the permission error is translated.
+   */
+  public function testPermissionDeniedMessageIsTranslated(): void {
+    $this->createTestEntity('MessageTemplate', $this->params, 'workflow');
+    $replacement = \Civi\Api4\WordReplacement::create(FALSE)
+      ->setValues([
+        'find_word' => 'Editing or creating system workflow messages requires edit system workflow message templates permission or the edit message templates permission',
+        'replace_word' => 'Translated permission message',
+        'match_type' => 'exactMatch',
+      ])
+      ->execute()->single();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['edit user-driven message templates'];
+    $this->callAPIFailure('MessageTemplate', 'create', [
+      'id' => $this->ids['MessageTemplate']['workflow'],
+      'msg_subject' => 'test msg permission subject',
+      'check_permissions' => TRUE,
+    ], 'Translated permission message');
+    \Civi\Api4\WordReplacement::delete(FALSE)->addWhere('id', '=', $replacement['id'])->execute();
+  }
+
 }

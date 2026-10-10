@@ -198,8 +198,7 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $participantID = CRM_Core_DAO::singleValueQuery('select max(id) from civicrm_participant');
 
     if (!$participantID) {
-      CRM_Core_Session::setStatus(ts('Preview requires at least one event and one participant record.
-       If you are just getting started, you can add a test participant record.'), ts('Preview Requirements'), 'alert');
+      CRM_Core_Session::setStatus(ts('Preview requires at least one event and one participant record. If you are just getting started, you can add a test participant record.'), ts('Preview Requirements'), 'alert');
       return;
     }
 

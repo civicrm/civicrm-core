@@ -196,7 +196,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             $entity = str_replace('Model', '', $entityType);
             $backboneModel = self::convertCiviModelToBackboneModel(
               $entity,
-              ts('%1', [1 => $entity]),
+              $entity,
               $availableFields
             );
             if (!empty($backboneModel['schema'])) {
