@@ -271,7 +271,7 @@ class CRM_Core_Form_RecurringEntity {
             $entityStartDate = CRM_Utils_Date::processDate($values['repetition_start_date']);
             $end = CRM_Utils_Date::processDate($values['repeat_absolute_date']);
             if (($end < $entityStartDate) && ($end != 0)) {
-              $errors['repeat_absolute_date'] = ts('End date should be after current entity\'s start date');
+              $errors['repeat_absolute_date'] = ts("End date should be after current entity's start date");
             }
           }
           else {

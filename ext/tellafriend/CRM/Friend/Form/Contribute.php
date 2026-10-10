@@ -55,7 +55,7 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
     }
 
     if (!$this->_friendId) {
-      $defaults['intro'] = ts('Help us spread the word and leverage the power of your contribution by telling your friends. Use the space below to personalize your email message - let your friends know why you support us. Then fill in the name(s) and email address(es) and click \'Send Your Message\'.');
+      $defaults['intro'] = ts("Help us spread the word and leverage the power of your contribution by telling your friends. Use the space below to personalize your email message - let your friends know why you support us. Then fill in the name(s) and email address(es) and click 'Send Your Message'.");
       $defaults['suggested_message'] = ts('Thought you might be interested in learning about and helping this organization. I think they do important work.');
       $defaults['tf_thankyou_text'] = ts('Thanks for telling your friends about us and supporting our efforts. Together we can make a difference.');
       $defaults['tf_title'] = ts('Tell a Friend');

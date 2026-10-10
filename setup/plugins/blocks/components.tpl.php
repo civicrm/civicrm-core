@@ -16,7 +16,7 @@ endif; ?>
 
 <p class="tip">
   <strong><?php echo ts('Tip'); ?></strong>:
-  <?php echo ts('Not sure? That\'s OK. After installing, you can enable and disable components at any time.'); ?>
+  <?php echo ts("Not sure? That's OK. After installing, you can enable and disable components at any time."); ?>
 </p>
 
 <script type="text/javascript">

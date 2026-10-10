@@ -30,7 +30,7 @@ class CRM_Admin_Form_CMSUser extends CRM_Core_Form {
    */
   public function preProcess() {
     if (!\CRM_Utils_System::allowSynchronizeUsers()) {
-      \CRM_Core_Error::statusBounce(ts('This framework doesn\'t allow for syncing CMS users.'));
+      \CRM_Core_Error::statusBounce(ts("This framework doesn't allow for syncing CMS users."));
     }
   }
 

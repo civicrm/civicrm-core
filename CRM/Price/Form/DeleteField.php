@@ -79,7 +79,7 @@ class CRM_Price_Form_DeleteField extends CRM_Core_Form {
    */
   public function postProcess() {
     if (CRM_Price_BAO_PriceField::deleteField($this->_fid)) {
-      CRM_Core_Session::setStatus(ts('The Price Field \'%1\' has been deleted.', [1 => $this->_title]), '', 'success');
+      CRM_Core_Session::setStatus(ts("The Price Field '%1' has been deleted.", [1 => $this->_title]), '', 'success');
     }
   }
 

@@ -167,7 +167,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
     // also reset navigation
     CRM_Core_BAO_Navigation::resetNavigation();
 
-    CRM_Core_Session::setStatus(ts('Menu \'%1\' has been saved.',
+    CRM_Core_Session::setStatus(ts("Menu '%1' has been saved.",
       [1 => $navigation->label]
     ), ts('Saved'), 'success');
   }

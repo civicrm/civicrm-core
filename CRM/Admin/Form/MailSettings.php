@@ -64,7 +64,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
     $this->add('text', 'name', ts('Name'), $attributes['name'], TRUE);
 
     $this->add('text', 'domain', ts('Email Domain'), $attributes['domain'], TRUE);
-    $this->addRule('domain', ts('Email domain must use a valid internet domain format (e.g. \'example.org\').'), 'domain');
+    $this->addRule('domain', ts("Email domain must use a valid internet domain format (e.g. 'example.org')."), 'domain');
 
     $this->add('text', 'localpart', ts('Localpart'), $attributes['localpart']);
 

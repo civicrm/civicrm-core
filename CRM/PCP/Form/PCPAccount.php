@@ -86,7 +86,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     $this->_contactID = $contactID ?? CRM_Core_Session::getLoggedInContactID();
     if (!$this->_pageId) {
       if (!$this->_id) {
-        $msg = ts('We can\'t load the requested web page due to an incomplete link. This can be caused by using your browser\'s Back button or by using an incomplete or invalid link.');
+        $msg = ts("We can't load the requested web page due to an incomplete link. This can be caused by using your browser's Back button or by using an incomplete or invalid link.");
         CRM_Core_Error::statusBounce($msg);
       }
       else {

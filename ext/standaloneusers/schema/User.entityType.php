@@ -171,7 +171,7 @@ return [
       'title' => E::ts('Timezone'),
       'sql_type' => 'varchar(32)',
       'input_type' => 'Select',
-      'description' => E::ts('User\'s timezone'),
+      'description' => E::ts("User's timezone"),
       'input_attrs' => [
         'maxlength' => 32,
       ],

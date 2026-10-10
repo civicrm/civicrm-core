@@ -171,7 +171,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'no_repeat' => TRUE,
           ],
           'email_constituent' => [
-            'title' => ts('Contributor\'s Email'),
+            'title' => ts("Contributor's Email"),
             'name' => 'email',
             'alias' => 'emailconst',
           ],
@@ -188,7 +188,7 @@ class CRM_Report_Form_Contribute_SoftCredit extends CRM_Report_Form {
             'default' => TRUE,
           ],
           'phone_constituent' => [
-            'title' => ts('Contributor\'s Phone'),
+            'title' => ts("Contributor's Phone"),
             'name' => 'phone',
             'alias' => 'pconst',
             'no_repeat' => TRUE,

@@ -150,12 +150,12 @@ class CRM_Admin_Page_AJAX {
 
             $ret['illegal'] = TRUE;
             $table = $template->fetch('CRM/Price/Page/table.tpl');
-            $ret['content'] = ts('Unable to disable the \'%1\' price set - it is currently in use by one or more active events, contribution pages or contributions.', [
+            $ret['content'] = ts("Unable to disable the '%1' price set - it is currently in use by one or more active events, contribution pages or contributions.", [
               1 => $priceSet,
             ]) . "<br/> $table";
           }
           else {
-            $ret['content'] = ts('Are you sure you want to disable \'%1\' Price Set?', [1 => $priceSet]);
+            $ret['content'] = ts("Are you sure you want to disable '%1' Price Set?", [1 => $priceSet]);
           }
           break;
 
@@ -274,7 +274,7 @@ class CRM_Admin_Page_AJAX {
 
         case 'CRM_Core_BAO_OptionValue':
           $label = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $recordID, 'label');
-          $ret['content'] = ts('Are you sure you want to disable the \'%1\' option ?', [1 => $label]);
+          $ret['content'] = ts("Are you sure you want to disable the '%1' option ?", [1 => $label]);
           $ret['content'] .= '<br /><br />' . ts('WARNING - Disabling an option which has been assigned to existing records will result in that option being cleared when the record is edited.');
           break;
 

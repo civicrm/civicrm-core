@@ -37,7 +37,7 @@ class CaseManagerSpecProvider extends \Civi\Core\Service\AutoService implements 
   public function modifySpec(RequestSpec $spec) {
     $field = (new FieldSpec('case_manager_id', $spec->getEntity(), 'Integer'))
       ->setTitle(ts('Case Manager'))
-      ->setDescription(ts('Contact currently holding the case-type\'s manager role for this case.'))
+      ->setDescription(ts("Contact currently holding the case-type's manager role for this case."))
       ->setType('Extra')
       ->setColumnName('id')
       ->setFkEntity('Contact')
