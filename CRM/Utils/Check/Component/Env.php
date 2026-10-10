@@ -1082,17 +1082,19 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkMysqlVersion() {
     $messages = [];
     $version = CRM_Utils_SQL::getDatabaseVersion();
+    $isMariaDB = CRM_Utils_SQL::isMariaDB();
     $minRecommendedVersion = CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MYSQL_VER;
     $mariaDbRecommendedVersion = CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MARIADB_VER;
-    $upcomingCiviChangeVersion = '5.34';
-    if (version_compare($version, CRM_Utils_SQL::isMariaDB() ? $mariaDbRecommendedVersion : $minRecommendedVersion, '<')) {
+    if (version_compare($version, $isMariaDB ? $mariaDbRecommendedVersion : $minRecommendedVersion, '<')) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('To prepare for CiviCRM v%4, please upgrade MySQL. The recommended version will be MySQL v%2 or MariaDB v%3.', [
-          1 => $version,
-          2 => $minRecommendedVersion . '+',
-          3 => $mariaDbRecommendedVersion . '+',
-          4 => $upcomingCiviChangeVersion . '+',
+        ts('This system uses %1 v%2. CiviCRM v%3 will require MySQL v%4 or MariaDB v%5.', [
+          1 => $isMariaDB ? 'MariaDB' : 'MySQL',
+          // Drop suffixes like "-MariaDB-0+deb10u2" or "-log".
+          2 => strtok($version, '-'),
+          3 => CRM_Upgrade_Incremental_General::CIVI_VER_REQUIRING_RECOMMENDED_DB . '+',
+          4 => $minRecommendedVersion . '+',
+          5 => $mariaDbRecommendedVersion . '+',
         ]),
         ts('MySQL Out-of-Date'),
         \Psr\Log\LogLevel::NOTICE,

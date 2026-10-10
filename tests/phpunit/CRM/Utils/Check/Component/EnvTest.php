@@ -57,6 +57,25 @@ class CRM_Utils_Check_Component_EnvTest extends CiviUnitTestCase {
   }
 
   /**
+   * The warning names the database type and version and the upcoming requirement.
+   */
+  public function testCheckMysqlVersionMessage(): void {
+    $original = CRM_Utils_SQL::getDatabaseVersion();
+    Civi::$statics['CRM_Utils_SQL::getDatabaseVersion'] = '10.3.39-MariaDB-0+deb10u2';
+    try {
+      $messages = (new CRM_Utils_Check_Component_Env())->checkMysqlVersion();
+    }
+    finally {
+      Civi::$statics['CRM_Utils_SQL::getDatabaseVersion'] = $original;
+    }
+    $this->assertSame(sprintf('This system uses MariaDB v10.3.39. CiviCRM v%s+ will require MySQL v%s+ or MariaDB v%s+.',
+      CRM_Upgrade_Incremental_General::CIVI_VER_REQUIRING_RECOMMENDED_DB,
+      CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MYSQL_VER,
+      CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_MARIADB_VER
+    ), $messages[0]->getMessage());
+  }
+
+  /**
    * Test legacy extension type status check warning message.
    */
   public function testCheckExtensionTypes(): void {
