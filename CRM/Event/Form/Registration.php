@@ -1201,6 +1201,22 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get id of the contribution covering this registration, if one was
+   * created - set via Confirm::postProcess() once known, NULL for a free
+   * event (no contribution is ever created) or if real-time processing
+   * didn't reach contribution creation.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int|null
+   */
+  public function getContributionID(): ?int {
+    return $this->get('contributionID');
+  }
+
+  /**
    * Format user submitted price set params.
    *
    * Convert price set each param as an array.

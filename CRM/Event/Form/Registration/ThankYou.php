@@ -31,7 +31,6 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   public function preProcess(): void {
     parent::preProcess();
     $this->_params = $this->get('params');
-    $this->_lineItem = $this->get('lineItem');
     $finalAmount = $this->get('finalAmount');
     $this->assign('finalAmount', $finalAmount);
     $participantInfo = $this->get('participantInfo');
@@ -83,26 +82,22 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
     $invoicing = \Civi::settings()->get('invoicing');
 
-    $lineItemForTemplate = [];
-    if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
-      foreach ($this->_lineItem as $key => $value) {
-        if (!empty($value) && $value !== 'skip') {
-          $lineItemForTemplate[$key] = $value;
-        }
+    $totalAmount = 0;
+    if ($this->hasOrder()) {
+      $order = $this->getOrder();
+      $order->setExistingContributionID($this->getContributionID());
+      $lineItems = $order->getLineItems();
+      $totalAmount = $order->getTotalAmount();
+
+      if ($lineItems && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $order->getPriceSetID(), 'is_quick_config')) {
+        $this->assign('lineItem', [$order->getPriceSetID() => $lineItems]);
+      }
+      if ($invoicing) {
+        $this->assign('taxTerm', \Civi::settings()->get('tax_term'));
+        $this->assign('totalTaxAmount', $order->getTotalTaxAmount());
       }
     }
-
-    if ($this->_priceSetId &&
-      !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config') &&
-      !empty($lineItemForTemplate)
-    ) {
-      $this->assignLineItemsToTemplate($lineItemForTemplate);
-    }
-
-    if ($invoicing && $this->hasOrder()) {
-      $this->assign('totalTaxAmount', $this->getOrder()->getTotalTaxAmount());
-    }
-    $this->assign('totalAmount', $this->get('totalAmount'));
+    $this->assign('totalAmount', $totalAmount);
 
     $hookDiscount = $this->get('hookDiscount');
     if ($hookDiscount) {
@@ -111,7 +106,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
 
     $this->assign('receive_date', $this->get('receiveDate'));
     $this->assign('trxn_id', $this->get('trxnId'));
-    $this->assign('isAmountzero', $this->get('totalAmount') <= 0);
+    $this->assign('isAmountzero', $totalAmount <= 0);
 
     $defaults = [];
     $fields = [];

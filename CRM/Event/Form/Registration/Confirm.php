@@ -264,7 +264,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->set('part', $participantDetails);
       $this->assign('amounts', $amountArray);
       $this->assign('totalAmount', $this->getOrderTotalAmount());
-      $this->set('totalAmount', $this->getOrderTotalAmount());
 
       $this->assign('showPaymentOnConfirm', $this->isShowPaymentOnConfirm());
       if ($this->isShowPaymentOnConfirm()) {
@@ -580,6 +579,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     $this->set('participantIDs', $this->_participantIDS);
+    $this->set('contributionID', $contribution->id ?? NULL);
 
     // create line items, CRM-5313
     if ($this->_priceSetId &&
