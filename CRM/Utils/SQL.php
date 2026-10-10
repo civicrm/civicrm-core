@@ -190,6 +190,15 @@ class CRM_Utils_SQL {
     return \Civi::$statics[__METHOD__];
   }
 
+  /**
+   * Is the database server MariaDB rather than MySQL?
+   *
+   * @return bool
+   */
+  public static function isMariaDB(): bool {
+    return stripos(self::getDatabaseVersion(), 'mariadb') !== FALSE;
+  }
+
   public static function connect($dsn) {
     $dsn = CRM_Utils_SQL::autoSwitchDSN($dsn);
     $options = CRM_Utils_SQL::isSSLDSN($dsn) ? ['ssl' => TRUE] : [];
