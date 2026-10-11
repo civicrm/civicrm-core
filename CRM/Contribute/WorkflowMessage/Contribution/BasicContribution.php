@@ -204,7 +204,11 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
     if ($contribution['contribution_status_id:name'] === 'Partially paid') {
       $contribution['paid_amount'] = round($contribution['total_amount'] / 2, 2);
     }
-    elseif ($contribution['contribution_status_id:name'] === 'Pending' || $contribution['contribution_status_id:name'] === 'Refunded') {
+    elseif (in_array(
+      $contribution['contribution_status_id:name'],
+      ['Pending', 'Pending (Processing)', 'Refunded'],
+      TRUE
+    )) {
       $contribution['paid_amount'] = 0;
     }
     else {

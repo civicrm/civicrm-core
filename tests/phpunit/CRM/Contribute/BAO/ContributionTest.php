@@ -500,8 +500,22 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
     $this->assertFinancialTransactionCount(2, 2345, FALSE);
     $this->assertFinancialTransactionCount(0, 2345, TRUE);
-    // Update contribution amount.
+
+    // Moving a pending payment to processor-controlled processing must not
+    // record a payment or otherwise change the financial transactions.
     $params['id'] = $contribution['id'];
+    $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Pending (Processing)'
+    );
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
+
+    $this->assertEquals($params['contribution_status_id'], $contribution['contribution_status_id']);
+    $this->assertFinancialTransactionCount(2, 2345, FALSE);
+    $this->assertFinancialTransactionCount(0, 2345, TRUE);
+
+    // Update contribution amount.
     $params['contribution_status_id'] = 1;
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
@@ -509,6 +523,39 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($params['contribution_status_id'], $contribution['contribution_status_id'], 'Check for status update.');
     $this->assertFinancialTransactionCount(2, 2345, FALSE);
     $this->assertFinancialTransactionCount(1, 2345, TRUE);
+  }
+
+  /**
+   * Moving an online pending contribution through processing records payment only on completion.
+   */
+  public function testIsPaymentFlagForPendingProcessing(): void {
+    $params = [
+      'contact_id' => $this->individualCreate(),
+      'currency' => 'USD',
+      'financial_type_id' => 1,
+      'contribution_status_id' => 2,
+      'payment_instrument_id' => 1,
+      'receive_date' => '20080522000000',
+      'total_amount' => 200.00,
+      'trxn_id' => 'pending-processing',
+      'sequential' => TRUE,
+    ];
+
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
+    $this->assertFinancialTransactionCount(0, 'pending-processing', TRUE);
+
+    $params['id'] = $contribution['id'];
+    $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Pending (Processing)'
+    );
+    $this->callAPISuccess('Contribution', 'create', $params);
+    $this->assertFinancialTransactionCount(0, 'pending-processing', TRUE);
+
+    $params['contribution_status_id'] = 1;
+    $this->callAPISuccess('Contribution', 'create', $params);
+    $this->assertFinancialTransactionCount(1, 'pending-processing', TRUE);
   }
 
   /**
@@ -1549,6 +1596,47 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
     $activity = Activity::get()->setWhere($activityWhere)->execute()->first();
     $this->assertNull($activity['campaign_id'], 'Should have removed campaign from contribution activity');
+  }
+
+  /**
+   * Ensure processor-controlled pending contributions have restricted transitions.
+   */
+  public function testPendingProcessingStatusTransitions(): void {
+    $statusIDs = [];
+    $statusNames = ['Pending', 'Pending (Processing)', 'Completed', 'Failed', 'Cancelled', 'Refunded', 'Chargeback'];
+    foreach ($statusNames as $statusName) {
+      $statusIDs[$statusName] = CRM_Core_PseudoConstant::getKey(
+        'CRM_Contribute_BAO_Contribution',
+        'contribution_status_id',
+        $statusName
+      );
+      $this->assertNotEmpty($statusIDs[$statusName], "The {$statusName} contribution status should exist");
+    }
+
+    CRM_Contribute_BAO_Contribution::checkStatusValidation(
+      ['contribution_status_id' => $statusIDs['Pending']],
+      ['contribution_status_id' => $statusIDs['Pending (Processing)']]
+    );
+
+    foreach (['Completed', 'Failed', 'Cancelled'] as $allowedStatus) {
+      CRM_Contribute_BAO_Contribution::checkStatusValidation(
+        ['contribution_status_id' => $statusIDs['Pending (Processing)']],
+        ['contribution_status_id' => $statusIDs[$allowedStatus]]
+      );
+    }
+
+    foreach (['Refunded', 'Chargeback'] as $disallowedStatus) {
+      try {
+        CRM_Contribute_BAO_Contribution::checkStatusValidation(
+          ['contribution_status_id' => $statusIDs['Pending (Processing)']],
+          ['contribution_status_id' => $statusIDs[$disallowedStatus]]
+        );
+        $this->fail("Pending (Processing) should not transition directly to {$disallowedStatus}");
+      }
+      catch (CRM_Core_Exception $e) {
+        $this->assertStringContainsString('Cannot change contribution status', $e->getMessage());
+      }
+    }
   }
 
   /**
