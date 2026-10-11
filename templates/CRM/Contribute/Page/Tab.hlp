@@ -21,6 +21,9 @@
 {ts}Select the appropriate financial type for this transaction.{/ts}
 {/htxt}
 
+{htxt id='contribution_page_id'}
+{ts}Selecting a contribution page will include its receipt message in the email receipt.{/ts}
+{/htxt}
 
 {htxt id="payment_instrument_id"}
   <p>
