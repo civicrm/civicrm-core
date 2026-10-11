@@ -226,7 +226,7 @@ class Schema {
       // 'civicrm_afform_submission',
       // 'civicrm_batch',
       // 'civicrm_cache',
-      'civicrm_campaign',
+      // 'civicrm_campaign',
       // 'civicrm_campaign_group',
       // 'civicrm_case',
       // 'civicrm_case_activity',
