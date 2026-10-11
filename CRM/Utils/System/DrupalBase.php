@@ -286,10 +286,28 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * Copied from D7's `drupal_flush_all_caches()`, but
+   * omits the bits that are wasetful or dangerous, namely `registry_rebuild()`
+   * which can corrupt D7's database {registry} if called from outside Drupal.
    */
   public function flush() {
-    drupal_flush_all_caches();
+    if (function_exists('_drupal_flush_css_js')) {
+      _drupal_flush_css_js();
+      drupal_clear_css_cache();
+      drupal_clear_js_cache();
+    }
+    if (function_exists('entity_info_cache_clear')) {
+      entity_info_cache_clear();
+    }
+    if (function_exists('cache_clear_all')) {
+      // Don't clear cache_form - in-progress form submissions may break.
+      // Ordered so clearing the page cache will always be the last action.
+      $core = ['cache', 'cache_path', 'cache_filter', 'cache_bootstrap', 'cache_page'];
+      $tables = array_merge(module_invoke_all('flush_caches'), $core);
+      foreach ($tables as $table) {
+        cache_clear_all('*', $table, TRUE);
+      }
+    }
   }
 
   /**
