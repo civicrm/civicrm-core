@@ -293,12 +293,29 @@ class CRM_Utils_PDF_Label extends TCPDF {
     }
   }
 
+
   /**
    * Print a label.
    *
    * @param $texte
+   * @param int|bool $transpose
    */
-  public function AddPdfLabel($texte) {
+  public function AddPdfLabel($texte,$transpose=false) {
+    if ($transpose)
+    {
+      $this->AddTransposedPdfLabel($texte);
+    }
+    else
+    {
+      $this->AddUntransposedPdfLabel($texte);
+    }
+  }
+
+  /**
+   *
+   * @param $texte
+  */
+  public function AddUntransposedPdfLabel($texte) {
     if ($this->countX == $this->xNumber) {
       // Page full, we start a new one
       $this->AddPage();
@@ -356,4 +373,34 @@ class CRM_Utils_PDF_Label extends TCPDF {
     return $list;
   }
 
+  /**
+   * Transposition (like matrixes) of a label position
+   * @param $text
+   * @return void
+   */
+  public function AddTransposedPdfLabel($text) {
+    if ($this->countY == $this->yNumber) {
+      // Page full, we start a new one
+      $this->AddPage();
+      $this->countX = 0;
+      $this->countY = 0;
+    }
+
+    $posX = $this->marginLeft + ($this->countX * ($this->width + $this->xSpace));
+    $posY = $this->marginTop + ($this->countY * ($this->height + $this->ySpace));
+    $this->SetXY($posX + $this->paddingLeft, $posY + $this->paddingTop);
+    if ($this->generatorMethod) {
+      call_user_func_array([$this->generatorObject, $this->generatorMethod], [$text]);
+    }
+    else {
+      $this->generateLabel($text);
+    }
+    $this->countX++;
+
+    if ($this->countX == $this->xNumber) {
+      // End of column reached, we start a new one
+      $this->countY++;
+      $this->countX = 0;
+    }
+  }
 }
