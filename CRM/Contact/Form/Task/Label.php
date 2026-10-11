@@ -44,6 +44,10 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
   public static function buildLabelForm($form) {
     $form->setTitle(ts('Make Mailing Labels'));
 
+    //add offset and orientation transposition configuration
+    $form->add('text', 'offset', ts('Number of label slots to skip at the start of the sheet'), ['value' => 0]);
+    $form->add('checkbox', 'fill_across', ts('Fill across rows first'));
+
     //add select for label
     $label = CRM_Core_BAO_LabelFormat::getList(TRUE);
 
@@ -86,7 +90,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     $format = CRM_Core_BAO_LabelFormat::getDefaultValues();
     $defaults['label_name'] = $format['name'] ?? NULL;
     $defaults['do_not_mail'] = 1;
-
+    $defaults['offset'] = 0;
+    $defaults['fill_across'] = FALSE;
     return $defaults;
   }
 
@@ -126,6 +131,37 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    */
   protected function getContactIDs(): array {
     return $this->_contactIds;
+  }
+
+  /**
+   * @param array $fields
+   *
+   * @return bool|array
+   */
+  public static function validateOffset($fields): bool|array {
+
+    $errors = [];
+    if (is_array($fields) && array_key_exists('offset', $fields)) {
+      $offset = $fields['offset'];
+
+      if (!(CRM_Utils_Rule::positiveInteger($offset)||$offset === ''||is_null($offset))) {
+        $errors['offset'] = ts('Offset should be a zero or positive integer');
+      }
+      elseif (CRM_Utils_Rule::positiveInteger($offset)) {
+        // Skipping a full sheet or more would only produce blank pages.
+        $format = CRM_Core_BAO_LabelFormat::getByName($fields['label_name'] ?? NULL);
+        $labelsPerSheet = $format['NX'] * $format['NY'];
+        if ($offset >= $labelsPerSheet) {
+          $errors['offset'] = ts('The selected label format has %1 labels per sheet, so the offset must be less than %1.', [1 => $labelsPerSheet]);
+        }
+      }
+    }
+    return empty($errors) ? TRUE : $errors;
+  }
+
+  public function addRules(): void {
+    parent::addRules();
+    $this->addFormRule(['CRM_Contact_Form_Task_Label', 'validateOffset']);
   }
 
 }

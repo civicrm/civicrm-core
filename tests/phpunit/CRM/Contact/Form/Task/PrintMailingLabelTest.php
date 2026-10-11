@@ -121,6 +121,52 @@ NETHERLANDS S', $rows[$this->ids['Contact']['collins']][0]);
   }
 
   /**
+   * Test that an offset adds blank labels before the first contact.
+   */
+  public function testMailingLabelOffset(): void {
+    $this->createTestAddresses();
+    $rows = $this->submitForm(['offset' => 2]);
+    $this->assertCount(4, $rows);
+    // Blank labels must come first so the first positions on the sheet are left empty.
+    $this->assertEquals([-1, -2], array_slice(array_keys($rows), 0, 2));
+    $this->assertEquals([''], $rows[-1]);
+    $this->assertEquals([''], $rows[-2]);
+    $this->assertEquals($this->getExpectedAddress('souza'), $rows[$this->ids['Contact']['souza']][0]);
+    $this->assertEquals($this->getExpectedAddress('collins'), $rows[$this->ids['Contact']['collins']][0]);
+  }
+
+  /**
+   * Test the order labels are placed on the sheet.
+   *
+   * Format 3475 has 3 columns and 8 rows, so 2 labels stay on the first
+   * row when filling across, and in the first column when filling down.
+   */
+  public function testMailingLabelFillAcross(): void {
+    $this->createTestAddresses();
+
+    $pdf = $this->submitFormGetPdf([]);
+    $this->assertEquals(0, $pdf->countX);
+    $this->assertEquals(2, $pdf->countY);
+
+    $pdf = $this->submitFormGetPdf(['fill_across' => 1]);
+    $this->assertEquals(2, $pdf->countX);
+    $this->assertEquals(0, $pdf->countY);
+  }
+
+  /**
+   * @param array $submitValues
+   *
+   * @return \CRM_Utils_PDF_Label
+   */
+  protected function submitFormGetPdf(array $submitValues): CRM_Utils_PDF_Label {
+    $criteria = ['radio_ts' => 'ts_all', ['contact_id', 'IN', $this->ids['Contact']]];
+    $form = $this->getTestForm('CRM_Contact_Form_Search_Basic', $criteria)
+      ->addSubsequentForm('CRM_Contact_Form_Task_Label', ['label_name' => 3475] + $submitValues);
+    $form->processForm();
+    return $form->getException()->errorData['pdf'];
+  }
+
+  /**
    * Get the default address we expect for our test contact with the default string.
    *
    * @param string $identifier

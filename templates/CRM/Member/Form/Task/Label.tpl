@@ -14,6 +14,14 @@
         <td class="label">{$form.label_name.label} {help id="label_name" file="CRM/Contact/Form/Task/Label.hlp"}</td>
         <td>{$form.label_name.html}</td>
      </tr>
+    <tr class="crm-contact-task-mailing-label-form-block-fill_across">
+      <td class="label">{$form.fill_across.label} {help id="fill_across" file="CRM/Contact/Form/Task/Label.hlp"}</td>
+      <td>{$form.fill_across.html}</td>
+    </tr>
+    <tr class="crm-contact-task-mailing-label-form-block-offset">
+      <td class="label">{$form.offset.label} {help id="offset" file="CRM/Contact/Form/Task/Label.hlp"}</td>
+      <td>{$form.offset.html}</td>
+    </tr>
      <tr class="crm-contact-task-mailing-label-form-block-location_type_id">
         <td class="label">{$form.location_type_id.label}</td>
         <td>{$form.location_type_id.html}</td>

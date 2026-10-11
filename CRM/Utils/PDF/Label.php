@@ -141,6 +141,12 @@ class CRM_Utils_PDF_Label extends TCPDF {
   public $countY = 0;
 
   /**
+   * Fill across rows first
+   * @var bool
+   */
+  public $fill_across = FALSE;
+
+  /**
    * Custom method for generating label, called against $this->generatorObject
    *
    * @var string|null
@@ -153,6 +159,14 @@ class CRM_Utils_PDF_Label extends TCPDF {
    * @var object
    */
   protected $generatorObject;
+
+  public function getFillAcross(): bool {
+    return $this->fill_across;
+  }
+
+  public function setFillAcross(bool $fill_across): void {
+    $this->fill_across = $fill_across;
+  }
 
   /**
    * Constructor.
@@ -299,7 +313,8 @@ class CRM_Utils_PDF_Label extends TCPDF {
    * @param $texte
    */
   public function AddPdfLabel($texte) {
-    if ($this->countX == $this->xNumber) {
+    if ((!$this->getFillAcross() && $this->countX == $this->xNumber) ||
+        ($this->getFillAcross() && $this->countY == $this->yNumber)) {
       // Page full, we start a new one
       $this->AddPage();
       $this->countX = 0;
@@ -315,12 +330,23 @@ class CRM_Utils_PDF_Label extends TCPDF {
     else {
       $this->generateLabel($texte);
     }
-    $this->countY++;
-
-    if ($this->countY == $this->yNumber) {
-      // End of column reached, we start a new one
+    if ($this->getFillAcross()) {
       $this->countX++;
-      $this->countY = 0;
+
+      if ($this->countX == $this->xNumber) {
+        // End of row reached, we start a new one
+        $this->countY++;
+        $this->countX = 0;
+      }
+    }
+    else {
+      $this->countY++;
+
+      if ($this->countY == $this->yNumber) {
+        // End of column reached, we start a new one
+        $this->countX++;
+        $this->countY = 0;
+      }
     }
   }
 

@@ -56,6 +56,8 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     $defaults['merge_same_address'] = 0;
     $defaults['merge_same_household'] = 0;
     $defaults['do_not_mail'] = 1;
+    $defaults['offset'] = 0;
+    $defaults['fill_across'] = FALSE;
     return $defaults;
   }
 
@@ -73,6 +75,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     $mergeSameAddress = $formValues['merge_same_address'] ?? NULL;
     $mergeSameHousehold = $formValues['merge_same_household'] ?? NULL;
     $isPerMembership = $formValues['per_membership'] ?? NULL;
+    $offset = $formValues['offset'] ?? 0;
     if ($isPerMembership && ($mergeSameAddress || $mergeSameHousehold)) {
       // this shouldn't happen  - perhaps is could if JS is disabled
       CRM_Core_Session::setStatus(ts('As you are printing one label per membership your merge settings are being ignored'));
@@ -111,8 +114,14 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
     else {
       $labelRows = $rows;
     }
+    $offsettedRows = [];
+    for ($i = 1; $i <= $offset; $i++) {
+      $offsettedRows[-$i] = [''];
+    }
+    $offsettedRows += $labelRows;
+
     //call function to create labels
-    $this->createLabel($labelRows, $labelName);
+    $this->createLabel($offsettedRows, $labelName);
     CRM_Utils_System::civiExit();
   }
 
@@ -131,6 +140,7 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       throw new CRM_Core_Exception_PrematureExitException('civiExit called', ['rows' => $contactRows, 'format' => $format, 'file_name' => $fileName]);
     }
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
+    $pdf->setFillAcross((bool) $this->getSubmittedValue('fill_across'));
     $pdf->Open();
     $pdf->AddPage();
 
@@ -311,6 +321,11 @@ class CRM_Member_Form_Task_Label extends CRM_Member_Form_Task {
       $addressReturnProperties['postal_code_suffix'] = 1;
     }
     return $addressReturnProperties;
+  }
+
+  public function addRules(): void {
+    parent::addRules();
+    $this->addFormRule(['CRM_Contact_Form_Task_Label', 'validateOffset']);
   }
 
 }
