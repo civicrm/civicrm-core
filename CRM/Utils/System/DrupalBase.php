@@ -287,7 +287,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
    * Copied from D7's `drupal_flush_all_caches()`, but
-   * omits the bits that are wasetful or dangerous, namely `registry_rebuild()`
+   * omits the bits that are irrelevant or dangerous, namely `registry_rebuild()`
    * which can corrupt D7's database {registry} if called from outside Drupal.
    */
   public function flush() {
