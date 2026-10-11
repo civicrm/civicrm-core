@@ -157,6 +157,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event): void {
     unset(Civi::$statics[__CLASS__]);
+    Civi::service('asset_builder')->invalidate();
   }
 
   /**
