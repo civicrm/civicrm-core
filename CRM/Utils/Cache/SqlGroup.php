@@ -108,11 +108,10 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   public function set($key, $value, $ttl = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
 
-    $lock = Civi::lockManager()->acquire("cache.{$this->group}_{$key}._null");
+    // The caller already has the value, so a contended write is skipped at once rather than
+    // waited for: a writer inside a transaction holds the lock until it commits.
+    $lock = Civi::lockManager()->acquire("cache.{$this->group}_{$key}._null", 0);
     if (!$lock->isAcquired()) {
-      // Contention is transient and the caller already has the value, so skip
-      // the write rather than abort the request (cf. FileCache::set()).
-      Civi::log()->warning('SqlGroup: skipped cache write, lock unavailable', ['group' => $this->group]);
       return FALSE;
     }
 

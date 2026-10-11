@@ -46,10 +46,11 @@ class E2E_Cache_SqlGroupLockTest extends \CiviEndToEndTestCase {
     $cache = new CRM_Utils_Cache_SqlGroup(['group' => self::GROUP, 'prefetch' => FALSE]);
 
     $this->holdLock();
-    // CRM_Core_Lock::TIMEOUT applies here, so this call blocks briefly.
+    $start = microtime(TRUE);
     $result = $cache->set(self::KEY, 'value-that-should-not-be-stored');
 
     $this->assertFalse($result, 'set() should report failure rather than throw.');
+    $this->assertLessThan(1, microtime(TRUE) - $start, 'set() should not wait for the lock.');
     $this->assertEquals(0, $this->countRows(), 'No row should be written while the lock is held.');
   }
 
