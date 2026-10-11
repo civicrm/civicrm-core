@@ -21,7 +21,11 @@
   <tr>
    <td>
     {assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}
+    {if $isPendingFromApproval}
+    <p>{ts}This is an invitation to complete your registration which was pending approval.{/ts}</p>
+    {else}
     <p>{ts}This is an invitation to complete your registration that was initially waitlisted.{/ts}</p>
+    {/if}
    </td>
   </tr>
   {if !$isAdditional and {participant.id|boolean}}
