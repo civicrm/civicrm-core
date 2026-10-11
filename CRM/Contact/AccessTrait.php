@@ -20,27 +20,66 @@ use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Trait shared with entities attached to the contact record.
+ *
+ * Users of this trait must implement HookInterface.
+ * @phpstan-require-implements \Civi\Core\HookInterface
  */
 trait CRM_Contact_AccessTrait {
 
   /**
+   * Callback for `hook_civicrm_pre` event.
+   *
+   * Block non-admins from changing the contact_id of an existing record.
+   *
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public static function checkContactAccessPre(\Civi\Core\Event\PreEvent $event): void {
+    if (empty($event->params['check_permissions'])) {
+      return;
+    }
+    if ($event->action !== 'edit' || empty($event->id) || !array_key_exists('contact_id', $event->params)) {
+      return;
+    }
+    if (empty($event->params['check_permissions']) || CRM_Core_Permission::check('edit all contacts')) {
+      return;
+    }
+    $storedCid = \CRM_Core_DAO::getFieldValue(static::class, $event->id, 'contact_id');
+    if ((string) $storedCid !== (string) $event->params['contact_id']) {
+      throw new \Civi\API\Exception\UnauthorizedException(\ts('Cannot change the contact_id of an existing %1.', [1 => $event->entity]));
+    }
+  }
+
+  /**
+   * Callback for `civi.api4.authorizeRecord` event.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+  public static function checkContactAccessAuthorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $userID = $e->getUserID();
     $delegateAction = $e->getActionName() === 'get' ? 'get' : 'update';
     $cid = $record['contact_id'] ?? NULL;
-    if (!$cid && !empty($record['id'])) {
-      $cid = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'contact_id');
+    $storedCid = NULL;
+
+    if (!empty($record['id'])) {
+      $storedCid = (int) CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'contact_id');
+      if ($storedCid && !CoreUtil::checkAccessDelegated('Contact', $delegateAction, ['id' => $storedCid], $userID)) {
+        $e->setAuthorized(FALSE);
+        return;
+      }
+      if ($cid && $storedCid && (string) $cid !== (string) $storedCid && !CRM_Core_Permission::check('edit all contacts', $userID)) {
+        $e->setAuthorized(FALSE);
+        return;
+      }
     }
-    if (!$cid) {
+
+    $targetCid = $cid ?: $storedCid;
+    if (!$targetCid) {
       // With no contact id this must be part of an event locblock
       $e->setAuthorized(in_array(__CLASS__, ['CRM_Core_BAO_Phone', 'CRM_Core_BAO_Email', 'CRM_Core_BAO_Address', 'CRM_Core_BAO_IM']) &&
         CRM_Core_Permission::check('edit all events', $userID));
     }
     else {
-      $e->setAuthorized(CoreUtil::checkAccessDelegated('Contact', $delegateAction, ['id' => $cid], $userID));
+      $e->setAuthorized(CoreUtil::checkAccessDelegated('Contact', $delegateAction, ['id' => $targetCid], $userID));
     }
   }
 
