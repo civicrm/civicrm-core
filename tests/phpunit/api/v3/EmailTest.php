@@ -515,4 +515,29 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->assertEquals($emailMatchEmailID, $result[1]['id']);
   }
 
+  /**
+   * Test that a non-admin cannot steal another contact's email using APIv3.
+   */
+  public function testCannotStealEmailWithCheckPermissions(): void {
+    $userContact = $this->individualCreate(['first_name' => 'User']);
+    $otherContact = $this->individualCreate(['first_name' => 'Other']);
+    $otherEmail = $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $otherContact,
+      'email' => 'other@example.com',
+    ])['id'];
+
+    CRM_Core_Session::singleton()->set('userID', $userContact);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $this->callAPIFailure('Email', 'create', [
+      'id' => $otherEmail,
+      'contact_id' => $userContact,
+      'check_permissions' => 1,
+    ]);
+  }
+
 }
