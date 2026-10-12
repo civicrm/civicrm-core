@@ -91,18 +91,6 @@
   background: var(--crm-secondary-color);
   color: var(--crm-secondary-text-color);
 }
-.crm-container a.button.delete-button,
-.crm-container a.button.delete-button:link,
-.crm-container a.button.delete,
-.crm-container a.button.delete:link {
-  background: var(--crm-btn-danger-bg-color);
-  color: var(--crm-btn-cancel-text-color);
-}
-.crm-container a.button.delete-button:hover,
-.crm-container a.button.delete-button:focus,
-.crm-container a.button.delete:hover {
-  background: color-mix(in srgb, var(--crm-btn-danger-bg-color) 87.5%, #000 12.5%);
-}
 .crm-container .crm-button-type-cancel:hover,
 .crm-container .crm-button-type-cancel:focus,
 .crm-container button.ui-button:has(.fa-times):hover,
@@ -113,7 +101,7 @@
   color: var(--crm-secondary-hover-text-color);
 }
 
-/* BS3 colour options */
+/* With BS3 colour options */
 
 #bootstrap-theme .btn-secondary {
   background: var(--crm-secondary-color);
@@ -151,12 +139,13 @@
   background: color-mix(in srgb, var(--crm-btn-success-bg-color) 87.5%, #000 12.5%);
   color: var(--crm-btn-success-text-color);
 }
-#bootstrap-theme .btn-danger {
+#bootstrap-theme .btn-danger,
+.crm-container a.button:is(.delete-button,.delete-button:link,.delete,.delete:link) {
   background: var(--crm-btn-danger-bg-color);
   color: var(--crm-btn-danger-text-color);
 }
-#bootstrap-theme .btn.btn-danger:hover,
-#bootstrap-theme .btn.btn-danger:focus {
+#bootstrap-theme .btn.btn-danger:is(:hover,:focus),
+.crm-container a.button:is(.delete-button,.delete-button:link,.delete,.delete:link):is(:hover,:focus) {
   background: color-mix(in srgb, var(--crm-btn-danger-bg-color) 87.5%, #000 12.5%);
   color: var(--crm-btn-danger-text-color);
 }
