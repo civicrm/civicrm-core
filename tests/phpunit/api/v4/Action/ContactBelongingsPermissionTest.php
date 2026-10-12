@@ -591,4 +591,60 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
     $this->assertEquals($userContact, $stored);
   }
 
+  /**
+   * Test updating an existing report instance to change owner_id.
+   */
+  public function testCannotStealReportInstanceOwnerWithCheckPermissions(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+    $report = \CRM_Report_BAO_ReportInstance::add([
+      'report_id' => 'contact/summary',
+      'title' => 'Victim Report 1',
+      'owner_id' => $otherContact,
+      'created_id' => $otherContact,
+    ]);
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviReport',
+      'save Report Criteria',
+    ];
+
+    $this->expectException(UnauthorizedException::class);
+    \CRM_Report_BAO_ReportInstance::writeRecord([
+      'id' => $report->id,
+      'owner_id' => $userContact,
+      'check_permissions' => 1,
+    ]);
+  }
+
+  /**
+   * Test updating an existing report instance to change created_id.
+   */
+  public function testCannotStealReportInstanceCreatedIdWithCheckPermissions(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+    $report = \CRM_Report_BAO_ReportInstance::add([
+      'report_id' => 'contact/summary',
+      'title' => 'Victim Report 2',
+      'owner_id' => $otherContact,
+      'created_id' => $otherContact,
+    ]);
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviReport',
+      'save Report Criteria',
+    ];
+
+    $this->expectException(UnauthorizedException::class);
+    \CRM_Report_BAO_ReportInstance::writeRecord([
+      'id' => $report->id,
+      'created_id' => $userContact,
+      'check_permissions' => 1,
+    ]);
+  }
+
 }
