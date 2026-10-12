@@ -28,6 +28,11 @@ use Civi\Api4\Event\AuthorizeRecordEvent;
  * This class contains user jobs functionality.
  */
 class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface {
+  use \CRM_Core_OwnershipAccessTrait;
+
+  protected static function checkOwnerAdminPermission(?int $userID = NULL): bool {
+    return \CRM_Core_Permission::check([['administer CiviCRM data', 'administer queues']], $userID);
+  }
 
   /**
    * Check on the status of a queue.
@@ -238,11 +243,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $userID = $e->getUserID();
-    $cid = $record['created_id'] ?? NULL;
-    // @todo handle create action
-    if (!$cid && !empty($record['id'])) {
-      $cid = (int) CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'created_id');
-    }
+    $cid = !empty($record['id']) ? (int) CRM_Core_DAO::getFieldValue(static::class, $record['id'], 'created_id') : ($record['created_id'] ?? NULL);
     if ($cid && $e->getActionName() === 'update') {
       $e->setAuthorized(($cid === $userID) || (\CRM_Core_Permission::check('administer queues', $userID)));
     }
