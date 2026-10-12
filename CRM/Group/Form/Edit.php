@@ -127,6 +127,13 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to delete this reserved group.'));
       }
     }
+    elseif ($this->_action == CRM_Core_Action::RENEW) {
+      $this->assign('title', $this->_title);
+      CRM_Utils_System::setTitle(ts('Confirm Group Convert'));
+      if ($this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
+        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to convert this reserved group."));
+      }
+    }
     else {
       if ($this->_id && $this->_groupValues['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved groups')) {
         CRM_Core_Error::statusBounce(ts('You do not have sufficient permission to change settings for this reserved group.'));
@@ -207,7 +214,23 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->buildQuickEntityForm();
+    if ($this->_action & CRM_Core_Action::RENEW) {
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => ts('Convert'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
+      return;
+    }
+    else {
+      self::buildQuickEntityForm();
+    }
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -306,6 +329,11 @@ WHERE  title = %1
       CRM_Contact_BAO_Group::discard($this->_id);
       CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", [1 => $this->_groupValues['title']]), ts('Group Deleted'), 'success');
       $updateNestingCache = TRUE;
+    }
+    elseif ($this->_action & CRM_Core_Action::RENEW) {
+      CRM_Contact_BAO_Group::convertToRegularGroup($this->_id);
+      CRM_Core_Session::setStatus(ts("The Group '%1' has been converted.", [1 => $this->_title]), ts('Group Converted'), 'success');
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/group/search', 'force=1&context=smog&gid=' . $this->_id, TRUE, NULL, FALSE));
     }
     else {
       // store the submitted values in an array
