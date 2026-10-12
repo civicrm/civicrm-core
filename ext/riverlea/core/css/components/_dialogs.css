@@ -180,8 +180,7 @@
 #crm-notification-container div.ui-notify-message-style.error {
   border-color: var(--crm-notify-danger-color);
 }
-#crm-notification-container div.ui-notify-message-style.alert,
-#crm-notification-container div.ui-notify-message-style.warning {
+#crm-notification-container div.ui-notify-message-style:is(.alert,.warning) {
   border-color: var(--crm-notify-warning-color);
 }
 #crm-notification-container div.ui-notify-message-style.success {
@@ -190,8 +189,11 @@
 #crm-notification-container div.ui-notify-message-style.info {
   border-color: var(--crm-notify-info-color);
 }
+#crm-notification-container div.notify-content {
+  padding-left: 1.75rem;
+}
 #crm-notification-container div.ui-notify-message:last-child {
-  margin-bottom: 0;
+  margin-block: var(--crm-l-medium) 0;
 }
 #crm-notification-container div.ui-notify-message h1 {
   font-size: var(--crm-font-size);
@@ -199,17 +201,22 @@
   margin: 0 2ch var(--crm-l-medium) 0;
   color: var(--crm-notify-color);
 }
+#crm-notification-container div.ui-notify-message h1::before {
+  width: 1.75rem;
+  display: inline-block;
+  margin: 0 !important;
+  position: relative;
+}
 #crm-notification-container div.ui-notify-message h1:empty {
   float: left;
   margin: 0;
 }
-#crm-notification-container div.ui-notify-message-style,
 #crm-notification-container div.ui-notify-message .notify-content :is(p,ul,ol) {
   color: var(--crm-notify-color);
+  margin-block: var(--crm-l-medium);
 }
 #crm-notification-container div.ui-notify-message .notify-content :is(ul,ol) {
   padding-left: var(--crm-l-reg-2);
-  margin-block: var(--crm-l-medium);
 }
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget,
 #crm-notification-container div.ui-notify-message-style a.ui-button.ui-widget:hover,
