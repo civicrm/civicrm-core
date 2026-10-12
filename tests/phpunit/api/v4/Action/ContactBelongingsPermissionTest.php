@@ -20,6 +20,7 @@ use Civi\Api4\LocBlock;
 use Civi\Api4\Note;
 use Civi\Api4\Relationship;
 use Civi\Api4\SavedSearch;
+use Civi\Api4\UserJob;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -347,6 +348,72 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
           'id' => $otherRel,
           'contact_id_a' => $userContact,
           'contact_id_b' => $userContact,
+        ],
+      ])
+      ->execute();
+  }
+
+  /**
+   * Test AbstractUpdateAction: updating an existing user job to point to user.
+   */
+  public function testAbstractUpdateActionCannotStealUserJob(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+    $otherJob = UserJob::create(FALSE)
+      ->addValue('name', 'victim_job_test1')
+      ->addValue('created_id', $otherContact)
+      ->addValue('job_type', 'mail_import')
+      ->addValue('status_id', 2)
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+    ];
+
+    $values = [
+      'id' => $otherJob,
+      'created_id' => $userContact,
+    ];
+
+    $accessCheck = UserJob::checkAccess()
+      ->setValues($values)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertFalse($accessCheck['access']);
+
+    $this->expectException(UnauthorizedException::class);
+    UserJob::update()
+      ->setValues($values)
+      ->execute();
+  }
+
+  /**
+   * Test AbstractSaveAction: saving an existing user job to point to user.
+   */
+  public function testAbstractSaveActionCannotStealUserJob(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+    $otherJob = UserJob::create(FALSE)
+      ->addValue('name', 'victim_job_test2')
+      ->addValue('created_id', $otherContact)
+      ->addValue('job_type', 'mail_import')
+      ->addValue('status_id', 2)
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+    ];
+
+    $this->expectException(UnauthorizedException::class);
+    UserJob::save()
+      ->setRecords([
+        [
+          'id' => $otherJob,
+          'created_id' => $userContact,
         ],
       ])
       ->execute();
