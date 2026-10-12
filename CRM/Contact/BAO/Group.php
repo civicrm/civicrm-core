@@ -31,6 +31,38 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
   }
 
   /**
+   * convert the group to regular group
+   *
+   * @param int $groupID Group id.
+   */
+  public static function convertToRegularGroup($groupID) {
+    //recalculate cache to get updated results
+    CRM_Contact_BAO_GroupContactCache::add($groupID);
+
+    //load all the smart group members as static group members
+    $insertSql = "INSERT IGNORE INTO civicrm_group_contact (contact_id, group_id, status)
+       (SELECT DISTINCT contact_id, group_id, 'Added' FROM civicrm_group_contact_cache WHERE group_id = %1 )";
+
+    CRM_Core_DAO::executeQuery($insertSql, [
+      1 => [$groupID, 'Positive'],
+    ]);
+
+    //subscription history should reflect the date
+    $insertSql = "INSERT IGNORE INTO civicrm_subscription_history(contact_id, group_id, date, method, status)
+ (SELECT contact_id, group_id, now(), 'Admin', 'Added' FROM civicrm_group_contact WHERE group_id = %1 )";
+    CRM_Core_DAO::executeQuery($insertSql, [
+      1 => [$groupID, 'Positive'],
+    ]);
+
+    //update the smart to regular group, unset the saved search criteria
+    //of which the smart search is based on
+    $updateSql = "UPDATE civicrm_group SET saved_search_id = NULL, refresh_date = NULL WHERE id = %1;";
+    CRM_Core_DAO::executeQuery($updateSql, [
+      1 => [$groupID, 'Positive'],
+    ]);
+  }
+
+  /**
    * Delete the group and all the object that connect to this group.
    *
    * Incredibly destructive.
@@ -730,6 +762,9 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
       }
 
       $action = array_sum(array_keys($newLinks));
+      if (!$object->saved_search_id) {
+        $action -= CRM_Core_Action::RENEW;
+      }
 
       // CRM-9936
       if (property_exists($object, 'is_reserved')) {
@@ -1152,6 +1187,12 @@ WHERE {$whereClause}";
         'qs' => 'reset=1&action=delete&id=%%id%%',
         'title' => ts('Delete Group'),
         'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
+      ],
+      CRM_Core_Action::RENEW => [
+        'name' => ts('Convert'),
+        'url' => 'civicrm/group',
+        'qs' => 'reset=1&action=renew&id=%%id%%',
+        'title' => ts('Convert to Regular Group'),
       ],
     ];
   }
