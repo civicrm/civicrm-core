@@ -256,14 +256,25 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO implements \Civi\Core\HookIn
       return;
     }
 
-    $eid = $record['entity_id'] ?? NULL;
-    if (!$eid) {
+    $delegatedAction = $action === 'get' ? 'get' : 'update';
+    $storedEid = NULL;
+
+    // When referencing an existing record, verify access to the stored target entity
+    if (!empty($record['id'])) {
       $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $groupName, 'table_name', 'name');
-      $eid = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `$tableName` WHERE id = " . (int) $record['id']);
+      $storedEid = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `$tableName` WHERE id = " . (int) $record['id']);
+      if ($storedEid && !\Civi\Api4\Utils\CoreUtil::checkAccessDelegated($extends, $delegatedAction, ['id' => $storedEid], $userID)) {
+        $e->setAuthorized(FALSE);
+        return;
+      }
+      // entity_id on an existing custom value cannot be reassigned to another entity
+      if ($storedEid && isset($record['entity_id']) && (int) $record['entity_id'] !== (int) $storedEid) {
+        $e->setAuthorized(FALSE);
+        return;
+      }
     }
 
-    // Do we have access to the target record?
-    $delegatedAction = $action === 'get' ? 'get' : 'update';
+    $eid = $record['entity_id'] ?? $storedEid ?? NULL;
     $e->setAuthorized(\Civi\Api4\Utils\CoreUtil::checkAccessDelegated($extends, $delegatedAction, ['id' => $eid], $userID));
   }
 
