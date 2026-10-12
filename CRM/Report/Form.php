@@ -4998,6 +4998,10 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'title' => ts('Birth Date'),
         'operatorType' => CRM_Report_Form::OP_DATE,
       ],
+      'deceased_date' => [
+        'title' => ts('Deceased Date'),
+        'operatorType' => CRM_Report_Form::OP_DATE,
+      ],
       'contact_type' => [
         'title' => ts('Contact Type'),
       ],
