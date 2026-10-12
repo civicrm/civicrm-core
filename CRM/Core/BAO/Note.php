@@ -20,6 +20,11 @@
  */
 class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInterface {
   use CRM_Core_DynamicFKAccessTrait;
+  use CRM_Core_OwnershipAccessTrait;
+
+  protected static function getOwnerContactIdField(): string {
+    return 'contact_id';
+  }
 
   /**
    * Const the max number of notes we display at any given time.
@@ -65,12 +70,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
       return NULL;
     }
 
-    if (!empty($params['entity_table']) && $params['entity_table'] == 'civicrm_contact' && !empty($params['check_permissions'])) {
-      if (!CRM_Contact_BAO_Contact_Permission::allow($params['entity_id'], CRM_Core_Permission::EDIT)) {
-        throw new CRM_Core_Exception('Permission denied to modify contact record');
-      }
-    }
-
     $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
 
     $id = $params['id'] ?? $ids['id'] ?? NULL;
@@ -90,6 +89,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
         $params['contact_id'] = $params['entity_id'];
       }
     }
+
+    CRM_Utils_Hook::pre($id ? 'edit' : 'create', 'Note', $id, $params);
 
     $note = new CRM_Core_BAO_Note();
     $note->copyValues($params);
