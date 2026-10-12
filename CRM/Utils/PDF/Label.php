@@ -293,20 +293,17 @@ class CRM_Utils_PDF_Label extends TCPDF {
     }
   }
 
-
   /**
    * Print a label.
    *
    * @param $texte
    * @param int|bool $transpose
    */
-  public function AddPdfLabel($texte,$transpose=false) {
-    if ($transpose)
-    {
+  public function AddPdfLabel($texte, $transpose = FALSE) {
+    if ($transpose) {
       $this->AddTransposedPdfLabel($texte);
     }
-    else
-    {
+    else {
       $this->AddUntransposedPdfLabel($texte);
     }
   }
@@ -314,7 +311,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   /**
    *
    * @param $texte
-  */
+   */
   public function AddUntransposedPdfLabel($texte) {
     if ($this->countX == $this->xNumber) {
       // Page full, we start a new one
@@ -403,4 +400,5 @@ class CRM_Utils_PDF_Label extends TCPDF {
       $this->countX = 0;
     }
   }
+
 }

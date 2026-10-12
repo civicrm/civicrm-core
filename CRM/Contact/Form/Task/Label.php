@@ -45,8 +45,8 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
     $form->setTitle(ts('Make Mailing Labels'));
 
     //add offset and orientation transposition configuration
-    $form->add('text','offset',ts('Label offset'),['value' => 0],true);
-    $form->add('checkbox','transpose',ts('Label transpose'));
+    $form->add('text', 'offset', ts('Label offset'), ['value' => 0], TRUE);
+    $form->add('checkbox', 'transpose', ts('Label transpose'));
 
     //add select for label
     $label = CRM_Core_BAO_LabelFormat::getList(TRUE);
@@ -138,27 +138,28 @@ class CRM_Contact_Form_Task_Label extends CRM_Contact_Form_Task {
    *
    * @return bool|array
    */
-  public static function validateOffset($fields): bool|array
-  {
+  public static function validateOffset($fields): bool|array {
 
     $errors = [];
     if (is_array($fields) && array_key_exists('offset', $fields)) {
       $offset = $fields['offset'];
 
-      if (is_null($offset) || !preg_match('/^(([0-9])|([1-9][0-9]+))$/',$offset) || $offset < 0) {
+      if (is_null($offset) || !preg_match('/^(([0-9])|([1-9][0-9]+))$/', $offset) || $offset < 0) {
         $errors['offset'] = ts('Offset should be a zero or positive integer');
-      } else {
-        return true;
       }
-    } else {
+      else {
+        return TRUE;
+      }
+    }
+    else {
       $errors['offset'] = ts('Offset is required');
     }
     return $errors;
   }
 
-  public function addRules(): void
-  {
+  public function addRules(): void {
     parent::addRules();
     $this->addFormRule(array('CRM_Contact_Form_Task_Label', 'validateOffset'));
   }
+
 }

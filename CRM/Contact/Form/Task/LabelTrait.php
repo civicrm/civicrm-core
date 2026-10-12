@@ -106,15 +106,14 @@ trait CRM_Contact_Form_Task_LabelTrait {
     if (is_null($offset)) {
       $offset = 0;
     }
-    $offsettedRows=[];
-    for($i=1;$i<=$offset;$i++) {
+    $offsettedRows = [];
+    for ($i = 1; $i <= $offset; $i++) {
       $offsettedRows[-$i] = [''];
     }
-    $offsettedRows+=$reorderedRows;
-
+    $offsettedRows += $reorderedRows;
 
     //call function to create labels
-    $this->createLabel($offsettedRows, $this->getSubmittedValue('label_name'),$transpose);
+    $this->createLabel($offsettedRows, $this->getSubmittedValue('label_name'), $transpose);
   }
 
   /**
@@ -127,7 +126,7 @@ trait CRM_Contact_Form_Task_LabelTrait {
    * @param int $transpose
    *  Whether transposition should occur or not
    */
-  private function createLabel(array $contactRows, $format,$transpose=0): void {
+  private function createLabel(array $contactRows, $format, $transpose = 0): void {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
     $pdf->Open();
     $pdf->AddPage();
@@ -139,7 +138,7 @@ trait CRM_Contact_Form_Task_LabelTrait {
         $val .= "$v\n";
       }
 
-      $pdf->AddPdfLabel($val,$transpose);
+      $pdf->AddPdfLabel($val, $transpose);
       $val = '';
     }
     if (CIVICRM_UF === 'UnitTests') {
