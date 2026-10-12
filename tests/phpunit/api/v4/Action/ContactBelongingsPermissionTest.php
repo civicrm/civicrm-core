@@ -647,4 +647,174 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
     ]);
   }
 
+  /**
+   * Test AbstractUpdateAction: updating an existing custom value to change entity_id.
+   */
+  public function testAbstractUpdateActionCannotUpdateOtherCustomValue(): void {
+    $groupName = uniqid('grp');
+    $fieldName = uniqid('fld');
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => $groupName,
+      'name' => $groupName,
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+    ]);
+
+    $this->createTestRecord('CustomField', [
+      'label' => $fieldName,
+      'name' => $fieldName,
+      'custom_group_id' => $customGroup['id'],
+      'html_type' => 'Text',
+      'data_type' => 'String',
+    ]);
+
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+
+    $customRecord = civicrm_api4("Custom_$groupName", 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'entity_id' => $otherContact,
+        $fieldName => 'Victim Data',
+      ],
+    ])->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view all contacts',
+      'access all custom data',
+    ];
+
+    $values = [
+      'id' => $customRecord,
+      'entity_id' => $userContact,
+      $fieldName => 'Attacker Data',
+    ];
+
+    $accessCheck = civicrm_api4("Custom_$groupName", 'checkAccess', [
+      'values' => $values,
+      'action' => 'update',
+    ])->single();
+    $this->assertFalse($accessCheck['access']);
+
+    $this->expectException(UnauthorizedException::class);
+    civicrm_api4("Custom_$groupName", 'update', [
+      'values' => $values,
+    ]);
+  }
+
+  /**
+   * Test AbstractSaveAction: saving an existing custom value with different entity_id.
+   */
+  public function testAbstractSaveActionCannotUpdateOtherCustomValue(): void {
+    $groupName = uniqid('grp');
+    $fieldName = uniqid('fld');
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => $groupName,
+      'name' => $groupName,
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+    ]);
+
+    $this->createTestRecord('CustomField', [
+      'label' => $fieldName,
+      'name' => $fieldName,
+      'custom_group_id' => $customGroup['id'],
+      'html_type' => 'Text',
+      'data_type' => 'String',
+    ]);
+
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+
+    $customRecord = civicrm_api4("Custom_$groupName", 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'entity_id' => $otherContact,
+        $fieldName => 'Victim Data',
+      ],
+    ])->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'access all custom data',
+    ];
+
+    $this->expectException(UnauthorizedException::class);
+    civicrm_api4("Custom_$groupName", 'save', [
+      'records' => [
+        [
+          'id' => $customRecord,
+          'entity_id' => $userContact,
+          $fieldName => 'Attacker Data',
+        ],
+      ],
+    ]);
+  }
+
+  /**
+   * Test that a user can update their own custom value record.
+   */
+  public function testUserCanUpdateOwnCustomValue(): void {
+    $groupName = uniqid('grp');
+    $fieldName = uniqid('fld');
+    $customGroup = $this->createTestRecord('CustomGroup', [
+      'title' => $groupName,
+      'name' => $groupName,
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+    ]);
+
+    $this->createTestRecord('CustomField', [
+      'label' => $fieldName,
+      'name' => $fieldName,
+      'custom_group_id' => $customGroup['id'],
+      'html_type' => 'Text',
+      'data_type' => 'String',
+    ]);
+
+    $userContact = $this->createLoggedInUser();
+
+    $customRecord = civicrm_api4("Custom_$groupName", 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'entity_id' => $userContact,
+        $fieldName => 'My Data',
+      ],
+    ])->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'access all custom data',
+    ];
+
+    $values = [
+      'id' => $customRecord,
+      $fieldName => 'Updated Data',
+    ];
+
+    $accessCheck = civicrm_api4("Custom_$groupName", 'checkAccess', [
+      'values' => $values,
+      'action' => 'update',
+    ])->single();
+    $this->assertTrue($accessCheck['access']);
+
+    civicrm_api4("Custom_$groupName", 'update', [
+      'values' => $values,
+    ]);
+
+    $saved = civicrm_api4("Custom_$groupName", 'get', [
+      'checkPermissions' => FALSE,
+      'where' => [['id', '=', $customRecord]],
+    ])->first();
+    $this->assertEquals('Updated Data', $saved[$fieldName]);
+  }
+
 }
