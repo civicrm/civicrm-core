@@ -17,6 +17,15 @@ use Civi\Core\Event\PreEvent;
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implements Civi\Core\HookInterface {
+  use CRM_Core_OwnershipAccessTrait;
+
+  protected static function getOwnerContactIdField(): array {
+    return ['owner_id', 'created_id'];
+  }
+
+  protected static function checkOwnerAdminPermission(?int $userID = NULL): bool {
+    return CRM_Core_Permission::check('administer private reports', $userID);
+  }
 
   /**
    * Function ought to be deprecated in favor of self::writeRecord() once the fixmes are addressed.
