@@ -1063,6 +1063,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
     // provides transitional support.
     return;
   }
+  $entityId ??= $params['id'] ?? $params['contact_id'] ?? NULL;
   $values['custom'] = [];
   $checkCheckBoxField = FALSE;
   $entity = $extends;
@@ -1080,6 +1081,18 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
   foreach ($params as $key => $value) {
     [$customFieldID, $customValueID] = CRM_Core_BAO_CustomField::getKeyID($key, TRUE);
     if ($customFieldID && (!is_null($value))) {
+      if (!empty($params['check_permissions']) && $customValueID > 0) {
+        $tableName = CRM_Core_BAO_CustomField::getTableColumnGroup($customFieldID)[0] ?? NULL;
+        if ($tableName) {
+          $storedEntityId = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `$tableName` WHERE id = %1", [
+            1 => [(int) $customValueID, 'Integer'],
+          ]);
+          if ($storedEntityId && (int) $storedEntityId !== (int) $entityId) {
+            throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify custom field');
+          }
+        }
+      }
+
       if ($checkCheckBoxField && isset($fields['custom_' . $customFieldID]) && $fields['custom_' . $customFieldID]['html_type'] == 'CheckBox') {
         formatCheckBoxField($value, 'custom_' . $customFieldID, $entity);
       }
