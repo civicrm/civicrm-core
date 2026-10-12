@@ -4847,4 +4847,70 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test that an unauthorized user cannot modify another contact's multi-record custom value in Api3.
+   */
+  public function testCannotModifyOtherContactCustomValue(): void {
+    $customGroup = $this->customGroupCreate([
+      'title' => 'MultiGroupApi3',
+      'name' => 'multigroup_api3',
+      'extends' => 'Contact',
+      'is_multiple' => 1,
+    ]);
+    $customField = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'MultiFieldApi3',
+      'name' => 'multifield_api3',
+      'html_type' => 'Text',
+      'data_type' => 'String',
+    ]);
+
+    $victimContact = $this->individualCreate(['first_name' => 'Victim'], 'victim');
+    $userContact = $this->individualCreate(['first_name' => 'User'], 'user');
+
+    // Create a multi-record custom value on the victim contact
+    civicrm_api3('CustomValue', 'create', [
+      'entity_id' => $victimContact,
+      'custom_' . $customField['id'] . ':-1' => 'Original Data',
+    ]);
+    $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroup['id'], 'table_name');
+    $fieldName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $customField['id'], 'column_name');
+    $victimCustomId = (int) CRM_Core_DAO::singleValueQuery("SELECT id FROM `$tableName` WHERE entity_id = $victimContact");
+
+    CRM_Core_Session::singleton()->set('userID', $userContact);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+      'access all custom data',
+    ];
+
+    // Attempt to update victim's custom record while updating own contact
+    $this->callAPIFailure('Contact', 'create', [
+      'id' => $userContact,
+      'custom_' . $customField['id'] . '_' . $victimCustomId => 'Hacked Data',
+      'check_permissions' => 1,
+    ]);
+
+    // Ensure the victim's record was not changed
+    $storedValue = CRM_Core_DAO::singleValueQuery("SELECT `$fieldName` FROM `$tableName` WHERE id = $victimCustomId");
+    $this->assertEquals('Original Data', $storedValue);
+
+    // Create a multi-record custom value on the user's own contact
+    civicrm_api3('CustomValue', 'create', [
+      'entity_id' => $userContact,
+      'custom_' . $customField['id'] . ':-1' => 'My Data',
+    ]);
+    $userCustomId = (int) CRM_Core_DAO::singleValueQuery("SELECT id FROM `$tableName` WHERE entity_id = $userContact");
+
+    // Updating user's own custom record should succeed
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $userContact,
+      'custom_' . $customField['id'] . '_' . $userCustomId => 'My Updated Data',
+      'check_permissions' => 1,
+    ]);
+
+    $storedUserValue = CRM_Core_DAO::singleValueQuery("SELECT `$fieldName` FROM `$tableName` WHERE id = $userCustomId");
+    $this->assertEquals('My Updated Data', $storedUserValue);
+  }
 }
