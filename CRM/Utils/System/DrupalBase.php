@@ -289,7 +289,15 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function flush() {
-    drupal_flush_all_caches();
+    if (defined('DRUPAL_ROOT') && function_exists('drupal_flush_all_caches')) {
+      // Drupal assumes cwd is always DRUPAL_ROOT.
+      // Calling flush_all_caches from a different cwd will corrupt Drupal's registry_rebuild()
+      // by loading includes from the wrong relative path.
+      $oldCwd = getcwd();
+      chdir(DRUPAL_ROOT);
+      drupal_flush_all_caches();
+      chdir($oldCwd);
+    }
   }
 
   /**
