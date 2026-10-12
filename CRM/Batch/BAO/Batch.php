@@ -19,6 +19,11 @@
  * Batch BAO class.
  */
 class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\HookInterface {
+  use CRM_Core_OwnershipAccessTrait;
+
+  protected static function checkOwnerAdminPermission(?int $userID = NULL): bool {
+    return CRM_Core_Permission::check('edit all manual batches', $userID);
+  }
 
   /**
    * Cache for the current batch object.

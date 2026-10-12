@@ -14,6 +14,7 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Batch;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\LocBlock;
@@ -480,6 +481,114 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
         ],
       ])
       ->execute();
+  }
+
+  /**
+   * Test AbstractUpdateAction: updating an existing batch to change created_id.
+   */
+  public function testAbstractUpdateActionCannotStealBatchCreatedId(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+    $batch = Batch::create(FALSE)
+      ->addValue('title', 'Test Batch 1')
+      ->addValue('name', 'test_batch_1')
+      ->addValue('status_id:name', 'Open')
+      ->addValue('created_id', $otherContact)
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'administer CiviCRM',
+    ];
+
+    $values = [
+      'id' => $batch,
+      'created_id' => $userContact,
+    ];
+
+    $accessCheck = Batch::checkAccess()
+      ->setValues($values)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertFalse($accessCheck['access']);
+
+    $this->expectException(UnauthorizedException::class);
+    Batch::update()
+      ->setValues($values)
+      ->execute();
+  }
+
+  /**
+   * Test AbstractSaveAction: saving an existing batch to change created_id.
+   */
+  public function testAbstractSaveActionCannotStealBatchCreatedId(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+    $batch = Batch::create(FALSE)
+      ->addValue('title', 'Test Batch 2')
+      ->addValue('name', 'test_batch_2')
+      ->addValue('status_id:name', 'Open')
+      ->addValue('created_id', $otherContact)
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'administer CiviCRM',
+    ];
+
+    $this->expectException(UnauthorizedException::class);
+    Batch::save()
+      ->setRecords([
+        [
+          'id' => $batch,
+          'created_id' => $userContact,
+        ],
+      ])
+      ->execute();
+  }
+
+  /**
+   * Test that an admin with 'edit all manual batches' can change created_id in APIv4.
+   */
+  public function testAdminCanChangeBatchCreatedId(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+    $batch = Batch::create(FALSE)
+      ->addValue('title', 'Test Batch 3')
+      ->addValue('name', 'test_batch_3')
+      ->addValue('status_id:name', 'Open')
+      ->addValue('created_id', $otherContact)
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'administer CiviCRM',
+      'edit all manual batches',
+    ];
+
+    $values = [
+      'id' => $batch,
+      'created_id' => $userContact,
+    ];
+
+    $accessCheck = Batch::checkAccess()
+      ->setValues($values)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertTrue($accessCheck['access']);
+
+    Batch::update()
+      ->setValues($values)
+      ->execute();
+
+    $stored = \CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $batch, 'created_id');
+    $this->assertEquals($userContact, $stored);
   }
 
 }
