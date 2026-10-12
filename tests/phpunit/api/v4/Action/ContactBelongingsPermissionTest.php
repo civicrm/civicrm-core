@@ -18,6 +18,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\LocBlock;
 use Civi\Api4\Note;
+use Civi\Api4\SavedSearch;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -205,6 +206,70 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
           'id' => $otherNote,
           'entity_table' => 'civicrm_contact',
           'entity_id' => $userContact,
+        ],
+      ])
+      ->execute();
+  }
+
+  /**
+   * Test AbstractUpdateAction: updating an existing saved search to point to user.
+   */
+  public function testAbstractUpdateActionCannotStealSavedSearch(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+    $otherSearch = SavedSearch::create(FALSE)
+      ->addValue('name', 'victim_search_test1')
+      ->addValue('created_id', $otherContact)
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'manage own search_kit',
+    ];
+
+    $values = [
+      'id' => $otherSearch,
+      'created_id' => $userContact,
+    ];
+
+    $accessCheck = SavedSearch::checkAccess()
+      ->setValues($values)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertFalse($accessCheck['access']);
+
+    $this->expectException(UnauthorizedException::class);
+    SavedSearch::update()
+      ->setValues($values)
+      ->execute();
+  }
+
+  /**
+   * Test AbstractSaveAction: saving an existing saved search to point to user.
+   */
+  public function testAbstractSaveActionCannotStealSavedSearch(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+    $otherSearch = SavedSearch::create(FALSE)
+      ->addValue('name', 'victim_search_test2')
+      ->addValue('created_id', $otherContact)
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'manage own search_kit',
+    ];
+
+    $this->expectException(UnauthorizedException::class);
+    SavedSearch::save()
+      ->setRecords([
+        [
+          'id' => $otherSearch,
+          'created_id' => $userContact,
         ],
       ])
       ->execute();
