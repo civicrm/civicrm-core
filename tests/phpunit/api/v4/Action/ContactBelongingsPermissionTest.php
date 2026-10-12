@@ -18,6 +18,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\LocBlock;
 use Civi\Api4\Note;
+use Civi\Api4\Relationship;
 use Civi\Api4\SavedSearch;
 use Civi\Test\TransactionalInterface;
 
@@ -270,6 +271,82 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
         [
           'id' => $otherSearch,
           'created_id' => $userContact,
+        ],
+      ])
+      ->execute();
+  }
+
+  /**
+   * Test AbstractUpdateAction: updating an existing relationship between other contacts.
+   */
+  public function testAbstractUpdateActionCannotStealRelationship(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact1 = Contact::create(FALSE)
+      ->addValue('first_name', 'Other1')
+      ->execute()->first()['id'];
+    $otherContact2 = Contact::create(FALSE)
+      ->addValue('first_name', 'Other2')
+      ->execute()->first()['id'];
+    $otherRel = Relationship::create(FALSE)
+      ->addValue('contact_id_a', $otherContact1)
+      ->addValue('contact_id_b', $otherContact2)
+      ->addValue('relationship_type_id', 1)
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $values = [
+      'id' => $otherRel,
+      'contact_id_a' => $userContact,
+      'contact_id_b' => $userContact,
+    ];
+
+    $accessCheck = Relationship::checkAccess()
+      ->setValues($values)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertFalse($accessCheck['access']);
+
+    $this->expectException(UnauthorizedException::class);
+    Relationship::update()
+      ->setValues($values)
+      ->execute();
+  }
+
+  /**
+   * Test AbstractSaveAction: saving an existing relationship between other contacts.
+   */
+  public function testAbstractSaveActionCannotStealRelationship(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact1 = Contact::create(FALSE)
+      ->addValue('first_name', 'Other1')
+      ->execute()->first()['id'];
+    $otherContact2 = Contact::create(FALSE)
+      ->addValue('first_name', 'Other2')
+      ->execute()->first()['id'];
+    $otherRel = Relationship::create(FALSE)
+      ->addValue('contact_id_a', $otherContact1)
+      ->addValue('contact_id_b', $otherContact2)
+      ->addValue('relationship_type_id', 1)
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $this->expectException(UnauthorizedException::class);
+    Relationship::save()
+      ->setRecords([
+        [
+          'id' => $otherRel,
+          'contact_id_a' => $userContact,
+          'contact_id_b' => $userContact,
         ],
       ])
       ->execute();
