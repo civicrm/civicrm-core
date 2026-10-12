@@ -17,6 +17,7 @@ use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\LocBlock;
+use Civi\Api4\Note;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -135,6 +136,76 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
       ->setValues([
         'email_id.id' => $otherEmail,
         'email_id.email' => 'hacked@example.com',
+      ])
+      ->execute();
+  }
+
+  /**
+   * Test AbstractUpdateAction: updating an existing note to point to user's contact.
+   */
+  public function testAbstractUpdateActionCannotStealNoteRecord(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+    $otherNote = Note::create(FALSE)
+      ->addValue('entity_table', 'civicrm_contact')
+      ->addValue('entity_id', $otherContact)
+      ->addValue('note', 'Victim Secret')
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $values = [
+      'id' => $otherNote,
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $userContact,
+    ];
+
+    $accessCheck = Note::checkAccess()
+      ->setValues($values)
+      ->setAction('update')
+      ->execute()->single();
+    $this->assertFalse($accessCheck['access']);
+
+    $this->expectException(UnauthorizedException::class);
+    Note::update()
+      ->setValues($values)
+      ->execute();
+  }
+
+  /**
+   * Test AbstractSaveAction: saving an existing note to point to user's contact.
+   */
+  public function testAbstractSaveActionCannotStealNoteRecord(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact = Contact::create(FALSE)
+      ->addValue('first_name', 'Other')
+      ->execute()->first()['id'];
+    $otherNote = Note::create(FALSE)
+      ->addValue('entity_table', 'civicrm_contact')
+      ->addValue('entity_id', $otherContact)
+      ->addValue('note', 'Victim Secret')
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $this->expectException(UnauthorizedException::class);
+    Note::save()
+      ->setRecords([
+        [
+          'id' => $otherNote,
+          'entity_table' => 'civicrm_contact',
+          'entity_id' => $userContact,
+        ],
       ])
       ->execute();
   }
