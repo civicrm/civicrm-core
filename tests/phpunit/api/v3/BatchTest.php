@@ -124,4 +124,79 @@ class api_v3_BatchTest extends CiviUnitTestCase {
     $this->callAPISuccess('Batch', 'delete', $params);
   }
 
+  public function tearDown(): void {
+    CRM_Utils_Hook::singleton()->reset();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
+    parent::tearDown();
+  }
+
+  /**
+   * Test that a non-admin without 'edit all manual batches' cannot change created_id using APIv3.
+   */
+  public function testCannotStealBatchCreatedIdWithCheckPermissions(): void {
+    $this->hookClass->setHook('civicrm_alterAPIPermissions', function($entity, $action, &$params, &$permissions) {
+      if ($entity === 'batch') {
+        $permissions['batch']['default'] = ['edit own manual batches'];
+      }
+    });
+
+    $userContact = $this->individualCreate(['first_name' => 'User'], 'user');
+    $otherContact = $this->individualCreate(['first_name' => 'Other'], 'other');
+
+    $batch = $this->callAPISuccess('Batch', 'create', [
+      'title' => 'Victim Batch',
+      'name' => 'victim_batch',
+      'status_id' => 1,
+      'created_id' => $otherContact,
+    ]);
+
+    CRM_Core_Session::singleton()->set('userID', $userContact);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit own manual batches',
+    ];
+
+    $this->callAPIFailure('Batch', 'create', [
+      'id' => $batch['id'],
+      'created_id' => $userContact,
+      'check_permissions' => 1,
+    ]);
+  }
+
+  /**
+   * Test that an admin with 'edit all manual batches' can change created_id using APIv3.
+   */
+  public function testAdminCanChangeBatchCreatedId(): void {
+    $this->hookClass->setHook('civicrm_alterAPIPermissions', function($entity, $action, &$params, &$permissions) {
+      if ($entity === 'batch') {
+        $permissions['batch']['default'] = ['edit own manual batches'];
+      }
+    });
+
+    $userContact = $this->individualCreate(['first_name' => 'User'], 'user');
+    $otherContact = $this->individualCreate(['first_name' => 'Other'], 'other');
+
+    $batch = $this->callAPISuccess('Batch', 'create', [
+      'title' => 'Victim Batch 2',
+      'name' => 'victim_batch_2',
+      'status_id' => 1,
+      'created_id' => $otherContact,
+    ]);
+
+    CRM_Core_Session::singleton()->set('userID', $userContact);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit all manual batches',
+    ];
+
+    $this->callAPISuccess('Batch', 'create', [
+      'id' => $batch['id'],
+      'created_id' => $userContact,
+      'check_permissions' => 1,
+    ]);
+
+    $stored = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $batch['id'], 'created_id');
+    $this->assertEquals($userContact, $stored);
+  }
+
 }
