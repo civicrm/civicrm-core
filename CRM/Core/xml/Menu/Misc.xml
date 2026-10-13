@@ -149,13 +149,13 @@
   <item>
       <path>civicrm/ajax/batch</path>
      <page_callback>CRM_Batch_Page_AJAX::batchSave</page_callback>
-     <access_arguments>access CiviContribute</access_arguments>
+     <access_arguments>edit own manual batches</access_arguments>
      <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/ajax/batchlist</path>
      <page_callback>CRM_Batch_Page_AJAX::getBatchList</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+     <access_arguments>view own manual batches</access_arguments>
      <is_ajax>true</is_ajax>
   </item>
   <item>
