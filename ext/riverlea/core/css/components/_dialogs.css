@@ -83,7 +83,7 @@
   max-height: calc(100vh - 280px) !important; /* vs JQuery */
   height: calc(100% - 94px) !important;
   width: 100% !important;
-  max-width:110vw;
+  max-width: 100vw;
   overflow: scroll;
   border-radius: var(--crm-dialog-radius);
   background: var(--crm-dialog-body-bg-color);
