@@ -269,4 +269,53 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     CRM_Financial_Page_AJAX::getFinancialTransactionsList();
   }
 
+  /**
+   * Test getBatchSummary is denied for other user's batch when holding only 'view own manual batches'.
+   */
+  public function testGetBatchSummaryDeniedForOtherUserBatch(): void {
+    $ownerId = $this->individualCreate([], 'owner');
+    $batch = $this->createTestEntity('Batch', [
+      'title' => 'Other User Batch',
+      'created_id' => $ownerId,
+      'status_id:name' => 'Data Entry',
+    ]);
+
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'view own manual batches']);
+
+    $_REQUEST['batchID'] = $batch['id'];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Financial_Page_AJAX::getBatchSummary();
+  }
+
+  /**
+   * Test getBatchSummary succeeds when user has permission.
+   */
+  public function testGetBatchSummarySuccess(): void {
+    $loggedInUserId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'view own manual batches']);
+
+    $batch = $this->createTestEntity('Batch', [
+      'title' => 'Summary Test Batch',
+      'created_id' => $loggedInUserId,
+      'status_id:name' => 'Data Entry',
+      'payment_instrument_id:name' => 'Cash',
+      'item_count' => 5,
+      'total' => 100.00,
+    ]);
+
+    $_REQUEST['batchID'] = $batch['id'];
+
+    try {
+      CRM_Financial_Page_AJAX::getBatchSummary();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('Data Entry', $e->errorData['status']);
+      $this->assertEquals('Cash', $e->errorData['payment_instrument']);
+      $this->assertEquals(5, $e->errorData['item_count']);
+    }
+  }
+
 }

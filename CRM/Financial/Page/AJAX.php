@@ -553,7 +553,22 @@ class CRM_Financial_Page_AJAX {
    * @throws \CRM_Core_Exception
    */
   public static function getBatchSummary(): void {
-    CRM_Utils_JSON::output(self::makeBatchSummary(CRM_Utils_Type::escape($_REQUEST['batchID'], 'Integer')));
+    $batchId = CRM_Utils_Request::retrieve('batchID', 'Positive', NULL, FALSE, NULL, 'REQUEST');
+    if (!$batchId) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    $batch = \Civi\Api4\Batch::get(FALSE)
+      ->addWhere('id', '=', $batchId)
+      ->addSelect('created_id')
+      ->execute()
+      ->first();
+
+    if (!$batch || !CRM_Batch_BAO_Batch::checkBatchPermission('view', $batch['created_id'])) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    CRM_Utils_JSON::output(self::makeBatchSummary($batchId));
   }
 
   /**
