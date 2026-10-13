@@ -21,12 +21,10 @@
 class CRM_Activity_Page_AJAX {
 
   public static function getCaseActivity() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    // Should those params be passed through the validateParams method?
-    $caseID = CRM_Utils_Type::validate($_GET['caseID'], 'Integer');
-    $contactID = CRM_Utils_Type::validate($_GET['cid'], 'Integer');
-    $userID = CRM_Utils_Type::validate($_GET['userID'], 'Integer');
-    $context = CRM_Utils_Type::validate($_GET['context'] ?? NULL, 'String');
+    $caseID = self::retrieveAndValidateCaseId('caseID');
+    $contactID = CRM_Utils_Request::retrieve('cid', 'Positive');
+    $userID = CRM_Utils_Request::retrieve('userID', 'Positive');
+    $context = CRM_Utils_Request::retrieve('context', 'String');
 
     $optionalParameters = [
       'source_contact_id' => 'Integer',
@@ -48,7 +46,7 @@ class CRM_Activity_Page_AJAX {
   }
 
   public static function getCaseGlobalRelationships() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
+    self::retrieveAndValidateCaseId('caseID');
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
 
     // get the activities related to given case
@@ -79,9 +77,12 @@ class CRM_Activity_Page_AJAX {
   }
 
   public static function getCaseClientRelationships() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $caseID = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
-    $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
+    $caseID = self::retrieveAndValidateCaseId('caseID');
+    $contactID = CRM_Utils_Request::retrieve('cid', 'Positive');
+
+    if ($contactID && !in_array($contactID, CRM_Case_BAO_Case::getCaseClients($caseID)) && !CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::VIEW)) {
+      CRM_Utils_System::permissionDenied();
+    }
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
 
@@ -134,9 +135,8 @@ class CRM_Activity_Page_AJAX {
   }
 
   public static function getCaseRoles() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $caseID = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');
-    $contactID = CRM_Utils_Type::escape($_GET['cid'], 'Integer');
+    $caseID = self::retrieveAndValidateCaseId('caseID');
+    $contactID = CRM_Utils_Request::retrieve('cid', 'Positive');
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
 
@@ -280,12 +280,26 @@ class CRM_Activity_Page_AJAX {
   }
 
   public static function convertToCaseActivity() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $params = ['caseID', 'activityID', 'contactID', 'newSubject', 'targetContactIds', 'mode'];
-    $vals = [];
-    foreach ($params as $param) {
-      $vals[$param] = $_POST[$param] ?? NULL;
+    $activityId = CRM_Utils_Request::retrieve('activityID', 'Positive');
+    $caseId = self::retrieveAndValidateCaseId('caseID');
+    $mode = CRM_Utils_Request::retrieve('mode', 'String');
+    if (!$activityId || !in_array($mode, ['file', 'move', 'copy'], TRUE)) {
+      CRM_Utils_System::permissionDenied();
     }
+    $action = ($mode === 'copy') ? CRM_Core_Action::VIEW : CRM_Core_Action::UPDATE;
+    if (!CRM_Activity_BAO_Activity::checkPermission($activityId, $action)) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    $vals = [
+      'caseID' => $caseId,
+      'activityID' => $activityId,
+      'contactID' => CRM_Utils_Request::retrieve('contactID', 'Positive'),
+      'newSubject' => CRM_Utils_Request::retrieve('newSubject', 'String'),
+      'targetContactIds' => CRM_Utils_Request::retrieve('targetContactIds', 'CommaSeparatedIntegers'),
+      'assigneeContactIds' => CRM_Utils_Request::retrieve('assigneeContactIds', 'CommaSeparatedIntegers'),
+      'mode' => $mode,
+    ];
 
     CRM_Utils_JSON::output(self::_convertToCaseActivity($vals));
   }
@@ -421,6 +435,10 @@ class CRM_Activity_Page_AJAX {
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
+
+    if (empty($params['cid']) || !CRM_Contact_BAO_Contact_Permission::allow($params['cid'], CRM_Core_Permission::VIEW)) {
+      CRM_Utils_System::permissionDenied();
+    }
     // $params will be modified later on, need to save original filters
     $filterParams = $params;
 
@@ -467,6 +485,14 @@ class CRM_Activity_Page_AJAX {
     }
 
     CRM_Utils_JSON::output($activities);
+  }
+
+  private static function retrieveAndValidateCaseId(string $paramName): int {
+    $caseID = CRM_Utils_Request::retrieve($paramName, 'Positive');
+    if (!$caseID || !CRM_Case_BAO_Case::accessCase($caseID)) {
+      CRM_Utils_System::permissionDenied();
+    }
+    return $caseID;
   }
 
 }
