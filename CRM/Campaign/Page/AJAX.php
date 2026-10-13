@@ -21,7 +21,6 @@
 class CRM_Campaign_Page_AJAX {
 
   public static function registerInterview() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $fields = [
       'result',
       'voter_id',
@@ -37,8 +36,39 @@ class CRM_Campaign_Page_AJAX {
       $params[$fld] = $_POST[$fld] ?? NULL;
     }
     $params['details'] = $_POST['note'] ?? NULL;
-    $voterId = $params['voter_id'];
-    $activityId = $params['activity_id'];
+    $voterId = CRM_Utils_Type::escape($params['voter_id'] ?? NULL, 'Positive');
+    $activityId = CRM_Utils_Type::escape($params['activity_id'] ?? NULL, 'Positive');
+    $surveyId = CRM_Utils_Type::escape($params['survey_id'] ?? NULL, 'Positive');
+
+    if (!$voterId || !$activityId || !$surveyId) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    $activity = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('id', '=', $activityId)
+      ->addWhere('is_deleted', '=', FALSE)
+      ->addSelect('id', 'source_record_id', 'activity_type_id')
+      ->execute()
+      ->first();
+
+    if (!$activity || (int) $activity['source_record_id'] !== (int) $surveyId) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    $isTarget = \Civi\Api4\ActivityContact::get(FALSE)
+      ->addWhere('activity_id', '=', $activityId)
+      ->addWhere('contact_id', '=', $voterId)
+      ->addWhere('record_type_id:name', '=', 'Activity Targets')
+      ->execute()
+      ->count();
+
+    if (!$isTarget) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    if (empty($params['activity_type_id'])) {
+      $params['activity_type_id'] = $activity['activity_type_id'];
+    }
 
     $customKey = "field_{$voterId}_custom";
     foreach ($_POST as $key => $value) {
