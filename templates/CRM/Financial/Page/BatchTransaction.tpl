@@ -162,7 +162,7 @@ function saveRecord(recordID, op, recordBAO, entityID) {
 }
 
 function batchSummary(entityID) {
-  var postUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=getBatchSummary'}"{literal};
+  var postUrl = {/literal}"{crmURL p='civicrm/ajax/batch/summary' h=0}"{literal};
   //post request and get response
   CRM.$.post( postUrl, {batchID: entityID}, function(html) {
     CRM.$.each(html, function(i, val) {
