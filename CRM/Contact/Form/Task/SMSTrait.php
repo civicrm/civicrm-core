@@ -74,12 +74,12 @@ trait CRM_Contact_Form_Task_SMSTrait {
     if (!isset($this->phones)) {
       $contacts = [];
       $phoneGet = Phone::get()
-        ->addWhere('contact_id.do_not_sms', '=', FALSE)
-        ->addWhere('contact_id.is_deceased', '=', FALSE)
         ->addWhere('phone_numeric', '>', 0)
-        ->addWhere('phone_type_id:name', '=', 'Mobile')
         ->addOrderBy('is_primary')
         ->addSelect('id', 'contact_id', 'phone', 'phone_type_id:name', 'phone_numeric', 'contact_id.sort_name', 'phone_type_id', 'contact_id.display_name');
+      foreach (static::autocompleteFilters()['id'] as $field => $value) {
+        $phoneGet->addWhere($field, '=', $value);
+      }
       if ($this->getSubmittedValue('to')) {
         $phoneGet->addWhere('id', 'IN', explode(',', $this->getSubmittedValue('to')));
       }
@@ -416,6 +416,21 @@ trait CRM_Contact_Form_Task_SMSTrait {
   public function listTokens(): array {
     $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contactId']]);
     return $tokenProcessor->listTokens();
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public static function autocompleteFilters($mainEntityId = NULL): array {
+    return [
+       // Filter the `Phone.id` autocomplete
+      'id' => [
+        'phone_type_id:name' => 'Mobile',
+        'contact_id.is_deleted' => FALSE,
+        'contact_id.is_deceased' => FALSE,
+        'contact_id.do_not_sms' => FALSE,
+      ],
+    ];
   }
 
 }
