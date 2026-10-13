@@ -2233,6 +2233,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param $mainEntityId
    *   Whatever the _contactId or _entityId is set to (typically the main entity being edited by the form).
    * @return array
+   *   Array of filters keyed by field name
    */
   public static function autocompleteFilters($mainEntityId = NULL): array {
     return [];
