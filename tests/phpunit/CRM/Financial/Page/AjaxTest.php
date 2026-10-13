@@ -248,4 +248,25 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     CRM_Financial_Page_AJAX::bulkAssignRemove();
   }
 
+  /**
+   * Test getFinancialTransactionsList is denied for other user's batch when holding only 'view own manual batches'.
+   */
+  public function testGetFinancialTransactionsListDeniedForOtherUserBatch(): void {
+    $ownerId = $this->individualCreate([], 'owner');
+    $batch = $this->createTestEntity('Batch', [
+      'title' => 'Other User Batch',
+      'created_id' => $ownerId,
+      'status_id:name' => 'Data Entry',
+    ]);
+
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'view own manual batches']);
+
+    $_REQUEST['entityID'] = $batch['id'];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Financial_Page_AJAX::getFinancialTransactionsList();
+  }
+
 }
