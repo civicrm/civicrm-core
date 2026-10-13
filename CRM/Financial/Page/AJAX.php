@@ -249,6 +249,21 @@ class CRM_Financial_Page_AJAX {
    * @return string|wtf??
    */
   public static function getFinancialTransactionsList() {
+    $entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', NULL, FALSE, NULL, 'REQUEST');
+    if (!$entityID) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    $batch = \Civi\Api4\Batch::get(FALSE)
+      ->addWhere('id', '=', $entityID)
+      ->addSelect('created_id')
+      ->execute()
+      ->first();
+
+    if (!$batch || !CRM_Batch_BAO_Batch::checkBatchPermission('view', $batch['created_id'])) {
+      CRM_Utils_System::permissionDenied();
+    }
+
     $sortMapper = [
       0 => '',
       1 => '',
@@ -269,7 +284,6 @@ class CRM_Financial_Page_AJAX {
     $sort = isset($_REQUEST['iSortCol_0']) ? CRM_Utils_Array::value(CRM_Utils_Type::escape($_REQUEST['iSortCol_0'], 'Integer'), $sortMapper) : NULL;
     $sortOrder = isset($_REQUEST['sSortDir_0']) ? CRM_Utils_Type::escape($_REQUEST['sSortDir_0'], 'MysqlOrderByDirection') : 'asc';
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
-    $entityID = isset($_REQUEST['entityID']) ? CRM_Utils_Type::escape($_REQUEST['entityID'], 'Integer') : NULL;
     $notPresent = isset($_REQUEST['notPresent']) ? CRM_Utils_Type::escape($_REQUEST['notPresent'], 'Boolean') : NULL;
     $statusID = isset($_REQUEST['statusID']) ? CRM_Utils_Type::escape($_REQUEST['statusID'], 'Integer') : NULL;
     $search = isset($_REQUEST['search']);
