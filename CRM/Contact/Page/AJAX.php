@@ -446,13 +446,16 @@ LIMIT {$rowCount}
    * Process dupes.
    */
   public static function processDupes() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $oper = CRM_Utils_Type::escape($_REQUEST['op'], 'String');
-    $cid = CRM_Utils_Type::escape($_REQUEST['cid'], 'Positive');
-    $oid = CRM_Utils_Type::escape($_REQUEST['oid'], 'Positive');
+    $oper = CRM_Utils_Request::retrieve('op', 'String');
+    $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
+    $oid = CRM_Utils_Request::retrieve('oid', 'Positive');
 
-    if (!$oper || !$cid || !$oid) {
-      return;
+    if (!$oper || !$cid || !$oid || !in_array($oper, ['dupe-nondupe', 'nondupe-dupe'], TRUE)) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    if (!CRM_Contact_BAO_Contact_Permission::allow($cid) || !CRM_Contact_BAO_Contact_Permission::allow($oid)) {
+      CRM_Utils_System::permissionDenied();
     }
 
     $status = self::markNonDuplicates($cid, $oid, $oper);

@@ -8,7 +8,7 @@
       {/literal}'{ts escape="js"}Dedupe exception removed.{/ts}'{literal} :
       {/literal}'{ts escape="js"}Marked as non duplicates.{/ts}'{literal};
 
-    var url = {/literal}"{crmURL p='civicrm/ajax/rest' q='className=CRM_Contact_Page_AJAX&fnName=processDupes' h=0}"{literal};
+    var url = {/literal}"{crmURL p='civicrm/ajax/dedupe/process' h=0}"{literal};
     CRM.$.post( url, {cid: cid, oid: oid, op: oper}, function( result ) {
       if ( result.status == oper ) {
         CRM.alert('', statusMsg, 'success');
