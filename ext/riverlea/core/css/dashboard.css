@@ -1,5 +1,5 @@
 /* Style rules for Dashboard home screen.
-   Forked on 11 June 24, updated 30 May 26. */
+   Forked on 11 June 24, updated 13 Oct 26. */
 
 #civicrm-dashboard > .crm-flex-box {
   display: grid;
@@ -45,6 +45,32 @@
   flex-direction: row-reverse;
   cursor: move;
 }
+.crm-container crm-dashlet {
+  display: block;
+  position: relative;
+}
+.crm-container crm-dashlet > details {
+  margin: 0;
+  background-color: transparent;
+}
+/* Keep the dashlet colours (and the room for .crm-dashlet-actions) over the accordion-bold ones */
+.crm-container crm-dashlet > details > summary.crm-dashlet-header,
+.crm-container crm-dashlet > details > summary.crm-dashlet-header:is(:hover, :focus) {
+  background-color: var(--crm-dashlet-header-bg-color);
+  color: var(--crm-dashlet-header-color);
+  border: var(--crm-dashlet-header-border);
+  border-width: var(--crm-dashlet-header-border-width);
+  border-radius: var(--crm-dashlet-radius);
+  padding: var(--crm-dashlet-header-padding);
+  padding-right: 6rem;
+  flex-direction: row;
+}
+/* In the flex flow, as streams that position the caret absolutely assume accordion header padding */
+.crm-container crm-dashlet > details > summary.crm-dashlet-header::before {
+  color: var(--crm-dashlet-header-color);
+  position: static;
+  margin: 0 var(--crm-accordion-icon-spacing) 0 0;
+}
 .crm-container .crm-dashlet-header h3 {
   background: transparent;
   cursor: move;
@@ -56,7 +82,18 @@
   overflow: hidden;
   font-size: var(--crm-dashlet-header-font-size);
 }
-.crm-container .crm-dashlet-header a {
+.crm-container .crm-dashlet-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding: var(--crm-dashlet-header-padding);
+  padding-left: 0;
+  z-index: 1;
+}
+.crm-container .crm-dashlet-header a,
+.crm-container .crm-dashlet-actions a {
   color: var(--crm-dashlet-header-color);
   padding: var(--crm-l-xsmall) var(--crm-l-small);
   text-decoration: none;
@@ -65,16 +102,18 @@
   opacity: .7;
   float: right;
 }
-.crm-container .crm-dashlet-header:hover .crm-i {
+.crm-container .crm-dashlet-header:hover .crm-i,
+.crm-container .crm-dashlet-actions a:is(:hover, :focus) .crm-i {
   opacity: 1;
 }
-.crm-container .crm-dashlet-header a.crm-dashlet-collapse {
-  order: 1;
-}
-crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
+crm-dashlet[is-fullscreen=true] > details,
+crm-dashlet[is-fullscreen=true] > details > .crm-dashlet-content {
   height: calc(100% - 1em);
 }
-.crm-container .crm-dashlet-content {
+.crm-container crm-dashlet > details.crm-accordion-bold > .crm-dashlet-content {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   background: var(--crm-dashlet-bg-color);
   padding: var(--crm-dashlet-content-padding);
   overflow: auto;
@@ -82,16 +121,16 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 .crm-container .crm-dashlet-content > .ng-scope { /* for FormBuilder dashlets */
   padding: var(--crm-contact-block-padding);
 }
-.crm-container .crm-dashlet details.crm-accordion-bold > .crm-accordion-body {
+.crm-container .crm-dashlet-content details.crm-accordion-bold > .crm-accordion-body {
   padding: 0 var(--crm-padding-reg);
   border-bottom: var(--crm-accordion-border);
 }
-.crm-container .crm-dashlet .crm-accordion-body table {
+.crm-container .crm-dashlet-content .crm-accordion-body table {
   margin: 0;
   border: 0;
   box-shadow: var(--crm-input-box-shadow);
 }
-.crm-container .crm-dashlet .crm-accordion-body table tr {
+.crm-container .crm-dashlet-content .crm-accordion-body table tr {
   padding: var(--crm-contact-block-padding);
   display: flex;
   border: 0 solid transparent;
