@@ -101,35 +101,6 @@ CRM.$(function($) {
     $('.add-cc-link[rel='+type+']', $form).show();
     $('.crm-contactEmail-form-block-'+type, $form).hide().find('input.crm-ajax-select').select2('data', []);
   });
-
-  var sourceDataUrl = "{/literal}{crmURL p='civicrm/ajax/checkemail' q='id=1' h=0}{literal}";
-
-  function emailSelect(el, prepopulate) {
-    $(el, $form).data('api-entity', 'contact').css({width: '40em', 'max-width': '90%'}).crmSelect2({
-      minimumInputLength: 1,
-      multiple: true,
-      ajax: {
-        url: sourceDataUrl,
-        data: function(term) {
-          return {
-            name: term
-          };
-        },
-        results: function(response) {
-          return {
-            results: response
-          };
-        }
-      }
-    }).select2('data', prepopulate);
-  }
-
-  {/literal}
-  var toContact = {if $toContact}{$toContact}{else}''{/if};
-  {literal}
-  emailSelect('#to', toContact);
 });
-
-
-</script>
 {/literal}
+</script>

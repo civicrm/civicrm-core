@@ -339,60 +339,6 @@ class CRM_Contact_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  /**
-   *  Function to get email address of a contact.
-   */
-  public static function getContactEmail() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $queryStrings = [];
-    $name = $_GET['name'] ?? NULL;
-    if ($name) {
-      $name = CRM_Utils_Type::escape($name, 'String');
-      $wildCard = Civi::settings()->get('includeWildCardInName') ? '%' : '';
-      foreach (['cc.sort_name', 'ce.email'] as $column) {
-        $queryStrings[] = "{$column} LIKE '{$wildCard}{$name}%'";
-      }
-      $result = [];
-      $rowCount = Civi::settings()->get('search_autocomplete_count');
-
-      // add acl clause here
-      [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
-      if ($aclWhere) {
-        $aclWhere = "AND {$aclWhere}";
-      }
-      foreach ($queryStrings as &$queryString) {
-        $queryString = "(
-SELECT sort_name name, ce.email, cc.id
-FROM   civicrm_email ce INNER JOIN civicrm_contact cc ON cc.id = ce.contact_id
-       {$aclFrom}
-WHERE  ce.on_hold = 0 AND cc.is_deceased = 0 AND cc.do_not_email = 0 AND cc.is_deleted = 0 AND {$queryString}
-       {$aclWhere}
-LIMIT {$rowCount}
-)";
-      }
-      $query = implode(' UNION ', $queryStrings) . " LIMIT {$rowCount}";
-
-      // send query to hook to be modified if needed
-      CRM_Utils_Hook::contactListQuery($query,
-        $name,
-        CRM_Utils_Request::retrieve('context', 'Alphanumeric'),
-        CRM_Utils_Request::retrieve('cid', 'Positive')
-      );
-
-      $dao = CRM_Core_DAO::executeQuery($query);
-
-      while ($dao->fetch()) {
-        //working here
-        $result[] = [
-          'text' => '"' . $dao->name . '" <' . $dao->email . '>',
-          'id' => !empty($_GET['id']) ? "{$dao->id}::{$dao->email}" : '"' . $dao->name . '" <' . $dao->email . '>',
-        ];
-      }
-      CRM_Utils_JSON::output($result);
-    }
-    CRM_Utils_System::civiExit();
-  }
-
   public static function buildSubTypes() {
     CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $parent = CRM_Utils_Request::retrieve('parentId', 'Positive');

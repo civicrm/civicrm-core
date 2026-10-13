@@ -59,7 +59,7 @@ class CRM_Case_Form_EmailTest extends CiviCaseTestCase {
     $_GET['action'] = $_REQUEST['action'] = 'add';
 
     $form = $this->getFormObject('CRM_Case_Form_Task_Email', [
-      'to' => "{$anotherPersonId}::{$anotherPersonInfo['email']}",
+      'to' => (string) $this->callAPISuccess('Email', 'getsingle', ['contact_id' => $anotherPersonId])['id'],
       'cc_id' => '',
       'bcc_id' => '',
       'subject' => 'abc',

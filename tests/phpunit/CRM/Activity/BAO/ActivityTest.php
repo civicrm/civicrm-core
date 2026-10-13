@@ -2,6 +2,7 @@
 
 use Civi\Api4\Activity;
 use Civi\Api4\ActivityContact;
+use Civi\Api4\Email;
 use Civi\Api4\OptionValue;
 
 /**
@@ -1312,7 +1313,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     // @todo use getTestForm instead like the rest of the class.
     /** @var CRM_Contact_Form_Task_Email $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
-      'to' => $contactId . '::' . 'email@example.com',
+      'to' => Email::get(FALSE)->addWhere('contact_id', '=', $contactId)->execute()->single()['id'],
       'from_email_address' => 'from@example.com',
       'subject' => $subject,
       'html_message' => $html,
@@ -1338,7 +1339,7 @@ $text
     $this->assertEquals($activity['subject'], $subject, 'Activity subject does not match.');
     $mut->checkMailLog([
       'From: from@example.com',
-      'To: Anthony Anderson <email@example.com>',
+      'To: Anthony Anderson <anthony_anderson@civicrm.org>',
       "Subject: $subject",
       $html,
       $text,
