@@ -890,15 +890,14 @@ LIMIT {$rowCount}
    * Mark dupe pairs as selected from un-selected state or vice-versa, in dupe cache table.
    */
   public static function toggleDedupeSelect() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $pnid = $_REQUEST['pnid'];
-    $isSelected = CRM_Utils_Type::escape($_REQUEST['is_selected'], 'Boolean');
-    $cacheKeyString = CRM_Utils_Request::retrieve('cacheKey', 'Alphanumeric', NULL, FALSE);
+    $cacheKeyString = CRM_Utils_Request::retrieve('cacheKey', 'Alphanumeric', NULL, TRUE);
+    $pnid = CRM_Utils_Request::retrieve('pnid', 'String', NULL, TRUE);
+    $isSelected = CRM_Utils_Request::retrieve('is_selected', 'Boolean', NULL, TRUE);
 
     $params = [
       1 => [$isSelected, 'Boolean'],
-      // using % to address rows with conflicts as well
-      3 => ["$cacheKeyString%", 'String'],
+      3 => [$cacheKeyString, 'String'],
+      4 => [$cacheKeyString . '_conflicts', 'String'],
     ];
 
     //check pnid is_array or integer
@@ -909,12 +908,15 @@ LIMIT {$rowCount}
       $whereClause = " id IN ( {$pnid} ) ";
     }
     else {
-      $pnid = CRM_Utils_Type::escape($pnid, 'Integer');
+      $pnid = CRM_Utils_Type::escape($pnid, 'Positive');
+      if (!$pnid) {
+        CRM_Utils_System::permissionDenied();
+      }
       $whereClause = " id = %2";
-      $params[2]   = [$pnid, 'Integer'];
+      $params[2] = [$pnid, 'Integer'];
     }
 
-    $sql = "UPDATE civicrm_prevnext_cache SET is_selected = %1 WHERE {$whereClause} AND cachekey LIKE %3";
+    $sql = "UPDATE civicrm_prevnext_cache SET is_selected = %1 WHERE {$whereClause} AND cachekey IN (%3, %4)";
     CRM_Core_DAO::executeQuery($sql, $params);
 
     CRM_Utils_System::sendJSONResponse(['status' => 'success']);

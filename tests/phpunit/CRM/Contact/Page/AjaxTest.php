@@ -22,7 +22,10 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
+    unset($_SERVER['HTTP_X_REQUESTED_WITH']);
     $_REQUEST = $this->originalRequest;
+    $_GET = [];
+    $_POST = [];
     parent::tearDown();
   }
 
@@ -387,6 +390,154 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     foreach ($contactList as $contactId) {
       $this->assertTrue(in_array($contactId, $contactIds));
     }
+  }
+
+  /**
+   * Test toggleDedupeSelect succeeds for a single pair when user has permission.
+   */
+  public function testToggleDedupeSelectSuccess(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'merge duplicate contacts']);
+
+    $contact1 = $this->individualCreate([], 'c1');
+    $contact2 = $this->individualCreate([], 'c2');
+    $cacheKey = 'merge_Individual_1_0_0_test123';
+
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cachekey, is_selected) VALUES ('civicrm_contact', %1, %2, %3, 0)",
+      [1 => [$contact1, 'Positive'], 2 => [$contact2, 'Positive'], 3 => [$cacheKey, 'String']]
+    );
+    $pnid = CRM_Core_DAO::singleValueQuery(
+      "SELECT id FROM civicrm_prevnext_cache WHERE cachekey = %1",
+      [1 => [$cacheKey, 'String']]
+    );
+
+    $_POST = $_REQUEST = [
+      'cacheKey' => $cacheKey,
+      'pnid' => $pnid,
+      'is_selected' => 1,
+    ];
+
+    try {
+      CRM_Contact_Page_AJAX::toggleDedupeSelect();
+
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('success', $e->errorData['status']);
+    }
+
+    $isSelected = CRM_Core_DAO::singleValueQuery(
+      "SELECT is_selected FROM civicrm_prevnext_cache WHERE id = %1",
+      [1 => [$pnid, 'Integer']]
+    );
+    $this->assertEquals(1, $isSelected);
+  }
+
+  /**
+   * Test toggleDedupeSelect succeeds for multiple pairs.
+   */
+  public function testToggleDedupeSelectMultipleSuccess(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'merge duplicate contacts']);
+
+    $contact1 = $this->individualCreate([], 'c1');
+    $contact2 = $this->individualCreate([], 'c2');
+    $contact3 = $this->individualCreate([], 'c3');
+    $cacheKey = 'merge_Individual_1_0_0_testmulti';
+
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cachekey, is_selected) VALUES ('civicrm_contact', %1, %2, %3, 0)",
+      [1 => [$contact1, 'Positive'], 2 => [$contact2, 'Positive'], 3 => [$cacheKey, 'String']]
+    );
+    $pnid1 = CRM_Core_DAO::singleValueQuery(
+      "SELECT id FROM civicrm_prevnext_cache WHERE entity_id1 = %1 AND entity_id2 = %2 AND cachekey = %3",
+      [1 => [$contact1, 'Positive'], 2 => [$contact2, 'Positive'], 3 => [$cacheKey, 'String']]
+    );
+
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cachekey, is_selected) VALUES ('civicrm_contact', %1, %2, %3, 0)",
+      [1 => [$contact1, 'Positive'], 2 => [$contact3, 'Positive'], 3 => [$cacheKey, 'String']]
+    );
+    $pnid2 = CRM_Core_DAO::singleValueQuery(
+      "SELECT id FROM civicrm_prevnext_cache WHERE entity_id1 = %1 AND entity_id2 = %2 AND cachekey = %3",
+      [1 => [$contact1, 'Positive'], 2 => [$contact3, 'Positive'], 3 => [$cacheKey, 'String']]
+    );
+
+    $_POST = $_REQUEST = [
+      'cacheKey' => $cacheKey,
+      'pnid' => [$pnid1, $pnid2],
+      'is_selected' => 1,
+    ];
+
+    try {
+      CRM_Contact_Page_AJAX::toggleDedupeSelect();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('success', $e->errorData['status']);
+    }
+
+    $selectedCount = CRM_Core_DAO::singleValueQuery(
+      "SELECT count(*) FROM civicrm_prevnext_cache WHERE cachekey = %1 AND is_selected = 1",
+      [1 => [$cacheKey, 'String']]
+    );
+    $this->assertEquals(2, $selectedCount);
+  }
+
+  /**
+   * Test toggleDedupeSelect does not update rows if cacheKey only partially matches.
+   */
+  public function testToggleDedupeSelectPartialCacheKeyDoesNotMatch(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'merge duplicate contacts']);
+
+    $contact1 = $this->individualCreate([], 'c1');
+    $contact2 = $this->individualCreate([], 'c2');
+    $cacheKey = 'merge_Individual_1_0_0_test123';
+
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cachekey, is_selected) VALUES ('civicrm_contact', %1, %2, %3, 0)",
+      [1 => [$contact1, 'Positive'], 2 => [$contact2, 'Positive'], 3 => [$cacheKey, 'String']]
+    );
+    $pnid = CRM_Core_DAO::singleValueQuery(
+      "SELECT id FROM civicrm_prevnext_cache WHERE cachekey = %1",
+      [1 => [$cacheKey, 'String']]
+    );
+
+    $_POST = $_REQUEST = [
+      'cacheKey' => 'm',
+      'pnid' => $pnid,
+      'is_selected' => 1,
+    ];
+
+    try {
+      CRM_Contact_Page_AJAX::toggleDedupeSelect();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('success', $e->errorData['status']);
+    }
+
+    $isSelected = CRM_Core_DAO::singleValueQuery(
+      "SELECT is_selected FROM civicrm_prevnext_cache WHERE id = %1",
+      [1 => [$pnid, 'Integer']]
+    );
+    $this->assertEquals(0, $isSelected, 'Row should not be updated when cacheKey is only a prefix.');
+  }
+
+  /**
+   * Test toggleDedupeSelect is denied without cacheKey or pnid.
+   */
+  public function testToggleDedupeSelectDeniedWithoutCacheKey(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'merge duplicate contacts']);
+
+    $_POST = $_REQUEST = [
+      'pnid' => 1,
+      'is_selected' => 1,
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('Could not find valid value for cacheKey');
+    CRM_Contact_Page_AJAX::toggleDedupeSelect();
   }
 
 }
