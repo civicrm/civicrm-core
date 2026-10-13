@@ -134,6 +134,7 @@
      <path>civicrm/campaign/registerInterview</path>
      <page_callback>CRM_Campaign_Page_AJAX::registerInterview</page_callback>
      <access_arguments>administer CiviCampaign;manage campaign;interview campaign contacts</access_arguments>
+     <component>CiviCampaign</component>
      <is_ajax>true</is_ajax>
   </item>
   <item>
@@ -159,5 +160,12 @@
      <title>Delete Survey</title>
      <page_callback>CRM_Campaign_Form_Survey_Delete</page_callback>
      <access_arguments>administer CiviCampaign;manage campaign</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/ajax/campaign/processvoter</path>
+    <page_callback>CRM_Campaign_Page_AJAX::processVoterData</page_callback>
+    <access_arguments>reserve campaign contacts;release campaign contacts;gotv campaign contacts</access_arguments>
+    <component>CiviCampaign</component>
+    <is_ajax>true</is_ajax>
   </item>
  </menu>

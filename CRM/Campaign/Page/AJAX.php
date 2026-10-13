@@ -335,35 +335,56 @@ class CRM_Campaign_Page_AJAX {
   }
 
   public static function processVoterData() {
+    $operation = CRM_Utils_Request::retrieve('operation', 'String', NULL, FALSE, NULL, 'POST');
+    $permissions = [
+      'release' => 'release campaign contacts',
+      'reserve' => 'reserve campaign contacts',
+      'gotv' => 'gotv campaign contacts',
+    ];
+    if (!$operation || !isset($permissions[$operation]) || !CRM_Core_Permission::check($permissions[$operation])) {
+      CRM_Utils_System::permissionDenied();
+    }
+
     $status = NULL;
-    $operation = CRM_Utils_Type::escape($_POST['operation'], 'String');
-    if ($operation == 'release') {
-      $activityId = CRM_Utils_Type::escape($_POST['activity_id'], 'Integer');
-      $isDelete = CRM_Utils_String::strtoboolstr(CRM_Utils_Type::escape($_POST['isDelete'], 'String'));
-      if ($activityId &&
-        CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity',
-          $activityId,
-          'is_deleted',
-          $isDelete
-        )
-      ) {
-        $status = 'success';
+    if ($operation === 'release') {
+      $activityId = CRM_Utils_Request::retrieve('activity_id', 'Positive', NULL, FALSE, NULL, 'POST');
+      $isDelete = CRM_Utils_String::strtoboolstr(CRM_Utils_Request::retrieve('isDelete', 'String', NULL, FALSE, NULL, 'POST'));
+      if ($activityId) {
+        $activity = \Civi\Api4\Activity::get(FALSE)
+          ->addWhere('id', '=', $activityId)
+          ->addSelect('id', 'source_record_id')
+          ->execute()
+          ->first();
+        if ($activity && !empty($activity['source_record_id'])) {
+          $surveyExists = \Civi\Api4\Survey::get(FALSE)
+            ->addWhere('id', '=', $activity['source_record_id'])
+            ->execute()
+            ->count();
+          if ($surveyExists && CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity', $activityId, 'is_deleted', $isDelete)) {
+            $status = 'success';
+          }
+        }
       }
     }
-    elseif ($operation == 'reserve') {
-      $activityId = NULL;
+    elseif ($operation === 'reserve') {
+      $activityId = CRM_Utils_Request::retrieve('activity_id', 'Positive', NULL, FALSE, NULL, 'POST');
       $createActivity = TRUE;
-      if (!empty($_POST['activity_id'])) {
-        $activityId = CRM_Utils_Type::escape($_POST['activity_id'], 'Integer');
-        if ($activityId) {
-          $createActivity = FALSE;
-          $activityUpdated = CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity',
-            $activityId,
-            'is_deleted',
-            0
-          );
-          if ($activityUpdated) {
-            $status = 'success';
+      if ($activityId) {
+        $activity = \Civi\Api4\Activity::get(FALSE)
+          ->addWhere('id', '=', $activityId)
+          ->addSelect('id', 'source_record_id')
+          ->execute()
+          ->first();
+        if ($activity && !empty($activity['source_record_id'])) {
+          $surveyExists = \Civi\Api4\Survey::get(FALSE)
+            ->addWhere('id', '=', $activity['source_record_id'])
+            ->execute()
+            ->count();
+          if ($surveyExists) {
+            $createActivity = FALSE;
+            if (CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity', $activityId, 'is_deleted', 0)) {
+              $status = 'success';
+            }
           }
         }
       }
@@ -376,86 +397,91 @@ class CRM_Campaign_Page_AJAX {
         ];
         $activityParams = [];
         foreach ($ids as $id) {
-          $val = $_POST[$id] ?? NULL;
+          $val = CRM_Utils_Request::retrieve($id, 'Positive', NULL, FALSE, NULL, 'POST');
           if (!$val) {
             $createActivity = FALSE;
             break;
           }
-          $activityParams[$id] = CRM_Utils_Type::escape($val, 'Integer');
+          $activityParams[$id] = $val;
+        }
+        if ($createActivity && !CRM_Contact_BAO_Contact_Permission::allow($activityParams['target_contact_id'])) {
+          CRM_Utils_System::permissionDenied();
         }
       }
       if ($createActivity) {
-        $isReserved = CRM_Utils_String::strtoboolstr(CRM_Utils_Type::escape($_POST['isReserved'], 'String'));
-        $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
-        $scheduledStatusId = array_search('Scheduled', $activityStatus);
-        if ($isReserved) {
-          $surveyValues = [];
-          $surveyParams = ['id' => $activityParams['source_record_id']];
-          CRM_Core_DAO::commonRetrieve('CRM_Campaign_DAO_Survey',
-            $surveyParams,
-            $surveyValues,
-            ['title', 'activity_type_id', 'campaign_id']
-          );
+        $survey = \Civi\Api4\Survey::get(FALSE)
+          ->addWhere('id', '=', $activityParams['source_record_id'])
+          ->addSelect('title', 'activity_type_id', 'campaign_id')
+          ->execute()
+          ->first();
+        if ($survey) {
+          $isReserved = CRM_Utils_String::strtoboolstr(CRM_Utils_Request::retrieve('isReserved', 'String', NULL, FALSE, NULL, 'POST'));
+          $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
+          $scheduledStatusId = array_search('Scheduled', $activityStatus);
+          if ($isReserved) {
+            $activityTypeId = $survey['activity_type_id'];
+            $surveyTitle = CRM_Utils_Request::retrieve('surveyTitle', 'String', NULL, FALSE, NULL, 'POST') ?: $survey['title'];
 
-          $activityTypeId = $surveyValues['activity_type_id'];
+            $activityParams['subject'] = $surveyTitle . ' - ' . ts('Respondent Reservation');
+            $activityParams['status_id'] = $scheduledStatusId;
+            $activityParams['skipRecentView'] = 1;
+            $activityParams['activity_date_time'] = date('YmdHis');
+            $activityParams['activity_type_id'] = $activityTypeId;
+            $activityParams['campaign_id'] = $survey['campaign_id'] ?? NULL;
 
-          $surveytitle = $_POST['surveyTitle'] ?? NULL;
-          if (!$surveytitle) {
-            $surveytitle = $surveyValues['title'];
-          }
-
-          $subject = $surveytitle . ' - ' . ts('Respondent Reservation');
-          $activityParams['subject'] = $subject;
-          $activityParams['status_id'] = $scheduledStatusId;
-          $activityParams['skipRecentView'] = 1;
-          $activityParams['activity_date_time'] = date('YmdHis');
-          $activityParams['activity_type_id'] = $activityTypeId;
-          $activityParams['campaign_id'] = $surveyValues['campaign_id'] ?? NULL;
-
-          $activity = CRM_Activity_BAO_Activity::create($activityParams);
-          if ($activity->id) {
-            $status = 'success';
-          }
-        }
-        else {
-          //delete reserved activity for given voter.
-          $voterIds = [$activityParams['target_contact_id']];
-          $activities = CRM_Campaign_BAO_Survey::voterActivityDetails($activityParams['source_record_id'],
-            $voterIds,
-            $activityParams['source_contact_id'],
-            [$scheduledStatusId]
-          );
-          foreach ($activities as $voterId => $values) {
-            $activityId = $values['activity_id'] ?? NULL;
-            if ($activityId && ($values['status_id'] == $scheduledStatusId)) {
-              CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity',
-                $activityId,
-                'is_deleted',
-                TRUE
-              );
+            $activity = CRM_Activity_BAO_Activity::create($activityParams);
+            if ($activity->id) {
               $status = 'success';
-              break;
+            }
+          }
+          else {
+            // delete reserved activity for given voter.
+            $voterIds = [$activityParams['target_contact_id']];
+            $activities = CRM_Campaign_BAO_Survey::voterActivityDetails($activityParams['source_record_id'],
+              $voterIds,
+              $activityParams['source_contact_id'],
+              [$scheduledStatusId]
+            );
+            foreach ($activities as $voterId => $values) {
+              $activityId = $values['activity_id'] ?? NULL;
+              if ($activityId && ($values['status_id'] == $scheduledStatusId)) {
+                CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity',
+                  $activityId,
+                  'is_deleted',
+                  TRUE
+                );
+                $status = 'success';
+                break;
+              }
             }
           }
         }
       }
     }
-    elseif ($operation == 'gotv') {
-      $activityId = CRM_Utils_Type::escape($_POST['activity_id'], 'Integer');
-      $hasVoted = CRM_Utils_String::strtoboolstr(CRM_Utils_Type::escape($_POST['hasVoted'], 'String'));
+    elseif ($operation === 'gotv') {
+      $activityId = CRM_Utils_Request::retrieve('activity_id', 'Positive', NULL, FALSE, NULL, 'POST');
+      $hasVoted = CRM_Utils_String::strtoboolstr(CRM_Utils_Request::retrieve('hasVoted', 'String', NULL, FALSE, NULL, 'POST'));
       if ($activityId) {
-        if ($hasVoted) {
-          $statusValue = 2;
+        $activity = \Civi\Api4\Activity::get(FALSE)
+          ->addWhere('id', '=', $activityId)
+          ->addSelect('id', 'source_record_id')
+          ->execute()
+          ->first();
+        if ($activity && !empty($activity['source_record_id'])) {
+          $surveyExists = \Civi\Api4\Survey::get(FALSE)
+            ->addWhere('id', '=', $activity['source_record_id'])
+            ->execute()
+            ->count();
+          if ($surveyExists) {
+            $statusValue = $hasVoted ? 2 : 1;
+            CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity',
+              $activityId,
+              'status_id',
+              $statusValue
+            );
+            $status = 'success';
+          }
         }
-        else {
-          $statusValue = 1;
-        }
-        CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity',
-          $activityId,
-          'status_id',
-          $statusValue
-        );
-        $status = 'success';
       }
     }
 
