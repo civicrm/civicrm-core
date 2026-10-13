@@ -46,6 +46,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private array $lineItemChanges;
 
+  private array $existingFinancialItems;
+
   public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution, array $originalLineItems, array $updatedLineItems, array $inputValues = []) {
     // Deal with slopping typing first.
     if ($originalContribution) {
@@ -58,6 +60,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $this->updatedLineItems = $updatedLineItems;
     $this->inputValues = $inputValues;
     $this->lineItemChanges = $this->classifyLineItemChanges();
+    $this->setNonCancelledFinancialItems();
   }
 
   private function getUpdatedContribution(): CRM_Contribute_DAO_Contribution {
@@ -1397,39 +1400,40 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * settled financial item on a completely different contribution that
    * happens to reuse the same price option (eg. a membership renewal reusing
    * the same price field value each time).
-   *
-   * @return array
-   *   Array of financial items that have not been reversed.
    */
-  private function getNonCancelledFinancialItems(): array {
-    if (empty($this->originalLineItems)) {
-      return [];
+  private function setNonCancelledFinancialItems(): void {
+    if (empty($this->originalLineItems) || !$this->hasLineItemChanges()) {
+      $this->existingFinancialItems = [];
+      return;
     }
-    $financialItemResult = (array) FinancialItem::get(FALSE)
+    $this->existingFinancialItems = (array) FinancialItem::get(FALSE)
       ->addWhere('entity_table', '=', 'civicrm_line_item')
       ->addWhere('entity_id', 'IN', array_keys($this->originalLineItems))
       ->execute();
 
     // price_field_value_id isn't a financial_item field - pull it in from the line item.
-    foreach ($financialItemResult as $index => $financialItem) {
-      $financialItemResult[$index]['price_field_value_id'] = $this->originalLineItems[$financialItem['entity_id']]['price_field_value_id'];
+    foreach ($this->existingFinancialItems as $index => $financialItem) {
+      $this->existingFinancialItems[$index]['price_field_value_id'] = $this->originalLineItems[$financialItem['entity_id']]['price_field_value_id'];
     }
 
     $items = [];
-    foreach ($financialItemResult as $index => $financialItem) {
+    foreach ($this->existingFinancialItems as $index => $financialItem) {
       $items[$financialItem['price_field_value_id']][$index] = $financialItem['amount'];
 
       foreach ($items[$financialItem['price_field_value_id']] as $existingItemID => $existingAmount) {
         if ($financialItem['amount'] + $existingAmount == 0) {
           // Filter both rows as they cancel each other out.
-          unset($financialItemResult[$index]);
-          unset($financialItemResult[$existingItemID]);
+          unset($this->existingFinancialItems[$index]);
+          unset($this->existingFinancialItems[$existingItemID]);
           unset($items[$financialItem['price_field_value_id']][$existingItemID]);
           unset($items[$financialItem['price_field_value_id']][$index]);
         }
       }
     }
-    return $financialItemResult;
+  }
+
+  private function getNonCancelledFinancialItems(): array {
+    return $this->existingFinancialItems;
   }
 
   /**
@@ -1485,6 +1489,15 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     // This won't work if there is no contribution
     $this->addFinancialItemsOnLineItemsChange($trxnID);
+  }
+
+  /**
+   * Is any line item being added, changed or removed - see classifyLineItemChanges().
+   */
+  private function hasLineItemChanges(): bool {
+    return !empty($this->lineItemChanges['added'])
+      || !empty($this->lineItemChanges['changed'])
+      || !empty($this->lineItemChanges['removed']);
   }
 
   /**
