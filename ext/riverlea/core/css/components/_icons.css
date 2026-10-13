@@ -1,3 +1,19 @@
+/* Establish FontAwesome */
+#crm-notification-container .ui-notify-message :is(.ui-notify-cross,h1)::before,
+div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
+.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column)::before,
+.crm-container tr.disabled td:is(.crm-search-ctrl-column,.crm-extensions-status)::after,
+.crm-container td.disabled:first-of-type:not(.crm-search-ctrl-column)::before,
+.crm-container td.disabled.crm-search-ctrl-column::after,
+.crm-container .delete-icon,
+.crm-container span:is(.batch-valid,.batch-invalid),
+.crm-container .messages.crm-empty-table::before,
+.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon,
+.crm-credit_card_type-icons a::before {
+  font: normal normal var(--crm-font-size) "Font Awesome 6 Free", "FontAwesome";
+  text-rendering: auto;
+  margin: 0 var(--crm-l-medium) 0 0;
+}
 .crm-container .messages > .crm-i {
   padding: 0 var(--crm-l-medium) var(--crm-l-small) 0;
   float: left;
@@ -11,7 +27,7 @@
   padding: var(--crm-btn-small-padding);
 }
 .crm-container .select2-container[class*=" fa-"]::before,
-.crm-container .messages.crm-empty-table > img /* removes inform.gif icon */ {
+.crm-container .messages.crm-empty-table > :is(img,i.crm-i) /* removes inform.gif icon & double icon when markup uses both */ {
   display: none;
 }
 input#crm-qsearch-input::placeholder {
@@ -19,29 +35,6 @@ input#crm-qsearch-input::placeholder {
 }
 
 /* Notification icons */
-.crm-container #crm-notification-container div.ui-notify-message.error .notify-content .crm-i.fa-exclamation-triangle,
-.crm-container #crm-notification-container div.ui-notify-message div.icon {
-  display: none;
-}
-#crm-notification-container .ui-notify-message a.ui-notify-cross::before,
-.crm-container #crm-notification-container div.ui-notify-message h1::before,
-div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
-.crm-container tr.disabled td:first-of-type:not(.crm-search-ctrl-column)::before,
-.crm-container td.disabled:first-of-type:not(.crm-search-ctrl-column)::before,
-.crm-container tr.disabled td.crm-search-ctrl-column::after,
-.crm-container td.disabled.crm-search-ctrl-column::after,
-.crm-container tr.disabled td.crm-extensions-status::before,
-.crm-container .delete-icon,
-.crm-container span.batch-valid,
-.crm-container span.batch-invalid,
-.crm-container .messages.crm-empty-table::before {
-  font-family: "Font Awesome 6 Free", "FontAwesome";
-  font-style: normal;
-  font-weight: normal;
-  text-rendering: auto;
-  font-size: var(--crm-font-size);
-  margin: 0 var(--crm-l-medium) 0 0;
-}
 .crm-container #crm-notification-container div.ui-notify-message.error h1::before,
 .crm-container span.batch-invalid::before {
   content: var(--crm-icon-danger);
@@ -57,13 +50,9 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   content: var(--crm-icon-info);
   color: var(--crm-notify-info-color);
 }
-.crm-container #crm-notification-container div.ui-notify-message.alert h1::before,
-.crm-container #crm-notification-container div.ui-notify-message.warning h1::before {
+.crm-container #crm-notification-container div.ui-notify-message:is(.alert,.warning) h1::before {
   content: var(--crm-icon-danger);
   color: var(--crm-notify-warning-color);
-}
-.crm-container .messages.crm-empty-table > i.crm-i {
-  display: none; /* removes double icon when markup uses both */
 }
 
 /* Help icon */
@@ -165,24 +154,16 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   margin-left: -1.5ch;
   color: var(--crm-table-sort-color);
   line-height: inherit;
-  font-style: normal;
-  text-rendering: auto;
-  font-family: "Font Awesome 6 Free", "FontAwesome";
-  font-style: normal;
-  font-weight: normal;
+  font-size: inherit;
   cursor: var(--crm-link-hover-cursor);
   opacity: 1;
 }
 .crm-container .table > thead > tr > th:has(.crm-search-table-column-sort-icon) {
   padding-left: 2ch;
 }
-.crm-container a.sorting::after,
-.crm-container a.sorting_asc::after,
-.crm-container a.sorting_desc::after,
+.crm-container a:is(.sorting,.sorting_asc.sorting_desc)::after,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon::before,
-.crm-container table.dataTable thead th.sorting::before,
-.crm-container table.dataTable thead th.sorting_asc::before,
-.crm-container table.dataTable thead th.sorting_desc::before,
+.crm-container table.dataTable thead th:is(.sorting,.sorting_asc,.sorting_desc)::before,
 .jstree-default .jstree-icon {
   font-family: "Font Awesome 6 Free", "FontAwesome";
   font-style: normal;
@@ -191,13 +172,10 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   content: var(--crm-icon-sort);
   color: var(--crm-table-sort-color);
   cursor: var(--crm-link-hover-cursor);
+  margin-right: var(--crm-l-medium);
 }
-.crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon::before,
-.crm-container table.dataTable thead th.sorting::before,
-.crm-container table.dataTable thead th.sorting_asc::before,
-.crm-container table.dataTable thead th.sorting_desc::before,
-.jstree-default .jstree-icon {
-  margin-right: 0.5rem;
+.crm-container a:is(.sorting,.sorting_asc.sorting_desc)::after {
+  margin-right: 0;
 }
 .crm-container a.sorting_asc::after,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-asc::before,
@@ -343,10 +321,6 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   gap: var(--crm-flex-gap);
 }
 .crm-credit_card_type-icons a::before {
-  font-family: "Font Awesome 6 Free", "FontAwesome";
-  font-style: normal;
-  text-rendering: auto;
-  font-size: var(--crm-contact-icon-size);
   display: inline-block;
   content: '\f09d';
   font-size: 2.5rem;

@@ -304,7 +304,7 @@
   --crm-contact-tab-align: none;
   --crm-contact-tab-hang: 0; /* lip to extend tab flush with active region - set to 0 for no lip */
   --crm-contact-tab-radius: var(--crm-contact-radius);
-  --crm-contact-icon-size: var(--crm-l-reg);
+  --crm-contact-icon-size: var(--crm-font-size);
   --crm-contact-summary-row-bg-color: var(--crm-container-bg-color);
   --crm-contact-heading-inset: 0;
   --crm-contact-box-shadow: 0;

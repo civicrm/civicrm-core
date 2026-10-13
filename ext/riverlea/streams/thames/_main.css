@@ -451,25 +451,6 @@ html.cms-standalone body {
   background: #fff;
 }
 
-
-/* NOTIFICATIONS (the popup ones) */
-/* This produces a nicer hanging-indent type thing aligning the title and message to the left. */
-.crm-container .notify-content {
-  padding-left: 1.6rem;
-}
-
-/* Thames theme does hanging indent for the little <i>con, but happy for the list bullets to be outside of main text block as is narrow column. */
-#crm-notification-container div.ui-notify-message .notify-content ul,
-#crm-notification-container div.ui-notify-message .alert.notify-content ul {
-  margin: 1rem 0 0;
-  padding: 0;
-}
-
-/* Only include the margin under the h1 (h1!) when it's not empty. When it's empty the h1 only contains the <i>con and adding a margin messes up vertical alignment of the message. */
-#crm-notification-container div.ui-notify-message h1:not(:empty) {
-  margin-bottom: 1rem;
-}
-
 /* OTHER */
 /* 'alpha-filter' is the alphabetical pager you see, for example, on adv search results */
 .crm-container #alpha-filter li {

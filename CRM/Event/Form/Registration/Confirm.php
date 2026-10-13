@@ -248,7 +248,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   public function buildQuickForm() {
     $this->assignToTemplate();
     // This use of the ts function uses the legacy interpolation of the button name to avoid translations having to be re-done.
-    $this->assign('verifyText', !$this->_totalAmount ? ts('Click <strong>%1</strong> to complete your registration.', [1 => ts('Register')]) : $this->getPaymentProcessorObject()->getText('eventContinueText', []));
+    $this->assign('verifyText', !$this->getOrderTotalAmount() ? ts('Click <strong>%1</strong> to complete your registration.', [1 => ts('Register')]) : $this->getPaymentProcessorObject()->getText('eventContinueText', []));
 
     if ($this->isPaidEvent() &&
       (isset($this->_params[0]['amount']) && is_numeric($this->_params[0]['amount'])) &&
@@ -283,25 +283,16 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
 
-    if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-      $lineItemForTemplate = [];
-      if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
-        foreach ($this->_lineItem as $key => $value) {
-          if (!empty($value) && $value !== 'skip') {
-            $lineItemForTemplate[$key] = $value;
-          }
-        }
-      }
-      if (!empty($lineItemForTemplate)) {
-        $this->assignLineItemsToTemplate($lineItemForTemplate);
-      }
+    if ($this->hasOrder() && !$this->isQuickConfig()) {
+      $order = $this->getOrder();
+      $this->assign('lineItem', [$order->getPriceSetID() => $order->getLineItems()]);
     }
 
     //display additional participants profile.
     self::assignProfiles($this);
 
     //consider total amount.
-    $this->assign('isAmountzero', $this->_totalAmount <= 0);
+    $this->assign('isAmountzero', $this->getOrderTotalAmount() <= 0);
 
     $this->addButtons([
       [
@@ -494,7 +485,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
       else {
-        $participantRecord['amount'] = $this->_totalAmount;
+        $participantRecord['amount'] = $this->getOrderTotalAmount();
       }
 
       $contactID = CRM_Event_Form_Registration_Confirm::updateContactFields($contactID, $participantRecord, $fields, $this);
@@ -661,7 +652,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     if (($this->getPaymentProcessorObject()->supports('noReturn')
       ) && empty($params[0]['is_pay_later']) &&
       $this->isProcessRegistrationInRealTime() &&
-      $this->_totalAmount > 0
+      $this->getOrderTotalAmount() > 0
     ) {
       // @todo - we pass a whole lot of parameters to the processor here that are not passed by contribution
       // pages / this page with other processor types / webforms / afforms etc. It was added in 2014 for one
