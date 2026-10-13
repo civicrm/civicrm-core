@@ -162,23 +162,22 @@ tbody .crm-row-child:not(:has(~ .crm-row-child)) td {
 }
 
 /* Advance search compressed table */
-#search-status table.form-layout-compressed {
+#search-status {
   background: var(--crm-container-bg-color);
-  width: 100%;
-  border: 0;
   padding: var(--crm-padding-reg);
   border-radius: var(--crm-l-radius);
-  margin: 0;
+  box-shadow: var(--crm-shadow-block);
 }
-#search-status table.form-layout-compressed tr {
+#search-status table.form-layout-compressed,
+#search-status table.form-layout-compressed :is(tr,td) {
   border: 0;
+  margin: 0;
+  line-height: 1;
+  background: transparent;
+  box-shadow: none;
 }
-#search-status table.form-layout-compressed td {
-  padding-inline: var(--crm-padding-reg);
-}
-#search-status table.form-layout-compressed tr:first-of-type td,
-#search-status table.form-layout-compressed tr:last-of-type td {
-  padding-block: var(--crm-padding-reg);
+#search-status .select2-container-disabled a {
+  background-color: var(--crm-layer2-bg-color);
 }
 
 /* Report table */
