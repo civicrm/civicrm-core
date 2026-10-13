@@ -372,4 +372,36 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
     $this->assertEquals('Positive response', $activityAfter['details']);
   }
 
+  /**
+   * Test voterList is denied when user lacks the corresponding campaign permission.
+   */
+  public function testVoterListDeniedWithoutPermission(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM']);
+
+    $_POST = $_REQUEST = [
+      'campaign_search_voter_for' => 'reserve',
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Campaign_Page_AJAX::voterList();
+  }
+
+  /**
+   * Test voterList is denied for missing or invalid search mode.
+   */
+  public function testVoterListInvalidModeDenied(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'administer CiviCampaign']);
+
+    $_POST = $_REQUEST = [
+      'campaign_search_voter_for' => 'invalid_mode',
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Campaign_Page_AJAX::voterList();
+  }
+
 }

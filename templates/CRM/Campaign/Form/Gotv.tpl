@@ -106,7 +106,7 @@
 
   function loadVoterList( )
   {
-    var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_Campaign_Page_AJAX&fnName=voterList'}"{literal};
+    var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/campaign/voterlist' h=0 q='snippet=4'}"{literal};
 
     var searchVoterFor = {/literal}'{$searchVoterFor}'{literal};
     CRM.$( 'table.gotvVoterRecords', 'form.{/literal}{$form.formClass}{literal}').dataTable({

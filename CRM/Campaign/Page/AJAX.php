@@ -146,9 +146,21 @@ class CRM_Campaign_Page_AJAX {
   }
 
   public static function voterList() {
+    $searchVoterFor = CRM_Utils_Request::retrieve('campaign_search_voter_for', 'String', NULL, FALSE, NULL, 'POST');
+    $permissions = [
+      'reserve' => 'reserve campaign contacts',
+      'release' => 'release campaign contacts',
+      'gotv' => 'gotv campaign contacts',
+      'interview' => 'interview campaign contacts',
+    ];
+
+    if (!$searchVoterFor || !isset($permissions[$searchVoterFor]) || !CRM_Core_Permission::check($permissions[$searchVoterFor])) {
+      CRM_Utils_System::permissionDenied();
+    }
+
     //get the search criteria params.
     $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', NULL, FALSE, NULL, 'POST');
-    $searchParams = explode(',', $searchCriteria);
+    $searchParams = explode(',', (string) $searchCriteria);
 
     $params = $searchRows = [];
     foreach ($searchParams as $param) {
@@ -156,6 +168,7 @@ class CRM_Campaign_Page_AJAX {
         $params[$param] = $_POST[$param];
       }
     }
+    $params['campaign_search_voter_for'] = $searchVoterFor;
 
     //format multi-select group and contact types.
     foreach (['group', 'contact_type'] as $param) {
@@ -254,7 +267,7 @@ class CRM_Campaign_Page_AJAX {
       ],
       'sortOrder' => [
         'name' => 'sSortDir_0',
-        'type' => 'String',
+        'type' => 'MysqlOrderByDirection',
         'default' => 'asc',
       ],
     ];
