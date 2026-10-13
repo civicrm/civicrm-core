@@ -501,8 +501,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->_params['total_amount'] = $this->_params['total_amount'] ?? CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->getMembershipTypeID(), 'minimum_fee');
     $contributionRecurID = NULL;
     $this->assign('receiptType', 'membership renewal');
-    $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
-    $this->_params['invoice_id'] = $this->getInvoiceID();
 
     if ($this->getSubmittedValue('send_receipt')) {
       $this->_params['receipt_date'] = $now;
@@ -512,24 +510,11 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     if ($this->_mode) {
-      $this->_params['register_date'] = $now;
-      $this->_params['description'] = ts("Contribution submitted by a staff person using member's credit card for renewal");
-      $this->_params['amount'] = $this->_params['total_amount'];
-
-      // at this point we've created a contact and stored its address etc
-      // all the payment processors expect the name and address to be in the passed params
-      // so we copy stuff over to first_name etc.
-      // @todo - probably do not need to add in _params - just need to check what we added above.
-      $paymentParams = $this->prepareParamsForPaymentProcessor($this->getSubmittedValues()) + $this->_params;
-      if ($this->getSubmittedValue('send_receipt')) {
-        $paymentParams['email'] = $this->_contributorEmail;
-      }
-
-      $paymentParams['contactID'] = $this->_contributorContactID;
+      $paymentParams = $this->getPaymentParams();
 
       if (!empty($this->_params['auto_renew'])) {
 
-        $contributionRecurParams = $this->processRecurringContribution([
+        $contributionRecurID = $this->processRecurringContribution([
           'contact_id' => $this->_contributorContactID,
           'amount' => $this->_params['total_amount'],
           'contribution_status_id' => 'Pending',
@@ -538,16 +523,13 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
           'is_email_receipt' => (bool) $this->getSubmittedValue('send_receipt'),
           'payment_instrument_id' => $this->getPaymentInstrumentID(),
           'invoice_id' => $this->getInvoiceID(),
-        ], $paymentParams['membership_type_id'][1]);
+        ], $this->getMembershipTypeID())['contributionRecurID'];
 
-        $contributionRecurID = $contributionRecurParams['contributionRecurID'];
-        $paymentParams = array_merge($paymentParams, $contributionRecurParams);
+        $paymentParams['contributionRecurID'] = $contributionRecurID;
+        $paymentParams['is_recur'] = TRUE;
       }
 
-      $paymentParams['invoiceID'] = $paymentParams['invoice_id'];
-
       $payment = $this->_paymentProcessor['object'];
-      $paymentParams['currency'] = $this->getCurrency();
       $payment->setBackOffice(TRUE);
       $result = $payment->doPayment($paymentParams);
       $this->_params = array_merge($this->_params, $result);
@@ -586,6 +568,30 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     if ($this->getSubmittedValue('send_receipt')) {
       $this->sendReceipt();
     }
+  }
+
+  /**
+   * @return string
+   */
+  protected function getPaymentDescription(): string {
+    return ts("Contribution submitted by a staff person using member's credit card for renewal");
+  }
+
+  /**
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  protected function getFrequencyInterval(): ?int {
+    $interval = $this->getMembershipTypeValue('duration_interval');
+    return $interval ? (int) $interval : NULL;
+  }
+
+  /**
+   * @return string|null
+   * @throws \CRM_Core_Exception
+   */
+  protected function getFrequencyUnit(): ?string {
+    return $this->getMembershipTypeValue('duration_unit');
   }
 
   /**
