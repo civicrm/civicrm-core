@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\FinancialItem;
 use Civi\Api4\LineItem;
@@ -186,6 +187,55 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function getAccountsReceivableAccount(int $financialTypeID): ?int {
     return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($financialTypeID, 'Accounts Receivable Account is');
+  }
+
+  /**
+   * @return float
+   */
+  private function getUpdatedTaxAmount(): float {
+    $taxAmount = 0.0;
+    foreach ($this->getUpdatedLineItems() as $submittedLineItem) {
+      $taxAmount += $submittedLineItem['tax_amount'] ?? 0.0;
+    }
+    return $taxAmount;
+  }
+
+  /**
+   * @return float
+   */
+  private function getUpdatedTotalAmount(): float {
+    $totalAmount = 0.0;
+    foreach ($this->getUpdatedLineItems() as $submittedLineItem) {
+      $totalAmount += $submittedLineItem['line_total'] ?? 0.0;
+    }
+    return $totalAmount + $this->getUpdatedTaxAmount();
+  }
+
+  /**
+   * @return string|null
+   */
+  public function getUpdatedAmountLevel(): ?string {
+    // update line item with changed line total and other information. A resurrected
+    // line counts here too, same as a changed one.
+    $totalParticipant = 0;
+    $amountLevel = [];
+    foreach ($this->getUpdatedLineItems() as $lineItem) {
+      if (($lineItem['qty'] ?? 0) > 0) {
+        $amountLevel[] = $lineItem['label'] . ' - ' . (float) $lineItem['qty'];
+        if (($lineItem['entity_table'] ?? NULL) === 'civicrm_participant' && isset($lineItem['participant_count'])) {
+          $totalParticipant += $lineItem['participant_count'];
+        }
+      }
+    }
+    $displayParticipantCount = '';
+    if ($totalParticipant > 0) {
+      $displayParticipantCount = ' Participant Count -' . $totalParticipant;
+    }
+    $updateAmountLevel = NULL;
+    if (!empty($amountLevel)) {
+      $updateAmountLevel = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
+    }
+    return $updateAmountLevel;
   }
 
   private function isStatusChange(): bool {
@@ -1409,27 +1459,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws \CRM_Core_Exception
    */
   public function changeFeeSelections(): void {
-    $contributionId = $this->getContributionID();
-    $taxAmount = 0.0;
-    foreach ($this->getUpdatedLineItems() as $submittedLineItem) {
-      $taxAmount += $submittedLineItem['tax_amount'] ?? 0.0;
-    }
-
+    $trxnID = $this->recordAdjustmentTrxn();
     // get financial information that need to be recorded on basis on submitted price field value IDs
     $financialItemsArray = [];
     if (!empty($this->getChangedLineItems())) {
       $financialItemsArray = $this->getAdjustedFinancialItemsToRecord();
-    }
-
-    // update line item with changed line total and other information. A resurrected
-    // line counts here too, same as a changed one.
-    $totalParticipant = 0;
-    $amountLevel = [];
-    foreach (array_merge($this->getChangedLineItems(), $this->getResurrectedLineItems()) as $priceFieldValueID => $priceFieldValue) {
-      $amountLevel[] = $priceFieldValue['label'] . ' - ' . (float) $priceFieldValue['qty'];
-      if (($priceFieldValue['entity_table'] ?? NULL) === 'civicrm_participant' && isset($priceFieldValue['participant_count'])) {
-        $totalParticipant += $priceFieldValue['participant_count'];
-      }
     }
 
     foreach (array_merge($this->getResurrectedLineItems(), $this->getRemovedLineItems(), $this->getChangedLineItems()) as $lineItemToAlter) {
@@ -1438,17 +1472,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
 
     $this->addLineItemOnChangeFeeSelection();
-
-    $updatedAmount = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
-    $displayParticipantCount = '';
-    if ($totalParticipant > 0) {
-      $displayParticipantCount = ' Participant Count -' . $totalParticipant;
-    }
-    $updateAmountLevel = NULL;
-    if (!empty($amountLevel)) {
-      $updateAmountLevel = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $amountLevel) . $displayParticipantCount . CRM_Core_DAO::VALUE_SEPARATOR;
-    }
-    $trxnID = $this->recordAdjustedAmount($updatedAmount, $taxAmount, $updateAmountLevel);
 
     foreach ($this->getRemovedLineItems() as $line) {
       $this->reverseLineItem($line, $trxnID);
@@ -1685,20 +1708,16 @@ class CRM_Contribute_BAO_FinancialProcessor {
   /**
    * Record adjusted amount.
    *
-   * Relocated as-is from CRM_Price_BAO_LineItem::changeFeeSelections()'s support code.
-   *
-   * @param int $updatedAmount
-   * @param int $taxAmount
-   * @param bool $updateAmountLevel
-   *
    * @return int
    *   The trxn recording the balance change, created even when the balance
    *   is unchanged (total_amount 0) so every financial item touched by the
    *   fee change has something to link to.
    */
-  private function recordAdjustedAmount($updatedAmount, $taxAmount = NULL, $updateAmountLevel = NULL): int {
+  private function recordAdjustmentTrxn(): int {
     $contributionId = $this->getContributionID();
-    $paidAmount = \Civi\Api4\Contribution::get(FALSE)
+    $taxAmount = $this->getUpdatedTaxAmount();
+    $updatedAmount = $this->getUpdatedTotalAmount();
+    $paidAmount = Contribution::get(FALSE)
       ->addWhere('id', '=', $contributionId)
       ->addSelect('paid_amount')
       ->execute()->first()['paid_amount'];
@@ -1731,8 +1750,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
     $updatedContributionDAO->fee_amount = 0;
     $updatedContributionDAO->tax_amount = $taxAmount;
-    if (!empty($updateAmountLevel)) {
-      $updatedContributionDAO->amount_level = $updateAmountLevel;
+    if ($this->getUpdatedAmountLevel()) {
+      $updatedContributionDAO->amount_level = $this->getUpdatedAmountLevel();
     }
     $updatedContributionDAO->save();
 
