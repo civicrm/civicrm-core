@@ -1275,6 +1275,8 @@ class CRM_Utils_Token {
           // receipt_text_renewal appears to be long gone.
           'receipt_text_renewal' => 'receipt_text',
           '$totalTaxAmount' => 'contribution.tax_amount',
+          '$total_amount' => 'contribution.total_amount',
+          '$trxn_id' => 'contribution.trxn_id',
           '$getTaxDetails' => ts('no longer available / relevant'),
           '$isAmountZero' => ts('no longer available / relevant'),
           '$dataArray' => ts('see default template for how to show this'),

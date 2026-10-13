@@ -58,7 +58,7 @@ trait CustomFieldTrait {
     ];
     $allGroups = \CRM_Core_BAO_CustomGroup::getAll($groupFilters, \CRM_Core_Permission::VIEW);
     foreach ($allGroups as $group) {
-      $entityValueMatches = array_intersect((array) $group['extends_entity_column_value'], ($entityFilters[$group['extends_entity_column_id']] ?? []));
+      $entityValueMatches = array_intersect((array) $group['extends_entity_column_value'], ($entityFilters[$group['extends_entity_column_id'] ?? 0] ?? []));
       if ($entityValueMatches || !$entityFilters || empty($group['extends_entity_column_id'])) {
         foreach ($group['fields'] as $field) {
           if (!$field['is_view']) {

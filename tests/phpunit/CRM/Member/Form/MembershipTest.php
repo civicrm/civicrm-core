@@ -661,6 +661,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'total_amount' => $this->formatMoneyInput(50),
       'financial_type_id' => '2',
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'send_receipt' => TRUE,
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'credit_card_number' => '4111111111111111',
       'cvv2' => '123',
@@ -685,6 +686,12 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       ->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])
       ->execute()->single();
     $this->assertEquals('Online signup custom value', $membership[$this->getCustomFieldName('text', 4)]);
+
+    // The custom field's label and value should be assigned to, and rendered by, the receipt.
+    $this->assertMailSentContainingStrings([
+      'Enter text here',
+      'Online signup custom value',
+    ]);
   }
 
   /**

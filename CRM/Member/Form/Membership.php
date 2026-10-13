@@ -9,9 +9,11 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
 use Civi\Api4\Order;
+use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
  *
@@ -106,6 +108,19 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
     return $memTypeSelected;
+  }
+
+  /**
+   * Get the contribution ID.
+   *
+   * @api This function will not change in a minor release and is supported for
+   * use outside of core. This annotation / external support for properties
+   * is only given where there is specific test cover.
+   *
+   * @return int|null
+   */
+  public function getContributionID(): ?int {
+    return $this->ids['Contribution'] ?? $this->contributionID;
   }
 
   /**
@@ -894,8 +909,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   /**
    * Send email receipt.
    *
-   * @param array $formValues
-   *
    * @throws \CRM_Core_Exception
    *
    * @deprecated
@@ -903,16 +916,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    *   & needs rationalising.
    *
    */
-  protected function emailReceipt($formValues) {
-    // retrieve 'from email id' for acknowledgement
-    $receiptFrom = $formValues['from_email_address'] ?? NULL;
-
-    if (!empty($formValues['is_renew'])) {
-      $this->assign('receiptType', 'membership renewal');
-    }
-    else {
-      $this->assign('receiptType', 'membership signup');
-    }
+  protected function emailReceipt() {
 
     if ((empty($this->_contributorDisplayName) || empty($this->_contributorEmail))) {
       // in this case the form is being called statically from the batch editing screen
@@ -921,16 +925,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // however, we can assume that the contact_id passed in by the batch
       // function will be the recipient
       [$this->_contributorDisplayName, $this->_contributorEmail]
-        = CRM_Contact_BAO_Contact_Location::getEmailDetails($formValues['contact_id']);
+        = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->getContactID());
       if (empty($this->_receiptContactId)) {
-        $this->_receiptContactId = $formValues['contact_id'];
+        $this->_receiptContactId = $this->getContactID();
       }
     }
 
     CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'workflow' => 'membership_offline_receipt',
-        'from' => $receiptFrom,
+        'from' => $this->getSubmittedValue('from_email_address'),
         'toName' => $this->_contributorDisplayName,
         'toEmail' => $this->_contributorEmail,
         'PDFFilename' => ts('receipt') . '.pdf',
@@ -938,7 +942,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         'isTest' => (bool) ($this->_action & CRM_Core_Action::PREVIEW),
         'modelProps' => [
           'userEnteredText' => $this->getSubmittedValue('receipt_text'),
-          'contributionID' => $formValues['contribution_id'],
+          'contributionID' => $this->getContributionID(),
           'contactID' => $this->_receiptContactId,
           'membershipID' => $this->getMembershipID(),
         ],
@@ -983,8 +987,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->_priceSet,
       $formValues
     );
-
-    $isQuickConfig = $this->isQuickConfig();
 
     $lineItem = [$this->order->getPriceSetID() => $this->order->getLineItems()];
 
@@ -1104,7 +1106,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             ]);
           }
         }
-        catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+        catch (PaymentProcessorException $e) {
           if (!empty($paymentParams['contributionID'])) {
             CRM_Contribute_BAO_Contribution::failPayment($paymentParams['contributionID'], $this->_contactID,
               $e->getMessage());
@@ -1138,9 +1140,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         // set here.
         $params['receipt_date'] = $now;
       }
-
-      $this->set('params', $formValues);
-      $this->assign('trxn_id', $result['trxn_id'] ?? NULL);
 
       // required for creating membership for related contacts
       $params['action'] = $this->_action;
@@ -1187,7 +1186,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         if ($this->getMembershipID()) {
           $contributionId = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->getMembershipID());
           if ($contributionId) {
-            $isPaymentPending = \Civi\Api4\Contribution::get(FALSE)
+            $isPaymentPending = Contribution::get(FALSE)
               ->addSelect('contribution_status_id:name')
               ->addWhere('id', '=', $contributionId)
               ->execute()
@@ -1237,6 +1236,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
         $this->createSoftCredit($contribution->id);
         $params['contribution_id'] = $contribution->id;
+        $this->ids['Contribution'] = $contribution->id;
       }
     }
 
@@ -1252,23 +1252,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->addStatusMessage($this->getStatusMessageForCreate());
     }
 
-    $contributionId = $this->ids['Contribution'] ?? CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->getMembershipID());
+    $this->ids['Contribution'] ??= CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->getMembershipID());
     $membershipIds = $this->_membershipIDs;
-    if ($this->getSubmittedValue('send_receipt') && $contributionId && !empty($membershipIds)) {
-      $contributionStatus = \Civi\Api4\Contribution::get(FALSE)
+    if ($this->getSubmittedValue('send_receipt') && $this->ids['Contribution'] && !empty($membershipIds)) {
+      $contributionStatus = Contribution::get(FALSE)
         ->addSelect('contribution_status_id:name')
-        ->addWhere('id', '=', $contributionId)
+        ->addWhere('id', '=', $this->ids['Contribution'])
         ->execute()
         ->first();
       if ($contributionStatus['contribution_status_id:name'] === 'Completed') {
-        $formValues['contact_id'] = $this->_contactID;
-        $formValues['contribution_id'] = $contributionId;
-        // receipt_text_signup is no longer used in receipts from 5.47
-        // but may linger in some sites that have not updated their
-        // templates.
-        $formValues['receipt_text_signup'] = $this->getSubmittedValue('receipt_text');
-        // send email receipt
-        $this->emailMembershipReceipt($formValues);
+        $this->emailMembershipReceipt();
         $this->addStatusMessage(ts('A membership confirmation and receipt has been sent to %1.', [1 => $this->_contributorEmail]));
       }
     }
@@ -1535,14 +1528,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   /**
    * Send a receipt for the membership.
    *
-   * @param array $formValues
-   *
    * @return bool
    * @throws \CRM_Core_Exception
    */
-  protected function emailMembershipReceipt($formValues) {
-    $customValues = $this->getCustomValuesForReceipt();
-    $this->assign('customValues', $customValues);
+  protected function emailMembershipReceipt() {
     $this->assign('total_amount', $this->order->getTotalAmount());
 
     if ($this->_mode) {
@@ -1554,53 +1543,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->assign('is_pay_later', 0);
       $this->assign('isPrimary', 1);
     }
-    $this->emailReceipt($formValues);
+    $this->emailReceipt();
     return TRUE;
-  }
-
-  /**
-   * Filter the custom values from the input parameters (for display in the email).
-   *
-   * @todo move this to the WorkFlowMessageTrait.
-   *
-   * @return array
-   */
-  protected function getCustomValuesForReceipt(): array {
-    $customFieldValues = $this->getCustomFieldValues();
-    $customValues = [];
-    foreach ($customFieldValues as $customFieldString => $submittedValue) {
-      if ($submittedValue === NULL) {
-        // This would occur when the field is no longer appropriate - ie changing
-        // from a membership type with the field to one without it.
-        continue;
-      }
-      $customFieldID = (int) CRM_Core_BAO_CustomField::getKeyID($customFieldString);
-      $value = CRM_Core_BAO_CustomField::displayValue($this->getSubmittedValue($customFieldString), $customFieldID);
-      $customValues[CRM_Core_BAO_CustomField::getField($customFieldID)['label']] = $value;
-    }
-    return $customValues;
-  }
-
-  /**
-   * Get the custom fields tat are on the form with the submitted values.
-   *
-   * @internal I think it would be good to make this field
-   * available as an api supported method - maybe on the form custom data trait
-   * but I feel like we might want to talk about the format of the returned results
-   * (key-value vs array, custom field ID keys vs custom_, filters/ multiple functions
-   * with different formatting) so keeping private for now.
-   *
-   * @return array
-   */
-  private function getCustomFieldValues(): array {
-    $customFields = [];
-    foreach ($this->_elements as $element) {
-      $customFieldID = CRM_Core_BAO_CustomField::getKeyID($element->getName());
-      if ($customFieldID) {
-        $customFields[$element->getName()] = $this->getSubmittedValue($element->getName());
-      }
-    }
-    return $customFields;
   }
 
   /**
