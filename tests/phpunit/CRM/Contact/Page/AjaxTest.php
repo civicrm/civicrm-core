@@ -540,4 +540,75 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     CRM_Contact_Page_AJAX::toggleDedupeSelect();
   }
 
+  /**
+   * Test processDupes endpoint succeeds for creating and removing dedupe exceptions.
+   */
+  public function testProcessDupesEndpointSuccess(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'merge duplicate contacts', 'view all contacts']);
+
+    $contact1 = $this->individualCreate([], 'd1');
+    $contact2 = $this->individualCreate([], 'd2');
+
+    // 1. Mark as not duplicate
+    $_POST = $_REQUEST = [
+      'op' => 'dupe-nondupe',
+      'cid' => $contact1,
+      'oid' => $contact2,
+    ];
+
+    try {
+      CRM_Contact_Page_AJAX::processDupes();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('dupe-nondupe', $e->errorData['status']);
+    }
+
+    $c1 = min($contact1, $contact2);
+    $c2 = max($contact1, $contact2);
+    $exceptionExists = CRM_Core_DAO::singleValueQuery(
+      "SELECT count(*) FROM civicrm_dedupe_exception WHERE contact_id1 = %1 AND contact_id2 = %2",
+      [1 => [$c1, 'Positive'], 2 => [$c2, 'Positive']]
+    );
+    $this->assertEquals(1, $exceptionExists);
+
+    // 2. Remove exception
+    $_POST = $_REQUEST = [
+      'op' => 'nondupe-dupe',
+      'cid' => $contact1,
+      'oid' => $contact2,
+    ];
+
+    try {
+      CRM_Contact_Page_AJAX::processDupes();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('nondupe-dupe', $e->errorData['status']);
+    }
+
+    $exceptionExistsAfter = CRM_Core_DAO::singleValueQuery(
+      "SELECT count(*) FROM civicrm_dedupe_exception WHERE contact_id1 = %1 AND contact_id2 = %2",
+      [1 => [$c1, 'Positive'], 2 => [$c2, 'Positive']]
+    );
+    $this->assertEquals(0, $exceptionExistsAfter);
+  }
+
+  /**
+   * Test processDupes endpoint is denied when contacts do not exist.
+   */
+  public function testProcessDupesEndpointDeniedWithInvalidContacts(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'merge duplicate contacts']);
+
+    $_POST = $_REQUEST = [
+      'op' => 'dupe-nondupe',
+      'cid' => 999999,
+      'oid' => 999998,
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Contact_Page_AJAX::processDupes();
+  }
+
 }
