@@ -24,7 +24,7 @@
   <item>
      <path>civicrm/ajax/globalrelationships</path>
      <page_callback>CRM_Activity_Page_AJAX::getCaseGlobalRelationships</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+     <access_arguments>access my cases and activities</access_arguments>
      <is_ajax>true</is_ajax>
    </item>
   <item>
