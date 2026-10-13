@@ -1268,6 +1268,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws CRM_Core_Exception
    */
   private function reverseLineItem(array $line, int $trxnID): void {
+    LineItem::update(FALSE)
+      ->setValues($line)->execute();
     $this->reverseLineItemFinancialItem($line, FALSE, $trxnID);
     $this->reverseLineItemFinancialItem($line, TRUE, $trxnID);
   }
@@ -1433,8 +1435,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $trxnID = $this->recordAdjustmentTrxn();
 
     foreach ($this->getRemovedLineItems() as $lineItemToAlter) {
-      // Must use BAO rather than api because a bad line it in the api which we want to avoid.
-      CRM_Price_BAO_LineItem::create($lineItemToAlter);
       $this->reverseLineItem($lineItemToAlter, $trxnID);
     }
 
