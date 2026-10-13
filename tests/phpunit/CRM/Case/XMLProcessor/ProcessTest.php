@@ -172,10 +172,16 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    */
   protected function setupActivityDefinitions() {
     $this->activityTypeXml = $this->getActivityTypeXMl();
+    // Use the BAO rather than the API so the case is created without the standard timeline activities.
+    $caseID = CRM_Case_BAO_Case::writeRecord([
+      'case_type_id' => $this->caseTypeId,
+      'status_id' => 1,
+      'start_date' => date('Ymd'),
+    ])->id;
+    CRM_Case_BAO_CaseContact::writeRecord(['case_id' => $caseID, 'contact_id' => $this->ids['Contact']['ana']]);
     $this->activityParams = [
       'activity_date_time' => date('Ymd'),
-      // @todo This seems wrong: case 1 is from CiviCaseTestCase::createFixtureCase() and belongs to a different client.
-      'caseID' => 1,
+      'caseID' => $caseID,
       'clientID' => $this->ids['Contact']['ana'],
       'creatorID' => $this->getLoggedInUser(),
     ];
