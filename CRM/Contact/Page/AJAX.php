@@ -873,18 +873,15 @@ LIMIT {$rowCount}
   }
 
   public static function getAddressDisplay() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $contactId = CRM_Utils_Request::retrieve('contact_id', 'Positive');
-    if (!$contactId) {
-      $addressVal["error_message"] = "no contact id found";
+    if (!$contactId || !CRM_Contact_BAO_Contact_Permission::allow($contactId)) {
+      CRM_Utils_System::permissionDenied();
     }
-    else {
-      $entityBlock = [
-        'contact_id' => $contactId,
-        'entity_id' => $contactId,
-      ];
-      $addressVal = CRM_Core_BAO_Address::getValues($entityBlock);
-    }
+    $entityBlock = [
+      'contact_id' => $contactId,
+      'entity_id' => $contactId,
+    ];
+    $addressVal = CRM_Core_BAO_Address::getValues($entityBlock);
 
     CRM_Utils_JSON::output($addressVal);
   }
