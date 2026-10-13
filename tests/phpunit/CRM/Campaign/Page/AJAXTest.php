@@ -270,4 +270,106 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
     $this->assertEquals('Scheduled', $activityAfter2['status_id:name']);
   }
 
+  /**
+   * Test registerInterview is denied when user lacks 'interview campaign contacts' permission.
+   */
+  public function testRegisterInterviewDeniedWithoutPermission(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM']);
+
+    $_POST = $_REQUEST = [
+      'voter_id' => 1,
+      'survey_id' => 1,
+      'activity_id' => 1,
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Campaign_Page_AJAX::registerInterview();
+  }
+
+  /**
+   * Test registerInterview is denied when activity does not belong to survey or voter.
+   */
+  public function testRegisterInterviewDeniedOnMismatchedSurveyOrContact(): void {
+    $interviewerId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'interview campaign contacts']);
+
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'Interview Survey',
+      'activity_type_id:name' => 'Survey',
+    ]);
+    $voterId = $this->individualCreate();
+    $otherContactId = $this->individualCreate([], 'other');
+
+    $activity = $this->createTestEntity('Activity', [
+      'source_record_id' => $survey['id'],
+      'source_contact_id' => $interviewerId,
+      'target_contact_id' => [$otherContactId],
+      'activity_type_id:name' => 'Survey',
+      'status_id:name' => 'Scheduled',
+    ]);
+
+    // Mismatched voter (voterId is not target of activity)
+    $_POST = $_REQUEST = [
+      'voter_id' => $voterId,
+      'survey_id' => $survey['id'],
+      'activity_id' => $activity['id'],
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Campaign_Page_AJAX::registerInterview();
+  }
+
+  /**
+   * Test registerInterview successfully records interview for valid voter and survey activity.
+   */
+  public function testRegisterInterviewSuccess(): void {
+    $interviewerId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'interview campaign contacts']);
+
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'Interview Survey Success',
+      'activity_type_id:name' => 'Survey',
+    ]);
+    $voterId = $this->individualCreate();
+
+    $activity = $this->createTestEntity('Activity', [
+      'source_record_id' => $survey['id'],
+      'source_contact_id' => $interviewerId,
+      'target_contact_id' => [$voterId],
+      'activity_type_id:name' => 'Survey',
+      'status_id:name' => 'Scheduled',
+    ]);
+
+    $_POST = $_REQUEST = [
+      'voter_id' => $voterId,
+      'survey_id' => $survey['id'],
+      'activity_id' => $activity['id'],
+      'activity_type_id' => $activity['activity_type_id'],
+      'interviewer_id' => $interviewerId,
+      'surveyTitle' => 'Interview Survey Success',
+      'result' => 'Completed interview',
+      'note' => 'Positive response',
+    ];
+
+    try {
+      CRM_Campaign_Page_AJAX::registerInterview();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('success', $e->errorData['status']);
+    }
+
+    $activityAfter = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->addSelect('status_id:name', 'result', 'details')
+      ->execute()
+      ->first();
+
+    $this->assertEquals('Completed', $activityAfter['status_id:name']);
+    $this->assertEquals('Completed interview', $activityAfter['result']);
+    $this->assertEquals('Positive response', $activityAfter['details']);
+  }
+
 }
