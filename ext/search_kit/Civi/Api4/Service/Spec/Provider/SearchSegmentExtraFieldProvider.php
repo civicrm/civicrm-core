@@ -88,7 +88,8 @@ class SearchSegmentExtraFieldProvider extends AutoService implements Generic\Spe
     $set = self::getSets($field['entity'])[$field['name']];
 
     // Field prefix to use if entity comes from a join
-    $prefix = ($field['explicit_join'] ? $field['explicit_join'] . '.' : '') . ($field['implicit_join'] ? $field['implicit_join'] . '.' : '');
+    $prefix = ($field['implicit_join'] ?? $field['explicit_join'] ?? '');
+    $prefix = $prefix ? $prefix . '.' : '';
     $cases = [];
     foreach ($set['items'] as $index => $item) {
       $clauses = [];

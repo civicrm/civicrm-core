@@ -77,8 +77,8 @@ class Joiner {
    * @return string
    */
   public static function getExtraJoinSql(array $field, Api4SelectQuery $query): string {
-    $prefix = empty($field['explicit_join']) ? '' : $field['explicit_join'] . '.';
-    $prefix .= (empty($field['implicit_join']) ? '' : $field['implicit_join'] . '.');
+    $prefix = ($field['implicit_join'] ?? $field['explicit_join'] ?? '');
+    $prefix = $prefix ? $prefix . '.' : '';
     $idField = $query->getField($prefix . $field['name'] . '.id');
     // If permission denied to join, SELECT NULL
     return $idField['sql_name'] ?? 'NULL';

@@ -62,6 +62,25 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertArrayNotHasKey('link', $display['settings']['columns'][0]);
   }
 
+  public function testGetDefaultWithExplicitAndImplicitJoinColumnLink(): void {
+    $params = [
+      'api_entity' => 'LineItem',
+      'api_params' => [
+        'version' => 4,
+        'join' => [
+          ['Contribution AS con', 'INNER', ['contribution_id', '=', 'con.id']],
+        ],
+        'select' => ['id', 'con.contact_id.display_name'],
+      ],
+    ];
+    $display = SearchDisplay::getDefault(FALSE)
+      ->setSavedSearch($params)
+      ->execute()->single();
+
+    $this->assertEquals('Contact', $display['settings']['columns'][1]['link']['entity']);
+    $this->assertEquals('con.contact_id', $display['settings']['columns'][1]['link']['join']);
+  }
+
   public function testGetDefaultNoEntity() {
     $display = SearchDisplay::getDefault(FALSE)
       ->addSelect('*', 'saved_search_id', 'type:name', 'type:icon')
