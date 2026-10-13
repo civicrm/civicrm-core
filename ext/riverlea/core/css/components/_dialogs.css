@@ -7,6 +7,7 @@
   box-shadow: var(--crm-shadow-popup);
   color: var(--crm-text-color);
   padding: var(--crm-dialog-padding);
+  min-width: fit-content;
 }
 .crm-container.ui-dialog .ui-dialog-header,
 .crm-container.ui-dialog .ui-dialog-titlebar,
@@ -82,15 +83,14 @@
   max-height: calc(100vh - 280px) !important; /* vs JQuery */
   height: calc(100% - 94px) !important;
   width: 100% !important;
+  max-width: 100vw;
+  overflow: scroll;
   border-radius: var(--crm-dialog-radius);
   background: var(--crm-dialog-body-bg-color);
   color: var(--crm-text-color);
   margin: var(--crm-dialog-padding) 0;
   position: relative;
   padding: var(--crm-dialog-body-padding);
-}
-.crm-container.ui-dialog:has(.ui-dialog-buttonpane) .ui-dialog-content {
-  margin-bottom: calc(var(--crm-btn-height) + var(--crm-l-medium) + var(--crm-l-medium));
 }
 .crm-container.ui-dialog .ui-dialog-content .crm-container {
   background: var(--crm-dialog-bg-color);
@@ -129,8 +129,9 @@
   display: flex;
   padding: 0;
   margin: 0;
-  position: absolute;
+  position: relative;
   width: 100%;
+  min-width: fit-content;
   bottom: 0;
   left: 0;
 }
@@ -140,7 +141,7 @@
   gap: var(--crm-l-medium);
   padding: var(--crm-l-medium);
   justify-content: flex-end;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .crm-container.ui-dialog .buttons.pull-right {
   display: flex;
