@@ -48,6 +48,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
   private array $existingFinancialItems;
 
+  /**
+   * Sum of existing financial item amounts, keyed by line item (entity) ID -
+   * see checkFinancialItemTotalAmountByLineItemID().
+   *
+   * @var array
+   */
+  private array $financialItemTotalsByLineItemID = [];
+
   public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution, array $originalLineItems, array $updatedLineItems, array $inputValues = []) {
     // Deal with slopping typing first.
     if ($originalContribution) {
@@ -1416,6 +1424,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $this->existingFinancialItems[$index]['price_field_value_id'] = $this->originalLineItems[$financialItem['entity_id']]['price_field_value_id'];
     }
 
+    foreach ($this->existingFinancialItems as $financialItem) {
+      $this->financialItemTotalsByLineItemID[$financialItem['entity_id']]
+        = ($this->financialItemTotalsByLineItemID[$financialItem['entity_id']] ?? 0) + $financialItem['amount'];
+    }
+
     $items = [];
     foreach ($this->existingFinancialItems as $index => $financialItem) {
       $items[$financialItem['price_field_value_id']][$index] = $financialItem['amount'];
@@ -1437,17 +1450,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
-   * Helper function to return sum of financial item's amount related to a line-item
-   * @param int $lineItemID
-   *
-   * @return float $financialItem
+   * Sum of financial item amounts already recorded for a line item - from
+   * the financial items fetched in setNonCancelledFinancialItems().
    */
-  private function checkFinancialItemTotalAmountByLineItemID($lineItemID) {
-    return CRM_Core_DAO::singleValueQuery("
-      SELECT SUM(amount)
-      FROM civicrm_financial_item
-      WHERE entity_table = 'civicrm_line_item' AND entity_id = {$lineItemID}
-    ");
+  private function checkFinancialItemTotalAmountByLineItemID(int $lineItemID): float {
+    return $this->financialItemTotalsByLineItemID[$lineItemID] ?? 0;
   }
 
   /**
