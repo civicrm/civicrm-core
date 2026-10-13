@@ -231,7 +231,7 @@ class Schema {
       // 'civicrm_case',
       // 'civicrm_case_activity',
       // 'civicrm_case_contact',
-      'civicrm_case_type',
+      // 'civicrm_case_type',
       // 'civicrm_component',
       'civicrm_contact',
       // 'civicrm_contact_type',

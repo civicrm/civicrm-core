@@ -63,7 +63,7 @@ class CRM_Case_BAO_QueryTest extends CiviCaseTestCase {
       [
         0 => 'case_type_id',
         1 => 'IN',
-        2 => [1],
+        2 => [$this->caseTypeId],
         3 => 0,
         4 => 0,
       ],
@@ -106,7 +106,7 @@ class CRM_Case_BAO_QueryTest extends CiviCaseTestCase {
     $this->assertEquals(
       [
         0 => [
-          0 => 'civicrm_case.case_type_id IN ("1")',
+          0 => "civicrm_case.case_type_id IN (\"$this->caseTypeId\")",
           1 => 'civicrm_case.status_id IN ("1")',
           2 => 'civicrm_case.is_deleted = 0',
           3 => 'civicrm_case_contact.contact_id = contact_a.id',

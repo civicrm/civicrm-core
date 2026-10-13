@@ -174,8 +174,8 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->activityTypeXml = $this->getActivityTypeXMl();
     $this->activityParams = [
       'activity_date_time' => date('Ymd'),
-      // @todo This seems wrong, it just happens to work out because both caseId and caseTypeId equal 1 in the stock setup here.
-      'caseID' => $this->caseTypeId,
+      // @todo This seems wrong: case 1 is from CiviCaseTestCase::createFixtureCase() and belongs to a different client.
+      'caseID' => 1,
       'clientID' => $this->ids['Contact']['ana'],
       'creatorID' => $this->getLoggedInUser(),
     ];
