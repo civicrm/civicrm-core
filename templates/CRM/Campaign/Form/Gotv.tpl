@@ -179,7 +179,7 @@
     data['surveyTitle'] = {/literal}'{$surveyTitle|escape:javascript}'{literal};
 
     var actUrl = {/literal}
-      "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Campaign_Page_AJAX&fnName=processVoterData'}"
+      "{crmURL p='civicrm/ajax/campaign/processvoter' h=0}"
     {literal};
 
     //post data to save voter as voted/non voted.
