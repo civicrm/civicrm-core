@@ -475,38 +475,55 @@ class CRM_Financial_Page_AJAX {
   }
 
   public static function bulkAssignRemove() {
-    $checkIDs = $_REQUEST['ID'];
-    $entityID = CRM_Utils_Type::escape($_REQUEST['entityID'], 'Integer');
-    $action = CRM_Utils_Type::escape($_REQUEST['action'], 'String');
+    $entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', NULL, TRUE);
+    $action = $_POST['action'] ?? NULL;
+    $checkIDs = $_POST['ID'] ?? NULL;
+
+    if (!in_array($action, ['Assign', 'Remove'], TRUE) || !is_array($checkIDs)) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    $batch = \Civi\Api4\Batch::get(FALSE)
+      ->addWhere('id', '=', $entityID)
+      ->addSelect('created_id', 'status_id:name')
+      ->execute()
+      ->first();
+
+    if (!$batch || in_array($batch['status_id:name'], ['Closed', 'Exported'], TRUE) || !CRM_Batch_BAO_Batch::checkBatchPermission('edit', $batch['created_id'])) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    $cIDs = [];
     foreach ($checkIDs as $key => $value) {
-      if ((substr($value, 0, 7) == "mark_x_" && $action == 'Assign') || (substr($value, 0, 7) == "mark_y_" && $action == 'Remove')) {
-        $contributions = explode("_", $value);
-        $cIDs[] = $contributions[2];
+      if ((str_starts_with($value, 'mark_x_') && $action === 'Assign') || (str_starts_with($value, 'mark_y_') && $action === 'Remove')) {
+        $contributions = explode('_', $value);
+        if (!empty($contributions[2]) && CRM_Utils_Rule::positiveInteger($contributions[2])) {
+          $cIDs[] = (int) $contributions[2];
+        }
       }
     }
 
+    $errorMessage = NULL;
     foreach ($cIDs as $value) {
-      if ($action == 'Remove' || $action == 'Assign') {
-        $params = [
-          'entity_id' => $value,
-          'entity_table' => 'civicrm_financial_trxn',
-          'batch_id' => $entityID,
-        ];
-        try {
-          if ($action == 'Assign') {
-            CRM_Batch_BAO_EntityBatch::create($params);
-          }
-          else {
-            $delete = \Civi\Api4\EntityBatch::delete(FALSE);
-            foreach ($params as $field => $val) {
-              $delete->addWhere($field, '=', $val);
-            }
-            $delete->execute()->count();
-          }
+      $params = [
+        'entity_id' => $value,
+        'entity_table' => 'civicrm_financial_trxn',
+        'batch_id' => $entityID,
+      ];
+      try {
+        if ($action === 'Assign') {
+          CRM_Batch_BAO_EntityBatch::create($params);
         }
-        catch (\CRM_Core_Exception $e) {
-          $errorMessage = $e->getMessage();
+        else {
+          \Civi\Api4\EntityBatch::delete(FALSE)
+            ->addWhere('entity_id', '=', $value)
+            ->addWhere('entity_table', '=', 'civicrm_financial_trxn')
+            ->addWhere('batch_id', '=', $entityID)
+            ->execute();
         }
+      }
+      catch (\CRM_Core_Exception $e) {
+        $errorMessage = $e->getMessage();
       }
     }
     if ($errorMessage ?? FALSE) {

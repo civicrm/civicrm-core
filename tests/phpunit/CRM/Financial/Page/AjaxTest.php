@@ -15,9 +15,16 @@
  */
 class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
 
-  protected $_apiversion = 4;
+  public function setUp(): void {
+    parent::setUp();
+    $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
+  }
 
   public function tearDown(): void {
+    unset($_SERVER['HTTP_X_REQUESTED_WITH']);
+    $_REQUEST = [];
+    $_GET = [];
+    $_POST = [];
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanUp([
       'civicrm_entity_batch',
@@ -128,6 +135,116 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     $_REQUEST['action'] = 'Assign';
 
     $this->expectException(CRM_Core_Exception::class);
+    CRM_Financial_Page_AJAX::bulkAssignRemove();
+  }
+
+  /**
+   * Test bulkAssignRemove succeeds for assign and remove when user has permission.
+   */
+  public function testBulkAssignRemoveSuccess(): void {
+    $loggedInUserId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'edit own manual batches']);
+
+    $batch = $this->createTestEntity('Batch', [
+      'title' => 'Open Manual Batch',
+      'created_id' => $loggedInUserId,
+      'status_id:name' => 'Data Entry',
+    ]);
+
+    $individualID = $this->individualCreate();
+    $contributionId = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => 998877]);
+    $financialTrxnId = CRM_Core_DAO::singleValueQuery(
+      "SELECT financial_trxn_id FROM civicrm_entity_financial_trxn WHERE entity_table = 'civicrm_contribution' AND entity_id = %1",
+      [1 => [$contributionId, 'Positive']]
+    );
+
+    // 1. Assign transaction to batch
+    $_POST = $_REQUEST = [
+      'entityID' => $batch['id'],
+      'action' => 'Assign',
+      'ID' => ['mark_x_' . $financialTrxnId],
+    ];
+
+    try {
+      CRM_Financial_Page_AJAX::bulkAssignRemove();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['status' => 'record-updated-success', 'error_code' => 0], $e->errorData);
+    }
+
+    $assigned = CRM_Core_DAO::singleValueQuery(
+      "SELECT count(*) FROM civicrm_entity_batch WHERE entity_table = 'civicrm_financial_trxn' AND entity_id = %1 AND batch_id = %2",
+      [1 => [$financialTrxnId, 'Positive'], 2 => [$batch['id'], 'Positive']]
+    );
+    $this->assertEquals(1, $assigned);
+
+    // 2. Remove transaction from batch
+    $_POST = $_REQUEST = [
+      'entityID' => $batch['id'],
+      'action' => 'Remove',
+      'ID' => ['mark_y_' . $financialTrxnId],
+    ];
+
+    try {
+      CRM_Financial_Page_AJAX::bulkAssignRemove();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['status' => 'record-updated-success', 'error_code' => 0], $e->errorData);
+    }
+
+    $assignedAfter = CRM_Core_DAO::singleValueQuery(
+      "SELECT count(*) FROM civicrm_entity_batch WHERE entity_table = 'civicrm_financial_trxn' AND entity_id = %1 AND batch_id = %2",
+      [1 => [$financialTrxnId, 'Positive'], 2 => [$batch['id'], 'Positive']]
+    );
+    $this->assertEquals(0, $assignedAfter);
+  }
+
+  /**
+   * Test bulkAssignRemove is denied when user lacks edit permission on the batch.
+   */
+  public function testBulkAssignRemoveDeniedWithoutPermission(): void {
+    $ownerId = $this->individualCreate([], 'owner');
+    $batch = $this->createTestEntity('Batch', [
+      'title' => 'Other User Batch',
+      'created_id' => $ownerId,
+      'status_id:name' => 'Data Entry',
+    ]);
+
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'edit own manual batches']);
+
+    $_POST = $_REQUEST = [
+      'entityID' => $batch['id'],
+      'action' => 'Assign',
+      'ID' => ['mark_x_1'],
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Financial_Page_AJAX::bulkAssignRemove();
+  }
+
+  /**
+   * Test bulkAssignRemove is denied on closed batches.
+   */
+  public function testBulkAssignRemoveDeniedOnClosedBatch(): void {
+    $loggedInUserId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'edit all manual batches']);
+
+    $batch = $this->createTestEntity('Batch', [
+      'title' => 'Closed Batch',
+      'created_id' => $loggedInUserId,
+      'status_id:name' => 'Closed',
+    ]);
+
+    $_POST = $_REQUEST = [
+      'entityID' => $batch['id'],
+      'action' => 'Assign',
+      'ID' => ['mark_x_1'],
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
     CRM_Financial_Page_AJAX::bulkAssignRemove();
   }
 
