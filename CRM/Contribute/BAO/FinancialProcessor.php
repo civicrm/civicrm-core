@@ -1472,33 +1472,27 @@ class CRM_Contribute_BAO_FinancialProcessor {
   public function changeFeeSelections(): void {
     $trxnID = $this->recordAdjustmentTrxn();
 
-    foreach (array_merge($this->getResurrectedLineItems(), $this->getRemovedLineItems(), $this->getChangedLineItems()) as $lineItemToAlter) {
+    foreach ($this->getRemovedLineItems() as $lineItemToAlter) {
       // Must use BAO rather than api because a bad line it in the api which we want to avoid.
+      CRM_Price_BAO_LineItem::create($lineItemToAlter);
+      $this->reverseLineItem($lineItemToAlter, $trxnID);
+    }
+
+    foreach ($this->getChangedLineItems() as $lineItemToAlter) {
       CRM_Price_BAO_LineItem::create($lineItemToAlter);
     }
 
     // insert financial items
-    foreach ($this->getNewLineItems() as $priceFieldValueID => $lineParams) {
-      CRM_Price_BAO_LineItem::create($lineParams);
-    }
-
-    foreach ($this->getRemovedLineItems() as $line) {
-      $this->reverseLineItem($line, $trxnID);
-    }
-
-    foreach ($this->getAdjustedFinancialItemsToRecord() as $updateFinancialItemInfoValues) {
-      $this->createFinancialItem($updateFinancialItemInfoValues, $trxnID);
-    }
-
     foreach ($this->getAddedLineItems() as $lineParams) {
-      $lineParams['contribution_id'] = $this->getContributionID();
-      $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
-      // insert financial items
-      // ensure entity_financial_trxn table has a linking of it.
+      $lineObj = CRM_Price_BAO_LineItem::create($lineParams);
       $this->addFinancialItem($lineObj, FALSE, $trxnID);
       if (isset($lineObj->tax_amount) && (float) $lineObj->tax_amount !== 0.00) {
         $this->addFinancialItem($lineObj, TRUE, $trxnID);
       }
+    }
+
+    foreach ($this->getAdjustedFinancialItemsToRecord() as $updateFinancialItemInfoValues) {
+      $this->createFinancialItem($updateFinancialItemInfoValues, $trxnID);
     }
   }
 
