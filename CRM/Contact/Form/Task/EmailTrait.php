@@ -63,6 +63,22 @@ trait CRM_Contact_Form_Task_EmailTrait {
   public $_toContactIds = [];
 
   /**
+   * Specific email requested via the email_id url parameter.
+   *
+   * @var array{id?: int, email?: string, contact_id?: int}
+   */
+  public $_toEmail = [];
+
+  /**
+   * IDs of the emails to pre-populate in the "To" field.
+   *
+   * One email ID per valid recipient contact, used to build the form default.
+   *
+   * @var int[]
+   */
+  protected $_toEmailIds = [];
+
+  /**
    * Is the form being loaded from a search action.
    *
    * @var bool
@@ -149,8 +165,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
     $this->assign('suppressForm', FALSE);
     $this->assign('emailTask', TRUE);
 
-    $toArray = [];
-    $suppressedEmails = 0;
     //here we are getting logged in user id as array but we need target contact id. CRM-5988
     $cid = $this->get('cid');
     if ($cid) {
@@ -168,20 +182,23 @@ trait CRM_Contact_Form_Task_EmailTrait {
 
     $emailAttributes = [
       'class' => 'huge',
-      'title' => ts('Send email to'),
-    ];
-    $this->add('text', 'to', ts('To'), $emailAttributes, TRUE);
-
-    $this->addEntityRef('cc_id', ts('CC'), [
       'entity' => 'Email',
-      'multiple' => TRUE,
+      'select' => ['multiple' => TRUE],
+    ];
+
+    $this->addAutocomplete('to', ts('To'), $emailAttributes + [
+      'title' => ts('Send email to'),
+      'api' => ['fieldName' => 'Email.to'],
+    ], TRUE);
+
+    $this->addAutocomplete('cc_id', ts('CC'), $emailAttributes + [
       'title' => ts('CC Contacts'),
+      'api' => ['fieldName' => 'Email.cc_id'],
     ]);
 
-    $this->addEntityRef('bcc_id', ts('BCC'), [
-      'entity' => 'Email',
-      'multiple' => TRUE,
+    $this->addAutocomplete('bcc_id', ts('BCC'), $emailAttributes + [
       'title' => ts('BCC Contacts'),
+      'api' => ['fieldName' => 'Email.bcc_id'],
     ]);
 
     $setDefaults = TRUE;
@@ -200,41 +217,44 @@ trait CRM_Contact_Form_Task_EmailTrait {
     // check if we need to setdefaults and check for valid contact emails / communication preferences
     if (!empty($this->_allContactIds) && $setDefaults) {
       // get the details for all selected contacts ( to, cc and bcc contacts )
-      $allContactDetails = civicrm_api3('Contact', 'get', [
-        'id' => ['IN' => $this->_allContactIds],
-        'return' => ['sort_name', 'email', 'do_not_email', 'is_deceased', 'on_hold', 'display_name'],
-        'options' => ['limit' => 0],
-      ])['values'];
+      $allContactDetails = civicrm_api4('Contact', 'get', [
+        'where' => [['id', 'IN', $this->_allContactIds]],
+        'select' => ['sort_name', 'email_primary.email', 'email_primary.id', 'do_not_email', 'is_deceased', 'email_primary.on_hold', 'display_name'],
+      ])->indexBy('id');
 
       // The contact task supports passing in email_id in a url. It supports a single email
       // and is marked as having been related to CiviHR.
-      // The array will look like $this->_toEmail = ['email' => 'x', 'contact_id' => 2])
+      // The array will look like $this->_toEmail = ['id' => 5, 'email' => 'x', 'contact_id' => 2])
       // If it exists we want to use the specified email which might be different to the primary email
       // that we have.
       if (!empty($this->_toEmail['contact_id']) && !empty($allContactDetails[$this->_toEmail['contact_id']])) {
-        $allContactDetails[$this->_toEmail['contact_id']]['email'] = $this->_toEmail['email'];
+        $allContactDetails[$this->_toEmail['contact_id']]['email_primary.email'] = $this->_toEmail['email'];
+        $allContactDetails[$this->_toEmail['contact_id']]['email_primary.on_hold'] = $this->_toEmail['on_hold'];
+        $allContactDetails[$this->_toEmail['contact_id']]['email_primary.id'] = $this->_toEmail['id'];
       }
 
+      $this->_toEmailIds = [];
       // perform all validations on unique contact Ids
       foreach ($allContactDetails as $contactId => $value) {
+        $value['email_id'] = $value['email_primary.id'];
+        $value['email'] = $value['email_primary.email'];
+        $value['on_hold'] = $value['email_primary.on_hold'];
+        unset($value['email_primary.id'], $value['email_primary.email'], $value['email_primary.on_hold']);
         if ($value['do_not_email'] || empty($value['email']) || !empty($value['is_deceased']) || $value['on_hold']) {
           $this->setSuppressedEmail($contactId, $value);
         }
         elseif (in_array($contactId, $this->_toContactIds)) {
           $this->_toContactDetails[$contactId] = $this->_contactDetails[$contactId] = $value;
-          $toArray[] = [
-            'text' => '"' . $value['sort_name'] . '" <' . $value['email'] . '>',
-            'id' => "$contactId::{$value['email']}",
-          ];
+          if (!empty($value['email_id'])) {
+            $this->_toEmailIds[] = $value['email_id'];
+          }
         }
       }
 
-      if (empty($toArray)) {
+      if (empty($this->_toEmailIds)) {
         CRM_Core_Error::statusBounce(ts('Selected contact(s) do not have a valid email address, or communication preferences specify DO NOT EMAIL, or they are deceased or Primary email address is On Hold.'));
       }
     }
-
-    $this->assign('toContact', json_encode($toArray));
 
     $this->assign('suppressedEmails', count($this->suppressedEmails));
 
@@ -326,6 +346,9 @@ trait CRM_Contact_Form_Task_EmailTrait {
     }
     if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
       $defaults['from_email_address'] = CRM_Core_BAO_Domain::getFromEmail();
+    }
+    if (!empty($this->_toEmailIds)) {
+      $defaults['to'] = implode(',', $this->_toEmailIds);
     }
     return $defaults;
   }
@@ -461,21 +484,22 @@ trait CRM_Contact_Form_Task_EmailTrait {
    * @throws \CRM_Core_Exception
    */
   protected function getEmails(): array {
-    $allEmails = explode(',', $this->getSubmittedValue('to'));
-    $return = [];
-    $contactIDs = [];
-    foreach ($allEmails as $value) {
-      $values = explode('::', $value);
-      $return[$values[0]] = ['contact_id' => $values[0], 'email' => $values[1]];
-      $contactIDs[] = $values[0];
+    $to = $this->getSubmittedValue('to');
+    if (empty($to)) {
+      return [];
     }
+    $emailIDs = array_filter(array_map('intval', is_array($to) ? $to : explode(',', (string) $to)));
+    $return = [];
     $this->suppressedEmails = [];
-    $suppressionDetails = Email::get(FALSE)
-      ->addWhere('contact_id', 'IN', $contactIDs)
-      ->addWhere('is_primary', '=', TRUE)
-      ->addSelect('email', 'contact_id', 'contact_id.is_deceased', 'on_hold', 'contact_id.do_not_email', 'contact_id.display_name')
+    if (empty($emailIDs)) {
+      return $return;
+    }
+
+    $emails = Email::get()
+      ->addWhere('id', 'IN', $emailIDs)
+      ->addSelect('id', 'email', 'contact_id', 'contact_id.is_deceased', 'on_hold', 'contact_id.do_not_email', 'contact_id.display_name')
       ->execute();
-    foreach ($suppressionDetails as $details) {
+    foreach ($emails as $details) {
       if (empty($details['email']) || $details['contact_id.is_deceased'] || $details['contact_id.do_not_email'] || $details['on_hold']) {
         $this->setSuppressedEmail($details['contact_id'], [
           'on_hold' => $details['on_hold'],
@@ -483,7 +507,13 @@ trait CRM_Contact_Form_Task_EmailTrait {
           'email' => $details['email'],
           'display_name' => $details['contact_id.display_name'],
         ]);
-        unset($return[$details['contact_id']]);
+      }
+      else {
+        $return[$details['id']] = [
+          'id' => $details['id'],
+          'contact_id' => $details['contact_id'],
+          'email' => $details['email'],
+        ];
       }
     }
     return $return;
@@ -700,24 +730,6 @@ trait CRM_Contact_Form_Task_EmailTrait {
       CRM_Core_Error::statusBounce(ts('Your user record does not have a valid email address and no from addresses have been configured.'));
     }
     return $fromEmailValues;
-  }
-
-  /**
-   * Get the relevant emails.
-   *
-   * @param int $index
-   *
-   * @return string
-   */
-  protected function getEmail(int $index): string {
-    if (empty($this->emails)) {
-      $toEmails = explode(',', $this->getSubmittedValue('to'));
-      foreach ($toEmails as $value) {
-        $parts = explode('::', $value);
-        $this->emails[] = $parts[1];
-      }
-    }
-    return $this->emails[$index];
   }
 
   /**
@@ -1086,6 +1098,22 @@ trait CRM_Contact_Form_Task_EmailTrait {
       $bccArray = explode(',', $this->getSubmittedValue('bcc_id'));
     }
     return $bccArray;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public static function autocompleteFilters($mainEntityId = NULL): array {
+    $filters = [
+      'contact_id.is_deleted' => FALSE,
+      'contact_id.is_deceased' => FALSE,
+      'contact_id.do_not_email' => FALSE,
+    ];
+    return [
+      'to' => $filters,
+      'cc_id' => $filters,
+      'bcc_id' => $filters,
+    ];
   }
 
 }

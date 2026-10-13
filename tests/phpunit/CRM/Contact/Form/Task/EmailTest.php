@@ -10,7 +10,9 @@
  */
 
 use Civi\Api4\Activity;
+use Civi\Api4\Email;
 use Civi\Api4\SiteEmailAddress;
+use Civi\Test\Invasive;
 
 /**
  * Test class for CRM_Contact_Form_Task_Email.
@@ -88,10 +90,10 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
       $email = 'spy' . $i . '@secretsquirrels.com';
       $contactID = $this->individualCreate(['email' => $email]);
       $form_contactIds[$contactID] = $contactID;
-      $to[] = $contactID . '::' . $email;
+      $to[] = Email::get(FALSE)->addWhere('contact_id', '=', $contactID)->execute()->first()['id'];
     }
     $deceasedContactID = $this->individualCreate(['is_deceased' => 1, 'email' => 'dead@example.com']);
-    $to[] = $deceasedContactID . '::' . 'dead@example.com';
+    $to[] = Email::get(FALSE)->addWhere('contact_id', '=', $deceasedContactID)->execute()->first()['id'];
     /** @var CRM_Contact_Form_Task_Email $form */
     $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
       'to' => implode(',', $to),
@@ -114,6 +116,7 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
 
 --
 This is a test Signature',
+      'to' => implode(',', array_slice($to, 0, 27)),
     ], $form->_defaultValues);
     $form->postProcess();
     $activity = Activity::get(FALSE)->setSelect(['details'])->execute()->first();
@@ -134,6 +137,79 @@ This is a test Signature',
         'options' => NULL,
       ],
     ], CRM_Core_Session::singleton()->getStatus());
+  }
+
+  /**
+   * Only deliverable email IDs are returned, and several emails of one contact are kept.
+   */
+  public function testGetEmailsFiltersSuppressedAndKeepsMultipleEmailsPerContact(): void {
+    $contactID = $this->individualCreate(['email' => 'first@example.com']);
+    $secondEmailID = $this->createTestEntity('Email', [
+      'contact_id' => $contactID,
+      'email' => 'second@example.com',
+      'location_type_id:name' => 'Other',
+    ], 'second')['id'];
+    $firstEmailID = Email::get(FALSE)->addWhere('email', '=', 'first@example.com')->execute()->first()['id'];
+    $onHoldEmailID = $this->createTestEntity('Email', [
+      'contact_id' => $this->individualCreate(),
+      'email' => 'onhold@example.com',
+      'on_hold' => 1,
+    ], 'onhold')['id'];
+    $doNotEmailContactID = $this->individualCreate(['email' => 'dne@example.com', 'do_not_email' => 1]);
+    $doNotEmailID = Email::get(FALSE)->addWhere('contact_id', '=', $doNotEmailContactID)->execute()->first()['id'];
+
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email', [
+      'to' => implode(',', [$firstEmailID, $secondEmailID, $onHoldEmailID, $doNotEmailID]),
+    ]);
+    $emails = Invasive::call([$form, 'getEmails']);
+
+    $this->assertEqualsCanonicalizing([$firstEmailID, $secondEmailID], array_keys($emails));
+    $this->assertSame($contactID, (int) $emails[$secondEmailID]['contact_id']);
+    $this->assertSame('second@example.com', $emails[$secondEmailID]['email']);
+    $suppressed = Invasive::get([$form, 'suppressedEmails']);
+    $this->assertCount(2, $suppressed);
+  }
+
+  /**
+   * An empty or non-numeric "to" value yields no emails.
+   */
+  public function testGetEmailsIgnoresEmptyAndNonNumericValues(): void {
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email', ['to' => ' , abc,']);
+    $this->assertSame([], Invasive::call([$form, 'getEmails']));
+  }
+
+  /**
+   * When a specific (non-primary) email is requested it is the default "To" value.
+   */
+  public function testSpecificEmailIsDefaultTo(): void {
+    $contactID = $this->individualCreate();
+    $this->createTestEntity('Email', [
+      'contact_id' => $contactID,
+      'email' => 'primary@example.com',
+      'location_type_id:name' => 'Home',
+      'is_primary' => TRUE,
+      'on_hold' => TRUE,
+    ], 'primary');
+    $otherEmailID = $this->createTestEntity('Email', [
+      'contact_id' => $contactID,
+      'email' => 'other@example.com',
+      'location_type_id:name' => 'Other',
+    ], 'other')['id'];
+
+    /** @var CRM_Contact_Form_Task_Email $form */
+    $form = $this->getFormObject('CRM_Contact_Form_Task_Email');
+    $form->_contactIds = [$contactID => $contactID];
+    $form->_allContactIds = $form->_toContactIds = $form->_contactIds;
+    $form->_toEmail = Email::get(FALSE)->addWhere('id', '=', $otherEmailID)->execute()->first();
+    $form->isSearchContext = FALSE;
+    $form->buildForm();
+
+    $this->assertSame((string) $otherEmailID, (string) $form->_defaultValues['to']);
+    $this->assertEmpty(Invasive::get([$form, 'suppressedEmails']));
+    $toEmails = Invasive::get([$form, '_toContactDetails']);
+    $this->assertCount(1, $toEmails);
+    $this->assertSame('other@example.com', $toEmails[$contactID]['email']);
+    $this->assertEmpty($toEmails[$contactID]['on_hold']);
   }
 
 }

@@ -1242,38 +1242,6 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * Use this hook to populate the list of contacts returned by Contact Reference custom fields.
-   * By default, Contact Reference fields will search on and return all CiviCRM contacts.
-   * If you want to limit the contacts returned to a specific group, or some other criteria
-   * - you can override that behavior by providing a SQL query that returns some subset of your contacts.
-   * The hook is called when the query is executed to get the list of contacts to display.
-   *
-   * @param mixed $query
-   *   - the query that will be executed (input and output parameter);.
-   *   It's important to realize that the ACL clause is built prior to this hook being fired,
-   *   so your query will ignore any ACL rules that may be defined.
-   *   Your query must return two columns:
-   *     the contact 'data' to display in the autocomplete dropdown (usually contact.sort_name - aliased as 'data')
-   *     the contact IDs
-   * @param string $queryText
-   *   The name string to execute the query against (this is the value being typed in by the user).
-   * @param string $context
-   *   The context in which this ajax call is being made (for example: 'customfield', 'caseview').
-   * @param int $id
-   *   The id of the object for which the call is being made.
-   *   For custom fields, it will be the custom field id
-   *
-   * @return mixed
-   */
-  public static function contactListQuery(&$query, $queryText, $context, $id) {
-    $null = NULL;
-    return self::singleton()->invoke(['query', 'queryText', 'context', 'id'], $query, $queryText, $context, $id,
-      $null, $null,
-      'civicrm_contactListQuery'
-    );
-  }
-
-  /**
    * Hook definition for altering payment parameters before talking to a payment processor back end.
    *
    * Definition will look like this:
