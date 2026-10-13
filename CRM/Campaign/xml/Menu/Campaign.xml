@@ -168,4 +168,11 @@
     <component>CiviCampaign</component>
     <is_ajax>true</is_ajax>
   </item>
+  <item>
+    <path>civicrm/ajax/campaign/voterlist</path>
+    <page_callback>CRM_Campaign_Page_AJAX::voterList</page_callback>
+    <access_arguments>reserve campaign contacts;release campaign contacts;gotv campaign contacts;interview campaign contacts</access_arguments>
+    <component>CiviCampaign</component>
+    <is_ajax>true</is_ajax>
+  </item>
  </menu>
