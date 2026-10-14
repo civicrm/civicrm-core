@@ -1439,19 +1439,36 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
 
     foreach ($this->getChangedLineItems() as $lineItemToAlter) {
-      CRM_Price_BAO_LineItem::create($lineItemToAlter);
-      if ($lineItemToAlter['html_type'] === 'Text') {
-        $this->recordTextLineItemAdjustment($lineItemToAlter, $trxnID);
-      }
+      $this->alterLineItem($lineItemToAlter, $trxnID);
     }
 
-    // insert financial items
     foreach ($this->getAddedLineItems() as $lineParams) {
-      $lineObj = CRM_Price_BAO_LineItem::create($lineParams);
-      $this->addFinancialItem($lineObj, FALSE, $trxnID);
-      if (isset($lineObj->tax_amount) && (float) $lineObj->tax_amount !== 0.00) {
-        $this->addFinancialItem($lineObj, TRUE, $trxnID);
-      }
+      $this->addLineItem($lineParams, $trxnID);
+    }
+  }
+
+  /**
+   * Update a changed line item's row, and its financial item if it is a
+   * 'Text' price field - see recordTextLineItemAdjustment().
+   */
+  private function alterLineItem(array $line, int $trxnID): void {
+    LineItem::update(FALSE)->setValues($line)->execute();
+    if ($line['html_type'] === 'Text') {
+      $this->recordTextLineItemAdjustment($line, $trxnID);
+    }
+  }
+
+  /**
+   * Create a new (or resurrected) line item's row, and its financial item(s) -
+   * a resurrected line (see getResurrectedLineItems()) carries the cancelled
+   * row's id forward, so it's an update rather than an insert.
+   */
+  private function addLineItem(array $line, int $trxnID): void {
+    $action = isset($line['id']) ? LineItem::update(FALSE) : LineItem::create(FALSE);
+    $lineItem = (object) $action->setValues($line)->execute()->first();
+    $this->addFinancialItem($lineItem, FALSE, $trxnID);
+    if (isset($lineItem->tax_amount) && (float) $lineItem->tax_amount !== 0.00) {
+      $this->addFinancialItem($lineItem, TRUE, $trxnID);
     }
   }
 
