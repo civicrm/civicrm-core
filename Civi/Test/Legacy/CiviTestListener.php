@@ -113,7 +113,8 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     $test->setUpHeadless();
 
     \Civi::rebuild(['system' => TRUE])->execute();
-    \Civi::reset();
+    // Like Civi::reset(), minus the container boot that Config::singleton() repeats.
+    \Civi::$statics = [];
     \CRM_Core_Session::singleton()->set('userID', NULL);
     // ugh, performance
     $config = \CRM_Core_Config::singleton(TRUE, TRUE);
