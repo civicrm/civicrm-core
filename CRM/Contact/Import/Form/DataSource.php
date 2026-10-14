@@ -45,22 +45,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       CRM_Import_Parser::DUPLICATE_NOCHECK => ts('No Duplicate Checking'),
     ]);
 
-    $js = ['onClick' => "buildSubTypes();buildDedupeRules();"];
     // contact types option
-    $contactTypeOptions = $contactTypeAttributes = [];
-    if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-      $contactTypeOptions['Individual'] = ts('Individual');
-      $contactTypeAttributes['Individual'] = $js;
-    }
-    if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-      $contactTypeOptions['Household'] = ts('Household');
-      $contactTypeAttributes['Household'] = $js;
-    }
-    if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-      $contactTypeOptions['Organization'] = ts('Organization');
-      $contactTypeAttributes['Organization'] = $js;
-    }
-    $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions, [], NULL, FALSE, $contactTypeAttributes);
+    $contactTypeOptions = CRM_Contact_BAO_ContactType::basicTypePairs();
+    $this->addRadio('contactType', ts('Contact Type'), $contactTypeOptions);
 
     $this->addElement('select', 'contactSubType', ts('Subtype'));
     $this->addElement('select', 'dedupe_rule_id', ts('Dedupe Rule'));

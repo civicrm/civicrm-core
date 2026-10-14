@@ -339,37 +339,6 @@ class CRM_Contact_Page_AJAX {
     CRM_Utils_System::civiExit();
   }
 
-  public static function buildSubTypes() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $parent = CRM_Utils_Request::retrieve('parentId', 'Positive');
-
-    switch ($parent) {
-      case 1:
-        $contactType = 'Individual';
-        break;
-
-      case 2:
-        $contactType = 'Household';
-        break;
-
-      case 4:
-        $contactType = 'Organization';
-        break;
-    }
-
-    $subTypes = CRM_Contact_BAO_ContactType::subTypePairs($contactType, FALSE, NULL);
-    asort($subTypes);
-    CRM_Utils_JSON::output($subTypes);
-  }
-
-  public static function buildDedupeRules() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $contactType = CRM_Utils_Request::retrieve('parentId', 'String');
-    $dedupeRules = CRM_Dedupe_BAO_DedupeRuleGroup::getByType($contactType);
-
-    CRM_Utils_JSON::output($dedupeRules);
-  }
-
   /**
    * Retrieve signature based on email id.
    */
