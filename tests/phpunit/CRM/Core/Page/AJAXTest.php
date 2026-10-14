@@ -215,4 +215,59 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     CRM_Core_Page_AJAX::setIsQuickConfig();
   }
 
+  /**
+   * Test updateMode is denied when user lacks edit permissions on the entity.
+   */
+  public function testUpdateModeEventWithoutPermissionDenied(): void {
+    $otherContact = $this->individualCreate([], 'other_event_creator');
+    $event = $this->createTestEntity('Event', [
+      'title' => 'Test Recurring Event',
+      'event_type_id' => 1,
+      'default_role_id' => 1,
+      'start_date' => '2026-11-01 10:00:00',
+      'created_id' => $otherContact,
+    ], 'event_rec');
+
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviEvent', 'view event info']);
+
+    $_GET = $_REQUEST = [
+      'mode' => 1,
+      'entityId' => $event['id'],
+      'entityTable' => 'civicrm_event',
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Core_Page_AJAX_RecurringEntity::updateMode();
+  }
+
+  /**
+   * Test updateMode succeeds when user has permission.
+   */
+  public function testUpdateModeEventWithPermissionSuccess(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviEvent', 'view event info', 'edit all events']);
+    $event = $this->createTestEntity('Event', [
+      'title' => 'Test Recurring Event Permitted',
+      'event_type_id' => 1,
+      'default_role_id' => 1,
+      'start_date' => '2026-11-01 10:00:00',
+    ], 'event_rec2');
+
+    $_GET = $_REQUEST = [
+      'mode' => 1,
+      'entityId' => $event['id'],
+      'entityTable' => 'civicrm_event',
+    ];
+
+    try {
+      CRM_Core_Page_AJAX_RecurringEntity::updateMode();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertIsArray($e->errorData);
+    }
+  }
+
 }
