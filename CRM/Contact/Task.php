@@ -179,32 +179,26 @@ class CRM_Contact_Task extends CRM_Core_Task {
         ];
       }
 
-      if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
-        $label = CRM_Contact_BAO_ContactType::getLabel('Individual');
+      // Add tasks for enabled contact types
+      $contactTypes = CRM_Contact_BAO_ContactType::basicTypePairs();
+
+      if (isset($contactTypes['Individual'])) {
         self::$_tasks[self::INDIVIDUAL_CONTACTS] = [
-          'title' => ts('Add relationship - to %1',
-            [1 => $label]
-          ),
+          'title' => ts('Add relationship - to %1', [1 => $contactTypes['Individual']]),
           'class' => 'CRM_Contact_Form_Task_AddToIndividual',
         ];
       }
 
-      if (CRM_Contact_BAO_ContactType::isActive('Household')) {
-        $label = CRM_Contact_BAO_ContactType::getLabel('Household');
+      if (isset($contactTypes['Household'])) {
         self::$_tasks[self::HOUSEHOLD_CONTACTS] = [
-          'title' => ts('Add relationship - to %1',
-            [1 => $label]
-          ),
+          'title' => ts('Add relationship - to %1', [1 => $contactTypes['Household']]),
           'class' => 'CRM_Contact_Form_Task_AddToHousehold',
         ];
       }
 
-      if (CRM_Contact_BAO_ContactType::isActive('Organization')) {
-        $label = CRM_Contact_BAO_ContactType::getLabel('Organization');
+      if (isset($contactTypes['Organization'])) {
         self::$_tasks[self::ORGANIZATION_CONTACTS] = [
-          'title' => ts('Add relationship - to %1',
-            [1 => $label]
-          ),
+          'title' => ts('Add relationship - to %1', [1 => $contactTypes['Organization']]),
           'class' => 'CRM_Contact_Form_Task_AddToOrganization',
         ];
       }

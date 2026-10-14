@@ -181,8 +181,10 @@ abstract class CRM_Import_Form_DataSource extends CRM_Import_Forms {
 
   /**
    * A long-winded way to add one radio element to the form.
+   * @deprecated in 6.21 will be removed around 6.27
    */
   protected function addContactTypeSelector() {
+    CRM_Core_Error::deprecatedFunctionWarning();
     //contact types option
     $contactTypeOptions = [];
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {

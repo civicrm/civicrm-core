@@ -66,6 +66,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   public function tearDown(): void {
     parent::tearDown();
     ContactType::delete()->addWhere('id', 'IN', $this->ids['ContactType'])->execute();
+    ContactType::update(FALSE)
+      ->addValue('is_active', TRUE)
+      ->addWhere('id', '>', 0)
+      ->execute();
   }
 
   /**
@@ -159,6 +163,39 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     ];
     // Verify function returns field values formatted correctly by type
     $this->strictArrayCompare($expected, $allTypes);
+  }
+
+  public function testGetBasicTypePairs(): void {
+    ContactType::update(FALSE)
+      ->addValue('is_active', TRUE)
+      ->addWhere('parent_id', 'IS NULL')
+      ->execute();
+
+    $result = CRM_Contact_BAO_ContactType::basicTypePairs();
+    $this->assertEquals(['Individual', 'Household', 'Organization'], array_keys($result));
+
+    $result = CRM_Contact_BAO_ContactType::basicTypePairs(FALSE, 'id');
+    $this->assertEquals([1, 2, 3], array_keys($result));
+    $this->assertEquals(['Individual', 'Household', 'Organization'], array_values($result));
+
+    ContactType::update(FALSE)
+      ->addValue('is_active', FALSE)
+      ->addWhere('name', '=', 'Household')
+      ->execute();
+
+    $this->assertTrue(CRM_Contact_BAO_ContactType::isActive('Individual'));
+    $this->assertFalse(CRM_Contact_BAO_ContactType::isActive('Household'));
+    $this->assertFalse(CRM_Contact_BAO_ContactType::isActive('Not a real contact type name'));
+
+    $result = CRM_Contact_BAO_ContactType::basicTypePairs();
+    $this->assertEquals(['Individual', 'Organization'], array_keys($result));
+
+    $result = CRM_Contact_BAO_ContactType::basicTypePairs(TRUE);
+    $this->assertEquals(['Individual', 'Household', 'Organization'], array_values($result));
+
+    $result = CRM_Contact_BAO_ContactType::basicTypePairs(FALSE, 'id');
+    $this->assertEquals([1, 3], array_keys($result));
+    $this->assertEquals(['Individual', 'Organization'], array_values($result));
   }
 
   /**
