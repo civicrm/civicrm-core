@@ -164,7 +164,7 @@ class CRM_Extension_System {
   public function getDefaultContainer() {
     if ($this->defaultContainer === NULL) {
       if ($this->parameters['extensionsDir']) {
-        $this->defaultContainer = new CRM_Extension_Container_Default($this->parameters['extensionsDir'], $this->parameters['extensionsURL'], $this->getCache(), 'default');
+        $this->defaultContainer = new CRM_Extension_Container_Default($this->parameters['extensionsDir'], $this->parameters['extensionsURL'], $this->getCache(), 'default', $this->parameters['maxDepth']);
       }
       else {
         $this->defaultContainer = FALSE;
