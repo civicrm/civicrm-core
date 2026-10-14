@@ -11,7 +11,6 @@
     getFieldsCache = {},
     getActionsCache = {},
     params = {},
-    entityDoc,
     // The following apis do not use Api3SelectQuery so do not support advanced features like joins or OR
     NO_JOINS = ['Contact', 'Contribution', 'Pledge', 'Participant'],
 
@@ -92,13 +91,6 @@
       $row.find('.crm-marker').remove();
     }
     return $row;
-  }
-
-  function docCodeTpl(data) {
-    var $el = fromTemplate('#doc-code-tpl');
-    $el.find('.doc-filename').text(data.file);
-    $el.find('pre').text(data.code);
-    return $el;
   }
 
   /**
@@ -830,44 +822,6 @@
   }
 
   /**
-   * Fetch entity docs & actions
-   */
-  function getDocEntity() {
-    CRM.utils.setOptions($('#doc-action').prop('disabled', true).addClass('loading'), []);
-    $.getJSON(CRM.url('civicrm/ajax/apidoc', {entity: $(this).val()}))
-      .then(function(result) {
-        entityDoc = result.doc;
-        CRM.utils.setOptions($('#doc-action').prop('disabled', false).removeClass('loading'), result.actions);
-        $('#doc-result').html(result.doc);
-        prettyPrint('#doc-result pre');
-      });
-  }
-
-  /**
-   * Fetch entity+action docs & code
-   */
-  function getDocAction() {
-    var
-      entity = $('#doc-entity').val(),
-      action = $('#doc-action').val();
-    if (entity && action) {
-      $('#doc-result').block();
-      $.get(CRM.url('civicrm/ajax/apidoc', {entity: entity, action: action}))
-        .then(function(result) {
-          $('#doc-result').unblock().html(result.doc);
-          if (result.code) {
-            $('#doc-result').append(docCodeTpl(result));
-          }
-          prettyPrint('#doc-result pre');
-        });
-    } else {
-      $('#doc-result').html(entityDoc);
-      prettyPrint('#doc-result pre');
-    }
-    checkBookKeepingEntity(entity, action);
-  }
-
-  /**
    * Check if entity is Financial Trxn and Entity Financial Trxn
    * and Action is Create, delete, update etc then display warning
    */
@@ -974,23 +928,8 @@
   }
 
   $(document).ready(function() {
-    // Set up tabs - bind active tab to document hash because... it's cool?
-    document.location.hash = document.location.hash || 'explorer';
-      $('#mainTabContainer')
-      .tabs({
-          active: $(document.location.hash + '-tab').index() - 1
-        })
-      .on('tabsactivate', function(e, ui) {
-        if (ui.newPanel) {
-          document.location.hash = ui.newPanel.attr('id').replace('-tab', '');
-        }
-      });
-    $(window).on('hashchange', function() {
-      $('#mainTabContainer').tabs('option', 'active', $(document.location.hash + '-tab').index() - 1);
-    });
-
     // Initialize widgets
-    $('#api-entity, #doc-entity').crmSelect2({
+    $('#api-entity').crmSelect2({
       // Add strikethough class to selection to indicate deprecated apis
       formatSelection: function(option) {
         return $(option.element).hasClass('strikethrough') ? '<span class="strikethrough">' + CRM.utils.escapeHtml(option.text) + '</span>' : CRM.utils.escapeHtml(option.text);
@@ -1039,8 +978,6 @@
         items: '.api-chain-row, .api-param-row'
       });
     $('#api-join').on('change', 'input', onSelectJoin);
-    $('#doc-entity').on('change', getDocEntity);
-    $('#doc-action').on('change', getDocAction);
     $('#api-params-add').on('click', function(e) {
       e.preventDefault();
       addField();
