@@ -2132,18 +2132,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $defaults += $defaults[$this->_pId];
       unset($defaults[$this->_pId]);
       if ($this->_action == CRM_Core_Action::UPDATE) {
-        $discounts = [];
-        if (!empty($this->_values['discount'])) {
-          foreach ($this->_values['discount'] as $key => $value) {
-            $value = current($value);
-            $discounts[$key] = $value['name'];
-          }
-        }
-
-        if ($this->_discountId && !empty($discounts[$defaults['discount_id']])) {
-          $this->assign('discount', $discounts[$defaults['discount_id']]);
-        }
-
         $this->assign('fee_amount', $defaults['fee_amount'] ?? NULL);
         $this->assign('fee_level', $defaults['fee_level'] ?? NULL);
       }
@@ -2164,22 +2152,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $defaults = array_merge($defaults, $billingDefaults);
     }
 
-    // if user has selected discount use that to set default
-    if (isset($this->_discountId)) {
-      $defaults['discount_id'] = $this->_discountId;
-
-      //hack to set defaults for already selected discount value
-      if ($this->_action == CRM_Core_Action::UPDATE && !$this->_originalDiscountId) {
-        $this->_originalDiscountId = $defaults['discount_id'];
-        if ($this->_originalDiscountId) {
-          $defaults['discount_id'] = $this->_originalDiscountId;
-        }
-      }
-      $discountId = $this->_discountId;
-    }
-    else {
-      $discountId = CRM_Core_BAO_Discount::findSet($this->_eventId, 'civicrm_event');
-    }
+    $discountId = $this->getDiscountID();
 
     if ($discountId) {
       $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
