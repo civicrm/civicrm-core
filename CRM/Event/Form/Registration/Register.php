@@ -144,7 +144,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    */
   private function eventFeeWrangling() {
     $this->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
-    $this->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $this);
 
     //CRM-6907 set event specific currency.
     if ($this->getEventID() &&
@@ -250,7 +249,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $hasAdditionalParticipants = FALSE;
     if ($this->_allowConfirmation) {
       $this->_contactId = $contactID;
-      $this->_discountId = $discountId;
       $forcePayLater = $this->_defaults['is_pay_later'] ?? FALSE;
       $this->_defaults = array_merge($this->_defaults, $this->setFeeDefaults());
       $this->_defaults['is_pay_later'] = $forcePayLater;
