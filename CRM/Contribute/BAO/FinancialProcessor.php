@@ -48,6 +48,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
   private array $existingFinancialItems;
 
+  /**
+   * Sum of existing financial item amounts, keyed by line item (entity) ID -
+   * see checkFinancialItemTotalAmountByLineItemID().
+   *
+   * @var array
+   */
+  private array $financialItemTotalsByLineItemID = [];
+
   public function __construct(?CRM_Contribute_BAO_Contribution $originalContribution, CRM_Contribute_DAO_Contribution $updatedContribution, array $originalLineItems, array $updatedLineItems, array $inputValues = []) {
     // Deal with slopping typing first.
     if ($originalContribution) {
@@ -1416,6 +1424,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $this->existingFinancialItems[$index]['price_field_value_id'] = $this->originalLineItems[$financialItem['entity_id']]['price_field_value_id'];
     }
 
+    foreach ($this->existingFinancialItems as $financialItem) {
+      $this->financialItemTotalsByLineItemID[$financialItem['entity_id']]
+        = ($this->financialItemTotalsByLineItemID[$financialItem['entity_id']] ?? 0) + $financialItem['amount'];
+    }
+
     $items = [];
     foreach ($this->existingFinancialItems as $index => $financialItem) {
       $items[$financialItem['price_field_value_id']][$index] = $financialItem['amount'];
@@ -1437,17 +1450,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
-   * Helper function to return sum of financial item's amount related to a line-item
-   * @param int $lineItemID
-   *
-   * @return float $financialItem
+   * Sum of financial item amounts already recorded for a line item - from
+   * the financial items fetched in setNonCancelledFinancialItems().
    */
-  private function checkFinancialItemTotalAmountByLineItemID($lineItemID) {
-    return CRM_Core_DAO::singleValueQuery("
-      SELECT SUM(amount)
-      FROM civicrm_financial_item
-      WHERE entity_table = 'civicrm_line_item' AND entity_id = {$lineItemID}
-    ");
+  private function checkFinancialItemTotalAmountByLineItemID(int $lineItemID): float {
+    return $this->financialItemTotalsByLineItemID[$lineItemID] ?? 0;
   }
 
   /**
@@ -1464,31 +1471,35 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   public function changeFeeSelections(): void {
     $trxnID = $this->recordAdjustmentTrxn();
-    // get financial information that need to be recorded on basis on submitted price field value IDs
-    $financialItemsArray = [];
-    if (!empty($this->getChangedLineItems())) {
-      $financialItemsArray = $this->getAdjustedFinancialItemsToRecord();
-    }
 
     foreach (array_merge($this->getResurrectedLineItems(), $this->getRemovedLineItems(), $this->getChangedLineItems()) as $lineItemToAlter) {
       // Must use BAO rather than api because a bad line it in the api which we want to avoid.
       CRM_Price_BAO_LineItem::create($lineItemToAlter);
     }
 
-    $this->addLineItemOnChangeFeeSelection();
+    // insert financial items
+    foreach ($this->getNewLineItems() as $priceFieldValueID => $lineParams) {
+      CRM_Price_BAO_LineItem::create($lineParams);
+    }
 
     foreach ($this->getRemovedLineItems() as $line) {
       $this->reverseLineItem($line, $trxnID);
     }
 
-    if (!empty($financialItemsArray)) {
-      foreach ($financialItemsArray as $updateFinancialItemInfoValues) {
-        $this->createFinancialItem($updateFinancialItemInfoValues, $trxnID);
-      }
+    foreach ($this->getAdjustedFinancialItemsToRecord() as $updateFinancialItemInfoValues) {
+      $this->createFinancialItem($updateFinancialItemInfoValues, $trxnID);
     }
 
-    // This won't work if there is no contribution
-    $this->addFinancialItemsOnLineItemsChange($trxnID);
+    foreach ($this->getAddedLineItems() as $lineParams) {
+      $lineParams['contribution_id'] = $this->getContributionID();
+      $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
+      // insert financial items
+      // ensure entity_financial_trxn table has a linking of it.
+      $this->addFinancialItem($lineObj, FALSE, $trxnID);
+      if (isset($lineObj->tax_amount) && (float) $lineObj->tax_amount !== 0.00) {
+        $this->addFinancialItem($lineObj, TRUE, $trxnID);
+      }
+    }
   }
 
   /**
@@ -1664,57 +1675,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
   private function isCancelled($lineItem) {
     if ($lineItem['qty'] == 0 && $lineItem['line_total'] == 0) {
       return TRUE;
-    }
-  }
-
-  /**
-   * Add line Items as result of fee change.
-   *
-   * Each line item is expected to already carry its own
-   * entity_id/entity_table/contribution_id.
-   *
-   * Relocated as-is from CRM_Price_BAO_LineItem::changeFeeSelections()'s support code.
-   *
-   * Reads the genuinely-new line items from getNewLineItems() - a resurrected one
-   * (also in getAddedLineItems(), but carrying an id) already got its row updated
-   * via changeFeeSelections()'s own row-update loop.
-   *
-   * @internal - will change.
-   */
-  private function addLineItemOnChangeFeeSelection() {
-    // insert financial items
-    foreach ($this->getNewLineItems() as $priceFieldValueID => $lineParams) {
-      if (!array_key_exists('skip', $lineParams)) {
-        CRM_Price_BAO_LineItem::create($lineParams);
-      }
-    }
-  }
-
-  /**
-   * Add financial transactions when an array of line items is changed.
-   *
-   * Each line item is expected to already carry its own entity_id/entity_table.
-   *
-   * Relocated as-is from CRM_Price_BAO_LineItem::changeFeeSelections()'s support code.
-   *
-   * Reads getAddedLineItems() - both a genuinely new line and a resurrected one
-   * need 'add' (not 'adjust') financial-item treatment.
-   *
-   * @internal - will change.
-   *
-   * @param int $trxnID
-   *   Transaction paying for the added items.
-   */
-  private function addFinancialItemsOnLineItemsChange(int $trxnID) {
-    foreach ($this->getAddedLineItems() as $priceFieldValueID => $lineParams) {
-      $lineParams['contribution_id'] = $this->getContributionID();
-      $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
-      // insert financial items
-      // ensure entity_financial_trxn table has a linking of it.
-      $this->addFinancialItem($lineObj, FALSE, $trxnID);
-      if (isset($lineObj->tax_amount) && (float) $lineObj->tax_amount !== 0.00) {
-        $this->addFinancialItem($lineObj, TRUE, $trxnID);
-      }
     }
   }
 
