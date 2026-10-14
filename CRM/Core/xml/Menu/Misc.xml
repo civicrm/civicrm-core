@@ -125,7 +125,7 @@
   <item>
      <path>civicrm/ajax/chart</path>
      <page_callback>CRM_Contribute_Form_ContributionCharts</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+     <access_arguments>access CiviContribute</access_arguments>
      <is_ajax>true</is_ajax>
   </item>
   <item>
@@ -137,7 +137,7 @@
   <item>
      <path>civicrm/contribute/ajax/tableview</path>
      <page_callback>CRM_Contribute_Page_DashBoard</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+     <access_arguments>access CiviContribute</access_arguments>
      <is_ajax>true</is_ajax>
   </item>
   <item>
