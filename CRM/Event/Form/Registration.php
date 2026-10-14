@@ -2116,6 +2116,188 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * This function sets the default values for the form in edit/view mode.
+   *
+   * @return array
+   */
+  protected function setFeeDefaults(): array {
+    $defaults = [];
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
+
+    if ($this->_pId) {
+      $ids = [];
+      $params = ['id' => $this->_pId];
+
+      CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
+      $defaults += $defaults[$this->_pId];
+      unset($defaults[$this->_pId]);
+      if ($this->_action == CRM_Core_Action::UPDATE) {
+        $this->assign('fee_amount', $defaults['fee_amount'] ?? NULL);
+        $this->assign('fee_level', $defaults['fee_level'] ?? NULL);
+      }
+    }
+
+    if ($this->_mode) {
+      $config = CRM_Core_Config::singleton();
+      // set default country from config if no country set
+      if (empty($defaults["billing_country_id-{$billingLocationTypeID}"])) {
+        $defaults["billing_country_id-{$billingLocationTypeID}"] = $config->defaultContactCountry;
+      }
+
+      if (empty($defaults["billing_state_province_id-{$billingLocationTypeID}"])) {
+        $defaults["billing_state_province_id-{$billingLocationTypeID}"] = $config->defaultContactStateProvince;
+      }
+
+      $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactId);
+      $defaults = array_merge($defaults, $billingDefaults);
+    }
+
+    $discountId = $this->getDiscountID();
+
+    if ($discountId) {
+      $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Discount', $discountId, 'price_set_id');
+    }
+    else {
+      $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->_eventId);
+    }
+
+    if (($this->_action == CRM_Core_Action::ADD) && $this->_eventId && $discountId) {
+      // this case is for add mode, where we show discount automatically
+      $defaults['discount_id'] = $discountId;
+    }
+
+    if ($priceSetId) {
+      // get price set default values, CRM-4090
+      $priceSetValues = $this->setDefaultPriceSet($this->_pId, $this->_eventId);
+      if (!empty($priceSetValues)) {
+        $defaults = array_merge($defaults, $priceSetValues);
+      }
+
+      if ($this->_action == CRM_Core_Action::ADD && !empty($this->_priceSet['fields'])) {
+        foreach ($this->_priceSet['fields'] as $key => $val) {
+          foreach ($val['options'] as $keys => $values) {
+            if ($values['is_default']) {
+              if (!in_array(get_class($this), ['CRM_Event_Form_Task_Register']) && !empty($values['is_full'])) {
+                continue;
+              }
+
+              if ($val['html_type'] == 'CheckBox') {
+                $defaults["price_{$key}"][$keys] = 1;
+              }
+              else {
+                $defaults["price_{$key}"] = $keys;
+              }
+            }
+          }
+        }
+      }
+
+      $this->assign('totalAmount', $defaults['fee_amount'] ?? NULL);
+      if ($this->_action == CRM_Core_Action::UPDATE) {
+        $fee_level = $defaults['fee_level'];
+        CRM_Event_BAO_Participant::fixEventLevel($fee_level);
+        $this->assign('fee_level', $fee_level);
+        $this->assign('fee_amount', $defaults['fee_amount'] ?? NULL);
+      }
+    }
+
+    //CRM-4453
+    if (!empty($defaults['participant_fee_currency'])) {
+      $this->assign('fee_currency', $defaults['participant_fee_currency']);
+      $this->assign('currency', $defaults['participant_fee_currency']);
+    }
+
+    $defaults['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    return $defaults;
+  }
+
+  /**
+   * This function sets the default values for price set.
+   *
+   * @param int $participantID
+   * @param int $eventID
+   * @param bool $includeQtyZero
+   *
+   * @return array
+   */
+  private function setDefaultPriceSet($participantID, $eventID = NULL, $includeQtyZero = TRUE) {
+    $defaults = [];
+    if (!$eventID && $participantID) {
+      $eventID = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $participantID, 'event_id');
+    }
+    if (!$participantID || !$eventID) {
+      return $defaults;
+    }
+
+    // get price set ID.
+    $priceSetID = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID);
+    if (!$priceSetID) {
+      return $defaults;
+    }
+
+    // use line items for setdefault price set fields, CRM-4090
+    $lineItems[$participantID] = CRM_Price_BAO_LineItem::getLineItems($participantID, 'participant', FALSE, $includeQtyZero);
+
+    if (is_array($lineItems[$participantID]) &&
+      !CRM_Utils_System::isNull($lineItems[$participantID])
+    ) {
+
+      $priceFields = $htmlTypes = $optionValues = [];
+      foreach ($lineItems[$participantID] as $lineId => $items) {
+        $priceFieldId = $items['price_field_id'] ?? NULL;
+        $priceOptionId = $items['price_field_value_id'] ?? NULL;
+        if ($priceFieldId && $priceOptionId) {
+          $priceFields[$priceFieldId][] = $priceOptionId;
+        }
+      }
+
+      if (empty($priceFields)) {
+        return $defaults;
+      }
+
+      // get all price set field html types.
+      $sql = '
+SELECT  id, html_type
+  FROM  civicrm_price_field
+ WHERE  id IN (' . implode(',', array_keys($priceFields)) . ')';
+      $fieldDAO = CRM_Core_DAO::executeQuery($sql);
+      while ($fieldDAO->fetch()) {
+        $htmlTypes[$fieldDAO->id] = $fieldDAO->html_type;
+      }
+
+      foreach ($lineItems[$participantID] as $lineId => $items) {
+        $fieldId = $items['price_field_id'];
+        $htmlType = $htmlTypes[$fieldId] ?? NULL;
+        if (!$htmlType) {
+          continue;
+        }
+
+        if ($htmlType == 'Text') {
+          $defaults["price_{$fieldId}"] = $items['qty'];
+        }
+        else {
+          $fieldOptValues = $priceFields[$fieldId] ?? NULL;
+          if (!is_array($fieldOptValues)) {
+            continue;
+          }
+
+          foreach ($fieldOptValues as $optionId) {
+            if ($htmlType == 'CheckBox') {
+              $defaults["price_{$fieldId}"][$optionId] = TRUE;
+            }
+            else {
+              $defaults["price_{$fieldId}"] = $optionId;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    return $defaults;
+  }
+
+  /**
    * Get the price set ID for the event.
    *
    * @return int|null

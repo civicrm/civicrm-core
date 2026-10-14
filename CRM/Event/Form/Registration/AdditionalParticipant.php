@@ -50,14 +50,6 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   public $_contactId;
 
   /**
-   * Used within CRM_Event_Form_EventFees
-   *
-   * @var int
-   * @internal
-   */
-  public $_discountId;
-
-  /**
    * Alias of $this->_additionalParticipantId,
    * Used within CRM_Event_Form_EventFees
    *
@@ -154,12 +146,11 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     //CRM-4320, setdefault additional participant values.
     if ($this->_allowConfirmation && $this->_additionalParticipantId) {
       //hack to get set default from eventFees.php
-      $this->_discountId = $discountId;
       $this->_pId = $this->_additionalParticipantId;
       $this->_contactId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_additionalParticipantId, 'contact_id');
 
       CRM_Event_BAO_Participant::formatFieldsAndSetProfileDefaults($this->_contactId, $this);
-      $participantDefaults = CRM_Event_Form_EventFees::setDefaultValues($this);
+      $participantDefaults = $this->setFeeDefaults($this);
       $participantDefaults = array_merge($this->_defaults, $participantDefaults);
       // use primary email address if billing email address is empty
       if (empty($this->_defaults["email-{$this->_bltID}"]) &&

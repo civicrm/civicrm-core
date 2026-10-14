@@ -24,7 +24,7 @@ class CRM_Event_Form_EventFees {
   /**
    * This function sets the default values for the form in edit/view mode.
    *
-   * @param \CRM_Event_Form_Participant|\CRM_Event_Form_Registration_AdditionalParticipant|\CRM_Event_Form_Registration_Register $form
+   * @param \CRM_Event_Form_Participant $form
    *
    * @return array
    */
