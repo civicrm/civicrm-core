@@ -23,4 +23,10 @@ namespace Civi\Api4;
 class DedupeRuleGroup extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
 
+  public static function permissions(): array {
+    $permissions = parent::permissions();
+    $permissions['get'] = ['access CiviCRM'];
+    return $permissions;
+  }
+
 }

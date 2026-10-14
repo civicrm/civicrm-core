@@ -249,11 +249,6 @@
      <access_callback>1</access_callback>
 </item>
 <item>
-     <path>civicrm/ajax/subtype</path>
-     <page_callback>CRM_Contact_Page_AJAX::buildSubTypes</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-</item>
-<item>
      <path>civicrm/ajax/signature</path>
      <page_callback>CRM_Contact_Page_AJAX::getSignature</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
@@ -321,11 +316,6 @@
    <adminGroup>Manage</adminGroup>
    <page_callback>CRM_Contact_Page_DedupeException</page_callback>
    <weight>110</weight>
-</item>
-<item>
-     <path>civicrm/ajax/dedupeRules</path>
-     <page_callback>CRM_Contact_Page_AJAX::buildDedupeRules</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
 </item>
 <item>
     <path>civicrm/contact/view/useradd</path>

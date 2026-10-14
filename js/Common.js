@@ -284,7 +284,7 @@ if (!CRM.vars) CRM.vars = {};
         if ($elect.is('[multiple]')) {
           select.attr('placeholder', placeholder);
         } else {
-          newOptions = '<option value="">' + placeholder + '</option>' + newOptions;
+          newOptions = '<option value="">' + CRM.utils.escapeHtml(placeholder) + '</option>' + newOptions;
         }
       }
       $elect.append(newOptions);

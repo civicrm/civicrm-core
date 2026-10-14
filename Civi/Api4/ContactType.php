@@ -29,4 +29,10 @@ class ContactType extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
   use Generic\Traits\HierarchicalEntity;
 
+  public static function permissions(): array {
+    $permissions = parent::permissions();
+    $permissions['get'] = ['access CiviCRM'];
+    return $permissions;
+  }
+
 }

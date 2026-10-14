@@ -61,9 +61,9 @@
         </tr>
       {/if}
       {if array_key_exists('contactSubType', $form)}
-        <tr>
+        <tr id="contact-subtype">
           <td class="label">{$form.contactSubType.label} {help id='contactSubType' file="CRM/Contact/Import/Form/DataSource"}</td>
-          <td><span id="contact-subtype">{$form.contactSubType.html}</span></td>
+          <td>{$form.contactSubType.html}</td>
         </tr>
       {/if}
 
@@ -128,8 +128,43 @@
     CRM.$(function($) {
       // build data source form block
       buildDataSourceFormBlock();
-      buildSubTypes();
-      buildDedupeRules();
+
+      function onChangeContactType() {
+        const contactType = $('input[name="contactType"]:checked').val();
+        if (!contactType) {
+          // There are no contact fields on some import forms (e.g. import of activities)
+          return;
+        }
+
+        const apiCalls = {};
+        apiCalls.subtypes = ['ContactType', 'get', {
+          select: ['name', 'label'],
+          where: [['parent_id:name', '=', contactType], ['is_active', '=', true]],
+          orderBy: {label: 'ASC'},
+        }];
+        apiCalls.rules = ['DedupeRuleGroup', 'get', {
+          select: ['id', 'title', 'name', 'used:label', 'contact_type:label'],
+          where: [['contact_type', '=', contactType]],
+        }];
+        CRM.api4(apiCalls).then((result) => {
+          // Prevent race conditions
+          if ($('input[name="contactType"]:checked').val() !== contactType) return;
+          // Populate contactSubType
+          const subtypes = result.subtypes.map(({name, label}) => ({key: name, value: label}));
+          CRM.utils.setOptions('#contactSubType', subtypes, ts('None'));
+          $("#contact-subtype").toggle(!!subtypes.length);
+
+          // Populate dedupe_rule_id
+          const rules = result.rules.map((rule) => ({
+            key: rule.id,
+            value: (rule.title || rule.name || rule['contact_type:label']) + ' - ' + rule['used:label']
+          }));
+          CRM.utils.setOptions('#dedupe_rule_id', rules, ts('None'));
+        });
+      }
+
+      onChangeContactType();
+      $('input[name="contactType"]').change(onChangeContactType);
     });
 
     function buildDataSourceFormBlock(dataSource) {
@@ -147,61 +182,6 @@
       }
 
       CRM.$("#data-source-form-block").load(dataUrl);
-    }
-
-    function buildSubTypes( )
-    {
-      const element = cj('input[name="contactType"]:checked');
-      if (!element.length) {
-        // There are no contact fields on some import forms (e.g. import of activities)
-        return;
-      }
-
-      const elementVal = element.val( );
-      const postUrl = {/literal}"{crmURL p='civicrm/ajax/subtype' h=0}"{literal};
-      const param = 'parentId='+ elementVal;
-      cj.ajax({ type: "POST", url: postUrl, data: param, async: false, dataType: 'json',
-        success: function(subtype)
-        {
-          if ( subtype.length === 0 ) {
-            cj("#contactSubType").empty();
-            cj("#contact-subtype").hide();
-          }
-          else {
-            cj("#contact-subtype").show();
-            cj("#contactSubType").empty();
-            cj("#contactSubType").append("<option value=''>- {/literal}{ts escape='js'}select{/ts}{literal} -</option>");
-            for ( var key in  subtype ) {
-              // stick these new options in the subtype select
-              cj("#contactSubType").append("<option value="+key+">"+subtype[key]+" </option>");
-            }
-          }
-        }
-      });
-    }
-
-    function buildDedupeRules( )
-    {
-      element = cj("input[name=contactType]:checked").val();
-      var postUrl = {/literal}"{crmURL p='civicrm/ajax/dedupeRules' h=0}"{literal};
-      var param = 'parentId='+ element;
-      cj.ajax({ type: "POST", url: postUrl, data: param, async: false, dataType: 'json',
-        success: function(dedupe){
-          if ( dedupe.length === 0 ) {
-            cj("#dedupe_rule_id").empty();
-            cj("#contact-dedupe").hide();
-          } else {
-            cj("#contact-dedupe").show();
-            cj("#dedupe_rule_id").empty();
-
-            cj("#dedupe_rule_id").append("<option value=''>- {/literal}{ts escape='js'}select{/ts}{literal} -</option>");
-            for ( var key in  dedupe ) {
-              // stick these new options in the dedupe select
-              cj("#dedupe_rule_id").append("<option value="+key+">"+dedupe[key]+" </option>");
-            }
-          }
-        }
-      });
     }
   </script>
 {/literal}
