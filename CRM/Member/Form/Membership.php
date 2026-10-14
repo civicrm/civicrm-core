@@ -1037,23 +1037,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       //get the payment processor id as per mode. Try removing in favour of beginPostProcess.
       $params['payment_processor_id'] = $this->getPaymentProcessorID();
       $params['register_date'] = CRM_Utils_Time::date('YmdHis');
-
-      // at this point we've created a contact and stored its address etc
-      // all the payment processors expect the name and address to be in the
-      // so we copy stuff over to first_name etc.
-      $paymentParams = $this->prepareParamsForPaymentProcessor($this->getSubmittedValues());
-      $paymentParams['amount'] = $this->order->getTotalAmount();
-      $paymentParams['currencyID'] = $this->getCurrency();
-      $paymentParams['description'] = ts("Contribution submitted by a staff person using member's credit card for signup");
-      $paymentParams['invoiceID'] = $this->getInvoiceID();
-      $paymentParams['financial_type_id'] = $this->getFinancialTypeID();
-      $paymentParams['frequency_unit'] = $this->getFrequencyUnit();
-      $paymentParams['frequency_interval'] = $this->getFrequencyInterval();
-
-      $paymentParams['contactID'] = $this->_contributorContactID;
-      if ($this->getSubmittedValue('send_receipt')) {
-        $paymentParams['email'] = $this->_contributorEmail;
-      }
+      $paymentParams = $this->getPaymentParams();
 
       // CRM-7137 -for recurring membership,
       // we do need contribution and recurring records.

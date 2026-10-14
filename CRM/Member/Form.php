@@ -496,6 +496,35 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
   }
 
   /**
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getPaymentParams(): array {
+    $paymentParams = $this->prepareParamsForPaymentProcessor($this->getSubmittedValues());
+    $paymentParams['amount'] = $this->getOrder()->getTotalAmount();
+    $paymentParams['currencyID'] = $this->getCurrency();
+    $paymentParams['description'] = $this->getPaymentDescription();
+    $paymentParams['invoiceID'] = $this->getInvoiceID();
+    $paymentParams['financial_type_id'] = $this->getFinancialTypeID();
+    $paymentParams['frequency_unit'] = $this->getFrequencyUnit();
+    $paymentParams['frequency_interval'] = $this->getFrequencyInterval();
+
+    if ($this->getSubmittedValue('send_receipt')) {
+      $paymentParams['email'] = $this->_contributorEmail;
+    }
+    return $paymentParams;
+  }
+
+  /**
+   * Get the description to record against a payment taken via this form.
+   *
+   * @return string
+   */
+  protected function getPaymentDescription(): string {
+    return ts("Contribution submitted by a staff person using member's credit card for signup");
+  }
+
+  /**
    * @return int
    */
   protected function getNumRenewTerms(): int {
