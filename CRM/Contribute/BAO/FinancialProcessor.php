@@ -146,9 +146,17 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function createTaxFinancialItem(array $itemParams, $financial_type_id, $taxAmount, int $trxnID): void {
     $itemParams['description'] = \Civi::settings()->get('tax_term');
-    $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($financial_type_id);
+    $itemParams['financial_account_id'] = $this->getSalesTaxFinancialAccount($financial_type_id);
     $itemParams['amount'] = CRM_Contribute_BAO_FinancialProcessor::getMultiplier($this->getUpdatedContribution()->contribution_status_id) * $taxAmount;
     $this->createFinancialItem($itemParams, $trxnID);
+  }
+
+  /**
+   * @param int $financialTypeID
+   * @return int|null
+   */
+  private function getSalesTaxFinancialAccount(int $financialTypeID): ?int {
+    return CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($financialTypeID);
   }
 
   /**
@@ -1345,14 +1353,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
     if ($previousItem['contact_id'] !== (int) $this->updatedContribution->contact_id) {
       return TRUE;
     }
-    if ($isTax && $previousItem['amount'] !== $newLineItem['tax_amount']) {
-      return TRUE;
+    if ($isTax) {
+      if ($previousItem['amount'] !== $newLineItem['tax_amount']) {
+        return TRUE;
+      }
+      return $previousItem['financial_account_id'] !== (int) $this->getSalesTaxFinancialAccount($newLineItem['financial_type_id']);
     }
-    if ($isTax && $previousItem['financial_account_id'] !== (int) CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($newLineItem['financial_type_id'])) {
-      return TRUE;
-    }
-    // @todo - compare line item financial account for normal ones- this has been a missing piece for a long time!
-    return FALSE;
+    return $previousItem['financial_account_id'] !== $this->getRevenueAccountForType($newLineItem['financial_type_id']);
   }
 
   /**
