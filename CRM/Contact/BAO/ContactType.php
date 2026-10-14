@@ -28,8 +28,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
    * @throws \CRM_Core_Exception
    */
   public static function isActive($contactType) {
-    $contact = self::contactTypeInfo();
-    return array_key_exists($contactType, $contact);
+    return self::getAllContactTypes()[$contactType]['is_active'] ?? FALSE;
   }
 
   /**
@@ -57,22 +56,18 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
   }
 
   /**
+   * Gets name/label pairs for basic contact types (excluding subtypes)
+   *
    * @param bool $all
+   *   Should disabled types be returned?
    * @param string $key
+   *   Key to use (defaults to 'name')
    *
    * @return array
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function basicTypePairs($all = FALSE, $key = 'name') {
-    $subtypes = self::basicTypeInfo($all);
-
-    $pairs = [];
-    foreach ($subtypes as $name => $info) {
-      $index = ($key == 'name') ? $name : $info[$key];
-      $pairs[$index] = $info['label'];
-    }
-    return $pairs;
+    return array_column(self::basicTypeInfo($all), 'label', $key);
   }
 
   /**
@@ -145,7 +140,7 @@ class CRM_Contact_BAO_ContactType extends CRM_Contact_DAO_ContactType implements
   }
 
   /**
-   * Retrieve list of all types i.e basic + subtypes.
+   * Retrieve names of all types i.e basic + subtypes.
    *
    * @param bool $all
    *
