@@ -1268,6 +1268,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws CRM_Core_Exception
    */
   private function reverseLineItem(array $line, int $trxnID): void {
+    LineItem::update(FALSE)
+      ->setValues($line)->execute();
     $this->reverseLineItemFinancialItem($line, FALSE, $trxnID);
     $this->reverseLineItemFinancialItem($line, TRUE, $trxnID);
   }
@@ -1361,46 +1363,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
-   * Record the surplus/deficit financial item for a changed 'Text' price field -
-   * its price_field_value_id (and so financial account) never changes, so there's
-   * an amount adjustment rather than anything to reverse.
-   *
-   * Reads the changed line items from getChangedLineItems().
-   *
-   * @return array
-   */
-  private function getAdjustedFinancialItemsToRecord(): array {
-    $lineItemsToUpdate = $this->getChangedLineItems();
-    $financialItemsArray = [];
-    $financialItemResult = $this->getNonCancelledFinancialItems();
-    foreach ($financialItemResult as $updateFinancialItemInfoValues) {
-      $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
-
-      // the below params are not needed as we are creating new financial item
-      $totalFinancialAmount = $this->checkFinancialItemTotalAmountByLineItemID($updateFinancialItemInfoValues['entity_id']);
-      unset($updateFinancialItemInfoValues['id']);
-      unset($updateFinancialItemInfoValues['created_date']);
-
-      // INSERT a financial item to record surplus/lesser amount when a text price fee is changed
-      if (
-        !empty($lineItemsToUpdate)
-        && isset($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']])
-        && $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['html_type'] == 'Text'
-        && $updateFinancialItemInfoValues['amount'] > 0
-      ) {
-        $amountChangeOnTextLineItem = $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['line_total'] - $totalFinancialAmount;
-        if ($amountChangeOnTextLineItem !== (float) 0) {
-          // calculate the amount difference, considered as financial item amount
-          $updateFinancialItemInfoValues['amount'] = $amountChangeOnTextLineItem;
-          $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
-        }
-      }
-    }
-
-    return $financialItemsArray;
-  }
-
-  /**
    * Get Financial items, culling out any that have already been reversed.
    *
    * Only financial items belonging to one of $this->originalLineItems are eligible -
@@ -1472,33 +1434,62 @@ class CRM_Contribute_BAO_FinancialProcessor {
   public function changeFeeSelections(): void {
     $trxnID = $this->recordAdjustmentTrxn();
 
-    foreach (array_merge($this->getResurrectedLineItems(), $this->getRemovedLineItems(), $this->getChangedLineItems()) as $lineItemToAlter) {
-      // Must use BAO rather than api because a bad line it in the api which we want to avoid.
-      CRM_Price_BAO_LineItem::create($lineItemToAlter);
+    foreach ($this->getRemovedLineItems() as $lineItemToAlter) {
+      $this->reverseLineItem($lineItemToAlter, $trxnID);
     }
 
-    // insert financial items
-    foreach ($this->getNewLineItems() as $priceFieldValueID => $lineParams) {
-      CRM_Price_BAO_LineItem::create($lineParams);
-    }
-
-    foreach ($this->getRemovedLineItems() as $line) {
-      $this->reverseLineItem($line, $trxnID);
-    }
-
-    foreach ($this->getAdjustedFinancialItemsToRecord() as $updateFinancialItemInfoValues) {
-      $this->createFinancialItem($updateFinancialItemInfoValues, $trxnID);
+    foreach ($this->getChangedLineItems() as $lineItemToAlter) {
+      $this->alterLineItem($lineItemToAlter, $trxnID);
     }
 
     foreach ($this->getAddedLineItems() as $lineParams) {
-      $lineParams['contribution_id'] = $this->getContributionID();
-      $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
-      // insert financial items
-      // ensure entity_financial_trxn table has a linking of it.
-      $this->addFinancialItem($lineObj, FALSE, $trxnID);
-      if (isset($lineObj->tax_amount) && (float) $lineObj->tax_amount !== 0.00) {
-        $this->addFinancialItem($lineObj, TRUE, $trxnID);
+      $this->addLineItem($lineParams, $trxnID);
+    }
+  }
+
+  /**
+   * Update a changed line item's row, and its financial item if it is a
+   * 'Text' price field - see recordTextLineItemAdjustment().
+   */
+  private function alterLineItem(array $line, int $trxnID): void {
+    LineItem::update(FALSE)->setValues($line)->execute();
+    if ($line['html_type'] === 'Text') {
+      $this->recordTextLineItemAdjustment($line, $trxnID);
+    }
+  }
+
+  /**
+   * Create a new (or resurrected) line item's row, and its financial item(s) -
+   * a resurrected line (see getResurrectedLineItems()) carries the cancelled
+   * row's id forward, so it's an update rather than an insert.
+   */
+  private function addLineItem(array $line, int $trxnID): void {
+    $action = isset($line['id']) ? LineItem::update(FALSE) : LineItem::create(FALSE);
+    $lineItem = (object) $action->setValues($line)->execute()->first();
+    $this->addFinancialItem($lineItem, FALSE, $trxnID);
+    if (isset($lineItem->tax_amount) && (float) $lineItem->tax_amount !== 0.00) {
+      $this->addFinancialItem($lineItem, TRUE, $trxnID);
+    }
+  }
+
+  /**
+   * Record the surplus/deficit financial item for a changed 'Text' price field -
+   * its price_field_value_id (and so financial account) never changes, so there's
+   * an amount adjustment rather than anything to reverse.
+   */
+  private function recordTextLineItemAdjustment(array $lineItemToAlter, int $trxnID): void {
+    foreach ($this->getNonCancelledFinancialItems() as $existingFinancialItem) {
+      if ((int) $existingFinancialItem['entity_id'] !== $lineItemToAlter['id'] || $existingFinancialItem['amount'] <= 0) {
+        continue;
       }
+      $amountChange = $lineItemToAlter['line_total'] - $this->checkFinancialItemTotalAmountByLineItemID($lineItemToAlter['id']);
+      if ($amountChange !== (float) 0) {
+        unset($existingFinancialItem['id'], $existingFinancialItem['created_date']);
+        $existingFinancialItem['amount'] = $amountChange;
+        $existingFinancialItem['transaction_date'] = date('YmdHis');
+        $this->createFinancialItem($existingFinancialItem, $trxnID);
+      }
+      return;
     }
   }
 
