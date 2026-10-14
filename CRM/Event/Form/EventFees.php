@@ -22,33 +22,6 @@
 class CRM_Event_Form_EventFees {
 
   /**
-   * Set variables up before form is built.
-   *
-   * @deprecated since 5.69 will be removed around 5.74
-   *
-   * @param CRM_Core_Form $form
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public static function preProcess(&$form) {
-    CRM_Core_Error::deprecatedFunctionWarning();
-    //as when call come from register.php
-    if (!$form->_eventId) {
-      $form->_eventId = CRM_Utils_Request::retrieve('eventId', 'Positive', $form);
-    }
-
-    $form->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $form);
-    $form->_discountId = CRM_Utils_Request::retrieve('discountId', 'Positive', $form);
-
-    //CRM-6907 set event specific currency.
-    if ($form->_eventId &&
-      ($currency = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $form->_eventId, 'currency'))
-    ) {
-      CRM_Core_Config::singleton()->defaultCurrency = $currency;
-    }
-  }
-
-  /**
    * This function sets the default values for the form in edit/view mode.
    *
    * @param \CRM_Event_Form_Participant|\CRM_Event_Form_Registration_AdditionalParticipant|\CRM_Event_Form_Registration_Register $form
