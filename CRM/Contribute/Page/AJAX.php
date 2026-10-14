@@ -24,7 +24,6 @@ class CRM_Contribute_Page_AJAX {
    * Get Soft credit to list in DT
    */
   public static function getSoftContributionRows() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $requiredParameters = [
       'cid' => 'Integer',
       'context' => 'String',
@@ -36,6 +35,10 @@ class CRM_Contribute_Page_AJAX {
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);
+
+    if (empty($params['cid']) || !CRM_Contact_BAO_Contact_Permission::allow($params['cid'], CRM_Core_Permission::VIEW)) {
+      CRM_Utils_System::permissionDenied();
+    }
 
     $softCreditList = CRM_Contribute_BAO_ContributionSoft::getSoftContributionSelector($params);
     CRM_Utils_JSON::output($softCreditList);

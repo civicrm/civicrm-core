@@ -219,4 +219,22 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test getSoftContributionRows is denied when user lacks view permission on contact.
+   */
+  public function testGetSoftContributionRowsForbiddenContactDenied(): void {
+    $targetContactId = $this->individualCreate([], 'target_contact');
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute']);
+
+    $_GET = $_REQUEST = [
+      'cid' => $targetContactId,
+      'context' => 'contribution',
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Contribute_Page_AJAX::getSoftContributionRows();
+  }
+
 }
