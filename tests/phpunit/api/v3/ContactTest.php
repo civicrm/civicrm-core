@@ -1943,8 +1943,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
                 $contact2 => 'medium house',
               ],
               'display' => [
-                $contact1 => "big house\nsmall city, \n",
-                $contact2 => "medium house\nsmall city, \n",
+                $contact1 => "big house\nsmall city,",
+                $contact2 => "medium house\nsmall city,",
               ],
             ],
             [
@@ -1955,8 +1955,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
               ],
               'title' => 'Address 2 (Work)',
               'display' => [
-                $contact1 => "big office\nsmall city, \n",
-                $contact2 => "medium office\nsmall city, \n",
+                $contact1 => "big office\nsmall city,",
+                $contact2 => "medium office\nsmall city,",
               ],
             ],
           ],
