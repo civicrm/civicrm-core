@@ -152,90 +152,122 @@ class CRM_Financial_Page_AJAX {
    * Callback to perform action on batch records.
    */
   public static function assignRemove() {
-    $op = CRM_Utils_Type::escape($_POST['op'], 'String');
-    $recordBAO = CRM_Utils_Type::escape($_POST['recordBAO'], 'String');
+    $op = CRM_Utils_Type::escape($_POST['op'] ?? NULL, 'String');
+    $recordBAO = CRM_Utils_Type::escape($_POST['recordBAO'] ?? NULL, 'String');
+    $methods = [
+      'assign' => 'create',
+      'remove' => 'del',
+      'reopen' => 'writeRecord',
+      'close' => 'writeRecord',
+      'delete' => 'deleteBatch',
+    ];
+    $allowedBAOs = [
+      'assign' => 'CRM_Batch_BAO_EntityBatch',
+      'remove' => 'CRM_Batch_BAO_EntityBatch',
+      'close' => 'CRM_Batch_BAO_Batch',
+      'reopen' => 'CRM_Batch_BAO_Batch',
+      'delete' => 'CRM_Batch_BAO_Batch',
+    ];
+    if (!$op || !isset($methods[$op]) || $recordBAO !== $allowedBAOs[$op]) {
+      CRM_Utils_System::permissionDenied();
+    }
+
     $key = CRM_Utils_Request::retrieveValue('qfKey', 'String');
     $k = CRM_Core_Key::validate($key, 'CRM_Financial_Page_AJAX');
     if (!$k) {
       CRM_Utils_JSON::output(['status' => 'invalid key']);
     }
-    foreach ($_POST['records'] as $record) {
+    $records = [];
+    foreach ($_POST['records'] ?? [] as $record) {
       $recordID = CRM_Utils_Type::escape($record, 'Positive', FALSE);
       if ($recordID) {
         $records[] = $recordID;
       }
     }
+    if (empty($records)) {
+      CRM_Utils_JSON::output(['status' => 'record-updated-fail']);
+    }
 
     $entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', NULL, FALSE, NULL, 'POST');
-    $methods = [
-      'assign' => 'create',
-      'remove' => 'del',
-      'reopen' => 'create',
-      'close' => 'create',
-      'delete' => 'deleteBatch',
-    ];
-    if ($op == 'close') {
+    if (in_array($op, ['assign', 'remove'], TRUE)) {
+      if (!$entityID) {
+        CRM_Utils_System::permissionDenied();
+      }
+      $batch = Batch::get(FALSE)
+        ->addWhere('id', '=', $entityID)
+        ->addSelect('created_id', 'status_id:name')
+        ->execute()
+        ->first();
+      if (!$batch || in_array($batch['status_id:name'], ['Closed', 'Exported'], TRUE) || !CRM_Batch_BAO_Batch::checkBatchPermission('edit', $batch['created_id'])) {
+        CRM_Utils_System::permissionDenied();
+      }
+    }
+    else {
+      $action = ($op === 'delete') ? 'delete' : 'edit';
+      foreach ($records as $recordID) {
+        $batch = Batch::get(FALSE)
+          ->addWhere('id', '=', $recordID)
+          ->addSelect('created_id')
+          ->execute()
+          ->first();
+        if (!$batch || !CRM_Batch_BAO_Batch::checkBatchPermission($action, $batch['created_id'])) {
+          CRM_Utils_System::permissionDenied();
+        }
+      }
+    }
+
+    if ($op === 'close') {
       $totals = CRM_Batch_BAO_Batch::batchTotals($records);
     }
-    $response = ['status' => 'record-updated-fail'];
-    // first munge and clean the recordBAO and get rid of any non alpha numeric characters
-    $recordBAO = CRM_Utils_String::munge($recordBAO);
-    $recordClass = explode('_', $recordBAO);
-    // make sure recordClass is in the CRM namespace and
-    // at least 3 levels deep
-    if ($recordClass[0] == 'CRM' && count($recordClass) >= 3) {
-      foreach ($records as $recordID) {
-        $params = [];
-        switch ($op) {
-          case 'assign':
-          case 'remove':
-            if ($op == 'remove' || $op == 'assign') {
-              $params = [
-                'entity_id' => $recordID,
-                'entity_table' => 'civicrm_financial_trxn',
-                'batch_id' => $entityID,
-              ];
-            }
-            break;
+    foreach ($records as $recordID) {
+      $params = [];
+      switch ($op) {
+        case 'assign':
+        case 'remove':
+          $params = [
+            'entity_id' => $recordID,
+            'entity_table' => 'civicrm_financial_trxn',
+            'batch_id' => $entityID,
+          ];
+          break;
 
-          case 'close':
-            // Update totals when closing a batch
-            $params = $totals[$recordID];
-          case 'reopen':
-            $status = $op == 'close' ? 'Closed' : 'Reopened';
-            $batchStatus = CRM_Batch_DAO_Batch::buildOptions('status_id', 'validate');
-            $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
-            $session = CRM_Core_Session::singleton();
-            $params['modified_date'] = date('YmdHis');
-            $params['modified_id'] = $session->get('userID');
-            $params['id'] = $recordID;
-            break;
+        case 'close':
+          // Update totals when closing a batch
+          $params = $totals[$recordID];
+        case 'reopen':
+          $status = $op === 'close' ? 'Closed' : 'Reopened';
+          $batchStatus = CRM_Batch_DAO_Batch::buildOptions('status_id', 'validate');
+          $params['status_id'] = CRM_Utils_Array::key($status, $batchStatus);
+          $session = CRM_Core_Session::singleton();
+          $params['modified_date'] = date('YmdHis');
+          $params['modified_id'] = $session->get('userID');
+          $params['id'] = $recordID;
+          break;
 
-          case 'delete':
-            $params = $recordID;
-            break;
+        case 'delete':
+          $params = $recordID;
+          break;
+      }
+
+      if (method_exists($recordBAO, $methods[$op]) && !empty($params)) {
+        try {
+          $updated = call_user_func_array([$recordBAO, $methods[$op]], [&$params]);
         }
-
-        if (method_exists($recordBAO, $methods[$op]) & !empty($params)) {
-          try {
-            $updated = call_user_func_array([$recordBAO, $methods[$op]], [&$params]);
+        catch (\CRM_Core_Exception $e) {
+          $errorMessage = $e->getMessage();
+        }
+        if ($updated) {
+          $redirectStatus = $updated->status_id;
+          if ($batchStatus[$updated->status_id] == 'Reopened') {
+            $redirectStatus = array_search('Open', $batchStatus);
           }
-          catch (\CRM_Core_Exception $e) {
-            $errorMessage = $e->getMessage();
-          }
-          if ($updated) {
-            $redirectStatus = $updated->status_id;
-            if ($batchStatus[$updated->status_id] == "Reopened") {
-              $redirectStatus = array_search("Open", $batchStatus);
-            }
-            $response = [
-              'status' => 'record-updated-success',
-              'status_id' => $redirectStatus,
-            ];
-          }
-          if ($errorMessage ?? FALSE) {
-            $response = ['status' => $errorMessage];
-          }
+          $response = [
+            'status' => 'record-updated-success',
+            'status_id' => $redirectStatus,
+          ];
+        }
+        if ($errorMessage ?? FALSE) {
+          $response = ['status' => $errorMessage];
         }
       }
     }

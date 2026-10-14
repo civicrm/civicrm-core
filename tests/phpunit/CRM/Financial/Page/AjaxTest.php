@@ -318,4 +318,100 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test assignRemove is denied for invalid op or recordBAO.
+   */
+  public function testAssignRemoveInvalidOpOrBAODenied(): void {
+    $_POST['op'] = 'assign';
+    $_POST['recordBAO'] = 'CRM_Core_BAO_ActionSchedule';
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Financial_Page_AJAX::assignRemove();
+  }
+
+  /**
+   * Test assignRemove is denied when user lacks edit permission on the batch.
+   */
+  public function testAssignRemoveBatchPermissionDenied(): void {
+    $ownerId = $this->individualCreate([], 'owner');
+    $batch = $this->createTestEntity('Batch', [
+      'title' => 'Other User Batch',
+      'created_id' => $ownerId,
+      'status_id:name' => 'Data Entry',
+    ]);
+
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'edit own manual batches']);
+
+    $_POST['op'] = 'close';
+    $_POST['recordBAO'] = 'CRM_Batch_BAO_Batch';
+    $_POST['records'] = [$batch['id']];
+    $_REQUEST['qfKey'] = $_POST['qfKey'] = CRM_Core_Key::get('CRM_Financial_Page_AJAX');
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Financial_Page_AJAX::assignRemove();
+  }
+
+  /**
+   * Test assignRemove successfully closes batch when user has permission.
+   */
+  public function testAssignRemoveSuccess(): void {
+    $loggedInUserId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'edit own manual batches']);
+
+    $batch = $this->createTestEntity('Batch', [
+      'title' => 'My Batch To Close',
+      'created_id' => $loggedInUserId,
+      'status_id:name' => 'Data Entry',
+    ]);
+
+    $_POST['op'] = 'close';
+    $_POST['recordBAO'] = 'CRM_Batch_BAO_Batch';
+    $_POST['records'] = [$batch['id']];
+    $_REQUEST['qfKey'] = $_POST['qfKey'] = CRM_Core_Key::get('CRM_Financial_Page_AJAX');
+
+    try {
+      CRM_Financial_Page_AJAX::assignRemove();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('record-updated-success', $e->errorData['status']);
+    }
+
+    $updatedBatch = \Civi\Api4\Batch::get(FALSE)
+      ->addWhere('id', '=', $batch['id'])
+      ->addSelect('status_id:name')
+      ->execute()
+      ->first();
+    $this->assertEquals('Closed', $updatedBatch['status_id:name']);
+  }
+
+  /**
+   * Test assignRemove is denied when assigning transactions to a closed batch.
+   */
+  public function testAssignRemoveDeniedOnClosedBatch(): void {
+    $loggedInUserId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'edit all manual batches']);
+
+    $batch = $this->createTestEntity('Batch', [
+      'title' => 'Closed Batch',
+      'created_id' => $loggedInUserId,
+      'status_id:name' => 'Closed',
+    ]);
+
+    $_POST = [
+      'op' => 'assign',
+      'recordBAO' => 'CRM_Batch_BAO_EntityBatch',
+      'entityID' => $batch['id'],
+      'records' => [1],
+      'qfKey' => CRM_Core_Key::get('CRM_Financial_Page_AJAX'),
+    ];
+    $_REQUEST['qfKey'] = $_POST['qfKey'];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Financial_Page_AJAX::assignRemove();
+  }
+
 }

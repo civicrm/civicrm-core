@@ -183,6 +183,12 @@
      <is_ajax>true</is_ajax>
   </item>
   <item>
+     <path>civicrm/ajax/batch/assign</path>
+     <page_callback>CRM_Financial_Page_AJAX::assignRemove</page_callback>
+     <access_arguments>access CiviContribute</access_arguments>
+     <is_ajax>true</is_ajax>
+  </item>
+  <item>
       <path>civicrm/ajax/inline</path>
      <page_callback>CRM_Core_Page_AJAX::run</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
