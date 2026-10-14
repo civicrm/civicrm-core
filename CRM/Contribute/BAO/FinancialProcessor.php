@@ -297,27 +297,20 @@ class CRM_Contribute_BAO_FinancialProcessor {
   /**
    * Get the financial account for the item associated with the new transaction.
    *
-   * @param array $params
    * @param int $default
    *
    * @return int
    */
-  private function getFinancialAccountForStatusChangeTrxn($params, $default): int {
-    if (!empty($params['financial_account_id'])) {
-      return $params['financial_account_id'];
-    }
-
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['contribution_status_id'], 'name');
-    $preferredAccountsRelationships = [
+  private function getFinancialAccountForStatusChangeTrxn($default): int {
+    $relationshipType = [
       'Refunded' => 'Credit/Contra Revenue Account is',
       'Chargeback' => 'Chargeback Account is',
-    ];
+    ][$this->getUpdatedContributionStatus()] ?? NULL;
 
-    if (array_key_exists($contributionStatus, $preferredAccountsRelationships)) {
-      $financialTypeID = !empty($params['financial_type_id']) ? $params['financial_type_id'] : $this->getOriginalContribution()->financial_type_id;
+    if ($relationshipType) {
       return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
-        $financialTypeID,
-        $preferredAccountsRelationships[$contributionStatus]
+        $this->getUpdatedContributionValue('financial_type_id'),
+        $relationshipType
       );
     }
     return $default;
@@ -408,13 +401,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
           // Set amounts to create a reversal transaction.
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = -$this->getOriginalContribution()->total_amount;
           $params['trxnParams']['fee_amount'] = 0 - $this->getOriginalContribution()->fee_amount;
-          $this->updateFinancialAccounts($params, 'changeFinancialType');
-          /* $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id']; */
-          $params['financial_account_id'] = $this->getUpdatedFinancialAccount();
+          $this->updateFinancialAccounts($params['trxnParams'], 'changeFinancialType');
           // Set the amounts back to the original value for creating the new positive financial trxn.
           $params['total_amount'] = $params['trxnParams']['net_amount'] = $params['trxnParams']['total_amount'] = $this->getUpdatedContribution()->total_amount;
           $params['trxnParams']['fee_amount'] = $this->getUpdatedContribution()->fee_amount;
-          $this->updateFinancialAccounts($params);
+          $this->updateFinancialAccounts($params['trxnParams'], NULL, $this->getUpdatedFinancialAccount());
           $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
           $updated = TRUE;
           $params['deferred_financial_account_id'] = $this->getUpdatedFinancialAccount();
@@ -458,7 +449,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
           //Update Financial Records
           $params['trxnParams']['from_financial_account_id'] = NULL;
           $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $this->getOriginalContribution()->total_amount);
-          $this->updateFinancialAccounts($params, 'changedAmount');
+          $this->updateFinancialAccounts($params['trxnParams'], 'changedAmount');
           $updated = TRUE;
         }
 
@@ -678,24 +669,22 @@ class CRM_Contribute_BAO_FinancialProcessor {
   /**
    * Update all financial accounts entry.
    *
-   * @param array $params
-   *   Contribution object, line item array and params for trxn.
-   *
+   * @param array $trxnParams
+   *   Params for the trxn to record.
    * @param string $context
    *   Update scenarios.
-   *
-   * @return array
-   *   The updated line_item array, keyed as $params['line_item'] was, with
-   *   'deferred_line_total' & 'financial_item_id' added.
+   * @param int|null $financialAccount
+   *   Financial account to use for every line, overriding the per-line default - only
+   *   passed for the second pass of a changeFinancialType update.
    */
-  private function updateFinancialAccounts($params, $context = NULL): array {
-    $trxnID = $this->createFinancialTrxn($params['trxnParams']);
+  private function updateFinancialAccounts($trxnParams, $context = NULL, ?int $financialAccount = NULL): void {
+    $trxnID = $this->createFinancialTrxn($trxnParams);
     $lineItems = $this->getUpdatedLineItems();
     $postUpdateContribution = $this->getUpdatedContribution();
-    foreach ($lineItems as $fieldValueId => $lineItemDetails) {
+    foreach ($lineItems as $lineItemDetails) {
       $previousLineItem = $this->originalLineItems[$lineItemDetails['id'] ?? NULL] ?? [];
       $prevFinancialItem = $this->getExistingFinancialItemForLine($lineItemDetails['id'], FALSE);
-      $financialAccount = $this->getFinancialAccountForStatusChangeTrxn($params, $prevFinancialItem['financial_account_id']);
+      $lineFinancialAccount = $financialAccount ?? $this->getFinancialAccountForStatusChangeTrxn($prevFinancialItem['financial_account_id']);
 
       $itemParams = [
         'transaction_date' => CRM_Utils_Date::isoToMysql($postUpdateContribution->receive_date),
@@ -704,7 +693,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         'amount' => $this->getFinancialItemAmountFromParams($context, $lineItemDetails),
         'description' => $prevFinancialItem['description'] ?? NULL,
         'status_id' => $prevFinancialItem['status_id'],
-        'financial_account_id' => $financialAccount,
+        'financial_account_id' => $lineFinancialAccount,
         'entity_table' => 'civicrm_line_item',
         'entity_id' => $lineItemDetails['id'],
       ];
@@ -753,7 +742,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
     }
     $this->createDeferredTrxn(TRUE, $context);
-    return $params['line_item'];
   }
 
   /**
@@ -887,7 +875,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
       return;
     }
-    $this->updateFinancialAccounts($params, 'changedStatus');
+    $this->updateFinancialAccounts($params['trxnParams'], 'changedStatus');
   }
 
   /**
