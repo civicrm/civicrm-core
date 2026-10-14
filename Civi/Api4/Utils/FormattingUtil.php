@@ -234,52 +234,88 @@ class FormattingUtil {
    * @param \Civi\Api4\Query\Api4Query|null $query
    * @throws \CRM_Core_Exception
    */
-  public static function formatOutputValues(&$records, $fields, $action = 'get', $selectAliases = [], ?Api4Query $query = NULL) {
-    $fieldExprs = [];
+  public static function formatOutputValues(&$records, $fields, $action = 'get', $selectAliases = [], ?Api4Query $query = NULL): void {
+    if (empty($records)) {
+      return;
+    }
+    $columnMeta = [];
+    $formatKeys = [];
+
+    // Optimization: check in advance to see if any pseudoconstants will need replacing.
+    $allKeys = $query ? $query->getSelect() : array_keys(reset($records));
+    $hasPseudoconstants = str_contains(implode('', $allKeys), ':');
+
+    // Lazy-load column metadata as-needed. Cached in $columnMeta so it won't need to be looked up again.
+    $getColumnMeta = function(string $key) use ($fields, $selectAliases, &$formatKeys): array|bool {
+      $fieldExpr = SqlExpression::convert($selectAliases[$key] ?? $key);
+      $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields());
+      $baseName = $fieldName ? explode(':', $fieldName)[0] : '';
+      $field = $fields[$fieldName ?? ''] ?? $fields[$baseName] ?? $fields[$key] ?? NULL;
+
+      // No field or format callback = no formatting to be done
+      if (!$field && !method_exists($fieldExpr, 'formatOutputValue')) {
+        return FALSE;
+      }
+
+      if (!empty($field['output_formatters'])) {
+        $formatKeys[$key] = $key;
+      }
+
+      return [
+        'expr' => $fieldExpr,
+        'name' => $fieldName,
+        'field' => $field,
+        'suffix' => self::getSuffix($fieldName),
+        'dataType' => $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL),
+        'isContactType' => ($field['entity'] ?? NULL) === 'Contact' && ($field['name'] ?? NULL) === 'contact_type',
+      ];
+    };
+
     foreach ($records as &$result) {
       $contactTypePaths = [];
-      // Save an array of unprocessed values which are useful when replacing pseudocontants
-      $rawValues = $result;
-      foreach ($rawValues as $key => $value) {
-        // Pseudoconstants haven't been replaced yet so strip suffixes from raw values
-        if (strpos($key, ':') > strrpos($key, ')')) {
-          [$fieldName] = explode(':', $key);
-          $rawValues[$fieldName] = $value;
-          unset($rawValues[$key]);
+      $rawValues = [];
+
+      if ($hasPseudoconstants) {
+        $rawValues = $result;
+        foreach ($rawValues as $key => $value) {
+          // Pseudoconstants haven't been replaced yet so strip suffixes from raw values
+          if (strpos($key, ':') > strrpos($key, ')')) {
+            [$fieldName] = explode(':', $key);
+            $rawValues[$fieldName] = $value;
+            unset($rawValues[$key]);
+          }
         }
       }
+
       foreach ($result as $key => $value) {
         // Skip values that have already been unset by `formatOutputValue` functions
         if (!array_key_exists($key, $result)) {
           continue;
         }
-        // Use ??= to only convert each column once
-        $fieldExprs[$key] ??= SqlExpression::convert($selectAliases[$key] ?? $key);
-        $fieldExpr = $fieldExprs[$key];
-        $fieldName = \CRM_Utils_Array::first($fieldExpr->getFields());
-        $baseName = $fieldName ? \CRM_Utils_Array::first(explode(':', $fieldName)) : NULL;
-        $field = $fields[$fieldName ?? ''] ?? $fields[$baseName ?? ''] ?? $fields[$key] ?? NULL;
-        $dataType = $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL);
+        $columnMeta[$key] ??= $getColumnMeta($key);
+        // No field or format callback = no formatting to be done
+        if (!$columnMeta[$key]) {
+          continue;
+        }
+        $dataType = $columnMeta[$key]['dataType'];
+        $fieldExpr = $columnMeta[$key]['expr'];
+        $field = $columnMeta[$key]['field'];
+        $fieldName = $columnMeta[$key]['name'];
+
         // Allow Sql Functions to alter the value and/or $dataType
         if (method_exists($fieldExpr, 'formatOutputValue') && is_string($value)) {
           $fieldExpr->formatOutputValue($dataType, $result, $key, $query);
-          $value = $result[$key];
-        }
-        // Output postprocessing - @see FieldSpec::addOutputFormatter
-        if (!empty($field['output_formatters'])) {
-          self::applyFormatters($result, $fieldExpr, $field, $value);
-          $dataType = NULL;
+          $value = $result[$key] ?? NULL;
         }
         // Evaluate pseudoconstant suffixes
-        $suffix = self::getSuffix($fieldName);
         $fieldOptions = NULL;
-        if (isset($value) && $suffix) {
+        if (isset($value) && $columnMeta[$key]['suffix']) {
           $fieldOptions = self::getPseudoconstantList($field, $fieldName, $rawValues, $action);
           $dataType = NULL;
         }
         // Store contact_type value before replacing pseudoconstant (e.g. transforming it to contact_type:label)
         // Used by self::contactFieldsToRemove below
-        if ($value && isset($field['entity']) && $field['entity'] === 'Contact' && $field['name'] === 'contact_type') {
+        if ($value && $columnMeta[$key]['isContactType']) {
           $prefix = strrpos($fieldName, '.');
           $contactTypePaths[$prefix ? substr($fieldName, 0, $prefix + 1) : ''] = $value;
         }
@@ -292,6 +328,12 @@ class FormattingUtil {
           }
         }
         $result[$key] = self::convertDataType($value, $dataType);
+      }
+      // Output postprocessing - @see FieldSpec::addOutputFormatter
+      foreach ($formatKeys as $key) {
+        if (array_key_exists($key, $result)) {
+          self::applyFormatters($result, $columnMeta[$key]['expr'], $columnMeta[$key]['field'], $result[$key]);
+        }
       }
       // Remove inapplicable contact fields
       foreach ($contactTypePaths as $prefix => $contactType) {

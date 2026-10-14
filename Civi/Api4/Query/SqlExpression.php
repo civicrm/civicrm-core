@@ -99,7 +99,7 @@ abstract class SqlExpression {
    * @return SqlExpression
    * @throws \CRM_Core_Exception
    */
-  public static function convert(string $expression, $parseAlias = FALSE, $mustBe = []) {
+  public static function convert(string $expression, $parseAlias = FALSE, $mustBe = []): SqlExpression {
     $as = $parseAlias ? strrpos($expression, ' AS ') : FALSE;
     $expr = $as ? substr($expression, 0, $as) : $expression;
     $alias = $as ? self::munge(substr($expression, $as + 4), '_', 256) : NULL;
