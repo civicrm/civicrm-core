@@ -428,26 +428,6 @@ LIMIT {$rowCount}
   }
 
   /**
-   * Retrieve signature based on email id.
-   */
-  public static function getSignature() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $emailID = CRM_Utils_Type::escape($_REQUEST['emailID'], 'Positive');
-    $query = "SELECT signature_text, signature_html FROM civicrm_email WHERE id = {$emailID}";
-    $dao = CRM_Core_DAO::executeQuery($query);
-
-    $signatures = [];
-    while ($dao->fetch()) {
-      $signatures = [
-        'signature_text' => $dao->signature_text,
-        'signature_html' => $dao->signature_html,
-      ];
-    }
-
-    CRM_Utils_JSON::output($signatures);
-  }
-
-  /**
    * Process dupes.
    */
   public static function processDupes() {
