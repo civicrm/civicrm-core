@@ -15,15 +15,8 @@
     margin: 0;
     border: 0 none;
   }
-  #mainTabContainer ul.ui-tabs-nav {
-    font-size: 1.1em;
-    margin-bottom: .6em;
-  }
   pre#api-result {
     max-height: 50em;
-  }
-  pre#api-result,
-  div#doc-result {
     padding:1em;
     border: 1px solid lightgrey;
     margin-top: 1em;
@@ -190,14 +183,6 @@
   #mainTabContainer pre {
     background-color: #f9f9f9;
   }
-  .api-doc-code {
-    margin-top: 1em;
-    border-top: 1px solid #d3d3d3;
-  }
-  .doc-filename {
-    text-align: right;
-    font-style: italic;
-  }
   .crm-container .api-rest-params pre {
     display: inline-block;
   }
@@ -225,17 +210,7 @@
 </div>
 <div class="crm-block crm-content-block">
 <div id="mainTabContainer">
-  <ul role="tablist">
-    <li role="tab" class="crm-tab-button ui-corner-all" title="GUI to build and execute API calls">
-      <a href="#explorer-tab"><i class="crm-i fa-search" role="img" aria-hidden="true"></i> {ts}Explorer{/ts}</a>
-    </li>
-    <li role="tab" class="crm-tab-button ui-corner-all" title="API source-code and code-level documentation">
-      <a href="#docs-tab"><i class="crm-i fa-code" role="img" aria-hidden="true"></i> {ts}Code Docs{/ts}</a>
-    </li>
-  </ul>
-
-  <div id="explorer-tab" role="tabpanel">
-    <div class="crm-block crm-form-block">
+  <div class="crm-block crm-form-block">
     <form id="api-explorer">
       <label for="api-entity">{ts}Entity{/ts}:</label>
       <select class="crm-form-select big required" id="api-entity" name="entity">
@@ -308,31 +283,6 @@
 {ts}Results are displayed here.{/ts}
 </pre>
     </form>
-  </div>
-  </div>
-
-  <div id="docs-tab" role="tabpanel">
-    <div class="crm-block crm-form-block">
-    <form id="api-docs">
-      <label for="doc-entity">{ts}Entity{/ts}:</label>
-      <select class="crm-form-select big required" id="doc-entity" name="entity">
-        <option value="" selected="selected">{ts}Choose{/ts}...</option>
-        {foreach from=$entities.values item=entity}
-          <option value="{$entity}" {if !empty($entities.deprecated) && in_array($entity, $entities.deprecated)}class="strikethrough"{/if}>
-            {$entity}
-          </option>
-        {/foreach}
-      </select>
-      &nbsp;&nbsp;
-      <label for="doc-action">{ts}Action{/ts}:</label>
-      <select class="crm-form-select big crm-select2" id="doc-action" name="action">
-        <option value="" selected="selected">{ts}Choose{/ts}...</option>
-      </select>
-      <div id="doc-result">
-        {ts}Results are displayed here.{/ts}
-      </div>
-    </form>
-    </div>
   </div>
 </div>
 </div>
@@ -423,16 +373,6 @@
       <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
     </td>
   </tr>
-</script>
-
-<script type="text/template" id="doc-code-tpl">
-  <details class="api-doc-code">
-    <summary>{ts}Source Code{/ts}</summary>
-    <div class="crm-accordion-body">
-      <div class="doc-filename"><%- file %></div>
-      <pre class="lang-php linenums"><%- code %></pre>
-    </div>
-  </details>
 </script>
 
 <script type="text/template" id="join-tpl">
