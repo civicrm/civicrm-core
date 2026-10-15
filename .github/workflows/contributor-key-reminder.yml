@@ -1,0 +1,62 @@
+name: Contributor Key Reminder
+
+on:
+  pull_request_target:
+    types: [closed]
+
+jobs:
+  remind_contributor:
+    name: Remind Contributor
+    if: |
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
+
+    steps:
+      - name: Check and remind contributor
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          # 1. Accept only master or release branches (e.g. 6.29)
+          if [ "$BASE_REF" != "master" ] && ! [[ "$BASE_REF" =~ ^[0-9.]+$ ]]; then
+            echo "Base branch '$BASE_REF' is neither master nor a release branch. Skipping."
+            exit 0
+          fi
+
+          # 2. Skip if this PR itself already touched contributor-key.yml
+          TOUCHED=$(gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" --json files --jq '[.files[].path | select(. == "contributor-key.yml")] | length')
+          if [ "$TOUCHED" -gt 0 ]; then
+            echo "PR #$PR_NUMBER already edited contributor-key.yml. Skipping."
+            exit 0
+          fi
+
+          # 3. Fetch contributor-key.yml from master
+          gh api "repos/${{ github.repository }}/contents/contributor-key.yml?ref=master" \
+            -H "Accept: application/vnd.github.raw" > contributor-key.yml
+
+          # 4. Check if author handle is already listed
+          if grep -qiE "^\s*-?\s*github\s*:\s*['\"]?${PR_AUTHOR}['\"]?\s*$" contributor-key.yml; then
+            echo "Author @$PR_AUTHOR is already in contributor-key.yml. Skipping."
+            exit 0
+          fi
+
+          # 5. Post reminder comment
+          echo "Author @$PR_AUTHOR not found in contributor-key.yml. Posting reminder comment..."
+          gh pr comment "$PR_NUMBER" --repo "${{ github.repository }}" --body "Thank you for your contribution, @${PR_AUTHOR}! 🎉
+
+          To ensure you are credited in upcoming CiviCRM release notes, please add yourself to [\`contributor-key.yml\`](https://github.com/${{ github.repository }}/edit/master/contributor-key.yml):
+
+          \`\`\`yaml
+          - github      : ${PR_AUTHOR}
+            name        : Your Real Name
+            organization: Your Organization (optional)
+          \`\`\`
+
+          You can [edit the file directly on GitHub](https://github.com/${{ github.repository }}/edit/master/contributor-key.yml) to submit a quick pull request."
