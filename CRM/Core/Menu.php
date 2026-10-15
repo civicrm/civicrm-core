@@ -174,7 +174,7 @@ class CRM_Core_Menu {
             $value = [[$value], 'and'];
           }
         }
-        elseif ($key == 'is_public' || $key == 'is_ssl') {
+        elseif ($key == 'is_public' || $key == 'is_ssl' || $key == 'is_ajax') {
           $value = ($value == 'true' || $value == 1) ? 1 : 0;
         }
         $menu[$path][$key] = $value;
