@@ -352,6 +352,10 @@
 - github      : clarkac1
   name        : Andy Clark
 
+- github      : claude
+  name        : Claude
+  organization: Anthropic, PBC.
+
 - github      : clnlf
   name        : Carlos Loeza
   organization: Noah's Light Foundation
