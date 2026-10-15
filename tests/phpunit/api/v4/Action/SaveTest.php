@@ -20,6 +20,7 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Contact;
+use Civi\Api4\Navigation;
 use Civi\Test\TransactionalInterface;
 
 /**
@@ -117,6 +118,32 @@ class SaveTest extends Api4TestBase implements TransactionalInterface {
     ];
 
     self::assertEquals($expected, $allCreatedAndSavedContacts->getArrayCopy());
+  }
+
+  /**
+   * A match field omitted from the record should fall back to the field default.
+   *
+   * One common instance is a Navigation that matches on domain_id, but doesn't supply it.
+   */
+  public function testSaveWithMatchOnOmittedFieldWithDefault(): void {
+    $original = Navigation::create(FALSE)
+      ->addValue('name', 'test_match_default')
+      ->addValue('label', 'Original')
+      ->execute()->single();
+    self::assertEquals(\CRM_Core_BAO_Domain::getDomain()->id, $original['domain_id']);
+
+    $saved = Navigation::save(FALSE)
+      ->setMatch(['name', 'domain_id'])
+      ->setRecords([['name' => 'test_match_default', 'label' => 'Updated']])
+      ->execute()->single();
+
+    self::assertEquals($original['id'], $saved['id']);
+    self::assertEquals('Updated', $saved['label']);
+
+    $all = Navigation::get(FALSE)
+      ->addWhere('name', '=', 'test_match_default')
+      ->execute();
+    self::assertCount(1, $all);
   }
 
 }
