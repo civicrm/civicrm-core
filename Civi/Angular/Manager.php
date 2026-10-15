@@ -131,7 +131,7 @@ class Manager {
    * @throws \Exception
    */
   public function getModule($moduleName) {
-    $module = $this->cache->get("module $moduleName") ?? $this->getModules()[$moduleName] ?? NULL;
+    $module = $this->getModules()[$moduleName] ?? NULL;
     if (!isset($module)) {
       throw new \Exception("Unrecognized Angular module");
     }
