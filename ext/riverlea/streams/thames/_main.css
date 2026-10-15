@@ -192,6 +192,7 @@
 /* Dashlet */
   --crm-dashlet-box-shadow: none;
   --crm-dashlet-header-bg-color: var(--crm-paper);
+  --crm-dashlet-header-padding: var(--crm-l-small);
   --crm-dashlet-tabs-bg-color: var(--crm-tabs-bg-color);
   --crm-dashlet-radius: var(--crm-r-3);
 }

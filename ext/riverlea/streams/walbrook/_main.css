@@ -184,7 +184,6 @@
   --crm-dashlet-padding: 0;
   --crm-dashlet-header-bg-color: var(--crm-secondary-color);
   --crm-dashlet-header-color: var(--crm-text-light-color);
-  --crm-dashlet-header-padding: var(--crm-padding-reg);
   --crm-dashlet-tabs-border: var(--crm-tabs-border);
 /* Notifications */
   --crm-notify-bg-color: var(--crm-paper);
