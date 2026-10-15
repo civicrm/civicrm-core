@@ -199,4 +199,73 @@ EOHTML;
     $this->assertEquals('2024-07-04', $submission['extra']['fields']['extra_date']);
   }
 
+  private function useRequiredExtraFieldsForm(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{source: 'Hello'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+    <af-field defn="{data_type: 'Boolean', label: 'Extra Checkbox', input_type: 'CheckBox', name: 'extra_checkbox', required: true}" />
+  </fieldset>
+  <af-field defn="{label: 'Extra Text', input_type: 'Text', name: 'extra_text', required: true}" />
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+  }
+
+  /**
+   * Required extra fields that have values must pass validation and let the form submit.
+   */
+  public function testSubmitWithRequiredExtraFieldsFilledIn(): void {
+    $this->useRequiredExtraFieldsForm();
+
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          ['fields' => ['first_name' => 'Jane', 'last_name' => 'Doe']],
+        ],
+        'extra' => [
+          'fields' => [
+            'extra_checkbox' => TRUE,
+            // Matches an entity name, which must not make "extra" a dependent entity
+            'extra_text' => 'Individual1',
+          ],
+        ],
+      ])
+      ->execute();
+
+    $this->assertGreaterThan(0, $result[0]['Individual1'][0]['id']);
+  }
+
+  public function testSubmitWithRequiredExtraFieldMissing(): void {
+    $this->useRequiredExtraFieldsForm();
+
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues([
+          'Individual1' => [
+            ['fields' => ['first_name' => 'Jane', 'last_name' => 'Doe']],
+          ],
+          'extra' => [
+            'fields' => [
+              'extra_checkbox' => TRUE,
+            ],
+          ],
+        ])
+        ->execute();
+      $this->fail('Should have thrown validation exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+    }
+    $this->assertEquals('Extra Text is a required field.', $e->getMessage());
+  }
+
 }

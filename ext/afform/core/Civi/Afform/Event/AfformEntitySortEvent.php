@@ -88,6 +88,9 @@ class AfformEntitySortEvent extends AfformBaseEvent {
     $formEntities = array_keys($this->getFormDataModel()->getEntities());
 
     foreach ($this->entityValues as $entityName => $records) {
+      if (empty($this->getFormDataModel()->getEntity($entityName)['type'])) {
+        continue;
+      }
       foreach ($records as $record) {
         foreach ($record['fields'] ?? [] as $fieldValue) {
           foreach ((array) $fieldValue as $value) {

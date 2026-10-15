@@ -751,7 +751,12 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       // Gather submitted field values from $values['fields'] and sub-entities from $values['joins']
       $submittableFields = $this->getSubmittableFields($entity['fields']);
       $fileFields = $this->getFileFields($entity['type'], $submittableFields);
-      foreach ($submittedValues[$entityName] ?? [] as $values) {
+      $records = $submittedValues[$entityName] ?? [];
+      // "extra" is not a real entity so it needs to be reshaped to pass the `!is_array` so we can validate required fields.
+      if (!$entity['type']) {
+        $records = [$records];
+      }
+      foreach ($records as $values) {
         if (!is_array($values)) {
           // For "extra" we might have $values['fields'] if we added any extra fields.
           // But, if we have eg. recaptcha we will have $values['recaptcha2'] and might
