@@ -54,7 +54,7 @@ class ShutdownWorker {
 
   protected static function workOnQueue(string $queueName, int $seconds): void {
     $runner = new \CRM_Queue_Runner([
-      'title' => ts("Shutdown Worker for {$queueName}"),
+      'title' => ts('Shutdown Worker for %1', [1 => $queueName]),
       'queue' => \Civi::queue($queueName),
       'errorMode' => \CRM_Queue_Runner::ERROR_CONTINUE,
     ]);
