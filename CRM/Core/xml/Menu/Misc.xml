@@ -86,6 +86,7 @@
     <path>civicrm/ajax/attachment</path>
     <page_callback>CRM_Core_Page_AJAX_Attachment::attachFile</page_callback>
     <access_arguments>access CiviCRM;access AJAX API</access_arguments>
+    <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/api</path>
@@ -108,11 +109,13 @@
      <path>civicrm/ajax/rest</path>
      <page_callback>CRM_Utils_REST::ajax</page_callback>
      <access_arguments>access CiviCRM;access AJAX API</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/api/json</path>
      <page_callback>CRM_Utils_REST::ajaxJson</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/inline</path>
@@ -123,6 +126,7 @@
      <path>civicrm/ajax/chart</path>
      <page_callback>CRM_Contribute_Form_ContributionCharts</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
     <path>civicrm/asset/builder</path>
@@ -134,6 +138,7 @@
      <path>civicrm/contribute/ajax/tableview</path>
      <page_callback>CRM_Contribute_Page_DashBoard</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/payment/ipn</path>
@@ -145,16 +150,19 @@
       <path>civicrm/ajax/batch</path>
      <page_callback>CRM_Batch_Page_AJAX::batchSave</page_callback>
      <access_arguments>access CiviContribute</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/ajax/batchlist</path>
      <page_callback>CRM_Batch_Page_AJAX::getBatchList</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
       <path>civicrm/ajax/inline</path>
      <page_callback>CRM_Core_Page_AJAX::run</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
     <path>civicrm/dev/qunit</path>
@@ -181,6 +189,7 @@
     <page_callback>CRM_UF_Page_ProfileEditor::getSchemaJSON</page_callback>
     <title>ProfileEditor</title>
     <access_arguments>access CiviCRM</access_arguments>
+    <is_ajax>true</is_ajax>
   </item>
   <item>
     <path>civicrm/a</path>
@@ -196,6 +205,7 @@
      <path>civicrm/ajax/recurringentity/update-mode</path>
      <page_callback>CRM_Core_Page_AJAX_RecurringEntity::updateMode</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/recurringentity/preview</path>

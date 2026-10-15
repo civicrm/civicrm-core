@@ -638,17 +638,20 @@
     <path>civicrm/ajax/navmenu</path>
     <page_callback>CRM_Admin_Page_AJAX::navMenu</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
+    <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/ajax/menutree</path>
      <page_callback>CRM_Admin_Page_AJAX::menuTree</page_callback>
      <access_arguments>access CiviCRM,administer CiviCRM</access_arguments>
      <page_type>3</page_type>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/ajax/statusmsg</path>
      <page_callback>CRM_Admin_Page_AJAX::getStatusMsg</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/admin/price</path>

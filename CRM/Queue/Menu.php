@@ -45,6 +45,7 @@ class CRM_Queue_Menu {
         $menuPath['page_callback'] = ['CRM_Queue_Page_AJAX', 'runNext'];
         $menuPath['access_arguments'][0][] = 'access CiviCRM';
         $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
+        $menuPath['is_ajax'] = 1;
         break;
 
       case 'civicrm/queue/ajax/skipNext':
@@ -53,6 +54,7 @@ class CRM_Queue_Menu {
         $menuPath['page_callback'] = ['CRM_Queue_Page_AJAX', 'skipNext'];
         $menuPath['access_arguments'][0][] = 'access CiviCRM';
         $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
+        $menuPath['is_ajax'] = 1;
         break;
 
       case 'civicrm/queue/ajax/onEnd':
@@ -61,6 +63,7 @@ class CRM_Queue_Menu {
         $menuPath['page_callback'] = ['CRM_Queue_Page_AJAX', 'onEnd'];
         $menuPath['access_arguments'][0][] = 'access CiviCRM';
         $menuPath['access_callback'] = ['CRM_Core_Permission', 'checkMenu'];
+        $menuPath['is_ajax'] = 1;
         break;
 
       case 'civicrm/queue/monitor':
