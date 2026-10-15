@@ -14,16 +14,16 @@ class AfformSubmitUsageTest extends AfformUsageTestCase {
   public function testSubmitWithDisplayOnlyFields(): void {
 
     $layout = <<<EOHTML
-<af-form ctrl="afform">
-  <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" url-autofill="1" security="RBAC"  />
-  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
-    <af-field name="first_name" defn="{input_type: 'DisplayOnly', required: true}" />
-    <af-field name="last_name" />
-  </fieldset>
-  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
-  <af-field defn="{input_type: 'Text', name: 'test_field'}" />
-</af-form>
-EOHTML;
+      <af-form ctrl="afform">
+        <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" url-autofill="1" security="RBAC"  />
+        <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+          <af-field name="first_name" defn="{input_type: 'DisplayOnly', required: true}" />
+          <af-field name="last_name" />
+        </fieldset>
+        <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+        <af-field defn="{input_type: 'Text', name: 'test_field'}" />
+      </af-form>
+    EOHTML;
 
     $this->useValues([
       'layout' => $layout,
@@ -60,35 +60,80 @@ EOHTML;
 
   public function testSubmitWithTokensInConfirmationMessage(): void {
     $layout = <<<EOHTML
-<af-form ctrl="afform">
-  <af-entity data="{source: 'Hello'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC"  />
-  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
-    <af-field name="first_name" />
-    <af-field name="last_name" />
-  </fieldset>
-  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
-</af-form>
-EOHTML;
+      <af-form ctrl="afform">
+        <af-entity data="{source: 'Hello'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC"  />
+        <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+          <af-field name="first_name" />
+          <af-field name="last_name" />
+          <div af-join="Email" actions="{update: true, delete: true}" data="{location_type_id: 1}">
+            <div class="af-container af-layout-inline">
+              <af-field name="email" />
+            </div>
+          </div>
+          <div af-join="Email" actions="{update: true, delete: true}" data="{location_type_id: 2}">
+            <div class="af-container af-layout-inline">
+              <af-field name="email" />
+            </div>
+          </div>
+        </fieldset>
+        <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+      </af-form>
+    EOHTML;
 
     $this->useValues([
       'layout' => $layout,
       'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
       'confirmation_type' => 'show_confirmation_message',
-      'confirmation_message' => 'Thank you "[Individual1.0.first_name] [Individual1.0.last_name]" You are now registered as [Individual1.0.source] ID_[Individual1.0.id].',
+      'confirmation_message' => '
+        <p>Thank you "[Individual1.0.first_name] [Individual1.0.last_name]".</p>
+        <p>You are now registered as [Individual1.0.source] ID_[Individual1.0.id].</p>
+        <p>Your home email is [Individual1.0.Email.0.email] (ID [Individual1.0.Email.0.id]).</p>
+        <p>Your work email is [Individual1.0.Email.1.email] (ID [Individual1.0.Email.1.id]).</p>
+      ',
     ]);
 
     // Submit with new contact
     $submission = [
-      ['fields' => ['first_name' => 'Jane', 'last_name' => 'Doe']],
+      'Individual1' => [
+        0 => [
+          'fields' => [
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+          ],
+          'joins' => [
+            'Email' => [
+              0 => [
+                'email' => 'jane@home.com',
+              ],
+              1 => [
+                'email' => 'jane@work.com',
+              ],
+            ],
+          ],
+        ],
+      ],
     ];
+
     $result = Afform::submit()
       ->setName($this->formName)
-      ->setValues(['Individual1' => $submission])
+      ->setValues($submission)
       ->execute();
 
     $contactId = $result[0]['Individual1'][0]['id'];
-    $expectedMessage = "Thank you \"Jane Doe\" You are now registered as Hello ID_$contactId.";
-    $this->assertSame($expectedMessage, $result[0]['message']);
+    $emails = \Civi\Api4\Email::get(FALSE)
+      ->addWhere('contact_id', '=', $contactId)
+      ->execute()
+      ->indexBy('location_type_id');
+
+    $expectedLines = [
+      "<p>Thank you \"Jane Doe\".</p>",
+      "<p>You are now registered as Hello ID_{$contactId}.</p>",
+      "<p>Your home email is jane@home.com (ID {$emails[1]['id']}).</p>",
+      "<p>Your work email is jane@work.com (ID {$emails[2]['id']}).</p>",
+    ];
+    foreach ($expectedLines as $line) {
+      $this->assertStringContainsString($line, $result[0]['message']);
+    }
   }
 
   public function testSubmitWithRecaptcha(): void {
@@ -96,16 +141,16 @@ EOHTML;
     \Civi::settings()->set('recaptchaPublicKey', 'test_public_key');
 
     $layout = <<<EOHTML
-<af-form ctrl="afform">
-  <af-entity data="{source: 'Hello'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC"  />
-  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
-    <af-field name="first_name" />
-    <af-field name="last_name" />
-  </fieldset>
-  <crm-recaptcha2 />
-  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
-</af-form>
-EOHTML;
+      <af-form ctrl="afform">
+        <af-entity data="{source: 'Hello'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC"  />
+        <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+          <af-field name="first_name" />
+          <af-field name="last_name" />
+        </fieldset>
+        <crm-recaptcha2 />
+        <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+      </af-form>
+    EOHTML;
 
     $this->useValues([
       'layout' => $layout,
