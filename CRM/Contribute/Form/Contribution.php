@@ -538,17 +538,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
     }
 
-    if (!empty($defaults['contribution_status_id']) && in_array(
-        CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $defaults['contribution_status_id']),
-        // Historically not 'Cancelled' hence not using CRM_Contribute_BAO_Contribution::isContributionStatusNegative.
-        ['Refunded', 'Chargeback']
-      )) {
-      $defaults['refund_trxn_id'] = CRM_Core_BAO_FinancialTrxn::getRefundTransactionTrxnID($this->_id);
-    }
-    else {
-      $defaults['refund_trxn_id'] = $defaults['trxn_id'] ?? NULL;
-    }
-
     if (!empty($defaults['contribution_status_id'])
       && ('Template' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $defaults['contribution_status_id']))) {
       if ($this->elementExists('contribution_status_id')) {

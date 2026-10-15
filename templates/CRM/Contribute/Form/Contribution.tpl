@@ -174,12 +174,6 @@
                     <td class="label" style="vertical-align: top;">{$form.cancel_reason.label}</td>
                     <td>{$form.cancel_reason.html}</td>
                   </tr>
-                  {if array_key_exists('refund_trxn_id', $form)}
-                    <tr id="refundTrxnID">
-                      <td class="label" style="vertical-align: top;">{$form.refund_trxn_id.label}</td>
-                      <td>{$form.refund_trxn_id.html}</td>
-                    </tr>
-                  {/if}
                 </table>
               </fieldset>
             </td>
