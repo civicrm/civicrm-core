@@ -35,10 +35,11 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     $individualID = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => 12345]);
     $batch = $this->callAPISuccess('Batch', 'create', ['title' => 'test', 'status_id' => 'Open']);
-    CRM_Core_DAO::executeQuery("
-     INSERT INTO civicrm_entity_batch (entity_table, entity_id, batch_id)
-     values('civicrm_financial_trxn', 1, 1)
-   ");
+    $this->createTestEntity('EntityBatch', [
+      'entity_table' => 'civicrm_financial_trxn',
+      'entity_id' => 1,
+      'batch_id' => $batch['id'],
+    ]);
     $_REQUEST['sEcho'] = 1;
     $_REQUEST['entityID'] = $batch['id'];
     $_REQUEST['return'] = TRUE;
@@ -57,10 +58,11 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     $individualID = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => 12345]);
     $batch = $this->callAPISuccess('Batch', 'create', ['title' => 'test', 'status_id' => 'Open']);
-    CRM_Core_DAO::executeQuery("
-     INSERT INTO civicrm_entity_batch (entity_table, entity_id, batch_id)
-     values('civicrm_financial_trxn', 1, 1)
-   ");
+    $this->createTestEntity('EntityBatch', [
+      'entity_table' => 'civicrm_financial_trxn',
+      'entity_id' => 1,
+      'batch_id' => $batch['id'],
+    ]);
     $_REQUEST['sEcho'] = 1;
     $_REQUEST['entityID'] = $batch['id'];
     $_REQUEST['statusID'] = 1;
