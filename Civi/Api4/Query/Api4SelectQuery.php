@@ -445,17 +445,8 @@ class Api4SelectQuery extends Api4Query {
       return CoreUtil::entityExists($entity);
     }
     if (!isset($this->entityAccess[$entity])) {
-      try {
-        $this->entityAccess[$entity] = (bool) civicrm_api4($entity, 'getActions', [
-          'where' => [['name', '=', 'get']],
-          'select' => ['name'],
-        ])->first();
-      }
-      // Anonymous users might not even be allowed to use 'getActions'
-      // Or tne entity might not exist
-      catch (\CRM_Core_Exception $e) {
-        $this->entityAccess[$entity] = FALSE;
-      }
+      $this->entityAccess[$entity] = CoreUtil::entityExists($entity) &&
+        \Civi::service('civi_api_kernel')->runAuthorize($entity, 'get', ['version' => 4]);
     }
     return $this->entityAccess[$entity];
   }

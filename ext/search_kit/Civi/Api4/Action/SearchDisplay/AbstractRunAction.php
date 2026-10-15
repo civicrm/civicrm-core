@@ -894,7 +894,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
       $this->entityActions[$entityName] = [
         'all' => civicrm_api4($entityName, 'getActions', ['checkPermissions' => FALSE])->column('name'),
-        'allowed' => civicrm_api4($entityName, 'getActions', ['checkPermissions' => TRUE])->column('name'),
+        'allowed' => CoreUtil::getAllowedEntityActions($entityName),
       ];
     }
     // Map CRM_Core_Action names to API action names :/
