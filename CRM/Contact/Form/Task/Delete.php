@@ -66,6 +66,11 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     // sort out whether it’s a delete-to-trash, delete-into-oblivion or restore (and let the template know)
     $values = $this->controller->exportValues();
     $this->_skipUndelete = (CRM_Core_Permission::check('access deleted contacts') and (CRM_Utils_Request::retrieve('skip_undelete', 'Boolean', $this) or ($values['task'] ?? NULL) == CRM_Contact_Task::DELETE_PERMANENTLY) || in_array('delete-permanently', $this->urlPath));
+    // If trash is disabled, deleting is always permanent - mirror CRM_Contact_BAO_Contact::deleteContact()
+    // so the status message and redirect are correct.
+    if (!Civi::settings()->get('contact_undelete')) {
+      $this->_skipUndelete = TRUE;
+    }
     $this->_restore = (CRM_Utils_Request::retrieve('restore', 'Boolean', $this) or ($values['task'] ?? NULL) == CRM_Contact_Task::RESTORE or in_array('restore-contact', $this->urlPath));
 
     if ($this->_restore && !CRM_Core_Permission::check('access deleted contacts')) {
