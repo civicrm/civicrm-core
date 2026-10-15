@@ -268,14 +268,6 @@ class CRM_Contact_Page_AJAX {
     CRM_Utils_JSON::output($ret);
   }
 
-  public static function groupTree() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
-    $gids = CRM_Utils_Type::escape($_GET['gids'], 'String');
-    echo CRM_Contact_BAO_GroupNestingCache::json($gids);
-    CRM_Utils_System::civiExit();
-  }
-
   /**
    * Delete custom value.
    */
