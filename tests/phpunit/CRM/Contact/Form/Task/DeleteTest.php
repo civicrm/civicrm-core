@@ -135,6 +135,9 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
    * not enabled at all.
    */
   public function testDeleteWithoutTrash(): void {
+    // Clear any status messages from earlier.
+    CRM_Core_Session::singleton()->getStatus(TRUE);
+
     $old_undelete_setting = Civi::settings()->get('contact_undelete');
     Civi::settings()->set('contact_undelete', '0');
 
@@ -149,10 +152,8 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
     $contact_id = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_contact WHERE id = %1", $query_params);
     $this->assertEmpty($contact_id);
 
-    // @todo This is currently buggy in the UI. It deletes properly but shows
-    // the wrong message.
-    //$session_status = CRM_Core_Session::singleton()->getStatus();
-    //$this->assertEquals('Mr. Delete Me has been permanently deleted.', $session_status[0]['text']);
+    $session_status = CRM_Core_Session::singleton()->getStatus();
+    $this->assertEquals('Mr. Delete Me has been permanently deleted.', $session_status[0]['text']);
 
     // put settings back
     Civi::settings()->set('contact_undelete', $old_undelete_setting);
