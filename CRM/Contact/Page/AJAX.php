@@ -81,8 +81,6 @@ class CRM_Contact_Page_AJAX {
       $excludeGet = [
         'reset',
         'key',
-        'className',
-        'fnName',
         'json',
         'reset',
         'context',

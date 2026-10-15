@@ -35,20 +35,11 @@ class CRM_Core_Page_AJAX {
       throw new CRM_Core_Exception(ts('Invalid className: %1', [1 => $className]));
     }
 
-    $fnName = NULL;
-    if (isset($_REQUEST['fn_name'])) {
-      $fnName = CRM_Utils_Type::escape($_REQUEST['fn_name'], 'String');
-    }
-
-    if (!self::checkAuthz($type, $className, $fnName)) {
+    if (!self::checkAuthz($type, $className)) {
       CRM_Utils_System::civiExit();
     }
 
     switch ($type) {
-      case 'method':
-        call_user_func([$className, $fnName]);
-        break;
-
       case 'page':
       case 'class':
       case '':
@@ -106,31 +97,18 @@ class CRM_Core_Page_AJAX {
   }
 
   /**
-   * Determine whether the request is for a valid class/method name.
+   * Determine whether the request is for a valid class/page name.
    *
    * @param string $type
-   *   'method'|'class'|''.
+   *   'page'|'class'|''.
    * @param string $className
    *   'Class_Name'.
-   * @param string $fnName
-   *   Method name.
    *
    * @return bool
    */
-  public static function checkAuthz($type, $className, $fnName = NULL) {
+  public static function checkAuthz($type, $className) {
     self::validateAjaxRequestMethod();
     switch ($type) {
-      case 'method':
-        if (!preg_match('/^CRM_[a-zA-Z0-9]+_Page_AJAX$/', $className)) {
-          return FALSE;
-        }
-        if (!preg_match('/^[a-zA-Z0-9]+$/', $fnName)) {
-          return FALSE;
-        }
-
-        // ensure that function exists
-        return method_exists($className, $fnName);
-
       case 'page':
       case 'class':
       case '':

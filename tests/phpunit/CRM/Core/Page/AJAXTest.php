@@ -14,15 +14,13 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
   public function testCheckAuthz(): void {
     $cases = [];
 
-    $cases[] = ['method', 'CRM_Foo', FALSE, 'method'];
-    $cases[] = ['method', 'CRM_Foo_Page_AJAX_Bar', FALSE, 'method'];
-    $cases[] = ['method', 'CRM_Contact_Page_AJAX', TRUE, 'getAddressDisplay'];
-    $cases[] = ['method', 'CRM_Foo_Page_AJAX', FALSE, 'method('];
-    $cases[] = ['method', 'CRM_Foo_Page_AJAX', FALSE, 'method()'];
-    $cases[] = ['method', 'othermethod;CRM_Foo_Page_AJAX', FALSE, 'method'];
-    $cases[] = ['method', 'CRM_Foo_Page_AJAX;othermethod', FALSE, 'method'];
-    $cases[] = ['method', 'CRM_Foo_Page_Inline_Bar', FALSE, ''];
-    $cases[] = ['method', 'CRM_Foo_Page_Inline_Bar', FALSE, 'method'];
+    $cases[] = ['method', 'CRM_Foo', FALSE];
+    $cases[] = ['method', 'CRM_Foo_Page_AJAX_Bar', FALSE];
+    $cases[] = ['method', 'CRM_Contact_Page_AJAX', FALSE];
+    $cases[] = ['method', 'CRM_Foo_Page_AJAX', FALSE];
+    $cases[] = ['method', 'othermethod;CRM_Foo_Page_AJAX', FALSE];
+    $cases[] = ['method', 'CRM_Foo_Page_AJAX;othermethod', FALSE];
+    $cases[] = ['method', 'CRM_Foo_Page_Inline_Bar', FALSE];
     $cases[] = ['method', 'CRM_Foo->method', FALSE];
 
     $cases[] = ['page', 'CRM_Foo', FALSE];
@@ -54,16 +52,9 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
 
     foreach ($cases as $case) {
       list ($type, $className, $expectedResult) = $case;
-      $methodName = $case[3] ?? NULL;
-      $actualResult = CRM_Core_Page_AJAX::checkAuthz($type, $className, $methodName);
-      if ($methodName) {
-        $this->assertEquals($expectedResult, $actualResult,
-          sprintf('Check type=[%s] value=[%s] method=[%s]', $type, $className, $methodName));
-      }
-      else {
-        $this->assertEquals($expectedResult, $actualResult,
-          sprintf('Check type=[%s] value=[%s]', $type, $className));
-      }
+      $actualResult = CRM_Core_Page_AJAX::checkAuthz($type, $className);
+      $this->assertEquals($expectedResult, $actualResult,
+        sprintf('Check type=[%s] value=[%s]', $type, $className));
     }
   }
 

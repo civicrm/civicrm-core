@@ -243,7 +243,6 @@ class CRM_Utils_REST {
    */
   public static function process(&$args, $params) {
     $params['check_permissions'] = TRUE;
-    $fnName = $apiFile = NULL;
     // clean up all function / class names. they should be alphanumeric and _ only
     for ($i = 1; $i <= 3; $i++) {
       if (!empty($args[$i])) {
@@ -253,15 +252,7 @@ class CRM_Utils_REST {
 
     // incase of ajax functions className is passed in url
     if (isset($params['className'])) {
-      $params['className'] = CRM_Utils_String::munge($params['className']);
-
-      // functions that are defined only in AJAX.php can be called via
-      // rest interface
-      if (!CRM_Core_Page_AJAX::checkAuthz('method', $params['className'], $params['fnName'])) {
-        return self::error('Unknown function invocation.');
-      }
-
-      return call_user_func([$params['className'], $params['fnName']], $params);
+      return self::error('Class function invocation via ajax is not allowed.');
     }
 
     if (!array_key_exists('version', $params)) {
@@ -499,6 +490,11 @@ class CRM_Utils_REST {
       CRM_Utils_JSON::output($error);
     }
 
+    if (isset($requestParams['className'])) {
+      echo self::output(self::error('Class function invocation via ajax is not allowed.'));
+      CRM_Utils_System::civiExit();
+    }
+
     $q = $requestParams['fnName'] ?? NULL;
     if (!$q) {
       $entity = $requestParams['entity'] ?? NULL;
@@ -517,11 +513,8 @@ class CRM_Utils_REST {
       $args = explode('/', $q);
     }
 
-    // get the class name, since all ajax functions pass className
-    $className = $requestParams['className'] ?? NULL;
-
     // If the function isn't in the civicrm namespace, reject the request.
-    if (($args[0] != 'civicrm' && count($args) != 3) && !$className) {
+    if ($args[0] != 'civicrm' && count($args) != 3) {
       return self::error('Unknown function invocation.');
     }
 
