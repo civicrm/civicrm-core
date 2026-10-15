@@ -288,7 +288,7 @@ WHERE  title = %1
 
       $grpCnt = CRM_Core_DAO::singleValueQuery($query, $params);
       if ($grpCnt) {
-        $errors['title'] = ts('Group \'%1\' already exists.', [1 => $fields['title']]);
+        $errors['title'] = ts("Group '%1' already exists.", [1 => $fields['title']]);
       }
     }
 
@@ -338,7 +338,7 @@ WHERE  title = %1
       // Set the entity id so it is available to postProcess hook consumers
       $this->setEntityId($group->id);
 
-      CRM_Core_Session::setStatus(ts('The Group \'%1\' has been saved.', [1 => $group->title]), ts('Group Saved'), 'success');
+      CRM_Core_Session::setStatus(ts("The Group '%1' has been saved.", [1 => $group->title]), ts('Group Saved'), 'success');
 
       // Add context to the session, in case we are adding members to the group
       if ($this->_action & CRM_Core_Action::ADD) {

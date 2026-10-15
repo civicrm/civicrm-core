@@ -91,7 +91,7 @@ class CRM_Custom_Form_DeleteField extends CRM_Core_Form {
     CRM_Core_BAO_CustomField::deleteField($field);
 
     // also delete any profiles associted with this custom field
-    CRM_Core_Session::setStatus(ts('The custom field \'%1\' has been deleted.', [1 => $field->label]), '', 'success');
+    CRM_Core_Session::setStatus(ts("The custom field '%1' has been deleted.", [1 => $field->label]), '', 'success');
 
   }
 

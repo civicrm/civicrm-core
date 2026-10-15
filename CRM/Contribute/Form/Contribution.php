@@ -1104,7 +1104,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       }
       $tCnt = CRM_Core_DAO::singleValueQuery($query, $queryParams);
       if ($tCnt) {
-        $errors['trxn_id'] = ts('Transaction ID\'s must be unique. Transaction \'%1\' already exists in your database.', [1 => $fields['trxn_id']]);
+        $errors['trxn_id'] = ts("Transaction ID's must be unique. Transaction '%1' already exists in your database.", [1 => $fields['trxn_id']]);
       }
     }
     // CRM-16189

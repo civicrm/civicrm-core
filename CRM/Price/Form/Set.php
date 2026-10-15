@@ -271,7 +271,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
 
     $set = CRM_Price_BAO_PriceSet::create($params);
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      CRM_Core_Session::setStatus(ts('The Set \'%1\' has been saved.', [1 => $set->title]), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts("The Set '%1' has been saved.", [1 => $set->title]), ts('Saved'), 'success');
     }
     else {
       // Jump directly to adding a field if popups are disabled

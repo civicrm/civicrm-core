@@ -131,7 +131,7 @@ class CRM_Campaign_Form_SurveyType extends CRM_Admin_Form {
       $params['component_id'] = CRM_Core_Component::getComponentID('CiviCampaign');
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $this->_gName, $this->_action, $this->_id);
 
-      CRM_Core_Session::setStatus(ts('The Survey type \'%1\' has been saved.', [1 => $optionValue->label]), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts("The Survey type '%1' has been saved.", [1 => $optionValue->label]), ts('Saved'), 'success');
     }
   }
 

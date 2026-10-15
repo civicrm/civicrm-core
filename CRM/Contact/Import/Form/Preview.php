@@ -87,7 +87,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     if (!empty($fields['newTagName'])
       && !CRM_Utils_Rule::objectExists(trim($fields['newTagName']), ['CRM_Core_DAO_Tag'])
     ) {
-      $errors['newTagName'] = ts('Tag \'%1\' already exists.', [1 => $fields['newTagName']]);
+      $errors['newTagName'] = ts("Tag '%1' already exists.", [1 => $fields['newTagName']]);
     }
 
     if (!empty($fields['newGroupName'])) {
@@ -101,7 +101,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
           2 => [$title, 'String'],
         ]
       )) {
-        $errors['newGroupName'] = ts('Group \'%1\' already exists.', [1 => $fields['newGroupName']]);
+        $errors['newGroupName'] = ts("Group '%1' already exists.", [1 => $fields['newGroupName']]);
       }
     }
 

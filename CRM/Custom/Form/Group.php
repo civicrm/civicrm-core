@@ -81,7 +81,7 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
       2 => [(int) $self->_id, 'Integer'],
     ]);
     if ($grpCnt) {
-      $errors['title'] = ts('Custom group \'%1\' already exists in Database.', [1 => $title]);
+      $errors['title'] = ts("Custom group '%1' already exists in Database.", [1 => $title]);
     }
 
     if ($self->_isGroupEmpty && empty($fields['is_multiple']) && $fields['style'] == 'Tab with table') {
@@ -308,7 +308,7 @@ class CRM_Custom_Form_Group extends CRM_Admin_Form {
     Civi::rebuild(['system' => TRUE])->execute();
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      CRM_Core_Session::setStatus(ts('Your custom field set \'%1 \' has been saved.', [1 => $group['title']]), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts("Your custom field set '%1 ' has been saved.", [1 => $group['title']]), ts('Saved'), 'success');
     }
     else {
       // Redirect to search display of fields

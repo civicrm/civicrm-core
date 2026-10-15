@@ -2486,7 +2486,7 @@ SELECT  id, html_type
   protected function isPaidEvent(): bool {
     $isPaid = $this->getEventValue('is_monetary');
     if ($isPaid && !$this->getPriceFieldMetaData()) {
-      CRM_Core_Error::statusBounce(ts('Click <a href=\'%1\'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.', [1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $this->_eventId)]), $this->getInfoPageUrl(), ts('No Fee Level(s) or Price Set is configured for this event.'));
+      CRM_Core_Error::statusBounce(ts("Click <a href='%1'>CiviEvent >> Manage Event >> Configure >> Event Fees</a> to configure the Fee Level(s) or Price Set for this event.", [1 => CRM_Utils_System::url('civicrm/event/manage/fee', 'reset=1&action=update&id=' . $this->_eventId)]), $this->getInfoPageUrl(), ts('No Fee Level(s) or Price Set is configured for this event.'));
     }
     return $isPaid;
   }

@@ -285,7 +285,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       if (file_exists($file[0])) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts('File \'%1\' presents a security risk and should be deleted.', [1 => $file[0]]),
+          ts("File '%1' presents a security risk and should be deleted.", [1 => $file[0]]),
           ts('Unsafe Files'),
           $file[1],
           'fa-lock'

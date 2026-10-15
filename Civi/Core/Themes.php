@@ -210,7 +210,7 @@ class Themes extends \Civi\Core\Service\AutoService {
       'none' => [
         'ext' => 'civicrm',
         'title' => ts('None (Unstyled)'),
-        'help' => ts('Disable CiviCRM\'s built-in CSS files.'),
+        'help' => ts("Disable CiviCRM's built-in CSS files."),
         'search_order' => ['none', self::FALLBACK_THEME],
         'excludes' => [
           "css/civicrm.css",

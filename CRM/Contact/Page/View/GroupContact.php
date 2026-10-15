@@ -65,7 +65,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
   public function edit($groupId = NULL) {
     $controller = new CRM_Core_Controller_Simple(
       'CRM_Contact_Form_GroupContact',
-      ts('Contact\'s Groups'),
+      ts("Contact's Groups"),
       $this->_action
     );
     $controller->setEmbedded(TRUE);

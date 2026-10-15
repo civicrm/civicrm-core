@@ -281,7 +281,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       2 => [(int) $self->_id, 'Integer'],
     ]);
     if ($pCnt) {
-      $errors['title'] = ts('Profile \'%1\' already exists in Database.', [1 => $title]);
+      $errors['title'] = ts("Profile '%1' already exists in Database.", [1 => $title]);
     }
 
     return empty($errors) ? TRUE : $errors;
@@ -346,7 +346,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
       else {
         $url = CRM_Utils_System::url("civicrm/admin/uf/group/field#/?gid=$ufGroup->id");
-        CRM_Core_Session::setStatus(ts('Your CiviCRM Profile \'%1\' has been added. You can add fields to this profile now.',
+        CRM_Core_Session::setStatus(ts("Your CiviCRM Profile '%1' has been added. You can add fields to this profile now.",
           [1 => $ufGroup->title]
         ), ts('Profile Added'), 'success');
       }

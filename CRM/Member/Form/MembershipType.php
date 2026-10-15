@@ -55,7 +55,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       ],
       'financial_type_id' => [
         'name' => 'financial_type_id',
-        'description' => ts('Select the financial type assigned to fees for this membership type (for example \'Membership Fees\'). This is required for all membership types - including free or complimentary memberships.'),
+        'description' => ts("Select the financial type assigned to fees for this membership type (for example 'Membership Fees'). This is required for all membership types - including free or complimentary memberships."),
         'required' => TRUE,
       ],
       'auto_renew' => [

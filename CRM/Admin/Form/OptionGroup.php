@@ -138,7 +138,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
       }
 
       $optionGroup = CRM_Core_BAO_OptionGroup::writeRecord($params);
-      CRM_Core_Session::setStatus(ts('The Option Group \'%1\' has been saved.', [1 => $optionGroup->title]), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts("The Option Group '%1' has been saved.", [1 => $optionGroup->title]), ts('Saved'), 'success');
     }
   }
 

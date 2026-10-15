@@ -1031,7 +1031,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       empty($fields['pcp_is_anonymous']) &&
       ($fields['pcp_roll_nickname'] ?? NULL) == ''
     ) {
-      $errors['pcp_roll_nickname'] = ts('Please enter a name to include in the Honor Roll, or select \'contribute anonymously\'.');
+      $errors['pcp_roll_nickname'] = ts("Please enter a name to include in the Honor Roll, or select 'contribute anonymously'.");
     }
 
     // return if this is express mode
@@ -1445,7 +1445,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       ];
       $validProfile = CRM_Core_BAO_UFGroup::checkValidProfile($this->_values['honoree_profile_id'], $requiredProfileFields[$profileContactType]);
       if (!$validProfile) {
-        CRM_Core_Error::statusBounce(ts('This contribution page has been configured for contribution on behalf of honoree and the required fields of the selected honoree profile are disabled or doesn\'t exist.'));
+        CRM_Core_Error::statusBounce(ts("This contribution page has been configured for contribution on behalf of honoree and the required fields of the selected honoree profile are disabled or doesn't exist."));
       }
 
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);

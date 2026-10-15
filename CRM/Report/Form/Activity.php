@@ -718,7 +718,7 @@ class CRM_Report_Form_Activity extends CRM_Report_Form {
    */
   public function add2group($groupID) {
     if (($this->_params["contact_target_op"] ?? NULL) == 'nll') {
-      CRM_Core_Error::statusBounce(ts('Current filter criteria didn\'t have any target contact to add to group'));
+      CRM_Core_Error::statusBounce(ts("Current filter criteria didn't have any target contact to add to group"));
     }
 
     $new_select = 'AS addtogroup_contact_id';

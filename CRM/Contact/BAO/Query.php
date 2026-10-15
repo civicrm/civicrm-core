@@ -3739,7 +3739,7 @@ WHERE  $smartGroupClause
     $name = trim($value);
     $cond = " contact_a.sort_name LIKE '" . CRM_Core_DAO::escapeWildCardString($name) . "%'";
     $this->_where[$grouping][] = $cond;
-    $this->_qill[$grouping][] = ts('Showing only Contacts starting with: \'%1\'', [1 => $name]);
+    $this->_qill[$grouping][] = ts("Showing only Contacts starting with: '%1'", [1 => $name]);
   }
 
   /**
@@ -3802,11 +3802,11 @@ WHERE  $smartGroupClause
     }
     elseif ($name == 'postal_code_low') {
       $this->_where[$grouping][] = " ( $field >= '$val' ) ";
-      $this->_qill[$grouping][] = ts('Postal code greater than or equal to \'%1\'', [1 => $value]);
+      $this->_qill[$grouping][] = ts("Postal code greater than or equal to '%1'", [1 => $value]);
     }
     elseif ($name == 'postal_code_high') {
       $this->_where[$grouping][] = " ( $field <= '$val' ) ";
-      $this->_qill[$grouping][] = ts('Postal code less than or equal to \'%1\'', [1 => $value]);
+      $this->_qill[$grouping][] = ts("Postal code less than or equal to '%1'", [1 => $value]);
     }
   }
 
