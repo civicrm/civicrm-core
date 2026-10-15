@@ -109,10 +109,12 @@ class AfformSubmissionDefaultDisplaySubscriber extends \Civi\Core\Service\AutoSe
         'sortable' => TRUE,
       ];
       if ($field['fk_entity']) {
+        // strrchr()'s $before_needle param requires PHP 8.3
+        $lastDot = strrpos($field['name'], '.');
         $column['link'] = [
           'entity' => $field['fk_entity'],
           'action' => 'view',
-          'join' => strrchr($field['name'], '.', TRUE),
+          'join' => $lastDot === FALSE ? FALSE : substr($field['name'], 0, $lastDot),
           'target' => '_blank',
         ];
       }
