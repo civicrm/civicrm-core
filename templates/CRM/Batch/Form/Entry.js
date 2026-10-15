@@ -35,7 +35,7 @@ CRM.$(function($) {
 
   // Could be replaced if there ever is a PCP API.
   // See templates/CRM/Contribute/Form/PCP.js.tpl
-  var pcpURL = CRM.url('civicrm/ajax/rest', 'className=CRM_Contact_Page_AJAX&fnName=getPCPList&json=1&context=contact&reset=1');
+  var pcpURL = CRM.url('civicrm/ajax/pcp/list', 'json=1&context=contact&reset=1');
   $('input[name^="pcp_made_through_id"]').each(function() {
     // Figure out the name of the corresponding pcp_made_through[X] field
     var thisMadeThroughName = $(this).attr('name').replace('through_id', 'through');

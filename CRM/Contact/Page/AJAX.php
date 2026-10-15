@@ -144,9 +144,7 @@ class CRM_Contact_Page_AJAX {
    * Fetch PCP ID by PCP Supporter sort_name, also displays PCP title and associated Contribution Page title
    */
   public static function getPCPList() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $name = $_GET['term'] ?? NULL;
-    $name = CRM_Utils_Type::escape($name, 'String');
+    $name = CRM_Utils_Request::retrieve('term', 'String') ?? '';
     $limit = $max = Civi::settings()->get('search_autocomplete_count');
 
     $where = ' AND pcp.page_id = cp.id AND pcp.contact_id = cc.id';
@@ -160,14 +158,19 @@ class CRM_Contact_Page_AJAX {
     }
     $includeEmailFrom = $includeNickName = '';
     if ($config->includeNickNameInName) {
-      $includeNickName = " OR nick_name LIKE '$strSearch'";
+      $includeNickName = ' OR nick_name LIKE %1';
     }
     if ($config->includeEmailInName) {
-      $includeEmailFrom = "LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id AND eml.is_primary = 1 )";
-      $whereClause = " WHERE ( email LIKE '$strSearch' OR sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
+      $includeEmailFrom = 'LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id AND eml.is_primary = 1 )';
+      $whereClause = " WHERE ( email LIKE %1 OR sort_name LIKE %1 $includeNickName ) {$where} ";
     }
     else {
-      $whereClause = " WHERE ( sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
+      $whereClause = " WHERE ( sort_name LIKE %1 $includeNickName ) {$where} ";
+    }
+
+    [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
+    if ($aclWhere) {
+      $whereClause .= " AND {$aclWhere} ";
     }
 
     $offset = $count = 0;
@@ -183,19 +186,21 @@ class CRM_Contact_Page_AJAX {
         FROM (
             SELECT pcp.id as id, CONCAT_WS( ' :: ', {$select} ) as data, sort_name
             FROM civicrm_pcp pcp, civicrm_contribution_page cp, civicrm_contact cc
+            {$aclFrom}
             {$includeEmailFrom}
             {$whereClause} AND pcp.page_type = 'contribute'
             UNION ALL
             SELECT pcp.id as id, CONCAT_WS( ' :: ', {$select} ) as data, sort_name
             FROM civicrm_pcp pcp, civicrm_event cp, civicrm_contact cc
+            {$aclFrom}
             {$includeEmailFrom}
             {$whereClause} AND pcp.page_type = 'event'
             ) t
         ORDER BY sort_name
-        LIMIT $offset, $limit
-        ";
+        LIMIT " . (int) $offset . ', ' . (int) $limit . '
+        ';
 
-    $dao = CRM_Core_DAO::executeQuery($query);
+    $dao = CRM_Core_DAO::executeQuery($query, [1 => [$strSearch, 'String']]);
     $output = ['results' => [], 'more' => FALSE];
     while ($dao->fetch()) {
       if (++$count > $max) {
