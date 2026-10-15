@@ -31,6 +31,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
   }
 
   public function tearDown(): void {
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
     Afform::revert(FALSE)->addWhere('has_local', '=', TRUE)->execute();
     $this->conditionallyDeleteTestRecords();
     parent::tearDown();
@@ -654,6 +655,137 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $this->assertCount(2, $result);
     $this->assertEquals('Activity 2', $result[0]['data']['Contact_ActivityContact_Activity_01.subject']);
     $this->assertEquals('Activity 3', $result[1]['data']['Contact_ActivityContact_Activity_01.subject']);
+  }
+
+  /**
+   * Test that a search display in an Afform with joined entities works for a user
+   * with limited permissions (e.g. 'view all contacts') without throwing
+   * authorization errors for Entity::getActions or omitting joined info.
+   */
+  public function testLockedDownSearchWithJoinedInfo(): void {
+    $contact = $this->createTestRecord('Individual', [
+      'first_name' => 'Alice',
+      'last_name' => 'Wonderland',
+    ]);
+    $this->createTestRecord('Address', [
+      'contact_id' => $contact['id'],
+      'street_address' => '123 Rabbit Hole',
+    ]);
+    $this->createTestRecord('Phone', [
+      'contact_id' => $contact['id'],
+      'phone' => '555-1234',
+    ]);
+    $this->createTestRecord('Email', [
+      'contact_id' => $contact['id'],
+      'email' => 'alice@wonderland.org',
+    ]);
+
+    $this->createTestRecord('SavedSearch', [
+      'name' => 'Locked_Down_Search',
+      'label' => 'Locked Down Search',
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'id',
+          'display_name',
+          'Contact_Address_contact_id_01.street_address',
+          'Contact_Phone_contact_id_01.phone',
+          'Contact_Email_contact_id_01.email',
+        ],
+        'where' => [
+          ['id', '=', $contact['id']],
+        ],
+        'join' => [
+          [
+            'Address AS Contact_Address_contact_id_01',
+            'LEFT',
+            ['id', '=', 'Contact_Address_contact_id_01.contact_id'],
+          ],
+          [
+            'Phone AS Contact_Phone_contact_id_01',
+            'LEFT',
+            ['id', '=', 'Contact_Phone_contact_id_01.contact_id'],
+          ],
+          [
+            'Email AS Contact_Email_contact_id_01',
+            'LEFT',
+            ['id', '=', 'Contact_Email_contact_id_01.contact_id'],
+          ],
+        ],
+      ],
+    ]);
+
+    $this->createTestRecord('SearchDisplay', [
+      'name' => 'Locked_Down_Display',
+      'label' => 'Locked Down Display',
+      'saved_search_id.name' => 'Locked_Down_Search',
+      'type' => 'table',
+      'settings' => [
+        'columns' => [
+          [
+            'key' => 'display_name',
+            'label' => 'Display Name',
+            'type' => 'field',
+          ],
+          [
+            'key' => 'Contact_Address_contact_id_01.street_address',
+            'label' => 'Street Address',
+            'type' => 'field',
+          ],
+          [
+            'key' => 'Contact_Phone_contact_id_01.phone',
+            'label' => 'Phone',
+            'type' => 'field',
+          ],
+          [
+            'key' => 'Contact_Email_contact_id_01.email',
+            'label' => 'Email',
+            'type' => 'field',
+          ],
+        ],
+      ],
+      'acl_bypass' => FALSE,
+    ]);
+
+    $markup = <<<HTML
+      <div af-fieldset="">
+        <af-field name="display_name" />
+        <crm-search-display-table search-name="Locked_Down_Search" display-name="Locked_Down_Display"></crm-search-display-table>
+      </div>
+      HTML;
+
+    Afform::create(FALSE)
+      ->addValue('name', 'Locked_Down_Afform')
+      ->addValue('title', 'Locked Down Afform')
+      ->setLayoutFormat('html')
+      ->addValue('layout', $markup)
+      ->execute();
+
+    $logFile = \CRM_Core_Error::generateLogFileName('');
+    $logBefore = file_exists($logFile) ? file_get_contents($logFile) : '';
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts'];
+
+    $result = civicrm_api4('SearchDisplay', 'run', [
+      'return' => 'page:1',
+      'savedSearch' => 'Locked_Down_Search',
+      'display' => 'Locked_Down_Display',
+      'afform' => 'Locked_Down_Afform',
+    ]);
+
+    $logAfter = file_get_contents($logFile);
+    $newLogs = substr($logAfter, strlen($logBefore));
+
+    $this->assertStringNotContainsString('API4 Request Authorization failed: Address::getActions', $newLogs);
+    $this->assertStringNotContainsString('API4 Request Authorization failed: Phone::getActions', $newLogs);
+    $this->assertStringNotContainsString('API4 Request Authorization failed: Email::getActions', $newLogs);
+
+    $this->assertCount(1, $result);
+    $this->assertEquals('Alice Wonderland', $result[0]['data']['display_name']);
+    $this->assertEquals('123 Rabbit Hole', $result[0]['data']['Contact_Address_contact_id_01.street_address']);
+    $this->assertEquals('555-1234', $result[0]['data']['Contact_Phone_contact_id_01.phone']);
+    $this->assertEquals('alice@wonderland.org', $result[0]['data']['Contact_Email_contact_id_01.email']);
   }
 
 }
