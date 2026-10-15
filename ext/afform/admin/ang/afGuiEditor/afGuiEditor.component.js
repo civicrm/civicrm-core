@@ -634,29 +634,34 @@
 
       // Get all fields on the form for a particular entity
       this.getEntityFields = function(entityName) {
-        const fieldsets = afGui.findRecursive(editor.layout['#children'], {'af-fieldset': entityName}),
-          entityType = editor.getEntity(entityName).type,
-          entityFields = {fields: [], joins: []},
-          isJoin = (item) => Boolean(item && item['af-join']);
+        const fieldsets = afGui.findRecursive(editor.layout['#children'], {'af-fieldset': entityName});
+        const entityType = editor.getEntity(entityName).type;
+        const entityFields = {fields: [], joins: []};
+        const isJoin = (item) => Boolean(item && item['af-join']);
+
         fieldsets.forEach((fieldset) => {
           afGui.getFormElements(fieldset['#children'], {'#tag': 'af-field'}, isJoin).forEach((field) => {
             if (field.name) {
               entityFields.fields.push(fillFieldDefn(entityType, field));
             }
           });
+
+          // track multiple joins to the same entity
+          const entityJoinCounts = {};
           afGui.getFormElements(fieldset['#children'], isJoin).forEach((join) => {
-            const joinFields = [];
-            afGui.getFormElements(join['#children'], {'#tag': 'af-field'}).forEach((field) => {
-              if (field.name) {
-                joinFields.push(fillFieldDefn(join['af-join'], field));
-              }
+            const entity = join['af-join'];
+            const joinIndex = entityJoinCounts[entity] = (entity in entityJoinCounts) ? (entityJoinCounts[entity] + 1) : 0;
+
+            const joinFields = afGui.getFormElements(join['#children'], {'#tag': 'af-field'})
+              .filter((field) => field.name)
+              .map((field) => fillFieldDefn(join['af-join'], field));
+
+            entityFields.joins.push({
+              entity: entity,
+              joinIndex: joinIndex,
+              label: afGui.getEntity(entity).label,
+              fields: joinFields
             });
-            if (joinFields.length) {
-              entityFields.joins.push({
-                entity: join['af-join'],
-                fields: joinFields
-              });
-            }
           });
         });
         return entityFields;
