@@ -27,5 +27,6 @@
     <path>civicrm/ajax/tagTree</path>
     <page_callback>CRM_Admin_Page_AJAX::getTagTree</page_callback>
     <access_arguments>administer CiviCRM;manage tags</access_arguments>
+    <is_ajax>true</is_ajax>
   </item>
 </menu>

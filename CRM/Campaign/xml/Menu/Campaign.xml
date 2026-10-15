@@ -134,6 +134,7 @@
      <path>civicrm/campaign/registerInterview</path>
      <page_callback>CRM_Campaign_Page_AJAX::registerInterview</page_callback>
      <access_arguments>administer CiviCampaign;manage campaign;interview campaign contacts</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/survey/configure/main</path>

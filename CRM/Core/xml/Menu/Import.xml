@@ -61,6 +61,7 @@
     <path>civicrm/ajax/status</path>
     <page_callback>CRM_Contact_Import_Page_AJAX::status</page_callback>
     <access_arguments>import contacts,access CiviCRM</access_arguments>
+    <is_ajax>true</is_ajax>
   </item>
   <item>
     <path>civicrm/import/datasource</path>
