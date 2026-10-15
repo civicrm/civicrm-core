@@ -74,7 +74,17 @@ function civicrm_api3_contribution_create($params) {
   }
   _civicrm_api3_contribution_create_legacy_support_45($params);
 
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
+  $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Contribution');
+
+  // card_type_id & pan_truncation describe the payment instrument rather than the contribution
+  // itself, so they aren't part of the fields the BAO writes - apply them to the latest payment
+  // trxn here instead. This only matters on update - on create getTrxnParams() already carries
+  // these through onto the financial trxn it creates. CRM-20158.
+  if (!empty($params['id']) && (isset($params['card_type_id']) || isset($params['pan_truncation']))) {
+    CRM_Core_BAO_FinancialTrxn::updateCreditCardDetails($result['id'], $params['pan_truncation'] ?? NULL, $params['card_type_id'] ?? NULL);
+  }
+
+  return $result;
 }
 
 /**

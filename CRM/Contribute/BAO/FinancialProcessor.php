@@ -469,9 +469,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
               ]);
             }
           }
-          $cardType = $params['card_type_id'] ?? NULL;
-          $panTruncation = $params['pan_truncation'] ?? NULL;
-          CRM_Core_BAO_FinancialTrxn::updateCreditCardDetails($this->getUpdatedContribution()->id, $panTruncation, $cardType);
         }
       }
 
