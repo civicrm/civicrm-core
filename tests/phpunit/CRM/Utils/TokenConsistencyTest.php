@@ -565,7 +565,7 @@ contribution_recur.cancel_date :August 19th, 2021  9:12 AM
 contribution_recur.cancel_reason :Because
 contribution_recur.end_date :July 26th, 2021  6:07 PM
 contribution_recur.processor_id :abc
-contribution_recur.payment_token_id :1
+contribution_recur.payment_token_id :' . $this->contributionRecur['payment_token_id'] . '
 contribution_recur.trxn_id :123
 contribution_recur.invoice_id :inv123
 contribution_recur.contribution_status_id :2
@@ -575,7 +575,7 @@ contribution_recur.next_sched_contribution_date :September 8th, 2021
 contribution_recur.failure_count :0
 contribution_recur.failure_retry_date :January 3rd, 2020
 contribution_recur.auto_renew:label :Yes
-contribution_recur.payment_processor_id :1
+contribution_recur.payment_processor_id :' . $this->contributionRecur['payment_processor_id'] . '
 contribution_recur.financial_type_id :2
 contribution_recur.payment_instrument_id :4
 contribution_recur.is_email_receipt:label :Yes
@@ -642,7 +642,7 @@ contribution_recur.payment_instrument_id:name :Check
     $this->callAPISuccess('ActionSchedule', 'create', [
       'title' => 'job',
       'subject' => 'job',
-      'entity_value' => 1,
+      'entity_value' => CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'membership_type_id', 'General'),
       'mapping_id' => 4,
       'start_action_date' => 'membership_join_date',
       'start_action_offset' => 1,

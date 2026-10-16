@@ -140,7 +140,7 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
         'entity_id.start_date' => '2007-01-21',
         'entity_id.end_date' => '2007-12-21',
         'entity_id.source' => 'Payment',
-        'entity_id.membership_type_id' => 1,
+        'entity_id.membership_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'membership_type_id', 'General'),
       ])
       ->addChain('ContributionSoft', ContributionSoft::create()
         ->setValues([
