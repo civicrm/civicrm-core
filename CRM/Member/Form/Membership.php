@@ -33,8 +33,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public $_mode;
 
-  protected $_memTypeSelected;
-
   /**
    * Contact ID of the member.
    *
@@ -976,19 +974,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     //TODO: set memberships, fixme
     $this->setContextVariables($formValues);
     $originalMembershipType = $this->getMembershipValue('membership_type_id');
-
-    // Order::getPriceSetMetadata() deliberately strips 'fields' (it manages
-    // price-field metadata through its own accessor), so it is not a
-    // substitute for $this->_priceSet here - getPriceFieldIDs() needs that
-    // key to map submitted price_N checkbox values back to membership types
-    // when membership_type_id itself isn't submitted directly.
-    $this->getOrder();
-    $selectedMemberships = $this->_memTypeSelected = self::getSelectedMemberships(
-      $this->_priceSet,
-      $formValues
-    );
-
-    $lineItem = [$this->order->getPriceSetID() => $this->order->getLineItems()];
+    $lineItem = [$this->getOrder()->getPriceSetID() => $this->getOrder()->getLineItems()];
 
     $params['tax_amount'] = $this->order->getTotalTaxAmount();
     $params['total_amount'] = $this->order->getTotalAmount();
@@ -1111,7 +1097,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $params['status_id'] = $pendingMembershipStatusId;
         $params['skipStatusCal'] = TRUE;
         // as membership is pending set dates to null.
-        foreach ($selectedMemberships as $memType) {
+        foreach (array_keys($this->getOrder()->getMembershipTypes()) as $memType) {
           $membershipTypeValues[$memType]['joinDate'] = NULL;
           $membershipTypeValues[$memType]['startDate'] = NULL;
           $membershipTypeValues[$memType]['endDate'] = NULL;
@@ -1129,7 +1115,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $params['action'] = $this->_action;
 
       // create membership record
-      foreach ($selectedMemberships as $memType) {
+      foreach (array_keys($this->getOrder()->getMembershipTypes()) as $memType) {
         $membershipParams = array_merge($membershipTypeValues[$memType], $params);
         if (isset($result['fee_amount'])) {
           $membershipParams['fee_amount'] = $result['fee_amount'];
@@ -1225,7 +1211,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     // if selected membership doesn't match with earlier membership
-    if ($originalMembershipType && !in_array($originalMembershipType, $selectedMemberships)) {
+    if ($originalMembershipType && !in_array($originalMembershipType, array_keys($this->getOrder()->getMembershipTypes()))) {
       $this->updateContributionOnMembershipTypeChange($params);
     }
 
@@ -1469,8 +1455,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected function setStatusMessage() {
     //CRM-15187
     // display message when membership type is changed
-    if (($this->_action & CRM_Core_Action::UPDATE) && $this->getMembershipID() && !in_array($this->getMembershipValue('membership_type_id'), $this->_memTypeSelected)) {
-      $lineItems = CRM_Price_BAO_LineItem::getLineItems($this->getMembershipID(), 'membership');
+    $typeIDs = [];
+    foreach ($this->getOrder()->getMembershipTypes() as $membershipType) {
+      $typeIDs[] = $membershipType['id'];
+    }
+    if (($this->_action & CRM_Core_Action::UPDATE) && $this->getMembershipID() && !in_array($this->getMembershipValue('membership_type_id'), $typeIDs)) {
+      $lineItems = (array) LineItem::get(FALSE)
+        ->addWhere('entity_id', '=', $this->getMembershipID())
+        ->addWhere('entity_table', '=', 'civicrm_membership')
+        ->execute()->indexBy('id');
+
       if (empty($lineItems)) {
         return;
       }
@@ -1538,8 +1532,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   protected function getSelectedMembershipLabels(): string {
     $return = [];
-    foreach ($this->_memTypeSelected as $membershipTypeID) {
-      $return[] = $this->allMembershipTypeDetails[$membershipTypeID]['name'];
+    foreach ($this->getOrder()->getMembershipTypes() as $membershipType) {
+      $return[] = $this->allMembershipTypeDetails[$membershipType['id']]['name'];
     }
     return implode(', ', $return);
   }
@@ -1689,12 +1683,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   protected function getMembershipParameters(): array {
     $membershipTypeValues = [];
-    foreach ($this->_memTypeSelected as $memType) {
-      $membershipTypeValues[$memType]['membership_type_id'] = $memType;
+    foreach ($this->getOrder()->getMembershipTypes() as $membershipType) {
+      $membershipTypeValues[$membershipType['id']]['membership_type_id'] = $membershipType['id'];
       if (is_numeric($this->getSubmittedValue('max_related'))) {
         // The BAO will set from the membership type is not passed in but we should
         // not set this if we don't need to to let the BAO do it's thing.
-        $membershipTypeValues[$memType]['max_related'] = $this->getSubmittedValue('max_related');
+        $membershipTypeValues[$membershipType['id']]['max_related'] = $this->getSubmittedValue('max_related');
       }
     }
     // Really we don't need to do all this unless one of the join dates
