@@ -300,7 +300,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
         $nRows[$diff['id']][] = ['field' => '', 'from' => $from, 'to' => $to];
       }
       else {
-        $nRows[$diff['id']][] = ['field' => $field . " (id: {$diff['id']})", 'from' => $from, 'to' => $to];
+        $nRows[$diff['id']][] = ['field' => $field . " (record id: {$diff['id']})", 'from' => $from, 'to' => $to];
       }
     }
     // Transform the output so that we can compact the changes into the proper amount of rows IF trData is holding more than 1 array

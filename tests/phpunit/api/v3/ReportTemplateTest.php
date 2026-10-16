@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ActivityContact;
 use Civi\Api4\Contact;
 use Civi\Test\ACLPermissionTrait;
 
@@ -1647,6 +1648,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     \Civi::settings()->set('logging', 1);
     $this->createContactsWithActivities();
     $this->doQuestionableStuffInASeparateFunctionSoNobodyNotices();
+    $originalAssigneeRecordID = $this->getActivityAssigneeRecordID();
 
     // Do something that creates an update record.
     $this->callAPISuccess('Activity', 'create', [
@@ -1654,6 +1656,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'assignee_contact_id' => $this->contactIDs[0],
       'details' => 'Edited details',
     ]);
+    $newAssigneeRecordID = $this->getActivityAssigneeRecordID();
 
     // In normal UI flow you would go to the summary report and drill down,
     // but here we need to go directly to the connection id, so find out what
@@ -1682,9 +1685,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       // here's the delete
       0 => [
         'field' => [
-          0 => 'Activity ID (id: 2)',
-          1 => 'Contact ID (id: 2)',
-          2 => 'Activity Contact Type (id: 2)',
+          0 => "Activity ID (record id: $originalAssigneeRecordID)",
+          1 => "Contact ID (record id: $originalAssigneeRecordID)",
+          2 => "Activity Contact Type (record id: $originalAssigneeRecordID)",
         ],
         'from' => [
           0 => 'Very secret meeting (id: 1)',
@@ -1700,9 +1703,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       // this is the insert
       1 => [
         'field' => [
-          0 => 'Activity ID (id: 5)',
-          1 => 'Contact ID (id: 5)',
-          2 => 'Activity Contact Type (id: 5)',
+          0 => "Activity ID (record id: $newAssigneeRecordID)",
+          1 => "Contact ID (record id: $newAssigneeRecordID)",
+          2 => "Activity Contact Type (record id: $newAssigneeRecordID)",
         ],
         'from' => [
           0 => '',
@@ -1719,6 +1722,18 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals($expectedValues, $values);
 
     \Civi::settings()->set('logging', 0);
+  }
+
+  /**
+   * Get the id of the assignee ActivityContact record for $this->activityID.
+   *
+   * The record is created as a side effect of creating or updating the activity.
+   */
+  private function getActivityAssigneeRecordID(): int {
+    return ActivityContact::get(FALSE)
+      ->addWhere('activity_id', '=', $this->activityID)
+      ->addWhere('record_type_id:name', '=', 'Activity Assignees')
+      ->execute()->single()['id'];
   }
 
   /**
