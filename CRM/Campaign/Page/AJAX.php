@@ -506,14 +506,12 @@ class CRM_Campaign_Page_AJAX {
 
   public static function campaignGroups() {
     $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Positive',
-      CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST'
+      NULL, TRUE, NULL, 'POST'
     );
     $campGroups = [];
-    if ($surveyId) {
-      $campaignId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $surveyId, 'campaign_id');
-      if ($campaignId) {
-        $campGroups = CRM_Campaign_BAO_Campaign::getCampaignGroups($campaignId);
-      }
+    $campaignId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $surveyId, 'campaign_id');
+    if ($campaignId) {
+      $campGroups = CRM_Campaign_BAO_Campaign::getCampaignGroups($campaignId);
     }
 
     //CRM-7406 --If there is no campaign or no group associated with

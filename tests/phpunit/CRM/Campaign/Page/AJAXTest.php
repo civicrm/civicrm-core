@@ -404,4 +404,42 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
     CRM_Campaign_Page_AJAX::voterList();
   }
 
+  /**
+   * Test campaignGroups is denied when survey_id is missing.
+   */
+  public function testCampaignGroupsRequiresSurveyId(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'reserve campaign contacts']);
+
+    $_POST = $_REQUEST = [];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('Could not find valid value for survey_id');
+    CRM_Campaign_Page_AJAX::campaignGroups();
+  }
+
+  /**
+   * Test campaignGroups succeeds with valid survey and permission.
+   */
+  public function testCampaignGroupsSuccess(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'reserve campaign contacts']);
+
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'Groups Test Survey',
+      'activity_type_id:name' => 'Survey',
+    ]);
+
+    $_POST = $_REQUEST = ['survey_id' => $survey['id']];
+
+    try {
+      CRM_Campaign_Page_AJAX::campaignGroups();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('success', $e->errorData['status']);
+      $this->assertIsArray($e->errorData['groups']);
+      $this->assertEquals('', $e->errorData['groups'][0]['value']);
+    }
+  }
+
 }
