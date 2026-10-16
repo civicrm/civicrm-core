@@ -173,7 +173,7 @@ function civicrm_api3_entity_tag_replace($params) {
 
     return civicrm_api3_create_success($result, $params, 'EntityTag', 'replace');
   }
-  catch (Exception $e) {
+  catch (Throwable $e) {
     $transaction->rollback();
     return civicrm_api3_create_error($e->getMessage());
   }
