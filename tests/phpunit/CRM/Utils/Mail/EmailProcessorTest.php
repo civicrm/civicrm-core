@@ -191,13 +191,14 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
    * Copy a bounce from data/bounces into the mail directory.
    *
    * The bounces are addressed to b.2.1.aaaaaaaaaaaaaaaz, so point them at the
-   * event queue set up by setUpMailing().
+   * job and event queue set up by setUpMailing().
    *
    * @param string $fileName
    */
   private function addBounceToMailDirectory(string $fileName): void {
+    $jobID = $this->eventQueue['values'][$this->eventQueue['id']]['job_id'];
     $bounce = file_get_contents(__DIR__ . '/data/bounces/' . $fileName);
-    $bounce = str_replace('b.2.1.', 'b.2.' . $this->eventQueue['id'] . '.', $bounce);
+    $bounce = str_replace('b.2.1.', 'b.' . $jobID . '.' . $this->eventQueue['id'] . '.', $bounce);
     file_put_contents(__DIR__ . '/data/mail/' . $fileName, $bounce);
   }
 

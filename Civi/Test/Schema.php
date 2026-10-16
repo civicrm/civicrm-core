@@ -293,7 +293,7 @@ class Schema {
       // 'civicrm_mailing_event_trackable_url_open',
       // 'civicrm_mailing_event_unsubscribe',
       // 'civicrm_mailing_group',
-      'civicrm_mailing_job',
+      // 'civicrm_mailing_job',
       // 'civicrm_mailing_recipients',
       // 'civicrm_mailing_spool',
       // 'civicrm_mailing_trackable_url',
