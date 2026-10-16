@@ -68,6 +68,12 @@ module.exports = function(config) {
       'ext/civi_case/ang/*.js',
       'ext/civi_case/ang/**/*.js',
       'ext/civi_case/ang/**/*.html',
+      // Afform pulls every field-input-type module into `af`'s requires, so the
+      // afCheckout module (from civi_contribute) must load or any spec that uses
+      // `af` - e.g. crmMailing - fails to instantiate it.
+      'ext/civi_contribute/ang/*.js',
+      'ext/civi_contribute/ang/**/*.js',
+      'ext/civi_contribute/ang/**/*.html',
       'ext/afform/core/ang/*.js',
       'ext/afform/core/ang/**/*.js',
       'ext/afform/core/ang/**/*.html'
