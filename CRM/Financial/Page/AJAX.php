@@ -135,20 +135,6 @@ class CRM_Financial_Page_AJAX {
   }
 
   /**
-   * @param $config
-   */
-  public static function jqFinancialType($config) {
-    if (!isset($_GET['_value']) ||
-      empty($_GET['_value'])
-    ) {
-      CRM_Utils_System::civiExit();
-    }
-    $productId = CRM_Utils_Request::retrieve('_value', 'Positive');
-    $elements = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Product', $productId, 'financial_type_id');
-    CRM_Utils_JSON::output($elements);
-  }
-
-  /**
    * Callback to perform action on batch records.
    */
   public static function assignRemove() {
