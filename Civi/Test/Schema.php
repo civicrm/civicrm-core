@@ -317,7 +317,7 @@ class Schema {
       'civicrm_participant',
       'civicrm_participant_payment',
       // 'civicrm_participant_status_type',
-      'civicrm_payment_processor',
+      // 'civicrm_payment_processor',
       // 'civicrm_payment_processor_type',
       // 'civicrm_payment_token',
       // 'civicrm_pcp',
