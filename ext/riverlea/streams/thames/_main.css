@@ -202,6 +202,7 @@
   --crm-dropdown-hover-text-color: var(--crm-c-blue-dark);
   --crm-dropdown-hover-bg-color: var(--crm-c-blue-light);
   --crm-dropdown-width: 23ch;
+  --crm-dropdown-radius: 4px;
 }
 :root {
 /* Notifications */
@@ -438,12 +439,6 @@ html.cms-standalone body {
 /* .crm-container button.close { */
 /*   color: var(--crm-c-blue-darker) !important; */
 /* } */
-
-/* DROPDOWNS */
-.crm-container .btn-group .dropdown-menu,
-.crm-container .btn.dropdown-toggle+.dropdown-menu {
-  border-radius: 4px;
-}
 
 /* FORMS */
 
