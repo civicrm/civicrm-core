@@ -330,7 +330,7 @@ class Schema {
       // 'civicrm_premiums',
       // 'civicrm_premiums_product',
       'civicrm_prevnext_cache',
-      'civicrm_price_field',
+      // 'civicrm_price_field',
       // 'civicrm_price_field_value',
       // 'civicrm_price_set',
       'civicrm_price_set_entity',

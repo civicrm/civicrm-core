@@ -264,7 +264,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
     //Change selection to a lower amount.
     $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
-      'price_2' => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
+      'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
     ], [
       'id' => $contributionID,
