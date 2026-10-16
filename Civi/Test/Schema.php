@@ -315,7 +315,7 @@ class Schema {
       // 'civicrm_option_group',
       // 'civicrm_option_value',
       'civicrm_participant',
-      'civicrm_participant_payment',
+      // 'civicrm_participant_payment',
       // 'civicrm_participant_status_type',
       'civicrm_payment_processor',
       // 'civicrm_payment_processor_type',

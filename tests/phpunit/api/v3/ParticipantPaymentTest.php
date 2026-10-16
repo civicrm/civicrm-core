@@ -255,7 +255,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
    */
   public function _checkFinancialRecords($params, $context): void {
     $entityParams = [
-      'entity_id' => $params['id'],
+      'entity_id' => $params['contribution_id'],
       'entity_table' => 'civicrm_contribution',
     ];
     $trxn = current($this->retrieveEntityFinancialTrxn($entityParams));
