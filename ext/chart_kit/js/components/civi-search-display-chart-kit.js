@@ -318,6 +318,14 @@
       }
     }
 
+    // Whether this chart draws bars on the coordinate grid. Bar charts need a band
+    // scale so each bar has a width; line/area/series-as-line charts do not.
+    usesBarScale() {
+      return this._settings.chartType === 'bar'
+        || this._settings.seriesDisplayType === 'bar'
+        || this.getColumns().some((col) => col.seriesType === 'bar');
+    }
+
     buildCoordinateGrid() {
       const xCol = this.getFirstColumnForAxis('x');
 
@@ -338,9 +346,20 @@
           break;
 
         case 'integer':
-          this.chart
-            .x(d3.scaleBand().domain(d3.range(min, max + 1)))
-            .xUnits(dc.units.ordinal);
+          // A band scale pads both ends of the axis and places line points at the left
+          // edge of each band, so on a line/series chart the last value never reaches the
+          // right edge (dc forces the band padding, so it can't be tuned away). Only bar
+          // charts need the band width; render line/area on a linear scale so the first
+          // and last values sit on the axis ends, with ticks pinned to whole integers.
+          if (this.usesBarScale()) {
+            this.chart
+              .x(d3.scaleBand().domain(d3.range(min, max + 1)))
+              .xUnits(dc.units.ordinal);
+          }
+          else {
+            this.chart.x(d3.scaleLinear().domain([min, max]));
+            this.chart.xAxis().tickValues(d3.range(min, max + 1));
+          }
           break;
 
         default:
