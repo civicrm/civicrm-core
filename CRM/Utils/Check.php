@@ -248,7 +248,12 @@ class CRM_Utils_Check {
       }
     }
 
-    CRM_Utils_Hook::check($messages, $statusNames, $includeDisabled);
+    try {
+      CRM_Utils_Hook::check($messages, $statusNames, $includeDisabled);
+    }
+    catch (Throwable $e) {
+      $messages[] = self::failedCheckMessage('hook_civicrm_check', $e);
+    }
 
     // Publish the summary of a completed, unfiltered sweep, so a live status view
     // refreshes the cached footer severity instead of it outlasting a cleared warning.
@@ -259,6 +264,27 @@ class CRM_Utils_Check {
     }
 
     return $messages;
+  }
+
+  /**
+   * Report a check that threw instead of returning its messages.
+   *
+   * @param string $name
+   *   The check method, or the hook that failed.
+   * @param \Throwable $e
+   *
+   * @return CRM_Utils_Check_Message
+   * @internal
+   */
+  public static function failedCheckMessage(string $name, Throwable $e): CRM_Utils_Check_Message {
+    Civi::log()->error("System check $name failed: " . $e->getMessage(), ['exception' => $e]);
+    return new CRM_Utils_Check_Message(
+      $name,
+      ts('The system check %1 could not run: %2', [1 => $name, 2 => htmlentities($e->getMessage())]),
+      ts('System Check Failed'),
+      \Psr\Log\LogLevel::WARNING,
+      'fa-bug'
+    );
   }
 
   /**
