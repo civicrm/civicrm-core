@@ -142,4 +142,24 @@ class CRM_Core_SmartyTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Temporary variables are removed even when the template throws a PHP error.
+   */
+  public function testFetchWithCleansUpAfterError(): void {
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->registerPlugin('modifier', 'crmTestThrowError', function () {
+      throw new TypeError('Ruh-roh');
+    });
+    try {
+      $smarty->fetchWith('eval:{$error_variable|crmTestThrowError}', ['error_variable' => 'temporary value']);
+      $this->fail('The error should reach the caller');
+    }
+    catch (TypeError $e) {
+    }
+    finally {
+      $smarty->unregisterPlugin('modifier', 'crmTestThrowError');
+    }
+    $this->assertArrayNotHasKey('error_variable', $smarty->getTemplateVars());
+  }
+
 }

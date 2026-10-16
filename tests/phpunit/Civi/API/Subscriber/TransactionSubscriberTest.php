@@ -160,4 +160,24 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
     $this->assertDBQuery(0, "SELECT COUNT(*) FROM civicrm_email WHERE email IN ('first@example.org', 'second@example.org')");
   }
 
+  /**
+   * A PHP error while replacing tags rolls back the tags already added.
+   */
+  public function testEntityTagReplaceRollsBackOnError(): void {
+    $contactID = $this->individualCreate();
+    $keptTagID = $this->tagCreate(['name' => 'Kept'])['id'];
+    $newTagID = $this->tagCreate(['name' => 'New'])['id'];
+    $this->callAPISuccess('EntityTag', 'create', ['entity_id' => $contactID, 'tag_id' => $keptTagID]);
+    $this->hookClass->setHook('civicrm_pre', function ($op, $objectName) {
+      if ($op === 'delete' && $objectName === 'EntityTag') {
+        throw new \TypeError('Ruh-roh');
+      }
+    });
+    $this->callAPIFailure('EntityTag', 'replace', ['entity_id' => $contactID, 'tag_id' => [$newTagID]], 'Ruh-roh');
+    $this->assertDBQuery($keptTagID, 'SELECT GROUP_CONCAT(tag_id) FROM civicrm_entity_tag WHERE entity_table = %1 AND entity_id = %2', [
+      1 => ['civicrm_contact', 'String'],
+      2 => [$contactID, 'Integer'],
+    ]);
+  }
+
 }
