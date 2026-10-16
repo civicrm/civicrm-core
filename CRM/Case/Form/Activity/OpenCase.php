@@ -32,7 +32,7 @@ class CRM_Case_Form_Activity_OpenCase {
    * @throws \CRM_Core_Exception
    */
   public static function preProcess(&$form): void {
-    if ($form->_context === 'caseActivity') {
+    if ($form instanceof CRM_Case_Form_Activity) {
       $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $form);
       $atype = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Case Start Date');
       $caseId = CRM_Utils_Array::first($form->_caseId);
@@ -76,7 +76,7 @@ class CRM_Case_Form_Activity_OpenCase {
    */
   public static function setDefaultValues(&$form) {
     $defaults = [];
-    if ($form->_context === 'caseActivity') {
+    if ($form instanceof CRM_Case_Form_Activity) {
       return $defaults;
     }
 
@@ -156,7 +156,7 @@ class CRM_Case_Form_Activity_OpenCase {
    * @throws \Exception
    */
   public static function buildQuickForm(&$form) {
-    if ($form->_context == 'caseActivity') {
+    if ($form instanceof CRM_Case_Form_Activity) {
       return;
     }
     if ($form->_context == 'standalone') {
@@ -236,7 +236,7 @@ class CRM_Case_Form_Activity_OpenCase {
    * @param array $params
    */
   public static function beginPostProcess(&$form, &$params) {
-    if ($form->_context == 'caseActivity') {
+    if ($form instanceof CRM_Case_Form_Activity) {
       return;
     }
 
@@ -265,7 +265,7 @@ class CRM_Case_Form_Activity_OpenCase {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $form) {
-    if ($form->_context == 'caseActivity') {
+    if ($form instanceof CRM_Case_Form_Activity) {
       return TRUE;
     }
 
@@ -282,7 +282,7 @@ class CRM_Case_Form_Activity_OpenCase {
    * @throws \Exception
    */
   public static function endPostProcess($form, &$params): void {
-    if ($form->_context === 'caseActivity') {
+    if ($form instanceof CRM_Case_Form_Activity) {
       return;
     }
 
