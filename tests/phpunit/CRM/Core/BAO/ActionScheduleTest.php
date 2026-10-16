@@ -2493,6 +2493,51 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
+   * Code running while a reminder is sent sees that recipient's locale.
+   *
+   * The locale comes from a `tokenContext_locale` column, as a mailing query listener may add.
+   */
+  public function testReminderLocaleIsPerRecipient(): void {
+    $frID = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate'])['id'];
+    $this->callAPISuccess('Contact', 'create', ['email' => 'test-birth_day2@example.com'] + $this->fixtures['contact_birthdate']);
+    $this->createScheduleFromFixtures('sched_contact_birth_day_yesterday');
+    $addLocale = function ($e) use ($frID) {
+      $e->query->select("IF(reminder.contact_id = $frID, 'fr_FR', 'de_DE') AS tokenContext_locale");
+    };
+    // Rendering a token message resets the locale here, as no translation files are installed,
+    // so record it at the from-address lookup, which runs before rendering.
+    $seen = NULL;
+    $locales = [];
+    $recordLocale = function ($e) use (&$seen) {
+      if ($e->getApiRequest()['entity'] === 'SiteEmailAddress') {
+        $seen = \Civi\Core\Locale::detect()->nominal;
+      }
+    };
+    \Civi::dispatcher()->addListener('civi.actionSchedule.prepareMailingQuery', $addLocale);
+    \Civi::dispatcher()->addListener('civi.api.prepare', $recordLocale);
+    $this->hookClass->setHook('civicrm_alterMailParams', function ($params) use (&$seen, &$locales) {
+      $locales[$params['toEmail']] = $seen;
+    });
+    try {
+      $this->assertCronRuns([
+        [
+          'time' => '2005-07-08 20:00:00',
+          'recipients' => [['test-birth_day@example.com'], ['test-birth_day2@example.com']],
+        ],
+      ]);
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('civi.actionSchedule.prepareMailingQuery', $addLocale);
+      \Civi::dispatcher()->removeListener('civi.api.prepare', $recordLocale);
+    }
+    ksort($locales);
+    $this->assertEquals([
+      'test-birth_day2@example.com' => 'de_DE',
+      'test-birth_day@example.com' => 'fr_FR',
+    ], $locales);
+  }
+
+  /**
    * Run a series of cron jobs and make an assertion about email deliveries.
    *
    * @param array $cronRuns
