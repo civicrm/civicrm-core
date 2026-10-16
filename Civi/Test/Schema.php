@@ -357,7 +357,7 @@ class Schema {
       // 'civicrm_subscription_history',
       // 'civicrm_survey',
       // 'civicrm_system_log',
-      'civicrm_tag',
+      // 'civicrm_tag',
       // 'civicrm_tell_friend',
       // 'civicrm_timezone',
       // 'civicrm_totp',
