@@ -106,4 +106,40 @@ class SearchSaveFileTest extends \PHPUnit\Framework\TestCase implements Headless
     $this->assertEquals($file->id, $entityFiles->first()['file_id']);
   }
 
+  /**
+   * A failure while rendering the file does not leave output buffering open.
+   */
+  public function testSaveCsvFileErrorClosesOutputBuffer() {
+    SavedSearch::create(FALSE)
+      ->setValues([
+        'name' => 'TestContactCsv',
+        'label' => 'TestContactCsv',
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id'],
+          'where' => [],
+        ],
+      ])
+      ->execute();
+    $obLevel = ob_get_level();
+    // The CSV writer rejects a delimiter longer than one character.
+    $swap = \CRM_Utils_AutoClean::swapSettings(['fieldSeparator' => '||']);
+    try {
+      civicrm_api4('SearchDisplay', 'saveFile', [
+        'checkPermissions' => FALSE,
+        'format' => 'csv',
+        'savedSearch' => 'TestContactCsv',
+        'afform' => NULL,
+        'reportName' => 'Save File Test',
+        'fileName' => 'Test_File',
+      ]);
+      $this->fail('Expected an exception from the CSV writer');
+    }
+    catch (\Throwable $e) {
+      $this->assertInstanceOf(\League\Csv\Exception::class, $e);
+    }
+    $this->assertEquals($obLevel, ob_get_level());
+  }
+
 }
