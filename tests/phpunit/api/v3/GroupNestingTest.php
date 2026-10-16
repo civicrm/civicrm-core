@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\GroupNesting;
+
 /**
  * Test class for GroupNesting API - civicrm_group_nesting_*
  *
@@ -82,14 +84,16 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('group_nesting', 'get', $params);
 
     // expected data loaded in setUp
+    $child3ParentNestingID = $this->getGroupNestingID('child3', 'parent');
+    $child3ChildNestingID = $this->getGroupNestingID('child3', 'child');
     $expected = [
-      3 => [
-        'id' => 3,
+      $child3ParentNestingID => [
+        'id' => $child3ParentNestingID,
         'child_group_id' => $this->ids['Group']['child3'],
         'parent_group_id' => $this->ids['Group']['parent'],
       ],
-      4 => [
-        'id' => 4,
+      $child3ChildNestingID => [
+        'id' => $child3ChildNestingID,
         'child_group_id' => $this->ids['Group']['child3'],
         'parent_group_id' => $this->ids['Group']['child'],
       ],
@@ -111,25 +115,38 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('group_nesting', 'get', $params);
 
     // expected data loaded in setUp
+    $childNestingID = $this->getGroupNestingID('child', 'parent');
+    $child2NestingID = $this->getGroupNestingID('child2', 'parent');
+    $child3NestingID = $this->getGroupNestingID('child3', 'parent');
     $expected = [
-      1 => [
-        'id' => 1,
+      $childNestingID => [
+        'id' => $childNestingID,
         'child_group_id' => $this->ids['Group']['child'],
         'parent_group_id' => $this->ids['Group']['parent'],
       ],
-      2 => [
-        'id' => 2,
+      $child2NestingID => [
+        'id' => $child2NestingID,
         'child_group_id' => $this->ids['Group']['child2'],
         'parent_group_id' => $this->ids['Group']['parent'],
       ],
-      3 => [
-        'id' => 3,
+      $child3NestingID => [
+        'id' => $child3NestingID,
         'child_group_id' => $this->ids['Group']['child3'],
         'parent_group_id' => $this->ids['Group']['parent'],
       ],
     ];
 
     $this->assertEquals($expected, $result['values']);
+  }
+
+  /**
+   * Get the id of the nesting created in setUp by passing 'parents' to Group create.
+   */
+  private function getGroupNestingID(string $child, string $parent): int {
+    return GroupNesting::get(FALSE)
+      ->addWhere('child_group_id', '=', $this->ids['Group'][$child])
+      ->addWhere('parent_group_id', '=', $this->ids['Group'][$parent])
+      ->execute()->single()['id'];
   }
 
   /**

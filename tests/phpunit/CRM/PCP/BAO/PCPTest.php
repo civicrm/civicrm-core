@@ -104,14 +104,14 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccess('ContributionPage', 'create', $submitParams);
     $contributionPage = $this->callAPISuccessGetSingle('ContributionPage', []);
-    $this->callAPISuccess('Pcp', 'create', ['contact_id' => $contactID, 'title' => 'pcp', 'page_id' => $contributionPage['id'], 'pcp_block_id' => $block->id, 'is_active' => TRUE, 'status_id' => 'Approved']);
+    $pcpID = $this->callAPISuccess('Pcp', 'create', ['contact_id' => $contactID, 'title' => 'pcp', 'page_id' => $contributionPage['id'], 'pcp_block_id' => $block->id, 'is_active' => TRUE, 'status_id' => 'Approved'])['id'];
     $this->assertEquals([
       [],
       [
         [
           'pageTitle' => $contributionPage['title'],
-          'action' => '<span><a href="/index.php?q=civicrm/pcp/info&amp;reset=1&amp;id=' . $contributionPage['id'] . '&amp;component=contribute" class="action-item crm-hover-button" title=\'URL for this Page\' >URL for this Page</a><a href="/index.php?q=civicrm/friend&amp;eid=1&amp;blockId=1&amp;reset=1&amp;pcomponent=pcp&amp;component=contribute" class="action-item crm-hover-button" title=\'Tell Friends\' >Tell Friends</a></span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="/index.php?q=civicrm/pcp/info&amp;action=update&amp;reset=1&amp;id=1&amp;component=contribute" class="action-item crm-hover-button" title=\'Configure\' >Edit Your Page</a></li><li><a href="/index.php?q=civicrm/pcp/info&amp;action=browse&amp;reset=1&amp;id=1&amp;component=contribute" class="action-item crm-hover-button" title=\'Update Contact Information\' >Update Contact Information</a></li><li><a href="/index.php?q=civicrm/pcp&amp;action=disable&amp;reset=1&amp;id=1&amp;component=contribute" class="action-item crm-hover-button" title=\'Disable\' >Disable</a></li></ul></span>',
-          'pcpId' => '1',
+          'action' => '<span><a href="/index.php?q=civicrm/pcp/info&amp;reset=1&amp;id=' . $pcpID . '&amp;component=contribute" class="action-item crm-hover-button" title=\'URL for this Page\' >URL for this Page</a><a href="/index.php?q=civicrm/friend&amp;eid=' . $pcpID . '&amp;blockId=' . $block->id . '&amp;reset=1&amp;pcomponent=pcp&amp;component=contribute" class="action-item crm-hover-button" title=\'Tell Friends\' >Tell Friends</a></span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="/index.php?q=civicrm/pcp/info&amp;action=update&amp;reset=1&amp;id=' . $pcpID . '&amp;component=contribute" class="action-item crm-hover-button" title=\'Configure\' >Edit Your Page</a></li><li><a href="/index.php?q=civicrm/pcp/info&amp;action=browse&amp;reset=1&amp;id=' . $pcpID . '&amp;component=contribute" class="action-item crm-hover-button" title=\'Update Contact Information\' >Update Contact Information</a></li><li><a href="/index.php?q=civicrm/pcp&amp;action=disable&amp;reset=1&amp;id=' . $pcpID . '&amp;component=contribute" class="action-item crm-hover-button" title=\'Disable\' >Disable</a></li></ul></span>',
+          'pcpId' => (string) $pcpID,
           'pcpTitle' => 'pcp',
           'pcpStatus' => 'Approved',
           'class' => '',
