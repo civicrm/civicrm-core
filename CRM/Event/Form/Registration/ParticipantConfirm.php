@@ -30,6 +30,18 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
   protected $_cc = NULL;
 
   /**
+   * CheckSumValidatedContactID
+   * @var int
+   */
+  protected $_csContactID = NULL;
+
+  /**
+   * Participant Status ID
+   * @var int
+   */
+  protected $_participantStatusId = NULL;
+
+  /**
    * Set variables up before form is built.
    *
    * @return void
@@ -163,15 +175,14 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
     $participantId = $this->_participantId;
 
     if ($buttonName == '_qf_ParticipantConfirm_next') {
-      //lets get contact id in session.
-      $session = CRM_Core_Session::singleton();
-      $session->set('userID', $this->_csContactID);
 
       $this->postProcessHook();
 
+      $checksum = CRM_Contact_BAO_Contact_Utils::generateChecksum($this->_csContactID, NULL, 1);
+
       //check user registration status is from pending class
       $url = CRM_Utils_System::url('civicrm/event/register',
-        "reset=1&id={$this->_eventId}&participantId={$participantId}"
+        "reset=1&id={$this->getEventID()}&participantId={$participantId}&cid={$this->_csContactID}&cs={$checksum}"
       );
       CRM_Utils_System::redirect($url);
     }
