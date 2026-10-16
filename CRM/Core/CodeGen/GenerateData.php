@@ -2211,14 +2211,13 @@ ORDER BY cc.id; ";
         'financial_account_id' => $result->financial_account_id,
       ];
       $trxnId['id'] = $trxn->id;
-      $financialItem = CRM_Financial_BAO_FinancialItem::create($financialItem);
-      $entityFinancialTrxnRecord = [
+      $financialItem = CRM_Financial_BAO_FinancialItem::writeRecord($financialItem);
+      CRM_Financial_BAO_EntityFinancialTrxn::writeRecord([
         'entity_table' => "civicrm_financial_item",
         'entity_id' => $financialItem->id,
         'financial_trxn_id' => $trxn->id,
         'amount' => $result->total_amount,
-      ];
-      CRM_Financial_BAO_EntityFinancialTrxn::writeRecord($entityFinancialTrxnRecord);
+      ]);
     }
   }
 
