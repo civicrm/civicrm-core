@@ -25,22 +25,17 @@ use Civi\Api4\Navigation;
 use Civi\Api4\OptionGroup;
 use Civi\Api4\OptionValue;
 use Civi\Api4\SavedSearch;
-use Civi\Test;
-use Civi\Test\CiviEnvBuilder;
-use Civi\Test\HeadlessInterface;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use CRM_Core_ManagedEntities;
 use CRM_Core_Module;
 use CRM_Utils_System;
-use PHPUnit\Framework\TestCase;
+use api\v4\Api4TestBase;
 
 /**
  * @group headless
  */
-class ManagedEntityTest extends TestCase implements HeadlessInterface, TransactionalInterface, HookInterface {
-
-  use Test\Api4TestTrait;
+class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, HookInterface {
 
   /**
    * @var array[]
@@ -59,10 +54,6 @@ class ManagedEntityTest extends TestCase implements HeadlessInterface, Transacti
     // Disable multisite
     \Civi::settings()->revert('multisite_is_enabled');
     parent::tearDown();
-  }
-
-  public function setUpHeadless(): CiviEnvBuilder {
-    return Test::headless()->apply();
   }
 
   public function hook_civicrm_managed(array &$entities): void {

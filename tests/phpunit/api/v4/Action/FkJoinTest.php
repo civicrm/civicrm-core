@@ -33,6 +33,8 @@ use Civi\Test\TransactionalInterface;
  */
 class FkJoinTest extends Api4TestBase implements TransactionalInterface {
 
+  protected ?array $enableComponents = ['*'];
+
   public function tearDown(): void {
     $relatedTables = [
       'civicrm_activity',
@@ -468,8 +470,6 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testJoinCaseRoles(): void {
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-
     $contactID = $this->createTestRecord('Contact')['id'];
     $managerID = $this->createTestRecord('Contact')['id'];
 

@@ -32,10 +32,7 @@ use Civi\Api4\RelationshipCache;
  */
 class BasicCustomFieldTest extends Api4TestBase {
 
-  public function setUp(): void {
-    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
-    parent::setUp();
-  }
+  protected ?array $enableComponents = ['*'];
 
   /**
    * @throws \CRM_Core_Exception

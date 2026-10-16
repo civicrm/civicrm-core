@@ -12,10 +12,11 @@ use Civi\Api4\CiviCase;
  */
 class CaseTypeTest extends Api4TestBase {
 
+  protected ?array $enableComponents = ['CiviCase'];
+
   public function setUp(): void {
     parent::setUp();
     \CRM_Core_Dao::executeQuery('DELETE FROM civicrm_case_type WHERE id > 2');
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
   }
 
   public function testGetCaseTypeDefinition(): void {

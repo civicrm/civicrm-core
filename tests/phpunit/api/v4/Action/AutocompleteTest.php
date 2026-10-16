@@ -24,8 +24,6 @@ use Civi\API\Exception\UnauthorizedException;
 use Civi\API\Event\PrepareEvent;
 use Civi\Api4\Contact;
 use Civi\Api4\Event;
-use Civi\Api4\Group;
-use Civi\Api4\Mailing;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\EntitySet;
 use Civi\Api4\SavedSearch;
@@ -62,7 +60,6 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
   }
 
   public function setUp(): void {
-    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $this->hookCallback = NULL;
     $this->autocompleteRunCount = 0;
     // Ensure MockBasicEntity gets added via above listener
@@ -378,8 +375,6 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
   }
 
   public function testMailingRecipientsAutocomplete(): void {
-    Group::delete()->addWhere('id', '>', 0)->execute();
-    Mailing::delete()->addWhere('id', '>', 0)->execute();
     $group = $this->createTestRecord('Group', [
       'title' => 'Test Recipient Group',
       'group_type:name' => 'Mailing List',

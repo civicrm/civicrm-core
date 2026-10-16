@@ -34,6 +34,14 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
   use Test\GenericAssertionsTrait;
 
   /**
+   * Components to enable for this test class, or ['*'] for all components.
+   * NULL means use the default enabled components.
+   *
+   * @var array|null
+   */
+  protected ?array $enableComponents = NULL;
+
+  /**
    * @see CiviUnitTestCase
    *
    * @param string $name
@@ -46,7 +54,33 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
   }
 
   public function setUpHeadless(): CiviEnvBuilder {
-    return Test::headless()->apply();
+    $env = Test::headless()->apply();
+    $this->applyComponentSettings();
+    return $env;
+  }
+
+  protected function applyComponentSettings(): void {
+    \CRM_Core_DAO::init(CIVICRM_DSN);
+    $currentComponents = \Civi::settings()->get('enable_components') ?: [];
+    if ($this->enableComponents === ['*']) {
+      \CRM_Core_BAO_ConfigSetting::enableAllComponents();
+    }
+    elseif (is_array($this->enableComponents)) {
+      if (array_diff($this->enableComponents, $currentComponents) || array_diff($currentComponents, $this->enableComponents)) {
+        \CRM_Core_BAO_ConfigSetting::setEnabledComponents($this->enableComponents);
+      }
+    }
+    elseif ($currentComponents != \Civi::settings()->getDefault('enable_components')) {
+      \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
+    }
+  }
+
+  public static function tearDownAfterClass(): void {
+    \CRM_Core_DAO::init(CIVICRM_DSN);
+    if (\Civi::settings()->get('enable_components') != \Civi::settings()->getDefault('enable_components')) {
+      \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
+    }
+    parent::tearDownAfterClass();
   }
 
   /**
@@ -55,7 +89,6 @@ class Api4TestBase extends TestCase implements HeadlessInterface {
   public function tearDown(): void {
     $this->conditionallyDeleteTestRecords();
     \CRM_Utils_Time::resetTime();
-    \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
     parent::tearDown();
   }
 

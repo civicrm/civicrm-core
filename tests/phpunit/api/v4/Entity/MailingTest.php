@@ -20,10 +20,7 @@ use Civi\Test\TransactionalInterface;
  */
 class MailingTest extends Api4TestBase implements TransactionalInterface {
 
-  public function setUp(): void {
-    parent::setUp();
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviMail');
-  }
+  protected ?array $enableComponents = ['CiviMail'];
 
   /**
    * A save carrying an older modified_date than the stored one is refused, as APIv3 does (CRM-20892).
