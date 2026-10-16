@@ -286,8 +286,8 @@ class CRM_Core_Menu {
           $menu[$path]['page_type'] = 0;
         }
       }
-      catch (CRM_Core_Exception $e) {
-        Civi::log()->error('Menu path skipped:' . $e->getMessage());
+      catch (Throwable $e) {
+        Civi::log()->error('Menu path skipped:' . $e->getMessage(), ['exception' => $e]);
       }
     }
 
