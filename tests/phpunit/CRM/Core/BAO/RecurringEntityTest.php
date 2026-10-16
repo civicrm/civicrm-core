@@ -135,8 +135,8 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $finalResult = CRM_Core_BAO_RecurringEntity::updateModeAndPriceSet($entity_id, $entity_table, CRM_Core_BAO_RecurringEntity::MODE_ALL_ENTITY_IN_SERIES, [], 2);
     $this->assertEquals(2, count($recurringEntities["civicrm_event"]), "Recurring events not created.");
     $this->assertEquals(2, count($recurringEntities["civicrm_price_set_entity"]), "Recurring price sets not created.");
-    $priceSetOne = CRM_Price_BAO_PriceSet::getFor($entity_table, $recurringEntities["civicrm_price_set_entity"][0]);
-    $priceSetTwo = CRM_Price_BAO_PriceSet::getFor($entity_table, $recurringEntities["civicrm_price_set_entity"][1]);
+    $priceSetOne = CRM_Price_BAO_PriceSet::getFor($entity_table, $recurringEntities["civicrm_event"][0]);
+    $priceSetTwo = CRM_Price_BAO_PriceSet::getFor($entity_table, $recurringEntities["civicrm_event"][1]);
     $this->assertEquals(2, $priceSetOne, "Price set id of the recurring event is not updated.");
     $this->assertEquals(2, $priceSetTwo, 'Price set id of the recurring event is not updated.');
   }

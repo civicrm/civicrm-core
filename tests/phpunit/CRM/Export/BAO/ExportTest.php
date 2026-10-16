@@ -310,7 +310,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Membership ID' => '2',
       'Primary Member ID' => '',
       'Max Related' => '',
-      'Recurring Contribution ID' => 1,
+      'Recurring Contribution ID' => $this->ids['ContributionRecur']['default'],
       'Campaign ID' => '',
       'Status Override' => '',
       'Total Amount' => '200.00',
