@@ -48,14 +48,23 @@
 
     loadChartData: (displayCtrl) => {
       displayCtrl.chart.chart((displayCtrl._settings.seriesDisplayType === 'bar') ? dc.barChart : dc.lineChart);
+
+      // The datapoint key is a composite array that buildDimension builds from
+      // getDimensionColumns(), in that column order. Resolve the x and grouping (w)
+      // positions by axis rather than assuming a fixed order: the dimension columns
+      // are not guaranteed to come out as [w, x], and if x and w are transposed the
+      // grouping value gets plotted on the x-axis (off the scale domain) and every
+      // point collapses to x = 0, so no lines are drawn.
+      const dimCols = displayCtrl.getDimensionColumns();
+      const xIndex = dimCols.findIndex((col) => col.axis === 'x');
+      const wIndex = dimCols.findIndex((col) => col.axis === 'w');
+
       displayCtrl.chart
         .dimension(displayCtrl.dimension)
         .group(displayCtrl.group)
         .valueAccessor((d) => displayCtrl.getFirstColumnForAxis('y').valueAccessor(d))
-        // note: the datapoint keys are an array [w_value, x_value]
-        // see buildDimension on crmSearchDisplayChartKit
-        .keyAccessor((d) => d.key[1])
-        .seriesAccessor((d) => d.key[0]);
+        .keyAccessor((d) => d.key[xIndex])
+        .seriesAccessor((d) => d.key[wIndex]);
 
       displayCtrl.buildCoordinateGrid();
     }
