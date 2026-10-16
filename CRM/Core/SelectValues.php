@@ -1173,6 +1173,7 @@ class CRM_Core_SelectValues {
       [
         'key' => 'id',
         'label' => ts('Contact ID'),
+        'op' => '=',
       ],
       [
         'key' => 'external_identifier',
@@ -1233,6 +1234,7 @@ class CRM_Core_SelectValues {
         'label' => ts('Contribution ID'),
         'join' => ['Contribution AS Contribution', 'LEFT', ['Contribution.contact_id', '=', 'id']],
         'adv_search_legacy' => 'contribution_id',
+        'op' => '=',
       ],
       [
         'key' => 'Contribution.trxn_id',
@@ -1275,8 +1277,13 @@ class CRM_Core_SelectValues {
           'label' => $group['title'] . ': ' . $field['label'],
           'adv_search_legacy' => 'custom_' . $field['id'],
           'join' => $join,
+          'op' => ($field['data_type'] === 'Int') ? '=' : 'LIKE',
         ];
       }
+    }
+    // default operator is LIKE
+    foreach ($options as &$option) {
+      $option['op'] ??= 'LIKE';
     }
     return $options;
   }

@@ -56,22 +56,31 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         ],
       ];
 
-      // interpret filters
+      // get user inputs and clear from the original api request
+      $filterInputs = $apiRequest->getFilters();
+      $apiRequest->setFilters([]);
+      // the name/email value is supplied through getInput
+      // for historical reasons - TODO: rationalise
+      $input = $apiRequest->getInput();
+      $apiRequest->setInput('');
+
+      // now lets interpret the filters
       $duplicateOptions = [];
       $filterValues = [];
       $selectFields = ['sort_name'];
       $columns = [['type' => 'field', 'key' => 'sort_name']];
 
+      // relevant settings
       $ftsIndices = array_keys(\Civi::service('civi.schema.fts')->getIndicesForEntity('Contact'));
+      $allFilterFields = array_column(\CRM_Core_SelectValues::getQuicksearchOptions(), NULL, 'key');
+      $enabledFilterFields = \array_intersect_key($allFilterFields, array_flip(\Civi::settings()->get('quicksearch_options')));
 
-      if (!$apiRequest->getFilters()) {
+      if (!$filterInputs) {
         // this is the default option: Name (and Email)
         $useFtsForSortName = \in_array('contact_names', $ftsIndices);
         $includeNickName = $useFtsForSortName || \Civi::settings()->get('includeNickNameInName');
         $includeEmailWithName = \Civi::settings()->get('includeEmailInName');
         $wildcardAtStart = \Civi::settings()->get('includeWildCardInName') ? '%' : '';
-        $input = $apiRequest->getInput();
-        $apiRequest->setInput('');
 
         if ($useFtsForSortName) {
           // strip FULLTEXT BOOLEAN special characters to avoid invalid expression
@@ -104,31 +113,28 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         }
       }
       else {
-        $allowedFilters = \Civi::settings()->get('quicksearch_options');
+        foreach ($filterInputs as $filterField => $val) {
+          $filterFieldMeta = $enabledFilterFields[$filterField] ?? NULL;
+          if (!$filterFieldMeta) {
+            // unrecogised field
+            continue;
+          }
+          if ($filterField === 'phone_primary.phone' || $filterField === 'Phone.phone_numeric') {
+            $val = preg_replace('/\D/', '', $val);
+          }
+          // Add trusted filter
+          $filterValues[$filterField] = $val;
 
-        foreach ($apiRequest->getFilters() as $filterField => $val) {
-          if (in_array($filterField, $allowedFilters)) {
-
-            if ($filterField === 'phone_primary.phone' || $filterField === 'Phone.phone_numeric') {
-              $val = preg_replace('/\D/', '', $val);
-            }
-            // Add trusted filter
-            $filterValues[$filterField] = $val;
-
-            // so long as not a fts index, add to select
-            if (!in_array($filterField, $ftsIndices)) {
-              $selectFields[] = $filterField;
-            }
-            // If the filter includes a join, add it to the savedSearch query
-            if (str_contains($filterField, '.')) {
-              $quickSearchMeta = array_column(\CRM_Core_SelectValues::getQuicksearchOptions(), NULL, 'key');
-              if (!empty($quickSearchMeta[$filterField]['join'])) {
-                $apiParams['join'][] = $quickSearchMeta[$filterField]['join'];
-                // Prevent this field from displaying twice e.g. both Email.email and email_primary.email
-                [$entity, $field] = explode('.', $filterField);
-                $duplicateOptions[] = strtolower($entity) . "_primary.$field";
-              }
-            }
+          // so long as not a fts index, add to select
+          if (!in_array($filterField, $ftsIndices)) {
+            $selectFields[] = $filterField;
+          }
+          // If the filter includes a join, add it to the savedSearch query
+          if (!empty($filterFieldMeta['join'])) {
+            $apiParams['join'][] = $filterFieldMeta['join'];
+            // Prevent this field from displaying twice e.g. both Email.email and email_primary.email
+            [$entity, $field] = explode('.', $filterField);
+            $duplicateOptions[] = strtolower($entity) . "_primary.$field";
           }
         }
         // display additional selected fields using rewrite
@@ -184,7 +190,12 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
       // Add a UNION per search field
       foreach ($filterValues as $field => $value) {
         $params = $apiParams;
-        $params['where'][] = [$field, 'LIKE', $value . "%"];
+        if (($enabledFilterFields[$field]['op'] ?? NULL) === '=') {
+          $params['where'][] = [$field, '=', $value];
+        }
+        else {
+          $params['where'][] = [$field, 'LIKE', $value . "%"];
+        }
         // Strip all suffixes from inner select array (pseudoconstants will be evaluated by the outer query)
         $params['select'] = array_map(fn ($field) => explode(':', $field)[0], $params['select']);
         $savedSearch['api_params']['sets'][] = ['UNION DISTINCT', 'Contact', 'get', $params];
