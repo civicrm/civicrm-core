@@ -2398,7 +2398,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ->addValue('trxn_date', $repeatedContribution['values'][$repeatedContribution['id']]['receive_date'])
       ->execute();
 
-    $this->assertEquals($contributionRecur['values'][1]['is_test'], $repeatedContribution['values'][2]['is_test']);
+    $this->assertEquals($contributionRecur['values'][$contributionRecur['id']]['is_test'], $repeatedContribution['values'][2]['is_test']);
   }
 
   /**
@@ -2824,7 +2824,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $originalContribution = $this->setUpRecurringContribution([], ['financial_type_id' => 2]);
 
     $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
-      'contribution_recur_id' => $originalContribution['id'],
+      'contribution_recur_id' => $originalContribution['values'][$originalContribution['id']]['contribution_recur_id'],
       'trxn_id' => 234,
     ]);
     Payment::create(FALSE)
@@ -2976,7 +2976,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // This will made the trick to get the not equals behaviour.
     $this->callAPISuccess('line_item', 'create', ['id' => 1, 'financial_type_id' => 4]);
     $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
-      'contribution_recur_id' => $originalContribution['id'],
+      'contribution_recur_id' => $originalContribution['values'][$originalContribution['id']]['contribution_recur_id'],
       'trxn_id' => 1234,
     ]);
     Payment::create(FALSE)
@@ -3097,7 +3097,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contributionPage = $this->createReceiptableContributionPage(['is_recur' => TRUE, 'recur_frequency_unit' => 'month', 'recur_interval' => 1]);
 
     $this->_params['contribution_page_id'] = $contributionPage['id'];
-    $this->_params['contribution_recur_id'] = $recurring['id'];
+    $this->_params['contribution_recur_id'] = $recurring['values'][$recurring['id']]['contribution_recur_id'];
 
     $contribution = $this->setUpForCompleteTransaction();
 
