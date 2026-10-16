@@ -132,6 +132,36 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
   }
 
   /**
+   * Unlike testDoubleWaitlistRegistration, a contact resuming their own
+   * pending (pay-later / incomplete-transaction) registration - identified
+   * via the participantId url param, which sets _allowConfirmation - must
+   * NOT be bounced as a duplicate registration by
+   * Register::checkRegistration().
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testResumePendingRegistrationIsNotBouncedAsDuplicate(): void {
+    $event = $this->eventCreateUnpaid();
+    $contactID = $this->individualCreate();
+    $participantID = $this->participantCreate([
+      'event_id' => $event['id'],
+      'contact_id' => $contactID,
+      'status_id.name' => 'Pending from incomplete transaction',
+    ]);
+
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [], [
+      'id' => $this->getEventID(),
+      'cid' => $contactID,
+      'participantId' => $participantID,
+    ]);
+    // Should not throw - unlike testDoubleWaitlistRegistration, this is a
+    // legitimate resume of an existing pending registration, not a fresh
+    // duplicate attempt.
+    $form->processForm(FormWrapper::PREPROCESSED);
+    $this->assertTrue(TRUE);
+  }
+
+  /**
    * Test that current event is valid or not.
    *
    * @dataProvider eventDataProvider

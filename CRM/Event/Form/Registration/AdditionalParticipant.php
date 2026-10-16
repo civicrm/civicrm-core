@@ -50,15 +50,6 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
   public $_contactId;
 
   /**
-   * Alias of $this->_additionalParticipantId,
-   * Used within CRM_Event_Form_EventFees
-   *
-   * @var int
-   * @internal
-   */
-  public $_pId;
-
-  /**
    * Get the active UFGroups (profiles) on this form
    * Many forms load one or more UFGroups (profiles).
    * This provides a standard function to retrieve the IDs of those profiles from the form
@@ -145,12 +136,10 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     //CRM-4320, setdefault additional participant values.
     if ($this->_allowConfirmation && $this->_additionalParticipantId) {
-      //hack to get set default from eventFees.php
-      $this->_pId = $this->_additionalParticipantId;
       $this->_contactId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Participant', $this->_additionalParticipantId, 'contact_id');
 
       CRM_Event_BAO_Participant::formatFieldsAndSetProfileDefaults($this->_contactId, $this);
-      $participantDefaults = $this->setFeeDefaults($this);
+      $participantDefaults = $this->setFeeDefaults();
       $participantDefaults = array_merge($this->_defaults, $participantDefaults);
       // use primary email address if billing email address is empty
       if (empty($this->_defaults["email-{$this->_bltID}"]) &&
@@ -586,7 +575,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     return TRUE;
   }
 
-  protected function getParticipantIndex(): ?int {
+  protected function getParticipantIndex(): int {
     return (int) substr($this->_name, 12);
   }
 

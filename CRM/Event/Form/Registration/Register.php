@@ -143,8 +143,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @throws \CRM_Core_Exception
    */
   private function eventFeeWrangling() {
-    $this->_pId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
-
     //CRM-6907 set event specific currency.
     if ($this->getEventID() &&
       ($currency = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->getEventID(), 'currency'))

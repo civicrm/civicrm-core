@@ -1102,7 +1102,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   protected function getUsedSeatsCount(int $priceFieldValueID) : int {
     $skipParticipants = [];
-    if (!empty($this->_allowConfirmation) && (isset($this->_pId) || isset($this->_additionalParticipantId))) {
+    if (!empty($this->_allowConfirmation) && ($this->getParticipantID($this->getParticipantIndex()) || isset($this->_additionalParticipantId))) {
       // to skip current registered participants fields option count on confirmation.
       $skipParticipants[] = $this->_participantId;
       if (!empty($this->_additionalParticipantIds)) {
@@ -1206,12 +1206,29 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Get id of participant being acted on.
    *
+   * Index 0 (the default) is the primary participant. An additional
+   * participant is retrieved by the 1-based index used in
+   * $this->_additionalParticipantIds (see getParticipantIndex()).
+   *
    * @api This function will not change in a minor release and is supported for
    * use outside of core. This annotation / external support for properties
    * is only given where there is specific test cover.
    */
-  public function getParticipantID(): ?int {
-    return $this->_participantId;
+  public function getParticipantID(int $index = 0): ?int {
+    if ($index === 0) {
+      return $this->_participantId;
+    }
+    return $this->_additionalParticipantIds[$index] ?? NULL;
+  }
+
+  /**
+   * Get the index of the participant being acted on by the current step.
+   *
+   * 0 for the primary participant; overridden to return the 1-based
+   * additional-participant index on the additional-participant step.
+   */
+  protected function getParticipantIndex(): int {
+    return 0;
   }
 
   /**
@@ -2139,14 +2156,15 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   protected function setFeeDefaults(): array {
     $defaults = [];
     $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
+    $participantID = $this->getParticipantID($this->getParticipantIndex());
 
-    if ($this->_pId) {
+    if ($participantID) {
       $ids = [];
-      $params = ['id' => $this->_pId];
+      $params = ['id' => $participantID];
 
       CRM_Event_BAO_Participant::getValues($params, $defaults, $ids);
-      $defaults += $defaults[$this->_pId];
-      unset($defaults[$this->_pId]);
+      $defaults += $defaults[$participantID];
+      unset($defaults[$participantID]);
       if ($this->_action == CRM_Core_Action::UPDATE) {
         $this->assign('fee_amount', $defaults['fee_amount'] ?? NULL);
         $this->assign('fee_level', $defaults['fee_level'] ?? NULL);
@@ -2184,7 +2202,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     if ($priceSetId) {
       // get price set default values, CRM-4090
-      $priceSetValues = $this->setDefaultPriceSet($this->_pId, $this->_eventId);
+      $priceSetValues = $this->setDefaultPriceSet($participantID, $this->_eventId);
       if (!empty($priceSetValues)) {
         $defaults = array_merge($defaults, $priceSetValues);
       }
