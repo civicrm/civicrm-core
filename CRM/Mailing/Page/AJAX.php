@@ -89,6 +89,10 @@ class CRM_Mailing_Page_AJAX {
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $params += CRM_Core_Page_AJAX::validateParams(['contact_id' => 'Integer']);
 
+    if (empty($params['contact_id']) || !CRM_Contact_BAO_Contact_Permission::allow($params['contact_id'], CRM_Core_Permission::VIEW)) {
+      CRM_Utils_System::permissionDenied();
+    }
+
     // get the contact mailings
     $mailings = CRM_Mailing_BAO_Mailing::getContactMailingSelector($params);
 
