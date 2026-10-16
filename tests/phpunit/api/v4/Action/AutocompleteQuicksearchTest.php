@@ -465,7 +465,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
 
   public function testQuicksearchAutocompleteWithNonNumericPhone(): void {
     Setting::set(FALSE)
-      ->addValue('quicksearch_options', ['sort_name', 'phone_primary.phone'])
+      ->addValue('quicksearch_options', ['sort_name', 'Phone.phone_numeric'])
       ->execute();
 
     $contacts = $this->saveTestRecords('Contact', [
@@ -481,13 +481,13 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $resultWithNonNumeric = Contact::autocomplete(FALSE)
       ->setFormName('crmMenubar')
       ->setFieldName('crm-qsearch-input')
-      ->setFilters(['phone_primary.phone' => '(123) 456'])
+      ->setFilters(['Phone.phone_numeric' => '(123) 456'])
       ->execute();
 
     $resultNumeric = Contact::autocomplete(FALSE)
       ->setFormName('crmMenubar')
       ->setFieldName('crm-qsearch-input')
-      ->setFilters(['phone_primary.phone' => '123456'])
+      ->setFilters(['Phone.phone_numeric' => '123456'])
       ->execute();
 
     $this->assertEquals($resultNumeric, $resultWithNonNumeric);

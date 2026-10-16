@@ -119,7 +119,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
             // unrecogised field
             continue;
           }
-          if ($filterField === 'phone_primary.phone' || $filterField === 'Phone.phone_numeric') {
+          if ($filterField === 'Phone.phone_numeric') {
             $val = preg_replace('/\D/', '', $val);
           }
           // Add trusted filter
