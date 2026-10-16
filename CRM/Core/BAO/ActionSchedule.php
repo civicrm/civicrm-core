@@ -364,7 +364,7 @@ FROM civicrm_action_schedule cas
           $errors = [];
 
           // It's possible, eg, that sendReminderEmail fires Hook::alterMailParams() and that some listener use ts().
-          $swapLocale = empty($row->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($row->context['locale']);
+          $swapLocale = empty($tokenRow->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($tokenRow->context['locale']);
 
           // FIXME: This can't be right: "If mode is User Preference, send sms unconditionally without checking user preference"!
           if ($actionSchedule->mode === 'SMS' || $actionSchedule->mode === 'User_Preference') {
