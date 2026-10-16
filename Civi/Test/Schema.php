@@ -268,7 +268,7 @@ class Schema {
       'civicrm_group',
       'civicrm_group_contact',
       // 'civicrm_group_contact_cache',
-      'civicrm_group_nesting',
+      // 'civicrm_group_nesting',
       // 'civicrm_group_organization',
       'civicrm_im',
       // 'civicrm_install_canary',
