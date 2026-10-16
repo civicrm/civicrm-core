@@ -29,9 +29,7 @@ return [
           'having' => [],
         ],
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -49,10 +47,7 @@ return [
         'settings' => [
           'description' => NULL,
           'sort' => [
-            [
-              'name',
-              'ASC',
-            ],
+            ['name', 'ASC'],
           ],
           'limit' => 50,
           'pager' => [],

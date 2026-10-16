@@ -1,5 +1,4 @@
 <?php
-
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
@@ -48,9 +47,7 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -162,12 +159,7 @@ return [
             'crm-sticky-header',
           ],
           'cssRules' => [
-            [
-              'disabled',
-              'is_active',
-              '=',
-              FALSE,
-            ],
+            ['disabled', 'is_active', '=', FALSE],
           ],
           'toolbar' => [
             [

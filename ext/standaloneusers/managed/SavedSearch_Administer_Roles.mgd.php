@@ -18,12 +18,7 @@ return [
         'api_entity' => 'Role',
         'api_params' => [
           'version' => 4,
-          'select' => [
-            'id',
-            'name',
-            'label',
-            'is_active',
-          ],
+          'select' => ['id', 'name', 'label', 'is_active'],
           'orderBy' => [],
           'where' => [],
           'groupBy' => [],
@@ -33,9 +28,7 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -125,10 +118,7 @@ return [
             ],
           ],
           'actions' => TRUE,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
           'toolbar' => [
             [
               'text' => 'Add Role',

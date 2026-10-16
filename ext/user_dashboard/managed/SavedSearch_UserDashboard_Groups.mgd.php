@@ -32,16 +32,8 @@ return [
               '=',
               'Public Pages',
             ],
-            [
-              'is_active',
-              '=',
-              TRUE,
-            ],
-            [
-              'is_hidden',
-              '=',
-              FALSE,
-            ],
+            ['is_active', '=', TRUE],
+            ['is_hidden', '=', FALSE],
           ],
           'groupBy' => [
             'id',
@@ -76,9 +68,7 @@ return [
           'having' => [],
         ],
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -129,10 +119,7 @@ return [
             ],
           ],
           'actions' => FALSE,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
           'cssRules' => [
             [
               'disabled',

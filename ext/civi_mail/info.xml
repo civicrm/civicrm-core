@@ -45,7 +45,7 @@
   </mixins>
   <civix>
     <namespace>CRM/Mailing</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
     <angularModule>civiMail</angularModule>
   </civix>
 </extension>

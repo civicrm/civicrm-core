@@ -40,9 +40,10 @@
   </classloader>
   <mixins>
     <mixin>mgd-php@2.0.0</mixin>
+    <mixin>include-path@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Ewaysingle</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
   </civix>
 </extension>

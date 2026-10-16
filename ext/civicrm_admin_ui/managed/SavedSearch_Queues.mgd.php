@@ -1,5 +1,4 @@
 <?php
-
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
@@ -16,12 +15,7 @@ return [
         'api_entity' => 'Queue',
         'api_params' => [
           'version' => 4,
-          'select' => [
-            'id',
-            'name',
-            'type:label',
-            'status:label',
-          ],
+          'select' => ['id', 'name', 'type:label', 'status:label'],
           'orderBy' => [],
           'where' => [],
           'groupBy' => [],
@@ -29,9 +23,7 @@ return [
           'having' => [],
         ],
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [

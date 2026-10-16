@@ -18,10 +18,7 @@ return [
         'api_entity' => 'ContactType',
         'api_params' => [
           'version' => 4,
-          'select' => [
-            'label',
-            'description',
-          ],
+          'select' => ['label', 'description'],
           'orderBy' => [],
           'where' => [],
           'groupBy' => [],
@@ -31,9 +28,7 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -63,10 +58,7 @@ return [
           ],
           'placeholder' => 5,
           'sort' => [
-            [
-              'label',
-              'ASC',
-            ],
+            ['label', 'ASC'],
           ],
           'columns' => [
             [

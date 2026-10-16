@@ -48,7 +48,7 @@
   </mixins>
   <civix>
     <namespace>CRM/Contribute</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
     <angularModule>civiContribute</angularModule>
   </civix>
 </extension>

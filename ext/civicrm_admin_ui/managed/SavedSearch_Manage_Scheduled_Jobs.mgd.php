@@ -40,9 +40,7 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -61,14 +59,8 @@ return [
           'actions' => TRUE,
           'description' => NULL,
           'sort' => [
-            [
-              'is_active',
-              'DESC',
-            ],
-            [
-              'name',
-              'ASC',
-            ],
+            ['is_active', 'DESC'],
+            ['name', 'ASC'],
           ],
           'limit' => 50,
           'pager' => [
@@ -202,12 +194,7 @@ return [
             'crm-sticky-header',
           ],
           'cssRules' => [
-            [
-              'disabled',
-              'is_active',
-              '=',
-              FALSE,
-            ],
+            ['disabled', 'is_active', '=', FALSE],
           ],
         ],
         'acl_bypass' => FALSE,

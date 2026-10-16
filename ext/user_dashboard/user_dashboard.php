@@ -42,7 +42,6 @@ function user_dashboard_civicrm_navigationMenu(&$params) {
     'permission' => 'access Contact Dashboard',
     'weight' => 2,
   ]);
-  _user_dashboard_civix_navigationMenu($params);
 }
 
 /**
