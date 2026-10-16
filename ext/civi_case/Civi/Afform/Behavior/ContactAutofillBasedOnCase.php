@@ -122,12 +122,92 @@ class ContactAutofillBasedOnCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private static function getCaseRoleModes(string $contactType, array $modes): array {
+    // The role options depend only on the contact type - the incoming $modes is
+    // only appended to, never read - so build them per contact type and merge onto
+    // the caller's modes.
+    return array_merge($modes, self::getCaseRoleModeOptions($contactType));
+  }
+
+  /**
+   * Get the case-role autofill options for a contact type.
+   *
+   * Cached per contact type because this can be called once per contact type for
+   * every Afform parsed in a request (e.g. while reconciling managed entities).
+   * The case types and relationship types it reads don't change within a request
+   * and are fetched once (see getCaseRolesByRelationshipName/getActiveRelationshipTypes).
+   *
+   * @param string $contactType
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private static function getCaseRoleModeOptions(string $contactType): array {
+    if (isset(\Civi::$statics[__CLASS__]['caseRoleModes'][$contactType])) {
+      return \Civi::$statics[__CLASS__]['caseRoleModes'][$contactType];
+    }
+    $modes = [
+      [
+        'name' => 'role_on_case:client',
+        'label' => E::ts('Is client of case'),
+        'description' => E::ts('Contact is client on the case'),
+        'icon' => 'fa-folder-open',
+      ],
+    ];
+    $caseRoles = self::getCaseRolesByRelationshipName();
+    foreach (self::getActiveRelationshipTypes() as $relationshipType) {
+      if ($relationshipType['name_a_b']) {
+        $caseTypesWithThisRole = $caseRoles[$relationshipType['name_a_b']]
+          ?? $caseRoles[$relationshipType['label_a_b']]
+          ?? [];
+        $isMatchingContactType = empty($relationshipType['contact_type_a']) || $relationshipType['contact_type_a'] === $contactType;
+        if ($isMatchingContactType && !empty($caseTypesWithThisRole)) {
+          $modes[] = [
+            'name' => 'role_on_case:' . $relationshipType['name_a_b'],
+            'label' => E::ts('Case Role is: %1', [1 => $relationshipType['label_a_b']]),
+            'description' => E::ts('In use for the following case types: %1', [1 => implode(', ', $caseTypesWithThisRole)]),
+            'icon' => 'fa-folder-open',
+          ];
+        }
+      }
+
+      if ($relationshipType['name_b_a']) {
+        $caseTypesWithThisRole = $caseRoles[$relationshipType['name_b_a']]
+          ?? $caseRoles[$relationshipType['label_b_a']]
+          ?? [];
+        $isMatchingContactType = empty($relationshipType['contact_type_b']) || $relationshipType['contact_type_b'] === $contactType;
+        if ($isMatchingContactType && !empty($caseTypesWithThisRole)) {
+          $modes[] = [
+            'name' => 'role_on_case:' . $relationshipType['name_b_a'],
+            'label' => E::ts('Case Role is: %1', [1 => $relationshipType['label_b_a']]),
+            'description' => E::ts('In use for the following case types: %1', [1 => implode(', ', $caseTypesWithThisRole)]),
+            'icon' => 'fa-folder-open',
+          ];
+        }
+      }
+    }
     $modes[] = [
-      'name' => 'role_on_case:client',
-      'label' => E::ts('Is client of case'),
-      'description' => E::ts('Contact is client on the case'),
+      'name' => 'role_on_case:any',
+      'label' => E::ts('Case role is: any'),
+      'description' => E::ts('Contact has any role on the case'),
       'icon' => 'fa-folder-open',
     ];
+    \Civi::$statics[__CLASS__]['caseRoleModes'][$contactType] = $modes;
+    return $modes;
+  }
+
+  /**
+   * Map of relationship-type name/label => titles of the case types that use it
+   * as a case role.
+   *
+   * Case types aren't contact-type specific, so this is fetched once per request
+   * and shared across contact types.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private static function getCaseRolesByRelationshipName(): array {
+    if (isset(\Civi::$statics[__CLASS__]['caseRoles'])) {
+      return \Civi::$statics[__CLASS__]['caseRoles'];
+    }
     $caseRoles = [];
     $caseTypes = \Civi\Api4\CaseType::get(FALSE)
       ->addSelect('title', 'definition')
@@ -141,51 +221,27 @@ class ContactAutofillBasedOnCase {
         }
       }
     }
-    $relationshipTypes = \Civi\Api4\RelationshipType::get(FALSE)
-      ->addSelect('name_a_b', 'name_b_a', 'label_a_b', 'label_b_a', 'description', 'contact_type_a', 'contact_type_b')
-      ->addWhere('is_active', '=', TRUE)
-      ->addClause('OR', ['contact_type_a', '=', $contactType], ['contact_type_a', 'IS NULL'], ['contact_type_b', '=', $contactType], ['contact_type_b', 'IS NULL'])
-      ->execute();
-    foreach ($relationshipTypes as $relationshipType) {
-      if ($relationshipType['name_a_b']) {
-        $caseTypesWithThisRole = $caseRoles[$relationshipType['name_a_b']]
-          ?? $caseRoles[$relationshipType['label_a_b']]
-          ?? [];
-        $isMatchingContactType = empty($relationshipType['contact_type_a']) || $relationshipType['contact_type_a'] === $contactType;
-        if ($isMatchingContactType && !empty($caseTypesWithThisRole)) {
-          $caseTypes = implode(', ', $caseTypesWithThisRole);
-          $modes[] = [
-            'name' => 'role_on_case:' . $relationshipType['name_a_b'],
-            'label' => E::ts('Case Role is: %1', [1 => $relationshipType['label_a_b']]),
-            'description' => E::ts('In use for the following case types: %1', [1 => $caseTypes]),
-            'icon' => 'fa-folder-open',
-          ];
-        }
-      }
+    return \Civi::$statics[__CLASS__]['caseRoles'] = $caseRoles;
+  }
 
-      if ($relationshipType['name_b_a']) {
-        $caseTypesWithThisRole = $caseRoles[$relationshipType['name_b_a']]
-          ?? $caseRoles[$relationshipType['label_b_a']]
-          ?? [];
-        $isMatchingContactType = empty($relationshipType['contact_type_b']) || $relationshipType['contact_type_b'] === $contactType;
-        if ($isMatchingContactType && !empty($caseTypesWithThisRole)) {
-          $caseTypes = implode(', ', $caseTypesWithThisRole);
-          $modes[] = [
-            'name' => 'role_on_case:' . $relationshipType['name_b_a'],
-            'label' => E::ts('Case Role is: %1', [1 => $relationshipType['label_b_a']]),
-            'description' => E::ts('In use for the following case types: %1', [1 => $caseTypes]),
-            'icon' => 'fa-folder-open',
-          ];
-        }
-      }
+  /**
+   * All active relationship types, fetched once per request.
+   *
+   * Contact-type filtering is applied per contact type in PHP (see
+   * getCaseRoleModeOptions), so it isn't filtered in the query.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private static function getActiveRelationshipTypes(): array {
+    if (isset(\Civi::$statics[__CLASS__]['relationshipTypes'])) {
+      return \Civi::$statics[__CLASS__]['relationshipTypes'];
     }
-    $modes[] = [
-      'name' => 'role_on_case:any',
-      'label' => E::ts('Case role is: any'),
-      'description' => E::ts('Contact has any role on the case'),
-      'icon' => 'fa-folder-open',
-    ];
-    return $modes;
+    return \Civi::$statics[__CLASS__]['relationshipTypes'] = \Civi\Api4\RelationshipType::get(FALSE)
+      ->addSelect('name_a_b', 'name_b_a', 'label_a_b', 'label_b_a', 'contact_type_a', 'contact_type_b')
+      ->addWhere('is_active', '=', TRUE)
+      ->execute()
+      ->getArrayCopy();
   }
 
 }
