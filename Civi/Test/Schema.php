@@ -319,7 +319,7 @@ class Schema {
       // 'civicrm_participant_status_type',
       'civicrm_payment_processor',
       // 'civicrm_payment_processor_type',
-      'civicrm_payment_token',
+      // 'civicrm_payment_token',
       // 'civicrm_pcp',
       // 'civicrm_pcp_block',
       'civicrm_phone',

@@ -565,7 +565,7 @@ contribution_recur.cancel_date :August 19th, 2021  9:12 AM
 contribution_recur.cancel_reason :Because
 contribution_recur.end_date :July 26th, 2021  6:07 PM
 contribution_recur.processor_id :abc
-contribution_recur.payment_token_id :1
+contribution_recur.payment_token_id :' . $this->contributionRecur['payment_token_id'] . '
 contribution_recur.trxn_id :123
 contribution_recur.invoice_id :inv123
 contribution_recur.contribution_status_id :2
