@@ -761,15 +761,16 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->restoreMembershipTypes();
     $form = new CRM_Core_Form();
     $values = CRM_Member_BAO_Membership::buildMembershipTypeValues($form);
+    $generalTypeID = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'membership_type_id', 'General');
     $this->assertEquals([
-      'id' => 1,
+      'id' => $generalTypeID,
       'minimum_fee' => 100.00,
       'name' => 'General',
       'is_active' => TRUE,
       'description' => 'Regular annual membership.',
       'financial_type_id' => 2,
       'auto_renew' => 0,
-      'member_of_contact_id' => $values[1]['member_of_contact_id'],
+      'member_of_contact_id' => $values[$generalTypeID]['member_of_contact_id'],
       'relationship_type_id' => [7],
       'relationship_direction' => ['b_a'],
       'max_related' => NULL,
@@ -787,7 +788,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'receipt_text_renewal' => NULL,
       'title' => 'General',
       'frontend_title' => 'General',
-    ], $values[1]);
+    ], $values[$generalTypeID]);
   }
 
   /**

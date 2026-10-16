@@ -642,7 +642,7 @@ contribution_recur.payment_instrument_id:name :Check
     $this->callAPISuccess('ActionSchedule', 'create', [
       'title' => 'job',
       'subject' => 'job',
-      'entity_value' => 1,
+      'entity_value' => CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'membership_type_id', 'General'),
       'mapping_id' => 4,
       'start_action_date' => 'membership_join_date',
       'start_action_offset' => 1,
