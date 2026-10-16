@@ -33,6 +33,7 @@ use Civi\Api4\RelationshipType;
 use Civi\Api4\SubscriptionHistory;
 use Civi\Api4\UserJob;
 use Civi\Api4\Website;
+use Civi\Core\Exception\DBQueryException;
 
 /**
  *  Test contact import parser.
@@ -1352,6 +1353,46 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('IMPORTED', $row['_status']);
     $group = Group::get()->addWhere('title', '=', 'My New Group')->execute()->first();
     $this->assertCount(1, GroupContact::get()->addWhere('group_id', '=', $group['id'])->execute());
+  }
+
+  /**
+   * A PHP error while importing one row marks that row as failed and the other rows are imported.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportRowErrorDoesNotAbortImport(): void {
+    $this->hookClass->setHook('civicrm_import', function($object, $usage, &$objectRef, &$params) {
+      if (Contact::get(FALSE)->addWhere('id', '=', $params['contactID'])->execute()->single()['first_name'] === 'Sarah') {
+        throw new TypeError('Ruh-roh');
+      }
+    });
+    $this->importCSV('individual_related_create.csv', [
+      ['first_name'], ['last_name'], ['do_not_import'], ['do_not_import'], ['do_not_import'],
+    ]);
+    $dataSource = $this->getDataSource();
+    $statuses = [];
+    while ($row = $dataSource->getRow()) {
+      $statuses[] = [$row['_status'], $row['_status_message']];
+    }
+    $this->assertEquals('IMPORTED', $statuses[0][0]);
+    $this->assertEquals(['ERROR', 'Ruh-roh'], $statuses[1]);
+    $this->assertEquals('IMPORTED', $statuses[2][0]);
+    $this->assertEquals('IMPORTED', $statuses[3][0]);
+    $this->assertEquals(4, Contact::get()->addWhere('last_name', '=', 'Smith')->selectRowCount()->execute()->count());
+  }
+
+  /**
+   * A database error while importing a row is not recorded as a row error, so the queue can retry the batch.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportRowDatabaseErrorFailsBatch(): void {
+    $this->hookClass->setHook('civicrm_import', function() {
+      throw new DBQueryException('Lost connection to MySQL server during query');
+    });
+    [$dataSource, $parser] = $this->getDataSourceAndParser('individual_valid_basic.csv', [['first_name'], ['email'], ['source'], ['do_not_import']], []);
+    $this->expectException(DBQueryException::class);
+    $parser->importRow($dataSource->getRow());
   }
 
   /**

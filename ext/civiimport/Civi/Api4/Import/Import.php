@@ -31,7 +31,7 @@ class Import extends DAOGetAction {
       if (!$parser->validateRow($row)) {
         continue;
       }
-      $parser->import($row);
+      $parser->importRow($row);
     }
     $parser->doPostImportActions();
     \CRM_Core_BAO_UserJob::updateUserJobStatus($userJobID);
