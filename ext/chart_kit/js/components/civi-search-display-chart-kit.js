@@ -455,11 +455,49 @@
       legend.highlightSelected(true);
 
       if (this._settings.showLegend === 'right') {
-        // depends on chart type which padding keys are set
-        // (potential bug: if you set right padding on an axis chart, then switch to a chart without a right axis setting,
-        // it will keep using the right padding value, which you can no longer edit
-        const rightPadding = this._settings.format.padding.right ? this._settings.format.padding.right : this._settings.format.padding.outer;
-        legend.x(this._settings.format.width - legend.itemWidth() - rightPadding);
+        // Auto-fit the right margin to the legend rather than relying on a hand-tuned
+        // format.padding.right per report. After each render we measure the widest legend
+        // item, reserve a right margin that holds it plus a gap on each side, and park the
+        // legend in that margin aligned with the plot's top edge. The legend then never
+        // overlaps the plotted data (left/top) or clips at the SVG edge (right) — however
+        // many entries it has or however long the labels are — so it stays correct as the
+        // legend changes from report to report with no per-report padding tuning.
+        const leftGap = 16;   // space between the plot's right edge and the legend
+        const rightGap = 12;  // space between the legend and the SVG's right edge
+        const minRight = this._settings.format.padding.outer || 10;
+
+        // Initial placement for the first paint (corrected by the fit handler below once the
+        // legend DOM exists and can be measured).
+        const seedRight = this._settings.format.padding.right || minRight;
+        legend.x(this._settings.format.width - seedRight + leftGap);
+        legend.y(this._settings.format.padding.top || 0);
+
+        this.chart.on('pretransition.ckLegendFit', (chart) => {
+          const svg = chart.svg();
+          if (!svg || svg.empty()) {
+            return;
+          }
+          let maxItem = 0;
+          svg.selectAll('.dc-legend-item').each(function () {
+            const w = this.getBBox().width;
+            if (w > maxItem) {
+              maxItem = w;
+            }
+          });
+          if (!maxItem) {
+            return;
+          }
+          const neededRight = Math.max(minRight, Math.ceil(maxItem + leftGap + rightGap));
+          legend.y(chart.margins().top || 0);
+          legend.x(chart.width() - neededRight + leftGap);
+          // Re-fit the plot margin to the measured legend, then redraw once. Guarded by a
+          // threshold so it settles instead of looping on sub-pixel differences, and so a
+          // later legend change (e.g. a filter) re-fits on its own.
+          if (Math.abs((chart.margins().right || 0) - neededRight) > 2) {
+            chart.margins(Object.assign({}, chart.margins(), { right: neededRight }));
+            chart.redraw();
+          }
+        });
       }
       this.chart.legend(legend);
 
