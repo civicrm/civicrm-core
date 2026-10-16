@@ -646,12 +646,6 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   public static function buildSearchForm(&$form) {
     $form->addSearchFieldMetadata(['Participant' => self::getSearchFieldMetadata()]);
     $form->addFormFieldsFromMetadata();
-    $dataURLEventFee = CRM_Utils_System::url('civicrm/ajax/eventFee',
-      "reset=1",
-      FALSE, NULL, FALSE
-    );
-
-    $form->assign('dataURLEventFee', $dataURLEventFee);
 
     $form->addEntityRef('event_id', ts('Event Name'), [
       'entity' => 'Event',
