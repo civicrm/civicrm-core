@@ -3144,6 +3144,24 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * A PHP error while sending the receipt does not undo the completion.
+   */
+  public function testCompleteTransactionWithReceiptError(): void {
+    $contribution = $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, ['contribution_status_id' => 'Pending']));
+    $this->hookClass->setHook('civicrm_alterMailParams', function () {
+      throw new TypeError('Ruh-roh');
+    });
+    $this->callAPISuccess('Contribution', 'completetransaction', [
+      'id' => $contribution['id'],
+      'is_email_receipt' => 1,
+    ]);
+    $this->assertEquals('Completed', Contribution::get(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->addSelect('contribution_status_id:name')
+      ->execute()->single()['contribution_status_id:name']);
+  }
+
+  /**
    * Complete the transaction using the template with all the possible.
    */
   public function testCompleteTransactionWithTestTemplate(): void {
