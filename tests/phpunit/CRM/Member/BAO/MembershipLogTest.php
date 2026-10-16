@@ -24,6 +24,7 @@
  *   <http://www.gnu.org/licenses/>.
  */
 
+use Civi\Api4\MembershipLog;
 use Civi\Api4\MembershipType;
 
 /**
@@ -116,8 +117,12 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    */
   public function testDel(): void {
     list($contactID, $membershipID) = $this->setupMembership();
-    CRM_Member_BAO_MembershipLog::deleteRecord(['id' => $membershipID]);
-    $this->assertDBNull('CRM_Member_BAO_MembershipLog', $membershipID, 'membership_id',
+    // The log is written as a side effect of creating the membership.
+    $membershipLogID = MembershipLog::get(FALSE)
+      ->addWhere('membership_id', '=', $membershipID)
+      ->execute()->single()['id'];
+    CRM_Member_BAO_MembershipLog::deleteRecord(['id' => $membershipLogID]);
+    $this->assertDBNull('CRM_Member_BAO_MembershipLog', $membershipLogID, 'membership_id',
       'id', 'Database check for deleted membership log.'
     );
 
