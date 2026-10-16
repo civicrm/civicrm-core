@@ -9,7 +9,9 @@ jobs:
     name: Remind Contributor
     if: |
       github.event.pull_request.merged == true &&
-      github.event.pull_request.user.type != 'Bot'
+      github.event.pull_request.user.type != 'Bot' &&
+      !endsWith(github.event.pull_request.user.login, '[bot]') &&
+      github.event.pull_request.user.login != 'civicrm-builder'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -19,7 +21,7 @@ jobs:
     steps:
       - name: Check and remind contributor
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PR_COMMANDS_PAT || secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           BASE_REF: ${{ github.event.pull_request.base.ref }}
@@ -30,24 +32,32 @@ jobs:
             exit 0
           fi
 
-          # 2. Skip if this PR itself already touched contributor-key.yml
+          # 2. Skip bots and automated service accounts
+          case "$PR_AUTHOR" in
+            civicrm-builder|civicrm-bot|*\[bot\])
+              echo "Author @$PR_AUTHOR is an automated service account. Skipping."
+              exit 0
+              ;;
+          esac
+
+          # 3. Skip if this PR itself already touched contributor-key.yml
           TOUCHED=$(gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" --json files --jq '[.files[].path | select(. == "contributor-key.yml")] | length')
           if [ "$TOUCHED" -gt 0 ]; then
             echo "PR #$PR_NUMBER already edited contributor-key.yml. Skipping."
             exit 0
           fi
 
-          # 3. Fetch contributor-key.yml from master
+          # 4. Fetch contributor-key.yml from master
           gh api "repos/${{ github.repository }}/contents/contributor-key.yml?ref=master" \
             -H "Accept: application/vnd.github.raw" > contributor-key.yml
 
-          # 4. Check if author handle is already listed
+          # 5. Check if author handle is already listed
           if grep -qiE "^\s*-?\s*github\s*:\s*['\"]?${PR_AUTHOR}['\"]?\s*$" contributor-key.yml; then
             echo "Author @$PR_AUTHOR is already in contributor-key.yml. Skipping."
             exit 0
           fi
 
-          # 5. Post reminder comment
+          # 6. Post reminder comment
           echo "Author @$PR_AUTHOR not found in contributor-key.yml. Posting reminder comment..."
           gh pr comment "$PR_NUMBER" --repo "${{ github.repository }}" --body "Thank you for your contribution, @${PR_AUTHOR}! 🎉
 
