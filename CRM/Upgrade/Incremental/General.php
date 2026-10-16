@@ -47,8 +47,7 @@ class CRM_Upgrade_Incremental_General {
    *
    * A site running an earlier version will be encouraged to upgrade.
    *
-   * NOTE: When changing this, also update the target CiviCRM version in self::setPreUpgradeMessage
-   * (parm 4 of the 2nd message in that function).
+   * NOTE: When changing this, also update self::CIVI_VER_REQUIRING_RECOMMENDED_DB.
    */
   const MIN_RECOMMENDED_MYSQL_VER = '8.0';
 
@@ -62,8 +61,7 @@ class CRM_Upgrade_Incremental_General {
    *
    * A site running an earlier version will be encouraged to upgrade.
    *
-   * NOTE: When changing this, also update the target CiviCRM version in self::setPreUpgradeMessage
-   * (parm 4 of the 2nd message in that function).
+   * NOTE: When changing this, also update self::CIVI_VER_REQUIRING_RECOMMENDED_DB.
    */
   const MIN_RECOMMENDED_MARIADB_VER = '10.4';
 
@@ -71,6 +69,11 @@ class CRM_Upgrade_Incremental_General {
    * The minimum MariaDB version required to install Civi.
    */
   const MIN_INSTALL_MARIADB_VER = '10.2';
+
+  /**
+   * The CiviCRM version that will require the recommended MySQL/MariaDB version.
+   */
+  const CIVI_VER_REQUIRING_RECOMMENDED_DB = '6.23';
 
   /**
    * Compute any messages which should be displayed before upgrade.
@@ -93,13 +96,14 @@ class CRM_Upgrade_Incremental_General {
       ]);
       $preUpgradeMessage .= '</p>';
     }
-    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), self::MIN_RECOMMENDED_MYSQL_VER) < 0) {
+    $minRecommendedDbVer = CRM_Utils_SQL::isMariaDB() ? self::MIN_RECOMMENDED_MARIADB_VER : self::MIN_RECOMMENDED_MYSQL_VER;
+    if (version_compare(CRM_Utils_SQL::getDatabaseVersion(), $minRecommendedDbVer) < 0) {
       $preUpgradeMessage .= '<p>';
       $preUpgradeMessage .= ts('This system uses MySQL/MariaDB v%5. You may proceed with the upgrade, and CiviCRM v%1 will continue working normally. However, CiviCRM v%4 will require MySQL v%2 or MariaDB v%3.', [
         1 => $latestVer,
         2 => self::MIN_RECOMMENDED_MYSQL_VER . '+',
         3 => self::MIN_RECOMMENDED_MARIADB_VER . '+',
-        4 => '6.23' . '+',
+        4 => self::CIVI_VER_REQUIRING_RECOMMENDED_DB . '+',
         5 => CRM_Utils_SQL::getDatabaseVersion(),
       ]);
       $preUpgradeMessage .= '</p>';
