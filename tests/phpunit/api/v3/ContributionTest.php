@@ -3162,6 +3162,27 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * A PHP error while updating the membership does not undo the payment.
+   */
+  public function testPaymentWithMembershipError(): void {
+    $this->createPriceSetWithPage();
+    $this->setUpPendingContribution($this->ids['PriceFieldValue']['one_term_membership']);
+    $this->hookClass->setHook('civicrm_pre', function ($op, $objectName) {
+      if ($op === 'edit' && $objectName === 'Membership') {
+        throw new TypeError('Ruh-roh');
+      }
+    });
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $this->getContributionID(),
+      'total_amount' => 20,
+    ]);
+    $this->assertEquals('Completed', Contribution::get(FALSE)
+      ->addWhere('id', '=', $this->getContributionID())
+      ->addSelect('contribution_status_id:name')
+      ->execute()->single()['contribution_status_id:name']);
+  }
+
+  /**
    * Complete the transaction using the template with all the possible.
    */
   public function testCompleteTransactionWithTestTemplate(): void {
