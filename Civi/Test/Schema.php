@@ -325,7 +325,7 @@ class Schema {
       'civicrm_phone',
       'civicrm_pledge',
       // 'civicrm_pledge_block',
-      'civicrm_pledge_payment',
+      // 'civicrm_pledge_payment',
       // 'civicrm_preferences_date',
       // 'civicrm_premiums',
       // 'civicrm_premiums_product',

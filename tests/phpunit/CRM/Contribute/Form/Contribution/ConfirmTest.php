@@ -1220,12 +1220,12 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(30.00, $pledge['amount']);
 
     // Check if pledge payments created.
-    $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', ['pledge_id' => $pledge['id']]);
+    $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', ['pledge_id' => $pledge['id'], 'sequential' => 1]);
     $this->assertEquals(3, $pledgePayment['count']);
-    $this->assertEquals(date('Ymd', strtotime($pledgePayment['values'][1]['scheduled_date'])), date('Ymd', strtotime('+1 month')));
-    $this->assertEquals(10.00, $pledgePayment['values'][1]['scheduled_amount']);
+    $this->assertEquals(date('Ymd', strtotime($pledgePayment['values'][0]['scheduled_date'])), date('Ymd', strtotime('+1 month')));
+    $this->assertEquals(10.00, $pledgePayment['values'][0]['scheduled_amount']);
     // Will be pending when actual payment processor is used (dummy processor does not support future payments).
-    $this->assertEquals(1, $pledgePayment['values'][1]['status_id']);
+    $this->assertEquals(1, $pledgePayment['values'][0]['status_id']);
 
     // Check contribution recur record.
     $recur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
@@ -1245,13 +1245,14 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   public function testSubmitPledgePayment(): void {
     $this->testSubmitPledgePaymentPaymentProcessorRecurFuturePayment();
     $pledge = Pledge::get()->execute()->single();
-    $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', [
+    $secondPledgePayment = $this->callAPISuccess('pledge_payment', 'get', [
       'pledge_id' => $pledge['id'],
-    ]);
-    $this->assertEquals(2, $pledgePayment['values'][2]['status_id']);
+      'sequential' => 1,
+    ])['values'][1];
+    $this->assertEquals(2, $secondPledgePayment['status_id']);
 
     $this->submitOnlineContributionForm([
-      'pledge_amount' => [2 => 1],
+      'pledge_amount' => [$secondPledgePayment['id'] => 1],
       'pledge_frequency_unit' => 'month',
       'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
       'cid' => $pledge['contact_id'],
@@ -1274,8 +1275,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
     $this->assertEquals(10.00, $contribution['total_amount']);
     $pledgePayment = $this->callAPISuccess('PledgePayment', 'get', ['pledge_id' => $pledge['id']])['values'];
-    $this->assertEquals(1, $pledgePayment[2]['status_id'], 'This pledge payment should have been completed');
-    $this->assertEquals($contribution['id'], $pledgePayment[2]['contribution_id']);
+    $this->assertEquals(1, $pledgePayment[$secondPledgePayment['id']]['status_id'], 'This pledge payment should have been completed');
+    $this->assertEquals($contribution['id'], $pledgePayment[$secondPledgePayment['id']]['contribution_id']);
   }
 
   /**
