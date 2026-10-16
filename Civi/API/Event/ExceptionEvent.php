@@ -19,12 +19,12 @@ namespace Civi\API\Event;
 class ExceptionEvent extends Event {
 
   /**
-   * @var \Exception
+   * @var \Throwable
    */
   private $exception;
 
   /**
-   * @param \Exception $exception
+   * @param \Throwable $exception
    *   The exception which arose while processing the API request.
    * @param \Civi\API\Provider\ProviderInterface $apiProvider
    *   The API provider responsible for executing the request.
@@ -39,7 +39,7 @@ class ExceptionEvent extends Event {
   }
 
   /**
-   * @return \Exception
+   * @return \Throwable
    */
   public function getException() {
     return $this->exception;

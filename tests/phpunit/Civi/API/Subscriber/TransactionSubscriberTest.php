@@ -122,4 +122,42 @@ class TransactionSubscriberTest extends \CiviUnitTestCase {
     ]);
   }
 
+  public function testRollbackOnError(): void {
+    $this->hookClass->setHook('civicrm_post', function ($op, $objectName) {
+      if ($objectName === 'Individual') {
+        throw new \TypeError('Ruh-roh');
+      }
+    });
+    try {
+      civicrm_api3('Contact', 'create', [
+        'contact_type' => 'Individual',
+        'first_name' => 'Me',
+        'last_name' => 'Myself',
+      ]);
+      $this->fail('The error should reach the caller');
+    }
+    catch (\TypeError $e) {
+    }
+    $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_contact WHERE first_name = 'Me' AND last_name = 'Myself'");
+  }
+
+  public function testGenericReplaceRollsBackOnError(): void {
+    $contactID = $this->individualCreate();
+    $this->hookClass->setHook('civicrm_post', function ($op, $objectName, $objectId, $objectRef) {
+      if ($op === 'create' && $objectName === 'Email' && $objectRef->email === 'second@example.org') {
+        throw new \TypeError('Ruh-roh');
+      }
+    });
+    try {
+      civicrm_api3('Email', 'replace', [
+        'contact_id' => $contactID,
+        'values' => [['email' => 'first@example.org'], ['email' => 'second@example.org']],
+      ]);
+      $this->fail('The error should reach the caller');
+    }
+    catch (\TypeError $e) {
+    }
+    $this->assertDBQuery(0, "SELECT COUNT(*) FROM civicrm_email WHERE email IN ('first@example.org', 'second@example.org')");
+  }
+
 }

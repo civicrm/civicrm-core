@@ -165,7 +165,7 @@ class Kernel {
 
       return $this->respond($apiProvider, $apiRequest, $result);
     }
-    catch (\Exception $e) {
+    catch (\Throwable $e) {
       if ($apiRequest) {
         $this->dispatcher->dispatch('civi.api.exception', new ExceptionEvent($e, NULL, $apiRequest, $this));
       }
