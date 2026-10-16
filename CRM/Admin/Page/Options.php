@@ -120,6 +120,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
         'case_status',
         'encounter_medium',
         'case_type',
+        'contribution_status',
         'payment_instrument',
         'soft_credit_type',
         'website_type',

@@ -339,6 +339,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       'case_status',
       'encounter_medium',
       'case_type',
+      'contribution_status',
       'payment_instrument',
       'communication_style',
       'soft_credit_type',

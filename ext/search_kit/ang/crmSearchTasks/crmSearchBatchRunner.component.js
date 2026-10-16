@@ -84,6 +84,12 @@
         crmApi4(entityName, actionName, params).then(
           function(result) {
             stopIncrementer();
+            // Batch actions record a failed item in result.errors instead of failing the call
+            if (result.is_blocking_error) {
+              const messages = new Set(result.errors.map((error) => error.message));
+              ctrl.error({error: {error_message: [...messages].join(' ')}});
+              return;
+            }
             ctrl.progress = Math.floor(100 * ++currentBatch / totalBatches);
             processedCount += result.countFetched;
             countMatched += ('countMatched' in result ? result.countMatched : result.count);
