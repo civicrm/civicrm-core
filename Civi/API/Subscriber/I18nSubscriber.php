@@ -36,6 +36,7 @@ class I18nSubscriber implements EventSubscriberInterface {
     return [
       'civi.api.prepare' => ['onApiPrepare', Events::W_MIDDLE],
       'civi.api.respond' => ['onApiRespond', Events::W_LATE],
+      'civi.api.exception' => ['onApiRespond', Events::W_LATE],
     ];
   }
 
@@ -67,7 +68,7 @@ class I18nSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * Reset language to the default.
+   * Reset language to the default, whether the request succeeded or failed.
    *
    * @param \Civi\API\Event\Event $event
    *
