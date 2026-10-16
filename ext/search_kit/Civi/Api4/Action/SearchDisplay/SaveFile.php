@@ -91,9 +91,13 @@ class SaveFile extends AbstractRunAction {
     }
     else {
       ob_start();
-      $this->processData($this->display['label'], $this->display['settings']['columns'], $rows, $fileName);
-      $searchDisplayContent = ob_get_contents();
-      ob_end_clean();
+      try {
+        $this->processData($this->display['label'], $this->display['settings']['columns'], $rows, $fileName);
+        $searchDisplayContent = ob_get_contents();
+      }
+      finally {
+        ob_end_clean();
+      }
     }
 
     if (!empty($searchDisplayContent)) {
