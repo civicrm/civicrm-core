@@ -137,7 +137,7 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
     try {
       static::deleteRecord(['id' => $paymentProcessorTypeId]);
       // This message is bad on so many levels
-      CRM_Core_Session::setStatus(ts('Selected Payment Processor type has been deleted.<br/>'), '', 'success');
+      CRM_Core_Session::setStatus(ts('Selected Payment Processor type has been deleted.'), '', 'success');
       return TRUE;
     }
     catch (CRM_Core_Exception $e) {

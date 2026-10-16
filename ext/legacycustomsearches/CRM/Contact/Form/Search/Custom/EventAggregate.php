@@ -36,7 +36,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     $this->_columns = [
       ts('Event') => 'event_name',
       ts('Type') => 'event_type',
-      ts('Number of<br />Participant') => 'participant_count',
+      ts('Number of Participants') => 'participant_count',
       ts('Total Payment') => 'payment_amount',
       ts('Fee') => 'fee',
       ts('Net Payment') => 'net_payment',

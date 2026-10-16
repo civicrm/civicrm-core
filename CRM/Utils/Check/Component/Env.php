@@ -754,9 +754,10 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
     if (empty($setting) || empty($exts)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('None of the CiviCRM components are enabled. This is theoretically legal, but it is most likely a misconfiguration.<br/> Please inspect and re-save the <a %1>component settings</a>.', [
-          1 => sprintf('target="_blank" href="%s"', Civi::url('backend://civicrm/admin/setting/component?reset=1', 'ah')),
-        ]),
+        ts('None of the CiviCRM components are enabled. This is theoretically legal, but it is most likely a misconfiguration.') . '<br/>'
+          . ts('Please inspect and re-save the <a %1>component settings</a>.', [
+            1 => sprintf('target="_blank" href="%s"', Civi::url('backend://civicrm/admin/setting/component?reset=1', 'ah')),
+          ]),
         ts('Missing Components'),
         \Psr\Log\LogLevel::WARNING,
         'fa-server'
@@ -924,11 +925,8 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       if (version_compare($dbVersion, $codeVersion) > 0) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__,
-          ts('Your database is marked with an unexpected version number: %1. The v%2 codebase may not be compatible with your database state.
-            You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase
-            you were using until you resolve this problem.<br/>OR if this is a manual install from git, you might want to fix civicrm-version.php file.',
-              [1 => $dbVersion, 2 => $codeVersion]
-            ),
+          ts('Your database is marked with an unexpected version number: %1. The v%2 codebase may not be compatible with your database state. You will need to determine the correct version corresponding to your current database state. You may want to revert to the codebase you were using until you resolve this problem.', [1 => $dbVersion, 2 => $codeVersion])
+            . '<br/>' . ts('OR if this is a manual install from git, you might want to fix civicrm-version.php file.'),
           ts('Database In Unexpected Version'),
           \Psr\Log\LogLevel::ERROR,
           'fa-database'

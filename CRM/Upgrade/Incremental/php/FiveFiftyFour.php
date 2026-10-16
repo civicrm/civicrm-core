@@ -25,7 +25,8 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFour extends CRM_Upgrade_Incremental_
     parent::setPreUpgradeMessage($preUpgradeMessage, $rev, $currentVer);
     if ($rev === '5.54.alpha1') {
       if (\Civi::settings()->get('civicaseActivityRevisions')) {
-        $preUpgradeMessage .= '<p>' . ts('The setting that used to be at <em>Administer &gt; CiviCase &gt; CiviCase Settings</em> for <strong>Enable deprecated Embedded Activity Revisions</strong> is enabled, but is no longer functional.<ul><li>For more information see this <a %1>Lab Snippet</a>.</li></ul>', [1 => 'target="_blank" href="https://lab.civicrm.org/-/snippets/85"']) . '</p>';
+        $preUpgradeMessage .= '<p>' . ts('The setting that used to be at <em>Administer &gt; CiviCase &gt; CiviCase Settings</em> for <strong>Enable deprecated Embedded Activity Revisions</strong> is enabled, but is no longer functional.') . '</p>'
+          . '<ul><li>' . ts('For more information see this <a %1>Lab Snippet</a>.', [1 => 'target="_blank" href="https://lab.civicrm.org/-/snippets/85"']) . '</li></ul>';
       }
       $preUpgradeMessage .= ($this->renderQueueMessage() ?: '');
     }

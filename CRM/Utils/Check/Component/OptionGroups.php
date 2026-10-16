@@ -50,19 +50,16 @@ class CRM_Utils_Check_Component_OptionGroups extends CRM_Utils_Check_Component {
       }
     }
     if (!empty($problemValues)) {
-      $strings = '';
+      $rows = '';
       foreach ($problemValues as $problemValue) {
-        $strings .= ts('<tr><td> "%1" </td><td> "%2" </td></tr>', [
-          1 => $problemValue['group_name'],
-          2 => $problemValue['value_name'],
-        ]);
+        $rows .= '<tr><td>' . htmlspecialchars($problemValue['group_name']) . '</td><td>' . htmlspecialchars($problemValue['value_name']) . '</td></tr>';
       }
 
       $messages[] = new CRM_Utils_Check_Message(
        __FUNCTION__,
-       ts('The Following Option Values contain value fields that do not match the Data Type of the Option Group</p>
-        <p><table><tbody><th>Option Group</th><th>Option Value</th></tbody><tbody>') .
-        $strings . ts('</tbody></table></p>'),
+       ts('The Following Option Values contain value fields that do not match the Data Type of the Option Group')
+        . '<table><thead><tr><th>' . ts('Option Group') . '</th><th>' . ts('Option Value') . '</th></tr></thead><tbody>'
+        . $rows . '</tbody></table>',
         ts('Option Values with problematic Values'),
         \Psr\Log\LogLevel::NOTICE,
         'fa-server'
