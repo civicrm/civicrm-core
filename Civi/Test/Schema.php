@@ -220,7 +220,7 @@ class Schema {
       // 'civicrm_action_log',
       // 'civicrm_action_schedule',
       'civicrm_activity',
-      'civicrm_activity_contact',
+      // 'civicrm_activity_contact',
       'civicrm_address',
       // 'civicrm_address_format',
       // 'civicrm_afform_submission',
