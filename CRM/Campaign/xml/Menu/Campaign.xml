@@ -175,4 +175,11 @@
     <component>CiviCampaign</component>
     <is_ajax>true</is_ajax>
   </item>
- </menu>
+  <item>
+    <path>civicrm/ajax/campaign/groups</path>
+    <page_callback>CRM_Campaign_Page_AJAX::campaignGroups</page_callback>
+    <access_arguments>manage campaign;reserve campaign contacts</access_arguments>
+    <component>CiviCampaign</component>
+    <is_ajax>true</is_ajax>
+  </item>
+</menu>
