@@ -253,12 +253,12 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     // This should be overwritten from the contribution....
     $this->assign('currency', \Civi::settings()->get('defaultCurrency'));
     parent::preProcess();
-    $params = [];
-    $params['context'] = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'membership');
-    $params['id'] = $this->getMembershipID();
-    $params['mode'] = CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this);
-
-    $this->setContextVariables($params);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'membership');
+    $this->_id = $this->getMembershipID();
+    if ($this->_id) {
+      $this->_membershipIDs[] = $this->_id;
+    }
+    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
 
     $this->assign('context', $this->_context);
     $this->assign('membershipMode', $this->_mode);
@@ -570,35 +570,6 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   public function getPaymentProcessorID(): int {
     return (int) ($this->getSubmittedValue('payment_processor_id') ?: $this->_paymentProcessor['id']);
-  }
-
-  /**
-   * Set variables in a way that can be accessed from different places.
-   *
-   * This is part of refactoring for unit testability on the submit function.
-   *
-   * @param array $params
-   *
-   * @throws \CRM_Core_Exception
-   */
-  protected function setContextVariables(array $params): void {
-    $variables = [
-      'action' => '_action',
-      'context' => '_context',
-      'id' => '_id',
-      'cid' => '_contactID',
-      'mode' => '_mode',
-    ];
-    foreach ($variables as $paramKey => $classVar) {
-      if (isset($params[$paramKey]) && !isset($this->$classVar)) {
-        $this->$classVar = $params[$paramKey];
-      }
-    }
-
-    if ($this->_id) {
-      $this->_membershipIDs[] = $this->_id;
-    }
-    $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
   }
 
   /**

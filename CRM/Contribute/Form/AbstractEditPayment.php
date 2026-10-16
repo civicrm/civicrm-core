@@ -299,9 +299,12 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    */
   public function getContactID():?int {
     if ($this->_contactID === NULL) {
-      $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
-      if (empty($this->_contactID) && !empty($this->_id) && $this->entity) {
-        $this->_contactID = civicrm_api3($this->entity, 'getvalue', ['id' => $this->_id, 'return' => 'contact_id']);
+      $this->_contactID = $this->getSubmittedValue('contact_id');
+      if (!$this->_contactID) {
+        $this->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+        if (empty($this->_contactID) && !empty($this->_id) && $this->entity) {
+          $this->_contactID = civicrm_api3($this->entity, 'getvalue', ['id' => $this->_id, 'return' => 'contact_id']);
+        }
       }
     }
     return $this->_contactID ? (int) $this->_contactID : NULL;
