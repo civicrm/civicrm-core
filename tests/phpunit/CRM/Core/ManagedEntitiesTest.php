@@ -404,6 +404,45 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   }
 
   /**
+   * A PHP error while saving one APIv4 managed entity is logged and the others are still reconciled.
+   */
+  public function testErrorInOneEntityDoesNotStopOthers(): void {
+    $brokenIds = [];
+    $this->hookClass->setHook('civicrm_pre', function($op, $objectName, $id, &$params) use (&$brokenIds) {
+      $isBroken = $op === 'create' ? ($params['name'] ?? '') === 'managed_broken' : in_array((int) $id, $brokenIds, TRUE);
+      if ($objectName === 'OptionGroup' && $isBroken) {
+        throw new TypeError('Ruh-roh');
+      }
+    });
+    $declare = fn(string $name, string $title) => [
+      'module' => 'com.example.one',
+      'name' => $name,
+      'entity' => 'OptionGroup',
+      'params' => ['version' => 4, 'values' => ['name' => $name, 'title' => $title]],
+    ];
+    $groups = 'SELECT GROUP_CONCAT(CONCAT(name, ":", title) ORDER BY name) FROM civicrm_option_group WHERE name LIKE "managed_%"';
+
+    // Create.
+    $this->managedEntities = [$declare('managed_broken', 'Before'), $declare('managed_healthy', 'Before')];
+    (new CRM_Core_ManagedEntities($this->modules))->reconcile();
+    $this->assertDBQuery('managed_healthy:Before', $groups);
+    $this->assertDBQuery('managed_healthy', 'SELECT GROUP_CONCAT(name) FROM civicrm_managed WHERE module = "com.example.one"');
+
+    // Update: this one is created first, then fails from here on.
+    $this->managedEntities = [$declare('managed_alsobroken', 'Before'), $declare('managed_healthy', 'Before')];
+    (new CRM_Core_ManagedEntities($this->modules))->reconcile();
+    $brokenIds = [(int) CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_option_group WHERE name = "managed_alsobroken"')];
+    $this->managedEntities = [$declare('managed_alsobroken', 'After'), $declare('managed_healthy', 'After')];
+    (new CRM_Core_ManagedEntities($this->modules))->reconcile();
+    $this->assertDBQuery('managed_alsobroken:Before,managed_healthy:After', $groups);
+
+    // Delete.
+    $this->managedEntities = [];
+    (new CRM_Core_ManagedEntities($this->modules))->reconcile();
+    $this->assertDBQuery('managed_alsobroken:Before', $groups);
+  }
+
+  /**
    * Setup an active module with a malformed entity declaration.
    */
   public function testInvalidDeclarationModule(): void {
