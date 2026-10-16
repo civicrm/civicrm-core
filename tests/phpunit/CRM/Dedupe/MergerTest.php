@@ -2256,4 +2256,26 @@ WHERE
     return $contributionId;
   }
 
+  /**
+   * A PHP error during the merge must not leave a half merge behind.
+   */
+  public function testMergeRollsBackOnError(): void {
+    $keepID = $this->individualCreate();
+    $removeID = $this->individualCreate([], 1);
+    $this->hookClass->setHook('civicrm_merge', function ($type) use ($keepID) {
+      if ($type === 'sqls') {
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_contact SET nick_name = 'half-merged' WHERE id = %1", [1 => [$keepID, 'Integer']]);
+        throw new TypeError('Ruh-roh');
+      }
+    });
+    try {
+      $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $keepID, 'to_remove_id' => $removeID, 'mode' => 'aggressive']);
+      $this->fail('The error should reach the caller');
+    }
+    catch (TypeError $e) {
+    }
+    $this->assertDBQuery(0, "SELECT COUNT(*) FROM civicrm_contact WHERE nick_name = 'half-merged'");
+    $this->assertDBQuery(0, 'SELECT is_deleted FROM civicrm_contact WHERE id = %1', [1 => [$removeID, 'Integer']]);
+  }
+
 }
