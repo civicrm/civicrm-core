@@ -82,7 +82,9 @@ return [
               'key' => 'start_date',
               'label' => 'Start Date',
               'sortable' => TRUE,
-              'editable' => TRUE,
+              // Start date is required (see CRM_Campaign_Form_Campaign) but nullable in the schema,
+              // so inline edit would allow blanking it out. Edit via the form instead.
+              'editable' => FALSE,
             ],
             [
               'type' => 'field',
