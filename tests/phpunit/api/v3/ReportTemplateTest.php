@@ -1682,9 +1682,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       // here's the delete
       0 => [
         'field' => [
-          0 => 'Activity ID (id: 2)',
-          1 => 'Contact ID (id: 2)',
-          2 => 'Activity Contact Type (id: 2)',
+          0 => 'Activity ID (record id: 2)',
+          1 => 'Contact ID (record id: 2)',
+          2 => 'Activity Contact Type (record id: 2)',
         ],
         'from' => [
           0 => 'Very secret meeting (id: 1)',
@@ -1700,9 +1700,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       // this is the insert
       1 => [
         'field' => [
-          0 => 'Activity ID (id: 5)',
-          1 => 'Contact ID (id: 5)',
-          2 => 'Activity Contact Type (id: 5)',
+          0 => 'Activity ID (record id: 5)',
+          1 => 'Contact ID (record id: 5)',
+          2 => 'Activity Contact Type (record id: 5)',
         ],
         'from' => [
           0 => '',
