@@ -34,9 +34,7 @@ return [
           'having' => [],
         ],
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -141,11 +139,7 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'actions' => [
-            'delete',
-            'disable',
-            'enable',
-          ],
+          'actions' => ['delete', 'disable', 'enable'],
           'classes' => [
             'table',
             'table-striped',
@@ -166,12 +160,7 @@ return [
             ],
           ],
           'cssRules' => [
-            [
-              'disabled',
-              'is_active',
-              '=',
-              FALSE,
-            ],
+            ['disabled', 'is_active', '=', FALSE],
           ],
         ],
       ],

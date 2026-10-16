@@ -36,9 +36,7 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -68,10 +66,7 @@ return [
           ],
           'placeholder' => 5,
           'sort' => [
-            [
-              'name',
-              'ASC',
-            ],
+            ['name', 'ASC'],
           ],
           'columns' => [
             [
@@ -164,11 +159,7 @@ return [
                   'text' => 'Delete',
                   'style' => 'danger',
                   'path' => '',
-                  'condition' => [
-                    'is_reserved',
-                    '=',
-                    FALSE,
-                  ],
+                  'condition' => ['is_reserved', '=', FALSE],
                 ],
               ],
               'type' => 'menu',
@@ -187,12 +178,7 @@ return [
             ],
           ],
           'cssRules' => [
-            [
-              'disabled',
-              'is_active',
-              '=',
-              FALSE,
-            ],
+            ['disabled', 'is_active', '=', FALSE],
           ],
         ],
         'acl_bypass' => FALSE,

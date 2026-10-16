@@ -33,9 +33,7 @@ return [
           'having' => [],
         ],
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -53,10 +51,7 @@ return [
         'settings' => [
           'description' => NULL,
           'sort' => [
-            [
-              'username',
-              'ASC',
-            ],
+            ['username', 'ASC'],
           ],
           'limit' => 50,
           'pager' => [],
@@ -195,10 +190,7 @@ return [
             'enable',
             'send_password_reset',
           ],
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
           'toolbar' => [
             [
               'path' => '/civicrm/admin/user#',

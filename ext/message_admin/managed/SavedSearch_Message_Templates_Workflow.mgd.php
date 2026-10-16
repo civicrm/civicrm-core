@@ -57,28 +57,64 @@ return [
               'Translation AS MessageTemplate_Translation_entity_id_01',
               'LEFT',
               NULL,
-              ['MessageTemplate_Translation_entity_id_01.entity_table', '=', "'civicrm_msg_template'"],
-              ['MessageTemplate_Translation_entity_id_01.entity_id', '=', 'id'],
+              [
+                'MessageTemplate_Translation_entity_id_01.entity_table',
+                '=',
+                "'civicrm_msg_template'",
+              ],
+              [
+                'MessageTemplate_Translation_entity_id_01.entity_id',
+                '=',
+                'id',
+              ],
             ],
             [
               'Translation AS MessageTemplate_Translation_entity_id_02',
               'LEFT',
               NULL,
-              ['MessageTemplate_Translation_entity_id_02.entity_table', '=', "'civicrm_msg_template'"],
-              ['MessageTemplate_Translation_entity_id_02.entity_id', '=', 'id'],
-              ['MessageTemplate_Translation_entity_id_02.status_id:name', '=', '"active"'],
+              [
+                'MessageTemplate_Translation_entity_id_02.entity_table',
+                '=',
+                "'civicrm_msg_template'",
+              ],
+              [
+                'MessageTemplate_Translation_entity_id_02.entity_id',
+                '=',
+                'id',
+              ],
+              [
+                'MessageTemplate_Translation_entity_id_02.status_id:name',
+                '=',
+                '"active"',
+              ],
             ],
             [
               'Translation AS MessageTemplate_Translation_entity_id_03',
               'LEFT',
               NULL,
-              ['MessageTemplate_Translation_entity_id_03.entity_table', '=', "'civicrm_msg_template'"],
-              ['MessageTemplate_Translation_entity_id_03.entity_id', '=', 'id'],
-              ['MessageTemplate_Translation_entity_id_03.status_id:name', '=', '"draft"'],
+              [
+                'MessageTemplate_Translation_entity_id_03.entity_table',
+                '=',
+                "'civicrm_msg_template'",
+              ],
+              [
+                'MessageTemplate_Translation_entity_id_03.entity_id',
+                '=',
+                'id',
+              ],
+              [
+                'MessageTemplate_Translation_entity_id_03.status_id:name',
+                '=',
+                '"draft"',
+              ],
             ],
             // No explicit ON conditions needed - with no conditions given, API4's bridge-join
             // handling links the bridge row to this entity automatically (entity_id/entity_table).
-            ['File AS MessageTemplate_EntityFile_File_01', 'LEFT', 'EntityFile'],
+            [
+              'File AS MessageTemplate_EntityFile_File_01',
+              'LEFT',
+              'EntityFile',
+            ],
           ],
         ],
       ],
@@ -106,25 +142,35 @@ return [
         'acl_bypass' => TRUE,
         'settings' => [
           'limit' => 50,
-          'sort' => [['msg_title', 'ASC']],
-          'pager' => ['show_count' => TRUE, 'expose_limit' => TRUE],
+          'sort' => [
+            ['msg_title', 'ASC'],
+          ],
+          'pager' => [
+            'show_count' => TRUE,
+            'expose_limit' => TRUE,
+          ],
           'placeholder' => 5,
           // A workflow template is looked up by `workflow_name` alone when it is sent, so
           // disabling one would not stop it and deleting one would leave the workflow with
           // nothing to send. Listing the tasks leaves those two out of the bulk menu.
-          'actions' => ['add_translation', 'revert', 'update', 'download'],
+          'actions' => [
+            'add_translation',
+            'revert',
+            'update',
+            'download',
+          ],
           'classes' => ['table', 'table-striped'],
           'columns' => [
             [
               'type' => 'field',
               'key' => 'msg_title',
-              'label' => E::ts('Title'),
+              'label' => 'Title',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'translation_languages',
-              'label' => E::ts('Translations'),
+              'label' => 'Translations',
               // A link on a multi-valued field is built per value, so each language links to
               // its own translation rather than one link naming every language at once.
               'link' => [
@@ -134,21 +180,32 @@ return [
             [
               'type' => 'field',
               'key' => 'draft_languages',
-              'label' => E::ts('Drafts'),
-              'title' => E::ts('Languages with an unpublished draft'),
+              'label' => 'Drafts',
+              'title' => 'Languages with an unpublished draft',
               'link' => [
                 'path' => 'civicrm/admin/messageTemplates/edit#/edit?id=[id]&lang=[draft_codes]&status=draft',
               ],
               'icons' => [
-                ['icon' => 'fa-file-text-o', 'side' => 'left', 'if' => ['draft_languages', 'IS NOT EMPTY']],
+                [
+                  'icon' => 'fa-file-text-o',
+                  'side' => 'left',
+                  'if' => [
+                    'draft_languages',
+                    'IS NOT EMPTY',
+                  ],
+                ],
               ],
               'cssRules' => [
-                ['text-warning', 'draft_languages', 'IS NOT EMPTY'],
+                [
+                  'text-warning',
+                  'draft_languages',
+                  'IS NOT EMPTY',
+                ],
               ],
             ],
             [
               'type' => 'buttons',
-              'label' => E::ts('Modified'),
+              'label' => 'Modified',
               'size' => 'btn-xs',
               'links' => [
                 [
@@ -161,7 +218,14 @@ return [
                   // revert to.
                   'conditions' => [
                     ['customized', 'IS NOT EMPTY'],
-                    ['check user permission', 'CONTAINS', ['edit message templates', 'edit system workflow message templates']],
+                    [
+                      'check user permission',
+                      'CONTAINS',
+                      [
+                        'edit message templates',
+                        'edit system workflow message templates',
+                      ],
+                    ],
                   ],
                 ],
               ],
@@ -181,7 +245,15 @@ return [
                   'style' => 'default',
                   // A link naming a task is rendered whether or not the task is available
                   // to this user, so the task's own permission has to be restated here.
-                  'conditions' => [['check user permission', '=', ['translate CiviCRM']]],
+                  'conditions' => [
+                    [
+                      'check user permission',
+                      '=',
+                      [
+                        'translate CiviCRM',
+                      ],
+                    ],
+                  ],
                 ],
                 [
                   // Document-upload templates have no on-screen editor, so they keep using
@@ -191,14 +263,18 @@ return [
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
-                  'conditions' => [['has_document', 'IS NOT EMPTY']],
+                  'conditions' => [
+                    ['has_document', 'IS NOT EMPTY'],
+                  ],
                 ],
                 [
                   'path' => 'civicrm/admin/messageTemplates/edit#/edit?id=[id]',
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
-                  'conditions' => [['has_document', 'IS EMPTY']],
+                  'conditions' => [
+                    ['has_document', 'IS EMPTY'],
+                  ],
                 ],
               ],
             ],

@@ -32,7 +32,7 @@
   <comments>FormBuilder provides a UI to administer and edit forms. It is an optional admin tool and not required for the forms to function.</comments>
   <civix>
     <namespace>CRM/AfformAdmin</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
   </civix>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>

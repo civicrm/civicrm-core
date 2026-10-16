@@ -61,9 +61,7 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -81,10 +79,7 @@ return [
         'settings' => [
           'description' => '',
           'sort' => [
-            [
-              'time_stamp',
-              'DESC',
-            ],
+            ['time_stamp', 'DESC'],
           ],
           'limit' => 10,
           'pager' => [
@@ -126,10 +121,7 @@ return [
             ],
           ],
           'actions' => FALSE,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
           'noResultsText' => '',
         ],
         'acl_bypass' => FALSE,

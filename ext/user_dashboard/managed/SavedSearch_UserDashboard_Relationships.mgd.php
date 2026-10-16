@@ -26,7 +26,11 @@ return [
           ],
           'orderBy' => [],
           'where' => [
-            ['near_contact_id', '=', 'user_contact_id'],
+            [
+              'near_contact_id',
+              '=',
+              'user_contact_id',
+            ],
             ['is_current', '=', TRUE],
           ],
           'groupBy' => [],
@@ -34,15 +38,17 @@ return [
             [
               'Contact AS RelationshipCache_Contact_far_contact_id_01',
               'LEFT',
-              ['far_contact_id', '=', 'RelationshipCache_Contact_far_contact_id_01.id'],
+              [
+                'far_contact_id',
+                '=',
+                'RelationshipCache_Contact_far_contact_id_01.id',
+              ],
             ],
           ],
           'having' => [],
         ],
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -122,10 +128,7 @@ return [
             ],
           ],
           'actions' => FALSE,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
         ],
       ],
       'match' => [

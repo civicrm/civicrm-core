@@ -1,5 +1,4 @@
 <?php
-
 use CRM_CivicrmSearchUi_ExtensionUtil as E;
 
 return [
@@ -29,10 +28,7 @@ return [
             'owner_membership_id',
           ],
           'orderBy' => [
-            [
-              'join_date',
-              'DESC',
-            ],
+            ['join_date', 'DESC'],
           ],
           'where' => [],
           'groupBy' => [],
@@ -68,9 +64,7 @@ return [
           'having' => [],
         ],
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -111,7 +105,7 @@ return [
               'key' => 'membership_type_id:label',
               'label' => 'Type',
               'sortable' => TRUE,
-              'rewrite' => "[membership_type_id:label] {if '[is_primary_member]' === 'No'} (by relationship) {/if}",
+              'rewrite' => '[membership_type_id:label] {if \'[is_primary_member]\' === \'No\'} (by relationship) {/if}',
             ],
             [
               'type' => 'field',
@@ -285,10 +279,7 @@ return [
             ],
           ],
           'actions' => TRUE,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
           'headerCount' => TRUE,
         ],
       ],

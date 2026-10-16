@@ -27,10 +27,7 @@ return [
             [
               'option_group_id:name',
               'IN',
-              [
-                'label_format',
-                'name_badge',
-              ],
+              ['label_format', 'name_badge'],
             ],
           ],
           'groupBy' => [],
@@ -38,9 +35,7 @@ return [
           'having' => [],
         ],
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -131,11 +126,7 @@ return [
                   'icon' => 'fa-trash-o',
                   'text' => 'Delete',
                   'style' => 'danger',
-                  'condition' => [
-                    'is_reserved',
-                    '=',
-                    FALSE,
-                  ],
+                  'condition' => ['is_reserved', '=', FALSE],
                   'task' => '',
                   'entity' => '',
                   'action' => '',

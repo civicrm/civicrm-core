@@ -34,9 +34,7 @@ return [
           'having' => [],
         ],
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -58,10 +56,7 @@ return [
               'mapping_type_id:label',
               'ASC',
             ],
-            [
-              'name',
-              'ASC',
-            ],
+            ['name', 'ASC'],
           ],
           'limit' => 50,
           'pager' => [],
@@ -126,10 +121,7 @@ return [
               'alignment' => 'text-right',
             ],
           ],
-          'actions' => [
-            'delete',
-            'update',
-          ],
+          'actions' => ['delete', 'update'],
           'classes' => [
             'table',
             'table-striped',
