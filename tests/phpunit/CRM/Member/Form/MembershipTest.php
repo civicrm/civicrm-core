@@ -1426,7 +1426,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_id' => $membership['id'],
       'version' => 3,
     ]);
-    $prevContribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
+    $prevContribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['contribution_id']]);
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $contribution['contribution_id'],
       'payment_instrument_id' => 'Cash',
