@@ -304,7 +304,7 @@ class Schema {
       'civicrm_membership',
       // 'civicrm_membership_block',
       // 'civicrm_membership_log',
-      'civicrm_membership_payment',
+      // 'civicrm_membership_payment',
       // 'civicrm_membership_status',
       // 'civicrm_membership_type',
       // 'civicrm_menu',

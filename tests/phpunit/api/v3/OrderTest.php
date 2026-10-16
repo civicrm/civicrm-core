@@ -236,7 +236,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $this->checkPaymentResult($order, $expectedResult);
     $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', $params + ['version' => 3]);
 
-    $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['id']]);
+    $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['membership_id']]);
     $this->callAPISuccess('Contribution', 'Delete', ['id' => $order['id']]);
     $p['line_items'][] = [
       'line_item' => [array_pop($lineItems)],
@@ -382,7 +382,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
     // Check membership details
     $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', ['contribution_id' => $order['id'], 'version' => 3]);
-    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['id']]);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipPayment['membership_id']]);
 
     if (isset($expectations['status_id'])) {
       $membership['status_id'] = \CRM_Member_PseudoConstant::membershipstatus()[$membership['status_id']];
