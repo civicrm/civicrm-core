@@ -119,4 +119,39 @@ class CRM_Mailing_Page_AJAXTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test getContactMailings is denied when user lacks view permission on contact.
+   */
+  public function testGetContactMailingsForbiddenContactDenied(): void {
+    $targetContactId = $this->individualCreate([], 'target_contact');
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviMail']);
+
+    $_GET = $_REQUEST = ['contact_id' => $targetContactId];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Mailing_Page_AJAX::getContactMailings();
+  }
+
+  /**
+   * Test getContactMailings succeeds when user has permission to view contact.
+   */
+  public function testGetContactMailingsSuccess(): void {
+    $targetContactId = $this->individualCreate([], 'target_contact');
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviMail', 'view all contacts']);
+
+    $_GET = $_REQUEST = ['contact_id' => $targetContactId];
+
+    try {
+      CRM_Mailing_Page_AJAX::getContactMailings();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertIsArray($e->errorData);
+      $this->assertArrayHasKey('data', $e->errorData);
+    }
+  }
+
 }

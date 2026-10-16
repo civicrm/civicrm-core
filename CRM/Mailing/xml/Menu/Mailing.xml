@@ -196,7 +196,7 @@
   <item>
     <path>civicrm/ajax/contactmailing</path>
     <page_callback>CRM_Mailing_Page_AJAX::getContactMailings</page_callback>
-    <access_arguments>access CiviCRM</access_arguments>
+    <access_arguments>access CiviMail</access_arguments>
     <is_ajax>true</is_ajax>
   </item>
   <item>
