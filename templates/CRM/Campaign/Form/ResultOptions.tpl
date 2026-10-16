@@ -102,44 +102,31 @@
     }
 
     function loadOptionGroup( ) {
-        var data = new Object;
-
         resetResultSet( );
-        if ( cj('#option_group_id').val() ) {
-            data['option_group_id'] = cj('#option_group_id').val();
-            data['survey_id'] = surveyId;
-        } else {
+        var optionGroupId = cj('#option_group_id').val();
+        if (!optionGroupId) {
             return false;
         }
 
-       var dataUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Campaign_Page_AJAX&fnName=loadOptionGroupDetails'}"{literal}
+        CRM.api4('OptionValue', 'get', {
+            where: [['option_group_id', '=', +optionGroupId]],
+            orderBy: {weight: 'ASC'}
+        }).then((results) => {
+            var countRows = 1;
+            results.forEach((option) => {
+                cj('#option_label_' + countRows).val(option.label);
+                cj('#option_value_' + countRows).val(option.value);
+                cj('#option_weight_' + countRows).val(option.weight);
+                cj('#option_interval_' + countRows).val(option.filter ?? '');
+                cj('#radio'+countRows+' input').prop('checked', option.is_default);
 
-      // build new options
-      cj.post( dataUrl, data, function( opGroup ) {
-         if ( opGroup.status == 'success' ) {
-           var result = opGroup.result;
-             var countRows = 1;
-            for( key in result ) {
-                cj('#option_label_'+ countRows).val( result[key].label);
-                cj('#option_value_'+ countRows).val( result[key].value);
-                cj('#option_weight_'+ countRows).val( result[key].weight);
-
-                if ( surveyId && result[key].interval ) {
-                    cj('#option_interval_'+ countRows).val( result[key].interval);
+                if (countRows > 1) {
+                    showHideRow();
                 }
-
-                if ( result[key].is_default == 1 ) {
-                    cj('#radio'+countRows+' input').prop('checked', true);
-                }
-
-                if ( countRows > 1 ) {
-                    showHideRow( );
-                }
-                countRows +=1;
-        }
-        }
-      }, "json" );
-  }
+                countRows += 1;
+            });
+        });
+    }
 
     CRM.$(function($) {
         showOptionSelect( );

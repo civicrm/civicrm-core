@@ -118,33 +118,6 @@ class CRM_Campaign_Page_AJAX {
     CRM_Utils_JSON::output($result);
   }
 
-  public static function loadOptionGroupDetails() {
-
-    $id = CRM_Utils_Request::retrieve('option_group_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
-    $status = 'fail';
-
-    if ($id) {
-      $opValues = \Civi\Api4\OptionValue::get(FALSE)
-        ->addWhere('option_group_id', '=', $id)
-        ->addOrderBy('weight')
-        ->execute()->indexBy('id');
-      foreach ($opValues as $id => $value) {
-        $opValues[$id]['interval'] = $value['filter'];
-      }
-    }
-
-    if (!empty($opValues)) {
-      $status = 'success';
-    }
-
-    $result = [
-      'status' => $status,
-      'result' => $opValues,
-    ];
-
-    CRM_Utils_JSON::output($result);
-  }
-
   public static function voterList() {
     $searchVoterFor = CRM_Utils_Request::retrieve('campaign_search_voter_for', 'String', NULL, FALSE, NULL, 'POST');
     $permissions = [
