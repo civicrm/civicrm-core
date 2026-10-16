@@ -28,26 +28,31 @@ class CRM_Utils_Check_Component_Tokens extends CRM_Utils_Check_Component {
       $usesLineItems = (bool) CRM_Core_DAO::singleValueQuery('
           SELECT COUNT(*)
           FROM civicrm_msg_template
-          WHERE workflow_name = "' . $workflowName . '"
-          AND (
-            msg_html LIKE "%$lineItems%"
-          )
-        ');
+          WHERE workflow_name = %1
+          AND msg_html LIKE %2
+        ', [
+          1 => [$workflowName, 'String'],
+          2 => ['%$lineItems%', 'String'],
+        ]);
       foreach ($workflowChanges as $old => $new) {
         if ($old === '$lineItem' && $usesLineItems) {
           // Line Item is OK if part of a lineItems loop but not at the top level.
           continue;
         }
-        if (CRM_Core_DAO::singleValueQuery("
+        // Escape LIKE wildcards: token names contain '_', which would otherwise match any character.
+        if (CRM_Core_DAO::singleValueQuery('
           SELECT COUNT(*)
           FROM civicrm_msg_template
-          WHERE workflow_name = '$workflowName'
+          WHERE workflow_name = %1
           AND (
-            msg_html LIKE '%$old%'
-            OR msg_subject LIKE '%$old%'
-            OR civicrm_msg_template.msg_text LIKE '%$old%'
+            msg_html LIKE %2
+            OR msg_subject LIKE %2
+            OR msg_text LIKE %2
           )
-        ")) {
+        ', [
+          1 => [$workflowName, 'String'],
+          2 => ['%' . addcslashes($old, '\\%_') . '%', 'String'],
+        ])) {
           $problems[] = ts('Please review your %1 message template and remove references to the token %2 as it has been replaced by %3', [
             1 => $workflowName,
             2 => '{' . $old . '}',
