@@ -161,7 +161,7 @@
               entityType: entityName,
               afJoin: entityName,
               label: ts('%1 Fields', {1: entity.label}),
-              fields: filterFields(entity.fields)
+              fields: entity.fields ? filterFields(entity.fields) : [],
             });
           }
         });
