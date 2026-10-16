@@ -67,7 +67,7 @@ class api_v3_MailingGroupTest extends CiviUnitTestCase {
     $mail = new CiviMailUtils($this);
     $this->callAPISuccess('MailingEventUnsubscribe', 'create', $params);
     $mail->checkMailLog([
-      'mailto:e..1.brown@EXAMPLE.ORG',
+      'mailto:e..' . $this->ids['MailingEventQueue']['default'] . '.brown@EXAMPLE.ORG',
       'You have been un-subscribed from the following groups',
       'I approve',
       'civicrm/mailing/resubscribe',

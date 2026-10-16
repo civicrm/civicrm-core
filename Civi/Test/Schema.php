@@ -287,7 +287,7 @@ class Schema {
       // 'civicrm_mailing_event_confirm',
       // 'civicrm_mailing_event_delivered',
       // 'civicrm_mailing_event_opened',
-      'civicrm_mailing_event_queue',
+      // 'civicrm_mailing_event_queue',
       // 'civicrm_mailing_event_reply',
       // 'civicrm_mailing_event_subscribe',
       // 'civicrm_mailing_event_trackable_url_open',
