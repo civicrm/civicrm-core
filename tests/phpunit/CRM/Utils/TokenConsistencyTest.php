@@ -97,7 +97,7 @@ class CRM_Utils_TokenConsistencyTest extends CiviUnitTestCase {
    * @return string
    */
   protected function getExpectedCaseTokenOutput(): string {
-    return 'case.id :1
+    return 'case.id :' . $this->case['id'] . '
 case.case_type_id:label :Housing Support
 case.subject :Case Subject
 case.start_date :' . CRM_Utils_Date::customFormat($this->case['start_date']) . '
