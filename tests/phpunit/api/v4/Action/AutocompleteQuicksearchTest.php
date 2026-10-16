@@ -495,4 +495,83 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertEquals($cid, $resultNumeric[0]['id']);
   }
 
+  public function testQuicksearchAutocompleteExactVsPartialMatches(): void {
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'QuicksearchTestGroup',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'name' => 'TestString',
+      'custom_group_id.name' => 'QuicksearchTestGroup',
+    ]);
+    // we want to check integer fields are exact matched
+    $this->createTestRecord('CustomField', [
+      'name' => 'TestInteger',
+      'custom_group_id.name' => 'QuicksearchTestGroup',
+      'data_type' => 'Int',
+    ]);
+
+    Setting::set(FALSE)
+      ->addValue('quicksearch_options', ['Contribution.id', 'QuicksearchTestGroup.TestString', 'QuicksearchTestGroup.TestInteger'])
+      ->execute();
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'Aaa', 'QuicksearchTestGroup.TestInteger' => '123', 'QuicksearchTestGroup.TestString' => '123'],
+        ['first_name' => 'B', 'last_name' => 'Bbb', 'QuicksearchTestGroup.TestInteger' => '12', 'QuicksearchTestGroup.TestString' => '12'],
+      ],
+    ]);
+
+    // now we want to check exact match search for contribution 1 doesnt match contribution 10/11/12
+    // to do this we add a Contribution for Contact B with Contribution ID at least 10
+    $contributions = $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[1]['id'], 'total_amount' => '10'],
+      ],
+    ]);
+    $secondContactContributionId = $contributions[10]['id'];
+    $this->assertTrue($secondContactContributionId >= 10);
+    $partialMatch = intdiv($secondContactContributionId, 10);
+
+    // Check we dont get Contact B with the partial match
+    $partialMatchResult = (array) Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['Contribution.id' => $partialMatch])
+      ->execute();
+
+    // we'll probably get the first contact, but we cant be sure
+    // the important thing is we dont get the second contact
+    $secondContact = array_filter($partialMatchResult, fn ($item) => $item['id'] === $contacts[1]['id']);
+    $this->assertCount(0, $secondContact);
+
+    $customStringResult = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['QuicksearchTestGroup.TestString' => '12'])
+      ->execute();
+
+    // partial match => both contact should be returned
+    $this->assertCount(2, $customStringResult);
+
+    $customIntegerResult = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['QuicksearchTestGroup.TestInteger' => '12'])
+      ->execute();
+
+    // exact match => only the second contact should be returned
+    $this->assertCount(1, $customIntegerResult);
+    $this->assertEquals($contacts[1]['id'], $customIntegerResult[0]['id']);
+  }
+
 }
