@@ -1540,9 +1540,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       return FALSE;
     }
     // Encapsulate in a transaction to avoid half-merges.
-    $transaction = new CRM_Core_Transaction();
-
-    try {
+    CRM_Core_Transaction::create()->run(function () use ($mainId, $otherId, $migrationInfo, $checkPermissions) {
       $contactType = $migrationInfo['main_details']['contact_type'];
       $relTables = CRM_Dedupe_Merger::relTables();
       $submittedCustomFields = $moveTables = $tableOperations = $removeTables = [];
@@ -1653,14 +1651,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $submitted['id'] = $mainId;
         self::updateContact($mainId, $submitted);
       }
-    }
-    catch (\Throwable $e) {
-      // Without an explicit rollback the transaction is committed when it
-      // goes out of scope, keeping whatever was moved before the failure.
-      $transaction->rollback()->commit();
-      throw $e;
-    }
-    $transaction->commit();
+    });
     CRM_Utils_Hook::post('merge', 'Contact', $mainId);
     self::createMergeActivities($mainId, $otherId);
 
