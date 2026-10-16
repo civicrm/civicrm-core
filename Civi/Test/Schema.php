@@ -239,7 +239,7 @@ class Schema {
       // 'civicrm_contribution_page',
       // 'civicrm_contribution_product',
       // 'civicrm_contribution_recur',
-      'civicrm_contribution_soft',
+      // 'civicrm_contribution_soft',
       // 'civicrm_contribution_widget',
       // 'civicrm_country',
       // 'civicrm_county',

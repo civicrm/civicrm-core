@@ -77,21 +77,21 @@ class ContributionSoftTest extends BaseTestClass {
     $list = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->ids['Contact']['credited'], NULL, 0, $dataTableParameters);
     $this->assertEquals(2, $dataTableParameters['total']);
     foreach ($expectedCredits[1] as $key => $value) {
-      $this->assertEquals($value, $list[1][$key], $key);
+      $this->assertEquals($value, $list[$this->ids['ContributionSoft']['permitted']][$key], $key);
     }
     foreach ($expectedCredits[2] as $key => $value) {
-      $this->assertEquals($value, $list[2][$key], $key);
+      $this->assertEquals($value, $list[$this->ids['ContributionSoft'][1]][$key], $key);
     }
-    $this->assertEquals($this->ids['Contribution']['permitted'], $list[1]['contribution_id']);
+    $this->assertEquals($this->ids['Contribution']['permitted'], $list[$this->ids['ContributionSoft']['permitted']]['contribution_id']);
 
     // And with ACL restrictions.
     $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
     $list = CRM_Contribute_BAO_ContributionSoft::getSoftContributionList($this->ids['Contact']['credited']);
-    $this->assertArrayNotHasKey(2, $list);
+    $this->assertArrayNotHasKey($this->ids['ContributionSoft'][1], $list);
     CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS  ac');
     CRM_Core_DAO::executeQuery('CREATE TABLE ac SELECT id FROM civicrm_relationship');
     foreach ($expectedCredits[1] as $key => $value) {
-      $this->assertEquals($value, $list[1][$key], $key);
+      $this->assertEquals($value, $list[$this->ids['ContributionSoft']['permitted']][$key], $key);
     }
   }
 
@@ -144,13 +144,13 @@ class ContributionSoftTest extends BaseTestClass {
         'amount' => 100,
         'contact_id' => $this->ids['Contact']['credited'],
       ];
-      ContributionSoft::create(FALSE)->setValues($params)->execute();
+      $this->ids['ContributionSoft']['permitted'] = ContributionSoft::create(FALSE)->setValues($params)->execute()->first()['id'];
       $params2 = [
         'contribution_id' => $this->ids['Contribution'][1],
         'amount' => 200,
         'contact_id' => $this->ids['Contact']['credited'],
       ];
-      ContributionSoft::create(FALSE)->setValues($params2)->execute();
+      $this->ids['ContributionSoft'][1] = ContributionSoft::create(FALSE)->setValues($params2)->execute()->first()['id'];
     }
     catch (CRM_Core_Exception $e) {
       $this->fail($e->getMessage());
