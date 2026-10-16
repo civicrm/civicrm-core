@@ -264,7 +264,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $this->getTestForm('CRM_Case_Form_Case',
       array_merge([
         'activity_subject' => 'Case Subject',
-        'case_type_id' => 1,
+        'case_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_type_id', 'housing_support'),
         'status_id' => 1,
         'case_type' => 'housing_support',
         'subject' => 'Case Subject',
@@ -394,42 +394,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     // something changed it and then inadvertently didn't restore it.
     $this->errorHandlerAtStartOfTest = set_error_handler(function($errno, $errstr, $errfile, $errline) {});
     restore_error_handler();
-  }
-
-  /**
-   * Read everything from the datasets directory and insert into the db.
-   *
-   * @noinspection PhpUnhandledExceptionInspection*/
-  public function loadAllFixtures(): void {
-    $fixturesDir = __DIR__ . '/../../fixtures';
-
-    CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 0;');
-
-    $jsonFiles = glob($fixturesDir . '/*.json');
-    foreach ($jsonFiles as $jsonFixture) {
-      $json = json_decode(file_get_contents($jsonFixture));
-      foreach ($json as $tableName => $vars) {
-        if ($tableName === 'civicrm_contact') {
-          CRM_Core_DAO::executeQuery('DELETE c FROM civicrm_contact c LEFT JOIN civicrm_domain d ON d.contact_id = c.id WHERE d.id IS NULL');
-        }
-        else {
-          CRM_Core_DAO::executeQuery("TRUNCATE $tableName");
-        }
-        foreach ($vars as $entity) {
-          $keys = $values = [];
-          foreach ($entity as $key => $value) {
-            $keys[] = $key;
-            $values[] = is_numeric($value) ? $value : "'{$value}'";
-          }
-          CRM_Core_DAO::executeQuery("
-            INSERT INTO $tableName (" . implode(',', $keys) . ') VALUES(' . implode(',', $values) . ')'
-          );
-        }
-
-      }
-    }
-
-    CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1;');
   }
 
   /**

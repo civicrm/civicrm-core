@@ -11,8 +11,8 @@ class CRM_Case_PseudoConstantTest extends CiviCaseTestCase {
     CRM_Core_PseudoConstant::flush();
     $caseTypes = CRM_Case_PseudoConstant::caseType();
     $expectedTypes = [
-      1 => 'Housing Support',
-      2 => 'Adult Day Care Referral',
+      CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_type_id', 'housing_support') => 'Housing Support',
+      CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_type_id', 'adult_day_care_referral') => 'Adult Day Care Referral',
     ];
     $this->assertEquals($expectedTypes, $caseTypes);
   }

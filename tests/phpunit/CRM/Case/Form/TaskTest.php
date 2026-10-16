@@ -35,7 +35,9 @@ class CRM_Case_Form_TaskTest extends CiviCaseTestCase {
     foreach ($caseContacts as $caseContact) {
       // The corresponding case needs to exist. We don't care about most of
       // its values, just the case_id.
-      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_case (id, start_date, case_type_id, details, status_id, created_date) VALUES ({$caseContact['case_id']}, '2019-01-01', 1, '', 1, NOW())");
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_case (id, start_date, case_type_id, details, status_id, created_date) VALUES ({$caseContact['case_id']}, '2019-01-01', %1, '', 1, NOW())", [
+        1 => [$this->caseTypeId, 'Positive'],
+      ]);
       // Ditto the contact
       CRM_Core_DAO::executeQuery("INSERT INTO civicrm_contact (id, contact_type, created_date, image_URL, sort_name) VALUES ({$caseContact['contact_id']}, 'Individual', NOW(), '', 'Contact {$caseContact['contact_id']}')");
       // And now case_contact

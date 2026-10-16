@@ -440,7 +440,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $contactID2 = $this->individualCreate([], 1);
 
     $case = $this->callAPISuccess('case', 'create', [
-      'case_type_id' => 1,
+      'case_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_type_id', 'housing_support'),
       'subject' => 'blah',
       'contact_id' => $contactID1,
     ]);
