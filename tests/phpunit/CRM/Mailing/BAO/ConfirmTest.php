@@ -12,6 +12,7 @@
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
 use Civi\Api4\Mailing;
+use Civi\Api4\MailingEventSubscribe;
 use Civi\Api4\MailingGroup;
 use Civi\Api4\SubscriptionHistory;
 
@@ -65,11 +66,13 @@ class CRM_Mailing_BAO_ConfirmTest extends CiviUnitTestCase {
       'id' => $mailingComponentID,
     ]);
     $hash = 4;
-    CRM_Core_DAO::executeQuery("
-      INSERT INTO civicrm_mailing_event_subscribe (group_id, contact_id, hash) VALUES ($groupID, $contactID, $hash)
-    ");
+    $subscribeID = MailingEventSubscribe::create(FALSE)->setValues([
+      'group_id' => $groupID,
+      'contact_id' => $contactID,
+      'hash' => $hash,
+    ])->execute()->first()['id'];
 
-    CRM_Mailing_Event_BAO_MailingEventConfirm::confirm($contactID, 1, $hash);
+    CRM_Mailing_Event_BAO_MailingEventConfirm::confirm($contactID, $subscribeID, $hash);
     $mailUtil->checkAllMailLog([
       'From: "FIXME" <info@EXAMPLE.ORG>',
       'To: "Mr. Anthony Anderson II" <anthony_anderson@civicrm.org>',
