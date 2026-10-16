@@ -76,30 +76,32 @@
       this.editor.getEntities().forEach((entity) => {
         const entityFields = this.editor.getEntityFields(entity.name);
 
-        const items = entityFields.fields.reduce((items, field) => {
-          // Conditional in case field is missing
-          if (field) {
+        const fieldOptions = entityFields.fields
+          // Conditional in case field is missing (why would it be missing?)
+          .filter(Boolean)
+          .map((field) => {
             const key = entity.name + "[0][fields][" + field.name + "]";
             this.fieldDefns[key] = field;
-            items.push({id: key, text: field.label || field.input_attrs.label});
-          }
-          return items;
-        }, []);
-
-        entityFields.joins.forEach((join) => {
-          items.push({
-            text: afGui.getEntity(join.entity).label,
-            children: join.fields.reduce((items, field) => {
-              const key = entity.name + "[0][joins][" + join.entity + "][0][" + field.name + "]";
-              this.fieldDefns[key] = field;
-              items.push({id: key, text: field.label || field.input_attrs.label});
-              return items;
-            }, [])
+            return {id: key, text: field.label || field.input_attrs.label};
           });
-        });
+
+        const joinFieldOptions = entityFields.joins
+          .filter((join) => join.fields.length)
+          .map((join) => {
+            const joinFields = join.fields.map((field) => {
+              const key = `${entity.name}[0][joins][${join.entity}][${join.joinIndex}][${field.name}]`;
+              this.fieldDefns[key] = field;
+              return {id: key, text: field.label || field.input_attrs.label};
+            });
+            return {
+              text: `${join.label} ${join.joinIndex + 1}`,
+              children: joinFields,
+            };
+          });
+
         this.fieldSelector.push({
           text: entity.label,
-          children: items
+          children: fieldOptions.concat(joinFieldOptions),
         });
       });
     };

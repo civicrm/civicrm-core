@@ -634,29 +634,34 @@
 
       // Get all fields on the form for a particular entity
       this.getEntityFields = function(entityName) {
-        const fieldsets = afGui.findRecursive(editor.layout['#children'], {'af-fieldset': entityName}),
-          entityType = editor.getEntity(entityName).type,
-          entityFields = {fields: [], joins: []},
-          isJoin = (item) => Boolean(item && item['af-join']);
+        const fieldsets = afGui.findRecursive(editor.layout['#children'], {'af-fieldset': entityName});
+        const entityType = editor.getEntity(entityName).type;
+        const entityFields = {fields: [], joins: []};
+        const isJoin = (item) => Boolean(item && item['af-join']);
+
         fieldsets.forEach((fieldset) => {
           afGui.getFormElements(fieldset['#children'], {'#tag': 'af-field'}, isJoin).forEach((field) => {
             if (field.name) {
               entityFields.fields.push(fillFieldDefn(entityType, field));
             }
           });
+
+          // track multiple joins to the same entity
+          const entityJoinCounts = {};
           afGui.getFormElements(fieldset['#children'], isJoin).forEach((join) => {
-            const joinFields = [];
-            afGui.getFormElements(join['#children'], {'#tag': 'af-field'}).forEach((field) => {
-              if (field.name) {
-                joinFields.push(fillFieldDefn(join['af-join'], field));
-              }
+            const entity = join['af-join'];
+            const joinIndex = entityJoinCounts[entity] = (entity in entityJoinCounts) ? (entityJoinCounts[entity] + 1) : 0;
+
+            const joinFields = afGui.getFormElements(join['#children'], {'#tag': 'af-field'})
+              .filter((field) => field.name)
+              .map((field) => fillFieldDefn(join['af-join'], field));
+
+            entityFields.joins.push({
+              entity: entity,
+              joinIndex: joinIndex,
+              label: afGui.getEntity(entity).label,
+              fields: joinFields
             });
-            if (joinFields.length) {
-              entityFields.joins.push({
-                entity: join['af-join'],
-                fields: joinFields
-              });
-            }
           });
         });
         return entityFields;
@@ -1015,10 +1020,37 @@
             // when for messages we probably want gender_id:label
             // though that value won't be immediately available from
             // the form submission, so we'd need to ensure it was fetched
-            this.getEntityFields(entity.name).fields.forEach((field) => {
+            const entityFields = this.getEntityFields(entity.name);
+
+            entityFields.fields.forEach((field) => {
               entityTokens.push({
-                id: entity.name + '.0.' + field.name,
+                // NOTE: the tags pick the first record from a repeating entity
+                // though you can see and change that in the token, e.g.
+                // change [Individual1.0.first_name] to [Individual1.4.first_name]
+                id: `${entity.name}.0.${field.name}`,
                 text: field.label,
+              });
+            });
+
+            entityFields.joins.forEach((join) => {
+              const joinFieldTokens = join.fields.filter(Boolean).map((field) => {
+                // NOTE: the tags pick the first record from a repeating entity
+                // though you can see and change that in the token, e.g.
+                // change [Individual1.0.Email.0.email] to [Individual1.4.Email.2.email]
+                return {
+                  id: `${entity.name}.0.${join.entity}.${join.joinIndex}.${field.name}`,
+                  text: field.label,
+                };
+              });
+              if (includeSubmissionTokens) {
+                joinFieldTokens.unshift({
+                  id: `${entity.name}.0.${join.entity}.${join.joinIndex}.id`,
+                  text: `${join.label} ID`,
+                });
+              }
+              entityTokens.push({
+                text: `${join.label} ${join.joinIndex + 1}`,
+                children: joinFieldTokens
               });
             });
           }
