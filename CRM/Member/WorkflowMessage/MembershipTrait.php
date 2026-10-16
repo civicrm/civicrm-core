@@ -1,7 +1,8 @@
 <?php
 
+use Civi\Api4\Membership;
+
 /**
- * @method array getMembership()
  * @method ?int getMembershipID()
  * @method $this setMembershipID(?int $membershipID)
  */
@@ -35,6 +36,21 @@ trait CRM_Member_WorkflowMessage_MembershipTrait {
       $this->membershipID = $membership['id'];
     }
     return $this;
+  }
+
+  /**
+   * Get the membership record.
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getMembership(): array {
+    if (!$this->membership) {
+      $this->membership = Membership::get(FALSE)
+        ->addWhere('id', '=', $this->membershipID)
+        ->setSelect(array_merge($this->getAdditionalFieldsToLoadForMembership(), ['*']))->execute()->first();
+    }
+    return $this->membership;
   }
 
 }

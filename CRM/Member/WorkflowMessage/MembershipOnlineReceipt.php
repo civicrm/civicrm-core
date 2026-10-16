@@ -38,4 +38,11 @@ class CRM_Member_WorkflowMessage_MembershipOnlineReceipt extends GenericWorkflow
    */
   public $softCreditType;
 
+  /**
+   * Get the membership fields we need to load.
+   */
+  protected function getAdditionalFieldsToLoadForMembership(): array {
+    return [];
+  }
+
 }

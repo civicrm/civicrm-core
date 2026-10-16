@@ -664,30 +664,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    * @throws \CRM_Core_Exception
    */
   protected function sendReceipt() {
-    $receiptFrom = $this->_params['from_email_address'];
-    //get the group Tree
-    $this->_groupTree = CRM_Core_BAO_CustomGroup::getTree('Membership', NULL, $this->_id, FALSE, $this->getMembershipTypeID());
-
-    // retrieve custom data
-    $customFields = $customValues = $fo = [];
-    foreach ($this->_groupTree as $groupID => $group) {
-      if ($groupID === 'info') {
-        continue;
-      }
-      foreach ($group['fields'] as $k => $field) {
-        $field['title'] = $field['label'];
-        $customFields["custom_{$k}"] = $field;
-      }
-    }
-    $members = [['member_id', '=', $this->getMembershipID(), 0, 0]];
-    // check whether its a test drive
-    if ($this->_mode === 'test') {
-      $members[] = ['member_test', '=', 1, 0, 0];
-    }
-    CRM_Core_BAO_UFGroup::getValues($this->_contactID, $customFields, $customValues, FALSE, $members);
-
-    $this->assign('customValues', $customValues);
-
     if ($this->_mode) {
       $this->assign('address', CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($this->_params));
 
@@ -703,7 +679,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     [$this->isMailSent] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'workflow' => 'membership_offline_receipt',
-        'from' => $receiptFrom,
+        'from' => $this->getSubmittedValue('from_email_address'),
         'toName' => $this->_contributorDisplayName,
         'toEmail' => $this->_contributorEmail,
         'isTest' => $this->_mode === 'test',
