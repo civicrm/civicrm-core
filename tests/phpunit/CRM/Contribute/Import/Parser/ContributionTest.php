@@ -78,6 +78,9 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->addWhere('rule_table', '!=', 'civicrm_email')
       ->addWhere('dedupe_rule_group_id.name', '=', 'IndividualUnsupervised')->execute();
     Civi::settings()->set('enableBackgroundQueue', $this->enableBackgroundQueueOriginalValue);
+    if (file_exists(__DIR__ . '/data/pledge.csv')) {
+      unlink(__DIR__ . '/data/pledge.csv');
+    }
     parent::tearDown();
   }
 
@@ -462,6 +465,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   public function testPledgeImport(): void {
     $contactID = $this->individualCreate(['email' => 'mum@example.com']);
     $pledgeID = $this->pledgeCreate(['contact_id' => $contactID]);
+    // The csv references the pledge by id, so it is written once the pledge exists.
+    file_put_contents(__DIR__ . '/data/pledge.csv', "Email,Amount,Pledge ID,Receive date,Financial Type\nmum@example.com,20,$pledgeID,2022-01-07,Donation\n");
     $this->importCSV('pledge.csv', [
       ['name' => 'Contact.email_primary.email'],
       ['name' => 'Contribution.total_amount'],

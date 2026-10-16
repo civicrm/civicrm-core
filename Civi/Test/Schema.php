@@ -323,7 +323,7 @@ class Schema {
       // 'civicrm_pcp',
       // 'civicrm_pcp_block',
       'civicrm_phone',
-      'civicrm_pledge',
+      // 'civicrm_pledge',
       // 'civicrm_pledge_block',
       // 'civicrm_pledge_payment',
       // 'civicrm_preferences_date',
