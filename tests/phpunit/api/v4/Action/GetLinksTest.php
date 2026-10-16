@@ -32,6 +32,8 @@ use Civi\Test\TransactionalInterface;
  */
 class GetLinksTest extends Api4TestBase implements TransactionalInterface {
 
+  protected ?array $enableComponents = ['*'];
+
   public function testContactLinks(): void {
     $links = Contact::getLinks(FALSE)
       ->addWhere('api_action', '=', 'create')
@@ -108,8 +110,6 @@ class GetLinksTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testCaseActivityLinks() {
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-
     $case1 = $this->createTestRecord('Case')['id'];
     $acts = $this->saveTestRecords('Activity', [
       'records' => [

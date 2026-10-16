@@ -27,8 +27,9 @@ use api\v4\Api4TestBase;
  */
 class EntityTest extends Api4TestBase {
 
+  protected ?array $enableComponents = ['*'];
+
   public function testEntityGet(): void {
-    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
     $result = Entity::get(FALSE)
       ->execute()
       ->indexBy('name');

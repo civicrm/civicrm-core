@@ -378,10 +378,26 @@ trait Api4TestTrait {
     // If not created in a transaction, test records must be deleted
     $needsCleanup = !in_array('Civi\Test\TransactionalInterface', $implements, TRUE) ||
       // Creating custom groups or custom fields breaks transactions & requires cleanup
-      array_intersect(['CustomField', 'CustomGroup'], array_column($this->testRecords, 0));
+      array_intersect(['CustomField', 'CustomGroup'], array_column($this->testRecords, 0)) ||
+      // Toggling components mid-test triggers DDL and an implicit commit
+      $this->haveComponentsChanged();
     if ($needsCleanup) {
       $this->deleteTestRecords();
     }
+  }
+
+  private function haveComponentsChanged(): bool {
+    if (!isset($this->enableComponents)) {
+      $expected = \Civi::settings()->getDefault('enable_components');
+    }
+    elseif ($this->enableComponents === ['*']) {
+      $expected = array_keys(\CRM_Core_Component::getComponents());
+    }
+    else {
+      $expected = $this->enableComponents;
+    }
+    $actual = \Civi::settings()->get('enable_components') ?: [];
+    return array_diff($expected, $actual) || array_diff($actual, $expected);
   }
 
   /**

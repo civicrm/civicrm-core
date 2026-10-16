@@ -109,8 +109,6 @@ class GroupSubscriptionTest extends Api4TestBase {
   }
 
   public function testDoubleOptIn(): void {
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviMail');
-
     $contact = $this->createTestRecord('Contact', ['email_primary.email' => 'ex@m.ple']);
     $publicGroup = $this->createTestRecord('Group', ['visibility' => 'Public Pages'])['name'];
     $privateGroup = $this->createTestRecord('Group', ['visibility' => 'User and User Admin Only'])['name'];

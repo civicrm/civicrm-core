@@ -42,12 +42,7 @@ use Civi\Api4\Utils\CoreUtil;
  */
 class RequiredParamsSafeTest extends Api4TestBase {
 
-  public function setUp(): void {
-    // Enable all components so component-gated entities/actions
-    // (Event, Campaign, etc) are included in the scan.
-    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
-    parent::setUp();
-  }
+  protected ?array $enableComponents = ['*'];
 
   public function testRequiredParamsAreSafeToReadBeforeBeingSet(): void {
     $failures = [];

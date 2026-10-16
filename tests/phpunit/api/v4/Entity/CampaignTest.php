@@ -18,10 +18,7 @@ use api\v4\Api4TestBase;
  */
 class CampaignTest extends Api4TestBase {
 
-  public function setUp(): void {
-    parent::setUp();
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
-  }
+  protected ?array $enableComponents = ['CiviCampaign'];
 
   public function testCampaignAndSurveyUpdate(): void {
     $cid1 = $this->createLoggedInUser();

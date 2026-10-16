@@ -44,10 +44,7 @@ use Civi\Test\TransactionalInterface;
  */
 class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
 
-  public function setUp(): void {
-    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
-    parent::setUp();
-  }
+  protected ?array $enableComponents = ['*'];
 
   public function testOptionsAreReturned(): void {
     $fields = Contact::getFields(FALSE)
@@ -158,8 +155,6 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testPrefetchDisabled(): void {
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
     Campaign::create()->setValues(['name' => 'Big Campaign', 'title' => 'Biggie'])->execute();
     // The campaign_id field has prefetch = disabled in the schema,
     // Which means the options will NOT load but suffixes are still available

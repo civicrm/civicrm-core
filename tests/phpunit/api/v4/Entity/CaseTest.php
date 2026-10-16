@@ -32,10 +32,7 @@ use Civi\Api4\RelationshipType;
  */
 class CaseTest extends Api4TestBase {
 
-  public function setUp(): void {
-    parent::setUp();
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
-  }
+  protected ?array $enableComponents = ['CiviCase'];
 
   public function testGetFields(): void {
     $fields = CiviCase::getFields(FALSE)

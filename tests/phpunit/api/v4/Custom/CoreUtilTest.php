@@ -28,10 +28,7 @@ use Civi\Api4\Utils\CoreUtil;
  */
 class CoreUtilTest extends Api4TestBase {
 
-  public function setUp(): void {
-    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
-    parent::setUp();
-  }
+  protected ?array $enableComponents = ['*'];
 
   /**
    */

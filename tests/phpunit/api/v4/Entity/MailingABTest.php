@@ -20,10 +20,7 @@ use Civi\Test\TransactionalInterface;
  */
 class MailingABTest extends Api4TestBase implements TransactionalInterface {
 
-  public function setUp(): void {
-    parent::setUp();
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviMail');
-  }
+  protected ?array $enableComponents = ['CiviMail'];
 
   public function testMailingABCRUD(): void {
     // Create

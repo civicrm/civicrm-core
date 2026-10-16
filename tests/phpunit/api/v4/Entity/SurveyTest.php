@@ -29,10 +29,7 @@ use Civi\Test\TransactionalInterface;
  */
 class SurveyTest extends Api4TestBase implements TransactionalInterface {
 
-  public function setUp():void {
-    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
-    parent::setUp();
-  }
+  protected ?array $enableComponents = ['CiviCampaign'];
 
   public function testGetFields(): void {
     $fields = Survey::getFields(FALSE)
