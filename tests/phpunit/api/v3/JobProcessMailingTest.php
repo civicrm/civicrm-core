@@ -577,6 +577,25 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * A PHP error while recording the Bulk Email activity does not abort delivery.
+   */
+  public function testActivityErrorDoesNotAbortDelivery(): void {
+    $schedulerID = $this->individualCreate();
+    $this->createContactsInGroup(3, $this->_groupID);
+    $mailing = $this->callAPISuccess('Mailing', 'create', $this->_params + ['scheduled_id' => $schedulerID]);
+    $this->hookClass->setHook('civicrm_pre', function ($op, $objectName) {
+      if ($op === 'create' && $objectName === 'Activity') {
+        throw new TypeError('Ruh-roh');
+      }
+    });
+    $this->callAPISuccess('Job', 'process_mailing', []);
+    $this->assertDBQuery(3, 'SELECT COUNT(*) FROM civicrm_mailing_event_delivered d
+      INNER JOIN civicrm_mailing_event_queue q ON q.id = d.event_queue_id
+      INNER JOIN civicrm_mailing_job j ON j.id = q.job_id
+      WHERE j.mailing_id = %1', [1 => [$mailing['id'], 'Integer']]);
+  }
+
+  /**
    * Create contacts in group.
    *
    * @param int $count
