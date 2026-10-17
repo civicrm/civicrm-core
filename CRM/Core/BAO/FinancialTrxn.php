@@ -302,10 +302,12 @@ WHERE ceft.entity_id = %1";
    * @param int|float $amount
    * @param int $contributionId
    * @param int $financialTypeId
+   * @param int $trxnID
+   *   The financial trxn (e.g. the payment) that the fee is associated with.
    *
    * @throws \CRM_Core_Exception
    */
-  public static function recordFees($params, $amount, $contributionId, $financialTypeId) {
+  public static function recordFees($params, $amount, $contributionId, $financialTypeId, $trxnID) {
     $financialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($financialTypeId, 'Expense Account is');
     $trxnParams = $params['trxnParams'];
     $trxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
@@ -325,10 +327,6 @@ WHERE ceft.entity_id = %1";
         'amount' => $trxnParams['total_amount'],
       ])->execute();
 
-    $financialTrxnID = $params['entity_id'] ?? NULL;
-    if (!$financialTrxnID) {
-      $financialTrxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($trxnParams['contribution_id'], 'DESC')['financialTrxnId'];
-    }
     $financialItem = CRM_Financial_BAO_FinancialItem::writeRecord([
       'financial_account_id' => $financialAccount,
       'contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
@@ -338,7 +336,7 @@ WHERE ceft.entity_id = %1";
       'description' => 'Fee',
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
       'entity_table' => 'civicrm_financial_trxn',
-      'entity_id' => $financialTrxnID,
+      'entity_id' => $trxnID,
       'currency' => $trxnParams['currency'],
     ]);
     EntityFinancialTrxn::save(FALSE)->addRecord([
