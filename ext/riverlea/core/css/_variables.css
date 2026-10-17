@@ -354,7 +354,7 @@
   --crm-dashlet-header-border: unset;
   --crm-dashlet-header-border-width: unset;
   --crm-dashlet-header-font-size: var(--crm-font-size);
-  --crm-dashlet-header-padding: var(--crm-l-small);
+  --crm-dashlet-header-padding: var(--crm-accordion-header-padding);
   --crm-dashlet-content-padding: var(--crm-dashlet-padding) 0;
   --crm-dashlet-tabs-border: 0;
   --crm-dashlet-radius: var(--crm-l-radius);

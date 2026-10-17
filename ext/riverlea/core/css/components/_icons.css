@@ -106,7 +106,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container button .fa-times {
   color: var(--crm-icon-danger-color);
 }
-.crm-container .crm-dashlet-header a.fa-times {
+.crm-container .crm-dashlet-actions .crm-i.fa-times {
   color: var(--crm-dashlet-header-color);
 }
 
