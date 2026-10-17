@@ -264,6 +264,8 @@
   --crm-input-toggle-disabled-bg: var(--crm-inverse-bg-color);
   --crm-input-toggle-enabled-bg: var(--crm-focus-color);
   --crm-input-toggle-button-bg: var(--crm-paper);
+  --crm-input-required-font-size: var(--crm-font-size);
+  --crm-input-required-color: var(--crm-notify-danger-color);
 /* Tabs */
   --crm-tabs-bg-color: var(--crm-c-gray-200);
   --crm-tabs-padding: var(--crm-l-small);
