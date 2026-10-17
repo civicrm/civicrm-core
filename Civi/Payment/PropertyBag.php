@@ -827,13 +827,7 @@ class PropertyBag implements \ArrayAccess {
    * @param string $label e.g. 'default'
    */
   public function setDescription($description, $label = 'default') {
-    // @todo this logic was copied from a commit that then got deleted. Is it good?
-    $uninformativeStrings = [
-      ts('Online Event Registration: '),
-      ts('Online Contribution: '),
-    ];
-    $cleanedDescription = str_replace($uninformativeStrings, '', $description);
-    return $this->set('description', $label, $cleanedDescription);
+    return $this->set('description', $label, $description);
   }
 
   /**

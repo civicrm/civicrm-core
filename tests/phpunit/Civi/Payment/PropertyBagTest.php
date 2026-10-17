@@ -323,6 +323,15 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   /**
+   * The description is stored as given, also when it looks like a system-generated source.
+   */
+  public function testSetDescriptionKeepsText(): void {
+    $propertyBag = new PropertyBag();
+    $propertyBag->setDescription('Online Contribution: Annual appeal');
+    $this->assertEquals('Online Contribution: Annual appeal', $propertyBag->getDescription());
+  }
+
+  /**
    * Test the require method works.
    */
   public function testRequire(): void {
