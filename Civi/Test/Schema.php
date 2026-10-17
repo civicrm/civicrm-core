@@ -244,7 +244,7 @@ class Schema {
       // 'civicrm_country',
       // 'civicrm_county',
       // 'civicrm_currency',
-      'civicrm_custom_field',
+      // 'civicrm_custom_field',
       'civicrm_custom_group',
       // 'civicrm_dashboard',
       // 'civicrm_dashboard_contact',

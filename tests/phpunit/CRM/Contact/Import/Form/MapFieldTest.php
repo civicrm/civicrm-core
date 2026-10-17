@@ -359,7 +359,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
       1 => 'postal_greeting',
       2 => 'phone',
       3 => 'street_address',
-      4 => 'custom_1',
+      4 => $this->getCustomFieldName('text'),
       5 => 'street_address',
       6 => 'city',
       7 => 'state_province',

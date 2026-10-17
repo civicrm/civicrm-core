@@ -366,6 +366,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     // Register "contribution create" hook
     $this->hookClass->setHook('civicrm_post', [$this, 'implementHookPost']);
     \Civi::$statics['testCreateTemplateContributionFromFirstContributionTest']['custom_field_id'] = $custom_field['id'];
+    \Civi::$statics['testCreateTemplateContributionFromFirstContributionTest']['custom_field2_id'] = $custom_field2['id'];
 
     // Make sure a template contribution exists.
     $templateContributionId = CRM_Contribute_BAO_ContributionRecur::ensureTemplateContributionExists($contributionRecur['id']);
@@ -403,7 +404,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
 
     // Simulate an extension updating the custom data on the new contribution
     $contributionParams['entity_id'] = $objectId;
-    $contributionParams['custom_2'] = 'Template contribution custom data inserted by hook';
+    $contributionParams['custom_' . \Civi::$statics['testCreateTemplateContributionFromFirstContributionTest']['custom_field2_id']] = 'Template contribution custom data inserted by hook';
     civicrm_api3('CustomValue', 'create', $contributionParams);
   }
 
