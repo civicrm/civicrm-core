@@ -21,6 +21,19 @@ use Civi\Api4\PCPBlock;
  * This class generates form components for processing Event
  */
 class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
+  use CRM_Contribute_Form_ContributeFormTrait;
+
+  /**
+   * Get id of the contribution covering this registration.
+   *
+   * The trait's own stub otherwise takes precedence over the parent
+   * class's implementation, since traits are resolved before inheritance.
+   *
+   * @return int|null
+   */
+  public function getContributionID(): ?int {
+    return parent::getContributionID();
+  }
 
   /**
    * Set variables up before form is built.
@@ -66,7 +79,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    */
   public function buildQuickForm() {
     // Assign the email address from a contact id lookup as in CRM_Event_BAO_Event->sendMail()
-    $primaryContactId = $this->get('primaryContactId');
+    $primaryContactId = $this->getParticipantValue('contact_id');
     $email = NULL;
     if ($primaryContactId) {
       $email = CRM_Utils_Array::valueByRegexKey('/^email-/', current($this->_params));
@@ -104,8 +117,8 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
       $this->assign('hookDiscount', $hookDiscount);
     }
 
-    $this->assign('receive_date', $this->get('receiveDate'));
-    $this->assign('trxn_id', $this->get('trxnId'));
+    $this->assign('receive_date', $this->getContributionValue('contribution_status_id:name') === 'Completed' ? $this->getContributionValue('receive_date') : NULL);
+    $this->assign('trxn_id', $this->getContributionValue('trxn_id'));
     $this->assign('isAmountzero', $totalAmount <= 0);
 
     $defaults = [];
@@ -136,14 +149,13 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $this->_submitValues = array_merge($this->_submitValues, $defaults);
     $this->setDefaults($defaults);
 
-    $params['entity_id'] = $this->_eventId;
-    $params['entity_table'] = 'civicrm_event';
-
     $data = [];
     $extensionHtml = [];
 
     if (function_exists('tellafriend_civicrm_config')) {
       // @todo - move this to tellafriend extension
+      $params['entity_id'] = $this->getEventID();
+      $params['entity_table'] = 'civicrm_event';
       CRM_Friend_BAO_Friend::retrieve($params, $data);
       if (!empty($data['is_active'])) {
         $friendText = $data['title'];
