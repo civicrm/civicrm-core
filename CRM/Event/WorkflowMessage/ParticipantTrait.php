@@ -115,6 +115,19 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    */
   protected $isOnWaitlist;
 
+  /**
+   * Whether links which send event data to Google Calendar should be displayed.
+   *
+   * @var bool
+   *
+   * @scope tplParams
+   */
+  public $eventEnableGoogleCalendarLinks;
+
+  public function getEventEnableGoogleCalendarLinks(): bool {
+    return (bool) \Civi::settings()->get('event_enable_google_calendar_links');
+  }
+
   private function isCiviContributeEnabled(): bool {
     return array_key_exists('Contribution', \Civi::service('action_object_provider')->getEntities());
   }

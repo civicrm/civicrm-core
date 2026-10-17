@@ -67,4 +67,17 @@ return [
     'help_text' => NULL,
     'pseudoconstant' => ['callback' => 'CRM_Event_BAO_Event::getEventsForSelect2'],
   ],
+  'event_enable_google_calendar_links' => [
+    'name' => 'event_enable_google_calendar_links',
+    'settings_pages' => ['event' => ['weight' => 110]],
+    'type' => 'Boolean',
+    'default' => TRUE,
+    'add' => '6.17',
+    'title' => ts('Display Google Calendar links?'),
+    'html_type' => 'checkbox',
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('When enabled, CiviEvent displays a link which sends event details to Google Calendar. iCalendar downloads remain available regardless of this setting.'),
+    'help_text' => NULL,
+  ],
 ];
