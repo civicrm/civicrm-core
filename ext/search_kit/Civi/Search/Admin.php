@@ -174,7 +174,7 @@ class Admin {
         }
         try {
           $getFields = civicrm_api4($entity['name'], 'getFields', [
-            'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'fk_column', 'readonly', 'operators', 'suffixes', 'nullable'],
+            'select' => ['name', 'title', 'label', 'description', 'type', 'options', 'input_type', 'input_attrs', 'data_type', 'serialize', 'entity', 'fk_entity', 'fk_column', 'dfk_entities', 'readonly', 'operators', 'suffixes', 'nullable'],
             'where' => [['deprecated', '=', FALSE], ['name', 'NOT IN', ['api_key', 'hash']]],
             'orderBy' => ['label' => 'ASC'],
           ])->indexBy('name');
@@ -461,10 +461,17 @@ class Admin {
         // FIXME: See comment above: this loop should be able to handle every entity.
         // Above block could be removed and the first part of this conditional
         // `($field['type'] === 'Custom' || $isVirtualEntity)` can be removed.
-        if (($field['type'] === 'Custom' || $isVirtualEntity) && $field['fk_entity'] && in_array($field['input_type'], ['EntityRef', 'File'], TRUE)) {
-          $entityRefJoins = self::getEntityRefJoins($entity, $field);
-          foreach ($entityRefJoins as $joinEntity => $joinInfo) {
-            $joins[$joinEntity][] = $joinInfo;
+        if (($field['type'] === 'Custom' || $isVirtualEntity) && ($field['fk_entity'] || !empty($field['dfk_entities'])) && in_array($field['input_type'], ['EntityRef', 'File'], TRUE)) {
+          $dynamicCol = $field['input_attrs']['control_field'] ?? NULL;
+          $targets = $field['dfk_entities'] ?? ($field['fk_entity'] ? ['' => $field['fk_entity']] : []);
+          foreach ($targets as $dynamicValue => $targetEntity) {
+            if (!$targetEntity || !isset($allowedEntities[$targetEntity])) {
+              continue;
+            }
+            $entityRefJoins = self::getEntityRefJoins($entity, $field, $targetEntity, $dynamicCol ? $dynamicValue : NULL, $dynamicCol);
+            foreach ($entityRefJoins as $joinEntity => $joinInfo) {
+              $joins[$joinEntity][] = $joinInfo;
+            }
           }
         }
       }
@@ -482,33 +489,51 @@ class Admin {
   }
 
   /**
-   * Get joins for entity reference custom fields, and the entity_id field in
+   * Get joins for non-DAO entities, e.g. entityReference custom fields, and the entity_id field in
    * multi-record custom groups.
    *
+   * Note: This duplicates some of the logic in the main loop of self::getJoins, but the idea is to eventually
+   * consolidate the 2 functions, so we are bringing this one up to parity with the other.
+   *
+   * @param array $entity
+   * @param array $field
+   * @param string|null $targetEntity
+   * @param string|null $dynamicValue
+   * @param string|null $dynamicCol
    * @return array[]
    */
-  public static function getEntityRefJoins(array $entity, array $field): array {
+  public static function getEntityRefJoins(array $entity, array $field, ?string $targetEntity = NULL, ?string $dynamicValue = NULL, ?string $dynamicCol = NULL): array {
+    $targetEntity = $targetEntity ?? $field['fk_entity'];
+    if (!$targetEntity) {
+      return [];
+    }
     $exploded = explode('.', $field['name']);
     $bareFieldName = array_reverse($exploded)[0];
     $targetKey = $field['fk_column'] ?: 'id';
-    $alias = "{$entity['name']}_{$field['fk_entity']}_$bareFieldName";
-    $joins[$entity['name']] = [
-      'label' => $entity['title'] . ' ' . $field['label'],
-      'description' => $field['description'],
-      'entity' => $field['fk_entity'],
-      'conditions' => self::getJoinConditions($field['name'], $alias . '.' . $targetKey),
-      'defaults' => [],
-      'alias' => $alias,
-      'multi' => FALSE,
-    ];
+    $alias = "{$entity['name']}_{$targetEntity}_$bareFieldName";
+    $joins = [];
+    // For LineItem we have contribution_id and entity_id=contribution_id when entity_table=civicrm_contribution
+    // They are the same and it is confusing to have two joins in the SearchKit UI.
+    // Aliases: LineItem_Contribution_contribution_id and LineItem_Contribution_entity_id
+    if ($alias !== 'LineItem_Contribution_entity_id') {
+      $joins[$entity['name']] = [
+        'label' => $entity['title'] . ' ' . ($dynamicCol ? \Civi\Api4\Utils\CoreUtil::getInfoItem($targetEntity, 'title') : $field['label']),
+        'description' => $dynamicCol ? '' : $field['description'],
+        'entity' => $targetEntity,
+        'conditions' => self::getJoinConditions($field['name'], $alias . '.' . $targetKey, $dynamicValue, $dynamicCol),
+        'defaults' => [],
+        'alias' => $alias,
+        'multi' => FALSE,
+      ];
+    }
     // Do reverse join if not the same entity
-    if ($entity['name'] !== $field['fk_entity']) {
-      $alias = "{$field['fk_entity']}_{$entity['name']}_$bareFieldName";
-      $joins[$field['fk_entity']] = [
-        'label' => $entity['title_plural'],
-        'description' => $entity['description'] ?? '',
+    if ($entity['name'] !== $targetEntity) {
+      $alias = "{$targetEntity}_{$entity['name']}_$bareFieldName";
+      $joins[$targetEntity] = [
+        'label' => ($dynamicCol ? \Civi\Api4\Utils\CoreUtil::getInfoItem($targetEntity, 'title') . ' ' : '') . $entity['title_plural'],
+        'description' => $dynamicCol ? '' : ($entity['description'] ?? ''),
         'entity' => $entity['name'],
-        'conditions' => self::getJoinConditions($targetKey, "$alias.{$field['name']}"),
+        'conditions' => self::getJoinConditions($targetKey, "$alias.{$field['name']}", $dynamicValue, $dynamicCol ? $alias . '.' . $dynamicCol : NULL),
         'defaults' => self::getJoinDefaults($alias, $entity),
         'alias' => $alias,
         'multi' => TRUE,
