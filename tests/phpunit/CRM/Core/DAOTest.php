@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\Address;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 
@@ -778,6 +779,57 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $dbEmail->contact_id = $contact['id'];
     $dbEmail->find(TRUE);
     $this->assertEquals('jane.doe@example.com', $dbEmail->email);
+  }
+
+  /**
+   * Custom data passed to writeRecord() should be saved before post-save events fire.
+   */
+  public function testWriteRecordSavesCustomDataBeforePostEvents(): void {
+    $customGroup = CustomGroup::create(FALSE)
+      ->setValues([
+        'name' => 'address_extra',
+        'title' => 'Address Extra',
+        'extends' => 'Address',
+      ])
+      ->execute()->single();
+    $customField = CustomField::create(FALSE)
+      ->setValues([
+        'custom_group_id' => $customGroup['id'],
+        'label' => 'Note',
+        'data_type' => 'String',
+        'html_type' => 'Text',
+      ])
+      ->execute()->single();
+
+    $seen = [];
+    $listener = function ($event) use (&$seen, $customGroup, $customField) {
+      if ($event->object instanceof CRM_Core_DAO_Address) {
+        $seen[] = CRM_Core_DAO::singleValueQuery("SELECT {$customField['column_name']} FROM {$customGroup['table_name']} WHERE entity_id = %1", [
+          1 => [$event->object->id, 'Integer'],
+        ]);
+      }
+    };
+    \Civi::dispatcher()->addListener('civi.dao.postInsert', $listener);
+    \Civi::dispatcher()->addListener('civi.dao.postUpdate', $listener);
+
+    try {
+      $addressID = Address::create(FALSE)
+        ->addValue('contact_id', $this->individualCreate())
+        ->addValue('location_type_id', 1)
+        ->addValue('street_address', '1 Example Street')
+        ->addValue('address_extra.Note', 'First')
+        ->execute()->single()['id'];
+      Address::update(FALSE)
+        ->addWhere('id', '=', $addressID)
+        ->addValue('address_extra.Note', 'Second')
+        ->execute();
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('civi.dao.postInsert', $listener);
+      \Civi::dispatcher()->removeListener('civi.dao.postUpdate', $listener);
+    }
+
+    $this->assertEquals(['First', 'Second'], $seen);
   }
 
 }
