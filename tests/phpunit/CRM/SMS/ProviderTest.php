@@ -39,6 +39,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
    * Clean up after each test.
    */
   public function tearDown(): void {
+    $this->relabelMobileAndHome('Mobile', 'Home');
     parent::tearDown();
     $this->quickCleanup(['civicrm_email', 'civicrm_phone', 'civicrm_activity', 'civicrm_activity_contact']);
     $this->callAPISuccess('option_value', 'delete', ['id' => $this->option_value]);
@@ -84,6 +85,37 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccess('contact', 'getsingle', ['phone' => '+61487654321']);
     $activity = $this->callAPISuccess('activity', 'getsingle', ['id' => $result->id, 'return' => ['source_contact_id', 'target_contact_id', 'assignee_contact_id']]);
     $this->assertEquals($contact['id'], $activity['source_contact_id']);
+  }
+
+  /**
+   * A contact created for an unknown sender gets a home mobile phone, whatever those types are labelled.
+   */
+  public function testProcessInboundUnknownSenderWithRelabelledTypes(): void {
+    $this->relabelMobileAndHome('Mobiltelefon', 'Privat');
+    $provider = new CiviTestSMSProvider('CiviTestSMSProvider');
+    $provider->processInbound('+61412345678', 'This is a test message', NULL, '12345');
+    $phone = \Civi\Api4\Phone::get(FALSE)
+      ->addWhere('phone', '=', '61412345678')
+      ->addSelect('phone_type_id:name', 'location_type_id:name')
+      ->execute()->single();
+    $this->assertEquals('Mobile', $phone['phone_type_id:name']);
+    $this->assertEquals('Home', $phone['location_type_id:name']);
+  }
+
+  /**
+   * @param string $mobileLabel
+   * @param string $homeLabel
+   */
+  private function relabelMobileAndHome(string $mobileLabel, string $homeLabel): void {
+    \Civi\Api4\OptionValue::update(FALSE)
+      ->addWhere('option_group_id:name', '=', 'phone_type')
+      ->addWhere('name', '=', 'Mobile')
+      ->addValue('label', $mobileLabel)
+      ->execute();
+    \Civi\Api4\LocationType::update(FALSE)
+      ->addWhere('name', '=', 'Home')
+      ->addValue('display_name', $homeLabel)
+      ->execute();
   }
 
   public function smsHookTest(&$message) {

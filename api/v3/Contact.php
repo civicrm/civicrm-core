@@ -612,6 +612,7 @@ function _civicrm_api3_greeting_format_params($params) {
     ];
 
     $greetings = CRM_Core_PseudoConstant::greeting($filter);
+    $customizedId = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', "{$key}{$greeting}_id", 'Customized');
     $greetingId = $params["{$key}{$greeting}_id"] ?? NULL;
     $greetingVal = $params["{$key}{$greeting}"] ?? NULL;
     $customGreeting = $params["{$key}{$greeting}_custom"] ?? NULL;
@@ -621,7 +622,7 @@ function _civicrm_api3_greeting_format_params($params) {
     }
 
     if ($customGreeting && $greetingId &&
-      ($greetingId != array_search('Customized', $greetings))
+      ($greetingId != $customizedId)
     ) {
       throw new CRM_Core_Exception(ts('Provide either %1 greeting id and/or %1 greeting or custom %1 greeting',
         [1 => $key]
@@ -637,7 +638,7 @@ function _civicrm_api3_greeting_format_params($params) {
     }
 
     if ($greetingId) {
-      if (!$customGreeting && ($greetingId == array_search('Customized', $greetings))) {
+      if (!$customGreeting && ($greetingId == $customizedId)) {
         throw new CRM_Core_Exception(ts('Please provide a custom value for %1 greeting',
           [1 => $key]
         ));
@@ -653,7 +654,7 @@ function _civicrm_api3_greeting_format_params($params) {
     }
 
     if ($customGreeting) {
-      $greetingId = CRM_Utils_Array::key('Customized', $greetings);
+      $greetingId = $customizedId;
     }
 
     $customValue = isset($params['contact_id']) ? CRM_Core_DAO::getFieldValue(

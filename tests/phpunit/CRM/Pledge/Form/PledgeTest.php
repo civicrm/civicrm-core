@@ -47,4 +47,34 @@ class CRM_Pledge_Form_PledgeTest extends CiviUnitTestCase {
     $this->revertTemplateToReservedTemplate();
   }
 
+  /**
+   * A new pledge defaults to the Donation financial type, whatever it is labelled.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testDefaultFinancialTypeWithRelabelledDonation(): void {
+    $this->relabelDonation('Spende');
+    $form = $this->getFormObject('CRM_Pledge_Form_Pledge', [], ['action' => 'add']);
+    $form->buildForm();
+    $this->assertEquals(
+      CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'financial_type_id', 'Donation'),
+      $form->setDefaultValues()['financial_type_id']
+    );
+  }
+
+  /**
+   * @param string $label
+   */
+  private function relabelDonation(string $label): void {
+    \Civi\Api4\FinancialType::update(FALSE)
+      ->addWhere('name', '=', 'Donation')
+      ->addValue('label', $label)
+      ->execute();
+  }
+
+  protected function tearDown(): void {
+    $this->relabelDonation('Donation');
+    parent::tearDown();
+  }
+
 }
