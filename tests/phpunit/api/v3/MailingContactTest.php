@@ -55,9 +55,9 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(1, $count);
     $this->assertFalse(empty($result['values']));
-    $this->assertEquals(1, $result['values'][1]['mailing_id']);
-    $this->assertEquals("Some Subject", $result['values'][1]['subject']);
-    $this->assertEquals(CRM_Core_Session::getLoggedInContactID(), $result['values'][1]['creator_id']);
+    $this->assertEquals($mailingID, $result['values'][$mailingID]['mailing_id']);
+    $this->assertEquals("Some Subject", $result['values'][$mailingID]['subject']);
+    $this->assertEquals(CRM_Core_Session::getLoggedInContactID(), $result['values'][$mailingID]['creator_id']);
   }
 
   /**
