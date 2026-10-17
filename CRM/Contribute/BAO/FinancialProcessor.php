@@ -21,6 +21,46 @@ use Civi\Api4\PaymentProcessor;
  * This is a place to extract the financial record processing code to
  * in order to clean it up.
  *
+ * Core entities: a civicrm_financial_trxn is one double-entry movement
+ * (from_financial_account_id -> to_financial_account_id, total_amount).
+ * civicrm_entity_financial_trxn links a trxn to whatever it affected -
+ * always the contribution (entity_table=civicrm_contribution), and usually
+ * one or more civicrm_financial_item rows (entity_table=civicrm_financial_item,
+ * amount = that item's share of the trxn). A financial_item's own
+ * entity_table/entity_id (not to be confused with the entity_financial_trxn
+ * link above) points at what it represents - normally a civicrm_line_item.
+ *
+ * Which account to route a trxn through is resolved via
+ * civicrm_entity_financial_account, keyed by (financial_type_id,
+ * account_relationship) - eg. 'Income Account is', 'Accounts Receivable
+ * Account is', 'Expense Account is'. Several financial types commonly share
+ * the same account for a given relationship (eg. AR), so code that looks up
+ * accounts directly from a contribution's trxn history (reverseAccountPosition())
+ * dedupes before joining, rather than assuming one row per type.
+ *
+ * Reversing vs adjusting: a change is either reversed (book the exact
+ * negation of what's actually on record - reverseAccountPosition(),
+ * createReversalFinancialItem(), reversePriorFinancialTrxn()) or adjusted
+ * (book just the delta needed to reach the new target - the 'changedAmount'/
+ * 'changedStatus' contexts in getFinancialItemAmountFromParams()). Prefer
+ * reversing an actual looked-up value over recomputing "what it should be"
+ * from current state where the two could diverge (eg. the financial type, and
+ * so the account, having changed since the thing being reversed was posted).
+ *
+ * is_payment=1 marks a trxn as real money changing hands - it's what
+ * Contribution.paid_amount/balance_amount and Payment::getPayableItems()'s
+ * "how much has this item been paid" both filter on. A trxn that only posts
+ * to/reverses Accounts Receivable (an invoice, or cancelling one that was
+ * never paid) is not a payment and must not be flagged as one, regardless of
+ * the destination status rules that happen to apply elsewhere.
+ *
+ * Historical design intent: https://web.archive.org/web/20150130065626/http://wiki.civicrm.org/confluence/display/CRM/CiviAccounts+Data+Flow
+ * - useful for the overall shape, but a 2014 draft, not authoritative for
+ * current code: it has at least one documented error in its own worked
+ * example (see the page comment on cancelling a pay-later contribution -
+ * reversing both the accounts AND the amount double-reverses), and some
+ * sections (eg. Premiums) no longer correspond to any code in this class.
+ *
  * @internal core use only.
  *
  * @package CRM
