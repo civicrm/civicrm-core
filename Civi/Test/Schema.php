@@ -300,7 +300,7 @@ class Schema {
       // 'civicrm_mail_settings',
       // 'civicrm_managed',
       // 'civicrm_mapping',
-      'civicrm_mapping_field',
+      // 'civicrm_mapping_field',
       'civicrm_membership',
       // 'civicrm_membership_block',
       // 'civicrm_membership_log',
