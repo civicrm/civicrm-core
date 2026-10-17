@@ -362,8 +362,12 @@
           value = value[ctrl.search_operator] ? value[ctrl.search_operator] : null;
         }
         // Support "Select Current User" default
-        if (ctrl.defn.input_type === 'EntityRef' && ['Contact', 'Individual'].includes(ctrl.fkEntity) && value === 'user_contact_id') {
-          value = CRM.config.cid;
+        if (ctrl.defn.input_type === 'EntityRef' && ['Contact', 'Individual'].includes(ctrl.fkEntity)) {
+          if (value === 'user_contact_id') {
+            value = CRM.config.cid;
+          } else if (Array.isArray(value)) {
+            value = value.map((contactId) => contactId === 'user_contact_id' ? CRM.config.cid : contactId);
+          }
         }
         const isNumberRange = ctrl.defn.input_type === 'Number' && ctrl.defn.search_range;
         // correct the value type
