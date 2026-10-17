@@ -149,7 +149,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // and letting natural justice take care of the rest.
       $params['trxnParams']['trxn_id'] = $this->getUpdatedContribution()->trxn_id;
     }
-    if (!empty($params['contribution_status_id']) &&
+    if ($this->isCancellingUnpaidBalance()) {
+      $trxnID = $this->reverseAccountPosition('Accounts Receivable Account is');
+      if ($trxnID) {
+        $this->reverseLineItemsOnCancellation($trxnID);
+      }
+    }
+    elseif (!empty($params['contribution_status_id']) &&
       $this->getOriginalContribution()->contribution_status_id != $this->getUpdatedContribution()->contribution_status_id
     ) {
       //Update Financial Records
@@ -313,6 +319,91 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function getAccountsReceivableAccount(int $financialTypeID): ?int {
     return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($financialTypeID, 'Accounts Receivable Account is');
+  }
+
+  /**
+   * Reverse this contribution's net position in every account matching the
+   * given account-relationship (eg. 'Accounts Receivable Account is') back
+   * to zero.
+   *
+   * Finds the account(s) from the contribution's actual trxn history rather
+   * than assuming the current financial_type's account, since the financial
+   * type (and so the account) may have changed since the trxn(s) being
+   * reversed were posted - there could even be more than one such account if
+   * so.
+   */
+  private function reverseAccountPosition(string $accountRelationship): ?int {
+    $relationshipID = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE '$accountRelationship' "));
+    // Several financial types commonly share the same account for a given
+    // relationship (eg. all types usually point at one Accounts Receivable
+    // account) - select the distinct accounts first so joining to trxns below
+    // doesn't match & sum each trxn once per financial type sharing the account.
+    $query = "
+      SELECT a.financial_account_id,
+        SUM(IF(ft.to_financial_account_id = a.financial_account_id, ft.total_amount, 0))
+        - SUM(IF(ft.from_financial_account_id = a.financial_account_id, ft.total_amount, 0)) AS net_amount
+      FROM (
+        SELECT DISTINCT financial_account_id FROM civicrm_entity_financial_account
+        WHERE entity_table = 'civicrm_financial_type' AND account_relationship = %1
+      ) a
+      INNER JOIN civicrm_financial_trxn ft
+        ON ft.to_financial_account_id = a.financial_account_id OR ft.from_financial_account_id = a.financial_account_id
+      INNER JOIN civicrm_entity_financial_trxn eft
+        ON eft.financial_trxn_id = ft.id AND eft.entity_table = 'civicrm_contribution'
+      WHERE eft.entity_id = %2
+      GROUP BY a.financial_account_id
+    ";
+    $dao = CRM_Core_DAO::executeQuery($query, [
+      1 => [$relationshipID, 'Integer'],
+      2 => [$this->getContributionID(), 'Integer'],
+    ]);
+    $trxnID = NULL;
+    while ($dao->fetch()) {
+      $netAmount = round((float) $dao->net_amount, 2);
+      if (!$netAmount) {
+        continue;
+      }
+      $trxnID = $this->createFinancialTrxn([
+        'contribution_id' => $this->getContributionID(),
+        'to_financial_account_id' => $dao->financial_account_id,
+        'total_amount' => -$netAmount,
+        'net_amount' => -$netAmount,
+        'currency' => $this->getUpdatedContributionValue('currency'),
+        'trxn_date' => !empty($this->getUpdatedContribution()->cancel_date) ? $this->getUpdatedContribution()->cancel_date : date('YmdHis'),
+        'status_id' => $this->getUpdatedContribution()->contribution_status_id,
+        'is_payment' => FALSE,
+      ]);
+    }
+    return $trxnID;
+  }
+
+  /**
+   * Reverse every existing financial item for the contribution's current line
+   * items - unconditionally, unlike reverseLineFinancialItem() which only
+   * reverses when something about the line has actually changed. Used when
+   * cancelling a balance that was never paid, where every item needs zeroing
+   * regardless of whether the line itself changed.
+   */
+  private function reverseLineItemsOnCancellation(int $trxnID): void {
+    foreach ($this->getUpdatedLineItems() as $lineItem) {
+      foreach ([FALSE, TRUE] as $isTax) {
+        $previousItem = $this->getExistingFinancialItemForLine($lineItem['id'] ?? NULL, $isTax);
+        if (empty($previousItem) || !$previousItem['amount']) {
+          continue;
+        }
+        $this->createFinancialItem([
+          'transaction_date' => CRM_Utils_Date::isoToMysql($this->getUpdatedContribution()->receive_date),
+          'contact_id' => $this->getUpdatedContribution()->contact_id,
+          'entity_table' => 'civicrm_line_item',
+          'entity_id' => $lineItem['id'],
+          'amount' => -$previousItem['amount'],
+          'financial_account_id' => $previousItem['financial_account_id'],
+          'currency' => $previousItem['currency'],
+          'description' => $previousItem['description'],
+          'status_id' => $previousItem['status_id'],
+        ], $trxnID);
+      }
+    }
   }
 
   /**
@@ -820,6 +911,21 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
+   * Is this cancelling a contribution that was never paid - ie. only the
+   * accounts-receivable posting made when it was created needs reversing,
+   * as opposed to a refund/chargeback of money that was actually received.
+   *
+   * @return bool
+   */
+  private function isCancellingUnpaidBalance(): bool {
+    if ($this->getUpdatedContributionStatus() !== 'Cancelled') {
+      return FALSE;
+    }
+    return ($this->getOriginalContributionStatus() === 'Pending' && $this->getOriginalContribution()->is_pay_later)
+      || $this->getOriginalContributionStatus() === 'In Progress';
+  }
+
+  /**
    * Is the financial account changed on the contribution.
    *
    * @todo - this should only matter at the line item level.
@@ -876,17 +982,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
     elseif (($previousContributionStatus === 'Pending'
         && $this->getOriginalContribution()->is_pay_later) || $previousContributionStatus === 'In Progress'
     ) {
-      $arAccountId = $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id'));
-
-      if ($currentContributionStatus === 'Cancelled') {
-        // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-        $params['trxnParams']['to_financial_account_id'] = $arAccountId;
-        $params['trxnParams']['total_amount'] = -$params['total_amount'];
-      }
-      else {
-        // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-        $params['trxnParams']['from_financial_account_id'] = $arAccountId;
-      }
+      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+      // Cancelling from here (Pending-pay_later/In Progress) is handled by
+      // isCancellingUnpaidBalance() before this function is ever called.
+      $params['trxnParams']['from_financial_account_id'] = $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id'));
     }
 
     if ($this->isOriginalStatusPending() && $this->isCompletedTransaction()

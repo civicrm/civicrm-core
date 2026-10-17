@@ -1584,12 +1584,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 3,
       'cancel_date' => '2012-02-02 09:00',
     ]);
-    //Check if trxn_date is same as cancel_date.
-    $checkTrxnDate = [
-      'trxn_date' => '2012-02-02 09:00:00',
-    ];
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
-    $this->_checkFinancialTrxn($contribution, 'cancelPending', NULL, $checkTrxnDate);
+    $financialTrxns = $this->getFinancialTransactionsForContribution($contribution['id']);
+    $trxn = array_pop($financialTrxns);
+    // trxn_date should be the cancel_date, not the create date.
+    $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', ['id' => $trxn['financial_trxn_id']], [
+      'to_financial_account_id' => 7,
+      'total_amount' => -100,
+      'status_id' => 3,
+      'trxn_date' => '2012-02-02 09:00:00',
+    ]);
     $this->_checkFinancialItem($contribution['id'], 'cancelPending');
   }
 
@@ -4125,14 +4129,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'status_id' => 7,
         'trxn_date' => '2015-01-01 09:00:00',
         'trxn_id' => 'the refund',
-      ];
-      $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', ['id' => $trxn['financial_trxn_id']], array_merge($compareParams, $extraParams));
-    }
-    elseif ($context === 'cancelPending') {
-      $compareParams = [
-        'to_financial_account_id' => 7,
-        'total_amount' => -100,
-        'status_id' => 3,
       ];
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', ['id' => $trxn['financial_trxn_id']], array_merge($compareParams, $extraParams));
     }
