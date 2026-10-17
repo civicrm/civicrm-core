@@ -47,6 +47,59 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test flipDupePairs works via route invocation.
+   */
+  public function testFlipDupePairs(): void {
+    $dao = new CRM_Core_BAO_PrevNextCache();
+    $dao->entity_id1 = 1;
+    $dao->entity_id2 = 2;
+    $dao->is_selected = 1;
+    $dao->data = serialize([
+      'srcID' => 1,
+      'srcName' => 'Ms. Melissa Mouse II',
+      'dstID' => 2,
+      'dstName' => 'Mr. Maurice Mouse II',
+      'weight' => 20,
+      'canMerge' => TRUE,
+    ]);
+    $dao->save();
+
+    $_REQUEST['pnid'] = [$dao->id];
+
+    try {
+      CRM_Contact_Page_AJAX::flipDupePairs();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      // Expected from civiExit
+    }
+
+    $daoReloaded = new CRM_Core_BAO_PrevNextCache();
+    $daoReloaded->id = $dao->id;
+    $daoReloaded->find(TRUE);
+    $data = unserialize($daoReloaded->data);
+    $this->assertEquals(2, $data['srcID']);
+    $this->assertEquals(1, $data['dstID']);
+
+    // Also test single scalar pnid
+    $_REQUEST['pnid'] = $dao->id;
+    try {
+      CRM_Contact_Page_AJAX::flipDupePairs();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      // Expected from civiExit
+    }
+
+    $daoReloaded = new CRM_Core_BAO_PrevNextCache();
+    $daoReloaded->id = $dao->id;
+    $daoReloaded->find(TRUE);
+    $data = unserialize($daoReloaded->data);
+    $this->assertEquals(1, $data['srcID']);
+    $this->assertEquals(2, $data['dstID']);
+  }
+
+  /**
    * Tests the 'guts' of the processDupes function.
    *
    * @throws \Exception
