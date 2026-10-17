@@ -344,7 +344,7 @@ class Schema {
       // 'civicrm_relationship_type',
       // 'civicrm_report_instance',
       // 'civicrm_role',
-      'civicrm_saved_search',
+      // 'civicrm_saved_search',
       // 'civicrm_search_display',
       // 'civicrm_search_segment',
       // 'civicrm_session',
