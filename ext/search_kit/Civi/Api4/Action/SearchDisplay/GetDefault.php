@@ -131,7 +131,7 @@ class GetDefault extends \Civi\Api4\Generic\AbstractAction {
       ) {
         $col['link'] = [
           'entity' => $field['entity'],
-          'join' => implode('.', array_filter([$field['explicit_join'], $field['implicit_join']])),
+          'join' => $field['implicit_join'] ?? $field['explicit_join'] ?? '',
           'action' => 'view',
         ];
         // Hack to support links to relationships
