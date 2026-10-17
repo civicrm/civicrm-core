@@ -53,7 +53,7 @@
  *   $tx = new CRM_Core_Transaction();
  *   try {
  *     ...do work...
- *   } catch (Exception $ex) {
+ *   } catch (Throwable $ex) {
  *     $tx->rollback()->commit();
  *     throw $ex;
  *   }
@@ -154,7 +154,7 @@ class CRM_Core_Transaction {
 
   /**
    * Execute a function ($callable) within the scope of a transaction. If
-   * $callable encounters an unhandled exception, then rollback the transaction.
+   * $callable encounters an unhandled exception or error, then rollback the transaction.
    *
    * After calling run(), the CRM_Core_Transaction object is "used up"; do not
    * use it again.
@@ -162,13 +162,13 @@ class CRM_Core_Transaction {
    * @param callable $callable
    *   Should expect one parameter (CRM_Core_Transaction).
    * @return CRM_Core_Transaction
-   * @throws Exception
+   * @throws Throwable
    */
   public function run($callable) {
     try {
       $callable($this);
     }
-    catch (Exception $ex) {
+    catch (Throwable $ex) {
       $this->rollback()->commit();
       throw $ex;
     }
