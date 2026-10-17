@@ -126,7 +126,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       }
       else {
         if ($event_in_cart->event->payment_processor !== NULL && $event_in_cart->event->payment_processor !== $payment_processor_id) {
-          CRM_Core_Error::statusBounce(ts('When registering for multiple events all events must use the same payment processor. '));
+          CRM_Core_Error::statusBounce(ts('When registering for multiple events all events must use the same payment processor.'));
         }
       }
       if ($payment_processor_id) {
