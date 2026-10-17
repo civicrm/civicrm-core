@@ -28,9 +28,10 @@ class CRM_Core_BAO_PrevNextCacheTest extends CiviUnitTestCase {
       'canMerge' => TRUE,
     ]);
     $dao->save();
+    $prevNextCacheID = $dao->id;
     $dao = new CRM_Core_BAO_PrevNextCache();
-    $dao->id = 1;
-    CRM_Core_BAO_PrevNextCache::flipPair([1], 0);
+    $dao->id = $prevNextCacheID;
+    CRM_Core_BAO_PrevNextCache::flipPair([$prevNextCacheID], 0);
     $dao->find(TRUE);
     $this->assertEquals(1, $dao->entity_id1);
     $this->assertEquals(2, $dao->entity_id2);

@@ -40,8 +40,13 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
   public function testSelectorQuery(array $dataSet): void {
     $tag = $this->callAPISuccess('Tag', 'create', [
       'name' => 'Test Tag Name',
-      'parent_id' => 1,
+      'parent_id' => $this->callAPISuccess('Tag', 'create', ['name' => 'Test Tag Parent'])['id'],
     ]);
+    foreach ($dataSet['form_values'] as $index => $formValue) {
+      if (is_array($formValue) && ($formValue[2] ?? NULL) === '@tagid') {
+        $dataSet['form_values'][$index][2] = (string) $tag['id'];
+      }
+    }
     if (!empty($dataSet['limitedPermissions'])) {
       CRM_Core_Config::singleton()->userPermissionClass->permissions = [
         'access CiviCRM',
@@ -346,7 +351,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'description' => 'Tag Equals Test',
           'class' => 'CRM_Contact_Selector',
           'settings' => [],
-          'form_values' => [['contact_type', '=', 'Individual', 1, 0], ['tag', '=', '1', 1, 0]],
+          'form_values' => [['contact_type', '=', 'Individual', 1, 0], ['tag', '=', '@tagid', 1, 0]],
           'params' => [],
           'return_properties' => NULL,
           'context' => 'builder',

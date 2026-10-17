@@ -74,7 +74,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   public function testBounceProcessing(): void {
     $this->setUpMailing();
 
-    copy(__DIR__ . '/data/bounces/bounce_no_verp.txt', __DIR__ . '/data/mail/bounce_no_verp.txt');
+    $this->addBounceToMailDirectory('bounce_no_verp.txt');
     $this->assertFileExists(__DIR__ . '/data/mail/bounce_no_verp.txt');
     $this->callApiV3Success('Job', 'fetch_bounces', []);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/bounce_no_verp.txt');
@@ -88,7 +88,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $this->setUpMailing();
     $mail = 'test_invalid_character.eml';
 
-    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->addBounceToMailDirectory($mail);
     $this->callApiV3Success('Job', 'fetch_bounces', ['is_create_activities' => TRUE]);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
@@ -103,7 +103,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $this->setUpMailing();
     $mail = 'test_utf8mb4_character.txt';
 
-    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->addBounceToMailDirectory($mail);
     $this->callApiV3Success('Job', 'fetch_bounces', []);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
@@ -118,7 +118,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $this->setUpMailing();
     $mail = 'test_sample_message.eml';
 
-    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->addBounceToMailDirectory($mail);
     $this->callApiV3Success('Job', 'fetch_bounces', ['is_create_activities' => TRUE]);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
@@ -134,7 +134,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $this->setUpMailing();
     $mail = 'test_nested_message.eml';
 
-    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
+    $this->addBounceToMailDirectory($mail);
     $this->callApiV3Success('Job', 'fetch_bounces', []);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
@@ -162,7 +162,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
       'api.email.delete' => 1,
     ]);
 
-    copy(__DIR__ . '/data/bounces/bounce_no_verp.txt', __DIR__ . '/data/mail/bounce_no_verp.txt');
+    $this->addBounceToMailDirectory('bounce_no_verp.txt');
     $this->assertFileExists(__DIR__ . '/data/mail/bounce_no_verp.txt');
     $this->callApiV3Success('Job', 'fetch_bounces', []);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/bounce_no_verp.txt');
@@ -185,6 +185,21 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $this->assertEquals($expectedCount, CRM_Core_DAO::singleValueQuery(
       'SELECT count(*) FROM civicrm_mailing_event_bounce'
     ));
+  }
+
+  /**
+   * Copy a bounce from data/bounces into the mail directory.
+   *
+   * The bounces are addressed to b.2.1.aaaaaaaaaaaaaaaz, so point them at the
+   * job and event queue set up by setUpMailing().
+   *
+   * @param string $fileName
+   */
+  private function addBounceToMailDirectory(string $fileName): void {
+    $jobID = $this->eventQueue['values'][$this->eventQueue['id']]['job_id'];
+    $bounce = file_get_contents(__DIR__ . '/data/bounces/' . $fileName);
+    $bounce = str_replace('b.2.1.', 'b.' . $jobID . '.' . $this->eventQueue['id'] . '.', $bounce);
+    file_put_contents(__DIR__ . '/data/mail/' . $fileName, $bounce);
   }
 
   /**
