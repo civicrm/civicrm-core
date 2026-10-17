@@ -1,10 +1,12 @@
 <div id="bootstrap-theme" crm-dialog="crmSearchTask">
   <form name="crmSearchTaskApiBatchForm" ng-controller="crmSearchTaskApiBatch as $ctrl">
     <p><strong ng-if="apiBatch.confirmMsg">{{:: ts(apiBatch.confirmMsg, {1: $ctrl.ids.length, 2: $ctrl.entityTitle}) }}</strong></p>
-    <div class="form-inline" ng-repeat="field in apiBatch.fields">
-      <crm-search-input class="form-group" ng-model="apiBatch.params.values[field.name]" field="field" show-label="true"></crm-search-input>
+    <div class="crm-form-block" ng-if="apiBatch.fields">
+      <div class="crm-section" ng-repeat="field in apiBatch.fields">
+        <crm-search-input ng-model="apiBatch.params.values[field.name]" field="field" show-label="true"></crm-search-input>
+        <div class="clear"></div>
+      </div>
     </div>
-    <hr />
     <div ng-if="$ctrl.run" class="crm-search-task-progress">
       <h5 ng-if="apiBatch.runMsg">{{:: ts(apiBatch.runMsg, {1: $ctrl.ids.length, 2: $ctrl.entityTitle}) }}</h5>
       <crm-search-batch-runner entity="apiBatch.entity" action="{{:: apiBatch.action }}" params="$ctrl.run" ids="$ctrl.ids" success="$ctrl.onSuccess(result)" error="$ctrl.onError(error)" id-field="{{:: apiBatch.idField }}" display-ctrl="$ctrl.displayCtrl" is-link="$ctrl.isLink"></crm-search-batch-runner>
