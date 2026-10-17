@@ -574,4 +574,63 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertEquals($contacts[1]['id'], $customIntegerResult[0]['id']);
   }
 
+  public function testQuicksearchCustomFieldWithOptions(): void {
+    $this->createTestRecord('OptionGroup', [
+      'name' => 'CarTypes',
+    ]);
+    $this->saveTestRecords('OptionValue', [
+      'records' => [
+        ['label' => 'Ferrari', 'value' => 1, 'option_group_id:name' => 'CarTypes'],
+        ['label' => 'Ford', 'value' => 2, 'option_group_id:name' => 'CarTypes'],
+        ['label' => 'Mercedes', 'value' => 3, 'option_group_id:name' => 'CarTypes'],
+      ],
+    ]);
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'QuicksearchTestGroup',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'name' => 'DreamCar',
+      'custom_group_id.name' => 'QuicksearchTestGroup',
+      'option_group_id:name' => 'CarTypes',
+      'data_type' => 'Int',
+      'html_type' => 'Select',
+    ]);
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'Aaa', 'QuicksearchTestGroup.DreamCar:label' => 'Ferrari'],
+        ['first_name' => 'B', 'last_name' => 'Bbb', 'QuicksearchTestGroup.DreamCar:label' => 'Ford'],
+        ['first_name' => 'C', 'last_name' => 'Ccc', 'QuicksearchTestGroup.DreamCar:label' => 'Mercedes'],
+      ],
+    ]);
+
+    // NOTE: Option Custom Fields are exposed to quicksearch_options with :label suffix
+    Setting::set(FALSE)
+      ->addValue('quicksearch_options', ['QuicksearchTestGroup.DreamCar:label'])
+      ->execute();
+
+    // Check we can search using human-readable option labels
+    $mercedes = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['QuicksearchTestGroup.DreamCar:label' => 'Mercedes'])
+      ->execute();
+
+    $this->assertCount(1, $mercedes);
+    $this->assertEquals($mercedes[0]['id'], $contacts[2]['id']);
+
+    // TODO: the following seems like reasonable behaviour, but
+    // it doesn't work... yet.
+
+    // // Search should use contains so partial matches should be found
+    // $beginsWithF = Contact::autocomplete(FALSE)
+    //   ->setFormName('crmMenubar')
+    //   ->setFieldName('crm-qsearch-input')
+    //   ->setFilters(['QuicksearchTestGroup.DreamCar:label' => 'F'])
+    //   ->execute();
+
+    // // only the first two contacts should be returned
+    // $this->assertCount(2, $beginsWithF);
+  }
+
 }
