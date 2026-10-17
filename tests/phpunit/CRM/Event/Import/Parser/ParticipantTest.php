@@ -166,16 +166,16 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testImportUpdateUsingID() :void {
-    // Ensure that the next id on the participant table is 1 since that is in the csv.
-    $this->quickCleanup(['civicrm_participant']);
     $this->individualCreate();
     $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'radio', '', ['data_type' => 'Boolean']);
-    $this->createTestEntity('Participant', [
+    $participantID = $this->createTestEntity('Participant', [
       'status_id:name' => 'Pending from pay later',
       'contact_id' => $this->individualCreate(),
       'event_id' => $this->eventCreatePaid()['id'],
       'role_id:name' => ['Attendee'],
-    ]);
+    ])['id'];
+    $missingParticipantID = $participantID + 1;
+    $this->writeCSV('cancel_participant.csv', "id,Status,Yes-no-field\n$participantID,Cancelled,yes\n$missingParticipantID,Cancelled,no\n");
     $this->importCSV('cancel_participant.csv', [
       ['name' => 'Participant.id'],
       ['name' => 'Participant.status_id'],
@@ -191,7 +191,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals(TRUE, $participant[$this->getCustomFieldName('radio', 4)]);
     $row = $dataSource->getRow();
     $this->assertEquals('ERROR', $row['_status']);
-    $this->assertEquals('Participant record not found for id 2', $row['_status_message']);
+    $this->assertEquals('Participant record not found for id ' . $missingParticipantID, $row['_status_message']);
   }
 
   /**
