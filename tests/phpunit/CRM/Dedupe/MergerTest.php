@@ -1736,6 +1736,29 @@ WHERE
   }
 
   /**
+   * Merging restores cache flushing afterwards, also when a merge fails.
+   */
+  public function testMergeRestoresCacheFlushModeAfterError(): void {
+    $toKeepID = $this->individualCreate();
+    $toRemoveID = $this->individualCreate();
+    $dupePairs = [['dstID' => $toKeepID, 'srcID' => $toRemoveID]];
+    $this->hookClass->setHook('civicrm_merge', fn() => throw new TypeError('Ruh-roh'));
+    try {
+      CRM_Dedupe_Merger::merge($dupePairs, [], 'aggressive');
+      $this->fail('Expected the hook error to propagate');
+    }
+    catch (TypeError $e) {
+      $this->assertEquals('Ruh-roh', $e->getMessage());
+    }
+    $this->assertTrue(CRM_Core_Config::isPermitCacheFlushMode());
+
+    $this->hookClass->reset();
+    $result = CRM_Dedupe_Merger::merge($dupePairs, [], 'aggressive');
+    $this->assertCount(1, $result['merged']);
+    $this->assertTrue(CRM_Core_Config::isPermitCacheFlushMode());
+  }
+
+  /**
    * Test that a custom field attached to the relationship does not block merge.
    *
    * @throws \CRM_Core_Exception
