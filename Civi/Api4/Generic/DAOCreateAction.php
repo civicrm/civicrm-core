@@ -28,6 +28,7 @@ class DAOCreateAction extends AbstractCreateAction {
    */
   public function _run(Result $result) {
     $this->formatWriteValues($this->values);
+    $this->injectFacadeCondition();
     $this->fillDefaults($this->values);
     $this->validateValues();
 
@@ -44,6 +45,26 @@ class DAOCreateAction extends AbstractCreateAction {
       throw new \CRM_Core_Exception("Cannot pass $idField to Create action. Use Update action instead.");
     }
     parent::validateValues();
+  }
+
+  protected function injectFacadeCondition() {
+    $facadeConfig = $this->getFacadeConfig();
+    if (!$facadeConfig) {
+      return;
+    }
+    $field = $facadeConfig['field'];
+    $value = $facadeConfig['value'];
+    if (!isset($this->values[$field])) {
+      $this->values[$field] = $value;
+    }
+    elseif ($this->values[$field] !== $value) {
+      // Warn if user tried to set a different value
+      \Civi::log()->warning(
+        "Facade field '{$field}' must be '{$value}' for {$this->getEntityName()} but got '{$this->values[$field]}'"
+      );
+      // Force the correct value
+      $this->values[$field] = $value;
+    }
   }
 
 }

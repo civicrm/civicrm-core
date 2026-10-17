@@ -339,6 +339,15 @@ abstract class AbstractAction implements \ArrayAccess {
     return $this->_entityName;
   }
 
+  public function getFacadeConfig() {
+    $entityName = $this->getEntityName();
+    $is_facade = CoreUtil::getInfoItem($entityName, 'is_facade') ?? FALSE;
+    if ($is_facade) {
+      return CoreUtil::getInfoItem($entityName, 'facade_config');
+    }
+    return [];
+  }
+
   /**
    *
    * @return string
