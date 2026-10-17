@@ -129,11 +129,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
       $params['skipLineItem'] = FALSE;
       // Set amounts to create a reversal transaction.
-      $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = -$this->getOriginalContribution()->total_amount;
-      $params['trxnParams']['fee_amount'] = 0 - $this->getOriginalContribution()->fee_amount;
-      $this->updateFinancialAccounts($params['trxnParams'], 'changeFinancialType');
-      // Set the amounts back to the original value for creating the new positive financial trxn.
-      $params['total_amount'] = $params['trxnParams']['net_amount'] = $params['trxnParams']['total_amount'] = $this->getUpdatedContribution()->total_amount;
+      $reversalTrxnParams = $params['trxnParams'];
+      $reversalTrxnParams['total_amount'] = $reversalTrxnParams['net_amount'] = -$this->getOriginalContribution()->total_amount;
+      $reversalTrxnParams['fee_amount'] = 0 - $this->getOriginalContribution()->fee_amount;
+      $this->reversePriorFinancialTrxn($reversalTrxnParams, 'changeFinancialType');
+      // Use the current (updated) amounts for the replacement positive trxn - $reversalTrxnParams
+      // was a separate copy, so $params['trxnParams'] still holds the original contribution's amounts.
+      $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = $this->getUpdatedContribution()->total_amount;
       $params['trxnParams']['fee_amount'] = $this->getUpdatedContribution()->fee_amount;
       $this->updateFinancialAccounts($params['trxnParams'], NULL, $this->getUpdatedFinancialAccount());
       $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
@@ -609,12 +611,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
       return $lineTotal;
     }
-    if ($context === 'changeFinancialType') {
-      // This is a reversal that will be followed by a replacement line. We should also
-      // do this when currency changes or, perhaps we should always reverse & redo to mitigate
-      // complexity / error risk.
-      return -$this->getOriginalLineItemAmount($lineItemDetails['id'] ?? NULL, 'line_total');
-    }
     if ($context === 'changedStatus') {
       $cancelledTaxAmount = 0;
       if ($this->isContributionUpdateARefund()) {
@@ -741,11 +737,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
       ];
       $this->createFinancialItem($itemParams, $trxnID);
 
-      // If changing the financial type we reverse & recreate but really we should do this
-      // a) if the line item financial type changes (not contribution) and
-      // b) if the currency changes....
-      $isReversePrior = $context === 'changeFinancialType';
-
       // We have to create a new tax transaction if the last one was reversed OR the new one has tax
       // and there was no last one to reverse.
       $isTaxTransactionRequired = $lineItemDetails['tax_amount'] &&
@@ -764,12 +755,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $isTaxAdjustmentRequired = ($lineItemDetails['tax_amount'] ?? NULL)
         && $this->getOriginalLineItemAmount($lineItemDetails['id'], 'tax_amount') !== $lineItemDetails['tax_amount'];
 
-      if ($isReversePrior) {
-        // In this case we are on the first pass - reverse. Second pass will create new
-        // although would be better to restructure to a single pass.
-        $this->reverseLineFinancialItem($lineItemDetails, TRUE, $trxnID);
-      }
-      elseif ($isTaxTransactionRequired) {
+      if ($isTaxTransactionRequired) {
         // In this scenario we are on the second pass. We have done a reversal
         // on the first pass and now we are doing a second pass to create the
         // new correct new transaction (ideally we would not do as 2 passes
@@ -782,6 +768,39 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $taxAmount = (float) $lineItemDetails['tax_amount'] - $previousTaxAmount;
         $this->createTaxFinancialItem($itemParams, $lineItemDetails['financial_type_id'], $taxAmount, $trxnID);
       }
+    }
+    $this->createDeferredTrxn(TRUE, $context);
+  }
+
+  /**
+   * Update all financial accounts entry.
+   *
+   * @param array $trxnParams
+   *   Params for the trxn to record.
+   * @param string $context
+   *   Update scenarios.
+   */
+  private function reversePriorFinancialTrxn($trxnParams, $context = NULL): void {
+    $trxnID = $this->createFinancialTrxn($trxnParams);
+    $lineItems = $this->getUpdatedLineItems();
+    $postUpdateContribution = $this->getUpdatedContribution();
+    foreach ($lineItems as $lineItemDetails) {
+      $prevFinancialItem = $this->getExistingFinancialItemForLine($lineItemDetails['id'], FALSE);
+      $lineFinancialAccount = $this->getFinancialAccountForStatusChangeTrxn($prevFinancialItem['financial_account_id']);
+
+      $itemParams = [
+        'transaction_date' => CRM_Utils_Date::isoToMysql($postUpdateContribution->receive_date),
+        'contact_id' => $postUpdateContribution->contact_id,
+        'currency' => $postUpdateContribution->currency,
+        'amount' => -$this->getOriginalLineItemAmount($lineItemDetails['id'] ?? NULL, 'line_total'),
+        'description' => $prevFinancialItem['description'] ?? NULL,
+        'status_id' => $prevFinancialItem['status_id'],
+        'financial_account_id' => $lineFinancialAccount,
+        'entity_table' => 'civicrm_line_item',
+        'entity_id' => $lineItemDetails['id'],
+      ];
+      $this->createFinancialItem($itemParams, $trxnID);
+      $this->reverseLineFinancialItem($lineItemDetails, TRUE, $trxnID);
     }
     $this->createDeferredTrxn(TRUE, $context);
   }
