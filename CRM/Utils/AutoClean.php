@@ -68,6 +68,14 @@ class CRM_Utils_AutoClean {
       return NULL;
     }
 
+    if ($oldLocale !== NULL) {
+      // The CMS language can differ from the CiviCRM locale (e.g. a /fr/ page on a site with one
+      // CiviCRM language), so restore the CMS language that is active now, not the one implied by
+      // the locale.
+      $oldLocale = \Civi\Core\Locale::negotiate($oldLocale);
+      $oldLocale->uf = CRM_Utils_System::getUFLocale() ?? $oldLocale->uf;
+    }
+
     $i18n = \CRM_Core_I18n::singleton();
     $i18n->setLocale($newLocale);
     return static::with(function() use ($i18n, $oldLocale) {

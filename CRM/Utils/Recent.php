@@ -63,6 +63,14 @@ class CRM_Utils_Recent {
       if (!self::$_recent) {
         self::$_recent = [];
       }
+      // The stored URLs have the CMS language of the request that added them.
+      foreach (self::$_recent as $index => $item) {
+        foreach (['url', 'view_url', 'edit_url', 'delete_url'] as $key) {
+          if (!empty($item[$key]) && is_string($item[$key])) {
+            self::$_recent[$index][$key] = CRM_Utils_System::localizeUrl($item[$key]);
+          }
+        }
+      }
     }
   }
 

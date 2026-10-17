@@ -451,6 +451,17 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Adapt a previously generated URL (e.g. one stored in the session) to the current CMS language.
+   *
+   * @param string $url
+   *
+   * @return string
+   */
+  public function localizeUrl(string $url): string {
+    return $url;
+  }
+
+  /**
    * Determine the location of the CMS root.
    *
    * @return string|null
