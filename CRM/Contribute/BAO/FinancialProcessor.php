@@ -183,7 +183,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
       if ($amount) {
         $financialTxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getContributionID(), 'DESC')['financialTrxnId'];
-        CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
+        CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount()], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
       }
     }
     if (empty($params['skipLineItem'])) {
@@ -512,7 +512,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
         if (!empty($this->getUpdatedContributionValue('fee_amount')) && (empty($this->getOriginalContribution()) || $this->getUpdatedContribution()->fee_amount != $this->getOriginalContribution()->fee_amount)) {
           $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
           if ($amount) {
-            CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
+            CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount()], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
           }
         }
         if (empty($params['skipLineItem'])) {
@@ -970,11 +970,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
   /**
    * The function is responsible for handling financial entries if payment instrument is changed
    *
-   * @param $trxnParams
+   * @param array $trxnParams
    *
    * @return bool
    * @throws \CRM_Core_Exception
-   * @throws \Civi\API\Exception\UnauthorizedException
    */
   private function updateFinancialAccountsOnPaymentInstrumentChange($trxnParams) {
     // This is refactored code but the assumed logic is that if the financialAccount changed then there has already been a reversal
