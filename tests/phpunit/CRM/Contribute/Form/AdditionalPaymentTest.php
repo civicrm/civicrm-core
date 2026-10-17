@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\Country;
 use Civi\Api4\StateProvince;
 
@@ -57,6 +58,13 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    * @var array
    */
   protected $paymentInstruments = [];
+
+  /**
+   * Parameters the payment processor received.
+   *
+   * @var array
+   */
+  protected $paymentProcessorParams = [];
 
   /**
    * Dummy payment processor.
@@ -144,6 +152,29 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'Visa',
       '***********1111',
     ]);
+  }
+
+  /**
+   * A credit card payment passes the contribution ID and source to the processor.
+   */
+  public function testCreditCardPaymentPassesContributionDetails(): void {
+    $this->createPartiallyPaidOrder();
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $this->_contributionId)
+      ->addValue('source', 'Annual gala')
+      ->execute();
+    $this->hookClass->setHook('civicrm_alterPaymentProcessorParams', [$this, 'hook_civicrm_alterPaymentProcessorParams']);
+
+    $this->submitPayment(70, 'live');
+    $this->assertEquals($this->_contributionId, $this->paymentProcessorParams['contributionID']);
+    $this->assertEquals('Annual gala', $this->paymentProcessorParams['description']);
+  }
+
+  /**
+   * Record the parameters the payment processor receives.
+   */
+  public function hook_civicrm_alterPaymentProcessorParams($paymentObj, array &$rawParams, $cookedParams): void {
+    $this->paymentProcessorParams = $rawParams;
   }
 
   /**
@@ -360,7 +391,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'financial_type_id' => 1,
       'trxn_date' => '2017-04-11 13:05:11',
-      'payment_processor_id' => 0,
       'is_email_receipt' => $isEmailReceipt,
       'from_email_address' => 'site@something.com',
     ];
@@ -374,7 +404,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       $submitParams += [
         'payment_instrument_id' => array_search('Credit Card', $this->paymentInstruments, TRUE),
         'payment_processor_id' => $this->paymentProcessorID,
-        'credit_card_exp_date' => ['M' => 5, 'Y' => 2025],
+        'credit_card_exp_date' => ['M' => 5, 'Y' => (int) date('Y') + 1],
         'credit_card_number' => '411111111111111',
         'cvv2' => 234,
         'credit_card_type' => 'Visa',
@@ -386,6 +416,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     }
     else {
       $submitParams += [
+        'payment_processor_id' => 0,
         'payment_instrument_id' => array_search('Check', $this->paymentInstruments, TRUE),
         'check_number' => 'check-12345',
       ];
