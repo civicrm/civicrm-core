@@ -909,9 +909,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
-   * Is this cancelling a contribution that was never paid - ie. only the
-   * accounts-receivable posting made when it was created needs reversing,
-   * as opposed to a refund/chargeback of money that was actually received.
+   * Is this cancelling a contribution that was never paid - ie. at most the
+   * accounts-receivable posting made when it was created needs reversing
+   * (none at all for a plain Pending/Failed contribution, which never posted
+   * anything), as opposed to a refund/chargeback of money that was actually
+   * received.
    *
    * @return bool
    */
@@ -919,8 +921,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     if ($this->getUpdatedContributionStatus() !== 'Cancelled') {
       return FALSE;
     }
-    return ($this->getOriginalContributionStatus() === 'Pending' && $this->getOriginalContribution()->is_pay_later)
-      || $this->getOriginalContributionStatus() === 'In Progress';
+    return in_array($this->getOriginalContributionStatus(), ['Pending', 'In Progress', 'Failed'], TRUE);
   }
 
   /**
