@@ -364,6 +364,8 @@ WHERE ceft.entity_id = %1";
 
     if ($includeRefund) {
       $statusIDs[] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
+      // See ContributionGetSpecProvider::calculateAmountPaid() - keep these in sync.
+      $statusIDs[] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Chargeback');
     }
 
     $sql = "SELECT SUM(ft.total_amount) FROM civicrm_financial_trxn ft
