@@ -58,7 +58,11 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Common preprocess: fetch contact ID and contact type
    */
   public function preProcess() {
-    $this->assign('contactId', $this->getContactID());
+    $contactId = $this->getContactID();
+    if (!CRM_Contact_BAO_Contact_Permission::allow($contactId, CRM_Core_Permission::EDIT)) {
+      CRM_Utils_System::permissionDenied();
+    }
+    $this->assign('contactId', $contactId);
 
     // get contact type and subtype
     if (empty($this->_contactType)) {
