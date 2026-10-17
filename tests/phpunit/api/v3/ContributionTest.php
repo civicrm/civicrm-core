@@ -2974,7 +2974,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testRepeatTransactionUpdatedFinancialTypeAndNotEquals(): void {
     $originalContribution = $this->setUpRecurringContribution([], ['financial_type_id' => 2]);
     // This will made the trick to get the not equals behaviour.
-    $this->callAPISuccess('line_item', 'create', ['id' => 1, 'financial_type_id' => 4]);
+    $lineItemID = LineItem::get(FALSE)->addWhere('contribution_id', '=', $originalContribution['id'])->execute()->single()['id'];
+    $this->callAPISuccess('line_item', 'create', ['id' => $lineItemID, 'financial_type_id' => 4]);
     $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $originalContribution['values'][$originalContribution['id']]['contribution_recur_id'],
       'trxn_id' => 1234,

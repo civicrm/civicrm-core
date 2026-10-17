@@ -274,7 +274,7 @@ class Schema {
       // 'civicrm_install_canary',
       // 'civicrm_job',
       // 'civicrm_job_log',
-      'civicrm_line_item',
+      // 'civicrm_line_item',
       // 'civicrm_location_type',
       // 'civicrm_loc_block',
       // 'civicrm_log',

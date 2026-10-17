@@ -304,21 +304,21 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
         'amount' => 10.00,
         'status_id' => $unpaidStatus,
         'entity_table' => 'civicrm_line_item',
-        'entity_id' => 1,
+        'entity_id' => $lineItemIDs[0],
       ],
       [
         // when qty 3 is used, add the surplus amount i.e. $30 - $10 = $20
         'amount' => 20.00,
         'status_id' => $unpaidStatus,
         'entity_table' => 'civicrm_line_item',
-        'entity_id' => 1,
+        'entity_id' => $lineItemIDs[0],
       ],
       [
         // when qty 2 is used, add the surplus amount i.e. $20 - $30 = -$10
         'amount' => -10.00,
         'status_id' => $unpaidStatus,
         'entity_table' => 'civicrm_line_item',
-        'entity_id' => 1,
+        'entity_id' => $lineItemIDs[0],
       ],
     ];
     // Check if 3 financial items were recorded
