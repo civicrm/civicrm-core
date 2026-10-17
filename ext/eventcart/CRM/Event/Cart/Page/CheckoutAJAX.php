@@ -7,10 +7,17 @@ class CRM_Event_Cart_Page_CheckoutAJAX {
 
   public static function add_participant_to_cart() {
     $transaction = new CRM_Core_Transaction();
-    $cart_id = CRM_Utils_Request::retrieve('cart_id', 'Integer');
-    $event_id = CRM_Utils_Request::retrieve('event_id', 'Integer');
+    $cart_id = CRM_Utils_Request::retrieve('cart_id', 'Positive');
+    $event_id = CRM_Utils_Request::retrieve('event_id', 'Positive');
 
-    $cart = CRM_Event_Cart_BAO_Cart::find_by_id($cart_id);
+    $cart = CRM_Event_Cart_BAO_Cart::find_or_create_for_current_session();
+    $cart->load_associations();
+    if (!$cart_id || !$event_id || (int) $cart->id !== (int) $cart_id || !$cart->get_event_in_cart_by_event_id($event_id)) {
+      CRM_Utils_System::permissionDenied();
+    }
+    if (!CRM_Core_Permission::event(CRM_Core_Permission::VIEW, $event_id, 'register for events')) {
+      CRM_Utils_System::permissionDenied();
+    }
 
     $params_array = [
       'cart_id' => $cart->id,
@@ -18,7 +25,6 @@ class CRM_Event_Cart_Page_CheckoutAJAX {
       'event_id' => $event_id,
     ];
 
-    //XXX security?
     $participant = CRM_Event_Cart_BAO_MerParticipant::create($params_array);
     $participant->save();
 
@@ -46,9 +52,23 @@ class CRM_Event_Cart_Page_CheckoutAJAX {
   }
 
   public static function remove_participant_from_cart() {
-    $id = CRM_Utils_Request::retrieve('id', 'Integer');
+    $id = CRM_Utils_Request::retrieve('id', 'Positive');
+    if (!$id) {
+      CRM_Utils_System::permissionDenied();
+    }
+    $cart = CRM_Event_Cart_BAO_Cart::find_or_create_for_current_session();
+    $inCart = \Civi\Api4\EventCartParticipant::get(FALSE)
+      ->addWhere('cart_id', '=', $cart->id)
+      ->addWhere('participant_id', '=', $id)
+      ->execute()
+      ->first();
+    if (!$inCart) {
+      CRM_Utils_System::permissionDenied();
+    }
     $participant = CRM_Event_Cart_BAO_MerParticipant::get_by_id($id);
-    $participant->delete();
+    if ($participant) {
+      $participant->delete();
+    }
 
     CRM_Utils_System::civiExit();
   }
