@@ -53,6 +53,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
     $attachmentUrl = CRM_Core_BAO_File::attachmentInfo('civicrm_activity', $activityID);
     if ($attachmentUrl) {
       $report['fields'][] = [
+        'name' => 'Attachment(s)',
         'label' => 'Attachment(s)',
         'value' => $attachmentUrl,
         'type' => 'Link',
@@ -66,6 +67,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
         $tags[$tid] = $allTag[$tid];
       }
       $report['fields'][] = [
+        'name' => 'Tags',
         'label' => 'Tags',
         'value' => implode('<br />', $tags),
         'type' => 'String',
