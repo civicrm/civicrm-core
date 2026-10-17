@@ -32,7 +32,11 @@ return [
           ],
           'orderBy' => [],
           'where' => [
-            ['activity_type_id:name', '!=', 'Petition'],
+            [
+              'activity_type_id:name',
+              '!=',
+              'Petition',
+            ],
           ],
           'groupBy' => [],
           'join' => [],
@@ -41,9 +45,7 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -61,10 +63,7 @@ return [
         'settings' => [
           'actions' => FALSE,
           'limit' => 50,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
           'pager' => [
             'show_count' => FALSE,
             'expose_limit' => TRUE,
@@ -156,11 +155,7 @@ return [
                 [
                   'icon' => 'fa-check-square-o',
                   'side' => 'left',
-                  'if' => [
-                    'is_default',
-                    '=',
-                    TRUE,
-                  ],
+                  'if' => ['is_default', '=', TRUE],
                 ],
               ],
             ],
@@ -275,12 +270,7 @@ return [
             ],
           ],
           'cssRules' => [
-            [
-              'disabled',
-              'is_active',
-              '=',
-              FALSE,
-            ],
+            ['disabled', 'is_active', '=', FALSE],
           ],
         ],
         'acl_bypass' => FALSE,

@@ -34,7 +34,7 @@
   </classloader>
   <civix>
     <namespace>CRM/riverlea</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
   </civix>
   <mixins>
     <mixin>theme-php@1.0.0</mixin>

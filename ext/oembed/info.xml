@@ -43,7 +43,7 @@
   </requires>
   <civix>
     <namespace>CRM/Oembed</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
     <angularModule>crmOembed</angularModule>
   </civix>
   <mixins>

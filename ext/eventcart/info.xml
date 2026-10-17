@@ -40,7 +40,7 @@
   </mixins>
   <civix>
     <namespace>CRM/Event/Cart</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
   </civix>
   <upgrader>CiviMix\Schema\Eventcart\AutomaticUpgrader</upgrader>
 </extension>

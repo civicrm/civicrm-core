@@ -40,7 +40,7 @@
   </classloader>
   <civix>
     <namespace>CRM/Iframe</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
     <angularModule>crmIframe</angularModule>
   </civix>
   <mixins>
@@ -50,5 +50,6 @@
     <mixin>menu-xml@1.0.0</mixin>
     <mixin>setting-admin@1.0.1</mixin>
     <mixin>smarty@1.0.3</mixin>
+    <mixin>include-path@1.0.0</mixin>
   </mixins>
 </extension>

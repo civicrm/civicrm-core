@@ -44,7 +44,7 @@
   </mixins>
   <civix>
     <namespace>CRM/Campaign</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
     <angularModule>civiCampaign</angularModule>
   </civix>
 </extension>

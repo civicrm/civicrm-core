@@ -36,7 +36,7 @@
   </mixins>
   <civix>
     <namespace>CRM/AfformMock</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
   </civix>
   <classloader>
     <psr4 prefix="Civi\" path="Civi"/>
