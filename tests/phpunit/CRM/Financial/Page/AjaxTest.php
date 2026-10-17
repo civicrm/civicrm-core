@@ -34,10 +34,11 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
   public function testGetFinancialTransactionsList(): void {
     $individualID = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => 12345]);
+    $financialTrxnIDs = \Civi\Api4\FinancialTrxn::get(FALSE)->addOrderBy('id')->execute()->column('id');
     $batch = $this->callAPISuccess('Batch', 'create', ['title' => 'test', 'status_id' => 'Open']);
     $this->createTestEntity('EntityBatch', [
       'entity_table' => 'civicrm_financial_trxn',
-      'entity_id' => 1,
+      'entity_id' => $financialTrxnIDs[0],
       'batch_id' => $batch['id'],
     ]);
     $_REQUEST['sEcho'] = 1;
@@ -57,10 +58,11 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
   public function testGetFinancialTransactionsListOpenBatch(): void {
     $individualID = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => 12345]);
+    $financialTrxnIDs = \Civi\Api4\FinancialTrxn::get(FALSE)->addOrderBy('id')->execute()->column('id');
     $batch = $this->callAPISuccess('Batch', 'create', ['title' => 'test', 'status_id' => 'Open']);
     $this->createTestEntity('EntityBatch', [
       'entity_table' => 'civicrm_financial_trxn',
-      'entity_id' => 1,
+      'entity_id' => $financialTrxnIDs[0],
       'batch_id' => $batch['id'],
     ]);
     $_REQUEST['sEcho'] = 1;
@@ -70,10 +72,10 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     $_REQUEST['return'] = TRUE;
     $json = CRM_Financial_Page_AJAX::getFinancialTransactionsList();
     $json = str_replace(rtrim(CIVICRM_UF_BASEURL, '/'), 'http://FIX ME', $json);
-    $this->assertEquals('{"sEcho": 1, "iTotalRecords": 1, "iTotalDisplayRecords": 1, "aaData": [ ["<input type=\'checkbox\' id=\'mark_x_2\' name=\'mark_x_2\' value=\'1\' onclick=enableActions(\'x\')></input>","<a href=\"/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3\" data-tooltip-url=\"/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4&amp;is_show_email_task=1\" class=\"crm-summary-link\" aria-labelledby=\"crm-contactname-content\">'
+    $this->assertEquals('{"sEcho": 1, "iTotalRecords": 1, "iTotalDisplayRecords": 1, "aaData": [ ["<input type=\'checkbox\' id=\'mark_x_' . $financialTrxnIDs[1] . '\' name=\'mark_x_' . $financialTrxnIDs[1] . '\' value=\'1\' onclick=enableActions(\'x\')></input>","<a href=\"/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3\" data-tooltip-url=\"/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4&amp;is_show_email_task=1\" class=\"crm-summary-link\" aria-labelledby=\"crm-contactname-content\">'
     . '<i class=\"crm-i fa-fw fa-user\" title=\"\" role=\"img\" aria-hidden=\"true\"></i></a>","<a href=\"/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3\">Anderson, Anthony II</a>","$5.00","12345","' . CRM_Utils_Date::customFormat(date('Ymd')) . ' 12:00 AM","' . CRM_Utils_Date::customFormat(date('Ymd')) . ' 12:00 AM",'
     . '"Credit Card","Completed","Donation","<span><a href=\"/index.php?q=civicrm/contact/view/contribution&amp;reset=1&amp;id=1&amp;cid=3&amp;action=view&amp;context=contribution&amp;'
-    . 'selectedChild=contribute\" class=\"action-item crm-hover-button\" title=\'View Contribution\' >View</a><a href=\"#\" class=\"action-item crm-hover-button disable-action\" title=\'Assign Transaction\' onclick = \"assignRemove( 2,\'assign\' );\">Assign</a></span>"]] }', $json);
+    . 'selectedChild=contribute\" class=\"action-item crm-hover-button\" title=\'View Contribution\' >View</a><a href=\"#\" class=\"action-item crm-hover-button disable-action\" title=\'Assign Transaction\' onclick = \"assignRemove( ' . $financialTrxnIDs[1] . ',\'assign\' );\">Assign</a></span>"]] }', $json);
   }
 
   /**

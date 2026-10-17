@@ -548,7 +548,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
    */
   protected function getFinancialTransactionsForContribution($contributionID): Result {
     return EntityFinancialTrxn::get()
-      ->addWhere('id', '=', $contributionID)
+      ->addWhere('entity_id', '=', $contributionID)
       ->addWhere('entity_table', '=', 'civicrm_contribution')
       ->addSelect('*')->execute();
   }

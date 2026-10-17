@@ -1013,7 +1013,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $checkAgainst = [
       'financial_trxn_id.to_financial_account_id.name' => 'Deferred Revenue - Event Fee',
       'financial_trxn_id.from_financial_account_id.name' => 'Event Fee',
-      'financial_trxn_id' => '2',
+      'financial_trxn_id' => FinancialTrxn::get(FALSE)->addWhere('is_payment', '=', FALSE)->execute()->single()['id'],
     ];
     $result = $this->callAPISuccessGetSingle('EntityFinancialTrxn', [
       'return' => [
