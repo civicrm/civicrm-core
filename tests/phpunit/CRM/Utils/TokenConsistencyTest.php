@@ -789,7 +789,7 @@ participant.transferred_to_contact_id :
 participant.created_id :{$this->ids['Contact']['logged_in']}
 participant.role_id:label :Attendee
 participant.balance :
-participant.custom_2 :99999
+participant.{$this->getCustomFieldName('participant_int')} :99999
 participant.id :2
 participant.fee_currency :USD
 participant.discount_amount :

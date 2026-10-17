@@ -1213,7 +1213,7 @@ emo
       'contact.address_primary.county_id:label:',
       'contact.contact_is_deleted:',
       'contact.county:',
-      'contact.custom_6:',
+      'contact.' . $this->getCustomFieldName('file') . ':',
       'contact.deceased_date:',
       'contact.do_not_phone:',
     ], array_values($emptyLines), 'Most tokens should have data.');
@@ -1705,19 +1705,19 @@ im:IM Screen Name
 openid:OpenID
 world_region:America South, Central, North and Caribbean
 url:https://civicrm.org
-custom_1:Bobsled
-custom_2:Red
-custom_3:01/20/2021 12:00AM
-custom_4:999
-custom_5:<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
-custom_6:
-custom_7:New Zealand
-custom_8:France, Canada
-custom_9:Mr. Spider Man II
-custom_10:Queensland
-custom_11:Victoria, New South Wales
-custom_12:Yes
-custom_13:Purple
+' . $this->getCustomFieldName() . ':Bobsled
+' . $this->getCustomFieldName('select_string') . ':Red
+' . $this->getCustomFieldName('select_date') . ':01/20/2021 12:00AM
+' . $this->getCustomFieldName('int') . ':999
+' . $this->getCustomFieldName('link') . ':<a href="https://civicrm.org" target="_blank">https://civicrm.org</a>
+' . $this->getCustomFieldName('file') . ':
+' . $this->getCustomFieldName('country') . ':New Zealand
+' . $this->getCustomFieldName('multi_country') . ':France, Canada
+' . $this->getCustomFieldName('contact_reference') . ':Mr. Spider Man II
+' . $this->getCustomFieldName('state') . ':Queensland
+' . $this->getCustomFieldName('multi_state') . ':Victoria, New South Wales
+' . $this->getCustomFieldName('boolean') . ':Yes
+' . $this->getCustomFieldName('checkbox') . ':Purple
 checksum:cs=' . $checksum . '
 contact_id:' . $tokenData['contact_id'] . '
 ';

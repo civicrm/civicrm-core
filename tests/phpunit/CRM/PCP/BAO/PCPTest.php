@@ -97,7 +97,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     $block = CRM_PCP_BAO_PCPBlock::writeRecord($this->pcpBlockParams());
     $contactID = $this->individualCreate();
     $submitParams = [
-      'id' => 1,
+      'id' => $block->entity_id,
       'financial_type_id' => 1,
       'start_date' => date('Y-m-d 00:00:00'),
       'end_date' => date('Y-m-d 00:00:00', strtotime('+8 weeks')),
