@@ -171,7 +171,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'return.max_results' => 1,
     ];
     $result = $this->callAPISuccess('Event', 'Get', $params);
-    $this->assertEquals(1, $result['id'], ' in line ' . __LINE__);
+    $this->assertEquals($this->_eventIds[0], $result['id'], ' in line ' . __LINE__);
     $params = [
       'options' => [
         'sort' => 'id DESC',
@@ -181,7 +181,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('Event', 'Get', $params);
     $this->assertAPISuccess($result, ' in line ' . __LINE__);
-    $this->assertEquals(2, $result['id'], ' in line ' . __LINE__);
+    $this->assertEquals($this->_eventIds[1], $result['id'], ' in line ' . __LINE__);
     $params = [
       'options' => [
         'sort' => 'id ASC',
@@ -189,7 +189,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       ],
     ];
     $result = $this->callAPISuccess('Event', 'Get', $params);
-    $this->assertEquals(1, $result['id'], ' in line ' . __LINE__);
+    $this->assertEquals($this->_eventIds[0], $result['id'], ' in line ' . __LINE__);
 
   }
 

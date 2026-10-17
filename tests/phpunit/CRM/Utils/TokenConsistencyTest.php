@@ -820,8 +820,8 @@ event.location :15 Walton St<br />
 up the road<br />
 Emerald City, ME 90210-1234<br />
 United States<br />
-event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
-event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
+event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=' . $this->ids['Event'][0] . '
+event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=' . $this->ids['Event'][0] . '
 event.pay_later_receipt :Please transfer funds to our bank account.
 event.Custom_Group.Enter_text_here :my field
 event.confirm_email_text :
