@@ -48,3 +48,23 @@ _.each(cases, function(caseDetails, caseIndex) {
     equal(ufGroupModel.checkGroupType(caseDetails.validTypes), caseDetails.expected);
   });
 });
+
+module('UFFieldCollection.markDuplicates');
+
+test("Several new free HTML fields are not duplicates, whatever their label", function() {
+  var ufFieldCollection = new CRM.UF.UFFieldCollection([
+    {field_name: 'formatting', field_type: 'Formatting', label: 'Freies HTML'},
+    {field_name: 'formatting', field_type: 'Formatting', label: 'Freies HTML'}
+  ]);
+  ufFieldCollection.markDuplicates();
+  equal(ufFieldCollection.hasDuplicates(), false);
+});
+
+test("The same field twice is a duplicate", function() {
+  var ufFieldCollection = new CRM.UF.UFFieldCollection([
+    {field_name: 'nick_name', field_type: 'Contact', label: 'Nickname'},
+    {field_name: 'nick_name', field_type: 'Contact', label: 'Nickname'}
+  ]);
+  ufFieldCollection.markDuplicates();
+  equal(ufFieldCollection.hasDuplicates(), true);
+});
