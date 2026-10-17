@@ -49,8 +49,8 @@ function eventcart_civicrm_enable() {
   _eventcart_civix_civicrm_enable();
 }
 
-function eventcart_civicrm_tabset($name, &$tabs) {
-  if ($name === 'civicrm/event/manage') {
+function eventcart_civicrm_tabset($name, &$tabs, $context) {
+  if ($name == 'civicrm/event/manage' && !empty($context['event_id'])) {
     $tabs['conference'] = [
       'title' => E::ts('Conference Slots'),
       'link' => NULL,
@@ -58,7 +58,8 @@ function eventcart_civicrm_tabset($name, &$tabs) {
       'active' => TRUE,
       'current' => FALSE,
       'class' => 'ajaxForm',
-      'url' => 'civicrm/event/manage/conference',
+      'url' => CRM_Utils_System::url('civicrm/event/manage/conference',
+        "reset=1&action=update&id={$context['event_id']}"),
       'field' => 'slot_label_id',
     ];
   }
