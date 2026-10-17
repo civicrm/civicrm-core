@@ -1272,12 +1272,21 @@ class CRM_Core_SelectValues {
         if (in_array($field['data_type'], ['Date', 'File', 'ContactReference', 'EntityReference'])) {
           continue;
         }
+        if ($field['option_group_id']) {
+          $operator = 'CONTAINS';
+        }
+        elseif ($field['data_type'] === 'Int') {
+          $operator = '=';
+        }
+        else {
+          $operator = 'LIKE';
+        }
         $options[] = [
           'key' => $group['name'] . '.' . $field['name'] . ($field['option_group_id'] ? ':label' : ''),
           'label' => $group['title'] . ': ' . $field['label'],
           'adv_search_legacy' => 'custom_' . $field['id'],
           'join' => $join,
-          'op' => ($field['data_type'] === 'Int') ? '=' : 'LIKE',
+          'op' => $operator,
         ];
       }
     }

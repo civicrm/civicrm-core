@@ -190,12 +190,11 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
       // Add a UNION per search field
       foreach ($filterValues as $field => $value) {
         $params = $apiParams;
-        if (($enabledFilterFields[$field]['op'] ?? NULL) === '=') {
-          $params['where'][] = [$field, '=', $value];
+        $operator = $enabledFilterFields[$field]['op'] ?? 'LIKE';
+        if ($operator === 'LIKE') {
+          $value = $value . '%';
         }
-        else {
-          $params['where'][] = [$field, 'LIKE', $value . "%"];
-        }
+        $params['where'][] = [$field, $operator, $value];
         // Strip all suffixes from inner select array (pseudoconstants will be evaluated by the outer query)
         $params['select'] = array_map(fn ($field) => explode(':', $field)[0], $params['select']);
         $savedSearch['api_params']['sets'][] = ['UNION DISTINCT', 'Contact', 'get', $params];
