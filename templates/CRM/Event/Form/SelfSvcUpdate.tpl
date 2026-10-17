@@ -50,14 +50,9 @@
 </div>
 {literal}
 <script type="text/javascript">
-  var contributionID = {/literal}'{$contributionId}'{literal};
   var isConfirmationEmail = {/literal}'array_key_exists("is_confirmation_email", $form)'{literal};
   CRM.$(function($) {
     $('#action').on('change', function() {
-      selected = $(this).find("option:selected").text();
-      if (selected == 'Cancel' && contributionID) {
-        CRM.alert('{/literal}{ts escape='js'}Cancellations are not refundable.{/ts}{literal}', 'Warning', 'alert');
-      }
       if ($('#action').val() == 2 && isConfirmationEmail) {
         $('#is-confirmation-email-section').show();
       } else {
