@@ -69,7 +69,7 @@
 
 {htxt id='allow_selfcancelxfer'}
   <p>{ts}Check this box if you want to allow registered participants to either cancel their registration OR transfer it to another participant. If this feature is enabled, event confirmation emails will include a link to a Cancel or Transfer form.{/ts}</p>
-  <p>{ts}<strong>Automated refunds for cancellations are NOT currently supported.</strong> Participants who have paid for an event will be notified that cancellations are not refundable.{/ts}</p>
+  <p>{ts}<strong>Automated refunds for cancellations are NOT currently supported.</strong>{/ts}</p>
 {/htxt}
 
 {htxt id='selfcancelxfer_time'}
