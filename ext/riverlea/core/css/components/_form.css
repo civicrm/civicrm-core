@@ -775,7 +775,7 @@ span.crm-select-item-color {
 .crm-container input.crm-form-date,
 #bootstrap-theme input.dateplugin,
 #bootstrap-theme .input-group input.crm-form-date {
-  width: 12ch;
+  width: 16ch;
 }
 .crm-form-date-wrapper a.crm-clear-link {
   display: flex;
