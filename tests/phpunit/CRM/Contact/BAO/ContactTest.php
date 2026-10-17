@@ -914,12 +914,12 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     );
 
     //Verify if contact is correctly removed from group1
-    $groups = array_keys(CRM_Contact_BAO_GroupContact::getContactGroup($contactID, 'Removed'));
+    $groups = array_column(CRM_Contact_BAO_GroupContact::getContactGroup($contactID, 'Removed'), 'group_id');
     $expectedGroups = [$this->ids['Group']['id0']];
     $this->checkArrayEquals($expectedGroups, $groups);
 
     //Verify if contact is correctly added to group1 and group2
-    $groups = array_keys(CRM_Contact_BAO_GroupContact::getContactGroup($contactID, 'Added'));
+    $groups = array_column(CRM_Contact_BAO_GroupContact::getContactGroup($contactID, 'Added'), 'group_id');
     $expectedGroups = [$this->ids['Group']['id1'], $this->ids['Group']['id2']];
     $this->checkArrayEquals($expectedGroups, $groups);
 
