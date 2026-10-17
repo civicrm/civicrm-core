@@ -92,7 +92,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
           !CRM_Core_Permission::check('schedule mailings') &&
           !CRM_Core_Permission::check('approve mailings')
         ) {
-          unset($groupTypes['Mailing List']);
+          $groupTypes = array_diff($groupTypes, [CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Group', 'group_type', 'Mailing List')]);
         }
       }
 
