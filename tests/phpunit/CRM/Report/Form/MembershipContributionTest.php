@@ -88,6 +88,24 @@ class CRM_Report_Form_MembershipContributionTest extends CiviReportTestCase {
     $this->assertEquals([$this->contributionID], array_column($rows, 'civicrm_contribution_contribution_id'));
   }
 
+  public function testMemberContributionDetailListsContributionOnce(): void {
+    $rows = $this->getReportObject('CRM_Report_Form_Member_ContributionDetail', [
+      'fields' => ['membership_start_date'],
+    ])->getResultSet();
+
+    $this->assertEquals([$this->contributionID], array_column($rows, 'civicrm_contribution_contribution_id'));
+    $this->assertNotEmpty($rows[0]['civicrm_membership_membership_type_id']);
+  }
+
+  public function testBookkeepingFindsMembership(): void {
+    $rows = $this->getReportObject('CRM_Report_Form_Contribute_Bookkeeping', [
+      'fields' => ['id'],
+    ])->getResultSet();
+
+    // One row for the payment and one for the fee.
+    $this->assertEquals([$this->membershipID, $this->membershipID], array_column($rows, 'civicrm_membership_id'));
+  }
+
   /**
    * Creates a membership whose one contribution holds two line items for it.
    *
