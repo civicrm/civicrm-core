@@ -49,7 +49,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
     $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
     $queryObj = new CRM_Contact_BAO_Query($params);
     $this->assertEquals(
-      "civicrm_value_testsearchcus_1.date_field_{$dateCustomField['id']} BETWEEN '" . date('Y') . "0101000000' AND '" . date('Y') . "1231235959'",
+      "civicrm_value_testsearchcus_{$ids['custom_group_id']}.date_field_{$dateCustomField['id']} BETWEEN '" . date('Y') . "0101000000' AND '" . date('Y') . "1231235959'",
       $queryObj->_where[0][0]
     );
     $this->assertEquals('date field is This calendar year (between January 1st, ' . date('Y') . " 12:00 AM and December 31st, " . date('Y') . " 11:59 PM)", $queryObj->_qill[0][0]);
@@ -68,7 +68,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       'default_value' => NULL,
       'text_length' => NULL,
       'options_per_line' => NULL,
-      'custom_group_id' => '1',
+      'custom_group_id' => $ids['custom_group_id'],
       'extends_entity_column_value' => NULL,
       'extends_entity_column_id' => NULL,
       'is_view' => '0',
@@ -114,8 +114,8 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
     $queryObject = new CRM_Contact_BAO_Query($params);
     $queryObject->query();
     $this->assertEquals(
-      '( civicrm_value_group_with_fi_1.' . $this->getCustomFieldColumnName('date') . ' >= \'20140606000000\' ) AND
-( civicrm_value_group_with_fi_1.' . $this->getCustomFieldColumnName('date') . ' <= \'20150606235959\' )',
+      '( ' . $this->getCustomGroupTable() . '.' . $this->getCustomFieldColumnName('date') . ' >= \'20140606000000\' ) AND
+( ' . $this->getCustomGroupTable() . '.' . $this->getCustomFieldColumnName('date') . ' <= \'20150606235959\' )',
       trim($queryObject->_where[0][0])
     );
     $this->assertEquals('Test Date - greater than or equal to "June 6th, 2014 12:00 AM" AND less than or equal to "June 6th, 2015 11:59 PM"', $queryObject->_qill[0][0]);
@@ -148,7 +148,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
     $queryObject = new CRM_Contact_BAO_Query($params);
     $queryObject->query();
     $this->assertEquals(
-      'civicrm_value_group_with_fi_1.' . $this->getCustomFieldColumnName('date') . ' >= \'20140606000000\'',
+      $this->getCustomGroupTable() . '.' . $this->getCustomFieldColumnName('date') . ' >= \'20140606000000\'',
       trim($queryObject->_where[0][0])
     );
     $this->assertEquals(
@@ -186,7 +186,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
     $queryObj = new CRM_Contact_BAO_Query($params);
     $queryObj->query();
     $this->assertEquals(
-      'civicrm_value_testsearchcus_1.date_field_' . $dateCustomField['id'] . ' BETWEEN "20140606000000" AND "20150606235959"',
+      'civicrm_value_testsearchcus_' . $ids['custom_group_id'] . '.date_field_' . $dateCustomField['id'] . ' BETWEEN "20140606000000" AND "20150606235959"',
       $queryObj->_where[0][0]
     );
     $this->assertEquals($queryObj->_qill[0][0], "date field BETWEEN 'June 6th, 2014 12:00 AM AND June 6th, 2015 11:59 PM'");
@@ -233,7 +233,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       $queryObj = new CRM_Contact_BAO_Query($params);
       $queryObj->query();
       $this->assertEquals(
-        'civicrm_value_testsearchcus_1.' . strtolower($type) . "_field_{$customField['id']} BETWEEN \"$from\" AND \"$to\"",
+        'civicrm_value_testsearchcus_' . $ids['custom_group_id'] . '.' . strtolower($type) . "_field_{$customField['id']} BETWEEN \"$from\" AND \"$to\"",
         $queryObj->_where[0][0]
       );
       $this->assertEquals($queryObj->_qill[0][0], "$type field BETWEEN $from, $to");
@@ -284,7 +284,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       $queryObj = new CRM_Contact_BAO_Query($params);
       $queryObj->query();
       $this->assertEquals(
-        'civicrm_value_testlocalized_1.' . strtolower($type) . "_{$i}_field_{$customField['id']} BETWEEN \"$from\" AND \"$to\"",
+        'civicrm_value_testlocalized_' . $ids['custom_group_id'] . '.' . strtolower($type) . "_{$i}_field_{$customField['id']} BETWEEN \"$from\" AND \"$to\"",
         $queryObj->_where[0][0]
       );
       $this->assertEquals($queryObj->_qill[0][0], "$type $i field BETWEEN $formatted_from, $formatted_to");
@@ -341,7 +341,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       $queryObj->query();
 
       $this->assertEquals(
-        'civicrm_value_testsearchcus_1.' . strtolower($type) . "_field_{$customField['id']} <= $expectedValue",
+        'civicrm_value_testsearchcus_' . $ids['custom_group_id'] . '.' . strtolower($type) . "_field_{$customField['id']} <= $expectedValue",
         $queryObj->_where[0][0]
       );
       $this->assertEquals($queryObj->_qill[0][0],
@@ -359,7 +359,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
       $expectedValue = ($isDate) ? '"20150606000000"' : $expectedValue;
       $this->assertEquals(
-        'civicrm_value_testsearchcus_1.' . strtolower($type) . "_field_{$customField['id']} >= $expectedValue",
+        'civicrm_value_testsearchcus_' . $ids['custom_group_id'] . '.' . strtolower($type) . "_field_{$customField['id']} >= $expectedValue",
         $queryObj->_where[0][0]
       );
       $this->assertEquals(
@@ -421,7 +421,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       $queryObj->query();
 
       $this->assertEquals(
-        'civicrm_value_testlocalized_1.' . strtolower($type) . "_{$i}_field_{$customField['id']} <= $expectedValue",
+        'civicrm_value_testlocalized_' . $ids['custom_group_id'] . '.' . strtolower($type) . "_{$i}_field_{$customField['id']} <= $expectedValue",
         $queryObj->_where[0][0]
       );
       $this->assertEquals($queryObj->_qill[0][0],
@@ -439,7 +439,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
       $expectedValue = ($isDate) ? '"20150606000000"' : $expectedValue;
       $this->assertEquals(
-        'civicrm_value_testlocalized_1.' . strtolower($type) . "_{$i}_field_{$customField['id']} >= $expectedValue",
+        'civicrm_value_testlocalized_' . $ids['custom_group_id'] . '.' . strtolower($type) . "_{$i}_field_{$customField['id']} >= $expectedValue",
         $queryObj->_where[0][0]
       );
       $this->assertEquals(
@@ -476,7 +476,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
     $queryObj->query();
 
     $this->assertEquals(
-      "civicrm_value_testsearchcus_1.date_field_{$dateCustomField['id']} = '2015-06-06'",
+      "civicrm_value_testsearchcus_{$ids['custom_group_id']}.date_field_{$dateCustomField['id']} = '2015-06-06'",
       $queryObj->_where[0][0]
     );
     $this->assertEquals($queryObj->_qill[0][0], "date field = 'June 6th, 2015'");
