@@ -338,6 +338,24 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
+   * Total of the line items as they stood before this change - see
+   * changeFeeSelections(), where $this->originalContribution is NULL (the
+   * contribution object is loaded but not treated as the pre-change state)
+   * so this can't be read off $this->getOriginalContribution()->total_amount
+   * the way the isUpdate() path does.
+   *
+   * @return float
+   */
+  private function getOriginalTotalAmount(): float {
+    $totalAmount = 0.0;
+    foreach ($this->originalLineItems as $originalLineItem) {
+      $totalAmount += $originalLineItem['line_total'] ?? 0.0;
+      $totalAmount += $originalLineItem['tax_amount'] ?? 0.0;
+    }
+    return $totalAmount;
+  }
+
+  /**
    * @return string|null
    */
   public function getUpdatedAmountLevel(): ?string {
@@ -1677,9 +1695,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * Record adjusted amount.
    *
    * @return int
-   *   The trxn recording the balance change, created even when the balance
-   *   is unchanged (total_amount 0) so every financial item touched by the
-   *   fee change has something to link to.
+   *   The trxn recording the net change to the line items this fee-change
+   *   actually reverses/adds/alters, created even when that net change is
+   *   zero (eg. swapping two equal-priced options) so every financial item
+   *   touched by the fee change has something to link to.
    */
   private function recordAdjustmentTrxn(): int {
     $contributionId = $this->getContributionID();
@@ -1690,7 +1709,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
       ->addSelect('paid_amount')
       ->execute()->first()['paid_amount'];
 
+    // Used below to decide the contribution's resulting status - whether anything
+    // is still owed/overpaid once this change is applied - not the amount of this
+    // trxn itself, which instead needs to match what's about to be allocated to
+    // the line items it will be linked to (see dev/core#6873).
     $balanceAmt = $updatedAmount - $paidAmount;
+    $lineItemAdjustment = $updatedAmount - $this->getOriginalTotalAmount();
 
     $contributionStatuses = array_column(\Civi::entity('Contribution')->getOptions('contribution_status_id'), 'id', 'name');
 
@@ -1726,8 +1750,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $adjustedTrxnValues = [
       'from_financial_account_id' => NULL,
       'to_financial_account_id' => $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id')),
-      'total_amount' => $balanceAmt,
-      'net_amount' => $balanceAmt,
+      'total_amount' => $lineItemAdjustment,
+      'net_amount' => $lineItemAdjustment,
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       'payment_instrument_id' => $this->getUpdatedContributionValue('payment_instrument_id'),
       'contribution_id' => $this->getContributionID(),
