@@ -25,6 +25,13 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
    */
   protected $userJobID;
 
+  /**
+   * CSV files written by the test, to be removed in tearDown.
+   *
+   * @var string[]
+   */
+  private array $csvFiles = [];
+
   protected function setUp(): void {
     parent::setUp();
     $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
@@ -54,7 +61,22 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ->addWhere('name', '=', 'IndividualUnsupervised')
       ->setValues(['is_reserved' => TRUE])
       ->execute();
+    foreach ($this->csvFiles as $csvFile) {
+      unlink($csvFile);
+    }
     parent::tearDown();
+  }
+
+  /**
+   * Write a CSV file to the data directory, using ids only known at runtime.
+   *
+   * @param string $fileName
+   * @param string $content
+   */
+  private function writeCSV(string $fileName, string $content): void {
+    $path = __DIR__ . '/data/' . $fileName;
+    file_put_contents($path, $content);
+    $this->csvFiles[] = $path;
   }
 
   /**
@@ -144,16 +166,16 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testImportUpdateUsingID() :void {
-    // Ensure that the next id on the participant table is 1 since that is in the csv.
-    $this->quickCleanup(['civicrm_participant']);
     $this->individualCreate();
     $this->createCustomGroupWithFieldOfType(['extends' => 'Participant'], 'radio', '', ['data_type' => 'Boolean']);
-    $this->createTestEntity('Participant', [
+    $participantID = $this->createTestEntity('Participant', [
       'status_id:name' => 'Pending from pay later',
       'contact_id' => $this->individualCreate(),
       'event_id' => $this->eventCreatePaid()['id'],
       'role_id:name' => ['Attendee'],
-    ]);
+    ])['id'];
+    $missingParticipantID = $participantID + 1;
+    $this->writeCSV('cancel_participant.csv', "id,Status,Yes-no-field\n$participantID,Cancelled,yes\n$missingParticipantID,Cancelled,no\n");
     $this->importCSV('cancel_participant.csv', [
       ['name' => 'Participant.id'],
       ['name' => 'Participant.status_id'],
@@ -169,7 +191,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals(TRUE, $participant[$this->getCustomFieldName('radio', 4)]);
     $row = $dataSource->getRow();
     $this->assertEquals('ERROR', $row['_status']);
-    $this->assertEquals('Participant record not found for id 2', $row['_status_message']);
+    $this->assertEquals('Participant record not found for id ' . $missingParticipantID, $row['_status_message']);
   }
 
   /**
@@ -179,8 +201,9 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
    */
   public function testImportToTemplateEvent() :void {
     // When setting up for the test make sure the IDs match those in the csv.
-    $this->assertEquals(1, $this->eventCreatePaid(['is_template' => TRUE])['id']);
+    $eventID = $this->eventCreatePaid(['is_template' => TRUE])['id'];
     $this->assertEquals(3, $this->individualCreate());
+    $this->writeCSV('participant_with_event_id.csv', "Event ID,Campaign ID,Contact ID,Fee Amount,Fee Currency,Fee level,Is Pay Later,Participant Role,Participant Source,Participant Status,Register date,Do not import,Color\n$eventID,Soccer Cup,3,5000.55,USD,High,No,\"Attendee, Volunteer\",Phoned up,Registered,2022-12-07,,\"Purple, Mauve\"\n");
 
     $this->importCSV('participant_with_event_id.csv', [
       ['name' => 'Participant.event_id'],
@@ -374,8 +397,9 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
    * @dataProvider requiredFields
    */
   public function testRequiredFields(array $dataProvider): void {
-    $this->eventCreateUnpaid(['title' => 'Rain-forest Cup Youth Soccer Tournament']);
+    $eventID = $this->eventCreateUnpaid(['title' => 'Rain-forest Cup Youth Soccer Tournament'])['id'];
     $this->individualCreate(['external_identifier' => 'abc', 'email' => 'jenny@example.com']);
+    $this->writeCSV('participant_with_multiple_identifiers.csv', "Event ID, Participant ID, Contact ID, External Identifier, Email,Status\n$eventID,1,3,abc, jenny@example.com,Registered\n");
     $mapper = [
       ['name' => 'Participant.event_id'],
       ['name' => 'Participant.id'],

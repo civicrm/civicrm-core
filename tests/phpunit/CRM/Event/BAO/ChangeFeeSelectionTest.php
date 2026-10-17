@@ -512,7 +512,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    */
   protected function getParticipantLineItems(): array {
     return (array) LineItem::get(FALSE)
-      ->addWhere('contribution_id', '=', $this->ids['Participant']['order'])
+      ->addWhere('contribution_id', '=', $this->ids['Contribution']['order'])
       ->addOrderBy('id', 'DESC')
       ->execute();
   }

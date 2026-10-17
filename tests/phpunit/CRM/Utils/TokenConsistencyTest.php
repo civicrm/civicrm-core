@@ -790,7 +790,7 @@ participant.created_id :{$this->ids['Contact']['logged_in']}
 participant.role_id:label :Attendee
 participant.balance :
 participant.{$this->getCustomFieldName('participant_int')} :99999
-participant.id :2
+participant.id :{$this->ids['participant'][0]}
 participant.fee_currency :USD
 participant.discount_amount :
 participant.status_id:label :Attended
@@ -820,8 +820,8 @@ event.location :15 Walton St<br />
 up the road<br />
 Emerald City, ME 90210-1234<br />
 United States<br />
-event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=1
-event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=1
+event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=' . $this->ids['Event'][0] . '
+event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=' . $this->ids['Event'][0] . '
 event.pay_later_receipt :Please transfer funds to our bank account.
 event.Custom_Group.Enter_text_here :my field
 event.confirm_email_text :

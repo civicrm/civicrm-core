@@ -279,8 +279,8 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $this->runUserDashboard();
     $expectedStrings = [
       '<div class="header-dark">Your Event(s)</div>',
-      '<td class="crm-participant-event-id_1"><a href="/index.php?q=civicrm/event/info&amp;reset=1&amp;id=1&amp;context=dashboard">Annual CiviCRM meet</a></td>',
-      '<td class="crm-participant-event-id_2"><a href="/index.php?q=civicrm/event/info&amp;reset=1&amp;id=2&amp;context=dashboard">Social Distancing Meetup Group</a></td>',
+      '<td class="crm-participant-event-id_' . $this->getEventID() . '"><a href="/index.php?q=civicrm/event/info&amp;reset=1&amp;id=' . $this->getEventID() . '&amp;context=dashboard">Annual CiviCRM meet</a></td>',
+      '<td class="crm-participant-event-id_' . $this->getEventID('event_2') . '"><a href="/index.php?q=civicrm/event/info&amp;reset=1&amp;id=' . $this->getEventID('event_2') . '&amp;context=dashboard">Social Distancing Meetup Group</a></td>',
     ];
     $this->assertPageContains($expectedStrings);
     $this->individualCreate();

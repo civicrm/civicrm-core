@@ -21,7 +21,7 @@ class CRM_Core_BAO_DiscountTest extends CiviUnitTestCase {
     $this->addDiscountPriceSet();
     $options = Discount::getFields(TRUE)
       ->setLoadOptions(TRUE)
-      ->addValue('entity_id', 1)
+      ->addValue('entity_id', $this->getEventID())
       ->addValue('entity_table', 'civicrm_event')
       ->addWhere('name', '=', 'price_set_id')
       ->execute()->first()['options'];

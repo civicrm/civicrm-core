@@ -267,7 +267,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
     ], [
-      'id' => $contributionID,
+      'id' => $result['participant']['id'],
       'action' => CRM_Core_Action::UPDATE,
     ])->processForm();
     $this->callAPISuccess('Payment', 'create', [

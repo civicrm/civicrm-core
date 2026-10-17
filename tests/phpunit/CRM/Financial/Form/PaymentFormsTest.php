@@ -103,6 +103,11 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
         $formValues = array_merge($genericParams, $values['submitValues'], ['qfKey' => $qfKey]);
         $form = $this->getFormObject($formName, $formValues);
         $form->preProcess();
+        if ($formName === 'CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices') {
+          // The cart creates its participant in preProcess, so the submitted values can only be keyed by its id now.
+          $participantID = Participant::get(FALSE)->addWhere('event_id', '=', $eventID)->execute()->single()['id'];
+          $form->_submitValues['event'][$eventID]['participant'] = [$participantID => $form->_submitValues['event'][$eventID]['participant'][1]];
+        }
         $form->buildQuickForm();
         $form->postProcess();
         $qfKey = $form->controller->_key;

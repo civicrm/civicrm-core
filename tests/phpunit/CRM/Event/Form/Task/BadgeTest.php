@@ -103,7 +103,7 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
       '{participant.role_id:label}' => 'Attendee',
       '{participant.fee_label}' => NULL,
       '{event.end_date|crmDate:"%B %E%f"}' => 'October 23rd',
-      '{participant.event_id}' => 1,
+      '{participant.event_id}' => $this->getEventID(),
     ];
   }
 

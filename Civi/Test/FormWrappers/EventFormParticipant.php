@@ -19,7 +19,7 @@ class EventFormParticipant extends FormWrapper {
   }
 
   public function getParticipantID(): int {
-    return $this->form->getEventID();
+    return $this->form->getParticipantID();
   }
 
   public function getDiscountID(): int {
