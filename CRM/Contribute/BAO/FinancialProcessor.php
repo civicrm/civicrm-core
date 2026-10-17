@@ -330,31 +330,29 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
-   * @param array $params
+   * The financial account to transfer the money to.
+   *
+   * This is the account determined by the payment processor or payment_instrument_id.
+   * The payment_processor feels like an old brittle semi-supported value and configuring
+   * appropriate payment types makes more sense.
    *
    * @return int
    * @throws CRM_Core_Exception
    */
-  private function getToFinancialAccount(array $params): int {
+  private function getToFinancialAccount(): int {
     if ($this->isAccountsReceivableTransaction()) {
       return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
-        $params['financial_type_id'],
+        $this->getUpdatedContributionValue('financial_type_id'),
         'Accounts Receivable Account is'
       );
     }
     $accountID = NULL;
-    if (!empty($params['payment_processor'])) {
-      $accountID = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($params['payment_processor'], NULL, 'civicrm_payment_processor');
+    if (!empty($this->getInputValue('payment_processor'))) {
+      $accountID = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($this->getInputValue('payment_processor'), NULL, 'civicrm_payment_processor');
     }
-    // Probably here we should check $this->updatedContribution instead of params
-    // and then we would not need the next if.
-    if (!$accountID && !empty($params['payment_instrument_id'])) {
-      $accountID = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($params['payment_instrument_id']);
-    }
-    // Probably updatedContribution makes more sense - per previous comment.
-    // dev/financial#160 - If this is a contribution update, also check for an existing payment_instrument_id.
-    elseif (!$accountID && $this->getOriginalPaymentInstrumentID()) {
-      $accountID = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount((int) $this->getOriginalContribution()->payment_instrument_id);
+
+    if (!$accountID) {
+      $accountID = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($this->getUpdatedContributionValue('payment_instrument_id'));
     }
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('financial_account_type', NULL, " AND v.name LIKE 'Asset' "));
     $queryParams = [1 => [$relationTypeId, 'Integer']];
@@ -401,7 +399,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
     if ($this->isUpdate()) {
       if (!$this->isUnpaidAndNotPayLater()) {
-        $trxnParams = $this->getTrxnParams($params);
+        $trxnParams = $this->getTrxnParams();
         $params['trxnParams'] = $trxnParams;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $this->getOriginalContribution()->total_amount;
         $params['trxnParams']['fee_amount'] = $this->getOriginalContribution()->fee_amount;
@@ -497,7 +495,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     else {
       if (!$this->isUnpaidAndNotPayLater()) {
-        $trxnParams = $params['trxnParams'] = $this->getTrxnParams($params);
+        $trxnParams = $params['trxnParams'] = $this->getTrxnParams();
         if ($this->isRecordAccountsReceivable()) {
           $this->recordAlwaysAccountsReceivable($trxnParams);
         }
@@ -600,14 +598,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
-   * @param array $params
    * @return array
    * @throws CRM_Core_Exception
    */
-  private function getTrxnParams(array $params): array {
+  private function getTrxnParams(): array {
     $trxnParams = [
       'contribution_id' => $this->getContributionID(),
-      'to_financial_account_id' => $this->getToFinancialAccount($params),
+      'to_financial_account_id' => $this->getToFinancialAccount(),
       // If receive_date is not deliberately passed in we assume 'now'.
       // test testCompleteTransactionWithReceiptDateSet ensures we don't
       // default to loading the stored contribution receive_date.
