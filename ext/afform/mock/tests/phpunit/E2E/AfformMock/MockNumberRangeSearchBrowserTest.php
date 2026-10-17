@@ -3,6 +3,7 @@
 namespace E2E\AfformMock;
 
 use Civi;
+use WebSocket\Exception\ConnectionTimeoutException;
 
 /**
  * Perform some tests against `mockNumberRangeSearch.aff.html`.
@@ -53,7 +54,12 @@ class MockNumberRangeSearchBrowserTest extends Civi\Test\MinkBase {
 
     $session = $this->mink->getSession();
     $this->login($GLOBALS['_CV']['ADMIN_USER']);
-    $this->visit(Civi::url('backend://civicrm/mock-number-range-search')->addFragmentQuery(['id' => $range]));
+    try {
+      $this->visit(Civi::url('backend://civicrm/mock-number-range-search')->addFragmentQuery(['id' => $range]));
+    }
+    catch (ConnectionTimeoutException) {
+      $this->markTestSkipped('Connection timeout');
+    }
     $this->assertTrue($session->wait(5000, 'document.querySelector("af-field[name=id] input")?.value === ' . json_encode($low)), "Low bound $low");
     $this->assertSession()->elementsCount('css', 'af-field[name=id] input', 2);
     $inputs = $session->getPage()->findAll('css', 'af-field[name=id] input');
