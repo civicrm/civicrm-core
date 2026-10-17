@@ -92,10 +92,12 @@ class CRM_Queue_ErrorPolicy {
     try {
       $result = $callable();
     }
-    catch (Exception$e) {
+    catch (Throwable $e) {
       $this->reportException($e);
     }
-    $this->deactivate();
+    finally {
+      $this->deactivate();
+    }
     return $result;
   }
 
@@ -159,10 +161,10 @@ class CRM_Queue_ErrorPolicy {
   /**
    * Print an unhandled exception.
    *
-   * @param Exception $e
+   * @param Throwable $e
    *   The unhandled exception.
    */
-  protected function reportException(Exception $e) {
+  protected function reportException(Throwable $e) {
     CRM_Core_Error::debug_var('CRM_Queue_ErrorPolicy_reportException', CRM_Core_Error::formatTextException($e));
 
     $response = [
