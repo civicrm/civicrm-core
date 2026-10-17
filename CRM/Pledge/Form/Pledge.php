@@ -143,7 +143,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
       $defaults['max_reminders'] = 1;
       $defaults['additional_reminder_day'] = 5;
       $defaults['frequency_unit'] = array_search('month', $this->_freqUnits);
-      $defaults['financial_type_id'] = array_search('Donation', CRM_Contribute_PseudoConstant::financialType());
+      $defaults['financial_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'financial_type_id', 'Donation');
     }
 
     $pledgeStatus = CRM_Pledge_BAO_Pledge::buildOptions('status_id');

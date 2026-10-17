@@ -82,6 +82,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function tearDown(): void {
+    $this->relabelCustomizedEmailGreeting('Customized');
     $this->_apiversion = 3;
     $this->callAPISuccess('Setting', 'create', ['includeOrderByClause' => TRUE]);
     // truncate a few tables
@@ -2450,6 +2451,33 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals('Customized', $currentGreetings['email_greeting_id:name']);
     $this->assertEquals('Howdy', $currentGreetings['email_greeting_custom']);
     $this->assertEquals('Howdy', $currentGreetings['email_greeting_display']);
+  }
+
+  /**
+   * A custom greeting can be set with the Customized greeting id, whatever that option is labelled.
+   */
+  public function testCustomGreetingWithRelabelledCustomizedOption(): void {
+    $this->relabelCustomizedEmailGreeting('Benutzerdefiniert');
+    $contactID = $this->individualCreate();
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $contactID,
+      'email_greeting_id' => CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', 'email_greeting_id', 'Customized'),
+      'email_greeting_custom' => 'Howdy',
+    ]);
+    $greeting = $this->callAPISuccessGetSingle('Contact', ['version' => 4, 'id' => $contactID, 'return' => ['email_greeting_id:name', 'email_greeting_display']]);
+    $this->assertEquals('Customized', $greeting['email_greeting_id:name']);
+    $this->assertEquals('Howdy', $greeting['email_greeting_display']);
+  }
+
+  /**
+   * @param string $label
+   */
+  private function relabelCustomizedEmailGreeting(string $label): void {
+    \Civi\Api4\OptionValue::update(FALSE)
+      ->addWhere('option_group_id:name', '=', 'email_greeting')
+      ->addWhere('name', '=', 'Customized')
+      ->addValue('label', $label)
+      ->execute();
   }
 
   /**
