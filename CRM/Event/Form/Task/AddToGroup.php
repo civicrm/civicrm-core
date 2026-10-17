@@ -21,6 +21,7 @@
  * addition of contacts to groups.
  */
 class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
+  use CRM_Custom_Form_CustomDataTrait;
 
   /**
    * The context that we are working on.
@@ -54,9 +55,13 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
 
     parent::setContactIDs();
     $this->_context = $this->get('context');
-    $this->_id = $this->get('amtgID');
 
-    CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Group', $this->_id);
+    $this->assign('entityID', $this->getGroupID());
+  }
+
+  public function getGroupID(): ?int {
+    $this->_id = $this->get('amtgID');
+    return $this->_id ? (int) $this->_id : NULL;
   }
 
   /**
@@ -92,7 +97,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
           !CRM_Core_Permission::check('schedule mailings') &&
           !CRM_Core_Permission::check('approve mailings')
         ) {
-          unset($groupTypes['Mailing List']);
+          $groupTypes = array_diff($groupTypes, [CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Group', 'group_type', 'Mailing List')]);
         }
       }
 
@@ -110,7 +115,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
 
     $groupElement = $this->add('select', 'group_id', ts('Select Group'), $group);
 
-    $this->_title = $group[$this->_id];
+    $this->_title = $this->_id ? $group[$this->_id] : '';
 
     if ($this->_context === 'amtg') {
       $groupElement->freeze();
@@ -126,8 +131,9 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
     }
     else {
       $this->setTitle(ts('Add Contacts to A Group'));
-      //build custom data
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
+    }
+    if ($this->isSubmitted()) {
+      $this->addCustomDataFieldsToForm('Group');
     }
 
     $this->addDefaultButtons(ts('Add to Group'));
@@ -148,7 +154,6 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
     }
 
     $defaults['group_option'] = 0;
-    $defaults += CRM_Custom_Form_CustomData::setDefaultValues($this);
     return $defaults;
   }
 
@@ -207,7 +212,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
         $groupParams['group_type'] = '';
       }
       $groupParams['is_active'] = 1;
-      $groupParams['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->_id, 'Group');
+      $groupParams['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'Group');
 
       $createdGroup = CRM_Contact_BAO_Group::writeRecord($groupParams);
       $groupID = $createdGroup->id;
