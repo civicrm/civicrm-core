@@ -861,6 +861,69 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * A PHP error while validating one row marks that row as failed and the other rows are imported.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testValidateRowErrorDoesNotAbortImport(): void {
+    $this->setUpRowErrorImport('validate', 'sapphire');
+    $this->importCSV('contributions_match_external_id.csv', $this->getRowErrorMapping());
+    $rows = (array) Import::get($this->userJobID)->addOrderBy('_id')->execute();
+    $this->assertEquals(['ERROR', 'Ruh-roh'], [$rows[0]['_status'], $rows[0]['_status_message']]);
+    $this->assertEquals('IMPORTED', $rows[1]['_status'], $rows[1]['_status_message']);
+  }
+
+  /**
+   * A PHP error while importing one row is recorded against that row, by the queue and by the api import action.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportRowErrorDoesNotAbortImport(): void {
+    $this->setUpRowErrorImport('import', 'ruby');
+    $this->importCSV('contributions_match_external_id.csv', $this->getRowErrorMapping());
+    $rows = (array) Import::get($this->userJobID)->addOrderBy('_id')->execute();
+    $this->assertEquals('IMPORTED', $rows[0]['_status'], $rows[0]['_status_message']);
+    $this->assertEquals(['ERROR', 'Ruh-roh'], [$rows[1]['_status'], $rows[1]['_status_message']]);
+
+    Import::update($this->userJobID)->setValues(['_status' => 'NEW', '_status_message' => '', '_entity_id' => NULL])
+      ->addWhere('_id', '>', 0)->execute();
+    Import::import($this->userJobID)->execute();
+    $rows = (array) Import::get($this->userJobID)->addOrderBy('_id')->execute();
+    $this->assertEquals('IMPORTED', $rows[0]['_status'], $rows[0]['_status_message']);
+    $this->assertEquals(['ERROR', 'Ruh-roh'], [$rows[1]['_status'], $rows[1]['_status_message']]);
+  }
+
+  /**
+   * Create the contacts for contributions_match_external_id.csv and fail one row with a PHP error.
+   *
+   * @param string $context
+   *   The importAlterMappedRow context to fail in, validate or import.
+   * @param string $externalIdentifier
+   *   The row to fail.
+   */
+  private function setUpRowErrorImport(string $context, string $externalIdentifier): void {
+    $this->individualCreate(['external_identifier' => 'ruby']);
+    $this->individualCreate(['external_identifier' => 'sapphire']);
+    CRM_Utils_Hook::singleton()->setHook('civicrm_importAlterMappedRow', function($importType, $hookContext, &$mappedRow, $rowValues) use ($context, $externalIdentifier) {
+      if ($hookContext === $context && in_array($externalIdentifier, $rowValues, TRUE)) {
+        throw new TypeError('Ruh-roh');
+      }
+    });
+  }
+
+  /**
+   * @return array
+   */
+  private function getRowErrorMapping(): array {
+    return [
+      ['name' => 'Contact.external_identifier'],
+      ['name' => 'Contribution.total_amount'],
+      ['name' => 'Contribution.receive_date'],
+      ['name' => 'Contribution.financial_type_id'],
+    ];
+  }
+
+  /**
    * Run the import parser.
    *
    * @param array $originalValues
