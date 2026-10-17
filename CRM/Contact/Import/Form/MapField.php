@@ -420,7 +420,16 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($this->getUserJobID());
-    $parser->validate();
+
+    // Running validation can be slow - skip for large import files to stop hanging requests and timeouts.
+    $numberRows = $parser->getRowCount();
+    $largeFile = CRM_Utils_Constant::value('CIVICRM_IMPORT_LARGE_FILE', 10000);
+    if ($numberRows < $largeFile) {
+      $parser->validate();
+    } else {
+      $this->updateUserJobMetadata('validation_skipped', TRUE);
+    }
+
   }
 
   /**
