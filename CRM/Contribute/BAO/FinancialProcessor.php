@@ -257,6 +257,19 @@ class CRM_Contribute_BAO_FinancialProcessor {
     return $updateAmountLevel;
   }
 
+  /**
+   * @return bool
+   */
+  private function isRecordFinancialEntities(): bool {
+    // Checking $this->inputValues['is_pay_later'] means we only pick this up if
+    // is_pay_later has been passed in - this feels like a mistake but it
+    // is an entrenched mistake (the previous code did the same although
+    // less obviously as it checked a partially populated contribution object.
+    $isPayLater = !empty($this->getInputValue('is_pay_later'));
+    $isIncompletePending = $this->isPendingTransaction() && !$isPayLater;
+    return !$isIncompletePending && !$this->isFailedTransaction();
+  }
+
   private function isStatusChange(): bool {
     return $this->originalContribution->contribution_status_id !== $this->updatedContribution->contribution_status_id;
   }
@@ -356,19 +369,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws CRM_Core_Exception
    */
   public function recordFinancialAccounts(array &$params): void {
-    $skipRecords = FALSE;
-
-    // Checking $params['is_pay_later'] means we only pick this up if
-    // is_pay_later has been passed in - this feels like a mistake but it
-    // is an entrenched mistake (the previous code did the same although
-    // less obviously as it checked a partially populated contribution object.
-    $isPayLater = !empty($params['is_pay_later']);
-    $isIncompletePending = $this->isPendingTransaction() && !$isPayLater;
-    $isRecordFinancialTrxn = !$isIncompletePending && !$this->isFailedTransaction();
-
     if ($this->isUpdate()) {
-      if ($isRecordFinancialTrxn) {
-        $skipRecords = TRUE;
+      if ($this->isRecordFinancialEntities()) {
         $trxnParams = $this->getTrxnParams($params);
         $params['trxnParams'] = $trxnParams;
         $updated = FALSE;
@@ -469,6 +471,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
             }
           }
         }
+        // Process fee.
+        if (!empty($this->getUpdatedContributionValue('fee_amount')) && (empty($this->getOriginalContribution()) || $this->getUpdatedContribution()->fee_amount != $this->getOriginalContribution()->fee_amount)) {
+          $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
+          if ($amount) {
+            $financialTxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getContributionID(), 'DESC')['financialTrxnId'];
+            CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
+          }
+        }
       }
 
       // Line items are re-saved even when $isRecordFinancialTrxn is false (an
@@ -482,14 +492,29 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     else {
       $financialTxnID = NULL;
-      if ($isRecordFinancialTrxn) {
-        $skipRecords = TRUE;
+      if ($this->isRecordFinancialEntities()) {
         $trxnParams = $params['trxnParams'] = $this->getTrxnParams($params);
         if ($this->isRecordAccountsReceivable()) {
           $this->recordAlwaysAccountsReceivable($trxnParams);
         }
         $financialTxnID = $this->createFinancialTrxn($trxnParams);
-        $params['entity_id'] = $financialTxnID;
+        // Process fee.
+        if (!empty($this->getUpdatedContributionValue('fee_amount')) && (empty($this->getOriginalContribution()) || $this->getUpdatedContribution()->fee_amount != $this->getOriginalContribution()->fee_amount)) {
+          $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
+          if ($amount) {
+            CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
+          }
+        }
+
+        // create batch entry if batch_id is passed and
+        if (!empty($params['batch_id'])) {
+          $entityParams = [
+            'batch_id' => $params['batch_id'],
+            'entity_table' => 'civicrm_financial_trxn',
+            'entity_id' => $financialTxnID,
+          ];
+          CRM_Batch_BAO_EntityBatch::create($entityParams);
+        }
       }
 
       // Line items & financial items are created even when $isRecordFinancialTrxn
@@ -500,31 +525,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
           $this->createLineItem($line, $financialTxnID);
         }
         $this->createDeferredTrxn();
-      }
-
-      // create batch entry if batch_id is passed and
-      // ensure no batch entry is been made on 'Pending' or 'Failed' contribution, CRM-16611
-      if (!empty($params['batch_id']) && !empty($financialTxnID)) {
-        $entityParams = [
-          'batch_id' => $params['batch_id'],
-          'entity_table' => 'civicrm_financial_trxn',
-          'entity_id' => $financialTxnID,
-        ];
-        CRM_Batch_BAO_EntityBatch::create($entityParams);
-      }
-    }
-
-    // when a fee is charged
-    if (!empty($params['fee_amount']) && (empty($this->getOriginalContribution()) || $this->getUpdatedContribution()->fee_amount != $this->getOriginalContribution()->fee_amount) && $skipRecords) {
-      $amount = $params['fee_amount'] - ($this->getOriginalContributionValue('fee_amount') ?: 0);
-      if ($amount) {
-        if (empty($params['financial_type_id'])) {
-          $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->getContributionID(), 'financial_type_id', 'id');
-        }
-        else {
-          $financialTypeId = $params['financial_type_id'];
-        }
-        CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)], $amount, $this->getContributionID(), $financialTypeId);
       }
     }
 
