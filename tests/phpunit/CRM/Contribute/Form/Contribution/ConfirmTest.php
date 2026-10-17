@@ -1619,7 +1619,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'is_active' => 1,
       'module' => 'soft_credit',
       'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => 1,
+      'entity_id' => $this->getContributionPageID(),
       'uf_group_id' => $tributeProfile['id'],
       'module_data' => [
         'soft_credit' => [

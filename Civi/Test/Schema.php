@@ -236,7 +236,7 @@ class Schema {
       'civicrm_contact',
       // 'civicrm_contact_type',
       'civicrm_contribution',
-      'civicrm_contribution_page',
+      // 'civicrm_contribution_page',
       // 'civicrm_contribution_product',
       // 'civicrm_contribution_recur',
       'civicrm_contribution_soft',

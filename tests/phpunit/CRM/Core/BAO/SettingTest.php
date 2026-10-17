@@ -184,9 +184,9 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    * Test that options defined as a pseudoconstant can be converted to options.
    */
   public function testPseudoConstants(): void {
-    $this->contributionPageCreate();
+    $contributionPageID = $this->contributionPageCreate()['id'];
     $metadata = \Civi\Core\SettingsMetadata::getMetadata(['name' => ['default_invoice_page']], NULL, TRUE);
-    $this->assertEquals('Test Contribution Page', $metadata['default_invoice_page']['options'][1]);
+    $this->assertEquals('Test Contribution Page', $metadata['default_invoice_page']['options'][$contributionPageID]);
   }
 
 }
