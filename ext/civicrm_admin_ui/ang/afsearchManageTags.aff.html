@@ -1,0 +1,39 @@
+<div af-fieldset="">
+  <div class="help">
+    Tags are a convenient way to categorize contacts, activities, cases, files, and other records.
+    Edit a tag to change its parent.
+    Tag sets (for free-tagging) each get their own tab, listing just that set's tags.
+    <a href="https://docs.civicrm.org/user/en/latest/organising-your-data/groups-and-tags/" target="_blank">Learn more...</a>
+  </div>
+
+  <!-- `tagsetTab` is a wrapper object (not a bare scope var) so that `ng-click="tagsetTab.active = tagset"`
+       inside ng-repeat below mutates the same object the rest of this template reads, rather than
+       creating a shadowing property on ng-repeat's own child scope (the Angular "dot rule"). -->
+  <crm-manage-tagset-list tagsets="tagsets" active-tagset="tagsetTab.active"></crm-manage-tagset-list>
+
+  <div class="af-container af-layout-inline">
+    <af-field name="label" defn="{label: 'Tag', input_attrs: {}, search_operator: 'CONTAINS'}" />
+    <af-field name="used_for" defn="{input_attrs: {multiple: true}}" />
+    <af-field name="is_selectable" defn="{input_type: 'Radio', label: 'Selectable'}" />
+    <af-field name="is_reserved" defn="{input_type: 'Radio', label: 'Reserved'}" />
+    <crm-permission-popup-link permission="administer Tagsets" path="civicrm/tag/edit?action=add&amp;reset=1&amp;tagset=1" text="Add Tag Set" icon="fa-plus" style="default"></crm-permission-popup-link>
+  </div>
+
+  <ul class="nav nav-tabs" ng-init="tagsetTab = {active: null}">
+    <li ng-class="{active: !tagsetTab.active}"><a href="" ng-click="tagsetTab.active = null"><i class="crm-i fa-tags" role="img" aria-hidden="true"></i> Tags</a></li>
+    <li ng-repeat="tagset in tagsets" ng-class="{active: tagsetTab.active.id === tagset.id}">
+      <a href="" ng-click="tagsetTab.active = tagset">{{ tagset.label }}</a>
+    </li>
+  </ul>
+
+  <div ng-if="tagsetTab.active" class="af-container af-layout-inline">
+    <crm-permission-popup-link path="civicrm/tag/edit?action=add&amp;reset=1&amp;parent_id={{ tagsetTab.active.id }}" text="Add Tag" icon="fa-plus" style="primary"></crm-permission-popup-link>
+    <crm-permission-popup-link permission="administer Tagsets" path="civicrm/tag/edit?action=update&amp;reset=1&amp;id={{ tagsetTab.active.id }}" text="Edit Tag Set" icon="fa-pencil" style="default"></crm-permission-popup-link>
+    <crm-permission-popup-link permission="administer Tagsets" path="civicrm/tag/edit?action=delete&amp;reset=1&amp;id={{ tagsetTab.active.id }}" text="Remove Tag Set" icon="fa-trash" style="danger"></crm-permission-popup-link>
+  </div>
+
+  <div>
+    <crm-search-display-table ng-if="!tagsetTab.active" search-name="Manage_Tags_Table" display-name="Table"></crm-search-display-table>
+    <crm-search-display-table ng-if="tagsetTab.active" search-name="Manage_Tags_Tagset_Members" display-name="Table" filters="{parent_id: tagsetTab.active.id}"></crm-search-display-table>
+  </div>
+</div>
