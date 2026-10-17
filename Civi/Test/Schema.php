@@ -262,7 +262,7 @@ class Schema {
       // 'civicrm_extension',
       // 'civicrm_file',
       // 'civicrm_financial_account',
-      'civicrm_financial_item',
+      // 'civicrm_financial_item',
       'civicrm_financial_trxn',
       'civicrm_financial_type',
       'civicrm_group',

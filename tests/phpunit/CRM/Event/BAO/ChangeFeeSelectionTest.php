@@ -422,12 +422,13 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $this->registerParticipantAndPay($this->_expensiveFee);
     $this->submitForm($this->getVeryExpensiveID());
     $actualResults = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['sequential' => 1, 'entity_table' => 'civicrm_financial_item'])['values'];
+    $financialItemIDs = FinancialItem::get(FALSE)->addOrderBy('id')->execute()->column('id');
     $this->assertCount(3, $actualResults);
     $expectedResults = [
       [
         'id' => 2,
         'amount' => 100.0,
-        'entity_id' => 1,
+        'entity_id' => $financialItemIDs[0],
         'financial_trxn_id' => 1,
         'entity_table' => 'civicrm_financial_item',
       ],
@@ -435,14 +436,14 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
         'id' => 4,
         // ensure that reverse entry is entered in the EntityFinancialTrxn table on fee change to greater amount
         'amount' => -100.0,
-        'entity_id' => 2,
+        'entity_id' => $financialItemIDs[1],
         'financial_trxn_id' => 2,
         'entity_table' => 'civicrm_financial_item',
       ],
       [
         'id' => 5,
         'amount' => 300.00,
-        'entity_id' => 3,
+        'entity_id' => $financialItemIDs[2],
         'financial_trxn_id' => 2,
         'entity_table' => 'civicrm_financial_item',
       ],
@@ -461,22 +462,23 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $this->registerParticipantAndPay($this->_expensiveFee);
     $this->submitForm($this->getCheapFeeID());
     $actualResults = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['sequential' => 1, 'entity_table' => 'civicrm_financial_item', 'return' => ['amount', 'entity_id']])['values'];
+    $financialItemIDs = FinancialItem::get(FALSE)->addOrderBy('id')->execute()->column('id');
     $expectedResults = [
       [
         'id' => 2,
         'amount' => 100.00,
-        'entity_id' => 1,
+        'entity_id' => $financialItemIDs[0],
       ],
       [
         'id' => 4,
         // ensure that reverse entry is entered in the EntityFinancialTrxn table
         'amount' => -100.00,
-        'entity_id' => 2,
+        'entity_id' => $financialItemIDs[1],
       ],
       [
         'id' => 5,
         'amount' => 50.00,
-        'entity_id' => 3,
+        'entity_id' => $financialItemIDs[2],
       ],
     ];
     foreach ($expectedResults as $key => $expectedResult) {
