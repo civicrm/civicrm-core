@@ -2876,7 +2876,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $participantPayments = civicrm_api3('ParticipantPayment', 'get', ['contribution_id' => $contributionID, 'return' => 'participant_id', 'sequential' => 1])['values'];
-    if (!empty($participantPayments) && empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved']) && !$disableActionsOnCompleteOrder) {
+    if (!empty($participantPayments) && !$disableActionsOnCompleteOrder) {
       foreach ($participantPayments as $participantPayment) {
         $participantParams['id'] = $participantPayment['participant_id'];
         $participantParams['status_id'] = 'Registered';
