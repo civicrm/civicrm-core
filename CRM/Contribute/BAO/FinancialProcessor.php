@@ -1144,9 +1144,17 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $createdLineItem = CRM_Price_BAO_LineItem::create($line);
 
     if (!$this->isUpdate()) {
-      $this->addFinancialItem($createdLineItem, FALSE, $financialTrxnID);
+      $lineItemValues = [
+        'id' => $createdLineItem->id,
+        'line_total' => $createdLineItem->line_total,
+        'qty' => $createdLineItem->qty,
+        'label' => $createdLineItem->label,
+        'tax_amount' => $createdLineItem->tax_amount ?? NULL,
+        'financial_type_id' => $createdLineItem->financial_type_id,
+      ];
+      $this->addFinancialItem($lineItemValues, FALSE, $financialTrxnID);
       if (!empty($line['tax_amount'])) {
-        $this->addFinancialItem($createdLineItem, TRUE, $financialTrxnID);
+        $this->addFinancialItem($lineItemValues, TRUE, $financialTrxnID);
       }
     }
     return $createdLineItem;
@@ -1155,13 +1163,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
   /**
    * Add the financial items and financial trxn.
    *
-   * @param object $lineItem
-   *   Line item object.
+   * @param array $lineItem
+   *   Line item values - id, line_total, qty, label, tax_amount, financial_type_id.
    * @param bool $taxTrxnID
    * @param int|null $trxnId
    *   Transaction paying for this item. Pass NULL only when nothing has paid for it yet.
    */
-  private function addFinancialItem($lineItem, $taxTrxnID = FALSE, ?int $trxnId = NULL): void {
+  private function addFinancialItem(array $lineItem, $taxTrxnID = FALSE, ?int $trxnId = NULL): void {
     $contribution = $this->getUpdatedContribution();
     $financialItemStatus = array_column(\Civi::entity('FinancialItem')->getOptions('status_id'), 'id', 'name');
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
@@ -1181,16 +1189,16 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $params = [
       'transaction_date' => $contribution->receive_date,
       'contact_id' => $contribution->contact_id,
-      'amount' => $lineItem->line_total,
+      'amount' => $lineItem['line_total'],
       'currency' => $contribution->currency,
       'entity_table' => 'civicrm_line_item',
-      'entity_id' => $lineItem->id,
-      'description' => ($lineItem->qty != 1 ? $lineItem->qty . ' of ' : '') . $lineItem->label,
+      'entity_id' => $lineItem['id'],
+      'description' => ($lineItem['qty'] != 1 ? $lineItem['qty'] . ' of ' : '') . $lineItem['label'],
       'status_id' => $itemStatus,
     ];
 
     if ($taxTrxnID) {
-      $params['amount'] = $lineItem->tax_amount;
+      $params['amount'] = $lineItem['tax_amount'];
       $params['description'] = Civi::settings()->get('tax_term');
       $accountRelName = 'Sales Tax Account is';
     }
@@ -1200,9 +1208,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $accountRelName = 'Deferred Revenue Account is';
       }
     }
-    if ($lineItem->financial_type_id) {
+    if (!empty($lineItem['financial_type_id'])) {
       $params['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
-        $lineItem->financial_type_id,
+        $lineItem['financial_type_id'],
         $accountRelName
       );
     }
@@ -1261,8 +1269,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws CRM_Core_Exception
    */
   private function reverseLineItem(array $line, int $trxnID): void {
-    LineItem::update(FALSE)
-      ->setValues($line)->execute();
+    CRM_Price_BAO_LineItem::create($line);
     $this->reverseLineItemFinancialItem($line, FALSE, $trxnID);
     $this->reverseLineItemFinancialItem($line, TRUE, $trxnID);
   }
@@ -1444,7 +1451,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * 'Text' price field - see recordTextLineItemAdjustment().
    */
   private function alterLineItem(array $line, int $trxnID): void {
-    LineItem::update(FALSE)->setValues($line)->execute();
+    CRM_Price_BAO_LineItem::create($line);
     if ($line['html_type'] === 'Text') {
       $this->recordTextLineItemAdjustment($line, $trxnID);
     }
@@ -1456,11 +1463,18 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * row's id forward, so it's an update rather than an insert.
    */
   private function addLineItem(array $line, int $trxnID): void {
-    $action = isset($line['id']) ? LineItem::update(FALSE) : LineItem::create(FALSE);
-    $lineItem = (object) $action->setValues($line)->execute()->first();
-    $this->addFinancialItem($lineItem, FALSE, $trxnID);
-    if (isset($lineItem->tax_amount) && (float) $lineItem->tax_amount !== 0.00) {
-      $this->addFinancialItem($lineItem, TRUE, $trxnID);
+    $createdLineItem = CRM_Price_BAO_LineItem::create($line);
+    $lineItemValues = [
+      'id' => $createdLineItem->id,
+      'line_total' => $createdLineItem->line_total,
+      'qty' => $createdLineItem->qty,
+      'label' => $createdLineItem->label,
+      'tax_amount' => $createdLineItem->tax_amount ?? NULL,
+      'financial_type_id' => $createdLineItem->financial_type_id,
+    ];
+    $this->addFinancialItem($lineItemValues, FALSE, $trxnID);
+    if ((float) ($lineItemValues['tax_amount'] ?? 0) !== 0.00) {
+      $this->addFinancialItem($lineItemValues, TRUE, $trxnID);
     }
   }
 
