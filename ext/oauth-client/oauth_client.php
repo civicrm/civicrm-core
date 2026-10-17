@@ -20,7 +20,7 @@ function oauth_client_civicrm_config(&$config) {
  * @see CRM_Core_Permission::getCorePermissions()
  */
 function oauth_client_civicrm_permission(&$permissions) {
-  $prefix = ts('CiviCRM') . ': ';
+  $prefix = ts('CiviCRM:') . ' ';
   $permissions['manage OAuth client'] = [
     'label' => $prefix . ts('manage OAuth client'),
     'description' => ts('Create and delete OAuth client connections'),

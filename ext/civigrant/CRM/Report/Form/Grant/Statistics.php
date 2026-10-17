@@ -479,8 +479,8 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
         foreach ($grantStatistics as $key => $value) {
           $row[] = [
             'civicrm_grant_total_grants' => $value['title'],
-            'civicrm_grant_count' => ts('Number of Grants') . ' (%)',
-            'civicrm_grant_amount' => ts('Total Amount') . ' (%)',
+            'civicrm_grant_count' => ts('Number of Grants (%)'),
+            'civicrm_grant_amount' => ts('Total Amount (%)'),
           ];
 
           foreach ($value['value'] as $field => $values) {

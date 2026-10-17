@@ -584,7 +584,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterfa
         foreach ($groupIds as $gId) {
           $title[] = $allGroups[$gId];
         }
-        $group['title'] .= '<div class="crm-row-parent-name"><em>' . ts('Child of') . '</em>: ' . htmlentities(implode(', ', $title)) . '</div>';
+        $group['title'] .= '<div class="crm-row-parent-name"><em>' . ts('Child of:') . '</em> ' . htmlentities(implode(', ', $title)) . '</div>';
         $value['class'] = array_diff($value['class'], ['crm-row-parent']);
       }
       $group['DT_RowId'] = 'row_' . $value['id'];
