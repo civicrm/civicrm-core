@@ -299,7 +299,7 @@ class Schema {
       // 'civicrm_mailing_trackable_url',
       // 'civicrm_mail_settings',
       // 'civicrm_managed',
-      'civicrm_mapping',
+      // 'civicrm_mapping',
       'civicrm_mapping_field',
       'civicrm_membership',
       // 'civicrm_membership_block',
