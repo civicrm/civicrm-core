@@ -42,7 +42,7 @@ class CRM_Activity_Form_ActivityViewTest extends CiviUnitTestCase {
       'body_text' => "This\naddress\n\nis not ours: {domain.address}.\n\nDo not click this link {action.optOutUrl}.",
       'name' => 'amailing',
       'created_id' => $this->source_contact_id,
-    ]);
+    ])['id'];
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $this->case_id = $this->createCase($this->target_contact_id, $this->source_contact_id)->id;
   }
