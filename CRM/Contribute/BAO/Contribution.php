@@ -1763,13 +1763,12 @@ WHERE      $condition
   }
 
   /**
-   * This function check online pending contribution associated w/
-   * Online Event Registration or Online Membership signup.
+   * Get the pending pay-later contribution paying for a participant.
    *
    * @param int $componentId
    *   Participant id.
    *
-   * @return int
+   * @return int|null
    *   pending contribution id.
    */
   public static function checkOnlinePendingContribution($componentId) {
@@ -1778,13 +1777,11 @@ WHERE      $condition
     $idName = 'participant_id';
     $componentTable = 'civicrm_participant';
     $paymentTable = 'civicrm_participant_payment';
-    $source = ts('Online Event Registration');
     $pendingStatusId = array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'));
 
     $query = "
    SELECT  component.id as {$idName},
            componentPayment.contribution_id as contribution_id,
-           contribution.source source,
            contribution.contribution_status_id as contribution_status_id,
            contribution.is_pay_later as is_pay_later
      FROM  $componentTable component
@@ -1797,8 +1794,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
     while ($dao->fetch()) {
       if ($dao->contribution_id &&
         $dao->is_pay_later &&
-        $dao->contribution_status_id == $pendingStatusId &&
-        str_contains($dao->source, $source)
+        $dao->contribution_status_id == $pendingStatusId
       ) {
         $contributionId = $dao->contribution_id;
       }

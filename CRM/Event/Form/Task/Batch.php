@@ -261,15 +261,19 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   }
 
   /**
-   * Cancel the pending online contribution of a participant who gets a negative status.
+   * Cancel the pending contribution of a participant who was waiting to pay later.
    *
    * @param int $participantId
    * @param int $statusId
+   * @param int $fromStatusId
+   *   Participant status before the update.
    *
    * @throws \CRM_Core_Exception
    */
-  public static function updatePendingOnlineContribution($participantId, $statusId) {
-    if (!array_key_exists($statusId, CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'"))) {
+  public static function updatePendingOnlineContribution(int $participantId, $statusId, int $fromStatusId) {
+    if (CRM_Core_PseudoConstant::getName('CRM_Event_BAO_Participant', 'status_id', $fromStatusId) !== 'Pending from pay later'
+      || !array_key_exists($statusId, CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'"))
+    ) {
       return;
     }
     $contributionId = CRM_Contribute_BAO_Contribution::checkOnlinePendingContribution($participantId);
@@ -356,7 +360,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
         }
         if ($relatedStatusChange && $participantID && $value['status_id']) {
           //update related contribution status, CRM-4395
-          self::updatePendingOnlineContribution((int) $participantID, $value['status_id']);
+          self::updatePendingOnlineContribution((int) $participantID, $value['status_id'], (int) $fromStatusId);
         }
       }
       CRM_Core_Session::setStatus(ts('The updates have been saved.'), ts('Saved'), 'success');
