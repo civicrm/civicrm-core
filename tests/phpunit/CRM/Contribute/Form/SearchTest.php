@@ -92,7 +92,11 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $entities = $this->callAPISuccess('EntityBatch', 'get', ['batch_id' => $this->ids['Batch']['default']]);
     $ids = [];
     foreach ($entities['values'] as $value) {
-      $ids[] = $value['entity_id'];
+      $ids[] = $this->callAPISuccessGetValue('EntityFinancialTrxn', [
+        'financial_trxn_id' => $value['entity_id'],
+        'entity_table' => 'civicrm_contribution',
+        'return' => 'entity_id',
+      ]);
     }
 
     $useCases = [

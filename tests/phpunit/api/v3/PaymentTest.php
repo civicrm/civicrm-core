@@ -60,7 +60,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals(1, $payment['count']);
 
     $expectedResult = [
-      $contribution['id'] => [
+      $payment['id'] => [
         'total_amount' => 100,
         'trxn_id' => 23456,
         'trxn_date' => '2010-01-20 00:00:00',
