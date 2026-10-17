@@ -73,7 +73,12 @@ abstract class CRM_Utils_Check_Component {
     foreach ($this->getAllChecks() as $method) {
       // Note that we should check if the test is disabled BEFORE running it in case it's disabled for performance.
       if ($this->isRequested($method, $requestedChecks) && ($includeDisabled || !$this->isDisabled($method))) {
-        $messages = array_merge($messages, $this->$method($includeDisabled));
+        try {
+          $messages = array_merge($messages, $this->$method($includeDisabled));
+        }
+        catch (Throwable $e) {
+          $messages[] = CRM_Utils_Check::failedCheckMessage($method, $e);
+        }
       }
     }
     return $messages;
