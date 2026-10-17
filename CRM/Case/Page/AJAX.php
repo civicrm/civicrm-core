@@ -107,11 +107,10 @@ class CRM_Case_Page_AJAX {
    * @throws \CRM_Core_Exception
    */
   public static function addClient() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $caseId = CRM_Utils_Type::escape($_POST['caseID'], 'Positive');
     $contactId = CRM_Utils_Type::escape($_POST['contactID'], 'Positive');
 
-    if (!$contactId || !CRM_Case_BAO_Case::accessCase($caseId)) {
+    if (!$contactId || !CRM_Case_BAO_Case::accessCase($caseId) || !CRM_Contact_BAO_Contact_Permission::allow($contactId)) {
       CRM_Utils_System::permissionDenied();
     }
 
@@ -144,12 +143,11 @@ class CRM_Case_Page_AJAX {
    * Delete relationships specific to case and relationship type.
    */
   public static function deleteCaseRoles() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $caseId = CRM_Utils_Type::escape($_POST['case_id'], 'Positive');
     $cid = CRM_Utils_Type::escape($_POST['cid'], 'Positive');
     $relType = CRM_Utils_Request::retrieve('rel_type', 'String', CRM_Core_DAO::$_nullObject, TRUE);
 
-    if (!$cid || !CRM_Case_BAO_Case::accessCase($caseId)) {
+    if (!$cid || !CRM_Case_BAO_Case::accessCase($caseId) || !CRM_Contact_BAO_Contact_Permission::allow($cid)) {
       CRM_Utils_System::permissionDenied();
     }
 
