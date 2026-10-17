@@ -84,6 +84,19 @@ function civicrm_api3_contribution_create($params) {
     CRM_Core_BAO_FinancialTrxn::updateCreditCardDetails($result['id'], $params['pan_truncation'] ?? NULL, $params['card_type_id'] ?? NULL);
   }
 
+  // Support a data-correction update to an already-refunded contribution's refund
+  // trxn_id - ie. the person goes back in & fixes a transaction id that was entered
+  // incorrectly, as opposed to recording a new transaction. CRM-17751.
+  if (isset($params['refund_trxn_id'])) {
+    $refundIDs = CRM_Core_BAO_FinancialTrxn::getRefundTransactionIDs($result['id']);
+    if (!empty($refundIDs['financialTrxnId']) && $refundIDs['trxn_id'] != $params['refund_trxn_id']) {
+      civicrm_api3('FinancialTrxn', 'create', [
+        'id' => $refundIDs['financialTrxnId'],
+        'trxn_id' => $params['refund_trxn_id'],
+      ]);
+    }
+  }
+
   return $result;
 }
 
