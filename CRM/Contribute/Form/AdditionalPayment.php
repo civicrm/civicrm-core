@@ -405,16 +405,9 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     ]);
 
     if ($paymentParams['amount'] > 0.0) {
-      if (!empty($this->contributionID)) {
-        if (empty($paymentParams['description'])) {
-          $paymentParams['contributionID'] = $this->contributionID;
-          $paymentParams['description'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'source');
-        }
-
-        if (empty($paymentParams['financial_type_id'])) {
-          $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'financial_type_id');
-          $paymentParams['financial_type_id'] = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialTypeID);
-        }
+      $paymentParams['contributionID'] = $this->getContributionID();
+      if (empty($paymentParams['description'])) {
+        $paymentParams['description'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->getContributionID(), 'source');
       }
 
       try {
