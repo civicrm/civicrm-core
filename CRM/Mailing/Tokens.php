@@ -107,7 +107,7 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
    */
   protected function getRelatedTokens(): array {
     $tokens = [];
-    $tokens += $this->getRelatedTokensForEntity('Contact', 'created_id', ['display_name', 'email_primary.email'], [], ts('Creator') . ' : ');
+    $tokens += $this->getRelatedTokensForEntity('Contact', 'created_id', ['display_name', 'email_primary.email'], [], ts('Creator:') . ' ');
     return $tokens;
   }
 

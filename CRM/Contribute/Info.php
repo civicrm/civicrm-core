@@ -199,7 +199,7 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
         'title' => ts('Contribution'),
       ];
       if ($newCredit) {
-        $title = ts('Contribution') . '<br />&nbsp;&nbsp;(' . ts('credit card') . ')';
+        $title = ts('Contribution') . '<br />&nbsp;&nbsp;' . ts('(credit card)');
         $shortCut[0]['shortCuts'][] = [
           'path' => 'civicrm/contribute/add',
           'query' => "reset=1&action=add&context=standalone&mode=live",

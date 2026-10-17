@@ -237,7 +237,7 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
    * @param array $params
    */
   public function getPagerParams($action, &$params) {
-    $params['status'] = ts('Pledge') . ' %%StatusMessage%%';
+    $params['status'] = ts('Pledge %1', [1 => '%%StatusMessage%%']);
     $params['csvString'] = NULL;
     if ($this->_limit) {
       $params['rowCount'] = $this->_limit;

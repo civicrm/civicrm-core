@@ -700,7 +700,7 @@ class CRM_Core_Permission {
    * @return array
    */
   public static function getCorePermissions() {
-    $prefix = ts('CiviCRM') . ': ';
+    $prefix = ts('CiviCRM:') . ' ';
     $permissions = [
       'add contacts' => [
         'label' => $prefix . ts('add contacts'),

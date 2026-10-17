@@ -279,7 +279,7 @@ class CRM_Utils_Mail {
 
     $from = self::pluckEmailFromHeader($headers['From']);
 
-    $testMailStatusMsg = ts('Sending test email.') . ':<br />'
+    $testMailStatusMsg = ts('Sending test email:') . '<br />'
       . ts('From: %1', [1 => $from]) . '<br />'
       . ts('To: %1', [1 => $to]) . '<br />';
 
