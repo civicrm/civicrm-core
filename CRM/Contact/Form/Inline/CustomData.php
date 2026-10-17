@@ -62,6 +62,10 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
 
     $gid = (isset($this->_groupID)) ? $this->_groupID : NULL;
 
+    if (!$gid || !CRM_Core_BAO_CustomGroup::checkGroupAccess($gid, CRM_Core_Permission::EDIT)) {
+      CRM_Utils_System::permissionDenied();
+    }
+
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
       NULL,
       $this->getContactID(),

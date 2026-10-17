@@ -47,7 +47,11 @@ class CRM_Contact_Page_Inline_Address extends CRM_Core_Page {
     }
 
     // we just need current address block
-    $currentAddressBlock['address'][$locBlockNo] = array_pop($address);
+    $addressValues = array_pop($address);
+    if ($addressId > 0 && (empty($addressValues) || (int) ($addressValues['contact_id'] ?? 0) !== (int) $contactId)) {
+      CRM_Utils_System::permissionDenied();
+    }
+    $currentAddressBlock['address'][$locBlockNo] = $addressValues;
 
     if (!empty($currentAddressBlock['address'][$locBlockNo])) {
       // get contact name of shared contact names

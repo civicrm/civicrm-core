@@ -738,4 +738,82 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $this->assertEquals('Metropolis', $addresses->first()['city']);
   }
 
+  /**
+   * Test that inline contact forms deny access when the user lacks edit permission on the contact.
+   */
+  public function testInlineFormDeniedWithoutContactEditPermission(): void {
+    $contactId = $this->getTestEntityID('Contact');
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'view all contacts']);
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Email', [
+      'oplock_ts' => $this->getOplockTs(),
+      'email' => [
+        1 => [
+          'email' => 'unauthorized@example.org',
+          'location_type_id' => 1,
+          'is_primary' => 1,
+        ],
+      ],
+    ], ['cid' => $contactId]);
+    $formWrapper->processForm();
+  }
+
+  /**
+   * Test that inline address form denies access when aid belongs to another contact.
+   */
+  public function testAddressFormDeniedForOtherContactsAddress(): void {
+    $contactId = $this->getTestEntityID('Contact');
+    $otherContact = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Other',
+      'last_name' => 'Contact',
+    ], 'other_contact');
+    $otherAddress = $this->createTestEntity('Address', [
+      'contact_id' => $otherContact['id'],
+      'street_address' => '999 Secret St',
+      'location_type_id' => 1,
+    ], 'other_address');
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Address', [
+      'oplock_ts' => $this->getOplockTs(),
+      'address' => [
+        1 => [
+          'street_address' => 'Overwritten St',
+          'location_type_id' => 1,
+          'is_primary' => 1,
+        ],
+      ],
+    ], ['cid' => $contactId, 'locno' => 1, 'aid' => $otherAddress['id']]);
+    $formWrapper->processForm();
+  }
+
+  /**
+   * Test that inline custom data form denies access when user lacks edit permission on custom group.
+   */
+  public function testCustomDataFormDeniedWithoutCustomGroupEditPermission(): void {
+    $contactId = $this->getTestEntityID('Contact');
+    $customGroup = $this->createTestEntity('CustomGroup', [
+      'title' => 'Restricted Group',
+      'extends' => 'Individual',
+      'style' => 'Inline',
+    ]);
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'edit all contacts', 'view all custom data']);
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_CustomData', [
+      'oplock_ts' => $this->getOplockTs(),
+    ], ['cid' => $contactId, 'groupID' => $customGroup['id']]);
+    $formWrapper->processForm();
+  }
+
 }
