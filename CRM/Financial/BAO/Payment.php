@@ -184,7 +184,7 @@ class CRM_Financial_BAO_Payment {
         else {
           $financialTypeId = $params['financial_type_id'];
         }
-        CRM_Core_BAO_FinancialTrxn::recordFees($trxnParams, $amount, $params['contribution_id'], $financialTypeId);
+        CRM_Core_BAO_FinancialTrxn::recordFees($trxnParams, $amount, $params['contribution_id'], $financialTypeId, $trxn->id);
       }
     }
 
