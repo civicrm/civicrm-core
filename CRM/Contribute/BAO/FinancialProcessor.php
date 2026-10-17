@@ -160,7 +160,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $params['trxnParams']['payment_instrument_id'] = $this->getUpdatedContribution()->payment_instrument_id;
     $params['trxnParams']['check_number'] = $params['check_number'] ?? NULL;
 
-    if ($this->isPaymentInstrumentChange($params)) {
+    if ($this->isPaymentInstrumentChange()) {
       $this->updateFinancialAccountsOnPaymentInstrumentChange($params['trxnParams']);
     }
 
@@ -949,14 +949,15 @@ class CRM_Contribute_BAO_FinancialProcessor {
   /**
    * Does this transaction reflect a payment instrument change.
    *
-   * @param array $params
+   * Function is very complicated - is there a reason? It probably just dates
+   * back to when the contribution objects were unreliably loaded.
    *
    * @return bool
    */
-  private function isPaymentInstrumentChange(array $params): bool {
-    if (array_key_exists('payment_instrument_id', $params)) {
+  private function isPaymentInstrumentChange(): bool {
+    if (array_key_exists('payment_instrument_id', $this->inputValues)) {
       if (CRM_Utils_System::isNull($this->getOriginalContribution()->payment_instrument_id) &&
-        !CRM_Utils_System::isNull($params['payment_instrument_id'])
+        !CRM_Utils_System::isNull($this->inputValues['payment_instrument_id'])
       ) {
         //check if status is changed from Pending to Completed
         // do not update payment instrument changes for Pending to Completed
@@ -966,9 +967,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
           return TRUE;
         }
       }
-      elseif ((!CRM_Utils_System::isNull($params['payment_instrument_id']) &&
+      elseif ((!CRM_Utils_System::isNull($this->inputValues['payment_instrument_id']) &&
           !CRM_Utils_System::isNull($this->getOriginalContribution()->payment_instrument_id)) &&
-        $params['payment_instrument_id'] != $this->getOriginalContribution()->payment_instrument_id
+        $this->inputValues['payment_instrument_id'] != $this->getOriginalContribution()->payment_instrument_id
       ) {
         return TRUE;
       }
