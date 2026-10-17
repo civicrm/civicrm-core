@@ -256,7 +256,7 @@ class Schema {
       // 'civicrm_entity_batch',
       // 'civicrm_entity_file',
       // 'civicrm_entity_financial_account',
-      'civicrm_entity_financial_trxn',
+      // 'civicrm_entity_financial_trxn',
       // 'civicrm_entity_tag',
       // 'civicrm_event',
       // 'civicrm_extension',
