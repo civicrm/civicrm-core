@@ -260,14 +260,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
   /**
    * @return bool
    */
-  private function isRecordFinancialEntities(): bool {
-    // Checking $this->inputValues['is_pay_later'] means we only pick this up if
+  private function isUnpaidAndNotPayLater(): bool {
+    // Checking $this->getInputValue('is_pay_later') means we only pick this up if
     // is_pay_later has been passed in - this feels like a mistake but it
     // is an entrenched mistake (the previous code did the same although
     // less obviously as it checked a partially populated contribution object.
     $isPayLater = !empty($this->getInputValue('is_pay_later'));
     $isIncompletePending = $this->isPendingTransaction() && !$isPayLater;
-    return !$isIncompletePending && !$this->isFailedTransaction();
+    return $isIncompletePending || $this->isFailedTransaction();
   }
 
   private function isStatusChange(): bool {
@@ -369,8 +369,38 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws CRM_Core_Exception
    */
   public function recordFinancialAccounts(array &$params): void {
+    if ($this->isUnpaidAndNotPayLater()) {
+      if (empty($this->getInputValue('skipLineItem'))) {
+        foreach ($this->getUpdatedLineItems() as $lineParams) {
+          $createdLineItem = CRM_Price_BAO_LineItem::create($lineParams);
+          // We create financial items with NO transaction ID on create if the transaction
+          // has failed or if we do not yet have a payment, and it is not pay_later. Payment.create
+          // finds these and links them.
+          // This feels smelly and is an artifact from making always-record-accounts-receiveable
+          // optional. More concerning - we have never updated these when the transactions are altered
+          // while in this state - leaving the potential for unbalanced lines. This feels like
+          // a latent bug.
+          if (!$this->isUpdate()) {
+            $lineItemValues = [
+              'id' => $createdLineItem->id,
+              'line_total' => $createdLineItem->line_total,
+              'qty' => $createdLineItem->qty,
+              'label' => $createdLineItem->label,
+              'tax_amount' => $createdLineItem->tax_amount ?? NULL,
+              'financial_type_id' => $createdLineItem->financial_type_id,
+            ];
+            $this->addFinancialItem($lineItemValues, FALSE, NULL);
+            if (!empty($lineParams['tax_amount'])) {
+              $this->addFinancialItem($lineItemValues, TRUE, NULL);
+            }
+          }
+        }
+      }
+      unset($params['line_item']);
+      return;
+    }
     if ($this->isUpdate()) {
-      if ($this->isRecordFinancialEntities()) {
+      if (!$this->isUnpaidAndNotPayLater()) {
         $trxnParams = $this->getTrxnParams($params);
         $params['trxnParams'] = $trxnParams;
         $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $this->getOriginalContribution()->total_amount;
@@ -457,20 +487,16 @@ class CRM_Contribute_BAO_FinancialProcessor {
             CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
           }
         }
-      }
-
-      // Line items are re-saved even when $isRecordFinancialTrxn is false (an
-      // incomplete-pending/failed transaction still needs its line item rows).
-      if (empty($params['skipLineItem'])) {
-        foreach ($this->getUpdatedLineItems() as $line) {
-          $this->createLineItem($line, NULL);
+        if (empty($params['skipLineItem'])) {
+          foreach ($this->getUpdatedLineItems() as $line) {
+            CRM_Price_BAO_LineItem::create($line);
+          }
         }
       }
     }
 
     else {
-      $financialTxnID = NULL;
-      if ($this->isRecordFinancialEntities()) {
+      if (!$this->isUnpaidAndNotPayLater()) {
         $trxnParams = $params['trxnParams'] = $this->getTrxnParams($params);
         if ($this->isRecordAccountsReceivable()) {
           $this->recordAlwaysAccountsReceivable($trxnParams);
@@ -483,6 +509,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
             CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
           }
         }
+        if (empty($params['skipLineItem'])) {
+          foreach ($this->getAddedLineItems() as $lineParams) {
+            $this->addLineItem($lineParams, $financialTxnID);
+          }
+          $this->createDeferredTrxn();
+        }
 
         // create batch entry if batch_id is passed and
         if (!empty($params['batch_id'])) {
@@ -493,16 +525,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
           ];
           CRM_Batch_BAO_EntityBatch::create($entityParams);
         }
-      }
-
-      // Line items & financial items are created even when $isRecordFinancialTrxn
-      // is false (an incomplete-pending/failed transaction still needs its line
-      // item rows, just with no financial trxn to link them to).
-      if (empty($params['skipLineItem'])) {
-        foreach ($this->getUpdatedLineItems() as $line) {
-          $this->createLineItem($line, $financialTxnID);
-        }
-        $this->createDeferredTrxn();
       }
     }
 
@@ -1099,37 +1121,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
         civicrm_api3('EntityFinancialTrxn', 'create', $entityParams);
       }
     }
-  }
-
-  /**
-   * Create (or update) a line item's row, and its financial item(s) unless this
-   * is a contribution update - the update-specific branches elsewhere in
-   * recordFinancialAccounts() handle financial items for those already.
-   *
-   * @param array $line
-   * @param int|null $financialTrxnID
-   *   Transaction paying for this line. Only used when not an update.
-   *
-   * @return object
-   */
-  private function createLineItem(array $line, ?int $financialTrxnID): object {
-    $createdLineItem = CRM_Price_BAO_LineItem::create($line);
-
-    if (!$this->isUpdate()) {
-      $lineItemValues = [
-        'id' => $createdLineItem->id,
-        'line_total' => $createdLineItem->line_total,
-        'qty' => $createdLineItem->qty,
-        'label' => $createdLineItem->label,
-        'tax_amount' => $createdLineItem->tax_amount ?? NULL,
-        'financial_type_id' => $createdLineItem->financial_type_id,
-      ];
-      $this->addFinancialItem($lineItemValues, FALSE, $financialTrxnID);
-      if (!empty($line['tax_amount'])) {
-        $this->addFinancialItem($lineItemValues, TRUE, $financialTrxnID);
-      }
-    }
-    return $createdLineItem;
   }
 
   /**
