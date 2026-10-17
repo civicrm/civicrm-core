@@ -32,10 +32,19 @@ class CRM_Afform_Page_Verify extends CRM_Core_Page {
         ->execute()->first();
 
       if (!empty($afformSubmissionData) && $afformSubmissionData['status_id:name'] === 'Pending') {
-        \Civi\Api4\Afform::process(FALSE)
+        $processResult = \Civi\Api4\Afform::process(FALSE)
           ->setName($afformSubmissionData['afform_name'])
           ->setSubmissionId($sid)
-          ->execute();
+          ->execute()
+          ->first();
+
+        if (!empty($processResult['redirect'])) {
+          \CRM_Utils_System::redirect($processResult['redirect']);
+        }
+
+        if (isset($processResult['message'])) {
+          $this->assign('success_message', $processResult['message']);
+        }
 
         $verified = TRUE;
       }
