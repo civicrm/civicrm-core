@@ -705,7 +705,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     // Step 1: Create a Membership via backoffice whose with 50.00 payment
     $this->getTestForm('CRM_Member_Form_Membership', [
-      'cid' => $this->ids['Contact']['individual_0'],
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
@@ -747,7 +747,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     Civi::settings()->set('update_contribution_on_membership_type_change', TRUE);
 
     $params = [
-      'cid' => $this->ids['Contact']['individual_0'],
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
@@ -813,7 +813,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     // Step 1: Create a Membership via backoffice with a 50.00 payment.
     $this->getTestForm('CRM_Member_Form_Membership', [
-      'cid' => $this->ids['Contact']['individual_0'],
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
@@ -898,7 +898,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     Civi::settings()->set('update_contribution_on_membership_type_change', TRUE);
 
     $this->getTestForm('CRM_Member_Form_Membership', [
-      'cid' => $this->ids['Contact']['individual_0'],
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
@@ -997,7 +997,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     // convention only CiviCRM's auto-generated default membership price set
     // follows, not this custom one.
     $this->getTestForm('CRM_Member_Form_Membership', [
-      'cid' => $this->ids['Contact']['individual_0'],
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
@@ -1859,7 +1859,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testLineItemAmountOnSalesTax(): void {
-    $mailUtil = new CiviMailUtils($this, TRUE);
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType(2);
     $priceSet = $this->callAPISuccess('PriceSet', 'Get', ['extends' => 'CiviMember']);
@@ -1869,7 +1868,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     // clean the price options static variable to repopulate the options, in order to fetch tax information
     \Civi::$statics['CRM_Price_BAO_PriceField']['priceOptions'] = NULL;
     $params = [
-      'cid' => $this->ids['Contact']['individual_0'],
+      'contact_id' => $this->ids['Contact']['individual_0'],
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
@@ -1887,13 +1886,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'send_receipt' => 1,
       'from_email_address' => 'bob@example.com',
     ];
-
-    $form = $this->getForm($params);
     $this->createLoggedInUser();
-    $form->postProcess();
-    $email = preg_replace('/\s+/', ' ', $mailUtil->getMostRecentEmail());
+    $this->getTestForm('CRM_Member_Form_Membership', $params)
+      ->processForm();
     foreach ($this->getExpectedEmailStrings() as $string) {
-      $this->assertStringContainsString($string, $email);
+      $this->assertMailSentContainingString($string);
     }
 
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
@@ -1903,17 +1900,13 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals(50.00, $lineItem['line_total']);
     $this->assertEquals(5.00, $lineItem['tax_amount']);
 
-    $_REQUEST['id'] = $lineItem['contribution_id'];
-    $_REQUEST['context'] = 'membership';
     // Simply save the 'Edit Contribution' form
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
+    $this->getTestForm('CRM_Contribute_Form_Contribution', [
       'contact_id' => $this->ids['Contact']['individual_0'],
       'financial_type_id' => 2,
       'total_amount' => 55,
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-    ]);
-    $form->buildForm();
-    $form->postProcess();
+    ], ['id' => $lineItem['contribution_id'], 'context' => 'membership'])->processForm();
 
     // ensure that the LineItem data remain the same
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership']);
