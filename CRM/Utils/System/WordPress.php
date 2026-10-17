@@ -202,6 +202,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function isPageEmbedded() {
+    return civi_wp()->civicrm_context_get() === 'shortcode';
+  }
+
+  /**
    * Moved from CRM_Utils_System_Base
    */
   public function getDefaultFileStorage() {
