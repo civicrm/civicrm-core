@@ -3034,9 +3034,16 @@ class CRM_Report_Form extends CRM_Core_Form {
     // in dashboard mode for report
     //@todo - this could be done in the dashboard no we have a setter
     if (empty($this->_params['fields']) && !$this->_noFields
-      && empty($this->_params['task'])
+      && !empty($this->_formValues)
     ) {
+      $existingParams = $this->_params;
       $this->setParams($this->_formValues);
+      if (array_key_exists('task', $existingParams)) {
+        $this->_params['task'] = $existingParams['task'];
+      }
+      if (array_key_exists('output', $existingParams)) {
+        $this->_params['output'] = $existingParams['output'];
+      }
     }
 
     $this->processReportMode();
