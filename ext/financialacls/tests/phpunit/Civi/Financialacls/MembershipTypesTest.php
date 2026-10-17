@@ -4,6 +4,7 @@ namespace Civi\Financialacls;
 
 use Civi\Api4\Generic\Result;
 use Civi\Api4\MembershipType;
+use Civi\Api4\WordReplacement;
 
 // I fought the Autoloader and the autoloader won.
 require_once 'BaseTestClass.php';
@@ -12,6 +13,14 @@ require_once 'BaseTestClass.php';
  * @group headless
  */
 class MembershipTypesTest extends BaseTestClass {
+
+  public function tearDown(): void {
+    WordReplacement::delete(FALSE)->addWhere('id', '>', 0)->execute();
+    \CRM_Core_BAO_WordReplacement::rebuild();
+    \CRM_Member_Page_MembershipType::$_links = NULL;
+    MembershipType::delete(FALSE)->addWhere('id', '>', 0)->execute();
+    parent::tearDown();
+  }
 
   /**
    * Test buildMembershipTypes.
@@ -45,6 +54,32 @@ class MembershipTypesTest extends BaseTestClass {
       }
     }
     $this->setPermissions($permissions);
+    $page->browse();
+    $assigned = \CRM_Core_Smarty::singleton()->getTemplateVars();
+    $this->assertEquals('<span></span>', $assigned['rows'][$types['Go for it']['id']]['action']);
+  }
+
+  /**
+   * The edit & delete links are removed whatever their labels are, e.g. on a translated site.
+   */
+  public function testMembershipTypePageLinksWithRelabelledActions(): void {
+    WordReplacement::save(FALSE)
+      ->setRecords([
+        ['find_word' => 'Edit', 'replace_word' => 'Bearbeiten'],
+        ['find_word' => 'Disable', 'replace_word' => 'Deaktivieren'],
+        ['find_word' => 'Delete', 'replace_word' => 'Löschen'],
+      ])
+      ->setDefaults(['match_type' => 'exactMatch', 'is_active' => TRUE])
+      ->execute();
+    \CRM_Core_BAO_WordReplacement::rebuild();
+    \CRM_Member_Page_MembershipType::$_links = NULL;
+    $types = $this->setUpMembershipTypesACLLimited();
+    $this->setPermissions(array_diff(\CRM_Core_Config::singleton()->userPermissionClass->permissions, [
+      'edit contributions of type Donation',
+      'delete contributions of type Donation',
+    ]));
+
+    $page = new \CRM_Member_Page_MembershipType();
     $page->browse();
     $assigned = \CRM_Core_Smarty::singleton()->getTemplateVars();
     $this->assertEquals('<span></span>', $assigned['rows'][$types['Go for it']['id']]['action']);
