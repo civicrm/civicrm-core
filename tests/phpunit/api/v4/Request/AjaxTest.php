@@ -277,6 +277,29 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
   }
 
   /**
+   * A PHP error in an api call still gets a json error response.
+   */
+  public function testPhpErrorResponse(): void {
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
+    $listener = fn() => throw new \TypeError('Ruh-roh');
+    \Civi::dispatcher()->addListener('hook_civicrm_selectWhereClause', $listener);
+    try {
+      [$response, $code] = $this->runAjax([
+        'path' => 'civicrm/ajax/api4/Contact/get',
+        'get' => ['params' => json_encode(['limit' => 1])],
+      ]);
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('hook_civicrm_selectWhereClause', $listener);
+    }
+    $this->assertEquals(500, $code);
+    $this->assertEquals(500, $response['status']);
+    $this->assertEquals('1', $response['error_code']);
+    $this->assertStringContainsString('Error ID:', $response['error_message']);
+    $this->assertStringNotContainsString('Ruh-roh', $response['error_message']);
+  }
+
+  /**
    * Simulate an APIv4 ajax call
    *
    * @param array{path: string, get: array, post: array} $request

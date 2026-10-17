@@ -190,7 +190,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       // If at least one call succeeded, we give a success code
       $this->httpResponseCode = 200;
     }
-    catch (Exception $e) {
+    catch (Throwable $e) {
       $statusMap = [
         \Civi\API\Exception\UnauthorizedException::class => 403,
       ];
