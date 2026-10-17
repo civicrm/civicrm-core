@@ -67,7 +67,11 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
       "action=view&reset=1&id={$values['id']}"
     );
 
-    $title = CRM_Contact_BAO_Contact::displayName($values['contact_id']) . ' - ' . ts('Grant') . ': ' . CRM_Utils_Money::format($values['amount_total']) . ' (' . $grantType[$values['grant_type_id']] . ')';
+    $title = ts('%1 - Grant: %2 (%3)', [
+      1 => CRM_Contact_BAO_Contact::displayName($values['contact_id']),
+      2 => CRM_Utils_Money::format($values['amount_total']),
+      3 => $grantType[$values['grant_type_id']],
+    ]);
 
     $recentOther = [];
     if (CRM_Core_Permission::check('edit grants')) {

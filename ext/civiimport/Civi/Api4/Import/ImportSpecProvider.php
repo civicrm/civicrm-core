@@ -83,7 +83,7 @@ class ImportSpecProvider extends AutoService implements SpecProviderInterface {
         continue;
       }
       $field = new FieldSpec($column['name'], $spec->getEntity(), 'String');
-      $field->setTitle(ts('Import field') . ': ' . $column['label']);
+      $field->setTitle(ts('Import field: %1', [1 => $column['label']]));
       $field->setLabel($column['label']);
       $field->setType('Field');
       $field->setDataType($column['data_type']);

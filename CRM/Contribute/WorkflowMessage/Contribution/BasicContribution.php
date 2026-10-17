@@ -33,7 +33,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
       if ($page) {
         yield [
           'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $page['name'],
-          'title' => ts('Completed Contribution') . ' : ' . $page['frontend_title'],
+          'title' => ts('Completed Contribution: %1', [1 => $page['frontend_title']]),
           'tags' => ['preview'],
           'workflow' => $workflow,
           'is_show_line_items' => TRUE,
@@ -41,7 +41,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
         ];
         yield [
           'name' => 'workflow/' . $workflow . '/' . 'refunded_price_set_' . $page['name'],
-          'title' => ts('Refunded Contribution') . ' : ' . $page['frontend_title'],
+          'title' => ts('Refunded Contribution: %1', [1 => $page['frontend_title']]),
           'tags' => ['preview'],
           'workflow' => $workflow,
           'is_show_line_items' => TRUE,
@@ -54,14 +54,14 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
         if ($priceSet) {
           yield [
             'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'],
-            'title' => ts('Completed Contribution') . ' : ' . $priceSet['title'],
+            'title' => ts('Completed Contribution: %1', [1 => $priceSet['title']]),
             'tags' => ['preview'],
             'workflow' => $workflow,
             'is_show_line_items' => TRUE,
           ];
           yield [
             'name' => 'workflow/' . $workflow . '/' . 'refunded_price_set_' . $priceSet['name'],
-            'title' => ts('Refunded Contribution') . ' : ' . $priceSet['title'],
+            'title' => ts('Refunded Contribution: %1', [1 => $priceSet['title']]),
             'tags' => ['preview'],
             'workflow' => $workflow,
             'is_show_line_items' => TRUE,
@@ -72,7 +72,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
       foreach ($currencies as $currency) {
         yield [
           'name' => 'workflow/' . $workflow . '/basic_' . $currency,
-          'title' => ts('Completed Contribution') . ' : ' . $currency,
+          'title' => ts('Completed Contribution: %1', [1 => $currency]),
           'tags' => $workflow === 'contribution_offline_receipt' ? ['phpunit', 'preview'] : ['preview'],
           'workflow' => $workflow,
           // If there are no non-quick-config we have no show line items example.
@@ -81,7 +81,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
       }
       yield [
         'name' => 'workflow/' . $workflow . '/' . 'partially paid' . $currency,
-        'title' => ts('Partially Paid Contribution') . ' : ' . $currency,
+        'title' => ts('Partially Paid Contribution: %1', [1 => $currency]),
         'tags' => ['preview'],
         'workflow' => $workflow,
         'is_show_line_items' => $this->getNonQuickConfigPriceSet() ? TRUE : FALSE,
@@ -89,7 +89,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
       ];
       yield [
         'name' => 'workflow/' . $workflow . '/' . 'pending' . $currency,
-        'title' => ts('Pending Contribution') . ' : ' . $currency,
+        'title' => ts('Pending Contribution: %1', [1 => $currency]),
         'tags' => ['preview'],
         'workflow' => $workflow,
         'is_show_line_items' => $this->getNonQuickConfigPriceSet() ? TRUE : FALSE,

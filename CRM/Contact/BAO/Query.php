@@ -2966,7 +2966,7 @@ class CRM_Contact_BAO_Query {
     if (!empty($clause)) {
       $this->_where[$grouping][] = "( " . implode(' OR ', $clause) . " )";
     }
-    $this->_qill[$grouping][] = ts('Contact Subtype %1 ', [1 => $qillOperators[$op]]) . implode(' ' . ts('or') . ' ', array_keys($clause));
+    $this->_qill[$grouping][] = ts('Contact Subtype %1 %2', [1 => $qillOperators[$op], 2 => implode(' ' . ts('or') . ' ', array_keys($clause))]);
   }
 
   /**
@@ -5823,8 +5823,7 @@ AND   displayRelType.is_active = 1
       $qcache['relTypeLabel'] = $relationshipTypeLabel;
       $_rTempCache[$arg_sig]['queries'][$this->_displayRelationshipType] = $qcache;
     }
-    $qillMessage = ts('Contacts with a Relationship Type of: ');
-    $iqill = $qillMessage . "'" . $qcache['relTypeLabel'] . "'";
+    $iqill = ts("Contacts with a Relationship Type of: '%1'", [1 => $qcache['relTypeLabel']]);
     if (!is_array($this->_qill[0]) || !in_array($iqill, $this->_qill[0])) {
       $this->_qill[0][] = $iqill;
     }
@@ -7262,15 +7261,17 @@ AND   displayRelType.is_active = 1
    */
   protected function getQillForRelativeDateRange($from, $to, string $fieldTitle, string $relativeRange): string {
     if (!$from) {
-      return ts('%1 is ', [1 => $fieldTitle]) . $relativeRange . ' (' . ts('to %1', [1 => CRM_Utils_Date::customFormat($to)]) . ')';
+      return ts('%1 is %2 (to %3)', [1 => $fieldTitle, 2 => $relativeRange, 3 => CRM_Utils_Date::customFormat($to)]);
     }
     if (!$to) {
-      return ts('%1 is ', [1 => $fieldTitle]) . $relativeRange . ' (' . ts('from %1', [1 => CRM_Utils_Date::customFormat($from)]) . ')';
+      return ts('%1 is %2 (from %3)', [1 => $fieldTitle, 2 => $relativeRange, 3 => CRM_Utils_Date::customFormat($from)]);
     }
-    return ts('%1 is ', [1 => $fieldTitle]) . $relativeRange . ' (' . ts('between %1 and %2', [
-      1 => CRM_Utils_Date::customFormat($from),
-      2 => CRM_Utils_Date::customFormat($to),
-    ]) . ')';
+    return ts('%1 is %2 (between %3 and %4)', [
+      1 => $fieldTitle,
+      2 => $relativeRange,
+      3 => CRM_Utils_Date::customFormat($from),
+      4 => CRM_Utils_Date::customFormat($to),
+    ]);
   }
 
 }

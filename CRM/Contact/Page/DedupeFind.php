@@ -121,17 +121,18 @@ class CRM_Contact_Page_DedupeFind extends CRM_Core_Page_Basic {
       $mergedCount = $mergedCount + count($result['merged']);
 
       if (empty($result['merged']) && empty($result['skipped'])) {
-        $message = '';
-        if ($mergedCount >= 1) {
-          $message = ts("%1 pairs of duplicates were merged", [1 => $mergedCount]);
+        if ($mergedCount >= 1 && $skippedCount >= 1) {
+          $message = ts('%1 pairs of duplicates were merged and %2 pairs of duplicates were skipped due to conflict during the batch merge process with safe mode.', [1 => $mergedCount, 2 => $skippedCount]);
         }
-        if ($skippedCount >= 1) {
-          $message = $message ? "{$message} and " : '';
-          $message .= ts("%1 pairs of duplicates were skipped due to conflict",
-            [1 => $skippedCount]
-          );
+        elseif ($mergedCount >= 1) {
+          $message = ts('%1 pairs of duplicates were merged during the batch merge process with safe mode.', [1 => $mergedCount]);
         }
-        $message .= ts(" during the batch merge process with safe mode.");
+        elseif ($skippedCount >= 1) {
+          $message = ts('%1 pairs of duplicates were skipped due to conflict during the batch merge process with safe mode.', [1 => $skippedCount]);
+        }
+        else {
+          $message = ts('No pairs of duplicates were merged during the batch merge process with safe mode.');
+        }
         CRM_Core_Session::setStatus($message, ts('Merge Complete'), 'success');
         $urlQry['action'] = 'update';
         CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry));
