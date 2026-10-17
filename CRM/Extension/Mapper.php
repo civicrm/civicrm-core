@@ -362,7 +362,7 @@ class CRM_Extension_Mapper {
           $urls[$module->name] = $this->keyToUrl($module->name);
         }
         catch (CRM_Extension_Exception_MissingException $e) {
-          CRM_Core_Session::setStatus(ts('An enabled extension is missing from the extensions directory') . ':' . htmlentities($module->name), purify: FALSE);
+          CRM_Core_Session::setStatus(ts('An enabled extension is missing from the extensions directory: %1', [1 => htmlentities($module->name)]), purify: FALSE);
         }
       }
     }

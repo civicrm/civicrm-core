@@ -454,7 +454,7 @@ class CRM_Import_ImportProcessor {
       }
     }
     if (!empty($skipped)) {
-      CRM_Core_Session::setStatus(ts('Invalid saved mappings were skipped') . ':' . implode(', ', $skipped));
+      CRM_Core_Session::setStatus(ts('Invalid saved mappings were skipped: %1', [1 => implode(', ', $skipped)]));
     }
     $this->mappingFields = $this->rekeyBySortedColumnNumbers($fields);
   }

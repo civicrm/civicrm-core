@@ -117,7 +117,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch implements \Civi\Core\Hook
   public static function generateBatchName() {
     $sql = "SELECT max(id) FROM civicrm_batch";
     $batchNo = CRM_Core_DAO::singleValueQuery($sql) + 1;
-    return ts('Batch %1', [1 => $batchNo]) . ': ' . date('Y-m-d');
+    return ts('Batch %1: %2', [1 => $batchNo, 2 => date('Y-m-d')]);
   }
 
   /**
