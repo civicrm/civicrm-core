@@ -478,9 +478,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       //Unset ContactID for additional participants and set RegisterBy Id.
       if (empty($participantRecord['is_primary'])) {
         $contactID = $participantRecord['contact_id'] ?? NULL;
-        $registerByID = $this->get('registerByID');
-        if ($registerByID) {
-          $participantRecord['registered_by_id'] = $registerByID;
+        $registerByID = $this->getPrimaryParticipantID();
+        if ($this->getPrimaryParticipantID()) {
+          $participantRecord['registered_by_id'] = $this->getPrimaryParticipantID();
         }
       }
       else {
@@ -551,26 +551,14 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $this->_values['contributionId'] = $participantRecord['contributionID'];
       }
 
-      // CRM-11182 - Confirmation page might not be monetary
-      if ($this->isPaidEvent()) {
-        if (!$pending && !empty($participantRecord['is_primary']) &&
-          $this->isProcessRegistrationInRealTime()
-        ) {
-          $this->set('receiveDate', $participantRecord['receive_date'] ?? NULL);
-          $this->set('trxnId', $participantRecord['trxn_id'] ?? NULL);
-        }
-      }
-
       $this->confirmPostProcess($contactID, $participantRecord, $participantNum);
     }
 
-    //handle if no additional participant.
-    if (!$registerByID) {
-      $registerByID = $this->get('registerByID');
-    }
+    $registerByID = $this->getPrimaryParticipantID();
 
     $this->set('participantIDs', $this->_participantIDS);
     $this->set('contributionID', $contribution->id ?? NULL);
+    $this->set('participantId', $this->_participantIDS[0]);
 
     // create line items, CRM-5313
     if ($this->_priceSetId &&
@@ -768,7 +756,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       foreach ($additionalIDs as $participantID => $contactId) {
         $participantNum = 0;
-        if ($participantID == $registerByID) {
+        if ($participantID == $this->getPrimaryParticipantID()) {
           //build an array of custom profile and assigning it to template.
           $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $this->_values, NULL, $this->isTest());
 

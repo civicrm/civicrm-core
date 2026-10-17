@@ -921,9 +921,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       // CRM-10032
       $this->processFirstParticipant($participantID);
-    }
-
-    if (!empty($participantRecord['is_primary'])) {
       $participantRecord['participantID'] = $participantID;
       $this->set('primaryParticipant', $participantRecord);
     }
@@ -1049,10 +1046,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $optionFullIds = [];
     $selectedSelectPriceFieldIds = [];
     if ($field['html_type'] === 'Select') {
-      if ($this->getParticipantID()) {
+      if ($this->getPrimaryParticipantID()) {
         $selectedSelectPriceFieldIds = LineItem::get(FALSE)
           ->addWhere('entity_table', '=', 'civicrm_participant')
-          ->addWhere('entity_id', '=', $this->getParticipantID())
+          ->addWhere('entity_id', '=', $this->getPrimaryParticipantID())
           ->execute()->column('price_field_value_id');
       }
     }
@@ -1219,6 +1216,17 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       return $this->_participantId;
     }
     return $this->_additionalParticipantIds[$index] ?? NULL;
+  }
+
+  /**
+   * Get the primary participant ID.
+   *
+   * Wrapper for getParticipantID to make the intent clear.
+   *
+   * @return int|null
+   */
+  public function getPrimaryParticipantID(): ?int {
+    return $this->getParticipantID();
   }
 
   /**
@@ -1850,7 +1858,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return int|null
    */
   protected function getRegisteredByID(int $participantNumber): ?int {
-    return $participantNumber === 0 ? NULL : $this->get('registerByID');
+    return $participantNumber === 0 ? NULL : $this->getPrimaryParticipantID();
   }
 
   /**
@@ -1920,19 +1928,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function processFirstParticipant($participantID) {
     $this->_participantId = $participantID;
-    $this->set('participantId', $this->_participantId);
-
-    $ids = $participantValues = [];
-    $participantParams = ['id' => $this->_participantId];
-    CRM_Event_BAO_Participant::getValues($participantParams, $participantValues, $ids);
-    $this->_values['participant'] = $participantValues[$this->_participantId];
-    $this->set('values', $this->_values);
 
     // also set the allow confirmation stuff
-    if (array_key_exists(
-      $this->_values['participant']['status_id'],
-      CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Pending'")
-    )) {
+    if ($this->getParticipantValue('status_id.class') === 'Pending') {
       $this->_allowConfirmation = TRUE;
       $this->set('allowConfirmation', TRUE);
     }
@@ -1990,7 +1988,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         // setting register by Id and unset contactId.
         if (empty($value['is_primary'])) {
           $contactID = NULL;
-          $registerByID = $this->get('registerByID');
+          $registerByID = $this->getPrimaryParticipantID();
           if ($registerByID) {
             $value['registered_by_id'] = $registerByID;
           }
@@ -2078,10 +2076,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $isTest = TRUE;
     }
 
-    //handle if no additional participant.
-    if (!$registerByID) {
-      $registerByID = $this->get('registerByID');
-    }
+    $registerByID = $this->getPrimaryParticipantID();
     $primaryContactId = $this->get('primaryContactId');
 
     //build an array of custom profile and assigning it to template.
