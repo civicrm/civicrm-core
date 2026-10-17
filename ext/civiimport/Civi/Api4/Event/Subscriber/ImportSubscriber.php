@@ -186,6 +186,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
   protected function flushEntityMetadata(): void {
     try {
       unset(Civi::$statics['civiimport_tables']);
+      unset(Civi::$statics[\Civi\BAO\Import::class . '::getTableNameForUserJob']);
       Civi::cache('metadata')->delete('api4.entities.info');
       Civi::cache('metadata')->delete('api4.schema.map');
       Civi::cache('metadata')->delete('civiimport_tables');
