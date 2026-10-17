@@ -704,24 +704,15 @@ class CRM_Contact_Page_AJAX {
 
   /**
    * Swap contacts in a dupe pair i.e main with duplicate contact.
-   *
-   * @param int $prevNextId
    */
-  public static function flipDupePairs($prevNextId = NULL) {
-    if (!$prevNextId) {
-      CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-      // @todo figure out if this is always POST & specify that rather than inexact GET
+  public static function flipDupePairs() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
 
-      // We cannot use CRM_Utils_Request::retrieve() because it might be an array.
-      // It later gets validated in escapeAll below.
-      $prevNextId = $_REQUEST['pnid'];
-    }
+    // Could be an int or an array (type:'String' works for both)
+    $pnid = CRM_Utils_Request::retrieve('pnid', 'String', NULL, TRUE);
+    $onlySelected = is_array($pnid);
+    $prevNextId = CRM_Utils_Type::escapeAll((array) $pnid, 'Positive', TRUE);
 
-    $onlySelected = FALSE;
-    if (is_array($prevNextId) && !CRM_Utils_Array::crmIsEmptyArray($prevNextId)) {
-      $onlySelected = TRUE;
-    }
-    $prevNextId = CRM_Utils_Type::escapeAll((array) $prevNextId, 'Positive');
     CRM_Core_BAO_PrevNextCache::flipPair($prevNextId, $onlySelected);
     CRM_Utils_System::civiExit();
   }
