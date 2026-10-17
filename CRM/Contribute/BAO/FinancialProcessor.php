@@ -364,12 +364,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
     // less obviously as it checked a partially populated contribution object.
     $isPayLater = !empty($params['is_pay_later']);
     $isIncompletePending = $this->isPendingTransaction() && !$isPayLater;
-    if (!$isIncompletePending && !$this->isFailedTransaction()) {
-      $skipRecords = TRUE;
+    $isRecordFinancialTrxn = !$isIncompletePending && !$this->isFailedTransaction();
 
-      //build financial transaction params
-
-      if ($this->isUpdate()) {
+    if ($this->isUpdate()) {
+      if ($isRecordFinancialTrxn) {
+        $skipRecords = TRUE;
         $trxnParams = $this->getTrxnParams($params);
         $params['trxnParams'] = $trxnParams;
         $updated = FALSE;
@@ -472,31 +471,47 @@ class CRM_Contribute_BAO_FinancialProcessor {
         }
       }
 
-      else {
+      // Line items are re-saved even when $isRecordFinancialTrxn is false (an
+      // incomplete-pending/failed transaction still needs its line item rows).
+      if (empty($params['skipLineItem'])) {
+        foreach ($this->getUpdatedLineItems() as $line) {
+          $this->createLineItem($line, NULL);
+        }
+      }
+    }
+
+    else {
+      $financialTxnID = NULL;
+      if ($isRecordFinancialTrxn) {
+        $skipRecords = TRUE;
         $trxnParams = $params['trxnParams'] = $this->getTrxnParams($params);
-        // records finanical trxn and entity financial trxn
-        // also make it available as return value
         if ($this->isRecordAccountsReceivable()) {
           $this->recordAlwaysAccountsReceivable($trxnParams);
         }
         $financialTxnID = $this->createFinancialTrxn($trxnParams);
         $params['entity_id'] = $financialTxnID;
       }
-    }
-    // record line items and financial items
-    if (empty($params['skipLineItem'])) {
-      $this->createLineItems($financialTxnID ?? NULL);
-    }
 
-    // create batch entry if batch_id is passed and
-    // ensure no batch entry is been made on 'Pending' or 'Failed' contribution, CRM-16611
-    if (!empty($params['batch_id']) && !empty($financialTxnID)) {
-      $entityParams = [
-        'batch_id' => $params['batch_id'],
-        'entity_table' => 'civicrm_financial_trxn',
-        'entity_id' => $financialTxnID,
-      ];
-      CRM_Batch_BAO_EntityBatch::create($entityParams);
+      // Line items & financial items are created even when $isRecordFinancialTrxn
+      // is false (an incomplete-pending/failed transaction still needs its line
+      // item rows, just with no financial trxn to link them to).
+      if (empty($params['skipLineItem'])) {
+        foreach ($this->getUpdatedLineItems() as $line) {
+          $this->createLineItem($line, $financialTxnID);
+        }
+        $this->createDeferredTrxn();
+      }
+
+      // create batch entry if batch_id is passed and
+      // ensure no batch entry is been made on 'Pending' or 'Failed' contribution, CRM-16611
+      if (!empty($params['batch_id']) && !empty($financialTxnID)) {
+        $entityParams = [
+          'batch_id' => $params['batch_id'],
+          'entity_table' => 'civicrm_financial_trxn',
+          'entity_id' => $financialTxnID,
+        ];
+        CRM_Batch_BAO_EntityBatch::create($entityParams);
+      }
     }
 
     // when a fee is charged
@@ -1106,26 +1121,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
         // it is long-time broken & evidence of long-disuse.
         civicrm_api3('EntityFinancialTrxn', 'create', $entityParams);
       }
-    }
-  }
-
-  /**
-   * Process price set and line items.
-   *
-   * Reads the line items from the constructor's $updatedLineItems.
-   *
-   * @internal
-   *
-   * @param int|null $financialTrxnID
-   *
-   * @throws \CRM_Core_Exception
-   */
-  private function createLineItems(?int $financialTrxnID = NULL) {
-    foreach ($this->getUpdatedLineItems() as $line) {
-      $this->createLineItem($line, $financialTrxnID);
-    }
-    if (!$this->isUpdate()) {
-      $this->createDeferredTrxn();
     }
   }
 
