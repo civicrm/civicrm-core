@@ -569,13 +569,15 @@ class CRM_Extension_Mapper {
    *
    * @param CRM_Extension_Info $remoteExtensionInfo
    * @param array $localExtensionInfo
-   * @param bool $extensionDirectoryWritable
+   * @param bool $canDownload
+   *   Whether the system is currently able to download and install the upgrade
+   *   (e.g. the extension directory is writable and downloads are not disabled).
    *
    * @return string
    */
-  public function getUpgradeLink($remoteExtensionInfo, $localExtensionInfo, $extensionDirectoryWritable) {
+  public function getUpgradeLink($remoteExtensionInfo, $localExtensionInfo, $canDownload) {
     if (!empty($remoteExtensionInfo) && version_compare($localExtensionInfo['version'] ?? '', $remoteExtensionInfo->version, '<')) {
-      if ($extensionDirectoryWritable) {
+      if ($canDownload) {
         return ts('Version %1 is installed. <a %2>Upgrade to version %3</a>.', [
           1 => $localExtensionInfo['version'],
           2 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', "action=update&id={$localExtensionInfo['key']}&key={$localExtensionInfo['key']}") . '"',
