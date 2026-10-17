@@ -319,6 +319,28 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   /**
+   * @param string $createStyle
+   *   'sql-insert'|'bao-create'.
+   * @param string $commitStyle
+   *   'implicit-commit'|'explicit-commit'.
+   * @dataProvider dataCreateAndCommitStyles
+   */
+  public function testRun_error($createStyle, $commitStyle): void {
+    try {
+      CRM_Core_Transaction::create(TRUE)->run(function ($tx) use ($createStyle, $commitStyle) {
+        $this->createContactWithTransaction('nest-tx', $createStyle, $commitStyle);
+        $this->assertContactsExistByOffset([0 => TRUE]);
+        throw new TypeError('Ruh-roh');
+      });
+      $this->fail('The error should reach the caller');
+    }
+    catch (TypeError $e) {
+      $this->assertEquals('Ruh-roh', $e->getMessage());
+    }
+    $this->assertContactsExistByOffset([0 => FALSE]);
+  }
+
+  /**
    * @param $cids
    * @param bool $exist
    */

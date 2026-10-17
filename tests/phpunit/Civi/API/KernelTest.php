@@ -95,6 +95,27 @@ class KernelTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $result['is_error']);
   }
 
+  public function testErrorException(): void {
+    $exceptions = [];
+    $this->dispatcher->addListener('civi.api.exception', function (\Civi\API\Event\ExceptionEvent $event) use (&$exceptions) {
+      $exceptions[] = $event->getException();
+    });
+
+    $this->kernel->registerApiProvider($this->createWidgetFrobnicateProvider());
+    try {
+      $this->kernel->runSafe('Widget', 'frobnicate', [
+        'version' => self::MOCK_VERSION,
+        'error' => 'Frobnication encountered an error',
+      ]);
+      $this->fail('The error should reach the caller');
+    }
+    catch (\TypeError $e) {
+    }
+
+    $this->assertEquals('civi.api.exception', end($this->actualEventSequence)['name']);
+    $this->assertSame([$e], $exceptions);
+  }
+
   // TODO testAuthorizeException, testPrepareException, testRespondException
 
   /**
@@ -107,6 +128,9 @@ class KernelTest extends \CiviUnitTestCase {
     $provider->addAction('frobnicate', 'access CiviCRM', function ($apiRequest) {
       if (!empty($apiRequest['params']['exception'])) {
         throw new \Exception($apiRequest['params']['exception']);
+      }
+      if (!empty($apiRequest['params']['error'])) {
+        throw new \TypeError($apiRequest['params']['error']);
       }
       return civicrm_api3_create_success([98 => 'frob']);
     });
