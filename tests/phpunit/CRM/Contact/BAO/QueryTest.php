@@ -1002,7 +1002,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'delete', ['id' => $contactID_a, 'skip_undelete' => 1]);
     $this->callAPISuccess('Contact', 'delete', ['id' => $contactID_b, 'skip_undelete' => 1]);
     $this->callAPISuccess('CustomField', 'delete', ['id' => $customFieldId, 'skip_undelete' => 1]);
-    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $customGroup]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $customGroup['id']]);
   }
 
   /**

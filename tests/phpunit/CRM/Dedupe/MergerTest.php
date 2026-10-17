@@ -311,11 +311,11 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       return $a;
     };
 
-    $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'Contacts');
+    $customGroupID = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'Contacts')['custom_group_id'];
 
     // These are deliberately unset.
     $unsetRefs = array_fill_keys(['civicrm_group_contact_cache', 'civicrm_acl_cache', 'civicrm_acl_contact_cache'], 1);
-    $this->assertEquals($sortRefs(array_diff_key($this->getStaticCIDRefs(), $unsetRefs)), $sortRefs(CRM_Dedupe_Merger::cidRefs()));
+    $this->assertEquals($sortRefs(array_diff_key($this->getStaticCIDRefs($customGroupID), $unsetRefs)), $sortRefs(CRM_Dedupe_Merger::cidRefs()));
     $this->assertEquals($sortRefs(array_diff_key($this->getCalculatedCIDRefs(), $unsetRefs)), $sortRefs(CRM_Dedupe_Merger::cidRefs()));
   }
 
@@ -1447,8 +1447,10 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * There is also a check against an automated list but having both seems to
    * add extra stability to me. They do not change often.
+   *
+   * @param int $customGroupID
    */
-  public function getStaticCIDRefs() {
+  public function getStaticCIDRefs(int $customGroupID) {
     return [
       'civicrm_acl_cache' => [
         0 => 'contact_id',
@@ -1633,7 +1635,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_user_job' => [
         0 => 'created_id',
       ],
-      'civicrm_value_testgetcidref_1' => [
+      'civicrm_value_testgetcidref_' . $customGroupID => [
         0 => 'entity_id',
       ],
       'civicrm_website' => [
