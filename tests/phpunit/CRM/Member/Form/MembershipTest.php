@@ -869,8 +869,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testFinancialEntriesOnCancelledContribution(): void {
-    // @todo figure out why financial validation fails with this test.
-    $this->isValidateFinancialsOnPostAssert = FALSE;
     // Create two memberships for individual $this->ids['Contact']['individual_0'], via a price set in the back end.
     $this->createTwoMembershipsViaPriceSetInBackEnd($this->ids['Contact']['individual_0']);
 
