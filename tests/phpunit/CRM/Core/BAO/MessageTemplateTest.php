@@ -91,6 +91,116 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
   }
 
   /**
+   * The `case_activity` WorkflowMessage class declares both `caseId` and
+   * `activityId` as `@scope tokenContext`, plus the inherited `contactId`.
+   */
+  public function testGetWorkflowTokenSchemaCaseActivity(): void {
+    $schema = CRM_Core_BAO_MessageTemplate::getWorkflowTokenSchema('case_activity');
+    sort($schema);
+    $this->assertEquals(['activityId', 'caseId', 'contactId'], $schema);
+  }
+
+  /**
+   * `participant_confirm` pulls in `CRM_Event_WorkflowMessage_ParticipantTrait`,
+   * which declares `participantId`/`eventId` and, in turn, uses
+   * `ContributionTrait` (paid events involve a Contribution too).
+   */
+  public function testGetWorkflowTokenSchemaParticipantConfirm(): void {
+    $schema = CRM_Core_BAO_MessageTemplate::getWorkflowTokenSchema('participant_confirm');
+    $this->assertContains('contactId', $schema);
+    $this->assertContains('eventId', $schema);
+    $this->assertContains('participantId', $schema);
+    $this->assertContains('contributionId', $schema);
+  }
+
+  public function testGetWorkflowTokenSchemaContributionOnlineReceipt(): void {
+    $schema = CRM_Core_BAO_MessageTemplate::getWorkflowTokenSchema('contribution_online_receipt');
+    $this->assertContains('contactId', $schema);
+    $this->assertContains('contributionId', $schema);
+  }
+
+  /**
+   * An unrecognised workflow name resolves to `GenericWorkflowMessage`, which
+   * only declares `contactId` as `tokenContext` scope.
+   */
+  public function testGetWorkflowTokenSchemaUnknownWorkflowFallsBackToGeneric(): void {
+    $schema = CRM_Core_BAO_MessageTemplate::getWorkflowTokenSchema('not_a_real_workflow_xyz');
+    $this->assertEquals(['contactId'], $schema);
+  }
+
+  public function testGetWorkflowTokenSchemaNullWorkflowIsEmpty(): void {
+    $this->assertEquals([], CRM_Core_BAO_MessageTemplate::getWorkflowTokenSchema(NULL));
+  }
+
+  /**
+   * Covers the fallback order `resolveTokenSchema()` promises: an explicit
+   * stored `usage` beats the workflow-derived default, which beats the
+   * minimal `['contactId']` fallback -- and `$extraSchema` is always
+   * merged in on top regardless of which of those applied.
+   */
+  public function testResolveTokenSchemaPrecedence(): void {
+    // Explicit stored usage wins, even with a workflow_name present.
+    $schema = CRM_Core_BAO_MessageTemplate::resolveTokenSchema(['usage' => ['Case'], 'workflow_name' => 'participant_confirm']);
+    $this->assertEquals(['caseId'], $schema);
+
+    // No stored usage -> falls back to the workflow-derived schema.
+    $schema = CRM_Core_BAO_MessageTemplate::resolveTokenSchema(['usage' => NULL, 'workflow_name' => 'case_activity']);
+    sort($schema);
+    $this->assertEquals(['activityId', 'caseId', 'contactId'], $schema);
+
+    // No usage, no workflow -> minimal fallback.
+    $schema = CRM_Core_BAO_MessageTemplate::resolveTokenSchema(['usage' => NULL, 'workflow_name' => NULL]);
+    $this->assertEquals(['contactId'], $schema);
+
+    // extraSchema is always merged in on top.
+    $schema = CRM_Core_BAO_MessageTemplate::resolveTokenSchema(['usage' => ['Case'], 'workflow_name' => NULL], NULL, ['activityId']);
+    sort($schema);
+    $this->assertEquals(['activityId', 'caseId'], $schema);
+  }
+
+  /**
+   * @throws \CRM_Core_Exception
+   */
+  public function testResolveTokenSchemaById(): void {
+    $templateID = MessageTemplate::create(FALSE)->setValues([
+      'msg_html' => '<p>Schema by id</p>',
+      'workflow_name' => 'participant_confirm',
+      'usage' => ['Contribution'],
+      'is_active' => TRUE,
+    ])->execute()->first()['id'];
+
+    // The saved template's own usage wins over its own workflow_name.
+    $schema = CRM_Core_BAO_MessageTemplate::resolveTokenSchema($templateID);
+    $this->assertEquals(['contributionId'], $schema);
+  }
+
+  /**
+   * The editors pass an unsaved Usage selection, which replaces the stored one; an empty selection falls back to the workflow, then contact tokens.
+   */
+  public function testGetTokenSchemaWithUnsavedUsage(): void {
+    $templateID = MessageTemplate::create(FALSE)->setValues([
+      'msg_html' => '<p>Unsaved usage</p>',
+      'workflow_name' => 'participant_confirm',
+      'usage' => ['Contribution'],
+      'is_active' => TRUE,
+    ])->execute()->first()['id'];
+
+    $schema = MessageTemplate::getTokenSchema(FALSE)->setId($templateID)->setUsage(['Case', 'Contact'])->execute()->first()['schema'];
+    $this->assertEquals(['caseId', 'contactId'], $schema);
+
+    $schema = MessageTemplate::getTokenSchema(FALSE)->setId($templateID)->setUsage([])->execute()->first()['schema'];
+    $this->assertEqualsCanonicalizing(CRM_Core_BAO_MessageTemplate::getWorkflowTokenSchema('participant_confirm'), $schema);
+
+    $schema = MessageTemplate::getTokenSchema(FALSE)->setUsage([])->execute()->first()['schema'];
+    $this->assertEquals(['contactId'], $schema);
+  }
+
+  public function testConvertEntityToSchemaKey(): void {
+    $this->assertEquals('caseId', CRM_Core_BAO_MessageTemplate::convertEntityToSchemaKey('Case'));
+    $this->assertEquals('contribution_productId', CRM_Core_BAO_MessageTemplate::convertEntityToSchemaKey('ContributionProduct'));
+  }
+
+  /**
    * Data provider for locale configurations to test.
    *
    * @return array
