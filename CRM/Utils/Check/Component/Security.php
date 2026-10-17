@@ -234,7 +234,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     if (!$found) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
-        ts('The system requires a cryptographic signing key. Please configure <a %1>CIVICRM_SIGN_KEYS</a>. ',
+        ts('The system requires a cryptographic signing key. Please configure <a %1>CIVICRM_SIGN_KEYS</a>.',
           [1 => 'href="https://docs.civicrm.org/sysadmin/en/latest/setup/secret-keys/" target="_blank"']
         ),
         ts('Signing Key Required'),
