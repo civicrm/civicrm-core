@@ -363,21 +363,28 @@ FROM civicrm_action_schedule cas
           $dao = $tokenRow->context['actionSearchResult'];
           $errors = [];
 
-          // It's possible, eg, that sendReminderEmail fires Hook::alterMailParams() and that some listener use ts().
-          $swapLocale = empty($tokenRow->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($tokenRow->context['locale']);
+          try {
+            // It's possible, eg, that sendReminderEmail fires Hook::alterMailParams() and that some listener use ts().
+            $swapLocale = empty($tokenRow->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($tokenRow->context['locale']);
 
-          // FIXME: This can't be right: "If mode is User Preference, send sms unconditionally without checking user preference"!
-          if ($actionSchedule->mode === 'SMS' || $actionSchedule->mode === 'User_Preference') {
-            CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID, $dao->entityID, $alternateRecipients, $bccRecipients));
+            // FIXME: This can't be right: "If mode is User Preference, send sms unconditionally without checking user preference"!
+            if ($actionSchedule->mode === 'SMS' || $actionSchedule->mode === 'User_Preference') {
+              CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID, $dao->entityID, $alternateRecipients, $bccRecipients));
+            }
+            // FIXME: This can't be right: "If mode is User Preference, send email unconditionally without checking user preference"!
+            if ($actionSchedule->mode === 'Email' || $actionSchedule->mode === 'User_Preference') {
+              CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao->contactID, $alternateRecipients, $bccRecipients));
+            }
+            // insert activity log record if needed
+            if ($actionSchedule->record_activity && empty($errors)) {
+              $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
+              CRM_Core_BAO_ActionSchedule::createMailingActivity($tokenRow, $mapping, $dao->contactID, $dao->entityID, $caseID);
+            }
           }
-          // FIXME: This can't be right: "If mode is User Preference, send email unconditionally without checking user preference"!
-          if ($actionSchedule->mode === 'Email' || $actionSchedule->mode === 'User_Preference') {
-            CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao->contactID, $alternateRecipients, $bccRecipients));
-          }
-          // insert activity log record if needed
-          if ($actionSchedule->record_activity && empty($errors)) {
-            $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
-            CRM_Core_BAO_ActionSchedule::createMailingActivity($tokenRow, $mapping, $dao->contactID, $dao->entityID, $caseID);
+          catch (Throwable $e) {
+            // A failing recipient is logged like any other send error, so it is not retried forever.
+            \Civi::log()->error('Error sending scheduled reminder (ActionScheduleID: ' . $actionSchedule->id . ', ActionLogID: ' . $dao->reminderID . '): ' . $e->getMessage());
+            $errors['exception'] = $e->getMessage();
           }
 
           unset($swapLocale);
@@ -678,7 +685,7 @@ FROM civicrm_action_schedule cas
           $entityID
         );
       }
-      catch (CRM_Core_Exception $e) {
+      catch (Throwable $e) {
         $errors[] = $e->getMessage();
       }
     }

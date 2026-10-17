@@ -1885,6 +1885,32 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
+   * A recipient whose reminder throws is logged as failed and does not block the others.
+   */
+  public function testReminderErrorDoesNotBlockOtherRecipients(): void {
+    $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_birthdate']);
+    $this->callAPISuccess('Contact', 'create', ['email' => 'test-birth_day2@example.com'] + $this->fixtures['contact_birthdate']);
+    $this->createScheduleFromFixtures('sched_contact_birth_day_yesterday');
+    $this->hookClass->setHook('civicrm_alterMailParams', function ($params) {
+      if (($params['toEmail'] ?? NULL) === 'test-birth_day@example.com') {
+        throw new TypeError('Ruh-roh');
+      }
+    });
+    $this->assertCronRuns([
+      [
+        'time' => '2005-07-08 20:00:00',
+        'recipients' => [['test-birth_day2@example.com']],
+      ],
+      [
+        // The failed reminder is not retried.
+        'time' => '2005-07-09 20:00:00',
+        'recipients' => [],
+      ],
+    ]);
+    $this->assertDBQuery(1, "SELECT COUNT(*) FROM civicrm_action_log WHERE is_error = 1 AND action_date_time IS NOT NULL AND message = 'Ruh-roh'");
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    */
   public function testContactBirthDateAnniversary(): void {

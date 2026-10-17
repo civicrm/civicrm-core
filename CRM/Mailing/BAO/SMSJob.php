@@ -194,7 +194,7 @@ class CRM_Mailing_BAO_SMSJob extends CRM_Mailing_BAO_MailingJob {
           }
         }
       }
-      catch (CRM_Core_Exception $e) {
+      catch (Throwable $e) {
         // Handle SMS errors: CRM-15426
         $job_id = (int) $this->id;
         $mailing_id = (int) $mailing->id;
