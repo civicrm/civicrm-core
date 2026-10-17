@@ -1,5 +1,8 @@
 <?php
 
+use Civi\Api4\Contribution;
+use Civi\Api4\Participant;
+
 /**
  *  Test CRM_Event_Form_Registration functions.
  *
@@ -8,6 +11,11 @@
  */
 class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
   use CRMTraits_Financial_OrderTrait;
+
+  protected function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
 
   /**
    * Test the the submit function on the event participant submit function.
@@ -28,26 +36,69 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the the submit function on the event participant submit function.
-   *
-   * Test is to establish existing behaviour prior to code cleanup. It turns
-   * out the existing code ONLY cancels the contribution as well as the
-   * participant record if is_pay_later is true AND the source is 'Online Event
-   * Registration'.
+   * Cancelling a pay-later online registration cancels its pending contribution.
    *
    * @throws \CRM_Core_Exception
    */
   public function testSubmitCancel(): void {
-    $this->createEventOrder(['source' => 'Online Event Registration', 'is_pay_later' => 1]);
-    $participantCancelledStatusID = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Cancelled');
+    $this->createPayLaterRegistration('Online Event Registration: Annual CiviCRM meet', 'Pending from pay later');
+    $this->submitParticipantStatus('Cancelled');
+    $this->assertContributionStatus('Cancelled');
+  }
 
+  /**
+   * Registering the participant does not mark the pay-later contribution as paid.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitRegisteredKeepsContributionPending(): void {
+    $this->createPayLaterRegistration('Online Event Registration: Annual CiviCRM meet', 'Pending from pay later');
+    $this->submitParticipantStatus('Registered');
+    $this->assertContributionStatus('Pending');
+  }
+
+  /**
+   * Create a pending pay-later event order with the given source and participant status.
+   *
+   * @param string $source
+   * @param string $participantStatus
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function createPayLaterRegistration(string $source, string $participantStatus): void {
+    $this->createEventOrder(['source' => $source, 'is_pay_later' => 1]);
+    Participant::update(FALSE)
+      ->addWhere('id', '=', $this->ids['Participant'][0])
+      ->addValue('status_id:name', $participantStatus)
+      ->execute();
+  }
+
+  /**
+   * Submit the batch update form with a new status for the participant.
+   *
+   * @param string $status
+   */
+  private function submitParticipantStatus(string $status): void {
+    $statusID = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', $status);
     /** @var CRM_Event_Form_Task_Batch $form */
     $form = $this->getFormObject('CRM_Event_Form_Task_Batch');
-    $form->submit(['field' => [$this->ids['Participant'][0] => ['participant_status' => $participantCancelledStatusID]]]);
+    $form->submit(['field' => [$this->ids['Participant'][0] => ['participant_status' => $statusID]]]);
+    $this->assertEquals($status, Participant::get(FALSE)
+      ->addWhere('id', '=', $this->ids['Participant'][0])
+      ->addSelect('status_id:name')
+      ->execute()->single()['status_id:name']);
+  }
 
-    $participant = $this->callAPISuccessGetSingle('Participant', ['id' => $this->ids['Participant'][0]]);
-    $this->assertEquals($participantCancelledStatusID, $participant['participant_status_id']);
-    $this->callAPISuccessGetSingle('Contribution', ['id' => $this->ids['Contribution'][0], 'contribution_status_id' => 'Cancelled']);
+  /**
+   * @param string $status
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function assertContributionStatus(string $status): void {
+    $this->assertEquals($status, Contribution::get(FALSE)
+      ->addWhere('id', '=', $this->ids['Contribution'][0])
+      ->addSelect('contribution_status_id:name')
+      ->execute()->single()['contribution_status_id:name']);
   }
 
 }
