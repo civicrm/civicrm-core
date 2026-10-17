@@ -303,6 +303,7 @@
           }
         });
         delete params.scheduled_date;
+        delete params.scheduled_id;
         delete params.recipients; // the content was merged in
         return crmQueue(crmApi)('Mailing', 'create', params).then(function (recipResult) {
           // changes rolled back, so we don't care about updating mailing
@@ -335,6 +336,7 @@
             });
           }
           delete params.scheduled_date;
+          delete params.scheduled_id;
           delete params.recipients; // the content was merged in
           recipientCount = crmQueue(crmApi)('Mailing', 'create', params).then(function (recipResult) {
             // changes rolled back, so we don't care about updating mailing
@@ -366,7 +368,10 @@
         // WORKAROUND: Mailing.create (aka CRM_Mailing_BAO_Mailing::create()) interprets scheduled_date
         // as an *intent* to schedule and creates tertiary records. Saving a draft with a scheduled_date
         // is therefore not allowed. Remove this after fixing Mailing.create's contract.
+        // Also delete scheduled_id to prevent writeRecord from nullifying
+        // scheduled_date in the database when it processes the orphaned field.
         delete params.scheduled_date;
+        delete params.scheduled_id;
 
         delete params.jobs;
 
@@ -419,7 +424,10 @@
         // WORKAROUND: Mailing.create (aka CRM_Mailing_BAO_Mailing::create()) interprets scheduled_date
         // as an *intent* to schedule and creates tertiary records. Saving a draft with a scheduled_date
         // is therefore not allowed. Remove this after fixing Mailing.create's contract.
+        // Also delete scheduled_id to prevent writeRecord from nullifying
+        // scheduled_date in the database when it processes the orphaned field.
         delete params.scheduled_date;
+        delete params.scheduled_id;
 
         delete params.jobs;
 
