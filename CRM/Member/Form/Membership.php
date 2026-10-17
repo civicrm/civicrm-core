@@ -969,16 +969,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $params['id'] = $this->_id;
     }
 
-    // Set variables that we normally get from context.
-    // In form mode these are set in preProcess.
-    //TODO: set memberships, fixme
-    $this->setContextVariables($formValues);
     $originalMembershipType = $this->getMembershipValue('membership_type_id');
     $lineItem = [$this->getOrder()->getPriceSetID() => $this->getOrder()->getLineItems()];
 
     $params['tax_amount'] = $this->order->getTotalTaxAmount();
     $params['total_amount'] = $this->order->getTotalAmount();
-    $params['contact_id'] = $this->_contactID;
+    $params['contact_id'] = $this->getContactID();
 
     $params = array_merge($params, $this->getFormMembershipParams());
     $membershipTypeValues = $this->getMembershipParameters();
