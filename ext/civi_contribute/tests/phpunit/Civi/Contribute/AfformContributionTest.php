@@ -238,47 +238,41 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
     $this->assertEquals($participantId, $participantLineItem['entity_id']);
   }
 
-  /**
-   * @throws \CRM_Core_Exception
-   */
   public function testValidateLineItems(): void {
-    try {
-      $response = Afform::submit(FALSE)
-        ->setName('testAfformContribution')
-        ->setValues([
-          'Individual1' => [
-            [
-              'fields' => [
-                'first_name' => 'Test',
-                'last_name' => 'Contact',
-              ],
+    $response = Afform::submit(FALSE)
+      ->setName('testAfformContribution')
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => [
+              'first_name' => 'Test',
+              'last_name' => 'Contact',
             ],
           ],
-          'Participant1' => [
-            [
-              'fields' => [
-                'event_id' => $this->eventId,
-                // 'participant_fields.ticket_option' => $this->inPersonPriceFieldValueId,
-              ],
+        ],
+        'Participant1' => [
+          [
+            'fields' => [
+              'event_id' => $this->eventId,
+              // 'participant_fields.ticket_option' => $this->inPersonPriceFieldValueId,
             ],
           ],
-          'Contribution1' => [
-            [
-              'fields' => [
-                'source' => 'testContributionCreate',
-                // 'donation_options.additional_donation' => 5,
-              ],
+        ],
+        'Contribution1' => [
+          [
+            'fields' => [
+              'source' => 'testContributionCreate',
+              // 'donation_options.additional_donation' => 5,
             ],
           ],
-        ])
-        ->execute();
+        ],
+      ])
+      ->execute();
 
-      $this->fail('Afform::submit should have failed');
-    }
-    catch (\CRM_Core_Exception $e) {
-      $this->assertEquals(TRUE, \str_contains($e->getMessage(), 'No line items'));
-    }
-
+    $result = $response->first();
+    $this->assertTrue($result['is_blocking_error'] ?? FALSE);
+    $messages = implode("\n", array_map(fn (\Civi\Api4\Generic\Error $error) => $error->getMessage(), $result['errors']));
+    $this->assertEquals(TRUE, \str_contains($messages, 'No line items'));
   }
 
   public function testEntityDependencyOrdering() {
