@@ -553,24 +553,33 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function reverseLineItemsOnCancellation(int $trxnID): void {
     foreach ($this->getUpdatedLineItems() as $lineItem) {
-      foreach ([FALSE, TRUE] as $isTax) {
-        $previousItem = $this->getExistingFinancialItemForLine($lineItem['id'] ?? NULL, $isTax);
-        if (empty($previousItem) || !$previousItem['amount']) {
-          continue;
-        }
-        $this->createFinancialItem([
-          'transaction_date' => CRM_Utils_Date::isoToMysql($this->getUpdatedContribution()->receive_date),
-          'contact_id' => $this->getUpdatedContribution()->contact_id,
-          'entity_table' => 'civicrm_line_item',
-          'entity_id' => $lineItem['id'],
-          'amount' => -$previousItem['amount'],
-          'financial_account_id' => $previousItem['financial_account_id'],
-          'currency' => $previousItem['currency'],
-          'description' => $previousItem['description'],
-          'status_id' => $previousItem['status_id'],
-        ], $trxnID);
-      }
+      $this->createReversalFinancialItem($lineItem, FALSE, $trxnID);
+      $this->createReversalFinancialItem($lineItem, TRUE, $trxnID);
     }
+  }
+
+  /**
+   * Create the financial item that reverses $lineItem's existing financial
+   * item - the negated amount IS the reversal, taken from the existing item's
+   * own recorded amount/account rather than recalculated from the line item or
+   * current contribution state.
+   */
+  private function createReversalFinancialItem(array $lineItem, bool $isTax, int $trxnID): void {
+    $previousItem = $this->getExistingFinancialItemForLine($lineItem['id'] ?? NULL, $isTax);
+    if (empty($previousItem) || !$previousItem['amount']) {
+      return;
+    }
+    $this->createFinancialItem([
+      'transaction_date' => CRM_Utils_Date::isoToMysql($this->getUpdatedContribution()->receive_date),
+      'contact_id' => $this->getUpdatedContribution()->contact_id,
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => $lineItem['id'],
+      'amount' => -$previousItem['amount'],
+      'financial_account_id' => $this->getFinancialAccountForStatusChangeTrxn($previousItem['financial_account_id']),
+      'currency' => $previousItem['currency'],
+      'description' => $previousItem['description'],
+      'status_id' => $previousItem['status_id'],
+    ], $trxnID);
   }
 
   /**
@@ -982,24 +991,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function reversePriorFinancialTrxn($trxnParams, $context = NULL): void {
     $trxnID = $this->createFinancialTrxn($trxnParams);
-    $lineItems = $this->getUpdatedLineItems();
-    $postUpdateContribution = $this->getUpdatedContribution();
-    foreach ($lineItems as $lineItemDetails) {
-      $prevFinancialItem = $this->getExistingFinancialItemForLine($lineItemDetails['id'], FALSE);
-      $lineFinancialAccount = $this->getFinancialAccountForStatusChangeTrxn($prevFinancialItem['financial_account_id']);
-
-      $itemParams = [
-        'transaction_date' => CRM_Utils_Date::isoToMysql($postUpdateContribution->receive_date),
-        'contact_id' => $postUpdateContribution->contact_id,
-        'currency' => $postUpdateContribution->currency,
-        'amount' => -$this->getOriginalLineItemAmount($lineItemDetails['id'] ?? NULL, 'line_total'),
-        'description' => $prevFinancialItem['description'] ?? NULL,
-        'status_id' => $prevFinancialItem['status_id'],
-        'financial_account_id' => $lineFinancialAccount,
-        'entity_table' => 'civicrm_line_item',
-        'entity_id' => $lineItemDetails['id'],
-      ];
-      $this->createFinancialItem($itemParams, $trxnID);
+    foreach ($this->getUpdatedLineItems() as $lineItemDetails) {
+      $this->createReversalFinancialItem($lineItemDetails, FALSE, $trxnID);
       $this->reverseLineFinancialItem($lineItemDetails, TRUE, $trxnID);
     }
     $this->createDeferredTrxn(TRUE, $context);
@@ -1470,23 +1463,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws CRM_Core_Exception
    */
   private function reverseLineFinancialItem(array $newLineItem, bool $isTax, int $trxnID): void {
-    $previousItem = $this->getExistingFinancialItemForLine($newLineItem['id'], $isTax);
-    $isReversalRequired = $this->isReversalRequired($newLineItem, $isTax);
-    if (!$isReversalRequired) {
+    if (!$this->isReversalRequired($newLineItem, $isTax)) {
       return;
     }
-    $itemParams = [
-      'transaction_date' => CRM_Utils_Date::isoToMysql($this->getUpdatedContribution()->receive_date),
-      'contact_id' => $this->getUpdatedContribution()->contact_id,
-      'entity_table' => 'civicrm_line_item',
-      'entity_id' => $newLineItem['id'],
-      'amount' => -$previousItem['amount'],
-      'financial_account_id' => $previousItem['financial_account_id'],
-      'currency' => $previousItem['currency'],
-      'description' => $previousItem['description'],
-      'status_id' => $previousItem['status_id'],
-    ];
-    $this->createFinancialItem($itemParams, $trxnID);
+    $this->createReversalFinancialItem($newLineItem, $isTax, $trxnID);
   }
 
   /**
