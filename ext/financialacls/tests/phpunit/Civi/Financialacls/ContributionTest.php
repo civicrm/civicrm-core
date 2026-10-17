@@ -10,6 +10,8 @@
  */
 namespace Civi\Financialacls;
 
+use Civi\Api4\Contribution;
+
 require_once 'BaseTestClass.php';
 
 /**
@@ -125,6 +127,27 @@ class ContributionTest extends BaseTestClass {
       'total_amount' => $params['total_amount'],
       'version' => 3,
     ]);
+  }
+
+  /**
+   * A line item type the user may not edit removes the Edit link, and only that link.
+   */
+  public function testLinksForRestrictedLineItemType(): void {
+    $this->createContributionWithTwoLineItems();
+    $this->addFinancialAclPermissions([
+      ['view', 'Donation'],
+      ['edit', 'Donation'],
+      ['delete', 'Donation'],
+      ['view', 'Event Fee'],
+      ['delete', 'Event Fee'],
+    ]);
+    $contribution = Contribution::get(FALSE)->addSelect('id', 'contact_id')->execute()->single();
+    $links = \CRM_Core_Action::formLink(\CRM_Contribute_Selector_Search::links(), NULL,
+      ['id' => $contribution['id'], 'cid' => $contribution['contact_id'], 'cxt' => ''],
+      'more', FALSE, 'contribution.selector.row', 'Contribution', $contribution['id']);
+    $this->assertStringContainsString("title='View Contribution'", $links);
+    $this->assertStringNotContainsString("title='Edit Contribution'", $links);
+    $this->assertStringContainsString("title='Delete Contribution'", $links);
   }
 
   public function testSuperPermissions(): void {
