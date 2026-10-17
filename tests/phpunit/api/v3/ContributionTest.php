@@ -1362,10 +1362,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'status_id' => 'Chargeback',
       'to_financial_account_id' => 6,
     ]);
-    $this->assertEquals(0.0, (float) $this->callAPISuccessGetValue('Contribution', [
-      'id' => $contribution['id'],
-      'return' => 'paid_amount',
-    ]), 'paid_amount should reflect the chargeback reversal.');
+    $paidAmount = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->addSelect('paid_amount')
+      ->execute()->single()['paid_amount'];
+    $this->assertEquals(0.0, (float) $paidAmount, 'paid_amount should reflect the chargeback reversal.');
   }
 
   /**
