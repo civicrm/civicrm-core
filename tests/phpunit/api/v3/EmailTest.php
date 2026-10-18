@@ -21,6 +21,12 @@ class api_v3_EmailTest extends CiviUnitTestCase {
   protected $_entity;
   protected $_params;
 
+  /**
+   * Contacts the ACL hook grants access to.
+   * @var int[]
+   */
+  public $acledContacts = [];
+
   public function setUp(): void {
     $this->_entity = 'Email';
     parent::setUp();
@@ -538,6 +544,45 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'contact_id' => $userContact,
       'check_permissions' => 1,
     ]);
+  }
+
+  /**
+   * A user may not seize another contact's email by asserting their own
+   * contact_id in an update. Permission is governed by the stored owner.
+   */
+  public function testUpdateCannotSeizeForeignContactEmail(): void {
+    $victim = $this->individualCreate();
+    $attacker = $this->individualCreate();
+    $email = $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $victim,
+      'email' => 'victim@example.org',
+      'location_type_id' => $this->_locationTypeID,
+    ])['id'];
+
+    // User may edit only the attacker contact, not the victim.
+    $this->acledContacts = [$attacker];
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereOnlyAcled']);
+
+    $result = $this->callAPIFailure('Email', 'create', [
+      'id' => $email,
+      'contact_id' => $attacker,
+      'check_permissions' => 1,
+    ]);
+    $this->assertEquals('Permission denied to modify contact record', $result['error_message']);
+
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit all contacts'];
+    $owner = (int) CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_email WHERE id = %1', [1 => [$email, 'Integer']]);
+    $this->assertEquals($victim, $owner, 'Foreign email must not be reassigned.');
+  }
+
+  /**
+   * Restrict contact ACL access to the contacts in $this->acledContacts.
+   *
+   * @implements CRM_Utils_Hook::aclWhereClause
+   */
+  public function aclWhereOnlyAcled(string $type, array &$tables, array &$whereTables, int &$contactID, ?string &$where): void {
+    $where = ' contact_a.id IN (' . (implode(',', $this->acledContacts) ?: '0') . ') ';
   }
 
 }
