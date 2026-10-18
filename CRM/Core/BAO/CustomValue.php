@@ -191,19 +191,30 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO implements \Civi\Core\HookIn
    *   Custom value ID.
    * @param int $customGroupID
    *   Custom group ID.
+   * @param int|null $checkEntityID
+   *   Optional entity ID to ensure the custom value belongs to.
+   *
+   * @throws \CRM_Core_Exception
    */
-  public static function deleteCustomValue($customValueID, $customGroupID) {
+  public static function deleteCustomValue($customValueID, $customGroupID, ?int $checkEntityID = NULL) {
     // first we need to find custom value table, from custom group ID
-    $tableName = CRM_Core_BAO_CustomGroup::getGroup(['id' => $customGroupID])['table_name'];
+    $tableName = CRM_Core_BAO_CustomGroup::getGroup(['id' => $customGroupID])['table_name'] ?? NULL;
+    if (!$tableName) {
+      return;
+    }
 
     // Retrieve the $entityId so we can pass that to the hook.
-    $entityID = (int) CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM {$tableName} WHERE id = %1", [
+    $entityID = (int) CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `{$tableName}` WHERE id = %1", [
       1 => [$customValueID, 'Integer'],
     ]);
 
+    if ($checkEntityID && $entityID !== $checkEntityID) {
+      throw new CRM_Core_Exception('Custom value does not belong to the specified entity.');
+    }
+
     // delete custom value from corresponding custom value table
-    $sql = "DELETE FROM {$tableName} WHERE id = {$customValueID}";
-    CRM_Core_DAO::executeQuery($sql);
+    $sql = "DELETE FROM `{$tableName}` WHERE id = %1";
+    CRM_Core_DAO::executeQuery($sql, [1 => [$customValueID, 'Integer']]);
 
     CRM_Utils_Hook::custom('delete',
       (int) $customGroupID,
