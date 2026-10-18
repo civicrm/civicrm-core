@@ -3,7 +3,7 @@
 class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_campaign']);
+    $this->quickCleanup(['civicrm_campaign', 'civicrm_campaign_group', 'civicrm_group']);
     parent::tearDown();
   }
 
@@ -42,6 +42,25 @@ class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
     $result = CRM_Campaign_Form_Campaign::Submit($values, $form);
     $campaign = $this->callAPISuccess('campaign', 'get', ['id' => $result['id']]);
     $this->assertEquals('10000.00', $campaign['values'][$campaign['id']]['goal_revenue']);
+  }
+
+  /**
+   * Adding a campaign must not remove the groups of existing campaigns.
+   */
+  public function testSubmitAddKeepsGroupsOfOtherCampaigns(): void {
+    $this->createLoggedInUser();
+    $values = $this->getCorrectFormFields(',');
+    $values['includeGroups'] = [$this->groupCreate()];
+    $existing = CRM_Campaign_Form_Campaign::submit($values, new CRM_Campaign_Form_Campaign());
+
+    $values['title'] = 'Second Campaign';
+    $values['includeGroups'] = [];
+    CRM_Campaign_Form_Campaign::submit($values, new CRM_Campaign_Form_Campaign());
+
+    $this->assertEquals(1, CRM_Core_DAO::singleValueQuery(
+      'SELECT COUNT(*) FROM civicrm_campaign_group WHERE campaign_id = %1',
+      [1 => [$existing['id'], 'Positive']]
+    ));
   }
 
   /**

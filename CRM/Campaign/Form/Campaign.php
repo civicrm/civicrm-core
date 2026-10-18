@@ -365,13 +365,14 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $params['groups'] = $groups;
 
     // delete previous includes/excludes, if campaign already existed
-    $groupTableName = CRM_Contact_BAO_Group::getTableName();
-    $dao = new CRM_Campaign_DAO_CampaignGroup();
-    $dao->campaign_id = $form->_campaignId;
-    $dao->entity_table = $groupTableName;
-    $dao->find();
-    while ($dao->fetch()) {
-      $dao->delete();
+    if ($form->_campaignId) {
+      $dao = new CRM_Campaign_DAO_CampaignGroup();
+      $dao->campaign_id = $form->_campaignId;
+      $dao->entity_table = CRM_Contact_BAO_Group::getTableName();
+      $dao->find();
+      while ($dao->fetch()) {
+        $dao->delete();
+      }
     }
 
     //process custom data.
