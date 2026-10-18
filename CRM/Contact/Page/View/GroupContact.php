@@ -114,8 +114,11 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
     $this->assign('displayName', $displayName);
 
     if ($this->_action == CRM_Core_Action::DELETE) {
-      $groupContactId = CRM_Utils_Request::retrieve('gcid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE);
-      $status = CRM_Utils_Request::retrieve('st', 'String', CRM_Core_DAO::$_nullObject, TRUE);
+      if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
+        CRM_Utils_System::permissionDenied();
+      }
+      $groupContactId = CRM_Utils_Request::retrieve('gcid', 'Positive', NULL, TRUE);
+      $status = CRM_Utils_Request::retrieve('st', 'String', NULL, TRUE);
       if (is_numeric($groupContactId) && $status) {
         $this->del($groupContactId, $status, $this->_contactId);
       }
@@ -123,7 +126,11 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
       CRM_Utils_System::redirect($session->popUserContext());
     }
 
-    $this->edit(NULL, CRM_Core_Action::ADD);
+    $editPermission = CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT);
+    $this->assign('editPermission', $editPermission);
+    if ($editPermission) {
+      $this->edit(NULL, CRM_Core_Action::ADD);
+    }
     $this->browse();
     return parent::run();
   }
@@ -142,7 +149,29 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
    * @return bool
    */
   public static function del($groupContactId, $status, $contactID) {
-    $groupId = CRM_Contact_BAO_GroupContact::getGroupId($groupContactId);
+    $groupContact = new CRM_Contact_DAO_GroupContact();
+    $groupContact->id = $groupContactId;
+    if (!$groupContact->find(TRUE) || (int) $groupContact->contact_id !== (int) $contactID) {
+      CRM_Utils_System::permissionDenied();
+    }
+    $groupId = $groupContact->group_id;
+
+    $session = CRM_Core_Session::singleton();
+    $userID = $session->get('userID');
+
+    if ($userID == $contactID) {
+      $method = 'Web';
+      $visibility = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $groupId, 'visibility');
+      if ($visibility !== 'Public Pages' && !CRM_Core_Permission::check('edit all contacts')) {
+        CRM_Utils_System::permissionDenied();
+      }
+    }
+    else {
+      $method = 'Admin';
+      if (!CRM_Contact_BAO_Contact_Permission::allow($contactID, CRM_Core_Permission::EDIT)) {
+        CRM_Utils_System::permissionDenied();
+      }
+    }
 
     switch ($status) {
       case 'i':
@@ -169,15 +198,6 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
     }
 
     $ids = [$contactID];
-    $method = 'Admin';
-
-    $session = CRM_Core_Session::singleton();
-    $userID = $session->get('userID');
-
-    if ($userID == $contactID) {
-      $method = 'Web';
-    }
-
     CRM_Contact_BAO_GroupContact::removeContactsFromGroup($ids, $groupId, $method, $groupStatus);
   }
 

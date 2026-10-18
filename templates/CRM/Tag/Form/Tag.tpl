@@ -14,6 +14,7 @@
   (function($, _){{/literal}
     var entityID={$entityID},
       entityTable='{$entityTable}',
+      readOnly={if $readOnly}true{else}false{/if},
       $form = $('form.{$form.formClass}');
     {literal}
 
@@ -42,8 +43,8 @@
 
       // Load js tree.
       CRM.loadScript(CRM.config.resourceBase + 'bower_components/jstree/dist/jstree.min.js').done(function() {
-        $("#tagtree").jstree({
-          plugins : ['search', 'wholerow', 'checkbox'],
+        var jstreeConfig = {
+          plugins : readOnly ? ['search', 'wholerow'] : ['search', 'wholerow', 'checkbox'],
           core: {
             animation: 100,
             themes: {
@@ -59,13 +60,16 @@
           checkbox: {
             three_state: false
           }
-        })
-          .on('select_node.jstree deselect_node.jstree', function(e, selected) {
+        };
+        var tree = $("#tagtree").jstree(jstreeConfig);
+        if (!readOnly) {
+          tree.on('select_node.jstree deselect_node.jstree', function(e, selected) {
             var id = selected.node.a_attr.id.replace('tag_', ''),
               op = e.type === 'select_node' ? 'create' : 'delete';
             CRM.api3('entity_tag', op, {entity_table: entityTable, entity_id: entityID, tag_id: id}, true);
             updateContactSummaryTags();
           });
+        }
       });
 
       $(document).on('change', 'input.crm-contact-tagset', updateContactSummaryTags);
