@@ -1568,7 +1568,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
         }
         elseif (substr($key, 0, 15) === 'move_rel_table_' and $value == '0') {
-          $removeTables = array_merge($moveTables, $relTables[substr($key, 5)]['tables']);
+          $removeTables = array_merge($removeTables, $relTables[substr($key, 5)]['tables']);
         }
       }
       $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainId, (int) $otherId);

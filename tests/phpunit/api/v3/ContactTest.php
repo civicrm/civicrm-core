@@ -1873,10 +1873,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * CRM-20421: This test make sure that inherited memberships are deleted upon merging organization.
    *
+   * @dataProvider mergeWithoutMemberships
+   *
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function testMergeOrganizations(): void {
+  public function testMergeOrganizations(array $relTables): void {
     $organizationID1 = $this->organizationCreate();
     $organizationID2 = $this->organizationCreate([], 1);
     $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, [
@@ -1898,9 +1900,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $this->assertEquals($ownerMembershipID, $contactMembership['owner_membership_id'], 'Contact membership must be inherited from Organization');
 
-    CRM_Dedupe_Merger::moveAllBelongings($organizationID2, $organizationID1, [
-      'move_rel_table_memberships' => '0',
-      'move_rel_table_relationships' => '1',
+    CRM_Dedupe_Merger::moveAllBelongings($organizationID2, $organizationID1, $relTables + [
       'main_details' => [
         'contact_id' => $organizationID2,
         'contact_type' => 'Organization',
@@ -1916,6 +1916,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
 
     $this->assertEquals(0, $contactMembership['count'], 'Contact membership must be deleted after merging organization without memberships.');
+  }
+
+  public static function mergeWithoutMemberships(): array {
+    return [
+      'memberships not moved' => [['move_rel_table_memberships' => '0', 'move_rel_table_relationships' => '1']],
+      'another table not moved after memberships' => [['move_rel_table_memberships' => '0', 'move_rel_table_relationships' => '1', 'move_rel_table_activities' => '0']],
+    ];
   }
 
   /**
