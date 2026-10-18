@@ -1089,48 +1089,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
 
-      if ($paymentStatus !== 'Completed') {
-        $params['status_id'] = $pendingMembershipStatusId;
-        $params['skipStatusCal'] = TRUE;
-        // as membership is pending set dates to null.
-        foreach (array_keys($this->getOrder()->getMembershipTypes()) as $memType) {
-          $membershipTypeValues[$memType]['joinDate'] = NULL;
-          $membershipTypeValues[$memType]['startDate'] = NULL;
-          $membershipTypeValues[$memType]['endDate'] = NULL;
-        }
-      }
-      $now = CRM_Utils_Time::date('YmdHis');
-      $params['trxn_id'] = $result['trxn_id'] ?? NULL;
-      if ($this->getSubmittedValue('send_receipt') && $paymentStatus === 'Completed') {
-        // @todo this should be updated by the send function once sent rather than
-        // set here.
-        $params['receipt_date'] = $now;
-      }
-
-      // required for creating membership for related contacts
-      $params['action'] = $this->_action;
-
-      // create membership record
-      foreach (array_keys($this->getOrder()->getMembershipTypes()) as $memType) {
-        $membershipParams = array_merge($membershipTypeValues[$memType], $params);
-        if (isset($result['fee_amount'])) {
-          $membershipParams['fee_amount'] = $result['fee_amount'];
-        }
-        // This is required to trigger the recording of the membership contribution in the
-        // CRM_Member_BAO_Membership::Create function.
-        // @todo stop setting this & 'teach' the create function to respond to something
-        // appropriate as part of our 2-step always create the pending contribution & then finally add the payment
-        // process -
-        // @see http://wiki.civicrm.org/confluence/pages/viewpage.action?pageId=261062657#Payments&AccountsRoadmap-Movetowardsalwaysusinga2-steppaymentprocess
-        $membershipParams['contribution_status_id'] = $result['payment_status_id'] ?? NULL;
-        // The earlier process created the line items (although we want to get rid of the earlier one in favour
-        // of a single path!
-        unset($membershipParams['lineItems']);
-        $membershipParams['payment_instrument_id'] = $this->getPaymentInstrumentID();
-        $params['contribution'] = $membershipParams['contribution'] ?? NULL;
-        unset($params['lineItems']);
-      }
-
     }
     else {
       $params['action'] = $this->_action;
