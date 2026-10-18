@@ -153,6 +153,9 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
       }
     }
     else {
+      if (!$editPermission || !CRM_Core_BAO_CustomGroup::checkGroupAccess($this->_groupId, CRM_Core_Permission::EDIT)) {
+        CRM_Utils_System::permissionDenied();
+      }
 
       $controller = new CRM_Core_Controller_Simple('CRM_Contact_Form_CustomData',
         ts('Custom Data'),
