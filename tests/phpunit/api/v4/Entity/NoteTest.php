@@ -228,4 +228,49 @@ class NoteTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame([1, 0, 1, 0, 0, 5, 2, 0, 0, 1, 0], $notes->column('_descendents'));
   }
 
+  /**
+   * Test that private notes cannot be modified or un-privatized by non-authors.
+   */
+  public function testPrivateNoteProtectionsOnUpdate(): void {
+    $author = $this->createTestRecord('Individual');
+    $otherUser = $this->createTestRecord('Individual');
+    $targetContact = $this->createTestRecord('Individual');
+
+    $note = Note::create(FALSE)
+      ->addValue('entity_table', 'civicrm_contact')
+      ->addValue('entity_id', $targetContact['id'])
+      ->addValue('contact_id', $author['id'])
+      ->addValue('privacy', 1)
+      ->addValue('note', 'Secret')
+      ->execute()->first();
+
+    // Log in as otherUser who does not have 'view all notes'
+    \CRM_Core_Session::singleton()->set('userID', $otherUser['id']);
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+
+    try {
+      Note::update()
+        ->setCheckPermissions(TRUE)
+        ->addWhere('id', '=', $note['id'])
+        ->addValue('privacy', 0)
+        ->execute();
+      $this->fail('Other user should not be able to un-privatize a private note');
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      $this->assertEquals('ACL check failed', $e->getMessage());
+    }
+
+    try {
+      Note::update()
+        ->setCheckPermissions(TRUE)
+        ->addWhere('id', '=', $note['id'])
+        ->addValue('note', 'Hijacked note content')
+        ->execute();
+      $this->fail('Other user should not be able to edit a private note');
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      $this->assertEquals('ACL check failed', $e->getMessage());
+    }
+  }
+
 }
