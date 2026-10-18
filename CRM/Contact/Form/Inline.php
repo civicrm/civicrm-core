@@ -278,6 +278,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    */
   protected function saveContact(array $params = []): CRM_Contact_DAO_Contact {
     $params = array_merge($this->getContactUpdateParams(), $params);
+    $params['check_permissions'] = $params['check_permissions'] ?? TRUE;
     return CRM_Contact_BAO_Contact::create($params);
   }
 

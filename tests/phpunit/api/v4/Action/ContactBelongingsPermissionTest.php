@@ -817,4 +817,52 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
     $this->assertEquals('Updated Data', $saved[$fieldName]);
   }
 
+  /**
+   * Test Address::create cannot set master_id to an address belonging to a contact the user cannot view.
+   */
+  public function testAddressCannotShareAddressOfForbiddenContact(): void {
+    [$userContact, $otherContact] = $this->setupTestContacts();
+    $otherAddress = \Civi\Api4\Address::create(FALSE)
+      ->addValue('contact_id', $otherContact)
+      ->addValue('location_type_id', 1)
+      ->addValue('street_address', '123 Secret Lane')
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $this->expectException(UnauthorizedException::class);
+    \Civi\Api4\Address::create()
+      ->addValue('contact_id', $userContact)
+      ->addValue('location_type_id', 1)
+      ->addValue('master_id', $otherAddress)
+      ->execute();
+  }
+
+  /**
+   * Test Contact::update cannot set employer_id to an organization the user cannot view.
+   */
+  public function testContactCannotSetEmployerToForbiddenOrganization(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherOrg = Contact::create(FALSE)
+      ->addValue('contact_type', 'Organization')
+      ->addValue('organization_name', 'Secret Org')
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $this->expectException(UnauthorizedException::class);
+    Contact::update()
+      ->addWhere('id', '=', $userContact)
+      ->addValue('employer_id', $otherOrg)
+      ->execute();
+  }
+
 }

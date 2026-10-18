@@ -85,7 +85,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
       $address = CRM_Core_BAO_Address::getValues($params, FALSE, 'id');
       $addressValues = array_pop($address);
       if (empty($addressValues) || (int) ($addressValues['contact_id'] ?? 0) !== $this->getContactID()) {
-        CRM_Utils_System::permissionDenied();
+        throw new CRM_Core_Exception(ts('Invalid address ID for this contact.'));
       }
       $this->_values['address'][$this->_locBlockNo] = $addressValues;
       $this->_action = CRM_Core_Action::UPDATE;
@@ -173,6 +173,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
     }
 
     // save address changes
+    $params['check_permissions'] = TRUE;
     $address = CRM_Core_BAO_Address::legacyCreate($params, TRUE);
 
     $this->log();

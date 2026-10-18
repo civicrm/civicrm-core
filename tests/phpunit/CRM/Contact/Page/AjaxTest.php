@@ -747,6 +747,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       $this->assertIsArray($data);
       $this->assertEmpty($data['results']);
     }
+  }
 
   /**
    * Helper to set up a multi-record custom group and field.
