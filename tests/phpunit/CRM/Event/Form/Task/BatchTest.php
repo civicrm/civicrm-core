@@ -18,7 +18,7 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test the the submit function on the event participant submit function.
+   * Test the submit function on the event participant submit function.
    */
   public function testSubmit(): void {
     $group = $this->customGroupCreate(['extends' => 'Participant', 'title' => 'Participant']);
@@ -27,9 +27,9 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
     $participant = $this->callAPISuccessGetSingle('Participant', ['id' => $participantID]);
     $this->assertEquals(2, $participant['participant_status_id']);
 
-    /** @var CRM_Event_Form_Task_Batch $form */
-    $form = $this->getFormObject('CRM_Event_Form_Task_Batch');
-    $form->submit(['field' => [$participantID => ['participant_status_id' => 1, 'custom_' . $field['id'] => ['two' => 1, 'four' => 1]]]]);
+    $this->getTestForm('CRM_Event_Form_Task_Batch', [
+      'field' => [$participantID => ['participant_status_id' => 1, 'custom_' . $field['id'] => ['two' => 1, 'four' => 1]]],
+    ])->postProcess();
 
     $participant = $this->callAPISuccessGetSingle('Participant', ['id' => $participantID]);
     $this->assertEquals(1, $participant['participant_status_id']);
@@ -80,9 +80,9 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
    */
   private function submitParticipantStatus(string $status): void {
     $statusID = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', $status);
-    /** @var CRM_Event_Form_Task_Batch $form */
-    $form = $this->getFormObject('CRM_Event_Form_Task_Batch');
-    $form->submit(['field' => [$this->ids['Participant'][0] => ['participant_status' => $statusID]]]);
+    $this->getTestForm('CRM_Event_Form_Task_Batch', [
+      'field' => [$this->ids['Participant'][0] => ['participant_status' => $statusID]],
+    ])->postProcess();
     $this->assertEquals($status, Participant::get(FALSE)
       ->addWhere('id', '=', $this->ids['Participant'][0])
       ->addSelect('status_id:name')
