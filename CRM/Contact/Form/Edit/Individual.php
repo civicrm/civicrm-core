@@ -101,12 +101,22 @@ class CRM_Contact_Form_Edit_Individual {
    *   TRUE if no errors, else array of errors.
    */
   public static function formRule($fields, $files, $contactID = NULL) {
-    $errors = [];
-    $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Individual');
+    $hasNameElement = !($contactID instanceof CRM_Core_Form) || $contactID->elementExists('first_name') || $contactID->elementExists('last_name');
 
-    // make sure that firstName and lastName or a primary OpenID is set
-    if (!$primaryID && (empty($fields['first_name']) && empty($fields['last_name']))) {
-      $errors['_qf_default'] = ts('Please enter a First Name, Last Name or Email (Primary).');
+    if ($hasNameElement) {
+      $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Individual');
+
+      // make sure that firstName and lastName or a primary OpenID is set
+      if (!$primaryID && (empty($fields['first_name']) && empty($fields['last_name']))) {
+        $errors['_qf_default'] = ts('Please enter a First Name, Last Name or Email (Primary).');
+      }
+    }
+
+    if (!empty($fields['employer_id'])) {
+      $employerId = (int) $fields['employer_id'];
+      if (!CRM_Contact_BAO_Contact_Permission::allow($employerId, CRM_Core_Permission::VIEW) || CRM_Contact_BAO_Contact::getContactType($employerId) !== 'Organization') {
+        $errors['employer_id'] = ts('Please select a valid employer organization.');
+      }
     }
 
     return empty($errors) ? TRUE : $errors;

@@ -63,6 +63,12 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
 
       // (prevent chaining 1 and 3) CRM-21214
       if (isset($event->params['master_id']) && !CRM_Utils_System::isNull($event->params['master_id'])) {
+        if (!empty($event->params['check_permissions'])) {
+          $masterContactId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Address', $event->params['master_id'], 'contact_id');
+          if (!$masterContactId || !CRM_Contact_BAO_Contact_Permission::allow($masterContactId, CRM_Core_Permission::VIEW)) {
+            throw new \Civi\API\Exception\UnauthorizedException(ts('You do not have permission to share an address from this contact.'));
+          }
+        }
         self::fixSharedAddress($event->params);
       }
     }
@@ -1021,15 +1027,20 @@ SELECT is_primary,
       $addressDAO->save();
       $addressDAO->copyCustomFields($addressId, $addressDAO->id, $parentOperation);
     }
-    if ($masterId) {
-      // Update the upstream address. But don't copy up the master_id.
-      unset($params['master_id']);
-      $addressDAO = new CRM_Core_DAO_Address();
-      $upstreamDao->fetch();
-      $addressDAO->copyValues($params);
-      $addressDAO->id = $upstreamDao->id;
-      $addressDAO->save();
-      $addressDAO->copyCustomFields($addressId, $addressDAO->id, $parentOperation);
+    if ($masterId && $parentOperation === 'edit' && $upstreamDao->fetch()) {
+      $upstreamContactId = (int) $upstreamDao->contact_id;
+      if (!empty($params['check_permissions']) && !CRM_Contact_BAO_Contact_Permission::allow($upstreamContactId, CRM_Core_Permission::EDIT)) {
+        throw new \Civi\API\Exception\UnauthorizedException(ts('Permission denied to modify shared upstream address.'));
+      }
+      if (CRM_Contact_BAO_Contact_Permission::allow($upstreamContactId, CRM_Core_Permission::EDIT)) {
+        // Update the upstream address. But don't copy up the master_id.
+        unset($params['master_id']);
+        $addressDAO = new CRM_Core_DAO_Address();
+        $addressDAO->copyValues($params);
+        $addressDAO->id = $upstreamDao->id;
+        $addressDAO->save();
+        $addressDAO->copyCustomFields($addressId, $addressDAO->id, $parentOperation);
+      }
     }
   }
 
@@ -1401,7 +1412,7 @@ SELECT is_primary,
       // BUT info is not present at this time, and therefore we should be really careful when deleting the block.
       // $updateBlankLocInfo will help take appropriate decision. CRM-5969
       if (isset($value['id']) && !$addressExists && $updateBlankLocInfo) {
-        Address::delete(FALSE)->addWhere('id', '=', $value['id'])->execute();
+        Address::delete(!empty($params['check_permissions']))->addWhere('id', '=', $value['id'])->execute();
         continue;
       }
       elseif (!$addressExists) {
@@ -1429,6 +1440,10 @@ SELECT is_primary,
 
       if ($fixAddress) {
         self::fixAddress($value);
+      }
+
+      if (!empty($params['check_permissions'])) {
+        $value['check_permissions'] = TRUE;
       }
 
       // Format custom data

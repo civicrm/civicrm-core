@@ -72,6 +72,14 @@ trait CRM_Contact_AccessTrait {
       }
     }
 
+    if (!empty($record['master_id'])) {
+      $masterContactId = (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Address', $record['master_id'], 'contact_id');
+      if (!$masterContactId || !CoreUtil::checkAccessDelegated('Contact', 'get', ['id' => $masterContactId], $userID)) {
+        $e->setAuthorized(FALSE);
+        return;
+      }
+    }
+
     $targetCid = $cid ?: $storedCid;
     if (!$targetCid) {
       // With no contact id this must be part of an event locblock

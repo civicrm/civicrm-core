@@ -26,6 +26,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
+    \CRM_Utils_Hook::singleton()->reset();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
     \Civi::settings()->set('pinnedContactCountries', []);
     CRM_Core_I18n::singleton()->setLocale('en_US');
     parent::tearDown();
@@ -1088,6 +1090,97 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $victimAddressId)
       ->addWhere('contact_id', '=', $victimContactId)
       ->execute());
+  }
+
+  /**
+   * Updating a shared child address must not overwrite upstream master address if user lacks permission.
+   */
+  public function testSharedAddressCannotOverwriteUpstreamWithoutPermission(): void {
+    $userContact = $this->createLoggedInUser();
+
+    $orgContact = $this->createTestEntity('Contact', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'HQ Org',
+    ], 'hq_org');
+
+    $masterAddress = $this->createTestEntity('Address', [
+      'contact_id' => $orgContact['id'],
+      'location_type_id' => 1,
+      'street_address' => '100 Main St',
+      'city' => 'Metropolis',
+    ], 'master_address');
+
+    $childAddress = $this->createTestEntity('Address', [
+      'contact_id' => $userContact,
+      'location_type_id' => 1,
+      'master_id' => $masterAddress['id'],
+      'street_address' => '100 Main St',
+      'city' => 'Metropolis',
+    ], 'child_address');
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+      'view all contacts',
+    ];
+
+    // Attempt to update child address with modified street address and check_permissions
+    try {
+      CRM_Core_BAO_Address::writeRecord([
+        'id' => $childAddress['id'],
+        'contact_id' => $userContact,
+        'street_address' => '999 Hacked Way',
+        'master_id' => $masterAddress['id'],
+        'check_permissions' => TRUE,
+      ]);
+      $this->fail('Expected exception when modifying shared address without edit permission on master contact.');
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      $this->assertStringContainsString('Permission denied to modify shared upstream address', $e->getMessage());
+    }
+
+    // Verify upstream address was NOT overwritten
+    $upstream = Address::get(FALSE)
+      ->addWhere('id', '=', $masterAddress['id'])
+      ->execute()->single();
+    $this->assertEquals('100 Main St', $upstream['street_address']);
+  }
+
+  /**
+   * Creating a shared child address must never overwrite upstream master address.
+   */
+  public function testSharedAddressCreateCannotOverwriteUpstream(): void {
+    $orgContact = $this->createTestEntity('Contact', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'HQ Org 2',
+    ], 'hq_org_2');
+
+    $masterAddress = $this->createTestEntity('Address', [
+      'contact_id' => $orgContact['id'],
+      'location_type_id' => 1,
+      'street_address' => '500 Original St',
+      'city' => 'Gotham',
+    ], 'master_address_2');
+
+    $userContact = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Employee',
+    ], 'employee_contact');
+
+    CRM_Core_BAO_Address::writeRecord([
+      'contact_id' => $userContact['id'],
+      'location_type_id' => 1,
+      'master_id' => $masterAddress['id'],
+      'street_address' => 'Overwritten St',
+      'city' => 'Gotham',
+    ]);
+
+    // Upstream address should still have 500 Original St
+    $upstream = Address::get(FALSE)
+      ->addWhere('id', '=', $masterAddress['id'])
+      ->execute()->single();
+    $this->assertEquals('500 Original St', $upstream['street_address']);
   }
 
 }

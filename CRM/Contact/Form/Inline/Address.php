@@ -173,6 +173,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
     }
 
     // save address changes
+    $params['check_permissions'] = TRUE;
     $address = CRM_Core_BAO_Address::legacyCreate($params, TRUE);
 
     $this->log();
