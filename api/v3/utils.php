@@ -1382,7 +1382,7 @@ function _civicrm_api3_basic_create_fallback($bao_name, $params) {
  */
 function _civicrm_api3_basic_delete($bao_name, &$params) {
   civicrm_api3_verify_mandatory($params, NULL, ['id']);
-  _civicrm_api3_check_edit_permissions($bao_name, ['id' => $params['id']]);
+  _civicrm_api3_check_edit_permissions($bao_name, $params);
   if (method_exists($bao_name, 'del') && !\Civi\Api4\Utils\ReflectionUtils::isMethodDeprecated($bao_name, 'del')) {
     $args = [&$params['id']];
     $dao = new $bao_name();
@@ -2654,10 +2654,23 @@ function _civicrm_api3_check_edit_permissions($bao_name, $params) {
     'CRM_Core_BAO_Website',
     'CRM_Core_BAO_OpenID',
   ];
-  if (!empty($params['check_permissions']) && in_array($bao_name, $contactEntities)) {
-    $cid = !empty($params['contact_id']) ? $params['contact_id'] : CRM_Core_DAO::getFieldValue($bao_name, $params['id'], 'contact_id');
-    if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
-      throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
+  $bao_name = CRM_Core_DAO_AllCoreTables::getBAOClassName($bao_name) ?: $bao_name;
+  if (!empty($params['check_permissions'])) {
+    if ($bao_name === 'CRM_Contact_BAO_Contact' && !empty($params['id'])) {
+      if (!CRM_Contact_BAO_Contact_Permission::allow($params['id'], CRM_Core_Permission::EDIT)) {
+        throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
+      }
+    }
+    elseif (in_array($bao_name, $contactEntities)) {
+      // For an existing record only the id is trusted: resolve the owning contact
+      // from the database so a submitted contact_id cannot assert access to a
+      // record the caller does not own. A submitted contact_id applies only when
+      // there is no existing record (a create).
+      $cid = empty($params['id']) ? NULL : CRM_Core_DAO::getFieldValue($bao_name, $params['id'], 'contact_id');
+      $cid = $cid ?: ($params['contact_id'] ?? NULL);
+      if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
+        throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
+      }
     }
   }
 }
