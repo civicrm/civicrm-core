@@ -400,153 +400,148 @@ class CRM_Contribute_BAO_FinancialProcessor {
       return;
     }
     if ($this->isUpdate()) {
-      if (!$this->isUnpaidAndNotPayLater()) {
-        $trxnParams = $this->getTrxnParams($params);
-        $params['trxnParams'] = $trxnParams;
-        $updated = FALSE;
-        $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $this->getOriginalContribution()->total_amount;
-        $params['trxnParams']['fee_amount'] = $this->getOriginalContribution()->fee_amount;
-        $params['trxnParams']['net_amount'] = $this->getOriginalContribution()->net_amount;
-        $params['trxnParams']['status_id'] = $this->getOriginalContribution()->contribution_status_id;
-        if (!($this->isOriginalStatusPending() && $this->isCompletedTransaction())
-        ) {
-          $params['trxnParams']['payment_instrument_id'] = $this->getOriginalContribution()->payment_instrument_id;
-          $params['trxnParams']['check_number'] = $this->getOriginalContribution()->check_number;
-        }
+      $trxnParams = $this->getTrxnParams($params);
+      $params['trxnParams'] = $trxnParams;
+      $updated = FALSE;
+      $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $this->getOriginalContribution()->total_amount;
+      $params['trxnParams']['fee_amount'] = $this->getOriginalContribution()->fee_amount;
+      $params['trxnParams']['net_amount'] = $this->getOriginalContribution()->net_amount;
+      $params['trxnParams']['status_id'] = $this->getOriginalContribution()->contribution_status_id;
+      if (!($this->isOriginalStatusPending() && $this->isCompletedTransaction())
+      ) {
+        $params['trxnParams']['payment_instrument_id'] = $this->getOriginalContribution()->payment_instrument_id;
+        $params['trxnParams']['check_number'] = $this->getOriginalContribution()->check_number;
+      }
 
-        //if financial account is changed
-        if ($this->isFinancialAccountChanged()) {
-          $params['trxnParams']['trxn_date'] = date('YmdHis');
-          if ($this->isAccountsReceivableTransaction()) {
-            $accountRelationship = $this->getUpdatedContribution()->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
-            $params['trxnParams']['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
-              $this->getOriginalContribution()->financial_type_id, $accountRelationship);
+      //if financial account is changed
+      if ($this->isFinancialAccountChanged()) {
+        $params['trxnParams']['trxn_date'] = date('YmdHis');
+        if ($this->isAccountsReceivableTransaction()) {
+          $accountRelationship = $this->getUpdatedContribution()->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
+          $params['trxnParams']['to_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
+            $this->getOriginalContribution()->financial_type_id, $accountRelationship);
+        }
+        else {
+          $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getOriginalContribution()->id, 'DESC');
+          if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
+            $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
           }
-          else {
-            $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getOriginalContribution()->id, 'DESC');
-            if (!empty($lastFinancialTrxnId['financialTrxnId'])) {
-              $params['trxnParams']['to_financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialTrxn', $lastFinancialTrxnId['financialTrxnId'], 'to_financial_account_id');
-            }
-          }
-          $params['skipLineItem'] = FALSE;
-          // Set amounts to create a reversal transaction.
-          $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = -$this->getOriginalContribution()->total_amount;
-          $params['trxnParams']['fee_amount'] = 0 - $this->getOriginalContribution()->fee_amount;
-          $this->updateFinancialAccounts($params['trxnParams'], 'changeFinancialType');
-          // Set the amounts back to the original value for creating the new positive financial trxn.
-          $params['total_amount'] = $params['trxnParams']['net_amount'] = $params['trxnParams']['total_amount'] = $this->getUpdatedContribution()->total_amount;
-          $params['trxnParams']['fee_amount'] = $this->getUpdatedContribution()->fee_amount;
-          $this->updateFinancialAccounts($params['trxnParams'], NULL, $this->getUpdatedFinancialAccount());
-          $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
-          $updated = TRUE;
-          $params['deferred_financial_account_id'] = $this->getUpdatedFinancialAccount();
         }
+        $params['skipLineItem'] = FALSE;
+        // Set amounts to create a reversal transaction.
+        $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = -$this->getOriginalContribution()->total_amount;
+        $params['trxnParams']['fee_amount'] = 0 - $this->getOriginalContribution()->fee_amount;
+        $this->updateFinancialAccounts($params['trxnParams'], 'changeFinancialType');
+        // Set the amounts back to the original value for creating the new positive financial trxn.
+        $params['total_amount'] = $params['trxnParams']['net_amount'] = $params['trxnParams']['total_amount'] = $this->getUpdatedContribution()->total_amount;
+        $params['trxnParams']['fee_amount'] = $this->getUpdatedContribution()->fee_amount;
+        $this->updateFinancialAccounts($params['trxnParams'], NULL, $this->getUpdatedFinancialAccount());
+        $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
+        $updated = TRUE;
+        $params['deferred_financial_account_id'] = $this->getUpdatedFinancialAccount();
+      }
 
-        //Update contribution status
-        $params['trxnParams']['status_id'] = $this->getUpdatedContribution()->contribution_status_id;
-        if (!isset($params['refund_trxn_id'])) {
-          // CRM-17751 This has previously been deliberately set. No explanation as to why one variant
-          // gets preference over another so I am only 'protecting' a very specific tested flow
-          // and letting natural justice take care of the rest.
-          $params['trxnParams']['trxn_id'] = $this->getUpdatedContribution()->trxn_id;
-        }
-        if (!empty($params['contribution_status_id']) &&
-          $this->getOriginalContribution()->contribution_status_id != $this->getUpdatedContribution()->contribution_status_id
-        ) {
-          //Update Financial Records
-          $this->updateFinancialAccountsOnContributionStatusChange($params);
-          $updated = TRUE;
-        }
-
-        // change Payment Instrument for a Completed contribution
-        // first handle special case when contribution is changed from Pending to Completed status when initial payment
-        // instrument is null and now new payment instrument is added along with the payment
-        $params['trxnParams']['payment_instrument_id'] = $this->getUpdatedContribution()->payment_instrument_id;
-        $params['trxnParams']['check_number'] = $params['check_number'] ?? NULL;
-
-        if ($this->isPaymentInstrumentChange($params)) {
-          $updated = $this->updateFinancialAccountsOnPaymentInstrumentChange($params);
-        }
-
-        //if Change contribution amount
-        $params['trxnParams']['fee_amount'] = $params['fee_amount'] ?? NULL;
-        $params['trxnParams']['net_amount'] = $params['net_amount'] ?? NULL;
-        $totalAmount = $this->getUpdatedContribution()->total_amount ?? 0;
-        $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
+      //Update contribution status
+      $params['trxnParams']['status_id'] = $this->getUpdatedContribution()->contribution_status_id;
+      if (!isset($params['refund_trxn_id'])) {
+        // CRM-17751 This has previously been deliberately set. No explanation as to why one variant
+        // gets preference over another so I am only 'protecting' a very specific tested flow
+        // and letting natural justice take care of the rest.
         $params['trxnParams']['trxn_id'] = $this->getUpdatedContribution()->trxn_id;
-        // If the total has changed then create adjustments, but it the financial
-        // account has ALSO changed this will already have been dealt with using reverse & recreate above.
-        if ($this->isContributionTotalChanged() && !$this->isFinancialAccountChanged()) {
-          //Update Financial Records
-          $params['trxnParams']['from_financial_account_id'] = NULL;
-          $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $this->getOriginalContribution()->total_amount);
-          $this->updateFinancialAccounts($params['trxnParams'], 'changedAmount');
-          $updated = TRUE;
-        }
+      }
+      if (!empty($params['contribution_status_id']) &&
+        $this->getOriginalContribution()->contribution_status_id != $this->getUpdatedContribution()->contribution_status_id
+      ) {
+        //Update Financial Records
+        $this->updateFinancialAccountsOnContributionStatusChange($params);
+        $updated = TRUE;
+      }
 
-        if (!$updated) {
-          // Looks like we might have a data correction update.
-          // This would be a case where a transaction id has been entered but it is incorrect &
-          // the person goes back in & fixes it, as opposed to a new transaction.
-          // Currently the UI doesn't support multiple refunds against a single transaction & we are only supporting
-          // the data fix scenario.
-          // CRM-17751.
-          if (isset($params['refund_trxn_id'])) {
-            $refundIDs = CRM_Core_BAO_FinancialTrxn::getRefundTransactionIDs($params['id']);
-            if (!empty($refundIDs['financialTrxnId']) && $refundIDs['trxn_id'] != $params['refund_trxn_id']) {
-              civicrm_api3('FinancialTrxn', 'create', [
-                'id' => $refundIDs['financialTrxnId'],
-                'trxn_id' => $params['refund_trxn_id'],
-              ]);
-            }
-          }
-        }
-        // Process fee.
-        if (!empty($this->getUpdatedContributionValue('fee_amount')) && (empty($this->getOriginalContribution()) || $this->getUpdatedContribution()->fee_amount != $this->getOriginalContribution()->fee_amount)) {
-          $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
-          if ($amount) {
-            $financialTxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getContributionID(), 'DESC')['financialTrxnId'];
-            CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
-          }
-        }
-        if (empty($params['skipLineItem'])) {
-          foreach ($this->getUpdatedLineItems() as $line) {
-            CRM_Price_BAO_LineItem::create($line);
+      // change Payment Instrument for a Completed contribution
+      // first handle special case when contribution is changed from Pending to Completed status when initial payment
+      // instrument is null and now new payment instrument is added along with the payment
+      $params['trxnParams']['payment_instrument_id'] = $this->getUpdatedContribution()->payment_instrument_id;
+      $params['trxnParams']['check_number'] = $params['check_number'] ?? NULL;
+
+      if ($this->isPaymentInstrumentChange($params)) {
+        $updated = $this->updateFinancialAccountsOnPaymentInstrumentChange($params);
+      }
+
+      //if Change contribution amount
+      $params['trxnParams']['fee_amount'] = $params['fee_amount'] ?? NULL;
+      $params['trxnParams']['net_amount'] = $params['net_amount'] ?? NULL;
+      $totalAmount = $this->getUpdatedContribution()->total_amount ?? 0;
+      $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
+      $params['trxnParams']['trxn_id'] = $this->getUpdatedContribution()->trxn_id;
+      // If the total has changed then create adjustments, but it the financial
+      // account has ALSO changed this will already have been dealt with using reverse & recreate above.
+      if ($this->isContributionTotalChanged() && !$this->isFinancialAccountChanged()) {
+        //Update Financial Records
+        $params['trxnParams']['from_financial_account_id'] = NULL;
+        $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $this->getOriginalContribution()->total_amount);
+        $this->updateFinancialAccounts($params['trxnParams'], 'changedAmount');
+        $updated = TRUE;
+      }
+
+      if (!$updated) {
+        // Looks like we might have a data correction update.
+        // This would be a case where a transaction id has been entered but it is incorrect &
+        // the person goes back in & fixes it, as opposed to a new transaction.
+        // Currently the UI doesn't support multiple refunds against a single transaction & we are only supporting
+        // the data fix scenario.
+        // CRM-17751.
+        if (isset($params['refund_trxn_id'])) {
+          $refundIDs = CRM_Core_BAO_FinancialTrxn::getRefundTransactionIDs($params['id']);
+          if (!empty($refundIDs['financialTrxnId']) && $refundIDs['trxn_id'] != $params['refund_trxn_id']) {
+            civicrm_api3('FinancialTrxn', 'create', [
+              'id' => $refundIDs['financialTrxnId'],
+              'trxn_id' => $params['refund_trxn_id'],
+            ]);
           }
         }
       }
+      // Process fee.
+      if (!empty($this->getUpdatedContributionValue('fee_amount')) && (empty($this->getOriginalContribution()) || $this->getUpdatedContribution()->fee_amount != $this->getOriginalContribution()->fee_amount)) {
+        $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
+        if ($amount) {
+          $financialTxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getContributionID(), 'DESC')['financialTrxnId'];
+          CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
+        }
+      }
+      if (empty($params['skipLineItem'])) {
+        foreach ($this->getUpdatedLineItems() as $line) {
+          CRM_Price_BAO_LineItem::create($line);
+        }
+      }
     }
-
     else {
-      if (!$this->isUnpaidAndNotPayLater()) {
-        $trxnParams = $params['trxnParams'] = $this->getTrxnParams($params);
-        if ($this->isRecordAccountsReceivable()) {
-          $this->recordAlwaysAccountsReceivable($trxnParams);
+      $trxnParams = $params['trxnParams'] = $this->getTrxnParams($params);
+      if ($this->isRecordAccountsReceivable()) {
+        $this->recordAlwaysAccountsReceivable($trxnParams);
+      }
+      $financialTxnID = $this->createFinancialTrxn($trxnParams);
+      // Process fee.
+      if (!empty($this->getUpdatedContributionValue('fee_amount')) && (empty($this->getOriginalContribution()) || $this->getUpdatedContribution()->fee_amount != $this->getOriginalContribution()->fee_amount)) {
+        $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
+        if ($amount) {
+          CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
         }
-        $financialTxnID = $this->createFinancialTrxn($trxnParams);
-        // Process fee.
-        if (!empty($this->getUpdatedContributionValue('fee_amount')) && (empty($this->getOriginalContribution()) || $this->getUpdatedContribution()->fee_amount != $this->getOriginalContribution()->fee_amount)) {
-          $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
-          if ($amount) {
-            CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount($params)], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
-          }
+      }
+      if (empty($params['skipLineItem'])) {
+        foreach ($this->getAddedLineItems() as $lineParams) {
+          $this->addLineItem($lineParams, $financialTxnID);
         }
-        if (empty($params['skipLineItem'])) {
-          foreach ($this->getAddedLineItems() as $lineParams) {
-            $this->addLineItem($lineParams, $financialTxnID);
-          }
-          $this->createDeferredTrxn();
-        }
+        $this->createDeferredTrxn();
+      }
 
-        // create batch entry if batch_id is passed and
-        if (!empty($params['batch_id'])) {
-          $entityParams = [
-            'batch_id' => $params['batch_id'],
-            'entity_table' => 'civicrm_financial_trxn',
-            'entity_id' => $financialTxnID,
-          ];
-          CRM_Batch_BAO_EntityBatch::create($entityParams);
-        }
+      // create batch entry if batch_id is passed and
+      if (!empty($params['batch_id'])) {
+        $entityParams = [
+          'batch_id' => $params['batch_id'],
+          'entity_table' => 'civicrm_financial_trxn',
+          'entity_id' => $financialTxnID,
+        ];
+        CRM_Batch_BAO_EntityBatch::create($entityParams);
       }
     }
 
