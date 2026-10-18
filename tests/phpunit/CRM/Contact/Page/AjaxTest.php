@@ -747,6 +747,163 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       $this->assertIsArray($data);
       $this->assertEmpty($data['results']);
     }
+
+  /**
+   * Helper to set up a multi-record custom group and field.
+   */
+  private function createMultiRecordCustomGroup(string $extends = 'Contact'): array {
+    $groupName = uniqid('cg_');
+    $fieldName = uniqid('cf_');
+    $customGroup = $this->createTestEntity('CustomGroup', [
+      'title' => $groupName,
+      'name' => $groupName,
+      'extends' => $extends,
+      'is_multiple' => TRUE,
+    ], 'custom_group_' . $groupName);
+
+    $this->createTestEntity('CustomField', [
+      'label' => $fieldName,
+      'name' => $fieldName,
+      'custom_group_id' => $customGroup['id'],
+      'html_type' => 'Text',
+      'data_type' => 'String',
+    ], 'custom_field_' . $fieldName);
+
+    return [$customGroup, $groupName, $fieldName];
+  }
+
+  /**
+   * Test successful deletion of a custom value by authorized user.
+   */
+  public function testDeleteCustomValueSuccess(): void {
+    [$customGroup, $groupName, $fieldName] = $this->createMultiRecordCustomGroup();
+
+    $contactId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'edit my contact', 'access all custom data']);
+
+    $customValueId = civicrm_api4("Custom_{$groupName}", 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'entity_id' => $contactId,
+        $fieldName => 'User Data',
+      ],
+    ])->first()['id'];
+
+    $_REQUEST['valueID'] = $customValueId;
+    $_REQUEST['groupID'] = $customGroup['id'];
+    $_REQUEST['contactId'] = $contactId;
+
+    ob_start();
+    try {
+      CRM_Contact_Page_AJAX::deleteCustomValue();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      // Expected exit from AJAX endpoint
+    }
+    ob_end_clean();
+
+    $remaining = civicrm_api4("Custom_{$groupName}", 'get', [
+      'checkPermissions' => FALSE,
+      'where' => [['id', '=', $customValueId]],
+    ]);
+    $this->assertCount(0, $remaining);
+  }
+
+  /**
+   * Test that an attacker cannot delete another contact's custom value using their own contact ID.
+   */
+  public function testDeleteCustomValueDeniedForOtherContact(): void {
+    [$customGroup, $groupName, $fieldName] = $this->createMultiRecordCustomGroup();
+
+    $userContactId = $this->createLoggedInUser();
+    $victimContactId = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Victim',
+    ], 'victim')['id'];
+
+    $this->setPermissions(['access CiviCRM', 'edit my contact', 'access all custom data']);
+
+    $victimCustomValueId = civicrm_api4("Custom_{$groupName}", 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'entity_id' => $victimContactId,
+        $fieldName => 'Victim Secret',
+      ],
+    ])->first()['id'];
+
+    $_REQUEST['valueID'] = $victimCustomValueId;
+    $_REQUEST['groupID'] = $customGroup['id'];
+    $_REQUEST['contactId'] = $userContactId;
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+
+    CRM_Contact_Page_AJAX::deleteCustomValue();
+  }
+
+  /**
+   * Test that deletion is denied if user lacks edit permission on the contact.
+   */
+  public function testDeleteCustomValueDeniedWithoutContactEditPermission(): void {
+    [$customGroup, $groupName, $fieldName] = $this->createMultiRecordCustomGroup();
+
+    $contactId = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'ViewOnly',
+    ], 'view_only')['id'];
+
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'view all contacts', 'access all custom data']);
+
+    $customValueId = civicrm_api4("Custom_{$groupName}", 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'entity_id' => $contactId,
+        $fieldName => 'View Only Data',
+      ],
+    ])->first()['id'];
+
+    $_REQUEST['valueID'] = $customValueId;
+    $_REQUEST['groupID'] = $customGroup['id'];
+    $_REQUEST['contactId'] = $contactId;
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+
+    CRM_Contact_Page_AJAX::deleteCustomValue();
+  }
+
+  /**
+   * Test that deletion is denied if custom group does not extend Contact.
+   */
+  public function testDeleteCustomValueDeniedForNonContactGroup(): void {
+    [$customGroup, $groupName, $fieldName] = $this->createMultiRecordCustomGroup('Activity');
+
+    $contactId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'edit all contacts', 'access all custom data']);
+
+    $activity = $this->createTestEntity('Activity', [
+      'source_contact_id' => $contactId,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Meeting Test',
+    ], 'activity');
+
+    $customValueId = civicrm_api4("Custom_{$groupName}", 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'entity_id' => $activity['id'],
+        $fieldName => 'Activity Data',
+      ],
+    ])->first()['id'];
+
+    $_REQUEST['valueID'] = $customValueId;
+    $_REQUEST['groupID'] = $customGroup['id'];
+    $_REQUEST['contactId'] = $contactId;
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+
+    CRM_Contact_Page_AJAX::deleteCustomValue();
   }
 
 }

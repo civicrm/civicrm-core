@@ -285,18 +285,27 @@ class CRM_Contact_Page_AJAX {
   public static function deleteCustomValue() {
     CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     CRM_Utils_System::setHttpHeader('Content-Type', 'text/plain');
-    $customValueID = CRM_Utils_Type::escape($_REQUEST['valueID'], 'Positive');
-    $customGroupID = CRM_Utils_Type::escape($_REQUEST['groupID'], 'Positive');
-    $contactId = CRM_Utils_Request::retrieve('contactId', 'Positive');
+    $customValueID = CRM_Utils_Request::retrieve('valueID', 'Positive', NULL, TRUE);
+    $customGroupID = CRM_Utils_Request::retrieve('groupID', 'Positive', NULL, TRUE);
+    $contactId = CRM_Utils_Request::retrieve('contactId', 'Positive', NULL, TRUE);
+
+    $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['id' => $customGroupID]);
+    if (empty($customGroup['table_name']) || CRM_Core_BAO_CustomGroup::getEntityFromExtends($customGroup['extends']) !== 'Contact') {
+      CRM_Utils_System::permissionDenied();
+    }
     if (!CRM_Core_BAO_CustomGroup::checkGroupAccess($customGroupID, CRM_Core_Permission::EDIT) ||
       !CRM_Contact_BAO_Contact_Permission::allow($contactId, CRM_Core_Permission::EDIT)
     ) {
       CRM_Utils_System::permissionDenied();
     }
-    CRM_Core_BAO_CustomValue::deleteCustomValue($customValueID, $customGroupID);
-    if ($contactId) {
-      echo CRM_Contact_BAO_Contact::getCountComponent('custom_' . $customGroupID, $contactId);
+    $storedEntityId = (int) CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `{$customGroup['table_name']}` WHERE id = %1", [
+      1 => [$customValueID, 'Positive'],
+    ]);
+    if ($storedEntityId !== (int) $contactId) {
+      CRM_Utils_System::permissionDenied();
     }
+    CRM_Core_BAO_CustomValue::deleteCustomValue($customValueID, $customGroupID, $contactId);
+    echo CRM_Contact_BAO_Contact::getCountComponent('custom_' . $customGroupID, $contactId);
 
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
     CRM_Utils_System::civiExit();
