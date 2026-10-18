@@ -286,10 +286,7 @@ class CRM_Member_BAO_MembershipTypeChangeTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
 
     $toTypeID = $this->ids['MembershipType']['AnnualRolling2'];
-
-    $_REQUEST['id'] = $ids['membership_id'];
     $params = [
-      'cid' => $this->ids['Contact']['member'],
       'contact_id' => $this->ids['Contact']['member'],
       'join_date' => CRM_Utils_Time::date('Y-m-d', strtotime('-1 year')),
       'start_date' => '',
@@ -298,14 +295,8 @@ class CRM_Member_BAO_MembershipTypeChangeTest extends CiviUnitTestCase {
       'status_id' => '',
       'financial_type_id' => '2',
     ];
-    /** @var CRM_Member_Form_Membership $form */
-    $form = $this->getFormObject('CRM_Member_Form_Membership', $params);
-    $form->preProcess();
-    $form->buildQuickForm();
-    $form->_action = CRM_Core_Action::UPDATE;
-    $form->_id = $ids['membership_id'];
-    $form->_contactID = $this->ids['Contact']['member'];
-    $form->postProcess();
+    $this->getTestForm('CRM_Member_Form_Membership', $params, ['id' => $ids['membership_id'], 'action' => 'update'])
+      ->processForm();
 
     $line = $this->getTemplateMembershipLine($ids['template_contribution_id']);
     $this->assertEquals($toTypeID, $line['price_field_value.membership_type_id'], 'Template line should point at the new type after the form edit.');
