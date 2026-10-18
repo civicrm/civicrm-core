@@ -514,11 +514,11 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $countryCount = CRM_Core_DAO::singleValueQuery($sql);
 
     $statistics['counts']['case'] = [
-      'title' => ts('Total Number of Cases '),
+      'title' => ts('Total Number of Cases'),
       'value' => isset($statistics['counts']['rowsFound']) ? $statistics['counts']['rowsFound']['value'] : count($rows),
     ];
     $statistics['counts']['country'] = [
-      'title' => ts('Total Number of Countries '),
+      'title' => ts('Total Number of Countries'),
       'value' => $countryCount,
     ];
 

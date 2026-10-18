@@ -244,24 +244,24 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
     if (!$options) {
       $options = [
         'bounce' => [
-          'N' => ts('Successful '),
-          'Y' => ts('Bounced '),
+          'N' => ts('Successful'),
+          'Y' => ts('Bounced'),
         ],
         'delivered' => [
-          'Y' => ts('Successful '),
-          'N' => ts('Bounced '),
+          'Y' => ts('Successful'),
+          'N' => ts('Bounced'),
         ],
         'open' => [
-          'Y' => ts('Opened '),
-          'N' => ts('Unopened/Hidden '),
+          'Y' => ts('Opened'),
+          'N' => ts('Unopened/Hidden'),
         ],
         'click' => [
-          'Y' => ts('Clicked '),
-          'N' => ts('Not Clicked '),
+          'Y' => ts('Clicked'),
+          'N' => ts('Not Clicked'),
         ],
         'reply' => [
-          'Y' => ts('Replied '),
-          'N' => ts('No Reply '),
+          'Y' => ts('Replied'),
+          'N' => ts('No Reply'),
         ],
       ];
     }

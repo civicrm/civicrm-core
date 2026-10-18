@@ -407,16 +407,16 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
     $pcpSupporter = CRM_PCP_BAO_PCP::displayName($pcpID);
     switch ($component) {
       case 'event':
-        $pcp_supporter_text = ts('This event registration is being made thanks to the efforts of <strong>%1</strong>, who supports our campaign. ', [1 => $pcpSupporter]);
+        $pcp_supporter_text = ts('This event registration is being made thanks to the efforts of <strong>%1</strong>, who supports our campaign.', [1 => $pcpSupporter]);
         if (!empty($text)) {
-          $pcp_supporter_text .= ts('You can support it as well - once you complete the registration, you will be able to create your own Personal Campaign Page!');
+          $pcp_supporter_text .= ' ' . ts('You can support it as well - once you complete the registration, you will be able to create your own Personal Campaign Page!');
         }
         break;
 
       case 'contribute':
-        $pcp_supporter_text = ts('This contribution is being made thanks to the efforts of <strong>%1</strong>, who supports our campaign. ', [1 => $pcpSupporter]);
+        $pcp_supporter_text = ts('This contribution is being made thanks to the efforts of <strong>%1</strong>, who supports our campaign.', [1 => $pcpSupporter]);
         if (!empty($text)) {
-          $pcp_supporter_text .= ts('You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!');
+          $pcp_supporter_text .= ' ' . ts('You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!');
         }
         break;
     }

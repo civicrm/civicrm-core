@@ -339,7 +339,7 @@ class CRM_Mailing_BAO_Query {
         $query->_where[$grouping][] = "civicrm_mailing_event_unsubscribe.org_unsubscribe = 1";
         self::mailingEventQueryBuilder($query, $values,
           'civicrm_mailing_event_unsubscribe', 'mailing_unsubscribe',
-          ts('Mailing: '), $valueTitle
+          ts('Mailing:'), $valueTitle
         );
         return;
 
@@ -349,7 +349,7 @@ class CRM_Mailing_BAO_Query {
         $query->_where[$grouping][] = "civicrm_mailing_event_unsubscribe.org_unsubscribe = 0";
         self::mailingEventQueryBuilder($query, $values,
           'civicrm_mailing_event_unsubscribe', 'mailing_unsubscribe',
-          ts('Mailing: '), $valueTitle
+          ts('Mailing:'), $valueTitle
         );
         return;
 

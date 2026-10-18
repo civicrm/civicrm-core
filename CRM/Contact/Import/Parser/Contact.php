@@ -480,7 +480,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
    */
   private function getSuccessMessage(): string {
     if (!empty($this->_unparsedStreetAddressContacts)) {
-      $errorMessage = ts('Record imported successfully but unable to parse the street address: ');
+      $errorMessage = ts('Record imported successfully but unable to parse the street address:');
       foreach ($this->_unparsedStreetAddressContacts as $contactValue) {
         $contactUrl = CRM_Utils_System::url('civicrm/contact/add', 'reset=1&action=update&cid=' . $contactValue['id'], TRUE, NULL, FALSE);
         $errorMessage .= "\n Contact ID:" . $contactValue['id'] . " <a href=\"$contactUrl\"> " . $contactValue['streetAddress'] . '</a>';
