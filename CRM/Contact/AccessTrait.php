@@ -29,7 +29,7 @@ trait CRM_Contact_AccessTrait {
   /**
    * Callback for `hook_civicrm_pre` event.
    *
-   * Block non-admins from changing the contact_id of an existing record.
+   * Enforce contact permissions on create, edit, and delete.
    *
    * @throws \Civi\API\Exception\UnauthorizedException
    */
@@ -37,15 +37,38 @@ trait CRM_Contact_AccessTrait {
     if (empty($event->params['check_permissions'])) {
       return;
     }
-    if ($event->action !== 'edit' || empty($event->id) || !array_key_exists('contact_id', $event->params)) {
+    $userID = \CRM_Core_Session::getLoggedInContactID() ?: 0;
+
+    if ($event->action === 'create') {
+      $cid = $event->params['contact_id'] ?? NULL;
+      if ($cid && !CoreUtil::checkAccessDelegated('Contact', 'update', ['id' => $cid], $userID)) {
+        throw new \Civi\API\Exception\UnauthorizedException(\ts('Permission denied to modify contact record'));
+      }
       return;
     }
-    if (empty($event->params['check_permissions']) || CRM_Core_Permission::check('edit all contacts')) {
+
+    if ($event->action === 'edit' && !empty($event->id)) {
+      $storedCid = \CRM_Core_DAO::getFieldValue(static::class, $event->id, 'contact_id');
+      if ($storedCid && !CoreUtil::checkAccessDelegated('Contact', 'update', ['id' => $storedCid], $userID)) {
+        throw new \Civi\API\Exception\UnauthorizedException(\ts('Permission denied to modify contact record'));
+      }
+      if (array_key_exists('contact_id', $event->params)) {
+        if (!CRM_Core_Permission::check('edit all contacts', $userID) && (string) $storedCid !== (string) $event->params['contact_id']) {
+          throw new \Civi\API\Exception\UnauthorizedException(\ts('Cannot change the contact_id of an existing %1.', [1 => $event->entity]));
+        }
+        $newCid = $event->params['contact_id'];
+        if ($newCid && (string) $storedCid !== (string) $newCid && !CoreUtil::checkAccessDelegated('Contact', 'update', ['id' => $newCid], $userID)) {
+          throw new \Civi\API\Exception\UnauthorizedException(\ts('Permission denied to modify contact record'));
+        }
+      }
       return;
     }
-    $storedCid = \CRM_Core_DAO::getFieldValue(static::class, $event->id, 'contact_id');
-    if ((string) $storedCid !== (string) $event->params['contact_id']) {
-      throw new \Civi\API\Exception\UnauthorizedException(\ts('Cannot change the contact_id of an existing %1.', [1 => $event->entity]));
+
+    if ($event->action === 'delete' && !empty($event->id)) {
+      $storedCid = \CRM_Core_DAO::getFieldValue(static::class, $event->id, 'contact_id');
+      if ($storedCid && !CoreUtil::checkAccessDelegated('Contact', 'update', ['id' => $storedCid], $userID)) {
+        throw new \Civi\API\Exception\UnauthorizedException(\ts('Permission denied to modify contact record'));
+      }
     }
   }
 

@@ -54,6 +54,11 @@ class CRM_Core_BAO_CustomValueTable {
           $where = " WHERE  id = %{$count}";
           $params[$count] = [$firstField['id'], 'Integer'];
           $count++;
+          if ($entityID) {
+            $where .= " AND entity_id = %{$count}";
+            $params[$count] = [$entityID, 'Integer'];
+            $count++;
+          }
           $hookOP = 'edit';
         }
         else {
