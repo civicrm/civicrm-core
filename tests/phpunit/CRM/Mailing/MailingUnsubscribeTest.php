@@ -179,6 +179,30 @@ class CRM_Mailing_MailingUnsubscribeTest extends CiviUnitTestCase {
   }
 
   /**
+   * Resubscribing must only remove the group unsubscribe, never an opt-out
+   * recorded for the same queue entry.
+   */
+  public function testResubscribeKeepsOrgUnsubscribe() : void {
+    $this->setUpGroups('group1');
+    $this->addIndivToGroups('group1');
+    $queue = $this->sendMailing('group1');
+    CRM_Mailing_Event_BAO_MailingEventUnsubscribe::writeRecord([
+      'event_queue_id' => $queue['id'],
+      'org_unsubscribe' => 1,
+      'time_stamp' => date('YmdHis'),
+    ]);
+    CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queue['id'], $queue['hash']);
+
+    CRM_Mailing_Event_BAO_MailingEventResubscribe::resub_to_mailing(NULL, $queue['id'], $queue['hash']);
+
+    $remaining = CRM_Core_DAO::executeQuery(
+      'SELECT org_unsubscribe FROM civicrm_mailing_event_unsubscribe WHERE event_queue_id = %1',
+      [1 => [$queue['id'], 'Positive']]
+    )->fetchMap('org_unsubscribe', 'org_unsubscribe');
+    $this->assertEquals([1 => 1], $remaining);
+  }
+
+  /**
    *
    * Helper functions
    *
@@ -222,6 +246,9 @@ class CRM_Mailing_MailingUnsubscribeTest extends CiviUnitTestCase {
     CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queue_info['id'], $queue_info['hash']);
   }
 
+  /**
+   * Send a mailing to the given groups and return the contact's queue id and hash.
+   */
   private function sendMailing(...$sentTo) : array {
     foreach ($sentTo as $group) {
       $sentToIds[] = $this->groupIds[$group];
