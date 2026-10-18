@@ -157,6 +157,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
       // When a paymentProcessor is deleted, delete the associated test processor
       $testDAO = new CRM_Financial_DAO_PaymentProcessor();
       $testDAO->name = $event->object->name;
+      $testDAO->domain_id = $event->object->domain_id;
       $testDAO->is_test = 1;
       $testDAO->delete();
     }
