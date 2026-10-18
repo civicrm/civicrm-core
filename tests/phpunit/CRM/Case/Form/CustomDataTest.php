@@ -252,7 +252,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
           'custom_field_newvalue' => '2.34',
         ],
         'expected' => [
-          'string' => 'What?: 0.00 => 2.34',
+          'string' => 'What?:  => 2.34',
         ],
       ],
 
