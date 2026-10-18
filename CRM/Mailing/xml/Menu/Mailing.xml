@@ -203,6 +203,7 @@
     <path>civicrm/ajax/setupMailAccount</path>
     <page_callback>CRM_Mailing_Page_AJAX::setup</page_callback>
     <access_arguments>access CiviCRM,access CiviMail</access_arguments>
+    <is_ajax>false</is_ajax>
   </item>
   <item>
     <path>civicrm/mailing/url</path>

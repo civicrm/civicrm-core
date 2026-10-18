@@ -230,6 +230,7 @@
     <path>civicrm/ajax/angular-modules</path>
     <page_callback>\Civi\Angular\Page\Modules</page_callback>
     <access_arguments>*always allow*</access_arguments>
+    <is_ajax>false</is_ajax>
   </item>
   <item>
      <path>civicrm/ajax/recurringentity/update-mode</path>

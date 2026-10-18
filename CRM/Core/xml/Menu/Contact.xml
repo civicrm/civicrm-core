@@ -237,6 +237,7 @@
      <path>civicrm/ajax/groupTree</path>
      <page_callback>CRM_Contact_Page_AJAX::groupTree</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>false</is_ajax>
 </item>
 <item>
      <path>civicrm/ajax/customvalue</path>
@@ -255,11 +256,13 @@
      <path>civicrm/ajax/checkemail</path>
      <page_callback>CRM_Contact_Page_AJAX::getContactEmail</page_callback>
      <access_callback>1</access_callback>
+     <is_ajax>false</is_ajax>
 </item>
 <item>
      <path>civicrm/ajax/subtype</path>
      <page_callback>CRM_Contact_Page_AJAX::buildSubTypes</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>false</is_ajax>
 </item>
 <item>
      <path>civicrm/ajax/pdfFormat</path>
