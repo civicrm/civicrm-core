@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Address;
 use Civi\Api4\Relationship;
 
 /**
@@ -1091,6 +1092,70 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $this->assertEquals('41.70130897956', $addAddress->geo_code_1, 'In line' . __LINE__);
     $this->assertEquals('-73.9194186863', $addAddress->geo_code_2, 'In line' . __LINE__);
+  }
+
+  /**
+   * Submitting another contact's address id must not reassign that address.
+   */
+  public function testLegacyCreateCannotTakeOtherContactsAddress(): void {
+    $userContactId = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'User'], 'user')['id'];
+    $victimContactId = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Victim'], 'victim')['id'];
+    $victimAddressId = $this->createTestEntity('Address', [
+      'contact_id' => $victimContactId,
+      'location_type_id' => 1,
+      'street_address' => 'Victim Street',
+    ])['id'];
+
+    $addresses = CRM_Core_BAO_Address::legacyCreate([
+      'contact_id' => $userContactId,
+      'address' => [
+        1 => [
+          'id' => $victimAddressId,
+          'location_type_id' => 1,
+          'street_address' => 'User Street',
+        ],
+      ],
+    ], TRUE);
+
+    $this->assertNotEquals($victimAddressId, $addresses[0]->id);
+    $victimAddress = Address::get(FALSE)
+      ->addWhere('id', '=', $victimAddressId)
+      ->execute()->single();
+    $this->assertEquals($victimContactId, $victimAddress['contact_id']);
+    $this->assertEquals('Victim Street', $victimAddress['street_address']);
+    $userAddress = Address::get(FALSE)
+      ->addWhere('contact_id', '=', $userContactId)
+      ->execute()->single();
+    $this->assertEquals('User Street', $userAddress['street_address']);
+  }
+
+  /**
+   * Submitting another contact's address id with blank data must not delete that address.
+   */
+  public function testLegacyCreateCannotDeleteOtherContactsAddress(): void {
+    $userContactId = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'User'], 'user')['id'];
+    $victimContactId = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Victim'], 'victim')['id'];
+    $victimAddressId = $this->createTestEntity('Address', [
+      'contact_id' => $victimContactId,
+      'location_type_id' => 1,
+      'street_address' => 'Victim Street',
+    ])['id'];
+
+    CRM_Core_BAO_Address::legacyCreate([
+      'contact_id' => $userContactId,
+      'updateBlankLocInfo' => TRUE,
+      'address' => [
+        1 => [
+          'id' => $victimAddressId,
+          'street_address' => '',
+        ],
+      ],
+    ], TRUE);
+
+    $this->assertCount(1, Address::get(FALSE)
+      ->addWhere('id', '=', $victimAddressId)
+      ->addWhere('contact_id', '=', $victimContactId)
+      ->execute());
   }
 
 }

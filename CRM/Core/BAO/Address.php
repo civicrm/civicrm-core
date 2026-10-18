@@ -1371,12 +1371,18 @@ SELECT is_primary,
     $contactId = $params['contact_id'];
     //get all the addresses for this contact
     $addresses = self::allAddress($contactId);
+    $ownedAddressIds = array_map('intval', self::allAddress($contactId, TRUE) ?? []);
 
     $isPrimary = $isBilling = TRUE;
     $blocks = [];
     foreach ($params['address'] as $key => $value) {
       if (!is_array($value)) {
         continue;
+      }
+
+      // Prevent hijacking addresses belonging to another contact
+      if (!empty($value['id']) && !in_array((int) $value['id'], $ownedAddressIds, TRUE)) {
+        unset($value['id']);
       }
 
       $addressExists = self::dataExists($value);
