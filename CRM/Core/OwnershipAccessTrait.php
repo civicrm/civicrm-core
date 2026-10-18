@@ -44,7 +44,7 @@ trait CRM_Core_OwnershipAccessTrait {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public static function checkOwnershipAccessPre(\Civi\Core\Event\PreEvent $event): void {
-    if ($event->action !== 'edit' || empty($event->id)) {
+    if (!in_array($event->action, ['edit', 'create'], TRUE)) {
       return;
     }
     $ownerFields = (array) static::getOwnerContactIdField();
