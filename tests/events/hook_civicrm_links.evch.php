@@ -37,6 +37,7 @@ return new class() extends EventCheck implements HookInterface {
     'membershipType.manage.action::MembershipType',
     'messageTemplate.manage.action::MessageTemplate',
     'basic.CRM_Core_BAO_MessageTemplate.page::CRM_Core_BAO_MessageTemplate',
+    'priceField.row.actions::PriceField',
   ];
 
   /**

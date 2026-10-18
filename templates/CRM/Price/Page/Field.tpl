@@ -60,11 +60,11 @@
         <td>{if $row.expire_on}{$row.expire_on|crmDate}{/if}</td>
         <td>{if $row.html_type eq "Text"}{$row.price|crmMoney}{else}<a class="action-item" href="{crmURL p="civicrm/admin/price/field/option" q="action=browse&reset=1&sid=$sid&fid=$fid"}">{if $isReserved}{ts}View Price Options{/ts}{else}{ts}Edit Price Options{/ts}{/if}</a>{/if}</td>
         {if $getTaxDetails}
-            <td>{if $row.tax_rate != '' && $row.html_type eq "Text / Numeric Quantity"}
+            <td>{if $row.tax_rate != '' && $row.html_type eq "Text"}
                     {$taxTerm} ({$row.tax_rate|string_format:"%.2f"}%)
                 {/if}
       </td>
-            <td>{if $row.html_type eq "Text / Numeric Quantity"}{$row.tax_amount|crmMoney}{/if}</td>
+            <td>{if $row.html_type eq "Text"}{$row.tax_amount|crmMoney}{/if}</td>
         {/if}
         <td class="field-action">{$row.action|smarty:nodefaults|replace:'xx':$row.id}</td>
       </tr>
