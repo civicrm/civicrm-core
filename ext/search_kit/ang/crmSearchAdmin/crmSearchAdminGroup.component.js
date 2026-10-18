@@ -10,7 +10,7 @@
       const ts = $scope.ts = CRM.ts('org.civicrm.search_kit');
 
       this.getEntity = searchMeta.getEntity;
-      this.getField = (fieldName) => searchMeta.getField(fieldName, this.savedSearch);
+      this.getField = (fieldName, entity) => searchMeta.getField(fieldName, entity || this.savedSearch);
 
       this.smartGroupColumns = [];
 
