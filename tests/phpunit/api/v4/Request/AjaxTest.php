@@ -277,6 +277,38 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
   }
 
   /**
+   * Validation messages in the exception's error data are passed to the form.
+   */
+  public function testValidationErrorResponse(): void {
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
+    $validation = 'Submission is already processed.';
+    $listener = function() use (&$validation) {
+      throw new \CRM_Core_Exception('Invalid', 0, ['validation' => $validation]);
+    };
+    \Civi::dispatcher()->addListener('hook_civicrm_selectWhereClause', $listener);
+    try {
+      [$response, $code] = $this->runAjax([
+        'path' => 'civicrm/ajax/api4/Contact/get',
+        'get' => ['params' => json_encode(['limit' => 1])],
+      ]);
+      $this->assertEquals(500, $code);
+      $this->assertSame('0', $response['error_code']);
+      $this->assertEquals('Submission is already processed.', $response['error_message']);
+
+      $validation = ['First problem', 'Second problem'];
+      [$response] = $this->runAjax([
+        'path' => 'civicrm/ajax/api4/Contact/get',
+        'get' => ['params' => json_encode(['limit' => 1])],
+      ]);
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('hook_civicrm_selectWhereClause', $listener);
+    }
+    $this->assertSame('0', $response['error_code']);
+    $this->assertEquals("First problem\nSecond problem", $response['error_message']);
+  }
+
+  /**
    * Simulate an APIv4 ajax call
    *
    * @param array{path: string, get: array, post: array} $request

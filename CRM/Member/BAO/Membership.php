@@ -306,7 +306,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     // once we are rid of direct calls to the BAO::create from core
     // we will deprecate this stuff into the v3 api.
     // API4 doesn't pass in "version" - we explicitly pass it in for API4 Membership - see MembershipSaveTrait
-    if (($params['version'] ?? 0) !== 4) {
+    if (($params['version'] ?? 0) !== 4 && CRM_Core_Component::isEnabled('CiviContribute')) {
       $hasContributionLineItem = LineItem::get(FALSE)
         ->addWhere('entity_table', '=', 'civicrm_membership')
         ->addWhere('entity_id', '=', $membership->id)

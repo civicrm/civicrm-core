@@ -331,4 +331,19 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
     return TRUE;
   }
 
+  public function upgrade_6_20_beta1($rev): void {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Set contribution_status default', 'setContributionStatusDefault');
+  }
+
+  public static function setContributionStatusDefault(CRM_Queue_TaskContext $ctx): bool {
+    $curdefault = CRM_Core_DAO::singleValueQuery("SELECT ov.id FROM civicrm_option_value ov INNER JOIN civicrm_option_group og ON (og.id = ov.option_group_id AND og.name='contribution_status') WHERE ov.is_default = 1");
+    if (empty($curdefault)) {
+      $curdefault = CRM_Core_DAO::singleValueQuery("SELECT MIN(ov.id) AS minid FROM civicrm_option_value ov INNER JOIN civicrm_option_group og ON (og.id = ov.option_group_id AND og.name='contribution_status') ORDER BY ov.weight LIMIT 1");
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value SET is_default = 1 WHERE id = %1", [1 => [$curdefault, 'Integer']]);
+    }
+
+    return TRUE;
+  }
+
 }
