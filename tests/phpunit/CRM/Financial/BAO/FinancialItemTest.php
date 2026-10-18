@@ -12,6 +12,7 @@
 use Civi\Api4\Contribution;
 use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\FinancialItem;
+use Civi\Api4\LineItem;
 
 /**
  * Class CRM_Financial_BAO_FinancialItemTest
@@ -200,7 +201,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       ->setValues(['total_amount' => 300.00])
       ->execute();
 
-    $financialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
+    $lineItemID = LineItem::get(FALSE)->addWhere('contribution_id', '=', $contribution['id'])->execute()->single()['id'];
+    $financialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemID);
     $result = FinancialItem::get(FALSE)
       ->addWhere('id', '=', $financialItem['id'])
       ->addSelect('amount')
@@ -235,7 +237,8 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       ->addWhere('contact_id', '=', $contactId)
       ->addSelect('id')
       ->execute()->single();
-    $financialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($contribution['id']);
+    $lineItemID = LineItem::get(FALSE)->addWhere('contribution_id', '=', $contribution['id'])->execute()->single()['id'];
+    $financialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemID);
     $result = FinancialItem::get(FALSE)
       ->addWhere('id', '=', $financialItem['id'])
       ->addSelect('description', 'status_id', 'amount', 'financial_account_id')
