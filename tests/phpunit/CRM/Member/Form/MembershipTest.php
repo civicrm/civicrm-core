@@ -611,6 +611,38 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the back-office membership submission still works when CiviContribute
+   * is disabled, since CRM_Member_Form_Membership::submit() calls getOrder()
+   * unconditionally (unlike CRM_Event_Form_Participant, which guards it with
+   * getPriceSetID()).
+   *
+   * @see testSubmitPaidNoPayment
+   */
+  public function testSubmitPaidNoPaymentWithoutCiviContributeEnabled(): void {
+    $this->createLoggedInUser();
+    CRM_Core_BAO_ConfigSetting::disableComponent('CiviContribute');
+    try {
+      $this->getTestForm('CRM_Member_Form_Membership', [
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'join_date' => date('Y-m-d'),
+        'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['AnnualFixed']],
+        'total_amount' => 50,
+        'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+        'send_receipt' => TRUE,
+        'receipt_text' => 'Receipt text',
+        'financial_type_id' => '',
+      ])->processForm();
+    }
+    finally {
+      CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
+    }
+
+    // Check if Membership is set to New.
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
+  }
+
+  /**
    * Test that custom field data submitted for a back-office membership
    * signup with no online payment processor is saved against the created
    * membership.
