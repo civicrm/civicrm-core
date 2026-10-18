@@ -261,108 +261,21 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   }
 
   /**
+   * Cancel the pending online contribution of a participant who gets a negative status.
+   *
    * @param int $participantId
    * @param int $statusId
    *
    * @throws \CRM_Core_Exception
    */
   public static function updatePendingOnlineContribution($participantId, $statusId) {
-
-    $contributionId = CRM_Contribute_BAO_Contribution::checkOnlinePendingContribution($participantId,
-      'Event'
-    );
-    if (!$contributionId) {
+    if (!array_key_exists($statusId, CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'"))) {
       return;
     }
-
-    //status rules.
-    //1. participant - positive => contribution - completed.
-    //2. participant - negative => contribution - cancelled.
-
-    $positiveStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Positive'");
-    $negativeStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
-    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-
-    if (array_key_exists($statusId, $positiveStatuses)) {
-      $params = [
-        'component_id' => $participantId,
-        'contribution_id' => $contributionId,
-        'IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved' => 1,
-      ];
-
-      //change related contribution status.
-      self::updateContributionStatus($params);
-    }
-    if (array_key_exists($statusId, $negativeStatuses)) {
+    $contributionId = CRM_Contribute_BAO_Contribution::checkOnlinePendingContribution($participantId);
+    if ($contributionId) {
       civicrm_api3('Contribution', 'create', ['id' => $contributionId, 'contribution_status_id' => 'Cancelled']);
-      return;
     }
-
-  }
-
-  /**
-   * Update contribution status.
-   *
-   * @param array $params
-   *
-   * @throws \CRM_Core_Exception
-   * @throws \Exception
-   *
-   * @deprecated
-   * This is only called from one place in the code &
-   * it is unclear whether it is a function on the way in or on the way out
-   *
-   */
-  public static function updateContributionStatus($params) {
-    $input = ['component' => 'event'];
-
-    // reset template values.
-    $template = CRM_Core_Smarty::singleton();
-    $template->clearTemplateVars();
-
-    $contribution = new CRM_Contribute_BAO_Contribution();
-    $contribution->id = $params['contribution_id'];
-    $contribution->fetch();
-
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
-      'labelColumn' => 'name',
-      'flip' => 1,
-    ]);
-    $input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'] = $params['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'] ?? NULL;
-
-    // status is not pending
-    if ($contribution->contribution_status_id != $contributionStatuses['Pending']) {
-      return;
-    }
-
-    //set values for ipn code.
-    foreach (['fee_amount', 'check_number', 'payment_instrument_id'] as $field) {
-      $input[$field] = $params[$field] ?? NULL;
-      if (!$input[$field]) {
-        $input[$field] = $contribution->$field;
-      }
-    }
-    $input['trxn_id'] = $params['trxn_id'] ?? NULL;
-    if (!$input['trxn_id']) {
-      $input['trxn_id'] = $contribution->invoice_id;
-    }
-    $input['amount'] = $params['total_amount'] ?? NULL;
-    if (!$input['amount']) {
-      $input['amount'] = $contribution->total_amount;
-    }
-    $input['is_test'] = $contribution->is_test;
-    $input['net_amount'] = $contribution->net_amount;
-    if (!empty($input['fee_amount']) && !empty($input['amount'])) {
-      $input['net_amount'] = $input['amount'] - $input['fee_amount'];
-    }
-
-    //complete the contribution.
-    // @todo use the api - ie civicrm_api3('Contribution', 'completetransaction', $input);
-    // as this method is not preferred / supported.
-    CRM_Contribute_BAO_Contribution::completeOrder($input, NULL, $contribution->id ?? NULL);
-
-    // reset template values before processing next transactions
-    $template->clearTemplateVars();
   }
 
   /**
