@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Domain;
 use Civi\Api4\PaymentProcessor;
 
 /**
@@ -101,6 +102,28 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
       }
     }
     $this->assertTrue($found, 'The Manual payment processor should support "NoEmailProvided"');
+  }
+
+  /**
+   * Deleting a live processor must only delete its test processor in the same domain.
+   */
+  public function testDeleteKeepsTestProcessorOfOtherDomain(): void {
+    $this->useTransaction();
+    $otherDomainID = Domain::create(FALSE)
+      ->addValue('name', 'Other domain')
+      ->addValue('version', CRM_Utils_System::version())
+      ->execute()->first()['id'];
+    $otherTestID = $this->processorCreate(['name' => 'Shared', 'domain_id' => $otherDomainID]);
+    $this->dummyProcessorCreate(['name' => 'Shared']);
+
+    PaymentProcessor::delete(FALSE)
+      ->addWhere('id', '=', $this->ids['PaymentProcessor']['dummy_live'])
+      ->execute();
+
+    $remaining = PaymentProcessor::get(FALSE)
+      ->addWhere('id', 'IN', [$otherTestID, $this->ids['PaymentProcessor']['dummy_test']])
+      ->execute()->column('id');
+    $this->assertEquals([$otherTestID], $remaining);
   }
 
 }
