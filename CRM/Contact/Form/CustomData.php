@@ -73,6 +73,22 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
   public $_copyValueId;
 
+  public $_cdType;
+
+  public $_contactType;
+
+  public $_contactSubType;
+
+  public $_tableID;
+
+  public $_groupCount;
+
+  public $_entityId;
+
+  public $_groupTree;
+
+  public $_customValueCount;
+
   /**
    * Pre processing work done here.
    *
@@ -89,10 +105,16 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
       // this is due to some condition inside it which restricts it from saving in session
       // so doing this for multi record edit action
       $entityId = CRM_Utils_Request::retrieve('entityID', 'Positive', $this);
+      $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
+      $this->_tableID = $entityId;
+      if (!$this->_tableID || !CRM_Contact_BAO_Contact_Permission::allow($this->_tableID, CRM_Core_Permission::EDIT)) {
+        CRM_Utils_System::permissionDenied();
+      }
+      if ($this->_groupID && !CRM_Core_BAO_CustomGroup::checkGroupAccess($this->_groupID, CRM_Core_Permission::EDIT)) {
+        CRM_Utils_System::permissionDenied();
+      }
       $this->preProcessCustomData(NULL, CRM_Utils_Request::retrieve('type', 'String', $this), $entityId);
       if ($this->_multiRecordDisplay) {
-        $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this);
-        $this->_tableID = $entityId;
         $this->_contactType = CRM_Contact_BAO_Contact::getContactType($this->_tableID);
         $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
         $hasReachedMax = CRM_Core_BAO_CustomGroup::hasReachedMaxLimit($this->_groupID, $this->_tableID);
@@ -125,6 +147,12 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     }
     $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive', $this, TRUE);
     $this->_tableID = CRM_Utils_Request::retrieve('tableId', 'Positive', $this, TRUE);
+    if (!$this->_tableID || !CRM_Contact_BAO_Contact_Permission::allow($this->_tableID, CRM_Core_Permission::EDIT)) {
+      CRM_Utils_System::permissionDenied();
+    }
+    if ($this->_groupID && !CRM_Core_BAO_CustomGroup::checkGroupAccess($this->_groupID, CRM_Core_Permission::EDIT)) {
+      CRM_Utils_System::permissionDenied();
+    }
 
     $this->_contactType = CRM_Contact_BAO_Contact::getContactType($this->_tableID);
     $this->_contactSubType = CRM_Contact_BAO_Contact::getContactSubType($this->_tableID, ',');
