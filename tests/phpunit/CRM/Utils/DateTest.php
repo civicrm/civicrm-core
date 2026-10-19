@@ -2852,6 +2852,26 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * @dataProvider intervalAddMonthEndProvider
+   */
+  public function testIntervalAddClampsToMonthEnd(string $unit, int $interval, string $date, string $expected): void {
+    $result = CRM_Utils_Date::intervalAdd($unit, $interval, $date, TRUE);
+    $this->assertSame($expected, sprintf('%04d-%02d-%02d', $result['Y'], $result['M'], $result['d']));
+  }
+
+  public static function intervalAddMonthEndProvider(): array {
+    return [
+      ['month', 1, '2025-01-31', '2025-02-28'],
+      ['month', 1, '2024-01-31', '2024-02-29'],
+      ['month', 1, '2025-03-31', '2025-04-30'],
+      ['month', 13, '2025-01-31', '2026-02-28'],
+      ['month', 1, '2025-01-15', '2025-02-15'],
+      ['year', 1, '2024-02-29', '2025-02-28'],
+      ['day', 1, '2025-01-31', '2025-02-01'],
+    ];
+  }
+
   public function testDatePluginToStrftime(): void {
     $this->assertNull(CRM_Utils_Date::datePluginToStrftime(NULL, NULL));
     $this->assertSame('%Y', CRM_Utils_Date::datePluginToStrftime('yy'));

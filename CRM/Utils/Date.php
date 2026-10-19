@@ -921,11 +921,12 @@ class CRM_Utils_Date {
     $date = mktime($hour, $minute, $second, $month, $day, $year);
     switch ($unit) {
       case 'year':
-        $date = mktime($hour, $minute, $second, $month, $day, $year + $interval);
-        break;
-
       case 'month':
-        $date = mktime($hour, $minute, $second, $month + $interval, $day, $year);
+        // Clamp to the end of the target month: Jan 31 + 1 month is Feb 28, not Mar 3.
+        $targetMonth = $unit === 'month' ? $month + $interval : $month;
+        $targetYear = $unit === 'year' ? $year + $interval : $year;
+        $lastDay = (int) date('t', mktime(0, 0, 0, $targetMonth, 1, $targetYear));
+        $date = mktime($hour, $minute, $second, $targetMonth, min($day, $lastDay), $targetYear);
         break;
 
       case 'week':
