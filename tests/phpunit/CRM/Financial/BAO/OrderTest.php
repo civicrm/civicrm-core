@@ -155,6 +155,63 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that multiple distinct identifiers in one Order::create() call each
+   * create their own distinct Participant, all linked to the one shared
+   * Contribution (dev/core#6773) - the shape
+   * CRM_Event_Form_Registration_Confirm relies on for multi-participant
+   * event registrations.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateOrderMultipleDistinctParticipantsInOneCall(): void {
+    $this->eventCreatePaid();
+    $this->individualCreate();
+    $this->individualCreate([], 'additional');
+    Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id' => 1,
+      ])
+      ->addLineItem([
+        'identifier' => 'participant_0',
+        'entity_table' => 'civicrm_participant',
+        'entity_id.event_id' => $this->getEventID(),
+        'entity_id.contact_id' => $this->ids['Contact']['individual_0'],
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
+      ])
+      ->addLineItem([
+        'identifier' => 'participant_1',
+        'entity_table' => 'civicrm_participant',
+        'entity_id.event_id' => $this->getEventID(),
+        'entity_id.contact_id' => $this->ids['Contact']['additional'],
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_student'],
+      ])
+      ->execute();
+
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])
+      ->execute()->single();
+    $this->assertEquals(150, $contribution['total_amount']);
+
+    $lineItems = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(2, $lineItems);
+    $this->assertNotEquals($lineItems[0]['entity_id'], $lineItems[1]['entity_id'], 'Each identifier should create its own distinct Participant.');
+
+    $participants = Participant::get(FALSE)
+      ->addSelect('contact_id', 'fee_amount')
+      ->addOrderBy('id')
+      ->execute();
+    $this->assertCount(2, $participants);
+    $this->assertEquals($this->ids['Contact']['individual_0'], $participants[0]['contact_id']);
+    $this->assertEquals(50, $participants[0]['fee_amount']);
+    $this->assertEquals($this->ids['Contact']['additional'], $participants[1]['contact_id']);
+    $this->assertEquals(100, $participants[1]['fee_amount']);
+  }
+
+  /**
    * Test that line items sharing an identifier must have entity_table
    * declared on (at least) one of them - it cannot be inferred from the
    * identifier alone (dev/core#6773).
