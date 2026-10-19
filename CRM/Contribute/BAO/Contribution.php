@@ -2210,20 +2210,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if ($participantID) {
-      $eventParams = ['id' => $eventID];
-      $values['event'] = [];
-
-      CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
-
-      // @todo set this in is_email_receipt, based on $this->_relatedObjects.
-      if ($values['event']['is_email_confirm']) {
-        $values['is_email_receipt'] = 1;
-      }
-
-      if ($contributionID) {
-        $values['contributionId'] = $contributionID;
-      }
-
       return CRM_Event_BAO_Event::sendMail($contactID, $values,
         $participantID, $this->is_test, $returnMessageText
       );
@@ -2379,7 +2365,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $template->assign('is_recur', !empty($this->contribution_recur_id));
 
     if ($this->_component === 'event') {
-      $template->assign('event', $values['event']);
       $template->assign('participant', $values['participant']);
 
       $isTest = $this->is_test;
@@ -3381,14 +3366,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CRM_Core_Exception
    */
   protected function loadEventMessageTemplateParams(int $eventID, int $participantID): array {
-
-    $eventParams = [
-      'id' => $eventID,
-    ];
-    $values = ['event' => []];
-
-    CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
-
     //get participant details
     $participantParams = [
       'id' => $participantID,
