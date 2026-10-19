@@ -1229,7 +1229,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'civicrm_phone_contact_source_phone' => NULL,
       'civicrm_phone_contact_assignee_phone' => NULL,
       'civicrm_phone_contact_target_phone' => NULL,
-      'civicrm_activity_id' => '1',
+      'civicrm_activity_id' => $this->activityID,
       'civicrm_activity_source_record_id' => NULL,
       'civicrm_activity_activity_type_id' => 'Meeting',
       'civicrm_activity_activity_subject' => 'Very secret meeting',
@@ -1690,7 +1690,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
           2 => "Activity Contact Type (record id: $originalAssigneeRecordID)",
         ],
         'from' => [
-          0 => 'Very secret meeting (id: 1)',
+          0 => 'Very secret meeting (id: ' . $this->activityID . ')',
           1 => 'Mr. Anthony Łąchowski-Roberts II (id: 4)',
           2 => 'Activity Assignees',
         ],
@@ -1713,7 +1713,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
           2 => '',
         ],
         'to' => [
-          0 => 'Very secret meeting (id: 1)',
+          0 => 'Very secret meeting (id: ' . $this->activityID . ')',
           1 => 'Mr. Anthony Brzęczysław II (id: 3)',
           2 => 'Activity Assignees',
         ],
