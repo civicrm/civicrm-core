@@ -838,7 +838,7 @@ event.fee_label :Event fees
     return '
 New
 General
-1
+' . $this->getMembershipID() . '
 New
 General
 January 21st, 2007

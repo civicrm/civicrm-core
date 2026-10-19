@@ -307,7 +307,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Membership Expiration Date' => $membership['end_date'],
       'Membership Source' => 'Payment',
       'Membership Status' => 'Pending',
-      'Membership ID' => '2',
+      'Membership ID' => $membership['id'],
       'Primary Member ID' => '',
       'Max Related' => '',
       'Recurring Contribution ID' => $this->ids['ContributionRecur']['default'],

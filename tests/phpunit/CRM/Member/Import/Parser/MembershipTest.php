@@ -59,6 +59,13 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   protected $relationshipTypeID;
 
   /**
+   * CSV files written by the test, to be removed in tearDown.
+   *
+   * @var string[]
+   */
+  private array $csvFiles = [];
+
+  /**
    * API version in use.
    *
    * @var int
@@ -120,7 +127,22 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup($tablesToTruncate, TRUE);
+    foreach ($this->csvFiles as $csvFile) {
+      unlink($csvFile);
+    }
     parent::tearDown();
+  }
+
+  /**
+   * Write a CSV file to the data directory, using ids only known at runtime.
+   *
+   * @param string $fileName
+   * @param string $content
+   */
+  private function writeCSV(string $fileName, string $content): void {
+    $path = __DIR__ . '/data/' . $fileName;
+    file_put_contents($path, $content);
+    $this->csvFiles[] = $path;
   }
 
   /**
@@ -470,10 +492,11 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * Test the full form-flow import.
    */
   public function testImportCSVWithID() :void {
-    $this->createTestEntity('Membership', [
+    $membershipID = $this->createTestEntity('Membership', [
       'membership_type_id:name' => 'General',
       'contact_id' => $this->individualCreate(),
-    ]);
+    ])['id'];
+    $this->writeCSV('memberships_with_id.csv', "ID,Source,Membership Type,Start Date,Ignore me\n$membershipID,Import,General,2019-03-23,Just some cruft\n");
     $this->importCSV('memberships_with_id.csv', [
       ['name' => 'Membership.id'],
       ['name' => 'Membership.source'],
@@ -493,11 +516,12 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * Test the full form-flow import with ID and not all required fields.
    */
   public function testImportCSVWithIDMembershipTypeOptional() :void {
-    $this->createTestEntity('Membership', [
+    $membershipID = $this->createTestEntity('Membership', [
       'membership_type_id:name' => 'General',
       'contact_id' => $this->individualCreate(),
       'start_date' => '2019-03-23',
-    ]);
+    ])['id'];
+    $this->writeCSV('memberships_with_id.csv', "ID,Source,Membership Type,Start Date,Ignore me\n$membershipID,Import,General,2019-03-23,Just some cruft\n");
     $this->importCSV('memberships_with_id.csv', [
       ['name' => 'Membership.id'],
       ['name' => 'Membership.source'],
@@ -541,11 +565,12 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   public function testUpdateWithCustomDates(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Membership'], 'date');
     $contactID = $this->individualCreate(['external_identifier' => 'ext-1']);
-    $this->createTestEntity('Membership', [
+    $membershipID = $this->createTestEntity('Membership', [
       'contact_id' => $contactID,
       'membership_type_id:name' => 'General',
       'start_date' => '2020-10-01',
-    ]);
+    ])['id'];
+    $this->writeCSV('memberships_update_custom_date.csv', "Membership ID,Source,Membership Type,Start Date,Custom Date\n$membershipID,Import,General,23/03/2021,23/03/2019\n");
     $mapping = [
       ['name' => 'Membership.id'],
       ['name' => 'Membership.source'],
