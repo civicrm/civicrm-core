@@ -1830,8 +1830,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   /**
    * Get the id of the primary registrant, for an additional participant's
-   * registered_by_id - set via confirmPostProcess() once the primary has
-   * been created, before any additional participant is processed.
+   * registered_by_id - set once the primary has been created, before any
+   * additional participant is processed.
    *
    * @param int $participantNumber
    *
