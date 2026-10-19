@@ -16,6 +16,27 @@ CRM.$(function($) {
     // validate rows
     checkColumns($(this));
   });
+
+  $('input[id*="primary_contact_"]').change(function() {
+    var temp = this.id.split('_');
+    var ROWID = temp[3];
+    if ($(this).val()) {
+      updateContactInfo(ROWID, 'primary_');
+    }
+  });
+
+  $('select[id^="option_type_"]').each(function () {
+    if ($(this).val() == 1) {
+      $(this).attr('disabled', true);
+      $(this).hide();
+    }
+  });
+
+  $('#crm-container').on('keyup change', '*.selector-rows', function () {
+    // validate rows
+    checkColumns($(this));
+  });
+
   $('.pledge-adjust-option').click(function(){
     var blockNo = $(this).attr('id');
     $('select[id="option_type_' + blockNo + '"]').show();
@@ -106,6 +127,11 @@ CRM.$(function($) {
     });
 
   }
+  else if (CRM.batch.type_id == 3) {
+    $('select[id*="open_pledges_"]').change(function () {
+      setPledgeAmount($(this), $(this).val());
+    });
+  }
 
   // line breaks between radio buttons and checkboxes
   $('input.form-radio').next().after('<br />');
@@ -160,17 +186,22 @@ function checkColumns(parentRow) {
 
   parentRow.find('div .required').each(function () {
     //special case to handle contact autocomplete select
-    // @todo WHY OH WHY is this duplicated on the tpl file?
     var fieldId = cj(this).attr('id');
-    if (fieldId.substring(0, 16) == 'primary_contact_') {
+    // datepicker hasTimeEntry would not have an id - not sure why.
+    if (typeof fieldId !== 'undefined' && fieldId.substring(0, 16) == 'primary_contact_') {
       // if display value is set then make sure we also check if contact id is set
       if (!cj(this).val()) {
         inValidRow++;
       }
       else {
-        if (cj(this).val() && !cj('input[name="primary_contact_select_id[' + rowID + ']"]').val()) {
+        var contactIdElement = cj('input[name="primary_contact_select_id[' + rowID + ']"]');
+        if (cj(this).val() && !contactIdElement.val()) {
           inValidRow++;
           errorExists = true;
+        }
+        else if (cj(this).val() && contactIdElement.val()) {
+          // this is hack to remove error span because we are skipping this for autocomplete fields
+          cj(this).next('span.crm-error').remove();
         }
       }
     }
@@ -179,7 +210,7 @@ function checkColumns(parentRow) {
         inValidRow++;
       }
       else {
-        if (cj(this).hasClass('error') && !cj(this).hasClass('valid')) {
+        if (cj(this).hasClass('error') && (cj(this).hasClass('valid') || cj(this).hasClass('required'))) {
           errorExists = true;
         }
         else {
@@ -211,25 +242,7 @@ function calculateActualTotal() {
     }
   });
 
-  cj('.batch-actual-total').html(formatMoney(total));
-}
-
-//money formatting/localization
-function formatMoney(amount) {
-  var c = 2;
-  var t = CRM.setting.monetaryThousandSeparator;
-  var d = CRM.setting.monetaryDecimalPoint;
-
-  c = isNaN(c = Math.abs(c)) ? 2 : c;
-  t = t === undefined ? "." : t;
-  d = d === undefined ? "," : d;
-
-  var n = amount,
-    i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
-    s = n < 0 ? "-" : "",
-    j = (j = i.length) > 3 ? j % 3 : 0;
-
-  return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+  cj('.batch-actual-total').text(CRM.formatMoney(total, true));
 }
 
 /**
@@ -313,5 +326,106 @@ function setDateFieldValue(fname, fieldValue, blockNo) {
     displayDateValue = cj.datepicker.formatDate(date_format, actualDateValue);
   }
 
-  cj('#field_' + blockNo + '_' + fname + '_display').val(displayDateValue);
+  cj('[id^=field_' + blockNo + '_' + fname + '_display]').val(displayDateValue);
 }
+
+function updateContactInfo(blockNo, prefix) {
+  var contactHiddenElement = 'input[id="' + prefix + 'contact_id_' + blockNo + '"]';
+  var contactId = cj(contactHiddenElement).val();
+
+  var profileFields = (CRM.contact && CRM.contact.fieldmap) ? CRM.contact.fieldmap : {};
+  var returnProperties = (CRM.contact && CRM.contact.return) ? CRM.contact.return : '';
+
+  CRM.api('Contact', 'get', {
+    'sequential': '1',
+    'contact_id': contactId,
+    'return': returnProperties
+  }, {
+    success: function (data) {
+      if (data.values && data.values[0]) {
+        cj.each(data.values[0], function (key, value) {
+          // set the values
+          var actualFldName = profileFields[key];
+          if (key == 'country' || key == 'state_province') {
+            var idFldName = key + '_id';
+            value = data.values[0][idFldName];
+          }
+          setFieldValue(actualFldName, value, blockNo);
+        });
+      }
+
+      // for membership batch entry based on contact we need to enable / disable
+      // add membership select
+      if (CRM.batch.type_id == 2) {
+        CRM.api('Membership', 'get', {
+          'sequential': '1',
+          'contact_id': contactId
+        }, {
+          success: function (data) {
+            if (data.count > 0) {
+              //get the information on membership type
+              var membershipTypeId = data.values[0].membership_type_id;
+              var membershipJoinDate = data.values[0].join_date;
+              var membershipStartDate = data.values[0].start_date;
+              CRM.api('MembershipType', 'get', {
+                'sequential': '1',
+                'id': membershipTypeId
+              }, {
+                success: function (data) {
+                  var memTypeContactId = data.values[0].member_of_contact_id;
+                  cj('select[id="member_option_' + blockNo + '"]').prop('disabled', false).val(2);
+                  cj('select[id="field_' + blockNo + '_membership_type_0"]').val(memTypeContactId).change();
+                  cj('select[id="field_' + blockNo + '_membership_type_1"]').val(membershipTypeId).change();
+                  cj('#field_' + blockNo + '_' + 'membership_join_date').val(membershipJoinDate).trigger('change');
+                  cj('#field_' + blockNo + '_' + 'membership_start_date').val(membershipStartDate).trigger('change');
+                }
+              });
+            }
+          }
+        });
+      }
+      else if (CRM.batch.type_id == 3) {
+        cj('#open_pledges_' + blockNo).empty();
+        cj('#open_pledges_' + blockNo).append(cj('<option>', {
+          value: '',
+          text: '-select-'
+        }));
+        CRM.api('Pledge', 'get', {
+          'sequential': 1,
+          'contact_id': contactId || 0
+        }, {
+          success: function (data) {
+            cj.each(data.values, function (key, value) {
+              if (value.pledge_status != 'Completed') {
+                var date = cj.datepicker.parseDate('yy-mm-dd', value.pledge_next_pay_date);
+                var dateformat = CRM.config.dateInputFormat;
+                cj('#open_pledges_' + blockNo).append(cj('<option>', {
+                  value: value.pledge_id,
+                  text: cj.datepicker.formatDate(dateformat, date) + ", " + value.pledge_next_pay_amount + ' ' + value.pledge_currency
+                }));
+              }
+            });
+          }
+        });
+      }
+    }
+  });
+}
+
+function setPledgeAmount(form, pledgeID) {
+  var rowID = form.closest('div.crm-grid-row').attr('entity_id');
+  var dataUrl = CRM.url('civicrm/ajax/pledgeAmount');
+  if (pledgeID) {
+    cj.post(dataUrl, {pid: pledgeID}, function (data) {
+      cj('#field_' + rowID + '_financial_type').val(data.financial_type_id).change();
+      cj('#field_' + rowID + '_total_amount').val(data.amount).change();
+      cj('#field_' + rowID + '_total_amount').attr('readonly', true);
+    }, 'json');
+  }
+  else {
+    cj('#field_' + rowID + '_total_amount').val('').change();
+    cj('#field_' + rowID + '_financial_type').val('').change();
+    cj('#field_' + rowID + '_total_amount').removeAttr('readonly');
+  }
+}
+
