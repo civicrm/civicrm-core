@@ -1600,11 +1600,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * removed buckets. Unchanged lines are simply omitted - nothing to do for them.
    * Calculated once, in the constructor - see $lineItemChanges.
    *
-   * Identity is price_field_value_id - safe to use as a 1:1 match today. If a price
-   * field value ever legitimately carries more than one line (eg. several free-text
-   * amount entries against the same text field), findActivePreviousLineItem() is the
-   * one place that would need to change - the rest of this classification doesn't
-   * care how a match was found.
+   * Matching (findActivePreviousLineItem()/findCancelledPreviousLineItem()) is by
+   * entity_table + entity_id + price_field_value_id together - price_field_value_id
+   * alone is not enough, since more than one entity on the contribution can hold the
+   * same price option at once (eg. two participants in a group registration both on
+   * "Standard"), including the case where the entity being edited switches onto an
+   * option another entity already holds.
    *
    * @return array
    *   - added. Submitted lines with no active previous counterpart - this includes
@@ -1620,14 +1621,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $matchedIDs = [];
 
     foreach ($this->getUpdatedLineItems() as $submittedLineItem) {
-      // Identity is price_field_value_id (see docblock) - read it off the line
-      // itself rather than the array key, since a line merged in unchanged
-      // from another participant/entity (eg. ParticipantFeeSelection's
-      // addLineItemsNotYetRepresented()) is appended rather than keyed by it.
       $priceFieldValueID = $submittedLineItem['price_field_value_id'];
-      $previousLineItem = $this->findActivePreviousLineItem($priceFieldValueID);
+      $previousLineItem = $this->findActivePreviousLineItem($submittedLineItem);
       if ($previousLineItem === NULL) {
-        $cancelledLineItem = $this->findCancelledPreviousLineItem($priceFieldValueID);
+        $cancelledLineItem = $this->findCancelledPreviousLineItem($submittedLineItem);
         if ($cancelledLineItem !== NULL) {
           $submittedLineItem['id'] = $cancelledLineItem['id'];
         }
@@ -1658,11 +1655,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
   /**
    * Find the contribution's currently-active (non-cancelled) previous line item for
-   * a price field value, if any.
+   * the same entity and price field value as the given submitted line, if any.
    */
-  private function findActivePreviousLineItem($priceFieldValueID): ?array {
+  private function findActivePreviousLineItem(array $submittedLineItem): ?array {
     foreach ($this->originalLineItems as $previousLineItem) {
-      if ($previousLineItem['price_field_value_id'] == $priceFieldValueID && !$this->isCancelled($previousLineItem)) {
+      if ($this->isSameEntityAndPriceFieldValue($previousLineItem, $submittedLineItem) && !$this->isCancelled($previousLineItem)) {
         return $previousLineItem;
       }
     }
@@ -1670,16 +1667,23 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
-   * Find a previously-cancelled line item for a price field value, if any - so a
-   * re-selected option reuses its row rather than inserting a fresh one.
+   * Find a previously-cancelled line item for the same entity and price field value
+   * as the given submitted line, if any - so a re-selected option reuses its row
+   * rather than inserting a fresh one.
    */
-  private function findCancelledPreviousLineItem($priceFieldValueID): ?array {
+  private function findCancelledPreviousLineItem(array $submittedLineItem): ?array {
     foreach ($this->originalLineItems as $previousLineItem) {
-      if ($previousLineItem['price_field_value_id'] == $priceFieldValueID && $this->isCancelled($previousLineItem)) {
+      if ($this->isSameEntityAndPriceFieldValue($previousLineItem, $submittedLineItem) && $this->isCancelled($previousLineItem)) {
         return $previousLineItem;
       }
     }
     return NULL;
+  }
+
+  private function isSameEntityAndPriceFieldValue(array $previousLineItem, array $submittedLineItem): bool {
+    return $previousLineItem['price_field_value_id'] == $submittedLineItem['price_field_value_id']
+      && $previousLineItem['entity_table'] === $submittedLineItem['entity_table']
+      && (int) $previousLineItem['entity_id'] === (int) $submittedLineItem['entity_id'];
   }
 
   /**
