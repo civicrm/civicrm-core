@@ -1241,13 +1241,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * bulk operation over a set of line items rather than per-line-item. Consolidating
    * the two is a follow-up, not part of this move.
    *
-   * @param array $priceFieldValueIDsToCancel
+   * @param array $lineItemIDsToCancel
    * @param array $lineItemsToUpdate
    *
    * @return array
    *   List of formatted reverse Financial Items to be recorded
    */
-  private function getAdjustedFinancialItemsToRecord($priceFieldValueIDsToCancel, $lineItemsToUpdate): array {
+  private function getAdjustedFinancialItemsToRecord($lineItemIDsToCancel, $lineItemsToUpdate): array {
     $financialItemsArray = [];
     $financialItemResult = $this->getNonCancelledFinancialItems();
     foreach ($financialItemResult as $updateFinancialItemInfoValues) {
@@ -1259,7 +1259,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       unset($updateFinancialItemInfoValues['created_date']);
 
       // Reverse line items omitted from the submitted lines.
-      if (in_array($updateFinancialItemInfoValues['price_field_value_id'], $priceFieldValueIDsToCancel)
+      if (in_array($updateFinancialItemInfoValues['entity_id'], $lineItemIDsToCancel)
         && $updateFinancialItemInfoValues['amount'] != 0
       ) {
 
@@ -1274,11 +1274,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // INSERT a financial item to record surplus/lesser amount when a text price fee is changed
       elseif (
         !empty($lineItemsToUpdate)
-        && isset($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']])
-        && $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['html_type'] == 'Text'
+        && isset($lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']])
+        && $lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']]['html_type'] == 'Text'
         && $updateFinancialItemInfoValues['amount'] > 0
       ) {
-        $amountChangeOnTextLineItem = $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['line_total'] - $totalFinancialAmount;
+        $amountChangeOnTextLineItem = $lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']]['line_total'] - $totalFinancialAmount;
         if ($amountChangeOnTextLineItem !== (float) 0) {
           // calculate the amount difference, considered as financial item amount
           $updateFinancialItemInfoValues['amount'] = $amountChangeOnTextLineItem;
@@ -1318,15 +1318,15 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     $items = [];
     foreach ($financialItemResult as $index => $financialItem) {
-      $items[$financialItem['price_field_value_id']][$index] = $financialItem['amount'];
+      $items[$financialItem['entity_id']][$index] = $financialItem['amount'];
 
-      foreach ($items[$financialItem['price_field_value_id']] as $existingItemID => $existingAmount) {
+      foreach ($items[$financialItem['entity_id']] as $existingItemID => $existingAmount) {
         if ($financialItem['amount'] + $existingAmount == 0) {
           // Filter both rows as they cancel each other out.
           unset($financialItemResult[$index]);
           unset($financialItemResult[$existingItemID]);
-          unset($items[$financialItem['price_field_value_id']][$existingItemID]);
-          unset($items[$financialItem['price_field_value_id']][$index]);
+          unset($items[$financialItem['entity_id']][$existingItemID]);
+          unset($items[$financialItem['entity_id']][$index]);
         }
       }
     }
@@ -1431,8 +1431,32 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @return array
    */
   private function getLineItemsToAdd(array $submittedLineItems): array {
-    $previousPriceFieldValueIDs = array_column($this->originalLineItems, 'price_field_value_id');
-    return array_diff_key($submittedLineItems, array_flip($previousPriceFieldValueIDs));
+    $lineItemsToAdd = [];
+    foreach ($submittedLineItems as $key => $submittedLineItem) {
+      if (!$this->findPreviousLineItem($submittedLineItem)) {
+        $lineItemsToAdd[$key] = $submittedLineItem;
+      }
+    }
+    return $lineItemsToAdd;
+  }
+
+  /**
+   * Find the previous line item, if any, for the same entity and price field value.
+   *
+   * @param array $lineItem
+   *
+   * @return array|null
+   */
+  private function findPreviousLineItem(array $lineItem): ?array {
+    foreach ($this->originalLineItems as $previousLineItem) {
+      if ((int) $previousLineItem['price_field_value_id'] === (int) $lineItem['price_field_value_id']
+        && $previousLineItem['entity_table'] === $lineItem['entity_table']
+        && (int) $previousLineItem['entity_id'] === (int) $lineItem['entity_id']
+      ) {
+        return $previousLineItem;
+      }
+    }
+    return NULL;
   }
 
   /**
@@ -1464,17 +1488,16 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function getLineItemsToAlter(array $submittedLineItems): array {
     $lineItemsToUpdate = [];
-    $submittedPriceFieldValueIDs = array_keys($submittedLineItems);
     $lineItemsToCancel = $lineItemsToResurrect = [];
 
     foreach ($this->originalLineItems as $id => $previousLineItem) {
-      if (in_array($previousLineItem['price_field_value_id'], $submittedPriceFieldValueIDs)) {
-        $submittedLineItem = $submittedLineItems[$previousLineItem['price_field_value_id']];
+      $submittedLineItem = $this->findSubmittedLineItem($submittedLineItems, $previousLineItem);
+      if ($submittedLineItem) {
         if (($submittedLineItem['html_type'] ?? NULL) == 'Text') {
           // If a 'Text' price field was updated by changing qty value, then we are not adding new line-item but updating the existing one,
           //  because unlike other kind of price-field, it's related price-field-value-id isn't changed and thats why we need to make an
           //  exception here by adding financial item for updated line-item and will reverse any previous financial item entries.
-          $lineItemsToUpdate[$previousLineItem['price_field_value_id']] = array_merge($submittedLineItem, ['id' => $id]);
+          $lineItemsToUpdate[$id] = array_merge($submittedLineItem, ['id' => $id]);
         }
         else {
           // for updating the line items i.e. use-case - once deselect-option selecting again
@@ -1488,8 +1511,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
               $previousLineItem['qty'] != $submittedLineItem['qty']
             )
           ) {
-            $lineItemsToUpdate[$previousLineItem['price_field_value_id']] = $submittedLineItem;
-            $lineItemsToUpdate[$previousLineItem['price_field_value_id']]['id'] = $id;
+            $lineItemsToUpdate[$id] = $submittedLineItem;
+            $lineItemsToUpdate[$id]['id'] = $id;
             // Format is actually '0.00'
             if ($previousLineItem['line_total'] == 0) {
               $resurrectedLineItem = $submittedLineItem;
@@ -1499,13 +1522,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
           }
           // If there was previously a submitted line item for the same option value then there is
           // either no change or a qty adjustment. In either case we are not doing an add + reversal.
-          unset($lineItemsToCancel[$previousLineItem['price_field_value_id']]);
+          unset($lineItemsToCancel[$id]);
         }
       }
       else {
         if (!$this->isCancelled($previousLineItem)) {
           $cancelParams = ['qty' => 0, 'line_total' => 0, 'tax_amount' => 0, 'participant_count' => 0, 'non_deductible_amount' => 0, 'id' => $id];
-          $lineItemsToCancel[$previousLineItem['price_field_value_id']] = array_merge($previousLineItem, $cancelParams);
+          $lineItemsToCancel[$id] = array_merge($previousLineItem, $cancelParams);
 
         }
       }
@@ -1516,6 +1539,26 @@ class CRM_Contribute_BAO_FinancialProcessor {
       'line_items_to_cancel' => $lineItemsToCancel,
       'line_items_to_resurrect' => $lineItemsToResurrect,
     ];
+  }
+
+  /**
+   * Find the submitted line item, if any, for the same entity and price field value.
+   *
+   * @param array $submittedLineItems
+   * @param array $previousLineItem
+   *
+   * @return array|null
+   */
+  private function findSubmittedLineItem(array $submittedLineItems, array $previousLineItem): ?array {
+    foreach ($submittedLineItems as $submittedLineItem) {
+      if ((int) $submittedLineItem['price_field_value_id'] === (int) $previousLineItem['price_field_value_id']
+        && $submittedLineItem['entity_table'] === $previousLineItem['entity_table']
+        && (int) $submittedLineItem['entity_id'] === (int) $previousLineItem['entity_id']
+      ) {
+        return $submittedLineItem;
+      }
+    }
+    return NULL;
   }
 
   /**

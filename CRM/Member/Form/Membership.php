@@ -1516,9 +1516,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         // Already cancelled - nothing to preserve.
         continue;
       }
-      if (!isset($submittedLineItems[$lineItem['price_field_value_id']])) {
-        $submittedLineItems[$lineItem['price_field_value_id']] = $lineItem;
-      }
+      $submittedLineItems[] = $lineItem;
     }
   }
 
