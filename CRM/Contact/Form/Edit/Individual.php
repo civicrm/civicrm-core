@@ -66,6 +66,9 @@ class CRM_Contact_Form_Edit_Individual {
       // nick_name
       $form->addField('nick_name');
 
+      // legal_name
+      $form->addField('legal_name');
+
       // job title
       // override the size for UI to look better
       $form->addField('job_title', ['size' => '30']);
