@@ -256,8 +256,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    * Process the form after the input has been submitted and validated.
    */
   public function postProcess() {
-    $params = $this->exportValues();
-    $this->submit($params);
+    $this->submit();
   }
 
   /**
@@ -292,20 +291,14 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
   }
 
   /**
-   * @param array $params
-   *
    * @throws \CRM_Core_Exception
    */
-  public function submit($params) {
+  public function submit() {
     $statusClasses = CRM_Event_PseudoConstant::participantStatusClass();
-    if (isset($params['field'])) {
-      foreach ($params['field'] as $participantID => $value) {
-
+    if ($this->getSubmittedValue('field')) {
+      foreach ($this->getSubmittedValue('field') as $participantID => $value) {
         //check for custom data
-        $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value,
-          $participantID,
-          'Participant'
-        );
+        $value['custom'] = CRM_Core_BAO_CustomField::postProcess($value, $participantID, 'Participant');
         foreach (array_keys($value) as $fieldName) {
           // Unset the original custom field now that it has been formatting to the 'custom'
           // array as it may not be in the right format for the api as is (notably for
