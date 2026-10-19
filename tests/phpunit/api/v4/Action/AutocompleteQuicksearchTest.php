@@ -465,7 +465,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
 
   public function testQuicksearchAutocompleteWithNonNumericPhone(): void {
     Setting::set(FALSE)
-      ->addValue('quicksearch_options', ['sort_name', 'phone_primary.phone'])
+      ->addValue('quicksearch_options', ['sort_name', 'Phone.phone_numeric'])
       ->execute();
 
     $contacts = $this->saveTestRecords('Contact', [
@@ -481,18 +481,156 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $resultWithNonNumeric = Contact::autocomplete(FALSE)
       ->setFormName('crmMenubar')
       ->setFieldName('crm-qsearch-input')
-      ->setFilters(['phone_primary.phone' => '(123) 456'])
+      ->setFilters(['Phone.phone_numeric' => '(123) 456'])
       ->execute();
 
     $resultNumeric = Contact::autocomplete(FALSE)
       ->setFormName('crmMenubar')
       ->setFieldName('crm-qsearch-input')
-      ->setFilters(['phone_primary.phone' => '123456'])
+      ->setFilters(['Phone.phone_numeric' => '123456'])
       ->execute();
 
     $this->assertEquals($resultNumeric, $resultWithNonNumeric);
     $this->assertCount(1, $resultNumeric);
     $this->assertEquals($cid, $resultNumeric[0]['id']);
+  }
+
+  public function testQuicksearchAutocompleteExactVsPartialMatches(): void {
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'QuicksearchTestGroup',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'name' => 'TestString',
+      'custom_group_id.name' => 'QuicksearchTestGroup',
+    ]);
+    // we want to check integer fields are exact matched
+    $this->createTestRecord('CustomField', [
+      'name' => 'TestInteger',
+      'custom_group_id.name' => 'QuicksearchTestGroup',
+      'data_type' => 'Int',
+    ]);
+
+    Setting::set(FALSE)
+      ->addValue('quicksearch_options', ['Contribution.id', 'QuicksearchTestGroup.TestString', 'QuicksearchTestGroup.TestInteger'])
+      ->execute();
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'Aaa', 'QuicksearchTestGroup.TestInteger' => '123', 'QuicksearchTestGroup.TestString' => '123'],
+        ['first_name' => 'B', 'last_name' => 'Bbb', 'QuicksearchTestGroup.TestInteger' => '12', 'QuicksearchTestGroup.TestString' => '12'],
+      ],
+    ]);
+
+    // now we want to check exact match search for contribution 1 doesnt match contribution 10/11/12
+    // to do this we add a Contribution for Contact B with Contribution ID at least 10
+    $contributions = $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[0]['id'], 'total_amount' => '10'],
+        ['contact_id' => $contacts[1]['id'], 'total_amount' => '10'],
+      ],
+    ]);
+    $secondContactContributionId = $contributions[10]['id'];
+    $this->assertTrue($secondContactContributionId >= 10);
+    $partialMatch = intdiv($secondContactContributionId, 10);
+
+    // Check we dont get Contact B with the partial match
+    $partialMatchResult = (array) Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['Contribution.id' => $partialMatch])
+      ->execute();
+
+    // we'll probably get the first contact, but we cant be sure
+    // the important thing is we dont get the second contact
+    $secondContact = array_filter($partialMatchResult, fn ($item) => $item['id'] === $contacts[1]['id']);
+    $this->assertCount(0, $secondContact);
+
+    $customStringResult = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['QuicksearchTestGroup.TestString' => '12'])
+      ->execute();
+
+    // partial match => both contact should be returned
+    $this->assertCount(2, $customStringResult);
+
+    $customIntegerResult = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['QuicksearchTestGroup.TestInteger' => '12'])
+      ->execute();
+
+    // exact match => only the second contact should be returned
+    $this->assertCount(1, $customIntegerResult);
+    $this->assertEquals($contacts[1]['id'], $customIntegerResult[0]['id']);
+  }
+
+  public function testQuicksearchCustomFieldWithOptions(): void {
+    $this->createTestRecord('OptionGroup', [
+      'name' => 'CarTypes',
+    ]);
+    $this->saveTestRecords('OptionValue', [
+      'records' => [
+        ['label' => 'Ferrari', 'value' => 1, 'option_group_id:name' => 'CarTypes'],
+        ['label' => 'Ford', 'value' => 2, 'option_group_id:name' => 'CarTypes'],
+        ['label' => 'Mercedes', 'value' => 3, 'option_group_id:name' => 'CarTypes'],
+      ],
+    ]);
+    $this->createTestRecord('CustomGroup', [
+      'name' => 'QuicksearchTestGroup',
+    ]);
+    $this->createTestRecord('CustomField', [
+      'name' => 'DreamCar',
+      'custom_group_id.name' => 'QuicksearchTestGroup',
+      'option_group_id:name' => 'CarTypes',
+      'data_type' => 'Int',
+      'html_type' => 'Select',
+    ]);
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'Aaa', 'QuicksearchTestGroup.DreamCar:label' => 'Ferrari'],
+        ['first_name' => 'B', 'last_name' => 'Bbb', 'QuicksearchTestGroup.DreamCar:label' => 'Ford'],
+        ['first_name' => 'C', 'last_name' => 'Ccc', 'QuicksearchTestGroup.DreamCar:label' => 'Mercedes'],
+      ],
+    ]);
+
+    // NOTE: Option Custom Fields are exposed to quicksearch_options with :label suffix
+    Setting::set(FALSE)
+      ->addValue('quicksearch_options', ['QuicksearchTestGroup.DreamCar:label'])
+      ->execute();
+
+    // Check we can search using human-readable option labels
+    $mercedes = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['QuicksearchTestGroup.DreamCar:label' => 'Mercedes'])
+      ->execute();
+
+    $this->assertCount(1, $mercedes);
+    $this->assertEquals($mercedes[0]['id'], $contacts[2]['id']);
+
+    // TODO: the following seems like reasonable behaviour, but
+    // it doesn't work... yet.
+
+    // // Search should use contains so partial matches should be found
+    // $beginsWithF = Contact::autocomplete(FALSE)
+    //   ->setFormName('crmMenubar')
+    //   ->setFieldName('crm-qsearch-input')
+    //   ->setFilters(['QuicksearchTestGroup.DreamCar:label' => 'F'])
+    //   ->execute();
+
+    // // only the first two contacts should be returned
+    // $this->assertCount(2, $beginsWithF);
   }
 
 }
