@@ -35,11 +35,13 @@
         <div class="crm-content crm-contact-nick_name">{$nick_name|escape}</div>
       </div>
 
-      {if $contact_type eq 'Organization'}
+      {if $contact_type eq 'Organization' OR $contact_type eq 'Individual'}
       <div class="crm-summary-row">
         <div class="crm-label">{ts}Legal Name{/ts}</div>
         <div class="crm-content crm-contact-legal_name">{$legal_name|escape}</div>
       </div>
+      {/if}
+      {if $contact_type eq 'Organization'}
       <div class="crm-summary-row">
         <div class="crm-label">{ts}SIC Code{/ts}</div>
         <div class="crm-content crm-contact-sic_code">{$sic_code|escape}</div>
