@@ -815,11 +815,16 @@ WHERE  id = %1";
     $maxId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_price_set");
     $priceSet = civicrm_api3('PriceSet', 'getsingle', ['id' => $id]);
 
-    $newTitle = preg_replace('/\[Copy id \d+\]$/', "", $priceSet['title']);
+    $translatedCopyOf = ts('Copy id');
+    $newTitle = preg_replace('/\[' . $translatedCopyOf . ' \d+\]$/', "", $priceSet['title']);
     $title = ts('[Copy id %1]', [1 => $maxId + 1]);
+    $newTitle = mb_trim($newTitle) . ' ' . $title;
+    // Check if the new title is not longer than the column in the datbase
+    // which is a varchar(255).
+    $newTitle = CRM_Utils_String::ellipsify($newTitle, 255);
     $fieldsFix = [
       'replace' => [
-        'title' => trim($newTitle) . ' ' . $title,
+        'title' => $newTitle,
         'name' => substr($priceSet['name'], 0, 20) . 'price_set_' . ($maxId + 1),
       ],
     ];
