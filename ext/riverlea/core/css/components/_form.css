@@ -93,6 +93,7 @@
 }
 .crm-container .form-inline {
   padding: var(--crm-l-small) 0;
+  overflow: auto;
 }
 .crm-search-display .form-inline {
   padding: var(--crm-padding-reg) 0;
