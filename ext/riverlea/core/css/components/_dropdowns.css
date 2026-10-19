@@ -349,6 +349,7 @@
   font-weight: bold;
   border-bottom: 1px solid var(--crm-dropdown-color);
   margin-block: var(--crm-l-medium) var(--crm-l-small);
+  width: fit-content;
 }
 .crm-container li.dropdown-header:first-of-type {
   margin-top: 0;
