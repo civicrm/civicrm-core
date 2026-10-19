@@ -24,6 +24,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
+use Civi\Api4\LineItem;
 use Civi\Api4\Relationship;
 use Civi\Api4\Tag;
 use Civi\Test\TransactionalInterface;
@@ -489,6 +490,29 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     // FIXME: Currently returning 2
     // $this->assertCount(1, $contacts);
     $this->assertEquals($managerID, $contacts[0]['id']);
+  }
+
+  public function testExtraJoinSqlWithExplicitAndImplicitJoin(): void {
+    $contact = $this->createTestRecord('Contact');
+    $email = $this->createTestRecord('Email', [
+      'contact_id' => $contact['id'],
+      'email' => 'primary@example.com',
+      'is_primary' => 1,
+    ]);
+    $contribution = $this->createTestRecord('Contribution', [
+      'contact_id' => $contact['id'],
+    ]);
+    $lineItem = $this->createTestRecord('LineItem', [
+      'contribution_id' => $contribution['id'],
+    ]);
+
+    $result = LineItem::get(FALSE)
+      ->addJoin('Contribution AS con', 'INNER', ['contribution_id', '=', 'con.id'])
+      ->addSelect('con.contact_id.email_primary')
+      ->addWhere('id', '=', $lineItem['id'])
+      ->execute()->first();
+
+    $this->assertEquals($email['id'], $result['con.contact_id.email_primary']);
   }
 
 }

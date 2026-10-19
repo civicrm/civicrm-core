@@ -6,6 +6,7 @@ use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\CaseType;
 use Civi\Api4\CiviCase;
+use Civi\Api4\Tag;
 
 /**
  * @group headless
@@ -40,6 +41,29 @@ class CaseTypeTest extends Api4TestBase {
       // Only select caseType.definition, no other caseType fields to test the fallback in CaseTypeGetSpecProvider
       ->addSelect('case.case_type_id.definition')
       ->addWhere('id', '=', $activity['id'])
+      ->execute()->first();
+
+    $definition = $get['case.case_type_id.definition'];
+    $this->assertEquals('Open Case', $definition['activityTypes'][0]['name']);
+  }
+
+  public function testGetCaseTypeDefinitionViaTagJoin(): void {
+    $case = $this->createTestRecord('Case', [
+      'case_type_id:name' => 'housing_support',
+    ]);
+    $tag = $this->createTestRecord('Tag', [
+      'used_for' => ['civicrm_case'],
+    ]);
+    $this->createTestRecord('EntityTag', [
+      'tag_id' => $tag['id'],
+      'entity_id' => $case['id'],
+      'entity_table' => 'civicrm_case',
+    ]);
+    $get = Tag::get(FALSE)
+      ->addJoin('EntityTag AS entity_tag', 'INNER', ['id', '=', 'entity_tag.tag_id'])
+      ->addJoin('Case AS case', 'INNER', ['entity_tag.entity_id', '=', 'case.id'])
+      ->addSelect('case.case_type_id.definition')
+      ->addWhere('id', '=', $tag['id'])
       ->execute()->first();
 
     $definition = $get['case.case_type_id.definition'];

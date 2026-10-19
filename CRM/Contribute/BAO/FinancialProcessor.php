@@ -1335,6 +1335,64 @@ class CRM_Contribute_BAO_FinancialProcessor {
   }
 
   /**
+   * Function to retrieve financial items that need to be recorded as result of changed fee.
+   *
+   * Relocated as-is from CRM_Price_BAO_LineItem::changeFeeSelections()'s support code.
+   * This does the same job as isReversalRequired()/reverseLineFinancialItem() above -
+   * deciding whether a line item's previous financial item needs reversing - but as a
+   * bulk operation over a set of line items rather than per-line-item. Consolidating
+   * the two is a follow-up, not part of this move.
+   *
+   * @param array $lineItemIDsToCancel
+   * @param array $lineItemsToUpdate
+   *
+   * @return array
+   *   List of formatted reverse Financial Items to be recorded
+   */
+  private function getAdjustedFinancialItemsToRecord($lineItemIDsToCancel, $lineItemsToUpdate): array {
+    $financialItemsArray = [];
+    $financialItemResult = $this->getNonCancelledFinancialItems();
+    foreach ($financialItemResult as $updateFinancialItemInfoValues) {
+      $updateFinancialItemInfoValues['transaction_date'] = date('YmdHis');
+
+      // the below params are not needed as we are creating new financial item
+      $totalFinancialAmount = $this->checkFinancialItemTotalAmountByLineItemID($updateFinancialItemInfoValues['entity_id']);
+      unset($updateFinancialItemInfoValues['id']);
+      unset($updateFinancialItemInfoValues['created_date']);
+
+      // Reverse line items omitted from the submitted lines.
+      if (in_array($updateFinancialItemInfoValues['entity_id'], $lineItemIDsToCancel)
+        && $updateFinancialItemInfoValues['amount'] != 0
+      ) {
+
+        // INSERT negative financial_items
+        $updateFinancialItemInfoValues['amount'] = -$updateFinancialItemInfoValues['amount'];
+        // Append rather than key on entity_id: one line item can carry several
+        // financial items (revenue plus sales tax) and each needs its own reversal
+        // on its own financial account. The loop that consumes this array reads
+        // only the values, so the key carries no meaning.
+        $financialItemsArray[] = $updateFinancialItemInfoValues;
+      }
+      // INSERT a financial item to record surplus/lesser amount when a text price fee is changed
+      elseif (
+        !empty($lineItemsToUpdate)
+        && isset($lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']])
+        && $lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']]['html_type'] == 'Text'
+        && $updateFinancialItemInfoValues['amount'] > 0
+      ) {
+        $amountChangeOnTextLineItem = $lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']]['line_total'] - $totalFinancialAmount;
+        if ($amountChangeOnTextLineItem !== (float) 0) {
+          // calculate the amount difference, considered as financial item amount
+          $updateFinancialItemInfoValues['amount'] = $amountChangeOnTextLineItem;
+          $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
+        }
+      }
+    }
+
+    return $financialItemsArray;
+  }
+
+  /**
    * Get Financial items, culling out any that have already been reversed.
    *
    * Only financial items belonging to one of $this->originalLineItems are eligible -
@@ -1365,15 +1423,15 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     $items = [];
     foreach ($this->existingFinancialItems as $index => $financialItem) {
-      $items[$financialItem['price_field_value_id']][$index] = $financialItem['amount'];
+      $items[$financialItem['entity_id']][$index] = $financialItem['amount'];
 
-      foreach ($items[$financialItem['price_field_value_id']] as $existingItemID => $existingAmount) {
+      foreach ($items[$financialItem['entity_id']] as $existingItemID => $existingAmount) {
         if ($financialItem['amount'] + $existingAmount == 0) {
           // Filter both rows as they cancel each other out.
           unset($this->existingFinancialItems[$index]);
           unset($this->existingFinancialItems[$existingItemID]);
-          unset($items[$financialItem['price_field_value_id']][$existingItemID]);
-          unset($items[$financialItem['price_field_value_id']][$index]);
+          unset($items[$financialItem['entity_id']][$existingItemID]);
+          unset($items[$financialItem['entity_id']][$index]);
         }
       }
     }
@@ -1561,7 +1619,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $added = $changed = $removed = [];
     $matchedIDs = [];
 
-    foreach ($this->getUpdatedLineItems() as $priceFieldValueID => $submittedLineItem) {
+    foreach ($this->getUpdatedLineItems() as $submittedLineItem) {
+      // Identity is price_field_value_id (see docblock) - read it off the line
+      // itself rather than the array key, since a line merged in unchanged
+      // from another participant/entity (eg. ParticipantFeeSelection's
+      // addLineItemsNotYetRepresented()) is appended rather than keyed by it.
+      $priceFieldValueID = $submittedLineItem['price_field_value_id'];
       $previousLineItem = $this->findActivePreviousLineItem($priceFieldValueID);
       if ($previousLineItem === NULL) {
         $cancelledLineItem = $this->findCancelledPreviousLineItem($priceFieldValueID);
@@ -1629,6 +1692,26 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
     }
     return FALSE;
+  }
+
+  /**
+   * Find the submitted line item, if any, for the same entity and price field value.
+   *
+   * @param array $submittedLineItems
+   * @param array $previousLineItem
+   *
+   * @return array|null
+   */
+  private function findSubmittedLineItem(array $submittedLineItems, array $previousLineItem): ?array {
+    foreach ($submittedLineItems as $submittedLineItem) {
+      if ((int) $submittedLineItem['price_field_value_id'] === (int) $previousLineItem['price_field_value_id']
+        && $submittedLineItem['entity_table'] === $previousLineItem['entity_table']
+        && (int) $submittedLineItem['entity_id'] === (int) $previousLineItem['entity_id']
+      ) {
+        return $submittedLineItem;
+      }
+    }
+    return NULL;
   }
 
   /**

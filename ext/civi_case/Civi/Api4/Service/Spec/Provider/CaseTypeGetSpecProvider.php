@@ -47,7 +47,8 @@ class CaseTypeGetSpecProvider extends \Civi\Core\Service\AutoService implements 
    * @see \CRM_Case_BAO_CaseType::formatOutputDefinition
    */
   public static function renderSqlForDefinition(array $field, Api4SelectQuery $query): string {
-    return "IFNULL({$field['sql_name']}, `name`)";
+    $nameField = $query->getFieldSibling($field, 'name');
+    return "IFNULL({$field['sql_name']}, {$nameField['sql_name']})";
   }
 
 }

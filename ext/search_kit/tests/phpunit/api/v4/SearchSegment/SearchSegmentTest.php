@@ -7,6 +7,7 @@ use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\Individual;
+use Civi\Api4\LineItem;
 use Civi\Api4\Relationship;
 use Civi\Api4\SearchSegment;
 use Civi\Test\HeadlessInterface;
@@ -480,6 +481,52 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     // Volunteer cluster should have 2 participants (Volunteer, Attendee+Volunteer)
     $this->assertEquals('Yes', $result[1]['columns'][0]['val']);
     $this->assertEquals(2, $result[1]['data']['COUNT_id']);
+  }
+
+  /**
+   * Tests rendering a segment field via an explicit join followed by an implicit join.
+   * e.g., LineItem -> (explicit join) Contribution AS con -> (implicit join) contact_id -> segment
+   */
+  public function testSegmentViaExplicitAndImplicitJoin(): void {
+    $contact = Contact::create(FALSE)
+      ->addValue('contact_type', 'Organization')
+      ->addValue('organization_name', 'Acme Corp')
+      ->execute()->first();
+    $contribution = Contribution::create(FALSE)
+      ->addValue('contact_id', $contact['id'])
+      ->addValue('financial_type_id:name', 'Donation')
+      ->addValue('total_amount', 100)
+      ->execute()->first();
+    $lineItem = LineItem::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('qty', 1)
+      ->addValue('unit_price', 100)
+      ->addValue('line_total', 100)
+      ->addValue('entity_table', 'civicrm_contribution')
+      ->addValue('entity_id', $contribution['id'])
+      ->execute()->first();
+
+    SearchSegment::create(FALSE)
+      ->addValue('label', 'Contact Org Type')
+      ->addValue('entity_name', 'Contact')
+      ->addValue('items', [
+        [
+          'label' => 'Org',
+          'when' => [['contact_type:name', '=', 'Organization']],
+        ],
+        [
+          'label' => 'Other',
+        ],
+      ])
+      ->execute();
+
+    $query = LineItem::get(FALSE)
+      ->addJoin('Contribution AS con', 'INNER', ['contribution_id', '=', 'con.id'])
+      ->addSelect('con.contact_id.segment_Contact_Org_Type:label')
+      ->addWhere('id', '=', $lineItem['id']);
+
+    $result = $query->execute()->first();
+    $this->assertEquals('Org', $result['con.contact_id.segment_Contact_Org_Type:label']);
   }
 
 }
