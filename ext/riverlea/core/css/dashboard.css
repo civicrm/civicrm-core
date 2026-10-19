@@ -63,7 +63,7 @@
   padding: var(--crm-dashlet-header-padding);
   padding-left: 0;
   z-index: 1;
-  height: calc((var(--crm-dashlet-header-font-size) * 1.3)) + (2 * var(--crm-dashlet-header-padding));
+  height: calc((var(--crm-dashlet-header-font-size) * 1.3) + (2 * var(--crm-dashlet-header-padding)));
 }
 .crm-container :is(.crm-dashlet-actions,.crm-dashlet-header) a {
   color: var(--crm-dashlet-header-color);
@@ -71,8 +71,6 @@
   text-decoration: none;
   cursor: var(--crm-link-hover-cursor);
   opacity: .7;
-  float: right;
-  height: var(--crm-dashlet-header-font-size);
 }
 .crm-container :is(.crm-dashlet-actions,.crm-dashlet-header) a:is(:hover,:focus) {
   opacity: 1;
