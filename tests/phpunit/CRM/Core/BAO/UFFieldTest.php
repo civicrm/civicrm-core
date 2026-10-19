@@ -104,6 +104,26 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Assign Address Field
+   */
+  public function testAssignAddressField(): void {
+    $this->createUFGroup([
+      [
+        'field_name' => 'do_not_sms',
+        'field_type' => 'Contact',
+      ],
+      [
+        'field_name' => 'first_name',
+        'field_type' => 'Individual',
+      ],
+    ]);
+    $profileFields = [
+      'field_name' => NULL,
+    ];
+    CRM_Core_BAO_UFFIeld::assignAddressField('first_name', $profileFields, ['uf_group_id' => ['IN' => [$this->ids['UFGroup']['test']]]]);
+  }
+
+  /**
    * When omitting the id, return a list of all fields.
    */
   public function testGetAvailableFull(): void {

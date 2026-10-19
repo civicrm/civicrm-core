@@ -669,7 +669,14 @@ SELECT  id
       ->addWhere('is_active', '=', TRUE);
 
     foreach ($profileFilter as $filterKey => $filterVal) {
-      $profileQuery->addWhere($filterKey, '=', $filterVal);
+      if (is_array($filterVal)) {
+        foreach ($filterVal as $op => $val) {
+          $profileQuery->addWhere($filterKey, $op, $val);
+        }
+      }
+      else {
+        $profileQuery->addWhere($filterKey, '=', $filterVal);
+      }
     }
 
     $profileFields = $profileQuery->execute();
