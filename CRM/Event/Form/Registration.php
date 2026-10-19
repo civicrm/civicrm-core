@@ -405,7 +405,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56, $this->getCurrency()));
 
     //check if participant allow to walk registration wizard.
-    $this->_allowConfirmation = $this->get('allowConfirmation');
+    $this->_allowConfirmation = $this->_participantId && $this->getParticipantValue('status_id.class') === 'Pending';
     $this->assign('currency', $this->getCurrency());
     // check for Approval
     $this->_requireApproval = $this->get('requireApproval');
@@ -441,11 +441,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       CRM_Event_BAO_Event::retrieve($params, $this->_values['event']);
 
       $this->checkValidEvent();
-      // get the participant values, CRM-4320
-      $this->_allowConfirmation = FALSE;
-      if ($this->_participantId) {
-        $this->processFirstParticipant($this->_participantId);
-      }
       //check for additional participants.
       if ($this->_allowConfirmation && $this->_values['event']['is_multiple_registrations']) {
         $additionalParticipantIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_participantId);
@@ -864,71 +859,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * This is a throw-away object to calculate values, to allow it to validate
-   * input values during submission.
-   *
-   * @param array $fields
-   *   Submitted values.
-   *
-   * @return \CRM_Financial_BAO_Order
-   * @throws \CRM_Core_Exception
-   */
-  protected function getOrderForValidatingInput(array $fields): CRM_Financial_BAO_Order {
-    $order = new CRM_Financial_BAO_Order();
-    $order->setPriceSetID($this->getPriceSetID());
-    $order->setIsExcludeExpiredFields(TRUE);
-    $order->setForm($this);
-    $order->setPriceSelectionFromUnfilteredInput($fields);
-    return $order;
-  }
-
-  /**
-   * Get the form context.
-   *
-   * This is important for passing to the buildAmount hook as CiviDiscount checks it.
-   *
-   * @return string
-   */
-  public function getFormContext(): string {
-    return 'event';
-  }
-
-  /**
-   * Handle process after the confirmation of payment by User.
-   *
-   * @param int $contactID
-   * @param array $participantRecord
    * @param int $participantNum
-   *   The participant's slot number in $this->_params/$this->_lineItem (0 for
-   *   the primary, 1+ for additional participants) - skipped participants
-   *   are never passed in here, so this is not necessarily sequential.
-   *   _participantIDS must be keyed the same way _lineItem is, so that code
-   *   matching entities to line items (see Confirm::postProcess()) can look
-   *   up the right participant for a given slot even when earlier slots were
-   *   skipped.
-   *
-   * @throws \CRM_Core_Exception
+   * @param int $contactID
    */
-  public function confirmPostProcess($contactID, $participantRecord, int $participantNum = 0): void {
-    // add participant record
-    $participantID = $this->addParticipant($contactID, $participantNum);
-    $this->_participantIDS[$participantNum] = $participantID;
-
-    //setting register_by_id field and primaryContactId
-    if (!empty($participantRecord['is_primary'])) {
-      $this->set('registerByID', $participantID);
-      $this->set('primaryContactId', $contactID);
-
-      // CRM-10032
-      $this->processFirstParticipant($participantID);
-      $participantRecord['participantID'] = $participantID;
-      $this->set('primaryParticipant', $participantRecord);
-    }
-
-    $this->assign('action', $this->_action);
-
+  protected function createCMSUser(int $participantNum, int $contactID): void {
     // create CMS user
-    if (!empty($participantRecord['cms_create_account'])) {
+    if ($this->getSubmittedParticipantValue('cms_create_account')) {
+      $participantRecord = $this->getSubmittedParticipantValues($participantNum);
       $participantRecord['contactID'] = $contactID;
 
       if (array_key_exists('email-5', $participantRecord)) {
@@ -960,6 +897,36 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * This is a throw-away object to calculate values, to allow it to validate
+   * input values during submission.
+   *
+   * @param array $fields
+   *   Submitted values.
+   *
+   * @return \CRM_Financial_BAO_Order
+   * @throws \CRM_Core_Exception
+   */
+  protected function getOrderForValidatingInput(array $fields): CRM_Financial_BAO_Order {
+    $order = new CRM_Financial_BAO_Order();
+    $order->setPriceSetID($this->getPriceSetID());
+    $order->setIsExcludeExpiredFields(TRUE);
+    $order->setForm($this);
+    $order->setPriceSelectionFromUnfilteredInput($fields);
+    return $order;
+  }
+
+  /**
+   * Get the form context.
+   *
+   * This is important for passing to the buildAmount hook as CiviDiscount checks it.
+   *
+   * @return string
+   */
+  public function getFormContext(): string {
+    return 'event';
+  }
+
+  /**
    * Process the participant.
    *
    * @param int $contactID
@@ -968,7 +935,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return int
    * @throws \CRM_Core_Exception
    */
-  private function addParticipant($contactID, $participantNumber): int {
+  protected function addParticipant($contactID, $participantNumber): int {
     $transaction = new CRM_Core_Transaction();
 
     $participantParams = [
@@ -1920,23 +1887,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Set the first participant ID if not set.
-   *
-   * CRM-10032.
-   *
-   * @param int $participantID
-   */
-  public function processFirstParticipant($participantID) {
-    $this->_participantId = $participantID;
-
-    // also set the allow confirmation stuff
-    if ($this->getParticipantValue('status_id.class') === 'Pending') {
-      $this->_allowConfirmation = TRUE;
-      $this->set('allowConfirmation', TRUE);
-    }
-  }
-
-  /**
    * Check if event is valid.
    *
    * @todo - combine this with CRM_Event_BAO_Event::validRegistrationRequest
@@ -2028,8 +1978,24 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         if (!$this->getContactID() && !empty($value['is_primary'])) {
           $session->set('transaction.userID', $contactID);
         }
+        $participantNum = $key;
+        $participantRecord = $value;
+        // add participant record
+        $participantID = $this->addParticipant($contactID, $participantNum);
+        $this->_participantIDS[$participantNum] = $participantID;
 
-        $this->confirmPostProcess($contactID, $value, $key);
+        if (!empty($participantRecord['is_primary'])) {
+          // CRM-10032
+          $this->_participantId = $participantID;
+
+          if ($this->getParticipantValue('status_id.class') === 'Pending') {
+            $this->_allowConfirmation = TRUE;
+          }
+          $participantRecord['participantID'] = $participantID;
+          $this->set('primaryParticipant', $participantRecord);
+        }
+
+        $this->createCMSUser($participantNum, $contactID);
 
         //lets get additional participant id to cancel.
         if ($this->_allowConfirmation && is_array($cancelledIds)) {
@@ -2077,7 +2043,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     $registerByID = $this->getPrimaryParticipantID();
-    $primaryContactId = $this->get('primaryContactId');
+    $primaryContactId = $this->getParticipantValue('contact_id');
 
     //build an array of custom profile and assigning it to template.
     // @todo - don't call buildCustomProfile to get additionalParticipants.
