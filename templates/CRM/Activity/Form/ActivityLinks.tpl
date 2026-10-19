@@ -35,7 +35,7 @@
 {/literal}
 {else}
 <ul>
-  <li class="crm-activity-tab"><a href="#" data-tab="activity">{ts}Record Activity:{/ts}</a></li>
+<li class="crm-activity-tab dropdown-header">{ts}Record Activity:{/ts}</li>
 {foreach from=$activityTypes key=k item=act}
 <li class="crm-activity-type_{$k}">
   <a href="{$act.url}" data-tab="activity">
