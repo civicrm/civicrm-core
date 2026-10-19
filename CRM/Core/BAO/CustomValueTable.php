@@ -619,14 +619,11 @@ class CRM_Core_BAO_CustomValueTable {
               break;
 
             case 'Timestamp':
-              $fieldValue['value'] = NULL;
-              break;
-
             case 'StateProvince':
             case 'Country':
             case 'Money':
             case 'Float':
-              $fieldValue['value'] = (int) 0;
+              $fieldValue['value'] = NULL;
               break;
           }
         }

@@ -285,6 +285,46 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     $this->assertEquals($params['entityID'], $result['entityID']);
   }
 
+  /**
+   * Clearing a Money or Float value must store NULL, not 0.
+   *
+   * @dataProvider emptyValues
+   */
+  public function testSetValuesEmptyNumberStoresNull($emptyValue): void {
+    $contactID = $this->individualCreate();
+    $customGroup = $this->customGroupCreate();
+    $columns = [];
+    $params = ['entityID' => $contactID];
+    foreach (['Money', 'Float'] as $dataType) {
+      $field = $this->customFieldCreate([
+        'custom_group_id' => $customGroup['id'],
+        'data_type' => $dataType,
+        'html_type' => 'Text',
+        'label' => $dataType,
+        'default_value' => '',
+      ]);
+      $columns[] = $field['values'][$field['id']]['column_name'];
+      $params['custom_' . $field['id']] = '12.5';
+    }
+    $table = $customGroup['values'][$customGroup['id']]['table_name'];
+    $sql = "SELECT COUNT(*) FROM $table WHERE entity_id = $contactID AND " . implode(' IS NULL AND ', $columns) . ' IS NULL';
+
+    CRM_Core_BAO_CustomValueTable::setValues($params);
+    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery($sql));
+
+    foreach (array_keys($params) as $key) {
+      if ($key !== 'entityID') {
+        $params[$key] = $emptyValue;
+      }
+    }
+    CRM_Core_BAO_CustomValueTable::setValues($params);
+    $this->assertEquals(1, CRM_Core_DAO::singleValueQuery($sql));
+  }
+
+  public static function emptyValues(): array {
+    return [[NULL], ['']];
+  }
+
   public function hook_custom($op, $groupID, $entityID, &$params) {
     foreach ($params as $field) {
       $this->assertTrue(array_key_exists('entity_table', $field));
