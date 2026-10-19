@@ -49,7 +49,8 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->assertEquals('birth_date', $fields['Individual']['birth_date']['name']);
 
     $this->assertEquals('organization_name', $fields['Organization']['organization_name']['name']);
-    $this->assertEquals('legal_name', $fields['Organization']['legal_name']['name']);
+    $this->assertEquals('sic_code', $fields['Organization']['sic_code']['name']);
+    $this->assertEquals('legal_name', $fields['Contact']['legal_name']['name']);
 
     // already used
     $this->assertFalse(isset($fields['Contribution']['amount_level']));
@@ -117,7 +118,8 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->assertEquals('birth_date', $fields['Individual']['birth_date']['name']);
 
     $this->assertEquals('organization_name', $fields['Organization']['organization_name']['name']);
-    $this->assertEquals('legal_name', $fields['Organization']['legal_name']['name']);
+    $this->assertEquals('sic_code', $fields['Organization']['sic_code']['name']);
+    $this->assertEquals('legal_name', $fields['Contact']['legal_name']['name']);
 
     $this->assertEquals('amount_level', $fields['Contribution']['amount_level']['name']);
     $this->assertEquals('cancel_reason', $fields['Contribution']['cancel_reason']['name']);
@@ -154,7 +156,8 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->assertEquals('Individual', $fields['birth_date']['field_type']);
 
     $this->assertEquals('Organization', $fields['organization_name']['field_type']);
-    $this->assertEquals('Organization', $fields['legal_name']['field_type']);
+    $this->assertEquals('Organization', $fields['sic_code']['field_type']);
+    $this->assertEquals('Contact', $fields['legal_name']['field_type']);
 
     $this->assertEquals('Contribution', $fields['amount_level']['field_type']);
     $this->assertEquals('Contribution', $fields['cancel_reason']['field_type']);
