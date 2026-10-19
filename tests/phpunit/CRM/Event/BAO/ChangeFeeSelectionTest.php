@@ -830,6 +830,92 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   }
 
   /**
+   * dev/core#6634: addLineItemsNotYetRepresented() keys the merged-in line
+   * items by price_field_value_id. If the participant being edited switches
+   * to the SAME price option another participant on the contribution
+   * already holds, that key is already present in $submittedLineItems (as
+   * the edited participant's own new selection), so the other participant's
+   * "keep unchanged" line item is never merged in. getLineItemsToAdd()/
+   * getLineItemsToAlter() then have only one entry for that
+   * price_field_value_id to work from, and misattribute it to whichever
+   * participant already had a line item for it.
+   *
+   * Reproduced on smaster.demo.civicrm.org (CiviCRM 6.21.alpha1): the
+   * participant being edited ended up with their old line item cancelled
+   * and no replacement, while the other participant's line item - and the
+   * contribution total - were also wrong.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testFeeChangeMatchingAnotherParticipantsOptionDoesNotLoseTheLineItem(): void {
+    $participantA = $this->createTestEntity('Participant', [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'event_id' => $this->getEventID(),
+      'status_id:name' => 'Registered',
+      'role_id:name' => 'Attendee',
+    ], 'participantA');
+    $secondContactID = $this->individualCreate([], 'individual_1');
+    $participantB = $this->createTestEntity('Participant', [
+      'contact_id' => $secondContactID,
+      'event_id' => $this->getEventID(),
+      'status_id:name' => 'Registered',
+      'role_id:name' => 'Attendee',
+    ], 'participantB');
+
+    $contribution = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id:name' => 'Event Fee',
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participantA['id'],
+        'price_field_value_id' => $this->getExpensiveValueID(),
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participantB['id'],
+        'price_field_value_id' => $this->getCheapFeeID(),
+      ])
+      ->execute()->single();
+
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', (float) $this->_cheapFee + (float) $this->_expensiveFee)
+      ->execute();
+
+    // Change participant A onto the SAME option participant B already holds.
+    $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
+      $this->getPriceFieldFormLabel('PaidEvent') => $this->getCheapFeeID(),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+    ], [
+      'id' => $participantA['id'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
+
+    $participantALine = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('entity_id', '=', $participantA['id'])
+      ->addWhere('qty', '>', 0)
+      ->execute();
+    $this->assertCount(1, $participantALine, 'Participant A should have their own active line item for the new selection.');
+    $this->assertEquals($this->_cheapFee, $participantALine->first()['line_total']);
+
+    $participantBLine = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('entity_id', '=', $participantB['id'])
+      ->execute()->single();
+    $this->assertGreaterThan(0, $participantBLine['qty'], "Participant B's line item must survive participant A's fee change.");
+    $this->assertEquals($this->_cheapFee, $participantBLine['line_total']);
+
+    $this->assertEquals(
+      (float) $this->_cheapFee * 2,
+      $this->contributionInvoice($contribution['id']),
+      'The contribution total must reflect both participants holding the cheap fee.'
+    );
+  }
+
+  /**
    * Create one radio price field, with one value, on the PaidEvent price set.
    *
    * @param string $name

@@ -634,9 +634,7 @@ SELECT  id, html_type
         // Already cancelled - nothing to preserve.
         continue;
       }
-      if (!isset($submittedLineItems[$lineItem['price_field_value_id']])) {
-        $submittedLineItems[$lineItem['price_field_value_id']] = $lineItem;
-      }
+      $submittedLineItems[] = $lineItem;
     }
   }
 
