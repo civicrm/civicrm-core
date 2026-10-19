@@ -198,6 +198,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     return [
       'currency' => $this->getCurrency(),
       'is_test' => $this->isTest(),
+      'contact_id' => $this->_contributorContactID ?: $this->getContactID(),
       'receipt_date' => $this->getSubmittedValue('send_receipt') ? date('YmdHis') : NULL,
       'invoice_id' => $this->getInvoiceID(),
       'campaign_id' => $this->getSubmittedValue('campaign_id'),
