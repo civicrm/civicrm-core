@@ -861,8 +861,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * @param int $participantNum
    * @param int $contactID
-   *
-   * @return array
    */
   protected function createCMSUser(int $participantNum, int $contactID): void {
     // create CMS user
@@ -929,41 +927,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Handle process after the confirmation of payment by User.
-   *
-   * @param int $contactID
-   * @param array $participantRecord
-   * @param int $participantNum
-   *   The participant's slot number in $this->_params/$this->_lineItem (0 for
-   *   the primary, 1+ for additional participants) - skipped participants
-   *   are never passed in here, so this is not necessarily sequential.
-   *   _participantIDS must be keyed the same way _lineItem is, so that code
-   *   matching entities to line items (see Confirm::postProcess()) can look
-   *   up the right participant for a given slot even when earlier slots were
-   *   skipped.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  public function confirmPostProcess($contactID, $participantRecord, int $participantNum = 0): void {
-    // add participant record
-    $participantID = $this->addParticipant($contactID, $participantNum);
-    $this->_participantIDS[$participantNum] = $participantID;
-
-    if (!empty($participantRecord['is_primary'])) {
-      // CRM-10032
-      $this->_participantId = $participantID;
-
-      if ($this->getParticipantValue('status_id.class') === 'Pending') {
-        $this->_allowConfirmation = TRUE;
-      }
-      $participantRecord['participantID'] = $participantID;
-      $this->set('primaryParticipant', $participantRecord);
-    }
-
-    $this->createCMSUser($participantNum, $contactID);
-  }
-
-  /**
    * Process the participant.
    *
    * @param int $contactID
@@ -972,7 +935,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @return int
    * @throws \CRM_Core_Exception
    */
-  private function addParticipant($contactID, $participantNumber): int {
+  protected function addParticipant($contactID, $participantNumber): int {
     $transaction = new CRM_Core_Transaction();
 
     $participantParams = [
@@ -2015,8 +1978,24 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         if (!$this->getContactID() && !empty($value['is_primary'])) {
           $session->set('transaction.userID', $contactID);
         }
+        $participantNum = $key;
+        $participantRecord = $value;
+        // add participant record
+        $participantID = $this->addParticipant($contactID, $participantNum);
+        $this->_participantIDS[$participantNum] = $participantID;
 
-        $this->confirmPostProcess($contactID, $value, $key);
+        if (!empty($participantRecord['is_primary'])) {
+          // CRM-10032
+          $this->_participantId = $participantID;
+
+          if ($this->getParticipantValue('status_id.class') === 'Pending') {
+            $this->_allowConfirmation = TRUE;
+          }
+          $participantRecord['participantID'] = $participantID;
+          $this->set('primaryParticipant', $participantRecord);
+        }
+
+        $this->createCMSUser($participantNum, $contactID);
 
         //lets get additional participant id to cancel.
         if ($this->_allowConfirmation && is_array($cancelledIds)) {

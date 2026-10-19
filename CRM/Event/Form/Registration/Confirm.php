@@ -551,7 +551,22 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $this->_values['contributionId'] = $participantRecord['contributionID'];
       }
 
-      $this->confirmPostProcess($contactID, $participantRecord, $participantNum);
+      // add participant record
+      $participantID = $this->addParticipant($contactID, $participantNum);
+      $this->_participantIDS[$participantNum] = $participantID;
+
+      if (!empty($participantRecord['is_primary'])) {
+        // CRM-10032
+        $this->_participantId = $participantID;
+
+        if ($this->getParticipantValue('status_id.class') === 'Pending') {
+          $this->_allowConfirmation = TRUE;
+        }
+        $participantRecord['participantID'] = $participantID;
+        $this->set('primaryParticipant', $participantRecord);
+      }
+
+      $this->createCMSUser($participantNum, $contactID);
     }
 
     $registerByID = $this->getPrimaryParticipantID();
