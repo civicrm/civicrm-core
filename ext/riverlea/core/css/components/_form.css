@@ -97,7 +97,6 @@
 }
 .crm-search-display .form-inline {
   padding: var(--crm-padding-reg) 0;
-  overflow: auto;
 }
 /* Hide control-bar area if controls are empty */
 .crm-search-display .form-inline:not(:has(*)) {
