@@ -240,7 +240,7 @@ class CRM_Core_IDS {
     foreach ($result as $event) {
       $data[] = [
         'name' => $event->getName(),
-        'value' => stripslashes($event->getValue()),
+        'value' => self::redactSecrets(stripslashes($event->getValue())),
         'page' => $_SERVER['REQUEST_URI'],
         'userid' => $session->get('userID'),
         'session' => $session_id,
@@ -252,6 +252,36 @@ class CRM_Core_IDS {
 
     CRM_Core_Error::debug_var('IDS Detector Details', $data);
     return TRUE;
+  }
+
+  /**
+   * Keep credentials in JSON-encoded values, such as api4's `params`,
+   * out of the log.
+   *
+   * @internal
+   *
+   * @param string $value
+   *
+   * @return string
+   */
+  public static function redactSecrets(string $value): string {
+    $decoded = json_decode($value, TRUE);
+    if (!is_array($decoded)) {
+      return $value;
+    }
+    return json_encode(self::redactSecretKeys($decoded), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+  }
+
+  private static function redactSecretKeys(array $values): array {
+    foreach ($values as $key => $value) {
+      if (in_array($key, ['password', 'actorPassword', 'token', 'rememberJWT'], TRUE)) {
+        $values[$key] = '[redacted]';
+      }
+      elseif (is_array($value)) {
+        $values[$key] = self::redactSecretKeys($value);
+      }
+    }
+    return $values;
   }
 
   /**
