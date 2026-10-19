@@ -34,6 +34,7 @@ class MockNumberRangeSearchBrowserTest extends Civi\Test\MinkBase {
   /**
    * A number search range takes its bounds from the url.
    *
+   * @group ornery
    * @dataProvider getRanges
    */
   public function testRangeFromUrl(string $range, string $low, string $high): void {

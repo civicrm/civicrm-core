@@ -21,6 +21,8 @@ class MockDateRangeSearchBrowserTest extends Civi\Test\MinkBase {
 
   /**
    * A date search range passes its input_attrs to both datepickers, also after a reset.
+   *
+   * @group ornery
    */
   public function testInputAttrsOnDateRange(): void {
     $this->createTestRecord('SavedSearch', [
