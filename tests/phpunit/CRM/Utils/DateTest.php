@@ -2795,6 +2795,11 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       // YYYY-mm-dd format - eg. 2022-10-01.
       '2022-10-01' => ['date' => '2022-10-01', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001000000'],
       'invalid_date_2022-25-01' => ['date' => '2022-25-01', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => NULL],
+      'invalid_day_2022-04-31' => ['date' => '2022-04-31', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => NULL],
+      'invalid_day_20220229' => ['date' => '20220229', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => NULL],
+      'invalid_day_2022-04-31 15:54' => ['date' => '2022-04-31 15:54', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => NULL],
+      'zero_date_0000-00-00' => ['date' => '0000-00-00', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => NULL],
+      'leap_day_2024-02-29' => ['date' => '2024-02-29', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20240229000000'],
       '2022-10-01 15:54' => ['date' => '2022-10-01 15:54', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155400'],
       '2022-10-01 3:54' => ['date' => '2022-10-01 3:54', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001035400'],
       '2022-10-01 15:54:56' => ['date' => '2022-10-01 15:54:56', 'format' => CRM_Utils_Date::DATE_yyyy_mm_dd, 'expected' => '20221001155456'],
@@ -2813,6 +2818,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       '10/1/22' => ['date' => '10/1/22', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '20221001000000'],
       '10/01/22 15:54:56' => ['date' => '10/01/22 15:54:56', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '20221001155456'],
       '10/01/22 3:54:56' => ['date' => '10/01/22 3:54:56', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => '20221001035456'],
+      'invalid_day_04/31/22' => ['date' => '04/31/22', 'format' => CRM_Utils_Date::DATE_mm_dd_yy, 'expected' => NULL],
 
       // mm_dd_yyyy format - eg. US Style 10-01-2022 OR 10/01/2022 where 10 is the month. 4 digit year.
       '10-01-2022' => ['date' => '10-01-2022', 'format' => CRM_Utils_Date::DATE_mm_dd_yyyy, 'expected' => '20221001000000'],
@@ -2822,6 +2828,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       '10/01/2022' => ['date' => '10/01/2022', 'format' => CRM_Utils_Date::DATE_mm_dd_yyyy, 'expected' => '20221001000000'],
       '10/1/2022' => ['date' => '10/1/2022', 'format' => CRM_Utils_Date::DATE_mm_dd_yyyy, 'expected' => '20221001000000'],
       '10/1/2022 15:54:56' => ['date' => '10/1/2022 15:54:56', 'format' => CRM_Utils_Date::DATE_mm_dd_yyyy, 'expected' => '20221001155456'],
+      'invalid_day_02-30-2022' => ['date' => '02-30-2022', 'format' => CRM_Utils_Date::DATE_mm_dd_yyyy, 'expected' => NULL],
 
       // DATE_Month_dd_yyyy ie December, 12 2023
       'December, 11 2023' => ['date' => 'December, 11 2023', 'format' => CRM_Utils_Date::DATE_Month_dd_yyyy, 'expected' => '20231211000000'],
@@ -2830,6 +2837,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       'December,  1 2023-with-tab' => ['date' => "December,\t1 2023", 'format' => CRM_Utils_Date::DATE_Month_dd_yyyy, 'expected' => '20231201000000'],
       'December 1 2023-no-comma' => ['date' => 'December 1 2023', 'format' => CRM_Utils_Date::DATE_Month_dd_yyyy, 'expected' => '20231201000000'],
       'December 1 2023 15:35:35' => ['date' => 'December 1 2023 15:35:35', 'format' => CRM_Utils_Date::DATE_Month_dd_yyyy, 'expected' => '20231201153535'],
+      'invalid_day_February 30 2023' => ['date' => 'February 30 2023', 'format' => CRM_Utils_Date::DATE_Month_dd_yyyy, 'expected' => NULL],
 
       // dd_mon_yy format (NZ, Australia) - eg. 01-10-22 or 01/10/22 WHERE 01 is the DAY. 2 digit year.
       '01/10/22' => ['date' => '01/10/22', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001000000'],
@@ -2839,6 +2847,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       '1-Oct-22 3:54:56' => ['date' => '1-Oct-22 3:54:56', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001035456'],
       '1-10-22 15:54:56' => ['date' => '1-10-22 15:54:56', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001155456'],
       '1-10-22 3:54:56' => ['date' => '1-10-22 3:54:56', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => '20221001035456'],
+      'invalid_day_31-Apr-22' => ['date' => '31-Apr-22', 'format' => CRM_Utils_Date::DATE_dd_mon_yy, 'expected' => NULL],
 
       // dd_mon_yyyy format (NZ, Australia) - eg. 01-10-2022 or 01/10/2022 WHERE 01 is the DAY. 4 digit year.
       '01/10/2022' => ['date' => '01/10/2022', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001000000'],
@@ -2849,6 +2858,9 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       '1-10-2022 3:54:56' => ['date' => '1-10-2022 3:54:56', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001035456'],
       // German format https://civicrm.stackexchange.com/questions/34174/contact-import-german-date-format-support
       '01.10.2022' => ['date' => '01.10.2022', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '20221001000000'],
+      'invalid_day_31.04.1980' => ['date' => '31.04.1980', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => NULL],
+      'invalid_day_29.02.1981' => ['date' => '29.02.1981', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => NULL],
+      'leap_day_29.02.1980' => ['date' => '29.02.1980', 'format' => CRM_Utils_Date::DATE_dd_mm_yyyy, 'expected' => '19800229000000'],
     ];
   }
 
