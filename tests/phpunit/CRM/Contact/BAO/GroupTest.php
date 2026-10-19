@@ -83,8 +83,8 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'title' => 'Child Group C',
       'description' => 'Child Group C',
       'parents' => [
-        $group1->id => 1,
-        $group2->id => 1,
+        $group1->id,
+        $group2->id,
       ],
     ]);
     $group3 = CRM_Contact_BAO_Group::writeRecord($params);
@@ -137,7 +137,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
       'parents' => [
-        $group2->id => 1,
+        $group2->id,
       ],
       'group_type' => ['2' => 1],
     ];
