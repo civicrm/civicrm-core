@@ -430,7 +430,8 @@ class Api4SelectQuery extends Api4Query {
   }
 
   public function getFieldSibling(array $field, string $siblingFieldName) {
-    $prefix = ($field['explicit_join'] ? $field['explicit_join'] . '.' : '') . ($field['implicit_join'] ? $field['implicit_join'] . '.' : '');
+    $prefix = ($field['implicit_join'] ?? $field['explicit_join'] ?? '');
+    $prefix = $prefix ? $prefix . '.' : '';
     return $this->getField($prefix . $siblingFieldName);
   }
 

@@ -821,6 +821,215 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   }
 
   /**
+   * dev/core#6634: addLineItemsNotYetRepresented() keys the merged-in line
+   * items by price_field_value_id. If the participant being edited switches
+   * to the SAME price option another participant on the contribution
+   * already holds, that key is already present in $submittedLineItems (as
+   * the edited participant's own new selection), so the other participant's
+   * "keep unchanged" line item is never merged in. getLineItemsToAdd()/
+   * getLineItemsToAlter() then have only one entry for that
+   * price_field_value_id to work from, and misattribute it to whichever
+   * participant already had a line item for it.
+   *
+   * Reproduced on smaster.demo.civicrm.org (CiviCRM 6.21.alpha1): the
+   * participant being edited ended up with their old line item cancelled
+   * and no replacement, while the other participant's line item - and the
+   * contribution total - were also wrong.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testFeeChangeMatchingAnotherParticipantsOptionDoesNotLoseTheLineItem(): void {
+    $participantA = $this->createTestEntity('Participant', [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'event_id' => $this->getEventID(),
+      'status_id:name' => 'Registered',
+      'role_id:name' => 'Attendee',
+    ], 'participantA');
+    $secondContactID = $this->individualCreate([], 'individual_1');
+    $participantB = $this->createTestEntity('Participant', [
+      'contact_id' => $secondContactID,
+      'event_id' => $this->getEventID(),
+      'status_id:name' => 'Registered',
+      'role_id:name' => 'Attendee',
+    ], 'participantB');
+
+    $contribution = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id:name' => 'Event Fee',
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participantA['id'],
+        'price_field_value_id' => $this->getExpensiveValueID(),
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participantB['id'],
+        'price_field_value_id' => $this->getCheapFeeID(),
+      ])
+      ->execute()->single();
+
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', (float) $this->_cheapFee + (float) $this->_expensiveFee)
+      ->execute();
+
+    // Change participant A onto the SAME option participant B already holds.
+    $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
+      $this->getPriceFieldFormLabel('PaidEvent') => $this->getCheapFeeID(),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+    ], [
+      'id' => $participantA['id'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
+
+    $participantALine = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('entity_id', '=', $participantA['id'])
+      ->addWhere('qty', '>', 0)
+      ->execute();
+    $this->assertCount(1, $participantALine, 'Participant A should have their own active line item for the new selection.');
+    $this->assertEquals($this->_cheapFee, $participantALine->first()['line_total']);
+
+    $participantBLine = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('entity_id', '=', $participantB['id'])
+      ->execute()->single();
+    $this->assertGreaterThan(0, $participantBLine['qty'], "Participant B's line item must survive participant A's fee change.");
+    $this->assertEquals($this->_cheapFee, $participantBLine['line_total']);
+
+    $this->assertEquals(
+      (float) $this->_cheapFee * 2,
+      $this->contributionInvoice($contribution['id']),
+      'The contribution total must reflect both participants holding the cheap fee.'
+    );
+  }
+
+  /**
+   * dev/core#6634: getNonCancelledFinancialItems() groups a contribution's
+   * financial items by price_field_value_id alone to spot already-reversed
+   * +/- pairs. If a DIFFERENT participant on the same contribution has an
+   * unrelated, already-fully-reversed pair under that same price option,
+   * this participant's own still-active financial item can get swept into
+   * that pairing and wrongly treated as already reversed - so when their
+   * own fee changes, the required reversal is silently skipped.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testFeeChangeDoesNotPruneAnotherParticipantsUnrelatedFinancialItem(): void {
+    $participantA = $this->createTestEntity('Participant', [
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'event_id' => $this->getEventID(),
+      'status_id:name' => 'Registered',
+      'role_id:name' => 'Attendee',
+    ], 'participantA');
+    $secondContactID = $this->individualCreate([], 'individual_1');
+    $participantB = $this->createTestEntity('Participant', [
+      'contact_id' => $secondContactID,
+      'event_id' => $this->getEventID(),
+      'status_id:name' => 'Registered',
+      'role_id:name' => 'Attendee',
+    ], 'participantB');
+
+    $contribution = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id:name' => 'Event Fee',
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participantA['id'],
+        'price_field_value_id' => $this->getCheapFeeID(),
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id' => $participantB['id'],
+        'price_field_value_id' => $this->getVeryExpensiveID(),
+      ])
+      ->execute()->single();
+
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', (float) $this->_cheapFee + (float) $this->_veryExpensive)
+      ->execute();
+
+    $participantALine = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->addWhere('entity_id', '=', $participantA['id'])
+      ->execute()->single();
+
+    // Participant B's unrelated, already-fully-reversed OLD selection at the
+    // same price option participant A currently holds - built directly, as
+    // a stand-in for a past fee change, so it carries its own original +
+    // reversal financial items without a second form submission.
+    $oldLineItemForB = $this->createTestEntity('LineItem', [
+      'contribution_id' => $contribution['id'],
+      'entity_table' => 'civicrm_participant',
+      'entity_id' => $participantB['id'],
+      'price_field_id' => $participantALine['price_field_id'],
+      'price_field_value_id' => $this->getCheapFeeID(),
+      'label' => $participantALine['label'],
+      'qty' => 0,
+      'unit_price' => $this->_cheapFee,
+      'line_total' => 0,
+      'financial_type_id' => $participantALine['financial_type_id'],
+    ], 'oldLineItemB');
+
+    $incomeAccountID = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
+      $participantALine['financial_type_id'],
+      'Income Account is'
+    );
+    $this->createTestEntity('FinancialItem', [
+      'transaction_date' => date('Y-m-d'),
+      'contact_id' => $secondContactID,
+      'amount' => $this->_cheapFee,
+      'currency' => 'USD',
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => $oldLineItemForB['id'],
+      'description' => $participantALine['label'],
+      'status_id:name' => 'Paid',
+      'financial_account_id' => $incomeAccountID,
+    ], 'oldFinancialItemB1');
+    $this->createTestEntity('FinancialItem', [
+      'transaction_date' => date('Y-m-d'),
+      'contact_id' => $secondContactID,
+      'amount' => -(float) $this->_cheapFee,
+      'currency' => 'USD',
+      'entity_table' => 'civicrm_line_item',
+      'entity_id' => $oldLineItemForB['id'],
+      'description' => $participantALine['label'],
+      'status_id:name' => 'Paid',
+      'financial_account_id' => $incomeAccountID,
+    ], 'oldFinancialItemB2');
+
+    // Change participant A's own fee - this is what triggers a scan of
+    // every financial item on the contribution's line items, including
+    // participant B's unrelated pair above.
+    $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
+      $this->getPriceFieldFormLabel('PaidEvent') => $this->getExpensiveValueID(),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+    ], [
+      'id' => $participantA['id'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
+
+    $participantAOldLineFinancialItems = array_map('floatval', FinancialItem::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_line_item')
+      ->addWhere('entity_id', '=', $participantALine['id'])
+      ->addSelect('amount')
+      ->execute()
+      ->column('amount'));
+    sort($participantAOldLineFinancialItems);
+
+    $this->assertEquals(
+      [-(float) $this->_cheapFee, (float) $this->_cheapFee],
+      $participantAOldLineFinancialItems,
+      "Participant A's original financial item must be reversed on their own fee change, not wrongly treated as already reversed because participant B has an unrelated reversed pair under the same price option."
+    );
+  }
+
+  /**
    * Create one radio price field, with one value, on the PaidEvent price set.
    *
    * @param string $name
