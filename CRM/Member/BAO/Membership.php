@@ -1535,7 +1535,8 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    */
   public static function isCancelSubscriptionSupported($mid): bool {
     $cacheKeyString = "$mid";
-    static $supportsCancel = [];
+    $supportsCancel = &Civi::$statics[__CLASS__]['supportsCancel'];
+    $supportsCancel ??= [];
 
     if (!array_key_exists($cacheKeyString, $supportsCancel)) {
       $supportsCancel[$cacheKeyString] = FALSE;
