@@ -64,7 +64,7 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
     CRM_Contribute_Form_Task_Status::processForm($form, $params);
 
     $contribution = $this->callAPISuccess('Contribution', 'get', ['id' => $contributionId]);
-    $updatedContribution = $contribution['values'][1];
+    $updatedContribution = $contribution['values'][$contributionId];
 
     $this->assertEquals('', $updatedContribution['contribution_source']);
     $this->assertEquals(date("Y-m-d"), date("Y-m-d", strtotime($updatedContribution['receive_date'])));
@@ -112,7 +112,7 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
     CRM_Contribute_Form_Task_Status::processForm($form, $params);
 
     $contribution = $this->callAPISuccess('Contribution', 'get', ['id' => $contributionId]);
-    $updatedContribution = $contribution['values'][1];
+    $updatedContribution = $contribution['values'][$contributionId];
 
     $this->assertEquals('', $updatedContribution['contribution_source']);
     $this->assertEquals(date("Y-m-d"), date("Y-m-d", strtotime($updatedContribution['receive_date'])));

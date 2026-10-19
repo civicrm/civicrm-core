@@ -493,10 +493,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $tagID = $this->tagCreate(['name' => 'Big', 'used_for' => 'civicrm_contribution'])['id'];
     $contact1 = $this->individualCreate();
     $contact2 = $this->individualCreate();
-    $contributionID = NULL;
-    while ($contributionID !== $contact2) {
-      $contributionID = (int) $this->callAPISuccess('Contribution', 'create', ['contact_id' => $contact1, 'total_amount' => 5, 'financial_type_id' => 'Donation'])['id'];
-    }
+    // Give the contribution the same id as $contact2, so a merge that ignores entity_table would move the tag.
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_contribution AUTO_INCREMENT = ' . $contact2);
+    $contributionID = (int) $this->callAPISuccess('Contribution', 'create', ['contact_id' => $contact1, 'total_amount' => 5, 'financial_type_id' => 'Donation'])['id'];
+    $this->assertEquals($contact2, $contributionID);
     $entityTagParams = ['entity_id' => $contributionID, 'entity_table' => 'civicrm_contribution', 'tag_id' => $tagID];
     $this->callAPISuccess('EntityTag', 'create', $entityTagParams);
     $this->callAPISuccessGetSingle('EntityTag', $entityTagParams);

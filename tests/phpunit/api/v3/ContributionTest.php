@@ -2404,7 +2404,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ->addValue('trxn_date', $repeatedContribution['values'][$repeatedContribution['id']]['receive_date'])
       ->execute();
 
-    $this->assertEquals($contributionRecur['values'][$contributionRecur['id']]['is_test'], $repeatedContribution['values'][2]['is_test']);
+    $this->assertEquals($contributionRecur['values'][$contributionRecur['id']]['is_test'], $repeatedContribution['values'][$repeatedContribution['id']]['is_test']);
   }
 
   /**
@@ -2453,7 +2453,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     [$originalContribution, $membership] = $this->setUpAutoRenewMembership();
 
     $this->callAPISuccess('Contribution', 'repeattransaction', [
-      'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
+      'contribution_recur_id' => $originalContribution['values'][$originalContribution['id']]['contribution_recur_id'],
       'contribution_status_id' => 'Failed',
     ]);
 
@@ -2464,7 +2464,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
 
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
-      'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
+      'contribution_recur_id' => $originalContribution['values'][$originalContribution['id']]['contribution_recur_id'],
       'trxn_id' => 'bobsled',
     ]);
     Payment::create(FALSE)
@@ -2562,7 +2562,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
 
     $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
-      'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
+      'contribution_recur_id' => $originalContribution['values'][$originalContribution['id']]['contribution_recur_id'],
       'contribution_status_id' => $contributionStatus['name'],
       'trxn_id' => 'bobsled',
     ]);
@@ -4449,7 +4449,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'status_id' => 'Expired',
     ]);
     $repeatedContribution = $this->callAPISuccess('contribution', 'repeattransaction', [
-      'contribution_recur_id' => $originalContribution['values'][1]['contribution_recur_id'],
+      'contribution_recur_id' => $originalContribution['values'][$originalContribution['id']]['contribution_recur_id'],
       'contribution_status_id' => 'Pending',
       'trxn_id' => 1234,
     ]);
