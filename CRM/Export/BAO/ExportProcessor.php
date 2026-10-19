@@ -2302,6 +2302,9 @@ LIMIT $offset, $limit
         $row = [];
 
         foreach (array_keys($sqlColumns) as $column) {
+          if (!empty($this->outputSpecification[$column]['do_not_output_to_csv'])) {
+            continue;
+          }
           $row[$column] = $dao->$column;
         }
         $componentDetails[] = $row;
