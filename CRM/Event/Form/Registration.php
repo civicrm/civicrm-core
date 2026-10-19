@@ -938,6 +938,23 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   protected function addParticipant($contactID, $participantNumber): int {
     $transaction = new CRM_Core_Transaction();
 
+    $participantID = (int) Participant::save(FALSE)->addRecord($this->getParticipantParams($contactID, $participantNumber))->execute()->single()['id'];
+
+    $transaction->commit();
+
+    return $participantID;
+  }
+
+  /**
+   * Get the params for creating or updating a participant record.
+   *
+   * @param int $contactID
+   * @param $participantNumber
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function getParticipantParams($contactID, $participantNumber): array {
     $participantParams = [
       'id' => $this->getExistingParticipantID($participantNumber),
       'contact_id' => $contactID,
@@ -966,11 +983,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     $participantParams['discount_id'] = $this->getDiscountID();
 
-    $participantID = (int) Participant::save(FALSE)->addRecord($participantParams)->execute()->single()['id'];
-
-    $transaction->commit();
-
-    return $participantID;
+    return $participantParams;
   }
 
   /**
