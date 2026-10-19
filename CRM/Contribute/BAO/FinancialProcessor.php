@@ -1556,9 +1556,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function getNewLineItems(): array {
     $newLineItems = [];
-    foreach ($this->getAddedLineItems() as $priceFieldValueID => $lineItem) {
+    foreach ($this->getAddedLineItems() as $key => $lineItem) {
       if (!isset($lineItem['id'])) {
-        $newLineItems[$priceFieldValueID] = $lineItem;
+        $newLineItems[$key] = $lineItem;
       }
     }
     return $newLineItems;
@@ -1570,9 +1570,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
    */
   private function getResurrectedLineItems(): array {
     $resurrectedLineItems = [];
-    foreach ($this->getAddedLineItems() as $priceFieldValueID => $lineItem) {
+    foreach ($this->getAddedLineItems() as $key => $lineItem) {
       if (isset($lineItem['id'])) {
-        $resurrectedLineItems[$priceFieldValueID] = $lineItem;
+        $resurrectedLineItems[$key] = $lineItem;
       }
     }
     return $resurrectedLineItems;
@@ -1620,26 +1620,25 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $added = $changed = $removed = [];
     $matchedIDs = [];
 
-    foreach ($this->getUpdatedLineItems() as $submittedLineItem) {
-      $priceFieldValueID = $submittedLineItem['price_field_value_id'];
+    foreach ($this->getUpdatedLineItems() as $key => $submittedLineItem) {
       $previousLineItem = $this->findActivePreviousLineItem($submittedLineItem);
       if ($previousLineItem === NULL) {
         $cancelledLineItem = $this->findCancelledPreviousLineItem($submittedLineItem);
         if ($cancelledLineItem !== NULL) {
           $submittedLineItem['id'] = $cancelledLineItem['id'];
         }
-        $added[$priceFieldValueID] = $submittedLineItem;
+        $added[$key] = $submittedLineItem;
         continue;
       }
       $matchedIDs[] = $previousLineItem['id'];
       if ($this->lineItemValueChanged($previousLineItem, $submittedLineItem)) {
-        $changed[$priceFieldValueID] = array_merge($submittedLineItem, ['id' => $previousLineItem['id']]);
+        $changed[$key] = array_merge($submittedLineItem, ['id' => $previousLineItem['id']]);
       }
     }
 
     foreach ($this->originalLineItems as $id => $previousLineItem) {
       if (!$this->isCancelled($previousLineItem) && !in_array($id, $matchedIDs)) {
-        $removed[$previousLineItem['price_field_value_id']] = array_merge($previousLineItem, [
+        $removed[$id] = array_merge($previousLineItem, [
           'qty' => 0,
           'line_total' => 0,
           'tax_amount' => 0,
