@@ -12,6 +12,7 @@
 use Civi\Api4\Contribution;
 use Civi\Api4\ContributionRecur;
 use Civi\Api4\LineItem;
+use Civi\Api4\Membership;
 use Civi\Api4\Order;
 use Civi\Payment\Exception\PaymentProcessorException;
 
@@ -39,6 +40,61 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @var int
    */
   public $_contactID = NULL;
+
+  /**
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  private function getUnpaidMembershipStatus(): ?int {
+    // If is_override is empty then status_id="" (because it's a hidden field). That will trigger a recalculation in CRM_Member_BAO_Membership::create
+    //   unless is_override = TRUE or skipStatusCal = TRUE. But skipStatusCal also skips date calculations.
+    // If we are recording a contribution we *do* want to trigger a recalculation of membership status so it can go from Pending->New/Current
+    // So here we check if status_id is empty, default (ie. status in database) is pending and that we are not recording a contribution -
+    //   If all those are true then we skip the status calculation and explicitly set the pending status (to avoid a DB constraint status_id=0).
+    // Test cover in `CRM_Member_Form_MembershipTest::testOverrideSubmit()`.
+    $pendingMembershipStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
+    if (!empty($this->getSubmittedValue('status_id'))
+      || empty($this->_defaultValues['status_id'])
+      || $this->_mode
+      || $this->getSubmittedValue('record_contribution')
+      || (int) $this->_defaultValues['status_id'] !== $pendingMembershipStatusId
+    ) {
+      return NULL;
+    }
+    $isPaymentPending = FALSE;
+    if ($this->getMembershipID()) {
+      $contributionId = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->getMembershipID());
+      if ($contributionId) {
+        $isPaymentPending = Contribution::get(FALSE)
+          ->addSelect('contribution_status_id:name')
+          ->addWhere('id', '=', $contributionId)
+          ->execute()
+          ->first()['contribution_status_id:name'] === 'Pending';
+      }
+    }
+    return $isPaymentPending ? $this->_defaultValues['status_id'] : NULL;
+  }
+
+  /**
+   * Get the status to apply when recording a new, non-completed contribution
+   * (eg. pay-later) against a membership.
+   *
+   * Without this, a pay-later membership would get a date-calculated status
+   * (eg. 'New'/'Current') despite no payment having been received yet.
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  private function getPendingContributionMembershipStatus(): ?int {
+    if (!$this->getSubmittedValue('record_contribution') || !empty($this->getSubmittedValue('is_override'))) {
+      return NULL;
+    }
+    $completedContributionStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    if ((int) $this->getSubmittedValue('contribution_status_id') === $completedContributionStatusId) {
+      return NULL;
+    }
+    return (int) CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
+  }
 
   /**
    * Set entity fields to be assigned to the form.
@@ -970,10 +1026,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $originalMembershipType = $this->getMembershipValue('membership_type_id');
-    $lineItem = [$this->getOrder()->getPriceSetID() => $this->getOrder()->getLineItems()];
 
-    $params['tax_amount'] = $this->order->getTotalTaxAmount();
-    $params['total_amount'] = $this->order->getTotalAmount();
+    $params['tax_amount'] = $this->getOrder()->getTotalTaxAmount();
+    $params['total_amount'] = $this->getOrder()->getTotalAmount();
     $params['contact_id'] = $this->getContactID();
 
     $params = array_merge($params, $this->getFormMembershipParams());
@@ -983,8 +1038,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     if ($this->_contributorContactID != $this->_contactID) {
       $params['contribution_contact_id'] = $this->_contributorContactID;
     }
-
-    $pendingMembershipStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
 
     if ($this->getSubmittedValue('record_contribution')) {
       $recordContribution = [
@@ -997,21 +1050,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       foreach ($recordContribution as $f) {
         $params[$f] = $this->getSubmittedValue($f);
       }
-
-      $completedContributionStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
-      if (($params['contribution_status_id'] ?? NULL) != $completedContributionStatusId) {
-        if (empty($params['is_override'])) {
-          $params['status_id'] = $pendingMembershipStatusId;
-          $params['skipStatusCal'] = TRUE;
-        }
-      }
-
-    }
-
-    // process line items, until no previous line items.
-    if (!empty($lineItem)) {
-      $params['lineItems'] = $lineItem;
-      $params['processPriceSet'] = TRUE;
     }
 
     if ($this->_mode) {
@@ -1091,54 +1129,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     }
     else {
-      $params['action'] = $this->_action;
+      $lineItems = $this->getOrder()->getMembershipLineItems();
 
-      foreach ($lineItem[$this->_priceSetId] as $id => $lineItemValues) {
-        if (empty($lineItemValues['membership_type_id'])) {
-          continue;
-        }
-
-        $membershipParams = array_merge($params, $membershipTypeValues[$lineItemValues['membership_type_id']]);
-
-        // If is_override is empty then status_id="" (because it's a hidden field). That will trigger a recalculation in CRM_Member_BAO_Membership::create
-        //   unless is_override = TRUE or skipStatusCal = TRUE. But skipStatusCal also skips date calculations.
-        // If we are recording a contribution we *do* want to trigger a recalculation of membership status so it can go from Pending->New/Current
-        // So here we check if status_id is empty, default (ie. status in database) is pending and that we are not recording a contribution -
-        //   If all those are true then we skip the status calculation and explicitly set the pending status (to avoid a DB constraint status_id=0).
-        // Test cover in `CRM_Member_Form_MembershipTest::testOverrideSubmit()`.
-        $isPaymentPending = FALSE;
-        if ($this->getMembershipID()) {
-          $contributionId = CRM_Member_BAO_MembershipPayment::getLatestContributionIDFromLineitemAndFallbackToMembershipPayment($this->getMembershipID());
-          if ($contributionId) {
-            $isPaymentPending = Contribution::get(FALSE)
-              ->addSelect('contribution_status_id:name')
-              ->addWhere('id', '=', $contributionId)
-              ->execute()
-              ->first()['contribution_status_id:name'] === 'Pending';
-          }
-        }
-        if (empty($membershipParams['status_id'])
-          && !empty($this->_defaultValues['status_id'])
-          && !$this->getSubmittedValue('record_contribution')
-          && (int) $this->_defaultValues['status_id'] === $pendingMembershipStatusId
-          && $isPaymentPending
-        ) {
-          $membershipParams['status_id'] = $this->_defaultValues['status_id'];
-        }
-
-        if (!empty($softParams)) {
-          $params['soft_credit'] = $softParams;
-        }
-        unset($membershipParams['contribution_status_id']);
-        $membershipParams['skipLineItem'] = TRUE;
-        unset($membershipParams['lineItems'], $membershipParams['total_amount'], $membershipParams['tax_amount']);
-        $membershipParams['custom'] = CRM_Core_BAO_CustomField::postProcess($this->getSubmittedValues(), $this->_id, 'Membership');
-        $this->setMembership((array) CRM_Member_BAO_Membership::create($membershipParams));
-        $lineItem[$this->_priceSetId][$id]['entity_id'] = $this->membership['id'];
-        $lineItem[$this->_priceSetId][$id]['entity_table'] = 'civicrm_membership';
+      foreach ($lineItems as $id => $lineItemValues) {
+        $this->setMembership(Membership::save(FALSE)
+          ->addRecord($this->getMembershipParamsForType((int) $lineItemValues['membership_type_id']))
+          ->execute()->single());
+        $lineItems[$id]['entity_id'] = $this->membership['id'];
+        $lineItems[$id]['entity_table'] = 'civicrm_membership';
 
       }
-      $params['lineItems'] = $lineItem;
       if ($this->getSubmittedValue('record_contribution')) {
         $contributionParams = $this->getContributionValues();
         $contributionParams['skipCleanMoney'] = TRUE;
@@ -1155,7 +1155,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $contributionParams['contact_id'] = $params['contribution_contact_id'];
         }
 
-        $contributionParams['line_item'] = $params['lineItems'];
+        $contributionParams['line_item'] = [$this->getPriceSetID() => $lineItems];
 
         $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
         $this->createSoftCredit($contribution->id);
@@ -1504,6 +1504,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   protected function getContributionRecurID():?int {
     if (!array_key_exists('ContributionRecur', $this->ids)) {
+      if (!$this->_mode) {
+        return $this->getMembershipValue('contribution_recur_id');
+      }
       $this->createRecurringContribution();
     }
     return $this->ids['ContributionRecur'];
@@ -1594,8 +1597,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @throws \CRM_Core_Exception
    */
   protected function getFormMembershipParams(): array {
-    $params = [
-      'status_id' => $this->getSubmittedValue('status_id'),
+    return [
+      'id' => $this->_id ?: NULL,
+      'status_id' => $this->getPendingContributionMembershipStatus() ?: ($this->getUnpaidMembershipStatus() ?: $this->getSubmittedValue('status_id')),
+      'skipStatusCal' => (bool) $this->getPendingContributionMembershipStatus(),
       'source' => $this->getSource(),
       'contact_id' => $this->getMembershipContactID(),
       'is_override' => $this->getSubmittedValue('is_override'),
@@ -1607,7 +1612,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       'exclude_is_admin' => !$this->getSubmittedValue('is_override'),
       'contribution_recur_id' => $this->getContributionRecurID(),
     ];
-    return $params;
   }
 
   /**
