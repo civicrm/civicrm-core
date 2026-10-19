@@ -22,20 +22,16 @@ class CRM_Contribute_Form_CancelSubscriptionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testMail(): void {
-    $mut = new CiviMailUtils($this, TRUE);
     $this->addContribution();
-    /** @var CRM_Contribute_Form_CancelSubscription $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_CancelSubscription', ['is_notify' => TRUE]);
-    $form->set('crid', $this->getContributionRecurID());
-    $form->buildForm();
-    try {
-      $form->postProcess();
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $mut->checkMailLog($this->getExpectedMailStrings());
-      return;
-    }
-    $this->fail('should not be reachable');
+    $this->getTestForm('CRM_Contribute_Form_CancelSubscription', ['is_notify' => TRUE], ['crid' => $this->getContributionRecurID()])->processForm();
+    $this->assertMailSentContainingStrings($this->getExpectedMailStrings());
+    $this->assertMailSentContainingHeaderStrings([
+      'MIME-Version: 1.0',
+      'From: "Bob" <bob@example.org>',
+      'To: Anthony Anderson <anthony_anderson@civicrm.org>',
+      "Subject: Recurring Contribution Cancellation Notification - Mr. Anthony\n Anderson II",
+      'Return-Path: bob@example.org',
+    ]);
   }
 
   /**
@@ -45,11 +41,6 @@ class CRM_Contribute_Form_CancelSubscriptionTest extends CiviUnitTestCase {
    */
   public function getExpectedMailStrings(): array {
     return [
-      'MIME-Version: 1.0',
-      'From: "Bob" <bob@example.org>',
-      'To: Anthony Anderson <anthony_anderson@civicrm.org>',
-      "Subject: Recurring Contribution Cancellation Notification - Mr. Anthony\n Anderson II",
-      'Return-Path: bob@example.org',
       'Dear Anthony,',
       'Your recurring contribution of $10.00, every 1 month has been cancelled as requested',
     ];
@@ -64,10 +55,7 @@ class CRM_Contribute_Form_CancelSubscriptionTest extends CiviUnitTestCase {
    */
   public function testCancelSubscriptionForm(): void {
     $this->addContribution();
-    /** @var CRM_Contribute_Form_CancelSubscription $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_CancelSubscription', ['is_notify' => TRUE]);
-    $form->set('crid', $this->getContributionRecurID());
-    $form->buildForm();
+    $this->getTestForm('CRM_Contribute_Form_CancelSubscription', ['is_notify' => TRUE], ['crid' => $this->getContributionRecurID()])->processForm(\Civi\Test\FormWrapper::BUILT);
 
     /* Set the Payment processor to not support 'Cancel Recurring' */
     $paymentProcessorObj = Civi\Payment\System::singleton()->getById(CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorID($this->getContributionRecurID()));
