@@ -1344,6 +1344,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateChargebackContributionDefaultAccount(): void {
+    $this->isValidateFinancialTrxnsOnPostAssert = TRUE;
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
     $this->callAPISuccess('Contribution', 'create', [
       'id' => $contribution['id'],
@@ -1361,6 +1362,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'status_id' => 'Chargeback',
       'to_financial_account_id' => 6,
     ]);
+    $paidAmount = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->addSelect('paid_amount')
+      ->execute()->single()['paid_amount'];
+    $this->assertEquals(0.0, (float) $paidAmount, 'paid_amount should reflect the chargeback reversal.');
   }
 
   /**

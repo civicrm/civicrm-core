@@ -90,6 +90,7 @@ class ContributionGetSpecProvider extends \Civi\Core\Service\AutoService impleme
     $statusIDs = [
       \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded'),
+      \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Chargeback'),
     ];
 
     return "COALESCE((SELECT SUM(ft.total_amount) FROM civicrm_financial_trxn ft
@@ -106,6 +107,8 @@ class ContributionGetSpecProvider extends \Civi\Core\Service\AutoService impleme
     $statusIDs = [
       \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded'),
+      // See calculateAmountPaid() - keep these in sync.
+      \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Chargeback'),
     ];
     $idField = $query->getFieldSibling($totalAmountField, 'id');
 
