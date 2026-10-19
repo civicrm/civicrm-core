@@ -274,7 +274,8 @@ div.crm-inline-edit-form div.crm-clear {
 }
 .crm-contact-actions-list-inner {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 0;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: calc(2 * var(--crm-dropdown2-padding));
 }
 #crm-contact-actions-list .crm-contact_print-list {
   grid-column: 3;
