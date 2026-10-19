@@ -204,8 +204,6 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     $this->assign('defaultCurrencySymbol', CRM_Core_BAO_Country::defaultCurrencySymbol());
     // This could be updated to TRUE in the formRule
     $this->addExpectedSmartyVariable('batchAmountMismatch');
-    // It is unclear where this is otherwise assigned but the template expects it.
-    $this->addExpectedSmartyVariable('contactFields');
     // The not-always-present refresh button.
     $this->addOptionalQuickFormElement('_qf_Batch_refresh');
   }
