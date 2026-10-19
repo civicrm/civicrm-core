@@ -639,6 +639,9 @@
         const entityFields = {fields: [], joins: []};
         const isJoin = (item) => Boolean(item && item['af-join']);
 
+        // track multiple joins
+        const entityJoinCounts = {};
+
         fieldsets.forEach((fieldset) => {
           afGui.getFormElements(fieldset['#children'], {'#tag': 'af-field'}, isJoin).forEach((field) => {
             if (field.name) {
@@ -646,8 +649,6 @@
             }
           });
 
-          // track multiple joins to the same entity
-          const entityJoinCounts = {};
           afGui.getFormElements(fieldset['#children'], isJoin).forEach((join) => {
             const entity = join['af-join'];
             const joinIndex = entityJoinCounts[entity] = (entity in entityJoinCounts) ? (entityJoinCounts[entity] + 1) : 0;
