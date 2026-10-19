@@ -256,7 +256,7 @@ class CRM_Core_ManagedEntities {
       try {
         $result = civicrm_api4($item['entity_type'], 'save', $params);
       }
-      catch (CRM_Core_Exception $e) {
+      catch (Throwable $e) {
         $this->onApiError($item['module'], $item['name'], 'save', $e->getMessage(), $e);
         return;
       }
@@ -374,7 +374,7 @@ class CRM_Core_ManagedEntities {
       try {
         civicrm_api4($item['entity_type'], 'update', $params);
       }
-      catch (CRM_Core_Exception $e) {
+      catch (Throwable $e) {
         $this->onApiError($item['module'], $item['name'], 'update', $e->getMessage(), $e);
         return;
       }
@@ -477,24 +477,29 @@ class CRM_Core_ManagedEntities {
 
     // Delete the entity and the managed record
     if ($doDelete) {
-      try {
-        // APIv4 delete
-        if (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
+      // APIv4 delete
+      if (CRM_Core_BAO_Managed::isApi4ManagedType($item['entity_type'])) {
+        try {
           civicrm_api4($item['entity_type'], 'delete', [
             'checkPermissions' => FALSE,
             'where' => [['id', '=', $item['entity_id']]],
           ]);
         }
-        // APIv3 delete
-        else {
+        catch (Throwable $e) {
+          $this->onApiError($item['module'], $item['name'], 'delete', $e->getMessage(), $e);
+        }
+      }
+      // APIv3 delete
+      else {
+        try {
           $check = civicrm_api3($item['entity_type'], 'get', ['id' => $item['entity_id']]);
           if ($check['count']) {
             civicrm_api3($item['entity_type'], 'delete', ['id' => $item['entity_id']]);
           }
         }
-      }
-      catch (CRM_Core_Exception $e) {
-        $this->onApiError($item['module'], $item['name'], 'delete', $e->getMessage(), $e);
+        catch (CRM_Core_Exception $e) {
+          $this->onApiError($item['module'], $item['name'], 'delete', $e->getMessage(), $e);
+        }
       }
       // Ensure managed record is deleted.
       // Note: in many cases CRM_Core_BAO_Managed::on_hook_civicrm_post() will take care of

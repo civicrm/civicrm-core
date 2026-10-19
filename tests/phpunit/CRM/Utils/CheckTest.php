@@ -80,6 +80,44 @@ class CRM_Utils_CheckTest extends CiviUnitTestCase {
   }
 
   /**
+   * A check that throws is reported as a message of its own; the other checks still run.
+   */
+  public function testFailingCheckIsReported(): void {
+    $component = new class() extends CRM_Utils_Check_Component {
+
+      public function checkBroken(): array {
+        throw new TypeError('Ruh-roh');
+      }
+
+      public function checkHealthy(): array {
+        return [new CRM_Utils_Check_Message('checkHealthy', 'ok', 'Healthy', \Psr\Log\LogLevel::INFO)];
+      }
+
+    };
+    $messages = [];
+    foreach ($component->checkAll() as $message) {
+      $messages[$message->getName()] = $message;
+    }
+    $this->assertEquals(['checkBroken', 'checkHealthy'], array_keys($messages));
+    $this->assertStringContainsString('Ruh-roh', $messages['checkBroken']->getMessage());
+    $this->assertEquals(3, $messages['checkBroken']->getLevel());
+  }
+
+  /**
+   * A failing hook_civicrm_check listener is reported, and the core check results are kept.
+   */
+  public function testFailingCheckHookIsReported(): void {
+    $this->hookClass->setHook('civicrm_check', function() {
+      throw new TypeError('Ruh-roh');
+    });
+    $messages = CRM_Utils_Check::checkStatus();
+    $failed = array_filter($messages, fn($message) => $message->getTitle() === 'System Check Failed');
+    // Only the hook failed: no core check on a healthy site may report itself as failed.
+    $this->assertEquals(['hook_civicrm_check'], array_values(array_map(fn($message) => $message->getName(), $failed)));
+    $this->assertGreaterThan(1, count($messages));
+  }
+
+  /**
    * getMaxSeverity() returns the cached value on a hit and recomputes with $force.
    */
   public function testGetMaxSeverityCaching(): void {

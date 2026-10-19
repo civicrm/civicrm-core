@@ -87,6 +87,22 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
   }
 
   /**
+   * A PHP error while building one menu item skips that item, not the whole route table.
+   */
+  public function testBuildSkipsItemWithError(): void {
+    CRM_Utils_Hook::singleton()->setHook('civicrm_alterMenu', function(&$items) {
+      // An array 'component' makes the component lookup throw a TypeError.
+      $items['civicrm/menutest-broken'] = $items['civicrm/dashboard'];
+      $items['civicrm/menutest-broken']['component'] = ['CiviContribute'];
+    });
+
+    \Civi::router()->clear();
+    $item = \Civi::router()->get('civicrm/dashboard');
+    $this->assertEquals('civicrm/dashboard', $item['path']);
+    $this->assertEquals('CRM_Contact_Page_DashBoard', $item['page_callback']);
+  }
+
+  /**
    * Check that null database fields (such as 'title' for routes without explicit title)
    * are omitted from the route array rather than set to empty string.
    */
