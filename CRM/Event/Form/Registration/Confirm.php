@@ -547,10 +547,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $participantRecord['contactID'] = $contactID;
       }
 
-      if (!empty($participantRecord['contributionID'])) {
-        $this->_values['contributionId'] = $participantRecord['contributionID'];
-      }
-
       // add participant record
       $participantID = $this->addParticipant($contactID, $participantNum);
       $this->_participantIDS[$participantNum] = $participantID;
