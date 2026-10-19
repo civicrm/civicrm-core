@@ -1018,8 +1018,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $params = [];
 
     $this->processBillingAddress($this->getContributionContactID(), (string) $this->_contributorEmail);
-    $formValues = $this->_params;
-    $formValues['financial_type_id'] = $this->getFinancialTypeID();
 
     if ($this->_id) {
       $params['id'] = $this->_id;
@@ -1065,7 +1063,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       // we do need contribution and recurring records.
       $result = NULL;
 
-      $this->_params = $formValues;
       $contributionAddressID = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
       $contribution = Order::create(FALSE)
         ->setContributionValues($this->getContributionValues() + [
@@ -1095,8 +1092,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $payment->setBackOffice(TRUE);
         try {
           $result = $payment->doPayment($paymentParams);
-          $formValues = array_merge($formValues, $result);
-          $paymentStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $formValues['payment_status_id']);
+          $paymentStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $result['payment_status_id']);
           if (!empty($params['contribution_id']) && $paymentStatus === 'Completed') {
             civicrm_api3('Payment', 'create', [
               'fee_amount' => $result['fee_amount'] ?? 0,
