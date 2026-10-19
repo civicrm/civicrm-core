@@ -14,6 +14,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 use Civi\Api4\Contribution;
+use Civi\Api4\LineItem;
+use Civi\Api4\Order;
+use Civi\Api4\Participant;
 use Civi\Api4\Payment;
 use Civi\Payment\Exception\PaymentProcessorException;
 
@@ -471,6 +474,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $payment = $registerByID = $contribution = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
+    // If true, participants/contribution/line items are created together via Order::create() after this loop.
+    $isRealTimePaidWithLineItems = $this->isProcessRegistrationInRealTime() && $this->isPaidEvent() && $this->getLineItems();
+    $deferredParticipants = [];
+    $primaryParticipantRecord = NULL;
+
     $fields = [];
     foreach ($params as $participantNum => $participantRecord) {
       CRM_Event_Form_Registration_Confirm::fixLocationFields($participantRecord, $fields, $this);
@@ -479,9 +487,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if (empty($participantRecord['is_primary'])) {
         $contactID = $participantRecord['contact_id'] ?? NULL;
         $registerByID = $this->getPrimaryParticipantID();
-        if ($this->getPrimaryParticipantID()) {
-          $participantRecord['registered_by_id'] = $this->getPrimaryParticipantID();
-        }
+        // updateContactFields() below only checks this for emptiness, to pick the
+        // additional-participant profile - the primary may not have a real id yet
+        // if this registration creates everyone via one Order::create() call.
+        $participantRecord['registered_by_id'] = $registerByID ?: TRUE;
       }
       else {
         $participantRecord['amount'] = $this->getOrderTotalAmount();
@@ -530,53 +539,54 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
         $participantRecord['receive_date'] = $now;
 
-        if ($this->getLineItems() && !empty($participantRecord['is_primary']) &&
-          $this->isProcessRegistrationInRealTime()
-        ) {
-          // if paid event add a contribution record
-          //if primary participant contributing additional amount
-          //append (multiple participants) to its fee level. CRM-4196.
-          if (count($params) > 1) {
-            $participantRecord['amount_level'] .= ' ' . ts('(multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
-          }
-
-          //passing contribution id is already registered.
-          $contribution = $this->processContribution($participantRecord, $contactID);
-          $participantRecord['contributionID'] = $contribution->id;
+        //if primary participant contributing additional amount
+        //append (multiple participants) to its fee level. CRM-4196.
+        if (!empty($participantRecord['is_primary']) && count($params) > 1) {
+          $participantRecord['amount_level'] .= ' ' . ts('(multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
         }
         $participantRecord['contactID'] = $contactID;
       }
 
-      if (!empty($participantRecord['contributionID'])) {
-        $this->_values['contributionId'] = $participantRecord['contributionID'];
+      if (!empty($participantRecord['is_primary'])) {
+        $primaryParticipantRecord = $participantRecord;
       }
 
-      // add participant record
-      $participantID = $this->addParticipant($contactID, $participantNum);
-      $this->_participantIDS[$participantNum] = $participantID;
+      if ($isRealTimePaidWithLineItems) {
+        $deferredParticipants[$participantNum] = $participantRecord;
+      }
+      else {
+        // add participant record
+        $participantID = $this->addParticipant($contactID, $participantNum);
+        $this->_participantIDS[$participantNum] = $participantID;
 
-      if (!empty($participantRecord['is_primary'])) {
-        // CRM-10032
-        $this->_participantId = $participantID;
+        if (!empty($participantRecord['is_primary'])) {
+          // CRM-10032
+          $this->_participantId = $participantID;
 
-        if ($this->getParticipantValue('status_id.class') === 'Pending') {
-          $this->_allowConfirmation = TRUE;
+          if ($this->getParticipantValue('status_id.class') === 'Pending') {
+            $this->_allowConfirmation = TRUE;
+          }
+          $participantRecord['participantID'] = $participantID;
+          $this->set('primaryParticipant', $participantRecord);
         }
-        $participantRecord['participantID'] = $participantID;
-        $this->set('primaryParticipant', $participantRecord);
       }
 
       $this->createCMSUser($participantNum, $contactID);
     }
 
+    if ($isRealTimePaidWithLineItems) {
+      $contribution = $this->createOrderForParticipants($deferredParticipants, $primaryParticipantRecord);
+      $this->_values['contributionId'] = $contribution['id'];
+    }
+
     $registerByID = $this->getPrimaryParticipantID();
 
     $this->set('participantIDs', $this->_participantIDS);
-    $this->set('contributionID', $contribution->id ?? NULL);
+    $this->set('contributionID', $contribution['id'] ?? NULL);
     $this->set('participantId', $this->_participantIDS[0]);
 
     // create line items, CRM-5313
-    if ($this->_priceSetId &&
+    if (!$isRealTimePaidWithLineItems && $this->_priceSetId &&
       !empty($this->_lineItem)
     ) {
       // take all processed participant ids.
@@ -623,7 +633,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     if ($this->getOrderTotalAmount() > 0 && !$this->isPayLater() && is_object($payment) && !$this->getPaymentProcessorObject()->supports('noReturn')) {
       $participantRecord = $primaryParticipant;
       // https://docs.civicrm.org/dev/en/latest/extensions/payment-processors/create/#getpaymentformfields
-      $participantRecord['contributionID'] = $contribution->id;
+      $participantRecord['contributionID'] = $contribution['id'];
       // If registering from waitlist participant_id is set but contact_id is not.
       // We need a contact ID to process the payment so set the "primary" contact ID.
       $participantRecord['contactID'] = $participantRecord['contact_id'] = $contactID;
@@ -633,7 +643,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           Payment::create(FALSE)
             ->setNotificationForPayment(FALSE)
             ->setNotificationForCompleteOrder(FALSE)
-            ->addValue('contribution_id', $contribution->id)
+            ->addValue('contribution_id', $contribution['id'])
             ->addValue('total_amount', $this->getOrder()->getTotalAmount())
             ->addValue('payment_processor_id', $this->getPaymentProcessorID())
             ->addValue('trxn_id', $result['trxn_id'])
@@ -645,7 +655,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
       catch (PaymentProcessorException $e) {
-        CRM_Contribute_BAO_Contribution::failPayment($contribution->id,
+        CRM_Contribute_BAO_Contribution::failPayment($contribution['id'],
           $this->getContactID(), $e->getMessage());
       }
     }
@@ -799,7 +809,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         CRM_Event_BAO_Event::sendMail($contactId, $this->_values, $participantID, $this->isTest());
         if (!empty($contribution)) {
           Contribution::update(FALSE)
-            ->addWhere('id', '=', $contribution->id)
+            ->addWhere('id', '=', $contribution['id'])
             ->addValue('receipt_date', 'now')
             ->execute();
         }
@@ -808,63 +818,161 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Process the contribution.
+   * Create every participant, the contribution, and all line items for a
+   * real-time paid registration in one Order::create() call.
    *
-   * @param array $params
-   * @param int $contactID
+   * @param array $deferredParticipants
+   *   Participant records keyed by participant number (see the main loop in
+   *   postProcess()), each already carrying 'contactID'/'is_primary'/etc.
+   * @param array $primaryParticipantRecord
    *
-   * @return \CRM_Contribute_BAO_Contribution
-   *
+   * @return array
+   *   The created Contribution.
    * @throws \CRM_Core_Exception
    */
-  private function processContribution($params, $contactID): CRM_Contribute_BAO_Contribution {
-    // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
-    $transaction = new CRM_Core_Transaction();
-
-    $now = date('YmdHis');
-
+  private function createOrderForParticipants(array $deferredParticipants, array $primaryParticipantRecord): array {
     // @todo - this should come from the order
-    $financialTypeID = !empty($this->getEventValue('financial_type_id')) ? $this->getEventValue('financial_type_id') : $params['financial_type_id'];
+    $financialTypeID = !empty($this->getEventValue('financial_type_id')) ? $this->getEventValue('financial_type_id') : $primaryParticipantRecord['financial_type_id'];
 
-    $contribParams = [
-      'contact_id' => $contactID,
+    $order = Order::create(FALSE)->setContributionValues([
+      'contact_id' => $primaryParticipantRecord['contactID'],
       'financial_type_id' => $financialTypeID,
-      'receive_date' => $now,
-      'total_amount' => $this->getOrder()->getTotalAmount(),
-      'tax_amount' => $this->getOrderTotalTaxAmount(),
-      'amount_level' => $params['amount_level'],
-      'invoice_id' => $params['invoiceID'],
+      'receive_date' => date('YmdHis'),
+      'amount_level' => $primaryParticipantRecord['amount_level'],
+      'invoice_id' => $primaryParticipantRecord['invoiceID'],
       'currency' => $this->getCurrency(),
       'source' => $this->getSource(0),
-      'is_pay_later' => $params['is_pay_later'] ?? 0,
+      'is_pay_later' => $primaryParticipantRecord['is_pay_later'] ?? 0,
       'campaign_id' => $this->getCampaignID(0),
       'card_type_id' => $this->getCardTypeID(),
       'pan_truncation' => $this->getPanTruncation(),
-      // The ternary is probably redundant - paymentProcessor should always be set.
-      // For pay-later contributions it will be the pay-later processor.
       'payment_processor' => $this->_paymentProcessor ? $this->_paymentProcessor['id'] : NULL,
       'payment_instrument_id' => $this->_paymentProcessor ? $this->_paymentProcessor['payment_instrument_id'] : NULL,
       'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
-    ];
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id',
+        $this->getOrder()->getTotalAmount() == 0 ? 'Completed' : 'Pending'
+      ),
+      'is_test' => $this->isTest(),
+      'address_id' => CRM_Contribute_BAO_Contribution::createAddress($primaryParticipantRecord),
+    ]);
 
-    $contribParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id',
-      $contribParams['total_amount'] == 0 ? 'Completed' : 'Pending'
+    foreach ($deferredParticipants as $participantNum => $participantRecord) {
+      if (($this->_lineItem[$participantNum] ?? 'skip') === 'skip') {
+        continue;
+      }
+      // do cleanup line items if participant is re-walking the wizard.
+      $existingParticipantID = $this->getExistingParticipantID($participantNum);
+      if ($this->_allowConfirmation && $existingParticipantID) {
+        CRM_Price_BAO_LineItem::deleteLineItems($existingParticipantID, 'civicrm_participant');
+      }
+      $entityParams = ['identifier' => "participant_{$participantNum}", 'entity_table' => 'civicrm_participant'];
+      foreach ($this->getParticipantParams($participantRecord['contactID'], $participantNum) as $key => $value) {
+        $entityParams[$key === 'id' ? 'entity_id' : "entity_id.$key"] = $value;
+      }
+      if (empty($entityParams['entity_id'])) {
+        unset($entityParams['entity_id']);
+      }
+      // The primary doesn't have a real id yet at this point - it's being
+      // created in this same call - so registered_by_id for an additional
+      // participant can't be resolved here. Set below once it's known.
+      unset($entityParams['entity_id.registered_by_id']);
+      foreach ($this->_lineItem[$participantNum] as $line) {
+        $order->addLineItem($line + $entityParams);
+      }
+    }
+
+    $contribution = $order->execute()->single();
+
+    $this->assignParticipantIdsFromOrder($deferredParticipants, $contribution['id']);
+    $this->setRegisteredByIdForAdditionalParticipants($deferredParticipants);
+
+    // CRM-11124
+    CRM_Event_BAO_Participant::createDiscountTrxn(
+      $this->getEventID(),
+      ['contribution' => (object) $contribution, 'total_amount' => $contribution['total_amount']],
+      '',
+      CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($primaryParticipantRecord)
     );
 
-    $contribParams['is_test'] = $this->isTest();
-
-    $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params);
-
-    $contribParams['skipLineItem'] = 1;
-    $contribParams['skipCleanMoney'] = 1;
-    // create contribution record
-    $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
-    // CRM-11124
-    CRM_Event_BAO_Participant::createDiscountTrxn($this->getEventID(), $contribParams, '', CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($params));
-
-    $transaction->commit();
-
     return $contribution;
+  }
+
+  /**
+   * Resolve the real Participant ID Order::create() assigned to each
+   * participant number, and populate the identity-related properties that
+   * previously came straight from addParticipant()'s return value.
+   *
+   * Order::create() only returns the Contribution, and the 'identifier' used
+   * to group each participant's lines isn't a persisted column, so the real
+   * IDs are recovered by matching each new participant's contact_id back to
+   * the contact ID submitted for that participant number - falling back to
+   * creation order within a contact's own matches, for the rare case of two
+   * participant numbers sharing one contact.
+   *
+   * @param array $deferredParticipants
+   * @param int $contributionID
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function assignParticipantIdsFromOrder(array $deferredParticipants, int $contributionID): void {
+    $newParticipantIds = array_values(array_unique(array_column(
+      (array) LineItem::get(FALSE)
+        ->addSelect('entity_id')
+        ->addWhere('contribution_id', '=', $contributionID)
+        ->addWhere('entity_table', '=', 'civicrm_participant')
+        ->addOrderBy('id')
+        ->execute(),
+      'entity_id'
+    )));
+    $contactIdByParticipantId = array_column(
+      (array) Participant::get(FALSE)
+        ->addSelect('id', 'contact_id')
+        ->addWhere('id', 'IN', $newParticipantIds)
+        ->execute(),
+      'contact_id', 'id'
+    );
+    $idsByContactID = [];
+    foreach ($newParticipantIds as $participantID) {
+      $idsByContactID[$contactIdByParticipantId[$participantID]][] = $participantID;
+    }
+
+    foreach ($deferredParticipants as $participantNum => $participantRecord) {
+      $participantID = array_shift($idsByContactID[$participantRecord['contactID']]);
+      $this->_participantIDS[$participantNum] = $participantID;
+
+      if (!empty($participantRecord['is_primary'])) {
+        // CRM-10032
+        $this->_participantId = $participantID;
+        if ($this->getParticipantValue('status_id.class') === 'Pending') {
+          $this->_allowConfirmation = TRUE;
+        }
+        $participantRecord['participantID'] = $participantID;
+        $this->set('primaryParticipant', $participantRecord);
+      }
+    }
+  }
+
+  /**
+   * Set registered_by_id on every additional participant, now that the
+   * primary's real id is known (see createOrderForParticipants()).
+   *
+   * @param array $deferredParticipants
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function setRegisteredByIdForAdditionalParticipants(array $deferredParticipants): void {
+    $additionalParticipantIds = [];
+    foreach ($deferredParticipants as $participantNum => $participantRecord) {
+      if (empty($participantRecord['is_primary'])) {
+        $additionalParticipantIds[] = $this->_participantIDS[$participantNum];
+      }
+    }
+    if ($additionalParticipantIds) {
+      Participant::update(FALSE)
+        ->addWhere('id', 'IN', $additionalParticipantIds)
+        ->addValue('registered_by_id', $this->getPrimaryParticipantID())
+        ->execute();
+    }
   }
 
   protected function getPanTruncation(): string {
