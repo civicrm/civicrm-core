@@ -232,7 +232,7 @@ WHERE  email = %2
     ];
     $doCached = CRM_Core_DAO::executeQuery($groupsCachedSQL, $groupsParams);
     $doAdded = CRM_Core_DAO::executeQuery($groupsAddedSQL, $groupsParams);
-    $allGroups = $doAdded->fetchAll() + $doCached->fetchAll();
+    $allGroups = array_merge($doAdded->fetchAll(), $doCached->fetchAll());
     if ($return) {
       $returnGroups = [];
       foreach ($allGroups as $group) {
