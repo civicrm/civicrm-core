@@ -107,7 +107,7 @@ class CRM_Mailing_Page_ViewTest extends CiviUnitTestCase {
     $this->createTestEntity('GroupContact', $params);
 
     $email = Email::get()
-      ->addWhere('id', '=', $params['contact_id'])
+      ->addWhere('contact_id', '=', $params['contact_id'])
       ->execute()->first();
     $this->createTestEntity('MailingEventQueue', [
       'mailing_id' => $this->createMailing(),

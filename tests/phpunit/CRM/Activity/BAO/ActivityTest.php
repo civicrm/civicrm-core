@@ -1230,7 +1230,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $html = __FUNCTION__ . ' html {contact.display_name} {case.case_type_id:label}';
     $text = __FUNCTION__ . ' text {contact.display_name} {case.case_type_id:label}';
     $this->getTestForm('CRM_Case_Form_Task_Email', [
-      'to' => $contactId . '::' . 'email@example.com',
+      'to' => $this->getEmailIDs([$contactId]),
       'from_email_address' => 'from@example.com',
       'subject' => $subject,
       'html_message' => $html,
@@ -1374,7 +1374,7 @@ $text
     $html = __FUNCTION__ . ' html';
     $text = __FUNCTION__ . ' text';
     $this->getTestForm('CRM_Case_Form_Task_Email', [
-      'to' => $contactId . '::' . 'email@example.com',
+      'to' => $this->getEmailIDs([$contactId]),
       'from_email_address' => 'from@example.com',
       'subject' => '',
       'html_message' => $html,
@@ -1590,7 +1590,7 @@ $text
     $text = __FUNCTION__ . ' text';
 
     $this->getTestForm('CRM_Case_Form_Task_Email', [
-      'to' => $contactId . '::' . 'email@example.com',
+      'to' => $this->getEmailIDs([$contactId]),
       'from_email_address' => 'from@example.com',
       'subject' => $subject,
       'html_message' => $html,
@@ -1636,7 +1636,7 @@ $text
       'text_message' => $text,
       'campaign_id' => $campaign_id,
       'from_email_address' => 'from@example.com',
-      'to' => $contactId1 . '::email@example.com,' . $contactId2 . '::email2@example.com',
+      'to' => $this->getEmailIDs([$contactId1, $contactId2]),
     ], ['cid' => $contactId1 . ',' . $contactId2])
       ->processForm();
 
@@ -1690,9 +1690,7 @@ $textValue
       'text_message' => $text,
       'campaign_id' => $this->getCampaignID(),
       'from_email_address' => 'from@example.com',
-      'to' => $contactId1 . '::anthony_anderson@civicrm.org,'
-      . $contactId2 . '::anthony_anderson@civicrm.org,'
-      . $contactId3 . '::anthony_anderson@civicrm.org',
+      'to' => $this->getEmailIDs([$contactId1, $contactId2, $contactId3]),
       'attachFile_1' => [
         'uri' => $fileUri,
         'type' => 'text/plain',
@@ -1755,8 +1753,7 @@ $textValue
       'text_message' => $text,
       'campaign_id' => $this->getCampaignID(),
       'from_email_address' => 'from@example.com',
-      'to' => $contactId1 . '::' . $contact['values'][0]['email_primary.email'] . ','
-      . $contactId2 . '::' . $contact['values'][1]['email_primary.email'],
+      'to' => $this->getEmailIDs([$contactId1, $contactId2]),
       'attachFile_1' => [
         'uri' => $fileUri,
         'type' => 'text/plain',
@@ -2657,6 +2654,20 @@ $textValue
       ], 0)['id'];
     }
     return $this->ids['Campaign'][0];
+  }
+
+  /**
+   * Get the email ids of the given contacts, as the email form's 'to' value.
+   *
+   * @param int[] $contactIDs
+   *
+   * @return string
+   */
+  protected function getEmailIDs(array $contactIDs): string {
+    return implode(',', Email::get(FALSE)
+      ->addWhere('contact_id', 'IN', $contactIDs)
+      ->addOrderBy('id')
+      ->execute()->column('id'));
   }
 
 }
