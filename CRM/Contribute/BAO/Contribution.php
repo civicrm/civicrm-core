@@ -2210,7 +2210,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if ($participantID) {
-      return CRM_Event_BAO_Event::sendMail($contactID, $values,
+      return CRM_Event_BAO_Event::sendMail(NULL, $values,
         $participantID, $this->is_test, $returnMessageText
       );
     }
@@ -2375,12 +2375,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       if (count($additionalIDs)) {
         //set additionalParticipant true
         foreach ($additionalIDs as $participantID) {
-          //to change the status pending to completed
-          $additional = new CRM_Event_DAO_Participant();
-          $additional->id = $participantID;
-          $additional->find(TRUE);
-          $contactID = (int) $additional->contact_id;
-          CRM_Event_BAO_Event::sendMail($contactID, $values, $participantID, $isTest, $returnMessageText);
+          CRM_Event_BAO_Event::sendMail(NULL, $values, $participantID, $isTest, $returnMessageText);
         }
       }
     }
@@ -3374,16 +3369,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $values['participant'] = [];
 
     CRM_Event_BAO_Participant::getValues($participantParams, $values['participant'], $participantIds);
-    $ufJoinParams = [
-      'entity_table' => 'civicrm_event',
-      'entity_id' => $eventID,
-      'module' => 'CiviEvent',
-    ];
-
-    [$custom_pre_id, $custom_post_ids] = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-
-    $values['custom_pre_id'] = $custom_pre_id;
-    $values['custom_post_id'] = $custom_post_ids;
 
     return $values;
   }

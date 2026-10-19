@@ -1053,7 +1053,7 @@ WHERE civicrm_event.is_active = 1
   /**
    * Send e-mails.
    *
-   * @param int $contactID
+   * @param null $unused
    * @param array $values
    * @param int $participantId
    * @param bool $isTest
@@ -1062,26 +1062,37 @@ WHERE civicrm_event.is_active = 1
    * @return array|null
    * @throws \CRM_Core_Exception
    */
-  public static function sendMail($contactID, $values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
+  public static function sendMail($unused, $values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
 
     $template = CRM_Core_Smarty::singleton();
-    $gIds = [
-      'custom_pre_id' => $values['custom_pre_id'],
-      'custom_post_id' => $values['custom_post_id'],
-    ];
-
-    //get the params submitted by participant.
-    $participantParams = $values['params'][$participantId] ?? [];
     $eventID = \Civi\Api4\Participant::get(FALSE)
       ->addWhere('id', '=', $participantId)
       ->execute()->first()['event_id'];
+
+    //to change the status pending to completed
+    $additional = new CRM_Event_DAO_Participant();
+    $additional->id = $participantId;
+    $additional->find(TRUE);
+    $contactID = (int) $additional->contact_id;
+
+    //get the params submitted by participant.
+    $participantParams = $values['params'][$participantId] ?? [];
     $eventParams = ['id' => $eventID];
     $eventValues = [];
     CRM_Event_BAO_Event::commonRetrieve('CRM_Event_BAO_Event', $eventParams, $eventValues);
 
     if (!$returnMessageText) {
+      $gIds = [];
+      $ufJoinParams = [
+        'entity_table' => 'civicrm_event',
+        'entity_id' => $eventID,
+        'module' => 'CiviEvent',
+      ];
+
+      [$gIds['custom_pre_id'], $gIds['custom_post_ids']] = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+
       //send notification email if field values are set (CRM-1941)
-      foreach ($gIds as $key => $gIdValues) {
+      foreach ($gIds as $gIdValues) {
         if ($gIdValues) {
           if (!is_array($gIdValues)) {
             $gIdValues = [$gIdValues];
