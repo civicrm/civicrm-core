@@ -9,18 +9,19 @@ use Civi\Api4\Email;
  */
 class CRM_Pledge_Form_PledgeTest extends CiviUnitTestCase {
 
+  public $_apiversion = 4;
+
   /**
    * Test the post process function.
    *
    * @throws \CRM_Core_Exception
    */
   public function testPostProcess(): void {
-    $mut = new CiviMailUtils($this);
     $loggedInUser = $this->createLoggedInUser();
     $this->addLocationBlockToDomain();
     $this->swapMessageTemplateForInput('pledge_acknowledge', '{domain.name} {contact.first_name} {contact.email_greeting_display}');
 
-    $form = $this->getFormObject('CRM_Pledge_Form_Pledge', [
+    $this->getTestForm('CRM_Pledge_Form_Pledge', [
       'amount' => 10,
       'contact_id' => $this->individualCreate(),
       'is_acknowledge' => 1,
@@ -36,14 +37,11 @@ class CRM_Pledge_Form_PledgeTest extends CiviUnitTestCase {
       'scheduled_amount' => 10,
       'frequency_day' => 4,
       'status' => 'Pending',
-    ]);
-    $form->buildForm();
-    $form->postProcess();
-    $mut->checkAllMailLog([
+    ])->processForm();
+    $this->assertMailSentContainingStrings([
       'Default Domain Name Anthony',
       'Dear Anthony',
     ]);
-    $mut->clearMessages();
     $this->revertTemplateToReservedTemplate();
   }
 
