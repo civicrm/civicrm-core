@@ -139,6 +139,40 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * The processor gets the page title as description, the contribution keeps the full source.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPaymentDescriptionIsPageTitle(): void {
+    $this->createLoggedInUser();
+    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE], 'dummy');
+    $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID, 'frontend_title' => 'Annual appeal']);
+    $descriptions = [];
+    $this->hookClass->setHook('civicrm_alterPaymentProcessorParams', function ($paymentObj, &$rawParams) use (&$descriptions) {
+      $descriptions[] = $rawParams['description'];
+    });
+
+    $this->submitOnlineContributionForm([
+      'credit_card_number' => 4111111111111111,
+      'cvv2' => 234,
+      'credit_card_exp_date' => [
+        'M' => 2,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+      $this->getPriceFieldLabelForContributionPage($contributionPageID) => 100,
+      'credit_card_type' => 'Visa',
+      'email-5' => 'test@test.com',
+      'payment_processor_id' => $paymentProcessorID,
+    ], $contributionPageID);
+
+    $this->assertEquals(['Annual appeal'], $descriptions);
+    $this->assertEquals('Online Contribution: Annual appeal', Contribution::get(FALSE)
+      ->addWhere('contribution_page_id', '=', $contributionPageID)
+      ->addSelect('source')
+      ->execute()->single()['source']);
+  }
+
+  /**
    * Test that paying an existing contribution online does not overwrite its
    * receive_date with today's date.
    *
