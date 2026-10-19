@@ -1,1 +1,1 @@
-{ts 1=$event.event_title}Confirm your registration for %1{/ts} - {contact.display_name}
+{ts 1='{event.frontend_title}'}Confirm your registration for %1{/ts} - {contact.display_name}

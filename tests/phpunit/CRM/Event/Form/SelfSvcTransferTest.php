@@ -66,6 +66,7 @@ class CRM_Event_Form_SelfSvcTransferTest extends CiviUnitTestCase {
     ])->processForm();
 
     $this->assertMailSentContainingString('Your Event Registration has been Transferred', 1);
+    $this->assertMailSentContainingHeaderString('Annual CiviCRM meet');
   }
 
   /**
