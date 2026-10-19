@@ -97,6 +97,27 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
+   * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  public function saveOrder(): array {
+    $contributionAddressID = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
+    $contribution = Order::create(FALSE)
+      ->setContributionValues($this->getContributionValues() + [
+          'contact_id' => $this->_contributorContactID,
+          'address_id' => $contributionAddressID,
+          'contribution_recur_id' => $this->getContributionRecurID(),
+        ])
+      ->setLineItems($this->getLineItemForOrderApi())
+      ->execute()->single();
+    $this->ids['Contribution'] = $contribution['id'];
+    $this->setMembershipIDsFromOrder($contribution);
+    $this->createSoftCredit($contribution['id']);
+    return $contribution;
+  }
+
+  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {
@@ -1058,24 +1079,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $params['payment_processor_id'] = $this->getPaymentProcessorID();
       $params['register_date'] = CRM_Utils_Time::date('YmdHis');
       $paymentParams = $this->getPaymentParams();
-
-      // CRM-7137 -for recurring membership,
-      // we do need contribution and recurring records.
-      $result = NULL;
-
-      $contributionAddressID = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
-      $contribution = Order::create(FALSE)
-        ->setContributionValues($this->getContributionValues() + [
-          'contact_id' => $this->_contributorContactID,
-          'address_id' => $contributionAddressID,
-          'contribution_recur_id' => $this->getContributionRecurID(),
-        ])
-        ->setLineItems($this->getLineItemForOrderApi())
-        ->execute()->single();
-      $this->ids['Contribution'] = $contribution['id'];
-      $this->setMembershipIDsFromOrder($contribution);
-
-      $this->createSoftCredit($contribution['id']);
+      $contribution = $this->saveOrder();
 
       $paymentParams['contactID'] = $this->_contactID;
       $paymentParams['contributionID'] = $contribution['id'];
