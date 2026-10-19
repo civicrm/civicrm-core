@@ -405,7 +405,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->assign('moneyFormat', CRM_Utils_Money::format(1234.56, $this->getCurrency()));
 
     //check if participant allow to walk registration wizard.
-    $this->_allowConfirmation = $this->get('allowConfirmation');
+    $this->_allowConfirmation = $this->_participantId && $this->getParticipantValue('status_id.class') === 'Pending';
     $this->assign('currency', $this->getCurrency());
     // check for Approval
     $this->_requireApproval = $this->get('requireApproval');
@@ -441,11 +441,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       CRM_Event_BAO_Event::retrieve($params, $this->_values['event']);
 
       $this->checkValidEvent();
-      // get the participant values, CRM-4320
-      $this->_allowConfirmation = FALSE;
-      if ($this->_participantId) {
-        $this->processFirstParticipant($this->_participantId);
-      }
       //check for additional participants.
       if ($this->_allowConfirmation && $this->_values['event']['is_multiple_registrations']) {
         $additionalParticipantIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_participantId);
@@ -864,6 +859,46 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * @param int $participantNum
+   * @param int $contactID
+   *
+   * @return array
+   */
+  protected function createCMSUser(int $participantNum, int $contactID): void {
+    // create CMS user
+    if ($this->getSubmittedParticipantValue('cms_create_account')) {
+      $participantRecord = $this->getSubmittedParticipantValues($participantNum);
+      $participantRecord['contactID'] = $contactID;
+
+      if (array_key_exists('email-5', $participantRecord)) {
+        $mail = 'email-5';
+      }
+      else {
+        foreach ($participantRecord as $name => $dontCare) {
+          if (substr($name, 0, 5) == 'email') {
+            $mail = $name;
+            break;
+          }
+        }
+      }
+
+      // we should use primary email for
+      // 1. pay later participant.
+      // 2. waiting list participant.
+      // 3. require approval participant.
+      if (!empty($participantRecord['is_pay_later']) ||
+        $this->_allowWaitlist || $this->_requireApproval
+      ) {
+        $mail = 'email-Primary';
+      }
+
+      if (!CRM_Core_BAO_CMSUser::create($participantRecord, $mail)) {
+        CRM_Core_Error::statusBounce(ts('Your profile is not saved and Account is not created.'));
+      }
+    }
+  }
+
+  /**
    * This is a throw-away object to calculate values, to allow it to validate
    * input values during submission.
    *
@@ -914,49 +949,18 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $participantID = $this->addParticipant($contactID, $participantNum);
     $this->_participantIDS[$participantNum] = $participantID;
 
-    //setting register_by_id field and primaryContactId
     if (!empty($participantRecord['is_primary'])) {
-      $this->set('registerByID', $participantID);
-      $this->set('primaryContactId', $contactID);
-
       // CRM-10032
-      $this->processFirstParticipant($participantID);
+      $this->_participantId = $participantID;
+
+      if ($this->getParticipantValue('status_id.class') === 'Pending') {
+        $this->_allowConfirmation = TRUE;
+      }
       $participantRecord['participantID'] = $participantID;
       $this->set('primaryParticipant', $participantRecord);
     }
 
-    $this->assign('action', $this->_action);
-
-    // create CMS user
-    if (!empty($participantRecord['cms_create_account'])) {
-      $participantRecord['contactID'] = $contactID;
-
-      if (array_key_exists('email-5', $participantRecord)) {
-        $mail = 'email-5';
-      }
-      else {
-        foreach ($participantRecord as $name => $dontCare) {
-          if (substr($name, 0, 5) == 'email') {
-            $mail = $name;
-            break;
-          }
-        }
-      }
-
-      // we should use primary email for
-      // 1. pay later participant.
-      // 2. waiting list participant.
-      // 3. require approval participant.
-      if (!empty($participantRecord['is_pay_later']) ||
-        $this->_allowWaitlist || $this->_requireApproval
-      ) {
-        $mail = 'email-Primary';
-      }
-
-      if (!CRM_Core_BAO_CMSUser::create($participantRecord, $mail)) {
-        CRM_Core_Error::statusBounce(ts('Your profile is not saved and Account is not created.'));
-      }
-    }
+    $this->createCMSUser($participantNum, $contactID);
   }
 
   /**
@@ -1920,23 +1924,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
-   * Set the first participant ID if not set.
-   *
-   * CRM-10032.
-   *
-   * @param int $participantID
-   */
-  public function processFirstParticipant($participantID) {
-    $this->_participantId = $participantID;
-
-    // also set the allow confirmation stuff
-    if ($this->getParticipantValue('status_id.class') === 'Pending') {
-      $this->_allowConfirmation = TRUE;
-      $this->set('allowConfirmation', TRUE);
-    }
-  }
-
-  /**
    * Check if event is valid.
    *
    * @todo - combine this with CRM_Event_BAO_Event::validRegistrationRequest
@@ -2077,7 +2064,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     $registerByID = $this->getPrimaryParticipantID();
-    $primaryContactId = $this->get('primaryContactId');
+    $primaryContactId = $this->getParticipantValue('contact_id');
 
     //build an array of custom profile and assigning it to template.
     // @todo - don't call buildCustomProfile to get additionalParticipants.

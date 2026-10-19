@@ -604,7 +604,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $primaryParticipant['participantID'] = $registerByID;
     }
     //otherwise send mail Confirmation/Receipt
-    $primaryContactId = $this->get('primaryContactId');
+    $primaryContactId = $this->getParticipantValue('contact_id');
     if ($this->getOrderTotalAmount() > 0 && !$this->isPayLater() && is_object($payment) && !$this->getPaymentProcessorObject()->supports('noReturn')) {
       $participantRecord = $primaryParticipant;
       // https://docs.civicrm.org/dev/en/latest/extensions/payment-processors/create/#getpaymentformfields
@@ -658,7 +658,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if ($this->isPaidEvent() && $primaryParticipant) {
         if ($payment && is_object($payment)) {
           //CRM 14512 provide line items of all participants to payment gateway
-          $primaryContactId = $this->get('primaryContactId');
+          $primaryContactId = $this->getParticipantValue('contact_id');
 
           //build an array of cId/pId of participants
           $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID, NULL, $primaryContactId, $this->isTest(), TRUE);
