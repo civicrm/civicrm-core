@@ -1126,15 +1126,17 @@ WHERE civicrm_event.is_active = 1
       $notifyEmail = CRM_Utils_Array::valueByRegexKey('/^email-/', $participantParams) ?? $email;
       //send email only when email is present
       if (isset($notifyEmail) || $returnMessageText) {
-        $tplParams = array_merge($values, $participantParams, [
+        $tplParams = [
           'email' => $notifyEmail,
           'confirm_email_text' => $eventValues['confirm_email_text'] ?? NULL,
           'isShowLocation' => $eventValues['is_show_location'] ?? NULL,
           'credit_card_number' => CRM_Utils_System::mungeCreditCard($participantParams['credit_card_number'] ?? NULL),
           'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($participantParams['credit_card_exp_date'] ?? NULL)),
+          'credit_card_type' => $participantParams['credit_card_type'] ?? NULL,
+          'currency' => $values['currency'] ?? NULL,
           'selfcancelxfer_time' => abs($eventValues['selfcancelxfer_time']),
           'selfservice_preposition' => $eventValues['selfcancelxfer_time'] < 0 ? ts('after') : ts('before'),
-        ]);
+        ];
 
         $sendTemplateParams = [
           'workflow' => 'event_online_receipt',

@@ -213,19 +213,19 @@
                               <td>{$line.qty}</td>
                             {/if}
                             {if $isShowLineSubtotal || $isShowTax}
-                              <td>{$line.unit_price|crmMoney:$currency}</td>
+                              <td>{$line.unit_price|crmMoney:'{contribution.currency}'}</td>
                             {/if}
                             {if $isShowTax}
-                              <td>{$line.line_total|crmMoney:$currency}</td>
+                              <td>{$line.line_total|crmMoney:'{contribution.currency}'}</td>
                               {if $line.tax_rate || $line.tax_amount != ""}
                                 <td>{$line.tax_rate|string_format:"%.2f"}%</td>
-                                <td>{$line.tax_amount|crmMoney:$currency}</td>
+                                <td>{$line.tax_amount|crmMoney:'{contribution.currency}'}</td>
                               {else}
                                 <td></td>
                                 <td></td>
                               {/if}
                             {/if}
-                            <td>{$line.line_total_inclusive|crmMoney:$currency}</td>
+                            <td>{$line.line_total_inclusive|crmMoney:'{contribution.currency}'}</td>
                             {if $isShowParticipantCount}
                               <td>{$line.participant_count}</td>
                             {/if}
@@ -254,7 +254,7 @@
                       {$currentLineItem.label}{if $isPrimary && ($participants|@count > 1)} - {$currentParticipant.contact.display_name}{/if}
                     </td>
                     <td {$valueStyle}>
-                      {$currentLineItem.line_total|crmMoney:$currency}
+                      {$currentLineItem.line_total|crmMoney:'{contribution.currency}'}
                     </td>
                   </tr>
                   {/foreach}
