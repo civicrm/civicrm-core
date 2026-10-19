@@ -193,7 +193,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
    */
   public function postProcess() {
     // store the submitted values in an array
-    $params = $this->exportValues();
+    $params = $this->getSubmittedValues();
 
     if ($this->isSelfService() && $this->_donorEmail) {
       // for self service force notify
