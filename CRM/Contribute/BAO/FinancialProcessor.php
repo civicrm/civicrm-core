@@ -1318,15 +1318,15 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     $items = [];
     foreach ($financialItemResult as $index => $financialItem) {
-      $items[$financialItem['price_field_value_id']][$index] = $financialItem['amount'];
+      $items[$financialItem['entity_id']][$index] = $financialItem['amount'];
 
-      foreach ($items[$financialItem['price_field_value_id']] as $existingItemID => $existingAmount) {
+      foreach ($items[$financialItem['entity_id']] as $existingItemID => $existingAmount) {
         if ($financialItem['amount'] + $existingAmount == 0) {
           // Filter both rows as they cancel each other out.
           unset($financialItemResult[$index]);
           unset($financialItemResult[$existingItemID]);
-          unset($items[$financialItem['price_field_value_id']][$existingItemID]);
-          unset($items[$financialItem['price_field_value_id']][$index]);
+          unset($items[$financialItem['entity_id']][$existingItemID]);
+          unset($items[$financialItem['entity_id']][$index]);
         }
       }
     }
