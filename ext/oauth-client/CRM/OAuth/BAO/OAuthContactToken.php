@@ -1,8 +1,21 @@
 <?php
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
+use Civi\Core\Event\PreEvent;
 
 class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken implements \Civi\Core\HookInterface {
+
+  /**
+   * Preproceesing for create/edit/delete actions
+   */
+  public static function self_hook_civicrm_pre(PreEvent $event): void {
+    if (in_array($event->action, ['create', 'edit', 'delete'], TRUE)) {
+      if (!empty($event->id) && empty($event->params['id'])) {
+        $event->params['id'] = $event->id;
+      }
+      self::fillAndValidate($event->params, CRM_Core_Session::getLoggedInContactID());
+    }
+  }
 
   /**
    * Create or update OAuthContactToken based on array-data
@@ -49,8 +62,25 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken im
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private static function fillAndValidate(&$record, $userId) {
-    if (!empty($record['id']) && empty($record['contact_id'])) {
-      $record['contact_id'] = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'contact_id');
+    if (!empty($record['id'])) {
+      $storedCid = CRM_Core_DAO::getFieldValue(__CLASS__, $record['id'], 'contact_id');
+      if (!empty($record['check_permissions']) && $storedCid) {
+        if (!CRM_Contact_BAO_Contact_Permission::allow($storedCid, CRM_Core_Permission::EDIT, $userId)) {
+          throw new \Civi\API\Exception\UnauthorizedException('Access denied to contact');
+        }
+        if (
+          !CRM_Core_Permission::check(['manage all OAuth contact tokens'], $userId) &&
+          (string) $storedCid !== (string) $userId
+        ) {
+          throw new \Civi\API\Exception\UnauthorizedException('Access denied to OAuthContactToken for contact');
+        }
+        if (!empty($record['contact_id']) && (string) $record['contact_id'] !== (string) $storedCid && !CRM_Core_Permission::check(['manage all OAuth contact tokens'], $userId)) {
+          throw new \Civi\API\Exception\UnauthorizedException('Access denied to OAuthContactToken for contact');
+        }
+      }
+      if (empty($record['contact_id'])) {
+        $record['contact_id'] = $storedCid;
+      }
     }
     self::fillContactIdFromTag($record);
     if (!empty($record['check_permissions'])) {
@@ -63,7 +93,7 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken im
       }
       if (
         !CRM_Core_Permission::check(['manage all OAuth contact tokens'], $userId) &&
-        $cid != $userId
+        (string) $cid !== (string) $userId
       ) {
         throw new \Civi\API\Exception\UnauthorizedException('Access denied to OAuthContactToken for contact');
       }
