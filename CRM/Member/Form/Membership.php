@@ -1019,7 +1019,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $this->processBillingAddress($this->getContributionContactID(), (string) $this->_contributorEmail);
 
-    if ($this->_id) {
+    if ($this->_id && ($this->_action & CRM_Core_Action::UPDATE)) {
       $params['id'] = $this->_id;
     }
 
