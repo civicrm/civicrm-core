@@ -82,7 +82,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       'name' => 'Child Group',
       'title' => 'Child Group',
       'is_active' => 1,
-      'parents' => [$parent->id => 1],
+      'parents' => [$parent->id],
     ]);
 
     // Add $c1, $c2, $c3 to $child
