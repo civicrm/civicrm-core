@@ -229,7 +229,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       ->execute()->single();
     $this->assertArrayKeyExists($lineItem['contribution_id'], $contributions);
     $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $lineItem['entity_id'], 'return' => 'contact_id']);
-    $this->assertEquals($membership['contact_id'], $contributions[$lineItem['entity_id']]['contact_id']);
+    $this->assertEquals($membership['contact_id'], $contributions[$lineItem['contribution_id']]['contact_id']);
     $mut->checkMailLog([
       'Dave',
       'Wong',
