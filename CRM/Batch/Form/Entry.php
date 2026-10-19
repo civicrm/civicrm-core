@@ -197,9 +197,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     }
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/Batch/Form/Entry.js', 1, 'html-header')
-      ->addSetting(['batch' => ['type_id' => $this->_batchInfo['type_id']]])
-      ->addSetting(['setting' => ['monetaryThousandSeparator' => CRM_Core_Config::singleton()->monetaryThousandSeparator]])
-      ->addSetting(['setting' => ['monetaryDecimalPoint' => CRM_Core_Config::singleton()->monetaryDecimalPoint]]);
+      ->addSetting(['batch' => ['type_id' => $this->_batchInfo['type_id']]]);
 
     $this->assign('defaultCurrencySymbol', CRM_Core_BAO_Country::defaultCurrencySymbol());
     // This could be updated to TRUE in the formRule

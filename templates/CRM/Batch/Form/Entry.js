@@ -242,25 +242,7 @@ function calculateActualTotal() {
     }
   });
 
-  cj('.batch-actual-total').html(formatMoney(total));
-}
-
-//money formatting/localization
-function formatMoney(amount) {
-  var c = 2;
-  var t = CRM.setting.monetaryThousandSeparator;
-  var d = CRM.setting.monetaryDecimalPoint;
-
-  c = isNaN(c = Math.abs(c)) ? 2 : c;
-  t = t === undefined ? "." : t;
-  d = d === undefined ? "," : d;
-
-  var n = amount,
-    i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
-    s = n < 0 ? "-" : "",
-    j = (j = i.length) > 3 ? j % 3 : 0;
-
-  return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+  cj('.batch-actual-total').text(CRM.formatMoney(total, true));
 }
 
 /**
