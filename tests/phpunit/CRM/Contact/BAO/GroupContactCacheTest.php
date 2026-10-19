@@ -248,6 +248,27 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->assertCacheRefreshed($this->ids['Group'][0]);
   }
 
+  /**
+   * Test the cache rebuild job continues after a smart group whose search fails.
+   */
+  public function testJobContinuesAfterBrokenSmartGroup(): void {
+    $brokenSearch = $this->createTestEntity('SavedSearch', [
+      'api_entity' => 'Contact',
+      'api_params' => ['version' => 4, 'select' => ['id'], 'where' => [['no_such_field', '=', 1]]],
+    ], 'broken');
+    $broken = $this->createTestEntity('Group', ['title' => 'Broken', 'saved_search_id' => $brokenSearch['id']], 'broken');
+    [, $deceased] = $this->createLivingDead();
+    $search = $this->createTestEntity('SavedSearch', [
+      'api_entity' => 'Contact',
+      'api_params' => ['version' => 4, 'select' => ['id'], 'where' => [['is_deceased', '=', TRUE]]],
+    ]);
+    $group = $this->createTestEntity('Group', ['title' => 'Deceased', 'saved_search_id' => $search['id']]);
+
+    $this->callApiV3Success('Job', 'group_rebuild', []);
+    $this->assertCacheMatches([], $broken['id']);
+    $this->assertCacheMatches($deceased, $group['id']);
+  }
+
   // *** Everything below this should be moved to parent class ****
 
   /**

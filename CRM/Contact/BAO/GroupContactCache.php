@@ -152,7 +152,13 @@ AND (
       // first delete the current cache
       $params = [['group', 'IN', [$groupID], 0, 0]];
       // the below call updates the cache table as a byproduct of the query
-      CRM_Contact_BAO_Query::apiQuery($params, ['contact_id'], NULL, NULL, 0, 0, FALSE);
+      try {
+        CRM_Contact_BAO_Query::apiQuery($params, ['contact_id'], NULL, NULL, 0, 0, FALSE);
+      }
+      catch (Throwable $e) {
+        // One broken smart group must not keep the remaining groups from being rebuilt.
+        Civi::log()->error("Failed to rebuild the cache of smart group $groupID: " . $e->getMessage());
+      }
     }
   }
 
