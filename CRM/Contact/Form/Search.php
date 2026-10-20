@@ -413,7 +413,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         $url = CRM_Utils_System::makeURL('qfKey') . $formQFKey;
         CRM_Utils_System::redirect($url);
       }
-      $permissionForGroup = FALSE;
+      $permissionForGroup = $permissionForGroupSettings = FALSE;
 
       if (!empty($this->_groupID)) {
         // check if user has permission to edit members of this group
@@ -432,6 +432,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         // set the group title
         $groupValues = ['id' => $this->_groupID, 'title' => $this->_group[$this->_groupID]];
         $this->assign('group', $groupValues);
+
+        $permissionForGroupSettings = CRM_Core_Permission::check('edit groups') && CRM_Contact_BAO_Group::checkReservedGroupPermission($this->_groupID);
 
         // also set ssID if this is a saved search
         $ssID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $this->_groupID, 'saved_search_id');
@@ -455,6 +457,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       );
 
       $this->assign('permissionEditSmartGroup', CRM_Core_Permission::check('edit groups'));
+      $this->assign('permissionEditGroupSettings', $permissionForGroupSettings);
       $this->assign('permissionedForGroup', $permissionForGroup);
     }
 
