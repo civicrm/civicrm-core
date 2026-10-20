@@ -54,6 +54,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     $path = CRM_Utils_System::currentPath() ?? '';
 
+    // AJAX and API endpoints accessed outside wp-admin are frontend requests
+    if (str_starts_with($path, 'civicrm/ajax/') || str_starts_with($path, 'civicrm/api/')) {
+      return TRUE;
+    }
+
     // Get the menu for above URL.
     $item = CRM_Core_Menu::get($path);
 
