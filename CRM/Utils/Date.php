@@ -1521,6 +1521,11 @@ class CRM_Utils_Date {
       $date = self::replaceShortYear($date, '/', 3);
     }
 
+    // strtotime() rolls impossible days over (31.04.1980 becomes 1980-05-01), so reject them first.
+    $parsed = date_parse($date);
+    if (!checkdate((int) $parsed['month'], (int) $parsed['day'], (int) $parsed['year'])) {
+      return NULL;
+    }
     $timestamp = strtotime($date);
     return $timestamp ? date('YmdHis', $timestamp) : NULL;
   }
