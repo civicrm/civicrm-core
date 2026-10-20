@@ -597,7 +597,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    */
   public function testGetActivitiesForAdminDashboardAclLimitedViewContacts(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
-    $this->allowedContacts = [1, 3, 4, 5];
+    $this->allowedContacts = [18, 3, 4, 5];
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereMultipleContacts']);
     $this->setUpForActivityDashboardTests();
     $this->assertEquals(7, count(CRM_Activity_BAO_Activity::getActivities($this->_params)));
@@ -684,7 +684,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals($targetCount, $activities[$activityID]['target_contact_count']);
     $this->assertEquals([$targetContactIDs[0] => 'Anderson, Anthony II'], $activities[$activityID]['target_contact_name']);
     $this->assertEquals('Anderson, Anthony II', $activities[$activityID]['source_contact_name']);
-    $this->assertEquals('Anderson, Anthony II', $activities[$activityID]['assignee_contact_name'][4]);
+    $this->assertEquals('Anderson, Anthony II', $activities[$activityID]['assignee_contact_name'][$targetContactIDs[0]]);
   }
 
   /**
@@ -804,7 +804,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'with-activity' => [
         'params' => [
-          'contact_id' => 1,
+          'contact_id' => 18,
           'admin' => FALSE,
           'caseId' => NULL,
           'context' => 'home',
@@ -840,7 +840,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'sort-by-subject' => [
         'params' => [
-          'contact_id' => 1,
+          'contact_id' => 18,
           'admin' => FALSE,
           'caseId' => NULL,
           'context' => 'home',
@@ -863,13 +863,13 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           $this->assertEquals(0, $activityCount);
         }
         elseif ($caseName === 'with-activity') {
-          // contact id 1 is assigned as source, target and assignee for activity id 1, 7 and 8 respectively
+          // contact id 18 is assigned as source, target and assignee for activity id 1, 7 and 8 respectively
           $this->assertEquals(3, count($activities));
           $this->assertEquals(3, $activityCount);
-          $this->assertEquals(1, $activities[1]['source_contact_id']);
+          $this->assertEquals(18, $activities[1]['source_contact_id']);
           // @todo - this is a discrepancy between old & new - review.
-          //$this->assertEquals(TRUE, array_key_exists(1, $activities[7]['target_contact_name']));
-          $this->assertEquals(TRUE, array_key_exists(1, $activities[8]['assignee_contact_name']));
+          //$this->assertEquals(TRUE, array_key_exists(18, $activities[7]['target_contact_name']));
+          $this->assertEquals(TRUE, array_key_exists(18, $activities[8]['assignee_contact_name']));
         }
         elseif ($caseName === 'with-activity_type') {
           // contact id 3 for activity type 2 is assigned as assignee, source and target for
@@ -951,7 +951,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $testCases = [
       'todays-activity' => [
         'params' => [
-          'contact_id' => 1,
+          'contact_id' => 18,
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
@@ -964,7 +964,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'todays-activity-filtered-by-range' => [
         'params' => [
-          'contact_id' => 1,
+          'contact_id' => 18,
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
@@ -978,7 +978,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'last-week-activity' => [
         'params' => [
-          'contact_id' => 1,
+          'contact_id' => 18,
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
@@ -991,7 +991,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'this-quarter-activity' => [
         'params' => [
-          'contact_id' => 1,
+          'contact_id' => 18,
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
@@ -1004,7 +1004,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'activity-of-all-statuses' => [
         'params' => [
-          'contact_id' => 1,
+          'contact_id' => 18,
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',

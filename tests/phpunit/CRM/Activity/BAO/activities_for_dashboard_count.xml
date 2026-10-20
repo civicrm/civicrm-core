@@ -151,14 +151,31 @@
         first_name="Test"
         last_name="Contact 17"
     />
-    <!--  Source Contact: 1, Assignee Contact: 2,3 Target Contact: 4,5  -->
+    <!--  Contacts 18 and 19 stand in for the domain organisations the activities were originally linked to -->
+    <civicrm_contact
+        id="18"
+        contact_type="Organization"
+        is_opt_out="0"
+        display_name="Test Organization 18"
+        sort_name="Test Organization 18"
+        organization_name="Test Organization 18"
+    />
+    <civicrm_contact
+        id="19"
+        contact_type="Organization"
+        is_opt_out="0"
+        display_name="Test Organization 19"
+        sort_name="Test Organization 19"
+        organization_name="Test Organization 19"
+    />
+    <!--  Source Contact: 18, Assignee Contact: 19,3 Target Contact: 4,5  -->
     <civicrm_activity
         id="1"
         subject="subject 1"
         activity_type_id="2"
         status_id="1"
     />
-    <!-- Source Contact: 2, Assignee Contact: 4,5 Target: 6,7  -->
+    <!-- Source Contact: 19, Assignee Contact: 4,5 Target: 6,7  -->
     <civicrm_activity
         id="2"
         subject="subject 2"
@@ -193,21 +210,21 @@
         activity_type_id="2"
         status_id="1"
     />
-    <!-- Source Contact: 7, Assignee Contact: 14, 15 Target Contact: 16, 1 -->
+    <!-- Source Contact: 7, Assignee Contact: 14, 15 Target Contact: 16, 18 -->
     <civicrm_activity
         id="7"
         subject="subject 7"
         activity_type_id="2"
         status_id="1"
     />
-    <!-- Source Contact: 8, Assignee Contact: 16, 1 Target Contact: 2, 3  -->
+    <!-- Source Contact: 8, Assignee Contact: 16, 18 Target Contact: 19, 3  -->
     <civicrm_activity
         id="8"
         subject="subject 8"
         activity_type_id="2"
         status_id="1"
     />
-    <!-- Source Contact: 9, Assignee Contact: 2, 3 Target Contact: 4, 5  -->
+    <!-- Source Contact: 9, Assignee Contact: 19, 3 Target Contact: 4, 5  -->
     <civicrm_activity
         id="9"
         subject="subject 9"
@@ -266,12 +283,12 @@
     <!-- Source Contacts -->
     <civicrm_activity_contact
         activity_id="1"
-        contact_id="1"
+        contact_id="18"
         record_type_id="2"
     />
     <civicrm_activity_contact
         activity_id="2"
-        contact_id="2"
+        contact_id="19"
         record_type_id="2"
     />
     <civicrm_activity_contact
@@ -416,12 +433,12 @@
     />
     <civicrm_activity_contact
         activity_id="8"
-        contact_id="1"
+        contact_id="18"
         record_type_id="1"
     />
     <civicrm_activity_contact
         activity_id="9"
-        contact_id="2"
+        contact_id="19"
         record_type_id="1"
     />
     <civicrm_activity_contact
@@ -536,12 +553,12 @@
     />
     <civicrm_activity_contact
         activity_id="7"
-        contact_id="1"
+        contact_id="18"
         record_type_id="3"
     />
     <civicrm_activity_contact
         activity_id="8"
-        contact_id="2"
+        contact_id="19"
         record_type_id="3"
     />
     <civicrm_activity_contact
