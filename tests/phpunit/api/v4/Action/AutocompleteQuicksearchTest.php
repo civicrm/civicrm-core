@@ -583,6 +583,8 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
         ['label' => 'Ferrari', 'value' => 1, 'option_group_id:name' => 'CarTypes'],
         ['label' => 'Ford', 'value' => 2, 'option_group_id:name' => 'CarTypes'],
         ['label' => 'Mercedes', 'value' => 3, 'option_group_id:name' => 'CarTypes'],
+        // value 10 contains value 1 - to check option values are not partial matched
+        ['label' => 'Tesla', 'value' => 10, 'option_group_id:name' => 'CarTypes'],
       ],
     ]);
     $this->createTestRecord('CustomGroup', [
@@ -595,18 +597,27 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       'data_type' => 'Int',
       'html_type' => 'Select',
     ]);
+    $this->createTestRecord('CustomField', [
+      'name' => 'CarsOwned',
+      'custom_group_id.name' => 'QuicksearchTestGroup',
+      'option_group_id:name' => 'CarTypes',
+      'data_type' => 'Int',
+      'html_type' => 'Select',
+      'serialize' => 1,
+    ]);
 
     $contacts = $this->saveTestRecords('Contact', [
       'records' => [
-        ['first_name' => 'A', 'last_name' => 'Aaa', 'QuicksearchTestGroup.DreamCar:label' => 'Ferrari'],
-        ['first_name' => 'B', 'last_name' => 'Bbb', 'QuicksearchTestGroup.DreamCar:label' => 'Ford'],
-        ['first_name' => 'C', 'last_name' => 'Ccc', 'QuicksearchTestGroup.DreamCar:label' => 'Mercedes'],
+        ['first_name' => 'A', 'last_name' => 'Aaa', 'QuicksearchTestGroup.DreamCar:label' => 'Ferrari', 'QuicksearchTestGroup.CarsOwned:label' => ['Ford', 'Ferrari']],
+        ['first_name' => 'B', 'last_name' => 'Bbb', 'QuicksearchTestGroup.DreamCar:label' => 'Ford', 'QuicksearchTestGroup.CarsOwned:label' => ['Ford']],
+        ['first_name' => 'C', 'last_name' => 'Ccc', 'QuicksearchTestGroup.DreamCar:label' => 'Mercedes', 'QuicksearchTestGroup.CarsOwned:label' => ['Tesla']],
+        ['first_name' => 'D', 'last_name' => 'Ddd', 'QuicksearchTestGroup.DreamCar:label' => 'Tesla'],
       ],
     ]);
 
     // NOTE: Option Custom Fields are exposed to quicksearch_options with :label suffix
     Setting::set(FALSE)
-      ->addValue('quicksearch_options', ['QuicksearchTestGroup.DreamCar:label'])
+      ->addValue('quicksearch_options', ['QuicksearchTestGroup.DreamCar:label', 'QuicksearchTestGroup.CarsOwned:label'])
       ->execute();
 
     // Check we can search using human-readable option labels
@@ -618,6 +629,34 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
 
     $this->assertCount(1, $mercedes);
     $this->assertEquals($mercedes[0]['id'], $contacts[2]['id']);
+
+    // Ferrari (1) should not match Tesla (10)
+    $ferrari = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['QuicksearchTestGroup.DreamCar:label' => 'Ferrari'])
+      ->execute();
+
+    $this->assertCount(1, $ferrari);
+    $this->assertEquals($ferrari[0]['id'], $contacts[0]['id']);
+
+    // Multi-value fields match any one of the values, but still not partially
+    $ownsFord = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['QuicksearchTestGroup.CarsOwned:label' => 'Ford'])
+      ->execute();
+
+    $this->assertEquals([$contacts[0]['id'], $contacts[1]['id']], array_column((array) $ownsFord, 'id'));
+
+    $ownsFerrari = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['QuicksearchTestGroup.CarsOwned:label' => 'Ferrari'])
+      ->execute();
+
+    $this->assertCount(1, $ownsFerrari);
+    $this->assertEquals($ownsFerrari[0]['id'], $contacts[0]['id']);
 
     // TODO: the following seems like reasonable behaviour, but
     // it doesn't work... yet.
