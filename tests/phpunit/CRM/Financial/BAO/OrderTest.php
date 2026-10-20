@@ -412,6 +412,37 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Completing a membership order clears the status override end date.
+   */
+  public function testCompleteOrderLeavesNoStatusOverrideEndDate(): void {
+    $this->setUpMembershipPriceSet();
+    $contribution = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        'entity_id.source' => 'Test',
+      ])
+      ->execute()->single();
+
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', $contribution['total_amount'])
+      ->execute();
+
+    $membership = Membership::get(FALSE)
+      ->addJoin('LineItem AS line_item', 'INNER', ['line_item.entity_id', '=', 'id'], ['line_item.entity_table', '=', '"civicrm_membership"'])
+      ->addWhere('line_item.contribution_id', '=', $contribution['id'])
+      ->addSelect('status_id:name', 'is_override', 'status_override_end_date')
+      ->execute()->single();
+    $this->assertEquals('New', $membership['status_id:name']);
+    $this->assertFalse($membership['is_override']);
+    $this->assertNull($membership['status_override_end_date']);
+  }
+
+  /**
    * OrderCompletionMetadataValidateSubscriber should reject any key we
    * don't have a consumer for, at both the top level and within a known
    * bag, so we don't go live able to silently accumulate data no upgrade
