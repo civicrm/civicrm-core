@@ -141,7 +141,7 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
       //we might be renewing membership,
       //so make status override false.
       $membershipParams['is_override'] = FALSE;
-      $membershipParams['status_override_end_date'] = 'null';
+      $membershipParams['status_override_end_date'] = NULL;
       $membershipParams += \CRM_Member_BAO_Membership::getCalculatedDates($membershipParams);
 
       // An explicit end date (or other membership field) requested via
