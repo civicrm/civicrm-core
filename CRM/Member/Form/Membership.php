@@ -138,6 +138,23 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
+   * @param int $contributionID
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function submitPayment(int $contributionID): array {
+    $paymentParams = $this->getPaymentParams();
+    $paymentParams['contactID'] = $this->_contactID;
+    $paymentParams['contributionID'] = $contributionID;
+    $paymentParams['contributionRecurID'] = $this->getContributionRecurID();
+    $paymentParams['is_recur'] = $this->isCreateRecurringContribution();
+    $payment = $this->_paymentProcessor['object'];
+    $payment->setBackOffice(TRUE);
+    return $payment->doPayment($paymentParams);
+  }
+
+  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {
@@ -1061,20 +1078,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $originalMembershipType = $this->getMembershipValue('membership_type_id');
 
     if ($this->_mode) {
-      $paymentParams = $this->getPaymentParams();
       $contribution = $this->saveOrder();
 
-      $paymentParams['contactID'] = $this->_contactID;
-      $paymentParams['contributionID'] = $contribution['id'];
-
-      $paymentParams['contributionRecurID'] = $this->getContributionRecurID();
-      $paymentParams['is_recur'] = $this->isCreateRecurringContribution();
-
       if ($this->order->getTotalAmount() > 0.0) {
-        $payment = $this->_paymentProcessor['object'];
-        $payment->setBackOffice(TRUE);
         try {
-          $result = $payment->doPayment($paymentParams);
+          $result = $this->submitPayment($contribution['id']);
           $paymentStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $result['payment_status_id']);
           if ($this->getContributionID() && $paymentStatus === 'Completed') {
             $this->addPayment($result);
