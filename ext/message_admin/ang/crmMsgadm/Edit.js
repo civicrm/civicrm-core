@@ -111,19 +111,23 @@
         resolve: {
           prefetch: function(crmApi4, crmStatus, $location, $q) {
             var args = $location.search();
+            // "Copy" opens this same route with no id of its own, pointing at the record to
+            // clone - so the form loads that record's values but, with no id, Save creates a
+            // brand-new one rather than updating the original.
+            var sourceId = args.id || args.copyFrom;
 
             // A brand-new user-driven template (no id yet) has no workflow_name/translations to look up,
             // and crmApi4() with an empty request map errors server-side, so skip the API call entirely.
             // The three content fields default to '' rather than undefined - Monaco's setValue()
             // throws "Illegal argument" if ng-model ever resolves to undefined when it renders.
-            if (!args.id) {
+            if (!sourceId) {
               return $q.resolve({main: {msg_subject: '', msg_html: '', msg_text: ''}});
             }
 
             var requests = {};
 
             requests.main = ['MessageTemplate', 'get', {
-              where: [['id', '=', args.id]],
+              where: [['id', '=', sourceId]],
               chain: {
                 tags: ['EntityTag', 'get', {
                   select: ['tag_id'],
@@ -134,7 +138,7 @@
 
             requests.original = ['MessageTemplate', 'get', {
               join: [["MessageTemplate AS other", "INNER", null, ["workflow_name", "=", "other.workflow_name"]]],
-              where: [["other.id", "=", args.id], ["is_reserved", "=", true]],
+              where: [["other.id", "=", sourceId], ["is_reserved", "=", true]],
               limit: 25
             }];
 
@@ -153,6 +157,12 @@
             }
 
             return crmStatus({start: ts('Loading...'), success: ''}, crmApi4(requests).then(respMergeTranslations).then(pickFirsts).then(function(result) {
+              if (args.copyFrom) {
+                // Dropping the id is what turns the next Save into a create rather than an
+                // update of the record being copied from.
+                delete result.main.id;
+                result.main.msg_title = ts('%1 (Copy)', {1: result.main.msg_title});
+              }
               // A snapshot of the record as last loaded/saved, used as the "Show diff" baseline
               // for User-Driven templates, which have no reserved-default "Original" to diff
               // against - this lets them diff current unsaved edits vs. what's actually in the DB.
