@@ -101,7 +101,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function saveOrder(): array {
+  private function saveOrder(): array {
     $contributionAddressID = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
     $contribution = Order::create(FALSE)
       ->setContributionValues($this->getContributionValues() + [
@@ -1076,16 +1076,25 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $this->processBillingAddress($this->getContributionContactID(), (string) $this->_contributorEmail);
 
     $originalMembershipType = $this->getMembershipValue('membership_type_id');
+    $hasContribution = $this->_mode || $this->getSubmittedValue('record_contribution');
 
-    if ($this->_mode) {
+    if ($hasContribution) {
       $contribution = $this->saveOrder();
 
       if ($this->order->getTotalAmount() > 0.0) {
         try {
-          $result = $this->submitPayment($contribution['id']);
-          $paymentStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $result['payment_status_id']);
+          if ($this->_mode) {
+            $result = $this->submitPayment($contribution['id']);
+          }
+          $paymentStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $result['payment_status_id'] ?? $this->getSubmittedValue('contribution_status_id'));
           if ($this->getContributionID() && $paymentStatus === 'Completed') {
-            $this->addPayment($result);
+            $this->addPayment($result ?? []);
+          }
+          if (in_array($paymentStatus, ['Failed', 'Cancelled'])) {
+            Contribution::update(FALSE)
+              ->setValues(['contribution_status_id:name' => $paymentStatus])
+              ->addWhere('id', '=', $this->getContributionID())
+              ->execute();
           }
         }
         catch (PaymentProcessorException $e) {
@@ -1104,28 +1113,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
         }
       }
-
     }
     else {
-      $lineItems = $this->getOrder()->getMembershipLineItems();
-
-      foreach ($lineItems as $id => $lineItemValues) {
+      foreach ($this->getOrder()->getMembershipLineItems() as $id => $lineItemValues) {
         $this->setMembership(Membership::save(FALSE)
           ->addRecord($this->getMembershipParamsForType((int) $lineItemValues['membership_type_id']))
           ->execute()->single());
-        $lineItems[$id]['entity_id'] = $this->membership['id'];
-        $lineItems[$id]['entity_table'] = 'civicrm_membership';
-
-      }
-      if ($this->getSubmittedValue('record_contribution')) {
-        $contributionParams = $this->getContributionValues();
-        $contributionParams['contribution_status_id'] = $this->getSubmittedValue('contribution_status_id');
-        $contributionParams['skipCleanMoney'] = TRUE;
-        $contributionParams['line_item'] = [$this->getPriceSetID() => $lineItems];
-
-        $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
-        $this->createSoftCredit($contribution->id);
-        $this->ids['Contribution'] = $contribution->id;
       }
     }
 
