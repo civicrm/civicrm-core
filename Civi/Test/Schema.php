@@ -378,7 +378,7 @@ class Schema {
     $pdo = \Civi\Test::pdo();
     $query = sprintf(
       "SELECT table_name FROM INFORMATION_SCHEMA.TABLES
-        WHERE TABLE_SCHEMA = %s AND TABLE_TYPE = 'BASE TABLE' AND AUTO_INCREMENT = 1",
+        WHERE TABLE_SCHEMA = %s AND TABLE_TYPE = 'BASE TABLE'",
       $pdo->quote($dbName)
     );
     $tables = $pdo->query($query);
