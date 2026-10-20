@@ -12,6 +12,8 @@
 namespace Civi\Test;
 
 use WebSocket\Client;
+use WebSocket\Configuration;
+use WebSocket\Message\Close;
 
 /**
  * Watches a Chrome tab over its own DevTools session, independent of the Mink driver.
@@ -69,7 +71,7 @@ class ChromeObserver {
 
   public function __construct(string $chromeUrl, string $targetId) {
     $this->pageUrl = preg_replace('/^http/', 'ws', $chromeUrl) . '/devtools/page/' . $targetId;
-    $this->ws = new Client($this->pageUrl, ['timeout' => 5]);
+    $this->ws = new Client($this->pageUrl, new Configuration(timeout: 5));
     foreach (['Network.enable', 'Runtime.enable', 'Log.enable', 'Page.enable', 'Inspector.enable', 'Debugger.enable'] as $method) {
       $this->call($method);
     }
@@ -140,9 +142,9 @@ class ChromeObserver {
    * Asks the renderer over a separate connection, so a timeout leaves the observer session usable.
    */
   private function probeRenderer(array &$lines): bool {
-    $probe = new Client($this->pageUrl, ['timeout' => 3]);
+    $probe = new Client($this->pageUrl, new Configuration(timeout: 3));
     try {
-      $probe->send(json_encode(['id' => 1, 'method' => 'Runtime.evaluate', 'params' => ['expression' => 'document.readyState', 'returnByValue' => TRUE]]));
+      $probe->text(json_encode(['id' => 1, 'method' => 'Runtime.evaluate', 'params' => ['expression' => 'document.readyState', 'returnByValue' => TRUE]]));
       do {
         $message = json_decode($this->receiveFrom($probe), TRUE);
       } while (($message['id'] ?? NULL) !== 1);
@@ -213,7 +215,7 @@ class ChromeObserver {
       throw new \RuntimeException('observer connection closed');
     }
     try {
-      $this->ws->send(json_encode($message));
+      $this->ws->text(json_encode($message));
     }
     catch (\Throwable $e) {
       $this->ws = NULL;
@@ -241,14 +243,14 @@ class ChromeObserver {
   }
 
   /**
-   * The client answers a close frame by disconnecting and returns NULL; the next receive would reconnect.
+   * A close frame is returned like any message; the next receive would reconnect.
    */
   private function receiveFrom(Client $client): string {
     $message = $client->receive();
-    if ($message === NULL) {
+    if ($message instanceof Close) {
       throw new \RuntimeException('Chrome closed the DevTools connection');
     }
-    return $message;
+    return $message->getContent();
   }
 
   private function record(string $event, array $p): void {
