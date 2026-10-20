@@ -105,6 +105,24 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       });',
       ["Singular '%1'", "%count Plurals '%1'"],
     ];
+    // template literals, as minifiers write the strings of a bundled module
+    $cases[] = [
+      'alert(ts(`Hello world`));',
+      ['Hello world'],
+    ];
+    $cases[] = [
+      'n(ts(`Don\'t say "%1"`,{1:e}),ts(`One \`thing\``,{domain:`myext`}))',
+      ['Don\'t say "%1"', 'One `thing`'],
+    ];
+    $cases[] = [
+      'E.ts(`%1 contact`,{1:n,count:n,plural:`%1 contacts`})',
+      ['%1 contact', '%1 contacts'],
+    ];
+    // a template with a placeholder is not a constant
+    $cases[] = [
+      'alert(ts(`Hello ${name}`));',
+      [],
+    ];
     return $cases;
   }
 

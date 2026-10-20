@@ -39,15 +39,16 @@ class CRM_Utils_JS {
 
     $strings = [];
     // TODO: This regex is duplicated in `Civi\Strings\Parser\JsParser`
-    // Match all calls to ts() including an optional second argument
+    // Match all calls to ts() including an optional second argument.
+    // Template literals count when they hold no ${} placeholder: minifiers write every string that way.
     preg_match_all('~
       [^\w]ts\s*                                    # match "ts" with whitespace
       \(\s*                                         # match "(" argument list start
-      ((?:(?:\'(?:\\\\\'|[^\'])*\'|"(?:\\\\"|[^"])*")(?:\s*\+\s*)?)+)\s*    # first argument
+      ((?:(?:\'(?:\\\\\'|[^\'])*\'|"(?:\\\\"|[^"])*"|`(?:\\\\`|\$(?!\{)|[^`$])*`)(?:\s*\+\s*)?)+)\s*    # first argument
       (?:,\s*                                       # optional second argument start
         \{[^}]*                                     # object literal start
         plural[\'"]?\s*:\s*                         # plural key
-        (\'(?:\\\\\'|[^\'])*\'|"(?:\\\\"|[^"])*")   # plural string value
+        (\'(?:\\\\\'|[^\'])*\'|"(?:\\\\"|[^"])*"|`(?:\\\\`|\$(?!\{)|[^`$])*`)   # plural string value
         [^}]*\}                                     # object literal end
       )?\s*
       [,\)]                                         # match ")" or "," to finish
