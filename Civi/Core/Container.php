@@ -484,6 +484,43 @@ class Container {
       'handleException',
     ], -200);
 
+    // Security checks for contact belongings (Address, Email, Phone, etc.)
+    foreach ([
+      'Address' => 'CRM_Core_BAO_Address',
+      'Email' => 'CRM_Core_BAO_Email',
+      'IM' => 'CRM_Core_BAO_IM',
+      'OpenID' => 'CRM_Core_BAO_OpenID',
+      'Phone' => 'CRM_Core_BAO_Phone',
+      'Website' => 'CRM_Core_BAO_Website',
+      'GroupContact' => 'CRM_Contact_BAO_GroupContact',
+    ] as $entity => $bao) {
+      $dispatcher->addListener("hook_civicrm_pre::{$entity}", [$bao, 'checkContactAccessPre']);
+      $dispatcher->addListener("civi.api4.authorizeRecord::{$entity}", [$bao, 'checkContactAccessAuthorizeRecord']);
+    }
+
+    // Security checks for record ownership (Batch, SavedSearch, Note, UserJob, ReportInstance, SearchParamSet)
+    foreach ([
+      'Batch' => 'CRM_Batch_BAO_Batch',
+      'SavedSearch' => 'CRM_Contact_BAO_SavedSearch',
+      'Note' => 'CRM_Core_BAO_Note',
+      'UserJob' => 'CRM_Core_BAO_UserJob',
+      'ReportInstance' => 'CRM_Report_BAO_ReportInstance',
+      'SearchParamSet' => 'CRM_Afform_BAO_SearchParamSet',
+    ] as $entity => $bao) {
+      $dispatcher->addListener("hook_civicrm_pre::{$entity}", [$bao, 'checkOwnershipAccessPre']);
+      $dispatcher->addListener("civi.api4.authorizeRecord::{$entity}", [$bao, 'checkOwnershipAccessAuthorizeRecord']);
+    }
+
+    // Security checks for dynamic foreign keys (EntityTag, Note, Translation)
+    foreach ([
+      'EntityTag' => 'CRM_Core_BAO_EntityTag',
+      'Note' => 'CRM_Core_BAO_Note',
+      'Translation' => 'CRM_Core_BAO_Translation',
+    ] as $entity => $bao) {
+      $dispatcher->addListener("hook_civicrm_pre::{$entity}", [$bao, 'checkDynamicFKAccessPre']);
+      $dispatcher->addListener("civi.api4.authorizeRecord::{$entity}", [$bao, 'checkDynamicFKAccessAuthorizeRecord']);
+    }
+
     return $dispatcher;
   }
 
