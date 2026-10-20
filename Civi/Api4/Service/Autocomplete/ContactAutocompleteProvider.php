@@ -201,6 +201,12 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
       }
 
       $display['settings']['columns'] = $columns;
+      // Search terms are already embedded in the UNION sets, so there is nothing for
+      // AutocompleteAction to retry against other search fields. If we don't set this
+      // here, we may end up doing the same query twice when there are no results
+      // because we can have two searchFields. 'sort_name' here is meaningless,
+      // could be any TRUE string, but this is a logical value to return to the client.
+      $display['settings']['searchFields'] = ['sort_name'];
 
       $apiRequest->overrideSavedSearch($savedSearch);
       $apiRequest->overrideDisplay($display);
