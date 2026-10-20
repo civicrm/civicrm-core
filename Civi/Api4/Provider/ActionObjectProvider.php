@@ -200,6 +200,9 @@ class ActionObjectProvider extends AutoService implements ProviderInterface {
       $event = GenericHookEvent::create(['entities' => &$entities]);
       \Civi::dispatcher()->dispatch('civi.api4.entityTypes', $event);
       $this->fillEntityDefaults($entities);
+      foreach (array_diff_key(\Civi\Schema\EntityRepository::getFacades(), $entities) as $facadeName => $facade) {
+        \Civi::log()->warning("Facade $facadeName has no APIv4 entity. Add a class Civi\\Api4\\$facadeName which extends the API class of {$facade['facade_of']}.");
+      }
       ksort($entities);
       $cache->set('api4.entities.info', $entities);
     }

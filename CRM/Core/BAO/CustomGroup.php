@@ -1832,7 +1832,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   /**
    * Translate CustomGroup.extends to entity name.
    *
-   * CustomGroup.extends pretty much maps 1-1 with entity names, except for Individual, Organization & Household.
+   * CustomGroup.extends pretty much maps 1-1 with entity names, except for facades
+   * (e.g. Individual, Organization & Household) which map to their parent entity.
    * @param string $extends
    * @return string
    * @see self::getCustomGroupExtendsOptions
@@ -1841,7 +1842,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     if ($extends === 'Contact' || in_array($extends, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
       return 'Contact';
     }
-    return $extends;
+    // A custom group extending a facade (e.g. TestWidget) stores values for the parent entity (e.g. TestThing)
+    return CoreUtil::resolveFacade($extends);
   }
 
   /**
