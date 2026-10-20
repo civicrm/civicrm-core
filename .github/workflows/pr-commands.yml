@@ -182,6 +182,11 @@ jobs:
               fi
 
               if [ "$ACTION" = "rebase" ]; then
+                # Pushing a branch with no commits would make GitHub close the PR
+                if [ -z "$(git rev-list "origin/$NEW_BASE..HEAD")" ]; then
+                  gh pr comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "All commits of this PR are already in \`$NEW_BASE\` (e.g. via a port), so the branch was left unchanged."
+                  exit 0
+                fi
                 git push --force-with-lease head_repo HEAD:$head_branch
                 if [ "$NEW_BASE" != "$base_branch" ]; then
                   gh pr edit ${{ github.event.issue.number }} --base $NEW_BASE --repo ${{ github.repository }}
