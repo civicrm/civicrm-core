@@ -545,7 +545,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       CRM_Core_Transaction::forceRollbackIfEnabled();
       Manager::singleton(TRUE);
 
-      $tablesToTruncate = ['civicrm_contact', 'civicrm_uf_match', 'civicrm_email', 'civicrm_address', 'civicrm_loc_block', 'civicrm_acl'];
+      $tablesToTruncate = ['civicrm_contact', 'civicrm_uf_match', 'civicrm_email', 'civicrm_address', 'civicrm_phone', 'civicrm_loc_block', 'civicrm_acl'];
       $this->quickCleanup($tablesToTruncate);
       $this->createDomainContacts();
     }
