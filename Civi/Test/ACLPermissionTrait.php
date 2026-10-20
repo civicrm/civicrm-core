@@ -83,7 +83,7 @@ trait ACLPermissionTrait {
    * @noinspection PhpUnusedParameterInspection
    */
   public function aclWhereOnlySecond(string $type, array &$tables, array &$whereTables, int &$contactID, ?string &$where): void {
-    $where = ' contact_a.id > 1';
+    $where = ' contact_a.id > ' . (int) \CRM_Core_DAO::singleValueQuery('SELECT MIN(id) FROM civicrm_contact');
   }
 
   /**

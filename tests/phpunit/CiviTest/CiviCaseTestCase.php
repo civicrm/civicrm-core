@@ -114,7 +114,9 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_case (id, case_type_id, status_id, start_date, subject) VALUES (1, %1, 1, '2023-01-02', 'test case')", [
       1 => [$this->caseTypeId, 'Positive'],
     ]);
-    CRM_Core_DAO::executeQuery('INSERT INTO civicrm_case_contact (case_id, contact_id) VALUES (1, 3)');
+    CRM_Core_DAO::executeQuery('INSERT INTO civicrm_case_contact (case_id, contact_id) VALUES (1, %1)', [
+      1 => [$this->ids['Contact']['site_admin'], 'Positive'],
+    ]);
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1');
   }
 
