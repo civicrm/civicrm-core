@@ -62,8 +62,8 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
       ->execute()->single()['id'];
     $this->assertEquals([
       [
-        'contact_id' => '3',
-        'contact_type' => '<a href="/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3" data-tooltip-url="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4&amp;is_show_email_task=1" class="crm-summary-link" aria-labelledby="crm-contactname-content"><i class="crm-i fa-fw fa-user" title="" role="img" aria-hidden="true"></i></a>',
+        'contact_id' => $this->individualID,
+        'contact_type' => '<a href="/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=' . $this->individualID . '" data-tooltip-url="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=' . $this->individualID . '&amp;snippet=4&amp;is_show_email_task=1" class="crm-summary-link" aria-labelledby="crm-contactname-content"><i class="crm-i fa-fw fa-user" title="" role="img" aria-hidden="true"></i></a>',
         'sort_name' => 'Anderson, Anthony II',
         'display_name' => 'Mr. Anthony Anderson II',
         'activity_id' => $activityID,
@@ -77,11 +77,11 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
         'activity_is_test' => '0',
         'target_contact_name' => [],
         'assignee_contact_name' => [],
-        'source_contact_id' => '3',
+        'source_contact_id' => $this->individualID,
         'source_contact_name' => 'Anderson, Anthony II',
         'checkbox' => 'mark_x_' . $activityID,
         'mailingId' => '',
-        'action' => '<span><a href="/index.php?q=civicrm/contact/view/contribution&amp;action=view&amp;reset=1&amp;id=' . $this->contributionID . '&amp;cid=3&amp;context=search&amp;searchContext=activity&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=\'View Activity\' >View</a></span>',
+        'action' => '<span><a href="/index.php?q=civicrm/contact/view/contribution&amp;action=view&amp;reset=1&amp;id=' . $this->contributionID . '&amp;cid=' . $this->individualID . '&amp;context=search&amp;searchContext=activity&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=\'View Activity\' >View</a></span>',
         'campaign' => NULL,
         'campaign_id' => NULL,
         'repeat' => '',
