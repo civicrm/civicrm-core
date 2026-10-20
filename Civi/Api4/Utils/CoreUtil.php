@@ -491,6 +491,7 @@ class CoreUtil {
               'params' => $className::getParams(),
               'category' => $className::getCategory(),
               'dataType' => $className::getDataType(),
+              'preservesEntityReference' => (new \ReflectionClass($className))->getDefaultProperties()['preservesEntityReference'],
               'options' => CoreUtil::formatOptionList($className::getOptions(), ['id', 'name', 'label']),
             ];
           }
