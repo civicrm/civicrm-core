@@ -240,6 +240,32 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Resuming a mailing paused mid-send delivers the remaining recipients.
+   */
+  public function testResumeAfterPartialSendDeliversRemainingRecipients(): void {
+    $this->createContactsInGroup(6, $this->_groupID);
+    Civi::settings()->add(['mailerBatchLimit' => 2]);
+    $mailing = $this->callAPISuccess('Mailing', 'create', $this->_params);
+    $this->callApiV3Success('Job', 'process_mailing', []);
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+
+    CRM_Mailing_BAO_MailingJob::pause($mailing['id']);
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+    $this->callApiV3Success('Job', 'process_mailing', []);
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+
+    CRM_Mailing_BAO_MailingJob::resume($mailing['id']);
+    $this->assertEquals('Running', \Civi\Api4\Mailing::get(FALSE)->addWhere('id', '=', $mailing['id'])->execute()->single()['status']);
+    for ($i = 0; $i < 5; $i++) {
+      CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+      $this->callApiV3Success('Job', 'process_mailing', []);
+    }
+
+    $this->_mut->assertRecipients($this->getRecipients(1, 6));
+    $this->assertEquals('Complete', \Civi\Api4\Mailing::get(FALSE)->addWhere('id', '=', $mailing['id'])->execute()->single()['status']);
+  }
+
+  /**
    * Test mail when in non-production environment.
    *
    */
