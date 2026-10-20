@@ -1075,6 +1075,16 @@ WHERE  id = %1";
    * @return array
    */
   public static function &stateProvinceForCountry($countryID, $field = 'name') {
+    if (!CRM_Utils_Rule::positiveInteger($countryID)) {
+      $result = [];
+      return $result;
+    }
+    $countryID = (int) $countryID;
+
+    if (!in_array($field, ['name', 'abbreviation'], TRUE)) {
+      $field = 'name';
+    }
+
     static $_cache = NULL;
 
     $cacheKey = "{$countryID}_{$field}";
@@ -1130,7 +1140,12 @@ ORDER BY name";
    */
   public static function &countyForState($stateID) {
     if (is_array($stateID)) {
-      $states = implode(", ", $stateID);
+      $stateIDs = array_filter(array_map('intval', $stateID), fn($id) => $id > 0);
+      if (empty($stateIDs)) {
+        $result = [];
+        return $result;
+      }
+      $states = implode(", ", $stateIDs);
       $query = "
     SELECT civicrm_county.name name, civicrm_county.id id, civicrm_state_province.abbreviation abbreviation
       FROM civicrm_county
@@ -1146,6 +1161,11 @@ ORDER BY name";
       }
     }
     else {
+      if (!CRM_Utils_Rule::positiveInteger($stateID)) {
+        $result = [];
+        return $result;
+      }
+      $stateID = (int) $stateID;
 
       static $_cache = NULL;
 
@@ -1176,6 +1196,8 @@ ORDER BY name";
       while ($dao->fetch()) {
         $result[$dao->id] = $dao->name;
       }
+
+      $_cache[$cacheKey] = $result;
     }
 
     return $result;
