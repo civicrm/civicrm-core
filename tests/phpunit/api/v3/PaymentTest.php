@@ -401,7 +401,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('Payment', 'create', $params);
 
     // Here we set the email to an  invalid email & use check_permissions, domain email should be used.
-    $email = $this->callAPISuccess('Email', 'create', ['contact_id' => 1, 'email' => 'bob@example.com']);
+    $email = $this->callAPISuccess('Email', 'create', ['contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id, 'email' => 'bob@example.com']);
     $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id'], 'from' => $email['id'], 'check_permissions' => 1]);
     $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet - Mr. Anthony Anderson II', 'Registration Confirmation - Annual CiviCRM meet - Mr. Anthony Anderson II']);
     $mut->checkMailLog([

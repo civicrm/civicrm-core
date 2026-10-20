@@ -1691,7 +1691,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         ],
         'from' => [
           0 => 'Very secret meeting (id: ' . $this->activityID . ')',
-          1 => 'Mr. Anthony Łąchowski-Roberts II (id: 4)',
+          1 => 'Mr. Anthony Łąchowski-Roberts II (id: ' . $this->contactIDs[1] . ')',
           2 => 'Activity Assignees',
         ],
         'to' => [
@@ -1714,7 +1714,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         ],
         'to' => [
           0 => 'Very secret meeting (id: ' . $this->activityID . ')',
-          1 => 'Mr. Anthony Brzęczysław II (id: 3)',
+          1 => 'Mr. Anthony Brzęczysław II (id: ' . $this->contactIDs[0] . ')',
           2 => 'Activity Assignees',
         ],
       ],

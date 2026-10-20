@@ -384,7 +384,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $contact1 = $this->callAPISuccess('contact', 'create', $params);
 
-    $this->assertEquals(3, $contact1['id']);
+    $this->assertNotEmpty($contact1['id']);
     $email1 = $this->callAPISuccess('email', 'get', ['contact_id' => $contact1['id']]);
     $this->assertEquals(1, $email1['count']);
     $this->assertEquals($primaryEmail, $email1['values'][$email1['id']]['email']);
@@ -2020,7 +2020,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params = [
       'domain_id' => CRM_Core_Config::domainID(),
       'name' => 'Organization Membership',
-      'member_of_contact_id' => 1,
+      'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'financial_type_id' => 1,
       'minimum_fee' => 10,
       'duration_unit' => 'year',
@@ -4063,7 +4063,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'delete', ['id' => $this->ids['Contact'][3], 'skip_undelete' => TRUE]);
     $this->callAPIFailure('Contact', 'getmergedto', ['sequential' => 1, 'contact_id' => $this->ids['Contact'][0]]);
     $title = CRM_Contact_Page_View::setTitle($this->ids['Contact'][0], TRUE);
-    $this->assertStringContainsString('civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4', $title);
+    $this->assertStringContainsString('civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=' . $this->ids['Contact'][0] . '&amp;snippet=4', $title);
   }
 
   /**
