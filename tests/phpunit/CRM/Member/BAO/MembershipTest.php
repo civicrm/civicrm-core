@@ -1002,6 +1002,52 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
+   * A status update must expire the inherited membership of every contact
+   * whose relationship has ended, not only the first one processed.
+   */
+  public function testStatusJobExpiresInheritedMembershipOfEveryPastRelationship(): void {
+    $employerID = $this->organizationCreate();
+    $currentEmployeeID = $this->individualCreate([], 'current');
+    $formerEmployeeIDs = [$this->individualCreate([], 'former1'), $this->individualCreate([], 'former2')];
+    $this->createTestEntity('Relationship', [
+      'relationship_type_id:name' => 'Employee of',
+      'contact_id_a' => $currentEmployeeID,
+      'contact_id_b' => $employerID,
+      'is_active' => 1,
+    ], 'current');
+    foreach ($formerEmployeeIDs as $formerEmployeeID) {
+      $this->createTestEntity('Relationship', [
+        'relationship_type_id:name' => 'Employee of',
+        'contact_id_a' => $formerEmployeeID,
+        'contact_id_b' => $employerID,
+        'end_date' => date('Y-m-d', strtotime('-1 year')),
+        'is_active' => 1,
+      ], 'former_' . $formerEmployeeID);
+    }
+
+    $membership = $this->createTestEntity('Membership', [
+      'membership_type_id' => $this->createMembershipType($this->organizationCreate(), TRUE)['id'],
+      'contact_id' => $employerID,
+      'join_date' => date('Y-m-d', strtotime('-6 months')),
+      'start_date' => date('Y-m-d', strtotime('-6 months')),
+      'end_date' => date('Y-m-d', strtotime('+6 months')),
+      'status_id:name' => 'New',
+      'skipStatusCal' => TRUE,
+    ], 'owner');
+
+    $this->callAPISuccess('Job', 'process_membership', []);
+
+    $inherited = Membership::get(FALSE)
+      ->addSelect('contact_id', 'status_id:name', 'status_id.is_current_member')
+      ->addWhere('owner_membership_id', '=', $membership['id'])
+      ->execute()->indexBy('contact_id');
+    $this->assertEquals('Current', $inherited[$currentEmployeeID]['status_id:name']);
+    foreach ($formerEmployeeIDs as $formerEmployeeID) {
+      $this->assertFalse($inherited[$formerEmployeeID]['status_id.is_current_member'], "Former employee $formerEmployeeID");
+    }
+  }
+
+  /**
    * Creates the given amount of contacts.
    *
    * @param int $count
