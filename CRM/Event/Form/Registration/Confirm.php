@@ -91,10 +91,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
     $this->assign('hookDiscount', $this->_params[0]['discount'] ?? '');
     $this->preProcessExpress();
-
-    if ($this->isPaidEvent()) {
-      $this->_params[0]['invoiceID'] = $this->get('invoiceID');
-    }
     if (isset($this->_values['event']['confirm_title'])) {
       $this->setTitle($this->_values['event']['confirm_title']);
     }
@@ -759,7 +755,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'total_amount' => $this->getOrder()->getTotalAmount(),
       'tax_amount' => $this->getOrderTotalTaxAmount(),
       'amount_level' => $params['amount_level'],
-      'invoice_id' => $params['invoiceID'],
+      'invoice_id' => $this->getInvoiceID(),
       'currency' => $this->getCurrency(),
       'source' => $this->getSource(0),
       'is_pay_later' => $params['is_pay_later'] ?? 0,

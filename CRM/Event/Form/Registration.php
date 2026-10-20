@@ -1882,6 +1882,18 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * @return string
+   * @throws \Random\RandomException
+   */
+  protected function getInvoiceID(): string {
+    if (!$this->get('invoiceID')) {
+      // generate and set an invoiceID for this transaction
+      $this->set('invoiceID', bin2hex(random_bytes(16)));
+    }
+    return $this->get('invoiceID');
+  }
+
+  /**
    * Get the name of the wizard page a participant's values are submitted
    * on - 'Register' for the primary (0), 'Participant_N' for additional
    * participants - matching the keys setPriceSelectionFromUnfilteredMultiFormInput()
