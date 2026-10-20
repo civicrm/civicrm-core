@@ -263,6 +263,10 @@
         // Value precedence, lowest first: afform_default, stored value (first load only),
         // SearchParamSet, route params. On first load the routeParams watch applies the last two.
         function initializeValue(firstLoad) {
+          // Keep a value the field finds on load, e.g. prefilled before its af-if opened, or copied by af-repeat
+          if (firstLoad && $scope.dataProvider.getFieldData()[ctrl.fieldName] !== undefined) {
+            return;
+          }
           if (firstLoad && ctrl.afFieldset?.getStoredValue(ctrl.fieldName) !== undefined) {
             setValue(ctrl.afFieldset.getStoredValue(ctrl.fieldName));
           }
