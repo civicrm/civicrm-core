@@ -137,8 +137,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $params['trxnParams']['fee_amount'] = $this->getUpdatedContribution()->fee_amount;
       $this->updateFinancialAccounts($params['trxnParams'], NULL, $this->getUpdatedFinancialAccount());
       $params['trxnParams']['to_financial_account_id'] = $trxnParams['to_financial_account_id'];
-      $updated = TRUE;
-      $params['deferred_financial_account_id'] = $this->getUpdatedFinancialAccount();
     }
 
     //Update contribution status
@@ -163,7 +161,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $params['trxnParams']['check_number'] = $params['check_number'] ?? NULL;
 
     if ($this->isPaymentInstrumentChange($params)) {
-      $this->updateFinancialAccountsOnPaymentInstrumentChange($params);
+      $this->updateFinancialAccountsOnPaymentInstrumentChange($params['trxnParams']);
     }
 
     //if Change contribution amount
@@ -988,14 +986,15 @@ class CRM_Contribute_BAO_FinancialProcessor {
   /**
    * The function is responsible for handling financial entries if payment instrument is changed
    *
-   * @param array $inputParams
+   * @param array $trxnParams
    *
+   * @return bool
+   * @throws \CRM_Core_Exception
    */
-  private function updateFinancialAccountsOnPaymentInstrumentChange($inputParams) {
-    $deferredFinancialAccount = $inputParams['deferred_financial_account_id'] ?? NULL;
-    if (empty($deferredFinancialAccount)) {
-      $deferredFinancialAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getOriginalContributionValue('financial_type_id'), 'Deferred Revenue Account is');
-    }
+  private function updateFinancialAccountsOnPaymentInstrumentChange($trxnParams) {
+    // This is refactored code but the assumed logic is that if the financialAccount changed then there has already been a reversal
+    // and re-play so we now reverse the new one & re-do it so we want the account from the new one...
+    $deferredFinancialAccount = $this->isFinancialAccountChanged() ? $this->getUpdatedFinancialAccount() : CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getOriginalContributionValue('financial_type_id'), 'Deferred Revenue Account is');
 
     $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getContributionID(), 'DESC', FALSE, NULL, $deferredFinancialAccount);
 
@@ -1009,12 +1008,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
     //  in terms of reversing financial item and trxn
     $lastFinancialTrxn = civicrm_api3('FinancialTrxn', 'getsingle', ['id' => $lastFinancialTrxnId['financialTrxnId']]);
     unset($lastFinancialTrxn['id']);
-    $lastFinancialTrxn['trxn_date'] = $inputParams['trxnParams']['trxn_date'];
-    $lastFinancialTrxn['total_amount'] = -$inputParams['trxnParams']['total_amount'];
-    $lastFinancialTrxn['net_amount'] = -$inputParams['trxnParams']['net_amount'];
-    $lastFinancialTrxn['fee_amount'] = -$inputParams['trxnParams']['fee_amount'];
+    $lastFinancialTrxn['trxn_date'] = $trxnParams['trxn_date'];
+    $lastFinancialTrxn['total_amount'] = -$trxnParams['total_amount'];
+    $lastFinancialTrxn['net_amount'] = -$trxnParams['net_amount'];
+    $lastFinancialTrxn['fee_amount'] = -$trxnParams['fee_amount'];
     $lastFinancialTrxn['contribution_id'] = $this->getContributionID();
-    foreach ([$lastFinancialTrxn, $inputParams['trxnParams']] as $index => $financialTrxnParams) {
+    foreach ([$lastFinancialTrxn, $trxnParams] as $index => $financialTrxnParams) {
       $trxnID = $this->createFinancialTrxn($financialTrxnParams);
       $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($this->getContributionID());
       if (!empty($lineItems)) {
