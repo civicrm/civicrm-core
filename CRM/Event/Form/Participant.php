@@ -1727,11 +1727,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       ->addWhere('entity_table', '=', 'civicrm_participant')
       ->execute()->first()['entity_id'];
     $this->_id = $participantID;
-    // CRM-11124
-    if ($this->getSubmittedValue('discount_id')) {
-      $firstLine = array_values($this->getLineItems())[0];
-      CRM_Event_BAO_Participant::createDiscountTrxn($this->getEventID(), $contributionValues, '', $firstLine['price_field_value_id']);
-    }
     $transaction->commit();
 
     return ['contribution_id' => $contribution['id'], 'participant_id' => $participantID];

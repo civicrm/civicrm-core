@@ -1195,8 +1195,11 @@ WHERE  civicrm_participant.id = {$participantId}
    * @param string $feeLevel (deprecated)
    *
    * @return null|string
+   *
+   * @deprecated since 6.21, broken since 2016, will be removed in 6.31.
    */
   public static function getUnDiscountedAmountForEventPriceSetFieldValue($eventID, $discountedPriceFieldOptionID, $feeLevel) {
+    CRM_Core_Error::deprecatedFunctionWarning(NULL);
     $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $eventID, NULL);
     $params = [
       1 => [$priceSetId, 'Integer'],
@@ -1885,8 +1888,11 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
    * @param string $feeLevel (deprecated)
    * @param int $discountedPriceFieldOptionID
    *   ID of the civicrm_price_field_value field for the discount id.
+   *
+   * @deprecated since 6.21, broken since 2016, will be removed in 6.31.
    */
   public static function createDiscountTrxn($eventID, $contributionParams, $feeLevel, $discountedPriceFieldOptionID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning(NULL);
     $financialTypeID = $contributionParams['contribution']->financial_type_id;
     $total_amount = $contributionParams['total_amount'];
     if (empty($discountedPriceFieldOptionID)) {
