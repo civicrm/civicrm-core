@@ -60,12 +60,12 @@
   <table id="case_id_{$caseid}"  class="nestedActivitySelector crm-ajax-table display" data-page-length="10">
     <thead><tr>
       <th data-data="activity_date_time" class="crm-case-activities-date">{ts}Date{/ts}</th>
-      <th data-data="subject" cell-class="crmf-subject crm-editable" class="crm-case-activities-subject">{ts}Subject{/ts}</th>
+      <th data-data="subject" cell-class="crmf-subject crm-editable" cell-data-params='{ldelim}"is_auto":0{rdelim}' class="crm-case-activities-subject">{ts}Subject{/ts}</th>
       <th data-data="type" class="crm-case-activities-type">{ts}Type{/ts}</th>
       <th data-data="target_contact_name" class="crm-case-activities-with">{ts}With{/ts}</th>
       <th data-data="source_contact_name" class="crm-case-activities-assignee">{ts}Reporter{/ts}</th>
       <th data-data="assignee_contact_name" class="crm-case-activities-assignee">{ts}Assignee{/ts}</th>
-      <th data-data="status_id" cell-class="crmf-status_id crm-editable" cell-data-type="select" cell-data-refresh=1 class="crm-case-activities-status">{ts}Status{/ts}</th>
+      <th data-data="status_id" cell-class="crmf-status_id crm-editable" cell-data-params='{ldelim}"is_auto":0{rdelim}' cell-data-type="select" cell-data-refresh=1 class="crm-case-activities-status">{ts}Status{/ts}</th>
       <th data-data="links" data-orderable="false" class="crm-case-activities-status">&nbsp;</th>
     </tr></thead>
   </table>
