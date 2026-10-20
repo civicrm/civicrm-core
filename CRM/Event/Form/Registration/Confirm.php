@@ -659,7 +659,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // patterns and practices.
 
       //build an array of custom profile and assigning it to template
-      $customProfile = CRM_Event_BAO_Event::buildCustomProfile($registerByID, $this->_values, NULL, $this->isTest());
+      $customProfile = CRM_Event_BAO_Event::buildCustomProfile($registerByID, $this->_values);
       if (count($customProfile)) {
         // @todo - calculate this on the thank you page, where it is used rather than here & passing through.
         $this->set('customProfile', $customProfile);
@@ -669,31 +669,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       if ($this->isPaidEvent() && $primaryParticipant) {
         if ($payment && is_object($payment)) {
           //CRM 14512 provide line items of all participants to payment gateway
-          $primaryContactId = $this->getParticipantValue('contact_id');
-
-          //build an array of cId/pId of participants
-          $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID, NULL, $primaryContactId, $this->isTest(), TRUE);
-
-          //need to copy, since we are unsetting on the way.
-          $copyParticipantCountLines = $participantCount;
-
           //lets carry all participant params w/ values.
-          foreach ($additionalIDs as $participantID => $contactId) {
-            $participantNum = $participantID;
-            if ($participantID == $registerByID) {
-              // This is the is primary participant.
-              $participantNum = 0;
-            }
-            else {
-              if ($participantNum = array_search('participant', $copyParticipantCountLines)) {
-                //if no participant found break.
-                if ($participantNum === NULL) {
-                  break;
-                }
-                //unset current participant so we don't check them again
-                unset($copyParticipantCountLines[$participantNum]);
-              }
-            }
+          foreach ($this->_participantIDS as $participantNum => $participantID) {
             // get values of line items
             if ($this->_amount) {
               $amount = [];
@@ -732,62 +709,22 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
     else {
-
-      //build an array of cId/pId of participants
-      // @todo - don't call buildCustomProfile to get additionalParticipants.
-      // CRM_Event_BAO_Participant::getAdditionalParticipantIds is a better fit.
-      $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID,
-        NULL, $primaryContactId, $this->isTest(),
-        TRUE
-      );
       //let's send mails to all with meaningful text, CRM-4320.
       $this->assign('isRequireApproval', $this->_requireApproval);
 
-      //need to copy, since we are unsetting on the way.
-      $copyParticipantCount = $participantCount;
-
       //let's carry all participant params w/ values.
-      foreach ($additionalIDs as $participantID => $contactId) {
-        $participantNum = NULL;
-        if ($participantID == $registerByID) {
-          $participantNum = 0;
-        }
-        else {
-          if ($participantNum = array_search('participant', $copyParticipantCount)) {
-            unset($copyParticipantCount[$participantNum]);
-          }
-        }
-        if ($participantNum === NULL) {
-          break;
-        }
-
+      foreach ($this->_participantIDS as $participantNum => $participantID) {
         //carry the participant submitted values.
-        $this->_values['params'][$participantID] = $params[$participantNum];
+        $this->_values['params'][$participantID] = $this->getSubmittedParticipantValues($participantNum);
       }
 
-      foreach ($additionalIDs as $participantID => $contactId) {
-        $participantNum = 0;
-        if ($participantID == $this->getPrimaryParticipantID()) {
-          //build an array of custom profile and assigning it to template.
-          $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $this->_values, NULL, $this->isTest());
+      $customProfile = CRM_Event_BAO_Event::buildCustomProfile($this->getParticipantID(), $this->_values);
 
-          if (count($customProfile)) {
-            // @todo - calculate this on the thank you page, where it is used rather than here & passing through.
-            $this->set('customProfile', $customProfile);
-          }
-        }
-        else {
-          //take the Additional participant number.
-          if ($participantNum = array_search('participant', $participantCount)) {
-            unset($participantCount[$participantNum]);
-          }
-          // Change $this->_values['participant'] to include additional participant values
-          $ids = $participantValues = [];
-          $participantParams = ['id' => $participantID];
-          CRM_Event_BAO_Participant::getValues($participantParams, $participantValues, $ids);
-          $this->_values['participant'] = $participantValues[$participantID];
-        }
-
+      if (count($customProfile)) {
+        // @todo - calculate this on the thank you page, where it is used rather than here & passing through.
+        $this->set('customProfile', $customProfile);
+      }
+      foreach ($this->_participantIDS as $participantNum => $participantID) {
         //pass these variables since these are run time calculated.
         $this->_values['params']['isRequireApproval'] = $this->_requireApproval;
 
