@@ -9,6 +9,11 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
+use Civi\Api4\Email;
+use Civi\Api4\Mailing;
+use Civi\Api4\MailingEventQueue;
+
 /**
  * File for the CiviCRM APIv3 job functions
  *
@@ -161,6 +166,53 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     // Check that the deceased contact is not found in the mailing.
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
 
+  }
+
+  /**
+   * A contact set to do_not_email after scheduling is neither re-queued nor
+   * emailed, and the mailing still completes.
+   */
+  public function testDoNotEmailRecipientIsSkippedAndMailingCompletes(): void {
+    $this->createContactsInGroup(3, $this->_groupID);
+    $mailing = $this->callAPISuccess('Mailing', 'create', $this->_params);
+    $doNotEmailContactID = Email::get(FALSE)->addWhere('email', '=', 'mail3@nul.example.com')->execute()->single()['contact_id'];
+    Contact::update(FALSE)->addWhere('id', '=', $doNotEmailContactID)->addValue('do_not_email', TRUE)->execute();
+
+    $this->runProcessMailing(3);
+
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+    $this->assertEquals(0, MailingEventQueue::get(FALSE)
+      ->addWhere('mailing_id', '=', $mailing['id'])
+      ->addWhere('contact_id', '=', $doNotEmailContactID)
+      ->execute()->count());
+    $this->assertEquals('Complete', Mailing::get(FALSE)->addWhere('id', '=', $mailing['id'])->execute()->single()['status']);
+  }
+
+  /**
+   * A recipient missing from the initial queue is sent by the stopgap job
+   * and the mailing completes.
+   */
+  public function testRecipientMissingFromQueueIsSentAndMailingCompletes(): void {
+    $this->createContactsInGroup(3, $this->_groupID);
+    Civi::settings()->add(['mailerBatchLimit' => 1]);
+    $mailing = $this->callAPISuccess('Mailing', 'create', $this->_params);
+    $this->runProcessMailing(1);
+    MailingEventQueue::delete(FALSE)
+      ->addWhere('mailing_id', '=', $mailing['id'])
+      ->addWhere('email_id.email', '=', 'mail3@nul.example.com')
+      ->execute();
+
+    $this->runProcessMailing(5);
+
+    $this->_mut->assertRecipients($this->getRecipients(1, 3));
+    $this->assertEquals('Complete', Mailing::get(FALSE)->addWhere('id', '=', $mailing['id'])->execute()->single()['status']);
+  }
+
+  private function runProcessMailing(int $times): void {
+    for ($i = 0; $i < $times; $i++) {
+      CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
+      $this->callApiV3Success('Job', 'process_mailing', []);
+    }
   }
 
   /**

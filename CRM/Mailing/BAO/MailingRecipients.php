@@ -32,6 +32,33 @@ WHERE  mailing_id = %1
   }
 
   /**
+   * Joins on recipients (alias `r`) that keep only those who may be sent to now.
+   *
+   * @param int $mailingID
+   *
+   * @return array
+   */
+  public static function getDeliverableCriteria(int $mailingID): array {
+    $isSMSMode = CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $mailingID, 'sms_provider_id', 'id');
+    $mailingObject = new CRM_Mailing_BAO_Mailing();
+    $mailingObject->id = $mailingID;
+    $mailingObject->fetch();
+    $criteria = [
+      'contact_join' => CRM_Utils_SQL_Select::fragment()->join('c', 'INNER JOIN civicrm_contact c ON (c.id = r.contact_id
+       AND c.is_deleted = 0
+          AND c.is_deceased = 0
+          AND c.do_not_' . ($isSMSMode ? 'sms' : 'email') . ' = 0
+          AND c.is_opt_out = 0
+        )'),
+    ];
+    if (!$isSMSMode) {
+      $criteria['additional_join'] = CRM_Utils_SQL_Select::fragment()->join('e', 'INNER JOIN civicrm_email e ON (r.email_id = e.id AND e.on_hold = 0)');
+    }
+    CRM_Utils_Hook::alterMailingRecipients($mailingObject, $criteria, 'mailingQuery');
+    return $criteria;
+  }
+
+  /**
    * @param int $mailingID
    * @param null $offset
    * @param null $limit
@@ -50,28 +77,11 @@ WHERE  mailing_id = %1
       $limitString = "LIMIT $offset, $limit";
     }
 
-    $isSMSMode = CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $mailingID, 'sms_provider_id', 'id');
-    $mailingObject = new CRM_Mailing_BAO_Mailing();
-    $mailingObject->id = $mailingID;
-    $mailingObject->fetch();
-    $criteria = [
-      'contact_join' => CRM_Utils_SQL_Select::fragment()->join('c', 'INNER JOIN civicrm_contact c ON (c.id = r.contact_id
-       AND c.is_deleted = 0
-          AND c.is_deceased = 0
-          AND c.do_not_' . ($isSMSMode ? 'sms' : 'email') . ' = 0
-          AND c.is_opt_out = 0
-        )'),
-    ];
-    if (!$isSMSMode) {
-      $criteria['additional_join'] = CRM_Utils_SQL_Select::fragment()->join('e', 'INNER JOIN civicrm_email e ON (r.email_id = e.id AND e.on_hold = 0)');
-    }
-    CRM_Utils_Hook::alterMailingRecipients($mailingObject, $criteria, 'mailingQuery');
-
     $sqlObject = CRM_Utils_SQL_Select::from('civicrm_mailing_recipients r')
       ->select('r.contact_id')
       ->select('r.email_id')
       ->select('r.phone_id')
-      ->merge($criteria)
+      ->merge(self::getDeliverableCriteria((int) $mailingID))
       ->where('r.mailing_id = #mailingID')
       ->param('#mailingID', $mailingID)
       ->orderBy('r.id ASC');
