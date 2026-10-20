@@ -43,7 +43,6 @@ find_release_branches() {
 # Stops on a /rebase or /port that is most likely a mix-up of the RC and stable branch, unless forced.
 check_target() {
   local action=$1 target=$2 force=$3 reason=""
-  find_release_branches
   if [ "$action" = "port" ] && [ "$STATE" = "OPEN" ] && [ "$BASE_REF" = "master" ] && [ "$target" = "$RC_BRANCH" ]; then
     printf -v reason "\`%s\` is the RC branch and is forward-merged to \`master\`, so a port would duplicate this PR there. To land this change in \`%s\` and \`master\`, run \`/rebase %s\` instead." "$RC_BRANCH" "$RC_BRANCH" "$RC_BRANCH"
   elif [ "$action" = "rebase" ] && [ "$target" = "$STABLE_BRANCH" ] && [ "$BASE_REF" != "$STABLE_BRANCH" ]; then
@@ -186,10 +185,15 @@ elif [[ "$CMD" =~ ^/(rebase|port)([[:space:]]+([^[:space:]]+))?([[:space:]]+(for
   fi
 
   if [ "$ACTION" = "port" ] && [ -z "$NEW_BASE" ]; then
-    echo "Error: /port requires a target branch argument (e.g. /port 5.74)."
+    echo "Error: /port requires a target branch argument (e.g. /port 5.74 or /port stable)."
     exit 1
   fi
   NEW_BASE="${NEW_BASE:-$BASE_REF}"
+  find_release_branches
+  case "$NEW_BASE" in
+    rc) NEW_BASE="$RC_BRANCH" ;;
+    stable) NEW_BASE="$STABLE_BRANCH" ;;
+  esac
   check_target "$ACTION" "$NEW_BASE" "$FORCE"
   echo "Running $ACTION to $NEW_BASE..."
 
