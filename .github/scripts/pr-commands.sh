@@ -32,6 +32,28 @@ replay_onto() {
   fi
 }
 
+# The highest X.Y branch is the RC, which is forward-merged to master; the one below is stable, which is not.
+find_release_branches() {
+  local branches
+  branches=$(git ls-remote --heads origin | sed 's#.*refs/heads/##' | grep -E '^[0-9]+\.[0-9]+$' | sort -V)
+  RC_BRANCH=$(echo "$branches" | tail -n 1)
+  STABLE_BRANCH=$(echo "$branches" | tail -n 2 | head -n 1)
+}
+
+# Stops on a /rebase or /port that is most likely a mix-up of the RC and stable branch, unless forced.
+check_target() {
+  local action=$1 target=$2 force=$3 reason=""
+  find_release_branches
+  if [ "$action" = "port" ] && [ "$STATE" = "OPEN" ] && [ "$BASE_REF" = "master" ] && [ "$target" = "$RC_BRANCH" ]; then
+    printf -v reason "\`%s\` is the RC branch and is forward-merged to \`master\`, so a port would duplicate this PR there. To land this change in \`%s\` and \`master\`, run \`/rebase %s\` instead." "$RC_BRANCH" "$RC_BRANCH" "$RC_BRANCH"
+  elif [ "$action" = "rebase" ] && [ "$target" = "$STABLE_BRANCH" ] && [ "$BASE_REF" != "$STABLE_BRANCH" ]; then
+    printf -v reason "\`%s\` is the stable branch and is not forward-merged, so after this rebase the change would never reach \`%s\` or \`master\`. To land it in all three, run \`/rebase %s\` and \`/port %s\`." "$STABLE_BRANCH" "$RC_BRANCH" "$RC_BRANCH" "$STABLE_BRANCH"
+  fi
+  if [ -n "$reason" ] && [ -z "$force" ]; then
+    fail "$(printf "### ⚠️ Command Not Run\n\n%s\n\nIf you really mean it, run \`/%s %s force\`." "$reason" "$action" "$target")"
+  fi
+}
+
 rebase_pr() {
   local target=$1
   if [ "$target" = "$BASE_REF" ] && git merge-base --is-ancestor "origin/$BASE_REF" "$PR_HEAD"; then
@@ -154,15 +176,21 @@ if [[ "$CMD" =~ ^/squash ]]; then
   echo "Running squash..."
   squash_pr
 
-elif [[ "$CMD" =~ ^/(rebase|port)([[:space:]]+([^[:space:]]+))? ]]; then
+elif [[ "$CMD" =~ ^/(rebase|port)([[:space:]]+([^[:space:]]+))?([[:space:]]+(force)([[:space:]]|$))? ]]; then
   ACTION="${BASH_REMATCH[1]}"
   NEW_BASE="${BASH_REMATCH[3]}"
+  FORCE="${BASH_REMATCH[5]}"
+  if [ "$NEW_BASE" = "force" ]; then
+    NEW_BASE=""
+    FORCE="force"
+  fi
 
   if [ "$ACTION" = "port" ] && [ -z "$NEW_BASE" ]; then
     echo "Error: /port requires a target branch argument (e.g. /port 5.74)."
     exit 1
   fi
   NEW_BASE="${NEW_BASE:-$BASE_REF}"
+  check_target "$ACTION" "$NEW_BASE" "$FORCE"
   echo "Running $ACTION to $NEW_BASE..."
 
   git fetch origin "$BASE_REF"
