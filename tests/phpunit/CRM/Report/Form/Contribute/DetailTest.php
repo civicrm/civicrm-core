@@ -146,6 +146,8 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
    */
   public function testMultipleSoftCredits(): void {
     $this->quickCleanup($this->_tablesToTruncate);
+    // Truncating civicrm_contact removes the domain contacts, which the financial accounts point at.
+    $this->createDomainContacts();
 
     $solParams = [
       'first_name' => 'Solicitor 1',

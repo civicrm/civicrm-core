@@ -191,7 +191,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
     $mailingParams = [
       'name'           => 'Mailing Reply: mailing ',
       'subject'        => 'Mailing Reply: test',
-      'created_id'     => 1,
+      'created_id'     => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'groups'         => ['include' => [$group_1]],
       'scheduled_date' => 'now',
       'body_text'      => 'Please just {action.unsubscribeUrl}',

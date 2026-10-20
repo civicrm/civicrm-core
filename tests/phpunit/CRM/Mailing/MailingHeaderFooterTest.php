@@ -45,7 +45,7 @@ class CRM_Mailing_MailingHeaderFooterTest extends CiviUnitTestCase {
     $mailing = $this->callAPISuccess('Mailing', 'create', [
       'sequential' => 1,
       'name' => 'mailing name',
-      'created_id' => 1,
+      'created_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'groups' => ['include' => [$this->groupID]],
       'scheduled_date' => 'now',
       'subject' => 'My really interesting subject',
@@ -78,7 +78,7 @@ class CRM_Mailing_MailingHeaderFooterTest extends CiviUnitTestCase {
     $mailing = $this->callAPISuccess('Mailing', 'create', [
       'sequential' => 1,
       'name' => 'mailing name',
-      'created_id' => 1,
+      'created_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'groups' => ['include' => [$this->groupID]],
       'scheduled_date' => 'now',
       'header_id' => $mailingComponentHeader['name'],
@@ -110,7 +110,7 @@ class CRM_Mailing_MailingHeaderFooterTest extends CiviUnitTestCase {
     $mailing = $this->callAPISuccess('Mailing', 'create', [
       'sequential' => 1,
       'name' => 'mailing name',
-      'created_id' => 1,
+      'created_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'groups' => ['include' => [$this->groupID]],
       'scheduled_date' => 'now',
       'subject' => 'My really interesting subject',

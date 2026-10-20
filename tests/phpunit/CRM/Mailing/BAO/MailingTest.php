@@ -636,7 +636,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       'subject' => 'Test Subject',
       'body_html' => '<p>HTML Body</p>',
       'text_html' => 'Text Body',
-      'created_id' => 1,
+      'created_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'groups' => ['include' => [$groupID]],
       'scheduled_date' => 'now',
     ];

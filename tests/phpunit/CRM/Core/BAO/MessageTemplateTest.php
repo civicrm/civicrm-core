@@ -1028,8 +1028,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       'id' => CRM_Core_Config::domainID(),
       'description' => $values['description'],
     ]);
-    $this->callAPISuccess('Address', 'create', array_merge($values['address'], ['contact_id' => 1]));
-    $this->callAPISuccess('Email', 'create', array_merge(['email' => $values['email']], ['contact_id' => 1, 'is_primary' => 1]));
+    $this->callAPISuccess('Address', 'create', array_merge($values['address'], ['contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id]));
+    $this->callAPISuccess('Email', 'create', array_merge(['email' => $values['email']], ['contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id, 'is_primary' => 1]));
     $tokenString = '{domain.' . implode('} ~ {domain.', array_keys($values)) . '}';
 
     $messageContent = CRM_Core_BAO_MessageTemplate::renderTemplate([

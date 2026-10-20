@@ -925,7 +925,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     $this->doExportTest(['fields' => $fields, 'ids' => [$this->contactIDs[0]]]);
     foreach ($this->csv->getRecords() as $row) {
-      $this->assertEquals('BillingMobile3', $row['Billing-Phone-Much Much longer than just phone']);
+      $this->assertEquals('BillingMobile' . $this->contactIDs[0], $row['Billing-Phone-Much Much longer than just phone']);
       $this->assertEquals('', $row['Billing-Phone-Phone']);
       $this->assertEquals('Much Much longer than just phone', $row['Spouse of-Phone Type']);
       $this->assertEquals('Much Much longer than just phone', $row['Phone Type']);

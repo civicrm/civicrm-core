@@ -26,6 +26,8 @@ class CRM_Report_Form_Contact_LoggingDetailTest extends CiviReportTestCase {
     // Setup logging. This may create a series of backfilled log records.
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->quickCleanup($this->_tablesToTruncate);
+    // Truncating civicrm_contact removes the domain contacts, which the financial accounts point at.
+    $this->createDomainContacts();
 
     // The test needs to create+read some log records. We want this to have a new/separate `log_conn_id`.
     unset(\Civi::$statics['CRM_Utils_Request']['id']);

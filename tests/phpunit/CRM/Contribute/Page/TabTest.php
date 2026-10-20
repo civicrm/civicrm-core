@@ -36,7 +36,7 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
 
     $templateVariable = CRM_Core_Smarty::singleton()->getTemplateVars();
     $this->assertEquals('Mr. Anthony Anderson II', $templateVariable['displayName']);
-    $this->assertEquals("<span><a href=\"/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=" . $recurID . '&amp;cid=' . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='View Recurring Payment' >View</a><a href=\"/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=" . $recurID . "&amp;cid=3&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Edit Recurring Payment' >Edit</a><a href=\"/index.php?q=civicrm/contribute/unsubscribe&amp;reset=1&amp;crid=" . $recurID . '&amp;cid=' . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Cancel' >Cancel</a></span>",
+    $this->assertEquals("<span><a href=\"/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=" . $recurID . '&amp;cid=' . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='View Recurring Payment' >View</a><a href=\"/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=" . $recurID . "&amp;cid=" . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Edit Recurring Payment' >Edit</a><a href=\"/index.php?q=civicrm/contribute/unsubscribe&amp;reset=1&amp;crid=" . $recurID . '&amp;cid=' . $contactID . "&amp;context=contribution\" class=\"action-item crm-hover-button\" title='Cancel' >Cancel</a></span>",
       $this->getActionHtml($recurID)
     );
   }
@@ -47,18 +47,18 @@ class CRM_Contribute_Page_TabTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testLinksPaypalStandard(): void {
-    [, $recurID] = $this->setupTemplate([
+    [$contactID, $recurID] = $this->setupTemplate([
       'payment_processor_id' => $this->paymentProcessorCreate(['payment_processor_type_id' => 'PayPal_Standard']),
       'contact_id' => $this->createLoggedInUser(),
     ]);
-    $expected = '<span><a href="/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=' . $recurID . '&amp;cid=3&amp;context=contribution" class="action-item crm-hover-button" title=\'View Recurring Payment\' >View</a><a href="/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=' . $recurID . '&amp;cid=3&amp;context=contribution" class="action-item crm-hover-button" title=\'Edit Recurring Payment\' >Edit</a></span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="/index.php?q=civicrm/contribute/unsubscribe&amp;reset=1&amp;crid=' . $recurID . '&amp;cid=3&amp;context=contribution" class="action-item crm-hover-button" title=\'Cancel\' >Cancel</a></li><li><a href="/index.php?q=civicrm/contribute/updatebilling&amp;reset=1&amp;crid=' . $recurID . '&amp;cid=3&amp;context=contribution" class="action-item crm-hover-button" title=\'Change Billing Details\' >Change Billing Details</a></li></ul></span>';
+    $expected = '<span><a href="/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=' . $recurID . '&amp;cid=' . $contactID . '&amp;context=contribution" class="action-item crm-hover-button" title=\'View Recurring Payment\' >View</a><a href="/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=' . $recurID . '&amp;cid=' . $contactID . '&amp;context=contribution" class="action-item crm-hover-button" title=\'Edit Recurring Payment\' >Edit</a></span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="/index.php?q=civicrm/contribute/unsubscribe&amp;reset=1&amp;crid=' . $recurID . '&amp;cid=' . $contactID . '&amp;context=contribution" class="action-item crm-hover-button" title=\'Cancel\' >Cancel</a></li><li><a href="/index.php?q=civicrm/contribute/updatebilling&amp;reset=1&amp;crid=' . $recurID . '&amp;cid=' . $contactID . '&amp;context=contribution" class="action-item crm-hover-button" title=\'Change Billing Details\' >Change Billing Details</a></li></ul></span>';
     $this->assertEquals($expected, $this->getActionHtml($recurID));
 
     $page = new CRM_Contribute_Page_UserDashboard();
     $page->run();
     $expected = '<span><a href="https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_subscr-find&alias=sunil._1183377782_biz_api1.webaccess.co.in" class="action-item crm-hover-button no-popup" title=\'Cancel\' >Cancel</a>'
-      . '<a href="/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=' . $recurID . '&amp;cid=3&amp;context=dashboard" class="action-item crm-hover-button" title=\'View Recurring Payment\' >View</a>'
-      . '</span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=' . $recurID . '&amp;cid=3&amp;context=dashboard" class="action-item crm-hover-button" title=\'Edit Recurring Payment\' >Edit</a></li><li><a href="/index.php?q=civicrm/contribute/updatebilling&amp;reset=1&amp;crid=' . $recurID . '&amp;cid=3&amp;context=dashboard" class="action-item crm-hover-button" title=\'Change Billing Details\' >Change Billing Details</a></li></ul></span>';
+      . '<a href="/index.php?q=civicrm/contact/view/contributionrecur&amp;reset=1&amp;id=' . $recurID . '&amp;cid=' . $contactID . '&amp;context=dashboard" class="action-item crm-hover-button" title=\'View Recurring Payment\' >View</a>'
+      . '</span><span class=\'btn-slide crm-hover-button\'>more<ul class=\'panel\'><li><a href="/index.php?q=civicrm/contribute/updaterecur&amp;reset=1&amp;action=update&amp;crid=' . $recurID . '&amp;cid=' . $contactID . '&amp;context=dashboard" class="action-item crm-hover-button" title=\'Edit Recurring Payment\' >Edit</a></li><li><a href="/index.php?q=civicrm/contribute/updatebilling&amp;reset=1&amp;crid=' . $recurID . '&amp;cid=' . $contactID . '&amp;context=dashboard" class="action-item crm-hover-button" title=\'Change Billing Details\' >Change Billing Details</a></li></ul></span>';
     $this->assertEquals(
       $expected,
       $this->getDashboardActionHtml($recurID)

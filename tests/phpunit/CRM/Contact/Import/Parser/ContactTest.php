@@ -70,6 +70,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     RelationshipType::delete()->addWhere('name_a_b', '=', 'Dad to')->execute();
     ContactType::delete()->addWhere('name', '=', 'baby')->execute();
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "defaultContactCountry"');
+    if (file_exists(__DIR__ . '/../Form/data/contact_id_only.csv')) {
+      unlink(__DIR__ . '/../Form/data/contact_id_only.csv');
+    }
     parent::tearDown();
   }
 
@@ -1344,7 +1347,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testImportContactToGroup(): void {
-    $this->individualCreate();
+    $contactID = $this->individualCreate();
+    // The csv references the contact by id, so it is written once the contact exists.
+    file_put_contents(__DIR__ . '/../Form/data/contact_id_only.csv', "Contact ID\n$contactID\n");
     $this->importCSV('contact_id_only.csv', [['id']], [
       'newGroupName' => 'My New Group',
     ]);
@@ -1977,7 +1982,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $countries = CRM_Core_PseudoConstant::country(FALSE, FALSE);
     $this->callAPISuccess('Setting', 'create', ['countryLimit' => [array_search('United States', $countries, TRUE), array_search('Guyana', $countries, TRUE), array_search('Netherlands', $countries, TRUE)]]);
     $this->callAPISuccess('Setting', 'create', ['provinceLimit' => [array_search('United States', $countries, TRUE), array_search('Guyana', $countries, TRUE), array_search('Netherlands', $countries, TRUE)]]);
-    [$contactValues] = $this->setUpBaseContact();
+    [$contactValues, $contact] = $this->setUpBaseContact();
 
     // Set up the field mapping  - this looks like an array per mapping as saved in
     // civicrm_mapping_field - eg ['name' => 'street_address', 'location_type_id' => 1],
@@ -2006,7 +2011,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contactValues['work_country'] = '';
 
     $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, $fieldMapping);
-    $addresses = $this->callAPISuccess('Address', 'get', ['contact_id' => ['>' => 2], 'sequential' => 1]);
+    $addresses = $this->callAPISuccess('Address', 'get', ['contact_id' => $contact['id'], 'sequential' => 1]);
     $this->assertEquals(2, $addresses['count']);
     $this->assertEquals(array_search('United States', $countries, TRUE), $addresses['values'][0]['country_id']);
     $this->assertEquals(array_search('United States', $countries, TRUE), $addresses['values'][1]['country_id']);

@@ -198,7 +198,7 @@ class CRM_Mailing_MailingUnsubscribeTest extends CiviUnitTestCase {
     // Create the mailing
     $mailingId = $this->callAPISuccess('Mailing', 'create', [
       'name' => 'mailing name',
-      'created_id' => 1,
+      'created_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'groups' => ['include' => $sentToIds],
       'scheduled_date' => 'now',
       'subject' => 'My really interesting subject',

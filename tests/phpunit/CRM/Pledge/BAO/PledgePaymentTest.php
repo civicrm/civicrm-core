@@ -283,7 +283,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    */
   public function testCreatePledgePaymentForMultipleInstallments(): void {
     $scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
-    $contact_id = 2;
+    $contact_id = $this->individualCreate();
 
     $pledge = $this->callAPISuccess('Pledge', 'create', [
       'contact_id' => $contact_id,
@@ -371,7 +371,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
    */
   public function testCreatePledgePaymentForMultipleInstallments2(): void {
     $scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
-    $contact_id = 2;
+    $contact_id = $this->individualCreate();
 
     $params = [
       'contact_id' => $contact_id,

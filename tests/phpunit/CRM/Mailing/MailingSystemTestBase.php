@@ -49,7 +49,7 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
 
     $this->defaultParams = [
       'name' => 'mailing name',
-      'created_id' => 1,
+      'created_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'groups' => ['include' => [$this->_groupID]],
       'scheduled_date' => 'now',
     ];
