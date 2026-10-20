@@ -1362,6 +1362,8 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
 
       // max_related should be set in the parent membership
       unset($params['max_related']);
+      $isUpdate = (bool) (($params['action'] ?? NULL) & CRM_Core_Action::UPDATE);
+      unset($params['action']);
       // Number of inherited memberships available - NULL is interpreted as unlimited, '0' as none
       $numRelatedAvailable = ($membership->max_related == NULL ? PHP_INT_MAX : $membership->max_related);
       // will be used to queue potential memberships to be created.
@@ -1392,9 +1394,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
         ) {
           $params['status_id'] = $deceasedStatusId;
         }
-        elseif ((($params['action'] ?? NULL) & CRM_Core_Action::UPDATE) &&
-          ($relationshipStatus == CRM_Contact_BAO_Relationship::PAST)
-        ) {
+        elseif ($isUpdate && $relationshipStatus == CRM_Contact_BAO_Relationship::PAST) {
           $params['status_id'] = $expiredStatusId;
         }
 
@@ -1414,9 +1414,6 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
 
         // CRM-20966: Do not create membership_payment record for inherited membership.
         unset($params['relate_contribution_id']);
-
-        // only used above, not by the create/save calls below.
-        unset($params['action']);
 
         if (($params['status_id'] == $deceasedStatusId) || ($params['status_id'] == $expiredStatusId)) {
           // related membership is not active so does not count towards maximum
