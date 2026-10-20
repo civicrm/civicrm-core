@@ -47,11 +47,16 @@ class CRM_Campaign_Page_AJAX {
     $activity = \Civi\Api4\Activity::get(FALSE)
       ->addWhere('id', '=', $activityId)
       ->addWhere('is_deleted', '=', FALSE)
-      ->addSelect('id', 'source_record_id', 'activity_type_id')
+      ->addJoin('Survey AS survey', 'INNER',
+        ['source_record_id', '=', 'survey.id'],
+        ['activity_type_id', '=', 'survey.activity_type_id']
+      )
+      ->addWhere('survey.id', '=', $surveyId)
+      ->addSelect('id', 'activity_type_id')
       ->execute()
       ->first();
 
-    if (!$activity || (int) $activity['source_record_id'] !== (int) $surveyId) {
+    if (!$activity) {
       CRM_Utils_System::permissionDenied();
     }
 
@@ -365,42 +370,18 @@ class CRM_Campaign_Page_AJAX {
     if ($operation === 'release') {
       $activityId = CRM_Utils_Request::retrieve('activity_id', 'Positive', NULL, FALSE, NULL, 'POST');
       $isDelete = CRM_Utils_String::strtoboolstr(CRM_Utils_Request::retrieve('isDelete', 'String', NULL, FALSE, NULL, 'POST'));
-      if ($activityId) {
-        $activity = \Civi\Api4\Activity::get(FALSE)
-          ->addWhere('id', '=', $activityId)
-          ->addSelect('id', 'source_record_id')
-          ->execute()
-          ->first();
-        if ($activity && !empty($activity['source_record_id'])) {
-          $surveyExists = \Civi\Api4\Survey::get(FALSE)
-            ->addWhere('id', '=', $activity['source_record_id'])
-            ->execute()
-            ->count();
-          if ($surveyExists && CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity', $activityId, 'is_deleted', $isDelete)) {
-            $status = 'success';
-          }
-        }
+      if ($activityId && self::isSurveyActivity($activityId) && CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity', $activityId, 'is_deleted', $isDelete)) {
+        $status = 'success';
       }
     }
     elseif ($operation === 'reserve') {
       $activityId = CRM_Utils_Request::retrieve('activity_id', 'Positive', NULL, FALSE, NULL, 'POST');
       $createActivity = TRUE;
       if ($activityId) {
-        $activity = \Civi\Api4\Activity::get(FALSE)
-          ->addWhere('id', '=', $activityId)
-          ->addSelect('id', 'source_record_id')
-          ->execute()
-          ->first();
-        if ($activity && !empty($activity['source_record_id'])) {
-          $surveyExists = \Civi\Api4\Survey::get(FALSE)
-            ->addWhere('id', '=', $activity['source_record_id'])
-            ->execute()
-            ->count();
-          if ($surveyExists) {
-            $createActivity = FALSE;
-            if (CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity', $activityId, 'is_deleted', 0)) {
-              $status = 'success';
-            }
+        if (self::isSurveyActivity($activityId)) {
+          $createActivity = FALSE;
+          if (CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity', $activityId, 'is_deleted', 0)) {
+            $status = 'success';
           }
         }
       }
@@ -477,31 +458,36 @@ class CRM_Campaign_Page_AJAX {
     elseif ($operation === 'gotv') {
       $activityId = CRM_Utils_Request::retrieve('activity_id', 'Positive', NULL, FALSE, NULL, 'POST');
       $hasVoted = CRM_Utils_String::strtoboolstr(CRM_Utils_Request::retrieve('hasVoted', 'String', NULL, FALSE, NULL, 'POST'));
-      if ($activityId) {
-        $activity = \Civi\Api4\Activity::get(FALSE)
-          ->addWhere('id', '=', $activityId)
-          ->addSelect('id', 'source_record_id')
-          ->execute()
-          ->first();
-        if ($activity && !empty($activity['source_record_id'])) {
-          $surveyExists = \Civi\Api4\Survey::get(FALSE)
-            ->addWhere('id', '=', $activity['source_record_id'])
-            ->execute()
-            ->count();
-          if ($surveyExists) {
-            $statusValue = $hasVoted ? 2 : 1;
-            CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity',
-              $activityId,
-              'status_id',
-              $statusValue
-            );
-            $status = 'success';
-          }
-        }
+      if ($activityId && self::isSurveyActivity($activityId)) {
+        $statusValue = $hasVoted ? 2 : 1;
+        CRM_Core_DAO::setFieldValue('CRM_Activity_DAO_Activity',
+          $activityId,
+          'status_id',
+          $statusValue
+        );
+        $status = 'success';
       }
     }
 
     CRM_Utils_JSON::output(['status' => $status]);
+  }
+
+  /**
+   * Check if an activity belongs to a campaign survey.
+   *
+   * Verifies both source_record_id and activity_type_id against civicrm_survey,
+   * closing polymorphic foreign key traversal loopholes.
+   */
+  private static function isSurveyActivity(int $activityId): bool {
+    return (bool) \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('id', '=', $activityId)
+      ->addJoin('Survey AS survey', 'INNER',
+        ['source_record_id', '=', 'survey.id'],
+        ['activity_type_id', '=', 'survey.activity_type_id']
+      )
+      ->addSelect('id')
+      ->execute()
+      ->count();
   }
 
   public static function campaignGroups() {
