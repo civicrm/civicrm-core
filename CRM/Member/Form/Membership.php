@@ -118,6 +118,26 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   }
 
   /**
+   * @param $result
+   *
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  private function addPayment($result): void {
+    civicrm_api3('Payment', 'create', [
+      'fee_amount' => $result['fee_amount'] ?? 0,
+      'total_amount' => $this->order->getTotalAmount(),
+      'payment_instrument_id' => $this->getPaymentInstrumentID(),
+      'trxn_id' => $result['trxn_id'] ?? NULL,
+      'contribution_id' => $this->getContributionID(),
+      'is_send_contribution_notification' => FALSE,
+      'card_type_id' => $this->getCardTypeID(),
+      'pan_truncation' => $this->getPanTruncation(),
+      'check_number' => $this->getSubmittedValue('check_number'),
+    ]);
+  }
+
+  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {
@@ -1057,16 +1077,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           $result = $payment->doPayment($paymentParams);
           $paymentStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $result['payment_status_id']);
           if ($this->getContributionID() && $paymentStatus === 'Completed') {
-            civicrm_api3('Payment', 'create', [
-              'fee_amount' => $result['fee_amount'] ?? 0,
-              'total_amount' => $this->order->getTotalAmount(),
-              'payment_instrument_id' => $this->getPaymentInstrumentID(),
-              'trxn_id' => $result['trxn_id'],
-              'contribution_id' => $this->getContributionID(),
-              'is_send_contribution_notification' => FALSE,
-              'card_type_id' => $this->getCardTypeID(),
-              'pan_truncation' => $this->getPanTruncation(),
-            ]);
+            $this->addPayment($result);
           }
         }
         catch (PaymentProcessorException $e) {
