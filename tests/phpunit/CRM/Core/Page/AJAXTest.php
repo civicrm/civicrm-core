@@ -12,6 +12,7 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
+    $this->quickCleanup(['civicrm_relationship', 'civicrm_uf_group', 'civicrm_uf_join']);
     unset($_SERVER['HTTP_X_REQUESTED_WITH']);
     $_REQUEST = [];
     $_GET = [];
@@ -267,6 +268,232 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $this->assertIsArray($e->errorData);
+    }
+  }
+
+  /**
+   * Set up fixtures for getPermissionedLocation tests.
+   *
+   * @return array
+   */
+  private function setupPermissionedLocationFixtures(): array {
+    $this->setPermissions(['make online contributions', 'profile create']);
+
+    $org = $this->createTestEntity('Contact', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'Perm Test Org',
+    ], 'perm_org');
+
+    $this->createTestEntity('Address', [
+      'contact_id' => $org['id'],
+      'street_address' => '123 Main St',
+      'location_type_id' => 1,
+    ], 'perm_org_address');
+
+    $ind = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Perm',
+      'last_name' => 'User',
+    ], 'perm_ind');
+
+    $this->createTestEntity('Relationship', [
+      'contact_id_a' => $ind['id'],
+      'contact_id_b' => $org['id'],
+      'relationship_type_id:name' => 'Employee of',
+      'is_permission_a_b' => 1,
+      'is_active' => 1,
+    ], 'perm_rel');
+
+    $ufGroup = $this->createTestEntity('UFGroup', [
+      'title' => 'Perm Location Profile',
+      'is_active' => 1,
+    ], 'perm_ufg');
+
+    return [$org['id'], $ind['id'], $ufGroup['id']];
+  }
+
+  /**
+   * Test getPermissionedLocation is denied when an unauthenticated request supplies uid without checksum.
+   */
+  public function testGetPermissionedLocationDeniedWithoutChecksumForUnauthenticatedUid(): void {
+    [$orgId, $indId, $ufId] = $this->setupPermissionedLocationFixtures();
+
+    $_GET = $_REQUEST = [
+      'uid' => $indId,
+      'cid' => $orgId,
+      'ufID' => $ufId,
+    ];
+
+    try {
+      CRM_Core_Page_AJAX_Location::getPermissionedLocation();
+      $this->fail('Expected premature exit without data');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['error_code' => 0], $e->errorData);
+    }
+  }
+
+  /**
+   * Test getPermissionedLocation is denied when an invalid checksum is supplied.
+   */
+  public function testGetPermissionedLocationDeniedWithInvalidChecksum(): void {
+    [$orgId, $indId, $ufId] = $this->setupPermissionedLocationFixtures();
+
+    $_GET = $_REQUEST = [
+      'uid' => $indId,
+      'cid' => $orgId,
+      'ufID' => $ufId,
+      'cs' => 'invalid_checksum',
+    ];
+
+    try {
+      CRM_Core_Page_AJAX_Location::getPermissionedLocation();
+      $this->fail('Expected premature exit without data');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['error_code' => 0], $e->errorData);
+    }
+  }
+
+  /**
+   * Test getPermissionedLocation is denied when unauthenticated and no uid or checksum is provided.
+   */
+  public function testGetPermissionedLocationDeniedWhenUnauthenticatedWithoutUidOrChecksum(): void {
+    [$orgId, , $ufId] = $this->setupPermissionedLocationFixtures();
+
+    $_GET = $_REQUEST = [
+      'cid' => $orgId,
+      'ufID' => $ufId,
+    ];
+
+    try {
+      CRM_Core_Page_AJAX_Location::getPermissionedLocation();
+      $this->fail('Expected premature exit without data');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['error_code' => 0], $e->errorData);
+    }
+  }
+
+  /**
+   * Test getPermissionedLocation is denied when checksum is provided without uid.
+   */
+  public function testGetPermissionedLocationDeniedWithChecksumOnlyNoUid(): void {
+    [$orgId, $indId, $ufId] = $this->setupPermissionedLocationFixtures();
+    $validChecksum = CRM_Contact_BAO_Contact_Utils::generateChecksum($indId);
+
+    $_GET = $_REQUEST = [
+      'cid' => $orgId,
+      'ufID' => $ufId,
+      'cs' => $validChecksum,
+    ];
+
+    try {
+      CRM_Core_Page_AJAX_Location::getPermissionedLocation();
+      $this->fail('Expected premature exit without data');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['error_code' => 0], $e->errorData);
+    }
+  }
+
+  /**
+   * Test getPermissionedLocation succeeds when authenticated with a valid checksum.
+   */
+  public function testGetPermissionedLocationSuccessWithValidChecksum(): void {
+    [$orgId, $indId, $ufId] = $this->setupPermissionedLocationFixtures();
+    $validChecksum = CRM_Contact_BAO_Contact_Utils::generateChecksum($indId);
+
+    $_GET = $_REQUEST = [
+      'uid' => $indId,
+      'cid' => $orgId,
+      'ufID' => $ufId,
+      'cs' => $validChecksum,
+    ];
+
+    try {
+      CRM_Core_Page_AJAX_Location::getPermissionedLocation();
+      $this->fail('Expected premature exit with output');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertIsArray($e->errorData);
+      $this->assertEquals('123 Main St', $e->errorData['onbehalf_street_address-1']['value'] ?? NULL);
+    }
+  }
+
+  /**
+   * Test getPermissionedLocation succeeds for a logged-in user with permission on the organization.
+   */
+  public function testGetPermissionedLocationSuccessForLoggedInUser(): void {
+    [$orgId, $indId, $ufId] = $this->setupPermissionedLocationFixtures();
+    CRM_Core_Session::singleton()->set('userID', $indId);
+
+    $_GET = $_REQUEST = [
+      'cid' => $orgId,
+      'ufID' => $ufId,
+    ];
+
+    try {
+      CRM_Core_Page_AJAX_Location::getPermissionedLocation();
+      $this->fail('Expected premature exit with output');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertIsArray($e->errorData);
+      $this->assertEquals('123 Main St', $e->errorData['onbehalf_street_address-1']['value'] ?? NULL);
+    }
+  }
+
+  /**
+   * Test getPermissionedLocation is denied when logged in user lacks permission on the organization.
+   */
+  public function testGetPermissionedLocationDeniedForLoggedInUserWithoutPermissionOnOrg(): void {
+    [, $indId, $ufId] = $this->setupPermissionedLocationFixtures();
+    $otherOrg = $this->createTestEntity('Contact', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'Unrelated Org',
+    ], 'unrelated_org');
+
+    CRM_Core_Session::singleton()->set('userID', $indId);
+
+    $_GET = $_REQUEST = [
+      'cid' => $otherOrg['id'],
+      'ufID' => $ufId,
+    ];
+
+    try {
+      CRM_Core_Page_AJAX_Location::getPermissionedLocation();
+      $this->fail('Expected premature exit without data');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['error_code' => 0], $e->errorData);
+    }
+  }
+
+  /**
+   * Test getPermissionedLocation is denied when logged in user passes another uid without checksum.
+   */
+  public function testGetPermissionedLocationDeniedForLoggedInUserSpecifyingOtherUidWithoutChecksum(): void {
+    [$orgId, $indId, $ufId] = $this->setupPermissionedLocationFixtures();
+    $loggedUser = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Logged',
+      'last_name' => 'In',
+    ], 'logged_user');
+
+    CRM_Core_Session::singleton()->set('userID', $loggedUser['id']);
+
+    $_GET = $_REQUEST = [
+      'uid' => $indId,
+      'cid' => $orgId,
+      'ufID' => $ufId,
+    ];
+
+    try {
+      CRM_Core_Page_AJAX_Location::getPermissionedLocation();
+      $this->fail('Expected premature exit without data');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['error_code' => 0], $e->errorData);
     }
   }
 
