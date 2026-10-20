@@ -114,6 +114,7 @@
 
 - github      : angelajackson07
   name        : Angela Jackson
+  organization: Circle Interactive
 
 - github      : angusfretwell
   name        : Angus Fretwell
@@ -129,9 +130,6 @@
 - github      : amsharma9
   name        : Amal Sharma
   organization: Abhikalak Consultants
-
-- github      : mecachisenros
-  name        : Andrei Mondoc
 
 - github      : andrew-cormick-dockery
   name        : Andrew Cormick-Dockery
@@ -212,7 +210,7 @@
 
 - github      : awestuk
   organization: Humanists UK
-  name        : Andrew West;
+  name        : Andrew West
 
 - github      : awzilkie
   name        : Adam Zilkie
@@ -225,9 +223,8 @@
   name        : Aidan Saunders
   organization: Squiffle Consulting
 
-- name        : Matthias Bärnthaler
-
 - github      : baernm
+  name        : Matthias Bärnthaler
 
 - github      : bastienho
   name        : Bastien Ho
@@ -320,8 +317,6 @@
 - github      : chamilwijesooriya
   name        : Chamil Wijesooriya
   organization: MillerTech
-
-- name        : Chandana Bandara
 
 - name        : Charles Register
   organization: Hemophilia of North Carolina
@@ -428,10 +423,6 @@
   name        : Dave Jenkins
   organization: Circle Interactive
 
-- github      : angelajackson07
-  name        : Angela Jackson
-  organization: Circle Interactive
-
 - github      : darkdi
   organization: Rant
   name        : Dmitry Rantovov
@@ -478,13 +469,15 @@
 - github      : devappsoftware
   organization: DevApp
 
-- gitub       : dev-allinappli
+- github      : dev-allinappli
   name        : dev ALL IN APPLI
 
 - github      : devarun
   name        : Arun Singh
 
 - github      : devdavc
+  name        : David Cativo
+  organization: DevApp
 
 - github      : adam-devapp
   name        : Adam Kwiatkowski
@@ -527,7 +520,7 @@
 
 - github      : Erioldoesdesign
   organization: Third Sector Design
-  name        : Eriol Fox;
+  name        : Eriol Fox
 
 - github      : jmdh
   name        : Dominic Hargreaves
@@ -753,12 +746,9 @@
   name        : Hans Rossel
   organization: KOBA
 
-- name        : Heather Oliver
+- github      : HROliver
+  name        : Heather Oliver
   organization: Red Hot Irons
-  github      : HROliver
-
-- name        : Heather Oliver
-  organization: GMCVO Databases
 
 - github      : herbdool
   name        : Herb van den Dool
@@ -863,9 +853,7 @@
   organization: AGH Strategies
 
 - github      : jernic
-  name        : jernic
-
-- name        : Jeremy Nicholls
+  name        : Jeremy Nicholls
   organization: SEN Magazine
 
 - github      : jeromelebleu
@@ -933,9 +921,6 @@
 - github      : JohnFF
   name        : John Kirk
   organization: CiviFirst
-
-- name        : Jon-man Cheung
-  organization: GMCVO Databases
 
 - github      : jonesinator
   name        : Aaron Jones
@@ -1341,7 +1326,6 @@
 
 - github      : nirodaonline
   name        : Miguel Almeida
-  jira        : almeidam
 
 - github      : nishant-bhorodia
   name        : Nishant Bhorodia
@@ -1397,7 +1381,8 @@
   name        : Abhishek Pokhriyal
   organization: ColoredCow
 
-- name        : Pratiksha Dubey
+- github      : pratikshad
+  name        : Pratiksha Dubey
   organization: Web Access
 
 - github      : prondubuisi
@@ -1435,7 +1420,8 @@
   name        : Patrick Lam
   organization: University of Waterloo
 
-- name        : Paul Barmak
+- github      : pbarmak
+  name        : Paul Barmak
 
 - github      : penguintrax
   name        : Barbara Forbes-Lyons
@@ -1449,9 +1435,6 @@
 
 - github      : pillarsdotnet
   name        : Bob Vincent
-
-- name        : Peter Davis
-  organization: Fuzion
 
 - github      : pminf
   name        : Philipp Michael
@@ -1555,11 +1538,6 @@
 - github      : robinbowes
   name        : Robin Bowes
 
-- name        : Robert Lang
-
-- name        : Rohan Chavan
-  organization: Web Access
-
 - github      : rohankatkar
   name        : Rohan Katkar
   organization: CiviCRM
@@ -1592,7 +1570,8 @@
   name        : Morgan Robinson
   organization: Palante Technology Cooperative
 
-- name        : Steve Binkowski
+- github      : routinet
+  name        : Steve Binkowski
 
 - github      : stuart897
   name        : Stuart
@@ -1616,9 +1595,7 @@
 - github      : simonjohnparker
   name        : Simon John Parker
 
-- github      : Sinjinsmiley
-    
-- gitub       : sushantpaste
+- github      : sushantpaste
   organization: OSSeed Technologies LLP
   name        : Sushant Paste
 
@@ -1684,7 +1661,7 @@
 - github      : Sinjinsmiley
   name        : Simon East
   organization: North Essex Heritage
-  
+
 - github      : spalmstr
   name        : Stephen Palmstrom
 
@@ -1709,7 +1686,7 @@
   name        : Steve Kessler
   organization: CiviDesk
 
-- name`       : Stevel
+- name        : Stevel
 
 - github      : StijnVanhandsaeme
 
@@ -1815,10 +1792,12 @@
   name        : Tobias Voigt
   organization: civiservice.de
 
-- name        : Thomas Mannell
+- github      : tmannell
+  name        : Thomas Mannell
   organization: Registered Nurses' Association of Ontario
 
-- name        : Torrance Hodgson
+- github      : torrance
+  name        : Torrance Hodgson
 
 - github      : totten
   name        : Tim Otten
@@ -1831,7 +1810,6 @@
 - github      : tpokorra
   name        : Timotheus Pokorra
   organization: Hostsharing eG
-
 
 - github      : tresero
   name        : Jon Griffin
@@ -1851,9 +1829,6 @@
 - github      : tunbola
   name        : Tunbola Ogunwande
   organization: Timbsoft Technologies
-
-- name        : Tunbola Ogunwande
-  organization: CompuCorp
 
 - github      : twocs
   name        : Tom Anderson
@@ -1884,7 +1859,8 @@
 - github      : ustramooner
   name        : Ben van Klinken
 
-- name        : Vakees K
+- github      : vakeesan26
+  name        : Vakees K
 
 - github      : valfr35
   name        : Valéry Gouleau
@@ -1967,9 +1943,6 @@
   name        : dewy
   organization: OPEN
 
-- name        : Philipp Michael
-  organization: XIMA
-
 - github      : xavi-xaloc
 
 - github      : xurizaemon
@@ -2016,18 +1989,9 @@
 
 - github      : ziljah
 
-- github      : 19ATF72
-
 - github      : yogesh-compuco
   name        : Yogesh Pawar
   organization: Compuco
-
-- github      : devdavc
-  name        : David Cativo
-  organization: DevApp
-
-- github      : eightiesguy
-  name        : Jonny Toomey
 
 - github      : IProSoft
   name        : Artur Śmigielski
