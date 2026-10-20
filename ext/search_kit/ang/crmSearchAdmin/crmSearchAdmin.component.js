@@ -658,6 +658,13 @@
         errors.push(ts('%1 is a required field.', {1: label}));
         tab = 'group';
       }
+      // A smart group's members are the values of its first column, which e.g. a count is not
+      const firstColumns = [ctrl.savedSearch.api_params.select[0]].concat((ctrl.savedSearch.api_params.sets || []).map(set => set[3].select?.[0]));
+      const countedColumn = ctrl.groupExists && firstColumns.map(col => searchMeta.parseExpr(col, ctrl.savedSearch)?.fn)
+        .find(fn => fn?.category === 'aggregate' && !fn.preservesEntityReference);
+      if (countedColumn) {
+        errors.push(ts('The contact column of a smart group must hold contact IDs, not a %1. Group by the contact ID, or choose a function such as Min for this column.', {1: countedColumn.title}));
+      }
       ctrl.savedSearch.displays.forEach((display, index) => {
         if (!display.trashed && !display.label) {
           errorEl = '#crm-search-admin-display-label';

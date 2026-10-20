@@ -140,6 +140,122 @@ class SavedSearchTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayNotHasKey($in2['id'], (array) $outs);
   }
 
+  /**
+   * @dataProvider getContactIdAggregates
+   */
+  public function testGroupedSmartGroupTakesItsMembersFromAnAggregatedId(string $column, bool $takesFirst): void {
+    $lastName = uniqid();
+    $firstContact = Contact::create(FALSE)->addValue('last_name', $lastName)->execute()->first();
+    Contact::create(FALSE)->addValue('last_name', $lastName)->execute();
+    $other = Contact::create(FALSE)->addValue('last_name', $lastName . 'x')->execute()->first();
+
+    $savedSearch = civicrm_api4('SavedSearch', 'create', [
+      'values' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => [$column, 'last_name'],
+          'where' => [['last_name', 'IN', [$lastName, $lastName . 'x']]],
+          'groupBy' => ['last_name'],
+        ],
+      ],
+      'chain' => [
+        'group' => ['Group', 'create', ['values' => ['title' => 'Grouped Test', 'saved_search_id' => '$id']], 0],
+      ],
+    ])->first();
+
+    $ins = Contact::get(FALSE)
+      ->addWhere('groups', 'IN', [$savedSearch['group']['id']])
+      ->execute()->column('id');
+    $this->assertCount(2, $ins);
+    $this->assertContains($other['id'], $ins);
+    $this->assertEquals($takesFirst, in_array($firstContact['id'], $ins));
+  }
+
+  public static function getContactIdAggregates(): array {
+    return [
+      'MIN' => ['MIN(id) AS MIN_id', TRUE],
+      'MAX' => ['MAX(id) AS MAX_id', FALSE],
+      'GROUP_FIRST' => ['GROUP_FIRST(id ORDER BY id) AS GROUP_FIRST_id', TRUE],
+    ];
+  }
+
+  public function testSmartGroupGroupedByItsContactIdColumn(): void {
+    $twice = Contact::create(FALSE)->addValue('first_name', 'twice')->execute()->first();
+    $once = Contact::create(FALSE)->addValue('first_name', 'once')->execute()->first();
+    $domain = uniqid() . '.example.org';
+    foreach ([[$twice, 'a'], [$twice, 'b'], [$once, 'c']] as [$contact, $local]) {
+      Email::create(FALSE)->addValue('contact_id', $contact['id'])->addValue('email', "$local@$domain")->execute();
+    }
+
+    $savedSearch = civicrm_api4('SavedSearch', 'create', [
+      'values' => [
+        'api_entity' => 'Email',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['contact_id', 'COUNT(id) AS COUNT_id'],
+          'where' => [['email', 'LIKE', "%@$domain"]],
+          'groupBy' => ['contact_id'],
+          'having' => [['COUNT_id', '>=', 2]],
+        ],
+      ],
+      'chain' => [
+        'group' => ['Group', 'create', ['values' => ['title' => 'Grouped By Contact Test', 'saved_search_id' => '$id']], 0],
+      ],
+    ])->first();
+
+    $ins = Contact::get(FALSE)
+      ->addWhere('groups', 'IN', [$savedSearch['group']['id']])
+      ->execute()->column('id');
+    $this->assertEquals([$twice['id']], $ins);
+  }
+
+  public function testSmartGroupRefusesACountAsItsContactIds(): void {
+    $savedSearch = civicrm_api4('SavedSearch', 'create', [
+      'values' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['COUNT(id) AS COUNT_id', 'contact_type'],
+          'groupBy' => ['contact_type'],
+        ],
+      ],
+      'chain' => [
+        'group' => ['Group', 'create', ['values' => ['title' => 'Count Test', 'saved_search_id' => '$id']], 0],
+      ],
+    ])->first();
+
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('must hold contact IDs');
+    Contact::get(FALSE)
+      ->addWhere('groups', 'IN', [$savedSearch['group']['id']])
+      ->execute();
+  }
+
+  public function testSmartGroupRefusesACountAsItsContactIdsInACombinedSearch(): void {
+    $savedSearch = civicrm_api4('SavedSearch', 'create', [
+      'values' => [
+        'api_entity' => 'EntitySet',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['COUNT_id'],
+          'sets' => [
+            ['UNION ALL', 'Contact', 'get', ['select' => ['COUNT(id) AS COUNT_id'], 'groupBy' => ['contact_type']]],
+          ],
+        ],
+      ],
+      'chain' => [
+        'group' => ['Group', 'create', ['values' => ['title' => 'Count Set Test', 'saved_search_id' => '$id']], 0],
+      ],
+    ])->first();
+
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('must hold contact IDs');
+    Contact::get(FALSE)
+      ->addWhere('groups', 'IN', [$savedSearch['group']['id']])
+      ->execute();
+  }
+
   public function testMultipleSmartGroups(): void {
     $inGroup = $outGroup = [];
     $inName = uniqid('inGroup');

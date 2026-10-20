@@ -13,6 +13,7 @@ use Civi\API\Request;
 use Civi\Api4\Group;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Query\SqlExpression;
+use Civi\Api4\Query\SqlFunction;
 use Civi\Api4\SavedSearch;
 
 /**
@@ -529,6 +530,14 @@ ORDER BY   gc.contact_id, g.children
     $addSelect = "$groupID AS group_id";
 
     $apiParams = $savedSearch['api_params'] + ['select' => ['id'], 'checkPermissions' => FALSE];
+    // The first column's values become the members' contact IDs, which e.g. a count is not
+    $firstColumns = array_filter(array_merge([$apiParams['select'][0]], array_map(fn($set) => $set[3]['select'][0] ?? '', $apiParams['sets'] ?? [])));
+    foreach ($firstColumns as $column) {
+      $expr = SqlExpression::convert($column, TRUE);
+      if ($expr instanceof SqlFunction && $expr::getCategory() === SqlFunction::CATEGORY_AGGREGATE && !$expr->preservesEntityReference) {
+        throw new CRM_Core_Exception(ts('Smart group %1: the first column of its search must hold contact IDs, not %2.', [1 => $groupID, 2 => $column]));
+      }
+    }
     $idField = SqlExpression::convert($apiParams['select'][0], TRUE)->getAlias();
     // Unless there's a HAVING clause, we don't care about other columns
     if (empty($apiParams['having'])) {
