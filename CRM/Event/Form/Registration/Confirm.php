@@ -459,9 +459,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           unset($cancelledIds[$key]);
         }
       }
-      if ($this->isShowPaymentOnConfirm()) {
-        $params[$participantNum]['is_pay_later'] = $this->isPayLater();
-      }
     }
 
     $payment = is_array($this->_paymentProcessor) ? $this->_paymentProcessor['object'] : NULL;
@@ -493,7 +490,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         ) {
           // if paid event add a contribution record
           //passing contribution id is already registered.
-          $contribution = $this->processContribution($participantRecord, $contactID);
+          $contribution = $this->processContribution($contactID);
         }
       }
 
@@ -681,41 +678,18 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Get the text to store as civicrm_contribution.amount_level for this
-   * registration's contribution.
-   *
-   * This is the order's own amount-level text, plus a marker for when the
-   * primary participant's contribution also covers additional participants
-   * registered alongside them. CRM-4196.
-   *
-   * @throws \CRM_Core_Exception
-   */
-  private function getContributionAmountLevel(): string {
-    $amountLevel = $this->getOrder()->getAmountLevel();
-    if (count($this->getAllSubmittedValues()) > 1) {
-      $amountLevel .= ' ' . ts('(multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
-    }
-    return $amountLevel;
-  }
-
-  /**
    * Process the contribution.
    *
-   * @param array $params
    * @param int $contactID
    *
    * @return \CRM_Contribute_BAO_Contribution
-   *
-   * @throws \CRM_Core_Exception
    */
-  private function processContribution($params, $contactID): CRM_Contribute_BAO_Contribution {
+  private function processContribution($contactID): CRM_Contribute_BAO_Contribution {
     // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
     $transaction = new CRM_Core_Transaction();
 
     $now = date('YmdHis');
-
-    // @todo - this should come from the order
-    $financialTypeID = !empty($this->getEventValue('financial_type_id')) ? $this->getEventValue('financial_type_id') : $params['financial_type_id'];
+    $financialTypeID = !empty($this->getEventValue('financial_type_id')) ? $this->getEventValue('financial_type_id') : $this->getOrder()->getFinancialTypeID();
 
     $contribParams = [
       'contact_id' => $contactID,
@@ -723,11 +697,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'receive_date' => $now,
       'total_amount' => $this->getOrder()->getTotalAmount(),
       'tax_amount' => $this->getOrderTotalTaxAmount(),
-      'amount_level' => $this->getContributionAmountLevel(),
+      'amount_level' => $this->getAmountLevelForParticipant(0),
       'invoice_id' => $this->getInvoiceID(),
       'currency' => $this->getCurrency(),
       'source' => $this->getSource(0),
-      'is_pay_later' => $params['is_pay_later'] ?? 0,
+      'is_pay_later' => $this->isPayLater(),
       'campaign_id' => $this->getCampaignID(0),
       'card_type_id' => $this->getCardTypeID(),
       'pan_truncation' => $this->getPanTruncation(),
@@ -744,7 +718,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     $contribParams['is_test'] = $this->isTest();
 
-    $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($params);
+    $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedParticipantValues());
 
     $contribParams['skipLineItem'] = 1;
     $contribParams['skipCleanMoney'] = 1;
