@@ -100,12 +100,9 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     }
     $values = [
       'params' => [$participant->id => $participantParams],
-      'event' => $event_values,
-      'custom_pre_id' => $pre_id,
-      'custom_post_id' => $post_id,
       'payer' => $payer_values,
     ];
-    CRM_Event_BAO_Event::sendMail($participant->contact_id, $values, $participant->id);
+    CRM_Event_BAO_Event::sendMail(NULL, $values, $participant->id);
 
     return $participant;
   }

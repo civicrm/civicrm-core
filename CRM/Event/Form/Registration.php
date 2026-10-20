@@ -1933,16 +1933,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     // get all in and then unset those are confirmed.
     $cancelledIds = $this->_additionalParticipantIds;
 
-    $participantCount = [];
-    foreach ($params as $participantNum => $record) {
-      if ($record == 'skip') {
-        $participantCount[$participantNum] = 'skip';
-      }
-      elseif ($participantNum) {
-        $participantCount[$participantNum] = 'participant';
-      }
-    }
-
     $registerByID = NULL;
     foreach ($params as $key => $value) {
       if ($value != 'skip') {
@@ -2036,7 +2026,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if (!$this->isPaidEvent() || $this->getPaymentProcessorObject()->supports('noReturn')
     ) {
       // Send mail Confirmation/Receipt.
-      $this->sendMails($params, $registerByID, $participantCount);
+      $this->sendMails($params);
     }
   }
 
@@ -2044,43 +2034,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Send Mail to participants.
    *
    * @param $params
-   * @param $registerByID
-   * @param array $participantCount
    *
    * @throws \CRM_Core_Exception
    */
-  private function sendMails($params, $registerByID, array $participantCount) {
-    $isTest = FALSE;
-    if ($this->_action & CRM_Core_Action::PREVIEW) {
-      $isTest = TRUE;
-    }
-
-    $registerByID = $this->getPrimaryParticipantID();
-    $primaryContactId = $this->getParticipantValue('contact_id');
-
-    //build an array of custom profile and assigning it to template.
-    // @todo - don't call buildCustomProfile to get additionalParticipants.
-    // CRM_Event_BAO_Participant::getAdditionalParticipantIds is a better fit.
-    $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID, NULL,
-      $primaryContactId, $isTest, TRUE
-    );
+  private function sendMails($params) {
+    $isTest = $this->isTest();
 
     //lets carry all participant params w/ values.
-    foreach ($additionalIDs as $participantID => $contactId) {
-      $participantNum = NULL;
-      if ($participantID == $registerByID) {
-        $participantNum = 0;
-      }
-      else {
-        if ($participantNum = array_search('participant', $participantCount)) {
-          unset($participantCount[$participantNum]);
-        }
-      }
-
-      if ($participantNum === NULL) {
-        break;
-      }
-
+    foreach ($this->_participantIDS as $participantNum => $participantID) {
       //carry the participant submitted values.
       $this->_values['params'][$participantID] = $params[$participantNum];
     }
@@ -2088,9 +2049,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     //lets send  mails to all with meanigful text, CRM-4320.
     $this->assign('isRequireApproval', $this->_requireApproval);
 
-    foreach ($additionalIDs as $participantID => $contactId) {
+    foreach ($this->_participantIDS as $participantID) {
       // Send Confirmation mail to Primary & additional Participants if exists
-      CRM_Event_BAO_Event::sendMail($contactId, $this->_values, $participantID, $isTest);
+      CRM_Event_BAO_Event::sendMail(NULL, $this->_values, $participantID, $isTest);
     }
   }
 
