@@ -1,0 +1,24 @@
+name: Test PR Commands
+
+on:
+  push:
+    paths:
+      - '.github/scripts/pr-commands.sh'
+      - '.github/scripts/pr-commands.test.sh'
+      - '.github/workflows/pr-commands-test.yml'
+  pull_request:
+    paths:
+      - '.github/scripts/pr-commands.sh'
+      - '.github/scripts/pr-commands.test.sh'
+      - '.github/workflows/pr-commands-test.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run pr-commands.test.sh
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: .github/scripts/pr-commands.test.sh
