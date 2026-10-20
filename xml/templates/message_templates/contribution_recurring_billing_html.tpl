@@ -51,11 +51,6 @@
         {ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}<br />
        </td>
       </tr>
-      <tr>
-        <td {$labelStyle}>
-            {ts 1=$receipt_from_email}If you have questions please contact us at %1{/ts}
-        </td>
-       </tr>
   </table>
 
 </body>
