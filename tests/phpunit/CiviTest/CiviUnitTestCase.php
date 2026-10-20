@@ -1882,7 +1882,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       )
       ->setDefaults([
         'domain_id' => 1,
-        'member_of_contact_id' => 1,
+        'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
         'financial_type_id' => 2,
       ]
     )->execute();
