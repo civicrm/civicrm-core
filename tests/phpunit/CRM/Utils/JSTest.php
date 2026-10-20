@@ -118,6 +118,11 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       'E.ts(`%1 contact`,{1:n,count:n,plural:`%1 contacts`})',
       ['%1 contact', '%1 contacts'],
     ];
+    // a leading escaped quote belongs to the text
+    $cases[] = [
+      ' ts(\'\\\'Quoted\\\' first\'); ts("\\"Quoted\\" first"); ts(`\\`Quoted\\` first`);',
+      ['\'Quoted\' first', '"Quoted" first', '`Quoted` first'],
+    ];
     // a template with a placeholder is not a constant
     $cases[] = [
       'alert(ts(`Hello ${name}`));',
