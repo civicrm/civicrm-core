@@ -482,8 +482,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   public function createDomainContacts(): void {
     try {
-      $this->organizationCreate(['email' => 'fixme.domainemail@example.org']);
-      $this->organizationCreate([
+      // The contacts are recreated with new ids, so the domains and the seeded
+      // financial accounts must be pointed at them.
+      $oldContactIDs = CRM_Core_DAO::executeQuery('SELECT id, contact_id FROM civicrm_domain WHERE id IN (1, 2)')->fetchMap('id', 'contact_id');
+      $newContactIDs[1] = $this->organizationCreate(['email' => 'fixme.domainemail@example.org']);
+      $newContactIDs[2] = $this->organizationCreate([
         'organization_name' => 'Second Domain',
         'api.Email.create' => ['email' => 'domainemail2@example.org'],
         'api.Address.create' => [
@@ -504,6 +507,13 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
           'email' => 'info@EXAMPLE.ORG',
         ])
         ->setRecords([['domain_id' => 1], ['domain_id' => 2]])->execute();
+      foreach ($newContactIDs as $domainID => $contactID) {
+        CRM_Core_DAO::executeQuery('UPDATE civicrm_domain SET contact_id = %1 WHERE id = %2', [1 => [$contactID, 'Integer'], 2 => [$domainID, 'Integer']]);
+        if (!empty($oldContactIDs[$domainID])) {
+          CRM_Core_DAO::executeQuery('UPDATE civicrm_financial_account SET contact_id = %1 WHERE contact_id = %2', [1 => [$contactID, 'Integer'], 2 => [$oldContactIDs[$domainID], 'Integer']]);
+        }
+      }
+      unset(Civi::$statics['CRM_Core_BAO_Domain']['current']);
     }
     catch (CRM_Core_Exception $e) {
       $this->fail('failed to re-instate domain contacts ' . $e->getMessage());
