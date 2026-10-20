@@ -103,7 +103,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
   public function updateFinancialRecordsOnContributionUpdate(array $params): array {
     $trxnParams = $this->getTrxnParams();
     $params['trxnParams'] = $trxnParams;
-    $updated = FALSE;
     $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $this->getOriginalContribution()->total_amount;
     $params['trxnParams']['fee_amount'] = $this->getOriginalContribution()->fee_amount;
     $params['trxnParams']['net_amount'] = $this->getOriginalContribution()->net_amount;
@@ -155,7 +154,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
     ) {
       //Update Financial Records
       $this->updateFinancialAccountsOnContributionStatusChange($params);
-      $updated = TRUE;
     }
 
     // change Payment Instrument for a Completed contribution
@@ -165,7 +163,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $params['trxnParams']['check_number'] = $params['check_number'] ?? NULL;
 
     if ($this->isPaymentInstrumentChange($params)) {
-      $updated = $this->updateFinancialAccountsOnPaymentInstrumentChange($params);
+      $this->updateFinancialAccountsOnPaymentInstrumentChange($params);
     }
 
     //if Change contribution amount
@@ -181,26 +179,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $params['trxnParams']['from_financial_account_id'] = NULL;
       $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $this->getOriginalContribution()->total_amount);
       $this->updateFinancialAccounts($params['trxnParams'], 'changedAmount');
-      $updated = TRUE;
     }
 
-    if (!$updated) {
-      // Looks like we might have a data correction update.
-      // This would be a case where a transaction id has been entered but it is incorrect &
-      // the person goes back in & fixes it, as opposed to a new transaction.
-      // Currently the UI doesn't support multiple refunds against a single transaction & we are only supporting
-      // the data fix scenario.
-      // CRM-17751.
-      if (isset($params['refund_trxn_id'])) {
-        $refundIDs = CRM_Core_BAO_FinancialTrxn::getRefundTransactionIDs($params['id']);
-        if (!empty($refundIDs['financialTrxnId']) && $refundIDs['trxn_id'] != $params['refund_trxn_id']) {
-          civicrm_api3('FinancialTrxn', 'create', [
-            'id' => $refundIDs['financialTrxnId'],
-            'trxn_id' => $params['refund_trxn_id'],
-          ]);
-        }
-      }
-    }
     // Process fee.
     if (!empty($this->getUpdatedContributionValue('fee_amount')) && (empty($this->getOriginalContribution()) || $this->getUpdatedContribution()->fee_amount != $this->getOriginalContribution()->fee_amount)) {
       $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
