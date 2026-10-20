@@ -36,10 +36,22 @@ class CRM_Core_Page_AJAX_Location {
     $ufID = CRM_Utils_Request::retrieve('ufID', 'Integer', CRM_Core_DAO::$_nullObject, TRUE);
 
     // Verify user id
-    $user = CRM_Utils_Request::retrieve('uid', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, CRM_Core_Session::singleton()
-      ->get('userID'));
-    if (empty($user) || (CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE) && !CRM_Contact_BAO_Contact_Permission::validateChecksumContact($user, CRM_Core_DAO::$_nullObject, FALSE))
-    ) {
+    $uid = CRM_Utils_Request::retrieve('uid', 'Integer');
+    $cs = CRM_Utils_Request::retrieve('cs', 'String');
+    if ($uid) {
+      if (!$cs || !CRM_Contact_BAO_Contact_Permission::validateChecksumContact($uid, CRM_Core_DAO::$_nullObject, FALSE)) {
+        CRM_Utils_System::civiExit();
+      }
+      $user = $uid;
+    }
+    elseif ($cs) {
+      CRM_Utils_System::civiExit();
+    }
+    else {
+      $user = CRM_Core_Session::getLoggedInContactID();
+    }
+
+    if (empty($user)) {
       CRM_Utils_System::civiExit();
     }
 
