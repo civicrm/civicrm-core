@@ -326,6 +326,23 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($tagA['id'], $entityTags->first()['tag_id']);
   }
 
+  /**
+   * A tag merged into its own descendant hands its place in the tree to it.
+   */
+  public function testMergeTagIntoDescendant(): void {
+    $root = $this->createTestRecord('Tag', ['name' => 'root'])['id'];
+    $removed = $this->createTestRecord('Tag', ['name' => 'removed', 'parent_id' => $root])['id'];
+    $middle = $this->createTestRecord('Tag', ['name' => 'middle', 'parent_id' => $removed])['id'];
+    $target = $this->createTestRecord('Tag', ['name' => 'target', 'parent_id' => $middle])['id'];
+
+    Tag::merge(FALSE)->setTargetId($target)->setTagIds([$removed])->execute();
+
+    $parents = Tag::get(FALSE)
+      ->addWhere('id', 'IN', [$middle, $target])
+      ->execute()->column('parent_id', 'id');
+    $this->assertSame([$middle => $target, $target => $root], $parents);
+  }
+
   public function testMergeReservedTagRequiresPermission(): void {
     $this->createLoggedInUser();
 
