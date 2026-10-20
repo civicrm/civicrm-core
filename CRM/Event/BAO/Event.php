@@ -1531,45 +1531,24 @@ WHERE  id = $cfID
    *   Id of Primary participant.
    * @param array $values
    *   Key/value event info.
-   * @param int $contactId
-   *   Contact id of Primary participant.
-   * @param bool $isTest
-   *   Whether test or live transaction.
-   * @param bool $isIdsArray
-   *   To return an array of Ids.
-   *
-   * @param bool $skipCancel
    *
    * @return array
    *   array of Additional participant's info OR array of Ids.
+   * @throws \CRM_Core_Exception
+   * @throws \Civi\Core\Exception\DBQueryException
    */
-  public static function buildCustomProfile(
-    $participantId,
-    $values,
-    $contactId = NULL,
-    $isTest = FALSE,
-    $isIdsArray = FALSE,
-    $skipCancel = TRUE
-  ) {
+  public static function buildCustomProfile($participantId, $values) {
 
     $customProfile = $additionalIDs = [];
     if (!$participantId) {
       throw new CRM_Core_Exception(ts('Cannot find participant ID'));
     }
 
-    //set Ids of Primary Participant also.
-    if ($isIdsArray && $contactId) {
-      $additionalIDs[$participantId] = $contactId;
-    }
-
     //hack to skip cancelled participants, CRM-4320
     $where = "participant.registered_by_id={$participantId}";
-    if ($skipCancel) {
-      $cancelStatusId = 0;
-      $negativeStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
-      $cancelStatusId = array_search('Cancelled', $negativeStatuses);
-      $where .= " AND participant.status_id != {$cancelStatusId}";
-    }
+    $negativeStatuses = CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'");
+    $cancelStatusId = array_search('Cancelled', $negativeStatuses);
+    $where .= " AND participant.status_id != {$cancelStatusId}";
     $query = "
   SELECT  participant.id, participant.contact_id
     FROM  civicrm_participant participant
@@ -1578,11 +1557,6 @@ WHERE  id = $cfID
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $additionalIDs[$dao->id] = $dao->contact_id;
-    }
-
-    //return if only array is required.
-    if ($isIdsArray && $contactId) {
-      return $additionalIDs;
     }
 
     $preProfileID = $values['additional_custom_pre_id'] ?? NULL;
@@ -1602,7 +1576,7 @@ WHERE  id = $cfID
             $participantParams = $values['params'][$pId] ?? [];
           }
 
-          [$profilePre, $groupTitles] = self::buildCustomDisplay($preProfileID,
+          [$profilePre, $groupTitles] = CRM_Event_BAO_Event::buildCustomDisplay($preProfileID,
             'additionalCustomPre',
             $cId,
             $template,
@@ -1620,7 +1594,7 @@ WHERE  id = $cfID
             }
           }
 
-          [$profilePost, $groupTitles] = self::buildCustomDisplay($postProfileID,
+          [$profilePost, $groupTitles] = CRM_Event_BAO_Event::buildCustomDisplay($postProfileID,
             'additionalCustomPost',
             $cId,
             $template,
