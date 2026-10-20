@@ -1950,7 +1950,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     // ensure that the LineItem data add up to the data at the Contribution level
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
-        'contribution_id' => 1,
+        'contribution_id' => $lineItem['contribution_id'],
         'return' => ['tax_amount', 'total_amount'],
       ]
     );

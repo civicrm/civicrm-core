@@ -175,7 +175,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'activity_date_time' => date('Ymd'),
     ];
 
-    CRM_Activity_BAO_Activity::create($params);
+    $activityID = CRM_Activity_BAO_Activity::create($params)->id;
 
     // set custom hook
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'hook_civicrm_aclWhereClause']);
@@ -194,7 +194,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     // Note that because there is a target contact but it is not accessible the output is an empty string not n/a
     $this->assertEquals('', $activities['data'][0]['target_contact_name']);
     // verify that doing the underlying query shows we get a target contact_id
-    $this->assertEquals(1, CRM_Activity_BAO_Activity::getActivities(['contact_id' => $contactId])[1]['target_contact_count']);
+    $this->assertEquals(1, CRM_Activity_BAO_Activity::getActivities(['contact_id' => $contactId])[$activityID]['target_contact_count']);
     $this->cleanUpAfterACLs();
   }
 
@@ -673,7 +673,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'source_contact_id' => $contactId,
       'target_contact_id' => $targetContactIDs,
     ];
-    $this->activityCreate($activityParams);
+    $activityID = $this->activityCreate($activityParams)['id'];
 
     $params = [
       'contact_id' => $contactId,
@@ -681,10 +681,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     ];
     $activities = CRM_Activity_BAO_Activity::getActivities($params);
     //verify target count
-    $this->assertEquals($targetCount, $activities[1]['target_contact_count']);
-    $this->assertEquals([$targetContactIDs[0] => 'Anderson, Anthony II'], $activities[1]['target_contact_name']);
-    $this->assertEquals('Anderson, Anthony II', $activities[1]['source_contact_name']);
-    $this->assertEquals('Anderson, Anthony II', $activities[1]['assignee_contact_name'][4]);
+    $this->assertEquals($targetCount, $activities[$activityID]['target_contact_count']);
+    $this->assertEquals([$targetContactIDs[0] => 'Anderson, Anthony II'], $activities[$activityID]['target_contact_name']);
+    $this->assertEquals('Anderson, Anthony II', $activities[$activityID]['source_contact_name']);
+    $this->assertEquals('Anderson, Anthony II', $activities[$activityID]['assignee_contact_name'][4]);
   }
 
   /**
@@ -1704,8 +1704,9 @@ $textValue
     $result = $this->callAPISuccess('Activity', 'get', ['campaign_id' => $this->getCampaignID()]);
     // An activity created for each of the two contacts
     $this->assertEquals(3, $result['count']);
-    foreach ($result['values'] as $activity) {
-      $displayName = $this->callAPISuccessGetValue('Contact', ['id' => $this->ids['Contact'][$activity['id']], 'return' => 'display_name']);
+    $contactIDs = [$contactId1, $contactId2, $contactId3];
+    foreach (array_values($result['values']) as $index => $activity) {
+      $displayName = $this->callAPISuccessGetValue('Contact', ['id' => $contactIDs[$index], 'return' => 'display_name']);
       $htmlValue = str_replace('{contact.display_name}', $displayName, $html);
       $textValue = str_replace('{contact.display_name}', $displayName, $text);
       $subjectValue = str_replace('{contact.display_name}', $displayName, $subject);

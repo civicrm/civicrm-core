@@ -18,10 +18,15 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
    */
   protected $individualID;
 
+  /**
+   * @var int
+   */
+  protected $contributionID;
+
   public function setUp(): void {
     parent::setUp();
     $this->individualID = $this->individualCreate();
-    $this->contributionCreate([
+    $this->contributionID = $this->contributionCreate([
       'contact_id' => $this->individualID,
       'receive_date' => '2017-01-30',
     ]);
@@ -51,18 +56,22 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
     $form->postProcess();
     $qfKey = $form->controller->_key;
     $rows = $form->controller->get('rows');
+    // The activity is created internally when the contribution is created.
+    $activityID = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('source_record_id', '=', $this->contributionID)
+      ->execute()->single()['id'];
     $this->assertEquals([
       [
         'contact_id' => '3',
         'contact_type' => '<a href="/index.php?q=civicrm/contact/view&amp;reset=1&amp;cid=3" data-tooltip-url="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4&amp;is_show_email_task=1" class="crm-summary-link" aria-labelledby="crm-contactname-content"><i class="crm-i fa-fw fa-user" title="" role="img" aria-hidden="true"></i></a>',
         'sort_name' => 'Anderson, Anthony II',
         'display_name' => 'Mr. Anthony Anderson II',
-        'activity_id' => '1',
+        'activity_id' => $activityID,
         'activity_date_time' => '2017-01-30 00:00:00',
         'activity_status_id' => '2',
         'activity_status' => 'Completed',
         'activity_subject' => '$ 100.00 - SSF',
-        'source_record_id' => '1',
+        'source_record_id' => $this->contributionID,
         'activity_type_id' => '6',
         'activity_type' => 'Contribution',
         'activity_is_test' => '0',
@@ -70,9 +79,9 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
         'assignee_contact_name' => [],
         'source_contact_id' => '3',
         'source_contact_name' => 'Anderson, Anthony II',
-        'checkbox' => 'mark_x_1',
+        'checkbox' => 'mark_x_' . $activityID,
         'mailingId' => '',
-        'action' => '<span><a href="/index.php?q=civicrm/contact/view/contribution&amp;action=view&amp;reset=1&amp;id=1&amp;cid=3&amp;context=search&amp;searchContext=activity&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=\'View Activity\' >View</a></span>',
+        'action' => '<span><a href="/index.php?q=civicrm/contact/view/contribution&amp;action=view&amp;reset=1&amp;id=' . $this->contributionID . '&amp;cid=3&amp;context=search&amp;searchContext=activity&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=\'View Activity\' >View</a></span>',
         'campaign' => NULL,
         'campaign_id' => NULL,
         'repeat' => '',

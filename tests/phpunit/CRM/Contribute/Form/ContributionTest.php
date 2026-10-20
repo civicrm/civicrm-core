@@ -1166,7 +1166,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], $contribution['id']);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
-        'contribution_id' => 1,
+        'id' => $contribution['id'],
         'return' => ['tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'],
       ]
     );
@@ -1227,7 +1227,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], $contribution['id']);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
-        'contribution_id' => 1,
+        'id' => $contribution['id'],
         'return' => ['tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'],
       ]
     );
@@ -1274,11 +1274,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
     ]);
-    $contribution = $this->callAPISuccessGetSingle('Contribution',
-      [
-        'contribution_id' => 1,
-      ],
-    );
+    $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType', 'Campaign Contribution', 'id', 'name');
     $this->submitContributionForm([
       'id' => $contribution['id'],
@@ -1294,7 +1290,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], $contribution['id']);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
-        'contribution_id' => 1,
+        'id' => $contribution['id'],
         'return' => ['tax_amount', 'total_amount', 'net_amount', 'financial_type_id', 'receive_date', 'payment_instrument_id'],
       ]
     );
@@ -1321,7 +1317,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ]);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       [
-        'contribution_id' => 1,
         'return' => [
           'tax_amount',
           'total_amount',

@@ -546,6 +546,10 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
       'id' => $this->getLoggedInUser(),
     ]);
 
+    $activityIDs = \Civi\Api4\CaseActivity::get(FALSE)
+      ->addWhere('case_id', '=', $case_id)
+      ->addOrderBy('activity_id')
+      ->execute()->column('activity_id');
     foreach ($expected['activities'] as $idx => $activity) {
       $expected['activities'][$idx]['fields'][3]['value'] = $display_name['display_name'];
       $expected['activities'][$idx]['fields'][4]['value'] = $display_name['display_name'];
@@ -555,7 +559,7 @@ class CRM_Case_XMLProcessor_ReportTest extends CiviCaseTestCase {
         'option_group_id' => 'activity_type',
         'name' => $expected['activities'][$idx]['fields'][1]['value'],
       ]);
-      $expected['activities'][$idx]['editURL'] = CRM_Utils_System::url('civicrm/case/activity', "reset=1&cid={$client_id}&caseid={$case_id}&action=update&atype={$activityTypeId['value']}&id=" . ($idx + 1));
+      $expected['activities'][$idx]['editURL'] = CRM_Utils_System::url('civicrm/case/activity', "reset=1&cid={$client_id}&caseid={$case_id}&action=update&atype={$activityTypeId['value']}&id=" . $activityIDs[$idx]);
     }
   }
 

@@ -117,14 +117,14 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $expectedStrings = [
       'Your Contribution(s)',
       '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Contribution Date</th><th>Receipt Sent</th><th>Balance</th><th>Status</th><th></th>',
-      '<td>Completed</td><td><a class="button no-popup nowrap" href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=2&amp;cid=' . $this->contactID . '"><i class="crm-i fa-download" role="img" aria-hidden="true"></i><span>Download Invoice</span></a></td></tr><tr id=\'rowid1\'',
+      '<td>Completed</td><td><a class="button no-popup nowrap" href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=' . $this->contributions[1] . '&amp;cid=' . $this->contactID . '"><i class="crm-i fa-download" role="img" aria-hidden="true"></i><span>Download Invoice</span></a></td></tr><tr id=\'rowid' . $this->contributions[0] . '\'',
       'Pay Now',
     ];
 
     $this->assertPageContains($expectedStrings);
     $this->assertSmartyVariableArrayIncludes('contribute_rows', 2, [
       'contact_id' => $this->contactID,
-      'contribution_id' => '1',
+      'contribution_id' => $this->contributions[0],
       'total_amount' => '100.00',
       'financial_type' => 'Donation',
       'source' => 'SSF',

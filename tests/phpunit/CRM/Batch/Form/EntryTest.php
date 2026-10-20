@@ -202,14 +202,14 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertEquals('2013-07-17', $memberships[2]['join_date']);
     $memberships = $this->callAPISuccess('Contribution', 'get', ['return' => ['total_amount', 'trxn_id']]);
     $this->assertEquals(3, $memberships['count']);
-    foreach ($memberships['values'] as $key => $contribution) {
+    foreach (array_values($memberships['values']) as $index => $contribution) {
       $this->assertEquals($this->callAPISuccess('LineItem', 'getvalue', [
         'contribution_id' => $contribution['id'],
         'return' => 'line_total',
 
       ]), $contribution['total_amount']);
       $this->assertEquals(1500, $contribution['total_amount']);
-      $this->assertEquals($params['field'][$key]['trxn_id'], $contribution['trxn_id']);
+      $this->assertEquals($params['field'][$index + 1]['trxn_id'], $contribution['trxn_id']);
     }
   }
 

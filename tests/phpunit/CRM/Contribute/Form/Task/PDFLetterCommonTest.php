@@ -281,7 +281,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $formValues['html_message'] .= '{emoji.favourite_emoticon}';
     /** @var CRM_Contribute_Form_Task_PDFLetter $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter', $formValues);
-    $form->setContributionIds([$this->createContribution(array_merge(['campaign_id' => $tokens['campaign_id:label']], $tokens))]);
+    $contributionID = $this->createContribution(array_merge(['campaign_id' => $tokens['campaign_id:label']], $tokens));
+    $form->setContributionIds([$contributionID]);
     try {
       $form->postProcess();
     }
@@ -297,7 +298,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
 ' . "    \n" . '  </head>
   <body>
     <div id="crm-container">
-id : 1
+id : ' . $contributionID . '
 total_amount : €9,999.99
 fee_amount : €1,111.11
 net_amount : €7,777.78
@@ -461,7 +462,7 @@ emo
     <td></td>
   </tr>
   </tbody>
-</table>", $html[1]);
+</table>", $html[$contributionIDs[0]]);
     $this->assertEquals("<table border='1' cellpadding='2' cellspacing='0' class='table'>
   <tbody>
   <tr>
@@ -495,12 +496,12 @@ emo
     <td></td>
   </tr>
   </tbody>
-</table>", $html[2]);
+</table>", $html[$contributionIDs[1]]);
 
     $activities = $this->callAPISuccess('Activity', 'get', ['activity_type_id' => 'Print PDF Letter', 'sequential' => 1]);
     $this->assertEquals(2, $activities['count']);
-    $this->assertEquals($html[1], $activities['values'][0]['details']);
-    $this->assertEquals($html[2], $activities['values'][1]['details']);
+    $this->assertEquals($html[$contributionIDs[0]], $activities['values'][0]['details']);
+    $this->assertEquals($html[$contributionIDs[1]], $activities['values'][1]['details']);
     // Checking the cacheable hook is not called multiple times.
     $this->assertEquals(1, $this->hookTokensCalled);
     $mailUtil->checkAllMailLog($html);

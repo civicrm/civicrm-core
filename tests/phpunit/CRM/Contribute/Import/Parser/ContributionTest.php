@@ -78,8 +78,10 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ->addWhere('rule_table', '!=', 'civicrm_email')
       ->addWhere('dedupe_rule_group_id.name', '=', 'IndividualUnsupervised')->execute();
     Civi::settings()->set('enableBackgroundQueue', $this->enableBackgroundQueueOriginalValue);
-    if (file_exists(__DIR__ . '/data/pledge.csv')) {
-      unlink(__DIR__ . '/data/pledge.csv');
+    foreach (['pledge.csv', 'contributions_update.csv'] as $csv) {
+      if (file_exists(__DIR__ . '/data/' . $csv)) {
+        unlink(__DIR__ . '/data/' . $csv);
+      }
     }
     parent::tearDown();
   }
@@ -1020,13 +1022,21 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testImportUpdateExisting(): void {
-    $this->contributionCreate([
+    $contributionID = $this->contributionCreate([
       'contact_id' => $this->individualCreate(),
       'trxn_id' => 'abc',
       'invoice_id' => '65',
       'total_amount' => 8,
       'financial_type_id:name' => 'Event Fee',
     ]);
+    // The csv references the contribution by id, so it is written once the contribution exists.
+    file_put_contents(__DIR__ . '/data/contributions_update.csv', "Contribution ID,Invoice ID,Trxn ID,Contact ID,Total Amount,Receive Date,Financial Type,Reason,Row Status
+$contributionID,67,abc,8,999,2008-09-20,Donation,Invoice ID mismatch,invalid
+$contributionID,67,abcd,8,999,2008-09-20,Donation,Trxn ID mismatch,invalid
+$contributionID,65,abc,3,999,2008-09-20,Donation,All fields OK,valid
+,65,abc,3,999,2008-09-20,Donation,Only Invoice ID OK,valid
+$contributionID,,\"\",3,99,2008-09-20,Donation,Only Contribution ID OK,valid
+");
     $mapping = [
       ['name' => 'Contribution.id'],
       ['name' => 'Contribution.invoice_id'],

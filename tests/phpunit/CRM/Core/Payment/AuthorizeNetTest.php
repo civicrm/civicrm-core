@@ -164,7 +164,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     );
 
     $requests = $this->getRequestBodies();
-    $this->assertEquals($this->getExpectedRequest($contactId, date('Y-m-d')), $requests[0]);
+    $this->assertEquals($this->getExpectedRequest($contactId, $contribution['id'], date('Y-m-d')), $requests[0]);
     $header = $this->getRequestHeaders()[0];
     $this->assertEquals(['apitest.authorize.net'], $header['Host']);
     $this->assertEquals(['text/xml; charset=UTF8'], $header['Content-Type']);
@@ -303,13 +303,14 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $response = $this->getResponseBodies();
     $this->assertEquals($this->getExpectedRecurResponse(), $response[0], 3);
     $requests = $this->getRequestBodies();
-    $this->assertEquals($this->getExpectedRequest($contactId, date('Y-m-d', strtotime($start_date)), 70.23, 3, 4007000000027, '2022-10'), $requests[0]);
+    $this->assertEquals($this->getExpectedRequest($contactId, $contribution['id'], date('Y-m-d', strtotime($start_date)), 70.23, 3, 4007000000027, '2022-10'), $requests[0]);
   }
 
   /**
    * Get the content that we expect to see sent out.
    *
    * @param int $contactID
+   * @param int $contributionID
    * @param string $startDate
    *
    * @param int $amount
@@ -319,7 +320,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    *
    * @return string
    */
-  public function getExpectedRequest($contactID, $startDate, $amount = 7, $occurrences = 12, $cardNumber = 4444333322221111, $cardExpiry = '2025-09') {
+  public function getExpectedRequest($contactID, $contributionID, $startDate, $amount = 7, $occurrences = 12, $cardNumber = 4444333322221111, $cardExpiry = '2025-09') {
     return '<?xml version="1.0" encoding="utf-8"?>
 <ARBCreateSubscriptionRequest xmlns="AnetApi/xml/v1/schema/AnetApiSchema.xsd">
   <merchantAuthentication>
@@ -344,7 +345,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       </creditCard>
     </payment>
       <order>
-     <invoiceNumber>1</invoiceNumber>
+     <invoiceNumber>' . $contributionID . '</invoiceNumber>
         </order>
        <customer>
       <id>' . $contactID . '</id>
