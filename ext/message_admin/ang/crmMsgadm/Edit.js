@@ -221,11 +221,13 @@
           if (isCreate) {
             $ctrl.records.main.id = result[0].id;
           }
-          return crmApi4('EntityTag', 'replace', {
-            where: [['entity_table', '=', 'civicrm_msg_template'], ['entity_id', '=', $ctrl.records.main.id]],
-            records: ($ctrl.tagIds || []).map(function(id) { return {tag_id: id}; }),
-            match: ['tag_id']
-          }).then(function(entityTagResult) {
+          const tagIds = $ctrl.tagIds || [];
+          const where = [['entity_table', '=', 'civicrm_msg_template'], ['entity_id', '=', $ctrl.records.main.id]];
+          // EntityTag.replace rejects an empty `records`, so removing every tag is a delete.
+          const syncTags = tagIds.length ?
+            crmApi4('EntityTag', 'replace', {where: where, records: tagIds.map((id) => ({tag_id: id})), match: ['tag_id']}) :
+            crmApi4('EntityTag', 'delete', {where: where});
+          return syncTags.then(function(entityTagResult) {
             // Re-baseline the "Show diff" snapshot to what was just saved.
             $ctrl.records.savedMain = angular.copy($ctrl.records.main);
             return entityTagResult;
