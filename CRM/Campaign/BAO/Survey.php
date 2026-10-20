@@ -332,6 +332,11 @@ SELECT  survey.id    as id,
       return $activityDetails;
     }
 
+    $actTypeId = CRM_Core_DAO::getFieldValue('CRM_Campaign_DAO_Survey', $surveyId, 'activity_type_id');
+    if (!$actTypeId) {
+      return $activityDetails;
+    }
+
     $whereClause = NULL;
     if (is_array($statusIds) && !empty($statusIds)) {
       $whereClause = ' AND ( activity.status_id IN ( ' . implode(',', array_values($statusIds)) . ' ) )';
@@ -343,6 +348,7 @@ SELECT  survey.id    as id,
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
 
     $params[1] = [$surveyId, 'Integer'];
+    $params[2] = [$actTypeId, 'Integer'];
     $query = "
     SELECT  activity.id, activity.status_id,
             activityTarget.contact_id as voter_id,
@@ -353,10 +359,11 @@ INNER JOIN  civicrm_activity_contact activityTarget
 INNER JOIN  civicrm_activity_contact activityAssignment
   ON ( activityAssignment.activity_id = activity.id AND activityAssignment.record_type_id = $assigneeID )
      WHERE  activity.source_record_id = %1
+       AND  activity.activity_type_id = %2
      AND  activity.is_deleted = 0 ";
     if (!empty($interviewerId)) {
-      $query .= "AND activityAssignment.contact_id = %2 ";
-      $params[2] = [$interviewerId, 'Integer'];
+      $query .= "AND activityAssignment.contact_id = %3 ";
+      $params[3] = [$interviewerId, 'Integer'];
     }
     $query .= "AND  activityTarget.contact_id IN {$targetContactIds}
             $whereClause";
@@ -558,7 +565,12 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
     ) {
       $surveyActTypes = self::getSurveyActivityType();
       if (array_key_exists($activity->activity_type_id, $surveyActTypes)) {
-        $isSurveyActivity = TRUE;
+        $survey = new CRM_Campaign_DAO_Survey();
+        $survey->id = $activity->source_record_id;
+        $survey->selectAdd('activity_type_id');
+        if ($survey->find(TRUE) && (int) $survey->activity_type_id === (int) $activity->activity_type_id) {
+          $isSurveyActivity = TRUE;
+        }
       }
     }
 
@@ -864,7 +876,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
       FROM  civicrm_contact contact
 INNER JOIN civicrm_activity_contact assignment ON ( assignment.contact_id = contact.id AND record_type_id = $assigneeID )
 INNER JOIN  civicrm_activity activity ON ( activity.id = assignment.activity_id )
-INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
+INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id AND activity.activity_type_id = survey.activity_type_id )
             {$whereClause}";
 
     $interviewer = CRM_Core_DAO::executeQuery($query);
@@ -900,7 +912,7 @@ INNER JOIN  civicrm_survey survey ON ( activity.source_record_id = survey.id )
             survey.id as surveyId,
             survey.release_frequency as release_frequency
       FROM  civicrm_activity activity
-INNER JOIN  civicrm_survey survey ON ( survey.id = activity.source_record_id )
+INNER JOIN  civicrm_survey survey ON ( survey.id = activity.source_record_id AND survey.activity_type_id = activity.activity_type_id )
      WHERE  activity.is_deleted = 0
        AND  activity.status_id = %1
        AND  activity.activity_type_id IN ( ' . implode(', ', $surveyActivityTypesIds) . ' )';
