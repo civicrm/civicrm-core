@@ -492,12 +492,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $this->isProcessRegistrationInRealTime()
         ) {
           // if paid event add a contribution record
-          //if primary participant contributing additional amount
-          //append (multiple participants) to its fee level. CRM-4196.
-          if (count($params) > 1) {
-            $participantRecord['amount_level'] .= ' ' . ts('(multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
-          }
-
           //passing contribution id is already registered.
           $contribution = $this->processContribution($participantRecord, $contactID);
         }
@@ -687,6 +681,24 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
+   * Get the text to store as civicrm_contribution.amount_level for this
+   * registration's contribution.
+   *
+   * This is the order's own amount-level text, plus a marker for when the
+   * primary participant's contribution also covers additional participants
+   * registered alongside them. CRM-4196.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function getContributionAmountLevel(): string {
+    $amountLevel = $this->getOrder()->getAmountLevel();
+    if (count($this->getAllSubmittedValues()) > 1) {
+      $amountLevel .= ' ' . ts('(multiple participants)') . CRM_Core_DAO::VALUE_SEPARATOR;
+    }
+    return $amountLevel;
+  }
+
+  /**
    * Process the contribution.
    *
    * @param array $params
@@ -711,7 +723,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'receive_date' => $now,
       'total_amount' => $this->getOrder()->getTotalAmount(),
       'tax_amount' => $this->getOrderTotalTaxAmount(),
-      'amount_level' => $params['amount_level'],
+      'amount_level' => $this->getContributionAmountLevel(),
       'invoice_id' => $this->getInvoiceID(),
       'currency' => $this->getCurrency(),
       'source' => $this->getSource(0),
