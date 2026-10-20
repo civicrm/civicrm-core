@@ -17,13 +17,29 @@ class CRM_Custom_Import_Parser_ApiTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
   use CRMTraits_Import_ParserTrait;
 
+  public function tearDown(): void {
+    if (file_exists(__DIR__ . '/data/custom_data_date_select.csv')) {
+      unlink(__DIR__ . '/data/custom_data_date_select.csv');
+      rmdir(__DIR__ . '/data');
+    }
+    parent::tearDown();
+  }
+
   /**
    * Test the full form-flow import.
    *
    * @throws \CRM_Core_Exception
    */
   public function testImport(): void {
-    $this->individualCreate();
+    $contactID = $this->individualCreate();
+    // The csv references the contact by id, so it is written once the contact exists.
+    mkdir(__DIR__ . '/data');
+    file_put_contents(__DIR__ . '/data/custom_data_date_select.csv', "The Contact ID,The Level,The School,The Start Year
+$contactID,Red,Ah Ha,2010-12-01
+$contactID,R,Bah bah,2022-01-02
+$contactID,Aqua,Cah cah,2022-02-03
+$contactID,\"Red,Yellow\t\",Hogwarts\t,2023-02-03
+");
     $this->createCustomGroupWithFieldOfType(['is_multiple' => TRUE, 'extends' => 'Contact'], 'select', 'level', ['serialize' => 1]);
 
     $customGroupID = $this->ids['CustomGroup']['level'];
