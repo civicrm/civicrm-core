@@ -542,6 +542,16 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertTrue($secondContactContributionId >= 10);
     $partialMatch = intdiv($secondContactContributionId, 10);
 
+    // Check we get Contact B with the exact match
+    $exactMatchResult = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['Contribution.id' => $secondContactContributionId])
+      ->execute();
+
+    $this->assertCount(1, $exactMatchResult);
+    $this->assertEquals($contacts[1]['id'], $exactMatchResult[0]['id']);
+
     // Check we dont get Contact B with the partial match
     $partialMatchResult = (array) Contact::autocomplete(FALSE)
       ->setFormName('crmMenubar')
