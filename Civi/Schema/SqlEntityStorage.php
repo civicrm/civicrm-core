@@ -98,11 +98,13 @@ class SqlEntityStorage implements EntityStorageInterface {
   public function getLinksToTable(): array {
     $links = [];
     $thisTableName = \Civi::entity($this->entityName)->getMeta('table');
+    // References to a facade's records (e.g. an Individual) are to its parent entity (e.g. Contact)
+    $thisEntityName = EntityRepository::getFacadeParent($this->entityName) ?? $this->entityName;
     foreach (EntityRepository::getEntities() as $entityName => $entityInfo) {
       $entity = \Civi::entity($entityName);
       $entityFields = array_merge($entity->getFields(), $entity->getCustomFields(['is_active' => NULL]));
       foreach ($entityFields as $fieldName => $fieldInfo) {
-        if (($fieldInfo['entity_reference']['entity'] ?? NULL) === $this->entityName) {
+        if (($fieldInfo['entity_reference']['entity'] ?? NULL) === $thisEntityName) {
           $links[] = [
             'entity' => $entityName,
             'field' => $fieldName,
@@ -119,7 +121,7 @@ class SqlEntityStorage implements EntityStorageInterface {
               // Note: Adding strtolower ensures both values are also lowercase && not something like 'Contact' => 'Contact'
               (strtolower($option['id']) === $option['name'] && $option['id'] === $thisTableName) ||
               // New-style: ['id' => 'value', 'name' => 'EntityName', 'label' => 'Entity Label'][]
-              (strtolower($option['id']) !== $option['name'] && $option['name'] === $this->entityName)
+              (strtolower($option['id']) !== $option['name'] && $option['name'] === $thisEntityName)
             ) {
               $links[] = [
                 'entity' => $entityName,

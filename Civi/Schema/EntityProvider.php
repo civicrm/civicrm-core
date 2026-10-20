@@ -43,7 +43,22 @@ final class EntityProvider {
     $locale = \CRM_Core_I18N::getLocale();
     $cacheKey = $locale . ' ' . $this->entityName;
     if (!isset(Civi::$statics['civi.entity.fields'][$cacheKey])) {
-      Civi::$statics['civi.entity.fields'][$cacheKey] = $this->getMetaProvider()->getFields();
+      $facade = EntityRepository::getFacades()[$this->entityName] ?? NULL;
+      // Facades use their parent's fields (as modified by listeners), altered by the facade's `alterFields`
+      // callback. Fields set to FALSE by the callback are not part of the facade.
+      if ($facade) {
+        $fields = Civi::entity($facade['facade_of'])->getFields();
+        if (isset($facade['alterFields'])) {
+          $fields = $facade['alterFields']($fields);
+          if (!is_array($fields)) {
+            throw new \CRM_Core_Exception("The alterFields callback of facade $this->entityName must return an array of fields");
+          }
+        }
+        Civi::$statics['civi.entity.fields'][$cacheKey] = array_filter($fields);
+      }
+      else {
+        Civi::$statics['civi.entity.fields'][$cacheKey] = $this->getMetaProvider()->getFields();
+      }
       $hookParams = [
         'entity' => $this->entityName,
         'fields' => &Civi::$statics['civi.entity.fields'][$cacheKey],

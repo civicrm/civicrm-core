@@ -475,19 +475,29 @@ class Container {
         \Civi::dispatcher()->dispatch($eventName . "::" . $e->{$fieldName}, $e);
       };
     };
-    $aliasMethodEvent = function($eventName, $methodName) {
-      return function($e) use ($eventName, $methodName) {
-        \Civi::dispatcher()->dispatch($eventName . "::" . $e->{$methodName}(), $e);
-      };
-    };
     $aliasFuncEvent = function($eventName, $func) {
       return function($e) use ($eventName, $func) {
         \Civi::dispatcher()->dispatch($eventName . '::' . $func($e), $e);
       };
     };
 
-    $dispatcher->addListener('civi.api4.validate', $aliasMethodEvent('civi.api4.validate', 'getEntityName'), 100);
-    $dispatcher->addListener('civi.api4.authorizeRecord', $aliasMethodEvent('civi.api4.authorizeRecord', 'getEntityName'), 100);
+    // Dispatch e.g. "civi.api4.authorizeRecord::Activity". For a facade (e.g. Individual), first dispatch for its
+    // parent (e.g. Contact), so that the parent's validation and access rules also apply to the facade.
+    $aliasEntityEvent = function($eventName) {
+      return function($e) use ($eventName) {
+        $entityName = $e->getEntityName();
+        $facadeParent = \Civi\Schema\EntityRepository::getFacadeParent($entityName);
+        if ($facadeParent) {
+          \Civi::dispatcher()->dispatch($eventName . '::' . $facadeParent, $e);
+        }
+        if (!$e->isPropagationStopped()) {
+          \Civi::dispatcher()->dispatch($eventName . '::' . $entityName, $e);
+        }
+      };
+    };
+
+    $dispatcher->addListener('civi.api4.validate', $aliasEntityEvent('civi.api4.validate'), 100);
+    $dispatcher->addListener('civi.api4.authorizeRecord', $aliasEntityEvent('civi.api4.authorizeRecord'), 100);
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);

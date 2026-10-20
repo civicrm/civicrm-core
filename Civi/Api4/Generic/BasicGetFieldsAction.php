@@ -14,6 +14,7 @@ namespace Civi\Api4\Generic;
 
 use Civi\API\Exception\NotImplementedException;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Schema\EntityRepository;
 
 /**
  * Lists information about fields for the $ENTITY entity.
@@ -156,6 +157,11 @@ class BasicGetFieldsAction extends BasicGetAction {
       $values = array_filter($values, function($field) {
         return $field['name'] !== 'contact_type';
       });
+    }
+    // Hide fields which have a fixed value in a facade
+    if (!$isInternal && EntityRepository::getFacadeParent($this->getEntityName())) {
+      $fixedFields = EntityRepository::getFacades()[$this->getEntityName()]['where'];
+      $values = array_filter($values, fn($field) => !array_key_exists($field['name'], $fixedFields));
     }
   }
 

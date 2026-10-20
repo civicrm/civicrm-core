@@ -108,6 +108,18 @@ trait DAOActionTrait {
   }
 
   /**
+   * Add the values set by the entity's `where` info item (e.g. `contact_type` for 'Individual') to a new record.
+   *
+   * They are added before the record is validated, so that required-field checks and validation and access
+   * rules see the values which will be written.
+   *
+   * @param array $record
+   */
+  protected function addPresetValues(array &$record): void {
+    $record = (CoreUtil::getInfoItem($this->getEntityName(), 'where') ?? []) + $record;
+  }
+
+  /**
    * Fill field defaults which were declared by the api.
    *
    * Note: default values from core are ignored because the BAO or database layer will supply them.
