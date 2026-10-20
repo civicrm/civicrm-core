@@ -292,24 +292,23 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * @return bool True if a new child job was created for unqueued recipients, false otherwise.
    */
   private static function queueMissingRecipients(int $mailingID, int $parentJobID): bool {
-    $sql = "
-      SELECT mr.email_id, mr.contact_id, mr.phone_id
-      FROM civicrm_mailing_recipients mr
-      LEFT JOIN civicrm_mailing_event_queue meq
-        ON meq.mailing_id = mr.mailing_id
+    $sql = CRM_Utils_SQL_Select::from('civicrm_mailing_recipients r')
+      ->select(['r.email_id', 'r.contact_id', 'r.phone_id'])
+      ->merge(CRM_Mailing_BAO_MailingRecipients::getDeliverableCriteria($mailingID))
+      ->join('meq', 'LEFT JOIN civicrm_mailing_event_queue meq
+        ON meq.mailing_id = r.mailing_id
         AND meq.is_test = 0
         AND (
-          (mr.email_id IS NOT NULL AND mr.email_id = meq.email_id)
-          OR (mr.phone_id IS NOT NULL AND mr.phone_id = meq.phone_id)
-        )
-      INNER JOIN civicrm_contact cc ON cc.id = mr.contact_id
-      WHERE mr.mailing_id = %1
-        AND meq.id IS NULL
-        AND (mr.email_id > 0 OR mr.phone_id > 0)
-        AND cc.is_opt_out = 0
-    ";
+          (r.email_id IS NOT NULL AND r.email_id = meq.email_id)
+          OR (r.phone_id IS NOT NULL AND r.phone_id = meq.phone_id)
+        )')
+      ->where('r.mailing_id = #mailingID')
+      ->where('meq.id IS NULL')
+      ->where('r.email_id > 0 OR r.phone_id > 0')
+      ->param('#mailingID', $mailingID)
+      ->toSQL();
 
-    $unsent = CRM_Core_DAO::executeQuery($sql, [1 => [$mailingID, 'Integer']])->fetchAll();
+    $unsent = CRM_Core_DAO::executeQuery($sql)->fetchAll();
     if (count($unsent) === 0) {
       return FALSE;
     }
@@ -333,6 +332,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       'job_offset' => $nextOffset,
       'job_limit' => count($unsent),
       'status' => 'Scheduled',
+      'scheduled_date' => 'now',
     ])->execute()->first();
 
     $records = array_map(fn($row) => [
