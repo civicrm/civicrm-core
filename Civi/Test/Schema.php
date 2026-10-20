@@ -201,9 +201,13 @@ class Schema {
    * This sets the AUTO_INCREMENT to flush out tests or code that muddle ids
    * of test entities but pass because the ids are all low starting at 1
    *
+   * @param string[]|null $tables
+   *   Only set these tables (e.g. the ones just truncated), or NULL for all
+   *   tables. A table gets the same offset either way.
+   *
    * @return Schema
    */
-  public function setAutoIncrement() {
+  public function setAutoIncrement(?array $tables = NULL) {
     // Might want to tweak this
     $separation = 100;
     $autoIncrement = 1;
@@ -376,30 +380,28 @@ class Schema {
     $dbName = \Civi\Test::dsn('database');
 
     $pdo = \Civi\Test::pdo();
+    // Only tables with an auto-increment column (AUTO_INCREMENT is NULL for the others).
+    // Order by name so each table gets the same offset on every call.
     $query = sprintf(
       "SELECT table_name FROM INFORMATION_SCHEMA.TABLES
-        WHERE TABLE_SCHEMA = %s AND TABLE_TYPE = 'BASE TABLE'",
+        WHERE TABLE_SCHEMA = %s AND TABLE_TYPE = 'BASE TABLE' AND AUTO_INCREMENT IS NOT NULL
+        ORDER BY table_name",
       $pdo->quote($dbName)
     );
-    $tables = $pdo->query($query);
-    $queries = [
-      "USE {$dbName};",
-    ];
-
-    if (!empty($tables)) {
-      foreach ($tables as $table) {
-        $table_name = $table['TABLE_NAME'] ?? $table['table_name'];
-        if (!in_array($table_name, $excluded_tables, TRUE)) {
-          $autoIncrement += $separation;
-          $queries[] = "ALTER TABLE $table_name AUTO_INCREMENT=$autoIncrement;";
+    $tablesToSet = $tables === NULL ? NULL : array_flip($tables);
+    $queries = [];
+    foreach ($pdo->query($query)->fetchAll(\PDO::FETCH_COLUMN) as $table_name) {
+      if (!in_array($table_name, $excluded_tables, TRUE)) {
+        // The offset comes from the table's position in the full list, so it is
+        // the same whichever tables are being set.
+        $autoIncrement += $separation;
+        if ($tablesToSet === NULL || isset($tablesToSet[$table_name])) {
+          $queries[] = "ALTER TABLE `$dbName`.`$table_name` AUTO_INCREMENT=$autoIncrement;";
         }
       }
     }
-    foreach ($queries as $query) {
-      if (\Civi\Test::execute($query) === FALSE) {
-        throw new RuntimeException("Query failed: $query");
-      }
-    }
+    // execute() throws if a query fails.
+    \Civi\Test::execute(implode("\n", $queries));
     return $this;
   }
 
