@@ -125,27 +125,33 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
    * @return array
    */
   public static function _defaultContactCountries($availableCountries) {
-    // localise the country names if in an non-en_US locale
-    $tsLocale = CRM_Core_I18n::getLocale();
-    if ($tsLocale != '' and $tsLocale != 'en_US') {
-      $i18n = CRM_Core_I18n::singleton();
-      $i18n->localizeArray($availableCountries, [
-        'context' => 'country',
-      ]);
+    $tsLocale = CRM_Core_I18n::getLocale() ?: 'en_US';
+    $cacheKey = 'defaultContactCountries' . $tsLocale . md5(implode('|', array_values($availableCountries)));
+
+    if (!isset(Civi::$statics[__CLASS__][$cacheKey])) {
+      // localise the country names if in an non-en_US locale
+      if ($tsLocale != '' and $tsLocale != 'en_US') {
+        $i18n = CRM_Core_I18n::singleton();
+        $i18n->localizeArray($availableCountries, [
+          'context' => 'country',
+        ]);
+      }
       $availableCountries = CRM_Utils_Array::asort($availableCountries);
-    }
-    $pinnedContactCountries = CRM_Core_BAO_Country::pinnedContactCountries($availableCountries);
-    // if default country is set, percolate it to the top, then pinned countries and then remaining available countries.
-    if ($defaultContactCountry = Civi::settings()->get('defaultContactCountry')) {
-      $default = [$defaultContactCountry => $availableCountries[$defaultContactCountry] ?? NULL];
-      $availableCountries = $default + $pinnedContactCountries + $availableCountries;
-    }
-    elseif (!empty($pinnedContactCountries)) {
-      // if default country is missing then use only pinned countries at the top then rest of the countries.
-      $availableCountries = $pinnedContactCountries + $availableCountries;
+
+      $pinnedContactCountries = CRM_Core_BAO_Country::pinnedContactCountries($availableCountries);
+      // if default country is set, percolate it to the top, then pinned countries and then remaining available countries.
+      if ($defaultContactCountry = Civi::settings()->get('defaultContactCountry')) {
+        $default = [$defaultContactCountry => $availableCountries[$defaultContactCountry] ?? NULL];
+        $availableCountries = $default + $pinnedContactCountries + $availableCountries;
+      }
+      elseif (!empty($pinnedContactCountries)) {
+        // if default country is missing then use only pinned countries at the top then rest of the countries.
+        $availableCountries = $pinnedContactCountries + $availableCountries;
+      }
+      Civi::$statics[__CLASS__][$cacheKey] = $availableCountries;
     }
 
-    return $availableCountries;
+    return Civi::$statics[__CLASS__][$cacheKey];
   }
 
   /**
