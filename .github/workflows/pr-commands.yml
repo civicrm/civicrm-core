@@ -9,7 +9,7 @@ jobs:
     name: Execute PR Command
     if: |
       github.event.issue.pull_request != null &&
-      (startsWith(github.event.comment.body, '/squash') || startsWith(github.event.comment.body, '/rebase') || startsWith(github.event.comment.body, '/lintroll') || startsWith(github.event.comment.body, '/lint') || startsWith(github.event.comment.body, '/port') || startsWith(github.event.comment.body, '/SQUASH') || startsWith(github.event.comment.body, '/REBASE') || startsWith(github.event.comment.body, '/LINTROLL') || startsWith(github.event.comment.body, '/LINT') || startsWith(github.event.comment.body, '/PORT'))
+      (startsWith(github.event.comment.body, '/squash') || startsWith(github.event.comment.body, '/rebase') || startsWith(github.event.comment.body, '/lintroll') || startsWith(github.event.comment.body, '/lint') || startsWith(github.event.comment.body, '/port') || startsWith(github.event.comment.body, '/backport') || startsWith(github.event.comment.body, '/SQUASH') || startsWith(github.event.comment.body, '/REBASE') || startsWith(github.event.comment.body, '/LINTROLL') || startsWith(github.event.comment.body, '/LINT') || startsWith(github.event.comment.body, '/PORT') || startsWith(github.event.comment.body, '/BACKPORT'))
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs a PR command comment (/squash, /rebase, /port, /lint) for .github/workflows/pr-commands.yml.
+# Runs a PR command comment (/squash, /rebase, /port, /backport, /lint) for .github/workflows/pr-commands.yml.
 # Expects the upstream repo as `origin` in the current directory; inputs come from the environment.
 set -e
 
@@ -17,12 +17,16 @@ fail() {
   exit 1
 }
 
-# Replays the PR's commits onto origin/$1, leaving the result on a detached HEAD.
+# Replays the PR's commits onto origin/$2 for action $1 (rebase or port), leaving the result on a detached HEAD.
 replay_onto() {
-  local target=$1 conflicts instructions
+  local action=$1 target=$2 conflicts instructions
+  git fetch origin "$target"
   if ! git rebase --onto "origin/$target" "$UPSTREAM" "$PR_HEAD"; then
     conflicts=$(git diff --name-only --diff-filter=U)
     git rebase --abort
+    if [ "$action" = "port" ]; then
+      fail "$(printf "### ❌ Port Failed due to Conflicts\n\nPorting this PR to \`%s\` failed due to merge conflicts. The following files have conflicts:\n\`\`\`\n%s\n\`\`\`\n\nPlease create the port locally and open a PR against \`%s\`:\n\`\`\`bash\ngit fetch origin %s %s pull/%s/head\ngit checkout -b port-%s-%s %s\ngit rebase --onto origin/%s %s\n# Resolve conflicts in your editor, then run:\ngit add <conflicted-files>\ngit rebase --continue\n\`\`\`" "$target" "$conflicts" "$target" "$target" "$BASE_REF" "$PR_NUMBER" "$PR_NUMBER" "$target" "$PR_HEAD" "$target" "$(git rev-parse "$UPSTREAM")")"
+    fi
     if [ "$target" = "$BASE_REF" ]; then
       instructions="git rebase origin/$target"
     else
@@ -44,9 +48,9 @@ find_release_branches() {
 check_target() {
   local action=$1 target=$2 force=$3 reason=""
   if [ "$action" = "port" ] && [ "$STATE" = "OPEN" ] && [ "$BASE_REF" = "master" ] && [ "$target" = "$RC_BRANCH" ]; then
-    printf -v reason "\`%s\` is the RC branch and is forward-merged to \`master\`, so a port would duplicate this PR there. To land this change in \`%s\` and \`master\`, run \`/rebase %s\` instead." "$RC_BRANCH" "$RC_BRANCH" "$RC_BRANCH"
+    printf -v reason "\`%s\` is the RC branch and is forward-merged to \`master\`, so a port would duplicate this PR there. To land this change in \`%s\` and \`master\`, run \`/backport rc\` instead." "$RC_BRANCH" "$RC_BRANCH"
   elif [ "$action" = "rebase" ] && [ "$target" = "$STABLE_BRANCH" ] && [ "$BASE_REF" != "$STABLE_BRANCH" ]; then
-    printf -v reason "\`%s\` is the stable branch and is not forward-merged, so after this rebase the change would never reach \`%s\` or \`master\`. To land it in all three, run \`/rebase %s\` and \`/port %s\`." "$STABLE_BRANCH" "$RC_BRANCH" "$RC_BRANCH" "$STABLE_BRANCH"
+    printf -v reason "\`%s\` is the stable branch and is not forward-merged, so after this rebase the change would never reach \`%s\` or \`master\`. To land it in all three, run \`/backport stable\`." "$STABLE_BRANCH" "$RC_BRANCH"
   fi
   if [ -n "$reason" ] && [ -z "$force" ]; then
     fail "$(printf "### ⚠️ Command Not Run\n\n%s\n\nIf you really mean it, run \`/%s %s force\`." "$reason" "$action" "$target")"
@@ -59,7 +63,7 @@ rebase_pr() {
     echo "Branch is already up to date with $BASE_REF."
     return
   fi
-  replay_onto "$target"
+  replay_onto rebase "$target"
   git push --force-with-lease head_repo "HEAD:$HEAD_REF"
   if [ "$target" != "$BASE_REF" ]; then
     gh pr edit "$PR_NUMBER" --base "$target" --repo "$REPO"
@@ -68,7 +72,7 @@ rebase_pr() {
 
 port_pr() {
   local target=$1 title port_branch existing_pr new_pr_url body
-  replay_onto "$target"
+  replay_onto port "$target"
   title=$(gh pr view "$PR_NUMBER" --repo "$REPO" --json title --jq '.title')
   port_branch="port-$PR_NUMBER-$target"
   git push --force origin "HEAD:refs/heads/$port_branch"
@@ -87,6 +91,43 @@ port_pr() {
     printf -v body "\`%s\` port: %s\n\nIf this PR changes, you can update the port by running \`/port %s\` again." "$target" "$new_pr_url" "$target"
   fi
   gh pr comment "$PR_NUMBER" --repo "$REPO" --body "$body"
+}
+
+# Lands the PR in $1 (master, the RC or stable) and every newer branch, by rebasing and porting as needed.
+backport_pr() {
+  local target=$1 ports=() branch
+  if [ "$target" != "master" ] && [ "$target" != "$RC_BRANCH" ] && [ "$target" != "$STABLE_BRANCH" ]; then
+    fail "### ❌ Unknown Backport Target"$'\n\n'"\`/backport\` takes \`master\`, \`rc\` or \`$RC_BRANCH\`, \`stable\` or \`$STABLE_BRANCH\`. For other branches, use \`/port\`."
+  fi
+
+  if [ "$STATE" = "OPEN" ]; then
+    # Port only to stable and retarget this PR to master or the RC, which is forward-merged to master
+    if [ "$target" = "$STABLE_BRANCH" ]; then
+      port_pr "$STABLE_BRANCH"
+    fi
+    if [ "$target" = "master" ]; then
+      rebase_pr master
+    else
+      rebase_pr "$RC_BRANCH"
+    fi
+    return
+  fi
+
+  # A merged PR is in its base branch, and in master too if that is the RC
+  if [ "$target" = "$STABLE_BRANCH" ] && [ "$BASE_REF" != "$STABLE_BRANCH" ]; then
+    ports+=("$STABLE_BRANCH")
+  fi
+  if [ "$target" != "master" ] && [ "$BASE_REF" != "$RC_BRANCH" ]; then
+    ports+=("$RC_BRANCH")
+  elif [ "$target" = "master" ] && [ "$BASE_REF" != "master" ] && [ "$BASE_REF" != "$RC_BRANCH" ]; then
+    ports+=(master)
+  fi
+  if [ ${#ports[@]} -eq 0 ]; then
+    echo "Already merged into $BASE_REF, nothing to port."
+  fi
+  for branch in "${ports[@]}"; do
+    port_pr "$branch"
+  done
 }
 
 squash_pr() {
@@ -166,8 +207,8 @@ PR_HEAD=$(git rev-parse HEAD)
 
 CMD=$(echo "$COMMENT_BODY" | head -n 1 | xargs | tr '[:upper:]' '[:lower:]')
 
-if [ "$STATE" = "MERGED" ] && [[ ! "$CMD" =~ ^/port ]]; then
-  echo "Error: Only /port command is allowed on merged pull requests."
+if [ "$STATE" = "MERGED" ] && [[ ! "$CMD" =~ ^/(port|backport) ]]; then
+  echo "Error: Only /port and /backport are allowed on merged pull requests."
   exit 1
 fi
 
@@ -175,7 +216,7 @@ if [[ "$CMD" =~ ^/squash ]]; then
   echo "Running squash..."
   squash_pr
 
-elif [[ "$CMD" =~ ^/(rebase|port)([[:space:]]+([^[:space:]]+))?([[:space:]]+(force)([[:space:]]|$))? ]]; then
+elif [[ "$CMD" =~ ^/(rebase|port|backport)([[:space:]]+([^[:space:]]+))?([[:space:]]+(force)([[:space:]]|$))? ]]; then
   ACTION="${BASH_REMATCH[1]}"
   NEW_BASE="${BASH_REMATCH[3]}"
   FORCE="${BASH_REMATCH[5]}"
@@ -184,9 +225,8 @@ elif [[ "$CMD" =~ ^/(rebase|port)([[:space:]]+([^[:space:]]+))?([[:space:]]+(for
     FORCE="force"
   fi
 
-  if [ "$ACTION" = "port" ] && [ -z "$NEW_BASE" ]; then
-    echo "Error: /port requires a target branch argument (e.g. /port 5.74 or /port stable)."
-    exit 1
+  if [ "$ACTION" != "rebase" ] && [ -z "$NEW_BASE" ]; then
+    fail "### ❌ Target Branch Missing"$'\n\n'"\`/$ACTION\` needs a target branch, e.g. \`/$ACTION stable\`."
   fi
   NEW_BASE="${NEW_BASE:-$BASE_REF}"
   find_release_branches
@@ -194,13 +234,12 @@ elif [[ "$CMD" =~ ^/(rebase|port)([[:space:]]+([^[:space:]]+))?([[:space:]]+(for
     rc) NEW_BASE="$RC_BRANCH" ;;
     stable) NEW_BASE="$STABLE_BRANCH" ;;
   esac
-  check_target "$ACTION" "$NEW_BASE" "$FORCE"
+  if [ "$ACTION" != "backport" ]; then
+    check_target "$ACTION" "$NEW_BASE" "$FORCE"
+  fi
   echo "Running $ACTION to $NEW_BASE..."
 
   git fetch origin "$BASE_REF"
-  if [ "$NEW_BASE" != "$BASE_REF" ]; then
-    git fetch origin "$NEW_BASE"
-  fi
 
   # The commit the PR's own commits start after
   if [ "$STATE" = "MERGED" ]; then
