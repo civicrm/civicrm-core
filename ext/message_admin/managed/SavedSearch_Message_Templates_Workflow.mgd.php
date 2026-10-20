@@ -14,7 +14,6 @@ return [
         'label' => E::ts('System Workflow Messages'),
         'form_values' => [
           'join' => [
-            'MessageTemplate_Translation_entity_id_01' => E::ts('Any Translation'),
             'MessageTemplate_Translation_entity_id_02' => E::ts('Active Translation'),
             'MessageTemplate_Translation_entity_id_03' => E::ts('Draft Translation'),
           ],
@@ -50,16 +49,7 @@ return [
           'groupBy' => ['id'],
           'join' => [
             // The SearchKit editor only recognises join aliases in its own `<join>_NN` form, and
-            // expects condition values JSON-quoted. _01 is read only by the language filter, so
-            // filtering matches drafts as well as active translations without narrowing the
-            // languages the columns list; _02 feeds Translations and _03 Drafts.
-            [
-              'Translation AS MessageTemplate_Translation_entity_id_01',
-              'LEFT',
-              NULL,
-              ['MessageTemplate_Translation_entity_id_01.entity_table', '=', "'civicrm_msg_template'"],
-              ['MessageTemplate_Translation_entity_id_01.entity_id', '=', 'id'],
-            ],
+            // expects condition values JSON-quoted. _02 feeds Translations and _03 Drafts.
             [
               'Translation AS MessageTemplate_Translation_entity_id_02',
               'LEFT',
