@@ -101,7 +101,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function saveOrder(): array {
+  private function saveOrder(): array {
     $contributionAddressID = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedValues());
     $contribution = Order::create(FALSE)
       ->setContributionValues($this->getContributionValues() + [
