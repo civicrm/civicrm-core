@@ -25,19 +25,24 @@ require_once 'tests/phpunit/CRM/Mailing/MailingSystemTestBase.php';
 /**
  * Class FlexMailerSystemTest
  *
- * MailingSystemTest checks that overall composition and delivery of
+ * FlexMailerSystemTest checks that overall composition and delivery of
  * CiviMail blasts works. It extends CRM_Mailing_MailingSystemTestBase
  * which provides the general test scenarios -- but this variation
  * checks that certain internal events/hooks fire.
  *
- * FlexMailerSystemTest is the counterpart to MailingSystemTest.
  * @group headless
  * @group civimail
- * @see CRM_Mailing_MailingSystemTest
  */
 class FlexMailerSystemTest extends \CRM_Mailing_MailingSystemTestBase {
 
   private $counts;
+
+  /**
+   * Whether the test sends mail, so every FlexMailer event should fire.
+   *
+   * @var bool
+   */
+  private $expectDelivery = TRUE;
 
   public function setUp(): void {
     // Activate before transactions are setup.
@@ -82,12 +87,140 @@ class FlexMailerSystemTest extends \CRM_Mailing_MailingSystemTestBase {
     parent::tearDown();
     $this->assertNotEmpty($this->counts['hook_alterMailParams::flexmailer']);
     $this->assertEmpty($this->counts['hook_alterMailParams::civimail'] ?? NULL);
+    if (!$this->expectDelivery) {
+      return;
+    }
     foreach (FlexMailer::getEventTypes() as $event => $class) {
       $this->assertTrue(
         $this->counts[$class] > 0,
         "If FlexMailer is active, $event should fire at least once."
       );
     }
+  }
+
+  /**
+   * A scheme typed in front of a URL token is not doubled in the preview.
+   */
+  public function testMailerPreviewExtraScheme(): void {
+    // Preview only composes; nothing is walked or sent.
+    $this->expectDelivery = FALSE;
+    $contactID = $this->individualCreate();
+    $displayName = $this->callAPISuccess('contact', 'get', ['id' => $contactID]);
+    $displayName = $displayName['values'][$contactID]['display_name'];
+    $this->assertNotEmpty($displayName);
+
+    $params = $this->_params;
+    /** @noinspection HttpUrlsUsage */
+    $params['body_html'] = '<a href="http://{action.unsubscribeUrl}">Unsubscribe written in ckeditor</a>';
+    $params['api.Mailing.preview'] = [
+      'id' => '$value.id',
+      'contact_id' => $contactID,
+    ];
+    $params['options']['force_rollback'] = 1;
+
+    $result = $this->callAPISuccess('mailing', 'create', $params);
+    $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
+    $this->assertMatchesRegularExpression('!>Unsubscribe written in ckeditor</a>!', $previewResult['values']['body_html']);
+    $this->assertMatchesRegularExpression('!<a href="([^"]+)civicrm/mailing/unsubscribe&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
+    $this->assertStringNotContainsString("http://http://", $previewResult['values']['body_html']);
+  }
+
+  /**
+   * Test to check Activity being created on mailing Job.
+   *
+   */
+  public function testMailingActivityCreate(): void {
+    $subject = uniqid('testMailingActivityCreate');
+    $this->runMailingSuccess([
+      'subject' => $subject,
+      'body_html' => 'Test Mailing Activity Create',
+      'scheduled_id' => $this->individualCreate(),
+    ]);
+
+    $this->callAPISuccessGetCount('activity', [
+      'activity_type_id' => 'Bulk Email',
+      'status_id' => 'Completed',
+      'subject' => $subject,
+    ], 1);
+  }
+
+  /**
+   * Test the auto-respond email, including token presence.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailingReplyAutoRespond(): void {
+    // Because our parent class marks the _groupID as private, we can't use that :-(
+    $group_1 = $this->groupCreate([
+      'name' => 'Test Group Mailing Reply',
+      'title' => 'Test Group Mailing Reply',
+    ]);
+    $this->createContactsInGroup(1, $group_1);
+    $domainAddress = \Civi\Api4\Address::get(FALSE)
+      ->addWhere('contact_id', '=', \CRM_Core_BAO_Domain::getDomain()->id)
+      ->addOrderBy('is_primary', 'DESC')
+      ->execute()->first();
+    if ($domainAddress) {
+      \Civi\Api4\Address::update(FALSE)
+        ->setValues(['street_address' => 'Sesame Street'])
+        ->addWhere('id', '=', $domainAddress['id'])
+        ->execute();
+    }
+    else {
+      $this->callAPISuccess('Address', 'create', ['street_address' => 'Sesame Street', 'contact_id' => 1, 'version' => 4]);
+    }
+    // Also _mut is private to the parent, so we have to make our own:
+    $mut = new \CiviMailUtils($this, TRUE);
+
+    $replyComponent = $this->callAPISuccess('MailingComponent', 'get', ['id' => \CRM_Mailing_PseudoConstant::defaultComponent('Reply', ''), 'sequential' => 1])['values'][0];
+    $replyComponent['body_html'] .= ' {domain.address} ';
+    $replyComponent['body_txt'] = ($replyComponent['body_txt'] ?? '') . ' {domain.address} ';
+    $this->callAPISuccess('MailingComponent', 'create', $replyComponent);
+
+    // Create initial mailing to the group.
+    $mailingParams = [
+      'name'           => 'Mailing Reply: mailing ',
+      'subject'        => 'Mailing Reply: test',
+      'created_id'     => 1,
+      'groups'         => ['include' => [$group_1]],
+      'scheduled_date' => 'now',
+      'body_text'      => 'Please just {action.unsubscribeUrl}',
+      'auto_responder' => 1,
+      'reply_id'       => $replyComponent['id'],
+    ];
+
+    // The following code is exactly the same as runMailingSuccess() except that we store the ID of the mailing.
+    $mailing_1 = $this->callAPISuccess('Mailing', 'create', $mailingParams);
+    $mut->assertRecipients([]);
+    $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+
+    $allMessages = $mut->getAllMessages('ezc');
+    $this->assertCount(1, $allMessages);
+
+    // So far so good.
+    $message = end($allMessages);
+    $this->assertInstanceOf(\ezcMailText::class, $message->body);
+    $this->assertEquals('plain', $message->body->subType);
+    $this->assertEquals(1, preg_match(
+      '@mailing/unsubscribe.*jid=(\d+)&qid=(\d+)&h=([0-9a-z]+)@',
+      $message->body->text,
+      $matches
+    ));
+
+    \CRM_Mailing_Event_BAO_MailingEventReply::reply(
+      $matches[1],
+      $matches[2],
+      $matches[3]
+    );
+    $mut->checkMailLog([
+      'Please Send Inquiries to Our Contact Email Address',
+      'Sesame Street',
+      'do-not-reply@chaos.org',
+      'info@EXAMPLE.ORG',
+      'mail1@nul.example.com',
+    ], ['{domain.address}']);
+    $this->callAPISuccess('Mailing', 'delete', ['id' => $mailing_1['id']]);
+    $this->callAPISuccess('Group', 'delete', ['id' => $group_1]);
   }
 
   // ---- Boilerplate ----
