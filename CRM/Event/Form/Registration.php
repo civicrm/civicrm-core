@@ -897,6 +897,164 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * @param int|null $contactID
+   * @param int $participantNumber
+   *
+   * @return int
+   * @throws \CRM_Core_Exception
+   */
+  protected function saveContact(?int $contactID, int $participantNumber): int {
+    $fields = [];
+    //add the contact to group, if add to group is selected for a
+    //particular uf group
+    if (!empty($this->_fields)) {
+      foreach ($this->_fields as $name => $dontCare) {
+        $fields[$name] = 1;
+      }
+    }
+    $params = $this->getSubmittedParticipantValues($participantNumber);
+
+    // If there's no 'first_name' in the profile then overwrite the names from
+    // the billing fields (if they are set)
+    if (is_array($fields)) {
+      if (!array_key_exists('first_name', $fields)) {
+        $nameFields = ['first_name', 'middle_name', 'last_name'];
+        foreach ($nameFields as $name) {
+          $fields[$name] = 1;
+          if (array_key_exists("billing_$name", $params)) {
+            $params[$name] = $params["billing_{$name}"];
+            $params['preserveDBName'] = TRUE;
+          }
+        }
+      }
+    }
+
+    // Add the billing names to the billing address, if a billing name is set
+    $billingLocationTypeID = CRM_Core_BAO_LocationType::getBilling();
+    if (!empty($params['billing_first_name'])) {
+      $params["address_name-{$billingLocationTypeID}"] = $params['billing_first_name'] . ' ' . ($params['billing_middle_name'] ?? '') . ' ' . ($params['billing_last_name'] ?? '');
+      $fields["address_name-{$billingLocationTypeID}"] = 1;
+    }
+
+    $fields["email-{$billingLocationTypeID}"] = 1;
+    $fields['email-Primary'] = 1;
+
+    //if its pay later or additional participant set email address as primary.
+    // Note that it seems this function may have been broken and then
+    // accidentally started working - causing https://lab.civicrm.org/dev/core/-/issues/5330 was
+    // I can't see what changed...
+    if (empty($params['email-Primary']) && (!empty($params['is_pay_later']) || empty($params['is_primary']) ||
+        !$this->isPaidEvent() ||
+        $this->_allowWaitlist ||
+        $this->_requireApproval
+      ) && !empty($params["email-{$billingLocationTypeID}"])
+    ) {
+      $params['email-Primary'] = $params["email-{$billingLocationTypeID}"];
+    }
+    //for free event or additional participant, dont create billing email address.
+    if (empty($params['is_primary'])) {
+      unset($params["email-" . CRM_Core_BAO_LocationType::getBilling()]);
+    }
+    // get the add to groups
+    $addToGroups = [];
+    if ($participantNumber === 0) {
+      $topProfile = 'custom_pre_id';
+      $additionalProfiles = 'custom_post_id';
+    }
+    else {
+      $topProfile = 'additional_custom_pre_id';
+      $additionalProfiles = 'additional_custom_post_id';
+    }
+    $profiles = $this->_values[$additionalProfiles] ?? [];
+    if (!empty($this->_values[$topProfile])) {
+      $profiles[] = $this->_values[$topProfile];
+    }
+    if (!empty($profiles)) {
+      $uFGroups = \Civi\Api4\UFGroup::get(FALSE)
+        ->addSelect('add_to_group_id')
+        ->addWhere('id', 'IN', $profiles)
+        ->execute();
+      foreach ($uFGroups as $uFGroup) {
+        if (!empty($uFGroup['add_to_group_id'])) {
+          $addToGroups[$uFGroup['add_to_group_id']] = $uFGroup['add_to_group_id'];
+        }
+      }
+    }
+
+    // check for profile double opt-in and get groups to be subscribed
+    $subscribeGroupIds = CRM_Core_BAO_UFGroup::getDoubleOptInGroupIds($params, $contactID);
+
+    foreach ($addToGroups as $k) {
+      if (array_key_exists($k, $subscribeGroupIds)) {
+        unset($addToGroups[$k]);
+      }
+    }
+
+    // since we are directly adding contact to group lets unset it from mailing
+    if (!empty($addToGroups)) {
+      foreach ($addToGroups as $groupId) {
+        if (isset($subscribeGroupIds[$groupId])) {
+          unset($subscribeGroupIds[$groupId]);
+        }
+      }
+    }
+    if ($contactID) {
+      $ctype = CRM_Core_DAO::getFieldValue(
+        'CRM_Contact_DAO_Contact',
+        $contactID,
+        'contact_type'
+      );
+
+      if (array_key_exists('contact_id', $params) && empty($params['contact_id'])) {
+        // we unset this here because the downstream function ignores the contactID we give it
+        // if it is set & it is difficult to understand the implications of 'fixing' this downstream
+        // but if we are passing a contact id into this function it's reasonable to assume we don't
+        // want it ignored
+        unset($params['contact_id']);
+      }
+
+      $contactID = CRM_Contact_BAO_Contact::createProfileContact(
+        $params,
+        $fields,
+        $contactID,
+        $addToGroups,
+        NULL,
+        $ctype,
+        TRUE
+      );
+    }
+    else {
+
+      foreach (CRM_Contact_BAO_Contact::$_greetingTypes as $greeting) {
+        if (!isset($params[$greeting . '_id'])) {
+          $params[$greeting . '_id'] = CRM_Contact_BAO_Contact_Utils::defaultGreeting('Individual', $greeting);
+        }
+      }
+
+      $contactID = CRM_Contact_BAO_Contact::createProfileContact($params,
+        $fields,
+        NULL,
+        $addToGroups,
+        NULL,
+        NULL,
+        TRUE
+      );
+      $this->set('contactID', $contactID);
+    }
+
+    //get email primary first if exist
+    $subscriptionEmail = ['email' => $params['email-Primary'] ?? NULL];
+    if (!$subscriptionEmail['email']) {
+      $subscriptionEmail['email'] = $params['email-' . CRM_Core_BAO_LocationType::getBilling()] ?? NULL;
+    }
+    // subscribing contact to groups
+    if (!empty($subscribeGroupIds) && $subscriptionEmail['email']) {
+      CRM_Mailing_Event_BAO_MailingEventSubscribe::commonSubscribe($subscribeGroupIds, $subscriptionEmail, $contactID);
+    }
+    return $contactID;
+  }
+
+  /**
    * This is a throw-away object to calculate values, to allow it to validate
    * input values during submission.
    *
@@ -1936,15 +2094,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $registerByID = NULL;
     foreach ($params as $key => $value) {
       if ($value != 'skip') {
-        $fields = NULL;
 
         // setting register by Id and unset contactId.
         if (empty($value['is_primary'])) {
           $contactID = NULL;
           $registerByID = $this->getPrimaryParticipantID();
-          if ($registerByID) {
-            $value['registered_by_id'] = $registerByID;
-          }
           // get an email if one exists for the participant
           $participantEmail = '';
           foreach (array_keys($value) as $valueName) {
@@ -1966,13 +2120,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           $contactID = $this->getContactID();
         }
 
-        CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
-        //for free event or additional participant, dont create billing email address.
-        if (empty($value['is_primary'])) {
-          unset($value["email-{$this->_bltID}"]);
-        }
-
-        $contactID = CRM_Event_Form_Registration_Confirm::updateContactFields($contactID, $value, $fields, $this);
+        $contactID = $this->saveContact($contactID, $key);
 
         // lets store the contactID in the session
         // we dont store in userID in case the user is doing multiple

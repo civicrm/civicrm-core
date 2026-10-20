@@ -468,26 +468,19 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
 
-    $payment = $registerByID = $contribution = NULL;
+    $payment = $contribution = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
-    $fields = [];
     foreach ($params as $participantNum => $participantRecord) {
-      CRM_Event_Form_Registration_Confirm::fixLocationFields($participantRecord, $fields, $this);
-
-      //Unset ContactID for additional participants and set RegisterBy Id.
+      //Unset ContactID for additional participants.
       if (empty($participantRecord['is_primary'])) {
         $contactID = $participantRecord['contact_id'] ?? NULL;
-        $registerByID = $this->getPrimaryParticipantID();
-        if ($this->getPrimaryParticipantID()) {
-          $participantRecord['registered_by_id'] = $this->getPrimaryParticipantID();
-        }
       }
       else {
         $participantRecord['amount'] = $this->getOrderTotalAmount();
       }
 
-      $contactID = CRM_Event_Form_Registration_Confirm::updateContactFields($contactID, $participantRecord, $fields, $this);
+      $contactID = $this->saveContact($contactID, $participantNum);
 
       // lets store the contactID in the session
       // we dont store in userID in case the user is doing multiple
@@ -908,8 +901,11 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @param array $params
    * @param array $fields
    * @param CRM_Event_Form_Registration|CRM_Event_Form_Registration_Confirm $form
+   *
+   * @deprecated since 6.21 will be removed around 6.30
    */
   public static function fixLocationFields(&$params, &$fields, &$form) {
+    CRM_Core_Error::deprecatedFunctionWarning(NULL);
     if (!empty($form->_fields)) {
       foreach ($form->_fields as $name => $dontCare) {
         $fields[$name] = 1;
@@ -963,11 +959,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @param array $fields
    * @param CRM_Event_Form_Registration|CRM_Event_Form_Registration_Confirm $form
    *
+   * @deprecated since 6.21 will be removed around 6.30
    * @return int
    */
   public static function updateContactFields($contactID, $params, $fields, &$form) {
     //add the contact to group, if add to group is selected for a
     //particular uf group
+    CRM_Core_Error::deprecatedFunctionWarning(NULL);
 
     // get the add to groups
     $addToGroups = [];
