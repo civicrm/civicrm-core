@@ -386,8 +386,8 @@ class CustomValueTest extends Api4TestBase {
       ->addValue('test_nulls.stateprovince', 1234)
       ->addValue('test_nulls.country', 1228)
       ->addValue('test_nulls.link', 'http://example.com')
-      ->addValue('test_nulls.contactref', 1)
-      ->addValue('test_nulls.entityref', 1)
+      ->addValue('test_nulls.contactref', $cid)
+      ->addValue('test_nulls.entityref', $cid)
       ->execute();
 
     $contact = $this->getTestRecord('Contact', $cid, ['test_nulls.*']);
@@ -403,8 +403,8 @@ class CustomValueTest extends Api4TestBase {
     $this->assertSame(1234, $contact['test_nulls.stateprovince']);
     $this->assertSame(1228, $contact['test_nulls.country']);
     $this->assertSame('http://example.com', $contact['test_nulls.link']);
-    $this->assertSame(1, $contact['test_nulls.contactref']);
-    $this->assertSame(1, $contact['test_nulls.entityref']);
+    $this->assertSame($cid, $contact['test_nulls.contactref']);
+    $this->assertSame($cid, $contact['test_nulls.entityref']);
 
     // Update all values back to NULL
     Contact::update(FALSE)
