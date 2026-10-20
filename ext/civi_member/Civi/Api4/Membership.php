@@ -22,7 +22,7 @@ class Membership extends Generic\DAOEntity {
 
   /**
    * @param bool $checkPermissions
-   * @return Action\Contribution\Create
+   * @return Action\Membership\Create
    */
   public static function create($checkPermissions = TRUE) {
     return (new Action\Membership\Create(__CLASS__, __FUNCTION__))
