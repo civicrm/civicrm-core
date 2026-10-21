@@ -130,14 +130,16 @@ class CRM_Core_Permission {
 
     foreach ($permissions as $permission) {
       if (is_array($permission)) {
+        $orGranted = FALSE;
         foreach ($permission as $orPerm) {
           if (self::check($orPerm, $contactId)) {
-            //one of our 'or' permissions has succeeded - stop checking this permission
-            return TRUE;
+            $orGranted = TRUE;
+            break;
           }
         }
-        //none of our our conditions was met
-        return FALSE;
+        if (!$orGranted) {
+          return FALSE;
+        }
       }
       else {
         // This is an individual permission
