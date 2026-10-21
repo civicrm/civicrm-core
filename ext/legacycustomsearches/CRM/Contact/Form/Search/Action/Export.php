@@ -30,13 +30,6 @@ class CRM_Contact_Form_Search_Action_Export extends CRM_Core_Form_Task {
    * @param $order
    */
   public static function exportCustom($customSearchClass, $formValues, $order) {
-    $ext = CRM_Extension_System::singleton()->getMapper();
-    if (!$ext->isExtensionClass($customSearchClass)) {
-      require_once str_replace('_', DIRECTORY_SEPARATOR, $customSearchClass) . '.php';
-    }
-    else {
-      require_once $ext->classToPath($customSearchClass);
-    }
     $search = new $customSearchClass($formValues);
 
     $includeContactIDs = FALSE;

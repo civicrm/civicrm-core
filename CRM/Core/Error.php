@@ -21,7 +21,6 @@ use Civi\Core\Exception\DBQueryException;
 
 require_once 'PEAR/ErrorStack.php';
 require_once 'PEAR/Exception.php';
-require_once 'CRM/Core/Exception.php';
 
 require_once 'Log.php';
 

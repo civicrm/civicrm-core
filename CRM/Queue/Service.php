@@ -214,13 +214,7 @@ class CRM_Queue_Service {
    */
   protected function getQueueClass($type) {
     $type = preg_replace('/[^a-zA-Z0-9]/', '', $type);
-    $className = 'CRM_Queue_Queue_' . $type;
-    // FIXME: when used with class-autoloader, this may be unnecessary
-    if (!class_exists($className)) {
-      $classFile = 'CRM/Queue/Queue/' . $type . '.php';
-      require_once $classFile;
-    }
-    return $className;
+    return 'CRM_Queue_Queue_' . $type;
   }
 
   /**

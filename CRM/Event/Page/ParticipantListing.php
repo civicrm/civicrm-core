@@ -69,13 +69,8 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
       ));
     }
 
-    $classFile = str_replace('_',
-        DIRECTORY_SEPARATOR,
-        $className
-      ) . '.php';
-    $error = include_once $classFile;
-    if ($error == FALSE) {
-      CRM_Core_Error::statusBounce(ts('Participant listing code file: %1 does not exist. Please verify your custom participant listing settings in CiviCRM administrative panel.', [1 => $classFile]));
+    if (!class_exists($className)) {
+      CRM_Core_Error::statusBounce(ts('Participant listing code class: %1 does not exist. Please verify your custom participant listing settings in CiviCRM administrative panel.', [1 => $className]));
     }
 
     $participantListingClass = new $className();

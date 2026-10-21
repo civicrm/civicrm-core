@@ -58,7 +58,6 @@ abstract class CRM_SMS_Provider {
       $ext = CRM_Extension_System::singleton()->getMapper();
       if ($ext->isExtensionKey($providerName)) {
         $providerClass = $ext->keyToClass($providerName);
-        require_once "{$providerClass}.php";
       }
       else {
         // If we are running unit tests we simulate an SMS provider with the name "CiviTestSMSProvider"

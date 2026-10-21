@@ -1,7 +1,5 @@
 <?php
 
-require_once 'CRM/Core/Page.php';
-
 /**
  * Accept requests for "civicrm/dev/qunit/$ext/$suite"; locate the qunit
  * test-suite ($suite) in an extension ($ext) and render it.

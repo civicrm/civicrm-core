@@ -1293,16 +1293,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return string
    */
   public function getTemplateFileName() {
-    // TODO: Why is this bit missing from `CRM_Core_Page::getTemplateFileName`?
-    $ext = CRM_Extension_System::singleton()->getMapper();
-    if ($ext->isExtensionClass(CRM_Utils_System::getClassName($this))) {
-      $filename = $ext->getTemplateName(CRM_Utils_System::getClassName($this));
-      $tplname = $ext->getTemplatePath(CRM_Utils_System::getClassName($this)) . DIRECTORY_SEPARATOR . $filename;
-    }
-    else {
-      $tplname = CRM_Utils_System::getTemplateForClass($this);
-    }
-    return $tplname;
+    return CRM_Utils_System::getTemplateForClass($this);
   }
 
   /**

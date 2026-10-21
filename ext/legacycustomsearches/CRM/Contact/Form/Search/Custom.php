@@ -139,16 +139,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
    * @return string
    */
   public function getTemplateFileName() {
-
-    $ext = CRM_Extension_System::singleton()->getMapper();
-
-    if ($ext->isExtensionClass(CRM_Utils_System::getClassName($this->_customClass))) {
-      $fileName = $ext->getTemplatePath(CRM_Utils_System::getClassName($this->_customClass)) . '/' . $ext->getTemplateName(CRM_Utils_System::getClassName($this->_customClass));
-    }
-    else {
-      $fileName = $this->_customClass->templateFile();
-    }
-
+    $fileName = $this->_customClass->templateFile();
     return $fileName ?: parent::getTemplateFileName();
   }
 

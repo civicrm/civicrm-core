@@ -1682,13 +1682,6 @@ abstract class CRM_Core_Payment {
     // possible we may get more. Hence, iterate through all instances ..
 
     while ($dao->fetch()) {
-      // Check pp is extension - is this still required - surely the singleton below handles it.
-      $ext = CRM_Extension_System::singleton()->getMapper();
-      if ($ext->isExtensionKey($dao->class_name)) {
-        $paymentClass = $ext->keyToClass($dao->class_name, 'payment');
-        require_once $ext->classToPath($paymentClass);
-      }
-
       $processorInstance = System::singleton()->getById($dao->processor_id);
 
       // Should never be empty - we already established this processor_id exists and is active.

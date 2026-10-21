@@ -382,10 +382,7 @@ function _civicrm_api3_get_BAO($name) {
   if (!$dao) {
     return NULL;
   }
-  $bao = str_replace("DAO", "BAO", $dao);
-  $file = strtr($bao, '_', '/') . '.php';
-  // Check if this entity actually has a BAO. Fall back on the DAO if not.
-  return stream_resolve_include_path($file) ? $bao : $dao;
+  return CRM_Core_DAO_AllCoreTables::getBAOClassName($dao);
 }
 
 /**
