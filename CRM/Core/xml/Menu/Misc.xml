@@ -104,6 +104,7 @@
      <path>civicrm/ajax/apidoc</path>
      <page_callback>CRM_Admin_Page_APIExplorer::getDoc</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/ajax/rest</path>
