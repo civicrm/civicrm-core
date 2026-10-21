@@ -793,6 +793,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
         ],
       ],
     ], ['cid' => $contactId, 'locno' => 1, 'aid' => $otherAddress['id']]);
+    $formWrapper->processForm();
   }
 
   /**
