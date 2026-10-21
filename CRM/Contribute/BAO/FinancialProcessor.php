@@ -153,30 +153,31 @@ class CRM_Contribute_BAO_FinancialProcessor {
       //Update Financial Records
       $this->updateFinancialAccountsOnContributionStatusChange($params);
     }
+    $trxnParams = $params['trxnParams'];
+    unset($params['trxnParams']);
 
     // change Payment Instrument for a Completed contribution
     // first handle special case when contribution is changed from Pending to Completed status when initial payment
     // instrument is null and now new payment instrument is added along with the payment
-    $params['trxnParams']['payment_instrument_id'] = $this->getUpdatedContribution()->payment_instrument_id;
-    $params['trxnParams']['check_number'] = $params['check_number'] ?? NULL;
+    $trxnParams['payment_instrument_id'] = $this->getUpdatedContribution()->payment_instrument_id;
+    $trxnParams['check_number'] = $this->getInputValue('check_number');
 
     if ($this->isPaymentInstrumentChange()) {
-      $this->updateFinancialAccountsOnPaymentInstrumentChange($params['trxnParams']);
+      $this->updateFinancialAccountsOnPaymentInstrumentChange($trxnParams);
     }
 
     //if Change contribution amount
-    $params['trxnParams']['fee_amount'] = $params['fee_amount'] ?? NULL;
-    $params['trxnParams']['net_amount'] = $params['net_amount'] ?? NULL;
-    $totalAmount = $this->getUpdatedContribution()->total_amount ?? 0;
-    $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $totalAmount;
-    $params['trxnParams']['trxn_id'] = $this->getUpdatedContribution()->trxn_id;
+    $trxnParams['fee_amount'] = $this->getUpdatedContributionValue('fee_amount');
+    $trxnParams['net_amount'] = $this->getUpdatedContributionValue('net_amount');
+    $trxnParams['total_amount'] = $this->getUpdatedContribution()->total_amount ?? 0;
+    $trxnParams['trxn_id'] = $this->getUpdatedContribution()->trxn_id;
     // If the total has changed then create adjustments, but it the financial
     // account has ALSO changed this will already have been dealt with using reverse & recreate above.
     if ($this->isContributionTotalChanged() && !$this->isFinancialAccountChanged()) {
       //Update Financial Records
-      $params['trxnParams']['from_financial_account_id'] = NULL;
-      $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $this->getOriginalContribution()->total_amount);
-      $this->updateFinancialAccounts($params['trxnParams'], 'changedAmount');
+      $trxnParams['from_financial_account_id'] = NULL;
+      $trxnParams['total_amount'] = $trxnParams['net_amount'] = ($this->getUpdatedContributionValue('total_amount') - $this->getOriginalContribution()->total_amount);
+      $this->updateFinancialAccounts($trxnParams, 'changedAmount');
     }
 
     // Process fee.
@@ -184,7 +185,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
       if ($amount) {
         $financialTxnID = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->getContributionID(), 'DESC')['financialTrxnId'];
-        CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount()], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
+        CRM_Core_BAO_FinancialTrxn::recordFees([
+          'to_financial_account_id' => $this->getToFinancialAccount(),
+          'contribution_status_id' => $this->getUpdatedContributionValue('contribution_status_id'),
+          'trxnParams' => $trxnParams,
+        ], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
       }
     }
     if (empty($params['skipLineItem'])) {
@@ -529,7 +534,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
       if (!empty($this->getUpdatedContributionValue('fee_amount')) && (empty($this->getOriginalContribution()) || $this->getUpdatedContribution()->fee_amount != $this->getOriginalContribution()->fee_amount)) {
         $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
         if ($amount) {
-          CRM_Core_BAO_FinancialTrxn::recordFees($params + ['to_financial_account_id' => $this->getToFinancialAccount()], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
+          CRM_Core_BAO_FinancialTrxn::recordFees([
+            'to_financial_account_id' => $this->getToFinancialAccount(),
+            'contribution_status_id' => $this->getUpdatedContributionValue('contribution_status_id'),
+            'trxnParams' => $this->getTrxnParams(),
+          ], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
         }
       }
       if (empty($params['skipLineItem'])) {
