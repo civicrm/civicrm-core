@@ -49,37 +49,14 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
     $this->assertEquals("test.foo.bar", $this->mapper->classToKey('test_foo_bar'));
   }
 
-  public function testClassToPath(): void {
-    $this->assertEquals("{$this->basedir}/weird/foobar/oddball.php", $this->mapper->classToPath('test_foo_bar'));
-  }
-
-  public function testIsExtensionClass(): void {
-    $this->assertTrue($this->mapper->isExtensionClass('test_foo_bar'));
-    $this->assertFalse($this->mapper->isExtensionClass('test.foo.bar'));
-    $this->assertFalse($this->mapper->isExtensionClass('CRM_Core_DAO'));
-  }
-
   public function testIsExtensionKey(): void {
     $this->assertFalse($this->mapper->isExtensionKey('test_foo_bar'));
     $this->assertTrue($this->mapper->isExtensionKey('test.foo.bar'));
     $this->assertFalse($this->mapper->isExtensionKey('CRM_Core_DAO'));
   }
 
-  public function testGetTemplateName(): void {
-    $this->assertEquals("oddball.tpl", $this->mapper->getTemplateName('test_foo_bar'));
-  }
-
-  public function testGetTemplatePath(): void {
-    $this->assertEquals("{$this->basedir}/weird/foobar/templates", $this->mapper->getTemplatePath('test_foo_bar'));
-  }
-
   public function testKeyToClass(): void {
     $this->assertEquals("test_foo_bar", $this->mapper->keyToClass('test.foo.bar'));
-  }
-
-  public function testKeyToPath(): void {
-    $this->assertEquals("{$this->basedir}/weird/foobar/oddball.php", $this->mapper->classToPath('test.foo.bar'));
-    $this->assertEquals("{$this->basedir2}/weird/foobar/oddball.php", $this->mapperWithSlash->classToPath('test.foo.bar'));
   }
 
   public function testKeyToBasePath(): void {

@@ -114,15 +114,12 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * Given the class, provides extension path.
+   * Obsolete converter for ancient pre-civix snake_case extension class names.
    *
-   *
-   * @param string $clazz
-   *
-   * @return string
-   *   full path the extension .php file
+   * @deprecated in 6.21 will be removed around 6.27
    */
   public function classToPath($clazz) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $elements = explode('_', $clazz);
     $key = implode('.', $elements);
     return $this->keyToPath($key);
@@ -144,17 +141,12 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * Given the string, returns true or false if it's an extension class name.
+   * Obsolete checker for ancient pre-civix snake_case extension class names.
    *
-   *
-   * @param string $clazz
-   *   A string which might be an extension class name.
-   *
-   * @return bool
-   *   true if given string is an extension class name
+   * @deprecated in 6.21 will be removed around 6.27
    */
   public function isExtensionClass($clazz) {
-
+    CRM_Core_Error::deprecatedFunctionWarning();
     if (substr($clazz, 0, 4) != 'CRM_') {
       return (bool) preg_match('/^[a-z0-9]+(_[a-z0-9]+)+$/', $clazz);
     }
@@ -514,38 +506,23 @@ class CRM_Extension_Mapper {
   }
 
   /**
-   * Given the class, provides the template path.
+   * Obsolete unused function.
    *
-   *
-   * @param string $clazz
-   *   Extension class name.
-   *
-   * @return string
-   *   path to extension's templates directory
+   * @deprecated in 6.21 will be removed around 6.27
    */
   public function getTemplatePath($clazz) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $path = $this->container->getPath($this->classToKey($clazz));
     return $path . DIRECTORY_SEPARATOR . self::EXT_TEMPLATES_DIRNAME;
-    /*
-    $path = $this->classToPath($clazz);
-    $pathElm = explode(DIRECTORY_SEPARATOR, $path);
-    array_pop($pathElm);
-    return implode(DIRECTORY_SEPARATOR, $pathElm) . DIRECTORY_SEPARATOR . self::EXT_TEMPLATES_DIRNAME;
-     */
   }
 
   /**
-   * Given the class, provides the template name.
-   * @todo consider multiple templates, support for one template for now
+   * Obsolete unused function.
    *
-   *
-   * @param string $clazz
-   *   Extension class name.
-   *
-   * @return string
-   *   extension's template name
+   * @deprecated in 6.21 will be removed around 6.27
    */
   public function getTemplateName($clazz) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $info = $this->keyToInfo($this->classToKey($clazz));
     return (string) $info->file . '.tpl';
   }
