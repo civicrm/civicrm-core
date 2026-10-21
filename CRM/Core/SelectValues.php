@@ -1272,10 +1272,10 @@ class CRM_Core_SelectValues {
         if (in_array($field['data_type'], ['Date', 'File', 'ContactReference', 'EntityReference'])) {
           continue;
         }
-        if ($field['option_group_id']) {
+        if ($field['option_group_id'] && $field['serialize']) {
           $operator = 'CONTAINS';
         }
-        elseif ($field['data_type'] === 'Int') {
+        elseif ($field['option_group_id'] || $field['data_type'] === 'Int') {
           $operator = '=';
         }
         else {
