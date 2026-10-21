@@ -1906,13 +1906,15 @@ class CRM_Core_Permission {
   /**
    * Formats permissions into a nested list for Select2
    *
-   * @param array $groups Permission Types
+   * @internal - signature may change
+   *
+   * @param array $condition Api4 WHERE expression
    *
    * @return array[]
    */
-  public static function getPermissionList(array $groups): array {
+  public static function getPermissionList(array $condition): array {
     $perms = \Civi\Api4\Permission::get(FALSE)
-      ->addWhere('group', 'IN', $groups)
+      ->setWhere([$condition])
       ->addWhere('is_active', '=', 1)
       ->setOrderBy(['title' => 'ASC'])
       ->execute();

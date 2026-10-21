@@ -16,3 +16,15 @@ UPDATE civicrm_state_province SET abbreviation = '87' WHERE country_id = @countr
 
 -- Update ACL menu icon
 UPDATE `civicrm_navigation` SET `icon` = 'crm-i fa-users-between-lines' WHERE `name` = 'Permissions (Access Control)';
+
+-- Update report dashlets and navigation to use synthetic permissions
+UPDATE `civicrm_dashboard`
+SET `permission` = CONCAT('@report:', SUBSTRING(`name`, 8)),
+    `permission_operator` = 'AND'
+WHERE `name` REGEXP '^report/[0-9]+$';
+
+UPDATE `civicrm_navigation`
+SET `permission` = CONCAT('@report:', SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(`url`, 'civicrm/report/instance/', -1), '?', 1), '&', 1), '#', 1)),
+    `permission_operator` = 'AND'
+WHERE `url` REGEXP '^/?civicrm/report/instance/[0-9]+';
+

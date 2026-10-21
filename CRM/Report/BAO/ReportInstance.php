@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
 
 /**
@@ -68,28 +69,6 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
       $params['footer'] = $params['report_footer'];
     }
 
-    // Build permission array for nav & dashlet
-    $permission = [];
-    $permissionOperator = 'AND';
-    if (!empty($params['permission']) && $params['permission'] !== \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
-      $permission[] = $params['permission'];
-    }
-    // Merge in synthetic user role permissions
-    if (!empty($params['grouprole'])) {
-      foreach ($params['grouprole'] as $roleName) {
-        $permission[] = "has user role $roleName";
-      }
-      // This isn't perfect. Reports can have 1 permission and multiple roles.
-      // The roles are supposed to be joined with OR, and then joined to the permission with AND.
-      // But the schema for dashlets & navigation can't do all of that.
-      // This is correct in all cases except for when both a permission and multiple roles are selected.
-      // In that case it will be a little too permissive by joining the permission to the roles with OR
-      // instead of AND, but the report at runtime should still bounce the user if they don't have access.
-      if (count($params['grouprole']) > 1) {
-        $permissionOperator = 'OR';
-      }
-    }
-
     // build navigation parameters
     if (!empty($params['is_navigation'])) {
       if (!array_key_exists('navigation', $params)) {
@@ -97,8 +76,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
       }
       $navigationParams =& $params['navigation'];
 
-      $navigationParams['permission'] = $permission;
-      $navigationParams['permission_operator'] = $permissionOperator;
+      $navigationParams['permission_operator'] = 'AND';
       $navigationParams['label'] = $params['title'];
       $navigationParams['name'] = $params['title'];
 
@@ -123,8 +101,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
       $dashletParams = [
         'label' => $params['title'],
         'is_active' => 1,
-        'permission' => $permission,
-        'permission_operator' => $permissionOperator,
+        'permission_operator' => 'AND',
       ];
     }
 
@@ -137,6 +114,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
       if (empty($params['id']) && !empty($navigationParams['id'])) {
         unset($navigationParams['id']);
       }
+      $navigationParams['permission'] = "@report:$instance->id";
       $navigationParams['url'] = "civicrm/report/instance/{$instance->id}" . ($viewMode == 'view' ? '?reset=1&force=1' : '?reset=1&output=criteria');
       $navigation = CRM_Core_BAO_Navigation::add($navigationParams);
 
@@ -166,6 +144,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
       if (!empty($params['cache_minutes']) && CRM_Utils_Rule::positiveInteger($params['cache_minutes'])) {
         $dashletParams['cache_minutes'] = $params['cache_minutes'];
       }
+      $dashletParams['permission'] = "@report:$instance->id";
       $dashletParams['name'] = "report/{$instance->id}";
       $dashletParams['url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}{$chart}&context=dashlet" . $limitResult;
       $dashletParams['fullscreen_url'] = "civicrm/report/instance/{$instance->id}?reset=1&section={$section}{$chart}&context=dashletFullscreen" . $limitResult;
