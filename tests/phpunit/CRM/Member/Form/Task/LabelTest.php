@@ -16,6 +16,11 @@
  */
 class CRM_Member_Form_Task_LabelTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
+  }
+
   /**
    * Test print label.
    *

@@ -93,6 +93,7 @@ class CiviCaseTestCase extends CiviUnitTestCase {
       'civicrm_group_contact',
       'civicrm_file',
       'civicrm_entity_file',
+      'civicrm_log',
     ], TRUE);
     if (!empty($this->ids['CaseType'])) {
       CaseType::delete(FALSE)->addWhere('id', 'IN', $this->ids['CaseType'])->execute();

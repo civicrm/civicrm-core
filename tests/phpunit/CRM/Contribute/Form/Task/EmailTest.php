@@ -53,8 +53,8 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
       'cc_id' => '',
       'bcc_id' => '',
       'to' => implode(',', [
-        $contact1 . '::teresajensen-nielsen65@spamalot.co.in',
-        $contact2 . '::bob@example.com',
+        \Civi\Api4\Email::get(FALSE)->addWhere('contact_id', '=', $contact1)->execute()->single()['id'],
+        \Civi\Api4\Email::get(FALSE)->addWhere('contact_id', '=', $contact2)->execute()->single()['id'],
       ]),
       'subject' => '{contact.display_name} {contribution.total_amount}',
       'text_message' => '{contribution.financial_type_id:label} {contribution.invoice_number}',
