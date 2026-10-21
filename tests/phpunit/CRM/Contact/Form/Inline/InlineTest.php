@@ -194,7 +194,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $formWrapper->processForm(FormWrapper::VALIDATED);
 
     $this->assertEquals(
-      ['email[2][is_primary]' => ts('Only one can be marked as primary.')],
+      ['email[2][is_primary]' => ts('Only one email can be marked as primary.')],
       $formWrapper->getValidationOutput()
     );
   }
@@ -224,7 +224,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $formWrapper->processForm(FormWrapper::VALIDATED);
 
     $this->assertEquals(
-      ['phone[2][is_primary]' => ts('Only one can be marked as primary.')],
+      ['phone[2][is_primary]' => ts('Only one phone can be marked as primary.')],
       $formWrapper->getValidationOutput()
     );
 
@@ -322,7 +322,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $formWrapper->processForm(FormWrapper::VALIDATED);
 
     $this->assertEquals(
-      ['im[2][is_primary]' => ts('Only one can be marked as primary.')],
+      ['im[2][is_primary]' => ts('Only one IM can be marked as primary.')],
       $formWrapper->getValidationOutput()
     );
 
@@ -420,7 +420,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $formWrapper->processForm(FormWrapper::VALIDATED);
 
     $this->assertEquals(
-      ['openid[2][is_primary]' => ts('Only one can be marked as primary.')],
+      ['openid[2][is_primary]' => ts('Only one OpenID can be marked as primary.')],
       $formWrapper->getValidationOutput()
     );
 

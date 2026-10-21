@@ -92,7 +92,7 @@ trait CRM_Contact_Form_Edit_IMBlockTrait {
     $existingIMs = (array) $this->getExistingIMs()->indexBy('id');
     foreach ($ims as $index => $im) {
       $id = $im['id'] ?? NULL;
-      $dataExists = !CRM_Utils_System::isNull($im['name']);
+      $dataExists = !CRM_Utils_System::isNull($im['name'] ?? NULL);
       if (!$dataExists) {
         unset($ims[$index]);
         continue;
@@ -118,7 +118,7 @@ trait CRM_Contact_Form_Edit_IMBlockTrait {
         ->execute();
     }
 
-    if (!empty($ims)) {
+    if (!empty($existingIMs)) {
       IM::delete()->addWhere('id', 'IN', array_keys($existingIMs))
         ->execute();
     }

@@ -189,7 +189,7 @@ trait CRM_Contact_Form_Edit_EmailBlockTrait {
     $existingEmails = (array) $this->getExistingEmails()->indexBy('id');
     foreach ($emails as $index => $email) {
       $id = $email['id'] ?? NULL;
-      $dataExists = !CRM_Utils_System::isNull($email['email']);
+      $dataExists = !CRM_Utils_System::isNull($email['email'] ?? NULL);
       if (!$dataExists) {
         unset($emails[$index]);
         continue;
