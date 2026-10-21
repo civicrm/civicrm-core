@@ -144,7 +144,7 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
     $mailingParams = [
       'name'           => 'Issue 1108: mailing 1',
       'subject'        => 'Issue 1108: mailing 1',
-      'created_id'     => 1,
+      'created_id'     => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'groups'         => ['include' => [$group_1]],
       'scheduled_date' => 'now',
       'body_text'      => 'Please just {action.unsubscribe}',
@@ -176,7 +176,7 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
     $mailingParams = [
       'name'           => 'Issue 1108: mailing 2',
       'subject'        => 'Issue 1108: mailing 2',
-      'created_id'     => 1,
+      'created_id'     => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'mailings'       => ['include' => [$mailing_1['id']]],
       'groups'         => ['exclude' => [$group_2]],
       'scheduled_date' => 'now',

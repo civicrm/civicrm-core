@@ -228,7 +228,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
   }
 
   public function testRetrieveCaseIdsByContactId(): void {
-    $caseIds = CRM_Case_BAO_Case::retrieveCaseIdsByContactId(3, FALSE, 'housing_support');
+    $caseIds = CRM_Case_BAO_Case::retrieveCaseIdsByContactId($this->ids['Contact']['site_admin'], FALSE, 'housing_support');
     $this->assertEquals([1], $caseIds);
   }
 

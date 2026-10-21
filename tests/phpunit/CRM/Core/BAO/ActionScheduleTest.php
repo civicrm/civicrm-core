@@ -867,7 +867,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       $membershipTypeParams = [
         'title' => 'General',
         'period_type' => 'rolling',
-        'member_of_contact_id' => 1,
+        'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
         'financial_type_id:name' => 'Member Dues',
         'duration_unit' => 'month',
       ];
@@ -2841,7 +2841,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $membershipTypeID = $membershipOverrides['membership_type_id'] ?? $this->fixtures[$fixture]['membership_type_id'];
     if (is_array($membershipTypeID)) {
       $membershipTypeID = MembershipType::create()->setValues(array_merge([
-        'member_of_contact_id' => 1,
+        'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
         'financial_type_id:name' => 'Member Dues',
         'name' => 'fixture-created-type',
       ], $this->fixtures[$fixture]['membership_type_id']))->execute()->first()['id'];

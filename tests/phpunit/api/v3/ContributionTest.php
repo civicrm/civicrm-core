@@ -413,7 +413,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testCreateEmptyContributionIDUseDonation(): void {
     $params = [
       'contribution_id' => FALSE,
-      'contact_id' => 1,
+      'contact_id' => $this->individualID,
       'total_amount' => 1,
       'check_permissions' => FALSE,
       'financial_type_id' => 'Donation',
@@ -1552,7 +1552,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testCreateUpdateContributionInValidStatusChange(): void {
     $contributionParams = [
-      'contact_id' => 1,
+      'contact_id' => $this->individualID,
       'receive_date' => '2012-01-01',
       'total_amount' => 100.00,
       'financial_type_id' => 1,
@@ -3687,7 +3687,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $order = $this->callAPISuccess('Order', 'create', $orderParams);
     $this->callAPISuccess('Payment', 'create', ['total_amount' => 5, 'is_send_notification' => 0, 'order_id' => $order['id']]);
-    $address = $this->callAPISuccess('Address', 'create', ['contribution_id' => $order['id'], 'name' => 'bob', 'contact_id' => 1, 'street_address' => 'blah']);
+    $address = $this->callAPISuccess('Address', 'create', ['contribution_id' => $order['id'], 'name' => 'bob', 'contact_id' => $orderParams['contact_id'], 'street_address' => 'blah']);
     $this->callAPISuccess('Contribution', 'create', ['id' => $order['id'], 'address_id' => $address['id']]);
     $this->callAPISuccess('contribution', 'sendconfirmation', [
       'id' => $order['id'],
@@ -4287,7 +4287,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $membershipType = $this->callAPISuccess('MembershipType', 'create', [
       'domain_id' => 'Default Domain Name',
-      'member_of_contact_id' => 1,
+      'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'financial_type_id' => 'Member Dues',
       'duration_unit' => 'month',
       'duration_interval' => 1,

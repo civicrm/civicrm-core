@@ -36,7 +36,7 @@ class api_v3_PcpTest extends CiviUnitTestCase {
   public function setUp(): void {
     $this->params = [
       'title' => 'Pcp title',
-      'contact_id' => 1,
+      'contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'page_id' => 1,
       'pcp_block_id' => 1,
       'status_id:name' => 'Approved',

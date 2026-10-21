@@ -54,7 +54,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'subject' => 'Accidents in cars cause children',
       'body_text' => 'BEWARE children need regular infusions of toys. Santa knows your {domain.address}. There is no {action.optOutUrl}.',
       'name' => 'mailing name',
-      'created_id' => 1,
+      'created_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'groups' => ['include' => [$this->_groupID]],
       'scheduled_date' => 'now',
     ];

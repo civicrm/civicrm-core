@@ -181,7 +181,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
     // Create initial SMS mailing.
     $params = [
       'name' => 'mailing name',
-      'created_id' => 1,
+      'created_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'sms_provider_id' => $sms_provider['id'],
       'body_text' => 'Test SMS',
     ];

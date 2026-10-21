@@ -436,7 +436,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    * @dataProvider requiredFields
    */
   public function testRequiredFields(array $dataProvider): void {
-    $this->individualCreate(['external_identifier' => 'abc', 'email' => 'jenny@example.com']);
+    $contactID = $this->individualCreate(['external_identifier' => 'abc', 'email' => 'jenny@example.com']);
+    $this->writeCSV('membership_with_multiple_identifiers.csv', "Membership Type, Membership ID, Contact ID, External Identifier, Email,Start date\nGeneral,1,$contactID,abc, jenny@example.com,2022-01-01\n");
     $mapper = [
       ['name' => 'Membership.membership_type_id'],
       ['name' => 'Membership.id'],

@@ -24,7 +24,7 @@ trait MailingTestTrait {
       'subject' => 'maild' . rand(),
       'body_text' => 'bdkfhdskfhduew{domain.address}{action.optOutUrl}',
       'name' => 'mailing name' . rand(),
-      'created_id' => 1,
+      'created_id' => \CRM_Core_BAO_Domain::getDomain()->contact_id,
     ], $params);
 
     $result = $this->callAPISuccess('Mailing', 'create', $params);

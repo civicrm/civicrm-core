@@ -127,7 +127,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     $financialAccountTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
     $params = [
       'name' => 'TestFinancialAccount_' . rand(),
-      'contact_id' => 1,
+      'contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
       'is_deductible' => 0,
       'is_active' => 1,
       'is_reserved' => 0,

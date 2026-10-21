@@ -325,7 +325,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    */
   public function testContactGetPermissionHookNoDeleted(int $version): void {
     $this->_apiversion = $version;
-    $this->callAPISuccess('contact', 'create', ['id' => 2, 'is_deleted' => 1]);
+    $this->callAPISuccess('contact', 'create', ['id' => $this->ids['Contact']['test'], 'is_deleted' => 1]);
     $this->hookClass->setHook('civicrm_aclWhereClause', [
       $this,
       'aclWhereHookAllResults',
@@ -389,12 +389,12 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     ]);
     $result = $this->callAPISuccess('contact', 'get', [
       'sequential' => 1,
-      'id' => 2,
+      'id' => $this->ids['Contact']['test'],
       'check_permissions' => 1,
     ]);
 
     $this->assertEquals(1, $result['count']);
-    $this->assertEquals(2, $result['id']);
+    $this->assertEquals($this->ids['Contact']['test'], $result['id']);
   }
 
   /**
