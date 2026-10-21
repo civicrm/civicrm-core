@@ -740,7 +740,7 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
       $rows[$component_id]['reports'][$dao->id] = [
         'title' => $dao->title,
         'url' => "civicrm/report/instance/{$dao->id}",
-        'permission' => $dao->permission,
+        'permission' => "@report:{$dao->id}",
       ];
     }
     return $rows;

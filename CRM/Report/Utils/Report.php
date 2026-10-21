@@ -320,6 +320,46 @@ WHERE  inst.report_id = %1";
   }
 
   /**
+   * Check if user has permission to access a report instance.
+   *
+   * @param int $instanceId
+   * @param int|null $contactId
+   *
+   * @return bool
+   */
+  public static function checkInstancePermission(int $instanceId, ?int $contactId = NULL): bool {
+    if (!$instanceId || !CRM_Core_DAO::getFieldValue('CRM_Report_BAO_ReportInstance', $instanceId, 'id')) {
+      return FALSE;
+    }
+    if (CRM_Core_Permission::check('administer Reports', $contactId)) {
+      return TRUE;
+    }
+
+    $permission = CRM_Report_BAO_ReportInstance::getDbVal('permission', $instanceId);
+    $groupRole = CRM_Report_BAO_ReportInstance::getDbVal('grouprole', $instanceId);
+
+    $permsToCheck = [];
+    if (!empty($permission) && !str_starts_with($permission, '@report:') && $permission !== CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
+      $permsToCheck[] = $permission;
+    }
+    if (!empty($groupRole)) {
+      $rolePerms = [];
+      foreach ($groupRole as $role) {
+        $rolePerms[] = "has user role $role";
+      }
+      if ($rolePerms) {
+        $permsToCheck[] = $rolePerms;
+      }
+    }
+
+    if (empty($permsToCheck)) {
+      return TRUE;
+    }
+
+    return CRM_Core_Permission::check($permsToCheck, $contactId);
+  }
+
+  /**
    * @param int $instanceId
    *
    * @return bool

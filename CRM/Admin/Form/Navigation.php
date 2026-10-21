@@ -65,14 +65,17 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
     $this->add('text', 'icon', ts('Icon'), ['class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE]);
 
-    $getPerms = (array) \Civi\Api4\Permission::get(0)
-      ->addWhere('group', 'IN', ['civicrm', 'cms', 'const'])
-      ->setOrderBy(['title' => 'ASC'])
-      ->execute();
-    $permissions = [];
-    foreach ($getPerms as $perm) {
-      $permissions[] = ['id' => $perm['name'], 'text' => $perm['title'], 'description' => $perm['description'] ?? ''];
+    // I think the 'userRole' group would also work if we wanted to add that.
+    $conditions = [['group', 'IN', ['civicrm', 'cms', 'const']]];
+
+    // These 4 lines added to support CiviReport. ReportInstances use synthetic permissions which are not in the above groups,
+    // so to prevent the select2 from being blank, this ensures the options include whatever permission the menu already has.
+    $existingPerm = CRM_Core_DAO::unSerializeField($this->_defaults['permission'] ?? NULL, CRM_Core_DAO::SERIALIZE_COMMA);
+    if ($existingPerm) {
+      $conditions[] = ['name', 'IN', $existingPerm];
     }
+
+    $permissions = CRM_Core_Permission::getPermissionList(['OR', $conditions]);
     $this->add('select2', 'permission', ts('Permission'), $permissions, FALSE,
       ['placeholder' => ts('Unrestricted'), 'class' => 'huge', 'multiple' => TRUE]
     );
