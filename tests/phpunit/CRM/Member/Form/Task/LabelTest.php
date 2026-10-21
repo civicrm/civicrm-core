@@ -49,4 +49,34 @@ class CRM_Member_Form_Task_LabelTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test that an offset adds blank labels before the first member.
+   */
+  public function testMembershipLabelOffset(): void {
+    $this->contactMembershipCreate(['contact_id' => $this->individualCreate()]);
+    /** @var CRM_Member_Form_Task_Label $form */
+    $form = $this->getSearchFormObject('CRM_Member_Form_Task_Label', [
+      'task' => 201,
+      'radio_ts' => 'ts_sel',
+    ], 'Search');
+
+    $_SESSION['_' . $form->controller->_name . '_container']['values']['Label'] = [
+      'location_type_id' => NULL,
+      'label_name' => 3475,
+      'offset' => 2,
+    ];
+    $form->preProcess();
+    $form->buildForm();
+    try {
+      $form->postProcess();
+      $this->fail('Expected PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $rows = $e->errorData['rows'];
+      $this->assertCount(3, $rows);
+      $this->assertEquals([-1, -2], array_slice(array_keys($rows), 0, 2));
+      $this->assertEquals([''], $rows[-1]);
+    }
+  }
+
 }

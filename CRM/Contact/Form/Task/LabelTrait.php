@@ -98,8 +98,15 @@ trait CRM_Contact_Form_Task_LabelTrait {
       }
     }
 
+    $offset = $this->getSubmittedValue('offset') ?: 0;
+    $offsettedRows = [];
+    for ($i = 1; $i <= $offset; $i++) {
+      $offsettedRows[-$i] = [''];
+    }
+    $offsettedRows += $reorderedRows;
+
     //call function to create labels
-    $this->createLabel($reorderedRows, $this->getSubmittedValue('label_name'));
+    $this->createLabel($offsettedRows, $this->getSubmittedValue('label_name'));
   }
 
   /**
@@ -110,10 +117,11 @@ trait CRM_Contact_Form_Task_LabelTrait {
    * @param string $format
    *   Format in which labels needs to be printed.
    */
-  private function createLabel(array $contactRows, $format) {
+  private function createLabel(array $contactRows, $format): void {
     $pdf = new CRM_Utils_PDF_Label($format, 'mm');
     $pdf->Open();
     $pdf->AddPage();
+    $pdf->setFillAcross((bool) $this->getSubmittedValue('fill_across'));
 
     //build contact string that needs to be printed
     $val = NULL;
