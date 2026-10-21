@@ -10,12 +10,15 @@
  */
 
 use Civi\Api4\CustomGroup;
+use Civi\Test\ACLPermissionTrait;
 
 /**
  * Class CRM_Core_BAO_CustomGroupTest
  * @group headless
  */
 class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
+
+  use ACLPermissionTrait;
 
   public function setUp(): void {
     parent::setUp();
@@ -28,7 +31,8 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_contact', 'civicrm_campaign'], TRUE);
+    $this->quickCleanup(['civicrm_contact', 'civicrm_campaign', 'civicrm_event'], TRUE);
+    $this->cleanupCachedPermissions();
     parent::tearDown();
   }
 
@@ -729,6 +733,105 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertEquals('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Contact'));
     $this->assertEquals('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Individual'));
     $this->assertEquals('civicrm_participant', CRM_Core_BAO_CustomGroup::mapTableName('Participant'));
+  }
+
+  public function testBuildCustomDataViewEntityReferenceLink(): void {
+    $contactID = $this->createContactWithReference(['data_type' => 'EntityReference', 'fk_entity' => 'Event'], $this->createReferencedEvent());
+    $link = $this->getReferenceFieldView($contactID)['ref_links'][$this->ids['Event']['default']];
+    $this->assertStringContainsString('civicrm/event/info', $link);
+    $this->assertStringContainsString('target="crm-popup"', $link);
+    $this->assertStringContainsString('>Tom &amp; Jerry &lt;b&gt;Gala&lt;/b&gt;</a>', $link);
+  }
+
+  public function testBuildCustomDataViewEntityReferenceWithoutEntityPermission(): void {
+    $contactID = $this->createContactWithReference(['data_type' => 'EntityReference', 'fk_entity' => 'Event'], $this->createReferencedEvent());
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts', 'access all custom data'];
+    $field = $this->getReferenceFieldView($contactID);
+    $this->assertEquals([$this->ids['Event']['default'] => 'Tom &amp; Jerry &lt;b&gt;Gala&lt;/b&gt;'], $field['ref_links']);
+  }
+
+  public function testBuildCustomDataViewEntityReferenceWithoutViewPath(): void {
+    $financialTypeID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
+    $contactID = $this->createContactWithReference(['data_type' => 'EntityReference', 'fk_entity' => 'FinancialType'], $financialTypeID);
+    $field = $this->getReferenceFieldView($contactID);
+    $this->assertEquals([$financialTypeID => 'Donation'], $field['ref_links']);
+  }
+
+  public function testBuildCustomDataViewContactReferenceLinks(): void {
+    $contactID = $this->createContactWithReference(['data_type' => 'ContactReference', 'serialize' => 1], $this->createReferencedContacts());
+    $links = $this->getReferenceFieldView($contactID)['ref_links'];
+    $this->assertEquals([$this->ids['Contact']['first'], $this->ids['Contact']['second']], array_keys($links));
+    $this->assertStringContainsString('cid=' . $this->ids['Contact']['first'], $links[$this->ids['Contact']['first']]);
+    $this->assertStringContainsString('>Tom &amp; &lt;b&gt;Jerry&lt;/b&gt;</a>', $links[$this->ids['Contact']['first']]);
+    $this->assertStringContainsString('cid=' . $this->ids['Contact']['second'], $links[$this->ids['Contact']['second']]);
+  }
+
+  public function testBuildCustomDataViewContactReferenceLinkHiddenByAcl(): void {
+    $contactID = $this->createContactWithReference(['data_type' => 'ContactReference', 'serialize' => 1], $this->createReferencedContacts());
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'access all custom data'];
+    $this->allowedContacts = [$this->ids['Contact']['second']];
+    CRM_Utils_Hook::singleton()->setHook('civicrm_aclWhereClause', [$this, 'aclWhereMultipleContacts']);
+    $links = $this->getReferenceFieldView($contactID)['ref_links'];
+    // No link because no ACL access to this contact
+    $this->assertEquals('Tom &amp; &lt;b&gt;Jerry&lt;/b&gt;', $links[$this->ids['Contact']['first']]);
+    $this->assertStringContainsString('cid=' . $this->ids['Contact']['second'], $links[$this->ids['Contact']['second']]);
+  }
+
+  private function createReferencedContacts(): array {
+    return [
+      $this->createTestEntity('Contact', [
+        'contact_type' => 'Organization',
+        'organization_name' => 'Tom & <b>Jerry</b>',
+      ], 'first')['id'],
+      $this->createTestEntity('Contact', [
+        'contact_type' => 'Organization',
+        'organization_name' => 'Second Org',
+      ], 'second')['id'],
+    ];
+  }
+
+  private function createReferencedEvent(): int {
+    return $this->createTestEntity('Event', [
+      'title' => 'Tom & Jerry <b>Gala</b>',
+      'event_type_id:name' => 'Conference',
+      'start_date' => 'now',
+    ])['id'];
+  }
+
+  /**
+   * @param array $field
+   *   Values for the custom field, e.g. data_type and fk_entity.
+   * @param int|int[] $referenced
+   *
+   * @return int
+   */
+  private function createContactWithReference(array $field, $referenced): int {
+    $this->createTestEntity('CustomGroup', [
+      'title' => 'Reference Group',
+      'name' => 'reference_group',
+      'extends' => 'Contact',
+    ]);
+    $this->createTestEntity('CustomField', [
+      'custom_group_id.name' => 'reference_group',
+      'label' => 'Reference',
+      'name' => 'reference',
+      'html_type' => 'Autocomplete-Select',
+    ] + $field);
+    return $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Ref',
+      'last_name' => 'Holder',
+      'reference_group.reference' => $referenced,
+    ], 'holder')['id'];
+  }
+
+  private function getReferenceFieldView(int $contactID): array {
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Individual', NULL, $contactID, NULL, [], NULL, TRUE, NULL, FALSE, CRM_Core_Permission::VIEW);
+    $details = CRM_Core_BAO_CustomGroup::buildCustomDataView(new CRM_Core_Page(), $groupTree, FALSE, NULL, NULL, NULL, $contactID);
+    $record = CRM_Utils_Array::first($details[$this->ids['CustomGroup']['default']]);
+    return CRM_Utils_Array::first($record['fields']);
   }
 
 }
