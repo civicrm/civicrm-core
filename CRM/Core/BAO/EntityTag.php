@@ -401,6 +401,16 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag implements \Civi\Cor
       // 6. remove orphaned entity_tags
       "DELETE FROM civicrm_entity_tag WHERE tag_id = %2",
     ];
+    // Tag A below tag B takes B's place in the tree, so moving B's children cannot make a cycle.
+    $ancestors = [];
+    $ancestorId = $tagAId;
+    while ($ancestorId && !isset($ancestors[$ancestorId])) {
+      $ancestors[$ancestorId] = TRUE;
+      $ancestorId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $ancestorId, 'parent_id', 'id', TRUE);
+    }
+    if (isset($ancestors[$tagBId])) {
+      array_unshift($sqls, "UPDATE civicrm_tag a INNER JOIN civicrm_tag b ON b.id = %2 SET a.parent_id = b.parent_id WHERE a.id = %1");
+    }
     $tables = ['civicrm_entity_tag', 'civicrm_tag'];
 
     // Allow hook_civicrm_merge() to add SQL statements for the merge operation AND / OR

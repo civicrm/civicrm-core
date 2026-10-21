@@ -36,6 +36,19 @@ class MessageTemplateGetSpecProvider extends \Civi\Core\Service\AutoService impl
       ->setOperators(['CONTAINS'])
       ->addSqlFilter([__CLASS__, 'getKeywordFilterSql']);
     $spec->addFieldSpec($keyword);
+
+    $translationLanguage = new FieldSpec('translation_language', 'MessageTemplate', 'String');
+    $translationLanguage->setLabel(ts('Translation Language'))
+      ->setTitle(ts('Translation Language'))
+      ->setColumnName('id')
+      ->setDescription(ts('Active or draft translation'))
+      ->setType('Filter')
+      ->setInputType('Select')
+      ->setOperators(['IN'])
+      ->addSqlFilter([__CLASS__, 'getTranslationLanguageFilterSql'])
+      ->setSuffixes(['name', 'label'])
+      ->setOptionsCallback([__CLASS__, 'getTranslationLanguageOptions']);
+    $spec->addFieldSpec($translationLanguage);
   }
 
   /**
@@ -46,7 +59,8 @@ class MessageTemplateGetSpecProvider extends \Civi\Core\Service\AutoService impl
    * @param string $fieldAlias
    * @param string $operator
    * @param string $value
-   * return string
+   *
+   * @return string
    */
   public static function getKeywordFilterSql(array $field, string $fieldAlias, string $operator, $value): string {
     // $fieldAlias arrives fully backtick-quoted per identifier (e.g. `a`.`id`), not just
@@ -55,6 +69,29 @@ class MessageTemplateGetSpecProvider extends \Civi\Core\Service\AutoService impl
     $subjectColumn = \str_replace('`id`', '`msg_subject`', $fieldAlias);
     $escaped = \CRM_Core_DAO::escapeString('%' . $value . '%');
     return "($titleColumn LIKE '$escaped' OR $subjectColumn LIKE '$escaped')";
+  }
+
+  /**
+   * The search already has two joins to civicrm_translation and having this as
+   * a third one makes it too slow by multiplying the number of rows, so use an
+   * EXISTS subquery instead.
+   *
+   * @param array $field
+   * @param string $fieldAlias
+   * @param string $operator
+   * @param array $value
+   *
+   * @return string
+   */
+  public static function getTranslationLanguageFilterSql(array $field, string $fieldAlias, string $operator, $value): string {
+    $languages = \CRM_Core_DAO::escapeStrings((array) $value);
+    return "EXISTS (SELECT 1 FROM `civicrm_translation` `t`
+      WHERE `t`.`entity_table` = 'civicrm_msg_template' AND `t`.`entity_id` = $fieldAlias
+        AND `t`.`language` IN ($languages))";
+  }
+
+  public static function getTranslationLanguageOptions($field, $values, $returnFormat, $checkPermissions) {
+    return \Civi::entity('Translation')->getOptions('language', [], FALSE, $checkPermissions);
   }
 
   /**

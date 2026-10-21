@@ -111,6 +111,75 @@ class SearchRunWithCustomFieldTest extends Api4TestBase {
     $this->assertStringContainsString('example.com', $result[1]['columns'][1]['img']['src']);
   }
 
+  public function testRunWithCustomFileLink() {
+    $this->createTestRecord('CustomGroup', [
+      'title' => 'TestFileGroup',
+      'extends' => 'Individual',
+    ]);
+
+    $this->createTestRecord('CustomField', [
+      'label' => 'MyCustomFile',
+      'custom_group_id.name' => 'TestFileGroup',
+      'html_type' => 'File',
+      'data_type' => 'File',
+    ]);
+
+    $lastName = uniqid(__FUNCTION__);
+
+    $file = $this->createTestRecord('File', [
+      'mime_type' => 'application/pdf',
+      'file_name' => "$lastName.pdf",
+    ]);
+
+    $contact = $this->createTestRecord('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'File',
+      'last_name' => $lastName,
+      'TestFileGroup.MyCustomFile' => $file['id'],
+    ]);
+
+    $params = [
+      'checkPermissions' => FALSE,
+      'return' => 'page:1',
+      'savedSearch' => [
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'TestFileGroup.MyCustomFile'],
+          'where' => [['id', '=', $contact['id']]],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => '',
+        'settings' => [
+          'limit' => 20,
+          'columns' => [
+            [
+              'key' => 'id',
+              'label' => 'Contact ID',
+              'type' => 'field',
+            ],
+            [
+              'key' => 'TestFileGroup.MyCustomFile',
+              'label' => 'File',
+              'type' => 'field',
+              'link' => [
+                'path' => '[TestFileGroup.MyCustomFile]&download=0',
+                'target' => '_blank',
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $url = $result[0]['columns'][1]['links'][0]['url'] ?? NULL;
+    $this->assertNotNull($url);
+    $this->assertStringEndsWith('&download=0', $url, "URL was: $url");
+  }
+
   public function testMultiValuedFields():void {
     $this->createTestRecord('CustomGroup', [
       'extends' => 'Contact',
