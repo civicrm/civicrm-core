@@ -511,12 +511,6 @@ WHERE ac.contact_id IN ( $ids )
 
     if (!isset($_fieldsRetrieved[$daoName])) {
       $_fieldsRetrieved[$daoName] = [];
-      $daoFile = str_replace('_',
-          DIRECTORY_SEPARATOR,
-          $daoName
-        ) . '.php';
-      include_once $daoFile;
-
       $daoFields = &$daoName::fields();
 
       foreach ($daoFields as $key => & $value) {

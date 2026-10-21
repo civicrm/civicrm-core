@@ -94,7 +94,7 @@ class FinderQueryBuilder {
    */
   public function isUseReservedQuery(): bool {
     return $this->lookup('RuleGroup', 'is_reserved') &&
-      \CRM_Utils_File::isIncludable('CRM/Dedupe/BAO/QueryBuilder/' . $this->lookup('RuleGroup', 'name') . '.php');
+      class_exists("CRM_Dedupe_BAO_QueryBuilder_" . $this->lookup('RuleGroup', 'name'));
   }
 
   /**

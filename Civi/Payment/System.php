@@ -49,7 +49,6 @@ class System {
       $ext = \CRM_Extension_System::singleton()->getMapper();
       if ($ext->isExtensionKey($processor['class_name'])) {
         $paymentClass = $ext->keyToClass($processor['class_name'], 'payment');
-        require_once $ext->classToPath($paymentClass);
       }
       else {
         $paymentClass = 'CRM_Core_' . $processor['class_name'];
@@ -85,14 +84,12 @@ class System {
     $ext = \CRM_Extension_System::singleton()->getMapper();
     if ($ext->isExtensionKey($processor['class_name'])) {
       $paymentClass = $ext->keyToClass($processor['class_name'], 'payment');
-      require_once $ext->classToPath($paymentClass);
     }
     else {
       $paymentClass = 'CRM_Core_' . $processor['class_name'];
       if (empty($paymentClass)) {
         throw new \CRM_Core_Exception('no class provided');
       }
-      require_once str_replace('_', DIRECTORY_SEPARATOR, $paymentClass) . '.php';
     }
 
     $processorObject = new $paymentClass(!empty($processor['is_test']) ? 'test' : 'live', $processor);

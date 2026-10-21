@@ -442,13 +442,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
         $formName = CRM_Utils_String::getClassName($name);
       }
 
-      $ext = CRM_Extension_System::singleton()->getMapper();
-      if ($ext->isExtensionClass($className)) {
-        require_once $ext->classToPath($className);
-      }
-      else {
-        require_once str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
-      }
       $$stateName = new $className($stateMachine->find($className), $action, 'post', $formName);
       if ($title) {
         $$stateName->setTitle($title);

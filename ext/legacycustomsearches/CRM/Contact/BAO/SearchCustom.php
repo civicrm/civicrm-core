@@ -61,20 +61,12 @@ class CRM_Contact_BAO_SearchCustom {
 
     $ext = CRM_Extension_System::singleton()->getMapper();
 
-    if (!$ext->isExtensionKey($customSearchClass)) {
-      $customSearchFile = str_replace('_',
-          DIRECTORY_SEPARATOR,
-          $customSearchClass
-        ) . '.php';
-    }
-    else {
-      $customSearchFile = $ext->keyToPath($customSearchClass);
+    if ($ext->isExtensionKey($customSearchClass)) {
       $customSearchClass = $ext->keyToClass($customSearchClass);
     }
 
-    $error = include_once $customSearchFile;
-    if ($error == FALSE) {
-      throw new CRM_Core_Exception('Custom search file: ' . $customSearchFile . ' does not exist. Please verify your custom search settings in CiviCRM administrative panel.');
+    if (!class_exists($customSearchClass)) {
+      throw new CRM_Core_Exception('Custom search class: ' . $customSearchClass . ' does not exist. Please verify your custom search settings in CiviCRM administrative panel.');
     }
 
     return [$customSearchID, $customSearchClass, $formValues];
