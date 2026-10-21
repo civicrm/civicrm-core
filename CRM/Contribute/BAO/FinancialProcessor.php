@@ -861,47 +861,31 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     if ($this->isOriginalStatusPending() && $this->isCompletedTransaction()
     ) {
-      if (empty($params['line_item'])) {
-        //CRM-15296
-        //@todo - check with Joe regarding this situation - payment processors create pending transactions with no line items
-        // when creating recurring membership payment - there are 2 lines to comment out in contributionPageTest if fixed
-        // & this can be removed
-        return;
-      }
-      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-      // This is an update so original currency if none passed in.
-      $params['trxnParams']['currency'] = $params['currency'] ?? $this->getOriginalContribution()->currency;
-
       if ($this->isRecordAccountsReceivable() && !$this->getOriginalContributionValue('is_pay_later')) {
         $financialTrxnIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams']);
       }
 
       $financialTrxnIDs[] = $this->createFinancialTrxn($params['trxnParams']);
 
-      $entityFinancialTrxnRecord = [
-        'entity_table' => 'civicrm_financial_item',
-      ];
-      foreach ($params['line_item'] as $fieldId => $fields) {
-        foreach ($fields as $fieldValueId => $lineItemDetails) {
-          $this->updateFinancialItemForLineItemToPaid($lineItemDetails['id']);
-          $financialItems = FinancialItem::get(FALSE)
-            ->addSelect('id', 'amount')
-            ->addWhere('entity_id', '=', $lineItemDetails['id'])
-            ->addWhere('entity_table', '=', 'civicrm_line_item')
-            ->execute();
-          if ($financialItems->count() > 0) {
-            $entityFinancialTrxnRecordsToCreate = [];
-            foreach ($financialItems as $financialItem) {
-              $entityFinancialTrxnRecord['entity_id'] = $financialItem['id'];
-              $entityFinancialTrxnRecord['amount'] = $financialItem['amount'];
-              foreach ($financialTrxnIDs as $financialTrxnID) {
-                $entityFinancialTrxnRecord['financial_trxn_id'] = $financialTrxnID;
-                $entityFinancialTrxnRecordsToCreate[] = $entityFinancialTrxnRecord;
-              }
+      foreach ($this->getUpdatedLineItems() as $lineItemDetails) {
+        $this->updateFinancialItemForLineItemToPaid($lineItemDetails['id']);
+        $financialItems = FinancialItem::get(FALSE)
+          ->addSelect('id', 'amount')
+          ->addWhere('entity_id', '=', $lineItemDetails['id'])
+          ->addWhere('entity_table', '=', 'civicrm_line_item')
+          ->execute();
+        if ($financialItems->count() > 0) {
+          foreach ($financialItems as $financialItem) {
+            foreach ($financialTrxnIDs as $financialTrxnID) {
+              EntityFinancialTrxn::save(FALSE)
+                ->addRecord([
+                  'financial_trxn_id' => $financialTrxnID,
+                  'entity_id' => $financialItem['id'],
+                  'entity_table' => 'civicrm_financial_item',
+                  'amount' => $financialItem['amount'],
+                ])
+                ->execute();
             }
-            EntityFinancialTrxn::save(FALSE)
-              ->setRecords($entityFinancialTrxnRecordsToCreate)
-              ->execute();
           }
         }
       }
