@@ -243,6 +243,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
   }
 
+  /**
+   * @return int|null
+   */
+  private function getUpdatedAccountsReceivableAccount(): ?int {
+    return $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id'));
+  }
+
   private function getOriginalPaymentInstrumentID(): ?int {
     if (!$this->originalContribution) {
       return NULL;
@@ -545,6 +552,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $trxnParams = $params['trxnParams'] = $this->getTrxnParams();
       if ($this->isRecordAccountsReceivable()) {
         $this->recordAlwaysAccountsReceivable($trxnParams);
+        $trxnParams['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
       }
       $financialTxnID = $this->createFinancialTrxn($trxnParams);
       // Process fee.
@@ -887,16 +895,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
     elseif (($previousContributionStatus === 'Pending'
         && $this->getOriginalContribution()->is_pay_later) || $previousContributionStatus === 'In Progress'
     ) {
-      $arAccountId = $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id'));
-
       if ($currentContributionStatus === 'Cancelled') {
         // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-        $params['trxnParams']['to_financial_account_id'] = $arAccountId;
+        $params['trxnParams']['to_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
       }
       else {
         // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-        $params['trxnParams']['from_financial_account_id'] = $arAccountId;
+        $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
       }
     }
 
@@ -904,6 +910,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     ) {
       if ($this->isRecordAccountsReceivable() && !$this->getOriginalContributionValue('is_pay_later')) {
         $financialTrxnIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams']);
+        $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
       }
 
       $financialTrxnIDs[] = $this->createFinancialTrxn($params['trxnParams']);
@@ -960,15 +967,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return null|int
    */
-  private function recordAlwaysAccountsReceivable(&$trxnParams) {
+  private function recordAlwaysAccountsReceivable($trxnParams): ?int {
     $params = $trxnParams;
-    $arAccountId = $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id'));
-    $params['to_financial_account_id'] = $arAccountId;
+    $params['to_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
     $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $params['is_payment'] = FALSE;
-    $trxnID = $this->createFinancialTrxn($params);
-    $trxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
-    return $trxnID;
+    return $this->createFinancialTrxn($params);
   }
 
   /**
@@ -1830,7 +1834,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     $adjustedTrxnValues = [
       'from_financial_account_id' => NULL,
-      'to_financial_account_id' => $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id')),
+      'to_financial_account_id' => $this->getUpdatedAccountsReceivableAccount(),
       'total_amount' => $lineItemAdjustment,
       'net_amount' => $lineItemAdjustment,
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
