@@ -495,13 +495,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'skipLineItem' => 1,
       'api.line_item.create' => [
         [
-          'price_field_id' => 1,
+          'price_field_id' => $this->getDefaultContributionPriceFieldID(),
           'qty' => 2,
           'line_total' => '20',
           'unit_price' => '10',
         ],
         [
-          'price_field_id' => 1,
+          'price_field_id' => $this->getDefaultContributionPriceFieldID(),
           'qty' => 1,
           'line_total' => '80',
           'unit_price' => '80',

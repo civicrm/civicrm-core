@@ -57,12 +57,12 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $lParams = [
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
-      'price_field_id' => 1,
+      'price_field_id' => $this->getDefaultContributionPriceFieldID(),
       'qty' => 1,
       'label' => 'Contribution Amount',
       'unit_price' => $price,
       'line_total' => $price,
-      'price_field_value_id' => 1,
+      'price_field_value_id' => $this->getDefaultContributionPriceFieldValueID(),
       'financial_type_id' => 1,
     ];
 
@@ -100,12 +100,12 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $lParams = [
       'entity_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
-      'price_field_id' => 1,
+      'price_field_id' => $this->getDefaultContributionPriceFieldID(),
       'qty' => 1,
       'label' => 'Contribution Amount',
       'unit_price' => $price,
       'line_total' => $price,
-      'price_field_value_id' => 1,
+      'price_field_value_id' => $this->getDefaultContributionPriceFieldValueID(),
       'financial_type_id' => 1,
     ];
 
