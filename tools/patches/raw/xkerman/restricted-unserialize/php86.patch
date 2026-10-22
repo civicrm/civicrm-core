@@ -1,0 +1,19 @@
+commit 531e96fbaaecbdbbaf0b90c7afee1595c3e3187b
+Author: Tim Otten <totten@civicrm.org>
+Date:   Thu Oct 22 13:22:38 2026 -0700
+
+    Fix warnings on PHP 8.6
+
+diff --git a/src/ArrayHandler.php b/src/ArrayHandler.php
+index 3c5e832..af0af3b 100644
+--- a/src/ArrayHandler.php
++++ b/src/ArrayHandler.php
+@@ -58,7 +58,7 @@ class ArrayHandler implements HandlerInterface
+     private function parseKey($source)
+     {
+         list($key, $source) = $this->expressionParser->parse($source);
+-        if (!is_integer($key) && !is_string($key)) {
++        if (!is_int($key) && !is_string($key)) {
+             return $source->triggerError();
+         }
+         return array($key, $source);
