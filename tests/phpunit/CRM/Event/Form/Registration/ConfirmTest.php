@@ -393,6 +393,45 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(550, $contribution['total_amount'], 'Invalid Tax amount.');
   }
 
+  /**
+   * The only additional participant being dropped via the 'Skip
+   * Participant' button must not count towards the "real" participant
+   * total that decides whether '(multiple participants)' is appended to
+   * the fee level label - only the primary actually registers here, so
+   * the label must be left alone.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testFeeLabelExcludesFullySkippedAdditionalParticipant(): void {
+    $event = $this->eventCreatePaid();
+    $this->getFormWrapper([
+      'first_name' => 'Kim',
+      'last_name' => 'Reality',
+      'email-Primary' => 'demo@example.com',
+      'additional_participants' => 1,
+      'priceSetId' => $this->getPriceSetID('PaidEvent'),
+      'payment_processor_id' => 0,
+      $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_standard'],
+    ], $event['id'])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Pat',
+        'last_name' => 'Participant',
+        'email-Primary' => 'pat@example.com',
+        'priceSetId' => $this->getPriceSetID('PaidEvent'),
+        $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_student'],
+        // Clicking 'Skip Participant' submits this key (see
+        // AdditionalParticipant::buildQuickForm()) - the price selection
+        // above must be dropped entirely, not just excluded from the total.
+        '_qf_Participant_1_next_skip' => 'Skip Participant',
+      ])
+      ->processForm();
+
+    $this->callAPISuccessGetCount('Participant', [], 1);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['return' => ['total_amount', 'amount_level']]);
+    $this->assertEquals(300, $contribution['total_amount']);
+    $this->assertEquals(['Standard Rate - 1'], $contribution['amount_level']);
+  }
+
   public function checkPaymentParameters($paymentObject, $parameters): void {
     $requiredFields = ['contactID', 'amount', 'invoiceID', 'currency', 'billing_first_name', 'billing_last_name'];
     foreach ($requiredFields as $field) {
