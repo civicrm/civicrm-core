@@ -71,7 +71,6 @@ class CRM_Utils_Request {
    */
   public static function retrieve($name, $type, $store = NULL, $abort = FALSE, $default = NULL, $method = 'REQUEST') {
 
-    $value = NULL;
     switch ($method) {
       case 'GET':
         $value = self::getValue($name, $_GET);
