@@ -71,7 +71,7 @@ return [
       'input_type' => 'Text',
       'description' => ts('Permission for the dashlet'),
       'add' => '3.1',
-      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
+      'serialize' => CRM_Core_DAO::SERIALIZE_JSON_OR_COMMA,
     ],
     'permission_operator' => [
       'title' => ts('Dashlet Permission Operator'),

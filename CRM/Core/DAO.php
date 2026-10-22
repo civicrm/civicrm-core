@@ -127,7 +127,12 @@ class CRM_Core_DAO extends DB_DataObject {
      * If you're adding new fields, then use SERIALIZE_JSON instead. JSON is more
      * standardized and has fewer quirks.
      */
-    SERIALIZE_COMMA_KEY_VALUE = 6;
+    SERIALIZE_COMMA_KEY_VALUE = 6,
+    /**
+     * Like SERIALIZE_JSON, but fallback to reading SERIALIZE_COMMA values
+     * Useful for migrating a field from SERIALIZE_COMMA to SERIALIZE_JSON
+     */
+    SERIALIZE_JSON_OR_COMMA = 7;
 
   /**
    * Define entities that shouldn't be created or deleted when creating/ deleting
@@ -3370,6 +3375,9 @@ SELECT contact_id
       case self::SERIALIZE_COMMA_KEY_VALUE:
         return is_array($value) ? CRM_Utils_CommaKV::serialize($value) : $value;
 
+      case self::SERIALIZE_JSON_OR_COMMA:
+        return is_array($value) ? self::serializeField($value, self::SERIALIZE_JSON) : $value;
+
       default:
         throw new Exception('Unknown serialization method for field.');
     }
@@ -3403,6 +3411,9 @@ SELECT contact_id
 
       case self::SERIALIZE_JSON:
         return strlen($value) ? json_decode($value, TRUE) : [];
+
+      case self::SERIALIZE_JSON_OR_COMMA:
+        return self::unSerializeField($value, self::SERIALIZE_JSON) ?? self::unSerializeField($value, self::SERIALIZE_COMMA);
 
       case self::SERIALIZE_PHP:
         return strlen($value) ? CRM_Utils_String::unserialize($value) : [];

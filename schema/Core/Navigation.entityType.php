@@ -83,7 +83,7 @@ return [
       'input_type' => 'Text',
       'description' => ts('Permission(s) needed to access menu item'),
       'add' => '3.0',
-      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
+      'serialize' => CRM_Core_DAO::SERIALIZE_JSON_OR_COMMA,
     ],
     'permission_operator' => [
       'title' => ts('Permission Operator'),

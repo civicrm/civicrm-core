@@ -1423,6 +1423,7 @@ class CRM_Core_SelectValues {
       CRM_Core_DAO::SERIALIZE_JSON => 'json',
       CRM_Core_DAO::SERIALIZE_PHP => 'php',
       CRM_Core_DAO::SERIALIZE_COMMA => 'comma',
+      CRM_Core_DAO::SERIALIZE_JSON_OR_COMMA => 'json_or_comma',
     ];
   }
 
