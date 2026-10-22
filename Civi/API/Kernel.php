@@ -85,6 +85,14 @@ class Kernel {
       return $this->formatResult($apiRequest, $apiResponse);
     }
     catch (\Exception $e) {
+      \Civi::log()->error(
+        "API request $entity.$action failed",
+        [
+          'params' => $params,
+          'exception' => $e,
+        ]
+      );
+
       if ($e instanceof \CRM_Core_Exception) {
         $err = $this->formatApiException($e, $apiRequest);
       }
