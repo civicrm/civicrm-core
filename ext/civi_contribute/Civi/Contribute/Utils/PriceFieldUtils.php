@@ -215,14 +215,17 @@ class PriceFieldUtils {
       // 'membership_num_terms' => NULL,
     ];
 
+    $defaultContributionAmount = \CRM_Price_BAO_PriceSet::getDefaultPriceSet('contribution');
+    $defaultContributionAmount = reset($defaultContributionAmount);
+
     // special handling for Default Contribution Amount
     // this has one field value but the user will enter an amount
     // rather than option id
-    if ($field['price_field_id'] === 1) {
+    if ((int) $field['price_field_id'] === (int) $defaultContributionAmount['priceFieldID']) {
       $lineItem['qty'] = 1;
       $lineItem['unit_price'] = $fieldValue;
       // generic line item
-      $lineItem['price_field_value_id'] = 1;
+      $lineItem['price_field_value_id'] = (int) $defaultContributionAmount['priceFieldValueID'];
     }
     elseif ($field['is_enter_qty'] ?? FALSE) {
       $lineItem['qty'] = $fieldValue;
@@ -240,7 +243,7 @@ class PriceFieldUtils {
       $lineItem['qty'] = 1;
       $lineItem['unit_price'] = $fieldValue;
       // generic line item
-      $lineItem['price_field_value_id'] = 1;
+      $lineItem['price_field_value_id'] = (int) $defaultContributionAmount['priceFieldValueID'];
     }
 
     return $lineItem;
