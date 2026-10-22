@@ -221,12 +221,11 @@ class CRM_Financial_BAO_Payment {
     if ($isPaymentCompletesContribution) {
       if ($contributionStatus === 'Pending refund') {
         // Unit test cover in CRM_Event_BAO_AdditionalPaymentTest::testTransactionInfo.
-        civicrm_api3('Contribution', 'create',
-          [
-            'id' => $contribution['id'],
-            'contribution_status_id' => 'Completed',
-          ]
-        );
+        // Payment already recorded.
+        CRM_Contribute_BAO_Contribution::writeRecord([
+          'id' => $contribution['id'],
+          'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+        ]);
       }
       else {
         $contributionBAO = new CRM_Contribute_BAO_Contribution();
