@@ -250,6 +250,46 @@ class CRM_Contribute_BAO_FinancialProcessor {
     return $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id'));
   }
 
+  /**
+   * @return void
+   * @throws \CRM_Core_Exception
+   */
+  public function updateFinancialRecordsOnContributionCreate(): void {
+    $trxnParams = $this->getTrxnParams();
+    if ($this->isRecordAccountsReceivable()) {
+      $this->recordAlwaysAccountsReceivable($trxnParams);
+      $trxnParams['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
+    }
+    $financialTxnID = $this->createFinancialTrxn($trxnParams);
+    // Process fee.
+    if (!empty($this->getUpdatedContributionValue('fee_amount')) && (empty($this->getOriginalContribution()) || $this->getUpdatedContribution()->fee_amount != $this->getOriginalContribution()->fee_amount)) {
+      $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
+      if ($amount) {
+        CRM_Core_BAO_FinancialTrxn::recordFees([
+          'to_financial_account_id' => $this->getToFinancialAccount(),
+          'contribution_status_id' => $this->getUpdatedContributionValue('contribution_status_id'),
+          'trxnParams' => $this->getTrxnParams(),
+        ], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
+      }
+    }
+    if (empty($this->getInputValue('skipLineItem'))) {
+      foreach ($this->getAddedLineItems() as $lineParams) {
+        $this->addLineItem($lineParams, $financialTxnID);
+      }
+      $this->createDeferredTrxn();
+    }
+
+    // create batch entry if batch_id is passed and
+    if ($this->getInputValue('batch_id')) {
+      $entityParams = [
+        'batch_id' => $this->getInputValue('batch_id'),
+        'entity_table' => 'civicrm_financial_trxn',
+        'entity_id' => $financialTxnID,
+      ];
+      CRM_Batch_BAO_EntityBatch::create($entityParams);
+    }
+  }
+
   private function getOriginalPaymentInstrumentID(): ?int {
     if (!$this->originalContribution) {
       return NULL;
@@ -547,40 +587,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
     else {
       if ($this->isUnpaidAndNotPayLater()) {
         $this->saveLineItemsWithNoFinancialTransaction();
-        return;
       }
-      $trxnParams = $params['trxnParams'] = $this->getTrxnParams();
-      if ($this->isRecordAccountsReceivable()) {
-        $this->recordAlwaysAccountsReceivable($trxnParams);
-        $trxnParams['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
-      }
-      $financialTxnID = $this->createFinancialTrxn($trxnParams);
-      // Process fee.
-      if (!empty($this->getUpdatedContributionValue('fee_amount')) && (empty($this->getOriginalContribution()) || $this->getUpdatedContribution()->fee_amount != $this->getOriginalContribution()->fee_amount)) {
-        $amount = $this->getUpdatedContributionValue('fee_amount') - ($this->getOriginalContributionValue('fee_amount') ?: 0);
-        if ($amount) {
-          CRM_Core_BAO_FinancialTrxn::recordFees([
-            'to_financial_account_id' => $this->getToFinancialAccount(),
-            'contribution_status_id' => $this->getUpdatedContributionValue('contribution_status_id'),
-            'trxnParams' => $this->getTrxnParams(),
-          ], $amount, $this->getContributionID(), $this->getUpdatedContributionValue('financial_type_id'), $financialTxnID);
-        }
-      }
-      if (empty($params['skipLineItem'])) {
-        foreach ($this->getAddedLineItems() as $lineParams) {
-          $this->addLineItem($lineParams, $financialTxnID);
-        }
-        $this->createDeferredTrxn();
-      }
-
-      // create batch entry if batch_id is passed and
-      if (!empty($params['batch_id'])) {
-        $entityParams = [
-          'batch_id' => $params['batch_id'],
-          'entity_table' => 'civicrm_financial_trxn',
-          'entity_id' => $financialTxnID,
-        ];
-        CRM_Batch_BAO_EntityBatch::create($entityParams);
+      else {
+        $this->updateFinancialRecordsOnContributionCreate();
       }
     }
   }
