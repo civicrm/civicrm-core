@@ -79,7 +79,7 @@ class DebugSubscriber implements EventSubscriberInterface {
     if (!empty($apiRequest['params']['debug'])
       && (empty($apiRequest['params']['check_permissions']) || \CRM_Core_Permission::check('view debug output'))
     ) {
-      if (is_a($result, '\Civi\Api4\Generic\Result')) {
+      if (is_object($result) && is_a($result, '\Civi\Api4\Generic\Result')) {
         $result->debug ??= [];
         $debug =& $result->debug;
       }
