@@ -101,6 +101,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws \CRM_Core_Exception
    */
   public function updateFinancialRecordsOnContributionUpdate(array $params): array {
+    if ($this->isUnpaidAndNotPayLater()) {
+      $this->saveLineItemsWithNoFinancialTransaction();
+      return $params;
+    }
     $trxnParams = $this->getTrxnParams();
     $params['trxnParams'] = $trxnParams;
     $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $this->getOriginalContribution()->total_amount;
@@ -200,6 +204,50 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
     }
     return $params;
+  }
+
+  /**
+   * Save line items that do not have a payment or Accounts receivable transaction.
+   *
+   * In practice this is pending or in progress incomplete transactions or ones initially created
+   * as failed or cancelled.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function saveLineItemsWithNoFinancialTransaction(): void {
+    if (empty($this->getInputValue('skipLineItem'))) {
+      foreach ($this->getUpdatedLineItems() as $lineParams) {
+        $createdLineItem = CRM_Price_BAO_LineItem::create($lineParams);
+        // We create financial items with NO transaction ID on create if the transaction
+        // has failed or if we do not yet have a payment, and it is not pay_later. Payment.create
+        // finds these and links them.
+        // This feels smelly and is an artifact from making always-record-accounts-receiveable
+        // optional. More concerning - we have never updated these when the transactions are altered
+        // while in this state - leaving the potential for unbalanced lines. This feels like
+        // a latent bug.
+        if (!$this->isUpdate()) {
+          $lineItemValues = [
+            'id' => $createdLineItem->id,
+            'line_total' => $createdLineItem->line_total,
+            'qty' => $createdLineItem->qty,
+            'label' => $createdLineItem->label,
+            'tax_amount' => $createdLineItem->tax_amount ?? NULL,
+            'financial_type_id' => $createdLineItem->financial_type_id,
+          ];
+          $this->addFinancialItem($lineItemValues, FALSE, NULL);
+          if (!empty($lineParams['tax_amount'])) {
+            $this->addFinancialItem($lineItemValues, TRUE, NULL);
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * @return int|null
+   */
+  private function getUpdatedAccountsReceivableAccount(): ?int {
+    return $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id'));
   }
 
   private function getOriginalPaymentInstrumentID(): ?int {
@@ -493,43 +541,18 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws CRM_Core_Exception
    */
   public function recordFinancialAccounts(array &$params): void {
-    if ($this->isUnpaidAndNotPayLater()) {
-      if (empty($this->getInputValue('skipLineItem'))) {
-        foreach ($this->getUpdatedLineItems() as $lineParams) {
-          $createdLineItem = CRM_Price_BAO_LineItem::create($lineParams);
-          // We create financial items with NO transaction ID on create if the transaction
-          // has failed or if we do not yet have a payment, and it is not pay_later. Payment.create
-          // finds these and links them.
-          // This feels smelly and is an artifact from making always-record-accounts-receiveable
-          // optional. More concerning - we have never updated these when the transactions are altered
-          // while in this state - leaving the potential for unbalanced lines. This feels like
-          // a latent bug.
-          if (!$this->isUpdate()) {
-            $lineItemValues = [
-              'id' => $createdLineItem->id,
-              'line_total' => $createdLineItem->line_total,
-              'qty' => $createdLineItem->qty,
-              'label' => $createdLineItem->label,
-              'tax_amount' => $createdLineItem->tax_amount ?? NULL,
-              'financial_type_id' => $createdLineItem->financial_type_id,
-            ];
-            $this->addFinancialItem($lineItemValues, FALSE, NULL);
-            if (!empty($lineParams['tax_amount'])) {
-              $this->addFinancialItem($lineItemValues, TRUE, NULL);
-            }
-          }
-        }
-      }
-      unset($params['line_item']);
-      return;
-    }
     if ($this->isUpdate()) {
       $params = $this->updateFinancialRecordsOnContributionUpdate($params);
     }
     else {
+      if ($this->isUnpaidAndNotPayLater()) {
+        $this->saveLineItemsWithNoFinancialTransaction();
+        return;
+      }
       $trxnParams = $params['trxnParams'] = $this->getTrxnParams();
       if ($this->isRecordAccountsReceivable()) {
         $this->recordAlwaysAccountsReceivable($trxnParams);
+        $trxnParams['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
       }
       $financialTxnID = $this->createFinancialTrxn($trxnParams);
       // Process fee.
@@ -560,8 +583,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
         CRM_Batch_BAO_EntityBatch::create($entityParams);
       }
     }
-
-    unset($params['line_item']);
   }
 
   /**
@@ -874,16 +895,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
     elseif (($previousContributionStatus === 'Pending'
         && $this->getOriginalContribution()->is_pay_later) || $previousContributionStatus === 'In Progress'
     ) {
-      $arAccountId = $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id'));
-
       if ($currentContributionStatus === 'Cancelled') {
         // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-        $params['trxnParams']['to_financial_account_id'] = $arAccountId;
+        $params['trxnParams']['to_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
       }
       else {
         // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-        $params['trxnParams']['from_financial_account_id'] = $arAccountId;
+        $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
       }
     }
 
@@ -891,6 +910,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     ) {
       if ($this->isRecordAccountsReceivable() && !$this->getOriginalContributionValue('is_pay_later')) {
         $financialTrxnIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams']);
+        $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
       }
 
       $financialTrxnIDs[] = $this->createFinancialTrxn($params['trxnParams']);
@@ -947,15 +967,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
    *
    * @return null|int
    */
-  private function recordAlwaysAccountsReceivable(&$trxnParams) {
+  private function recordAlwaysAccountsReceivable($trxnParams): ?int {
     $params = $trxnParams;
-    $arAccountId = $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id'));
-    $params['to_financial_account_id'] = $arAccountId;
+    $params['to_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
     $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
     $params['is_payment'] = FALSE;
-    $trxnID = $this->createFinancialTrxn($params);
-    $trxnParams['from_financial_account_id'] = $params['to_financial_account_id'];
-    return $trxnID;
+    return $this->createFinancialTrxn($params);
   }
 
   /**
@@ -1817,7 +1834,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
     $adjustedTrxnValues = [
       'from_financial_account_id' => NULL,
-      'to_financial_account_id' => $this->getAccountsReceivableAccount($this->getUpdatedContributionValue('financial_type_id')),
+      'to_financial_account_id' => $this->getUpdatedAccountsReceivableAccount(),
       'total_amount' => $lineItemAdjustment,
       'net_amount' => $lineItemAdjustment,
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
