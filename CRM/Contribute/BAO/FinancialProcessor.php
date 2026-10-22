@@ -153,7 +153,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // and letting natural justice take care of the rest.
       $params['trxnParams']['trxn_id'] = $this->getUpdatedContribution()->trxn_id;
     }
-    if ($this->isSupportedContributionStatusChange()
+    if ($this->isOriginalStatusPending() && $this->isCompletedTransaction()) {
+      $this->recordPaymentFinancialTrxn($params);
+    }
+    elseif ($this->isSupportedContributionStatusChange()
       && !empty($params['contribution_status_id'])
       && $this->getOriginalContribution()->contribution_status_id != $this->getUpdatedContribution()->contribution_status_id
     ) {
@@ -291,6 +294,46 @@ class CRM_Contribute_BAO_FinancialProcessor {
     }
   }
 
+  /**
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function recordPaymentFinancialTrxn(array $params): void {
+    if ($this->isRecordAccountsReceivable() && !$this->getOriginalContributionValue('is_pay_later')) {
+      $financialTrxnIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams']);
+      $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
+    }
+    if ($this->wasOriginalBalanceOwedToAccountsReceivable()) {
+      $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
+    }
+
+    $financialTrxnIDs[] = $this->createFinancialTrxn($params['trxnParams']);
+
+    foreach ($this->getUpdatedLineItems() as $lineItemDetails) {
+      $this->updateFinancialItemForLineItemToPaid($lineItemDetails['id']);
+      $financialItems = FinancialItem::get(FALSE)
+        ->addSelect('id', 'amount')
+        ->addWhere('entity_id', '=', $lineItemDetails['id'])
+        ->addWhere('entity_table', '=', 'civicrm_line_item')
+        ->execute();
+      if ($financialItems->count() > 0) {
+        foreach ($financialItems as $financialItem) {
+          foreach ($financialTrxnIDs as $financialTrxnID) {
+            EntityFinancialTrxn::save(FALSE)
+              ->addRecord([
+                'financial_trxn_id' => $financialTrxnID,
+                'entity_id' => $financialItem['id'],
+                'entity_table' => 'civicrm_financial_item',
+                'amount' => $financialItem['amount'],
+              ])
+              ->execute();
+          }
+        }
+      }
+    }
+  }
+
   private function getOriginalPaymentInstrumentID(): ?int {
     if (!$this->originalContribution) {
       return NULL;
@@ -331,6 +374,21 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
   private function isOriginalStatusPending(): bool {
     return in_array($this->getOriginalContributionStatus(), ['Pending', 'In Progress'], TRUE);
+  }
+
+  /**
+   * Was the amount currently owed on the contribution booked to accounts receivable.
+   *
+   * True for a pay-later Pending contribution, or an In Progress one (e.g. a payment
+   * processor transaction awaiting completion) - in both cases nothing has actually
+   * been paid yet, and the amount outstanding was booked to accounts receivable
+   * rather than an asset account.
+   *
+   * @return bool
+   */
+  private function wasOriginalBalanceOwedToAccountsReceivable(): bool {
+    return ($this->getOriginalContributionStatus() === 'Pending' && $this->getOriginalContribution()->is_pay_later)
+      || $this->getOriginalContributionStatus() === 'In Progress';
   }
 
   /**
@@ -924,40 +982,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
         // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
         $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
       }
-    }
-
-    if ($this->isOriginalStatusPending() && $this->isCompletedTransaction()
-    ) {
-      if ($this->isRecordAccountsReceivable() && !$this->getOriginalContributionValue('is_pay_later')) {
-        $financialTrxnIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams']);
-        $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
-      }
-
-      $financialTrxnIDs[] = $this->createFinancialTrxn($params['trxnParams']);
-
-      foreach ($this->getUpdatedLineItems() as $lineItemDetails) {
-        $this->updateFinancialItemForLineItemToPaid($lineItemDetails['id']);
-        $financialItems = FinancialItem::get(FALSE)
-          ->addSelect('id', 'amount')
-          ->addWhere('entity_id', '=', $lineItemDetails['id'])
-          ->addWhere('entity_table', '=', 'civicrm_line_item')
-          ->execute();
-        if ($financialItems->count() > 0) {
-          foreach ($financialItems as $financialItem) {
-            foreach ($financialTrxnIDs as $financialTrxnID) {
-              EntityFinancialTrxn::save(FALSE)
-                ->addRecord([
-                  'financial_trxn_id' => $financialTrxnID,
-                  'entity_id' => $financialItem['id'],
-                  'entity_table' => 'civicrm_financial_item',
-                  'amount' => $financialItem['amount'],
-                ])
-                ->execute();
-            }
-          }
-        }
-      }
-      return;
     }
     $this->updateFinancialAccounts($params['trxnParams'], 'changedStatus');
   }
