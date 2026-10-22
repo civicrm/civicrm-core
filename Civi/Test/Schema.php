@@ -198,6 +198,19 @@ class Schema {
   }
 
   /**
+   * Seeded tables whose AUTO_INCREMENT is offset before Data::populate() loads
+   * the seed data, so that the seeded rows themselves do not start at id 1.
+   *
+   * Tables are added in batches as the related failures are fixed.
+   * Do not add civicrm_domain: domain id 1 is assumed throughout.
+   */
+  public const SEED_TABLES_TO_OFFSET = [
+    'civicrm_price_field',
+    'civicrm_price_field_value',
+    'civicrm_price_set',
+  ];
+
+  /**
    * This sets the AUTO_INCREMENT to flush out tests or code that muddle ids
    * of test entities but pass because the ids are all low starting at 1
    *
