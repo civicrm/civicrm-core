@@ -1097,7 +1097,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $transaction = new CRM_Core_Transaction();
 
     $participantID = (int) Participant::save(FALSE)->addRecord($this->getParticipantParams($contactID, $participantNumber))->execute()->single()['id'];
-
+    $this->_participantIDS[$participantNumber] = $participantID;
     $transaction->commit();
 
     return $participantID;
@@ -1351,7 +1351,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function getParticipantID(int $index = 0): ?int {
     if ($index === 0) {
-      return $this->_participantId;
+      return $this->_participantId ?? $this->_participantIDS[0] ?? NULL;
     }
     return $this->_additionalParticipantIds[$index] ?? NULL;
   }
@@ -2145,7 +2145,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $participantRecord = $value;
         // add participant record
         $participantID = $this->addParticipant($contactID, $participantNum);
-        $this->_participantIDS[$participantNum] = $participantID;
 
         if (!empty($participantRecord['is_primary'])) {
           // CRM-10032
