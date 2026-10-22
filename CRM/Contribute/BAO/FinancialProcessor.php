@@ -887,13 +887,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $previousContributionStatus = $this->getOriginalContributionStatus();
     $currentContributionStatus = $this->getUpdatedContributionStatus();
 
-    if ((($previousContributionStatus === 'Partially paid' && $this->isCompletedTransaction())
-      || ($previousContributionStatus === 'Pending refund' && $this->isCompletedTransaction())
-      // This concept of pay_later as different to any other sort of pending is deprecated & it's unclear
-      // why it is here or where it is handled instead.
-      || ($previousContributionStatus === 'Pending' && $this->getOriginalContribution()->is_pay_later == TRUE
-        && $currentContributionStatus === 'Partially paid'))
-    ) {
+    // Partially paid -> Completed reaches here via a direct (non-Payment.create) status
+    // update, eg. the back-office contribution form - CRM_Member_Form_MembershipTest::
+    // testSubmitUpdateMembershipFromPartiallyPaid() exercises it. Returning early leaves
+    // the remaining balance unposted - assuming that it has been otherwise dealt with.
+    if ($previousContributionStatus === 'Partially paid' && $this->isCompletedTransaction()) {
       return;
     }
 
