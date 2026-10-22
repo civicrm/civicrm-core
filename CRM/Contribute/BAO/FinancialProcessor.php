@@ -101,6 +101,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws \CRM_Core_Exception
    */
   public function updateFinancialRecordsOnContributionUpdate(array $params): array {
+    if ($this->isUnpaidAndNotPayLater()) {
+      $this->saveLineItemsWithNoFinancialTransaction();
+      return $params;
+    }
     $trxnParams = $this->getTrxnParams();
     $params['trxnParams'] = $trxnParams;
     $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $this->getOriginalContribution()->total_amount;
@@ -200,6 +204,43 @@ class CRM_Contribute_BAO_FinancialProcessor {
       }
     }
     return $params;
+  }
+
+  /**
+   * Save line items that do not have a payment or Accounts receivable transaction.
+   *
+   * In practice this is pending or in progress incomplete transactions or ones initially created
+   * as failed or cancelled.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function saveLineItemsWithNoFinancialTransaction(): void {
+    if (empty($this->getInputValue('skipLineItem'))) {
+      foreach ($this->getUpdatedLineItems() as $lineParams) {
+        $createdLineItem = CRM_Price_BAO_LineItem::create($lineParams);
+        // We create financial items with NO transaction ID on create if the transaction
+        // has failed or if we do not yet have a payment, and it is not pay_later. Payment.create
+        // finds these and links them.
+        // This feels smelly and is an artifact from making always-record-accounts-receiveable
+        // optional. More concerning - we have never updated these when the transactions are altered
+        // while in this state - leaving the potential for unbalanced lines. This feels like
+        // a latent bug.
+        if (!$this->isUpdate()) {
+          $lineItemValues = [
+            'id' => $createdLineItem->id,
+            'line_total' => $createdLineItem->line_total,
+            'qty' => $createdLineItem->qty,
+            'label' => $createdLineItem->label,
+            'tax_amount' => $createdLineItem->tax_amount ?? NULL,
+            'financial_type_id' => $createdLineItem->financial_type_id,
+          ];
+          $this->addFinancialItem($lineItemValues, FALSE, NULL);
+          if (!empty($lineParams['tax_amount'])) {
+            $this->addFinancialItem($lineItemValues, TRUE, NULL);
+          }
+        }
+      }
+    }
   }
 
   private function getOriginalPaymentInstrumentID(): ?int {
@@ -493,40 +534,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws CRM_Core_Exception
    */
   public function recordFinancialAccounts(array &$params): void {
-    if ($this->isUnpaidAndNotPayLater()) {
-      if (empty($this->getInputValue('skipLineItem'))) {
-        foreach ($this->getUpdatedLineItems() as $lineParams) {
-          $createdLineItem = CRM_Price_BAO_LineItem::create($lineParams);
-          // We create financial items with NO transaction ID on create if the transaction
-          // has failed or if we do not yet have a payment, and it is not pay_later. Payment.create
-          // finds these and links them.
-          // This feels smelly and is an artifact from making always-record-accounts-receiveable
-          // optional. More concerning - we have never updated these when the transactions are altered
-          // while in this state - leaving the potential for unbalanced lines. This feels like
-          // a latent bug.
-          if (!$this->isUpdate()) {
-            $lineItemValues = [
-              'id' => $createdLineItem->id,
-              'line_total' => $createdLineItem->line_total,
-              'qty' => $createdLineItem->qty,
-              'label' => $createdLineItem->label,
-              'tax_amount' => $createdLineItem->tax_amount ?? NULL,
-              'financial_type_id' => $createdLineItem->financial_type_id,
-            ];
-            $this->addFinancialItem($lineItemValues, FALSE, NULL);
-            if (!empty($lineParams['tax_amount'])) {
-              $this->addFinancialItem($lineItemValues, TRUE, NULL);
-            }
-          }
-        }
-      }
-      unset($params['line_item']);
-      return;
-    }
     if ($this->isUpdate()) {
       $params = $this->updateFinancialRecordsOnContributionUpdate($params);
     }
     else {
+      if ($this->isUnpaidAndNotPayLater()) {
+        $this->saveLineItemsWithNoFinancialTransaction();
+        return;
+      }
       $trxnParams = $params['trxnParams'] = $this->getTrxnParams();
       if ($this->isRecordAccountsReceivable()) {
         $this->recordAlwaysAccountsReceivable($trxnParams);
@@ -560,8 +575,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
         CRM_Batch_BAO_EntityBatch::create($entityParams);
       }
     }
-
-    unset($params['line_item']);
   }
 
   /**

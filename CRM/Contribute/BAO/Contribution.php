@@ -275,6 +275,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
         // https://github.com/civicrm/civicrm-core/pull/14673
         $financialProcessor = new CRM_Contribute_BAO_FinancialProcessor($params['prevContribution'] ?? NULL, $contribution, $previousLineItems, reset($params['line_item']), $params);
         $financialProcessor->recordFinancialAccounts($params);
+        unset($params['line_item']);
+        unset($params['trxnParams']);
       }
     }
 
