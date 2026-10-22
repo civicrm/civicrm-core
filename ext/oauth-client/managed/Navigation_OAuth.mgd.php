@@ -13,10 +13,7 @@ return [
         'label' => E::ts('OAuth'),
         'name' => 'OAuth',
         'url' => 'civicrm/admin/oauth',
-        'permission' => [
-          'manage OAuth client',
-        ],
-        'permission_operator' => 'OR',
+        'permission' => ['manage OAuth client'],
         'parent_id.name' => 'System Settings',
         // Must be declared: a managed entity keeps its stored value for any omitted field,
         // so without this the menu item stays hidden after the extension is disabled and re-enabled.

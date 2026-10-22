@@ -15,9 +15,11 @@ return [
   'requires' => ['crmMsgadm', 'crmEntityTags'],
   'server_route' => 'civicrm/admin/messageTemplates',
   'permission' => [
-    'edit message templates',
-    'edit user-driven message templates',
-    'edit system workflow message templates',
+    'OR',
+    [
+      'edit message templates',
+      'edit user-driven message templates',
+      'edit system workflow message templates',
+    ],
   ],
-  'permission_operator' => 'OR',
 ];

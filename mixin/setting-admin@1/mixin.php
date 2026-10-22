@@ -93,8 +93,7 @@ class About {
       'url' => $this->getPath() . '?reset=1',
       // 'icon' => 'crm-i fa-wrench', // None of the other "System Settings" have icons, so we don't.
       // 'permission' => ['administer CiviCRM', $this->getPerm()],
-      'permission' => "administer CiviCRM,{$this->getPerm()}",
-      'permission_operator' => 'OR',
+      'permission' => ['OR', ["administer CiviCRM", $this->getPerm()]],
     ];
   }
 
