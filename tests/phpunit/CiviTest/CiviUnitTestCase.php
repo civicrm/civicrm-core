@@ -1745,7 +1745,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1;');
 
     // Truncate resets the autoincrements, so re-apply separation
-    \Civi\Test::schema()->setAutoIncrement();
+    \Civi\Test::schema()->setAutoIncrement($tablesToTruncate);
   }
 
   /**
