@@ -242,14 +242,14 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'skipLineItem' => 1,
       'api.line_item.create' => [
         [
-          'price_field_id' => $this->ids['price_field'],
+          'price_field_id' => $this->ids['price_field'][0],
           'qty' => 1,
           'line_total' => '100',
           'unit_price' => '100',
           'financial_type_id' => $this->financialTypeID,
         ],
         [
-          'price_field_id' => $this->ids['price_field'],
+          'price_field_id' => $this->ids['price_field'][0],
           'qty' => 1,
           'line_total' => '300',
           'unit_price' => '300',

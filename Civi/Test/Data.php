@@ -14,6 +14,9 @@ class Data {
   public function populate() {
     \Civi\Test::asPreInstall(function() {
       \Civi\Test::schema()->truncateAll();
+      // Truncating reset the auto-increments; offset the seeded tables that are
+      // ready for it before the seed data is loaded.
+      \Civi\Test::schema()->setAutoIncrement(Schema::SEED_TABLES_TO_OFFSET);
 
       \Civi\Test::schema()->setStrict(FALSE);
 

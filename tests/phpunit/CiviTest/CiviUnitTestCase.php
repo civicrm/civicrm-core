@@ -1827,9 +1827,36 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   public function restoreDefaultPriceSetConfig(): void {
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_price_set WHERE name NOT IN('default_contribution_amount', 'default_membership_type_amount')");
     CRM_Core_DAO::executeQuery('UPDATE civicrm_price_set SET is_quick_config = 1, is_active = 1');
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_price_set SET id = 1 WHERE name ='default_contribution_amount'");
-    CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field` (`id`, `price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `help_pre`, `help_post`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `active_on`, `expire_on`, `javascript`, `visibility_id`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', 'Text', 0, NULL, NULL, 1, 1, 1, 1, 1, NULL, NULL, NULL, 1)");
-    CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`id`, `price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `non_deductible_amount`) VALUES (1, 1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, 1, 0.00)");
+    // Recreate the seeded field & value for the default contribution price set,
+    // without assuming the ids the seed data gave them.
+    $priceSetID = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_price_set WHERE name = 'default_contribution_amount'");
+    CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field` (`price_set_id`, `name`, `label`, `html_type`, `is_enter_qty`, `help_pre`, `help_post`, `weight`, `is_display_amounts`, `options_per_line`, `is_active`, `is_required`, `active_on`, `expire_on`, `javascript`, `visibility_id`) VALUES (%1, 'contribution_amount', 'Contribution Amount', 'Text', 0, NULL, NULL, 1, 1, 1, 1, 1, NULL, NULL, NULL, 1)", [1 => [$priceSetID, 'Integer']]);
+    $priceFieldID = CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()');
+    CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `non_deductible_amount`) VALUES (%1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, %2, 0.00)", [
+      1 => [$priceFieldID, 'Integer'],
+      2 => [CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'), 'Integer'],
+    ]);
+    unset(Civi::$statics['CRM_Price_BAO_PriceSet']);
+  }
+
+  /**
+   * Get the id of the price field of the default contribution price set.
+   *
+   * @return int
+   */
+  protected function getDefaultContributionPriceFieldID(): int {
+    $priceSet = CRM_Price_BAO_PriceSet::getDefaultPriceSet();
+    return (int) reset($priceSet)['priceFieldID'];
+  }
+
+  /**
+   * Get the id of the price field value of the default contribution price set.
+   *
+   * @return int
+   */
+  protected function getDefaultContributionPriceFieldValueID(): int {
+    $priceSet = CRM_Price_BAO_PriceSet::getDefaultPriceSet();
+    return (int) reset($priceSet)['priceFieldValueID'];
   }
 
   /**
@@ -3968,15 +3995,16 @@ WHERE a1.is_primary = 0
    * Ensure the default price set & field exist for memberships.
    */
   protected function ensureMembershipPriceSetExists(): void {
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_price_set (`id`, `name`, `title`, `extends`)
-      VALUES (2, 'default_membership_type_amount', 'Membership Amount', 3)
-      ON DUPLICATE KEY UPDATE `name` = 'default_membership_type_amount', title = 'Membership Amount';
-    ");
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_price_field
-      (`id`, `name`, `price_set_id`, `label`, `html_type`)
-      VALUES (2, 1, 2, 'Membership Amount', 'Radio')
-      ON DUPLICATE KEY UPDATE `name` = '1', price_set_id = 1, label =  'Membership Amount', html_type = 'Radio'
-    ");
+    $priceSetID = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_price_set WHERE name = 'default_membership_type_amount'");
+    if (!$priceSetID) {
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_price_set (`name`, `title`, `extends`)
+        VALUES ('default_membership_type_amount', 'Membership Amount', 3)");
+      $priceSetID = CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()');
+    }
+    if (!CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_price_field WHERE price_set_id = %1', [1 => [$priceSetID, 'Integer']])) {
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_price_field (`name`, `price_set_id`, `label`, `html_type`)
+        VALUES ('1', %1, 'Membership Amount', 'Radio')", [1 => [$priceSetID, 'Integer']]);
+    }
   }
 
   /**

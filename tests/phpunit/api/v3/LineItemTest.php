@@ -47,8 +47,8 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
     ];
     $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
     $this->params = [
-      'price_field_value_id' => 1,
-      'price_field_id' => 1,
+      'price_field_value_id' => $this->getDefaultContributionPriceFieldValueID(),
+      'price_field_id' => $this->getDefaultContributionPriceFieldID(),
       'entity_table' => 'civicrm_contribution',
       'entity_id' => $contribution['id'],
       'qty' => 1,

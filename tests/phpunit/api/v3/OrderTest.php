@@ -742,8 +742,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         0 => [
           'line_item' => [
             '0' => [
-              'price_field_id' => 1,
-              'price_field_value_id' => 1,
+              'price_field_id' => $this->getDefaultContributionPriceFieldID(),
+              'price_field_value_id' => $this->getDefaultContributionPriceFieldValueID(),
               'label' => 'Test 1',
               'field_title' => 'Test 1',
               'qty' => 1,
@@ -775,8 +775,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         0 => [
           'line_item' => [
             '0' => [
-              'price_field_id' => 1,
-              'price_field_value_id' => 1,
+              'price_field_id' => $this->getDefaultContributionPriceFieldID(),
+              'price_field_value_id' => $this->getDefaultContributionPriceFieldValueID(),
               'label' => 'Test 1',
               'field_title' => 'Test 1',
               'qty' => 1,
@@ -811,8 +811,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         0 => [
           'line_item' => [
             '0' => [
-              'price_field_id' => 1,
-              'price_field_value_id' => 1,
+              'price_field_id' => $this->getDefaultContributionPriceFieldID(),
+              'price_field_value_id' => $this->getDefaultContributionPriceFieldValueID(),
               'label' => 'Test 1',
               'field_title' => 'Test 1',
               'qty' => 1,
@@ -868,7 +868,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         [
           'line_item' => [
             [
-              'price_field_id' => 1,
+              'price_field_id' => $this->getDefaultContributionPriceFieldID(),
               'unit_price' => 50.00,
               'qty' => 1,
               'line_total' => 50.00,
@@ -881,7 +881,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         [
           'line_item' => [
             [
-              'price_field_id' => 1,
+              'price_field_id' => $this->getDefaultContributionPriceFieldID(),
               'unit_price' => 50.00,
               'qty' => 1,
               'line_total' => 50.00,
