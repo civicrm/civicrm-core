@@ -415,6 +415,7 @@ return [
       'sql_type' => 'text',
       'input_type' => 'Text',
       'add' => '1.7',
+      'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
       'usage' => [
         'import',
         'export',
