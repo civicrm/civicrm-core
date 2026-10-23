@@ -109,7 +109,9 @@ class TagFieldSpecProvider extends \Civi\Core\Service\AutoService implements Spe
   }
 
   private function getTaggableEntities(): array {
-    return \CRM_Core_OptionGroup::values('tag_used_for', FALSE, FALSE, FALSE, NULL, 'name');
+    // exclude entities that don't use EntityTag table such as Afform
+    $filter = 'AND v.filter != 1';
+    return \CRM_Core_OptionGroup::values('tag_used_for', FALSE, FALSE, FALSE, $filter, 'name');
   }
 
   /**
