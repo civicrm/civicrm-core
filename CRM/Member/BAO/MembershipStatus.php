@@ -315,7 +315,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus im
   public static function getNewMembershipTypeID(): int {
     $cacheKey = __CLASS__ . __FUNCTION__;
     if (!isset(\Civi::$statics[$cacheKey])) {
-      \Civi::$statics[$cacheKey] = (bool) CRM_Core_DAO::singleValueQuery(
+      \Civi::$statics[$cacheKey] = (int) CRM_Core_DAO::singleValueQuery(
         'SELECT id FROM civicrm_membership_status
         WHERE start_event = "join_date"
         AND start_event_adjust_unit IS NULL
