@@ -319,7 +319,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
         ->addValue('target_contact_id', '$id')
       )
       ->addChain('r1', Relationship::create()
-        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid1, 'relationship_type_id' => 1])
+        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid1, 'relationship_type_id:name' => 'Child of'])
       )
       ->execute()
       ->first()['id'];
@@ -336,10 +336,10 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
         ->addValue('target_contact_id', '$id')
       )
       ->addChain('r1', Relationship::create()
-        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid1, 'relationship_type_id' => 1])
+        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid1, 'relationship_type_id:name' => 'Child of'])
       )
       ->addChain('r2', Relationship::create()
-        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid2, 'relationship_type_id' => 2, 'is_active' => FALSE])
+        ->setValues(['contact_id_a' => '$id', 'contact_id_b' => $cid2, 'relationship_type_id:name' => 'Spouse of', 'is_active' => FALSE])
       )
       ->execute()
       ->first()['id'];

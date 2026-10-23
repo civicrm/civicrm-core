@@ -329,8 +329,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
 
     // create some relationships
     $this->callAPISuccess('Relationship', 'create', [
-      // CHILD OF
-      'relationship_type_id' => 1,
+      'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
       'contact_id_a'         => $contacts[1],
       'contact_id_b'         => $contacts[0],
       'is_permission_b_a'    => 1,
@@ -338,8 +337,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     ]);
 
     $this->callAPISuccess('Relationship', 'create', [
-      // CHILD OF
-      'relationship_type_id' => 1,
+      'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
       'contact_id_a'         => $contacts[2],
       'contact_id_b'         => $contacts[1],
       'is_permission_b_a'    => 1,
@@ -347,8 +345,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     ]);
 
     $this->callAPISuccess('Relationship', 'create', [
-      // CHILD OF
-      'relationship_type_id' => 1,
+      'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
       'contact_id_a'         => $contacts[4],
       'contact_id_b'         => $contacts[2],
       'is_permission_b_a'    => 1,
@@ -356,8 +353,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     ]);
 
     $this->callAPISuccess('Relationship', 'create', [
-      // SIBLING OF
-      'relationship_type_id' => 4,
+      'relationship_type_id' => $this->getRelationshipTypeID('Sibling of'),
       'contact_id_a'         => $contacts[5],
       'contact_id_b'         => $contacts[0],
       // View
@@ -366,8 +362,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     ]);
 
     $this->callAPISuccess('Relationship', 'create', [
-      // CHILD OF
-      'relationship_type_id' => 1,
+      'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
       'contact_id_a'         => $contacts[6],
       'contact_id_b'         => $contacts[5],
       // Edit
@@ -376,8 +371,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     ]);
 
     $this->callAPISuccess('Relationship', 'create', [
-      // CHILD OF
-      'relationship_type_id' => 1,
+      'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
       'contact_id_a'         => $contacts[7],
       'contact_id_b'         => $contacts[5],
       // View
@@ -386,8 +380,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     ]);
 
     $this->callAPISuccess('Relationship', 'create', [
-      // SIBLING OF
-      'relationship_type_id' => 4,
+      'relationship_type_id' => $this->getRelationshipTypeID('Sibling of'),
       'contact_id_a'         => $contacts[0],
       'contact_id_b'         => $contacts[8],
       // edit  (as a_b)
@@ -396,8 +389,7 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
     ]);
 
     $this->callAPISuccess('Relationship', 'create', [
-      // CHILD OF
-      'relationship_type_id' => 1,
+      'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
       'contact_id_a'         => $contacts[9],
       'contact_id_b'         => $contacts[8],
       // view

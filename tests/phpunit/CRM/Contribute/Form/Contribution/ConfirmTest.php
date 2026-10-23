@@ -286,7 +286,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->createTestEntity('Relationship', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $organizationID,
-      'relationship_type_id' => 5,
+      'relationship_type_id' => $this->getRelationshipTypeID('Employee of'),
       'is_current_employer' => 1,
     ]);
 
@@ -342,7 +342,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->createTestEntity('Relationship', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $organizationID,
-      'relationship_type_id' => 5,
+      'relationship_type_id' => $this->getRelationshipTypeID('Employee of'),
       'is_current_employer' => 1,
     ]);
     $submittedValues = $this->getBillingSubmitValues() + [
@@ -373,7 +373,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->createTestEntity('Relationship', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $existingOrgID,
-      'relationship_type_id' => 5,
+      'relationship_type_id' => $this->getRelationshipTypeID('Employee of'),
       'is_current_employer' => 1,
       'is_permission_a_b:name' => 'View and update',
     ]);

@@ -23,6 +23,22 @@ class CRM_Core_BAO_MappingTest extends CiviUnitTestCase {
    * @dataProvider getMappingMaps
    */
   public function testSaveMappingFields($params, $expected) {
+    // The data provider runs before the relationship types exist, so it gives names; look up the ids.
+    foreach ($params['mapper'] as &$mapperFields) {
+      foreach ($mapperFields as &$mapperField) {
+        if (preg_match('/^(.+)_(a_b|b_a)$/', $mapperField[1] ?? '', $matches)) {
+          $mapperField[1] = $this->getRelationshipTypeID($matches[1]) . '_' . $matches[2];
+        }
+      }
+      unset($mapperField);
+    }
+    unset($mapperFields);
+    foreach ($expected as &$expectedField) {
+      if (isset($expectedField['relationship_type_id'])) {
+        $expectedField['relationship_type_id'] = (string) $this->getRelationshipTypeID($expectedField['relationship_type_id']);
+      }
+    }
+    unset($expectedField);
     $mapping = $this->callAPISuccess('Mapping', 'create', ['name' => 'teest']);
     CRM_Core_BAO_Mapping::saveMappingFields($params, $mapping['id']);
     $saved = $this->callAPISuccess('MappingField', 'get', ['mapping_id' => $mapping['id'], 'sequential' => 1])['values'];
@@ -51,7 +67,7 @@ class CRM_Core_BAO_MappingTest extends CiviUnitTestCase {
           'mapper' => [
             1 =>
               [
-                ['Individual', '10_b_a', 'id'],
+                ['Individual', 'Supervised by_b_a', 'id'],
                 ['Individual', 'city', ' '],
                 ['Individual', 'contact_sub_type'],
                 ['Student', 'custom_27'],
@@ -60,7 +76,7 @@ class CRM_Core_BAO_MappingTest extends CiviUnitTestCase {
                 ['Individual', 'postal_code', '2'],
                 ['Individual', 'im', '1', '1'],
                 ['Individual', 'url'],
-                ['Individual', '1_b_a', 'phone', '5', '1'],
+                ['Individual', 'Child of_b_a', 'phone', '5', '1'],
               ],
           ],
         ],
@@ -70,7 +86,7 @@ class CRM_Core_BAO_MappingTest extends CiviUnitTestCase {
               'name' => 'id',
               'contact_type' => 'Individual',
               'column_number' => '0',
-              'relationship_type_id' => '10',
+              'relationship_type_id' => 'Supervised by',
               'relationship_direction' => 'b_a',
               'grouping' => '1',
             ],
@@ -142,7 +158,7 @@ class CRM_Core_BAO_MappingTest extends CiviUnitTestCase {
               'column_number' => '9',
               'location_type_id' => '5',
               'phone_type_id' => '1',
-              'relationship_type_id' => '1',
+              'relationship_type_id' => 'Child of',
               'relationship_direction' => 'b_a',
               'grouping' => '1',
             ],

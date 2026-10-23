@@ -65,7 +65,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'period_type' => 'rolling',
       'name' => 'Organization Membership Type' . ($withRelationship ? '1' : '0'),
       'title' => 'Organization Membership Type',
-      'relationship_type_id' => ($withRelationship) ? 5 : NULL,
+      'relationship_type_id' => ($withRelationship) ? $this->getRelationshipTypeID('Employee of') : NULL,
       'relationship_direction' => ($withRelationship) ? 'b_a' : NULL,
       'max_related' => $maxRelated ?: NULL,
     ], 'organization');
@@ -771,7 +771,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'financial_type_id' => 2,
       'auto_renew' => 0,
       'member_of_contact_id' => $values[$generalTypeID]['member_of_contact_id'],
-      'relationship_type_id' => [7],
+      'relationship_type_id' => [$this->getRelationshipTypeID('Head of Household for')],
       'relationship_direction' => ['b_a'],
       'max_related' => NULL,
       'duration_unit' => 'year',

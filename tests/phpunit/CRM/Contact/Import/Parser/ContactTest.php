@@ -89,7 +89,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     // Create a membership that should be inherited.
     $this->createTestEntity('MembershipType', [
       'name' => 'Workplace',
-      'relationship_type_id' => 5,
+      'relationship_type_id' => $this->getRelationshipTypeID('Employee of'),
       'relationship_direction' => 'b_a',
       'max_related' => 100,
       'duration_unit' => 'year',
@@ -116,7 +116,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ->execute()
       ->first()['id'];
     $userJobID = $this->getUserJobID([
-      'mapper' => [['first_name'], ['last_name'], ['email'], ['5_a_b', 'organization_name']],
+      'mapper' => [['first_name'], ['last_name'], ['email'], [$this->getRelationshipTypeID('Employee of') . '_a_b', 'organization_name']],
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
       'dedupe_rule_id' => $ruleGroupId,
     ]);
@@ -452,7 +452,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     Relationship::create(FALSE)
       ->addValue('contact_id_a', $anthony)
       ->addValue('contact_id_b', $jon)
-      ->addValue('relationship_type_id', 1)
+      ->addValue('relationship_type_id', $this->getRelationshipTypeID('Child of'))
       ->execute();
 
     $this->runImport([
@@ -1232,6 +1232,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @param array $submittedValues
    */
   public function testValidation(string $csv, array $mapper, string $expectedError = '', array $submittedValues = []): void {
+    // The data provider runs before the relationship types exist, so it gives e.g. 'Child of_a_b'; look up the id.
+    foreach ($mapper as &$mapperField) {
+      if (preg_match('/^(.+)_(a_b|b_a)$/', $mapperField[0], $matches)) {
+        $mapperField[0] = $this->getRelationshipTypeID($matches[1]) . '_' . $matches[2];
+      }
+    }
+    unset($mapperField);
     try {
       $this->validateCSV($csv, $mapper, $submittedValues);
     }
@@ -1258,12 +1265,12 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ],
       'individual_related_required_met' => [
         'csv' => 'individual_valid_with_related_email.csv',
-        'mapper' => [['first_name'], ['last_name'], ['1_a_b', 'email']],
+        'mapper' => [['first_name'], ['last_name'], ['Child of_a_b', 'email']],
         'expected_error' => '',
       ],
       'individual_related_required_not_met' => [
         'csv' => 'individual_invalid_with_related_phone.csv',
-        'mapper' => [['first_name'], ['last_name'], ['1_a_b', 'phone', 1, 2]],
+        'mapper' => [['first_name'], ['last_name'], ['Child of_a_b', 'phone', 1, 2]],
         'expected_error' => '(Child of) Missing required fields: First Name and Last Name OR Email OR External Identifier',
       ],
       'individual_bad_email' => [
@@ -1273,7 +1280,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ],
       'individual_related_bad_email' => [
         'csv' => 'individual_invalid_related_email.csv',
-        'mapper' => [['1_a_b', 'email', 1], ['first_name'], ['last_name']],
+        'mapper' => [['Child of_a_b', 'email', 1], ['first_name'], ['last_name']],
         'expected_error' => 'Invalid value for field(s) : (Child of) Email',
       ],
       'individual_invalid_external_identifier_only' => [
@@ -1464,9 +1471,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['first_name'],
       ['last_name'],
       ['gender_id'],
-      ['1_a_b', 'first_name'],
-      ['1_a_b', 'last_name'],
-      ['1_a_b', 'gender_id'],
+      [$this->getRelationshipTypeID('Child of') . '_a_b', 'first_name'],
+      [$this->getRelationshipTypeID('Child of') . '_a_b', 'last_name'],
+      [$this->getRelationshipTypeID('Child of') . '_a_b', 'gender_id'],
       ['do_not_import'],
     ];
     $csv = 'individual_genders.csv';
@@ -1724,9 +1731,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $mapper = [
       ['first_name'],
       ['last_name'],
-      ['5_a_b', 'organization_name'],
+      [$this->getRelationshipTypeID('Employee of') . '_a_b', 'organization_name'],
       ['contact_sub_type'],
-      ['5_a_b', 'contact_sub_type'],
+      [$this->getRelationshipTypeID('Employee of') . '_a_b', 'contact_sub_type'],
       // mapField Form expects all fields to be mapped.
       ['do_not_import'],
       ['do_not_import'],
@@ -2261,9 +2268,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'mapper' => [
         ['first_name'],
         ['phone', 1, 1],
-        ['5_a_b', 'url', 1],
+        [$this->getRelationshipTypeID('Employee of') . '_a_b', 'url', 1],
         ['im', 1, 1],
-        ['5_a_b', 'phone', 1, 1],
+        [$this->getRelationshipTypeID('Employee of') . '_a_b', 'phone', 1, 1],
       ],
     ]));
     $parser->init();
@@ -2280,7 +2287,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         ],
       ],
       'relationship' => [
-        '5_a_b' => [
+        $this->getRelationshipTypeID('Employee of') . '_a_b' => [
           'contact_type' => 'Organization',
           'contact_sub_type' => NULL,
           'website' => [
@@ -2332,7 +2339,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $mapper = [
       ['first_name'],
       ['last_name'],
-      ['1_a_b', 'email'],
+      [$this->getRelationshipTypeID('Child of') . '_a_b', 'email'],
     ];
     $values = ['Alok', 'Patel', 'tim.cook@apple.com', 1];
 
@@ -2578,8 +2585,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $mapper = [
       ['first_name'],
       ['last_name'],
-      ['5_a_b', 'external_identifier'],
-      ['5_a_b', 'organization_name'],
+      [$this->getRelationshipTypeID('Employee of') . '_a_b', 'external_identifier'],
+      [$this->getRelationshipTypeID('Employee of') . '_a_b', 'organization_name'],
     ];
 
     $values = array_values($contactImportValues);

@@ -332,7 +332,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->setUpActivityExportData();
     $selectedFields = [
       ['contact_type' => 'Individual', 'name' => 'display_name'],
-      ['contact_type' => 'Individual', 'relationship_type_id' => '5', 'relationship_direction' => 'a_b', 'name' => 'display_name'],
+      ['contact_type' => 'Individual', 'relationship_type_id' => $this->getRelationshipTypeID('Employee of'), 'relationship_direction' => 'a_b', 'name' => 'display_name'],
     ];
 
     $this->doExportTest([
@@ -1007,6 +1007,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       }
     }
 
+    $spouseOf = $this->getRelationshipTypeID('Spouse of');
+    $householdMemberOf = $this->getRelationshipTypeID('Household Member of');
+    $employeeOf = $this->getRelationshipTypeID('Employee of');
     $this->assertEquals([
       'contact_id' => '`contact_id` varchar(64)',
       'billing_city' => '`billing_city` varchar(64)',
@@ -1024,24 +1027,24 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'whare_kai_city' => '`whare_kai_city` varchar(64)',
       'whare_kai_street_address' => '`whare_kai_street_address` varchar(96)',
       'whare_kai_postal_code' => '`whare_kai_postal_code` varchar(64)',
-      '2_a_b_billing_city' => '`2_a_b_billing_city` varchar(64)',
-      '2_a_b_home_city' => '`2_a_b_home_city` varchar(64)',
-      '2_a_b_main_city' => '`2_a_b_main_city` varchar(64)',
-      '2_a_b_other_city' => '`2_a_b_other_city` varchar(64)',
-      '2_a_b_whare_kai_city' => '`2_a_b_whare_kai_city` varchar(64)',
-      '2_a_b_city' => '`2_a_b_city` varchar(64)',
-      '8_a_b_billing_city' => '`8_a_b_billing_city` varchar(64)',
-      '8_a_b_home_city' => '`8_a_b_home_city` varchar(64)',
-      '8_a_b_main_city' => '`8_a_b_main_city` varchar(64)',
-      '8_a_b_other_city' => '`8_a_b_other_city` varchar(64)',
-      '8_a_b_whare_kai_city' => '`8_a_b_whare_kai_city` varchar(64)',
-      '8_a_b_city' => '`8_a_b_city` varchar(64)',
-      '5_a_b_billing_city' => '`5_a_b_billing_city` varchar(64)',
-      '5_a_b_home_city' => '`5_a_b_home_city` varchar(64)',
-      '5_a_b_main_city' => '`5_a_b_main_city` varchar(64)',
-      '5_a_b_other_city' => '`5_a_b_other_city` varchar(64)',
-      '5_a_b_whare_kai_city' => '`5_a_b_whare_kai_city` varchar(64)',
-      '5_a_b_city' => '`5_a_b_city` varchar(64)',
+      "{$spouseOf}_a_b_billing_city" => "`{$spouseOf}_a_b_billing_city` varchar(64)",
+      "{$spouseOf}_a_b_home_city" => "`{$spouseOf}_a_b_home_city` varchar(64)",
+      "{$spouseOf}_a_b_main_city" => "`{$spouseOf}_a_b_main_city` varchar(64)",
+      "{$spouseOf}_a_b_other_city" => "`{$spouseOf}_a_b_other_city` varchar(64)",
+      "{$spouseOf}_a_b_whare_kai_city" => "`{$spouseOf}_a_b_whare_kai_city` varchar(64)",
+      "{$spouseOf}_a_b_city" => "`{$spouseOf}_a_b_city` varchar(64)",
+      "{$householdMemberOf}_a_b_billing_city" => "`{$householdMemberOf}_a_b_billing_city` varchar(64)",
+      "{$householdMemberOf}_a_b_home_city" => "`{$householdMemberOf}_a_b_home_city` varchar(64)",
+      "{$householdMemberOf}_a_b_main_city" => "`{$householdMemberOf}_a_b_main_city` varchar(64)",
+      "{$householdMemberOf}_a_b_other_city" => "`{$householdMemberOf}_a_b_other_city` varchar(64)",
+      "{$householdMemberOf}_a_b_whare_kai_city" => "`{$householdMemberOf}_a_b_whare_kai_city` varchar(64)",
+      "{$householdMemberOf}_a_b_city" => "`{$householdMemberOf}_a_b_city` varchar(64)",
+      "{$employeeOf}_a_b_billing_city" => "`{$employeeOf}_a_b_billing_city` varchar(64)",
+      "{$employeeOf}_a_b_home_city" => "`{$employeeOf}_a_b_home_city` varchar(64)",
+      "{$employeeOf}_a_b_main_city" => "`{$employeeOf}_a_b_main_city` varchar(64)",
+      "{$employeeOf}_a_b_other_city" => "`{$employeeOf}_a_b_other_city` varchar(64)",
+      "{$employeeOf}_a_b_whare_kai_city" => "`{$employeeOf}_a_b_whare_kai_city` varchar(64)",
+      "{$employeeOf}_a_b_city" => "`{$employeeOf}_a_b_city` varchar(64)",
     ], $this->processor->getSQLColumns());
   }
 

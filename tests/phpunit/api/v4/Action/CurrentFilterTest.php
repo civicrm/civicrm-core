@@ -41,30 +41,30 @@ class CurrentFilterTest extends Api4TestBase implements TransactionalInterface {
     $contactID2 = Contact::create()->addValue('first_name', 'Bob2')->execute()->first()['id'];
 
     $current = Relationship::create()->setValues([
-      'relationship_type_id' => 1,
+      'relationship_type_id:name' => 'Child of',
       'contact_id_a' => $contactID1,
       'contact_id_b' => $contactID2,
       'end_date' => 'now + 1 week',
     ])->execute()->first();
     $indefinite = Relationship::create()->setValues([
-      'relationship_type_id' => 2,
+      'relationship_type_id:name' => 'Spouse of',
       'contact_id_a' => $contactID1,
       'contact_id_b' => $contactID2,
     ])->execute()->first();
     $expiring = Relationship::create()->setValues([
-      'relationship_type_id' => 3,
+      'relationship_type_id:name' => 'Partner of',
       'contact_id_a' => $contactID1,
       'contact_id_b' => $contactID2,
       'end_date' => 'now',
     ])->execute()->first();
     $past = Relationship::create()->setValues([
-      'relationship_type_id' => 3,
+      'relationship_type_id:name' => 'Partner of',
       'contact_id_a' => $contactID1,
       'contact_id_b' => $contactID2,
       'end_date' => 'now - 1 week',
     ])->execute()->first();
     $inactive = Relationship::create()->setValues([
-      'relationship_type_id' => 4,
+      'relationship_type_id:name' => 'Sibling of',
       'contact_id_a' => $contactID1,
       'contact_id_b' => $contactID2,
       'is_active' => 0,

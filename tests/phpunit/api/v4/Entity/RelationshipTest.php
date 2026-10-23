@@ -49,7 +49,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       ->setValues([
         'contact_id_a' => $c1,
         'contact_id_b' => $c2,
-        'relationship_type_id' => 1,
+        'relationship_type_id:name' => 'Child of',
       ])->execute();
     $cacheRecords = RelationshipCache::get(FALSE)
       ->addClause('OR', ['near_contact_id', '=', $c1], ['far_contact_id', '=', $c1])
@@ -67,7 +67,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       ->setValues([
         'contact_id_a' => $c1,
         'contact_id_b' => $c2,
-        'relationship_type_id' => 1,
+        'relationship_type_id:name' => 'Child of',
         'description' => "Wow, we're related!",
         'is_permission_a_b' => 1,
         'is_permission_b_a:name' => 'View only',
@@ -106,7 +106,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
         'contact_id_b' => $c2,
         'start_date' => $today->format('Y-m-d'),
         'end_date' => $future->format('Y-m-d'),
-        'relationship_type_id' => 1,
+        'relationship_type_id:name' => 'Child of',
         'description' => "Wow, we're related!",
         'is_permission_a_b' => 1,
         'is_permission_b_a:name' => 'View only',
@@ -122,7 +122,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
         'contact_id_b' => $c2,
         'start_date' => $today->format('Y-m-d'),
         'end_date' => $future->format('Y-m-d'),
-        'relationship_type_id' => 1,
+        'relationship_type_id:name' => 'Child of',
         'description' => "Wow, we're related!",
         'is_permission_a_b' => 1,
         'is_permission_b_a:name' => 'View only',
@@ -160,7 +160,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       ->setValues([
         'contact_id_a' => $cid[0],
         'contact_id_b' => $cid[1],
-        'relationship_type_id' => 1,
+        'relationship_type_id:name' => 'Child of',
       ])
       ->execute()->first();
     $this->assertFalse($check['access']);
@@ -169,7 +169,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       Relationship::create()->setValues([
         'contact_id_a' => $cid[1],
         'contact_id_b' => $cid[0],
-        'relationship_type_id' => 1,
+        'relationship_type_id:name' => 'Child of',
       ])->execute();
       $this->fail();
     }
@@ -177,13 +177,13 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       Relationship::create(FALSE)->setValues([
         'contact_id_a' => $cid[1],
         'contact_id_b' => $cid[0],
-        'relationship_type_id' => 1,
+        'relationship_type_id:name' => 'Child of',
       ])->execute();
     }
     Relationship::create()->setValues([
       'contact_id_a' => $cid[1],
       'contact_id_b' => $cid[2],
-      'relationship_type_id' => 1,
+      'relationship_type_id:name' => 'Child of',
     ])->execute();
 
     $this->assertCount(2, Relationship::get(FALSE)->addWhere('contact_id_a', '=', $cid[1])->execute());
@@ -327,7 +327,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       ->setValues([
         'contact_id_a' => $c1,
         'contact_id_b' => $c2,
-        'relationship_type_id' => 1,
+        'relationship_type_id:name' => 'Child of',
       ])->execute();
 
     // Verify rows exist in cache

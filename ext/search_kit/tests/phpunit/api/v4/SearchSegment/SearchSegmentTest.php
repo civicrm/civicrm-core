@@ -258,7 +258,7 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     Individual::save(FALSE)
       ->setRecords($sampleData)
       ->addChain('rel', Relationship::create()
-        ->addValue('relationship_type_id', 1)
+        ->addValue('relationship_type_id:name', 'Child of')
         ->addValue('contact_id_b', $cid)
         ->addValue('contact_id_a', '$id')
       )

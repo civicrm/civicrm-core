@@ -40,8 +40,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
     $this->params = [
       'expires_date' => '2021-08-08',
       'form_values' => [
-        // Is volunteer for
-        'relation_type_id' => '6_a_b',
+        'relation_type_id' => $this->getRelationshipTypeID('Volunteer for') . '_a_b',
         'relation_target_name' => 'Default Organization',
       ],
     ];
@@ -153,8 +152,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
         'contact_id_a' => '$value.id',
         // default organization:
         'contact_id_b' => 1,
-        // volunteer relationship:
-        'relationship_type_id' => 6,
+        'relationship_type_id' => $this->getRelationshipTypeID('Volunteer for'),
         'is_active' => 1,
       ],
     ]);
