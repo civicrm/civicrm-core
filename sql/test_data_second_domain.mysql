@@ -2,21 +2,22 @@
   INSERT INTO civicrm_contact(sort_name, display_name, contact_type, organization_name)
   VALUES (@domainName, @domainName, 'Organization', @domainName);
   SET @contactID:=LAST_INSERT_ID();
+  SELECT @locationTypeHome := id FROM civicrm_location_type WHERE name = 'Home';
   INSERT INTO civicrm_address ( contact_id, location_type_id, is_primary, is_billing, street_address, street_number, street_number_suffix, street_number_predirectional, street_name, street_type, street_number_postdirectional, street_unit, supplemental_address_1, supplemental_address_2, supplemental_address_3, city, county_id, state_province_id, postal_code_suffix, postal_code, usps_adc, country_id, geo_code_1, geo_code_2, timezone)
       VALUES
-      ( @contactID, 1, 1, 1, '15 Main St', 15, 'S', NULL, 'Main', 'St', NULL, NULL, NULL, NULL, NULL, 'Collinsville', NULL, 1006, NULL, '6022', NULL, 1228, 41.8328, -72.9253, NULL);
+      ( @contactID, @locationTypeHome, 1, 1, '15 Main St', 15, 'S', NULL, 'Main', 'St', NULL, NULL, NULL, NULL, NULL, 'Collinsville', NULL, 1006, NULL, '6022', NULL, 1228, 41.8328, -72.9253, NULL);
 
 SELECT @addId := id from civicrm_address where street_address = '15 Main St';
 
 INSERT INTO civicrm_email (contact_id, location_type_id, email, is_primary, is_billing, on_hold, hold_date, reset_date)
       VALUES
-      (@contactID, 1, 'domainemail2@example.org', 1, 0, 0, NULL, NULL);
+      (@contactID, @locationTypeHome, 'domainemail2@example.org', 1, 0, 0, NULL, NULL);
 
 SELECT @emailId := id from civicrm_email where email = 'domainemail2@example.org';
 
 INSERT INTO civicrm_phone (contact_id, location_type_id, is_primary, is_billing, mobile_provider_id, phone, phone_type_id)
       VALUES
-      (@contactID, 1, 1, 0, NULL,'204 555-1001', 1);
+      (@contactID, @locationTypeHome, 1, 0, NULL,'204 555-1001', 1);
 
 SELECT @phoneId := id from civicrm_phone where phone = '204 555-1001';
 
