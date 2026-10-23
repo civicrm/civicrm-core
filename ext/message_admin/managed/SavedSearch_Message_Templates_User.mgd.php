@@ -169,7 +169,7 @@ return [
           ],
         ],
       ],
-      'match' => ['name'],
+      'match' => ['saved_search_id', 'name'],
     ],
   ],
 ];
