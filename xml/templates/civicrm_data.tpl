@@ -31,6 +31,10 @@ INSERT INTO civicrm_component (name, namespace) VALUES ('CiviCampaign'  , 'CRM_C
 -- references to component ID, so it's better to keep the auto-increment values stable.
 DELETE FROM civicrm_component WHERE name = 'CiviGrant';
 
+{crmSqlData file="sql/civicrm_data/civicrm_location_type.sqldata.php"}
+SELECT @locationTypeHome := id FROM civicrm_location_type WHERE name = 'Home';
+SELECT @locationTypeMain := id FROM civicrm_location_type WHERE name = 'Main';
+
 -- Create organization contact
 INSERT INTO civicrm_contact( `contact_type`, `sort_name`, `display_name`, `legal_name`, `organization_name`)
 VALUES ('Organization', @defaultOrganization, @defaultOrganization, @defaultOrganization, @defaultOrganization);
@@ -38,12 +42,11 @@ SET @contactID := LAST_INSERT_ID();
 
 INSERT INTO civicrm_email (contact_id, location_type_id, email, is_primary, is_billing, on_hold, hold_date, reset_date)
 VALUES
-(@contactID, 1, 'fixme.domainemail@example.org', 1, 0, 0, NULL, NULL);
+(@contactID, @locationTypeHome, 'fixme.domainemail@example.org', 1, 0, 0, NULL, NULL);
 
 INSERT INTO civicrm_domain (name, version, contact_id) VALUES (@domainName, '2.2', @contactID);
 SELECT @domainID := id FROM civicrm_domain where name = 'Default Domain Name';
 
-{crmSqlData file="sql/civicrm_data/civicrm_location_type.sqldata.php"}
 {crmSqlData file="sql/civicrm_data/civicrm_relationship_type.sqldata.php"}
 {crmSqlData file="sql/civicrm_data/civicrm_tag.sqldata.php"}
 {crmSqlData file="sql/civicrm_data/civicrm_mailing_component.sqldata.php"}
