@@ -84,7 +84,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       'email' => 'spam@dev.null',
       'contact_id' => $contactID,
       'is_primary' => 0,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ];
 
     $this->callAPISuccess('Email', 'create', $params);

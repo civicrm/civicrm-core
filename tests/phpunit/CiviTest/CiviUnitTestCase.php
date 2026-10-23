@@ -493,7 +493,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
         'api.Email.create' => ['email' => 'domainemail2@example.org'],
         'api.Address.create' => [
           'street_address' => '15 Main St',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'city' => 'Collinsville',
           'country_id' => 1228,
           'state_province_id' => 1003,

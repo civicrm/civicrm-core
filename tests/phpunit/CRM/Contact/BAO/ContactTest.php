@@ -764,7 +764,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //Now check DB for Address
     $searchParams = [
       'contact_id' => $contactId,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
     ];
     $compareParams = [
@@ -795,7 +795,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //Now check DB for Phone
     $searchParams = [
       'contact_id' => $contactId,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
     ];
     $compareParams = ['phone' => $profileParams['phone-Primary-1']];
@@ -804,7 +804,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //Now check DB for Mobile
     $searchParams = [
       'contact_id' => $contactId,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone_type_id' => $params['phone'][2]['phone_type_id'],
     ];
     $compareParams = ['phone' => $profileParams['phone-Primary-2']];
@@ -969,7 +969,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //Now check DB for Address
     $searchParams = [
       'contact_id' => $contactId,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
     ];
     $compareParams = [
@@ -1000,7 +1000,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //Now check DB for Phone
     $searchParams = [
       'contact_id' => $contactId,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
     ];
     $compareParams = ['phone' => $updatePfParams['phone-Primary-1']];
@@ -1009,7 +1009,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     //Now check DB for Mobile
     $searchParams = [
       'contact_id' => $contactId,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone_type_id' => $params['phone'][2]['phone_type_id'],
     ];
     $compareParams = ['phone' => $updatePfParams['phone-Primary-2']];
@@ -1353,7 +1353,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
         $params = [
           'email' => 'ex-1@example.com',
           'is_primary' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'contact_id' => $contactId,
         ];
         $this->callAPISuccess('Email', 'create', $params);
@@ -1387,7 +1387,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
         $params = [
           'phone' => '202-555-1000',
           'is_primary' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'contact_id' => $contactId,
         ];
         CRM_Core_BAO_Phone::writeRecord($params);
@@ -1553,7 +1553,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $email = $this->callAPISuccess('Email', 'create', [
       'contact_id' => $contactId,
       'email' => 'work@example.com',
-      'location_type_id' => 2,
+      'location_type_id' => $this->getLocationTypeID('Work'),
       'is_primary' => 0,
     ]);
     $emailId = $email['id'];
@@ -1565,8 +1565,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertNotEmpty($resultPrimary[1]);
 
     // Test specific location type lookup
-    $resultLocation = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactId, FALSE, 2);
-    $this->assertEquals([$displayName, 'work@example.com', 2, $emailId], $resultLocation);
+    $workLocationTypeID = $this->getLocationTypeID('Work');
+    $resultLocation = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactId, FALSE, $workLocationTypeID);
+    $this->assertEquals([$displayName, 'work@example.com', $workLocationTypeID, $emailId], $resultLocation);
   }
 
   /**

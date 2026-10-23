@@ -224,13 +224,13 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     ]);
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $testEntities = [
-      'Email' => ['email' => 'null@nothing', 'location_type_id' => 1],
-      'Phone' => ['phone' => '123456', 'location_type_id' => 1],
-      'IM' => ['name' => 'hello', 'location_type_id' => 1],
+      'Email' => ['email' => 'null@nothing', 'location_type_id' => $this->getLocationTypeID('Home')],
+      'Phone' => ['phone' => '123456', 'location_type_id' => $this->getLocationTypeID('Home')],
+      'IM' => ['name' => 'hello', 'location_type_id' => $this->getLocationTypeID('Home')],
       'Website' => ['url' => 'http://test'],
       'Address' => [
         'street_address' => '123 Sesame St.',
-        'location_type_id' => 1,
+        'location_type_id' => $this->getLocationTypeID('Home'),
       ],
     ];
     // v3 GroupContact API is nonstandard

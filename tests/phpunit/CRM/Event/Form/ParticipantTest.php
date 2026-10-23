@@ -562,7 +562,7 @@ United States<br />',
       'contact_id' => $loggedInContactID,
       'is_primary' => 1,
       'email' => 'testLoggedInReceiptEmail@civicrm.org',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ]);
 
     //Modify html to contain event_type_id token.
@@ -751,6 +751,7 @@ London,',
    * @return array
    */
   private function getSubmitParamsForCreditCardPayment(int $paymentProcessorID): array {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     return [
       'register_date' => '2018-09-04',
       'status_id' => $this->getParticipantStatusID('Registered'),
@@ -764,11 +765,11 @@ London,',
       'billing_first_name' => 'Junko',
       'billing_middle_name' => '',
       'billing_last_name' => 'Adams',
-      'billing_street_address-5' => '790L Lincoln St S',
-      'billing_city-5' => 'Baltimore',
-      'billing_state_province_id-5' => 1031,
-      'billing_postal_code-5' => 10545,
-      'billing_country_id-5' => 1228,
+      "billing_street_address-$billingLocationTypeID" => '790L Lincoln St S',
+      "billing_city-$billingLocationTypeID" => 'Baltimore',
+      "billing_state_province_id-$billingLocationTypeID" => 1031,
+      "billing_postal_code-$billingLocationTypeID" => 10545,
+      "billing_country_id-$billingLocationTypeID" => 1228,
       'payment_processor_id' => $paymentProcessorID,
       'from_email_address' => '"FIXME" <info@EXAMPLE.ORG>',
       'send_receipt' => 1,
