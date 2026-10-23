@@ -123,7 +123,7 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_participant_create_spec(&$params) {
-  $params['status_id']['api.default'] = 'Registered';
+  $params['status_id']['api.required'] = 0;
   $params['register_date']['api.default'] = "now";
   $params['event_id']['api.required'] = 1;
   $params['contact_id']['api.required'] = 1;
