@@ -101,8 +101,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       ],
       // Attendee.
       'role_id' => '1',
-      // No-show.
-      'status_id' => '8',
+      'status_id' => $this->getParticipantStatusID('Awaiting approval'),
     ];
 
     $this->fixtures['phone_call'] = [
@@ -260,7 +259,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'absolute_date' => CRM_Utils_Date::processDate('20120614100000'),
       'body_html' => '<p>sched_event_name_1day_on_abs_date</p>',
       'body_text' => 'sched_event_name_1day_on_abs_date',
-      'entity_status' => '1',
+      'entity_status' => (string) $this->getParticipantStatusID('Registered'),
       'entity_value' => '2',
       'group_id' => NULL,
       'is_active' => '1',
@@ -1259,7 +1258,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testEventNameWithAbsoluteDateAndNothingElse(): void {
-    $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], ['status_id' => 1]));
+    $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], ['status_id' => $this->getParticipantStatusID('Registered')]));
     $this->callAPISuccess('Email', 'create', [
       'contact_id' => $participant->contact_id,
       'email' => 'test-event@example.com',
@@ -2312,7 +2311,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     // Create event+participant with start_date = 20120315, end_date = 20120615.
     $params = $this->fixtures['participant'];
     $params['event_id'] = $this->callAPISuccess('Event', 'create', array_merge($this->fixtures['participant']['event_id'], ['event_type_id' => 1]))['id'];
-    $params['status_id'] = 2;
+    $params['status_id'] = $this->getParticipantStatusID('Attended');
     $params['contact_id'] = $this->individualCreate(array_merge($this->fixtures['contact'], ['email' => 'test-event@example.com']));
     $this->callAPISuccess('Participant', 'create', $params);
 
@@ -2399,7 +2398,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     // Create event+participant with start_date = 20120315, end_date = 20120615.
     $params = $this->fixtures['participant'];
     $params['event_id'] = $this->callAPISuccess('Event', 'create', array_merge($this->fixtures['participant']['event_id'], ['event_type_id' => 1]))['id'];
-    $params['status_id'] = 2;
+    $params['status_id'] = $this->getParticipantStatusID('Attended');
     $params['role_id'] = $testValue['role_id'];
     $params['contact_id'] = $this->individualCreate(array_merge($this->fixtures['contact'], ['email' => 'test-event@example.com']));
     $this->callAPISuccess('Participant', 'create', $params);
@@ -2447,7 +2446,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testEventTypeEndDateRepeat(): void {
     // Create event+participant with start_date = 20120315, end_date = 20120615.
-    $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], ['status_id' => 2]));
+    $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], ['status_id' => $this->getParticipantStatusID('Attended')]));
     $this->callAPISuccess('Email', 'create', [
       'contact_id' => $participant->contact_id,
       'email' => 'test-event@example.com',

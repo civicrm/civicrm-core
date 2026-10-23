@@ -47,7 +47,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   public function testSubmit(): void {
     $form = $this->getForm([], [
       'register_date' => date('Ymd'),
-      'status_id' => 1,
+      'status_id' => $this->getParticipantStatusID('Registered'),
       'role_id' => [CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
     ])->postProcess();
     $this->assertEquals($this->getEventID(), $form->getEventID());
@@ -57,7 +57,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   public function testSubmitWithExistingParticipant(): void {
     $submittedValues = [
       'register_date' => date('Ymd'),
-      'status_id' => 1,
+      'status_id' => $this->getParticipantStatusID('Registered'),
       'role_id' => [CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
     ];
     $form = $this->getForm([], $submittedValues)->postProcess();
@@ -76,7 +76,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
 
   public function testSubmitDualRole(): void {
     $this->getForm([], [
-      'status_id' => 1,
+      'status_id' => $this->getParticipantStatusID('Registered'),
       'register_date' => date('Ymd'),
       'send_receipt' => 1,
       'from_email_address' => 'admin@email.com',
@@ -97,13 +97,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->addSelect('subject')
       ->execute()->single();
     $this->assertStringContainsString('Volunteer, Speaker', $activity['subject']);
-    $this->assertStringContainsString(CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'status_id', 1), $activity['subject']);
+    $this->assertStringContainsString(CRM_Core_PseudoConstant::getLabel('CRM_Event_BAO_Participant', 'status_id', $this->getParticipantStatusID('Registered')), $activity['subject']);
   }
 
   public function testSubmitWithCustomData(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Participant', 'extends_entity_column_id' => 1, 'extends_entity_column_value' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Volunteer')]);
     $email = $this->getForm([], [
-      'status_id' => 1,
+      'status_id' => $this->getParticipantStatusID('Registered'),
       'register_date' => date('Ymd'),
       'send_receipt' => 1,
       'from_email_address' => 'admin@email.com',
@@ -147,7 +147,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->execute();
     $this->getForm(['is_monetary' => FALSE], [
       'register_date' => date('Ymd'),
-      'status_id' => 1,
+      'status_id' => $this->getParticipantStatusID('Registered'),
       'send_receipt' => '1',
       'from_email_address' => '"mailer" <mail@example.org>',
       'role_id' => [CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'role_id', 'Attendee')],
@@ -753,7 +753,7 @@ London,',
   private function getSubmitParamsForCreditCardPayment(int $paymentProcessorID): array {
     return [
       'register_date' => '2018-09-04',
-      'status_id' => 1,
+      'status_id' => $this->getParticipantStatusID('Registered'),
       'credit_card_number' => 4444333322221111,
       'cvv2' => 123,
       'credit_card_exp_date' => [

@@ -59,7 +59,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->_params = [
       'contact_id' => $this->_contactID,
       'event_id' => $this->getEventID(),
-      'status_id' => 1,
+      'status_id' => $this->getParticipantStatusID('Registered'),
       'role_id' => 1,
       // to ensure it matches later on
       'register_date' => '2007-07-21 00:00:00',
@@ -415,7 +415,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $participant = $this->callAPISuccess('participant', 'create', $this->_params);
     $update = [
       'id' => $participant['id'],
-      'status_id' => 2,
+      'status_id' => $this->getParticipantStatusID('Attended'),
     ];
     $this->callAPISuccess('participant', 'create', $update);
     $this->getAndCheck(array_merge($this->_params, $update), $participant['id'], 'participant');
@@ -429,7 +429,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $participant = $this->callAPISuccess('participant', 'create', $myParams);
     $update = [
       'id' => $participant['id'],
-      'status_id' => 2,
+      'status_id' => $this->getParticipantStatusID('Attended'),
     ];
     $update = $this->callAPISuccess('participant', 'create', $update);
 
@@ -566,7 +566,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'id' => $participantId,
       'contact_id' => $this->_individualId,
       'event_id' => $this->getEventID(),
-      'status_id' => 3,
+      'status_id' => $this->getParticipantStatusID('No-show'),
       'role_id' => [3],
       'register_date' => '2006-01-21 00:00:00',
       'source' => 'US Open',
@@ -594,7 +594,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->assertAPISuccess($participant);
     $update = [
       'id' => $participant['id'],
-      'status_id' => 2,
+      'status_id' => $this->getParticipantStatusID('Attended'),
     ];
     $this->callAPISuccess('participant', 'create', $update);
     $this->assertEquals($participant['values'][$participant['id']]['fee_level'],
@@ -609,7 +609,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   public function testUpdateWithWrongParticipantID(): void {
     $params = [
       'id' => 1234,
-      'status_id' => 3,
+      'status_id' => $this->getParticipantStatusID('No-show'),
       'role_id' => 3,
       'register_date' => '2006-01-21',
       'source' => 'US Open',
@@ -629,7 +629,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $params = [
       'id' => $participantID,
       'contact_id' => 12345,
-      'status_id' => 3,
+      'status_id' => $this->getParticipantStatusID('No-show'),
       'role_id' => 3,
       'register_date' => '2006-01-21',
       'source' => 'US Open',
@@ -659,7 +659,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'display_name' => 'Guru',
       'api.participant' => [
         'event_id' => $this->getEventID(),
-        'status_id' => 1,
+        'status_id' => $this->getParticipantStatusID('Registered'),
         'role_id' => 1,
         'format.only_id' => 1,
       ],
@@ -698,7 +698,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_post', [$this, 'onPost']);
     $params = [
       'id' => $participantID,
-      'status_id' => 1,
+      'status_id' => $this->getParticipantStatusID('Registered'),
     ];
     $this->callAPISuccess('Participant', 'create', $params);
 

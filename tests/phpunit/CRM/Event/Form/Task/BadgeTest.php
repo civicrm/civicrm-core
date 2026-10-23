@@ -92,7 +92,7 @@ class CRM_Event_Form_Task_BadgeTest extends CiviUnitTestCase {
       '{contact.display_name}' => 'Mr. Anthony Anderson II',
       '{contact.current_employer}' => 'Default Organization',
       '{event.start_date|crmDate:"%B %E%f"}' => 'October 21st',
-      '{participant.status_id}' => 2,
+      '{participant.status_id}' => $this->getParticipantStatusID('Attended'),
       '{participant.role_id}' => 1,
       '{participant.register_date}' => 'February 19th, 2007',
       '{participant.source}' => 'Wimbledon',

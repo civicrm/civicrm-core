@@ -25,14 +25,14 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
     $field = $this->customFieldCreate(['custom_group_id' => $group['id'], 'html_type' => 'CheckBox', 'option_values' => ['two' => 'A couple', 'three' => 'A few', 'four' => 'Too Many']]);
     $participantID = $this->participantCreate();
     $participant = $this->callAPISuccessGetSingle('Participant', ['id' => $participantID]);
-    $this->assertEquals(2, $participant['participant_status_id']);
+    $this->assertEquals($this->getParticipantStatusID('Attended'), $participant['participant_status_id']);
 
     $this->getTestForm('CRM_Event_Form_Task_Batch', [
-      'field' => [$participantID => ['participant_status_id' => 1, 'custom_' . $field['id'] => ['two' => 1, 'four' => 1]]],
+      'field' => [$participantID => ['participant_status_id' => $this->getParticipantStatusID('Registered'), 'custom_' . $field['id'] => ['two' => 1, 'four' => 1]]],
     ])->postProcess();
 
     $participant = $this->callAPISuccessGetSingle('Participant', ['id' => $participantID]);
-    $this->assertEquals(1, $participant['participant_status_id']);
+    $this->assertEquals($this->getParticipantStatusID('Registered'), $participant['participant_status_id']);
   }
 
   /**

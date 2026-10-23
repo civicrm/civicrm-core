@@ -278,7 +278,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals(0, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
     $this->assertEquals(1, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
     $participant = $this->callAPISuccess('Participant', 'create', [
-      'participant_status' => 1,
+      'participant_status' => $this->getParticipantStatusID('Registered'),
       'role_id' => 1,
       'contact_id' => $contactID,
       'event_id' => $this->_eventIds[0],
