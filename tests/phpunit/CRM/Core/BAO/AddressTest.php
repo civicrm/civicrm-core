@@ -452,7 +452,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => $contactId,
       'street_address' => $street_address,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ];
 
     $result = civicrm_api3('Address', 'create', $params);

@@ -227,6 +227,37 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     foreach (glob(dirname(__FILE__) . "/SavedSearchDataSets/*.sql") as $file) {
       CRM_Utils_File::sourceSQLFile(NULL, $file);
     }
+    // The data sets come from sites with the standard location type ids
+    // (1 = Home ... 5 = Billing), so map those to this database's ids.
+    $locationTypeIDs = [];
+    foreach (['Home', 'Work', 'Main', 'Other', 'Billing'] as $index => $name) {
+      $locationTypeIDs[$index + 1] = $this->getLocationTypeID($name);
+    }
+    foreach ($locationTypeIDs as $legacyID => $locationTypeID) {
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_mapping_field SET location_type_id = %1 WHERE location_type_id = %2', [
+        1 => [$locationTypeID, 'Integer'],
+        2 => [$legacyID, 'Integer'],
+      ]);
+    }
+    $savedSearches = CRM_Core_DAO::executeQuery('SELECT id, form_values FROM civicrm_saved_search WHERE form_values IS NOT NULL');
+    while ($savedSearches->fetch()) {
+      $formValues = CRM_Utils_String::unserialize($savedSearches->form_values);
+      if (!is_array($formValues['mapper'] ?? NULL)) {
+        continue;
+      }
+      foreach ($formValues['mapper'] as &$mapperRows) {
+        foreach ($mapperRows as &$mapperRow) {
+          if (isset($mapperRow[2], $locationTypeIDs[$mapperRow[2]])) {
+            $mapperRow[2] = (string) $locationTypeIDs[$mapperRow[2]];
+          }
+        }
+      }
+      unset($mapperRows, $mapperRow);
+      CRM_Core_DAO::executeQuery('UPDATE civicrm_saved_search SET form_values = %1 WHERE id = %2', [
+        1 => [serialize($formValues), 'String'],
+        2 => [$savedSearches->id, 'Integer'],
+      ]);
+    }
   }
 
   /**

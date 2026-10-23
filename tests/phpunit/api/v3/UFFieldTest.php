@@ -56,7 +56,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       'label' => 'Test Phone',
       'is_searchable' => 1,
       'is_active' => 1,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone_type_id' => 1,
       'uf_group_id' => $this->createTestEntity('UFGroup', [
         'group_type' => 'Contact',
@@ -70,7 +70,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     ]);
 
     // needs to be a different field
-    $params['location_type_id'] = 2;
+    $params['location_type_id'] = $this->getLocationTypeID('Work');
     $ufField2 = $this->callAPISuccess('UFField', 'create', $params);
     $this->assertEquals(1, $ufField2['values'][$ufField2['id']]['weight']);
     $this->assertDBQuery(1, 'SELECT weight FROM civicrm_uf_field WHERE id = %1', [
@@ -103,7 +103,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       'label' => 'Test Country',
       'is_searchable' => 1,
       'is_active' => 1,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ];
     $baseFields[] = [
       'field_name' => 'phone',
@@ -113,7 +113,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       'label' => 'Test Phone',
       'is_searchable' => 1,
       'is_active' => 1,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone_type_id' => 1,
     ];
 

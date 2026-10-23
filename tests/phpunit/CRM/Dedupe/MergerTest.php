@@ -417,12 +417,12 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', [
       'contact_id' => $contact1,
       'state_province_id' => 1049,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ]);
     $this->callAPISuccess('address', 'create', [
       'contact_id' => $contact2,
       'state_province_id' => 1049,
-      'location_type_id' => 2,
+      'location_type_id' => $this->getLocationTypeID('Work'),
     ]);
     $ruleGroup = $this->createRuleGroup();
     $this->callAPISuccess('Rule', 'create', [

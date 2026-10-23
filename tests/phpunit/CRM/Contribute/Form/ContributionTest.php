@@ -490,7 +490,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'credit_card_exp_date' => ['M' => 5, 'Y' => date('Y', strtotime('+ 1 year'))],
       'credit_card_number' => '411111111111111',
       'credit_card_type' => 'Visa',
-      'billing_city-5' => 'Vancouver',
+      'billing_city-' . $this->getLocationTypeID('Billing') => 'Vancouver',
     ], NULL, 'live');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['return' => 'address_id']);
     $this->assertNotEmpty($contribution['address_id']);
@@ -545,7 +545,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertEmpty($contribution['address_id']);
     $this->callAPISuccessGetCount('Address', [
       'city' => 'Vancouver',
-      'location_type_id' => 5,
+      'location_type_id' => $this->getLocationTypeID('Billing'),
     ], 0);
   }
 

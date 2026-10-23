@@ -19,7 +19,7 @@ class CRM_Utils_AddressTest extends CiviUnitTestCase {
       'country' => 'United States',
       'postal_code' => 33101,
       'contact_id' => $contact['id'],
-      'location_type_id' => 5,
+      'location_type_id' => $this->getLocationTypeID('Billing'),
       'is_primary' => 1,
     ]);
     $addressDetails = $address['values'][$address['id']];
