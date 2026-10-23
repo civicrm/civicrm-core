@@ -103,6 +103,7 @@ return [
       'description' => ts('Participant status ID. FK to civicrm_participant_status_type. Default of 1 should map to status = Registered.'),
       'add' => '1.7',
       'unique_name' => 'participant_status_id',
+      'default_callback' => ['CRM_Event_BAO_Participant', 'getDefaultStatusID'],
       'default' => 1,
       'usage' => [
         'import',

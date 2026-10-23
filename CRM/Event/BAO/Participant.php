@@ -1991,6 +1991,15 @@ WHERE    civicrm_participant.contact_id = {$contactID} AND
   }
 
   /**
+   * Default_callback for status_id field.
+   *
+   * @return int
+   */
+  public static function getDefaultStatusID(): int {
+    return (int) CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered');
+  }
+
+  /**
    * CRM-17797 -- Format fields and setDefaults for primary and additional participants profile
    * @param int $contactId
    * @param CRM_Core_Form $form
