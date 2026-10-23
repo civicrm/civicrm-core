@@ -836,6 +836,26 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get the contact id for the registration.
+   *
+   * @param array $fields
+   * @param bool $isAdditional
+   *
+   * @return int|null
+   * @throws \CRM_Core_Exception
+   */
+  protected function getRegistrationContactID($fields, $isAdditional) {
+    $contactID = NULL;
+    if (!$isAdditional) {
+      $contactID = $this->getContactID();
+    }
+    if (!$contactID && is_array($fields) && $fields) {
+      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', [], FALSE, $this->getEventValue('dedupe_rule_group_id'), ['event_id' => $this->getEventID()]);
+    }
+    return $contactID;
+  }
+
+  /**
    * @param int $participantNum
    *
    * @return float|null

@@ -47,26 +47,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_paymentProcessorID;
 
   /**
-   * Get the contact id for the registration.
-   *
-   * @param array $fields
-   * @param CRM_Event_Form_Registration $form
-   * @param bool $isAdditional
-   *
-   * @return int|null
-   */
-  public static function getRegistrationContactID($fields, $form, $isAdditional) {
-    $contactID = NULL;
-    if (!$isAdditional) {
-      $contactID = $form->getContactID();
-    }
-    if (!$contactID && is_array($fields) && $fields) {
-      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', [], FALSE, $form->_values['event']['dedupe_rule_group_id'] ?? NULL, ['event_id' => $form->_values['event']['id'] ?? NULL]);
-    }
-    return $contactID;
-  }
-
-  /**
    * Get the active UFGroups (profiles) on this form
    * Many forms load one or more UFGroups (profiles).
    * This provides a standard function to retrieve the IDs of those profiles from the form
@@ -656,7 +636,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if (!$this->_allowConfirmation) {
       // check if the participant is already registered
       if (!$this->_skipDupeRegistrationCheck) {
-        $params['contact_id'] = self::getRegistrationContactID($params, $this, FALSE);
+        $params['contact_id'] = $this->getRegistrationContactID($params, FALSE);
       }
     }
 
@@ -847,7 +827,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       return FALSE;
     }
 
-    $contactID = self::getRegistrationContactID($fields, $form, $isAdditional);
+    $contactID = $form->getRegistrationContactID($fields, $isAdditional);
 
     if ($contactID) {
       $errors = CRM_Event_BAO_Participant::validateExistingRegistration(

@@ -597,7 +597,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     if (!$this->_allowConfirmation) {
       // check if the participant is already registered
-      $params['contact_id'] = CRM_Event_Form_Registration_Register::getRegistrationContactID($params, $this, TRUE);
+      $params['contact_id'] = $this->getRegistrationContactID($params, TRUE);
     }
 
     if (!empty($params['image_URL'])) {
