@@ -604,13 +604,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contactValues['external_identifier'] = 'android';
     $contactValues['street_address'] = 'Big Mansion';
     $contactValues['phone'] = '911';
-    $mapper = $this->getFieldMappingFromInput($contactValues, 2);
+    $mapper = $this->getFieldMappingFromInput($contactValues, $this->getLocationTypeID('Work'));
     $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, $mapper);
     $address = $this->callAPISuccessGetSingle('Address', ['street_address' => 'Big Mansion']);
-    $this->assertEquals(2, $address['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Work'), $address['location_type_id']);
 
     $phone = $this->callAPISuccessGetSingle('Phone', ['phone' => '911']);
-    $this->assertEquals(2, $phone['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Work'), $phone['location_type_id']);
 
     $contact = $this->callAPISuccessGetSingle('Contact', $contactValues);
     $this->callAPISuccess('Contact', 'delete', ['id' => $contact['id']]);
@@ -784,11 +784,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $mapper = $this->getFieldMappingFromInput($contactValues);
     $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, $mapper);
     $address = $this->callAPISuccessGetSingle('Address', ['street_address' => 'Big Mansion']);
-    $this->assertEquals(1, $address['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Home'), $address['location_type_id']);
     $this->assertEquals(1, $address['is_primary']);
 
     $phone = $this->callAPISuccessGetSingle('Phone', ['phone' => '12334']);
-    $this->assertEquals(1, $phone['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Home'), $phone['location_type_id']);
 
     $this->callAPISuccessGetSingle('Email', ['email' => 'bill.gates@microsoft.com']);
 
@@ -825,7 +825,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contact1 = $this->callAPISuccess('Contact', 'create', $contact1Params);
     $this->callAPISuccess('Address', 'create', [
       'contact_id' => $contact1['id'],
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'street_address' => 'Big Mansion',
     ]);
 
@@ -835,11 +835,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'street_address' => 'Big Mansion',
     ];
 
-    // We want to import with a location_type_id of 4.
-    $fieldMapping = $this->getFieldMappingFromInput($contactValues, 4);
+    // We want to import with the 'Other' location type.
+    $fieldMapping = $this->getFieldMappingFromInput($contactValues, $this->getLocationTypeID('Other'));
     $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_SKIP, CRM_Import_Parser::DUPLICATE, $fieldMapping, NULL, $ruleGroupID);
     $address = $this->callAPISuccessGetSingle('Address', ['street_address' => 'Big Mansion']);
-    $this->assertEquals(1, $address['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Home'), $address['location_type_id']);
     $contact = $this->callAPISuccessGetSingle('Contact', $contact1Params);
     $this->callAPISuccess('Contact', 'delete', ['id' => $contact['id']]);
   }
@@ -1095,27 +1095,27 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
     $fieldMapping = $this->getFieldMappingFromInput($contactValues);
     $contactValues['street_address_2'] = 'Teeny Mansion';
-    $fieldMapping[] = ['name' => 'street_address', 'location_type_id' => 3];
+    $fieldMapping[] = ['name' => 'street_address', 'location_type_id' => $this->getLocationTypeID('Main')];
     $contactValues['phone_2'] = 4444;
-    $fieldMapping[] = ['name' => 'phone', 'location_type_id' => 3, 'phone_type_id' => 1];
+    $fieldMapping[] = ['name' => 'phone', 'location_type_id' => $this->getLocationTypeID('Main'), 'phone_type_id' => 1];
 
     $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, $fieldMapping);
     $contact = $this->callAPISuccessGetSingle('Contact', ['external_identifier' => 'android']);
     $address = $this->callAPISuccess('Address', 'get', ['contact_id' => $contact['id'], 'sequential' => 1]);
 
-    $this->assertEquals(3, $address['values'][0]['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Main'), $address['values'][0]['location_type_id']);
     $this->assertEquals(0, $address['values'][0]['is_primary']);
     $this->assertEquals('Teeny Mansion', $address['values'][0]['street_address']);
 
-    $this->assertEquals(1, $address['values'][1]['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Home'), $address['values'][1]['location_type_id']);
     $this->assertEquals(1, $address['values'][1]['is_primary']);
     $this->assertEquals('Big Mansion', $address['values'][1]['street_address']);
 
     $phone = $this->callAPISuccess('Phone', 'get', ['contact_id' => $contact['id'], 'sequential' => 1]);
-    $this->assertEquals(1, $phone['values'][0]['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Home'), $phone['values'][0]['location_type_id']);
     $this->assertEquals(1, $phone['values'][0]['is_primary']);
     $this->assertEquals(12334, $phone['values'][0]['phone']);
-    $this->assertEquals(3, $phone['values'][1]['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Main'), $phone['values'][1]['location_type_id']);
     $this->assertEquals(0, $phone['values'][1]['is_primary']);
     $this->assertEquals(4444, $phone['values'][1]['phone']);
 
@@ -1162,7 +1162,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contactValues['street_address'] = 'Big Mansion';
     $contactValues['phone'] = 12334;
 
-    $fieldMapping = $this->getFieldMappingFromInput($contactValues, 3);
+    $fieldMapping = $this->getFieldMappingFromInput($contactValues, $this->getLocationTypeID('Main'));
 
     $contactValues['street_address_2'] = 'Teeny Mansion';
     $fieldMapping[] = ['name' => 'street_address', 'location_type_id' => 'Primary'];
@@ -1173,19 +1173,19 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccessGetSingle('Contact', ['external_identifier' => 'android']);
     $address = $this->callAPISuccess('Address', 'get', ['contact_id' => $contact['id'], 'sequential' => 1])['values'];
 
-    $this->assertEquals(1, $address[1]['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Home'), $address[1]['location_type_id']);
     $this->assertEquals(1, $address[1]['is_primary']);
     $this->assertEquals('Teeny Mansion', $address[1]['street_address']);
 
-    $this->assertEquals(3, $address[0]['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Main'), $address[0]['location_type_id']);
     $this->assertEquals(0, $address[0]['is_primary']);
     $this->assertEquals('Big Mansion', $address[0]['street_address']);
 
     $phone = $this->callAPISuccess('Phone', 'get', ['contact_id' => $contact['id'], 'sequential' => 1, 'options' => ['sort' => 'is_primary DESC']])['values'];
-    $this->assertEquals(3, $phone[1]['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Main'), $phone[1]['location_type_id']);
     $this->assertEquals(0, $phone[1]['is_primary']);
     $this->assertEquals(12334, $phone[1]['phone']);
-    $this->assertEquals(1, $phone[0]['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Home'), $phone[0]['location_type_id']);
     $this->assertEquals(1, $phone[0]['is_primary']);
     $this->assertEquals(4444, $phone[0]['phone']);
 
@@ -1205,15 +1205,15 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contactValues['street_address'] = 'Big Mansion';
     $contactValues['city'] = 'Big City';
     $contactID = $this->callAPISuccessGetValue('Contact', ['external_identifier' => 'android', 'return' => 'id']);
-    $originalAddress = $this->callAPISuccess('Address', 'create', ['location_type_id' => 2, 'street_address' => 'small house', 'contact_id' => $contactID]);
-    $originalPhone = $this->callAPISuccess('phone', 'create', ['location_type_id' => 2, 'phone' => '1234', 'contact_id' => $contactID, 'phone_type_id' => 1]);
+    $originalAddress = $this->callAPISuccess('Address', 'create', ['location_type_id' => $this->getLocationTypeID('Work'), 'street_address' => 'small house', 'contact_id' => $contactID]);
+    $originalPhone = $this->callAPISuccess('phone', 'create', ['location_type_id' => $this->getLocationTypeID('Work'), 'phone' => '1234', 'contact_id' => $contactID, 'phone_type_id' => 1]);
     $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, []);
     $phone = $this->callAPISuccessGetSingle('Phone', ['phone' => '98765']);
-    $this->assertEquals(2, $phone['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Work'), $phone['location_type_id']);
     $this->assertEquals($originalPhone['id'], $phone['id']);
     $this->callAPISuccess('Email', 'getsingle', ['contact_id' => $contactID]);
     $address = $this->callAPISuccessGetSingle('Address', ['street_address' => 'Big Mansion']);
-    $this->assertEquals(2, $address['location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Work'), $address['location_type_id']);
     $this->assertEquals($originalAddress['id'], $address['id']);
     $this->assertEquals('Big City', $address['city']);
     $this->callAPISuccessGetSingle('Contact', $contactValues);

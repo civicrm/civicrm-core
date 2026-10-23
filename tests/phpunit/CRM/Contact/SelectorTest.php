@@ -575,7 +575,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
   public function testContactIDQuery(): void {
     $params = [
       [
-        0 => 'country-1',
+        0 => 'country-' . $this->getLocationTypeID('Home'),
         1 => '=',
         2 => '1228',
         3 => 1,
@@ -714,7 +714,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
     //Search for any params.
     $params = [
       [
-        0 => 'country-1',
+        0 => 'country-' . $this->getLocationTypeID('Home'),
         1 => '=',
         2 => '1228',
         3 => 1,

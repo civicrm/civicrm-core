@@ -1631,7 +1631,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
         'field_type' => $field_type,
       ];
       if ($field_type === 'Contact') {
-        $params['location_type_id'] = 1;
+        $params['location_type_id'] = $this->getLocationTypeID('Home');
       }
       $this->callAPISuccess('UFField', 'create', $params);
     }
@@ -1661,6 +1661,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery('UPDATE civicrm_uf_join SET id = ' . $newID . ' WHERE weight = 1 AND module = "CiviContribute"');
     $processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
     $processor->setDoDirectPaymentResult(['payment_status_id' => 1, 'fee_amount' => .72]);
+    $homeLocationTypeID = $this->getLocationTypeID('Home');
     $this->submitOnlineContributionForm([
       'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
       'id' => $this->getContributionPageID(),
@@ -1668,11 +1669,11 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'honor' => [
         'first_name' => 'James',
         'last_name' => 'Bond',
-        'street_address-1' => 'Vaxhaul Cross',
-        'city-1' => 'London',
-        'postal_code-1' => 'M4K1J1',
-        'country-1' => 1039,
-        'state_province-1' => 1068,
+        "street_address-$homeLocationTypeID" => 'Vaxhaul Cross',
+        "city-$homeLocationTypeID" => 'London',
+        "postal_code-$homeLocationTypeID" => 'M4K1J1',
+        "country-$homeLocationTypeID" => 1039,
+        "state_province-$homeLocationTypeID" => 1068,
       ],
     ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
