@@ -703,6 +703,11 @@ class Submit extends AbstractProcessor {
     $mainEntity = $event->getFormDataModel()->getEntity($event->getEntityName());
     foreach ($joins as $joinEntityName => $joinValues) {
       $values = self::filterEmptyJoins($mainEntity, $joinEntityName, $joinValues);
+      // Expand a multi-value join field (e.g. a multi-select bound to a
+      // single-value column such as EntityTag.tag_id) into one record per
+      // value, so every selected value is saved as its own row instead of an
+      // array being written into a single record.
+      $values = self::expandMultivalueJoinRecords($joinEntityName, $values);
       $whereClause = self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId);
       $mainIdField = CoreUtil::getIdFieldName($mainEntity['type']);
       $joinIdField = CoreUtil::getIdFieldName($joinEntityName);
@@ -781,6 +786,60 @@ class Submit extends AbstractProcessor {
         $event->setJoinIds($index, $joinEntityName, []);
       }
     }
+  }
+
+  /**
+   * Expand any join record that holds multiple values for a single-value field
+   * into one record per value.
+   *
+   * A multi-select widget bound to a join field that stores one value per row
+   * (e.g. EntityTag.tag_id) submits a single record with an array value; the
+   * join entity cannot store that, so without expansion nothing is saved. This
+   * turns `[['tag_id' => [1, 2]]]` into `[['tag_id' => 1], ['tag_id' => 2]]`.
+   * Fields that genuinely store a list (serialize set) are left untouched.
+   *
+   * @param string $joinEntityName
+   * @param array $records
+   * @return array
+   */
+  private static function expandMultivalueJoinRecords(string $joinEntityName, array $records): array {
+    static $scalarFields = [];
+    if (!array_key_exists($joinEntityName, $scalarFields)) {
+      $scalarFields[$joinEntityName] = [];
+      try {
+        foreach (civicrm_api4($joinEntityName, 'getFields', ['checkPermissions' => FALSE, 'action' => 'create']) as $field) {
+          if (empty($field['serialize'])) {
+            $scalarFields[$joinEntityName][$field['name']] = TRUE;
+          }
+        }
+      }
+      catch (\Exception $e) {
+        return $records;
+      }
+    }
+    $expanded = [];
+    foreach ($records as $record) {
+      $multiField = NULL;
+      foreach ($record as $fieldName => $value) {
+        if (is_array($value) && !empty($scalarFields[$joinEntityName][$fieldName])) {
+          $multiField = $fieldName;
+          break;
+        }
+      }
+      if ($multiField === NULL) {
+        $expanded[] = $record;
+        continue;
+      }
+      $idField = CoreUtil::getIdFieldName($joinEntityName);
+      foreach (array_unique($record[$multiField]) as $singleValue) {
+        $newRecord = [$multiField => $singleValue] + $record;
+        // Expanded rows are distinct records, so they must not keep the
+        // original row's id (which would make replace() overwrite a row).
+        unset($newRecord[$idField]);
+        $expanded[] = $newRecord;
+      }
+    }
+    return array_values($expanded);
   }
 
   /**
