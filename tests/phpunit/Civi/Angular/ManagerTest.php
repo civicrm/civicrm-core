@@ -169,8 +169,9 @@ class ManagerTest extends \CiviUnitTestCase {
    * Get the full, recursive list of dependencies for a set of Angular modules.
    */
   public function testResolveDeps(): void {
-    // If crmMailing changes, feel free to use a different example.
+    // If crmStatusPage changes, feel free to use a different example.
     $expected = [
+      'api4',
       'crmResource',
       'crmStatusPage',
       'crmUi',
