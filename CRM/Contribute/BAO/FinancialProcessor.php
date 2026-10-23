@@ -105,6 +105,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $this->saveLineItemsWithNoFinancialTransaction();
       return $params;
     }
+    if ($this->getOriginalContributionStatus() === 'Partially paid' && $this->isCompletedTransaction()) {
+      CRM_Core_Error::deprecatedWarning('updating partially paid to completed without going through the payment api is deprecated and will create incorrect financial records');
+    }
     $trxnParams = $this->getTrxnParams();
     $params['trxnParams'] = $trxnParams;
     $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $this->getOriginalContribution()->total_amount;
@@ -886,14 +889,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
   private function updateFinancialAccountsOnContributionStatusChange(&$params): void {
     $previousContributionStatus = $this->getOriginalContributionStatus();
     $currentContributionStatus = $this->getUpdatedContributionStatus();
-
-    // Partially paid -> Completed reaches here via a direct (non-Payment.create) status
-    // update, eg. the back-office contribution form - CRM_Member_Form_MembershipTest::
-    // testSubmitUpdateMembershipFromPartiallyPaid() exercises it. Returning early leaves
-    // the remaining balance unposted - assuming that it has been otherwise dealt with.
-    if ($previousContributionStatus === 'Partially paid' && $this->isCompletedTransaction()) {
-      return;
-    }
 
     if ($this->isContributionUpdateARefund()) {
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
