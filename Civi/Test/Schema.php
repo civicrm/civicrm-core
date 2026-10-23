@@ -206,6 +206,7 @@ class Schema {
    */
   public const SEED_TABLES_TO_OFFSET = [
     'civicrm_financial_type',
+    'civicrm_location_type',
     'civicrm_membership_status',
     'civicrm_participant_status_type',
     'civicrm_price_field',
