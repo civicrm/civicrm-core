@@ -398,7 +398,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @throws \CRM_Core_Exception
    */
   public function postProcess() {
-    $now = date('YmdHis');
 
     $this->_params = $this->get('params');
     $this->cleanMoneyFields($this->_params);
@@ -425,41 +424,20 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->set('params', $this->_params);
     }
 
-    // CRM-4320, lets build array of cancelled additional participant ids
-    // those are drop or skip by primary at the time of confirmation.
-    // get all in and then unset those we want to process.
-    $cancelledIds = $this->_additionalParticipantIds;
-
-    $params = $this->_params;
+    $params = [];
+    foreach ($this->getSubmittedParticipantNumbers() as $participantNum) {
+      $params[$participantNum] = $this->_params[$participantNum];
+    }
     if ($this->isPaidEvent()) {
       $this->set('finalAmount', $this->_amount);
     }
-    $participantCount = [];
 
     if ($this->isShowPaymentOnConfirm()) {
       // Set the payment processor so that we can submit the payment
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->getSubmittedValue('payment_processor_id'));
     }
 
-    //unset the skip participant from params.
-    //build the $participantCount array.
-    //maintain record for all participants.
-    foreach ($params as $participantNum => $participantRecord) {
-      if ($participantRecord === 'skip') {
-        unset($params[$participantNum]);
-        $participantCount[$participantNum] = 'skip';
-      }
-      elseif ($participantNum) {
-        $participantCount[$participantNum] = 'participant';
-      }
-      //lets get additional participant id to cancel.
-      if ($this->_allowConfirmation && is_array($cancelledIds)) {
-        $additionalId = $participantRecord['participant_id'] ?? NULL;
-        if ($additionalId && $key = array_search($additionalId, $cancelledIds)) {
-          unset($cancelledIds[$key]);
-        }
-      }
-    }
+    $this->cancelParticipantsRemovedFromSubmission();
 
     $payment = is_array($this->_paymentProcessor) ? $this->_paymentProcessor['object'] : NULL;
     $contribution = NULL;
@@ -540,14 +518,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, 'civicrm_participant');
         }
       }
-    }
-
-    //update status and send mail to cancelled additional participants, CRM-4320
-    if ($this->_allowConfirmation && is_array($cancelledIds) && !empty($cancelledIds)) {
-      $cancelledId = array_search('Cancelled',
-        CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'")
-      );
-      CRM_Event_BAO_Participant::transitionParticipants($cancelledIds, $cancelledId);
     }
 
     if ($this->getOrderTotalAmount() > 0 && !$this->isPayLater() && is_object($payment) && !$this->getPaymentProcessorObject()->supports('noReturn')) {
@@ -1176,6 +1146,41 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
     return $amountArray;
+  }
+
+  /**
+   * Cancel any additional participant dropped from the submission since it
+   * was first saved - CRM-4320.
+   *
+   * Reachable by resuming a Pending registration via the participantId URL
+   * param (pay-later/incomplete-transaction, or requires-approval) - that
+   * re-walks Register through to Confirm with $_allowConfirmation set, and
+   * Registration::preProcess() populates $_additionalParticipantIds from
+   * the additional participants already on that registration. Any of
+   * those ids not matched to an existing participant_id in this
+   * resubmission has been dropped (via the 'Skip Participant' button, or
+   * simply submitting fewer additional participants than before) and must
+   * be transitioned to Cancelled.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function cancelParticipantsRemovedFromSubmission(): void {
+    $cancelledIds = $this->_additionalParticipantIds;
+    if ($this->_allowConfirmation && is_array($cancelledIds)) {
+      foreach ($this->getSubmittedParticipantNumbers() as $participantNum) {
+        $additionalId = $this->getExistingParticipantID($participantNum);
+        if ($additionalId && $key = array_search($additionalId, $cancelledIds)) {
+          unset($cancelledIds[$key]);
+        }
+      }
+    }
+    //update status and send mail to cancelled additional participants, CRM-4320
+    if ($this->_allowConfirmation && is_array($cancelledIds) && !empty($cancelledIds)) {
+      $cancelledId = array_search('Cancelled',
+        CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'")
+      );
+      CRM_Event_BAO_Participant::transitionParticipants($cancelledIds, $cancelledId);
+    }
   }
 
   /**

@@ -432,6 +432,71 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(['Standard Rate - 1'], $contribution['amount_level']);
   }
 
+  /**
+   * Resuming a Pending registration with fewer additional participants
+   * than originally submitted must cancel the one(s) no longer present -
+   * CRM-4320, via Confirm::cancelParticipantsRemovedFromSubmission().
+   *
+   * $_additionalParticipantIds is populated positionally (see
+   * AdditionalParticipant::preProcess(), which reads
+   * $this->_additionalParticipantIds[$participantNo]) - the resubmitted
+   * Participant_1 page matches the first of the two original additional
+   * participants by position, leaving the second one dropped and due for
+   * cancellation.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testResumePendingRegistrationCancelsDroppedAdditionalParticipant(): void {
+    $event = $this->eventCreateUnpaid();
+    $primaryContactID = $this->individualCreate([], 'primary');
+    $primaryParticipantID = $this->participantCreate([
+      'event_id' => $event['id'],
+      'contact_id' => $primaryContactID,
+      'status_id.name' => 'Pending from incomplete transaction',
+    ]);
+    $keepContactID = $this->individualCreate([], 'keep');
+    $keepParticipantID = $this->participantCreate([
+      'event_id' => $event['id'],
+      'contact_id' => $keepContactID,
+      'registered_by_id' => $primaryParticipantID,
+      'status_id.name' => 'Pending from incomplete transaction',
+    ]);
+    $dropContactID = $this->individualCreate([], 'drop');
+    $dropParticipantID = $this->participantCreate([
+      'event_id' => $event['id'],
+      'contact_id' => $dropContactID,
+      'registered_by_id' => $primaryParticipantID,
+      'status_id.name' => 'Pending from incomplete transaction',
+    ]);
+
+    $this->getTestForm('CRM_Event_Form_Registration_Register', [
+      'first_name' => 'Primary',
+      'last_name' => 'Person',
+      'email-Primary' => 'primary@example.com',
+      'additional_participants' => 1,
+    ], [
+      'id' => $event['id'],
+      'cid' => $primaryContactID,
+      'participantId' => $primaryParticipantID,
+    ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+        'first_name' => 'Keep',
+        'last_name' => 'Participant',
+        'email-Primary' => 'keep@example.com',
+      ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
+      ->processForm();
+
+    $statuses = Participant::get(FALSE)
+      ->addWhere('id', 'IN', [$keepParticipantID, $dropParticipantID])
+      ->addSelect('status_id:name')
+      ->execute()
+      ->indexBy('id');
+
+    $this->assertNotEquals('Cancelled', $statuses[$keepParticipantID]['status_id:name']);
+    $this->assertEquals('Cancelled', $statuses[$dropParticipantID]['status_id:name']);
+  }
+
   public function checkPaymentParameters($paymentObject, $parameters): void {
     $requiredFields = ['contactID', 'amount', 'invoiceID', 'currency', 'billing_first_name', 'billing_last_name'];
     foreach ($requiredFields as $field) {

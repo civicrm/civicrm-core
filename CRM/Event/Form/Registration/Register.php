@@ -246,7 +246,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     //set default participant fields, CRM-4320.
     $hasAdditionalParticipants = FALSE;
     if ($this->_allowConfirmation) {
-      $this->_contactId = $contactID;
       $forcePayLater = $this->_defaults['is_pay_later'] ?? FALSE;
       $this->_defaults = array_merge($this->_defaults, $this->setFeeDefaults());
       $this->_defaults['is_pay_later'] = $forcePayLater;
