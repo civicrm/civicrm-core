@@ -2,6 +2,21 @@
   padding: 1px max(10px, 1vw) 1rem;
 }
 
+/* Flex column from html down: #crm-container fills the viewport height left below
+   the menubar margin on body, so short pages fit the viewport without scrolling. */
+html.crm-standalone {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+html.crm-standalone body,
+html.crm-standalone body > #crm-container {
+  min-height: 0;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .breadcrumb > ol {
   padding-inline-start: 0;
 }
