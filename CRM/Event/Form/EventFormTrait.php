@@ -87,19 +87,27 @@ trait CRM_Event_Form_EventFormTrait {
    * is only given where there is specific test cover.
    *
    * @param string $fieldName
+   * @param int $index
+   *   0 (the default) is the primary participant - see getParticipantID().
+   *   Only CRM_Event_Form_Registration (and subclasses) resolve a non-zero
+   *   index to anything; everywhere else it's a no-op since their own
+   *   getParticipantID() ignores the argument. Each index gets its own
+   *   cache slot, so looking up an additional participant can't return a
+   *   stale value cached for the primary (or vice versa).
    *
    * @return mixed
    *
    * @throws \CRM_Core_Exception
    */
-  public function getParticipantValue(string $fieldName) {
-    if ($this->isDefined('Participant')) {
-      return $this->lookup('Participant', $fieldName);
+  public function getParticipantValue(string $fieldName, int $index = 0) {
+    $nickname = $index === 0 ? 'Participant' : "Participant{$index}";
+    if ($this->isDefined($nickname)) {
+      return $this->lookup($nickname, $fieldName);
     }
-    $id = $this->getParticipantID();
+    $id = $this->getParticipantID($index);
     if ($id) {
-      $this->define('Participant', 'Participant', ['id' => $id]);
-      return $this->lookup('Participant', $fieldName);
+      $this->define('Participant', $nickname, ['id' => $id]);
+      return $this->lookup($nickname, $fieldName);
     }
     return NULL;
   }
