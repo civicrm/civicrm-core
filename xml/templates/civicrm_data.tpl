@@ -179,7 +179,7 @@ VALUES ( @setID, 'contribution_amount', 'Contribution Amount', 'Text', '1', '1',
 SELECT @fieldID := max(id) FROM civicrm_price_field WHERE name = 'contribution_amount' AND price_set_id = @setID;
 
 INSERT INTO `civicrm_price_field_value` (  `price_field_id`, `name`, `label`, `amount`, `weight`, `is_default`, `is_active`, `financial_type_id`)
-VALUES ( @fieldID, 'contribution_amount', 'Contribution Amount', '1', '1', '0', '1', 1);
+VALUES ( @fieldID, 'contribution_amount', 'Contribution Amount', '1', '1', '0', '1', @financial_type_id_dtn);
 
 {crmSqlData file="sql/civicrm_data/civicrm_extension.sqldata.php"}
 {crmSqlData file="sql/civicrm_data/civicrm_option_group/soft_credit_type.sqldata.php"}
