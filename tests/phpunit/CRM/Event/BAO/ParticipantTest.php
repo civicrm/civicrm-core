@@ -45,7 +45,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'event_id' => $this->getEventID(),
       'register_date' => date('Y-m-d') . ' 00:00:00',
       'role_id' => 1,
-      'status_id' => 1,
+      'status_id' => $this->getParticipantStatusID('Registered'),
       'source' => 'Event_' . $this->getEventID(),
       'contact_id' => $this->ids['Contact']['individual_0'],
     ];
@@ -64,7 +64,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $params = array_merge($params, [
       'id' => $participant->id,
       'role_id' => 2,
-      'status_id' => 3,
+      'status_id' => $this->getParticipantStatusID('No-show'),
     ]);
 
     // Participant Edited
@@ -74,7 +74,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     );
 
     $this->assertDBCompareValue('CRM_Event_BAO_Participant', $updatedParticipant->id, 'status_id',
-      'id', 3, 'Check DB for updated status id  of the participant'
+      'id', $this->getParticipantStatusID('No-show'), 'Check DB for updated status id  of the participant'
     );
   }
 
@@ -95,7 +95,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'event_id' => $this->getEventID(),
       'register_date' => '2007-02-19 00:00:00',
       'role_id' => 1,
-      'status_id' => 2,
+      'status_id' => $this->getParticipantStatusID('Attended'),
       'source' => 'Wimbledon',
       'contact_id' => $this->ids['Contact']['individual_0'],
       'id' => $participantID,
@@ -175,7 +175,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'event_id' => $this->getEventID(),
       'register_date' => date('Y-m-d') . ' 00:00:00',
       'role_id' => 1,
-      'status_id' => 1,
+      'status_id' => $this->getParticipantStatusID('Registered'),
       'source' => 'Event_' . $this->getEventID(),
       'contact_id' => $this->ids['Contact']['individual_0'],
     ]);
@@ -216,7 +216,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'event_id' => $this->getEventID(),
       'register_date' => date('Y-m-d') . ' 00:00:00',
       'role_id' => 1,
-      'status_id' => 1,
+      'status_id' => $this->getParticipantStatusID('Registered'),
       'source' => 'Event_' . $this->getEventID(),
       'contact_id' => $this->ids['Contact']['individual_0'],
       'note' => 'Note added for Event_' . $this->getEventID(),
@@ -239,7 +239,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $params = array_merge($params, [
       'id' => $participant->id,
       'role_id' => 2,
-      'status_id' => 3,
+      'status_id' => $this->getParticipantStatusID('No-show'),
       'note' => 'Test Event in edit mode is running successfully ....',
     ]);
 
@@ -252,7 +252,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
 
     //Checking Edited Value of status_id in the database.
     $this->assertDBCompareValue('CRM_Event_DAO_Participant', $participant->id, 'status_id',
-      'id', 3, 'Check DB for updated status id  of the participant'
+      'id', $this->getParticipantStatusID('No-show'), 'Check DB for updated status id  of the participant'
     );
 
     //Checking for Activity added in the table for relative participant.
@@ -289,12 +289,12 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
    * @param int $selfSvcEnabled
    * @param int $selfSvcHours
    * @param int $hoursToEvent
-   * @param int $participantStatusID
+   * @param string $participantStatus
    * @param bool $isBackOffice
    * @param bool $successExpected  A boolean that indicates whether this test should pass or fail.
    */
-  public function testGetSelfServiceEligibility(int $selfSvcEnabled, int $selfSvcHours, int $hoursToEvent, int $participantStatusID, bool $isBackOffice, bool $successExpected): void {
-    $participantId = $this->participantCreate(['contact_id' => $this->ids['Contact']['individual_0'], 'event_id' => $this->getEventID(), 'status_id' => $participantStatusID]);
+  public function testGetSelfServiceEligibility(int $selfSvcEnabled, int $selfSvcHours, int $hoursToEvent, string $participantStatus, bool $isBackOffice, bool $successExpected): void {
+    $participantId = $this->participantCreate(['contact_id' => $this->ids['Contact']['individual_0'], 'event_id' => $this->getEventID(), 'status_id' => $this->getParticipantStatusID($participantStatus)]);
     $now = new Datetime();
     if ($hoursToEvent >= 0) {
       $startDate = $now->add(new DateInterval("PT{$hoursToEvent}H"))->format('Y-m-d H:i:s');
@@ -320,7 +320,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'selfSvcEnabled' => 1,
       'selfSvcHours' => 12,
       'hoursToEvent' => 16,
-      'participantStatusId' => 1,
+      'participantStatus' => 'Registered',
       'isBackOffice' => FALSE,
       'successExpected' => TRUE,
     ];
@@ -329,7 +329,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'selfSvcEnabled' => 1,
       'selfSvcHours' => 12,
       'hoursToEvent' => 16,
-      'participantStatusId' => 7,
+      'participantStatus' => 'On waitlist',
       'isBackOffice' => FALSE,
       'successExpected' => TRUE,
     ];
@@ -338,7 +338,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'selfSvcEnabled' => 1,
       'selfSvcHours' => 12,
       'hoursToEvent' => 8,
-      'participantStatusId' => 1,
+      'participantStatus' => 'Registered',
       'isBackOffice' => FALSE,
       'successExpected' => FALSE,
     ];
@@ -347,7 +347,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'selfSvcEnabled' => 1,
       'selfSvcHours' => 12,
       'hoursToEvent' => 16,
-      'participantStatusId' => 2,
+      'participantStatus' => 'Attended',
       'isBackOffice' => FALSE,
       'successExpected' => FALSE,
     ];
@@ -356,7 +356,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'selfSvcEnabled' => 0,
       'selfSvcHours' => 12,
       'hoursToEvent' => 16,
-      'participantStatusId' => 1,
+      'participantStatus' => 'Registered',
       'isBackOffice' => FALSE,
       'successExpected' => FALSE,
     ];
@@ -365,7 +365,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'selfSvcEnabled' => 1,
       'selfSvcHours' => 36,
       'hoursToEvent' => 46,
-      'participantStatusId' => 1,
+      'participantStatus' => 'Registered',
       'isBackOffice' => FALSE,
       'successExpected' => TRUE,
     ];
@@ -374,7 +374,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'selfSvcEnabled' => 1,
       'selfSvcHours' => 36,
       'hoursToEvent' => 25,
-      'participantStatusId' => 1,
+      'participantStatus' => 'Registered',
       'isBackOffice' => FALSE,
       'successExpected' => FALSE,
     ];
@@ -383,7 +383,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'selfSvcEnabled' => 1,
       'selfSvcHours' => -12,
       'hoursToEvent' => 4,
-      'participantStatusId' => 1,
+      'participantStatus' => 'Registered',
       'isBackOffice' => FALSE,
       'successExpected' => TRUE,
     ];
@@ -391,7 +391,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'selfSvcEnabled' => 1,
       'selfSvcHours' => 0,
       'hoursToEvent' => -6,
-      'participantStatusId' => 1,
+      'participantStatus' => 'Registered',
       'isBackOffice' => FALSE,
       'successExpected' => FALSE,
     ];
@@ -400,7 +400,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'selfSvcEnabled' => 0,
       'selfSvcHours' => 12,
       'hoursToEvent' => 16,
-      'participantStatusId' => 1,
+      'participantStatus' => 'Registered',
       'isBackOffice' => TRUE,
       'successExpected' => TRUE,
     ];
@@ -409,7 +409,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'selfSvcEnabled' => 0,
       'selfSvcHours' => 12,
       'hoursToEvent' => 16,
-      'participantStatusId' => 2,
+      'participantStatus' => 'Attended',
       'isBackOffice' => TRUE,
       'successExpected' => TRUE,
     ];

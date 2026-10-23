@@ -524,7 +524,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeId,
       'source' => 'Test pay later suite',
       'is_pay_later' => 1,
-      'status_id' => 5,
+      'status_id' => $this->getMembershipStatusID('Pending'),
       'version' => 4,
     ];
     $organizationMembershipID = $this->callAPISuccess('Membership', 'create', $params)['id'];
@@ -579,8 +579,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $activeMembershipParams = [
       'contact_id' => $employerId[3],
       'membership_type_id' => $membershipTypeId,
-      // Current
-      'status_id' => 2,
+      'status_id' => $this->getMembershipStatusID('Current'),
       'source' => 'Test suite',
       'start_date' => date('Y-m-d'),
       'end_date' => '+1 year',
@@ -588,8 +587,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $inactiveMembershipParams = [
       'contact_id' => $memberContactId[4],
       'membership_type_id' => $membershipTypeId,
-      // Cancelled
-      'status_id' => 6,
+      'status_id' => $this->getMembershipStatusID('Cancelled'),
       'source' => 'Test suite',
       'start_date' => date('Y-m-d'),
       'end_date' => '+1 year',
@@ -597,8 +595,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $getActiveMembershipParams = [
       'contact_id' => $memberContactId[4],
       'membership_type_id' => $membershipTypeId,
-      // Current
-      'status_id' => 2,
+      'status_id' => $this->getMembershipStatusID('Current'),
     ];
 
     // Create inactive membership on the employee.
@@ -760,7 +757,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'start_date' => '2006-01-21',
       'end_date' => '2006-12-21',
       'source' => 'Payment',
-      'status_id' => '2',
+      'status_id' => $this->getMembershipStatusID('Current'),
     ];
 
     $this->callAPIFailure('membership', 'create', $params);

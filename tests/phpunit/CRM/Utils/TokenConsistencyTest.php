@@ -778,7 +778,7 @@ contribution_recur.payment_instrument_id:name :Check
    * @return string
    */
   protected function getExpectedParticipantTokenOutput(): string {
-    return "participant.status_id :2
+    return "participant.status_id :{$this->getParticipantStatusID('Attended')}
 participant.role_id :1
 participant.register_date :February 19th, 2007
 participant.source :Wimbledon

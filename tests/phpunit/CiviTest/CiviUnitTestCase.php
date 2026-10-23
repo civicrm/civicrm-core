@@ -812,6 +812,30 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   }
 
   /**
+   * Get the id of a participant status.
+   *
+   * @param string $name
+   *   e.g. 'Registered'.
+   *
+   * @return int
+   */
+  protected function getParticipantStatusID(string $name): int {
+    return (int) CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', $name);
+  }
+
+  /**
+   * Get the id of a membership status.
+   *
+   * @param string $name
+   *   e.g. 'New'.
+   *
+   * @return int
+   */
+  protected function getMembershipStatusID(string $name): int {
+    return (int) CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', $name);
+  }
+
+  /**
    * Create a relationship type.
    *
    * @param array $params
@@ -1938,6 +1962,11 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @param string $errorText
    */
   public function getAndCheck(array $params, int $id, string $entity, int $delete = 1, string $errorText = ''): void {
+    if (strtolower($entity) === 'participant' && isset($params['status_id'])) {
+      // Returning 'status_id' from Participant.get gives the status of a related activity.
+      $params['participant_status_id'] = $params['status_id'];
+      unset($params['status_id']);
+    }
 
     $result = $this->callAPISuccessGetSingle($entity, [
       'id' => $id,
@@ -3511,7 +3540,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
             'entity_table' => 'civicrm_participant',
             'entity_id.event_id' => $this->getEventID('PaidEvent'),
             'entity_id.role_id' => 1,
-            'entity_id.status_id' => 14,
+            'entity_id.status_id' => $this->getParticipantStatusID('Pending refund'),
             'entity_id.fee_currency' => 'USD',
             'entity_id.contact_id' => $this->individualCreate(),
           ],
@@ -3522,7 +3551,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
             'entity_table' => 'civicrm_participant',
             'entity_id.event_id' => $this->getEventID('PaidEvent'),
             'entity_id.role_id' => 1,
-            'entity_id.status_id' => 14,
+            'entity_id.status_id' => $this->getParticipantStatusID('Pending refund'),
             'entity_id.fee_currency' => 'USD',
             'entity_id.contact_id' => $contactID,
           ],
@@ -3550,7 +3579,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
             'financial_type_id' => 4,
             'event_id' => $this->getEventID('PaidEvent'),
             'role_id' => 1,
-            'status_id' => 14,
+            'status_id' => $this->getParticipantStatusID('Pending refund'),
             'fee_currency' => 'USD',
             'contact_id' => $this->individualCreate(),
           ],
@@ -3570,7 +3599,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
             'financial_type_id' => 4,
             'event_id' => $this->getEventID('PaidEvent'),
             'role_id' => 1,
-            'status_id' => 14,
+            'status_id' => $this->getParticipantStatusID('Pending refund'),
             'fee_currency' => 'USD',
             'contact_id' => $contactID,
           ],

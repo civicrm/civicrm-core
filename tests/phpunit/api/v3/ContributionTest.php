@@ -3409,7 +3409,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $this->_ids['participant'],
       'return' => 'participant_status_id',
     ]);
-    $this->assertEquals(1, $participantStatus);
+    $this->assertEquals($this->getParticipantStatusID('Registered'), $participantStatus);
 
     //Assert only three activities are created.
     $activities = $this->callAPISuccess('Activity', 'get', [
@@ -3852,7 +3852,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $participantParams = [
       'contact_id' => $this->individualID,
       'event_id' => $event['id'],
-      'status_id' => 1,
+      'status_id' => $this->getParticipantStatusID('Registered'),
       'role_id' => 1,
       // to ensure it matches later on
       'register_date' => '2007-07-21 00:00:00',
@@ -3942,7 +3942,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function createPendingParticipantContribution(): int {
     $this->ids['Event']['PaidEvent'] = $this->eventCreatePaid(['is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org', 'confirm_email_text' => ''])['id'];
-    $participantID = $this->participantCreate(['event_id' => $this->ids['Event']['PaidEvent'], 'status_id' => 6, 'contact_id' => $this->individualID]);
+    $participantID = $this->participantCreate(['event_id' => $this->ids['Event']['PaidEvent'], 'status_id' => $this->getParticipantStatusID('Pending from incomplete transaction'), 'contact_id' => $this->individualID]);
     $this->_ids['participant'] = $participantID;
     $params = array_merge($this->_params, ['contact_id' => $this->individualID, 'contribution_status_id' => 2, 'financial_type_id' => 'Event Fee']);
     $contribution = $this->callAPISuccess('contribution', 'create', $params);

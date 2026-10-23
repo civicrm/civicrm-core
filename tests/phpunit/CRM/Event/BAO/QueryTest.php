@@ -223,13 +223,16 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
    *
    * @throws \CRM_Core_Exception
    */
-  public function testParameters($parameters, $expected) {
+  public function testParameters(string $operator, array $statuses, array $expected): void {
+    // The data provider runs before the statuses exist, so it gives names; look up the ids.
+    $statusIDs = array_map(fn($status) => $this->getParticipantStatusID($status), $statuses);
+    $parameters = [['participant_status_id', $operator, $operator === '=' ? reset($statusIDs) : $statusIDs, 0, 0]];
     $query = new CRM_Contact_BAO_Query(
       $parameters, NULL, NULL,
       FALSE, FALSE, CRM_Contact_BAO_Query::MODE_EVENT
     );
     $query->query(FALSE);
-    $this->assertEquals($expected['where'], trim($query->_whereClause));
+    $this->assertEquals(sprintf($expected['where'], ...$statusIDs), trim($query->_whereClause));
     $this->assertEquals($expected['qill'], trim($query->_qill[0][0]));
   }
 
@@ -239,16 +242,18 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
   public static function getEventSearchParameters() {
     return [
       [
-        [['participant_status_id', '=', 1, 0, 0]],
+        '=',
+        ['Registered'],
         [
-          'where' => '( civicrm_participant.status_id = 1 )',
+          'where' => '( civicrm_participant.status_id = %d )',
           'qill' => 'Status ID = Registered',
         ],
       ],
       [
-        [['participant_status_id', 'IN', [1, 2], 0, 0]],
+        'IN',
+        ['Registered', 'Attended'],
         [
-          'where' => '( civicrm_participant.status_id IN ("1", "2") )',
+          'where' => '( civicrm_participant.status_id IN ("%d", "%d") )',
           'qill' => 'Status ID In Registered, Attended',
         ],
       ],

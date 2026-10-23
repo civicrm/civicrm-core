@@ -101,8 +101,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       ],
       // Attendee.
       'role_id' => '1',
-      // No-show.
-      'status_id' => '8',
+      'status_id' => $this->getParticipantStatusID('Awaiting approval'),
     ];
 
     $this->fixtures['phone_call'] = [
@@ -260,7 +259,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'absolute_date' => CRM_Utils_Date::processDate('20120614100000'),
       'body_html' => '<p>sched_event_name_1day_on_abs_date</p>',
       'body_text' => 'sched_event_name_1day_on_abs_date',
-      'entity_status' => '1',
+      'entity_status' => (string) $this->getParticipantStatusID('Registered'),
       'entity_value' => '2',
       'group_id' => NULL,
       'is_active' => '1',
@@ -1259,7 +1258,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testEventNameWithAbsoluteDateAndNothingElse(): void {
-    $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], ['status_id' => 1]));
+    $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], ['status_id' => $this->getParticipantStatusID('Registered')]));
     $this->callAPISuccess('Email', 'create', [
       'contact_id' => $participant->contact_id,
       'email' => 'test-event@example.com',
@@ -1301,7 +1300,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   public function testMembershipDateMatch(): void {
     $contactID = $this->individualCreate(array_merge($this->fixtures['contact'], ['email' => 'test-member@example.com']));
     $membershipTypeID = $this->getMembershipTypeID();
-    $membership = $this->createTestEntity('Membership', array_merge($this->fixtures['rolling_membership'], ['status_id' => 1, 'contact_id' => $contactID, 'membership_type_id' => $membershipTypeID]));
+    $membership = $this->createTestEntity('Membership', array_merge($this->fixtures['rolling_membership'], ['status_id' => $this->getMembershipStatusID('New'), 'contact_id' => $contactID, 'membership_type_id' => $membershipTypeID]));
     $this->createScheduleFromFixtures('sched_membership_join_2week', ['entity_value' => $membershipTypeID]);
 
     // start_date=2012-03-15 ; schedule is 2 weeks after join_date
@@ -1663,11 +1662,11 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   public function testMultipleMembershipEndDateMatch(): void {
     $contactID = $this->callAPISuccess('Contact', 'create', array_merge($this->fixtures['contact'], ['email' => 'test-member@example.com']))['id'];
     $contactID2 = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_2'])['id'];
-    $membershipOne = $this->createMembershipFromFixture('rolling_membership', 2, [], ['contact_id' => $contactID]);
+    $membershipOne = $this->createMembershipFromFixture('rolling_membership', 'Current', [], ['contact_id' => $contactID]);
     $membershipTypeId = $membershipOne['membership_type_id'];
-    $membershipTwo = $this->createMembershipFromFixture('rolling_membership', 2, [], ['contact_id' => $contactID2, 'membership_type_id' => $membershipTypeId]);
+    $membershipTwo = $this->createMembershipFromFixture('rolling_membership', 'Current', [], ['contact_id' => $contactID2, 'membership_type_id' => $membershipTypeId]);
     // We are using dates that 'should' be expired but the test expects them not to be
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_membership SET status_id = 2 WHERE 1');
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_membership SET status_id = %1 WHERE 1', [1 => [$this->getMembershipStatusID('Current'), 'Integer']]);
     $this->createScheduleFromFixtures('sched_membership_end_2week', ['entity_value' => $membershipTypeId]);
 
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
@@ -2312,7 +2311,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     // Create event+participant with start_date = 20120315, end_date = 20120615.
     $params = $this->fixtures['participant'];
     $params['event_id'] = $this->callAPISuccess('Event', 'create', array_merge($this->fixtures['participant']['event_id'], ['event_type_id' => 1]))['id'];
-    $params['status_id'] = 2;
+    $params['status_id'] = $this->getParticipantStatusID('Attended');
     $params['contact_id'] = $this->individualCreate(array_merge($this->fixtures['contact'], ['email' => 'test-event@example.com']));
     $this->callAPISuccess('Participant', 'create', $params);
 
@@ -2399,7 +2398,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     // Create event+participant with start_date = 20120315, end_date = 20120615.
     $params = $this->fixtures['participant'];
     $params['event_id'] = $this->callAPISuccess('Event', 'create', array_merge($this->fixtures['participant']['event_id'], ['event_type_id' => 1]))['id'];
-    $params['status_id'] = 2;
+    $params['status_id'] = $this->getParticipantStatusID('Attended');
     $params['role_id'] = $testValue['role_id'];
     $params['contact_id'] = $this->individualCreate(array_merge($this->fixtures['contact'], ['email' => 'test-event@example.com']));
     $this->callAPISuccess('Participant', 'create', $params);
@@ -2447,7 +2446,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testEventTypeEndDateRepeat(): void {
     // Create event+participant with start_date = 20120315, end_date = 20120615.
-    $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], ['status_id' => 2]));
+    $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], ['status_id' => $this->getParticipantStatusID('Attended')]));
     $this->callAPISuccess('Email', 'create', [
       'contact_id' => $participant->contact_id,
       'email' => 'test-event@example.com',
@@ -2622,7 +2621,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'start_date' => '20120315',
         'end_date' => '20130315',
         'is_override' => 0,
-        'status_id' => 2,
+        'status_id' => $this->getMembershipStatusID('Current'),
       ];
       $membershipParams['status-id'] = 1;
       $membership = $this->createTestObject('CRM_Member_DAO_Membership', $membershipParams);
@@ -2672,7 +2671,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   public function testInheritedMembershipPermissions(): void {
     // Set up common parameters for memberships.
     $membershipParams = $this->fixtures['rolling_membership'];
-    $membershipParams['status_id'] = 1;
+    $membershipParams['status_id'] = $this->getMembershipStatusID('New');
 
     $membershipParams['membership_type_id']['relationship_type_id'] = 1;
     $membershipParams['membership_type_id']['relationship_direction'] = 'b_a';

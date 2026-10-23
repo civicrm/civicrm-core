@@ -1376,11 +1376,11 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
     if ($params['recur_frequency_unit'] === $params['duration_unit']) {
       // Membership will be in "New" state because it will get confirmed as payment matches
-      $expectedMembershipStatus = 1;
+      $expectedMembershipStatus = $this->getMembershipStatusID('New');
     }
     else {
       // Membership will still be in "Pending" state as it won't get confirmed as payment doesn't match
-      $expectedMembershipStatus = 5;
+      $expectedMembershipStatus = $this->getMembershipStatusID('Pending');
     }
 
     $submitParams = [
@@ -2302,7 +2302,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals($membershipPayment['contribution_id'], $contribution['id']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id']]);
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
-    $this->assertEquals(5, $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('Pending'), $membership['status_id']);
 
     $line = $this->callAPISuccess('line_item', 'getsingle', ['contribution_id' => $contribution['id']]);
     $this->assertEquals('civicrm_membership', $line['entity_table']);
@@ -2437,7 +2437,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $id)
       ->execute()->first()['contact_id']
     );
-    $this->assertEquals(1, $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('New'), $membership['status_id']);
     return $membership;
   }
 

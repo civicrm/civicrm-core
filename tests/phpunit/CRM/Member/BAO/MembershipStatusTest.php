@@ -116,6 +116,8 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
   public function testGetMembershipStatusByDateMore($input, $expected) {
     // Sanity check we have something close to the stock install.
     $this->assertEquals(7, $this->callAPISuccess('MembershipStatus', 'getcount'));
+    // The data provider runs before the statuses exist, so it gives the name; look up the id.
+    $expected['id'] = (string) $this->getMembershipStatusID($expected['name']);
 
     $this->assertEquals(
       $expected,
@@ -142,7 +144,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-03-01',
         ],
         [
-          'id' => '1',
           'name' => 'New',
         ],
       ],
@@ -154,7 +155,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-04-29',
         ],
         [
-          'id' => '2',
           'name' => 'Current',
         ],
       ],
@@ -166,7 +166,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-05-01',
         ],
         [
-          'id' => '3',
           'name' => 'Grace',
         ],
       ],
@@ -178,7 +177,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-06-01',
         ],
         [
-          'id' => '4',
           'name' => 'Expired',
         ],
       ],
@@ -190,7 +188,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-03-01',
         ],
         [
-          'id' => '2',
           'name' => 'Current',
         ],
       ],
@@ -202,7 +199,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-04-29',
         ],
         [
-          'id' => '2',
           'name' => 'Current',
         ],
       ],
@@ -214,7 +210,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-05-01',
         ],
         [
-          'id' => '3',
           'name' => 'Grace',
         ],
       ],
@@ -226,7 +221,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-06-01',
         ],
         [
-          'id' => '4',
           'name' => 'Expired',
         ],
       ],
@@ -238,7 +232,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-03-01',
         ],
         [
-          'id' => '1',
           'name' => 'New',
         ],
       ],
@@ -250,7 +243,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-04-29',
         ],
         [
-          'id' => '2',
           'name' => 'Current',
         ],
       ],
@@ -262,7 +254,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-12-30',
         ],
         [
-          'id' => '2',
           'name' => 'Current',
         ],
       ],
@@ -274,7 +265,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2021-01-01',
         ],
         [
-          'id' => '2',
           'name' => 'Current',
         ],
       ],
@@ -286,7 +276,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2021-01-31',
         ],
         [
-          'id' => '2',
           'name' => 'Current',
         ],
       ],
@@ -298,7 +287,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2021-02-21',
         ],
         [
-          'id' => '3',
           'name' => 'Grace',
         ],
       ],
@@ -310,7 +298,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2021-03-21',
         ],
         [
-          'id' => '4',
           'name' => 'Expired',
         ],
       ],
@@ -322,7 +309,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-03-01',
         ],
         [
-          'id' => '1',
           'name' => 'New',
         ],
       ],
@@ -334,7 +320,6 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
           'statusDate' => '2020-06-01',
         ],
         [
-          'id' => '2',
           'name' => 'Current',
         ],
       ],

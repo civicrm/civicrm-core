@@ -91,7 +91,7 @@ class ParticipantTest extends Api4TestBase {
     $pid = $this->saveTestRecords('Participant', [
       'records' => $records,
       'defaults' => [
-        'status_id' => 2,
+        'status_id:name' => 'Attended',
         'role_id' => 1,
         'register_date' => 20070219,
         'event_level' => 'Payment',

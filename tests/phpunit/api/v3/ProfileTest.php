@@ -394,7 +394,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'get_options' => 'all',
     ]);
     $this->assertArrayHasKey('participant_status_id', $result['values']);
-    $this->assertEquals('Attended', $result['values']['participant_status_id']['options'][2]);
+    $this->assertEquals('Attended', $result['values']['participant_status_id']['options'][$this->getParticipantStatusID('Attended')]);
     $this->assertEquals(['participant_status'], $result['values']['participant_status_id']['api.aliases']);
   }
 
