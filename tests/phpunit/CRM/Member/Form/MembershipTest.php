@@ -275,7 +275,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'join_date' => date('Y-m-d'),
       'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['AnnualFixed']],
       'is_override' => TRUE,
-      'status_id' => 1,
+      'status_id' => $this->getMembershipStatusID('New'),
       'status_override_end_date' => date('Y-m-d'),
     ];
     $files = [];
@@ -292,7 +292,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'join_date' => date('Y-m-d'),
       'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['AnnualFixed']],
       'is_override' => CRM_Member_StatusOverrideTypes::UNTIL_DATE,
-      'status_id' => 1,
+      'status_id' => $this->getMembershipStatusID('New'),
     ];
     $files = [];
     $membershipForm = new CRM_Member_Form_Membership();
@@ -785,7 +785,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'end_date' => '',
       // This format reflects the first number being the organisation & the 25 being the type.
       'membership_type_id' => [$this->ids['Contact']['organization'], $secondMembershipType['id']],
-      'status_id' => 1,
+      'status_id' => $this->getMembershipStatusID('New'),
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       //Member dues, see data.xml
@@ -935,7 +935,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => [$this->ids['Contact']['organization'], $secondMembershipType['id']],
-      'status_id' => 1,
+      'status_id' => $this->getMembershipStatusID('New'),
       'receive_date' => date('Y-m-d', strtotime('+1 day')) . ' 20:36:00',
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'financial_type_id' => '2',
@@ -1037,7 +1037,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'price_' . $membershipFieldID => $this->ids['PriceFieldValue']['membership_lifetime'],
       '_qf_default' => '',
       'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['lifetime']],
-      'status_id' => 1,
+      'status_id' => $this->getMembershipStatusID('New'),
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'financial_type_id' => '2',

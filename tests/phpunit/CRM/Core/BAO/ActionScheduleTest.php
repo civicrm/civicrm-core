@@ -1300,7 +1300,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   public function testMembershipDateMatch(): void {
     $contactID = $this->individualCreate(array_merge($this->fixtures['contact'], ['email' => 'test-member@example.com']));
     $membershipTypeID = $this->getMembershipTypeID();
-    $membership = $this->createTestEntity('Membership', array_merge($this->fixtures['rolling_membership'], ['status_id' => 1, 'contact_id' => $contactID, 'membership_type_id' => $membershipTypeID]));
+    $membership = $this->createTestEntity('Membership', array_merge($this->fixtures['rolling_membership'], ['status_id' => $this->getMembershipStatusID('New'), 'contact_id' => $contactID, 'membership_type_id' => $membershipTypeID]));
     $this->createScheduleFromFixtures('sched_membership_join_2week', ['entity_value' => $membershipTypeID]);
 
     // start_date=2012-03-15 ; schedule is 2 weeks after join_date
@@ -1662,11 +1662,11 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   public function testMultipleMembershipEndDateMatch(): void {
     $contactID = $this->callAPISuccess('Contact', 'create', array_merge($this->fixtures['contact'], ['email' => 'test-member@example.com']))['id'];
     $contactID2 = $this->callAPISuccess('Contact', 'create', $this->fixtures['contact_2'])['id'];
-    $membershipOne = $this->createMembershipFromFixture('rolling_membership', 2, [], ['contact_id' => $contactID]);
+    $membershipOne = $this->createMembershipFromFixture('rolling_membership', 'Current', [], ['contact_id' => $contactID]);
     $membershipTypeId = $membershipOne['membership_type_id'];
-    $membershipTwo = $this->createMembershipFromFixture('rolling_membership', 2, [], ['contact_id' => $contactID2, 'membership_type_id' => $membershipTypeId]);
+    $membershipTwo = $this->createMembershipFromFixture('rolling_membership', 'Current', [], ['contact_id' => $contactID2, 'membership_type_id' => $membershipTypeId]);
     // We are using dates that 'should' be expired but the test expects them not to be
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_membership SET status_id = 2 WHERE 1');
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_membership SET status_id = %1 WHERE 1', [1 => [$this->getMembershipStatusID('Current'), 'Integer']]);
     $this->createScheduleFromFixtures('sched_membership_end_2week', ['entity_value' => $membershipTypeId]);
 
     // end_date=2012-06-15 ; schedule is 2 weeks before end_date
@@ -2621,7 +2621,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'start_date' => '20120315',
         'end_date' => '20130315',
         'is_override' => 0,
-        'status_id' => 2,
+        'status_id' => $this->getMembershipStatusID('Current'),
       ];
       $membershipParams['status-id'] = 1;
       $membership = $this->createTestObject('CRM_Member_DAO_Membership', $membershipParams);
@@ -2671,7 +2671,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   public function testInheritedMembershipPermissions(): void {
     // Set up common parameters for memberships.
     $membershipParams = $this->fixtures['rolling_membership'];
-    $membershipParams['status_id'] = 1;
+    $membershipParams['status_id'] = $this->getMembershipStatusID('New');
 
     $membershipParams['membership_type_id']['relationship_type_id'] = 1;
     $membershipParams['membership_type_id']['relationship_direction'] = 'b_a';
