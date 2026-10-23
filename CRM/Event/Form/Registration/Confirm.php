@@ -14,6 +14,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 use Civi\Api4\Contribution;
+use Civi\Api4\LineItem;
 use Civi\Api4\Payment;
 use Civi\Payment\Exception\PaymentProcessorException;
 
@@ -410,6 +411,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     $this->cancelParticipantsRemovedFromSubmission();
+    $this->deleteUncontributedLineItemsForParticipantsBeingAltered();
 
     $payment = is_array($this->_paymentProcessor) ? $this->_paymentProcessor['object'] : NULL;
     $contribution = NULL;
@@ -466,10 +468,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           continue;
         }
         if ($entityId = $allParticipantIds[$key] ?? NULL) {
-          // do cleanup line  items if participant re-walking wizard.
-          if ($this->_allowConfirmation) {
-            CRM_Price_BAO_LineItem::deleteLineItems($entityId, 'civicrm_participant');
-          }
+          // Any line item safe to clear for a participant re-walking the
+          // wizard was already removed, early in postProcess() - see
+          // deleteUncontributedLineItemsForParticipantsBeingAltered().
           $lineItem[$this->_priceSetId] = $value;
           CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, 'civicrm_participant');
         }
@@ -1121,6 +1122,34 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'")
       );
       CRM_Event_BAO_Participant::transitionParticipants($cancelledIds, $cancelledId);
+    }
+  }
+
+  /**
+   * Clear out any line item left over from an earlier, abandoned attempt
+   * at confirming this same registration, for every participant already
+   * on record (i.e. this is a resume, not a fresh registration).
+   *
+   * Only a line item with no contribution_id is safe to delete - one is
+   * only ever created without a contribution_id when no payment is involved
+   * (or something went wrong...).
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function deleteUncontributedLineItemsForParticipantsBeingAltered(): void {
+    $existingParticipantIds = [];
+    foreach ($this->getSubmittedParticipantNumbers() as $participantNum) {
+      $existingParticipantID = $this->getExistingParticipantID($participantNum);
+      if ($existingParticipantID) {
+        $existingParticipantIds[] = $existingParticipantID;
+      }
+    }
+    if ($existingParticipantIds) {
+      LineItem::delete(FALSE)
+        ->addWhere('contribution_id', 'IS NULL')
+        ->addWhere('entity_id', 'IN', $existingParticipantIds)
+        ->addWhere('entity_table', '=', 'civicrm_participant')
+        ->execute();
     }
   }
 
