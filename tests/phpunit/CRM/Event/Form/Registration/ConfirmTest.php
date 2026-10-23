@@ -212,7 +212,12 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   public function testSourceIsConsistentAcrossParticipants(): void {
     $event = $this->eventCreatePaid();
-    $this->getFormWrapper([
+    // Build the chain directly, rather than via getFormWrapper(), which
+    // already appends Confirm - adding an additional participant after that
+    // would process Confirm before the additional participant's own
+    // postProcess() has run (FormWrapper runs subsequent forms in the order
+    // they were added), which can't happen in the real wizard.
+    $this->getTestForm('CRM_Event_Form_Registration_Register', [
       'first_name' => 'Kim',
       'last_name' => 'Reality',
       'email-Primary' => 'demo@example.com',
@@ -220,7 +225,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
       'payment_processor_id' => 0,
       $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_free'],
-    ], $event['id'])
+    ], ['id' => $event['id']])
       ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
         'first_name' => 'Pat',
         'last_name' => 'Participant',
@@ -228,6 +233,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         'priceSetId' => $this->getPriceSetID('PaidEvent'),
         $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_free'],
       ])
+      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
       ->processForm();
 
     $sources = array_unique(Participant::get(FALSE)->addSelect('source')->execute()->column('source'));
