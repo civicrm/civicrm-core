@@ -11,7 +11,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   use CRMTraits_Financial_OrderTrait;
   use CRM_Core_Payment_AuthorizeNetTrait;
 
-  protected $_financialTypeID = 1;
+  protected $_financialTypeID;
   protected $_contactID;
   protected $_contributionRecurID;
   protected $_contributionPageID;
@@ -22,6 +22,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
+    $this->_financialTypeID = $this->getFinancialTypeID('Donation');
     $this->_paymentProcessorID = $this->paymentProcessorAuthorizeNetCreate(['is_test' => 0], 'test');
     $this->_contactID = $this->individualCreate();
     $contributionPage = $this->callAPISuccess('ContributionPage', 'create', [
@@ -71,7 +72,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     // has is_email_receipt set to 0.
     $this->getTestForm('CRM_Contribute_Form_Contribution', [
       'total_amount' => 200,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'receive_date' => date('m/d/Y'),
       'receive_date_time' => date('H:i:s'),
       'contact_id' => $this->ids['Contact']['individual_0'],

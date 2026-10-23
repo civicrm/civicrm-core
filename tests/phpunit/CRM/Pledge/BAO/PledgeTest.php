@@ -30,7 +30,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
       'frequency_interval' => 1,
       'frequency_day' => 1,
       'installments' => 12,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'create_date' => '2010-05-13 00:00:00',
       'acknowledge_date' => '2010-05-13 00:00:00',
       'start_date' => '2010-05-13 00:00:00',

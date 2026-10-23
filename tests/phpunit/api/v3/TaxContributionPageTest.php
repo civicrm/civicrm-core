@@ -51,7 +51,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->ids['PaymentProcessor'] = $this->paymentProcessorCreate();
     $this->params = [
       'title' => 'Test Contribution Page',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_processor' => $this->ids['PaymentProcessor'],
       'currency' => 'NZD',
       'goal_amount' => 350,
@@ -69,7 +69,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'help_pre' => 'Where does your goat sleep',
       'help_post' => 'thank you for your time',
       'extends' => 2,
-      'financial_type_id' => 3,
+      'financial_type_id' => $this->getFinancialTypeID('Campaign Contribution'),
       'is_quick_config' => 0,
       'is_reserved' => 0,
     ];

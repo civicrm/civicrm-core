@@ -5,6 +5,7 @@ use Civi\Api4\Contribution;
 use Civi\Test\Api3TestTrait;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\FormTrait;
+use Civi\Test\LookupHelperTrait;
 use Civi\Test\HeadlessInterface;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
@@ -37,6 +38,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
   use Api3TestTrait;
   use ContactTestTrait;
   use FormTrait;
+  use LookupHelperTrait;
 
   /**
    * Created ids.
@@ -141,7 +143,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
               'qty' => 1,
               'unit_price' => 200,
               'line_total' => 200,
-              'financial_type_id' => 1,
+              'financial_type_id' => $this->getFinancialTypeID('Donation'),
               'entity_table' => 'civicrm_membership',
               'price_field_id' => $priceFieldID,
               'price_field_value_id' => $generalPriceFieldValueID,
@@ -166,7 +168,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       'period_type' => 'rolling',
       'member_of_contact_id' => 1,
       'domain_id' => 1,
-      'financial_type_id' => 2,
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'relationship_type_id' => RelationshipType::create(FALSE)->setValues(['name_a_b' => 'AB', 'name_b_a' => 'BA'])->execute()->first()['id'],
       'relationship_direction' => 'a_b',
       'is_active' => 1,
@@ -198,7 +200,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       'url_button' => 'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',
       'class_name' => 'Payment_PayPalImpl',
       'billing_mode' => 3,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'financial_account_id' => 12,
       // Credit card = 1 so can pass 'by accident'.
       'payment_instrument_id' => 'Debit Card',
@@ -272,7 +274,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
     $this->createLoggedInUser();
     $formValues = [
       'contact_id' => $this->ids['contact'][0],
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'),
     ];
     $this->getTestForm('CRM_Contribute_Form_Contribution', $formValues, [
@@ -330,7 +332,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
             [
               'line_total' => 5,
               'qty' => 1,
-              'financial_type_id' => 1,
+              'financial_type_id' => $this->getFinancialTypeID('Donation'),
               'entity_table' => 'civicrm_participant',
               'price_field_id' => PriceField::get()->addSelect('id')->addWhere('name', '=', 'contribution_amount')->execute()->first()['id'],
             ],

@@ -933,7 +933,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'period_type' => 'fixed',
       'fixed_period_start_day' => '101',
       'fixed_period_rollover_day' => '1231',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'weight' => 50,
       'is_active' => 1,
       'visibility' => 'Public',
@@ -949,7 +949,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'period_type' => 'fixed',
       'fixed_period_start_day' => '101',
       'fixed_period_rollover_day' => '1231',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'weight' => 51,
       'is_active' => 1,
       'visibility' => 'Public',
@@ -997,7 +997,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
     $contribPage = civicrm_api3('ContributionPage', 'create', [
       'title' => 'Membership',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'financial_account_id' => 1,
       'is_credit_card_only' => '0',
       'is_monetary' => '0',
@@ -1027,7 +1027,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'title' => 'Two Membership Type Checkbox',
       'extends' => 'CiviMember',
       'is_active' => 1,
-      'financial_type_id' => '1',
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ]);
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_price_set_entity (entity_table, entity_id, price_set_id) VALUES('civicrm_contribution_page', $contribPage1, {$priceSet['id']})");
 
@@ -1055,7 +1055,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'membership_num_terms' => '1',
       'is_default' => '0',
       'is_active' => '1',
-      'financial_type_id' => '1',
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'non_deductible_amount' => '0.00',
       'contribution_type_id' => '2',
     ]);
@@ -1070,7 +1070,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'membership_num_terms' => '1',
       'is_default' => '0',
       'is_active' => '1',
-      'financial_type_id' => '1',
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'non_deductible_amount' => '0.00',
       'contribution_type_id' => '2',
     ]);

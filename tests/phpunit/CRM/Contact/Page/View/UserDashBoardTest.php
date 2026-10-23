@@ -184,7 +184,7 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $contactID,
       'currency' => 'USD',
-      'financial_type_id' => 4,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'contribution_status_id' => 1,
       'receive_date' => 'now',
       'total_amount' => 66,

@@ -32,7 +32,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
       'help_pre' => "Please describe your goat in detail",
       'help_post' => "thank you for your time",
       'extends' => [2],
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'is_quick_config' => 1,
       'is_reserved' => 1,
     ];
@@ -57,7 +57,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
       'name' => 'some_price_set',
       'title' => 'Some Price Set',
       'is_active' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'extends' => [1, 2],
     ];
     $createResult = $this->callAPISuccess($this->_entity, 'create', $createParams);

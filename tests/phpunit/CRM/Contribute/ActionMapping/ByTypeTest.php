@@ -203,7 +203,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
       'total_amount' => '100',
       'currency' => 'EUR',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'non_deductible_amount' => '10',
       'fee_amount' => '5',
       'net_amount' => '95',
@@ -231,7 +231,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
       'contact_id' => $this->contacts['bob']['id'],
       'receive_date' => date('Ymd', strtotime($this->targetDate)),
       'total_amount' => '150',
-      'financial_type_id' => 2,
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'non_deductible_amount' => '10',
       'fee_amount' => '5',
       'net_amount' => '145',
@@ -246,7 +246,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
   public function scheduleForDues(): void {
     $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
-    $this->schedule->entity_value = CRM_Utils_Array::implodePadded([1]);
+    $this->schedule->entity_value = CRM_Utils_Array::implodePadded([$this->getFinancialTypeID('Donation')]);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded([1]);
   }
 
@@ -256,7 +256,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
   public function scheduleForDonation(): void {
     $this->schedule->mapping_id = 'contribtype';
     $this->schedule->start_action_date = 'receive_date';
-    $this->schedule->entity_value = CRM_Utils_Array::implodePadded([2]);
+    $this->schedule->entity_value = CRM_Utils_Array::implodePadded([$this->getFinancialTypeID('Member Dues')]);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
   }
 
@@ -266,7 +266,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
   public function scheduleForDonationWithAbsoluteDate(): void {
     $this->schedule->mapping_id = 'contribtype';
     $this->schedule->absolute_date = date('Y-m-d', strtotime($this->targetDate));
-    $this->schedule->entity_value = CRM_Utils_Array::implodePadded([2]);
+    $this->schedule->entity_value = CRM_Utils_Array::implodePadded([$this->getFinancialTypeID('Member Dues')]);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
   }
 
@@ -361,7 +361,7 @@ class CRM_Contribute_ActionMapping_ByTypeTest extends AbstractMappingTestCase {
       'id  - not valid for action schedule',
       'cancel date August 9th, 2021',
       'source SSF',
-      'financial type id = 1',
+      'financial type id = ' . $this->getFinancialTypeID('Donation'),
       'financial type name = Donation',
       'financial type label = Donation',
       'payment instrument id = 4',

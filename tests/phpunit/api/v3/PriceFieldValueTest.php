@@ -60,7 +60,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'help_pre' => "Where does your goat sleep",
       'help_post' => "thank you for your time",
       'extends' => 2,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'is_quick_config' => 1,
       'is_reserved' => 1,
     ];
@@ -83,7 +83,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'name' => 'rye grass',
       'label' => 'juicy and healthy',
       'amount' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
 
     $membershipOrgId = $this->organizationCreate();
@@ -94,7 +94,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'title' => 'Priceset with Multiple Terms',
       'is_active' => 1,
       'extends' => 3,
-      'financial_type_id' => 2,
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'is_quick_config' => 1,
       'is_reserved' => 1,
     ];
@@ -163,7 +163,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'amount' => 90,
       'membership_num_terms' => 2,
       'is_active' => 1,
-      'financial_type_id' => 2,
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
     ];
     $result = $this->callAPISuccess('PriceFieldValue', 'create', $params);
     $this->assertEquals($result['values'][$result['id']]['membership_num_terms'], 2);
@@ -180,7 +180,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'amount' => 90,
       'membership_num_terms' => 2,
       'is_active' => 1,
-      'financial_type_id' => 2,
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
     ];
     $params2 = [
       'price_field_id' => $this->priceFieldID2,
@@ -190,7 +190,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'amount' => 120,
       'membership_num_terms' => 3,
       'is_active' => 1,
-      'financial_type_id' => 2,
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
     ];
     $result1 = $this->callAPISuccess('PriceFieldValue', 'create', $params2);
     $result2 = $this->callAPISuccess('PriceFieldValue', 'create', $params2);

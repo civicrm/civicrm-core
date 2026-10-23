@@ -95,7 +95,7 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
       'extends' => 2,
       'is_quick_config' => 0,
       // donation
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'name' => 'priciest',
       'title' => 'Priciest Price Set',
     ])['id'];

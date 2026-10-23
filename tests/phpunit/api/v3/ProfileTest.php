@@ -588,7 +588,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->_contactID = $this->individualCreate();
     $this->callAPIV3Success('profile', 'submit', [
       'profile_id' => 'membership_batch_entry',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'membership_type' => $this->_membershipTypeID,
       'join_date' => 'now',
       'total_amount' => 10,
@@ -602,7 +602,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_contactID]);
     $this->assertEquals(10, $contribution['total_amount']);
-    $this->assertEquals(1, $contribution['financial_type_id']);
+    $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
     // contribution_status_id => 1 (Completed) was requested; since Order::create()
     // always creates a Pending contribution, submit() should have recorded a
     // Payment to bring it to Completed.
