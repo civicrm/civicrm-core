@@ -564,59 +564,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
   }
 
-  /**
-   * Process the contribution.
-   *
-   * @param int $contactID
-   *
-   * @return \CRM_Contribute_BAO_Contribution
-   */
-  private function processContribution($contactID): CRM_Contribute_BAO_Contribution {
-    // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
-    $transaction = new CRM_Core_Transaction();
-
-    $now = date('YmdHis');
-    $financialTypeID = !empty($this->getEventValue('financial_type_id')) ? $this->getEventValue('financial_type_id') : $this->getOrder()->getFinancialTypeID();
-
-    $contribParams = [
-      'contact_id' => $contactID,
-      'financial_type_id' => $financialTypeID,
-      'receive_date' => $now,
-      'total_amount' => $this->getOrder()->getTotalAmount(),
-      'tax_amount' => $this->getOrderTotalTaxAmount(),
-      'amount_level' => $this->getAmountLevelForParticipant(0),
-      'invoice_id' => $this->getInvoiceID(),
-      'currency' => $this->getCurrency(),
-      'source' => $this->getSource(0),
-      'is_pay_later' => $this->isPayLater(),
-      'campaign_id' => $this->getCampaignID(0),
-      'card_type_id' => $this->getCardTypeID(),
-      'pan_truncation' => $this->getPanTruncation(),
-      // The ternary is probably redundant - paymentProcessor should always be set.
-      // For pay-later contributions it will be the pay-later processor.
-      'payment_processor' => $this->_paymentProcessor ? $this->_paymentProcessor['id'] : NULL,
-      'payment_instrument_id' => $this->_paymentProcessor ? $this->_paymentProcessor['payment_instrument_id'] : NULL,
-      'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
-    ];
-
-    $contribParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id',
-      $contribParams['total_amount'] == 0 ? 'Completed' : 'Pending'
-    );
-
-    $contribParams['is_test'] = $this->isTest();
-
-    $contribParams['address_id'] = CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedParticipantValues());
-
-    $contribParams['skipLineItem'] = 1;
-    $contribParams['skipCleanMoney'] = 1;
-    // create contribution record
-    $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
-
-    $transaction->commit();
-
-    return $contribution;
-  }
-
   protected function getPanTruncation(): string {
     return substr((string) $this->getSubmittedValue('credit_card_number'), -4);
   }
@@ -1139,9 +1086,47 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // add participant record
       $this->addParticipant($contacts[$participantNum], $participantNum);
     }
+
     // if paid event add a contribution record
-    //passing contribution id is already registered.
-    $contribution = $this->processContribution($contacts[0]);
+    // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
+    $transaction = new CRM_Core_Transaction();
+
+    $financialTypeID = !empty($this->getEventValue('financial_type_id')) ? $this->getEventValue('financial_type_id') : $this->getOrder()->getFinancialTypeID();
+
+    $contribParams = [
+      'contact_id' => $contacts[0],
+      'financial_type_id' => $financialTypeID,
+      'receive_date' => date('YmdHis'),
+      'total_amount' => $this->getOrder()->getTotalAmount(),
+      'tax_amount' => $this->getOrderTotalTaxAmount(),
+      'amount_level' => $this->getAmountLevelForParticipant(0),
+      'invoice_id' => $this->getInvoiceID(),
+      'currency' => $this->getCurrency(),
+      'source' => $this->getSource(0),
+      'is_pay_later' => $this->isPayLater(),
+      'campaign_id' => $this->getCampaignID(0),
+      'card_type_id' => $this->getCardTypeID(),
+      'pan_truncation' => $this->getPanTruncation(),
+      // The ternary is probably redundant - paymentProcessor should always be set.
+      // For pay-later contributions it will be the pay-later processor.
+      'payment_processor' => $this->_paymentProcessor ? $this->_paymentProcessor['id'] : NULL,
+      'payment_instrument_id' => $this->_paymentProcessor ? $this->_paymentProcessor['payment_instrument_id'] : NULL,
+      'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
+      'is_test' => $this->isTest(),
+      'address_id' => CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedParticipantValues()),
+    ];
+
+    $contribParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id',
+      $contribParams['total_amount'] == 0 ? 'Completed' : 'Pending'
+    );
+
+    $contribParams['skipLineItem'] = 1;
+    $contribParams['skipCleanMoney'] = 1;
+    // create contribution record
+    $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
+
+    $transaction->commit();
+
     // create line items, CRM-5313
     if ($this->_priceSetId &&
       !empty($this->_lineItem)
