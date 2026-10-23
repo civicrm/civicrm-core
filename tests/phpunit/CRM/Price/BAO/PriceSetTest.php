@@ -45,14 +45,14 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
       ->addValue('label', 'Radio 2')
       ->addValue('amount', '2')
       ->addValue('weight', 2)
-      ->addValue('financial_type_id', 1)
+      ->addValue('financial_type_id:name', 'Donation')
       ->execute();
     \Civi\Api4\PriceFieldValue::create()
       ->addValue('price_field_id', $radioPriceFieldId)
       ->addValue('label', 'Radio 1')
       ->addValue('amount', '1')
       ->addValue('weight', 1)
-      ->addValue('financial_type_id', 1)
+      ->addValue('financial_type_id:name', 'Donation')
       ->execute();
     $priceSet = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($priceSetId);
     $firstPriceField = array_values($priceSet['fields'])[0];

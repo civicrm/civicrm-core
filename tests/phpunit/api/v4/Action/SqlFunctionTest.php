@@ -45,6 +45,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testGroupAggregates(): void {
+    $donationID = $this->getFinancialTypeID('Donation');
     $cid = Contact::create(FALSE)->addValue('first_name', 'bill')->execute()->first()['id'];
     Contribution::save(FALSE)
       ->setDefaults(['contact_id' => $cid, 'financial_type_id:name' => 'Donation'])
@@ -119,14 +120,14 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addGroupBy('contact_id')
       ->addWhere('contact_id', '=', $cid)
       ->addSelect("GROUP_CONCAT(CONCAT(financial_type_id, ', ', contact_id, ', ', total_amount))")
-      ->addSelect("GROUP_CONCAT((financial_type_id = 1)) AS is_donation")
+      ->addSelect("GROUP_CONCAT((financial_type_id = $donationID)) AS is_donation")
       ->addSelect("GROUP_CONCAT(MONTH(receive_date):label) AS months")
       ->addSelect('COUNT(*) AS count')
       ->execute()
       ->first();
 
     $this->assertTrue(4 === $agg['count']);
-    $this->assertContains('1, ' . $cid . ', 100.00', $agg['GROUP_CONCAT:financial_type_id_contact_id_total_amount']);
+    $this->assertContains($donationID . ', ' . $cid . ', 100.00', $agg['GROUP_CONCAT:financial_type_id_contact_id_total_amount']);
     $this->assertEquals([TRUE, TRUE, FALSE, FALSE], $agg['is_donation']);
     $this->assertEquals(['January', 'February', 'March', 'April'], $agg['months']);
 
@@ -135,8 +136,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addGroupBy('contact_id')
       ->addWhere('contact_id', '=', $cid)
       ->addSelect('GROUP_FIRST(financial_type_id:name ORDER BY id) AS financial_type_1')
-      ->addSelect("GROUP_FIRST((financial_type_id = 1) ORDER BY id) AS is_donation_1")
-      ->addSelect("GROUP_FIRST((financial_type_id = 1) ORDER BY id DESC) AS is_donation_4")
+      ->addSelect("GROUP_FIRST((financial_type_id = $donationID) ORDER BY id) AS is_donation_1")
+      ->addSelect("GROUP_FIRST((financial_type_id = $donationID) ORDER BY id DESC) AS is_donation_4")
       ->addSelect("GROUP_FIRST(MONTH(receive_date):label ORDER BY id) AS months")
       ->addSelect('COUNT(*) AS count')
       ->execute()
@@ -224,7 +225,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
   public function testGroupHaving(): void {
     $cid = Contact::create(FALSE)->addValue('first_name', 'donor')->execute()->first()['id'];
     Contribution::save(FALSE)
-      ->setDefaults(['contact_id' => $cid, 'financial_type_id' => 1])
+      ->setDefaults(['contact_id' => $cid, 'financial_type_id:name' => 'Donation'])
       ->setRecords([
         ['total_amount' => 100, 'receive_date' => '2020-02-02'],
         ['total_amount' => 200, 'receive_date' => '2020-02-02'],
@@ -283,7 +284,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
   public function testGroupHavingWithDateAggregateFunction(): void {
     $cid = Contact::create(FALSE)->addValue('first_name', 'donor')->execute()->first()['id'];
     Contribution::save(FALSE)
-      ->setDefaults(['contact_id' => $cid, 'financial_type_id' => 1])
+      ->setDefaults(['contact_id' => $cid, 'financial_type_id:name' => 'Donation'])
       ->setRecords([
         // Earliest receive_date is in the same year as, but chronologically after, the HAVING
         // filter below. This is exactly the case a naive string comparison gets wrong.

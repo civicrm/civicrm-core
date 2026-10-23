@@ -32,7 +32,7 @@ class CRM_Member_Page_MembershipTypeTest extends CiviUnitTestCase {
         'title' => 'General',
         'frontend_title' => 'General',
         'member_of_contact_id' => $this->setupIDs['contact'],
-        'financial_type_id' => '2',
+        'financial_type_id' => (string) $this->getFinancialTypeID('Member Dues'),
         'minimum_fee' => 0.0,
         'duration_unit' => 'year',
         'duration_interval' => '1',

@@ -46,7 +46,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->individualCreate();
     $this->params = [
       'title' => 'Test Contribution Page',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'currency' => 'NZD',
       'goal_amount' => 34567,
       'is_pay_later' => 1,
@@ -91,7 +91,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('ContributionPage', 'create', $this->params);
     $getParams = [
       'currency' => 'NZD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
     $getResult = $this->callAPISuccess('ContributionPage', 'get', $getParams);
     $this->assertEquals(1, $getResult['count']);
@@ -105,7 +105,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $getParams = [
       'amount' => '34567',
       'currency' => 'NZD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
     $getResult = $this->callAPISuccess('ContributionPage', 'get', $getParams);
     $this->assertEquals(1, $getResult['count']);

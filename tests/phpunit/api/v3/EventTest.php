@@ -296,14 +296,14 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * We need to ensure this is supported as an alias for financial_type_id.
    */
   public function testCreateGetEventLegacyContributionTypeID(): void {
-    $contributionTypeArray = ['contribution_type_id' => 3];
+    $contributionTypeArray = ['contribution_type_id' => $this->getFinancialTypeID('Campaign Contribution')];
     if (isset($this->_params[0]['financial_type_id'])) {
       //in case someone edits $this->_params & invalidates this test :-)
       unset($this->_params[0]['financial_type_id']);
     }
     $result = $this->callAPISuccess('event', 'create', $this->_params[0] + $contributionTypeArray);
     $getresult = $this->callAPISuccess('event', 'get', [] + $contributionTypeArray);
-    $this->assertEquals($getresult['values'][$getresult['id']]['contribution_type_id'], 3);
+    $this->assertEquals($getresult['values'][$getresult['id']]['contribution_type_id'], $this->getFinancialTypeID('Campaign Contribution'));
     $this->assertEquals($result['id'], $getresult['id']);
     $this->callAPISuccess('event', 'delete', ['id' => $result['id']]);
   }

@@ -1062,7 +1062,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 2,
       'is_pay_later' => 1,
     ];
@@ -1129,7 +1129,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 2,
       'is_pay_later' => 1,
       'trxn_id' => 'trxn_1',
@@ -1206,7 +1206,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 2,
     ];
     $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
@@ -1246,7 +1246,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => 50,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 'Failed',
     ];
     $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
@@ -1273,7 +1273,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 'Pending',
       'is_pay_later' => 1,
     ];
@@ -1366,7 +1366,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 2,
       'is_pay_later' => 1,
     ];
@@ -1426,7 +1426,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 'Pending',
     ];
     $order = $this->callAPISuccess('Order', 'create', $contributionParams);
@@ -1561,7 +1561,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_status_id' => 'Pending',
       'receive_date'           => date('Y-m-d H:i:s'),
       'fee_amount' => 0,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'is_pay_later' => 1,
     ]);
     $trxnID = 'abcd';
@@ -1591,7 +1591,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_status_id' => 'Pending',
       'receive_date'           => date('Y-m-d H:i:s'),
       'fee_amount' => 0,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'is_pay_later' => 1,
     ]);
     $trxnID = 'abcd121212';

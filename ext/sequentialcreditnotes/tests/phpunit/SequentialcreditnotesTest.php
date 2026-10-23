@@ -21,6 +21,7 @@ use Civi\Test\TransactionalInterface;
 class SequentialcreditnotesTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
 
   use \Civi\Test\Api3TestTrait;
+  use \Civi\Test\LookupHelperTrait;
 
   /**
    * Setup for headless test.
@@ -51,7 +52,7 @@ class SequentialcreditnotesTest extends \PHPUnit\Framework\TestCase implements H
     $params = [
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 3,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',

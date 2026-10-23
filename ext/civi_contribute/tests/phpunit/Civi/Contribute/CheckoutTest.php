@@ -7,6 +7,7 @@ use Civi\Checkout\CheckoutSession;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
 use Civi\Test\HeadlessInterface;
+use Civi\Test\LookupHelperTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,6 +16,8 @@ use PHPUnit\Framework\TestCase;
  * @group headless
  */
 class CheckoutTest extends TestCase implements HeadlessInterface {
+
+  use LookupHelperTrait;
 
   protected $afformContributionSettingBackup;
 
@@ -128,7 +131,7 @@ class CheckoutTest extends TestCase implements HeadlessInterface {
     return \Civi\Api4\Order::create(FALSE)
       ->setContributionValues([
         'contact_id' => $this->contactId,
-        'financial_type_id' => 1,
+        'financial_type_id' => $this->getFinancialTypeID('Donation'),
       ])
       ->addLineItem([
         'unit_price' => 10,
