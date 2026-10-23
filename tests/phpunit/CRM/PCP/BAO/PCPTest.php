@@ -98,7 +98,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     $submitParams = [
       'id' => $block->entity_id,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'start_date' => date('Y-m-d 00:00:00'),
       'end_date' => date('Y-m-d 00:00:00', strtotime('+8 weeks')),
     ];

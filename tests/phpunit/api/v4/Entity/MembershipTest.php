@@ -55,7 +55,7 @@ class MembershipTest extends Api4TestBase implements TransactionalInterface {
       MembershipType::save(FALSE)
         ->setRecords($sampleData)
         ->addDefault('domain_id.name', $domain)
-        ->addDefault('financial_type_id', 1)
+        ->addDefault('financial_type_id:name', 'Donation')
         ->addDefault('duration_unit', 'day')
         ->addDefault('period_type', 'rolling')
         ->addDefault('member_of_contact_id', Contact::create(FALSE)
@@ -96,7 +96,7 @@ class MembershipTest extends Api4TestBase implements TransactionalInterface {
       'period_type' => 'rolling',
       'member_of_contact_id' => 1,
       'domain_id' => 1,
-      'financial_type_id' => 2,
+      'financial_type_id:name' => 'Member Dues',
       'is_active' => 1,
       'sequential' => 1,
       'visibility' => 'Public',

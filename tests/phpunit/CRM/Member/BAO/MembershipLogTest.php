@@ -76,7 +76,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
     ];
     $this->relationshipTypeID = $this->relationshipTypeCreate($params);
     $this->organizationContactID = $this->organizationCreate();
-    $this->financialTypeID = 1;
+    $this->financialTypeID = $this->getFinancialTypeID('Donation');
 
     $params = [
       'name' => 'test type',

@@ -452,7 +452,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'title' => 'My Price Set',
       'is_active' => 1,
       'extends' => 1,
-      'financial_type_id' => 4,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
     ]);
 
     // Add the price set to the event with another API call.
@@ -480,7 +480,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'label' => 'price_field_value_1',
       'amount' => 20,
       'is_active' => 1,
-      'financial_type_id' => 4,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
     ]);
 
     $pfv2 = $this->callAPISuccess('PriceFieldValue', 'create', [
@@ -489,7 +489,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'label' => 'price_field_value_2',
       'amount' => 5,
       'is_active' => 1,
-      'financial_type_id' => 4,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
     ]);
 
     // pay 2 times price field value 1, and 2 times price field value 2.
@@ -664,7 +664,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
         'format.only_id' => 1,
       ],
       'api.contribution.create' => [
-        'financial_type_id' => 1,
+        'financial_type_id' => $this->getFinancialTypeID('Donation'),
         'total_amount' => 100,
         'format.only_id' => 1,
       ],

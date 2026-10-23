@@ -292,7 +292,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'scheduled_date' => $scheduled_date,
       'amount' => 1618.80,
       'pledge_status_id' => 2,
-      'pledge_financial_type_id' => 1,
+      'pledge_financial_type_id' => $this->getFinancialTypeID('Donation'),
       'pledge_original_installment_amount' => 134.90,
       'original_installment_amount' => 134.90,
       'frequency_interval' => 1,
@@ -304,7 +304,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
 
     $contributionID = $this->contributionCreate([
       'contact_id' => $contact_id,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'invoice_id' => 46,
       'trxn_id' => 46,
       'total_amount' => 404.70,
@@ -380,7 +380,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'scheduled_date' => $scheduled_date,
       'amount' => 100.00,
       'pledge_status_id' => 2,
-      'pledge_financial_type_id' => 1,
+      'pledge_financial_type_id' => $this->getFinancialTypeID('Donation'),
       // the API does not allow this
       'original_installment_amount' => (100 / 12),
       'frequency_interval' => 1,
@@ -394,7 +394,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
 
     $contributionID = $this->contributionCreate([
       'contact_id' => $contact_id,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'invoice_id' => 47,
       'trxn_id' => 47,
       'total_amount' => 100.00,

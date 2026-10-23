@@ -50,7 +50,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   protected $_contactID;
 
-  protected $_financialTypeId = 1;
+  protected $_financialTypeId;
 
   /**
    * Entity to be extended.
@@ -69,6 +69,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // Connect to the database.
     parent::setUp();
     $this->_entity = 'contact';
+    $this->_financialTypeId = $this->getFinancialTypeID('Donation');
     $this->_params = [
       'first_name' => 'abc1',
       'contact_type' => 'Individual',
@@ -2018,7 +2019,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'domain_id' => CRM_Core_Config::domainID(),
       'name' => 'Organization Membership',
       'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'minimum_fee' => 10,
       'duration_unit' => 'year',
       'duration_interval' => 1,
@@ -2742,7 +2743,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api.contribution.create' => [
         'receive_date' => '2010-01-01',
         'total_amount' => 100.00,
-        'financial_type_id' => 1,
+        'financial_type_id' => $this->getFinancialTypeID('Donation'),
         'payment_instrument_id' => 1,
         'non_deductible_amount' => 10.00,
         'fee_amount' => 50.00,
@@ -2755,7 +2756,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api.contribution.create.1' => [
         'receive_date' => '2011-01-01',
         'total_amount' => 120.00,
-        'financial_type_id' => $this->_financialTypeId = 1,
+        'financial_type_id' => $this->_financialTypeId,
         'payment_instrument_id' => 1,
         'non_deductible_amount' => 10.00,
         'fee_amount' => 50.00,
@@ -2924,7 +2925,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api.contribution.create' => [
         'receive_date' => '2010-01-01',
         'total_amount' => 100.00,
-        'financial_type_id' => 1,
+        'financial_type_id' => $this->getFinancialTypeID('Donation'),
         'payment_instrument_id' => 1,
         'non_deductible_amount' => 10.00,
         'fee_amount' => 50.00,
@@ -2938,7 +2939,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api.contribution.create.1' => [
         'receive_date' => '2011-01-01',
         'total_amount' => 120.00,
-        'financial_type_id' => 1,
+        'financial_type_id' => $this->getFinancialTypeID('Donation'),
         'payment_instrument_id' => 1,
         'non_deductible_amount' => 10.00,
         'fee_amount' => 50.00,

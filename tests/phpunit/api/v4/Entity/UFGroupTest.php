@@ -31,7 +31,7 @@ class UFGroupTest extends Api4TestBase {
       ],
       'contribution' => [
         'title' => 'Contribution Profile',
-        'group_type' => "Individual,Contact\x01ContributionType:1:2",
+        'group_type' => "Individual,Contact\x01ContributionType:" . $this->getFinancialTypeID('Donation') . ':' . $this->getFinancialTypeID('Member Dues'),
         'expected' => ['Individual', 'Contact', 'Contributions: Donation, Member Dues'],
       ],
       'participant_role' => [
@@ -46,7 +46,7 @@ class UFGroupTest extends Api4TestBase {
       ],
       'multiple_subtypes' => [
         'title' => 'Multiple Subtypes Profile',
-        'group_type' => "Individual,Contact\x01ParticipantRole:1,ContributionType:1",
+        'group_type' => "Individual,Contact\x01ParticipantRole:1,ContributionType:" . $this->getFinancialTypeID('Donation'),
         'expected' => ['Individual', 'Contact', 'Role: Attendee', 'Contributions: Donation'],
       ],
       'empty' => [

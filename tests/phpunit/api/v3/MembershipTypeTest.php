@@ -41,7 +41,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $params = [
       'name' => '60+ Membership',
       'description' => 'people above 60 are given health instructions',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'minimum_fee' => '200',
       'duration_unit' => 'month',
       'duration_interval' => '10',
@@ -86,7 +86,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $params = [
       'name' => '60+ Membership',
       'description' => 'people above 60 are given health instructions',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'domain_id' => '1',
       'minimum_fee' => '200',
       'duration_unit' => 'month',
@@ -112,7 +112,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'name' => '40+ Membership',
       'description' => 'people above 40 are given health instructions',
       'member_of_contact_id' => $this->_contactID,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'domain_id' => '1',
       'minimum_fee' => '200',
       'duration_unit' => 'month',
@@ -140,7 +140,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'name' => '60+ Membership',
       'description' => 'people above 60 are given health instructions',
       'member_of_contact_id' => $this->_contactID,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'minimum_fee' => '1200',
       'duration_unit' => 'month',
       'duration_interval' => '10',
@@ -209,7 +209,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
    */
   public function testUpdate(int $version): void {
     $this->_apiversion = $version;
-    $id = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID, 'financial_type_id' => 2]);
+    $id = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID, 'financial_type_id' => $this->getFinancialTypeID('Member Dues')]);
     $newMemberOrgParams = [
       'organization_name' => 'New membership organisation',
       'contact_type' => 'Organization',
@@ -355,7 +355,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'id' => $memType[1],
       'name' => 'General - Edited',
       'visibility' => 'Admin',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'minimum_fee' => 300,
       'description' => 'Test edit description',
     ];

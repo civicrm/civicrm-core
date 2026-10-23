@@ -695,7 +695,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'period_type' => 'rolling',
       'member_of_contact_id' => $memberOfOrganization,
       'domain_id' => 1,
-      'financial_type_id' => 2,
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'is_active' => 1,
       'sequential' => 1,
       'visibility' => 'Public',
@@ -1061,7 +1061,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'scheduled_date' => date('Ymd'),
       'amount' => 100.00,
       'status_id' => '2',
-      'financial_type_id' => '1',
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'original_installment_amount' => 20,
       'frequency_interval' => 5,
       'frequency_unit' => 'year',
@@ -1102,7 +1102,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'receive_date' => date('Ymd'),
       'total_amount' => 100.00,
       'fee_amount' => 5.00,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_instrument_id' => 1,
       'non_deductible_amount' => 10.00,
       'source' => 'SSF',
@@ -1892,7 +1892,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       ->setDefaults([
         'domain_id' => 1,
         'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
-        'financial_type_id' => 2,
+        'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       ]
     )->execute();
   }
@@ -2297,7 +2297,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'url_button' => 'https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif',
       'class_name' => 'Payment_PayPalImpl',
       'billing_mode' => 3,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'financial_account_id' => 12,
       // Credit card = 1 so can pass 'by accident'.
       'payment_instrument_id:name' => 'Debit Card',
@@ -2419,7 +2419,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       $this->contributionCreate([
         'contact_id' => $this->ids['Contact']['individual_0'],
         'is_test' => 1,
-        'financial_type_id' => 1,
+        'financial_type_id' => $this->getFinancialTypeID('Donation'),
         'invoice_id' => 'abcd',
         'trxn_id' => 345,
         'receive_date' => '2019-07-25 07:34:23',
@@ -2966,7 +2966,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       ], 'special')['id'];
       $contributionPageID = $this->createTestEntity('ContributionPage', [
         'title' => 'Test Contribution Page',
-        'financial_type_id' => 1,
+        'financial_type_id' => $this->getFinancialTypeID('Donation'),
         'currency' => 'NZD',
         'goal_amount' => 50,
         'is_pay_later' => 1,
@@ -2976,7 +2976,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       $priceSetID = $this->createTestEntity('PriceSet', [
         'is_quick_config' => 0,
         'extends' => CRM_Core_Component::getComponentID('CiviMember'),
-        'financial_type_id' => 1,
+        'financial_type_id' => $this->getFinancialTypeID('Donation'),
         'title' => 'my Page',
         'name' => 'member_not_quick_config',
       ])['id'];
@@ -3478,7 +3478,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
           'total_amount' => 300,
           'currency' => 'USD',
           'contact_id' => $contactID,
-          'financial_type_id' => 4,
+          'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
         ],
         'line_items' => [
           [
@@ -3509,7 +3509,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'total_amount' => 300,
       'currency' => 'USD',
       'contact_id' => $contactID,
-      'financial_type_id' => 4,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'line_items' => [
         [
           'line_item' => [
@@ -3523,7 +3523,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
             ],
           ],
           'params' => [
-            'financial_type_id' => 4,
+            'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
             'event_id' => $this->getEventID('PaidEvent'),
             'role_id' => 1,
             'status_id' => $this->getParticipantStatusID('Pending refund'),
@@ -3543,7 +3543,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
             ],
           ],
           'params' => [
-            'financial_type_id' => 4,
+            'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
             'event_id' => $this->getEventID('PaidEvent'),
             'role_id' => 1,
             'status_id' => $this->getParticipantStatusID('Pending refund'),
