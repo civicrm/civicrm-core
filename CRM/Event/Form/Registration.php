@@ -111,6 +111,21 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get the participant numbers actually present in this submission
+   * (0 = primary, 1+ = additional) - when 'Skip Participant' button
+   * is used they are excluded.
+   *
+   * @return int[]
+   */
+  protected function getSubmittedParticipantNumbers(): array {
+    $participantNumbers = [];
+    foreach (array_keys($this->getAllSubmittedValues()) as $pageName) {
+      $participantNumbers[] = $pageName === 'Register' ? 0 : (int) substr($pageName, strlen('Participant_'));
+    }
+    return $participantNumbers;
+  }
+
+  /**
    * Get the combined submitted values for the 'Main' trio of pages
    * (Register, Confirm, ThankYou).
    *
@@ -2276,7 +2291,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $defaults["billing_state_province_id-{$billingLocationTypeID}"] = $config->defaultContactStateProvince;
       }
 
-      $billingDefaults = $this->getProfileDefaults('Billing', $this->_contactId);
+      $billingDefaults = $this->getProfileDefaults('Billing', $this->getContactID());
       $defaults = array_merge($defaults, $billingDefaults);
     }
 
@@ -2289,14 +2304,14 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $this->_eventId);
     }
 
-    if (($this->_action == CRM_Core_Action::ADD) && $this->_eventId && $discountId) {
+    if (($this->_action == CRM_Core_Action::ADD) && $this->getEventID() && $discountId) {
       // this case is for add mode, where we show discount automatically
       $defaults['discount_id'] = $discountId;
     }
 
     if ($priceSetId) {
       // get price set default values, CRM-4090
-      $priceSetValues = $this->setDefaultPriceSet($participantID, $this->_eventId);
+      $priceSetValues = $this->setDefaultPriceSet($participantID, $this->getEventID());
       if (!empty($priceSetValues)) {
         $defaults = array_merge($defaults, $priceSetValues);
       }
