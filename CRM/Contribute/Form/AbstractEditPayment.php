@@ -434,7 +434,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
       'billing_first_name',
       'billing_middle_name',
       'billing_last_name',
-      'street_address-5',
+      "street_address-{$billingLocationTypeID}",
       "city-{$billingLocationTypeID}",
       "state_province_id-{$billingLocationTypeID}",
       "postal_code-{$billingLocationTypeID}",
@@ -557,7 +557,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    */
   protected function processBillingAddress(int $contactID, string $email): void {
     $submittedValues = $this->getSubmittedValues();
-    $submittedValues['email-5'] = $submittedValues['email-Primary'] = $email;
+    $submittedValues['email-' . CRM_Core_BAO_LocationType::getBilling()] = $submittedValues['email-Primary'] = $email;
 
     [$hasBillingField, $addressParams] = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($submittedValues);
 
