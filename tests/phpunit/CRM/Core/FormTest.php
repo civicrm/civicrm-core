@@ -91,8 +91,7 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
 
     $priceSetId = $this->callAPISuccess('PriceSet', 'create', [
       'is_active' => 1,
-      // extends contribution
-      'extends' => 2,
+      'extends' => 'CiviContribute',
       'is_quick_config' => 0,
       // donation
       'financial_type_id' => $this->getFinancialTypeID('Donation'),

@@ -244,7 +244,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('option_group', 'get', [
       'name' => 'preferred_communication_method',
       'sequential' => 1,
-      'api.option_value.create' => ['component_id' => 2, 'name' => 'my@y.com'],
+      'api.option_value.create' => ['component_id' => CRM_Core_Component::getComponentID('CiviContribute'), 'name' => 'my@y.com'],
     ]);
     $this->assertAPISuccess($result);
     $optionValueId = $result['values'][0]['api.option_value.create']['id'];
@@ -252,7 +252,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'id' => $optionValueId,
       'return' => 'component_id',
     ]);
-    $this->assertEquals(2, $component_id);
+    $this->assertEquals(CRM_Core_Component::getComponentID('CiviContribute'), $component_id);
     $this->callAPISuccess('option_value', 'delete', ['id' => $optionValueId]);
   }
 
@@ -274,7 +274,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'id' => $optionValueId,
       'return' => 'component_id',
     ]);
-    $this->assertEquals(2, $component_id);
+    $this->assertEquals(CRM_Core_Component::getComponentID('CiviContribute'), $component_id);
     $this->callAPISuccess('option_value', 'delete', ['id' => $optionValueId]);
   }
 

@@ -25,7 +25,7 @@ class CRM_Price_BAO_PriceFieldTest extends CiviUnitTestCase {
   public function testSubmitPriceFieldWithOptions(): void {
     $priceSet = $this->callAPISuccess('PriceSet', 'create', [
       'is_active' => 1,
-      'extends' => 2,
+      'extends' => 'CiviContribute',
       'is_quick_config' => 1,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'name' => 'test_price_set',

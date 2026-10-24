@@ -45,14 +45,12 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
 
     \Civi\Api4\PriceSet::save(FALSE)
       ->addRecord([
-        // participant
-        'extends' => [1],
+        'extends:name' => ['CiviEvent'],
         'name' => 'participant_fields',
         'title' => 'Participant Options',
       ])
       ->addRecord([
-         // contribution
-        'extends' => [2],
+        'extends:name' => ['CiviContribute'],
         'name' => 'donation_options',
         'title' => 'Donation Options',
       ])

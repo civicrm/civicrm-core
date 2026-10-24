@@ -451,7 +451,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'name' => 'my_price_set',
       'title' => 'My Price Set',
       'is_active' => 1,
-      'extends' => 1,
+      'extends' => 'CiviEvent',
       'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
     ]);
 
