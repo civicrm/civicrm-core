@@ -29,11 +29,13 @@
       <div class="crm-label">{$form.nick_name.label}</div>
       <div class="crm-content">{$form.nick_name.html}</div>
     </div>
-    {if $contactType eq 'Organization'}
+    {if $contactType eq 'Organization' OR $contactType eq 'Individual'}
     <div class="crm-summary-row">
       <div class="crm-label">{$form.legal_name.label}</div>
       <div class="crm-content">{$form.legal_name.html}</div>
     </div>
+    {/if}
+    {if $contactType eq 'Organization'}
     <div class="crm-summary-row">
       <div class="crm-label">{$form.sic_code.label}</div>
       <div class="crm-content">{$form.sic_code.html}</div>

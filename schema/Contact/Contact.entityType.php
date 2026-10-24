@@ -444,7 +444,6 @@ return [
       'input_type' => 'Text',
       'description' => ts('Legal Name.'),
       'add' => '1.1',
-      'contact_type' => 'Organization',
       'usage' => [
         'import',
         'export',

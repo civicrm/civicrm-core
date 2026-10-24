@@ -1525,7 +1525,6 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
           $commonValues = [
             'Individual' => [
               'household_name',
-              'legal_name',
               'sic_code',
               'organization_name',
               'email_greeting_custom',
