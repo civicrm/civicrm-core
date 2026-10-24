@@ -39,13 +39,13 @@ class CRM_Mailing_Event_BAO_MailingEventBounce extends CRM_Mailing_Event_DAO_Mai
     $params['time_stamp'] = date('YmdHis');
 
     // if we dont have a valid bounce type, we should set it
-    // to bounce_type_id 11 which is Syntax error. this allows such email
+    // to the Syntax error bounce type. this allows such email
     // addresses to be bounce a few more time before being put on hold
     // CRM-4814
     // we changed this behavior since this bounce type might be due to some issue
     // with the connection or smtp server etc
     if (empty($params['bounce_type_id'])) {
-      $params['bounce_type_id'] = 11;
+      $params['bounce_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_BounceType', 'Syntax', 'id', 'name');
       if (empty($params['bounce_reason'])) {
         $params['bounce_reason'] = ts('Unknown bounce type: Could not parse bounce email');
       }
