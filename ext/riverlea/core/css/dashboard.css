@@ -1,5 +1,5 @@
 /* Style rules for Dashboard home screen.
-   Forked on 11 June 24, updated 30 May 26. */
+   Forked on 11 June 24, updated 13 Oct 26. */
 
 #civicrm-dashboard > .crm-flex-box {
   display: grid;
@@ -10,71 +10,79 @@
   /* avoid total collapse else no droppable area if all widgets removed */
   min-height: 10rem;
 }
-#civicrm-dashboard:has(.crm-inactive-dashlet-fieldset[open]) .crm-dashboard-droppable {
-  border: 3px dashed var(--crm-c-gray-400);
-  padding: var(--crm-padding-reg);
-}
-#civicrm-dashboard:has(.crm-inactive-dashlet-fieldset[open]) .crm-dashlet {
-  max-height: 15rem;
-  overflow: hidden;
-}
-#civicrm-dashboard:has(.crm-inactive-dashlet-fieldset[open]) {
-  display: flex;
-  flex-direction: column;
-  gap: var(--crm-padding-reg);
-}
-.crm-container .crm-dashlet {
+.crm-container .crm-dashlet crm-dashlet > details {
   border-radius: var(--crm-dashlet-radius);
   background-color: var(--crm-dashlet-bg-color);
   padding: var(--crm-dashlet-padding);
   box-shadow: var(--crm-dashlet-box-shadow);
-  margin-bottom: var(--crm-padding-reg);
+  margin: 0 0 var(--crm-padding-reg);
   border: var(--crm-dashlet-border);
 }
-.crm-container .ui-sortable-helper.crm-dashlet {
-  box-shadow: var(--crm-shadow-block);
+.crm-container crm-dashlet {
+  display: block;
+  position: relative;
 }
-.crm-container .crm-dashlet-header {
+.crm-container crm-dashlet > details > summary.crm-dashlet-header {
   background-color: var(--crm-dashlet-header-bg-color);
-  border-radius: var(--crm-dashlet-radius);
+  color: var(--crm-dashlet-header-color);
   border: var(--crm-dashlet-header-border);
   border-width: var(--crm-dashlet-header-border-width);
+  border-radius: var(--crm-dashlet-radius);
   padding: var(--crm-dashlet-header-padding);
+  padding-right: 5rem;
   display: flex;
+  flex-direction: row;
   align-items: center;
-  flex-direction: row-reverse;
   cursor: move;
+  gap: var(--crm-accordion-icon-spacing);
+}
+.crm-container crm-dashlet > details > summary.crm-dashlet-header:is(:hover, :focus) {
+  background-color: var(--crm-dashlet-header-bg-color);
+}
+/* In the flex flow, as streams that position the caret absolutely assume accordion header padding */
+.crm-container crm-dashlet > details > summary.crm-dashlet-header::before {
+  color: var(--crm-dashlet-header-color);
+  position: static;
+  margin: 0;
+  min-width: 1ch;
+  cursor: var(--crm-link-hover-cursor);
 }
 .crm-container .crm-dashlet-header h3 {
-  background: transparent;
   cursor: move;
   margin: 0 auto 0 0;
   padding: 0;
   color: var(--crm-dashlet-header-color);
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
   font-size: var(--crm-dashlet-header-font-size);
 }
-.crm-container .crm-dashlet-header a {
+.crm-container .crm-dashlet-actions {
+  position: absolute;
+  top: var(--crm-dashlet-padding);
+  right: var(--crm-dashlet-padding);
+  display: flex;
+  align-items: center;
+  padding: var(--crm-dashlet-header-padding);
+  padding-left: 0;
+  z-index: 1;
+  height: calc((var(--crm-dashlet-header-font-size) * 1.3) + (2 * var(--crm-dashlet-header-padding)));
+}
+.crm-container :is(.crm-dashlet-actions,.crm-dashlet-header) a {
   color: var(--crm-dashlet-header-color);
-  padding: var(--crm-l-xsmall) var(--crm-l-small);
+  padding: 0 var(--crm-l-small);
   text-decoration: none;
-  font-size: var(--crm-font-size);
   cursor: var(--crm-link-hover-cursor);
   opacity: .7;
-  float: right;
 }
-.crm-container .crm-dashlet-header:hover .crm-i {
+.crm-container :is(.crm-dashlet-actions,.crm-dashlet-header) a:is(:hover,:focus) {
   opacity: 1;
 }
-.crm-container .crm-dashlet-header a.crm-dashlet-collapse {
-  order: 1;
-}
-crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
+crm-dashlet[is-fullscreen=true] > details,
+crm-dashlet[is-fullscreen=true] > details > .crm-dashlet-content {
   height: calc(100% - 1em);
 }
-.crm-container .crm-dashlet-content {
+.crm-container crm-dashlet > details.crm-accordion-bold > .crm-dashlet-content {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
   background: var(--crm-dashlet-bg-color);
   padding: var(--crm-dashlet-content-padding);
   overflow: auto;
@@ -82,16 +90,16 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 .crm-container .crm-dashlet-content > .ng-scope { /* for FormBuilder dashlets */
   padding: var(--crm-contact-block-padding);
 }
-.crm-container .crm-dashlet details.crm-accordion-bold > .crm-accordion-body {
+.crm-container .crm-dashlet-content details.crm-accordion-bold > .crm-accordion-body {
   padding: 0 var(--crm-padding-reg);
   border-bottom: var(--crm-accordion-border);
 }
-.crm-container .crm-dashlet .crm-accordion-body table {
+.crm-container .crm-dashlet-content .crm-accordion-body table {
   margin: 0;
   border: 0;
   box-shadow: var(--crm-input-box-shadow);
 }
-.crm-container .crm-dashlet .crm-accordion-body table tr {
+.crm-container .crm-dashlet-content .crm-accordion-body table tr {
   padding: var(--crm-contact-block-padding);
   display: flex;
   border: 0 solid transparent;
@@ -121,8 +129,6 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   max-width: 30rem;
   opacity: .8;
 }
-
-/* Drop Zone */
 #civicrm-dashboard .ui-sortable-placeholder {
   border: 2px dashed var(--crm-c-gray-700);
   visibility: visible !important;
@@ -137,6 +143,64 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
 #civicrm-dashboard .ui-sortable-placeholder > * {
   display: none;
 }
+#civicrm-dashboard:has(.crm-inactive-dashlet-fieldset[open]) .crm-dashboard-droppable {
+  border: 3px dashed var(--crm-c-gray-400);
+  padding: var(--crm-padding-reg);
+}
+#civicrm-dashboard:has(.crm-inactive-dashlet-fieldset[open]) .crm-dashlet {
+  max-height: 15rem;
+  overflow: hidden;
+}
+#civicrm-dashboard:has(.crm-inactive-dashlet-fieldset[open]) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--crm-padding-reg);
+}
+
+/* Available (inactive) dashlets */
+#civicrm-dashboard .crm-inactive-dashlet-fieldset {
+  background-color: var(--crm-dashlet-dashlets-bg-color);
+  border-radius: var(--crm-dashlet-radius);
+  margin-bottom: var(--crm-padding-reg);
+}
+#civicrm-dashboard .crm-inactive-dashlet-fieldset[open] {
+  box-shadow: var(--crm-dashlet-box-shadow);
+}
+#civicrm-dashboard .crm-inactive-dashlet-fieldset summary {
+  background-color: var(--crm-dashlet-dashlets-bg-color);
+  color: var(--crm-dashlet-dashlets-color);
+}
+#civicrm-dashboard .crm-inactive-dashlet-fieldset summary input {
+  margin-left: var(--crm-padding-reg);
+}
+#civicrm-dashboard .crm-inactive-dashlet-fieldset > .crm-accordion-body {
+  padding: var(--crm-padding-reg);
+}
+#civicrm-dashboard .crm-inactive-dashlet-fieldset > .crm-accordion-body > .crm-dashboard-droppable {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--crm-padding-reg);
+  padding: 0;
+  border: 0;
+}
+.crm-container .crm-inactive-dashlet {
+  width: 20rem;
+  height: var(--crm-l-large-2);
+  box-shadow: var(--crm-shadow-popup);
+  background-color: color-mix(in srgb, var(--crm-dashlet-bg-color) 90%, #fff 10%);
+  border-radius: var(--crm-dashlet-radius);
+  margin: 0;
+}
+.crm-container .crm-inactive-dashlet .crm-dashlet-header {
+  background-color: var(--crm-dashlet-header-bg-color);
+  border-radius: var(--crm-dashlet-radius) var(--crm-dashlet-radius) 0 0;
+  padding: var(--crm-dashlet-header-padding);
+}
+.crm-container .crm-inactive-dashlet .crm-dashlet-header h3 {
+  font-size: var(--crm-font-small-size);
+  padding: var(--crm-padding-small);
+}
+
 
 /* News feed */
 .crm-container #civicrm-news-feed {
@@ -180,49 +244,6 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   gap: var(--crm-flex-gap);
   margin: 0;
   padding: var(--crm-heading-padding);
-}
-
-/* Available (inactive) dashlets */
-#civicrm-dashboard .crm-inactive-dashlet-fieldset {
-  background-color: var(--crm-dashlet-dashlets-bg-color);
-  border-radius: var(--crm-dashlet-radius);
-  margin-bottom: var(--crm-padding-reg);
-}
-#civicrm-dashboard .crm-inactive-dashlet-fieldset[open] {
-  box-shadow: var(--crm-dashlet-box-shadow);
-}
-#civicrm-dashboard .crm-inactive-dashlet-fieldset summary {
-  background-color: var(--crm-dashlet-dashlets-bg-color);
-  color: var(--crm-dashlet-dashlets-color);
-}
-#civicrm-dashboard .crm-inactive-dashlet-fieldset summary input {
-  margin-left: var(--crm-padding-reg);
-}
-#civicrm-dashboard .crm-inactive-dashlet-fieldset > .crm-accordion-body {
-  padding: var(--crm-padding-reg);
-}
-#civicrm-dashboard .crm-inactive-dashlet-fieldset > .crm-accordion-body > .crm-dashboard-droppable {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--crm-padding-reg);
-  padding: 0;
-  border: 0;
-}
-.crm-container .crm-inactive-dashlet {
-  width: 20rem;
-  height: var(--crm-l-large-2);
-  box-shadow: var(--crm-shadow-popup);
-  background-color: color-mix(in srgb, var(--crm-dashlet-bg-color) 90%, #fff 10%);
-  border-radius: var(--crm-dashlet-radius);
-  margin: 0;
-}
-.crm-container .crm-inactive-dashlet .crm-dashlet-header {
-  height: 2rem;
-  border-radius: var(--crm-dashlet-radius) var(--crm-dashlet-radius) 0 0;
-}
-.crm-container .crm-inactive-dashlet .crm-dashlet-header h3 {
-  font-size: var(--crm-font-small-size);
-  padding-left: var(--crm-padding-small);
 }
 
 /* Searchkit Dashlets */

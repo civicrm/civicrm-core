@@ -16,14 +16,26 @@
   border-radius: 3px;
 }
 
-.crm-container .crm-dashlet-content {
+.crm-container crm-dashlet {
+  display: block;
+  position: relative;
+}
+
+.crm-container crm-dashlet > details {
+  margin: 0;
+}
+
+.crm-container crm-dashlet > details.crm-accordion-bold > .crm-dashlet-content {
   background-color: #ffffff;
+  border: 0 none;
+  border-radius: 0;
   padding: 0.5em;
   overflow-x: auto;
   min-height: 10em;
 }
 
-crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
+crm-dashlet[is-fullscreen=true] > details,
+crm-dashlet[is-fullscreen=true] > details > .crm-dashlet-content {
   height: calc(100% - 1em);
 }
 
@@ -37,18 +49,42 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   padding: 5px 0;
 }
 
-.crm-container .crm-dashlet-header h3 {
+/* #civicrm-dashboard outranks bootstrap3's #bootstrap-theme summary/h3/a rules and the accordion-bold colours */
+#civicrm-dashboard crm-dashlet > details > summary.crm-dashlet-header,
+#civicrm-dashboard crm-dashlet > details > summary.crm-dashlet-header:is(:hover, :focus) {
+  background-color: #5d677b;
+  color: #fcfcfc;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  padding: 5px 80px 5px 8px;
+  cursor: move;
+}
+
+#civicrm-dashboard .crm-dashlet-header h3 {
   background: transparent;
   cursor: move;
-  margin: 0 50px 0 0;
+  margin: 0;
   padding: 0;
+  font-size: 1rem;
+  line-height: 1.4;
   color: #fcfcfc;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-.crm-container .crm-dashlet-header a {
+.crm-container .crm-dashlet-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  padding: 7px 0;
+  z-index: 1;
+}
+
+#civicrm-dashboard .crm-dashlet-header a,
+#civicrm-dashboard .crm-dashlet-actions a {
   font-size: 14px;
   padding: 0 6px;
   float: right;
@@ -56,11 +92,10 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   color: #fcfcfc;
   opacity: .7;
 }
-.crm-container .crm-dashlet-header a.crm-dashlet-collapse {
-  float: left;
-}
 
-.crm-container .crm-dashlet-header:hover .crm-i {
+.crm-container .crm-dashlet-header:hover .crm-i,
+.crm-container .crm-dashlet-actions a:hover .crm-i,
+.crm-container .crm-dashlet-actions a:focus .crm-i {
   opacity: 1;
 }
 
@@ -85,7 +120,7 @@ crm-dashlet[is-fullscreen=true] > .crm-dashlet-content {
   box-shadow: 1px 1px 4px 1px rgba(0,0,0,0.2);
   background-color: #eee;
 }
-.crm-container .crm-inactive-dashlet .crm-dashlet-header h3 {
+#civicrm-dashboard .crm-inactive-dashlet .crm-dashlet-header h3 {
   font-size: 100%;
   padding-left: 5px;
 }
