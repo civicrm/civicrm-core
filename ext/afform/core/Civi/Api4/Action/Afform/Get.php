@@ -108,11 +108,13 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
       }
     }
 
-    // Purify markup in confirmation_message
-    if ($this->_isFieldSelected('confirmation_message')) {
-      foreach ($afforms as $name => $record) {
-        if (isset($record['confirmation_message']) && str_contains($afforms[$name]['confirmation_message'], '<')) {
-          $afforms[$name]['confirmation_message'] = \CRM_Utils_String::purifyHTML($afforms[$name]['confirmation_message']);
+    // Purify markup in messages
+    foreach (['confirmation_message', 'verification_confirmation_message'] as $message) {
+      if ($this->_isFieldSelected($message)) {
+        foreach ($afforms as $name => $record) {
+          if (isset($record[$message]) && str_contains($afforms[$name][$message], '<')) {
+            $afforms[$name][$message] = \CRM_Utils_String::purifyHTML($afforms[$name][$message]);
+          }
         }
       }
     }
