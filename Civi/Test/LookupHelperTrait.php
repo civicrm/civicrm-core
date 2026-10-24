@@ -121,6 +121,32 @@ trait LookupHelperTrait {
   }
 
   /**
+   * Get the id of an option group.
+   *
+   * @param string $name
+   *   e.g. 'activity_type'.
+   *
+   * @return int
+   */
+  protected function getOptionGroupID(string $name): int {
+    return (int) \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $name, 'id', 'name');
+  }
+
+  /**
+   * Get the id (not the value) of an option value.
+   *
+   * @param string $optionGroupName
+   *   e.g. 'preferred_communication_method'.
+   * @param string $name
+   *   e.g. 'Phone'.
+   *
+   * @return int
+   */
+  protected function getOptionValueID(string $optionGroupName, string $name): int {
+    return (int) \CRM_Core_OptionGroup::getRowValues($optionGroupName, $name, 'name', 'String', FALSE)['id'] ?? NULL;
+  }
+
+  /**
    * Get the id of a relationship type.
    *
    * @param string $nameAB
