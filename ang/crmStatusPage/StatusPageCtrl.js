@@ -1,64 +1,68 @@
 (function(angular, $) {
 
   angular.module('crmStatusPage').controller('crmStatusPageCtrl',
-    function($scope, crmApi, crmStatus, statusData) {
+    function($scope, crmApi, crmApi4, crmStatus) {
       $scope.ts = CRM.ts();
       $scope.help = CRM.help;
       $scope.formatDate = CRM.utils.formatDate;
-      $scope.statuses = statusData.values;
+      $scope.$ctrl = this;
 
       // Refresh the list. Optionally execute api calls first.
-      function refresh(apiCalls, title) {
+      const refresh = (apiCalls, title) => {
         title = title || 'Untitled operation';
-        apiCalls = (apiCalls || []).concat([['System', 'check', {sequential: 1, options: {limit: 0, sort: 'severity_id DESC'}}]]);
+        apiCalls = (apiCalls || []).concat([['System', 'check', {
+          select: ['*', 'severity_id:name'],
+          orderBy: {severity_id: 'DESC'}
+        }]]);
         $('#crm-status-list').block();
-        crmApi(apiCalls, true)
-          .then(function(results) {
-            $scope.statuses = results[results.length - 1].values;
-            results.forEach(function(result) {
-              if (result.is_error) {
-                var error_message = ts(result.error_message);
-                if (typeof(result.debug_information) !== 'undefined') {
-                  error_message += '<div class="status-debug-information">' +
-                      '<b>' + ts('Debug information') + ':</b><br>' +
-                      result.debug_information + '</div>';
-                }
-                CRM.alert(error_message, ts('Operation failed: ' + title), 'error');
-                }
+        crmApi4(apiCalls)
+          .then((results) => {
+            this.statuses = results[results.length - 1];
+            results.forEach((result) => {
+              (result.errors ?? []).forEach((error) => {
+                CRM.alert(error.message, error.title, 'error');
               });
+            });
+            $('#crm-status-list').unblock();
+          })
+          .catch((error) => {
+            var error_message = ts(error.error_message || 'Unknown error');
+            CRM.alert(error_message, ts('Operation failed: ' + title), 'error');
             $('#crm-status-list').unblock();
           });
-      }
+      };
 
       // updates a status preference and refreshes status data
-      $scope.setPref = function(status, until, visible) {
+      $scope.setPref = (status, until, visible) => {
         refresh([
-          ['StatusPreference', 'create', {
-            name: status.name,
-            ignore_severity: visible ? 0 : status.severity,
-            hush_until: until
+          ['StatusPreference', 'save', {
+            records: [{
+              name: status.name,
+              ignore_severity: visible ? 0 : status.severity_id,
+              hush_until: until
+            }]
           }]
         ], 'Set preference');
       };
 
-      $scope.countVisible = function(visibility) {
-        return $scope.statuses.filter((s) => s.is_visible == visibility && s.severity_id >= 2).length;
+      $scope.countVisible = (visibility) => {
+        return this.statuses?.filter((s) => s.is_visible === visibility && s.severity_id >= 2)?.length;
       };
 
-      $scope.doAction = function(action) {
+      this.doAction = (action) => {
         function run() {
           switch (action.type) {
             case 'href':
               window.location = action.params.url ? action.params.url : CRM.url(action.params.path, action.params.query, action.params.mode);
               break;
 
-            case 'api3':
+            case 'api4':
               refresh([action.params], action.title);
               break;
 
-            case 'api4':
+            case 'api3':
               $('#crm-status-list').block();
-              CRM.api4([action.params]).then(() => refresh());
+              crmApi([action.params], true).then(() => refresh());
               break;
           }
         }
@@ -72,6 +76,8 @@
           run();
         }
       };
+
+      refresh();
     });
 
 })(angular, CRM.$);
