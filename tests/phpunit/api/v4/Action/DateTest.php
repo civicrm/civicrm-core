@@ -329,4 +329,115 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
     $this->assertNotContains($ids[3], $result);
   }
 
+  /**
+   * Values that strtotime() cannot parse or would roll over into a different date.
+   */
+  public static function invalidDateProvider(): array {
+    return [
+      'text' => ['not a date'],
+      'string null' => ['null'],
+      'month 13' => ['1980-13-01'],
+      'April 31' => ['1980-04-31'],
+      'February 29 in a common year' => ['1981-02-29'],
+      'impossible day with time' => ['2026-02-30 10:00:00'],
+      'zero date' => ['0000-00-00'],
+      'negative timestamp' => ['-00011130000000'],
+    ];
+  }
+
+  /**
+   * @dataProvider invalidDateProvider
+   */
+  public function testCreateRejectsInvalidDate(string $value): void {
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('Invalid date value');
+    Contact::create(FALSE)
+      ->addValue('first_name', 'c')
+      ->addValue('birth_date', $value)
+      ->execute();
+  }
+
+  /**
+   * @dataProvider invalidDateProvider
+   */
+  public function testWhereRejectsInvalidDate(string $value): void {
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('Invalid date value');
+    Activity::get(FALSE)
+      ->addWhere('activity_date_time', '>', $value)
+      ->execute();
+  }
+
+  public static function patternOperatorProvider(): array {
+    $operators = ['LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP', 'REGEXP BINARY', 'NOT REGEXP BINARY'];
+    $cases = [];
+    foreach ($operators as $operator) {
+      $cases["Date $operator"] = ['birth_date', $operator];
+      $cases["Timestamp $operator"] = ['created_date', $operator];
+    }
+    return $cases;
+  }
+
+  /**
+   * @dataProvider patternOperatorProvider
+   */
+  public function testWhereRejectsPatternOnDate(string $field, string $operator): void {
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage("The $operator operator only accepts a relative date");
+    Contact::get(FALSE)
+      ->addWhere($field, $operator, '2020-%')
+      ->execute();
+  }
+
+  public function testWhereLikeRelativeDate(): void {
+    $thisYear = $this->createTestRecord('Activity', ['activity_date_time' => 'now'])['id'];
+    $lastYear = $this->createTestRecord('Activity', ['activity_date_time' => '-1 year'])['id'];
+    $result = Activity::get(FALSE)
+      ->addWhere('id', 'IN', [$thisYear, $lastYear])
+      ->addWhere('activity_date_time', 'LIKE', 'this.year')
+      ->execute()->column('id');
+    $this->assertEquals([$thisYear], $result);
+    $result = Activity::get(FALSE)
+      ->addWhere('id', 'IN', [$thisYear, $lastYear])
+      ->addWhere('activity_date_time', 'NOT LIKE', 'this.year')
+      ->execute()->column('id');
+    $this->assertEquals([$lastYear], $result);
+  }
+
+  /**
+   * A quoted date in an expression condition is passed to permission checks without its quotes.
+   */
+  public function testWhereExpressionWithQuotedDate(): void {
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
+    $id = $this->createTestRecord('Contact', ['birth_date' => '1980-01-01'])['id'];
+    $result = Contact::get()
+      ->addWhere('id', '=', $id)
+      ->addWhere('birth_date', '=', '"1980-01-01"', TRUE)
+      ->execute();
+    $this->assertCount(1, $result);
+  }
+
+  public function testValidDateInput(): void {
+    $values = [
+      '2024-02-29' => '2024-02-29',
+      '20260101000000' => '2026-01-01',
+      '2026-01-01T10:00:00' => '2026-01-01',
+      'last day of february 2025' => '2025-02-28',
+      'first monday of january 2026' => '2026-01-05',
+      '' => NULL,
+    ];
+    foreach ($values as $input => $expected) {
+      $id = $this->createTestRecord('Contact', ['birth_date' => $input])['id'];
+      $birthDate = Contact::get(FALSE)->addWhere('id', '=', $id)->execute()->single()['birth_date'];
+      $this->assertSame($expected, $birthDate, "Input: '$input'");
+    }
+    $contact = $this->createTestRecord('Contact', ['birth_date' => '2026-01-01']);
+    Contact::update(FALSE)->addWhere('id', '=', $contact['id'])->addValue('birth_date', NULL)->execute();
+    $result = Contact::get(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addWhere('birth_date', 'IS NULL')
+      ->execute();
+    $this->assertCount(1, $result);
+  }
+
 }

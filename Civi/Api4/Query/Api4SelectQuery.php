@@ -349,7 +349,13 @@ class Api4SelectQuery extends Api4Query {
         // If flag is set then value must be parsed as an expression
         if ($isExpr && is_string($valueExpr)) {
           $expr = SqlExpression::convert($valueExpr);
-          $valueExpr = in_array($expr->getType(), ['SqlString', 'SqlNumber'], TRUE) ? $expr->getExpr() : NULL;
+          if ($expr->getType() === 'SqlString') {
+            // Strip surrounding quotes
+            $valueExpr = substr($expr->getExpr(), 1, -1);
+          }
+          else {
+            $valueExpr = $expr->getType() === 'SqlNumber' ? $expr->getExpr() : NULL;
+          }
         }
         if (isset($valueExpr)) {
           [$fieldPath] = explode(':', $fieldExpr);
