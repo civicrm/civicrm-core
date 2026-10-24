@@ -121,7 +121,7 @@ class CRM_Utils_Mail_EmailProcessor {
         try {
           $incomingMail = new CRM_Utils_Mail_IncomingMail($mail, (string) $dao->domain, (string) $dao->localpart);
         }
-        catch (CRM_Core_Exception $e) {
+        catch (Throwable $e) {
           $store->markIgnored($key);
           continue;
         }
@@ -205,7 +205,7 @@ class CRM_Utils_Mail_EmailProcessor {
             CRM_Utils_Hook::emailProcessor('activity', $activityParams, $mail, $result, NULL, $dao->id);
             echo "Processed as Activity: {$mail->subject}\n";
           }
-          catch (Exception $e) {
+          catch (Throwable $e) {
             // Try again with just the bounceString as the details.
             // This allows us to still process even if we hit https://lab.civicrm.org/dev/mail/issues/36
             // as tested in testBounceProcessingInvalidCharacter.
@@ -214,7 +214,7 @@ class CRM_Utils_Mail_EmailProcessor {
               civicrm_api3('Activity', 'create', $activityParams);
               $matches = TRUE;
             }
-            catch (CRM_Core_Exception $e) {
+            catch (Throwable $e) {
               echo "Failed Processing: {$mail->subject}. Reason: " . $e->getMessage() . "\n";
               $store->markIgnored($key);
               continue;
@@ -234,101 +234,106 @@ class CRM_Utils_Mail_EmailProcessor {
 
         // handle the action by passing it to the proper API call
         if (!empty($action)) {
-          $result = NULL;
+          try {
+            $result = NULL;
 
-          switch ($action) {
-            case 'b':
-              $text = $incomingMail->getBody();
+            switch ($action) {
+              case 'b':
+                $text = $incomingMail->getBody();
 
-              $activityParams = [
-                'job_id' => $job,
-                'event_queue_id' => $queue,
-                'hash' => $hash,
-                'body' => $text ?: ts('We could not extract the mail body from this bounce message.'),
-                'version' => 3,
-                // Setting is_transactional means it will rollback if
-                // it crashes part way through creating the bounce.
-                // If the api were standard & had a create this would be the
-                // default. Adding the standard api & deprecating this one
-                // would probably be the
-                // most consistent way to address this - but this is
-                // a quick hack.
-                'is_transactional' => 1,
-              ];
-              $result = civicrm_api('Mailing', 'event_bounce', $activityParams);
-              break;
+                $activityParams = [
+                  'job_id' => $job,
+                  'event_queue_id' => $queue,
+                  'hash' => $hash,
+                  'body' => $text ?: ts('We could not extract the mail body from this bounce message.'),
+                  'version' => 3,
+                  // Setting is_transactional means it will rollback if
+                  // it crashes part way through creating the bounce.
+                  // If the api were standard & had a create this would be the
+                  // default. Adding the standard api & deprecating this one
+                  // would probably be the
+                  // most consistent way to address this - but this is
+                  // a quick hack.
+                  'is_transactional' => 1,
+                ];
+                $result = civicrm_api('Mailing', 'event_bounce', $activityParams);
+                break;
 
-            case 'c':
-              // CRM-7921
-              $activityParams = [
-                'contact_id' => $job,
-                'subscribe_id' => $queue,
-                'hash' => $hash,
-                'version' => 3,
-              ];
-              $result = civicrm_api('Mailing', 'event_confirm', $activityParams);
-              break;
+              case 'c':
+                // CRM-7921
+                $activityParams = [
+                  'contact_id' => $job,
+                  'subscribe_id' => $queue,
+                  'hash' => $hash,
+                  'version' => 3,
+                ];
+                $result = civicrm_api('Mailing', 'event_confirm', $activityParams);
+                break;
 
-            case 'o':
-              $activityParams = [
-                'job_id' => $job,
-                'event_queue_id' => $queue,
-                'hash' => $hash,
-                'version' => 3,
-              ];
-              $result = civicrm_api('MailingGroup', 'event_domain_unsubscribe', $activityParams);
-              break;
+              case 'o':
+                $activityParams = [
+                  'job_id' => $job,
+                  'event_queue_id' => $queue,
+                  'hash' => $hash,
+                  'version' => 3,
+                ];
+                $result = civicrm_api('MailingGroup', 'event_domain_unsubscribe', $activityParams);
+                break;
 
-            case 'r':
-              // instead of text and HTML parts (4th and 6th params) send the whole email as the last param
-              $activityParams = [
-                'job_id' => $job,
-                'event_queue_id' => $queue,
-                'hash' => $hash,
-                'bodyTxt' => NULL,
-                'replyTo' => $replyTo,
-                'bodyHTML' => NULL,
-                'fullEmail' => $mail->generate(),
-                'version' => 3,
-              ];
-              $result = civicrm_api('Mailing', 'event_reply', $activityParams);
-              break;
+              case 'r':
+                // instead of text and HTML parts (4th and 6th params) send the whole email as the last param
+                $activityParams = [
+                  'job_id' => $job,
+                  'event_queue_id' => $queue,
+                  'hash' => $hash,
+                  'bodyTxt' => NULL,
+                  'replyTo' => $replyTo,
+                  'bodyHTML' => NULL,
+                  'fullEmail' => $mail->generate(),
+                  'version' => 3,
+                ];
+                $result = civicrm_api('Mailing', 'event_reply', $activityParams);
+                break;
 
-            case 'e':
-              $activityParams = [
-                'job_id' => $job,
-                'event_queue_id' => $queue,
-                'hash' => $hash,
-                'version' => 3,
-              ];
-              $result = civicrm_api('MailingGroup', 'event_resubscribe', $activityParams);
-              break;
+              case 'e':
+                $activityParams = [
+                  'job_id' => $job,
+                  'event_queue_id' => $queue,
+                  'hash' => $hash,
+                  'version' => 3,
+                ];
+                $result = civicrm_api('MailingGroup', 'event_resubscribe', $activityParams);
+                break;
 
-            case 's':
-              $activityParams = [
-                'email' => $mail->from->email,
-                'group_id' => $job,
-                'version' => 3,
-              ];
-              $result = civicrm_api('MailingGroup', 'event_subscribe', $activityParams);
-              break;
+              case 's':
+                $activityParams = [
+                  'email' => $mail->from->email,
+                  'group_id' => $job,
+                  'version' => 3,
+                ];
+                $result = civicrm_api('MailingGroup', 'event_subscribe', $activityParams);
+                break;
 
-            case 'u':
-              $activityParams = [
-                'job_id' => $job,
-                'event_queue_id' => $queue,
-                'hash' => $hash,
-                'version' => 3,
-              ];
-              $result = civicrm_api('MailingGroup', 'event_unsubscribe', $activityParams);
-              break;
+              case 'u':
+                $activityParams = [
+                  'job_id' => $job,
+                  'event_queue_id' => $queue,
+                  'hash' => $hash,
+                  'version' => 3,
+                ];
+                $result = civicrm_api('MailingGroup', 'event_unsubscribe', $activityParams);
+                break;
+            }
+
+            if ($result['is_error']) {
+              echo "Failed Processing: {$mail->subject}, Action: $action, Job ID: $job, Queue ID: $queue, Hash: $hash. Reason: {$result['error_message']}\n";
+            }
+            else {
+              CRM_Utils_Hook::emailProcessor('mailing', $activityParams, $mail, $result, $action, $dao->id);
+            }
           }
-
-          if ($result['is_error']) {
-            echo "Failed Processing: {$mail->subject}, Action: $action, Job ID: $job, Queue ID: $queue, Hash: $hash. Reason: {$result['error_message']}\n";
-          }
-          else {
-            CRM_Utils_Hook::emailProcessor('mailing', $activityParams, $mail, $result, $action, $dao->id);
+          catch (Throwable $e) {
+            echo "Failed Processing: {$mail->subject}, Action: $action, Job ID: $job, Queue ID: $queue, Hash: $hash. Reason: {$e->getMessage()}\n";
           }
         }
 
