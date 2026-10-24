@@ -293,4 +293,33 @@ class AdminTest extends Api4TestBase {
     );
   }
 
+  public function testEntityRefGetJoinsDfk(): void {
+    $schema = Admin::getSchema();
+    $aclEntityRole = $schema['ACLEntityRole'];
+    $entityIdField = array_column($aclEntityRole['fields'], NULL, 'name')['entity_id'];
+    $this->assertArrayHasKey('civicrm_contact', $entityIdField['dfk_entities']);
+
+    $joins = Admin::getEntityRefJoins($aclEntityRole, $entityIdField, 'Contact', 'civicrm_contact', 'entity_table');
+
+    $this->assertEquals([
+      ['entity_id', '=', 'ACLEntityRole_Contact_entity_id.id'],
+      ['entity_table', '=', "'civicrm_contact'"],
+    ], $joins['ACLEntityRole']['conditions']);
+
+    $this->assertEquals([
+      ['id', '=', 'Contact_ACLEntityRole_entity_id.entity_id'],
+      ['Contact_ACLEntityRole_entity_id.entity_table', '=', "'civicrm_contact'"],
+    ], $joins['Contact']['conditions']);
+
+    $this->assertEquals('ACL Role Assignment Contact', $joins['ACLEntityRole']['label']);
+    $this->assertEquals('Contact ACL Role Assignments', $joins['Contact']['label']);
+
+    // LineItem.entity_id straight join should be suppressed to avoid duplicate with contribution_id
+    $lineItem = $schema['LineItem'];
+    $lineItemEntityId = array_column($lineItem['fields'], NULL, 'name')['entity_id'];
+    $lineItemJoins = Admin::getEntityRefJoins($lineItem, $lineItemEntityId, 'Contribution', 'civicrm_contribution', 'entity_table');
+    $this->assertArrayNotHasKey('LineItem', $lineItemJoins);
+    $this->assertArrayHasKey('Contribution', $lineItemJoins);
+  }
+
 }
