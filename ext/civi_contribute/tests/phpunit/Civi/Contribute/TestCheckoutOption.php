@@ -8,8 +8,19 @@ use Civi\Checkout\CheckoutSession;
 
 class TestCheckoutOption extends CheckoutOption implements AfformCheckoutOptionInterface {
 
+  /**
+   * Set by tests that need the option to resolve to a real PaymentProcessor.
+   *
+   * @var int|null
+   */
+  public ?int $paymentProcessorID = NULL;
+
   public function getLabel(): string {
     return 'TEST';
+  }
+
+  public function getPaymentProcessorId(bool $testMode = FALSE): ?int {
+    return $this->paymentProcessorID;
   }
 
   public function startCheckout(CheckoutSession $session): void {

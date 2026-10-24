@@ -3,6 +3,8 @@
 namespace Civi\Contribute;
 
 use Civi\Api4\Afform;
+use Civi\Api4\Contribution;
+use Civi\Api4\PaymentProcessor;
 use Civi\Checkout\CheckoutSession;
 use Civi\Test;
 use Civi\Test\CiviEnvBuilder;
@@ -17,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 class AfformCheckoutTest extends TestCase implements HeadlessInterface {
 
   protected $afformContributionSettingBackup;
+
+  protected TestCheckoutOption $checkoutOption;
 
   /**
    * Setup used when HeadlessInterface is implemented.
@@ -42,8 +46,9 @@ class AfformCheckoutTest extends TestCase implements HeadlessInterface {
 
     // add a listener with our test checkout option
     // (payment integrations should do similar with a real CheckoutOptionInterface implemenation)
+    $this->checkoutOption = new TestCheckoutOption();
     \Civi::dispatcher()->addListener('civi.checkout.options', function ($e) {
-      $e->options['test_checkout_option'] = new TestCheckoutOption();
+      $e->options['test_checkout_option'] = $this->checkoutOption;
     });
 
     $layout = <<<HTML
@@ -63,6 +68,7 @@ class AfformCheckoutTest extends TestCase implements HeadlessInterface {
           <!-- price field for Contribution -->
           <af-field name="default_contribution_amount.contribution_amount" />
           <af-field name="checkout_option" />
+          <af-field name="recur_period" />
         </div>
       </fieldset>
     </af-form>
@@ -124,6 +130,138 @@ class AfformCheckoutTest extends TestCase implements HeadlessInterface {
     // the session should be pending so that should be our nextUrl
     $nextUrl = $session->getNextUrl();
     $this->assertEquals(TRUE, \str_starts_with($nextUrl, 'https://now.go.to'));
+  }
+
+  /**
+   * recur_period on the submitted Contribution should produce a ContributionRecur
+   * as part of the same Order, linked to the Contribution and sharing its values.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRecurringContributionCreate(): void {
+    $this->checkoutOption->paymentProcessorID = $this->getPaymentProcessorID();
+
+    $response = Afform::submit(FALSE)
+      ->setName('testAfformCheckout')
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => [
+              'first_name' => 'Test',
+              'last_name' => 'Recur',
+            ],
+          ],
+        ],
+        'Contribution1' => [
+          [
+            'fields' => [
+              'source' => 'testRecurringContributionCreate',
+              'default_contribution_amount.contribution_amount' => 5,
+              'checkout_option' => 'test_checkout_option',
+              'recur_period' => 'monthly',
+            ],
+          ],
+        ],
+      ])
+      ->execute();
+
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $response->single()['Contribution1'][0]['id'])
+      ->addSelect(
+        'contact_id',
+        'total_amount',
+        'currency',
+        'is_test',
+        'financial_type_id',
+        'contribution_recur_id',
+        'contribution_recur_id.contact_id',
+        'contribution_recur_id.amount',
+        'contribution_recur_id.currency',
+        'contribution_recur_id.is_test',
+        'contribution_recur_id.financial_type_id',
+        'contribution_recur_id.frequency_unit',
+        'contribution_recur_id.frequency_interval',
+        'contribution_recur_id.next_sched_contribution_date',
+        'contribution_recur_id.payment_processor_id'
+      )
+      ->execute()
+      ->single();
+
+    // The Order created both records and linked them.
+    $this->assertNotEmpty($contribution['contribution_recur_id']);
+    $this->assertEquals($contribution['contact_id'], $contribution['contribution_recur_id.contact_id']);
+    $this->assertEquals($contribution['total_amount'], $contribution['contribution_recur_id.amount']);
+    $this->assertEquals($contribution['currency'], $contribution['contribution_recur_id.currency']);
+    $this->assertEquals($contribution['is_test'], $contribution['contribution_recur_id.is_test']);
+    $this->assertEquals($contribution['financial_type_id'], $contribution['contribution_recur_id.financial_type_id']);
+
+    // recur_period 'monthly' unpacks to a monthly schedule with a next date.
+    $this->assertEquals('month', $contribution['contribution_recur_id.frequency_unit']);
+    $this->assertEquals(1, $contribution['contribution_recur_id.frequency_interval']);
+    $this->assertNotEmpty($contribution['contribution_recur_id.next_sched_contribution_date']);
+
+    // The processor comes from the selected checkout option.
+    $this->assertEquals($this->checkoutOption->paymentProcessorID, $contribution['contribution_recur_id.payment_processor_id']);
+  }
+
+  /**
+   * Without recur_period the same form should create a one-off Contribution.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testNonRecurringContributionCreate(): void {
+    $response = Afform::submit(FALSE)
+      ->setName('testAfformCheckout')
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => [
+              'first_name' => 'Test',
+              'last_name' => 'OneOff',
+            ],
+          ],
+        ],
+        'Contribution1' => [
+          [
+            'fields' => [
+              'source' => 'testNonRecurringContributionCreate',
+              'default_contribution_amount.contribution_amount' => 5,
+              'checkout_option' => 'test_checkout_option',
+            ],
+          ],
+        ],
+      ])
+      ->execute();
+
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $response->single()['Contribution1'][0]['id'])
+      ->addSelect('contribution_recur_id')
+      ->execute()
+      ->single();
+    $this->assertEmpty($contribution['contribution_recur_id']);
+  }
+
+  private function getPaymentProcessorID(): int {
+    $existing = PaymentProcessor::get(FALSE)
+      ->addWhere('name', '=', 'test_processor')
+      ->addSelect('id')
+      ->execute()
+      ->first();
+    if ($existing) {
+      return $existing['id'];
+    }
+    return PaymentProcessor::create(FALSE)
+      ->addValue('name', 'test_processor')
+      ->addValue('title', 'Test Processor')
+      ->addValue('frontend_title', 'Test Processor')
+      ->addValue('payment_processor_type_id:name', 'Dummy')
+      ->addValue('class_name', 'Payment_Dummy')
+      ->addValue('domain_id', \CRM_Core_Config::domainID())
+      ->addValue('billing_mode', 1)
+      ->addValue('is_active', TRUE)
+      ->addValue('is_recur', TRUE)
+      ->execute()
+      ->single()['id'];
   }
 
   /**
