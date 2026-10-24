@@ -1440,7 +1440,7 @@ UPDATE  civicrm_participant
 
     $emailType = NULL;
     $toStatus = $statusTypes[$toStatusId];
-    $fromStatus = $statusTypes[$fromStatusId] ?? NULL;
+    $fromStatus = $fromStatusId ? ($statusTypes[$fromStatusId] ?? NULL) : NULL;
 
     switch ($toStatus) {
       case 'Pending from waitlist':
