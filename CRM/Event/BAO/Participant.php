@@ -1441,6 +1441,7 @@ UPDATE  civicrm_participant
     $emailType = NULL;
     $toStatus = $statusTypes[$toStatusId];
     $fromStatus = $statusTypes[$fromStatusId] ?? NULL;
+    $isPendingFromApproval = ($toStatus === 'Pending from approval');
 
     switch ($toStatus) {
       case 'Pending from waitlist':
@@ -1485,7 +1486,8 @@ UPDATE  civicrm_participant
               $participantDetails[$additionalId],
               $eventDetails[$participantDetails[$additionalId]['event_id']],
               NULL,
-              $emailType
+              $emailType,
+              $isPendingFromApproval
             );
 
             //get the mail participant ids
@@ -1504,7 +1506,8 @@ UPDATE  civicrm_participant
           $participantValues,
           $eventDetails[$participantValues['event_id']],
           NULL,
-          $emailType
+          $emailType,
+          $isPendingFromApproval
         );
 
         //get the mail participant ids
@@ -1551,6 +1554,10 @@ UPDATE  civicrm_participant
    *   Required contact details.
    * @param string $mailType
    *   (eg 'approval', 'confirm', 'expired' ).
+   * @param bool $isPendingFromApproval
+   *   True if this 'Confirm' mail is for someone whose new status is
+   *   'Pending from approval' (event approval workflow), as opposed to
+   *   'Pending from waitlist' (event waitlist).
    *
    * @return bool
    */
@@ -1559,7 +1566,8 @@ UPDATE  civicrm_participant
     $participantValues,
     $eventDetails,
     $contactDetails,
-    $mailType
+    $mailType,
+    $isPendingFromApproval = FALSE
   ) {
     //send emails.
     $mailSent = FALSE;
@@ -1614,6 +1622,7 @@ UPDATE  civicrm_participant
             'isAdditional' => $participantValues['registered_by_id'],
             'isExpired' => $mailType === 'Expired',
             'isConfirm' => $mailType === 'Confirm',
+            'isPendingFromApproval' => $isPendingFromApproval,
             'checksumValue' => $checksumValue,
           ],
           'modelProps' => [
