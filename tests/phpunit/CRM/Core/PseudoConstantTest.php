@@ -971,9 +971,9 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'Organization' => 'Organization',
     ];
     $byId = [
-      1 => 'Individual',
-      2 => 'Household',
-      3 => 'Organization',
+      $this->getContactTypeID('Individual') => 'Individual',
+      $this->getContactTypeID('Household') => 'Household',
+      $this->getContactTypeID('Organization') => 'Organization',
     ];
     // By default this should return an array keyed by name
     $result = CRM_Contact_DAO_Contact::buildOptions('contact_type');
