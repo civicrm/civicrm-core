@@ -4061,7 +4061,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'delete', ['id' => $this->ids['Contact'][3], 'skip_undelete' => TRUE]);
     $this->callAPIFailure('Contact', 'getmergedto', ['sequential' => 1, 'contact_id' => $this->ids['Contact'][0]]);
     $title = CRM_Contact_Page_View::setTitle($this->ids['Contact'][0], TRUE);
-    $this->assertStringContainsString('civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=' . $this->ids['Contact'][0] . '&amp;snippet=4', $title);
+    $this->assertStringContainsString('civicrm/profile/view&amp;reset=1&amp;gid=' . $this->getProfileID('summary_overlay') . '&amp;id=' . $this->ids['Contact'][0] . '&amp;snippet=4', $title);
   }
 
   /**
