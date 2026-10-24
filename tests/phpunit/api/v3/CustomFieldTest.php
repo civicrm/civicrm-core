@@ -208,8 +208,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'is_required' => 1,
       'is_searchable' => 0,
       'is_active' => 1,
-      // Option group id 3: gender
-      'option_group_id' => 3,
+      'option_group_id' => 'gender',
     ];
 
     $customField = $this->callAPISuccess('custom_field', 'create', $params);
@@ -219,7 +218,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'return' => 'option_group_id',
     ]);
 
-    $this->assertEquals(3, $optionGroupID);
+    $this->assertEquals($this->getOptionGroupID('gender'), $optionGroupID);
   }
 
   /**

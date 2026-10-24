@@ -59,7 +59,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
     parent::setUp();
     $this->contactID = $this->individualCreate();
     $activityTypes = $this->callAPISuccess('OptionValue', 'create', [
-      'option_group_id' => 2,
+      'option_group_id' => 'activity_type',
       'name' => 'Test activity type',
       'label' => 'Test activity type',
       'sequential' => 1,

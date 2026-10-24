@@ -45,16 +45,17 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   }
 
   public function testGetOptionGroupByID(): void {
-    $result = $this->callAPISuccess('option_group', 'get', ['id' => 1]);
+    $optionGroupID = $this->getOptionGroupID('preferred_communication_method');
+    $result = $this->callAPISuccess('option_group', 'get', ['id' => $optionGroupID]);
     $this->assertEquals(1, $result['count']);
-    $this->assertEquals(1, $result['id']);
+    $this->assertEquals($optionGroupID, $result['id']);
   }
 
   public function testGetOptionGroupByName(): void {
     $params = ['name' => 'preferred_communication_method'];
     $result = $this->callAPISuccess('option_group', 'get', $params);
     $this->assertEquals(1, $result['count']);
-    $this->assertEquals(1, $result['id']);
+    $this->assertEquals($this->getOptionGroupID('preferred_communication_method'), $result['id']);
   }
 
   public function testGetOptionGroup(): void {
