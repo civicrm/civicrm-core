@@ -70,6 +70,35 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * A $0 order has nothing to pay, so the contribution should be Completed
+   * rather than left Pending.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateOrderForFreeLineItemCompletesContribution(): void {
+    $this->eventCreatePaid();
+    $this->individualCreate();
+    $contribution = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->ids['Contact']['individual_0'],
+        'financial_type_id' => 1,
+      ])
+      ->addLineItem([
+        'entity_table' => 'civicrm_participant',
+        'entity_id.event_id' => $this->getEventID(),
+        'entity_id.contact_id' => $this->ids['Contact']['individual_0'],
+        'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_free'],
+      ])
+      ->execute()->single();
+    $this->assertEquals(0, $contribution['total_amount']);
+    $contribution = Contribution::get(FALSE)
+      ->addSelect('contribution_status_id:name')
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute()->single();
+    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+  }
+
+  /**
    * Test that several line items tagged with the same 'identifier' create
    * one Participant, not one per line (dev/core#6773).
    *

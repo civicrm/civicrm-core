@@ -1855,7 +1855,8 @@ class CRM_Financial_BAO_Order {
     $this->contributionValues['total_amount'] = $this->getTotalAmount();
     $this->contributionValues['tax_amount'] = $this->getTotalTaxAmount();
     $this->contributionValues['amount_level'] = $this->contributionValues['amount_level'] ?? $this->getAmountLevel();
-    $this->contributionValues['contribution_status_id:name'] = 'Pending';
+    // A $0 order has nothing to pay, so it is Completed on creation.
+    $this->contributionValues['contribution_status_id:name'] = $this->contributionValues['total_amount'] == 0.0 ? 'Completed' : 'Pending';
     if ($this->getExistingContributionRecurID()) {
       $this->contributionValues['contribution_recur_id'] = $this->getExistingContributionRecurID();
     }
