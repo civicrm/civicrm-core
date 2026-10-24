@@ -1,4 +1,7 @@
 <?php
+
+use CRM_Utils_SQL_Literal as Literal;
+
 return CRM_Core_CodeGen_OptionGroup::create('entity_batch_extends', 'a/0083')
   ->addMetadata([
     'title' => ts('Entity Batch Extends'),
@@ -9,6 +12,6 @@ return CRM_Core_CodeGen_OptionGroup::create('entity_batch_extends', 'a/0083')
       'value' => 'civicrm_financial_trxn',
       'name' => 'civicrm_financial_trxn',
       'is_default' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
   ]);

@@ -1,4 +1,7 @@
 <?php
+
+use CRM_Utils_SQL_Literal as Literal;
+
 return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
   ->addMetadata([
     'title' => ts('Account Relationship'),
@@ -11,7 +14,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'is_default' => 1,
       'description' => 'Income Account is',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Credit/Contra Revenue Account is'),
@@ -19,7 +22,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'name' => 'Credit/Contra Revenue Account is',
       'description' => 'Credit/Contra Revenue Account is',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Accounts Receivable Account is'),
@@ -27,7 +30,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'name' => 'Accounts Receivable Account is',
       'description' => 'Accounts Receivable Account is',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Credit Liability Account is'),
@@ -36,7 +39,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'description' => 'Credit Liability Account is',
       'is_reserved' => 1,
       'is_active' => 0,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Expense Account is'),
@@ -44,7 +47,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'name' => 'Expense Account is',
       'description' => 'Expense Account is',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Asset Account is'),
@@ -52,7 +55,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'name' => 'Asset Account is',
       'description' => 'Asset Account is',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Cost of Sales Account is'),
@@ -60,7 +63,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'name' => 'Cost of Sales Account is',
       'description' => 'Cost of Sales Account is',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Premiums Inventory Account is'),
@@ -68,7 +71,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'name' => 'Premiums Inventory Account is',
       'description' => 'Premiums Inventory Account is',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Discounts Account is'),
@@ -76,7 +79,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'name' => 'Discounts Account is',
       'description' => 'Discounts Account is',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Sales Tax Account is'),
@@ -84,7 +87,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'name' => 'Sales Tax Account is',
       'description' => 'Sales Tax Account is',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Chargeback Account is'),
@@ -92,7 +95,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'name' => 'Chargeback Account is',
       'description' => 'Chargeback Account is',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Deferred Revenue Account is'),
@@ -100,7 +103,7 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'name' => 'Deferred Revenue Account is',
       'description' => 'Deferred Revenue Account is',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Accounts Payable Account is'),
@@ -108,6 +111,6 @@ return CRM_Core_CodeGen_OptionGroup::create('account_relationship', 'a/0061')
       'name' => 'Accounts Payable Account is',
       'description' => 'Accounts Payable Account is',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
   ]);

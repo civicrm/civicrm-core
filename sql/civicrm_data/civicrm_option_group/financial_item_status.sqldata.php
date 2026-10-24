@@ -1,4 +1,7 @@
 <?php
+
+use CRM_Utils_SQL_Literal as Literal;
+
 return CRM_Core_CodeGen_OptionGroup::create('financial_item_status', 'a/0071')
   ->addMetadata([
     'title' => ts('Financial Item Status'),
@@ -12,7 +15,7 @@ return CRM_Core_CodeGen_OptionGroup::create('financial_item_status', 'a/0071')
       'weight' => 1,
       'description' => 'Paid',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Unpaid'),
@@ -21,7 +24,7 @@ return CRM_Core_CodeGen_OptionGroup::create('financial_item_status', 'a/0071')
       'weight' => 1,
       'description' => 'Unpaid',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Partially paid'),
@@ -30,6 +33,6 @@ return CRM_Core_CodeGen_OptionGroup::create('financial_item_status', 'a/0071')
       'weight' => 2,
       'description' => 'Partially paid',
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
   ]);
