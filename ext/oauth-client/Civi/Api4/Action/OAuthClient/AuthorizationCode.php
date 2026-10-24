@@ -171,15 +171,18 @@ class AuthorizationCode extends AbstractGrantAction {
     parent::validate();
     if ($this->landingUrl) {
       $landingUrlParsed = parse_url($this->landingUrl);
-      $landingUrlIp = gethostbyname($landingUrlParsed['host'] . '.');
       $allowedBases = [
         \Civi::paths()->getVariable('cms.root', 'url'),
         \Civi::paths()->getVariable('civicrm.root', 'url'),
       ];
+      $allowedBasesEvent = \Civi\Core\Event\GenericHookEvent::create([
+        'allowedBases' => &$allowedBases,
+      ]);
+      \Civi::dispatcher()->dispatch('civi.oauth.allowedBases', $allowedBasesEvent);
+
       foreach ($allowedBases as $allowed) {
         $allowedParsed = parse_url($allowed);
-        $allowedIp = gethostbyname($allowedParsed['host'] . '.');
-        if ($landingUrlIp === $allowedIp && $landingUrlParsed['scheme'] == $allowedParsed['scheme']) {
+        if ($allowedParsed['host'] === $landingUrlParsed['host'] && $landingUrlParsed['scheme'] == $allowedParsed['scheme']) {
           return;
         }
       }
