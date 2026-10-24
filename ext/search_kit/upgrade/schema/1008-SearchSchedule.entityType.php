@@ -1,0 +1,228 @@
+<?php
+use CRM_Search_ExtensionUtil as E;
+
+return [
+  'name' => 'SearchSchedule',
+  'table' => 'civicrm_search_schedule',
+  'class' => 'CRM_Search_DAO_SearchSchedule',
+  'getInfo' => fn() => [
+    'title' => E::ts('Search Schedule'),
+    'title_plural' => E::ts('Search Schedules'),
+    'description' => E::ts('Scheduled emails of SearchKit displays.'),
+    'log' => TRUE,
+    'icon' => 'fa-calendar-check-o',
+    'label_field' => 'label',
+  ],
+  'getIndices' => fn() => [
+    'index_is_active_next_run' => [
+      'fields' => [
+        'is_active' => TRUE,
+        'next_run' => TRUE,
+      ],
+      'add' => '6.21',
+    ],
+  ],
+  'getFields' => fn() => [
+    'id' => [
+      'title' => E::ts('Search Schedule ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'required' => TRUE,
+      'description' => E::ts('Unique SearchSchedule ID'),
+      'add' => '6.21',
+      'primary_key' => TRUE,
+      'auto_increment' => TRUE,
+    ],
+    'search_display_id' => [
+      'title' => E::ts('Search Display ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'EntityRef',
+      'required' => TRUE,
+      'description' => E::ts('FK to the search display being sent.'),
+      'add' => '6.21',
+      'input_attrs' => [
+        'label' => E::ts('Search Display'),
+      ],
+      'entity_reference' => [
+        'entity' => 'SearchDisplay',
+        'key' => 'id',
+        'on_delete' => 'CASCADE',
+      ],
+    ],
+    'label' => [
+      'title' => E::ts('Label'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'required' => TRUE,
+      'description' => E::ts('Administrative label; also used as the attachment name.'),
+      'add' => '6.21',
+      'input_attrs' => [
+        'maxlength' => 255,
+      ],
+    ],
+    'is_active' => [
+      'title' => E::ts('Enabled'),
+      'sql_type' => 'boolean',
+      'input_type' => 'CheckBox',
+      'required' => TRUE,
+      'description' => E::ts('Is this schedule active?'),
+      'add' => '6.21',
+      'default' => TRUE,
+    ],
+    'recipients' => [
+      'title' => E::ts('Recipients'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'EntityRef',
+      'required' => TRUE,
+      'description' => E::ts('Contact IDs to receive the email.'),
+      'add' => '6.21',
+      'serialize' => CRM_Core_DAO::SERIALIZE_COMMA,
+      'input_attrs' => [
+        'multiple' => '1',
+      ],
+      'entity_reference' => [
+        'entity' => 'Contact',
+        'key' => 'id',
+        'fk' => FALSE,
+      ],
+    ],
+    'msg_template_id' => [
+      'title' => E::ts('Message Template ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'EntityRef',
+      'description' => E::ts('FK to the message template used for the email body.'),
+      'add' => '6.21',
+      'input_attrs' => [
+        'label' => E::ts('Message Template'),
+      ],
+      'entity_reference' => [
+        'entity' => 'MessageTemplate',
+        'key' => 'id',
+        'on_delete' => 'SET NULL',
+      ],
+    ],
+    'subject' => [
+      'title' => E::ts('Email Subject'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'required' => TRUE,
+      'add' => '6.21',
+      'input_attrs' => [
+        'maxlength' => 255,
+      ],
+    ],
+    'format' => [
+      'title' => E::ts('Attachment Format'),
+      'sql_type' => 'varchar(16)',
+      'input_type' => 'Select',
+      'required' => TRUE,
+      'add' => '6.21',
+      'default' => 'csv',
+      'pseudoconstant' => [
+        'callback' => ['CRM_Search_BAO_SearchSchedule', 'getFormats'],
+      ],
+    ],
+    'filters' => [
+      'title' => E::ts('Filters'),
+      'sql_type' => 'text',
+      'input_type' => 'TextArea',
+      'description' => E::ts('Filter values passed to the search display.'),
+      'add' => '6.21',
+      'serialize' => CRM_Core_DAO::SERIALIZE_JSON,
+    ],
+    'frequency_unit' => [
+      'title' => E::ts('Frequency Unit'),
+      'sql_type' => 'varchar(8)',
+      'input_type' => 'Select',
+      'required' => TRUE,
+      'add' => '6.21',
+      'default' => 'week',
+      'input_attrs' => [
+        'control_field' => 'frequency_interval',
+      ],
+      'pseudoconstant' => [
+        'callback' => ['CRM_Search_BAO_SearchSchedule', 'getFrequencyUnits'],
+      ],
+    ],
+    'frequency_interval' => [
+      'title' => E::ts('Frequency Interval'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Number',
+      'required' => TRUE,
+      'description' => E::ts('Number of frequency units between sends.'),
+      'add' => '6.21',
+      'default' => 1,
+      'input_attrs' => [
+        'min' => 1,
+      ],
+    ],
+    'start_date' => [
+      'title' => E::ts('Start Date'),
+      'sql_type' => 'datetime',
+      'input_type' => 'Select Date',
+      'required' => TRUE,
+      'description' => E::ts('First send; also anchors the time of day, weekday and day of month for later sends.'),
+      'add' => '6.21',
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
+      ],
+    ],
+    'next_run' => [
+      'title' => E::ts('Next Run'),
+      'sql_type' => 'datetime',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => E::ts('When this schedule will next be sent. Calculated automatically.'),
+      'add' => '6.21',
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
+      ],
+    ],
+    'last_run' => [
+      'title' => E::ts('Last Run'),
+      'sql_type' => 'datetime',
+      'input_type' => 'Select Date',
+      'readonly' => TRUE,
+      'description' => E::ts('When this schedule was last processed.'),
+      'add' => '6.21',
+      'input_attrs' => [
+        'format_type' => 'activityDateTime',
+      ],
+    ],
+    'created_id' => [
+      'title' => E::ts('Created By Contact ID'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'EntityRef',
+      'readonly' => TRUE,
+      'description' => E::ts('FK to contact table.'),
+      'add' => '6.21',
+      'default_callback' => ['CRM_Core_Session', 'getLoggedInContactID'],
+      'input_attrs' => [
+        'label' => E::ts('Created By'),
+      ],
+      'entity_reference' => [
+        'entity' => 'Contact',
+        'key' => 'id',
+        'on_delete' => 'SET NULL',
+      ],
+    ],
+    'created_date' => [
+      'title' => E::ts('Created Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => NULL,
+      'required' => TRUE,
+      'readonly' => TRUE,
+      'add' => '6.21',
+      'default' => 'CURRENT_TIMESTAMP',
+    ],
+    'modified_date' => [
+      'title' => E::ts('Modified Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => NULL,
+      'required' => TRUE,
+      'readonly' => TRUE,
+      'add' => '6.21',
+      'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    ],
+  ],
+];
