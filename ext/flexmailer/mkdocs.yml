@@ -5,7 +5,6 @@ theme:
 
 nav:
 - Introduction: index.md
-- Installation: install.md
 - Development:
   - Overview: develop/index.md
   - CheckSendableEvent: develop/CheckSendableEvent.md
