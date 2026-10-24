@@ -492,6 +492,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
     if (!$this->originalContribution) {
       return NULL;
     }
+    $payableAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->originalContribution->financial_type_id, 'Accounts Payable Account is');
+    if ($payableAccount) {
+      return $payableAccount;
+    }
     $accountRelationship = $this->updatedContribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
     return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->originalContribution->financial_type_id, $accountRelationship);
   }
@@ -510,6 +514,13 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @throws CRM_Core_Exception
    */
   private function getRevenueAccountForType(int $financialTypeID): int {
+    // Where a financial type has an Accounts Payable account configured, its money is being
+    // held to pay back out rather than kept as income, so it belongs there rather than in the
+    // usual income (or deferred revenue) account.
+    $payableAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($financialTypeID, 'Accounts Payable Account is');
+    if ($payableAccount) {
+      return $payableAccount;
+    }
     $accountRelationship = $this->updatedContribution->revenue_recognition_date ? 'Deferred Revenue Account is' : 'Income Account is';
     $account = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($financialTypeID, $accountRelationship);
     if (!$account) {
@@ -529,16 +540,38 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @return int
    */
   private function getFinancialAccountForStatusChangeTrxn($default): int {
+    // Where the financial type the item was already recorded under has an Accounts
+    // Payable account configured, its money was never recorded as income - it is only
+    // being held to be paid back out - so every status change, including one that pays
+    // it out and looks like a refund, stays against Accounts Payable rather than being
+    // routed through the income-reversal accounts below. This checks the original
+    // contribution's type, not the updated one, because a financial type change in
+    // progress has already moved the contribution to the new type by the time this
+    // reversal runs.
+    $payableAccount = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
+      $this->getOriginalContributionValue('financial_type_id'),
+      'Accounts Payable Account is'
+    );
+    if ($payableAccount) {
+      return $payableAccount;
+    }
+
     $relationshipType = [
       'Refunded' => 'Credit/Contra Revenue Account is',
       'Chargeback' => 'Chargeback Account is',
     ][$this->getUpdatedContributionStatus()] ?? NULL;
 
     if ($relationshipType) {
-      return CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
+      $account = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
         $this->getUpdatedContributionValue('financial_type_id'),
         $relationshipType
       );
+      // Fall back to the item's existing account rather than returning an empty one -
+      // the method is typed to return an int, and a NULL financial_account_id would be
+      // corrupt data for the financial item.
+      if ($account) {
+        return $account;
+      }
     }
     return $default;
   }
@@ -1228,6 +1261,14 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $accountRelName = 'Income Account is';
       if (property_exists($contribution, 'revenue_recognition_date') && !CRM_Utils_System::isNull($contribution->revenue_recognition_date)) {
         $accountRelName = 'Deferred Revenue Account is';
+      }
+      if ($lineItem->financial_type_id
+        && CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($lineItem->financial_type_id, 'Accounts Payable Account is')
+      ) {
+        // Where a financial type has an Accounts Payable account configured, the money
+        // is being held to pay back out rather than kept as income, so it should never
+        // be recorded as income in the first place.
+        $accountRelName = 'Accounts Payable Account is';
       }
     }
     if (!empty($lineItem['financial_type_id'])) {
