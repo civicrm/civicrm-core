@@ -479,12 +479,21 @@ FROM civicrm_action_schedule cas
    * @throws \CRM_Core_Exception
    */
   public static function processQueue($now = NULL, $params = []): void {
+    // Undo a time set from $now when the job ends, unless one was already set before.
+    $resetTime = $now && !CRM_Utils_Time::isOverridden();
     $now = $now ? CRM_Utils_Time::setTime($now) : CRM_Utils_Time::date('YmdHis');
 
-    $mappings = CRM_Core_BAO_ActionSchedule::getMappings();
-    foreach ($mappings as $mappingID => $mapping) {
-      CRM_Core_BAO_ActionSchedule::buildRecipientContacts((string) $mappingID, $now, $params);
-      CRM_Core_BAO_ActionSchedule::sendMailings($mappingID, $now);
+    try {
+      $mappings = CRM_Core_BAO_ActionSchedule::getMappings();
+      foreach ($mappings as $mappingID => $mapping) {
+        CRM_Core_BAO_ActionSchedule::buildRecipientContacts((string) $mappingID, $now, $params);
+        CRM_Core_BAO_ActionSchedule::sendMailings($mappingID, $now);
+      }
+    }
+    finally {
+      if ($resetTime) {
+        CRM_Utils_Time::resetTime();
+      }
     }
   }
 
