@@ -247,8 +247,9 @@ class Schema {
    * @return Schema
    */
   public function setAutoIncrement(?array $tables = NULL) {
-    // Might want to tweak this
-    $separation = 100;
+    // More than any seeded table's row count (civicrm_option_value has ~900),
+    // so seeded tables' id ranges don't overlap.
+    $separation = 1000;
     $autoIncrement = 1;
 
     // This is a list of all standard tables (as of 2025/05/26)
