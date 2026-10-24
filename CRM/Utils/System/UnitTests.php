@@ -225,4 +225,11 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
     throw new CRM_Core_Exception_PrematureExitException('sendJSONResponse', $response, $httpResponseCode);
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function renderMaintenanceMessage(string $content): void {
+    throw new CRM_Core_Exception_PrematureExitException('renderMaintenanceMessage', ['content' => $content]);
+  }
+
 }
