@@ -11,6 +11,7 @@
 
 use Civi\Api4\Contribution;
 use Civi\Api4\EntityFinancialAccount;
+use Civi\Api4\OptionValue;
 
 /**
  * Class CRM_Event_BAO_AdditionalPaymentTest
@@ -188,7 +189,10 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals(0, $contribution['balance_amount'], 'Balance is not correct');
     $this->assertEquals('Completed', $contribution['contribution_status_id:label'], 'Contribution status is not correct');
 
-    $this->callAPISuccess('OptionValue', 'delete', ['id' => $paymentInstrumentID]);
+    OptionValue::delete(FALSE)
+      ->addWhere('option_group_id:name', '=', 'payment_instrument')
+      ->addWhere('value', '=', $paymentInstrumentID)
+      ->execute();
   }
 
   /**
