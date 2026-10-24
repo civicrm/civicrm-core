@@ -219,6 +219,8 @@ class Schema {
     'civicrm_mailing_component',
     'civicrm_membership_status',
     'civicrm_msg_template',
+    'civicrm_option_group',
+    'civicrm_option_value',
     'civicrm_participant_status_type',
     'civicrm_payment_processor_type',
     'civicrm_preferences_date',
