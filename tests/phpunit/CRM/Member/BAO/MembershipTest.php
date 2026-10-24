@@ -768,7 +768,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'name' => 'General',
       'is_active' => TRUE,
       'description' => 'Regular annual membership.',
-      'financial_type_id' => 2,
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'auto_renew' => 0,
       'member_of_contact_id' => $values[$generalTypeID]['member_of_contact_id'],
       'relationship_type_id' => [$this->getRelationshipTypeID('Head of Household for')],

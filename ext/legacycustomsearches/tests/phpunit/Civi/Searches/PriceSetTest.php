@@ -32,6 +32,7 @@ use Civi\Test\Api3TestTrait;
 use Civi\Test\ContactTestTrait;
 use Civi\Test\EventTestTrait;
 use Civi\Test\HeadlessInterface;
+use Civi\Test\LookupHelperTrait;
 use Civi\Core\HookInterface;
 use Civi\Test\TransactionalInterface;
 use PHPUnit\Framework\TestCase;
@@ -46,6 +47,7 @@ class CRM_Contact_Form_Search_Custom_PriceSetTest extends TestCase implements He
   use EventTestTrait;
   use Api3TestTrait;
   use ContactTestTrait;
+  use LookupHelperTrait;
 
   /**
    * Civi\Test has many helpers, like install(), uninstall(), sql(), and
@@ -68,7 +70,7 @@ class CRM_Contact_Form_Search_Custom_PriceSetTest extends TestCase implements He
       'total_amount' => 100,
       'currency' => 'USD',
       'contact_id' => $contactID,
-      'financial_type_id' => 4,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'line_items' => [
         [
           'line_item' => [
@@ -81,7 +83,7 @@ class CRM_Contact_Form_Search_Custom_PriceSetTest extends TestCase implements He
             ],
           ],
           'params' => [
-            'financial_type_id' => 4,
+            'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
             'event_id' => $this->getEventID(),
             'role_id' => 1,
             'status_id' => 14,

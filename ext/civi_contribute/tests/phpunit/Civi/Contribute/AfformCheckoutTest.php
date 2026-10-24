@@ -49,7 +49,7 @@ class AfformCheckoutTest extends TestCase implements HeadlessInterface {
     $layout = <<<HTML
     <af-form ctrl="afform">
       <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="FBAC" />
-      <af-entity type="Contribution" name="Contribution1" label="Contribution 1" data="{contact_id: 'Individual1', financial_type_id: 1, currency: 'USD'}" actions="{create: true, update: false}" security="FBAC" />
+      <af-entity type="Contribution" name="Contribution1" label="Contribution 1" data="{contact_id: 'Individual1', 'financial_type_id:name': 'Donation', currency: 'USD'}" actions="{create: true, update: false}" security="FBAC" />
       <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
         <div class="af-container">
           <af-field name="first_name" />

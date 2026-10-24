@@ -25,7 +25,7 @@ class EntityFinancialAccountTest extends BaseTestClass {
     $this->assertCount(9, $restrictedAccounts);
     foreach ($restrictedAccounts as $restrictedAccount) {
       if ($restrictedAccount['entity_table'] === 'civicrm_financial_type') {
-        $this->assertEquals(1, $restrictedAccount['entity_id']);
+        $this->assertEquals($this->getFinancialTypeID('Donation'), $restrictedAccount['entity_id']);
       }
     }
   }

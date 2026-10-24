@@ -67,6 +67,9 @@ trait CRMTraits_Profile_ProfileTrait {
    * Ensure we don't have a profile with the id or one to ensure that we are not casting an array to it.
    */
   protected function eliminateUFGroupOne() {
+    if (!CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_uf_group WHERE id = 1')) {
+      return;
+    }
     $profileID = $this->createProfile(['name' => 'dummy_for_removing']);
     CRM_Core_DAO::executeQuery("UPDATE civicrm_uf_join SET uf_group_id = $profileID WHERE uf_group_id = 1");
     CRM_Core_DAO::executeQuery("UPDATE civicrm_uf_field SET uf_group_id = $profileID WHERE uf_group_id = 1");

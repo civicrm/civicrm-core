@@ -612,7 +612,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       $params = [
         'contact_id' => $contact['id'],
         'street_address' => 'Ambachtstraat 23',
-        'location_type_id' => 1,
+        'location_type_id' => $this->getLocationTypeID('Home'),
       ];
       $this->callAPISuccess('address', 'create', $params);
       $contactIds[$count++] = $contact['id'];

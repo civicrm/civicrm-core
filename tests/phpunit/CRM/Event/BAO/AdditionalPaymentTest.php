@@ -88,7 +88,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
         'currency' => 'USD',
         'receipt_date' => 'today',
         'contact_id' => $this->contactID,
-        'financial_type_id' => 4,
+        'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
         'payment_instrument_id' => 4,
         'contribution_status_id' => 'Pending',
         'receive_date' => 'today',

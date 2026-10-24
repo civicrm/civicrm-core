@@ -1040,14 +1040,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         'contact_id' => $this->ids['Contact']['first'],
         'receive_date' => '2016-10-01',
         'revenue_recognition_date' => (new DateTime('+3 month'))->format('Y-m-t'),
-        'financial_type_id' => 2,
+        'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       ]
     );
     $this->contributionCreate(
       [
         'contact_id' => $this->ids['Contact']['first'],
         'revenue_recognition_date' => (new DateTime('+22 month'))->format('Y-m-t'),
-        'financial_type_id' => 4,
+        'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
         'trxn_id' => NULL,
         'invoice_id' => NULL,
       ]
@@ -1056,7 +1056,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       [
         'contact_id' => $this->ids['Contact']['second'],
         'revenue_recognition_date' => (new DateTime('+1 month'))->format('Y-m-t'),
-        'financial_type_id' => 4,
+        'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
         'trxn_id' => NULL,
         'invoice_id' => NULL,
       ]
@@ -1066,7 +1066,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         'contact_id' => $this->ids['Contact']['second'],
         'receive_date' => '2016-03-01',
         'revenue_recognition_date' => (new DateTime('+4 month'))->format('Y-m-t'),
-        'financial_type_id' => 2,
+        'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
         'trxn_id' => NULL,
         'invoice_id' => NULL,
       ]
@@ -1574,12 +1574,12 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $contact = $this->individualCreate();
     // Two contributions with different financial types.
     // We don't really care which types, just different.
-    $this->contributionCreate(['contact_id' => $contact, 'receive_date' => (date('Y') - 1) . '-07-01', 'financial_type_id' => 1, 'total_amount' => '10']);
-    $this->contributionCreate(['contact_id' => $contact, 'receive_date' => (date('Y') - 1) . '-08-01', 'financial_type_id' => 2, 'total_amount' => '20']);
+    $this->contributionCreate(['contact_id' => $contact, 'receive_date' => (date('Y') - 1) . '-07-01', 'financial_type_id' => $this->getFinancialTypeID('Donation'), 'total_amount' => '10']);
+    $this->contributionCreate(['contact_id' => $contact, 'receive_date' => (date('Y') - 1) . '-08-01', 'financial_type_id' => $this->getFinancialTypeID('Member Dues'), 'total_amount' => '20']);
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'contribute/history',
       'financial_type_id_op' => 'in',
-      'financial_type_id_value' => [1],
+      'financial_type_id_value' => [$this->getFinancialTypeID('Donation')],
       'options' => ['metadata' => ['sql']],
       'fields' => [
         'relationship_type_id' => 1,
@@ -1600,10 +1600,10 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     // our sorting options are limited in this report - default is last name so let's ensure order
     $contact1 = $this->individualCreate(['last_name' => 'Aardvark']);
     $contact2 = $this->individualCreate(['last_name' => 'Zebra']);
-    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => (date('Y') - 1) . '-07-01', 'financial_type_id' => 1, 'total_amount' => '10']);
-    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => (date('Y') - 1) . '-08-01', 'financial_type_id' => 1, 'total_amount' => '20']);
-    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => date('Y') . '-01-01', 'financial_type_id' => 1, 'total_amount' => '40']);
-    $this->contributionCreate(['contact_id' => $contact2, 'receive_date' => (date('Y') - 1) . '-09-01', 'financial_type_id' => 1, 'total_amount' => '80']);
+    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => (date('Y') - 1) . '-07-01', 'financial_type_id' => $this->getFinancialTypeID('Donation'), 'total_amount' => '10']);
+    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => (date('Y') - 1) . '-08-01', 'financial_type_id' => $this->getFinancialTypeID('Donation'), 'total_amount' => '20']);
+    $this->contributionCreate(['contact_id' => $contact1, 'receive_date' => date('Y') . '-01-01', 'financial_type_id' => $this->getFinancialTypeID('Donation'), 'total_amount' => '40']);
+    $this->contributionCreate(['contact_id' => $contact2, 'receive_date' => (date('Y') - 1) . '-09-01', 'financial_type_id' => $this->getFinancialTypeID('Donation'), 'total_amount' => '80']);
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'contribute/repeat',
       'receive_date1' => 'previous.year',

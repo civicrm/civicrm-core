@@ -123,7 +123,7 @@ trait CRMTraits_Financial_PriceSetTrait {
     $this->ids['PriceSet']['membership'] = (int) $this->callAPISuccess('PriceSet', 'create', [
       'is_quick_config' => 0,
       'extends' => 'CiviMember',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'title' => 'my Page',
     ])['id'];
 

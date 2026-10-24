@@ -458,7 +458,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
             'type' => 'field',
             'key' => 'financial_type_id:label',
             'label' => 'Financial Type',
-            'default' => '1',
+            'default' => (string) $this->getFinancialTypeID('Donation'),
           ],
           [
             'type' => 'field',
@@ -511,7 +511,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $rows = civicrm_api4($apiName, 'get');
     $this->assertEquals([1, 2, 3, 4, 5], $rows->column('_id'));
     foreach ($rows as $row) {
-      $this->assertEquals('1', $row[$fieldKeys['Financial Type']]);
+      $this->assertEquals((string) $this->getFinancialTypeID('Donation'), $row[$fieldKeys['Financial Type']]);
       $this->assertNull($row[$fieldKeys['Total Amount']]);
       $this->assertNull($row[$fieldKeys['Contact First Name']]);
       $this->assertNull($row[$fieldKeys['Soft Credit Contact ID']]);
@@ -530,7 +530,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       'records' => [
         [
           $fieldKeys['Total Amount'] => 100,
-          $fieldKeys['Financial Type'] => 1,
+          $fieldKeys['Financial Type'] => $this->getFinancialTypeID('Donation'),
           $fieldKeys['Contact First Name'] => 'Jane',
           $fieldKeys['Contact Last Name'] => $lastName,
           $fieldKeys['Contact Gender'] => 1,
@@ -539,14 +539,14 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
         ],
         [
           $fieldKeys['Total Amount'] => 200,
-          $fieldKeys['Financial Type'] => 2,
+          $fieldKeys['Financial Type'] => $this->getFinancialTypeID('Member Dues'),
           $fieldKeys['Contact First Name'] => 'John',
           $fieldKeys['Contact Last Name'] => $lastName,
           $fieldKeys['Contact Gender'] => 2,
         ],
         [
           $fieldKeys['Total Amount'] => 300,
-          $fieldKeys['Financial Type'] => 1,
+          $fieldKeys['Financial Type'] => $this->getFinancialTypeID('Donation'),
           $fieldKeys['Contact First Name'] => 'Jin',
           $fieldKeys['Contact Last Name'] => $lastName,
           $fieldKeys['Soft Credit Contact ID'] => $softCreditContactId,
@@ -602,8 +602,8 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertEquals(100, $contributions[0]['total_amount']);
     $this->assertEquals(200, $contributions[1]['total_amount']);
     $this->assertEquals(300, $contributions[2]['total_amount']);
-    $this->assertEquals(1, $contributions[0]['financial_type_id']);
-    $this->assertEquals(2, $contributions[1]['financial_type_id']);
+    $this->assertEquals($this->getFinancialTypeID('Donation'), $contributions[0]['financial_type_id']);
+    $this->assertEquals($this->getFinancialTypeID('Member Dues'), $contributions[1]['financial_type_id']);
     $this->assertEquals('Jane', $contributions[0]['contact_id.first_name']);
     $this->assertEquals('John', $contributions[1]['contact_id.first_name']);
     $this->assertEquals(1, $contributions[0]['contact_id.gender_id']);

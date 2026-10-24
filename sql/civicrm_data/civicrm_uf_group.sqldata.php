@@ -3,7 +3,6 @@
 return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
   ->addValues([
     [
-      'id' => 1,
       'name' => 'name_and_address',
       'group_type' => 'Individual,Contact',
       'title' => ts('Name and Address'),
@@ -13,7 +12,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
       'help_post' => NULL,
     ],
     [
-      'id' => 2,
       'name' => 'supporter_profile',
       'group_type' => 'Individual,Contact',
       'title' => ts('Supporter Profile'),
@@ -23,7 +21,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
       'help_post' => '<p><strong>' . ts('The information you provide will NOT be shared with any third party organisations.') . '</strong></p><p>' . ts('Thank you for getting involved in our campaign!') . '</p>',
     ],
     [
-      'id' => 3,
       'name' => 'participant_status',
       'group_type' => 'Participant',
       'title' => ts('Participant Status'),
@@ -33,7 +30,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
       'help_post' => NULL,
     ],
     [
-      'id' => 4,
       'name' => 'new_individual',
       'group_type' => 'Individual,Contact',
       'title' => ts('New Individual'),
@@ -43,7 +39,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
       'help_post' => NULL,
     ],
     [
-      'id' => 5,
       'name' => 'new_organization',
       'group_type' => 'Organization,Contact',
       'title' => ts('New Organization'),
@@ -53,7 +48,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
       'help_post' => NULL,
     ],
     [
-      'id' => 6,
       'name' => 'new_household',
       'group_type' => 'Household,Contact',
       'title' => ts('New Household'),
@@ -63,7 +57,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
       'help_post' => NULL,
     ],
     [
-      'id' => 7,
       'name' => 'summary_overlay',
       'group_type' => 'Contact',
       'title' => ts('Summary Overlay'),
@@ -73,7 +66,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
       'help_post' => NULL,
     ],
     [
-      'id' => 8,
       'name' => 'shared_address',
       'group_type' => 'Contact',
       'title' => ts('Shared Address'),
@@ -83,7 +75,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
       'help_post' => NULL,
     ],
     [
-      'id' => 9,
       'name' => 'on_behalf_organization',
       'group_type' => 'Contact,Organization',
       'title' => ts('On Behalf Of Organization'),
@@ -93,7 +84,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
       'help_post' => NULL,
     ],
     [
-      'id' => 10,
       'name' => 'contribution_batch_entry',
       'group_type' => 'Contribution',
       'title' => ts('Contribution Bulk Entry'),
@@ -103,7 +93,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
       'help_post' => NULL,
     ],
     [
-      'id' => 11,
       'name' => 'membership_batch_entry',
       'group_type' => 'Membership',
       'title' => ts('Membership Bulk Entry'),
@@ -113,7 +102,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
       'help_post' => NULL,
     ],
     [
-      'id' => 12,
       'name' => 'event_registration',
       'group_type' => 'Individual,Contact',
       'title' => ts('Your Registration Info'),
@@ -123,7 +111,6 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_group')
       'help_post' => NULL,
     ],
     [
-      'id' => 13,
       'name' => 'honoree_individual',
       'group_type' => 'Individual,Contact',
       'title' => ts('Honoree Individual'),

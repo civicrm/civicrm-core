@@ -21,7 +21,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       'email' => 'ignore1@example.com',
       // 'street_address-1' => 'Irrelevant'
       'api.Address.create' => [
-        'location_type_id' => 1,
+        'location_type_id' => $this->getLocationTypeID('Home'),
         'street_address' => '123 Irrelevant Str',
         'supplemental_address_1' => 'Room 987',
       ],
@@ -187,9 +187,9 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       'api.Email.replace' => [
         'options' => ['match' => 'location_type_id'],
         'values' => [
-          ['location_type_id' => 1, 'email' => 'j1-a@example.com', 'signature_text' => 'The Dude abides.'],
+          ['location_type_id' => $this->getLocationTypeID('Home'), 'email' => 'j1-a@example.com', 'signature_text' => 'The Dude abides.'],
           [
-            'location_type_id' => 2,
+            'location_type_id' => $this->getLocationTypeID('Work'),
             'email' => 'j2@example.com',
             'signature_text' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.',
           ],
@@ -213,8 +213,8 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       'api.Email.replace' => [
         'options' => ['match' => 'location_type_id'],
         'values' => [
-          ['location_type_id' => 1, 'email' => 'j1-b@example.com'],
-          ['location_type_id' => 3, 'email' => 'j3@example.com'],
+          ['location_type_id' => $this->getLocationTypeID('Home'), 'email' => 'j1-b@example.com'],
+          ['location_type_id' => $this->getLocationTypeID('Main'), 'email' => 'j3@example.com'],
         ],
       ],
     ]);
@@ -270,12 +270,12 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
         'options' => ['match' => 'location_type_id'],
         'values' => [
           [
-            'location_type_id' => 1,
+            'location_type_id' => $this->getLocationTypeID('Home'),
             'street_address' => 'j1-a Example Ave',
             'supplemental_address_1' => 'The Dude abides.',
           ],
           [
-            'location_type_id' => 2,
+            'location_type_id' => $this->getLocationTypeID('Work'),
             'street_address' => 'j2 Example Ave',
             'supplemental_address_1' => 'You know, a lotta ins, a lotta outs, a lotta what-have-yous.',
           ],
@@ -299,8 +299,8 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       'api.Address.replace' => [
         'options' => ['match' => 'location_type_id'],
         'values' => [
-          ['location_type_id' => 1, 'street_address' => 'j1-b Example Ave'],
-          ['location_type_id' => 3, 'street_address' => 'j3 Example Ave'],
+          ['location_type_id' => $this->getLocationTypeID('Home'), 'street_address' => 'j1-b Example Ave'],
+          ['location_type_id' => $this->getLocationTypeID('Main'), 'street_address' => 'j3 Example Ave'],
         ],
       ],
     ]);

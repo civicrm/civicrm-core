@@ -68,7 +68,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
 
     $this->_contactId = $this->individualCreate();
     $this->ids['contact'] = $this->_contactId;
-    $this->_financialTypeId = 1;
+    $this->_financialTypeId = $this->getFinancialTypeID('Donation');
 
     $this->_contributionParams = [
       'contact_id' => $this->_contactId,

@@ -38,7 +38,7 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
     $this->_params = [
       'contact_id' => $this->organizationCreate(),
       'openid' => 'My OpenID handle',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'sequential' => 1,
     ];
   }

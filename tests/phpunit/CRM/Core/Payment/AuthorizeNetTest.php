@@ -207,7 +207,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
 
     $contributionParams = [
       'contact_id' => $contactId,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'receive_date' => $start_date,
       'total_amount' => $amount,
       'invoice_id' => $invoiceID,
@@ -240,7 +240,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => 3,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'is_email_receipt' => 1,
       'from_email_address' => "{$firstName}.{$lastName}@example.com",
       'receive_date' => $start_date,

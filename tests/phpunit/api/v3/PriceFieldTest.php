@@ -34,7 +34,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
       'help_pre' => 'Where does your goat sleep',
       'help_post' => 'thank you for your time',
       'extends' => 2,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'is_quick_config' => 1,
       'is_reserved' => 1,
     ];
@@ -190,7 +190,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
       'name' => 'rye grass',
       'label' => 'juicy and healthy',
       'amount' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ]);
     $this->callAPISuccess($this->_entity, 'create', ['id' => $field['id'], 'label' => 'Rose Variety']);
     $priceFieldValue = $this->callAPISuccess('price_field_value', 'get', ['price_field_id' => $field['id']]);

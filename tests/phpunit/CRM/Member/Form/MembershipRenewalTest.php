@@ -220,6 +220,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitRecur(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->callAPISuccess('MembershipType', 'create', [
       'id' => $this->ids['MembershipType']['annual_fixed'],
       'duration_unit' => 'month',
@@ -242,7 +243,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'source' => '',
       'total_amount' => '77.00',
       //Member dues, see data.xml
-      'financial_type_id' => '2',
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text' => 'Thank you text',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
@@ -255,11 +256,11 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
       'billing_last_name' => 'Last',
-      'billing_street_address-5' => '10 Test St',
-      'billing_city-5' => 'Test',
-      'billing_state_province_id-5' => '1003',
-      'billing_postal_code-5' => '90210',
-      'billing_country_id-5' => '1228',
+      "billing_street_address-$billingLocationTypeID" => '10 Test St',
+      "billing_city-$billingLocationTypeID" => 'Test',
+      "billing_state_province_id-$billingLocationTypeID" => '1003',
+      "billing_postal_code-$billingLocationTypeID" => '90210',
+      "billing_country_id-$billingLocationTypeID" => '1228',
       'send_receipt' => 1,
     ], ['cid' => $this->ids['Contact']['individual'], 'id' => $this->ids['Membership']['default'], 'mode' => 'test'])
       ->processForm();
@@ -435,7 +436,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'num_terms' => '2',
       'total_amount' => '50.00',
       //Member dues, see data.xml
-      'financial_type_id' => '2',
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text_signup' => 'Thank you text',
@@ -469,6 +470,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitPayLaterWithBilling(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->createLoggedInUser();
     $originalMembership = $this->callAPISuccessGetSingle('membership', ['membership_type_id' => $this->ids['MembershipType']['annual_fixed']]);
     $this->getTestForm('CRM_Member_Form_MembershipRenewal', [
@@ -481,7 +483,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'num_terms' => '2',
       'total_amount' => '50.00',
       //Member dues, see data.xml
-      'financial_type_id' => '2',
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text_signup' => 'Thank you text',
@@ -491,11 +493,11 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
       'billing_first_name' => 'Test',
       'billing_middle_name' => 'Last',
-      'billing_street_address-5' => '10 Test St',
-      'billing_city-5' => 'Test',
-      'billing_state_province_id-5' => '1003',
-      'billing_postal_code-5' => '90210',
-      'billing_country_id-5' => '1228',
+      "billing_street_address-$billingLocationTypeID" => '10 Test St',
+      "billing_city-$billingLocationTypeID" => 'Test',
+      "billing_state_province_id-$billingLocationTypeID" => '1003',
+      "billing_postal_code-$billingLocationTypeID" => '90210',
+      "billing_country_id-$billingLocationTypeID" => '1228',
     ], ['cid' => $this->ids['Contact']['individual'], 'id' => $this->ids['Membership']['default']])
       ->processForm();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual'], 'membership_type_id' => $this->ids['MembershipType']['annual_fixed']]);
@@ -540,7 +542,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'num_terms' => '2',
       'total_amount' => '50.00',
       //Member dues, see data.xml
-      'financial_type_id' => '2',
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text_signup' => 'Thank you text',
@@ -682,7 +684,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['annual_fixed']],
       'num_terms' => '1',
       'total_amount' => '50.00',
-      'financial_type_id' => '2',
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'record_contribution' => TRUE,
@@ -721,7 +723,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'num_terms' => '2',
       'total_amount' => '50.00',
       //Member dues, see data.xml
-      'financial_type_id' => '2',
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text_signup' => 'Thank you text',
@@ -783,7 +785,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'num_terms' => '1',
       'total_amount' => '50.00',
       //Member dues, see data.xml
-      'financial_type_id' => '2',
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text_signup' => 'Thank you text',
@@ -826,7 +828,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'num_terms' => '1',
       'total_amount' => $this->formatMoneyInput('7800.90'),
       //Member dues, see data.xml
-      'financial_type_id' => '2',
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text' => 'Thank you text',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
@@ -868,7 +870,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact']['individual'],
       'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['annual_fixed']],
       'renewal_date' => '2020-06-10',
-      'financial_type_id' => '2',
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'num_terms' => '1',
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'record_contribution' => '1',

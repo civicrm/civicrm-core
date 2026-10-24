@@ -55,7 +55,7 @@ class api_v3_ValidateTest extends CiviUnitTestCase {
   public function testContributionDateValidate(): void {
     $params = [
       'action' => "create",
-      'financial_type_id' => "1",
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'total_amount' => "100",
       'contact_id' => "1",
       'receive_date' => 'abc',

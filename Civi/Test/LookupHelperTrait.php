@@ -37,6 +37,18 @@ trait LookupHelperTrait {
   }
 
   /**
+   * Get the id of a location type.
+   *
+   * @param string $name
+   *   e.g. 'Home'.
+   *
+   * @return int
+   */
+  protected function getLocationTypeID(string $name): int {
+    return (int) \CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $name);
+  }
+
+  /**
    * Get the id of a participant status.
    *
    * @param string $name
@@ -70,6 +82,18 @@ trait LookupHelperTrait {
    */
   protected function getRelationshipTypeID(string $nameAB): int {
     return (int) \CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $nameAB, 'id', 'name_a_b');
+  }
+
+  /**
+   * Get the id of a profile (UFGroup).
+   *
+   * @param string $name
+   *   e.g. 'name_and_address'.
+   *
+   * @return int
+   */
+  protected function getProfileID(string $name): int {
+    return (int) \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $name, 'id', 'name');
   }
 
   /**
