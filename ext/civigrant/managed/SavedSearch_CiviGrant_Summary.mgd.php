@@ -36,9 +36,7 @@ return [
         'description' => NULL,
         'mapping_id' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -56,10 +54,7 @@ return [
         'settings' => [
           'actions' => FALSE,
           'limit' => 50,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
           'pager' => [
             'show_count' => TRUE,
             'expose_limit' => TRUE,

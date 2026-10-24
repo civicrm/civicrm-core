@@ -1,5 +1,4 @@
 <?php
-
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
@@ -38,9 +37,7 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -59,10 +56,7 @@ return [
           'actions' => TRUE,
           'description' => NULL,
           'sort' => [
-            [
-              'priority',
-              'ASC',
-            ],
+            ['priority', 'ASC'],
           ],
           'limit' => 50,
           'pager' => [],

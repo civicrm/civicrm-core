@@ -18,11 +18,7 @@ return [
         'api_entity' => 'OptionValue',
         'api_params' => [
           'version' => 4,
-          'select' => [
-            'label',
-            'value',
-            'filter',
-          ],
+          'select' => ['label', 'value', 'filter'],
           'orderBy' => [],
           'where' => [],
           'groupBy' => [],
@@ -32,9 +28,7 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -54,10 +48,7 @@ return [
           'sort' => [],
           'limit' => 50,
           'actions' => FALSE,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
           'draggable' => 'weight',
           'pager' => [
             'hide_single' => TRUE,

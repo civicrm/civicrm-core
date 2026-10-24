@@ -205,12 +205,7 @@ return [
             ],
           ],
           'cssRules' => [
-            [
-              'disabled',
-              'is_active',
-              '=',
-              FALSE,
-            ],
+            ['disabled', 'is_active', '=', FALSE],
           ],
           'hierarchical' => TRUE,
           'collapsible' => 'open',

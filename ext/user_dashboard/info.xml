@@ -37,7 +37,7 @@
   </classloader>
   <civix>
     <namespace>CRM/UserDashboard</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
     <angularModule>crmUserDashboard</angularModule>
   </civix>
   <mixins>

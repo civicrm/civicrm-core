@@ -91,9 +91,6 @@ function _legacycustomsearches_civix_civicrm_config($config = NULL) {
   }
   $configured = TRUE;
 
-  $extRoot = __DIR__ . DIRECTORY_SEPARATOR;
-  $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
-  set_include_path($include_path);
   // Based on <compatibility>, this does not currently require mixin/polyfill.php.
 }
 
@@ -153,48 +150,5 @@ function _legacycustomsearches_civix_insert_navigation_menu(&$menu, $path, $item
       }
     }
     return $found;
-  }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_navigationMenu().
- */
-function _legacycustomsearches_civix_navigationMenu(&$nodes) {
-  if (!is_callable(['CRM_Core_BAO_Navigation', 'fixNavigationMenu'])) {
-    _legacycustomsearches_civix_fixNavigationMenu($nodes);
-  }
-}
-
-/**
- * Given a navigation menu, generate navIDs for any items which are
- * missing them.
- */
-function _legacycustomsearches_civix_fixNavigationMenu(&$nodes) {
-  $maxNavID = 1;
-  array_walk_recursive($nodes, function($item, $key) use (&$maxNavID) {
-    if ($key === 'navID') {
-      $maxNavID = max($maxNavID, $item);
-    }
-  });
-  _legacycustomsearches_civix_fixNavigationMenuItems($nodes, $maxNavID, NULL);
-}
-
-function _legacycustomsearches_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parentID) {
-  $origKeys = array_keys($nodes);
-  foreach ($origKeys as $origKey) {
-    if (!isset($nodes[$origKey]['attributes']['parentID']) && $parentID !== NULL) {
-      $nodes[$origKey]['attributes']['parentID'] = $parentID;
-    }
-    // If no navID, then assign navID and fix key.
-    if (!isset($nodes[$origKey]['attributes']['navID'])) {
-      $newKey = ++$maxNavID;
-      $nodes[$origKey]['attributes']['navID'] = $newKey;
-      $nodes[$newKey] = $nodes[$origKey];
-      unset($nodes[$origKey]);
-      $origKey = $newKey;
-    }
-    if (isset($nodes[$origKey]['child']) && is_array($nodes[$origKey]['child'])) {
-      _legacycustomsearches_civix_fixNavigationMenuItems($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
-    }
   }
 }

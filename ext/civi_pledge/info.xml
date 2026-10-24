@@ -42,7 +42,7 @@
   </mixins>
   <civix>
     <namespace>CRM/Pledge</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
     <angularModule>civiPledge</angularModule>
   </civix>
 </extension>

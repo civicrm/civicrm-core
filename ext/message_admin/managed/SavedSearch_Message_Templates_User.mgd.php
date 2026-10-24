@@ -37,8 +37,16 @@ return [
           // API4's bridge-join handling links the bridge row to this entity automatically
           // (entity_id/entity_table), same as the generic `tags` virtual field does elsewhere.
           'join' => [
-            ['File AS MessageTemplate_EntityFile_File_01', 'LEFT', 'EntityFile'],
-            ['Tag AS MessageTemplate_EntityTag_Tag_01', 'LEFT', 'EntityTag'],
+            [
+              'File AS MessageTemplate_EntityFile_File_01',
+              'LEFT',
+              'EntityFile',
+            ],
+            [
+              'Tag AS MessageTemplate_EntityTag_Tag_01',
+              'LEFT',
+              'EntityTag',
+            ],
           ],
         ],
       ],
@@ -64,14 +72,27 @@ return [
         'acl_bypass' => TRUE,
         'settings' => [
           'limit' => 50,
-          'sort' => [['msg_title', 'ASC']],
-          'pager' => ['show_count' => TRUE, 'expose_limit' => TRUE],
+          'sort' => [
+            ['msg_title', 'ASC'],
+          ],
+          'pager' => [
+            'show_count' => TRUE,
+            'expose_limit' => TRUE,
+          ],
           'placeholder' => 5,
           // `revert` restores a template from the packaged original it was copied from, which
           // a user-driven template does not have, so it would report reverting nothing.
           // `tag` becomes available once MessageTemplate is registered in `tag_used_for`
           // (see CRM_Upgrade_Incremental_php_SixTwenty::registerMessageTemplateTagUsedFor()).
-          'actions' => ['add_translation', 'delete', 'disable', 'download', 'enable', 'tag', 'update'],
+          'actions' => [
+            'add_translation',
+            'delete',
+            'disable',
+            'download',
+            'enable',
+            'tag',
+            'update',
+          ],
           'classes' => ['table', 'table-striped'],
           'toolbar' => [
             [
@@ -93,25 +114,25 @@ return [
             [
               'type' => 'field',
               'key' => 'msg_title',
-              'label' => E::ts('Title'),
+              'label' => 'Title',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'msg_subject',
-              'label' => E::ts('Subject'),
+              'label' => 'Subject',
               'sortable' => TRUE,
             ],
             [
               'type' => 'field',
               'key' => 'is_active',
-              'label' => E::ts('Enabled'),
+              'label' => 'Enabled',
               'sortable' => TRUE,
             ],
             [
               'type' => 'include',
               'path' => '~/crmMsgadm/tagsColumn.html',
-              'label' => E::ts('Tags'),
+              'label' => 'Tags',
             ],
             [
               'type' => 'menu',
@@ -129,28 +150,36 @@ return [
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
-                  'conditions' => [['has_document', 'IS NOT EMPTY']],
+                  'conditions' => [
+                    ['has_document', 'IS NOT EMPTY'],
+                  ],
                 ],
                 [
                   'path' => 'civicrm/admin/messageTemplates/edit#/edit?id=[id]',
                   'icon' => 'fa-pencil',
                   'text' => E::ts('Edit'),
                   'style' => 'default',
-                  'conditions' => [['has_document', 'IS EMPTY']],
+                  'conditions' => [
+                    ['has_document', 'IS EMPTY'],
+                  ],
                 ],
                 [
                   'task' => 'enable',
                   'icon' => 'fa-toggle-on',
                   'text' => E::ts('Enable'),
                   'style' => 'default',
-                  'conditions' => [['is_active', '=', FALSE]],
+                  'conditions' => [
+                    ['is_active', '=', FALSE],
+                  ],
                 ],
                 [
                   'task' => 'disable',
                   'icon' => 'fa-toggle-off',
                   'text' => E::ts('Disable'),
                   'style' => 'default',
-                  'conditions' => [['is_active', '=', TRUE]],
+                  'conditions' => [
+                    ['is_active', '=', TRUE],
+                  ],
                 ],
                 [
                   'task' => 'delete',
@@ -159,7 +188,15 @@ return [
                   'style' => 'danger',
                   // A link naming a task is rendered whether or not the task is available
                   // to this user, so the task's own permission has to be restated here.
-                  'conditions' => [['check user permission', '=', ['administer CiviCRM']]],
+                  'conditions' => [
+                    [
+                      'check user permission',
+                      '=',
+                      [
+                        'administer CiviCRM',
+                      ],
+                    ],
+                  ],
                 ],
               ],
             ],

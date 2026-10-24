@@ -45,9 +45,10 @@
     <mixin>smarty@1.0.3</mixin>
     <mixin>entity-types-php@2.0.0</mixin>
     <mixin>scan-classes@1.0.0</mixin>
+    <mixin>include-path@1.0.0</mixin>
   </mixins>
   <civix>
     <namespace>CRM/Grant</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
   </civix>
 </extension>

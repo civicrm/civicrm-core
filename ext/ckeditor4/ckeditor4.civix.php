@@ -93,15 +93,8 @@ spl_autoload_register('_ckeditor4_civix_class_loader', TRUE, TRUE);
 
 function _ckeditor4_civix_class_loader($class) {
   if ($class === 'CRM_Ckeditor4_DAO_Base') {
-    if (version_compare(CRM_Utils_System::version(), '5.74.beta', '>=')) {
-      class_alias('CRM_Core_DAO_Base', 'CRM_Ckeditor4_DAO_Base');
-      // ^^ Materialize concrete names -- encourage IDE's to pick up on this association.
-    }
-    else {
-      $realClass = 'CiviMix\\Schema\\Ckeditor4\\DAO';
-      class_alias($realClass, $class);
-      // ^^ Abstract names -- discourage IDE's from picking up on this association.
-    }
+    class_alias('CRM_Core_DAO_Base', 'CRM_Ckeditor4_DAO_Base');
+    // ^^ Materialize concrete names -- encourage IDE's to pick up on this association.
     return;
   }
 
@@ -126,9 +119,6 @@ function _ckeditor4_civix_civicrm_config($config = NULL) {
   }
   $configured = TRUE;
 
-  $extRoot = __DIR__ . DIRECTORY_SEPARATOR;
-  $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
-  set_include_path($include_path);
   // Based on <compatibility>, this does not currently require mixin/polyfill.php.
 }
 
@@ -188,48 +178,5 @@ function _ckeditor4_civix_insert_navigation_menu(&$menu, $path, $item) {
       }
     }
     return $found;
-  }
-}
-
-/**
- * (Delegated) Implements hook_civicrm_navigationMenu().
- */
-function _ckeditor4_civix_navigationMenu(&$nodes) {
-  if (!is_callable(['CRM_Core_BAO_Navigation', 'fixNavigationMenu'])) {
-    _ckeditor4_civix_fixNavigationMenu($nodes);
-  }
-}
-
-/**
- * Given a navigation menu, generate navIDs for any items which are
- * missing them.
- */
-function _ckeditor4_civix_fixNavigationMenu(&$nodes) {
-  $maxNavID = 1;
-  array_walk_recursive($nodes, function($item, $key) use (&$maxNavID) {
-    if ($key === 'navID') {
-      $maxNavID = max($maxNavID, $item);
-    }
-  });
-  _ckeditor4_civix_fixNavigationMenuItems($nodes, $maxNavID, NULL);
-}
-
-function _ckeditor4_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parentID) {
-  $origKeys = array_keys($nodes);
-  foreach ($origKeys as $origKey) {
-    if (!isset($nodes[$origKey]['attributes']['parentID']) && $parentID !== NULL) {
-      $nodes[$origKey]['attributes']['parentID'] = $parentID;
-    }
-    // If no navID, then assign navID and fix key.
-    if (!isset($nodes[$origKey]['attributes']['navID'])) {
-      $newKey = ++$maxNavID;
-      $nodes[$origKey]['attributes']['navID'] = $newKey;
-      $nodes[$newKey] = $nodes[$origKey];
-      unset($nodes[$origKey]);
-      $origKey = $newKey;
-    }
-    if (isset($nodes[$origKey]['child']) && is_array($nodes[$origKey]['child'])) {
-      _ckeditor4_civix_fixNavigationMenuItems($nodes[$origKey]['child'], $maxNavID, $nodes[$origKey]['attributes']['navID']);
-    }
   }
 }

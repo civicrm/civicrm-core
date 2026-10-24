@@ -24,7 +24,6 @@ return [
             'edit_url',
             'tags',
             'primary_entities',
-
           ],
           'orderBy' => [],
           'where' => [],
@@ -222,9 +221,7 @@ return [
               ],
             ],
           ],
-          'cssRules' => [
-            //['disabled', 'is_active', '=', FALSE],
-          ],
+          'cssRules' => [],
         ],
       ],
       'match' => [
