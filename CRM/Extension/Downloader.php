@@ -80,6 +80,22 @@ class CRM_Extension_Downloader {
   }
 
   /**
+   * Determine whether the system policy allows downloading extensions.
+   *
+   * This is a reflection of *policy* and *intent*; it does not indicate whether
+   * a download will actually *work*. For that, see checkRequirements().
+   *
+   * Note this is independent of CRM_Extension_Browser::isEnabled(), which governs
+   * whether the system checks for available extensions/updates. It is possible to
+   * allow checking for updates (ext_repo_url) while disallowing downloads (ext_repo_download).
+   *
+   * @return bool
+   */
+  public function isEnabled(): bool {
+    return (bool) \Civi::settings()->get('ext_repo_download');
+  }
+
+  /**
    * Determine whether downloading is supported.
    *
    * @param \CRM_Extension_Info $extensionInfo Optional info for (updated) extension
@@ -89,6 +105,13 @@ class CRM_Extension_Downloader {
    */
   public function checkRequirements($extensionInfo = NULL) {
     $errors = [];
+
+    if (!$this->isEnabled()) {
+      $errors[] = [
+        'title' => ts('Downloads Disabled'),
+        'message' => ts('The system administrator has disabled extension downloads.'),
+      ];
+    }
 
     if (!$this->containerDir || !is_dir($this->containerDir) || !is_writable($this->containerDir)) {
       $civicrmDestination = urlencode(CRM_Utils_System::url('civicrm/admin/extensions', 'reset=1'));
