@@ -131,12 +131,14 @@
          <a href="{$icalFeed}">{ts}Download iCalendar entry for this event.{/ts}</a>
        </td>
      </tr>
+     {if $eventEnableGoogleCalendarLinks}
      <tr>
        <td colspan="2" {$valueStyle}>
            {capture assign=gCalendar}{crmURL p='civicrm/event/ical' q="gCalendar=1&reset=1&id={event.id}" h=0 a=1 fe=1}{/capture}
          <a href="{$gCalendar}">{ts}Add event to Google Calendar{/ts}</a>
        </td>
      </tr>
+     {/if}
      {/if}
 
      {if {contact.email|boolean}}
