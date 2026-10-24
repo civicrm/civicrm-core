@@ -37,6 +37,18 @@ trait LookupHelperTrait {
   }
 
   /**
+   * Get the id of a dedupe rule group.
+   *
+   * @param string $name
+   *   e.g. 'IndividualSupervised'.
+   *
+   * @return int
+   */
+  protected function getDedupeRuleGroupID(string $name): int {
+    return (int) \CRM_Core_DAO::getFieldValue('CRM_Dedupe_DAO_DedupeRuleGroup', $name, 'id', 'name');
+  }
+
+  /**
    * Get the id of a financial account.
    *
    * @param string $name
