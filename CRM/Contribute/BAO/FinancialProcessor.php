@@ -105,6 +105,9 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $this->saveLineItemsWithNoFinancialTransaction();
       return $params;
     }
+    if ($this->getOriginalContributionStatus() === 'Partially paid' && $this->isCompletedTransaction()) {
+      CRM_Core_Error::deprecatedWarning('updating partially paid to completed without going through the payment api is deprecated and will create incorrect financial records');
+    }
     $trxnParams = $this->getTrxnParams();
     $params['trxnParams'] = $trxnParams;
     $params['trxnParams']['total_amount'] = $trxnParams['total_amount'] = $params['total_amount'] = $this->getOriginalContribution()->total_amount;
@@ -884,35 +887,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @param array $params
    */
   private function updateFinancialAccountsOnContributionStatusChange(&$params): void {
-    $previousContributionStatus = $this->getOriginalContributionStatus();
-    $currentContributionStatus = $this->getUpdatedContributionStatus();
-
-    // Partially paid -> Completed reaches here via a direct (non-Payment.create) status
-    // update, eg. the back-office contribution form - CRM_Member_Form_MembershipTest::
-    // testSubmitUpdateMembershipFromPartiallyPaid() exercises it. Returning early leaves
-    // the remaining balance unposted - assuming that it has been otherwise dealt with.
-    if ($previousContributionStatus === 'Partially paid' && $this->isCompletedTransaction()) {
-      return;
-    }
-
-    if ($this->isContributionUpdateARefund()) {
-      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-      $params['trxnParams']['total_amount'] = -$params['total_amount'];
-    }
-    elseif (($previousContributionStatus === 'Pending'
-        && $this->getOriginalContribution()->is_pay_later) || $previousContributionStatus === 'In Progress'
-    ) {
-      if ($currentContributionStatus === 'Cancelled') {
-        // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-        $params['trxnParams']['to_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
-        $params['trxnParams']['total_amount'] = -$params['total_amount'];
-      }
-      else {
-        // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-        $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
-      }
-    }
-
     if ($this->isOriginalStatusPending() && $this->isCompletedTransaction()
     ) {
       if ($this->isRecordAccountsReceivable() && !$this->getOriginalContributionValue('is_pay_later')) {
@@ -945,6 +919,59 @@ class CRM_Contribute_BAO_FinancialProcessor {
         }
       }
       return;
+    }
+
+    $isCancellingFromPayLaterOrInProgress = (($this->getOriginalContributionStatus() === 'Pending'
+        && $this->getOriginalContribution()->is_pay_later) || $this->getOriginalContributionStatus() === 'In Progress')
+      && $this->getUpdatedContributionStatus() === 'Cancelled';
+
+    if ($this->isContributionUpdateARefund() || $isCancellingFromPayLaterOrInProgress) {
+      $this->updateFinancialAccountsOnContributionStatusReversal($params);
+    }
+    else {
+      $this->updateFinancialAccountsOnContributionStatusChangeToNonCoreStatus($params);
+    }
+  }
+
+  /**
+   * Reverse the posting for a contribution moving to a negative status -
+   * Refunded/Chargeback/Cancelled from Completed, or Cancelled from a
+   * Pending(pay_later)/In Progress Accounts Receivable posting.
+   *
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function updateFinancialAccountsOnContributionStatusReversal(&$params): void {
+    if ($this->isContributionUpdateARefund()) {
+      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+      $params['trxnParams']['total_amount'] = -$params['total_amount'];
+    }
+    else {
+      // Must be the Cancelled-from-pay_later/In Progress case, per the caller's condition.
+      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+      $params['trxnParams']['to_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
+      $params['trxnParams']['total_amount'] = -$params['total_amount'];
+    }
+    $this->updateFinancialAccounts($params['trxnParams'], 'changedStatus');
+  }
+
+  /**
+   * Handle a contribution status change that isn't a reversal and isn't the
+   * Pending/In Progress -> Completed path - ie. a transition this class has
+   * no specific handling for, which in practice means a transition to a
+   * site's own custom (non-reserved) contribution status.
+   *
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function updateFinancialAccountsOnContributionStatusChangeToNonCoreStatus(&$params): void {
+    if (($this->getOriginalContributionStatus() === 'Pending' && $this->getOriginalContribution()->is_pay_later)
+      || $this->getOriginalContributionStatus() === 'In Progress'
+    ) {
+      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+      $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
     }
     $this->updateFinancialAccounts($params['trxnParams'], 'changedStatus');
   }
