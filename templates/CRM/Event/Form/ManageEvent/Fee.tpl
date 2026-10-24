@@ -209,7 +209,7 @@
     {/if}
     {literal}
 
-    if ( document.getElementsByName('is_monetary')[0].checked ) {
+    if ( document.querySelector('[name="is_monetary"][type="checkbox"]').checked ) {
         cj('#event-fees').show();
     }
 
