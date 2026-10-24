@@ -85,6 +85,18 @@ trait LookupHelperTrait {
   }
 
   /**
+   * Get the id of a profile (UFGroup).
+   *
+   * @param string $name
+   *   e.g. 'name_and_address'.
+   *
+   * @return int
+   */
+  protected function getProfileID(string $name): int {
+    return (int) \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $name, 'id', 'name');
+  }
+
+  /**
    * Get the id of the price field of the default contribution price set.
    *
    * @return int
