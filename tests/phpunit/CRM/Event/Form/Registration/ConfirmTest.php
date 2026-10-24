@@ -220,15 +220,15 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
       'payment_processor_id' => 0,
       $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_free'],
-    ], $event['id'])
-      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+    ], $event['id'], '', [
+      [
         'first_name' => 'Pat',
         'last_name' => 'Participant',
         'email-Primary' => 'pat@example.com',
         'priceSetId' => $this->getPriceSetID('PaidEvent'),
         $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_free'],
-      ])
-      ->processForm();
+      ],
+    ])->processForm();
 
     $sources = array_unique(Participant::get(FALSE)->addSelect('source')->execute()->column('source'));
     $this->assertEquals(['Online Event Registration: ' . $event['title']], $sources);
@@ -412,8 +412,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
       'payment_processor_id' => 0,
       $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_standard'],
-    ], $event['id'])
-      ->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', [
+    ], $event['id'], '', [
+      [
         'first_name' => 'Pat',
         'last_name' => 'Participant',
         'email-Primary' => 'pat@example.com',
@@ -423,8 +423,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         // AdditionalParticipant::buildQuickForm()) - the price selection
         // above must be dropped entirely, not just excluded from the total.
         '_qf_Participant_1_next_skip' => 'Skip Participant',
-      ])
-      ->processForm();
+      ],
+    ])->processForm();
 
     $this->callAPISuccessGetCount('Participant', [], 1);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['return' => ['total_amount', 'amount_level']]);
@@ -1139,18 +1139,24 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @param array $submittedValues
    * @param int $eventID
    * @param string $mode
+   * @param array $additionalParticipantValues
+   *   Submitted values for each additional participant, in order - these
+   *   must run before Confirm, matching the real wizard.
    *
    * @return \Civi\Test\FormWrappers\EventFormOnline
    */
-  public function getFormWrapper(array $submittedValues, int $eventID, string $mode = '') {
+  public function getFormWrapper(array $submittedValues, int $eventID, string $mode = '', array $additionalParticipantValues = []) {
     $urlParameters = ['id' => $eventID];
     if ($mode !== '') {
       $urlParameters['mode'] = $mode;
     }
-    return $this->getTestForm('CRM_Event_Form_Registration_Register',
+    $form = $this->getTestForm('CRM_Event_Form_Registration_Register',
       $submittedValues,
-      $urlParameters)
-      ->addSubsequentForm('CRM_Event_Form_Registration_Confirm');
+      $urlParameters);
+    foreach ($additionalParticipantValues as $participantValues) {
+      $form->addSubsequentForm('CRM_Event_Form_Registration_AdditionalParticipant', $participantValues);
+    }
+    return $form->addSubsequentForm('CRM_Event_Form_Registration_Confirm');
   }
 
   /**
