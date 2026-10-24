@@ -359,7 +359,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'temp name'");
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
 
-    $contactId = $this->individualCreate(['address' => [['street_address' => '27 Cool way', 'location_type_id' => 1]]]);
+    $contactId = $this->individualCreate(['address' => [['street_address' => '27 Cool way', 'location_type_id' => $this->getLocationTypeID('Home')]]]);
     $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactId]);
     $this->assertEquals('Anthony', $contact['first_name']);
     $this->assertEquals('anthony_anderson@civicrm.org', $contact['email']);
@@ -370,8 +370,8 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'create', [
       'id' => $contactId,
       'first_name' => 'Dopey',
-      'address' => [['street_address' => '25 Dorky way', 'location_type_id' => 1]],
-      'email' => ['email' => ['email' => 'dopey@mail.com', 'location_type_id' => 1]],
+      'address' => [['street_address' => '25 Dorky way', 'location_type_id' => $this->getLocationTypeID('Home')]],
+      'email' => ['email' => ['email' => 'dopey@mail.com', 'location_type_id' => $this->getLocationTypeID('Home')]],
       'api.contribution.create' => ['financial_type_id' => 'Donation', 'receive_date' => 'now', 'total_amount' => 10],
     ]);
     $contact = $this->callAPISuccessGetSingle('contact', ['id' => $contactId, 'return' => ['first_name', 'email', 'modified_date', 'street_address']]);

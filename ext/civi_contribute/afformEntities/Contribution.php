@@ -11,7 +11,7 @@ return [
   'defaults' => "{
     data: {
       contact_id: 'user_contact_id',
-      financial_type_id: 1
+      'financial_type_id:name': 'Donation'
     },
     actions: {
       create: true,

@@ -96,7 +96,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'member_of_contact_id' => $organizationContactID,
       'period_type' => 'fixed',
       'duration_interval' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'relationship_type_id' => $this->ids['RelationshipType']['Test Employee of'],
       'visibility' => 'Public',
       'is_active' => 1,

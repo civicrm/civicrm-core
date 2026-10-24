@@ -576,7 +576,7 @@ contribution_recur.failure_count :0
 contribution_recur.failure_retry_date :January 3rd, 2020
 contribution_recur.auto_renew:label :Yes
 contribution_recur.payment_processor_id :' . $this->contributionRecur['payment_processor_id'] . '
-contribution_recur.financial_type_id :2
+contribution_recur.financial_type_id :' . $this->getFinancialTypeID('Member Dues') . '
 contribution_recur.payment_instrument_id :4
 contribution_recur.is_email_receipt:label :Yes
 contribution_recur.frequency_unit:label :year

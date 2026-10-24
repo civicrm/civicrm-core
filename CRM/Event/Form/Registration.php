@@ -883,8 +883,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       $participantRecord = $this->getSubmittedParticipantValues($participantNum);
       $participantRecord['contactID'] = $contactID;
 
-      if (array_key_exists('email-5', $participantRecord)) {
-        $mail = 'email-5';
+      $billingEmail = 'email-' . CRM_Core_BAO_LocationType::getBilling();
+      if (array_key_exists($billingEmail, $participantRecord)) {
+        $mail = $billingEmail;
       }
       else {
         foreach ($participantRecord as $name => $dontCare) {

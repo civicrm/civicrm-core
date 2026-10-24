@@ -39,7 +39,7 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
 
     $params = [
       'title' => 'Test Contribution Page',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'is_for_organization' => 0,
       'for_organization' => ' I am contributing on behalf of an organization',
       'goal_amount' => '400',

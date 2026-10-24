@@ -284,10 +284,11 @@ class PropertyBag implements \ArrayAccess {
       return $prop;
     }
     // Handling for legacy addition of billing details.
-    if ($newName === NULL && substr($prop, -2) === '-' . \CRM_Core_BAO_LocationType::getBilling()
-      && isset(static::$propMap[substr($prop, 0, -2)])
+    $billingSuffix = '-' . \CRM_Core_BAO_LocationType::getBilling();
+    if ($newName === NULL && str_ends_with($prop, $billingSuffix)
+      && isset(static::$propMap[substr($prop, 0, -strlen($billingSuffix))])
     ) {
-      $billingAddressProp = substr($prop, 0, -2);
+      $billingAddressProp = substr($prop, 0, -strlen($billingSuffix));
       $newName = static::$propMap[$billingAddressProp] ?? NULL;
       if ($newName === TRUE) {
         // Good, modern name.

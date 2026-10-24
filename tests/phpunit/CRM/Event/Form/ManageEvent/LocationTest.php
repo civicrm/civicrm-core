@@ -55,14 +55,14 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
           'geo_code_1' => '18.219023',
           'geo_code_2' => '-105.00973',
           'is_primary' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
       'email' => [
         '1' => [
           'email' => 'john.smith@example.org',
           'is_primary' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
       'phone' => [
@@ -70,12 +70,12 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
           'phone_type_id' => 1,
           'phone' => '303443689',
           'is_primary' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
         '2' => [
           'phone_type_id' => 2,
           'phone' => '9833910234',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
     ], $eventID);
@@ -91,7 +91,7 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
 
     $this->assertEquals([
       'id' => $address['id'],
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'is_billing' => '0',
       'street_address' => 'Saint Helier St',

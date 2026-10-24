@@ -37,6 +37,18 @@ trait LookupHelperTrait {
   }
 
   /**
+   * Get the id of a location type.
+   *
+   * @param string $name
+   *   e.g. 'Home'.
+   *
+   * @return int
+   */
+  protected function getLocationTypeID(string $name): int {
+    return (int) \CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $name);
+  }
+
+  /**
    * Get the id of a participant status.
    *
    * @param string $name

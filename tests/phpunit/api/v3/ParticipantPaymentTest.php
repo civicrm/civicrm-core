@@ -126,7 +126,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     // create contribution w/o fee
     $contributionID = $this->contributionCreate([
       'contact_id' => $this->contactID,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_instrument_id' => 4,
       'fee_amount' => 0,
       'net_amount' => 100,
@@ -158,7 +158,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'contact_id' => $this->contactID,
       'contribution_page_id' => $contributionPage['id'],
       'payment_processor' => $pageParams['processor_id'],
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
     $contributionID = $this->contributionCreate($contributionParams);
 
@@ -189,7 +189,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       'contribution_page_id' => $contributionPage['id'],
       'contribution_status_id' => 2,
       'is_pay_later' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
     $contributionID = $this->contributionCreate($contributionParams);
 

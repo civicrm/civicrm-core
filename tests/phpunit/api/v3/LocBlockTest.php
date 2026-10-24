@@ -38,12 +38,12 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
     ]);
     $phone = $this->callAPISuccess('phone', 'create', [
       'contact_id' => 'null',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone' => '1234567',
     ]);
     $address = $this->callAPISuccess('address', 'create', [
       'contact_id' => 'null',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'street_address' => '1234567',
     ]);
     $params = [
@@ -64,19 +64,19 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
   public function testCreateLocBlockEntities(): void {
     $params = [
       'email' => [
-        'location_type_id' => 1,
+        'location_type_id' => $this->getLocationTypeID('Home'),
         'email' => 'test2@loc.block',
       ],
       'phone' => [
-        'location_type_id' => 1,
+        'location_type_id' => $this->getLocationTypeID('Home'),
         'phone' => '987654321',
       ],
       'phone_2' => [
-        'location_type_id' => 1,
+        'location_type_id' => $this->getLocationTypeID('Home'),
         'phone' => '456-7890',
       ],
       'address' => [
-        'location_type_id' => 1,
+        'location_type_id' => $this->getLocationTypeID('Home'),
         'street_address' => '987654321',
       ],
     ];

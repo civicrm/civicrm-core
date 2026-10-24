@@ -97,6 +97,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Test getting multiple profiles.
    */
   public function testProfileGetMultiple(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $profileFieldValues = $this->createIndividualContact();
     $expected = reset($profileFieldValues);
     $contactId = key($profileFieldValues);
@@ -115,13 +116,13 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'billing_first_name' => 'abc1',
       'billing_middle_name' => 'J.',
       'billing_last_name' => 'xyz1',
-      'billing_street_address-5' => '5 Saint Helier St',
-      'billing_city-5' => 'Gotham City',
-      'billing_state_province_id-5' => '1021',
-      'billing_country_id-5' => '1228',
-      'billing_postal_code-5' => '90210',
-      'billing-email-5' => 'abc1.xyz1@yahoo.com',
-      'email-5' => 'abc1.xyz1@yahoo.com',
+      "billing_street_address-$billingLocationTypeID" => '5 Saint Helier St',
+      "billing_city-$billingLocationTypeID" => 'Gotham City',
+      "billing_state_province_id-$billingLocationTypeID" => '1021',
+      "billing_country_id-$billingLocationTypeID" => '1228',
+      "billing_postal_code-$billingLocationTypeID" => '90210',
+      "billing-email-$billingLocationTypeID" => 'abc1.xyz1@yahoo.com',
+      "email-$billingLocationTypeID" => 'abc1.xyz1@yahoo.com',
     ], $result['Billing']);
   }
 
@@ -129,12 +130,13 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Test getting billing profile filled using is_billing.
    */
   public function testProfileGetBillingUseIsBillingLocation(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $individual = $this->createIndividualContact();
     $contactId = key($individual);
     $this->callAPISuccess('address', 'create', [
       'is_billing' => 1,
       'street_address' => 'is billing st',
-      'location_type_id' => 2,
+      'location_type_id' => $this->getLocationTypeID('Work'),
       'contact_id' => $contactId,
     ]);
 
@@ -149,13 +151,13 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'billing_first_name' => 'abc1',
       'billing_middle_name' => 'J.',
       'billing_last_name' => 'xyz1',
-      'billing_street_address-5' => 'is billing st',
-      'billing_city-5' => '',
-      'billing_state_province_id-5' => '',
-      'billing_country_id-5' => '',
-      'billing-email-5' => 'abc1.xyz1@yahoo.com',
-      'email-5' => 'abc1.xyz1@yahoo.com',
-      'billing_postal_code-5' => '',
+      "billing_street_address-$billingLocationTypeID" => 'is billing st',
+      "billing_city-$billingLocationTypeID" => '',
+      "billing_state_province_id-$billingLocationTypeID" => '',
+      "billing_country_id-$billingLocationTypeID" => '',
+      "billing-email-$billingLocationTypeID" => 'abc1.xyz1@yahoo.com',
+      "email-$billingLocationTypeID" => 'abc1.xyz1@yahoo.com',
+      "billing_postal_code-$billingLocationTypeID" => '',
     ], $result['Billing']);
   }
 
@@ -163,18 +165,19 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Test getting multiple profiles, including billing.
    */
   public function testProfileGetMultipleHasBillingLocation(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $individual = $this->createIndividualContact();
     $contactId = key($individual);
     $this->callAPISuccess('address', 'create', [
       'contact_id' => $contactId,
       'street_address' => '25 Big Street',
       'city' => 'big city',
-      'location_type_id' => 5,
+      'location_type_id' => $this->getLocationTypeID('Billing'),
     ]);
     $this->callAPISuccess('email', 'create', [
       'contact_id' => $contactId,
       'email' => 'big@once.com',
-      'location_type_id' => 2,
+      'location_type_id' => $this->getLocationTypeID('Work'),
       'is_billing' => 1,
     ]);
 
@@ -189,13 +192,13 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'billing_first_name' => 'abc1',
       'billing_middle_name' => 'J.',
       'billing_last_name' => 'xyz1',
-      'billing_street_address-5' => '25 Big Street',
-      'billing_city-5' => 'big city',
-      'billing_state_province_id-5' => '',
-      'billing_country_id-5' => '',
-      'billing-email-5' => 'big@once.com',
-      'email-5' => 'big@once.com',
-      'billing_postal_code-5' => '',
+      "billing_street_address-$billingLocationTypeID" => '25 Big Street',
+      "billing_city-$billingLocationTypeID" => 'big city',
+      "billing_state_province_id-$billingLocationTypeID" => '',
+      "billing_country_id-$billingLocationTypeID" => '',
+      "billing-email-$billingLocationTypeID" => 'big@once.com',
+      "email-$billingLocationTypeID" => 'big@once.com',
+      "billing_postal_code-$billingLocationTypeID" => '',
     ], $result['values']['Billing']);
   }
 
@@ -204,6 +207,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    *
    */
   public function testProfileGetBillingEmptyContact(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->callAPISuccess('Setting', 'create', ['defaultContactCountry' => 1228]);
     $params = [
       'profile_id' => ['Billing'],
@@ -214,13 +218,13 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'billing_first_name' => '',
       'billing_middle_name' => '',
       'billing_last_name' => '',
-      'billing_street_address-5' => '',
-      'billing_city-5' => '',
-      'billing_state_province_id-5' => '',
-      'billing_country_id-5' => '1228',
-      'billing_email-5' => '',
-      'email-5' => '',
-      'billing_postal_code-5' => '',
+      "billing_street_address-$billingLocationTypeID" => '',
+      "billing_city-$billingLocationTypeID" => '',
+      "billing_state_province_id-$billingLocationTypeID" => '',
+      "billing_country_id-$billingLocationTypeID" => '1228',
+      "billing_email-$billingLocationTypeID" => '',
+      "email-$billingLocationTypeID" => '',
+      "billing_postal_code-$billingLocationTypeID" => '',
     ], $result['Billing']);
   }
 
@@ -287,6 +291,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Check getfields works & gives us our fields
    */
   public function testGetFields(): void {
+    $homeLocationTypeID = $this->getLocationTypeID('Home');
     $ufGroupParams = [
       'group_type' => 'Individual,Contact',
       'title' => 'Flat Coffee',
@@ -321,7 +326,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
           'visibility' => 'Public Pages and Listings',
           'field_type' => 'Contact',
           'phone_type_id' => 2,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'label' => 'Phone',
         ],
         [
@@ -337,14 +342,14 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
           'is_required' => 1,
           'visibility' => 'Public Pages and Listings',
           'field_type' => 'Contact',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'label' => 'State Province',
         ],
         [
           'field_name' => 'postal_code',
           'is_required' => 0,
           'field_type' => 'Contact',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'label' => 'State Province',
         ],
         [
@@ -376,8 +381,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertEquals('2', $result['values']['first_name']['type']);
     $this->assertEquals('Email', $result['values']['email-primary']['title']);
     $this->assertEquals('phone', $result['values']['phone-primary-1']['entity']);
-    $this->assertEquals('phone', $result['values']['phone_and_ext-1-2']['entity']);
-    $this->assertEquals('civicrm_state_province', $result['values']['state_province-1']['pseudoconstant']['table']);
+    $this->assertEquals('phone', $result['values']["phone_and_ext-$homeLocationTypeID-2"]['entity']);
+    $this->assertEquals('civicrm_state_province', $result['values']["state_province-$homeLocationTypeID"]['pseudoconstant']['table']);
     $this->assertEquals('defaultValue', $result['values']['custom_' . $customFieldID]['default_value']);
     $this->assertArrayNotHasKey('participant_status', $result['values']);
     $this->assertEquals('website', $result['values']['url-1']['entity']);
@@ -439,14 +444,15 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Check with missing required field in profile.
    */
   public function testProfileSubmitCheckProfileRequired(): void {
+    $homeLocationTypeID = $this->getLocationTypeID('Home');
     $profileFieldValues = $this->createIndividualContact();
     $contactId = key($profileFieldValues);
     $updateParams = [
       'first_name' => 'abc2',
       'last_name' => 'xyz2',
-      'phone-1-1' => '022 321 826',
-      'country-1' => '1013',
-      'state_province-1' => '1000',
+      "phone-$homeLocationTypeID-1" => '022 321 826',
+      "country-$homeLocationTypeID" => '1013',
+      "state_province-$homeLocationTypeID" => '1000',
     ];
 
     $params = array_merge([
@@ -465,6 +471,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Check with success.
    */
   public function testProfileSubmit(): void {
+    $homeLocationTypeID = $this->getLocationTypeID('Home');
     $profileFieldValues = $this->createIndividualContact();
     $contactId = key($profileFieldValues);
 
@@ -503,9 +510,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'first_name' => 'abc2',
       'last_name' => 'xyz2',
       'email-primary' => 'abc2.xyz2@gmail.com',
-      'phone-1-1' => '022 321 826',
-      'country-1' => '1013',
-      'state_province-1' => '1000',
+      "phone-$homeLocationTypeID-1" => '022 321 826',
+      "country-$homeLocationTypeID" => '1013',
+      "state_province-$homeLocationTypeID" => '1000',
       'city-primary' => 'Somewhere',
       'url-1' => 'http://example.com',
       'im-primary' => 'abc2xyz2',
@@ -588,7 +595,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->_contactID = $this->individualCreate();
     $this->callAPIV3Success('profile', 'submit', [
       'profile_id' => 'membership_batch_entry',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'membership_type' => $this->_membershipTypeID,
       'join_date' => 'now',
       'total_amount' => 10,
@@ -602,7 +609,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_contactID]);
     $this->assertEquals(10, $contribution['total_amount']);
-    $this->assertEquals(1, $contribution['financial_type_id']);
+    $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
     // contribution_status_id => 1 (Completed) was requested; since Order::create()
     // always creates a Pending contribution, submit() should have recorded a
     // Payment to bring it to Completed.
@@ -681,6 +688,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Check with success.
    */
   public function testProfileApply(): void {
+    $homeLocationTypeID = $this->getLocationTypeID('Home');
     $profileFieldValues = $this->createIndividualContact();
     $contactId = key($profileFieldValues);
 
@@ -690,9 +698,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'first_name' => 'abc2',
       'last_name' => 'xyz2',
       'email-Primary' => 'abc2.xyz2@gmail.com',
-      'phone-1-1' => '022 321 826',
-      'country-1' => '1013',
-      'state_province-1' => '1000',
+      "phone-$homeLocationTypeID-1" => '022 321 826',
+      "country-$homeLocationTypeID" => '1013',
+      "state_province-$homeLocationTypeID" => '1000',
     ];
 
     $result = $this->callAPIV3Success('profile', 'apply', $params);
@@ -705,19 +713,19 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'last_name' => 'xyz2',
     ];
     $expected['email'] = [
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
       'email' => 'abc2.xyz2@gmail.com',
     ];
 
     $expected['phone'] = [
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
       'phone_type_id' => 1,
       'phone' => '022 321 826',
     ];
     $expected['address'] = [
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
       'country_id' => 1013,
       'state_province_id' => 1000,
@@ -849,12 +857,13 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * @return array
    */
   public function createIndividualContact(array $params = []): array {
+    $homeLocationTypeID = $this->getLocationTypeID('Home');
     $contactParams = array_merge([
       'first_name' => 'abc1',
       'last_name' => 'xyz1',
       'email' => 'abc1.xyz1@yahoo.com',
       'api.address.create' => [
-        'location_type_id' => 1,
+        'location_type_id' => $this->getLocationTypeID('Home'),
         'is_primary' => 1,
         'street_address' => '5 Saint Helier St',
         'county' => 'Marin',
@@ -868,7 +877,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
         'is_billing' => 0,
       ],
       'api.phone.create' => [
-        'location_type_id' => '1',
+        'location_type_id' => $this->getLocationTypeID('Home'),
         'phone' => '021 512 755',
         'phone_type_id' => '1',
         'is_primary' => '1',
@@ -882,9 +891,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'first_name' => 'abc1',
       'last_name' => 'xyz1',
       'email-primary' => 'abc1.xyz1@yahoo.com',
-      'phone-1-1' => '021 512 755',
-      'country-1' => '1228',
-      'state_province-1' => '1021',
+      "phone-$homeLocationTypeID-1" => '021 512 755',
+      "country-$homeLocationTypeID" => '1228',
+      "state_province-$homeLocationTypeID" => '1021',
     ];
 
     return $profileData;
@@ -980,7 +989,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'email' => 'abc1.xyz1@yahoo.com',
       'api.address.create' => [
-        'location_type_id' => 1,
+        'location_type_id' => $this->getLocationTypeID('Home'),
         'is_primary' => 1,
         'name' => 'Saint Helier St',
         'county' => 'Marin',
@@ -1074,7 +1083,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
           'is_required' => 1,
           'visibility' => 'Public Pages and Listings',
           'field_type' => 'Contact',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'phone_type_id' => 1,
           'label' => 'Phone',
         ],
@@ -1083,7 +1092,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
           'is_required' => 1,
           'visibility' => 'Public Pages and Listings',
           'field_type' => 'Contact',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'label' => 'Country',
         ],
         [
@@ -1091,14 +1100,14 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
           'is_required' => 1,
           'visibility' => 'Public Pages and Listings',
           'field_type' => 'Contact',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'label' => 'State Province',
         ],
         [
           'field_name' => 'postal_code',
           'is_required' => 0,
           'field_type' => 'Contact',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'label' => 'State Province',
         ],
       ],

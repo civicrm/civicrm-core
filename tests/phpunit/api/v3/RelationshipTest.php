@@ -1101,7 +1101,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $relatedMembershipType = $this->callAPISuccess('MembershipType', 'create', [
       'name' => 'Membership with Related',
       'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'minimum_fee' => 0.00,
       'duration_unit' => 'year',
       'duration_interval' => 1,

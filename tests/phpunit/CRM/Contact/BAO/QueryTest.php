@@ -358,11 +358,11 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', [
       'contact_id' => $contactID,
       'city' => 'Cool City',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ]);
     $params = [
       0 => [
-        0 => 'city-1',
+        0 => 'city-' . $this->getLocationTypeID('Home'),
         1 => '=',
         2 => 'Cool City',
         3 => 1,
@@ -414,7 +414,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       'field_name' => 'phone',
       'is_required' => FALSE,
       'visibility' => 'Public Pages and Listings',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone_type_id' => 1,
       'label' => 'Phone-Phone (Primary)',
       'field_type' => 'Contact',
@@ -497,11 +497,11 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', [
       'contact_id' => $contactID,
       'city' => 'Cool City',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ]);
     $params = [
       0 => [
-        0 => 'city-1',
+        0 => 'city-' . $this->getLocationTypeID('Home'),
         1 => '=',
         2 => 'Dumb City',
         3 => 1,
@@ -591,7 +591,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $params = [
       0 => [
-        0 => 'state_province-4',
+        0 => 'state_province-' . $this->getLocationTypeID('Other'),
         1 => 'IS NOT EMPTY',
         2 => '',
         3 => 1,
@@ -604,7 +604,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       'sort_name' => 1,
       'location' => [
         'other' => [
-          'location_type' => 4,
+          'location_type' => $this->getLocationTypeID('Other'),
           'state_province' => 1,
         ],
       ],
@@ -614,7 +614,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     // the display_name. Plain SQL however does the job
     CRM_Core_DAO::executeQuery('update civicrm_location_type set name=%2 where id=%1',
       [
-        1 => [4, 'Integer'],
+        1 => [$this->getLocationTypeID('Other'), 'Integer'],
         2 => ['other', 'String'],
       ]);
 
@@ -645,7 +645,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       'contact_id' => $contactID,
       'city' => 'Cool CITY',
       'street_address' => 'Long STREET',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ]);
     $returnProperties = [
       'contact_type' => 1,

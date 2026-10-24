@@ -331,7 +331,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $this->assertCount(4, $result);
 
     $params['savedSearch'] = 'TestSearchForEmail';
-    $params['filters'] = ['location_type_id' => 1, 'contact_id.display_name' => __FUNCTION__];
+    $params['filters'] = ['location_type_id' => $this->getLocationTypeID('Home'), 'contact_id.display_name' => __FUNCTION__];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result);
 
@@ -342,7 +342,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
 
     // No filters will work; they are in the fieldset belonging to the non-default display
     $params['savedSearch'] = 'TestContactEmailSearch';
-    $params['filters'] = ['source' => 'afform_multi_test', 'Contact_Email_contact_id_01.location_type_id' => 1];
+    $params['filters'] = ['source' => 'afform_multi_test', 'Contact_Email_contact_id_01.location_type_id' => $this->getLocationTypeID('Home')];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertGreaterThanOrEqual(3, $result->count());
 

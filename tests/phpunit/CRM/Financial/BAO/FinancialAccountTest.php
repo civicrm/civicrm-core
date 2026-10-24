@@ -140,7 +140,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
    * Test getting financial account for a given financial Type with a particular relationship.
    */
   public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltIn(): void {
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Income Account is'));
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Income Account is'));
   }
 
   /**
@@ -157,7 +157,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
       'label' => 'Changed label',
     ]);
     // run test
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Income Account is'));
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Income Account is'));
     // restore label
     $this->callAPISuccess('OptionValue', 'create', [
       'id' => $optionValue['id'],
@@ -169,7 +169,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
    * Test getting financial account for a given financial Type with a particular relationship.
    */
   public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInRefunded(): void {
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Credit/Contra Revenue Account is'));
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Credit/Contra Revenue Account is'));
   }
 
   /**
@@ -186,7 +186,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
       'label' => 'Changed label',
     ]);
     // run test
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Credit/Contra Revenue Account is'));
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Credit/Contra Revenue Account is'));
     // restore label
     $this->callAPISuccess('OptionValue', 'create', [
       'id' => $optionValue['id'],
@@ -198,7 +198,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
    * Test getting financial account for a given financial Type with a particular relationship.
    */
   public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInChargeBack(): void {
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Chargeback Account is'));
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Chargeback Account is'));
   }
 
   /**
@@ -215,7 +215,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
       'label' => 'Changed label',
     ]);
     // run test
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Chargeback Account is'));
+    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Chargeback Account is'));
     // restore label
     $this->callAPISuccess('OptionValue', 'create', [
       'id' => $optionValue['id'],
@@ -233,13 +233,13 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
     ]);
 
     $this->callAPISuccess('EntityFinancialAccount', 'create', [
-      'entity_id' => 2,
+      'entity_id' => $this->getFinancialTypeID('Member Dues'),
       'entity_table' => 'civicrm_financial_type',
       'account_relationship' => 'Credit/Contra Revenue Account is',
       'financial_account_id' => 'Refund Account',
     ]);
     $this->assertEquals($financialAccount['id'],
-      CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(2, 'Credit/Contra Revenue Account is'));
+      CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Credit/Contra Revenue Account is'));
   }
 
   /**
@@ -319,7 +319,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
       'contact_id' => $cid,
       'receive_date' => '2016-01-20',
       'total_amount' => 100,
-      'financial_type_id' => 4,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'revenue_recognition_date' => date('Ymd', strtotime("+1 month")),
       'line_items' => [
         [
@@ -332,7 +332,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
               'qty' => 1,
               'unit_price' => 100,
               'line_total' => 100,
-              'financial_type_id' => 4,
+              'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
             ],
             [
               'entity_table' => 'civicrm_contribution',
@@ -342,7 +342,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
               'qty' => 1,
               'unit_price' => 200,
               'line_total' => 200,
-              'financial_type_id' => 4,
+              'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
             ],
           ],
         ],
@@ -358,7 +358,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
       'contact_id' => $cid,
       'receive_date' => '2016-01-20',
       'total_amount' => 100,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'revenue_recognition_date' => date('Ymd', strtotime("+1 month")),
     ];
     try {

@@ -48,7 +48,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => $contactID,
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -121,7 +121,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => $this->ids['Contact']['individual_0'],
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -216,7 +216,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -315,7 +315,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = [
       'contact_id' => $this->ids['Contact']['individual_0'],
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -364,7 +364,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $contributionParams = [
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -406,7 +406,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $param = [
       'contact_id' => $this->individualCreate(),
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -441,7 +441,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $contributionID = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->individualCreate(),
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -476,7 +476,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 2,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -564,7 +564,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $priceField = CRM_Price_BAO_PriceField::create($paramsField);
     $eventParams = [
       'id' => $this->getEventID(),
-      'financial_type_id' => 4,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'is_monetary' => 1,
     ];
     CRM_Event_BAO_Event::create($eventParams);
@@ -572,7 +572,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
     $priceFields = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField->id]);
     $participantParams = [
-      'financial_type_id' => 4,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'event_id' => $this->getEventID(),
       'role_id' => 1,
       'status_id' => 14,
@@ -584,7 +584,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'total_amount' => 300,
       'currency' => 'USD',
       'contact_id' => $this->ids['Contact']['individual_0'],
-      'financial_type_id' => 4,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'contribution_status_id' => 'Pending',
       'participant_id' => $participant->id,
       'sequential' => TRUE,
@@ -628,7 +628,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $params = [
       'contact_id' => $this->individualCreate(),
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -678,7 +678,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contact_id' => $contactID,
       'receive_date' => '2010-01-20',
       'total_amount' => 100,
-      'financial_type_id' => 4,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'contribution_status_id' => 'Pending',
     ];
     $order = $this->callAPISuccess('Order', 'create', $params);
@@ -771,7 +771,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $params = [
       'contact_id' => $this->individualCreate(),
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 'Pending',
       'payment_instrument_id' => 1,
       'receive_date' => '20080522000000',

@@ -76,7 +76,7 @@ class FinancialTypeTest extends BaseTestClass {
     $this->assertCount(4, $types);
     $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
     $type = \CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
-    $this->assertEquals([1 => 'Donation'], $type);
+    $this->assertEquals([$this->getFinancialTypeID('Donation') => 'Donation'], $type);
   }
 
   /**

@@ -166,7 +166,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'register_date' => date('Ymd'),
       'payment_processor_id' => 0,
       'record_contribution' => TRUE,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
       $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
       'check_number' => '879',
@@ -253,7 +253,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'register_date' => date('Ymd'),
       'payment_processor_id' => 0,
       'record_contribution' => TRUE,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
       $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
       'check_number' => '879',
@@ -367,7 +367,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'register_date' => date('Ymd'),
       'payment_processor_id' => 0,
       'record_contribution' => TRUE,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
       $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_student'],
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
@@ -466,7 +466,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   public function testSubmitWithPayment(string $thousandSeparator): void {
     $this->setCurrencySeparators($thousandSeparator);
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
-    $form = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
+    $form = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => $this->getFinancialTypeID('Donation')], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
     $this->assertStringContainsStrings($form->getFirstMailBody(), [
       'Junko Adams<br/>',
       '790L Lincoln St S<br />
@@ -516,7 +516,7 @@ United States<br />',
     $this->setCurrencySeparators($thousandSeparator);
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
     System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['payment_status_id' => 'failed']);
-    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
+    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => $this->getFinancialTypeID('Donation')], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
     $this->assertPrematureExit();
   }
 
@@ -536,7 +536,7 @@ United States<br />',
   public function testSubmitWithPendingProcessorPayment(): void {
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
     System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['message' => 'Awaiting bank clearance']);
-    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
+    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => $this->getFinancialTypeID('Donation')], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
 
     $contribution = Contribution::get(FALSE)->addSelect('contribution_status_id:name')->execute()->single();
     $this->assertEquals('Pending', $contribution['contribution_status_id:name']);
@@ -562,7 +562,7 @@ United States<br />',
       'contact_id' => $loggedInContactID,
       'is_primary' => 1,
       'email' => 'testLoggedInReceiptEmail@civicrm.org',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ]);
 
     //Modify html to contain event_type_id token.
@@ -584,7 +584,7 @@ United States<br />',
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
     $submitParams = $this->getSubmitParamsForCreditCardPayment($paymentProcessorID);
     $submitParams['from_email_address'] = $email['id'];
-    $message = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1, 'pay_later_receipt' => 'pay us'], $submitParams, TRUE, 'Live')->getFirstMail();
+    $message = $this->submitForm(['is_monetary' => 1, 'financial_type_id' => $this->getFinancialTypeID('Donation'), 'pay_later_receipt' => 'pay us'], $submitParams, TRUE, 'Live')->getFirstMail();
     $participantID = Participant::get()->addWhere('event_id', '=', $this->getEventID('PaidEvent'))->execute()->first()['id'];
     //Check if type is correctly populated in mails.
     //Also check the string email is present not numeric from.
@@ -731,7 +731,7 @@ London,',
       'total_amount' => 65,
       'payment_processor_id' => 0,
       'record_contribution' => TRUE,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'check_number' => '879',
@@ -751,6 +751,7 @@ London,',
    * @return array
    */
   private function getSubmitParamsForCreditCardPayment(int $paymentProcessorID): array {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     return [
       'register_date' => '2018-09-04',
       'status_id' => $this->getParticipantStatusID('Registered'),
@@ -764,11 +765,11 @@ London,',
       'billing_first_name' => 'Junko',
       'billing_middle_name' => '',
       'billing_last_name' => 'Adams',
-      'billing_street_address-5' => '790L Lincoln St S',
-      'billing_city-5' => 'Baltimore',
-      'billing_state_province_id-5' => 1031,
-      'billing_postal_code-5' => 10545,
-      'billing_country_id-5' => 1228,
+      "billing_street_address-$billingLocationTypeID" => '790L Lincoln St S',
+      "billing_city-$billingLocationTypeID" => 'Baltimore',
+      "billing_state_province_id-$billingLocationTypeID" => 1031,
+      "billing_postal_code-$billingLocationTypeID" => 10545,
+      "billing_country_id-$billingLocationTypeID" => 1228,
       'payment_processor_id' => $paymentProcessorID,
       'from_email_address' => '"FIXME" <info@EXAMPLE.ORG>',
       'send_receipt' => 1,
@@ -784,9 +785,9 @@ London,',
   public function testSubmitWithDeferredRecognition(): void {
     Civi::settings()->set('deferred_revenue_enabled', TRUE);
     $futureDate = ((int) date('Y')) + 1 . '-09-20';
-    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => 1, 'start_date' => $futureDate], [
+    $this->submitForm(['is_monetary' => 1, 'financial_type_id' => $this->getFinancialTypeID('Donation'), 'start_date' => $futureDate], [
       'record_contribution' => TRUE,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     // Api doesn't retrieve it & we don't much want to change that as we want to feature freeze BAO_Query.
@@ -911,7 +912,7 @@ London,',
       'line_total' => '1550.55',
       'participant_count' => '0',
       'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
-      'financial_type_id' => '4',
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'tax_amount' => '0.00',
     ], $lineItem);
 
@@ -1002,7 +1003,7 @@ London,',
       $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
       'check_number' => '879',
       'record_contribution' => '1',
-      'financial_type_id' => '4',
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'receive_date' => '2020-01-31 00:51:00',
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'trxn_id' => '',
