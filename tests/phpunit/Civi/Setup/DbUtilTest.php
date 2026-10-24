@@ -47,6 +47,73 @@ class DbUtilTest extends \CiviUnitTestCase {
   }
 
   /**
+   * @dataProvider serverProvider
+   * @param string $server
+   * @param string $expected
+   */
+  public function testEncodeServer(string $server, string $expected) {
+    $this->assertSame($expected, \Civi\Setup\DbUtil::encodeServer($server));
+  }
+
+  /**
+   * Data provider for testEncodeServer
+   * @return array
+   */
+  public static function serverProvider():array {
+    return [
+      'host only' => ['localhost', 'localhost'],
+      'host and port' => ['localhost:3306', 'localhost:3306'],
+      'host needing encoding' => ['my host:3306', 'my%20host:3306'],
+      'socket is left alone' => ['unix(/var/lib/mysql/mysql.sock)', 'unix(/var/lib/mysql/mysql.sock)'],
+    ];
+  }
+
+  /**
+   * encodeDsn() and parseDsn() must be inverses of each other, and the string
+   * they agree on must also be readable by PEAR::DB at runtime.
+   *
+   * @dataProvider credentialProvider
+   * @param string $username
+   * @param string $password
+   * @param string $database
+   */
+  public function testEncodeDsnRoundTrip(string $username, string $password, string $database) {
+    $db = [
+      'server' => 'db.example.org:3306',
+      'username' => $username,
+      'password' => $password,
+      'database' => $database,
+      'ssl_params' => [],
+    ];
+    $dsn = \Civi\Setup\DbUtil::encodeDsn($db);
+    $this->assertSame($db, \Civi\Setup\DbUtil::parseDsn($dsn));
+
+    $pear = \DB::parseDSN($dsn);
+    $this->assertSame($username, $pear['username']);
+    $this->assertSame($password, $pear['password']);
+    $this->assertSame($database, $pear['database']);
+  }
+
+  /**
+   * Data provider for testEncodeDsnRoundTrip
+   * @return array
+   */
+  public static function credentialProvider():array {
+    return [
+      'plain' => ['civicrm', 'secret', 'civicrm'],
+      'hash' => ['civicrm', 'pa#ss', 'civicrm'],
+      'slash' => ['civicrm', 'pa/ss', 'civicrm'],
+      'question mark' => ['civicrm', 'pa?ss', 'civicrm'],
+      'at sign' => ['civicrm', 'pa@ss', 'civicrm'],
+      'colon' => ['civicrm', 'pa:ss', 'civicrm'],
+      'percent' => ['civicrm', 'pa%ss', 'civicrm'],
+      'space' => ['civicrm', 'pa ss', 'civicrm'],
+      'plus' => ['civicrm', 'pa+ss', 'civicrm'],
+      'special database' => ['civicrm', 'secret', 'db name'],
+    ];
+  }
+
+  /**
    * A well-formed DSN should survive parsing, including the socket notation.
    *
    * @dataProvider wellFormedDsnProvider
@@ -79,6 +146,28 @@ class DbUtilTest extends \CiviUnitTestCase {
           'server' => 'host:3306',
           'username' => 'user',
           'password' => 'pa#ss',
+          'database' => 'db',
+          'ssl_params' => [],
+        ],
+      ],
+      // A literal '+' in a hand-typed DSN means a '+', not a space. parseDsn()
+      // decodes with rawurldecode() to match how PEAR::DB reads it back later.
+      'literal plus in password' => [
+        'mysql://user:pa+ss@host:3306/db',
+        [
+          'server' => 'host:3306',
+          'username' => 'user',
+          'password' => 'pa+ss',
+          'database' => 'db',
+          'ssl_params' => [],
+        ],
+      ],
+      'encoded space in password' => [
+        'mysql://user:pa%20ss@host:3306/db',
+        [
+          'server' => 'host:3306',
+          'username' => 'user',
+          'password' => 'pa ss',
           'database' => 'db',
           'ssl_params' => [],
         ],
