@@ -99,6 +99,31 @@ class AfformPlacementTest extends TestCase implements HeadlessInterface {
     $this->assertEquals(99, $tabs['test3']['weight']);
   }
 
+  public function testContactSummaryTabsFollowSavedAndRevertedForms(): void {
+    $getTabs = function (): array {
+      $tabs = [];
+      $context = ['contact_id' => 0, 'contact_type' => 'Individual', 'caller' => 'UnitTests'];
+      \CRM_Utils_Hook::tabset('civicrm/contact/view', $tabs, $context);
+      return array_column($tabs, 'title', 'id');
+    };
+    Afform::create()
+      ->addValue('name', $this->formNames[0])
+      ->addValue('title', 'Test A')
+      ->addValue('placement', ['contact_summary_tab'])
+      ->execute();
+    $this->assertSame('Test A', $getTabs()['test0'] ?? NULL);
+
+    Afform::create()
+      ->addValue('name', $this->formNames[1])
+      ->addValue('title', 'Test B')
+      ->addValue('placement', ['contact_summary_tab'])
+      ->execute();
+    $this->assertSame('Test B', $getTabs()['test1'] ?? NULL);
+
+    Afform::revert(FALSE)->addWhere('name', '=', $this->formNames[0])->execute();
+    $this->assertArrayNotHasKey('test0', $getTabs());
+  }
+
   public function testAfformContactSummaryBlock(): void {
     $this->saveTestRecords('ContactType', [
       'records' => [
