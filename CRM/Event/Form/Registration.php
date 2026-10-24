@@ -1066,6 +1066,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if (!empty($subscribeGroupIds) && $subscriptionEmail['email']) {
       CRM_Mailing_Event_BAO_MailingEventSubscribe::commonSubscribe($subscribeGroupIds, $subscriptionEmail, $contactID);
     }
+    // lets store the contactID in the session
+    // we dont store in userID in case the user is doing multiple
+    // transactions etc
+    // for things like tell a friend
+    if (!$this->getContactID() && $participantNumber === 0) {
+      CRM_Core_Session::singleton()->set('transaction.userID', $contactID);
+    }
     return $contactID;
   }
 
@@ -2110,7 +2117,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function processRegistration($params) {
-    $session = CRM_Core_Session::singleton();
     $participantInfo = [];
 
     // CRM-4320, lets build array of cancelled additional participant ids
@@ -2149,13 +2155,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
         $contactID = $this->saveContact($contactID, $key);
 
-        // lets store the contactID in the session
-        // we dont store in userID in case the user is doing multiple
-        // transactions etc
-        // for things like tell a friend
-        if (!$this->getContactID() && !empty($value['is_primary'])) {
-          $session->set('transaction.userID', $contactID);
-        }
         $participantNum = $key;
         $participantRecord = $value;
         // add participant record
