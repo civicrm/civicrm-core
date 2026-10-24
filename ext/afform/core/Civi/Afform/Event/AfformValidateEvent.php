@@ -5,15 +5,13 @@ namespace Civi\Afform\Event;
 use Civi\Afform\FormDataModel;
 use Civi\Afform\Utils;
 use Civi\Api4\Action\Afform\Submit;
+use Civi\Api4\Generic\Result;
 
 class AfformValidateEvent extends AfformBaseEvent {
 
-  /**
-   * @var array
-   */
-  private array $errors = [];
-
   private array $entityFieldDefn = [];
+
+  private Result $result;
 
   /**
    * AfformValidateEvent constructor.
@@ -21,9 +19,18 @@ class AfformValidateEvent extends AfformBaseEvent {
    * @param array $afform
    * @param \Civi\Afform\FormDataModel $formDataModel
    * @param \Civi\Api4\Action\Afform\Submit $apiRequest
+   * @param \Civi\Api4\Generic\Result $result
    */
-  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest) {
+  public function __construct(array $afform, FormDataModel $formDataModel, Submit $apiRequest, Result $result) {
     parent::__construct($afform, $formDataModel, $apiRequest);
+    $this->result = $result;
+  }
+
+  /**
+   * @return \Civi\Api4\Generic\Result
+   */
+  public function getResult(): Result {
+    return $this->result;
   }
 
   /**
@@ -36,8 +43,8 @@ class AfformValidateEvent extends AfformBaseEvent {
    * @deprecated
    */
   public function setError(string $errorMsg): void {
-    \CRM_Core_Error::deprecatedFunctionWarning('addError');
-    $this->errors[] = $errorMsg;
+    \CRM_Core_Error::deprecatedFunctionWarning('$this->getResult()->addError()');
+    $this->getResult()->addError($errorMsg);
   }
 
   /**
@@ -46,9 +53,12 @@ class AfformValidateEvent extends AfformBaseEvent {
    * @param string $errorMsg
    *
    * @return void
+   *
+   * @deprecated
    */
   public function addError(string $errorMsg): void {
-    $this->errors[] = $errorMsg;
+    \CRM_Core_Error::deprecatedFunctionWarning('$this->getResult()->addError()');
+    $this->result->addError($errorMsg);
   }
 
   /**
@@ -57,18 +67,24 @@ class AfformValidateEvent extends AfformBaseEvent {
    * @param array $errors
    *
    * @return void
+   *
+   * @deprecated
    */
   public function setErrors(array $errors): void {
-    $this->errors = $errors;
+    \CRM_Core_Error::deprecatedFunctionWarning('$this->getResult()->setErrors()');
+    $this->result->setErrors($errors);
   }
 
   /**
    * Get all errors that have been set by other callers
    *
    * @return array
+   *
+   * @deprecated
    */
   public function getErrors(): array {
-    return $this->errors;
+    \CRM_Core_Error::deprecatedFunctionWarning('$this->getResult()->getErrors()');
+    return $this->result->getErrors();
   }
 
   /**
