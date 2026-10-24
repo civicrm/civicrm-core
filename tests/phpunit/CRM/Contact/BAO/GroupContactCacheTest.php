@@ -248,7 +248,71 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->assertCacheRefreshed($this->ids['Group'][0]);
   }
 
+  /**
+   * Test the cache rebuild job continues after a smart group whose search fails.
+   */
+  public function testJobContinuesAfterBrokenSmartGroup(): void {
+    $brokenSearch = $this->createTestEntity('SavedSearch', [
+      'api_entity' => 'Contact',
+      'api_params' => ['version' => 4, 'select' => ['id'], 'where' => [['no_such_field', '=', 1]]],
+    ], 'broken');
+    $broken = $this->createTestEntity('Group', ['title' => 'Broken', 'saved_search_id' => $brokenSearch['id']], 'broken');
+    [, $deceased] = $this->createLivingDead();
+    $search = $this->createTestEntity('SavedSearch', [
+      'api_entity' => 'Contact',
+      'api_params' => ['version' => 4, 'select' => ['id'], 'where' => [['is_deceased', '=', TRUE]]],
+    ]);
+    $group = $this->createTestEntity('Group', ['title' => 'Deceased', 'saved_search_id' => $search['id']]);
+
+    $this->callApiV3Success('Job', 'group_rebuild', []);
+    $this->assertCacheMatches([], $broken['id']);
+    $this->assertCacheMatches($deceased, $group['id']);
+  }
+
   // *** Everything below this should be moved to parent class ****
+
+  /**
+   * A failing rebuild in load() must not keep the group locked for the process.
+   */
+  public function testLoadReleasesGroupLockAfterError(): void {
+    [$group, , $deceased] = $this->setupSmartGroup();
+    CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($group->id);
+    $this->hookClass->setHook('civicrm_buildGroupContactCache', fn() => throw new TypeError('Ruh-roh'));
+    try {
+      CRM_Contact_BAO_GroupContactCache::load($group);
+      $this->fail('Expected the hook error to propagate');
+    }
+    catch (TypeError $e) {
+      $this->assertEquals('Ruh-roh', $e->getMessage());
+    }
+    $this->hookClass->reset();
+
+    $this->assertTrue(CRM_Contact_BAO_GroupContactCache::load($group));
+    $this->assertCacheMatches([$deceased[0], $deceased[1], $deceased[2]], $group->id);
+  }
+
+  /**
+   * A failing rebuild while filtering by group must not keep the group locked.
+   */
+  public function testPopulateTemporaryTableReleasesGroupLockAfterError(): void {
+    [$group, , $deceased] = $this->setupSmartGroup();
+    CRM_Contact_BAO_GroupContactCache::invalidateGroupContactCache($group->id);
+    $tempTable = CRM_Utils_SQL_TempTable::build()->setMemory()->createWithColumns('contact_id int');
+    $this->hookClass->setHook('civicrm_buildGroupContactCache', fn() => throw new TypeError('Ruh-roh'));
+    try {
+      CRM_Contact_BAO_GroupContactCache::populateTemporaryTableWithContactsInGroups([$group->id], $tempTable->getName());
+      $this->fail('Expected the hook error to propagate');
+    }
+    catch (TypeError $e) {
+      $this->assertEquals('Ruh-roh', $e->getMessage());
+    }
+    $this->hookClass->reset();
+
+    CRM_Contact_BAO_GroupContactCache::populateTemporaryTableWithContactsInGroups([$group->id], $tempTable->getName());
+    $this->assertCacheMatches([$deceased[0], $deceased[1], $deceased[2]], $group->id);
+    $this->assertEquals(3, CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM ' . $tempTable->getName()));
+    $tempTable->drop();
+  }
 
   /**
    * Tears down the fixture, for example, closes a network connection.
