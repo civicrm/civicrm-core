@@ -18,11 +18,15 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
 
   /**
    * @var CRM_Core_DAO_LocationType|null
+   * @deprecated
+   *   No longer used: the default location type is cached in \Civi::$statics.
    */
   public static $_defaultLocationType = NULL;
 
   /**
    * @var int|null
+   * @deprecated
+   *   No longer used: the billing location type is cached in \Civi::$statics.
    */
   public static $_billingLocationType = NULL;
 
@@ -44,12 +48,12 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
    *                          null otherwise
    */
   public static function &getDefault() {
-    if (self::$_defaultLocationType == NULL) {
+    if (!isset(\Civi::$statics[__CLASS__]['default'])) {
       $params = ['is_default' => 1];
       $defaults = [];
-      self::$_defaultLocationType = self::retrieve($params, $defaults);
+      \Civi::$statics[__CLASS__]['default'] = self::retrieve($params, $defaults);
     }
-    return self::$_defaultLocationType;
+    return \Civi::$statics[__CLASS__]['default'];
   }
 
   /**
@@ -58,11 +62,11 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType implements \Ci
    * @return int
    */
   public static function getBilling() {
-    if (self::$_billingLocationType == NULL) {
+    if (!isset(\Civi::$statics[__CLASS__]['billing'])) {
       $locationTypes = CRM_Core_DAO_Address::buildOptions('location_type_id', 'validate');
-      self::$_billingLocationType = array_search('Billing', $locationTypes);
+      \Civi::$statics[__CLASS__]['billing'] = array_search('Billing', $locationTypes);
     }
-    return self::$_billingLocationType;
+    return \Civi::$statics[__CLASS__]['billing'];
   }
 
   /**
