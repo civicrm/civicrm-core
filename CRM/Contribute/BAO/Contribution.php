@@ -2904,7 +2904,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         civicrm_api3('Contribution', 'sendconfirmation', $sendConfirmationParams);
         \Civi::log()->info("Contribution {$contributionID} Receipt sent");
       }
-      catch (Exception $e) {
+      catch (Throwable $e) {
         \Civi::log()->warning("Contribution {$contributionID} Failed to send receipt: " . $e->getMessage());
       }
     }
