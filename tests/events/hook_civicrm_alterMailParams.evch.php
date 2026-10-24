@@ -87,6 +87,8 @@ return new class() extends EventCheck implements HookInterface {
     'table' => ['type' => 'string', 'for' => 'messageTemplate', 'regex' => '/civicrm_msg_template/'],
     'entity' => ['type' => 'string|NULL', 'for' => 'singleEmail'],
     'entity_id' => ['type' => 'int|NULL', 'for' => 'singleEmail'],
+    // The Activity recorded for the message.
+    'emailActivityID' => ['type' => 'int|NULL', 'for' => 'singleEmail'],
 
     // ## View: messageTemplate
 
