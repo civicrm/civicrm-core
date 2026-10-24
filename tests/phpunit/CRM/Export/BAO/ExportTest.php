@@ -1217,6 +1217,28 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that greetings exceeding max column length are ellipsified on same address merge.
+   */
+  public function testMergeSameAddressGreetingEllipsify(): void {
+    $this->setUpContactExportData();
+    $otherPostalGreeting = array_search(ts('Other'), CRM_Export_Form_Select::getGreetingOptions()['postal_greeting']);
+    $this->doExportTest([
+      'mergeSameAddress' => TRUE,
+      'exportParams' => [
+        'postal_greeting' => (string) $otherPostalGreeting,
+        'postal_greeting_other' => str_repeat('x', 300),
+        'mergeOption' => '1',
+        'mapping' => '',
+      ],
+    ]);
+    $expected = str_repeat('x', 252) . '...';
+    $this->assertExpectedOutput([
+      'Postal Greeting' => $expected,
+      'Email Greeting' => $expected,
+    ], $this->csv->nth(0));
+  }
+
+  /**
    * Test exporting when no rows are retrieved.
    *
    * @throws \CRM_Core_Exception
