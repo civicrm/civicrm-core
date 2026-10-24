@@ -339,7 +339,7 @@ class AfformAdminMeta {
         'danger' => E::ts('Danger'),
       ];
 
-      $permissions = \CRM_Core_Permission::getPermissionList(['afformGeneric', 'const', 'civicrm', 'cms', 'userRole']);
+      $permissions = \CRM_Core_Permission::getPermissionList(['group', 'IN', ['afformGeneric', 'const', 'civicrm', 'cms', 'userRole']]);
 
       $dateRanges = \CRM_Utils_Array::makeNonAssociative(\CRM_Core_OptionGroup::values('relative_date_filters'), 'id', 'label');
       $dateRanges = array_merge([['id' => '{}', 'label' => E::ts('Choose Date Range')]], $dateRanges);

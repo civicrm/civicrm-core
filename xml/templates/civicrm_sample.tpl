@@ -114,10 +114,10 @@ INSERT INTO `civicrm_contact_type`
 INSERT INTO `civicrm_dashboard`
     ( `domain_id`, `name`, `label`, `url`, `permission`, `permission_operator`, `is_active`, `fullscreen_url`)
     VALUES
-    ( @domain_id, 'report/7',  '{ts escape="sql"}Donor Summary{/ts}',        'civicrm/report/instance/7?reset=1&section=1&charts=barChart',  'access CiviContribute', 'AND', '1', 'civicrm/report/instance/7?reset=1&section=1&charts=barChart&context=dashletFullscreen'),
-    ( @domain_id, 'report/14', '{ts escape="sql"}Top Donors{/ts}',           'civicrm/report/instance/14?reset=1&section=2',                 'access CiviContribute', 'AND', '1', 'civicrm/report/instance/14?reset=1&section=2&context=dashletFullscreen'),
-    ( @domain_id, 'report/27', '{ts escape="sql"}Event Income Summary{/ts}', 'civicrm/report/instance/27?reset=1&section=1&charts=pieChart', 'access CiviEvent'     , 'AND', '1', 'civicrm/report/instance/27?reset=1&section=1&charts=pieChart&context=dashletFullscreen'),
-    ( @domain_id, 'report/22', '{ts escape="sql"}Membership Summary{/ts}',   'civicrm/report/instance/22?reset=1&section=2',                 'access CiviMember'    , 'AND', '1', 'civicrm/report/instance/22?reset=1&section=2&context=dashletFullscreen');
+    ( @domain_id, 'report/7',  '{ts escape="sql"}Donor Summary{/ts}',        'civicrm/report/instance/7?reset=1&section=1&charts=barChart',  '@report:7', 'AND', '1', 'civicrm/report/instance/7?reset=1&section=1&charts=barChart&context=dashletFullscreen'),
+    ( @domain_id, 'report/14', '{ts escape="sql"}Top Donors{/ts}',           'civicrm/report/instance/14?reset=1&section=2',                 '@report:14', 'AND', '1', 'civicrm/report/instance/14?reset=1&section=2&context=dashletFullscreen'),
+    ( @domain_id, 'report/27', '{ts escape="sql"}Event Income Summary{/ts}', 'civicrm/report/instance/27?reset=1&section=1&charts=pieChart', '@report:27', 'AND', '1', 'civicrm/report/instance/27?reset=1&section=1&charts=pieChart&context=dashletFullscreen'),
+    ( @domain_id, 'report/22', '{ts escape="sql"}Membership Summary{/ts}',   'civicrm/report/instance/22?reset=1&section=2',                 '@report:22', 'AND', '1', 'civicrm/report/instance/22?reset=1&section=2&context=dashletFullscreen');
 
 -- INSERT sample data for membership
 
