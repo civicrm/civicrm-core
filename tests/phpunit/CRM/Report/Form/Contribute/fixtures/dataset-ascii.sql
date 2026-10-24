@@ -27,18 +27,19 @@ INSERT INTO `civicrm_address` (`contact_id`, `location_type_id`, `is_primary`, `
 (NULL, 1, 1, 1, '11B Woodbridge Path SW', 11, 'B', NULL, 'Woodbridge', 'Path', NULL, NULL, NULL, NULL, NULL, 'Dayton', NULL, 1034, NULL, 'B10 G56', NULL, 1228, 39.7531, -84.2471, 0, NULL, NULL, NULL),
 (NULL, 1, 1, 1, '581O Lincoln Dr SW', 581, 'O', NULL, 'Lincoln', 'Dr', NULL, NULL, NULL, NULL, NULL, 'Santa Fe', NULL, 1030, NULL, '87594', NULL, 1228, 35.5212, -105.982, 0, NULL, NULL, NULL);
 
+SET @donationFinancialTypeID := (SELECT id FROM civicrm_financial_type WHERE name = 'Donation');
 INSERT INTO `civicrm_contribution` (`id`, `contact_id`, `financial_type_id`, `contribution_page_id`, `payment_instrument_id`, `receive_date`, `non_deductible_amount`, `total_amount`, `fee_amount`, `net_amount`, `trxn_id`, `invoice_id`, `currency`, `cancel_date`, `cancel_reason`, `receipt_date`, `thankyou_date`, `source`, `amount_level`, `contribution_recur_id`, `is_test`, `is_pay_later`, `contribution_status_id`, `address_id`, `check_number`, `campaign_id`, `is_template`) VALUES
-(1, 3, 1, NULL, 4, '2010-04-11 00:00:00', 0.00, 125.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '1041', NULL, 0),
-(2, 4, 1, NULL, 1, '2010-03-21 00:00:00', 0.00, 50.00, NULL, NULL, 'P20901X1', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins', NULL, NULL, 0, 0, 1, NULL, NULL, NULL, 0),
-(3, 6, 1, NULL, 4, '2010-04-29 00:00:00', 0.00, 25.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '2095', NULL, 0),
-(4, 8, 1, NULL, 4, '2010-04-11 00:00:00', 0.00, 50.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '10552', NULL, 0),
-(5, 16, 1, NULL, 4, '2010-04-15 00:00:00', 0.00, 500.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '509', NULL, 0),
-(6, 19, 1, NULL, 4, '2010-04-11 00:00:00', 0.00, 175.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '102', NULL, 0),
-(7, 82, 1, NULL, 1, '2010-03-27 00:00:00', 0.00, 50.00, NULL, NULL, 'P20193L2', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins', NULL, NULL, 0, 0, 1, NULL, NULL, NULL, 0),
-(8, 92, 1, NULL, 1, '2010-03-08 00:00:00', 0.00, 10.00, NULL, NULL, 'P40232Y3', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', NULL, NULL, 0, 0, 1, NULL, NULL, NULL, 0),
-(9, 34, 1, NULL, 1, '2010-04-22 00:00:00', 0.00, 250.00, NULL, NULL, 'P20193L6', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', NULL, NULL, 0, 0, 1, NULL, NULL, NULL, 0),
-(10, 71, 1, NULL, 1, '2009-07-01 11:53:50', 0.00, 500.00, NULL, NULL, 'PL71', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, NULL, NULL, NULL, 1),
-(11, 71, 1, NULL, 1, '2009-07-01 11:53:51', 0.00, 500.00, NULL, NULL, 'PL72', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, NULL, NULL, NULL, 0);
+(1, 3, @donationFinancialTypeID, NULL, 4, '2010-04-11 00:00:00', 0.00, 125.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '1041', NULL, 0),
+(2, 4, @donationFinancialTypeID, NULL, 1, '2010-03-21 00:00:00', 0.00, 50.00, NULL, NULL, 'P20901X1', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins', NULL, NULL, 0, 0, 1, NULL, NULL, NULL, 0),
+(3, 6, @donationFinancialTypeID, NULL, 4, '2010-04-29 00:00:00', 0.00, 25.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '2095', NULL, 0),
+(4, 8, @donationFinancialTypeID, NULL, 4, '2010-04-11 00:00:00', 0.00, 50.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '10552', NULL, 0),
+(5, 16, @donationFinancialTypeID, NULL, 4, '2010-04-15 00:00:00', 0.00, 500.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '509', NULL, 0),
+(6, 19, @donationFinancialTypeID, NULL, 4, '2010-04-11 00:00:00', 0.00, 175.00, NULL, NULL, NULL, NULL, 'USD', NULL, NULL, NULL, NULL, 'Apr 2007 Mailer 1', NULL, NULL, 0, 0, 1, NULL, '102', NULL, 0),
+(7, 82, @donationFinancialTypeID, NULL, 1, '2010-03-27 00:00:00', 0.00, 50.00, NULL, NULL, 'P20193L2', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Save the Penguins', NULL, NULL, 0, 0, 1, NULL, NULL, NULL, 0),
+(8, 92, @donationFinancialTypeID, NULL, 1, '2010-03-08 00:00:00', 0.00, 10.00, NULL, NULL, 'P40232Y3', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', NULL, NULL, 0, 0, 1, NULL, NULL, NULL, 0),
+(9, 34, @donationFinancialTypeID, NULL, 1, '2010-04-22 00:00:00', 0.00, 250.00, NULL, NULL, 'P20193L6', NULL, 'USD', NULL, NULL, NULL, NULL, 'Online: Help CiviCRM', NULL, NULL, 0, 0, 1, NULL, NULL, NULL, 0),
+(10, 71, @donationFinancialTypeID, NULL, 1, '2009-07-01 11:53:50', 0.00, 500.00, NULL, NULL, 'PL71', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, NULL, NULL, NULL, 1),
+(11, 71, @donationFinancialTypeID, NULL, 1, '2009-07-01 11:53:51', 0.00, 500.00, NULL, NULL, 'PL72', NULL, 'USD', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 1, NULL, NULL, NULL, 0);
 
 INSERT INTO `civicrm_email` (`contact_id`, `location_type_id`, `email`, `is_primary`, `is_billing`, `on_hold`, `is_bulkmail`, `hold_date`, `reset_date`, `signature_text`, `signature_html`) VALUES
 (71, 1, 'grantm@fishmail.net', 1, 0, 0, 0, NULL, NULL, NULL, NULL),

@@ -55,7 +55,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       ],
       'field' => [
         1 => [
-          'financial_type' => 1,
+          'financial_type' => $this->getFinancialTypeID('Donation'),
           'total_amount' => 70,
           'receive_date' => '2013-07-24',
           'payment_instrument' => 1,
@@ -63,7 +63,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
           'contribution_status_id' => 1,
         ],
         2 => [
-          'financial_type' => 1,
+          'financial_type' => $this->getFinancialTypeID('Donation'),
           'total_amount' => 30,
           'receive_date' => '2014-07-24',
           'payment_instrument' => 1,
@@ -76,7 +76,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
     // create random contribution to check IS NULL filter more precisely
     $nonBatchContributionID = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'total_amount' => 123,
       'receive_date' => '2014-07-24',
       'payment_instrument' => 1,
@@ -152,7 +152,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $contactID1 = $this->individualCreate([], 1);
     $contactID2 = $this->individualCreate([], 2);
     $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'total_amount' => 100,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,
@@ -169,7 +169,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     ];
     CRM_Core_BAO_FinancialTrxn::create($params);
     $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'total_amount' => 150,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,
@@ -177,7 +177,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contact_id' => $contactID1,
     ]);
     $Contribution3 = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,
@@ -255,7 +255,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $contactID1 = $this->individualCreate([], 1);
     $contactID2 = $this->individualCreate([], 2);
     $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'total_amount' => 100,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,
@@ -273,7 +273,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     ];
     CRM_Core_BAO_FinancialTrxn::create($params);
     $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'total_amount' => 150,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,
@@ -281,7 +281,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contact_id' => $contactID1,
     ]);
     $Contribution3 = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,
@@ -416,7 +416,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $contactID1 = $this->individualCreate([], 1);
     $contactID2 = $this->individualCreate([], 2);
     $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'total_amount' => 100,
       'receive_date' => date('Y-m-d'),
       'payment_instrument' => 1,
@@ -426,7 +426,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contact_id' => $contactID1,
     ]);
     $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'total_amount' => 150,
       'receive_date' => date('Y-m-d', strtotime(date('Y-m-d') . ' - 1 days')),
       'payment_instrument' => 1,
@@ -436,7 +436,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contact_id' => $contactID2,
     ]);
     $Contribution3 = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,

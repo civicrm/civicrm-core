@@ -57,7 +57,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'payment_processor_id' => $this->ids['payment_processor'],
       'is_email_receipt' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_instrument_id' => 1,
       'campaign_id' => NULL,
     ];
@@ -181,7 +181,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_instrument_id' => 1,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
@@ -240,7 +240,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $firstContrib = $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_instrument_id' => 1,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
@@ -251,7 +251,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_instrument_id' => 1,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
@@ -277,7 +277,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $firstContrib = $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_instrument_id' => 1,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
@@ -290,7 +290,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_instrument_id' => 1,
       'currency' => 'USD',
       'contact_id' => $this->individualCreate(),
@@ -326,7 +326,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $firstContrib = $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_instrument_id' => 1,
       'currency' => 'USD',
       'contact_id' => $this->_params['contact_id'],
@@ -339,7 +339,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $secondContrib = $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_instrument_id' => 1,
       'currency' => 'USD',
       'contact_id' => $this->_params['contact_id'],
@@ -353,7 +353,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $thirdContrib = $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_instrument_id' => 1,
       'currency' => 'USD',
       'contact_id' => $this->_params['contact_id'],
@@ -420,7 +420,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $templateContrib = $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'source' => 'Template Contribution',
       'payment_instrument_id' => 1,
       'currency' => 'AUD',
@@ -433,7 +433,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'source' => 'Non-template Contribution',
       'payment_instrument_id' => 1,
       'currency' => 'USD',
@@ -465,7 +465,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $templateContribution = $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'source' => 'Template Contribution',
       'payment_instrument_id' => 1,
       'currency' => 'AUD',

@@ -43,7 +43,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'scheduled_date' => $this->scheduled_date,
       'amount' => 100.00,
       'pledge_status_id' => '2',
-      'pledge_financial_type_id' => '1',
+      'pledge_financial_type_id' => $this->getFinancialTypeID('Donation'),
       'pledge_original_installment_amount' => 20,
       'frequency_interval' => 5,
       'frequency_unit' => 'year',
@@ -418,7 +418,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'pledge_status_id' => 3,
       'amount' => 100,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'start_date' => date('Ymd'),
       'installments' => 10,
     ];
@@ -465,7 +465,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'pledge_status_id' => 3,
       'amount' => 100,
-      'contribution_type_id' => 1,
+      'contribution_type_id' => $this->getFinancialTypeID('Donation'),
       'start_date' => date('Ymd'),
       'installments' => 10,
     ];

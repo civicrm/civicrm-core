@@ -438,7 +438,7 @@ class PseudoconstantTest extends Api4TestBase {
     $contributionId = $this->createTestRecord('Contribution', [
       'campaign_id' => $campaignId,
       'contact_id' => $contact['id'],
-      'financial_type_id' => 1,
+      'financial_type_id:name' => 'Donation',
       'total_amount' => .01,
     ])['id'];
 

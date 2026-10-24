@@ -17,7 +17,7 @@ use Civi\Api4\ContributionRecur;
  */
 class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
   protected $_contributionID;
-  protected $_financialTypeID = 1;
+  protected $_financialTypeID;
   protected $_contactID;
   protected $_contributionRecurID;
   protected $_contributionPageID;
@@ -29,6 +29,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
+    $this->_financialTypeID = $this->getFinancialTypeID('Donation');
     $this->_paymentProcessorID = $this->paymentProcessorCreate(['is_test' => 0, 'payment_processor_type_id' => 'PayPal_Standard']);
     $this->_contactID = $this->individualCreate();
     $contributionPage = $this->callAPISuccess('ContributionPage', 'create', [

@@ -116,7 +116,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'receipt_date' => date('Y-m-d') . ' 00:00:00',
       'contact_id' => $this->ids['Contact']['individual_0'],
-      'financial_type_id' => 4,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'payment_instrument_id' => 4,
       'contribution_status_id' => 'Pending',
       'receive_date' => date('Y-m-d') . ' 00:00:00',
@@ -259,7 +259,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       ->setContributionValues([
         'contact_id' => $this->ids['Contact']['individual_0'],
         'currency' => 'USD',
-        'financial_type_id' => 4,
+        'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
         'payment_instrument_id' => 4,
         'contribution_status_id:name' => 'Pending',
         'source' => 'Test set with information',
