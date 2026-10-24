@@ -295,6 +295,21 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * A row that fails to save must not leave cache flushing disabled.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportErrorRestoresCacheFlushMode(): void {
+    $this->hookClass->setHook('civicrm_pre', function ($op, $objectName) {
+      if ($op === 'create' && $objectName === 'Individual') {
+        throw new CRM_Core_Exception('Ruh-roh');
+      }
+    });
+    $this->runImport(['first_name' => 'Bill', 'last_name' => 'Gates'], CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::ERROR);
+    $this->assertTrue(CRM_Core_Config::isPermitCacheFlushMode());
+  }
+
+  /**
    * Test updating an existing contact with external_identifier match but subtype mismatch.
    *
    * The subtype is updated, as there is no conflicting contact data.
