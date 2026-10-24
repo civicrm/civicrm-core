@@ -28,7 +28,7 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
       'title' => 'API Test Payment Processor Type',
       'class_name' => 'CRM_Core_Payment_APITest',
       'billing_mode' => 'form',
-      'payment_processor_type_id' => 1,
+      'payment_processor_type_id' => $this->getPaymentProcessorTypeID('PayPal_Standard'),
       'is_recur' => 0,
       'domain_id' => 1,
       'accepted_credit_cards' => json_encode([

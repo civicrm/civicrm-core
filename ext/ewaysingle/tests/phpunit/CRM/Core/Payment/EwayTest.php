@@ -22,6 +22,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
 
   use \Civi\Test\GuzzleTestTrait;
   use \Civi\Test\Api3TestTrait;
+  use \Civi\Test\LookupHelperTrait;
 
   /**
    * Instance of CRM_Core_Payment_eWay|null
@@ -151,7 +152,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
       'class_name' => 'Payment_eWAY',
       'billing_mode' => 1,
       'financial_type_id' => 1,
-      'financial_account_id' => 12,
+      'financial_account_id' => $this->getFinancialAccountID('Payment Processor Account'),
       // Credit card = 1 so can pass 'by accident'.
       'payment_instrument_id' => 'Debit Card',
     ];

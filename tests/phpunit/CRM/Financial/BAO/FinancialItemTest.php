@@ -114,7 +114,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'contact_id' => $contactID,
       'description' => 'Contribution Amount',
       'amount' => $price,
-      'financial_account_id' => 1,
+      'financial_account_id' => $this->getFinancialAccountID('Donation'),
       'status_id' => 1,
       'transaction_date' => date('YmdHis'),
       'entity_id' => $lineItem->id,
@@ -246,7 +246,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $this->assertEquals('Contribution Amount', $result['description']);
     $this->assertEquals(1, $result['status_id']);
     $this->assertEquals(100.00, $result['amount']);
-    $this->assertEquals(1, $result['financial_account_id']);
+    $this->assertEquals($this->getFinancialAccountID('Donation'), $result['financial_account_id']);
   }
 
 }

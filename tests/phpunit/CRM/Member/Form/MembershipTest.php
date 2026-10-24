@@ -535,7 +535,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->_checkFinancialRecords([
       'id' => $contribution['id'],
       'total_amount' => 1234.56,
-      'financial_account_id' => 2,
+      'financial_account_id' => $this->getFinancialAccountID('Member Dues'),
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', [
         'id' => $this->ids['PaymentProcessor']['dummy'],
         'return' => 'payment_instrument_id',

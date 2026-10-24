@@ -464,21 +464,21 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     ];
     if ($context !== 'online' && $context !== 'payLater') {
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, [
-        'to_financial_account_id' => 6,
+        'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
         'total_amount' => 120,
         'status_id' => 1,
       ]);
     }
     if ($context === 'online') {
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, [
-        'to_financial_account_id' => 12,
+        'to_financial_account_id' => $this->getFinancialAccountID('Payment Processor Account'),
         'total_amount' => 120,
         'status_id' => 1,
       ]);
     }
     elseif ($context === 'payLater') {
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams, [
-        'to_financial_account_id' => 7,
+        'to_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
         'total_amount' => 120,
         'status_id' => 2,
       ]);

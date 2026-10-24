@@ -201,7 +201,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       'class_name' => 'Payment_PayPalImpl',
       'billing_mode' => 3,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
-      'financial_account_id' => 12,
+      'financial_account_id' => $this->getFinancialAccountID('Payment Processor Account'),
       // Credit card = 1 so can pass 'by accident'.
       'payment_instrument_id' => 'Debit Card',
     ], $params);

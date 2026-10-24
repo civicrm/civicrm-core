@@ -918,8 +918,8 @@ London,',
 
     $payment = $this->callAPISuccessGetSingle('FinancialTrxn', ['is_payment' => 1]);
     $this->assertAttributesEquals([
-      'to_financial_account_id' => 6,
-      'from_financial_account_id' => 7,
+      'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
+      'from_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
       'total_amount' => 20,
       'fee_amount' => '0.00',
       'net_amount' => 20,
@@ -938,7 +938,7 @@ London,',
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Partially paid'),
       'entity_table' => 'civicrm_line_item',
       'entity_id' => $lineItem['id'],
-      'financial_account_id' => 4,
+      'financial_account_id' => $this->getFinancialAccountID('Event Fee'),
     ], $financialItem);
 
     $this->assertStringContainsStrings($message['headers'] . $message['body'], [

@@ -916,7 +916,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'name' => 'Dummy',
       'title' => 'Dummy',
       'payment_processor_type_id:name' => 'Dummy',
-      'financial_account_id' => 12,
+      'financial_account_id' => $this->getFinancialAccountID('Payment Processor Account'),
       'is_test' => TRUE,
       'is_active' => 1,
       'user_name' => '',
@@ -965,7 +965,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'title' => 'Test Contribution Page',
       'financial_type_id:name' => 'Donation',
       'currency' => 'USD',
-      'financial_account_id' => 1,
+      'financial_account_id' => $this->getFinancialAccountID('Donation'),
       'is_active' => 1,
       'is_allow_other_amount' => 1,
       'min_amount' => 10,
@@ -2298,7 +2298,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'class_name' => 'Payment_PayPalImpl',
       'billing_mode' => 3,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
-      'financial_account_id' => 12,
+      'financial_account_id' => $this->getFinancialAccountID('Payment Processor Account'),
       // Credit card = 1 so can pass 'by accident'.
       'payment_instrument_id:name' => 'Debit Card',
     ], $params);
@@ -2748,7 +2748,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     ];
     if ($context !== 'online' && $context !== 'payLater') {
       $compareParams = [
-        'to_financial_account_id' => 6,
+        'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
         'total_amount' => (float) ($params['total_amount'] ?? 100.00),
         'status_id' => 1,
       ];
@@ -2758,7 +2758,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     }
     elseif ($context === 'online') {
       $compareParams = [
-        'to_financial_account_id' => 12,
+        'to_financial_account_id' => $this->getFinancialAccountID('Payment Processor Account'),
         'total_amount' => (float) ($params['total_amount'] ?? 100.00),
         'status_id' => 1,
         'payment_instrument_id' => $params['payment_instrument_id'] ?? 1,
@@ -2766,7 +2766,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     }
     elseif ($context === 'payLater') {
       $compareParams = [
-        'to_financial_account_id' => 7,
+        'to_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
         'total_amount' => (float) ($params['total_amount'] ?? 100.00),
         'status_id' => 2,
       ];
@@ -2783,13 +2783,13 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $compareParams = [
       'amount' => (float) ($params['total_amount'] ?? 100.00),
       'status_id' => 1,
-      'financial_account_id' => $params['financial_account_id'] ?? 1,
+      'financial_account_id' => $params['financial_account_id'] ?? $this->getFinancialAccountID('Donation'),
     ];
     if ($context === 'payLater') {
       $compareParams = [
         'amount' => (float) ($params['total_amount'] ?? 100.00),
         'status_id' => 3,
-        'financial_account_id' => $params['financial_account_id'] ?? 1,
+        'financial_account_id' => $params['financial_account_id'] ?? $this->getFinancialAccountID('Donation'),
       ];
     }
     $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
@@ -2803,8 +2803,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
         'id' => $maxTrxn['financial_trxn_id'],
       ];
       $compareParams = [
-        'to_financial_account_id' => 5,
-        'from_financial_account_id' => 6,
+        'to_financial_account_id' => $this->getFinancialAccountID('Banking Fees'),
+        'from_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
         'total_amount' => 50,
         'status_id' => 1,
       ];
@@ -2817,7 +2817,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       $compareParams = [
         'amount' => 50.00,
         'status_id' => 1,
-        'financial_account_id' => 5,
+        'financial_account_id' => $this->getFinancialAccountID('Banking Fees'),
       ];
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);
     }

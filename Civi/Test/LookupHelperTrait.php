@@ -121,6 +121,18 @@ trait LookupHelperTrait {
   }
 
   /**
+   * Get the id of a tag.
+   *
+   * @param string $name
+   *   e.g. 'Major_Donor'.
+   *
+   * @return int
+   */
+  protected function getTagID(string $name): int {
+    return (int) \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $name, 'id', 'name');
+  }
+
+  /**
    * Get the id of the price field of the default contribution price set.
    *
    * @return int

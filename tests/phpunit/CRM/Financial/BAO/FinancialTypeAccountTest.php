@@ -93,14 +93,13 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
    */
   public function testValidateRelationship(): void {
     $params = ['labelColumn' => 'name'];
-    $financialAccount = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
     $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', $params);
     $financialType = CRM_Contribute_PseudoConstant::financialType();
     $financialAccountType = new CRM_Financial_DAO_EntityFinancialAccount();
     $financialAccountType->entity_table = 'civicrm_financial_type';
     $financialAccountType->entity_id = array_search('Member Dues', $financialType);
     $financialAccountType->account_relationship = array_search('Credit/Contra Revenue Account is', $accountRelationships);
-    $financialAccountType->financial_account_id = array_search('Liability', $financialAccount);
+    $financialAccountType->financial_account_id = $this->getFinancialAccountID('Accounts Payable');
     try {
       CRM_Financial_BAO_EntityFinancialAccount::validateRelationship($financialAccountType);
       $this->fail("Missed expected exception");
