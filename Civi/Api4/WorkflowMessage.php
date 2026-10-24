@@ -75,40 +75,8 @@ class WorkflowMessage extends Generic\AbstractEntity {
    * @return Generic\BasicGetFieldsAction
    */
   public static function getFields($checkPermissions = TRUE) {
-    return (new Generic\BasicGetFieldsAction(__CLASS__, __FUNCTION__, function() {
-      return [
-        [
-          'name' => 'name',
-          'title' => 'Name',
-          'data_type' => 'String',
-        ],
-        [
-          'name' => 'group',
-          'title' => 'Group',
-          'data_type' => 'String',
-        ],
-        [
-          'name' => 'class',
-          'title' => 'Class',
-          'data_type' => 'String',
-        ],
-        [
-          'name' => 'description',
-          'title' => 'Description',
-          'data_type' => 'String',
-        ],
-        [
-          'name' => 'support',
-          'title' => 'Support Level',
-          'options'  => [
-            'experimental' => ts('Experimental: Message may change substantively with no special communication or facilitation.'),
-            'template-only' => ts('Template Support: Changes affecting the content of the message-template will get active support/facilitation.'),
-            'full' => ts('Full Support: All changes affecting message-templates or message-senders will get active support/facilitation.'),
-          ],
-          'data_type' => 'String',
-        ],
-      ];
-    }))->setCheckPermissions($checkPermissions);
+    return (new Action\WorkflowMessage\GetFields('WorkflowMessage', __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
   }
 
   public static function permissions() {
