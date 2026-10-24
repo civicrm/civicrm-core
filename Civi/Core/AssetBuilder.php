@@ -3,6 +3,7 @@
 namespace Civi\Core;
 
 use Civi\Core\Exception\UnknownAssetException;
+use Civi\Crypto\Exception\CryptoException;
 
 /**
  * Class AssetBuilder
@@ -338,12 +339,31 @@ class AssetBuilder extends \Civi\Core\Service\AutoService {
    */
   public static function pageRender($get) {
     // Beg your pardon, sir. Please may I have an HTTP response class instead?
+    $badRequest = [
+      'statusCode' => 400,
+      'mimeType' => 'text/plain',
+      'content' => 'Invalid asset request',
+    ];
+    if (!isset($get['aj']) || !is_string($get['aj'])) {
+      return $badRequest;
+    }
+    try {
+      $obj = \Civi::service('crypto.jwt')->decode($get['aj'], ['SIGN', 'WEAK_SIGN']);
+    }
+    catch (CryptoException | \TypeError $e) {
+      // Malformed, tampered or expired token. The JWT library throws a
+      // TypeError for some malformed headers, such as an "alg" that is not a
+      // string, and decode() does not convert that one.
+      return $badRequest;
+    }
+    $arr = json_decode(json_encode($obj), TRUE);
+    // A token signed with this key for another purpose has no asset claim.
+    if (!is_string($arr['asset'][0] ?? NULL) || !is_array($arr['asset'][1] ?? NULL)) {
+      return $badRequest;
+    }
     try {
       /** @var Assetbuilder $assets */
       $assets = \Civi::service('asset_builder');
-
-      $obj = \Civi::service('crypto.jwt')->decode($get['aj'], ['SIGN', 'WEAK_SIGN']);
-      $arr = json_decode(json_encode($obj), TRUE);
       return $assets->render($arr['asset'][0], $arr['asset'][1]);
     }
     catch (UnknownAssetException $e) {
