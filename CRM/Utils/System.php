@@ -33,6 +33,7 @@ use GuzzleHttp\Psr7\Response;
  * @method static string postURL(int $action) Determine the post URL for a form.
  * @method static string|null getUFLocale() Get the locale of the CMS.
  * @method static bool setUFLocale(string $civicrm_language) Set the locale of the CMS.
+ * @method static string localizeUrl(string $url) Adapt a previously generated URL to the current CMS language.
  * @method static bool isUserLoggedIn() Check if user is logged in.
  * @method static int getLoggedInUfID() Get current logged in user id.
  * @method static void setHttpHeader(string $name, string $value) Set http header.
@@ -1552,7 +1553,7 @@ class CRM_Utils_System {
    * @return mixed|string
    */
   public static function baseCMSURL() {
-    static $_baseURL = NULL;
+    $_baseURL = Civi::$statics[__CLASS__]['baseCMSURL'] ?? NULL;
     if (!$_baseURL) {
       $config = CRM_Core_Config::singleton();
       $_baseURL = $userFrameworkBaseURL = $config->userFrameworkBaseURL;
@@ -1585,8 +1586,20 @@ class CRM_Utils_System {
           }
         }
       }
+      Civi::$statics[__CLASS__]['baseCMSURL'] = $_baseURL;
     }
     return $_baseURL;
+  }
+
+  /**
+   * Forget the cached CMS base URLs, so they are recomputed for the current CMS language.
+   *
+   * @internal
+   */
+  public static function flushBaseURLCache(): void {
+    $config = CRM_Core_Config::singleton();
+    unset($config->userFrameworkBaseURL, $config->useFrameworkRelativeBase);
+    unset(Civi::$statics[__CLASS__]['baseCMSURL']);
   }
 
   /**
