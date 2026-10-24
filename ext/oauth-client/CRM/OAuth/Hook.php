@@ -123,10 +123,11 @@ class CRM_OAuth_Hook {
    * @param string|null $error
    * @param string|null $description
    * @param string|null $uri
-   * @param string $state
+   * @param array $state
+   *   The state stored when the flow began (e.g. 'clientId', 'tag', 'landingUrl').
    * @return void
    */
-  public static function oauthReturnError(?string $error, ?string $description, ?string $uri, string $state): void {
+  public static function oauthReturnError(?string $error, ?string $description, ?string $uri, array $state): void {
     $event = \Civi\Core\Event\GenericHookEvent::create([
       'error' => $error,
       'description' => $description,
