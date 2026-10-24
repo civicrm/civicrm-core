@@ -165,6 +165,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    * @todo document naming convention for CiviMail locks as this is key to ensuring they work properly.
    *
    * @param int|null $timeout
+   *   Seconds to wait; 0 returns immediately, NULL uses the lock's default.
    *
    * @return bool
    * @throws \CRM_Core_Exception
@@ -175,7 +176,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
       $query = "SELECT GET_LOCK( %1, %2 )";
       $params = [
         1 => [$this->_id, 'String'],
-        2 => [$timeout ?: $this->_timeout, 'Integer'],
+        2 => [$timeout ?? $this->_timeout, 'Integer'],
       ];
       $res = CRM_Core_DAO::singleValueQuery($query, $params);
       if ($res) {
