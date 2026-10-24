@@ -140,7 +140,7 @@ class CRM_Mailing_Event_BAO_MailingEventResubscribe {
     // remove entry from Unsubscribe table.
     $ue = new CRM_Mailing_Event_BAO_MailingEventUnsubscribe();
     $ue->event_queue_id = $queue_id;
-    $ue->org_resubscribe = 0;
+    $ue->org_unsubscribe = 0;
     if ($ue->find(TRUE)) {
       $ue->delete();
     }
