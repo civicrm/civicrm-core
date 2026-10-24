@@ -281,7 +281,7 @@ class CRM_Queue_Runner {
           $exception = new Exception('Task returned false');
         }
       }
-      catch (Exception $e) {
+      catch (Throwable $e) {
         $isOK = FALSE;
         $exception = $e;
       }

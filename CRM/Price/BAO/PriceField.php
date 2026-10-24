@@ -137,7 +137,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         try {
           CRM_Price_BAO_PriceFieldValue::create($options, $optionsIds);
         }
-        catch (Exception $e) {
+        catch (Throwable $e) {
           $transaction->rollback();
           throw new CRM_Core_Exception($e->getMessage());
         }
@@ -149,7 +149,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         try {
           CRM_Price_BAO_PriceFieldValue::create($options, $optionsIds);
         }
-        catch (Exception $e) {
+        catch (Throwable $e) {
           $transaction->rollback();
           throw new CRM_Core_Exception($e->getMessage());
         }

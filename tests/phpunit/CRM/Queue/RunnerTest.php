@@ -162,6 +162,35 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Run a series of tasks; when one throws a PHP error, skip over it.
+   */
+  public function testRunAll_Continue_Error(): void {
+    $this->queue->createItem(new CRM_Queue_Task(
+      ['CRM_Queue_RunnerTest', '_recordValue'],
+      ['a'],
+      'Add "a"'
+    ));
+    $this->queue->createItem(new CRM_Queue_Task(
+      ['CRM_Queue_RunnerTest', '_throwError'],
+      ['b'],
+      'Throw error'
+    ));
+    $this->queue->createItem(new CRM_Queue_Task(
+      ['CRM_Queue_RunnerTest', '_recordValue'],
+      ['c'],
+      'Add "c"'
+    ));
+
+    $runner = new CRM_Queue_Runner([
+      'queue' => $this->queue,
+      'errorMode' => CRM_Queue_Runner::ERROR_CONTINUE,
+    ]);
+    $runner->runAll();
+    $this->assertEquals(['a', 'c'], self::$_recordedValues);
+    $this->assertQueueStats(0, 0, 0, $this->queue);
+  }
+
+  /**
    * Run a series of tasks; when one throws an exception,
    * abort processing and return it to the queue.
    */
@@ -270,6 +299,14 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
    */
   public static function _throwException($taskCtx, $value) {
     throw new Exception("Manufactured error: $value");
+  }
+
+  /**
+   * @param $taskCtx
+   * @param $value
+   */
+  public static function _throwError($taskCtx, $value) {
+    throw new TypeError("Manufactured error: $value");
   }
 
   /**
