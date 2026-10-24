@@ -12,10 +12,17 @@ use Civi\Test\TransactionalInterface;
 class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
   use \Civi\Test\Api4TestTrait;
 
+  private ?\Civi\Core\Locale $previousLocale = NULL;
+
   public function setUpHeadless() {
     return \Civi\Test::headless()
       ->installMe(__DIR__)
       ->apply();
+  }
+
+  public function tearDown(): void {
+    $this->previousLocale?->apply();
+    parent::tearDown();
   }
 
   public function testGetOptions(): void {
@@ -236,6 +243,124 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     <crm-search-display-list search="'testGetMarkupAddButton'" display="'testGetMarkupAddButtonDisplay'" api-entity="Individual" settings="{addButton: {path: 'civicrm/test/url', text: 'Test', icon: 'fa-plus'}, toolbar: [{path: 'civicrm/test/url', text: 'Test', icon: 'fa-plus', style: 'primary', target: 'crm-popup'}]}" filters="{}"></crm-search-display-list>
     MARKUP;
     $this->assertSame($expected, $result['markup']);
+  }
+
+  /**
+   * Every user-facing text of a display is translated on get, not only labels and link texts.
+   */
+  public function testGetTranslatesDisplayTexts(): void {
+    $texts = [
+      'Display label', 'Column label', 'Column tooltip', 'Nothing here', 'Link text', 'Link tooltip',
+      'Menu text', 'Toolbar text', 'Toolbar tooltip', 'Legacy add', 'Intro text', 'No results text',
+      'Search button', 'Totals', 'Column total', 'Add row', 'Rewrite text', 'Image alt', 'Html label',
+      'Html rewrite', 'Markup <b>label</b>', 'Smarty {$label}',
+    ];
+    \Civi\Api4\WordReplacement::save(FALSE)
+      ->setRecords(array_map(fn($text) => ['find_word' => $text, 'replace_word' => "DE $text"], $texts))
+      ->setDefaults(['language' => 'de_DE', 'match_type' => 'exactMatch'])
+      ->execute();
+
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'api_entity' => 'Contact',
+      'api_params' => ['version' => 4, 'select' => ['id', 'display_name']],
+    ]);
+    $display = $this->createTestRecord('SearchDisplay', [
+      'saved_search_id' => $savedSearch['id'],
+      'type' => 'table',
+      'label' => 'Display label',
+      'settings' => [
+        'description' => 'Intro text',
+        'noResultsText' => 'No results text',
+        'button' => 'Search button',
+        'tally' => ['label' => 'Totals'],
+        'editableRow' => ['create' => TRUE, 'createLabel' => 'Add row'],
+        'addButton' => ['path' => 'civicrm/test', 'text' => 'Legacy add'],
+        'toolbar' => [['path' => 'civicrm/test', 'text' => 'Toolbar text', 'title' => 'Toolbar tooltip']],
+        'columns' => [
+          [
+            'type' => 'field',
+            'key' => 'display_name',
+            'label' => 'Column label',
+            'title' => 'Column tooltip',
+            'rewrite' => 'Rewrite text',
+            'empty_value' => 'Nothing here',
+            'tally' => ['label' => 'Column total'],
+          ],
+          [
+            'type' => 'menu',
+            'text' => 'Menu text',
+            'links' => [['path' => 'civicrm/test', 'text' => 'Link text', 'title' => 'Link tooltip']],
+          ],
+          ['type' => 'image', 'image' => ['alt' => 'Image alt']],
+          ['type' => 'html', 'key' => 'display_name', 'label' => 'Html label', 'rewrite' => 'Html rewrite'],
+          ['type' => 'field', 'key' => 'id', 'label' => 'Markup <b>label</b>', 'rewrite' => 'Smarty {$label}'],
+        ],
+      ],
+    ]);
+
+    // Activate the locale directly: a language name is negotiated down to en_US without its .mo file
+    $this->previousLocale = \Civi\Core\Locale::detect();
+    (new \Civi\Core\Locale(['nominal' => 'de_DE', 'ts' => 'de_DE', 'moneyFormat' => 'de_DE']))->apply();
+    $result = SearchDisplay::get(FALSE)
+      ->addWhere('id', '=', $display['id'])
+      ->execute()->single();
+    $this->previousLocale->apply();
+    $settings = $result['settings'];
+
+    $this->assertSame([
+      'label' => 'DE Display label',
+      'description' => 'DE Intro text',
+      'noResultsText' => 'DE No results text',
+      'button' => 'DE Search button',
+      'tally.label' => 'DE Totals',
+      'editableRow.createLabel' => 'DE Add row',
+      'addButton.text' => 'DE Legacy add',
+      'toolbar.0.text' => 'DE Toolbar text',
+      'toolbar.0.title' => 'DE Toolbar tooltip',
+      'columns.0.label' => 'DE Column label',
+      'columns.0.title' => 'DE Column tooltip',
+      'columns.0.rewrite' => 'DE Rewrite text',
+      'columns.0.empty_value' => 'DE Nothing here',
+      'columns.0.tally.label' => 'DE Column total',
+      'columns.1.text' => 'DE Menu text',
+      'columns.1.links.0.text' => 'DE Link text',
+      'columns.1.links.0.title' => 'DE Link tooltip',
+      'columns.2.image.alt' => 'DE Image alt',
+      'columns.3.label' => 'DE Html label',
+    ], [
+      'label' => $result['label'],
+      'description' => $settings['description'],
+      'noResultsText' => $settings['noResultsText'],
+      'button' => $settings['button'],
+      'tally.label' => $settings['tally']['label'],
+      'editableRow.createLabel' => $settings['editableRow']['createLabel'],
+      'addButton.text' => $settings['addButton']['text'],
+      'toolbar.0.text' => $settings['toolbar'][0]['text'],
+      'toolbar.0.title' => $settings['toolbar'][0]['title'],
+      'columns.0.label' => $settings['columns'][0]['label'],
+      'columns.0.title' => $settings['columns'][0]['title'],
+      'columns.0.rewrite' => $settings['columns'][0]['rewrite'],
+      'columns.0.empty_value' => $settings['columns'][0]['empty_value'],
+      'columns.0.tally.label' => $settings['columns'][0]['tally']['label'],
+      'columns.1.text' => $settings['columns'][1]['text'],
+      'columns.1.links.0.text' => $settings['columns'][1]['links'][0]['text'],
+      'columns.1.links.0.title' => $settings['columns'][1]['links'][0]['title'],
+      'columns.2.image.alt' => $settings['columns'][2]['image']['alt'],
+      'columns.3.label' => $settings['columns'][3]['label'],
+    ]);
+    // The rewrite of an html column and texts with markup or Smarty are templates and stay as stored
+    $this->assertSame('Html rewrite', $settings['columns'][3]['rewrite']);
+    $this->assertSame('Markup <b>label</b>', $settings['columns'][4]['label']);
+    $this->assertSame('Smarty {$label}', $settings['columns'][4]['rewrite']);
+    // Keys that are not texts stay as stored
+    $this->assertSame('display_name', $settings['columns'][0]['key']);
+    $this->assertSame('civicrm/test', $settings['toolbar'][0]['path']);
+
+    // In English the stored texts come back unchanged
+    $result = SearchDisplay::get(FALSE)
+      ->addWhere('id', '=', $display['id'])
+      ->execute()->single();
+    $this->assertSame('No results text', $result['settings']['noResultsText']);
   }
 
 }
