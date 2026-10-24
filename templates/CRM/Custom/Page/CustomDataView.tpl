@@ -67,8 +67,8 @@
                               {$element.field_value}
                             {/if}
                           {else}
-                            {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
-                              {$element.contact_ref_links|join:', '}
+                            {if !empty($element.ref_links)}
+                              {$element.ref_links|join:', '}
                             {elseif $element.field_type eq 'File' || $element.field_type eq 'TextArea' || $element.field_type eq 'RichTextEditor' || $element.field_type === 'Link'}
                               {$element.field_value|purify}
                             {else}
@@ -121,8 +121,8 @@
                   {/if}
                 {else}
                   <div class="content">
-                    {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
-                      {$element.contact_ref_links|join:', '}
+                    {if !empty($element.ref_links)}
+                      {$element.ref_links|join:', '}
                     {elseif $element.field_type eq 'File' || $element.field_type eq 'TextArea' || $element.field_type eq 'RichTextEditor' || $element.field_type === 'Link'}
                       {$element.field_value|purify}
                     {else}
