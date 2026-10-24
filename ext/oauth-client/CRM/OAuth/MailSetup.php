@@ -46,7 +46,7 @@ class CRM_OAuth_MailSetup {
     $authCode = Civi\Api4\OAuthClient::authorizationCode(0)
       ->addWhere('id', '=', $setupAction['oauth_client_id'])
       ->setStorage('OAuthSysToken')
-      ->setTag('MailSettings:setup')
+      ->setTag(\Civi\OAuth\OAuthMailSettingsTag::SETUP_TAG)
       ->setPrompt($setupAction['prompt'] ?? 'select_account')
       ->execute()
       ->single();
@@ -73,7 +73,26 @@ class CRM_OAuth_MailSetup {
    * @param string $nextUrl
    */
   public static function onReturn($token, &$nextUrl) {
-    if ($token['tag'] !== 'MailSettings:setup') {
+    /** @var \Civi\OAuth\OAuthMailSettingsTag $mailTag */
+    $mailTag = Civi::service('oauth_client.mail_settings_tag');
+
+    // Re-connecting an existing account: it is already tagged with the record id, so there is
+    // nothing to create. alterMailStore() refreshes every token with this tag, so a stale one
+    // left behind would fail its refresh and break mail polling.
+    if ($mailTag->checkTokenTag($token['tag'] ?? '')) {
+      \Civi\Api4\OAuthSysToken::delete(FALSE)
+        ->addWhere('tag', '=', $token['tag'])
+        ->addWhere('id', '!=', $token['id'])
+        ->execute();
+      CRM_Core_Session::setStatus(
+        ts('The connection for this account has been renewed.'),
+        ts('Reconnected'),
+        'success'
+      );
+      return;
+    }
+
+    if ($token['tag'] !== \Civi\OAuth\OAuthMailSettingsTag::SETUP_TAG) {
       return;
     }
 
@@ -98,9 +117,17 @@ class CRM_OAuth_MailSetup {
       'info'
     );
 
-    $nextUrl = CRM_Utils_System::url('civicrm/admin/mailSettings/edit', [
+    $nextUrl = self::getEditUrl($mailSettings['id']);
+  }
+
+  /**
+   * @param int $mailSettingsId
+   * @return string
+   */
+  private static function getEditUrl($mailSettingsId): string {
+    return CRM_Utils_System::url('civicrm/admin/mailSettings/edit', [
       'action' => 'update',
-      'id' => $mailSettings['id'],
+      'id' => $mailSettingsId,
       'reset' => 1,
     ], TRUE, NULL, FALSE);
   }
@@ -113,7 +140,7 @@ class CRM_OAuth_MailSetup {
   public static function alterMailStore(&$mailSettings) {
     $token = civicrm_api4('OAuthSysToken', 'refresh', [
       'checkPermissions' => FALSE,
-      'where' => [['tag', '=', 'MailSettings:' . $mailSettings['id']]],
+      'where' => [['tag', '=', \Civi\OAuth\OAuthMailSettingsTag::TOKEN_TAG_PREFIX . $mailSettings['id']]],
       'orderBy' => ['id' => 'DESC'],
     ])->first();
 
