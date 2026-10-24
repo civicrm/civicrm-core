@@ -25,6 +25,18 @@ trait LookupHelperTrait {
   }
 
   /**
+   * Get the id of a contact type.
+   *
+   * @param string $name
+   *   e.g. 'Individual'.
+   *
+   * @return int
+   */
+  protected function getContactTypeID(string $name): int {
+    return (int) \CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $name, 'id', 'name');
+  }
+
+  /**
    * Get the id of a financial account.
    *
    * @param string $name
