@@ -442,6 +442,26 @@ dl dl {
   max-width: 100%;
   min-height: 100vh;
   padding: var(--crm-page-padding);
+  display: flex;
+  flex-direction: column;
+}
+/* Joomla nests the footer in #crm-content */
+#crm-container > #crm-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+/* Fills the space below short pages, so the footer can stick to the viewport bottom
+   there; on long pages it has no room to move and sits right after the content */
+.crm-footer-area {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+#civicrm-footer {
+  position: sticky;
+  bottom: 1rem;
 }
 .crm-container .crm-flex-box {
   display: flex;

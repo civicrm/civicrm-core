@@ -2,6 +2,21 @@
   padding: 1px max(10px, 1vw) 1rem;
 }
 
+/* html is the flex root, so the menubar margin on body counts against the viewport
+   height instead of adding a scrollbar on top of a 100vh min-height. */
+html.crm-standalone {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+html.crm-standalone body,
+html.crm-standalone body > #crm-container {
+  min-height: 0;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .breadcrumb > ol {
   padding-inline-start: 0;
 }
