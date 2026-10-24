@@ -213,6 +213,9 @@ class Schema {
     'civicrm_price_field_value',
     'civicrm_price_set',
     'civicrm_relationship_type',
+    'civicrm_uf_field',
+    'civicrm_uf_group',
+    'civicrm_uf_join',
   ];
 
   /**
