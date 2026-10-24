@@ -25,6 +25,18 @@ trait LookupHelperTrait {
   }
 
   /**
+   * Get the id of a financial account.
+   *
+   * @param string $name
+   *   e.g. 'Deposit Bank Account'.
+   *
+   * @return int
+   */
+  protected function getFinancialAccountID(string $name): int {
+    return (int) \CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $name, 'id', 'name');
+  }
+
+  /**
    * Get the id of a payment instrument.
    *
    * @param string $name
@@ -46,6 +58,18 @@ trait LookupHelperTrait {
    */
   protected function getLocationTypeID(string $name): int {
     return (int) \CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $name);
+  }
+
+  /**
+   * Get the id of a payment processor type.
+   *
+   * @param string $name
+   *   e.g. 'Dummy'.
+   *
+   * @return int
+   */
+  protected function getPaymentProcessorTypeID(string $name): int {
+    return (int) \CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType', $name, 'id', 'name');
   }
 
   /**
