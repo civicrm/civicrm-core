@@ -136,7 +136,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     \Civi::service('asset_builder')->setCacheEnabled(TRUE);
     $url = \Civi::service('asset_builder')->getUrl($asset, $params);
     $this->assertEquals(1, $this->fired['hook_civicrm_buildAsset']);
-    $this->assertMatchesRegularExpression(';^https?:.*dyn/square.[0-9a-f]+.(txt|js)$;', $url);
+    $this->assertMatchesRegularExpression(';^https?:.*dyn/\d+-[a-zA-Z0-9]+-[a-z]{2}_[A-Z]{2}/square.[0-9a-f]+.(txt|js)$;', $url);
     $response = $this->createGuzzle()->get($url);
     // Note: This actually relies on httpd to determine MIME type.
     // That could be ambiguous for javascript.
