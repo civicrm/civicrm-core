@@ -97,12 +97,13 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Test getting multiple profiles.
    */
   public function testProfileGetMultiple(): void {
+    $nameAndAddressProfileID = $this->getProfileID('name_and_address');
     $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $profileFieldValues = $this->createIndividualContact();
     $expected = reset($profileFieldValues);
     $contactId = key($profileFieldValues);
     $params = [
-      'profile_id' => [$this->_profileID, 1, 'Billing'],
+      'profile_id' => [$this->_profileID, $nameAndAddressProfileID, 'Billing'],
       'contact_id' => $contactId,
     ];
 
@@ -110,8 +111,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     foreach ($expected as $profileField => $value) {
       $this->assertEquals($value, $result[$this->_profileID][$profileField], ' error message: ' . "missing/mismatching value for $profileField");
     }
-    $this->assertEquals('abc1', $result[1]['first_name'], ' error message: ' . 'missing/mismatching value for first name');
-    $this->assertArrayNotHasKey('email-Primary', $result[1], 'profile 1 does not include email');
+    $this->assertEquals('abc1', $result[$nameAndAddressProfileID]['first_name'], ' error message: ' . 'missing/mismatching value for first name');
+    $this->assertArrayNotHasKey('email-Primary', $result[$nameAndAddressProfileID], 'profile 1 does not include email');
     $this->assertEquals([
       'billing_first_name' => 'abc1',
       'billing_middle_name' => 'J.',
@@ -130,6 +131,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Test getting billing profile filled using is_billing.
    */
   public function testProfileGetBillingUseIsBillingLocation(): void {
+    $nameAndAddressProfileID = $this->getProfileID('name_and_address');
     $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $individual = $this->createIndividualContact();
     $contactId = key($individual);
@@ -141,12 +143,12 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     ]);
 
     $params = [
-      'profile_id' => [$this->_profileID, 1, 'Billing'],
+      'profile_id' => [$this->_profileID, $nameAndAddressProfileID, 'Billing'],
       'contact_id' => $contactId,
     ];
 
     $result = $this->callAPIV3Success('profile', 'get', $params)['values'];
-    $this->assertEquals('abc1', $result[1]['first_name']);
+    $this->assertEquals('abc1', $result[$nameAndAddressProfileID]['first_name']);
     $this->assertEquals([
       'billing_first_name' => 'abc1',
       'billing_middle_name' => 'J.',
@@ -165,6 +167,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Test getting multiple profiles, including billing.
    */
   public function testProfileGetMultipleHasBillingLocation(): void {
+    $nameAndAddressProfileID = $this->getProfileID('name_and_address');
     $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $individual = $this->createIndividualContact();
     $contactId = key($individual);
@@ -182,12 +185,12 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     ]);
 
     $params = [
-      'profile_id' => [$this->_profileID, 1, 'Billing'],
+      'profile_id' => [$this->_profileID, $nameAndAddressProfileID, 'Billing'],
       'contact_id' => $contactId,
     ];
 
     $result = $this->callAPIV3Success('profile', 'get', $params);
-    $this->assertEquals('abc1', $result['values'][1]['first_name']);
+    $this->assertEquals('abc1', $result['values'][$nameAndAddressProfileID]['first_name']);
     $this->assertEquals([
       'billing_first_name' => 'abc1',
       'billing_middle_name' => 'J.',

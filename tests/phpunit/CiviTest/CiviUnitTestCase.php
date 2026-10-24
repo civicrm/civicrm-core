@@ -1355,7 +1355,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   public function uFFieldCreate($params = []) {
     $params = array_merge([
-      'uf_group_id' => 1,
+      'uf_group_id' => $this->getProfileID('name_and_address'),
       'field_name' => 'first_name',
       'is_active' => 1,
       'is_required' => 1,
@@ -1384,7 +1384,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
         'entity_table' => 'civicrm_event',
         'entity_id' => 3,
         'weight' => 1,
-        'uf_group_id' => 1,
+        'uf_group_id' => $this->getProfileID('name_and_address'),
       ];
     }
     return $this->callAPISuccess('UFJoin', 'create', $params);

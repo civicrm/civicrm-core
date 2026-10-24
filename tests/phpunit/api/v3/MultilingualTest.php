@@ -88,7 +88,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
       'Attachment' => ['id' => 13],
       'CustomValue' => ['entity_id' => 13],
       'MailingContact' => ['contact_id' => 13],
-      'Profile' => ['profile_id' => 13],
+      'Profile' => ['profile_id' => $this->getProfileID('honoree_individual')],
       'MailingGroup' => ['mailing_id' => 13],
     ];
     // deprecated or API.Get is not supported/implemented
