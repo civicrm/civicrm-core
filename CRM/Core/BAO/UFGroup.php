@@ -3294,8 +3294,7 @@ SELECT  group_id
       }
     }
 
-    //since we don't have names, compare w/ label.
-    $mailingListGroupType = array_search('Mailing List', CRM_Core_OptionGroup::values('group_type'));
+    $mailingListGroupType = (string) CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Group', 'group_type', 'Mailing List');
 
     //actual processing start.
     foreach ($params['group'] as $groupId => $isSelected) {
@@ -3309,7 +3308,7 @@ SELECT  group_id
         CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $groupId, 'group_type', 'id')
       );
       //get only mailing type group and unset it from params
-      if (in_array($mailingListGroupType, $groupTypes) && !in_array($groupId, $contactGroups)) {
+      if (in_array($mailingListGroupType, $groupTypes, TRUE) && !in_array($groupId, $contactGroups)) {
         $subscribeGroupIds[$groupId] = $groupId;
         unset($params['group'][$groupId]);
       }
