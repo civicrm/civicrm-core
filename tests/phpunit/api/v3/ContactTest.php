@@ -1183,8 +1183,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         [
           'contact_id_a' => '$value.id',
           'contact_id_b' => $create_result_1['id'],
-          // spouse of:
-          'relationship_type_id' => 2,
+          'relationship_type_id' => $this->getRelationshipTypeID('Spouse of'),
           'start_date' => '2005-01-12',
           'end_date' => '2006-01-11',
           'description' => 'old',
@@ -1193,7 +1192,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
           'contact_id_a' => '$value.id',
           'contact_id_b' => $create_result_1['id'],
           // spouse of (was married twice :))
-          'relationship_type_id' => 2,
+          'relationship_type_id' => $this->getRelationshipTypeID('Spouse of'),
           'start_date' => '2006-07-01',
           'end_date' => '2010-07-01',
           'description' => 'new',
@@ -1588,8 +1587,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         [
           'contact_id_a' => '$value.id',
           'contact_id_b' => $create_result_1['id'],
-          // child of
-          'relationship_type_id' => 1,
+          'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
         ],
       ],
     ];
@@ -1604,8 +1602,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         [
           'contact_id_a' => '$value.id',
           'contact_id_b' => $create_result_2['id'],
-          // child of
-          'relationship_type_id' => 1,
+          'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
         ],
       ],
     ];
@@ -1617,7 +1614,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'id' => $create_result_2['id'],
       'api.relationship.get' => [
         'contact_id_b' => '$value.id',
-        'relationship_type_id' => 1,
+        'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
       ],
     ];
     $get_result = $this->callAPISuccess('contact', 'getsingle', $get_params);
@@ -2026,7 +2023,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'duration_unit' => 'year',
       'duration_interval' => 1,
       'period_type' => 'rolling',
-      'relationship_type_id' => 5,
+      'relationship_type_id' => $this->getRelationshipTypeID('Employee of'),
       'relationship_direction' => 'b_a',
       'visibility' => 'Public',
       'is_active' => 1,

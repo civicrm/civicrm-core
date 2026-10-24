@@ -45,7 +45,7 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
     $r = Relationship::create()
       ->addValue('contact_id_a', $c1)
       ->addValue('contact_id_b', $c2)
-      ->addValue('relationship_type_id', 1)
+      ->addValue('relationship_type_id:name', 'Child of')
       ->addValue('start_date', 'now')
       ->addValue('end_date', 'now + 1 week')
       ->execute()

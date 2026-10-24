@@ -845,7 +845,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
     $result = $this->callAPISuccess($this->entity, 'get', [
       'contact_id' => $this->_cId_a,
-      'relationship_type_id' => 1,
+      'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
     ]);
     $this->assertEquals(0, $result['count']);
     $this->callAPISuccess($this->entity, 'delete', ['id' => $created['id']]);
@@ -867,9 +867,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->entity, 'create', $this->_params);
     $org3 = $this->organizationCreate();
     // lets just assume built in ones aren't being messed with!
-    $relType2 = 5;
+    $relType2 = $this->getRelationshipTypeID('Employee of');
     // lets just assume built in ones aren't being messed with!
-    $relType3 = 6;
+    $relType3 = $this->getRelationshipTypeID('Volunteer for');
 
     // Relationship 2.
     $this->callAPISuccess($this->entity, 'create',
@@ -909,8 +909,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->entity, 'create', $this->_params);
     $org3 = $this->organizationCreate();
     // lets just assume built in ones aren't being messed with!
-    $relType2 = 5;
-    $relType3 = 6;
+    $relType2 = $this->getRelationshipTypeID('Employee of');
+    $relType3 = $this->getRelationshipTypeID('Volunteer for');
 
     // Relationship 2.
     $this->callAPISuccess($this->entity, 'create',
@@ -959,10 +959,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $org3 = $this->organizationCreate();
 
     // lets just assume built in ones aren't being messed with!
-    $relType2 = 5;
+    $relType2 = $this->getRelationshipTypeID('Employee of');
     // lets just assume built in ones aren't being messed with!
-    $relType3 = 6;
-    $relType1 = 1;
+    $relType3 = $this->getRelationshipTypeID('Volunteer for');
+    $relType1 = $this->getRelationshipTypeID('Child of');
     $memberType = $this->membershipTypeCreate([
       'relationship_type_id' => [$relType1, $relType3],
       'relationship_direction' => ['a_b', 'b_a'],
@@ -1024,9 +1024,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $org3 = $this->organizationCreate();
 
     // Let's just assume built in ones aren't being messed with!
-    $relType2 = 5;
-    $relType3 = 6;
-    $relType1 = 1;
+    $relType2 = $this->getRelationshipTypeID('Employee of');
+    $relType3 = $this->getRelationshipTypeID('Volunteer for');
+    $relType1 = $this->getRelationshipTypeID('Child of');
     $memberType = $this->membershipTypeCreate([
       'relationship_type_id' => [$relType1, $relType3],
       'relationship_direction' => ['a_b', 'b_a'],
@@ -1148,7 +1148,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   public function testRelationshipCreateWithEmployerData(): void {
     // CASE A: Create a current employee relationship without setting end date, ensure that employer field is set
     $params = [
-      'relationship_type_id' => '5_a_b',
+      'relationship_type_id' => $this->getRelationshipTypeID('Employee of') . '_a_b',
       'related_contact_id' => $this->_cId_b,
       'start_date' => '2008-12-20',
       'end_date' => NULL,
@@ -1169,7 +1169,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       ]));
     // CASE B: Create a past employee relationship by setting end date of past, ensure that employer field is cleared
     $params = [
-      'relationship_type_id' => '5_a_b',
+      'relationship_type_id' => $this->getRelationshipTypeID('Employee of') . '_a_b',
       'related_contact_id' => $this->_cId_b,
       // set date to past date
       'end_date' => '2010-12-20',
@@ -1194,7 +1194,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   public function testDisableExpiredRelationships(): void {
     // Step 1: Create a current employer relationship with Org A
     $params = [
-      'relationship_type_id' => '5',
+      'relationship_type_id' => $this->getRelationshipTypeID('Employee of'),
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,
       'start_date' => '2008-12-20',
@@ -1216,7 +1216,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     // Step 2: Create a PAST employer relationship with Org B, and setting is_current_employer = FALSE
     $orgID2 = $this->organizationCreate();
     $params = [
-      'relationship_type_id' => '5',
+      'relationship_type_id' => $this->getRelationshipTypeID('Employee of'),
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $orgID2,
       'start_date' => '2008-12-20',

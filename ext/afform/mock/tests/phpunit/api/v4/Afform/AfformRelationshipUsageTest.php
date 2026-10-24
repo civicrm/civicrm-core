@@ -18,10 +18,11 @@ class AfformRelationshipUsageTest extends AfformUsageTestCase implements Transac
    * Tests creating a relationship between multiple contacts
    */
   public function testCreateContactsWithPresetRelationships(): void {
+    $childOfID = $this->getRelationshipTypeID('Child of');
     $layout = <<<EOHTML
 <af-form ctrl="afform">
   <af-entity data="{contact_type: 'Individual', source: 'Test Rel'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
-  <af-entity security="FBAC" type="Relationship" name="Relationship1" label="Relationship 1" actions="{create: true, update: true}" data="{contact_id_b: ['Individual1'], contact_id_a: ['Individual2'], relationship_type_id: '1'}" />
+  <af-entity security="FBAC" type="Relationship" name="Relationship1" label="Relationship 1" actions="{create: true, update: true}" data="{contact_id_b: ['Individual1'], contact_id_a: ['Individual2'], relationship_type_id: '$childOfID'}" />
   <af-entity data="{contact_type: 'Individual', source: 'Test Rel'}" type="Contact" name="Individual2" label="Individual 2" actions="{create: true, update: true}" security="RBAC" />
   <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
     <afblock-name-individual></afblock-name-individual>
@@ -65,8 +66,8 @@ EOHTML;
     $this->assertCount(2, $saved);
     $this->assertEquals('Firsty2', $saved[0]['contact_id_a.first_name']);
     $this->assertEquals('Firsty3', $saved[1]['contact_id_a.first_name']);
-    $this->assertEquals(1, $saved[0]['relationship_type_id']);
-    $this->assertEquals(1, $saved[1]['relationship_type_id']);
+    $this->assertEquals($childOfID, $saved[0]['relationship_type_id']);
+    $this->assertEquals($childOfID, $saved[1]['relationship_type_id']);
   }
 
   /**

@@ -914,7 +914,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('Relationship', 'create', [
       'contact_id_a' => $contactID_a,
       'contact_id_b' => $contactID_b,
-      'relationship_type_id' => 1,
+      'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
       'is_active' => 1,
     ]);
     // Create a group and add contact A to it.
@@ -931,7 +931,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
         1 => 'IN',
         2 =>
           [
-            0 => '1_b_a',
+            0 => $this->getRelationshipTypeID('Child of') . '_b_a',
           ],
         3 => 0,
         4 => 0,
@@ -971,7 +971,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $relationship = $this->callAPISuccess('Relationship', 'create', [
       'contact_id_a' => $contactID_a,
       'contact_id_b' => $contactID_b,
-      'relationship_type_id' => 2,
+      'relationship_type_id' => $this->getRelationshipTypeID('Spouse of'),
       'is_active' => 1,
       "custom_{$customFieldId}" => 'testvalue',
     ]);
@@ -981,7 +981,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
         1 => 'IN',
         2 =>
           [
-            0 => '2_a_b',
+            0 => $this->getRelationshipTypeID('Spouse of') . '_a_b',
           ],
         3 => 0,
         4 => 0,
@@ -1014,7 +1014,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $this->callAPISuccess('Relationship', 'create', [
       'contact_id_a' => $contactID_a,
       'contact_id_b' => $contactID_b,
-      'relationship_type_id' => 2,
+      'relationship_type_id' => $this->getRelationshipTypeID('Spouse of'),
       'is_active' => 1,
     ]);
     // Create a group and add contact A to it.
@@ -1031,7 +1031,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
         1 => 'IN',
         2 =>
           [
-            0 => '2_a_b',
+            0 => $this->getRelationshipTypeID('Spouse of') . '_a_b',
           ],
         3 => 0,
         4 => 0,
@@ -1068,7 +1068,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
         1 => 'IN',
         2 =>
           [
-            0 => '2_a_b',
+            0 => $this->getRelationshipTypeID('Spouse of') . '_a_b',
           ],
         3 => 0,
         4 => 0,
@@ -1094,7 +1094,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testRelationshipPermissionClause(): void {
-    $params = [['relation_type_id', 'IN', ['1_b_a'], 0, 0], ['relation_permission', 'IN', [2], 0, 0]];
+    $params = [['relation_type_id', 'IN', [$this->getRelationshipTypeID('Child of') . '_b_a'], 0, 0], ['relation_permission', 'IN', [2], 0, 0]];
     $sql = CRM_Contact_BAO_Query::getQuery($params);
     $this->assertStringContainsString('(civicrm_relationship.is_permission_a_b IN (2))', $sql);
   }
@@ -1106,20 +1106,22 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    */
   public function testRelationshipClause(): void {
     $today = date('Ymd');
+    $householdMemberOf = $this->getRelationshipTypeID('Household Member of');
+    $supervisedBy = $this->getRelationshipTypeID('Supervised by');
     $from1 = ' FROM civicrm_contact contact_a LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_a = contact_a.id ) LEFT JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_b = contact_b.id )';
     $from2 = ' FROM civicrm_contact contact_a LEFT JOIN civicrm_relationship ON (civicrm_relationship.contact_id_b = contact_a.id ) LEFT JOIN civicrm_contact contact_b ON (civicrm_relationship.contact_id_a = contact_b.id )';
     $where1 = "WHERE  ( (
 civicrm_relationship.is_active = 1 AND
 ( civicrm_relationship.end_date IS NULL OR civicrm_relationship.end_date >= {$today} ) AND
 ( civicrm_relationship.start_date IS NULL OR civicrm_relationship.start_date <= {$today} )
-) AND (contact_b.is_deleted = 0) AND civicrm_relationship.relationship_type_id IN (8) )  AND (contact_a.is_deleted = 0)";
+) AND (contact_b.is_deleted = 0) AND civicrm_relationship.relationship_type_id IN ({$householdMemberOf}) )  AND (contact_a.is_deleted = 0)";
     $where2 = "WHERE  ( (
 civicrm_relationship.is_active = 1 AND
 ( civicrm_relationship.end_date IS NULL OR civicrm_relationship.end_date >= {$today} ) AND
 ( civicrm_relationship.start_date IS NULL OR civicrm_relationship.start_date <= {$today} )
-) AND (contact_b.is_deleted = 0) AND civicrm_relationship.relationship_type_id IN (8,10) )  AND (contact_a.is_deleted = 0)";
+) AND (contact_b.is_deleted = 0) AND civicrm_relationship.relationship_type_id IN ({$householdMemberOf},{$supervisedBy}) )  AND (contact_a.is_deleted = 0)";
     // Test Traditional single select format
-    $params1 = [['relation_type_id', '=', '8_a_b', 0, 0]];
+    $params1 = [['relation_type_id', '=', $householdMemberOf . '_a_b', 0, 0]];
     $query1 = new CRM_Contact_BAO_Query(
       $params1, ['contact_id'],
       NULL, TRUE, FALSE, 1,
@@ -1130,7 +1132,7 @@ civicrm_relationship.is_active = 1 AND
     $this->assertLike($from1, $sql1[1]);
     $this->assertLike($where1, $sql1[2]);
     // Test single relationship type selected in multiple select.
-    $params2 = [['relation_type_id', 'IN', ['8_a_b'], 0, 0]];
+    $params2 = [['relation_type_id', 'IN', [$householdMemberOf . '_a_b'], 0, 0]];
     $query2 = new CRM_Contact_BAO_Query(
       $params2, ['contact_id'],
       NULL, TRUE, FALSE, 1,
@@ -1141,7 +1143,7 @@ civicrm_relationship.is_active = 1 AND
     $this->assertLike($from1, $sql2[1]);
     $this->assertLike($where1, $sql2[2]);
     // Test multiple relationship types selected.
-    $params3 = [['relation_type_id', 'IN', ['8_a_b', '10_a_b'], 0, 0]];
+    $params3 = [['relation_type_id', 'IN', [$householdMemberOf . '_a_b', $supervisedBy . '_a_b'], 0, 0]];
     $query3 = new CRM_Contact_BAO_Query(
       $params3, ['contact_id'],
       NULL, TRUE, FALSE, 1,
@@ -1152,7 +1154,7 @@ civicrm_relationship.is_active = 1 AND
     $this->assertLike($from1, $sql3[1]);
     $this->assertLike($where2, $sql3[2]);
     // Test Multiple Relationship type selected where one doesn't actually exist.
-    $params4 = [['relation_type_id', 'IN', ['8_a_b', '10_a_b', '14_a_b'], 0, 0]];
+    $params4 = [['relation_type_id', 'IN', [$householdMemberOf . '_a_b', $supervisedBy . '_a_b', '14_a_b'], 0, 0]];
     $query4 = new CRM_Contact_BAO_Query(
       $params4, ['contact_id'],
       NULL, TRUE, FALSE, 1,
@@ -1164,7 +1166,7 @@ civicrm_relationship.is_active = 1 AND
     $this->assertLike($where2, $sql4[2]);
 
     // Test Multiple b to a Relationship type  .
-    $params5 = [['relation_type_id', 'IN', ['8_b_a', '10_b_a', '14_b_a'], 0, 0]];
+    $params5 = [['relation_type_id', 'IN', [$householdMemberOf . '_b_a', $supervisedBy . '_b_a', '14_b_a'], 0, 0]];
     $query5 = new CRM_Contact_BAO_Query(
       $params5, ['contact_id'],
       NULL, TRUE, FALSE, 1,

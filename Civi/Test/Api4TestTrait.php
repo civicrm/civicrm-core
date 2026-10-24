@@ -21,6 +21,8 @@ use Civi\Api4\Utils\CoreUtil;
  */
 trait Api4TestTrait {
 
+  use LookupHelperTrait;
+
   /**
    * Records created which will be deleted during tearDown
    *

@@ -186,6 +186,11 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testLoadSavedMapping(array $fieldSpec, string $expectedJS, array $expectedDefaults): void {
+    if (isset($fieldSpec['relationship_type_id'])) {
+      // The data provider runs before the relationship types exist, so it gives the name; look up the id.
+      $fieldSpec['relationship_type_id'] = $this->getRelationshipTypeID($fieldSpec['relationship_type_id']);
+      $expectedDefaults['mapper[0]'][0] = sprintf($expectedDefaults['mapper[0]'][0], $fieldSpec['relationship_type_id']);
+    }
     $mapping = $this->callAPISuccess('Mapping', 'create', ['name' => 'my test']);
     $this->callAPISuccess('MappingField', 'create', array_merge(['mapping_id' => $mapping['id']], $fieldSpec));
     $this->form = $this->form = $this->getMapFieldFormObject(['savedMapping' => $mapping['id'], 'sqlQuery' => 'SELECT nada FROM civicrm_tmp_d_import_job_xxx']);
@@ -216,7 +221,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $this->assertEquals(3, $processor->getPhoneTypeID(10));
     $this->assertEquals(1, $processor->getLocationTypeID(10));
     $this->assertEquals(2, $processor->getWebsiteTypeID(8));
-    $this->assertEquals('4_a_b', $processor->getRelationshipKey(9));
+    $this->assertEquals($this->getRelationshipTypeID('Sibling of') . '_a_b', $processor->getRelationshipKey(9));
     $this->assertEquals('addressee', $processor->getFieldName(0));
     $this->assertEquals('street_address', $processor->getFieldName(3));
     $this->assertEquals($this->getCustomFieldName('text'), $processor->getFieldName(4));
@@ -250,14 +255,14 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
       ],
       [
         // Yes, the relationship mapping really does use url whereas non relationship uses website because... legacy
-        ['name' => 'url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'a_b'],
+        ['name' => 'url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1, 'relationship_type_id' => 'Child of', 'relationship_direction' => 'a_b'],
         "swapOptions(document.forms.MapField, 'mapper[0]', 2, 4, 'hs_mapper_0_');\n",
-        ['mapper[0]' => ['1_a_b', 'url', 1]],
+        ['mapper[0]' => ['%d_a_b', 'url', 1]],
       ],
       [
-        ['name' => 'phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'b_a'],
+        ['name' => 'phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'relationship_type_id' => 'Child of', 'relationship_direction' => 'b_a'],
         '',
-        ['mapper[0]' => ['1_b_a', 'phone', 'Primary', 1]],
+        ['mapper[0]' => ['%d_b_a', 'phone', 'Primary', 1]],
       ],
       [
         ['name' => 'do_not_import', 'contact_type' => 'Individual', 'column_number' => 0],
@@ -423,21 +428,21 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
         [
           'name' => $legacyMode ? 'State Province' : 'state_province',
           'column_number' => '7',
-          'relationship_type_id' => 4,
+          'relationship_type_id' => $this->getRelationshipTypeID('Sibling of'),
           'relationship_direction' => 'a_b',
           'location_type_id' => '1',
         ],
         [
           'name' => $legacyMode ? 'Url' : 'url',
           'column_number' => '8',
-          'relationship_type_id' => 4,
+          'relationship_type_id' => $this->getRelationshipTypeID('Sibling of'),
           'relationship_direction' => 'a_b',
           'website_type_id' => 2,
         ],
         [
           'name' => $legacyMode ? 'Phone' : 'phone',
           'column_number' => '9',
-          'relationship_type_id' => 4,
+          'relationship_type_id' => $this->getRelationshipTypeID('Sibling of'),
           'location_type_id' => '1',
           'relationship_direction' => 'a_b',
           'phone_type_id' => 2,

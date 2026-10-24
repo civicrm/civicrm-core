@@ -2673,7 +2673,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $membershipParams = $this->fixtures['rolling_membership'];
     $membershipParams['status_id'] = $this->getMembershipStatusID('New');
 
-    $membershipParams['membership_type_id']['relationship_type_id'] = 1;
+    $membershipParams['membership_type_id']['relationship_type_id'] = $this->getRelationshipTypeID('Child of');
     $membershipParams['membership_type_id']['relationship_direction'] = 'b_a';
     $membershipType1 = $this->createTestObject('CRM_Member_DAO_MembershipType', $membershipParams['membership_type_id']);
 
@@ -2719,7 +2719,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     // Each child gets a relationship, one with permission to edit the parent.  This
     // will trigger inherited memberships for the first membership type
     $relParams = [
-      'relationship_type_id' => 1,
+      'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
       'contact_id_a' => $nonPermChild->id,
       'contact_id_b' => $mainMembership->contact_id,
       'is_active' => 1,

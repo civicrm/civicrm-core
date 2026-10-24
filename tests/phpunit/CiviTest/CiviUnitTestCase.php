@@ -58,6 +58,7 @@ use Civi\Test\EventTestTrait;
 use Civi\Test\FormTrait;
 use Civi\Test\GenericAssertionsTrait;
 use Civi\Test\LocaleTestTrait;
+use Civi\Test\LookupHelperTrait;
 use Civi\Test\MailingTestTrait;
 use Civi\Test\PageTrait;
 use League\Csv\Reader;
@@ -95,6 +96,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   use ContactTestTrait;
   use MailingTestTrait;
   use LocaleTestTrait;
+  use LookupHelperTrait;
   use FormTrait;
   use PageTrait;
 
@@ -809,30 +811,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     }
     $renewedMembershipEndDate->sub(new DateInterval('P1D'));
     return $renewedMembershipEndDate->format('Y-m-d');
-  }
-
-  /**
-   * Get the id of a participant status.
-   *
-   * @param string $name
-   *   e.g. 'Registered'.
-   *
-   * @return int
-   */
-  protected function getParticipantStatusID(string $name): int {
-    return (int) CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', $name);
-  }
-
-  /**
-   * Get the id of a membership status.
-   *
-   * @param string $name
-   *   e.g. 'New'.
-   *
-   * @return int
-   */
-  protected function getMembershipStatusID(string $name): int {
-    return (int) CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', $name);
   }
 
   /**
@@ -1864,26 +1842,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Get the id of the price field of the default contribution price set.
-   *
-   * @return int
-   */
-  protected function getDefaultContributionPriceFieldID(): int {
-    $priceSet = CRM_Price_BAO_PriceSet::getDefaultPriceSet();
-    return (int) reset($priceSet)['priceFieldID'];
-  }
-
-  /**
-   * Get the id of the price field value of the default contribution price set.
-   *
-   * @return int
-   */
-  protected function getDefaultContributionPriceFieldValueID(): int {
-    $priceSet = CRM_Price_BAO_PriceSet::getDefaultPriceSet();
-    return (int) reset($priceSet)['priceFieldValueID'];
-  }
-
-  /**
    * Recreate default membership types.
    *
    * @noinspection PhpUnhandledExceptionInspection
@@ -1903,7 +1861,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
             'duration_unit' => 'year',
             'duration_interval' => 2,
             'period_type' => 'rolling',
-            'relationship_type_id' => 7,
+            'relationship_type_id' => $this->getRelationshipTypeID('Head of Household for'),
             'relationship_direction' => 'b_a',
             'visibility' => 'Public',
             'is_active' => 1,
@@ -1925,7 +1883,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
             'duration_unit' => 'lifetime',
             'duration_interval' => 1,
             'period_type' => 'rolling',
-            'relationship_type_id' => 7,
+            'relationship_type_id' => $this->getRelationshipTypeID('Head of Household for'),
             'relationship_direction' => 'b_a',
             'visibility' => 'Admin',
           ],
@@ -2868,17 +2826,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     // Be really careful not to remove or bypass this without ensuring stray rows do not re-appear
     // when calling completeTransaction or repeatTransaction.
     $this->callAPISuccessGetCount('FinancialItem', ['description' => 'Sales Tax', 'amount' => 0], 0);
-  }
-
-  /**
-   * Return financial type id on basis of name
-   *
-   * @param string $name Financial type m/c name
-   *
-   * @return int
-   */
-  public function getFinancialTypeID(string $name): int {
-    return CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'financial_type_id', $name);
   }
 
   /**

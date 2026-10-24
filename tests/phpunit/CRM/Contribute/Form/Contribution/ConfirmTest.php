@@ -48,20 +48,6 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
-   * Get the payment instrument ID.
-   *
-   * Function just exists to avoid line-wrapping hell with the
-   * longer function it calls.
-   *
-   * @param string $name
-   *
-   * @return int
-   */
-  protected function getPaymentInstrumentID(string $name): int {
-    return CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $name);
-  }
-
-  /**
    * CRM-21200: Test that making online payment for pending contribution
    * doesn't overwrite the contribution details
    *
@@ -300,7 +286,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->createTestEntity('Relationship', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $organizationID,
-      'relationship_type_id' => 5,
+      'relationship_type_id' => $this->getRelationshipTypeID('Employee of'),
       'is_current_employer' => 1,
     ]);
 
@@ -356,7 +342,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->createTestEntity('Relationship', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $organizationID,
-      'relationship_type_id' => 5,
+      'relationship_type_id' => $this->getRelationshipTypeID('Employee of'),
       'is_current_employer' => 1,
     ]);
     $submittedValues = $this->getBillingSubmitValues() + [
@@ -387,7 +373,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->createTestEntity('Relationship', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $existingOrgID,
-      'relationship_type_id' => 5,
+      'relationship_type_id' => $this->getRelationshipTypeID('Employee of'),
       'is_current_employer' => 1,
       'is_permission_a_b:name' => 'View and update',
     ]);
