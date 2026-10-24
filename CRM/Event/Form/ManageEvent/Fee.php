@@ -239,6 +239,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     $paymentProcessor = PaymentProcessor::get(FALSE)
       ->addWhere('is_test', '=', FALSE)
       ->addWhere('is_active', '=', TRUE)
+      ->addWhere('domain_id', '=', CRM_Core_Config::domainID())
       ->execute()
       ->column('title', 'id');
 
