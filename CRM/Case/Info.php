@@ -268,6 +268,17 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   }
 
   /**
+   * Settings for the crmCaseType Angular module.
+   *
+   * @return array
+   */
+  public static function getCaseTypeAngularSettings(): array {
+    return [
+      'caseComponentId' => CRM_Core_Component::getComponentID('CiviCase'),
+    ];
+  }
+
+  /**
    * @return array
    *   Array(string $value => string $label).
    */

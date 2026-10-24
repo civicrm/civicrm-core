@@ -6,4 +6,5 @@ return [
   'css' => ['ang/crmCaseType.css'],
   'partials' => ['ang/crmCaseType'],
   'requires' => ['ngRoute', 'crmUi', 'unsavedChanges', 'crmUtil', 'crmResource'],
+  'settingsFactory' => ['CRM_Case_Info', 'getCaseTypeAngularSettings'],
 ];
