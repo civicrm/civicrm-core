@@ -3606,9 +3606,6 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme .affix {
   position: fixed;
 }
-@-ms-viewport {
-  width: device-width;
-}
 #bootstrap-theme .visible-sm {
   display: none !important;
 }
