@@ -165,6 +165,8 @@ class CRM_Utils_Cache {
    *     should function correctly, but it can be harder to inspect/debug.
    *   - type: array|string, list of acceptable cache types, in order of preference.
    *   - prefetch: bool, whether to prefetch all data in cache (if possible).
+   *     If omitted, FALSE. Only FileCache and SqlGroup support prefetching;
+   *     other drivers ignore this option.
    *   - scope: string, How broadly is this cache shared? (Available in v5.80+)
    *       - version: Cache is tied to current version of CiviCRM (RECOMMENDED)
    *       - runtime: Cache is tied to domain ID, HTTP host, version, etc

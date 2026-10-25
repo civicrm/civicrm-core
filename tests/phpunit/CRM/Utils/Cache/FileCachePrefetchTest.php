@@ -10,7 +10,7 @@
  */
 
 /**
- * CRM_Utils_Cache::create() should forward the caller's prefetch option.
+ * FileCache should only read the whole cache group when explicitly asked to.
  *
  * @group headless
  */
@@ -23,8 +23,16 @@ class CRM_Utils_Cache_FileCachePrefetchTest extends CiviUnitTestCase {
    */
   private array $caches = [];
 
+  /**
+   * Unique directory for this test, so leftover files cannot affect results.
+   *
+   * @var string
+   */
+  private string $prefix;
+
   protected function setUp(): void {
     parent::setUp();
+    $this->prefix = 'FileCachePrefetchTest_' . uniqid();
     $this->caches = [];
   }
 
@@ -33,6 +41,25 @@ class CRM_Utils_Cache_FileCachePrefetchTest extends CiviUnitTestCase {
       $cache->clear();
     }
     parent::tearDown();
+  }
+
+  public function testDefaultDoesNotPrefetch(): void {
+    $this->createFileCache()->set('foo', 'bar');
+
+    $cache = $this->createFileCache();
+
+    $this->assertSame([], $this->readPrefetchedValues($cache));
+    $this->assertSame('bar', $cache->get('foo'));
+  }
+
+  public function testExplicitPrefetchReadsWholeGroup(): void {
+    $this->createFileCache()->set('foo', 'bar');
+
+    $cache = $this->createFileCache(['prefetch' => TRUE]);
+
+    $values = $this->readPrefetchedValues($cache);
+    $this->assertCount(1, $values);
+    $this->assertSame('bar', $values[$this->inMemoryKey($cache, 'foo')] ?? NULL);
   }
 
   public function testCreateForwardsPrefetchOption(): void {
@@ -55,8 +82,6 @@ class CRM_Utils_Cache_FileCachePrefetchTest extends CiviUnitTestCase {
     $this->assertCount(1, $values);
     $this->assertSame('bar', $values[$this->inMemoryKey($reader, 'foo')] ?? NULL);
 
-    // The driver default is still TRUE, so an explicit FALSE only takes effect
-    // when create() forwards it.
     $noPrefetch = $this->unwrapFileCache(CRM_Utils_Cache::create([
       'name' => $name,
       'type' => ['FileCache'],
@@ -65,6 +90,21 @@ class CRM_Utils_Cache_FileCachePrefetchTest extends CiviUnitTestCase {
     $this->caches[] = $noPrefetch;
     $this->assertSame([], $this->readPrefetchedValues($noPrefetch));
     $this->assertSame('bar', $noPrefetch->get('foo'));
+
+    // With no option, the FileCache default applies.
+    $defaultReader = $this->unwrapFileCache(CRM_Utils_Cache::create([
+      'name' => $name,
+      'type' => ['FileCache'],
+    ]));
+    $this->caches[] = $defaultReader;
+    $this->assertSame([], $this->readPrefetchedValues($defaultReader));
+  }
+
+  private function createFileCache(array $config = []): CRM_Utils_Cache_FileCache {
+    $config += ['prefix' => $this->prefix];
+    $cache = new CRM_Utils_Cache_FileCache($config);
+    $this->caches[] = $cache;
+    return $cache;
   }
 
   /**
