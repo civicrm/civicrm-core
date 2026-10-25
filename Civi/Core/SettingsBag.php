@@ -399,6 +399,8 @@ class SettingsBag {
     }
     $dao->find(TRUE);
     $oldValue = \CRM_Utils_String::unserialize($dao->value);
+    // A missing or NULL value means the default is in effect.
+    $oldEffective = $dao->value === NULL ? $this->getDefault($name) : $oldValue;
 
     // Call 'on_change' listeners. It would be nice to only fire when there's
     // a genuine change in the data. However, PHP developers have mixed
@@ -459,12 +461,13 @@ class SettingsBag {
 
     // Call 'post_change' listeners after the value has been saved.
     // Unlike 'on_change', this will only fire if the oldValue and newValue are not equivalent (using == comparison)
-    if ($value != $oldValue && !empty($metadata['post_change'])) {
+    $newEffective = $value ?? $this->getDefault($name);
+    if ($newEffective != $oldEffective && !empty($metadata['post_change'])) {
       foreach ($metadata['post_change'] as $callback) {
         call_user_func(
           \Civi\Core\Resolver::singleton()->get($callback),
-          $oldValue,
-          $value,
+          $oldEffective,
+          $newEffective,
           $metadata,
           $this->domainId
         );
