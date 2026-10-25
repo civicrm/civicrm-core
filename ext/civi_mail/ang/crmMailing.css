@@ -52,17 +52,7 @@
   margin: auto;
 }
 
-/* Odd: These placeholder directives break if combined */
-input[name=preview_test_email]:-moz-placeholder {
-  text-align: center;
-}
-input[name=preview_test_email]::-moz-placeholder {
-  text-align: center;
-}
-input[name=preview_test_email]::-webkit-input-placeholder {
-  text-align: center;
-}
-input[name=preview_test_email]:-ms-input-placeholder {
+input[name=preview_test_email]::placeholder {
   text-align: center;
 }
 
