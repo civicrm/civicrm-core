@@ -80,6 +80,7 @@ class TabsetPlacement extends AutoSubscriber {
           'weight' => $afform['placement_weight'] ?? $weight++,
           'icon' => 'crm-i ' . ($afform['icon'] ?: 'fa-list-alt'),
           'is_active' => TRUE,
+          'count' => FALSE,
           // Used by ContactLayout for managing tabs
           'contact_type' => PlacementUtils::filterContactTypes($afform['placement_filters']['contact_type'] ?? []) ?: NULL,
           'template' => 'afform/InlineAfform.tpl',
