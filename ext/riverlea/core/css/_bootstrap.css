@@ -1300,58 +1300,6 @@ fieldset[disabled] #bootstrap-theme .form-control {
 #bootstrap-theme textarea.form-control {
   height: auto;
 }
-@media screen and (-webkit-min-device-pixel-ratio: 0) {
-  #bootstrap-theme input[type="date"].form-control,
-  #bootstrap-theme input[type="time"].form-control,
-  #bootstrap-theme input[type="datetime-local"].form-control,
-  #bootstrap-theme input[type="month"].form-control {
-    line-height: 30px;
-  }
-  #bootstrap-theme input[type="date"].input-sm,
-  #bootstrap-theme .input-group-sm > input.form-control[type="date"],
-  #bootstrap-theme .input-group-sm > input.input-group-addon[type="date"],
-  #bootstrap-theme .input-group-sm > .input-group-btn > input.btn[type="date"],
-  .input-group-sm #bootstrap-theme input[type="date"],
-  #bootstrap-theme input[type="time"].input-sm,
-  #bootstrap-theme .input-group-sm > input.form-control[type="time"],
-  #bootstrap-theme .input-group-sm > input.input-group-addon[type="time"],
-  #bootstrap-theme .input-group-sm > .input-group-btn > input.btn[type="time"],
-  .input-group-sm #bootstrap-theme input[type="time"],
-  #bootstrap-theme input[type="datetime-local"].input-sm,
-  #bootstrap-theme .input-group-sm > input.form-control[type="datetime-local"],
-  #bootstrap-theme .input-group-sm > input.input-group-addon[type="datetime-local"],
-  #bootstrap-theme .input-group-sm > .input-group-btn > input.btn[type="datetime-local"],
-  .input-group-sm #bootstrap-theme input[type="datetime-local"],
-  #bootstrap-theme input[type="month"].input-sm,
-  #bootstrap-theme .input-group-sm > input.form-control[type="month"],
-  #bootstrap-theme .input-group-sm > input.input-group-addon[type="month"],
-  #bootstrap-theme .input-group-sm > .input-group-btn > input.btn[type="month"],
-  .input-group-sm #bootstrap-theme input[type="month"] {
-    line-height: 30px;
-  }
-  #bootstrap-theme input[type="date"].input-lg,
-  #bootstrap-theme .input-group-lg > input.form-control[type="date"],
-  #bootstrap-theme .input-group-lg > input.input-group-addon[type="date"],
-  #bootstrap-theme .input-group-lg > .input-group-btn > input.btn[type="date"],
-  .input-group-lg #bootstrap-theme input[type="date"],
-  #bootstrap-theme input[type="time"].input-lg,
-  #bootstrap-theme .input-group-lg > input.form-control[type="time"],
-  #bootstrap-theme .input-group-lg > input.input-group-addon[type="time"],
-  #bootstrap-theme .input-group-lg > .input-group-btn > input.btn[type="time"],
-  .input-group-lg #bootstrap-theme input[type="time"],
-  #bootstrap-theme input[type="datetime-local"].input-lg,
-  #bootstrap-theme .input-group-lg > input.form-control[type="datetime-local"],
-  #bootstrap-theme .input-group-lg > input.input-group-addon[type="datetime-local"],
-  #bootstrap-theme .input-group-lg > .input-group-btn > input.btn[type="datetime-local"],
-  .input-group-lg #bootstrap-theme input[type="datetime-local"],
-  #bootstrap-theme input[type="month"].input-lg,
-  #bootstrap-theme .input-group-lg > input.form-control[type="month"],
-  #bootstrap-theme .input-group-lg > input.input-group-addon[type="month"],
-  #bootstrap-theme .input-group-lg > .input-group-btn > input.btn[type="month"],
-  .input-group-lg #bootstrap-theme input[type="month"] {
-    line-height: 54px;
-  }
-}
 #bootstrap-theme .form-group {
   margin-bottom: 15px;
 }
