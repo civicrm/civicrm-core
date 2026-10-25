@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\StatusPreference;
+
 /**
  *  Class api_v3_StatusPreferenceTest
  *
@@ -89,6 +91,15 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     $this->assertEquals($statusPreference['values'][$id]['domain_id'], $result['values'][$id]['domain_id'], 'In line ' . __LINE__);
     $this->assertEquals('2015-12-12', $result['values'][$id]['hush_until'], 'In line ' . __LINE__);
     $this->assertEquals($statusPreference['values'][$id]['ignore_severity'], $result['values'][$id]['ignore_severity'], 'In line ' . __LINE__);
+  }
+
+  /**
+   * An update without ignore_severity keeps the stored value.
+   */
+  public function testUpdateKeepsIgnoreSeverity(): void {
+    $id = $this->createTestEntity('StatusPreference', $this->_params)['id'];
+    StatusPreference::update(FALSE)->addWhere('id', '=', $id)->addValue('is_active', FALSE)->execute();
+    $this->assertSame(4, StatusPreference::get(FALSE)->addWhere('id', '=', $id)->execute()->single()['ignore_severity']);
   }
 
   /**

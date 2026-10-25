@@ -30,20 +30,17 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
   public static function create($params) {
     $statusPreference = new CRM_Core_DAO_StatusPreference();
 
-    // Default severity level to ignore is 0 (DEBUG).
-    $params['ignore_severity'] ??= 0;
-
     // Severity can be either text ('critical') or an integer <= 7.
     // It's a magic number, but based on PSR-3 standards.
-    if (!CRM_Utils_Rule::integer($params['ignore_severity'])) {
+    if (isset($params['ignore_severity']) && !CRM_Utils_Rule::integer($params['ignore_severity'])) {
       $params['ignore_severity'] = CRM_Utils_Check::severityMap($params['ignore_severity']);
+      // If severity is now blank, you have an invalid severity string.
+      if (is_null($params['ignore_severity'])) {
+        throw new CRM_Core_Exception(ts('Invalid string passed as severity level.'));
+      }
     }
-    if ($params['ignore_severity'] > 7) {
+    if (($params['ignore_severity'] ?? 0) > 7) {
       throw new CRM_Core_Exception(ts('You can not pass a severity level higher than 7.'));
-    }
-    // If severity is now blank, you have an invalid severity string.
-    if (is_null($params['ignore_severity'])) {
-      throw new CRM_Core_Exception(ts('Invalid string passed as severity level.'));
     }
 
     // Set default domain when creating (or updating by name)
@@ -56,6 +53,11 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
       $statusPreference->domain_id = $params['domain_id'];
       $statusPreference->name = $params['name'];
       $statusPreference->find(TRUE);
+    }
+
+    // Default severity level to ignore is 0 (DEBUG) for a new preference.
+    if (empty($params['id']) && !$statusPreference->id) {
+      $params['ignore_severity'] ??= 0;
     }
 
     $op = $statusPreference->id ? 'edit' : 'create';
