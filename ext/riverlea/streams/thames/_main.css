@@ -425,21 +425,6 @@ html.cms-standalone body {
   display: none;
 }
 
-/* .modal-header .close { order: 3; } */
-/* .crm-container  .modal-header .ui-icon[class*=" fa-"] { font-size: 1rem; } */
-/* I don't know what problem this solved, but it creates an undesired left padding */
-/* #bootstrap-theme .modal-header::before, #bootstrap-theme .modal-header::after { */
-/*   display: none !important; */
-/* } */
-/**/
-/* #bootstrap-theme .modal-header { */
-/*   border:none; */
-/* } */
-/**/
-/* .crm-container button.close { */
-/*   color: var(--crm-c-blue-darker) !important; */
-/* } */
-
 /* FORMS */
 
 .crm-container .replace-plain {
@@ -565,7 +550,7 @@ div.crm-summary-contactname-block+.crm-actions-ribbon {
   flex-wrap: wrap;
 }
 
-/* */
+/* Contact summary tags block */
 #contact-summary .crm-tag-item {
   border-radius: var(--crm-r-1);
 }
