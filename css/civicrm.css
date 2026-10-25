@@ -346,10 +346,7 @@ input.crm-form-entityref {
   vertical-align: middle;
   padding: 1px 2px;
   height: 1.8em;
-  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #eee), color-stop(15%, #fff));
-  background-image: -webkit-linear-gradient(top, #eee 1%, #fff 15%);
-  background-image: -moz-linear-gradient(top, #eee 1%, #fff 15%);
-  background-image: linear-gradient(top, #eee 1%, #fff 15%);
+  background-image: linear-gradient(to bottom, #eee 1%, #fff 15%);
 }
 
 .crm-container input.crm-form-text[disabled],
@@ -358,10 +355,7 @@ input.crm-form-entityref {
 .crm-container input.crm-form-text[readonly],
 .crm-container input.crm-form-password[disabled],
 .crm-container input.crm-form-password[readonly] {
-  background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #ddd), color-stop(15%, #f2f2f2));
-  background-image: -webkit-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
-  background-image: -moz-linear-gradient(top, #ddd 1%, #f2f2f2 15%);
-  background-image: linear-gradient(top, #ddd 1%, #f2f2f2 15%);
+  background-image: linear-gradient(to bottom, #ddd 1%, #f2f2f2 15%);
 }
 
 .crm-container input.crm-form-text[disabled],
@@ -1580,11 +1574,7 @@ input.crm-form-entityref {
 .crm-container .crm-hover-button:hover,
 .crm-container a.crm-hover-button:hover,
 .crm-container a.crm-hover-button:active {
-  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #eee), color-stop(1, #ccc));
-  background-image: -webkit-linear-gradient(center bottom, #eee 0%, #ccc 100%);
-  background-image: -moz-linear-gradient(center bottom, #eee 0%, #ccc 100%);
-  filter: "progid: DXImageTransform.Microsoft.gradient(startColorstr = '#cccccc', endColorstr = '#eeeeee', GradientType = 0)";
-  background-image: linear-gradient(top, #eee 0%, #ccc 100%);
+  background-image: linear-gradient(to top, #eee 0%, #ccc 100%);
   border: 1px solid #aaaaaa;
   opacity: 1;
   color: #2786c2;
