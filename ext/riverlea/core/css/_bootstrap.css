@@ -1661,7 +1661,6 @@ fieldset[disabled] #bootstrap-theme .form-control {
 #bootstrap-theme html input[type="button"],
 #bootstrap-theme input[type="reset"],
 #bootstrap-theme input[type="submit"] {
-  -webkit-appearance: button;
   cursor: var(--crm-link-hover-cursor);
 }
 #bootstrap-theme button[disabled],
