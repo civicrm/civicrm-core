@@ -1,19 +1,22 @@
-<div crm-ui-debug="statuses"></div>
-
-<h1 crm-page-title crm-document-title="ts('CiviCRM System Status') + ' (' + countVisible(1) + ')'">
+<h1 crm-page-title crm-document-title="ts('CiviCRM System Status') + ' (' + countVisible(true) + ')'">
   {{:: ts('CiviCRM System Status') }}
 </h1>
 
 <div id="crm-status-list" crm-ui-tab-set>
   <div crm-ui-tab
-    ng-repeat="tab in [{is_visible: 1, icon: 'fa-bell'}, {is_visible: 0, icon: 'fa-bell-slash-o'}]"
-    id="tab-status-visible-{{tab.is_visible}}"
+    ng-repeat="tab in [{is_visible: true, icon: 'fa-bell'}, {is_visible: false, icon: 'fa-bell-slash-o'}]"
+    id="tab-status-visible-{{tab.is_visible ? 1 : 0}}"
     count="{{countVisible(tab.is_visible)}}"
     crm-title="tab.is_visible ? ts('Active') : ts('Hidden')"
     crm-icon="{{tab.icon}}"
     >
-    <div class="crm-status-item" ng-repeat="status in statuses | filter:{is_visible: tab.is_visible}" >
-      <h3 class="crm-severity-{{status.severity}}">
+    <div ng-if="!$ctrl.statuses">
+      <div class="crm-loading-spinner">
+        <div class="sr-only">{{:: ts('Loading') }}</div>
+      </div>
+    </div>
+    <div class="crm-status-item" ng-repeat="status in $ctrl.statuses | filter:{is_visible: tab.is_visible}" >
+      <h3 class="crm-severity-{{status['severity_id:name']}}">
         <i ng-if="status.icon" class="crm-i {{status.icon}}" role="img" aria-hidden="true"></i>
         {{status.title}}
         <div statuspage-popup-menu class="hush-menu css_right"></div>
@@ -31,7 +34,7 @@
           >
         </a>
         <div ng-if="status.actions" class="crm-buttons crm-status-item-actions">
-          <button type="button" ng-repeat="action in status.actions" ng-click="doAction(action)">
+          <button type="button" ng-repeat="action in status.actions" ng-click="$ctrl.doAction(action)">
             <i class="crm-i {{:: action.icon }}" ng-if="action.icon" role="img" aria-hidden="true"></i>
             {{:: action.title }}
           </button>
