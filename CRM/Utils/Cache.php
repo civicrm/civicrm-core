@@ -246,6 +246,11 @@ class CRM_Utils_Cache {
     $dbCacheClass = 'CRM_Utils_Cache_' . $class;
     $settings = self::getCacheSettings($class);
     $settings['prefix'] = ($settings['prefix'] ?? '') . self::DELIMITER . $shortName . $scopeId;
+    if (isset($params['prefetch'])) {
+      // Forward explicit values, including FALSE. Drivers without prefetch
+      // support only read the config keys they know, so the key is inert.
+      $settings['prefetch'] = (bool) $params['prefetch'];
+    }
     $cache = new $dbCacheClass($settings);
     if (!empty($params['withArray'])) {
       $cache = $params['withArray'] === 'fast' ? new CRM_Utils_Cache_FastArrayDecorator($cache) : new CRM_Utils_Cache_ArrayDecorator($cache);
