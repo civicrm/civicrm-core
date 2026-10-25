@@ -29,11 +29,12 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    * @param bool $taxTrxnID
    * @param array|null $trxnId
    *
-   * @deprecated only called from deprecated code path.
+   * @deprecated since 6.21 will be removed around 6.33
    *
    * @return CRM_Financial_DAO_FinancialItem
    */
   public static function add($lineItem, $contribution, $taxTrxnID = FALSE, $trxnId = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('Order api v4');
     $financialItemStatus = array_column(\Civi::entity('FinancialItem')->getOptions('status_id'), 'id', 'name');
     $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id);
     $itemStatus = NULL;
