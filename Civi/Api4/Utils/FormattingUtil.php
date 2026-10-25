@@ -177,7 +177,15 @@ class FormattingUtil {
   public static function formatDateValue($format, $value, &$operator = NULL, $index = NULL) {
     // Non-relative dates (or if no search operator)
     if (!$operator || !array_key_exists($value ?? '', (array) \CRM_Core_OptionGroup::values('relative_date_filters'))) {
-      return date($format, strtotime($value ?? ''));
+      if (in_array($operator, ['LIKE', 'NOT LIKE', 'REGEXP', 'NOT REGEXP', 'REGEXP BINARY', 'NOT REGEXP BINARY'], TRUE)) {
+        throw new \CRM_Core_Exception("The $operator operator only accepts a relative date on date fields, not '$value'");
+      }
+      $timestamp = strtotime($value ?? '');
+      // strtotime() reads a whitespace-only string as "now"
+      if (($value ?? '') !== '' && (trim($value) === '' || $timestamp === FALSE || !self::isCalendarDate($value))) {
+        throw new \CRM_Core_Exception("Invalid date value: '$value'");
+      }
+      return date($format, $timestamp);
     }
     if (isset($index) && !strstr($operator, 'BETWEEN')) {
       throw new \CRM_Core_Exception("Relative dates cannot be in an array using the $operator operator.");
@@ -222,6 +230,18 @@ class FormattingUtil {
       default:
         throw new \CRM_Core_Exception("Relative dates cannot be used with the $operator operator.");
     }
+  }
+
+  /**
+   * Check that an explicit day exists in its month, as strtotime() rolls e.g. 1980-04-31 over to 1980-05-01.
+   *
+   * @param string $value
+   * @return bool
+   */
+  private static function isCalendarDate(string $value): bool {
+    ['year' => $year, 'month' => $month, 'day' => $day] = date_parse($value);
+    // A date without a year is checked against a leap year.
+    return $day === FALSE || checkdate((int) $month, $day, $year ?: 2000);
   }
 
   /**

@@ -88,7 +88,7 @@
         if (!allowedOps && field.data_type === 'Boolean') {
           allowedOps = ['=', '!=', 'IS EMPTY', 'IS NOT NULL', 'IS NULL'];
         }
-        if (!allowedOps && ['Boolean', 'Float', 'Date'].includes(field.data_type)) {
+        if (!allowedOps && ['Boolean', 'Float', 'Date', 'Timestamp'].includes(field.data_type)) {
           allowedOps = ['=', '!=', '<', '>', '<=', '>=', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'IS EMPTY', 'IS NOT EMPTY'];
         }
         if (!allowedOps && (field.data_type === 'Array' || field.serialize)) {
