@@ -1472,11 +1472,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     foreach ($fields as $val) {
       $submitParams[$val] = $prevContribution[$val];
     }
-    $_REQUEST['action'] = 'update';
-    $_REQUEST['id'] = $contribution['contribution_id'];
     // Complete the contribution from offline form.
-    $form = $this->getContributionForm($submitParams);
-    $form->postProcess();
+    $this->getTestForm('CRM_Contribute_Form_Contribution', $submitParams, [
+      'action' => 'update',
+      'id' => $contribution['contribution_id'],
+    ])->processForm();
 
     // Check if Membership is updated to New.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
@@ -1496,15 +1496,15 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
 
-    $_REQUEST['id'] = $membership['id'];
-    $form = $this->getForm([
+    $this->getTestForm('CRM_Member_Form_Membership', [
       'contact_id' => $this->ids['Contact']['individual_0'],
       'id' => $membership['id'],
       'join_date' => date('Y-m-d'),
       'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['AnnualFixed']],
       'financial_type_id' => '',
-    ]);
-    $form->postProcess();
+    ], [
+      'id' => $membership['id'],
+    ])->processForm();
 
     // Check if Membership stays as Pending.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
@@ -1744,28 +1744,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   }
 
   /**
-   * Get a membership form object.
-   *
-   * We need to instantiate the form to run preprocess, which means we have to
-   * trick it about the request method.
-   *
-   * @param array $formValues
-   *
-   * @return \CRM_Member_Form_Membership
-   * @throws \CRM_Core_Exception
-   */
-  protected function getForm(array $formValues = []): CRM_Member_Form_Membership {
-    if (isset($_REQUEST['cid'])) {
-      unset($_REQUEST['cid']);
-    }
-    /** @var CRM_Member_Form_Membership $form*/
-    $form = $this->getFormObject('CRM_Member_Form_Membership', $formValues);
-    $form->preProcess();
-    $form->buildForm();
-    return $form;
-  }
-
-  /**
    * @return array
    */
   protected function getBaseSubmitParams(): array {
@@ -1831,6 +1809,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
+      '_qf_default' => '',
       'price_' . $this->getPriceFieldID() => [
         $this->ids['PriceFieldValue']['AnnualRollingOrg2'] => 1,
         $this->ids['PriceFieldValue']['AnnualRolling'] => 1,
@@ -1863,22 +1842,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'billing_postal_code-5' => '90210',
       'billing_country_id-5' => '1228',
     ];
-    $form = $this->getForm($params);
-    $form->postProcess();
-  }
-
-  /**
-   * Get the contribution form object.
-   *
-   * @param array $formValues
-   *
-   * @return \CRM_Contribute_Form_Contribution
-   */
-  protected function getContributionForm(array $formValues): CRM_Contribute_Form_Contribution {
-    /** @var CRM_Contribute_Form_Contribution $form */
-    $form = $this->getFormObject('CRM_Contribute_Form_Contribution', $formValues);
-    $form->buildForm();
-    return $form;
+    $this->getTestForm('CRM_Member_Form_Membership', $params)->processForm();
   }
 
   /**
