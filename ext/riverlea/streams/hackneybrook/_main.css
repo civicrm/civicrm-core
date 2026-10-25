@@ -129,7 +129,6 @@
   --crm-icon-warning-color: var(--crm-warning-color);
   --crm-icon-info-color: var(--crm-notify-info-color);
   /* Frontend */
-  --crm-f-form-width: 800px;
   --crm-f-legend-align: unset;
   --crm-f-legend-size: var(--crm-l-reg-2);
   --crm-f-form-width: 50vw;
