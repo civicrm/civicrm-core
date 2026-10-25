@@ -27,7 +27,7 @@ return [
         'color' => NULL,
         'visibility_id' => NULL,
       ],
-      'match' => ['name'],
+      'match' => ['name', 'option_group_id'],
     ],
   ],
   [
