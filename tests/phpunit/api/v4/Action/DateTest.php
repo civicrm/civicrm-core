@@ -342,6 +342,7 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
       'impossible day with time' => ['2026-02-30 10:00:00'],
       'zero date' => ['0000-00-00'],
       'negative timestamp' => ['-00011130000000'],
+      'whitespace' => [' '],
     ];
   }
 

@@ -181,7 +181,8 @@ class FormattingUtil {
         throw new \CRM_Core_Exception("The $operator operator only accepts a relative date on date fields, not '$value'");
       }
       $timestamp = strtotime($value ?? '');
-      if (($value ?? '') !== '' && ($timestamp === FALSE || !self::isCalendarDate($value))) {
+      // strtotime() reads a whitespace-only string as "now"
+      if (($value ?? '') !== '' && (trim($value) === '' || $timestamp === FALSE || !self::isCalendarDate($value))) {
         throw new \CRM_Core_Exception("Invalid date value: '$value'");
       }
       return date($format, $timestamp);
