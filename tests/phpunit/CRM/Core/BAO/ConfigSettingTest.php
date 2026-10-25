@@ -34,4 +34,10 @@ class CRM_Core_BAO_ConfigSettingTest extends CiviUnitTestCase {
     $this->assertEquals(count($newNames), count($origNames) + 1);
   }
 
+  public function testRevertComponents(): void {
+    CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
+    Civi::settings()->revert('enable_components');
+    $this->assertEquals(Civi::settings()->getDefault('enable_components'), Civi::settings()->get('enable_components'));
+  }
+
 }
