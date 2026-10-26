@@ -43,7 +43,7 @@
 }
 
 #bootstrap-theme.api4-explorer-page .explorer-help-panel .panel-body {
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 /* because each help p is in a div, this undoes bootstrap removing margin from last-child */

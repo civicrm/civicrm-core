@@ -159,7 +159,7 @@ af-tabset .crm-tab-panel {
   margin: var(--crm-contact-tab-hang);
 }
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list li span {
-  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .crm-contact-page #mainTabContainer .crm-contact-tabs-list li .ui-tabs-anchor {
   display: grid;

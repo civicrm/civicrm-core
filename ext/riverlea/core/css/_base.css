@@ -27,7 +27,6 @@ body {
 .crm-container tr,
 .crm-container td,
 .crm-container details {
-  background-color: transparent;
   background: transparent;
   border: 0;
   padding: 0;
@@ -35,8 +34,6 @@ body {
   border-radius: unset;
   height: unset;
   color: inherit;
-  line-height: inherit;
-  font-family: inherit;
   font: inherit;
   font-size: inherit;
 }

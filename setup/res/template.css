@@ -160,7 +160,7 @@ body {
 }
 .civicrm-setup-body .comp-box:hover {
   background: #ddd;
-  cursor: hand;
+  cursor: pointer;
 }
 .civicrm-setup-body .comp-box > span {
   width: 100%;
@@ -190,7 +190,7 @@ body {
 }
 .civicrm-setup-body .optin-box:hover {
   background: #ddd;
-  cursor: hand;
+  cursor: pointer;
 }
 .civicrm-setup-body .optin-box > span {
   width: 100%;
