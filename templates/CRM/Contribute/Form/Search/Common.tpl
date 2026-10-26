@@ -148,7 +148,6 @@
   <td>
     {$form.contribution_pcp_made_through_id.label} <br />
     {$form.contribution_pcp_made_through_id.html}
-    {include file="CRM/Contribute/Form/PCP.js.tpl"}
   </td>
   <td>&nbsp;</td>
 </tr>

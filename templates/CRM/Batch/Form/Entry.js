@@ -54,36 +54,6 @@ CRM.$(function($) {
     }
   });
 
-  // Could be replaced if there ever is a PCP API.
-  // See templates/CRM/Contribute/Form/PCP.js.tpl
-  var pcpURL = CRM.url('civicrm/ajax/pcp/list', 'json=1&context=contact&reset=1');
-  $('input[name^="pcp_made_through_id"]').each(function() {
-    // Figure out the name of the corresponding pcp_made_through[X] field
-    var thisMadeThroughName = $(this).attr('name').replace('through_id', 'through');
-    $(this).crmSelect2({
-      minimumInputLength: 1,
-      ajax: {
-        url: pcpURL,
-        data: function(term, page) {
-          return {term: term, page_num: page};
-        },
-        results: function(response) {
-          return response;
-        }
-      },
-      initSelection: function(el, callback) {
-        callback({id: $(el).val(), text: $('[name="'+thisMadeThroughName+'"]').val()});
-      }
-    })
-      // This is just a cheap trick to store the name when the form reloads
-      .on('change', function() {
-        var fieldNameVal = $(this).select2('data');
-        if (!fieldNameVal) {
-          fieldNameVal = '';
-        }
-        $('[name="'+thisMadeThroughName+'"]').val(fieldNameVal.text);
-      });
-  });
 
   function showHidePCPRoll() {
     $(this).parents('.crm-grid-cell').children('.pcp_roll_display').toggle($(this).prop('checked'));
