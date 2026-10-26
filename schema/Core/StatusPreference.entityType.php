@@ -11,11 +11,13 @@ return [
     'add' => '4.7',
   ],
   'getIndices' => fn() => [
-    'UI_status_pref_name' => [
+    'UI_name_domain_id' => [
       'fields' => [
         'name' => TRUE,
+        'domain_id' => TRUE,
       ],
-      'add' => '4.7',
+      'unique' => TRUE,
+      'add' => '6.21',
     ],
   ],
   'getFields' => fn() => [

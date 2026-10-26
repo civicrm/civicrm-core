@@ -87,6 +87,29 @@ class CRM_Upgrade_Incremental_php_SixTwentyOne extends CRM_Upgrade_Incremental_B
         'callback' => ['CRM_Utils_Check', 'getSeverityOptions'],
       ],
     ]);
+    $this->addTask('Make StatusPreference name unique per domain', 'makeStatusPreferenceNameUnique');
+  }
+
+  /**
+   * Keep one StatusPreference per name and domain (the oldest, which is the one
+   * the BAO has been updating) and replace the name index with a unique one.
+   *
+   * @return bool
+   */
+  public static function makeStatusPreferenceNameUnique(): bool {
+    CRM_Core_DAO::executeQuery("
+      DELETE sp1 FROM civicrm_status_pref sp1
+      INNER JOIN civicrm_status_pref sp2
+      WHERE sp1.id > sp2.id
+        AND sp1.domain_id = sp2.domain_id
+        AND sp1.name = sp2.name
+    ", i18nRewrite: FALSE);
+    Civi::schemaHelper()->dropIndex('civicrm_status_pref', 'UI_status_pref_name');
+    Civi::schemaHelper()->createIndex('civicrm_status_pref', 'UI_name_domain_id', [
+      'fields' => ['name' => TRUE, 'domain_id' => TRUE],
+      'unique' => TRUE,
+    ]);
+    return TRUE;
   }
 
   /**
