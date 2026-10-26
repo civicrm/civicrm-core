@@ -76,7 +76,6 @@
 #bootstrap-theme fieldset[disabled] .btn,
 .crm-container button.disabled {
   cursor: not-allowed;
-  filter: alpha(opacity=65);
   opacity: .65;
   pointer-events: none;
   box-shadow: none;

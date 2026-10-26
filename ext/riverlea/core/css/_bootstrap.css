@@ -2220,7 +2220,7 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
 #bootstrap-theme .navbar-default .navbar-brand:hover,
 #bootstrap-theme .navbar-default .navbar-brand:focus {
   color: white;
-  background-color: none;
+  background-color: transparent;
 }
 #bootstrap-theme .navbar-default .navbar-text {
   color: #ddd;
@@ -2316,7 +2316,7 @@ fieldset[disabled] #bootstrap-theme .navbar-default .btn-link:focus {
 #bootstrap-theme .navbar-inverse .navbar-brand:hover,
 #bootstrap-theme .navbar-inverse .navbar-brand:focus {
   color: white;
-  background-color: none;
+  background-color: transparent;
 }
 #bootstrap-theme .navbar-inverse .navbar-text {
   color: white;
@@ -2919,7 +2919,6 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   line-height: 1;
   color: black;
   text-shadow: 0 1px 0 #fff;
-  filter: alpha(opacity=20);
   opacity: .2;
 }
 #bootstrap-theme .close:hover,
@@ -2927,7 +2926,6 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   color: black;
   text-decoration: none;
   cursor: var(--crm-link-hover-cursor);
-  filter: alpha(opacity=50);
   opacity: .5;
 }
 #bootstrap-theme button.close {
@@ -2992,11 +2990,9 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   background-color: black;
 }
 #bootstrap-theme .modal-backdrop.fade {
-  filter: alpha(opacity=0);
   opacity: 0;
 }
 #bootstrap-theme .modal-backdrop.in {
-  filter: alpha(opacity=50);
   opacity: .5;
 }
 #bootstrap-theme .modal-header {
@@ -3092,11 +3088,9 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   word-wrap: normal;
   white-space: normal;
   font-size: 12px;
-  filter: alpha(opacity=0);
   opacity: 0;
 }
 #bootstrap-theme .tooltip.in {
-  filter: alpha(opacity=90);
   opacity: .9;
 }
 #bootstrap-theme .tooltip.top {
