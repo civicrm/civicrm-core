@@ -200,7 +200,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    */
   public static function onToggleComponents($oldValue, $newValue, $metadata) {
     if (
-      in_array('CiviCase', $newValue)
+      in_array('CiviCase', $newValue ?? $metadata['default'])
       &&
       (!$oldValue || !in_array('CiviCase', $oldValue))
     ) {
