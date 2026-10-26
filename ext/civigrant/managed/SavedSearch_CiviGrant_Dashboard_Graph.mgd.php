@@ -19,7 +19,9 @@ return [
             'SUM(amount_granted) AS SUM_amount_granted',
             'YEAR(money_transfer_date) AS YEAR_money_transfer_date',
           ],
-          'orderBy' => ['money_transfer_date' => 'ASC'],
+          'orderBy' => [
+            'money_transfer_date' => 'ASC',
+          ],
           'where' => [
             [
               'YEAR(money_transfer_date)',

@@ -42,9 +42,7 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -62,10 +60,7 @@ return [
         'settings' => [
           'description' => NULL,
           'sort' => [
-            [
-              'title',
-              'ASC',
-            ],
+            ['title', 'ASC'],
           ],
           'limit' => 50,
           'pager' => [],

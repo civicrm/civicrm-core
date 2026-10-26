@@ -1,5 +1,4 @@
 <?php
-
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [

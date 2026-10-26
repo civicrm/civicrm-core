@@ -39,9 +39,7 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -71,10 +69,7 @@ return [
           ],
           'placeholder' => 5,
           'sort' => [
-            [
-              'weight',
-              'ASC',
-            ],
+            ['weight', 'ASC'],
           ],
           'columns' => [
             [
@@ -183,12 +178,7 @@ return [
             ],
           ],
           'cssRules' => [
-            [
-              'disabled',
-              'is_active',
-              '=',
-              FALSE,
-            ],
+            ['disabled', 'is_active', '=', FALSE],
           ],
           'draggable' => 'weight',
         ],

@@ -32,15 +32,9 @@ return [
           ],
           'orderBy' => [],
           'where' => [
-            [
-              'is_template',
-              '=',
-              FALSE,
-            ],
+            ['is_template', '=', FALSE],
           ],
-          'groupBy' => [
-            'id',
-          ],
+          'groupBy' => ['id'],
           'join' => [
             [
               'LocBlock AS Event_LocBlock_loc_block_id_01',
@@ -121,9 +115,7 @@ return [
         ],
         'description' => E::ts('this replaces the current Manage Events screen'),
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -141,10 +133,7 @@ return [
         'settings' => [
           'description' => NULL,
           'sort' => [
-            [
-              'start_date',
-              'ASC',
-            ],
+            ['start_date', 'ASC'],
           ],
           'limit' => 50,
           'pager' => [],
@@ -448,10 +437,7 @@ return [
             ],
           ],
           'actions' => TRUE,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
           'toolbar' => [
             [
               'action' => 'add',

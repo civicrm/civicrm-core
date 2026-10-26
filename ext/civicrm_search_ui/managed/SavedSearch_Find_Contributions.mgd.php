@@ -1,5 +1,4 @@
 <?php
-
 use CRM_CivicrmSearchUi_ExtensionUtil as E;
 
 return [
@@ -33,9 +32,7 @@ return [
           ],
           'orderBy' => [],
           'where' => [],
-          'groupBy' => [
-            'id',
-          ],
+          'groupBy' => ['id'],
           'join' => [
             [
               'Contact AS Contribution_Contact_contact_id_01',
@@ -79,9 +76,7 @@ return [
         'expires_date' => NULL,
         'description' => NULL,
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -233,10 +228,7 @@ return [
             ],
           ],
           'actions' => TRUE,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
         ],
         'acl_bypass' => FALSE,
       ],

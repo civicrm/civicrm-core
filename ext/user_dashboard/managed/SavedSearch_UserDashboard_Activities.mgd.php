@@ -25,15 +25,9 @@ return [
           ],
           'orderBy' => [],
           'where' => [
-            [
-              'status_id:name',
-              '!=',
-              'Completed',
-            ],
+            ['status_id:name', '!=', 'Completed'],
           ],
-          'groupBy' => [
-            'id',
-          ],
+          'groupBy' => ['id'],
           'join' => [
             [
               'Contact AS Activity_ActivityContact_Contact_01',
@@ -89,9 +83,7 @@ return [
           'having' => [],
         ],
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -155,10 +147,7 @@ return [
             ],
           ],
           'actions' => FALSE,
-          'classes' => [
-            'table',
-            'table-striped',
-          ],
+          'classes' => ['table', 'table-striped'],
         ],
       ],
       'match' => [

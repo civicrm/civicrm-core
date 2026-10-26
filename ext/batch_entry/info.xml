@@ -40,7 +40,7 @@
   </classloader>
   <civix>
     <namespace>CRM/BatchEntry</namespace>
-    <format>25.10.2</format>
+    <format>26.10.2</format>
     <angularModule>crmBatchEntry</angularModule>
   </civix>
   <mixins>

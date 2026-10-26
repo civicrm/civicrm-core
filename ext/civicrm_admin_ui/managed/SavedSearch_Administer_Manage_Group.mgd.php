@@ -1,5 +1,4 @@
 <?php
-
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 return [
@@ -31,15 +30,9 @@ return [
           ],
           'orderBy' => [],
           'where' => [
-            [
-              'is_hidden',
-              '=',
-              FALSE,
-            ],
+            ['is_hidden', '=', FALSE],
           ],
-          'groupBy' => [
-            'id',
-          ],
+          'groupBy' => ['id'],
           'join' => [
             [
               'Contact AS Group_GroupContact_Contact_01',
@@ -65,9 +58,7 @@ return [
           'having' => [],
         ],
       ],
-      'match' => [
-        'name',
-      ],
+      'match' => ['name'],
     ],
   ],
   [
@@ -85,10 +76,7 @@ return [
         'settings' => [
           'description' => NULL,
           'sort' => [
-            [
-              'title',
-              'ASC',
-            ],
+            ['title', 'ASC'],
           ],
           'limit' => 50,
           'pager' => [
@@ -253,12 +241,7 @@ return [
             ],
           ],
           'cssRules' => [
-            [
-              'disabled',
-              'is_active',
-              '=',
-              FALSE,
-            ],
+            ['disabled', 'is_active', '=', FALSE],
           ],
           'hierarchical' => TRUE,
           'collapsible' => 'closed',

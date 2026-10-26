@@ -15,10 +15,7 @@ return [
         'api_entity' => 'Navigation',
         'api_params' => [
           'version' => 4,
-          'select' => [
-            'id',
-            'label',
-          ],
+          'select' => ['id', 'label'],
           'orderBy' => [],
           'where' => [
             ['domain_id:name', '=', 'current_domain'],
@@ -57,11 +54,7 @@ return [
                 [
                   'icon' => 'fa-ban',
                   'side' => 'left',
-                  'if' => [
-                    'is_active',
-                    '=',
-                    FALSE,
-                  ],
+                  'if' => ['is_active', '=', FALSE],
                 ],
                 [
                   'field' => 'icon',
@@ -72,12 +65,7 @@ return [
               'break' => FALSE,
               'editable' => TRUE,
               'cssRules' => [
-                [
-                  'disabled',
-                  'is_active',
-                  '=',
-                  FALSE,
-                ],
+                ['disabled', 'is_active', '=', FALSE],
               ],
             ],
             [
