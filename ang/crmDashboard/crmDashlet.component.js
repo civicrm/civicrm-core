@@ -37,7 +37,7 @@
       function setChecker() {
         if (angular.isUndefined(checker)) {
           checker = $interval(function() {
-            if (!ctrl.collapsed && !isFresh() && (!document.hasFocus || document.hasFocus())) {
+            if (ctrl.isOpen() && !isFresh() && (!document.hasFocus || document.hasFocus())) {
               stopChecker();
               reload(ctrl.dashlet.url);
             }
@@ -52,8 +52,15 @@
         }
       }
 
-      this.toggleCollapse = function() {
-        ctrl.collapsed = !ctrl.collapsed;
+      // Fullscreen ignores the collapsed state without overwriting it, so the cached state survives.
+      this.isOpen = () => ctrl.isFullscreen || !ctrl.collapsed;
+
+      // Sync from the native <details> toggle; ng-open firing it again is a no-op.
+      this.onToggle = (event) => {
+        if (ctrl.isFullscreen || event.target.open === ctrl.isOpen()) {
+          return;
+        }
+        ctrl.collapsed = !event.target.open;
         setCache();
       };
 
@@ -83,7 +90,7 @@
 
         var cache = getCache();
         lastLoaded = cache.lastLoaded;
-        ctrl.collapsed = !this.fullscreen && !!cache.collapsed;
+        ctrl.collapsed = !!cache.collapsed;
 
         if (ctrl.dashlet.url) {
           var fresh = cache.content && isFresh();
