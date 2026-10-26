@@ -153,7 +153,10 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // and letting natural justice take care of the rest.
       $params['trxnParams']['trxn_id'] = $this->getUpdatedContribution()->trxn_id;
     }
-    if ($this->isSupportedContributionStatusChange()
+    if ($this->isOriginalStatusPending() && $this->isCompletedTransaction()) {
+      $params = $this->addPayment($params);
+    }
+    elseif ($this->isSupportedContributionStatusChange()
       && !empty($params['contribution_status_id'])
       && $this->getOriginalContribution()->contribution_status_id != $this->getUpdatedContribution()->contribution_status_id
     ) {
@@ -924,41 +927,51 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
       }
     }
+    $this->updateFinancialAccounts($params['trxnParams'], 'changedStatus');
+  }
 
-    if ($this->isOriginalStatusPending() && $this->isCompletedTransaction()
-    ) {
-      if ($this->isRecordAccountsReceivable() && !$this->getOriginalContributionValue('is_pay_later')) {
-        $financialTrxnIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams']);
-        $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
-      }
+  /**
+   * Record payment completing a Pending/In Progress contribution - called
+   * directly instead of routing through updateFinancialAccountsOnContributionStatusChange(),
+   * since this is a fresh payment at the contribution's current amount, not
+   * an adjustment relative to whatever was previously pending.
+   *
+   * @param array $params
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function addPayment(array $params): array {
+    if ($this->isRecordAccountsReceivable() && !$this->getOriginalContributionValue('is_pay_later')) {
+      $financialTrxnIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams']);
+      $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
+    }
 
-      $financialTrxnIDs[] = $this->createFinancialTrxn($params['trxnParams']);
+    $financialTrxnIDs[] = $this->createFinancialTrxn($params['trxnParams']);
 
-      foreach ($this->getUpdatedLineItems() as $lineItemDetails) {
-        $this->updateFinancialItemForLineItemToPaid($lineItemDetails['id']);
-        $financialItems = FinancialItem::get(FALSE)
-          ->addSelect('id', 'amount')
-          ->addWhere('entity_id', '=', $lineItemDetails['id'])
-          ->addWhere('entity_table', '=', 'civicrm_line_item')
-          ->execute();
-        if ($financialItems->count() > 0) {
-          foreach ($financialItems as $financialItem) {
-            foreach ($financialTrxnIDs as $financialTrxnID) {
-              EntityFinancialTrxn::save(FALSE)
-                ->addRecord([
-                  'financial_trxn_id' => $financialTrxnID,
-                  'entity_id' => $financialItem['id'],
-                  'entity_table' => 'civicrm_financial_item',
-                  'amount' => $financialItem['amount'],
-                ])
-                ->execute();
-            }
+    foreach ($this->getUpdatedLineItems() as $lineItemDetails) {
+      $this->updateFinancialItemForLineItemToPaid($lineItemDetails['id']);
+      $financialItems = FinancialItem::get(FALSE)
+        ->addSelect('id', 'amount')
+        ->addWhere('entity_id', '=', $lineItemDetails['id'])
+        ->addWhere('entity_table', '=', 'civicrm_line_item')
+        ->execute();
+      if ($financialItems->count() > 0) {
+        foreach ($financialItems as $financialItem) {
+          foreach ($financialTrxnIDs as $financialTrxnID) {
+            EntityFinancialTrxn::save(FALSE)
+              ->addRecord([
+                'financial_trxn_id' => $financialTrxnID,
+                'entity_id' => $financialItem['id'],
+                'entity_table' => 'civicrm_financial_item',
+                'amount' => $financialItem['amount'],
+              ])
+              ->execute();
           }
         }
       }
-      return;
     }
-    $this->updateFinancialAccounts($params['trxnParams'], 'changedStatus');
+    return $params;
   }
 
   /**
