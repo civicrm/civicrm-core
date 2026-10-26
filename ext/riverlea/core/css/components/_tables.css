@@ -304,7 +304,7 @@ tbody.scrollContent tr.alternateRow:hover,
 }
 .crm-container .table > :is(thead,tbody,tfoot) > :is(tr > td.active,tr > th.active,tr.active > td,tr.active > th) {
   background-color: var(--crm-table-row-bg-color);
-}*/
+}
 .crm-container .table-hover > tbody > :is(tr > td.active:hover,th.active:hover,tr.active:hover > td,tr:hover > .active,tr.active:hover > th) {
   background-color: var(--crm-table-row-hover-color);
 }
