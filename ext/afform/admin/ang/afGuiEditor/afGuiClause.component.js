@@ -56,7 +56,7 @@
 
       this.addClause = function(value) {
         if (value) {
-          ctrl.clauses.push([value, '=', '""']);
+          ctrl.clauses.push([value, '=', '']);
         }
       };
 
