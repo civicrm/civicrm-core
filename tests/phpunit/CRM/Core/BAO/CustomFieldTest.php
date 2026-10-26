@@ -1128,7 +1128,13 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $dao = CRM_Core_DAO::executeQuery(('SHOW CREATE TABLE ' . $customGroup['values'][$customGroup['id']]['table_name']));
     $dao->fetch();
     $collation = \CRM_Core_BAO_SchemaHandler::getInUseCollation();
-    $this->assertStringContainsString("`$testLink` varchar(2047) COLLATE $collation DEFAULT NULL", $dao->Create_Table);
+    $this->assertStringContainsString("`$testLink` varchar(2047) ", $dao->Create_Table);
+    // MariaDB leaves a column's collation out of SHOW CREATE TABLE when it matches the table's.
+    $columnCollation = CRM_Core_DAO::singleValueQuery(
+      'SELECT COLLATION_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %1 AND COLUMN_NAME = %2',
+      [1 => [$customGroup['values'][$customGroup['id']]['table_name'], 'String'], 2 => [$testLink, 'String']]
+    );
+    $this->assertEquals($collation, $columnCollation);
     $this->assertStringContainsString('KEY `index_my_text` (`my_text`)', $dao->Create_Table);
     $this->assertStringContainsString("KEY `index_$testLink` (`$testLink`(512))", $dao->Create_Table);
     $characterSet = stripos($collation, 'utf8mb4') !== FALSE ? 'utf8mb4' : 'utf8';
