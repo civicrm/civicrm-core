@@ -20,7 +20,7 @@
           <tr><td colspan='4'>
             <span class="label">{$form.communication_style_id.label} {help id="communication_style" file="CRM/Contact/Form/Contact.hlp"}</span>
             <span class="value">{$form.communication_style_id.html}</span>
-          </td><tr>
+          </td></tr>
         {/if}
         <tr>
           {if array_key_exists('email_greeting_id', $form)}

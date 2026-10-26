@@ -26,7 +26,7 @@
             {$form.address.$blockId.postal_code_suffix.label}
             {help id="id-postal-code-suffix" file="CRM/Contact/Form/Contact.hlp" title=$form.address.$blockId.postal_code_suffix.textLabel}<br/>
             {$form.address.$blockId.postal_code_suffix.html}
-          <td>
+          </td>
       {/if}
     {/if}
     <td colspan="2">&nbsp;&nbsp;</td>

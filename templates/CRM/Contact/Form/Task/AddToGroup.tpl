@@ -29,7 +29,7 @@
                 <tr class="crm-contact-task-addtogroup-form-block-title">
                    <td class="label">{$form.title.label}<span class="crm-marker">*</span></td>
                    <td>{$form.title.html}</td>
-                <tr>
+                </tr>
                 <tr class="crm-contact-task-addtogroup-form-block-description">
                    <td class="label">{$form.description.label}</td>
                    <td>{$form.description.html}</td></tr>
