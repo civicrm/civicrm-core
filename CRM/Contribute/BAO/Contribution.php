@@ -2399,6 +2399,46 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
+   * Is changing from the old to the new contribution status a permitted transition.
+   *
+   * True whenever either status is a site-defined (non-reserved) status - the
+   * core transition table below only constrains movement between two core
+   * statuses - or the new status is in that table's list of valid transitions
+   * for the old one.
+   *
+   * This is the single source of truth for which core-to-core status changes
+   * are valid - both checkStatusValidation() (which throws) and
+   * CRM_Contribute_Form_Contribution::getAvailableContributionStatuses()
+   * (which filters the status-change dropdown) call this, so the two can't
+   * drift apart again.
+   *
+   * @param int $oldContributionStatusID
+   * @param int $newContributionStatusID
+   *
+   * @return bool
+   */
+  public static function isValidStatusTransition(int $oldContributionStatusID, int $newContributionStatusID): bool {
+    $contributionStatuses = array_column(\Civi::entity('Contribution')->getOptions('contribution_status_id'), NULL, 'id');
+    if (empty($contributionStatuses[$newContributionStatusID]['is_reserved'])
+      || empty($contributionStatuses[$oldContributionStatusID]['is_reserved'])
+    ) {
+      return TRUE;
+    }
+    $checkStatus = [
+      'Cancelled' => ['Completed', 'Refunded'],
+      'Completed' => ['Cancelled', 'Refunded', 'Chargeback', 'Partially paid', 'Pending refund'],
+      'Pending' => ['Cancelled', 'Completed', 'Failed', 'Partially paid'],
+      'In Progress' => ['Cancelled', 'Completed', 'Failed'],
+      'Refunded' => ['Cancelled', 'Completed'],
+      'Partially paid' => ['Completed', 'Refunded'],
+      'Pending refund' => ['Completed', 'Refunded'],
+      'Failed' => ['Pending'],
+    ];
+    $validNewStatues = $checkStatus[$contributionStatuses[$oldContributionStatusID]['name']] ?? [];
+    return in_array($contributionStatuses[$newContributionStatusID]['name'], $validNewStatues, TRUE);
+  }
+
+  /**
    * Check status validation on update of a contribution.
    *
    * @param array $oldContributionValues
@@ -2410,34 +2450,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @throws \CRM_Core_Exception
    */
   public static function checkStatusValidation(array $oldContributionValues, array $newContributionValues): void {
-    $contributionStatuses = array_column(\Civi::entity('Contribution')->getOptions('contribution_status_id'), NULL, 'id');
-    $newContributionStatusName = $contributionStatuses[$newContributionValues['contribution_status_id']]['name'];
-    $oldContributionStatusName = $contributionStatuses[$oldContributionValues['contribution_status_id']]['name'];
-    if (empty($contributionStatuses[$newContributionValues['contribution_status_id']]['is_reserved'])) {
-      // Allow transitioning to a custom status from any normal/reserved status
-      return;
-    }
-    if (empty($contributionStatuses[$oldContributionValues['contribution_status_id']]['is_reserved'])) {
-      // Allow transitioning from a custom status to any normal/reserved status
-      return;
-    }
-
-    $checkStatus = [
-      'Cancelled' => ['Completed', 'Refunded'],
-      'Completed' => ['Cancelled', 'Refunded', 'Chargeback', 'Partially paid', 'Pending refund'],
-      'Pending' => ['Cancelled', 'Completed', 'Failed', 'Partially paid'],
-      'In Progress' => ['Cancelled', 'Completed', 'Failed'],
-      'Refunded' => ['Cancelled', 'Completed'],
-      'Partially paid' => ['Completed', 'Refunded'],
-      'Pending refund' => ['Completed', 'Refunded'],
-      'Failed' => ['Pending'],
-    ];
-    $validNewStatues = $checkStatus[$oldContributionStatusName] ?? [];
-
-    if (!in_array($newContributionStatusName, $validNewStatues, TRUE)) {
+    if (!self::isValidStatusTransition((int) $oldContributionValues['contribution_status_id'], (int) $newContributionValues['contribution_status_id'])) {
+      $contributionStatuses = array_column(\Civi::entity('Contribution')->getOptions('contribution_status_id'), NULL, 'id');
       throw new CRM_Core_Exception(ts('Cannot change contribution status from %1 to %2.', [
-        1 => $oldContributionStatusName,
-        2 => $newContributionStatusName,
+        1 => $contributionStatuses[$oldContributionValues['contribution_status_id']]['name'],
+        2 => $contributionStatuses[$newContributionValues['contribution_status_id']]['name'],
       ]));
     }
   }
