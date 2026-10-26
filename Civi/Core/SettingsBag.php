@@ -460,9 +460,9 @@ class SettingsBag {
     }
 
     // Call 'post_change' listeners after the value has been saved.
-    // Unlike 'on_change', this will only fire if the oldValue and newValue are not equivalent (using == comparison)
+    // Unlike 'on_change', this only fires if the stored or the effective value changes (using == comparison).
     $newEffective = $value ?? $this->getDefault($name);
-    if ($newEffective != $oldEffective && !empty($metadata['post_change'])) {
+    if (($value != $oldValue || $newEffective != $oldEffective) && !empty($metadata['post_change'])) {
       foreach ($metadata['post_change'] as $callback) {
         call_user_func(
           \Civi\Core\Resolver::singleton()->get($callback),

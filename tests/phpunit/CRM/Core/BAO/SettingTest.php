@@ -184,6 +184,13 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $this->assertEquals(1, $_testOnChange_hookCalls['count']);
     $this->assertFalse($_testOnChange_hookCalls['oldValue']);
     $this->assertTrue($_testOnChange_hookCalls['newValue']);
+
+    // saving the default over a missing value, so listeners can sync to it
+    $_testOnChange_hookCalls = ['count' => 0];
+    Civi::settings()->set('postChangeExample', TRUE);
+    $this->assertEquals(1, $_testOnChange_hookCalls['count']);
+    $this->assertTrue($_testOnChange_hookCalls['oldValue']);
+    $this->assertTrue($_testOnChange_hookCalls['newValue']);
   }
 
   /**
