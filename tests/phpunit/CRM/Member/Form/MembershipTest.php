@@ -1313,6 +1313,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitPayLaterWithBilling(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $params = [
       'contact_id' => $this->ids['Contact']['individual_0'],
       'join_date' => date('Y-m-d'),
@@ -1338,11 +1339,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
       'billing_first_name' => 'Test',
       'billing_middle_name' => 'Last',
-      'billing_street_address-5' => '10 Test St',
-      'billing_city-5' => 'Test',
-      'billing_state_province_id-5' => '1003',
-      'billing_postal_code-5' => '90210',
-      'billing_country_id-5' => '1228',
+      "billing_street_address-$billingLocationTypeID" => '10 Test St',
+      "billing_city-$billingLocationTypeID" => 'Test',
+      "billing_state_province_id-$billingLocationTypeID" => '1003',
+      "billing_postal_code-$billingLocationTypeID" => '90210',
+      "billing_country_id-$billingLocationTypeID" => '1228',
     ];
     $this->createLoggedInUser();
     $this->getTestForm('CRM_Member_Form_Membership', $params)->processForm();
@@ -1378,6 +1379,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitPayLaterWithBillingStatusOverride(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $params = [
       'contact_id' => $this->ids['Contact']['individual_0'],
       'join_date' => date('Y-m-d'),
@@ -1405,11 +1407,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contribution_status_id' => 2,
       'billing_first_name' => 'Test',
       'billing_middle_name' => 'Last',
-      'billing_street_address-5' => '10 Test St',
-      'billing_city-5' => 'Test',
-      'billing_state_province_id-5' => '1003',
-      'billing_postal_code-5' => '90210',
-      'billing_country_id-5' => '1228',
+      "billing_street_address-$billingLocationTypeID" => '10 Test St',
+      "billing_city-$billingLocationTypeID" => 'Test',
+      "billing_state_province_id-$billingLocationTypeID" => '1003',
+      "billing_postal_code-$billingLocationTypeID" => '90210',
+      "billing_country_id-$billingLocationTypeID" => '1228',
     ];
     $this->createLoggedInUser();
 
@@ -1747,6 +1749,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @return array
    */
   protected function getBaseSubmitParams(): array {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     return [
       'contact_id' => $this->ids['Contact']['individual_0'],
       'price_set_id' => 0,
@@ -1778,11 +1781,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
       'billing_middle_name' => 'Last',
-      'billing_street_address-5' => '10 Test St',
-      'billing_city-5' => 'Test',
-      'billing_state_province_id-5' => '1003',
-      'billing_postal_code-5' => '90210',
-      'billing_country_id-5' => '1228',
+      "billing_street_address-$billingLocationTypeID" => '10 Test St',
+      "billing_city-$billingLocationTypeID" => 'Test',
+      "billing_state_province_id-$billingLocationTypeID" => '1003',
+      "billing_postal_code-$billingLocationTypeID" => '90210',
+      "billing_country_id-$billingLocationTypeID" => '1228',
       'send_receipt' => 1,
     ];
   }

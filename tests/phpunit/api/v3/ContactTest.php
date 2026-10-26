@@ -1936,7 +1936,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
           ],
           'address' => [
             [
-              'location_type_id' => '1',
+              'location_type_id' => $this->getLocationTypeID('Home'),
               'title' => 'Address 1 (Home)',
               'street_address' => [
                 $contact1 => 'big house',
@@ -1948,7 +1948,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
               ],
             ],
             [
-              'location_type_id' => '2',
+              'location_type_id' => $this->getLocationTypeID('Work'),
               'street_address' => [
                 $contact1 => 'big office',
                 $contact2 => 'medium office',
@@ -1962,7 +1962,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
           ],
           'email' => [
             [
-              'location_type_id' => '1',
+              'location_type_id' => $this->getLocationTypeID('Home'),
               'email' => [
                 $contact1 => 'bob@example.com',
                 $contact2 => 'anthony_anderson@civicrm.org',
@@ -2494,7 +2494,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'api.address.create' => [
           'country' => 'United States',
           'state_province_id' => 'Michigan',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
       [
@@ -2504,7 +2504,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'api.address.create' => [
           'country' => 'United States',
           'state_province_id' => 'Alabama',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
     ];
@@ -2650,12 +2650,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api.phone.create' => [
         0 => [
           'phone' => '111-111-1111',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'phone_type_id' => 1,
         ],
         1 => [
           'phone' => '222-222-2222',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'phone_type_id' => 2,
         ],
       ],
@@ -3287,7 +3287,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'state_province_id' => 1004,
       'geo_code_1' => '37.79',
       'geo_code_2' => '-122.40',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'contact_id' => $contactID,
     ];
 
@@ -3424,7 +3424,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
           [
             'email' => 'spam@dev.null',
             'is_primary' => 0,
-            'location_type_id' => 1,
+            'location_type_id' => $this->getLocationTypeID('Home'),
           ],
         ],
       ],
@@ -3433,12 +3433,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
           [
             'phone' => '234-567-0001',
             'is_primary' => 1,
-            'location_type_id' => 1,
+            'location_type_id' => $this->getLocationTypeID('Home'),
           ],
           [
             'phone' => '234-567-0002',
             'is_primary' => 0,
-            'location_type_id' => 1,
+            'location_type_id' => $this->getLocationTypeID('Home'),
           ],
         ],
       ],
@@ -3555,7 +3555,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('address', 'create', [
       'contact_id' => $contactID,
       'city' => 'Cool City',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ]);
     $result = $this->callAPISuccess('contact', 'get', ['city' => 'Cool City', 'return' => 'contact_type']);
     $this->assertEquals(1, $result['count']);
@@ -3851,14 +3851,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contactIDWithoutBlankAddress = ($isReverse ? $this->ids['contact'][0] : $this->ids['contact'][1]);
     $this->callAPISuccess('Address', 'create', [
       'contact_id' => $contactIDWithBlankAddress,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ]);
     $this->callAPISuccess('Address', 'create', [
       'country_id' => 'MX',
       'contact_id' => $contactIDWithoutBlankAddress,
       'street_address' => 'First on the left after you cross the border',
       'postal_code' => 90210,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ]);
 
     $contact = $this->doMerge($isReverse);
@@ -4889,7 +4889,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contactID = $this->callAPISuccess('Contact', 'create', $this->_params)['id'];
     $this->callAPISuccess('Address', 'create', [
       'contact_id' => $contactID,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'street_address' => '42 Operator Array Lane',
     ]);
 

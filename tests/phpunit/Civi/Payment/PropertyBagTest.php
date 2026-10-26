@@ -146,7 +146,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   /**
-   * Test that emails set by the legacy method of 'email-5' can be retrieved with getEmail.
+   * Test that emails set by the legacy method of 'email-{billing location type id}' can be retrieved with getEmail.
    */
   public function testSetBillingEmailLegacy(): void {
     $localPropertyBag = PropertyBag::cast(['email-' . \CRM_Core_BAO_LocationType::getBilling() => 'a@b.com']);
@@ -267,6 +267,8 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    * @dataProvider otherParamsDataProvider
    */
   public function testOtherParams($prop, $legacy_names, $valid_values, $invalid_values) {
+    // The data provider runs before the location types exist, so legacy billing names end in '-Billing'; use the id.
+    $legacy_names = preg_replace('/-Billing$/', '-' . \CRM_Core_BAO_LocationType::getBilling(), $legacy_names);
     $setter = 'set' . ucfirst($prop);
     $getter = 'get' . ucfirst($prop);
 
@@ -430,14 +432,14 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $valid_ints = [[123, 123], ['123', 123]];
     $invalid_ints = [-1, 0, NULL, ''];
     return [
-      ['billingStreetAddress', ['billing_street_address', 'street_address', 'billing_street_address-5'], $valid_strings_inc_null, []],
+      ['billingStreetAddress', ['billing_street_address', 'street_address', 'billing_street_address-Billing'], $valid_strings_inc_null, []],
       ['billingSupplementalAddress1', [], $valid_strings_inc_null, []],
       ['billingSupplementalAddress2', [], $valid_strings_inc_null, []],
       ['billingSupplementalAddress3', [], $valid_strings_inc_null, []],
-      ['billingCity', ['billing_city', 'city', 'billing_city-5'], $valid_strings_inc_null, []],
-      ['billingPostalCode', ['billing_postal_code', 'postal_code', 'billing_postal_code-5'], $valid_strings_inc_null, []],
+      ['billingCity', ['billing_city', 'city', 'billing_city-Billing'], $valid_strings_inc_null, []],
+      ['billingPostalCode', ['billing_postal_code', 'postal_code', 'billing_postal_code-Billing'], $valid_strings_inc_null, []],
       ['billingCounty', [], $valid_strings_inc_null, []],
-      ['billingStateProvince', ['billing_state_province', 'state_province', 'billing_state_province-5'], $valid_strings_inc_null, []],
+      ['billingStateProvince', ['billing_state_province', 'state_province', 'billing_state_province-Billing'], $valid_strings_inc_null, []],
       ['contributionID', ['contribution_id'], $valid_ints, $invalid_ints],
       ['contributionRecurID', ['contribution_recur_id'], $valid_ints, $invalid_ints],
       ['description', [], [['foo' , 'foo'], ['', '']], []],

@@ -78,7 +78,7 @@ class CRM_Contact_Form_Task_EmailTest extends CiviUnitTestCase {
     $loggedInContactID = $this->createLoggedInUser();
     $loggedInEmail = $this->callAPISuccess('Email', 'create', [
       'email' => 'mickey@mouse.com',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
       'contact_id' => $loggedInContactID,
       'signature_text' => 'This is a test Signature',

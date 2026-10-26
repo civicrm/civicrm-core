@@ -725,7 +725,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
           'street_address' => '100 Innovation Way',
           'city' => 'Metropolis',
           'postal_code' => '90210',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 1,
         ],
       ],

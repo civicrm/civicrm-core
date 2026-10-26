@@ -2035,7 +2035,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // Scenario 2: Contribution using address
     $address = $this->callAPISuccess('address', 'create', [
       'street_address' => 'contribution billing st',
-      'location_type_id' => 2,
+      'location_type_id' => $this->getLocationTypeID('Work'),
       'contact_id' => $this->_params['contact_id'],
     ]);
     $params = array_merge($this->_params, [

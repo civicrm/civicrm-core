@@ -532,7 +532,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $cid = $this->individualCreate();
     $r = $this->callAPISuccess('Address', 'create', [
       'contact_id' => $cid,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'street_address' => '123 Some St',
       'city' => 'Hereville',
       //'US',
@@ -642,7 +642,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $cid = $this->individualCreate();
     $r = $this->callAPISuccess('Address', 'create', [
       'contact_id' => $cid,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       // Trigger geocoding to return 'null's for geo_code_1 and geo_code_2
       'street_address' => 'Does not exist',
       'city' => 'Hereville',

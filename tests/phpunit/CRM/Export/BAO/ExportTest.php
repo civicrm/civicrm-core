@@ -518,8 +518,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     $selectedFields = [
       ['contact_type' => 'Individual', 'name' => 'email'],
-      ['contact_type' => 'Individual', 'name' => 'email', 'location_type_id' => '1'],
-      ['contact_type' => 'Individual', 'name' => 'email', 'location_type_id' => '2'],
+      ['contact_type' => 'Individual', 'name' => 'email', 'location_type_id' => $this->getLocationTypeID('Home')],
+      ['contact_type' => 'Individual', 'name' => 'email', 'location_type_id' => $this->getLocationTypeID('Work')],
     ];
     $this->doExportTest([
       'ids' => [],
@@ -1059,7 +1059,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     //export the master address for contact B
     $selectedFields = [
-      ['contact_type' => 'Individual', 'name' => 'master_id', 'location_type_id' => 1],
+      ['contact_type' => 'Individual', 'name' => 'master_id', 'location_type_id' => $this->getLocationTypeID('Home')],
     ];
     $this->doExportTest([
       'fields' => $selectedFields,
@@ -3002,10 +3002,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $fields = [
       ['contact_type' => 'Individual', 'name' => 'first_name'],
       ['contact_type' => 'Individual', 'name' => 'last_name'],
-      ['contact_type' => 'Individual', 'name' => 'street_address', 'location_type_id' => 1],
-      ['contact_type' => 'Individual', 'name' => 'city', 'location_type_id' => 1],
-      ['contact_type' => 'Individual', 'name' => 'country', 'location_type_id' => 1],
-      ['contact_type' => 'Individual', 'name' => 'email', 'location_type_id' => 1],
+      ['contact_type' => 'Individual', 'name' => 'street_address', 'location_type_id' => $this->getLocationTypeID('Home')],
+      ['contact_type' => 'Individual', 'name' => 'city', 'location_type_id' => $this->getLocationTypeID('Home')],
+      ['contact_type' => 'Individual', 'name' => 'country', 'location_type_id' => $this->getLocationTypeID('Home')],
+      ['contact_type' => 'Individual', 'name' => 'email', 'location_type_id' => $this->getLocationTypeID('Home')],
     ];
     $processor = new CRM_Export_BAO_ExportProcessor(FALSE, $fields,
     'AND');

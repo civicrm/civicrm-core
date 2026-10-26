@@ -130,7 +130,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(1, $contacts);
     $this->assertEquals($contact1['id'], $contacts[0]['id']);
     $this->assertEquals('+35355439483', $contacts[0]['phone.phone']);
-    $this->assertEquals('1', $contacts[0]['phone.location_type_id']);
+    $this->assertEquals($this->getLocationTypeID('Home'), $contacts[0]['phone.location_type_id']);
   }
 
   public function testImplicitJoinOnExplicitJoin(): void {
@@ -142,7 +142,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
 
     $contacts = Contact::get(FALSE)
       ->addWhere('id', '=', $contact1['id'])
-      ->addJoin('Address AS address', TRUE, ['id', '=', 'address.contact_id'], ['address.location_type_id', '=', 1])
+      ->addJoin('Address AS address', TRUE, ['id', '=', 'address.contact_id'], ['address.location_type_id', '=', $this->getLocationTypeID('Home')])
       ->addSelect('id', 'address.country_id.iso_code')
       ->execute();
     $this->assertCount(1, $contacts);
@@ -156,7 +156,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       'country_id' => 1228,
     ]);
     $contacts = Contact::get(FALSE)
-      ->addJoin('Address AS address', 'EXCLUDE', ['id', '=', 'address.contact_id'], ['address.location_type_id', '=', 1])
+      ->addJoin('Address AS address', 'EXCLUDE', ['id', '=', 'address.contact_id'], ['address.location_type_id', '=', $this->getLocationTypeID('Home')])
       ->addSelect('id')
       ->execute()->column('id');
     $this->assertNotContains($contact1['id'], $contacts);

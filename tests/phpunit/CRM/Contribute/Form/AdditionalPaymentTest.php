@@ -385,6 +385,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function submitPayment(float $amount, ?string $mode = NULL, bool $isEmailReceipt = FALSE): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $submitParams = [
       'contact_id' => $this->ids['Contact']['order'] ?? $this->_individualId,
       'total_amount' => $amount,
@@ -408,10 +409,10 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
         'credit_card_number' => '411111111111111',
         'cvv2' => 234,
         'credit_card_type' => 'Visa',
-        'billing_city-5' => 'Vancouver',
-        'billing_state_province_id-5' => $stateProvinceID['id'],
-        'billing_postal_code-5' => 1321312,
-        'billing_country_id-5' => Country::get()->addWhere('name', '=', 'Canada')->execute()->first()['id'],
+        "billing_city-$billingLocationTypeID" => 'Vancouver',
+        "billing_state_province_id-$billingLocationTypeID" => $stateProvinceID['id'],
+        "billing_postal_code-$billingLocationTypeID" => 1321312,
+        "billing_country_id-$billingLocationTypeID" => Country::get()->addWhere('name', '=', 'Canada')->execute()->first()['id'],
       ];
     }
     else {
