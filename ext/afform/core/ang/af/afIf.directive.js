@@ -12,8 +12,10 @@
       link: function($scope, $element, $attr, ctrl, $transclude) {
         let block, childScope, previousElements;
 
+        const expression = CRM.afform.parseExpression($attr.afIf);
+
         $scope.$watch(
-          () => ctrl[0].evaluateExpression($attr.afIf),
+          () => ctrl[0].evaluateExpression(expression),
           (value) => value ? addElement() : removeElement()
         );
 

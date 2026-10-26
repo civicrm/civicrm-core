@@ -86,8 +86,6 @@
           this.search_operator = this.defn.search_operator;
         }
 
-        fieldOptions = this.defn.options || null;
-
         // Datepickers read these once when linking, so they must be set before the template renders
         if (this.defn.search_range && this.defn.is_date) {
           this.inputAttrs = [this.defn.input_attrs || {}];
@@ -97,6 +95,18 @@
             attrs.timePlaceholder = attrs['timePlaceholder' + i];
             this.inputAttrs.push(attrs);
           }
+        }
+
+        // get the field options
+        fieldOptions = this.defn.options || null;
+
+        // preparse if conditionals in options
+        if (Array.isArray(fieldOptions)) {
+          fieldOptions.forEach((option) => {
+            if (option.if) {
+              option.if = CRM.afform.parseExpression(option.if);
+            }
+          });
         }
 
         // Ensure boolean options are truly boolean
@@ -134,8 +144,9 @@
         // Watch conditional required attribute
         const afRequiredAttr = $element.attr('af-required');
         if (afRequiredAttr) {
+          const expression = CRM.afform.parseExpression(afRequiredAttr);
           $scope.$watch(
-            () => ctrl.afForm.evaluateExpression(afRequiredAttr),
+            () => this.afForm.evaluateExpression(expression),
             (value) => ctrl.defn.required = value
           );
         }
@@ -143,8 +154,9 @@
         // Watch conditional disabled attribute
         const afDisabledAttr = $element.attr('af-disabled');
         if (afDisabledAttr) {
+          const expression = CRM.afform.parseExpression(afDisabledAttr);
           $scope.$watch(
-            () => ctrl.afForm.evaluateExpression(afDisabledAttr),
+            () => this.afForm.evaluateExpression(expression),
             (value) => ctrl.defn.disabled = value
           );
         }
@@ -512,7 +524,7 @@
         return fieldOptions.filter((opt) => {
           if (!opt.if || !opt.if.length) return true;
           try {
-            return this.afForm.checkConditional(opt.if);
+            return this.afForm.evaluateExpression(opt.if);
           } catch (e) {
             // Permissive: misconfigured rule => visible. Server-side checks
             // are still authoritative.

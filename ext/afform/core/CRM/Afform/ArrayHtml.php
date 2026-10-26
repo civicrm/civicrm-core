@@ -30,6 +30,9 @@ class CRM_Afform_ArrayHtml {
       'af-fieldset' => 'text',
       'data' => 'js',
       'actions' => 'js',
+      'af-if' => 'json',
+      'af-required' => 'json',
+      'af-disabled' => 'json',
     ],
     'af-entity' => [
       '#selfClose' => TRUE,
@@ -346,6 +349,10 @@ class CRM_Afform_ArrayHtml {
    */
   protected function encodeAttrValue($type, $mixedAttrValue) {
     switch ($type) {
+      case 'json':
+        // we only need to JSON encode non strings
+        return is_string($mixedAttrValue) ? $mixedAttrValue : json_encode($mixedAttrValue);
+
       case 'text':
         return $mixedAttrValue;
 

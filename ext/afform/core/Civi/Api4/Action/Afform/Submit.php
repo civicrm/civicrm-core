@@ -164,61 +164,6 @@ class Submit extends AbstractProcessor {
   }
 
   /**
-   * PHP interpretation of the "af-if" directive to determine conditional status.
-   * @return bool - Is this conditional true or not.
-   */
-  public static function checkAfformConditional(array $conditional, array $allEntityValues) : bool {
-    foreach ($conditional as $clause) {
-      $clauseResult = self::checkAfformConditionalClause($clause, $allEntityValues);
-      if (!$clauseResult) {
-        return FALSE;
-      }
-    }
-    return TRUE;
-  }
-
-  private static function checkAfformConditionalClause(array $clause, array $allEntityValues) {
-    if ($clause[0] == 'OR') {
-      // recurse here.
-      $orResult = FALSE;
-      foreach ($clause[1] as $subClause) {
-        $orResult = $orResult || self::checkAfformConditionalClause($subClause, $allEntityValues);
-      }
-      return $orResult;
-    }
-    else {
-      $submittedValue = self::getValueFromEntity($clause[0], $allEntityValues);
-      // `==` is deprecated in favor of `=`
-      $op = $clause[1] === '==' ? '=' : $clause[1];
-      $expected = isset($clause[2]) ? \CRM_Utils_JS::decode($clause[2]) : NULL;
-      return self::compareValues($submittedValue, $op, $expected);
-    }
-  }
-
-  /**
-   * Given a value like "Individual1[0][fields][Volunteer_Info.Residency_History]", searches a multi-dimensional array for the corresponding value if it exists.
-   */
-  private static function getValueFromEntity(string $getThisValue, array $allEntityValues) {
-    $keys = explode('[', str_replace(']', '', $getThisValue));
-
-    // Initialize the value to the original array
-    $value = $allEntityValues;
-
-    foreach ($keys as $key) {
-      // Strip quotes from array key
-      $key = trim($key, '\'"');
-      if (isset($value[$key])) {
-        $value = $value[$key];
-      }
-      else {
-        // If any key is not found, return null
-        return NULL;
-      }
-    }
-    return $value;
-  }
-
-  /**
    * Validate all fields of type "EntityRef" contain values that are allowed by filters
    *
    * @param \Civi\Afform\Event\AfformValidateEvent $event
@@ -253,14 +198,8 @@ class Submit extends AbstractProcessor {
    */
   private static function getFieldInputError(AfformValidateEvent $event, string $fieldName, array $fieldDefn, array $attributes, $value) {
     // Check if element is disabled
-    $isDisabled = FALSE;
-    $disabledConditionals = $attributes['af-disabled'] ?? [];
-    foreach ($disabledConditionals as $conditional) {
-      if (self::checkAfformConditional($conditional, $event->getSubmittedValues())) {
-        $isDisabled = TRUE;
-        break;
-      }
-    }
+    $disabledWhen = $attributes['af-disabled'] ?? NULL;
+    $isDisabled = $disabledWhen && $event->getApiRequest()->checkAfformConditional($disabledWhen);
     if ($isDisabled) {
       return NULL;
     }
@@ -288,30 +227,16 @@ class Submit extends AbstractProcessor {
       return NULL;
     }
 
-    $isRequired = !empty($fieldDefn['required']);
-    if (!$isRequired && !empty($attributes['af-required'])) {
-      $isRequired = TRUE;
-      foreach ($attributes['af-required'] as $conditional) {
-        if (!self::checkAfformConditional($conditional, $event->getSubmittedValues())) {
-          $isRequired = FALSE;
-          break;
-        }
-      }
-    }
-
+    $isAlwaysRequired = !empty($fieldDefn['required']);
+    $requiredWhen = $attributes['af-required'] ?? NULL;
+    $isRequired = $isAlwaysRequired || ($requiredWhen && $event->getApiRequest()->checkAfformConditional($requiredWhen));
     if (!$isRequired) {
       return NULL;
     }
 
     // Check if element is visible
-    $isVisible = TRUE;
-    $conditionals = $attributes['af-if'] ?? [];
-    foreach ($conditionals as $conditional) {
-      $isVisible = self::checkAfformConditional($conditional, $event->getSubmittedValues());
-      if (!$isVisible) {
-        break;
-      }
-    }
+    $visibleWhen = $attributes['af-if'] ?? NULL;
+    $isVisible = !$visibleWhen || $event->getApiRequest()->checkAfformConditional($visibleWhen);
     if ($isVisible) {
       $label = $fieldDefn['label'] ?? $fieldDefn['title'] ?? $fieldName;
       return E::ts('%1 is a required field.', [1 => $label]);
@@ -527,14 +452,8 @@ class Submit extends AbstractProcessor {
       // Check main entity fields
       foreach ($afEntity['fields'] as $fieldName => $attributes) {
         if (isset($record['fields'][$fieldName])) {
-          $isDisabled = FALSE;
-          $disabledConditionals = $attributes['af-disabled'] ?? [];
-          foreach ($disabledConditionals as $conditional) {
-            if (self::checkAfformConditional($conditional, $event->getSubmittedValues())) {
-              $isDisabled = TRUE;
-              break;
-            }
-          }
+          $disabledWhen = $attributes['af-disabled'] ?? NULL;
+          $isDisabled = $disabledWhen && $event->getApiRequest()->checkAfformConditional($disabledWhen);
           if ($isDisabled) {
             unset($record['fields'][$fieldName]);
           }
@@ -547,14 +466,8 @@ class Submit extends AbstractProcessor {
           foreach ($record['joins'][$joinEntity] as $joinIndex => &$joinValues) {
             foreach ($join['fields'] ?? [] as $fieldName => $attributes) {
               if (isset($joinValues[$fieldName])) {
-                $isDisabled = FALSE;
-                $disabledConditionals = $attributes['af-disabled'] ?? [];
-                foreach ($disabledConditionals as $conditional) {
-                  if (self::checkAfformConditional($conditional, $event->getSubmittedValues())) {
-                    $isDisabled = TRUE;
-                    break;
-                  }
-                }
+                $disabledWhen = $attributes['af-disabled'] ?? NULL;
+                $isDisabled = $disabledWhen && $event->getApiRequest()->checkAfformConditional($disabledWhen);
                 if ($isDisabled) {
                   unset($joinValues[$fieldName]);
                 }

@@ -57,17 +57,12 @@
       }
 
       // Getter for ng-model.
-      // Returns a reference to avoid infinite loops in ngModel.watch
       function getValue() {
-        let newVal = JSON.parse(ctrl.clause[1 + ctrl.offset]);
-        if (!angular.equals(newVal, conditionValue)) {
-          conditionValue = newVal;
-        }
-        return conditionValue;
+        return ctrl.clause[1 + ctrl.offset];
       }
 
       function setValue(val) {
-        ctrl.clause[1 + ctrl.offset] = JSON.stringify(val);
+        ctrl.clause[1 + ctrl.offset] = val;
       }
 
       // Getter/setter for use with ng-model
