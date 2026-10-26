@@ -137,18 +137,16 @@ af-tabset .crm-tab-panel {
 }
 #mainTabContainer .crm-contact-tabs-list ~ .ui-tabs-panel {
   box-shadow: var(--crm-contact-box-shadow);
+  flex-grow: 1;
+  padding: var(--crm-contact-panel-padding);
+  border: var(--crm-contact-panel-border);
+  border-radius: var(--crm-contact-panel-radius);
 }
 .crm-contact-page #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor:has(.crm-i) {
   grid-template-columns: min-content auto min-content;
 }
 .crm-contact-page #mainTabContainer .ui-tabs-nav li .ui-tabs-anchor i {
   font-size: var(--crm-contact-icon-size);
-}
-#mainTabContainer .crm-contact-tabs-list ~ .ui-tabs-panel {
-  flex-grow: 1;
-  padding: var(--crm-contact-panel-padding);
-  border: var(--crm-contact-panel-border);
-  border-radius: var(--crm-contact-panel-radius);
 }
 #mainTabContainer .crm-contact-tabs-list ~ .ui-tabs-panel .afform-directive {
   /* Allow the crm-admin-block-context-dropdown widget to go all the way to the bottom of the tab */
