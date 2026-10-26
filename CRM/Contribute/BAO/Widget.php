@@ -45,6 +45,7 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
 
     $widget = new CRM_Contribute_DAO_Widget();
     $widget->contribution_page_id = $contributionPageID;
+    $widget->is_active = TRUE;
     if (!$widget->find(TRUE)) {
       $data['is_error'] = TRUE;
       CRM_Core_Error::debug_log_message("$contributionPageID is not found");
