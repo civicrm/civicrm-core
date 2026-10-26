@@ -368,6 +368,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
           'entity_table' => 'civicrm_contact',
           'note' => $params['note'],
           'subject' => $params['subject'] ?? NULL,
+          'note_date' => $params['note_date'] ?? NULL,
           'contact_id' => $contactId,
         ];
         CRM_Core_BAO_Note::add($noteParams);
@@ -1274,7 +1275,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
       $fields = array_merge($fields, $locationFields);
 
       $fields = array_merge($fields, CRM_Contact_DAO_Contact::import());
-      $fields = array_merge($fields, CRM_Core_DAO_Note::import());
+      $fields = array_merge($fields, array_intersect_key(CRM_Core_DAO_Note::import(), array_flip(['note', 'subject', 'note_date'])));
 
       //website fields
       $fields = array_merge($fields, CRM_Core_DAO_Website::import());

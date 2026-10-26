@@ -150,7 +150,7 @@ return [
       ],
     ],
     'subject' => [
-      'title' => ts('Subject'),
+      'title' => ts('Note Subject'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'description' => ts('subject of note description'),
