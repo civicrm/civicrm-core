@@ -127,8 +127,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $message->addAction(
         ts('Disable Debug Mode'),
         ts('Disable debug mode now?'),
-        'api3',
-        ['Setting', 'create', ['debug_enabled' => 0]]
+        'api4',
+        ['Setting', 'set', ['values' => ['debug_enabled' => FALSE]]],
+        'fa-ban'
       );
       return [$message];
     }

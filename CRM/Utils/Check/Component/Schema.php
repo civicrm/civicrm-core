@@ -236,13 +236,14 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         ts("Your database is missing a function to populate the 'Phone number' field with a numbers-only version of the phone."),
         ts('Missing Phone numeric function'),
         \Psr\Log\LogLevel::WARNING,
-        'fa-server'
+        'fa-database'
       );
       $msg->addAction(
-        ts('Rebuild triggers (also re-builds the phone number function)'),
-        ts('Create missing function now? This may take a few minutes.'),
-        'api3',
-        ['System', 'flush', ['triggers' => TRUE]]
+        ts('Rebuild SQL Triggers and Functions'),
+        ts('Rebuild SQL triggers and functions now? This may take a few minutes.'),
+        'api4',
+        ['System', 'flush', ['triggers' => TRUE]],
+        'fa-clock-rotate-left'
       );
       return [$msg];
     }
@@ -269,10 +270,11 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         'fa-database'
       );
       $msg->addAction(
-        ts('Rebuild triggers'),
-        ts('Create missing triggers now? This may take a few minutes.'),
-        'api3',
-        ['System', 'flush', ['triggers' => TRUE]]
+        ts('Rebuild SQL Triggers and Functions'),
+        ts('Rebuild SQL triggers and functions now? This may take a few minutes.'),
+        'api4',
+        ['System', 'flush', ['triggers' => TRUE]],
+        'fa-clock-rotate-left'
       );
       return [$msg];
     }
