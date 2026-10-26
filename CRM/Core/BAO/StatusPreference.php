@@ -14,10 +14,13 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Core\Event\PostEvent;
+use Civi\Core\HookInterface;
+
 /**
  * This class contains functions for managing Status Preferences.
  */
-class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
+class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference implements HookInterface {
 
   /**
    * Create or update a Status Preference entry.
@@ -63,10 +66,18 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
 
     CRM_Utils_Hook::post($op, 'StatusPreference', $statusPreference->id, $statusPreference, $params);
 
-    // Clear the static cache of the CRM_Utils_Check so that the newly created message is available.
-    unset(\Civi::$statics['CRM_Utils_Check']);
-
     return $statusPreference;
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   *
+   * Clears the cached check results and preferences so the next check sees the change.
+   *
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(PostEvent $event): void {
+    unset(\Civi::$statics['CRM_Utils_Check']);
   }
 
 }
