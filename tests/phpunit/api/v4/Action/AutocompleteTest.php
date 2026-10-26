@@ -681,7 +681,6 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
 
     $contribPage = $this->createTestRecord('ContributionPage', [
       'title' => 'Save the Earth Campaign',
-      'financial_type_id' => 1,
     ]);
 
     $event = $this->createTestRecord('Event', [
