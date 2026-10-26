@@ -14,10 +14,13 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Core\Event\PostEvent;
+use Civi\Core\HookInterface;
+
 /**
  * This class contains functions for managing Status Preferences.
  */
-class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
+class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference implements HookInterface {
 
   /**
    * Create or update a Status Preference entry.
@@ -30,20 +33,17 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
   public static function create($params) {
     $statusPreference = new CRM_Core_DAO_StatusPreference();
 
-    // Default severity level to ignore is 0 (DEBUG).
-    $params['ignore_severity'] ??= 0;
-
     // Severity can be either text ('critical') or an integer <= 7.
     // It's a magic number, but based on PSR-3 standards.
-    if (!CRM_Utils_Rule::integer($params['ignore_severity'])) {
+    if (isset($params['ignore_severity']) && !CRM_Utils_Rule::integer($params['ignore_severity'])) {
       $params['ignore_severity'] = CRM_Utils_Check::severityMap($params['ignore_severity']);
+      // If severity is now blank, you have an invalid severity string.
+      if (is_null($params['ignore_severity'])) {
+        throw new CRM_Core_Exception(ts('Invalid string passed as severity level.'));
+      }
     }
-    if ($params['ignore_severity'] > 7) {
+    if (($params['ignore_severity'] ?? 0) > 7) {
       throw new CRM_Core_Exception(ts('You can not pass a severity level higher than 7.'));
-    }
-    // If severity is now blank, you have an invalid severity string.
-    if (is_null($params['ignore_severity'])) {
-      throw new CRM_Core_Exception(ts('Invalid string passed as severity level.'));
     }
 
     // Set default domain when creating (or updating by name)
@@ -66,10 +66,18 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
 
     CRM_Utils_Hook::post($op, 'StatusPreference', $statusPreference->id, $statusPreference, $params);
 
-    // Clear the static cache of the CRM_Utils_Check so that the newly created message is available.
-    unset(\Civi::$statics['CRM_Utils_Check']);
-
     return $statusPreference;
+  }
+
+  /**
+   * Callback for hook_civicrm_post().
+   *
+   * Clears the cached check results and preferences so the next check sees the change.
+   *
+   * @param \Civi\Core\Event\PostEvent $event
+   */
+  public static function self_hook_civicrm_post(PostEvent $event): void {
+    unset(\Civi::$statics['CRM_Utils_Check']);
   }
 
 }

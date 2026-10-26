@@ -14,5 +14,8 @@ UPDATE civicrm_state_province SET abbreviation = '79' WHERE country_id = @countr
 UPDATE civicrm_state_province SET abbreviation = '81' WHERE country_id = @country_id AND name = 'Valgamaa';
 UPDATE civicrm_state_province SET abbreviation = '87' WHERE country_id = @country_id AND name = 'Võrumaa';
 
+-- StatusPreference.ignore_severity becomes required
+UPDATE civicrm_status_pref SET ignore_severity = 0 WHERE ignore_severity IS NULL;
+
 -- Update ACL menu icon
 UPDATE `civicrm_navigation` SET `icon` = 'crm-i fa-users-between-lines' WHERE `name` = 'Permissions (Access Control)';

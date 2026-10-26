@@ -27,12 +27,12 @@ abstract class CRM_Utils_Check_Component {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function getChecksConfig() {
-    if (!isset(Civi::$statics[__FUNCTION__])) {
-      Civi::$statics[__FUNCTION__] = (array) StatusPreference::get(FALSE)
+    if (!isset(Civi::$statics['CRM_Utils_Check']['checksConfig'])) {
+      Civi::$statics['CRM_Utils_Check']['checksConfig'] = (array) StatusPreference::get(FALSE)
         ->addWhere('domain_id', '=', 'current_domain')
         ->execute()->indexBy('name');
     }
-    return Civi::$statics[__FUNCTION__];
+    return Civi::$statics['CRM_Utils_Check']['checksConfig'];
   }
 
   /**

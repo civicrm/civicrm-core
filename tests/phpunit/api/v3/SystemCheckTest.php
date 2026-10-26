@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\StatusPreference;
+use Civi\Api4\System;
 
 /**
  * System.check API has many special test cases, so they have their own class.
@@ -30,7 +31,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
   public function setUp(): void {
     parent::setUp();
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviMail');
-    StatusPreference::update(FALSE)->setValues(['is_active', '=', TRUE])
+    StatusPreference::update(FALSE)->addValue('is_active', TRUE)
       ->addWhere('is_active', '=', FALSE)->execute();
     $this->useTransaction(TRUE);
   }
@@ -86,6 +87,19 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         $this->fail('Check should have been skipped');
       }
     }
+  }
+
+  /**
+   * Disabling or deleting a preference applies to later checks in the same request.
+   */
+  public function testIsInactiveAfterEarlierRun(): void {
+    $this->assertContains('checkDefaultMailbox', System::check(FALSE)->execute()->column('name'));
+    StatusPreference::save(FALSE)
+      ->addRecord(['name' => 'checkDefaultMailbox', 'is_active' => FALSE])
+      ->execute();
+    $this->assertNotContains('checkDefaultMailbox', System::check(FALSE)->execute()->column('name'));
+    StatusPreference::delete(FALSE)->addWhere('name', '=', 'checkDefaultMailbox')->execute();
+    $this->assertContains('checkDefaultMailbox', System::check(FALSE)->execute()->column('name'));
   }
 
   /**
