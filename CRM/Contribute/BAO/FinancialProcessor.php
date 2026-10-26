@@ -680,7 +680,8 @@ class CRM_Contribute_BAO_FinancialProcessor {
       'card_type_id' => $this->getInputValue('card_type_id'),
     ];
     //CRM-16259, set is_payment flag for non pending status
-    if (!$this->isAccountsReceivableTransaction()) {
+    // dev/core#6886 - cancelling a Pending contribution reverses the AR trxn, which was never a payment.
+    if (!$this->isAccountsReceivableTransaction() && !($this->isNegativeTransaction() && $this->isOriginalStatusPending())) {
       $trxnParams['is_payment'] = 1;
     }
     if ($this->getInputValue('payment_processor')) {
