@@ -260,7 +260,10 @@
   display: flex;
   gap: var(--crm-flex-gap);
   align-items: center;
+  /* ensure dropdown menus from containers are visible */
+  overflow: visible;
 }
+
 #afGuiEditor-canvas af-gui-container-multi-toggle .btn .ng-binding {
   display: flex;
   margin-right: var(--crm-l-medium);
