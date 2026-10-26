@@ -221,7 +221,6 @@ button#crm-designer-add-custom-set {
 .crm-designer-dialog li.crm-designer-row-placeholder,
 .crm-designer-dialog li.ui-draggable-dragging,
 .crm-designer-dialog .bbf-form ul {
-  list-style-image: none;
   list-style: none;
 }
 

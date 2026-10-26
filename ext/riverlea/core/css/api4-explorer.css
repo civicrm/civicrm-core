@@ -17,7 +17,6 @@
   padding: var(--crm-l-medium);
 }
 #bootstrap-theme .api4-explorer-row .panel-heading h3 {
-  background-color: transparent;
   color: var(--crm-alert-info-text-color);
   background: transparent;
   margin: 0 !important /* vs bootstrap3 */;
