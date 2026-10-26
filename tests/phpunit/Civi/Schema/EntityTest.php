@@ -80,6 +80,41 @@ class EntityTest extends \CiviUnitTestCase {
     $this->assertSame('New fake field', $apiFields['new_field']['description']);
   }
 
+  /**
+   * An extension's entity is registered before its upgrade creates the table.
+   */
+  public function testGetReferenceCountsSkipsMissingTable(): void {
+    $this->hookClass->setHook('civicrm_entityTypes', function (array &$entityTypes): void {
+      $entityTypes['MissingTableEntity'] = [
+        'name' => 'MissingTableEntity',
+        'table' => 'civicrm_missing_table_entity',
+        'module' => 'civicrm',
+        'getInfo' => fn() => ['title' => 'Missing Table Entity'],
+        'getFields' => fn() => [
+          'id' => [
+            'sql_type' => 'int unsigned',
+            'input_type' => 'Number',
+            'required' => TRUE,
+            'primary_key' => TRUE,
+            'auto_increment' => TRUE,
+          ],
+          'contact_id' => [
+            'sql_type' => 'int unsigned',
+            'input_type' => 'EntityRef',
+            'entity_reference' => ['entity' => 'Contact', 'key' => 'id'],
+          ],
+        ],
+      ];
+    });
+    EntityRepository::flush();
+    $contactId = $this->individualCreate();
+    $this->createTestEntity('Email', ['contact_id' => $contactId, 'email' => 'missing.table@example.org']);
+
+    $counts = \Civi::entity('Contact')->getReferenceCounts(['id' => $contactId]);
+    $this->assertContains('Email', array_column($counts, 'name'));
+    $this->assertNotContains('MissingTableEntity', array_column($counts, 'name'));
+  }
+
   public function onActivityFields(GenericHookEvent $event): void {
     $this->assertSame('Activity', $event->entity);
     // Alter existing field
