@@ -443,45 +443,27 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $contribution = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
-    foreach ($params as $participantNum => $participantRecord) {
+    foreach ($this->getSubmittedParticipantNumbers() as $participantNum) {
       //Unset ContactID for additional participants.
-      if (empty($participantRecord['is_primary'])) {
-        $contactID = $participantRecord['contact_id'] ?? NULL;
+      if ($participantNum > 0) {
+        $contactID = $this->getParticipantValue('contact_id', $participantNum);
       }
-      else {
-        $participantRecord['amount'] = $this->getOrderTotalAmount();
-      }
-
       $contactID = $this->saveContact($contactID, $participantNum);
-
-      // lets store the contactID in the session
-      // we dont store in userID in case the user is doing multiple
-      // transactions etc
-      // for things like tell a friend
-      if (!$this->getContactID() && !empty($participantRecord['is_primary'])) {
-        CRM_Core_Session::singleton()->set('transaction.userID', $contactID);
-      }
-
-      if (!($this->_allowWaitlist || $this->_requireApproval) && $this->isPaidEvent()) {
-        if ($this->getLineItems() && !empty($participantRecord['is_primary']) &&
-          $this->isProcessRegistrationInRealTime()
-        ) {
-          // if paid event add a contribution record
-          //passing contribution id is already registered.
-          $contribution = $this->processContribution($contactID);
-        }
-      }
-
       // add participant record
       $this->addParticipant($contactID, $participantNum);
-
-      if (!empty($participantRecord['is_primary'])) {
-        if ($this->getParticipantValue('status_id.class') === 'Pending') {
-          $this->_allowConfirmation = TRUE;
-        }
-      }
-
       $this->createCMSUser($participantNum, $contactID);
+    }
+
+    $contactID = $this->getParticipantValue('contact_id');
+
+    if (!($this->_allowWaitlist || $this->_requireApproval) && $this->isPaidEvent()) {
+      if ($this->getLineItems() &&
+        $this->isProcessRegistrationInRealTime()
+      ) {
+        // if paid event add a contribution record
+        //passing contribution id is already registered.
+        $contribution = $this->processContribution($contactID);
+      }
     }
 
     $registerByID = $this->getPrimaryParticipantID();
@@ -497,7 +479,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     ) {
       // take all processed participant ids.
       $allParticipantIds = $this->_participantIDS;
-
+      if ($this->getParticipantValue('status_id.class') === 'Pending') {
+        $this->_allowConfirmation = TRUE;
+      }
       // when participant re-walk wizard.
       if ($this->_allowConfirmation &&
         !empty($this->_additionalParticipantIds)
