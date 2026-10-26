@@ -411,23 +411,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     else {
       $contactID = $this->getContactID();
     }
-
-    // if a discount has been applied, lets now deduct it from the amount
-    // and fix the fee level
-    if (!empty($this->_params[0]['discount']['applied'])) {
-      foreach ($this->_params as $k => $v) {
-        if (($this->_params[$k]['amount'] ?? NULL) > 0 && !empty($this->_params[$k]['discountAmount'])) {
-          $this->_params[$k]['amount'] -= $this->_params[$k]['discountAmount'];
-          $this->_params[$k]['amount_level'] .= ($this->_params[$k]['discountMessage'] ?? NULL);
-        }
-      }
-      $this->set('params', $this->_params);
-    }
-
-    $params = [];
-    foreach ($this->getSubmittedParticipantNumbers() as $participantNum) {
-      $params[$participantNum] = $this->_params[$participantNum];
-    }
     if ($this->isPaidEvent()) {
       $this->set('finalAmount', $this->_amount);
     }
@@ -556,30 +539,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           // They are not consistent with our standards and are only set for redirect processors and only
           // on this one form. We should notify & discontinue setting these.
           foreach ($this->_participantIDS as $participantNum => $participantID) {
-            // get values of line items
-            if ($this->_amount) {
-              $amount = [];
-              $amount[$participantNum]['label'] = preg_replace('//', '', $params[$participantNum]['amount_level']);
-              $amount[$participantNum]['amount'] = $params[$participantNum]['amount'];
-              $params[$participantNum]['amounts'] = $amount;
-            }
-
-            if (!empty($this->_lineItem)) {
-              $lineItems = $this->_lineItem;
-              $lineItem = [];
-              if ($lineItemValue = ($lineItems[$participantNum] ?? NULL)) {
-                $lineItem[] = $lineItemValue;
-              }
-              $params[$participantNum]['lineItem'] = $lineItem;
-            }
-
             //only add additional participants and not the primary participant as we already have that
             //added to $primaryParticipant so that this change doesn't break or require changes to
             //existing gateway implementations
             // @todo - this was all added before we started standardising our payment parameters.
             // They are not consistent with our standards and are only set for redirect processors and only
             // on this one form. We should notify & discontinue setting these.
-            $primaryParticipant['participants_info'][$participantID] = $params[$participantNum];
+            $primaryParticipant['participants_info'][$participantID] = $this->getSubmittedParticipantValues($participantNum);
           }
 
           //get event custom field information
@@ -588,6 +554,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           // on this one form. We should notify & discontinue setting these.
           $groupTree = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, $this->getEventID(), 0, $this->_values['event']['event_type_id']);
           $primaryParticipant['eventCustomFields'] = $groupTree;
+          $primaryParticipant['line_item'] = $this->getLineItems();
+          $primaryParticipant['amounts'] = ['amount_level' => $this->getAmountLevelForParticipant(0), 'amount' => $this->getFeeAmountForParticipant(0)];
 
           // call postprocess hook before leaving
           $this->postProcessHook();
