@@ -134,23 +134,19 @@
         // Watch conditional required attribute
         const afRequiredAttr = $element.attr('af-required');
         if (afRequiredAttr) {
-          $scope.$watch(() => {
-            const conditions = $scope.$eval(afRequiredAttr);
-            return ctrl.afForm.checkConditions(conditions);
-          }, (value) => {
-            ctrl.defn.required = value;
-          });
+          $scope.$watch(
+            () => ctrl.afForm.evaluateExpression(afRequiredAttr),
+            (value) => ctrl.defn.required = value
+          );
         }
 
         // Watch conditional disabled attribute
         const afDisabledAttr = $element.attr('af-disabled');
         if (afDisabledAttr) {
-          $scope.$watch(() => {
-            const conditions = $scope.$eval(afDisabledAttr);
-            return ctrl.afForm.checkConditions(conditions);
-          }, (value) => {
-            ctrl.defn.disabled = value;
-          });
+          $scope.$watch(
+            () => ctrl.afForm.evaluateExpression(afDisabledAttr),
+            (value) => ctrl.defn.disabled = value
+          );
         }
 
         // check for tokens in the default value
@@ -516,7 +512,7 @@
         return fieldOptions.filter((opt) => {
           if (!opt.if || !opt.if.length) return true;
           try {
-            return this.afForm.checkConditions(opt.if);
+            return this.afForm.checkConditional(opt.if);
           } catch (e) {
             // Permissive: misconfigured rule => visible. Server-side checks
             // are still authoritative.
