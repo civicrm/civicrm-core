@@ -60,18 +60,28 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if ($event->action === 'delete') {
-      // Check dependencies before deleting
+      // Check dependencies before deleting, with a message that says what is blocking it.
+      $financialTypes = CRM_Core_DAO::executeQuery("
+        SELECT ft.name
+        FROM civicrm_entity_financial_account efa
+        INNER JOIN civicrm_financial_type ft ON ft.id = efa.entity_id
+        WHERE efa.entity_table = 'civicrm_financial_type' AND efa.financial_account_id = %1",
+        [1 => [$event->id, 'Integer']]
+      )->fetchMap('name', 'name');
+      if ($financialTypes) {
+        throw new CRM_Core_Exception(ts('This financial account cannot be deleted because it is assigned to the following financial type(s): %1. Change those financial type accounts before deleting it.', [1 => implode(', ', $financialTypes)]));
+      }
       $dependency = [
-        ['Core', 'FinancialTrxn', 'to_financial_account_id'],
-        ['Financial', 'FinancialTypeAccount', 'financial_account_id'],
-        ['Financial', 'FinancialItem', 'financial_account_id'],
+        ['Financial', 'FinancialTypeAccount', 'financial_account_id', ts('This financial account cannot be deleted because it is assigned to a payment method or other entity. Remove that assignment before deleting it.')],
+        ['Core', 'FinancialTrxn', 'to_financial_account_id', ts('This financial account cannot be deleted because financial transactions have been recorded against it.')],
+        ['Financial', 'FinancialItem', 'financial_account_id', ts('This financial account cannot be deleted because financial items have been recorded against it.')],
       ];
       foreach ($dependency as $name) {
         $className = "CRM_{$name[0]}_BAO_{$name[1]}";
         $bao = new $className();
         $bao->{$name[2]} = $event->id;
         if ($bao->find(TRUE)) {
-          throw new CRM_Core_Exception(ts('This financial account cannot be deleted since it is being used as a header account. Please remove it from being a header account before trying to delete it again.'));
+          throw new CRM_Core_Exception($name[3]);
         }
       }
     }
