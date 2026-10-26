@@ -55,11 +55,6 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
       $statusPreference->find(TRUE);
     }
 
-    // Default severity level to ignore is 0 (DEBUG) for a new preference.
-    if (empty($params['id']) && !$statusPreference->id) {
-      $params['ignore_severity'] ??= 0;
-    }
-
     $op = $statusPreference->id ? 'edit' : 'create';
     CRM_Utils_Hook::pre($op, 'StatusPreference', $statusPreference->id, $params);
 

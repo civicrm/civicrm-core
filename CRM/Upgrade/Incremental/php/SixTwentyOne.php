@@ -75,6 +75,18 @@ class CRM_Upgrade_Incremental_php_SixTwentyOne extends CRM_Upgrade_Incremental_B
     ]);
 
     $this->addTask('Make the index UI_case_activity_id for civicrm_case_activity unique', 'makeCaseActivityIndexUnique');
+    $this->addTask('Make "StatusPreference.ignore_severity" required', 'alterSchemaField', 'StatusPreference', 'ignore_severity', [
+      'title' => ts('Ignore Severity'),
+      'sql_type' => 'int unsigned',
+      'input_type' => 'Select',
+      'description' => ts('Hush messages up to and including this severity.'),
+      'add' => '4.7',
+      'required' => TRUE,
+      'default' => 0,
+      'pseudoconstant' => [
+        'callback' => ['CRM_Utils_Check', 'getSeverityOptions'],
+      ],
+    ]);
   }
 
   /**

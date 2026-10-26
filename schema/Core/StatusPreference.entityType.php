@@ -82,7 +82,8 @@ return [
       'input_type' => 'Select',
       'description' => ts('Hush messages up to and including this severity.'),
       'add' => '4.7',
-      'default' => 1,
+      'required' => TRUE,
+      'default' => 0,
       'usage' => [
         'import',
         'export',
