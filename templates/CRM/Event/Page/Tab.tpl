@@ -31,7 +31,7 @@
        <div class="action-link">
            <a accesskey="N" href="{$newEventURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-plus-circle" role="img" aria-hidden="true"></i> {ts}Add Event Registration{/ts}</span></a>
             {if $accessContribution and $newCredit}
-                <a accesskey="N" href="{$newCreditURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-credit-card" role="img" aria-hidden="true"></i> {ts}Submit Credit Card Event Registration{/ts}</a></span>
+                <a accesskey="N" href="{$newCreditURL|smarty:nodefaults}" class="button"><span><i class="crm-i fa-credit-card" role="img" aria-hidden="true"></i> {ts}Submit Credit Card Event Registration{/ts}</span></a>
             {/if}
             <br/><br/>
        </div>

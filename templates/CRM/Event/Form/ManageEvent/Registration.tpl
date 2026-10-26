@@ -233,7 +233,7 @@
         <td>{$form.thankyou_footer_text.html}</td>
       </tr>
     </table>
-  </div
+  </div>
 </details>
 
 {* Confirmation Email Block *}
