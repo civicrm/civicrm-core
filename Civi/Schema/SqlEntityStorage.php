@@ -40,7 +40,16 @@ class SqlEntityStorage implements EntityStorageInterface {
     foreach ($links as $link) {
       $select = $link['select'];
       $select->select('COUNT(*) AS count');
-      $count = \CRM_Core_DAO::singleValueQuery($select->toSQL());
+      try {
+        $count = \CRM_Core_DAO::singleValueQuery($select->toSQL());
+      }
+      catch (\Civi\Core\Exception\DBQueryException $e) {
+        // An extension's table does not exist until its upgrade has run, so it holds no references.
+        if ($e->getSQLErrorCode() !== 1146) {
+          throw $e;
+        }
+        continue;
+      }
       if ($count) {
         $counts[] = [
           'name' => $link['entity'],
