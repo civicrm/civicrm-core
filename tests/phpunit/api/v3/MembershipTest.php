@@ -154,7 +154,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $contactId2 = $this->individualCreate();
     $contactId3 = $this->individualCreate();
     $order = $this->callAPISuccess('Order', 'create', [
-      'financial_type_id' => '1',
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contact_id' => $contactId1,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'is_pay_later' => 1,
@@ -211,7 +211,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     /** @var CRM_Contribute_Form_Contribution $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution', [
       'total_amount' => 150,
-      'financial_type_id' => '1',
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contact_id' => $contactId1,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'contribution_status_id' => 1,
@@ -423,7 +423,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'period_type' => 'rolling',
       'member_of_contact_id' => $membershipOrgId,
       'domain_id' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'relationship_type_id' => $relationshipTypeId,
       'relationship_direction' => 'b_a',
       'max_related' => 2,

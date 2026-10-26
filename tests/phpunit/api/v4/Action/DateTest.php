@@ -157,7 +157,7 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
     Contribution::create(FALSE)
       ->addValue('contact_id', $c1)
       ->addValue('receive_date', (date('Y') - 1) . '-06-01')
-      ->addValue('financial_type_id', 1)
+      ->addValue('financial_type_id:name', 'Donation')
       ->addValue('total_amount', 12)
       ->execute();
 
@@ -165,7 +165,7 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
     Contribution::create(FALSE)
       ->addValue('contact_id', $c1)
       ->addValue('receive_date', date('Y') . '-06-01')
-      ->addValue('financial_type_id', 1)
+      ->addValue('financial_type_id:name', 'Donation')
       ->addValue('total_amount', 6)
       ->execute();
 
@@ -173,7 +173,7 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
     Contribution::create(FALSE)
       ->addValue('contact_id', $c1)
       ->addValue('receive_date', (date('Y') - 2) . '-06-01')
-      ->addValue('financial_type_id', 1)
+      ->addValue('financial_type_id:name', 'Donation')
       ->addValue('total_amount', 24)
       ->execute();
 

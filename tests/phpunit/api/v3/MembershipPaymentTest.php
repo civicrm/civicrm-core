@@ -45,7 +45,7 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
     $params = [
       'contact_id' => $this->_contactID,
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 1,
       'contribution_page_id' => NULL,
       'payment_instrument_id' => 1,

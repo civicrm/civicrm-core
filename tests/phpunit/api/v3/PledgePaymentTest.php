@@ -21,7 +21,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   protected $_individualId;
   protected $_pledgeID;
   protected $_contributionID;
-  protected $_financialTypeId = 1;
+  protected $_financialTypeId;
   protected $_entity = 'PledgePayment';
 
   /**
@@ -29,6 +29,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
+    $this->_financialTypeId = $this->getFinancialTypeID('Donation');
     $this->_individualId = $this->individualCreate();
     $this->_pledgeID = $this->pledgeCreate(['contact_id' => $this->_individualId]);
     $this->_contributionID = $this->contributionCreate(['contact_id' => $this->_individualId]);
@@ -261,7 +262,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'scheduled_date' => 'first day 2015',
       'pledge_amount' => 100.00,
       'pledge_status_id' => '2',
-      'pledge_financial_type_id' => '1',
+      'pledge_financial_type_id' => $this->getFinancialTypeID('Donation'),
       'pledge_original_installment_amount' => 20,
       'frequency_interval' => 5,
       'frequency_unit' => 'year',

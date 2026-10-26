@@ -94,7 +94,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'total_amount' => 100,
       'currency' => 'USD',
       'contact_id' => $this->_individualId,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
     $this->_processorParams = [
       'domain_id' => 1,
@@ -389,7 +389,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact']['order'] ?? $this->_individualId,
       'total_amount' => $amount,
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'trxn_date' => '2017-04-11 13:05:11',
       'is_email_receipt' => $isEmailReceipt,
       'from_email_address' => 'site@something.com',

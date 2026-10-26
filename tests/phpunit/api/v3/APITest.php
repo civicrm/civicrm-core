@@ -158,7 +158,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     // $contact = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage')->toArray();
     $result = $this->callAPISuccess('ContributionPage', 'create', [
       'title' => "Test Contribution Page",
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'currency' => 'USD',
       'goal_amount' => 100,
     ]);

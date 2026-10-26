@@ -35,7 +35,7 @@ class ContributionTest extends Api4TestBase implements TransactionalInterface {
         ['financial_type_id' => $fid],
         ['financial_type_id' => $fid],
         ['financial_type_id' => $fid],
-        ['financial_type_id' => 1],
+        ['financial_type_id:name' => 'Donation'],
       ],
       'defaults' => [
         'contact_id' => $cid,

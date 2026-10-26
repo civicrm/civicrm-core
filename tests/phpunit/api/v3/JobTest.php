@@ -2153,7 +2153,7 @@ ENDSQLUPDATE;
       'period_type' => 'rolling',
       'member_of_contact_id' => $membershipOrgId,
       'domain_id' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'relationship_type_id' => $employerRelationshipId,
       'relationship_direction' => 'b_a',
       'is_active' => 1,

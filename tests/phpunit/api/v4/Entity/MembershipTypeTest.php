@@ -53,7 +53,7 @@ class MembershipTypeTest extends Api4TestBase implements TransactionalInterface 
       'duration_interval' => 1,
       'period_type' => 'rolling',
       'member_of_contact_id' => $contact['id'],
-      'financial_type_id' => 2,
+      'financial_type_id:name' => 'Member Dues',
       'relationship_type_id' => $relationshipType1['id'],
       'relationship_direction' => 'a_b',
     ]);
@@ -85,7 +85,7 @@ class MembershipTypeTest extends Api4TestBase implements TransactionalInterface 
       'duration_interval' => 1,
       'period_type' => 'rolling',
       'member_of_contact_id' => $contact['id'],
-      'financial_type_id' => 2,
+      'financial_type_id:name' => 'Member Dues',
       'relationship_type_id' => [$relationshipType1['id'], $relationshipType2['id']],
       'relationship_direction' => ['a_b', 'b_a'],
     ]);

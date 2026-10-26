@@ -513,7 +513,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
    */
   public function testKeyConstraintCheck(): void {
     $fieldInfo = $this->callAPISuccess('Contribution', 'getfields', [])['values']['financial_type_id'];
-    _civicrm_api3_validate_constraint(1, 'financial_type_id', $fieldInfo, 'Contribution');
+    _civicrm_api3_validate_constraint($this->getFinancialTypeID('Donation'), 'financial_type_id', $fieldInfo, 'Contribution');
     _civicrm_api3_validate_constraint('Donation', 'financial_type_id', $fieldInfo, 'Contribution');
     try {
       _civicrm_api3_validate_constraint('Blah', 'financial_type_id', $fieldInfo, 'Contribution');

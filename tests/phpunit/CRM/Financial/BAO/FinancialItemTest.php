@@ -50,7 +50,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'create', [
       'contact_id' => $this->individualCreate(),
       'total_amount' => $price,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'is_active' => 1,
       'skipLineItem' => 1,
     ]);
@@ -63,7 +63,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'unit_price' => $price,
       'line_total' => $price,
       'price_field_value_id' => $this->getDefaultContributionPriceFieldValueID(),
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
 
     $lineItem = CRM_Price_BAO_LineItem::create($lParams);
@@ -91,7 +91,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $cParams = [
       'contact_id' => $contactID,
       'total_amount' => $price,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'is_active' => 1,
       'skipLineItem' => 1,
     ];
@@ -106,7 +106,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'unit_price' => $price,
       'line_total' => $price,
       'price_field_value_id' => $this->getDefaultContributionPriceFieldValueID(),
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
 
     $lineItem = CRM_Price_BAO_LineItem::create($lParams);
@@ -184,7 +184,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $contribution = $this->createTestEntity('Contribution', [
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',
@@ -225,10 +225,10 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $this->setCurrencySeparators($thousandSeparator);
     $contactId = $this->individualCreate();
     $this->enableTaxAndInvoicing();
-    $this->addTaxAccountToFinancialType(1);
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID('Donation'));
     $this->getTestForm('CRM_Contribute_Form_Contribution', [
       'total_amount' => 100,
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contact_id' => $contactId,
       'contribution_status_id' => 1,
       'price_set_id' => 0,

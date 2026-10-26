@@ -129,7 +129,7 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
       ->setContributionValues([
         'contact_id' => $this->ids['Contact']['individual_0'],
         'total_amount' => 100,
-        'financial_type_id' => 2,
+        'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
         'receive_date' => '2018-06-08',
       ])
       ->addLineItem([
@@ -205,7 +205,7 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
         // The assumption is the last to be created will have a later time.
         'receive_date' => ' + ' . $index . ' minutes',
         'total_amount' => $credit['amount'],
-        'financial_type_id' => 1,
+        'financial_type_id' => $this->getFinancialTypeID('Donation'),
         'non_deductible_amount' => '10',
         'contribution_status_id' => 1,
         'soft_credit' => [

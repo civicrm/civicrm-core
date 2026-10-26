@@ -225,7 +225,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $params = [
       'title' => 'Test_Group_6',
       'name' => 'test_group_6',
-      'extends' => ['Contribution', [1]],
+      'extends' => ['Contribution', [$this->getFinancialTypeID('Donation')]],
       'weight' => 6,
       'collapse_display' => 1,
       'style' => 'Inline',
