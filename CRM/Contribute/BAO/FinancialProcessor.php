@@ -153,8 +153,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
       // and letting natural justice take care of the rest.
       $params['trxnParams']['trxn_id'] = $this->getUpdatedContribution()->trxn_id;
     }
-    if (!empty($params['contribution_status_id']) &&
-      $this->getOriginalContribution()->contribution_status_id != $this->getUpdatedContribution()->contribution_status_id
+    if ($this->isOriginalStatusPending() && $this->isCompletedTransaction()) {
+      $params = $this->addPayment($params);
+    }
+    elseif ($this->isSupportedContributionStatusChange()
+      && !empty($params['contribution_status_id'])
+      && $this->getOriginalContribution()->contribution_status_id != $this->getUpdatedContribution()->contribution_status_id
     ) {
       //Update Financial Records
       $this->updateFinancialAccountsOnContributionStatusChange($params);
@@ -330,6 +334,25 @@ class CRM_Contribute_BAO_FinancialProcessor {
 
   private function isOriginalStatusPending(): bool {
     return in_array($this->getOriginalContributionStatus(), ['Pending', 'In Progress'], TRUE);
+  }
+
+  /**
+   * Is this a status change FinancialProcessor should actually act on.
+   *
+   * Partially paid -> Completed is expected to reach here only via
+   * Payment.create (which bypasses FinancialProcessor entirely via
+   * is_post_payment_create before this is ever called) - a direct
+   * Contribution.create call that skips that is unsupported and would
+   * create incorrect financial records, so warn and decline to act.
+   *
+   * @return bool
+   */
+  private function isSupportedContributionStatusChange(): bool {
+    if ($this->getOriginalContributionStatus() === 'Partially paid' && $this->isCompletedTransaction()) {
+      CRM_Core_Error::deprecatedWarning('updating partially paid to completed without going through the payment api is deprecated and will create incorrect financial records');
+      return FALSE;
+    }
+    return TRUE;
   }
 
   /**
@@ -887,14 +910,6 @@ class CRM_Contribute_BAO_FinancialProcessor {
     $previousContributionStatus = $this->getOriginalContributionStatus();
     $currentContributionStatus = $this->getUpdatedContributionStatus();
 
-    // Partially paid -> Completed reaches here via a direct (non-Payment.create) status
-    // update, eg. the back-office contribution form - CRM_Member_Form_MembershipTest::
-    // testSubmitUpdateMembershipFromPartiallyPaid() exercises it. Returning early leaves
-    // the remaining balance unposted - assuming that it has been otherwise dealt with.
-    if ($previousContributionStatus === 'Partially paid' && $this->isCompletedTransaction()) {
-      return;
-    }
-
     if ($this->isContributionUpdateARefund()) {
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['trxnParams']['total_amount'] = -$params['total_amount'];
@@ -912,41 +927,51 @@ class CRM_Contribute_BAO_FinancialProcessor {
         $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
       }
     }
+    $this->updateFinancialAccounts($params['trxnParams'], 'changedStatus');
+  }
 
-    if ($this->isOriginalStatusPending() && $this->isCompletedTransaction()
-    ) {
-      if ($this->isRecordAccountsReceivable() && !$this->getOriginalContributionValue('is_pay_later')) {
-        $financialTrxnIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams']);
-        $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
-      }
+  /**
+   * Record payment completing a Pending/In Progress contribution - called
+   * directly instead of routing through updateFinancialAccountsOnContributionStatusChange(),
+   * since this is a fresh payment at the contribution's current amount, not
+   * an adjustment relative to whatever was previously pending.
+   *
+   * @param array $params
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private function addPayment(array $params): array {
+    if ($this->isRecordAccountsReceivable() && !$this->getOriginalContributionValue('is_pay_later')) {
+      $financialTrxnIDs[] = $this->recordAlwaysAccountsReceivable($params['trxnParams']);
+      $params['trxnParams']['from_financial_account_id'] = $this->getUpdatedAccountsReceivableAccount();
+    }
 
-      $financialTrxnIDs[] = $this->createFinancialTrxn($params['trxnParams']);
+    $financialTrxnIDs[] = $this->createFinancialTrxn($params['trxnParams']);
 
-      foreach ($this->getUpdatedLineItems() as $lineItemDetails) {
-        $this->updateFinancialItemForLineItemToPaid($lineItemDetails['id']);
-        $financialItems = FinancialItem::get(FALSE)
-          ->addSelect('id', 'amount')
-          ->addWhere('entity_id', '=', $lineItemDetails['id'])
-          ->addWhere('entity_table', '=', 'civicrm_line_item')
-          ->execute();
-        if ($financialItems->count() > 0) {
-          foreach ($financialItems as $financialItem) {
-            foreach ($financialTrxnIDs as $financialTrxnID) {
-              EntityFinancialTrxn::save(FALSE)
-                ->addRecord([
-                  'financial_trxn_id' => $financialTrxnID,
-                  'entity_id' => $financialItem['id'],
-                  'entity_table' => 'civicrm_financial_item',
-                  'amount' => $financialItem['amount'],
-                ])
-                ->execute();
-            }
+    foreach ($this->getUpdatedLineItems() as $lineItemDetails) {
+      $this->updateFinancialItemForLineItemToPaid($lineItemDetails['id']);
+      $financialItems = FinancialItem::get(FALSE)
+        ->addSelect('id', 'amount')
+        ->addWhere('entity_id', '=', $lineItemDetails['id'])
+        ->addWhere('entity_table', '=', 'civicrm_line_item')
+        ->execute();
+      if ($financialItems->count() > 0) {
+        foreach ($financialItems as $financialItem) {
+          foreach ($financialTrxnIDs as $financialTrxnID) {
+            EntityFinancialTrxn::save(FALSE)
+              ->addRecord([
+                'financial_trxn_id' => $financialTrxnID,
+                'entity_id' => $financialItem['id'],
+                'entity_table' => 'civicrm_financial_item',
+                'amount' => $financialItem['amount'],
+              ])
+              ->execute();
           }
         }
       }
-      return;
     }
-    $this->updateFinancialAccounts($params['trxnParams'], 'changedStatus');
+    return $params;
   }
 
   /**
