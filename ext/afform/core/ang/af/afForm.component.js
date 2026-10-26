@@ -234,6 +234,13 @@
         );
       }
 
+      this.evaluateExpression = (expression) => {
+        if (!Array.isArray) {
+          expression = $parse(expression)();
+        }
+        return this.checkConditions(expression);
+      }
+
       // Handle the logic for conditional fields
       this.checkConditions = function(conditions, op) {
         op = op || 'AND';
