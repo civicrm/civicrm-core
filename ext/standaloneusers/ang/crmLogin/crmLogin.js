@@ -73,7 +73,14 @@
         .then((response) => {
           if (response.url) {
             // Success.
-            $window.location = response.url;
+            if (response.url === originalUrl && originalUrl.includes('#')) {
+              // The login form was shown in place of this page. Assigning a URL with a
+              // #fragment again is an in-page navigation, so the page would not load.
+              $window.location.reload();
+            }
+            else {
+              $window.location = response.url;
+            }
             return;
           }
           if (response.publicError) {
