@@ -260,7 +260,6 @@ select.crm-error {
     border-radius: 50%;
     border: 1px solid var(--crm-input-toggle-button-bg);
     background: var(--crm-input-toggle-button-bg);
-    -webkit-transition: 0.1s;
     transition: 0.1s;
   }
   & input[type="checkbox"].crm-form-toggle:checked {

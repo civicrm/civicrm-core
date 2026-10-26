@@ -51,8 +51,6 @@ i.crm-i {
   /* Many browsers require -webkit prefixes. To avoid repeating long SVG strings, use a css variable */
   mask: var(--icon);
   mask-size: cover;
-  -webkit-mask: var(--icon);
-  -webkit-mask-size: cover;
 }
 
 .crm-i.fa-crm-formula {

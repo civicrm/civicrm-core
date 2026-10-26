@@ -4098,7 +4098,6 @@ span.crm-status-icon {
     border: 1px solid #fff;
     border-radius: 50%;
     background: #fff;
-    -webkit-transition: 0.1s;
     transition: 0.1s;
   }
   & input[type="checkbox"].crm-form-toggle:checked {

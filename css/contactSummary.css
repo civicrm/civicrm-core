@@ -330,7 +330,6 @@ div#crm-contact-thumbnail {
 #crm-container .contact_basic_information-section.narrowform table.form-layout-compressed td label {
   display: block;
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
   width: 25%;
   float: left;
   padding-right: 1%;
@@ -338,7 +337,6 @@ div#crm-contact-thumbnail {
 
 #crm-container .contact_basic_information-section.narrowform table.form-layout-compressed td input {
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
   width: 75%;
 }
 
@@ -346,7 +344,6 @@ div#crm-contact-thumbnail {
 #crm-container #mainTabContainer.narrowpage #contact-summary div.contactCardLeft,
 #crm-container #mainTabContainer.narrowpage #contact-summary div.contactCardRight {
   box-sizing: border-box;
-  -moz-box-sizing: border-box;
   float: none;
   width: 100%;
 }

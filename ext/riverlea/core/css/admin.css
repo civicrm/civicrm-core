@@ -132,8 +132,6 @@
     column-gap: var(--crm-padding-reg);
   }
   .crm-container .admin-section-items dl {
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
     break-inside: avoid;
     margin: 0 var(--crm-padding-reg);
   }
