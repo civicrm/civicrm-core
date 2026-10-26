@@ -3535,7 +3535,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   visibility: hidden;
 }
 #bootstrap-theme .text-hide {
-  font: 0/0 a;
+  font: 0/0 a, sans-serif;
   color: transparent;
   text-shadow: none;
   background-color: transparent;
