@@ -26,6 +26,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\Event;
 use Civi\Api4\MockBasicEntity;
 use Civi\Api4\EntitySet;
+use Civi\Api4\PCP;
 use Civi\Api4\SavedSearch;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\HookInterface;
@@ -668,6 +669,128 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertEquals("$title Alpha", $result[1]['label']);
     $this->assertEquals(\CRM_Utils_Date::customFormat('2026-01-15 10:00:00'), $result[1]['description'][1]);
     $this->assertNotContains('Alpha Description', $result[1]['description']);
+  }
+
+  public function testPCPAutocomplete(): void {
+    $supporters = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'Arthur', 'last_name' => 'Dent', 'email_primary.email' => 'arthur@example.com'],
+        ['first_name' => 'Ford', 'last_name' => 'Prefect', 'email_primary.email' => 'ford@example.com'],
+      ],
+    ]);
+
+    $contribPage = $this->createTestRecord('ContributionPage', [
+      'title' => 'Save the Earth Campaign',
+      'financial_type_id' => 1,
+    ]);
+
+    $event = $this->createTestRecord('Event', [
+      'title' => 'End of the Universe Gala',
+      'event_type_id:name' => 'Fundraiser',
+      'start_date' => '2026-12-01',
+    ]);
+
+    $pcpBlocks = $this->saveTestRecords('PCPBlock', [
+      'records' => [
+        [
+          'entity_table' => 'civicrm_contribution_page',
+          'entity_id' => $contribPage['id'],
+          'target_entity_type' => 'contribute',
+          'target_entity_id' => $contribPage['id'],
+        ],
+        [
+          'entity_table' => 'civicrm_event',
+          'entity_id' => $event['id'],
+          'target_entity_type' => 'event',
+          'target_entity_id' => $event['id'],
+        ],
+      ],
+    ]);
+
+    $pcps = $this->saveTestRecords('PCP', [
+      'records' => [
+        [
+          'contact_id' => $supporters[0]['id'],
+          'page_type' => 'contribute',
+          'page_id' => $contribPage['id'],
+          'pcp_block_id' => $pcpBlocks[0]['id'],
+          'title' => 'Arthur Tea Fund',
+        ],
+        [
+          'contact_id' => $supporters[1]['id'],
+          'page_type' => 'event',
+          'page_id' => $event['id'],
+          'pcp_block_id' => $pcpBlocks[1]['id'],
+          'title' => 'Ford Hitchhiking Fund',
+        ],
+        // Inactive PCP should not be returned
+        [
+          'contact_id' => $supporters[1]['id'],
+          'page_type' => 'event',
+          'page_id' => $event['id'],
+          'pcp_block_id' => $pcpBlocks[1]['id'],
+          'title' => '2 Heads are Better than 1',
+          'is_active' => FALSE,
+        ],
+        // Unapproved PCP should not be returned
+        [
+          'contact_id' => $supporters[0]['id'],
+          'page_type' => 'contribute',
+          'page_id' => $contribPage['id'],
+          'pcp_block_id' => $pcpBlocks[0]['id'],
+          'title' => 'Arthur Vogon Defense',
+          'status_id:name' => 'Waiting Review',
+        ],
+      ],
+      'defaults' => [
+        'status_id:name' => 'Approved',
+        'is_active' => TRUE,
+      ],
+    ]);
+
+    // Search by supporter contact sort_name
+    $result = PCP::autocomplete(FALSE)
+      ->setInput('Dent')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertSame($pcps[0]['id'], $result[0]['id']);
+    $this->assertSame('Dent, Arthur: Arthur Tea Fund', $result[0]['label']);
+    $this->assertSame('Save the Earth Campaign', $result[0]['description'][0]);
+
+    // Search by PCP title
+    $result = PCP::autocomplete(FALSE)
+      ->setInput('Tea Fund')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertSame($pcps[0]['id'], $result[0]['id']);
+
+    // Search by Contribution Page title
+    $result = PCP::autocomplete(FALSE)
+      ->setInput('Save the Earth')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertSame($pcps[0]['id'], $result[0]['id']);
+
+    // Search by Event title
+    $result = PCP::autocomplete(FALSE)
+      ->setInput('Universe Gala')
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertSame($pcps[1]['id'], $result[0]['id']);
+
+    // Fetch by IDs (render mode)
+    $result = PCP::autocomplete(FALSE)
+      ->setIds([$pcps[0]['id'], $pcps[1]['id']])
+      ->execute();
+    $this->assertCount(2, $result);
+    $ids = array_column((array) $result, 'id');
+    $this->assertContains($pcps[0]['id'], $ids);
+    $this->assertContains($pcps[1]['id'], $ids);
+
+    // Test with runAutocomplete helper (emulating crmAutocomplete client)
+    $allResults = $this->runAutocomplete('PCP', ['input' => 'Dent']);
+    $this->assertCount(1, $allResults);
+    $this->assertSame($pcps[0]['id'], $allResults[0]['id']);
   }
 
 }
