@@ -30,9 +30,6 @@
   <smarty_compatibility>
     <ver>5</ver>
   </smarty_compatibility>
-  <requires>
-    <ext version="~4.5">org.civicrm.afform</ext>
-  </requires>
   <comments>This extension provides a framework for OAuth support</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>
