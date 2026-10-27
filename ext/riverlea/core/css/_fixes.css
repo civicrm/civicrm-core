@@ -730,6 +730,12 @@ details + .crm-content-block:has(.dataTables_wrapper) {
   padding: var(--crm-tab-padding);
 }
 
+/* af-admin-list-menu - fix btn float:right narrowing available space for table */
+#bootstrap-theme af-admin-list-menu .btn {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 /******************
     COMMON EXTENSIONS
 *******************/
