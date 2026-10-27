@@ -106,7 +106,8 @@
 
     getResultsSoon() {
       clearTimeout(this.nextRun);
-      this.nextRun = setTimeout(() => this.runSearch(), 600);
+      // Angular keeps a detached copy of a compiled template, whose attribute changes schedule runs too
+      this.nextRun = setTimeout(() => this.isConnected && this.runSearch(), 600);
     }
 
     // common functionality for the controller's $onInit function
