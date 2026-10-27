@@ -1,0 +1,1 @@
+Backport fix for CVE-2026-108359 (unbounded ODS row and column repeats) from 5.10.0

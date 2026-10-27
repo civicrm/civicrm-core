@@ -316,6 +316,11 @@
       "pear/net_smtp": {
         "Add in CiviCRM custom error message for CRM-8744": "https://download.civicrm.org/patches/ee02d81d09432e524b249c9d874c9756b88924df8f5a8d69b19e8b4d6f532327/error-msg.patch"
       },
+      "phpoffice/phpspreadsheet": {
+        "Backport fix for CVE-2026-108360 (SSRF via redirect in Drawing::setPath) from 5.10.0": "https://download.civicrm.org/patches/4024fc7b75a281f9f106e24b5bfde22839b320b4871c760e12610373987bf71b/drawing-redirect.patch",
+        "Backport fix for CVE-2026-108359 (unbounded ODS row and column repeats) from 5.10.0": "https://download.civicrm.org/patches/4e541eae64a6f5b646943170e4e6dfac9d4ebde0963d4cd264080dd6f9cba544/ods-repeats.patch",
+        "Backport fix for CVE-2026-108357 and CVE-2026-108358 (XmlScanner bypass) from 5.10.0": "https://download.civicrm.org/patches/232ddf0ebe8dc358f85e41cb9c92fe50632bd04cbaf8e7feaf208113105c3e15/xmlscanner-unentity.patch"
+      },
       "xkerman/restricted-unserialize": {
         "Fix warnings on PHP 8.4 and PHP 8.5": "https://download.civicrm.org/patches/1f01239f400e9aff4e59c2e744fc73bdfb48c6c3b0e93665851b7be763b2716b/php84-php85.patch",
         "Fix warnings on PHP 8.6": "https://download.civicrm.org/patches/1c3a4594c7e52a2ff5a6b21ab0833e339d0f7bf908c55db96afac04f57d695d5/php86.patch"

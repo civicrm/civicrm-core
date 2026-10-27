@@ -1,0 +1,56 @@
+Backport fix for CVE-2026-108357 and CVE-2026-108358 (XmlScanner bypass) from 5.10.0
+
+diff --git a/src/PhpSpreadsheet/Reader/Security/XmlScanner.php b/src/PhpSpreadsheet/Reader/Security/XmlScanner.php
+index 7b4e104..5d238a8 100644
+--- a/src/PhpSpreadsheet/Reader/Security/XmlScanner.php
++++ b/src/PhpSpreadsheet/Reader/Security/XmlScanner.php
+@@ -56,6 +56,11 @@ class XmlScanner
+             throw new Reader\Exception('UTF-7 encoding not permitted');
+         }
+         if (substr($xml, 0, Reader\Csv::UTF8_BOM_LEN) === Reader\Csv::UTF8_BOM) {
++            if (preg_match(self::ENCODING_PATTERN, $xml, $matches) === 1) {
++                if (strtolower($matches[2]) !== 'utf-8') {
++                    throw new Reader\Exception("BOM says UTF-8 but encoding says {$matches[2]}");
++                }
++            }
+             $xml = substr($xml, Reader\Csv::UTF8_BOM_LEN);
+         }
+ 
+diff --git a/src/PhpSpreadsheet/Reader/Xml.php b/src/PhpSpreadsheet/Reader/Xml.php
+index f5cdc81..9e5bd99 100644
+--- a/src/PhpSpreadsheet/Reader/Xml.php
++++ b/src/PhpSpreadsheet/Reader/Xml.php
+@@ -2,6 +2,7 @@
+ 
+ namespace PhpOffice\PhpSpreadsheet\Reader;
+ 
++use Composer\Pcre\Preg;
+ use DateTime;
+ use DateTimeZone;
+ use PhpOffice\PhpSpreadsheet\Cell\AddressHelper;
+@@ -53,9 +54,14 @@ class Xml extends BaseReader
+ 
+     public static function unentity(string $contents): string
+     {
+-        $contents = preg_replace('/&(amp|lt|gt|quot|apos);/', "\u{fffe}\u{feff}\$1;", trim($contents)) ?? $contents;
++        // fffe is invalid, replace with replacement char
++        $contents = str_replace("\u{fffe}", "\u{fffd}", $contents);
++        // use positive lookahead to "protect" valid xml entities
++        $contents = Preg::replace('/&(?=(?:amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);)/', "\u{fffe}", trim($contents));
++        // now decode remaining html entities
+         $contents = html_entity_decode($contents, ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
+-        $contents = str_replace("\u{fffe}\u{feff}", '&', $contents);
++        // Escape remaining ampersands, restore those which were replaced with fffe
++        $contents = str_replace(['&', "\u{fffe}"], ['&amp;', '&'], $contents);
+ 
+         return $contents;
+     }
+@@ -651,7 +657,7 @@ class Xml extends BaseReader
+                 }
+                 $rangeCalculated = false;
+                 if (isset($xmlX->WorksheetOptions->Panes->Pane->RangeSelection)) {
+-                    if (1 === preg_match('/^R(\d+)C(\d+):R(\d+)C(\d+)$/', (string) $xmlX->WorksheetOptions->Panes->Pane->RangeSelection, $selectionMatches)) {
++                    if (Preg::isMatch('/^R(\d+)C(\d+):R(\d+)C(\d+)$/', (string) $xmlX->WorksheetOptions->Panes->Pane->RangeSelection, $selectionMatches)) {
+                         $selectedCell = Coordinate::stringFromColumnIndex((int) $selectionMatches[2])
+                             . $selectionMatches[1]
+                             . ':'

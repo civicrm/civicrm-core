@@ -1,0 +1,1 @@
+Backport fix for CVE-2026-108357 and CVE-2026-108358 (XmlScanner bypass) from 5.10.0

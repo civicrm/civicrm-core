@@ -1,0 +1,1 @@
+Backport fix for CVE-2026-108360 (SSRF via redirect in Drawing::setPath) from 5.10.0
