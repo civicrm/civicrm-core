@@ -17,7 +17,10 @@ describe('civi-search-display', function() {
 
   beforeEach(function() {
     jasmine.clock().install();
-    CRM.tabHeader = {updateCount: jasmine.createSpy('updateCount')};
+    CRM.tabHeader = {
+      updateCount: jasmine.createSpy('updateCount'),
+      hasCount: (tab) => !CRM.$(tab).hasClass('crm-tab-hide-count'),
+    };
     spyOn(CRM, 'url').and.returnValue('/civicrm/ajax/api4');
     spyOn(CRM.$, 'post').and.callFake(function(url, data) {
       var response = data.calls ? {run: {values: [{}, {}], count: 2}} : {values: [], count: 7};
@@ -133,6 +136,23 @@ describe('civi-search-display', function() {
     container.appendChild(element);
     jasmine.clock().tick(2000);
     expect(JSON.parse(CRM.$.post.calls.mostRecent().args[1].calls).run[2].savedSearch).toBe('S');
+  });
+
+  it('does not update the contact tab count if the tab hides count', async () => {
+    container.innerHTML = '<div class="crm-contact-page"><ul role="tablist"><li id="tab_chart" class="crm-tab-hide-count"></li></ul><div class="ui-tabs-panel" id="contact-chart">' + display + '</div></div>';
+    await tickPastCountFetch();
+    expect(CRM.tabHeader.updateCount).not.toHaveBeenCalled();
+  });
+
+  it('does not report count if inside a subsearch', async () => {
+    container.innerHTML = '<div class="crm-search-col-type-subsearch">' + display + '</div>';
+    var element = container.querySelector('test-civi-search-display');
+    var onTotalCount = jasmine.createSpy('onTotalCount');
+    element.onTotalCount.push(onTotalCount);
+    await tickPastCountFetch();
+    expect(CRM.$.post).not.toHaveBeenCalled();
+    await element.runSearch();
+    expect(onTotalCount).not.toHaveBeenCalled();
   });
 
 });

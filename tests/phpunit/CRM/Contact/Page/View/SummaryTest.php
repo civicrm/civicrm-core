@@ -24,6 +24,7 @@ class CRM_Contact_Page_View_SummaryTest extends CiviUnitTestCase implements Head
 
   public function tearDown(): void {
     unset($_GET['cid'], $_REQUEST['cid']);
+    \Civi::settings()->revert('contact_summary_tab_counts');
     parent::tearDown();
   }
 
@@ -78,6 +79,30 @@ class CRM_Contact_Page_View_SummaryTest extends CiviUnitTestCase implements Head
 
     $this->assertArrayHasKey('log', $tabs);
     $this->assertIsNumeric($tabs['log']['count']);
+  }
+
+  public function testContactSummaryTabCountsDisabled(): void {
+    $contact = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Tab',
+      'last_name' => 'Tester',
+    ]);
+
+    $_GET['cid'] = $_REQUEST['cid'] = $contact['id'];
+
+    \Civi::settings()->set('contact_summary_tab_counts', FALSE);
+
+    $page = new \CRM_Contact_Page_View_Summary();
+    $page->set('contactType', 'Individual');
+    $page->getContactID();
+
+    $tabs = $page->getTabs();
+
+    $this->assertNotEmpty($tabs);
+    foreach ($tabs as $tab) {
+      $this->assertTrue($tab['hideCount']);
+      $this->assertFalse(is_numeric($tab['count']));
+    }
   }
 
 }

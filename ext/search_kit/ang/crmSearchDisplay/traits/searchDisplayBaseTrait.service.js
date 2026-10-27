@@ -77,8 +77,8 @@
         // FIXME: Additional hack to directly update tabHeader for contact summary tab. It would be better to
         // decouple the contactTab code into a separate directive that checks totalCount.
         let contactTab = $element.closest('.crm-contact-page .ui-tabs-panel').attr('id');
-        // Only the first display in a tab gets to control the count
-        if (contactTab && !$element.is($('#' + contactTab + ' [search][display]').first())) {
+        // Only the first display in a tab gets to control the count, and only if counts are not disabled
+        if (contactTab && (!$element.is($('#' + contactTab + ' [search][display]').first()) || (!CRM.tabHeader?.hasCount(contactTab.replace('contact-', '#tab_'))))) {
           contactTab = null;
         }
         let hasCounter = !isSubsearch && (contactTab || ctrl.hasOwnProperty('totalCount'));

@@ -388,6 +388,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
 
+    $showTabCounts = \Civi::settings()->get('contact_summary_tab_counts');
+
     // show the tabs only if user has generic access to CiviCRM
     $accessCiviCRM = CRM_Core_Permission::check('access CiviCRM');
     foreach (self::basicTabs() as $tab) {
@@ -433,7 +435,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'title' => $group['title'],
         'weight' => $weight,
         'count' => NULL,
-        'hideCount' => !$group['is_multiple'],
+        'hideCount' => !$group['is_multiple'] || !$showTabCounts,
         'class' => 'livePage',
         'icon' => 'crm-i ' . ($group['icon'] ?: 'fa-gear'),
       ];
@@ -457,15 +459,17 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
 
-    foreach ($allTabs as $key => $tab) {
+    foreach ($allTabs as $key => &$tab) {
+      $tab['hideCount'] ??= !$showTabCounts;
       // Get tab counts last to avoid wasting time; skip if a tab was removed or count was hidden.
       if (!isset($tab['count']) && empty($tab['hideCount']) && isset($getCountParams[$tab['id']])) {
-        $allTabs[$key]['count'] = call_user_func_array([
+        $tab['count'] = call_user_func_array([
           'CRM_Contact_BAO_Contact',
           'getCountComponent',
         ], $getCountParams[$tab['id']]);
       }
     }
+    unset($tab);
 
     // ensure all keys used in the template are set, to avoid notices
     $allTabs = \CRM_Core_Smarty::setRequiredTabTemplateKeys($allTabs);
