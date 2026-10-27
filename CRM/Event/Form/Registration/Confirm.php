@@ -398,20 +398,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @throws \CRM_Core_Exception
    */
   public function postProcess() {
-
-    $this->_params = $this->get('params');
-    $this->cleanMoneyFields($this->_params);
-
-    if (!empty($this->_params[0]['contact_id'])) {
-      // unclear when this would be set & whether it could be checked in getContactID.
-      // perhaps it relates to when cid is in the url
-      //@todo someone who knows add comments on the various contactIDs in this form
-      $contactID = $this->_params[0]['contact_id'];
-    }
-    else {
-      $contactID = $this->getContactID();
-    }
+    $contactID = $this->getRegistrationContactID($this->getSubmittedParticipantValues(), FALSE);
     if ($this->isPaidEvent()) {
+      // Used on thank you page, could be calculated there.
       $this->set('finalAmount', $this->_amount);
     }
 
