@@ -699,9 +699,9 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'user_unique_id' => '123456789',
       'is_bulkmail' => '1',
       'tag' => [
-        '3' => '1',
-        '4' => '1',
-        '1' => '1',
+        $this->getTagID('Government_Entity') => '1',
+        $this->getTagID('Major_Donor') => '1',
+        $this->getTagID('Non_profit') => '1',
       ],
       'group' => [
         $this->ids['Group']["id0"] => '1',
@@ -895,8 +895,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       'user_unique_id' => '1122334455',
       'is_bulkmail' => '1',
       'tag' => [
-        '2' => '1',
-        '5' => '1',
+        $this->getTagID('Company') => '1',
+        $this->getTagID('Volunteer') => '1',
       ],
       //Remove the contact from group1 and add to other 2 groups.
       'group' => [

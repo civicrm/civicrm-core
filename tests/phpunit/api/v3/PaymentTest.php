@@ -351,8 +351,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('payment', 'create', $params);
     $this->checkPaymentResult($payment, [
       $payment['id'] => [
-        'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
+        'from_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
+        'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
         'total_amount' => 50,
         'status_id' => 1,
         'is_payment' => 1,
@@ -447,8 +447,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ])['values'][0];
 
     $expected = [
-      'from_financial_account_id' => 7,
-      'to_financial_account_id' => 6,
+      'from_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
+      'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
       'total_amount' => -30,
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Refunded'),
       'is_payment' => 1,
@@ -555,8 +555,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('payment', 'create', $params);
     $expectedResult = [
       $payment['id'] => [
-        'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
+        'from_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
+        'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
         'total_amount' => 100,
         'status_id' => 1,
         'is_payment' => 1,
@@ -708,8 +708,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = [
       $payment['id'] => [
-        'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
+        'from_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
+        'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
         'total_amount' => 100,
         'status_id' => 1,
         'is_payment' => 1,
@@ -956,8 +956,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('payment', 'create', $params);
     $expectedResult = [
       $payment['id'] => [
-        'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
+        'from_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
+        'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
         'total_amount' => 50,
         'status_id' => 1,
         'is_payment' => 1,
@@ -1080,8 +1080,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = [
       $payment['id'] => [
-        'from_financial_account_id' => 7,
-        'to_financial_account_id' => 12,
+        'from_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
+        'to_financial_account_id' => $this->getFinancialAccountID('Payment Processor Account'),
         'total_amount' => 100,
         'status_id' => 1,
         'is_payment' => 1,
@@ -1148,8 +1148,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = [
       $payment['id'] => [
-        'from_financial_account_id' => 7,
-        'to_financial_account_id' => 12,
+        'from_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
+        'to_financial_account_id' => $this->getFinancialAccountID('Payment Processor Account'),
         'total_amount' => 100,
         'status_id' => 1,
         'is_payment' => 1,
@@ -1295,8 +1295,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = [
       $payment['id'] => [
-        'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
+        'from_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
+        'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
         'total_amount' => 40,
         'status_id' => 1,
         'is_payment' => 1,
@@ -1383,8 +1383,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = [
       $payment['id'] => [
-        'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
+        'from_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
+        'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
         'total_amount' => 40,
         'status_id' => 1,
         'is_payment' => 1,
@@ -1479,8 +1479,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   protected function checkPaymentIsValid(int $paymentID, int $contributionID, int $amount = 50): void {
     $payment = $this->callAPISuccess('Payment', 'getsingle', ['financial_trxn_id' => $paymentID]);
-    $this->assertEquals(7, $payment['from_financial_account_id']);
-    $this->assertEquals(6, $payment['to_financial_account_id']);
+    $this->assertEquals($this->getFinancialAccountID('Accounts Receivable'), $payment['from_financial_account_id']);
+    $this->assertEquals($this->getFinancialAccountID('Deposit Bank Account'), $payment['to_financial_account_id']);
     $this->assertEquals(1, $payment['status_id']);
     $this->assertEquals(1, $payment['is_payment']);
     $this->assertEquals($amount, $payment['total_amount']);

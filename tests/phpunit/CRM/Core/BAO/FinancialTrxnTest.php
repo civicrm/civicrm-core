@@ -36,7 +36,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     ]);
     $params = [
       'contribution_id' => $contributionID,
-      'to_financial_account_id' => 1,
+      'to_financial_account_id' => $this->getFinancialAccountID('Donation'),
       'trxn_date' => 20091021184930,
       'trxn_type' => 'Debit',
       'total_amount' => 10,

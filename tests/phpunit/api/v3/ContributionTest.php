@@ -75,7 +75,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'title' => 'Test Contribution Page',
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'currency' => 'USD',
-      'financial_account_id' => 1,
+      'financial_account_id' => $this->getFinancialAccountID('Donation'),
       'payment_processor' => $this->processorCreate(),
       'is_active' => 1,
       'is_allow_other_amount' => 1,
@@ -1356,11 +1356,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'api.FinancialItem.getsingle' => ['amount' => ['<' => 0]],
     ]);
-    $this->assertEquals(1, $lineItems['api.FinancialItem.getsingle']['financial_account_id']);
+    $this->assertEquals($this->getFinancialAccountID('Donation'), $lineItems['api.FinancialItem.getsingle']['financial_account_id']);
     $this->callAPISuccessGetSingle('FinancialTrxn', [
       'total_amount' => -100,
       'status_id' => 'Chargeback',
-      'to_financial_account_id' => 6,
+      'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
     ]);
     $paidAmount = Contribution::get(FALSE)
       ->addWhere('id', '=', $contribution['id'])
@@ -4017,7 +4017,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     if ($context === 'refund') {
       $compareParams = [
         'status_id' => 1,
-        'financial_account_id' => 1,
+        'financial_account_id' => $this->getFinancialAccountID('Donation'),
         'amount' => -100,
       ];
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $params, $compareParams);
@@ -4025,7 +4025,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     elseif ($context === 'cancelPending') {
       $compareParams = [
         'status_id' => 3,
-        'financial_account_id' => 1,
+        'financial_account_id' => $this->getFinancialAccountID('Donation'),
         'amount' => -100,
       ];
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $params, $compareParams);
@@ -4037,11 +4037,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'amount' => -100,
       ];
       $compareParams = [
-        'financial_account_id' => 1,
+        'financial_account_id' => $this->getFinancialAccountID('Donation'),
       ];
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $params, $compareParams);
       $params = [
-        'financial_account_id' => 3,
+        'financial_account_id' => $this->getFinancialAccountID('Campaign Contribution'),
         'entity_id' => $lineKey,
       ];
       $compareParams = [
@@ -4126,7 +4126,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = ['id' => $trxn['financial_trxn_id']];
     if ($context === 'refund') {
       $compareParams = [
-        'to_financial_account_id' => 6,
+        'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
         'total_amount' => -100,
         'status_id' => 7,
         'trxn_date' => '2015-01-01 09:00:00',
@@ -4136,7 +4136,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     }
     elseif ($context === 'cancelPending') {
       $compareParams = [
-        'to_financial_account_id' => 7,
+        'to_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
         'total_amount' => -100,
         'status_id' => 3,
       ];
@@ -4173,7 +4173,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         $compareParams['payment_instrument_id'] = $instrumentId;
       }
       else {
-        $compareParams['to_financial_account_id'] = 12;
+        $compareParams['to_financial_account_id'] = $this->getFinancialAccountID('Payment Processor Account');
       }
       $this->assertDBCompareValues('CRM_Financial_DAO_FinancialTrxn', $trxnParams1, array_merge($compareParams, $extraParams));
       $compareParams['total_amount'] = 100;
@@ -4207,7 +4207,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_option_value',
       'entity_id' => $optionValue['id'],
       'account_relationship' => $relationTypeId,
-      'financial_account_id' => 7,
+      'financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
     ];
     CRM_Financial_BAO_EntityFinancialAccount::add($financialParams);
     $this->assertNotEmpty($optionValue['values'][$optionValue['id']]['value']);

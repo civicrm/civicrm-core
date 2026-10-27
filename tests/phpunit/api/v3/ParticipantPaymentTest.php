@@ -266,7 +266,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     switch ($context) {
       case 'online':
         $compareParams = [
-          'to_financial_account_id' => 12,
+          'to_financial_account_id' => $this->getFinancialAccountID('Payment Processor Account'),
           'total_amount' => 100,
           'status_id' => 1,
         ];
@@ -274,7 +274,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
 
       case 'offline':
         $compareParams = [
-          'to_financial_account_id' => 6,
+          'to_financial_account_id' => $this->getFinancialAccountID('Deposit Bank Account'),
           'total_amount' => 100,
           'status_id' => 1,
         ];
@@ -282,7 +282,7 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
 
       case 'payLater':
         $compareParams = [
-          'to_financial_account_id' => 7,
+          'to_financial_account_id' => $this->getFinancialAccountID('Accounts Receivable'),
           'total_amount' => 100,
           'status_id' => 2,
         ];
@@ -302,14 +302,14 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
       $compareParams = [
         'amount' => 100,
         'status_id' => 1,
-        'financial_account_id' => 1,
+        'financial_account_id' => $this->getFinancialAccountID('Donation'),
       ];
     }
     elseif ($context === 'payLater') {
       $compareParams = [
         'amount' => 100,
         'status_id' => 3,
-        'financial_account_id' => 1,
+        'financial_account_id' => $this->getFinancialAccountID('Donation'),
       ];
     }
     $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $financialItemParams, $compareParams);

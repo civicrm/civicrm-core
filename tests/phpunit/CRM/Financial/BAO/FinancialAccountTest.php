@@ -140,7 +140,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
    * Test getting financial account for a given financial Type with a particular relationship.
    */
   public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltIn(): void {
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Income Account is'));
+    $this->assertEquals($this->getFinancialAccountID('Member Dues'), CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Income Account is'));
   }
 
   /**
@@ -157,7 +157,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
       'label' => 'Changed label',
     ]);
     // run test
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Income Account is'));
+    $this->assertEquals($this->getFinancialAccountID('Member Dues'), CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Income Account is'));
     // restore label
     $this->callAPISuccess('OptionValue', 'create', [
       'id' => $optionValue['id'],
@@ -169,7 +169,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
    * Test getting financial account for a given financial Type with a particular relationship.
    */
   public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInRefunded(): void {
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Credit/Contra Revenue Account is'));
+    $this->assertEquals($this->getFinancialAccountID('Member Dues'), CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Credit/Contra Revenue Account is'));
   }
 
   /**
@@ -186,7 +186,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
       'label' => 'Changed label',
     ]);
     // run test
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Credit/Contra Revenue Account is'));
+    $this->assertEquals($this->getFinancialAccountID('Member Dues'), CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Credit/Contra Revenue Account is'));
     // restore label
     $this->callAPISuccess('OptionValue', 'create', [
       'id' => $optionValue['id'],
@@ -198,7 +198,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
    * Test getting financial account for a given financial Type with a particular relationship.
    */
   public function testGetFinancialAccountByFinancialTypeAndRelationshipBuiltInChargeBack(): void {
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Chargeback Account is'));
+    $this->assertEquals($this->getFinancialAccountID('Member Dues'), CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Chargeback Account is'));
   }
 
   /**
@@ -215,7 +215,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
       'label' => 'Changed label',
     ]);
     // run test
-    $this->assertEquals(2, CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Chargeback Account is'));
+    $this->assertEquals($this->getFinancialAccountID('Member Dues'), CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($this->getFinancialTypeID('Member Dues'), 'Chargeback Account is'));
     // restore label
     $this->callAPISuccess('OptionValue', 'create', [
       'id' => $optionValue['id'],
