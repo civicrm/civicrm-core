@@ -106,7 +106,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         $this->callAPISuccess('FinancialAccount', 'delete', ['id' => $financialAccount['id']]);
       }
     }
-    $this->restoreUFGroupOne();
     $this->revertTemplateToReservedTemplate();
     parent::tearDown();
   }
@@ -3401,7 +3400,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->createJoinedProfile(['entity_id' => $this->ids['Event']['PaidEvent'], 'entity_table' => 'civicrm_event']);
     $this->createJoinedProfile(['entity_id' => $this->ids['Event']['PaidEvent'], 'entity_table' => 'civicrm_event', 'weight' => 2], ['name' => 'post_1', 'title' => 'title_post_2', 'frontend_title' => 'public 2']);
     $this->createJoinedProfile(['entity_id' => $this->ids['Event']['PaidEvent'], 'entity_table' => 'civicrm_event', 'weight' => 3], ['name' => 'post_2', 'title' => 'title_post_3', 'frontend_title' => 'public 3']);
-    $this->eliminateUFGroupOne();
 
     $this->callAPISuccess('contribution', 'completetransaction', ['id' => $contributionID]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID, 'return' => ['contribution_source']]);

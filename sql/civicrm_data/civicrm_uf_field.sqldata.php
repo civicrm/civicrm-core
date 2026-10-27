@@ -2,6 +2,8 @@
 
 use CRM_Utils_SQL_Literal as Literal;
 
+$ufGroupID = fn(string $name) => new Literal("(SELECT id FROM civicrm_uf_group WHERE name = '$name')");
+
 return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
   ->addDefaults([
     'is_reserved' => 0,
@@ -15,7 +17,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
   ])
   ->addValues([
     [
-      'uf_group_id' => 1,
+      'uf_group_id' => $ufGroupID('name_and_address'),
       'field_name' => 'first_name',
       'is_required' => 1,
       'weight' => 1,
@@ -23,7 +25,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 1,
+      'uf_group_id' => $ufGroupID('name_and_address'),
       'field_name' => 'last_name',
       'is_required' => 1,
       'weight' => 2,
@@ -31,7 +33,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 1,
+      'uf_group_id' => $ufGroupID('name_and_address'),
       'field_name' => 'street_address',
       'weight' => 3,
       'location_type_id' => new Literal('@locationTypeHome'),
@@ -39,7 +41,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 1,
+      'uf_group_id' => $ufGroupID('name_and_address'),
       'field_name' => 'city',
       'weight' => 4,
       'location_type_id' => new Literal('@locationTypeHome'),
@@ -47,7 +49,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 1,
+      'uf_group_id' => $ufGroupID('name_and_address'),
       'field_name' => 'postal_code',
       'weight' => 5,
       'location_type_id' => new Literal('@locationTypeHome'),
@@ -55,7 +57,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 1,
+      'uf_group_id' => $ufGroupID('name_and_address'),
       'field_name' => 'country',
       'weight' => 6,
       'location_type_id' => new Literal('@locationTypeHome'),
@@ -63,7 +65,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 1,
+      'uf_group_id' => $ufGroupID('name_and_address'),
       'field_name' => 'state_province',
       'weight' => 7,
       'location_type_id' => new Literal('@locationTypeHome'),
@@ -71,7 +73,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 2,
+      'uf_group_id' => $ufGroupID('supporter_profile'),
       'field_name' => 'first_name',
       'is_required' => 1,
       'weight' => 1,
@@ -79,7 +81,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 2,
+      'uf_group_id' => $ufGroupID('supporter_profile'),
       'field_name' => 'last_name',
       'is_required' => 1,
       'weight' => 2,
@@ -87,7 +89,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 2,
+      'uf_group_id' => $ufGroupID('supporter_profile'),
       'field_name' => 'email',
       'is_required' => 1,
       'weight' => 3,
@@ -95,7 +97,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 3,
+      'uf_group_id' => $ufGroupID('participant_status'),
       'field_name' => 'participant_status',
       'is_required' => 1,
       'is_reserved' => 1,
@@ -104,7 +106,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Participant',
     ],
     [
-      'uf_group_id' => 4,
+      'uf_group_id' => $ufGroupID('new_individual'),
       'field_name' => 'first_name',
       'is_required' => 1,
       'weight' => 1,
@@ -112,7 +114,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 4,
+      'uf_group_id' => $ufGroupID('new_individual'),
       'field_name' => 'last_name',
       'is_required' => 1,
       'weight' => 2,
@@ -120,14 +122,14 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 4,
+      'uf_group_id' => $ufGroupID('new_individual'),
       'field_name' => 'email',
       'weight' => 3,
       'label' => ts('Email Address'),
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 5,
+      'uf_group_id' => $ufGroupID('new_organization'),
       'field_name' => 'organization_name',
       'is_required' => 1,
       'weight' => 2,
@@ -135,14 +137,14 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Organization',
     ],
     [
-      'uf_group_id' => 5,
+      'uf_group_id' => $ufGroupID('new_organization'),
       'field_name' => 'email',
       'weight' => 3,
       'label' => ts('Email Address'),
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 6,
+      'uf_group_id' => $ufGroupID('new_household'),
       'field_name' => 'household_name',
       'is_required' => 1,
       'weight' => 2,
@@ -150,14 +152,14 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Household',
     ],
     [
-      'uf_group_id' => 6,
+      'uf_group_id' => $ufGroupID('new_household'),
       'field_name' => 'email',
       'weight' => 3,
       'label' => ts('Email Address'),
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 7,
+      'uf_group_id' => $ufGroupID('summary_overlay'),
       'field_name' => 'phone',
       'is_required' => 1,
       'weight' => 1,
@@ -167,7 +169,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'phone_type_id' => 1,
     ],
     [
-      'uf_group_id' => 7,
+      'uf_group_id' => $ufGroupID('summary_overlay'),
       'field_name' => 'phone',
       'is_required' => 1,
       'weight' => 2,
@@ -177,7 +179,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'phone_type_id' => 2,
     ],
     [
-      'uf_group_id' => 7,
+      'uf_group_id' => $ufGroupID('summary_overlay'),
       'field_name' => 'street_address',
       'is_required' => 1,
       'weight' => 3,
@@ -185,7 +187,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 7,
+      'uf_group_id' => $ufGroupID('summary_overlay'),
       'field_name' => 'city',
       'is_required' => 1,
       'weight' => 4,
@@ -193,7 +195,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 7,
+      'uf_group_id' => $ufGroupID('summary_overlay'),
       'field_name' => 'state_province',
       'is_required' => 1,
       'weight' => 5,
@@ -201,7 +203,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 7,
+      'uf_group_id' => $ufGroupID('summary_overlay'),
       'field_name' => 'postal_code',
       'is_required' => 1,
       'weight' => 6,
@@ -209,7 +211,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 7,
+      'uf_group_id' => $ufGroupID('summary_overlay'),
       'field_name' => 'email',
       'is_required' => 1,
       'weight' => 7,
@@ -217,7 +219,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 7,
+      'uf_group_id' => $ufGroupID('summary_overlay'),
       'field_name' => 'group',
       'is_required' => 1,
       'weight' => 8,
@@ -225,7 +227,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 7,
+      'uf_group_id' => $ufGroupID('summary_overlay'),
       'field_name' => 'tag',
       'is_required' => 1,
       'weight' => 9,
@@ -233,7 +235,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 7,
+      'uf_group_id' => $ufGroupID('summary_overlay'),
       'field_name' => 'gender_id',
       'is_required' => 1,
       'weight' => 10,
@@ -241,7 +243,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 7,
+      'uf_group_id' => $ufGroupID('summary_overlay'),
       'field_name' => 'birth_date',
       'is_required' => 1,
       'weight' => 11,
@@ -249,7 +251,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 8,
+      'uf_group_id' => $ufGroupID('shared_address'),
       'field_name' => 'street_address',
       'is_required' => 1,
       'is_reserved' => 1,
@@ -259,7 +261,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 8,
+      'uf_group_id' => $ufGroupID('shared_address'),
       'field_name' => 'city',
       'is_required' => 1,
       'is_reserved' => 1,
@@ -269,7 +271,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 8,
+      'uf_group_id' => $ufGroupID('shared_address'),
       'field_name' => 'postal_code',
       'weight' => 3,
       'location_type_id' => new Literal('@locationTypeHome'),
@@ -277,7 +279,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 8,
+      'uf_group_id' => $ufGroupID('shared_address'),
       'field_name' => 'country',
       'weight' => 4,
       'location_type_id' => new Literal('@locationTypeHome'),
@@ -285,7 +287,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 8,
+      'uf_group_id' => $ufGroupID('shared_address'),
       'field_name' => 'state_province',
       'weight' => 5,
       'location_type_id' => new Literal('@locationTypeHome'),
@@ -293,7 +295,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 9,
+      'uf_group_id' => $ufGroupID('on_behalf_organization'),
       'field_name' => 'organization_name',
       'is_required' => 1,
       'weight' => 1,
@@ -301,7 +303,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Organization',
     ],
     [
-      'uf_group_id' => 9,
+      'uf_group_id' => $ufGroupID('on_behalf_organization'),
       'field_name' => 'phone',
       'is_required' => 1,
       'weight' => 2,
@@ -312,7 +314,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'phone_type_id' => 1,
     ],
     [
-      'uf_group_id' => 9,
+      'uf_group_id' => $ufGroupID('on_behalf_organization'),
       'field_name' => 'email',
       'is_required' => 1,
       'weight' => 3,
@@ -322,7 +324,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 9,
+      'uf_group_id' => $ufGroupID('on_behalf_organization'),
       'field_name' => 'street_address',
       'is_required' => 1,
       'weight' => 4,
@@ -331,7 +333,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 9,
+      'uf_group_id' => $ufGroupID('on_behalf_organization'),
       'field_name' => 'city',
       'is_required' => 1,
       'weight' => 5,
@@ -340,7 +342,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 9,
+      'uf_group_id' => $ufGroupID('on_behalf_organization'),
       'field_name' => 'postal_code',
       'is_required' => 1,
       'weight' => 6,
@@ -349,7 +351,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 9,
+      'uf_group_id' => $ufGroupID('on_behalf_organization'),
       'field_name' => 'country',
       'is_required' => 1,
       'weight' => 7,
@@ -358,7 +360,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 9,
+      'uf_group_id' => $ufGroupID('on_behalf_organization'),
       'field_name' => 'state_province',
       'is_required' => 1,
       'weight' => 8,
@@ -367,7 +369,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 10,
+      'uf_group_id' => $ufGroupID('contribution_batch_entry'),
       'field_name' => 'financial_type',
       'is_reserved' => 1,
       'weight' => 1,
@@ -375,7 +377,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contribution',
     ],
     [
-      'uf_group_id' => 10,
+      'uf_group_id' => $ufGroupID('contribution_batch_entry'),
       'field_name' => 'total_amount',
       'is_reserved' => 1,
       'weight' => 2,
@@ -383,7 +385,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contribution',
     ],
     [
-      'uf_group_id' => 10,
+      'uf_group_id' => $ufGroupID('contribution_batch_entry'),
       'field_name' => 'contribution_status_id',
       'is_required' => 1,
       'is_reserved' => 1,
@@ -392,7 +394,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contribution',
     ],
     [
-      'uf_group_id' => 10,
+      'uf_group_id' => $ufGroupID('contribution_batch_entry'),
       'field_name' => 'receive_date',
       'is_required' => 1,
       'is_reserved' => 1,
@@ -401,56 +403,56 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contribution',
     ],
     [
-      'uf_group_id' => 10,
+      'uf_group_id' => $ufGroupID('contribution_batch_entry'),
       'field_name' => 'contribution_source',
       'weight' => 5,
       'label' => ts('Contribution Source'),
       'field_type' => 'Contribution',
     ],
     [
-      'uf_group_id' => 10,
+      'uf_group_id' => $ufGroupID('contribution_batch_entry'),
       'field_name' => 'payment_instrument',
       'weight' => 6,
       'label' => ts('Payment Method'),
       'field_type' => 'Contribution',
     ],
     [
-      'uf_group_id' => 10,
+      'uf_group_id' => $ufGroupID('contribution_batch_entry'),
       'field_name' => 'contribution_check_number',
       'weight' => 7,
       'label' => ts('Check Number'),
       'field_type' => 'Contribution',
     ],
     [
-      'uf_group_id' => 10,
+      'uf_group_id' => $ufGroupID('contribution_batch_entry'),
       'field_name' => 'send_receipt',
       'weight' => 8,
       'label' => ts('Send Receipt'),
       'field_type' => 'Contribution',
     ],
     [
-      'uf_group_id' => 10,
+      'uf_group_id' => $ufGroupID('contribution_batch_entry'),
       'field_name' => 'invoice_id',
       'weight' => 9,
       'label' => ts('Invoice ID'),
       'field_type' => 'Contribution',
     ],
     [
-      'uf_group_id' => 10,
+      'uf_group_id' => $ufGroupID('contribution_batch_entry'),
       'field_name' => 'soft_credit',
       'weight' => 10,
       'label' => ts('Soft Credit'),
       'field_type' => 'Contribution',
     ],
     [
-      'uf_group_id' => 10,
+      'uf_group_id' => $ufGroupID('contribution_batch_entry'),
       'field_name' => 'soft_credit_type',
       'weight' => 11,
       'label' => ts('Soft Credit Type'),
       'field_type' => 'Contribution',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'membership_type',
       'is_required' => 1,
       'is_reserved' => 1,
@@ -459,7 +461,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'membership_join_date',
       'is_required' => 1,
       'is_reserved' => 1,
@@ -468,7 +470,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'membership_start_date',
       'is_reserved' => 1,
       'weight' => 3,
@@ -476,7 +478,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'membership_end_date',
       'is_reserved' => 1,
       'weight' => 4,
@@ -484,21 +486,21 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'membership_source',
       'weight' => 5,
       'label' => ts('Membership Source'),
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'send_receipt',
       'weight' => 6,
       'label' => ts('Send Receipt'),
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'financial_type',
       'is_reserved' => 1,
       'weight' => 7,
@@ -506,7 +508,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'total_amount',
       'is_reserved' => 1,
       'weight' => 8,
@@ -514,7 +516,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'receive_date',
       'is_required' => 1,
       'is_reserved' => 1,
@@ -523,21 +525,21 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'payment_instrument',
       'weight' => 10,
       'label' => ts('Payment Method'),
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'contribution_check_number',
       'weight' => 11,
       'label' => ts('Check Number'),
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'contribution_status_id',
       'is_required' => 1,
       'is_reserved' => 1,
@@ -546,7 +548,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'soft_credit',
       'weight' => 13,
 
@@ -554,14 +556,14 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 11,
+      'uf_group_id' => $ufGroupID('membership_batch_entry'),
       'field_name' => 'soft_credit_type',
       'weight' => 14,
       'label' => ts('Soft Credit Type'),
       'field_type' => 'Membership',
     ],
     [
-      'uf_group_id' => 12,
+      'uf_group_id' => $ufGroupID('event_registration'),
       'field_name' => 'first_name',
       'is_required' => 1,
       'weight' => 1,
@@ -569,7 +571,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 12,
+      'uf_group_id' => $ufGroupID('event_registration'),
       'field_name' => 'last_name',
       'is_required' => 1,
       'weight' => 2,
@@ -577,7 +579,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 12,
+      'uf_group_id' => $ufGroupID('event_registration'),
       'field_name' => 'email',
       'is_required' => 1,
       'weight' => 3,
@@ -585,7 +587,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Contact',
     ],
     [
-      'uf_group_id' => 13,
+      'uf_group_id' => $ufGroupID('honoree_individual'),
       'field_name' => 'prefix_id',
       'is_reserved' => 1,
       'weight' => 1,
@@ -593,7 +595,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 13,
+      'uf_group_id' => $ufGroupID('honoree_individual'),
       'field_name' => 'first_name',
       'is_required' => 1,
       'is_reserved' => 1,
@@ -602,7 +604,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 13,
+      'uf_group_id' => $ufGroupID('honoree_individual'),
       'field_name' => 'last_name',
       'is_required' => 1,
       'is_reserved' => 1,
@@ -611,7 +613,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'field_type' => 'Individual',
     ],
     [
-      'uf_group_id' => 13,
+      'uf_group_id' => $ufGroupID('honoree_individual'),
       'field_name' => 'email',
       'is_reserved' => 1,
       'weight' => 4,
