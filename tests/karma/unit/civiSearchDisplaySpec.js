@@ -1,6 +1,6 @@
 'use strict';
 
-describe('civi-search-display total count', function() {
+describe('civi-search-display', function() {
   var container;
 
   beforeAll(function() {
@@ -116,6 +116,23 @@ describe('civi-search-display total count', function() {
     element.onTotalCount.push(onTotalCount);
     await element.runSearch();
     expect(onTotalCount).toHaveBeenCalledWith(2);
+  });
+
+  it('runs no search for a display that is not in the document', function() {
+    var element = document.createElement('test-civi-search-display');
+    element.setAttribute('filters', '{{ $ctrl.filters }}');
+    jasmine.clock().tick(2000);
+    expect(CRM.$.post).not.toHaveBeenCalled();
+  });
+
+  it('runs the search a filter change schedules once the display is in the document', function() {
+    var element = document.createElement('test-civi-search-display');
+    element.setAttribute('search', 'S');
+    element.setAttribute('display', 'D');
+    element.setAttribute('filters', '{}');
+    container.appendChild(element);
+    jasmine.clock().tick(2000);
+    expect(JSON.parse(CRM.$.post.calls.mostRecent().args[1].calls).run[2].savedSearch).toBe('S');
   });
 
 });
