@@ -453,6 +453,13 @@ abstract class CRM_Utils_Hook {
       ->invoke(['bundle'], $bundle, $null, $null, $null, $null, $null, 'civicrm_alterBundle');
   }
 
+  public static function alterCountQuery(&$query, $eventId, $extraWhereClause) {
+    return self::singleton()->invoke(['query', 'eventId', 'extraWhereClause'], $query, $eventId,
+      $extraWhereClause, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterCountQuery'
+    );
+  }
+
   /**
    * This hook is invoked during the CiviCRM form preProcess phase.
    *
