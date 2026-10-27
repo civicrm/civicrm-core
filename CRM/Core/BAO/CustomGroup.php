@@ -49,27 +49,37 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
   }
 
   /**
+   * Inserting a group also names and creates its value table, before any post hook runs.
+   *
+   * @inheritDoc
+   */
+  public function save($hook = TRUE) {
+    $isNew = empty($this->id);
+    parent::save($hook);
+    if ($isNew) {
+      $munged_title = strtolower(CRM_Utils_String::munge($this->title, '_', 13));
+      $this->table_name = $this->table_name ?: "civicrm_value_{$munged_title}_{$this->id}";
+      CRM_Core_DAO::setFieldValue('CRM_Core_DAO_CustomGroup',
+        $this->id,
+        'table_name',
+        $this->table_name
+      );
+      // Read the stored row into a separate object so $this keeps its typed values.
+      $stored = new CRM_Core_DAO_CustomGroup();
+      $stored->id = $this->id;
+      $stored->find(TRUE);
+      self::createTable($stored);
+    }
+    return $this;
+  }
+
+  /**
    * @param \Civi\Core\Event\PostEvent $e
    * @see CRM_Utils_Hook::post()
    */
   public static function _hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
     $params = $e->params;
     if ($e->entity === 'CustomGroup') {
-      $group = $e->object;
-      if ($e->action === 'create') {
-        $munged_title = strtolower(CRM_Utils_String::munge($group->title, '_', 13));
-        $tableName = $params['table_name'] ?? "civicrm_value_{$munged_title}_{$group->id}";
-        CRM_Core_DAO::setFieldValue('CRM_Core_DAO_CustomGroup',
-          $group->id,
-          'table_name',
-          $tableName
-        );
-        $group->find(TRUE);
-
-        // now create the table associated with this group
-        self::createTable($group);
-      }
-
       if (($params['overrideFKConstraint'] ?? NULL) == 1) {
         $table = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup',
           $params['id'],

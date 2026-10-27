@@ -30,6 +30,7 @@ use Civi\Api4\OptionValue;
 class CustomGroupTest extends Api4TestBase {
 
   public function tearDown(): void {
+    \Civi::dispatcher()->setDispatchPolicy(NULL);
     CustomGroup::delete(FALSE)
       ->addWhere('id', '>', 0)
       ->execute();
@@ -51,6 +52,21 @@ class CustomGroupTest extends Api4TestBase {
     $this->assertEquals('Test_n_quotes_', $group['name']);
     $this->assertEqualsWithDelta(strtotime('now'), strtotime($group['created_date']), 3);
     $this->assertEquals($userId, $group['created_id']);
+  }
+
+  /**
+   * The upgrader's dispatch policy drops hook_civicrm_post, which also creates the table.
+   */
+  public function testCreateCustomGroupDuringUpgrade(): void {
+    \Civi::dispatcher()->setDispatchPolicy(\CRM_Upgrade_DispatchPolicy::get('upgrade.finish'));
+    $created = CustomGroup::create(FALSE)
+      ->addValue('title', 'Added during upgrade')
+      ->addValue('extends', 'Contact')
+      ->execute()->single();
+
+    $tableName = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $created['id'], 'table_name');
+    $this->assertNotEmpty($tableName);
+    $this->assertTrue(\CRM_Core_DAO::checkTableExists($tableName));
   }
 
   public function testUpdateCustomGroup(): void {
