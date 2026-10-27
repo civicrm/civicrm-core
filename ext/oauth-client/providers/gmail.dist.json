@@ -16,7 +16,7 @@
   "mailSettingsTemplate": {
     "name": "{{token.resource_owner.email}}",
     "domain": "{{token.resource_owner.email|getMailDomain}}",
-    "localpart": null,
+    "localpart": "{{token.resource_owner.email|getMailUser}}+",
     "return_path": null,
     "protocol:name": "IMAP",
     "server": "imap.gmail.com",
