@@ -38,7 +38,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'label' => 'sub_individual',
       'name' => 'sub_individual',
       // Individual
-      'parent_id' => 1,
+      'parent_id' => $this->getContactTypeID('Individual'),
       'is_active' => 1,
     ];
     CRM_Contact_BAO_ContactType::writeRecord($params);
@@ -48,7 +48,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'label' => 'sub_organization',
       'name' => 'sub_organization',
       // Organization
-      'parent_id' => 3,
+      'parent_id' => $this->getContactTypeID('Organization'),
       'is_active' => 1,
     ];
     CRM_Contact_BAO_ContactType::writeRecord($params);
@@ -58,7 +58,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'label' => 'sub_household',
       'name' => 'sub_household',
       // Household
-      'parent_id' => 2,
+      'parent_id' => $this->getContactTypeID('Household'),
       'is_active' => 1,
     ];
     CRM_Contact_BAO_ContactType::writeRecord($params);
@@ -268,7 +268,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'label' => 'sub2_individual',
       'name' => 'sub2_individual',
       // Individual
-      'parent_id' => 1,
+      'parent_id' => $this->getContactTypeID('Individual'),
       'is_active' => 1,
     ];
     CRM_Contact_BAO_ContactType::writeRecord($params);
@@ -311,7 +311,7 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
       'label' => 'sub2_organization',
       'name' => 'sub2_organization',
       // Organization
-      'parent_id' => 3,
+      'parent_id' => $this->getContactTypeID('Organization'),
       'is_active' => 1,
     ];
     CRM_Contact_BAO_ContactType::writeRecord($params);

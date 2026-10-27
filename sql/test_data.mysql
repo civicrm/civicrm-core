@@ -1,11 +1,13 @@
 
+ SELECT @contactTypeIndividual := id FROM civicrm_contact_type WHERE name = 'Individual';
+ SELECT @contactTypeOrganization := id FROM civicrm_contact_type WHERE name = 'Organization';
  INSERT INTO `civicrm_contact_type`
   ( `name`, `label`,`image_URL`, `parent_id`, `is_active`, `is_reserved`, `icon`)
  VALUES
-  ( 'Student'     , 'Student'     , NULL, 1, 1, 0, 'fa-graduation-cap'),
-  ( 'Parent'      , 'Parent'      , NULL, 1, 1, 0, 'fa-user-circle-o'),
-  ( 'Staff'       , 'Staff'       , NULL, 1, 1, 0, 'fa-id-badge'),
-  ( 'Team'        , 'Team'        , NULL, 3, 1, 0, 'fa-users'),
-  ( 'Sponsor'     , 'Sponsor'     , NULL, 3, 1, 0, 'fa-leaf');
+  ( 'Student'     , 'Student'     , NULL, @contactTypeIndividual, 1, 0, 'fa-graduation-cap'),
+  ( 'Parent'      , 'Parent'      , NULL, @contactTypeIndividual, 1, 0, 'fa-user-circle-o'),
+  ( 'Staff'       , 'Staff'       , NULL, @contactTypeIndividual, 1, 0, 'fa-id-badge'),
+  ( 'Team'        , 'Team'        , NULL, @contactTypeOrganization, 1, 0, 'fa-users'),
+  ( 'Sponsor'     , 'Sponsor'     , NULL, @contactTypeOrganization, 1, 0, 'fa-leaf');
 
 

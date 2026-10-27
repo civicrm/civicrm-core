@@ -205,6 +205,7 @@ class Schema {
    * Do not add civicrm_domain: domain id 1 is assumed throughout.
    */
   public const SEED_TABLES_TO_OFFSET = [
+    'civicrm_contact_type',
     'civicrm_financial_account',
     'civicrm_financial_type',
     'civicrm_location_type',

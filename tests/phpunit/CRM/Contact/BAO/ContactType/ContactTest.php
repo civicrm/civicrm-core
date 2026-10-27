@@ -33,7 +33,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
       'label' => 'indiv_student',
       'name' => 'indiv_student',
       // Individual
-      'parent_id' => 1,
+      'parent_id' => $this->getContactTypeID('Individual'),
       'is_active' => 1,
     ];
     CRM_Contact_BAO_ContactType::writeRecord($params);
@@ -43,7 +43,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
       'label' => 'indiv_parent',
       'name' => 'indiv_parent',
       // Individual
-      'parent_id' => 1,
+      'parent_id' => $this->getContactTypeID('Individual'),
       'is_active' => 1,
     ];
     CRM_Contact_BAO_ContactType::writeRecord($params);
@@ -53,7 +53,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
       'label' => 'org_sponsor',
       'name' => 'org_sponsor',
       // Organization
-      'parent_id' => 3,
+      'parent_id' => $this->getContactTypeID('Organization'),
       'is_active' => 1,
     ];
     CRM_Contact_BAO_ContactType::writeRecord($params);
@@ -63,7 +63,7 @@ class CRM_Contact_BAO_ContactType_ContactTest extends CiviUnitTestCase {
       'label' => 'org_team',
       'name' => 'org_team',
       // Organization
-      'parent_id' => 3,
+      'parent_id' => $this->getContactTypeID('Organization'),
       'is_active' => 1,
     ];
     CRM_Contact_BAO_ContactType::writeRecord($params);

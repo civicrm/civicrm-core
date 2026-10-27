@@ -8,19 +8,16 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_contact_type')
   ])
   ->addValues([
     [
-      'id' => 1,
       'name' => 'Individual',
       'label' => ts('Individual'),
       'icon' => 'fa-user',
     ],
     [
-      'id' => 2,
       'name' => 'Household',
       'label' => ts('Household'),
       'icon' => 'fa-home',
     ],
     [
-      'id' => 3,
       'name' => 'Organization',
       'label' => ts('Organization'),
       'icon' => 'fa-building',

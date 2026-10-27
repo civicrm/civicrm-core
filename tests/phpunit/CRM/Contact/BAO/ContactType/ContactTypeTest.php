@@ -153,7 +153,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
       'name' => 'blah',
       'label' => 'blah blah',
       'id' => $createdType['id'],
-      'parent_id' => 1,
+      'parent_id' => $this->getContactTypeID('Individual'),
       'is_reserved' => FALSE,
       'parent' => 'Individual',
       'parent_label' => 'Individual',
@@ -175,7 +175,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals(['Individual', 'Household', 'Organization'], array_keys($result));
 
     $result = CRM_Contact_BAO_ContactType::basicTypePairs(FALSE, 'id');
-    $this->assertEquals([1, 2, 3], array_keys($result));
+    $this->assertEquals([$this->getContactTypeID('Individual'), $this->getContactTypeID('Household'), $this->getContactTypeID('Organization')], array_keys($result));
     $this->assertEquals(['Individual', 'Household', 'Organization'], array_values($result));
 
     ContactType::update(FALSE)
@@ -194,7 +194,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals(['Individual', 'Household', 'Organization'], array_values($result));
 
     $result = CRM_Contact_BAO_ContactType::basicTypePairs(FALSE, 'id');
-    $this->assertEquals([1, 3], array_keys($result));
+    $this->assertEquals([$this->getContactTypeID('Individual'), $this->getContactTypeID('Organization')], array_keys($result));
     $this->assertEquals(['Individual', 'Organization'], array_values($result));
   }
 
@@ -206,7 +206,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
   public function getExpectedContactTypes(): array {
     return [
       'Individual' => [
-        'id' => 1,
+        'id' => $this->getContactTypeID('Individual'),
         'name' => 'Individual',
         'label' => 'Individual',
         'is_active' => TRUE,
@@ -219,7 +219,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'icon' => 'fa-user',
       ],
       'Household' => [
-        'id' => 2,
+        'id' => $this->getContactTypeID('Household'),
         'name' => 'Household',
         'label' => 'Household',
         'is_active' => TRUE,
@@ -232,7 +232,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'icon' => 'fa-home',
       ],
       'Organization' => [
-        'id' => 3,
+        'id' => $this->getContactTypeID('Organization'),
         'name' => 'Organization',
         'label' => 'Organization',
         'is_active' => TRUE,
@@ -245,10 +245,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'icon' => 'fa-building',
       ],
       'Student' => [
-        'id' => 4,
+        'id' => $this->getContactTypeID('Student'),
         'name' => 'Student',
         'label' => 'Student',
-        'parent_id' => 1,
+        'parent_id' => $this->getContactTypeID('Individual'),
         'is_active' => TRUE,
         'is_reserved' => FALSE,
         'description' => NULL,
@@ -258,10 +258,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'icon' => 'fa-graduation-cap',
       ],
       'Parent' => [
-        'id' => 5,
+        'id' => $this->getContactTypeID('Parent'),
         'name' => 'Parent',
         'label' => 'Parent',
-        'parent_id' => 1,
+        'parent_id' => $this->getContactTypeID('Individual'),
         'is_active' => TRUE,
         'is_reserved' => FALSE,
         'description' => NULL,
@@ -271,10 +271,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'icon' => 'fa-user-circle-o',
       ],
       'Staff' => [
-        'id' => 6,
+        'id' => $this->getContactTypeID('Staff'),
         'name' => 'Staff',
         'label' => 'Staff',
-        'parent_id' => 1,
+        'parent_id' => $this->getContactTypeID('Individual'),
         'is_active' => TRUE,
         'is_reserved' => FALSE,
         'description' => NULL,
@@ -284,10 +284,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'icon' => 'fa-id-badge',
       ],
       'Team' => [
-        'id' => 7,
+        'id' => $this->getContactTypeID('Team'),
         'name' => 'Team',
         'label' => 'Team',
-        'parent_id' => 3,
+        'parent_id' => $this->getContactTypeID('Organization'),
         'is_active' => TRUE,
         'is_reserved' => FALSE,
         'description' => NULL,
@@ -297,10 +297,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'icon' => 'fa-users',
       ],
       'Sponsor' => [
-        'id' => 8,
+        'id' => $this->getContactTypeID('Sponsor'),
         'name' => 'Sponsor',
         'label' => 'Sponsor',
-        'parent_id' => 3,
+        'parent_id' => $this->getContactTypeID('Organization'),
         'is_active' => TRUE,
         'is_reserved' => FALSE,
         'description' => NULL,
@@ -313,7 +313,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'id' => $this->ids['ContactType'][0],
         'name' => 'sub1_individual',
         'label' => 'Sub1 Individual',
-        'parent_id' => 1,
+        'parent_id' => $this->getContactTypeID('Individual'),
         'is_active' => TRUE,
         'is_reserved' => FALSE,
         'description' => NULL,
@@ -326,7 +326,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'id' => $this->ids['ContactType'][1],
         'name' => 'sub2_individual',
         'label' => 'Sub2 Individual',
-        'parent_id' => 1,
+        'parent_id' => $this->getContactTypeID('Individual'),
         'is_active' => TRUE,
         'is_reserved' => FALSE,
         'description' => NULL,
@@ -339,7 +339,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'id' => $this->ids['ContactType'][2],
         'name' => 'sub_organization',
         'label' => 'Sub Organization',
-        'parent_id' => 3,
+        'parent_id' => $this->getContactTypeID('Organization'),
         'is_active' => TRUE,
         'is_reserved' => FALSE,
         'description' => NULL,
@@ -352,7 +352,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'id' => $this->ids['ContactType'][3],
         'name' => 'sub_household',
         'label' => 'Sub Household',
-        'parent_id' => 2,
+        'parent_id' => $this->getContactTypeID('Household'),
         'is_active' => TRUE,
         'is_reserved' => FALSE,
         'description' => NULL,
