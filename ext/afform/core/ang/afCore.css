@@ -17,10 +17,6 @@ a.af-api4-action-idle {
 .af-container.af-layout-inline {
   flex-direction: row;
 }
-/* Hidden fields */
-.af-field-type-hidden {
-  display: none;
-}
 .af-container.af-layout-cols > .af-title {
   flex: 0 0 100%;
 }

@@ -1106,7 +1106,7 @@ input.crm-form-entityref {
   color: #ffffff;
   margin-left: 5px;
   font-size: 13px;
-  font-family: Verdana;
+  font-family: Verdana, sans-serif;
   padding: 2px 0 0 0;
 }
 
@@ -4098,7 +4098,6 @@ span.crm-status-icon {
     border: 1px solid #fff;
     border-radius: 50%;
     background: #fff;
-    -webkit-transition: 0.1s;
     transition: 0.1s;
   }
   & input[type="checkbox"].crm-form-toggle:checked {

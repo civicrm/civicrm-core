@@ -274,9 +274,6 @@
 .crm-search fieldset div.api4-input.ui-sortable-helper {
   background-color: rgba(255, 255, 255, .9);
 }
-.crm-search fieldset div.api4-input.ui-sortable-helper {
-  background-color: rgba(255, 255, 255, .9);
-}
 .crm-search .api4-clause-fieldset fieldset {
   float: right;
   width: calc(100% - 58px);

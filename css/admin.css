@@ -76,8 +76,6 @@
     column-gap: 1em;
   }
   #crm-container .admin-section-items dl {
-    -webkit-column-break-inside: avoid;
-    page-break-inside: avoid;
     break-inside: avoid;
     margin: 0 1em;
   }

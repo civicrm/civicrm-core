@@ -63,12 +63,10 @@
 }
 #crm-menubar-state:checked ~ .crm-menubar-toggle-btn .crm-menubar-toggle-btn-icon:before {
   top: 0;
-  -webkit-transform: rotate(-45deg);
   transform: rotate(-45deg);
 }
 #crm-menubar-state:checked ~ .crm-menubar-toggle-btn .crm-menubar-toggle-btn-icon:after {
   top: 0;
-  -webkit-transform: rotate(45deg);
   transform: rotate(45deg);
 }
 /* hide menu state checkbox (keep it visible to screen readers) */
@@ -107,7 +105,6 @@
   height: 2px;
   width: 24px;
   background: #bbb;
-  -webkit-transition: all 0.25s;
   transition: all 0.25s;
 }
 #civicrm-menu-nav .crm-menubar-toggle-btn-icon:before {

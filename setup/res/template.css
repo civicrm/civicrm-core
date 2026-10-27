@@ -243,7 +243,6 @@ body {
   color: white;
   border: 0 none;
   cursor: pointer;
-  -webkit-border-radius: 5px;
   border-radius: 5px;
   font-size: 20px;
 }

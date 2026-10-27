@@ -136,7 +136,7 @@
 .crm-i.fa-caret-square-o-left,
 .crm-i.fa-building-o,
 .crm-i.fa-arrow-circle-o-down {
-  font-family: "Font Awesome 6 Free";
+  font-family: "Font Awesome 6 Free", sans-serif;
   font-weight: 400;
 }
 
@@ -327,7 +327,7 @@
 .crm-i.fa-superpowers,
 .crm-i.fa-wpexplorer,
 .crm-i.fa-meetup {
-  font-family: "Font Awesome 6 Brands";
+  font-family: "Font Awesome 6 Brands", sans-serif;
   font-weight: 400;
 }
 

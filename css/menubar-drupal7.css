@@ -30,8 +30,6 @@
   }
 
   body.toolbar.crm-menubar-visible.crm-menubar-below-cms-menu #toolbar {
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
     box-shadow: none;
   }
 
