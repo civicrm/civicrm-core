@@ -25,6 +25,7 @@ use Civi\Api4\GroupContact;
 use Civi\Api4\IM;
 use Civi\Api4\LocationType;
 use Civi\Api4\Membership;
+use Civi\Api4\Note;
 use Civi\Api4\OpenID;
 use Civi\Api4\Phone;
 use Civi\Api4\Queue;
@@ -66,7 +67,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_openid', 'civicrm_email', 'civicrm_user_job', 'civicrm_relationship', 'civicrm_im', 'civicrm_website', 'civicrm_queue', 'civicrm_queue_item', 'civicrm_subscription_history'], TRUE);
+    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_openid', 'civicrm_email', 'civicrm_user_job', 'civicrm_relationship', 'civicrm_im', 'civicrm_website', 'civicrm_queue', 'civicrm_queue_item', 'civicrm_subscription_history', 'civicrm_note'], TRUE);
     RelationshipType::delete()->addWhere('name_a_b', '=', 'Dad to')->execute();
     ContactType::delete()->addWhere('name', '=', 'baby')->execute();
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "defaultContactCountry"');
@@ -1348,6 +1349,36 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     }
     ob_end_clean();
     $this->fail('Should have resulted in a premature exit exception');
+  }
+
+  /**
+   * Test that Note's id and entity fields are not offered for contact import.
+   */
+  public function testImportableFieldsExcludeNoteEntityFields(): void {
+    $fields = CRM_Contact_BAO_Contact::importableFields('Individual');
+    // Contact and Note both key their id field as 'id' - check Note's has not replaced Contact's.
+    $this->assertEquals('civicrm_contact', $fields['id']['table_name']);
+    $this->assertArrayNotHasKey('entity_table', $fields);
+    $this->assertArrayNotHasKey('entity_id', $fields);
+  }
+
+  /**
+   * Test that a note's subject and date are imported along with the note.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportNoteWithSubjectAndDate(): void {
+    $this->importCSV('individual_with_note_subject_date.csv', [['first_name'], ['last_name'], ['note'], ['subject'], ['note_date']]);
+    $contactID = Contact::get(FALSE)
+      ->addWhere('last_name', '=', 'Jones')
+      ->execute()->single()['id'];
+    $note = Note::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_contact')
+      ->addWhere('entity_id', '=', $contactID)
+      ->execute()->single();
+    $this->assertEquals('Kinda dull', $note['note']);
+    $this->assertEquals('First impressions', $note['subject']);
+    $this->assertEquals('2024-05-06 00:00:00', $note['note_date']);
   }
 
   /**

@@ -158,7 +158,7 @@ class ContributionParser extends ImportParser {
         ],
       ];
       $contributionFields = $this->getImportFieldsForEntity('Contribution');
-      $note = $this->getImportFieldsForEntity('Note');
+      $note = array_intersect_key($this->getImportFieldsForEntity('Note'), ['note' => TRUE]);
       foreach ($contributionFields + $note as $fieldName => $field) {
         $field['entity_instance'] = 'Contribution';
         $field['entity_prefix'] = 'Contribution.';
@@ -661,8 +661,9 @@ class ContributionParser extends ImportParser {
     ], $noteParams);
     if ($this->isUpdateExisting()) {
       $note = Note::get(FALSE)
-        ->addSelect('entity_table', '=', 'civicrm_contribution')
-        ->addSelect('entity_id', '=', $contributionID)->execute()->first();
+        ->addSelect('id')
+        ->addWhere('entity_table', '=', 'civicrm_contribution')
+        ->addWhere('entity_id', '=', $contributionID)->execute()->first();
       if (!empty($note)) {
         $noteParams['id'] = $note['id'];
       }
