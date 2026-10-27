@@ -103,6 +103,68 @@ class CRM_Contact_Page_View_SummaryTest extends CiviUnitTestCase implements Head
       $this->assertTrue($tab['hideCount']);
       $this->assertFalse(is_numeric($tab['count']));
     }
+
+    $this->assertFalse(\CRM_Contact_BAO_Contact::getCountComponent('activity', $contact['id']));
+    $this->assertIsInt(\CRM_Contact_BAO_Contact::getCountComponent('activity', $contact['id'], FALSE));
+  }
+
+  public function testCustomFieldTabCount(): void {
+    $contact = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Custom',
+      'last_name' => 'Tester',
+    ]);
+
+    $customGroup = $this->createTestEntity('CustomGroup', [
+      'title' => 'Multi Record Group',
+      'name' => 'MultiRecordGroup',
+      'extends' => 'Individual',
+      'style' => 'Tab',
+      'is_multiple' => TRUE,
+    ]);
+
+    $customField = $this->createTestEntity('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Favorite Food',
+      'name' => 'favorite_food',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ]);
+
+    // Initial count is 0
+    $count = \CRM_Contact_BAO_Contact::getCountComponent('custom_' . $customGroup['id'], $contact['id']);
+    $this->assertSame(0, $count);
+
+    // Add two custom records
+    $this->createTestEntity('Custom_' . $customGroup['name'], [
+      'entity_id' => $contact['id'],
+      $customField['name'] => 'Pizza',
+    ], 'rec1');
+
+    $this->createTestEntity('Custom_' . $customGroup['name'], [
+      'entity_id' => $contact['id'],
+      $customField['name'] => 'Tacos',
+    ], 'rec2');
+
+    // Count by custom group tab identifier (custom_<groupId>)
+    $countByTabId = \CRM_Contact_BAO_Contact::getCountComponent('custom_' . $customGroup['id'], $contact['id']);
+    $this->assertSame(2, $countByTabId);
+
+    // Verify Summary getTabs() picks up the count
+    $_GET['cid'] = $_REQUEST['cid'] = $contact['id'];
+    $page = new \CRM_Contact_Page_View_Summary();
+    $page->set('contactType', 'Individual');
+    $page->getContactID();
+    $tabs = $page->getTabs();
+
+    $tabKey = 'custom_' . $customGroup['id'];
+    $this->assertArrayHasKey($tabKey, $tabs);
+    $this->assertSame(2, $tabs[$tabKey]['count']);
+    $this->assertFalse($tabs[$tabKey]['hideCount']);
+
+    // Invalid type throws exception
+    $this->expectException(\CRM_Core_Exception::class);
+    \CRM_Contact_BAO_Contact::getCountComponent('nonexistent_component_type', $contact['id']);
   }
 
 }
