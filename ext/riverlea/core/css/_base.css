@@ -440,6 +440,7 @@ dl dl {
 
 #crm-container /* applied to #crm not .crm to apply only once */ {
   max-width: 100%;
+  box-sizing: border-box; /* keeps the page padding inside the 100vh */
   min-height: 100vh;
   padding: var(--crm-page-padding);
   display: flex;
