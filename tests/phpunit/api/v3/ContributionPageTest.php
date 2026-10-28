@@ -657,7 +657,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'billing_first_name' => 'Dave',
       'billing_middle_name' => 'Joseph',
       'billing_last_name' => 'Wong',
-      'email-' . \CRM_Core_BAO_LocationType::getBilling() => 'dave@example.com',
+      'email-' . $this->getLocationTypeID('Billing') => 'dave@example.com',
       'payment_processor_id' => $this->ids['PaymentProcessor'][$processorIdentifier],
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
