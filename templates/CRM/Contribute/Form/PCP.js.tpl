@@ -13,7 +13,7 @@
     var $form = $("form.{/literal}{$form.formClass}{literal}");
 
     // FIXME: This could be much simpler as an entityRef field but pcp doesn't have a searchable api :(
-    var pcpURL = CRM.url('civicrm/ajax/rest', 'className=CRM_Contact_Page_AJAX&fnName=getPCPList&json=1&context=contact&reset=1');
+    var pcpURL = CRM.url('civicrm/ajax/pcp/list', 'json=1&context=contact&reset=1');
     $('input[name=pcp_made_through_id]', $form).crmSelect2({
       minimumInputLength: 1,
       ajax: {

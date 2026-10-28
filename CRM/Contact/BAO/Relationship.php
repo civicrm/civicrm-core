@@ -2300,14 +2300,27 @@ SELECT count(*)
     // which is different from relationship id
     $relationshipID = $record['relationship_id'] ?? $record['id'] ?? NULL;
 
-    // Delegate relationship permissions to contacts a & b
-    foreach (['a', 'b'] as $ab) {
-      if (empty($record["contact_id_$ab"]) && !empty($relationshipID)) {
-        $record["contact_id_$ab"] = CRM_Core_DAO::getFieldValue(__CLASS__, $relationshipID, "contact_id_$ab");
+    // Delegate relationship permissions to contacts a & b (both stored and new)
+    $contactsToCheck = [];
+    if (!empty($relationshipID)) {
+      foreach (['a', 'b'] as $ab) {
+        $stored = CRM_Core_DAO::getFieldValue(__CLASS__, $relationshipID, "contact_id_$ab");
+        if ($stored) {
+          $contactsToCheck[] = (int) $stored;
+        }
       }
-      if (!empty($record["contact_id_$ab"]) && !\Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', $delegateAction, ['id' => $record["contact_id_$ab"]], $userID)) {
+    }
+    foreach (['a', 'b'] as $ab) {
+      if (!empty($record["contact_id_$ab"])) {
+        $contactsToCheck[] = (int) $record["contact_id_$ab"];
+      }
+    }
+
+    $contactsToCheck = array_unique($contactsToCheck);
+    foreach ($contactsToCheck as $cid) {
+      if (!\Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contact', $delegateAction, ['id' => $cid], $userID)) {
         $e->setAuthorized(FALSE);
-        break;
+        return;
       }
     }
   }

@@ -24,4 +24,10 @@
      <is_public>true</is_public>
      <weight>0</weight>
   </item>
+  <item>
+    <path>civicrm/ajax/pcp/list</path>
+    <page_callback>CRM_Contact_Page_AJAX::getPCPList</page_callback>
+    <access_arguments>access CiviContribute;edit contributions</access_arguments>
+    <is_ajax>true</is_ajax>
+  </item>
 </menu>

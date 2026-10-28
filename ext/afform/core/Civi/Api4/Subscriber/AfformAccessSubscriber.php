@@ -41,7 +41,7 @@ class AfformAccessSubscriber extends AutoService implements EventSubscriberInter
     $apiRequest = $event->getApiRequest();
     $action = $apiRequest->getActionName();
 
-    if (!in_array($action, ['revert', 'delete', 'update'], TRUE)) {
+    if (!in_array($action, ['revert', 'delete', 'update', 'create'], TRUE)) {
       // We only care about these actions.
       return;
     }
@@ -52,13 +52,17 @@ class AfformAccessSubscriber extends AutoService implements EventSubscriberInter
 
     // Get user as we need to check for Test user
     $user_id = \CRM_Core_Session::getLoggedInContactID();
-    if ('update' === $action) {
+    if (in_array($action, ['update', 'create'], TRUE)) {
       $orig = [];
       $this->checkNameForAfform($afform, $orig, $scanner);
       // Check if updating or creating
       if ($orig) {
-        // We have an existing afform, so we need to check `manage own afform` permissions
-        if (!$this->checkAccess($apiRequest, $afform, $user_id)) {
+        // We have an existing afform, so we need to check `manage own afform` permissions.
+        // Its owner is the stored one: a submitted created_id is the value being written, and must
+        // pass as well, so an owner cannot hand the form to someone else.
+        $stored = ['created_id' => $orig['created_id'] ?? NULL] + $afform;
+        if (!$this->checkAccess($apiRequest, $stored, $user_id)
+          || (array_key_exists('created_id', $afform) && !$this->checkAccess($apiRequest, $afform, $user_id))) {
           $event->setAuthorized(FALSE);
         }
       }

@@ -560,6 +560,143 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('fa-pencil', $result[0]['columns'][1]['links'][0]['icon']);
   }
 
+  public function testGroupEnableDisableTaskLinks(): void {
+    $this->createLoggedInUser();
+
+    $unreservedActive = $this->createTestRecord('Group', [
+      'is_reserved' => FALSE,
+      'is_active' => TRUE,
+    ]);
+    $unreservedInactive = $this->createTestRecord('Group', [
+      'is_reserved' => FALSE,
+      'is_active' => FALSE,
+    ]);
+    $reservedActive = $this->createTestRecord('Group', [
+      'is_reserved' => TRUE,
+      'is_active' => TRUE,
+    ]);
+    $reservedInactive = $this->createTestRecord('Group', [
+      'is_reserved' => TRUE,
+      'is_active' => FALSE,
+    ]);
+
+    $search = SavedSearch::create(FALSE)
+      ->setValues([
+        'name' => uniqid(__FUNCTION__),
+        'api_entity' => 'Group',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'title'],
+          'where' => [['id', 'IN', [
+            $unreservedActive['id'],
+            $unreservedInactive['id'],
+            $reservedActive['id'],
+            $reservedInactive['id'],
+          ],
+          ],
+          ],
+        ],
+      ])
+      ->addChain('display', SearchDisplay::create()
+        ->setValues([
+          'type' => 'table',
+          'label' => uniqid(__FUNCTION__),
+          'saved_search_id' => '$id',
+          'settings' => [
+            'actions' => TRUE,
+            'pager' => [],
+            'columns' => [
+              [
+                'key' => 'title',
+                'label' => 'Title',
+                'type' => 'field',
+              ],
+              [
+                'type' => 'menu',
+                'links' => [
+                  [
+                    'task' => 'enable',
+                    'entity' => 'Group',
+                    'target' => 'crm-popup',
+                    'icon' => 'fa-toggle-on',
+                    'text' => 'Enable',
+                    'style' => 'default',
+                    'condition' => [],
+                  ],
+                  [
+                    'task' => 'disable',
+                    'entity' => 'Group',
+                    'target' => 'crm-popup',
+                    'icon' => 'fa-toggle-off',
+                    'text' => 'Disable',
+                    'style' => 'default',
+                    'condition' => [],
+                  ],
+                ],
+              ],
+            ],
+            'sort' => [
+              ['id', 'ASC'],
+            ],
+          ],
+        ]), 0)
+      ->execute()->first();
+
+    $params = [
+      'return' => 'page:1',
+      'savedSearch' => $search['name'],
+      'display' => $search['display']['name'],
+    ];
+
+    // User without 'administer reserved groups'
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit groups',
+      'view all contacts',
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $rows = [];
+    foreach ($result as $row) {
+      $rows[$row['data']['id']] = $row['columns'][1]['links'];
+    }
+
+    // Unreserved groups show enable or disable according to is_active
+    $this->assertCount(1, $rows[$unreservedActive['id']]);
+    $this->assertEquals('disable', $rows[$unreservedActive['id']][0]['task']);
+    $this->assertCount(1, $rows[$unreservedInactive['id']]);
+    $this->assertEquals('enable', $rows[$unreservedInactive['id']][0]['task']);
+
+    // Reserved groups have no enable/disable links without permission
+    $this->assertCount(0, $rows[$reservedActive['id']]);
+    $this->assertCount(0, $rows[$reservedInactive['id']]);
+
+    // Grant 'administer reserved groups'
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit groups',
+      'view all contacts',
+      'administer reserved groups',
+    ];
+
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $rows = [];
+    foreach ($result as $row) {
+      $rows[$row['data']['id']] = $row['columns'][1]['links'];
+    }
+
+    // All groups show enable or disable according to is_active
+    $this->assertCount(1, $rows[$unreservedActive['id']]);
+    $this->assertEquals('disable', $rows[$unreservedActive['id']][0]['task']);
+    $this->assertCount(1, $rows[$unreservedInactive['id']]);
+    $this->assertEquals('enable', $rows[$unreservedInactive['id']][0]['task']);
+
+    $this->assertCount(1, $rows[$reservedActive['id']]);
+    $this->assertEquals('disable', $rows[$reservedActive['id']][0]['task']);
+    $this->assertCount(1, $rows[$reservedInactive['id']]);
+    $this->assertEquals('enable', $rows[$reservedInactive['id']][0]['task']);
+  }
+
   public function testRelationshipCacheLinks():void {
     $case = $this->createTestRecord('Case');
     $relationships = $this->saveTestRecords('Relationship', [
@@ -2912,7 +3049,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
   }
 
   public function testKeyIsReturned(): void {
-    $id = $this->createTestRecord('Email')['id'];
+    $contact = $this->createTestRecord('Contact');
+    $id = $this->createTestRecord('Email', ['contact_id' => $contact['id']])['id'];
     $params = [
       'checkPermissions' => FALSE,
       'return' => 'page:1',
@@ -3408,12 +3546,16 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
   public function testRunWithAddressProximity(): void {
     require_once __DIR__ . '/../../../../../../../tests/phpunit/CRM/Utils/Geocode/TestProvider.php';
+    $contact = $this->createTestRecord('Contact');
     $sampleData = [
       ['geo_code_1' => \CRM_Utils_Geocode_TestProvider::GEO_CODE_1, 'geo_code_2' => \CRM_Utils_Geocode_TestProvider::GEO_CODE_2],
       ['geo_code_1' => \CRM_Utils_Geocode_TestProvider::GEO_CODE_1 - .05, 'geo_code_2' => \CRM_Utils_Geocode_TestProvider::GEO_CODE_2 + .05],
       ['geo_code_1' => '0', 'geo_code_2' => '0'],
     ];
-    $addresses = $this->saveTestRecords('Address', ['records' => $sampleData])
+    $addresses = $this->saveTestRecords('Address', [
+      'records' => $sampleData,
+      'defaults' => ['contact_id' => $contact['id']],
+    ])
       ->column('id');
 
     \Civi\Api4\Setting::set(FALSE)

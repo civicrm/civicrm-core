@@ -106,7 +106,7 @@
 
   function loadVoterList( )
   {
-    var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='snippet=4&className=CRM_Campaign_Page_AJAX&fnName=voterList'}"{literal};
+    var sourceUrl = {/literal}"{crmURL p='civicrm/ajax/campaign/voterlist' h=0 q='snippet=4'}"{literal};
 
     var searchVoterFor = {/literal}'{$searchVoterFor}'{literal};
     CRM.$( 'table.gotvVoterRecords', 'form.{/literal}{$form.formClass}{literal}').dataTable({
@@ -179,7 +179,7 @@
     data['surveyTitle'] = {/literal}'{$surveyTitle|escape:javascript}'{literal};
 
     var actUrl = {/literal}
-      "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Campaign_Page_AJAX&fnName=processVoterData'}"
+      "{crmURL p='civicrm/ajax/campaign/processvoter' h=0}"
     {literal};
 
     //post data to save voter as voted/non voted.

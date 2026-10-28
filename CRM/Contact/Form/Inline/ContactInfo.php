@@ -29,6 +29,7 @@ class CRM_Contact_Form_Inline_ContactInfo extends CRM_Contact_Form_Inline {
     // Build contact type specific fields
     $class = 'CRM_Contact_Form_Edit_' . $this->_contactType;
     $class::buildQuickForm($this, 2);
+    $this->addFormRule([$class, 'formRule'], $this);
   }
 
   /**

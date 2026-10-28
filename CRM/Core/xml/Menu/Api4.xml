@@ -4,6 +4,7 @@
     <path>civicrm/ajax/api4</path>
     <page_callback>CRM_Api4_Page_AJAX</page_callback>
     <access_callback>1</access_callback>
+    <is_ajax>false</is_ajax>
   </item>
   <item>
     <path>civicrm/api4</path>

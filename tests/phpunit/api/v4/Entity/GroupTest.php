@@ -338,4 +338,147 @@ class GroupTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals([$parent2['id']], $get['parents']);
   }
 
+  public function testReservedGroupPermissions(): void {
+    $this->createLoggedInUser();
+
+    $reservedGroup = Group::create(FALSE)
+      ->addValue('title', 'Reserved Group ' . uniqid())
+      ->addValue('is_reserved', TRUE)
+      ->execute()->single();
+
+    $unreservedGroup = Group::create(FALSE)
+      ->addValue('title', 'Regular Group ' . uniqid())
+      ->addValue('is_reserved', FALSE)
+      ->execute()->single();
+
+    // User has permission to edit normal groups, but NOT reserved groups
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit groups',
+      'view all contacts',
+    ];
+
+    // Allowed to modify regular group
+    Group::update(TRUE)
+      ->addWhere('id', '=', $unreservedGroup['id'])
+      ->addValue('title', 'Regular Group Updated')
+      ->execute();
+
+    // User cannot modify reserved group
+    try {
+      Group::update(TRUE)
+        ->addWhere('id', '=', $reservedGroup['id'])
+        ->addValue('title', 'Hacked Title')
+        ->execute();
+      $this->fail('User without "administer reserved groups" should not be able to update a reserved group.');
+    }
+    catch (UnauthorizedException $e) {
+      $this->addToAssertionCount(1);
+    }
+
+    // User cannot un-reserve a reserved group
+    try {
+      Group::update(TRUE)
+        ->addWhere('id', '=', $reservedGroup['id'])
+        ->addValue('is_reserved', FALSE)
+        ->execute();
+      $this->fail('User without "administer reserved groups" should not be able to un-reserve a reserved group.');
+    }
+    catch (UnauthorizedException $e) {
+      $this->addToAssertionCount(1);
+    }
+
+    // User cannot delete reserved group
+    try {
+      Group::delete(TRUE)
+        ->addWhere('id', '=', $reservedGroup['id'])
+        ->execute();
+      $this->fail('User without "administer reserved groups" should not be able to delete a reserved group.');
+    }
+    catch (UnauthorizedException $e) {
+      $this->addToAssertionCount(1);
+    }
+
+    // User cannot make a normal group reserved
+    try {
+      Group::update(TRUE)
+        ->addWhere('id', '=', $unreservedGroup['id'])
+        ->addValue('is_reserved', TRUE)
+        ->execute();
+      $this->fail('User without "administer reserved groups" should not be able to make a group reserved.');
+    }
+    catch (UnauthorizedException $e) {
+      $this->addToAssertionCount(1);
+    }
+
+    // User cannot create a reserved group
+    try {
+      Group::create(TRUE)
+        ->addValue('title', 'New Reserved Group ' . uniqid())
+        ->addValue('is_reserved', TRUE)
+        ->execute();
+      $this->fail('User without "administer reserved groups" should not be able to create a reserved group.');
+    }
+    catch (UnauthorizedException $e) {
+      $this->addToAssertionCount(1);
+    }
+
+    // User CAN update an unreserved group explicitly passing is_reserved = FALSE
+    Group::update(TRUE)
+      ->addWhere('id', '=', $unreservedGroup['id'])
+      ->addValue('is_reserved', FALSE)
+      ->execute();
+
+    // User cannot save/update a reserved group via Group::save
+    try {
+      Group::save(TRUE)
+        ->addRecord(['id' => $reservedGroup['id'], 'title' => 'Hacked via Save'])
+        ->execute();
+      $this->fail('User without "administer reserved groups" should not be able to save a reserved group.');
+    }
+    catch (UnauthorizedException $e) {
+      $this->addToAssertionCount(1);
+    }
+
+    // Verify checkAccess API reflects permissions
+    $this->assertFalse(Group::checkAccess()->setAction('update')->setValues(['id' => $reservedGroup['id']])->execute()->single()['access']);
+    $this->assertFalse(Group::checkAccess()->setAction('delete')->setValues(['id' => $reservedGroup['id']])->execute()->single()['access']);
+    $this->assertTrue(Group::checkAccess()->setAction('update')->setValues(['id' => $unreservedGroup['id']])->execute()->single()['access']);
+
+    // Now grant "administer reserved groups" permission
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit groups',
+      'view all contacts',
+      'administer reserved groups',
+    ];
+
+    // User CAN update reserved group
+    $updated = Group::update(TRUE)
+      ->addWhere('id', '=', $reservedGroup['id'])
+      ->addValue('title', 'Legit Admin Update')
+      ->execute()->single();
+    $this->assertEquals('Legit Admin Update', $updated['title']);
+
+    // User CAN un-reserve a group
+    $unreserved = Group::update(TRUE)
+      ->addWhere('id', '=', $reservedGroup['id'])
+      ->addValue('is_reserved', FALSE)
+      ->execute()->single();
+    $this->assertFalse($unreserved['is_reserved']);
+
+    // User CAN create a reserved group
+    $newReserved = Group::create(TRUE)
+      ->addValue('title', 'Admin Reserved Group ' . uniqid())
+      ->addValue('is_reserved', TRUE)
+      ->execute()->single();
+    $this->assertTrue($newReserved['is_reserved']);
+
+    // User CAN delete reserved group
+    $deleted = Group::delete(TRUE)
+      ->addWhere('id', '=', $newReserved['id'])
+      ->execute();
+    $this->assertCount(1, $deleted);
+  }
+
 }

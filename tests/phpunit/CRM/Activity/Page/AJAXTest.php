@@ -5,6 +5,19 @@
  */
 class CRM_Activity_Page_AJAXTest extends CiviCaseTestCase {
 
+  public function setUp(): void {
+    parent::setUp();
+    $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
+  }
+
+  public function tearDown(): void {
+    unset($_SERVER['HTTP_X_REQUESTED_WITH']);
+    $_REQUEST = [];
+    $_GET = [];
+    $_POST = [];
+    parent::tearDown();
+  }
+
   /**
    * Test the underlying function that implements file-on-case.
    *
@@ -285,6 +298,438 @@ class CRM_Activity_Page_AJAXTest extends CiviCaseTestCase {
     // clean up
     \Civi::settings()->set('preserve_activity_tab_filter', '0');
     $_GET = $_REQUEST = [];
+  }
+
+  /**
+   * Test convertToCaseActivity endpoint succeeds when user has required permissions.
+   */
+  public function testConvertToCaseActivityEndpointSuccess(): void {
+    $loggedInUserId = $this->createLoggedInUser();
+    $this->setPermissions([
+      'access CiviCRM',
+      'access all cases and activities',
+      'edit all contacts',
+      'view all contacts',
+    ]);
+
+    $targetContactId = $this->individualCreate([], 'target');
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $loggedInUserId,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Meeting for case',
+      'status_id' => 'Completed',
+      'target_id' => $targetContactId,
+    ]);
+
+    $case = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $targetContactId,
+      'case_type_id' => 'housing_support',
+      'subject' => 'Housing assistance',
+    ]);
+
+    $_POST = $_REQUEST = [
+      'activityID' => $activity['id'],
+      'caseID' => $case['id'],
+      'mode' => 'file',
+      'targetContactIds' => (string) $targetContactId,
+    ];
+
+    try {
+      CRM_Activity_Page_AJAX::convertToCaseActivity();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertNotEmpty($e->errorData['newId']);
+      $newActivityId = $e->errorData['newId'];
+    }
+
+    $caseActivities = $this->callAPISuccess('Activity', 'get', [
+      'case_id' => $case['id'],
+      'id' => $newActivityId,
+    ])['values'];
+    $this->assertCount(1, $caseActivities);
+    $this->assertEquals('Meeting for case', $caseActivities[$newActivityId]['subject']);
+  }
+
+  /**
+   * Test convertToCaseActivity endpoint is denied when user lacks case permission.
+   */
+  public function testConvertToCaseActivityEndpointDeniedWithoutCasePermission(): void {
+    $ownerId = $this->individualCreate([], 'owner');
+    $targetContactId = $this->individualCreate([], 'target');
+
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $ownerId,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Meeting to file',
+      'status_id' => 'Completed',
+      'target_id' => $targetContactId,
+    ]);
+
+    $case = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $targetContactId,
+      'case_type_id' => 'housing_support',
+      'subject' => 'Housing assistance',
+    ]);
+
+    $this->createLoggedInUser();
+    // User only has basic access CiviCRM, no case permissions
+    $this->setPermissions(['access CiviCRM']);
+
+    $_POST = $_REQUEST = [
+      'activityID' => $activity['id'],
+      'caseID' => $case['id'],
+      'mode' => 'file',
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Activity_Page_AJAX::convertToCaseActivity();
+  }
+
+  /**
+   * Test convertToCaseActivity endpoint is denied when user lacks activity edit permission.
+   */
+  public function testConvertToCaseActivityEndpointDeniedWithoutActivityPermission(): void {
+    $otherUserId = $this->individualCreate([], 'other');
+    $targetContactId = $this->individualCreate([], 'target');
+
+    $activity = $this->callAPISuccess('Activity', 'create', [
+      'source_contact_id' => $otherUserId,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Meeting to move',
+      'status_id' => 'Completed',
+      'target_id' => $targetContactId,
+    ]);
+
+    $case = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $targetContactId,
+      'case_type_id' => 'housing_support',
+      'subject' => 'Housing assistance',
+    ]);
+
+    $this->createLoggedInUser();
+    // User has case access, but lacks edit all contacts / permission to edit other contact's activity
+    $this->setPermissions([
+      'access CiviCRM',
+      'access all cases and activities',
+    ]);
+
+    $_POST = $_REQUEST = [
+      'activityID' => $activity['id'],
+      'caseID' => $case['id'],
+      'mode' => 'move',
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Activity_Page_AJAX::convertToCaseActivity();
+  }
+
+  /**
+   * Test convertToCaseActivity endpoint is denied with invalid parameters.
+   */
+  public function testConvertToCaseActivityEndpointInvalidParamsDenied(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access all cases and activities']);
+
+    $_POST = $_REQUEST = [
+      'activityID' => 1,
+      'caseID' => 'invalid_case_id',
+      'mode' => 'file',
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Activity_Page_AJAX::convertToCaseActivity();
+  }
+
+  /**
+   * Test getCaseRoles is denied when caseID is missing or invalid.
+   */
+  public function testGetCaseRolesMissingCaseIdDenied(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access all cases and activities']);
+
+    $_GET = $_REQUEST = [];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Activity_Page_AJAX::getCaseRoles();
+  }
+
+  /**
+   * Test getCaseRoles is denied when user lacks permission to access the case.
+   */
+  public function testGetCaseRolesForbiddenCaseDenied(): void {
+    $targetContactId = $this->individualCreate([], 'target_contact');
+    $case = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $targetContactId,
+      'case_type_id' => 'housing_support',
+      'subject' => 'Needs housing',
+    ]);
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM']);
+
+    $_GET = $_REQUEST = [
+      'caseID' => $case['id'],
+      'cid' => $targetContactId,
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Activity_Page_AJAX::getCaseRoles();
+  }
+
+  /**
+   * Test getCaseRoles succeeds when user has permission to access the case.
+   */
+  public function testGetCaseRolesPermittedSuccess(): void {
+    $targetContactId = $this->individualCreate([], 'target_contact');
+    $case = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $targetContactId,
+      'case_type_id' => 'housing_support',
+      'subject' => 'Needs housing',
+    ]);
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access all cases and activities', 'view all contacts']);
+
+    $_GET = $_REQUEST = [
+      'caseID' => $case['id'],
+      'cid' => $targetContactId,
+    ];
+
+    try {
+      CRM_Activity_Page_AJAX::getCaseRoles();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $data = $e->errorData;
+      $this->assertIsArray($data);
+      $this->assertArrayHasKey('data', $data);
+      $this->assertArrayHasKey('recordsTotal', $data);
+    }
+  }
+
+  /**
+   * Test getCaseClientRelationships is denied when caseID is missing or invalid.
+   */
+  public function testGetCaseClientRelationshipsMissingCaseIdDenied(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access all cases and activities']);
+
+    $_GET = $_REQUEST = [];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Activity_Page_AJAX::getCaseClientRelationships();
+  }
+
+  /**
+   * Test getCaseClientRelationships is denied when user lacks permission to access the case.
+   */
+  public function testGetCaseClientRelationshipsForbiddenCaseDenied(): void {
+    $targetContactId = $this->individualCreate([], 'target_contact');
+    $case = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $targetContactId,
+      'case_type_id' => 'housing_support',
+      'subject' => 'Needs housing',
+    ]);
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM']);
+
+    $_GET = $_REQUEST = [
+      'caseID' => $case['id'],
+      'cid' => $targetContactId,
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Activity_Page_AJAX::getCaseClientRelationships();
+  }
+
+  /**
+   * Test getCaseClientRelationships succeeds when user has permission to access the case.
+   */
+  public function testGetCaseClientRelationshipsPermittedSuccess(): void {
+    $targetContactId = $this->individualCreate([], 'target_contact');
+    $case = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $targetContactId,
+      'case_type_id' => 'housing_support',
+      'subject' => 'Needs housing',
+    ]);
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access all cases and activities', 'view all contacts']);
+
+    $_GET = $_REQUEST = [
+      'caseID' => $case['id'],
+      'cid' => $targetContactId,
+    ];
+
+    try {
+      CRM_Activity_Page_AJAX::getCaseClientRelationships();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $data = $e->errorData;
+      $this->assertIsArray($data);
+      $this->assertArrayHasKey('data', $data);
+      $this->assertArrayHasKey('recordsTotal', $data);
+    }
+  }
+
+  /**
+   * Test getCaseActivity is denied when caseID is missing or invalid.
+   */
+  public function testGetCaseActivityMissingCaseIdDenied(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access all cases and activities']);
+
+    $_GET = $_REQUEST = [];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Activity_Page_AJAX::getCaseActivity();
+  }
+
+  /**
+   * Test getCaseActivity is denied when user lacks permission to access the case.
+   */
+  public function testGetCaseActivityForbiddenCaseDenied(): void {
+    $targetContactId = $this->individualCreate([], 'target_contact');
+    $case = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $targetContactId,
+      'case_type_id' => 'housing_support',
+      'subject' => 'Needs housing',
+    ]);
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM']);
+
+    $_GET = $_REQUEST = [
+      'caseID' => $case['id'],
+      'cid' => $targetContactId,
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Activity_Page_AJAX::getCaseActivity();
+  }
+
+  /**
+   * Test getCaseActivity succeeds when user has permission to access the case.
+   */
+  public function testGetCaseActivityPermittedSuccess(): void {
+    $targetContactId = $this->individualCreate([], 'target_contact');
+    $case = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $targetContactId,
+      'case_type_id' => 'housing_support',
+      'subject' => 'Needs housing',
+    ]);
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access all cases and activities', 'view all contacts']);
+
+    $_GET = $_REQUEST = [
+      'caseID' => $case['id'],
+      'cid' => $targetContactId,
+    ];
+
+    try {
+      CRM_Activity_Page_AJAX::getCaseActivity();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $data = $e->errorData;
+      $this->assertIsArray($data);
+      $this->assertArrayHasKey('data', $data);
+      $this->assertArrayHasKey('recordsTotal', $data);
+    }
+  }
+
+  /**
+   * Test getCaseGlobalRelationships is denied without case permissions.
+   */
+  public function testGetCaseGlobalRelationshipsDeniedWithoutPermission(): void {
+    $cid = $this->individualCreate();
+    $case = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $cid,
+      'case_type_id' => 'housing_support',
+      'subject' => 'Global relationships case',
+    ]);
+    $this->setPermissions(['access CiviCRM']);
+
+    $_GET = $_REQUEST = [
+      'caseID' => $case['id'],
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Activity_Page_AJAX::getCaseGlobalRelationships();
+  }
+
+  /**
+   * Test getCaseGlobalRelationships succeeds when user has case access.
+   */
+  public function testGetCaseGlobalRelationshipsSuccess(): void {
+    $cid = $this->individualCreate();
+    $case = $this->callAPISuccess('Case', 'create', [
+      'contact_id' => $cid,
+      'case_type_id' => 'housing_support',
+      'subject' => 'Global relationships case',
+    ]);
+    $this->setPermissions(['access CiviCRM', 'access all cases and activities', 'view all contacts']);
+
+    $_GET = $_REQUEST = [
+      'caseID' => $case['id'],
+    ];
+
+    try {
+      CRM_Activity_Page_AJAX::getCaseGlobalRelationships();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $data = $e->errorData;
+      $this->assertIsArray($data);
+      $this->assertArrayHasKey('data', $data);
+      $this->assertArrayHasKey('recordsTotal', $data);
+    }
+  }
+
+  /**
+   * Test getContactActivity is denied when user lacks view permission on contact.
+   */
+  public function testGetContactActivityForbiddenContactDenied(): void {
+    $targetContactId = $this->individualCreate();
+    $this->setPermissions(['access CiviCRM']);
+
+    $_GET = $_REQUEST = [
+      'cid' => $targetContactId,
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Activity_Page_AJAX::getContactActivity();
+  }
+
+  /**
+   * Test getContactActivity succeeds when user has permission to view contact.
+   */
+  public function testGetContactActivityPermittedSuccess(): void {
+    $targetContactId = $this->individualCreate([], 'target_contact');
+    $this->setPermissions(['access CiviCRM', 'view all contacts']);
+
+    $_GET = $_REQUEST = [
+      'cid' => $targetContactId,
+    ];
+
+    try {
+      CRM_Activity_Page_AJAX::getContactActivity();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $data = $e->errorData;
+      $this->assertIsArray($data);
+      $this->assertArrayHasKey('data', $data);
+      $this->assertArrayHasKey('recordsTotal', $data);
+    }
   }
 
 }

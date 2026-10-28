@@ -44,7 +44,7 @@ class CRM_Core_Exception_PrematureExitException extends RuntimeException {
    */
   public function __construct($message = "", $errorData = [], $error_code = 0, ?Throwable $previous = NULL) {
     parent::__construct($message, $error_code, $previous);
-    $this->errorData = $errorData + ['error_code' => $error_code];
+    $this->errorData = (array) $errorData + ['error_code' => $error_code];
   }
 
 }

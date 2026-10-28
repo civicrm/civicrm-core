@@ -10,5 +10,6 @@
     <path>civicrm/ajax/multirecordfieldlist</path>
     <page_callback>CRM_Custom_Page_AJAX::getMultiRecordFieldList</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
+    <is_ajax>true</is_ajax>
   </item>
 </menu>

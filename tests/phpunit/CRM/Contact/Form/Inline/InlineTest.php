@@ -62,6 +62,8 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
    * Helper to clean up contacts and related entities.
    */
   public function tearDown(): void {
+    \CRM_Utils_Hook::singleton()->reset();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
     $this->quickCleanup($this->tablesToCleanUp);
     parent::tearDown();
   }
@@ -736,6 +738,209 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $this->assertCount(1, $addresses);
     $this->assertEquals('100 Innovation Way', $addresses->first()['street_address']);
     $this->assertEquals('Metropolis', $addresses->first()['city']);
+  }
+
+  /**
+   * Test that inline contact forms deny access when the user lacks edit permission on the contact.
+   */
+  public function testInlineFormDeniedWithoutContactEditPermission(): void {
+    $contactId = $this->getTestEntityID('Contact');
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'view all contacts']);
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Email', [
+      'oplock_ts' => $this->getOplockTs(),
+      'email' => [
+        1 => [
+          'email' => 'unauthorized@example.org',
+          'location_type_id' => 1,
+          'is_primary' => 1,
+        ],
+      ],
+    ], ['cid' => $contactId]);
+    $formWrapper->processForm();
+  }
+
+  /**
+   * Test that inline address form denies access when aid belongs to another contact.
+   */
+  public function testAddressFormDeniedForOtherContactsAddress(): void {
+    $contactId = $this->getTestEntityID('Contact');
+    $otherContact = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Other',
+      'last_name' => 'Contact',
+    ], 'other_contact');
+    $otherAddress = $this->createTestEntity('Address', [
+      'contact_id' => $otherContact['id'],
+      'street_address' => '999 Secret St',
+      'location_type_id' => 1,
+    ], 'other_address');
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Address', [
+      'oplock_ts' => $this->getOplockTs(),
+      'address' => [
+        1 => [
+          'street_address' => 'Overwritten St',
+          'location_type_id' => 1,
+          'is_primary' => 1,
+        ],
+      ],
+    ], ['cid' => $contactId, 'locno' => 1, 'aid' => $otherAddress['id']]);
+    $formWrapper->processForm();
+  }
+
+  /**
+   * Test ContactInfo inline form validates employer_id permissions.
+   */
+  public function testContactInfoFormEmployerPermissions(): void {
+    $userContact = $this->createLoggedInUser();
+
+    $secretOrg = $this->createTestEntity('Contact', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'Secret Org',
+    ], 'secret_org');
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    // Try linking to an organization the user cannot view
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_ContactInfo', [
+      'oplock_ts' => $this->getOplockTs($userContact),
+      'employer_id' => $secretOrg['id'],
+    ], ['cid' => $userContact]);
+    $formWrapper->processForm(FormWrapper::VALIDATED);
+
+    $this->assertEquals(
+      ['employer_id' => ts('Please select a valid employer organization.')],
+      $formWrapper->getValidationOutput()
+    );
+
+    // Now give permission to view all contacts and test valid link
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+      'view all contacts',
+    ];
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_ContactInfo', [
+      'oplock_ts' => $this->getOplockTs($userContact),
+      'employer_id' => $secretOrg['id'],
+    ], ['cid' => $userContact]);
+    $formWrapper->processForm();
+
+    $userRecord = civicrm_api4('Contact', 'get', [
+      'checkPermissions' => FALSE,
+      'where' => [['id', '=', $userContact]],
+      'select' => ['employer_id'],
+    ])->first();
+    $this->assertEquals($secretOrg['id'], $userRecord['employer_id']);
+  }
+
+  /**
+   * Test Address inline form validates master_id permissions and rejects other contacts' address IDs.
+   */
+  public function testAddressFormPermissions(): void {
+    $userContact = $this->createLoggedInUser();
+
+    $otherContact = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Victim',
+      'last_name' => 'Person',
+    ], 'victim_contact');
+
+    $otherAddress = $this->createTestEntity('Address', [
+      'contact_id' => $otherContact['id'],
+      'location_type_id' => 1,
+      'street_address' => '500 Confidential Blvd',
+    ], 'victim_address');
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    // Try requesting aid of another contact's address
+    $this->expectException(\CRM_Core_Exception::class);
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Address', [
+      'oplock_ts' => $this->getOplockTs($userContact),
+    ], ['cid' => $userContact, 'locno' => 1, 'aid' => $otherAddress['id']]);
+    $formWrapper->processForm();
+  }
+
+  /**
+   * Test that inline custom data form denies access when user lacks edit permission on custom group.
+   */
+  public function testCustomDataFormDeniedWithoutCustomGroupEditPermission(): void {
+    $contactId = $this->getTestEntityID('Contact');
+    $customGroup = $this->createTestEntity('CustomGroup', [
+      'title' => 'Restricted Group',
+      'extends' => 'Individual',
+      'style' => 'Inline',
+    ]);
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'edit all contacts', 'view all custom data']);
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_CustomData', [
+      'oplock_ts' => $this->getOplockTs(),
+    ], ['cid' => $contactId, 'groupID' => $customGroup['id']]);
+    $formWrapper->processForm();
+  }
+
+  /**
+   * Test Address form validates use_shared_address with forbidden master_id.
+   */
+  public function testAddressFormSharedAddressPermissions(): void {
+    $userContact = $this->createLoggedInUser();
+
+    $otherContact = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Victim',
+      'last_name' => 'Person',
+    ], 'victim_contact_2');
+
+    $otherAddress = $this->createTestEntity('Address', [
+      'contact_id' => $otherContact['id'],
+      'location_type_id' => 1,
+      'street_address' => '500 Confidential Blvd',
+    ], 'victim_address_2');
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Address', [
+      'oplock_ts' => $this->getOplockTs($userContact),
+      'address' => [
+        1 => [
+          'location_type_id' => 1,
+          'use_shared_address' => 1,
+          'master_id' => $otherAddress['id'],
+        ],
+      ],
+    ], ['cid' => $userContact, 'locno' => 1]);
+    $formWrapper->processForm(FormWrapper::VALIDATED);
+
+    $this->assertEquals(
+      ['address[1][use_shared_address]' => ts('You do not have permission to share an address from this contact.')],
+      $formWrapper->getValidationOutput()
+    );
   }
 
 }

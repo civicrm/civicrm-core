@@ -1,0 +1,195 @@
+diff -ruN src/PhpSpreadsheet/Reader/Ods.php src/PhpSpreadsheet/Reader/Ods.php
+--- src/PhpSpreadsheet/Reader/Ods.php	2026-07-13 06:08:02
++++ src/PhpSpreadsheet/Reader/Ods.php	2026-10-28 09:57:12
+@@ -209,6 +209,7 @@
+                     if ($xml->name == 'table:table-row' && $xml->nodeType == XMLReader::ELEMENT) {
+                         $rowspan = $xml->getAttribute('table:number-rows-repeated');
+                         $rowspan = empty($rowspan) ? 1 : (int) $rowspan;
++                        self::checkRowsRepeated($currRow, $rowspan);
+                         $currRow += $rowspan;
+                         $currCol = 0;
+                         // Step into the row
+@@ -218,6 +219,10 @@
+                             if ($xml->name == 'table:table-cell' && $xml->nodeType == XMLReader::ELEMENT) {
+                                 $mergeSize = $xml->getAttribute('table:number-columns-repeated');
+                                 $mergeSize = empty($mergeSize) ? 1 : (int) $mergeSize;
++                                self::checkColumnsRepeatedInt(
++                                    $currCol,
++                                    $mergeSize
++                                );
+                                 $currCol += $mergeSize;
+                                 if (!$xml->isEmptyElement) {
+                                     $tmpInfo['totalColumns'] = max($tmpInfo['totalColumns'], $currCol);
+@@ -227,6 +232,11 @@
+                                 }
+                             } elseif ($xml->name == 'table:covered-table-cell' && $xml->nodeType == XMLReader::ELEMENT) {
+                                 $mergeSize = $xml->getAttribute('table:number-columns-repeated');
++                                $mergeSize = empty($mergeSize) ? 1 : (int) $mergeSize;
++                                self::checkColumnsRepeatedInt(
++                                    $currCol,
++                                    $mergeSize
++                                );
+                                 $currCol += (int) $mergeSize;
+                             }
+                             if ($doread) {
+@@ -322,7 +332,7 @@
+                 ->scan($zip->getFromName('meta.xml'))
+         );
+         if ($xml === false) {
+-            throw new Exception('Unable to read data from {$pFilename}');
++            throw new Exception('Unable to read data from {$filename}');
+         }
+ 
+         /** @var array{meta?: string, office?: string, dc?: string} */
+@@ -817,6 +827,7 @@
+         } else {
+             $rowRepeats = 1;
+         }
++        self::checkRowsRepeated($rowID, $rowRepeats);
+         $worksheet = $spreadsheet->getSheetByName($worksheetName);
+ 
+         $columnID = 'A';
+@@ -830,6 +841,8 @@
+             } else {
+                 $colRepeats = 1;
+             }
++            $columnIndex = Coordinate::columnIndexFromString($columnID);
++            self::checkColumnsRepeated($columnID, $colRepeats);
+             $styleName = $cellData->getAttributeNS($tableNs, 'style-name');
+             if ($styleName === '') {
+                 if ($worksheet === null || !$worksheet->columnDimensionExists($columnID)) {
+@@ -1313,17 +1326,19 @@
+         bool $processStyles = true
+     ): void {
+         if ($childNode->hasAttributeNS($tableNs, 'number-columns-repeated')) {
+-            $rowRepeats = (int) $childNode->getAttributeNS($tableNs, 'number-columns-repeated');
++            $colRepeats = (int) $childNode->getAttributeNS($tableNs, 'number-columns-repeated');
+         } else {
+-            $rowRepeats = 1;
++            $colRepeats = 1;
+         }
++        // called routine expects index to be 1 less than it is
++        self::checkColumnsRepeatedInt($tableColumnIndex - 1, $colRepeats);
+         $tableStyleName = $childNode->getAttributeNS($tableNs, 'style-name');
+         if ($processWidths) {
+             if (isset($columnWidths[$tableStyleName])) {
+                 $columnWidth = new HelperDimension($columnWidths[$tableStyleName]);
+                 $tableColumnIndex2 = $tableColumnIndex;
+                 $tableColumnString = Coordinate::stringFromColumnIndex($tableColumnIndex2);
+-                for ($rowRepeats2 = $rowRepeats; $rowRepeats2 > 0 && $tableColumnIndex2 <= AddressRange::MAX_COLUMN_INT; --$rowRepeats2) {
++                for ($colRepeats2 = $colRepeats; $colRepeats2 > 0 && $tableColumnIndex2 <= AddressRange::MAX_COLUMN_INT; --$colRepeats2) {
+                     if (!$this->readEmptyCells && $tableColumnIndex2 > $this->highestDataIndex) {
+                         break;
+                     }
+@@ -1342,7 +1357,7 @@
+             if ($defaultStyleName !== 'Default' && isset($this->allStyles[$defaultStyleName])) {
+                 $tableColumnIndex2 = $tableColumnIndex;
+                 $tableColumnString = Coordinate::stringFromColumnIndex($tableColumnIndex2);
+-                for ($rowRepeats2 = $rowRepeats; $rowRepeats2 > 0 && $tableColumnIndex2 <= AddressRange::MAX_COLUMN_INT; --$rowRepeats2) {
++                for ($colRepeats2 = $colRepeats; $colRepeats2 > 0 && $tableColumnIndex2 <= AddressRange::MAX_COLUMN_INT; --$colRepeats2) {
+                     $spreadsheet->getActiveSheet()
+                         ->getStyle($tableColumnString)
+                         ->applyFromArray(
+@@ -1355,7 +1370,7 @@
+                 }
+             }
+         }
+-        $tableColumnIndex += $rowRepeats;
++        $tableColumnIndex += $colRepeats;
+     }
+ 
+     private function processSettings(ZipArchive $zip, Spreadsheet $spreadsheet): void
+@@ -1799,6 +1814,30 @@
+             if ($decimalPlaces === '0' && $minIntegerDigits > 1) {
+                 $this->numberFormats[$styleName] = str_repeat('0', $minIntegerDigits);
+             }
++        }
++    }
++
++    private static function checkRowsRepeated(int $rowID, int $rowRepeats): void
++    {
++        if ($rowRepeats < 1 || $rowID + $rowRepeats - 1 > AddressRange::MAX_ROW) {
++            throw new Exception("Invalid number-rows-repeated $rowRepeats following row $rowID");
++        }
++    }
++
++    private static function checkColumnsRepeated(string $colID, int $colRepeats): void
++    {
++        $colIndex = Coordinate::columnIndexFromString($colID);
++        if ($colRepeats < 1 || $colIndex + $colRepeats - 1 > AddressRange::MAX_COLUMN_INT) {
++            throw new Exception("Invalid number-columns-repeated $colRepeats following column $colID");
++        }
++    }
++
++    private static function checkColumnsRepeatedInt(int $colIndex, int $colRepeats): void
++    {
++        // We don't have column string at this point,
++        //    and colIndex is actually 1 less than it should be.
++        if ($colRepeats < 1 || $colIndex + $colRepeats > AddressRange::MAX_COLUMN_INT) {
++            throw new Exception("Invalid number-columns-repeated $colRepeats following column index $colIndex");
+         }
+     }
+ }
+diff -ruN src/PhpSpreadsheet/Reader/Security/XmlScanner.php src/PhpSpreadsheet/Reader/Security/XmlScanner.php
+--- src/PhpSpreadsheet/Reader/Security/XmlScanner.php	2026-07-13 06:08:02
++++ src/PhpSpreadsheet/Reader/Security/XmlScanner.php	2026-10-28 09:51:30
+@@ -56,6 +56,11 @@
+             throw new Reader\Exception('UTF-7 encoding not permitted');
+         }
+         if (substr($xml, 0, Reader\Csv::UTF8_BOM_LEN) === Reader\Csv::UTF8_BOM) {
++            if (preg_match(self::ENCODING_PATTERN, $xml, $matches) === 1) {
++                if (strtolower($matches[2]) !== 'utf-8') {
++                    throw new Reader\Exception("BOM says UTF-8 but encoding says {$matches[2]}");
++                }
++            }
+             $xml = substr($xml, Reader\Csv::UTF8_BOM_LEN);
+         }
+ 
+diff -ruN src/PhpSpreadsheet/Reader/Xml.php src/PhpSpreadsheet/Reader/Xml.php
+--- src/PhpSpreadsheet/Reader/Xml.php	2026-07-13 06:08:02
++++ src/PhpSpreadsheet/Reader/Xml.php	2026-10-28 09:52:44
+@@ -2,6 +2,7 @@
+ 
+ namespace PhpOffice\PhpSpreadsheet\Reader;
+ 
++use Composer\Pcre\Preg;
+ use DateTime;
+ use DateTimeZone;
+ use PhpOffice\PhpSpreadsheet\Cell\AddressHelper;
+@@ -53,9 +54,15 @@
+ 
+     public static function unentity(string $contents): string
+     {
++        // fffe is invalid, replace with replacement char
++        $contents = str_replace("\u{fffe}", "\u{fffd}", $contents);
++        // use positive lookahead to "protect" valid xml entities
++        $contents = Preg::replace('/&(?=(?:amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);)/', "\u{fffe}", trim($contents));
++        // now decode remaining html entities
+         $contents = preg_replace('/&(amp|lt|gt|quot|apos);/', "\u{fffe}\u{feff}\$1;", trim($contents)) ?? $contents;
+         $contents = html_entity_decode($contents, ENT_NOQUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
+-        $contents = str_replace("\u{fffe}\u{feff}", '&', $contents);
++        // Escape remaining ampersands, restore those which were replaced with fffe
++        $contents = str_replace(['&', "\u{fffe}"], ['&amp;', '&'], $contents);
+ 
+         return $contents;
+     }
+@@ -651,7 +658,7 @@
+                 }
+                 $rangeCalculated = false;
+                 if (isset($xmlX->WorksheetOptions->Panes->Pane->RangeSelection)) {
+-                    if (1 === preg_match('/^R(\d+)C(\d+):R(\d+)C(\d+)$/', (string) $xmlX->WorksheetOptions->Panes->Pane->RangeSelection, $selectionMatches)) {
++                    if (Preg::isMatch('/^R(\d+)C(\d+):R(\d+)C(\d+)$/', (string) $xmlX->WorksheetOptions->Panes->Pane->RangeSelection, $selectionMatches)) {
+                         $selectedCell = Coordinate::stringFromColumnIndex((int) $selectionMatches[2])
+                             . $selectionMatches[1]
+                             . ':'
+diff -ruN src/PhpSpreadsheet/Worksheet/Drawing.php src/PhpSpreadsheet/Worksheet/Drawing.php
+--- src/PhpSpreadsheet/Worksheet/Drawing.php	2026-07-13 06:08:02
++++ src/PhpSpreadsheet/Worksheet/Drawing.php	2026-10-28 09:57:37
+@@ -139,6 +139,7 @@
+             if (str_starts_with($path, 'https:') || str_starts_with($path, 'http:')) {
+                 $ctxArray = [
+                     'http' => [
++                        'follow_location' => 0,
+                         'user_agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                         'header' => [
+                             //'Connection: keep-alive', // unacceptable performance

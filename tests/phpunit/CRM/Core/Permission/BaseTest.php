@@ -81,4 +81,38 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
     $this->assertTrue(CRM_Core_Permission::check('view all contacts'));
   }
 
+  /**
+   * Test compound permissions with nested arrays representing AND/OR combinations.
+   *
+   * An outer array represents AND conditions. Inner arrays represent OR conditions.
+   * If an inner OR condition matches, the check must still evaluate the remaining
+   * AND conditions in the outer array.
+   */
+  public function testCheckCompoundPermissions(): void {
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'view all contacts',
+    ];
+
+    // User has 'view all contacts' but lacks 'administer CiviCRM'.
+    // The inner array (view all contacts OR access CiviCRM) is satisfied,
+    // but the outer AND condition requires 'administer CiviCRM'.
+    $this->assertFalse(
+      CRM_Core_Permission::check([
+        ['view all contacts', 'access CiviCRM'],
+        'administer CiviCRM',
+      ]),
+      'Permission check must evaluate subsequent AND conditions after an inner OR condition passes.'
+    );
+
+    // Two inner OR groups joined with AND: first OR is satisfied, second OR is not
+    $this->assertFalse(
+      CRM_Core_Permission::check([
+        ['view all contacts', 'access CiviCRM'],
+        ['administer CiviCRM', 'administer Reports'],
+      ]),
+      'Permission check must evaluate subsequent OR groups joined with AND.'
+    );
+  }
+
 }

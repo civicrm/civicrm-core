@@ -273,6 +273,24 @@ trait DAOActionTrait {
         continue;
       }
       $fkEntity = \Civi::entity($fkEntityName);
+      // Ensure specified field is unique
+      $uniqueIndex = FALSE;
+      // TODO: 'name' is grandfathered in but we should remove this exception and add missing indices
+      if ($fkField === 'name') {
+        $uniqueIndex = TRUE;
+      }
+      else {
+        $indices = $fkEntity->getMeta('indices') ?: [];
+        foreach ($indices as $index) {
+          // Index should only include the field and maybe domain_id
+          if (!empty($index['unique']) && !array_diff(array_keys($index['fields']), [$fkField, 'domain_id'])) {
+            $uniqueIndex = TRUE;
+          }
+        }
+      }
+      if (!$uniqueIndex) {
+        throw new \CRM_Core_Exception('No unique index on ' . $field['fk_entity'] . '.' . $fkField);
+      }
       // Constrain search to the domain of the current entity
       $domainConstraint = NULL;
       if ($fkEntity->getField('domain_id')) {

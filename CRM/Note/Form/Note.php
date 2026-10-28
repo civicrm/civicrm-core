@@ -15,6 +15,8 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Utils\CoreUtil;
+
 /**
  * This class generates form components generic to note
  *
@@ -41,6 +43,38 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Integer', $this);
     $this->_entityTable = CRM_Utils_Request::retrieve('entity_table', 'String', $this);
     $this->_entityId = CRM_Utils_Request::retrieve('entity_id', 'Integer', $this);
+
+    $currentUserId = CRM_Core_Session::getLoggedInContactID() ?: 0;
+    $delegateAction = ($this->_action & CRM_Core_Action::VIEW) ? 'get' : 'update';
+
+    if ($this->_id) {
+      $note = new CRM_Core_DAO_Note();
+      $note->id = $this->_id;
+      if (!$note->find(TRUE)) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+      }
+      $this->_entityTable = $note->entity_table;
+      $this->_entityId = (int) $note->entity_id;
+
+      if ((int) $note->privacy === 1 && !CRM_Core_Permission::check('view all notes')) {
+        if (!$currentUserId || (int) $note->contact_id !== (int) $currentUserId) {
+          CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+        }
+      }
+    }
+    elseif ($this->_action & CRM_Core_Action::ADD) {
+      if (!$this->_entityTable || !$this->_entityId) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+      }
+    }
+    else {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+    }
+
+    $targetEntity = CRM_Core_DAO_AllCoreTables::getEntityNameForTable($this->_entityTable);
+    if (!$targetEntity || !CoreUtil::checkAccessDelegated($targetEntity, $delegateAction, ['id' => $this->_entityId], $currentUserId)) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+    }
 
     $this->setPageTitle($this->_entityTable === 'civicrm_note' ? ts('Comment') : ts('Note'));
   }
@@ -144,16 +178,16 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
 
     $session = CRM_Core_Session::singleton();
-    $params['contact_id'] = $session->get('userID');
 
     if ($this->_action & CRM_Core_Action::ADD) {
+      $params['contact_id'] = $session->get('userID');
       $params['entity_table'] = $this->_entityTable;
       $params['entity_id'] = $this->_entityId;
     }
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->setFormRedirect();
-      CRM_Core_BAO_Note::deleteRecord(['id' => $this->_id]);
+      CRM_Core_BAO_Note::deleteRecord(['id' => $this->_id, 'check_permissions' => TRUE]);
       $status = ts('Selected Note has been deleted successfully.');
       CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
       return;
@@ -167,6 +201,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     // add attachments as needed
     CRM_Core_BAO_File::formatAttachment($params, $params, 'civicrm_note', $params['id']);
 
+    $params['check_permissions'] = TRUE;
     $note = CRM_Core_BAO_Note::add($params);
 
     // check and attach and files as needed

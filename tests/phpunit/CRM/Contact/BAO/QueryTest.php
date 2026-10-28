@@ -347,6 +347,67 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
+   * A quote in a value that ends up in an RLIKE clause must not break out of the string literal.
+   */
+  public function testRegexValueIsEscaped(): void {
+    $phoneContactID = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Anna', 'last_name' => 'Regex', 'preferred_communication_method' => [1]], 'phone')['id'];
+    $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Ben', 'last_name' => 'Regex', 'preferred_communication_method' => [2]], 'email');
+    $injection = "1' OR 1 OR '";
+
+    $this->callAPISuccessGetCount('Contact', ['last_name' => 'Regex', 'preferred_communication_method' => 1], 1);
+    $this->callAPISuccessGetCount('Contact', ['last_name' => 'Regex', 'preferred_communication_method' => $injection], 0);
+
+    $this->assertSame([$phoneContactID], $this->getContactIDsForQuery([['first_name', 'RLIKE', '^An', 0, 0]]));
+    $this->assertSame([], $this->getContactIDsForQuery([['first_name', 'RLIKE', $injection, 0, 0]]));
+  }
+
+  private function getContactIDsForQuery(array $params): array {
+    $dao = (new CRM_Contact_BAO_Query($params))->searchQuery();
+    $contactIDs = [];
+    while ($dao->fetch()) {
+      $contactIDs[] = (int) $dao->contact_id;
+    }
+    return $contactIDs;
+  }
+
+  /**
+   * Show the severity of the unescaped RLIKE sink and that the fix closes it.
+   *
+   * The payload's result is decided solely by a sub-query against a different
+   * table (civicrm_email), proving that an attacker could run arbitrary SQL and
+   * read data the contact query never touches. The real buildClause() must treat
+   * the same payload as a literal regex, so it matches nothing.
+   */
+  public function testRegexInjectionCannotRunCrossTableSubquery(): void {
+    $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Carla', 'last_name' => 'Subquery'], 'with_email');
+    $this->callAPISuccess('Email', 'create', ['contact_id' => $this->ids['Contact']['with_email'], 'email' => 'injection-probe@example.org']);
+    $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Dan', 'last_name' => 'Subquery'], 'no_email');
+
+    $totalContacts = (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_contact');
+
+    // A value that never matches a first name on its own, closed off so the
+    // trailing quote from the clause is commented out. The result hangs on
+    // whether the sub-query against civicrm_email finds the probe address.
+    $payload = static fn(string $comparison): string =>
+      "zzz' OR (SELECT COUNT(id) FROM civicrm_email WHERE email = 'injection-probe@example.org') = $comparison -- ";
+
+    // The vulnerable pattern: the value dropped into the clause with no escaping,
+    // exactly as the pre-fix buildClause() did. Built here so core stays fixed.
+    $runVulnerable = static fn(string $value): int => (int) CRM_Core_DAO::singleValueQuery(
+      "SELECT COUNT(*) FROM civicrm_contact contact_a WHERE CAST(contact_a.first_name AS BINARY) RLIKE BINARY '$value'"
+    );
+
+    // Sub-query true (one probe row) selects every contact; false selects none.
+    // The gap is controlled entirely by the read of the other table.
+    $this->assertSame($totalContacts, $runVulnerable($payload('1')));
+    $this->assertSame(0, $runVulnerable($payload('999')));
+
+    // The fixed clause escapes the value, so the same payload is a literal regex
+    // that no first name matches and no sub-query runs.
+    $this->assertSame([], $this->getContactIDsForQuery([['first_name', 'RLIKE', $payload('1'), 0, 0]]));
+  }
+
+  /**
    * Check that we get a successful result querying for home address.
    * CRM-14263 search builder failure with search profile & address in criteria
    *

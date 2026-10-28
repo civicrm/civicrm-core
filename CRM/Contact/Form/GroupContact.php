@@ -59,9 +59,13 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
    * Pre process form.
    */
   public function preProcess() {
-    $this->_contactId = $this->get('contactId');
+    $this->setAction(CRM_Core_Action::ADD);
+    $this->_contactId = $this->get('contactId') ?: CRM_Utils_Request::retrieve('cid', 'Positive', $this);
     $this->_groupContactId = $this->get('groupContactId');
     $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
+    if ($this->_context !== 'user' && (!$this->_contactId || !CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT))) {
+      CRM_Utils_System::permissionDenied();
+    }
   }
 
   /**
@@ -132,7 +136,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
    */
   public function postProcess() {
     $contactID = [$this->_contactId];
-    $groupId = $this->controller->exportValue('GroupContact', 'group_id');
+    $groupId = (int) $this->controller->exportValue('GroupContact', 'group_id');
     $method = ($this->_context == 'user') ? 'Web' : 'Admin';
 
     $session = CRM_Core_Session::singleton();
@@ -141,6 +145,17 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
     if ($userID == $this->_contactId) {
       $method = 'Web';
     }
+
+    if ($this->_context == 'user' || $method == 'Web') {
+      $visibility = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $groupId, 'visibility');
+      if ($visibility !== 'Public Pages' && !CRM_Core_Permission::check('edit all contacts')) {
+        CRM_Utils_System::permissionDenied();
+      }
+    }
+    elseif (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
+      CRM_Utils_System::permissionDenied();
+    }
+
     $groupContact = CRM_Contact_BAO_GroupContact::addContactsToGroup($contactID, $groupId, $method);
 
     if ($groupContact && $this->_context != 'user') {

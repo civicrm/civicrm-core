@@ -107,7 +107,17 @@ function civicrm_api3_generic_setValue($apiRequest) {
   }
 
   $dao_name = _civicrm_api3_get_DAO($entity);
+  $bao_name = _civicrm_api3_get_BAO($entity);
+  $checkPermissions = !empty($apiRequest['params']['check_permissions']);
+
+  if ($checkPermissions && $bao_name) {
+    _civicrm_api3_check_edit_permissions($bao_name, ['id' => $id, 'check_permissions' => TRUE]);
+  }
+
   $params = ['id' => $id, $field => $value];
+  if ($checkPermissions) {
+    $params['check_permissions'] = TRUE;
+  }
 
   if ((!empty($def['pseudoconstant']) || !empty($def['option_group_id'])) && $value !== '' && $value !== 'null') {
     _civicrm_api3_api_match_pseudoconstant($params[$field], $entity, $field, $def);

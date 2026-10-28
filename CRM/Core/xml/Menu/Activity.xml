@@ -19,32 +19,38 @@
      <path>civicrm/ajax/activity</path>
      <page_callback>CRM_Activity_Page_AJAX::getCaseActivity</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/ajax/globalrelationships</path>
      <page_callback>CRM_Activity_Page_AJAX::getCaseGlobalRelationships</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+     <access_arguments>access my cases and activities</access_arguments>
+     <is_ajax>true</is_ajax>
    </item>
   <item>
      <path>civicrm/ajax/clientrelationships</path>
      <page_callback>CRM_Activity_Page_AJAX::getCaseClientRelationships</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
    </item>
    <item>
      <path>civicrm/ajax/caseroles</path>
      <page_callback>CRM_Activity_Page_AJAX::getCaseRoles</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
    </item>
    <item>
      <path>civicrm/ajax/contactactivity</path>
      <page_callback>CRM_Activity_Page_AJAX::getContactActivity</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/ajax/activity/convert</path>
      <page_callback>CRM_Activity_Page_AJAX::convertToCaseActivity</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
      <page_type>3</page_type>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/activity/search</path>

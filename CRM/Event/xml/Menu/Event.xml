@@ -289,16 +289,6 @@
     <weight>4</weight>
   </item>
   <item>
-     <path>civicrm/ajax/eventFee</path>
-     <page_callback>CRM_Event_Page_AJAX::eventFee</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
-  </item>
-  <item>
-     <path>civicrm/ajax/locBlock</path>
-     <page_callback>CRM_Core_Page_AJAX_Location::getLocBlock</page_callback>
-     <access_arguments>access CiviEvent</access_arguments>
-  </item>
-  <item>
     <path>civicrm/event/participant/feeselection</path>
     <title>Change Registration Selections</title>
     <page_callback>CRM_Event_Form_ParticipantFeeSelection</page_callback>

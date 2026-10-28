@@ -6,11 +6,13 @@
      <page_callback>CRM_Core_Page_AJAX_Location::jqState</page_callback>
      <access_callback>1</access_callback>
      <is_public>true</is_public>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/ajax/jqCounty</path>
      <page_callback>CRM_Core_Page_AJAX_Location::jqCounty</page_callback>
      <access_callback>1</access_callback>
      <is_public>true</is_public>
+     <is_ajax>true</is_ajax>
   </item>
 </menu>

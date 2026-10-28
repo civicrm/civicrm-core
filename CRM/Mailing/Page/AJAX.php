@@ -50,13 +50,23 @@ class CRM_Mailing_Page_AJAX {
    * Fetch the template text/html messages
    */
   public static function template() {
-    $templateId = CRM_Utils_Type::escape($_POST['tid'], 'Integer');
+    $templateId = CRM_Utils_Request::retrieve('tid', 'Positive', NULL, FALSE, NULL, 'REQUEST');
+    if (!$templateId) {
+      CRM_Utils_System::permissionDenied();
+    }
 
     $messageTemplate = new CRM_Core_DAO_MessageTemplate();
     $messageTemplate->id = $templateId;
     $messageTemplate->selectAdd();
-    $messageTemplate->selectAdd('msg_text, msg_html, msg_subject, pdf_format_id');
-    $messageTemplate->find(TRUE);
+    $messageTemplate->selectAdd('id, msg_text, msg_html, msg_subject, pdf_format_id, workflow_name');
+    if (!$messageTemplate->find(TRUE)) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    if ($messageTemplate->workflow_name && !CRM_Core_Permission::check([['edit message templates', 'edit system workflow message templates', 'administer CiviCRM']])) {
+      CRM_Utils_System::permissionDenied();
+    }
+
     $messages = [
       'subject' => $messageTemplate->msg_subject,
       'msg_text' => $messageTemplate->msg_text,
@@ -78,6 +88,10 @@ class CRM_Mailing_Page_AJAX {
   public static function getContactMailings() {
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $params += CRM_Core_Page_AJAX::validateParams(['contact_id' => 'Integer']);
+
+    if (empty($params['contact_id']) || !CRM_Contact_BAO_Contact_Permission::allow($params['contact_id'], CRM_Core_Permission::VIEW)) {
+      CRM_Utils_System::permissionDenied();
+    }
 
     // get the contact mailings
     $mailings = CRM_Mailing_BAO_Mailing::getContactMailingSelector($params);

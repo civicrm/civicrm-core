@@ -134,6 +134,8 @@
      <path>civicrm/campaign/registerInterview</path>
      <page_callback>CRM_Campaign_Page_AJAX::registerInterview</page_callback>
      <access_arguments>interview campaign contacts</access_arguments>
+     <component>CiviCampaign</component>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/survey/configure/main</path>
@@ -159,4 +161,25 @@
      <page_callback>CRM_Campaign_Form_Survey_Delete</page_callback>
      <access_arguments>manage campaign</access_arguments>
   </item>
- </menu>
+  <item>
+    <path>civicrm/ajax/campaign/processvoter</path>
+    <page_callback>CRM_Campaign_Page_AJAX::processVoterData</page_callback>
+    <access_arguments>reserve campaign contacts;release campaign contacts;gotv campaign contacts</access_arguments>
+    <component>CiviCampaign</component>
+    <is_ajax>true</is_ajax>
+  </item>
+  <item>
+    <path>civicrm/ajax/campaign/voterlist</path>
+    <page_callback>CRM_Campaign_Page_AJAX::voterList</page_callback>
+    <access_arguments>reserve campaign contacts;release campaign contacts;gotv campaign contacts;interview campaign contacts</access_arguments>
+    <component>CiviCampaign</component>
+    <is_ajax>true</is_ajax>
+  </item>
+  <item>
+    <path>civicrm/ajax/campaign/groups</path>
+    <page_callback>CRM_Campaign_Page_AJAX::campaignGroups</page_callback>
+    <access_arguments>manage campaign;reserve campaign contacts</access_arguments>
+    <component>CiviCampaign</component>
+    <is_ajax>true</is_ajax>
+  </item>
+</menu>
