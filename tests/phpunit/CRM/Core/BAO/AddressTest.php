@@ -50,7 +50,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'country_id' => '1228',
       'geo_code_1' => '18.219023',
       'geo_code_2' => '-105.00973',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'is_billing' => '0',
     ];
@@ -79,7 +79,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'country_id' => '1228',
       'geo_code_1' => '18.219023',
       'geo_code_2' => '-105.00973',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'is_billing' => '0',
     ];
@@ -114,7 +114,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'country_id' => '1228',
       'geo_code_1' => '31.694842',
       'geo_code_2' => '-106.29998',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'is_billing' => '0',
       'contact_id' => $contactId,
@@ -159,7 +159,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'country_id' => '1228',
       'geo_code_1' => '31.694842',
       'geo_code_2' => '-106.29998',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'is_billing' => '1',
       'contact_id' => $contactId,
@@ -175,7 +175,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'country_id' => '1228',
       'geo_code_1' => '18.219023',
       'geo_code_2' => '-105.00973',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'is_billing' => '1',
       'contact_id' => $contactId,
@@ -219,7 +219,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'country_id' => '1228',
       'geo_code_1' => '31.694842',
       'geo_code_2' => '-106.29998',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'is_billing' => '1',
       'contact_id' => $contactId,
@@ -240,7 +240,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'country_id' => '1228',
       'geo_code_1' => '18.219023',
       'geo_code_2' => '-105.00973',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'is_billing' => '1',
       'contact_id' => $contactId,
@@ -286,7 +286,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'country_id' => '1228',
       'geo_code_1' => '31.694842',
       'geo_code_2' => '-106.29998',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'is_billing' => '0',
       'contact_id' => $contactId,
@@ -310,7 +310,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'country_id' => '1228',
       'geo_code_1' => '44.553719',
       'geo_code_2' => '-90.61457',
-      'location_type_id' => '2',
+      'location_type_id' => $this->getLocationTypeID('Work'),
       'is_primary' => '',
       'is_billing' => '1',
       'contact_id' => $contactId,
@@ -348,7 +348,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'country_id' => '1228',
       'geo_code_1' => '31.694842',
       'geo_code_2' => '-106.29998',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'is_billing' => '0',
       'contact_id' => $contactId,
@@ -388,7 +388,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'country_id' => '1228',
       'geo_code_1' => '18.219023',
       'geo_code_2' => '-105.00973',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'is_billing' => '0',
     ];
@@ -595,7 +595,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $addressParamsA = [
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'contact_id' => $contactIdA,
     ];
@@ -603,7 +603,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $addressParamsB = [
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'master_id' => $addAddressA->id,
       'contact_id' => $contactIdB,
@@ -612,7 +612,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $addressParamsC = [
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'master_id' => $addAddressB->id,
       'contact_id' => $contactIdC,
@@ -622,7 +622,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $updatedAddressParamsA = [
       'id' => $addAddressA->id,
       'street_address' => '1313 New Address Lane',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'contact_id' => $contactIdA,
     ];
@@ -655,7 +655,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $addressParamsA = [
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'contact_id' => $contactIdA,
     ];
@@ -663,7 +663,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $addressParamsB = [
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'contact_id' => $contactIdB,
     ];
@@ -671,7 +671,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $addressParamsC = [
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'master_id' => $addAddressA->id,
       'contact_id' => $contactIdC,
@@ -681,7 +681,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $updatedAddressParamsA = [
       'id' => $addAddressA->id,
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'master_id' => $addAddressB->id,
       'contact_id' => $contactIdA,
@@ -691,7 +691,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $updatedAddressParamsB = [
       'id' => $addAddressB->id,
       'street_address' => '1313 New Address Lane',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'contact_id' => $contactIdB,
     ];
@@ -719,7 +719,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $addressParamsA = [
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'contact_id' => $contactIdA,
     ];
@@ -728,7 +728,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $updatedAddressParamsA = [
       'id' => $addAddressA->id,
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'master_id' => $addAddressA->id,
       'contact_id' => $contactIdA,
@@ -761,7 +761,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $householdAddressId = $this->createTestEntity('Address', [
       'street_address' => '123 Fake St.',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
       'contact_id' => $householdId,
     ], 'household')['id'];
@@ -770,7 +770,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     // active 'Household Member of' relationship.
     $this->createTestEntity('Address', [
       'street_address' => '123 Fake St.',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
       'master_id' => $householdAddressId,
       'contact_id' => $memberId,
@@ -818,7 +818,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $addressParamsA = [
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'contact_id' => $contactIdA,
     ];
@@ -830,7 +830,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $addressParamsB = [
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'master_id' => $addressA['id'],
       'contact_id' => $contactIdB,
@@ -921,7 +921,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $addressParamsA = [
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'contact_id' => $contactIdA,
       $customField => 'this is a custom text field',
@@ -933,7 +933,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     // without having the custom field, we should still copy the values from master
     $addressParamsB = [
       'street_address' => '123 Fake St.',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'master_id' => $addAddressA->id,
       'contact_id' => $contactIdB,
@@ -1076,7 +1076,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'country_id' => '1228',
       'geo_code_1' => '41.701308979563',
       'geo_code_2' => '-73.91941868639',
-      'location_type_id' => '1',
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => '1',
       'is_billing' => '0',
       'contact_id' => $contactId,

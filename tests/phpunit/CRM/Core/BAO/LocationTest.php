@@ -78,14 +78,14 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
           'geo_code_1' => '18.219023',
           'geo_code_2' => '-105.00973',
           'is_primary' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
       'email' => [
         '1' => [
           'email' => 'john.smith@example.org',
           'is_primary' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
       'phone' => [
@@ -93,18 +93,18 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
           'phone_type_id' => 1,
           'phone' => '303443689',
           'is_primary' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
         '2' => [
           'phone_type_id' => 2,
           'phone' => '9833910234',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
       'openid' => [
         '1' => [
           'openid' => 'https://civicrm.org/',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 1,
         ],
       ],
@@ -112,7 +112,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
         '1' => [
           'name' => 'jane.doe',
           'provider_id' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 1,
         ],
       ],
@@ -125,7 +125,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     //Now check DB for contact
     $searchParams = [
       'contact_id' => $contactId,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
     ];
     $compareParams = [
@@ -156,7 +156,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
 
     $searchParams = [
       'contact_id' => $contactId,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
       'phone_type_id' => 1,
     ];
@@ -165,7 +165,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
 
     $searchParams = [
       'contact_id' => $contactId,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone_type_id' => 2,
     ];
     $compareParams = ['phone' => '9833910234'];
@@ -197,14 +197,14 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
           'geo_code_1' => '18.219023',
           'geo_code_2' => '-105.00973',
           'is_primary' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
       'email' => [
         '1' => [
           'email' => 'john.smith@example.org',
           'is_primary' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
       'phone' => [
@@ -212,18 +212,18 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
           'phone_type_id' => 1,
           'phone' => '303443689',
           'is_primary' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
         '2' => [
           'phone_type_id' => 2,
           'phone' => '9833910234',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
       'openid' => [
         '1' => [
           'openid' => 'https://civicrm.org/',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 1,
         ],
       ],
@@ -231,7 +231,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
         '1' => [
           'name' => 'jane.doe',
           'provider_id' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 1,
         ],
       ],

@@ -24,7 +24,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
     $params = [
       'phone' => '(415) 222-1011 x 221',
       'is_primary' => 1,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone_type' => 'Mobile',
       'contact_id' => $contactId,
     ];

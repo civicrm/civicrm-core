@@ -195,15 +195,15 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
 
     $this->saveTestRecords('Address', [
       'records' => [
-        ['contact_id' => $cid1, 'city' => 'A', 'location_type_id' => 1],
-        ['contact_id' => $cid1, 'city' => 'A', 'location_type_id' => 2],
-        ['contact_id' => $cid1, 'city' => 'B', 'location_type_id' => 3],
+        ['contact_id' => $cid1, 'city' => 'A', 'location_type_id:name' => 'Home'],
+        ['contact_id' => $cid1, 'city' => 'A', 'location_type_id:name' => 'Work'],
+        ['contact_id' => $cid1, 'city' => 'B', 'location_type_id:name' => 'Main'],
       ],
     ]);
     $this->saveTestRecords('Email', [
       'records' => [
-        ['contact_id' => $cid1, 'email' => 'test1@example.org', 'location_type_id' => 1],
-        ['contact_id' => $cid1, 'email' => 'test2@example.org', 'location_type_id' => 2],
+        ['contact_id' => $cid1, 'email' => 'test1@example.org', 'location_type_id:name' => 'Home'],
+        ['contact_id' => $cid1, 'email' => 'test2@example.org', 'location_type_id:name' => 'Work'],
       ],
     ]);
 

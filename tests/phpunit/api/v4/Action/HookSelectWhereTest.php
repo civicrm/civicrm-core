@@ -37,18 +37,21 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
   private $hookCondition = [];
 
   public function testHookPhoneClause(): void {
+    $homeID = $this->getLocationTypeID('Home');
+    $workID = $this->getLocationTypeID('Work');
+    $mainID = $this->getLocationTypeID('Main');
     $cid = $this->createTestRecord('Individual')['id'];
     $this->saveTestRecords('Phone', [
       'records' => [
-        ['phone' => '111-1111', 'location_type_id' => 1, 'contact_id' => $cid],
-        ['phone' => '222-2222', 'location_type_id' => 2, 'contact_id' => $cid],
-        ['phone' => '333-3333', 'location_type_id' => 3, 'contact_id' => $cid],
+        ['phone' => '111-1111', 'location_type_id' => $homeID, 'contact_id' => $cid],
+        ['phone' => '222-2222', 'location_type_id' => $workID, 'contact_id' => $cid],
+        ['phone' => '333-3333', 'location_type_id' => $mainID, 'contact_id' => $cid],
       ],
     ]);
 
     $this->hookEntity = 'Phone';
     $this->hookCondition = [
-      'location_type_id' => ['= 1'],
+      'location_type_id' => ["= $homeID"],
     ];
     $result = Phone::get()
       ->addWhere('contact_id', '=', $cid)
@@ -68,6 +71,9 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
   }
 
   public function testDedupeACLClauses(): void {
+    $homeID = $this->getLocationTypeID('Home');
+    $workID = $this->getLocationTypeID('Work');
+    $mainID = $this->getLocationTypeID('Main');
     $cidDisallowed = $this->createTestRecord('Individual')['id'];
     $cidAllowed = $this->createTestRecord('Individual', [
       'first_name' => 'Allowed',
@@ -75,10 +81,10 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
 
     $this->saveTestRecords('Address', [
       'records' => [
-        ['location_type_id' => 1, 'contact_id' => $cidDisallowed],
-        ['location_type_id' => 1, 'contact_id' => $cidAllowed, 'street_address' => '111 Allowed'],
-        ['location_type_id' => 2, 'contact_id' => $cidAllowed, 'street_address' => '222 Allowed'],
-        ['location_type_id' => 3, 'contact_id' => $cidAllowed, 'street_address' => '333 Allowed'],
+        ['location_type_id' => $homeID, 'contact_id' => $cidDisallowed],
+        ['location_type_id' => $homeID, 'contact_id' => $cidAllowed, 'street_address' => '111 Allowed'],
+        ['location_type_id' => $workID, 'contact_id' => $cidAllowed, 'street_address' => '222 Allowed'],
+        ['location_type_id' => $mainID, 'contact_id' => $cidAllowed, 'street_address' => '333 Allowed'],
       ],
     ]);
 
@@ -93,7 +99,7 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
 
     $this->hookEntity = 'Address';
     $this->hookCondition = [
-      'location_type_id' => ['IN (1,2)'],
+      'location_type_id' => ["IN ($homeID,$workID)"],
     ];
 
     $result = Address::get()
@@ -104,11 +110,11 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
     $this->assertCount(2, $result);
 
     // Ensure our selectWhereClause has been inserted exactly once
-    $selectWhereCount = substr_count($result->debug['sql'][0], '`location_type_id` IN (1,2)');
+    $selectWhereCount = substr_count($result->debug['sql'][0], "`location_type_id` IN ($homeID,$workID)");
     $this->assertEquals(1, $selectWhereCount);
 
     $result = Address::get()
-      ->addWhere('location_type_id', '=', 1)
+      ->addWhere('location_type_id', '=', $homeID)
       ->addSelect('id', 'contact_id.first_name')
       ->setDebug(TRUE)
       ->execute();
@@ -116,7 +122,7 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
     $this->assertCount(1, $result);
     $this->assertEquals('Allowed', $result[0]['contact_id.first_name']);
 
-    $selectWhereCount = substr_count($result->debug['sql'][0], '`location_type_id` IN (1,2)');
+    $selectWhereCount = substr_count($result->debug['sql'][0], "`location_type_id` IN ($homeID,$workID)");
     $this->assertEquals(1, $selectWhereCount);
 
     // We only want to see one contact ACL where clause
@@ -125,7 +131,7 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
 
     // Try with explicit join
     $result = Address::get()
-      ->addWhere('location_type_id', '=', 1)
+      ->addWhere('location_type_id', '=', $homeID)
       ->addSelect('id', 'contact.first_name')
       ->addJoin('Contact AS contact', 'INNER', ['contact.id', '=', 'contact_id'])
       ->setDebug(TRUE)
@@ -134,7 +140,7 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
     $this->assertCount(1, $result);
     $this->assertEquals('Allowed', $result[0]['contact.first_name']);
 
-    $selectWhereCount = substr_count($result->debug['sql'][0], '`location_type_id` IN (1,2)');
+    $selectWhereCount = substr_count($result->debug['sql'][0], "`location_type_id` IN ($homeID,$workID)");
     $this->assertEquals(1, $selectWhereCount);
 
     // We only want to see one contact ACL where clause
@@ -148,7 +154,7 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
 
     $this->hookEntity = 'Address';
     $this->hookCondition = [
-      'location_type_id' => ['IN (2)'],
+      'location_type_id' => ["IN ($workID)"],
     ];
 
     $result = Phone::get()
@@ -163,7 +169,7 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
     $this->assertEquals('Allowed', $result[0]['contact.first_name']);
     $this->assertEquals('222 Allowed', $result[0]['address.street_address']);
 
-    $selectWhereCount = substr_count($result->debug['sql'][0], '`location_type_id` IN (2)');
+    $selectWhereCount = substr_count($result->debug['sql'][0], "`location_type_id` IN ($workID)");
     $this->assertEquals(1, $selectWhereCount);
 
     // We only want to see one contact ACL where clause

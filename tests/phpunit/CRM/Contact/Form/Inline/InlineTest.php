@@ -78,12 +78,12 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'email' => [
         1 => [
           'email' => 'lobo@example.org',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 0,
         ],
         2 => [
           'email' => 'lobo.secondary@example.org',
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'is_primary' => 0,
         ],
       ],
@@ -104,17 +104,17 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'email' => [
         1 => [
           'email' => 'lobo.updated@example.org',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 0,
         ],
         2 => [
           'email' => 'lobo.secondary@example.org',
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'is_primary' => 1,
         ],
         3 => [
           'email' => 'lobo.work@example.org',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 0,
         ],
       ],
@@ -160,7 +160,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'email' => [
         1 => [
           'email' => '',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 0,
         ],
       ],
@@ -179,12 +179,12 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'email' => [
         1 => [
           'email' => 'one@example.org',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 1,
         ],
         2 => [
           'email' => 'two@example.org',
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'is_primary' => 1,
         ],
       ],
@@ -209,12 +209,12 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'phone' => [
         1 => [
           'phone' => '111111',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 1,
         ],
         2 => [
           'phone' => '222222',
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'is_primary' => 1,
         ],
       ],
@@ -232,7 +232,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'phone' => [
         1 => [
           'phone' => '555-0100',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'phone_type_id' => 1,
           'is_primary' => 1,
         ],
@@ -252,13 +252,13 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
         1 => ['phone' => ''],
         2 => [
           'phone' => '555-0199',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'phone_type_id' => 1,
           'is_primary' => 0,
         ],
         3 => [
           'phone' => '555-9876',
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'phone_type_id' => 1,
           'is_primary' => 0,
         ],
@@ -279,7 +279,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'phone' => [
         1 => [
           'phone' => '',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 0,
         ],
         2 => ['phone' => ''],
@@ -305,13 +305,13 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'im' => [
         1 => [
           'name' => 'user1',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'provider_id' => 1,
           'is_primary' => 1,
         ],
         2 => [
           'name' => 'user2',
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'provider_id' => 1,
           'is_primary' => 1,
         ],
@@ -330,7 +330,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'im' => [
         1 => [
           'name' => 'ghopper',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'provider_id' => 1,
           'is_primary' => 0,
         ],
@@ -351,19 +351,19 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'im' => [
         1 => [
           'name' => 'ghopper_updated',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'provider_id' => 1,
           'is_primary' => 0,
         ],
         2 => [
           'name' => 'alovelace',
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'provider_id' => 1,
           'is_primary' => 0,
         ],
         3 => [
           'name' => 'aturing',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'provider_id' => 2,
           'is_primary' => 1,
         ],
@@ -405,12 +405,12 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'openid' => [
         1 => [
           'openid' => 'https://user1.openid.example.org',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 1,
         ],
         2 => [
           'openid' => 'https://user2.openid.example.org',
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'is_primary' => 1,
         ],
       ],
@@ -428,12 +428,12 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'openid' => [
         1 => [
           'openid' => 'https://timbl.openid.example.org',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 0,
         ],
         2 => [
           'openid' => 'https://w3c.openid.example.org',
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'is_primary' => 1,
         ],
       ],
@@ -451,12 +451,12 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'openid' => [
         1 => [
           'openid' => 'https://w3c.updated.openid.example.org',
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'is_primary' => 0,
         ],
         2 => [
           'openid' => 'https://timbl.updated.openid.example.org',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 1,
         ],
       ],

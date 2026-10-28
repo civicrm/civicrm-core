@@ -136,7 +136,7 @@ class CRM_Event_Form_ManageEvent_LocationTest extends CiviUnitTestCase {
           'geo_code_1' => '18.219023',
           'geo_code_2' => '-105.00973',
           'is_primary' => 1,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
     ], $eventID);

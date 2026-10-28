@@ -26,7 +26,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     $params = [
       'email' => 'jane.doe@example.com',
       'is_primary' => 1,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'contact_id' => $contactId,
     ];
 
@@ -65,7 +65,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     $params = [
       'email' => 'jane.doe@example.com',
       'is_primary' => 1,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'contact_id' => $contactId,
     ];
 

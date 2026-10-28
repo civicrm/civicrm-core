@@ -23,7 +23,7 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
     $openIdURL = "http://test-username.civicrm.org/";
     $params = [
       'contact_id' => $contactId,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'openid' => $openIdURL,
       'is_primary' => 1,
     ];
@@ -63,7 +63,7 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
     $openIdURLOne = "http://test-one-username.civicrm.org/";
     $params = [
       'contact_id' => $contactId,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'openid' => $openIdURLOne,
       'is_primary' => 1,
       'allowed_to_login' => 1,
@@ -78,7 +78,7 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
     $openIdURLTwo = "http://test-two-username.civicrm.org/";
     $params = [
       'contact_id' => $contactId,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'openid' => $openIdURLTwo,
     ];
 

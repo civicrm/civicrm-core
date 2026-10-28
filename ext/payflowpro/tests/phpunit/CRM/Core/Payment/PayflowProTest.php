@@ -71,7 +71,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
       // Paypal is super special and requires this. Leaving out of the more generic
       // get billing params for now to make it more obvious.
       // When/if PropertyBag supports all the params paypal needs we can convert & simplify this.
-      $params[str_replace('-5', '', str_replace('billing_', '', $key))] = $value;
+      $params[str_replace('-' . $this->getLocationTypeID('Billing'), '', str_replace('billing_', '', $key))] = $value;
     }
     $params['state_province'] = 'NSW';
     $params['country'] = 'AU';
@@ -96,7 +96,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
       // Paypal is super special and requires this. Leaving out of the more generic
       // get billing params for now to make it more obvious.
       // When/if PropertyBag supports all the params paypal needs we can convert & simplify this.
-      $params[str_replace('-5', '', str_replace('billing_', '', $key))] = $value;
+      $params[str_replace('-' . $this->getLocationTypeID('Billing'), '', str_replace('billing_', '', $key))] = $value;
     }
     $params['state_province'] = 'NSW';
     $params['country'] = 'AU';
@@ -124,7 +124,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
       // Paypal is super special and requires this. Leaving out of the more generic
       // get billing params for now to make it more obvious.
       // When/if PropertyBag supports all the params paypal needs we can convert & simplify this.
-      $params[str_replace('-5', '', str_replace('billing_', '', $key))] = $value;
+      $params[str_replace('-' . $this->getLocationTypeID('Billing'), '', str_replace('billing_', '', $key))] = $value;
     }
     $params['state_province'] = 'NSW';
     $params['country'] = 'AU';
@@ -147,15 +147,16 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
    * @return array
    */
   protected function getBillingParams(): array {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     return [
       'billing_first_name' => 'John',
       'billing_middle_name' => '',
       'billing_last_name' => "O'Connor",
-      'billing_street_address-5' => '8 Hobbitton Road',
-      'billing_city-5' => 'The Shire',
-      'billing_state_province_id-5' => 1012,
-      'billing_postal_code-5' => 5010,
-      'billing_country_id-5' => 1228,
+      "billing_street_address-$billingLocationTypeID" => '8 Hobbitton Road',
+      "billing_city-$billingLocationTypeID" => 'The Shire',
+      "billing_state_province_id-$billingLocationTypeID" => 1012,
+      "billing_postal_code-$billingLocationTypeID" => 5010,
+      "billing_country_id-$billingLocationTypeID" => 1228,
       'credit_card_number' => '4111111111111111',
       'cvv2' => 123,
       'credit_card_exp_date' => [

@@ -57,7 +57,7 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
       ],
     ])->column('id');
     [$e0, $e1, $e2] = $this->saveTestRecords('Email', [
-      'defaults' => ['location_type_id' => 1],
+      'defaults' => ['location_type_id:name' => 'Home'],
       'records' => [
         ['contact_id' => $cid2, 'email' => 'nosomany@example.com'],
         ['contact_id' => $cid1, 'email' => 'first@example.com'],
@@ -66,7 +66,7 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
     ])->column('id');
     $replacement = [
       ['email' => 'firstedited@example.com', 'id' => $e1],
-      ['contact_id' => $cid1, 'email' => 'third@example.com', 'location_type_id' => 1],
+      ['contact_id' => $cid1, 'email' => 'third@example.com', 'location_type_id:name' => 'Home'],
     ];
     $replaced = Email::replace()
       ->setRecords($replacement)

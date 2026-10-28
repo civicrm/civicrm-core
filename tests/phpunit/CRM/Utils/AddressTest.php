@@ -39,7 +39,7 @@ class CRM_Utils_AddressTest extends CiviUnitTestCase {
       'contact_id' => 1,
       'county_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'county_id', 'Alameda'),
       'postal_code_suffix' => '12345',
-      'location_type_id' => 5,
+      'location_type_id' => $this->getLocationTypeID('Billing'),
       'is_primary' => 1,
       'name' => 'Big house',
       'supplemental_address_1' => 'line 1',

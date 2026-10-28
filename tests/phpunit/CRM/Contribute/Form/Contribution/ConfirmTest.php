@@ -54,6 +54,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testPayNowPayment(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $individualID = $this->createLoggedInUser();
     $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE], 'dummy');
     $processor = \Civi\Payment\System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
@@ -85,7 +86,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       ],
       $this->getPriceFieldLabelForContributionPage($contributionPageID2) => 100,
       'credit_card_type' => 'Visa',
-      'email-5' => 'test@test.com',
+      "email-$billingLocationTypeID" => 'test@test.com',
       'payment_processor_id' => $paymentProcessorID,
       'year' => 2021,
       'month' => 2,
@@ -130,6 +131,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testPaymentDescriptionIsPageTitle(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->createLoggedInUser();
     $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE], 'dummy');
     $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID, 'frontend_title' => 'Annual appeal']);
@@ -147,7 +149,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       ],
       $this->getPriceFieldLabelForContributionPage($contributionPageID) => 100,
       'credit_card_type' => 'Visa',
-      'email-5' => 'test@test.com',
+      "email-$billingLocationTypeID" => 'test@test.com',
       'payment_processor_id' => $paymentProcessorID,
     ], $contributionPageID);
 
@@ -165,6 +167,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testPayNowPaymentDoesNotOverwriteReceiveDate(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $originalReceiveDate = '2020-03-04 05:06:07';
 
     $individualID = $this->createLoggedInUser();
@@ -208,7 +211,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       ],
       $this->getPriceFieldLabelForContributionPage($contributionPageID2) => 100,
       'credit_card_type' => 'Visa',
-      'email-5' => 'test@test.com',
+      "email-$billingLocationTypeID" => 'test@test.com',
       'payment_processor_id' => $paymentProcessorID,
     ], $contributionPageID2, ['ccid' => $contribution['id']]);
 
@@ -241,6 +244,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testNewOnlineContributionReceiveDateIsToday(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->createLoggedInUser();
     $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE], 'dummy');
     $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
@@ -254,7 +258,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       ],
       $this->getPriceFieldLabelForContributionPage($contributionPageID) => 60,
       'credit_card_type' => 'Visa',
-      'email-5' => 'test@test.com',
+      "email-$billingLocationTypeID" => 'test@test.com',
       'payment_processor_id' => $paymentProcessorID,
     ], $contributionPageID);
 
@@ -365,6 +369,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * newly-created organization, not hijacked onto that stale dropdown value.
    */
   public function testOnBehalfNewOrganizationMembershipIsNotStolenByExistingOrg(): void {
+    $mainLocationTypeID = $this->getLocationTypeID('Main');
     $individualID = $this->createLoggedInUser();
     $existingOrgID = $this->organizationCreate([
       'organization_name' => 'Existing Org',
@@ -406,13 +411,13 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'org_option' => 1,
       'onbehalf' => [
         'organization_name' => 'Brand New Org',
-        'phone-3-1' => '11122233',
-        'email-3' => 'brand-new-org@example.org',
-        'street_address-3' => '456 New Org Street',
-        'city-3' => 'Newville',
-        'postal_code-3' => '99999',
-        'country-3' => 1228,
-        'state_province-3' => 1021,
+        "phone-$mainLocationTypeID-1" => '11122233',
+        "email-$mainLocationTypeID" => 'brand-new-org@example.org',
+        "street_address-$mainLocationTypeID" => '456 New Org Street',
+        "city-$mainLocationTypeID" => 'Newville',
+        "postal_code-$mainLocationTypeID" => '99999',
+        "country-$mainLocationTypeID" => 1228,
+        "state_province-$mainLocationTypeID" => 1021,
       ],
     ], $this->getContributionPageID('QuickConfig'));
 
@@ -593,6 +598,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
    */
   private function submitFormWithMembershipAndContribution(bool $isSeparateMembershipPayment) {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $paymentProcessorID = $this->paymentProcessorCreate([
       'payment_processor_type_id' => 'Dummy',
       'is_test' => FALSE,
@@ -630,7 +636,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'price_' . $this->ids['PriceField']['contribution'] => $this->ids['PriceFieldValue']['contribution'],
       'priceSetId' => $this->ids['PriceSet']['membership_block'],
       'credit_card_type' => 'Visa',
-      'email-5' => 'test@test.com',
+      "email-$billingLocationTypeID" => 'test@test.com',
       'payment_processor_id' => $paymentProcessorID,
       'year' => 2021,
       'month' => 2,
@@ -660,6 +666,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * @dataProvider getThousandSeparators
    */
   public function testSubmitContributionComplexPriceSetPayLater(string $thousandSeparator): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
     $this->contributionPageWithPriceSetCreate([], ['is_quick_config' => FALSE]);
@@ -669,7 +676,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'id' => $this->getContributionPageID(),
       'first_name' => 'J',
       'last_name' => 'T',
-      'email-5' => 'JT@ohcanada.ca',
+      "email-$billingLocationTypeID" => 'JT@ohcanada.ca',
       'receive_date' => date('Y-m-d H:i:s'),
       'payment_processor_id' => 0,
       'priceSetId' => $this->getPriceSetID('ContributionPage'),
@@ -713,12 +720,13 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * Test form submission with basic price set.
    */
   public function testSubmit(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->contributionPageWithPriceSetCreate();
     $this->submitOnlineContributionForm([
       'id' => $this->getContributionPageID(),
       'first_name' => 'J',
       'last_name' => 'T',
-      'email-5' => 'JT@ohcanada.ca',
+      "email-$billingLocationTypeID" => 'JT@ohcanada.ca',
       'receive_date' => date('Y-m-d H:i:s'),
       'payment_processor_id' => 0,
       'priceSetId' => $this->getPriceSetID('ContributionPage'),
@@ -738,6 +746,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitQuantityScalesNonDeductibleAmount(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->contributionPageWithPriceSetCreate();
     PriceFieldValue::update(FALSE)
       ->addWhere('id', '=', $this->ids['PriceFieldValue']['text_field_2.95'])
@@ -748,7 +757,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'id' => $this->getContributionPageID(),
       'first_name' => 'J',
       'last_name' => 'T',
-      'email-5' => 'JT@ohcanada.ca',
+      "email-$billingLocationTypeID" => 'JT@ohcanada.ca',
       'receive_date' => date('Y-m-d H:i:s'),
       'payment_processor_id' => 0,
       'priceSetId' => $this->getPriceSetID('ContributionPage'),
@@ -770,6 +779,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitContributionPageWithPriceSetTaxEnabled(string $thousandSeparator): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->setCurrencySeparators($thousandSeparator);
     $this->enableTaxAndInvoicing();
     $this->contributionPageWithPriceSetCreate([], ['is_quick_config' => FALSE]);
@@ -779,7 +789,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'id' => $this->getContributionPageID(),
       'first_name' => 'Billy',
       'last_name' => 'Gruff',
-      'email-5' => 'billy@goat.gruff',
+      "email-$billingLocationTypeID" => 'billy@goat.gruff',
       'receive_date' => date('Y-m-d H:i:s'),
       'payment_processor_id' => 0,
       'priceSetId' => $this->getPriceSetID('ContributionPage'),
@@ -918,6 +928,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCustomFieldsOnMembershipGetUpdated(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $contactID = $this->individualCreate();
     $contactID1 = $this->organizationCreate();
     $contactID2 = $this->organizationCreate();
@@ -1097,7 +1108,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'email' => 'admin@example.com',
       'description' => 'Membership Contribution',
       'contact_id' => $contactID,
-      'email-5' => 'test@test.com',
+      "email-$billingLocationTypeID" => 'test@test.com',
       'amount' => 100,
     ], $contribPage1);
     $membership1 = civicrm_api3('Membership', 'getsingle', [
@@ -1118,6 +1129,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * using membership PriceSet.
    */
   public function testDonationOnMembershipPagePriceSet(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $contactID = $this->individualCreate();
     $this->createPriceSetWithPage();
     $this->submitOnlineContributionForm([
@@ -1125,7 +1137,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'email' => 'admin@example.com',
       'contact_id' => $contactID,
       'select_contact_id' => $contactID,
-      'email-5' => 'test@test.com',
+      "email-$billingLocationTypeID" => 'test@test.com',
       'is_pay_later' => 1,
     ], $this->ids['ContributionPage']['default']);
 
@@ -1145,7 +1157,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'description' => 'Membership Contribution',
       'contact_id' => $contactID,
       'select_contact_id' => $contactID,
-      'email-5' => 'test@test.com',
+      "email-$billingLocationTypeID" => 'test@test.com',
       'is_pay_later' => 1,
     ], $this->ids['ContributionPage']['default']);
 
@@ -2457,6 +2469,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    * Test that emailed receipt for quick-config contribution page does not contain ASCII 0x01 (SOH) characters.
    */
   public function testQuickConfigEmailedReceiptNoASCII0x01(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->contributionPageQuickConfigCreate(
       ['is_email_receipt' => 1],
       [],
@@ -2470,7 +2483,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'price_' . $this->ids['PriceField']['contribution_amount'] => $this->ids['PriceFieldValue']['contribution_amount_15'],
       'id' => $this->getContributionPageID(),
-      'email-5' => 'donor@example.com',
+      "email-$billingLocationTypeID" => 'donor@example.com',
     ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
 
     $this->assertMailSentCount(1);

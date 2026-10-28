@@ -458,6 +458,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @dataProvider getThousandSeparators
    */
   public function testSubmit(string $thousandSeparator): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
 
     $this->setCurrencySeparators($thousandSeparator);
     $this->createLoggedInUser();
@@ -487,11 +488,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
       'billing_last_name' => 'Last',
-      'billing_street_address-5' => '10 Test St',
-      'billing_city-5' => 'Test',
-      'billing_state_province_id-5' => '1003',
-      'billing_postal_code-5' => '90210',
-      'billing_country_id-5' => '1228',
+      "billing_street_address-$billingLocationTypeID" => '10 Test St',
+      "billing_city-$billingLocationTypeID" => 'Test',
+      "billing_state_province_id-$billingLocationTypeID" => '1003',
+      "billing_postal_code-$billingLocationTypeID" => '90210',
+      "billing_country_id-$billingLocationTypeID" => '1228',
       'send_receipt' => TRUE,
       'receipt_text' => 'Receipt text',
     ];
@@ -679,6 +680,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmitWithCustomDataAndPayment(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->createCustomGroupWithFieldOfType(['extends' => 'Membership']);
     $this->createLoggedInUser();
     $this->getTestForm('CRM_Member_Form_Membership', [
@@ -704,11 +706,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
       'billing_last_name' => 'Last',
-      'billing_street_address-5' => '10 Test St',
-      'billing_city-5' => 'Test',
-      'billing_state_province_id-5' => '1003',
-      'billing_postal_code-5' => '90210',
-      'billing_country_id-5' => '1228',
+      "billing_street_address-$billingLocationTypeID" => '10 Test St',
+      "billing_city-$billingLocationTypeID" => 'Test',
+      "billing_state_province_id-$billingLocationTypeID" => '1003',
+      "billing_postal_code-$billingLocationTypeID" => '90210',
+      "billing_country_id-$billingLocationTypeID" => '1228',
       $this->getCustomFieldName('text') => 'Online signup custom value',
     ], ['mode' => 'test'])->processForm();
 
@@ -1803,6 +1805,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   protected function createTwoMembershipsViaPriceSetInBackEnd(int $contactId, bool $isTaxEnabled = TRUE): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     // register for both of these memberships via backoffice membership form submission
     $this->createLoggedInUser();
     $this->createMembershipPriceSet();
@@ -1839,11 +1842,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Pending'),
       'billing_first_name' => 'Test',
       'billing_middle_name' => 'Last',
-      'billing_street_address-5' => '10 Test St',
-      'billing_city-5' => 'Test',
-      'billing_state_province_id-5' => '1003',
-      'billing_postal_code-5' => '90210',
-      'billing_country_id-5' => '1228',
+      "billing_street_address-$billingLocationTypeID" => '10 Test St',
+      "billing_city-$billingLocationTypeID" => 'Test',
+      "billing_state_province_id-$billingLocationTypeID" => '1003',
+      "billing_postal_code-$billingLocationTypeID" => '90210',
+      "billing_country_id-$billingLocationTypeID" => '1228',
     ];
     $this->getTestForm('CRM_Member_Form_Membership', $params)->processForm();
   }

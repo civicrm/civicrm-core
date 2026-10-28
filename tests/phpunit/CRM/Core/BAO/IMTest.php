@@ -18,7 +18,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
       'name' => 'jane.doe',
       'provider_id' => 1,
       'is_primary' => 1,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'contact_id' => $contactId,
     ];
 

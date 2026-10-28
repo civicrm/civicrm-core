@@ -36,7 +36,7 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
     ], 'first');
     $this->createTestEntity('Phone', [
       'phone_type_id' => $mobile_type_id,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone' => '1111111111',
       'contact_id' => $this->ids['Contact']['first'],
     ], 'first');
@@ -47,13 +47,13 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
     ], 'second');
     $this->createTestEntity('Phone', [
       'phone_type_id' => $phone_type_id,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone' => '9999999999',
       'contact_id' => $this->ids['Contact']['second'],
     ], 'second_phone');
     $this->createTestEntity('Phone', [
       'phone_type_id' => $mobile_type_id,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone' => '2222222222',
       'contact_id' => $this->ids['Contact']['second'],
     ], 'second');
@@ -64,7 +64,7 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
     ], 'third');
     $this->createTestEntity('Phone', [
       'phone_type_id' => $mobile_type_id,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone' => '3333333333',
       'contact_id' => $this->ids['Contact']['third'],
     ], 'third');
@@ -75,7 +75,7 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
     ], 'fourth');
     $this->createTestEntity('Phone', [
       'phone_type_id' => $mobile_type_id,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone' => '4444444444',
       'contact_id' => $this->ids['Contact']['fourth'],
     ], 'fourth');
@@ -87,7 +87,7 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
     ], 'fifth');
     $this->createTestEntity('Phone', [
       'phone_type_id' => $mobile_type_id,
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'phone' => '5555555555',
       'contact_id' => $this->ids['Contact']['fifth'],
     ], 'fifth');
