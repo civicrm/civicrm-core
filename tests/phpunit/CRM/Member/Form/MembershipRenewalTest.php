@@ -244,7 +244,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'num_terms' => '1',
       'source' => '',
       'total_amount' => '77.00',
-      //Member dues, see data.xml
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text' => 'Thank you text',
@@ -437,7 +436,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'auto_renew' => '0',
       'num_terms' => '2',
       'total_amount' => '50.00',
-      //Member dues, see data.xml
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
@@ -484,7 +482,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'auto_renew' => '0',
       'num_terms' => '2',
       'total_amount' => '50.00',
-      //Member dues, see data.xml
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
@@ -543,7 +540,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'auto_renew' => '0',
       'num_terms' => '2',
       'total_amount' => '50.00',
-      //Member dues, see data.xml
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
@@ -724,7 +720,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'auto_renew' => '0',
       'num_terms' => '2',
       'total_amount' => '50.00',
-      //Member dues, see data.xml
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
@@ -786,7 +781,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'auto_renew' => '0',
       'num_terms' => '1',
       'total_amount' => '50.00',
-      //Member dues, see data.xml
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_instrument_id' => 4,
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
@@ -830,7 +824,6 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['annual_fixed']],
       'num_terms' => '1',
       'total_amount' => $this->formatMoneyInput('7800.90'),
-      //Member dues, see data.xml
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
       'receipt_text' => 'Thank you text',
