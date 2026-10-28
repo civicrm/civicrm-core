@@ -46,6 +46,7 @@ use Civi\Core\Exception\DBQueryException;
 class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   use CRMTraits_Custom_CustomDataTrait;
   use CRMTraits_Import_ParserTrait;
+  use CRMTraits_Import_MapperTrait;
 
   /**
    * Main entity for the class.
@@ -1233,17 +1234,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @param array $submittedValues
    */
   public function testValidation(string $csv, array $mapper, string $expectedError = '', array $submittedValues = []): void {
-    // The data provider runs before the relationship and location types exist, so it
-    // gives e.g. 'Child of_a_b' and ['phone', 'Home', 1]; look up the ids.
-    foreach ($mapper as &$mapperField) {
-      if (preg_match('/^(.+)_(a_b|b_a)$/', $mapperField[0], $matches)) {
-        $mapperField[0] = $this->getRelationshipTypeID($matches[1]) . '_' . $matches[2];
-      }
-      elseif (($mapperField[1] ?? NULL) === 'Home') {
-        $mapperField[1] = $this->getLocationTypeID('Home');
-      }
-    }
-    unset($mapperField);
+    $mapper = $this->convertMapperNamesToIDs($mapper);
     try {
       $this->validateCSV($csv, $mapper, $submittedValues);
     }
@@ -1327,13 +1318,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \League\Csv\CannotInsertRecord
    */
   public function testImport($csv, $mapper, $expectedOutcomes = [], $submittedValues = [], $apiLookup = []): void {
-    // The data provider runs before the location types exist, so it gives e.g. ['country', 'Home']; look up the id.
-    foreach ($mapper as &$mapperField) {
-      if (($mapperField[1] ?? NULL) === 'Home') {
-        $mapperField[1] = $this->getLocationTypeID('Home');
-      }
-    }
-    unset($mapperField);
+    $mapper = $this->convertMapperNamesToIDs($mapper);
     $this->importCSV($csv, $mapper, $submittedValues);
     $dataSource = new CRM_Import_DataSource_CSV(UserJob::get(FALSE)->setSelect(['id'])->execute()->first()['id']);
     foreach ($expectedOutcomes as $outcome => $count) {
