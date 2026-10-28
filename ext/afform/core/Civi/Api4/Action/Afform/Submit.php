@@ -703,6 +703,12 @@ class Submit extends AbstractProcessor {
     $mainEntity = $event->getFormDataModel()->getEntity($event->getEntityName());
     foreach ($joins as $joinEntityName => $joinValues) {
       $values = self::filterEmptyJoins($mainEntity, $joinEntityName, $joinValues);
+      // Expand a multi-value join field (e.g. a multi-select bound to a
+      // single-value column such as EntityTag.tag_id) into one record per
+      // value, so every selected value is saved as its own row instead of an
+      // array being written into a single record. $expanded flags whether that
+      // happened, which changes how the records must be saved below.
+      [$values, $expanded] = self::expandMultivalueJoinRecords($joinEntityName, $values);
       $whereClause = self::getJoinWhereClause($event->getFormDataModel(), $event->getEntityName(), $joinEntityName, $entityId);
       $mainIdField = CoreUtil::getIdFieldName($mainEntity['type']);
       $joinIdField = CoreUtil::getIdFieldName($joinEntityName);
@@ -731,35 +737,85 @@ class Submit extends AbstractProcessor {
 
       // Reverse FK e.g. Contact <= Email.contact_id
       elseif ($values) {
-        // In update mode, set ids of existing values
+        // In update mode, reattach the ids of existing rows so submitted rows
+        // update them. This matches by submitted index, so it is only valid
+        // when nothing expanded: expanded records are a fresh, complete set
+        // carrying no ids and are id-matched by natural key instead (see
+        // `match` below), and a positional reattach would put an existing row's
+        // id onto a different expanded row.
         if ($joinAllowedAction['update']) {
-          $existingJoinValues = $event->getApiRequest()->loadJoins($joinEntityName, $mainEntity, $entityId, $index);
-          foreach ($existingJoinValues as $joinIndex => $existingJoin) {
-            if (!empty($existingJoin[$joinIdField]) && !empty($values[$joinIndex])) {
-              $values[$joinIndex][$joinIdField] = $existingJoin[$joinIdField];
+          if (!$expanded) {
+            $existingJoinValues = $event->getApiRequest()->loadJoins($joinEntityName, $mainEntity, $entityId, $index);
+            foreach ($existingJoinValues as $joinIndex => $existingJoin) {
+              if (!empty($existingJoin[$joinIdField]) && !empty($values[$joinIndex])) {
+                $values[$joinIndex][$joinIdField] = $existingJoin[$joinIdField];
+              }
             }
           }
         }
+        // Create-only container: never honour a client-submitted id. Done per
+        // record rather than gated on $expanded, so a non-expanded row in a
+        // mixed submit cannot keep an id and update an existing row here.
         else {
           foreach ($values as $key => $value) {
             unset($values[$key][$joinIdField]);
           }
         }
+        // Seed defaults from the join where clause so a dynamic FK's control
+        // field (e.g. EntityTag.entity_table) is set too, not just the entity_id
+        // FK; otherwise rows save with an empty entity_table and the tags are
+        // invisible everywhere.
+        $fkField = self::getFkField($joinEntityName, $mainEntity['type']);
+        $defaults = [$fkField['name'] => $entityId];
+        foreach ($whereClause as $clause) {
+          if (is_array($clause) && ($clause[1] ?? NULL) === '=') {
+            $defaults[$clause[0]] = $clause[2];
+          }
+        }
+        // Only a record expanded from a multi-value field carries no id and so
+        // needs matching on its natural key; every other join save matches by id
+        // as before, so match_fields stays empty for them.
+        $matchFields = $expanded ? (CoreUtil::getInfoItem($joinEntityName, 'match_fields') ?? []) : [];
         // Use REPLACE action if update+delete are both allowed (only need to check for 'delete' as it implies 'update')
         if ($joinAllowedAction['delete']) {
-          $result = civicrm_api4($joinEntityName, 'replace', [
-            // Disable permission checks because the main entity has already been vetted
-            'checkPermissions' => FALSE,
-            'where' => $whereClause,
-            'records' => $values,
-          ]);
+          if ($matchFields) {
+            // Expanded multi-value join (e.g. EntityTag): the records carry no
+            // id, so replace() would have to id-match them on their natural key
+            // to avoid re-inserting a duplicate. But replace()'s match-based
+            // delete of de-selected rows is not reliable across versions (it can
+            // leave a de-selected row behind), so manage the set explicitly
+            // instead: load the existing rows, delete the ones the submitted set
+            // no longer contains, then match-save the submitted records.
+            $result = self::replaceExpandedJoinRecords($joinEntityName, $whereClause, $joinIdField, $matchFields, $defaults, $values);
+          }
+          else {
+            $result = civicrm_api4($joinEntityName, 'replace', [
+              // Disable permission checks because the main entity has already been vetted
+              'checkPermissions' => FALSE,
+              'where' => $whereClause,
+              'records' => $values,
+            ]);
+          }
         }
         else {
-          $fkField = self::getFkField($joinEntityName, $mainEntity['type']);
           $result = civicrm_api4($joinEntityName, 'save', [
             // Disable permission checks because the main entity has already been vetted
             'checkPermissions' => FALSE,
-            'defaults' => [$fkField['name'] => $entityId],
+            'defaults' => $defaults,
+            // Same reason as the replace branch: when records were expanded,
+            // id-match an existing row on its natural key so a re-submitted
+            // multi-value record (e.g. EntityTag) updates it in place rather
+            // than inserting a duplicate and hitting the unique index. Only
+            // when update is allowed — on a create-only container match must
+            // not turn an insert into an update of an existing row.
+            //
+            // Consequence: on a fully create-only container (neither update nor
+            // delete allowed) this path assumes the row does not already exist.
+            // If the form still resolves to an existing parent that already
+            // carries the value, the INSERT hits the unique index. The correct
+            // behaviour would be to skip an already-existing row (create-only
+            // can neither update nor delete it), which is left for a follow-up.
+            'match' => ($expanded && $joinAllowedAction['update']) ? $matchFields : [],
             'records' => $values,
           ]);
         }
@@ -781,6 +837,156 @@ class Submit extends AbstractProcessor {
         $event->setJoinIds($index, $joinEntityName, []);
       }
     }
+  }
+
+  /**
+   * Save an expanded multi-value join (e.g. EntityTag) where update and delete
+   * are both allowed, without relying on replace()'s match-based delete.
+   *
+   * The expanded records carry no id, so replace() would have to id-match them
+   * on their natural key to avoid re-inserting a duplicate; but its delete of
+   * de-selected rows is not reliable across versions. So manage the set
+   * explicitly: load the existing rows (the same read prefill relies on), delete
+   * the ones the submitted set no longer contains, then match-save the submitted
+   * records so a surviving row updates in place rather than inserting a
+   * duplicate and hitting the join's unique index. Returns the saved records,
+   * as replace() would.
+   *
+   * @param string $joinEntityName
+   * @param array $whereClause
+   * @param string $joinIdField
+   * @param array $matchFields
+   * @param array $defaults
+   * @param array $values
+   * @return \Civi\Api4\Generic\Result
+   */
+  private static function replaceExpandedJoinRecords(string $joinEntityName, array $whereClause, string $joinIdField, array $matchFields, array $defaults, array $values) {
+    // Natural-key signature: the match fields, taking a value from the record
+    // or, for a field fixed by the where clause (e.g. entity_id, entity_table),
+    // from the shared defaults. Cast so an int id and its string form compare
+    // equal between the submitted records and the loaded rows.
+    $signature = function (array $record) use ($matchFields, $defaults) {
+      $key = [];
+      foreach ($matchFields as $field) {
+        $key[$field] = (string) ($record[$field] ?? $defaults[$field] ?? '');
+      }
+      return implode("\0", $key);
+    };
+    $submitted = [];
+    foreach ($values as $record) {
+      $submitted[$signature($record)] = TRUE;
+    }
+    $existing = civicrm_api4($joinEntityName, 'get', [
+      // Disable permission checks because the main entity has already been vetted
+      'checkPermissions' => FALSE,
+      'where' => $whereClause,
+      'select' => array_merge([$joinIdField], $matchFields),
+    ]);
+    $deleteIds = [];
+    foreach ($existing as $row) {
+      if (empty($submitted[$signature($row)])) {
+        $deleteIds[] = $row[$joinIdField];
+      }
+    }
+    if ($deleteIds) {
+      civicrm_api4($joinEntityName, 'delete', [
+        'checkPermissions' => FALSE,
+        'where' => [[$joinIdField, 'IN', $deleteIds]],
+      ]);
+    }
+    return civicrm_api4($joinEntityName, 'save', [
+      'checkPermissions' => FALSE,
+      'defaults' => $defaults,
+      'match' => $matchFields,
+      'records' => $values,
+    ]);
+  }
+
+  /**
+   * Expand any join record that holds multiple values for a single-value field
+   * into one record per value.
+   *
+   * A multi-select widget bound to a join field that stores one value per row
+   * (e.g. EntityTag.tag_id) submits a single record with an array value; the
+   * join entity cannot store that, so without expansion nothing is saved. This
+   * turns `[['tag_id' => [1, 2]]]` into `[['tag_id' => 1], ['tag_id' => 2]]`.
+   * Fields that genuinely store a list (serialize set) are left untouched.
+   *
+   * @param string $joinEntityName
+   * @param array $records
+   * @return array
+   *   Tuple of [records, expanded], where `expanded` is TRUE only when at least
+   *   one record was split into several. When it is FALSE the records are
+   *   returned unchanged, with their original keys intact.
+   */
+  private static function expandMultivalueJoinRecords(string $joinEntityName, array $records): array {
+    static $scalarFields = [];
+    if (!array_key_exists($joinEntityName, $scalarFields)) {
+      try {
+        $fields = [];
+        foreach (civicrm_api4($joinEntityName, 'getFields', ['checkPermissions' => FALSE, 'action' => 'create']) as $field) {
+          if (empty($field['serialize'])) {
+            $fields[$field['name']] = TRUE;
+          }
+        }
+        // Only populate the cache on success, so a transient getFields() failure
+        // does not permanently disable expansion for the rest of the request.
+        $scalarFields[$joinEntityName] = $fields;
+      }
+      catch (\Exception $e) {
+        \Civi::log('afform')->warning('Afform: could not load fields for {entity}; multi-value join expansion skipped. {message}', [
+          'entity' => $joinEntityName,
+          'message' => $e->getMessage(),
+        ]);
+        return [$records, FALSE];
+      }
+    }
+    $expanded = [];
+    $didExpand = FALSE;
+    $idField = CoreUtil::getIdFieldName($joinEntityName);
+    foreach ($records as $key => $record) {
+      $multiField = NULL;
+      foreach ($record as $fieldName => $value) {
+        if (is_array($value) && !empty($scalarFields[$joinEntityName][$fieldName])) {
+          $multiField = $fieldName;
+          break;
+        }
+      }
+      if ($multiField === NULL) {
+        // Append rather than write by original key: once a record has expanded,
+        // $expanded holds appended integer keys, so a keyed write here could
+        // land on a slot an expanded row already took and overwrite it. The
+        // original keys only need to survive when nothing expanded, which the
+        // early return below handles by returning $records untouched.
+        $expanded[] = $record;
+        continue;
+      }
+      $didExpand = TRUE;
+      foreach ($record[$multiField] as $singleValue) {
+        $newRecord = [$multiField => $singleValue] + $record;
+        // Expanded rows are distinct records, so they must not keep the
+        // original row's id (which would make replace() overwrite a row).
+        unset($newRecord[$idField]);
+        $expanded[] = $newRecord;
+      }
+    }
+    // Preserve the original keys when nothing was expanded: filterEmptyJoins()
+    // keeps the submitted indexes deliberately, and both the existing-row
+    // matching in saveJoins() and file uploads in SubmitFile rely on them.
+    if (!$didExpand) {
+      return [$records, FALSE];
+    }
+    // Deduplicate identical rows across the whole expanded set, not within each
+    // record: the same value repeated in one multi-select, or chosen again in a
+    // second repeat row, would otherwise issue two inserts of the same natural
+    // key and hit the join's unique index.
+    $unique = [];
+    foreach ($expanded as $record) {
+      $signature = $record;
+      ksort($signature);
+      $unique[serialize($signature)] = $record;
+    }
+    return [array_values($unique), TRUE];
   }
 
   /**
