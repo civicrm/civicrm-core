@@ -88,7 +88,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    */
   public function enableSalesTaxOnFinancialType($type): void {
     $this->enableTaxAndInvoicing();
-    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', $type));
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID($type));
   }
 
   /**

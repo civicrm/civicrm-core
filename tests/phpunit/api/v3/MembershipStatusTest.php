@@ -154,7 +154,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $this->callApiSuccess('membership', 'create', $params);
     $this->callApiSuccess('contact', 'create', ['id' => $contactID, 'is_deceased' => 1]);
     $membership = $this->callApiSuccessGetSingle('membership', ['contact_id' => $contactID]);
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased'), $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('Deceased'), $membership['status_id']);
   }
 
   /**

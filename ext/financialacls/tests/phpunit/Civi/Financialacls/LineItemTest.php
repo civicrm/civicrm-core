@@ -41,14 +41,14 @@ class LineItemTest extends BaseTestClass {
         [
           'line_item' => [
             [
-              'financial_type_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+              'financial_type_id' => $this->getFinancialTypeID('Donation'),
               'line_total' => 40,
               'price_field_id' => $this->ids['PriceField']['default'],
               'price_field_value_id' => $this->ids['PriceFieldValue']['default-1'],
               'qty' => 1,
             ],
             [
-              'financial_type_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Member Dues'),
+              'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
               'line_total' => 50,
               'price_field_id' => $this->ids['PriceField']['default'],
               'price_field_value_id' => $this->ids['PriceFieldValue']['default-2'],

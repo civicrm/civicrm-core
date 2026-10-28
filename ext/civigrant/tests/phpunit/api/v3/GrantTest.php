@@ -28,6 +28,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
   use Api3TestTrait;
   use ContactTestTrait;
   use Test\EntityTrait;
+  use \Civi\Test\LookupHelperTrait;
 
   protected $_apiversion = 3;
   protected array $params;
@@ -179,7 +180,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
    * must still read it from civicrm_contribution.
    */
   public function testContributionGetExplicitReturnOfSharedFieldName(): void {
-    $financialTypeID = (int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
+    $financialTypeID = $this->getFinancialTypeID('Donation');
     $contributionID = $this->createTestEntity('Contribution', [
       'contact_id' => $this->individualCreate(),
       'currency' => 'NZD',

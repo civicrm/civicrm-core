@@ -156,7 +156,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $order = $this->callAPISuccess('Order', 'create', [
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contact_id' => $contactId1,
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'is_pay_later' => 1,
       'receive_date' => date('Ymd'),
       'line_items' => [
@@ -213,7 +213,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'total_amount' => 150,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contact_id' => $contactId1,
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
     ]);
     $form->buildForm();
@@ -868,7 +868,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     //Update Status and check activities created.
     $updateStatus = [
       'id' => $result['id'],
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
+      'status_id' => $this->getMembershipStatusID('Cancelled'),
       'version' => 4,
     ];
     $this->callAPISuccess('Membership', 'create', $updateStatus);

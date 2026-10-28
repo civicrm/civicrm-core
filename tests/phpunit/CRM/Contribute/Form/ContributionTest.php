@@ -817,7 +817,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->submitContributionForm([
       'financial_type_id' => $this->getFinancialTypeID('Campaign Contribution'),
       'contact_id' => $this->ids['Contact'][0],
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => 1,
       'total_amount' => 5,
       'pcp_made_through_id' => $pcpID,
@@ -1006,7 +1006,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 50,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contact_id' => $this->ids['Contact'][0],
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'check_number' => '7890',
       "billing_city-$billingLocationTypeID" => 'Vancouver',
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
@@ -1778,7 +1778,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
   public function testContributionFormRule(): void {
     $fields = [
       'contact_id' => $this->ids['Contact'][0],
-      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'currency' => 'USD',
       'total_amount' => '10',
       'price_set_id' => '',
@@ -1789,7 +1789,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'receive_date' => date('Y-m-d H:i:s'),
       'from_email_address' => key(CRM_Core_BAO_Email::getFromEmail()),
       'receipt_date' => '',
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'trxn_id' => '',
       'check_number' => '',
       'soft_credit_contact_id' => [
@@ -1843,7 +1843,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
     $fields = [
       'contact_id' => $this->ids['Contact'][0],
-      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'currency' => 'USD',
       'total_amount' => '10',
       'price_set_id' => '',
@@ -1854,7 +1854,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'receive_date' => date('Y-m-d H:i:s'),
       'from_email_address' => key(CRM_Core_BAO_Email::getFromEmail()),
       'receipt_date' => '',
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'trxn_id' => '1234',
       'check_number' => '',
       'soft_credit_contact_id' => [

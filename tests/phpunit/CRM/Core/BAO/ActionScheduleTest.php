@@ -2846,7 +2846,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       ], $this->fixtures[$fixture]['membership_type_id']))->execute()->first()['id'];
     }
     $params = array_merge($this->fixtures[$fixture], [
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', $status),
+      'status_id' => $this->getMembershipStatusID($status),
       'membership_type_id' => $membershipTypeID,
     ], $membershipOverrides);
     if (empty($params['contact_id'])) {

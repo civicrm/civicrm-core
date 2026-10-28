@@ -17,7 +17,7 @@ class CRM_Price_Page_FieldTest extends CiviUnitTestCase {
    */
   public function testTaxColumnsForTextField(): void {
     $this->enableTaxAndInvoicing();
-    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'));
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID('Donation'));
     $priceSet = $this->createTestEntity('PriceSet', [
       'title' => 'Taxed price set',
       'name' => 'taxed_price_set',

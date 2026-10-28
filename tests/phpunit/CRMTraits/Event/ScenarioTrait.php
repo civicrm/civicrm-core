@@ -44,7 +44,7 @@ trait CRMTraits_Event_ScenarioTrait {
    */
   protected function createScenarioMultipleParticipantPendingWithTax(): void {
     $this->eventCreatePaid();
-    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'));
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID('Event Fee'));
     $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
       'first_name' => 'Participant1',
       'last_name' => 'LastName',
@@ -103,7 +103,7 @@ trait CRMTraits_Event_ScenarioTrait {
    */
   protected function createScenarioMultipleParticipantPendingWithTaxSkippingSecond(): void {
     $this->eventCreatePaid();
-    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'));
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID('Event Fee'));
     $form = $this->getTestForm('CRM_Event_Form_Registration_Register', [
       'first_name' => 'Participant1',
       'last_name' => 'LastName',

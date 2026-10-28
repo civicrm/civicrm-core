@@ -171,7 +171,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'trxn_date' => '2017-04-11 13:05:11',
       'payment_processor_id' => 0,
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'check_number' => '#123',
     ]);
     $form->preProcess();
@@ -224,7 +224,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     ];
     EntityFinancialAccount::create()->setValues($financialAccountParams)->execute();
 
-    return CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $params['label']);
+    return $this->getPaymentInstrumentID($params['label']);
   }
 
   /**
@@ -269,7 +269,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     //Change selection to a lower amount.
     $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
       'price_' . $this->ids['PriceField']['PaidEvent'] => $this->ids['PriceFieldValue']['PaidEvent_student_early'],
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+      'status_id' => $this->getParticipantStatusID('Registered'),
     ], [
       'id' => $result['participant']['id'],
       'action' => CRM_Core_Action::UPDATE,

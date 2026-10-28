@@ -704,7 +704,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
       'street_address' => '123 Fake Street',
       'city' => 'Metropolis',
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
     ], 'addr_1');
 
     $_POST = $_REQUEST = ['contact_id' => $contactId];

@@ -756,7 +756,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'email' => [
         1 => [
           'email' => 'unauthorized@example.org',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 1,
         ],
       ],
@@ -777,7 +777,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $otherAddress = $this->createTestEntity('Address', [
       'contact_id' => $otherContact['id'],
       'street_address' => '999 Secret St',
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
     ], 'other_address');
 
     $this->expectException(CRM_Core_Exception::class);
@@ -788,7 +788,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'address' => [
         1 => [
           'street_address' => 'Overwritten St',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'is_primary' => 1,
         ],
       ],
@@ -861,7 +861,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $otherAddress = $this->createTestEntity('Address', [
       'contact_id' => $otherContact['id'],
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
       'street_address' => '500 Confidential Blvd',
     ], 'victim_address');
 
@@ -915,7 +915,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $otherAddress = $this->createTestEntity('Address', [
       'contact_id' => $otherContact['id'],
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
       'street_address' => '500 Confidential Blvd',
     ], 'victim_address_2');
 
@@ -929,7 +929,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'oplock_ts' => $this->getOplockTs($userContact),
       'address' => [
         1 => [
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'use_shared_address' => 1,
           'master_id' => $otherAddress['id'],
         ],

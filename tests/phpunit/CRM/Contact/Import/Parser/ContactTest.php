@@ -2048,8 +2048,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'country' => 'United States',
     ];
 
-    $homeLocationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Home');
-    $workLocationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Work');
+    $homeLocationTypeID = $this->getLocationTypeID('Home');
+    $workLocationTypeID = $this->getLocationTypeID('Work');
     foreach ($addressValues as $field => $value) {
       $contactValues['home_' . $field] = $value;
       $contactValues['work_' . $field] = $value;

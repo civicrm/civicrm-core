@@ -2503,7 +2503,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testRepeattransactionRenewMembershipOldMembership(): void {
     $entities = $this->setUpAutoRenewMembership();
-    $newStatusID = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New');
+    $newStatusID = $this->getMembershipStatusID('New');
     $membership = $this->callAPISuccess('Membership', 'create', [
       'id' => $entities[1]['id'],
       'join_date' => '4 months ago',
@@ -2572,7 +2572,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $dateTime = new DateTime('yesterday');
     $this->assertEquals($dateTime->format('Y-m-d'), $updatedMembership['end_date']);
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Expired'), $updatedMembership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('Expired'), $updatedMembership['status_id']);
 
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
     $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
@@ -4194,7 +4194,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @return mixed
    */
   public function _addPaymentInstrument() {
-    $gId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'payment_instrument', 'id', 'name');
+    $gId = $this->getOptionGroupID('payment_instrument');
     $optionParams = [
       'option_group_id' => $gId,
       'label' => 'Test Card',

@@ -102,11 +102,11 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals([], $manualPayment->getPaymentFormFields());
 
     // The reserved instruments' grouping is set by core's seed data / upgrade step.
-    $reservedCheckID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
+    $reservedCheckID = $this->getPaymentInstrumentID('Check');
     $manualPayment->setPaymentInstrumentID($reservedCheckID);
     $this->assertEquals(['check_number'], $manualPayment->getPaymentFormFields());
 
-    $reservedCreditCardID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit Card');
+    $reservedCreditCardID = $this->getPaymentInstrumentID('Credit Card');
     $manualPayment->setPaymentInstrumentID($reservedCreditCardID);
     $this->assertEquals(['credit_card_type', 'pan_truncation'], $manualPayment->getPaymentFormFields());
   }

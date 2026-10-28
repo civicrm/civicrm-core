@@ -93,10 +93,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    */
   public function testCurrentEmployerRelationship(): void {
     CRM_Core_BAO_ConfigSetting::disableComponent('CiviMember');
-    $employerRelationshipID = $this->callAPISuccessGetValue('RelationshipType', [
-      'return' => 'id',
-      'name_b_a' => 'Employer Of',
-    ]);
+    $employerRelationshipID = $this->getRelationshipTypeID('Employee of');
     $employerRelationship = $this->callAPISuccess('Relationship', 'create', [
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,

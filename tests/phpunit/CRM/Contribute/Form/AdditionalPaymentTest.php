@@ -515,7 +515,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    */
   public function testMultiplePaymentForPendingPayLaterContributionHasCorrectionAllocation(): void {
     $this->enableTaxAndInvoicing();
-    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'), ['tax_rate' => 20]);
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID('Donation'), ['tax_rate' => 20]);
     $this->createPendingOrder();
 
     $this->submitPayment(60);
