@@ -2516,7 +2516,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $paramsSet['title'] = 'Price Set';
     $paramsSet['name'] = 'price_set';
     $paramsSet['is_active'] = FALSE;
-    $paramsSet['extends'] = 1;
+    $paramsSet['extends:name'] = ['CiviEvent'];
     $paramsSet['min_amount'] = $minAmt;
 
     $priceSetID = PriceSet::create(FALSE)->setValues($paramsSet)->execute()->first()['id'];
@@ -2609,7 +2609,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $paramsSet['name'] = $identifier;
     $paramsSet['is_active'] = TRUE;
     $paramsSet['financial_type_id:name'] = 'Event Fee';
-    $paramsSet['extends'] = 1;
+    $paramsSet['extends:name'] = ['CiviEvent'];
     $priceSet = $this->createTestEntity('PriceSet', $paramsSet, $identifier);
     if ($componentID) {
       CRM_Price_BAO_PriceSet::addTo('civicrm_' . $component, $componentID, $priceSet['id']);

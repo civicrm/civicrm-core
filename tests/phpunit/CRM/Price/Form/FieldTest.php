@@ -149,7 +149,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
         'html_type' => 'CheckBox',
         'price' => '5',
         'non_deductible_amount' => '',
-        'financial_type_id' => '1',
+        'financial_type_id' => $this->getFinancialTypeID('Donation'),
         'membership_type_id' =>
           [
             1 => $membershipTypeID,

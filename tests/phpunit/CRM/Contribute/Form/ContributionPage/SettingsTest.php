@@ -10,7 +10,7 @@ class CRM_Contribute_Form_ContributionPage_SettingsTest extends CiviUnitTestCase
   private function getCorrectFormFields() {
     return [
       'title' => 'Test contribution page',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'start_date' => date('Y-m-d'),
       'end_date' => date('Y-m-d', time() + 86400),
     ];

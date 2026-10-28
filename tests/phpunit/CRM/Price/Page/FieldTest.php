@@ -21,7 +21,7 @@ class CRM_Price_Page_FieldTest extends CiviUnitTestCase {
     $priceSet = $this->createTestEntity('PriceSet', [
       'title' => 'Taxed price set',
       'name' => 'taxed_price_set',
-      'extends' => 1,
+      'extends:name' => ['CiviEvent'],
       'financial_type_id:name' => 'Donation',
     ]);
     $priceField = $this->createTestEntity('PriceField', [

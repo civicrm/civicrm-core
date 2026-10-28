@@ -5208,7 +5208,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'name' => 'quick config set',
       'title' => 'basic price set',
       'is_quick_config' => TRUE,
-      'extends' => 2,
+      'extends:name' => ['CiviContribute'],
     ], 'basic')['id'];
 
     $priceFieldID = PriceField::create()->setValues([

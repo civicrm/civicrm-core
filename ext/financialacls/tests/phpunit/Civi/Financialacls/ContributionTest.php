@@ -53,7 +53,7 @@ class ContributionTest extends BaseTestClass {
       'title' => 'Price Set',
       'name' => 'price_set',
       'financial_type_id.name' => 'Donation',
-      'extends' => 1,
+      'extends:name' => ['CiviEvent'],
     ], $identifier);
     $this->createTestEntity('PriceField', [
       'label' => 'Price Field',

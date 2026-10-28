@@ -63,7 +63,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'duration_interval' => '3',
       'is_active' => 1,
       'domain_id' => 1,
-      'financial_type_id' => 2,
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
     ];
 
     $this->fixtures['rolling_membership'] = [
