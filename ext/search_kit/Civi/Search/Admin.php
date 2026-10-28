@@ -74,7 +74,7 @@ class Admin {
       'joins' => self::getJoins($schema),
       'pseudoFields' => AbstractRunAction::getPseudoFields(),
       'operators' => \CRM_Utils_Array::makeNonAssociative(self::getOperators()),
-      'permissions' => \CRM_Core_Permission::getPermissionList(['civicrm', 'cms', 'userRole']),
+      'permissions' => \CRM_Core_Permission::getPermissionList(['group', 'IN', ['civicrm', 'cms', 'userRole']]),
       'functions' => self::getSqlFunctions(),
       'displayTypes' => Display::getDisplayTypes(['id', 'name', 'label', 'description', 'icon', 'grouping']),
       'styles' => \CRM_Utils_Array::makeNonAssociative(self::getStyles()),

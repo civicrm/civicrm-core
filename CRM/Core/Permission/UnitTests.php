@@ -27,6 +27,12 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
   public $permissions = NULL;
 
   /**
+   * role mapping to stub checkGroupRole() calls
+   * @var array
+   */
+  public $groupRoles = NULL;
+
+  /**
    * Given a permission string, check for access requirements
    *
    * @param string $str
@@ -45,6 +51,17 @@ class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
     }
     // return the stubbed permission (defaulting to true if the array is missing)
     return isset($this->permissions) && is_array($this->permissions) ? in_array($str, $this->permissions) : TRUE;
+  }
+
+  /**
+   * @param array $array
+   * @return bool
+   */
+  public function checkGroupRole($array) {
+    if (isset($this->groupRoles) && is_array($this->groupRoles)) {
+      return (bool) array_intersect($array, $this->groupRoles);
+    }
+    return FALSE;
   }
 
   /**
