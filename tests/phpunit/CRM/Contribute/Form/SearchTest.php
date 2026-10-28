@@ -23,6 +23,8 @@ use Civi\Api4\Payment;
  */
 class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
+  public $_apiversion = 4;
+
   public function setUp(): void {
     parent::setUp();
     $this->individualCreate();
