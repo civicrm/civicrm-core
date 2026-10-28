@@ -52,18 +52,6 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   private static $completed;
 
   /**
-   * Mailing components
-   * @var array
-   */
-  private static $component;
-
-  /**
-   * Default component id's, indexed by component type
-   * @var array
-   */
-  private static $defaultComponent;
-
-  /**
    * Mailing Types
    * @var array
    */
@@ -137,17 +125,14 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
   public static function &component($type = NULL) {
     $name = $type ?: 'ALL';
 
-    if (!self::$component || !array_key_exists($name, self::$component)) {
-      if (!self::$component) {
-        self::$component = [];
-      }
+    if (!array_key_exists($name, Civi::$statics[__CLASS__]['component'] ?? [])) {
       if (!$type) {
-        self::$component[$name] = NULL;
-        CRM_Core_PseudoConstant::populate(self::$component[$name], 'CRM_Mailing_BAO_MailingComponent');
+        Civi::$statics[__CLASS__]['component'][$name] = NULL;
+        CRM_Core_PseudoConstant::populate(Civi::$statics[__CLASS__]['component'][$name], 'CRM_Mailing_BAO_MailingComponent');
       }
       else {
         // we need to add an additional filter for $type
-        self::$component[$name] = [];
+        Civi::$statics[__CLASS__]['component'][$name] = [];
 
         $object = new CRM_Mailing_BAO_MailingComponent();
         $object->component_type = $type;
@@ -157,11 +142,11 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
         $object->is_active = 1;
         $object->find();
         while ($object->fetch()) {
-          self::$component[$name][$object->id] = $object->name;
+          Civi::$statics[__CLASS__]['component'][$name][$object->id] = $object->name;
         }
       }
     }
-    return self::$component[$name];
+    return Civi::$statics[__CLASS__]['component'][$name];
   }
 
   /**
@@ -176,7 +161,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    *   The ID of the default mailing component.
    */
   public static function &defaultComponent($type, $undefined = NULL) {
-    if (!self::$defaultComponent) {
+    if (empty(Civi::$statics[__CLASS__]['defaultComponent'])) {
       $queryDefaultComponents = "SELECT id, component_type
                 FROM    civicrm_mailing_component
                 WHERE   is_active = 1
@@ -185,12 +170,12 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
 
       $dao = CRM_Core_DAO::executeQuery($queryDefaultComponents);
 
-      self::$defaultComponent = [];
+      Civi::$statics[__CLASS__]['defaultComponent'] = [];
       while ($dao->fetch()) {
-        self::$defaultComponent[$dao->component_type] = $dao->id;
+        Civi::$statics[__CLASS__]['defaultComponent'][$dao->component_type] = $dao->id;
       }
     }
-    $value = self::$defaultComponent[$type] ?? $undefined;
+    $value = Civi::$statics[__CLASS__]['defaultComponent'][$type] ?? $undefined;
     return $value;
   }
 
@@ -279,6 +264,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
     if (isset(self::$$name)) {
       self::$$name = NULL;
     }
+    unset(Civi::$statics[__CLASS__][$name]);
   }
 
 }
