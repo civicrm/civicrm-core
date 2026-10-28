@@ -112,11 +112,15 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 0');
     CRM_Core_DAO::executeQuery('TRUNCATE civicrm_case');
     CRM_Core_DAO::executeQuery('TRUNCATE civicrm_case_contact');
-    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_case (id, case_type_id, status_id, start_date, subject) VALUES (1, %1, 1, '2023-01-02', 'test case')", [
+    // Truncating reset the auto-increments.
+    \Civi\Test::schema()->setAutoIncrement(['civicrm_case', 'civicrm_case_contact']);
+    CRM_Core_DAO::executeQuery("INSERT INTO civicrm_case (case_type_id, status_id, start_date, subject) VALUES (%1, 1, '2023-01-02', 'test case')", [
       1 => [$this->caseTypeId, 'Positive'],
     ]);
-    CRM_Core_DAO::executeQuery('INSERT INTO civicrm_case_contact (case_id, contact_id) VALUES (1, %1)', [
-      1 => [$this->ids['Contact']['site_admin'], 'Positive'],
+    $this->ids['Case']['fixture'] = (int) CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()');
+    CRM_Core_DAO::executeQuery('INSERT INTO civicrm_case_contact (case_id, contact_id) VALUES (%1, %2)', [
+      1 => [$this->ids['Case']['fixture'], 'Positive'],
+      2 => [$this->ids['Contact']['site_admin'], 'Positive'],
     ]);
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1');
   }

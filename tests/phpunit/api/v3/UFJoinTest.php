@@ -42,10 +42,11 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       'group_type' => 'Contact',
       'title' => 'Test Profile',
     ])['id'];
+    $contributionPageID = $this->contributionPageCreate()['id'];
     $params = [
       'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => 1,
+      'entity_id' => $contributionPageID,
       'weight' => 1,
       'uf_group_id' => $ufGroupID,
       'is_active' => 1,
@@ -60,7 +61,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       'id' => $ufJoin['id'],
       'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => 1,
+      'entity_id' => $contributionPageID,
       'weight' => 1,
       'uf_group_id' => $ufGroupID,
       'is_active' => 0,
@@ -82,10 +83,11 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
    */
   public function testCreateSurveyUFJoin(int $version): void {
     $this->_apiversion = $version;
+    $this->enableCiviCampaign();
     $params = [
       'module' => 'CiviCampaign',
       'entity_table' => 'civicrm_survey',
-      'entity_id' => 1,
+      'entity_id' => $this->createTestEntity('Survey', ['title' => 'Test Survey'])['id'],
       'weight' => 1,
       'uf_group_id' => $this->createTestEntity('UFGroup', [
         'group_type' => 'Contact',

@@ -615,7 +615,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'title' => 'Price Set abc',
       'is_active' => TRUE,
       'financial_type_id:name' => 'Donation',
-      'extends' => 2,
+      'extends:name' => ['CiviContribute'],
       'name' => 'price_set_abc',
     ])['id'];
 

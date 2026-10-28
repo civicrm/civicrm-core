@@ -88,7 +88,7 @@ class FinancialTypeTest extends BaseTestClass {
     $priceSetID = PriceSet::create()->setValues([
       'title' => 'Price Set Financial ACLS',
       'name' => 'test_price_set',
-      'extends' => 1,
+      'extends:name' => ['CiviEvent'],
       'financial_type_id:name' => 'Donation',
     ])->execute()->first()['id'];
 

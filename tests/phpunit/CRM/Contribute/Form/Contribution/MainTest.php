@@ -165,7 +165,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       'name' => 'priceset',
       'title' => 'Priceset with Multiple Terms',
       'is_active' => 1,
-      'extends' => 3,
+      'extends:name' => ['CiviMember'],
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'is_quick_config' => 1,
       'is_reserved' => 1,

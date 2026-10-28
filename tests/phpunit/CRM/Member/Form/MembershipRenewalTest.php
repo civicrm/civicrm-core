@@ -54,9 +54,10 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'period_type' => 'fixed',
       'fixed_period_start_day' => '101',
       'fixed_period_rollover_day' => '1231',
-      'relationship_type_id' => 20,
       'minimum_fee' => 100,
       'financial_type_id' => $this->financialTypeID,
+      'relationship_type_id' => [$this->getRelationshipTypeID('Employee of')],
+      'relationship_direction' => ['b_a'],
       'max_related' => 10,
     ], 'annual_fixed');
     $this->createTestEntity('MembershipType', [
@@ -66,9 +67,10 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'duration_unit' => 'year',
       'duration_interval' => 1,
       'period_type' => 'rolling',
-      'relationship_type_id' => 20,
       'minimum_fee' => 100,
       'financial_type_id' => $this->financialTypeID,
+      'relationship_type_id' => [$this->getRelationshipTypeID('Employee of')],
+      'relationship_direction' => ['b_a'],
       'max_related' => 10,
     ], 'rolling');
 

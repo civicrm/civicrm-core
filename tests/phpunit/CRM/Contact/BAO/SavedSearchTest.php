@@ -134,7 +134,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
       'radio_ts' => 'ts_all',
       'component_mode' => CRM_Contact_BAO_Query::MODE_CONTACTS,
       'display_relationship_type' => "{$relTypeID}_a_b",
-      'uf_group_id' => 1,
+      'uf_group_id' => $this->getProfileID('name_and_address'),
     ];
     $queryParams = [];
     CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
@@ -146,7 +146,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
       'operator' => 'AND',
       'component_mode' => CRM_Contact_BAO_Query::MODE_CONTACTS,
       'display_relationship_type' => "{$relTypeID}_a_b",
-      'uf_group_id' => 1,
+      'uf_group_id' => $this->getProfileID('name_and_address'),
     ];
     $this->checkArrayEquals($result, $expectedResult);
   }

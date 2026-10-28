@@ -293,7 +293,7 @@ class CRM_Member_BAO_MembershipTypeChangeTest extends CiviUnitTestCase {
       'end_date' => '',
       'membership_type_id' => [$this->ids['Contact']['organization'], $toTypeID],
       'status_id' => '',
-      'financial_type_id' => '2',
+      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
     ];
     $this->getTestForm('CRM_Member_Form_Membership', $params, ['id' => $ids['membership_id'], 'action' => 'update'])
       ->processForm();

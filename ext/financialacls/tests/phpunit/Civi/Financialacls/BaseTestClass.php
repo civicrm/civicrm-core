@@ -95,7 +95,7 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
       'title' => 'Price Set',
       'name' => 'price_set',
       'financial_type_id.name' => 'Event Fee',
-      'extends' => 1,
+      'extends:name' => ['CiviEvent'],
     ], $identifier);
     $this->createTestEntity('PriceField', [
       'label' => 'Price Field',

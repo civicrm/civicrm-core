@@ -3028,7 +3028,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $lineItem2 = $this->callAPISuccess('line_item', 'get', array_merge($lineItemParams, [
       'entity_id' => $originalContribution['id'] + 1,
     ]));
-    $this->callAPISuccess('line_item', 'create', ['id' => 1, 'financial_type_id' => $this->getFinancialTypeID('Donation')]);
+    $this->callAPISuccess('line_item', 'create', ['id' => $lineItem1['values'][0]['id'], 'financial_type_id' => $this->getFinancialTypeID('Donation')]);
     unset($expectedLineItem['id'], $expectedLineItem['entity_id']);
     unset($lineItem2['values'][0]['id'], $lineItem2['values'][0]['entity_id']);
     $this->assertEquals($expectedLineItem, $lineItem2['values'][0]);
@@ -5208,7 +5208,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'name' => 'quick config set',
       'title' => 'basic price set',
       'is_quick_config' => TRUE,
-      'extends' => 2,
+      'extends:name' => ['CiviContribute'],
     ], 'basic')['id'];
 
     $priceFieldID = PriceField::create()->setValues([

@@ -547,7 +547,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       'name' => 'generic_price_set',
       'title' => 'generic price set',
       'is_quick_config' => TRUE,
-      'extends' => 2,
+      'extends:name' => ['CiviContribute'],
     ], 'generic')['id'];
 
     $this->createTestEntity('PriceField', [
@@ -617,7 +617,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       'name' => 'price_set',
       'title' => 'membership price set',
       'is_quick_config' => TRUE,
-      'extends' => 2,
+      'extends:name' => ['CiviContribute'],
     ], 'membership')['id'];
 
     $this->createTestEntity('PriceField', [
