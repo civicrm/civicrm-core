@@ -27,15 +27,16 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   public function testGetOptionValueByID(): void {
-    $result = $this->callAPISuccess('option_value', 'get', ['id' => 1]);
+    $optionValueID = $this->getOptionValueID('preferred_communication_method', 'Phone');
+    $result = $this->callAPISuccess('option_value', 'get', ['id' => $optionValueID]);
     $this->assertEquals(1, $result['count']);
-    $this->assertEquals(1, $result['id']);
+    $this->assertEquals($optionValueID, $result['id']);
   }
 
   public function testGetOptionValueByValue(): void {
-    $result = $this->callAPISuccess('option_value', 'get', ['option_group_id' => 1, 'value' => '1']);
+    $result = $this->callAPISuccess('option_value', 'get', ['option_group_id' => 'preferred_communication_method', 'value' => '1']);
     $this->assertEquals(1, $result['count']);
-    $this->assertEquals(1, $result['id']);
+    $this->assertEquals($this->getOptionValueID('preferred_communication_method', 'Phone'), $result['id']);
   }
 
   /**
@@ -56,11 +57,11 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   public function testGetOptionValueOffSet(): void {
 
     $result = $this->callAPISuccess('option_value', 'get', [
-      'option_group_id' => 1,
+      'option_group_id' => 'preferred_communication_method',
       'value' => '1',
     ]);
     $result2 = $this->callAPISuccess('option_value', 'get', [
-      'option_group_id' => 1,
+      'option_group_id' => 'preferred_communication_method',
       'value' => '1',
       'options' => ['offset' => 1],
     ]);
@@ -72,14 +73,14 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
    */
   public function testGetSingleValueOptionValueSort(): void {
     $result = $this->callAPISuccess('option_value', 'getsingle', [
-      'option_group_id' => 1,
+      'option_group_id' => 'preferred_communication_method',
       'options' => [
         'sort' => 'label ASC',
         'limit' => 1,
       ],
     ]);
     $params = [
-      'option_group_id' => 1,
+      'option_group_id' => 'preferred_communication_method',
       'options' => [
         'sort' => 'label DESC',
         'limit' => 1,
@@ -112,7 +113,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   }
 
   public function testGetOptionGroup(): void {
-    $params = ['option_group_id' => 1];
+    $params = ['option_group_id' => 'preferred_communication_method'];
     $result = $this->callAPISuccess('option_value', 'get', $params);
     $this->assertGreaterThan(1, $result['count']);
   }

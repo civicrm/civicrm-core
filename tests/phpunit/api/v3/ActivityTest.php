@@ -67,7 +67,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     //create activity types
     $this->test_activity_type_value = 9999;
     $activityTypes = $this->callAPISuccess('option_value', 'create', [
-      'option_group_id' => 2,
+      'option_group_id' => 'activity_type',
       'name' => 'Test activity type',
       'label' => 'Test activity type',
       'value' => $this->test_activity_type_value,

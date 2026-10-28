@@ -250,7 +250,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    *
    * @return string
    */
-  protected function getOptionGroupID(string $key): string {
+  protected function getCustomFieldOptionGroupID(string $key): string {
     return (string) $this->callAPISuccessGetValue('CustomField', [
       'id' => $this->getCustomFieldID($key),
       'return' => 'option_group_id',
