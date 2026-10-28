@@ -869,6 +869,21 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   }
 
   /**
+   * Get the line items submitted for a given participant.
+   *
+   * @param int $participantNum
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getLineItemsForParticipant(int $participantNum): array {
+    if (!$this->hasOrder()) {
+      return [];
+    }
+    return $this->getOrder()->getLineItemsForIdentifier($this->getParticipantPageName($participantNum));
+  }
+
+  /**
    * Get the fee level text to register a participant with.
    *
    * Does not reproduce any adjustment hook_civicrm_eventDiscount might have

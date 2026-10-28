@@ -417,26 +417,31 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $contribution = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
+    $contacts = [];
     foreach ($this->getSubmittedParticipantNumbers() as $participantNum) {
       //Unset ContactID for additional participants.
       if ($participantNum > 0) {
         $contactID = $this->getParticipantValue('contact_id', $participantNum);
       }
       $contactID = $this->saveContact($contactID, $participantNum);
-      // add participant record
-      $this->addParticipant($contactID, $participantNum);
       $this->createCMSUser($participantNum, $contactID);
+      $contacts[$participantNum] = $contactID;
     }
 
-    $contactID = $this->getParticipantValue('contact_id');
-
-    if (!($this->_allowWaitlist || $this->_requireApproval) && $this->isPaidEvent()) {
-      if ($this->getLineItems() &&
-        $this->isProcessRegistrationInRealTime()
-      ) {
-        // if paid event add a contribution record
-        //passing contribution id is already registered.
-        $contribution = $this->processContribution($contactID);
+    if (!($this->_allowWaitlist || $this->_requireApproval) && $this->isPaidEvent()
+      && $this->getLineItems() && $this->isProcessRegistrationInRealTime()
+    ) {
+      $contribution = $this->saveOrder($contacts);
+    }
+    else {
+      foreach ($this->getSubmittedParticipantNumbers() as $participantNum) {
+        // add participant record
+        $participantID = $this->addParticipant($contacts[$participantNum], $participantNum);
+        foreach ($this->getLineItemsForParticipant($participantNum) as $lineItem) {
+          LineItem::create(FALSE)
+            ->setValues(['entity_table' => 'civicrm_participant', 'entity_id' => $participantID] + $lineItem)
+            ->execute();
+        }
       }
     }
 
@@ -446,36 +451,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $this->set('contributionID', $contribution->id ?? NULL);
     $this->set('participantId', $this->_participantIDS[0]);
     $this->_participantId = $this->_participantIDS[0];
-
-    // create line items, CRM-5313
-    if ($this->_priceSetId &&
-      !empty($this->_lineItem)
-    ) {
-      // take all processed participant ids.
-      $allParticipantIds = $this->_participantIDS;
-      if ($this->getParticipantValue('status_id.class') === 'Pending') {
-        $this->_allowConfirmation = TRUE;
-      }
-      // when participant re-walk wizard.
-      if ($this->_allowConfirmation &&
-        !empty($this->_additionalParticipantIds)
-      ) {
-        $allParticipantIds = array_merge([$registerByID], $this->_additionalParticipantIds);
-      }
-
-      foreach ($this->_lineItem as $key => $value) {
-        if ($value == 'skip') {
-          continue;
-        }
-        if ($entityId = $allParticipantIds[$key] ?? NULL) {
-          // Any line item safe to clear for a participant re-walking the
-          // wizard was already removed, early in postProcess() - see
-          // deleteUncontributedLineItemsForParticipantsBeingAltered().
-          $lineItem[$this->_priceSetId] = $value;
-          CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, 'civicrm_participant');
-        }
-      }
-    }
 
     if ($this->getOrderTotalAmount() > 0 && !$this->isPayLater() && is_object($payment) && !$this->getPaymentProcessorObject()->supports('noReturn')) {
       try {
@@ -1151,6 +1126,52 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         ->addWhere('entity_table', '=', 'civicrm_participant')
         ->execute();
     }
+  }
+
+  /**
+   * @param array $contacts
+   *
+   * @return \CRM_Contribute_BAO_Contribution
+   * @throws \CRM_Core_Exception
+   */
+  private function saveOrder(array $contacts): CRM_Contribute_BAO_Contribution {
+    foreach ($this->getSubmittedParticipantNumbers() as $participantNum) {
+      // add participant record
+      $this->addParticipant($contacts[$participantNum], $participantNum);
+    }
+    // if paid event add a contribution record
+    //passing contribution id is already registered.
+    $contribution = $this->processContribution($contacts[0]);
+    // create line items, CRM-5313
+    if ($this->_priceSetId &&
+      !empty($this->_lineItem)
+    ) {
+      // take all processed participant ids.
+      $allParticipantIds = $this->_participantIDS;
+      if ($this->getParticipantValue('status_id.class') === 'Pending') {
+        $this->_allowConfirmation = TRUE;
+      }
+      // when participant re-walk wizard.
+      if ($this->_allowConfirmation &&
+        !empty($this->_additionalParticipantIds)
+      ) {
+        $allParticipantIds = array_merge([$this->getPrimaryParticipantID()], $this->_additionalParticipantIds);
+      }
+
+      foreach ($this->_lineItem as $key => $value) {
+        if ($value == 'skip') {
+          continue;
+        }
+        if ($entityId = $allParticipantIds[$key] ?? NULL) {
+          // Any line item safe to clear for a participant re-walking the
+          // wizard was already removed, early in postProcess() - see
+          // deleteUncontributedLineItemsForParticipantsBeingAltered().
+          $lineItem[$this->_priceSetId] = $value;
+          CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, 'civicrm_participant');
+        }
+      }
+    }
+    return $contribution;
   }
 
   /**
