@@ -2428,9 +2428,13 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     $statuses = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id');
+    $previousContributionStatusID = (int) CRM_Utils_Array::key($this->getPreviousContributionStatus(), $statusNames);
 
     foreach ($statuses as $statusID => $label) {
-      if (!array_key_exists($statusID, $statusNames)) {
+      if (!array_key_exists($statusID, $statusNames)
+        || ((int) $statusID !== $previousContributionStatusID
+          && !CRM_Contribute_BAO_Contribution::isValidStatusTransition($previousContributionStatusID, (int) $statusID))
+      ) {
         unset($statuses[$statusID]);
       }
     }
