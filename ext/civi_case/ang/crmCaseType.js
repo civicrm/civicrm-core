@@ -453,7 +453,7 @@
     }
 
     function createActivity(name, callback) {
-      CRM.loadForm(CRM.url('civicrm/admin/options/activity_type', {action: 'add', reset: 1, label: name, component_id: 7}))
+      CRM.loadForm(CRM.url('civicrm/admin/options/activity_type', {action: 'add', reset: 1, label: name, component_id: CRM.crmCaseType.caseComponentId}))
         .on('crmFormSuccess', function(e, data) {
           $scope.activityTypes[data.optionValue.name] = data.optionValue;
           $scope.activityTypeOptions.push(formatActivityTypeOption(data.optionValue));

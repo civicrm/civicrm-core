@@ -80,7 +80,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     $paramsSet['name'] = CRM_Utils_String::titleToVar($paramsSet['title']);
     $paramsSet['is_active'] = TRUE;
     $paramsSet['financial_type_id'] = 'Event Fee';
-    $paramsSet['extends'] = 1;
+    $paramsSet['extends'] = 'CiviEvent';
     $priceSet = $this->callAPISuccess('price_set', 'create', $paramsSet);
     $form = new CRM_Price_Form_Field();
     $form->_action = CRM_Core_Action::ADD;

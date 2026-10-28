@@ -139,7 +139,7 @@ class ActivityLinksProvider extends \Civi\Core\Service\AutoSubscriber {
       elseif ($act['name'] == 'Print PDF Letter') {
         $url = 'civicrm/activity/pdf/add';
       }
-      elseif (!empty($act['filter']) || (!empty($act['component_id']) && $act['component_id'] != '1')) {
+      elseif (!empty($act['filter']) || (!empty($act['component_id']) && $act['component_id'] != \CRM_Core_Component::getComponentID('CiviEvent'))) {
         continue;
       }
 

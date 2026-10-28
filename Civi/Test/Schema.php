@@ -205,9 +205,11 @@ class Schema {
    * Do not add civicrm_domain: domain id 1 is assumed throughout.
    */
   public const SEED_TABLES_TO_OFFSET = [
+    'civicrm_component',
     'civicrm_contact_type',
     'civicrm_dedupe_rule',
     'civicrm_dedupe_rule_group',
+    'civicrm_entity_financial_account',
     'civicrm_financial_account',
     'civicrm_financial_type',
     'civicrm_job',
@@ -216,6 +218,7 @@ class Schema {
     'civicrm_mailing_bounce_type',
     'civicrm_mailing_component',
     'civicrm_membership_status',
+    'civicrm_msg_template',
     'civicrm_participant_status_type',
     'civicrm_payment_processor_type',
     'civicrm_preferences_date',

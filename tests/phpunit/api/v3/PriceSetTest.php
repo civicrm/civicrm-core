@@ -31,7 +31,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
       'is_active' => 1,
       'help_pre' => "Please describe your goat in detail",
       'help_post' => "thank you for your time",
-      'extends' => [2],
+      'extends' => [CRM_Core_Component::getComponentID('CiviContribute')],
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'is_quick_config' => 1,
       'is_reserved' => 1,
@@ -58,7 +58,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
       'title' => 'Some Price Set',
       'is_active' => 1,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
-      'extends' => [1, 2],
+      'extends' => ['CiviEvent', 'CiviContribute'],
     ];
     $createResult = $this->callAPISuccess($this->_entity, 'create', $createParams);
 
@@ -104,7 +104,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
       'entity_id' => $event['id'],
       'name' => 'event price',
       'title' => 'event price',
-      'extends' => 1,
+      'extends' => 'CiviEvent',
     ];
     $createResult = $this->callAPISuccess($this->_entity, 'create', $createParams);
     $result = $this->callAPISuccess($this->_entity, 'get', [

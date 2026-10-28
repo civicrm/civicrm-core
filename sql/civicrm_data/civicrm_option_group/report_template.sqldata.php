@@ -1,4 +1,7 @@
 <?php
+
+use CRM_Utils_SQL_Literal as Literal;
+
 return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
   ->addMetadata([
     'title' => ts('Report Template'),
@@ -46,7 +49,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_Summary',
       'weight' => 6,
       'description' => ts('Groups and totals contributions by criteria including contact, time period, financial type, contributor location, etc.'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Contribution Detail Report'),
@@ -54,7 +57,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_Detail',
       'weight' => 7,
       'description' => ts('Lists specific contributions by criteria including contact, time period, financial type, contributor location, etc. Contribution summary report points to this report for contribution details.'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Repeat Contributions Report'),
@@ -62,7 +65,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_Repeat',
       'weight' => 8,
       'description' => ts('Given two date ranges, shows contacts who contributed in both the date ranges with the amount contributed in each and the percentage increase / decrease.'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Contributions by Organization Report'),
@@ -70,7 +73,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_OrganizationSummary',
       'weight' => 9,
       'description' => ts('Displays a detailed list of contributions grouped by organization, which includes contributions made by employees for the organisation.'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Contributions by Household Report'),
@@ -78,7 +81,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_HouseholdSummary',
       'weight' => 10,
       'description' => ts('Displays a detailed list of contributions grouped by household which includes contributions made by members of the household.'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Top Donors Report'),
@@ -86,7 +89,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_TopDonor',
       'weight' => 11,
       'description' => ts('Provides a list of the top donors during a time period you define. You can include as many donors as you want (for example, top 100 of your donors).'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('SYBUNT Report'),
@@ -94,7 +97,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_Sybunt',
       'weight' => 12,
       'description' => ts('SYBUNT means some year(s) but not this year. Provides a list of constituents who donated at some time in the history of your organization but did not donate during the time period you specify.'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('LYBUNT Report'),
@@ -102,7 +105,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_Lybunt',
       'weight' => 13,
       'description' => ts('LYBUNT means last year but not this year. Provides a list of constituents who donated last year but did not donate during the time period you specify as the current year.'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Soft Credit Report'),
@@ -110,7 +113,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_SoftCredit',
       'weight' => 14,
       'description' => ts('Shows contributions made by contacts that have been soft-credited to other contacts.'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Membership Report (Summary)'),
@@ -118,7 +121,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Member_Summary',
       'weight' => 15,
       'description' => ts('Provides a summary of memberships by type and Member Since.'),
-      'component_id' => 3,
+      'component_id' => new Literal('@componentCiviMember'),
     ],
     [
       'label' => ts('Membership Report (Detail)'),
@@ -126,7 +129,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Member_Detail',
       'weight' => 16,
       'description' => ts('Provides a list of members along with their membership status and membership details (Member Since, Membership Start Date, Membership Expiration Date). Can also display contributions (payments) associated with each membership.'),
-      'component_id' => 3,
+      'component_id' => new Literal('@componentCiviMember'),
     ],
     [
       'label' => ts('Membership Report (Lapsed)'),
@@ -134,7 +137,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Member_Lapse',
       'weight' => 17,
       'description' => ts('Provides a list of memberships that lapsed or will lapse before the date you specify.'),
-      'component_id' => 3,
+      'component_id' => new Literal('@componentCiviMember'),
     ],
     [
       'label' => ts('Event Participant Report (List)'),
@@ -142,7 +145,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Event_ParticipantListing',
       'weight' => 18,
       'description' => ts('Provides lists of participants for an event.'),
-      'component_id' => 1,
+      'component_id' => new Literal('@componentCiviEvent'),
     ],
     [
       'label' => ts('Event Income Report (Summary)'),
@@ -150,7 +153,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Event_Summary',
       'weight' => 19,
       'description' => ts('Provides an overview of event income. You can include key information such as event ID, registration, attendance, and income generated to help you determine the success of an event.'),
-      'component_id' => 1,
+      'component_id' => new Literal('@componentCiviEvent'),
     ],
     [
       'label' => ts('Event Income Report (Detail)'),
@@ -158,7 +161,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Event_Income',
       'weight' => 20,
       'description' => ts('Helps you to analyze the income generated by an event. The report can include details by participant type, status and payment method.'),
-      'component_id' => 1,
+      'component_id' => new Literal('@componentCiviEvent'),
     ],
     [
       'label' => ts('Pledge Detail Report'),
@@ -166,7 +169,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Pledge_Detail',
       'weight' => 21,
       'description' => ts('List of pledges including amount pledged, pledge status, next payment date, balance due, total amount paid etc.'),
-      'component_id' => 6,
+      'component_id' => new Literal('@componentCiviPledge'),
     ],
     [
       'label' => ts('Pledged but not Paid Report'),
@@ -174,7 +177,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Pledge_Pbnp',
       'weight' => 22,
       'description' => ts('Pledged but not Paid Report'),
-      'component_id' => 6,
+      'component_id' => new Literal('@componentCiviPledge'),
     ],
     [
       'label' => ts('Relationship Report'),
@@ -189,7 +192,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Case_Summary',
       'weight' => 24,
       'description' => ts('Provides a summary of cases and their duration by date range, status, staff member and / or case role.'),
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
     ],
     [
       'label' => ts('Case Time Spent Report'),
@@ -197,7 +200,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Case_TimeSpent',
       'weight' => 25,
       'description' => ts('Aggregates time spent on case and / or non-case activities by activity type and contact.'),
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
     ],
     [
       'label' => ts('Contact Demographics Report'),
@@ -205,7 +208,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Case_Demographics',
       'weight' => 26,
       'description' => ts('Demographic breakdown for case clients (and or non-case contacts) in your database. Includes custom contact fields.'),
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
     ],
     [
       'label' => ts('Database Log Report'),
@@ -227,7 +230,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_Bookkeeping',
       'weight' => 29,
       'description' => ts('Shows Bookkeeping Transactions Report'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Participant list Count Report'),
@@ -235,7 +238,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Event_ParticipantListCount',
       'weight' => 31,
       'description' => ts('Shows the Participant list with Participant Count.'),
-      'component_id' => 1,
+      'component_id' => new Literal('@componentCiviEvent'),
     ],
     [
       'label' => ts('Income Count Summary Report'),
@@ -243,7 +246,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Event_IncomeCountSummary',
       'weight' => 32,
       'description' => ts('Shows the Income Summary of events with Count.'),
-      'component_id' => 1,
+      'component_id' => new Literal('@componentCiviEvent'),
     ],
     [
       'label' => ts('Case Detail Report'),
@@ -251,7 +254,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Case_Detail',
       'weight' => 33,
       'description' => ts('Case Details'),
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
     ],
     [
       'label' => ts('Mail Bounce Report'),
@@ -259,7 +262,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Mailing_Bounce',
       'weight' => 34,
       'description' => ts('Bounce Report for mailings'),
-      'component_id' => 4,
+      'component_id' => new Literal('@componentCiviMail'),
     ],
     [
       'label' => ts('Mail Summary Report'),
@@ -267,7 +270,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Mailing_Summary',
       'weight' => 35,
       'description' => ts('Summary statistics for mailings'),
-      'component_id' => 4,
+      'component_id' => new Literal('@componentCiviMail'),
     ],
     [
       'label' => ts('Mail Opened Report'),
@@ -275,7 +278,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Mailing_Opened',
       'weight' => 36,
       'description' => ts('Display contacts who opened emails from a mailing'),
-      'component_id' => 4,
+      'component_id' => new Literal('@componentCiviMail'),
     ],
     [
       'label' => ts('Mail Click-Through Report'),
@@ -283,7 +286,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Mailing_Clicks',
       'weight' => 37,
       'description' => ts('Display clicks from each mailing'),
-      'component_id' => 4,
+      'component_id' => new Literal('@componentCiviMail'),
     ],
     [
       'label' => ts('Contact Logging Report (Summary)'),
@@ -307,7 +310,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Campaign_SurveyDetails',
       'weight' => 43,
       'description' => ts('Detailed report for canvassing, phone-banking, walk lists or other surveys.'),
-      'component_id' => 9,
+      'component_id' => new Literal('@componentCiviCampaign'),
     ],
     [
       'label' => ts('Personal Campaign Page Report'),
@@ -315,7 +318,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_PCP',
       'weight' => 44,
       'description' => ts('Summarizes amount raised and number of contributors for each Personal Campaign Page.'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Pledge Summary Report'),
@@ -323,7 +326,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Pledge_Summary',
       'weight' => 45,
       'description' => ts('Groups and totals pledges by criteria including contact, time period, pledge status, location, etc.'),
-      'component_id' => 6,
+      'component_id' => new Literal('@componentCiviPledge'),
     ],
     [
       'label' => ts('Contribution Aggregate by Relationship'),
@@ -331,7 +334,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_History',
       'weight' => 46,
       'description' => ts('List contact\'s donation history, grouped by year, along with contributions attributed to any of the contact\'s related contacts.'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Mail Detail Report'),
@@ -339,7 +342,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Mailing_Detail',
       'weight' => 47,
       'description' => ts('Provides reporting on Intended and Successful Deliveries, Unsubscribes and Opt-outs, Replies and Forwards.'),
-      'component_id' => 4,
+      'component_id' => new Literal('@componentCiviMail'),
     ],
     [
       'label' => ts('Contribution and Membership Details'),
@@ -347,7 +350,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Member_ContributionDetail',
       'weight' => 48,
       'description' => ts('Contribution details for any type of contribution, plus associated membership information for contributions which are in payment for memberships.'),
-      'component_id' => 3,
+      'component_id' => new Literal('@componentCiviMember'),
     ],
     [
       'label' => ts('Recurring Contributions Report'),
@@ -355,7 +358,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_Recur',
       'weight' => 49,
       'description' => ts('Provides information about the status of recurring contributions'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Recurring Contributions Summary'),
@@ -363,7 +366,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_RecurSummary',
       'weight' => 49,
       'description' => ts('Provides simple summary for each payment instrument for which there are recurring contributions (e.g. Credit Card, Standing Order, Direct Debit, etc., NULL), showing within a given date range.'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Deferred Revenue Details'),
@@ -371,6 +374,6 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'name' => 'CRM_Report_Form_Contribute_DeferredRevenue',
       'weight' => 50,
       'description' => ts('Deferred Revenue Details Report'),
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
   ]);

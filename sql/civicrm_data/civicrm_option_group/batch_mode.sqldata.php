@@ -1,4 +1,7 @@
 <?php
+
+use CRM_Utils_SQL_Literal as Literal;
+
 return CRM_Core_CodeGen_OptionGroup::create('batch_mode', 'a/0065')
   ->addMetadata([
     'title' => ts('Batch Mode'),
@@ -11,5 +14,5 @@ return CRM_Core_CodeGen_OptionGroup::create('batch_mode', 'a/0065')
   ])
   ->addDefaults([
     'is_reserved' => 1,
-    'component_id' => 2,
+    'component_id' => new Literal('@componentCiviContribute'),
   ]);

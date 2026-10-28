@@ -640,8 +640,6 @@ class CRM_Core_Menu {
    * @throws \CRM_Core_Exception
    */
   public static function fillComponentIds(&$menu, $path) {
-    static $cache = [];
-
     if (array_key_exists('component_id', $menu[$path])) {
       return;
     }
@@ -657,8 +655,8 @@ class CRM_Core_Menu {
 
     $componentId = NULL;
 
-    if (array_key_exists($compPath, $cache)) {
-      $menu[$path]['component_id'] = $cache[$compPath];
+    if (array_key_exists($compPath, Civi::$statics[__CLASS__]['componentIds'] ?? [])) {
+      $menu[$path]['component_id'] = Civi::$statics[__CLASS__]['componentIds'][$compPath];
     }
     else {
       if (!empty($menu[$compPath]['component'])) {
@@ -668,7 +666,7 @@ class CRM_Core_Menu {
         );
       }
       $menu[$path]['component_id'] = $componentId ?: NULL;
-      $cache[$compPath] = $menu[$path]['component_id'];
+      Civi::$statics[__CLASS__]['componentIds'][$compPath] = $menu[$path]['component_id'];
     }
   }
 

@@ -1,4 +1,7 @@
 <?php
+
+use CRM_Utils_SQL_Literal as Literal;
+
 return CRM_Core_CodeGen_OptionGroup::create('wysiwyg_presets', 'a/0077')
   ->addMetadata([
     'title' => ts('WYSIWYG Editor Presets'),
@@ -14,13 +17,13 @@ return CRM_Core_CodeGen_OptionGroup::create('wysiwyg_presets', 'a/0077')
       'label' => ts('CiviMail'),
       'value' => 2,
       'name' => 'civimail',
-      'component_id' => 4,
+      'component_id' => new Literal('@componentCiviMail'),
     ],
     [
       'label' => ts('CiviEvent'),
       'value' => 3,
       'name' => 'civievent',
-      'component_id' => 1,
+      'component_id' => new Literal('@componentCiviEvent'),
     ],
   ])
   ->addDefaults([

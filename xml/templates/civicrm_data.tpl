@@ -30,6 +30,13 @@ INSERT INTO civicrm_component (name, namespace) VALUES ('CiviCampaign'  , 'CRM_C
 -- go ahead and insert it, then delete. This is because too much legacy code has hard-coded
 -- references to component ID, so it's better to keep the auto-increment values stable.
 DELETE FROM civicrm_component WHERE name = 'CiviGrant';
+SELECT @componentCiviEvent := id FROM civicrm_component WHERE name = 'CiviEvent';
+SELECT @componentCiviContribute := id FROM civicrm_component WHERE name = 'CiviContribute';
+SELECT @componentCiviMember := id FROM civicrm_component WHERE name = 'CiviMember';
+SELECT @componentCiviMail := id FROM civicrm_component WHERE name = 'CiviMail';
+SELECT @componentCiviPledge := id FROM civicrm_component WHERE name = 'CiviPledge';
+SELECT @componentCiviCase := id FROM civicrm_component WHERE name = 'CiviCase';
+SELECT @componentCiviCampaign := id FROM civicrm_component WHERE name = 'CiviCampaign';
 
 {crmSqlData file="sql/civicrm_data/civicrm_location_type.sqldata.php"}
 SELECT @locationTypeHome := id FROM civicrm_location_type WHERE name = 'Home';
@@ -171,8 +178,8 @@ VALUES
 -- CRM-9714
 
 INSERT INTO `civicrm_price_set` ( `name`, `title`, `is_active`, `extends`, `is_quick_config`, `financial_type_id`, `is_reserved` )
-VALUES ( 'default_contribution_amount', 'Contribution Amount', '1', '2', '1', NULL, 1),
-( 'default_membership_type_amount', 'Membership Amount', '1', '3', '1', @financial_type_id_md, 1);
+VALUES ( 'default_contribution_amount', 'Contribution Amount', '1', CONCAT('', @componentCiviContribute, ''), '1', NULL, 1),
+( 'default_membership_type_amount', 'Membership Amount', '1', CONCAT('', @componentCiviMember, ''), '1', @financial_type_id_md, 1);
 
 SELECT @setID := max(id) FROM civicrm_price_set WHERE name = 'default_contribution_amount' AND is_quick_config = 1;
 

@@ -1,4 +1,7 @@
 <?php
+
+use CRM_Utils_SQL_Literal as Literal;
+
 return CRM_Core_CodeGen_OptionGroup::create('mail_approval_status', 'a/0054')
   ->addMetadata([
     'title' => ts('CiviMail Approval Status'),
@@ -10,20 +13,20 @@ return CRM_Core_CodeGen_OptionGroup::create('mail_approval_status', 'a/0054')
       'name' => 'Approved',
       'is_default' => 1,
       'is_reserved' => 1,
-      'component_id' => 4,
+      'component_id' => new Literal('@componentCiviMail'),
     ],
     [
       'label' => ts('Rejected'),
       'value' => 2,
       'name' => 'Rejected',
       'is_reserved' => 1,
-      'component_id' => 4,
+      'component_id' => new Literal('@componentCiviMail'),
     ],
     [
       'label' => ts('None'),
       'value' => 3,
       'name' => 'None',
       'is_reserved' => 1,
-      'component_id' => 4,
+      'component_id' => new Literal('@componentCiviMail'),
     ],
   ]);

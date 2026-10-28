@@ -34,7 +34,7 @@ class CRM_Price_BAO_PriceFieldValueTest extends CiviUnitTestCase {
       'is_active' => 1,
       'help_pre' => "Where does your goat sleep",
       'help_post' => "thank you for your time",
-      'extends' => 2,
+      'extends' => 'CiviContribute',
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'is_quick_config' => 1,
       'is_reserved' => 1,

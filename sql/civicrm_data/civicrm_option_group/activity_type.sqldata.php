@@ -1,5 +1,7 @@
 <?php
 
+use CRM_Utils_SQL_Literal as Literal;
+
 return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
   ->addMetadata([
     'title' => ts('Activity Type'),
@@ -47,7 +49,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Online or offline event registration.'),
       'is_reserved' => 1,
-      'component_id' => 1,
+      'component_id' => new Literal('@componentCiviEvent'),
     ],
     [
       'label' => ts('Contribution'),
@@ -56,7 +58,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Online or offline contribution.'),
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Membership Signup'),
@@ -65,7 +67,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Online or offline membership signup.'),
       'is_reserved' => 1,
-      'component_id' => 3,
+      'component_id' => new Literal('@componentCiviMember'),
     ],
     [
       'label' => ts('Membership Renewal'),
@@ -74,7 +76,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Online or offline membership renewal.'),
       'is_reserved' => 1,
-      'component_id' => 3,
+      'component_id' => new Literal('@componentCiviMember'),
     ],
     [
       'label' => ts('Tell a Friend'),
@@ -91,7 +93,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Send Pledge Acknowledgment.'),
       'is_reserved' => 1,
-      'component_id' => 6,
+      'component_id' => new Literal('@componentCiviPledge'),
     ],
     [
       'label' => ts('Pledge Reminder'),
@@ -100,7 +102,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Send Pledge Reminder.'),
       'is_reserved' => 1,
-      'component_id' => 6,
+      'component_id' => new Literal('@componentCiviPledge'),
     ],
     [
       'label' => ts('Inbound Email'),
@@ -115,7 +117,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 13,
       'name' => 'Open Case',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-folder-open-o',
       'description' => '',
     ],
@@ -124,7 +126,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 14,
       'name' => 'Follow up',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-share-square-o',
       'description' => '',
     ],
@@ -133,7 +135,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 15,
       'name' => 'Change Case Type',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-random',
       'description' => '',
     ],
@@ -142,7 +144,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 16,
       'name' => 'Change Case Status',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-pencil-square-o',
       'description' => '',
     ],
@@ -151,7 +153,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 53,
       'name' => 'Change Case Subject',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-pencil-square-o',
       'description' => '',
     ],
@@ -160,7 +162,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 33,
       'name' => 'Change Custom Data',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-table',
       'description' => '',
     ],
@@ -171,14 +173,14 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('offline membership renewal reminder.'),
       'is_reserved' => 1,
-      'component_id' => 3,
+      'component_id' => new Literal('@componentCiviMember'),
     ],
     [
       'label' => ts('Change Case Start Date'),
       'value' => 18,
       'name' => 'Change Case Start Date',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-calendar',
       'description' => '',
     ],
@@ -195,7 +197,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 20,
       'name' => 'Assign Case Role',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-user-plus',
       'description' => '',
     ],
@@ -204,7 +206,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 21,
       'name' => 'Remove Case Role',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-user-times',
       'description' => '',
     ],
@@ -221,7 +223,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 23,
       'name' => 'Merge Case',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-compress',
       'description' => '',
     ],
@@ -230,7 +232,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 24,
       'name' => 'Reassigned Case',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-user-circle-o',
       'description' => '',
     ],
@@ -239,7 +241,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 25,
       'name' => 'Link Cases',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-link',
       'description' => '',
     ],
@@ -248,7 +250,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'value' => 26,
       'name' => 'Change Case Tags',
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-tags',
       'description' => '',
     ],
@@ -259,7 +261,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       // FIXME: Weird weight
       'weight' => 27 - 1,
       'is_reserved' => 1,
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-users',
       'description' => '',
     ],
@@ -270,7 +272,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       // FIXME: Weird weight
       'weight' => 28 - 1,
       'is_reserved' => 1,
-      'component_id' => 9,
+      'component_id' => new Literal('@componentCiviCampaign'),
       'description' => '',
     ],
     [
@@ -280,7 +282,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       // FIXME: Weird weight
       'weight' => 29 - 1,
       'is_reserved' => 1,
-      'component_id' => 9,
+      'component_id' => new Literal('@componentCiviCampaign'),
       'description' => '',
     ],
     [
@@ -290,7 +292,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       // FIXME: Weird weight
       'weight' => 30 - 1,
       'is_reserved' => 1,
-      'component_id' => 9,
+      'component_id' => new Literal('@componentCiviCampaign'),
       'description' => '',
     ],
     [
@@ -300,7 +302,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       // FIXME: Weird weight
       'weight' => 31 - 1,
       'is_reserved' => 1,
-      'component_id' => 9,
+      'component_id' => new Literal('@componentCiviCampaign'),
       'description' => '',
     ],
     [
@@ -310,7 +312,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       // FIXME: Weird weight
       'weight' => 32 - 1,
       'is_reserved' => 1,
-      'component_id' => 9,
+      'component_id' => new Literal('@componentCiviCampaign'),
       'description' => '',
     ],
     [
@@ -330,7 +332,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'weight' => 35,
       'description' => ts('Change Membership Status.'),
       'is_reserved' => 1,
-      'component_id' => 3,
+      'component_id' => new Literal('@componentCiviMember'),
     ],
     [
       'label' => ts('Change Membership Type'),
@@ -339,7 +341,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Change Membership Type.'),
       'is_reserved' => 1,
-      'component_id' => 3,
+      'component_id' => new Literal('@componentCiviMember'),
     ],
     [
       'label' => ts('Cancel Recurring Contribution'),
@@ -347,7 +349,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'name' => 'Cancel Recurring Contribution',
       'filter' => 1,
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
       'description' => '',
     ],
     [
@@ -356,7 +358,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'name' => 'Update Recurring Contribution Billing Details',
       'filter' => 1,
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
       'description' => '',
     ],
     [
@@ -365,7 +367,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'name' => 'Update Recurring Contribution',
       'filter' => 1,
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
       'description' => '',
     ],
     [
@@ -383,7 +385,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Export Accounting Batch'),
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('SMS delivery'),
@@ -408,7 +410,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Additional payment recorded for event or membership fee.'),
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Refund'),
@@ -417,7 +419,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Refund recorded for event or membership fee.'),
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Change Registration'),
@@ -426,7 +428,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Changes to an existing event registration.'),
       'is_reserved' => 1,
-      'component_id' => 1,
+      'component_id' => new Literal('@componentCiviEvent'),
     ],
     [
       'label' => ts('Downloaded Invoice'),
@@ -467,14 +469,14 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Failed Payment'),
       'is_reserved' => 1,
-      'component_id' => 2,
+      'component_id' => new Literal('@componentCiviContribute'),
     ],
     [
       'label' => ts('Case Client was removed from Case'),
       'value' => 55,
       'name' => 'Case Client Removed',
       'description' => ts('Case client was removed from a case'),
-      'component_id' => 7,
+      'component_id' => new Literal('@componentCiviCase'),
       'icon' => 'fa-trash',
     ],
     [
@@ -484,7 +486,7 @@ return CRM_Core_CodeGen_OptionGroup::create('activity_type', 'a/0002')
       'filter' => 1,
       'description' => ts('Write-off Pledge.'),
       'is_reserved' => 1,
-      'component_id' => 6,
+      'component_id' => new Literal('@componentCiviPledge'),
     ],
   ])
   ->syncColumns('fill', ['value' => 'weight']);
