@@ -1,6 +1,6 @@
-diff -ruN DB/common.php DB/common.php
---- DB/common.php	2020-04-20 05:45:59.000000000 +1000
-+++ DB/common.php	2020-08-01 14:46:53.146175149 +1000
+diff -ruN a/DB/common.php b/DB/common.php
+--- a/DB/common.php	2020-04-20 05:45:59.000000000 +1000
++++ b/DB/common.php	2020-08-01 14:46:53.146175149 +1000
 @@ -1150,7 +1147,22 @@
       */
      function modifyQuery($query)
@@ -25,9 +25,9 @@ diff -ruN DB/common.php DB/common.php
      }
 
      // }}}
-diff -ruN DB/mysqli.php DB/mysqli.php
---- DB/mysqli.php	2020-04-20 05:45:59.000000000 +1000
-+++ DB/mysqli.php	2020-08-01 14:51:11.871272253 +1000
+diff -ruN a/DB/mysqli.php b/DB/mysqli.php
+--- a/DB/mysqli.php	2020-04-20 05:45:59.000000000 +1000
++++ b/DB/mysqli.php	2020-08-01 14:51:11.871272253 +1000
 @@ -314,7 +317,8 @@
                      $dsn['password'],
                      $dsn['database'],
@@ -53,9 +53,9 @@ diff -ruN DB/mysqli.php DB/mysqli.php
 
  }
 
-diff -ruN DB.php DB.php
---- DB.php	2020-04-20 05:45:59.000000000 +1000
-+++ DB.php	2020-08-01 14:43:45.338870953 +1000
+diff -ruN a/DB.php b/DB.php
+--- a/DB.php	2020-04-20 05:45:59.000000000 +1000
++++ b/DB.php	2020-08-01 14:43:45.338870953 +1000
 @@ -641,8 +646,12 @@
                  . 'CREATE|DROP|'
                  . 'LOAD DATA|SELECT .* INTO .* FROM|COPY|'
