@@ -156,7 +156,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $financialTrxn->save();
     $params = [
       'entity_table' => 'civicrm_contribution',
-      'entity_id' => 1,
+      'entity_id' => $this->contributionCreate(['contact_id' => $this->individualCreate()]),
       'financial_trxn_id' => $financialTrxn->id,
       'amount' => $amount,
     ];

@@ -428,14 +428,12 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $this->assertCount(3, $actualResults);
     $expectedResults = [
       [
-        'id' => 2,
         'amount' => 100.0,
         'entity_id' => $financialItemIDs[0],
         'financial_trxn_id' => $financialTrxnIDs[0],
         'entity_table' => 'civicrm_financial_item',
       ],
       [
-        'id' => 4,
         // ensure that reverse entry is entered in the EntityFinancialTrxn table on fee change to greater amount
         'amount' => -100.0,
         'entity_id' => $financialItemIDs[1],
@@ -443,7 +441,6 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
         'entity_table' => 'civicrm_financial_item',
       ],
       [
-        'id' => 5,
         'amount' => 300.00,
         'entity_id' => $financialItemIDs[2],
         'financial_trxn_id' => $financialTrxnIDs[1],
@@ -467,18 +464,15 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $financialItemIDs = FinancialItem::get(FALSE)->addOrderBy('id')->execute()->column('id');
     $expectedResults = [
       [
-        'id' => 2,
         'amount' => 100.00,
         'entity_id' => $financialItemIDs[0],
       ],
       [
-        'id' => 4,
         // ensure that reverse entry is entered in the EntityFinancialTrxn table
         'amount' => -100.00,
         'entity_id' => $financialItemIDs[1],
       ],
       [
-        'id' => 5,
         'amount' => 50.00,
         'entity_id' => $financialItemIDs[2],
       ],
