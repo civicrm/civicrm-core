@@ -726,7 +726,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @throws \CRM_Core_Exception
    */
   protected function formatLink(array $link, array $data, bool $allowMultiple = FALSE, ?string $text = NULL, ?int $index = NULL): ?array {
-    $useApi = (!empty($link['entity']) && !empty($link['action']));
+    $useApi = (!empty($link['entity']) && !empty($link['action']) && empty($link['task']));
     // When rendering multiple links, gather multivalued token values
     if (isset($index)) {
       foreach ($data as $key => $value) {

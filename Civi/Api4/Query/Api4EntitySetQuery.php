@@ -23,6 +23,8 @@ class Api4EntitySetQuery extends Api4Query {
 
   /**
    * @param \Civi\Api4\Action\EntitySet\Get $api
+   *
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function __construct($api) {
     parent::__construct($api);
@@ -39,6 +41,15 @@ class Api4EntitySetQuery extends Api4Query {
       $params['checkPermissions'] = $api->getCheckPermissions();
       $params['version'] = 4;
       $apiRequest = Request::create($entity, $action, $params);
+
+      if ($params['checkPermissions']) {
+        // Neither Request::create() nor Api4SelectQuery will check API-level
+        // permissions, so we need to do it here
+        $kernel = \Civi::service('civi_api_kernel');
+        [$apiProvider, $apiRequest] = $kernel->resolve($apiRequest);
+        $kernel->authorize($apiProvider, $apiRequest);
+      }
+
       // For non-aggregated queries, add a tracking id so the rows can be identified
       // for output-formatting purposes
       if (!$isAggregate) {

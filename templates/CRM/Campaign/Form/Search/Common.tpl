@@ -139,8 +139,7 @@ function buildCampaignGroups( surveyId ) {
   var operation = {/literal}'{$searchVoterFor}'{literal};
   if ( !surveyId || operation != 'reserve' ) return;
 
-  var grpUrl = {/literal}"{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Campaign_Page_AJAX&fnName=campaignGroups'}"
-  {literal};
+  var grpUrl = {/literal}"{crmURL p='civicrm/ajax/campaign/groups' h=0}"{literal};
 
   cj.post( grpUrl,
     {survey_id:surveyId},

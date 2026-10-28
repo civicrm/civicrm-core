@@ -83,6 +83,7 @@
      <path>civicrm/ajax/memType</path>
      <page_callback>CRM_Member_Page_AJAX::getMemberTypeDefaults</page_callback>
      <access_arguments>access CiviCRM,access CiviMember</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
     <path>civicrm/admin/member/membershipType/add</path>

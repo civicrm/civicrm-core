@@ -172,6 +172,7 @@
     <path>civicrm/ajax/template</path>
     <page_callback>CRM_Mailing_Page_AJAX::template</page_callback>
     <access_arguments>access CiviCRM</access_arguments>
+    <is_ajax>true</is_ajax>
   </item>
   <item>
     <path>civicrm/mailing/view</path>
@@ -195,12 +196,14 @@
   <item>
     <path>civicrm/ajax/contactmailing</path>
     <page_callback>CRM_Mailing_Page_AJAX::getContactMailings</page_callback>
-    <access_arguments>access CiviCRM</access_arguments>
+    <access_arguments>access CiviMail</access_arguments>
+    <is_ajax>true</is_ajax>
   </item>
   <item>
     <path>civicrm/ajax/setupMailAccount</path>
     <page_callback>CRM_Mailing_Page_AJAX::setup</page_callback>
     <access_arguments>access CiviCRM,access CiviMail</access_arguments>
+    <is_ajax>false</is_ajax>
   </item>
   <item>
     <path>civicrm/mailing/url</path>

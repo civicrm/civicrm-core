@@ -3,6 +3,7 @@ namespace Civi\ext\afform\mock\tests\phpunit\api\v4\Afform;
 
 use api\v4\Afform\AfformUsageTestCase;
 use Civi\Api4\Afform;
+use Civi\Api4\Email;
 
 /**
  * Test case for Afform with autocomplete.
@@ -349,6 +350,99 @@ EOHTML;
     finally {
       \Civi::dispatcher()->removeListener('hook_civicrm_pre', $listen);
     }
+  }
+
+  /**
+   * Ensure saveJoins() does not allow ids of join entities that do not belong
+   * to the parent entity.
+   */
+  public function testSaveJoinsDoesNotAllowForeignIds(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="FBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+    <div af-join="Email" min="1" af-repeat="Add">
+      <afblock-contact-email></afblock-contact-email>
+    </div>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'is_public' => TRUE,
+      'permission' => ['*always allow*'],
+    ]);
+
+    $contact = $this->createTestRecord('Individual', [
+      'first_name' => 'Alice',
+      'last_name' => 'Tester',
+    ]);
+
+    $email1 = $this->createTestRecord('Email', [
+      'contact_id' => $contact['id'],
+      'email' => 'alice1@example.com',
+      'location_type_id' => 1,
+      'is_primary' => TRUE,
+    ]);
+
+    $email2 = $this->createTestRecord('Email', [
+      'contact_id' => $contact['id'],
+      'email' => 'alice2@example.com',
+      'location_type_id' => 2,
+      'is_primary' => FALSE,
+    ]);
+
+    $otherContact = $this->createTestRecord('Individual', [
+      'first_name' => 'Bob',
+      'last_name' => 'Victim',
+    ]);
+
+    $otherEmail = $this->createTestRecord('Email', [
+      'contact_id' => $otherContact['id'],
+      'email' => 'bob@example.com',
+      'location_type_id' => 1,
+      'is_primary' => TRUE,
+    ]);
+
+    $submission = [
+      'Individual1' => [
+        [
+          'fields' => [
+            'id' => $contact['id'],
+            'first_name' => 'Alice',
+            'last_name' => 'Tester',
+          ],
+          'joins' => [
+            'Email' => [
+              ['email' => 'alice1@example.com', 'location_type_id' => 1],
+              ['email' => 'alice2@example.com', 'location_type_id' => 2],
+              ['id' => $otherEmail['id'], 'email' => 'hacked@example.com', 'location_type_id' => 1],
+            ],
+          ],
+        ],
+      ],
+    ];
+
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues($submission)
+        ->execute();
+    }
+    catch (\CRM_Core_Exception $e) {
+    }
+
+    $victimEmail = Email::get(FALSE)
+      ->addWhere('id', '=', $otherEmail['id'])
+      ->execute()
+      ->first();
+
+    $this->assertEquals('bob@example.com', $victimEmail['email']);
+    $this->assertEquals($otherContact['id'], $victimEmail['contact_id']);
   }
 
 }

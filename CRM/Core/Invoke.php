@@ -79,6 +79,10 @@ class CRM_Core_Invoke {
     self::init($args);
     Civi::dispatcher()->dispatch('civi.invoke.auth', \Civi\Core\Event\GenericHookEvent::create(['args' => $args]));
     $item = self::getItem($args);
+    // Guard against CSRF for ajax routes
+    if (!empty($item['is_ajax'])) {
+      CRM_Core_Page_AJAX::validateAjaxRequestMethod();
+    }
     return self::runItem($item);
     // NOTE: runItem() may return HTML, or it may call print+exit.
   }

@@ -20,9 +20,11 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\ContactType;
 use Civi\Api4\EntitySet;
 use Civi\Api4\Group;
+use Civi\Api4\MailSettings;
 use Civi\Api4\Relationship;
 use Civi\Api4\Tag;
 use Civi\Test\TransactionalInterface;
@@ -476,6 +478,38 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->assertEquals('Individual sub', $result[0]['label']);
     $this->assertNull($result[1]['label']);
     $this->assertNull($result[1]['name']);
+  }
+
+  public function testUnionWithPermittedEntity(): void {
+    $name = uniqid('mail');
+    $this->createTestRecord('MailSettings', ['name' => $name]);
+    $this->createLoggedInUser();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM'];
+
+    $result = EntitySet::get()
+      ->addSet('UNION ALL', MailSettings::get()
+        ->addSelect('name')
+        ->addWhere('name', '=', $name)
+      )
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals($name, $result[0]['name']);
+  }
+
+  public function testUnionWithUnpermittedEntity(): void {
+    $name = uniqid('mail');
+    $this->createTestRecord('MailSettings', ['name' => $name]);
+    $this->createLoggedInUser();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+
+    $this->expectException(UnauthorizedException::class);
+    EntitySet::get()
+      ->addSet('UNION ALL', MailSettings::get()
+        ->addSelect('name')
+        ->addWhere('name', '=', $name)
+      )
+      ->execute();
   }
 
 }

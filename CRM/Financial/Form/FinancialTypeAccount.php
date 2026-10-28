@@ -164,44 +164,33 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
       $element->freeze();
     }
 
+    $financialAccountRelations = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
+    $financialAccounts = (array) \Civi\Api4\FinancialAccount::get(FALSE)
+      ->addSelect('id', 'label', 'financial_account_type_id', 'is_default')
+      ->addWhere('is_active', '=', TRUE)
+      ->addOrderBy('label')
+      ->execute();
+
+    $this->assign('accountRelationships', $AccountTypeRelationship);
+    $this->assign('financialAccountRelations', $financialAccountRelations);
+    $this->assign('financialAccounts', $financialAccounts);
+
     if ($this->_action == CRM_Core_Action::ADD) {
       if (!empty($this->_submitValues['account_relationship']) || !empty($this->_submitValues['financial_account_id'])) {
-        $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
-        $financialAccountType = $financialAccountType[$this->_submitValues['account_relationship']] ?? NULL;
-        $result = \Civi\Api4\FinancialAccount::get()
-          ->addSelect('id', 'label')
-          ->addWhere('financial_account_type_id', '=', $financialAccountType)
-          ->addWhere('is_active', '=', TRUE)
-          ->addOrderBy('label')
-          ->execute()
-          ->column('label', 'id');
-
-        $financialAccountSelect = ['' => ts('- select -')] + $result;
+        $financialAccountType = $financialAccountRelations[$this->_submitValues['account_relationship']] ?? NULL;
+        $matching = array_filter($financialAccounts, fn($acc) => $acc['financial_account_type_id'] == $financialAccountType);
+        $financialAccountSelect = ['' => ts('- select -')] + array_column($matching, 'label', 'id');
       }
       else {
-        $result = \Civi\Api4\FinancialAccount::get()
-          ->addSelect('id', 'label')
-          ->addWhere('is_active', '=', TRUE)
-          ->addOrderBy('label')
-          ->execute()
-          ->column('label', 'id');
         $financialAccountSelect = [
           'select' => ts('- select -'),
-        ] + $result;
+        ] + array_column($financialAccounts, 'label', 'id');
       }
     }
     if ($this->_action == CRM_Core_Action::UPDATE) {
-      $financialAccountType = CRM_Financial_BAO_FinancialAccount::getfinancialAccountRelations();
-      $financialAccountType = $financialAccountType[$this->_defaultValues['account_relationship']];
-      $result = \Civi\Api4\FinancialAccount::get()
-        ->addSelect('id', 'label')
-        ->addWhere('financial_account_type_id', '=', $financialAccountType)
-        ->addWhere('is_active', '=', TRUE)
-        ->addOrderBy('label')
-        ->execute()
-        ->column('label', 'id');
-
-      $financialAccountSelect = ['' => ts('- select -')] + $result;
+      $financialAccountType = $financialAccountRelations[$this->_defaultValues['account_relationship']] ?? NULL;
+      $matching = array_filter($financialAccounts, fn($acc) => $acc['financial_account_type_id'] == $financialAccountType);
+      $financialAccountSelect = ['' => ts('- select -')] + array_column($matching, 'label', 'id');
     }
 
     $this->add('select',

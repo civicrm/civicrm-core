@@ -63,27 +63,23 @@
   CRM.$(function($) {
 
     function getFinancialType(set) {
-      var callbackURL = CRM.url('civicrm/ajax/rest', {
-        className: 'CRM_Financial_Page_AJAX',
-        fnName: 'jqFinancialType',
-        _value: $("#product_id").val()
-      });
-      $.ajax({
-        url: callbackURL,
-        success: function( data, textStatus ){
-          data = eval(data);//get json array
-          if ((data != null) && (set)) {
-            $("#financial_type_id").val(data);
+      const productId = $("#product_id").val();
+      CRM.api4('Product', 'get', {
+        select: ['financial_type_id'],
+        where: [['id', '=', productId]],
+      }, 0)
+        .then((data) => {
+          if (data?.financial_type_id && set) {
+            $("#financial_type_id").val(data.financial_type_id);
           }
 
-          if (data == $("#financial_type_id").val()) {
+          if (data?.financial_type_id && data.financial_type_id == $("#financial_type_id").val()) {
             $("#resetfinancialtype").hide();
           }
           else {
             $("#resetfinancialtype").show();
           }
-        }
-      });
+        });
     }
 
     getFinancialType(false);

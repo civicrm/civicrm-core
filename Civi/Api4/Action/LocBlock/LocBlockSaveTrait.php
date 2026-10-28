@@ -53,7 +53,7 @@ trait LocBlockSaveTrait {
             $referenceCount = CoreUtil::getRefCountTotal($joinEntity, $entityId);
             if ($referenceCount <= 1) {
               civicrm_api4($joinEntity, 'delete', [
-                'checkPermissions' => FALSE,
+                'checkPermissions' => $this->checkPermissions,
                 'where' => [
                   ['id', '=', $entityId],
                 ],
@@ -67,7 +67,7 @@ trait LocBlockSaveTrait {
               $item['id'] = $entityId;
             }
             $saved = civicrm_api4($joinEntity, 'save', [
-              'checkPermissions' => FALSE,
+              'checkPermissions' => $this->checkPermissions,
               'records' => [$item],
             ])->first();
             $params[$joinField] = $saved['id'] ?? NULL;

@@ -116,24 +116,29 @@
   <item>
      <path>civicrm/case/ajax/addclient</path>
      <page_callback>CRM_Case_Page_AJAX::addClient</page_callback>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
      <path>civicrm/case/ajax/processtags</path>
      <page_callback>CRM_Case_Page_AJAX::processCaseTags</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
      <page_type>3</page_type>
+     <is_ajax>true</is_ajax>
   </item>
    <item>
      <path>civicrm/case/ajax/details</path>
      <page_callback>CRM_Case_Page_AJAX::CaseDetails</page_callback>
+     <is_ajax>true</is_ajax>
   </item>
   <item>
     <path>civicrm/ajax/delcaserole</path>
     <page_callback>CRM_Case_Page_AJAX::deleteCaseRoles</page_callback>
+    <is_ajax>true</is_ajax>
   </item>
   <item>
     <path>civicrm/ajax/get-cases</path>
     <page_callback>CRM_Case_Page_AJAX::getCases</page_callback>
+    <is_ajax>true</is_ajax>
   </item>
   <item>
     <path>civicrm/case/email/add</path>

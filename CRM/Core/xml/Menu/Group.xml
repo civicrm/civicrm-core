@@ -33,5 +33,6 @@
      <path>civicrm/ajax/grouplist</path>
      <page_callback>CRM_Group_Page_AJAX::getGroupList</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
   </item>
 </menu>

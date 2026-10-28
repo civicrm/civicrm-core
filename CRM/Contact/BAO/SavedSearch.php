@@ -20,6 +20,11 @@ use Civi\Api4\Event\AuthorizeRecordEvent;
  * Business object for Saved searches.
  */
 class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements \Civi\Core\HookInterface {
+  use CRM_Core_OwnershipAccessTrait;
+
+  protected static function checkOwnerAdminPermission(?int $userID = NULL): bool {
+    return CRM_Core_Permission::check(['administer search_kit'], $userID);
+  }
 
   /**
    * Retrieve DB object and copy to defaults array.
@@ -458,7 +463,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    * @inheritDoc
    */
   public static function writeRecord(array $record): CRM_Contact_DAO_SavedSearch {
-    if (!empty($record['check_permission']) && !CRM_Core_Permission::check('administer search_kit') && !empty($record['id'])) {
+    if ((!empty($record['check_permission']) || !empty($record['check_permissions'])) && !CRM_Core_Permission::check('administer search_kit') && !empty($record['id'])) {
       self::checkManageOwnPermission($record, CRM_Core_Session::getLoggedInContactID());
     }
     return parent::writeRecord($record);
@@ -468,7 +473,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    * @inheritDoc
    */
   public static function deleteRecord(array $record): CRM_Contact_DAO_SavedSearch {
-    if (!empty($record['check_permission']) && !CRM_Core_Permission::check('administer search_kit')) {
+    if ((!empty($record['check_permission']) || !empty($record['check_permissions'])) && !CRM_Core_Permission::check('administer search_kit')) {
       self::checkManageOwnPermission($record, CRM_Core_Session::getLoggedInContactID());
     }
     return parent::deleteRecord($record);
@@ -489,7 +494,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
       throw new \Civi\API\Exception\UnauthorizedException('You do not have permission to manage this SavedSearch.');
     }
 
-    $created_id = empty($record['created_id']) ? self::getFieldValue(parent::class, $record['id'], 'created_id') : $record['created_id'];
+    $created_id = !empty($record['id']) ? self::getFieldValue(parent::class, $record['id'], 'created_id') : ($record['created_id'] ?? NULL);
     // When we have a created_id, we need to compare against user to see if they are the owner.
     if (!empty($created_id)) {
 

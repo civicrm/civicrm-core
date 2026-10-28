@@ -318,20 +318,21 @@ CRM.$(function($) {
 
   function setSignature() {
     var emailID = $("#fromEmailAddress").val( );
-    if ( !isNaN( emailID ) ) {
-      var dataUrl = {/literal}"{crmURL p='civicrm/ajax/signature' h=0}"{literal};
-      $.post( dataUrl, {emailID: emailID}, function( data ) {
-
-        if (data.signature_text) {
+    if (emailID && !isNaN(emailID)) {
+      CRM.api4('Email', 'get', {
+        select: ['signature_text', 'signature_html'],
+        where: [['id', '=', +emailID]]
+      }, 0).then((data) => {
+        if (data?.signature_text) {
           var textMessage =  $("#"+ text_message).val( ) + '\n\n--\n' + data.signature_text;
           $("#"+ text_message).val( textMessage );
         }
 
-        if (data.signature_html) {
+        if (data?.signature_html) {
           var htmlMessage = CRM.wysiwyg.getVal("#" + html_message) + '<br/><br/>--<br/>' + data.signature_html;
           CRM.wysiwyg.setVal("#" + html_message, htmlMessage);
         }
-      }, 'json');
+      });
     }
   }
   $("#fromEmailAddress", form).change(setSignature);

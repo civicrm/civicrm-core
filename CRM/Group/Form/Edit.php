@@ -292,6 +292,10 @@ WHERE  title = %1
       }
     }
 
+    if (!CRM_Contact_BAO_Group::checkReservedGroupPermission($self->_id, $fields['is_reserved'] ?? NULL)) {
+      $errors['is_reserved'] = ts('You do not have permission to alter reserved groups.');
+    }
+
     return empty($errors) ? TRUE : $errors;
   }
 

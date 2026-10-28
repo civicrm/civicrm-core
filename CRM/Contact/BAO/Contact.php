@@ -204,7 +204,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
 
       $newContact = empty($params['contact_id']);
       if (!CRM_Utils_System::isNull($newEmployer)) {
-        CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contact->id, $newEmployer, $employerId, $newContact);
+        CRM_Contact_BAO_Contact_Utils::createCurrentEmployerRelationship($contact->id, $newEmployer, $employerId, $newContact, !empty($params['check_permissions']));
       }
       elseif ($employerId) {
         CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($contact->id, $employerId);

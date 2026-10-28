@@ -346,4 +346,144 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     }
   }
 
+  public function testReservedGroupPermissions(): void {
+    $this->createLoggedInUser();
+
+    $reservedGroup = $this->groupCreate([
+      'name' => 'reserved_' . uniqid(),
+      'title' => 'Reserved Group ' . uniqid(),
+      'is_reserved' => 1,
+    ]);
+
+    $unreservedGroup = $this->groupCreate([
+      'name' => 'unreserved_' . uniqid(),
+      'title' => 'Regular Group ' . uniqid(),
+      'is_reserved' => 0,
+    ]);
+
+    // User has permission to edit normal groups, but NOT reserved groups
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit groups',
+      'view all contacts',
+    ];
+
+    // Allowed to modify regular group
+    $this->callAPISuccess('Group', 'create', [
+      'id' => $unreservedGroup,
+      'title' => 'Regular Group Updated',
+      'check_permissions' => 1,
+    ]);
+
+    // User cannot modify reserved group
+    $this->callAPIFailure('Group', 'create', [
+      'id' => $reservedGroup,
+      'title' => 'Hacked Title',
+      'check_permissions' => 1,
+    ]);
+
+    // User cannot un-reserve a reserved group
+    $this->callAPIFailure('Group', 'create', [
+      'id' => $reservedGroup,
+      'is_reserved' => 0,
+      'check_permissions' => 1,
+    ]);
+
+    // User cannot delete reserved group
+    $this->callAPIFailure('Group', 'delete', [
+      'id' => $reservedGroup,
+      'check_permissions' => 1,
+    ]);
+
+    // User cannot make a normal group reserved
+    $this->callAPIFailure('Group', 'create', [
+      'id' => $unreservedGroup,
+      'is_reserved' => 1,
+      'check_permissions' => 1,
+    ]);
+
+    // User cannot create a reserved group
+    $this->callAPIFailure('Group', 'create', [
+      'title' => 'New Reserved Group ' . uniqid(),
+      'is_reserved' => 1,
+      'check_permissions' => 1,
+    ]);
+
+    // User CAN update an unreserved group explicitly passing is_reserved = 0
+    $this->callAPISuccess('Group', 'create', [
+      'id' => $unreservedGroup,
+      'is_reserved' => 0,
+      'check_permissions' => 1,
+    ]);
+
+    // Now grant "administer reserved groups" permission
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit groups',
+      'view all contacts',
+      'administer reserved groups',
+    ];
+
+    // User CAN update reserved group
+    $updated = $this->callAPISuccess('Group', 'create', [
+      'id' => $reservedGroup,
+      'title' => 'Legit Admin Update',
+      'check_permissions' => 1,
+    ]);
+    $this->assertEquals('Legit Admin Update', $updated['values'][$reservedGroup]['title']);
+
+    // User CAN un-reserve a group
+    $unreserved = $this->callAPISuccess('Group', 'create', [
+      'id' => $reservedGroup,
+      'is_reserved' => 0,
+      'check_permissions' => 1,
+    ]);
+    $this->assertEquals(0, $unreserved['values'][$reservedGroup]['is_reserved']);
+
+    // User CAN create a reserved group
+    $newReserved = $this->callAPISuccess('Group', 'create', [
+      'title' => 'Admin Reserved Group ' . uniqid(),
+      'is_reserved' => 1,
+      'check_permissions' => 1,
+    ]);
+    $this->assertEquals(1, $newReserved['values'][$newReserved['id']]['is_reserved']);
+
+    // User CAN delete reserved group
+    $this->callAPISuccess('Group', 'delete', [
+      'id' => $newReserved['id'],
+      'check_permissions' => 1,
+    ]);
+  }
+
+  public function testReservedGroupWithoutCheckPermissions(): void {
+    $this->createLoggedInUser();
+
+    $reservedGroup = $this->groupCreate([
+      'name' => 'reserved_' . uniqid(),
+      'title' => 'Reserved Group ' . uniqid(),
+      'is_reserved' => 1,
+    ]);
+
+    // User without 'administer reserved groups'
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit groups',
+      'view all contacts',
+    ];
+
+    // When check_permissions is 0, modifying a reserved group is allowed
+    $updated = $this->callAPISuccess('Group', 'create', [
+      'id' => $reservedGroup,
+      'title' => 'Modified Without Permission Check',
+      'check_permissions' => 0,
+    ]);
+    $this->assertEquals('Modified Without Permission Check', $updated['values'][$reservedGroup]['title']);
+
+    // Deleting a reserved group without check_permissions is allowed
+    $this->callAPISuccess('Group', 'delete', [
+      'id' => $reservedGroup,
+      'check_permissions' => 0,
+    ]);
+  }
+
 }

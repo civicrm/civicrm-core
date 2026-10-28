@@ -17,6 +17,8 @@
  * @group headless
  */
 class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
+  use \Civi\Test\ACLPermissionTrait;
+
   protected $_apiversion = 3;
   protected $_contactID;
   protected $_membershipTypeID;
@@ -127,6 +129,74 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('membership_payment', 'get', $params);
     $this->assertEquals($result['values'][$result['id']]['membership_id'], $params['membership_id'], 'Check Membership Id');
     $this->assertEquals($result['values'][$result['id']]['contribution_id'], $params['contribution_id'], 'Check Contribution Id');
+  }
+
+  /**
+   * Test row-level ACL for MembershipPayment under contact-level ACLs.
+   */
+  public function testMembershipPaymentRowAcl(): void {
+    // 1. Create contacts: contact 0 (disallowed) and contact 1 (allowed)
+    $disallowedContactId = $this->individualCreate();
+    $allowedContactId = $this->individualCreate();
+
+    // 2. Setup ACL: only allowedContactId is permitted
+    $this->allowedContactId = $allowedContactId;
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'view debug output',
+      'access CiviMember',
+      'access CiviContribute',
+    ];
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereOnlyOne']);
+
+    // Create contributions
+    $disallowedContributionId = $this->contributionCreate([
+      'contact_id' => $disallowedContactId,
+      'financial_type_id' => 1,
+      'total_amount' => 50,
+    ]);
+    $allowedContributionId = $this->contributionCreate([
+      'contact_id' => $allowedContactId,
+      'financial_type_id' => 1,
+      'total_amount' => 50,
+    ]);
+
+    // Create memberships
+    $membershipTypeId = $this->membershipTypeCreate();
+    $disallowedMembership = $this->callAPISuccess('Membership', 'create', [
+      'contact_id' => $disallowedContactId,
+      'membership_type_id' => $membershipTypeId,
+      'join_date' => 'now',
+    ]);
+    $disallowedMembershipId = $disallowedMembership['id'];
+    $allowedMembership = $this->callAPISuccess('Membership', 'create', [
+      'contact_id' => $allowedContactId,
+      'membership_type_id' => $membershipTypeId,
+      'join_date' => 'now',
+    ]);
+    $allowedMembershipId = $allowedMembership['id'];
+
+    // Create MembershipPayments
+    $disallowedMembershipPayment = $this->callAPISuccess('MembershipPayment', 'create', [
+      'membership_id' => $disallowedMembershipId,
+      'contribution_id' => $disallowedContributionId,
+    ]);
+    $disallowedMembershipPaymentId = $disallowedMembershipPayment['id'];
+
+    $allowedMembershipPayment = $this->callAPISuccess('MembershipPayment', 'create', [
+      'membership_id' => $allowedMembershipId,
+      'contribution_id' => $allowedContributionId,
+    ]);
+    $allowedMembershipPaymentId = $allowedMembershipPayment['id'];
+
+    // Retrieve MembershipPayments under ACL
+    $membershipPayments = $this->callAPISuccess('MembershipPayment', 'get', [
+      'check_permissions' => TRUE,
+    ]);
+    $membershipPaymentIds = array_keys($membershipPayments['values']);
+
+    $this->assertNotContains($disallowedMembershipPaymentId, $membershipPaymentIds);
+    $this->assertContains($allowedMembershipPaymentId, $membershipPaymentIds);
   }
 
 }

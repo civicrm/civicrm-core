@@ -81,8 +81,6 @@ class CRM_Contact_Page_AJAX {
       $excludeGet = [
         'reset',
         'key',
-        'className',
-        'fnName',
         'json',
         'reset',
         'context',
@@ -146,9 +144,7 @@ class CRM_Contact_Page_AJAX {
    * Fetch PCP ID by PCP Supporter sort_name, also displays PCP title and associated Contribution Page title
    */
   public static function getPCPList() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $name = $_GET['term'] ?? NULL;
-    $name = CRM_Utils_Type::escape($name, 'String');
+    $name = CRM_Utils_Request::retrieve('term', 'String') ?? '';
     $limit = $max = Civi::settings()->get('search_autocomplete_count');
 
     $where = ' AND pcp.page_id = cp.id AND pcp.contact_id = cc.id';
@@ -162,14 +158,19 @@ class CRM_Contact_Page_AJAX {
     }
     $includeEmailFrom = $includeNickName = '';
     if ($config->includeNickNameInName) {
-      $includeNickName = " OR nick_name LIKE '$strSearch'";
+      $includeNickName = ' OR nick_name LIKE %1';
     }
     if ($config->includeEmailInName) {
-      $includeEmailFrom = "LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id AND eml.is_primary = 1 )";
-      $whereClause = " WHERE ( email LIKE '$strSearch' OR sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
+      $includeEmailFrom = 'LEFT JOIN civicrm_email eml ON ( cc.id = eml.contact_id AND eml.is_primary = 1 )';
+      $whereClause = " WHERE ( email LIKE %1 OR sort_name LIKE %1 $includeNickName ) {$where} ";
     }
     else {
-      $whereClause = " WHERE ( sort_name LIKE '$strSearch' $includeNickName ) {$where} ";
+      $whereClause = " WHERE ( sort_name LIKE %1 $includeNickName ) {$where} ";
+    }
+
+    [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
+    if ($aclWhere) {
+      $whereClause .= " AND {$aclWhere} ";
     }
 
     $offset = $count = 0;
@@ -185,19 +186,21 @@ class CRM_Contact_Page_AJAX {
         FROM (
             SELECT pcp.id as id, CONCAT_WS( ' :: ', {$select} ) as data, sort_name
             FROM civicrm_pcp pcp, civicrm_contribution_page cp, civicrm_contact cc
+            {$aclFrom}
             {$includeEmailFrom}
             {$whereClause} AND pcp.page_type = 'contribute'
             UNION ALL
             SELECT pcp.id as id, CONCAT_WS( ' :: ', {$select} ) as data, sort_name
             FROM civicrm_pcp pcp, civicrm_event cp, civicrm_contact cc
+            {$aclFrom}
             {$includeEmailFrom}
             {$whereClause} AND pcp.page_type = 'event'
             ) t
         ORDER BY sort_name
-        LIMIT $offset, $limit
-        ";
+        LIMIT " . (int) $offset . ', ' . (int) $limit . '
+        ';
 
-    $dao = CRM_Core_DAO::executeQuery($query);
+    $dao = CRM_Core_DAO::executeQuery($query, [1 => [$strSearch, 'String']]);
     $output = ['results' => [], 'more' => FALSE];
     while ($dao->fetch()) {
       if (++$count > $max) {
@@ -274,18 +277,27 @@ class CRM_Contact_Page_AJAX {
   public static function deleteCustomValue() {
     CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     CRM_Utils_System::setHttpHeader('Content-Type', 'text/plain');
-    $customValueID = CRM_Utils_Type::escape($_REQUEST['valueID'], 'Positive');
-    $customGroupID = CRM_Utils_Type::escape($_REQUEST['groupID'], 'Positive');
-    $contactId = CRM_Utils_Request::retrieve('contactId', 'Positive');
+    $customValueID = CRM_Utils_Request::retrieve('valueID', 'Positive', NULL, TRUE);
+    $customGroupID = CRM_Utils_Request::retrieve('groupID', 'Positive', NULL, TRUE);
+    $contactId = CRM_Utils_Request::retrieve('contactId', 'Positive', NULL, TRUE);
+
+    $customGroup = CRM_Core_BAO_CustomGroup::getGroup(['id' => $customGroupID]);
+    if (empty($customGroup['table_name']) || CRM_Core_BAO_CustomGroup::getEntityFromExtends($customGroup['extends']) !== 'Contact') {
+      CRM_Utils_System::permissionDenied();
+    }
     if (!CRM_Core_BAO_CustomGroup::checkGroupAccess($customGroupID, CRM_Core_Permission::EDIT) ||
       !CRM_Contact_BAO_Contact_Permission::allow($contactId, CRM_Core_Permission::EDIT)
     ) {
       CRM_Utils_System::permissionDenied();
     }
-    CRM_Core_BAO_CustomValue::deleteCustomValue($customValueID, $customGroupID);
-    if ($contactId) {
-      echo CRM_Contact_BAO_Contact::getCountComponent('custom_' . $customGroupID, $contactId);
+    $storedEntityId = (int) CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM `{$customGroup['table_name']}` WHERE id = %1", [
+      1 => [$customValueID, 'Positive'],
+    ]);
+    if ($storedEntityId !== (int) $contactId) {
+      CRM_Utils_System::permissionDenied();
     }
+    CRM_Core_BAO_CustomValue::deleteCustomValue($customValueID, $customGroupID, $contactId);
+    echo CRM_Contact_BAO_Contact::getCountComponent('custom_' . $customGroupID, $contactId);
 
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
     CRM_Utils_System::civiExit();
@@ -332,36 +344,104 @@ class CRM_Contact_Page_AJAX {
   }
 
   /**
-   * Retrieve signature based on email id.
+   *  Function to get email address of a contact.
    */
-  public static function getSignature() {
+  public static function getContactEmail() {
     CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $emailID = CRM_Utils_Type::escape($_REQUEST['emailID'], 'Positive');
-    $query = "SELECT signature_text, signature_html FROM civicrm_email WHERE id = {$emailID}";
-    $dao = CRM_Core_DAO::executeQuery($query);
+    $queryStrings = [];
+    $name = $_GET['name'] ?? NULL;
+    if ($name) {
+      $name = CRM_Utils_Type::escape($name, 'String');
+      $wildCard = Civi::settings()->get('includeWildCardInName') ? '%' : '';
+      foreach (['cc.sort_name', 'ce.email'] as $column) {
+        $queryStrings[] = "{$column} LIKE '{$wildCard}{$name}%'";
+      }
+      $result = [];
+      $rowCount = Civi::settings()->get('search_autocomplete_count');
 
-    $signatures = [];
-    while ($dao->fetch()) {
-      $signatures = [
-        'signature_text' => $dao->signature_text,
-        'signature_html' => $dao->signature_html,
-      ];
+      // add acl clause here
+      [$aclFrom, $aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause('cc');
+      if ($aclWhere) {
+        $aclWhere = "AND {$aclWhere}";
+      }
+      foreach ($queryStrings as &$queryString) {
+        $queryString = "(
+SELECT sort_name name, ce.email, cc.id
+FROM   civicrm_email ce INNER JOIN civicrm_contact cc ON cc.id = ce.contact_id
+       {$aclFrom}
+WHERE  ce.on_hold = 0 AND cc.is_deceased = 0 AND cc.do_not_email = 0 AND cc.is_deleted = 0 AND {$queryString}
+       {$aclWhere}
+LIMIT {$rowCount}
+)";
+      }
+      $query = implode(' UNION ', $queryStrings) . " LIMIT {$rowCount}";
+
+      // send query to hook to be modified if needed
+      CRM_Utils_Hook::contactListQuery($query,
+        $name,
+        CRM_Utils_Request::retrieve('context', 'Alphanumeric'),
+        CRM_Utils_Request::retrieve('cid', 'Positive')
+      );
+
+      $dao = CRM_Core_DAO::executeQuery($query);
+
+      while ($dao->fetch()) {
+        //working here
+        $result[] = [
+          'text' => '"' . $dao->name . '" <' . $dao->email . '>',
+          'id' => !empty($_GET['id']) ? "{$dao->id}::{$dao->email}" : '"' . $dao->name . '" <' . $dao->email . '>',
+        ];
+      }
+      CRM_Utils_JSON::output($result);
+    }
+    CRM_Utils_System::civiExit();
+  }
+
+  public static function buildSubTypes() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
+    $parent = CRM_Utils_Request::retrieve('parentId', 'Positive');
+
+    switch ($parent) {
+      case 1:
+        $contactType = 'Individual';
+        break;
+
+      case 2:
+        $contactType = 'Household';
+        break;
+
+      case 4:
+        $contactType = 'Organization';
+        break;
     }
 
-    CRM_Utils_JSON::output($signatures);
+    $subTypes = CRM_Contact_BAO_ContactType::subTypePairs($contactType, FALSE, NULL);
+    asort($subTypes);
+    CRM_Utils_JSON::output($subTypes);
+  }
+
+  public static function buildDedupeRules() {
+    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
+    $contactType = CRM_Utils_Request::retrieve('parentId', 'String');
+    $dedupeRules = CRM_Dedupe_BAO_DedupeRuleGroup::getByType($contactType);
+
+    CRM_Utils_JSON::output($dedupeRules);
   }
 
   /**
    * Process dupes.
    */
   public static function processDupes() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $oper = CRM_Utils_Type::escape($_REQUEST['op'], 'String');
-    $cid = CRM_Utils_Type::escape($_REQUEST['cid'], 'Positive');
-    $oid = CRM_Utils_Type::escape($_REQUEST['oid'], 'Positive');
+    $oper = CRM_Utils_Request::retrieve('op', 'String');
+    $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
+    $oid = CRM_Utils_Request::retrieve('oid', 'Positive');
 
-    if (!$oper || !$cid || !$oid) {
-      return;
+    if (!$oper || !$cid || !$oid || !in_array($oper, ['dupe-nondupe', 'nondupe-dupe'], TRUE)) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    if (!CRM_Contact_BAO_Contact_Permission::allow($cid) || !CRM_Contact_BAO_Contact_Permission::allow($oid)) {
+      CRM_Utils_System::permissionDenied();
     }
 
     $status = self::markNonDuplicates($cid, $oid, $oper);
@@ -770,18 +850,15 @@ class CRM_Contact_Page_AJAX {
   }
 
   public static function getAddressDisplay() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $contactId = CRM_Utils_Request::retrieve('contact_id', 'Positive');
-    if (!$contactId) {
-      $addressVal["error_message"] = "no contact id found";
+    if (!$contactId || !CRM_Contact_BAO_Contact_Permission::allow($contactId)) {
+      CRM_Utils_System::permissionDenied();
     }
-    else {
-      $entityBlock = [
-        'contact_id' => $contactId,
-        'entity_id' => $contactId,
-      ];
-      $addressVal = CRM_Core_BAO_Address::getValues($entityBlock);
-    }
+    $entityBlock = [
+      'contact_id' => $contactId,
+      'entity_id' => $contactId,
+    ];
+    $addressVal = CRM_Core_BAO_Address::getValues($entityBlock);
 
     CRM_Utils_JSON::output($addressVal);
   }
@@ -790,15 +867,14 @@ class CRM_Contact_Page_AJAX {
    * Mark dupe pairs as selected from un-selected state or vice-versa, in dupe cache table.
    */
   public static function toggleDedupeSelect() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $pnid = $_REQUEST['pnid'];
-    $isSelected = CRM_Utils_Type::escape($_REQUEST['is_selected'], 'Boolean');
-    $cacheKeyString = CRM_Utils_Request::retrieve('cacheKey', 'Alphanumeric', NULL, FALSE);
+    $cacheKeyString = CRM_Utils_Request::retrieve('cacheKey', 'Alphanumeric', NULL, TRUE);
+    $pnid = CRM_Utils_Request::retrieve('pnid', 'String', NULL, TRUE);
+    $isSelected = CRM_Utils_Request::retrieve('is_selected', 'Boolean', NULL, TRUE);
 
     $params = [
       1 => [$isSelected, 'Boolean'],
-      // using % to address rows with conflicts as well
-      3 => ["$cacheKeyString%", 'String'],
+      3 => [$cacheKeyString, 'String'],
+      4 => [$cacheKeyString . '_conflicts', 'String'],
     ];
 
     //check pnid is_array or integer
@@ -809,12 +885,15 @@ class CRM_Contact_Page_AJAX {
       $whereClause = " id IN ( {$pnid} ) ";
     }
     else {
-      $pnid = CRM_Utils_Type::escape($pnid, 'Integer');
+      $pnid = CRM_Utils_Type::escape($pnid, 'Positive');
+      if (!$pnid) {
+        CRM_Utils_System::permissionDenied();
+      }
       $whereClause = " id = %2";
-      $params[2]   = [$pnid, 'Integer'];
+      $params[2] = [$pnid, 'Integer'];
     }
 
-    $sql = "UPDATE civicrm_prevnext_cache SET is_selected = %1 WHERE {$whereClause} AND cachekey LIKE %3";
+    $sql = "UPDATE civicrm_prevnext_cache SET is_selected = %1 WHERE {$whereClause} AND cachekey IN (%3, %4)";
     CRM_Core_DAO::executeQuery($sql, $params);
 
     CRM_Utils_System::sendJSONResponse(['status' => 'success']);

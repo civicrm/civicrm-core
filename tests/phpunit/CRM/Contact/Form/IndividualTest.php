@@ -70,4 +70,47 @@ class CRM_Contact_Form_IndividualTest extends CiviUnitTestCase {
     $this->assertStringContainsString('<label for="first_name">', $contents);
   }
 
+  /**
+   * Test that a non-admin cannot steal another contact's email via QuickForm contact edit.
+   */
+  public function testCannotStealEmailViaQuickForm(): void {
+    $userContact = $this->createTestEntity('Contact', ['first_name' => 'User'], 'user');
+    $otherContact = $this->createTestEntity('Contact', ['first_name' => 'Other'], 'other');
+    $otherEmail = $this->createTestEntity('Email', [
+      'contact_id' => $otherContact['id'],
+      'email' => 'other@example.com',
+      'location_type_id' => 1,
+    ]);
+
+    \CRM_Core_Session::singleton()->set('userID', $userContact['id']);
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $timestamps = \CRM_Contact_BAO_Contact::getTimestamps($userContact['id']);
+
+    // Attempt to submit an update to the user's contact claiming $otherEmail['id']
+    $form = $this->getTestForm('CRM_Contact_Form_Contact', [
+      'first_name' => 'User Updated',
+      'modified_date' => $timestamps['modified_date'],
+      'email' => [
+        1 => [
+          'id' => $otherEmail['id'],
+          'email' => 'hacked@example.com',
+          'location_type_id' => 1,
+        ],
+      ],
+    ], [
+      'cid' => $userContact['id'],
+      'action' => \CRM_Core_Action::UPDATE,
+    ]);
+    $form->processForm();
+
+    // Check who owns $otherEmail['id'] now
+    $emailOwner = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Email', $otherEmail['id'], 'contact_id');
+    $this->assertEquals($otherContact['id'], $emailOwner, 'Email contact_id must not be reassigned to the user contact');
+  }
+
 }

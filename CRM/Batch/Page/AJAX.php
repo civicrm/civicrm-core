@@ -24,9 +24,21 @@ class CRM_Batch_Page_AJAX {
    * Save record.
    */
   public static function batchSave() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     // save the entered information in 'data' column
-    $batchId = CRM_Utils_Type::escape($_POST['batch_id'], 'Positive');
+    $batchId = CRM_Utils_Type::escape($_POST['batch_id'] ?? NULL, 'Positive');
+    if (!$batchId) {
+      CRM_Utils_System::permissionDenied();
+    }
+
+    $batch = \Civi\Api4\Batch::get(FALSE)
+      ->addWhere('id', '=', $batchId)
+      ->addSelect('created_id', 'status_id:name')
+      ->execute()
+      ->first();
+
+    if (!$batch || in_array($batch['status_id:name'], ['Closed', 'Exported'], TRUE) || !CRM_Batch_BAO_Batch::checkBatchPermission('edit', $batch['created_id'])) {
+      CRM_Utils_System::permissionDenied();
+    }
 
     unset($_POST['qfKey']);
     CRM_Core_DAO::setFieldValue('CRM_Batch_DAO_Batch', $batchId, 'data', json_encode(['values' => $_POST]));
@@ -39,7 +51,6 @@ class CRM_Batch_Page_AJAX {
    * @deprecated
    */
   public static function getBatchList() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
     if ($context != 'financialBatch') {
       $sortMapper = [

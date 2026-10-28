@@ -48,6 +48,10 @@ class CRM_Contact_Page_View_Tag extends CRM_Core_Page {
 
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->assign('action', $this->_action);
+
+    if (!in_array($this->_action, ['browse', CRM_Core_Action::BROWSE], TRUE) && !CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)) {
+      CRM_Utils_System::permissionDenied();
+    }
   }
 
   /**
