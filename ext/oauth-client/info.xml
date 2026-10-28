@@ -21,18 +21,15 @@
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
   <php_compatibility>
-    <ver>8.0</ver>
     <ver>8.1</ver>
     <ver>8.2</ver>
     <ver>8.3</ver>
     <ver>8.4</ver>
+    <ver>8.5</ver>
   </php_compatibility>
   <smarty_compatibility>
     <ver>5</ver>
   </smarty_compatibility>
-  <requires>
-    <ext version="~4.5">org.civicrm.afform</ext>
-  </requires>
   <comments>This extension provides a framework for OAuth support</comments>
   <classloader>
     <psr0 prefix="CRM_" path="."/>

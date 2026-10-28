@@ -16,18 +16,18 @@
     <url desc="Support">https://lab.civicrm.org/dev/core/-/issues</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2024-09-18</releaseDate>
-  <version>1.0.0</version>
+  <releaseDate>[civicrm.releaseDate]</releaseDate>
+  <version>[civicrm.version]</version>
   <develStage>alpha</develStage>
   <compatibility>
     <ver>[civicrm.majorVersion]</ver>
   </compatibility>
   <php_compatibility>
-    <ver>8.0</ver>
     <ver>8.1</ver>
     <ver>8.2</ver>
     <ver>8.3</ver>
     <ver>8.4</ver>
+    <ver>8.5</ver>
   </php_compatibility>
   <smarty_compatibility>
     <ver>5</ver>
