@@ -13,15 +13,15 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     $userID = $this->createLoggedInUser();
 
     $addTimeline = civicrm_api3('Case', 'addtimeline', [
-      'case_id' => 1,
+      'case_id' => $this->ids['Case']['fixture'],
       'timeline' => "standard_timeline",
     ]);
 
-    $query = CRM_Case_BAO_Case::getCaseActivityQuery('recent', $userID, ' civicrm_case.id IN( 1 )');
+    $query = CRM_Case_BAO_Case::getCaseActivityQuery('recent', $userID, " civicrm_case.id IN({$this->ids['Case']['fixture']})");
     $res = CRM_Core_DAO::executeQuery($query);
     $openCaseType = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
     while ($res->fetch()) {
-      $message = 'Failed asserting that the latest activity from Case ID 1 was "Open Case":';
+      $message = 'Failed asserting that the latest activity from the case was "Open Case":';
       $this->assertEquals($openCaseType, $res->activity_type_id, $message . PHP_EOL . print_r($res, TRUE));
     }
   }
@@ -37,7 +37,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
   public function testAddCaseToContact(): void {
     $this->createLoggedInUser();
     $params = [
-      'case_id' => 1,
+      'case_id' => $this->ids['Case']['fixture'],
       'contact_id' => $this->individualCreate(),
     ];
     CRM_Case_BAO_CaseContact::writeRecord($params);
@@ -223,13 +223,13 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
   }
 
   public function testGetCaseType(): void {
-    $caseTypeLabel = CRM_Case_BAO_Case::getCaseType(1);
+    $caseTypeLabel = CRM_Case_BAO_Case::getCaseType($this->ids['Case']['fixture']);
     $this->assertEquals('Housing Support', $caseTypeLabel);
   }
 
   public function testRetrieveCaseIdsByContactId(): void {
     $caseIds = CRM_Case_BAO_Case::retrieveCaseIdsByContactId($this->ids['Contact']['site_admin'], FALSE, 'housing_support');
-    $this->assertEquals([1], $caseIds);
+    $this->assertEquals([$this->ids['Case']['fixture']], $caseIds);
   }
 
   /**

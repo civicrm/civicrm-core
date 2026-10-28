@@ -53,7 +53,7 @@ class api_v3_CaseContactTest extends CiviCaseTestCase {
     $result = $this->callAPISuccess('CaseContact', 'get', [
       'contact_id' => $this->contactID,
     ]);
-    $this->assertEquals($this->case['id'], $result['id']);
+    $this->assertEquals($this->case['id'], $result['values'][$result['id']]['case_id']);
   }
 
   /**
