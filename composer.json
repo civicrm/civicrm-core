@@ -112,7 +112,7 @@
     "pear/db": "~1.12.2",
     "civicrm/composer-compile-lib": "~0.6 || ~1.0",
     "ezyang/htmlpurifier": "^4.13",
-    "phpoffice/phpspreadsheet": "^5",
+    "phpoffice/phpspreadsheet": "^5 < 5.10",
     "symfony/polyfill-php82": "^1.28",
     "symfony/polyfill-php83": "^1.0",
     "symfony/polyfill-php84": "^1.30",
