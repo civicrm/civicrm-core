@@ -458,8 +458,8 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     }
 
     foreach ($allTabs as $key => $tab) {
-      // Get tab counts last to avoid wasting time; if a tab was removed by hook, the count isn't needed.
-      if (!isset($tab['count']) && isset($getCountParams[$tab['id']])) {
+      // Get tab counts last to avoid wasting time; skip if a tab was removed or count was hidden.
+      if (!isset($tab['count']) && empty($tab['hideCount']) && isset($getCountParams[$tab['id']])) {
         $allTabs[$key]['count'] = call_user_func_array([
           'CRM_Contact_BAO_Contact',
           'getCountComponent',

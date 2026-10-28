@@ -93,6 +93,10 @@ class AfformPlacementTest extends TestCase implements HeadlessInterface {
     $this->assertEquals('crm-i smiley-face', $tabs['test1']['icon']);
     // Fallback icon
     $this->assertEquals('crm-i fa-list-alt', $tabs['test2']['icon']);
+    // Forms should have count => FALSE so core does not execute legacy count queries
+    $this->assertFalse($tabs['test1']['count']);
+    $this->assertFalse($tabs['test2']['count']);
+    $this->assertFalse($tabs['test3']['count']);
     // Forms should be sorted by title alphabetically
     $this->assertGreaterThan($tabs['test2']['weight'], $tabs['test1']['weight']);
     // Should respect explicit weight
