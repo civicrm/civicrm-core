@@ -1,0 +1,568 @@
+<?php
+/*
+ +--------------------------------------------------------------------+
+ | Copyright CiviCRM LLC. All rights reserved.                        |
+ |                                                                    |
+ | This work is published under the GNU AGPLv3 license with some      |
+ | permitted exceptions and without any warranty. For full license    |
+ | and copyright information, see https://civicrm.org/licensing       |
+ +--------------------------------------------------------------------+
+ */
+
+/**
+ * Test class for CRM_Campaign_Page_AJAX.
+ *
+ * @group headless
+ */
+class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
+
+  public function setUp(): void {
+    parent::setUp();
+    $this->enableCiviCampaign();
+    $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
+  }
+
+  public function tearDown(): void {
+    unset($_SERVER['HTTP_X_REQUESTED_WITH']);
+    $_REQUEST = [];
+    $_GET = [];
+    $_POST = [];
+    $this->quickCleanUp([
+      'civicrm_survey',
+      'civicrm_activity_contact',
+      'civicrm_activity',
+    ]);
+    parent::tearDown();
+  }
+
+  /**
+   * Test processVoterData is denied for invalid operations.
+   */
+  public function testProcessVoterDataInvalidOperation(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'administer CiviCampaign']);
+
+    $_POST = $_REQUEST = [
+      'operation' => 'unsupported_op',
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Campaign_Page_AJAX::processVoterData();
+  }
+
+  /**
+   * Test processVoterData operations are denied when lacking specific permissions.
+   *
+   * @dataProvider unsupportedPermissionProvider
+   */
+  public function testProcessVoterDataDeniedWithoutPermission(string $operation, array $userPermissions): void {
+    $this->createLoggedInUser();
+    $this->setPermissions($userPermissions);
+
+    $_POST = $_REQUEST = [
+      'operation' => $operation,
+      'activity_id' => 1,
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Campaign_Page_AJAX::processVoterData();
+  }
+
+  public function unsupportedPermissionProvider(): array {
+    return [
+      ['reserve', ['access CiviCRM']],
+      ['release', ['access CiviCRM']],
+      ['gotv', ['access CiviCRM']],
+    ];
+  }
+
+  /**
+   * Test reserving and unreserving a voter respondent.
+   */
+  public function testProcessVoterDataReserveSuccess(): void {
+    $interviewerId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'reserve campaign contacts', 'view all contacts']);
+
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'Voter Outreach Survey',
+      'activity_type_id:name' => 'Survey',
+    ]);
+    $voterId = $this->individualCreate();
+
+    // 1. Reserve respondent
+    $_POST = $_REQUEST = [
+      'operation' => 'reserve',
+      'source_record_id' => $survey['id'],
+      'source_contact_id' => $interviewerId,
+      'target_contact_id' => $voterId,
+      'assignee_contact_id' => $interviewerId,
+      'isReserved' => '1',
+      'surveyTitle' => 'Voter Outreach Survey',
+    ];
+
+    try {
+      CRM_Campaign_Page_AJAX::processVoterData();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['status' => 'success', 'error_code' => 0], $e->errorData);
+    }
+
+    $activity = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('source_record_id', '=', $survey['id'])
+      ->addWhere('activity_type_id:name', '=', 'Survey')
+      ->addWhere('is_deleted', '=', FALSE)
+      ->execute()
+      ->first();
+    $this->assertNotNull($activity);
+
+    // 2. Unreserve respondent
+    $_POST = $_REQUEST = [
+      'operation' => 'reserve',
+      'source_record_id' => $survey['id'],
+      'source_contact_id' => $interviewerId,
+      'target_contact_id' => $voterId,
+      'assignee_contact_id' => $interviewerId,
+      'isReserved' => '0',
+    ];
+
+    try {
+      CRM_Campaign_Page_AJAX::processVoterData();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['status' => 'success', 'error_code' => 0], $e->errorData);
+    }
+
+    $activityAfter = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->addSelect('is_deleted')
+      ->execute()
+      ->first();
+    $this->assertEquals(1, $activityAfter['is_deleted']);
+  }
+
+  /**
+   * Test reserving a voter respondent is denied when user lacks permission on target contact.
+   */
+  public function testProcessVoterDataReserveDeniedWithoutContactPermission(): void {
+    $interviewerId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'reserve campaign contacts']);
+
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'Voter Outreach Survey',
+      'activity_type_id:name' => 'Survey',
+    ]);
+    $voterId = $this->individualCreate();
+
+    $_POST = $_REQUEST = [
+      'operation' => 'reserve',
+      'source_record_id' => $survey['id'],
+      'source_contact_id' => $interviewerId,
+      'target_contact_id' => $voterId,
+      'assignee_contact_id' => $interviewerId,
+      'isReserved' => '1',
+      'surveyTitle' => 'Voter Outreach Survey',
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Campaign_Page_AJAX::processVoterData();
+  }
+
+  /**
+   * Test releasing an activity.
+   */
+  public function testProcessVoterDataReleaseSuccess(): void {
+    $interviewerId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'release campaign contacts', 'view all contacts', 'view all activities', 'view debug output']);
+
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'Release Test Survey',
+      'activity_type_id:name' => 'Survey',
+    ]);
+    $activity = $this->createTestEntity('Activity', [
+      'source_record_id' => $survey['id'],
+      'source_contact_id' => $interviewerId,
+      'activity_type_id:name' => 'Survey',
+      'is_deleted' => 0,
+    ]);
+
+    $_POST = $_REQUEST = [
+      'operation' => 'release',
+      'activity_id' => $activity['id'],
+      'isDelete' => '1',
+    ];
+
+    try {
+      CRM_Campaign_Page_AJAX::processVoterData();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['status' => 'success', 'error_code' => 0], $e->errorData);
+    }
+
+    $activityAfter = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->addSelect('is_deleted')
+      ->execute()
+      ->first();
+    $this->assertEquals(1, $activityAfter['is_deleted']);
+  }
+
+  /**
+   * Test GOTV voting status updates.
+   */
+  public function testProcessVoterDataGotvSuccess(): void {
+    $interviewerId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'gotv campaign contacts', 'view all contacts', 'view all activities']);
+
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'GOTV Test Survey',
+      'activity_type_id:name' => 'Survey',
+    ]);
+    $activity = $this->createTestEntity('Activity', [
+      'source_record_id' => $survey['id'],
+      'source_contact_id' => $interviewerId,
+      'activity_type_id:name' => 'Survey',
+      'status_id:name' => 'Scheduled',
+    ]);
+
+    // 1. Mark as voted
+    $_POST = $_REQUEST = [
+      'operation' => 'gotv',
+      'activity_id' => $activity['id'],
+      'hasVoted' => '1',
+    ];
+
+    try {
+      CRM_Campaign_Page_AJAX::processVoterData();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['status' => 'success', 'error_code' => 0], $e->errorData);
+    }
+
+    $activityAfter = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->addSelect('status_id:name')
+      ->execute()
+      ->first();
+    $this->assertEquals('Completed', $activityAfter['status_id:name']);
+
+    // 2. Mark as not voted
+    $_POST = $_REQUEST = [
+      'operation' => 'gotv',
+      'activity_id' => $activity['id'],
+      'hasVoted' => '0',
+    ];
+
+    try {
+      CRM_Campaign_Page_AJAX::processVoterData();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['status' => 'success', 'error_code' => 0], $e->errorData);
+    }
+
+    $activityAfter2 = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->addSelect('status_id:name')
+      ->execute()
+      ->first();
+    $this->assertEquals('Scheduled', $activityAfter2['status_id:name']);
+  }
+
+  /**
+   * Test processVoterData rejects operations on activities that are not survey activities,
+   * even if source_record_id happens to match an existing survey ID.
+   */
+  public function testProcessVoterDataDeniedForNonSurveyActivity(): void {
+    $interviewerId = $this->createLoggedInUser();
+    $this->setPermissions([
+      'access CiviCRM',
+      'release campaign contacts',
+      'reserve campaign contacts',
+      'gotv campaign contacts',
+      'view all contacts',
+      'view all activities',
+    ]);
+
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'Polymorphic Test Survey',
+      'activity_type_id:name' => 'Survey',
+    ]);
+
+    // Create a non-survey activity whose source_record_id matches the survey ID.
+    $nonSurveyActivity = $this->createTestEntity('Activity', [
+      'source_record_id' => $survey['id'],
+      'source_contact_id' => $interviewerId,
+      'activity_type_id:name' => 'Meeting',
+      'status_id:name' => 'Scheduled',
+      'is_deleted' => 0,
+    ], 'meetingAct');
+
+    // 1. Release should fail and not delete
+    $_POST = $_REQUEST = [
+      'operation' => 'release',
+      'activity_id' => $nonSurveyActivity['id'],
+      'isDelete' => '1',
+    ];
+    try {
+      CRM_Campaign_Page_AJAX::processVoterData();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['status' => NULL, 'error_code' => 0], $e->errorData);
+    }
+    $activityAfterRelease = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('id', '=', $nonSurveyActivity['id'])
+      ->addSelect('is_deleted')
+      ->execute()
+      ->first();
+    $this->assertEquals(0, $activityAfterRelease['is_deleted']);
+
+    // 2. GOTV should fail and not alter status
+    $_POST = $_REQUEST = [
+      'operation' => 'gotv',
+      'activity_id' => $nonSurveyActivity['id'],
+      'hasVoted' => '1',
+    ];
+    try {
+      CRM_Campaign_Page_AJAX::processVoterData();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['status' => NULL, 'error_code' => 0], $e->errorData);
+    }
+    $activityAfterGotv = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('id', '=', $nonSurveyActivity['id'])
+      ->addSelect('status_id:name')
+      ->execute()
+      ->first();
+    $this->assertEquals('Scheduled', $activityAfterGotv['status_id:name']);
+
+    // 3. Reserve should fail and not restore a soft-deleted non-survey activity
+    \Civi\Api4\Activity::update(FALSE)
+      ->addWhere('id', '=', $nonSurveyActivity['id'])
+      ->addValue('is_deleted', 1)
+      ->execute();
+
+    $_POST = $_REQUEST = [
+      'operation' => 'reserve',
+      'activity_id' => $nonSurveyActivity['id'],
+    ];
+    try {
+      CRM_Campaign_Page_AJAX::processVoterData();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals(['status' => NULL, 'error_code' => 0], $e->errorData);
+    }
+    $activityAfterReserve = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('id', '=', $nonSurveyActivity['id'])
+      ->addSelect('is_deleted')
+      ->execute()
+      ->first();
+    $this->assertEquals(1, $activityAfterReserve['is_deleted']);
+  }
+
+  /**
+   * Test registerInterview is denied when user lacks 'interview campaign contacts' permission.
+   */
+  public function testRegisterInterviewDeniedWithoutPermission(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM']);
+
+    $_POST = $_REQUEST = [
+      'voter_id' => 1,
+      'survey_id' => 1,
+      'activity_id' => 1,
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Campaign_Page_AJAX::registerInterview();
+  }
+
+  /**
+   * Test registerInterview is denied when activity does not belong to survey or voter.
+   */
+  public function testRegisterInterviewDeniedOnMismatchedSurveyOrContact(): void {
+    $interviewerId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'interview campaign contacts']);
+
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'Interview Survey',
+      'activity_type_id:name' => 'Survey',
+    ]);
+    $voterId = $this->individualCreate();
+    $otherContactId = $this->individualCreate([], 'other');
+
+    $activity = $this->createTestEntity('Activity', [
+      'source_record_id' => $survey['id'],
+      'source_contact_id' => $interviewerId,
+      'target_contact_id' => [$otherContactId],
+      'activity_type_id:name' => 'Survey',
+      'status_id:name' => 'Scheduled',
+    ]);
+
+    // Mismatched voter (voterId is not target of activity)
+    $_POST = $_REQUEST = [
+      'voter_id' => $voterId,
+      'survey_id' => $survey['id'],
+      'activity_id' => $activity['id'],
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Campaign_Page_AJAX::registerInterview();
+  }
+
+  /**
+   * Test registerInterview is denied when activity type does not match survey activity type.
+   */
+  public function testRegisterInterviewDeniedOnMismatchedActivityType(): void {
+    $interviewerId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'interview campaign contacts']);
+
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'Interview Survey Type Mismatch',
+      'activity_type_id:name' => 'Survey',
+    ]);
+    $voterId = $this->individualCreate();
+
+    $nonSurveyActivity = $this->createTestEntity('Activity', [
+      'source_record_id' => $survey['id'],
+      'source_contact_id' => $interviewerId,
+      'target_contact_id' => [$voterId],
+      'activity_type_id:name' => 'Meeting',
+      'status_id:name' => 'Scheduled',
+    ], 'meetingInterviewAct');
+
+    $_POST = $_REQUEST = [
+      'voter_id' => $voterId,
+      'survey_id' => $survey['id'],
+      'activity_id' => $nonSurveyActivity['id'],
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Campaign_Page_AJAX::registerInterview();
+  }
+
+  /**
+   * Test registerInterview successfully records interview for valid voter and survey activity.
+   */
+  public function testRegisterInterviewSuccess(): void {
+    $interviewerId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'interview campaign contacts']);
+
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'Interview Survey Success',
+      'activity_type_id:name' => 'Survey',
+    ]);
+    $voterId = $this->individualCreate();
+
+    $activity = $this->createTestEntity('Activity', [
+      'source_record_id' => $survey['id'],
+      'source_contact_id' => $interviewerId,
+      'target_contact_id' => [$voterId],
+      'activity_type_id:name' => 'Survey',
+      'status_id:name' => 'Scheduled',
+    ]);
+
+    $_POST = $_REQUEST = [
+      'voter_id' => $voterId,
+      'survey_id' => $survey['id'],
+      'activity_id' => $activity['id'],
+      'activity_type_id' => $activity['activity_type_id'],
+      'interviewer_id' => $interviewerId,
+      'surveyTitle' => 'Interview Survey Success',
+      'result' => 'Completed interview',
+      'note' => 'Positive response',
+    ];
+
+    try {
+      CRM_Campaign_Page_AJAX::registerInterview();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('success', $e->errorData['status']);
+    }
+
+    $activityAfter = \Civi\Api4\Activity::get(FALSE)
+      ->addWhere('id', '=', $activity['id'])
+      ->addSelect('status_id:name', 'result', 'details')
+      ->execute()
+      ->first();
+
+    $this->assertEquals('Completed', $activityAfter['status_id:name']);
+    $this->assertEquals('Completed interview', $activityAfter['result']);
+    $this->assertEquals('Positive response', $activityAfter['details']);
+  }
+
+  /**
+   * Test voterList is denied when user lacks the corresponding campaign permission.
+   */
+  public function testVoterListDeniedWithoutPermission(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM']);
+
+    $_POST = $_REQUEST = [
+      'campaign_search_voter_for' => 'reserve',
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Campaign_Page_AJAX::voterList();
+  }
+
+  /**
+   * Test voterList is denied for missing or invalid search mode.
+   */
+  public function testVoterListInvalidModeDenied(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'administer CiviCampaign']);
+
+    $_POST = $_REQUEST = [
+      'campaign_search_voter_for' => 'invalid_mode',
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Campaign_Page_AJAX::voterList();
+  }
+
+  /**
+   * Test campaignGroups is denied when survey_id is missing.
+   */
+  public function testCampaignGroupsRequiresSurveyId(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'reserve campaign contacts']);
+
+    $_POST = $_REQUEST = [];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('Could not find valid value for survey_id');
+    CRM_Campaign_Page_AJAX::campaignGroups();
+  }
+
+  /**
+   * Test campaignGroups succeeds with valid survey and permission.
+   */
+  public function testCampaignGroupsSuccess(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'reserve campaign contacts']);
+
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'Groups Test Survey',
+      'activity_type_id:name' => 'Survey',
+    ]);
+
+    $_POST = $_REQUEST = ['survey_id' => $survey['id']];
+
+    try {
+      CRM_Campaign_Page_AJAX::campaignGroups();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('success', $e->errorData['status']);
+      $this->assertIsArray($e->errorData['groups']);
+      $this->assertEquals('', $e->errorData['groups'][0]['value']);
+    }
+  }
+
+}

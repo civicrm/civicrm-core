@@ -161,6 +161,18 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
     $session->pushUserContext($url);
 
     if (CRM_Utils_Request::retrieve('confirmed', 'Boolean')) {
+      $relId = $this->getEntityId();
+      $rel = new CRM_Contact_DAO_Relationship();
+      $rel->id = $relId;
+      if (!$rel->find(TRUE) || ($this->getContactId() != $rel->contact_id_a && $this->getContactId() != $rel->contact_id_b)) {
+        CRM_Utils_System::permissionDenied();
+      }
+      if (!CRM_Contact_BAO_Contact_Permission::allow($rel->contact_id_a, CRM_Core_Permission::EDIT) ||
+        !CRM_Contact_BAO_Contact_Permission::allow($rel->contact_id_b, CRM_Core_Permission::EDIT)
+      ) {
+        CRM_Utils_System::permissionDenied();
+      }
+
       if ($this->getCaseId()) {
         //create an activity for case role removal.CRM-4480
         CRM_Case_BAO_Case::createCaseRoleActivity($this->getCaseId(), $this->getEntityId());

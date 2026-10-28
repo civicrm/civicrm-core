@@ -259,6 +259,19 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
       ->setValues(['access_token' => "stranger-token-revised"])
       ->execute();
     $this->assertCount(0, $updateTokensForWrongContact);
+
+    // Attempt to seize stranger's token by ID
+    $this->usePerms(['manage my OAuth contact tokens', 'edit my contact']);
+    try {
+      Civi\Api4\OAuthContactToken::update()
+        ->addWhere('id', '=', $strangerContactToken['id'])
+        ->setValues(['contact_id' => $loggedInContactID])
+        ->execute();
+      $this->fail("User should not be able to seize a stranger's OAuth token");
+    }
+    catch (\Civi\API\Exception\UnauthorizedException $e) {
+      $this->assertEquals('ACL check failed', $e->getMessage());
+    }
   }
 
   public function testDelete() {

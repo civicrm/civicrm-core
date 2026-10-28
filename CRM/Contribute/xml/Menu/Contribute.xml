@@ -219,6 +219,7 @@
     <path>civicrm/ajax/permlocation</path>
     <page_callback>CRM_Core_Page_AJAX_Location::getPermissionedLocation</page_callback>
     <access_arguments>make online contributions</access_arguments>
+    <is_ajax>true</is_ajax>
   </item>
   <item>
     <path>civicrm/contribute/unsubscribe</path>
@@ -317,7 +318,8 @@
   <item>
     <path>civicrm/ajax/softcontributionlist</path>
     <page_callback>CRM_Contribute_Page_AJAX::getSoftContributionRows</page_callback>
-    <access_arguments>access CiviCRM</access_arguments>
+    <access_arguments>access CiviContribute</access_arguments>
+    <is_ajax>true</is_ajax>
   </item>
   <item>
     <path>civicrm/contribute/contributionrecur-payments</path>

@@ -231,37 +231,38 @@
      <page_callback>CRM_Contact_Page_AJAX::relationship</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
      <page_type>3</page_type>
+     <is_ajax>true</is_ajax>
 </item>
 <item>
      <path>civicrm/ajax/customvalue</path>
      <page_callback>CRM_Contact_Page_AJAX::deleteCustomValue</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
      <page_type>3</page_type>
+     <is_ajax>true</is_ajax>
 </item>
 <item>
      <path>civicrm/ajax/cmsuser</path>
      <page_callback>CRM_Contact_Page_AJAX::checkUserName</page_callback>
      <access_callback>1</access_callback>
-</item>
-<item>
-     <path>civicrm/ajax/signature</path>
-     <page_callback>CRM_Contact_Page_AJAX::getSignature</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
 </item>
 <item>
      <path>civicrm/ajax/pdfFormat</path>
      <page_callback>CRM_Contact_Page_AJAX::pdfFormat</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
 </item>
 <item>
      <path>civicrm/ajax/paperSize</path>
      <page_callback>CRM_Contact_Page_AJAX::paperSize</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
 </item>
 <item>
      <path>civicrm/ajax/contactref</path>
      <page_callback>CRM_Contact_Page_AJAX::contactReference</page_callback>
      <access_arguments>access contact reference fields; access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
 </item>
 <item>
    <path>civicrm/dashlet/myCases</path>
@@ -298,6 +299,7 @@
    <path>civicrm/ajax/dedupefind</path>
    <page_callback>CRM_Contact_Page_AJAX::getDedupes</page_callback>
    <access_arguments>merge duplicate contacts</access_arguments>
+   <is_ajax>true</is_ajax>
 </item>
 <item>
   <path>civicrm/contact/dedupemerge</path>
@@ -322,16 +324,31 @@
      <path>civicrm/ajax/markSelection</path>
      <page_callback>CRM_Contact_Page_AJAX::selectUnselectContacts</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
 </item>
 <item>
      <path>civicrm/ajax/toggleDedupeSelect</path>
      <page_callback>CRM_Contact_Page_AJAX::toggleDedupeSelect</page_callback>
      <access_arguments>merge duplicate contacts</access_arguments>
+     <is_ajax>true</is_ajax>
 </item>
 <item>
      <path>civicrm/ajax/flipDupePairs</path>
      <page_callback>CRM_Contact_Page_AJAX::flipDupePairs</page_callback>
      <access_arguments>merge duplicate contacts</access_arguments>
+     <is_ajax>true</is_ajax>
+</item>
+<item>
+     <path>civicrm/ajax/dedupe/process</path>
+     <page_callback>CRM_Contact_Page_AJAX::processDupes</page_callback>
+     <access_arguments>merge duplicate contacts</access_arguments>
+     <is_ajax>true</is_ajax>
+</item>
+<item>
+     <path>civicrm/ajax/contact/address</path>
+     <page_callback>CRM_Contact_Page_AJAX::getAddressDisplay</page_callback>
+     <access_arguments>access CiviCRM</access_arguments>
+     <is_ajax>true</is_ajax>
 </item>
 <item>
   <path>civicrm/activity/sms/add</path>
@@ -345,5 +362,6 @@
     <path>civicrm/ajax/contactrelationships</path>
     <page_callback>CRM_Contact_Page_AJAX::getContactRelationships</page_callback>
     <access_arguments>access CiviCRM;view my contact</access_arguments>
+    <is_ajax>true</is_ajax>
   </item>
 </menu>

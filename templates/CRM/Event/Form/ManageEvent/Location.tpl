@@ -88,33 +88,67 @@
         displayMessage({/literal}{$locUsed}{literal});
 
         $('#loc_event_id', $form).change(function() {
-          $.ajax({
-            url: CRM.url('civicrm/ajax/locBlock', 'reset=1'),
-            data: {'lbid': $(this).val()},
-            dataType: 'json',
-            success: function(data) {
-              var selectLocBlockId = $('#loc_event_id').val();
-              // Only change state when options are loaded.
-              if (data.address_1_state_province_id) {
-                var defaultState = data.address_1_state_province_id;
-                $('#address_1_state_province_id', $form).one('crmOptionsUpdated', function() {
-                  $(this).val(defaultState).change();
-                });
-                delete data.address_1_state_province_id;
+          const selectLocBlockId = $(this).val();
+          if (!selectLocBlockId) {
+            $(":input[id *= 'address_1_'], :input[id *= 'email_'], :input[id *= 'phone_']", $form).val('').change();
+            displayMessage(0);
+            return false;
+          }
+          CRM.api4('LocBlock', 'get', {
+            select: [
+              'address_id.*',
+              'email_id.email',
+              'email_2_id.email',
+              'phone_id.phone',
+              'phone_id.phone_type_id',
+              'phone_id.phone_ext',
+              'phone_2_id.phone',
+              'phone_2_id.phone_type_id',
+              'phone_2_id.phone_ext',
+              'COUNT(event.id) AS count_loc_used'
+            ],
+            join: [
+              ['Event AS event', 'LEFT', ['event.loc_block_id', '=', 'id']]
+            ],
+            where: [['id', '=', selectLocBlockId]],
+            groupBy: ['id']
+          }).then((locBlocks) => {
+            if (!locBlocks.length) {
+              return;
+            }
+            var locBlock = locBlocks[0],
+              data = {};
+            for (const [key, val] of Object.entries(locBlock)) {
+              if (key.startsWith('address_id.') && key !== 'address_id.id') {
+                data['address_1_' + key.substring(11)] = val ?? '';
+              } else if (key.startsWith('email_id.')) {
+                data['email_1_' + key.substring(9)] = val ?? '';
+              } else if (key.startsWith('email_2_id.')) {
+                data['email_2_' + key.substring(11)] = val ?? '';
+              } else if (key.startsWith('phone_id.')) {
+                data['phone_1_' + key.substring(9)] = val ?? '';
+              } else if (key.startsWith('phone_2_id.')) {
+                data['phone_2_' + key.substring(11)] = val ?? '';
               }
-              for(i in data) {
-                if ( i == 'count_loc_used' ) {
-                  if ( ((selectLocBlockId == locBlockId) && data.count_loc_used > 1) ||
-                    ((selectLocBlockId != locBlockId) && data.count_loc_used > 0) ) {
-                    // Counts retrieved via AJAX are already "other" Event counts.
-                    displayMessage(parseInt(data.count_loc_used) + 1);
-                  } else {
-                    displayMessage(0);
-                  }
-                } else {
-                  $('#'+i, $form).val(data[i]).change();
-                }
-              }
+            }
+            // Only change state when options are loaded.
+            if (data.address_1_state_province_id) {
+              var defaultState = data.address_1_state_province_id;
+              $('#address_1_state_province_id', $form).one('crmOptionsUpdated', function() {
+                $(this).val(defaultState).change();
+              });
+              delete data.address_1_state_province_id;
+            }
+            for (const [field, val] of Object.entries(data)) {
+              $('#' + field, $form).val(val).change();
+            }
+            var countLocUsed = locBlock.count_loc_used || 0;
+            if ( ((selectLocBlockId == locBlockId) && countLocUsed > 1) ||
+              ((selectLocBlockId != locBlockId) && countLocUsed > 0) ) {
+              // Counts retrieved via AJAX are already "other" Event counts.
+              displayMessage(parseInt(countLocUsed, 10) + 1);
+            } else {
+              displayMessage(0);
             }
           });
           return false;

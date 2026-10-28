@@ -79,6 +79,7 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
       ->setValues($params)
       ->addWhere('id', '=', $this->getContactID())
       ->execute();
+    $params['check_permissions'] = TRUE;
     CRM_Contact_BAO_Contact::create($params);
 
     $this->response();

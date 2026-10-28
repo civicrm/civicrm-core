@@ -608,4 +608,12 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
     return $clause;
   }
 
+  protected function getRequiredValuesToCreate(string $entity, array $values = []): array {
+    $values = parent::getRequiredValuesToCreate($entity, $values);
+    if (in_array($entity, ['Address', 'Email', 'Phone', 'IM'], TRUE) && empty($values['contact_id'])) {
+      $values['contact_id'] = $this->createTestRecord('Contact')['id'];
+    }
+    return $values;
+  }
+
 }

@@ -14,5 +14,6 @@
     <path>civicrm/ajax/admin/search</path>
     <page_callback>CRM_Search_Page_AJAX</page_callback>
     <access_arguments>administer CiviCRM data;manage own search_kit</access_arguments>
+    <is_ajax>false</is_ajax>
   </item>
 </menu>

@@ -83,7 +83,8 @@ trait ContactSaveTrait {
             $item['contact_id'] = $contact->id;
             $item["is_$type"] = TRUE;
             $saved = civicrm_api4($entity, 'save', [
-              'checkPermissions' => FALSE,
+              // If updating an existing record, check permissions to prevent unauthorized contact_id swapping
+              'checkPermissions' => $this->checkPermissions && !empty($item['id']),
               'records' => [$item],
               'match' => ['contact_id', "is_$type"],
             ])->first();

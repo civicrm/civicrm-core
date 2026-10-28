@@ -29,113 +29,71 @@
    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="botttom"}</div>
 </div>
 
-<script language="JavaScript" type="text/javascript">
+{if $action ne 8}
+<script type="text/javascript">
 {literal}
 CRM.$(function($) {
-  $("#financial_account_id").change(function() {
-    {/literal}
-      relationID = "#account_relationship"
-      financialAccountID = "#financial_account_id"
-      callbackURL = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancialRelation'}"
-    {literal}
-    var financialId = $("#financial_account_id").val();
-    var check = $(relationID).val();
-    if (check == 'select' || financialId == 'select') {
-      callbackURL = callbackURL+"&_value=" + financialId;
-      $.ajax({
-        url: callbackURL,
-      	context: document.body,
-      	success: function(data, textStatus) {
-          $(relationID).html("");//clear old options
-  	  data = eval(data);//get json array
-          if (data != null) {
-    	    for (i = 0; i < data.length; i++) {
-      	      if (data[i].selected == 'Selected') {
-                var idf = data[i].value;
-              }
-              $(relationID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
-    	    }
-          }
-  	  if (idf != null) {
-      	    $(relationID).val(idf);
-          }
-        }
-      });
-    }
-    if (financialId == 'select') {
-      {/literal}
-        callbackURLs = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancial'}"
-      {literal}
-      callbackURLs = callbackURLs + "&_value=select";
-      $.ajax({
-        url: callbackURLs,
-        context: document.body,
-        success: function(data, textStatus) {
-          $(financialAccountID).html("");//clear old options
-    	  data = eval(data);//get json array
-          if (data != null) {
-      	    for (i = 0; i < data.length; i++) {
-              $(financialAccountID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
-            }
-          }
-        }
-      });
-    }
-  });
-  $("#account_relationship").change(function() {
-    {/literal}
-      relationID = "#account_relationship"
-      financialAccountID = "#financial_account_id"
-      callbackURLs = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancial'}"
-    {literal}
-    var financialId = $("#account_relationship").val();
-    var check = $(financialAccountID).val();
-    callbackURLs = callbackURLs+"&_value="+financialId;
-    $.ajax({
-      url: callbackURLs,
-      context: document.body,
-      success: function(data, textStatus) {
-        $(financialAccountID).html("");//clear old options
-        data = eval(data);//get json array
-        if (data != null) {
-          for (i = 0; i < data.length; i++) {
-       	    if (data[i].selected == 'Selected') {
-              var idf = data[i].value;
-            }
-	    $(financialAccountID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
-          }
-        }
-  	if (idf != null) {
-    	  $(financialAccountID).val(idf);
-        }
+  const relations = {/literal}{$financialAccountRelations|json}{literal};
+  const accounts = {/literal}{$financialAccounts|json}{literal};
+  const relationships = {/literal}{$accountRelationships|json}{literal};
+
+  const $rel = $('#account_relationship');
+  const $acc = $('#financial_account_id');
+
+  const resetAccounts = (matchingAccounts, defaultId) => {
+    $acc.empty().append(new Option(ts('- select -'), 'select'));
+    matchingAccounts.forEach((acc) => {
+      $acc.append(new Option(acc.label, acc.id));
+    });
+    $acc.val(defaultId || 'select');
+  };
+
+  const resetRelationships = (matchingRelIds, selectedId) => {
+    $rel.empty().append(new Option(ts('- Select Financial Account Relationship -'), 'select'));
+    matchingRelIds.forEach((id) => {
+      if (relationships[id]) {
+        $rel.append(new Option(relationships[id], id));
       }
     });
-    if (financialId == 'select') {
-      {/literal}
-        callbackURL = "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Financial_Page_AJAX&fnName=jqFinancialRelation'}"
-      {literal}
-      callbackURL = callbackURL+"&_value=select";
-      $.ajax({
-        url: callbackURL,
-        context: document.body,
-        success: function(data, textStatus) {
-          $(relationID).html("");//clear old options
-          data = eval(data);//get json array
-          if (data != null) {
-            for (i = 0; i < data.length; i++) {
-              if (data[i].selected == 'Selected') {
-                var idf = data[i].value;
-              }
-              $(relationID).get(0).add(new Option(data[i].name, data[i].value), document.all ? i : null);
-            }
-          }
-          if (idf != null) {
-            $(relationID).val(idf);
-          }
-        }
-      });
+    $rel.val(selectedId || 'select');
+  };
+
+  $acc.on('change', () => {
+    const financialId = $acc.val();
+    const currentRel = $rel.val();
+
+    if (currentRel === 'select' || financialId === 'select') {
+      if (financialId === 'select') {
+        resetRelationships(Object.keys(relationships));
+        resetAccounts(accounts);
+      }
+      else {
+        const selectedAccount = accounts.find((acc) => acc.id == financialId);
+        const typeId = selectedAccount ? selectedAccount.financial_account_type_id : null;
+        const matchingRelIds = Object.keys(relations).filter((id) => relations[id] == typeId);
+        const autoSelect = matchingRelIds.length === 1 ? matchingRelIds[0] : null;
+        resetRelationships(matchingRelIds, autoSelect);
+      }
+    }
+  });
+
+  $rel.on('change', () => {
+    const relVal = $rel.val();
+
+    if (relVal === 'select') {
+      resetAccounts(accounts);
+      resetRelationships(Object.keys(relationships));
+    }
+    else {
+      const typeId = relations[relVal];
+      const matchingAccounts = typeId
+        ? accounts.filter((acc) => acc.financial_account_type_id == typeId)
+        : accounts;
+      const defaultAcc = matchingAccounts.find((acc) => acc.is_default);
+      resetAccounts(matchingAccounts, defaultAcc ? defaultAcc.id : null);
     }
   });
 });
 {/literal}
 </script>
+{/if}

@@ -21,6 +21,15 @@
  */
 class CRM_Upgrade_Incremental_php_SixNineteen extends CRM_Upgrade_Incremental_Base {
 
+  public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL): void {
+    if ($rev === '6.19.alpha1') {
+      $preUpgradeMessage .= '<p>' . ts('Authenticating using passwords in the Authorization header (%1) is now strongly discouraged, and <b>will not work if you have Multi Factor Authentication enabled</b>. For api calls, you should use api keys instead (%2).', [
+        1 => '<code>Authorization: Basic [user:pass]</code>',
+        2 => '<code>Authorization: Bearer [api_key]</code>',
+      ]) . '</p>';
+    }
+  }
+
   /**
    * Upgrade step; adds tasks including 'runSql'.
    *

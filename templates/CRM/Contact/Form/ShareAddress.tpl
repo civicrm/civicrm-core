@@ -86,11 +86,8 @@
       $householdLabel.toggle(contactType === 'Individual' && otherContactType === 'Household');
 
 
-      $.post(CRM.url('civicrm/ajax/inline'), {
-          'contact_id': sharedContactId,
-          'type': 'method',
-          'class_name': 'CRM_Contact_Page_AJAX',
-          'fn_name': 'getAddressDisplay'
+      $.post(CRM.url('civicrm/ajax/contact/address'), {
+          'contact_id': sharedContactId
         },
         function(response) {
           // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response

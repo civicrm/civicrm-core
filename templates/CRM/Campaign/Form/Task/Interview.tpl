@@ -339,7 +339,7 @@ function releaseOrReserveVoter(voterId) {
   data['activity_id'] = activityId;
 
   var actUrl = {/literal}
-  "{crmURL p='civicrm/ajax/rest' h=0 q='className=CRM_Campaign_Page_AJAX&fnName=processVoterData'}"
+  "{crmURL p='civicrm/ajax/campaign/processvoter' h=0}"
   {literal};
 
     //post data to release / reserve voter.

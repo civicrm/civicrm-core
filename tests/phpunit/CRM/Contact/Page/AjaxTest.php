@@ -22,7 +22,10 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
+    unset($_SERVER['HTTP_X_REQUESTED_WITH']);
     $_REQUEST = $this->originalRequest;
+    $_GET = [];
+    $_POST = [];
     parent::tearDown();
   }
 
@@ -440,6 +443,521 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     foreach ($contactList as $contactId) {
       $this->assertTrue(in_array($contactId, $contactIds));
     }
+  }
+
+  /**
+   * Test toggleDedupeSelect succeeds for a single pair when user has permission.
+   */
+  public function testToggleDedupeSelectSuccess(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'merge duplicate contacts']);
+
+    $contact1 = $this->individualCreate([], 'c1');
+    $contact2 = $this->individualCreate([], 'c2');
+    $cacheKey = 'merge_Individual_1_0_0_test123';
+
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cachekey, is_selected) VALUES ('civicrm_contact', %1, %2, %3, 0)",
+      [1 => [$contact1, 'Positive'], 2 => [$contact2, 'Positive'], 3 => [$cacheKey, 'String']]
+    );
+    $pnid = CRM_Core_DAO::singleValueQuery(
+      "SELECT id FROM civicrm_prevnext_cache WHERE cachekey = %1",
+      [1 => [$cacheKey, 'String']]
+    );
+
+    $_POST = $_REQUEST = [
+      'cacheKey' => $cacheKey,
+      'pnid' => $pnid,
+      'is_selected' => 1,
+    ];
+
+    try {
+      CRM_Contact_Page_AJAX::toggleDedupeSelect();
+
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('success', $e->errorData['status']);
+    }
+
+    $isSelected = CRM_Core_DAO::singleValueQuery(
+      "SELECT is_selected FROM civicrm_prevnext_cache WHERE id = %1",
+      [1 => [$pnid, 'Integer']]
+    );
+    $this->assertEquals(1, $isSelected);
+  }
+
+  /**
+   * Test toggleDedupeSelect succeeds for multiple pairs.
+   */
+  public function testToggleDedupeSelectMultipleSuccess(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'merge duplicate contacts']);
+
+    $contact1 = $this->individualCreate([], 'c1');
+    $contact2 = $this->individualCreate([], 'c2');
+    $contact3 = $this->individualCreate([], 'c3');
+    $cacheKey = 'merge_Individual_1_0_0_testmulti';
+
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cachekey, is_selected) VALUES ('civicrm_contact', %1, %2, %3, 0)",
+      [1 => [$contact1, 'Positive'], 2 => [$contact2, 'Positive'], 3 => [$cacheKey, 'String']]
+    );
+    $pnid1 = CRM_Core_DAO::singleValueQuery(
+      "SELECT id FROM civicrm_prevnext_cache WHERE entity_id1 = %1 AND entity_id2 = %2 AND cachekey = %3",
+      [1 => [$contact1, 'Positive'], 2 => [$contact2, 'Positive'], 3 => [$cacheKey, 'String']]
+    );
+
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cachekey, is_selected) VALUES ('civicrm_contact', %1, %2, %3, 0)",
+      [1 => [$contact1, 'Positive'], 2 => [$contact3, 'Positive'], 3 => [$cacheKey, 'String']]
+    );
+    $pnid2 = CRM_Core_DAO::singleValueQuery(
+      "SELECT id FROM civicrm_prevnext_cache WHERE entity_id1 = %1 AND entity_id2 = %2 AND cachekey = %3",
+      [1 => [$contact1, 'Positive'], 2 => [$contact3, 'Positive'], 3 => [$cacheKey, 'String']]
+    );
+
+    $_POST = $_REQUEST = [
+      'cacheKey' => $cacheKey,
+      'pnid' => [$pnid1, $pnid2],
+      'is_selected' => 1,
+    ];
+
+    try {
+      CRM_Contact_Page_AJAX::toggleDedupeSelect();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('success', $e->errorData['status']);
+    }
+
+    $selectedCount = CRM_Core_DAO::singleValueQuery(
+      "SELECT count(*) FROM civicrm_prevnext_cache WHERE cachekey = %1 AND is_selected = 1",
+      [1 => [$cacheKey, 'String']]
+    );
+    $this->assertEquals(2, $selectedCount);
+  }
+
+  /**
+   * Test toggleDedupeSelect does not update rows if cacheKey only partially matches.
+   */
+  public function testToggleDedupeSelectPartialCacheKeyDoesNotMatch(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'merge duplicate contacts']);
+
+    $contact1 = $this->individualCreate([], 'c1');
+    $contact2 = $this->individualCreate([], 'c2');
+    $cacheKey = 'merge_Individual_1_0_0_test123';
+
+    CRM_Core_DAO::executeQuery(
+      "INSERT INTO civicrm_prevnext_cache (entity_table, entity_id1, entity_id2, cachekey, is_selected) VALUES ('civicrm_contact', %1, %2, %3, 0)",
+      [1 => [$contact1, 'Positive'], 2 => [$contact2, 'Positive'], 3 => [$cacheKey, 'String']]
+    );
+    $pnid = CRM_Core_DAO::singleValueQuery(
+      "SELECT id FROM civicrm_prevnext_cache WHERE cachekey = %1",
+      [1 => [$cacheKey, 'String']]
+    );
+
+    $_POST = $_REQUEST = [
+      'cacheKey' => 'm',
+      'pnid' => $pnid,
+      'is_selected' => 1,
+    ];
+
+    try {
+      CRM_Contact_Page_AJAX::toggleDedupeSelect();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('success', $e->errorData['status']);
+    }
+
+    $isSelected = CRM_Core_DAO::singleValueQuery(
+      "SELECT is_selected FROM civicrm_prevnext_cache WHERE id = %1",
+      [1 => [$pnid, 'Integer']]
+    );
+    $this->assertEquals(0, $isSelected, 'Row should not be updated when cacheKey is only a prefix.');
+  }
+
+  /**
+   * Test toggleDedupeSelect is denied without cacheKey or pnid.
+   */
+  public function testToggleDedupeSelectDeniedWithoutCacheKey(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'merge duplicate contacts']);
+
+    $_POST = $_REQUEST = [
+      'pnid' => 1,
+      'is_selected' => 1,
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('Could not find valid value for cacheKey');
+    CRM_Contact_Page_AJAX::toggleDedupeSelect();
+  }
+
+  /**
+   * Test processDupes endpoint succeeds for creating and removing dedupe exceptions.
+   */
+  public function testProcessDupesEndpointSuccess(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'merge duplicate contacts', 'view all contacts']);
+
+    $contact1 = $this->individualCreate([], 'd1');
+    $contact2 = $this->individualCreate([], 'd2');
+
+    // 1. Mark as not duplicate
+    $_POST = $_REQUEST = [
+      'op' => 'dupe-nondupe',
+      'cid' => $contact1,
+      'oid' => $contact2,
+    ];
+
+    try {
+      CRM_Contact_Page_AJAX::processDupes();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('dupe-nondupe', $e->errorData['status']);
+    }
+
+    $c1 = min($contact1, $contact2);
+    $c2 = max($contact1, $contact2);
+    $exceptionExists = CRM_Core_DAO::singleValueQuery(
+      "SELECT count(*) FROM civicrm_dedupe_exception WHERE contact_id1 = %1 AND contact_id2 = %2",
+      [1 => [$c1, 'Positive'], 2 => [$c2, 'Positive']]
+    );
+    $this->assertEquals(1, $exceptionExists);
+
+    // 2. Remove exception
+    $_POST = $_REQUEST = [
+      'op' => 'nondupe-dupe',
+      'cid' => $contact1,
+      'oid' => $contact2,
+    ];
+
+    try {
+      CRM_Contact_Page_AJAX::processDupes();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertEquals('nondupe-dupe', $e->errorData['status']);
+    }
+
+    $exceptionExistsAfter = CRM_Core_DAO::singleValueQuery(
+      "SELECT count(*) FROM civicrm_dedupe_exception WHERE contact_id1 = %1 AND contact_id2 = %2",
+      [1 => [$c1, 'Positive'], 2 => [$c2, 'Positive']]
+    );
+    $this->assertEquals(0, $exceptionExistsAfter);
+  }
+
+  /**
+   * Test processDupes endpoint is denied when contacts do not exist.
+   */
+  public function testProcessDupesEndpointDeniedWithInvalidContacts(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'merge duplicate contacts']);
+
+    $_POST = $_REQUEST = [
+      'op' => 'dupe-nondupe',
+      'cid' => 999999,
+      'oid' => 999998,
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Contact_Page_AJAX::processDupes();
+  }
+
+  /**
+   * Test getAddressDisplay is denied when contact_id is missing or invalid.
+   */
+  public function testGetAddressDisplayMissingContactIdDenied(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'view all contacts']);
+
+    $_POST = $_REQUEST = [];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Contact_Page_AJAX::getAddressDisplay();
+  }
+
+  /**
+   * Test getAddressDisplay is denied when user lacks permission to view contact.
+   */
+  public function testGetAddressDisplayForbiddenContactDenied(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM']);
+    $contactId = $this->individualCreate([], 'target_contact');
+
+    $_POST = $_REQUEST = ['contact_id' => $contactId];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Contact_Page_AJAX::getAddressDisplay();
+  }
+
+  /**
+   * Test getAddressDisplay succeeds when user has permission to view contact.
+   */
+  public function testGetAddressDisplayPermittedContactSuccess(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'view all contacts']);
+    $contactId = $this->individualCreate([], 'target_contact');
+    $this->createTestEntity('Address', [
+      'contact_id' => $contactId,
+      'street_address' => '123 Fake Street',
+      'city' => 'Metropolis',
+      'location_type_id' => 1,
+    ], 'addr_1');
+
+    $_POST = $_REQUEST = ['contact_id' => $contactId];
+
+    try {
+      CRM_Contact_Page_AJAX::getAddressDisplay();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $data = $e->errorData;
+      $this->assertIsArray($data);
+      $this->assertNotEmpty($data);
+      $firstAddress = reset($data);
+      $this->assertStringContainsString('123 Fake Street', $firstAddress['display_text']);
+    }
+  }
+
+  /**
+   * Test getPCPList succeeds with CiviContribute permission.
+   */
+  public function testGetPCPListPermittedSuccess(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'view all contacts']);
+    $contactId = $this->individualCreate(['first_name' => 'Supporter', 'last_name' => 'Jones'], 'pcp_supporter');
+    $contribPage = $this->createTestEntity('ContributionPage', [
+      'title' => 'PCP Goal Page',
+      'financial_type_id' => 1,
+    ], 'pcp_contrib_page');
+    $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord([
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $contribPage['id'],
+      'target_entity_id' => 1,
+      'is_active' => 1,
+    ]);
+    $pcp = $this->createTestEntity('PCP', [
+      'contact_id' => $contactId,
+      'title' => 'Save the Whales',
+      'page_id' => $contribPage['id'],
+      'page_type' => 'contribute',
+      'status_id' => 1,
+      'pcp_block_id' => $pcpBlock->id,
+    ], 'pcp_entity');
+
+    $_GET['term'] = 'Jones';
+
+    try {
+      CRM_Contact_Page_AJAX::getPCPList();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $data = $e->errorData;
+      $this->assertIsArray($data);
+      $this->assertNotEmpty($data['results']);
+      $this->assertEquals($pcp['id'], $data['results'][0]['id']);
+      $this->assertStringContainsString('Save the Whales', $data['results'][0]['text']);
+    }
+  }
+
+  /**
+   * Test getPCPList respects contact ACLs when user cannot view supporter contact.
+   */
+  public function testGetPCPListContactAclEnforced(): void {
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute']);
+    $contactId = $this->individualCreate(['first_name' => 'Hidden', 'last_name' => 'Supporter'], 'pcp_hidden');
+    $contribPage = $this->createTestEntity('ContributionPage', [
+      'title' => 'PCP Goal Page 2',
+      'financial_type_id' => 1,
+    ], 'pcp_contrib_page2');
+    $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord([
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $contribPage['id'],
+      'target_entity_id' => 1,
+      'is_active' => 1,
+    ]);
+    $this->createTestEntity('PCP', [
+      'contact_id' => $contactId,
+      'title' => 'Hidden PCP Page',
+      'page_id' => $contribPage['id'],
+      'page_type' => 'contribute',
+      'status_id' => 1,
+      'pcp_block_id' => $pcpBlock->id,
+    ], 'pcp_entity2');
+
+    $_GET['term'] = 'Hidden';
+
+    try {
+      CRM_Contact_Page_AJAX::getPCPList();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $data = $e->errorData;
+      $this->assertIsArray($data);
+      $this->assertEmpty($data['results']);
+    }
+  }
+
+  /**
+   * Helper to set up a multi-record custom group and field.
+   */
+  private function createMultiRecordCustomGroup(string $extends = 'Contact'): array {
+    $groupName = uniqid('cg_');
+    $fieldName = uniqid('cf_');
+    $customGroup = $this->createTestEntity('CustomGroup', [
+      'title' => $groupName,
+      'name' => $groupName,
+      'extends' => $extends,
+      'is_multiple' => TRUE,
+    ], 'custom_group_' . $groupName);
+
+    $this->createTestEntity('CustomField', [
+      'label' => $fieldName,
+      'name' => $fieldName,
+      'custom_group_id' => $customGroup['id'],
+      'html_type' => 'Text',
+      'data_type' => 'String',
+    ], 'custom_field_' . $fieldName);
+
+    return [$customGroup, $groupName, $fieldName];
+  }
+
+  /**
+   * Test successful deletion of a custom value by authorized user.
+   */
+  public function testDeleteCustomValueSuccess(): void {
+    [$customGroup, $groupName, $fieldName] = $this->createMultiRecordCustomGroup();
+
+    $contactId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'edit my contact', 'access all custom data']);
+
+    $customValueId = civicrm_api4("Custom_{$groupName}", 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'entity_id' => $contactId,
+        $fieldName => 'User Data',
+      ],
+    ])->first()['id'];
+
+    $_REQUEST['valueID'] = $customValueId;
+    $_REQUEST['groupID'] = $customGroup['id'];
+    $_REQUEST['contactId'] = $contactId;
+
+    ob_start();
+    try {
+      CRM_Contact_Page_AJAX::deleteCustomValue();
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      // Expected exit from AJAX endpoint
+    }
+    ob_end_clean();
+
+    $remaining = civicrm_api4("Custom_{$groupName}", 'get', [
+      'checkPermissions' => FALSE,
+      'where' => [['id', '=', $customValueId]],
+    ]);
+    $this->assertCount(0, $remaining);
+  }
+
+  /**
+   * Test that an attacker cannot delete another contact's custom value using their own contact ID.
+   */
+  public function testDeleteCustomValueDeniedForOtherContact(): void {
+    [$customGroup, $groupName, $fieldName] = $this->createMultiRecordCustomGroup();
+
+    $userContactId = $this->createLoggedInUser();
+    $victimContactId = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Victim',
+    ], 'victim')['id'];
+
+    $this->setPermissions(['access CiviCRM', 'edit my contact', 'access all custom data']);
+
+    $victimCustomValueId = civicrm_api4("Custom_{$groupName}", 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'entity_id' => $victimContactId,
+        $fieldName => 'Victim Secret',
+      ],
+    ])->first()['id'];
+
+    $_REQUEST['valueID'] = $victimCustomValueId;
+    $_REQUEST['groupID'] = $customGroup['id'];
+    $_REQUEST['contactId'] = $userContactId;
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+
+    CRM_Contact_Page_AJAX::deleteCustomValue();
+  }
+
+  /**
+   * Test that deletion is denied if user lacks edit permission on the contact.
+   */
+  public function testDeleteCustomValueDeniedWithoutContactEditPermission(): void {
+    [$customGroup, $groupName, $fieldName] = $this->createMultiRecordCustomGroup();
+
+    $contactId = $this->createTestEntity('Contact', [
+      'contact_type' => 'Individual',
+      'first_name' => 'ViewOnly',
+    ], 'view_only')['id'];
+
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'view all contacts', 'access all custom data']);
+
+    $customValueId = civicrm_api4("Custom_{$groupName}", 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'entity_id' => $contactId,
+        $fieldName => 'View Only Data',
+      ],
+    ])->first()['id'];
+
+    $_REQUEST['valueID'] = $customValueId;
+    $_REQUEST['groupID'] = $customGroup['id'];
+    $_REQUEST['contactId'] = $contactId;
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+
+    CRM_Contact_Page_AJAX::deleteCustomValue();
+  }
+
+  /**
+   * Test that deletion is denied if custom group does not extend Contact.
+   */
+  public function testDeleteCustomValueDeniedForNonContactGroup(): void {
+    [$customGroup, $groupName, $fieldName] = $this->createMultiRecordCustomGroup('Activity');
+
+    $contactId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'edit all contacts', 'access all custom data']);
+
+    $activity = $this->createTestEntity('Activity', [
+      'source_contact_id' => $contactId,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Meeting Test',
+    ], 'activity');
+
+    $customValueId = civicrm_api4("Custom_{$groupName}", 'create', [
+      'checkPermissions' => FALSE,
+      'values' => [
+        'entity_id' => $activity['id'],
+        $fieldName => 'Activity Data',
+      ],
+    ])->first()['id'];
+
+    $_REQUEST['valueID'] = $customValueId;
+    $_REQUEST['groupID'] = $customGroup['id'];
+    $_REQUEST['contactId'] = $contactId;
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+
+    CRM_Contact_Page_AJAX::deleteCustomValue();
   }
 
 }

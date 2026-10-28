@@ -15,11 +15,18 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\Event\AuthorizeRecordEvent;
+
 /**
  * BAO object for crm_note table.
  */
 class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInterface {
   use CRM_Core_DynamicFKAccessTrait;
+  use CRM_Core_OwnershipAccessTrait;
+
+  protected static function getOwnerContactIdField(): string {
+    return 'contact_id';
+  }
 
   /**
    * Const the max number of notes we display at any given time.
@@ -65,12 +72,6 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
       return NULL;
     }
 
-    if (!empty($params['entity_table']) && $params['entity_table'] == 'civicrm_contact' && !empty($params['check_permissions'])) {
-      if (!CRM_Contact_BAO_Contact_Permission::allow($params['entity_id'], CRM_Core_Permission::EDIT)) {
-        throw new CRM_Core_Exception('Permission denied to modify contact record');
-      }
-    }
-
     $loggedInContactID = CRM_Core_Session::getLoggedInContactID();
 
     $id = $params['id'] ?? $ids['id'] ?? NULL;
@@ -90,6 +91,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
         $params['contact_id'] = $params['entity_id'];
       }
     }
+
+    CRM_Utils_Hook::pre($id ? 'edit' : 'create', 'Note', $id, $params);
 
     $note = new CRM_Core_BAO_Note();
     $note->copyValues($params);
@@ -208,12 +211,53 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
    * @param \Civi\Core\Event\PreEvent $event
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
+    if (!empty($event->params['check_permissions']) && ($event->action === 'edit' || $event->action === 'delete') && $event->id) {
+      if ($event->action === 'delete') {
+        self::checkDynamicFKAccessPre($event);
+      }
+      self::checkPrivacyAccess((int) $event->id, $event->params);
+    }
     if ($event->action === 'delete' && $event->id) {
       // When deleting a note, also delete child notes
       // This causes recursion as this hook is called again while deleting child notes,
       // So the children of children, etc. will also be deleted.
       foreach (self::getDescendentIds($event->id) as $child) {
-        self::deleteRecord(['id' => $child]);
+        self::deleteRecord(['id' => $child, 'check_permissions' => !empty($event->params['check_permissions'])]);
+      }
+    }
+  }
+
+  protected static function checkPrivacyAccess(int $id, array $params = []): void {
+    $userId = CRM_Core_Session::getLoggedInContactID() ?: 0;
+    if (CRM_Core_Permission::check('view all notes', $userId)) {
+      return;
+    }
+    $privacy = (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'privacy');
+    $newPrivacy = isset($params['privacy']) ? (int) $params['privacy'] : $privacy;
+    if ($privacy === 1 || $newPrivacy === 1) {
+      $authorId = (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'contact_id');
+      if (!$userId || $userId !== $authorId) {
+        throw new \Civi\API\Exception\UnauthorizedException(ts('Permission denied to modify private note.'));
+      }
+    }
+  }
+
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
+    $record = $e->getRecord();
+    $id = $record['id'] ?? NULL;
+    $userId = $e->getUserID() ?: (CRM_Core_Session::getLoggedInContactID() ?: 0);
+
+    if (CRM_Core_Permission::check('view all notes', $userId)) {
+      return;
+    }
+
+    $privacy = (int) ($record['privacy'] ?? ($id ? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'privacy') : 0));
+    $storedPrivacy = $id ? (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'privacy') : 0;
+    if ($privacy === 1 || $storedPrivacy === 1) {
+      $authorId = (int) ($id ? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'contact_id') : ($record['contact_id'] ?? 0));
+      if (!$userId || $authorId !== (int) $userId) {
+        $e->setAuthorized(FALSE);
+        $e->stopPropagation();
       }
     }
   }
@@ -340,7 +384,12 @@ ORDER BY  modified_date desc";
     $note->entity_id = $parentId;
     $note->orderBy('modified_date asc');
     $note->find();
+    $canViewAllNotes = CRM_Core_Permission::check('view all notes');
+    $currentUserId = CRM_Core_Session::getLoggedInContactID() ?: 0;
     while ($note->fetch()) {
+      if ((int) $note->privacy === 1 && !$canViewAllNotes && (!$currentUserId || (int) $note->contact_id !== (int) $currentUserId)) {
+        continue;
+      }
       CRM_Core_DAO::storeValues($note, $tree[$note->id]);
 
       // get name of user that created this note

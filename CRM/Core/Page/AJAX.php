@@ -35,20 +35,11 @@ class CRM_Core_Page_AJAX {
       throw new CRM_Core_Exception(ts('Invalid className: %1', [1 => $className]));
     }
 
-    $fnName = NULL;
-    if (isset($_REQUEST['fn_name'])) {
-      $fnName = CRM_Utils_Type::escape($_REQUEST['fn_name'], 'String');
-    }
-
-    if (!self::checkAuthz($type, $className, $fnName)) {
+    if (!self::checkAuthz($type, $className)) {
       CRM_Utils_System::civiExit();
     }
 
     switch ($type) {
-      case 'method':
-        call_user_func([$className, $fnName]);
-        break;
-
       case 'page':
       case 'class':
       case '':
@@ -75,18 +66,42 @@ class CRM_Core_Page_AJAX {
    *
    */
   public static function setIsQuickConfig() {
-    $id = $context = NULL;
-    if (!empty($_REQUEST['id'])) {
-      $id = CRM_Utils_Type::escape($_REQUEST['id'], 'Integer');
-    }
-
+    $id = CRM_Utils_Request::retrieve('id', 'Positive');
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
 
-    // return false if $id is null and
-    // $context is not civicrm_event or civicrm_contribution_page
-    if (!$id || !in_array($context, ['civicrm_event', 'civicrm_contribution_page'])) {
-      return FALSE;
+    // Return permission denied if $id is null or $context is not civicrm_event or civicrm_contribution_page
+    if (!$id || !in_array($context, ['civicrm_event', 'civicrm_contribution_page'], TRUE)) {
+      CRM_Utils_System::permissionDenied();
     }
+
+    if ($context === 'civicrm_event') {
+      if (!CRM_Core_Permission::check('access CiviEvent') || !CRM_Event_BAO_Event::checkPermission($id, CRM_Core_Permission::EDIT)) {
+        CRM_Utils_System::permissionDenied();
+      }
+      if (!CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $id, 'id')) {
+        CRM_Utils_System::permissionDenied();
+      }
+    }
+    elseif ($context === 'civicrm_contribution_page') {
+      if (!CRM_Core_Permission::check('access CiviContribute') || !CRM_Core_Permission::check('administer CiviCRM')) {
+        CRM_Utils_System::permissionDenied();
+      }
+      $page = \Civi\Api4\ContributionPage::get(FALSE)
+        ->addWhere('id', '=', $id)
+        ->addSelect('financial_type_id')
+        ->execute()
+        ->first();
+      if (!$page) {
+        CRM_Utils_System::permissionDenied();
+      }
+      if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus() && !empty($page['financial_type_id'])) {
+        $financialTypeName = CRM_Contribute_PseudoConstant::financialType($page['financial_type_id']);
+        if (!$financialTypeName || !CRM_Core_Permission::check('edit contributions of type ' . $financialTypeName)) {
+          CRM_Utils_System::permissionDenied();
+        }
+      }
+    }
+
     $priceSetId = CRM_Price_BAO_PriceSet::getFor($context, $id, NULL);
     if ($priceSetId) {
       $sql = "UPDATE
@@ -97,7 +112,7 @@ class CRM_Core_Page_AJAX {
       ";
       CRM_Core_DAO::executeQuery($sql, [1 => [$id, 'Integer']]);
 
-      if ($context == 'civicrm_event') {
+      if ($context === 'civicrm_event') {
         CRM_Core_BAO_Discount::del($id, $context);
       }
     }
@@ -106,31 +121,18 @@ class CRM_Core_Page_AJAX {
   }
 
   /**
-   * Determine whether the request is for a valid class/method name.
+   * Determine whether the request is for a valid class/page name.
    *
    * @param string $type
-   *   'method'|'class'|''.
+   *   'page'|'class'|''.
    * @param string $className
    *   'Class_Name'.
-   * @param string $fnName
-   *   Method name.
    *
    * @return bool
    */
-  public static function checkAuthz($type, $className, $fnName = NULL) {
+  public static function checkAuthz($type, $className) {
     self::validateAjaxRequestMethod();
     switch ($type) {
-      case 'method':
-        if (!preg_match('/^CRM_[a-zA-Z0-9]+_Page_AJAX$/', $className)) {
-          return FALSE;
-        }
-        if (!preg_match('/^[a-zA-Z0-9]+$/', $fnName)) {
-          return FALSE;
-        }
-
-        // ensure that function exists
-        return method_exists($className, $fnName);
-
       case 'page':
       case 'class':
       case '':

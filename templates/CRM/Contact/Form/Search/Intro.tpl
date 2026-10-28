@@ -27,7 +27,7 @@
         {help id="add-to-smartGroup" title=$helpTitle}
       {/if}
   {/if}
-  {if $permissionEditSmartGroup}
+  {if $permissionEditGroupSettings}
     {capture assign=groupSettingsURL}{crmURL p='civicrm/group/edit' q="action=update&id=`$group.id`&reset=1"}{/capture}
         <a href="{$groupSettingsURL}" class="action-item button"><span><i class="crm-i fa-wrench" role="img" aria-hidden="true"></i> {ts}Edit Group Settings{/ts}</span></a>
   {/if}

@@ -111,8 +111,8 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   }
 
   public function preProcess() {
-    $this->_contactId = $this->get('contactId');
-    $this->_relationshipId = $this->get('id');
+    $this->_contactId = $this->get('contactId') ?: CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->_relationshipId = $this->get('id') ?: CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
     $contact = \Civi\Api4\Contact::get(FALSE)
       ->addSelect('display_name', 'contact_type')
@@ -121,7 +121,7 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
       ->first();
     $this->_contactType = $contact['contact_type'];
     $this->_display_name_a = $contact['display_name'];
-    $this->assign('display_name_a', htmlspecialchars($this->_display_name_a));
+    $this->assign('display_name_a', htmlspecialchars((string) $this->_display_name_a));
 
     $this->_rtype = CRM_Utils_Request::retrieve('rtype', 'String', $this);
     $this->_rtypeId = CRM_Utils_Request::retrieve('relTypeId', 'String', $this);
@@ -165,10 +165,10 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
     // Check for permissions
     if (in_array($this->_action, [CRM_Core_Action::ADD, CRM_Core_Action::UPDATE, CRM_Core_Action::DELETE])) {
       if (!CRM_Contact_BAO_Contact_Permission::allow($this->_contactId, CRM_Core_Permission::EDIT)
-        ||
-        (!empty($this->_values['contact_id_b']) && !CRM_Contact_BAO_Contact_Permission::allow($this->_values['contact_id_b'], CRM_Core_Permission::EDIT))
+        || (!empty($this->_values['contact_id_a']) && !CRM_Contact_BAO_Contact_Permission::allow($this->_values['contact_id_a'], CRM_Core_Permission::EDIT))
+        || (!empty($this->_values['contact_id_b']) && !CRM_Contact_BAO_Contact_Permission::allow($this->_values['contact_id_b'], CRM_Core_Permission::EDIT))
       ) {
-        CRM_Core_Error::statusBounce(ts('You do not have the necessary permission to edit this contact.'));
+        CRM_Utils_System::permissionDenied();
       }
     }
 
@@ -548,7 +548,18 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   private function updateAction($params) {
-    [$params, $_] = $this->preparePostProcessParameters($params);
+    [$params, $primaryContactLetter] = $this->preparePostProcessParameters($params);
+    $secondaryContactLetter = ($primaryContactLetter == 'a') ? 'b' : 'a';
+    $relatedContactId = $params['contact_id_' . $secondaryContactLetter] ?? NULL;
+    if ($relatedContactId) {
+      if (!CRM_Contact_BAO_Contact_Permission::allow($relatedContactId, CRM_Core_Permission::VIEW)) {
+        CRM_Utils_System::permissionDenied();
+      }
+      $permOverRelated = ($secondaryContactLetter === 'b') ? !empty($params['is_permission_a_b']) : !empty($params['is_permission_b_a']);
+      if ($permOverRelated && !CRM_Contact_BAO_Contact_Permission::allow($relatedContactId, CRM_Core_Permission::EDIT)) {
+        CRM_Utils_System::permissionDenied();
+      }
+    }
     try {
       civicrm_api3('relationship', 'create', $params);
     }
@@ -570,6 +581,18 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
    */
   private function createAction($params) {
     [$params, $primaryContactLetter] = $this->preparePostProcessParameters($params);
+    $secondaryContactLetter = ($primaryContactLetter == 'a') ? 'b' : 'a';
+    $relatedContactIds = (array) ($params['contact_id_' . $secondaryContactLetter] ?? []);
+
+    foreach ($relatedContactIds as $relatedContactId) {
+      if (!$relatedContactId || !CRM_Contact_BAO_Contact_Permission::allow($relatedContactId, CRM_Core_Permission::VIEW)) {
+        CRM_Utils_System::permissionDenied();
+      }
+      $permOverRelated = ($secondaryContactLetter === 'b') ? !empty($params['is_permission_a_b']) : !empty($params['is_permission_b_a']);
+      if ($permOverRelated && !CRM_Contact_BAO_Contact_Permission::allow($relatedContactId, CRM_Core_Permission::EDIT)) {
+        CRM_Utils_System::permissionDenied();
+      }
+    }
 
     $outcome = CRM_Contact_BAO_Relationship::createMultiple($params, $primaryContactLetter);
 

@@ -331,4 +331,59 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['count']);
   }
 
+  /**
+   * Test that a non-admin cannot steal another contact's note using APIv3.
+   */
+  public function testCannotStealNoteWithCheckPermissions(): void {
+    $userContact = $this->individualCreate(['first_name' => 'User'], 'user');
+    $otherContact = $this->individualCreate(['first_name' => 'Other'], 'other');
+    $otherNote = $this->createTestEntity('Note', [
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $otherContact,
+      'note' => 'Victim Secret',
+    ]);
+
+    \CRM_Core_Session::singleton()->set('userID', $userContact);
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $this->callAPIFailure('Note', 'create', [
+      'id' => $otherNote['id'],
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $userContact,
+      'check_permissions' => 1,
+    ]);
+  }
+
+  /**
+   * Test that a non-admin cannot change the contact_id (author) of an existing note.
+   */
+  public function testCannotChangeNoteAuthorWithCheckPermissions(): void {
+    $authorContact = $this->individualCreate(['first_name' => 'Author'], 'author');
+    $userContact = $this->individualCreate(['first_name' => 'User'], 'user');
+
+    $note = $this->createTestEntity('Note', [
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $userContact,
+      'contact_id' => $authorContact,
+      'note' => 'Original Author Note',
+    ]);
+
+    \CRM_Core_Session::singleton()->set('userID', $userContact);
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $this->callAPIFailure('Note', 'create', [
+      'id' => $note['id'],
+      'contact_id' => $userContact,
+      'check_permissions' => 1,
+    ]);
+  }
+
 }

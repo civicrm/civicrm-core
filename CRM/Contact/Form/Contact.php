@@ -748,6 +748,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
           'name' => ts('Delete Contact Image'),
           'url' => 'civicrm/contact/image',
           'qs' => 'reset=1&cid=%%id%%&action=delete',
+          'weight' => 0,
         ],
       ];
       $deleteURL = CRM_Core_Action::formLink($deleteURL,

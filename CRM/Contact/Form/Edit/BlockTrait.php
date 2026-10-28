@@ -110,14 +110,14 @@ trait CRM_Contact_Form_Edit_BlockTrait {
 
     if ($records) {
       civicrm_api4($entity, 'save', [
-        'checkPermissions' => FALSE,
+        'checkPermissions' => TRUE,
         'records' => array_values($records),
       ]);
     }
 
     if (!empty($existingRecords)) {
       civicrm_api4($entity, 'delete', [
-        'checkPermissions' => FALSE,
+        'checkPermissions' => TRUE,
         'where' => [['id', 'IN', array_keys($existingRecords)]],
       ]);
     }

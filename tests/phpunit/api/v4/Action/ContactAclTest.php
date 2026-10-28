@@ -21,9 +21,13 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
+use Civi\Api4\Address;
 use Civi\Api4\Contact;
+use Civi\Api4\Dashboard;
 use Civi\Api4\Email;
+use Civi\Api4\Group;
 use Civi\Api4\Individual;
+use Civi\Api4\IM;
 use Civi\Api4\LocationType;
 use Civi\Api4\Organization;
 use Civi\Api4\Phone;
@@ -36,6 +40,12 @@ use Civi\Test\TransactionalInterface;
 class ContactAclTest extends Api4TestBase implements TransactionalInterface, HookInterface {
 
   use \Civi\Test\ACLPermissionTrait;
+
+  public function tearDown(): void {
+    \CRM_Utils_Hook::singleton()->reset();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
+    parent::tearDown();
+  }
 
   public function testPermissionInfo(): void {
     foreach (['Contact', 'Individual', 'Organization', 'Household'] as $entity) {
@@ -138,6 +148,74 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertCount(1, $result);
   }
 
+  /**
+   * Tests that a user with no permissions cannot get addresses, emails, phones, and IMs with NULL contact_id.
+   */
+  public function testNullContactIdGetWithoutPermissions(): void {
+    $contact = $this->createTestEntity('Contact', [
+      'first_name' => 'Hidden',
+      'last_name' => 'Contact',
+    ], 'contact');
+
+    $nullAddress = $this->createTestEntity('Address', [
+      'street_address' => '123 Main St',
+      'contact_id' => NULL,
+    ], 'null_address');
+    $contactAddress = $this->createTestEntity('Address', [
+      'street_address' => '456 Elm St',
+      'contact_id' => $contact['id'],
+    ], 'contact_address');
+
+    $nullEmail = $this->createTestEntity('Email', [
+      'email' => 'null@example.com',
+      'contact_id' => NULL,
+    ], 'null_email');
+    $contactEmail = $this->createTestEntity('Email', [
+      'email' => 'contact@example.com',
+      'contact_id' => $contact['id'],
+    ], 'contact_email');
+
+    $nullPhone = $this->createTestEntity('Phone', [
+      'phone' => '1234567',
+      'contact_id' => NULL,
+    ], 'null_phone');
+    $contactPhone = $this->createTestEntity('Phone', [
+      'phone' => '7654321',
+      'contact_id' => $contact['id'],
+    ], 'contact_phone');
+
+    $nullIM = $this->createTestEntity('IM', [
+      'name' => 'null_user',
+      'contact_id' => NULL,
+    ], 'null_im');
+    $contactIM = $this->createTestEntity('IM', [
+      'name' => 'contact_user',
+      'contact_id' => $contact['id'],
+    ], 'contact_im');
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    $addresses = Address::get()
+      ->addWhere('id', 'IN', [$nullAddress['id'], $contactAddress['id']])
+      ->execute();
+    $this->assertCount(0, $addresses);
+
+    $emails = Email::get()
+      ->addWhere('id', 'IN', [$nullEmail['id'], $contactEmail['id']])
+      ->execute();
+    $this->assertCount(0, $emails);
+
+    $phones = Phone::get()
+      ->addWhere('id', 'IN', [$nullPhone['id'], $contactPhone['id']])
+      ->execute();
+    $this->assertCount(0, $phones);
+
+    $ims = IM::get()
+      ->addWhere('id', 'IN', [$nullIM['id'], $contactIM['id']])
+      ->execute();
+    $this->assertCount(0, $ims);
+  }
+
   public function testContactAclClauseDedupe(): void {
     $cid = $this->saveTestRecords('Individual', ['records' => 4])
       ->column('id');
@@ -188,6 +266,85 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertEquals(array_slice($email, 1), $locationTypeGet->column('email.id'));
     // ACL clause should have been inserted once
     $this->assertEquals(1, substr_count($locationTypeGet->debug['sql'][0], 'civicrm_acl_contact_cache'));
+  }
+
+  public function testContactAclBypassViaDashboardJoin(): void {
+    $firstDash = $this->createTestRecord('Dashboard')['id'];
+    $indId = 0;
+    $allInds = [];
+    while ($indId < $firstDash + 4 || count($allInds) < 4) {
+      $indId = $this->createTestRecord('Individual')['id'];
+      $allInds[] = $indId;
+    }
+    $cid = array_slice($allInds, -4);
+
+    $dashId = $firstDash;
+    while ($dashId < max($cid)) {
+      $dashId = $this->createTestRecord('Dashboard')['id'];
+    }
+
+    // Grant access to all but contact 0
+    $this->allowedContacts = array_slice($cid, 1);
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view debug output'];
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_aclWhereClause', [$this, 'aclWhereMultipleContacts']);
+
+    // Direct query on Contact should only return the 3 allowed contacts
+    $this->assertCount(3, Contact::get()->execute());
+
+    // Joining through Dashboard should NOT bypass contact ACLs
+    $dashboardGet = Dashboard::get()
+      ->setCheckPermissions(TRUE)
+      ->addSelect('id', 'c.id', 'c.display_name')
+      ->addJoin('Contact AS c', 'INNER', ['c.id', '=', 'id'])
+      ->addWhere('id', 'IN', $cid)
+      ->execute();
+
+    $this->assertCount(3, $dashboardGet);
+    $this->assertEquals($this->allowedContacts, $dashboardGet->column('c.id'));
+  }
+
+  public function testActivityAclBypassViaGroupJoin(): void {
+    $firstGroup = $this->createTestRecord('Group')['id'];
+    $actId = 0;
+    $allActs = [];
+    while ($actId < $firstGroup + 4 || count($allActs) < 4) {
+      $actId = $this->createTestRecord('Activity')['id'];
+      $allActs[] = $actId;
+    }
+    $activities = array_slice($allActs, -4);
+
+    $groupId = $firstGroup;
+    while ($groupId < max($activities)) {
+      $groupId = $this->createTestRecord('Group')['id'];
+    }
+
+    $allowedActivities = array_slice($activities, 0, 2);
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_selectWhereClause', function ($entity, &$clauses) use ($allowedActivities, $activities) {
+      $entityName = is_object($entity) ? \CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($entity)) : $entity;
+      if ($entityName === 'Activity') {
+        $clauses['id'][] = 'IN (' . implode(',', $allowedActivities) . ')';
+      }
+      elseif ($entityName === 'Group') {
+        $clauses['id'][] = 'IN (' . implode(',', $activities) . ')';
+      }
+    });
+
+    $actGet = Activity::get()
+      ->setCheckPermissions(TRUE)
+      ->addSelect('id')
+      ->addWhere('id', 'IN', $activities)
+      ->execute();
+    $this->assertCount(2, $actGet);
+    $this->assertEquals($allowedActivities, $actGet->column('id'));
+
+    $groupGet = Group::get()
+      ->setCheckPermissions(TRUE)
+      ->addSelect('act.id', 'act.subject')
+      ->addJoin('Activity AS act', 'INNER', ['act.id', '=', 'id'])
+      ->addWhere('id', 'IN', $activities)
+      ->execute();
+    $this->assertCount(2, $groupGet);
+    $this->assertEquals($allowedActivities, $groupGet->column('act.id'));
   }
 
   public function testAclCacheBuildDoubleChecksRetrieveUnderLock(): void {
