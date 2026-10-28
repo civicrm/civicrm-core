@@ -141,6 +141,13 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   protected $ids = [];
 
   /**
+   * Ids given to the rows loaded by loadXMLDataSet(), keyed by table and the id in the file.
+   *
+   * @var array
+   */
+  private $xmlDataSetIDs = [];
+
+  /**
    * Should financials be checked after the test but before tear down.
    *
    * Ideally all tests (or at least all that call any financial api calls ) should do this but there
@@ -415,38 +422,97 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * This could do with further tidy up - the initial priority is simply to get rid of
    * the dbunity package which is no longer supported.
    *
+   * The ids in the file are not used as they are: each table's ids are moved
+   * past its current auto-increment (as are the foreign keys that point at
+   * them), so the rows don't depend on or collide with other ids. Use
+   * getXMLDataSetID() to find the id a row was given.
+   *
    * @param string $fileName
    */
   protected function loadXMLDataSet($fileName) {
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 0');
     $xml = json_decode(json_encode(simplexml_load_file($fileName)), TRUE);
+    $rows = [];
     foreach ($xml as $tableName => $element) {
-      if (!empty($element)) {
-        foreach ($element as $row) {
-          $keys = $values = [];
-          if (isset($row['@attributes'])) {
-            foreach ($row['@attributes'] as $key => $value) {
-              $keys[] = $key;
-              $values[] = is_numeric($value) ? $value : "'{$value}'";
-            }
-          }
-          elseif (!empty($row)) {
-            // cos we copied it & it is inconsistent....
-            foreach ($row as $key => $value) {
-              $keys[] = $key;
-              $values[] = is_numeric($value) ? $value : "'{$value}'";
-            }
-          }
-
-          if (!empty($values)) {
-            CRM_Core_DAO::executeQuery("
-            INSERT INTO $tableName (" . implode(',', $keys) . ') VALUES(' . implode(',', $values) . ')'
-            );
-          }
+      foreach ($element as $row) {
+        // cos we copied it & it is inconsistent....
+        $row = $row['@attributes'] ?? $row;
+        if (!empty($row)) {
+          $rows[] = [$tableName, $row];
         }
       }
     }
+    $shifts = [];
+    foreach (array_unique(array_column($rows, 0)) as $tableName) {
+      $nextID = CRM_Core_DAO::singleValueQuery('SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %1', [1 => [$tableName, 'String']]);
+      $shifts[$tableName] = max(0, (int) $nextID - 1);
+    }
+    foreach ($rows as [$tableName, $row]) {
+      $foreignKeys = $this->getXMLDataSetForeignKeys($tableName);
+      $keys = $values = [];
+      foreach ($row as $key => $value) {
+        $referencedTable = $key === 'id' ? $tableName : ($foreignKeys[$key] ?? NULL);
+        if ($key === 'entity_id' && isset($row['entity_table'])) {
+          $referencedTable = $row['entity_table'];
+        }
+        if ($referencedTable && isset($shifts[$referencedTable]) && is_numeric($value) && $value > 0) {
+          $value += $shifts[$referencedTable];
+          if ($key === 'id') {
+            $this->xmlDataSetIDs[$tableName][$row['id']] = (int) $value;
+          }
+        }
+        $keys[] = $key;
+        $values[] = is_numeric($value) ? $value : "'{$value}'";
+      }
+      CRM_Core_DAO::executeQuery("
+            INSERT INTO $tableName (" . implode(',', $keys) . ') VALUES(' . implode(',', $values) . ')'
+      );
+    }
     CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1');
+  }
+
+  /**
+   * Get the id given to a row loaded by loadXMLDataSet().
+   *
+   * @param string $tableName
+   * @param int $id
+   *   The row's id in the XML file.
+   *
+   * @return int
+   */
+  protected function getXMLDataSetID(string $tableName, int $id): int {
+    return $this->xmlDataSetIDs[$tableName][$id];
+  }
+
+  /**
+   * Get the ids given to the rows of a table loaded by loadXMLDataSet().
+   *
+   * @param string $tableName
+   *
+   * @return int[]
+   *   The new ids, keyed by the ids in the XML file.
+   */
+  protected function getXMLDataSetIDs(string $tableName): array {
+    return $this->xmlDataSetIDs[$tableName];
+  }
+
+  /**
+   * Get the foreign key columns of a table, and the tables they reference.
+   *
+   * @param string $tableName
+   *
+   * @return array
+   *   e.g. ['contact_id' => 'civicrm_contact']
+   */
+  private function getXMLDataSetForeignKeys(string $tableName): array {
+    $foreignKeys = [];
+    $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($tableName);
+    foreach ($daoName ? $daoName::getSupportedFields() : [] as $field) {
+      if (!empty($field['FKClassName'])) {
+        $foreignKeys[$field['name']] = CRM_Core_DAO_AllCoreTables::getTableForClass($field['FKClassName']);
+      }
+    }
+    return $foreignKeys;
   }
 
   /**

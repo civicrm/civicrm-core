@@ -53,7 +53,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
   public function testAllIMs(): void {
     $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/im_test.xml');
 
-    $contactId = 69;
+    $contactId = $this->getXMLDataSetID('civicrm_contact', 69);
     $IMs = CRM_Core_BAO_IM::allIMs($contactId);
 
     $this->assertEquals(count($IMs), 3, 'Checking number of returned IMs.');
