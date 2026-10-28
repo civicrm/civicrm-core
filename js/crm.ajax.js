@@ -666,7 +666,7 @@
         // small delay to allow contents to render
         window.setTimeout(function() {
           var currentHeight = $wrapper.outerHeight(),
-            padding = currentHeight - $dialog.height(),
+            padding = currentHeight - $dialog.innerHeight(),
             newHeight = $dialog.prop('scrollHeight') + padding,
             menuHeight = $('#civicrm-menu').outerHeight();
           if ($('body').hasClass('crm-menubar-below-cms-menu')) {
