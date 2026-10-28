@@ -1454,7 +1454,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $addressParams = [
       'name' => 'event place',
       'street_address' => 'streety street',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
     ];
     // api requires contact_id - perhaps incorrectly but use add to get past that.

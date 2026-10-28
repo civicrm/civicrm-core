@@ -60,6 +60,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    * Test works but not both due to some form of caching going on in the SmartySingleton
    */
   public function testCreateSingleNowDated(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->isRecur = TRUE;
     $this->setupMockHandler();
     $firstName = 'John';
@@ -117,10 +118,10 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'source' => 'Mordor',
       'soft_credit_to' => '',
       'soft_contact_id' => '',
-      'billing_state_province-5' => 'IL',
-      'state_province-5' => 'IL',
-      'billing_country-5' => 'US',
-      'country-5' => 'US',
+      "billing_state_province-$billingLocationTypeID" => 'IL',
+      "state_province-$billingLocationTypeID" => 'IL',
+      "billing_country-$billingLocationTypeID" => 'US',
+      "country-$billingLocationTypeID" => 'US',
       'year' => 2025,
       'month' => 9,
       'ip_address' => '127.0.0.1',
@@ -177,6 +178,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    * Create a single post dated payment as a recurring transaction.
    */
   public function testCreateSinglePostDated(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->isRecur = TRUE;
     $this->setupMockHandler();
     $start_date = date('Ymd', strtotime('+ 1 week'));
@@ -224,11 +226,11 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'billing_first_name' => $firstName,
       'billing_middle_name' => '',
       'billing_last_name' => $lastName,
-      'billing_street_address-5' => '8 Hobbitton Road',
-      'billing_city-5' => 'The Shire',
-      'billing_state_province_id-5' => 1012,
-      'billing_postal_code-5' => 5010,
-      'billing_country_id-5' => 1228,
+      "billing_street_address-$billingLocationTypeID" => '8 Hobbitton Road',
+      "billing_city-$billingLocationTypeID" => 'The Shire',
+      "billing_state_province_id-$billingLocationTypeID" => 1012,
+      "billing_postal_code-$billingLocationTypeID" => 5010,
+      "billing_country_id-$billingLocationTypeID" => 1228,
       'credit_card_number' => '4007000000027',
       'cvv2' => 123,
       'credit_card_exp_date' => [
@@ -252,10 +254,10 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'source' => 'Mordor',
       'soft_credit_to' => '',
       'soft_contact_id' => '',
-      'billing_state_province-5' => 'IL',
-      'state_province-5' => 'IL',
-      'billing_country-5' => 'US',
-      'country-5' => 'US',
+      "billing_state_province-$billingLocationTypeID" => 'IL',
+      "state_province-$billingLocationTypeID" => 'IL',
+      "billing_country-$billingLocationTypeID" => 'US',
+      "country-$billingLocationTypeID" => 'US',
       'year' => 2022,
       'month' => 10,
       'ip_address' => '127.0.0.1',
@@ -371,15 +373,16 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    * @return array
    */
   protected function getBillingParams(): array {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     return [
       'billing_first_name' => 'John',
       'billing_middle_name' => '',
       'billing_last_name' => "O'Connor",
-      'billing_street_address-5' => '8 Hobbitton Road',
-      'billing_city-5' => 'The Shire',
-      'billing_state_province_id-5' => 1012,
-      'billing_postal_code-5' => 5010,
-      'billing_country_id-5' => 1228,
+      "billing_street_address-$billingLocationTypeID" => '8 Hobbitton Road',
+      "billing_city-$billingLocationTypeID" => 'The Shire',
+      "billing_state_province_id-$billingLocationTypeID" => 1012,
+      "billing_postal_code-$billingLocationTypeID" => 5010,
+      "billing_country_id-$billingLocationTypeID" => 1228,
       'credit_card_number' => '4444333322221111',
       'cvv2' => 123,
       'credit_card_exp_date' => [

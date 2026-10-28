@@ -52,6 +52,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testIPNPaymentRecurNoReceipt(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->isRecur = TRUE;
     $this->setupMockHandler($this->ids['PaymentProcessor']['test']);
     $mut = new CiviMailUtils($this, TRUE);
@@ -87,11 +88,11 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'billing_first_name' => 'Junko',
       'billing_middle_name' => '',
       'billing_last_name' => 'Adams',
-      'billing_street_address-5' => time() . ' Lincoln St S',
-      'billing_city-5' => 'Mary-knoll',
-      'billing_state_province_id-5' => 1031,
-      'billing_postal_code-5' => 10545,
-      'billing_country_id-5' => 1228,
+      "billing_street_address-$billingLocationTypeID" => time() . ' Lincoln St S',
+      "billing_city-$billingLocationTypeID" => 'Mary-knoll',
+      "billing_state_province_id-$billingLocationTypeID" => 1031,
+      "billing_postal_code-$billingLocationTypeID" => 10545,
+      "billing_country_id-$billingLocationTypeID" => 1228,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => 2,

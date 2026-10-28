@@ -1077,7 +1077,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function testMergeSameAddressSpecifyFields(): void {
     $this->setUpContactSameAddressExportData();
-    $this->doExportTest(['mergeSameAddress' => TRUE, 'fields' => [['contact_type' => 'Individual', 'name' => 'master_id', 'location_type_id' => 1]]]);
+    $this->doExportTest(['mergeSameAddress' => TRUE, 'fields' => [['contact_type' => 'Individual', 'name' => 'master_id', 'location_type_id' => $this->getLocationTypeID('Home')]]]);
   }
 
   /**

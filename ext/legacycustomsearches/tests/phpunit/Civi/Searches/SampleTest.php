@@ -275,7 +275,7 @@ class SampleTest extends TestCase implements HeadlessInterface, HookInterface, T
           'address',
           Address::create()->setValues([
             'contact_id' => '$id',
-            'location_type_id' => 1,
+            'location_type_id:name' => 'Home',
             'state_province_id' => $state,
           ]));
       }

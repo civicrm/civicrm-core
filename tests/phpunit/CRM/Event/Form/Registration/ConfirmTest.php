@@ -303,6 +303,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * https://github.com/civicrm/civicrm-core/pull/23358, https://lab.civicrm.org/extensions/stripe/-/issues/347
    */
   public function testWaitlistRegistrationContactIDParam(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->hookClass->setHook('civicrm_alterPaymentProcessorParams', [$this, 'checkPaymentParameters']);
     $paymentProcessorID = $this->processorCreate();
     $event = $this->eventCreatePaid(['payment_processor' => [$paymentProcessorID]]);
@@ -326,17 +327,17 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'billing_first_name' => 'Bob',
       'billing_middle_name' => '',
       'billing_last_name' => 'Smith',
-      'billing_street_address-5' => 'p',
-      'billing_city-5' => 'p',
-      'billing_state_province_id-5' => '1061',
-      'billing_postal_code-5' => '7',
-      'billing_country_id-5' => '1228',
+      "billing_street_address-$billingLocationTypeID" => 'p',
+      "billing_city-$billingLocationTypeID" => 'p',
+      "billing_state_province_id-$billingLocationTypeID" => '1061',
+      "billing_postal_code-$billingLocationTypeID" => '7',
+      "billing_country_id-$billingLocationTypeID" => '1228',
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
       $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_student'],
       'payment_processor_id' => $paymentProcessorID,
       'participant_id' => $waitlistParticipantID,
-      'billing_state_province-5' => 'AP',
-      'billing_country-5' => 'US',
+      "billing_state_province-$billingLocationTypeID" => 'AP',
+      "billing_country-$billingLocationTypeID" => 'US',
       'hidden_processor' => 1,
     ], 'live');
     $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantID, 'return' => ['participant_status']]);
@@ -990,6 +991,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @param array $submitValues
    */
   protected function submitPaidEvent(array $eventParams = [], array $submitValues = []): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->dummyProcessorCreate();
     $event = $this->eventCreatePaid(['payment_processor' => [$this->ids['PaymentProcessor']['dummy_live']], 'confirm_email_text' => '', 'is_pay_later' => FALSE, 'start_date' => '2022-09-16 12:00', 'end_date' => '2022-09-17 12:00'] + $eventParams);
     $this->submitForm($event['id'], array_merge([
@@ -1000,19 +1002,19 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'billing_first_name' => 'Kim',
       'billing_middle_name' => '',
       'billing_last_name' => 'Reality',
-      'billing_street_address-5' => 'p',
-      'billing_city-5' => 'p',
-      'billing_state_province_id-5' => '1061',
-      'billing_postal_code-5' => '7',
-      'billing_country_id-5' => '1228',
+      "billing_street_address-$billingLocationTypeID" => 'p',
+      "billing_city-$billingLocationTypeID" => 'p',
+      "billing_state_province_id-$billingLocationTypeID" => '1061',
+      "billing_postal_code-$billingLocationTypeID" => '7',
+      "billing_country_id-$billingLocationTypeID" => '1228',
       'priceSetId' => $this->ids['PriceSet']['PaidEvent'],
       $this->getPriceFieldFormLabel('PaidEvent') => $this->ids['PriceFieldValue']['PaidEvent_student'],
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy_live'],
       'year' => '2019',
       'month' => '1',
       'button' => '_qf_Register_upload',
-      'billing_state_province-5' => 'AP',
-      'billing_country-5' => 'US',
+      "billing_state_province-$billingLocationTypeID" => 'AP',
+      "billing_country-$billingLocationTypeID" => 'US',
     ], $submitValues));
   }
 
@@ -1171,6 +1173,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * @return array
    */
   public function getCreditCardParameters(int $paymentProcessorID): array {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     return [
       'credit_card_number' => '4111111111111111',
       'cvv2' => '123',
@@ -1179,17 +1182,17 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         'Y' => date('Y') + 1,
       ],
       'priceSetId' => $this->getPriceSetID('PaidEvent'),
-      'billing_state_province-5' => 'AP',
-      'billing_country-5' => 'US',
+      "billing_state_province-$billingLocationTypeID" => 'AP',
+      "billing_country-$billingLocationTypeID" => 'US',
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'p',
       'billing_middle_name' => '',
       'billing_last_name' => 'p',
-      'billing_street_address-5' => 'p',
-      'billing_city-5' => 'p',
-      'billing_state_province_id-5' => '1061',
-      'billing_postal_code-5' => '7',
-      'billing_country_id-5' => '1228',
+      "billing_street_address-$billingLocationTypeID" => 'p',
+      "billing_city-$billingLocationTypeID" => 'p',
+      "billing_state_province_id-$billingLocationTypeID" => '1061',
+      "billing_postal_code-$billingLocationTypeID" => '7',
+      "billing_country_id-$billingLocationTypeID" => '1228',
       'payment_processor_id' => $paymentProcessorID,
       'hidden_processor' => '1',
     ];

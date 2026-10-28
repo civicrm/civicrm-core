@@ -1985,6 +1985,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testPayLater(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $mut = new CiviMailUtils($this, TRUE);
     $this->swapMessageTemplateForTestTemplate();
     $this->createLoggedInUser();
@@ -1994,7 +1995,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contributionPageID,
       'price_' . $this->ids['PriceField']['basic'] => $this->ids['PriceFieldValue']['basic'],
       'contact_id' => $this->individualID,
-      'email-5' => 'anthony_anderson@civicrm.org',
+      "email-$billingLocationTypeID" => 'anthony_anderson@civicrm.org',
       'payment_processor_id' => 0,
       'is_pay_later' => 1,
       'invoiceID' => 'f28e1ddc86f8c4a0ff5bcf46393e4bc8',
@@ -3477,6 +3478,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Completed via offline
    */
   public function testPendingToCompleteContribution(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->createPriceSetWithPage();
     $this->setUpPendingContribution($this->ids['PriceFieldValue']['one_term_membership'], 'new');
     $this->callAPISuccess('membership', 'getsingle', ['id' => $this->_ids['membership']]);
@@ -3496,11 +3498,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'billing_middle_name' => '',
       'billing_last_name' => 'Adams',
-      'billing_street_address-5' => '790L Lincoln St S',
-      'billing_city-5' => 'Mary knoll',
-      'billing_state_province_id-5' => 1031,
-      'billing_postal_code-5' => 10545,
-      'billing_country_id-5' => 1228,
+      "billing_street_address-$billingLocationTypeID" => '790L Lincoln St S',
+      "billing_city-$billingLocationTypeID" => 'Mary knoll',
+      "billing_state_province_id-$billingLocationTypeID" => 1031,
+      "billing_postal_code-$billingLocationTypeID" => 10545,
+      "billing_country_id-$billingLocationTypeID" => 1228,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => '',

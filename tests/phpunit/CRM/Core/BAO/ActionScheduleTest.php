@@ -2611,7 +2611,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'contact_id' => $contact->id,
         'is_primary' => 1,
         'email' => "test-member-$interval_unit@example.com",
-        'location_type_id' => 1,
+        'location_type_id' => $this->getLocationTypeID('Home'),
       ];
       $this->createTestObject('CRM_Core_DAO_Email', $emailParams);
       $membershipParams = [
@@ -2698,7 +2698,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $emailParams = [
       'contact_id' => $mainMembership->contact_id,
       'email' => 'test-member@example.com',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'is_primary' => 1,
     ];
     $this->createTestObject('CRM_Core_DAO_Email', $emailParams);
@@ -2795,7 +2795,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   public function testMembershipScheduleWithAbsoluteDate(): void {
     $membership = $this->createMembershipFromFixture('rolling_membership', 'New', [
       'email' => 'test-member@example.com',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ]);
 
     $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], ['contact_id' => $membership['contact_id']]));
@@ -2856,7 +2856,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     if ($emailParams) {
       Civi\Api4\Email::create(FALSE)->setValues(array_merge([
         'contact_id' => $membership['contact_id'],
-        'location_type_id' => 1,
+        'location_type_id' => $this->getLocationTypeID('Home'),
       ], $emailParams))->execute();
     }
     return $membership;

@@ -73,6 +73,7 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
    * @return CRM_Contribute_Form_Contribution_ThankYou
    */
   private function getThankYouFormWithContribution(int $paymentProcessorID, bool $withPendingContribution = FALSE, bool $isTestContribution = FALSE) {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $pageContribution = $this->getPageContribution((($withPendingContribution) ? 2 : 1), $isTestContribution);
     if (!isset($this->ids['ContributionPage'])) {
       $this->contributionPageCreatePaid(['payment_processor' => $paymentProcessorID])['id'];
@@ -80,7 +81,7 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
     $form = $this->getThankYouForm();
     $form->_params['contributionID'] = $pageContribution['contribution_id'];
     $form->_params['invoiceID'] = $pageContribution['invoice_id'];
-    $form->_params['email-5'] = 'demo@example.com';
+    $form->_params["email-$billingLocationTypeID"] = 'demo@example.com';
     $form->_params['payment_processor_id'] = $paymentProcessorID;
     if ($isTestContribution) {
       $_REQUEST['action'] = 1024;

@@ -46,14 +46,14 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $a1 = Address::create(FALSE)
       ->addValue('is_primary', TRUE)
       ->addValue('contact_id', $cid)
-      ->addValue('location_type_id', 1)
+      ->addValue('location_type_id:name', 'Home')
       ->addValue('city', 'Somewhere')
       ->execute()->single();
 
     $a2 = Address::create(FALSE)
       ->addValue('is_primary', TRUE)
       ->addValue('contact_id', $cid)
-      ->addValue('location_type_id', 2)
+      ->addValue('location_type_id:name', 'Work')
       ->addValue('city', 'Elsewhere')
       ->execute()->single();
 

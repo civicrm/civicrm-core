@@ -326,7 +326,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
 
     // This filter will not work because the search display is not within an <af-field>
     $params['savedSearch'] = 'TestSearchForPhone';
-    $params['filters'] = ['location_type_id' => 1];
+    $params['filters'] = ['location_type_id' => $this->getLocationTypeID('Home')];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(4, $result);
 

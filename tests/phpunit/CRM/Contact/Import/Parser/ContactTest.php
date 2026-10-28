@@ -624,41 +624,41 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $id = $this->individualCreate([
       'phone' => [
         1 => [
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'phone' => '987654321',
         ],
         2 => [
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'phone' => '456-7890',
         ],
       ],
       'im' => [
         1 => [
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'name' => 'bob',
         ],
         2 => [
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'name' => 'fred',
         ],
       ],
       'openid' => [
         1 => [
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'openid' => 'bob',
         ],
         2 => [
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'openid' => 'fred',
         ],
       ],
       'email' => [
         1 => [
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'email' => 'bob@example.com',
         ],
         2 => [
-          'location_type_id' => 2,
+          'location_type_id' => $this->getLocationTypeID('Work'),
           'email' => 'fred@example.com',
         ],
       ],
@@ -1131,7 +1131,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   public function testImportTwoPhonesDifferentTypes(): void {
     $processor = new CRM_Import_ImportProcessor();
     $processor->setUserJobID($this->getUserJobID([
-      'mapper' => [['first_name'], ['last_name'], ['email'], ['phone', 1, 2], ['phone', 1, 1]],
+      'mapper' => [['first_name'], ['last_name'], ['email'], ['phone', $this->getLocationTypeID('Home'), 2], ['phone', $this->getLocationTypeID('Home'), 1]],
       'onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE,
     ]));
     $processor->setMappingFields(
@@ -1139,8 +1139,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
         ['name' => 'first_name'],
         ['name' => 'last_name'],
         ['name' => 'email'],
-        ['name' => 'phone', 'location_type_id' => 1, 'phone_type_id' => 2],
-        ['name' => 'phone', 'location_type_id' => 1, 'phone_type_id' => 1],
+        ['name' => 'phone', 'location_type_id' => $this->getLocationTypeID('Home'), 'phone_type_id' => 2],
+        ['name' => 'phone', 'location_type_id' => $this->getLocationTypeID('Home'), 'phone_type_id' => 1],
       ]
     );
     $importer = $processor->getImporterObject();
@@ -1233,10 +1233,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @param array $submittedValues
    */
   public function testValidation(string $csv, array $mapper, string $expectedError = '', array $submittedValues = []): void {
-    // The data provider runs before the relationship types exist, so it gives e.g. 'Child of_a_b'; look up the id.
+    // The data provider runs before the relationship and location types exist, so it
+    // gives e.g. 'Child of_a_b' and ['phone', 'Home', 1]; look up the ids.
     foreach ($mapper as &$mapperField) {
       if (preg_match('/^(.+)_(a_b|b_a)$/', $mapperField[0], $matches)) {
         $mapperField[0] = $this->getRelationshipTypeID($matches[1]) . '_' . $matches[2];
+      }
+      elseif (($mapperField[1] ?? NULL) === 'Home') {
+        $mapperField[1] = $this->getLocationTypeID('Home');
       }
     }
     unset($mapperField);
@@ -1276,7 +1280,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ],
       'individual_bad_email' => [
         'csv' => 'individual_invalid_email.csv',
-        'mapper' => [['email', 1], ['first_name'], ['last_name']],
+        'mapper' => [['email', 'Home'], ['first_name'], ['last_name']],
         'expected_error' => 'Invalid value for field(s) : Email',
       ],
       'individual_related_bad_email' => [
@@ -1300,14 +1304,14 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'organization_email_no_organization_name' => [
         // Email is only enough in upgrade mode.
         'csv' => 'organization_email_no_organization_name.csv',
-        'mapper' => [['email'], ['phone', 1, 1]],
+        'mapper' => [['email'], ['phone', 'Home', 1]],
         'expected_error' => 'Missing required fields: Organization Name',
         'submitted_values' => ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP, 'contactType' => 'Organization'],
       ],
       'organization_email_no_organization_name_update_mode' => [
         // Email is enough in upgrade mode (at least to pass validate).
         'csv' => 'organization_email_no_organization_name.csv',
-        'mapper' => [['email'], ['phone', 1, 1]],
+        'mapper' => [['email'], ['phone', 'Home', 1]],
         'expected_error' => '',
         'submitted_values' => ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE, 'contactType' => 'Organization'],
       ],
@@ -1323,6 +1327,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \League\Csv\CannotInsertRecord
    */
   public function testImport($csv, $mapper, $expectedOutcomes = [], $submittedValues = [], $apiLookup = []): void {
+    // The data provider runs before the location types exist, so it gives e.g. ['country', 'Home']; look up the id.
+    foreach ($mapper as &$mapperField) {
+      if (($mapperField[1] ?? NULL) === 'Home') {
+        $mapperField[1] = $this->getLocationTypeID('Home');
+      }
+    }
+    unset($mapperField);
     $this->importCSV($csv, $mapper, $submittedValues);
     $dataSource = new CRM_Import_DataSource_CSV(UserJob::get(FALSE)->setSelect(['id'])->execute()->first()['id']);
     foreach ($expectedOutcomes as $outcome => $count) {
@@ -1458,7 +1469,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ],
       'individual_unicode.csv' => [
         'csv' => 'individual_unicode.csv',
-        'mapper' => [['first_name'], ['last_name'], ['url', 1], ['country', 1]],
+        'mapper' => [['first_name'], ['last_name'], ['url', 1], ['country', 'Home']],
         'expected_outcomes' => [CRM_Import_Parser::VALID => 1],
       ],
       'individual_invalid_sub_type' => [
@@ -1616,8 +1627,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       ['birth_date'],
       ['deceased_date'],
       [$this->getCustomFieldName('contact_date')],
-      [$this->getCustomFieldName('address_date'), 1],
-      ['street_address', 1],
+      [$this->getCustomFieldName('address_date'), $this->getLocationTypeID('Home')],
+      ['street_address', $this->getLocationTypeID('Home')],
       ['do_not_import'],
       ['do_not_import'],
     ];
@@ -1654,9 +1665,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->importCSV('individual_boolean.csv', [
       ['first_name'],
       ['last_name'],
-      ['street_address', 1],
+      ['street_address', $this->getLocationTypeID('Home')],
       ['do_not_email'],
-      [$this->getCustomFieldName('address_boolean'), 1],
+      [$this->getCustomFieldName('address_boolean'), $this->getLocationTypeID('Home')],
       [$this->getCustomFieldName('contact_boolean')],
     ]);
     $contacts = Address::get()->addWhere('contact_id.first_name', 'IN', ['Joe', 'Betty'])->setSelect([
@@ -2294,14 +2305,15 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function testMapFields(): void {
+    $homeID = $this->getLocationTypeID('Home');
     $parser = new CRM_Contact_Import_Parser_Contact();
     $parser->setUserJobID($this->getUserJobID([
       'mapper' => [
         ['first_name'],
-        ['phone', 1, 1],
+        ['phone', $homeID, 1],
         [$this->getRelationshipTypeID('Employee of') . '_a_b', 'url', 1],
-        ['im', 1, 1],
-        [$this->getRelationshipTypeID('Employee of') . '_a_b', 'phone', 1, 1],
+        ['im', $homeID, 1],
+        [$this->getRelationshipTypeID('Employee of') . '_a_b', 'phone', $homeID, 1],
       ],
     ]));
     $parser->init();
@@ -2311,9 +2323,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->assertEquals([
       'first_name' => 'Bob',
       'phone' => [
-        '1_1' => [
+        "{$homeID}_1" => [
           'phone' => '123',
-          'location_type_id' => 1,
+          'location_type_id' => $homeID,
           'phone_type_id' => 1,
         ],
       ],
@@ -2328,18 +2340,18 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
             ],
           ],
           'phone' => [
-            '1_1' => [
+            "{$homeID}_1" => [
               'phone' => '456',
-              'location_type_id' => 1,
+              'location_type_id' => $homeID,
               'phone_type_id' => 1,
             ],
           ],
         ],
       ],
       'im' => [
-        '1_1' => [
+        "{$homeID}_1" => [
           'name' => 'my-handle',
-          'location_type_id' => 1,
+          'location_type_id' => $homeID,
           'provider_id' => 1,
         ],
       ],
@@ -2455,8 +2467,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $mapper = [
       ['first_name'],
       ['last_name'],
-      ['geo_code_1', 1],
-      ['geo_code_2', 1],
+      ['geo_code_1', $this->getLocationTypeID('Home')],
+      ['geo_code_2', $this->getLocationTypeID('Home')],
     ];
     $csv = 'individual_geocode.csv';
     $this->validateMultiRowCsv($csv, $mapper, 'GeoCode2');

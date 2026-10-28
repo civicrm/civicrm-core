@@ -911,6 +911,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    * @throws \CRM_Core_Exception
    */
   public function testProcessOnBehalfOrganization(): void {
+    $mainLocationTypeID = $this->getLocationTypeID('Main');
     $orgInfo = [
       'phone' => '11111111',
       'email' => 'testorg@gmail.com',
@@ -947,7 +948,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         3 => [
           'street_address' => $orgInfo['street_address'],
           'city' => $orgInfo['city'],
-          'location_type_id' => 3,
+          'location_type_id' => $this->getLocationTypeID('Main'),
           'postal_code' => $orgInfo['postal_code'],
           'country' => 'US',
           'state_province' => 'AA',
@@ -957,13 +958,13 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     ];
     $fields = [
       'organization_name' => 1,
-      'phone-3-1' => 1,
-      'email-3' => 1,
-      'street_address-3' => 1,
-      'city-3' => 1,
-      'postal_code-3' => 1,
-      'country-3' => 1,
-      'state_province-3' => 1,
+      "phone-$mainLocationTypeID-1" => 1,
+      "email-$mainLocationTypeID" => 1,
+      "street_address-$mainLocationTypeID" => 1,
+      "city-$mainLocationTypeID" => 1,
+      "postal_code-$mainLocationTypeID" => 1,
+      "country-$mainLocationTypeID" => 1,
+      "state_province-$mainLocationTypeID" => 1,
     ];
     $empty = [];
     CRM_Contribute_Form_Contribution_Confirm::processOnBehalfOrganization($behalfOrganization, $contactID, $empty, $empty, $empty);

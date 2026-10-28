@@ -65,6 +65,8 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testUnsupervisedWithTwoEmailFields(): void {
+    $workLocationTypeID = $this->getLocationTypeID('Work');
+    $homeLocationTypeID = $this->getLocationTypeID('Home');
     $this->setupForGroupDedupe();
     $emails = [
       ['hood@example.com', ''],
@@ -74,8 +76,8 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       $fields = [
         'first_name' => 'robin',
         'last_name' => 'hood',
-        'email-1' => $emails[$i][0],
-        'email-2' => $emails[$i][1],
+        "email-$homeLocationTypeID" => $emails[$i][0],
+        "email-$workLocationTypeID" => $emails[$i][1],
       ];
       $dedupeResults = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual');
 

@@ -178,6 +178,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function on the contribution page.
    */
   public function testSubmitCreditCardDummyProcessor(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $form = $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
@@ -193,11 +194,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'billing_first_name' => 'Junko',
       'billing_middle_name' => '',
       'billing_last_name' => 'Adams',
-      'billing_street_address-5' => '790L Lincoln St S',
-      'billing_city-5' => 'Mary Knoll',
-      'billing_state_province_id-5' => 1031,
-      'billing_postal_code-5' => 10545,
-      'billing_country_id-5' => 1228,
+      "billing_street_address-$billingLocationTypeID" => '790L Lincoln St S',
+      "billing_city-$billingLocationTypeID" => 'Mary Knoll',
+      "billing_state_province_id-$billingLocationTypeID" => 1031,
+      "billing_postal_code-$billingLocationTypeID" => 10545,
+      "billing_country_id-$billingLocationTypeID" => 1228,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => '',
@@ -233,6 +234,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function on the contribution page
    */
   public function testSubmitCreditCardWithEmailReceipt(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $form = $this->submitContributionForm([
       'total_amount' => 50,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
@@ -248,11 +250,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'billing_first_name' => 'Junko',
       'billing_middle_name' => '',
       'billing_last_name' => 'Adams',
-      'billing_street_address-5' => '790L Lincoln St S',
-      'billing_city-5' => 'Mary Knoll',
-      'billing_state_province_id-5' => 1031,
-      'billing_postal_code-5' => 10545,
-      'billing_country_id-5' => 1228,
+      "billing_street_address-$billingLocationTypeID" => '790L Lincoln St S',
+      "billing_city-$billingLocationTypeID" => 'Mary Knoll',
+      "billing_state_province_id-$billingLocationTypeID" => 1031,
+      "billing_postal_code-$billingLocationTypeID" => 10545,
+      "billing_country_id-$billingLocationTypeID" => 1228,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => '',
@@ -284,6 +286,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function on the contribution page.
    */
   public function testSubmitCreditCardNoReceipt(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
     $error = FALSE;
@@ -303,11 +306,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'billing_first_name' => 'Junko',
         'billing_middle_name' => '',
         'billing_last_name' => 'Adams',
-        'billing_street_address-5' => '790L Lincoln St S',
-        'billing_city-5' => 'Mary Knoll',
-        'billing_state_province_id-5' => 1031,
-        'billing_postal_code-5' => 10545,
-        'billing_country_id-5' => 1228,
+        "billing_street_address-$billingLocationTypeID" => '790L Lincoln St S',
+        "billing_city-$billingLocationTypeID" => 'Mary Knoll',
+        "billing_state_province_id-$billingLocationTypeID" => 1031,
+        "billing_postal_code-$billingLocationTypeID" => 10545,
+        "billing_country_id-$billingLocationTypeID" => 1228,
         'frequency_interval' => 1,
         'frequency_unit' => 'month',
         'installments' => '',
@@ -344,6 +347,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function on the contribution page.
    */
   public function testSubmitCreditCardFee(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->paymentProcessor->setDoDirectPaymentResult(['payment_status_id' => 1, 'is_error' => 0, 'trxn_id' => 'tx', 'fee_amount' => .08]);
     $this->submitContributionForm([
       'total_amount' => 50,
@@ -361,11 +365,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'billing_first_name' => 'Junko',
       'billing_middle_name' => '',
       'billing_last_name' => 'Adams',
-      'billing_street_address-5' => '790L Lincoln St S',
-      'billing_city-5' => 'Mary Knoll',
-      'billing_state_province_id-5' => 1031,
-      'billing_postal_code-5' => 10545,
-      'billing_country_id-5' => 1228,
+      "billing_street_address-$billingLocationTypeID" => '790L Lincoln St S',
+      "billing_city-$billingLocationTypeID" => 'Mary Knoll',
+      "billing_state_province_id-$billingLocationTypeID" => 1031,
+      "billing_postal_code-$billingLocationTypeID" => 10545,
+      "billing_country_id-$billingLocationTypeID" => 1228,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => '',
@@ -394,6 +398,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test a fully deductible contribution submitted by credit card (CRM-16669).
    */
   public function testSubmitCreditCardFullyDeductible(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $this->getTestForm('CRM_Contribute_Form_Contribution', [
       'total_amount' => 50,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
@@ -410,11 +415,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'billing_first_name' => 'Junko',
       'billing_middle_name' => '',
       'billing_last_name' => 'Adams',
-      'billing_street_address-5' => '790L Lincoln St S',
-      'billing_city-5' => 'Mary Knoll',
-      'billing_state_province_id-5' => 1031,
-      'billing_postal_code-5' => 10545,
-      'billing_country_id-5' => 1228,
+      "billing_street_address-$billingLocationTypeID" => '790L Lincoln St S',
+      "billing_city-$billingLocationTypeID" => 'Mary Knoll',
+      "billing_state_province_id-$billingLocationTypeID" => 1031,
+      "billing_postal_code-$billingLocationTypeID" => 10545,
+      "billing_country_id-$billingLocationTypeID" => 1228,
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'installments' => '',
@@ -506,6 +511,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * receive date for recurring contribution.
    */
   public function testSubmitCreditCardWithRecur(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $receiveDate = date('Y-m-d H:i:s', strtotime('+1 month'));
     $this->submitContributionForm([
       'total_amount' => 50,
@@ -521,7 +527,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'credit_card_exp_date' => ['M' => 5, 'Y' => date('Y', strtotime('+ 1 year'))],
       'credit_card_number' => '411111111111111',
       'credit_card_type' => 'Visa',
-      'billing_city-5' => 'Vancouver',
+      "billing_city-$billingLocationTypeID" => 'Vancouver',
     ], NULL, 'live');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['return' => 'receive_date']);
     $this->assertEquals($contribution['receive_date'], $receiveDate);
@@ -994,6 +1000,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * Test the submit function that completes the partially paid payment using Credit Card
    */
   public function testPartialPaymentWithCreditCard(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     // create a partially paid contribution by using back-office form
     $form = $this->getContributionForm([
       'total_amount' => 50,
@@ -1001,7 +1008,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact'][0],
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'check_number' => '7890',
-      'billing_city-5' => 'Vancouver',
+      "billing_city-$billingLocationTypeID" => 'Vancouver',
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
     ]);
     $form->postProcess();
@@ -1020,10 +1027,10 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'credit_card_number' => '411111111111111',
       'cvv2' => 234,
       'credit_card_type' => 'Visa',
-      'billing_city-5' => 'Vancouver',
-      'billing_state_province_id-5' => 1059,
-      'billing_postal_code-5' => 1321312,
-      'billing_country_id-5' => 1228,
+      "billing_city-$billingLocationTypeID" => 'Vancouver',
+      "billing_state_province_id-$billingLocationTypeID" => 1059,
+      "billing_postal_code-$billingLocationTypeID" => 1321312,
+      "billing_country_id-$billingLocationTypeID" => 1228,
       'trxn_date' => '2017-04-11 13:05:11',
     ], ['id' => $contribution['id'], 'mode' => 'live'])->processForm();
     $this->assertEquals($contribution['id'], $form->getContributionID());
@@ -1405,6 +1412,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
    * function to test card_type and pan truncation.
    */
   public function testCardTypeAndPanTruncationLiveMode(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $visaID = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', 'Visa');
     $this->submitContributionForm(
       [
@@ -1422,11 +1430,11 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'billing_first_name' => 'Junko',
         'billing_middle_name' => '',
         'billing_last_name' => 'Adams',
-        'billing_street_address-5' => '790L Lincoln St S',
-        'billing_city-5' => 'Maryknoll',
-        'billing_state_province_id-5' => 1031,
-        'billing_postal_code-5' => 10545,
-        'billing_country_id-5' => 1228,
+        "billing_street_address-$billingLocationTypeID" => '790L Lincoln St S',
+        "billing_city-$billingLocationTypeID" => 'Maryknoll',
+        "billing_state_province_id-$billingLocationTypeID" => 1031,
+        "billing_postal_code-$billingLocationTypeID" => 10545,
+        "billing_country_id-$billingLocationTypeID" => 1228,
         'frequency_interval' => 1,
         'frequency_unit' => 'month',
         'installments' => '',

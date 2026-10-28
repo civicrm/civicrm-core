@@ -380,7 +380,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params = [
       'email' => $primaryEmail,
       'contact_type' => 'Individual',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ];
 
     $contact1 = $this->callAPISuccess('contact', 'create', $params);
@@ -1420,7 +1420,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params = [
       'email' => 'man2@yahoo.com',
       'contact_type' => 'Individual',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'api.group_contact.create' => ['group_id' => $groupId],
     ];
 
@@ -1727,7 +1727,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'last_name' => 'xyz4',
       'email' => 'man4@yahoo.com',
       'contact_type' => 'Individual',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ];
     $result = $this->callAPISuccess('contact', 'create', $params);
 
@@ -2302,7 +2302,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $params = [
       'email' => 'man2@yahoo.com',
       'contact_type' => 'Individual',
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
     ];
 
     $contact = $this->callAPISuccess('contact', 'create', $params);
@@ -3674,6 +3674,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    */
   public function testGetMatchesPhoneWithType(string $phoneKey): void {
+    // The data provider runs before the location types exist, so it names them; use the id.
+    $phoneKey = str_replace('-Main-', '-' . $this->getLocationTypeID('Main') . '-', $phoneKey);
     $ruleGroup = $this->createRuleGroup();
     $this->callAPISuccess('Rule', 'create', [
       'dedupe_rule_group_id' => $ruleGroup['id'],
@@ -3700,7 +3702,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     return [
       ['phone-Primary-1'],
       ['phone-Primary'],
-      ['phone-3-1'],
+      ['phone-Main-1'],
     ];
   }
 
