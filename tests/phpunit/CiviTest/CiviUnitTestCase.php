@@ -1435,28 +1435,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Add a UF Join Entry.
-   *
-   * @param array|null $params
-   *
-   * @return int
-   *   $id of created UF Join
-   */
-  public function ufjoinCreate(?array $params = NULL): int {
-    if ($params === NULL) {
-      $params = [
-        'is_active' => 1,
-        'module' => 'CiviEvent',
-        'entity_table' => 'civicrm_event',
-        'entity_id' => 3,
-        'weight' => 1,
-        'uf_group_id' => $this->getProfileID('name_and_address'),
-      ];
-    }
-    return $this->callAPISuccess('UFJoin', 'create', $params);
-  }
-
-  /**
    * @param array $params
    *   Optional parameters.
    * @param string $identifier
