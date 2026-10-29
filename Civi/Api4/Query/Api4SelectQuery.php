@@ -563,7 +563,8 @@ class Api4SelectQuery extends Api4Query {
         }
         // 4. Link to joinEntity's id from a field that is not a known FK (e.g. SepaMandate.entity_id -> Contribution.id)
         // Counts as explicit so no FK condition is guessed; without $aclStack the joined entity keeps all its ACL clauses.
-        elseif ($joinFieldName === 'id') {
+        // A literal id is a filter, not a link, so it does not count.
+        elseif ($joinFieldName === 'id' && $otherSideField) {
           return TRUE;
         }
 
