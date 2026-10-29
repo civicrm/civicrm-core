@@ -827,3 +827,14 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 .af-container.af-layout-cols { /* vs afCore */
   column-gap: var(--crm-l-medium);
 }
+
+/* See https://lab.civicrm.org/dev/core/-/work_items/6899 */
+.fa-spin {
+  animation-name: none;
+}
+.fa-spin::before {
+  animation-name: fa-spin;
+  animation-duration: var(--fa-animation-duration,2s);
+  animation-iteration-count: var(--fa-animation-iteration-count,infinite);
+  animation-timing-function: var(--fa-animation-timing,linear);
+}
