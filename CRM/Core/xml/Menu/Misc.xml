@@ -13,11 +13,6 @@
      <page_callback>CRM_Export_BAO_Export::invoke</page_callback>
   </item>
   <item>
-     <path>civicrm/export/contact</path>
-     <title>Export Contacts</title>
-     <weight>0</weight>
-  </item>
-  <item>
     <path>civicrm/export/standalone</path>
     <title>Export</title>
     <page_callback>CRM_Export_Controller_Standalone</page_callback>
