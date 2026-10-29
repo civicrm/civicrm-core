@@ -359,21 +359,21 @@ function _civicrm_api3_mailing_deprecation() {
  * @return array
  */
 function civicrm_api3_mailing_event_reply($params) {
-  $job       = $params['job_id'];
-  $queue     = $params['event_queue_id'];
+  $queue     = (int) $params['event_queue_id'];
   $hash      = $params['hash'];
   $replyto   = $params['replyTo'];
   $bodyTxt   = $params['bodyTxt'] ?? NULL;
   $bodyHTML  = $params['bodyHTML'] ?? NULL;
   $fullEmail = $params['fullEmail'] ?? NULL;
 
-  $mailing = CRM_Mailing_Event_BAO_MailingEventReply::reply($job, $queue, $hash, $replyto);
+  $mailing = CRM_Mailing_Event_BAO_MailingEventReply::reply(NULL, $queue, $hash, $replyto);
 
   if (empty($mailing)) {
     return civicrm_api3_create_error('Queue event could not be found');
   }
 
-  CRM_Mailing_Event_BAO_MailingEventReply::send($queue, $mailing, $bodyTxt, $replyto, $bodyHTML, $fullEmail);
+  CRM_Mailing_Event_BAO_MailingEventReply::
+  send($queue, $mailing, $bodyTxt, $replyto, $bodyHTML, $fullEmail);
 
   return civicrm_api3_create_success($params);
 }
@@ -386,9 +386,7 @@ function civicrm_api3_mailing_event_reply($params) {
  * @param array $params
  *   Array of parameters determined by getfields.
  */
-function _civicrm_api3_mailing_event_reply_spec(&$params) {
-  $params['job_id']['api.required'] = 1;
-  $params['job_id']['title'] = 'Job ID';
+function _civicrm_api3_mailing_event_reply_spec(array &$params): void {
   $params['event_queue_id']['api.required'] = 1;
   $params['event_queue_id']['title'] = 'Event Queue ID';
   $params['hash']['api.required'] = 1;
