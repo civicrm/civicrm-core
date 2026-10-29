@@ -1851,7 +1851,7 @@ class CRM_Financial_BAO_Order {
    * @return void
    * @throws \CRM_Core_Exception
    */
-  private function calculateContributionValues() {
+  private function calculateContributionValues(): void {
     $this->contributionValues['total_amount'] = $this->getTotalAmount();
     $this->contributionValues['tax_amount'] = $this->getTotalTaxAmount();
     $this->contributionValues['amount_level'] = $this->contributionValues['amount_level'] ?? $this->getAmountLevel();
@@ -1946,6 +1946,10 @@ class CRM_Financial_BAO_Order {
     $result = Contribution::create(FALSE)
       ->setValues($this->contributionValues)->execute();
     $this->saveOrderCompletionMetadata((int) $result->first()['id']);
+    if ($this->contributionValues['total_amount'] == 0.0) {
+      // A $0 order has nothing to pay, so don't leave it pending.
+      CRM_Contribute_BAO_Contribution::writeRecord(['id' => $result->first()['id'], 'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')]);
+    }
     return $result;
   }
 
