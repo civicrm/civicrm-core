@@ -105,9 +105,9 @@ ORDER BY page_type, page_id';
 
       if ($pcpInfoDao->status_id != $approved || $pcpInfoDao->is_active != 1) {
         $class = 'disabled';
-        if (!function_exists('tellafriend_civicrm_config') || !$pcpInfoDao->is_tellfriend_enabled) {
-          $mask -= CRM_Core_Action::DETACH;
-        }
+      }
+      if (isset($pcpLink[CRM_Core_Action::DETACH]) && (!$pcpInfoDao->is_tellfriend_enabled || $pcpInfoDao->status_id != $approved || $pcpInfoDao->is_active != 1)) {
+        $mask -= CRM_Core_Action::DETACH;
       }
 
       if ($pcpInfoDao->is_active == 1) {
@@ -289,13 +289,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
           'qs' => 'action=update&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
           'title' => ts('Configure'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
-        ],
-        CRM_Core_Action::DETACH => [
-          'name' => ts('Tell Friends'),
-          'url' => 'civicrm/friend',
-          'qs' => 'eid=%%pcpId%%&blockId=%%pcpBlock%%&reset=1&pcomponent=pcp&component=%%pageComponent%%',
-          'title' => ts('Tell Friends'),
-          'weight' => -15,
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('URL for this Page'),

@@ -2,7 +2,7 @@
 
 require_once 'tellafriend.civix.php';
 
-use CRM_Tellafriend_ExtensionUtil as E;
+use CRM_Friend_ExtensionUtil as E;
 
 /**
  * Implements hook_civicrm_config().
@@ -144,6 +144,23 @@ function tellafriend_civicrm_copy(string $objectName, $object, ?int $original_id
     ], [
       'entity_id' => $object->id,
     ]);
+  }
+}
+
+/**
+ * Implements hook_civicrm_links().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_links/
+ */
+function tellafriend_civicrm_links(string $op, ?string $objectName, $objectId, array &$links, ?int &$mask = NULL, array &$values = []): void {
+  if ($op === 'pcp.user.actions.all') {
+    $links[CRM_Core_Action::DETACH] = [
+      'name' => E::ts('Tell Friends'),
+      'url' => 'civicrm/friend',
+      'qs' => 'eid=%%pcpId%%&blockId=%%pcpBlock%%&reset=1&pcomponent=pcp&component=%%pageComponent%%',
+      'title' => E::ts('Tell Friends'),
+      'weight' => -15,
+    ];
   }
 }
 
