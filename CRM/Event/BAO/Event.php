@@ -404,7 +404,7 @@ WHERE      civicrm_event.is_active = 1 AND
     $query = "
 SELECT     civicrm_event.id as id, civicrm_event.title as event_title, civicrm_event.is_public as is_public,
            civicrm_event.max_participants as max_participants, civicrm_event.start_date as start_date,
-           civicrm_event.end_date as end_date, civicrm_event.is_online_registration, civicrm_event.is_monetary, civicrm_event.is_show_location,civicrm_event.is_map as is_map, civicrm_option_value.label as event_type, civicrm_tell_friend.is_active as is_friend_active,
+           civicrm_event.end_date as end_date, civicrm_event.is_online_registration, civicrm_event.is_monetary, civicrm_event.is_show_location,civicrm_event.is_map as is_map, civicrm_option_value.label as event_type,
            civicrm_event.slot_label_id,
            civicrm_event.summary as summary,
            civicrm_pcp_block.id as is_pcp_enabled,
@@ -413,7 +413,6 @@ FROM       civicrm_event
 LEFT JOIN  civicrm_option_value ON (
            civicrm_event.event_type_id = civicrm_option_value.value AND
            civicrm_option_value.option_group_id = %1 )
-LEFT JOIN  civicrm_tell_friend ON ( civicrm_tell_friend.entity_id = civicrm_event.id  AND civicrm_tell_friend.entity_table = 'civicrm_event' )
 LEFT JOIN  civicrm_pcp_block ON ( civicrm_pcp_block.entity_id = civicrm_event.id AND civicrm_pcp_block.entity_table = 'civicrm_event')
 LEFT JOIN  civicrm_recurring_entity ON ( civicrm_event.id = civicrm_recurring_entity.entity_id AND civicrm_recurring_entity.entity_table = 'civicrm_event' )
 WHERE      civicrm_event.is_active = 1 AND
@@ -539,7 +538,6 @@ $event_summary_limit
       $statusClasses = ['Positive', 'Pending', 'Waiting', 'Negative'];
       $eventSummary['events'][$dao->id]['statuses'] = array_fill_keys($statusClasses, []);
 
-      $eventSummary['events'][$dao->id]['friend'] = $dao->is_friend_active;
       $eventSummary['events'][$dao->id]['is_monetary'] = $dao->is_monetary;
       $eventSummary['events'][$dao->id]['is_online_registration'] = $dao->is_online_registration;
       $eventSummary['events'][$dao->id]['is_show_location'] = $dao->is_show_location;
