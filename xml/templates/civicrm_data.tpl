@@ -11,6 +11,18 @@
 --
 -- This file provides template to civicrm_data.mysql. Inserts all base data needed for a new CiviCRM DB
 
+{*
+  Don't assume the ids that rows will get: refer to other seeded rows by name.
+  - For ids that several files need (e.g. components, location types), set a
+    variable here after inserting the rows, e.g.
+    SELECT @locationTypeHome := id FROM civicrm_location_type WHERE name = 'Home';
+    and use it in *.sqldata.php files with new CRM_Utils_SQL_Literal('@locationTypeHome').
+  - For a one-off lookup inside a *.sqldata.php file, use a subquery, e.g.
+    new CRM_Utils_SQL_Literal("(SELECT id FROM civicrm_uf_group WHERE name = 'x')").
+  Tests offset the seeded tables' ids (Civi\Test\Schema::SEED_TABLES_TO_OFFSET)
+  so that rows relying on fixed ids fail.
+*}
+
 SET @domainName := 'Default Domain Name';
 SET @defaultOrganization := 'Default Organization';
 
