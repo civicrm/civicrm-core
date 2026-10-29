@@ -418,7 +418,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
     $params = [
-      'contact_id' => 9,
+      'contact_id' => $this->getXMLDataSetID('civicrm_contact', 9),
       'admin' => FALSE,
       'caseId' => NULL,
       'context' => 'home',
@@ -454,7 +454,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
     $params = [
-      'contact_id' => 9,
+      'contact_id' => $this->getXMLDataSetID('civicrm_contact', 9),
       'admin' => FALSE,
       'caseId' => NULL,
       'context' => 'activity',
@@ -530,7 +530,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->createTestActivities();
 
     $params = [
-      'contact_id' => 17,
+      'contact_id' => $this->getXMLDataSetID('civicrm_contact', 17),
       'admin' => FALSE,
       'caseId' => NULL,
       'context' => 'home',
@@ -554,6 +554,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->addCaseWithActivity();
     CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
+    $datasetActivityIDs = array_flip($this->getXMLDataSetIDs('civicrm_activity'));
     $activitiesNew = CRM_Activity_BAO_Activity::getActivities($this->_params);
     // $this->assertEquals($activities, $activitiesDeprecatedFn);
 
@@ -564,7 +565,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $this->assertCount($count, $activities);
 
       foreach ($activities as $key => $value) {
-        $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
+        $this->assertEquals($value['subject'], "subject {$datasetActivityIDs[$key]}", 'Verify activity subject is correct.');
         $this->assertEquals($value['activity_type_id'], 2, 'Verify activity type is correct.');
         $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
       }
@@ -597,9 +598,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    */
   public function testGetActivitiesForAdminDashboardAclLimitedViewContacts(): void {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
-    $this->allowedContacts = [18, 3, 4, 5];
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereMultipleContacts']);
     $this->setUpForActivityDashboardTests();
+    $this->allowedContacts = array_map(fn($id) => $this->getXMLDataSetID('civicrm_contact', $id), [18, 3, 4, 5]);
     $this->assertEquals(7, count(CRM_Activity_BAO_Activity::getActivities($this->_params)));
   }
 
@@ -612,7 +613,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->addCaseWithActivity();
     CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
-    $contactID = 9;
+    $contactID = $this->getXMLDataSetID('civicrm_contact', 9);
+    $datasetActivityIDs = array_flip($this->getXMLDataSetIDs('civicrm_activity'));
     $params = [
       'contact_id' => $contactID,
       'admin' => FALSE,
@@ -633,14 +635,14 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $this->assertEquals($count, count($activities));
 
       foreach ($activities as $key => $value) {
-        $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
+        $this->assertEquals($value['subject'], "subject {$datasetActivityIDs[$key]}", 'Verify activity subject is correct.');
         $this->assertEquals($value['activity_type_id'], 2, 'Verify activity type is correct.');
         $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
 
-        if ($key == 3) {
+        if ($datasetActivityIDs[$key] == 3) {
           $this->assertArrayHasKey($contactID, $value['target_contact_name']);
         }
-        elseif ($key == 4) {
+        elseif ($datasetActivityIDs[$key] == 4) {
           $this->assertArrayHasKey($contactID, $value['assignee_contact_name']);
         }
       }
@@ -693,7 +695,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   public function testGetActivitiesforContactSummaryWithSortOptions(): void {
     $this->createTestActivities();
     $params = [
-      'contact_id' => 9,
+      'contact_id' => $this->getXMLDataSetID('civicrm_contact', 9),
       'admin' => FALSE,
       'caseId' => NULL,
       'context' => 'activity',
@@ -721,7 +723,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->addCaseWithActivity();
     CRM_Core_Config::singleton()->userPermissionClass->permissions[] = 'access all cases and activities';
 
-    $contactID = 9;
+    $contactID = $this->getXMLDataSetID('civicrm_contact', 9);
+    $datasetActivityIDs = array_flip($this->getXMLDataSetIDs('civicrm_activity'));
     $params = [
       'contact_id' => $contactID,
       'admin' => FALSE,
@@ -738,33 +741,34 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activities = CRM_Activity_BAO_Activity::getActivities($params);
     $this->assertEquals($count, count($activities));
     foreach ($activities as $key => $value) {
-      $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
+      $datasetID = $datasetActivityIDs[$key];
+      $this->assertEquals($value['subject'], "subject {$datasetID}", 'Verify activity subject is correct.');
 
-      if ($key > 8) {
+      if ($datasetID > 8) {
         $this->assertEquals($value['status_id'], 2, 'Verify all activities are scheduled.');
       }
       else {
         $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
       }
 
-      if ($key === 12) {
+      if ($datasetID === 12) {
         $this->assertEquals($value['activity_type'], 'Bulk Email', 'Verify activity type is correct.');
         $this->assertEquals('(2 recipients)', $value['recipients']);
         $targetContactID = key($value['target_contact_name']);
         // The 2 targets have ids 10 & 11. Since they are not sorted it could be either on some systems.
-        $this->assertTrue(in_array($targetContactID, [10, 11]));
+        $this->assertTrue(in_array($targetContactID, [$this->getXMLDataSetID('civicrm_contact', 10), $this->getXMLDataSetID('civicrm_contact', 11)]));
       }
-      elseif ($key > 8) {
+      elseif ($datasetID > 8) {
         $this->assertEquals($value['activity_type_id'], 1, 'Verify activity type is correct.');
       }
       else {
         $this->assertEquals($value['activity_type_id'], 2, 'Verify activity type is correct.');
       }
 
-      if ($key == 3) {
-        $this->assertEquals([$contactID => 'Test Contact ' . $contactID], $value['target_contact_name']);
+      if ($datasetID == 3) {
+        $this->assertEquals([$contactID => 'Test Contact 9'], $value['target_contact_name']);
       }
-      elseif ($key == 4) {
+      elseif ($datasetID == 4) {
         $this->assertArrayHasKey($contactID, $value['assignee_contact_name']);
       }
     }
@@ -792,7 +796,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $testCases = [
       'with-no-activity' => [
         'params' => [
-          'contact_id' => 17,
+          'contact_id' => $this->getXMLDataSetID('civicrm_contact', 17),
           'admin' => FALSE,
           'caseId' => NULL,
           'context' => 'home',
@@ -804,7 +808,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'with-activity' => [
         'params' => [
-          'contact_id' => 18,
+          'contact_id' => $this->getXMLDataSetID('civicrm_contact', 18),
           'admin' => FALSE,
           'caseId' => NULL,
           'context' => 'home',
@@ -816,7 +820,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'with-activity_type' => [
         'params' => [
-          'contact_id' => 3,
+          'contact_id' => $this->getXMLDataSetID('civicrm_contact', 3),
           'admin' => FALSE,
           'caseId' => NULL,
           'context' => 'home',
@@ -828,7 +832,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'exclude-all-activity_type' => [
         'params' => [
-          'contact_id' => 3,
+          'contact_id' => $this->getXMLDataSetID('civicrm_contact', 3),
           'admin' => FALSE,
           'caseId' => NULL,
           'context' => 'home',
@@ -840,7 +844,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'sort-by-subject' => [
         'params' => [
-          'contact_id' => 18,
+          'contact_id' => $this->getXMLDataSetID('civicrm_contact', 18),
           'admin' => FALSE,
           'caseId' => NULL,
           'context' => 'home',
@@ -866,10 +870,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           // contact id 18 is assigned as source, target and assignee for activity id 1, 7 and 8 respectively
           $this->assertEquals(3, count($activities));
           $this->assertEquals(3, $activityCount);
-          $this->assertEquals(18, $activities[1]['source_contact_id']);
+          $this->assertEquals($this->getXMLDataSetID('civicrm_contact', 18), $activities[$this->getXMLDataSetID('civicrm_activity', 1)]['source_contact_id']);
           // @todo - this is a discrepancy between old & new - review.
           //$this->assertEquals(TRUE, array_key_exists(18, $activities[7]['target_contact_name']));
-          $this->assertEquals(TRUE, array_key_exists(18, $activities[8]['assignee_contact_name']));
+          $this->assertEquals(TRUE, array_key_exists($this->getXMLDataSetID('civicrm_contact', 18), $activities[$this->getXMLDataSetID('civicrm_activity', 8)]['assignee_contact_name']));
         }
         elseif ($caseName === 'with-activity_type') {
           // contact id 3 for activity type 2 is assigned as assignee, source and target for
@@ -877,11 +881,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           $this->assertEquals(3, count($activities));
           $this->assertEquals(3, $activityCount);
           // ensure activity type id is 2
-          $this->assertEquals(2, $activities[1]['activity_type_id']);
-          $this->assertEquals(3, $activities[3]['source_contact_id']);
+          $this->assertEquals(2, $activities[$this->getXMLDataSetID('civicrm_activity', 1)]['activity_type_id']);
+          $this->assertEquals($this->getXMLDataSetID('civicrm_contact', 3), $activities[$this->getXMLDataSetID('civicrm_activity', 3)]['source_contact_id']);
           // @todo review inconsistency between 2 versions.
           // $this->assertEquals(TRUE, array_key_exists(3, $activities[8]['target_contact_name']));
-          $this->assertTrue(array_key_exists(3, $activities[1]['assignee_contact_name']));
+          $this->assertTrue(array_key_exists($this->getXMLDataSetID('civicrm_contact', 3), $activities[$this->getXMLDataSetID('civicrm_activity', 1)]['assignee_contact_name']));
         }
         if ($caseName === 'exclude-all-activity_type') {
           $this->assertCount(0, $activities);
@@ -942,7 +946,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         $date = $today;
       }
       $this->callAPISuccess('Activity', 'create', [
-        'id' => $i,
+        'id' => $this->getXMLDataSetID('civicrm_activity', $i),
         'activity_date_time' => $date,
       ]);
     }
@@ -951,7 +955,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $testCases = [
       'todays-activity' => [
         'params' => [
-          'contact_id' => 18,
+          'contact_id' => $this->getXMLDataSetID('civicrm_contact', 18),
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
@@ -964,7 +968,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'todays-activity-filtered-by-range' => [
         'params' => [
-          'contact_id' => 18,
+          'contact_id' => $this->getXMLDataSetID('civicrm_contact', 18),
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
@@ -978,7 +982,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'last-week-activity' => [
         'params' => [
-          'contact_id' => 18,
+          'contact_id' => $this->getXMLDataSetID('civicrm_contact', 18),
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
@@ -991,7 +995,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'this-quarter-activity' => [
         'params' => [
-          'contact_id' => 18,
+          'contact_id' => $this->getXMLDataSetID('civicrm_contact', 18),
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
@@ -1004,7 +1008,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       ],
       'activity-of-all-statuses' => [
         'params' => [
-          'contact_id' => 18,
+          'contact_id' => $this->getXMLDataSetID('civicrm_contact', 18),
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
@@ -1022,13 +1026,15 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $activities = CRM_Activity_BAO_Activity::getActivities($testCase['params']);
       $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($testCase['params']);
       asort($activities);
-      $activityIDs = array_keys($activities);
+      // The activity ids in the dataset.
+      $datasetActivityIDs = array_flip($this->getXMLDataSetIDs('civicrm_activity'));
+      $activityIDs = array_map(fn($id) => $datasetActivityIDs[$id], array_keys($activities));
 
       if ($caseName === 'todays-activity' || $caseName === 'todays-activity-filtered-by-range') {
         // Only one of the 4 activities today relates to contact id 1.
         $this->assertEquals(1, $activityCount);
         $this->assertCount(1, $activities);
-        $this->assertEquals([7], array_keys($activities));
+        $this->assertEquals([7], $activityIDs);
       }
       elseif ($caseName === 'last-week-activity') {
         // Only one of the 3 activities today relates to contact id 1.
@@ -1562,7 +1568,7 @@ $text
   protected function createTestActivities(): void {
     $this->loadXMLDataSet(__DIR__ . '/activities_for_dashboard_count.xml');
     // Make changes to improve variation in php since the xml method is brittle & relies on option values being unchanged.
-    $this->callAPISuccess('Activity', 'create', ['id' => 12, 'activity_type_id:name' => 'Bulk Email']);
+    $this->callAPISuccess('Activity', 'create', ['id' => $this->getXMLDataSetID('civicrm_activity', 12), 'activity_type_id:name' => 'Bulk Email']);
   }
 
   /**
@@ -1843,10 +1849,10 @@ $textValue
       // Create case
       $params = [
         'subject'       => 'test case 1',
-        'contact_id'    => 3,
+        'contact_id'    => $this->getXMLDataSetID('civicrm_contact', 3),
         'status_id'     => 'Open',
         'case_type_id'  => $case_type_id,
-        'creator_id'    => 3,
+        'creator_id'    => $this->getXMLDataSetID('civicrm_contact', 3),
       ];
       $case_id = $this->callAPISuccess('case', 'create', $params)['id'];
     }
@@ -1857,8 +1863,8 @@ $textValue
       'activity_type_id' => 'Meeting',
       'status_id' => 'Scheduled',
       'case_id' => $case_id,
-      'source_contact_id' => 3,
-      'assignee_id' => [9],
+      'source_contact_id' => $this->getXMLDataSetID('civicrm_contact', 3),
+      'assignee_id' => [$this->getXMLDataSetID('civicrm_contact', 9)],
       'version' => 3,
       'subject' => 'test meeting activity',
     ])['id'] ?? NULL;

@@ -58,6 +58,8 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
 
     sort($contacts, SORT_NUMERIC);
 
+    // The data provider gives the contacts' ids in the dataset.
+    $ids = array_map(fn($id) => $this->getXMLDataSetID('civicrm_contact', $id), $ids);
     $this->assertEquals($ids, $contacts);
   }
 
@@ -69,8 +71,9 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
     $this->loadXMLDataSet(dirname(__FILE__) . '/queryDataset.xml');
     // ensure that total unique opened mail count is same while
     //   fetching rows and row count for mailing_id = 14
-    $totalOpenedMailCount = CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount(14, NULL, TRUE);
-    $totalOpenedMail = CRM_Mailing_Event_BAO_MailingEventOpened::getRows(14, NULL, TRUE);
+    $mailingID = $this->getXMLDataSetID('civicrm_mailing', 14);
+    $totalOpenedMailCount = CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount($mailingID, NULL, TRUE);
+    $totalOpenedMail = CRM_Mailing_Event_BAO_MailingEventOpened::getRows($mailingID, NULL, TRUE);
 
     $this->assertEquals(4, $totalOpenedMailCount);
     $this->assertEquals(4, count($totalOpenedMail));
@@ -84,10 +87,12 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
 
     // ensure that total unique clicked mail count is same while
     //   fetching rows and row count for mailing_id = 14 and
-    //   trackable_url_id 12
-    $totalDistinctTrackableUrlCount = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTotalCount(14, NULL, TRUE, 13);
-    $totalTrackableUrlCount = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTotalCount(14, NULL, FALSE, 13);
-    $totalTrackableUrlMail = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getRows(14, NULL, TRUE, 13);
+    //   trackable_url_id 13 (in the dataset)
+    $mailingID = $this->getXMLDataSetID('civicrm_mailing', 14);
+    $trackableURLID = $this->getXMLDataSetID('civicrm_mailing_trackable_url', 13);
+    $totalDistinctTrackableUrlCount = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTotalCount($mailingID, NULL, TRUE, $trackableURLID);
+    $totalTrackableUrlCount = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTotalCount($mailingID, NULL, FALSE, $trackableURLID);
+    $totalTrackableUrlMail = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getRows($mailingID, NULL, TRUE, $trackableURLID);
 
     $this->assertEquals(3, $totalDistinctTrackableUrlCount, "Accurately display distinct count of unique trackable URLs");
     $this->assertEquals(4, $totalTrackableUrlCount, "Accurately display count of unique trackable URLs");
