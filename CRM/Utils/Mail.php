@@ -145,6 +145,23 @@ class CRM_Utils_Mail {
         }
       });
     }
+    if ($driver === 'smtp') {
+      // CRM-8744: Net_SMTP::parseResponse() raises a generic, unhelpful
+      // 'Invalid response code received from server' error whenever the
+      // server's response doesn't match what was expected, with no pointer
+      // to how to fix it. Rewrite that specific message here, rather than
+      // relying on the pear/net_smtp patch, so it applies wherever the
+      // result surfaces (including FlexMailer's bulk-send bounce handling).
+      $mailer->addResultFilter('0100_friendly_response_error', function ($mailer, $result, $recipients, $headers, $body) {
+        if (is_a($result, 'PEAR_Error') && $result->getMessage() === 'Invalid response code received from server') {
+          return PEAR::raiseError(
+            'Invalid response code received from SMTP server while sending email.  This is often caused by a misconfiguration in Outbound Email settings. Please verify the settings at Administer CiviCRM >> Global Settings >> Outbound Email (SMTP).',
+            $result->getCode(),
+            PEAR_ERROR_RETURN
+          );
+        }
+      });
+    }
     if (in_array($driver, ['smtp', 'mail', 'sendmail'])) {
       $mailer->addFilter('2000_log', ['CRM_Utils_Mail_Logger', 'filter']);
       $mailer->addFilter('2100_validate', function ($mailer, &$recipients, &$headers, &$body) {

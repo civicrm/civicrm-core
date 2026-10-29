@@ -45,6 +45,11 @@ class CRM_Utils_Mail_FilteredPearMailer extends Mail {
   protected $_filters = [];
 
   /**
+   * @var callable[]
+   */
+  protected $_resultFilters = [];
+
+  /**
    * CRM_Utils_Mail_FilteredPearMailer constructor.
    * @param string $driver
    * @param array $params
@@ -74,7 +79,22 @@ class CRM_Utils_Mail_FilteredPearMailer extends Mail {
       }
     }
 
-    return $this->_delegate->send($recipients, $headers, $body);
+    try {
+      $result = $this->_delegate->send($recipients, $headers, $body);
+    }
+    catch (CRM_Core_Exception $e) {
+      // CiviCRM's ambient PEAR error scope (CRM_Core_Config::singleton())
+      // converts the delegate's raiseError() into a thrown exception; unwrap
+      // it so result-filters still see a PEAR_Error.
+      $result = $e->getErrorData()['exception'] ?? $e;
+    }
+    foreach ($this->_resultFilters as $filter) {
+      $altered = call_user_func($filter, $this, $result, $recipients, $headers, $body);
+      if ($altered !== NULL) {
+        $result = $altered;
+      }
+    }
+    return $result;
   }
 
   /**
@@ -91,6 +111,27 @@ class CRM_Utils_Mail_FilteredPearMailer extends Mail {
   public function addFilter($id, $func) {
     $this->_filters[$id] = $func;
     ksort($this->_filters);
+    return $this;
+  }
+
+  /**
+   * Add a filter that runs after the delegate has sent (or failed to send)
+   * the message, and may rewrite the result it produced - e.g. to replace
+   * an unhelpful PEAR_Error message. Runs regardless of whether send()
+   * succeeded, so check $result's type before acting on it.
+   *
+   * @param string $id
+   *   Unique ID for this filter. Filters are sorted by ID.
+   *   Suggestion: '{nnnn}_{name}', where '{nnnn}' is a number.
+   *   Filters are sorted and executed in order.
+   * @param callable $func
+   *   function(FilteredPearMailer $mailer, mixed $result, mixed $recipients, array $headers, string $body).
+   *   Return null to leave $result as-is, or a replacement value to use instead.
+   * @return static
+   */
+  public function addResultFilter($id, $func) {
+    $this->_resultFilters[$id] = $func;
+    ksort($this->_resultFilters);
     return $this;
   }
 

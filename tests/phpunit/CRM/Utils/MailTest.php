@@ -196,24 +196,75 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
   }
 
   /**
+   * CRM-8744: for the 'smtp' driver, CRM_Utils_Mail::_createMailer() should
+   * rewrite Net_SMTP's generic 'Invalid response code received from server'
+   * error into something that points admins at Outbound Email settings,
+   * rather than relying on the pear/net_smtp patch.
+   */
+  public function testCreateMailerRewritesGenericSmtpResponseError(): void {
+    $mailer = CRM_Utils_Mail::_createMailer('smtp', []);
+    $this->swapMailerDelegate($mailer, PEAR::raiseError('Invalid response code received from server', 550, PEAR_ERROR_RETURN));
+    $this->clearPreSendFilters($mailer);
+
+    $result = $mailer->send('to@example.com', ['To' => 'to@example.com'], 'body text');
+
+    $this->assertTrue(is_a($result, 'PEAR_Error'));
+    $this->assertStringContainsString('Outbound Email', $result->getMessage());
+    $this->assertEquals(550, $result->getCode());
+  }
+
+  /**
+   * The rewrite is specific to that one message; other smtp errors should
+   * be passed through unaltered.
+   */
+  public function testCreateMailerLeavesOtherSmtpErrorsAlone(): void {
+    $mailer = CRM_Utils_Mail::_createMailer('smtp', []);
+    $this->swapMailerDelegate($mailer, PEAR::raiseError('Failed to set sender', NULL, PEAR_ERROR_RETURN));
+    $this->clearPreSendFilters($mailer);
+
+    $result = $mailer->send('to@example.com', ['To' => 'to@example.com'], 'body text');
+
+    $this->assertTrue(is_a($result, 'PEAR_Error'));
+    $this->assertEquals('Failed to set sender', $result->getMessage());
+  }
+
+  /**
    * Replace a CRM_Utils_Mail_FilteredPearMailer's real delegate with a mock
-   * that records its '_params' instead of actually calling mail().
+   * that returns $sendReturns instead of actually sending anything.
    *
    * @return object
    *   The mock delegate, so its '_params' can be asserted on afterwards.
    */
-  private function swapMailerDelegate(CRM_Utils_Mail_FilteredPearMailer $mailer): object {
-    $mockDelegate = new class() extends Mail {
+  private function swapMailerDelegate(CRM_Utils_Mail_FilteredPearMailer $mailer, $sendReturns = TRUE): object {
+    $mockDelegate = new class($sendReturns) extends Mail {
       public $_params = '';
+      private $sendReturns;
+
+      public function __construct($sendReturns) {
+        $this->sendReturns = $sendReturns;
+      }
 
       public function send($recipients, $headers, $body) {
-        return TRUE;
+        return $this->sendReturns;
       }
 
     };
     $reflection = new ReflectionProperty($mailer, '_delegate');
     $reflection->setValue($mailer, $mockDelegate);
     return $mockDelegate;
+  }
+
+  /**
+   * Clear a CRM_Utils_Mail_FilteredPearMailer's pre-send filters.
+   *
+   * CRM_Utils_Mail_Logger::filter() (registered as '2000_log' on every
+   * smtp/mail/sendmail mailer) short-circuits send() with TRUE whenever
+   * CIVICRM_MAIL_LOG is defined, as it is on standard test sites - before
+   * the mock delegate or any result-filter runs. Tests that only care
+   * about result-filter behaviour need this cleared first.
+   */
+  private function clearPreSendFilters(CRM_Utils_Mail_FilteredPearMailer $mailer): void {
+    (new ReflectionProperty($mailer, '_filters'))->setValue($mailer, []);
   }
 
   /**
