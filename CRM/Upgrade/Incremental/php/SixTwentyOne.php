@@ -88,6 +88,13 @@ class CRM_Upgrade_Incremental_php_SixTwentyOne extends CRM_Upgrade_Incremental_B
       ],
     ]);
     $this->addTask('Make StatusPreference name unique per domain', 'makeStatusPreferenceNameUnique');
+    $this->addTask('Increase length of "Batch.name"', 'alterSchemaField', 'Batch', 'name', [
+      'title' => ts('Batch Name'),
+      'sql_type' => 'varchar(255)',
+      'input_type' => 'Text',
+      'description' => ts('Variable name/programmatic handle for this batch.'),
+      'add' => '3.3',
+    ]);
   }
 
   /**
