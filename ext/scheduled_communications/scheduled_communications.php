@@ -31,6 +31,19 @@ function scheduled_communications_civicrm_enable(): void {
 }
 
 /**
+ * Implements hook_civicrm_disable().
+ *
+ * Job.send_reminder is provided by this extension, so its scheduled job would fail on every cron run.
+ */
+function scheduled_communications_civicrm_disable(): void {
+  \Civi\Api4\Job::update(FALSE)
+    ->addWhere('api_entity', '=', 'Job')
+    ->addWhere('api_action', '=', 'send_reminder')
+    ->addValue('is_active', FALSE)
+    ->execute();
+}
+
+/**
  * Implements hook_civicrm_tabset().
  *
  * Adds "Schedule Reminders" to the Manage Event tabs (with an event_id) and to the event "Configure" links (without).
