@@ -111,7 +111,7 @@
 
   /**
    * Data provider for select2 "fields to return" selector
-   * @returns {{results: Array.<T>}}
+   * @returns {{results: Array<Object>}}
    */
   function returnFields() {
     return {results: fields.concat({id: '-', text: ts('Other') + '...', description: ts('Choose a field not in this list')})};
@@ -119,7 +119,7 @@
 
   /**
    * Data provider for select2 "field" selectors
-   * @returns {{results: Array.<T>}}
+   * @returns {{results: Array<Object>}}
    */
   function selectFields() {
     var items = fields.filter((field) => params[field.id] === undefined);

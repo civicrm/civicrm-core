@@ -58,7 +58,7 @@
 
   /**
    * Return the DOM siblings between the first and last node in the given array.
-   * @param {Array} array like object
+   * @param {ArrayLike<Node>} nodes
    * @returns {Array} the inputted object or a jqLite collection containing the nodes
    */
   function getBlockNodes(nodes) {

@@ -622,7 +622,7 @@
   };
   /**
    * An event callback for CRM.popup or a standalone function to refresh the content around a given element
-   * @param e {event|selector}
+   * @param e {*} an event, or anything jQuery accepts (selector, element, jQuery object)
    */
   CRM.refreshParent = function(e) {
     // Use e.target if input smells like an event, otherwise assume it's a jQuery selector
