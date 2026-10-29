@@ -131,6 +131,23 @@ function tellafriend_civicrm_buildForm(string $formName, CRM_Core_Form $form): v
 }
 
 /**
+ * Implements hook_civicrm_copy().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_copy/
+ */
+function tellafriend_civicrm_copy(string $objectName, $object, ?int $original_id = NULL): void {
+  if (in_array($objectName, ['ContributionPage', 'Event'], TRUE)) {
+    $entityTable = $objectName === 'ContributionPage' ? 'civicrm_contribution_page' : 'civicrm_event';
+    CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend', [
+      'entity_id' => $original_id,
+      'entity_table' => $entityTable,
+    ], [
+      'entity_id' => $object->id,
+    ]);
+  }
+}
+
+/**
  * Implements hook_civicrm_check().
  */
 function tellafriend_civicrm_check(&$messages) {

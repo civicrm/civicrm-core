@@ -960,14 +960,6 @@ WHERE civicrm_event.is_active = 1
       ['entity_id' => $copyEvent->id]
     );
 
-    CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend',
-      [
-        'entity_id' => $id,
-        'entity_table' => 'civicrm_event',
-      ],
-      ['entity_id' => $copyEvent->id]
-    );
-
     CRM_Core_DAO::copyGeneric('CRM_PCP_DAO_PCPBlock',
       [
         'entity_id' => $id,
