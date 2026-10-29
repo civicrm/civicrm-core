@@ -34,7 +34,7 @@ return [
     ],
     'name' => [
       'title' => ts('Batch Name'),
-      'sql_type' => 'varchar(64)',
+      'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
       'description' => ts('Variable name/programmatic handle for this batch.'),
       'add' => '3.3',
