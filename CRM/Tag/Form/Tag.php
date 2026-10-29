@@ -22,6 +22,13 @@
 class CRM_Tag_Form_Tag extends CRM_Core_Form {
 
   /**
+   * Tags are saved via ajax as they are changed, so there is nothing to warn about.
+   *
+   * @var bool
+   */
+  protected $unsavedChangesWarn = FALSE;
+
+  /**
    * The contact id, used when add/edit tag
    *
    * @var int
