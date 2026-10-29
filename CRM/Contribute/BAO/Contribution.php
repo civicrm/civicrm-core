@@ -129,23 +129,21 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     //set defaults in create mode
     if (!$contributionID) {
-      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
+      $params['payment_instrument_id'] = empty($params['payment_instrument_id']) ? self::getDefaultPaymentInstrumentID() : $params['payment_instrument_id'];
+      $params['contribution_status_id'] = empty($params['contribution_status_id']) ? CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed') : $params['contribution_status_id'];
+      $params['receive_date'] = empty($params['receive_date']) ? date('Y-m-d H:i:s') : $params['receive_date'];
+    }
+    $previousContributionStatus = NULL;
+    if ($contributionID) {
+      $params['prevContribution'] = self::getOriginalContribution($contributionID);
+      $previousContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['prevContribution']->contribution_status_id);
     }
 
-    $contributionStatusID = $params['contribution_status_id'] ?? NULL;
-    if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $contributionStatusID) === 'Partially paid' && empty($params['is_post_payment_create'])) {
+    $contributionStatusID = (int) ($params['contribution_status_id'] ?? $params['prevContribution']->contribution_status_id);
+    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatusID);
+    if ($previousContributionStatus !== $contributionStatus && CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $contributionStatusID) === 'Partially paid' && empty($params['is_post_payment_create'])) {
       CRM_Core_Error::deprecatedFunctionWarning('Setting status to partially paid other than by using Payment.create is deprecated and unreliable');
     }
-    if (!$contributionStatusID) {
-      // Since the fee amount is expecting this (later on) ensure it is always set.
-      // It would only not be set for an update where it is unchanged.
-      $params['contribution_status_id'] = Contribution::get(FALSE)
-        ->addSelect('contribution_status_id')
-        ->addWhere('id', '=', $contributionID)
-        ->execute()
-        ->first()['contribution_status_id'] ?? NULL;
-    }
-    $contributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['contribution_status_id']);
 
     if (!$contributionID
       && !empty($params['membership_id'])
@@ -166,12 +164,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
 
     $previousLineItems = [];
     if ($contributionID) {
-      $params['prevContribution'] = self::getOriginalContribution($contributionID);
       $order = new CRM_Financial_BAO_Order();
       $order->setExistingContributionID($contributionID);
       $previousLineItems = $order->getLineItems();
     }
-    $previousContributionStatus = ($contributionID && !empty($params['prevContribution'])) ? CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', (int) $params['prevContribution']->contribution_status_id) : NULL;
 
     if ($contributionID && !empty($params['revenue_recognition_date'])
       && !($previousContributionStatus === 'Pending')
@@ -386,21 +382,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       return TRUE;
     }
     return FALSE;
-  }
-
-  /**
-   * Get defaults for new entity.
-   *
-   * @return array
-   */
-  public static function getDefaults() {
-    return [
-      'payment_instrument_id' => key(CRM_Core_OptionGroup::values('payment_instrument',
-        FALSE, FALSE, FALSE, 'AND is_default = 1')
-      ),
-      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-      'receive_date' => date('Y-m-d H:i:s'),
-    ];
   }
 
   /**
@@ -2091,6 +2072,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'yearDate' => $yearDate,
       'monthDate' => $monthDate,
     ];
+  }
+
+  /**
+   * @return int|null
+   */
+  public static function getDefaultPaymentInstrumentID(): ?int {
+    return key(CRM_Core_OptionGroup::values('payment_instrument',
+      FALSE, FALSE, FALSE, 'AND is_default = 1')
+    );
   }
 
   /**
