@@ -561,6 +561,11 @@ class Api4SelectQuery extends Api4Query {
         elseif (!empty($joinEntityFields[$joinFieldName]['dfk_entities']) && (in_array($otherSideEntity, $joinEntityFields[$joinFieldName]['dfk_entities'], TRUE) || in_array(CoreUtil::getApiNameFromTableName($otherSideTable), $joinEntityFields[$joinFieldName]['dfk_entities'], TRUE))) {
           $isFK = TRUE;
         }
+        // 4. Dynamic FK on other side pointing to joinEntity (e.g. Note.entity_id -> Contact.id)
+        // The ON clause need not restrict entity_table, so the joined entity keeps all its ACL clauses.
+        elseif (isset($otherSideField['dfk_entities'][$joinTable]) && $joinFieldName === 'id') {
+          return TRUE;
+        }
 
         if ($isFK) {
           $aclStack = [$clause[$otherSide], $expr];
