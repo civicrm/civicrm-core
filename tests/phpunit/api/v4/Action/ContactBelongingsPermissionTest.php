@@ -293,7 +293,7 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
     $otherRel = Relationship::create(FALSE)
       ->addValue('contact_id_a', $otherContact1)
       ->addValue('contact_id_b', $otherContact2)
-      ->addValue('relationship_type_id', 1)
+      ->addValue('relationship_type_id:name', 'Child of')
       ->execute()->first()['id'];
 
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
@@ -334,7 +334,7 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
     $otherRel = Relationship::create(FALSE)
       ->addValue('contact_id_a', $otherContact1)
       ->addValue('contact_id_b', $otherContact2)
-      ->addValue('relationship_type_id', 1)
+      ->addValue('relationship_type_id:name', 'Child of')
       ->execute()->first()['id'];
 
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = [

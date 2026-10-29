@@ -361,12 +361,12 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     // Create contributions
     $disallowedContributionId = $this->contributionCreate([
       'contact_id' => $disallowedContactId,
-      'financial_type_id' => 1,
+      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'),
       'total_amount' => 50,
     ]);
     $allowedContributionId = $this->contributionCreate([
       'contact_id' => $allowedContactId,
-      'financial_type_id' => 1,
+      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'),
       'total_amount' => 50,
     ]);
 

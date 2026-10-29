@@ -199,7 +199,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     ], 'addr_contrib');
     $this->createTestEntity('Contribution', [
       'contact_id' => $contact1['id'],
-      'financial_type_id' => 1,
+      'financial_type_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
       'total_amount' => 100,
       'address_id' => $addressContrib['id'],
     ], 'contrib1');
