@@ -275,8 +275,8 @@ trait DAOActionTrait {
       $fkEntity = \Civi::entity($fkEntityName);
       // Ensure specified field is unique
       $uniqueIndex = FALSE;
-      // TODO: 'name' is grandfathered in but we should remove this exception and add missing indices
-      if ($fkField === 'name') {
+      // TODO: 'name' and 'iso_code' are grandfathered in but we should remove this exception and add missing indices
+      if (in_array($fkField, ['name', 'iso_code'], TRUE)) {
         $uniqueIndex = TRUE;
       }
       else {
