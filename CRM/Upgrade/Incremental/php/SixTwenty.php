@@ -334,6 +334,9 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
   public function upgrade_6_20_beta1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Set contribution_status default', 'setContributionStatusDefault');
+    $this->addTask('Remove index civicrm_country.UI_name_iso_code', 'dropIndex', 'civicrm_country', 'UI_name_iso_code');
+    $this->addTask('Add index civicrm_country.UI_name', 'addIndex', 'civicrm_country', 'name', 'UI');
+    $this->addTask('Add index civicrm_country.UI_iso_code', 'addIndex', 'civicrm_country', 'iso_code', 'UI');
   }
 
   public static function setContributionStatusDefault(CRM_Queue_TaskContext $ctx): bool {

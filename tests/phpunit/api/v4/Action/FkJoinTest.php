@@ -21,6 +21,7 @@ namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
+use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
@@ -130,6 +131,21 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($contact1['id'], $contacts[0]['id']);
     $this->assertEquals('+35355439483', $contacts[0]['phone.phone']);
     $this->assertEquals('1', $contacts[0]['phone.location_type_id']);
+  }
+
+  public function testCreateWithFkIsoCode(): void {
+    $contact = Contact::create(FALSE)
+      ->addValue('first_name', 'Frenchie')
+      ->addValue('address_primary.country_id.iso_code', 'FR')
+      ->execute()
+      ->first();
+    $address = Address::get(FALSE)
+      ->addWhere('contact_id', '=', $contact['id'])
+      ->addSelect('country_id:name', 'country_id:label')
+      ->execute()
+      ->first();
+    $this->assertEquals('FR', $address['country_id:name']);
+    $this->assertEquals('France', $address['country_id:label']);
   }
 
   public function testImplicitJoinOnExplicitJoin(): void {
