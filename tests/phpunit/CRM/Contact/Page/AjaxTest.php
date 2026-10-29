@@ -731,7 +731,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate(['first_name' => 'Supporter', 'last_name' => 'Jones'], 'pcp_supporter');
     $contribPage = $this->createTestEntity('ContributionPage', [
       'title' => 'PCP Goal Page',
-      'financial_type_id' => 1,
+      'financial_type_id:name' => 'Donation',
     ], 'pcp_contrib_page');
     $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord([
       'entity_table' => 'civicrm_contribution_page',
@@ -772,7 +772,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate(['first_name' => 'Hidden', 'last_name' => 'Supporter'], 'pcp_hidden');
     $contribPage = $this->createTestEntity('ContributionPage', [
       'title' => 'PCP Goal Page 2',
-      'financial_type_id' => 1,
+      'financial_type_id:name' => 'Donation',
     ], 'pcp_contrib_page2');
     $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord([
       'entity_table' => 'civicrm_contribution_page',

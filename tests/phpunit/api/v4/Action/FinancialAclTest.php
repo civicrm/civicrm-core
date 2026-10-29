@@ -64,14 +64,14 @@ class FinancialAclTest extends Api4TestBase implements TransactionalInterface, H
       'contact_id' => $disallowedContactId,
       'amount' => 100,
       'installments' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id:name' => 'Donation',
       'start_date' => 'now',
     ])['id'];
     $allowedPledgeId = $this->createTestRecord('Pledge', [
       'contact_id' => $allowedContactId,
       'amount' => 100,
       'installments' => 1,
-      'financial_type_id' => 1,
+      'financial_type_id:name' => 'Donation',
       'start_date' => 'now',
     ])['id'];
 
@@ -98,12 +98,12 @@ class FinancialAclTest extends Api4TestBase implements TransactionalInterface, H
     // --- Contributions Setup ---
     $disallowedContributionId = $this->createTestRecord('Contribution', [
       'contact_id' => $disallowedContactId,
-      'financial_type_id' => 1,
+      'financial_type_id:name' => 'Donation',
       'total_amount' => 50,
     ])['id'];
     $allowedContributionId = $this->createTestRecord('Contribution', [
       'contact_id' => $allowedContactId,
-      'financial_type_id' => 1,
+      'financial_type_id:name' => 'Donation',
       'total_amount' => 50,
     ])['id'];
 

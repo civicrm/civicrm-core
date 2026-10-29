@@ -11,6 +11,7 @@
 
 use Civi\Test\FormWrapper;
 use Civi\Test\HeadlessInterface;
+use Civi\Api4\RelationshipType;
 
 /**
  * Test class for Relationship permissions on contact view and form
@@ -42,10 +43,11 @@ class CRM_Contact_Page_View_RelationshipPermissionTest extends CiviUnitTestCase 
     $contactB = $this->createTestEntity('Contact', ['contact_type' => 'Individual'], 'contact_b');
     $unrelated = $this->createTestEntity('Contact', ['contact_type' => 'Individual'], 'unrelated');
 
+    $relationshipTypeID = RelationshipType::get(FALSE)->addWhere('name_a_b', '=', 'Child Of')->execute()->first()['id'];
     $rel = $this->createTestEntity('Relationship', [
       'contact_id_a' => $contactA['id'],
       'contact_id_b' => $contactB['id'],
-      'relationship_type_id' => 1,
+      'relationship_type_id' => $relationshipTypeID,
     ], 'rel_test');
 
     $this->createLoggedInUser();
@@ -73,10 +75,11 @@ class CRM_Contact_Page_View_RelationshipPermissionTest extends CiviUnitTestCase 
     $contactA = $this->createTestEntity('Contact', ['contact_type' => 'Individual'], 'contact_a2');
     $contactB = $this->createTestEntity('Contact', ['contact_type' => 'Individual'], 'contact_b2');
 
+    $relationshipTypeID = RelationshipType::get(FALSE)->addWhere('name_a_b', '=', 'Child Of')->execute()->first()['id'];
     $rel = $this->createTestEntity('Relationship', [
       'contact_id_a' => $contactA['id'],
       'contact_id_b' => $contactB['id'],
-      'relationship_type_id' => 1,
+      'relationship_type_id' => $relationshipTypeID,
     ], 'rel_test2');
 
     $this->createLoggedInUser();
@@ -104,10 +107,11 @@ class CRM_Contact_Page_View_RelationshipPermissionTest extends CiviUnitTestCase 
     $contactA = $this->createTestEntity('Contact', ['contact_type' => 'Individual'], 'contact_a3');
     $contactB = $this->createTestEntity('Contact', ['contact_type' => 'Individual'], 'contact_b3');
 
+    $relationshipTypeID = RelationshipType::get(FALSE)->addWhere('name_a_b', '=', 'Child Of')->execute()->first()['id'];
     $rel = $this->createTestEntity('Relationship', [
       'contact_id_a' => $contactA['id'],
       'contact_id_b' => $contactB['id'],
-      'relationship_type_id' => 1,
+      'relationship_type_id' => $relationshipTypeID,
     ], 'rel_test3');
 
     $this->createLoggedInUser();
@@ -137,9 +141,9 @@ class CRM_Contact_Page_View_RelationshipPermissionTest extends CiviUnitTestCase 
 
     $this->expectException(CRM_Core_Exception::class);
     $this->expectExceptionMessage('You do not have permission to access this page.');
-
+    $relationshipTypeID = RelationshipType::get(FALSE)->addWhere('name_a_b', '=', 'Child Of')->execute()->first()['id'];
     $this->getTestForm('CRM_Contact_Form_Relationship', [
-      'relationship_type_id' => '1_a_b',
+      'relationship_type_id' => $relationshipTypeID . '_a_b',
       'related_contact_id' => (string) $targetContact['id'],
       'is_permission_a_b' => 1,
     ], [
