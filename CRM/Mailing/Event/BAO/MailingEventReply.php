@@ -25,8 +25,8 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
   /**
    * Register a reply event.
    *
-   * @param int $job_id
-   *   The job ID of the reply.
+   * @param null $job_id
+   *   unused
    * @param int $queue_id
    *   The queue event id.
    * @param string $hash
@@ -34,10 +34,10 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
    *
    * @param null $replyto
    *
-   * @return CRM_Mailing_BAO_Mailing|null
+   * @return CRM_Mailing_DAO_Mailing|null
    *   The mailing object, or null on failure
    */
-  public static function &reply($job_id, $queue_id, $hash, $replyto = NULL) {
+  public static function reply($job_id, int $queue_id, $hash, $replyto = NULL) {
     // First make sure there's a matching queue event.
     $q = CRM_Mailing_Event_BAO_MailingEventQueue::verify(NULL, $queue_id, $hash);
 
@@ -47,14 +47,12 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
       return $success;
     }
 
-    $mailing = new CRM_Mailing_BAO_Mailing();
-    $mailings = CRM_Mailing_BAO_Mailing::getTableName();
-    $jobs = CRM_Mailing_BAO_MailingJob::getTableName();
-    $mailing->query(
-      "SELECT * FROM  $mailings
-            INNER JOIN      $jobs
-                ON          $jobs.mailing_id = $mailings.id
-            WHERE           $jobs.id = {$q->job_id}"
+    $mailing = CRM_Core_DAO::executeQuery(
+      "SELECT * FROM  civicrm_mailing m
+            INNER JOIN      civicrm_mailing_event_queue q
+                ON          q.mailing_id = m.id
+            WHERE           q.id = %1",
+      [1 => [$queue_id, 'Integer']]
     );
     $mailing->fetch();
     if ($mailing->auto_responder) {
@@ -78,7 +76,7 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
    *
    * @param int $queue_id
    *   Queue event ID of the sender.
-   * @param CRM_Mailing_BAO_Mailing $mailing
+   * @param CRM_Mailing_DAO_Mailing $mailing
    *   The mailing object.
    * @param string $bodyTxt
    *   Text part of the body (ignored if $fullEmail provided).
@@ -89,27 +87,24 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
    * @param string $fullEmail
    *   Whole email to forward in one string.
    */
-  public static function send($queue_id, &$mailing, &$bodyTxt, $replyto, &$bodyHTML = NULL, &$fullEmail = NULL) {
-    $emails = CRM_Core_BAO_Email::getTableName();
-    $queue = CRM_Mailing_Event_BAO_MailingEventQueue::getTableName();
-    $contacts = CRM_Contact_BAO_Contact::getTableName();
+  public static function send(int $queue_id, $mailing, $bodyTxt, $replyto, $bodyHTML = NULL, $fullEmail = NULL) {
     $domain_id = CRM_Core_Config::domainID();
     $domainValues = civicrm_api3('Domain', 'get', ['sequential' => 1, 'id' => $domain_id]);
     $fromEmail = CRM_Core_BAO_Domain::getNoReplyEmailAddress();
 
-    $eq = new CRM_Core_DAO();
-    $eq->query("SELECT     $contacts.display_name as display_name,
-                           $emails.email as email,
-                           $queue.job_id as job_id,
-                           $queue.hash as hash
-                   FROM        $queue
-                   INNER JOIN  $contacts
-                           ON  $queue.contact_id = $contacts.id
-                   INNER JOIN  $emails
-                           ON  $queue.email_id = $emails.id
-                   WHERE       $queue.id = " . CRM_Utils_Type::escape($queue_id, 'Integer')
+    $query = CRM_Core_DAO::executeQuery("SELECT c.display_name as display_name,
+                           e.email as email,
+                           q.job_id as job_id,
+                           q.hash as hash
+                   FROM        civicrm_mailing_event_queue q
+                   INNER JOIN  civicrm_contact c
+                           ON  q.contact_id = c.id
+                   INNER JOIN  civicrm_email e
+                           ON  q.email_id = e.id
+                   WHERE       q.id = %1",
+      [1 => [$queue_id, 'Integer']]
     );
-    $eq->fetch();
+    $eq = $query->fetchAll()[0];
 
     if ($fullEmail) {
       // parse the email and set a new destination
@@ -140,7 +135,7 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
       $b = $parsed->generateBody();
     }
     else {
-      $fromName = empty($eq->display_name) ? $eq->email : "{$eq->display_name} ({$eq->email})";
+      $fromName = empty($eq['display_name']) ? $eq['email'] : "{$eq['display_name']} ({$eq['email']})";
 
       $message = new Mail_mime(CRM_Utils_Mail::pickDefaultEol());
 
@@ -148,20 +143,20 @@ class CRM_Mailing_Event_BAO_MailingEventReply extends CRM_Mailing_Event_DAO_Mail
         'Subject' => "Re: {$mailing->subject}",
         'To' => $mailing->replyto_email,
         'From' => "\"$fromName\" <$fromEmail>",
-        'Reply-To' => empty($replyto) ? $eq->email : $replyto,
+        'Reply-To' => empty($replyto) ? $eq['email'] : $replyto,
         'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
         // CRM-17754 Include re-sent headers to indicate that we have forwarded on the email
         'Resent-From' => $domainValues['values'][0]['from_email'],
         'Resent-Date' => date('r'),
       ];
 
-      $message->setTxtBody($bodyTxt);
-      $message->setHTMLBody($bodyHTML);
+      $message->setTxtBody((string) $bodyTxt);
+      $message->setHTMLBody((string) $bodyHTML);
       $b = CRM_Utils_Mail::setMimeParams($message);
       $h = $message->headers($headers);
     }
 
-    CRM_Mailing_BAO_Mailing::addMessageIdHeader($h, 'r', NULL, $queue_id, $eq->hash);
+    CRM_Mailing_BAO_Mailing::addMessageIdHeader($h, 'r', NULL, $queue_id, $eq['hash']);
     $mailer = \Civi::service('pear_mail');
 
     if (is_object($mailer)) {

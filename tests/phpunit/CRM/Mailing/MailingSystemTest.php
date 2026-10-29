@@ -40,6 +40,8 @@ use Civi\Api4\Address;
  */
 class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
 
+  public $_apiversion = 4;
+
   private $counts;
 
   private $checkMailParamsContext = TRUE;
@@ -91,7 +93,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
     ];
     $params['options']['force_rollback'] = 1;
 
-    $result = $this->callAPISuccess('mailing', 'create', $params);
+    $result = $this->callApiV3Success('Mailing', 'create', $params);
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
     $this->assertMatchesRegularExpression('!>Unsubscribe written in ckeditor</a>!', $previewResult['values']['body_html']);
     $this->assertMatchesRegularExpression('!<a href="([^"]+)civicrm/mailing/unsubscribe&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*">!', $previewResult['values']['body_html']);
@@ -148,8 +150,8 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
     ]);
 
     $this->callAPISuccessGetCount('activity', [
-      'activity_type_id' => 'Bulk Email',
-      'status_id' => 'Completed',
+      'activity_type_id:name' => 'Bulk Email',
+      'status_id:name' => 'Completed',
       'subject' => $subject,
     ], 1);
   }
@@ -200,7 +202,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
     ];
 
     // The following code is exactly the same as runMailingSuccess() except that we store the ID of the mailing.
-    $mailing_1 = $this->callAPISuccess('Mailing', 'create', $mailingParams);
+    $this->callAPIV3Success('Mailing', 'create', $mailingParams);
     $mut->assertRecipients([]);
     $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
@@ -217,8 +219,6 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
       $matches
     ));
 
-    $this->checkMailParamsContext = FALSE;
-
     CRM_Mailing_Event_BAO_MailingEventReply::reply(
       $matches[1],
       $matches[2],
@@ -231,8 +231,63 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
       'info@EXAMPLE.ORG',
       'mail1@nul.example.com',
     ], ['{domain.address}']);
-    $this->callAPISuccess('Mailing', 'delete', ['id' => $mailing_1['id']]);
-    $this->callAPISuccess('Group', 'delete', ['id' => $group_1]);
+  }
+
+  /**
+   * Test that a reply is forwarded to the mailing's replyto_email
+   * when forward_replies is enabled.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMailingReplyForward(): void {
+    $group_1 = $this->groupCreate([
+      'name' => 'Test Group Mailing Reply Forward',
+      'title' => 'Test Group Mailing Reply Forward',
+    ]);
+    $this->createContactsInGroup(1, $group_1);
+    // Also _mut is private to the parent, so we have to make our own:
+    $mut = new CiviMailUtils($this, TRUE);
+
+    $mailingParams = [
+      'name'            => 'Mailing Reply Forward: mailing',
+      'subject'         => 'Mailing Reply Forward: test',
+      'created_id'      => CRM_Core_BAO_Domain::getDomain()->contact_id,
+      'groups'          => ['include' => [$group_1]],
+      'scheduled_date'  => 'now',
+      'body_text'       => 'Please just {action.unsubscribeUrl}',
+      'forward_replies' => 1,
+      'replyto_email'   => 'forward-target@example.org',
+    ];
+
+    $mailing_1 = $this->callAPIV3Success('Mailing', 'create', $mailingParams);
+    $mut->assertRecipients([]);
+    $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+
+    $allMessages = $mut->getAllMessages('ezc');
+    $this->assertCount(1, $allMessages);
+
+    $message = end($allMessages);
+    $this->assertEquals(1, preg_match(
+      '@mailing/unsubscribe.*jid=(\d+)&qid=(\d+)&h=([0-9a-z]+)@',
+      $message->body->text,
+      $matches
+    ));
+
+    $this->checkMailParamsContext = FALSE;
+
+    $this->callAPIV3Success('Mailing', 'event_reply', [
+      'event_queue_id' => $matches[2],
+      'hash' => $matches[3],
+      'bodyTxt' => 'This is my forwarded reply text.',
+      'replyTo' => 'original-sender@example.org',
+    ]);
+
+    $mut->checkMailLog([
+      'Re: Mailing Reply Forward: test',
+      'forward-target@example.org',
+      'Reply-To: original-sender@example.org',
+      'This is my forwarded reply text.',
+    ]);
   }
 
 }

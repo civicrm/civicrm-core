@@ -488,7 +488,7 @@ United States
    */
   protected function runMailingSuccess($params) {
     $mailingParams = array_merge($this->defaultParams, $params);
-    $this->callAPISuccess('Mailing', 'create', $mailingParams);
+    $this->callApiV3Success('Mailing', 'create', $mailingParams);
     $this->_mut->assertRecipients([]);
     $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
@@ -525,7 +525,7 @@ United States
       'subject' => 'Accidents in cars cause children for {contact.display_name}!',
       'body_text' => 'BEWARE children need regular infusions of toys. Santa knows your {domain.address}. There is no {action.optOutUrl}.',
     ]);
-    $this->callAPISuccess('Mailing', 'create', $mailingParams);
+    $this->callAPIV3Success('Mailing', 'create', $mailingParams);
     $this->_mut->assertRecipients([]);
     $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
     $queueItems = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_mailing_event_queue")->fetchAll();
