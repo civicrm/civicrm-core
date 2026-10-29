@@ -101,6 +101,10 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
   }
 
   public static function updateLastAccessed() {
+    if (\CRM_Utils_System::currentPath() === 'civicrm/authx/id') {
+      // ignore polling whether logged in
+      return;
+    }
     $sess = CRM_Core_Session::singleton();
     $ufID = (int) $sess->get('ufID');
     if (!$ufID) {
