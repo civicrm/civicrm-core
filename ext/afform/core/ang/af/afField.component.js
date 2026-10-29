@@ -154,6 +154,7 @@
         }
 
         // check for tokens in the default value
+        let tokenDefault;
         const tokens = this.afForm?.identifyTokens(this.defn.afform_default);
         if (tokens && tokens.size) {
           const calculateValueWatcher = $scope.$watchCollection(() => Object.values(this.afForm.getTokenValues(tokens)), () => {
@@ -162,8 +163,12 @@
               calculateValueWatcher();
               return;
             }
-            const calculatedValue = this.afForm.replaceTokens(this.defn.afform_default);
-            setValue(calculatedValue);
+            // A value the field got elsewhere, such as from a loaded record, is kept
+            const value = $scope.getSetValue();
+            if (tokenDefault !== undefined && value !== undefined && !angular.equals(value, tokenDefault)) {
+              return;
+            }
+            setTokenDefault();
           });
         }
 
@@ -260,6 +265,11 @@
           }
         }
 
+        function setTokenDefault() {
+          setValue(ctrl.afForm.replaceTokens(ctrl.defn.afform_default));
+          tokenDefault = angular.copy($scope.getSetValue());
+        }
+
         // Value precedence, lowest first: afform_default, stored value (first load only),
         // SearchParamSet, route params. On first load the routeParams watch applies the last two.
         function initializeValue(firstLoad) {
@@ -273,7 +283,7 @@
           // Set default value based on field defn
           else if ('afform_default' in ctrl.defn) {
             if (ctrl.afForm?.identifyTokens(ctrl.defn.afform_default)) {
-              setValue(ctrl.afForm.replaceTokens(ctrl.defn.afform_default));
+              setTokenDefault();
             }
             else {
               setValue(ctrl.defn.afform_default);
