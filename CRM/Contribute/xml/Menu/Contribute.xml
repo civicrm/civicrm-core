@@ -20,13 +20,6 @@
     <component>CiviContribute</component>
   </item>
   <item>
-    <path>civicrm/contribute/chart</path>
-    <title>Contribution Summary - Chart View</title>
-    <page_callback>CRM_Contribute_Form_ContributionCharts</page_callback>
-    <access_arguments>access CiviContribute</access_arguments>
-    <component>CiviContribute</component>
-  </item>
-  <item>
     <path>civicrm/contribute/transact</path>
     <title>CiviContribute</title>
     <page_callback>CRM_Contribute_Controller_Contribution</page_callback>
