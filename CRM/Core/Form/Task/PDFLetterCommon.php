@@ -144,6 +144,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
     $form->assign('useThisPageFormat', ts('Always use this Page Format with the new template?'));
     $form->assign('useSelectedPageFormat', ts('Should the new template always use the selected Page Format?'));
     $form->assign('totalSelectedContacts', !is_null($form->_contactIds) ? count($form->_contactIds) : 0);
+    $form->assign('defaultFormat', CRM_Core_BAO_PdfFormat::getDefaultValues());
 
     $form->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
 

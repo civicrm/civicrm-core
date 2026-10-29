@@ -247,12 +247,6 @@
      <is_ajax>true</is_ajax>
 </item>
 <item>
-     <path>civicrm/ajax/pdfFormat</path>
-     <page_callback>CRM_Contact_Page_AJAX::pdfFormat</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-     <is_ajax>true</is_ajax>
-</item>
-<item>
      <path>civicrm/ajax/paperSize</path>
      <page_callback>CRM_Contact_Page_AJAX::paperSize</page_callback>
      <access_arguments>access CiviCRM</access_arguments>

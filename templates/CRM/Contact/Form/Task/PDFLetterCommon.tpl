@@ -229,17 +229,34 @@ function fillFormatInfo( data, bind ) {
   showBindFormatChkBox();
 }
 
-function selectFormat( val, bind ) {
+function selectFormat(val, bind) {
+  const defaultFormat = {/literal}{$defaultFormat|json nofilter}{literal};
   updateFormatLabel();
-  if (!val) {
-    val = 0;
-    bind = false;
+  if (!val || val === '0') {
+    fillFormatInfo(defaultFormat, false);
+    return;
   }
 
-  var dataUrl = {/literal}"{crmURL p='civicrm/ajax/pdfFormat' h=0}"{literal};
-  cj.post( dataUrl, {formatId: val}, function( data ) {
-    fillFormatInfo(data, bind);
-  }, 'json');
+  CRM.api4('OptionValue', 'get', {
+    select: ['id', 'value'],
+    where: [
+      ['id', '=', val],
+      ['option_group_id:name', '=', 'pdf_format'],
+      ['is_active', '=', true]
+    ]
+  }, 0).then((optionValue) => {
+    let format = defaultFormat;
+    if (optionValue && optionValue.value) {
+      try {
+        format = Object.assign({}, defaultFormat, JSON.parse(optionValue.value), {id: optionValue.id});
+      } catch (e) {
+        format = Object.assign({}, defaultFormat, {id: optionValue.id});
+      }
+    } else if (optionValue) {
+      format = Object.assign({}, defaultFormat, {id: optionValue.id});
+    }
+    fillFormatInfo(format, bind);
+  });
 }
 
 function selectPaper( val )
