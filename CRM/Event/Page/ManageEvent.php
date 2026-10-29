@@ -409,10 +409,6 @@ ORDER BY start_date desc
 
         $defaults['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
 
-        if (function_exists('tellafriend_civicrm_config')) {
-          $manageEvent[$dao->id]['friend'] = CRM_Friend_BAO_Friend::getValues($params);
-        }
-
         if (isset($defaults['location']['address'][1]['city'])) {
           $manageEvent[$dao->id]['city'] = $defaults['location']['address'][1]['city'];
         }
