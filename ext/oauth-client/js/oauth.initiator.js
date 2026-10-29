@@ -29,7 +29,7 @@
    *
    * @param {string} [url] - The URL to open.
    * @param {string} [target]
-   * @param {object} [params] - Optional window parameters.
+   * @param {object} [params] - Optional window parameters; keys not listed below pass through as window features (e.g., scrollbars, resizable).
    * @param {string|number} [params.width] - Width (px or percentage string like "80%").
    * @param {string|number} [params.height] - Height (px or percentage string like "80%").
    * @param {string|number} [params.minWidth] - Minimum width (px or percentage).
@@ -37,7 +37,8 @@
    * @param {string|number} [params.minHeight] - Minimum height (px or percentage).
    * @param {string|number} [params.maxHeight] - Maximum height (px or percentage).
    * @param {boolean} [params.center=false] - Whether to center the popup.
-   * @param {...any} [params.*] - Any other window features (e.g., scrollbars, resizable).
+   * @param {number} [params.left] - Left position (px); computed when centering.
+   * @param {number} [params.top] - Top position (px); computed when centering.
    *
    * @returns {Window|null} A reference to the new window.
    */

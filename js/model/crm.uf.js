@@ -450,9 +450,8 @@
       this.initializeCopyToChildrenRelation('ufGroupModel', options.ufGroupModel, models);
     },
     /**
-     *
-     * @param name
-     * @return {UFEntityModel} if found; otherwise, null
+     * @param {string} name
+     * @return {CRM.UF.UFEntityModel} or undefined (if not found)
      */
     getByName: function(name) {
       // TODO consider indexing

@@ -34,7 +34,6 @@
      * Add a new UFField model to a UFFieldCollection (if doing so is legal).
      * If it fails, display an alert.
      *
-     * @param {int} ufGroupId
      * @param {CRM.UF.UFFieldCollection} ufFieldCollection
      * @param {Object} addOptions
      * @return {CRM.UF.UFFieldModel} or null (if the field is not addable)

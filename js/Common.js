@@ -399,7 +399,7 @@ if (!CRM.vars) CRM.vars = {};
    * Render an option list
    * @param options {array}
    * @param val {string} default value
-   * @param escapeHtml {bool}
+   * @param escapeHtml {boolean}
    * @return string
    */
   CRM.utils.renderOptions = function(options, val, escapeHtml) {
@@ -2147,11 +2147,11 @@ if (!CRM.vars) CRM.vars = {};
   /**
    * Format a date (and optionally time) for output to the user
    *
-   * @param {string|int|Date} input
+   * @param {string|number|Date} input
    *   Input may be a js Date object, a unix timestamp or a 'yyyy-mm-dd' string
    * @param {string|null} dateFormat
    *   A string like 'yy-mm-dd' or null to use the system default
-   * @param {int|bool} timeFormat
+   * @param {number|boolean} timeFormat
    *   Leave empty to omit time from the output (default)
    *   Or pass 12, 24, or true to use the system default for 12/24hr format
    * @returns {string}

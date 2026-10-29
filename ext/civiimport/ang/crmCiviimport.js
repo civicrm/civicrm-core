@@ -107,7 +107,7 @@
         /**
          * Get fields available to map to.
          *
-         * @type {function(): {results: $scope.data.entityMetadata}}
+         * @returns {{results: Array}} the selected entities from $scope.data.entityMetadata, with filtered fields
          */
         $scope.getFields = (function () {
           var fields = [];
@@ -186,7 +186,11 @@
          * Currently we only filter contact fields here, based on contact type, dedupe rule,
          * and action.
          *
-         * @type {(function(*=, *=, *=, *=): (*))|*}
+         * @param {string} entityType
+         * @param {Array} fields
+         * @param {Object} selection
+         * @param {string} entityFieldPrefix
+         * @returns {Array}
          */
         function filterEntityFields(entityType, fields, selection, entityFieldPrefix) {
           if (entityType === 'Contact') {
@@ -198,7 +202,10 @@
         /**
          * Filter contact fields, removing fields not appropriate for the entity or action.
          *
-         * @type {function(*=, *): *}
+         * @param {Array} fields
+         * @param {Object} selection
+         * @param {string} entityFieldPrefix
+         * @returns {Array}
          */
         function filterContactFields(fields, selection, entityFieldPrefix) {
           const contactType = selection.contact_type;
@@ -244,8 +251,8 @@
         /**
          * Get metadata for the given entity.
          *
-         * @param selectedEntity
-         * @returns {*[]}
+         * @param {string} selectedEntity
+         * @returns {Object} empty if the entity is not found
          */
         $scope.getEntityMetadata = function (selectedEntity) {
           let entityData = {};
@@ -260,8 +267,8 @@
         /**
          * Get a list of dedupe rules for the entity type.
          *
-         * @param selectedEntity
-         * @returns [{}]
+         * @param {string} selectedEntity
+         * @returns {Array<Object>}
          *   e.g [{name: 'IndividualSupervised', 'text' : 'Name and email', 'is_default' : true}]
          */
         $scope.getDedupeRules = function (selectedEntity) {
@@ -289,7 +296,8 @@
         /**
          * Get the entity for the given field.
          *
-         * @type {$scope.getEntityForField}
+         * @param {string} fieldName
+         * @returns {string} empty if no entity has the field
          */
         $scope.getEntityForField = (function (fieldName) {
           let entityName = '';
@@ -316,8 +324,6 @@
          * Add another row to the mapping.
          *
          * This row will use a default value and be the same for all rows imported.
-         *
-         * @type {$scope.addRow}
          */
         $scope.addRow = (function () {
           $scope.data.importMappings.push({'header' : '', 'selectedField' : undefined});
@@ -344,7 +350,7 @@
          *   ...
          * - entity_configuration
          *
-         * @type {$scope.save}
+         * @param {Event} $event
          */
         $scope.save = (function ($event) {
           $event.preventDefault();
@@ -438,7 +444,7 @@
     /**
      * Get the available dedupe rules.
      *
-     * @type {function(*): []|*}
+     * @returns {{results: Array}}
      */
     $scope.getDedupeRule = (function() {
       return {results: $scope.entity.dedupe_rules};
@@ -447,7 +453,7 @@
     /**
      * Update the metadata module after a change.
      *
-     * @type {$scope.updateContactType}
+     * @param {Object} entity
      */
     $scope.updateContactType = (function(entity) {
       entity.dedupe_rules = $scope.getDedupeRules(entity.selected.contact_type);

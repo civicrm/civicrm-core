@@ -28,7 +28,7 @@
    * The CaseView form includes some extra fields which are meant to open in a dialog.
    * We stash them initially and pop them up as needed
    * TODO: Creating a separate form class for each of these and opening them as standard popup links would be simpler and more reusable
-   * @type {pre, post}
+   * @type {Object<string, {pre?: Function, post?: Function}>} keyed by dialog selector
    */
   var miniForms = {
     '#manageTagsDialog': {
