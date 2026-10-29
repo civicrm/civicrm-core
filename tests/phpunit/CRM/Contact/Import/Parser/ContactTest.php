@@ -454,7 +454,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     Relationship::create(FALSE)
       ->addValue('contact_id_a', $anthony)
       ->addValue('contact_id_b', $jon)
-      ->addValue('relationship_type_id', $this->getRelationshipTypeID('Child of'))
+      ->addValue('relationship_type_id:name', 'Child of')
       ->execute();
 
     $this->runImport([

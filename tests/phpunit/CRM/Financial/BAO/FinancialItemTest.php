@@ -186,7 +186,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $contribution = $this->createTestEntity('Contribution', [
       'contact_id' => $contactId,
       'currency' => 'USD',
-      'financial_type_id' => $this->getFinancialTypeID('Donation'),
+      'financial_type_id:name' => 'Donation',
       'contribution_status_id' => 1,
       'payment_instrument_id' => 1,
       'source' => 'STUDENT',

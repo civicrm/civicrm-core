@@ -131,7 +131,7 @@ class CheckoutTest extends TestCase implements HeadlessInterface {
     return \Civi\Api4\Order::create(FALSE)
       ->setContributionValues([
         'contact_id' => $this->contactId,
-        'financial_type_id' => $this->getFinancialTypeID('Donation'),
+        'financial_type_id:name' => 'Donation',
       ])
       ->addLineItem([
         'unit_price' => 10,

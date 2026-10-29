@@ -774,7 +774,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'period_type' => 'fixed',
       'fixed_period_start_day' => '101',
       'fixed_period_rollover_day' => '1231',
-      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
+      'financial_type_id:name' => 'Member Dues',
     ]);
     Civi::settings()->set('update_contribution_on_membership_type_change', TRUE);
 
@@ -923,7 +923,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'period_type' => 'fixed',
       'fixed_period_start_day' => '101',
       'fixed_period_rollover_day' => '1231',
-      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
+      'financial_type_id:name' => 'Member Dues',
     ]);
     Civi::settings()->set('update_contribution_on_membership_type_change', TRUE);
 
