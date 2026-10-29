@@ -2349,9 +2349,18 @@ if (!CRM.vars) CRM.vars = {};
   };
 
   CRM.utils.createButton = (label, btnClass = null, icon = null, clickHandler = null, href = null, target = null, type = 'button') => {
-    const button = document.createElement('button');
+    // href and target only work on a link, so a button with an href is an <a class="btn">.
+    const button = document.createElement(href ? 'a' : 'button');
 
-    button.type = type;
+    if (href) {
+      button.href = href;
+      if (target) {
+        button.target = target;
+      }
+    }
+    else {
+      button.type = type;
+    }
 
     button.classList.add('btn');
     if (btnClass) {
@@ -2370,12 +2379,6 @@ if (!CRM.vars) CRM.vars = {};
 
     if (clickHandler) {
       button.onclick = clickHandler;
-    }
-    if (href) {
-      button.href = href;
-    }
-    if (target) {
-      button.target = target;
     }
 
     return button;
