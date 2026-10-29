@@ -15,6 +15,7 @@
  */
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
+use Civi\Api4\Order;
 use Civi\Api4\Payment;
 use Civi\Payment\Exception\PaymentProcessorException;
 
@@ -1083,22 +1084,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @throws \CRM_Core_Exception
    */
   private function saveOrder(array $contacts): CRM_Contribute_BAO_Contribution {
-    foreach ($this->getSubmittedParticipantNumbers() as $participantNum) {
-      // add participant record
-      $this->addParticipant($contacts[$participantNum], $participantNum);
-    }
-
-    // if paid event add a contribution record
-    // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
-    $transaction = new CRM_Core_Transaction();
-
     $financialTypeID = !empty($this->getEventValue('financial_type_id')) ? $this->getEventValue('financial_type_id') : $this->getOrder()->getFinancialTypeID();
 
-    $contribParams = [
+    $order = Order::create()->setContributionValues([
       'contact_id' => $contacts[0],
       'financial_type_id' => $financialTypeID,
       'receive_date' => date('YmdHis'),
-      'total_amount' => $this->getOrder()->getTotalAmount(),
       'tax_amount' => $this->getOrderTotalTaxAmount(),
       'amount_level' => $this->getAmountLevelForParticipant(0),
       'invoice_id' => $this->getInvoiceID(),
@@ -1115,48 +1106,25 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'revenue_recognition_date' => $this->getRevenueRecognitionDate(),
       'is_test' => $this->isTest(),
       'address_id' => CRM_Contribute_BAO_Contribution::createAddress($this->getSubmittedParticipantValues()),
-    ];
+    ]);
 
-    $contribParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id',
-      $contribParams['total_amount'] == 0 ? 'Completed' : 'Pending'
-    );
+    // if paid event add a contribution record
+    // Note this used to be shared with the backoffice form & no longer is, some code may no longer be required.
+    $transaction = new CRM_Core_Transaction();
 
-    $contribParams['skipLineItem'] = 1;
-    $contribParams['skipCleanMoney'] = 1;
-    // create contribution record
-    $contribution = CRM_Contribute_BAO_Contribution::add($contribParams);
-
-    $transaction->commit();
-
-    // create line items, CRM-5313
-    if ($this->_priceSetId &&
-      !empty($this->_lineItem)
-    ) {
-      // take all processed participant ids.
-      $allParticipantIds = $this->_participantIDS;
-      if ($this->getParticipantValue('status_id.class') === 'Pending') {
-        $this->_allowConfirmation = TRUE;
-      }
-      // when participant re-walk wizard.
-      if ($this->_allowConfirmation &&
-        !empty($this->_additionalParticipantIds)
-      ) {
-        $allParticipantIds = array_merge([$this->getPrimaryParticipantID()], $this->_additionalParticipantIds);
-      }
-
-      foreach ($this->_lineItem as $key => $value) {
-        if ($value == 'skip') {
-          continue;
-        }
-        if ($entityId = $allParticipantIds[$key] ?? NULL) {
-          // Any line item safe to clear for a participant re-walking the
-          // wizard was already removed, early in postProcess() - see
-          // deleteUncontributedLineItemsForParticipantsBeingAltered().
-          $lineItem[$this->_priceSetId] = $value;
-          CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, 'civicrm_participant');
-        }
+    foreach ($this->getSubmittedParticipantNumbers() as $participantNum) {
+      // add participant record
+      $participantID = $this->addParticipant($contacts[$participantNum], $participantNum);
+      foreach ($this->getLineItemsForParticipant($participantNum) as $lineItem) {
+        $lineItem['entity_table'] = 'civicrm_participant';
+        $lineItem['entity_id'] = $participantID;
+        $order->addLineItem($lineItem);
       }
     }
+
+    $contribution = CRM_Contribute_BAO_Contribution::findById((int) $order->execute()->single()['id']);
+
+    $transaction->commit();
     return $contribution;
   }
 

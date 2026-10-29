@@ -388,12 +388,12 @@ WHERE li.contribution_id = %1";
    *
    * @param bool $update
    *
-   * @deprecated we are working hard to remove remaining callers to this function.
-   * Use the v4 order api instead.
+   * @deprecated since 6.21 will be removed around 6.33
    *
    * @throws \CRM_Core_Exception
    */
   public static function processPriceSet($entityId, $lineItems, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning('Order api v4');
     if (!$entityId || !is_array($lineItems)
       || CRM_Utils_System::isNull($lineItems)
     ) {

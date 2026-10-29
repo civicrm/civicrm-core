@@ -66,10 +66,12 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
 
-    $lineItem = CRM_Price_BAO_LineItem::create($lParams);
+    $lineItem = CRM_Price_BAO_LineItem::writeRecord($lParams);
     $contributionObj = $this->getContributionObject($contribution['id']);
 
+    $oldErrorLevel = error_reporting(0);
     CRM_Financial_BAO_FinancialItem::add($lineItem, $contributionObj);
+    error_reporting($oldErrorLevel);
     $result = $this->assertDBNotNull(
       'CRM_Financial_DAO_FinancialItem',
       $lineItem->id,
@@ -109,7 +111,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
 
-    $lineItem = CRM_Price_BAO_LineItem::create($lParams);
+    $lineItem = CRM_Price_BAO_LineItem::writeRecord($lParams);
     $fParams = [
       'contact_id' => $contactID,
       'description' => 'Contribution Amount',
