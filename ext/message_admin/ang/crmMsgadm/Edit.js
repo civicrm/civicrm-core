@@ -202,9 +202,8 @@
     ];
 
     function doSave() {
-      // Flush any live rich-text session before reading $ctrl.records.main - otherwise
-      // this saves stale content if the user clicked the outer Save button without first
-      // clicking the rich-text editor's own Save button.
+      // Flush any live rich-text editor before reading $ctrl.records.main - otherwise
+      // this can save stale content if the editor hasn't updated the model yet.
       crmMsgadmFlushRichText();
       const requests = {};
       if ($ctrl.lang) {
