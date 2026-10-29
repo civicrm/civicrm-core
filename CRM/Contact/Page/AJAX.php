@@ -674,18 +674,6 @@ class CRM_Contact_Page_AJAX {
   }
 
   /**
-   * Retrieve Paper Size dimensions.
-   */
-  public static function paperSize() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $paperSizeName = CRM_Utils_Type::escape($_REQUEST['paperSizeName'], 'String');
-
-    $paperSize = CRM_Core_BAO_PaperSize::getByName($paperSizeName);
-
-    CRM_Utils_JSON::output($paperSize);
-  }
-
-  /**
    * Swap contacts in a dupe pair i.e main with duplicate contact.
    */
   public static function flipDupePairs() {

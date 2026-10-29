@@ -75,7 +75,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *   URL of page calling this function.
    *
    */
-  public static function &addOrder(&$list, $returnURL) {
+  public static function addOrder(&$list, $returnURL) {
     $filter = "option_group_id = " . self::_getGid();
     CRM_Utils_Weight::addOrder($list, 'CRM_Core_DAO_OptionValue', 'id', $returnURL, $filter);
   }
@@ -89,7 +89,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @return array
    *   (reference)   Paper Size list
    */
-  public static function &getList($namesOnly = FALSE) {
+  public static function getList($namesOnly = FALSE) {
     static $list = [];
     if (self::_getGid()) {
       // get saved Paper Sizes from Option Value table
@@ -116,7 +116,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @return array
    *   Name/value pairs containing the default Paper Size values.
    */
-  public static function &getDefaultValues() {
+  public static function getDefaultValues() {
     $params = ['is_active' => 1, 'is_default' => 1];
     $defaults = [];
     if (!self::retrieve($params, $defaults)) {
@@ -140,7 +140,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @return array
    *   (reference) associative array of name/value pairs
    */
-  public static function &getPaperFormat($field, $val) {
+  public static function getPaperFormat($field, $val) {
     $params = ['is_active' => 1, $field => $val];
     $paperFormat = [];
     if (self::retrieve($params, $paperFormat)) {
@@ -160,7 +160,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @return array
    *   (reference) associative array of name/value pairs
    */
-  public static function &getByName($name) {
+  public static function getByName($name) {
     return self::getPaperFormat('name', $name);
   }
 
@@ -173,7 +173,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @return array
    *   (reference) associative array of name/value pairs
    */
-  public static function &getById($id) {
+  public static function getById($id) {
     return self::getPaperFormat('id', $id);
   }
 
