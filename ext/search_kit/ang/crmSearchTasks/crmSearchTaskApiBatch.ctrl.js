@@ -10,6 +10,11 @@
     this.apiBatch = $scope.apiBatch = this.task.apiBatch;
     this.entityTitle = this.getEntityTitle();
 
+    // PHP serializes empty params as a JSON array, which would drop the `where` and `values` set below
+    if (!this.apiBatch.params || Array.isArray(this.apiBatch.params)) {
+      this.apiBatch.params = {};
+    }
+
     // Default to search entity
     this.apiBatch.entity = this.apiBatch.entity || this.entity;
     // Default primary key if not specified
@@ -21,7 +26,6 @@
     }
 
     if (ctrl.apiBatch.fields) {
-      ctrl.apiBatch.params = ctrl.apiBatch.params || {};
       ctrl.apiBatch.params.values = ctrl.apiBatch.params.values || {};
       // Set values from field defaults
       ctrl.apiBatch.fields.forEach((field) => {
