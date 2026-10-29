@@ -495,6 +495,61 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertEquals($cid, $resultNumeric[0]['id']);
   }
 
+  public function testQuicksearchAutocompleteWithLeadingWildcardPhone(): void {
+    Setting::set(FALSE)
+      ->addValue('quicksearch_options', ['sort_name', 'Phone.phone_numeric'])
+      ->execute();
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'Aaa', 'phone_primary.phone' => '212-555-4321'],
+        ['first_name' => 'B', 'last_name' => 'Bbb', 'phone_primary.phone' => '212-555-1234'],
+      ],
+    ]);
+
+    $result = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['Phone.phone_numeric' => '%4321'])
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals($contacts[0]['id'], $result[0]['id']);
+  }
+
+  public function testQuicksearchAutocompletePhoneWithWildcardSetting(): void {
+    Setting::set(FALSE)
+      ->addValue('quicksearch_options', ['sort_name', 'Phone.phone_numeric'])
+      ->addValue('includeWildCardInName', FALSE)
+      ->execute();
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'A', 'last_name' => 'Aaa', 'phone_primary.phone' => '212-555-4321'],
+        ['first_name' => 'B', 'last_name' => 'Bbb', 'phone_primary.phone' => '212-555-1234'],
+      ],
+    ]);
+
+    $result = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['Phone.phone_numeric' => '4321'])
+      ->execute();
+    $this->assertCount(0, $result);
+
+    Setting::set(FALSE)
+      ->addValue('includeWildCardInName', TRUE)
+      ->execute();
+
+    $result = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setFilters(['Phone.phone_numeric' => '4321'])
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals($contacts[0]['id'], $result[0]['id']);
+  }
+
   public function testQuicksearchAutocompleteExactVsPartialMatches(): void {
     $this->createTestRecord('CustomGroup', [
       'name' => 'QuicksearchTestGroup',
