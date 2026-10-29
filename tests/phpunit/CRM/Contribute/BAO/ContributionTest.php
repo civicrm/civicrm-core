@@ -1356,7 +1356,11 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       ['contact_id' => $contactId_1]
     ))['values'][0];
 
-    $activity = $this->callAPISuccessGetSingle('Activity', ['source_record_id' => $contribution['id']]);
+    $activityParams = [
+      'source_record_id' => $contribution['id'],
+      'activity_type_id' => 'Contribution',
+    ];
+    $activity = $this->callAPISuccessGetSingle('Activity', $activityParams);
 
     $activityContactParams = [
       'activity_id' => $activity['id'],
@@ -1388,8 +1392,11 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         'source_contact_id' => $contactId_3,
       ]
     ))['values'][0];
-
-    $activity = $this->callAPISuccessGetSingle('Activity', ['source_record_id' => $contribution['id']]);
+    $activityParams = [
+      'source_record_id' => $contribution['id'],
+      'activity_type_id' => 'Contribution',
+    ];
+    $activity = $this->callAPISuccessGetSingle('Activity', $activityParams);
 
     $activityContactParams = [
       'activity_id' => $activity['id'],
