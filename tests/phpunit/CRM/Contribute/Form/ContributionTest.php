@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\Order;
 use Civi\Api4\Participant;
 use Civi\Api4\PriceField;
@@ -1037,6 +1038,51 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertNotEmpty($contribution);
     $this->assertEquals('Completed', $contribution['contribution_status']);
+  }
+
+  /**
+   * dev/core#6887-adjacent - a Pending refund contribution moving to Completed
+   * should route through Payment.create for the outstanding balance, the same
+   * way Pending/Partially paid already do, rather than falling through to
+   * FinancialProcessor's generic status-change handling, which has no basis
+   * to know the correct amount and would post the full original total_amount
+   * again regardless of what, if anything, has actually been paid.
+   */
+  public function testSubmitUpdatePendingRefundToCompleted(): void {
+    $this->submitContributionForm([
+      'total_amount' => 100,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
+      'contact_id' => $this->ids['Contact'][0],
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+    ]);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->ids['Contact'][0]]);
+    // Simulate having reached 'Pending refund' - nothing has actually been paid,
+    // so the full amount is still outstanding.
+    Contribution::update(FALSE)
+      ->addValue('contribution_status_id:name', 'Pending refund')
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute();
+
+    $this->submitContributionForm([
+      'total_amount' => 100,
+      'net_amount' => 100,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
+      'contact_id' => $this->ids['Contact'][0],
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+    ], $contribution['id']);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
+    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertEquals(0, $contribution['balance_amount']);
+
+    $financialTrxns = $this->callAPISuccess('FinancialTrxn', 'get', ['sequential' => TRUE])['values'];
+    $paymentTrxns = array_values(array_filter($financialTrxns, fn(array $trxn) => !empty($trxn['is_payment'])));
+    // Exactly one payment trxn, for the outstanding balance - not an
+    // uncontrolled second trxn on top of it.
+    $this->assertCount(1, $paymentTrxns);
+    $this->assertEquals(100, $paymentTrxns[0]['total_amount']);
   }
 
   /**

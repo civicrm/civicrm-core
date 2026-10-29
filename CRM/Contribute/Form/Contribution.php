@@ -13,6 +13,7 @@ use Civi\Api4\Contribution;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
 use Civi\Api4\Participant;
+use Civi\Api4\Payment;
 use Civi\Payment\Exception\PaymentProcessorException;
 
 /**
@@ -2103,19 +2104,26 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         unset($params['note']);
       }
       $previousStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->_values['contribution_status_id'] ?? NULL);
+      $submittedStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'));
       // process associated membership / participant, CRM-4395
       if ($this->getContributionID() && $this->getAction() & CRM_Core_Action::UPDATE
-        && in_array($previousStatus, ['Pending', 'Partially paid'], TRUE)
-        && 'Completed' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $this->getSubmittedValue('contribution_status_id'))) {
+        && $previousStatus !== 'Completed' && $submittedStatus === 'Completed'
+        && $this->getContributionValue('balance_amount') > 0
+      ) {
+        // Any transition to Completed is a payment of whatever is still unpaid - route it
+        // through Payment.create rather than letting it fall through to FinancialProcessor's
+        // generic status-change handling below, which has no reliable way to know the correct
+        // amount (and, for some origins eg. Pending refund, no basis to decide the status
+        // change is even valid on its own).
         // @todo make users use add payment form.
-        civicrm_api3('Payment', 'create', [
-          'is_send_contribution_notification' => FALSE,
-          'contribution_id' => $this->getContributionID(),
-          'total_amount' => $this->getContributionValue('balance_amount'),
-          'currency' => $this->getSubmittedValue('currency'),
-          'payment_instrument_id' => $this->getSubmittedValue('payment_instrument_id'),
-          'check_number' => $this->getSubmittedValue('check_number'),
-        ]);
+        Payment::create(FALSE)
+          ->setNotificationForCompleteOrder(FALSE)
+          ->addValue('contribution_id', $this->getContributionID())
+          ->addValue('total_amount', $this->getContributionValue('balance_amount'))
+          ->addValue('currency', $this->getSubmittedValue('currency'))
+          ->addValue('payment_instrument_id', $this->getSubmittedValue('payment_instrument_id'))
+          ->addValue('check_number', $this->getSubmittedValue('check_number'))
+          ->execute();
       }
       if ($this->isAmountFrozen()) {
         // If the user has no opportunity to edit these then don't update them.
