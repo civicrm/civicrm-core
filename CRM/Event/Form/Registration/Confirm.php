@@ -446,9 +446,10 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     $registerByID = $this->getPrimaryParticipantID();
+    $contributionID = $contribution->id ?? NULL;
 
     $this->set('participantIDs', $this->_participantIDS);
-    $this->set('contributionID', $contribution->id ?? NULL);
+    $this->set('contributionID', $contributionID);
     $this->set('participantId', $this->_participantIDS[0]);
     $this->_participantId = $this->_participantIDS[0];
 
@@ -459,7 +460,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           Payment::create(FALSE)
             ->setNotificationForPayment(FALSE)
             ->setNotificationForCompleteOrder(FALSE)
-            ->addValue('contribution_id', $contribution->id)
+            ->addValue('contribution_id', $contributionID)
             ->addValue('total_amount', $this->getOrder()->getTotalAmount())
             ->addValue('payment_processor_id', $this->getPaymentProcessorID())
             ->addValue('trxn_id', $result['trxn_id'])
@@ -471,7 +472,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
       catch (PaymentProcessorException $e) {
-        CRM_Contribute_BAO_Contribution::failPayment($contribution->id,
+        CRM_Contribute_BAO_Contribution::failPayment($contributionID,
           $this->getContactID(), $e->getMessage());
       }
     }
@@ -554,9 +555,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
         //send mail to primary as well as additional participants.
         CRM_Event_BAO_Event::sendMail(NULL, $this->_values, $participantID, $this->isTest());
-        if (!empty($contribution)) {
+        if ($contributionID) {
           Contribution::update(FALSE)
-            ->addWhere('id', '=', $contribution->id)
+            ->addWhere('id', '=', $contributionID)
             ->addValue('receipt_date', 'now')
             ->execute();
         }
