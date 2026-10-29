@@ -694,23 +694,22 @@ html.crm-standalone  nav.breadcrumb>ol {
 .crm-status-box-outer.status-start .crm-status-box-inner {
   /* Allow space for spinner.*/
   padding-left: 2.5ch;
+  display: flex;
+  align-items: center;
 }
-
-/* The spinner. */
-.crm-status-box-outer.status-start .crm-status-box-inner::before {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+/* saving1 rotating indicator */
+.crm-container .crm-status-box-outer.status-start .crm-status-box-inner::before {
+  top: unset;
   margin-left: -2.5ch;
   display: block;
   content: '';
   line-height: 1;
   animation: thames-spinner 1s infinite;
   transform-origin: center;
-  width: 1.5ch;
-  height: 1.5ch;
+  width: 1em;
+  height: 1em;
   border: dashed 1px white;
-  border-radius: 2ch;
+  border-radius: 1em;
 }
 
 @keyframes thames-spinner {
