@@ -568,4 +568,25 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($subject, $result->single()['subject.id']);
   }
 
+  public function testJoinOnLiteralIdKeepsInferredCondition(): void {
+    $subject = $this->createTestRecord('Contact')['id'];
+    $editor = $this->createTestRecord('Contact')['id'];
+    $otherEditor = $this->createTestRecord('Contact')['id'];
+    foreach ([$editor, $otherEditor] as $modifiedId) {
+      $this->createTestRecord('Log', [
+        'entity_table' => 'civicrm_contact',
+        'entity_id' => $subject,
+        'modified_id' => $modifiedId,
+      ]);
+    }
+
+    // A literal id filters the joined contact; Log.modified_id = editor.id is still inferred
+    $result = Log::get(FALSE)
+      ->addSelect('modified_id')
+      ->addJoin('Contact AS editor', 'INNER', ['editor.id', '=', (string) $editor])
+      ->addWhere('entity_id', '=', $subject)
+      ->execute();
+    $this->assertEquals([$editor], $result->column('modified_id'));
+  }
+
 }
