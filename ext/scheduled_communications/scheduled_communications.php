@@ -31,6 +31,55 @@ function scheduled_communications_civicrm_enable(): void {
 }
 
 /**
+ * Implements hook_civicrm_tabset().
+ *
+ * Adds "Schedule Reminders" to the Manage Event tabs (with an event_id) and to the event "Configure" links (without).
+ */
+function scheduled_communications_civicrm_tabset($tabsetName, &$tabs, $context): void {
+  if ($tabsetName !== 'civicrm/event/manage') {
+    return;
+  }
+  $permissions = CRM_Event_BAO_Event::getAllPermissions();
+  if (!CRM_Core_Permission::check('administer CiviCRM data') && empty($permissions[CRM_Core_Permission::EDIT])) {
+    return;
+  }
+  if (!empty($context['event_id'])) {
+    $tab = [
+      'title' => E::ts('Schedule Reminders'),
+      'link' => NULL,
+      'valid' => (bool) CRM_Core_BAO_ActionSchedule::isConfigured($context['event_id'], CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID),
+      'active' => TRUE,
+      'current' => FALSE,
+      'class' => 'livePage',
+      'icon' => 'crm-i fa-envelope',
+    ];
+  }
+  else {
+    $tab = [
+      'title' => E::ts('Schedule Reminders'),
+      'url' => 'civicrm/event/manage/reminder',
+      'field' => 'reminder',
+    ];
+  }
+  $position = array_search('registration', array_keys($tabs), TRUE);
+  $position = $position === FALSE ? count($tabs) : $position + 1;
+  $tabs = array_slice($tabs, 0, $position, TRUE) + ['reminder' => $tab] + array_slice($tabs, $position, NULL, TRUE);
+}
+
+/**
+ * Implements hook_civicrm_alterAngular().
+ */
+function scheduled_communications_civicrm_alterAngular(\Civi\Angular\Manager $angular): void {
+  $changeSet = \Civi\Angular\ChangeSet::create('scheduled_reminders_membership_types')
+    ->alterHtml('~/afsearchAdministerMembershipTypes/afsearchAdministerMembershipTypes.aff.html', function(\phpQueryObject $doc) {
+      $doc->find('.help')->append('<p>' . E::ts('Configure membership renewal reminders using <a %1>Schedule Reminders</a>.', [
+        1 => 'ng-href="{{:: crmUrl(\'civicrm/admin/scheduleReminders?reset=1\') }}"',
+      ]) . '</p>');
+    });
+  $angular->add($changeSet);
+}
+
+/**
  * @implements CRM_Utils_Hook::permission().
  */
 function scheduled_communications_civicrm_permission(&$permissions) {

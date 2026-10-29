@@ -172,16 +172,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
           'field' => 'is_online_registration',
         ];
 
-      // @fixme I don't understand the event permissions check here - can we just get rid of it?
-      $permissions = CRM_Event_BAO_Event::getAllPermissions();
-      if (CRM_Core_Permission::check('administer CiviCRM data') || !empty($permissions[CRM_Core_Permission::EDIT])) {
-        self::$_tabLinks[$cacheKey]['reminder']
-          = [
-            'title' => ts('Schedule Reminders'),
-            'url' => 'civicrm/event/manage/reminder',
-            'field' => 'reminder',
-          ];
-      }
       self::$_tabLinks[$cacheKey]['pcp']
         = [
           'title' => ts('Personal Campaign Pages'),

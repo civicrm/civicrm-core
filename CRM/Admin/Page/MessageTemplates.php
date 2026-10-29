@@ -286,6 +286,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     $this->assign('canEditMessageTemplates', CRM_Core_Permission::check('edit message templates'));
     $this->assign('canEditUserDrivenMessageTemplates', CRM_Core_Permission::check('edit user-driven message templates'));
     $this->assign('isCiviMailEnabled', CRM_Core_Component::isEnabled('CiviMail'));
+    $this->assign('isScheduledRemindersEnabled', CRM_Extension_System::singleton()->getMapper()->isActiveModule('scheduled_communications'));
     Civi::resources()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting([
