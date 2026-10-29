@@ -121,6 +121,30 @@ class CRM_Utils_Mail {
 
     // Previously, CiviCRM bundled patches to change the behavior of 3 specific drivers. Use wrapper/filters to avoid patching.
     $mailer = new CRM_Utils_Mail_FilteredPearMailer($driver, $params, $mailer);
+    // CRM-1367: every message needs a Date header (RFC 5322 requires it; some
+    // MTAs, e.g. qmail with local delivery, never add one themselves). Doing
+    // it here, rather than relying on the pear/mail patch, means it applies
+    // regardless of which code composed the headers.
+    $mailer->addFilter('0100_date', function ($mailer, &$recipients, &$headers, &$body) {
+      if (!array_key_exists('Date', $headers)) {
+        $headers['Date'] = date('r');
+      }
+    });
+    if ($driver === 'mail') {
+      // CRM-5946: Mail_mail::send() never derives the sendmail -f (envelope
+      // sender) argument from the message's own headers, so it falls back
+      // to the server default regardless of Return-Path. Set it here,
+      // rather than relying on the pear/mail patch.
+      $mailer->addFilter('0150_envelope_sender', function ($mailer, &$recipients, &$headers, &$body) {
+        $from = $headers['Return-Path'] ?? NULL;
+        if (empty($from) && !empty($headers['From'])) {
+          $from = CRM_Utils_Mail::pluckEmailFromHeader($headers['From']) ?: $headers['From'];
+        }
+        if (!empty($from)) {
+          $mailer->getDelegate()->_params = '-f' . $from;
+        }
+      });
+    }
     if (in_array($driver, ['smtp', 'mail', 'sendmail'])) {
       $mailer->addFilter('2000_log', ['CRM_Utils_Mail_Logger', 'filter']);
       $mailer->addFilter('2100_validate', function ($mailer, &$recipients, &$headers, &$body) {
