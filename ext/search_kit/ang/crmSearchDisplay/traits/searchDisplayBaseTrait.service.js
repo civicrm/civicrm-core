@@ -287,6 +287,8 @@
       onClickSearchButton: function() {
         this.rowCount = null;
         this.page = 1;
+        // Clear selected rows
+        this.selectNone?.();
         this.getResultsPronto();
       },
 
