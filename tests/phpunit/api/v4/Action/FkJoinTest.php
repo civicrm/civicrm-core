@@ -25,6 +25,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
 use Civi\Api4\LineItem;
+use Civi\Api4\Note;
 use Civi\Api4\Relationship;
 use Civi\Api4\Tag;
 use Civi\Test\TransactionalInterface;
@@ -526,6 +527,25 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->first();
 
     $this->assertEquals($email['id'], $result['con.contact_id.email_primary']);
+  }
+
+  public function testJoinFromDynamicForeignKey(): void {
+    $author = $this->createTestRecord('Contact', ['first_name' => 'Author'])['id'];
+    $subject = $this->createTestRecord('Contact', ['first_name' => 'Subject'])['id'];
+    $note = $this->createTestRecord('Note', [
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $subject,
+      'contact_id' => $author,
+      'note' => 'Note about the subject',
+    ])['id'];
+
+    $result = Note::get(FALSE)
+      ->addSelect('subject.id')
+      ->addJoin('Contact AS subject', 'INNER', ['entity_table', '=', '"civicrm_contact"'], ['entity_id', '=', 'subject.id'])
+      ->addWhere('id', '=', $note)
+      ->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals($subject, $result->single()['subject.id']);
   }
 
 }
