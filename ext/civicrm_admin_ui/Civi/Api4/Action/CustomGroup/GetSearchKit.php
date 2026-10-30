@@ -2,6 +2,8 @@
 
 namespace Civi\Api4\Action\CustomGroup;
 
+use Civi\Api4\SearchDisplay;
+use Civi\Api4\Utils\CoreUtil;
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 /**
@@ -180,12 +182,6 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
   }
 
   protected function getColumnForField(array $group, array $field): array {
-    // TODO: for entity ref columns, we would like to use
-    // a display-friendly column from the joined entity
-    // but
-    // a) we will need to determine the column based on
-    //    the entity (e.g. display_name for contact)
-    // b) we will need to add it to the SavedSearch as well
     $column = [
       'type' => 'field',
       'key' => $field['name'],
@@ -212,6 +208,48 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     elseif ($field['data_type'] === 'Date') {
       if (!empty($field['date_format']) || !empty($field['time_format'])) {
         $column['format'] = \CRM_Utils_Date::datePluginToStrftime($field['date_format'] ?? '', $field['time_format'] ?? NULL);
+      }
+    }
+    // Show display name of ContactReference fields
+    elseif ($field['data_type'] === 'ContactReference') {
+      $column['key'] .= '.display_name';
+      $column['link'] = [
+        'entity' => 'Contact',
+        'action' => 'view',
+        'join' => $field['name'],
+      ];
+    }
+    // Display value of EntityReference fields based on Autocomplete settings
+    elseif ($field['data_type'] === 'EntityReference' && !empty($field['fk_entity'])) {
+      $defaultDisplay = SearchDisplay::getDefault(FALSE)
+        ->setSavedSearch(['api_entity' => $field['fk_entity']])
+        ->setType('autocomplete')
+        ->execute()->first();
+      $defaultCol = $defaultDisplay['settings']['columns'][0] ?? [];
+      if (!empty($defaultCol['key'])) {
+        $column['key'] = $field['name'] . '.' . $defaultCol['key'];
+      }
+      if (!empty($defaultCol['rewrite'])) {
+        $column['rewrite'] = preg_replace('/\[([^\]]+)\]/', '[' . $field['name'] . '.$1]', $defaultCol['rewrite']);
+      }
+      if (!empty($defaultCol['empty_value'])) {
+        $column['empty_value'] = preg_replace('/\[([^\]]+)\]/', '[' . $field['name'] . '.$1]', $defaultCol['empty_value']);
+      }
+      if (!empty($defaultCol['icons'])) {
+        $column['icons'] = [];
+        foreach ($defaultCol['icons'] as $icon) {
+          if (!empty($icon['field'])) {
+            $icon['field'] = $field['name'] . '.' . $icon['field'];
+          }
+          $column['icons'][] = $icon;
+        }
+      }
+      if (isset(CoreUtil::getInfoItem($field['fk_entity'], 'paths')['view'])) {
+        $column['link'] = [
+          'entity' => $field['fk_entity'],
+          'action' => 'view',
+          'join' => $field['name'],
+        ];
       }
     }
 
