@@ -108,7 +108,7 @@ class CRM_Contact_Form_Edit_Individual {
       $errors['_qf_default'] = ts('Please enter a First Name, Last Name or Email (Primary).');
     }
 
-    self::validateEmployer($fields, $errors);
+    self::validateEmployer($fields, $errors, $contactID ? (int) $contactID : NULL);
 
     return empty($errors) ? TRUE : $errors;
   }
@@ -118,11 +118,14 @@ class CRM_Contact_Form_Edit_Individual {
    *
    * @param array $fields
    * @param array $errors
+   * @param int|null $contactID
+   *   The individual being edited; its current employer is accepted without a VIEW check.
    */
-  public static function validateEmployer(array $fields, array &$errors): void {
+  public static function validateEmployer(array $fields, array &$errors, ?int $contactID = NULL): void {
     if (!empty($fields['employer_id'])) {
       $employerId = (int) $fields['employer_id'];
-      if (!CRM_Contact_BAO_Contact_Permission::allow($employerId, CRM_Core_Permission::VIEW) || CRM_Contact_BAO_Contact::getContactType($employerId) !== 'Organization') {
+      $currentEmployerId = $contactID ? (int) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'employer_id') : 0;
+      if ($employerId !== $currentEmployerId && (!CRM_Contact_BAO_Contact_Permission::allow($employerId, CRM_Core_Permission::VIEW) || CRM_Contact_BAO_Contact::getContactType($employerId) !== 'Organization')) {
         $errors['employer_id'] = ts('Please select a valid employer organization.');
       }
     }
