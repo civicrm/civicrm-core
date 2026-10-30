@@ -2576,4 +2576,32 @@ ENDSQLUPDATE;
     $settings->set('core_maintenance_mode', $startMode);
   }
 
+  /**
+   * A failing preJob or postJob hook does not stop the remaining jobs.
+   */
+  public function testExecuteContinuesAfterHookError(): void {
+    \Civi\Api4\Job::update(FALSE)->addWhere('id', 'IS NOT NULL')->addValue('is_active', FALSE)->execute();
+    foreach (['Fails after', 'Fails before'] as $name) {
+      $this->callAPISuccess('Job', 'create', [
+        'name' => $name,
+        'run_frequency' => 'Always',
+        'api_entity' => 'Domain',
+        'api_action' => 'get',
+        'is_active' => 1,
+      ]);
+    }
+    $this->hookClass->setHook('civicrm_preJob', function ($job) {
+      if ($job->name === 'Fails before') {
+        throw new TypeError('Ruh-roh');
+      }
+    });
+    $this->hookClass->setHook('civicrm_postJob', function ($job) {
+      if ($job->name === 'Fails after') {
+        throw new TypeError('Ruh-roh');
+      }
+    });
+    $this->callApiV3Success('Job', 'execute');
+    $this->assertDBQuery(2, "SELECT COUNT(*) FROM civicrm_job WHERE name IN ('Fails after', 'Fails before') AND last_run_end IS NOT NULL");
+  }
+
 }
