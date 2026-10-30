@@ -118,6 +118,42 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
   }
 
   /**
+   * Filters that register tables the search already joins must not break the
+   * query or duplicate rows.
+   */
+  public function testGetBatchFinancialItemsFilterOnJoinedTables(): void {
+    $contactId = $this->individualCreate();
+    $recurIDs = [];
+    foreach (['first', 'second'] as $identifier) {
+      $recurIDs[] = $this->createTestEntity('ContributionRecur', [
+        'contact_id' => $contactId,
+        'amount' => 5,
+        'frequency_unit' => 'month',
+        'frequency_interval' => 1,
+        'financial_type_id:name' => 'Donation',
+      ], $identifier)['id'];
+    }
+    $contributionId = $this->contributionCreate([
+      'contact_id' => $contactId,
+      'contribution_recur_id' => $recurIDs[0],
+    ]);
+    $batch = CRM_Batch_BAO_Batch::writeRecord([
+      'title' => 'Test Batch',
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open'),
+    ]);
+    $search = fn(array $params) => CRM_Batch_BAO_Batch::getBatchFinancialItems($batch->id, ['civicrm_contribution.id as contribution_id'], TRUE, $params)->fetchAll();
+
+    $this->assertCount(0, $search(['financial_trxn_card_type_id' => '1']));
+    $this->assertCount(0, $search(['financial_trxn_pan_truncation' => '1234']));
+    $this->assertCount(0, $search(['contribution_pcp_made_through_id' => 1]));
+    $recurringRows = $search(['contribution_recurring' => 1]);
+    $this->assertNotEmpty($recurringRows);
+    $this->assertEquals([$contributionId], array_unique(array_column($recurringRows, 'contribution_id')));
+    $trxnIds = array_column($recurringRows, 'id');
+    $this->assertEquals(array_unique($trxnIds), $trxnIds);
+  }
+
+  /**
    * Test testExportFinancialBatch.
    *
    * @throws \CRM_Core_Exception
