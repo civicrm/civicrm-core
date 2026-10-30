@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\ContactType;
+use Civi\Api4\Group;
 use Civi\Api4\Individual;
 use Civi\Api4\RelationshipCache;
 use Civi\Test\TransactionalInterface;
@@ -157,6 +158,36 @@ class GetLinksTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString("id={$acts[2]}", $links['delete']['path']);
     $this->assertStringContainsString("caseid=$case1", $links['delete']['path']);
     $this->assertStringNotContainsString("id={$acts[2]}", $links['add']['path']);
+  }
+
+  /**
+   * A serialized/multi-valued field's raw value can end up as the token source for a link
+   * built for a single record (e.g. SearchKit rendering a link per multi-value custom field
+   * item without fully splitting the row first). This must not fatal - a link with an
+   * unresolvable required token should just be dropped, same as if the value were missing.
+   */
+  public function testMultiValueTokenDoesNotFatal(): void {
+    $links = Group::getLinks(FALSE)
+      ->setValues(['id' => [1, 2]])
+      ->execute();
+    foreach ($links as $link) {
+      $this->assertStringNotContainsString('[id]', $link['path']);
+      $this->assertStringNotContainsString('Array', $link['path']);
+    }
+    // Links whose path requires `id` are dropped; links without an `id` token remain.
+    $this->assertNotContains('view', array_column((array) $links, 'ui_action'));
+  }
+
+  /**
+   * A single-item array (e.g. a multi-value field that happens to have exactly one value)
+   * unambiguously resolves to that one value.
+   */
+  public function testSingleItemArrayTokenIsUnwrapped(): void {
+    $group = $this->createTestRecord('Group');
+    $links = Group::getLinks(FALSE)
+      ->setValues(['id' => [$group['id']]])
+      ->execute()->indexBy('ui_action');
+    $this->assertStringContainsString((string) $group['id'], $links['view']['path']);
   }
 
 }
