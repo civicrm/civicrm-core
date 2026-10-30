@@ -3,6 +3,7 @@
 namespace Civi\Financialacls;
 
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionRecur;
 use Civi\Api4\FinancialType;
 use Civi\Api4\PriceField;
 use Civi\Api4\PriceFieldValue;
@@ -50,6 +51,7 @@ class BaseTestClass extends TestCase implements HeadlessInterface, HookInterface
    */
   public function tearDown(): void {
     Contribution::delete(FALSE)->addWhere('id', '>', 0)->execute();
+    ContributionRecur::delete(FALSE)->addWhere('id', '>', 0)->execute();
     FinancialType::delete(FALSE)->addWhere('name', 'LIKE', '%test%')->execute();
     Product::delete(FALSE)->addWhere('name', '=', '10_dollars')->execute();
     $this->cleanupPriceSets();

@@ -10,6 +10,8 @@
  */
 namespace Civi\Financialacls;
 
+use Civi\Api4\Contribution;
+
 require_once 'BaseTestClass.php';
 
 /**
@@ -125,6 +127,55 @@ class ContributionTest extends BaseTestClass {
       'total_amount' => $params['total_amount'],
       'version' => 3,
     ]);
+  }
+
+  /**
+   * Recurring rows are checked against the recurring contribution, not a contribution sharing its ID.
+   */
+  public function testRecurringLinksIgnoreContributionWithSameID(): void {
+    $this->createContributionWithTwoLineItems();
+    $contributionID = Contribution::get(FALSE)->execute()->single()['id'];
+    $recurID = $this->createRecurringContribution('Donation');
+    \CRM_Core_DAO::executeQuery('UPDATE civicrm_contribution_recur SET id = %1 WHERE id = %2', [
+      1 => [$contributionID, 'Integer'],
+      2 => [$recurID, 'Integer'],
+    ]);
+    $this->setRecurringLinkPermissions([['view', 'Donation'], ['edit', 'Donation']]);
+    $this->assertSame(['View', 'Edit'], $this->getRecurringLinkNames($contributionID));
+  }
+
+  /**
+   * A recurring contribution of a type the user may not edit loses its Edit link.
+   */
+  public function testRecurringLinksForRestrictedType(): void {
+    $recurID = $this->createRecurringContribution('Event Fee');
+    $this->setRecurringLinkPermissions([['view', 'Event Fee']]);
+    $this->assertSame(['View'], $this->getRecurringLinkNames($recurID));
+  }
+
+  private function createRecurringContribution(string $financialType): int {
+    return $this->createTestEntity('ContributionRecur', [
+      'contact_id' => $this->individualCreate(),
+      'amount' => 10,
+      'frequency_interval' => 1,
+      'financial_type_id:name' => $financialType,
+    ])['id'];
+  }
+
+  private function setRecurringLinkPermissions(array $aclPermissions): void {
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'view all contacts', 'edit contributions']);
+    $this->addFinancialAclPermissions($aclPermissions);
+  }
+
+  private function getRecurringLinkNames(int $recurID): array {
+    $links = [
+      ['name' => 'View', 'bit' => \CRM_Core_Action::VIEW],
+      ['name' => 'Edit', 'bit' => \CRM_Core_Action::UPDATE],
+    ];
+    $mask = NULL;
+    $values = ['crid' => $recurID];
+    \CRM_Utils_Hook::links('contribution.selector.recurring', 'Contribution', $recurID, $links, $mask, $values);
+    return array_column($links, 'name');
   }
 
   public function testSuperPermissions(): void {
