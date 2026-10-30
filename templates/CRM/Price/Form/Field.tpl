@@ -209,21 +209,25 @@
 {literal}
 <script type="text/javascript">
   option_html_type(this.form);
-  function calculateRowValues( row ) {
-    var mtype = cj("#membership_type_id_"+row).val();
-    var postUrl = "{/literal}{crmURL p='civicrm/ajax/memType' h=0}{literal}";
+  function calculateRowValues(row) {
+    var mtype = cj("#membership_type_id_" + row).val();
+    if (!mtype) {
+      cj("#option_amount_" + row).val('');
+      cj("#option_label_" + row).val('');
+      cj("#option_financial_type_id_" + row).val('');
+      cj("#membership_num_terms_" + row).val('');
+      return;
+    }
 
-    cj.post( postUrl, {mtype: mtype}, function(data) {
-      cj("#option_amount_"+ row).val(data.total_amount);
-      cj("#option_label_"+ row).val(data.name);
-      cj("#option_financial_type_id_"+ row).val(data.financial_type_id);
-      if (data.name) {
-        cj("#membership_num_terms_"+ row).val('1');
-      }
-      else {
-        cj("#membership_num_terms_"+ row).val('');
-      }
-    }, 'json');
+    CRM.api4('MembershipType', 'get', {
+      select: ['name', 'minimum_fee', 'financial_type_id'],
+      where: [['id', '=', mtype]]
+    }, 0).then((membershipType) => {
+      cj("#option_amount_" + row).val(CRM.formatMoney(membershipType.minimum_fee ?? 0, true));
+      cj("#option_label_" + row).val(membershipType.name || '');
+      cj("#option_financial_type_id_" + row).val(membershipType.financial_type_id || '');
+      cj("#membership_num_terms_" + row).val(membershipType.name ? '1' : '');
+    });
   }
 </script>
 {/literal}

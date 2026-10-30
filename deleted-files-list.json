@@ -207,6 +207,7 @@
     "CRM/Member/Import/Form/Summary.php",
     "CRM/Member/Import/Parser.php",
     "CRM/Member/Import/Parser/*",
+    "CRM/Member/Page/AJAX.php",
     "CRM/Pledge/Config.php",
     "CRM/Pledge/Form/Task/SearchTaskHookSample.php",
     "CRM/Profile/Page/Listings.php",
