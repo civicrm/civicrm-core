@@ -517,4 +517,77 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
     return $options;
   }
 
+  /**
+   * Convert an entity name (e.g. `Case`) to its TokenProcessor schema key
+   * (e.g. `caseId`).
+   *
+   * @param string $entity
+   *
+   * @return string
+   */
+  public static function convertEntityToSchemaKey(string $entity): string {
+    return CRM_Core_DAO_AllCoreTables::convertEntityNameToLower($entity) . 'Id';
+  }
+
+  /**
+   * Derive TokenProcessor schema keys for a named workflow, from the
+   * `@scope tokenContext` field annotations on its
+   * `Civi\WorkflowMessage\*` class (if one is registered for this workflow).
+   *
+   * @param string|null $workflowName
+   *
+   * @return array
+   */
+  public static function getWorkflowTokenSchema(?string $workflowName): array {
+    if (!$workflowName) {
+      return [];
+    }
+    $schema = [];
+    foreach (WorkflowMessage::create($workflowName)->getFields() as $field) {
+      $scopeKey = $field->getScope()['tokenContext'] ?? NULL;
+      if ($scopeKey && substr($scopeKey, -2) === 'Id') {
+        $schema[] = $scopeKey;
+      }
+    }
+    return array_values(array_unique($schema));
+  }
+
+  /**
+   * Resolve the effective token schema for a template: its own stored
+   * `usage` (converted from entity names to schema keys), else the
+   * workflow-derived defaults, else a minimal fallback -- merged with any
+   * extra schema keys the calling screen already knows about (e.g. a
+   * pre-selected ScheduleReminders mapping).
+   *
+   * @param int|array|null $idOrValues
+   *   A MessageTemplate id, or an array already containing its
+   *   'usage'/'workflow_name' values.
+   * @param string|null $workflowName
+   *   Used only when $idOrValues doesn't already carry 'workflow_name'.
+   * @param array $extraSchema
+   *
+   * @return array
+   */
+  public static function resolveTokenSchema($idOrValues, ?string $workflowName = NULL, array $extraSchema = []): array {
+    if (is_array($idOrValues)) {
+      $values = $idOrValues;
+    }
+    elseif ($idOrValues) {
+      $values = (array) MessageTemplate::get(FALSE)
+        ->addWhere('id', '=', $idOrValues)
+        ->addSelect('usage', 'workflow_name')
+        ->execute()->first();
+    }
+    else {
+      $values = [];
+    }
+    $usage = $values['usage'] ?? [];
+    $schema = array_map([__CLASS__, 'convertEntityToSchemaKey'], $usage ?: []);
+    $workflowName = $workflowName ?? $values['workflow_name'] ?? NULL;
+    if (empty($schema) && $workflowName) {
+      $schema = self::getWorkflowTokenSchema($workflowName);
+    }
+    return array_values(array_unique(array_merge($schema ?: ['contactId'], $extraSchema)));
+  }
+
 }

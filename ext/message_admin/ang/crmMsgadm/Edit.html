@@ -20,14 +20,25 @@
       <!-- TODO: Pretty name -->
     </div>
 
-    <!-- Tagging is only offered for User-Driven templates for now. -->
-    <div class="form-group" ng-if="!$ctrl.lang && !$ctrl.records.main.workflow_name">
-      <label for="msgtpl_tags">
-        {{:: ts('Tags') }}
-      </label>
-      <input id="msgtpl_tags" ng-model="$ctrl.tagIds" ng-list
-        crm-entityref="{entity: 'Tag', create: true, api: {params: {used_for: 'civicrm_msg_template'}}, select: {multiple: true, minimumInputLength: 0, placeholder: ts('Select tags')}}"
-        class="huge form-control" />
+    <!-- Tags and Usage are only offered for User-Driven templates; System Workflow templates derive their token categories from the workflow. -->
+    <div class="row" ng-if="!$ctrl.lang && !$ctrl.records.main.workflow_name">
+      <div class="form-group col-md-6">
+        <label for="msgtpl_tags">
+          {{:: ts('Tags') }}
+        </label>
+        <input id="msgtpl_tags" ng-model="$ctrl.tagIds" ng-list
+          crm-entityref="{entity: 'Tag', create: true, api: {params: {used_for: 'civicrm_msg_template'}}, select: {multiple: true, minimumInputLength: 0, placeholder: ts('Select tags')}}"
+          class="huge form-control" />
+      </div>
+      <div class="form-group col-md-6">
+        <label for="msgtpl_usage">
+          {{:: ts('Usage') }}
+        </label>
+        <input id="msgtpl_usage" ng-model="$ctrl.records.main.usage" ng-list
+          crm-ui-select="{multiple: true, placeholder: ts('Contact tokens only'), data: $ctrl.usageOptions}"
+          class="huge form-control" />
+        <p class="help-block">{{:: ts('Which token categories to offer in the token picker. Leave blank to offer contact tokens only; otherwise include Contact if contact tokens are needed too.') }}</p>
+      </div>
     </div>
 
     <a name="crm-msgadm-tabs"></a>
