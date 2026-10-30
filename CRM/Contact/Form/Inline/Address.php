@@ -162,7 +162,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
     $params['updateBlankLocInfo'] = TRUE;
 
     // process shared contact address.
-    CRM_Contact_BAO_Contact_Utils::processSharedAddress($params['address']);
+    CRM_Contact_BAO_Contact_Utils::processSharedAddress($params['address'], $this->_values['address'] ?? []);
 
     if ($this->_parseStreetAddress) {
       CRM_Contact_Form_Contact::parseAddress($params);
