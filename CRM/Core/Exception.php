@@ -53,7 +53,11 @@ class CRM_Core_Exception extends PEAR_Exception {
     }
     // DIVERGENCE: CRM_Core_Exception used `$message`. API_Exception and CiviCRM_API3_Exception used `ts($message)`.
     // IMHO, this seems like a terrible place to put `ts()` - civistrings won't detect, and it's hard dependency on l10n services.
-    parent::__construct($message, $code, $previous);
+    parent::__construct($message, $code);
+    // PEAR_Exception does not pass a previous exception on to Exception.
+    if ($previous) {
+      (new ReflectionProperty(Exception::class, 'previous'))->setValue($this, $previous);
+    }
     $this->errorData = $errorData + ['error_code' => $error_code];
   }
 
