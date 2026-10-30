@@ -865,6 +865,18 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   public function postContainerBoot(): void {
     $sess = \CRM_Core_Session::singleton();
     $sess->initialize();
+    self::restrictPrivateDir(\Civi::paths()->getPath('[civicrm.private]/.'));
+  }
+
+  /**
+   * The private directory sits inside the web root, so give it a deny-all .htaccess (Apache).
+   * A directory the web server cannot write is left alone: restrictAccess() would exit on every request.
+   */
+  public static function restrictPrivateDir(string $dir): void {
+    $dir = \CRM_Utils_File::addTrailingSlash($dir);
+    if (!file_exists($dir . '.htaccess') && is_writable($dir)) {
+      \CRM_Utils_File::restrictAccess($dir);
+    }
   }
 
   public function getRoleNames(): array {
