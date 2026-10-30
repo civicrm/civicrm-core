@@ -34,7 +34,7 @@
               enabled: false
             },
             automaticLayout: true,
-            scrollbar: {
+            scrollbar: angular.extend({
               useShadows: false,
               verticalHasArrows: true,
               horizontalHasArrows: true,
@@ -43,7 +43,7 @@
               verticalScrollbarSize: 17,
               horizontalScrollbarSize: 17,
               arrowSize: 30
-            }
+            }, options.scrollbar)
           });
 
           heightPct = options.crmHeightPct || heightPct;
@@ -100,6 +100,11 @@
             $scope.$watch($parse($attr.ngDisabled), function (disabled) {
               editor.updateOptions({ readOnly: disabled });
             });
+          }
+
+          if (options.crmHeightLines) {
+            var codeEditor = originalMessage ? editor.getModifiedEditor() : editor;
+            editorEl.height(options.crmHeightLines * codeEditor.getOption(monaco.editor.EditorOption.lineHeight));
           }
 
           crmMonaco.editor = editor;
