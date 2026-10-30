@@ -4140,3 +4140,39 @@ html.crm-standalone body {
   display: flex;
   justify-content: flex-end;
 }
+
+/* Print just the dialog whose print button was clicked (see crm.ajax.js) */
+@media print {
+  body.crm-dialog-printing {
+    overflow: visible !important;
+  }
+  body.crm-dialog-printing > :not(.crm-dialog-print-target) {
+    display: none !important;
+  }
+  body.crm-dialog-printing .crm-dialog-print-target {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+  body.crm-dialog-printing .crm-dialog-print-target::before,
+  body.crm-dialog-printing .crm-dialog-print-target .ui-dialog-titlebar .ui-button,
+  body.crm-dialog-printing .crm-dialog-print-target .ui-dialog-buttonpane,
+  body.crm-dialog-printing .crm-dialog-print-target .ui-resizable-handle {
+    display: none !important;
+  }
+  body.crm-dialog-printing .crm-dialog-print-target .ui-dialog-titlebar {
+    background: none !important;
+    color: inherit !important;
+  }
+  body.crm-dialog-printing .crm-dialog-print-target .ui-dialog-content {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  /* Some CMS themes (e.g. WordPress admin) draw checked states with backgrounds, which don't print */
+  body.crm-dialog-printing .crm-dialog-print-target input:is([type="checkbox"], [type="radio"]) {
+    appearance: auto !important;
+  }
+}
