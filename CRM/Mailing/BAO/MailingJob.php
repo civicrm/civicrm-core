@@ -811,7 +811,7 @@ AND    civicrm_activity.source_record_id = %2
           $cachedActivityID = $activityResult['id'];
           \Civi::$statics[__METHOD__]['cachedActivityID'][$this->mailing_id] = $cachedActivityID;
         }
-        catch (Exception $e) {
+        catch (Throwable $e) {
           $result = FALSE;
         }
       }
@@ -845,7 +845,7 @@ AND    record_type_id = {$targetRecordID}
         try {
           ActivityContact::save(FALSE)->setRecords($activityTargets)->setDefaults(['activity_id' => $cachedActivityID, 'record_type_id' => $targetRecordID])->execute();
         }
-        catch (Exception $e) {
+        catch (Throwable $e) {
           $result = FALSE;
         }
       }
