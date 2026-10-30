@@ -39,8 +39,13 @@ trait ArrayFormatTrait {
     }
 
     $ret = [];
+    // Use statics to cache the lookups to minimise repeated calls to preg_replace.
+    $cacheKey = 'snake_keys';
+    if (!isset(\Civi::$statics[__TRAIT__][$cacheKey])) {
+      \Civi::$statics[__TRAIT__][$cacheKey] = [];
+    }
     foreach ($getter->getPublicVars($this) as $key => $val) {
-      $key = strtolower(preg_replace('/(?=[A-Z])/', '_$0', $key));
+      $key = \Civi::$statics[__TRAIT__][$cacheKey][$key] ??= strtolower(preg_replace('/(?=[A-Z])/', '_$0', $key));
       $ret[$key] = $val;
     }
     return $ret;
