@@ -2537,6 +2537,32 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   }
 
   /**
+   * A simulated time passed to the reminder job does not outlast the job, also when it fails.
+   */
+  public function testProcessQueueResetsSimulatedTime(): void {
+    $this->callApiV3Success('Job', 'send_reminder', ['now' => '2005-07-08 20:00:00']);
+    $this->assertFalse(CRM_Utils_Time::isOverridden());
+
+    unset(\Civi::$statics['CRM_Core_BAO_ActionSchedule']['mappings']);
+    $fail = function () {
+      throw new TypeError('Ruh-roh');
+    };
+    \Civi::dispatcher()->addListener('civi.actionSchedule.getMappings', $fail);
+    try {
+      CRM_Core_BAO_ActionSchedule::processQueue('2005-07-08 20:00:00');
+      $this->fail('Expected TypeError');
+    }
+    catch (TypeError $e) {
+      $this->assertEquals('Ruh-roh', $e->getMessage());
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('civi.actionSchedule.getMappings', $fail);
+      unset(\Civi::$statics['CRM_Core_BAO_ActionSchedule']['mappings']);
+    }
+    $this->assertFalse(CRM_Utils_Time::isOverridden());
+  }
+
+  /**
    * Run a series of cron jobs and make an assertion about email deliveries.
    *
    * @param array $cronRuns
