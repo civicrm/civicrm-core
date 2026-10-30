@@ -448,6 +448,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public static function toBeSkipped_automock($sequential = FALSE) {
     $entitiesWithoutGet = [
+      'Country',
       'MailingContact',
       'EntityTag',
       'Participant',
@@ -534,6 +535,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public static function toBeSkipped_getlimit() {
     $entitiesWithout = [
+      'Country',
+      // Creating 30 countries breaks unique indices
       'Case',
       //case api has non-std mandatory fields one of (case_id, contact_id, activity_id, contact_id)
       'EntityTag',

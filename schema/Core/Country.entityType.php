@@ -13,13 +13,19 @@ return [
     'label_field' => 'name',
   ],
   'getIndices' => fn() => [
-    'UI_name_iso_code' => [
+    'UI_name' => [
       'fields' => [
         'name' => TRUE,
+      ],
+      'unique' => TRUE,
+      'add' => '6.20',
+    ],
+    'UI_iso_code' => [
+      'fields' => [
         'iso_code' => TRUE,
       ],
       'unique' => TRUE,
-      'add' => '1.1',
+      'add' => '6.20',
     ],
   ],
   'getFields' => fn() => [
