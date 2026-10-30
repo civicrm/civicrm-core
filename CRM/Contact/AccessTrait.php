@@ -95,7 +95,7 @@ trait CRM_Contact_AccessTrait {
       }
     }
 
-    if (!empty($record['master_id'])) {
+    if (!empty($record['master_id']) && !CRM_Core_BAO_Address::isSharedFrom($record['id'] ?? NULL, $record['master_id'])) {
       $masterContactId = (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Address', $record['master_id'], 'contact_id');
       if (!$masterContactId || !CoreUtil::checkAccessDelegated('Contact', 'get', ['id' => $masterContactId], $userID)) {
         $e->setAuthorized(FALSE);

@@ -25,6 +25,13 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
   use CRM_Contact_AccessTrait;
 
   /**
+   * Edited address ids that start sharing from another master and bring no custom data of their own.
+   *
+   * @var bool[]
+   */
+  private static $sharingNewMaster = [];
+
+  /**
    * @deprecated
    *
    * @param array $params
@@ -58,17 +65,15 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
    */
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if (in_array($event->action, ['create', 'edit'])) {
+      self::checkSharedAddressAccess($event->action === 'edit' ? (int) $event->id : NULL, $event->params);
+      if ($event->action === 'edit') {
+        self::$sharingNewMaster[$event->id] = empty($event->params['custom']) && !CRM_Utils_System::isNull($event->params['master_id'] ?? NULL) && !self::isSharedFrom($event->id, $event->params['master_id']);
+      }
       CRM_Core_BAO_Block::handlePrimary($event->params, __CLASS__);
       CRM_Core_BAO_Block::handleBilling($event->params, __CLASS__);
 
       // (prevent chaining 1 and 3) CRM-21214
       if (isset($event->params['master_id']) && !CRM_Utils_System::isNull($event->params['master_id'])) {
-        if (!empty($event->params['check_permissions'])) {
-          $masterContactId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Address', $event->params['master_id'], 'contact_id');
-          if (!$masterContactId || !CRM_Contact_BAO_Contact_Permission::allow($masterContactId, CRM_Core_Permission::VIEW)) {
-            throw new \Civi\API\Exception\UnauthorizedException(ts('You do not have permission to share an address from this contact.'));
-          }
-        }
         self::fixSharedAddress($event->params);
       }
     }
@@ -79,11 +84,11 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
    * @param \Civi\Core\Event\PostEvent $event
    */
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
-    // Copy custom data from master address if not supplied
-    if ($event->action === 'create' && !isset($event->params['custom'])) {
-      if (isset($event->params['master_id']) && !CRM_Utils_System::isNull($event->params['master_id'])) {
-        $event->object->copyCustomFields($event->params['master_id'], $event->id, $event->action);
-      }
+    // Copy custom data from a newly shared master address if not supplied
+    $sharesNewMaster = $event->action === 'create' ? empty($event->params['custom']) : !empty(self::$sharingNewMaster[$event->id]);
+    unset(self::$sharingNewMaster[$event->id]);
+    if ($sharesNewMaster && isset($event->params['master_id']) && !CRM_Utils_System::isNull($event->params['master_id'])) {
+      $event->object->copyCustomFields($event->params['master_id'], $event->id, $event->action);
     }
     if (in_array($event->action, ['create', 'edit'])) {
       // call the function to sync shared address and create relationships
@@ -833,6 +838,161 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   }
 
   /**
+   * Guard the master address before anything is written.
+   *
+   * Sharing needs view access to the master contact. A change to the shared values needs edit access to it:
+   * with check_permissions it is refused, otherwise the address stops sharing so it never diverges from its master.
+   *
+   * @param int|null $addressId
+   * @param array $params
+   *
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  private static function checkSharedAddressAccess(?int $addressId, array &$params): void {
+    $stored = $addressId ? self::fetchAddressRow($addressId) : NULL;
+    $storedMasterId = (int) ($stored['master_id'] ?? 0);
+    $masterId = array_key_exists('master_id', $params) ? (int) $params['master_id'] : $storedMasterId;
+    if (!$masterId) {
+      return;
+    }
+    $master = self::fetchAddressRow($masterId);
+    if ($master && $master['master_id']) {
+      $masterId = (int) $master['master_id'];
+      $master = self::fetchAddressRow($masterId);
+    }
+    $alreadyShared = self::isSharedFrom($addressId, $params['master_id'] ?? $storedMasterId);
+    $checkPermissions = !empty($params['check_permissions']);
+    if ($checkPermissions && !$alreadyShared && (!$master || !CRM_Contact_BAO_Contact_Permission::allow((int) $master['contact_id'], CRM_Core_Permission::VIEW))) {
+      throw new \Civi\API\Exception\UnauthorizedException(ts('You do not have permission to share an address from this contact.'));
+    }
+    if (!$addressId || !$master || CRM_Contact_BAO_Contact_Permission::allow((int) $master['contact_id'], CRM_Core_Permission::EDIT)) {
+      return;
+    }
+    if (self::changesSharedAddress($addressId, $alreadyShared ? $stored : NULL, $master, $params)) {
+      if ($checkPermissions) {
+        throw new \Civi\API\Exception\UnauthorizedException(ts('Permission denied to modify shared upstream address.'));
+      }
+      $params['master_id'] = '';
+    }
+  }
+
+  /**
+   * @param int $addressId
+   *
+   * @return array|null
+   */
+  private static function fetchAddressRow(int $addressId): ?array {
+    return CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_address WHERE id = %1', [1 => [$addressId, 'Integer']])->fetchAll()[0] ?? NULL;
+  }
+
+  /**
+   * Would the params give the address values its master does not have?
+   *
+   * A value counts as unchanged if it equals the master's, or the address's own stored value while it already shares
+   * from that master (copied files get their own ids).
+   *
+   * @param int $addressId
+   * @param array|null $sharedRow
+   *   The stored address row if it already shares from this master.
+   * @param array $master
+   *   The master address row.
+   * @param array $params
+   *
+   * @return bool
+   */
+  private static function changesSharedAddress(int $addressId, ?array $sharedRow, array $master, array $params): bool {
+    $alreadyShared = $sharedRow !== NULL;
+    $references = $alreadyShared ? [$master, $sharedRow] : [$master];
+    $fields = \Civi::entity('Address')->getFields();
+    // legacyCreate() resets manual_geo_code when a form or import omits it; the coordinates themselves are compared.
+    $sharedValues = array_diff_key(array_intersect_key($params, $fields), array_flip(['id', 'contact_id', 'master_id', 'is_primary', 'is_billing', 'location_type_id', 'manual_geo_code']));
+    foreach ($sharedValues as $name => $value) {
+      $isNumber = (bool) preg_match('/^(tinyint|smallint|int|bigint|double|float|decimal|boolean)\b/', $fields[$name]['sql_type']);
+      if (!in_array(self::normalizeSharedValue($value, $isNumber), array_map(fn($row) => self::normalizeSharedValue($row[$name], $isNumber), $references), TRUE)) {
+        return TRUE;
+      }
+    }
+    foreach ((array) ($params['custom'] ?? []) as $rows) {
+      foreach ($rows as $field) {
+        $value = CRM_Core_BAO_CustomValueTable::getStorageValue($field)[0];
+        $stored = CRM_Core_DAO::executeQuery("SELECT entity_id, `{$field['column_name']}` AS value FROM `{$field['table_name']}` WHERE entity_id IN (%1, %2)", [
+          1 => [$master['id'], 'Integer'],
+          2 => [$alreadyShared ? $addressId : $master['id'], 'Integer'],
+        ])->fetchMap('entity_id', 'value');
+        $normalize = fn($v) => self::normalizeCustomValue($v, $field['type'], !empty($field['serialize']));
+        $referenceValues = [$stored[$master['id']] ?? NULL];
+        if ($alreadyShared) {
+          $referenceValues[] = $stored[$addressId] ?? NULL;
+        }
+        if (!in_array($normalize($value), array_map($normalize, $referenceValues), TRUE)) {
+          return TRUE;
+        }
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Bring a submitted or stored core value into a form where equal values compare identical.
+   *
+   * @param mixed $value
+   * @param bool $isNumber
+   *
+   * @return float|string|null
+   */
+  private static function normalizeSharedValue($value, bool $isNumber) {
+    if (is_bool($value)) {
+      $value = (int) $value;
+    }
+    if (CRM_Utils_System::isNull($value)) {
+      return NULL;
+    }
+    return $isNumber && is_numeric($value) ? (float) $value : (string) $value;
+  }
+
+  /**
+   * Bring a custom value in storage form, or as read from its table, into a comparable form.
+   *
+   * @param mixed $value
+   * @param string $dataType
+   *   Custom field data type.
+   * @param bool $serialize
+   *
+   * @return array|float|string|null
+   */
+  private static function normalizeCustomValue($value, string $dataType, bool $serialize) {
+    if ($value === FALSE || CRM_Utils_System::isNull($value)) {
+      return NULL;
+    }
+    if ($serialize) {
+      $values = array_values(array_filter(explode(CRM_Core_DAO::VALUE_SEPARATOR, (string) $value), 'strlen'));
+      sort($values);
+      return $values ?: NULL;
+    }
+    if ($dataType === 'Date') {
+      return str_pad(CRM_Utils_Date::isoToMysql($value), 14, '0');
+    }
+    $isNumber = in_array($dataType, ['Int', 'Float', 'Money', 'Boolean', 'StateProvince', 'Country', 'File', 'ContactReference', 'EntityReference'], TRUE);
+    return $isNumber && is_numeric($value) ? (float) $value : (string) $value;
+  }
+
+  /**
+   * Is the saved address already shared from the given master address, or from the master that one shares?
+   *
+   * @param int|null $addressId
+   * @param int|string|null $masterId
+   *
+   * @return bool
+   */
+  public static function isSharedFrom($addressId, $masterId): bool {
+    if (!$addressId || !$masterId) {
+      return FALSE;
+    }
+    $storedMasterId = (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Address', $addressId, 'master_id');
+    return $storedMasterId && in_array($storedMasterId, [(int) $masterId, (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Address', $masterId, 'master_id')], TRUE);
+  }
+
+  /**
    * Check if current address is used by any other contacts.
    *
    * @param int $addressId
@@ -1028,11 +1188,8 @@ SELECT is_primary,
       $addressDAO->copyCustomFields($addressId, $addressDAO->id, $parentOperation);
     }
     if ($masterId && $parentOperation === 'edit' && $upstreamDao->fetch()) {
-      $upstreamContactId = (int) $upstreamDao->contact_id;
-      if (!empty($params['check_permissions']) && !CRM_Contact_BAO_Contact_Permission::allow($upstreamContactId, CRM_Core_Permission::EDIT)) {
-        throw new \Civi\API\Exception\UnauthorizedException(ts('Permission denied to modify shared upstream address.'));
-      }
-      if (CRM_Contact_BAO_Contact_Permission::allow($upstreamContactId, CRM_Core_Permission::EDIT)) {
+      // A change by a user who may not edit the upstream contact was refused or unshared in self_hook_civicrm_pre.
+      if (CRM_Contact_BAO_Contact_Permission::allow((int) $upstreamDao->contact_id, CRM_Core_Permission::EDIT)) {
         // Update the upstream address. But don't copy up the master_id.
         unset($params['master_id']);
         $addressDAO = new CRM_Core_DAO_Address();
