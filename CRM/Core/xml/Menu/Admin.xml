@@ -83,12 +83,6 @@
      <weight>25</weight>
   </item>
   <item>
-     <path>civicrm/admin/uf/group/setting</path>
-     <title>AdditionalInfo Form</title>
-     <page_callback>CRM_UF_Form_AdvanceSetting</page_callback>
-     <weight>0</weight>
-  </item>
-  <item>
      <path>civicrm/admin/options/activity_type</path>
      <title>Activity Types</title>
      <desc>CiviCRM has several built-in activity types (meetings, phone calls, emails sent). Track other types of interactions by creating custom activity types here.</desc>

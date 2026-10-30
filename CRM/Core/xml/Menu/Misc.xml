@@ -13,11 +13,6 @@
      <page_callback>CRM_Export_BAO_Export::invoke</page_callback>
   </item>
   <item>
-     <path>civicrm/export/contact</path>
-     <title>Export Contacts</title>
-     <weight>0</weight>
-  </item>
-  <item>
     <path>civicrm/export/standalone</path>
     <title>Export</title>
     <page_callback>CRM_Export_Controller_Standalone</page_callback>
@@ -111,11 +106,6 @@
      <page_callback>CRM_Utils_REST::ajaxJson</page_callback>
      <access_arguments>access CiviCRM</access_arguments>
      <is_ajax>true</is_ajax>
-  </item>
-  <item>
-     <path>civicrm/inline</path>
-     <page_callback>CRM_Utils_REST::loadTemplate</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/ajax/chart</path>
