@@ -440,6 +440,35 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * A new contribution must not pick up the custom value row of another
+   * contribution whose ID happens to equal the contact ID.
+   */
+  public function testCreateWithCustomFieldWhenContactIDMatchesOtherContributionID(): void {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
+    $customKey = 'custom_' . $ids['custom_field_id'];
+    $first = $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $this->individualID,
+      'total_amount' => 10,
+      'financial_type_id' => 'Donation',
+      $customKey => 'first',
+    ]);
+    // Make sure a contact exists whose ID equals the first contribution's ID.
+    if (!CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_contact WHERE id = %1', [1 => [$first['id'], 'Integer']])) {
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_contact (id, contact_type, sort_name, display_name) VALUES (%1, 'Individual', 'Collision', 'Collision')", [1 => [$first['id'], 'Integer']]);
+    }
+    $second = $this->callAPISuccess('Contribution', 'create', [
+      'contact_id' => $first['id'],
+      'total_amount' => 20,
+      'financial_type_id' => 'Donation',
+      $customKey => 'second',
+    ]);
+    $this->assertEquals('second', $this->callAPISuccessGetValue('Contribution', ['id' => $second['id'], 'return' => $customKey]));
+    $this->assertEquals('first', $this->callAPISuccessGetValue('Contribution', ['id' => $first['id'], 'return' => $customKey]));
+    $this->customFieldDelete($ids['custom_field_id']);
+    $this->customGroupDelete($ids['custom_group_id']);
+  }
+
+  /**
    * Test creating a contribution without skipLineItems.
    */
   public function testCreateContributionNoLineItems(): void {
