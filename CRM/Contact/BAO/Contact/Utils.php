@@ -739,8 +739,10 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
    *
    * @param array $address
    *   This is associated array which contains submitted form values.
+   * @param array $currentAddresses
+   *   The contact's saved addresses, keyed like $address.
    */
-  public static function processSharedAddress(&$address) {
+  public static function processSharedAddress(&$address, array $currentAddresses = []) {
     if (!is_array($address)) {
       return;
     }
@@ -752,7 +754,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
 
     // 1. loop through entire submitted address array
     $skipFields = ['is_primary', 'location_type_id', 'is_billing', 'master_id', 'add_relationship', 'id', 'contact_id'];
-    foreach ($address as & $values) {
+    foreach ($address as $instance => & $values) {
       // 2. check if "Use another contact's address" is checked, if not continue
       // Additionally, if master_id is set (address was shared), set master_id to empty value.
       if (empty($values['use_shared_address'])) {
@@ -770,7 +772,8 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
         continue;
       }
       $masterContactId = (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Address', $values['master_id'], 'contact_id');
-      if (!$masterContactId || !CRM_Contact_BAO_Contact_Permission::allow($masterContactId, CRM_Core_Permission::VIEW)) {
+      $alreadyShared = CRM_Core_BAO_Address::isSharedFrom($currentAddresses[$instance]['id'] ?? NULL, $values['master_id']);
+      if (!$masterContactId || (!$alreadyShared && !CRM_Contact_BAO_Contact_Permission::allow($masterContactId, CRM_Core_Permission::VIEW))) {
         throw new CRM_Core_Exception(ts('You do not have permission to share an address from this contact.'));
       }
 
