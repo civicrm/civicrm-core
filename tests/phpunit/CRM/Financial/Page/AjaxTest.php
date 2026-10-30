@@ -359,7 +359,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
    */
   public function testAssignRemoveSuccess(): void {
     $loggedInUserId = $this->createLoggedInUser();
-    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'edit own manual batches']);
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'close own manual batches']);
 
     $batch = $this->createTestEntity('Batch', [
       'title' => 'My Batch To Close',
@@ -385,6 +385,28 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
       ->execute()
       ->first();
     $this->assertEquals('Closed', $updatedBatch['status_id:name']);
+  }
+
+  /**
+   * Closing a batch needs the close permission, not the edit permission.
+   */
+  public function testAssignRemoveCloseNeedsClosePermission(): void {
+    $loggedInUserId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'edit own manual batches']);
+    $batch = $this->createTestEntity('Batch', [
+      'title' => 'My Batch',
+      'created_id' => $loggedInUserId,
+      'status_id:name' => 'Data Entry',
+    ]);
+
+    $_POST['op'] = 'close';
+    $_POST['recordBAO'] = 'CRM_Batch_BAO_Batch';
+    $_POST['records'] = [$batch['id']];
+    $_REQUEST['qfKey'] = $_POST['qfKey'] = CRM_Core_Key::get('CRM_Financial_Page_AJAX');
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Financial_Page_AJAX::assignRemove();
   }
 
   /**
