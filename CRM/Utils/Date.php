@@ -1143,7 +1143,7 @@ class CRM_Utils_Date {
       $relativeTerm === 'ending' && $unit === 'month' => "DATE_SUB(CURDATE(), INTERVAL 29 DAY)",
       $relativeTerm === 'ending' && $unit === 'quarter' => "DATE_SUB(CURDATE(), INTERVAL 89 DAY)",
       $relativeTerm === 'ending' && $unit === 'week' => "DATE_SUB(CURDATE(), INTERVAL 6 DAY)",
-      default => "DATE_SUB(CURDATE() + INTERVAL 1 DAY, INTERVAL $count $intervalUnit)",
+      default => "DATE_SUB(CURDATE(), INTERVAL $count $intervalUnit) + INTERVAL 1 DAY",
     };
 
     $startingTo = match (TRUE) {

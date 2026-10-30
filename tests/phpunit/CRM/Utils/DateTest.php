@@ -39,6 +39,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
     date_default_timezone_set($this->timeZone);
+    CRM_Core_DAO::executeQuery('SET TIMESTAMP = DEFAULT');
     parent::tearDown();
   }
 
@@ -228,77 +229,39 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test relativeToAbsolute function on a range of year options.
+   * Test relativeToAbsolute on 'ending' terms, with MySQL's clock pinned to $today.
    *
-   * Go backwards one year at a time through the sequence.
+   * @dataProvider relativeEndingProvider
    */
-  public function testRelativeEnding(): void {
-    $relativeDateValues = [
-      'ending.week' => '- 6 days',
-      'ending_30.day' => '- 29 days',
-      'ending.year' => '- 1 year + 1 day',
-      'ending_90.day' => '- 89 days',
-      'ending_60.day' => '- 59 days',
-      'ending_2.year' => '- 2 years + 1 day',
-      'ending_3.year' => '- 3 years + 1 day',
-      'ending_18.year' => '- 18 years + 1 day',
-      'ending_18.quarter' => '- 54 months + 1 day',
-      'ending_18.week' => '- 18 weeks + 1 day',
-      'ending_18.month' => '- 18 months + 1 day',
-      'ending_18.day' => '- 17 days',
-    ];
-
-    foreach ($relativeDateValues as $key => $value) {
-      $parts = explode('.', $key);
-      $date = CRM_Utils_Date::relativeToAbsolute($parts[0], $parts[1]);
-      $this->assertEquals([
-        'from' => date('Ymd000000', strtotime($value)),
-        'to' => date('Ymd235959'),
-      ], $date, 'relative term is ' . $key);
-    }
-
-    $date = CRM_Utils_Date::relativeToAbsolute('ending', 'month');
+  public function testRelativeEnding(string $today, string $relativeTerm, string $unit, string $expectedFrom): void {
+    CRM_Core_DAO::executeQuery('SET TIMESTAMP = UNIX_TIMESTAMP(%1)', [1 => ["$today 12:00:00", 'String']]);
     $this->assertEquals([
-      'from' => date('Ymd000000', strtotime('- 29 days')),
-      'to' => date('Ymd235959'),
-    ], $date, 'relative term is ending.week');
+      'from' => $expectedFrom,
+      'to' => str_replace('-', '', $today) . '235959',
+    ], CRM_Utils_Date::relativeToAbsolute($relativeTerm, $unit));
   }
 
-  /**
-   * Test relativeToAbsolute function on a range of year options.
-   *
-   * Go backwards one year at a time through the sequence.
-   */
-  public function testRelativeThisFiscal(): void {
-    $relativeDateValues = [
-      'ending.week' => '- 6 days',
-      'ending_30.day' => '- 29 days',
-      'ending.year' => '- 1 year + 1 day',
-      'ending_90.day' => '- 89 days',
-      'ending_60.day' => '- 59 days',
-      'ending_2.year' => '- 2 years + 1 day',
-      'ending_3.year' => '- 3 years + 1 day',
-      'ending_18.year' => '- 18 years + 1 day',
-      'ending_18.quarter' => '- 54 months + 1 day',
-      'ending_18.week' => '- 18 weeks + 1 day',
-      'ending_18.month' => '- 18 months + 1 day',
-      'ending_18.day' => '- 17 days',
+  public static function relativeEndingProvider(): array {
+    return [
+      'ending.week' => ['2026-10-30', 'ending', 'week', '20261024000000'],
+      'ending.month' => ['2026-10-30', 'ending', 'month', '20261001000000'],
+      'ending.quarter' => ['2026-10-30', 'ending', 'quarter', '20260802000000'],
+      'ending.year' => ['2026-10-30', 'ending', 'year', '20251031000000'],
+      'ending_10.day' => ['2026-10-30', 'ending_10', 'day', '20261021000000'],
+      'ending_30.day' => ['2026-10-30', 'ending_30', 'day', '20261001000000'],
+      'ending_60.day' => ['2026-10-30', 'ending_60', 'day', '20260901000000'],
+      'ending_90.day' => ['2026-10-30', 'ending_90', 'day', '20260802000000'],
+      'ending_2.week' => ['2026-10-30', 'ending_2', 'week', '20261017000000'],
+      'ending_6.month' => ['2026-10-30', 'ending_6', 'month', '20260501000000'],
+      'ending_2.quarter' => ['2026-10-30', 'ending_2', 'quarter', '20260501000000'],
+      'ending_2.year' => ['2026-10-30', 'ending_2', 'year', '20241031000000'],
+      'ending_3.year' => ['2026-10-30', 'ending_3', 'year', '20231031000000'],
+      'ending_5.year' => ['2026-10-30', 'ending_5', 'year', '20211031000000'],
+      'ending_6.month from leap day' => ['2024-02-29', 'ending_6', 'month', '20230830000000'],
+      'ending.year from day before leap day' => ['2024-02-28', 'ending', 'year', '20230301000000'],
+      'ending.year from leap day' => ['2024-02-29', 'ending', 'year', '20230301000000'],
+      'ending_6.month from 31st' => ['2024-03-31', 'ending_6', 'month', '20231001000000'],
     ];
-
-    foreach ($relativeDateValues as $key => $value) {
-      $parts = explode('.', $key);
-      $date = CRM_Utils_Date::relativeToAbsolute($parts[0], $parts[1]);
-      $this->assertEquals([
-        'from' => date('Ymd000000', strtotime($value)),
-        'to' => date('Ymd235959'),
-      ], $date, 'relative term is ' . $key);
-    }
-
-    $date = CRM_Utils_Date::relativeToAbsolute('ending', 'month');
-    $this->assertEquals([
-      'from' => date('Ymd000000', strtotime('- 29 days')),
-      'to' => date('Ymd235959'),
-    ], $date, 'relative term is ending.week');
   }
 
   /**
