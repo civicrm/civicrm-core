@@ -119,6 +119,17 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
   }
 
   /**
+   * @see \CRM_RouterTest_Page_StaticExamples::psr7Cookies()
+   */
+  public function testPsr7Cookies(): void {
+    $result = $this->client->get('frontend://civicrm/route-test/psr7-cookies', ['authx_user' => NULL]);
+    $this->assertEquals(200, $result->getStatusCode());
+    $setCookies = $result->getHeader('Set-Cookie');
+    $this->assertContains('routerTestA=1; Path=/; Expires=Wed, 21 Oct 2037 07:28:00 GMT', $setCookies);
+    $this->assertContains('routerTestB=2; Path=/', $setCookies);
+  }
+
+  /**
    * @see \CRM_RouterTest_Page_StaticExamples::psr7()
    */
   public function testPsr7OldInput(): void {
