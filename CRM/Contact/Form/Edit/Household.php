@@ -69,11 +69,16 @@ class CRM_Contact_Form_Edit_Household {
    */
   public static function formRule($fields, $files, $contactID = NULL) {
     $errors = [];
-    $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Household');
+    // Inline forms that don't show the name have nothing to validate here.
+    $hasNameElement = !($contactID instanceof CRM_Core_Form) || $contactID->elementExists('household_name');
 
-    // make sure that household name is set
-    if (empty($fields['household_name'])) {
-      $errors['household_name'] = ts('Household Name should be set.');
+    if ($hasNameElement) {
+      $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Household');
+
+      // make sure that household name is set
+      if (empty($fields['household_name'])) {
+        $errors['household_name'] = ts('Household Name should be set.');
+      }
     }
 
     return empty($errors) ? TRUE : $errors;
