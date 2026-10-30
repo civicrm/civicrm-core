@@ -19,7 +19,7 @@
     </div>
     <div class="panel-body" uib-collapse="!accordions.msg_subject">
       <div ng-model="$ctrl.msgtpl.msg_subject"
-           crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightPct: 0.15})"
+           crm-monaco="$ctrl.monacoOptions({language: 'smarty', crmHeightLines: 4, scrollbar: {verticalHasArrows: false}})"
            crm-monaco-insert-rx="insert:msg_subject"
            ng-disabled="$ctrl.isDisabled()"
       ></div>
