@@ -1399,6 +1399,80 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
   }
 
   /**
+   * Get the labels of referenced records, linked if the current user can view the record.
+   *
+   * @param string $entityName
+   * @param array<int,string> $labels
+   *   Labels keyed by record id, in display order.
+   *
+   * @return array<int,string>
+   *   HTML keyed by record id, in display order.
+   * @throws \CRM_Core_Exception
+   */
+  private static function getReferenceLinks(string $entityName, array $labels): array {
+    foreach ($labels as $id => $label) {
+      $labels[$id] = htmlspecialchars($label === '' ? (string) $id : $label);
+    }
+    // Don't try to get links for entities that aren't enabled
+    if (!in_array('get', CoreUtil::getAllowedEntityActions($entityName), TRUE)) {
+      return $labels;
+    }
+    $viewPath = civicrm_api4($entityName, 'getLinks', [
+      'checkPermissions' => FALSE,
+      'where' => [['ui_action', '=', 'view']],
+    ])->first()['path'] ?? NULL;
+    if (!$viewPath) {
+      return $labels;
+    }
+    $records = civicrm_api4($entityName, 'get', [
+      'checkPermissions' => TRUE,
+      'select' => array_column(CRM_Utils_String::getSquareTokens($viewPath), 'content'),
+      'where' => [['id', 'IN', array_keys($labels)]],
+    ]);
+    foreach ($records as $record) {
+      // Access was already checked above; checking again would rerun the get query
+      $link = civicrm_api4($entityName, 'getLinks', [
+        'checkPermissions' => FALSE,
+        'values' => $record,
+        'where' => [['ui_action', '=', 'view']],
+      ])->first();
+      if (!empty($link['path'])) {
+        $attributes = array_filter([
+          'href' => (string) Civi::url($link['path']),
+          'target' => $link['target'] ?? NULL,
+          'title' => $link['text'] ?? NULL,
+        ]);
+        $labels[$record['id']] = '<a ' . CRM_Utils_String::htmlAttributes($attributes) . '>' . $labels[$record['id']] . '</a>';
+      }
+    }
+    return $labels;
+  }
+
+  /**
+   * Get contact display names, no permission check.
+   *
+   * @param array $contactIds
+   *
+   * @return array<int,string>
+   *   Display names keyed by contact id, in order.
+   * @throws \CRM_Core_Exception
+   */
+  private static function getContactDisplayNames(array $contactIds): array {
+    $displayNames = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('display_name')
+      ->addWhere('id', 'IN', $contactIds)
+      ->execute()
+      ->column('display_name', 'id');
+    $orderedNames = [];
+    foreach ($contactIds as $contactId) {
+      if (isset($displayNames[$contactId])) {
+        $orderedNames[$contactId] = $displayNames[$contactId];
+      }
+    }
+    return $orderedNames;
+  }
+
+  /**
    * Build custom data view.
    *
    * @param CRM_Core_Form|CRM_Core_Page $form
@@ -1457,19 +1531,16 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
             if (empty($properties['is_view']) && in_array($key, $editableGroups)) {
               $details[$groupID][$values['id']]['editable'] = TRUE;
             }
-            // also return contact reference contact id if user has view all or edit all contacts perm
-            if ($details[$groupID][$values['id']]['fields'][$k]['field_data_type'] === 'ContactReference'
-              && CRM_Core_Permission::check([['view all contacts', 'edit all contacts']])
-            ) {
-              $details[$groupID][$values['id']]['fields'][$k]['contact_ref_links'] = [];
-              $path = CRM_Contact_DAO_Contact::getEntityPaths()['view'];
-              foreach (CRM_Utils_Array::explodePadded($values['data'] ?? []) as $contactId) {
-                $displayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'display_name');
-                if ($displayName) {
-                  $url = CRM_Utils_System::url(str_replace('[id]', $contactId, $path));
-                  $details[$groupID][$values['id']]['fields'][$k]['contact_ref_links'][] = '<a href="' . $url . '" title="' . ts('View Contact', ['escape' => 'htmlattribute']) . '">' .
-                    $displayName . '</a>';
-                }
+            // Links are only needed when rendering the view; edit forms call this with $returnCount
+            // just to count existing multi-record sets, and the links would be discarded.
+            if (!$returnCount && !empty($values['data'])) {
+              if ($properties['data_type'] === 'ContactReference') {
+                $labels = self::getContactDisplayNames(CRM_Utils_Array::explodePadded($values['data']));
+                $details[$groupID][$values['id']]['fields'][$k]['ref_links'] = self::getReferenceLinks('Contact', $labels);
+              }
+              elseif ($properties['data_type'] === 'EntityReference') {
+                $labels = [(int) $values['data'] => (string) $details[$groupID][$values['id']]['fields'][$k]['field_value']];
+                $details[$groupID][$values['id']]['fields'][$k]['ref_links'] = self::getReferenceLinks($properties['fk_entity'], $labels);
               }
             }
           }
