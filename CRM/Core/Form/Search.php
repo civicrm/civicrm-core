@@ -363,12 +363,14 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * @param array $rows
    */
   public function addRowSelectors($rows) {
-    $this->addElement('checkbox', 'toggleSelect', NULL, NULL, ['class' => 'select-rows']);
+    $this->addElement('checkbox', 'toggleSelect', NULL, NULL, ['class' => 'select-rows', 'aria-label' => ts('Select All Rows')]);
     if (!empty($rows)) {
+      $rowId = 1;
       foreach ($rows as $row) {
         if (!empty($row['checkbox'])) {
-          $this->addElement('checkbox', $row['checkbox'], NULL, NULL, ['class' => 'select-row']);
+          $this->addElement('checkbox', $row['checkbox'], NULL, NULL, ['class' => 'select-row', 'aria-label' => ts('Select Row %1', [1 => $rowId])]);
         }
+        $rowId++;
       }
     }
   }
