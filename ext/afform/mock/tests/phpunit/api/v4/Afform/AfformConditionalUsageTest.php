@@ -42,6 +42,8 @@ EOHTML;
         ->setName($this->formName)
         ->setValues(['Individual1' => $submission])
         ->execute();
+
+      $this->fail('Should error without required field');
     }
     catch (\CRM_Core_Exception $e) {
     }
@@ -56,6 +58,7 @@ EOHTML;
         ->setName($this->formName)
         ->setValues(['Individual1' => $submission])
         ->execute();
+      $this->fail('Should error without required field');
     }
     catch (\CRM_Core_Exception $e) {
     }

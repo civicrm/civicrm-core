@@ -41,7 +41,7 @@
           if (staticItem !== ruleName && this.node.defn) {
             delete this.node.defn[staticItem];
           }
-          this.node[ruleName] = '(' + JSON.stringify(this.conditions[ruleName]).replace(/"/g, '&quot;') + ')';
+          this.node[ruleName] = JSON.stringify(this.conditions[ruleName]);
         }
       });
       dialogService.close('afformGuiConditionalDialog');
@@ -51,11 +51,7 @@
       if (!this.node[rule]) {
         return [];
       }
-      const raw = this.node[rule].replace(/&quot;/g, '"').trim();
-      if (raw.charAt(0) !== '(') {
-        return [];
-      }
-      return $parse(raw.slice(1, -1))();
+      return CRM.afform.parseExpression(this.node[rule]);
     };
 
     this.$onInit = () => {
@@ -80,7 +76,7 @@
           // Conditional in case field is missing (why would it be missing?)
           .filter(Boolean)
           .map((field) => {
-            const key = entity.name + "[0][fields][" + field.name + "]";
+            const key = `[${entity.name}.0.${field.name}]`;
             this.fieldDefns[key] = field;
             return {id: key, text: field.label || field.input_attrs.label};
           });
@@ -89,7 +85,7 @@
           .filter((join) => join.fields.length)
           .map((join) => {
             const joinFields = join.fields.map((field) => {
-              const key = `${entity.name}[0][joins][${join.entity}][${join.joinIndex}][${field.name}]`;
+              const key = `[${entity.name}.0.${join.entity}.${join.joinIndex}.${field.name}]`;
               this.fieldDefns[key] = field;
               return {id: key, text: field.label || field.input_attrs.label};
             });

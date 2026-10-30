@@ -234,38 +234,33 @@
         );
       }
 
-      // Handle the logic for conditional fields
-      this.checkConditions = function(conditions, op) {
-        op = op || 'AND';
-        // OR and AND have the opposite behavior so the logic is inverted
-        // NOT works identically to OR but gets flipped at the end
-        let ret = op === 'AND',
-          flip = !ret;
-        (conditions || []).forEach((clause) => {
-          // Recurse into nested group
-          if (Array.isArray(clause[1])) {
-            if (ctrl.checkConditions(clause[1], clause[0]) === flip) {
-              ret = flip;
-            }
-          } else {
-            // Angular can't handle expressions with quotes inside brackets, so they are omitted
-            // Here we add them back to make valid js
-            if (typeof clause[0] === 'string' && clause[0].charAt(0) !== '"') {
-              clause[0] = clause[0].replace(/\[([^'"])/g, "['$1").replace(/([^'"])]/g, "$1']");
-            }
-            let parser1 = $parse(clause[0]);
-            let parser2 = $parse(clause[2]);
-            let result = compareConditions(parser1(data), clause[1], parser2(data));
-            if (result === flip) {
-              ret = flip;
-            }
-          }
-        });
-        return op === 'NOT' ? !ret : ret;
+      this.evaluateExpression = (expression) => {
+        const parsed = CRM.afform.parseExpression(expression);
+        if (Array.isArray(parsed)) {
+          return this.evaluateBooleanExpression(parsed);
+        }
+        throw new Error('Unsupported expression, expected boolean array');
       };
 
-      function compareConditions(val1, op, val2) {
+      // Handle the logic for conditional arrays
+      this.evaluateBooleanExpression = (conditions) => {
+        if (conditions.every(Array.isArray)) {
+          // implicit AND => run as explicit AND
+          return this.evaluateBooleanExpression(['AND', conditions]);
+        }
+        if (conditions[0] === 'AND') {
+          return conditions[1].every((subcondition) => this.evaluateBooleanExpression(subcondition));
+        }
+        if (conditions[0] === 'OR') {
+          return conditions[1].some((subcondition) => this.evaluateBooleanExpression(subcondition));
+        }
+        return compareConditions(conditions[0], conditions[1], conditions[2]);
+      };
+
+      const compareConditions = (val1, op, val2) => {
         const yes = (op !== '!=' && !op.includes('NOT '));
+
+        val1 = this.getTokenValue(val1);
 
         switch (op) {
           case '=':
@@ -329,9 +324,9 @@
             }
             return angular.equals(val1, val2) === yes;
         }
-      }
+      };
 
-      function likeCompare(str, pattern) {
+      const likeCompare = (str, pattern) => {
         // Escape regex special characters in the pattern, except for % and _
         const regexPattern = pattern
           .replace(/([.+?^=!:${}()|\[\]\/\\])/g, "\\$1")
@@ -339,7 +334,7 @@
           .replace(/_/g, '.'); // Convert _ to .
         const regex = new RegExp(`^${regexPattern}$`, 'i');
         return regex.test(str);
-      }
+      };
 
       // Called after form is submitted and files are uploaded
       function postProcess() {

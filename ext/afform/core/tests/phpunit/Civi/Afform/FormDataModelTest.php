@@ -121,4 +121,22 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertEquals($expectEntities, $fdm->getEntities());
   }
 
+  public function testParseConditionalExpression(): void {
+    $original = ['AND', [
+      ['[Individual1.0.first_name]', '=', 'John'],
+      ['[Individual1.0.last_name]', '=', 'Coltrane'],
+    ]];
+
+    $canonicalExpression = \htmlentities(\json_encode($original));
+    $parsed = FormDataModel::parseExpression($canonicalExpression);
+
+    $this->assertSame($original, $parsed, 'Canonical expression parsing returns original');
+
+    // try deriving this with php ;)
+    $angularJsExpression = '([[&amp;quot;Individual1[0][fields][first_name]&amp;quot;,&amp;quot;=&amp;quot;,&amp;quot;\&amp;quot;John\&amp;quot;&amp;quot;],[&amp;quot;Individual1[0][fields][last_name]&amp;quot;,&amp;quot;=&amp;quot;,&amp;quot;\&amp;quot;Coltrane\&amp;quot;&amp;quot;]])';
+
+    $parsed = FormDataModel::parseExpression($angularJsExpression, 'AngularJS expression parsing returns original');
+    $this->assertSame($original, $parsed);
+  }
+
 }

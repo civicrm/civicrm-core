@@ -9,6 +9,7 @@ use Civi\Afform\FormDataModel;
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\AfformSubmission;
 use Civi\Api4\File;
+use Civi\Api4\Generic\BasicGetAction;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\Utils\CoreUtil;
 use CRM_Afform_ExtensionUtil as E;
@@ -1028,7 +1029,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     preg_match_all('/\[[a-zA-Z0-9_]+\.[0-9]+\.[^]]+]/', $text, $matches);
 
     foreach ($matches[0] as $token) {
-      $text = str_replace($token, $this->getTokenValue($token), $text);
+      $text = str_replace($token, $this->getTokenStringValue($token), $text);
     }
 
     // handle special case of JWT token token
@@ -1037,7 +1038,15 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     return $text;
   }
 
-  private function getTokenValue(string $token): string {
+  private function getTokenStringValue(string $token): string {
+    $raw = $this->getTokenRawValue($token);
+    if (is_array($raw)) {
+      return implode(', ', array_map(fn ($i) => (string) $i, $raw));
+    }
+    return (string) $raw;
+  }
+
+  private function getTokenRawValue(string $token): mixed {
     $token = \trim($token, '[]');
     // split Individual1.0.first_name
     // remember: custom field field names can contain .
@@ -1047,25 +1056,54 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     }
     [$entityName, $index, $field] = explode('.', $token, 3);
     if ($field === 'id') {
-      return (string) $this->_entityIds[$entityName][$index]['id'];
+      return $this->_entityIds[$entityName][$index]['id'];
     }
     if (isset($this->_submissionTokenValues[$entityName][$index][$field])) {
-      return (string) $this->_submissionTokenValues[$entityName][$index][$field];
+      return $this->_submissionTokenValues[$entityName][$index][$field];
     }
     if (isset($this->_entityValues[$entityName][$index]['fields'][$field])) {
-      return (string) $this->_entityValues[$entityName][$index]['fields'][$field];
+      return $this->_entityValues[$entityName][$index]['fields'][$field];
     }
     if (\substr_count($field, '.') >= 2) {
       // we may have a join token
       [$joinEntity, $joinIndex, $joinField] = explode('.', $field, 3);
       if ($joinField === 'id') {
-        return (string) $this->_entityIds[$entityName][$index]['joins'][$joinEntity][$joinIndex]['id'];
+        return $this->_entityIds[$entityName][$index]['joins'][$joinEntity][$joinIndex]['id'];
       }
       if (isset($this->_entityValues[$entityName][$index]['joins'][$joinEntity][$joinIndex][$joinField])) {
-        return (string) $this->_entityValues[$entityName][$index]['joins'][$joinEntity][$joinIndex][$joinField];
+        return $this->_entityValues[$entityName][$index]['joins'][$joinEntity][$joinIndex][$joinField];
       }
     }
     return '';
+  }
+
+  /**
+   * PHP interpretation of the "af-if" directive to determine conditional status.
+   * @return bool - Is this conditional true or not.
+   */
+  public function checkAfformConditional(array $conditional) : bool {
+    if (array_all($conditional, fn ($clause) => \is_array($clause))) {
+      // implicit AND => explicit AND
+      return self::checkAfformConditional(['AND', $conditional]);
+    }
+    if ($conditional[0] === 'AND') {
+      return array_all($conditional[1], fn ($subcondition) => self::checkAfformConditional($subcondition));
+    }
+    if ($conditional[0] === 'OR') {
+      return array_any($conditional[1], fn ($subcondition) => self::checkAfformConditional($subcondition));
+    }
+    return self::checkAfformConditionalClause($conditional[0], $conditional[1], $conditional[2] ?? '');
+  }
+
+  private function checkAfformConditionalClause(string $value1, string $operator, mixed $value2) {
+    // NOTE: currently we only support the first value
+    // being a single token
+    $submittedValue = $this->getTokenRawValue($value1);
+    // `==` is deprecated in favor of `=`
+    if ($operator === '==') {
+      $operator = '=';
+    }
+    return BasicGetAction::compareValues($submittedValue, $operator, $value2);
   }
 
 }
