@@ -2194,11 +2194,13 @@ WHERE  ce.loc_block_id = $locBlockId";
           'icon' => 'fa-download',
         ];
 
-        $return[] = [
-          'url' => CRM_Utils_System::url('civicrm/event/ical', ['gCalendar' => 1] + $query, TRUE, NULL, TRUE),
-          'text' => ts('Add event to Google Calendar'),
-          'icon' => 'fa-share',
-        ];
+        if (\Civi::settings()->get('event_enable_google_calendar_links')) {
+          $return[] = [
+            'url' => CRM_Utils_System::url('civicrm/event/ical', ['gCalendar' => 1] + $query, TRUE, NULL, TRUE),
+            'text' => ts('Add event to Google Calendar'),
+            'icon' => 'fa-share',
+          ];
+        }
       }
     }
     else {
