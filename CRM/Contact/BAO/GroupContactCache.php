@@ -372,12 +372,15 @@ WHERE  id IN ( $groupIDs )
       $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()
         ->setCategory('gccache')
         ->setMemory();
-      self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
-      self::clearGroupContactCache([$groupID]);
-      self::updateCacheFromTempTable($groupContactsTempTable, [$groupID], $startTime);
-      self::releaseGroupLocks([$groupID]);
-      $groupContactsTempTable->drop();
-
+      try {
+        self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
+        self::clearGroupContactCache([$groupID]);
+        self::updateCacheFromTempTable($groupContactsTempTable, [$groupID], $startTime);
+      }
+      finally {
+        self::releaseGroupLocks([$groupID]);
+        $groupContactsTempTable->drop();
+      }
     }
     return in_array($groupID, $lockedGroups);
   }
@@ -676,24 +679,28 @@ ORDER BY   gc.contact_id, g.children
         ->setMemory();
       $lockedGroups = self::getLocksForRefreshableGroupsTo($smartGroups);
       if (!empty($lockedGroups)) {
-        self::buildGroupContactTempTable($lockedGroups, $groupContactsTempTable);
-        // Note in theory we could do this transfer from the temp
-        // table to the group_contact_cache table out-of-process - possibly by
-        // continuing on after the browser is released (which seems to be
-        // possibly possible https://stackoverflow.com/questions/15273570/continue-processing-php-after-sending-http-response
-        // or by making the table durable and using a cron to process it (or an ajax call
-        // at the end to process out of the queue.
-        // if we did that we would union in DISTINCT contact_id FROM
-        // $groupContactsTempTable->getName()
-        // but still use the last union for array_diff_key($smartGroups, $locks)
-        // as that would hold the already-cached groups (if any).
-        // Also - if we switched to the 'triple union' approach described above
-        // we could throw a try-catch around this line since best-effort would
-        // be good enough & potentially improve user experience.
-        self::clearGroupContactCache($lockedGroups);
-        self::updateCacheFromTempTable($groupContactsTempTable, $lockedGroups);
-        self::releaseGroupLocks($lockedGroups);
-        $groupContactsTempTable->drop();
+        try {
+          self::buildGroupContactTempTable($lockedGroups, $groupContactsTempTable);
+          // Note in theory we could do this transfer from the temp
+          // table to the group_contact_cache table out-of-process - possibly by
+          // continuing on after the browser is released (which seems to be
+          // possibly possible https://stackoverflow.com/questions/15273570/continue-processing-php-after-sending-http-response
+          // or by making the table durable and using a cron to process it (or an ajax call
+          // at the end to process out of the queue.
+          // if we did that we would union in DISTINCT contact_id FROM
+          // $groupContactsTempTable->getName()
+          // but still use the last union for array_diff_key($smartGroups, $locks)
+          // as that would hold the already-cached groups (if any).
+          // Also - if we switched to the 'triple union' approach described above
+          // we could throw a try-catch around this line since best-effort would
+          // be good enough & potentially improve user experience.
+          self::clearGroupContactCache($lockedGroups);
+          self::updateCacheFromTempTable($groupContactsTempTable, $lockedGroups);
+        }
+        finally {
+          self::releaseGroupLocks($lockedGroups);
+          $groupContactsTempTable->drop();
+        }
       }
 
       $smartGroups = implode(',', $smartGroups);
