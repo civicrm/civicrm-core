@@ -8,6 +8,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
     $this->callAPISuccess('OptionValue', 'get', ['option_group_id' => 'safe_file_extension', 'value' => 17, 'api.option_value.delete' => ['id' => "\$value.id"]]);
+    Civi::fs()->remove(sys_get_temp_dir() . '/testCleanDir');
     parent::tearDown();
   }
 
@@ -731,17 +732,16 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
   public function testCleanDir(): void {
     $a_dir = sys_get_temp_dir() . '/testCleanDir';
-    system('rm -rf ' . escapeshellarg($a_dir));
+    Civi::fs()->mkdir("$a_dir/externaldir1/sub1");
+    Civi::fs()->touch(["$a_dir/externalfile1", "$a_dir/externaldir1/file1"]);
     Civi::fs()->mkdir(["$a_dir/clean/sub1"]);
     Civi::fs()->touch(["$a_dir/clean/file1", "$a_dir/clean/sub1/file2"]);
     Civi::fs()->symlink("nonexistent", "$a_dir/clean/link1");
-    Civi::fs()->symlink("../external1", "$a_dir/clean/link2");
-    Civi::fs()->symlink("../external2", "$a_dir/clean/link3");
+    Civi::fs()->symlink("$a_dir/externalfile1", "$a_dir/clean/link2");
+    Civi::fs()->symlink("$a_dir/externaldir1", "$a_dir/clean/link3");
     if (function_exists('posix_mkfifo')) {
       posix_mkfifo("$a_dir/clean/fifo1", 0644);
     }
-    Civi::fs()->mkdir("$a_dir/externaldir1/sub1");
-    Civi::fs()->touch(["$a_dir/externalfile1", "$a_dir/externaldir1/file1"]);
 
     CRM_Utils_File::cleanDir("$a_dir/clean", FALSE, FALSE);
     if (getenv('DEBUG')) {
@@ -753,18 +753,21 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $this->assertThat("$a_dir/externaldir1/sub1", $this->directoryExists());
     $this->assertThat("$a_dir/externaldir1/file1", $this->fileExists());
     $this->assertThat("$a_dir/clean", $this->directoryExists());
+    $this->assertThat("$a_dir/clean/file1", $this->logicalNot($this->fileExists()));
+    $this->assertThat("$a_dir/clean/sub1/file2", $this->logicalNot($this->fileExists()));
+    $this->assertFalse(is_link("$a_dir/clean/link1"));
+    $this->assertFalse(is_link("$a_dir/clean/link2"));
+    $this->assertFalse(is_link("$a_dir/clean/link3"));
+    $this->assertThat("$a_dir/clean/fifo1", $this->logicalNot($this->fileExists()));
 
     // The first call to `cleanDir(...$rmdir=FALSE...)` left behind the folder.
     // But you can also clean it up...
     CRM_Utils_File::cleanDir("$a_dir/clean", TRUE, FALSE);
     $this->assertThat("$a_dir/clean", $this->logicalNot($this->directoryExists()));
-
-    system('rm -rf ' . escapeshellarg($a_dir));
   }
 
   public function testCleanDir_TopLink(): void {
     $a_dir = sys_get_temp_dir() . '/testCleanDir';
-    system('rm -rf ' . escapeshellarg($a_dir));
     Civi::fs()->mkdir(["$a_dir/externaldir1/sub1"]);
     Civi::fs()->touch("$a_dir/externaldir1/file1");
     Civi::fs()->symlink("$a_dir/externaldir1", "$a_dir/my_dir");
@@ -781,8 +784,21 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
     $this->assertThat("$a_dir/externaldir1/file1", $this->fileExists());
     $this->assertThat("$a_dir/externaldir1/sub1", $this->directoryExists());
+  }
 
-    system('rm -rf ' . escapeshellarg($a_dir));
+  public function testCleanDir_EmptySymlinkedDir(): void {
+    $a_dir = sys_get_temp_dir() . '/testCleanDir';
+    Civi::fs()->mkdir(["$a_dir/externaldir1/sub1"]);
+    Civi::fs()->touch(["$a_dir/externaldir1/file1", "$a_dir/externaldir1/sub1/file2"]);
+    Civi::fs()->symlink("$a_dir/externaldir1", "$a_dir/my_dir");
+
+    CRM_Utils_File::cleanDir("$a_dir/my_dir", FALSE, FALSE);
+
+    $this->assertTrue(is_link("$a_dir/my_dir"));
+    $this->assertThat("$a_dir/externaldir1/file1", $this->logicalNot($this->fileExists()));
+    $this->assertThat("$a_dir/externaldir1/sub1/file2", $this->logicalNot($this->fileExists()));
+    // rmdir is FALSE, it doesn't remove subdirectories either
+    $this->assertThat("$a_dir/externaldir1/sub1", $this->directoryExists());
   }
 
 }
