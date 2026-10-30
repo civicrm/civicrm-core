@@ -865,4 +865,38 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
       ->execute();
   }
 
+  /**
+   * Test Contact::update can resubmit a current employer the user cannot view.
+   */
+  public function testContactCanKeepEmployerUserCannotView(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherOrg = Contact::create(FALSE)
+      ->addValue('contact_type', 'Organization')
+      ->addValue('organization_name', 'Secret Org')
+      ->execute()->first()['id'];
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $userContact)
+      ->addValue('employer_id', $otherOrg)
+      ->execute();
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    Contact::update()
+      ->addWhere('id', '=', $userContact)
+      ->addValue('employer_id', $otherOrg)
+      ->addValue('job_title', 'Organizer')
+      ->execute();
+
+    $contact = Contact::get(FALSE)
+      ->addSelect('employer_id', 'job_title')
+      ->addWhere('id', '=', $userContact)
+      ->execute()->single();
+    $this->assertEquals($otherOrg, $contact['employer_id']);
+    $this->assertEquals('Organizer', $contact['job_title']);
+  }
+
 }
