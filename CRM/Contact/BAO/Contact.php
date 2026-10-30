@@ -107,81 +107,22 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
       return NULL;
     }
 
-    // Fix for validate contact sub type CRM-5143.
-    if (isset($params['contact_sub_type'])) {
-      if (empty($params['contact_sub_type'])) {
-        $params['contact_sub_type'] = 'null';
-      }
-      elseif ($params['contact_sub_type'] !== 'null') {
-        if (!CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'],
-          $params['contact_type'], TRUE
-        )
-        ) {
-          // we'll need to fix tests to handle this
-          // CRM-7925
-          throw new CRM_Core_Exception(ts('The Contact Sub Type does not match the Contact type for this record'));
-        }
-        // Ensure value is an array so it can be handled properly by `copyValues()`
-        if (is_string($params['contact_sub_type'])) {
-          $params['contact_sub_type'] = CRM_Core_DAO::unSerializeField($params['contact_sub_type'], self::fields()['contact_sub_type']['serialize']);
-        }
-      }
-    }
+    self::formatFieldsForWrite($params);
 
-    $defaults = ['source' => $params['contact_source'] ?? NULL];
-    if ($params['contact_type'] === 'Organization' && isset($params['organization_name'])) {
-      $defaults['display_name'] = $params['organization_name'];
-      $defaults['sort_name'] = $params['organization_name'];
-    }
-    if ($params['contact_type'] === 'Household' && isset($params['household_name'])) {
-      $defaults['display_name'] = $params['household_name'];
-      $defaults['sort_name'] = $params['household_name'];
-    }
-    $params = array_merge($defaults, $params);
-
-    if (!empty($params['deceased_date']) && $params['deceased_date'] !== 'null') {
-      $params['is_deceased'] = TRUE;
-    }
     $allNull = $contact->copyValues($params);
 
     $contact->id = $contactID;
 
     if ($contact->contact_type === 'Individual') {
       $allNull = FALSE;
-      // @todo get rid of this - most of this formatting should
-      // be done by time we get here - maybe start with some
-      // deprecation notices.
-      CRM_Contact_BAO_Individual::format($params, $contact);
     }
 
-    // Note that copyValues() above might already call this, via
-    // CRM_Utils_String::ellipsify(), but e.g. for Individual it gets put
-    // back or altered by Individual::format() just above, so we need to
-    // check again.
-    // Note also orgs will get ellipsified, but if we do that here then
-    // some existing tests on individual fail.
-    // Also api v3 will enforce org naming length by failing, v4 will truncate.
-    if (mb_strlen(($contact->display_name ?? ''), 'UTF-8') > 128) {
-      $contact->display_name = mb_substr($contact->display_name, 0, 128, 'UTF-8');
-    }
-    if (mb_strlen(($contact->sort_name ?? ''), 'UTF-8') > 128) {
-      $contact->sort_name = mb_substr($contact->sort_name, 0, 128, 'UTF-8');
-    }
-
-    $privacy = $params['privacy'] ?? NULL;
-    if ($privacy && is_array($privacy)) {
+    if (!empty($params['privacy']) && is_array($params['privacy'])) {
       $allNull = FALSE;
-      foreach (self::$_commPrefs as $name) {
-        $contact->$name = $privacy[$name] ?? FALSE;
-      }
     }
 
-    // Since hash was required, make sure we have a 0 value for it (CRM-1063).
-    // @todo - does this mean we can remove this block?
-    // Fixed in 1.5 by making hash optional, only do this in create mode, not update.
-    if ((!isset($contact->hash) || !$contact->hash) && !$contact->id) {
+    if (!empty($params['hash']) && !$contact->id) {
       $allNull = FALSE;
-      $contact->hash = bin2hex(random_bytes(16));
     }
 
     // Even if we don't need $employerId, it's important to call getFieldValue() before
@@ -217,6 +158,110 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Co
     }
 
     return $contact;
+  }
+
+  /**
+   * Format & default contact fields before the record is written.
+   *
+   * @param array $params
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function formatFieldsForWrite(array &$params): void {
+    $contactID = $params['contact_id'] ?? $params['id'] ?? NULL;
+    $contactType = $params['contact_type'] ?? ($contactID ? self::getContactType($contactID) : NULL);
+
+    // Fix for validate contact sub type CRM-5143.
+    if (isset($params['contact_sub_type'])) {
+      if (empty($params['contact_sub_type'])) {
+        $params['contact_sub_type'] = 'null';
+      }
+      elseif ($params['contact_sub_type'] !== 'null') {
+        if (!CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'],
+          $contactType, TRUE
+        )
+        ) {
+          // we'll need to fix tests to handle this
+          // CRM-7925
+          throw new CRM_Core_Exception(ts('The Contact Sub Type does not match the Contact type for this record'));
+        }
+        // Ensure value is an array so it can be handled properly by `copyValues()`
+        if (is_string($params['contact_sub_type'])) {
+          $params['contact_sub_type'] = CRM_Core_DAO::unSerializeField($params['contact_sub_type'], self::fields()['contact_sub_type']['serialize']);
+        }
+      }
+    }
+
+    $defaults = ['source' => $params['contact_source'] ?? NULL];
+    if ($contactType === 'Organization' && isset($params['organization_name'])) {
+      $defaults['display_name'] = $params['organization_name'];
+      $defaults['sort_name'] = $params['organization_name'];
+    }
+    if ($contactType === 'Household' && isset($params['household_name'])) {
+      $defaults['display_name'] = $params['household_name'];
+      $defaults['sort_name'] = $params['household_name'];
+    }
+    $params = array_merge($defaults, $params);
+
+    if (!empty($params['deceased_date']) && $params['deceased_date'] !== 'null') {
+      $params['is_deceased'] = TRUE;
+    }
+
+    if ($contactType === 'Individual') {
+      // @todo get rid of this most of this formatting should be done by time we get here
+      $contact = new CRM_Contact_DAO_Contact();
+      $contact->copyValues($params);
+      $contact->id = $contactID;
+      CRM_Contact_BAO_Individual::format($params, $contact);
+      foreach (['first_name', 'middle_name', 'last_name', 'nick_name', 'formal_title', 'display_name', 'sort_name'] as $field) {
+        if (isset($contact->$field) && $contact->$field !== 'null') {
+          $params[$field] = $contact->$field;
+        }
+      }
+
+      // Note that copyValues() above might already call this, via
+      // CRM_Utils_String::ellipsify(), but e.g. for Individual it gets put
+      // back or altered by Individual::format() just above, so we need to
+      // check again.
+      // Note also orgs will get ellipsified, but if we do that here then
+      // some existing tests on individual fail.
+      // Also api v3 will enforce org naming length by failing, v4 will truncate.
+      foreach (['display_name', 'sort_name'] as $field) {
+        if (mb_strlen(($params[$field] ?? ''), 'UTF-8') > 128) {
+          $params[$field] = mb_substr($params[$field], 0, 128, 'UTF-8');
+        }
+      }
+    }
+
+    $privacy = $params['privacy'] ?? NULL;
+    if ($privacy && is_array($privacy)) {
+      foreach (self::$_commPrefs as $name) {
+        $params[$name] = $privacy[$name] ?? FALSE;
+      }
+    }
+
+    // Since hash was required, make sure we have a 0 value for it (CRM-1063).
+    // @todo - does this mean we can remove this block?
+    // Fixed in 1.5 by making hash optional, only do this in create mode, not update.
+    if (empty($params['hash']) && !$contactID) {
+      $params['hash'] = bin2hex(random_bytes(16));
+    }
+  }
+
+  /**
+   * Callback for hook_civicrm_pre().
+   *
+   * Formats the fields for contacts written via `writeRecord()` (ie. APIv4),
+   * which do not go through `add()`.
+   *
+   * @param \Civi\Core\Event\PreEvent $event
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
+    if ($event->action === 'create' || $event->action === 'edit') {
+      self::formatFieldsForWrite($event->params);
+    }
   }
 
   /**
