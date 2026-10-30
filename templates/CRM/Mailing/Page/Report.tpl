@@ -28,7 +28,7 @@
       <td>{$report.event_totals.actionlinks.delivered}</td></tr>
 {if $report.mailing.open_tracking}
   <tr><td class="label"><a href="{$report.event_totals.links.opened}&distinct=1">{ts}Unique Opens{/ts}</a></td>
-      <td>{$report.event_totals.opened} ({$report.event_totals.opened_rate|string_format:"%0.2f"}%)</td>
+      <td>{$report.event_totals.opened} ({$report.event_totals.opened_rate|string_format:"%0.2f"}%){if $report.event_totals.runQueue_date} {ts escape="html" 1=$report.event_totals.runQueue_date|crmDate}(as of %1){/ts}{if $canRefreshRunQueueDate && $report.event_totals.runQueue_jobId} <a class="crm-hover-button" id="refresh_opens" title="{ts escape="html"}Run refresh job now{/ts}" target="_blank" href="{crmURL p='civicrm/admin/joblog' q="reset=1&jid=`$report.event_totals.runQueue_jobId`"}"><i class="crm-i fa-refresh"></i></a>{/if}{/if}</td>
       <td>{$report.event_totals.actionlinks.opened_unique}</td></tr>
   <tr><td class="label"><a href="{$report.event_totals.links.opened}">{ts}Total Opens{/ts}</a></td>
       <td>{$report.event_totals.total_opened}</td>
