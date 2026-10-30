@@ -379,6 +379,10 @@ class CRM_Core_Config_MagicMerge {
         $this->locals[$name] = NULL;
         return;
 
+      case 'user-system':
+        // Computed by the user system; dropping the cached value above makes __get() recompute it.
+        return;
+
       case 'callback':
         // Array(0 => $type, 1 => $obj, 2 => $getter, 3 => $setter, 4 => $unsetter).
         if (!isset($this->map[$k][1], $this->map[$k][4])) {
