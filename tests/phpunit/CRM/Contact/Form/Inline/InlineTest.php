@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contact;
 use Civi\Api4\Generic\Result;
 use Civi\Test\FormWrapper;
 
@@ -845,6 +846,42 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'select' => ['employer_id'],
     ])->first();
     $this->assertEquals($secretOrg['id'], $userRecord['employer_id']);
+  }
+
+  /**
+   * Test ContactInfo inline form saves when the current employer is one the user cannot view.
+   */
+  public function testContactInfoFormKeepsEmployerUserCannotView(): void {
+    $userContact = $this->createLoggedInUser();
+    $secretOrg = $this->createTestEntity('Contact', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'Secret Org',
+    ], 'secret_org');
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $userContact)
+      ->addValue('employer_id', $secretOrg['id'])
+      ->execute();
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_ContactInfo', [
+      'oplock_ts' => $this->getOplockTs($userContact),
+      'employer_id' => $secretOrg['id'],
+      'job_title' => 'Organizer',
+    ], ['cid' => $userContact]);
+    $formWrapper->processForm();
+
+    $this->assertEmpty($formWrapper->getValidationOutput());
+    $userRecord = Contact::get(FALSE)
+      ->addSelect('employer_id', 'job_title')
+      ->addWhere('id', '=', $userContact)
+      ->execute()->first();
+    $this->assertEquals($secretOrg['id'], $userRecord['employer_id']);
+    $this->assertEquals('Organizer', $userRecord['job_title']);
   }
 
   /**
