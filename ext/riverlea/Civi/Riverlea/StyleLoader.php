@@ -117,10 +117,18 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
         $bundle->addVars(E::LONG_NAME, ['resourceUrl' => E::url()]);
       }
 
-      if ($this->userControlsEnabled()) {
-        // Load the user controls
-        $bundle->addStyleFile('riverlea', 'elements/civi-riverlea-user-controls.css', ['weight' => 955]);
-        $bundle->addScriptFile('riverlea', 'elements/civi-riverlea-user-controls.js', [
+      $userControls = \Civi::settings()->get('riverlea_user_controls_backend') ?: [];
+
+      if ($userControls) {
+        foreach ($userControls as $control) {
+          // Load the user controls
+          $bundle->addStyleFile('riverlea', "elements/civi-riverlea-{$control}-control.css", ['weight' => 955]);
+          $bundle->addScriptFile('riverlea', "elements/civi-riverlea-{$control}-control.js", [
+            'weight' => 960,
+            'translate' => FALSE,
+          ]);
+        }
+        $bundle->addScriptFile('riverlea', "js/userControlsLoader.js", [
           'weight' => 960,
           'translate' => FALSE,
         ]);
@@ -198,7 +206,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
   }
 
   public function getCurrentDarkMode(): string {
-    if ($this->userControlsEnabled()) {
+    if (in_array('dark-mode', \Civi::settings()->get('riverlea_user_controls_backend') ?: [])) {
       // we need to inherit from the user controlled preference
       return 'inherit';
     }
@@ -247,51 +255,6 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
       ->first();
 
     $e->content = $render['content'] ?? '';
-  }
-
-  /**
-   * Validate the font size setting: it should be a floating
-   * point number (CSS font size in rem)
-   */
-  public static function validateFontSize($value):bool {
-    $fontSize = \CRM_Utils_Type::validate($value, 'Float', FALSE);
-    if ($fontSize < 0.5 || $fontSize > 2) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
-   * Get font size setting and add a variable for it
-   * to the CSS properties of every stream
-   */
-  public static function onChangeFontsize($oldValue, $newValue, $metadata) {
-    if ($oldValue != $newValue) {
-      $fontSize = floatval($newValue);
-      // Get current CSS properties for every stream
-      $riverleaStreams = \Civi\Api4\RiverleaStream::get(TRUE)
-        ->addSelect('vars')
-        ->execute();
-      // Add new font size to each stream as a CSS property
-      foreach ($riverleaStreams as $riverleaStream) {
-        $riverleaStream['vars']['--crm-font-size'] = $fontSize . "rem";
-        // Write the new value to the CSS vars of each stream
-        $results = \Civi\Api4\RiverleaStream::update(TRUE)
-          ->addValue('vars', $riverleaStream['vars'])
-          ->addWhere('id', '=', $riverleaStream['id'])
-          ->execute();
-      }
-    }
-  }
-
-  /**
-   * Is the backend dark-mode toggle enabled in theme settings?
-   */
-  private function userControlsEnabled(): bool {
-    if (!\CRM_Utils_System::isFrontendPage()) {
-      return !!\Civi::settings()->get('riverlea_user_controls_backend');
-    }
-    return FALSE;
   }
 
 }
