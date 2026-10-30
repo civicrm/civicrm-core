@@ -164,6 +164,17 @@ return [
                   ],
                 ],
                 [
+                  // `copyFrom` (vs `id`) tells the Edit route to prepopulate from this record
+                  // without loading its id, so Cancel leaves the database untouched and Save
+                  // creates a new template. Document-upload templates aren't edited here at
+                  // all (see the `Edit` link above), so copying one isn't offered either.
+                  'path' => 'civicrm/admin/messageTemplates/edit#/edit?copyFrom=[id]',
+                  'icon' => 'fa-copy',
+                  'text' => E::ts('Copy'),
+                  'style' => 'default',
+                  'conditions' => [['has_document', 'IS EMPTY']],
+                ],
+                [
                   'task' => 'enable',
                   'icon' => 'fa-toggle-on',
                   'text' => E::ts('Enable'),
