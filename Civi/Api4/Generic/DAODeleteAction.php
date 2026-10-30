@@ -33,6 +33,8 @@ class DAODeleteAction extends AbstractBatchAction {
       throw new \CRM_Core_Exception('Cannot delete ' . $this->getEntityName() . ' with no "where" parameter specified');
     }
 
+    $this->injectFacadeCondition();
+
     $items = $this->getBatchRecords();
 
     if ($this->getCheckPermissions()) {
@@ -48,6 +50,14 @@ class DAODeleteAction extends AbstractBatchAction {
     if ($items) {
       $result->exchangeArray($this->deleteObjects($items));
     }
+  }
+
+  protected function injectFacadeCondition() {
+    $facadeConfig = $this->getFacadeConfig();
+    if (!$facadeConfig) {
+      return;
+    }
+    $this->addWhere($facadeConfig['field'], '=', $facadeConfig['value']);
   }
 
   /**
