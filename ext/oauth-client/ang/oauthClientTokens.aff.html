@@ -1,10 +1,11 @@
 <div af-api4-ctrl="tokens" af-api4="['OAuthSysToken', 'get', {'where': [['client_id', '=', options.clientId]]}]">
 </div>
-<div ng-if="tokens.result.length == 0">
-  {{ts('No tokens found')}}
+<div ng-if="tokens.result.length == 0" oauth-util-grant-ctrl="granter">
+  <p>{{ts('No tokens found')}}</p>
+  <a class="btn btn-primary" ng-click="granter.authCode(options.clientId)">{{ts('Connect')}}</a>
 </div>
 
-<table class="table" ng-if="tokens.result.length > 0">
+<table class="table" ng-if="tokens.result.length > 0" oauth-util-grant-ctrl="granter">
   <tr>
     <th>{{ts('ID')}}</th>
     <th>{{ts('Tag')}}</th>
@@ -34,6 +35,12 @@
            af-api4-success-msg="ts('Refreshed')"
            af-api4-success="tokens.refresh()"
         >{{ts('Refresh')}}</a>
+
+        <a class="btn btn-default"
+           ng-if="token.tag.startsWith('MailSettings:') && token.tag !== 'MailSettings:setup'"
+           ng-click="granter.authCode(options.clientId, token.tag)"
+           title="{{ts('Sign in again and replace this token')}}"
+        >{{ts('Re-connect')}}</a>
 
         <a class="btn btn-danger"
            af-api4-action="['OAuthSysToken', 'delete', {where: [['id', '=', token.id]]}]"
