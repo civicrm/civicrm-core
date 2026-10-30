@@ -114,7 +114,9 @@ class CRM_Contact_Form_Edit_Individual {
 
     if (!empty($fields['employer_id'])) {
       $employerId = (int) $fields['employer_id'];
-      if (!CRM_Contact_BAO_Contact_Permission::allow($employerId, CRM_Core_Permission::VIEW) || CRM_Contact_BAO_Contact::getContactType($employerId) !== 'Organization') {
+      $individualId = $contactID instanceof CRM_Contact_Form_Inline ? $contactID->getContactID() : $contactID;
+      $currentEmployerId = $individualId ? (int) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $individualId, 'employer_id') : 0;
+      if ($employerId !== $currentEmployerId && (!CRM_Contact_BAO_Contact_Permission::allow($employerId, CRM_Core_Permission::VIEW) || CRM_Contact_BAO_Contact::getContactType($employerId) !== 'Organization')) {
         $errors['employer_id'] = ts('Please select a valid employer organization.');
       }
     }
