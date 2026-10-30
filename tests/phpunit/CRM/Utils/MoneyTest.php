@@ -97,11 +97,20 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
    */
   public function testFormatLocaleNumericRoundedByOptionalPrecision($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
-    $result = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision(8950.3678, 8);
+
+    $result = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision("8950", 8);
+    $expected = ($thousandSeparator === ',') ? '8,950.00' : '8.950,00';
+    $this->assertEquals($expected, $result);
+
+    $result = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision("8950.000000000", 8);
+    $expected = ($thousandSeparator === ',') ? '8,950.00' : '8.950,00';
+    $this->assertEquals($expected, $result);
+
+    $result = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision("8950.3678", 8);
     $expected = ($thousandSeparator === ',') ? '8,950.3678' : '8.950,3678';
     $this->assertEquals($expected, $result);
 
-    $result = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision(123456789.987654321, 9);
+    $result = CRM_Utils_Money::formatLocaleNumericRoundedByOptionalPrecision("123456789.987654321", 5);
     $expected = ($thousandSeparator === ',') ? '123,456,789.98765' : '123.456.789,98765';
     $this->assertEquals($result, $expected);
   }
