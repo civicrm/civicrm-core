@@ -1019,6 +1019,16 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * Visitors who are not logged in can register for a paid event.
+   */
+  public function testPaidSubmitAsAnonymousUser(): void {
+    $this->setPermissions(['register for events', 'profile create', 'profile view']);
+    $this->submitPaidEvent();
+    $this->assertCount(1, Participant::get(FALSE)->execute());
+    $this->assertCount(1, Contribution::get(FALSE)->execute());
+  }
+
+  /**
    * Ensure an email is sent when confirm is disabled for unpaid events.
    */
   public function testSubmitUnpaidEventNoConfirm(): void {
