@@ -184,7 +184,8 @@ class CRM_Contact_Form_Edit_Address {
           }
           else {
             $masterContactId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Address', $addressValues['master_id'], 'contact_id');
-            if (!$masterContactId || !CRM_Contact_BAO_Contact_Permission::allow($masterContactId, CRM_Core_Permission::VIEW)) {
+            $alreadyShared = CRM_Core_BAO_Address::isSharedFrom($self->_values['address'][$instance]['id'] ?? NULL, $addressValues['master_id']);
+            if (!$masterContactId || (!$alreadyShared && !CRM_Contact_BAO_Contact_Permission::allow($masterContactId, CRM_Core_Permission::VIEW))) {
               $errors["address[$instance][use_shared_address]"] = ts('You do not have permission to share an address from this contact.');
             }
           }

@@ -843,6 +843,42 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
   }
 
   /**
+   * Test Address::update can resubmit the master_id an address already shares.
+   */
+  public function testAddressCanKeepSharedAddressOfForbiddenContact(): void {
+    [$userContact, $otherContact] = $this->setupTestContacts();
+    $masterAddress = \Civi\Api4\Address::create(FALSE)
+      ->addValue('contact_id', $otherContact)
+      ->addValue('location_type_id', 1)
+      ->addValue('street_address', '123 Secret Lane')
+      ->execute()->first()['id'];
+    $sharedAddress = \Civi\Api4\Address::create(FALSE)
+      ->addValue('contact_id', $userContact)
+      ->addValue('location_type_id', 1)
+      ->addValue('master_id', $masterAddress)
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    \Civi\Api4\Address::update()
+      ->addWhere('id', '=', $sharedAddress)
+      ->addValue('master_id', $masterAddress)
+      ->addValue('is_billing', TRUE)
+      ->execute();
+
+    $address = \Civi\Api4\Address::get(FALSE)
+      ->addSelect('master_id', 'is_billing')
+      ->addWhere('id', '=', $sharedAddress)
+      ->execute()->single();
+    $this->assertEquals($masterAddress, $address['master_id']);
+    $this->assertTrue($address['is_billing']);
+  }
+
+  /**
    * Test Contact::update cannot set employer_id to an organization the user cannot view.
    */
   public function testContactCannotSetEmployerToForbiddenOrganization(): void {
