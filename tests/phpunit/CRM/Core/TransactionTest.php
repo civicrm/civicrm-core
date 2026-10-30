@@ -273,6 +273,25 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $this->assertEquals(['_postRollback', 'lkj', ';'], $this->callbackLog[1]);
   }
 
+  public function testCallback_preCommitError(): void {
+    $tx = new CRM_Core_Transaction();
+    $this->createContactWithTransaction('reuse-tx', 'sql-insert', 'implicit-commit');
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, function () {
+      throw new RuntimeException('Pre-commit failed');
+    });
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, [$this, '_postRollback'], ['lkj', ';']);
+
+    try {
+      $tx->commit();
+      $this->fail('The error should reach the caller');
+    }
+    catch (RuntimeException $e) {
+      $this->assertEquals('Pre-commit failed', $e->getMessage());
+    }
+    $this->assertContactsExistByOffset([0 => FALSE]);
+    $this->assertEquals([['_postRollback', 'lkj', ';']], $this->callbackLog);
+  }
+
   /**
    * @param string $createStyle
    *   'sql-insert'|'bao-create'.
