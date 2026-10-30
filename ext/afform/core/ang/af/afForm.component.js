@@ -255,7 +255,7 @@
             }
             let parser1 = $parse(clause[0]);
             let parser2 = $parse(clause[2]);
-            let result = compareConditions(parser1(data), clause[1], parser2(data));
+            let result = compareConditions(parser1(data), clause[1], resolveRelativeDate(parser2(data)));
             if (result === flip) {
               ret = flip;
             }
@@ -263,6 +263,49 @@
         });
         return op === 'NOT' ? !ret : ret;
       };
+
+      // Resolves the "@now"/"@now±N" (relative to today) and "@field:<path>"/"@field:<path>±N"
+      // (relative to another date field) tokens into an absolute yyyy-mm-dd string. Other
+      // values pass through.
+      function resolveRelativeDate(val) {
+        if (Array.isArray(val)) {
+          return val.map(resolveRelativeDate);
+        }
+        if (typeof val !== 'string') {
+          return val;
+        }
+        let baseDate, offsetStr;
+        const nowMatch = val.match(/^@now([+-]\d+)?$/);
+        if (nowMatch) {
+          baseDate = new Date();
+          offsetStr = nowMatch[1];
+        } else {
+          const fieldMatch = val.match(/^@field:([^+-]+)([+-]\d+)?$/);
+          if (!fieldMatch) {
+            return val;
+          }
+          let path = fieldMatch[1];
+          if (path.charAt(0) !== '"') {
+            path = path.replace(/\[([^'"])/g, "['$1").replace(/([^'"])]/g, "$1']");
+          }
+          baseDate = parseDateOnly($parse(path)(data));
+          offsetStr = fieldMatch[2];
+          if (!baseDate) {
+            return null;
+          }
+        }
+        const offset = offsetStr ? parseInt(offsetStr, 10) : 0;
+        baseDate.setDate(baseDate.getDate() + offset);
+        const pad = (n) => (n < 10 ? '0' : '') + n;
+        return baseDate.getFullYear() + '-' + pad(baseDate.getMonth() + 1) + '-' + pad(baseDate.getDate());
+      }
+
+      // Parses a yyyy-mm-dd string as a local-time Date, avoiding new Date(str)'s UTC parsing
+      // (which can shift the date by a day depending on the browser's timezone).
+      function parseDateOnly(val) {
+        const match = typeof val === 'string' && val.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        return match ? new Date(parseInt(match[1], 10), parseInt(match[2], 10) - 1, parseInt(match[3], 10)) : null;
+      }
 
       function compareConditions(val1, op, val2) {
         const yes = (op !== '!=' && !op.includes('NOT '));

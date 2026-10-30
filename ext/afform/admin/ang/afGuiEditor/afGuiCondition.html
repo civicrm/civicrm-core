@@ -2,10 +2,46 @@
   <option ng-repeat="(name, label) in $ctrl.getOperators()" value="{{:: name }}">{{:: label }}</option>
 </select>
 <div class="form-group" ng-if="$ctrl.operatorTakesInput() && !$ctrl.isBetween()">
-  <input af-gui-field-value="$ctrl.field" ng-model="$ctrl.getSetValue" op="$ctrl.clause[$ctrl.offset]" ng-model-options="{getterSetter: true}" class="form-control">
+  <select class="form-control" ng-if="$ctrl.isDateField()" ng-model="$ctrl.getSetMode" ng-model-options="{getterSetter: true}">
+    <option value="literal">{{ ts('Specific date') }}</option>
+    <option value="now">{{ ts('Relative to today') }}</option>
+    <option value="field">{{ ts('Relative to another date field') }}</option>
+  </select>
+  <input af-gui-field-value="$ctrl.field" ng-if="!$ctrl.isDateField() || $ctrl.getSetMode() === 'literal'" ng-model="$ctrl.getSetValue" op="$ctrl.clause[$ctrl.offset]" ng-model-options="{getterSetter: true}" class="form-control">
+  <span ng-if="$ctrl.isDateField() && $ctrl.getSetMode() === 'field'">
+    <input class="form-control" ng-model="$ctrl.getSetFieldPath" ng-model-options="{getterSetter: true}" crm-ui-select="{data: $ctrl.getDateFieldOptions(), allowClear: true, placeholder: ts('Field')}">
+  </span>
+  <span ng-if="$ctrl.isDateField() && $ctrl.getSetMode() !== 'literal'">
+    <input type="number" ng-model="$ctrl.getSetOffset" ng-model-options="{getterSetter: true, updateOn: 'blur'}" class="form-control">
+    {{ ts('days offset') }}
+  </span>
 </div>
 <div class="form-group" ng-if="$ctrl.isBetween()">
-  <input af-gui-field-value="$ctrl.field" ng-model="$ctrl.getSetValueAt0" op="'&gt;'" ng-model-options="{getterSetter: true}" class="form-control">
+  <select class="form-control" ng-if="$ctrl.isDateField()" ng-model="$ctrl.getSetMode0" ng-model-options="{getterSetter: true}">
+    <option value="literal">{{ ts('Specific date') }}</option>
+    <option value="now">{{ ts('Relative to today') }}</option>
+    <option value="field">{{ ts('Relative to another date field') }}</option>
+  </select>
+  <input af-gui-field-value="$ctrl.field" ng-if="!$ctrl.isDateField() || $ctrl.getSetMode0() === 'literal'" ng-model="$ctrl.getSetValueAt0" op="'&gt;'" ng-model-options="{getterSetter: true}" class="form-control">
+  <span ng-if="$ctrl.isDateField() && $ctrl.getSetMode0() === 'field'">
+    <input class="form-control" ng-model="$ctrl.getSetFieldPath0" ng-model-options="{getterSetter: true}" crm-ui-select="{data: $ctrl.getDateFieldOptions(), allowClear: true, placeholder: ts('Field')}">
+  </span>
+  <span ng-if="$ctrl.isDateField() && $ctrl.getSetMode0() !== 'literal'">
+    <input type="number" ng-model="$ctrl.getSetOffset0" ng-model-options="{getterSetter: true, updateOn: 'blur'}" class="form-control">
+    {{ ts('days offset') }}
+  </span>
   -
-  <input af-gui-field-value="$ctrl.field" ng-model="$ctrl.getSetValueAt1" op="'&lt;'" ng-model-options="{getterSetter: true}" class="form-control">
+  <select class="form-control" ng-if="$ctrl.isDateField()" ng-model="$ctrl.getSetMode1" ng-model-options="{getterSetter: true}">
+    <option value="literal">{{ ts('Specific date') }}</option>
+    <option value="now">{{ ts('Relative to today') }}</option>
+    <option value="field">{{ ts('Relative to another date field') }}</option>
+  </select>
+  <input af-gui-field-value="$ctrl.field" ng-if="!$ctrl.isDateField() || $ctrl.getSetMode1() === 'literal'" ng-model="$ctrl.getSetValueAt1" op="'&lt;'" ng-model-options="{getterSetter: true}" class="form-control">
+  <span ng-if="$ctrl.isDateField() && $ctrl.getSetMode1() === 'field'">
+    <input class="form-control" ng-model="$ctrl.getSetFieldPath1" ng-model-options="{getterSetter: true}" crm-ui-select="{data: $ctrl.getDateFieldOptions(), allowClear: true, placeholder: ts('Field')}">
+  </span>
+  <span ng-if="$ctrl.isDateField() && $ctrl.getSetMode1() !== 'literal'">
+    <input type="number" ng-model="$ctrl.getSetOffset1" ng-model-options="{getterSetter: true, updateOn: 'blur'}" class="form-control">
+    {{ ts('days offset') }}
+  </span>
 </div>
