@@ -63,7 +63,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address implements Civi\Core\Hoo
 
       // (prevent chaining 1 and 3) CRM-21214
       if (isset($event->params['master_id']) && !CRM_Utils_System::isNull($event->params['master_id'])) {
-        if (!empty($event->params['check_permissions'])) {
+        if (!empty($event->params['check_permissions']) && !self::isSharedFrom($event->id, $event->params['master_id'])) {
           $masterContactId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Address', $event->params['master_id'], 'contact_id');
           if (!$masterContactId || !CRM_Contact_BAO_Contact_Permission::allow($masterContactId, CRM_Core_Permission::VIEW)) {
             throw new \Civi\API\Exception\UnauthorizedException(ts('You do not have permission to share an address from this contact.'));
@@ -833,6 +833,40 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
   }
 
   /**
+   * Would saving these params change the stored address or its custom data?
+   *
+   * @param int $addressId
+   * @param array $params
+   *
+   * @return bool
+   */
+  private static function changesStoredAddress(int $addressId, array $params): bool {
+    if (!empty($params['custom'])) {
+      return TRUE;
+    }
+    $stored = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_address WHERE id = %1', [1 => [$addressId, 'Integer']])->fetchAll()[0];
+    foreach (array_intersect_key($params, $stored) as $field => $value) {
+      $value = is_bool($value) ? (int) $value : $value;
+      if ($field !== 'id' && (string) $value !== (string) $stored[$field]) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * Is the saved address already shared from the given master address?
+   *
+   * @param int|null $addressId
+   * @param int|string|null $masterId
+   *
+   * @return bool
+   */
+  public static function isSharedFrom($addressId, $masterId): bool {
+    return $addressId && $masterId && (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Address', $addressId, 'master_id') === (int) $masterId;
+  }
+
+  /**
    * Check if current address is used by any other contacts.
    *
    * @param int $addressId
@@ -1029,12 +1063,13 @@ SELECT is_primary,
     }
     if ($masterId && $parentOperation === 'edit' && $upstreamDao->fetch()) {
       $upstreamContactId = (int) $upstreamDao->contact_id;
-      if (!empty($params['check_permissions']) && !CRM_Contact_BAO_Contact_Permission::allow($upstreamContactId, CRM_Core_Permission::EDIT)) {
+      // Don't copy up the master_id.
+      unset($params['master_id']);
+      $canEditUpstream = CRM_Contact_BAO_Contact_Permission::allow($upstreamContactId, CRM_Core_Permission::EDIT);
+      if (!$canEditUpstream && !empty($params['check_permissions']) && self::changesStoredAddress((int) $upstreamDao->id, $params)) {
         throw new \Civi\API\Exception\UnauthorizedException(ts('Permission denied to modify shared upstream address.'));
       }
-      if (CRM_Contact_BAO_Contact_Permission::allow($upstreamContactId, CRM_Core_Permission::EDIT)) {
-        // Update the upstream address. But don't copy up the master_id.
-        unset($params['master_id']);
+      if ($canEditUpstream) {
         $addressDAO = new CRM_Core_DAO_Address();
         $addressDAO->copyValues($params);
         $addressDAO->id = $upstreamDao->id;

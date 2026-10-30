@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Address;
 use Civi\Api4\Generic\Result;
 use Civi\Test\FormWrapper;
 
@@ -941,6 +942,55 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       ['address[1][use_shared_address]' => ts('You do not have permission to share an address from this contact.')],
       $formWrapper->getValidationOutput()
     );
+  }
+
+  /**
+   * Test Address form saves an existing shared address whose master contact the user cannot view.
+   */
+  public function testAddressFormKeepsSharedAddressUserCannotView(): void {
+    $userContact = $this->createLoggedInUser();
+    $otherContact = $this->createTestEntity('Contact', [
+      'contact_type' => 'Household',
+      'household_name' => 'Hidden Household',
+    ], 'hidden_household');
+    $masterAddress = $this->createTestEntity('Address', [
+      'contact_id' => $otherContact['id'],
+      'location_type_id' => 1,
+      'street_address' => '500 Shared Lane',
+    ], 'master_address');
+    $sharedAddress = $this->createTestEntity('Address', [
+      'contact_id' => $userContact,
+      'location_type_id' => 1,
+      'is_primary' => TRUE,
+      'master_id' => $masterAddress['id'],
+    ], 'shared_address');
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Address', [
+      'oplock_ts' => $this->getOplockTs($userContact),
+      'address' => [
+        1 => [
+          'location_type_id' => 1,
+          'is_primary' => 1,
+          'use_shared_address' => 1,
+          'master_id' => $masterAddress['id'],
+        ],
+      ],
+    ], ['cid' => $userContact, 'locno' => 1, 'aid' => $sharedAddress['id']]);
+    $formWrapper->processForm();
+
+    $this->assertEmpty($formWrapper->getValidationOutput());
+    $address = Address::get(FALSE)
+      ->addSelect('master_id', 'street_address')
+      ->addWhere('id', '=', $sharedAddress['id'])
+      ->execute()->single();
+    $this->assertEquals($masterAddress['id'], $address['master_id']);
+    $this->assertEquals('500 Shared Lane', $address['street_address']);
   }
 
 }
