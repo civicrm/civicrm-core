@@ -259,7 +259,7 @@ class CoreUtil {
     // For get actions, just run a get and ACLs will be applied to the query.
     // It's a cheap trick and not as efficient as not running the query at all,
     // but authorizeRecord doesn't consistently check permissions for the "get" action.
-    if (is_a($apiRequest, '\Civi\Api4\Generic\AbstractGetAction')) {
+    if (is_a($apiRequest, '\Civi\Api4\Generic\DAOGetAction')) {
       return (bool) $apiRequest->addSelect($idField)->addWhere($idField, '=', $record[$idField])->execute()->count();
     }
 
