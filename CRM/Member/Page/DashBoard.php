@@ -82,96 +82,103 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
       ->execute()
       ->column('title', 'id');
 
+    // Gather every dashboard count across all membership types in two grouped queries
+    // rather than the ~16 per-type queries this loop previously issued.
+    $summaryStats = CRM_Member_BAO_Membership::getMembershipSummaryStats(
+      array_keys($membershipTypes), $preMonth, $preMonthEnd, $monthStart, $yearStart, $ymd, $current
+    );
+
     foreach ($membershipTypes as $key => $value) {
+      $stats = $summaryStats[$key];
 
       $membershipSummary[$key]['premonth']['new'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $preMonth, $preMonthEnd),
+        'count' => $stats['premonth_new'],
         'name' => $value,
         'url' => FALSE,
       ];
 
       $membershipSummary[$key]['premonth']['renew'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $preMonth, $preMonthEnd),
+        'count' => $stats['premonth_renew'],
         'name' => $value,
         'url' => FALSE,
       ];
 
       $membershipSummary[$key]['premonth']['total'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $preMonth, $preMonthEnd),
+        'count' => $stats['premonth_total'],
         'name' => $value,
         'url' => FALSE,
       ];
 
       $membershipSummary[$key]['month']['new'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $monthStart, $ymd),
+        'count' => $stats['month_new'],
         'name' => $value,
         'url' => FALSE,
       ];
 
       $membershipSummary[$key]['month']['renew'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $monthStart, $ymd),
+        'count' => $stats['month_renew'],
         'name' => $value,
         'url' => FALSE,
       ];
 
       $membershipSummary[$key]['month']['total'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $monthStart, $ymd),
+        'count' => $stats['month_total'],
         'name' => $value,
         'url' => FALSE,
       ];
 
       $membershipSummary[$key]['year']['new'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipJoins($key, $yearStart, $ymd),
+        'count' => $stats['year_new'],
         'name' => $value,
         'url' => FALSE,
       ];
 
       $membershipSummary[$key]['year']['renew'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipRenewals($key, $yearStart, $ymd),
+        'count' => $stats['year_renew'],
         'name' => $value,
         'url' => FALSE,
       ];
 
       $membershipSummary[$key]['year']['total'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $yearStart, $ymd),
+        'count' => $stats['year_total'],
         'name' => $value,
         'url' => FALSE,
       ];
 
       $membershipSummary[$key]['current']['total'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipCount($key, $current),
+        'count' => $stats['current_total'],
         'name' => $value,
         'url' => FALSE,
       ];
 
-      $membershipSummary[$key]['total']['total'] = ['count' => CRM_Member_BAO_Membership::getMembershipCount($key, $ymd)];
+      $membershipSummary[$key]['total']['total'] = ['count' => $stats['total_total']];
 
       //LCD also get summary stats for membership owners
       $membershipSummary[$key]['premonth_owner']['premonth_owner'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $preMonth, $preMonthEnd, 0, 1),
+        'count' => $stats['premonth_owner'],
         'name' => $value,
         'url' => FALSE,
       ];
 
       $membershipSummary[$key]['month_owner']['month_owner'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $monthStart, $ymd, 0, 1),
+        'count' => $stats['month_owner'],
         'name' => $value,
         'url' => FALSE,
       ];
 
       $membershipSummary[$key]['year_owner']['year_owner'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipStarts($key, $yearStart, $ymd, 0, 1),
+        'count' => $stats['year_owner'],
         'name' => $value,
         'url' => FALSE,
       ];
 
       $membershipSummary[$key]['current_owner']['current_owner'] = [
-        'count' => CRM_Member_BAO_Membership::getMembershipCount($key, $current, 0, 1),
+        'count' => $stats['current_owner'],
         'name' => $value,
         'url' => FALSE,
       ];
 
-      $membershipSummary[$key]['total_owner']['total_owner'] = ['count' => CRM_Member_BAO_Membership::getMembershipCount($key, $ymd, 0, 1)];
+      $membershipSummary[$key]['total_owner']['total_owner'] = ['count' => $stats['total_owner']];
       //LCD end
     }
 
