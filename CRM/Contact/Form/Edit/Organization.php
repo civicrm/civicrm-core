@@ -74,11 +74,16 @@ class CRM_Contact_Form_Edit_Organization {
    */
   public static function formRule($fields, $files, $contactID = NULL) {
     $errors = [];
-    $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Organization');
+    // Inline forms that don't show the name have nothing to validate here.
+    $hasNameElement = !($contactID instanceof CRM_Core_Form) || $contactID->elementExists('organization_name');
 
-    // make sure that organization name is set
-    if (empty($fields['organization_name'])) {
-      $errors['organization_name'] = ts('Organization Name should be set.');
+    if ($hasNameElement) {
+      $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Organization');
+
+      // make sure that organization name is set
+      if (empty($fields['organization_name'])) {
+        $errors['organization_name'] = ts('Organization Name should be set.');
+      }
     }
 
     // add code to make sure that the uniqueness criteria is satisfied
