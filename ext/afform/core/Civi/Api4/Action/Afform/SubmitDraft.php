@@ -23,11 +23,12 @@ class SubmitDraft extends AbstractProcessor {
     if (!$cid) {
       throw new UnauthorizedException('Only authenticated users may save a draft.');
     }
+    $draftData = $this->filterDraftValues($this->getValues());
     AfformSubmission::replace(FALSE)
       ->addWhere('contact_id', '=', $cid)
       ->addWhere('status_id:name', '=', 'Draft')
       ->addWhere('afform_name', '=', $this->_afform['name'])
-      ->addRecord(['data' => $this->getValues()])
+      ->addRecord(['data' => $draftData])
       ->execute();
     return [];
   }

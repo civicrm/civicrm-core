@@ -795,9 +795,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         $values['joins'] = array_intersect_key($values['joins'] ?? [], $entity['joins'] ?? []);
         foreach ($values['joins'] as $joinEntity => &$joinValues) {
           // Only accept values from join fields on the form
-          $idField = CoreUtil::getIdFieldName($joinEntity);
-          $allowedFields = $this->getSubmittableFields($entity['joins'][$joinEntity]['fields'] ?? []);
-          $allowedFields[$idField] = TRUE;
+          $allowedFields = $this->getAllowedJoinFields($entity['joins'][$joinEntity]);
           $fileFields = $this->getFileFields($joinEntity, $allowedFields);
           // Enforce the limit set by join[max]
           $joinValues = array_slice($joinValues, 0, $entity['joins'][$joinEntity]['max'] ?? NULL);
@@ -826,6 +824,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
                 }
               }
               // Creating new record, add placeholder value so the file upload will have an id
+              $idField = CoreUtil::getIdFieldName($joinEntity);
               if (empty($joinValues[$index][$idField])) {
                 $joinValues[$index][$fileFieldName] = '';
               }
@@ -858,6 +857,88 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     }
 
     return $entityValues;
+  }
+
+  /**
+   * Filter draft submission values to exclude non-submittable fields (e.g. DisplayOnly).
+   */
+  public function filterDraftValues(array $submittedValues): array {
+    $filtered = [];
+    foreach ($this->_formDataModel->getEntities() as $entityName => $entity) {
+      if (!isset($submittedValues[$entityName])) {
+        continue;
+      }
+      $allowedFields = $this->getAllowedEntityFields($entity);
+      // Form-level "extra" entity is a flat associative array: ['fields' => [...]]
+      if (!$entity['type']) {
+        if (isset($submittedValues[$entityName]['fields']) && is_array($submittedValues[$entityName]['fields'])) {
+          $filtered[$entityName]['fields'] = array_intersect_key($submittedValues[$entityName]['fields'], $allowedFields);
+        }
+        continue;
+      }
+      if (!is_array($submittedValues[$entityName])) {
+        continue;
+      }
+      $filtered[$entityName] = [];
+      foreach ($submittedValues[$entityName] as $recordIndex => $record) {
+        if (!is_array($record)) {
+          continue;
+        }
+        $filteredRecord = [];
+        if (isset($record['fields']) && is_array($record['fields'])) {
+          $filteredRecord['fields'] = array_intersect_key($record['fields'], $allowedFields);
+        }
+        if (isset($record['extras']) && is_array($record['extras'])) {
+          $filteredRecord['extras'] = $record['extras'];
+        }
+        if (isset($record['joins']) && is_array($record['joins'])) {
+          $filteredRecord['joins'] = [];
+          foreach ($entity['joins'] ?? [] as $joinEntity => $joinDefn) {
+            if (empty($record['joins'][$joinEntity]) || !is_array($record['joins'][$joinEntity])) {
+              continue;
+            }
+            $allowedJoinFields = $this->getAllowedJoinFields($joinDefn);
+            foreach ($record['joins'][$joinEntity] as $joinIndex => $joinRecord) {
+              if (is_array($joinRecord)) {
+                $filteredRecord['joins'][$joinEntity][$joinIndex] = array_intersect_key($joinRecord, $allowedJoinFields);
+              }
+            }
+          }
+        }
+        $filtered[$entityName][$recordIndex] = $filteredRecord;
+      }
+    }
+    return $filtered;
+  }
+
+  /**
+   * Return allowed submittable fields for an entity on the form.
+   *
+   * @param array $entity
+   * @return array
+   */
+  protected function getAllowedEntityFields(array $entity): array {
+    $allowed = $this->getSubmittableFields($entity['fields'] ?? []);
+    if (!empty($entity['type'])) {
+      $idField = CoreUtil::getIdFieldName($entity['type']);
+      $allowed[$idField] = TRUE;
+    }
+    return $allowed;
+  }
+
+  /**
+   * Return allowed submittable fields for a joined entity on the form.
+   *
+   * @param array $joinDefn
+   * @return array
+   */
+  protected function getAllowedJoinFields(array $joinDefn): array {
+    $allowed = $this->getSubmittableFields($joinDefn['fields'] ?? []);
+    if (!empty($joinDefn['type'])) {
+      $idField = CoreUtil::getIdFieldName($joinDefn['type']);
+      $allowed[$idField] = TRUE;
+    }
+    return $allowed;
   }
 
   /**

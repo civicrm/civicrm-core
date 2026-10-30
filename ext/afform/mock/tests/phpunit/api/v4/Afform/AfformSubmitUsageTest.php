@@ -3,6 +3,8 @@ namespace Civi\ext\afform\mock\tests\phpunit\api\v4\Afform;
 
 use api\v4\Afform\AfformUsageTestCase;
 use Civi\Api4\Afform;
+use Civi\Api4\AfformSubmission;
+use Civi\Api4\Contact;
 use Civi\Api4\Email;
 
 /**
@@ -443,6 +445,101 @@ EOHTML;
 
     $this->assertEquals('bob@example.com', $victimEmail['email']);
     $this->assertEquals($otherContact['id'], $victimEmail['contact_id']);
+  }
+
+  public function testDraftWithDisplayOnlyFields(): void {
+    $layout = <<<EOHTML
+      <af-form ctrl="afform">
+        <af-entity data="{contact_type: 'Individual'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" url-autofill="1" security="RBAC" />
+        <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+          <af-field name="first_name" defn="{input_type: 'DisplayOnly'}" />
+          <af-field name="last_name" />
+        </fieldset>
+        <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+      </af-form>
+    EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $loggedInUser = $this->createLoggedInUser();
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $loggedInUser)
+      ->addValue('first_name', 'InitialFirst')
+      ->addValue('last_name', 'InitialLast')
+      ->execute();
+
+    // 1. Submit a draft with an empty (or stale) display-only field and an edited last_name
+    Afform::submitDraft()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => [
+              'first_name' => '',
+              'last_name' => 'DraftModifiedLast',
+            ],
+          ],
+        ],
+      ])
+      ->execute();
+
+    // Verify Fix 1: Display-only field first_name is not stored in civicrm_afform_submission draft
+    $savedDraft = AfformSubmission::get(FALSE)
+      ->addWhere('contact_id', '=', $loggedInUser)
+      ->addWhere('status_id:name', '=', 'Draft')
+      ->addWhere('afform_name', '=', $this->formName)
+      ->execute()
+      ->first();
+
+    $this->assertNotEmpty($savedDraft);
+    $this->assertArrayNotHasKey('first_name', $savedDraft['data']['Individual1'][0]['fields']);
+    $this->assertEquals('DraftModifiedLast', $savedDraft['data']['Individual1'][0]['fields']['last_name']);
+
+    // 2. An admin modifies the display-only field in the database
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $loggedInUser)
+      ->addValue('first_name', 'AdminUpdatedFirst')
+      ->execute();
+
+    // 3. User revisits form: prefill should merge draft while reflecting the updated display-only field
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('form')
+      ->setArgs(['Individual1' => [$loggedInUser]])
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertEquals('AdminUpdatedFirst', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('DraftModifiedLast', $prefill['Individual1']['values'][0]['fields']['last_name']);
+
+    // 4. Verify Fix 2: Even if an existing draft in DB contains a display-only field (e.g. empty string),
+    // prefill should ignore the display-only value from the draft.
+    AfformSubmission::update(FALSE)
+      ->addWhere('id', '=', $savedDraft['id'])
+      ->addValue('data', [
+        'Individual1' => [
+          [
+            'fields' => [
+              'first_name' => '',
+              'last_name' => 'LegacyDraftLast',
+            ],
+          ],
+        ],
+      ])
+      ->execute();
+
+    $prefillLegacy = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('form')
+      ->setArgs(['Individual1' => [$loggedInUser]])
+      ->execute()
+      ->indexBy('name');
+
+    $this->assertEquals('AdminUpdatedFirst', $prefillLegacy['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertEquals('LegacyDraftLast', $prefillLegacy['Individual1']['values'][0]['fields']['last_name']);
   }
 
 }
