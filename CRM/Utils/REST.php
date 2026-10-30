@@ -72,6 +72,18 @@ class CRM_Utils_REST {
   }
 
   /**
+   * Log a PHP error and report it to the caller by error ID only.
+   *
+   * @param Throwable $e
+   * @return array
+   */
+  private static function phpError(Throwable $e): array {
+    $errorId = CRM_Core_Error::createErrorId();
+    Civi::log()->error("REST Error ({$errorId}): {$e->getMessage()}", ['error_id' => $errorId, 'exception' => $e]);
+    return self::error(ts('Sorry an error occurred and your request was not completed. (Error ID: %1)', [1 => $errorId]));
+  }
+
+  /**
    * Generates values needed for non-error responses.
    * @param array $params
    *
@@ -281,6 +293,9 @@ class CRM_Utils_REST {
     catch (Exception $e) {
       return self::error($e->getMessage());
     }
+    catch (Throwable $e) {
+      return self::phpError($e);
+    }
 
     if ($result === FALSE) {
       return self::error('Unknown error.');
@@ -458,6 +473,9 @@ class CRM_Utils_REST {
     }
     catch (Exception $e) {
       $result = self::error($e->getMessage());
+    }
+    catch (Throwable $e) {
+      $result = self::phpError($e);
     }
 
     echo self::output($result);
