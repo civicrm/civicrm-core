@@ -740,6 +740,33 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Swapping an option for an equal-priced one leaves the balance unchanged,
+   * so the processing fee recorded on the contribution must stay.
+   */
+  public function testSwappingEqualPricedOptionKeepsTheProcessingFee(): void {
+    $this->createPriceField('fifty_euros', 'Fifty euros', 50.00);
+    $this->createPriceField('thirty_five_euros', 'Thirty-five euros', 35.00);
+    $this->createPriceField('fifty_euros_again', 'Fifty euros again', 50.00);
+    $this->registerAndPayForPriceFieldValues(['fifty_euros', 'thirty_five_euros'], 85.00);
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $this->ids['Contribution']['order'])
+      ->addValue('fee_amount', 3.00)
+      ->addValue('net_amount', 82.00)
+      ->execute();
+
+    $this->submitForm(NULL, [
+      $this->getPriceFieldFormLabel('fifty_euros_again') => $this->ids['PriceFieldValue']['fifty_euros_again'],
+      $this->getPriceFieldFormLabel('thirty_five_euros') => $this->ids['PriceFieldValue']['thirty_five_euros'],
+    ]);
+
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $this->ids['Contribution']['order'])
+      ->addSelect('total_amount', 'fee_amount', 'net_amount')
+      ->execute()->single();
+    $this->assertEquals([85.00, 3.00, 82.00], [(float) $contribution['total_amount'], (float) $contribution['fee_amount'], (float) $contribution['net_amount']]);
+  }
+
+  /**
    * A contribution can cover more than one participant - eg. a group
    * registration paid for in one payment - and changing one participant's
    * fee selection must not cancel another participant's line item on the
