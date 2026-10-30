@@ -11,6 +11,7 @@
 
 use Civi\Api4\ActivityContact;
 use Civi\Api4\Contact;
+use Civi\Api4\Group;
 use Civi\Test\ACLPermissionTrait;
 
 /**
@@ -546,6 +547,56 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     if ($template === 'contribute/summary') {
       $this->assertEquals(3, $rows['values'][0]['civicrm_contribution_total_amount_count']);
     }
+  }
+
+  /**
+   * Test the group filter includes smart groups nested below a selected group.
+   *
+   * The smart group sits two levels below the selected group, with a regular
+   * group in between, and neither regular group has any direct members.
+   *
+   * @see https://lab.civicrm.org/dev/core/-/issues/6896
+   *
+   * @dataProvider getReportTemplatesForNestedGroupTests
+   *
+   * @param string $template
+   *   Name of the template to test.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testReportsWithSmartGroupNestedUnderParentGroup(string $template): void {
+    $smartGroupID = $this->setUpPopulatedSmartGroup();
+    $grandParentGroupID = $this->createTestEntity('Group', ['title' => 'Grandparent group'], 'grandparent')['id'];
+    $parentGroupID = $this->createTestEntity('Group', [
+      'title' => 'Parent group',
+      'parents' => [$grandParentGroupID],
+    ], 'parent')['id'];
+    Group::update(FALSE)
+      ->addWhere('id', '=', $smartGroupID)
+      ->addValue('parents', [$parentGroupID])
+      ->execute();
+
+    foreach ([$parentGroupID, $grandParentGroupID] as $groupID) {
+      $rows = $this->callAPISuccess('report_template', 'getrows', [
+        'report_id' => $template,
+        'gid_value' => [$groupID],
+        'gid_op' => 'in',
+        'options' => ['metadata' => ['sql']],
+      ]);
+      $this->assertNumberOfContactsInResult(3, $rows, $template);
+    }
+  }
+
+  /**
+   * Get templates for the nested group test.
+   *
+   * Covers reports using the legacy group filter (contact/summary) as well as
+   * those using the optimised group filter.
+   *
+   * @return array
+   */
+  public static function getReportTemplatesForNestedGroupTests(): array {
+    return array_merge([['contact/summary']], self::getMembershipAndContributionReportTemplatesForGroupTests());
   }
 
   /**
