@@ -345,12 +345,6 @@
      <is_ajax>true</is_ajax>
 </item>
 <item>
-     <path>civicrm/ajax/contact/address</path>
-     <page_callback>CRM_Contact_Page_AJAX::getAddressDisplay</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
-     <is_ajax>true</is_ajax>
-</item>
-<item>
   <path>civicrm/activity/sms/add</path>
   <path_arguments>action=add</path_arguments>
   <title>Activities</title>
