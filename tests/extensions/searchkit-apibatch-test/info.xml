@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<extension key="searchkit-apibatch-test" type="module">
+  <file>searchkit_apibatch_test</file>
+  <name>SearchKit apiBatch Test</name>
+  <description>Declares SearchKit tasks for the SearchKit browser tests.</description>
+  <license>AGPL-3.0</license>
+  <version>1.0</version>
+  <tags>
+    <tag>mgmt:hidden</tag>
+  </tags>
+</extension>
