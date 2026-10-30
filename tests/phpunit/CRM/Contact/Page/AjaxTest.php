@@ -665,64 +665,6 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getAddressDisplay is denied when contact_id is missing or invalid.
-   */
-  public function testGetAddressDisplayMissingContactIdDenied(): void {
-    $this->createLoggedInUser();
-    $this->setPermissions(['access CiviCRM', 'view all contacts']);
-
-    $_POST = $_REQUEST = [];
-
-    $this->expectException(CRM_Core_Exception::class);
-    $this->expectExceptionMessage('You do not have permission to access this page.');
-    CRM_Contact_Page_AJAX::getAddressDisplay();
-  }
-
-  /**
-   * Test getAddressDisplay is denied when user lacks permission to view contact.
-   */
-  public function testGetAddressDisplayForbiddenContactDenied(): void {
-    $this->createLoggedInUser();
-    $this->setPermissions(['access CiviCRM']);
-    $contactId = $this->individualCreate([], 'target_contact');
-
-    $_POST = $_REQUEST = ['contact_id' => $contactId];
-
-    $this->expectException(CRM_Core_Exception::class);
-    $this->expectExceptionMessage('You do not have permission to access this page.');
-    CRM_Contact_Page_AJAX::getAddressDisplay();
-  }
-
-  /**
-   * Test getAddressDisplay succeeds when user has permission to view contact.
-   */
-  public function testGetAddressDisplayPermittedContactSuccess(): void {
-    $this->createLoggedInUser();
-    $this->setPermissions(['access CiviCRM', 'view all contacts']);
-    $contactId = $this->individualCreate([], 'target_contact');
-    $this->createTestEntity('Address', [
-      'contact_id' => $contactId,
-      'street_address' => '123 Fake Street',
-      'city' => 'Metropolis',
-      'location_type_id' => 1,
-    ], 'addr_1');
-
-    $_POST = $_REQUEST = ['contact_id' => $contactId];
-
-    try {
-      CRM_Contact_Page_AJAX::getAddressDisplay();
-      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $data = $e->errorData;
-      $this->assertIsArray($data);
-      $this->assertNotEmpty($data);
-      $firstAddress = reset($data);
-      $this->assertStringContainsString('123 Fake Street', $firstAddress['display_text']);
-    }
-  }
-
-  /**
    * Test getPCPList succeeds with CiviContribute permission.
    */
   public function testGetPCPListPermittedSuccess(): void {

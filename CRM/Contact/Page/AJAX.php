@@ -764,20 +764,6 @@ class CRM_Contact_Page_AJAX {
     return $cId;
   }
 
-  public static function getAddressDisplay() {
-    $contactId = CRM_Utils_Request::retrieve('contact_id', 'Positive');
-    if (!$contactId || !CRM_Contact_BAO_Contact_Permission::allow($contactId)) {
-      CRM_Utils_System::permissionDenied();
-    }
-    $entityBlock = [
-      'contact_id' => $contactId,
-      'entity_id' => $contactId,
-    ];
-    $addressVal = CRM_Core_BAO_Address::getValues($entityBlock);
-
-    CRM_Utils_JSON::output($addressVal);
-  }
-
   /**
    * Mark dupe pairs as selected from un-selected state or vice-versa, in dupe cache table.
    */

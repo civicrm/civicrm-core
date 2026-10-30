@@ -86,33 +86,44 @@
       $householdLabel.toggle(contactType === 'Individual' && otherContactType === 'Household');
 
 
-      $.post(CRM.url('civicrm/ajax/contact/address'), {
-          'contact_id': sharedContactId
-        },
-        function(response) {
-          // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response
-          if (response && $el.val() === sharedContactId) {
-            var selected = ' checked="checked"',
-              addressHTML = '';
+      CRM.api4('Address', 'get', {
+        where: [['contact_id', '=', sharedContactId]],
+        select: ['id', 'location_type_id:label', 'display'],
+        orderBy: {is_primary: 'DESC', id: 'ASC'}
+      }).then((response) => {
+        // Avoid race conditions - check that value hasn't been changed by the user while we were waiting for response
+        if (response && $el.val() === sharedContactId) {
+          $contentArea.empty();
 
-            $.each(response, function(i, val) {
-              if (addressHTML) {
-                selected = '';
-              } else {
-                $('input[name="address[' + blockNo + '][master_id]"]').val(val.id);
+          if (response.length) {
+            response.forEach((val, index) => {
+              if (index === 0) {
+                $masterElement.val(val.id);
               }
-              var name = 'selected_shared_address-'+ blockNo,
-                id = name + '-' + val.id;
-              addressHTML += '<input type="radio" name="' + name + '" id="' + id + '" value="' + val.id + '"' + selected +'><label for="' + id + '">' + val.display_text + '</label>('+val.location_type+')<br/>';
+              var name = 'selected_shared_address-' + blockNo,
+                id = name + '-' + val.id,
+                $radio = $('<input>', {type: 'radio', name: name, id: id, value: val.id}).prop('checked', index === 0),
+                $label = $('<label>', {for: id}).text(val.display);
+
+              $contentArea.append($radio, $label);
+              if (val['location_type_id:label']) {
+                $contentArea.append(document.createTextNode('(' + val['location_type_id:label'] + ')'));
+              }
+              $contentArea.append($('<br>'));
             });
-
-            if (!addressHTML) {
-              addressHTML = {/literal}"{ts escape='js'}Selected contact does not have an address. Please click the following link to edit that contact to add an address, or select a different contact.{/ts}"{literal} + ' <a target="_blank" href="' + CRM.url('civicrm/contact/add', 'reset=1&action=update&cid=' + sharedContactId) + '">{/literal}{ts escape='js'}Edit Contact Details{/ts}{literal}</a>';
-            }
-
-            $contentArea.html(addressHTML);
+          } else {
+            $contentArea
+              .text({/literal}"{ts escape='js'}Selected contact does not have an address. Please click the following link to edit that contact to add an address, or select a different contact.{/ts} "{literal})
+              .append(
+                $('<a>', {
+                  target: '_blank',
+                  href: CRM.url('civicrm/contact/add', 'reset=1&action=update&cid=' + sharedContactId),
+                  text: {/literal}"{ts escape='js'}Edit Contact Details{/ts}"{literal}
+                })
+              );
           }
-        },'json');
+        }
+      });
     });
   });
 </script>
