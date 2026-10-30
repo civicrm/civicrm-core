@@ -2,6 +2,9 @@
 namespace Civi\Standalone;
 
 use Civi;
+use Civi\Authx\CheckCredential;
+use Civi\Authx\CheckCredentialEvent;
+use Civi\Standalone\MFA\Base as MFABase;
 use CRM_Standaloneusers_BAO_Role;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -28,6 +31,8 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
     return [
       '&civi.standalone.loadUser' => ['onLoadUser', 1000],
       '&civi.standalone.checkPassword' => ['onCheckPassword', -500],
+      // Priority is for this to be called before the password check
+      'civi.authx.checkCredential' => ['disallowBasicAuthIfMFAEnabled', CheckCredential::PRIORITY_BASIC_USER + 1],
     ];
   }
 
@@ -243,6 +248,19 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
     // Implement a pluggable interface here to handle some of these password types or more.
     Civi::log()->warning("Denying access to user whose stored password relies on '$algo' which we have not implemented yet.");
     return FALSE;
+  }
+
+  /**
+   * Disallow HTTP "Basic" credential as `username:password` when MFA is required.
+   *
+   * @param \Civi\Authx\CheckCredentialEvent $check
+   */
+  public function disallowBasicAuthIfMFAEnabled(CheckCredentialEvent $check): void {
+    if ($check->credFormat === 'Basic') {
+      if (MFABase::getAvailableClasses()) {
+        $check->reject("Basic credentials not supported on systems with MFA enabled.");
+      }
+    }
   }
 
 }
