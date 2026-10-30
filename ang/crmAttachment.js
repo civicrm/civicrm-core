@@ -13,6 +13,9 @@
       this.trash = [];
       this.uploader = new FileUploader({
         url: CRM.url('civicrm/ajax/attachment'),
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        },
         onAfterAddingFile: function onAfterAddingFile(item) {
           item.crmData = {
             description: ''
