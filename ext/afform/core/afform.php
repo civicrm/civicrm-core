@@ -394,12 +394,14 @@ function afform_civicrm_permissionList(&$permissions) {
 }
 
 /**
- * Clear any local/in-memory caches based on afform data.
+ * Clear any caches based on afform data.
  */
 function _afform_clear() {
   $container = \Civi::container();
   $container->get('afform_scanner')->clear();
   $container->get('angular')->clear();
+  // Placement lists, see PlacementUtils::getAfformsForPlacement()
+  \Civi::cache('metadata')->clear();
 }
 
 /**

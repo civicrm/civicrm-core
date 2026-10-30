@@ -149,6 +149,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     $this->createUserJobTable('xyz');
     $userJobParameters['metadata']['DataSource']['table_name'] = 'xyz';
     UserJob::update(FALSE)->addWhere('id', '=', $userJobID)->setValues($userJobParameters)->execute();
+    $this->assertSame('xyz', \Civi\BAO\Import::getTableNameForUserJob($userJobID));
     // This is our new table, with nothing in it, but we if we api-call & don't get an exception so we are winning.
     Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->addWhere('_id', '=', $rowID)->execute()->first();
   }
