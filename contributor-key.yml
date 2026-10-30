@@ -741,6 +741,9 @@
 - github      : khorporative
   name        : Aivars
 
+- github      : hansrossel
+  name        : Hans Rossel
+
 - github      : h-c-c
   name        : Peter Hartmann
   organization: Hartmann Computer Consulting
@@ -953,6 +956,9 @@
   name        : Jeremy Proffitt
   organization: Ezodesign
 
+- github      : JuanSartor
+  name        : Juan Ignacio Sartor
+
 - name        : Julian Libor
 
 - name        : Julie Hall
@@ -1009,6 +1015,9 @@
 - github      : kcristiano
   name        : Kevin Cristiano
   organization: Tadpole Collective
+
+- github      : kgoess
+  name        : Kevin Goess
 
 - github      : kenwest
   name        : Ken West
@@ -1612,7 +1621,7 @@
   name        : Simon John Parker
 
 - github      : Sinjinsmiley
-    
+
 - gitub       : sushantpaste
   organization: OSSeed Technologies LLP
   name        : Sushant Paste
@@ -1679,7 +1688,7 @@
 - github      : Sinjinsmiley
   name        : Simon East
   organization: North Essex Heritage
-  
+
 - github      : spalmstr
   name        : Stephen Palmstrom
 
@@ -1722,6 +1731,9 @@
   name        : Swastik Pareek
   organization: QED42
 
+- github      : syxys1
+  name        : Sylvain Plante
+
 - github      : systopia
   name        : SYSTOPIA
   organization: SYSTOPIA
@@ -1762,6 +1774,10 @@
   name        : Tycho Schottelius
   organization: SYSTOPIA
 
+- github      : tacman
+  name        : Tac Tacelosky
+  organization: Survos
+  
 - github      : tamarmeir
   name        : Tamar Meir
   organization: Forest CRM Consulting
