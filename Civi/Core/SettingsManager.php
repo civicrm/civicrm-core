@@ -308,7 +308,7 @@ class SettingsManager {
       foreach (['domain', 'contact'] as $entityKey) {
         $this->mandatory[$entityKey] = array_merge(
             $this->mandatory[$entityKey] ?? [],
-            $this->getEnvSettingValues($entity)
+            $this->getEnvSettingValues($entityKey)
         );
       }
     }
