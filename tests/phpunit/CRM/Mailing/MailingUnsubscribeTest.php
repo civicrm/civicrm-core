@@ -153,6 +153,32 @@ class CRM_Mailing_MailingUnsubscribeTest extends CiviUnitTestCase {
   }
 
   /**
+   * Sent to a static group and a smart group, contact in both.
+   * Should remove from both groups
+   */
+  public function testUnsubscribeFromStaticAndSmartGroup() : void {
+    $this->setUpGroups('static');
+    $this->addIndivToGroups('static');
+    $this->setUpSmartGroup('smart');
+    $this->sendAndUnsubscribe('static', 'smart');
+    $this->checkGroupContactStatus(['static' => 'Removed']);
+    $this->checkNotInSmartGroup('smart');
+  }
+
+  /**
+   * Sent to a static group and a smart group, contact in both.
+   * The unsubscribe form should offer both groups
+   */
+  public function testUnsubscribeFormOffersStaticAndSmartGroup() : void {
+    $this->setUpGroups('static');
+    $this->addIndivToGroups('static');
+    $this->setUpSmartGroup('smart');
+    $queue_info = $this->sendMailing('static', 'smart');
+    $offered = CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queue_info['id'], $queue_info['hash'], TRUE);
+    $this->assertEqualsCanonicalizing([$this->groupIds['static'], $this->groupIds['smart']], array_keys($offered));
+  }
+
+  /**
    *
    * Helper functions
    *
@@ -192,6 +218,11 @@ class CRM_Mailing_MailingUnsubscribeTest extends CiviUnitTestCase {
   }
 
   private function sendAndUnsubscribe(...$sentTo) : void {
+    $queue_info = $this->sendMailing(...$sentTo);
+    CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queue_info['id'], $queue_info['hash']);
+  }
+
+  private function sendMailing(...$sentTo) : array {
     foreach ($sentTo as $group) {
       $sentToIds[] = $this->groupIds[$group];
     }
@@ -222,9 +253,7 @@ class CRM_Mailing_MailingUnsubscribeTest extends CiviUnitTestCase {
       ->addWhere('contact_id', '=', $this->indivId)
       ->execute()
       ->single();
-
-    // Do the unsubscribe
-    CRM_Mailing_Event_BAO_MailingEventUnsubscribe::unsub_from_mailing(NULL, $queue_info['id'], $queue_info['hash']);
+    return $queue_info;
   }
 
   private function checkNotInSmartGroup($key) : void {
