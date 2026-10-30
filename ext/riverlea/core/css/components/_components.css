@@ -227,12 +227,6 @@ table.advmultiselect {
 .crm-container .panel-body:after {
   clear: both;
 }
-.crm-container .panel-title {
-  margin-top: 0;
-  margin-bottom: 0;
-  font-size: var(--crm-font-size);
-  color: inherit;
-}
 .crm-container .panel-title > :is(a,small,.small,small > a,.small > a) {
   color: inherit;
 }

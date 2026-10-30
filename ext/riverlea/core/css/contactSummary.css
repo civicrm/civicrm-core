@@ -43,9 +43,6 @@
   overflow: hidden;
   border: var(--crm-contact-image-border);
 }
-.crm-container div.contact_panel {
-  display: block;
-}
 .crm-container table.image_URL-section td {
   text-align: inherit;
   display: flex;

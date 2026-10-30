@@ -295,7 +295,7 @@ select.crm-error {
 }
 .crm-container .crm-editable-form button {
   background: transparent;
-  padding: var(--crm-padding-small);
+  padding: 0 !important;
 }
 .crm-container .crm-editable-form [type="submit"] {
   color: var(--crm-success-color) !important;
@@ -362,9 +362,6 @@ select.crm-error {
 .crm-container .crm-search-field-editable input.form-control:not(.crm-form-date,.crm-form-time) {
   width: 100%;
   min-width: 14ch;
-}
-.crm-container .crm-editable-form button {
-  padding: 0 !important;
 }
 .crm-container .crm-editable-form button i.crm-i {
   margin: 0;
@@ -453,11 +450,9 @@ input.crm-form-checkbox) + label {
 
 /* Select2 */
 
-.crm-container .select2-container {
-  max-width: 100%;
-}
 /* Set width using !important to override the inline fixed width given by select2.js */
 .crm-container .select2-container {
+  max-width: 100%;
   width: var(--crm-input-width) !important /* vs inline fixed width */;
 }
 .crm-container .select2-container-multi {

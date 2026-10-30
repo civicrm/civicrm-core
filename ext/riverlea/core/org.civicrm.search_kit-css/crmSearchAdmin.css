@@ -237,6 +237,7 @@
   box-shadow: none;
 }
 .crm-search-admin-edit-columns {
+  height: 100%;
   padding: 0;
   border: 0 solid transparent;
 }
@@ -309,9 +310,6 @@
 }
 #bootstrap-theme.crm-search .btn.form-control {
   height: 36px;
-}
-.crm-search-admin-edit-columns {
-  height: 100%;
 }
 .crm-search-admin-edit-columns > fieldset {
   background-color: rgba(255, 255, 255, .8);
