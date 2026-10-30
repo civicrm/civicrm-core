@@ -11,6 +11,7 @@
 namespace Civi\FlexMailer\Listener;
 
 use Civi\Core\Service\AutoService;
+use Civi\Core\Service\IsActiveTrait;
 use Civi\FlexMailer\Event\ComposeBatchEvent;
 
 /**
