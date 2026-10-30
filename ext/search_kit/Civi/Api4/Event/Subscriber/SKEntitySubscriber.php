@@ -103,6 +103,10 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
     // Build the new table
     $savedSearchID = $event->params['saved_search_id'] ?? \CRM_Core_DAO::getFieldValue('CRM_Search_DAO_SearchDisplay', $event->id, 'saved_search_id');
     $this->loadSavedSearch($savedSearchID);
+    // Reload search with permissions force-disabled; the table is filled without permission checks,
+    // so its column metadata must not depend on the current user (who may be anonymous during install/cron)
+    $this->savedSearch['api_params']['checkPermissions'] = FALSE;
+    $this->loadSavedSearch();
     $table = [
       'name' => _getSearchKitDisplayTableName($newName),
       'is_multiple' => FALSE,
