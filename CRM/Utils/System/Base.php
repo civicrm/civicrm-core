@@ -1073,11 +1073,31 @@ abstract class CRM_Utils_System_Base {
    */
   public function sendResponse(\Psr\Http\Message\ResponseInterface $response) {
     http_response_code($response->getStatusCode());
-    foreach ($response->getHeaders() as $name => $values) {
-      CRM_Utils_System::setHttpHeader($name, implode(', ', (array) $values));
-    }
+    $this->sendResponseHeaders($response);
     echo $response->getBody();
     CRM_Utils_System::civiExit(0, ['response' => $response]);
+  }
+
+  /**
+   * Emit the headers of a PSR-7 response.
+   *
+   * Each Set-Cookie value is sent as its own header line via PHP, because a
+   * cookie cannot be comma-folded and the D7/Backdrop header APIs fold
+   * repeated headers into one line.
+   *
+   * @param \Psr\Http\Message\ResponseInterface $response
+   */
+  protected function sendResponseHeaders(\Psr\Http\Message\ResponseInterface $response): void {
+    foreach ($response->getHeaders() as $name => $values) {
+      if (strcasecmp($name, 'Set-Cookie') === 0) {
+        foreach ($values as $value) {
+          header("$name: $value", FALSE);
+        }
+      }
+      else {
+        CRM_Utils_System::setHttpHeader($name, implode(', ', $values));
+      }
+    }
   }
 
   /**
