@@ -11,17 +11,13 @@
 
 namespace Civi\Afform\Placement;
 
-use Civi\Core\Service\AutoService;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Runtime code for placing Afforms in the Contact Summary Actions menu
- *
- * @service
- * @internal
  */
-class CaseSummaryBlockPlacement extends AutoService {
+class CaseSummaryBlockPlacement {
 
   /**
    * Implements hook_civicrm_buildForm().

@@ -18,11 +18,7 @@ use Civi\Api4\Membership;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Payment\System;
 
-/**
- * @service
- * @internal
- */
-class MembershipLinksProvider extends \Civi\Core\Service\AutoService {
+class MembershipLinksProvider {
   use LinksProviderTrait;
 
   #[CiviEventListener(event: 'civi.api4.getLinks')]

@@ -13,7 +13,6 @@ namespace Civi\Api4\Subscriber;
 
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\SavedSearch;
-use Civi\Core\Service\AutoService;
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Afform;
 use Civi\Api4\Generic\AutocompleteAction;
@@ -21,10 +20,8 @@ use Civi\Api4\Utils\CoreUtil;
 
 /**
  * Preprocess api autocomplete requests
- * @service
- * @internal
  */
-class AfformAutocompleteSubscriber extends AutoService {
+class AfformAutocompleteSubscriber {
 
   /**
    * @param \Civi\API\Event\PrepareEvent $event

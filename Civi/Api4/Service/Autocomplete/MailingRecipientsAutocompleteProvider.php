@@ -13,14 +13,11 @@ namespace Civi\Api4\Service\Autocomplete;
 
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoService;
 
 /**
  * Provide autocomplete searches tailored to the CiviMail recipients widget
- * @service
- * @internal
  */
-class MailingRecipientsAutocompleteProvider extends AutoService {
+class MailingRecipientsAutocompleteProvider {
 
   /**
    * Construct a special-purpose SavedSearch for the Mailing.recipients autocomplete

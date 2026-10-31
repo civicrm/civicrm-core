@@ -15,11 +15,7 @@ namespace Civi\Api4\Service\Autocomplete;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class OptionValueAutocompleteProvider extends \Civi\Core\Service\AutoService {
+class OptionValueAutocompleteProvider {
 
   #[CiviEventListener(event: 'civi.api.prepare', priority: 200)]
   public function onApiPrepare(\Civi\API\Event\PrepareEvent $event): void {

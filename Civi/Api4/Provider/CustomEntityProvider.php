@@ -14,15 +14,10 @@ namespace Civi\Api4\Provider;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\CustomValue;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoService;
 use Civi\Schema\EntityRepository;
 use CRM_Core_BAO_CustomGroup;
 
-/**
- * @service
- * @internal
- */
-class CustomEntityProvider extends AutoService {
+class CustomEntityProvider {
 
   /**
    * Get custom-field pseudo-entities

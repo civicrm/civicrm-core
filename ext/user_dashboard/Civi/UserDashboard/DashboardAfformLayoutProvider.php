@@ -4,11 +4,7 @@ namespace Civi\UserDashboard;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class DashboardAfformLayoutProvider extends \Civi\Core\Service\AutoService {
+class DashboardAfformLayoutProvider {
 
   /**
    * Provides markup for the dashboard layout.

@@ -20,11 +20,8 @@ use Civi\Core\Event\GenericHookEvent;
  * Provides default display for type 'table' and type 'autocomplete'
  *
  * Other extensions can override or modify these defaults on a per-type or per-entity basis.
- *
- * @service
- * @internal
  */
-class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService {
+class DefaultDisplaySubscriber {
 
   /**
    * Defaults for Autocomplete display type.

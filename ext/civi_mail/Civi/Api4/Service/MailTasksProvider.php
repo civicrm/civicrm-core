@@ -15,11 +15,7 @@ use Civi\Core\Attribute\CiviEventListener;
 use CRM_Mailing_ExtensionUtil as E;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class MailTasksProvider extends \Civi\Core\Service\AutoService {
+class MailTasksProvider {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event

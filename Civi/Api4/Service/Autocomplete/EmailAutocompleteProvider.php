@@ -15,11 +15,7 @@ namespace Civi\Api4\Service\Autocomplete;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class EmailAutocompleteProvider extends \Civi\Core\Service\AutoService {
+class EmailAutocompleteProvider {
 
   /**
    * Provide default SearchDisplay for Email autocompletes

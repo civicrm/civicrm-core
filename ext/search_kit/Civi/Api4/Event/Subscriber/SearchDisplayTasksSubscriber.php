@@ -17,10 +17,8 @@ use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Event subscriber to filter search display tasks
- * @service
- * @internal
  */
-class SearchDisplayTasksSubscriber extends \Civi\Core\Service\AutoService {
+class SearchDisplayTasksSubscriber {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event

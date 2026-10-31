@@ -4,15 +4,11 @@ namespace Civi\Managed;
 
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Domain;
-use Civi\Core\Service\AutoService;
 
 /**
  * If an extension defines a record that should exist on all domains, replicate it across domains.
- *
- * @service
- * @internal
  */
-class MultisiteManaged extends AutoService {
+class MultisiteManaged {
 
   private $entities = [];
   private $domains;

@@ -14,14 +14,11 @@ namespace Civi\Api4\Event\Subscriber;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Generic\AutocompleteAction;
 use Civi\Api4\Utils\CoreUtil;
-use Civi\Core\Service\AutoService;
 
 /**
  * Preprocess api autocomplete requests
- * @service
- * @internal
  */
-class AutocompleteFieldSubscriber extends AutoService {
+class AutocompleteFieldSubscriber {
 
   /**
    * Apply any filters set in the QuickForm or field schema for autocomplete fields

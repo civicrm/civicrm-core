@@ -15,11 +15,7 @@ namespace Civi\Api4\Service\Autocomplete;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class PledgeAutocompleteProvider extends \Civi\Core\Service\AutoService {
+class PledgeAutocompleteProvider {
 
   /**
    * Provide default SavedSearch for Pledge autocompletes

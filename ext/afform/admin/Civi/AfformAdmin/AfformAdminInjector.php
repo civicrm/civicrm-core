@@ -11,7 +11,6 @@
 
 namespace Civi\AfformAdmin;
 
-use Civi\Core\Service\AutoService;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Afform;
 use Civi\Api4\SavedSearch;
@@ -19,11 +18,9 @@ use Civi\Api4\SearchDisplay;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
- * @service
- * @internal
  * @package Civi\AfformAdmin
  */
-class AfformAdminInjector extends AutoService {
+class AfformAdminInjector {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e

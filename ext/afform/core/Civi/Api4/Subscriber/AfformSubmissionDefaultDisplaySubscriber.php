@@ -18,11 +18,8 @@ use CRM_Afform_ExtensionUtil as E;
 
 /**
  * Provides default display for AfAdmin_Submission_List search display
- *
- * @service
- * @internal
  */
-class AfformSubmissionDefaultDisplaySubscriber extends \Civi\Core\Service\AutoService {
+class AfformSubmissionDefaultDisplaySubscriber {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e

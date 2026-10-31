@@ -11,17 +11,13 @@
 
 namespace Civi\Afform\Placement;
 
-use Civi\Core\Service\AutoService;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Runtime code for placing Afforms as tabs
- *
- * @service
- * @internal
  */
-class TabsetPlacement extends AutoService {
+class TabsetPlacement {
 
   const TABSETS = [
     'civicrm/contact/view' => 'contact_summary_tab',

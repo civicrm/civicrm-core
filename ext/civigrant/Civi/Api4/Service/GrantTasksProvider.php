@@ -15,11 +15,7 @@ use Civi\Core\Attribute\CiviEventListener;
 use CRM_Grant_ExtensionUtil as E;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class GrantTasksProvider extends \Civi\Core\Service\AutoService {
+class GrantTasksProvider {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event

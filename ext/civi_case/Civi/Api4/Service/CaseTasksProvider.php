@@ -16,11 +16,7 @@ use Civi\Api4\CaseType;
 use CRM_Case_ExtensionUtil as E;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class CaseTasksProvider extends \Civi\Core\Service\AutoService {
+class CaseTasksProvider {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event

@@ -14,11 +14,7 @@ namespace Civi\Api4\Service\Links;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class MembershipStatusLinksProvider extends \Civi\Core\Service\AutoService {
+class MembershipStatusLinksProvider {
   use LinksProviderTrait;
 
   /**

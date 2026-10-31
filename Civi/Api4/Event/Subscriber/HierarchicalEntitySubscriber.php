@@ -17,16 +17,12 @@ use Civi\API\Event\PrepareEvent;
 use Civi\API\Event\RespondEvent;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
-use Civi\Core\Service\AutoService;
 
 /**
  * This intercepts api.get actions for HierarchicalEntities and, if the `_depth` field is present in the select clause,
  * will populate the `_depth` field and sort results into hierarchical order.
- *
- * @service
- * @internal
  */
-class HierarchicalEntitySubscriber extends AutoService {
+class HierarchicalEntitySubscriber {
 
   private static $_originalLimit;
   private static $_originalOffset;

@@ -19,11 +19,9 @@ use CRM_CivicrmAdminUi_ExtensionUtil as E;
 /**
  * Add SearchKit/FormBuilder displays for CustomGroups
  *
- * @service
- * @internal
  * @see \Civi\Api4\Action\CustomGroup\GetSearchKit
  */
-class CustomGroupDisplays extends \Civi\Core\Service\AutoService {
+class CustomGroupDisplays {
 
   #[CiviEventListener(event: 'hook_civicrm_managed', priority: \Civi\API\Events::W_EARLY)]
   public function registerSearchKits(GenericHookEvent $e): void {

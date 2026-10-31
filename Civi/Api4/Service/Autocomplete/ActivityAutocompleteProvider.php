@@ -16,11 +16,7 @@ use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class ActivityAutocompleteProvider extends \Civi\Core\Service\AutoService {
+class ActivityAutocompleteProvider {
 
   /**
    * Provide default SavedSearch for Activity autocompletes

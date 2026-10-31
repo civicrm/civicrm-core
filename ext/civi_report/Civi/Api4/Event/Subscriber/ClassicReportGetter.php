@@ -10,17 +10,13 @@
  */
 namespace Civi\Api4\Event\Subscriber;
 
-use Civi\Core\Service\AutoService;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Expose classic ReportInstance reports to civi.api4.report.get
- *
- * @service
- * @internal
  */
-class ClassicReportGetter extends AutoService {
+class ClassicReportGetter {
 
   #[CiviEventListener(event: 'civi.api4.report.get')]
   public function onGetReports(GenericHookEvent $e) {
