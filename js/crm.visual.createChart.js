@@ -42,13 +42,12 @@
         var xml = new XMLSerializer().serializeToString(svg);
         var image64 =  'data:image/svg+xml;base64,' + btoa(xml);
 
-        downloadImageUrl('image/svg+xml', image64, data.title.replace(/[^a-zA-Z0-9-]+/g, '') + '.svg');
+        downloadImageUrl(image64, data.title.replace(/[^a-zA-Z0-9-]+/g, '') + '.svg');
       });
-      function downloadImageUrl(mime, url, filename) {
+      function downloadImageUrl(url, filename) {
         var downloadLink = document.createElement('a');
         downloadLink.download = filename;
         downloadLink.href = url;
-        downloadLink.downloadurl = [mime, downloadLink.download, url].join(':');
         document.body.append(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
@@ -77,7 +76,7 @@
           canvas.getContext('2d').drawImage(img, 0, 0);
           // canvas.style.display = 'block';
           var imgURL = canvas.toDataURL('image/png');
-          downloadImageUrl('image/png', imgURL, data.title.replace(/[^a-zA-Z0-9-]+/g, '') + '.png');
+          downloadImageUrl(imgURL, data.title.replace(/[^a-zA-Z0-9-]+/g, '') + '.png');
           div.removeChild(canvas);
         };
         img.src = image64;
