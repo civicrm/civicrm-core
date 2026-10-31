@@ -26,6 +26,19 @@ class Container {
   const SELF = 'civi_container_factory';
 
   /**
+   * Hooks that createContainer() and compile() dispatch.
+   */
+  const COMPILE_HOOKS = ['hook_civicrm_container', 'hook_civicrm_entityTypes', 'hook_civicrm_scanClasses'];
+
+  /**
+   * Container classes compiled by this test process.
+   *
+   * @var array
+   *   Ex: $testContainers[$envId] = ['class' => 'CachedCiviTestContainer_...', 'file' => '/path/to/templates_c/...'].
+   */
+  private static $testContainers = [];
+
+  /**
    * @param bool $reset
    *   Whether to forcibly rebuild the entire container.
    * @return \Symfony\Component\DependencyInjection\TaggedContainerInterface
@@ -62,7 +75,7 @@ class Container {
     $cacheMode = defined('CIVICRM_CONTAINER_CACHE') ? CIVICRM_CONTAINER_CACHE : 'auto';
 
     // In pre-installation environments, don't bother with caching.
-    if (!defined('CIVICRM_DSN') || defined('CIVICRM_TEST') || CIVICRM_UF === 'UnitTests' || $cacheMode === 'never' || \CRM_Utils_System::isInUpgradeMode()) {
+    if (!defined('CIVICRM_DSN') || $cacheMode === 'never' || \CRM_Utils_System::isInUpgradeMode()) {
       $containerBuilder = $this->createContainer();
       $containerBuilder->compile();
       return $containerBuilder;
@@ -72,6 +85,9 @@ class Container {
       [\CRM_Core_Config_Runtime::getId()],
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'prefix')
     )));
+    if (defined('CIVICRM_TEST') || CIVICRM_UF === 'UnitTests') {
+      return $this->loadTestContainer($envId);
+    }
     $file = \Civi::paths()->getPath("[civicrm.compile]/CachedCiviContainer.{$envId}.php");
     $containerCacheClass = "CachedCiviContainer_{$envId}";
     $containerConfigCache = new ConfigCache($file, $cacheMode === 'auto');
@@ -88,6 +104,48 @@ class Container {
     require_once $file;
     $c = new $containerCacheClass();
     return $c;
+  }
+
+  /**
+   * Compile the container once per test process and environment; each boot gets a fresh instance.
+   *
+   * The compiled class lives in the compile dir, so clearing it (`Civi::rebuild(['files' => TRUE])`)
+   * forces a new compile, as on a live site. Forced modules count as part of the environment;
+   * a test that listens to one of the COMPILE_HOOKS gets its own container.
+   *
+   * @param string $envId
+   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   */
+  private function loadTestContainer(string $envId) {
+    $test = $GLOBALS['CIVICRM_TEST_CASE'] ?? NULL;
+    $testListeners = $test instanceof \Civi\Test\HeadlessInterface ? EventScanner::findListeners($test) : [];
+    $testHooks = array_map(fn($event) => ltrim($event, '&'), array_keys($testListeners));
+    if (array_intersect(self::COMPILE_HOOKS, $testHooks)) {
+      $containerBuilder = $this->createContainer();
+      $containerBuilder->compile();
+      return $containerBuilder;
+    }
+
+    $envId = md5($envId . ',' . implode(',', $GLOBALS['CIVICRM_FORCE_MODULES'] ?? []));
+    if (!isset(self::$testContainers[$envId]) || !is_file(self::$testContainers[$envId]['file'])) {
+      $containerBuilder = $this->createContainer();
+      $containerBuilder->compile();
+      $class = 'CachedCiviTestContainer_' . $envId . '_' . bin2hex(random_bytes(4));
+      $file = \Civi::paths()->getPath("[civicrm.compile]/{$class}.php");
+      file_put_contents($file, (new PhpDumper($containerBuilder))->dump(['class' => $class]));
+      require_once $file;
+      if (empty(self::$testContainers)) {
+        register_shutdown_function(function () {
+          foreach (self::$testContainers as $compiled) {
+            if (is_file($compiled['file'])) {
+              unlink($compiled['file']);
+            }
+          }
+        });
+      }
+      self::$testContainers[$envId] = ['class' => $class, 'file' => $file];
+    }
+    return new self::$testContainers[$envId]['class']();
   }
 
   /**
