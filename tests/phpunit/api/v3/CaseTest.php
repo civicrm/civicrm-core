@@ -62,6 +62,48 @@ class api_v3_CaseTest extends CiviCaseTestCase {
   }
 
   /**
+   * Creating a Case with a single-value custom field must not take its
+   * custom-value entity id from contact_id.
+   *
+   * contact_id is the case client, not the case. Using it sends the single-value
+   * lookup in CRM_Core_BAO_CustomField::formatCustomField() at whichever case
+   * already owns that id, and callers that pass several clients as an array
+   * (Webform CiviCRM does) interpolate into that query as the literal 'Array'.
+   */
+  public function testCaseCreateCustomFieldNotKeyedOnClient(): void {
+    $customGroup = $this->customGroupCreate([
+      'extends' => 'Case',
+      'title' => 'case_single_value',
+      'is_multiple' => 0,
+    ]);
+    $customField = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Case note',
+      'html_type' => 'Text',
+      'data_type' => 'String',
+    ]);
+    $key = 'custom_' . $customField['id'];
+
+    $case = $this->callAPISuccess('Case', 'create', [
+      'case_type_id' => $this->caseTypeId,
+      'subject' => 'Case from webform',
+      // Webform CiviCRM passes clients as an array.
+      'contact_id' => [$this->individualCreate([], 'webform_client')],
+      $key => 'from webform',
+    ]);
+
+    $this->assertEquals('from webform', $this->callAPISuccessGetValue('Case', [
+      'id' => $case['id'],
+      'return' => $key,
+    ]));
+
+    // The value must be stored against the case, not against the client.
+    $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroup['id'], 'table_name');
+    $entityIds = CRM_Core_DAO::executeQuery("SELECT entity_id FROM `$tableName`")->fetchMap('entity_id', 'entity_id');
+    $this->assertEquals([$case['id'] => $case['id']], $entityIds);
+  }
+
+  /**
    * Test Getlist with id and case_id
    */
   public function testCaseGetListById(): void {
