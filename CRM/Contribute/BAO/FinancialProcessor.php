@@ -1868,8 +1868,12 @@ class CRM_Contribute_BAO_FinancialProcessor {
       $updatedContributionDAO->contribution_status_id = $contributionStatuses['Completed'];
     }
 
-    $updatedContributionDAO->total_amount = $updatedContributionDAO->net_amount = $updatedAmount;
-    $updatedContributionDAO->fee_amount = 0;
+    $updatedContributionDAO->total_amount = $updatedAmount;
+    if ($lineItemAdjustment) {
+      // The recorded fee belongs to the old total; it cannot be carried over.
+      $updatedContributionDAO->net_amount = $updatedAmount;
+      $updatedContributionDAO->fee_amount = 0;
+    }
     $updatedContributionDAO->tax_amount = $taxAmount;
     if ($this->getUpdatedAmountLevel()) {
       $updatedContributionDAO->amount_level = $this->getUpdatedAmountLevel();
