@@ -74,8 +74,7 @@ class CRM_Extension_ClassLoader {
    * @return CRM_Extension_ClassLoader
    */
   public function register() {
-    // In pre-installation environments, don't bother with caching.
-    if (!defined('CIVICRM_DSN') || defined('CIVICRM_TEST') || \CRM_Utils_System::isInUpgradeMode()) {
+    if (!$this->shouldUseCacheFile()) {
       $this->loader = $this->buildClassLoader();
       return $this->loader->register();
     }
@@ -85,7 +84,9 @@ class CRM_Extension_ClassLoader {
       $this->loader = require $file;
     }
     else {
-      $this->loader = $this->buildClassLoader();
+      // The file persists until cleared, so rescan rather than baking in possibly stale cached ext paths.
+      $this->container->refresh();
+      $this->loader = $this->buildClassLoader(TRUE);
       $ser = serialize($this->loader);
       Civi::fs()->dumpFile($file,
         sprintf("<?php\nreturn unserialize(%s);", var_export($ser, 1))
@@ -95,11 +96,22 @@ class CRM_Extension_ClassLoader {
   }
 
   /**
+   * Whether to load and save the class loader via the cache file.
+   *
+   * Pre-installation, test and upgrade environments build it fresh instead.
+   */
+  protected function shouldUseCacheFile(): bool {
+    return defined('CIVICRM_DSN') && !defined('CIVICRM_TEST') && !\CRM_Utils_System::isInUpgradeMode();
+  }
+
+  /**
+   * @param bool $fresh
+   *   Re-read each extension's info.xml rather than reuse info loaded earlier in the request
    * @return \Composer\Autoload\ClassLoader
    * @throws \CRM_Extension_Exception
    * @throws \Exception
    */
-  public function buildClassLoader() {
+  public function buildClassLoader(bool $fresh = FALSE) {
     $loader = new \Composer\Autoload\ClassLoader();
 
     $statuses = $this->manager->getStatuses();
@@ -107,7 +119,7 @@ class CRM_Extension_ClassLoader {
       if ($status !== CRM_Extension_Manager::STATUS_INSTALLED) {
         continue;
       }
-      self::loadExtension($loader, $this->mapper->keyToInfo($key), $this->mapper->keyToBasePath($key));
+      self::loadExtension($loader, $this->mapper->keyToInfo($key, $fresh), $this->mapper->keyToBasePath($key));
     }
     foreach (static::$newExtensions as $record) {
       static::loadExtension($loader, $record[0], $record[1]);
@@ -185,7 +197,7 @@ class CRM_Extension_ClassLoader {
   protected function getCacheFile() {
     $envId = md5(implode(',', array_merge(
       [\CRM_Core_Config_Runtime::getId()],
-      array_column($this->mapper->getActiveModuleFiles(), 'prefix')
+      array_column($this->mapper->getActiveModuleFiles(withPaths: FALSE), 'prefix')
       // dev/core#4055 - When toggling ext's on systems with opcode caching, you may get stale reads for a moment.
       // New cache key ensures new data-set.
     )));
