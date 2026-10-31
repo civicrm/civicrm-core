@@ -198,26 +198,6 @@
 
       <div class="form-group">
         <label>
-          <input type="checkbox" ng-model="editor.afform.manual_processing" ng-click="editor.toggleManualProcessing()" ng-class="{'disabled': !!editor.afform.allow_verification_by_email}">
-          {{:: editor.meta.afform_fields.manual_processing.title }}
-          <a crm-ui-help="hs({id: 'manual_processing', title: editor.meta.afform_fields.manual_processing.title})"></a>
-        </label>
-      </div>
-
-      <div class="form-group" ng-if="!!editor.afform.manual_processing">
-        <label>
-          <input type="checkbox" ng-model="editor.afform.allow_verification_by_email" ng-click="editor.toggleEmailVerification()">
-          {{:: editor.meta.afform_fields.allow_verification_by_email.title }}
-          <a crm-ui-help="hs({id: 'allow_verification_by_email', title: editor.meta.afform_fields.allow_verification_by_email.title})"></a>
-        </label>
-        <div class="form-inline" ng-if="editor.afform.allow_verification_by_email">
-          <label>{{:: editor.meta.afform_fields.email_confirmation_template_id.title }}</label>
-          <input class="form-control" crm-autocomplete="'MessageTemplate'" id="afform_email_confirmation_template_id" ng-model="editor.afform.email_confirmation_template_id" auto-open="true" placeholder="{{:: ts('Select') }}">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>
           {{:: editor.meta.afform_fields.confirmation_type.title }}
           <a crm-ui-help="hs({id: 'confirmation_type', title: editor.meta.afform_fields.confirmation_type.title})"></a>
         </label>
@@ -239,21 +219,82 @@
         </div>
         <p class="help-block">{{:: ts('Enter a URL or path that the form should redirect to following a successful submission.') }}</p>
       </div>
-    </div>
 
-    <div class="form-group" ng-if="editor.afform.confirmation_type === 'show_confirmation_message'">
-      <label for="af_config_confirmation_message">
-        {{:: editor.meta.afform_fields.confirmation_message.title }}
-      </label>
-      <civi-rich-text-input
-        id="af_config_confirmation_message"
-        class="form-control"
-        crm-custom-element-model
-        ng-model="editor.afform.confirmation_message"
-        token-picker
-        include-submission-tokens
-      ></civi-rich-text-input>
-      <p class="help-block">{{:: ts("This message wil be displayed when the form is submitted.") }}</p>
+      <div class="form-group" ng-if="editor.afform.confirmation_type === 'show_confirmation_message'">
+        <label for="af_config_confirmation_message">
+          {{:: editor.meta.afform_fields.confirmation_message.title }}
+        </label>
+        <civi-rich-text-input
+          id="af_config_confirmation_message"
+          class="form-control"
+          crm-custom-element-model
+          ng-model="editor.afform.confirmation_message"
+          token-picker
+          include-submission-tokens
+        ></civi-rich-text-input>
+        <p class="help-block">{{:: ts("This message will be displayed when the form is submitted.") }}</p>
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input type="checkbox" ng-model="editor.afform.manual_processing" ng-click="editor.toggleManualProcessing()" ng-class="{'disabled': !!editor.afform.allow_verification_by_email}">
+          {{:: editor.meta.afform_fields.manual_processing.title }}
+          <a crm-ui-help="hs({id: 'manual_processing', title: editor.meta.afform_fields.manual_processing.title})"></a>
+        </label>
+      </div>
+
+      <div class="form-group" ng-if="!!editor.afform.manual_processing">
+        <label>
+          <input type="checkbox" ng-model="editor.afform.allow_verification_by_email" ng-click="editor.toggleEmailVerification()">
+          {{:: editor.meta.afform_fields.allow_verification_by_email.title }}
+          <a crm-ui-help="hs({id: 'allow_verification_by_email', title: editor.meta.afform_fields.allow_verification_by_email.title})"></a>
+        </label>
+        <div ng-if="editor.afform.allow_verification_by_email">
+          <div class="form-inline">
+            <label>{{:: editor.meta.afform_fields.email_confirmation_template_id.title }}</label>
+            <input class="form-control" crm-autocomplete="'MessageTemplate'" id="afform_email_confirmation_template_id" ng-model="editor.afform.email_confirmation_template_id" auto-open="true" placeholder="{{:: ts('Select') }}">
+          </div>
+
+          <div class="form-group">
+            <label>
+              {{:: editor.meta.afform_fields.verification_confirmation_type.title }}
+              <a crm-ui-help="hs({id: 'verification_confirmation_type', title: editor.meta.afform_fields.verification_confirmation_type.title})"></a>
+            </label>
+            <p class="form-inline">
+              <label class="radio" ng-repeat="ctype in editor.meta.afform_fields.verification_confirmation_type.options">
+                <input class="crm-form-radio" type="radio" name="verification_confirmation_type" ng-model="editor.afform.verification_confirmation_type" ng-value="ctype.id">
+                {{:: ctype.label }}
+              </label>
+            </p>
+          </div>
+
+          <div class="form-group" ng-class="{'has-error': !!config_form.verification_redirect.$error.pattern}" ng-if="editor.afform.verification_confirmation_type === 'redirect_to_url'">
+            <label for="af_config_verification_redirect">
+              {{:: editor.meta.afform_fields.verification_redirect.title }}
+            </label>
+            <div class="input-group">
+              <input ng-model="editor.afform.verification_redirect" name="verification_redirect" class="form-control" id="af_config_verification_redirect" pattern="^((http|https):\/\/|\/|civicrm\/)[-0-9a-zA-Z\/_.]\S+$" title="{{:: ts('Post-Verification Page must be either an absolute url, a relative url or a path starting with CiviCRM') }}" ng-model-options="editor.debounceMode" >
+              <af-gui-token-select class="input-group-addon" model="editor.afform" field="verification_redirect"></af-gui-token-select>
+            </div>
+            <p class="help-block">{{:: ts('Enter a URL or path that the form should redirect to following successful verification.') }}</p>
+          </div>
+
+          <div class="form-group" ng-if="editor.afform.verification_confirmation_type === 'show_confirmation_message'">
+            <label for="af_config_verification_confirmation_message">
+              {{:: editor.meta.afform_fields.verification_confirmation_message.title }}
+            </label>
+            <civi-rich-text-input
+              id="af_config_verification_confirmation_message"
+              class="form-control"
+              crm-custom-element-model
+              ng-model="editor.afform.verification_confirmation_message"
+              token-picker
+              include-submission-tokens
+            ></civi-rich-text-input>
+            <p class="help-block">{{:: ts("This message will be displayed when the verification is completed.") }}</p>
+          </div>
+        </div>
+      </div>
     </div>
 
   </fieldset>
