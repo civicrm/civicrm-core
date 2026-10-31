@@ -414,13 +414,22 @@ function updateContactInfo(blockNo, prefix) {
 
 function setPledgeAmount(form, pledgeID) {
   var rowID = form.closest('div.crm-grid-row').attr('entity_id');
-  var dataUrl = CRM.url('civicrm/ajax/pledgeAmount');
   if (pledgeID) {
-    cj.post(dataUrl, {pid: pledgeID}, function (data) {
-      cj('#field_' + rowID + '_financial_type').val(data.financial_type_id).change();
-      cj('#field_' + rowID + '_total_amount').val(data.amount).change();
-      cj('#field_' + rowID + '_total_amount').attr('readonly', true);
-    }, 'json');
+    CRM.api4('PledgePayment', 'get', {
+      select: ['scheduled_amount', 'pledge_id.financial_type_id'],
+      where: [
+        ['pledge_id', '=', pledgeID],
+        ['status_id:name', 'IN', ['Pending', 'Overdue']],
+      ],
+      orderBy: {scheduled_date: 'ASC'},
+      limit: 1,
+    }).then((payments) => {
+      if (payments.length) {
+        cj('#field_' + rowID + '_financial_type').val(payments[0]['pledge_id.financial_type_id']).change();
+        cj('#field_' + rowID + '_total_amount').val(payments[0].scheduled_amount).change();
+        cj('#field_' + rowID + '_total_amount').attr('readonly', true);
+      }
+    });
   }
   else {
     cj('#field_' + rowID + '_total_amount').val('').change();
