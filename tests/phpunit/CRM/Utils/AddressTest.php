@@ -62,13 +62,14 @@ line 3
    * and test using alternate names for state_province field
    */
   public function testStateProvinceFormattedBillingAddress(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
     $params = [
-      'billing_street_address-' . CRM_Core_BAO_LocationType::getBilling() => '123 Happy Place',
-      'billing_city-' . CRM_Core_BAO_LocationType::getBilling() => 'Miami',
-      'billing_postal_code-' . CRM_Core_BAO_LocationType::getBilling() => 33101,
+      "billing_street_address-$billingLocationTypeID" => '123 Happy Place',
+      "billing_city-$billingLocationTypeID" => 'Miami',
+      "billing_postal_code-$billingLocationTypeID" => 33101,
       // 1000 => Alabama (AL)
-      'state_province-' . CRM_Core_BAO_LocationType::getBilling() => '1000',
-      'country-' . CRM_Core_BAO_LocationType::getBilling() => 'United States',
+      "state_province-$billingLocationTypeID" => '1000',
+      "country-$billingLocationTypeID" => 'United States',
     ];
 
     // Set address_format (we are only interested in state_province & state_province_name).
@@ -83,17 +84,17 @@ line 3
     $this->assertEquals("Alabama\n", $formatted_address);
 
     // Test using alternate names for state/province field.
-    unset($params['state_province-' . CRM_Core_BAO_LocationType::getBilling()]);
+    unset($params["state_province-$billingLocationTypeID"]);
     // Alternate name 1.
-    $params['billing_state_province-' . CRM_Core_BAO_LocationType::getBilling()] = '1000';
+    $params["billing_state_province-$billingLocationTypeID"] = '1000';
     $addFormat = '{contact.state_province_name}';
     Civi::settings()->set('address_format', $addFormat);
     $formatted_address = CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params);
     $this->assertEquals("Alabama\n", $formatted_address);
 
-    unset($params['state_province-' . CRM_Core_BAO_LocationType::getBilling()]);
+    unset($params["state_province-$billingLocationTypeID"]);
     // alternate name 2
-    $params['billing_state_province_id-' . CRM_Core_BAO_LocationType::getBilling()] = '1000';
+    $params["billing_state_province_id-$billingLocationTypeID"] = '1000';
     $addFormat = '{contact.state_province_name}';
     Civi::settings()->set('address_format', $addFormat);
     $formatted_address = CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params);

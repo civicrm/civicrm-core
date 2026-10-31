@@ -1300,7 +1300,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   public function testMembershipDateMatch(): void {
     $contactID = $this->individualCreate(array_merge($this->fixtures['contact'], ['email' => 'test-member@example.com']));
     $membershipTypeID = $this->getMembershipTypeID();
-    $membership = $this->createTestEntity('Membership', array_merge($this->fixtures['rolling_membership'], ['status_id' => $this->getMembershipStatusID('New'), 'contact_id' => $contactID, 'membership_type_id' => $membershipTypeID]));
+    $membership = $this->createTestEntity('Membership', array_merge($this->fixtures['rolling_membership'], ['status_id:name' => 'New', 'contact_id' => $contactID, 'membership_type_id' => $membershipTypeID]));
     $this->createScheduleFromFixtures('sched_membership_join_2week', ['entity_value' => $membershipTypeID]);
 
     // start_date=2012-03-15 ; schedule is 2 weeks after join_date
@@ -2882,7 +2882,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     if ($emailParams) {
       Civi\Api4\Email::create(FALSE)->setValues(array_merge([
         'contact_id' => $membership['contact_id'],
-        'location_type_id' => $this->getLocationTypeID('Home'),
+        'location_type_id:name' => 'Home',
       ], $emailParams))->execute();
     }
     return $membership;

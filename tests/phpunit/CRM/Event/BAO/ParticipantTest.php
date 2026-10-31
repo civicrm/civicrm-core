@@ -175,7 +175,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
       'event_id' => $this->getEventID(),
       'register_date' => date('Y-m-d') . ' 00:00:00',
       'role_id' => 1,
-      'status_id' => $this->getParticipantStatusID('Registered'),
+      'status_id:name' => 'Registered',
       'source' => 'Event_' . $this->getEventID(),
       'contact_id' => $this->ids['Contact']['individual_0'],
     ]);

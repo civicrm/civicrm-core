@@ -168,7 +168,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       'period_type' => 'rolling',
       'member_of_contact_id' => 1,
       'domain_id' => 1,
-      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
+      'financial_type_id:name' => 'Member Dues',
       'relationship_type_id' => RelationshipType::create(FALSE)->setValues(['name_a_b' => 'AB', 'name_b_a' => 'BA'])->execute()->first()['id'],
       'relationship_direction' => 'a_b',
       'is_active' => 1,

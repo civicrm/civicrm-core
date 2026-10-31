@@ -106,7 +106,7 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
   }
 
   public function createTestableBillingProfile($name, $withState): void {
-    $billingID = CRM_Core_BAO_LocationType::getBilling();
+    $billingID = $this->getLocationTypeID('Billing');
 
     $this->ids['UFGroup']["{$name}_billing"] = $this->callAPISuccess('UFGroup', 'create', [
       'group_type' => 'Contact',

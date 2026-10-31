@@ -43,7 +43,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     Order::create()
       ->setContributionValues([
         'contact_id' => $this->ids['Contact']['individual_0'],
-        'financial_type_id' => $this->getFinancialTypeID('Donation'),
+        'financial_type_id:name' => 'Donation',
       ])
       ->addLineItem([
         'entity_table' => 'civicrm_participant',
@@ -115,7 +115,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     Order::create()
       ->setContributionValues([
         'contact_id' => $this->ids['Contact']['individual_0'],
-        'financial_type_id' => $this->getFinancialTypeID('Donation'),
+        'financial_type_id:name' => 'Donation',
       ])
       ->addLineItem([
         'identifier' => 'participant_1',
@@ -165,7 +165,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     Order::create()
       ->setContributionValues([
         'contact_id' => $this->ids['Contact']['individual_0'],
-        'financial_type_id' => $this->getFinancialTypeID('Donation'),
+        'financial_type_id:name' => 'Donation',
       ])
       ->addLineItem([
         'identifier' => 'participant_1',

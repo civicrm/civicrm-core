@@ -325,7 +325,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       'title' => 'CheckBox Membership',
       'is_active' => 1,
       'extends' => CRM_Core_Component::getComponentID('CiviMember'),
-      'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
+      'financial_type_id:name' => 'Member Dues',
     ], 'checkboxMembership');
 
     $priceField = $this->createTestEntity('PriceField', [
@@ -345,7 +345,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
         'amount' => 100,
         'membership_type_id' => $membershipTypeID,
         'membership_num_terms' => 1,
-        'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
+        'financial_type_id:name' => 'Member Dues',
         'is_active' => 1,
       ], 'checkboxMembership_' . $membershipTypeID);
       $priceFieldValueIDs[$membershipTypeID] = $priceFieldValue['id'];
