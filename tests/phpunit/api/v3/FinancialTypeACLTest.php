@@ -29,13 +29,6 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   protected $_ids = [];
 
   /**
-   * Parameters to create payment processor.
-   *
-   * @var array
-   */
-  protected $_processorParams = [];
-
-  /**
    * ID of created event.
    *
    * @var int
@@ -61,17 +54,6 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'net_amount' => 95.00,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-    ];
-    $this->_processorParams = [
-      'domain_id' => 1,
-      'name' => 'Dummy',
-      'payment_processor_type_id' => 10,
-      'financial_account_id' => 12,
-      'is_active' => 1,
-      'user_name' => '',
-      'url_site' => 'http://dummy.com',
-      'url_recur' => 'http://dummy.com',
-      'billing_mode' => 1,
     ];
   }
 

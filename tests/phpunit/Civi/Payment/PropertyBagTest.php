@@ -10,6 +10,8 @@ use PHPUnit\Framework\Error\Deprecated as DeprecatedError;
  */
 class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
 
+  use \Civi\Test\LookupHelperTrait;
+
   /**
    * @return \Civi\Test\CiviEnvBuilder
    */
@@ -149,7 +151,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    * Test that emails set by the legacy method of 'email-{billing location type id}' can be retrieved with getEmail.
    */
   public function testSetBillingEmailLegacy(): void {
-    $localPropertyBag = PropertyBag::cast(['email-' . \CRM_Core_BAO_LocationType::getBilling() => 'a@b.com']);
+    $localPropertyBag = PropertyBag::cast(['email-' . $this->getLocationTypeID('Billing') => 'a@b.com']);
     $this->assertEquals('a@b.com', $localPropertyBag->getEmail());
   }
 
@@ -268,7 +270,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    */
   public function testOtherParams($prop, $legacy_names, $valid_values, $invalid_values) {
     // The data provider runs before the location types exist, so legacy billing names end in '-Billing'; use the id.
-    $legacy_names = preg_replace('/-Billing$/', '-' . \CRM_Core_BAO_LocationType::getBilling(), $legacy_names);
+    $legacy_names = preg_replace('/-Billing$/', '-' . $this->getLocationTypeID('Billing'), $legacy_names);
     $setter = 'set' . ucfirst($prop);
     $getter = 'get' . ucfirst($prop);
 

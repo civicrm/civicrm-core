@@ -157,7 +157,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $contactID1 = $this->individualCreate([], 1);
     $contactID2 = $this->individualCreate([], 2);
     $contribution1 = Order::create(FALSE)->setContributionValues([
-      'financial_type_id' => $this->getFinancialTypeID('Donation'),
+      'financial_type_id:name' => 'Donation',
       'receive_date' => date('Ymd'),
       'contact_id' => $contactID1,
     ])->addLineItem(['line_total' => 100])->execute()->single();
@@ -177,7 +177,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contact_id' => $contactID1,
     ]);
     $contribution3 = Order::create(FALSE)->setContributionValues([
-      'financial_type_id' => $this->getFinancialTypeID('Donation'),
+      'financial_type_id:name' => 'Donation',
       'receive_date' => date('Ymd'),
       'contact_id' => $contactID2,
     ])->addLineItem(['line_total' => 200])->execute()->single();
@@ -250,7 +250,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $contactID1 = $this->individualCreate([], 1);
     $contactID2 = $this->individualCreate([], 2);
     $contribution1 = Order::create(FALSE)->setContributionValues([
-      'financial_type_id' => $this->getFinancialTypeID('Donation'),
+      'financial_type_id:name' => 'Donation',
       'receive_date' => date('Ymd'),
       'contact_id' => $contactID1,
     ])->addLineItem(['line_total' => 100])->execute()->single();
@@ -271,7 +271,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contact_id' => $contactID1,
     ]);
     $contribution3 = Order::create(FALSE)->setContributionValues([
-      'financial_type_id' => $this->getFinancialTypeID('Donation'),
+      'financial_type_id:name' => 'Donation',
       'receive_date' => date('Ymd'),
       'contact_id' => $contactID2,
     ])->addLineItem(['line_total' => 200])->execute()->single();

@@ -46,13 +46,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
   protected $_contributionId;
 
   /**
-   * Parameters to create payment processor.
-   *
-   * @var array
-   */
-  protected $_processorParams = [];
-
-  /**
    * Payment instrument mapping.
    *
    * @var array
@@ -95,17 +88,6 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
       'currency' => 'USD',
       'contact_id' => $this->_individualId,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
-    ];
-    $this->_processorParams = [
-      'domain_id' => 1,
-      'name' => 'Dummy',
-      'payment_processor_type_id' => 10,
-      'financial_account_id' => 12,
-      'is_active' => 1,
-      'user_name' => '',
-      'url_site' => 'https://dummy.com',
-      'url_recur' => 'https://dummy.com',
-      'billing_mode' => 1,
     ];
 
     $instruments = $this->callAPISuccess('contribution', 'getoptions', ['field' => 'payment_instrument_id']);

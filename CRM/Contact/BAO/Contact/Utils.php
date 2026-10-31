@@ -76,10 +76,7 @@ class CRM_Contact_BAO_Contact_Utils {
     }
 
     if ($addProfileOverlay) {
-      static $summaryOverlayProfileId = NULL;
-      if (!$summaryOverlayProfileId) {
-        $summaryOverlayProfileId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', 'summary_overlay', 'id', 'name');
-      }
+      $summaryOverlayProfileId = Civi::$statics[__CLASS__]['summaryOverlayProfileId'] ??= CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', 'summary_overlay', 'id', 'name');
 
       $contactURL = $contactUrl ?: CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$contactId}"

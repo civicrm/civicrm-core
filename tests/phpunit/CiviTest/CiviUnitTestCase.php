@@ -1435,28 +1435,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   }
 
   /**
-   * Add a UF Join Entry.
-   *
-   * @param array|null $params
-   *
-   * @return int
-   *   $id of created UF Join
-   */
-  public function ufjoinCreate(?array $params = NULL): int {
-    if ($params === NULL) {
-      $params = [
-        'is_active' => 1,
-        'module' => 'CiviEvent',
-        'entity_table' => 'civicrm_event',
-        'entity_id' => 3,
-        'weight' => 1,
-        'uf_group_id' => $this->getProfileID('name_and_address'),
-      ];
-    }
-    return $this->callAPISuccess('UFJoin', 'create', $params);
-  }
-
-  /**
    * @param array $params
    *   Optional parameters.
    * @param string $identifier
@@ -1958,7 +1936,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       ->setDefaults([
         'domain_id' => 1,
         'member_of_contact_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
-        'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
+        'financial_type_id:name' => 'Member Dues',
       ]
     )->execute();
   }
@@ -3032,7 +3010,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       ], 'special')['id'];
       $contributionPageID = $this->createTestEntity('ContributionPage', [
         'title' => 'Test Contribution Page',
-        'financial_type_id' => $this->getFinancialTypeID('Donation'),
+        'financial_type_id:name' => 'Donation',
         'currency' => 'NZD',
         'goal_amount' => 50,
         'is_pay_later' => 1,
@@ -3042,7 +3020,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       $priceSetID = $this->createTestEntity('PriceSet', [
         'is_quick_config' => 0,
         'extends' => CRM_Core_Component::getComponentID('CiviMember'),
-        'financial_type_id' => $this->getFinancialTypeID('Donation'),
+        'financial_type_id:name' => 'Donation',
         'title' => 'my Page',
         'name' => 'member_not_quick_config',
       ])['id'];

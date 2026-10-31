@@ -129,7 +129,7 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
       ->setContributionValues([
         'contact_id' => $this->ids['Contact']['individual_0'],
         'total_amount' => 100,
-        'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
+        'financial_type_id:name' => 'Member Dues',
         'receive_date' => '2018-06-08',
       ])
       ->addLineItem([

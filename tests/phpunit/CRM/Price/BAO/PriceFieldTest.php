@@ -89,8 +89,8 @@ class CRM_Price_BAO_PriceFieldTest extends CiviUnitTestCase {
    */
   public function testCreateRollsBackOnError(): void {
     $priceSetID = $this->callAPISuccess('PriceSet', 'create', [
-      'extends' => 2,
-      'financial_type_id' => 1,
+      'extends' => 'CiviContribute',
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'title' => 'Rollback Price Set',
     ])['id'];
     $this->hookClass->setHook('civicrm_post', function ($op, $objectName, $objectId, $objectRef) {
@@ -101,7 +101,7 @@ class CRM_Price_BAO_PriceFieldTest extends CiviUnitTestCase {
     $params = [
       'label' => 'Rollback Amount',
       'html_type' => 'Radio',
-      'financial_type_id' => 1,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'price_set_id' => $priceSetID,
       'option_label' => [1 => 'Low', 2 => 'Medium'],
       'option_amount' => [1 => 10, 2 => 50],

@@ -20,7 +20,7 @@ trait LookupHelperTrait {
    *
    * @return int
    */
-  public function getFinancialTypeID(string $name): int {
+  protected function getFinancialTypeID(string $name): int {
     return (int) \CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'financial_type_id', $name);
   }
 

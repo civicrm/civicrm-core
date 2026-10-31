@@ -24,7 +24,7 @@ class CRM_Contribute_Form_UpdateBillingTest extends CiviUnitTestCase {
    */
   public function testMail(): void {
     $this->addContribution();
-    $billingLocationID = CRM_Core_BAO_LocationType::getBilling();
+    $billingLocationID = $this->getLocationTypeID('Billing');
     $form = $this->getTestForm('CRM_Contribute_Form_UpdateBilling',
       [
         'is_notify' => TRUE,

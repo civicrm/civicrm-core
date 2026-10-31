@@ -27,6 +27,7 @@ use Civi\Api4\UserJob;
 class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
 
   use CRMTraits_Custom_CustomDataTrait;
+  use CRMTraits_Import_MapperTrait;
 
   /**
    * Map field form.
@@ -59,13 +60,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testSubmit(array $params, array $mapper, array $expecteds = []): void {
-    // The data provider runs before the location types exist, so it gives names; look up the ids.
-    foreach ($mapper as &$mapperField) {
-      if (isset($mapperField[1]) && !is_numeric($mapperField[1])) {
-        $mapperField[1] = $this->getLocationTypeID($mapperField[1]);
-      }
-    }
-    unset($mapperField);
+    $mapper = $this->convertMapperNamesToIDs($mapper);
     foreach ($expecteds as &$expected) {
       foreach ($expected['result'] ?? [] as $key => $expectedValues) {
         if (isset($expectedValues['location_type_id'])) {
