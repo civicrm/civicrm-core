@@ -824,7 +824,7 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
     [$userContact, $otherContact] = $this->setupTestContacts();
     $otherAddress = \Civi\Api4\Address::create(FALSE)
       ->addValue('contact_id', $otherContact)
-      ->addValue('location_type_id', 1)
+      ->addValue('location_type_id:name', 'Home')
       ->addValue('street_address', '123 Secret Lane')
       ->execute()->first()['id'];
 
@@ -837,7 +837,7 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
     $this->expectException(UnauthorizedException::class);
     \Civi\Api4\Address::create()
       ->addValue('contact_id', $userContact)
-      ->addValue('location_type_id', 1)
+      ->addValue('location_type_id:name', 'Home')
       ->addValue('master_id', $otherAddress)
       ->execute();
   }

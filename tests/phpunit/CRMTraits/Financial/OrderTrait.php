@@ -99,7 +99,7 @@ trait CRMTraits_Financial_OrderTrait {
               'qty' => 1,
               'unit_price' => 100,
               'line_total' => 100,
-              'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+              'financial_type_id' => $this->getFinancialTypeID('Donation'),
               'entity_table' => 'civicrm_contribution',
               'price_field_id' => $this->callAPISuccessGetValue('price_field', [
                 'return' => 'id',

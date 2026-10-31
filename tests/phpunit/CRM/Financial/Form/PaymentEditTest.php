@@ -48,9 +48,9 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
     $this->getTestForm('CRM_Contribute_Form_Contribution', [
       'total_amount' => 50,
       'receive_date' => '2015-04-21 23:27:00',
-      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contact_id' => $this->_individualID,
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'check_number' => '123XA',
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
     ])->processForm();
@@ -61,7 +61,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
 
     // build parameters which changed payment instrument and tran date values
     $params = [
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Credit Card'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', 'Visa'),
       'pan_truncation' => 1111,
       'trxn_id' => 'txn_12',
@@ -116,11 +116,11 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
    */
   public function testSubmitOnPaymentInstrumentChangeSameAccount(): void {
     // First create a contribution using 'Check' as payment instrument
-    $paymentInstrument = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
+    $paymentInstrument = $this->getPaymentInstrumentID('Check');
     $this->getTestForm('CRM_Contribute_Form_Contribution', [
       'total_amount' => 50,
       'receive_date' => '2015-04-21 23:27:00',
-      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contact_id' => $this->_individualID,
       'payment_instrument_id' => $paymentInstrument,
       'check_number' => '123XA',
@@ -178,11 +178,11 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
   public function testSubmitOnCheckNumberChange(): void {
     // CASE 1: Submit contribution using Check as payment instrument and check_number as '123XA'
     $checkNumber1 = '123XA';
-    $checkPaymentInstrumentID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
+    $checkPaymentInstrumentID = $this->getPaymentInstrumentID('Check');
     // First create a contribution using 'Check' as payment instrument
     $this->getTestForm('CRM_Contribute_Form_Contribution', [
       'total_amount' => 50,
-      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contact_id' => $this->_individualID,
       'payment_instrument_id' => $checkPaymentInstrumentID,
       'check_number' => $checkNumber1,

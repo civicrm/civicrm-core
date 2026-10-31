@@ -90,7 +90,7 @@ NETHERLANDS S', $rows[$this->ids['Contact']['collins']][0]);
     \Civi::settings()->set('mailing_format', $this->getDefaultMailingFormat());
     $this->createTestAddresses();
     $rows = $this->submitForm([
-      'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Work'),
+      'location_type_id' => $this->getLocationTypeID('Work'),
     ]);
     // Check that the non-primary phone has been appended - ie the one with 0 for non-primary at the end.
     $this->assertEquals($this->getExpectedAddress('souza', FALSE), $rows[$this->ids['Contact']['souza']][0]);

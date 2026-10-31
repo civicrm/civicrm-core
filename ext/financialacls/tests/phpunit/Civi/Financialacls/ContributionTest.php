@@ -33,7 +33,7 @@ class ContributionTest extends BaseTestClass {
     $this->assertEquals(0, $result->N);
 
     // It didn't find any rows cos it is restricted to only find contributions where all lines are visible.
-    \CRM_Core_DAO::executeQuery('UPDATE civicrm_line_item SET financial_type_id = ' . \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'));
+    \CRM_Core_DAO::executeQuery('UPDATE civicrm_line_item SET financial_type_id = ' . $this->getFinancialTypeID('Donation'));
     $result = \CRM_Core_DAO::executeQuery($sql);
     $result->fetch();
     $this->assertEquals(300, $result->amount);
@@ -102,7 +102,7 @@ class ContributionTest extends BaseTestClass {
       'label' => 'price 1',
       'qty' => 1,
       'line_total' => 100,
-      'financial_type_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'),
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'entity_table' => 'civicrm_contribution',
     ];
     $params['line_items'][]['line_item'][] = [
@@ -111,7 +111,7 @@ class ContributionTest extends BaseTestClass {
       'label' => 'price 2',
       'qty' => 1,
       'line_total' => 200,
-      'financial_type_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'),
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
       'entity_table' => 'civicrm_contribution',
     ];
 

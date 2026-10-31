@@ -349,7 +349,7 @@ class CRM_Member_BAO_MembershipTypeChangeTest extends CiviUnitTestCase {
     // Add 10% tax to the Member Dues financial type used by AnnualRolling2.
     $this->enableTaxAndInvoicing();
     $this->addTaxAccountToFinancialType(
-      (int) \Civi\Api4\FinancialType::get(FALSE)->addWhere('name', '=', 'Member Dues')->addSelect('id')->execute()->first()['id'],
+      $this->getFinancialTypeID('Member Dues'),
       ['tax_rate' => 10]
     );
     \Civi::cache('metadata')->flush();

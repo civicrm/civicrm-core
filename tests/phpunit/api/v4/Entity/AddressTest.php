@@ -179,7 +179,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $addressContact1 = $this->createTestEntity('Address', [
       'contact_id' => $contact1['id'],
       'street_address' => '100 Alice Way',
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
     ], 'addr_contact1');
 
     $contact2 = $this->createTestEntity('Contact', [
@@ -189,17 +189,17 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $addressContact2 = $this->createTestEntity('Address', [
       'contact_id' => $contact2['id'],
       'street_address' => '200 Bob St',
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
     ], 'addr_contact2');
 
     $addressContrib = $this->createTestEntity('Address', [
       'contact_id' => NULL,
       'street_address' => '300 Contrib Blvd',
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
     ], 'addr_contrib');
     $this->createTestEntity('Contribution', [
       'contact_id' => $contact1['id'],
-      'financial_type_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      'financial_type_id:name' => 'Donation',
       'total_amount' => 100,
       'address_id' => $addressContrib['id'],
     ], 'contrib1');
@@ -207,12 +207,12 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $addressEvent1 = $this->createTestEntity('Address', [
       'contact_id' => NULL,
       'street_address' => '401 Event Ave',
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
     ], 'addr_event1');
     $addressEvent2 = $this->createTestEntity('Address', [
       'contact_id' => NULL,
       'street_address' => '402 Event Ave',
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
     ], 'addr_event2');
     $locBlock = $this->createTestEntity('LocBlock', [
       'address_id' => $addressEvent1['id'],
@@ -229,7 +229,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $addressOrphan = $this->createTestEntity('Address', [
       'contact_id' => NULL,
       'street_address' => '500 Orphan St',
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
     ], 'addr_orphan');
 
     $allTestAddressIds = [

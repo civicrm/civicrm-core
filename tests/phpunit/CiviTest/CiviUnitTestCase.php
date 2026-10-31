@@ -1902,7 +1902,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $priceFieldID = CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()');
     CRM_Core_DAO::executeQuery("INSERT INTO `civicrm_price_field_value` (`price_field_id`, `name`, `label`, `description`, `amount`, `count`, `max_value`, `weight`, `membership_type_id`, `membership_num_terms`, `is_default`, `is_active`, `financial_type_id`, `non_deductible_amount`) VALUES (%1, 'contribution_amount', 'Contribution Amount', NULL, '1', NULL, NULL, 1, NULL, NULL, 0, 1, %2, 0.00)", [
       1 => [$priceFieldID, 'Integer'],
-      2 => [CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'), 'Integer'],
+      2 => [$this->getFinancialTypeID('Donation'), 'Integer'],
     ]);
     unset(Civi::$statics['CRM_Price_BAO_PriceSet']);
   }
@@ -2603,7 +2603,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'is_active' => ['1' => 1],
       'price_set_id' => $priceSetID,
       'is_enter_qty' => 1,
-      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'financial_type_id', 'Event Fee'),
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
     ];
     if ($type === 'Radio') {
       foreach ($options as $index => $option) {
@@ -3454,7 +3454,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     require_once 'CiviTest/CiviTestSMSProvider.php';
 
     // Option value params for CiviTestSMSProvider
-    $groupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'sms_provider_name', 'id', 'name');
+    $groupID = $this->getOptionGroupID('sms_provider_name');
     $params = [
       'option_group_id' => $groupID,
       'label' => 'unittestSMS',

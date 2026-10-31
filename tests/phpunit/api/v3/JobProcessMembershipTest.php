@@ -382,7 +382,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
 
     $this->callApiV3Success('Job', 'process_membership', [
       'exclude_membership_status_ids' => [
-        CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
+        $this->getMembershipStatusID('Cancelled'),
       ],
     ]);
 
@@ -398,7 +398,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
 
     $this->callApiV3Success('Job', 'process_membership', [
       'exclude_membership_status_ids' => [
-        CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
+        $this->getMembershipStatusID('Cancelled'),
       ],
     ]);
 
@@ -414,7 +414,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
 
     $this->callApiV3Success('Job', 'process_membership', [
       'exclude_membership_status_ids' => [
-        CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
+        $this->getMembershipStatusID('Cancelled'),
       ],
     ]);
 
@@ -430,7 +430,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
 
     $this->callApiV3Success('Job', 'process_membership', [
       'exclude_membership_status_ids' => [
-        CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
+        $this->getMembershipStatusID('Cancelled'),
       ],
     ]);
 
@@ -447,7 +447,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
 
     $this->callApiV3Success('Job', 'process_membership', [
       'exclude_membership_status_ids' => [
-        CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled'),
+        $this->getMembershipStatusID('Cancelled'),
       ],
     ]);
 

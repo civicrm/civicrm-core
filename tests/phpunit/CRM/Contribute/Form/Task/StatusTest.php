@@ -142,7 +142,7 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
       'payment_instrument_id_1' => $checkInstrument['value'],
     ]));
 
-    $cashID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Cash');
+    $cashID = $this->getPaymentInstrumentID('Cash');
     $errors = CRM_Contribute_Form_Task_Status::formRule([
       'check_number_1' => '12345',
       'payment_instrument_id_1' => $cashID,

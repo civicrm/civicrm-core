@@ -597,7 +597,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $organization2 = $this->organizationCreate(['organization_name' => 'Org 2', 'legal_name' => 'well dodgey']);
     $contact1 = $this->individualCreate(['employer_id' => $organization1, 'first_name' => 'one']);
     $contact2 = $this->individualCreate(['employer_id' => $organization2, 'first_name' => 'one']);
-    $employerRelationshipTypeID = $this->callAPISuccessGetValue('RelationshipType', ['return' => 'id', 'label_a_b' => 'Employee of']);
+    $employerRelationshipTypeID = $this->getRelationshipTypeID('Employee of');
     $selectedFields = [
       ['contact_type' => 'Individual', 'name' => 'first_name'],
       ['contact_type' => 'Individual', 'relationship_type_id' => $employerRelationshipTypeID, 'relationship_direction' => 'a_b', 'name' => 'organization_name'],
@@ -747,7 +747,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $this->getCustomFieldName('float') => 10,
     ]);
     $selectedFields = [
-      ['name' => 'city', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Billing')],
+      ['name' => 'city', 'location_type_id' => $this->getLocationTypeID('Billing')],
       ['name' => $this->getCustomFieldName('text')],
       ['name' => $this->getCustomFieldName('country')],
       ['name' => $this->getCustomFieldName('select_string')],
@@ -958,9 +958,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
           'city' => $locationLabel . $contactID . 'city',
           'postal_code' => $locationLabel . $contactID . 'postal_code',
         ]);
-        $fields[] = ['contact_type' => 'Individual', 'name' => 'city', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $locationName)];
-        $fields[] = ['contact_type' => 'Individual', 'name' => 'street_address', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $locationName)];
-        $fields[] = ['contact_type' => 'Individual', 'name' => 'postal_code', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $locationName)];
+        $fields[] = ['contact_type' => 'Individual', 'name' => 'city', 'location_type_id' => $this->getLocationTypeID($locationName)];
+        $fields[] = ['contact_type' => 'Individual', 'name' => 'street_address', 'location_type_id' => $this->getLocationTypeID($locationName)];
+        $fields[] = ['contact_type' => 'Individual', 'name' => 'postal_code', 'location_type_id' => $this->getLocationTypeID($locationName)];
       }
     }
 

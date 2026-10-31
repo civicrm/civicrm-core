@@ -1760,7 +1760,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     // Add more random relationships to make the test more realistic
     foreach (['Employee of', 'Volunteer for'] as $relationshipType) {
-      $relTypeId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $relationshipType, 'id', 'name_a_b');
+      $relTypeId = $this->getRelationshipTypeID($relationshipType);
       $this->callAPISuccess('relationship', 'create', [
         'contact_id_a' => $result['id'],
         'contact_id_b' => $this->organizationCreate(),

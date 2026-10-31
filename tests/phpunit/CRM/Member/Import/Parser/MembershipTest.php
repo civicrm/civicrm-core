@@ -331,7 +331,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $importResponse = $membershipImporter->import($importValues);
     $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
     $createdStatusID = $this->callAPISuccessGetValue('Membership', ['return' => 'status_id']);
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $createdStatusID);
+    $this->assertEquals($this->getMembershipStatusID('New'), $createdStatusID);
     $this->callAPISuccess('MembershipStatus', 'get', [
       'name' => 'New',
       'api.MembershipStatus.create' => [

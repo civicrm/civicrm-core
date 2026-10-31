@@ -559,7 +559,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   private function submitForm(?int $participantFee = NULL, array $priceSetParams = []): void {
     $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', $priceSetParams + [
       $this->getPriceFieldFormLabel('PaidEvent') => $participantFee,
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+      'status_id' => $this->getParticipantStatusID('Registered'),
     ], [
       'id' => $this->ids['Participant']['order'],
       'action' => CRM_Core_Action::UPDATE,
@@ -588,7 +588,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $fromEmailAddress = array_key_first(CRM_Event_BAO_Event::getFromEmailIds($this->getEventID())['from_email_id']);
     $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
       $this->getPriceFieldFormLabel('PaidEvent') => $this->getCheapFeeID(),
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'On waitlist'),
+      'status_id' => $this->getParticipantStatusID('On waitlist'),
       'send_receipt' => 1,
       'from_email_address' => $fromEmailAddress,
       'receipt_text' => 'This is my distinctive confirmation message',
@@ -680,7 +680,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    */
   public function testOmittedTaxedLineItemReversesBothItems(): void {
     $this->enableTaxAndInvoicing();
-    $this->addTaxAccountToFinancialType((int) CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee'));
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID('Event Fee'));
     $this->createPriceField('ten_euros', 'Ten euros', 10.00);
     $this->createPriceField('thirty_five_euros', 'Thirty-five euros', 35.00);
     $this->registerAndPayForPriceFieldValues(['ten_euros', 'thirty_five_euros'], 49.50);
@@ -799,7 +799,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     // Change participant A's fee only.
     $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
       $this->getPriceFieldFormLabel('PaidEvent') => $this->getVeryExpensiveID(),
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+      'status_id' => $this->getParticipantStatusID('Registered'),
     ], [
       'id' => $participantA['id'],
       'action' => CRM_Core_Action::UPDATE,
@@ -872,7 +872,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     // Change participant A onto the SAME option participant B already holds.
     $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
       $this->getPriceFieldFormLabel('PaidEvent') => $this->getCheapFeeID(),
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+      'status_id' => $this->getParticipantStatusID('Registered'),
     ], [
       'id' => $participantA['id'],
       'action' => CRM_Core_Action::UPDATE,
@@ -1002,7 +1002,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     // participant B's unrelated pair above.
     $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
       $this->getPriceFieldFormLabel('PaidEvent') => $this->getExpensiveValueID(),
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Registered'),
+      'status_id' => $this->getParticipantStatusID('Registered'),
     ], [
       'id' => $participantA['id'],
       'action' => CRM_Core_Action::UPDATE,

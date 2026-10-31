@@ -2048,7 +2048,7 @@ ENDSQLUPDATE;
     $this->callAPISuccess('Contact', 'create', ['id' => $deadManWalkingID, 'is_deceased' => 1]);
     $this->callApiV3Success('Job', 'process_membership');
     $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipID]);
-    $deceasedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased');
+    $deceasedStatusId = $this->getMembershipStatusID('Deceased');
     $this->assertEquals($deceasedStatusId, $membership['status_id']);
   }
 
@@ -2056,7 +2056,7 @@ ENDSQLUPDATE;
    * Test we get an error is deceased status is disabled.
    */
   public function testProcessMembershipNoDeceasedStatus(): void {
-    $deceasedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Deceased');
+    $deceasedStatusId = $this->getMembershipStatusID('Deceased');
     $this->callAPISuccess('MembershipStatus', 'create', ['is_active' => 0, 'id' => $deceasedStatusId]);
     CRM_Core_PseudoConstant::flush();
 
@@ -2140,10 +2140,7 @@ ENDSQLUPDATE;
     /*
      * Create membership type with inheritance and check processing of secondary memberships.
      */
-    $employerRelationshipId = $this->callAPISuccessGetValue('RelationshipType', [
-      'return' => 'id',
-      'name_b_a' => 'Employer Of',
-    ]);
+    $employerRelationshipId = $this->getRelationshipTypeID('Employee of');
     // Create membership type: inherited through employment.
     $membershipOrgId = $this->organizationCreate();
     $params = [

@@ -79,7 +79,7 @@ class CRM_Contact_Form_IndividualTest extends CiviUnitTestCase {
     $otherEmail = $this->createTestEntity('Email', [
       'contact_id' => $otherContact['id'],
       'email' => 'other@example.com',
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
     ]);
 
     \CRM_Core_Session::singleton()->set('userID', $userContact['id']);
@@ -99,7 +99,7 @@ class CRM_Contact_Form_IndividualTest extends CiviUnitTestCase {
         1 => [
           'id' => $otherEmail['id'],
           'email' => 'hacked@example.com',
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
         ],
       ],
     ], [

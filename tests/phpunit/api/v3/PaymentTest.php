@@ -1089,7 +1089,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
         'pan_truncation' => '1234',
         'trxn_result_code' => 'Startling success',
         'trxn_id' => 1234,
-        'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Debit Card'),
+        'payment_instrument_id' => $this->getPaymentInstrumentID('Debit Card'),
       ],
     ];
     $this->checkPaymentResult($payment, $expectedResult);
@@ -1157,7 +1157,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
         'pan_truncation' => '1234',
         'trxn_result_code' => 'Startling success',
         'trxn_id' => 'trxn_2',
-        'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Debit Card'),
+        'payment_instrument_id' => $this->getPaymentInstrumentID('Debit Card'),
       ],
     ];
     $this->checkPaymentResult($payment, $expectedResult);

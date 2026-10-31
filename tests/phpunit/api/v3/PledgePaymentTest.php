@@ -363,14 +363,14 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'contact_id' => $disallowedContactId,
       'amount' => 100,
       'installments' => 1,
-      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'start_date' => 'now',
     ]);
     $allowedPledgeId = $this->pledgeCreate([
       'contact_id' => $allowedContactId,
       'amount' => 100,
       'installments' => 1,
-      'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'start_date' => 'now',
     ]);
 

@@ -43,7 +43,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
     $this->individualCreate([], 'individual');
     $this->processorCreate();
-    $this->financialTypeID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Member Dues');
+    $this->financialTypeID = $this->getFinancialTypeID('Member Dues');
     $this->organizationCreate([], 'organization');
     $this->createTestEntity('MembershipType', [
       'domain_id' => 1,
@@ -336,7 +336,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $nextYear = (int) CRM_Utils_Time::date('Y') + 1;
     $this->assertEquals(CRM_Utils_Time::date($nextYear . '-01-31'), $membership['end_date']);
     $expectedStatus = (strtotime(CRM_Utils_Time::date('Y-07-14')) > CRM_Utils_Time::time()) ? 'New' : 'Current';
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', $expectedStatus), $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID($expectedStatus), $membership['status_id']);
     $this->assertNotEmpty($membership['contribution_recur_id']);
     $this->assertNotEmpty('original_source', $membership['source']);
 
@@ -893,7 +893,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Time::date('Y-01-01'), $log['start_date']);
     $this->assertEquals(CRM_Utils_Time::date('Y-12-31'), $log['end_date']);
     $this->assertEqualsWithDelta(CRM_Utils_Time::time(), strtotime($log['modified_date']), 20);
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Current'), $log['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('Current'), $log['status_id']);
   }
 
   /**

@@ -470,7 +470,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    */
   public function testSeparatePaymentWithTax(): void {
     $this->enableTaxAndInvoicing();
-    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'));
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID('Donation'));
     $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
     $this->submitOnlineContributionForm([
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
@@ -495,7 +495,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
    */
   public function testSeparatePaymentWithTaxOtherAmount(): void {
     $this->enableTaxAndInvoicing();
-    $this->addTaxAccountToFinancialType(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'));
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID('Donation'));
     $this->contributionPageQuickConfigCreate([], [], FALSE, TRUE, TRUE, TRUE);
     $this->submitOnlineContributionForm([
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],

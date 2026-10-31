@@ -246,7 +246,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   public function testAnnualQueryWithFinancialACLsEnabled(): void {
     $this->enableFinancialACLs();
     $this->createLoggedInUserWithFinancialACL();
-    $permittedFinancialType = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
+    $permittedFinancialType = $this->getFinancialTypeID('Donation');
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
     $this->assertStringContainsString('SUM(total_amount) as amount,', $sql);
     $this->assertStringContainsString('b.contact_id IN (1,2,3)', $sql);
@@ -1468,10 +1468,10 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     ], 'internationalCheck');
     $this->assertEquals(['check_number'], CRM_Contribute_BAO_Contribution::getPaymentInstrumentFields($checkInstrument['value']));
 
-    $cashID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Cash');
+    $cashID = $this->getPaymentInstrumentID('Cash');
     $this->assertEquals([], CRM_Contribute_BAO_Contribution::getPaymentInstrumentFields($cashID));
 
-    $checkID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');
+    $checkID = $this->getPaymentInstrumentID('Check');
     $this->assertEquals(['check_number'], CRM_Contribute_BAO_Contribution::getPaymentInstrumentFields($checkID));
   }
 

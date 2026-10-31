@@ -556,7 +556,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     ], CRM_Core_Session::singleton()->getStatus());
 
     // Check if Membership is set to New.
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('New'), $membership['status_id']);
   }
 
   /**
@@ -584,7 +584,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // Check if Membership is set to New.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('New'), $membership['status_id']);
 
     $this->assertMailSentCount(0);
   }
@@ -608,7 +608,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // Check if Membership is set to New.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('New'), $membership['status_id']);
   }
 
   /**
@@ -640,7 +640,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // Check if Membership is set to New.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('New'), $membership['status_id']);
   }
 
   /**
@@ -748,7 +748,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'record_contribution' => 1,
       'total_amount' => 50,
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
@@ -788,7 +788,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => [$this->ids['Contact']['organization'], $secondMembershipType['id']],
       'status_id' => $this->getMembershipStatusID('New'),
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       //Member dues, see data.xml
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
@@ -854,7 +854,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'record_contribution' => 1,
       'total_amount' => 50,
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
@@ -937,7 +937,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => [$this->ids['Contact']['organization'], $secondMembershipType['id']],
       'status_id' => $this->getMembershipStatusID('New'),
       'receive_date' => date('Y-m-d', strtotime('+1 day')) . ' 20:36:00',
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
     ], [
@@ -1039,7 +1039,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => [$this->ids['Contact']['organization'], $this->ids['MembershipType']['lifetime']],
       'status_id' => $this->getMembershipStatusID('New'),
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
     ], [
@@ -1083,7 +1083,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
       'record_contribution' => 1,
       'total_amount' => $this->formatMoneyInput(50),
-      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
       //Member dues, see data.xml
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
@@ -1367,7 +1367,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     ]);
 
     // Check if Membership is set to Pending.
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('Pending'), $membership['status_id']);
 
     // Check if Contribution is_pay_later flag is set.
     $this->assertEquals(1, $contribution['is_pay_later']);
@@ -1392,7 +1392,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'num_terms' => '2',
       'source' => '',
       'is_override' => TRUE,
-      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'),
+      'status_id' => $this->getMembershipStatusID('Pending'),
       'total_amount' => '50.00',
       //Member dues, see data.xml
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
@@ -1436,7 +1436,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     ]);
 
     // Check if Membership is set to Pending.
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('Pending'), $membership['status_id']);
 
     // Check if Contribution is_pay_later flag is set.
     $this->assertEquals(1, $contribution['is_pay_later']);
@@ -1496,7 +1496,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     // Perform a pay later membership contribution.
     $this->testSubmitPayLaterWithBilling();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('Pending'), $membership['status_id']);
 
     $this->getTestForm('CRM_Member_Form_Membership', [
       'contact_id' => $this->ids['Contact']['individual_0'],
@@ -1510,7 +1510,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // Check if Membership stays as Pending.
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('Pending'), $membership['status_id']);
   }
 
   /**
@@ -1520,11 +1520,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testOverrideSubmit(): void {
-    $pendingStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
+    $pendingStatusId = $this->getMembershipStatusID('Pending');
     $params = $this->getBaseSubmitParams();
     unset($params['auto_renew'], $params['is_recur']);
     $params['is_override'] = 1;
-    $params['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
+    $params['status_id'] = $this->getMembershipStatusID('Pending');
     $this->createLoggedInUser();
     $this->getTestForm('CRM_Member_Form_Membership', $params, [
       'cid' => $this->ids['Contact']['individual_0'],
@@ -1995,7 +1995,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $form->processForm();
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     // Check if Membership is set to Pending.
-    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending'), $membership['status_id']);
+    $this->assertEquals($this->getMembershipStatusID('Pending'), $membership['status_id']);
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'contact_id' => $this->ids['Contact']['individual_0'],
     ]);

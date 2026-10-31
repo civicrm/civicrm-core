@@ -1532,19 +1532,19 @@ civicrm_relationship.is_active = 1 AND
       'total_amount' => 100,
       'financial_type_id' => 'Member Dues',
     ]);
-    $eventFeeType = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee');
+    $eventFeeType = $this->getFinancialTypeID('Event Fee');
     $this->createContributionWithTwoLineItemsAgainstPriceSet(['contact_id' => $contactID, 'source' => 'SSF']);
     $this->createContributionWithTwoLineItemsAgainstPriceSet(['contact_id' => $contactID, 'source' => 'SSF'], [
-      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      $this->getFinancialTypeID('Donation'),
       $eventFeeType,
     ], 'event_fee');
     $this->createContributionWithTwoLineItemsAgainstPriceSet(['contact_id' => $contactID, 'source' => 'SSF'], [
-      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
-      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      $this->getFinancialTypeID('Donation'),
+      $this->getFinancialTypeID('Donation'),
     ], 'two_donations');
     $this->createContributionWithTwoLineItemsAgainstPriceSet(['contact_id' => $contactID, 'source' => 'SSF', 'financial_type_id' => $eventFeeType], [
-      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
-      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      $this->getFinancialTypeID('Donation'),
+      $this->getFinancialTypeID('Donation'),
     ], 'two_more_donations');
     $this->contributionCreate([
       'contact_id' => $contactID,

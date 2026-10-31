@@ -287,7 +287,7 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     $this->createTestEntity('Address', [
       'contact_id' => $org['id'],
       'street_address' => '123 Main St',
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
     ], 'perm_org_address');
 
     $ind = $this->createTestEntity('Contact', [
@@ -417,7 +417,7 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $this->assertIsArray($e->errorData);
-      $this->assertEquals('123 Main St', $e->errorData['onbehalf_street_address-1']['value'] ?? NULL);
+      $this->assertEquals('123 Main St', $e->errorData['onbehalf_street_address-' . $this->getLocationTypeID('Home')]['value'] ?? NULL);
     }
   }
 
@@ -439,7 +439,7 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $this->assertIsArray($e->errorData);
-      $this->assertEquals('123 Main St', $e->errorData['onbehalf_street_address-1']['value'] ?? NULL);
+      $this->assertEquals('123 Main St', $e->errorData['onbehalf_street_address-' . $this->getLocationTypeID('Home')]['value'] ?? NULL);
     }
   }
 

@@ -764,7 +764,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $householdAddressId = $this->createTestEntity('Address', [
       'street_address' => '123 Fake St.',
-      'location_type_id' => $this->getLocationTypeID('Home'),
+      'location_type_id:name' => 'Home',
       'is_primary' => 1,
       'contact_id' => $householdId,
     ], 'household')['id'];
@@ -773,7 +773,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     // active 'Household Member of' relationship.
     $this->createTestEntity('Address', [
       'street_address' => '123 Fake St.',
-      'location_type_id' => $this->getLocationTypeID('Home'),
+      'location_type_id:name' => 'Home',
       'is_primary' => 1,
       'master_id' => $householdAddressId,
       'contact_id' => $memberId,
@@ -1104,7 +1104,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $victimContactId = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Victim'], 'victim')['id'];
     $victimAddressId = $this->createTestEntity('Address', [
       'contact_id' => $victimContactId,
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
       'street_address' => 'Victim Street',
     ])['id'];
 
@@ -1113,7 +1113,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'address' => [
         1 => [
           'id' => $victimAddressId,
-          'location_type_id' => 1,
+          'location_type_id' => $this->getLocationTypeID('Home'),
           'street_address' => 'User Street',
         ],
       ],
@@ -1139,7 +1139,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $victimContactId = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Victim'], 'victim')['id'];
     $victimAddressId = $this->createTestEntity('Address', [
       'contact_id' => $victimContactId,
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
       'street_address' => 'Victim Street',
     ])['id'];
 
@@ -1173,14 +1173,14 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $masterAddress = $this->createTestEntity('Address', [
       'contact_id' => $orgContact['id'],
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
       'street_address' => '100 Main St',
       'city' => 'Metropolis',
     ], 'master_address');
 
     $childAddress = $this->createTestEntity('Address', [
       'contact_id' => $userContact,
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
       'master_id' => $masterAddress['id'],
       'street_address' => '100 Main St',
       'city' => 'Metropolis',
@@ -1226,7 +1226,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $masterAddress = $this->createTestEntity('Address', [
       'contact_id' => $orgContact['id'],
-      'location_type_id' => 1,
+      'location_type_id:name' => 'Home',
       'street_address' => '500 Original St',
       'city' => 'Gotham',
     ], 'master_address_2');
@@ -1238,7 +1238,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     CRM_Core_BAO_Address::writeRecord([
       'contact_id' => $userContact['id'],
-      'location_type_id' => 1,
+      'location_type_id' => $this->getLocationTypeID('Home'),
       'master_id' => $masterAddress['id'],
       'street_address' => 'Overwritten St',
       'city' => 'Gotham',

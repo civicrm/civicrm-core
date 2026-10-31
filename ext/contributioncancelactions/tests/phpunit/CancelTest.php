@@ -81,7 +81,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
     Relationship::create()->setValues([
       'contact_id_a' => $this->ids['contact'][0],
       'contact_id_b' => Contact::create()->setValues(['first_name' => 'Bugs', 'last_name' => 'Bunny'])->execute()->first()['id'],
-      'relationship_type_id' => RelationshipType::get()->addWhere('name_a_b', '=', 'AB')->execute()->first()['id'],
+      'relationship_type_id:name' => 'AB',
     ])->execute();
 
     $this->createMembershipOrder();

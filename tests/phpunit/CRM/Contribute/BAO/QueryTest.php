@@ -30,7 +30,7 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID, 'financial_type_id' => 'Campaign Contribution']);
     $this->contributionCreate(['contact_id' => $contactID, 'financial_type_id' => 'Donation']);
-    $donationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
+    $donationTypeID = $this->getFinancialTypeID('Donation');
 
     $params = [
       ['financial_type_id', '=', $donationTypeID , 1, 0],

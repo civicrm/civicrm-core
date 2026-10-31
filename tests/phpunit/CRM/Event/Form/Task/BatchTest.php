@@ -79,7 +79,7 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
    * @param string $status
    */
   private function submitParticipantStatus(string $status): void {
-    $statusID = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', $status);
+    $statusID = $this->getParticipantStatusID($status);
     $this->getTestForm('CRM_Event_Form_Task_Batch', [
       'field' => [$this->ids['Participant'][0] => ['participant_status' => $statusID]],
     ])->postProcess();
