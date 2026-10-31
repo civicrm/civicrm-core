@@ -11,35 +11,27 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
 use Civi\Api4\Generic\Traits\SavedSearchInspectorTrait;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\PreEvent;
 use Civi\Core\Service\AutoService;
 use Civi\Search\Meta;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Presave helper for search displays of type "batch"
  * @service
  * @internal
  */
-class BatchDisplaySubscriber extends AutoService implements EventSubscriberInterface {
+class BatchDisplaySubscriber extends AutoService {
 
   use SavedSearchInspectorTrait;
 
   /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_pre::SearchDisplay' => 'onPreSaveDisplay',
-    ];
-  }
-
-  /**
    * @param \Civi\Core\Event\PreEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::SearchDisplay')]
   public function onPreSaveDisplay(PreEvent $event): void {
     if (!$this->applies($event)) {
       return;

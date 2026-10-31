@@ -11,6 +11,7 @@
 
 namespace Civi\Api4\Service;
 
+use Civi\Core\Attribute\CiviEventListener;
 use CRM_Member_ExtensionUtil as E;
 use Civi\Core\Event\GenericHookEvent;
 
@@ -18,17 +19,12 @@ use Civi\Core\Event\GenericHookEvent;
  * @service
  * @internal
  */
-class MembershipTasksProvider extends \Civi\Core\Service\AutoSubscriber {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_searchKitTasks' => 'addMembershipTasks',
-    ];
-  }
+class MembershipTasksProvider extends \Civi\Core\Service\AutoService {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_searchKitTasks')]
   public function addMembershipTasks(GenericHookEvent $event): void {
     foreach (\CRM_Member_Task::tasks() as $id => $task) {
       if (!empty($task['url'])) {

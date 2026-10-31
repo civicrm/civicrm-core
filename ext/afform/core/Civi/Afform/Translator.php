@@ -2,27 +2,19 @@
 
 namespace Civi\Afform;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Angular\ChangeSet;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @service civi.afform.translator
  */
-class Translator extends AutoService implements EventSubscriberInterface {
-
-  /**
-   *
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      '&hook_civicrm_alterAngular' => 'translateAfform',
-    ];
-  }
+class Translator extends AutoService {
 
   /**
    * @param \Civi\Angular\Manager $angular
    */
+  #[CiviEventListener(event: '&hook_civicrm_alterAngular')]
   public function translateAfform($angular) {
 
     /**

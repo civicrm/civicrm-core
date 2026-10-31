@@ -11,20 +11,15 @@
 
 namespace Civi\Authx;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @service authx.ignore_improvised_proxy
  */
-class IgnoreImprovisedFirewall extends AutoService implements EventSubscriberInterface {
+class IgnoreImprovisedFirewall extends AutoService {
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.authx.checkPolicy' => ['onCheckPolicy', -500],
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.authx.checkPolicy', priority: -500)]
   public function onCheckPolicy(CheckPolicyEvent $event) {
     if (
       // The request uses the standard HTTP Authorization header...

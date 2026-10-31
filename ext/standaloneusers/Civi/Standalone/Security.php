@@ -1,9 +1,9 @@
 <?php
 namespace Civi\Standalone;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi;
 use CRM_Standaloneusers_BAO_Role;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Security related functions for Standaloneusers.
@@ -22,14 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @service standaloneusers.security
  */
-class Security extends Civi\Core\Service\AutoService implements EventSubscriberInterface {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      '&civi.standalone.loadUser' => ['onLoadUser', 1000],
-      '&civi.standalone.checkPassword' => ['onCheckPassword', -500],
-    ];
-  }
+class Security extends Civi\Core\Service\AutoService {
 
   /**
    * @return Security
@@ -133,6 +126,7 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
     return $success ?: FALSE;
   }
 
+  #[CiviEventListener(event: '&civi.standalone.checkPassword', priority: -500)]
   public function onCheckPassword(array $cred, array $user, ?bool &$success): void {
     if ($success === NULL && !empty($user['hashed_password']) && $this->checkHashedPassword($cred['password'], $user['hashed_password'])) {
       $success = TRUE;
@@ -156,6 +150,7 @@ class Security extends Civi\Core\Service\AutoService implements EventSubscriberI
     return $user;
   }
 
+  #[CiviEventListener(event: '&civi.standalone.loadUser', priority: 1000)]
   public function onLoadUser(array $cred, ?array &$user): void {
     $user = \Civi\Api4\User::get(FALSE)
       ->addWhere('username', '=', $cred['username'])

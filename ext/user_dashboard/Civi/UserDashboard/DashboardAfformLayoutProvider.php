@@ -1,28 +1,21 @@
 <?php
 namespace Civi\UserDashboard;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
  * @service
  * @internal
  */
-class DashboardAfformLayoutProvider extends \Civi\Core\Service\AutoSubscriber {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.afform.get' => [
-        ['addDashboardLayout', -100],
-        ['addGroupSubscriptionLayout', -100],
-      ],
-    ];
-  }
+class DashboardAfformLayoutProvider extends \Civi\Core\Service\AutoService {
 
   /**
    * Provides markup for the dashboard layout.
    *
    * Dynamically retrieves search displays tagged as "UserDashboard" and includes them in the generated layout.
    */
+  #[CiviEventListener(event: 'civi.afform.get', priority: -100)]
   public function addDashboardLayout(GenericHookEvent $event) {
     if (!$event->getLayout ||
       ($event->getTypes && !in_array('search', $event->getTypes)) ||
@@ -57,6 +50,7 @@ class DashboardAfformLayoutProvider extends \Civi\Core\Service\AutoSubscriber {
   /**
    * Generates dynamic form layout for subscribing to public groups.
    */
+  #[CiviEventListener(event: 'civi.afform.get', priority: -100)]
   public function addGroupSubscriptionLayout(GenericHookEvent $event) {
     if (!$event->getLayout ||
       ($event->getTypes && !in_array('form', $event->getTypes)) ||

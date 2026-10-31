@@ -11,6 +11,7 @@
 
 namespace Civi\Api4\Service\Links;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\API\Event\RespondEvent;
 use Civi\Core\Event\GenericHookEvent;
 
@@ -18,20 +19,14 @@ use Civi\Core\Event\GenericHookEvent;
  * @service
  * @internal
  */
-class CaseLinksProvider extends \Civi\Core\Service\AutoSubscriber {
+class CaseLinksProvider extends \Civi\Core\Service\AutoService {
   use LinksProviderTrait;
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api4.getLinks' => 'alterCaseLinks',
-      'civi.api.respond' => ['alterActivityLinksResult', -50],
-    ];
-  }
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @return void
    */
+  #[CiviEventListener(event: 'civi.api4.getLinks')]
   public static function alterCaseLinks(GenericHookEvent $e): void {
     // Tweak case view/edit links
     if ($e->entity === 'Case') {
@@ -51,6 +46,7 @@ class CaseLinksProvider extends \Civi\Core\Service\AutoSubscriber {
    * @return void
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'civi.api.respond', priority: -50)]
   public static function alterActivityLinksResult(RespondEvent $e): void {
     $request = $e->getApiRequest();
     if ($request['version'] == 4 && $request->getEntityName() === 'Activity' && is_a($request, '\Civi\Api4\Action\GetLinks')) {

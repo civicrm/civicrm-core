@@ -11,6 +11,7 @@
 
 namespace Civi\AdminUI;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\PostEvent;
 use CRM_CivicrmAdminUi_ExtensionUtil as E;
@@ -18,29 +19,13 @@ use CRM_CivicrmAdminUi_ExtensionUtil as E;
 /**
  * Add SearchKit/FormBuilder displays for CustomGroups
  *
+ * @service
+ * @internal
  * @see \Civi\Api4\Action\CustomGroup\GetSearchKit
  */
-class CustomGroupDisplays extends \Civi\Core\Service\AutoSubscriber {
+class CustomGroupDisplays extends \Civi\Core\Service\AutoService {
 
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      // NOTE: we need to add the base declarations early because they may become
-      // out of date *during* the reconciliation process - we dont want the initial
-      // hooks to overwrite updates made when CustomFields are added by other extensions
-      'hook_civicrm_managed' => ['registerSearchKits', \Civi\API\Events::W_EARLY],
-      'hook_civicrm_post::CustomGroup' => 'onGroupChange',
-      // TODO: finish https://github.com/civicrm/civicrm-core/pull/34192 and then use
-      // a field wildcard in the search kit declaration => then fields will always be
-      // correct at run time and we wont need to hook into CustomField edits
-      'hook_civicrm_post::CustomField' => 'onFieldChange',
-      // Register links to the displays in the entity schema
-      'civi.api4.entityTypes' => ['addCustomGroupLinks', \Civi\API\Events::W_LATE],
-    ];
-  }
-
+  #[CiviEventListener(event: 'hook_civicrm_managed', priority: \Civi\API\Events::W_EARLY)]
   public function registerSearchKits(GenericHookEvent $e): void {
     if ($e->modules && !in_array(E::LONG_NAME, $e->modules, TRUE)) {
       return;
@@ -59,6 +44,7 @@ class CustomGroupDisplays extends \Civi\Core\Service\AutoSubscriber {
     }
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_post::CustomGroup')]
   public function onGroupChange(PostEvent $e): void {
     $groupName = $e->object->name;
 
@@ -112,6 +98,7 @@ class CustomGroupDisplays extends \Civi\Core\Service\AutoSubscriber {
     \CRM_Core_ManagedEntities::singleton()->reconcileDeclarations($declarations);
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_post::CustomField')]
   public function onFieldChange(PostEvent $e): void {
     // NOTE: group should still exist even if deleting field
     $groupId = $e->object->custom_group_id;
@@ -126,6 +113,7 @@ class CustomGroupDisplays extends \Civi\Core\Service\AutoSubscriber {
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event
    */
+  #[CiviEventListener(event: 'civi.api4.entityTypes', priority: \Civi\API\Events::W_LATE)]
   public function addCustomGroupLinks(GenericHookEvent $event) {
     foreach ($event->entities as $name => $entity) {
       if (str_starts_with($name, 'Custom_')) {

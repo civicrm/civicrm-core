@@ -11,10 +11,9 @@
 
 namespace Civi\Authx;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Civi\Standalone\MFA\Base as MFABase;
-use Civi\Standalone\Security;
 use Civi\Standalone\Event\LogoutEvent;
 
 /**
@@ -23,23 +22,14 @@ use Civi\Standalone\Event\LogoutEvent;
  *
  * @service authx_standalone
  */
-class Standalone extends AutoService implements AuthxInterface, EventSubscriberInterface {
-
-  /**
-   * @inheritdoc
-   */
-  public static function getSubscribedEvents(): array {
-    $events = [];
-    // Priority is for this to be called before the password check.
-    $events['civi.authx.checkCredential'][] = ['disallowBasicAuthIfMFAEnabled', CheckCredential::PRIORITY_BASIC_USER + 1];
-    return $events;
-  }
+class Standalone extends AutoService implements AuthxInterface {
 
   /**
    * Disallow HTTP "Basic" credential as `username:password` when MFA is required.
    *
    * @param \Civi\Authx\CheckCredentialEvent $check
    */
+  #[CiviEventListener(event: 'civi.authx.checkCredential', priority: CheckCredential::PRIORITY_BASIC_USER + 1)]
   public function disallowBasicAuthIfMFAEnabled(CheckCredentialEvent $check): void {
     if ($check->credFormat === 'Basic') {
       if (MFABase::getAvailableClasses()) {

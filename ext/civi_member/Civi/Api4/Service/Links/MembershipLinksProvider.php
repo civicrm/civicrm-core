@@ -12,6 +12,7 @@
 
 namespace Civi\Api4\Service\Links;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\API\Event\RespondEvent;
 use Civi\Api4\Membership;
 use Civi\Core\Event\GenericHookEvent;
@@ -21,16 +22,10 @@ use Civi\Payment\System;
  * @service
  * @internal
  */
-class MembershipLinksProvider extends \Civi\Core\Service\AutoSubscriber {
+class MembershipLinksProvider extends \Civi\Core\Service\AutoService {
   use LinksProviderTrait;
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api4.getLinks' => 'alterMembershipLinks',
-      'civi.api.respond' => 'alterMembershipLinksResult',
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.api4.getLinks')]
   public static function alterMembershipLinks(GenericHookEvent $e): void {
     if ($e->entity == 'Membership') {
       $addTemplate = [
@@ -46,6 +41,7 @@ class MembershipLinksProvider extends \Civi\Core\Service\AutoSubscriber {
     }
   }
 
+  #[CiviEventListener(event: 'civi.api.respond')]
   public static function alterMembershipLinksResult(RespondEvent $e): void {
     $request = $e->getApiRequest();
     if ($request['version'] == 4 && $request->getEntityName() === 'Membership' && is_a($request, '\Civi\Api4\Action\GetLinks')) {
