@@ -2,6 +2,9 @@
 
 namespace Civi\Core\Event;
 
+use Civi\Core\Attribute\CiviEventListener;
+use Civi\Core\ClassScanner;
+
 /**
  * The `EventScanner` is a utility for scanning a class to see if it has any event-listeners. It may check
  * for common interfaces and conventions. Example:
@@ -50,17 +53,13 @@ class EventScanner {
    *   The object/class which will receive the notifications.
    *   Use a string (class-name) if the listeners are static methods.
    *   Use an object-instance if the listeners are regular methods.
-   * @param string|null $self
-   *   If the target $class is focused on a specific entity/form/etc, use the `$self` parameter to specify it.
-   *   This will activate support for `self_{$event}` methods.
-   *   Ex: if '$self' is 'Contact', then 'function self_hook_civicrm_pre()' maps to 'on_hook_civicrm_pre::Contact'.
    * @return array
    *   List of events/listeners. Format is compatible with 'getSubscribedEvents()'.
    *   Ex: ['some.event' => [['firstFunc'], ['secondFunc']]
    */
-  public static function findListeners($target, $self = NULL): array {
+  public static function findListeners($target): array {
     $class = is_object($target) ? get_class($target) : $target;
-    $key = "$class::" . ($self ?: '');
+    $key = $class;
     if (isset(self::$listenerMaps[$key])) {
       return self::$listenerMaps[$key];
     }
@@ -68,11 +67,12 @@ class EventScanner {
     $listenerMap = [];
     // These 2 interfaces do the same thing; one is meant for unit tests and the other for runtime code
     if (is_subclass_of($class, '\Civi\Core\HookInterface')) {
-      $listenerMap = static::mergeListenerMap($listenerMap, static::findFunctionListeners($class, $self));
+      $listenerMap = static::mergeListenerMap($listenerMap, static::findFunctionListeners($class));
     }
     if (is_subclass_of($class, '\Symfony\Component\EventDispatcher\EventSubscriberInterface')) {
       $listenerMap = static::mergeListenerMap($listenerMap, static::normalizeListenerMap($class::getSubscribedEvents()));
     }
+    $listenerMap = static::mergeListenerMap($listenerMap, static::findAttributeListeners($class));
 
     if (CIVICRM_UF === 'UnitTests') {
       self::$listenerMaps[$key] = $listenerMap;
@@ -82,13 +82,9 @@ class EventScanner {
 
   /**
    * @param string $class
-   * @param string|null $self
-   *   If the target $class is focused on a specific entity/form/etc, use the `$self` parameter to specify it.
-   *   This will activate support for `self_{$event}` methods.
-   *   Ex: if '$self' is 'Contact', then 'function self_hook_civicrm_pre()' maps to 'hook_civicrm_pre::Contact'.
    * @return array
    */
-  protected static function findFunctionListeners(string $class, $self = NULL): array {
+  protected static function findFunctionListeners(string $class): array {
     $listenerMap = [];
 
     /**
@@ -122,16 +118,41 @@ class EventScanner {
             break;
 
           case 'self_':
-            if ($self === NULL) {
-              throw new \RuntimeException("Cannot add self_*() listeners for $class");
-            }
-            $addListener($toEventName(substr($func, 5)) . '::' . $self, $func);
+            // Ex: if '$self' is 'Contact', then 'function self_hook_civicrm_pre()' maps to 'hook_civicrm_pre::Contact'.
+            $addListener($toEventName(substr($func, 5)) . '::' . self::getSelfEntity($class), $func);
             break;
         }
       }
     }
 
     return $listenerMap;
+  }
+
+  /**
+   * Scan the class's public methods for `#[CiviEventListener]` attributes.
+   *
+   * @param string $class
+   * @return array
+   */
+  protected static function findAttributeListeners(string $class): array {
+    $listenerMap = [];
+    foreach (ClassScanner::findAttributes(new \ReflectionClass($class), CiviEventListener::class) as [$attribute, $method]) {
+      /** @var \Civi\Core\Attribute\CiviEventListener $listener */
+      $listener = $attribute->newInstance();
+      $event = str_contains($listener->event, '{self}')
+        ? str_replace('{self}', self::getSelfEntity($class), $listener->event)
+        : $listener->event;
+      $listenerMap[$event][] = [$method->getName(), $listener->priority];
+    }
+    return $listenerMap;
+  }
+
+  private static function getSelfEntity(string $class): string {
+    $self = \CRM_Core_DAO_AllCoreTables::getEntityNameForClass($class);
+    if ($self === NULL) {
+      throw new \RuntimeException("Cannot resolve self entity for $class");
+    }
+    return $self;
   }
 
   /**

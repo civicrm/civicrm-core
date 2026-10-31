@@ -3,6 +3,8 @@
 namespace Civi\Core\Service;
 
 use Civi\Api4\Utils\ReflectionUtils;
+use Civi\Core\Attribute\CiviEventListener;
+use Civi\Core\ClassScanner;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -152,6 +154,9 @@ class AutoDefinition {
     $result = isset($docBlock['serviceTags']) ? static::splitSymbols($docBlock['serviceTags']) : [];
     if (isset(static::$forceServiceTags[$className])) {
       $result[] = static::$forceServiceTags[$className];
+    }
+    if (ClassScanner::findAttributes($class, CiviEventListener::class)) {
+      $result[] = 'event_subscriber';
     }
     $parents = array_merge($class->getInterfaces(), $class->getTraits(), [$class->getParentClass()]);
     foreach ($parents as $parent) {
