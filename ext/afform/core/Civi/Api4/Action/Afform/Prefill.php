@@ -33,11 +33,9 @@ class Prefill extends AbstractProcessor {
           ->execute()->first();
       }
     }
+    parent::loadEntities();
     if (!empty($afformSubmission['data'])) {
       $this->populateSubmissionData($afformSubmission['data']);
-    }
-    else {
-      parent::loadEntities();
     }
   }
 
@@ -45,11 +43,44 @@ class Prefill extends AbstractProcessor {
    * Load the data from submission table
    */
   protected function populateSubmissionData(array $submissionData) {
-    $this->_entityValues = $this->_formDataModel->getEntities();
-    foreach ($this->_entityValues as $entity => &$values) {
-      foreach ($submissionData as $e => $submission) {
-        if ($entity === $e) {
-          $values = $submission ?? [];
+    $submissionData = $this->filterDraftValues($submissionData);
+    foreach ($submissionData as $entityName => $records) {
+      if (!is_array($records)) {
+        continue;
+      }
+      foreach ($records as $index => $record) {
+        if (!is_array($record)) {
+          continue;
+        }
+        $this->_entityValues[$entityName][$index] ??= ['fields' => []];
+        if (isset($record['fields']) && is_array($record['fields'])) {
+          $this->_entityValues[$entityName][$index]['fields'] = array_merge(
+            $this->_entityValues[$entityName][$index]['fields'] ?? [],
+            $record['fields']
+          );
+        }
+        if (isset($record['extras']) && is_array($record['extras'])) {
+          $this->_entityValues[$entityName][$index]['extras'] = array_merge(
+            $this->_entityValues[$entityName][$index]['extras'] ?? [],
+            $record['extras']
+          );
+        }
+        if (isset($record['joins']) && is_array($record['joins'])) {
+          $this->_entityValues[$entityName][$index]['joins'] ??= [];
+          foreach ($record['joins'] as $joinEntity => $joinRecords) {
+            if (!is_array($joinRecords)) {
+              continue;
+            }
+            $this->_entityValues[$entityName][$index]['joins'][$joinEntity] ??= [];
+            foreach ($joinRecords as $joinIndex => $joinRecord) {
+              if (is_array($joinRecord)) {
+                $this->_entityValues[$entityName][$index]['joins'][$joinEntity][$joinIndex] = array_merge(
+                  $this->_entityValues[$entityName][$index]['joins'][$joinEntity][$joinIndex] ?? [],
+                  $joinRecord
+                );
+              }
+            }
+          }
         }
       }
     }
