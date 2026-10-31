@@ -17,6 +17,7 @@
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * Trait for entities with an entity_table + entity_id dynamic FK.
@@ -35,6 +36,7 @@ trait CRM_Core_DynamicFKAccessTrait {
    * @throws \CRM_Core_Exception
    * @throws \Civi\API\Exception\UnauthorizedException
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function checkDynamicFKAccessPre(\Civi\Core\Event\PreEvent $event): void {
     if (empty($event->params['check_permissions'])) {
       return;
@@ -84,6 +86,7 @@ trait CRM_Core_DynamicFKAccessTrait {
   /**
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
   public static function checkDynamicFKAccessAuthorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $userID = $e->getUserID();

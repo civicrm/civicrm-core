@@ -17,6 +17,7 @@
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * Trait shared with entities attached to the contact record.
@@ -33,6 +34,7 @@ trait CRM_Contact_AccessTrait {
    *
    * @throws \Civi\API\Exception\UnauthorizedException
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function checkContactAccessPre(\Civi\Core\Event\PreEvent $event): void {
     if (empty($event->params['check_permissions'])) {
       return;
@@ -76,6 +78,7 @@ trait CRM_Contact_AccessTrait {
    * Callback for `civi.api4.authorizeRecord` event.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
   public static function checkContactAccessAuthorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $userID = $e->getUserID();
