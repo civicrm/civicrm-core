@@ -2375,23 +2375,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'checkPermissions' => FALSE,
       'select' => ['*', 'custom.*'],
     ];
+    if ($blockInfo['entity'] === 'Address') {
+      $searchParams['select'][] = 'display';
+    }
     $locationBlock = [];
     $values = civicrm_api4($blockInfo['entity'], 'get', $searchParams);
     if (count($values)) {
       $cnt = 0;
       foreach ($values as $value) {
         $locationBlock[$cnt] = $value;
-        // Fix address display
-        if ($blockInfo['entity'] == 'Address') {
-          // For performance avoid geocoding while merging https://issues.civicrm.org/jira/browse/CRM-21786
-          // we can expect existing geocode values to be retained.
-          $value['skip_geocode'] = TRUE;
-          CRM_Core_BAO_Address::fixAddress($value);
-          unset($value['skip_geocode']);
-          $locationBlock[$cnt]['display'] = CRM_Utils_Address::format($value);
-        }
         // Fix email display
-        elseif ($blockInfo['entity'] == 'Email') {
+        if ($blockInfo['entity'] == 'Email') {
           $locationBlock[$cnt]['display'] = CRM_Utils_Mail::format($value);
         }
 
