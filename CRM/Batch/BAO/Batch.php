@@ -783,8 +783,15 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
       $from .= " " . implode(" ", $customJoins);
     }
 
-    $whereTables = $query->_whereTables;
-    unset($whereTables['civicrm_contact'], $whereTables['civicrm_contribution']);
+    // Tables the FROM above already joins; joining them again is a SQL error or duplicates rows.
+    $whereTables = array_diff_key($query->_whereTables, array_flip([
+      'civicrm_contact',
+      'civicrm_contribution',
+      'civicrm_contribution_recur',
+      'civicrm_contribution_soft',
+      'civicrm_entity_financial_trxn',
+      'civicrm_financial_trxn',
+    ]));
     $fromExtra = trim(str_replace('FROM civicrm_contact contact_a', '', CRM_Contact_BAO_Query::fromClause($whereTables)));
     if ($fromExtra) {
       $from .= ' ' . $fromExtra;
