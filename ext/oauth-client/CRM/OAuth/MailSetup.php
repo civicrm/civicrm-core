@@ -118,7 +118,20 @@ class CRM_OAuth_MailSetup {
     ])->first();
 
     if ($token === NULL) {
-      return;
+      // A rejected refresh leaves the token out of the result; without this the poll would go ahead
+      // with the account's (empty) password and fail as an IMAP login error.
+      $rejected = \Civi\Api4\OAuthSysToken::get(FALSE)
+        ->addSelect('error')
+        ->addWhere('tag', '=', 'MailSettings:' . $mailSettings['id'])
+        ->addOrderBy('id', 'DESC')
+        ->execute()
+        ->first();
+      if ($rejected === NULL) {
+        return;
+      }
+      $error = $rejected['error'] ?? [];
+      throw new \Civi\OAuth\OAuthException(sprintf('Could not refresh the OAuth token for mail store #%d: %s',
+        $mailSettings['id'], $error['error_description'] ?? $error['error'] ?? 'unknown error'));
     }
     // Not certain if 'refresh' will complain about staleness. Doesn't hurt to double-check.
     if (empty($token['access_token']) || $token['expires'] < CRM_Utils_Time::time()) {
