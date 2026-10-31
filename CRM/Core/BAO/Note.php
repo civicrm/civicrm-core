@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -20,7 +21,7 @@ use Civi\Api4\Event\AuthorizeRecordEvent;
 /**
  * BAO object for crm_note table.
  */
-class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
   use CRM_Core_DynamicFKAccessTrait;
   use CRM_Core_OwnershipAccessTrait;
 
@@ -210,6 +211,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
    * Event fired prior to modifying a Note.
    * @param \Civi\Core\Event\PreEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if (!empty($event->params['check_permissions']) && ($event->action === 'edit' || $event->action === 'delete') && $event->id) {
       if ($event->action === 'delete') {
@@ -241,6 +243,8 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
       }
     }
   }
+
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
 
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();

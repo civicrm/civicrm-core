@@ -21,9 +21,6 @@ use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * Trait shared with entities attached to the contact record.
- *
- * Users of this trait must implement HookInterface.
- * @phpstan-require-implements \Civi\Core\HookInterface
  */
 trait CRM_Contact_AccessTrait {
 

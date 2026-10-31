@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
@@ -18,7 +19,7 @@ use Civi\Api4\Relationship;
 /**
  * Class CRM_Contact_BAO_Relationship.
  */
-class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implements \Civi\Core\HookInterface {
+class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
   /**
    * Various constants to indicate different type of relationships.
@@ -561,6 +562,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if ($event->action === 'delete' && $event->id) {
       self::clearCurrentEmployer($event->id, CRM_Core_Action::DELETE);
@@ -572,6 +574,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship implemen
    * @param \Civi\Core\Event\PostEvent $event
    * @throws CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     if ($event->action === 'delete' && $event->id) {
       if (CRM_Core_Permission::access('CiviMember')) {
@@ -2292,6 +2295,7 @@ SELECT count(*)
    * Check related contact access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $userID = $e->getUserID();

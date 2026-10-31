@@ -1,13 +1,14 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -22,7 +23,7 @@ use Civi\WorkflowMessage\WorkflowMessage;
 /**
  * Class CRM_Core_BAO_MessageTemplate.
  */
-class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
   /**
    * @deprecated
@@ -136,6 +137,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if ($event->action === 'create' || $event->action === 'edit') {
       self::checkWorkflow($event->params);
@@ -154,6 +156,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    * @param \Civi\Core\Event\PostEvent $event
    * @throws CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     if ($event->action === 'create' || $event->action === 'edit') {
       $fileParams = $event->params['file_id'] ?? NULL;
@@ -491,6 +494,7 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate implemen
    *
    * @see CRM_Utils_Hook::translateFields
    */
+  #[CiviEventListener(event: '&hook_civicrm_translateFields')]
   public static function hook_civicrm_translateFields(&$fields) {
     $fields['civicrm_msg_template']['msg_subject'] = TRUE;
     $fields['civicrm_msg_template']['msg_text'] = TRUE;

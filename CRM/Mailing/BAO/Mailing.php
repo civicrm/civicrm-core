@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -21,7 +22,7 @@ use Civi\Api4\MailingGroup;
 /**
  * Class CRM_Mailing_BAO_Mailing
  */
-class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing implements \Civi\Core\HookInterface {
+class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
 
   /**
    * An array that holds the complete templates
@@ -1831,6 +1832,7 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if ($event->action === 'create') {
       $params = &$event->params;

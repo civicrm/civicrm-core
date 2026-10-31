@@ -21,9 +21,6 @@ use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * Trait for entities with an entity_table + entity_id dynamic FK.
- *
- * Users of this trait must implement HookInterface.
- * @phpstan-require-implements \Civi\Core\HookInterface
  */
 trait CRM_Core_DynamicFKAccessTrait {
 
