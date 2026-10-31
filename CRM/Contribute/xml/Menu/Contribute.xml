@@ -68,12 +68,6 @@
     <weight>430</weight>
   </item>
   <item>
-    <path>civicrm/admin/contribute/friend</path>
-    <title>Tell a Friend</title>
-    <page_callback>CRM_Friend_Form_Contribute</page_callback>
-    <weight>440</weight>
-  </item>
-  <item>
     <path>civicrm/admin/contribute/widget</path>
     <title>Configure Widget</title>
     <page_callback>CRM_Contribute_Form_ContributionPage_Widget</page_callback>

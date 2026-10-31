@@ -164,15 +164,16 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $daoEvent->save();
     $this->assertDBNotNull('CRM_Event_DAO_Event', $daoEvent->id, 'id', 'id', 'Check DB if event was created');
 
-    //Create tell a friend for event
-    $daoTellAFriend = new CRM_Friend_DAO_Friend();
-    $daoTellAFriend->entity_table = 'civicrm_event';
+    //Create PCP block for event
+    $daoPCPBlock = new CRM_PCP_DAO_PCPBlock();
+    $daoPCPBlock->entity_table = 'civicrm_event';
     // join with event
-    $daoTellAFriend->entity_id = $daoEvent->id;
-    $daoTellAFriend->title = 'Testing tell a friend';
-    $daoTellAFriend->is_active = 1;
-    $daoTellAFriend->save();
-    $this->assertDBNotNull('CRM_Friend_DAO_Friend', $daoTellAFriend->id, 'id', 'id', 'Check DB if tell a friend was created');
+    $daoPCPBlock->entity_id = $daoEvent->id;
+    $daoPCPBlock->target_entity_type = 'event';
+    $daoPCPBlock->target_entity_id = $daoEvent->id;
+    $daoPCPBlock->is_active = 1;
+    $daoPCPBlock->save();
+    $this->assertDBNotNull('CRM_PCP_DAO_PCPBlock', $daoPCPBlock->id, 'id', 'id', 'Check DB if PCP block was created');
 
     // time to use recursion
     $recursion = new CRM_Core_BAO_RecurringEntity();
@@ -191,7 +192,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
 
     $recursion->linkedEntities = [
       [
-        'table' => 'civicrm_tell_friend',
+        'table' => 'civicrm_pcp_block',
         'findCriteria' => [
           'entity_id' => $recursion->entity_id,
           'entity_table' => 'civicrm_event',
@@ -224,11 +225,11 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $resultDates = array_diff($actualDates, $expectedDates);
     $this->assertEquals(0, count($resultDates), "Check if all the value in expected array matches actual array");
 
-    foreach ($generatedEntities['civicrm_tell_friend'] as $key => $val) {
-      $this->assertDBNotNull('CRM_Friend_DAO_Friend', $val, 'id', 'id', 'Check if friends were created in loop');
-      $this->assertDBCompareValue('CRM_Friend_DAO_Friend', $val, 'entity_id', 'id', $generatedEntities['civicrm_event'][$key], 'Check DB if correct FK was maintained with event for Friend');
+    foreach ($generatedEntities['civicrm_pcp_block'] as $key => $val) {
+      $this->assertDBNotNull('CRM_PCP_DAO_PCPBlock', $val, 'id', 'id', 'Check if PCP blocks were created in loop');
+      $this->assertDBCompareValue('CRM_PCP_DAO_PCPBlock', $val, 'entity_id', 'id', $generatedEntities['civicrm_event'][$key], 'Check DB if correct FK was maintained with event for PCP block');
     }
-    $this->assertCount($recursion->schedule['start_action_offset'], $generatedEntities['civicrm_tell_friend'], 'Check if the number of tell a friend records are right');
+    $this->assertCount($recursion->schedule['start_action_offset'], $generatedEntities['civicrm_pcp_block'], 'Check if the number of PCP block records are right');
 
     // set mode to ALL, i.e any change to changing event affects all related recurring activities
     $recursion->mode(3);
@@ -245,10 +246,10 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     end($generatedEntities['civicrm_event']);
     $key = key($generatedEntities['civicrm_event']);
 
-    end($generatedEntities['civicrm_tell_friend']);
-    $actKey = key($generatedEntities['civicrm_tell_friend']);
+    end($generatedEntities['civicrm_pcp_block']);
+    $actKey = key($generatedEntities['civicrm_pcp_block']);
 
-    //Check if both(event/tell a friend) keys are same
+    //Check if both(event/pcp block) keys are same
     $this->assertEquals($key, $actKey, "Check if both the keys are same");
 
     //Cross check event exists before we test deletion
@@ -263,15 +264,15 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $this->assertDBCompareValues('CRM_Core_DAO_RecurringEntity', $searchParamsEventBeforeDelete, $expectedValuesEventBeforeDelete);
 
     //Cross check event exists before we test deletion
-    $searchParamsTellAFriendBeforeDelete = [
-      'entity_id' => $generatedEntities['civicrm_tell_friend'][$actKey],
-      'entity_table' => 'civicrm_tell_friend',
+    $searchParamsPcpBlockBeforeDelete = [
+      'entity_id' => $generatedEntities['civicrm_pcp_block'][$actKey],
+      'entity_table' => 'civicrm_pcp_block',
     ];
-    $expectedValuesTellAFriendBeforeDelete = [
-      'entity_id' => $generatedEntities['civicrm_tell_friend'][$actKey],
-      'entity_table' => 'civicrm_tell_friend',
+    $expectedValuesPcpBlockBeforeDelete = [
+      'entity_id' => $generatedEntities['civicrm_pcp_block'][$actKey],
+      'entity_table' => 'civicrm_pcp_block',
     ];
-    $this->assertDBCompareValues('CRM_Core_DAO_RecurringEntity', $searchParamsTellAFriendBeforeDelete, $expectedValuesTellAFriendBeforeDelete);
+    $this->assertDBCompareValues('CRM_Core_DAO_RecurringEntity', $searchParamsPcpBlockBeforeDelete, $expectedValuesPcpBlockBeforeDelete);
 
     //Delete an event from recurring set and respective linked entity should be deleted from civicrm_recurring_entity_table
     $daoRecurEvent = new CRM_Event_DAO_Event();
@@ -289,13 +290,13 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $compareParams = [];
     $this->assertDBCompareValues('CRM_Core_DAO_RecurringEntity', $searchParams, $compareParams);
 
-    //Find tell_a_friend id if that was deleted from civicrm
+    //Find PCP block id if that was deleted from civicrm
     $searchActParams = [
-      'entity_id' => $generatedEntities['civicrm_tell_friend'][$actKey],
-      'entity_table' => 'civicrm_tell_friend',
+      'entity_id' => $generatedEntities['civicrm_pcp_block'][$actKey],
+      'entity_table' => 'civicrm_event',
     ];
     $compareActParams = [];
-    $this->assertDBCompareValues('CRM_Friend_DAO_Friend', $searchActParams, $compareActParams);
+    $this->assertDBCompareValues('CRM_PCP_DAO_PCPBlock', $searchActParams, $compareActParams);
   }
 
   /**

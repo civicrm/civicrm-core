@@ -1672,6 +1672,7 @@
     "templates/CRM/Event/Import/Form/Summary.tpl",
     "templates/CRM/Event/Page/ICalendar.tpl",
     "templates/CRM/Export/Form/table.tpl",
+    "templates/CRM/Friend/*",
     "templates/CRM/Grant/*",
     "templates/CRM/Group/Form/ParentGroups.tpl",
     "templates/CRM/Import/Form/MapTable.tpl",

@@ -2,7 +2,7 @@
 
 require_once 'tellafriend.civix.php';
 
-use CRM_Tellafriend_ExtensionUtil as E;
+use CRM_Friend_ExtensionUtil as E;
 
 /**
  * Implements hook_civicrm_config().
@@ -62,6 +62,105 @@ function tellafriend_civicrm_tabset($tabsetName, &$tabs, $context) {
       $default['url'] = 'civicrm/event/manage/friend';
     }
     $tabs['friend'] = ['title' => ts('Tell a Friend')] + $default;
+  }
+}
+
+/**
+ * Implements hook_civicrm_buildForm().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildForm/
+ */
+function tellafriend_civicrm_buildForm(string $formName, CRM_Core_Form $form): void {
+  if ($formName === 'CRM_Event_Form_Registration_ThankYou') {
+    $params = [
+      'entity_id' => $form->getEventID(),
+      'entity_table' => 'civicrm_event',
+    ];
+    $data = [];
+    CRM_Friend_BAO_Friend::retrieve($params, $data);
+    if (!empty($data['is_active'])) {
+      $friendText = $data['title'];
+      $action = $form->isTest() ? '&action=preview' : '';
+      $friendURL = CRM_Utils_System::url('civicrm/friend',
+        "eid={$form->getEventID()}&reset=1{$action}&pcomponent=event"
+      );
+      $html = '<div id="tell-a-friend" class="crm-section tell_friend_link-section">
+            <a href="' . htmlentities($friendURL) . '" title="' . htmlentities($friendText) . '" class="button"><span><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> ' . CRM_Utils_String::purifyHTML($friendText) . '</span></a>
+       </div><br /><br />';
+      $extensionHtml = (array) $form->get_template_vars('extensionHtml');
+      $extensionHtml[] = $html;
+      $form->assign('extensionHtml', $extensionHtml);
+    }
+  }
+  elseif ($formName === 'CRM_Contribute_Form_Contribution_ThankYou') {
+    $values = [
+      'entity_id' => $form->_id,
+      'entity_table' => 'civicrm_contribution_page',
+    ];
+    $data = [];
+    CRM_Friend_BAO_Friend::retrieve($values, $data);
+    $tellAFriend = FALSE;
+    $friendURL = NULL;
+    $friendText = NULL;
+    $subUrl = '';
+
+    if ($form->_pcpId) {
+      if (!empty($form->_pcpBlock['is_tellfriend_enabled'])) {
+        $friendText = ts('Tell a Friend');
+        $subUrl = "eid={$form->_pcpId}&blockId={$form->_pcpBlock['id']}&pcomponent=pcp";
+        $tellAFriend = TRUE;
+      }
+    }
+    elseif (!empty($data['is_active'])) {
+      $friendText = $data['title'];
+      $subUrl = "eid={$form->_id}&pcomponent=contribute";
+      $tellAFriend = TRUE;
+    }
+
+    if ($tellAFriend) {
+      if ($form->_action & CRM_Core_Action::PREVIEW) {
+        $friendURL = CRM_Utils_System::url('civicrm/friend', "reset=1&action=preview&{$subUrl}");
+      }
+      else {
+        $friendURL = CRM_Utils_System::url('civicrm/friend', "reset=1&{$subUrl}");
+      }
+      $form->assign('friendText', $friendText);
+      $form->assign('friendURL', $friendURL);
+    }
+  }
+}
+
+/**
+ * Implements hook_civicrm_copy().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_copy/
+ */
+function tellafriend_civicrm_copy(string $objectName, $object, ?int $original_id = NULL): void {
+  if (in_array($objectName, ['ContributionPage', 'Event'], TRUE)) {
+    $entityTable = $objectName === 'ContributionPage' ? 'civicrm_contribution_page' : 'civicrm_event';
+    CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend', [
+      'entity_id' => $original_id,
+      'entity_table' => $entityTable,
+    ], [
+      'entity_id' => $object->id,
+    ]);
+  }
+}
+
+/**
+ * Implements hook_civicrm_links().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_links/
+ */
+function tellafriend_civicrm_links(string $op, ?string $objectName, $objectId, array &$links, ?int &$mask = NULL, array &$values = []): void {
+  if ($op === 'pcp.user.actions.all') {
+    $links[CRM_Core_Action::DETACH] = [
+      'name' => E::ts('Tell Friends'),
+      'url' => 'civicrm/friend',
+      'qs' => 'eid=%%pcpId%%&blockId=%%pcpBlock%%&reset=1&pcomponent=pcp&component=%%pageComponent%%',
+      'title' => E::ts('Tell Friends'),
+      'weight' => -15,
+    ];
   }
 }
 

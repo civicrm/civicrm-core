@@ -469,13 +469,6 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     //copy price sets
     CRM_Price_BAO_PriceSet::copyPriceSet('civicrm_contribution_page', $id, $copy->id);
 
-    $copyTellFriend = CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend', [
-      'entity_id' => $id,
-      'entity_table' => 'civicrm_contribution_page',
-    ], [
-      'entity_id' => $copy->id,
-    ]);
-
     $copyPersonalCampaignPages = CRM_Core_DAO::copyGeneric('CRM_PCP_DAO_PCPBlock', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
@@ -539,10 +532,6 @@ WHERE entity_table = 'civicrm_contribution_page'
       'premium',
     ];
 
-    if (function_exists('tellafriend_civicrm_config')) {
-      $sections[] = 'friend';
-    }
-
     $query = "
    SELECT  civicrm_contribution_page.id as id,
            civicrm_contribution_page.financial_type_id as settings,
@@ -550,7 +539,6 @@ WHERE entity_table = 'civicrm_contribution_page'
            civicrm_membership_block.id as membership,
            civicrm_uf_join.id as custom,
            civicrm_contribution_page.thankyou_title as thankyou,
-           civicrm_tell_friend.id as friend,
            civicrm_pcp_block.id as pcp,
            civicrm_contribution_widget.id as widget,
            civicrm_premiums.id as premium
@@ -562,9 +550,6 @@ LEFT JOIN  civicrm_uf_join             ON ( civicrm_uf_join.entity_id = civicrm_
                                             AND civicrm_uf_join.entity_table = 'civicrm_contribution_page'
                                             AND module = 'CiviContribute'
                                             AND civicrm_uf_join.is_active = 1 )
-LEFT JOIN  civicrm_tell_friend         ON ( civicrm_tell_friend.entity_id = civicrm_contribution_page.id
-                                            AND civicrm_tell_friend.entity_table = 'civicrm_contribution_page'
-                                            AND civicrm_tell_friend.is_active = 1)
 LEFT JOIN  civicrm_pcp_block           ON ( civicrm_pcp_block.entity_id = civicrm_contribution_page.id
                                             AND civicrm_pcp_block.entity_table = 'civicrm_contribution_page'
                                             AND civicrm_pcp_block.is_active = 1 )
