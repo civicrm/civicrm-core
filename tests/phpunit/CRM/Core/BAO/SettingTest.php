@@ -71,14 +71,14 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
 
   /**
    * Ensure that overrides in $civicrm_setting apply when
-   * using getItem($group,$name).
+   * using Civi::settings()->get(item)
    */
   public function testGetItem_Override(): void {
     global $civicrm_setting;
-    $civicrm_setting[CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME]['imageUploadDir'] = '/test/override';
+    $civicrm_setting['domain']['display_name_format'] = '/test/override {contact.first_name}';
     Civi::service('settings_manager')->useMandatory();
-    $value = Civi::settings()->get('imageUploadDir');
-    $this->assertEquals('/test/override', $value);
+    $value = Civi::settings()->get('display_name_format');
+    $this->assertEquals('/test/override {contact.first_name}', $value);
 
     $civicrm_setting['domain']['customCSSURL'] = 'http://test.test/overridedomain';
     Civi::service('settings_manager')->useMandatory();

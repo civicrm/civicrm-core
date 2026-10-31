@@ -629,6 +629,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       $this->assertEquals(0, $releasedLocks, "The test should not leave any dangling locks. Found $releasedLocks");
     }
 
+    // reset any custom directories
+    $this->customDirectories([]);
     // \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
     \Civi::settings()->importValues($this->originalSettings);
 
@@ -2097,31 +2099,18 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @param array $customDirs
    *   With members:.
-   *   'php_path' Set to TRUE to use the default, FALSE or "" to disable support, or a string path to use another path
-   *   'template_path' Set to TRUE to use the default, FALSE or "" to disable support, or a string path to use another path
+   *   'php_path' Set to TRUE to use the default, FALSE or "" to disable support
+   *   'template_path' Set to TRUE to use the default, FALSE or "" to disable support
    */
   public function customDirectories($customDirs) {
-    $config = CRM_Core_Config::singleton();
+    $phpPath = !empty($customDirs['php_path']) ? (dirname(__DIR__) . '/custom_directories/php/') : NULL;
+    \Civi::settings()->updateConstant('customPHPPathDir', $phpPath);
 
-    if (empty($customDirs['php_path']) || $customDirs['php_path'] === FALSE) {
-      unset($config->customPHPPathDir);
-    }
-    elseif ($customDirs['php_path'] === TRUE) {
-      $config->customPHPPathDir = dirname(dirname(__FILE__)) . '/custom_directories/php/';
-    }
-    else {
-      $config->customPHPPathDir = $php_path;
-    }
+    $templatePath = !empty($customDirs['template_path']) ? (dirname(__DIR__) . '/custom_directories/templates/') : NULL;
+    \Civi::settings()->updateConstant('customTemplateDir', $templatePath);
 
-    if (empty($customDirs['template_path']) || $customDirs['template_path'] === FALSE) {
-      unset($config->customTemplateDir);
-    }
-    elseif ($customDirs['template_path'] === TRUE) {
-      $config->customTemplateDir = dirname(dirname(__FILE__)) . '/custom_directories/templates/';
-    }
-    else {
-      $config->customTemplateDir = $template_path;
-    }
+    // force reload of these core settings
+    CRM_Core_Config::singleton(TRUE, TRUE);
   }
 
   /**
