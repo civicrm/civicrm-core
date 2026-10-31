@@ -170,7 +170,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     }
 
     if ($contributionID && !empty($params['revenue_recognition_date'])
-      && !($previousContributionStatus === 'Pending')
+      && !in_array($previousContributionStatus, ['Pending', 'In Progress'], TRUE)
       && !self::allowUpdateRevenueRecognitionDate($contributionID)
     ) {
       unset($params['revenue_recognition_date']);
@@ -378,7 +378,12 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     if (empty($params['contribution_recur_id']) && empty($params['prevContribution']->contribution_recur_id)) {
       return FALSE;
     }
-    if ($params['prevContribution']->contribution_status_id == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending')) {
+    $previousStatus = CRM_Core_PseudoConstant::getName(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      (int) $params['prevContribution']->contribution_status_id
+    );
+    if (in_array($previousStatus, ['Pending', 'In Progress'], TRUE)) {
       return TRUE;
     }
     return FALSE;
@@ -2417,7 +2422,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $checkStatus = [
       'Cancelled' => ['Completed', 'Refunded'],
       'Completed' => ['Cancelled', 'Refunded', 'Chargeback', 'Partially paid', 'Pending refund'],
-      'Pending' => ['Cancelled', 'Completed', 'Failed', 'Partially paid'],
+      'Pending' => ['Cancelled', 'Completed', 'Failed', 'In Progress', 'Partially paid'],
       'In Progress' => ['Cancelled', 'Completed', 'Failed'],
       'Refunded' => ['Cancelled', 'Completed'],
       'Partially paid' => ['Completed', 'Refunded'],
@@ -3146,7 +3151,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         'weight' => 0,
       ];
     }
-    if ($contributionStatus !== 'Pending' && CRM_Core_Permission::check('refund contributions')) {
+    if (!in_array($contributionStatus, ['Pending', 'In Progress'], TRUE) && CRM_Core_Permission::check('refund contributions')) {
       $actionLinks[] = [
         'url' => 'civicrm/payment',
         'title' => ts('Record Refund'),

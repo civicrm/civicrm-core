@@ -500,7 +500,20 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
     $this->assertFinancialTransactionCount(2, 2345, FALSE);
     $this->assertFinancialTransactionCount(0, 2345, TRUE);
-    // Update contribution amount.
+
+    $params['id'] = $contribution['id'];
+    $params['contribution_status_id'] = CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'In Progress'
+    );
+    $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
+
+    $this->assertEquals($params['contribution_status_id'], $contribution['contribution_status_id']);
+    $this->assertFinancialTransactionCount(2, 2345, FALSE);
+    $this->assertFinancialTransactionCount(0, 2345, TRUE);
+
+    // Complete the contribution after the payment processor reports success.
     $params['id'] = $contribution['id'];
     $params['contribution_status_id'] = 1;
 
