@@ -25,7 +25,7 @@ MY_MIXINS=''
 
 ## Unit-tests for old-mixins may conflict with unit-tests for new-mixins.
 ## Therefore, these are pulled out and tested separately.
-OLD_MIXINS='mgd-php@1 entity-types-php@1 smarty-v2@1'
+OLD_MIXINS='mgd-php@1 entity-types-php@1 smarty-v2@1 scan-classes@1'
 
 ###############################################################################
 
