@@ -11,13 +11,13 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\API\Event\Event;
 use Civi\API\Event\PrepareEvent;
 use Civi\API\Event\RespondEvent;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This intercepts api.get actions for HierarchicalEntities and, if the `_depth` field is present in the select clause,
@@ -26,7 +26,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @service
  * @internal
  */
-class HierarchicalEntitySubscriber extends AutoService implements EventSubscriberInterface {
+class HierarchicalEntitySubscriber extends AutoService {
 
   private static $_originalLimit;
   private static $_originalOffset;
@@ -34,18 +34,9 @@ class HierarchicalEntitySubscriber extends AutoService implements EventSubscribe
   private static $_extraFields = ['_depth', '_descendents'];
 
   /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api.prepare' => ['onApiPrepare', 100],
-      'civi.api.respond' => ['onApiRespond', 100],
-    ];
-  }
-
-  /**
    * Preprocess
    */
+  #[CiviEventListener(event: 'civi.api.prepare', priority: 100)]
   public function onApiPrepare(PrepareEvent $event): void {
     if ($this->applies($event)) {
       /** @var \Civi\Api4\Generic\AbstractGetAction $apiRequest */
@@ -70,6 +61,7 @@ class HierarchicalEntitySubscriber extends AutoService implements EventSubscribe
   /**
    * Postprocess
    */
+  #[CiviEventListener(event: 'civi.api.respond', priority: 100)]
   public function onApiRespond(RespondEvent $event): void {
     if ($this->applies($event) && $event->getResponse()->count()) {
       $apiRequest = $event->getApiRequest();

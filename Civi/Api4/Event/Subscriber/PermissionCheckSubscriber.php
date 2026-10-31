@@ -11,8 +11,7 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
-use Civi\API\Events;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * For any API requests that correspond to a Doctrine entity
@@ -21,23 +20,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @service civi.api4.permissionCheck
  */
-class PermissionCheckSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api.authorize' => [
-        ['onApiAuthorize', Events::W_LATE],
-      ],
-    ];
-  }
+class PermissionCheckSubscriber extends \Civi\Core\Service\AutoService {
 
   /**
    * @param \Civi\API\Event\AuthorizeEvent $event
    *   API authorization event.
    */
+  #[CiviEventListener(event: 'civi.api.authorize', priority: -100)]
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
     /** @var \Civi\Api4\Generic\AbstractAction $apiRequest */
     $apiRequest = $event->getApiRequest();

@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Membership;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
@@ -9,7 +10,6 @@ use Civi\Api4\OrderCompletionMetadata;
 use Civi\Core\Service\AutoService;
 use Civi\Core\Service\IsActiveTrait;
 use Civi\Order\Event\OrderCompleteEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class OrderCompleteSubscriber
@@ -18,18 +18,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * This class provides the default behaviour for updating memberships on completion of contribution (On "Order Complete")
  */
-class OrderCompleteSubscriber extends AutoService implements EventSubscriberInterface {
+class OrderCompleteSubscriber extends AutoService {
 
   use IsActiveTrait;
-
-  /**
-   * @inheritDoc
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.order.complete' => ['onOrderComplete', 0],
-    ];
-  }
 
   /**
    * Default handler for Membership on "Order Complete"
@@ -38,6 +29,7 @@ class OrderCompleteSubscriber extends AutoService implements EventSubscriberInte
    *
    * @param \Civi\Order\Event\OrderCompleteEvent $event
    */
+  #[CiviEventListener(event: 'civi.order.complete')]
   public function onOrderComplete(OrderCompleteEvent $event): void {
     if (!$this->isActive()) {
       return;

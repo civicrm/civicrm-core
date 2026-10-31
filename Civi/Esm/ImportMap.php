@@ -2,7 +2,7 @@
 
 namespace Civi\Esm;
 
-use Civi\Core\HookInterface;
+use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * ECMAScript Modules (ESMs) allow you to load a JS file based on a physical-path or a
@@ -22,7 +22,7 @@ use Civi\Core\HookInterface;
  *
  * @service esm.import_map
  */
-class ImportMap extends \Civi\Core\Service\AutoService implements HookInterface {
+class ImportMap extends \Civi\Core\Service\AutoService {
 
   /**
    * @var array|null
@@ -93,6 +93,7 @@ class ImportMap extends \Civi\Core\Service\AutoService implements HookInterface 
    * @param ImportMap $importMap
    * @return void
    */
+  #[CiviEventListener(event: '&hook_civicrm_esmImportMap')]
   public function hook_civicrm_esmImportMap(ImportMap $importMap): void {
     $importMap->addPrefix('civicrm/', 'civicrm');
   }

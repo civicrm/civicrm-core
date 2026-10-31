@@ -11,9 +11,8 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
-use Civi\API\Events;
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Event\AuthorizeRecordEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Enforce constraints on Custom entities
@@ -28,21 +27,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @service internal
  */
-class CustomValueAccessSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api4.authorizeRecord' => ['onApiAuthorizeRecord', Events::W_LATE],
-    ];
-  }
+class CustomValueAccessSubscriber extends \Civi\Core\Service\AutoService {
 
   /**
    * @param \Civi\Api4\Event\AuthorizeRecordEvent $event
    *   API record authorize event
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord', priority: -100)]
   public function onApiAuthorizeRecord(AuthorizeRecordEvent $event) {
     $apiRequest = $event->getApiRequest();
 

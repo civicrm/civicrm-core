@@ -2,8 +2,8 @@
 
 namespace Civi\I18n;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  *
@@ -11,13 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @service
  * @internal
  */
-class TranslationAfformProvider extends AutoService implements EventSubscriberInterface {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.afform.get' => 'getTranslationAfforms',
-    ];
-  }
+class TranslationAfformProvider extends AutoService {
 
   /**
    * Generates afforms for each ECK entity type and sub-type.
@@ -25,6 +19,7 @@ class TranslationAfformProvider extends AutoService implements EventSubscriberIn
    * @param \Civi\Core\Event\GenericHookEvent $event
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'civi.afform.get')]
   public static function getTranslationAfforms($event): void {
     $locales = \CRM_Core_I18n::uiLanguages();
 

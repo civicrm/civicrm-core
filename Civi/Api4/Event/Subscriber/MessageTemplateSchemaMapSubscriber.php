@@ -2,23 +2,14 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @service civi.api4.messagetemplateSchema
  */
-class MessageTemplateSchemaMapSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'api.schema_map.build' => 'onSchemaBuild',
-    ];
-  }
+class MessageTemplateSchemaMapSubscriber extends \Civi\Core\Service\AutoService {
 
   /**
    * This creates a joinable which gets exposed and rendered by:
@@ -29,6 +20,7 @@ class MessageTemplateSchemaMapSubscriber extends \Civi\Core\Service\AutoService 
    *
    * Condition based on CRM_Admin_Page_MessageTemplates::__construct()
    */
+  #[CiviEventListener(event: 'api.schema_map.build')]
   public function onSchemaBuild(SchemaMapBuildEvent $event) {
     $schema = $event->getSchemaMap();
     $table = $schema->getTableByName('civicrm_msg_template');
