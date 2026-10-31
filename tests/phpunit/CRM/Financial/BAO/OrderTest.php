@@ -16,6 +16,7 @@ use Civi\Api4\Order;
 use Civi\Api4\OrderCompletionMetadata;
 use Civi\Api4\Participant;
 use Civi\Api4\Payment;
+use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
 use Civi\Test\EventTestTrait;
 
@@ -256,6 +257,49 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $this->assertEquals('2006-12-21', $membership['end_date']);
     // A membership payment should have been created for legacy compatibility.
     $this->callAPISuccessGetSingle('MembershipPayment', ['version' => 3, 'membership_id' => $lineItem['entity_id'], 'contribution_id' => $contribution['id']]);
+  }
+
+  /**
+   * A free membership order is completed, activates the membership and stays
+   * completed when a payment of 0 is recorded against it.
+   */
+  public function testCreateFreeOrderForMembershipActivatesMembership(): void {
+    $this->setUpMembershipPriceSet();
+    PriceFieldValue::update(FALSE)
+      ->addWhere('id', '=', $this->ids['PriceFieldValue']['membership_first'])
+      ->addValue('amount', 0)
+      ->execute();
+    $contribution = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        'entity_id.source' => 'Test',
+      ])
+      ->execute()->single();
+
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single();
+    $getMembershipStatus = fn() => Membership::get(FALSE)
+      ->addWhere('id', '=', $lineItem['entity_id'])
+      ->addSelect('status_id:name')
+      ->execute()->single()['status_id:name'];
+    $getContributionStatus = fn() => Contribution::get(FALSE)
+      ->addWhere('id', '=', $contribution['id'])
+      ->addSelect('contribution_status_id:name')
+      ->execute()->single()['contribution_status_id:name'];
+    $this->assertEquals('Completed', $getContributionStatus());
+    $this->assertEquals('New', $getMembershipStatus());
+
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 0)
+      ->execute();
+    $this->assertEquals('Completed', $getContributionStatus());
+    $this->assertEquals('New', $getMembershipStatus());
   }
 
   /**

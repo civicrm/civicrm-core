@@ -265,7 +265,7 @@ class CRM_Financial_BAO_Payment {
         ->addWhere('id', '=', $contribution['id'])
         ->execute()
         ->first()['paid_amount'];
-      if ($contributionPaidAmount === 0.0) {
+      if ($contributionPaidAmount === 0.0 && (float) $contribution['total_amount'] !== 0.0) {
         // If the contribution has previously been Completed (fully paid) and now has total payments adding up to 0
         //  change status to 'refunded'.
         // Note: If refunds add up to more than total amount it'll get set to "Partially paid" - see below.
