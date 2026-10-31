@@ -414,7 +414,9 @@ return [
       'title' => ts('Amount Label'),
       'sql_type' => 'text',
       'input_type' => 'Text',
+      'description' => ts('Summary of the price options purchased (label - quantity), e.g. "Standard - 1, T-shirt - 2". Generated from the line items, which are the authoritative record.'),
       'add' => '1.7',
+      'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
       'usage' => [
         'import',
         'export',
