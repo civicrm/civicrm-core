@@ -72,16 +72,27 @@ var currentHeight;
 var currentMetric = document.getElementById('metric').value;
 selectPaper( document.getElementById('paper_size').value );
 
-function selectPaper( val )
-{
-    dataUrl = {/literal}"{crmURL p='civicrm/ajax/paperSize' h=0}"{literal};
-    cj.post( dataUrl, {paperSizeName: val}, function( data ) {
-        cj("#paper_size").val( data.name );
-        metric = document.getElementById('metric').value;
-        currentWidth = convertMetric( data.width, data.metric, metric );
-        currentHeight = convertMetric( data.height, data.metric, metric );
-        updatePaperDimensions( );
-    }, 'json');
+function selectPaper(val) {
+  const where = [
+    ['option_group_id:name', '=', 'paper_size'],
+    ['is_active', '=', true]
+  ];
+  if (val && val !== '0') {
+    where.push(['name', '=', val]);
+  } else {
+    where.push(['is_default', '=', true]);
+  }
+  CRM.api4('OptionValue', 'get', {
+    select: ['name', 'value'],
+    where: where
+  }, 0).then((paperSize) => {
+    const data = JSON.parse(paperSize.value);
+    cj("#paper_size").val(data.name);
+    metric = document.getElementById('metric').value;
+    currentWidth = convertMetric(data.width, data.metric, metric);
+    currentHeight = convertMetric(data.height, data.metric, metric);
+    updatePaperDimensions();
+  });
 }
 
 function selectMetric( metric )

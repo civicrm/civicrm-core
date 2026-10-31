@@ -674,30 +674,6 @@ class CRM_Contact_Page_AJAX {
   }
 
   /**
-   * Retrieve a PDF Page Format for the PDF Letter form.
-   */
-  public static function pdfFormat() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $formatId = CRM_Utils_Type::escape($_REQUEST['formatId'], 'Integer');
-
-    $pdfFormat = CRM_Core_BAO_PdfFormat::getById($formatId);
-
-    CRM_Utils_JSON::output($pdfFormat);
-  }
-
-  /**
-   * Retrieve Paper Size dimensions.
-   */
-  public static function paperSize() {
-    CRM_Core_Page_AJAX::validateAjaxRequestMethod();
-    $paperSizeName = CRM_Utils_Type::escape($_REQUEST['paperSizeName'], 'String');
-
-    $paperSize = CRM_Core_BAO_PaperSize::getByName($paperSizeName);
-
-    CRM_Utils_JSON::output($paperSize);
-  }
-
-  /**
    * Swap contacts in a dupe pair i.e main with duplicate contact.
    */
   public static function flipDupePairs() {

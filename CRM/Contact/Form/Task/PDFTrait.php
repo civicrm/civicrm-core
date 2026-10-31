@@ -148,6 +148,7 @@ trait CRM_Contact_Form_Task_PDFTrait {
     $this->assign('useThisPageFormat', ts('Always use this Page Format with the new template?'));
     $this->assign('useSelectedPageFormat', ts('Should the new template always use the selected Page Format?'));
     $this->assign('totalSelectedContacts', !is_null($this->_contactIds) ? count($this->_contactIds) : 0);
+    $this->assign('defaultFormat', CRM_Core_BAO_PdfFormat::getDefaultValues());
 
     $this->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
     $documentTypes = implode(',', CRM_Core_SelectValues::documentApplicationType());
