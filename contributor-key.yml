@@ -983,6 +983,9 @@
 - name        : Julia Koelsch
   organization: Spry Digital
 
+- github      : JuanSartor
+  name        : Juan Ignacio Sartor
+
 - name        : Julian Libor
 
 - name        : Julie Hall
@@ -1042,6 +1045,9 @@
 - github      : kewljuice
   name        : Wouter Hechtermans
   organization: Calibrate
+
+- github      : kgoess
+  name        : Kevin Goess
 
 - github      : khorporative
   name        : Aivars
@@ -1796,6 +1802,13 @@
 - github      : systopia
   name        : SYSTOPIA
   organization: SYSTOPIA
+
+- github      : syxys1
+  name        : Sylvain Plante
+
+- github      : tacman
+  name        : Tac Tacelosky
+  organization: Survos
 
 - github      : tamarmeir
   name        : Tamar Meir
