@@ -1947,8 +1947,8 @@ class CRM_Financial_BAO_Order {
       ->setValues($this->contributionValues)->execute();
     $this->saveOrderCompletionMetadata((int) $result->first()['id']);
     if ($this->contributionValues['total_amount'] == 0.0) {
-      // A $0 order has nothing to pay, so don't leave it pending.
-      CRM_Contribute_BAO_Contribution::writeRecord(['id' => $result->first()['id'], 'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')]);
+      // A $0 order has nothing to pay, so complete it (activating its memberships) rather than leave it pending.
+      CRM_Contribute_BAO_Contribution::completeOrder(['is_email_receipt' => FALSE], NULL, (int) $result->first()['id']);
     }
     return $result;
   }
