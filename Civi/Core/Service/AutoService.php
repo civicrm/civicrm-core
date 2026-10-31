@@ -33,14 +33,15 @@ namespace Civi\Core\Service;
  * @see \Civi\Core\Service\AutoDefinitionTest
  * @link https://docs.civicrm.org/dev/en/latest/framework/services/
  *
- * = INTERFACES =
+ * = INTERFACES & ATTRIBUTES =
  *
- * Additionally, some `interface`s will be detected automatically. If an AutoService implements
- * any of these interfaces, then it will be registered with appropriate parties:
+ * Additionally, some `interface`s and attributes will be detected automatically. If an AutoService
+ * implements any of these interfaces or attributes, then it will be registered with appropriate parties:
  *
  * @see \Civi\Core\HookInterface
  * @see \Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface
  * @see \Symfony\Component\EventDispatcher\EventSubscriberInterface
+ * @see \Civi\Core\Attribute\CiviEventListener
  *
  * = REQUIREMENTS / LIMITATIONS =
  *

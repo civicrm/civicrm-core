@@ -4,7 +4,6 @@ namespace Civi\Core;
 use Civi\Core\Compiler\AutoServiceScannerPass;
 use Civi\Core\Compiler\EventScannerPass;
 use Civi\Core\Compiler\SpecProviderPass;
-use Civi\Core\Event\EventScanner;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Lock\LockManager;
 use Symfony\Component\Config\ConfigCache;
@@ -370,22 +369,6 @@ class Container {
       '\Civi\Token\TidySubscriber',
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
-
-    $dispatcherDefn = $container->getDefinition('dispatcher');
-    // Get all declared BAO classes
-    $baoClasses = \CRM_Core_DAO_AllCoreTables::getBaoClasses();
-    // "Extra" BAO classes that don't have a DAO but still need to listen to hooks
-    $baoClasses[] = \CRM_Core_BAO_CustomValue::class;
-    foreach ($baoClasses as $key => $baoClass) {
-      // Key will be a valid entity name for all but the "extra" classes which don't have a DAO entity.
-      $baoEntity = is_numeric($key) ? NULL : $key;
-      $listenerMap = EventScanner::findListeners($baoClass, $baoEntity);
-      if ($listenerMap) {
-        $file = (new \ReflectionClass($baoClass))->getFileName();
-        $container->addResource(new \Symfony\Component\Config\Resource\FileResource($file));
-        $dispatcherDefn->addMethodCall('addListenerMap', [$baoClass, $listenerMap]);
-      }
-    }
 
     // FIXME: Automatically scan BasicServices for ProviderInterface.
     $container->getDefinition('civi_api_kernel')->addMethodCall(
