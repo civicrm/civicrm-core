@@ -11,26 +11,16 @@
 
 namespace Civi\Api4\Service\Autocomplete;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Provide autocomplete searches tailored to the CiviMail recipients widget
  * @service
  * @internal
  */
-class MailingRecipientsAutocompleteProvider extends AutoService implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.search.autocompleteDefault' => ['mailingAutocompleteDefaultSearch', 50],
-      'civi.search.defaultDisplay' => ['mailingAutocompleteDefaultDisplay', 50],
-    ];
-  }
+class MailingRecipientsAutocompleteProvider extends AutoService {
 
   /**
    * Construct a special-purpose SavedSearch for the Mailing.recipients autocomplete
@@ -40,6 +30,7 @@ class MailingRecipientsAutocompleteProvider extends AutoService implements Event
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @return void
    */
+  #[CiviEventListener(event: 'civi.search.autocompleteDefault', priority: 50)]
   public function mailingAutocompleteDefaultSearch(GenericHookEvent $e) {
     if (
       !is_array($e->savedSearch) ||
@@ -115,6 +106,7 @@ class MailingRecipientsAutocompleteProvider extends AutoService implements Event
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @return void
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay', priority: 50)]
   public function mailingAutocompleteDefaultDisplay(GenericHookEvent $e) {
     if (
       // Early return if display has already been overridden

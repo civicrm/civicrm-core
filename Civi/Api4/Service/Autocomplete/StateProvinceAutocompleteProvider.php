@@ -12,20 +12,21 @@
 
 namespace Civi\Api4\Service\Autocomplete;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\HookInterface;
 
 /**
  * @service
  * @internal
  */
-class StateProvinceAutocompleteProvider extends \Civi\Core\Service\AutoService implements HookInterface {
+class StateProvinceAutocompleteProvider extends \Civi\Core\Service\AutoService {
 
   /**
    * Provide default SearchDisplay for StateProvince autocompletes
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay')]
   public static function on_civi_search_defaultDisplay(GenericHookEvent $e) {
     if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || $e->savedSearch['api_entity'] !== 'StateProvince') {
       return;
