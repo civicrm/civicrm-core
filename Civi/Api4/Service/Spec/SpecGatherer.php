@@ -12,17 +12,17 @@
 
 namespace Civi\Api4\Service\Spec;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class SpecGatherer
  * @package Civi\Api4\Service\Spec
  * @service spec_gatherer
  */
-class SpecGatherer extends AutoService implements EventSubscriberInterface {
+class SpecGatherer extends AutoService {
 
   /**
    * @var \Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface[]
@@ -33,16 +33,11 @@ class SpecGatherer extends AutoService implements EventSubscriberInterface {
 
   private $fieldCache = [];
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.cache.metadata.clear' => 'onClearMetadata',
-    ];
-  }
-
   /**
    * When metadata cache flush is requested, internal caches in this service
    * should also be cleared.
    */
+  #[CiviEventListener(event: 'civi.cache.metadata.clear')]
   public function onClearMetadata(): void {
     $this->entityActionValues = [];
     $this->fieldCache = [];

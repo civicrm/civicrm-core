@@ -11,26 +11,17 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Generic\AutocompleteAction;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Preprocess api autocomplete requests
  * @service
  * @internal
  */
-class AutocompleteFieldSubscriber extends AutoService implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api.prepare' => ['onApiPrepare', 150],
-    ];
-  }
+class AutocompleteFieldSubscriber extends AutoService {
 
   /**
    * Apply any filters set in the QuickForm or field schema for autocomplete fields
@@ -47,6 +38,7 @@ class AutocompleteFieldSubscriber extends AutoService implements EventSubscriber
    *
    * @param \Civi\API\Event\PrepareEvent $event
    */
+  #[CiviEventListener(event: 'civi.api.prepare', priority: 150)]
   public function onApiPrepare(\Civi\API\Event\PrepareEvent $event): void {
     $apiRequest = $event->getApiRequest();
     if (is_object($apiRequest) && is_a($apiRequest, 'Civi\Api4\Generic\AutocompleteAction')) {

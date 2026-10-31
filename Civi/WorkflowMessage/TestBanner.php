@@ -12,9 +12,9 @@
 
 namespace Civi\WorkflowMessage;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\MessageTemplate;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * If someone sends an automated message for a test record (e.g. Contribution with `is_test=1`),
@@ -23,14 +23,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @service
  * @internal
  */
-class TestBanner extends AutoService implements EventSubscriberInterface {
+class TestBanner extends AutoService {
 
-  public static function getSubscribedEvents(): array {
-    return [
-      '&hook_civicrm_alterMailContent' => ['onAlterMailContent', -1000],
-    ];
-  }
-
+  #[CiviEventListener(event: '&hook_civicrm_alterMailContent', priority: -1000)]
   public function onAlterMailContent(array &$mailContent): void {
     // Only alter workflow-messages -- not CiviMail messages
     if (!empty($mailContent['mailingID'])) {
