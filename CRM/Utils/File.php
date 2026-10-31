@@ -120,10 +120,9 @@ class CRM_Utils_File {
       return;
     }
 
-    if (is_link($target) /* it's a directory based on a symlink... no need to recurse... */) {
-      if ($rmdir) {
-        static::try_unlink($target, 'symlink');
-      }
+    // If the directory we are removing is a symlink, unlink it.
+    if (is_link($target) && $rmdir) {
+      static::try_unlink($target, 'symlink');
       return;
     }
 
