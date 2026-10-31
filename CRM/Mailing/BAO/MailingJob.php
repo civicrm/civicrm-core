@@ -642,6 +642,8 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
     MailingJob::update(FALSE)
       ->setValues(['status:name' => 'Paused'])
       ->addWhere('mailing_id', '=', $mailingID)
+      ->addWhere('is_test', '=', FALSE)
+      ->addWhere('status:name', 'IN', ['Scheduled', 'Running'])
       ->execute();
     Mailing::update(FALSE)
       ->setValues(['status:name' => 'Paused'])
@@ -672,12 +674,23 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
    *   The id of the mailing to be resumed.
    */
   public static function resume($mailingID) {
-    MailingJob::update(FALSE)
-      ->setValues(['status:name' => 'Scheduled'])
+    // runJobs() only starts Scheduled jobs that never ran, so started jobs must go back to Running.
+    foreach (['Scheduled' => 'IS NULL', 'Running' => 'IS NOT NULL'] as $status => $startDate) {
+      MailingJob::update(FALSE)
+        ->setValues(['status:name' => $status])
+        ->addWhere('mailing_id', '=', $mailingID)
+        ->addWhere('is_test', '=', FALSE)
+        ->addWhere('status:name', '=', 'Paused')
+        ->addWhere('start_date', $startDate)
+        ->execute();
+    }
+    $isStarted = MailingJob::get(FALSE)
       ->addWhere('mailing_id', '=', $mailingID)
-      ->execute();
+      ->addWhere('is_test', '=', FALSE)
+      ->addWhere('start_date', 'IS NOT NULL')
+      ->execute()->count() > 0;
     Mailing::update(FALSE)
-      ->setValues(['status:name' => 'Scheduled'])
+      ->setValues(['status:name' => $isStarted ? 'Running' : 'Scheduled'])
       ->addWhere('id', '=', $mailingID)
       ->execute();
   }
