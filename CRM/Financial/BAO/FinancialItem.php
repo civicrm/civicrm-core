@@ -41,10 +41,7 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     if ($contributionStatus === 'Completed' || $contributionStatus === 'Pending refund') {
       $itemStatus = $financialItemStatus['Paid'];
     }
-    elseif ($contributionStatus === 'Pending'
-      // In progress is no longer present on new installs unless extensions add it.
-      || $contributionStatus === 'In Progress'
-    ) {
+    elseif (in_array($contributionStatus, ['Pending', 'In Progress'], TRUE)) {
       $itemStatus = $financialItemStatus['Unpaid'];
     }
     elseif ($contributionStatus === 'Partially paid') {

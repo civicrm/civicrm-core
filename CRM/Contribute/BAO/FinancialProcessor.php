@@ -403,6 +403,11 @@ class CRM_Contribute_BAO_FinancialProcessor {
    * @return bool
    */
   private function isSupportedContributionStatusChange(): bool {
+    // Pending and In Progress both represent an unpaid contribution. Moving
+    // between them changes the workflow state, but not the financial state.
+    if ($this->isOriginalStatusPending() && $this->isPendingTransaction()) {
+      return FALSE;
+    }
     if ($this->getOriginalContributionStatus() === 'Partially paid' && $this->isCompletedTransaction()) {
       CRM_Core_Error::deprecatedWarning('updating partially paid to completed without going through the payment api is deprecated and will create incorrect financial records');
       return FALSE;
@@ -1236,10 +1241,7 @@ class CRM_Contribute_BAO_FinancialProcessor {
     if ($contributionStatus === 'Completed' || $contributionStatus === 'Pending refund') {
       $itemStatus = $financialItemStatus['Paid'];
     }
-    elseif ($contributionStatus === 'Pending'
-      // In progress is no longer present on new installs unless extensions add it.
-      || $contributionStatus === 'In Progress'
-    ) {
+    elseif (in_array($contributionStatus, ['Pending', 'In Progress'], TRUE)) {
       $itemStatus = $financialItemStatus['Unpaid'];
     }
     elseif ($contributionStatus === 'Partially paid') {

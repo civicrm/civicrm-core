@@ -31,3 +31,35 @@ SET `permission` = CONCAT('@report:', SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_
     `permission_operator` = 'AND'
 WHERE `url` REGEXP '^/?civicrm/report/instance/[0-9]+';
 
+-- Add the core contribution status used while an asynchronous payment is being processed.
+SELECT @contribution_status_group_id := id FROM civicrm_option_group WHERE name = 'contribution_status';
+SELECT @use_core_in_progress_slot := NOT EXISTS(
+  SELECT 1 FROM civicrm_option_value WHERE option_group_id = @contribution_status_group_id AND value = '5'
+);
+SELECT @in_progress_value := IF(@use_core_in_progress_slot, 5, COALESCE(MAX(CAST(value AS UNSIGNED)), 0) + 1)
+FROM civicrm_option_value WHERE option_group_id = @contribution_status_group_id;
+SELECT @in_progress_weight := IF(@use_core_in_progress_slot, 5, COALESCE(MAX(weight), 0) + 1)
+FROM civicrm_option_value WHERE option_group_id = @contribution_status_group_id;
+
+INSERT INTO civicrm_option_value (
+  option_group_id, {localize field='label'}label{/localize}, value, name, weight,
+  {localize field='description'}description{/localize}, is_reserved, is_active, is_default
+)
+SELECT
+  @contribution_status_group_id,
+  {localize}'{ts escape="sql"}In Progress{/ts}'{/localize},
+  @in_progress_value,
+  'In Progress',
+  @in_progress_weight,
+  {localize}'{ts escape="sql"}The payer has completed their action and the payment processor is still processing the payment.{/ts}'{/localize},
+  1,
+  1,
+  0
+WHERE NOT EXISTS (
+  SELECT 1 FROM civicrm_option_value
+  WHERE option_group_id = @contribution_status_group_id AND name = 'In Progress'
+);
+
+UPDATE civicrm_option_value
+SET is_reserved = 1, is_active = 1
+WHERE option_group_id = @contribution_status_group_id AND name = 'In Progress';
