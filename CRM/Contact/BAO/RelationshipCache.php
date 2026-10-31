@@ -1,18 +1,20 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
+
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
  * Class CRM_Contact_BAO_RelationshipCache.
  */
-class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCache implements \Civi\Core\HookInterface {
+class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCache {
 
   /**
    * The "mappings" array defines the values to put into `civicrm_relationship_cache`
@@ -71,6 +73,7 @@ class CRM_Contact_BAO_RelationshipCache extends CRM_Contact_DAO_RelationshipCach
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @see \CRM_Utils_Hook::triggerInfo
    */
+  #[CiviEventListener(event: 'hook_civicrm_triggerInfo')]
   public static function on_hook_civicrm_triggerInfo($e): void {
     $relUpdates = self::createInsertUpdateQueries();
     // Use utf8mb4_bin or utf8_bin, depending on what's in use.

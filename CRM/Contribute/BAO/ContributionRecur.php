@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 use Brick\Money\Money;
@@ -19,7 +20,7 @@ use Civi\Api4\LineItem;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur implements Civi\Core\HookInterface {
+class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
   /**
    * Create recurring contribution.
@@ -62,6 +63,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * Event fired before modifying an IM.
    * @param \Civi\Core\Event\PreEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if (in_array($event->action, ['create', 'edit'])) {
       // make sure we're not creating a new recurring contribution with the same transaction ID
@@ -81,6 +83,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * Event fired after modifying a recurring contribution.
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     if ($event->action !== 'edit') {
       return;
@@ -1010,6 +1013,7 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
   /**
    * @implements CRM_Utils_Hook::fieldOptions
    */
+  #[CiviEventListener(event: '&hook_civicrm_fieldOptions')]
   public static function hook_civicrm_fieldOptions($entity, $field, &$options, $params) {
     // This faithfully recreates the hack in the above buildOptions() function, appending _test to the name of test processors,
     // which allows `CRM_Utils_TokenConsistencyTest::testContributionRecurTokenConsistency` to pass.

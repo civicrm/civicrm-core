@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -15,12 +16,11 @@
  */
 
 use Civi\Core\Event\PostEvent;
-use Civi\Core\HookInterface;
 
 /**
  * This class contains functions for managing Status Preferences.
  */
-class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference implements HookInterface {
+class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference {
 
   /**
    * Create or update a Status Preference entry.
@@ -76,6 +76,7 @@ class CRM_Core_BAO_StatusPreference extends CRM_Core_DAO_StatusPreference implem
    *
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(PostEvent $event): void {
     unset(\Civi::$statics['CRM_Utils_Check']);
   }

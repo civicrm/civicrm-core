@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 use Civi\Api4\Utils\CoreUtil;
@@ -20,7 +21,7 @@ use Civi\Api4\Utils\CoreUtil;
 /**
  *  Access Control List
  */
-class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL implements \Civi\Core\HookInterface {
+class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
   /**
    * Available operations for  pseudoconstant.
@@ -374,6 +375,7 @@ SELECT acl.*
    * Event fired before an action is taken on an ACL record.
    * @param \Civi\Core\Event\PreEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     // Reset cache when deleting an ACL record
     if ($event->action === 'delete') {

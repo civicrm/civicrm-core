@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -20,7 +21,7 @@ use Civi\Api4\Utils\CoreUtil;
 /**
  * Class CRM_Core_BAO_CustomField
  */
-class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
   /**
    * Build and retrieve the list of data types and descriptions.
@@ -1065,6 +1066,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    * Callback for hook_civicrm_pre().
    * @param \Civi\Core\Event\PreEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre')]
   public static function on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     // When deleting a custom group, delete all orphaned fields
     if ($event->entity === 'CustomGroup' && $event->action === 'delete') {
@@ -1081,6 +1083,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    * Callback for hook_civicrm_post().
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     if ($event->action === 'delete') {
       Civi::rebuild(['system' => TRUE])->execute();
@@ -1103,6 +1106,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    * Get the number of rows in the value table with a not NULL value for this field
    * - this will prevent automatic cleanup of the CustomField if there is data for it
    */
+  #[CiviEventListener(event: 'hook_civicrm_referenceCounts')]
   public static function on_hook_civicrm_referenceCounts($e) {
     $dao = $e->dao;
     if (!is_a($dao, \CRM_Core_DAO_CustomField::class)) {

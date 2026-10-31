@@ -18,7 +18,7 @@
 /**
  * Track a list of known queues.
  */
-class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue implements \Civi\Core\HookInterface {
+class CRM_Queue_BAO_Queue extends CRM_Queue_DAO_Queue {
 
   public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $clauses = [];

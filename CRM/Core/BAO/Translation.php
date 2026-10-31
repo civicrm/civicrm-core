@@ -1,24 +1,24 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 use Civi\Api4\Generic\AbstractAction;
 use Civi\Api4\Translation;
-use Civi\Core\HookInterface;
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookInterface {
+class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation {
 
   use CRM_Core_DynamicFKAccessTrait;
 
@@ -96,6 +96,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
    *
    * @param \Civi\Api4\Event\ValidateValuesEvent $e
    */
+  #[CiviEventListener(event: 'civi.api4.validate::{self}')]
   public static function self_civi_api4_validate(\Civi\Api4\Event\ValidateValuesEvent $e) {
     $statuses = array_column(self::getStatuses(), 'id');
     $dataTypes = [CRM_Utils_Type::T_STRING, CRM_Utils_Type::T_TEXT, CRM_Utils_Type::T_LONGTEXT];
@@ -155,6 +156,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
    *
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event): void {
     unset(Civi::$statics[__CLASS__]);
   }
@@ -167,6 +169,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation implements HookI
    * @see \CRM_Utils_Hook::apiWrappers()
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: '&hook_civicrm_apiWrappers')]
   public static function hook_civicrm_apiWrappers(&$wrappers, $apiRequest): void {
     if (!($apiRequest instanceof \Civi\Api4\Generic\DAOGetAction) || $apiRequest['action'] !== 'get') {
       return;

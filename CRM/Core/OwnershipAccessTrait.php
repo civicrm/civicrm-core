@@ -15,9 +15,6 @@ use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * Trait for entities with an owner contact ID (e.g. created_id, created_by, or contact_id).
- *
- * Users of this trait must implement HookInterface.
- * @phpstan-require-implements \Civi\Core\HookInterface
  */
 trait CRM_Core_OwnershipAccessTrait {
 
