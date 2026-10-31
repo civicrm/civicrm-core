@@ -1,7 +1,7 @@
 <?php
 use CRM_Afform_ExtensionUtil as E;
 
-class CRM_Afform_BAO_SearchParamSet extends CRM_Afform_DAO_SearchParamSet implements \Civi\Core\HookInterface {
+class CRM_Afform_BAO_SearchParamSet extends CRM_Afform_DAO_SearchParamSet {
   use CRM_Core_OwnershipAccessTrait;
 
   protected static function getOwnerContactIdField(): string {

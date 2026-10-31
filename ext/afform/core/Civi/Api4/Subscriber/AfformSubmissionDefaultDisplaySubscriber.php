@@ -11,9 +11,9 @@
 
 namespace Civi\Api4\Subscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\AfformSubmissionData;
 use Civi\Core\Event\GenericHookEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
@@ -22,22 +22,12 @@ use CRM_Afform_ExtensionUtil as E;
  * @service
  * @internal
  */
-class AfformSubmissionDefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.search.defaultDisplay' => [
-        'getDefault',
-      ],
-    ];
-  }
+class AfformSubmissionDefaultDisplaySubscriber extends \Civi\Core\Service\AutoService {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay')]
   public static function getDefault(GenericHookEvent $e) {
     $savedSearchName = $e->savedSearch['name'] ?? NULL;
 

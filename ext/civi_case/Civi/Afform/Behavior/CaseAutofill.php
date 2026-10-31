@@ -1,27 +1,17 @@
 <?php
 namespace Civi\Afform\Behavior;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Token\TokenRow;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Case_ExtensionUtil as E;
 
 /**
  * @service
  * @internal
  */
-class CaseAutofill extends AbstractBehavior implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.afform.prefill' => ['onAfformPrefill', 99],
-      '&civi.afform.createToken' => ['onCreateToken', 99],
-    ];
-  }
+class CaseAutofill extends AbstractBehavior {
 
   public static function getEntities():array {
     return ['Case'];
@@ -48,6 +38,7 @@ class CaseAutofill extends AbstractBehavior implements EventSubscriberInterface 
     return $modes;
   }
 
+  #[CiviEventListener(event: 'civi.afform.prefill', priority: 99)]
   public static function onAfformPrefill(AfformPrefillEvent $event): void {
     /* @var \Civi\Api4\Action\Afform\Prefill $apiRequest */
     $apiRequest = $event->getApiRequest();
@@ -65,6 +56,7 @@ class CaseAutofill extends AbstractBehavior implements EventSubscriberInterface 
     }
   }
 
+  #[CiviEventListener(event: '&civi.afform.createToken', priority: 99)]
   public function onCreateToken(TokenRow $row, array &$afformArgs) {
     if (!empty($row->context['caseId'])) {
       $afformArgs['case_id'] = $row->context['caseId'];

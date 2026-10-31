@@ -11,25 +11,24 @@
 
 namespace Civi\Afform\Placement;
 
+use Civi\Core\Service\AutoService;
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Runtime code for placing Afforms in the Contact Summary Actions menu
+ *
+ * @service
+ * @internal
  */
-class CaseSummaryBlockPlacement extends AutoSubscriber {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_buildForm' => 'onBuildForm',
-    ];
-  }
+class CaseSummaryBlockPlacement extends AutoService {
 
   /**
    * Implements hook_civicrm_buildForm().
    *
    * Adds Afforms to case summary screen.
    */
+  #[CiviEventListener(event: 'hook_civicrm_buildForm')]
   public static function onBuildForm(GenericHookEvent $e) {
     if ($e->formName !== 'CRM_Case_Form_CaseView') {
       return;

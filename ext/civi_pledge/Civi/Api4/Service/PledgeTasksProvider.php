@@ -11,6 +11,7 @@
 
 namespace Civi\Api4\Service;
 
+use Civi\Core\Attribute\CiviEventListener;
 use CRM_Pledge_ExtensionUtil as E;
 use Civi\Core\Event\GenericHookEvent;
 
@@ -18,17 +19,12 @@ use Civi\Core\Event\GenericHookEvent;
  * @service
  * @internal
  */
-class PledgeTasksProvider extends \Civi\Core\Service\AutoSubscriber {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_searchKitTasks' => ['addTasks', 100],
-    ];
-  }
+class PledgeTasksProvider extends \Civi\Core\Service\AutoService {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_searchKitTasks', priority: 100)]
   public function addTasks(GenericHookEvent $event): void {
     if (\CRM_Core_Permission::check('edit pledges') || !$event->checkPermissions) {
       $event->tasks['Pledge']['pledge.cancel'] = [

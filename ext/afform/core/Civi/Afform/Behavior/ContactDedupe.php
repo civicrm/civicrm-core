@@ -1,26 +1,17 @@
 <?php
 namespace Civi\Afform\Behavior;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformSubmitEvent;
 use Civi\Api4\Utils\CoreUtil;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
  * @service
  * @internal
  */
-class ContactDedupe extends AbstractBehavior implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.afform.submit' => ['onAfformSubmit', 101],
-    ];
-  }
+class ContactDedupe extends AbstractBehavior {
 
   public static function getEntities():array {
     return \CRM_Contact_BAO_ContactType::basicTypes();
@@ -52,6 +43,7 @@ class ContactDedupe extends AbstractBehavior implements EventSubscriberInterface
     return $modes;
   }
 
+  #[CiviEventListener(event: 'civi.afform.submit', priority: 101)]
   public static function onAfformSubmit(AfformSubmitEvent $event) {
     $entity = $event->getEntity();
     $dedupeMode = $entity['contact-dedupe'] ?? NULL;
