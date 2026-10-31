@@ -56,4 +56,45 @@ class CRM_Utils_Mail_FilteredPearMailerTest extends CiviUnitTestCase {
     $this->assertEquals('the triumph of veggies over fruits', $r);
   }
 
+  public function testResultFilter(): void {
+    $mock = new class() extends \Mail {
+
+      public function send($recipients, $headers, $body) {
+        return PEAR::raiseError('unripe banana');
+      }
+
+    };
+
+    $fm = new CRM_Utils_Mail_FilteredPearMailer('mock', [], $mock);
+    $fm->addResultFilter('1000_ripen', function ($mailer, $result, $recipients, $headers, $body) {
+      if (is_a($result, 'PEAR_Error') && $result->getMessage() === 'unripe banana') {
+        return PEAR::raiseError('ripe banana', NULL, PEAR_ERROR_RETURN);
+      }
+    });
+    $r = $fm->send(['recip'], ['Subject' => 'Fruit loops'], 'body');
+
+    $this->assertTrue(is_a($r, 'PEAR_Error'));
+    $this->assertEquals('ripe banana', $r->getMessage());
+  }
+
+  public function testResultFilter_leavesUnmatchedResultsAlone(): void {
+    $mock = new class() extends \Mail {
+
+      public function send($recipients, $headers, $body) {
+        return 'all the fruits in the basket';
+      }
+
+    };
+
+    $fm = new CRM_Utils_Mail_FilteredPearMailer('mock', [], $mock);
+    $fm->addResultFilter('1000_ripen', function ($mailer, $result, $recipients, $headers, $body) {
+      if (is_a($result, 'PEAR_Error') && $result->getMessage() === 'unripe banana') {
+        return PEAR::raiseError('ripe banana', NULL, PEAR_ERROR_RETURN);
+      }
+    });
+    $r = $fm->send(['recip'], ['Subject' => 'Fruit loops'], 'body');
+
+    $this->assertEquals('all the fruits in the basket', $r);
+  }
+
 }

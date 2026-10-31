@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d2054cef881f76093f261151f2272b25",
+    "content-hash": "f29e10ca440746533da4dbbff7fd34a1",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -2270,16 +2270,16 @@
         },
         {
             "name": "pear/db",
-            "version": "v1.12.2",
+            "version": "v1.12.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/DB.git",
-                "reference": "f6cf9399683e1bdc408bdeeaf12fec2f78140896"
+                "reference": "97ea56201976c58dfbc5825fd3aaef484aab53c2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/DB/zipball/f6cf9399683e1bdc408bdeeaf12fec2f78140896",
-                "reference": "f6cf9399683e1bdc408bdeeaf12fec2f78140896",
+                "url": "https://api.github.com/repos/pear/DB/zipball/97ea56201976c58dfbc5825fd3aaef484aab53c2",
+                "reference": "97ea56201976c58dfbc5825fd3aaef484aab53c2",
                 "shasum": ""
             },
             "require": {
@@ -2330,7 +2330,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=DB",
                 "source": "https://github.com/pear/DB"
             },
-            "time": "2024-04-15T21:14:06+00:00"
+            "time": "2025-11-10T09:00:46+00:00"
         },
         {
             "name": "pear/log",
@@ -2462,16 +2462,16 @@
         },
         {
             "name": "pear/mail_mime",
-            "version": "1.10.11",
+            "version": "1.10.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Mail_Mime.git",
-                "reference": "d4fb9ce61201593d0f8c6db629c45e29c3409c14"
+                "reference": "cda56082cc1a3722d6929caa66abfe95b7406e12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Mail_Mime/zipball/d4fb9ce61201593d0f8c6db629c45e29c3409c14",
-                "reference": "d4fb9ce61201593d0f8c6db629c45e29c3409c14",
+                "url": "https://api.github.com/repos/pear/Mail_Mime/zipball/cda56082cc1a3722d6929caa66abfe95b7406e12",
+                "reference": "cda56082cc1a3722d6929caa66abfe95b7406e12",
                 "shasum": ""
             },
             "require": {
@@ -2509,20 +2509,20 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Mail_Mime",
                 "source": "https://github.com/pear/Mail_Mime"
             },
-            "time": "2021-09-05T08:42:45+00:00"
+            "time": "2026-08-08T07:08:35+00:00"
         },
         {
             "name": "pear/net_smtp",
-            "version": "1.12.1",
+            "version": "1.12.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Net_SMTP.git",
-                "reference": "5d7ba854d75a7c207d8581de1cc6fd2895ae2518"
+                "reference": "76173b3ee542a683127ab5429612b6ea519db64d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Net_SMTP/zipball/5d7ba854d75a7c207d8581de1cc6fd2895ae2518",
-                "reference": "5d7ba854d75a7c207d8581de1cc6fd2895ae2518",
+                "url": "https://api.github.com/repos/pear/Net_SMTP/zipball/76173b3ee542a683127ab5429612b6ea519db64d",
+                "reference": "76173b3ee542a683127ab5429612b6ea519db64d",
                 "shasum": ""
             },
             "require": {
@@ -2578,7 +2578,7 @@
                 "issues": "https://github.com/pear/Net_SMTP/issues",
                 "source": "https://github.com/pear/Net_SMTP"
             },
-            "time": "2024-04-15T19:42:15+00:00"
+            "time": "2026-01-04T22:03:47+00:00"
         },
         {
             "name": "pear/net_socket",
@@ -2640,30 +2640,31 @@
         },
         {
             "name": "pear/pear-core-minimal",
-            "version": "v1.10.13",
+            "version": "v1.10.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/pear-core-minimal.git",
-                "reference": "aed862e95fd286c53cc546734868dc38ff4b5b1d"
+                "reference": "c7b55789d01de0ce090d289b73f1bbd6a2f113b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/pear-core-minimal/zipball/aed862e95fd286c53cc546734868dc38ff4b5b1d",
-                "reference": "aed862e95fd286c53cc546734868dc38ff4b5b1d",
+                "url": "https://api.github.com/repos/pear/pear-core-minimal/zipball/c7b55789d01de0ce090d289b73f1bbd6a2f113b1",
+                "reference": "c7b55789d01de0ce090d289b73f1bbd6a2f113b1",
                 "shasum": ""
             },
             "require": {
                 "pear/console_getopt": "~1.4",
-                "pear/pear_exception": "~1.0"
+                "pear/pear_exception": "~1.0",
+                "php": ">=5.4"
             },
             "replace": {
                 "rsky/pear-core-min": "self.version"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "": "src/"
-                }
+                "classmap": [
+                    "src/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "include-path": [
@@ -2684,7 +2685,7 @@
                 "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=PEAR",
                 "source": "https://github.com/pear/pear-core-minimal"
             },
-            "time": "2023-04-19T19:15:47+00:00"
+            "time": "2025-12-14T20:37:07+00:00"
         },
         {
             "name": "pear/pear_exception",
