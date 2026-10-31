@@ -16,12 +16,12 @@
  */
 
 use Civi\Api4\Activity;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * This class contains the functions for Case Management.
  */
-class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInterface {
+class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
 
   /**
    * Static field for all the case information that we can potentially export.
@@ -29,13 +29,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInte
    * @var array
    */
   public static $_exportableFields = NULL;
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_pre' => ['_on_hook_civicrm_pre', -200],
-      'hook_civicrm_post' => ['_on_hook_civicrm_post', 200],
-    ];
-  }
 
   /**
    * Create a case object.
@@ -55,6 +48,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInte
     return self::writeRecord($params);
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_pre', priority: -200)]
   public static function _on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $e) {
     if ($e->entity !== 'Case') {
       return;
@@ -84,6 +78,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInte
   /**
    * @param \Civi\Core\Event\PostEvent $e
    */
+  #[CiviEventListener(event: 'hook_civicrm_post', priority: 200)]
   public static function _on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
     // FIXME: The EventScanner ought to skip over disabled components when registering HookInterface
     if (!CRM_Core_Component::isEnabled('CiviCase')) {
