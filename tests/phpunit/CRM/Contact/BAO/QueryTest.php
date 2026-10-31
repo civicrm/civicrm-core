@@ -534,7 +534,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       'location' => [
         1 => [
           'location_type' => 'Primary',
-          'phone-1' => 1,
+          'phone-1' => '1',
           'city' => 1,
         ],
       ],
@@ -827,7 +827,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     // Precaution as hitting some inconsistent set up running in isolation vs in the suite.
     CRM_Core_DAO::executeQuery('UPDATE civicrm_address SET postal_code = NULL');
 
-    $this->individualCreate(['api.address.create' => ['postal_code' => 5, 'location_type_id' => 'Main']]);
+    $this->individualCreate(['api.address.create' => ['postal_code' => '5', 'location_type_id' => 'Main']]);
     $this->individualCreate(['api.address.create' => ['postal_code' => 'EH10 4RB-889', 'location_type_id' => 'Main']]);
     $this->individualCreate(['api.address.create' => ['postal_code' => '4', 'location_type_id' => 'Main']]);
     $this->individualCreate(['api.address.create' => ['postal_code' => '6', 'location_type_id' => 'Main']]);
@@ -899,7 +899,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testNonNumericEqualsPostal(): void {
-    $this->individualCreate(['api.address.create' => ['postal_code' => 5, 'location_type_id' => 'Main']]);
+    $this->individualCreate(['api.address.create' => ['postal_code' => '5', 'location_type_id' => 'Main']]);
     $this->individualCreate(['api.address.create' => ['postal_code' => 'EH10 4RB-889', 'location_type_id' => 'Main']]);
     $this->individualCreate(['api.address.create' => ['postal_code' => '4', 'location_type_id' => 'Main']]);
     $this->individualCreate(['api.address.create' => ['postal_code' => '6', 'location_type_id' => 'Main']]);

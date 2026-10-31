@@ -645,7 +645,7 @@ London,',
     $submittedValues['contact_id'] = $this->ids['Contact']['event'] = $this->individualCreate();
 
     if (!empty($eventParams['is_monetary'])) {
-      $phone = Phone::create()->setValues(['phone' => 1235, 'phone_type_id:name' => 'Mobile', 'phone_ext' => 456])->execute()->first();
+      $phone = Phone::create()->setValues(['phone' => '1235', 'phone_type_id:name' => 'Mobile', 'phone_ext' => '456'])->execute()->first();
       $address = Address::create()->setValues(['street_address' => '8 Baker Street', 'supplemental_address_1' => 'Upstairs', 'city' => 'London'])->execute()->first();
       $locationBlockID = LocBlock::create()->setValues(['phone_id' => $phone['id'], 'address_id' => $address['id']])->execute()->first()['id'];
       $event = $this->eventCreatePaid(array_merge([
@@ -755,8 +755,8 @@ London,',
     return [
       'register_date' => '2018-09-04',
       'status_id' => $this->getParticipantStatusID('Registered'),
-      'credit_card_number' => 4444333322221111,
-      'cvv2' => 123,
+      'credit_card_number' => '4444333322221111',
+      'cvv2' => '123',
       'credit_card_exp_date' => [
         'M' => 9,
         'Y' => date('Y', strtotime('+ 1 year')),
@@ -833,7 +833,7 @@ London,',
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $this->callAPISuccessGetValue('Contribution', ['return' => 'id']),
       'total_amount'  => 20,
-      'check_number' => 879,
+      'check_number' => '879',
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
     ]);
     $this->assertPartialPaymentResult($isQuickConfig, $message, FALSE);
@@ -854,7 +854,7 @@ London,',
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $this->callAPISuccessGetValue('Contribution', ['return' => 'id']),
       'total_amount'  => 20,
-      'check_number' => 879,
+      'check_number' => '879',
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
     ]);
     $this->assertPartialPaymentResult($isQuickConfig, $message, FALSE);

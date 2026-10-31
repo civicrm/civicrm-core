@@ -781,7 +781,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contactValues['nick_name'] = 'Old Bill';
     $contactValues['external_identifier'] = 'android';
     $contactValues['street_address'] = 'Big Mansion';
-    $contactValues['phone'] = 12334;
+    $contactValues['phone'] = '12334';
     $mapper = $this->getFieldMappingFromInput($contactValues);
     $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, $mapper);
     $address = $this->callAPISuccessGetSingle('Address', ['street_address' => 'Big Mansion']);
@@ -1092,7 +1092,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contactValues['external_identifier'] = 'android';
 
     $contactValues['street_address'] = 'Big Mansion';
-    $contactValues['phone'] = 12334;
+    $contactValues['phone'] = '12334';
 
     $fieldMapping = $this->getFieldMappingFromInput($contactValues);
     $contactValues['street_address_2'] = 'Teeny Mansion';
@@ -1161,7 +1161,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contactValues['nick_name'] = 'Old Bill';
     $contactValues['external_identifier'] = 'android';
     $contactValues['street_address'] = 'Big Mansion';
-    $contactValues['phone'] = 12334;
+    $contactValues['phone'] = '12334';
 
     $fieldMapping = $this->getFieldMappingFromInput($contactValues, $this->getLocationTypeID('Main'));
 
@@ -2044,7 +2044,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'street_address' => 'PO Box 2716',
       'city' => 'Midway',
       'state_province' => 'UT',
-      'postal_code' => 84049,
+      'postal_code' => '84049',
       'country' => 'United States',
     ];
 

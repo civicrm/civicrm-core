@@ -1335,7 +1335,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'receipt_text_signup' => 'Thank you text',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'record_contribution' => TRUE,
-      'trxn_id' => 777,
+      'trxn_id' => '777',
       'contribution_status_id' => 2,
       'billing_first_name' => 'Test',
       'billing_middle_name' => 'Last',
@@ -1363,7 +1363,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('address', [
       'contact_id' => $this->ids['Contact']['individual_0'],
       'street_address' => '10 Test St',
-      'postal_code' => 90210,
+      'postal_code' => '90210',
     ]);
 
     // Check if Membership is set to Pending.
@@ -1403,7 +1403,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'receipt_text_signup' => 'Thank you text',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'record_contribution' => TRUE,
-      'trxn_id' => 777,
+      'trxn_id' => '777',
       'contribution_status_id' => 2,
       'billing_first_name' => 'Test',
       'billing_middle_name' => 'Last',
@@ -1432,7 +1432,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('address', [
       'contact_id' => $this->ids['Contact']['individual_0'],
       'street_address' => '10 Test St',
-      'postal_code' => 90210,
+      'postal_code' => '90210',
     ]);
 
     // Check if Membership is set to Pending.
@@ -1836,7 +1836,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'receipt_text_signup' => 'Thank you text',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'record_contribution' => TRUE,
-      'trxn_id' => 777,
+      'trxn_id' => '777',
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Pending'),
       'billing_first_name' => 'Test',
       'billing_middle_name' => 'Last',

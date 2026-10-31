@@ -144,7 +144,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'street_address' => '8 Hobbiton Road',
       'city' => 'The Shire',
       'state_province' => 'IL',
-      'postal_code' => 5010,
+      'postal_code' => '5010',
       'country' => 'US',
       'contributionPageID' => '',
       'email' => 'john.smith@example.com',
@@ -232,7 +232,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       "billing_postal_code-$billingLocationTypeID" => 5010,
       "billing_country_id-$billingLocationTypeID" => 1228,
       'credit_card_number' => '4007000000027',
-      'cvv2' => 123,
+      'cvv2' => '123',
       'credit_card_exp_date' => [
         'M' => 11,
         'Y' => 2022,
@@ -281,7 +281,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'street_address' => '8 Hobbiton Road',
       'city' => 'The Shire',
       'state_province' => 'IL',
-      'postal_code' => 5010,
+      'postal_code' => '5010',
       'country' => 'US',
       'contributionPageID' => '',
       'email' => 'john.smith@example.com',
@@ -384,7 +384,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       "billing_postal_code-$billingLocationTypeID" => 5010,
       "billing_country_id-$billingLocationTypeID" => 1228,
       'credit_card_number' => '4444333322221111',
-      'cvv2' => 123,
+      'cvv2' => '123',
       'credit_card_exp_date' => [
         'M' => 9,
         'Y' => 2025,
@@ -419,7 +419,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'country' => 'Angola',
       'month' => '3',
       'year' => '2022',
-      'subscriptionId' => 6656444,
+      'subscriptionId' => '6656444',
       'amount' => '6.00',
     ];
     $message = '';
@@ -448,7 +448,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       '_qf_default' => 'UpdateSubscription:next',
       '_qf_UpdateSubscription_next' => 'Save',
       'id' => '2',
-      'subscriptionId' => 1234,
+      'subscriptionId' => '1234',
     ];
     $message = '';
     $result = $this->processor->changeSubscriptionAmount($message, $params);

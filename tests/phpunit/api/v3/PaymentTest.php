@@ -42,7 +42,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'receive_date' => '2010-01-20',
       'total_amount' => 100.00,
       'financial_type_id' => 'Donation',
-      'trxn_id' => 23456,
+      'trxn_id' => '23456',
       'contribution_status_id' => 1,
     ]);
 
@@ -62,7 +62,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $expectedResult = [
       $payment['id'] => [
         'total_amount' => 100,
-        'trxn_id' => 23456,
+        'trxn_id' => '23456',
         'trxn_date' => '2010-01-20 00:00:00',
         'contribution_id' => $contribution['id'],
         'is_payment' => 1,
@@ -213,24 +213,24 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $individual2 = $this->individualCreate();
     $params1 = [
       'contact_id' => $this->individualCreate(),
-      'trxn_id' => 111111,
+      'trxn_id' => '111111',
       'total_amount' => 10,
     ];
     $contributionID1 = $this->contributionCreate($params1);
 
     $params2 = [
       'contact_id' => $individual2,
-      'trxn_id' => 222222,
+      'trxn_id' => '222222',
       'total_amount' => 20,
     ];
     $contributionID2 = $this->contributionCreate($params2);
 
-    $paymentParams = ['trxn_id' => 111111];
+    $paymentParams = ['trxn_id' => '111111'];
     $payment = $this->callAPISuccess('payment', 'get', $paymentParams);
     $expectedResult = [
       $payment['id'] => [
         'total_amount' => 10,
-        'trxn_id' => 111111,
+        'trxn_id' => '111111',
         'status_id' => 1,
         'is_payment' => 1,
         'contribution_id' => $contributionID1,
@@ -238,12 +238,12 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ];
     $this->checkPaymentResult($payment, $expectedResult);
 
-    $paymentParams = ['trxn_id' => 222222];
+    $paymentParams = ['trxn_id' => '222222'];
     $payment = $this->callAPISuccess('payment', 'get', $paymentParams);
     $expectedResult = [
       $payment['id'] => [
         'total_amount' => 20,
-        'trxn_id' => 222222,
+        'trxn_id' => '222222',
         'status_id' => 1,
         'is_payment' => 1,
         'contribution_id' => $contributionID2,
@@ -293,7 +293,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->_apiversion = $apiVersion;
     $contributionID1 = $this->contributionCreate([
       'contact_id' => $this->individualCreate(),
-      'trxn_id' => 111111,
+      'trxn_id' => '111111',
       'total_amount' => 10,
     ]);
 
@@ -322,7 +322,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   public function testNegativePaymentWithNegativeContribution(): void {
     $params1 = [
       'contact_id' => $this->individualCreate(),
-      'trxn_id' => 111111,
+      'trxn_id' => '111111',
       'total_amount' => -10,
     ];
     $contributionID1 = $this->contributionCreate($params1);
@@ -1075,7 +1075,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'pan_truncation' => '1234',
       'trxn_result_code' => 'Startling success',
       'payment_processor_id' => $processorID,
-      'trxn_id' => 1234,
+      'trxn_id' => '1234',
     ];
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = [
@@ -1088,7 +1088,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
         'card_type_id' => 1,
         'pan_truncation' => '1234',
         'trxn_result_code' => 'Startling success',
-        'trxn_id' => 1234,
+        'trxn_id' => '1234',
         'payment_instrument_id' => $this->getPaymentInstrumentID('Debit Card'),
       ],
     ];

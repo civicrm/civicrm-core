@@ -298,7 +298,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('address', [
       'contact_id' => $this->ids['Contact']['individual'],
       'street_address' => '10 Test St',
-      'postal_code' => 90210,
+      'postal_code' => '90210',
     ]);
     $this->assertMailSentContainingString('Thank you text');
   }
@@ -444,7 +444,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'receipt_text_signup' => 'Thank you text',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'record_contribution' => TRUE,
-      'trxn_id' => 777,
+      'trxn_id' => '777',
       'contribution_status_id' => 2,
     ], ['cid' => $this->ids['Contact']['individual'], 'id' => $this->ids['Membership']['default']])
       ->processForm();
@@ -491,7 +491,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'receipt_text_signup' => 'Thank you text',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'record_contribution' => TRUE,
-      'trxn_id' => 777,
+      'trxn_id' => '777',
       'contribution_status_id' => 2,
       'billing_first_name' => 'Test',
       'billing_middle_name' => 'Last',
@@ -520,7 +520,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('address', [
       'contact_id' => $this->ids['Contact']['individual'],
       'street_address' => '10 Test St',
-      'postal_code' => 90210,
+      'postal_code' => '90210',
     ]);
   }
 
@@ -550,7 +550,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'receipt_text_signup' => 'Thank you text',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'record_contribution' => TRUE,
-      'trxn_id' => 777,
+      'trxn_id' => '777',
       'contribution_status_id' => 1,
       'fee_amount' => .5,
     ], ['cid' => $this->ids['Contact']['individual'], 'id' => $this->ids['Membership']['default']])
@@ -731,7 +731,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'receipt_text_signup' => 'Thank you text',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'record_contribution' => TRUE,
-      'trxn_id' => 777,
+      'trxn_id' => '777',
       'contribution_status_id' => 1,
       'fee_amount' => .5,
     ], ['cid' => $this->ids['Contact']['individual'], 'id' => $originalMembership['id']])
@@ -793,7 +793,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'receipt_text_signup' => 'Thank you text',
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'record_contribution' => TRUE,
-      'trxn_id' => 777,
+      'trxn_id' => '777',
       'contribution_status_id' => 1,
       'fee_amount' => .5,
     ], ['cid' => $this->ids['Contact']['individual'], 'id' => $this->ids['Membership']['expired']])

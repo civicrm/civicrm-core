@@ -742,7 +742,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       'contribution' => [
         'id' => 111,
         'receive_date' => '2012-01-02',
-        'invoice_id' => 11111,
+        'invoice_id' => '11111',
       ],
     ]);
     $p->addRow([
@@ -754,7 +754,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       'contribution' => [
         'id' => 111,
         'receive_date' => '2012-01-02',
-        'invoice_id' => 22222,
+        'invoice_id' => '22222',
       ],
     ]);
     $p->evaluate();
@@ -789,7 +789,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       'contribution' => [
         'id' => 333,
         'receive_date' => '2012-01-02',
-        'invoice_id' => 33333,
+        'invoice_id' => '33333',
       ],
     ]);
     $p->addRow([
@@ -797,7 +797,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       'contribution' => [
         'id' => 444,
         'receive_date' => '2012-01-02',
-        'invoice_id' => 44444,
+        'invoice_id' => '44444',
       ],
     ]);
     $p->evaluate();
@@ -818,8 +818,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
    * Ex: $tokenContext['oldSmartyVar'] = 'new_entity.new_field';
    */
   public function testSmartyTokenAlias_Contribution(): void {
-    $first = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2010-01-01', 'invoice_id' => 100, 'trxn_id' => 1000]);
-    $second = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2011-02-02', 'invoice_id' => 200, 'trxn_id' => 1]);
+    $first = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2010-01-01', 'invoice_id' => '100', 'trxn_id' => '1000']);
+    $second = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2011-02-02', 'invoice_id' => '200', 'trxn_id' => '1']);
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
     $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
     $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
