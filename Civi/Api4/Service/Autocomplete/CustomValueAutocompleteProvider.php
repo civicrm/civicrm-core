@@ -16,11 +16,7 @@ use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class CustomValueAutocompleteProvider extends \Civi\Core\Service\AutoService {
+class CustomValueAutocompleteProvider {
 
   /**
    * Provide default SearchDisplay for autocompletes of multi-record custom values

@@ -11,18 +11,14 @@
 
 namespace Civi\Afform\Placement;
 
-use Civi\Core\Service\AutoService;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Code for placing Afforms as Contact Summary Blocks at runtime,
  * and declaring blocks for ContactLayout Editor.
- *
- * @service
- * @internal
  */
-class ContactSummaryBlockPlacement extends AutoService {
+class ContactSummaryBlockPlacement {
 
   /**
    * Implements hook_civicrm_pageRun().

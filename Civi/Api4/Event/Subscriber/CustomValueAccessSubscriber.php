@@ -24,10 +24,8 @@ use Civi\Api4\Event\AuthorizeRecordEvent;
  * - deny delete if min_multiple under threat
  * - deny replace / save if it will threaten min/max
  * - ?
- *
- * @service internal
  */
-class CustomValueAccessSubscriber extends \Civi\Core\Service\AutoService {
+class CustomValueAccessSubscriber {
 
   /**
    * @param \Civi\Api4\Event\AuthorizeRecordEvent $event

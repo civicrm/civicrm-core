@@ -14,11 +14,7 @@ namespace Civi\Api4\Service\Links;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\API\Event\RespondEvent;
 
-/**
- * @service
- * @internal
- */
-class ParticipantLinksProvider extends \Civi\Core\Service\AutoService {
+class ParticipantLinksProvider {
   use LinksProviderTrait;
 
   /**

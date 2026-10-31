@@ -15,11 +15,7 @@ use Civi\Core\Attribute\CiviEventListener;
 use Civi\API\Event\RespondEvent;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class CaseLinksProvider extends \Civi\Core\Service\AutoService {
+class CaseLinksProvider {
   use LinksProviderTrait;
 
   /**

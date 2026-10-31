@@ -15,11 +15,7 @@ namespace Civi\Api4\Service\Autocomplete;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class ContactTypeAutocompleteProvider extends \Civi\Core\Service\AutoService {
+class ContactTypeAutocompleteProvider {
 
   /**
    * Provide default SearchDisplay for ContactType autocompletes

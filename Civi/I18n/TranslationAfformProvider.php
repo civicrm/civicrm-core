@@ -3,15 +3,8 @@
 namespace Civi\I18n;
 
 use Civi\Core\Attribute\CiviEventListener;
-use Civi\Core\Service\AutoService;
 
-/**
- *
- *
- * @service
- * @internal
- */
-class TranslationAfformProvider extends AutoService {
+class TranslationAfformProvider {
 
   /**
    * Generates afforms for each ECK entity type and sub-type.

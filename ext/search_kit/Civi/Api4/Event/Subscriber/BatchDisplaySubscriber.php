@@ -16,15 +16,12 @@ use Civi\Api4\Action\SearchDisplay\AbstractRunAction;
 use Civi\Api4\Generic\Traits\SavedSearchInspectorTrait;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\PreEvent;
-use Civi\Core\Service\AutoService;
 use Civi\Search\Meta;
 
 /**
  * Presave helper for search displays of type "batch"
- * @service
- * @internal
  */
-class BatchDisplaySubscriber extends AutoService {
+class BatchDisplaySubscriber {
 
   use SavedSearchInspectorTrait;
 

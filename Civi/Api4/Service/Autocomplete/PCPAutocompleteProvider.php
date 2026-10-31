@@ -17,11 +17,8 @@ use Civi\Core\Event\GenericHookEvent;
 
 /**
  * Provide autocomplete searches for Personal Campaign Pages (PCP).
- *
- * @service
- * @internal
  */
-class PCPAutocompleteProvider extends \Civi\Core\Service\AutoService {
+class PCPAutocompleteProvider {
 
   /**
    * Provide default SavedSearch for PCP autocompletes.

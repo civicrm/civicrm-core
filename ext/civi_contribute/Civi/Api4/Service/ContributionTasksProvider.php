@@ -15,11 +15,7 @@ use Civi\Core\Attribute\CiviEventListener;
 use CRM_Contribute_ExtensionUtil as E;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class ContributionTasksProvider extends \Civi\Core\Service\AutoService {
+class ContributionTasksProvider {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event

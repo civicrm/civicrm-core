@@ -14,14 +14,11 @@ namespace Civi\Api4\Subscriber;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\Utils\AfformSaveTrait;
-use Civi\Core\Service\AutoService;
 
 /**
  * Preprocess api authorize requests
- * @service
- * @internal
  */
-class AfformAccessSubscriber extends AutoService {
+class AfformAccessSubscriber {
   use AfformSaveTrait;
 
   /**

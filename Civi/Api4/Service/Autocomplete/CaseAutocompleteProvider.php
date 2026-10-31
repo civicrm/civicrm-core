@@ -16,11 +16,7 @@ use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class CaseAutocompleteProvider extends \Civi\Core\Service\AutoService {
+class CaseAutocompleteProvider {
 
   /**
    * Provide default SavedSearch for Case autocompletes

@@ -15,11 +15,7 @@ namespace Civi\Api4\Service\Autocomplete;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class EventAutocompleteProvider extends \Civi\Core\Service\AutoService {
+class EventAutocompleteProvider {
 
   /**
    * Add is_template filter to event template autocompletes

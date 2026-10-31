@@ -15,11 +15,7 @@ namespace Civi\Api4\Service\Autocomplete;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class EntityAutocompleteProvider extends \Civi\Core\Service\AutoService {
+class EntityAutocompleteProvider {
 
   /**
    * Provide default SearchDisplay for autocompletes of API Entity names

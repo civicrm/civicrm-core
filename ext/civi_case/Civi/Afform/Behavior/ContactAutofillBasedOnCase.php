@@ -7,14 +7,9 @@ use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\API\Event\RespondEvent;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoService;
 use CRM_Case_ExtensionUtil as E;
 
-/**
- * @service
- * @internal
- */
-class ContactAutofillBasedOnCase extends AutoService {
+class ContactAutofillBasedOnCase {
 
   #[CiviEventListener(event: 'civi.api.respond')]
   public static function onAfformGetBehaviors(RespondEvent $event) {

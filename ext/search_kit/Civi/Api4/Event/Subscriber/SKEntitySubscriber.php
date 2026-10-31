@@ -19,16 +19,13 @@ use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
-use Civi\Core\Service\AutoService;
 use Civi\Search\Meta;
 use Civi\Search\SKEntityGenerator;
 
 /**
  * Manages tables and API entities created from search displays of type "entity"
- * @service
- * @internal
  */
-class SKEntitySubscriber extends AutoService {
+class SKEntitySubscriber {
 
   use SavedSearchInspectorTrait;
 

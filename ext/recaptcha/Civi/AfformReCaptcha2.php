@@ -7,14 +7,11 @@ use CRM_Recaptcha_ExtensionUtil as E;
 use Civi\Afform\AHQ;
 use Civi\Afform\Event\AfformValidateEvent;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoService;
 
 /**
  * Provides ReCaptcha2 validation element to Afform
- * @internal
- * @service
  */
-class AfformReCaptcha2 extends AutoService {
+class AfformReCaptcha2 {
 
   #[CiviEventListener(event: 'civi.afform_admin.metadata')]
   public static function onAfformGetMetadata(GenericHookEvent $event) {

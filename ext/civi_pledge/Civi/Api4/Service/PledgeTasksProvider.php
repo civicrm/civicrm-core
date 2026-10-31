@@ -15,11 +15,7 @@ use Civi\Core\Attribute\CiviEventListener;
 use CRM_Pledge_ExtensionUtil as E;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class PledgeTasksProvider extends \Civi\Core\Service\AutoService {
+class PledgeTasksProvider {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event

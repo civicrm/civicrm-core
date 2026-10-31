@@ -2,14 +2,9 @@
 
 namespace Civi\Search;
 
-use Civi\Core\Service\AutoService;
 use Civi\Core\Attribute\CiviEventListener;
 
-/**
- * @service
- * @internal
- */
-class AngularDependencyInjector extends AutoService {
+class AngularDependencyInjector {
 
   /**
    * Generate dynamic list of dependencies for the `crmSearchDisplay` module.

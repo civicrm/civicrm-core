@@ -18,11 +18,7 @@ use Civi\Api4\Setting;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService {
+class ContactAutocompleteProvider {
 
   /**
    * Custom autocomplete for the menubar quicksearch.

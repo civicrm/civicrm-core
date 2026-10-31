@@ -2,15 +2,10 @@
 
 namespace Civi\LegacyFinder;
 
-use Civi\Core\Service\AutoService;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class Finder extends AutoService {
+class Finder {
 
   /**
    * This function exists to provide legacy hook support for finding duplicates.

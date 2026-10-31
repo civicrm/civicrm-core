@@ -15,11 +15,7 @@ namespace Civi\Api4\Service\Autocomplete;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class CountryAutocompleteProvider extends \Civi\Core\Service\AutoService {
+class CountryAutocompleteProvider {
 
   /**
    * Provide default SearchDisplay for Country autocompletes
