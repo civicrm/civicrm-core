@@ -47,6 +47,31 @@ class CRM_Event_Form_Task_BatchTest extends CiviUnitTestCase {
   }
 
   /**
+   * The registration is recognised by its status, not by the wording of its source.
+   *
+   * The source may have been stored in another language or typed in by the
+   * registrant through a participant_source profile field.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitCancelWithOtherSource(): void {
+    $this->createPayLaterRegistration('Anmeldung zu Annual CiviCRM meet (online)', 'Pending from pay later');
+    $this->submitParticipantStatus('Cancelled');
+    $this->assertContributionStatus('Cancelled');
+  }
+
+  /**
+   * A pending contribution of a participant who is not waiting for a pay-later payment is left alone.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSubmitCancelKeepsContributionOfRegisteredParticipant(): void {
+    $this->createPayLaterRegistration('Online Event Registration: Annual CiviCRM meet', 'Registered');
+    $this->submitParticipantStatus('Cancelled');
+    $this->assertContributionStatus('Pending');
+  }
+
+  /**
    * Registering the participant does not mark the pay-later contribution as paid.
    *
    * @throws \CRM_Core_Exception
