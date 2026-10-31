@@ -61,17 +61,10 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
     if (!array_key_exists('Contribution', \Civi::service('action_object_provider')->getEntities())) {
       return $tokens;
     }
-    $tokens += $this->getRelatedTokensForEntity('Address', 'address_id', ['name', 'id']);
+    $tokens += $this->getRelatedTokensForEntity('Address', 'address_id', ['name', 'id', 'display']);
 
     $tokens['address_id.name']['title'] = ts('Billing Address Name');
-    $tokens['address_id.display'] = [
-      'title' => ts('Billing Address'),
-      'name' => 'address_id.display',
-      'type' => 'mapped',
-      'input_type' => 'Text',
-      'audience' => 'user',
-      'data_type' => 'String',
-    ];
+    $tokens['address_id.display']['title'] = ts('Billing Address');
 
     // Ideally we would derive this from 'usage' - but it looks like adding the usage data
     // was quite a bit of work & didn't leave the energy to implement - esp expose for
@@ -90,10 +83,6 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
    * @return string|int
    */
   protected function getFieldValue(TokenRow $row, string $field) {
-    $entityName = $this->getEntityName();
-    if (isset($row->context[$entityName][$field])) {
-      return $row->context[$entityName][$field];
-    }
     if ($field === 'address_id.display') {
       $addressID = $this->getFieldValue($row, 'address_id.id');
       // We possibly could figure out how to load in a cleverer way
