@@ -292,19 +292,23 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * @return bool True if a new child job was created for unqueued recipients, false otherwise.
    */
   private static function queueMissingRecipients(int $mailingID, int $parentJobID): bool {
+    $smsProviderID = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailingID, 'sms_provider_id');
+    $andClause = "r.email_id IS NOT NULL AND r.email_id = meq.email_id";
+    $whereClause = "r.email_id > 0";
+    if (!empty($smsProviderID)) {
+      $andClause = "r.phone_id IS NOT NULL AND r.phone_id = meq.phone_id";
+      $whereClause = "r.phone_id > 0";
+    }
     $sql = CRM_Utils_SQL_Select::from('civicrm_mailing_recipients r')
       ->select(['r.email_id', 'r.contact_id', 'r.phone_id'])
       ->merge(CRM_Mailing_BAO_MailingRecipients::getDeliverableCriteria($mailingID))
       ->join('meq', 'LEFT JOIN civicrm_mailing_event_queue meq
         ON meq.mailing_id = r.mailing_id
         AND meq.is_test = 0
-        AND (
-          (r.email_id IS NOT NULL AND r.email_id = meq.email_id)
-          OR (r.phone_id IS NOT NULL AND r.phone_id = meq.phone_id)
-        )')
+        AND ' . $andClause)
       ->where('r.mailing_id = #mailingID')
       ->where('meq.id IS NULL')
-      ->where('r.email_id > 0 OR r.phone_id > 0')
+      ->where($whereClause)
       ->param('#mailingID', $mailingID)
       ->toSQL();
 
