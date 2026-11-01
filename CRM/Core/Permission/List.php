@@ -10,6 +10,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
@@ -30,6 +31,7 @@ class CRM_Core_Permission_List {
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @see \CRM_Utils_Hook::permissionList
    */
+  #[CiviEventListener(event: 'hook_civicrm_permissionList', priority: 950)]
   public static function findCiviPermissions(GenericHookEvent $e) {
     $allCorePerms = \CRM_Core_Permission::basicPermissions(TRUE, TRUE);
     foreach ($allCorePerms as $permName => $corePerm) {
@@ -51,6 +53,7 @@ class CRM_Core_Permission_List {
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @see \CRM_Utils_Hook::permissionList
    */
+  #[CiviEventListener(event: 'hook_civicrm_permissionList', priority: 925)]
   public static function findCmsPermissions(GenericHookEvent $e) {
     $config = \CRM_Core_Config::singleton();
 
@@ -85,6 +88,7 @@ class CRM_Core_Permission_List {
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @see \CRM_Utils_Hook::permissionList
    */
+  #[CiviEventListener(event: 'hook_civicrm_permissionList', priority: 975)]
   public static function findConstPermissions(GenericHookEvent $e) {
     // There are a handful of special permissions defined in CRM/Core/Permission.
     // Enforcement of them is handled in `CRM_Core_Permission_*::check()`

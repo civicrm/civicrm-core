@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Attribute\CiviEventListener;
+
 /**
  * This class contains functions for managing Tag(tag) for a contact
  *
@@ -498,10 +500,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   /**
    * This function deletes entity tags when a related entity is called.
    *
-   * It is registered as a listener in \Civi\Core\Container::createEventDispatcher
-   *
    * @param \Civi\Core\DAO\Event\PreDelete $event
    */
+  #[CiviEventListener(event: 'civi.dao.preDelete')]
   public static function preDeleteOtherEntity($event) {
     if (
       $event->object instanceof CRM_Core_DAO_EntityTag

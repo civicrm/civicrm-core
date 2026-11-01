@@ -432,18 +432,15 @@ class Container {
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);
-    $dispatcher->addListener('&civi.mailing.track', ['CRM_Mailing_BAO_MailingTrackableURL', 'on_civi_mailing_track'], -500);
     $dispatcher->addListener('hook_civicrm_initiators', $aliasFuncEvent('hook_civicrm_initiators', fn($e) => $e->context['for']), 100);
     $dispatcher->addListener('hook_civicrm_post', ['\CRM_Core_Transaction', 'addPostCommit'], -1000);
     $dispatcher->addListener('hook_civicrm_pre', $aliasEvent('hook_civicrm_pre', 'entity'), 100);
-    $dispatcher->addListener('civi.dao.preDelete', ['\CRM_Core_BAO_EntityTag', 'preDeleteOtherEntity']);
     $dispatcher->addListener('hook_civicrm_post', $aliasEvent('hook_civicrm_post', 'entity'), 100);
     $dispatcher->addListener('hook_civicrm_postCommit', $aliasEvent('hook_civicrm_postCommit', 'entity'), 100);
     $dispatcher->addListener('hook_civicrm_post::Activity', ['\Civi\CCase\Events', 'fireCaseChange']);
     $dispatcher->addListener('hook_civicrm_post::Case', ['\Civi\CCase\Events', 'fireCaseChange']);
     $dispatcher->addListener('hook_civicrm_caseChange', ['\Civi\CCase\Events', 'delegateToXmlListeners']);
     $dispatcher->addListener('hook_civicrm_caseChange', ['\Civi\CCase\SequenceListener', 'onCaseChange_static']);
-    $dispatcher->addListener('hook_civicrm_cryptoRotateKey', ['\Civi\Crypto\RotateKeys', 'rotateSmtp']);
     $dispatcher->addListener('hook_civicrm_eventDefs', ['\Civi\Core\CiviEventInspector', 'findBuiltInEvents']);
     // TODO We need a better code-convention for metadata about non-hook events.
     $dispatcher->addListener('hook_civicrm_eventDefs', ['\Civi\API\Events', 'hookEventDefs']);
@@ -457,16 +454,6 @@ class Container {
     $dispatcher->addListener('hook_civicrm_alterExternUrl', ['\CRM_Utils_System', 'migrateExternUrl'], 1000);
     // Not a BAO class so it can't implement hookInterface
     $dispatcher->addListener('hook_civicrm_post', ['CRM_Utils_Recent', 'on_hook_civicrm_post']);
-    $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findConstPermissions'], 975);
-    $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCiviPermissions'], 950);
-    $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCmsPermissions'], 925);
-    $dispatcher->addListener('hook_civicrm_permission_check', ['CRM_Core_Permission', 'checkConstPermissions'], 1000);
-
-    $dispatcher->addListener('hook_civicrm_postSave_civicrm_domain', ['\CRM_Core_BAO_Domain', 'onPostSave']);
-    $dispatcher->addListener('hook_civicrm_unhandled_exception', [
-      'CRM_Core_LegacyErrorHandler',
-      'handleException',
-    ], -200);
 
     return $dispatcher;
   }
