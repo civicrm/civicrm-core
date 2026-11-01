@@ -7,13 +7,13 @@ table.crm-sticky-header > thead > tr {
   top: var(--crm-menubar-bottom, 0px);
   z-index: 2;
 }
-.crm-search-display-table > table.table > thead > tr > th.crm-search-result-select {
+.crm-search-display-table table.table > thead > tr > th.crm-search-result-select {
   padding-inline: var(--crm-l-medium);
   text-transform: none;
   color: initial;
   min-width: 95px; /* Don't allow button to be split on 2 lines */
 }
-.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon + .crm-search-display-table-column-label {
+.crm-search-display-table table.table > thead > tr > th i.crm-search-table-column-sort-icon + .crm-search-display-table-column-label {
   margin-left: 0 !important;
 }
 .crm-search-display.crm-search-display-table tfoot > tr > td {

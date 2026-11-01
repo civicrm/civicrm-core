@@ -8,7 +8,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .delete-icon,
 .crm-container span:is(.batch-valid,.batch-invalid),
 .crm-container .messages.crm-empty-table::before,
-.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon,
+.crm-search-display-table table.table > thead > tr > th i.crm-search-table-column-sort-icon,
 .crm-credit_card_type-icons a::before {
   font: normal normal var(--crm-font-size) "Font Awesome 6 Free", "FontAwesome";
   text-rendering: auto;
@@ -148,7 +148,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container th a:focus {
   text-decoration: none;
 }
-.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon {
+.crm-search-display-table table.table > thead > tr > th i.crm-search-table-column-sort-icon {
   /* Bootstrap & SearchKit sort resets */
   position: absolute;
   margin-left: -1.5ch;
@@ -179,14 +179,14 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-container a.sorting_asc::after,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-asc::before,
-.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon.fa-sort-asc::before,
+.crm-search-display-table table.table > thead > tr > th i.crm-search-table-column-sort-icon.fa-sort-asc::before,
 .crm-container table.dataTable thead th.sorting_asc::before {
   content: var(--crm-icon-sort-asc);
   color: var(--crm-table-sort-active-color);
 }
 .crm-container a.sorting_desc::after,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon.fa-sort-desc::before,
-.crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon.fa-sort-desc::before,
+.crm-search-display-table table.table > thead > tr > th i.crm-search-table-column-sort-icon.fa-sort-desc::before,
 .crm-container table.dataTable thead th.sorting_desc::before {
   content: var(--crm-icon-sort-desc);
   color: var(--crm-table-sort-active-color);
