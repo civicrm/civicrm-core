@@ -99,7 +99,7 @@ class CRM_Mailing_MailingHeaderFooterTest extends CiviUnitTestCase {
       'name' => 'CiviTestSMSProvider',
       'api_type' => 1,
       'username' => 1,
-      'password' => 1,
+      'password' => '1',
       'api_url' => 1,
       'api_params' => 'a=1',
       'is_default' => 1,

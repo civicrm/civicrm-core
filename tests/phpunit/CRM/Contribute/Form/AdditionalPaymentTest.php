@@ -389,7 +389,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
         'payment_processor_id' => $this->paymentProcessorID,
         'credit_card_exp_date' => ['M' => 5, 'Y' => (int) date('Y') + 1],
         'credit_card_number' => '411111111111111',
-        'cvv2' => 234,
+        'cvv2' => '234',
         'credit_card_type' => 'Visa',
         "billing_city-$billingLocationTypeID" => 'Vancouver',
         "billing_state_province_id-$billingLocationTypeID" => $stateProvinceID['id'],

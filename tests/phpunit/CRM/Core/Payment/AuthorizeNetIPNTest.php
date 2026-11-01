@@ -78,8 +78,8 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'receive_date_time' => date('H:i:s'),
       'contact_id' => $this->ids['Contact']['individual_0'],
       'contribution_status_id' => 1,
-      'credit_card_number' => 4444333322221111,
-      'cvv2' => 123,
+      'credit_card_number' => '4444333322221111',
+      'cvv2' => '123',
       'credit_card_exp_date' => [
         'M' => 9,
         'Y' => 2025,
@@ -407,7 +407,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
 
     $this->_contactID = $this->individualCreate(['first_name' => 'Antonia', 'prefix_id' => 'Mrs.', 'email' => 'antonia_anderson@civicrm.org']);
 
-    $this->setupMembershipRecurringPaymentProcessorTransaction(['is_email_receipt' => TRUE], ['invoice_id' => 8977, 'contribution_page_id' => NULL]);
+    $this->setupMembershipRecurringPaymentProcessorTransaction(['is_email_receipt' => TRUE], ['invoice_id' => '8977', 'contribution_page_id' => NULL]);
     $mut->clearMessages();
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction(['x_trans_id' => 'hers']));
     $IPN->main();

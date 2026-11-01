@@ -1332,11 +1332,11 @@ emo
   protected function getDomainTokenData(): array {
     return [
       'name' => 'Default Domain Name',
-      'phone' => 123,
+      'phone' => '123',
       'address' => [
         'street_address' => 'Buckingham palace',
         'supplemental_address_1' => 'Up the road',
-        'postal_code' => 90210,
+        'postal_code' => '90210',
         'geocode_1' => 789,
         'geocode_2' => 890,
         'city' => 'London',

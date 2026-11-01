@@ -78,8 +78,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $contributionPageID2 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
 
     $this->submitOnlineContributionForm([
-      'credit_card_number' => 4111111111111111,
-      'cvv2' => 234,
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '234',
       'credit_card_exp_date' => [
         'M' => 2,
         'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
@@ -141,8 +141,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     });
 
     $this->submitOnlineContributionForm([
-      'credit_card_number' => 4111111111111111,
-      'cvv2' => 234,
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '234',
       'credit_card_exp_date' => [
         'M' => 2,
         'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
@@ -203,8 +203,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $contributionPageID2 = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
 
     $this->submitOnlineContributionForm([
-      'credit_card_number' => 4111111111111111,
-      'cvv2' => 234,
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '234',
       'credit_card_exp_date' => [
         'M' => 2,
         'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
@@ -250,8 +250,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
 
     $this->submitOnlineContributionForm([
-      'credit_card_number' => 4111111111111111,
-      'cvv2' => 234,
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '234',
       'credit_card_exp_date' => [
         'M' => 2,
         'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
@@ -626,8 +626,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ]);
 
     $submittedValues = [
-      'credit_card_number' => 4111111111111111,
-      'cvv2' => 234,
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '234',
       'credit_card_exp_date' => [
         'M' => 2,
         'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
@@ -1491,7 +1491,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
-      'cvv2' => 123,
+      'cvv2' => '123',
     ];
     $this->submitOnlineContributionForm($submitParams,
       $this->getContributionPageID());
@@ -1767,7 +1767,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
-      'cvv2' => 123,
+      'cvv2' => '123',
     ];
     $this->submitOnlineContributionForm($submitParams,
         $this->getContributionPageID('existingMemberPage'), ['cid' => $this->ids['Contact']['member']]);
@@ -1864,7 +1864,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
-      'cvv2' => 123,
+      'cvv2' => '123',
     ];
     $this->submitOnlineContributionForm($submitParams,
       $this->getContributionPageID('existingMemberPage'), ['cid' => $this->ids['Contact']['member']]);

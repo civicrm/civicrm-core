@@ -260,7 +260,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       ->addValue('total_amount', 100)
       ->addValue('payment_instrument_id', 1)
       ->addValue('card_type_id', 1)
-      ->addValue('pan_truncation', 1234)
+      ->addValue('pan_truncation', '1234')
       ->execute();
     $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
@@ -281,7 +281,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       ->addValue('total_amount', 200)
       ->addValue('payment_instrument_id', 1)
       ->addValue('card_type_id', 2)
-      ->addValue('pan_truncation', 5678)
+      ->addValue('pan_truncation', '5678')
       ->execute();
 
     $useCases = [

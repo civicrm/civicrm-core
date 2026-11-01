@@ -68,7 +68,7 @@ class CRM_Import_ParserTest extends CiviUnitTestCase {
         'Organization',
       ],
       'organization field 2' => [
-        ['sic_code' => 123],
+        ['sic_code' => '123'],
         'Organization',
       ],
       'household field 1' => [

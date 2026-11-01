@@ -173,7 +173,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->assertFalse(isset($financialTrxn['pan_truncation']));
     $params = [
       'card_type_id' => 2,
-      'pan_truncation' => 4567,
+      'pan_truncation' => '4567',
       'id' => $contribution['id'],
     ];
     $this->callAPISuccess('Contribution', 'create', $params);
