@@ -656,6 +656,34 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
   }
 
   /**
+   * ContactInfo for organizations and households doesn't show the name, so
+   * validation must not require it.
+   */
+  public function testContactInfoFormValidatesWithoutName(): void {
+    $org = $this->createTestEntity('Contact', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'Acme Corp',
+    ], 'org_contact');
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_ContactInfo', [
+      'oplock_ts' => $this->getOplockTs($org['id']),
+      'legal_name' => 'Acme Corporation LLC',
+    ], ['cid' => $org['id']]);
+    $formWrapper->processForm(FormWrapper::VALIDATED);
+    $this->assertEmpty($formWrapper->getValidationOutput());
+
+    $household = $this->createTestEntity('Contact', [
+      'contact_type' => 'Household',
+      'household_name' => 'The Smiths',
+    ], 'household_contact');
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_ContactInfo', [
+      'oplock_ts' => $this->getOplockTs($household['id']),
+      'nick_name' => 'Smiths',
+    ], ['cid' => $household['id']]);
+    $formWrapper->processForm(FormWrapper::VALIDATED);
+    $this->assertEmpty($formWrapper->getValidationOutput());
+  }
+
+  /**
    * Test Demographics inline form submission.
    */
   public function testDemographicsForm(): void {
