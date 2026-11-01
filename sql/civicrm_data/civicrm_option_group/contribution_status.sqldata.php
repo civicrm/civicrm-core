@@ -9,7 +9,8 @@ return CRM_Core_CodeGen_OptionGroup::create('contribution_status', 'a/0011')
     [ts('Pending'), 'Pending', 2],
     [ts('Cancelled'), 'Cancelled', 3],
     [ts('Failed'), 'Failed', 4],
-    // 5 and 6 went fishing.
+    [ts('In Progress'), 'In Progress', 5, 'description' => ts('The payer has completed their action and the payment processor is still processing the payment.')],
+    // 6 went fishing.
     [ts('Refunded'), 'Refunded', 7],
     [ts('Partially paid'), 'Partially paid', 8],
     [ts('Pending refund'), 'Pending refund', 9],
