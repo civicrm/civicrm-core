@@ -1063,7 +1063,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
     // provides transitional support.
     return;
   }
-  $entityId ??= $params['id'] ?? $params['contact_id'] ?? NULL;
+  $entityId ??= $params['id'] ?? NULL;
   $values['custom'] = [];
   $checkCheckBoxField = FALSE;
   $entity = $extends;
