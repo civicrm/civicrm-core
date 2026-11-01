@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Attribute\CiviEventListener;
+
 /**
  *
  * @package CRM
@@ -26,6 +28,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
    * @see CRM_Core_BAO_Domain::getDomain()
    * @param CRM_Core_DAO_Domain $domain
    */
+  #[CiviEventListener(event: 'hook_civicrm_postSave_civicrm_domain')]
   public static function onPostSave($domain) {
     // We want to clear out any cached tokens.
     // Editing a domain is so rare we can risk being heavy handed.
