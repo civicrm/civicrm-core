@@ -12,20 +12,12 @@
 
 namespace Civi\Api4\Service\Links;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class RelationshipCacheLinksProvider extends \Civi\Core\Service\AutoSubscriber {
+class RelationshipCacheLinksProvider {
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api4.getLinks' => 'alterRelationshipCacheLinks',
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.api4.getLinks')]
   public static function alterRelationshipCacheLinks(GenericHookEvent $e): void {
     if ($e->entity === 'RelationshipCache') {
       foreach ($e->links as &$link) {
