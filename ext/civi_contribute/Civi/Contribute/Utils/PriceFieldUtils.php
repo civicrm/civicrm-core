@@ -118,10 +118,27 @@ class PriceFieldUtils {
       ->execute();
 
     // Add amount to each PriceFieldValue option label
+    // Prices repeat heavily across price sets, and money() is slow, so format
+    // each distinct amount once.
+    $currency = \CRM_Core_Config::singleton()->defaultCurrency;
+    $formattedAmounts = [];
     foreach ($fieldValues as &$fieldValue) {
       if (!empty($priceFields[$fieldValue['price_field_id']]['is_display_amounts'])) {
-        $fieldValue['label'] = $fieldValue['label'] . ' - ' . \Civi::format()->money($fieldValue['amount'], \CRM_Core_Config::singleton()->defaultCurrency);
+        $amountKey = (string) $fieldValue['amount'];
+        $formattedAmounts[$amountKey] ??= \Civi::format()->money($fieldValue['amount'], $currency);
+        $fieldValue['label'] = $fieldValue['label'] . ' - ' . $formattedAmounts[$amountKey];
       }
+    }
+
+    // End the by-reference loop above, so the variable cannot alias the last
+    // element when it is reused.
+    unset($fieldValue);
+
+    // Group the values by field once. Filtering the whole list for every field
+    // is O(fields x values).
+    $fieldValuesByField = [];
+    foreach ($fieldValues as $optionValue) {
+      $fieldValuesByField[$optionValue['price_field_id']][] = $optionValue;
     }
 
     $extendsIdToEntityMap = self::getExtendsIdToEntityMap();
@@ -152,7 +169,7 @@ class PriceFieldUtils {
         'is_enter_qty' => $priceField['is_enter_qty'],
       ];
 
-      $options = array_values(array_filter($fieldValues, fn($value) => ($value['price_field_id'] === $priceField['id'])));
+      $options = $fieldValuesByField[$priceField['id']] ?? [];
 
       if ($fieldSpec['is_enter_qty']) {
         if (!$options) {
