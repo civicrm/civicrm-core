@@ -2,10 +2,10 @@
 
 namespace Civi\Api4\Service;
 
-use Civi\Core\ClassScanner;
-use Civi\Core\Service\AutoSubscriber;
-use Civi\Core\Event\GenericHookEvent;
 use Civi\Api4\Generic\EntityInterface;
+use Civi\Core\Attribute\CiviEventListener;
+use Civi\Core\ClassScanner;
+use Civi\Core\Event\GenericHookEvent;
 use CRM_Extension_Info;
 
 /**
@@ -17,15 +17,9 @@ use CRM_Extension_Info;
  *
  * @see LegacySpecGatherer
  */
-class LegacyEntityScanner extends AutoSubscriber {
+class LegacyEntityScanner {
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api4.entityTypes' => 'addEntities',
-      'hook_civicrm_check' => 'check',
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.api4.entityTypes')]
   public function addEntities(GenericHookEvent $e): void {
     foreach (self::getEntitiesFromClasses() as $info) {
       if (!isset($e->entities[$info['name']])) {
@@ -120,6 +114,7 @@ class LegacyEntityScanner extends AutoSubscriber {
     return FALSE;
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_check')]
   public function check(GenericHookEvent $e): void {
     // Prefer entities be discoverable via class-scanner. Any entities that aren't should generate warnings.
     $scannedEntities = array_map(fn($c) => $c::getEntityName(), ClassScanner::get(['interface' => EntityInterface::class]));

@@ -3,8 +3,8 @@ declare(strict_types = 1);
 
 namespace Civi\Contribute\EventSubscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\PreEvent;
-use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Rejects OrderCompletionMetadata writes containing keys we don't yet
@@ -19,19 +19,14 @@ use Civi\Core\Service\AutoSubscriber;
  * 'email', Civi\Membership\OrderCompleteSubscriber for 'entity') lets us
  * extend the format later without carrying that risk now.
  */
-final class OrderCompletionMetadataValidateSubscriber extends AutoSubscriber {
+final class OrderCompletionMetadataValidateSubscriber {
 
   private const ALLOWED_KEYS = [
     'email' => ['userMessageText', 'is_send_receipt'],
     'entity' => ['join_date', 'start_date', 'end_date'],
   ];
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_pre' => 'onPre',
-    ];
-  }
-
+  #[CiviEventListener(event: 'hook_civicrm_pre')]
   public function onPre(PreEvent $event): void {
     if ($event->entity !== 'OrderCompletionMetadata' || !in_array($event->action, ['create', 'edit'], TRUE)) {
       return;
