@@ -261,7 +261,10 @@ class CRM_Extension_System {
    */
   public function getCache() {
     if ($this->cache === NULL) {
-      $cacheGroup = 'ext_' . CRM_Utils_String::base64UrlEncode(md5(serialize($this->parameters), TRUE));
+      // Nothing cached here depends on the URLs, which can differ between CLI and web. Leave
+      // them out so every process shares one group, and a flush from any of them clears it.
+      $cacheParams = array_diff_key($this->parameters, array_flip(['extensionsURL', 'resourceBase', 'userFrameworkBaseURL']));
+      $cacheGroup = 'ext_' . CRM_Utils_String::base64UrlEncode(md5(serialize($cacheParams), TRUE));
       // Extension system starts before container. Manage our own cache.
       $this->cache = CRM_Utils_Cache::create([
         'name' => $cacheGroup,

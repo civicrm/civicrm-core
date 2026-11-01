@@ -23,4 +23,35 @@ class CRM_Extension_SystemTest extends CiviUnitTestCase {
     $this->assertNotContains('test.deep', $keys);
   }
 
+  public function testCacheIsSharedWhenOnlyUrlsDiffer(): void {
+    $extensionsDir = $this->createTempDir('ext-cache-');
+    $webParams = [
+      'extensionsDir' => $extensionsDir,
+      'extensionsURL' => 'https://example.org/ext',
+      'resourceBase' => 'https://example.org/core',
+      'userFrameworkBaseURL' => 'https://example.org/',
+    ];
+    $cliParams = [
+      'extensionsDir' => $extensionsDir,
+      'extensionsURL' => 'http://localhost/ext',
+      'resourceBase' => 'http://localhost/core',
+      'userFrameworkBaseURL' => 'http://localhost/',
+    ];
+
+    // Each new system stands in for a separate process, with no in-memory copy of the cache.
+    (new CRM_Extension_System($webParams))->getCache()->set('probe', 'set by web');
+    $this->assertEquals('set by web', (new CRM_Extension_System($cliParams))->getCache()->get('probe'));
+
+    (new CRM_Extension_System($cliParams))->getCache()->flush();
+    $this->assertNull((new CRM_Extension_System($webParams))->getCache()->get('probe'));
+  }
+
+  public function testCacheIsSeparateForDifferentExtensionsDirs(): void {
+    $siteA = new CRM_Extension_System(['extensionsDir' => $this->createTempDir('ext-cache-a-')]);
+    $siteB = new CRM_Extension_System(['extensionsDir' => $this->createTempDir('ext-cache-b-')]);
+
+    $siteA->getCache()->set('probe', 'set by site A');
+    $this->assertNull($siteB->getCache()->get('probe'));
+  }
+
 }
