@@ -34,8 +34,10 @@ use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\DedupeRule;
+use Civi\Api4\EntityFinancialTrxn;
 use Civi\Api4\ExampleData;
 use Civi\Api4\FinancialAccount;
+use Civi\Api4\FinancialItem;
 use Civi\Api4\FinancialType;
 use Civi\Api4\LineItem;
 use Civi\Api4\MembershipType;
@@ -643,6 +645,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     }
     $this->validateAllPayments();
     $this->validateAllContributions();
+    $this->validateAllFinancialTrxns();
   }
 
   /**
@@ -3616,6 +3619,117 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       }
       $this->assertEquals($taxTotal, (float) ($contribution['tax_amount'] ?? 0));
       $this->assertEquals($total + $taxTotal, $contribution['total_amount']);
+    }
+  }
+
+  /**
+   * Validate financial trxns & financial items recorded against every contribution.
+   *
+   * This is deliberately cast wide rather than pre-judging what's "by design" -
+   * three checks, against every contribution with any financial trxn:
+   *
+   * 1. Every financial trxn's total_amount must equal the sum of whatever it has
+   *    allocated to civicrm_financial_item (via civicrm_entity_financial_trxn).
+   *    A trxn with NO such allocation is asserted against zero, not skipped -
+   *    eg. recordAlwaysAccountsReceivable() currently creates a trxn with no
+   *    financial_item allocation at all, which this will now flag.
+   * 2. The sum of all `is_payment = 1` trxns for a contribution must equal its
+   *    paid_amount.
+   * 3. For a fully-settled contribution (balance_amount = 0, ie. fully paid or
+   *    fully refunded), every one of its financial items' own `amount` must equal
+   *    the sum of its `is_payment = 1`-linked civicrm_entity_financial_trxn rows.
+   *    This mirrors the "paid"/"balance" calculation Payment::getPayableItems()
+   *    already does (it explicitly filters allocated.financial_trxn_id.is_payment
+   *    = TRUE when working out how much of an item has been paid) - at zero
+   *    balance that paid amount should equal the item's full amount. This is
+   *    deliberately NOT asserted for a partially-paid contribution, since which
+   *    items absorbed a partial payment is allocation-dependent (line_item_allocation,
+   *    proportional ratio) and isn't safe to assert generically.
+   *
+   * Expect this to surface failures that need triage - some may be genuine bugs,
+   * some may be existing trxn types this check doesn't yet model correctly. Narrow
+   * it down once we see what it finds, rather than trying to pre-guess every
+   * legitimate exception now.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function validateAllFinancialTrxns(): void {
+    $contributionIDs = EntityFinancialTrxn::get(FALSE)
+      ->addWhere('entity_table', '=', 'civicrm_contribution')
+      ->addSelect('entity_id')
+      ->execute()->column('entity_id');
+    foreach (array_unique($contributionIDs) as $contributionID) {
+      $trxnLinks = EntityFinancialTrxn::get(FALSE)
+        ->addWhere('entity_table', '=', 'civicrm_contribution')
+        ->addWhere('entity_id', '=', $contributionID)
+        ->addSelect('financial_trxn_id', 'financial_trxn_id.total_amount', 'financial_trxn_id.is_payment')
+        ->execute();
+
+      $paymentTotal = 0;
+      foreach ($trxnLinks as $trxnLink) {
+        $financialTrxnID = $trxnLink['financial_trxn_id'];
+        $totalAmount = (float) $trxnLink['financial_trxn_id.total_amount'];
+
+        $itemLinks = EntityFinancialTrxn::get(FALSE)
+          ->addWhere('entity_table', '=', 'civicrm_financial_item')
+          ->addWhere('financial_trxn_id', '=', $financialTrxnID)
+          ->execute();
+        $itemTotal = 0;
+        foreach ($itemLinks as $itemLink) {
+          $itemTotal += $itemLink['amount'];
+        }
+        $this->assertEquals(
+          round($totalAmount, 2),
+          round($itemTotal, 2),
+          "FinancialTrxn $financialTrxnID (contribution $contributionID) total_amount does not match the sum of its allocated financial items ({$itemLinks->count()} found).
+          " .print_r($itemLinks, TRUE) . print_r($trxnLink, TRUE)
+        );
+
+        if ($trxnLink['financial_trxn_id.is_payment']) {
+          $paymentTotal += $totalAmount;
+        }
+      }
+
+      $contribution = Contribution::get(FALSE)
+        ->addWhere('id', '=', $contributionID)
+        ->addSelect('paid_amount', 'balance_amount')
+        ->execute()->first();
+      $this->assertEquals(
+        round((float) ($contribution['paid_amount'] ?? 0), 2),
+        round($paymentTotal, 2),
+        "Contribution $contributionID: sum of is_payment trxns does not match paid_amount."
+      );
+
+      if (round((float) ($contribution['balance_amount'] ?? 0), 2) === 0.0) {
+        $lineItemIDs = LineItem::get(FALSE)
+          ->addWhere('contribution_id', '=', $contributionID)
+          ->addSelect('id')
+          ->execute()->column('id');
+        if (!empty($lineItemIDs)) {
+          $financialItems = FinancialItem::get(FALSE)
+            ->addWhere('entity_table', '=', 'civicrm_line_item')
+            ->addWhere('entity_id', 'IN', $lineItemIDs)
+            ->addSelect('id', 'amount')
+            ->execute();
+          foreach ($financialItems as $financialItem) {
+            $paidLinks = EntityFinancialTrxn::get(FALSE)
+              ->addWhere('entity_table', '=', 'civicrm_financial_item')
+              ->addWhere('entity_id', '=', $financialItem['id'])
+              ->addWhere('financial_trxn_id.is_payment', '=', TRUE)
+              ->addSelect('amount')
+              ->execute();
+            $paidTotal = 0;
+            foreach ($paidLinks as $paidLink) {
+              $paidTotal += $paidLink['amount'];
+            }
+            $this->assertEquals(
+              round((float) $financialItem['amount'], 2),
+              round($paidTotal, 2),
+              "FinancialItem {$financialItem['id']} (contribution $contributionID, zero balance) amount does not match the sum of its is_payment-linked allocations."
+            );
+          }
+        }
+      }
     }
   }
 
