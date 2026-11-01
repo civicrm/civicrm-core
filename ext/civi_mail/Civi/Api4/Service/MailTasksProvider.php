@@ -11,24 +11,16 @@
 
 namespace Civi\Api4\Service;
 
+use Civi\Core\Attribute\CiviEventListener;
 use CRM_Mailing_ExtensionUtil as E;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class MailTasksProvider extends \Civi\Core\Service\AutoSubscriber {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_searchKitTasks' => 'addMailTasks',
-    ];
-  }
+class MailTasksProvider {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_searchKitTasks')]
   public function addMailTasks(GenericHookEvent $event): void {
     if (
         \CRM_Core_Permission::access('CiviMail') || !$event->checkPermissions ||

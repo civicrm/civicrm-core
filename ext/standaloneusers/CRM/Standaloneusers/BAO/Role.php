@@ -1,4 +1,5 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /**
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
@@ -7,7 +8,7 @@
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use CRM_Standaloneusers_ExtensionUtil as E;
 
-class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implements \Civi\Core\HookInterface {
+class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role {
 
   public const SUPERADMIN_ROLE_NAME = 'admin';
 
@@ -17,6 +18,7 @@ class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implemen
    * Event fired after an action is taken on a Role record.
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     // Reset cache
     Civi::cache('metadata')->clear();
@@ -40,6 +42,7 @@ class CRM_Standaloneusers_BAO_Role extends CRM_Standaloneusers_DAO_Role implemen
    * @param \Civi\Api4\Event\AuthorizeRecordEvent $e
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $action = $e->getActionName();

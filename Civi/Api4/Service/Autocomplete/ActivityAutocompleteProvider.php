@@ -12,21 +12,18 @@
 
 namespace Civi\Api4\Service\Autocomplete;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\HookInterface;
 
-/**
- * @service
- * @internal
- */
-class ActivityAutocompleteProvider extends \Civi\Core\Service\AutoService implements HookInterface {
+class ActivityAutocompleteProvider {
 
   /**
    * Provide default SavedSearch for Activity autocompletes
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.autocompleteDefault')]
   public static function on_civi_search_autocompleteDefault(GenericHookEvent $e) {
     if (!is_array($e->savedSearch) || $e->savedSearch['api_entity'] !== 'Activity') {
       return;
@@ -61,6 +58,7 @@ class ActivityAutocompleteProvider extends \Civi\Core\Service\AutoService implem
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay')]
   public static function on_civi_search_defaultDisplay(GenericHookEvent $e) {
     if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || $e->savedSearch['api_entity'] !== 'Activity') {
       return;

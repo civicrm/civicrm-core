@@ -44,7 +44,7 @@
   <mixins>
     <mixin>ang-php@1.0.0</mixin>
     <mixin>mgd-php@2.0.0</mixin>
-    <mixin>scan-classes@1.0.0</mixin>
+    <mixin>scan-classes@2.0.0</mixin>
     <mixin>smarty@1.0.3</mixin>
     <mixin>entity-types-php@2.0.0</mixin>
     <mixin>menu-xml@1.0.0</mixin>

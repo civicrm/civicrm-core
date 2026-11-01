@@ -11,32 +11,21 @@
 
 namespace Civi\Api4\Subscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\Utils\AfformSaveTrait;
-use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Preprocess api authorize requests
- * @service
- * @internal
  */
-class AfformAccessSubscriber extends AutoService implements EventSubscriberInterface {
+class AfformAccessSubscriber {
   use AfformSaveTrait;
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api4.authorizeRecord::Afform' => ['onApiAuthorizeRecord', 500],
-    ];
-  }
 
   /**
    * @param \Civi\Api4\Event\AuthorizeRecordEvent $event
    *   API record authorize event
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::Afform', priority: 500)]
   public function onApiAuthorizeRecord(AuthorizeRecordEvent $event) {
     $apiRequest = $event->getApiRequest();
     $action = $apiRequest->getActionName();

@@ -14,20 +14,14 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
  * The CiviCRM duplicate discovery engine is based on an
  * algorithm designed by David Strauss <david@fourkitchens.com>.
  */
-class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_findExistingDuplicates' => ['hook_civicrm_findExistingDuplicates', -200],
-      'hook_civicrm_findDuplicates' => ['hook_civicrm_findDuplicates', -200],
-    ];
-  }
+class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup {
 
   /**
    * @var array
@@ -135,6 +129,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
    *
    * @return void
    */
+  #[CiviEventListener(event: 'hook_civicrm_findExistingDuplicates', priority: -200)]
   public static function hook_civicrm_findExistingDuplicates(GenericHookEvent $event) {
     $ruleGroupIDs = $event->ruleGroupIDs;
     $ruleGroup = new \CRM_Dedupe_BAO_DedupeRuleGroup();
@@ -193,6 +188,7 @@ class CRM_Dedupe_BAO_DedupeRuleGroup extends CRM_Dedupe_DAO_DedupeRuleGroup impl
     \CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS dedupe');
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_findDuplicates', priority: -200)]
   public static function hook_civicrm_findDuplicates(GenericHookEvent $event): void {
     $lookupParameters = $event->dedupeParams['match_params'];
     if (!$lookupParameters || !empty($event->dedupeResults['handled'])) {

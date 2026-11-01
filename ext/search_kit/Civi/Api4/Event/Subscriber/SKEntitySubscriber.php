@@ -11,6 +11,7 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Generic\Traits\SavedSearchInspectorTrait;
 use Civi\Api4\Job;
 use Civi\Api4\SKEntity;
@@ -18,36 +19,22 @@ use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\PostEvent;
 use Civi\Core\Event\PreEvent;
-use Civi\Core\Service\AutoService;
 use Civi\Search\Meta;
 use Civi\Search\SKEntityGenerator;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Manages tables and API entities created from search displays of type "entity"
- * @service
- * @internal
  */
-class SKEntitySubscriber extends AutoService implements EventSubscriberInterface {
+class SKEntitySubscriber {
 
   use SavedSearchInspectorTrait;
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api4.entityTypes' => 'on_civi_api4_entityTypes',
-      'hook_civicrm_pre::SearchDisplay' => 'onPreSaveDisplay',
-      'hook_civicrm_post::SearchDisplay' => 'onPostSaveDisplay',
-    ];
-  }
 
   /**
    * Register SearchDisplays of type 'entity'
    *
    * @param \Civi\Core\Event\GenericHookEvent $event
    */
+  #[CiviEventListener(event: 'civi.api4.entityTypes')]
   public static function on_civi_api4_entityTypes(GenericHookEvent $event): void {
     // Can't use the API to fetch search displays because this hook is called when the API boots
     foreach (_getSearchKitEntityDisplays() as $display) {
@@ -75,6 +62,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
   /**
    * @param \Civi\Core\Event\PreEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::SearchDisplay')]
   public function onPreSaveDisplay(PreEvent $event): void {
     if (!$this->applies($event)) {
       return;
@@ -213,6 +201,7 @@ class SKEntitySubscriber extends AutoService implements EventSubscriberInterface
   /**
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::SearchDisplay')]
   public function onPostSaveDisplay(PostEvent $event): void {
     if ($this->applies($event)) {
       \CRM_Core_DAO_AllCoreTables::flush();

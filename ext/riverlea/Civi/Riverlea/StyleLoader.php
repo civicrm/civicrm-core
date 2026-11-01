@@ -2,6 +2,7 @@
 
 namespace Civi\Riverlea;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
 use CRM_riverlea_ExtensionUtil as E;
@@ -14,7 +15,7 @@ use CRM_riverlea_ExtensionUtil as E;
  *
  * @service riverlea.style_loader
  */
-class StyleLoader extends AutoService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
+class StyleLoader extends AutoService {
 
   public const DYNAMIC_FILE = 'river.css';
 
@@ -39,14 +40,6 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     '_fixes.css',
   ];
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_themes' => ['onGetThemes', 0],
-      'hook_civicrm_alterBundle' => ['alterBundles', 0],
-      'hook_civicrm_buildAsset' => ['buildDynamicCss', 0],
-    ];
-  }
-
   protected ?array $streams;
 
   /**
@@ -56,6 +49,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     return !!$this->getCurrentStream();
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_themes')]
   public function onGetThemes($e): void {
     // always add (hidden) Riverlea base theme
     $e->themes['_riverlea_core_'] = [
@@ -100,6 +94,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
     }
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_alterBundle')]
   public function alterBundles(GenericHookEvent $e): void {
     if (!$this->isActive()) {
       return;
@@ -233,6 +228,7 @@ class StyleLoader extends AutoService implements \Symfony\Component\EventDispatc
    * @see CRM_Utils_hook::buildAsset()
    * @see \Civi\Core\AssetBuilder
    */
+  #[CiviEventListener(event: 'hook_civicrm_buildAsset')]
   public function buildDynamicCss($e) {
     if ($e->asset !== static::DYNAMIC_FILE) {
       return;

@@ -11,30 +11,25 @@
 
 namespace Civi\Afform\Placement;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Runtime code for placing Afforms as tabs
  */
-class TabsetPlacement extends AutoSubscriber {
+class TabsetPlacement {
 
   const TABSETS = [
     'civicrm/contact/view' => 'contact_summary_tab',
     'civicrm/event/manage' => 'event_manage_tab',
   ];
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_tabset' => 'onTabset',
-    ];
-  }
-
   /**
    * Implements hook_civicrm_tabset().
    *
    * Adds afforms as contextual summary tabs.
    */
+  #[CiviEventListener(event: 'hook_civicrm_tabset')]
   public static function onTabset(GenericHookEvent $e) {
     $placement = self::TABSETS[$e->tabsetName] ?? NULL;
     if (!$placement) {

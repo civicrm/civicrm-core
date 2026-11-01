@@ -11,25 +11,16 @@
 
 namespace Civi\AfformAdmin;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Afform;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
-use Civi\Core\Service\AutoSubscriber;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
  * @package Civi\AfformAdmin
  */
-class AfformAdminInjector extends AutoSubscriber {
-
-  /**
-   * @inheritDoc
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_alterAngular' => 'preprocess',
-    ];
-  }
+class AfformAdminInjector {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
@@ -38,6 +29,7 @@ class AfformAdminInjector extends AutoSubscriber {
    *
    * @see afCoreDirective.checkLinkPerm
    */
+  #[CiviEventListener(event: 'hook_civicrm_alterAngular')]
   public static function preprocess($e) {
     $changeSet = \Civi\Angular\ChangeSet::create('afformAdmin')
       // Adjust default distance unit for Location input type in the FormBuilder preview template

@@ -11,24 +11,16 @@
 
 namespace Civi\Api4\Service;
 
+use Civi\Core\Attribute\CiviEventListener;
 use CRM_Contribute_ExtensionUtil as E;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class ContributionTasksProvider extends \Civi\Core\Service\AutoSubscriber {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_searchKitTasks' => 'addContributionTasks',
-    ];
-  }
+class ContributionTasksProvider {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_searchKitTasks')]
   public function addContributionTasks(GenericHookEvent $event): void {
     // FIXME: CRM_Contribute_Task::tasks() should respect `$this->checkPermissions`
     foreach (\CRM_Contribute_Task::tasks() as $id => $task) {

@@ -11,12 +11,10 @@
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Event\AuthorizeRecordEvent;
+use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * Trait for entities with an owner contact ID (e.g. created_id, created_by, or contact_id).
- *
- * Users of this trait must implement HookInterface.
- * @phpstan-require-implements \Civi\Core\HookInterface
  */
 trait CRM_Core_OwnershipAccessTrait {
 
@@ -43,6 +41,7 @@ trait CRM_Core_OwnershipAccessTrait {
    *
    * @throws \Civi\API\Exception\UnauthorizedException
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function checkOwnershipAccessPre(\Civi\Core\Event\PreEvent $event): void {
     if (!in_array($event->action, ['edit', 'create'], TRUE)) {
       return;
@@ -87,6 +86,7 @@ trait CRM_Core_OwnershipAccessTrait {
    *
    * @param \Civi\Api4\Event\AuthorizeRecordEvent $e
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
   public static function checkOwnershipAccessAuthorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     if (!in_array($e->getActionName(), ['update', 'create'], TRUE)) {

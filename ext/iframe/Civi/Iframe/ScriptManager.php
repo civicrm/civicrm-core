@@ -2,7 +2,7 @@
 
 namespace Civi\Iframe;
 
-use Civi\Core\HookInterface;
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Service\AutoService;
 use CRM_Iframe_ExtensionUtil as E;
 
@@ -11,7 +11,7 @@ use CRM_Iframe_ExtensionUtil as E;
  *
  * @service iframe.script
  */
-class ScriptManager extends AutoService implements HookInterface {
+class ScriptManager extends AutoService {
 
   /**
    * The symbolic of the system status-check which monitors the script.
@@ -27,6 +27,7 @@ class ScriptManager extends AutoService implements HookInterface {
   /**
    * @see \CRM_Utils_Hook::check()
    */
+  #[CiviEventListener(event: '&hook_civicrm_check')]
   public function hook_civicrm_check(&$messages, $statusNames = [], $includeDisabled = FALSE): void {
     if ($statusNames && !in_array(static::CHECK_NAME, $statusNames)) {
       return;

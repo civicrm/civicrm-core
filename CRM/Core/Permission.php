@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Attribute\CiviEventListener;
+
 /**
  *
  * @package CRM
@@ -200,6 +202,7 @@ class CRM_Core_Permission {
     return $config->userPermissionClass->checkGroupRole($array);
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_permission_check', priority: 1000)]
   public static function checkConstPermissions(\Civi\Core\Event\GenericHookEvent $e) {
     if ($e->permission === CRM_Core_Permission::ANY_AUTHENTICATED_CONTACT) {
       // For typical web-requests, we're just asking if there is a "logged in contact ID".

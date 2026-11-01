@@ -11,27 +11,21 @@
 
 namespace Civi\Afform\Placement;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Code for placing Afforms as Contact Summary Blocks at runtime,
  * and declaring blocks for ContactLayout Editor.
  */
-class ContactSummaryBlockPlacement extends AutoSubscriber {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_pageRun' => 'onPageRun',
-      'hook_civicrm_contactSummaryBlocks' => 'onGetBlocks',
-    ];
-  }
+class ContactSummaryBlockPlacement {
 
   /**
    * Implements hook_civicrm_pageRun().
    *
    * Adds afforms as contact summary blocks.
    */
+  #[CiviEventListener(event: 'hook_civicrm_pageRun')]
   public static function onPageRun(GenericHookEvent $e) {
     $page = $e->page;
     if (!in_array(get_class($page), ['CRM_Contact_Page_View_Summary', 'CRM_Contact_Page_View_Print'])) {
@@ -66,6 +60,7 @@ class ContactSummaryBlockPlacement extends AutoSubscriber {
    *
    * @link https://github.com/civicrm/org.civicrm.contactlayout
    */
+  #[CiviEventListener(event: 'hook_civicrm_contactSummaryBlocks')]
   public static function onGetBlocks(GenericHookEvent $e) {
     $afforms = \Civi\Api4\Afform::get()
       ->setSelect(['name', 'title', 'directive_name', 'module_name', 'type', 'type:icon', 'type:label', 'placement_filters'])

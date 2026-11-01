@@ -4,7 +4,6 @@ namespace Civi\Core;
 use Civi\Core\Compiler\AutoServiceScannerPass;
 use Civi\Core\Compiler\EventScannerPass;
 use Civi\Core\Compiler\SpecProviderPass;
-use Civi\Core\Event\EventScanner;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Lock\LockManager;
 use Symfony\Component\Config\ConfigCache;
@@ -371,22 +370,6 @@ class Container {
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
-    $dispatcherDefn = $container->getDefinition('dispatcher');
-    // Get all declared BAO classes
-    $baoClasses = \CRM_Core_DAO_AllCoreTables::getBaoClasses();
-    // "Extra" BAO classes that don't have a DAO but still need to listen to hooks
-    $baoClasses[] = \CRM_Core_BAO_CustomValue::class;
-    foreach ($baoClasses as $key => $baoClass) {
-      // Key will be a valid entity name for all but the "extra" classes which don't have a DAO entity.
-      $baoEntity = is_numeric($key) ? NULL : $key;
-      $listenerMap = EventScanner::findListeners($baoClass, $baoEntity);
-      if ($listenerMap) {
-        $file = (new \ReflectionClass($baoClass))->getFileName();
-        $container->addResource(new \Symfony\Component\Config\Resource\FileResource($file));
-        $dispatcherDefn->addMethodCall('addListenerMap', [$baoClass, $listenerMap]);
-      }
-    }
-
     // FIXME: Automatically scan BasicServices for ProviderInterface.
     $container->getDefinition('civi_api_kernel')->addMethodCall(
       'registerApiProvider',
@@ -449,18 +432,15 @@ class Container {
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);
-    $dispatcher->addListener('&civi.mailing.track', ['CRM_Mailing_BAO_MailingTrackableURL', 'on_civi_mailing_track'], -500);
     $dispatcher->addListener('hook_civicrm_initiators', $aliasFuncEvent('hook_civicrm_initiators', fn($e) => $e->context['for']), 100);
     $dispatcher->addListener('hook_civicrm_post', ['\CRM_Core_Transaction', 'addPostCommit'], -1000);
     $dispatcher->addListener('hook_civicrm_pre', $aliasEvent('hook_civicrm_pre', 'entity'), 100);
-    $dispatcher->addListener('civi.dao.preDelete', ['\CRM_Core_BAO_EntityTag', 'preDeleteOtherEntity']);
     $dispatcher->addListener('hook_civicrm_post', $aliasEvent('hook_civicrm_post', 'entity'), 100);
     $dispatcher->addListener('hook_civicrm_postCommit', $aliasEvent('hook_civicrm_postCommit', 'entity'), 100);
     $dispatcher->addListener('hook_civicrm_post::Activity', ['\Civi\CCase\Events', 'fireCaseChange']);
     $dispatcher->addListener('hook_civicrm_post::Case', ['\Civi\CCase\Events', 'fireCaseChange']);
     $dispatcher->addListener('hook_civicrm_caseChange', ['\Civi\CCase\Events', 'delegateToXmlListeners']);
     $dispatcher->addListener('hook_civicrm_caseChange', ['\Civi\CCase\SequenceListener', 'onCaseChange_static']);
-    $dispatcher->addListener('hook_civicrm_cryptoRotateKey', ['\Civi\Crypto\RotateKeys', 'rotateSmtp']);
     $dispatcher->addListener('hook_civicrm_eventDefs', ['\Civi\Core\CiviEventInspector', 'findBuiltInEvents']);
     // TODO We need a better code-convention for metadata about non-hook events.
     $dispatcher->addListener('hook_civicrm_eventDefs', ['\Civi\API\Events', 'hookEventDefs']);
@@ -474,53 +454,6 @@ class Container {
     $dispatcher->addListener('hook_civicrm_alterExternUrl', ['\CRM_Utils_System', 'migrateExternUrl'], 1000);
     // Not a BAO class so it can't implement hookInterface
     $dispatcher->addListener('hook_civicrm_post', ['CRM_Utils_Recent', 'on_hook_civicrm_post']);
-    $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findConstPermissions'], 975);
-    $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCiviPermissions'], 950);
-    $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCmsPermissions'], 925);
-    $dispatcher->addListener('hook_civicrm_permission_check', ['CRM_Core_Permission', 'checkConstPermissions'], 1000);
-
-    $dispatcher->addListener('hook_civicrm_postSave_civicrm_domain', ['\CRM_Core_BAO_Domain', 'onPostSave']);
-    $dispatcher->addListener('hook_civicrm_unhandled_exception', [
-      'CRM_Core_LegacyErrorHandler',
-      'handleException',
-    ], -200);
-
-    // Security checks for contact belongings (Address, Email, Phone, etc.)
-    foreach ([
-      'Address' => 'CRM_Core_BAO_Address',
-      'Email' => 'CRM_Core_BAO_Email',
-      'IM' => 'CRM_Core_BAO_IM',
-      'OpenID' => 'CRM_Core_BAO_OpenID',
-      'Phone' => 'CRM_Core_BAO_Phone',
-      'Website' => 'CRM_Core_BAO_Website',
-      'GroupContact' => 'CRM_Contact_BAO_GroupContact',
-    ] as $entity => $bao) {
-      $dispatcher->addListener("hook_civicrm_pre::{$entity}", [$bao, 'checkContactAccessPre']);
-      $dispatcher->addListener("civi.api4.authorizeRecord::{$entity}", [$bao, 'checkContactAccessAuthorizeRecord']);
-    }
-
-    // Security checks for record ownership (Batch, SavedSearch, Note, UserJob, ReportInstance, SearchParamSet)
-    foreach ([
-      'Batch' => 'CRM_Batch_BAO_Batch',
-      'SavedSearch' => 'CRM_Contact_BAO_SavedSearch',
-      'Note' => 'CRM_Core_BAO_Note',
-      'UserJob' => 'CRM_Core_BAO_UserJob',
-      'ReportInstance' => 'CRM_Report_BAO_ReportInstance',
-      'SearchParamSet' => 'CRM_Afform_BAO_SearchParamSet',
-    ] as $entity => $bao) {
-      $dispatcher->addListener("hook_civicrm_pre::{$entity}", [$bao, 'checkOwnershipAccessPre']);
-      $dispatcher->addListener("civi.api4.authorizeRecord::{$entity}", [$bao, 'checkOwnershipAccessAuthorizeRecord']);
-    }
-
-    // Security checks for dynamic foreign keys (EntityTag, Note, Translation)
-    foreach ([
-      'EntityTag' => 'CRM_Core_BAO_EntityTag',
-      'Note' => 'CRM_Core_BAO_Note',
-      'Translation' => 'CRM_Core_BAO_Translation',
-    ] as $entity => $bao) {
-      $dispatcher->addListener("hook_civicrm_pre::{$entity}", [$bao, 'checkDynamicFKAccessPre']);
-      $dispatcher->addListener("civi.api4.authorizeRecord::{$entity}", [$bao, 'checkDynamicFKAccessAuthorizeRecord']);
-    }
 
     return $dispatcher;
   }

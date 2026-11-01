@@ -12,23 +12,20 @@
 
 namespace Civi\Api4\Service\Autocomplete;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\API\Event\PrepareEvent;
 use Civi\Api4\Setting;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\HookInterface;
 
-/**
- * @service
- * @internal
- */
-class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService implements HookInterface {
+class ContactAutocompleteProvider {
 
   /**
    * Custom autocomplete for the menubar quicksearch.
    *
    * @param \Civi\API\Event\PrepareEvent $event
    */
+  #[CiviEventListener(event: 'civi.api.prepare')]
   public static function on_civi_api_prepare(PrepareEvent $event) {
     $apiRequest = $event->getApiRequest();
     if (is_object($apiRequest) &&
@@ -218,6 +215,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay')]
   public static function on_civi_search_defaultDisplay(GenericHookEvent $e) {
     if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || !CoreUtil::isContact($e->savedSearch['api_entity'])) {
       return;

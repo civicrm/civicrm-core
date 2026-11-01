@@ -1,13 +1,15 @@
 <?php
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Core\Event\PreEvent;
 
-class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken implements \Civi\Core\HookInterface {
+class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken {
 
   /**
    * Preproceesing for create/edit/delete actions
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(PreEvent $event): void {
     if (in_array($event->action, ['create', 'edit', 'delete'], TRUE)) {
       if (!empty($event->id) && empty($event->params['id'])) {
@@ -43,6 +45,7 @@ class CRM_OAuth_BAO_OAuthContactToken extends CRM_OAuth_DAO_OAuthContactToken im
   /**
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $userId = $e->getUserID();

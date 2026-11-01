@@ -11,25 +11,20 @@
 
 namespace Civi\Afform\Placement;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Runtime code for placing Afforms in the Contact Summary Actions menu
  */
-class ContactSummaryActionsPlacement extends AutoSubscriber {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_summaryActions' => 'onSummaryActions',
-    ];
-  }
+class ContactSummaryActionsPlacement {
 
   /**
    * Implements hook_civicrm_summaryActions().
    *
    * Adds afforms to the contact summary actions menu.
    */
+  #[CiviEventListener(event: 'hook_civicrm_summaryActions')]
   public static function onSummaryActions(GenericHookEvent $e) {
     if (empty($e->contactID)) {
       return;

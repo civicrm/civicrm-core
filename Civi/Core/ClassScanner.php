@@ -25,9 +25,13 @@ namespace Civi\Core;
 class ClassScanner {
 
   /**
-   * We cache information about classes that support each interface. Which interfaces should we track?
+   * We cache information about classes that support each interface or attribute. Which ones should we track?
+   *
+   * Matches:
+   * - CiviCRM interfaces/attributes (`CRM_*` and `Civi\*`, including `CiviEventListener`).
+   * - Symfony `EventSubscriberInterface` (used by some BAO classes without `HookInterface`).
    */
-  const CIVI_INTERFACE_REGEX = ';^(CRM_|Civi\\\);';
+  const CIVI_INTERFACE_REGEX = ';^(CRM_|Civi\\\|Symfony\\\Component\\\EventDispatcher\\\EventSubscriberInterface$);';
 
   /**
    * We load PHP files to find classes. Which files should we load?
@@ -46,34 +50,35 @@ class ClassScanner {
    *
    * @param array $criteria
    *   Ex: ['interface' => 'Civi\Core\HookInterface']
+   *   Ex: ['attribute' => 'Symfony\Component\EventDispatcher\Attribute\AsEventListener']
    * @return string[]
    *   List of matching classes.
    */
   public static function get(array $criteria): array {
-    if (!isset($criteria['interface'])) {
-      throw new \RuntimeException("Malformed request: ClassScanner::get() must specify an interface filter");
+    $target = $criteria['interface'] ?? $criteria['attribute'] ?? NULL;
+    if (!$target) {
+      throw new \RuntimeException("Malformed request: ClassScanner::get() must specify an interface or attribute filter");
     }
 
     $cache = static::cache('index');
-    $interface = $criteria['interface'];
-    $interfaceId = md5($interface);
+    $targetId = md5($target);
 
     $knownInterfaces = $cache->get('knownInterfaces');
     if ($knownInterfaces === NULL) {
       $knownInterfaces = static::buildIndex($cache);
       $cache->set('knownInterfaces', $knownInterfaces, static::TTL);
     }
-    if (!in_array($interface, $knownInterfaces)) {
+    if (!in_array($target, $knownInterfaces)) {
       return [];
     }
 
-    $classes = $cache->get($interfaceId);
+    $classes = $cache->get($targetId);
     if ($classes === NULL) {
       // Some cache backends don't guarantee the completeness of the set.
       //I suppose this one got purged early. We'll need to rebuild the whole set.
       $knownInterfaces = static::buildIndex($cache);
       $cache->set('knownInterfaces', $knownInterfaces, static::TTL);
-      $classes = $cache->get($interfaceId);
+      $classes = $cache->get($targetId);
     }
 
     return static::filterLiveClasses($classes ?: [], $criteria);
@@ -162,24 +167,53 @@ class ClassScanner {
         return FALSE;
       }
       $reflClass = new \ReflectionClass($class);
-      return !$reflClass->isAbstract() && ($reflClass)->implementsInterface($criteria['interface']);
+      return !$reflClass->isAbstract()
+        && (!isset($criteria['interface']) || $reflClass->implementsInterface($criteria['interface']))
+        && (!isset($criteria['attribute']) || static::findAttributes($reflClass, $criteria['attribute']))
+        // Skip class aliases
+        && $reflClass->getName() === $class;
     });
   }
 
   /**
-   * Does `$class` have any interfaces that we care about?
+   * Does `$class` have any interfaces or attributes that we care about?
    *
    * @param string $class
    *   Concrete class that we are examining.
    *   Ex: 'Civi\Myextension\Foo'
    * @return array
-   *   List of implemented interfaces that we care about.
+   *   List of implemented interfaces and attributes that we care about.
    *   Ex: ['Civi\Core\HookInterface', 'Civi\Core\Service\AutoServiceInterface']
    * @throws \ReflectionException
    */
   private static function getRelevantInterfaces(string $class): array {
-    $rawInterfaceNames = (new \ReflectionClass($class))->getInterfaceNames();
-    return preg_grep(static::CIVI_INTERFACE_REGEX, $rawInterfaceNames);
+    $reflClass = new \ReflectionClass($class);
+    if ($reflClass->getName() !== $class) {
+      // Skip class aliases
+      return [];
+    }
+    $attributeNames = array_map(fn($found) => $found[0]->getName(), static::findAttributes($reflClass));
+    return preg_grep(static::CIVI_INTERFACE_REGEX, array_unique(array_merge($reflClass->getInterfaceNames(), $attributeNames)));
+  }
+
+  /**
+   * Find attributes declared on any public methods of a class.
+   *
+   * @param \ReflectionClass $class
+   * @param string|null $name
+   *   Only return attributes of this type (or its subclasses). NULL returns all attributes.
+   * @return array
+   *   List of [\ReflectionAttribute $attribute, \ReflectionMethod $method].
+   * @internal
+   */
+  public static function findAttributes(\ReflectionClass $class, ?string $name = NULL): array {
+    $found = [];
+    foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+      foreach ($method->getAttributes($name, $name ? \ReflectionAttribute::IS_INSTANCEOF : 0) as $attribute) {
+        $found[] = [$attribute, $method];
+      }
+    }
+    return $found;
   }
 
   /**

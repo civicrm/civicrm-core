@@ -1,4 +1,5 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /**
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
@@ -6,16 +7,16 @@
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\UserRole;
-use Civi\Core\HookInterface;
 
 /**
  * Business access object for the User entity.
  */
-class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implements HookInterface {
+class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User {
 
   /**
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $action = $e->getActionName();
@@ -50,6 +51,7 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
    * Event fired before an action is taken on a User record.
    * @param \Civi\Core\Event\PreEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if (in_array($event->action, ['create', 'edit'], TRUE)) {
       if (empty($event->params['when_updated'])) {
@@ -76,6 +78,7 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User implemen
    * Event fired after an action is taken on a User record.
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     // Handle virtual "roles" field (defined in UserSpecProvider)
     // @see \Civi\Api4\Service\Spec\Provider\UserSpecProvider

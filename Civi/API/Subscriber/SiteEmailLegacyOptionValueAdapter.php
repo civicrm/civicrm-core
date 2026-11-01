@@ -12,33 +12,20 @@
 namespace Civi\API\Subscriber;
 
 use Civi\Api4\Generic\AbstractAction;
-use Civi\Core\Service\AutoSubscriber;
+use Civi\Core\Attribute\CiviEventListener;
 use CRM_Core_Config;
 
 /**
  * Wraps the OptionValue api (v3 and v4) to provide backward compatibility
  * with the SiteEmailAddress entity (formerly the `from_email_address` option group).
  */
-class SiteEmailLegacyOptionValueAdapter extends AutoSubscriber {
+class SiteEmailLegacyOptionValueAdapter {
 
   private static $apiIds = [];
 
   const CONCAT_LABEL = 'CONCAT(\'"\', display_name, \'" <\', email, \'>\')';
 
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api.prepare' => [
-        ['onApiPrepare', 2000],
-      ],
-      'civi.api.respond' => [
-        ['onApiRespond', 2000],
-      ],
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.api.prepare', priority: 2000)]
   public function onApiPrepare(\Civi\API\Event\PrepareEvent $event) {
     $apiRequest = $event->getApiRequest();
     if ($apiRequest['entity'] !== 'OptionValue') {
@@ -53,6 +40,7 @@ class SiteEmailLegacyOptionValueAdapter extends AutoSubscriber {
     }
   }
 
+  #[CiviEventListener(event: 'civi.api.respond', priority: 2000)]
   public function onApiRespond(\Civi\API\Event\RespondEvent $event) {
     $apiRequest = $event->getApiRequest();
     // If ID was previously stashed by preprocessApi3SiteEmailOptionValues

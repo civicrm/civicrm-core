@@ -11,6 +11,7 @@
 
 namespace Civi\Crypto;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
@@ -25,6 +26,7 @@ class RotateKeys {
    *
    * @see CRM_Utils_Hook::cryptoRotateKey()
    */
+  #[CiviEventListener(event: 'hook_civicrm_cryptoRotateKey')]
   public static function rotateSmtp(GenericHookEvent $e) {
     if ($e->tag !== 'CRED') {
       return;

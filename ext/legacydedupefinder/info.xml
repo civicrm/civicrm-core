@@ -32,7 +32,7 @@
   </smarty_compatibility>
   <comments>Adds backwards compatibility for dedupe hooks. If you do not need them, you can improve dedupe performance by disabling this extension.</comments>
   <mixins>
-    <mixin>scan-classes@1.0.0</mixin>
+    <mixin>scan-classes@2.0.0</mixin>
   </mixins>
   <classloader>
     <psr0 prefix="CRM_" path="."/>

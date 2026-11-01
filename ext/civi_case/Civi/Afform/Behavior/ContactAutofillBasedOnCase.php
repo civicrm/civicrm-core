@@ -1,33 +1,17 @@
 <?php
 namespace Civi\Afform\Behavior;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\API\Event\RespondEvent;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Case_ExtensionUtil as E;
 
-/**
- * @service
- * @internal
- */
-class ContactAutofillBasedOnCase extends AutoService implements EventSubscriberInterface {
+class ContactAutofillBasedOnCase {
 
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api.respond' => 'onAfformGetBehaviors',
-      'hook_civicrm_buildAsset' => 'onBuildAsset',
-      'civi.afform.sort.prefill' => 'onAfformSortPrefill',
-      'civi.afform.prefill' => ['onAfformPrefill', 100],
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.api.respond')]
   public static function onAfformGetBehaviors(RespondEvent $event) {
     if ($event->getEntityName() == 'AfformBehavior' && $event->getActionName() == 'get') {
       $response = $event->getResponse();
@@ -44,6 +28,7 @@ class ContactAutofillBasedOnCase extends AutoService implements EventSubscriberI
     }
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_buildAsset')]
   public static function onBuildAsset(GenericHookEvent $event) {
     if ($event->asset == 'angular-modules.json') {
       $json = json_decode($event->content, TRUE);
@@ -55,6 +40,7 @@ class ContactAutofillBasedOnCase extends AutoService implements EventSubscriberI
     }
   }
 
+  #[CiviEventListener(event: 'civi.afform.sort.prefill')]
   public static function onAfformSortPrefill(AfformEntitySortEvent $event): void {
     $entities = $event->getFormDataModel()->getEntities();
     foreach ($entities as $entityName => $entity) {
@@ -66,6 +52,7 @@ class ContactAutofillBasedOnCase extends AutoService implements EventSubscriberI
     }
   }
 
+  #[CiviEventListener(event: 'civi.afform.prefill', priority: 100)]
   public static function onAfformPrefill(AfformPrefillEvent $event): void {
     /* @var \Civi\Api4\Action\Afform\Prefill $apiRequest */
     $apiRequest = $event->getApiRequest();

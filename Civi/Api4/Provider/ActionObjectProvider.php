@@ -11,42 +11,28 @@
 
 namespace Civi\Api4\Provider;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\API\Event\ResolveEvent;
 use Civi\API\Provider\ProviderInterface;
 use Civi\Api4\Generic\AbstractAction;
-use Civi\API\Events;
 use Civi\Api4\Utils\ReflectionUtils;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
 use Civi\Core\ClassScanner;
 use Civi\Api4\Generic\EntityInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Accept $apiRequests based on \Civi\API\Action
  *
  * @service action_object_provider
  */
-class ActionObjectProvider extends AutoService implements EventSubscriberInterface, ProviderInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    // Using a high priority allows adhoc implementations
-    // to override standard implementations -- which is
-    // handy for testing/mocking.
-    return [
-      'civi.api.resolve' => [
-        ['onApiResolve', Events::W_EARLY],
-      ],
-    ];
-  }
+class ActionObjectProvider extends AutoService implements ProviderInterface {
 
   /**
    * @param \Civi\API\Event\ResolveEvent $event
    *   API resolution event.
    */
+  #[CiviEventListener(event: 'civi.api.resolve', priority: 100)]
   public function onApiResolve(ResolveEvent $event) {
     $apiRequest = $event->getApiRequest();
     if ($apiRequest instanceof AbstractAction) {
