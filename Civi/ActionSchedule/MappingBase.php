@@ -14,7 +14,7 @@ namespace Civi\ActionSchedule;
 use Civi\Api4\Contact;
 use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\Utils\CoreUtil;
-use Civi\Core\Service\AutoSubscriber;
+use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * Base implementation of MappingInterface.
@@ -22,16 +22,10 @@ use Civi\Core\Service\AutoSubscriber;
  * Extend this class to register a new type of ActionSchedule mapping.
  * Note: When choosing a value to return from `getId()`, use a "machine name" style string.
  */
-abstract class MappingBase extends AutoSubscriber implements MappingInterface {
+abstract class MappingBase implements MappingInterface {
 
   public function getId() {
     return $this->getName();
-  }
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.actionSchedule.getMappings' => 'onRegisterActionMappings',
-    ];
   }
 
   /**
@@ -39,6 +33,7 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
    *
    * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
    */
+  #[CiviEventListener(event: 'civi.actionSchedule.getMappings')]
   public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations): void {
     $registrations->register(new static());
   }
