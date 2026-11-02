@@ -228,8 +228,7 @@ table.advmultiselect {
   clear: both;
 }
 .crm-container .panel-title {
-  margin-top: 0;
-  margin-bottom: 0;
+  margin-block: 0;
   font-size: var(--crm-font-size);
   color: inherit;
 }
@@ -247,11 +246,6 @@ table.advmultiselect {
   color: var(--crm-text-color);
   background-color: var(--crm-layer1-bg-color);
   border-bottom: var(--crm-panel-border);
-}
-.crm-container .panel-title {
-  font-size: 1rem;
-  color: inherit;
-  margin: 0;
 }
 .crm-container .panel-default {
   border: var(--crm-border);

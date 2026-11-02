@@ -108,8 +108,10 @@ input.crm-form-checkbox + label {
 /* TABLE STYLING */
 
 .crm-container table {
+  position: relative;
   margin: 0 0 1em;
   border-collapse: collapse;
+  border: 1px solid #efefef;
   width: 100%;
   font-size: 13px;
 }
@@ -1051,6 +1053,8 @@ input.crm-form-entityref {
 .crm-container .crm-tasks {
   margin-bottom: 4px;
   padding: 4px;
+  background-color: #f0f0e8;
+  color: #52534d;
 }
 
 .crm-container .crm-search-results {
@@ -1593,11 +1597,6 @@ input.crm-form-entityref {
   display: inline;
 }
 
-/* theming for panel and context menus */
-.crm-container td ul.panel li {
-  background-color: #2f2f2e;
-}
-
 .crm-container .btn-slide .panel li a:hover,
 .crm-container .crm-participant-list-inner li a:hover,
 .crm-container .crm-event-links-list-inner li a:hover,
@@ -1628,6 +1627,7 @@ input.crm-form-entityref {
   margin: 0;
   padding: 2px;
   list-style: none;
+  background-color: #2f2f2e;
   background-image: none;
   width: auto;
 }
@@ -1722,6 +1722,7 @@ input.crm-form-entityref {
 }
 
 #crm-container div.contact_details {
+  background-color: transparent;
   padding: 4px;
   line-height: 1.4em;
   clear: both;
@@ -2587,14 +2588,6 @@ div.crm-container form {
   padding: 5px;
 }
 
-.crm-container .dataTables_paginate {
-  width: auto;
-}
-
-.crm-container .dataTables_info {
-  padding-top: 3px;
-}
-
 .crm-container div.dataTables_wrapper .ui-widget-header {
   font-weight: normal;
 }
@@ -2651,11 +2644,13 @@ div.crm-container form {
 }
 
 .crm-container .dataTables_info {
+  padding-top: 3px;
   width: 60%;
   float: left;
 }
 
 .crm-container .dataTables_paginate {
+  width: auto;
   float: right;
   text-align: right;
 }
@@ -2794,11 +2789,6 @@ div.crm-container form {
 }
 
 /* tables */
-.crm-container table {
-  position: relative;
-  border: 1px solid #efefef;
-}
-
 .crm-container .crm-form-block table {
   border: none;
 }
@@ -2872,10 +2862,6 @@ tbody.scrollContent tr.alternateRow {
 }
 
 /*contact summary page */
-#crm-container div.contact_details {
-  background-color: transparent;
-}
-
 .crm-container table.crm-info-panel td {
   border-bottom: 1px solid #fff;
 }
@@ -2957,12 +2943,6 @@ tbody.scrollContent tr.alternateRow {
 }
 
 /* search results */
-.crm-container .crm-search-tasks,
-.crm-container .crm-tasks {
-  background-color: #f0f0e8;
-  color: #52534d;
-}
-
 #crm-container .crm-tasks table {
   margin: 0;
 }

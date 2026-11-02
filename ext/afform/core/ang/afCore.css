@@ -151,15 +151,12 @@ af-search-param-sets dl > div > dt {
   min-width: 10rem;
 }
 .crm-container ul.crm-checkbox-list.checkbox-plain {
+  border: none;
   overflow: unset;
   width: unset;
   background-color: unset;
   height: unset;
   max-height: unset;
-}
-
-.crm-container ul.crm-checkbox-list.checkbox-plain {
-  border: none;
 }
 
 .crm-container ul.crm-checkbox-list.checkbox-plain li {
