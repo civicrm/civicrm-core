@@ -321,10 +321,19 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     // check Field is created
     $getField = \Civi\Api4\CustomField::get(FALSE)->addWhere('name', '=', 'test_custom_field')->execute();
     $this->assertEquals(1, count($getField));
+    $group = \Civi\Api4\CustomGroup::get(FALSE)->addWhere('name', '=', 'test_custom_group')->execute()->single();
+
+    // Before adding data, CustomGroup::on_hook_civicrm_referenceCounts should not report any value rows
+    $groupRefs = array_column(\Civi\Api4\Utils\CoreUtil::getRefCount('CustomGroup', $group['id']), 'count', 'name');
+    $this->assertArrayNotHasKey('custom_group_value_table_rows', $groupRefs);
 
     // add some data to the field
     $contactId = \Civi\Api4\Contact::get(FALSE)->setLimit(1)->addSelect('id')->execute()->single()['id'];
     \Civi\Api4\Contact::update(FALSE)->addWhere('id', '=', $contactId)->addValue('test_custom_group.test_custom_field', 'test_value')->execute();
+
+    // Now CustomGroup::on_hook_civicrm_referenceCounts should report 1 row with data
+    $groupRefs = array_column(\Civi\Api4\Utils\CoreUtil::getRefCount('CustomGroup', $group['id']), 'count', 'name');
+    $this->assertEquals(1, $groupRefs['custom_group_value_table_rows'] ?? NULL);
 
     // Later on, entity definition disappears; but we should not cleanup while there is data in the field
     $this->managedEntities = [];
@@ -335,10 +344,13 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $value = \Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $contactId)->addSelect('test_custom_group.test_custom_field')->execute()->single()['test_custom_group.test_custom_field'];
     $this->assertSame('test_value', $value);
 
-    // Now delete the data
+    // Now delete the data in the managed field, but add an orphaned column with data to the value table
     \Civi\Api4\Contact::update(FALSE)->addWhere('id', '=', $contactId)->addValue('test_custom_group.test_custom_field', NULL)->execute();
+    CRM_Core_DAO::executeQuery("ALTER TABLE `{$group['table_name']}` ADD COLUMN `orphaned_col` varchar(255) DEFAULT NULL");
+    CRM_Core_DAO::executeQuery("UPDATE `{$group['table_name']}` SET `orphaned_col` = 'orphaned_data'");
 
-    // Reconcile again -- now there is no data in the field, we expect it to be deleted
+    // Reconcile again -- now there is no data in test_custom_field, we expect the field to be deleted,
+    // but CustomGroup::on_hook_civicrm_referenceCounts should prevent the group from being deleted while orphaned_col has data
     $this->managedEntities = [];
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
@@ -346,6 +358,15 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     // check field has been deleted
     $getField = \Civi\Api4\CustomField::get(FALSE)->addWhere('name', '=', 'test_custom_field')->execute();
     $this->assertEquals(0, count($getField));
+
+    // check group has NOT been cleaned up yet because of the data in orphaned_col
+    $getGroup = \Civi\Api4\CustomGroup::get(FALSE)->addWhere('name', '=', 'test_custom_group')->execute();
+    $this->assertCount(1, $getGroup);
+
+    // Clear the data in orphaned_col (leaving the empty column in place) and reconcile again -- now the group should be cleaned up
+    CRM_Core_DAO::executeQuery("UPDATE `{$group['table_name']}` SET `orphaned_col` = NULL");
+    $me = new CRM_Core_ManagedEntities($this->modules);
+    $me->reconcile();
 
     // check group has also been cleaned up
     $getGroup = \Civi\Api4\CustomGroup::get(FALSE)->addWhere('name', '=', 'test_custom_group')->execute();

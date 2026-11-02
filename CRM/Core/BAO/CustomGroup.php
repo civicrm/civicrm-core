@@ -92,7 +92,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   }
 
   /**
-   * Get the number of value columns in the value table for this CustomGroup
+   * Count rows with non-NULL values in the value table for this CustomGroup
    * - this will prevent automatic cleanup of the CustomGroup if there is data for it
    */
   #[CiviEventListener(event: 'hook_civicrm_referenceCounts')]
@@ -103,25 +103,36 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     }
     $dao->find(TRUE);
     $tableName = $dao->table_name;
-
     $dbName = $dao->_database;
-    $tableColumns = intval(\CRM_Core_DAO::singleValueQuery("
-     SELECT COUNT(1)
-       FROM INFORMATION_SCHEMA.COLUMNS
-       WHERE TABLE_SCHEMA = '{$dbName}'
-         AND TABLE_NAME = '{$tableName}'
-    "));
 
     // custom value tables always have `id` and `entity_id` but these are meaningless
-    // by themselves - count how many more columns it has
-    $valueColumns = $tableColumns - 2;
+    // by themselves - check all other columns for non-NULL values
+    $valueColumns = \CRM_Core_DAO::executeQuery("
+      SELECT COLUMN_NAME
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = '%1'
+        AND TABLE_NAME = '%2'
+        AND COLUMN_NAME NOT IN ('id', 'entity_id')
+    ", [
+      1 => [$dbName, 'MysqlColumnNameOrAlias'],
+      2 => [$tableName, 'MysqlColumnNameOrAlias'],
+    ])->fetchMap('COLUMN_NAME', 'COLUMN_NAME');
 
     if ($valueColumns) {
-      $e->refCounts[] = [
-        'type' => 'sql',
-        'name' => 'custom_group_value_table_value_columns',
-        'count' => $valueColumns,
-      ];
+      $where = [];
+      foreach ($valueColumns as $colName) {
+        $where[] = "`$colName` IS NOT NULL";
+      }
+      $rows = (int) \CRM_Core_DAO::singleValueQuery("SELECT COUNT(1) FROM `%1` WHERE " . implode(' OR ', $where), [
+        1 => [$tableName, 'MysqlColumnNameOrAlias'],
+      ]);
+      if ($rows) {
+        $e->refCounts[] = [
+          'type' => 'sql',
+          'name' => 'custom_group_value_table_rows',
+          'count' => $rows,
+        ];
+      }
     }
   }
 
