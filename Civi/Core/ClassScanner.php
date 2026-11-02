@@ -208,7 +208,12 @@ class ClassScanner {
    */
   public static function findAttributes(\ReflectionClass $class, ?string $name = NULL): array {
     $found = [];
+    $parentClass = $class->getParentClass();
     foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+      $declaringClass = $method->getDeclaringClass();
+      if ($declaringClass->getName() !== $class->getName() && (!$parentClass || !$parentClass->isAbstract() || !$declaringClass->isAbstract())) {
+        continue;
+      }
       foreach ($method->getAttributes($name, $name ? \ReflectionAttribute::IS_INSTANCEOF : 0) as $attribute) {
         $found[] = [$attribute, $method];
       }

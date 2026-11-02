@@ -70,7 +70,12 @@ class EventScanner {
       $listenerMap = static::mergeListenerMap($listenerMap, static::findFunctionListeners($class));
     }
     if (is_subclass_of($class, '\Symfony\Component\EventDispatcher\EventSubscriberInterface')) {
-      $listenerMap = static::mergeListenerMap($listenerMap, static::normalizeListenerMap($class::getSubscribedEvents()));
+      $reflClass = new \ReflectionClass($class);
+      $parentClass = $reflClass->getParentClass();
+      $declaringClass = $reflClass->getMethod('getSubscribedEvents')->getDeclaringClass();
+      if ($declaringClass->getName() === $class || ($parentClass && $parentClass->isAbstract() && $declaringClass->isAbstract())) {
+        $listenerMap = static::mergeListenerMap($listenerMap, static::normalizeListenerMap($class::getSubscribedEvents()));
+      }
     }
     $listenerMap = static::mergeListenerMap($listenerMap, static::findAttributeListeners($class));
 
@@ -106,7 +111,14 @@ class EventScanner {
       $listenerMap[$event][] = [$func, $priority];
     };
 
-    foreach (get_class_methods($class) as $func) {
+    $reflClass = new \ReflectionClass($class);
+    $parentClass = $reflClass->getParentClass();
+    foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+      $declaringClass = $method->getDeclaringClass();
+      if ($declaringClass->getName() !== $reflClass->getName() && (!$parentClass || !$parentClass->isAbstract() || !$declaringClass->isAbstract())) {
+        continue;
+      }
+      $func = $method->getName();
       if (preg_match('/^(hook_|on_|self_)/', $func, $m)) {
         switch ($m[1]) {
           case 'hook_':
@@ -142,9 +154,16 @@ class EventScanner {
     foreach (ClassScanner::findAttributes(new \ReflectionClass($class), CiviEventListener::class) as [$attribute, $method]) {
       /** @var \Civi\Core\Attribute\CiviEventListener $listener */
       $listener = $attribute->newInstance();
-      $event = str_contains($listener->event, '{self}')
-        ? str_replace('{self}', \CRM_Core_DAO_AllCoreTables::getEntityNameForClass($class) ?? '', $listener->event)
-        : $listener->event;
+      if (str_contains($listener->event, '{self}')) {
+        $self = \CRM_Core_DAO_AllCoreTables::getEntityNameForClass($class);
+        if ($self === NULL) {
+          continue;
+        }
+        $event = str_replace('{self}', $self, $listener->event);
+      }
+      else {
+        $event = $listener->event;
+      }
       $listenerMap[$event][] = [$method->getName(), $listener->priority];
     }
     return $listenerMap;
