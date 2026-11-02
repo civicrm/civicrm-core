@@ -57,7 +57,15 @@ class EventScannerPass implements CompilerPassInterface {
     }
 
     $dispatcher = $container->getDefinition('dispatcher');
+    // Historically, all BAO classes were scanned for HookInterface / EventSubscriberInterface even if an extension
+    // didn't use scan-classes mixin. This grandfathers in those 2 interfaces, but the newer CiviEventListener is stricter
+    // and will only work for extensions using scan-classes.
+    $legacyBaoClasses = array_filter(
+      \CRM_Core_DAO_AllCoreTables::getBaoClasses(),
+      fn($class) => is_subclass_of($class, HookInterface::class) || is_subclass_of($class, EventSubscriberInterface::class)
+    );
     $baoClasses = array_unique([
+      ...$legacyBaoClasses,
       ...ClassScanner::get(['interface' => HookInterface::class]),
       ...ClassScanner::get(['interface' => EventSubscriberInterface::class]),
       ...ClassScanner::get(['attribute' => CiviEventListener::class]),
