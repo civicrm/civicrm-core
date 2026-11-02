@@ -102,15 +102,21 @@
 
   {literal}
     <script type="text/javascript">
-
-      function calculateRowValues( ) {
+      function calculateRowValues() {
         var mtype = cj("#membership_type_id").val();
-        var postUrl = "{/literal}{crmURL p='civicrm/ajax/memType' h=0}{literal}";
-        cj.post( postUrl, {mtype: mtype}, function( data ) {
-          cj("#amount").val( data.total_amount );
-          cj("#label").val( data.name );
+        if (!mtype) {
+          cj("#amount").val('');
+          cj("#label").val('');
+          return;
+        }
 
-        }, 'json');
+        CRM.api4('MembershipType', 'get', {
+          select: ['name', 'minimum_fee'],
+          where: [['id', '=', mtype]]
+        }, 0).then((membershipType) => {
+          cj("#amount").val(CRM.formatMoney(membershipType.minimum_fee ?? 0, true));
+          cj("#label").val(membershipType.name || '');
+        });
       }
     </script>
   {/literal}

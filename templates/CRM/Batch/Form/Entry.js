@@ -143,16 +143,24 @@ CRM.$(function($) {
 
 function setPaymentBlock(form, memType) {
   var rowID = form.closest('div.crm-grid-row').attr('entity_id');
-  var dataUrl = CRM.url('civicrm/ajax/memType');
 
   if (!memType) {
     memType = cj('select[id="field_' + rowID + '_membership_type_1"]').val();
   }
 
-  cj.post(dataUrl, {mtype: memType}, function (data) {
-    cj('#field_' + rowID + '_financial_type').val(data.financial_type_id);
-    cj('#field_' + rowID + '_total_amount').val(data.total_amount).change();
-  }, 'json');
+  if (!memType) {
+    cj('#field_' + rowID + '_financial_type').val('');
+    cj('#field_' + rowID + '_total_amount').val('').change();
+    return;
+  }
+
+  CRM.api4('MembershipType', 'get', {
+    select: ['financial_type_id', 'minimum_fee'],
+    where: [['id', '=', memType]]
+  }, 0).then((membershipType) => {
+    cj('#field_' + rowID + '_financial_type').val(membershipType.financial_type_id || '');
+    cj('#field_' + rowID + '_total_amount').val(CRM.formatMoney(membershipType.minimum_fee ?? 0, true)).change();
+  });
 }
 
 function hideSendReceipt() {
