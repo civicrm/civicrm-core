@@ -263,7 +263,7 @@ WHERE  id IN ( $idString )
     }
     if (is_numeric($employerIDorName)) {
       $employerID = (int) $employerIDorName;
-      if ($checkPermissions && (!CRM_Contact_BAO_Contact_Permission::allow($employerID, CRM_Core_Permission::VIEW) || CRM_Contact_BAO_Contact::getContactType($employerID) !== 'Organization')) {
+      if ($checkPermissions && $employerID !== (int) $previousEmployerID && (!CRM_Contact_BAO_Contact_Permission::allow($employerID, CRM_Core_Permission::VIEW) || CRM_Contact_BAO_Contact::getContactType($employerID) !== 'Organization')) {
         throw new \Civi\API\Exception\UnauthorizedException(ts('Permission denied to link to this employer organization.'));
       }
     }
@@ -272,7 +272,7 @@ WHERE  id IN ( $idString )
       $dupeIDs = CRM_Contact_BAO_Contact::getDuplicateContacts(['organization_name' => $employerName], 'Organization', 'Unsupervised', [], FALSE);
       if (!empty($dupeIDs)) {
         $employerID = (int) (reset($dupeIDs));
-        if ($checkPermissions && !CRM_Contact_BAO_Contact_Permission::allow($employerID, CRM_Core_Permission::VIEW)) {
+        if ($checkPermissions && $employerID !== (int) $previousEmployerID && !CRM_Contact_BAO_Contact_Permission::allow($employerID, CRM_Core_Permission::VIEW)) {
           throw new \Civi\API\Exception\UnauthorizedException(ts('Permission denied to link to this employer organization.'));
         }
       }
