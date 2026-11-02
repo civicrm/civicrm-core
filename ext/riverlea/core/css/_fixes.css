@@ -718,9 +718,6 @@ details + .crm-content-block:has(.dataTables_wrapper) {
 .crm-container .af-layout-inline ~ .btn-group.pull-right {
   margin: var(--crm-padding-reg) 0;
 }
-.crm-container .crm-search-display-table .form-inline .form-group.pull-right {
-  margin-left: auto;
-}
 
 /* CiviCampaign dashboard */
 
