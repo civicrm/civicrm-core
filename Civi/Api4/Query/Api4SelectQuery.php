@@ -402,6 +402,17 @@ class Api4SelectQuery extends Api4Query {
     return array_filter($clauses);
   }
 
+  private function isHiddenCustomField(string $fieldName): bool {
+    [$groupName, $customFieldName] = array_pad(array_slice(explode('.', $fieldName), -2), -2, NULL);
+    $permittedGroups = \CRM_Core_Permission::customGroup();
+    foreach (\CRM_Core_BAO_CustomGroup::getAll() as $group) {
+      if ($group['name'] === $groupName && !in_array($group['id'], $permittedGroups) && in_array($customFieldName, array_column($group['fields'], 'name'), TRUE)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
   /**
    * Fetch a field from the getFields list
    *
@@ -423,6 +434,10 @@ class Api4SelectQuery extends Api4Query {
       $this->autoJoinFK($fieldName);
     }
     $field = $this->apiFieldSpec[$fieldName] ?? NULL;
+    // dev/core#6905 - custom fields the user can't view are not in the spec, treat them as unauthorized rather than invalid
+    if ($field === NULL && $this->getCheckPermissions() && $this->isHiddenCustomField($fieldName)) {
+      $field = FALSE;
+    }
     if (!$field) {
       $this->debug($field === FALSE ? 'unauthorized_fields' : 'undefined_fields', $fieldName);
     }

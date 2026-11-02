@@ -372,4 +372,36 @@ class CustomGroupACLTest extends Api4TestBase {
 
   }
 
+  /**
+   * dev/core#6905 - filtering by a custom field the user can't view should not throw "Invalid field".
+   */
+  public function testWhereOnHiddenCustomField(): void {
+    $group = $this->createTestRecord('CustomGroup', [
+      'title' => 'MySecretSingle',
+      'extends' => 'Individual',
+    ]);
+    CustomField::create(FALSE)->setValues([
+      'label' => 'MyField',
+      'html_type' => 'Text',
+      'custom_group_id' => $group['id'],
+    ])->execute();
+    $cid = $this->createTestRecord('Contact', ['first_name' => 'Hidden', 'MySecretSingle.MyField' => 'abc'])['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts'];
+    $result = Contact::get()
+      ->addSelect('id', 'MySecretSingle.MyField')
+      ->addWhere('id', '=', $cid)
+      ->addWhere('MySecretSingle.MyField', '=', 'abc')
+      ->execute()->single();
+    $this->assertArrayNotHasKey('MySecretSingle.MyField', $result);
+
+    try {
+      Contact::get()->addWhere('MySecretSingle.NoSuchField', '=', 'abc')->execute();
+      $this->fail('Nonexistent field should throw an exception');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('Invalid field', $e->getMessage());
+    }
+  }
+
 }
