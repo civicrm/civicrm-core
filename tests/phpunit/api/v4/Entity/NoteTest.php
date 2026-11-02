@@ -273,4 +273,24 @@ class NoteTest extends Api4TestBase implements TransactionalInterface {
     }
   }
 
+  /**
+   * A private note created without a contact_id is authored by the current user.
+   */
+  public function testPrivateNoteCreateDefaultsAuthorToCurrentUser(): void {
+    $user = $this->createTestRecord('Individual');
+    $targetContact = $this->createTestRecord('Individual');
+    \CRM_Core_Session::singleton()->set('userID', $user['id']);
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit all contacts'];
+
+    $note = Note::create()
+      ->setCheckPermissions(TRUE)
+      ->addValue('entity_table', 'civicrm_contact')
+      ->addValue('entity_id', $targetContact['id'])
+      ->addValue('privacy', 1)
+      ->addValue('note', 'Mine')
+      ->execute()->first();
+
+    $this->assertEquals($user['id'], $note['contact_id']);
+  }
+
 }
