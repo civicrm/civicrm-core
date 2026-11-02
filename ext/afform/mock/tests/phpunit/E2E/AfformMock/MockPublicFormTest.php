@@ -168,6 +168,51 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
   }
 
   /**
+   * The page token checks the same params when they arrive in a JSON body.
+   */
+  public function testAuthenticatedUrlToken_JsonBody(): void {
+    $lebowski = $this->getLebowskiCID();
+    $url = $this->renderTokens($lebowski, '{form.mockPublicFormUrl}', 'text/plain');
+    parse_str(parse_url($url, PHP_URL_QUERY), $queryParams);
+    $auth = ['_authx' => $queryParams['_aff']];
+
+    $response = $this->callApi4AuthTokenSuccess($auth, 'Afform', 'prefill', ['name' => $this->getFormName()], TRUE);
+    $this->assertEquals($lebowski, $response['values'][0]['values'][0]['fields']['id'], 'Afform.prefill should return id');
+
+    $body = $this->callApi4AuthTokenFailure($auth, 'Afform', 'prefill', [
+      'name' => $this->getFormName(),
+      'chain' => ['name_me_0' => ['Contact', 'get', []]],
+    ], TRUE);
+    $this->assertMatchesRegularExpression('/JWT specifies a different form or route/', $body, 'Response should have error message');
+
+    $prefill = ['Afform', 'prefill', ['name' => $this->getFormName()]];
+    $response = $this->postJsonWithToken($auth, 'civicrm/ajax/api4', ['calls' => ['prefill' => $prefill]]);
+    $this->assertStatusCode(200, $response);
+    $this->assertEquals($lebowski, json_decode((string) $response->getBody(), TRUE)['prefill']['values'][0]['values'][0]['fields']['id']);
+
+    $response = $this->postJsonWithToken($auth, 'civicrm/ajax/api4', ['calls' => ['prefill' => $prefill, 'contacts' => ['Contact', 'get', []]]]);
+    $this->assertStatusCode(401, $response);
+
+    // The token check and the API call read the same source when params arrive twice.
+    $sneakyParams = ['name' => $this->getFormName(), 'chain' => ['name_me_0' => ['Contact', 'get', []]]];
+    $response = $this->postJsonWithToken($auth, 'civicrm/ajax/api4/Afform/prefill', ['params' => $prefill[2]], ['params' => json_encode($sneakyParams)]);
+    $this->assertStatusCode(200, $response);
+    $this->assertArrayNotHasKey('name_me_0', json_decode((string) $response->getBody(), TRUE)['values'][0]);
+  }
+
+  private function postJsonWithToken(array $auth, string $path, array $body, array $query = []): \Psr\Http\Message\ResponseInterface {
+    return $this->createGuzzle(['http_errors' => FALSE])->post($path, [
+      'headers' => [
+        'X-Requested-With' => 'XMLHttpRequest',
+        'X-Civi-Auth' => $auth['_authx'],
+        'Content-Type' => 'application/json',
+      ],
+      'query' => $query,
+      'body' => json_encode($body),
+    ]);
+  }
+
+  /**
    * The prior test checks that Afform Message Tokens are working.
    *
    * There are other ways to generate a token - e.g. a custom or future script which produces a JWT.
@@ -335,8 +380,8 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $this->assertEquals($cid, $j['contact_id'], "Response did not give expected contact ID\n" . $formattedFailure);
   }
 
-  protected function callApi4AuthTokenSuccess(array $auth, string $entity, string $action, $params = []) {
-    $response = $this->callApi4AuthToken($auth, $entity, $action, $params);
+  protected function callApi4AuthTokenSuccess(array $auth, string $entity, string $action, $params = [], bool $jsonBody = FALSE) {
+    $response = $this->callApi4AuthToken($auth, $entity, $action, $params, $jsonBody);
     $this->assertContentType('application/json', $response);
     $this->assertStatusCode(200, $response);
     $result = json_decode((string) $response->getBody(), 1);
@@ -346,8 +391,8 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     return $result;
   }
 
-  protected function callApi4AuthTokenFailure(array $auth, string $entity, string $action, $params = []): string {
-    $httpResponse = $this->callApi4AuthToken($auth, $entity, $action, $params);
+  protected function callApi4AuthTokenFailure(array $auth, string $entity, string $action, $params = [], bool $jsonBody = FALSE): string {
+    $httpResponse = $this->callApi4AuthToken($auth, $entity, $action, $params, $jsonBody);
     $this->assertSame(401, $httpResponse->getStatusCode(), "HTTP status code should be 401");
     return (string) $httpResponse->getBody();
   }
@@ -357,11 +402,16 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
    * @param string $entity
    * @param string $action
    * @param array $params
+   * @param bool $jsonBody
+   *   Send params in an `application/json` POST body, with the token in the X-Civi-Auth header.
    *
    * @return \Psr\Http\Message\ResponseInterface
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  protected function callApi4AuthToken(array $auth, string $entity, string $action, array $params = []): \Psr\Http\Message\ResponseInterface {
+  protected function callApi4AuthToken(array $auth, string $entity, string $action, array $params = [], bool $jsonBody = FALSE): \Psr\Http\Message\ResponseInterface {
+    if ($jsonBody) {
+      return $this->postJsonWithToken($auth, "civicrm/ajax/api4/$entity/$action", ['params' => $params]);
+    }
     $http = $this->createGuzzle(['http_errors' => FALSE]);
     $method = str_starts_with($action, 'get') ? 'GET' : 'POST';
 

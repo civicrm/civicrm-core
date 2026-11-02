@@ -15,6 +15,9 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use GuzzleHttp\Psr7\ServerRequest;
+use Psr\Http\Message\ServerRequestInterface;
+
 /**
  * Class for managing a http request
  */
@@ -132,16 +135,6 @@ class CRM_Utils_Request {
     foreach (($method ?? []) as $key => $value) {
       if (str_contains($key, 'amp;')) {
         $method[str_replace('amp;', '', $key)] = $method[$key];
-        if ($method === '$_POST' && $_SERVER['CONTENT_TYPE'] === 'application/json') {
-          static $post = NULL;
-          if (!isset($post)) {
-            $rawPost = file_get_contents('php://input');
-            $post = json_decode($rawPost, TRUE) ?? [];
-          }
-          if (isset($post[$name])) {
-            return $post[$name];
-          }
-        }
         if (isset($method[$name])) {
           return $method[$name];
         }
@@ -176,12 +169,84 @@ class CRM_Utils_Request {
     if ($_POST) {
       $result = array_merge($result, $_POST);
     }
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_SERVER['CONTENT_TYPE'] === 'application/json') {
-      $rawPost = file_get_contents('php://input');
-      $jsonPost = json_decode($rawPost, TRUE) ?? [];
-      $result = array_merge($result, $jsonPost);
+    // Any JSON array merges here, including the lists some webhooks send; malformed bodies are left to the caller.
+    $jsonBody = json_decode(self::getRawJsonBody(), TRUE);
+    return is_array($jsonBody) ? array_merge($result, $jsonBody) : $result;
+  }
+
+  /**
+   * Get the top-level values of a POST body sent as `application/json`.
+   *
+   * @param \Psr\Http\Message\ServerRequestInterface|null $request
+   *   Defaults to the current request.
+   * @return array
+   *   Empty unless the request is a POST with a JSON media type.
+   * @throws \CRM_Core_Exception
+   *   If the JSON body is malformed or not an object.
+   */
+  public static function getJsonBody(?ServerRequestInterface $request = NULL): array {
+    $raw = self::getRawJsonBody($request);
+    if ($raw === '') {
+      return [];
     }
-    return $result;
+    $body = json_decode($raw, TRUE);
+    if (!is_array($body) || !str_starts_with($raw, '{')) {
+      throw new CRM_Core_Exception('Malformed JSON in request body: expected an object.');
+    }
+    return $body;
+  }
+
+  /**
+   * @return string
+   *   The trimmed body of a POST with a JSON media type, otherwise ''.
+   */
+  private static function getRawJsonBody(?ServerRequestInterface $request = NULL): string {
+    if ($request === NULL) {
+      // Skip building a request object for the common non-POST case.
+      if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+        return '';
+      }
+      return \Civi::$statics[__CLASS__]['rawJsonBody'] ??= self::getRawJsonBody(ServerRequest::fromGlobals());
+    }
+    if ($request->getMethod() !== 'POST' || !self::isJsonContentType($request->getHeaderLine('Content-Type'))) {
+      return '';
+    }
+    return trim((string) $request->getBody());
+  }
+
+  /**
+   * Retrieve a structured value: JSON-encoded in form/query data, or nested in a JSON body.
+   *
+   * @param string $name
+   * @param string $method
+   *   'GET', 'POST' or 'REQUEST'. A JSON body is only read for POST and REQUEST.
+   * @param \Psr\Http\Message\ServerRequestInterface|null $request
+   *   Defaults to the current request.
+   * @return array|null
+   *   NULL if the value is absent or empty.
+   * @throws \CRM_Core_Exception
+   *   If the value or the JSON body is malformed.
+   */
+  public static function retrieveJson(string $name, string $method = 'REQUEST', ?ServerRequestInterface $request = NULL): ?array {
+    $value = $method === 'GET' ? NULL : (self::getJsonBody($request)[$name] ?? NULL);
+    $value ??= self::retrieve($name, 'String', NULL, FALSE, NULL, $method);
+    if ($value === NULL || $value === '') {
+      return NULL;
+    }
+    if (is_string($value)) {
+      $value = json_decode($value, TRUE);
+    }
+    if (!is_array($value)) {
+      throw new CRM_Core_Exception("Malformed JSON in '$name'.");
+    }
+    return $value;
+  }
+
+  /**
+   * Media types compare case-insensitively and ignore parameters such as `charset` (RFC 9110).
+   */
+  private static function isJsonContentType(string $contentType): bool {
+    return strtolower(trim(explode(';', $contentType)[0])) === 'application/json';
   }
 
   /**

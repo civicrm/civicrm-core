@@ -37,6 +37,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
       'request' => $_REQUEST,
       'method' => $_SERVER['REQUEST_METHOD'] ?? NULL,
       'httpx' => $_SERVER['HTTP_X_REQUESTED_WITH'] ?? NULL,
+      'debug' => \Civi::settings()->get('debug_enabled'),
     ];
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
     $_SERVER['HTTP_REFERER'] ??= NULL;
@@ -48,6 +49,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     $_REQUEST = $this->originalRequest['request'];
     $_SERVER['REQUEST_METHOD'] = $this->originalRequest['method'];
     $_SERVER['HTTP_X_REQUESTED_WITH'] = $this->originalRequest['httpx'];
+    \Civi::settings()->set('debug_enabled', $this->originalRequest['debug']);
     parent::tearDown();
   }
 
@@ -55,6 +57,8 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
    * Check that api can only be accessed with XMLHttpRequest
    */
   public function testAjaxMethodCheck(): void {
+    // Debug mode deliberately lifts the check.
+    \Civi::settings()->set('debug_enabled', FALSE);
     $_SERVER['HTTP_X_REQUESTED_WITH'] = NULL;
     [$response, $code] = $this->runAjax([
       'path' => 'civicrm/ajax/api4/Contact/get',

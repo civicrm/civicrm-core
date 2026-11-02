@@ -50,13 +50,10 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     }
 
     // Two call formats. Which one was used? Note: CRM_Api4_Permission::check() and CRM_Api4_Page_AJAX::run() should have matching conditionals.
-    if (empty($this->urlPath[3])) {
-      // Received multi-call format
-      $calls = CRM_Utils_Request::retrieve('calls', 'String', NULL, TRUE, NULL, 'POST');
-      $calls = json_decode($calls, TRUE);
-      if (!is_array($calls)) {
-        $this->sendMalformedJsonResponse('calls');
-      }
+    $isMultiCall = empty($this->urlPath[3]);
+    $this->checkJsonBodyKeys($isMultiCall ? ['calls'] : ['params', 'index']);
+    if ($isMultiCall) {
+      $calls = $this->getJsonInput('calls', 'POST') ?? throw new CRM_Core_Exception(ts('Could not find valid value for %1', [1 => 'calls']));
       foreach ($calls as $index => $call) {
         $response[$index] = call_user_func_array([$this, 'execute'], $call);
       }
@@ -66,7 +63,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       $entity = $this->urlPath[3];
       $action = $this->urlPath[4];
       $params = $this->getParamsFromRequest($entity, $action);
-      $index = CRM_Utils_Request::retrieve('index', 'String');
+      $index = CRM_Utils_Request::getJsonBody()['index'] ?? CRM_Utils_Request::retrieve('index', 'String');
       $response = $this->execute($entity, $action, $params, $index);
     }
 
@@ -75,11 +72,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
 
   private function getParamsFromRequest(string $entity, string $action): array {
     $config = CRM_Core_Config::singleton();
-    $params = CRM_Utils_Request::retrieve('params', 'String');
-    $params = $params ? json_decode($params, TRUE) : [];
-    if (!is_array($params)) {
-      $this->sendMalformedJsonResponse('params');
-    }
+    $params = $this->getJsonInput('params') ?? [];
 
     // Add query params if they are not in the params json and if they are allowed by the api action
     $queryParams = array_diff_key($_GET, $params);
@@ -96,6 +89,40 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       }
     }
     return $params;
+  }
+
+  /**
+   * @return array|null
+   *   NULL if the input is absent.
+   */
+  private function getJsonInput(string $name, string $method = 'REQUEST'): ?array {
+    try {
+      return CRM_Utils_Request::retrieveJson($name, $method);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->sendMalformedJsonResponse($name);
+      return NULL;
+    }
+  }
+
+  /**
+   * A JSON body carries the same top-level keys as form data; reject others rather than run the call without them.
+   */
+  private function checkJsonBodyKeys(array $allowedKeys): void {
+    $unknownKeys = [];
+    try {
+      $unknownKeys = array_diff(array_keys(CRM_Utils_Request::getJsonBody()), $allowedKeys);
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->sendMalformedJsonResponse('request body');
+    }
+    if ($unknownKeys) {
+      $this->httpResponseCode = 400;
+      CRM_Utils_System::sendJSONResponse([
+        'error_code' => 400,
+        'error_message' => 'Unknown key(s) in JSON request body: ' . implode(', ', $unknownKeys) . '. Expected: ' . implode(', ', $allowedKeys) . '.',
+      ], $this->httpResponseCode);
+    }
   }
 
   /**
