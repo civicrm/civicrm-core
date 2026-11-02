@@ -2,6 +2,8 @@
 
 namespace Civi\Api4\Action\EmailMessage;
 
+use CRM_Postbox_ExtensionUtil as E;
+
 /**
  * Send an unsent email message record
  */
@@ -17,13 +19,6 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
       'from_site_email_address_id.display_name',
       //'from_email',
       //'from_name',
-      'to_contact_id',
-      "to_contact_id.display_name",
-      "to_contact_id.email_primary.email",
-      "to_contact_id.email_primary.on_hold",
-      "to_contact_id.do_not_email",
-      "to_contact_id.is_deceased",
-      "to_contact_id.is_deleted",
       'location_type',
       'extra',
     ];
@@ -93,7 +88,18 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
     return '"' . $fromName . '" <' . $fromEmail . '>';
   }
 
-  private function renderRecipient(array $contactRecord, ?string $locationType = NULL): array {
+  private function renderRecipient(array $record, ?string $locationType = NULL): array {
+    // remove join prefix from contact details
+    $contactRecord = [
+      'id' => $record['contact_id'],
+      'display_name' => $record['contact_id.display_name'],
+      'email_primary.email' => $record['contact_id.email_primary.email'],
+      'email_primary.on_hold' => $record['contact_id.email_primary.on_hold'],
+      'do_not_email' => $record['contact_id.do_not_email'],
+      'is_deceased' => $record['contact_id.is_deceased'],
+      'is_deleted' => $record['contact_id.is_deleted'],
+    ];
+
     if ($contactRecord["do_not_email"] || $contactRecord["is_deceased"] || $contactRecord["is_deleted"]) {
       throw new \CRM_Core_Exception("Recipient is deceased, deleted, or has opted out from all mailings");
     }
@@ -131,6 +137,7 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
       'id' => $contactRecord['id'],
       'email' => $email,
       'name' => ($name !== '') ? $name : $email,
+      'type' => $record['recipient_type'],
     ];
   }
 
@@ -154,18 +161,21 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
 
     $fromAddress = $this->renderFromAddress($record);
 
-    // remove join prefix from to contact record details
-    $toContactRecord = [
-      'id' => $record['to_contact_id'],
-      'display_name' => $record["to_contact_id.display_name"],
-      'email_primary.email' => $record["to_contact_id.email_primary.email"],
-      'email_primary.on_hold' => $record["to_contact_id.email_primary.on_hold"],
-      'do_not_email' => $record["to_contact_id.do_not_email"],
-      'is_deceased' => $record["to_contact_id.is_deceased"],
-      'is_deleted' => $record["to_contact_id.is_deleted"],
-    ];
+    $recipientRecords = (array) \Civi\Api4\EmailMessageRecipient::get(FALSE)
+      ->addWhere('email_message_id', '=', $record['id'])
+      ->addSelect('recipient_type', 'contact_id', 'contact_id.display_name', 'contact_id.email_primary.email', 'contact_id.email_primary.on_hold', 'contact_id.is_deceased', 'contact_id.is_deleted')
+      ->execute();
 
-    $recipient = $this->renderRecipient($toContactRecord, $record['location_type']);
+    $recipients = array_map(fn ($recipientRecord) => $this->renderRecipient($recipientRecord, $record['location_type']), $recipientRecords);
+
+    // NOTE: we currently only support a single TO recipient, due to the constraints
+    // of CRM_Utils_Mail::send. Additional TO recipients will be ignored
+    $toRecipient = array_find($recipients, fn ($recipient) => ($recipient['type'] === 'to'));
+
+    if (!$toRecipient) {
+      throw new \CRM_Core_Exception(E::ts('No TO recipients found for Email Message %1', [1 => $record['id']]));
+    }
+
     $message = $this->renderMessage($record);
 
     // set up the parameters for CRM_Utils_Mail::send
@@ -174,26 +184,30 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
       'groupName' => 'Postbox',
       'from' => $fromAddress,
       // recipient details
-      'contactId' => $recipient['id'],
-      'toName' => $recipient['name'],
-      'toEmail' => $recipient['email'],
+      'contactId' => $toRecipient['id'],
+      'toName' => $toRecipient['name'],
+      'toEmail' => $toRecipient['email'],
       // message content
       'subject' => $message['subject'],
       'html' => $message['html'],
       'text' => $message['text'],
     ];
 
-    // TODO: support additional contacts in cc / bcc
-    // if (!empty($record['extra']) && !empty($record['extra']['cc_contacts'])) {
-    //   $mailParams['cc'] = $record['cc_id.email_primary.email'];
-    // }
+    $ccRecipients = array_filter($recipients, fn ($recipient) => ($recipient['type'] === 'cc'));
+    if ($ccRecipients) {
+      $mailParams['cc'] = \array_column($ccRecipients, 'email');
+    }
+    $bccRecipients = array_filter($recipients, fn ($recipient) => ($recipient['type'] === 'bcc'));
+    if ($bccRecipients) {
+      $mailParams['bcc'] = \array_column($bccRecipients, 'email');
+    }
 
     // Try to send the email.
     $result = \CRM_Utils_Mail::send($mailParams);
 
     // Falsey return from CRM_Utils_Mail indicates an error
     if (!$result) {
-      throw new \CRM_Core_Exception("Error sending email to {$recipient['name']} <{$recipient['email']}>");
+      throw new \CRM_Core_Exception("Error sending email to {$toRecipient['name']} <{$toRecipient['email']}>");
     }
   }
 
