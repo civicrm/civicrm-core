@@ -13,11 +13,17 @@ abstract class CheckoutOption implements CheckoutOptionInterface {
     return $this->getLabel();
   }
 
+  /**
+   * @inheritdoc
+   */
   public function getPaymentMethod(): ?string {
     return NULL;
   }
 
-  public function getPaymentProcessorId(bool $testMode = FALSE): ?int {
+  /**
+   * @inheritdoc
+   */
+  public function getPaymentProcessorId(): ?int {
     return NULL;
   }
 
@@ -41,7 +47,7 @@ abstract class CheckoutOption implements CheckoutOptionInterface {
    * legacy payment processors where 1 PaymentProcessor = 1 Checkout Option
    */
   protected function getQuickformProcessor(bool $testMode = FALSE): ?\CRM_Core_Payment {
-    $id = $this->getPaymentProcessorId($testMode);
+    $id = $this->getPaymentProcessorId();
     $connection = \Civi\Api4\PaymentProcessor::get(FALSE)->addWhere('id', '=', $id)->execute()->first();
     if (!$connection || empty($connection['name'])) {
       return NULL;
