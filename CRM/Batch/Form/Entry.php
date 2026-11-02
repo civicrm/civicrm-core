@@ -377,22 +377,37 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
   public static function formRule($params, $files, $self) {
     $errors = [];
     $batchTypes = array_flip(CRM_Batch_DAO_Batch::buildOptions('type_id', 'validate'));
-    $fields = [
-      'total_amount' => ts('Amount'),
+    $requiredFields = [
       'financial_type' => ts('Financial Type'),
       'payment_instrument' => ts('Payment Method'),
     ];
 
     //CRM-16480 if contact is selected, validate financial type and amount field.
-    foreach ($params['field'] as $key => $value) {
-      if (isset($value['trxn_id'])) {
-        if (0 < CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_contribution WHERE trxn_id = %1', [1 => [$value['trxn_id'], 'String']])) {
+    foreach ($params['field'] as $key => $values) {
+      if (isset($values['trxn_id'])) {
+        if (0 < CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_contribution WHERE trxn_id = %1', [1 => [$values['trxn_id'], 'String']])) {
           $errors["field[$key][trxn_id]"] = ts('Transaction ID must be unique within the database');
         }
       }
-      foreach ($fields as $field => $label) {
-        if (!empty($params['primary_contact_id'][$key]) && empty($value[$field])) {
-          $errors["field[$key][$field]"] = ts('%1 is a required field.', [1 => $label]);
+      if (!empty($params['primary_contact_id'][$key])) {
+        foreach ($requiredFields as $field => $label) {
+          if (empty($values[$field])) {
+            $errors["field[$key][$field]"] = ts('%1 is a required field.', [1 => $label]);
+          }
+        }
+        foreach ($self->submittableMoneyFields as $moneyFieldName) {
+          // If we have any money fields, they must be 0+.
+          if (array_key_exists($moneyFieldName, $values)
+              && !(is_numeric($values[$moneyFieldName]) && $values[$moneyFieldName] >= 0)) {
+            $label = match($moneyFieldName) {
+              "total_amount" => ts('Amount'),
+              "net_amount" => ts('Net amount'),
+              "non_deductable_amount" => ts('Non-deductable amount'),
+              "fee_amount" => ts('Fee amount'),
+              default => $moneyFieldName
+            };
+            $errors["field[$key][$moneyFieldName]"] = ts('%1 is a required field.', [1 => $label]);
+          }
         }
       }
     }
