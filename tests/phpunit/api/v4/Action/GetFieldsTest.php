@@ -205,7 +205,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->setAction('create')
       ->execute()->indexBy('name');
     $this->assertIsInt($optionValueFields['filter']['default_value']);
-    $this->assertEquals(0, $optionValueFields['filter']['default_value']);
+    $this->assertSame(0, $optionValueFields['filter']['default_value']);
   }
 
   public function testActivityTagGetFields(): void {

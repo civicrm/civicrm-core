@@ -127,19 +127,19 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     // Results should be in alphabetical order by giving tier
     $this->assertSame('Heavy hitter', $result[0]['columns'][0]['val']);
     $this->assertEquals(56.0, $result[0]['data']['AVG_total_amount']);
-    $this->assertEquals(1, $result[0]['data']['COUNT_total_amount']);
+    $this->assertSame(1, $result[0]['data']['COUNT_total_amount']);
 
     $this->assertSame('Low ball', $result[1]['columns'][0]['val']);
     $this->assertEquals(1.5, $result[1]['data']['AVG_total_amount']);
-    $this->assertEquals(1, $result[1]['data']['COUNT_total_amount']);
+    $this->assertSame(1, $result[1]['data']['COUNT_total_amount']);
 
     $this->assertSame('Major league', $result[2]['columns'][0]['val']);
     $this->assertEquals(30.0, $result[2]['data']['AVG_total_amount']);
-    $this->assertEquals(3, $result[2]['data']['COUNT_total_amount']);
+    $this->assertSame(3, $result[2]['data']['COUNT_total_amount']);
 
     $this->assertSame('Minor league', $result[3]['columns'][0]['val']);
     $this->assertEquals(15.0, $result[3]['data']['AVG_total_amount']);
-    $this->assertEquals(2, $result[3]['data']['COUNT_total_amount']);
+    $this->assertSame(2, $result[3]['data']['COUNT_total_amount']);
   }
 
   /**
@@ -232,13 +232,13 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertCount(3, $result);
 
     $this->assertSame('Not a Color!', $result[0]['columns'][0]['val']);
-    $this->assertEquals(3, $result[0]['data']['COUNT_id']);
+    $this->assertSame(3, $result[0]['data']['COUNT_id']);
 
     $this->assertSame('Primary Color', $result[1]['columns'][0]['val']);
-    $this->assertEquals(2, $result[1]['data']['COUNT_id']);
+    $this->assertSame(2, $result[1]['data']['COUNT_id']);
 
     $this->assertSame('Secondary Color', $result[2]['columns'][0]['val']);
-    $this->assertEquals(1, $result[2]['data']['COUNT_id']);
+    $this->assertSame(1, $result[2]['data']['COUNT_id']);
   }
 
   /**
@@ -323,16 +323,16 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertCount(4, $result);
 
     $this->assertSame('Child', $result[0]['columns'][0]['val']);
-    $this->assertEquals(2, $result[0]['data']['COUNT_id']);
+    $this->assertSame(2, $result[0]['data']['COUNT_id']);
 
     $this->assertSame('Baby', $result[1]['columns'][0]['val']);
-    $this->assertEquals(1, $result[1]['data']['COUNT_id']);
+    $this->assertSame(1, $result[1]['data']['COUNT_id']);
 
     $this->assertSame('Adult', $result[2]['columns'][0]['val']);
-    $this->assertEquals(2, $result[2]['data']['COUNT_id']);
+    $this->assertSame(2, $result[2]['data']['COUNT_id']);
 
     $this->assertSame('', $result[3]['columns'][0]['val']);
-    $this->assertEquals(1, $result[3]['data']['COUNT_id']);
+    $this->assertSame(1, $result[3]['data']['COUNT_id']);
   }
 
   public function testSegmentWithContainsOperators(): void {
@@ -460,11 +460,11 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
 
     // Non-Worker cluster should have 2 participants (Attendee only)
     $this->assertSame('Non-Worker', $result[0]['columns'][0]['val']);
-    $this->assertEquals(2, $result[0]['data']['COUNT_id']);
+    $this->assertSame(2, $result[0]['data']['COUNT_id']);
 
     // Worker cluster should have 3 participants (Volunteer, Host+Speaker, Attendee+Volunteer)
     $this->assertSame('Worker', $result[1]['columns'][0]['val']);
-    $this->assertEquals(3, $result[1]['data']['COUNT_id']);
+    $this->assertSame(3, $result[1]['data']['COUNT_id']);
 
     // Test second segment using CONTAINS / NOT CONTAINS operators
     $params['savedSearch']['api_params']['select'][0] = 'segment_Is_Volunteer:label';
@@ -476,11 +476,11 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
 
     // Non-Volunteer cluster should have 3 participants (Host+Speaker, Attendee, Attendee)
     $this->assertSame('No', $result[0]['columns'][0]['val']);
-    $this->assertEquals(3, $result[0]['data']['COUNT_id']);
+    $this->assertSame(3, $result[0]['data']['COUNT_id']);
 
     // Volunteer cluster should have 2 participants (Volunteer, Attendee+Volunteer)
     $this->assertSame('Yes', $result[1]['columns'][0]['val']);
-    $this->assertEquals(2, $result[1]['data']['COUNT_id']);
+    $this->assertSame(2, $result[1]['data']['COUNT_id']);
   }
 
   /**

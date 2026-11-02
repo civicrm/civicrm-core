@@ -133,7 +133,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertContains('Parent', $getFields['contact_sub_type']['options']);
     $this->assertFalse($getFields['contact_sub_type']['required']);
     $this->assertTrue($getFields['contact_sub_type']['nullable']);
-    $this->assertEquals(1, $getFields['contact_sub_type']['serialize']);
+    $this->assertSame(1, $getFields['contact_sub_type']['serialize']);
     $this->assertSame('Date', $getFields['birth_date']['data_type']);
     $this->assertSame('Boolean', $getFields['is_deceased']['data_type']);
     $this->assertSame('Integer', $getFields['_id']['data_type']);
@@ -141,7 +141,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // The table was initialized with one empty row. Now create another.
     $created = civicrm_api4($apiName, 'create')->single();
-    $this->assertEquals(2, $created['_id']);
+    $this->assertSame(2, $created['_id']);
 
     $created = civicrm_api4($apiName, 'get', ['where' => [['_id', '=', 2]]])->single();
     $this->assertNull($created['first_name']);
@@ -599,22 +599,22 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     $this->assertEquals($import[0]['_entity_id'], $contributions[0]['id']);
     $this->assertEquals($import[1]['_entity_id'], $contributions[1]['id']);
-    $this->assertEquals(100, $contributions[0]['total_amount']);
-    $this->assertEquals(200, $contributions[1]['total_amount']);
-    $this->assertEquals(300, $contributions[2]['total_amount']);
+    $this->assertSame(100, $contributions[0]['total_amount']);
+    $this->assertSame(200, $contributions[1]['total_amount']);
+    $this->assertSame(300, $contributions[2]['total_amount']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contributions[0]['financial_type_id']);
     $this->assertEquals($this->getFinancialTypeID('Member Dues'), $contributions[1]['financial_type_id']);
     $this->assertSame('Jane', $contributions[0]['contact_id.first_name']);
     $this->assertSame('John', $contributions[1]['contact_id.first_name']);
-    $this->assertEquals(1, $contributions[0]['contact_id.gender_id']);
-    $this->assertEquals(2, $contributions[1]['contact_id.gender_id']);
+    $this->assertSame(1, $contributions[0]['contact_id.gender_id']);
+    $this->assertSame(2, $contributions[1]['contact_id.gender_id']);
 
     $contributionSoft = civicrm_api4('ContributionSoft', 'get', [
       'select' => ['contact_id', 'amount', 'soft_credit_type_id:name'],
       'where' => [['contribution_id', '=', $contributions[0]['id']]],
     ])->single();
     $this->assertEquals($softCreditContactId, $contributionSoft['contact_id']);
-    $this->assertEquals(10, $contributionSoft['amount']);
+    $this->assertSame(10, $contributionSoft['amount']);
     // This value was set in the ON clause & should have carried through
     $this->assertSame('in_honor_of', $contributionSoft['soft_credit_type_id:name']);
 
@@ -623,7 +623,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       'where' => [['contribution_id', '=', $contributions[2]['id']]],
     ])->single();
     // Not specified in 2nd contribution but implied by the total_amount
-    $this->assertEquals(300, $contributionSoft['amount']);
+    $this->assertSame(300, $contributionSoft['amount']);
   }
 
 }

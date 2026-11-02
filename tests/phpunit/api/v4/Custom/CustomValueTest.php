@@ -182,7 +182,7 @@ class CustomValueTest extends Api4TestBase {
       ->execute();
 
     // check if two custom values are created
-    $this->assertEquals(2, count($result));
+    $this->assertSame(2, count($result));
     $expectedResult = [
       [
         'id' => 1,
@@ -247,7 +247,7 @@ class CustomValueTest extends Api4TestBase {
     $result = CustomValue::get($group)
       ->addSelect('id', 'entity_id', $colorFieldName, $colorFieldName . ':label', $multiFieldName, $multiFieldName . ':label', $refFieldName)
       ->execute();
-    $this->assertEquals(1, count($result));
+    $this->assertSame(1, count($result));
 
     $expectedResult = [
       [
@@ -281,7 +281,7 @@ class CustomValueTest extends Api4TestBase {
     CustomValue::delete($group)->addWhere("id", "=", 3)->execute();
     $result = CustomValue::get($group)->execute();
     // check that there are no custom values present
-    $this->assertEquals(0, count($result));
+    $this->assertSame(0, count($result));
   }
 
   /**

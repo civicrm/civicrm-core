@@ -76,7 +76,7 @@ class GetLinksTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
     $this->assertStringContainsString('ct=Individual', $links[0]['path']);
     $this->assertSame('Add Individual', $links[0]['text']);
-    $this->assertEquals(0, $links[0]['weight']);
+    $this->assertSame(0, $links[0]['weight']);
     $this->assertNull($links[0]['api_values']);
     $links = $links->indexBy('text');
     $this->assertSame('fa-squirrel', $links['Add Squirrel']['icon']);

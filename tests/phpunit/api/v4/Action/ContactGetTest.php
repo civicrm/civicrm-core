@@ -753,13 +753,13 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
         $adjustForLeapYear = -1;
       }
     }
-    $this->assertEquals(1, $result['abc']['age_years']);
+    $this->assertSame(1, $result['abc']['age_years']);
     $this->assertEquals(3 + $adjustForLeapYear, $result['abc']['next_birthday']);
     $this->assertEquals(3 + $adjustForLeapYear, $result['abc']['DAYSTOANNIV:birth_date']);
-    $this->assertEquals(21, $result['def']['age_years']);
-    $this->assertEquals(0, $result['ghi']['age_years']);
-    $this->assertEquals(0, $result['ghi']['next_birthday']);
-    $this->assertEquals(0, $result['ghi']['DAYSTOANNIV:birth_date']);
+    $this->assertSame(21, $result['def']['age_years']);
+    $this->assertSame(0, $result['ghi']['age_years']);
+    $this->assertSame(0, $result['ghi']['next_birthday']);
+    $this->assertSame(0, $result['ghi']['DAYSTOANNIV:birth_date']);
 
     Contact::get(FALSE)
       ->addWhere('age_years', '=', 21)
@@ -786,7 +786,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ->setLimit(10)
       ->execute();
 
-    $this->assertEquals(20, $get1->count());
+    $this->assertSame(20, $get1->count());
     $this->assertCount(10, (array) $get1);
 
   }

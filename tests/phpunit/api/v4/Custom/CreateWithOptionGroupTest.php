@@ -89,7 +89,7 @@ class CreateWithOptionGroupTest extends Api4TestBase {
 
     $this->assertSame('Red', $result["$group.$colorField:label"]);
     $this->assertSame('Corn', $result["$group.$foodField:label"]);
-    $this->assertEquals(50000, $result['FinancialStuff.Salary']);
+    $this->assertSame(50000, $result['FinancialStuff.Salary']);
   }
 
   public function testWithCustomDataForMultipleContacts(): void {
@@ -168,7 +168,7 @@ class CreateWithOptionGroupTest extends Api4TestBase {
 
     $this->assertSame('Blue', $blueCheese["$group.$colorField:label"]);
     $this->assertSame('Cheese', $blueCheese["$group.$foodField:label"]);
-    $this->assertEquals(500000, $blueCheese['FinancialStuff.Salary']);
+    $this->assertSame(500000, $blueCheese['FinancialStuff.Salary']);
   }
 
 }

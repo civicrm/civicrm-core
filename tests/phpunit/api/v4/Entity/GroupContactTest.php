@@ -35,7 +35,7 @@ class GroupContactTest extends Api4TestBase {
       ->addWhere('id', '=', $group['id'])
       ->addSelect('contact_count')
       ->execute()->single();
-    $this->assertEquals(0, $count['contact_count']);
+    $this->assertSame(0, $count['contact_count']);
 
     $result = $this->createTestRecord('GroupContact', [
       'group_id' => $group['id'],
@@ -47,7 +47,7 @@ class GroupContactTest extends Api4TestBase {
       ->addWhere('id', '=', $group['id'])
       ->addSelect('contact_count')
       ->execute()->single();
-    $this->assertEquals(1, $count['contact_count']);
+    $this->assertSame(1, $count['contact_count']);
   }
 
 }

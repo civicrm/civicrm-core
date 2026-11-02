@@ -639,7 +639,7 @@ EOHTML;
       ->execute()->single();
     $this->assertTrue($stats['submit_enabled']);
     $this->assertFalse($stats['submit_currently_open']);
-    $this->assertEquals(3, $stats['submission_count']);
+    $this->assertSame(3, $stats['submission_count']);
 
     // Prefilling and submitting are no longer allowed.
     try {
@@ -699,7 +699,7 @@ EOHTML;
       ->execute()->single();
     $this->assertTrue($stats['submit_enabled']);
     $this->assertFalse($stats['submit_currently_open']);
-    $this->assertEquals(5, $stats['submission_count']);
+    $this->assertSame(5, $stats['submission_count']);
 
     // Prefilling and submitting are no longer allowed.
     try {
@@ -863,10 +863,10 @@ EOHTML;
       ->execute();
 
     $this->assertCount(2, $phoneValues);
-    $this->assertEquals(1, $phoneValues[0]['location_type_id']);
+    $this->assertSame(1, $phoneValues[0]['location_type_id']);
     $this->assertSame('1-1-1', $phoneValues[0]['phone']);
     $this->assertEquals('111', $phoneValues[0]['phone_ext']);
-    $this->assertEquals(2, $phoneValues[1]['location_type_id']);
+    $this->assertSame(2, $phoneValues[1]['location_type_id']);
     $this->assertSame('2-2-2', $phoneValues[1]['phone']);
     $this->assertEquals('222', $phoneValues[1]['phone_ext']);
 
@@ -900,10 +900,10 @@ EOHTML;
       ->execute();
 
     $this->assertCount(2, $phoneValues);
-    $this->assertEquals(1, $phoneValues[0]['location_type_id']);
+    $this->assertSame(1, $phoneValues[0]['location_type_id']);
     $this->assertEquals('1', $phoneValues[0]['phone']);
     $this->assertEquals('111', $phoneValues[0]['phone_ext']);
-    $this->assertEquals(2, $phoneValues[1]['location_type_id']);
+    $this->assertSame(2, $phoneValues[1]['location_type_id']);
     $this->assertEquals('2', $phoneValues[1]['phone']);
 
     $prefill = Afform::prefill()

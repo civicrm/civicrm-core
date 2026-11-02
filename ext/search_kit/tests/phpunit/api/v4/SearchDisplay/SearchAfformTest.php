@@ -428,7 +428,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     // The search should now have three references (its display + 2 Afforms)
     $refs = CoreUtil::getRefCount('SavedSearch', $search['id']);
     $this->assertCount(2, $refs);
-    $this->assertEquals(2, array_column($refs, 'count', 'type')['Afform']);
+    $this->assertSame(2, array_column($refs, 'count', 'type')['Afform']);
 
     // The display should still have one reference (the Afform)
     $refs = CoreUtil::getRefCount('SearchDisplay', $display['id']);

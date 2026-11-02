@@ -319,18 +319,18 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
       ->addGroupBy('id')
       ->execute()->indexBy('id');
-    $this->assertEquals(1, (int) $grouped[$cid1]['tag_count']);
-    $this->assertEquals(2, (int) $grouped[$cid2]['tag_count']);
-    $this->assertEquals(0, (int) $grouped[$cid3]['tag_count']);
+    $this->assertSame(1, (int) $grouped[$cid1]['tag_count']);
+    $this->assertSame(2, (int) $grouped[$cid2]['tag_count']);
+    $this->assertSame(0, (int) $grouped[$cid3]['tag_count']);
 
     $reverse = Tag::get(FALSE)
       ->addJoin('Contact', FALSE, 'EntityTag', ['contact.id', 'IN', [$cid1, $cid2, $cid3]])
       ->addGroupBy('id')
       ->addSelect('name', 'COUNT(contact.id) AS contacts')
       ->execute()->indexBy('name');
-    $this->assertEquals(2, (int) $reverse[$tag1]['contacts']);
-    $this->assertEquals(1, (int) $reverse[$tag2]['contacts']);
-    $this->assertEquals(1, (int) $reverse[$tag3]['contacts']);
+    $this->assertSame(2, (int) $reverse[$tag1]['contacts']);
+    $this->assertSame(1, (int) $reverse[$tag2]['contacts']);
+    $this->assertSame(1, (int) $reverse[$tag3]['contacts']);
   }
 
   public function testBridgeJoinRelationshipContactActivity(): void {

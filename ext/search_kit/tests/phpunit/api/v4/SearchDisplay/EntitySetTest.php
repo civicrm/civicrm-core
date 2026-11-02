@@ -135,8 +135,8 @@ class EntitySetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(2, $result);
 
     // Verify values and result_row_num
-    $this->assertEquals(1, $result[0]['columns'][2]['val']);
-    $this->assertEquals(2, $result[1]['columns'][2]['val']);
+    $this->assertSame(1, $result[0]['columns'][2]['val']);
+    $this->assertSame(2, $result[1]['columns'][2]['val']);
   }
 
 }

@@ -20,8 +20,8 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
 
   public function setUp(): void {
     parent::setUp();
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client WHERE guid <> "{civi_connect}"'));
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_systoken'));
+    $this->assertSame(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client WHERE guid <> "{civi_connect}"'));
+    $this->assertSame(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_systoken'));
   }
 
   public function tearDown(): void {
@@ -61,7 +61,7 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
 
     $usePerms(['manage OAuth client', 'manage OAuth client secrets']);
     $getTokens = Civi\Api4\OAuthSysToken::get()->execute();
-    $this->assertEquals(1, count($getTokens));
+    $this->assertSame(1, count($getTokens));
     // ^^ Started at 0, added 1.
     $token = $getTokens->first();
     $this->assertEquals($client['id'], $token['client_id']);
@@ -76,7 +76,7 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
 
     $usePerms(['manage OAuth client', 'manage OAuth client secrets']);
     $getTokens = Civi\Api4\OAuthSysToken::get()->execute();
-    $this->assertEquals(1, count($getTokens));
+    $this->assertSame(1, count($getTokens));
     $token = $getTokens->first();
     $this->assertEquals($client['id'], $token['client_id']);
     $this->assertSame("revised-access-token-$random", $token['access_token']);
@@ -131,7 +131,7 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
 
     $usePerms(['manage OAuth client']);
     $getTokens = Civi\Api4\OAuthSysToken::get()->execute();
-    $this->assertEquals(1, count($getTokens));
+    $this->assertSame(1, count($getTokens));
     // ^^ Started at 0, added 1.
     $token = $getTokens->first();
     $this->assertEquals($client['id'], $token['client_id']);
@@ -152,7 +152,7 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
 
     $usePerms(['manage OAuth client', 'manage OAuth client secrets']);
     $getTokens = Civi\Api4\OAuthSysToken::get()->execute();
-    $this->assertEquals(1, count($getTokens));
+    $this->assertSame(1, count($getTokens));
     $token = $getTokens->first();
     $this->assertEquals($client['id'], $token['client_id']);
     $this->assertSame("example-access-token-$random", $token['access_token']);
@@ -194,7 +194,7 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
       ->addWhere('client_id.provider', '=', 'test_example_1')
       ->addWhere('scopes', 'CONTAINS', 'foo')
       ->execute();
-    $this->assertEquals(1, count($getTokens));
+    $this->assertSame(1, count($getTokens));
     $this->assertEquals($createToken->first()['id'], $getTokens->first()['id']);
 
     $usePerms(['manage OAuth client']);
@@ -202,14 +202,14 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
       ->addWhere('client_id.provider', '=', 'test_example_1')
       ->addWhere('scopes', 'CONTAINS', 'nada')
       ->execute();
-    $this->assertEquals(0, count($getTokens));
+    $this->assertSame(0, count($getTokens));
 
     $usePerms(['manage OAuth client']);
     $getTokens = Civi\Api4\OAuthSysToken::get()
       ->addWhere('client_id.provider', '=', 'test_example_2')
       ->addWhere('scopes', 'CONTAINS', 'foo')
       ->execute();
-    $this->assertEquals(0, count($getTokens));
+    $this->assertSame(0, count($getTokens));
   }
 
 }

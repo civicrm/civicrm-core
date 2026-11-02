@@ -202,10 +202,10 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
       ->addOrderBy('contact_id_a')
       ->execute();
     $this->assertCount(4, $result);
-    $this->assertEquals(1, $result[0]['count']);
-    $this->assertEquals(2, $result[1]['count']);
-    $this->assertEquals(2, $result[2]['count']);
-    $this->assertEquals(1, $result[3]['count']);
+    $this->assertSame(1, $result[0]['count']);
+    $this->assertSame(2, $result[1]['count']);
+    $this->assertSame(2, $result[2]['count']);
+    $this->assertSame(1, $result[3]['count']);
   }
 
   public function testUnionWithSelectAndOrderBy(): void {
@@ -322,17 +322,17 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
       $byContactAndSide[$row['contact_id_a']][$row['side']] = $row['rel_count'];
     }
 
-    $this->assertEquals(2, $byContactAndSide[$contacts[0]]['a']);
+    $this->assertSame(2, $byContactAndSide[$contacts[0]]['a']);
     $this->assertArrayNotHasKey('b', $byContactAndSide[$contacts[0]]);
 
-    $this->assertEquals(1, $byContactAndSide[$contacts[1]]['a']);
-    $this->assertEquals(1, $byContactAndSide[$contacts[1]]['b']);
+    $this->assertSame(1, $byContactAndSide[$contacts[1]]['a']);
+    $this->assertSame(1, $byContactAndSide[$contacts[1]]['b']);
 
-    $this->assertEquals(1, $byContactAndSide[$contacts[2]]['a']);
-    $this->assertEquals(2, $byContactAndSide[$contacts[2]]['b']);
+    $this->assertSame(1, $byContactAndSide[$contacts[2]]['a']);
+    $this->assertSame(2, $byContactAndSide[$contacts[2]]['b']);
 
     $this->assertArrayNotHasKey('a', $byContactAndSide[$contacts[3]]);
-    $this->assertEquals(1, $byContactAndSide[$contacts[3]]['b']);
+    $this->assertSame(1, $byContactAndSide[$contacts[3]]['b']);
   }
 
   public function testUnionWithJoinsInEachSet(): void {
@@ -422,9 +422,9 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
       )
       ->execute();
 
-    $this->assertEquals(0, $result->countFetched());
-    $this->assertEquals(5, $result->rowCount);
-    $this->assertEquals(5, $result->countMatched());
+    $this->assertSame(0, $result->countFetched());
+    $this->assertSame(5, $result->rowCount);
+    $this->assertSame(5, $result->countMatched());
 
     // Test selecting row_count in conjunction with other fields
     $resultWithFields = EntitySet::get(FALSE)
@@ -441,9 +441,9 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
       ->setLimit(2)
       ->execute();
 
-    $this->assertEquals(2, $resultWithFields->countFetched());
-    $this->assertEquals(5, $resultWithFields->rowCount);
-    $this->assertEquals(5, $resultWithFields->countMatched());
+    $this->assertSame(2, $resultWithFields->countFetched());
+    $this->assertSame(5, $resultWithFields->rowCount);
+    $this->assertSame(5, $resultWithFields->countMatched());
     $this->assertSame('1G', $resultWithFields[0]['title']);
     $this->assertSame('1T', $resultWithFields[1]['title']);
   }

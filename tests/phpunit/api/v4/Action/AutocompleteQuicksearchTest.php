@@ -371,7 +371,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertCount(1, $results);
     $result = $results->first();
     $this->assertSame('TestXYZsmithson, William', $result['label']);
-    $this->assertEquals(1, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
+    $this->assertSame(1, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
 
     // find contacts by nick_name - note with FTS
     // we ignore the "includeNickNameInName" setting
@@ -385,7 +385,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertCount(1, $results);
     $result = $results->first();
     $this->assertSame('TestXYZblacksmith, Mary "Mags"', $result['label']);
-    $this->assertEquals(2, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
+    $this->assertSame(2, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
 
     // find contacts by legal_name
     $results = Contact::autocomplete(FALSE)
@@ -397,7 +397,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $this->assertCount(1, $results);
     $result = $results->first();
     $this->assertSame('TestXYZsmithson, William', $result['label']);
-    $this->assertEquals(1, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
+    $this->assertSame(1, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
   }
 
   public function testAddressFieldQuickSearch(): void {

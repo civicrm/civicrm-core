@@ -101,7 +101,7 @@ class CoreUtilTest extends Api4TestBase {
       'content' => 'Hello 123',
     ])['id'];
 
-    $this->assertEquals(0, CoreUtil::getRefCountTotal('File', $fileId));
+    $this->assertSame(0, CoreUtil::getRefCountTotal('File', $fileId));
 
     $activity = $this->createTestRecord('Activity');
     $this->createTestRecord('EntityFile', [
@@ -110,7 +110,7 @@ class CoreUtilTest extends Api4TestBase {
       'entity_id' => $activity['id'],
     ]);
 
-    $this->assertEquals(1, CoreUtil::getRefCountTotal('File', $fileId));
+    $this->assertSame(1, CoreUtil::getRefCountTotal('File', $fileId));
 
     $tagId = $this->createTestRecord('Tag', [
       'used_for' => 'civicrm_file',
@@ -124,7 +124,7 @@ class CoreUtilTest extends Api4TestBase {
       'tag_id' => $tagId,
     ]);
 
-    $this->assertEquals(2, CoreUtil::getRefCountTotal('File', $fileId));
+    $this->assertSame(2, CoreUtil::getRefCountTotal('File', $fileId));
 
     $customGroup = $this->createTestRecord('CustomGroup', [
       'extends' => 'Activity',
@@ -145,7 +145,7 @@ class CoreUtilTest extends Api4TestBase {
     $idCheck = \CRM_Core_DAO::singleValueQuery("SELECT {$customField['column_name']} FROM {$customGroup['table_name']}");
     $this->assertEquals($fileId, $idCheck);
 
-    $this->assertEquals(3, CoreUtil::getRefCountTotal('File', $fileId));
+    $this->assertSame(3, CoreUtil::getRefCountTotal('File', $fileId));
 
     $activity2 = $this->createTestRecord('Activity');
     $this->createTestRecord('EntityFile', [
@@ -154,7 +154,7 @@ class CoreUtilTest extends Api4TestBase {
       'entity_id' => $activity2['id'],
     ]);
 
-    $this->assertEquals(4, CoreUtil::getRefCountTotal('File', $fileId));
+    $this->assertSame(4, CoreUtil::getRefCountTotal('File', $fileId));
   }
 
 }

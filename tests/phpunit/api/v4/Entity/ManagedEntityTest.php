@@ -542,14 +542,14 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
     $this->assertCount(4, $nav['export']);
     $this->assertTrue($nav['is_active']);
 
-    $this->assertEquals(50, $nav['export'][0]['params']['values']['weight']);
+    $this->assertSame(50, $nav['export'][0]['params']['values']['weight']);
     $this->assertSame('Navigation_Test_Parent_Navigation_Test_Child_1', $nav['export'][1]['name']);
     $this->assertSame('Navigation_Test_Parent_Navigation_Test_Child_2', $nav['export'][2]['name']);
     $this->assertSame('Navigation_Test_Parent_Navigation_Test_Child_3', $nav['export'][3]['name']);
     // The has_separator should be using numeric key not pseudoconstant
     $this->assertNull($nav['export'][0]['params']['values']['has_separator']);
-    $this->assertEquals(1, $nav['export'][1]['params']['values']['has_separator']);
-    $this->assertEquals(2, $nav['export'][2]['params']['values']['has_separator']);
+    $this->assertSame(1, $nav['export'][1]['params']['values']['has_separator']);
+    $this->assertSame(2, $nav['export'][2]['params']['values']['has_separator']);
     // Weight should not be included in export of children, leaving it to be auto-managed
     $this->assertArrayNotHasKey('weight', $nav['export'][1]['params']['values']);
     // Domain is auto-managed & should not be included in export
@@ -811,7 +811,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->addWhere('name', '=', 'record_on_its_way_out')
       ->execute();
 
-    $this->assertEquals(1, count($managedRecords));
+    $this->assertSame(1, count($managedRecords));
 
     // delete the group
     Group::delete(FALSE)
@@ -827,7 +827,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->addWhere('name', '=', 'record_on_its_way_out')
       ->execute();
 
-    $this->assertEquals(0, count($managedRecords));
+    $this->assertSame(0, count($managedRecords));
   }
 
   /**

@@ -111,7 +111,7 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
 
     // Ensure our selectWhereClause has been inserted exactly once
     $selectWhereCount = substr_count($result->debug['sql'][0], "`location_type_id` IN ($homeID,$workID)");
-    $this->assertEquals(1, $selectWhereCount);
+    $this->assertSame(1, $selectWhereCount);
 
     $result = Address::get()
       ->addWhere('location_type_id', '=', $homeID)
@@ -123,11 +123,11 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
     $this->assertSame('Allowed', $result[0]['contact_id.first_name']);
 
     $selectWhereCount = substr_count($result->debug['sql'][0], "`location_type_id` IN ($homeID,$workID)");
-    $this->assertEquals(1, $selectWhereCount);
+    $this->assertSame(1, $selectWhereCount);
 
     // We only want to see one contact ACL where clause
     $aclCount = substr_count($result->debug['sql'][0], 'civicrm_acl_contact_cache');
-    $this->assertEquals(1, $aclCount);
+    $this->assertSame(1, $aclCount);
 
     // Try with explicit join
     $result = Address::get()
@@ -141,11 +141,11 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
     $this->assertSame('Allowed', $result[0]['contact.first_name']);
 
     $selectWhereCount = substr_count($result->debug['sql'][0], "`location_type_id` IN ($homeID,$workID)");
-    $this->assertEquals(1, $selectWhereCount);
+    $this->assertSame(1, $selectWhereCount);
 
     // We only want to see one contact ACL where clause
     $aclCount = substr_count($result->debug['sql'][0], 'civicrm_acl_contact_cache');
-    $this->assertEquals(1, $aclCount);
+    $this->assertSame(1, $aclCount);
 
     // Try joining through another entity
     $phone = $this->createTestRecord('Phone', [
@@ -170,11 +170,11 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
     $this->assertSame('222 Allowed', $result[0]['address.street_address']);
 
     $selectWhereCount = substr_count($result->debug['sql'][0], "`location_type_id` IN ($workID)");
-    $this->assertEquals(1, $selectWhereCount);
+    $this->assertSame(1, $selectWhereCount);
 
     // We only want to see one contact ACL where clause
     $aclCount = substr_count($result->debug['sql'][0], 'civicrm_acl_contact_cache');
-    $this->assertEquals(1, $aclCount);
+    $this->assertSame(1, $aclCount);
   }
 
   /**

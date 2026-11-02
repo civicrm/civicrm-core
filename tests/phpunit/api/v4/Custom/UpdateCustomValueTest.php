@@ -60,7 +60,7 @@ class UpdateCustomValueTest extends Api4TestBase {
 
     $result = CustomValueTable::getEntityValues($contactId, 'Contact');
 
-    $this->assertEquals(1, count($result));
+    $this->assertSame(1, count($result));
     $this->assertContains('Blue', $result);
   }
 

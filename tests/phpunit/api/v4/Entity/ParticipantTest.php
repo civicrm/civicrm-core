@@ -52,12 +52,12 @@ class ParticipantTest extends Api4TestBase {
 
     // With no records:
     $result = Participant::get(FALSE)->execute();
-    $this->assertEquals(0, $result->count(), "count of empty get is not 0");
+    $this->assertSame(0, $result->count(), "count of empty get is not 0");
 
     // Check that the $result knows what the inputs were
     $this->assertSame('Participant', $result->entity);
     $this->assertSame('get', $result->action);
-    $this->assertEquals(4, $result->version);
+    $this->assertSame(4, $result->version);
 
     // Create some test related records before proceeding
     $participantCount = 20;
@@ -255,7 +255,7 @@ class ParticipantTest extends Api4TestBase {
       ->addWhere('id', 'IN', [$eventWithMax, $eventUnlimited])
       ->addOrderBy('id')
       ->execute();
-    $this->assertEquals(3, $events[0]['remaining_participants']);
+    $this->assertSame(3, $events[0]['remaining_participants']);
     // `remaining_participants` is always NULL for unlimited events
     $this->assertNull($events[1]['remaining_participants']);
 
@@ -286,7 +286,7 @@ class ParticipantTest extends Api4TestBase {
       ->addOrderBy('id')
       ->execute();
     // 1 Spot remaining
-    $this->assertEquals(1, $events[0]['remaining_participants']);
+    $this->assertSame(1, $events[0]['remaining_participants']);
     // `remaining_participants` is always NULL for unlimited events
     $this->assertNull($events[1]['remaining_participants']);
 
@@ -307,7 +307,7 @@ class ParticipantTest extends Api4TestBase {
       ->addOrderBy('id')
       ->execute();
     // -1 spot remaining
-    $this->assertEquals(-1, $events[0]['remaining_participants']);
+    $this->assertSame(-1, $events[0]['remaining_participants']);
     // `remaining_participants` is always NULL for unlimited events
     $this->assertNull($events[1]['remaining_participants']);
   }

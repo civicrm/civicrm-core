@@ -105,9 +105,9 @@ class CustomGroupTest extends Api4TestBase {
     $groups = CustomGroup::get(FALSE)
       ->addWhere('id', 'IN', $id)
       ->execute()->indexBy('id');
-    $this->assertEquals(1, $groups[$id[1]]['weight']);
-    $this->assertEquals(2, $groups[$id[0]]['weight']);
-    $this->assertEquals(3, $groups[$id[2]]['weight']);
+    $this->assertSame(1, $groups[$id[1]]['weight']);
+    $this->assertSame(2, $groups[$id[0]]['weight']);
+    $this->assertSame(3, $groups[$id[2]]['weight']);
 
     // Change weight of 3rd group
     CustomGroup::update(FALSE)
@@ -119,9 +119,9 @@ class CustomGroupTest extends Api4TestBase {
     $groups = CustomGroup::get(FALSE)
       ->addWhere('id', 'IN', $id)
       ->execute()->indexBy('id');
-    $this->assertEquals(1, $groups[$id[2]]['weight']);
-    $this->assertEquals(2, $groups[$id[1]]['weight']);
-    $this->assertEquals(3, $groups[$id[0]]['weight']);
+    $this->assertSame(1, $groups[$id[2]]['weight']);
+    $this->assertSame(2, $groups[$id[1]]['weight']);
+    $this->assertSame(3, $groups[$id[0]]['weight']);
 
     // Verify that other values were not interfered with
     $this->assertSame('Contribution', $groups[$id[0]]['extends']);

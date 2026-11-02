@@ -43,7 +43,7 @@ class SystemRotateKeyTest extends Api4TestBase implements TransactionalInterface
 
   public function testRekey(): void {
     $result = \Civi\Api4\System::rotateKey(0)->setTag('UNIT-TEST')->execute();
-    $this->assertEquals(2, count($result));
+    $this->assertSame(2, count($result));
     $this->assertSame('Updated field A using UNIT-TEST.', $result[0]['message']);
     $this->assertSame('info', $result[0]['level']);
     $this->assertSame('Updated field B using UNIT-TEST.', $result[1]['message']);

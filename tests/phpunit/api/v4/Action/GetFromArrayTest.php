@@ -36,8 +36,8 @@ class GetFromArrayTest extends Api4TestBase {
       ->setOffset(2)
       ->setLimit(2)
       ->execute();
-    $this->assertEquals(3, $result[0]['field1']);
-    $this->assertEquals(4, $result[1]['field1']);
+    $this->assertSame(3, $result[0]['field1']);
+    $this->assertSame(4, $result[1]['field1']);
 
     // The object's count() method will account for all results, ignoring limit, while the array results are limited
     $this->assertCount(2, (array) $result);
@@ -166,7 +166,7 @@ class GetFromArrayTest extends Api4TestBase {
     $result = MockArrayEntity::get()
       ->addWhere('field2', 'LIKE', 'ra')
       ->execute();
-    $this->assertEquals(0, count($result));
+    $this->assertSame(0, count($result));
 
     $result = MockArrayEntity::get()
       ->addWhere('field2', 'NOT LIKE', '%ra%')

@@ -117,8 +117,8 @@ class ContactJoinTest extends Api4TestBase {
       ->execute();
     $this->assertCount(1, $addr);
     $this->assertSame('Hello', $contact['address_billing.city']);
-    $this->assertEquals(1001, $contact['address_billing.state_province_id']);
-    $this->assertEquals(1228, $contact['address_billing.country_id']);
+    $this->assertSame(1001, $contact['address_billing.state_province_id']);
+    $this->assertSame(1228, $contact['address_billing.country_id']);
     $emails = Email::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute();

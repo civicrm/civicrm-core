@@ -81,7 +81,7 @@ class QueueTest extends Api4TestBase {
     // Get item #1. Run it. Finish it.
     $first = Queue::claimItems()->setQueue($queueName)->execute()->single();
     $this->assertCallback('doSomething', ['first'], $first);
-    $this->assertEquals(0, count(Queue::claimItems()->setQueue($queueName)->execute()), 'Linear queue should not return more items while first item is pending.');
+    $this->assertSame(0, count(Queue::claimItems()->setQueue($queueName)->execute()), 'Linear queue should not return more items while first item is pending.');
     $firstResult = Queue::runItems(0)->setItems([$first])->execute()->single();
     $this->assertSame('ok', $firstResult['outcome']);
     $this->assertEquals($first['id'], $firstResult['item']['id']);
@@ -169,15 +169,15 @@ class QueueTest extends Api4TestBase {
     }
 
     $result = Queue::runItems(0)->setQueue($queueName)->execute();
-    $this->assertEquals(3, count($result));
+    $this->assertSame(3, count($result));
     $this->assertEquals([0, 1, 2], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][0]);
 
     $result = Queue::runItems(0)->setQueue($queueName)->execute();
-    $this->assertEquals(3, count($result));
+    $this->assertSame(3, count($result));
     $this->assertEquals([3, 4, 5], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][1]);
 
     $result = Queue::runItems(0)->setQueue($queueName)->execute();
-    $this->assertEquals(1, count($result));
+    $this->assertSame(1, count($result));
     $this->assertEquals([6], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][2]);
   }
 
@@ -214,19 +214,19 @@ class QueueTest extends Api4TestBase {
 
     \Civi::$statics['QueueTest']['onHandlerLog'] = [];
     $result = Queue::runItems(0)->setQueue($queueName)->execute();
-    $this->assertEquals(3, count($result));
+    $this->assertSame(3, count($result));
     $this->assertEquals([0, 10, 20], \Civi::$statics['QueueTest']['onHandlerLog']);
     $this->assertQueueStats(4, 4, 0, $queue);
 
     \Civi::$statics['QueueTest']['onHandlerLog'] = [];
     $result = Queue::runItems(0)->setQueue($queueName)->execute();
-    $this->assertEquals(3, count($result));
+    $this->assertSame(3, count($result));
     $this->assertEquals([30, 40, 50], \Civi::$statics['QueueTest']['onHandlerLog']);
     $this->assertQueueStats(1, 1, 0, $queue);
 
     \Civi::$statics['QueueTest']['onHandlerLog'] = [];
     $result = Queue::runItems(0)->setQueue($queueName)->execute();
-    $this->assertEquals(1, count($result));
+    $this->assertSame(1, count($result));
     $this->assertEquals([60], \Civi::$statics['QueueTest']['onHandlerLog']);
     $this->assertQueueStats(0, 0, 0, $queue);
   }
@@ -247,7 +247,7 @@ class QueueTest extends Api4TestBase {
     }
     $this->assertQueueStats(20, 20, 0, $queue);
     $result = Queue::reset(FALSE)->setQueue($queueName)->execute();
-    $this->assertEquals(20, $result[0]['items']);
+    $this->assertSame(20, $result[0]['items']);
     $this->assertQueueStats(0, 0, 0, $queue);
   }
 
@@ -271,27 +271,27 @@ class QueueTest extends Api4TestBase {
     $this->assertEquals([0, 1, 2, 3], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][0], 'Scope of first batch');
     $this->assertEquals([4, 5, 6, 7], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][1], 'Scope of second batch');
     $this->assertEquals([8, 9, 10, 11], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][2], 'Scope of third batch');
-    $this->assertEquals(12, $result[0]['item_successes']);
-    $this->assertEquals(0, $result[0]['item_errors']);
-    $this->assertEquals(3, $result[0]['loop_requests']);
+    $this->assertSame(12, $result[0]['item_successes']);
+    $this->assertSame(0, $result[0]['item_errors']);
+    $this->assertSame(3, $result[0]['loop_requests']);
     $this->assertTrue(is_numeric($result[0]['loop_duration']));
     $this->assertSame('Reached request limit (3)', $result[0]['exit_message']);
-    $this->assertEquals(0, $result[0]['queue_blocked']);
-    $this->assertEquals(8, $result[0]['queue_ready'], 'Due to request limit, we left some items in queue');
-    $this->assertEquals(8, $result[0]['queue_total'], 'Due to request limit, we left some items in queue');
+    $this->assertSame(0, $result[0]['queue_blocked']);
+    $this->assertSame(8, $result[0]['queue_ready'], 'Due to request limit, we left some items in queue');
+    $this->assertSame(8, $result[0]['queue_total'], 'Due to request limit, we left some items in queue');
 
     // And run any remaining batches...
     $result = Queue::run(0)->setQueue($queueName)->setMaxRequests(10)->execute();
     $this->assertEquals([12, 13, 14, 15], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][3], 'Scope of fourth batch');
     $this->assertEquals([16, 17, 18, 19], \Civi::$statics[__CLASS__]['onHookQueueRunLog'][4], 'Scope of fifth batch');
-    $this->assertEquals(8, $result[0]['item_successes']);
-    $this->assertEquals(0, $result[0]['item_errors']);
+    $this->assertSame(8, $result[0]['item_successes']);
+    $this->assertSame(0, $result[0]['item_errors']);
     $this->assertEquals(2 + 1, $result[0]['loop_requests']);
     $this->assertTrue(is_numeric($result[0]['loop_duration']));
     $this->assertSame('No claimable items', $result[0]['exit_message']);
-    $this->assertEquals(0, $result[0]['queue_blocked'], 'Queue should be empty');
-    $this->assertEquals(0, $result[0]['queue_ready'], 'Queue should be empty');
-    $this->assertEquals(0, $result[0]['queue_total'], 'Queue should be empty');
+    $this->assertSame(0, $result[0]['queue_blocked'], 'Queue should be empty');
+    $this->assertSame(0, $result[0]['queue_ready'], 'Queue should be empty');
+    $this->assertSame(0, $result[0]['queue_total'], 'Queue should be empty');
   }
 
   public function testRunLoop_abort() {
@@ -311,14 +311,14 @@ class QueueTest extends Api4TestBase {
 
     // 20 items ==> 4 per batch ==> 5 batches. Let's run the first 3...
     $result = Queue::run(0)->setQueue($queueName)->execute();
-    $this->assertEquals(3, $result[0]['item_successes'], "Executed A+B+C");
-    $this->assertEquals(1, $result[0]['item_errors'], "Exception on D");
-    $this->assertEquals(4, $result[0]['loop_requests'], "Attempted A+B+C+D");
+    $this->assertSame(3, $result[0]['item_successes'], "Executed A+B+C");
+    $this->assertSame(1, $result[0]['item_errors'], "Exception on D");
+    $this->assertSame(4, $result[0]['loop_requests'], "Attempted A+B+C+D");
     $this->assertTrue(is_numeric($result[0]['loop_duration']));
     $this->assertSame('Queue is not active (status => aborted)', $result[0]['exit_message']);
-    $this->assertEquals(0, $result[0]['queue_blocked'], 'No tasks are time-blocked (future-scheduled)');
-    $this->assertEquals(2, $result[0]['queue_ready'], 'Need to try D+E');
-    $this->assertEquals(2, $result[0]['queue_total'], 'Need to try D+E');
+    $this->assertSame(0, $result[0]['queue_blocked'], 'No tasks are time-blocked (future-scheduled)');
+    $this->assertSame(2, $result[0]['queue_ready'], 'Need to try D+E');
+    $this->assertSame(2, $result[0]['queue_total'], 'Need to try D+E');
   }
 
   public static function dummyTask(\CRM_Queue_TaskContext $ctx, string $outcome): bool {
@@ -388,7 +388,7 @@ class QueueTest extends Api4TestBase {
     $this->assertQueueStats(0, 0, 0, $queue);
 
     $startResult = Queue::claimItems()->setQueue($queueName)->execute();
-    $this->assertEquals(0, $startResult->count());
+    $this->assertSame(0, $startResult->count());
   }
 
   public static function getDelayableDrivers(): array {
@@ -615,20 +615,20 @@ class QueueTest extends Api4TestBase {
     $this->assertQueueStats(2, 2, 0, $queue);
     $this->assertFalse(isset($firedQueueStatus[$queueName]));
     $this->assertTrue($queue->isActive());
-    $this->assertEquals(4, $this->getTestRecord('UserJob', $userJob['id'])['status_id']);
+    $this->assertSame(4, $this->getTestRecord('UserJob', $userJob['id'])['status_id']);
 
     // OK, let's run both items - and check status afterward.
     Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
     $this->assertQueueStats(1, 1, 0, $queue);
     $this->assertFalse(isset($firedQueueStatus[$queueName]));
     $this->assertTrue($queue->isActive());
-    $this->assertEquals(4, $this->getTestRecord('UserJob', $userJob['id'])['status_id']);
+    $this->assertSame(4, $this->getTestRecord('UserJob', $userJob['id'])['status_id']);
 
     Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
     $this->assertQueueStats(0, 0, 0, $queue);
     $this->assertSame('completed', $firedQueueStatus[$queueName]);
     $this->assertFalse($queue->isActive());
-    $this->assertEquals(1, $this->getTestRecord('UserJob', $userJob['id'])['status_id']);
+    $this->assertSame(1, $this->getTestRecord('UserJob', $userJob['id'])['status_id']);
   }
 
   /**

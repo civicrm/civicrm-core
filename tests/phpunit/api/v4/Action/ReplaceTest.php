@@ -74,9 +74,9 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
       ->setReload(['id', 'email', 'contact_id.sort_name'])
       ->execute()->indexBy('id');
     // Should have saved 2 records
-    $this->assertEquals(2, $replaced->count());
+    $this->assertSame(2, $replaced->count());
     // Should have updated 1 record
-    $this->assertEquals(1, $replaced->countMatched());
+    $this->assertSame(1, $replaced->countMatched());
     // Should have deleted email2
     $this->assertEquals([['id' => $e2]], $replaced->deleted);
     // Check reloaded values
@@ -91,7 +91,7 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->indexBy('id');
     $this->assertSame('firstedited@example.com', $results[$e1]['email']);
-    $this->assertEquals(2, $results->count());
+    $this->assertSame(2, $results->count());
     $this->assertArrayNotHasKey($e2, (array) $results);
     $this->assertArrayNotHasKey($e0, (array) $results);
     unset($results[$e1]);

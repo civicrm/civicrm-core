@@ -264,23 +264,23 @@ class GroupTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertCount(5, $herarchical);
     $this->assertEquals($parent2['id'], $herarchical[0]['id']);
-    $this->assertEquals(0, $herarchical[0]['_depth']);
+    $this->assertSame(0, $herarchical[0]['_depth']);
     // Parent 2 has 2 descendents; child2 and subChild
-    $this->assertEquals(2, $herarchical[0]['_descendents']);
+    $this->assertSame(2, $herarchical[0]['_descendents']);
     $this->assertEquals($child2['id'], $herarchical[1]['id']);
-    $this->assertEquals(1, $herarchical[1]['_depth']);
-    $this->assertEquals(1, $herarchical[1]['_descendents']);
+    $this->assertSame(1, $herarchical[1]['_depth']);
+    $this->assertSame(1, $herarchical[1]['_descendents']);
     $this->assertEquals($subChild['id'], $herarchical[2]['id']);
-    $this->assertEquals(2, $herarchical[2]['_depth']);
-    $this->assertEquals(0, $herarchical[2]['_descendents']);
+    $this->assertSame(2, $herarchical[2]['_depth']);
+    $this->assertSame(0, $herarchical[2]['_descendents']);
     // Parent1 comes after parent2, alphabetically
     $this->assertEquals($parent1['id'], $herarchical[3]['id']);
-    $this->assertEquals(0, $herarchical[3]['_depth']);
-    $this->assertEquals(1, $herarchical[3]['_descendents']);
+    $this->assertSame(0, $herarchical[3]['_depth']);
+    $this->assertSame(1, $herarchical[3]['_descendents']);
     // Parent 1 has 1 descendent; child1
     $this->assertEquals($child1['id'], $herarchical[4]['id']);
-    $this->assertEquals(1, $herarchical[4]['_depth']);
-    $this->assertEquals(0, $herarchical[4]['_descendents']);
+    $this->assertSame(1, $herarchical[4]['_depth']);
+    $this->assertSame(0, $herarchical[4]['_descendents']);
   }
 
   public function testAddRemoveParents(): void {

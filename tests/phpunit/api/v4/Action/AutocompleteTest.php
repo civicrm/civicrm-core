@@ -239,7 +239,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->execute();
 
     $result = $this->runAutocomplete('MockBasicEntity', ['input' => 'est']);
-    $this->assertEquals(3, $this->autocompleteRunCount);
+    $this->assertSame(3, $this->autocompleteRunCount);
     $this->assertCount(count($sampleData), $result);
     $this->assertSame('Test 1', $result[0]['label']);
     $this->assertSame('Test 11', $result[10]['label']);
@@ -271,7 +271,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->setInput((string) $sample['b']['id'])
       ->setKey('name')
       ->execute();
-    $this->assertEquals(1, $result1->countFetched());
+    $this->assertSame(1, $result1->countFetched());
     $this->assertSame('b', $result1[0]['id']);
 
     // This key won't be used since api_entity is not a unique index

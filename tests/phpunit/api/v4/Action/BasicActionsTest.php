@@ -101,7 +101,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->execute()->first()['identifier'];
 
     $result = MockBasicEntity::get()->selectRowCount()->execute();
-    $this->assertEquals(2, $result->count());
+    $this->assertSame(2, $result->count());
 
     // Updating a single record should support identifier either in the values or the where clause
     // Test both styles of update
@@ -126,9 +126,9 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->indexBy('identifier');
 
     // 3 total records saved
-    $this->assertEquals(3, $result->countFetched());
+    $this->assertSame(3, $result->countFetched());
     // 2 records updated
-    $this->assertEquals(2, $result->countMatched());
+    $this->assertSame(2, $result->countMatched());
 
     // Check updated values
     $this->assertTrue(5 === $result[$id1]['weight']);
@@ -206,7 +206,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->replaceRecords($objects);
 
     $result = MockBasicEntity::batchFrobnicate()->addWhere('color', '=', 'blue')->execute();
-    $this->assertEquals(2, count($result));
+    $this->assertSame(2, count($result));
     $this->assertEquals([400, 1600], \CRM_Utils_Array::collect('frobnication', (array) $result));
   }
 
@@ -292,7 +292,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       $this->assertEquals($expected, $options);
     }
 
-    $this->assertEquals(1, $this->getFieldsCallCount);
+    $this->assertSame(1, $this->getFieldsCallCount);
   }
 
   public function testPseudoconstantFallbackDoesNotCacheMissingOptions(): void {
@@ -311,7 +311,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       }
     }
 
-    $this->assertEquals(2, $this->getFieldsCallCount);
+    $this->assertSame(2, $this->getFieldsCallCount);
   }
 
   public function testPseudoconstantFallbackIsLocaleScoped(): void {
@@ -324,11 +324,11 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     try {
       $tsLocale = 'en_US';
       FormattingUtil::getPseudoconstantList($field, 'group:label');
-      $this->assertEquals(1, $this->getFieldsCallCount);
+      $this->assertSame(1, $this->getFieldsCallCount);
 
       $tsLocale = 'fr_FR';
       FormattingUtil::getPseudoconstantList($field, 'group:label');
-      $this->assertEquals(2, $this->getFieldsCallCount);
+      $this->assertSame(2, $this->getFieldsCallCount);
     }
     finally {
       $tsLocale = $originalLocale;
@@ -602,7 +602,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertSame('one', $results[0]['group']);
     $this->assertSame('First', $results[0]['group:label']);
     $this->assertSame('one', $results[0]['group:name']);
-    $this->assertEquals(3, $results[0]['fruit']);
+    $this->assertSame(3, $results[0]['fruit']);
     $this->assertSame('Banana', $results[0]['fruit:label']);
     $this->assertSame('banana', $results[0]['fruit:name']);
     $this->assertSame('yellow', $results[0]['fruit:color']);

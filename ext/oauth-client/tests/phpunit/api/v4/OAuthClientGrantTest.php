@@ -21,7 +21,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
 
   public function setUp(): void {
     parent::setUp();
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client WHERE guid <> "{civi_connect}"'));
+    $this->assertSame(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client WHERE guid <> "{civi_connect}"'));
   }
 
   public function tearDown(): void {
@@ -52,7 +52,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
     else {
       $result = Civi\Api4\OAuthClient::authorizationCode()->addWhere('id', '=', $client['id'])->execute();
     }
-    $this->assertEquals(1, $result->count());
+    $this->assertSame(1, $result->count());
     foreach ($result as $ac) {
       $this->assertSame('query', $ac['response_mode']);
       $url = parse_url($ac['url']);
@@ -97,7 +97,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       ->addWhere('id', '=', $client['id'])
       ->setResponseMode('web_message')
       ->execute();
-    $this->assertEquals(1, $result->count());
+    $this->assertSame(1, $result->count());
     foreach ($result as $ac) {
       $this->assertSame('web_message', $ac['response_mode']);
 
@@ -304,7 +304,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       'guid' => "example-id",
       'secret' => "example-secret",
     ])->execute();
-    $this->assertEquals(1, $create->count());
+    $this->assertSame(1, $create->count());
     $client = $create->first();
     $this->assertTrue(!empty($client['id']));
     return $client;

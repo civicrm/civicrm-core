@@ -46,7 +46,7 @@ class RecentItemsTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('source_contact_id', $cid)
       ->addValue('subject', 'Hello recent!')
       ->execute()->first()['id'];
-    $this->assertEquals(1, $this->getRecentItemCount(['type' => 'Activity', 'id' => $aid1]));
+    $this->assertSame(1, $this->getRecentItemCount(['type' => 'Activity', 'id' => $aid1]));
     $recentItem = RecentItem::get(FALSE)->execute()->first();
     $this->assertStringContainsString('Hello recent!', $recentItem['title']);
     $this->assertStringContainsString("id=$aid1", $recentItem['view_url']);
@@ -57,13 +57,13 @@ class RecentItemsTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('source_contact_id', $cid)
       ->addValue('subject', 'Goodbye recent!')
       ->execute()->first()['id'];
-    $this->assertEquals(1, $this->getRecentItemCount(['type' => 'Activity', 'entity_id' => $aid2]));
+    $this->assertSame(1, $this->getRecentItemCount(['type' => 'Activity', 'entity_id' => $aid2]));
     $this->assertStringContainsString('Goodbye recent!', RecentItem::get(FALSE)->execute()[0]['title']);
 
     Activity::delete(FALSE)->addWhere('id', '=', $aid1)->execute();
 
-    $this->assertEquals(0, $this->getRecentItemCount(['entity_type' => 'Activity', 'entity_id' => $aid1]));
-    $this->assertEquals(1, $this->getRecentItemCount(['entity_type' => 'Activity', 'entity_id' => $aid2]));
+    $this->assertSame(0, $this->getRecentItemCount(['entity_type' => 'Activity', 'entity_id' => $aid1]));
+    $this->assertSame(1, $this->getRecentItemCount(['entity_type' => 'Activity', 'entity_id' => $aid2]));
   }
 
   /**

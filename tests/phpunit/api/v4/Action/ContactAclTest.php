@@ -117,14 +117,14 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertCount(3, $allowedEmails);
     $this->assertEquals(array_slice($email, 1), $allowedEmails->column('id'));
     // ACL clause should have been inserted once
-    $this->assertEquals(1, substr_count($allowedEmails->debug['sql'][0], 'civicrm_acl_contact_cache'));
+    $this->assertSame(1, substr_count($allowedEmails->debug['sql'][0], 'civicrm_acl_contact_cache'));
 
     $allowedActivities = Activity::get()->setDebug(TRUE)
       ->execute();
     $this->assertCount(3, $allowedActivities);
     $this->assertEquals(array_slice($activity, 1), $allowedActivities->column('id'));
     // ACL clause should have been inserted once
-    $this->assertEquals(1, substr_count($allowedActivities->debug['sql'][0], 'civicrm_acl_contact_cache'));
+    $this->assertSame(1, substr_count($allowedActivities->debug['sql'][0], 'civicrm_acl_contact_cache'));
 
     $error = NULL;
     try {
@@ -245,7 +245,7 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertCount(3, $contactGet);
     $this->assertEquals(array_slice($email, 1), $contactGet->column('email.id'));
     // ACL clause should have been inserted once
-    $this->assertEquals(1, substr_count($contactGet->debug['sql'][0], 'civicrm_acl_contact_cache'));
+    $this->assertSame(1, substr_count($contactGet->debug['sql'][0], 'civicrm_acl_contact_cache'));
 
     // Same should work with Individual api as Contact
     $contactGet = Individual::get()->setDebug(TRUE)
@@ -255,7 +255,7 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertCount(3, $contactGet);
     $this->assertEquals(array_slice($email, 1), $contactGet->column('email.id'));
     // ACL clause should have been inserted once
-    $this->assertEquals(1, substr_count($contactGet->debug['sql'][0], 'civicrm_acl_contact_cache'));
+    $this->assertSame(1, substr_count($contactGet->debug['sql'][0], 'civicrm_acl_contact_cache'));
 
     // Joining through another entity does not allow acl bypass
     $locationTypeGet = LocationType::get()->setDebug(TRUE)
@@ -265,7 +265,7 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
     $this->assertCount(3, $locationTypeGet);
     $this->assertEquals(array_slice($email, 1), $locationTypeGet->column('email.id'));
     // ACL clause should have been inserted once
-    $this->assertEquals(1, substr_count($locationTypeGet->debug['sql'][0], 'civicrm_acl_contact_cache'));
+    $this->assertSame(1, substr_count($locationTypeGet->debug['sql'][0], 'civicrm_acl_contact_cache'));
   }
 
   public function testContactAclBypassViaDashboardJoin(): void {

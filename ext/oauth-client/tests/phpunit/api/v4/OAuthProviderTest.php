@@ -35,7 +35,7 @@ class api_v4_OAuthProviderTest extends \PHPUnit\Framework\TestCase implements He
       ->addWhere('name', 'LIKE', 'test_example%')
       ->addOrderBy('name', 'DESC')
       ->execute();
-    $this->assertEquals(4, $examples->count());
+    $this->assertSame(4, $examples->count());
     [$ex4, $ex3, $ex2, $ex1] = $examples->getArrayCopy();
 
     $this->assertSame('test_example_4_sandbox', $ex4['name']);
@@ -106,7 +106,7 @@ class api_v4_OAuthProviderTest extends \PHPUnit\Framework\TestCase implements He
       ->addWhere('tags', 'CONTAINS', 'LaundryInstructions')
       ->addOrderBy('name', 'DESC')
       ->execute();
-    $this->assertEquals(1, $examples->count());
+    $this->assertSame(1, $examples->count());
 
     $this->assertSame('My\Example2', $examples->single()['class']);
     $this->assertSame('https://example.com/two', $examples->single()['options']['urlAuthorize']);

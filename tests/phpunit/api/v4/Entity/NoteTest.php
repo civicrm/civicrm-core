@@ -146,7 +146,7 @@ class NoteTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame('Not private', $visibleNotes[$notes[0]]['note']);
     $this->assertSame('Private', $visibleNotes[$notes[1]]['note']);
     // ACL clause should have been inserted only once because entity_table was specified
-    $this->assertEquals(1, substr_count($visibleNotes->debug['sql'][0], 'civicrm_acl_contact_cache'));
+    $this->assertSame(1, substr_count($visibleNotes->debug['sql'][0], 'civicrm_acl_contact_cache'));
   }
 
   public function testGetHierarchicalNotes(): void {

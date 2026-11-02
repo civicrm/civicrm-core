@@ -69,7 +69,7 @@ class SearchExportTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     // The savedSearch should be first before its reference entities
     $this->assertSame('SavedSearch', $export->first()['entity']);
     // Ensure api version is set to 4
-    $this->assertEquals(4, $export['SavedSearch_TestSearchToExport']['params']['version']);
+    $this->assertSame(4, $export['SavedSearch_TestSearchToExport']['params']['version']);
     $this->assertSame('Contact', $export['SavedSearch_TestSearchToExport']['params']['values']['api_entity']);
     // Ensure FK is set correctly
     $this->assertArrayNotHasKey('saved_search_id', $export['SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport']['params']['values']);
