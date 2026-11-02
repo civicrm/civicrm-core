@@ -209,6 +209,7 @@
     "CRM/Member/Import/Parser/*",
     "CRM/Pledge/Config.php",
     "CRM/Pledge/Form/Task/SearchTaskHookSample.php",
+    "CRM/Pledge/Page/AJAX.php",
     "CRM/Profile/Page/Listings.php",
     "CRM/Queue/BasicHandler.php",
     "CRM/Queue/TaskRunner.php",
