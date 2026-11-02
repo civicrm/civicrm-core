@@ -249,7 +249,13 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       $anyChildLeft = CRM_Core_DAO::singleValueQuery($child_job_sql, $params);
 
       if (!$anyChildLeft) {
+        $lock = \Civi::lockManager()->acquire("worker.mailing.queueMissingRecipients.{$job->mailing_id}");
+        // Only allow one job process to calulate the missing recipients. Don't mark mailing as complete until that is done.
+        if (!$lock->isAcquired()) {
+          return;
+        }
         $anyChildLeft = self::queueMissingRecipients((int) $job->mailing_id, (int) $job->id);
+        $lock->release();
       }
 
       // all of the child jobs are complete, update
