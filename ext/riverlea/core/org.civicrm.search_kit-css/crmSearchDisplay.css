@@ -6,6 +6,11 @@ form.crm-search-display-page {
   /* For positioning the .crm-admin-block-context-dropdown button */
   position: relative;
 }
+#bootstrap-theme .crm-search-display > .form-inline > .form-group.pull-right {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--crm-flex-gap);
+}
 
 /* Sortable headers */
 .crm-search-display th.crm-sortable-col {
