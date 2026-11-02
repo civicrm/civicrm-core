@@ -350,6 +350,23 @@ Czech Republic
   }
 
   /**
+   * Message-template previews (e.g. CRM_Contribute_WorkflowMessage_Contribution_BasicContribution::build())
+   * fabricate a canned 'address_id.display' string directly in the token context, since a preview contact
+   * has no real address_id to look up. CRM_Contribute_Tokens::getFieldValue() must return that context
+   * value as-is rather than unconditionally re-resolving address_id.display via Address::get(), which
+   * would find nothing for a fabricated/absent address_id and render a blank billing address.
+   */
+  public function testContributionAddressDisplayFromPreviewContext(): void {
+    $text = $this->renderText(
+      ['contributionId' => 0],
+      '{contribution.address_id.display}',
+      ['contribution' => ['address_id.display' => 'CANNED ADDRESS STRING']],
+      FALSE
+    );
+    $this->assertEquals('CANNED ADDRESS STRING', $text);
+  }
+
+  /**
    * Get tokens that are not advertised via listTokens.
    *
    * @return string[]
