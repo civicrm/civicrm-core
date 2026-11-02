@@ -21,12 +21,13 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    */
   public function testCreateMissingReportMenuItemLink(): void {
     $reportCount = $this->getCountReportInstances();
-    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_navigation WHERE url LIKE 'civicrm/report/instance/1?reset=1%'");
+    $reportInstanceID = $this->getFirstReportInstanceID();
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_navigation WHERE url LIKE 'civicrm/report/instance/{$reportInstanceID}?reset=1%'");
     $this->assertEquals($reportCount - 1, $this->getCountReportInstances());
     CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
 
     $this->assertEquals($reportCount, $this->getCountReportInstances());
-    $url = 'civicrm/report/instance/1';
+    $url = 'civicrm/report/instance/' . $reportInstanceID;
     $url_params = 'reset=1';
     $new_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params);
     $this->assertNotNull($new_nav->id);
@@ -70,19 +71,21 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    * Function tests CRM_Core_BAO_Navigation::rebuildReportsNavigation.
    */
   public function testUpdateExistingReportMenuLink(): void {
-    $url = 'civicrm/report/instance/1';
+    $url = 'civicrm/report/instance/' . $this->getFirstReportInstanceID();
     $url_params = 'reset=1';
     $existing_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params);
 
     $this->assertNotEquals(FALSE, $existing_nav);
-    $existing_nav->parent_id = 1;
+    // Move it under some other menu item.
+    $otherParentID = (int) CRM_Core_DAO::singleValueQuery('SELECT MIN(id) FROM civicrm_navigation WHERE domain_id = %1', [1 => [CRM_Core_Config::domainID(), 'Positive']]);
+    $existing_nav->parent_id = $otherParentID;
     $existing_nav->save();
     CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
     $parent_url = 'civicrm/report/list';
     $parent_url_params = 'compid=99&reset=1';
     $reportsMenu = CRM_Core_BAO_Navigation::createOrUpdateTopLevelReportsNavItem(CRM_Core_Config::domainID());
     $parent_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($parent_url, $parent_url_params, $reportsMenu->id);
-    $this->assertNotEquals($parent_nav->id, 1);
+    $this->assertNotEquals($parent_nav->id, $otherParentID);
     $changed_existing_nav = new CRM_Core_BAO_Navigation();
     $changed_existing_nav->id = $existing_nav->id;
     $changed_existing_nav->find(TRUE);
@@ -145,6 +148,16 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    *
    * @return int
    */
+
+  /**
+   * Get the id of the first report instance of the current domain.
+   *
+   * @return int
+   */
+  private function getFirstReportInstanceID(): int {
+    return (int) CRM_Core_DAO::singleValueQuery('SELECT MIN(id) FROM civicrm_report_instance WHERE domain_id = %1', [1 => [CRM_Core_Config::domainID(), 'Positive']]);
+  }
+
   protected function getCountReportInstances() {
     return CRM_Core_DAO::singleValueQuery(
       "SELECT count(*) FROM civicrm_navigation WHERE url LIKE 'civicrm/report/instance/%'");
