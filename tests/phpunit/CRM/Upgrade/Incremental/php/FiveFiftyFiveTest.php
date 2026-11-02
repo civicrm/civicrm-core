@@ -13,7 +13,7 @@ class CRM_Upgrade_Incremental_php_FiveFiftyFiveTest extends CiviCaseTestCase {
     $this->assertEquals(1, CRM_Core_DAO::singleValueQuery("SELECT count(id) FROM civicrm_print_label WHERE data like '%" . 'crmDate:\"%B %E%f\"' . "%'"));
     $originalFixed = CRM_Core_DAO::singleValueQuery("SELECT data FROM civicrm_print_label WHERE name = 'Annual_Conference_Hanging_Badge_fixed'");
     $originalBusted = CRM_Core_DAO::singleValueQuery("SELECT data FROM civicrm_print_label WHERE name = 'Annual_Conference_Hanging_Badge_busted'");
-    $this->assertEquals(NULL, json_decode($originalBusted));
+    $this->assertNull(json_decode($originalBusted));
     $this->assertFalse(NULL === json_decode($originalFixed));
     CRM_Upgrade_Incremental_php_FiveFiftyFive::fix_event_badge_upgrade();
     $fixedBusted = CRM_Core_DAO::singleValueQuery('SELECT data FROM civicrm_print_label WHERE name = \'Annual_Conference_Hanging_Badge_busted\'');

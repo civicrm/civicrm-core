@@ -179,16 +179,16 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     ];
     $this->assertEquals('1', CRM_Utils_Array::pathGet($arr, ['one']));
     $this->assertEquals('2', CRM_Utils_Array::pathGet($arr, ['two', 'half']));
-    $this->assertEquals(NULL, CRM_Utils_Array::pathGet($arr, ['zoo', 'half']));
+    $this->assertNull(CRM_Utils_Array::pathGet($arr, ['zoo', 'half']));
     CRM_Utils_Array::pathSet($arr, ['zoo', 'half'], '3');
     $this->assertEquals(3, CRM_Utils_Array::pathGet($arr, ['zoo', 'half']));
     $this->assertEquals(3, $arr['zoo']['half']);
 
     $arrCopy = $arr;
-    $this->assertEquals(FALSE, CRM_Utils_Array::pathUnset($arr, ['does-not-exist']));
+    $this->assertFalse(CRM_Utils_Array::pathUnset($arr, ['does-not-exist']));
     $this->assertEquals($arrCopy, $arr);
 
-    $this->assertEquals(TRUE, CRM_Utils_Array::pathUnset($arr, ['two', 'half'], FALSE));
+    $this->assertTrue(CRM_Utils_Array::pathUnset($arr, ['two', 'half'], FALSE));
     $this->assertEquals([], $arr['two']);
     $this->assertTrue(array_key_exists('two', $arr));
 
@@ -219,22 +219,22 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $emptyPath = [];
 
     $x = 'hello';
-    $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertTrue(CRM_Utils_Array::pathIsset($x, $emptyPath));
     $this->assertSame('hello', CRM_Utils_Array::pathGet($x, $emptyPath));
     $this->assertSame('hello', $x);
 
     CRM_Utils_Array::pathSet($x, $emptyPath, 'bon jour');
-    $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertTrue(CRM_Utils_Array::pathIsset($x, $emptyPath));
     $this->assertSame('bon jour', CRM_Utils_Array::pathGet($x, $emptyPath));
     $this->assertSame('bon jour', $x);
 
     CRM_Utils_Array::pathUnset($x, $emptyPath);
-    $this->assertEquals(FALSE, CRM_Utils_Array::pathIsset($x, $emptyPath));
-    $this->assertEquals(NULL, CRM_Utils_Array::pathGet($x, $emptyPath));
-    $this->assertEquals(NULL, $x);
+    $this->assertFalse(CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertNull(CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertNull($x);
 
     CRM_Utils_Array::pathSet($x, $emptyPath, 'buenos dias');
-    $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
+    $this->assertTrue(CRM_Utils_Array::pathIsset($x, $emptyPath));
     $this->assertSame('buenos dias', CRM_Utils_Array::pathGet($x, $emptyPath));
     $this->assertSame('buenos dias', $x);
   }
@@ -525,7 +525,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     // array key exists; value is null
     // This is the one situation in which the function's behavior differs from
     // that of PHP's null-coalescing operator (??)
-    $this->assertEquals(NULL, CRM_Utils_Array::value('c', $list, 'fruit'));
+    $this->assertNull(CRM_Utils_Array::value('c', $list, 'fruit'));
   }
 
   public function testDeepSort() {

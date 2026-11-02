@@ -36,7 +36,7 @@ class ReflectionUtilsTest extends Api4TestBase {
     $reflection = new \ReflectionClass($grandChild);
     $doc = ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => "Test"]);
 
-    $this->assertEquals(TRUE, $doc['internal']);
+    $this->assertTrue($doc['internal']);
     $this->assertSame('Grandchild class for Test, with a 2-line description!', $doc['description']);
 
     $expectedComment = 'This is an extended comment.

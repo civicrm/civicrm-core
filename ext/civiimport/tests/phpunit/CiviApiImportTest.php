@@ -105,7 +105,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     ])->execute();
 
     $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->execute()->first();
-    $this->assertEquals(NULL, $import['amount_given']);
+    $this->assertNull($import['amount_given']);
 
     Import::save($userJobID)->setRecords([
       [

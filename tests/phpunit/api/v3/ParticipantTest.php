@@ -121,7 +121,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Participant', 'get', $params);
     foreach ($result['values'] as $values) {
-      $this->assertEquals(NULL, $values['participant_role_id']);
+      $this->assertNull($values['participant_role_id']);
     }
 
   }

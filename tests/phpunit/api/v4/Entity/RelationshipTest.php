@@ -134,7 +134,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('near_contact_id', 'orientation', 'description', 'start_date', 'end_date', 'is_active')
       ->execute()->indexBy('near_contact_id');
     $this->assertCount(1, $cacheRecords);
-    $this->assertEquals(FALSE, $cacheRecords[$c1]['is_active']);
+    $this->assertFalse($cacheRecords[$c1]['is_active']);
     $this->assertEquals($today->format('Y-m-d'), $cacheRecords[$c1]['start_date']);
     $this->assertEquals($future->format('Y-m-d'), $cacheRecords[$c1]['end_date']);
 
@@ -145,7 +145,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->indexBy('near_contact_id');
     $this->assertCount(1, $cacheRecords);
     $cacheRecord = $cacheRecords->first();
-    $this->assertEquals(TRUE, $cacheRecord['is_active']);
+    $this->assertTrue($cacheRecord['is_active']);
     $this->assertEquals($today->format('Y-m-d'), $cacheRecord['start_date']);
     $this->assertEquals($future->format('Y-m-d'), $cacheRecord['end_date']);
   }

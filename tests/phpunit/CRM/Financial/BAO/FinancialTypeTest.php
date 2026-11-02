@@ -53,7 +53,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $result = FinancialType::get()->addWhere('id', '=', $financialTypeID)->execute();
     $this->assertCount(0, $result, 'Verify financial types record deletion.');
     $results = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_entity_financial_account WHERE entity_id = %1', [1 => [$financialTypeID, 'Positive']])->fetchAll();
-    $this->assertEquals(TRUE, empty($results), 'Assert related entity financial account has been deleted as well');
+    $this->assertTrue(empty($results), 'Assert related entity financial account has been deleted as well');
     if ($isMultiLingual) {
       global $dbLocale;
       $dbLocale = '_en_US';

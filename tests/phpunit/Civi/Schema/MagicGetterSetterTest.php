@@ -55,7 +55,7 @@ class MagicGetterSetterTest extends \CiviUnitTestCase {
 
   public function testExample(): void {
     $ex = $this->createExample();
-    $this->assertEquals(NULL, $ex->setProtectedField(NULL)->getProtectedField());
+    $this->assertNull($ex->setProtectedField(NULL)->getProtectedField());
     $this->assertSame('apple', $ex->setProtectedField('apple')->getProtectedField());
     $this->assertSame('banana', $ex->setPublicField('banana')->getPublicField());
     $this->assertSame('cherry', $ex->setSet('cherry')->getSet());

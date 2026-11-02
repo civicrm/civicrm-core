@@ -416,7 +416,7 @@ class QueueTest extends Api4TestBase {
 
     // Not available... yet...
     $claim1 = $queue->claimItem();
-    $this->assertEquals(NULL, $claim1);
+    $this->assertNull($claim1);
 
     // OK, it'll come in a few seconds...
     $claim2 = $this->waitForClaim(0.5, 6, $queueName);
@@ -558,12 +558,12 @@ class QueueTest extends Api4TestBase {
     switch ($errorMode) {
       case 'delete':
         $claimAndRun('delete', 0);
-        $this->assertEquals(TRUE, $queue->isActive());
+        $this->assertTrue($queue->isActive());
         break;
 
       case 'abort':
         $claimAndRun('abort', 1);
-        $this->assertEquals(FALSE, $queue->isActive());
+        $this->assertFalse($queue->isActive());
         break;
     }
 
@@ -613,21 +613,21 @@ class QueueTest extends Api4TestBase {
 
     // Verify initial status
     $this->assertQueueStats(2, 2, 0, $queue);
-    $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
-    $this->assertEquals(TRUE, $queue->isActive());
+    $this->assertFalse(isset($firedQueueStatus[$queueName]));
+    $this->assertTrue($queue->isActive());
     $this->assertEquals(4, $this->getTestRecord('UserJob', $userJob['id'])['status_id']);
 
     // OK, let's run both items - and check status afterward.
     Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
     $this->assertQueueStats(1, 1, 0, $queue);
-    $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
-    $this->assertEquals(TRUE, $queue->isActive());
+    $this->assertFalse(isset($firedQueueStatus[$queueName]));
+    $this->assertTrue($queue->isActive());
     $this->assertEquals(4, $this->getTestRecord('UserJob', $userJob['id'])['status_id']);
 
     Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
     $this->assertQueueStats(0, 0, 0, $queue);
     $this->assertSame('completed', $firedQueueStatus[$queueName]);
-    $this->assertEquals(FALSE, $queue->isActive());
+    $this->assertFalse($queue->isActive());
     $this->assertEquals(1, $this->getTestRecord('UserJob', $userJob['id'])['status_id']);
   }
 
@@ -663,19 +663,19 @@ class QueueTest extends Api4TestBase {
 
     // Verify initial status
     $this->assertQueueStats(2, 2, 0, $queue);
-    $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
-    $this->assertEquals(TRUE, $queue->isActive());
+    $this->assertFalse(isset($firedQueueStatus[$queueName]));
+    $this->assertTrue($queue->isActive());
 
     // OK, let's run both items - and check status afterward.
     Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
     $this->assertQueueStats(1, 1, 0, $queue);
-    $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
-    $this->assertEquals(TRUE, $queue->isActive());
+    $this->assertFalse(isset($firedQueueStatus[$queueName]));
+    $this->assertTrue($queue->isActive());
 
     Queue::runItems(FALSE)->setQueue($queueName)->execute()->single();
     $this->assertQueueStats(0, 0, 0, $queue);
-    $this->assertEquals(FALSE, isset($firedQueueStatus[$queueName]));
-    $this->assertEquals(TRUE, $queue->isActive());
+    $this->assertFalse(isset($firedQueueStatus[$queueName]));
+    $this->assertTrue($queue->isActive());
   }
 
   public static function doSomething(\CRM_Queue_TaskContext $ctx, string $something) {

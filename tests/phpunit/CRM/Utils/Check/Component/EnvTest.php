@@ -22,8 +22,8 @@ class CRM_Utils_Check_Component_EnvTest extends CiviUnitTestCase {
     $failRequest = $check->fileExists('https://civicrm.org', 0.001);
     $successRequest = $check->fileExists('https://civicrm.org', 0);
 
-    $this->assertEquals(FALSE, $failRequest, 'Request should fail for minimum timeout.');
-    $this->assertEquals(TRUE, $successRequest, 'Request should not fail for infinite timeout.');
+    $this->assertFalse($failRequest, 'Request should fail for minimum timeout.');
+    $this->assertTrue($successRequest, 'Request should not fail for infinite timeout.');
 
   }
 

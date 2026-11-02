@@ -156,7 +156,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
     $search = $this->getTestRecord('SavedSearch', ['name' => $newName], ['label', 'has_base', 'base_module', 'local_modified_date']);
     $this->assertSame('Whatever', $search['label']);
     // Check calculated fields
-    $this->assertEquals(NULL, $search['base_module']);
+    $this->assertNull($search['base_module']);
     $this->assertFalse($search['has_base']);
     $this->assertNull($search['local_modified_date']);
   }
@@ -540,7 +540,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->execute()->first();
 
     $this->assertCount(4, $nav['export']);
-    $this->assertEquals(TRUE, $nav['is_active']);
+    $this->assertTrue($nav['is_active']);
 
     $this->assertEquals(50, $nav['export'][0]['params']['values']['weight']);
     $this->assertSame('Navigation_Test_Parent_Navigation_Test_Child_1', $nav['export'][1]['name']);
@@ -564,7 +564,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->execute();
     foreach ([1, 2, 3] as $index => $weight) {
       $this->assertEquals($weight, $children[$index]['weight']);
-      $this->assertEquals(TRUE, $children[$index]['is_active']);
+      $this->assertTrue($children[$index]['is_active']);
     }
 
     // Try exporting the decoy records
@@ -592,13 +592,13 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->execute();
     foreach ([1, 2, 3] as $index => $weight) {
       $this->assertEquals($weight, $children[$index]['weight']);
-      $this->assertEquals(FALSE, $children[$index]['is_active']);
+      $this->assertFalse($children[$index]['is_active']);
     }
 
     $nav = Navigation::get(FALSE)
       ->addWhere('name', '=', 'Test_Parent')
       ->execute()->first();
-    $this->assertEquals(FALSE, $nav['is_active']);
+    $this->assertFalse($nav['is_active']);
 
     // Refresh managed entities with module active
     $allModules = [
@@ -614,13 +614,13 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->execute();
     foreach ([1, 2, 3] as $index => $weight) {
       $this->assertEquals($weight, $children[$index]['weight']);
-      $this->assertEquals(TRUE, $children[$index]['is_active']);
+      $this->assertTrue($children[$index]['is_active']);
     }
     // Parent should also be re-enabled
     $nav = Navigation::get(FALSE)
       ->addWhere('name', '=', 'Test_Parent')
       ->execute()->first();
-    $this->assertEquals(TRUE, $nav['is_active']);
+    $this->assertTrue($nav['is_active']);
   }
 
   /**

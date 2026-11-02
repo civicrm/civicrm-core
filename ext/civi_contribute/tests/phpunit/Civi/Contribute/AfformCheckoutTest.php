@@ -123,7 +123,7 @@ class AfformCheckoutTest extends TestCase implements HeadlessInterface {
     // we set the pending url in startCheckout
     // the session should be pending so that should be our nextUrl
     $nextUrl = $session->getNextUrl();
-    $this->assertEquals(TRUE, \str_starts_with($nextUrl, 'https://now.go.to'));
+    $this->assertTrue(\str_starts_with($nextUrl, 'https://now.go.to'));
   }
 
   /**
@@ -157,7 +157,7 @@ class AfformCheckoutTest extends TestCase implements HeadlessInterface {
       $this->fail('Afform::validate should have failed');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals(TRUE, \str_contains($e->getMessage(), 'No payments over 10 USD'));
+      $this->assertTrue(\str_contains($e->getMessage(), 'No payments over 10 USD'));
     }
 
   }
@@ -193,7 +193,7 @@ class AfformCheckoutTest extends TestCase implements HeadlessInterface {
       $this->fail('Afform::submit should have failed because we passed an invalid checkout option');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals(TRUE, \str_contains($e->getMessage(), 'No CheckoutOption found with name: invalid_checkout_option'));
+      $this->assertTrue(\str_contains($e->getMessage(), 'No CheckoutOption found with name: invalid_checkout_option'));
     }
 
   }

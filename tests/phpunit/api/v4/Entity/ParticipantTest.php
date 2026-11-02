@@ -40,7 +40,7 @@ class ParticipantTest extends Api4TestBase {
     $getParams = $result['get']['params'];
     $whereDescription = 'Criteria for selecting Participants';
 
-    $this->assertEquals(TRUE, $getParams['checkPermissions']['default']);
+    $this->assertTrue($getParams['checkPermissions']['default']);
     $this->assertStringContainsString($whereDescription, $getParams['where']['description']);
   }
 

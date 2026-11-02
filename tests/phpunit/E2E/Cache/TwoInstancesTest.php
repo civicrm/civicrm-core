@@ -115,7 +115,7 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
     $this->assertEquals(5678, $b->get('foo'), 'Check value B after initial setup');
 
     $a->clear();
-    $this->assertEquals(NULL, $a->get('foo'), 'Check value A after clearing A');
+    $this->assertNull($a->get('foo'), 'Check value A after clearing A');
     $this->assertEquals(5678, $b->get('foo'), 'Check value B after clearing A');
   }
 
@@ -137,7 +137,7 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
 
     $b->clear();
     $this->assertEquals(1234, $a->get('foo'), 'Check value A after clearing B');
-    $this->assertEquals(NULL, $b->get('foo'), 'Check value B after clearing B');
+    $this->assertNull($b->get('foo'), 'Check value B after clearing B');
   }
 
   /**

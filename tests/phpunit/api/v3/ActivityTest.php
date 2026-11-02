@@ -1147,8 +1147,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $target = $result['values'][$result['id']]['target_contact_id'];
     $this->assertCount(2, $assignee);
     $this->assertCount(1, $target);
-    $this->assertEquals(TRUE, in_array($contact1, $assignee));
-    $this->assertEquals(TRUE, in_array($contact2, $target));
+    $this->assertTrue(in_array($contact1, $assignee));
+    $this->assertTrue(in_array($contact2, $target));
 
     $contact3Params = [
       'first_name' => 'Jijo',
@@ -1197,8 +1197,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $this->assertCount(1, $assignee);
     $this->assertCount(1, $target);
-    $this->assertEquals(TRUE, in_array($contact3, $assignee));
-    $this->assertEquals(TRUE, in_array($contact4, $target));
+    $this->assertTrue(in_array($contact3, $assignee));
+    $this->assertTrue(in_array($contact4, $target));
     $this->_params['activity_type_id'] = $this->test_activity_type_value;
     foreach ($this->_params as $fld => $val) {
       $this->assertEquals($val, $result['values'][$result['id']][$fld]);

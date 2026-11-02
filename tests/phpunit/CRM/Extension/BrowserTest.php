@@ -37,14 +37,14 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
 
   public function testDisabled(): void {
     $this->browser = new CRM_Extension_Browser(FALSE, '/index.html');
-    $this->assertEquals(FALSE, $this->browser->isEnabled());
+    $this->assertFalse($this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->assertEquals([], $this->browser->getExtensions());
   }
 
   public function testGetExtensions_good(): void {
     $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL);
-    $this->assertEquals(TRUE, $this->browser->isEnabled());
+    $this->assertTrue($this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->setupMockHandler();
     $exts = $this->browser->getExtensions();
@@ -59,7 +59,7 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
 
   public function testGetExtension_good(): void {
     $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL);
-    $this->assertEquals(TRUE, $this->browser->isEnabled());
+    $this->assertTrue($this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->setupMockHandler();
     $info = $this->browser->getExtension('test.crm.extension.browsertest.b');
@@ -69,11 +69,11 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
 
   public function testGetExtension_nonexistent(): void {
     $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL);
-    $this->assertEquals(TRUE, $this->browser->isEnabled());
+    $this->assertTrue($this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->setupMockHandler();
     $info = $this->browser->getExtension('test.crm.extension.browsertest.nonexistent');
-    $this->assertEquals(NULL, $info);
+    $this->assertNull($info);
   }
 
 }

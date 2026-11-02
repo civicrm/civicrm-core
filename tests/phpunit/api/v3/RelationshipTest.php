@@ -1244,8 +1244,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
         'return' => 'current_employer_id',
       ]));
     // Result B: Ensure that the previous employer relationship with Org B is successfully disabled
-    $this->assertEquals(
-      FALSE,
+    $this->assertFalse(
       (bool) $this->callAPISuccess('Relationship', 'getvalue', [
         'id' => $relationshipB['id'],
         'return' => 'is_active',

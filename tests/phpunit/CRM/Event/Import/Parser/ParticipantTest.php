@@ -188,7 +188,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $row['_entity_id'])
       ->addSelect($this->getCustomFieldName('radio', 4))
       ->execute()->first();
-    $this->assertEquals(TRUE, $participant[$this->getCustomFieldName('radio', 4)]);
+    $this->assertTrue($participant[$this->getCustomFieldName('radio', 4)]);
     $row = $dataSource->getRow();
     $this->assertSame('ERROR', $row['_status']);
     $this->assertEquals('Participant record not found for id ' . $missingParticipantID, $row['_status_message']);

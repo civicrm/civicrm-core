@@ -448,8 +448,8 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       $this->assertEquals($cid1, $result[0]['id']);
       $this->assertEquals($cid2, $result[1]['id']);
       $this->assertEquals($cid3, $result[1]['Contact_RelationshipCache_Contact_01.id']);
-      $this->assertEquals(TRUE, $result[0]['Contact_RelationshipCache_Contact_01.is_current']);
-      $this->assertEquals(FALSE, $result[1]['Contact_RelationshipCache_Contact_01.is_current']);
+      $this->assertTrue($result[0]['Contact_RelationshipCache_Contact_01.is_current']);
+      $this->assertFalse($result[1]['Contact_RelationshipCache_Contact_01.is_current']);
     }
   }
 

@@ -374,33 +374,33 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(1, $result[$aids[1]]['trashed']);
     $this->assertEquals(0, $result[$aids[2]]['trashed']);
 
-    $this->assertEquals(NULL, $result[$aids[0]]['nullif_subject_is_location']);
+    $this->assertNull($result[$aids[0]]['nullif_subject_is_location']);
     $this->assertSame('xyz', $result[$aids[1]]['nullif_subject_is_location']);
     $this->assertSame('def', $result[$aids[2]]['nullif_subject_is_location']);
 
     $this->assertEquals(123, $result[$aids[0]]['nullif_duration_is_456']);
-    $this->assertEquals(NULL, $result[$aids[1]]['nullif_duration_is_456']);
-    $this->assertEquals(NULL, $result[$aids[2]]['nullif_duration_is_456']);
+    $this->assertNull($result[$aids[1]]['nullif_duration_is_456']);
+    $this->assertNull($result[$aids[2]]['nullif_duration_is_456']);
 
     $this->assertEquals('123', $result[$aids[0]]['coalesce_duration_location']);
     $this->assertSame('abc', $result[$aids[1]]['coalesce_duration_location']);
     $this->assertEquals('456', $result[$aids[2]]['coalesce_duration_location']);
 
     $this->assertEquals(200, $result[$aids[0]]['greatest_of_duration_or_200']);
-    $this->assertEquals(NULL, $result[$aids[1]]['greatest_of_duration_or_200']);
+    $this->assertNull($result[$aids[1]]['greatest_of_duration_or_200']);
     $this->assertEquals(456, $result[$aids[2]]['greatest_of_duration_or_200']);
 
     $this->assertEquals(123, $result[$aids[0]]['least_of_duration_and_300']);
-    $this->assertEquals(NULL, $result[$aids[1]]['least_of_duration_and_300']);
+    $this->assertNull($result[$aids[1]]['least_of_duration_and_300']);
     $this->assertEquals(300, $result[$aids[2]]['least_of_duration_and_300']);
 
-    $this->assertEquals(FALSE, $result[$aids[0]]['duration_isnull']);
-    $this->assertEquals(TRUE, $result[$aids[1]]['duration_isnull']);
-    $this->assertEquals(FALSE, $result[$aids[2]]['duration_isnull']);
+    $this->assertFalse($result[$aids[0]]['duration_isnull']);
+    $this->assertTrue($result[$aids[1]]['duration_isnull']);
+    $this->assertFalse($result[$aids[2]]['duration_isnull']);
 
-    $this->assertEquals(TRUE, $result[$aids[0]]['duration_isnotnull']);
-    $this->assertEquals(FALSE, $result[$aids[1]]['duration_isnotnull']);
-    $this->assertEquals(TRUE, $result[$aids[2]]['duration_isnotnull']);
+    $this->assertTrue($result[$aids[0]]['duration_isnotnull']);
+    $this->assertFalse($result[$aids[1]]['duration_isnotnull']);
+    $this->assertTrue($result[$aids[2]]['duration_isnotnull']);
 
     $this->assertEquals(123, $result[$aids[0]]['ifnull_duration_2']);
     $this->assertEquals(2, $result[$aids[1]]['ifnull_duration_2']);

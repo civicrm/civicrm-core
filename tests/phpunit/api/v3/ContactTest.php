@@ -3938,7 +3938,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'return' => "contact_is_deleted",
       'id' => $contact1,
     ]);
-    $this->assertEquals(TRUE, $contact1IsDeletedAfterMerge);
+    $this->assertTrue($contact1IsDeletedAfterMerge);
     $mergedContact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact2, 'return' => $customFieldKeys]);
     foreach ($customFieldKeys as $key) {
       $this->assertEquals($contact1CustomFieldValues[$key], $mergedContact[$key]);

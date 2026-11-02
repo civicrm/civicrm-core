@@ -85,11 +85,11 @@ class CryptoRegistryTest extends \CiviUnitTestCase {
     $registry = \Civi::service('crypto.registry');
 
     foreach ($valids as $valid) {
-      $this->assertEquals(TRUE, $registry->isValidKeyId($valid), "Key ID \"$valid\" should be valid");
+      $this->assertTrue($registry->isValidKeyId($valid), "Key ID \"$valid\" should be valid");
     }
 
     foreach ($invalids as $invalid) {
-      $this->assertEquals(FALSE, $registry->isValidKeyId($invalid), "Key ID \"$invalid\" should be invalid");
+      $this->assertFalse($registry->isValidKeyId($invalid), "Key ID \"$invalid\" should be invalid");
     }
   }
 

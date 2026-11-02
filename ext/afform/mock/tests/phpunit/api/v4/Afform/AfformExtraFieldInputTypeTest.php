@@ -195,7 +195,7 @@ EOHTML;
     $this->assertSame('Jane', $submission['Individual1'][0]['fields']['first_name']);
     $this->assertSame('cart-token-123', $submission['extra']['fields']['extra_hidden']);
     $this->assertSame('option_b', $submission['extra']['fields']['extra_select']);
-    $this->assertEquals(TRUE, $submission['extra']['fields']['extra_checkbox']);
+    $this->assertTrue($submission['extra']['fields']['extra_checkbox']);
     $this->assertSame('2024-07-04', $submission['extra']['fields']['extra_date']);
   }
 

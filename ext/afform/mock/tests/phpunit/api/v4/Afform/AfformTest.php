@@ -80,8 +80,8 @@ class AfformTest extends AfformTestCase implements TransactionalInterface {
     $this->assertEquals($get($originalMetadata, 'placement') ?? [], $get($result[0], 'placement'), $message);
     $this->assertEquals($get($originalMetadata, 'permission'), $get($result[0], 'permission'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
-    $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
-    $this->assertEquals(FALSE, $get($result[0], 'has_local'), $message);
+    $this->assertTrue($get($result[0], 'has_base'), $message);
+    $this->assertFalse($get($result[0], 'has_local'), $message);
     $this->assertSame('org.civicrm.afform-mock', $get($result[0], 'base_module'), $message);
     $checkDashlet($originalMetadata);
 
@@ -106,8 +106,8 @@ class AfformTest extends AfformTestCase implements TransactionalInterface {
     $this->assertEquals($get($originalMetadata, 'server_route'), $get($result[0], 'server_route'), $message);
     $this->assertEquals(['access foo', 'access bar'], $get($result[0], 'permission'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
-    $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
-    $this->assertEquals(TRUE, $get($result[0], 'has_local'), $message);
+    $this->assertTrue($get($result[0], 'has_base'), $message);
+    $this->assertTrue($get($result[0], 'has_local'), $message);
     $this->assertSame('org.civicrm.afform-mock', $get($result[0], 'base_module'), $message);
     $checkDashlet($result[0]);
 
@@ -123,8 +123,8 @@ class AfformTest extends AfformTestCase implements TransactionalInterface {
     $this->assertEquals($get($originalMetadata, 'permission'), $get($result[0], 'permission'), $message);
     $this->assertEquals($get($originalMetadata, 'placement') ?? [], $get($result[0], 'placement'), $message);
     $this->assertTrue(is_array($result[0]['layout']), $message);
-    $this->assertEquals(TRUE, $get($result[0], 'has_base'), $message);
-    $this->assertEquals(FALSE, $get($result[0], 'has_local'), $message);
+    $this->assertTrue($get($result[0], 'has_base'), $message);
+    $this->assertFalse($get($result[0], 'has_local'), $message);
     $this->assertSame('org.civicrm.afform-mock', $get($result[0], 'base_module'), $message);
 
     $checkDashlet($originalMetadata);

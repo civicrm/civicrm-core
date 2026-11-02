@@ -134,7 +134,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $field = $fields['myPublicString'];
     $this->assertEquals(['string'], $field->getType());
     $this->assertSame('String', $field->getDataType());
-    $this->assertEquals(NULL, $field->getSerialize());
+    $this->assertNull($field->getSerialize());
 
     $field = $fields['implicitStringArray'];
     $this->assertEquals(['string[]'], $field->getType());
@@ -149,7 +149,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $field = $fields['myProtectedInt'];
     $this->assertEquals(['int'], $field->getType());
     $this->assertSame('Integer', $field->getDataType());
-    $this->assertEquals(NULL, $field->getSerialize());
+    $this->assertNull($field->getSerialize());
   }
 
   /**
@@ -225,7 +225,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
       'implicitStringArray' => ['is not mapped between class and tpl'],
     ]);
 
-    $this->assertEquals(NULL, $ex->getimplicitStringArray());
+    $this->assertNull($ex->getimplicitStringArray());
     $ex->setimplicitStringArray(['this is the real class field']);
 
     $tpl = $ex->export('tplParams');

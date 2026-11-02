@@ -696,7 +696,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
       );
 
       $sql = $selector->getQueryObject()->query();
-      $this->assertEquals(TRUE, strpos($sql[2], $filtersByWhereClause[$op]));
+      $this->assertTrue(strpos($sql[2], $filtersByWhereClause[$op]));
 
       $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
       $this->assertCount(1, $rows);
@@ -809,7 +809,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
     $whereClause = $selector->getQueryObject()->query()[2];
     $expectedClause = sprintf('( %s.%s IS NOT NULL )', $customGroupTableName, $customFieldColumnName);
     // test the presence of expected date clause
-    $this->assertEquals(TRUE, strpos($whereClause, $expectedClause));
+    $this->assertTrue(strpos($whereClause, $expectedClause));
 
     $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
     $this->assertCount(1, $rows);

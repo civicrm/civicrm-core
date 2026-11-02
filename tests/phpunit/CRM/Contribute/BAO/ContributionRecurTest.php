@@ -845,7 +845,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $createParams['is_email_receipt'] = '';
     $recurring2 = $this->callAPISuccess('ContributionRecur', 'create', $createParams);
     $recurring2 = ContributionRecur::get(FALSE)->addWhere('id', '=', $recurring2['id'])->addSelect('is_email_receipt')->execute()->first();
-    $this->assertEquals(NULL, $recurring2['is_email_receipt']);
+    $this->assertNull($recurring2['is_email_receipt']);
 
     // Pass 0 value to is_email_receipt.
     $createParams['is_email_receipt'] = 0;

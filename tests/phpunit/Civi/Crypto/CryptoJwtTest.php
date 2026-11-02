@@ -171,7 +171,7 @@ class CryptoJwtTest extends \CiviUnitTestCase {
 
   public function testSuiteToAlg(): void {
     $this->assertSame('HS256', Invasive::call([CryptoJwt::class, 'suiteToAlg'], ['jwt-hs256']));
-    $this->assertEquals(NULL, Invasive::call([CryptoJwt::class, 'suiteToAlg'], ['aes-cbc']));
+    $this->assertNull(Invasive::call([CryptoJwt::class, 'suiteToAlg'], ['aes-cbc']));
   }
 
 }

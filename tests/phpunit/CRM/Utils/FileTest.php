@@ -96,14 +96,14 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   public function testCreateDir() {
     foreach ([TRUE, FALSE, 'exception'] as $abortMode) {
       $validNewPath = sys_get_temp_dir() . '/testCreateDir-' . uniqid();
-      $this->assertEquals(TRUE, CRM_Utils_File::createDir($validNewPath, $abortMode), 'Should create directory');
+      $this->assertTrue(CRM_Utils_File::createDir($validNewPath, $abortMode), 'Should create directory');
       $this->assertTrue(is_dir($validNewPath));
       @rmdir($validNewPath);
     }
 
     foreach ([TRUE, FALSE, 'exception'] as $abortMode) {
       $existingPath = __DIR__;
-      $this->assertEquals(NULL, CRM_Utils_File::createDir($existingPath, $abortMode), 'Does not need to create directory');
+      $this->assertNull(CRM_Utils_File::createDir($existingPath, $abortMode), 'Does not need to create directory');
     }
   }
 
@@ -112,7 +112,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $this->assertFalse(is_dir($invalidPath));
 
     // If $abort=FALSE, then it simply returns outcome.
-    $this->assertEquals(FALSE, CRM_Utils_File::createDir($invalidPath, FALSE));
+    $this->assertFalse(CRM_Utils_File::createDir($invalidPath, FALSE));
     $this->assertFalse(is_dir($invalidPath));
 
     // If $abort='exception', then it raises a normal exception.

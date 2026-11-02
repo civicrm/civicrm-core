@@ -188,7 +188,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $output = $input;
     CRM_Core_BAO_Navigation::fixNavigationMenu($output);
 
-    $this->assertEquals(NULL, $output[10]['attributes']['parentID']);
+    $this->assertNull($output[10]['attributes']['parentID']);
     $this->assertEquals(10, $output[10]['attributes']['navID']);
     $this->assertEquals(10, $output[10]['child'][11]['attributes']['parentID']);
     $this->assertEquals(11, $output[10]['child'][11]['attributes']['navID']);
@@ -227,7 +227,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     CRM_Core_BAO_Navigation::fixNavigationMenu($output);
 
     $this->assertSame('Custom Menu Entry', $output[10]['attributes']['label']);
-    $this->assertEquals(NULL, $output[10]['attributes']['parentID']);
+    $this->assertNull($output[10]['attributes']['parentID']);
     $this->assertEquals(10, $output[10]['attributes']['navID']);
 
     $this->assertSame('Custom Child Menu', $output[10]['child'][101]['attributes']['label']);
@@ -269,7 +269,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     CRM_Core_BAO_Navigation::fixNavigationMenu($output);
 
     $this->assertSame('Custom Menu Entry', $output[10]['attributes']['label']);
-    $this->assertEquals(NULL, $output[10]['attributes']['parentID']);
+    $this->assertNull($output[10]['attributes']['parentID']);
     $this->assertEquals(10, $output[10]['attributes']['navID']);
 
     $this->assertSame('Custom Child Menu', $output[10]['child'][101]['attributes']['label']);

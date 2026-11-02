@@ -1588,7 +1588,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $options = $this->callAPISuccess('Membership', 'getoptions', ['field' => 'membership_type_id']);
     $this->assertSame('Another one', array_pop($options['values']));
     $this->assertSame('General', array_pop($options['values']));
-    $this->assertEquals(NULL, array_pop($options['values']));
+    $this->assertNull(array_pop($options['values']));
   }
 
   /**

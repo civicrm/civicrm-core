@@ -635,7 +635,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
     $this->assertEquals([], CRM_Core_DAO::$_nullArray);
-    $this->assertEquals(NULL, CRM_Core_DAO::$_nullObject);
+    $this->assertNull(CRM_Core_DAO::$_nullObject);
     // Setting large properties to NULL here ensures memory is released as each
     // test class is held in memory until the very end.
     $this->formController = NULL;

@@ -295,7 +295,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
         'limit' => 0,
       ],
     ])['values'];
-    $this->assertEquals(FALSE, empty($result), 'Verify membership types for organization.');
+    $this->assertFalse(empty($result), 'Verify membership types for organization.');
 
     $result = $this->callAPISuccess('MembershipType', 'get', [
       'member_of_contact_id' => 501,
@@ -303,7 +303,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
         'limit' => 0,
       ],
     ])['values'];
-    $this->assertEquals(TRUE, empty($result), 'Verify membership types for organization.');
+    $this->assertTrue(empty($result), 'Verify membership types for organization.');
   }
 
   /**

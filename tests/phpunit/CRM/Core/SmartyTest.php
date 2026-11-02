@@ -44,7 +44,7 @@ class CRM_Core_SmartyTest extends CiviUnitTestCase {
   public function testFetchWith_CleanNull(): void {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('my_variable', NULL);
-    $this->assertEquals(NULL, $smarty->getTemplateVars()['my_variable']);
+    $this->assertNull($smarty->getTemplateVars()['my_variable']);
 
     $tpl = 'eval:({$my_variable})';
     $this->assertSame('()', $smarty->fetchWith($tpl, []));
@@ -53,7 +53,7 @@ class CRM_Core_SmartyTest extends CiviUnitTestCase {
     ]));
 
     // Assert global state
-    $this->assertEquals(NULL, $smarty->getTemplateVars()['my_variable']);
+    $this->assertNull($smarty->getTemplateVars()['my_variable']);
   }
 
   /**

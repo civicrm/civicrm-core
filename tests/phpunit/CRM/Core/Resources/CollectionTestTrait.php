@@ -310,12 +310,12 @@ trait CRM_Core_Resources_CollectionTestTrait {
     $this->assertSame('foo', $b->get('borg')['name']);
     $this->assertSame('whiz', $b->get('whiz')['name']);
     $this->assertSame('whiz', $b->get('bang')['name']);
-    $this->assertEquals(NULL, $b->get('snafu'));
+    $this->assertNull($b->get('snafu'));
 
     // Go back+forth, updating with one name then reading with the other.
 
     $b->get('borg')['borgify'] = TRUE;
-    $this->assertEquals(TRUE, $b->get('foo')['borgify']);
+    $this->assertTrue($b->get('foo')['borgify']);
 
     $b->get('foo')['d'] = 'ie';
     $this->assertSame('ie', $b->get('borg')['d']);

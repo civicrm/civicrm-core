@@ -110,7 +110,7 @@ trait CRMTraits_Import_ParserTrait {
         'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
       ]);
       $result = $runner->runAll();
-      $this->assertEquals(TRUE, $result, $result === TRUE ? '' : CRM_Core_Error::formatTextException($result['exception']));
+      $this->assertTrue($result, $result === TRUE ? '' : CRM_Core_Error::formatTextException($result['exception']));
     }
     else {
       throw new CRM_Core_Exception('nothing queued');

@@ -227,7 +227,7 @@ class CustomValueTest extends Api4TestBase {
       ->execute()
       ->first();
     $this->assertSame('b', $result[$colorFieldName]);
-    $this->assertEquals(NULL, $result[$refFieldName]);
+    $this->assertNull($result[$refFieldName]);
 
     // CASE 3: Test CustomValue::replace
     // create a second contact which will be used to replace the custom values, created earlier

@@ -36,7 +36,7 @@ class ExtUserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterfa
       1 => [$mail, 'String'],
     ]);
 
-    $this->assertEquals(NULL, $getUserId($username), 'User does not exist yet.');
+    $this->assertNull($getUserId($username), 'User does not exist yet.');
     $this->assertEquals(0, $getMailCount("$username@127.0.0.1"));
 
     $loginUserId = \_authx_uf()->checkPassword($username, $secret);
@@ -67,7 +67,7 @@ class ExtUserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterfa
     $this->assertEmpty($getUserId($username), 'User does not exist yet.');
     $loginUserId = \_authx_uf()->checkPassword($username, 'wrong');
     $this->assertNotEmpty($getUserId($username), 'External user should be mapped.');
-    $this->assertEquals(NULL, $loginUserId, 'But the password check should ultimately fail.');
+    $this->assertNull($loginUserId, 'But the password check should ultimately fail.');
   }
 
   /**

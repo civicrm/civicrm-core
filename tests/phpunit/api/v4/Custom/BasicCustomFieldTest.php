@@ -100,7 +100,7 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->addWhere('id', '=', $contactId)
       ->execute()
       ->first();
-    $this->assertEquals(NULL, $contact['MyIndividualFields.MyLink']);
+    $this->assertNull($contact['MyIndividualFields.MyLink']);
 
     // Disable the field and it disappears from getFields and from the API output.
     CustomField::update(FALSE)

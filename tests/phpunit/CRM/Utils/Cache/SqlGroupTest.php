@@ -80,7 +80,7 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
       'prefetch' => FALSE,
     ]);
     // should be NULL b/c value was NOT prefetched
-    $this->assertEquals(NULL, $c->getFromFrontCache('foo'));
+    $this->assertNull($c->getFromFrontCache('foo'));
     // should work b/c value is fetched on demand
     $this->assertEquals($fooValue, $c->get('foo'));
     // should work b/c value was fetched on demand

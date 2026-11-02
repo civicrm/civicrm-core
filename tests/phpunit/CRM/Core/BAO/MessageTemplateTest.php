@@ -677,7 +677,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
         ],
       ]
     );
-    $this->assertEquals(FALSE, $sent);
+    $this->assertFalse($sent);
     $this->assertSame('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!', $subject);
     $this->assertSame('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!', $messageText);
     $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!</p>', $messageHtml);
@@ -713,7 +713,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
           'attachments' => NULL,
         ]
       );
-      $this->assertEquals(FALSE, $sent);
+      $this->assertFalse($sent);
       $this->assertSame('Hello testSendTemplate_RenderMode_Default Abba Baa!', $subject);
       $this->assertSame('Hello testSendTemplate_RenderMode_Default Abba Baa!', $messageText);
       $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_Default Abba Baa!</p>', $messageHtml);
@@ -861,7 +861,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
           'attachments' => NULL,
         ]
       );
-      $this->assertEquals(FALSE, $sent);
+      $this->assertFalse($sent);
       $this->assertSame('Hello Abba Baa about Something Something!', $subject);
       $this->assertSame('Hello Abba Baa about Something Something!', $messageText);
       $this->assertStringContainsString('<p>Hello Abba Baa about Something Something!</p>', $messageHtml);

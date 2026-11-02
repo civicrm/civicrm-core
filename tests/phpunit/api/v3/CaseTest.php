@@ -367,7 +367,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'activity_id' => $activity,
       'return' => 'activities',
     ]);
-    $this->assertEquals(FALSE, empty($result['values'][$id]));
+    $this->assertFalse(empty($result['values'][$id]));
     $this->assertEquals($result['values'][$id], $case);
   }
 

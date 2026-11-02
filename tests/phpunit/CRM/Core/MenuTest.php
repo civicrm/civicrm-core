@@ -161,8 +161,8 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
   }
 
   public function testIsPublicRoute(): void {
-    $this->assertEquals(FALSE, \CRM_Core_Menu::isPublicRoute('civicrm/contribute'));
-    $this->assertEquals(TRUE, \CRM_Core_Menu::isPublicRoute('civicrm/contribute/transact'));
+    $this->assertFalse(\CRM_Core_Menu::isPublicRoute('civicrm/contribute'));
+    $this->assertTrue(\CRM_Core_Menu::isPublicRoute('civicrm/contribute/transact'));
   }
 
   /**

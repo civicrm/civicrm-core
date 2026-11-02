@@ -66,7 +66,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
 
       $this->assertFalse($e->diffs->isLoaded());
       $this->assertEquals(1, count($e->diffs));
-      $this->assertEquals(NULL, $e->diffs[0]['old']);
+      $this->assertNull($e->diffs[0]['old']);
       $this->assertSame('Alice', $e->diffs[0]['new']['first_name']);
       $this->assertSame('Alison', $e->diffs[0]['new']['last_name']);
 
@@ -95,7 +95,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
       $this->assertEquals(2, count($e->diffs));
       $this->assertSame('Alice', $e->diffs[0]['old']['first_name']);
       $this->assertSame('Alicia', $e->diffs[0]['new']['first_name']);
-      $this->assertEquals(NULL, $e->diffs[1]['old']);
+      $this->assertNull($e->diffs[1]['old']);
       $this->assertSame('Bob', $e->diffs[1]['new']['first_name']);
 
     });

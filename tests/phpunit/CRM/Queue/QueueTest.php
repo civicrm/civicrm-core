@@ -291,7 +291,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     // haven't reach expiration yet
     CRM_Utils_Time::setTime('2012-04-01 1:59:00');
     $item2 = $this->queue->claimItem();
-    $this->assertEquals(FALSE, $item2);
+    $this->assertFalse($item2);
 
     // pass expiration mark
     CRM_Utils_Time::setTime('2012-04-01 2:00:03');
@@ -328,7 +328,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     // haven't reached expiration yet, so claimItem fails
     CRM_Utils_Time::setTime('2012-04-01 1:59:00');
     $item2 = $this->queue->claimItem();
-    $this->assertEquals(FALSE, $item2);
+    $this->assertFalse($item2);
 
     // but stealItem works
     $item3 = $this->queue->stealItem();

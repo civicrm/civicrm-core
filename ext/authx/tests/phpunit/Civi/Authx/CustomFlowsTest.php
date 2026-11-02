@@ -46,7 +46,7 @@ class CustomFlowsTest extends AbstractFlowsTest {
       $this->assertEquals($this->getDemoUID(), $report['userId'], $msg);
       $this->assertSame('script', $report['flow'], $msg);
       $this->assertSame('assigned', $report['credType'], $msg);
-      $this->assertEquals(FALSE, $report['useSession'], $msg);
+      $this->assertFalse($report['useSession'], $msg);
     }
 
     $invalidPrincipals = [

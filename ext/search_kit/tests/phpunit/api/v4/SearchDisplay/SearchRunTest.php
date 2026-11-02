@@ -172,7 +172,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(2, $count);
 
     // Raw value should be boolean, view value should be string
-    $this->assertEquals(FALSE, $result[0]['data']['is_deceased']);
+    $this->assertFalse($result[0]['data']['is_deceased']);
     $this->assertEquals(ts('No'), $result[0]['columns'][4]['val']);
 
     $params['filters'] = ['last_name' => $lastName, 'id' => ['>' => $result[0]['data']['id'], '<=' => $result[1]['data']['id'] + 1]];

@@ -57,7 +57,7 @@ class E2E_CivicrmAdminUi_ManageGroupsTest extends \Civi\Test\MinkBase {
     // Confirm the group is now inactive.  But wait until "Saved" appears because of race conditions.
     $session->wait(5000, 'document.querySelectorAll("div.crm-status-box-outer.status-success").length > 0');
     $basicGroupStatus = Group::get(FALSE)->addWhere('id', '=', $gidBasic)->execute()->single()['is_active'];
-    $this->assertEquals(FALSE, $basicGroupStatus);
+    $this->assertFalse($basicGroupStatus);
   }
 
   public function tearDown(): void {

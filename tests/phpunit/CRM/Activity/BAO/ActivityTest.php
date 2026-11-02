@@ -873,7 +873,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           $this->assertEquals($this->getXMLDataSetID('civicrm_contact', 18), $activities[$this->getXMLDataSetID('civicrm_activity', 1)]['source_contact_id']);
           // @todo - this is a discrepancy between old & new - review.
           //$this->assertEquals(TRUE, array_key_exists(18, $activities[7]['target_contact_name']));
-          $this->assertEquals(TRUE, array_key_exists($this->getXMLDataSetID('civicrm_contact', 18), $activities[$this->getXMLDataSetID('civicrm_activity', 8)]['assignee_contact_name']));
+          $this->assertTrue(array_key_exists($this->getXMLDataSetID('civicrm_contact', 18), $activities[$this->getXMLDataSetID('civicrm_activity', 8)]['assignee_contact_name']));
         }
         elseif ($caseName === 'with-activity_type') {
           // contact id 3 for activity type 2 is assigned as assignee, source and target for
@@ -1443,7 +1443,7 @@ $text
    */
   public function testSendSmsMobilePhoneNumber(): void {
     $sent = $this->createSendSmsTest(TRUE, 2);
-    $this->assertEquals(TRUE, $sent[0]);
+    $this->assertTrue($sent[0]);
     /** @var CiviTestSMSProvider $providerObj */
     $providerObj = CRM_SMS_Provider::singleton(['provider_id' => $this->ids['SmsProvider'][0]]);
     $this->assertSame('text Anthony', $providerObj->getSentMessage());
@@ -1455,7 +1455,7 @@ $text
    */
   public function testSendSMSMobileInToProviderParam(): void {
     $sent = $this->createSendSmsTest(TRUE, 2, TRUE);
-    $this->assertEquals(TRUE, $sent[0], 'Expected sent should be true');
+    $this->assertTrue($sent[0], 'Expected sent should be true');
   }
 
   /**

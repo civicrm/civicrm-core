@@ -382,7 +382,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $isDelete = CRM_Core_BAO_CustomGroup::deleteGroup($groupObject);
 
     // Check it worked!
-    $this->assertEquals(TRUE, $isDelete);
+    $this->assertTrue($isDelete);
     $this->assertDBNull('CRM_Core_DAO_CustomGroup', $customGroup['id'], 'title', 'id',
       'Database check for custom group record.'
     );
@@ -455,12 +455,12 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $usedFor = CRM_Core_BAO_CustomGroup::checkCustomField(
       $customFieldId, ['Individual']
     );
-    $this->assertEquals(FALSE, $usedFor);
+    $this->assertFalse($usedFor);
 
     $usedFor = CRM_Core_BAO_CustomGroup::checkCustomField(
       $customFieldId, ['Contribution', 'Membership', 'Participant']
     );
-    $this->assertEquals(TRUE, $usedFor);
+    $this->assertTrue($usedFor);
   }
 
   /**

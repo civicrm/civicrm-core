@@ -55,7 +55,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $this->assertSame('test.foo', $info->key);
     $this->assertSame('foo', $info->file);
     $this->assertSame('zamboni', $info->typeInfo['extra']);
-    $this->assertEquals(NULL, $info->upgrader);
+    $this->assertNull($info->upgrader);
     $this->assertEquals([], $info->requires);
   }
 
