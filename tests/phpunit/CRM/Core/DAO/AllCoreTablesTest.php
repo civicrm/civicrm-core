@@ -67,8 +67,8 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
     // civicrm_group UI_title is localizable
     // Check indices without localization
     $indices = CRM_Core_DAO_AllCoreTables::indices(FALSE);
-    $this->assertEquals($indices['civicrm_group']['UI_title']['name'], 'UI_title');
-    $this->assertEquals($indices['civicrm_group']['UI_title']['sig'], 'civicrm_group::1::title');
+    $this->assertSame('UI_title', $indices['civicrm_group']['UI_title']['name']);
+    $this->assertSame('civicrm_group::1::title', $indices['civicrm_group']['UI_title']['sig']);
 
     // Not sure how we should be setting the locales, but this works for testing purposes
     $domain = new CRM_Core_DAO_Domain();
@@ -78,11 +78,11 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
 
     // Check indices with localization
     $indices = CRM_Core_DAO_AllCoreTables::indices(TRUE);
-    $this->assertEquals($indices['civicrm_group']['UI_title_en_UK']['name'], 'UI_title_en_UK');
-    $this->assertEquals($indices['civicrm_group']['UI_title_en_UK']['sig'], 'civicrm_group::1::title_en_UK');
+    $this->assertSame('UI_title_en_UK', $indices['civicrm_group']['UI_title_en_UK']['name']);
+    $this->assertSame('civicrm_group::1::title_en_UK', $indices['civicrm_group']['UI_title_en_UK']['sig']);
 
-    $this->assertEquals($indices['civicrm_group']['UI_title_fr_FR']['name'], 'UI_title_fr_FR');
-    $this->assertEquals($indices['civicrm_group']['UI_title_fr_FR']['sig'], 'civicrm_group::1::title_fr_FR');
+    $this->assertSame('UI_title_fr_FR', $indices['civicrm_group']['UI_title_fr_FR']['name']);
+    $this->assertSame('civicrm_group::1::title_fr_FR', $indices['civicrm_group']['UI_title_fr_FR']['sig']);
   }
 
   /**

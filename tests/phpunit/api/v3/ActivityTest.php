@@ -583,10 +583,10 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('activity', 'create', $params);
     $this->assertEquals($result['values'][$result['id']]['duration'], 120);
-    $this->assertEquals($result['values'][$result['id']]['subject'], 'Make-it-Happen Meeting');
+    $this->assertSame('Make-it-Happen Meeting', $result['values'][$result['id']]['subject']);
     $this->assertEquals($result['values'][$result['id']]['activity_date_time'], date('Ymd') . '000000');
-    $this->assertEquals($result['values'][$result['id']]['location'], 'Pennsylvania');
-    $this->assertEquals($result['values'][$result['id']]['details'], 'a test activity');
+    $this->assertSame('Pennsylvania', $result['values'][$result['id']]['location']);
+    $this->assertSame('a test activity', $result['values'][$result['id']]['details']);
   }
 
   /**
@@ -1245,7 +1245,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('Activity', 'create', $params);
-    $this->assertEquals($result['values'][$activity['id']]['subject'], 'Hurry update works');
+    $this->assertSame('Hurry update works', $result['values'][$activity['id']]['subject']);
     $this->assertEquals($result['values'][$activity['id']]['status_id'], 1
     );
   }

@@ -565,7 +565,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $this->assertCount($count, $activities);
 
       foreach ($activities as $key => $value) {
-        $this->assertEquals($value['subject'], "subject {$datasetActivityIDs[$key]}", 'Verify activity subject is correct.');
+        $this->assertSame("subject {$datasetActivityIDs[$key]}", $value['subject'], 'Verify activity subject is correct.');
         $this->assertEquals($value['activity_type_id'], 2, 'Verify activity type is correct.');
         $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
       }
@@ -635,7 +635,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $this->assertEquals($count, count($activities));
 
       foreach ($activities as $key => $value) {
-        $this->assertEquals($value['subject'], "subject {$datasetActivityIDs[$key]}", 'Verify activity subject is correct.');
+        $this->assertSame("subject {$datasetActivityIDs[$key]}", $value['subject'], 'Verify activity subject is correct.');
         $this->assertEquals($value['activity_type_id'], 2, 'Verify activity type is correct.');
         $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
 
@@ -742,7 +742,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals($count, count($activities));
     foreach ($activities as $key => $value) {
       $datasetID = $datasetActivityIDs[$key];
-      $this->assertEquals($value['subject'], "subject {$datasetID}", 'Verify activity subject is correct.');
+      $this->assertSame("subject {$datasetID}", $value['subject'], 'Verify activity subject is correct.');
 
       if ($datasetID > 8) {
         $this->assertEquals($value['status_id'], 2, 'Verify all activities are scheduled.');
@@ -752,7 +752,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       }
 
       if ($datasetID === 12) {
-        $this->assertEquals($value['activity_type'], 'Bulk Email', 'Verify activity type is correct.');
+        $this->assertSame('Bulk Email', $value['activity_type'], 'Verify activity type is correct.');
         $this->assertSame('(2 recipients)', $value['recipients']);
         $targetContactID = key($value['target_contact_name']);
         // The 2 targets have ids 10 & 11. Since they are not sorted it could be either on some systems.

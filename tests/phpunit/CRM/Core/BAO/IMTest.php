@@ -42,7 +42,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
     $isEditIM = $this->assertDBNotNull('CRM_Core_DAO_IM', $imId, 'provider_id', 'id', 'Database check on updated IM provider_name record.');
     $this->assertEquals($isEditIM, 3, 'Verify IM provider_id value is 3.');
     $isEditIM = $this->assertDBNotNull('CRM_Core_DAO_IM', $imId, 'name', 'id', 'Database check on updated IM name record.');
-    $this->assertEquals($isEditIM, 'doe.jane', 'Verify IM provider_id value is doe.jane.');
+    $this->assertSame('doe.jane', $isEditIM, 'Verify IM provider_id value is doe.jane.');
 
     $this->contactDelete($contactId);
   }

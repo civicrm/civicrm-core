@@ -77,11 +77,11 @@ class api_v3_APITest extends CiviUnitTestCase {
     set_include_path($oldPath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
 
     $result = $this->callAPISuccess('contact', 'example_action1', []);
-    $this->assertEquals($result['values'][0], 'civicrm_api3_generic_example_action1 is ok');
+    $this->assertSame('civicrm_api3_generic_example_action1 is ok', $result['values'][0]);
     $result = $this->callAPISuccess('contact', 'example_action2', []);
-    $this->assertEquals($result['values'][0], 'civicrm_api3_contact_example_action2 is ok');
+    $this->assertSame('civicrm_api3_contact_example_action2 is ok', $result['values'][0]);
     $result = $this->callAPISuccess('test_entity', 'example_action3', []);
-    $this->assertEquals($result['values'][0], 'civicrm_api3_test_entity_example_action3 is ok');
+    $this->assertSame('civicrm_api3_test_entity_example_action3 is ok', $result['values'][0]);
 
     set_include_path($oldPath);
   }

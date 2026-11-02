@@ -72,7 +72,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
       'name' => 'IM',
     ]);
 
-    $this->assertEquals($french['label'], 'Messagerie instantanée');
+    $this->assertSame('Messagerie instantanée', $french['label']);
     $this->assertEquals($default['label'], $english_original['label']);
   }
 

@@ -161,7 +161,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
 
     $result = $this->callAPISuccess('note', 'create', $this->_params);
-    $this->assertEquals($result['values'][$result['id']]['note'], 'Hello!!! m testing Note');
+    $this->assertSame('Hello!!! m testing Note', $result['values'][$result['id']]['note']);
     $this->assertEquals(date('Y-m-d', strtotime($this->_createdDate)), date('Y-m-d', strtotime($result['values'][$result['id']]['created_date'])));
     $this->assertEquals(date('Y-m-d', strtotime($this->_createdDate)), date('Y-m-d', strtotime($result['values'][$result['id']]['note_date'])));
     $this->assertEquals(date('Y-m-d', strtotime($this->_params['modified_date'])), date('Y-m-d', strtotime($result['values'][$result['id']]['modified_date'])));
@@ -188,8 +188,8 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Note', 'Create', $params);
     $this->assertAPISuccess($result);
-    $this->assertEquals($result['values'][0]['note'], "Hello!!! ' testing Note");
-    $this->assertEquals($result['values'][0]['subject'], "With a '");
+    $this->assertSame("Hello!!! ' testing Note", $result['values'][0]['note']);
+    $this->assertSame("With a '", $result['values'][0]['subject']);
     $this->assertArrayHasKey('id', $result);
   }
 
@@ -258,7 +258,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $note = $this->callAPISuccess('Note', 'Get', []);
     $this->assertEquals($note['id'], $this->_noteID);
     $this->assertEquals($note['values'][$this->_noteID]['entity_id'], $this->_contactID);
-    $this->assertEquals($note['values'][$this->_noteID]['entity_table'], 'civicrm_contact');
+    $this->assertSame('civicrm_contact', $note['values'][$this->_noteID]['entity_table']);
     $this->assertEquals($note['values'][$this->_noteID]['note_date'], $params['note_date']);
     $this->assertEquals(date('Y-m-d', strtotime($note['values'][$this->_noteID]['created_date'])), date('Y-m-d'));
     $this->assertSame('Hello World', $note['values'][$this->_noteID]['subject']);

@@ -91,10 +91,10 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
 
     $result = $this->callAPIFailure('relationship_type', 'delete', $params);
     if ($version == 3) {
-      $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
+      $this->assertSame('Mandatory key(s) missing from params array: id', $result['error_message']);
     }
     else {
-      $this->assertEquals($result['error_message'], 'Parameter "where" is required.');
+      $this->assertSame('Parameter "where" is required.', $result['error_message']);
     }
   }
 

@@ -50,7 +50,7 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
   public function testSuffixedFieldMeta():void {
     $suffixedFieldMeta = FormDataModel::getField('Individual', 'communication_style_id:name', 'create');
 
-    $this->assertEquals($suffixedFieldMeta['data_type'], 'String');
+    $this->assertSame('String', $suffixedFieldMeta['data_type']);
 
     // check there are options
     $options = $suffixedFieldMeta['options'];

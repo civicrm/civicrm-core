@@ -61,7 +61,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
       'name' => 'test status',
     ];
     $result = $this->callAPISuccess('membership_status', 'get', $params);
-    $this->assertEquals($result['values'][$this->_membershipStatusID]['name'], "test status", "In line " . __LINE__);
+    $this->assertSame("test status", $result['values'][$this->_membershipStatusID]['name'], "In line " . __LINE__);
   }
 
   /**

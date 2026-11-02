@@ -130,9 +130,9 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'Database check for created contact address.'
     );
 
-    $this->assertEquals($addAddress->street_address, 'E 906N Pine Pl W', 'In line' . __LINE__);
-    $this->assertEquals($addAddress->supplemental_address_1, 'Editorial Dept', 'In line' . __LINE__);
-    $this->assertEquals($addAddress->city, 'El Paso', 'In line' . __LINE__);
+    $this->assertSame('E 906N Pine Pl W', $addAddress->street_address, 'In line' . __LINE__);
+    $this->assertSame('Editorial Dept', $addAddress->supplemental_address_1, 'In line' . __LINE__);
+    $this->assertSame('El Paso', $addAddress->city, 'In line' . __LINE__);
     $this->assertEquals($addAddress->postal_code, '88575', 'In line' . __LINE__);
     $this->assertEquals($addAddress->geo_code_1, '31.694842', 'In line' . __LINE__);
     $this->assertEquals($addAddress->geo_code_2, '-106.29998', 'In line' . __LINE__);
@@ -368,7 +368,7 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
 
     $allAddress = CRM_Core_BAO_Address::allAddress($contact_Id);
 
-    $this->assertEquals($allAddress, NULL, 'Checking null for returned addresses.');
+    $this->assertNull($allAddress, 'Checking null for returned addresses.');
 
     $this->contactDelete($contactId);
   }
@@ -410,10 +410,10 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $address = CRM_Core_BAO_Address::getValues($entityBlock);
     $this->assertEquals($address[1]['id'], $addressId);
     $this->assertEquals($address[1]['contact_id'], $contactId);
-    $this->assertEquals($address[1]['state_province_abbreviation'], 'AL');
-    $this->assertEquals($address[1]['state_province'], 'Alabama');
-    $this->assertEquals($address[1]['country'], 'United States');
-    $this->assertEquals($address[1]['street_address'], 'Oberoi Garden');
+    $this->assertSame('AL', $address[1]['state_province_abbreviation']);
+    $this->assertSame('Alabama', $address[1]['state_province']);
+    $this->assertSame('United States', $address[1]['country']);
+    $this->assertSame('Oberoi Garden', $address[1]['street_address']);
     $this->contactDelete($contactId);
   }
 
@@ -480,34 +480,34 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     // valid Street address to be parsed ( without locale )
     $street_address = "54A Excelsior Ave. Apt 1C";
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address);
-    $this->assertEquals($parsedStreetAddress['street_name'], 'Excelsior Ave.');
-    $this->assertEquals($parsedStreetAddress['street_unit'], 'Apt 1C');
+    $this->assertSame('Excelsior Ave.', $parsedStreetAddress['street_name']);
+    $this->assertSame('Apt 1C', $parsedStreetAddress['street_unit']);
     $this->assertEquals($parsedStreetAddress['street_number'], '54');
-    $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'A');
+    $this->assertSame('A', $parsedStreetAddress['street_number_suffix']);
 
     // Out-of-range street number to be parsed.
     $street_address = '505050505050 Main St';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address);
-    $this->assertEquals($parsedStreetAddress['street_name'], '');
-    $this->assertEquals($parsedStreetAddress['street_unit'], '');
-    $this->assertEquals($parsedStreetAddress['street_number'], '');
-    $this->assertEquals($parsedStreetAddress['street_number_suffix'], '');
+    $this->assertSame('', $parsedStreetAddress['street_name']);
+    $this->assertSame('', $parsedStreetAddress['street_unit']);
+    $this->assertSame('', $parsedStreetAddress['street_number']);
+    $this->assertSame('', $parsedStreetAddress['street_number_suffix']);
 
     // valid Street address to be parsed ( $locale = 'en_US' )
     $street_address = "54A Excelsior Ave. Apt 1C";
     $locale = 'en_US';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
-    $this->assertEquals($parsedStreetAddress['street_name'], 'Excelsior Ave.');
-    $this->assertEquals($parsedStreetAddress['street_unit'], 'Apt 1C');
+    $this->assertSame('Excelsior Ave.', $parsedStreetAddress['street_name']);
+    $this->assertSame('Apt 1C', $parsedStreetAddress['street_unit']);
     $this->assertEquals($parsedStreetAddress['street_number'], '54');
-    $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'A');
+    $this->assertSame('A', $parsedStreetAddress['street_number_suffix']);
 
     // invalid Street address ( $locale = 'en_US' )
     $street_address = "West St. Apt 1";
     $locale = 'en_US';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
-    $this->assertEquals($parsedStreetAddress['street_name'], 'West St.');
-    $this->assertEquals($parsedStreetAddress['street_unit'], 'Apt 1');
+    $this->assertSame('West St.', $parsedStreetAddress['street_name']);
+    $this->assertSame('Apt 1', $parsedStreetAddress['street_unit']);
     $this->assertNotContains('street_number', $parsedStreetAddress);
     $this->assertNotContains('street_number_suffix', $parsedStreetAddress);
 
@@ -515,16 +515,16 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $street_address = "2-123CA Main St";
     $locale = 'fr_CA';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
-    $this->assertEquals($parsedStreetAddress['street_name'], 'Main St');
+    $this->assertSame('Main St', $parsedStreetAddress['street_name']);
     $this->assertEquals($parsedStreetAddress['street_unit'], '2');
     $this->assertEquals($parsedStreetAddress['street_number'], '123');
-    $this->assertEquals($parsedStreetAddress['street_number_suffix'], 'CA');
+    $this->assertSame('CA', $parsedStreetAddress['street_number_suffix']);
 
     // invalid Street address ( $locale = 'fr_CA' )
     $street_address = "123 Main St";
     $locale = 'fr_CA';
     $parsedStreetAddress = CRM_Core_BAO_Address::parseStreetAddress($street_address, $locale);
-    $this->assertEquals($parsedStreetAddress['street_name'], 'Main St');
+    $this->assertSame('Main St', $parsedStreetAddress['street_name']);
     $this->assertEquals($parsedStreetAddress['street_number'], '123');
     $this->assertNotContains('street_unit', $parsedStreetAddress);
     $this->assertNotContains('street_number_suffix', $parsedStreetAddress);

@@ -37,10 +37,10 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typecheck($type, $value);
       if ($type == 'Date') {
-        $this->assertEquals($valid, '2008-06-24', 'Checking type ' . $type . ' for returned CustomField Type.');
+        $this->assertSame('2008-06-24', $valid, 'Checking type ' . $type . ' for returned CustomField Type.');
       }
       else {
-        $this->assertEquals($valid, TRUE, 'Checking type ' . $type . ' for returned CustomField Type.');
+        $this->assertTrue($valid, 'Checking type ' . $type . ' for returned CustomField Type.');
       }
     }
   }
@@ -49,7 +49,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     $values = ['check1' => 'chk'];
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typecheck($type, $value);
-      $this->assertEquals($valid, NULL, 'Checking invalid type for returned CustomField Type.');
+      $this->assertNull($valid, 'Checking invalid type for returned CustomField Type.');
     }
   }
 
@@ -60,7 +60,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     ];
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typecheck($type, $value);
-      $this->assertEquals($valid, NULL, 'Checking type ' . $type . ' for returned CustomField Type.');
+      $this->assertNull($valid, 'Checking type ' . $type . ' for returned CustomField Type.');
     }
   }
 
@@ -157,7 +157,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
   public function testFixCustomFieldValueWithEmptyParams(): void {
     $params = [];
     $result = CRM_Core_BAO_CustomValue::fixCustomFieldValue($params);
-    $this->assertEquals($result, NULL, 'Checking the returned value of type Memo.');
+    $this->assertNull($result, 'Checking the returned value of type Memo.');
   }
 
 }

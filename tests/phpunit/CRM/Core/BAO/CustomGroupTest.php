@@ -540,7 +540,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customGroupId = $customGroup['id'];
     $isEmptyGroup = CRM_Core_BAO_CustomGroup::isGroupEmpty($customGroupId);
 
-    $this->assertEquals($isEmptyGroup, TRUE, 'Check that custom Group is Empty.');
+    $this->assertTrue($isEmptyGroup, 'Check that custom Group is Empty.');
     $this->customGroupDelete($customGroup['id']);
   }
 
@@ -673,7 +673,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $_GET[$fieldName] = '2017-06-13';
     $extractedGetParams = CRM_Core_BAO_CustomGroup::extractGetParams($form, 'Individual');
 
-    $this->assertEquals($extractedGetParams[$fieldName], '2017-06-13');
+    $this->assertSame('2017-06-13', $extractedGetParams[$fieldName]);
   }
 
   /**

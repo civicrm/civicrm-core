@@ -54,9 +54,9 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     $group = $group["values"];
     $this->assertNotNull(count($group));
-    $this->assertEquals($group[$this->_groupID]['name'], "Test Group 1");
+    $this->assertSame("Test Group 1", $group[$this->_groupID]['name']);
     $this->assertEquals($group[$this->_groupID]['is_active'], 1);
-    $this->assertEquals($group[$this->_groupID]['visibility'], 'Public Pages');
+    $this->assertSame('Public Pages', $group[$this->_groupID]['visibility']);
   }
 
   /**
@@ -86,11 +86,11 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $group = $this->callAPISuccess('group', 'get', $params);
 
     foreach ($group['values'] as $v) {
-      $this->assertEquals($v['name'], "Test Group 1");
-      $this->assertEquals($v['title'], 'New Test Group Created');
-      $this->assertEquals($v['description'], 'New Test Group Created');
+      $this->assertSame("Test Group 1", $v['name']);
+      $this->assertSame('New Test Group Created', $v['title']);
+      $this->assertSame('New Test Group Created', $v['description']);
       $this->assertEquals($v['is_active'], 1);
-      $this->assertEquals($v['visibility'], 'Public Pages');
+      $this->assertSame('Public Pages', $v['visibility']);
     }
   }
 
@@ -109,10 +109,10 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     foreach ($group as $v) {
       $this->assertEquals($v['id'], $this->_groupID);
-      $this->assertEquals($v['title'], 'New Test Group Created');
-      $this->assertEquals($v['description'], 'New Test Group Created');
+      $this->assertSame('New Test Group Created', $v['title']);
+      $this->assertSame('New Test Group Created', $v['description']);
       $this->assertEquals($v['is_active'], 1);
-      $this->assertEquals($v['visibility'], 'Public Pages');
+      $this->assertSame('Public Pages', $v['visibility']);
     }
   }
 
@@ -127,8 +127,8 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $params['id'] = $this->_groupID;
     $params['return.name'] = 1;
     $group = $this->callAPISuccess('group', 'get', $params);
-    $this->assertEquals($group['values'][$this->_groupID]['name'],
-      "Test Group 1"
+    $this->assertSame("Test Group 1",
+      $group['values'][$this->_groupID]['name']
     );
   }
 
@@ -145,10 +145,10 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     foreach ($group['values'] as $v) {
       $this->assertEquals($v['id'], $this->_groupID);
-      $this->assertEquals($v['name'], "Test Group 1");
-      $this->assertEquals($v['description'], 'New Test Group Created');
+      $this->assertSame("Test Group 1", $v['name']);
+      $this->assertSame('New Test Group Created', $v['description']);
       $this->assertEquals($v['is_active'], 1);
-      $this->assertEquals($v['visibility'], 'Public Pages');
+      $this->assertSame('Public Pages', $v['visibility']);
     }
   }
 
@@ -170,9 +170,9 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('Group', 'create', $params);
     $group = $result['values'][$result['id']];
-    $this->assertEquals($group['name'], "Test Group type");
+    $this->assertSame("Test Group type", $group['name']);
     $this->assertEquals($group['is_active'], 1);
-    $this->assertEquals($group['parents'], "");
+    $this->assertSame("", $group['parents']);
     $this->assertEquals($group['group_type'], $params['group_type']);
 
     //Pass group_type param in checkbox format.
@@ -183,7 +183,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     ]);
     $result = $this->callAPISuccess('Group', 'create', $params);
     $group = $result['values'][$result['id']];
-    $this->assertEquals($group['name'], "Test Checkbox Format");
+    $this->assertSame("Test Checkbox Format", $group['name']);
     $this->assertEquals($group['group_type'], array_keys($params['group_type']));
 
     //assert single value for group_type and parent

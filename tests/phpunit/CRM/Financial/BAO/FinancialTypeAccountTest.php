@@ -106,7 +106,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     }
     catch (Exception $e) {
       $this->assertTrue(TRUE, 'Received expected exception');
-      $this->assertEquals($e->getMessage(), "This financial account cannot have 'Credit/Contra Revenue Account is' relationship.");
+      $this->assertSame("This financial account cannot have 'Credit/Contra Revenue Account is' relationship.", $e->getMessage());
     }
   }
 

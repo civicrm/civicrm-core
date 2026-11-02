@@ -1013,7 +1013,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->getFinancialTypeID('Donation'));
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
-    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
+    $this->assertSame('SSF', $contribution['values'][$contribution['id']]['source']);
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1);
 
     $lineItems = $this->callAPISuccess('line_item', 'get', [
@@ -1690,9 +1690,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     //check against values in CiviUnitTestCase::createContribution()
     $this->assertEquals($old_contact_id, $this->individualID);
     $this->assertEquals($old_fee_amount, 5.00);
-    $this->assertEquals($old_source, 'SSF');
+    $this->assertSame('SSF', $old_source);
     $this->assertEquals($old_trxn_id, 212355);
-    $this->assertEquals($old_invoice_id, 'old_invoice');
+    $this->assertSame('old_invoice', $old_invoice_id);
     $params = [
       'id' => $contributionID,
       'contact_id' => $this->individualID,

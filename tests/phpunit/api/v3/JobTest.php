@@ -2563,11 +2563,11 @@ ENDSQLUPDATE;
 
     $settings->set('core_maintenance_mode', TRUE);
     $result = $this->callApiV3Success('Job', 'execute');
-    $this->assertEquals($result['skipped'] ?? NULL, 'maintenance_mode');
+    $this->assertSame('maintenance_mode', $result['skipped'] ?? NULL);
 
     $settings->set('core_maintenance_mode', FALSE);
     $result = $this->callApiV3Success('Job', 'execute');
-    $this->assertEquals($result['skipped'] ?? FALSE, FALSE);
+    $this->assertFalse($result['skipped'] ?? FALSE);
 
     // revert
     $settings->set('core_maintenance_mode', $startMode);

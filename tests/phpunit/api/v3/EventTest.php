@@ -105,7 +105,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'id' => $this->_events[1]['id'],
     ];
     $result = $this->callAPISuccess('event', 'get', $params);
-    $this->assertEquals($result['values'][$this->_eventIds[1]]['event_title'], 'Annual CiviCRM meet 2');
+    $this->assertSame('Annual CiviCRM meet 2', $result['values'][$this->_eventIds[1]]['event_title']);
   }
 
   /**
@@ -790,7 +790,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('event', 'get', $params);
 
     $this->assertEquals($result['values'][$this->_eventIds[0]]['id'], $this->_eventIds[0]);
-    $this->assertEquals($result['values'][$this->_eventIds[0]]['title'], 'Annual CiviCRM meet');
+    $this->assertSame('Annual CiviCRM meet', $result['values'][$this->_eventIds[0]]['title']);
   }
 
   /**

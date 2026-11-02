@@ -48,7 +48,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
       'Database check on updated financial type record.'
     );
 
-    $this->assertEquals($result, 'Donations', 'Verify financial type name.');
+    $this->assertSame('Donations', $result, 'Verify financial type name.');
   }
 
   /**
@@ -65,7 +65,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
 
     $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
 
-    $this->assertEquals($result->name, 'Donations', 'Verify financial account name.');
+    $this->assertSame('Donations', $result->name, 'Verify financial account name.');
   }
 
   /**

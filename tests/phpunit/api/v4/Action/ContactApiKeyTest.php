@@ -277,7 +277,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
       ->first();
 
     // Assert key was updated
-    $this->assertEquals($result['api_key'], "IGotThePower!");
+    $this->assertSame("IGotThePower!", $result['api_key']);
   }
 
   public function testUpdateOwnApiKey(): void {

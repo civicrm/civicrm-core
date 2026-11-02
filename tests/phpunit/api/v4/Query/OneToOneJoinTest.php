@@ -54,8 +54,8 @@ class OneToOneJoinTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->indexBy('last_name');
 
-    $this->assertEquals($contacts['One']['preferred_language:label'], 'Armenian');
-    $this->assertEquals($contacts['Two']['preferred_language:label'], 'Basque');
+    $this->assertSame('Armenian', $contacts['One']['preferred_language:label']);
+    $this->assertSame('Basque', $contacts['Two']['preferred_language:label']);
   }
 
 }

@@ -460,7 +460,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     ]);
     $activity = array_shift($result['values']);
 
-    $this->assertEquals($activity['subject'], 'Case status changed from Ongoing to Resolved');
+    $this->assertSame('Case status changed from Ongoing to Resolved', $activity['subject']);
     $this->assertEquals($activity['activity_date_time'], $now_date);
     $this->assertEquals($activity['status_id'], $completed_status);
 

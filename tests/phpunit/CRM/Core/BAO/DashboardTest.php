@@ -43,7 +43,7 @@ class CRM_Core_BAO_DashboardTest extends CiviUnitTestCase {
   public function testDashletModuleRequirements(): void {
     $crmDashboard = \Civi::service('angular')->getModules()['crmDashboard'];
 
-    $this->assertEquals(in_array($this->dashletModule, $crmDashboard['requires']), TRUE);
+    $this->assertTrue(in_array($this->dashletModule, $crmDashboard['requires']));
   }
 
 }

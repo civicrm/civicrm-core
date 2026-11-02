@@ -888,8 +888,8 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
     // Target groups+mailings are special.
     $cloneGroups = $this->callAPISuccess('MailingGroup', 'get', ['mailing_id' => $cloneId, 'sequential' => 1]);
     $this->assertEquals(1, $cloneGroups['count']);
-    $this->assertEquals($cloneGroups['values'][0]['group_type'], 'Include');
-    $this->assertEquals($cloneGroups['values'][0]['entity_table'], 'civicrm_group');
+    $this->assertSame('Include', $cloneGroups['values'][0]['group_type']);
+    $this->assertSame('civicrm_group', $cloneGroups['values'][0]['entity_table']);
     $this->assertEquals($cloneGroups['values'][0]['entity_id'], $groupIDs['inc']);
   }
 

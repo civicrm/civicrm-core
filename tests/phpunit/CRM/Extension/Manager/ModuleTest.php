@@ -251,11 +251,11 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $activeModules = CRM_Core_PseudoConstant::getModuleExtensions(TRUE);
     foreach ($activeModules as $activeModule) {
       if ($activeModule['prefix'] == $prefix) {
-        $this->assertEquals($expectedIsActive, TRUE);
+        $this->assertTrue($expectedIsActive);
         return;
       }
     }
-    $this->assertEquals($expectedIsActive, FALSE);
+    $this->assertFalse($expectedIsActive);
   }
 
   /**
@@ -269,7 +269,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
         return;
       }
     }
-    $this->assertEquals($expectedIsActive, FALSE);
+    $this->assertFalse($expectedIsActive);
   }
 
   /**
