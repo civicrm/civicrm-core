@@ -1,0 +1,137 @@
+--- a/DB/mysqli.php
++++ b/DB/mysqli.php
+@@ -163,6 +163,28 @@
+     var $_db = '';
+ 
+     /**
++     * The database last selected on each link, keyed by link (clones share it)
++     *
++     * A WeakMap on PHP 8+; false without WeakMap, which selects every time.
++     * Only statements sent through the driver are seen, so a caller that changes
++     * the database on $connection directly must not rely on this cache.
++     *
++     * @var WeakMap|false|null
++     * @access private
++     */
++    static $_selected_dbs = null;
++
++    /**
++     * Statements that cannot change the connection's database
++     *
++     * Any other statement, one led by a comment included, makes the next one
++     * select the database again. The list is kept to statements that embed no
++     * other statement on MySQL or MariaDB: SET, CREATE, ALTER, BEGIN and
++     * EXPLAIN each have a form that can change or drop the database.
++     */
++    const DB_NEUTRAL_STATEMENT = '/^\s*+(?:(?:SELECT|INSERT|UPDATE|DELETE|REPLACE|SHOW|WITH|COMMIT|ROLLBACK|SAVEPOINT|RELEASE|LOCK|UNLOCK|TRUNCATE)\b|START\s+TRANSACTION\b|DROP\s+(?:TEMPORARY\s+)?TABLE\b)/i';
++
++    /**
+      * Array for converting MYSQLI_*_FLAG constants to text values
+      * @var    array
+      * @access public
+@@ -420,10 +442,8 @@
+         $ismanip = $this->_checkManip($query);
+         $this->last_query = $query;
+         $query = $this->modifyQuery($query);
+-        if ($this->_db) {
+-            if (!@mysqli_select_db($this->connection, $this->_db)) {
+-                return $this->mysqliRaiseError(DB_ERROR_NODBSELECTED);
+-            }
++        if (!$this->_selectDb()) {
++            return $this->mysqliRaiseError(DB_ERROR_NODBSELECTED);
+         }
+         if (!$this->autocommit && $ismanip) {
+             if ($this->transaction_opcount == 0) {
+@@ -435,6 +455,13 @@
+             }
+             $this->transaction_opcount++;
+         }
++        // Forget before running, in case the statement throws.
++        $dbs = self::$_selected_dbs;
++        if ($dbs && is_object($this->connection)
++            && !preg_match(self::DB_NEUTRAL_STATEMENT, $query)
++        ) {
++            unset($dbs[$this->connection]);
++        }
+         $result = @mysqli_query($this->connection, $query);
+         if (!$result) {
+             return $this->mysqliRaiseError();
+@@ -446,6 +473,39 @@
+     }
+ 
+     // }}}
++    // {{{ _selectDb()
++
++    /**
++     * Selects the DSN's database unless the link already has it selected
++     *
++     * @return bool  false if the database could not be selected
++     * @access private
++     */
++    function _selectDb()
++    {
++        if (!$this->_db) {
++            return true;
++        }
++        if (self::$_selected_dbs === null) {
++            self::$_selected_dbs = class_exists('WeakMap', false)
++                ? new WeakMap() : false;
++        }
++        $dbs = self::$_selected_dbs;
++        $link = $this->connection;
++        $track = $dbs && is_object($link);
++        if ($track && isset($dbs[$link]) && $dbs[$link] === $this->_db) {
++            return true;
++        }
++        if (!@mysqli_select_db($link, $this->_db)) {
++            return false;
++        }
++        if ($track) {
++            $dbs[$link] = $this->_db;
++        }
++        return true;
++    }
++
++    // }}}
+     // {{{ nextResult()
+ 
+     /**
+@@ -622,10 +682,8 @@
+     function commit()
+     {
+         if ($this->transaction_opcount > 0) {
+-            if ($this->_db) {
+-                if (!@mysqli_select_db($this->connection, $this->_db)) {
+-                    return $this->mysqliRaiseError(DB_ERROR_NODBSELECTED);
+-                }
++            if (!$this->_selectDb()) {
++                return $this->mysqliRaiseError(DB_ERROR_NODBSELECTED);
+             }
+             $result = @mysqli_query($this->connection, 'COMMIT');
+             $result = @mysqli_query($this->connection, 'SET AUTOCOMMIT=1');
+@@ -648,10 +706,8 @@
+     function rollback()
+     {
+         if ($this->transaction_opcount > 0) {
+-            if ($this->_db) {
+-                if (!@mysqli_select_db($this->connection, $this->_db)) {
+-                    return $this->mysqliRaiseError(DB_ERROR_NODBSELECTED);
+-                }
++            if (!$this->_selectDb()) {
++                return $this->mysqliRaiseError(DB_ERROR_NODBSELECTED);
+             }
+             $result = @mysqli_query($this->connection, 'ROLLBACK');
+             $result = @mysqli_query($this->connection, 'SET AUTOCOMMIT=1');
+@@ -1028,10 +1084,8 @@
+     {
+         if (is_string($result)) {
+             // Fix for bug #11580.
+-            if ($this->_db) {
+-                if (!@mysqli_select_db($this->connection, $this->_db)) {
+-                    return $this->mysqliRaiseError(DB_ERROR_NODBSELECTED);
+-                }
++            if (!$this->_selectDb()) {
++                return $this->mysqliRaiseError(DB_ERROR_NODBSELECTED);
+             }
+ 
+             /*
