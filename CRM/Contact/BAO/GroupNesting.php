@@ -198,7 +198,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
     }
     while ($dao->fetch()) {
       // make sure we're not following any cyclical references
-      if (!array_key_exists($dao->parent_group_id, $childGroupIds) && $dao->child_group_id != $groupIds[0]) {
+      if (!array_key_exists($dao->parent_group_id, $childGroupIds) && !in_array($dao->child_group_id, $groupIds)) {
         $tmpGroupIds[] = $dao->child_group_id;
       }
     }
