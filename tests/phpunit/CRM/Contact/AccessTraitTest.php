@@ -174,7 +174,7 @@ class CRM_Contact_AccessTraitTest extends CiviUnitTestCase implements HeadlessIn
       1 => [$row2Id, 'Integer'],
     ]);
 
-    $this->assertEquals('Original 2', $savedVal2);
+    $this->assertSame('Original 2', $savedVal2);
   }
 
 }

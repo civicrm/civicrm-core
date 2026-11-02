@@ -118,7 +118,7 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
 
     // No ajax set in the route, should succeed.
     $result = CRM_Core_Invoke::_invoke(['civicrm', 'test-ajax-route']);
-    $this->assertEquals('ajax_success', $result);
+    $this->assertSame('ajax_success', $result);
 
     // Now set is_ajax on route
     $route['is_ajax'] = 1;
@@ -130,7 +130,7 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
     // Ajax set in the route, correct header sent, should succeed.
     $result = CRM_Core_Invoke::_invoke(['civicrm', 'test-ajax-route']);
-    $this->assertEquals('ajax_success', $result);
+    $this->assertSame('ajax_success', $result);
 
     unset($_SERVER['HTTP_X_REQUESTED_WITH']);
 

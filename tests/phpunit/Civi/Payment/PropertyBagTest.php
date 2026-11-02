@@ -152,7 +152,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
    */
   public function testSetBillingEmailLegacy(): void {
     $localPropertyBag = PropertyBag::cast(['email-' . $this->getLocationTypeID('Billing') => 'a@b.com']);
-    $this->assertEquals('a@b.com', $localPropertyBag->getEmail());
+    $this->assertSame('a@b.com', $localPropertyBag->getEmail());
   }
 
   /**
@@ -188,8 +188,8 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     // The proper way.
     $propertyBag = new PropertyBag();
     $propertyBag->setCustomProperty('customThingForMyProcessor', 'fidget');
-    $this->assertEquals('fidget', $propertyBag->getCustomProperty('customThingForMyProcessor'));
-    $this->assertEquals('', $propertyBag->lastWarning);
+    $this->assertSame('fidget', $propertyBag->getCustomProperty('customThingForMyProcessor'));
+    $this->assertSame('', $propertyBag->lastWarning);
 
     // Test we can do this with array, although we should get a warning.
     $propertyBag = new PropertyBag();
@@ -207,7 +207,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     error_reporting($ignoreUserDeprecatedErrors);
     $propertyBag['customThingForMyProcessor'] = 'fidget';
     error_reporting($oldLevel);
-    $this->assertEquals('fidget', $propertyBag->getCustomProperty('customThingForMyProcessor'));
+    $this->assertSame('fidget', $propertyBag->getCustomProperty('customThingForMyProcessor'));
 
     // Getting by array access should also cause deprecation error.
     try {
@@ -219,7 +219,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // But again, it should work.
     error_reporting($ignoreUserDeprecatedErrors);
-    $this->assertEquals('fidget', $propertyBag['customThingForMyProcessor']);
+    $this->assertSame('fidget', $propertyBag['customThingForMyProcessor']);
     error_reporting($oldLevel);
 
   }
@@ -332,7 +332,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   public function testSetDescriptionKeepsText(): void {
     $propertyBag = new PropertyBag();
     $propertyBag->setDescription('Online Contribution: Annual appeal');
-    $this->assertEquals('Online Contribution: Annual appeal', $propertyBag->getDescription());
+    $this->assertSame('Online Contribution: Annual appeal', $propertyBag->getDescription());
   }
 
   /**
@@ -348,7 +348,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       $propertyBag->require(['contactID', 'description', 'contributionID', 'somethingthatdoesntexist']);
     }
     catch (\InvalidArgumentException $e) {
-      $this->assertEquals('Required properties missing: contributionID, somethingthatdoesntexist', $e->getMessage());
+      $this->assertSame('Required properties missing: contributionID, somethingthatdoesntexist', $e->getMessage());
     }
   }
 
@@ -481,7 +481,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       $this->assertCount(1, $propertyBag->logs);
       $latestLog = end($propertyBag->logs);
       $this->assertMatchesRegularExpression("/setBillingCountry input warnings.*Expected string.*munged to: \"\"/s", $latestLog);
-      $this->assertEquals('', $propertyBag->getBillingCountry());
+      $this->assertSame('', $propertyBag->getBillingCountry());
     }
 
     // '' special case
@@ -491,7 +491,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
     $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\n.*munged to: ""/', $latestLog);
-    $this->assertEquals('', $propertyBag->getBillingCountry());
+    $this->assertSame('', $propertyBag->getBillingCountry());
 
     // Invalid country name
     $propertyBag = new PropertyBag();
@@ -500,7 +500,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
     $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\nGiven input did not match a country name\.\n.*munged to: ""/', $latestLog);
-    $this->assertEquals('', $propertyBag->getBillingCountry());
+    $this->assertSame('', $propertyBag->getBillingCountry());
 
     // Valid country name
     $propertyBag = new PropertyBag();
@@ -509,7 +509,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
     $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nNot ISO 3166-1.+\nGiven input matched a country name.*?\n.*munged to: "GB"/', $latestLog);
-    $this->assertEquals('GB', $propertyBag->getBillingCountry());
+    $this->assertSame('GB', $propertyBag->getBillingCountry());
 
     // Invalid country ID
     $propertyBag = new PropertyBag();
@@ -518,7 +518,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
     $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nExpected string\nGiven input looked like it could be a country ID but did not.*?\n.*munged to: ""/', $latestLog);
-    $this->assertEquals('', $propertyBag->getBillingCountry());
+    $this->assertSame('', $propertyBag->getBillingCountry());
 
     // Valid country ID
     $propertyBag = new PropertyBag();
@@ -527,7 +527,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $this->assertCount(1, $propertyBag->logs);
     $latestLog = end($propertyBag->logs);
     $this->assertMatchesRegularExpression('/setBillingCountry input warnings.+\nExpected string\nGiven input matched a country ID.*?\n.*munged to: "NZ"/', $latestLog);
-    $this->assertEquals('NZ', $propertyBag->getBillingCountry());
+    $this->assertSame('NZ', $propertyBag->getBillingCountry());
   }
 
   /**
@@ -563,7 +563,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       $result = $propertyBag->getter('contribution_recur_id');
     }
     catch (\InvalidArgumentException $e) {
-      $this->assertEquals("Attempted to get 'contribution_recur_id' via getCustomProperty - must use using its getter.", $e->getMessage());
+      $this->assertSame("Attempted to get 'contribution_recur_id' via getCustomProperty - must use using its getter.", $e->getMessage());
     }
 
     // Nb. up to 5.26, the custom property getter did not throw an exception if the property is unset, it just returned NULL.
@@ -582,7 +582,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       $this->fail("Expected to get an exception when trying to use setter for a non-standard property.");
     }
     catch (\BadMethodCallException $e) {
-      $this->assertEquals("Cannot use generic setter with non-standard properties; you must use setCustomProperty for custom properties.", $e->getMessage());
+      $this->assertSame("Cannot use generic setter with non-standard properties; you must use setCustomProperty for custom properties.", $e->getMessage());
     }
 
     // Test labels.

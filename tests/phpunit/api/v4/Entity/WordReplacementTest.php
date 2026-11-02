@@ -36,7 +36,7 @@ class WordReplacementTest extends Api4TestBase implements TransactionalInterface
 
     $result = $this->getTestRecord('WordReplacement', $create['id']);
     $this->assertTrue($result['is_active']);
-    $this->assertEquals('wildcardMatch', $result['match_type']);
+    $this->assertSame('wildcardMatch', $result['match_type']);
     $this->assertEquals(\CRM_Core_Config::domainID(), $result['domain_id']);
     $this->assertEquals(\CRM_Core_I18n::getLocale(), $result['language']);
   }
@@ -63,8 +63,8 @@ class WordReplacementTest extends Api4TestBase implements TransactionalInterface
     $enCustomStrings = \CRM_Core_BAO_WordReplacement::getLocaleCustomStrings('en_US');
     $frCustomStrings = \CRM_Core_BAO_WordReplacement::getLocaleCustomStrings('fr_CA');
 
-    $this->assertEquals('Donation', $enCustomStrings['enabled']['wildcardMatch']['Contribution']);
-    $this->assertEquals('Don', $frCustomStrings['enabled']['wildcardMatch']['Contribution']);
+    $this->assertSame('Donation', $enCustomStrings['enabled']['wildcardMatch']['Contribution']);
+    $this->assertSame('Don', $frCustomStrings['enabled']['wildcardMatch']['Contribution']);
 
     // Test APIv4 replace scoped to en_US: should not delete the fr_CA record
     \Civi\Api4\WordReplacement::replace(FALSE)
@@ -92,9 +92,9 @@ class WordReplacementTest extends Api4TestBase implements TransactionalInterface
     $enCustomStrings = \CRM_Core_BAO_WordReplacement::getLocaleCustomStrings('en_US');
     $frCustomStrings = \CRM_Core_BAO_WordReplacement::getLocaleCustomStrings('fr_CA');
 
-    $this->assertEquals('Gift', $enCustomStrings['enabled']['wildcardMatch']['Contribution']);
-    $this->assertEquals('Subscription', $enCustomStrings['enabled']['exactMatch']['Membership']);
-    $this->assertEquals('Don', $frCustomStrings['enabled']['wildcardMatch']['Contribution']);
+    $this->assertSame('Gift', $enCustomStrings['enabled']['wildcardMatch']['Contribution']);
+    $this->assertSame('Subscription', $enCustomStrings['enabled']['exactMatch']['Membership']);
+    $this->assertSame('Don', $frCustomStrings['enabled']['wildcardMatch']['Contribution']);
   }
 
   public function testHtmlWordReplacement(): void {
@@ -118,7 +118,7 @@ class WordReplacementTest extends Api4TestBase implements TransactionalInterface
 
     $enStrings = \CRM_Core_BAO_WordReplacement::getLocaleCustomStrings('en_US');
     $this->assertArrayHasKey('<strong>Important</strong>', $enStrings['enabled']['wildcardMatch']);
-    $this->assertEquals('<em>Crucial</em>', $enStrings['enabled']['wildcardMatch']['<strong>Important</strong>']);
+    $this->assertSame('<em>Crucial</em>', $enStrings['enabled']['wildcardMatch']['<strong>Important</strong>']);
   }
 
 }

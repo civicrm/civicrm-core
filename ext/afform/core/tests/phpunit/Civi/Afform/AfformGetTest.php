@@ -124,7 +124,7 @@ HTML;
 
     $this->assertEquals($this->formName, $result[0]['id']);
     $this->assertEquals($title, $result[0]['label']);
-    $this->assertEquals('fa-list-alt', $result[0]['icon']);
+    $this->assertSame('fa-list-alt', $result[0]['icon']);
   }
 
   public function testGetSearchDisplays() {
@@ -174,13 +174,13 @@ AFFORM;
       ->execute()->single()['layout'][0]['#children'];
 
     // Legacy contact_type should have been converted to entity type
-    $this->assertEquals('Organization', $entity[0]['type']);
+    $this->assertSame('Organization', $entity[0]['type']);
     $this->assertCount(1, $entity[0]['data']);
     $this->assertEquals(1, $entity[0]['data']['num']);
-    $this->assertEquals('Household', $entity[1]['type']);
+    $this->assertSame('Household', $entity[1]['type']);
     $this->assertCount(1, $entity[1]['data']);
     $this->assertEquals(2, $entity[1]['data']['thing']);
-    $this->assertEquals('Individual', $entity[2]['type']);
+    $this->assertSame('Individual', $entity[2]['type']);
     $this->assertCount(0, $entity[2]['data']);
   }
 

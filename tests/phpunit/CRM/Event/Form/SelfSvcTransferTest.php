@@ -163,7 +163,7 @@ class CRM_Event_Form_SelfSvcTransferTest extends CiviUnitTestCase {
       'cs' => CRM_Contact_BAO_Contact_Utils::generateChecksum($this->ids['Contact']['individual_0']),
       'is_backoffice' => 0,
     ])->processForm();
-    $this->assertEquals('Registration Transferred', CRM_Core_Session::singleton()->getStatus()[1]['title']);
+    $this->assertSame('Registration Transferred', CRM_Core_Session::singleton()->getStatus()[1]['title']);
   }
 
 }

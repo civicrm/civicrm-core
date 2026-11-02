@@ -86,8 +86,8 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
 
     // Original contact hasn't changed
     $get = \Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $contact['id'])->execute()->single();
-    $this->assertEquals('FirstBegin', $get['first_name']);
-    $this->assertEquals('LastBegin', $get['last_name']);
+    $this->assertSame('FirstBegin', $get['first_name']);
+    $this->assertSame('LastBegin', $get['last_name']);
 
     // Instead of updating original, a new contact was created.
     $this->assertEquals(1, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact WHERE first_name=%1', [1 => ["Firsty{$r}", 'String']]));
@@ -155,9 +155,9 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $response = $this->callApi4AuthTokenSuccess($auth, 'Afform', 'prefill', [
       'name' => $this->getFormName(),
     ]);
-    $this->assertEquals('me', $response['values'][0]['name']);
+    $this->assertSame('me', $response['values'][0]['name']);
     $this->assertEquals($lebowski, $response['values'][0]['values'][0]['fields']['id'], 'Afform.prefill should return id');
-    $this->assertEquals('Lebowski', $response['values'][0]['values'][0]['fields']['last_name'], 'Afform.prefill should return last_name');
+    $this->assertSame('Lebowski', $response['values'][0]['values'][0]['fields']['last_name'], 'Afform.prefill should return last_name');
 
     // But the token cannot be used for Afform calls with sneaky params...
     $body = $this->callApi4AuthTokenFailure($auth, 'Afform', 'prefill', [

@@ -49,10 +49,10 @@ class PCPTest extends Api4TestBase {
       ->execute()->indexBy('title');
 
     $this->assertCount(4, $results);
-    $this->assertEquals('Ghi', $results['A']['contribution_page.title']);
-    $this->assertEquals('Jkl', $results['B']['contribution_page.title']);
-    $this->assertEquals('Abc', $results['C']['event.title']);
-    $this->assertEquals('Def', $results['D']['event.title']);
+    $this->assertSame('Ghi', $results['A']['contribution_page.title']);
+    $this->assertSame('Jkl', $results['B']['contribution_page.title']);
+    $this->assertSame('Abc', $results['C']['event.title']);
+    $this->assertSame('Def', $results['D']['event.title']);
     $this->assertNull($results['C']['contribution_page.title']);
     $this->assertNull($results['D']['contribution_page.title']);
     $this->assertNull($results['A']['event.title']);

@@ -76,7 +76,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $getParams = ['id' => $result['id'], 'return.custom_' . $ids['custom_field_id'] => 1];
     $check = $this->callAPISuccess($this->_entity, 'get', $getParams);
     $this->callAPISuccess('pledge', 'delete', ['id' => $check['id']]);
-    $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
+    $this->assertSame("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
@@ -105,9 +105,9 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($this->_pledge['id'], $pledge['pledge_id']);
     $this->assertEquals(date('Y-m-d') . ' 00:00:00', $pledge['pledge_create_date']);
     $this->assertEquals(100.00, $pledge['pledge_amount']);
-    $this->assertEquals('Pending Label**', $pledge['pledge_status']);
+    $this->assertSame('Pending Label**', $pledge['pledge_status']);
     $this->assertEquals(5, $pledge['pledge_frequency_interval']);
-    $this->assertEquals('year', $pledge['pledge_frequency_unit']);
+    $this->assertSame('year', $pledge['pledge_frequency_unit']);
     $this->assertEquals(date('Y-m-d', strtotime($this->scheduled_date)) . ' 00:00:00', $pledge['pledge_next_pay_date']);
     $this->assertEquals($pledge['pledge_next_pay_amount'], 20.00);
 
@@ -130,7 +130,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('pledge', 'get', $params);
     $pledge = $result['values'][$this->_pledge['id']];
     $this->callAPISuccess('pledge', 'delete', $pledge);
-    $this->assertEquals('Donation', $pledge['pledge_financial_type']);
+    $this->assertSame('Donation', $pledge['pledge_financial_type']);
   }
 
   /**
@@ -148,7 +148,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('pledge', 'get', $params);
     $pledge = $result['values'][$this->_pledge['id']];
     $this->callAPISuccess('pledge', 'delete', $pledge);
-    $this->assertEquals('Donation', $pledge['pledge_financial_type']);
+    $this->assertSame('Donation', $pledge['pledge_financial_type']);
   }
 
   /**
@@ -286,7 +286,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'sequential' => 1,
     ]);
     $this->assertEquals($payments['count'], 5);
-    $this->assertEquals('2011-07-06 00:00:00', $payments['values'][4]['scheduled_date']);
+    $this->assertSame('2011-07-06 00:00:00', $payments['values'][4]['scheduled_date']);
 
     $this->callAPISuccess('pledge', 'delete', ['pledge_id' => $pledge['id']]);
   }
@@ -348,7 +348,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $pledgeDetails = $this->callAPISuccess('Pledge', 'Get', ['id' => $result['id'], 'sequential' => 1]);
     $pledge = $pledgeDetails['values'][0];
     $this->assertEquals(100.00, $pledge['pledge_amount']);
-    $this->assertEquals('year', $pledge['pledge_frequency_unit']);
+    $this->assertSame('year', $pledge['pledge_frequency_unit']);
     $this->assertEquals(5, $pledge['pledge_frequency_interval']);
     $this->assertEquals(20, $pledge['pledge_next_pay_amount']);
 

@@ -120,14 +120,14 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       ->addWhere('contact_id', '=', $this->_contactID)
       ->addSelect('contribution_status_id:name')
       ->execute()->first();
-    $this->assertEquals('In Progress', $recur['contribution_status_id:name']);
+    $this->assertSame('In Progress', $recur['contribution_status_id:name']);
     $mut->checkMailLog(['https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_subscr-find'], ['civicrm/contribute/unsubscribe', 'civicrm/contribute/updatebilling']);
     $mut->stop();
     $contribution1 = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->_contributionID]);
     $this->assertEquals(1, $contribution1['contribution_status_id']);
-    $this->assertEquals('8XA571746W2698126', $contribution1['trxn_id']);
+    $this->assertSame('8XA571746W2698126', $contribution1['trxn_id']);
     // source gets set by processor
-    $this->assertEquals('Online Contribution:', substr($contribution1['contribution_source'], 0, 20));
+    $this->assertSame('Online Contribution:', substr($contribution1['contribution_source'], 0, 20));
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurSubsequentTransaction());
@@ -138,7 +138,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(2, $contributions['count']);
     $contribution2 = $contributions['values'][1];
-    $this->assertEquals('second_one', $contribution2['trxn_id']);
+    $this->assertSame('second_one', $contribution2['trxn_id']);
     $paramsThatShouldMatch = [
       'total_amount',
       'net_amount',
@@ -170,7 +170,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
     $membershipEndDate = $this->callAPISuccessGetValue('membership', ['return' => 'end_date']);
     $this->assertEquals(1, $contribution['contribution_status_id']);
-    $this->assertEquals('8XA571746W2698126', $contribution['trxn_id']);
+    $this->assertSame('8XA571746W2698126', $contribution['trxn_id']);
     // source gets set by processor
     $this->assertSame(substr($contribution['contribution_source'], 0, 20), 'Online Contribution:');
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
@@ -184,7 +184,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'sequential' => 1,
     ]);
     $this->assertEquals(2, $contribution['count']);
-    $this->assertEquals('second_one', $contribution['values'][1]['trxn_id']);
+    $this->assertSame('second_one', $contribution['values'][1]['trxn_id']);
     $this->callAPISuccessGetCount('line_item', [
       'entity_id' => $this->ids['membership'],
       'entity_table' => 'civicrm_membership',
@@ -303,7 +303,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->assertEquals($_REQUEST['txn_id'], $contribution['trxn_id']);
     $this->assertEquals($completedStatusID, $contribution['contribution_status_id']);
     $this->assertEquals('5.00', $contribution['fee_amount']);
-    $this->assertEquals('test12345', $contribution['custom_' . $this->ids['CustomField']['Contribution']]);
+    $this->assertSame('test12345', $contribution['custom_' . $this->ids['CustomField']['Contribution']]);
   }
 
   /**
@@ -367,13 +367,13 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       ->addWhere('contact_id', '=', $this->_contactID)
       ->addSelect('contribution_status_id:name')
       ->execute()->first();
-    $this->assertEquals('In Progress', $recur['contribution_status_id:name']);
+    $this->assertSame('In Progress', $recur['contribution_status_id:name']);
     $contribution1 = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->_contributionID]);
     $this->assertEquals(1, $contribution1['contribution_status_id']);
-    $this->assertEquals('8XA571746W2698126', $contribution1['trxn_id']);
+    $this->assertSame('8XA571746W2698126', $contribution1['trxn_id']);
     $this->assertEquals('0.63', $contribution1['fee_amount']);
     // source gets set by processor
-    $this->assertEquals('Online Contribution:', substr($contribution1['contribution_source'], 0, 20));
+    $this->assertSame('Online Contribution:', substr($contribution1['contribution_source'], 0, 20));
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
     $this->assertEquals(5, $contributionRecur['contribution_status_id']);
   }

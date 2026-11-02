@@ -53,8 +53,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
         'msg_html' => '<p>Hello testRenderTemplate {contact.display_name}!</p>',
       ],
     ]);
-    $this->assertEquals('Hello testRenderTemplate Abba Baa!', $rendered['subject']);
-    $this->assertEquals('Hello testRenderTemplate Abba Baa!', $rendered['text']);
+    $this->assertSame('Hello testRenderTemplate Abba Baa!', $rendered['subject']);
+    $this->assertSame('Hello testRenderTemplate Abba Baa!', $rendered['text']);
     $this->assertStringContainsString('<p>Hello testRenderTemplate Abba Baa!</p>', $rendered['html']);
   }
 
@@ -330,9 +330,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setLanguage('es_MX')
       ->setTranslationMode('fuzzy')
       ->execute()->first();
-    $this->assertEquals('subject - Mexican', $translatedTemplate['msg_subject']);
-    $this->assertEquals('html - Mexican', $translatedTemplate['msg_html']);
-    $this->assertEquals('es_MX', $translatedTemplate['actual_language']);
+    $this->assertSame('subject - Mexican', $translatedTemplate['msg_subject']);
+    $this->assertSame('html - Mexican', $translatedTemplate['msg_html']);
+    $this->assertSame('es_MX', $translatedTemplate['actual_language']);
 
     // This should fall back to Spanish...
     $translatedTemplate = MessageTemplate::get()
@@ -342,8 +342,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setLanguage('es_MX')
       ->setTranslationMode('fuzzy')
       ->execute()->first();
-    $this->assertEquals('subject - Spanish', $translatedTemplate['msg_subject']);
-    $this->assertEquals('html -Spanish', $translatedTemplate['msg_html']);
+    $this->assertSame('subject - Spanish', $translatedTemplate['msg_subject']);
+    $this->assertSame('html -Spanish', $translatedTemplate['msg_html']);
 
     // This should fall back to en_US translation...
     $translatedTemplate = MessageTemplate::get()
@@ -353,8 +353,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setLanguage('es_MX')
       ->setTranslationMode('fuzzy')
       ->execute()->first();
-    $this->assertEquals('subject - site default translation', $translatedTemplate['msg_subject']);
-    $this->assertEquals('html - site default translation', $translatedTemplate['msg_html']);
+    $this->assertSame('subject - site default translation', $translatedTemplate['msg_subject']);
+    $this->assertSame('html - site default translation', $translatedTemplate['msg_html']);
   }
 
   /**
@@ -389,9 +389,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setTranslationMode('fuzzy')
       ->execute()->first();
 
-    $this->assertEquals('site default subject', $translated['msg_subject']);
-    $this->assertEquals('site default html', $translated['msg_html']);
-    $this->assertEquals('en_US', $translated['actual_language']);
+    $this->assertSame('site default subject', $translated['msg_subject']);
+    $this->assertSame('site default html', $translated['msg_html']);
+    $this->assertSame('en_US', $translated['actual_language']);
   }
 
   /**
@@ -422,9 +422,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setTranslationMode('fuzzy')
       ->execute()->first();
 
-    $this->assertEquals('site default subject', $translated['msg_subject']);
-    $this->assertEquals('es_MX html', $translated['msg_html']);
-    $this->assertEquals('es_MX', $translated['actual_language']);
+    $this->assertSame('site default subject', $translated['msg_subject']);
+    $this->assertSame('es_MX html', $translated['msg_html']);
+    $this->assertSame('es_MX', $translated['actual_language']);
   }
 
   /**
@@ -452,9 +452,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setTranslationMode('fuzzy')
       ->execute()->first();
 
-    $this->assertEquals('nynorsk subject', $translated['msg_subject']);
-    $this->assertEquals('nynorsk html', $translated['msg_html']);
-    $this->assertEquals('nn_NO', $translated['actual_language']);
+    $this->assertSame('nynorsk subject', $translated['msg_subject']);
+    $this->assertSame('nynorsk html', $translated['msg_html']);
+    $this->assertSame('nn_NO', $translated['actual_language']);
   }
 
   /**
@@ -489,9 +489,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setTranslationMode('fuzzy')
       ->execute()->first();
 
-    $this->assertEquals('uruguayan subject', $translated['msg_subject']);
-    $this->assertEquals('uruguayan html', $translated['msg_html']);
-    $this->assertEquals('es_UY', $translated['actual_language']);
+    $this->assertSame('uruguayan subject', $translated['msg_subject']);
+    $this->assertSame('uruguayan html', $translated['msg_html']);
+    $this->assertSame('es_UY', $translated['actual_language']);
   }
 
   /**
@@ -519,9 +519,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setTranslationMode('fuzzy')
       ->execute()->first();
 
-    $this->assertEquals('nynorsk subject', $translated['msg_subject']);
-    $this->assertEquals('nynorsk html', $translated['msg_html']);
-    $this->assertEquals('nn_NO', $translated['actual_language']);
+    $this->assertSame('nynorsk subject', $translated['msg_subject']);
+    $this->assertSame('nynorsk html', $translated['msg_html']);
+    $this->assertSame('nn_NO', $translated['actual_language']);
   }
 
   /**
@@ -555,9 +555,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setTranslationMode('fuzzy')
       ->execute()->first();
 
-    $this->assertEquals('GB subject', $translated['msg_subject']);
-    $this->assertEquals('US html', $translated['msg_html']);
-    $this->assertEquals('en_GB', $translated['actual_language']);
+    $this->assertSame('GB subject', $translated['msg_subject']);
+    $this->assertSame('US html', $translated['msg_html']);
+    $this->assertSame('en_GB', $translated['actual_language']);
 
     $cleanup->cleanup();
   }
@@ -581,8 +581,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setTranslationMode('fuzzy')
       ->execute()->first();
 
-    $this->assertEquals('raw subject', $translated['msg_subject']);
-    $this->assertEquals('raw content', $translated['msg_html']);
+    $this->assertSame('raw subject', $translated['msg_subject']);
+    $this->assertSame('raw content', $translated['msg_html']);
     $this->assertArrayNotHasKey('actual_language', $translated);
   }
 
@@ -611,8 +611,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setTranslationMode('fuzzy')
       ->execute()->first();
 
-    $this->assertEquals('raw subject', $translated['msg_subject']);
-    $this->assertEquals('raw html', $translated['msg_html']);
+    $this->assertSame('raw subject', $translated['msg_subject']);
+    $this->assertSame('raw html', $translated['msg_html']);
     $this->assertArrayHasKey('actual_language', $translated);
     $this->assertNull($translated['actual_language']);
   }
@@ -648,9 +648,9 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ->setTranslationMode('fuzzy')
       ->execute()->first();
 
-    $this->assertEquals('en_GB subject', $translated['msg_subject']);
-    $this->assertEquals('en_CA html', $translated['msg_html']);
-    $this->assertEquals('en_CA', $translated['actual_language']);
+    $this->assertSame('en_GB subject', $translated['msg_subject']);
+    $this->assertSame('en_CA html', $translated['msg_html']);
+    $this->assertSame('en_CA', $translated['actual_language']);
   }
 
   /**
@@ -678,8 +678,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ]
     );
     $this->assertEquals(FALSE, $sent);
-    $this->assertEquals('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!', $subject);
-    $this->assertEquals('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!', $messageText);
+    $this->assertSame('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!', $subject);
+    $this->assertSame('Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!', $messageText);
     $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_OpenTemplate Abba Baa!</p>', $messageHtml);
   }
 
@@ -714,8 +714,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
         ]
       );
       $this->assertEquals(FALSE, $sent);
-      $this->assertEquals('Hello testSendTemplate_RenderMode_Default Abba Baa!', $subject);
-      $this->assertEquals('Hello testSendTemplate_RenderMode_Default Abba Baa!', $messageText);
+      $this->assertSame('Hello testSendTemplate_RenderMode_Default Abba Baa!', $subject);
+      $this->assertSame('Hello testSendTemplate_RenderMode_Default Abba Baa!', $messageText);
       $this->assertStringContainsString('<p>Hello testSendTemplate_RenderMode_Default Abba Baa!</p>', $messageHtml);
     });
   }
@@ -767,7 +767,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     );
 
     // Verify content
-    $this->assertEquals('Test Subject', $subject);
+    $this->assertSame('Test Subject', $subject);
 
     // In successful case, errorMessage should be NULL
     if ($sent === TRUE) {
@@ -862,8 +862,8 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
         ]
       );
       $this->assertEquals(FALSE, $sent);
-      $this->assertEquals('Hello Abba Baa about Something Something!', $subject);
-      $this->assertEquals('Hello Abba Baa about Something Something!', $messageText);
+      $this->assertSame('Hello Abba Baa about Something Something!', $subject);
+      $this->assertSame('Hello Abba Baa about Something Something!', $messageText);
       $this->assertStringContainsString('<p>Hello Abba Baa about Something Something!</p>', $messageHtml);
     });
   }
@@ -1042,12 +1042,12 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->assertEquals('Default Domain Name ~  ~ <div class="location vcard"><span class="adr"><span class="street-address">Buckingham palace</span><br /><span class="extended-address">Up the road</span><br /><span class="locality">London</span>, <span class="postal-code">90210</span><br /></span></div> ~ crown@example.com ~ 1 ~ rather nice', $messageContent['html']);
-    $this->assertEquals('Default Domain Name ~  ~ Buckingham palace
+    $this->assertSame('Default Domain Name ~  ~ <div class="location vcard"><span class="adr"><span class="street-address">Buckingham palace</span><br /><span class="extended-address">Up the road</span><br /><span class="locality">London</span>, <span class="postal-code">90210</span><br /></span></div> ~ crown@example.com ~ 1 ~ rather nice', $messageContent['html']);
+    $this->assertSame('Default Domain Name ~  ~ Buckingham palace
 Up the road
 London, 90210
  ~ crown@example.com ~ 1 ~ rather nice', $messageContent['text']);
-    $this->assertEquals('Default Domain Name ~  ~ Buckingham palace Up the road London, 90210  ~ crown@example.com ~ 1 ~ rather nice', $messageContent['subject']);
+    $this->assertSame('Default Domain Name ~  ~ Buckingham palace Up the road London, 90210  ~ crown@example.com ~ 1 ~ rather nice', $messageContent['subject']);
   }
 
   /**
@@ -1066,9 +1066,9 @@ London, 90210
       ],
       'tplParams' => ['tokenString' => 'Something really witty'],
     ]);
-    $this->assertEquals('Something really witty', $messageContent['text']);
-    $this->assertEquals('Something really witty', $messageContent['html']);
-    $this->assertEquals('Something really witty', $messageContent['subject']);
+    $this->assertSame('Something really witty', $messageContent['text']);
+    $this->assertSame('Something really witty', $messageContent['html']);
+    $this->assertSame('Something really witty', $messageContent['subject']);
   }
 
   /**
@@ -1089,9 +1089,9 @@ London, 90210
       'tplParams' => ['tokenString' => 'Something really witty'],
     ]);
 
-    $this->assertEquals('{$tokenString}', $messageContent['text']);
-    $this->assertEquals('{$tokenString}', $messageContent['html']);
-    $this->assertEquals('{$tokenString}', $messageContent['subject']);
+    $this->assertSame('{$tokenString}', $messageContent['text']);
+    $this->assertSame('{$tokenString}', $messageContent['html']);
+    $this->assertSame('{$tokenString}', $messageContent['subject']);
   }
 
   /**
@@ -1590,7 +1590,7 @@ emo
     $tokenProcessor->addRow(['contactId' => $tokenData['contact_id']]);
     $tokenProcessor->evaluate();
     $messageHtml = $tokenProcessor->getRow(0)->render('html');
-    $this->assertEquals('primary_email:anthony_anderson@civicrm.org
+    $this->assertSame('primary_email:anthony_anderson@civicrm.org
 primary_address:Street Address
 primary_im:IM Screen Name
 primary_website:https://civicrm.org

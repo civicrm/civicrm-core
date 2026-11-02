@@ -46,7 +46,7 @@ class OptionValueJoinTest extends Api4TestBase {
     $this->assertEquals(['first_name', 'id', 'preferred_communication_method:label'], $keys);
     $firstPreferredMethod = array_shift($first['preferred_communication_method:label']);
 
-    $this->assertEquals(
+    $this->assertSame(
       'Phone',
       $firstPreferredMethod
     );

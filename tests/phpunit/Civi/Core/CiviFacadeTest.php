@@ -28,7 +28,7 @@ class CiviFacadeTest extends \CiviUnitTestCase {
     $this->createLoggedInUser();
     $settingsBag = \Civi::contactSettings();
     $settingsBag->set('foo', 'bar');
-    $this->assertEquals('bar', $settingsBag->get('foo'));
+    $this->assertSame('bar', $settingsBag->get('foo'));
   }
 
   /**
@@ -46,7 +46,7 @@ class CiviFacadeTest extends \CiviUnitTestCase {
     $cid = \CRM_Core_DAO::singleValueQuery('SELECT MIN(id) FROM civicrm_contact');
     $settingsBag = \Civi::contactSettings($cid);
     $settingsBag->set('foo', 'bar');
-    $this->assertEquals('bar', $settingsBag->get('foo'));
+    $this->assertSame('bar', $settingsBag->get('foo'));
   }
 
 }

@@ -243,7 +243,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
     $this->assertCount(1, $getUpdatedTokensWithLimitedAccess);
     $token = $getUpdatedTokensWithLimitedAccess->first();
     $this->assertEquals($loggedInContactID, $token['contact_id']);
-    $this->assertEquals("own-token-revised", $token['access_token']);
+    $this->assertSame("own-token-revised", $token['access_token']);
 
     $this->usePerms(['manage my OAuth contact tokens', 'view all contacts']);
     $updates = Civi\Api4\OAuthContactToken::update()
@@ -270,7 +270,7 @@ class api_v4_OAuthContactTokenTest extends \PHPUnit\Framework\TestCase implement
       $this->fail("User should not be able to seize a stranger's OAuth token");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('ACL check failed', $e->getMessage());
+      $this->assertSame('ACL check failed', $e->getMessage());
     }
   }
 

@@ -476,7 +476,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
 
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('success', $e->errorData['status']);
+      $this->assertSame('success', $e->errorData['status']);
     }
 
     $isSelected = CRM_Core_DAO::singleValueQuery(
@@ -526,7 +526,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       CRM_Contact_Page_AJAX::toggleDedupeSelect();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('success', $e->errorData['status']);
+      $this->assertSame('success', $e->errorData['status']);
     }
 
     $selectedCount = CRM_Core_DAO::singleValueQuery(
@@ -566,7 +566,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       CRM_Contact_Page_AJAX::toggleDedupeSelect();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('success', $e->errorData['status']);
+      $this->assertSame('success', $e->errorData['status']);
     }
 
     $isSelected = CRM_Core_DAO::singleValueQuery(
@@ -614,7 +614,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       CRM_Contact_Page_AJAX::processDupes();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('dupe-nondupe', $e->errorData['status']);
+      $this->assertSame('dupe-nondupe', $e->errorData['status']);
     }
 
     $c1 = min($contact1, $contact2);
@@ -636,7 +636,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       CRM_Contact_Page_AJAX::processDupes();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('nondupe-dupe', $e->errorData['status']);
+      $this->assertSame('nondupe-dupe', $e->errorData['status']);
     }
 
     $exceptionExistsAfter = CRM_Core_DAO::singleValueQuery(

@@ -275,7 +275,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertCount(3, $info);
     foreach ($info as $trigger) {
       // table for trigger should be civicrm_group
-      $this->assertEquals('civicrm_group', $trigger['table'][0]);
+      $this->assertSame('civicrm_group', $trigger['table'][0]);
       if ($trigger['event'][0] == 'UPDATE') {
         // civicrm_group.cache_date should be an exception, i.e. not logged
         $this->assertStringNotContainsString(
@@ -306,33 +306,33 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => FALSE]);
     $ci = Civi::$statics['CRM_Logging_Schema']['columnSpecs']['civicrm_test_column_info'];
 
-    $this->assertEquals('test_id', $ci['test_id']['COLUMN_NAME']);
-    $this->assertEquals('int', $ci['test_id']['DATA_TYPE']);
-    $this->assertEquals('NO', $ci['test_id']['IS_NULLABLE']);
-    $this->assertEquals('auto_increment', $ci['test_id']['EXTRA']);
+    $this->assertSame('test_id', $ci['test_id']['COLUMN_NAME']);
+    $this->assertSame('int', $ci['test_id']['DATA_TYPE']);
+    $this->assertSame('NO', $ci['test_id']['IS_NULLABLE']);
+    $this->assertSame('auto_increment', $ci['test_id']['EXTRA']);
     if (!$this->isMySQL8()) {
       $this->assertEquals('10', $ci['test_id']['LENGTH']);
     }
 
-    $this->assertEquals('varchar', $ci['test_varchar']['DATA_TYPE']);
+    $this->assertSame('varchar', $ci['test_varchar']['DATA_TYPE']);
     $this->assertEquals('42', $ci['test_varchar']['LENGTH']);
 
-    $this->assertEquals('int', $ci['test_integer']['DATA_TYPE']);
+    $this->assertSame('int', $ci['test_integer']['DATA_TYPE']);
     if (!$this->isMySQL8()) {
       $this->assertEquals('8', $ci['test_integer']['LENGTH']);
     }
-    $this->assertEquals('YES', $ci['test_integer']['IS_NULLABLE']);
+    $this->assertSame('YES', $ci['test_integer']['IS_NULLABLE']);
 
-    $this->assertEquals('decimal', $ci['test_decimal']['DATA_TYPE']);
-    $this->assertEquals('20,2', $ci['test_decimal']['LENGTH']);
+    $this->assertSame('decimal', $ci['test_decimal']['DATA_TYPE']);
+    $this->assertSame('20,2', $ci['test_decimal']['LENGTH']);
 
-    $this->assertEquals('enum', $ci['test_enum']['DATA_TYPE']);
-    $this->assertEquals("'A','B','C'", $ci['test_enum']['ENUM_VALUES']);
+    $this->assertSame('enum', $ci['test_enum']['DATA_TYPE']);
+    $this->assertSame("'A','B','C'", $ci['test_enum']['ENUM_VALUES']);
     $this->assertArrayNotHasKey('LENGTH', $ci['test_enum']);
 
     $this->assertEquals('42', $ci['test_integer_default']['COLUMN_DEFAULT']);
 
-    $this->assertEquals('date', $ci['test_date']['DATA_TYPE']);
+    $this->assertSame('date', $ci['test_date']['DATA_TYPE']);
   }
 
   public function testIndexes(): void {
@@ -364,7 +364,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     if (!$this->isMySQL8()) {
       $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
     }
-    $this->assertEquals('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
+    $this->assertSame('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
     CRM_Core_DAO::executeQuery(
       "ALTER TABLE civicrm_test_length_change
       CHANGE COLUMN test_integer test_integer int(4) NULL,
@@ -376,7 +376,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     if (!$this->isMySQL8()) {
       $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
     }
-    $this->assertEquals('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
+    $this->assertSame('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
   }
 
   /**
@@ -395,7 +395,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema->fixSchemaDifferences();
     $ci = Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // new enum value should be included
-    $this->assertEquals("'A','B','C','D'", $ci['civicrm_test_enum_change']['test_enum']['ENUM_VALUES']);
+    $this->assertSame("'A','B','C','D'", $ci['civicrm_test_enum_change']['test_enum']['ENUM_VALUES']);
   }
 
   /**

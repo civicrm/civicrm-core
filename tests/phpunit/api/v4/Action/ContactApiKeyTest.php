@@ -56,7 +56,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->first();
     $this->assertEquals($key, $result['api_key']);
-    $this->assertEquals('no', $result['is_api_key_null']);
+    $this->assertSame('no', $result['is_api_key_null']);
     $this->assertFalse($isSafe($result), "Should reveal secret details ($key): " . var_export($result, 1));
 
     // Can also be fetched via join
@@ -66,7 +66,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', '=', $contact['email']['id'])
       ->execute()->first();
     $this->assertEquals($key, $email['contact_id.api_key']);
-    $this->assertEquals('no', $result['is_api_key_null']);
+    $this->assertSame('no', $result['is_api_key_null']);
     $this->assertFalse($isSafe($email), "Should reveal secret details ($key): " . var_export($email, 1));
 
     // Remove permission and we should not see the key
@@ -320,7 +320,7 @@ class ContactApiKeyTest extends Api4TestBase implements TransactionalInterface {
       ->first();
 
     // Assert key was updated
-    $this->assertEquals("MyId!", $result['api_key']);
+    $this->assertSame("MyId!", $result['api_key']);
   }
 
   public function testApiKeyWithGetFields(): void {

@@ -67,8 +67,8 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->indexBy('name');
     // Ensure table & column are returned
-    $this->assertEquals('civicrm_contact', $fields['contact_type']['table_name']);
-    $this->assertEquals('display_name', $fields['display_name']['column_name']);
+    $this->assertSame('civicrm_contact', $fields['contact_type']['table_name']);
+    $this->assertSame('display_name', $fields['display_name']['column_name']);
 
     // Check suffixes
     $this->assertEquals(['name', 'label', 'icon'], $fields['contact_type']['suffixes']);
@@ -99,8 +99,8 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayNotHasKey('format_type', $fields['birth_date']['input_attrs']);
 
     // Check extra fields
-    $this->assertEquals('Integer', $fields['address_primary']['data_type']);
-    $this->assertEquals('Email', $fields['email_primary']['fk_entity']);
+    $this->assertSame('Integer', $fields['address_primary']['data_type']);
+    $this->assertSame('Email', $fields['email_primary']['fk_entity']);
   }
 
   public function testComponentFields(): void {
@@ -121,13 +121,13 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->setAction('get')
       ->execute()->indexBy('name');
 
-    $this->assertEquals('Text', $getFields['email']['input_type']);
+    $this->assertSame('Text', $getFields['email']['input_type']);
 
     $createFields = Email::getFields(FALSE)
       ->setAction('create')
       ->execute()->indexBy('name');
 
-    $this->assertEquals('Email', $createFields['email']['input_type']);
+    $this->assertSame('Email', $createFields['email']['input_type']);
     $this->assertIsInt($createFields['location_type_id']['default_value']);
 
     // Check `required` and `nullable`
@@ -182,9 +182,9 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue($actFields['subject']['nullable']);
     $this->assertFalse($actFields['subject']['deprecated']);
     $this->assertTrue($actFields['phone_id']['deprecated']);
-    $this->assertEquals('now', $actFields['created_date']['default_value']);
-    $this->assertEquals('now', $actFields['activity_date_time']['default_value']);
-    $this->assertEquals('Date', $actFields['activity_date_time']['input_type']);
+    $this->assertSame('now', $actFields['created_date']['default_value']);
+    $this->assertSame('now', $actFields['activity_date_time']['default_value']);
+    $this->assertSame('Date', $actFields['activity_date_time']['input_type']);
 
     $getFields = Activity::getFields(FALSE)
       ->setAction('get')
@@ -232,9 +232,9 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->single();
     $this->assertCount(1, $tagField['options']);
     $this->assertIsInt($tagField['options'][0]['id']);
-    $this->assertEquals('Act_Tag', $tagField['options'][0]['name']);
-    $this->assertEquals('Test tag for activities', $tagField['options'][0]['description']);
-    $this->assertEquals('#aaaaaa', $tagField['options'][0]['color']);
+    $this->assertSame('Act_Tag', $tagField['options'][0]['name']);
+    $this->assertSame('Test tag for activities', $tagField['options'][0]['description']);
+    $this->assertSame('#aaaaaa', $tagField['options'][0]['color']);
   }
 
   public function testIdIsInt(): void {
@@ -273,35 +273,35 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
   public function testDynamicFks(): void {
     $tagFields = EntityTag::getFields(FALSE)
       ->execute()->indexBy('name');
-    $this->assertEquals('Tag', $tagFields['tag_id']['fk_entity']);
+    $this->assertSame('Tag', $tagFields['tag_id']['fk_entity']);
     $this->assertEmpty($tagFields['entity_id']['fk_entity']);
-    $this->assertEquals('Activity', $tagFields['entity_id']['dfk_entities']['civicrm_activity']);
-    $this->assertEquals('entity_table', $tagFields['entity_id']['input_attrs']['control_field']);
+    $this->assertSame('Activity', $tagFields['entity_id']['dfk_entities']['civicrm_activity']);
+    $this->assertSame('entity_table', $tagFields['entity_id']['input_attrs']['control_field']);
 
     $tagFields = EntityTag::getFields(FALSE)
       ->addValue('entity_table', 'civicrm_activity')
       ->execute()->indexBy('name');
     // fk_entity should be specific to specified entity_table, but dfk_entities should still contain all values
-    $this->assertEquals('Activity', $tagFields['entity_id']['fk_entity']);
-    $this->assertEquals('Contact', $tagFields['entity_id']['dfk_entities']['civicrm_contact']);
-    $this->assertEquals('id', $tagFields['entity_id']['fk_column']);
+    $this->assertSame('Activity', $tagFields['entity_id']['fk_entity']);
+    $this->assertSame('Contact', $tagFields['entity_id']['dfk_entities']['civicrm_contact']);
+    $this->assertSame('id', $tagFields['entity_id']['fk_column']);
 
     $tagFields = EntityTag::getFields(FALSE)
       ->addValue('entity_table:name', 'Contact')
       ->execute()->indexBy('name');
-    $this->assertEquals('Contact', $tagFields['entity_id']['fk_entity']);
-    $this->assertEquals('SavedSearch', $tagFields['entity_id']['dfk_entities']['civicrm_saved_search']);
+    $this->assertSame('Contact', $tagFields['entity_id']['fk_entity']);
+    $this->assertSame('SavedSearch', $tagFields['entity_id']['dfk_entities']['civicrm_saved_search']);
 
     $pcpFields = PCP::getFields(FALSE)
       ->addValue('page_type:name', 'ContributionPage')
       ->setLoadOptions(['id', 'name', 'label'])
       ->execute()->indexBy('name');
-    $this->assertEquals('ContributionPage', $pcpFields['page_id']['fk_entity']);
-    $this->assertEquals('ContributionPage', $pcpFields['page_id']['dfk_entities']['contribute']);
-    $this->assertEquals('Event', $pcpFields['page_id']['dfk_entities']['event']);
+    $this->assertSame('ContributionPage', $pcpFields['page_id']['fk_entity']);
+    $this->assertSame('ContributionPage', $pcpFields['page_id']['dfk_entities']['contribute']);
+    $this->assertSame('Event', $pcpFields['page_id']['dfk_entities']['event']);
     $options = array_column($pcpFields['page_type']['options'], 'name', 'id');
-    $this->assertEquals('ContributionPage', $options['contribute']);
-    $this->assertEquals('Event', $options['event']);
+    $this->assertSame('ContributionPage', $options['contribute']);
+    $this->assertSame('Event', $options['event']);
   }
 
   public function testEmptyOptionListIsReturnedAsAnArray(): void {
@@ -409,7 +409,7 @@ class GetFieldsTest extends Api4TestBase implements TransactionalInterface {
 
     $options = array_column($field['options'], 'grouping', 'name');
     $this->assertArrayHasKey('search', $options);
-    $this->assertEquals('searchlike', $options['search']);
+    $this->assertSame('searchlike', $options['search']);
   }
 
 }

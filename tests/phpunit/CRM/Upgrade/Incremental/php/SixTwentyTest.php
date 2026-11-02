@@ -71,7 +71,7 @@ class CRM_Upgrade_Incremental_php_SixTwentyTest extends CiviUnitTestCase {
       ->execute()
       ->first();
     $this->assertNotEmpty($legacyRow);
-    $this->assertEquals('en_US', $legacyRow['language']);
+    $this->assertSame('en_US', $legacyRow['language']);
 
     // 5. Verify the domain serialized string was migrated to civicrm_word_replacement
     $migratedRow = WordReplacement::get(FALSE)
@@ -80,8 +80,8 @@ class CRM_Upgrade_Incremental_php_SixTwentyTest extends CiviUnitTestCase {
       ->execute()
       ->first();
     $this->assertNotEmpty($migratedRow);
-    $this->assertEquals('Personal', $migratedRow['replace_word']);
-    $this->assertEquals('exactMatch', $migratedRow['match_type']);
+    $this->assertSame('Personal', $migratedRow['replace_word']);
+    $this->assertSame('exactMatch', $migratedRow['match_type']);
   }
 
   /**

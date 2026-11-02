@@ -265,14 +265,14 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('relationship', 'create', ['id' => $relID, 'description' => 'blah']);
     $this->assertEquals($relID, $result['id']);
 
-    $this->assertEquals('blah', $result['values'][$result['id']]['description']);
+    $this->assertSame('blah', $result['values'][$result['id']]['description']);
 
     $result = $this->callAPISuccess('relationship', 'create', ['id' => $relID, 'is_permission_b_a' => 1]);
     $this->assertEquals(1, $result['values'][$result['id']]['is_permission_b_a']);
     $result = $this->callAPISuccess('relationship', 'create', ['id' => $result['id'], 'is_active' => 0]);
     $result = $this->callAPISuccess('relationship', 'get', ['id' => $result['id']]);
     $this->assertEquals(0, $result['values'][$result['id']]['is_active']);
-    $this->assertEquals('blah', $result['values'][$result['id']]['description']);
+    $this->assertSame('blah', $result['values'][$result['id']]['description']);
     $this->assertEquals(1, $result['values'][$result['id']]['is_permission_b_a']);
   }
 
@@ -346,7 +346,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
     $getParams = ['id' => $relationshipId];
     $check = $this->callAPISuccess('relationship', 'get', $getParams);
-    $this->assertEquals('Hello! this is custom data for relationship', $check['values'][$check['id']][$this->getCustomFieldName('text')]);
+    $this->assertSame('Hello! this is custom data for relationship', $check['values'][$check['id']][$this->getCustomFieldName('text')]);
 
     //Test Edit of custom field from the form.
     $updateParams = array_merge($getParams, [
@@ -360,7 +360,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $reln->submit($updateParams);
 
     $check = $this->callAPISuccess('relationship', 'get', $getParams);
-    $this->assertEquals('Edited Text Value', $check['values'][$check['id']][$this->getCustomFieldName('text')]);
+    $this->assertSame('Edited Text Value', $check['values'][$check['id']][$this->getCustomFieldName('text')]);
   }
 
   /**
@@ -381,7 +381,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
     $getParams = ['id' => $result['id']];
     $check = $this->callAPISuccess($this->entity, 'get', $getParams);
-    $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+    $this->assertSame("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);

@@ -78,18 +78,18 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $civicrm_setting[CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME]['imageUploadDir'] = '/test/override';
     Civi::service('settings_manager')->useMandatory();
     $value = Civi::settings()->get('imageUploadDir');
-    $this->assertEquals('/test/override', $value);
+    $this->assertSame('/test/override', $value);
 
     $civicrm_setting['domain']['customCSSURL'] = 'http://test.test/overridedomain';
     Civi::service('settings_manager')->useMandatory();
     $value = Civi::settings()->get('customCSSURL');
-    $this->assertEquals('http://test.test/overridedomain', $value);
+    $this->assertSame('http://test.test/overridedomain', $value);
 
     // CRM-14974 test suite
     $civicrm_setting['Test Preferences']['overrideSetting'] = '/test/override';
     Civi::service('settings_manager')->useMandatory();
     $value = Civi::settings()->get('overrideSetting');
-    $this->assertEquals('/test/override', $value);
+    $this->assertSame('/test/override', $value);
     // CRM-14974 tear down
     unset($civicrm_setting['Test Preferences']);
     $query = "DELETE FROM civicrm_setting WHERE name = 'overrideSetting'";
@@ -139,7 +139,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     Civi::settings()->set('onChangeExample', ['First', 'Value']);
     $this->assertEquals(1, $_testOnChange_hookCalls['count']);
     $this->assertEquals(['First', 'Value'], $_testOnChange_hookCalls['newValue']);
-    $this->assertEquals('List of Components', $_testOnChange_hookCalls['metadata']['title']);
+    $this->assertSame('List of Components', $_testOnChange_hookCalls['metadata']['title']);
 
     // change value
     $_testOnChange_hookCalls = ['count' => 0];
@@ -147,7 +147,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     $this->assertEquals(1, $_testOnChange_hookCalls['count']);
     $this->assertEquals(['First', 'Value'], $_testOnChange_hookCalls['oldValue']);
     $this->assertEquals(['Second', 'Value'], $_testOnChange_hookCalls['newValue']);
-    $this->assertEquals('List of Components', $_testOnChange_hookCalls['metadata']['title']);
+    $this->assertSame('List of Components', $_testOnChange_hookCalls['metadata']['title']);
   }
 
   /**
@@ -215,12 +215,12 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   public function testSetCivicrmEnvironment(): void {
     Civi::settings()->set('environment', 'Staging');
     $values = Civi::settings()->get('environment');
-    $this->assertEquals('Staging', $values);
+    $this->assertSame('Staging', $values);
     global $civicrm_setting;
     $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['environment'] = 'Development';
     Civi::service('settings_manager')->useMandatory();
     $environment = CRM_Core_Config::environment();
-    $this->assertEquals('Development', $environment);
+    $this->assertSame('Development', $environment);
   }
 
   /**
@@ -229,7 +229,7 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   public function testPseudoConstants(): void {
     $contributionPageID = $this->contributionPageCreate()['id'];
     $metadata = \Civi\Core\SettingsMetadata::getMetadata(['name' => ['default_invoice_page']], NULL, TRUE);
-    $this->assertEquals('Test Contribution Page', $metadata['default_invoice_page']['options'][$contributionPageID]);
+    $this->assertSame('Test Contribution Page', $metadata['default_invoice_page']['options'][$contributionPageID]);
   }
 
 }

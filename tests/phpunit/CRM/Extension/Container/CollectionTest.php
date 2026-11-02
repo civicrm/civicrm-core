@@ -41,11 +41,11 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
 
-    $this->assertEquals("/path/to/foo", $c->getPath('test.foo'));
-    $this->assertEquals("/path/to/bar", $c->getPath('test.foo.bar'));
-    $this->assertEquals("/path/to/whiz", $c->getPath('test.whiz'));
-    $this->assertEquals("/path/to/whizbang", $c->getPath('test.whizbang'));
-    $this->assertEquals("/path/to/conflict-b", $c->getPath('test.conflict'));
+    $this->assertSame("/path/to/foo", $c->getPath('test.foo'));
+    $this->assertSame("/path/to/bar", $c->getPath('test.foo.bar'));
+    $this->assertSame("/path/to/whiz", $c->getPath('test.whiz'));
+    $this->assertSame("/path/to/whizbang", $c->getPath('test.whizbang'));
+    $this->assertSame("/path/to/conflict-b", $c->getPath('test.conflict'));
   }
 
   public function testGetResUrl(): void {
@@ -58,25 +58,25 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
 
-    $this->assertEquals('http://foo', $c->getResUrl('test.foo'));
-    $this->assertEquals('http://foobar', $c->getResUrl('test.foo.bar'));
-    $this->assertEquals('http://whiz', $c->getResUrl('test.whiz'));
-    $this->assertEquals('http://whizbang', $c->getResUrl('test.whizbang'));
-    $this->assertEquals('http://conflict-b', $c->getResUrl('test.conflict'));
+    $this->assertSame('http://foo', $c->getResUrl('test.foo'));
+    $this->assertSame('http://foobar', $c->getResUrl('test.foo.bar'));
+    $this->assertSame('http://whiz', $c->getResUrl('test.whiz'));
+    $this->assertSame('http://whizbang', $c->getResUrl('test.whizbang'));
+    $this->assertSame('http://conflict-b', $c->getResUrl('test.conflict'));
   }
 
   public function testCaching(): void {
     $cache = new CRM_Utils_Cache_ArrayCache([]);
     $this->assertTrue(!is_array($cache->get('ext-collection')));
     $c = $this->_createContainer($cache, 'ext-collection');
-    $this->assertEquals('http://foo', $c->getResUrl('test.foo'));
+    $this->assertSame('http://foo', $c->getResUrl('test.foo'));
     $this->assertTrue(is_array($cache->get('ext-collection')));
 
     $cacheData = $cache->get('ext-collection');
     // 'test.foo' was defined in the 'a' container
-    $this->assertEquals('a', $cacheData['test.foo']);
+    $this->assertSame('a', $cacheData['test.foo']);
     // 'test.whiz' was defined in the 'b' container
-    $this->assertEquals('b', $cacheData['test.whiz']);
+    $this->assertSame('b', $cacheData['test.whiz']);
   }
 
   /**

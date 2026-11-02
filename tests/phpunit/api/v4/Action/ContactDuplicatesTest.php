@@ -50,8 +50,8 @@ class ContactDuplicatesTest extends Api4TestBase {
       ->execute()
       ->indexBy('name');
 
-    $this->assertEquals('Contact', $fields['contact_type']['entity']);
-    $this->assertEquals('Email', $fields['email_primary.email']['entity']);
+    $this->assertSame('Contact', $fields['contact_type']['entity']);
+    $this->assertSame('Email', $fields['email_primary.email']['entity']);
   }
 
   public function testGetRuleGroupNames(): void {
@@ -176,7 +176,7 @@ class ContactDuplicatesTest extends Api4TestBase {
       ->addWhere('id', 'IN', $testContacts)
       ->execute();
     $this->assertCount(1, $check);
-    $this->assertEquals('Jo', $check[0]['first_name']);
+    $this->assertSame('Jo', $check[0]['first_name']);
   }
 
   public function testGetMergedToFrom(): void {

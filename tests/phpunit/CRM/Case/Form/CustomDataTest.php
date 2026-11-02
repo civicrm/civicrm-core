@@ -387,7 +387,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $hadException = TRUE;
-      $this->assertEquals('redirect', $e->errorData['context']);
+      $this->assertSame('redirect', $e->errorData['context']);
       // compare parts of query string separately to avoid any clean url format mismatches
       $this->assertStringContainsString('civicrm/contact/view/case', $e->errorData['url']);
       $this->assertStringContainsString("reset=1&id={$caseId}&cid={$individual}&action=view", $e->errorData['url']);

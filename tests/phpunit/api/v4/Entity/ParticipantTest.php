@@ -55,8 +55,8 @@ class ParticipantTest extends Api4TestBase {
     $this->assertEquals(0, $result->count(), "count of empty get is not 0");
 
     // Check that the $result knows what the inputs were
-    $this->assertEquals('Participant', $result->entity);
-    $this->assertEquals('get', $result->action);
+    $this->assertSame('Participant', $result->entity);
+    $this->assertSame('get', $result->action);
     $this->assertEquals(4, $result->version);
 
     // Create some test related records before proceeding

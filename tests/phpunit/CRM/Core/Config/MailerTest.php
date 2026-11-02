@@ -44,7 +44,7 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
       'send' => function ($recipients, $headers, $body) use ($test) {
         $test->calls['send']++;
         $test->assertEquals(['to@example.org'], $recipients);
-        $test->assertEquals('Subject Example', $headers['Subject']);
+        $test->assertSame('Subject Example', $headers['Subject']);
       },
     ]);
 

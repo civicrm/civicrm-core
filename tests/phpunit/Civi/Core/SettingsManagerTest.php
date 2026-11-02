@@ -54,21 +54,21 @@ class SettingsManagerTest extends \CiviUnitTestCase {
 
     $daSettings = $manager->getBagByDomain($da->id);
     $daSettings->set('d1', 'un');
-    $this->assertEquals('un', $daSettings->get('d1'));
-    $this->assertEquals('beta', $daSettings->get('d2'));
-    $this->assertEquals('GAMMA!', $daSettings->get('d3'));
+    $this->assertSame('un', $daSettings->get('d1'));
+    $this->assertSame('beta', $daSettings->get('d2'));
+    $this->assertSame('GAMMA!', $daSettings->get('d3'));
 
     $dbSettings = $manager->getBagByDomain($db->id);
-    $this->assertEquals('alpha', $dbSettings->get('d1'));
-    $this->assertEquals('beta', $dbSettings->get('d2'));
-    $this->assertEquals('GAMMA!', $dbSettings->get('d3'));
+    $this->assertSame('alpha', $dbSettings->get('d1'));
+    $this->assertSame('beta', $dbSettings->get('d2'));
+    $this->assertSame('GAMMA!', $dbSettings->get('d3'));
 
     $managerRedux = $this->createManager()->bootComplete();
 
     $daSettingsRedux = $managerRedux->getBagByDomain($da->id);
-    $this->assertEquals('un', $daSettingsRedux->get('d1'));
-    $this->assertEquals('beta', $daSettingsRedux->get('d2'));
-    $this->assertEquals('GAMMA!', $daSettingsRedux->get('d3'));
+    $this->assertSame('un', $daSettingsRedux->get('d1'));
+    $this->assertSame('beta', $daSettingsRedux->get('d2'));
+    $this->assertSame('GAMMA!', $daSettingsRedux->get('d3'));
   }
 
   /**
@@ -83,22 +83,22 @@ class SettingsManagerTest extends \CiviUnitTestCase {
 
     $caSettings = $manager->getBagByContact($domain->id, $ca->id);
     $caSettings->set('c1', 'un');
-    $this->assertEquals('un', $caSettings->get('c1'));
-    $this->assertEquals('beta', $caSettings->get('c2'));
-    $this->assertEquals('GAMMA MAN!', $caSettings->get('c3'));
+    $this->assertSame('un', $caSettings->get('c1'));
+    $this->assertSame('beta', $caSettings->get('c2'));
+    $this->assertSame('GAMMA MAN!', $caSettings->get('c3'));
 
     $cbSettings = $manager->getBagByContact($domain->id, $cb->id);
-    $this->assertEquals('alpha', $cbSettings->get('c1'));
-    $this->assertEquals('beta', $cbSettings->get('c2'));
-    $this->assertEquals('GAMMA MAN!', $cbSettings->get('c3'));
+    $this->assertSame('alpha', $cbSettings->get('c1'));
+    $this->assertSame('beta', $cbSettings->get('c2'));
+    $this->assertSame('GAMMA MAN!', $cbSettings->get('c3'));
 
     // Read settings from freshly initialized objects.
     $manager = $this->createManager()->bootComplete();
 
     $caSettingsRedux = $manager->getBagByContact($domain->id, $ca->id);
-    $this->assertEquals('un', $caSettingsRedux->get('c1'));
-    $this->assertEquals('beta', $caSettingsRedux->get('c2'));
-    $this->assertEquals('GAMMA MAN!', $caSettingsRedux->get('c3'));
+    $this->assertSame('un', $caSettingsRedux->get('c1'));
+    $this->assertSame('beta', $caSettingsRedux->get('c2'));
+    $this->assertSame('GAMMA MAN!', $caSettingsRedux->get('c3'));
   }
 
   public function testCrossOver(): void {
@@ -111,20 +111,20 @@ class SettingsManagerTest extends \CiviUnitTestCase {
 
     $domainSettings = $manager->getBagByDomain($domain->id);
     $domainSettings->set('monkeywrench', 'from domain');
-    $this->assertEquals('from domain', $domainSettings->get('monkeywrench'));
+    $this->assertSame('from domain', $domainSettings->get('monkeywrench'));
 
     $contactSettings = $manager->getBagByContact($domain->id, $contact->id);
     $contactSettings->set('monkeywrench', 'from contact');
-    $this->assertEquals('from contact', $contactSettings->get('monkeywrench'));
+    $this->assertSame('from contact', $contactSettings->get('monkeywrench'));
 
     // Read settings from freshly initialized objects.
     $manager = $this->createManager()->bootComplete();
 
     $domainSettings = $manager->getBagByDomain($domain->id);
-    $this->assertEquals('from domain', $domainSettings->get('monkeywrench'));
+    $this->assertSame('from domain', $domainSettings->get('monkeywrench'));
 
     $contactSettings = $manager->getBagByContact($domain->id, $contact->id);
-    $this->assertEquals('from contact', $contactSettings->get('monkeywrench'));
+    $this->assertSame('from contact', $contactSettings->get('monkeywrench'));
   }
 
   /**

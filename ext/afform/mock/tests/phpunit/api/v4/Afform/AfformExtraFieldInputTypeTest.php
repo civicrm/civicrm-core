@@ -57,10 +57,10 @@ EOHTML;
       ->setLimit(1)
       ->execute()->single()['data'];
 
-    $this->assertEquals('Extra 1', $submission['extra']['fields']['extra_field_1']);
-    $this->assertEquals('Extra 2', $submission['extra']['fields']['extra_field_2']);
-    $this->assertEquals('Jane', $submission['Individual1']['fields']['first_name']);
-    $this->assertEquals('Doe', $submission['Individual1']['fields']['last_name']);
+    $this->assertSame('Extra 1', $submission['extra']['fields']['extra_field_1']);
+    $this->assertSame('Extra 2', $submission['extra']['fields']['extra_field_2']);
+    $this->assertSame('Jane', $submission['Individual1']['fields']['first_name']);
+    $this->assertSame('Doe', $submission['Individual1']['fields']['last_name']);
   }
 
   /**
@@ -192,11 +192,11 @@ EOHTML;
       ->setLimit(1)
       ->execute()->single()['data'];
 
-    $this->assertEquals('Jane', $submission['Individual1'][0]['fields']['first_name']);
-    $this->assertEquals('cart-token-123', $submission['extra']['fields']['extra_hidden']);
-    $this->assertEquals('option_b', $submission['extra']['fields']['extra_select']);
+    $this->assertSame('Jane', $submission['Individual1'][0]['fields']['first_name']);
+    $this->assertSame('cart-token-123', $submission['extra']['fields']['extra_hidden']);
+    $this->assertSame('option_b', $submission['extra']['fields']['extra_select']);
     $this->assertEquals(TRUE, $submission['extra']['fields']['extra_checkbox']);
-    $this->assertEquals('2024-07-04', $submission['extra']['fields']['extra_date']);
+    $this->assertSame('2024-07-04', $submission['extra']['fields']['extra_date']);
   }
 
   private function useRequiredExtraFieldsForm(): void {
@@ -265,7 +265,7 @@ EOHTML;
     }
     catch (\CRM_Core_Exception $e) {
     }
-    $this->assertEquals('Extra Text is a required field.', $e->getMessage());
+    $this->assertSame('Extra Text is a required field.', $e->getMessage());
   }
 
 }

@@ -127,7 +127,7 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
 
     $input = 'Hello world is the greatest greeting in the world';
     $actual = CRM_Utils_String::ellipsify($input, 11, ' (...)');
-    $this->assertEquals('Hello (...)', $actual);
+    $this->assertSame('Hello (...)', $actual);
   }
 
   public function testRandom(): void {

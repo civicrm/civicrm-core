@@ -81,7 +81,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'title', 'member_of_contact_id',
       'Database check on updated membership record.'
     );
-    $this->assertEquals('test type', $membership, 'Verify membership type title.');
+    $this->assertSame('test type', $membership, 'Verify membership type title.');
   }
 
   /**
@@ -108,7 +108,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $params = ['title' => 'General'];
     $default = [];
     $result = CRM_Member_BAO_MembershipType::retrieve($params, $default);
-    $this->assertEquals('General', $result->title, 'Verify membership type name.');
+    $this->assertSame('General', $result->title, 'Verify membership type name.');
   }
 
   /**
@@ -148,7 +148,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $membershipType[$membershipTypeID] = $params;
 
     CRM_Member_BAO_MembershipType::convertDayFormat($membershipType);
-    $this->assertEquals('Dec 14', $membershipType[$membershipTypeID]['fixed_period_rollover_day'], 'Verify memberFixed Period Rollover Day.');
+    $this->assertSame('Dec 14', $membershipType[$membershipTypeID]['fixed_period_rollover_day'], 'Verify memberFixed Period Rollover Day.');
   }
 
   /**
@@ -177,7 +177,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       ->addOrderBy('weight', 'ASC')
       ->execute()
       ->column('title', 'id');
-    $this->assertEquals('General', $result[$membershipTypeID], 'Verify membership types.');
+    $this->assertSame('General', $result[$membershipTypeID], 'Verify membership types.');
   }
 
   /**
@@ -193,8 +193,8 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       ->execute()
       ->first();
 
-    $this->assertEquals('General', $result['name'], 'Verify membership type details.');
-    $this->assertEquals('year', $result['duration_unit'], 'Verify membership types details.');
+    $this->assertSame('General', $result['name'], 'Verify membership type details.');
+    $this->assertSame('year', $result['duration_unit'], 'Verify membership types details.');
   }
 
   /**

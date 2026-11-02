@@ -63,13 +63,13 @@ class CRM_Core_Payment_PaypalStdTest extends CiviUnitTestCase {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $redirectValues = parse_url($e->errorData['url']);
-      $this->assertEquals('https', $redirectValues['scheme']);
-      $this->assertEquals('www.paypal.com', $redirectValues['host']);
-      $this->assertEquals('/cgi-bin/webscr', $redirectValues['path']);
+      $this->assertSame('https', $redirectValues['scheme']);
+      $this->assertSame('www.paypal.com', $redirectValues['host']);
+      $this->assertSame('/cgi-bin/webscr', $redirectValues['path']);
       $query = [];
       parse_str($redirectValues['query'], $query);
       $this->assertEquals(5.24, $query['amount']);
-      $this->assertEquals('CiviCRM_SP', $query['bn']);
+      $this->assertSame('CiviCRM_SP', $query['bn']);
     }
   }
 

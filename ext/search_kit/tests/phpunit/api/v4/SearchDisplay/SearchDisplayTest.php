@@ -26,7 +26,7 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->first()['options'];
 
     $displayTypeOptions = array_column($displayTypeOptions, NULL, 'id');
-    $this->assertEquals('non-viewable', $displayTypeOptions['autocomplete']['grouping']);
+    $this->assertSame('non-viewable', $displayTypeOptions['autocomplete']['grouping']);
   }
 
   public function testGetDefault() {
@@ -44,18 +44,18 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->execute()->single();
 
     $this->assertCount(5, $display['settings']['columns']);
-    $this->assertEquals('Contacts', $display['label']);
-    $this->assertEquals('crm-search-display-table', $display['type:name']);
-    $this->assertEquals('fa-table', $display['type:icon']);
-    $this->assertEquals('Contact', $display['saved_search_id.api_entity']);
-    $this->assertEquals('Contacts', $display['saved_search_id.api_entity:label']);
+    $this->assertSame('Contacts', $display['label']);
+    $this->assertSame('crm-search-display-table', $display['type:name']);
+    $this->assertSame('fa-table', $display['type:icon']);
+    $this->assertSame('Contact', $display['saved_search_id.api_entity']);
+    $this->assertSame('Contacts', $display['saved_search_id.api_entity:label']);
 
     // Default sort order should have been added
     $this->assertEquals([['sort_name', 'ASC']], $display['settings']['sort']);
 
     // `display_name` column should have a link
-    $this->assertEquals('Contact', $display['settings']['columns'][1]['link']['entity']);
-    $this->assertEquals('view', $display['settings']['columns'][1]['link']['action']);
+    $this->assertSame('Contact', $display['settings']['columns'][1]['link']['entity']);
+    $this->assertSame('view', $display['settings']['columns'][1]['link']['action']);
     $this->assertEmpty($display['settings']['columns'][1]['link']['join']);
 
     // `first_name` column should not have a link
@@ -77,8 +77,8 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->setSavedSearch($params)
       ->execute()->single();
 
-    $this->assertEquals('Contact', $display['settings']['columns'][1]['link']['entity']);
-    $this->assertEquals('con.contact_id', $display['settings']['columns'][1]['link']['join']);
+    $this->assertSame('Contact', $display['settings']['columns'][1]['link']['entity']);
+    $this->assertSame('con.contact_id', $display['settings']['columns'][1]['link']['join']);
   }
 
   public function testGetDefaultNoEntity() {
@@ -87,9 +87,9 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->execute()->single();
 
     $this->assertCount(0, $display['settings']['columns']);
-    $this->assertEquals('', $display['label']);
-    $this->assertEquals('crm-search-display-table', $display['type:name']);
-    $this->assertEquals('fa-table', $display['type:icon']);
+    $this->assertSame('', $display['label']);
+    $this->assertSame('crm-search-display-table', $display['type:name']);
+    $this->assertSame('fa-table', $display['type:icon']);
     $this->assertNull($display['saved_search_id']);
   }
 
@@ -132,11 +132,11 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->addValue('label', 'My test search')
       ->execute()->first();
     // Name will be created from munged label
-    $this->assertEquals('My_test_search', $savedSearch0['name'], "SavedSearch 0");
+    $this->assertSame('My_test_search', $savedSearch0['name'], "SavedSearch 0");
     // Name will have _r appended to ensure it's unique, where r is a string of
     // random chars.
-    $this->assertEquals('My_test_search_', substr($savedSearch1['name'], 0, 15), "SavedSearch 1");
-    $this->assertEquals('My_test_search_', substr($savedSearch2['name'], 0, 15), "SavedSearch 2");
+    $this->assertSame('My_test_search_', substr($savedSearch1['name'], 0, 15), "SavedSearch 1");
+    $this->assertSame('My_test_search_', substr($savedSearch2['name'], 0, 15), "SavedSearch 2");
     $this->assertNotSame($savedSearch1['name'], $savedSearch2['name'], "SavedSearch 1,2");
 
     $display0 = SearchDisplay::create()
@@ -155,12 +155,12 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->addValue('type', 'table')
       ->execute()->first();
     // Name will be created from munged label
-    $this->assertEquals('My_test_display', $display0['name'], "SearchDisplay 0");
+    $this->assertSame('My_test_display', $display0['name'], "SearchDisplay 0");
     // Name will have _r appended (r is random string) to ensure it's unique to
     // savedSearch0.
-    $this->assertEquals('My_test_display_', substr($display1['name'], 0, 16), "SearchDisplay 1");
+    $this->assertSame('My_test_display_', substr($display1['name'], 0, 16), "SearchDisplay 1");
     // This is for a different saved search so doesn't need a suffix appended
-    $this->assertEquals('My_test_display', $display2['name'], "SearchDisplay 2");
+    $this->assertSame('My_test_display', $display2['name'], "SearchDisplay 2");
   }
 
   public function testGetMarkup(): void {
@@ -192,7 +192,7 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->addFilter('first_name', 'Fil')
       ->execute()->first();
 
-    $this->assertEquals('crmSearchDisplayList', $result['module']);
+    $this->assertSame('crmSearchDisplayList', $result['module']);
 
     $expected = <<<MARKUP
     <crm-search-display-list search="'testGetMarkup'" display="'testGetMarkupDisplay'" api-entity="Individual" settings="{columns: [{key: 'id', rewrite: '&quot;[test] &amp; &lt;escape&gt;&quot;'}]}" filters="{first_name: 'Fil'}"></crm-search-display-list>

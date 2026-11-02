@@ -69,7 +69,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->setLoadOptions(TRUE)
       ->execute()->indexBy('name');
 
-    $this->assertEquals('Boolean', $fields['has_base']['data_type']);
+    $this->assertSame('Boolean', $fields['has_base']['data_type']);
     // If this core extension ever goes away or gets renamed, just pick a different one here
     $this->assertArrayHasKey('org.civicrm.flexmailer', $fields['base_module']['options']);
   }
@@ -118,10 +118,10 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
 
     $time = $this->getCurrentTimestamp();
     $search = $this->getTestRecord('SavedSearch', ['name' => 'TestManagedSavedSearch'], ['*', 'has_base', 'base_module', 'local_modified_date']);
-    $this->assertEquals('Altered state', $search['description']);
+    $this->assertSame('Altered state', $search['description']);
     // Check calculated fields
     $this->assertTrue($search['has_base']);
-    $this->assertEquals('civicrm', $search['base_module']);
+    $this->assertSame('civicrm', $search['base_module']);
     // local_modified_date should reflect the update just made
     $this->assertGreaterThanOrEqual($time, $search['local_modified_date']);
     $this->assertLessThanOrEqual($this->getCurrentTimestamp(), $search['local_modified_date']);
@@ -143,7 +143,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
     $this->assertNull($search['expires_date']);
     // Check calculated fields
     $this->assertTrue($search['has_base']);
-    $this->assertEquals('civicrm', $search['base_module']);
+    $this->assertSame('civicrm', $search['base_module']);
     // local_modified_date should be reset by the revert action
     $this->assertNull($search['local_modified_date']);
 
@@ -154,7 +154,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->addValue('label', 'Whatever')
       ->execute();
     $search = $this->getTestRecord('SavedSearch', ['name' => $newName], ['label', 'has_base', 'base_module', 'local_modified_date']);
-    $this->assertEquals('Whatever', $search['label']);
+    $this->assertSame('Whatever', $search['label']);
     // Check calculated fields
     $this->assertEquals(NULL, $search['base_module']);
     $this->assertFalse($search['has_base']);
@@ -191,7 +191,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
 
     $search = $this->getTestRecord('SavedSearch', ['name' => 'TestAutoUpdateSavedSearch'], ['description', 'local_modified_date']);
-    $this->assertEquals('Original state', $search['description']);
+    $this->assertSame('Original state', $search['description']);
     $this->assertNull($search['local_modified_date']);
 
     // Remove managed search
@@ -214,14 +214,14 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->addSelect('description', 'has_base', 'base_module', 'local_modified_date')
       ->execute();
     $search = $result->single();
-    $this->assertEquals('Original state', $search['description']);
+    $this->assertSame('Original state', $search['description']);
     // Check calculated fields
     $this->assertTrue($search['has_base']);
-    $this->assertEquals('civicrm', $search['base_module']);
+    $this->assertSame('civicrm', $search['base_module']);
     $this->assertNull($search['local_modified_date']);
 
     $search = $this->getTestRecord('SavedSearch', ['name' => 'TestAutoUpdateSavedSearch'], ['description', 'local_modified_date']);
-    $this->assertEquals('Original state', $search['description']);
+    $this->assertSame('Original state', $search['description']);
     $this->assertNull($search['local_modified_date']);
 
     // Update packaged version
@@ -231,7 +231,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
 
     // Because the entity was not modified, it will be updated to match the new packaged version
     $search = $this->getTestRecord('SavedSearch', ['name' => 'TestAutoUpdateSavedSearch'], ['description', 'local_modified_date']);
-    $this->assertEquals('New packaged state', $search['description']);
+    $this->assertSame('New packaged state', $search['description']);
     $this->assertNull($search['local_modified_date']);
 
     // Update local
@@ -247,7 +247,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
 
     // Because the entity was  modified, it will not be updated
     $search = $this->getTestRecord('SavedSearch', ['name' => 'TestAutoUpdateSavedSearch'], ['description', 'local_modified_date']);
-    $this->assertEquals('Altered state', $search['description']);
+    $this->assertSame('Altered state', $search['description']);
     $this->assertNotNull($search['local_modified_date']);
 
     SavedSearch::revert(FALSE)
@@ -260,10 +260,10 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->addSelect('description', 'has_base', 'base_module', 'local_modified_date')
       ->execute();
     $search = $result->single();
-    $this->assertEquals('Newer packaged state', $search['description']);
+    $this->assertSame('Newer packaged state', $search['description']);
     // Check calculated fields
     $this->assertTrue($search['has_base']);
-    $this->assertEquals('civicrm', $search['base_module']);
+    $this->assertSame('civicrm', $search['base_module']);
     // local_modified_date should be reset by the revert action
     $this->assertNull($search['local_modified_date']);
 
@@ -362,7 +362,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->execute();
 
     $this->assertCount(1, $values);
-    $this->assertEquals('Option Value 1', $values[0]['label']);
+    $this->assertSame('Option Value 1', $values[0]['label']);
     $this->assertNull($values[0]['local_modified_date']);
     $this->assertTrue($values[0]['has_base']);
 
@@ -404,10 +404,10 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->execute();
 
     $this->assertCount(2, $values);
-    $this->assertEquals('1 New Label', $values[0]['label']);
+    $this->assertSame('1 New Label', $values[0]['label']);
     $this->assertNotNull($values[0]['local_modified_date']);
     $this->assertTrue($values[0]['has_base']);
-    $this->assertEquals('Option Value 2', $values[1]['label']);
+    $this->assertSame('Option Value 2', $values[1]['label']);
     $this->assertNull($values[1]['local_modified_date']);
     $this->assertTrue($values[1]['has_base']);
 
@@ -543,9 +543,9 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
     $this->assertEquals(TRUE, $nav['is_active']);
 
     $this->assertEquals(50, $nav['export'][0]['params']['values']['weight']);
-    $this->assertEquals('Navigation_Test_Parent_Navigation_Test_Child_1', $nav['export'][1]['name']);
-    $this->assertEquals('Navigation_Test_Parent_Navigation_Test_Child_2', $nav['export'][2]['name']);
-    $this->assertEquals('Navigation_Test_Parent_Navigation_Test_Child_3', $nav['export'][3]['name']);
+    $this->assertSame('Navigation_Test_Parent_Navigation_Test_Child_1', $nav['export'][1]['name']);
+    $this->assertSame('Navigation_Test_Parent_Navigation_Test_Child_2', $nav['export'][2]['name']);
+    $this->assertSame('Navigation_Test_Parent_Navigation_Test_Child_3', $nav['export'][3]['name']);
     // The has_separator should be using numeric key not pseudoconstant
     $this->assertNull($nav['export'][0]['params']['values']['has_separator']);
     $this->assertEquals(1, $nav['export'][1]['params']['values']['has_separator']);
@@ -722,7 +722,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
 
     $created = $this->getTestRecord('Group', ['name' => $original['name']]);
 
-    $this->assertEquals('My Managed Group', $created['title']);
+    $this->assertSame('My Managed Group', $created['title']);
     $this->assertEquals($original['name'], $created['name']);
     $this->assertGreaterThan($original['id'], $created['id']);
   }
@@ -763,7 +763,7 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
 
     $status = \CRM_Core_Session::singleton()->getStatus(TRUE);
     $this->assertStringContainsString('already exists', $status[0]['text']);
-    $this->assertEquals('error', $status[0]['type']);
+    $this->assertSame('error', $status[0]['type']);
 
     // Now reconcile using a match param
     $managed['params']['match'] = ['name'];
@@ -773,10 +773,10 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
     $managedGroup = $this->getTestRecord('OptionGroup', ['name' => $optionGroup['name']], ['id', 'title', 'description', 'base_module']);
 
     $this->assertEquals($optionGroup['id'], $managedGroup['id']);
-    $this->assertEquals('Cool new title', $managedGroup['title']);
-    $this->assertEquals('Cool new description', $managedGroup['description']);
+    $this->assertSame('Cool new title', $managedGroup['title']);
+    $this->assertSame('Cool new description', $managedGroup['description']);
     // The existing record has been converted to a managed entity!
-    $this->assertEquals('civicrm', $managedGroup['base_module']);
+    $this->assertSame('civicrm', $managedGroup['base_module']);
   }
 
   /**
@@ -1017,13 +1017,13 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
       ->indexBy('value');
 
     // check option value 1 got updated successfully
-    $this->assertEquals('Updated Option Value 1', $values[1]['label']);
+    $this->assertSame('Updated Option Value 1', $values[1]['label']);
 
     // check option value 2 didn't get removed (because we didnt pass that declaration to the reconcile)
     $this->assertCount(2, $values);
 
     // check option value 2 didn't get updated
-    $this->assertEquals('Option Value 2', $values[2]['label']);
+    $this->assertSame('Option Value 2', $values[2]['label']);
   }
 
   public static function sampleEntityTypes() {

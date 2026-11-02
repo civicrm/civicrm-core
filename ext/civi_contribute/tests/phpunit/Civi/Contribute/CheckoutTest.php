@@ -107,13 +107,13 @@ class CheckoutTest extends TestCase implements HeadlessInterface {
       ->first();
 
     // check the contribution is updated
-    $this->assertEquals('Pending', $contribution['contribution_status_id:name']);
+    $this->assertSame('Pending', $contribution['contribution_status_id:name']);
     $this->assertEquals(TRUE, $contribution['is_pay_later']);
 
     // check the session is successful
     $this->assertEquals(CheckoutSession::STATUS_SUCCESS, $checkoutSession->getStatus());
     // check the session tells us to go to the thank you page now
-    $this->assertEquals("https://thank.you", $checkoutSession->getNextUrl());
+    $this->assertSame("https://thank.you", $checkoutSession->getNextUrl());
 
     // we should be able to tokenise the session
     $token = $checkoutSession->tokenise();

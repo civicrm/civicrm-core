@@ -632,13 +632,13 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       else {
         //Assert secondary email gets included in search results.
         while ($resultDAO->fetch()) {
-          $this->assertEquals('secondary@example.com', $resultDAO->email);
+          $this->assertSame('secondary@example.com', $resultDAO->email);
         }
       }
 
       // API should always return primary email.
       $result = $this->callAPISuccess('Contact', 'get', ['contact_id' => $contactID]);
-      $this->assertEquals('primary@example.com', $result['values'][$contactID]['email']);
+      $this->assertSame('primary@example.com', $result['values'][$contactID]['email']);
     }
   }
 
@@ -720,7 +720,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       [$select, $from, $where, $having] = $queryObj->query();
       $dao = CRM_Core_DAO::executeQuery("$select $from $where $having");
       $dao->fetch();
-      $this->assertEquals('Anderson, Anthony II', $dao->sort_name);
+      $this->assertSame('Anderson, Anthony II', $dao->sort_name);
     }
     catch (PEAR_Exception $e) {
       $err = $e->getCause();
@@ -758,39 +758,39 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   public function testSearchBuilderActivityType(): void {
     $queryObj = new CRM_Contact_BAO_Query([['activity_type', '=', '3', 1, 0]]);
     $this->assertStringContainsString('WHERE  (  ( civicrm_activity.activity_type_id = 3 )', $queryObj->getSearchSQL());
-    $this->assertEquals('Activity Type = Email', $queryObj->_qill[1][0]);
+    $this->assertSame('Activity Type = Email', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_type_id', '=', '3', 1, 0]]);
     $this->assertStringContainsString('WHERE  (  ( civicrm_activity.activity_type_id = 3 )', $queryObj->getSearchSQL());
-    $this->assertEquals('Activity Type ID = Email', $queryObj->_qill[1][0]);
+    $this->assertSame('Activity Type ID = Email', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_status', '=', '3', 1, 0]]);
     $this->assertStringContainsString('WHERE  (  ( civicrm_activity.status_id = 3 )', $queryObj->getSearchSQL());
-    $this->assertEquals('Activity Status = Cancelled', $queryObj->_qill[1][0]);
+    $this->assertSame('Activity Status = Cancelled', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_status_id', '=', '3', 1, 0]]);
     $this->assertStringContainsString('WHERE  (  ( civicrm_activity.status_id = 3 )', $queryObj->getSearchSQL());
-    $this->assertEquals('Activity Status = Cancelled', $queryObj->_qill[1][0]);
+    $this->assertSame('Activity Status = Cancelled', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_engagement_level', '=', '3', 1, 0]]);
     $this->assertStringContainsString('WHERE  (  ( civicrm_activity.engagement_level = 3 )', $queryObj->getSearchSQL());
-    $this->assertEquals('Engagement Index = 3', $queryObj->_qill[1][0]);
+    $this->assertSame('Engagement Index = 3', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_id', '=', '3', 1, 0]]);
     $this->assertStringContainsString('WHERE  (  ( civicrm_activity.id = 3 )', $queryObj->getSearchSQL());
-    $this->assertEquals('Activity ID = 3', $queryObj->_qill[1][0]);
+    $this->assertSame('Activity ID = 3', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_campaign_id', '=', '3', 1, 0]]);
     $this->assertStringContainsString('WHERE  (  ( civicrm_activity.campaign_id = 3 )', $queryObj->getSearchSQL());
-    $this->assertEquals('Campaign ID = 3', $queryObj->_qill[1][0]);
+    $this->assertSame('Campaign ID = 3', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_priority_id', '=', '3', 1, 0]]);
     $this->assertStringContainsString('WHERE  (  ( civicrm_activity.priority_id = 3 )', $queryObj->getSearchSQL());
-    $this->assertEquals('Priority = Low', $queryObj->_qill[1][0]);
+    $this->assertSame('Priority = Low', $queryObj->_qill[1][0]);
 
     $queryObj = new CRM_Contact_BAO_Query([['activity_subject', '=', '3', 1, 0]]);
     $this->assertStringContainsString("WHERE  (  ( civicrm_activity.subject = '3' )", $queryObj->getSearchSQL());
-    $this->assertEquals("Subject = '3'", $queryObj->_qill[1][0]);
+    $this->assertSame("Subject = '3'", $queryObj->_qill[1][0]);
   }
 
   /**
@@ -813,7 +813,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     );
 
     [$select] = $query->query();
-    $this->assertEquals('SELECT contact_a.id as contact_id', $select);
+    $this->assertSame('SELECT contact_a.id as contact_id', $select);
   }
 
   /**
@@ -886,8 +886,8 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       [$result] = CRM_Contact_BAO_Query::apiQuery($searchParams);
       $this->assertCount(1, $result, 'search for ' . $key);
       $contact = reset($result);
-      $this->assertEquals('Minnie Mouse', $contact['display_name']);
-      $this->assertEquals('BOb', $contact['current_employer']);
+      $this->assertSame('Minnie Mouse', $contact['display_name']);
+      $this->assertSame('BOb', $contact['current_employer']);
     }
   }
 
@@ -915,7 +915,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     );
 
     $sql = $query->query(FALSE);
-    $this->assertEquals("WHERE  ( civicrm_address.postal_code = 'EH10 4RB-889' )  AND (contact_a.is_deleted = 0)", $sql[2]);
+    $this->assertSame("WHERE  ( civicrm_address.postal_code = 'EH10 4RB-889' )  AND (contact_a.is_deleted = 0)", $sql[2]);
     $result = CRM_Core_DAO::executeQuery(implode(' ', $sql));
     $this->assertEquals(1, $result->N);
 
@@ -1347,7 +1347,7 @@ civicrm_relationship.is_active = 1 AND
       CRM_Contact_BAO_Query::apiQuery($params, $returnProperties, NULL, NULL, 0, $numberOfContacts);
     }
     catch (Exception $e) {
-      $this->assertEquals(
+      $this->assertSame(
         'One of parameters  (value: foo@example.com) is not of the type Positive',
         $e->getMessage()
       );
@@ -1579,43 +1579,43 @@ civicrm_relationship.is_active = 1 AND
    */
   public function testGenericWhereHandling(): void {
     $query = new CRM_Contact_BAO_Query([['suffix_id', '=', 2, 0]]);
-    $this->assertEquals('contact_a.suffix_id = 2', $query->_where[0][0]);
-    $this->assertEquals('Individual Suffix = Sr.', $query->_qill[0][0]);
+    $this->assertSame('contact_a.suffix_id = 2', $query->_where[0][0]);
+    $this->assertSame('Individual Suffix = Sr.', $query->_qill[0][0]);
     $this->assertNotTrue(isset($query->_tables['civicrm_activity']));
 
     $query = new CRM_Contact_BAO_Query([['prefix_id', '=', 2, 0]]);
-    $this->assertEquals('contact_a.prefix_id = 2', $query->_where[0][0]);
-    $this->assertEquals('Individual Prefix = Ms.', $query->_qill[0][0]);
+    $this->assertSame('contact_a.prefix_id = 2', $query->_where[0][0]);
+    $this->assertSame('Individual Prefix = Ms.', $query->_qill[0][0]);
     $this->assertNotTrue(isset($query->_tables['civicrm_activity']));
 
     $query = new CRM_Contact_BAO_Query([['gender_id', '=', 2, 0]]);
-    $this->assertEquals('contact_a.gender_id = 2', $query->_where[0][0]);
-    $this->assertEquals('Gender = Male', $query->_qill[0][0]);
+    $this->assertSame('contact_a.gender_id = 2', $query->_where[0][0]);
+    $this->assertSame('Gender = Male', $query->_qill[0][0]);
     $this->assertNotTrue(isset($query->_tables['civicrm_activity']));
 
     $query = new CRM_Contact_BAO_Query([['communication_style_id', '=', 2, 0]]);
-    $this->assertEquals('contact_a.communication_style_id = 2', $query->_where[0][0]);
-    $this->assertEquals('Communication Style = Familiar', $query->_qill[0][0]);
+    $this->assertSame('contact_a.communication_style_id = 2', $query->_where[0][0]);
+    $this->assertSame('Communication Style = Familiar', $query->_qill[0][0]);
 
     $query = new CRM_Contact_BAO_Query([['communication_style_id', '=', 2, 0]]);
-    $this->assertEquals('contact_a.communication_style_id = 2', $query->_where[0][0]);
-    $this->assertEquals('Communication Style = Familiar', $query->_qill[0][0]);
+    $this->assertSame('contact_a.communication_style_id = 2', $query->_where[0][0]);
+    $this->assertSame('Communication Style = Familiar', $query->_qill[0][0]);
 
     $query = new CRM_Contact_BAO_Query([['contact_type', '=', 'Household', 0]]);
-    $this->assertEquals("contact_a.contact_type = 'Household'", $query->_where[0][0]);
-    $this->assertEquals('Contact Type = Household', $query->_qill[0][0]);
+    $this->assertSame("contact_a.contact_type = 'Household'", $query->_where[0][0]);
+    $this->assertSame('Contact Type = Household', $query->_qill[0][0]);
 
     $query = new CRM_Contact_BAO_Query([['on_hold', '=', 0, 0]]);
-    $this->assertEquals('civicrm_email.on_hold = 0', $query->_where[0][0]);
-    $this->assertEquals('On Hold = 0', $query->_qill[0][0]);
+    $this->assertSame('civicrm_email.on_hold = 0', $query->_where[0][0]);
+    $this->assertSame('On Hold = 0', $query->_qill[0][0]);
 
     $query = new CRM_Contact_BAO_Query([['on_hold', '=', 1, 0]]);
-    $this->assertEquals('civicrm_email.on_hold = 1', $query->_where[0][0]);
-    $this->assertEquals('On Hold = 1', $query->_qill[0][0]);
+    $this->assertSame('civicrm_email.on_hold = 1', $query->_where[0][0]);
+    $this->assertSame('On Hold = 1', $query->_qill[0][0]);
 
     $query = new CRM_Contact_BAO_Query([['world_region', '=', 3, 0]]);
-    $this->assertEquals('civicrm_worldregion.id = 3', $query->_where[0][0]);
-    $this->assertEquals('World Region = Middle East and North Africa', $query->_qill[0][0]);
+    $this->assertSame('civicrm_worldregion.id = 3', $query->_where[0][0]);
+    $this->assertSame('World Region = Middle East and North Africa', $query->_qill[0][0]);
   }
 
   /**
@@ -1663,8 +1663,8 @@ civicrm_relationship.is_active = 1 AND
     $rows = CRM_Core_DAO::executeQuery(implode(' ', $sql))->fetchAll();
     // Check expected results.
     $this->assertCount(1, $rows);
-    $this->assertEquals('John', $rows[0]['first_name']);
-    $this->assertEquals('Smith', $rows[0]['last_name']);
+    $this->assertSame('John', $rows[0]['first_name']);
+    $this->assertSame('Smith', $rows[0]['last_name']);
   }
 
   /**

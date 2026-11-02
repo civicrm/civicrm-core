@@ -54,13 +54,13 @@ $contactID,\"Red,Yellow\t\",Hogwarts\t,2023-02-03
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
     $row = $dataSource->getRow();
-    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertSame('ERROR', $row['_status']);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
     $values = CustomValue::get('level', FALSE)
       ->addWhere('entity_id', '=', $row['the_contact_id'])->execute();
     $this->assertEquals(['R'], $values[0]['Pick_Color']);

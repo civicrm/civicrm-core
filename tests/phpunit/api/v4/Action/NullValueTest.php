@@ -82,7 +82,7 @@ class NullValueTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->first();
 
-    $this->assertEquals('hello', $activity['subject']);
+    $this->assertSame('hello', $activity['subject']);
 
     $saved = Activity::save(FALSE)
       ->addRecord(['id' => $activity['id'], 'subject' => NULL])

@@ -292,7 +292,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       $membershipImporter->validateValues($importValues);
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertEquals('Invalid value for field(s) : Status Override End Date', $e->getMessage());
+      $this->assertSame('Invalid value for field(s) : Status Override End Date', $e->getMessage());
       return;
     }
     $this->fail('Exception expected');
@@ -423,8 +423,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $importResponse = $membershipImporter->import($importValues);
     $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
     $membership = $this->callAPISuccessGetSingle('Membership', ['return' => [$this->getCustomFieldName('text', 4), $this->getCustomFieldName('select_string', 4)]]);
-    $this->assertEquals('blah', $membership[$this->getCustomFieldName('text')]);
-    $this->assertEquals('R', $membership[$this->getCustomFieldName('select_string')]);
+    $this->assertSame('blah', $membership[$this->getCustomFieldName('text')]);
+    $this->assertSame('R', $membership[$this->getCustomFieldName('select_string')]);
   }
 
   /**
@@ -455,7 +455,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->importCSV('membership_with_multiple_identifiers.csv', $mapper, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_NOCHECK, 'saveMapping' => FALSE]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
   }
 
   public static function requiredFields(): array {
@@ -479,14 +479,14 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('ERROR', $row['_status']);
-    $this->assertEquals('Invalid value for field(s) : Membership Type', $row['_status_message']);
+    $this->assertSame('ERROR', $row['_status']);
+    $this->assertSame('Invalid value for field(s) : Membership Type', $row['_status_message']);
     $userJob = UserJob::get()
       ->addSelect('status_id:name', 'status_id:label')
       ->addWhere('id', '=', $this->userJobID)
       ->execute()->single();
-    $this->assertEquals('complete_with_errors', $userJob['status_id:name']);
-    $this->assertEquals('Complete with Errors', $userJob['status_id:label']);
+    $this->assertSame('complete_with_errors', $userJob['status_id:name']);
+    $this->assertSame('Complete with Errors', $userJob['status_id:label']);
   }
 
   /**
@@ -507,10 +507,10 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->assertSame('IMPORTED', $row['_status']);
     $membership = Membership::get(FALSE)
       ->execute()->single();
-    $this->assertEquals('2019-03-23', $membership['start_date']);
+    $this->assertSame('2019-03-23', $membership['start_date']);
   }
 
   /**
@@ -532,11 +532,11 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->assertSame('IMPORTED', $row['_status']);
     $membership = Membership::get(FALSE)
       ->execute()->single();
-    $this->assertEquals('2019-03-23', $membership['start_date']);
-    $this->assertEquals('Import', $membership['source']);
+    $this->assertSame('2019-03-23', $membership['start_date']);
+    $this->assertSame('Import', $membership['source']);
   }
 
   /**
@@ -555,9 +555,9 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ], ['fieldSeparator' => 'tab']);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->assertSame('IMPORTED', $row['_status']);
     $membership = $this->callAPISuccessGetSingle('Membership', []);
-    $this->assertEquals('2019-03-23', $membership['join_date']);
+    $this->assertSame('2019-03-23', $membership['join_date']);
   }
 
   /**
@@ -581,8 +581,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ];
     $this->importCSV('memberships_update_custom_date.csv', $mapping, ['dateFormats' => 32]);
     $membership = $this->callAPISuccessGetSingle('Membership', ['return' => ['start_date', $this->getCustomFieldName('date', 4)]]);
-    $this->assertEquals('2021-03-23', $membership['start_date']);
-    $this->assertEquals('2019-03-23 00:00:00', $membership[$this->getCustomFieldName('date')]);
+    $this->assertSame('2021-03-23', $membership['start_date']);
+    $this->assertSame('2019-03-23 00:00:00', $membership[$this->getCustomFieldName('date')]);
   }
 
   /**

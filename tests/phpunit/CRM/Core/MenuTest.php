@@ -23,10 +23,10 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $menu = [];
     CRM_Core_Menu::readXML($xml, $menu);
     $this->assertTrue(isset($menu['civicrm/foo/bar']));
-    $this->assertEquals('Foo Bar', $menu['civicrm/foo/bar']['title']);
-    $this->assertEquals('The foo is one with the bar.', $menu['civicrm/foo/bar']['desc']);
-    $this->assertEquals('CRM_Foo_Page_Bar', $menu['civicrm/foo/bar']['page_callback']);
-    $this->assertEquals('Customize Data and Screens', $menu['civicrm/foo/bar']['adminGroup']);
+    $this->assertSame('Foo Bar', $menu['civicrm/foo/bar']['title']);
+    $this->assertSame('The foo is one with the bar.', $menu['civicrm/foo/bar']['desc']);
+    $this->assertSame('CRM_Foo_Page_Bar', $menu['civicrm/foo/bar']['page_callback']);
+    $this->assertSame('Customize Data and Screens', $menu['civicrm/foo/bar']['adminGroup']);
     $this->assertEquals('10', $menu['civicrm/foo/bar']['weight']);
     $this->assertTrue(!isset($menu['civicrm/foo/bar']['ids_arguments']));
   }
@@ -49,7 +49,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $menu = [];
     CRM_Core_Menu::readXML($xml, $menu);
     $this->assertTrue(isset($menu['civicrm/foo/bar']));
-    $this->assertEquals('Foo Bar', $menu['civicrm/foo/bar']['title']);
+    $this->assertSame('Foo Bar', $menu['civicrm/foo/bar']['title']);
     $this->assertEquals(['alpha', 'beta'], $menu['civicrm/foo/bar']['ids_arguments']['json']);
     $this->assertEquals(['gamma'], $menu['civicrm/foo/bar']['ids_arguments']['exceptions']);
     $this->assertEquals([], $menu['civicrm/foo/bar']['ids_arguments']['html']);
@@ -83,7 +83,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     \Civi::router()->clear();
     $item = \Civi::router()->get('civicrm/case');
     $this->assertTrue(in_array('foobar', $item['ids_arguments']['exceptions']));
-    $this->assertEquals('godliness', $item['whimsy']);
+    $this->assertSame('godliness', $item['whimsy']);
   }
 
   /**
@@ -98,8 +98,8 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
 
     \Civi::router()->clear();
     $item = \Civi::router()->get('civicrm/dashboard');
-    $this->assertEquals('civicrm/dashboard', $item['path']);
-    $this->assertEquals('CRM_Contact_Page_DashBoard', $item['page_callback']);
+    $this->assertSame('civicrm/dashboard', $item['path']);
+    $this->assertSame('CRM_Contact_Page_DashBoard', $item['page_callback']);
   }
 
   /**

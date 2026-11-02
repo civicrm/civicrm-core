@@ -137,7 +137,7 @@ class SearchTimeoutTest extends Api4TestBase implements TransactionalInterface {
           $this->fail("Expected search timeout exception for code {$errorCode} was not thrown.");
         }
         catch (\CRM_Core_Exception $e) {
-          $this->assertEquals('search_timeout', $e->getErrorCode());
+          $this->assertSame('search_timeout', $e->getErrorCode());
           $this->assertStringContainsString('The search query timed out', $e->getMessage());
         }
       }

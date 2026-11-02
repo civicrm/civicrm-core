@@ -49,16 +49,16 @@ class FieldsCallbackTest extends Api4TestBase {
     $this->assertGreaterThan(1, $getFields->count());
     // Check new field
     $extraField = $getFields['test_extra_field'];
-    $this->assertEquals('Test Extra Field Label', $extraField['label']);
-    $this->assertEquals('Test Extra Field Title', $extraField['title']);
-    $this->assertEquals('Text', $extraField['input_type']);
+    $this->assertSame('Test Extra Field Label', $extraField['label']);
+    $this->assertSame('Test Extra Field Title', $extraField['title']);
+    $this->assertSame('Text', $extraField['input_type']);
     $this->assertEquals(['import'], $extraField['usage']);
     $this->assertTrue($extraField['readonly']);
     $this->assertFalse($extraField['required']);
     // Check modified fields
-    $this->assertEquals('Test ID Title', $getFields['id']['title']);
+    $this->assertSame('Test ID Title', $getFields['id']['title']);
     $this->assertTrue($getFields['email']['readonly']);
-    $this->assertEquals('Test Primary Title', $getFields['is_primary']['title']);
+    $this->assertSame('Test Primary Title', $getFields['is_primary']['title']);
     // Default should not have been affected simply by changing the title
     $this->assertNull($getFields['is_primary']['default_value']);
   }

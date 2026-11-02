@@ -118,7 +118,7 @@ class CRM_Mailing_BAO_MailingJobTest extends CiviUnitTestCase {
       }
     }
     $this->assertNotNull($newJob, 'New child job found');
-    $this->assertEquals('Scheduled', $newJob['status']);
+    $this->assertSame('Scheduled', $newJob['status']);
 
     // Verify recipient was added to civicrm_mailing_event_queue for the new job
     $queuedCount = CRM_Core_DAO::singleValueQuery("

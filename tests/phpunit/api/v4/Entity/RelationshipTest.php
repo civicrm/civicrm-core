@@ -78,12 +78,12 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('near_contact_id', 'orientation', 'description', 'relationship_created_date', 'relationship_modified_date', 'permission_near_to_far:name', 'permission_far_to_near:name')
       ->execute()->indexBy('near_contact_id');
     $this->assertCount(2, $cacheRecords);
-    $this->assertEquals("Wow, we're related!", $cacheRecords[$c1]['description']);
-    $this->assertEquals("Wow, we're related!", $cacheRecords[$c2]['description']);
-    $this->assertEquals('View and update', $cacheRecords[$c1]['permission_near_to_far:name']);
-    $this->assertEquals('View only', $cacheRecords[$c2]['permission_near_to_far:name']);
-    $this->assertEquals('View only', $cacheRecords[$c1]['permission_far_to_near:name']);
-    $this->assertEquals('View and update', $cacheRecords[$c2]['permission_far_to_near:name']);
+    $this->assertSame("Wow, we're related!", $cacheRecords[$c1]['description']);
+    $this->assertSame("Wow, we're related!", $cacheRecords[$c2]['description']);
+    $this->assertSame('View and update', $cacheRecords[$c1]['permission_near_to_far:name']);
+    $this->assertSame('View only', $cacheRecords[$c2]['permission_near_to_far:name']);
+    $this->assertSame('View only', $cacheRecords[$c1]['permission_far_to_near:name']);
+    $this->assertSame('View and update', $cacheRecords[$c2]['permission_far_to_near:name']);
     $this->assertEquals($relationship['created_date'], $cacheRecords[$c1]['relationship_created_date']);
     $this->assertEquals($relationship['modified_date'], $cacheRecords[$c2]['relationship_modified_date']);
   }
@@ -224,7 +224,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
 
     // One success, one error
     $this->assertCount(1, $saved->getErrors());
-    $this->assertEquals('duplicate', $saved->getErrors()[0]->getCode());
+    $this->assertSame('duplicate', $saved->getErrors()[0]->getCode());
     $this->assertCount(1, $saved);
   }
 
@@ -271,7 +271,7 @@ class RelationshipTest extends Api4TestBase implements TransactionalInterface {
 
     // One success, one error
     $this->assertCount(1, $new->getErrors());
-    $this->assertEquals('duplicate', $new->getErrors()[0]->getCode());
+    $this->assertSame('duplicate', $new->getErrors()[0]->getCode());
     $this->assertCount(1, $new);
   }
 

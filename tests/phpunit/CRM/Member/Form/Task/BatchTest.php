@@ -80,9 +80,9 @@ class CRM_Member_Form_Task_BatchTest extends CiviUnitTestCase {
       ->processForm();
 
     $memberships = $this->callAPISuccess('Membership', 'get', [])['values'];
-    $this->assertEquals('2019-12-26', $memberships[$membership1]['join_date']);
-    $this->assertEquals('2019-11-26', $memberships[$membership2]['join_date']);
-    $this->assertEquals('form', $memberships[$membership2]['source']);
+    $this->assertSame('2019-12-26', $memberships[$membership1]['join_date']);
+    $this->assertSame('2019-11-26', $memberships[$membership2]['join_date']);
+    $this->assertSame('form', $memberships[$membership2]['source']);
     $this->assertEquals(80, $memberships[$membership1][$this->getCustomFieldName('text')]);
     $this->assertEquals(100, $memberships[$membership2][$this->getCustomFieldName('text')]);
   }

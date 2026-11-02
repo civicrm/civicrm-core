@@ -182,7 +182,7 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
     $cmd = strtr($runner, ['@PHP' => escapeshellarg('Civi::pipe("t");')]);
     $rpc = new \Civi\Pipe\BasicPipeClient($cmd);
 
-    $this->assertEquals('trusted', $rpc->getWelcome()['t'], "Expect standard Civi::pipe header when starting via $name");
+    $this->assertSame('trusted', $rpc->getWelcome()['t'], "Expect standard Civi::pipe header when starting via $name");
 
     $r = $rpc->call('echo', ['a' => 123]);
     $this->assertEquals(['a' => 123], $r);

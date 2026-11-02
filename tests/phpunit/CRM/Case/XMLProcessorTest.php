@@ -30,13 +30,13 @@ class CRM_Case_XMLProcessorTest extends CiviCaseTestCase {
     // wrong, depending on your point of view). Let's not use the words right
     // and wrong let's just call it one way and the other way.
     $relationshipTypes = $processor->allRelationshipTypes(FALSE);
-    $this->assertEquals('Food poison tester is', $relationshipTypes["{$relationshipTypeID}_a_b"]);
-    $this->assertEquals('Food poison tester for', $relationshipTypes["{$relationshipTypeID}_b_a"]);
+    $this->assertSame('Food poison tester is', $relationshipTypes["{$relationshipTypeID}_a_b"]);
+    $this->assertSame('Food poison tester for', $relationshipTypes["{$relationshipTypeID}_b_a"]);
 
     // For true, B and A are the other way around here.
     $relationshipTypes = $processor->allRelationshipTypes(TRUE);
-    $this->assertEquals('Food poison tester is', $relationshipTypes["{$relationshipTypeID}_b_a"]);
-    $this->assertEquals('Food poison tester for', $relationshipTypes["{$relationshipTypeID}_a_b"]);
+    $this->assertSame('Food poison tester is', $relationshipTypes["{$relationshipTypeID}_b_a"]);
+    $this->assertSame('Food poison tester for', $relationshipTypes["{$relationshipTypeID}_a_b"]);
   }
 
 }

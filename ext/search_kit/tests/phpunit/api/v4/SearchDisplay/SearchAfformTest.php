@@ -411,7 +411,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     // The display should now have one reference (the Afform)
     $refs = CoreUtil::getRefCount('SearchDisplay', $display['id']);
     $this->assertCount(1, $refs);
-    $this->assertEquals('Afform', $refs[0]['type']);
+    $this->assertSame('Afform', $refs[0]['type']);
 
     // Create an afform that uses the search default display
     Afform::create(FALSE)
@@ -433,7 +433,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     // The display should still have one reference (the Afform)
     $refs = CoreUtil::getRefCount('SearchDisplay', $display['id']);
     $this->assertCount(1, $refs);
-    $this->assertEquals('Afform', $refs[0]['type']);
+    $this->assertSame('Afform', $refs[0]['type']);
 
     SearchDisplay::delete(FALSE)
       ->addWhere('name', '=', 'TestDisplayToDelete')
@@ -525,7 +525,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $params['filters']['is_active'] = FALSE;
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result);
-    $this->assertEquals('c', $result[0]['columns'][0]['val']);
+    $this->assertSame('c', $result[0]['columns'][0]['val']);
 
     // Because the 2 displays share a fieldset, the filter field should work on both
     $params = $baseParams;
@@ -533,7 +533,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $params['filters']['label'] = 'b';
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result);
-    $this->assertEquals('b', $result[0]['columns'][0]['val']);
+    $this->assertSame('b', $result[0]['columns'][0]['val']);
 
     $params = $baseParams;
     $params['filters']['is_active'] = FALSE;
@@ -629,8 +629,8 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(5, $result);
     $this->assertNull($result[0]['data']['Contact_ActivityContact_Activity_01.subject']);
-    $this->assertEquals('Activity 2', $result[1]['data']['Contact_ActivityContact_Activity_01.subject']);
-    $this->assertEquals('Activity 3', $result[2]['data']['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertSame('Activity 2', $result[1]['data']['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertSame('Activity 3', $result[2]['data']['Contact_ActivityContact_Activity_01.subject']);
     $this->assertNull($result[3]['data']['Contact_ActivityContact_Activity_01.subject']);
     $this->assertNull($result[4]['data']['Contact_ActivityContact_Activity_01.subject']);
 
@@ -639,7 +639,7 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(5, $result);
     $this->assertNull($result[0]['data']['Contact_ActivityContact_Activity_01.subject']);
-    $this->assertEquals('Activity 2', $result[1]['data']['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertSame('Activity 2', $result[1]['data']['Contact_ActivityContact_Activity_01.subject']);
     $this->assertNull($result[2]['data']['Contact_ActivityContact_Activity_01.subject']);
     $this->assertNull($result[3]['data']['Contact_ActivityContact_Activity_01.subject']);
     $this->assertNull($result[4]['data']['Contact_ActivityContact_Activity_01.subject']);
@@ -653,8 +653,8 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $params['filters'] = ['Contact_ActivityContact_Activity_01.status_id' => [2]];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $this->assertEquals('Activity 2', $result[0]['data']['Contact_ActivityContact_Activity_01.subject']);
-    $this->assertEquals('Activity 3', $result[1]['data']['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertSame('Activity 2', $result[0]['data']['Contact_ActivityContact_Activity_01.subject']);
+    $this->assertSame('Activity 3', $result[1]['data']['Contact_ActivityContact_Activity_01.subject']);
   }
 
   /**
@@ -782,10 +782,10 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $this->assertStringNotContainsString('API4 Request Authorization failed: Email::getActions', $newLogs);
 
     $this->assertCount(1, $result);
-    $this->assertEquals('Alice Wonderland', $result[0]['data']['display_name']);
-    $this->assertEquals('123 Rabbit Hole', $result[0]['data']['Contact_Address_contact_id_01.street_address']);
-    $this->assertEquals('555-1234', $result[0]['data']['Contact_Phone_contact_id_01.phone']);
-    $this->assertEquals('alice@wonderland.org', $result[0]['data']['Contact_Email_contact_id_01.email']);
+    $this->assertSame('Alice Wonderland', $result[0]['data']['display_name']);
+    $this->assertSame('123 Rabbit Hole', $result[0]['data']['Contact_Address_contact_id_01.street_address']);
+    $this->assertSame('555-1234', $result[0]['data']['Contact_Phone_contact_id_01.phone']);
+    $this->assertSame('alice@wonderland.org', $result[0]['data']['Contact_Email_contact_id_01.email']);
   }
 
 }

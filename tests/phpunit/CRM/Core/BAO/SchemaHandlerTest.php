@@ -343,8 +343,8 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
       ],
     ];
     CRM_Core_BAO_SchemaHandler::addIndexSignature('my_table', $indices);
-    $this->assertEquals('my_table::1::id::name(3)', $indices['one']['sig']);
-    $this->assertEquals('my_table::0::title', $indices['two']['sig']);
+    $this->assertSame('my_table::1::id::name(3)', $indices['one']['sig']);
+    $this->assertSame('my_table::0::title', $indices['two']['sig']);
   }
 
   /**
@@ -396,19 +396,19 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
       'type' => 'text',
     ];
     $sql = CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($params, FALSE);
-    $this->assertEquals('ALTER TABLE civicrm_contact
+    $this->assertSame('ALTER TABLE civicrm_contact
         ADD COLUMN `big_bob` text NULL', trim($sql));
 
     $params['operation'] = 'modify';
     $params['comment'] = 'super big';
     $params['fkName'] = CRM_Core_BAO_SchemaHandler::getIndexName('civicrm_contact', 'big_bob');
     $sql = CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($params, FALSE);
-    $this->assertEquals("ALTER TABLE civicrm_contact
+    $this->assertSame("ALTER TABLE civicrm_contact
         MODIFY `big_bob` text NULL COMMENT 'super big'", trim($sql));
 
     $params['operation'] = 'delete';
     $sql = CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($params, FALSE);
-    $this->assertEquals('ALTER TABLE civicrm_contact DROP COLUMN `big_bob`', trim($sql));
+    $this->assertSame('ALTER TABLE civicrm_contact DROP COLUMN `big_bob`', trim($sql));
   }
 
   /**
@@ -419,18 +419,18 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     $keysByName = array_column($keys, NULL, 'name');
 
     $this->assertArrayHasKey('FK_civicrm_contribution_currency', $keysByName);
-    $this->assertEquals('civicrm_contribution', $keysByName['FK_civicrm_contribution_currency']['table']);
-    $this->assertEquals('currency', $keysByName['FK_civicrm_contribution_currency']['field']);
-    $this->assertEquals('Currency', $keysByName['FK_civicrm_contribution_currency']['spec']['entity_reference']['entity']);
-    $this->assertEquals('name', $keysByName['FK_civicrm_contribution_currency']['spec']['entity_reference']['key']);
-    $this->assertEquals('SET NULL', $keysByName['FK_civicrm_contribution_currency']['spec']['entity_reference']['on_delete']);
+    $this->assertSame('civicrm_contribution', $keysByName['FK_civicrm_contribution_currency']['table']);
+    $this->assertSame('currency', $keysByName['FK_civicrm_contribution_currency']['field']);
+    $this->assertSame('Currency', $keysByName['FK_civicrm_contribution_currency']['spec']['entity_reference']['entity']);
+    $this->assertSame('name', $keysByName['FK_civicrm_contribution_currency']['spec']['entity_reference']['key']);
+    $this->assertSame('SET NULL', $keysByName['FK_civicrm_contribution_currency']['spec']['entity_reference']['on_delete']);
 
     $this->assertArrayHasKey('FK_civicrm_participant_fee_currency', $keysByName);
-    $this->assertEquals('civicrm_participant', $keysByName['FK_civicrm_participant_fee_currency']['table']);
-    $this->assertEquals('fee_currency', $keysByName['FK_civicrm_participant_fee_currency']['field']);
-    $this->assertEquals('Currency', $keysByName['FK_civicrm_participant_fee_currency']['spec']['entity_reference']['entity']);
-    $this->assertEquals('name', $keysByName['FK_civicrm_participant_fee_currency']['spec']['entity_reference']['key']);
-    $this->assertEquals('SET NULL', $keysByName['FK_civicrm_participant_fee_currency']['spec']['entity_reference']['on_delete']);
+    $this->assertSame('civicrm_participant', $keysByName['FK_civicrm_participant_fee_currency']['table']);
+    $this->assertSame('fee_currency', $keysByName['FK_civicrm_participant_fee_currency']['field']);
+    $this->assertSame('Currency', $keysByName['FK_civicrm_participant_fee_currency']['spec']['entity_reference']['entity']);
+    $this->assertSame('name', $keysByName['FK_civicrm_participant_fee_currency']['spec']['entity_reference']['key']);
+    $this->assertSame('SET NULL', $keysByName['FK_civicrm_participant_fee_currency']['spec']['entity_reference']['on_delete']);
 
     // Numeric foreign keys should not be included.
     $this->assertArrayNotHasKey('FK_civicrm_contribution_contact_id', $keysByName);

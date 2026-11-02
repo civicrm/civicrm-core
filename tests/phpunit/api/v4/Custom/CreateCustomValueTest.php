@@ -58,7 +58,7 @@ class CreateCustomValueTest extends Api4TestBase {
 
     $optionGroup = $this->getTestRecord('OptionGroup', $optionGroupId);
 
-    $this->assertEquals('MyContactFields :: Color', $optionGroup['title']);
+    $this->assertSame('MyContactFields :: Color', $optionGroup['title']);
 
     $createdOptionValues = OptionValue::get(FALSE)
       ->addWhere('option_group_id', '=', $optionGroupId)
@@ -124,8 +124,8 @@ class CreateCustomValueTest extends Api4TestBase {
       ->execute()
       ->first();
 
-    $this->assertEquals('2022-02-02', $result['date_field']);
-    $this->assertEquals('2022-02-02 12:07:31', $result['date_time_field']);
+    $this->assertSame('2022-02-02', $result['date_field']);
+    $this->assertSame('2022-02-02 12:07:31', $result['date_time_field']);
 
   }
 
@@ -237,7 +237,7 @@ class CreateCustomValueTest extends Api4TestBase {
       )
       ->execute()->single()['created_im'][0];
 
-    self::assertEquals('otherval', $result['IMCustom.im_select_field']);
+    self::assertSame('otherval', $result['IMCustom.im_select_field']);
     self::assertEquals($customBoolFieldDefault, $result['IMCustom.im_boolean_field']);
   }
 

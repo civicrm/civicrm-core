@@ -135,7 +135,7 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
     catch (\Exception $e) {
       $error = $e->getMessage();
     }
-    $this->assertEquals('ACL check failed', $error);
+    $this->assertSame('ACL check failed', $error);
 
     $result = Phone::create()
       ->setValues(['contact_id' => $cid[1], 'phone' => '1234567890'])

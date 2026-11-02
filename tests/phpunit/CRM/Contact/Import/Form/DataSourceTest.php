@@ -46,7 +46,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource');
     $form->buildQuickForm();
     $element = $form->getElement('savedMapping');
-    $this->assertEquals('Well dressed ducks', $element->_options[1]['text']);
+    $this->assertSame('Well dressed ducks', $element->_options[1]['text']);
   }
 
   /**
@@ -166,7 +166,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
       ->execute()
       ->first();
 
-    $this->assertEquals('contact_import', $userJob['job_type']);
+    $this->assertSame('contact_import', $userJob['job_type']);
     $this->assertEmpty($userJob['metadata']['import_mappings'] ?? []);
     $this->assertEmpty($userJob['metadata']['template_id'] ?? NULL);
     $this->assertEquals(3, $userJob['metadata']['DataSource']['number_of_columns']);

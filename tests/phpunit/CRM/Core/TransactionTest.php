@@ -335,7 +335,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
       $this->fail('The error should reach the caller');
     }
     catch (TypeError $e) {
-      $this->assertEquals('Ruh-roh', $e->getMessage());
+      $this->assertSame('Ruh-roh', $e->getMessage());
     }
     $this->assertContactsExistByOffset([0 => FALSE]);
   }

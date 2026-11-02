@@ -131,7 +131,7 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
       ]);
     $form->processForm();
     $activities = $this->callAPISuccess('Activity', 'get', ['sequential' => 1])['values'];
-    $this->assertEquals('Your SMS Reminder', $activities[0]['subject']);
+    $this->assertSame('Your SMS Reminder', $activities[0]['subject']);
   }
 
 }

@@ -166,8 +166,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $params['filters']['first_name'] = ['One', 'Two'];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $this->assertEquals('One', $result[0]['data']['first_name']);
-    $this->assertEquals('Two', $result[1]['data']['first_name']);
+    $this->assertSame('One', $result[0]['data']['first_name']);
+    $this->assertSame('Two', $result[1]['data']['first_name']);
     $count = civicrm_api4('SearchDisplay', 'run', ['return' => 'row_count'] + $params);
     $this->assertCount(2, $count);
 
@@ -179,8 +179,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $params['sort'] = [['first_name', 'ASC']];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $this->assertEquals('Three', $result[0]['data']['first_name']);
-    $this->assertEquals('Two', $result[1]['data']['first_name']);
+    $this->assertSame('Three', $result[0]['data']['first_name']);
+    $this->assertSame('Two', $result[1]['data']['first_name']);
     $count = civicrm_api4('SearchDisplay', 'run', ['return' => 'row_count'] + $params);
     $this->assertCount(2, $count);
 
@@ -251,7 +251,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result[0]['columns'][0]['links']);
-    $this->assertEquals('', $result[0]['columns'][1]['val']);
+    $this->assertSame('', $result[0]['columns'][1]['val']);
     $this->assertArrayNotHasKey('links', $result[0]['columns'][1]);
     $this->assertCount(1, $result[1]['columns'][0]['links']);
     $this->assertCount(1, $result[1]['columns'][1]['links']);
@@ -346,8 +346,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
     ];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $this->assertEquals('Individual', $result->first()['data']['contact_type']);
-    $this->assertEquals('Unit test', $result->first()['data']['source']);
+    $this->assertSame('Individual', $result->first()['data']['contact_type']);
+    $this->assertSame('Unit test', $result->first()['data']['source']);
     $this->assertEquals($lastName, $result->first()['data']['last_name']);
   }
 
@@ -422,22 +422,22 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // 1st link is to a quickform-based search task (CRM_Contribute_Task::PDF_RECEIPT)
     $this->assertArrayNotHasKey('task', $result[0]['columns'][1]['links'][0]);
     $this->assertStringContainsString('id=' . $contributions[0]['id'] . '&qfKey=', $result[0]['columns'][1]['links'][0]['url']);
-    $this->assertEquals('fa-external-link', $result[0]['columns'][1]['links'][0]['icon']);
+    $this->assertSame('fa-external-link', $result[0]['columns'][1]['links'][0]['icon']);
     // 2nd link is to the native SK bulk-update task
     $this->assertArrayNotHasKey('url', $result[0]['columns'][1]['links'][1]);
     $this->assertArrayNotHasKey('action', $result[0]['columns'][1]['links'][1]);
-    $this->assertEquals('update', $result[0]['columns'][1]['links'][1]['task']);
-    $this->assertEquals('fa-pencil', $result[0]['columns'][1]['links'][1]['icon']);
+    $this->assertSame('update', $result[0]['columns'][1]['links'][1]['task']);
+    $this->assertSame('fa-pencil', $result[0]['columns'][1]['links'][1]['icon']);
     // 3rd link is a popup link to the delete contribution quickform
     $this->assertArrayNotHasKey('task', $result[0]['columns'][1]['links'][2]);
     $this->assertStringContainsString('action=delete&id=' . $contributions[0]['id'], $result[0]['columns'][1]['links'][2]['url']);
-    $this->assertEquals('crm-popup', $result[0]['columns'][1]['links'][2]['target']);
-    $this->assertEquals('fa-trash', $result[0]['columns'][1]['links'][2]['icon']);
-    $this->assertEquals('Delete', $result[0]['columns'][1]['links'][2]['title']);
+    $this->assertSame('crm-popup', $result[0]['columns'][1]['links'][2]['target']);
+    $this->assertSame('fa-trash', $result[0]['columns'][1]['links'][2]['icon']);
+    $this->assertSame('Delete', $result[0]['columns'][1]['links'][2]['title']);
     // 4th link tests token replacement in title
-    $this->assertEquals('Test Link', $result[0]['columns'][1]['links'][3]['text']);
+    $this->assertSame('Test Link', $result[0]['columns'][1]['links'][3]['text']);
     $this->assertEquals('View ' . $result[0]['data']['contact_id.display_name'], $result[0]['columns'][1]['links'][3]['title']);
-    $this->assertEquals('fa-test', $result[0]['columns'][1]['links'][3]['icon']);
+    $this->assertSame('fa-test', $result[0]['columns'][1]['links'][3]['icon']);
     // The user-error malformed path should have been fixed
     $this->assertStringContainsString('?q=civicrm/test&foo=1&bar=2', $result[0]['columns'][1]['links'][3]['url']);
   }
@@ -556,8 +556,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // Native SK tasks should not have a url
     $this->assertArrayNotHasKey('url', $result[0]['columns'][1]['links'][0]);
     $this->assertArrayNotHasKey('action', $result[0]['columns'][1]['links'][0]);
-    $this->assertEquals('disable', $result[0]['columns'][1]['links'][0]['task']);
-    $this->assertEquals('fa-pencil', $result[0]['columns'][1]['links'][0]['icon']);
+    $this->assertSame('disable', $result[0]['columns'][1]['links'][0]['task']);
+    $this->assertSame('fa-pencil', $result[0]['columns'][1]['links'][0]['icon']);
   }
 
   public function testGroupEnableDisableTaskLinks(): void {
@@ -663,9 +663,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     // Unreserved groups show enable or disable according to is_active
     $this->assertCount(1, $rows[$unreservedActive['id']]);
-    $this->assertEquals('disable', $rows[$unreservedActive['id']][0]['task']);
+    $this->assertSame('disable', $rows[$unreservedActive['id']][0]['task']);
     $this->assertCount(1, $rows[$unreservedInactive['id']]);
-    $this->assertEquals('enable', $rows[$unreservedInactive['id']][0]['task']);
+    $this->assertSame('enable', $rows[$unreservedInactive['id']][0]['task']);
 
     // Reserved groups have no enable/disable links without permission
     $this->assertCount(0, $rows[$reservedActive['id']]);
@@ -687,14 +687,14 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     // All groups show enable or disable according to is_active
     $this->assertCount(1, $rows[$unreservedActive['id']]);
-    $this->assertEquals('disable', $rows[$unreservedActive['id']][0]['task']);
+    $this->assertSame('disable', $rows[$unreservedActive['id']][0]['task']);
     $this->assertCount(1, $rows[$unreservedInactive['id']]);
-    $this->assertEquals('enable', $rows[$unreservedInactive['id']][0]['task']);
+    $this->assertSame('enable', $rows[$unreservedInactive['id']][0]['task']);
 
     $this->assertCount(1, $rows[$reservedActive['id']]);
-    $this->assertEquals('disable', $rows[$reservedActive['id']][0]['task']);
+    $this->assertSame('disable', $rows[$reservedActive['id']][0]['task']);
     $this->assertCount(1, $rows[$reservedInactive['id']]);
-    $this->assertEquals('enable', $rows[$reservedInactive['id']][0]['task']);
+    $this->assertSame('enable', $rows[$reservedInactive['id']][0]['task']);
   }
 
   public function testRelationshipCacheLinks():void {
@@ -780,17 +780,17 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayNotHasKey('task', $result[0]['columns'][1]['links'][0]);
     $this->assertStringContainsString('id=' . $relationships[0]['id'], $result[0]['columns'][1]['links'][0]['url']);
     // 2nd link is to delete
-    $this->assertEquals('fa-trash', $result[0]['columns'][1]['links'][1]['icon']);
+    $this->assertSame('fa-trash', $result[0]['columns'][1]['links'][1]['icon']);
     // Ensure "empty" titles are still returned
     $this->assertEquals('0', $result[0]['columns'][1]['links'][1]['title']);
     // 3rd link is the disable task for active relationships or the enable task for inactive ones
-    $this->assertEquals('disable', $result[0]['columns'][1]['links'][2]['task']);
-    $this->assertEquals('disable', $result[1]['columns'][1]['links'][2]['task']);
-    $this->assertEquals('enable', $result[2]['columns'][1]['links'][2]['task']);
-    $this->assertEquals('enable', $result[3]['columns'][1]['links'][2]['task']);
+    $this->assertSame('disable', $result[0]['columns'][1]['links'][2]['task']);
+    $this->assertSame('disable', $result[1]['columns'][1]['links'][2]['task']);
+    $this->assertSame('enable', $result[2]['columns'][1]['links'][2]['task']);
+    $this->assertSame('enable', $result[3]['columns'][1]['links'][2]['task']);
     $this->assertStringContainsString('Enable', $result[3]['columns'][1]['links'][2]['title']);
     // 4th link is to the case, and only for the relevant entity
-    $this->assertEquals('Manage Case', $result[2]['columns'][1]['links'][3]['text']);
+    $this->assertSame('Manage Case', $result[2]['columns'][1]['links'][3]['text']);
     $this->assertStringContainsString("id={$case['id']}", $result[3]['columns'][1]['links'][3]['url']);
   }
 
@@ -852,8 +852,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(2, $result);
-    $this->assertEquals('Green', $result[0]['columns'][1]['val']);
-    $this->assertEquals('Red', $result[1]['columns'][1]['val']);
+    $this->assertSame('Green', $result[0]['columns'][1]['val']);
+    $this->assertSame('Red', $result[1]['columns'][1]['val']);
   }
 
   public function testRelatedContactSearchWithRelationshipCustomFieldFilter(): void {
@@ -926,7 +926,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result);
-    $this->assertEquals('Red', $result[0]['columns'][1]['val']);
+    $this->assertSame('Red', $result[0]['columns'][1]['val']);
   }
 
   /**
@@ -995,10 +995,10 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
     ];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $this->assertEquals("Uno $lastName", $result[0]['columns'][1]['val']);
-    $this->assertEquals("Two $lastName", $result[1]['columns'][1]['val']);
-    $this->assertEquals("testmail@unit.test (Home)", $result[0]['columns'][2]['val']);
-    $this->assertEquals("", $result[1]['columns'][2]['val']);
+    $this->assertSame("Uno $lastName", $result[0]['columns'][1]['val']);
+    $this->assertSame("Two $lastName", $result[1]['columns'][1]['val']);
+    $this->assertSame("testmail@unit.test (Home)", $result[0]['columns'][2]['val']);
+    $this->assertSame("", $result[1]['columns'][2]['val']);
 
     // Try running it with illegal tags like {crmApi}
     $params['display']['columns'][1]['rewrite'] = '{crmApi entity="Email" action="get" va="notAllowed"}';
@@ -1049,8 +1049,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
     ];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $this->assertEquals("#{$contacts[0]['id']} is #{$contacts[0]['id']}", $result[0]['columns'][0]['val']);
-    $this->assertEquals("Uno $lastName", $result[0]['columns'][1]['val']);
+    $this->assertSame("#{$contacts[0]['id']} is #{$contacts[0]['id']}", $result[0]['columns'][0]['val']);
+    $this->assertSame("Uno $lastName", $result[0]['columns'][1]['val']);
   }
 
   /**
@@ -1102,10 +1102,10 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ],
     ];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $this->assertEquals("Alpha Middle $lastName", $result[0]['columns'][0]['val']);
-    $this->assertEquals("Beta $lastName", $result[1]['columns'][0]['val']);
-    $this->assertEquals("Alpha (Al)", $result[0]['columns'][1]['val']);
-    $this->assertEquals("Beta", $result[1]['columns'][1]['val']);
+    $this->assertSame("Alpha Middle $lastName", $result[0]['columns'][0]['val']);
+    $this->assertSame("Beta $lastName", $result[1]['columns'][0]['val']);
+    $this->assertSame("Alpha (Al)", $result[0]['columns'][1]['val']);
+    $this->assertSame("Beta", $result[1]['columns'][1]['val']);
   }
 
   /**
@@ -1677,18 +1677,18 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
 
     // Non-conditional style rule
-    $this->assertEquals('text-center', $result[0]['columns'][0]['cssClass']);
+    $this->assertSame('text-center', $result[0]['columns'][0]['cssClass']);
     // First contact is deceased, gets strikethrough class
-    $this->assertEquals('strikethrough', $result[0]['cssClass']);
+    $this->assertSame('strikethrough', $result[0]['cssClass']);
     $this->asserttrue(empty($result[1]['cssClass']));
     // Ensure the view contact link was formed
     $this->assertStringContainsString('cid=' . $contacts[0]['id'], $result[0]['columns'][1]['links'][0]['url']);
-    $this->assertEquals('_blank', $result[0]['columns'][1]['links'][0]['target']);
+    $this->assertSame('_blank', $result[0]['columns'][1]['links'][0]['target']);
     // 1st column gets static + conditional style
     $this->assertStringContainsString('text-right', $result[0]['columns'][2]['cssClass']);
     $this->assertStringContainsString('bg-danger', $result[0]['columns'][2]['cssClass']);
     // 2nd row gets static style but no conditional styles apply
-    $this->assertEquals('text-right', $result[1]['columns'][2]['cssClass']);
+    $this->assertSame('text-right', $result[1]['columns'][2]['cssClass']);
     // 3rd column gets static + conditional style
     $this->assertStringContainsString('text-right', $result[2]['columns'][2]['cssClass']);
     $this->assertStringContainsString('bg-warning', $result[2]['columns'][2]['cssClass']);
@@ -1847,14 +1847,14 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
 
     // Has a nick name
-    $this->assertEquals("Nick $lastName", $result[0]['columns'][1]['val']);
-    $this->assertEquals("Nick $lastName", $result[0]['columns'][1]['links'][0]['text']);
+    $this->assertSame("Nick $lastName", $result[0]['columns'][1]['val']);
+    $this->assertSame("Nick $lastName", $result[0]['columns'][1]['links'][0]['text']);
     // Title is display name
-    $this->assertEquals("Zero $lastName", $result[0]['columns'][1]['title']);
+    $this->assertSame("Zero $lastName", $result[0]['columns'][1]['title']);
     // No nick name - using first name instead per empty_value setting
-    $this->assertEquals("First $lastName", $result[1]['columns'][1]['val']);
-    $this->assertEquals("First $lastName", $result[1]['columns'][1]['title']);
-    $this->assertEquals("First $lastName", $result[1]['columns'][1]['links'][0]['text']);
+    $this->assertSame("First $lastName", $result[1]['columns'][1]['val']);
+    $this->assertSame("First $lastName", $result[1]['columns'][1]['title']);
+    $this->assertSame("First $lastName", $result[1]['columns'][1]['links'][0]['text']);
     // Check links
     $this->assertNotEmpty($result[0]['columns'][1]['links'][0]['url']);
     $this->assertNotEmpty($result[1]['columns'][1]['links'][0]['url']);
@@ -1895,7 +1895,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
 
     $this->assertCount(1, $result);
-    $this->assertEquals('Contact', $result[0]['columns'][0]['val']);
+    $this->assertSame('Contact', $result[0]['columns'][0]['val']);
   }
 
   public function testGroupByContactType(): void {
@@ -2062,14 +2062,14 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(3, $result);
 
     // Currency should have been fetched automatically and used to format the value
-    $this->assertEquals('GBP', $result[2]['data']['currency']);
-    $this->assertEquals('£100.00', $result[2]['columns'][0]['val']);
+    $this->assertSame('GBP', $result[2]['data']['currency']);
+    $this->assertSame('£100.00', $result[2]['columns'][0]['val']);
 
-    $this->assertEquals('USD', $result[1]['data']['currency']);
-    $this->assertEquals('$200.00', $result[1]['columns'][0]['val']);
+    $this->assertSame('USD', $result[1]['data']['currency']);
+    $this->assertSame('$200.00', $result[1]['columns'][0]['val']);
 
-    $this->assertEquals('JPY', $result[0]['data']['currency']);
-    $this->assertEquals('¥500', $result[0]['columns'][0]['val']);
+    $this->assertSame('JPY', $result[0]['data']['currency']);
+    $this->assertSame('¥500', $result[0]['columns'][0]['val']);
 
     // Now do a search for the contribution line-items
     $params['savedSearch'] = [
@@ -2085,14 +2085,14 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(3, $result);
 
     // An automatic join should have been added to fetch the contribution currency
-    $this->assertEquals('GBP', $result[2]['data']['contribution_id.currency']);
-    $this->assertEquals('£100.00', $result[2]['columns'][0]['val']);
+    $this->assertSame('GBP', $result[2]['data']['contribution_id.currency']);
+    $this->assertSame('£100.00', $result[2]['columns'][0]['val']);
 
-    $this->assertEquals('USD', $result[1]['data']['contribution_id.currency']);
-    $this->assertEquals('$200.00', $result[1]['columns'][0]['val']);
+    $this->assertSame('USD', $result[1]['data']['contribution_id.currency']);
+    $this->assertSame('$200.00', $result[1]['columns'][0]['val']);
 
-    $this->assertEquals('JPY', $result[0]['data']['contribution_id.currency']);
-    $this->assertEquals('¥500', $result[0]['columns'][0]['val']);
+    $this->assertSame('JPY', $result[0]['data']['contribution_id.currency']);
+    $this->assertSame('¥500', $result[0]['columns'][0]['val']);
 
     // Now try it via joins
     $params['savedSearch'] = [
@@ -2111,14 +2111,14 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(3, $result);
 
     // The parent join should have been used rather than adding an unnecessary implicit join
-    $this->assertEquals('GBP', $result[2]['data']['contribution.currency']);
-    $this->assertEquals('£100.00', $result[2]['columns'][0]['val']);
+    $this->assertSame('GBP', $result[2]['data']['contribution.currency']);
+    $this->assertSame('£100.00', $result[2]['columns'][0]['val']);
 
-    $this->assertEquals('USD', $result[1]['data']['contribution.currency']);
-    $this->assertEquals('$200.00', $result[1]['columns'][0]['val']);
+    $this->assertSame('USD', $result[1]['data']['contribution.currency']);
+    $this->assertSame('$200.00', $result[1]['columns'][0]['val']);
 
-    $this->assertEquals('JPY', $result[0]['data']['contribution.currency']);
-    $this->assertEquals('¥500', $result[0]['columns'][0]['val']);
+    $this->assertSame('JPY', $result[0]['data']['contribution.currency']);
+    $this->assertSame('¥500', $result[0]['columns'][0]['val']);
   }
 
   public function testContributionAggregateCurrency():void {
@@ -2151,16 +2151,16 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(3, $result);
 
     // Currency should have been used to format the aggregated values
-    $this->assertEquals('GBP', $result[0]['data']['currency']);
-    $this->assertEquals('£100.00', $result[0]['columns'][0]['val']);
+    $this->assertSame('GBP', $result[0]['data']['currency']);
+    $this->assertSame('£100.00', $result[0]['columns'][0]['val']);
     $this->assertEquals(1, $result[0]['columns'][1]['val']);
 
-    $this->assertEquals('JPY', $result[1]['data']['currency']);
-    $this->assertEquals('¥500', $result[1]['columns'][0]['val']);
+    $this->assertSame('JPY', $result[1]['data']['currency']);
+    $this->assertSame('¥500', $result[1]['columns'][0]['val']);
     $this->assertEquals(1, $result[1]['columns'][1]['val']);
 
-    $this->assertEquals('USD', $result[2]['data']['currency']);
-    $this->assertEquals('$400.00', $result[2]['columns'][0]['val']);
+    $this->assertSame('USD', $result[2]['data']['currency']);
+    $this->assertSame('$400.00', $result[2]['columns'][0]['val']);
     $this->assertEquals(2, $result[2]['columns'][1]['val']);
 
     $params = [
@@ -2186,17 +2186,17 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(4, $result);
 
     // Currency should have been used to format the aggregated values
-    $this->assertEquals('GBP', $result[0]['data']['currency']);
-    $this->assertEquals('£100.00', $result[0]['columns'][0]['val']);
+    $this->assertSame('GBP', $result[0]['data']['currency']);
+    $this->assertSame('£100.00', $result[0]['columns'][0]['val']);
 
-    $this->assertEquals('USD', $result[1]['data']['currency']);
-    $this->assertEquals('$150.00', $result[1]['columns'][0]['val']);
+    $this->assertSame('USD', $result[1]['data']['currency']);
+    $this->assertSame('$150.00', $result[1]['columns'][0]['val']);
 
-    $this->assertEquals('JPY', $result[2]['data']['currency']);
-    $this->assertEquals('¥500', $result[2]['columns'][0]['val']);
+    $this->assertSame('JPY', $result[2]['data']['currency']);
+    $this->assertSame('¥500', $result[2]['columns'][0]['val']);
 
-    $this->assertEquals('USD', $result[3]['data']['currency']);
-    $this->assertEquals('$250.00', $result[3]['columns'][0]['val']);
+    $this->assertSame('USD', $result[3]['data']['currency']);
+    $this->assertSame('$250.00', $result[3]['columns'][0]['val']);
   }
 
   public function testCustomFieldCurrency(): void {
@@ -2276,15 +2276,15 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(1, $result);
 
     // 1. Custom money field controlled by another custom Currency field (JPY -> ¥500)
-    $this->assertEquals('JPY', $result[0]['data']['test_part_grp.custom_currency']);
-    $this->assertEquals('¥500', $result[0]['columns'][0]['val']);
+    $this->assertSame('JPY', $result[0]['data']['test_part_grp.custom_currency']);
+    $this->assertSame('¥500', $result[0]['columns'][0]['val']);
 
     // 2. Custom money field controlled by core fee_currency field (GBP -> £300.00)
-    $this->assertEquals('GBP', $result[0]['data']['fee_currency']);
-    $this->assertEquals('£300.00', $result[0]['columns'][1]['val']);
+    $this->assertSame('GBP', $result[0]['data']['fee_currency']);
+    $this->assertSame('£300.00', $result[0]['columns'][1]['val']);
 
     // 3. Custom money field with no control field (uses default currency -> $200.00)
-    $this->assertEquals('$200.00', $result[0]['columns'][2]['val']);
+    $this->assertSame('$200.00', $result[0]['columns'][2]['val']);
   }
 
   public function testTally(): void {
@@ -3040,12 +3040,12 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(3, $result);
 
     // Contacts will be returned in order by sort_name
-    $this->assertEquals('Both', $result[0]['columns'][0]['val']);
-    $this->assertEquals('fa-star', $result[0]['columns'][0]['icons']['left'][0]);
-    $this->assertEquals('No icon', $result[1]['columns'][0]['val']);
-    $this->assertEquals('fa-user', $result[1]['columns'][0]['icons']['left'][0]);
-    $this->assertEquals('Starry', $result[2]['columns'][0]['val']);
-    $this->assertEquals('fa-star', $result[2]['columns'][0]['icons']['left'][0]);
+    $this->assertSame('Both', $result[0]['columns'][0]['val']);
+    $this->assertSame('fa-star', $result[0]['columns'][0]['icons']['left'][0]);
+    $this->assertSame('No icon', $result[1]['columns'][0]['val']);
+    $this->assertSame('fa-user', $result[1]['columns'][0]['icons']['left'][0]);
+    $this->assertSame('Starry', $result[2]['columns'][0]['val']);
+    $this->assertSame('fa-star', $result[2]['columns'][0]['icons']['left'][0]);
   }
 
   public function testKeyIsReturned(): void {
@@ -3144,11 +3144,11 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result->toolbar);
     $menu = $result->toolbar[0];
-    $this->assertEquals('Add Contact', $menu['text']);
-    $this->assertEquals('fa-plus', $menu['icon']);
+    $this->assertSame('Add Contact', $menu['text']);
+    $this->assertSame('fa-plus', $menu['icon']);
     $button = $menu['children'][0];
-    $this->assertEquals('fa-user', $button['icon']);
-    $this->assertEquals('Add Individual', $button['text']);
+    $this->assertSame('fa-user', $button['icon']);
+    $this->assertSame('Add Individual', $button['text']);
     $this->assertStringContainsString('=Individual', $button['url']);
 
     // Try with pseudoconstant (for proper test the label needs to be different from the name)
@@ -3161,10 +3161,10 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     unset($params['display']['settings']['toolbar'][0]['text']);
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $menu = $result->toolbar[0];
-    $this->assertEquals('Add Disorganization', $menu['text']);
+    $this->assertSame('Add Disorganization', $menu['text']);
     $button = $menu['children'][0];
     $this->assertStringContainsString('=Organization', $button['url']);
-    $this->assertEquals('Add Disorganization', $button['text']);
+    $this->assertSame('Add Disorganization', $button['text']);
 
     // Test legacy 'addButton' setting
     $params['display']['settings']['toolbar'] = NULL;
@@ -3234,15 +3234,15 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertEquals(0, $result->rowCount);
     $this->assertCount(2, $result->toolbar);
-    $this->assertEquals('Always', $result->toolbar[0]['text']);
-    $this->assertEquals('Add New', $result->toolbar[1]['text']);
+    $this->assertSame('Always', $result->toolbar[0]['text']);
+    $this->assertSame('Add New', $result->toolbar[1]['text']);
 
     // With matching contacts: the "no results" button is excluded from the toolbar.
     $params['filters'] = ['first_name' => 'ToolbarNoResultsTest'];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertGreaterThan(0, $result->rowCount);
     $this->assertCount(1, $result->toolbar);
-    $this->assertEquals('Always', $result->toolbar[0]['text']);
+    $this->assertSame('Always', $result->toolbar[0]['text']);
   }
 
   /**
@@ -3669,7 +3669,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals([$tags[1]['label']], $row[2][3]['val']);
 
     $this->assertEquals(4, $row[3][0]['val']);
-    $this->assertEquals('', $row[3][3]['val']);
+    $this->assertSame('', $row[3][3]['val']);
   }
 
   /**
@@ -4241,8 +4241,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // Test with custom strftime format
     $params['display']['settings']['columns'][1]['format'] = '%Y-%m';
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $this->assertEquals('1985-03', $result[0]['columns'][1]['val']);
-    $this->assertEquals('2001-11', $result[1]['columns'][1]['val']);
+    $this->assertSame('1985-03', $result[0]['columns'][1]['val']);
+    $this->assertSame('2001-11', $result[1]['columns'][1]['val']);
   }
 
   /**

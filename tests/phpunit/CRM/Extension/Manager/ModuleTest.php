@@ -129,7 +129,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
 
     // install it
     $manager->install(['test.extension.manager.module.auto1']);
-    $this->assertEquals('installed', $manager->getStatus('test.extension.manager.module.auto1'));
+    $this->assertSame('installed', $manager->getStatus('test.extension.manager.module.auto1'));
     $this->assertHookCounts('test_extension_manager_module_auto1', [
       'install' => 1,
       'enable' => 1,
@@ -142,11 +142,11 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     // dirty removal
     CRM_Utils_File::cleanDir($this->basedir . '/test.extension.manager.module.auto1', TRUE, FALSE);
     $manager->refresh();
-    $this->assertEquals('installed-missing', $manager->getStatus('test.extension.manager.module.auto1'));
+    $this->assertSame('installed-missing', $manager->getStatus('test.extension.manager.module.auto1'));
 
     // disable while missing
     $manager->disable(['test.extension.manager.module.auto1']);
-    $this->assertEquals('disabled-missing', $manager->getStatus('test.extension.manager.module.auto1'));
+    $this->assertSame('disabled-missing', $manager->getStatus('test.extension.manager.module.auto1'));
     $this->assertHookCounts('test_extension_manager_module_auto1', [
       'install' => 1,
       'enable' => 1,
@@ -166,7 +166,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
       // normally called -- but not for missing modules!
       'uninstall' => 0,
     ]);
-    $this->assertEquals('unknown', $manager->getStatus('test.extension.manager.module.auto1'));
+    $this->assertSame('unknown', $manager->getStatus('test.extension.manager.module.auto1'));
     $this->assertModuleActiveByName(FALSE, 'test_extension_manager_module_auto1');
     $this->assertModuleActiveByKey(FALSE, 'test.extension.manager.module.auto1');
   }
@@ -185,7 +185,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
 
     // install it
     $manager->install(['test.extension.manager.module.auto2']);
-    $this->assertEquals('installed', $manager->getStatus('test.extension.manager.module.auto2'));
+    $this->assertSame('installed', $manager->getStatus('test.extension.manager.module.auto2'));
     $this->assertHookCounts('test_extension_manager_module_auto2', [
       'install' => 1,
       'enable' => 1,
@@ -198,11 +198,11 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     // dirty removal
     CRM_Utils_File::cleanDir($this->basedir . '/test.extension.manager.module.auto2', TRUE, FALSE);
     $manager->refresh();
-    $this->assertEquals('installed-missing', $manager->getStatus('test.extension.manager.module.auto2'));
+    $this->assertSame('installed-missing', $manager->getStatus('test.extension.manager.module.auto2'));
 
     // disable while missing
     $manager->disable(['test.extension.manager.module.auto2']);
-    $this->assertEquals('disabled-missing', $manager->getStatus('test.extension.manager.module.auto2'));
+    $this->assertSame('disabled-missing', $manager->getStatus('test.extension.manager.module.auto2'));
     $this->assertHookCounts('test_extension_manager_module_auto2', [
       'install' => 1,
       'enable' => 1,
@@ -222,7 +222,7 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
       'disable' => 0,
       'uninstall' => 0,
     ]);
-    $this->assertEquals('disabled', $manager->getStatus('test.extension.manager.module.auto2'));
+    $this->assertSame('disabled', $manager->getStatus('test.extension.manager.module.auto2'));
     $this->assertModuleActiveByName(FALSE, 'test_extension_manager_module_auto2');
     $this->assertModuleActiveByKey(FALSE, 'test.extension.manager.module.auto2');
   }

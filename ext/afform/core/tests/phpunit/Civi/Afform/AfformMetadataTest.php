@@ -28,22 +28,22 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
     $individualFields = \Civi\AfformAdmin\AfformAdminMeta::getFields('Individual');
 
     // Ensure the "Existing Contact" `id` field exists
-    $this->assertEquals('Existing Individual', $individualFields['id']['label']);
-    $this->assertEquals('EntityRef', $individualFields['id']['input_type']);
+    $this->assertSame('Existing Individual', $individualFields['id']['label']);
+    $this->assertSame('EntityRef', $individualFields['id']['input_type']);
   }
 
   public function testGetLocBlockFields():void {
     $fields = \Civi\AfformAdmin\AfformAdminMeta::getFields('LocBlock');
 
     // Ensure the "Existing" `id` field exists
-    $this->assertEquals('Existing Location', $fields['id']['label']);
-    $this->assertEquals('EntityRef', $fields['id']['input_type']);
+    $this->assertSame('Existing Location', $fields['id']['label']);
+    $this->assertSame('EntityRef', $fields['id']['input_type']);
     // FK fields should not be included
     $this->assertArrayNotHasKey('email_id', $fields);
     $this->assertArrayNotHasKey('email_2_id', $fields);
     // 1st and 2nd join fields should exist
-    $this->assertEquals('Text', $fields['address_id.street_address']['input_type']);
-    $this->assertEquals('Text', $fields['address_2_id.street_address']['input_type']);
+    $this->assertSame('Text', $fields['address_id.street_address']['input_type']);
+    $this->assertSame('Text', $fields['address_2_id.street_address']['input_type']);
 
   }
 
@@ -88,10 +88,10 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
     $defn = \CRM_Utils_JS::getRawProps($afField->getAttribute('defn'));
     $options = \CRM_Utils_JS::decode($defn['options']);
     $this->assertCount(2, $options);
-    $this->assertEquals('Individual1', $options[0]['id']);
-    $this->assertEquals('Individual 1', $options[0]['label']);
-    $this->assertEquals('Organization1', $options[1]['id']);
-    $this->assertEquals('Organization 1', $options[1]['label']);
+    $this->assertSame('Individual1', $options[0]['id']);
+    $this->assertSame('Individual 1', $options[0]['label']);
+    $this->assertSame('Organization1', $options[1]['id']);
+    $this->assertSame('Organization 1', $options[1]['label']);
   }
 
   /**
@@ -113,7 +113,7 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
     AfformMetadataInjector::setFieldMetadata($afField, $fieldInfo);
     $defn = \CRM_Utils_JS::getRawProps($afField->getAttribute('defn'));
     $inputAttrs = \CRM_Utils_JS::decode($defn['input_attrs']);
-    $this->assertEquals('- choose an activity -', $inputAttrs['placeholder']);
+    $this->assertSame('- choose an activity -', $inputAttrs['placeholder']);
   }
 
   /**
@@ -134,7 +134,7 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
     AfformMetadataInjector::setFieldMetadata($afField, $fieldInfo);
     $defn = \CRM_Utils_JS::getRawProps($afField->getAttribute('defn'));
     $inputAttrs = \CRM_Utils_JS::decode($defn['input_attrs']);
-    $this->assertEquals('Select Activities', $inputAttrs['placeholder']);
+    $this->assertSame('Select Activities', $inputAttrs['placeholder']);
   }
 
   /**

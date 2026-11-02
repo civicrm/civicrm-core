@@ -238,7 +238,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
 
     $this->assertArrayHasKey($idField, $fields, $errMsg);
     // Hmm, not true of every primary key... what about Afform.name?
-    $this->assertEquals('Integer', $fields[$idField]['data_type']);
+    $this->assertSame('Integer', $fields[$idField]['data_type']);
 
     // The underlying schema is not 100% consistent, but this is the standard in APIv4
     if (isset($fields['is_active'])) {

@@ -259,7 +259,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString('Error ID:', $response[1]['error_message']);
     // Email.get should succeed and return 1 result
     $this->assertEquals(1, $response[2]['count']);
-    $this->assertEquals('me@test.er', $response[2]['values'][0]['email']);
+    $this->assertSame('me@test.er', $response[2]['values'][0]['email']);
     // Email.delete should succeed because we have 'edit all contacts'
     $this->assertEquals(0, $response[4]['count']);
 
@@ -293,7 +293,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
       ]);
       $this->assertEquals(500, $code);
       $this->assertSame('0', $response['error_code']);
-      $this->assertEquals('Submission is already processed.', $response['error_message']);
+      $this->assertSame('Submission is already processed.', $response['error_message']);
 
       $validation = ['First problem', 'Second problem'];
       [$response] = $this->runAjax([
@@ -305,7 +305,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
       \Civi::dispatcher()->removeListener('hook_civicrm_selectWhereClause', $listener);
     }
     $this->assertSame('0', $response['error_code']);
-    $this->assertEquals("First problem\nSecond problem", $response['error_message']);
+    $this->assertSame("First problem\nSecond problem", $response['error_message']);
   }
 
   /**

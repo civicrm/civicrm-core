@@ -21,7 +21,7 @@ class CiviConnectTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     [$clientId, $authToken] = \Civi::service('oauth_client.civi_connect')->getCreds();
     $this->assertMatchesRegularExpression('/^eddsa_[a-zA-Z0-9=+\/]+$/', $clientId);
     $decode = \Civi::service('crypto.jwt')->decode($authToken, 'CONNECT');
-    $this->assertEquals('CiviConnect', $decode['scope']);
+    $this->assertSame('CiviConnect', $decode['scope']);
   }
 
 }

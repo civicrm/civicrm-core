@@ -56,11 +56,11 @@ class MagicGetterSetterTest extends \CiviUnitTestCase {
   public function testExample(): void {
     $ex = $this->createExample();
     $this->assertEquals(NULL, $ex->setProtectedField(NULL)->getProtectedField());
-    $this->assertEquals('apple', $ex->setProtectedField('apple')->getProtectedField());
-    $this->assertEquals('banana', $ex->setPublicField('banana')->getPublicField());
-    $this->assertEquals('cherry', $ex->setSet('cherry')->getSet());
-    $this->assertEquals('date', $ex->setGet('date')->getGet());
-    $this->assertEquals('base_and_set_and_get', $ex->setOverriddenProtectedField('base')->getOverriddenProtectedField());
+    $this->assertSame('apple', $ex->setProtectedField('apple')->getProtectedField());
+    $this->assertSame('banana', $ex->setPublicField('banana')->getPublicField());
+    $this->assertSame('cherry', $ex->setSet('cherry')->getSet());
+    $this->assertSame('date', $ex->setGet('date')->getGet());
+    $this->assertSame('base_and_set_and_get', $ex->setOverriddenProtectedField('base')->getOverriddenProtectedField());
 
     $nonMethods = [
       'goozfraba',

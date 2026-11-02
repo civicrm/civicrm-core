@@ -104,11 +104,11 @@ EOHTML;
     // Metadata assertions
     $this->assertEquals(1, $fields['Individual1.0.preferred_communication_method']['serialize']);
     $this->assertEquals(1, $fields['Individual1.0.contact_sub_type']['serialize']);
-    $this->assertEquals('Integer', $fields['Individual1.0.gender_id']['data_type']);
+    $this->assertSame('Integer', $fields['Individual1.0.gender_id']['data_type']);
 
     // Extra fields (unindexed)
     $this->assertArrayHasKey('extra.extra_field_1', $fields);
-    $this->assertEquals('My Field :)', $fields['extra.extra_field_1']['label']);
+    $this->assertSame('My Field :)', $fields['extra.extra_field_1']['label']);
 
     // Test internal action entityFields()
     $action = \Civi\Api4\AfformSubmissionData::get(FALSE)
@@ -209,13 +209,13 @@ EOHTML;
     $record = $records[0];
 
     // By default, dynamic fields at index 0 should be populated
-    $this->assertEquals('John', $record['Individual1.0.first_name']);
-    $this->assertEquals('Doe', $record['Individual1.0.last_name']);
+    $this->assertSame('John', $record['Individual1.0.first_name']);
+    $this->assertSame('Doe', $record['Individual1.0.last_name']);
     $this->assertEquals('2', $record['Individual1.0.gender_id']);
     $this->assertEquals(['1', '2'], $record['Individual1.0.preferred_communication_method']);
     $this->assertEquals(['Student', 'Staff'], $record['Individual1.0.contact_sub_type:name']);
-    $this->assertEquals('john.doe1@example.com', $record['Individual1.0.Email.0.email']);
-    $this->assertEquals('Hello World', $record['extra.extra_field_1']);
+    $this->assertSame('john.doe1@example.com', $record['Individual1.0.Email.0.email']);
+    $this->assertSame('Hello World', $record['extra.extra_field_1']);
     $this->assertIsNumeric($record['Individual1.0.id']);
     $this->assertIsNumeric($record['Individual1.0.Email.0.id']);
 
@@ -316,7 +316,7 @@ EOHTML;
       ->addWhere('id', '=', $aliceSubmissionId)
       ->execute();
     $this->assertCount(1, $results);
-    $this->assertEquals('Alice', $results[0]['Individual1.0.first_name']);
+    $this->assertSame('Alice', $results[0]['Individual1.0.first_name']);
 
     // 2. Stage 2 filtering: filter on dynamic form field (first_name)
     $results = AfformSubmissionData::get(FALSE)
@@ -324,7 +324,7 @@ EOHTML;
       ->addWhere('Individual1.0.first_name', '=', 'Bob')
       ->execute();
     $this->assertCount(1, $results);
-    $this->assertEquals('Bob', $results[0]['Individual1.0.first_name']);
+    $this->assertSame('Bob', $results[0]['Individual1.0.first_name']);
 
     // 3. Combined filtering (both stages)
     $results = AfformSubmissionData::get(FALSE)
@@ -333,7 +333,7 @@ EOHTML;
       ->addWhere('Individual1.0.first_name', '=', 'Alice')
       ->execute();
     $this->assertCount(1, $results);
-    $this->assertEquals('Alice', $results[0]['Individual1.0.first_name']);
+    $this->assertSame('Alice', $results[0]['Individual1.0.first_name']);
 
     // Combined filtering that should return empty
     $results = AfformSubmissionData::get(FALSE)

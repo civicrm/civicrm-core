@@ -80,7 +80,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     $this->assertMaxIds($maxIDs);
 
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
-    $this->assertEquals("Hello $displayName",
+    $this->assertSame("Hello $displayName",
       $previewResult['values']['subject']);
 
     $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
@@ -93,7 +93,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     $this->assertStringContainsString("&amp;jid=&amp;qid=&amp;h=fakehash", $previewResult['values']['body_html']);
     $this->assertStringContainsString("subj=(Hello ", $previewResult['values']['body_html']);
 
-    $this->assertEquals('flexmailer', $previewResult['values']['_rendered_by_']);
+    $this->assertSame('flexmailer', $previewResult['values']['_rendered_by_']);
   }
 
   public function testMailerPreviewWithoutId(): void {
@@ -109,7 +109,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     $previewResult = $this->callAPISuccess('mailing', 'preview', $params);
     $this->assertMaxIds($maxIDs);
 
-    $this->assertEquals("Hello $displayName",
+    $this->assertSame("Hello $displayName",
       $previewResult['values']['subject']);
 
     $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
@@ -122,7 +122,7 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     $this->assertStringContainsString("&amp;jid=&amp;qid=&amp;h=fakehash", $previewResult['values']['body_html']);
     $this->assertStringContainsString("subj=(Hello ", $previewResult['values']['body_html']);
 
-    $this->assertEquals('flexmailer', $previewResult['values']['_rendered_by_']);
+    $this->assertSame('flexmailer', $previewResult['values']['_rendered_by_']);
   }
 
   /**
@@ -138,8 +138,8 @@ class MailingPreviewTest extends \CiviUnitTestCase {
     $previewResult = $this->callAPISuccess('mailing', 'preview', $params);
     $this->assertMaxIds($maxIDs);
 
-    $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
-    $this->assertEquals('flexmailer', $previewResult['values']['_rendered_by_']);
+    $this->assertSame("Hello $displayName", $previewResult['values']['subject']);
+    $this->assertSame('flexmailer', $previewResult['values']['_rendered_by_']);
   }
 
   /**

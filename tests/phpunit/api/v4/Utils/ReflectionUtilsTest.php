@@ -37,7 +37,7 @@ class ReflectionUtilsTest extends Api4TestBase {
     $doc = ReflectionUtils::getCodeDocs($reflection, NULL, ['entity' => "Test"]);
 
     $this->assertEquals(TRUE, $doc['internal']);
-    $this->assertEquals('Grandchild class for Test, with a 2-line description!', $doc['description']);
+    $this->assertSame('Grandchild class for Test, with a 2-line description!', $doc['description']);
 
     $expectedComment = 'This is an extended comment.
 
@@ -56,8 +56,8 @@ This is the base class.';
     $reflection = new \ReflectionClass($grandChild);
     $doc = ReflectionUtils::getCodeDocs($reflection->getProperty('foo'), 'Property');
 
-    $this->assertEquals('This is the foo property.', $doc['description']);
-    $this->assertEquals("In the child class, foo has been barred.\n\n - In general, you can do nothing with it.", $doc['comment']);
+    $this->assertSame('This is the foo property.', $doc['description']);
+    $this->assertSame("In the child class, foo has been barred.\n\n - In general, you can do nothing with it.", $doc['comment']);
   }
 
   public static function docBlockExamples(): array {

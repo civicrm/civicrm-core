@@ -252,7 +252,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
     $entityValues = CRM_Core_BAO_CustomValueTable::getEntityValues($contactID, 'Individual');
 
-    $this->assertEquals('<p><strong>This is a <u>test</u></p>', $entityValues[$customField['id']],
+    $this->assertSame('<p><strong>This is a <u>test</u></p>', $entityValues[$customField['id']],
       'Checking same for returned value.'
     );
   }

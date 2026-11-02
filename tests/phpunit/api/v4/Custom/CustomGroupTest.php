@@ -48,8 +48,8 @@ class CustomGroupTest extends Api4TestBase {
       ->addWhere('id', '=', $createdGroup['id'])
       ->execute()->first();
 
-    $this->assertEquals('Test\'n "quotes"', $group['title']);
-    $this->assertEquals('Test_n_quotes_', $group['name']);
+    $this->assertSame('Test\'n "quotes"', $group['title']);
+    $this->assertSame('Test_n_quotes_', $group['name']);
     $this->assertEqualsWithDelta(strtotime('now'), strtotime($group['created_date']), 3);
     $this->assertEquals($userId, $group['created_id']);
   }
@@ -124,10 +124,10 @@ class CustomGroupTest extends Api4TestBase {
     $this->assertEquals(3, $groups[$id[0]]['weight']);
 
     // Verify that other values were not interfered with
-    $this->assertEquals('Contribution', $groups[$id[0]]['extends']);
-    $this->assertEquals('Contribution', $groups[$id[1]]['extends']);
+    $this->assertSame('Contribution', $groups[$id[0]]['extends']);
+    $this->assertSame('Contribution', $groups[$id[1]]['extends']);
     $this->assertEquals([$financialType['id']], $groups[$id[1]]['extends_entity_column_value']);
-    $this->assertEquals('Individual', $groups[$id[2]]['extends']);
+    $this->assertSame('Individual', $groups[$id[2]]['extends']);
     $this->assertEquals(['Tester'], $groups[$id[2]]['extends_entity_column_value']);
   }
 

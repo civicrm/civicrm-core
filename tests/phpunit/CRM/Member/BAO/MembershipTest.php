@@ -355,7 +355,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     ];
     $membership = $this->callAPISuccess('Membership', 'create', $params);
 
-    $this->assertEquals('Anderson, Anthony II', CRM_Member_BAO_Membership::sortName($membership['id']));
+    $this->assertSame('Anderson, Anthony II', CRM_Member_BAO_Membership::sortName($membership['id']));
   }
 
   /**
@@ -473,7 +473,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     ]);
 
     $membership = Membership::get()->addSelect('status_id:name')->execute()->single();
-    $this->assertEquals('Grace', $membership['status_id:name'], 'Verify correct status id is calculated.');
+    $this->assertSame('Grace', $membership['status_id:name'], 'Verify correct status id is calculated.');
 
     $this->contributionPageQuickConfigCreate();
     $this->submitOnlineContributionForm([
@@ -482,7 +482,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     ] + $this->getBillingSubmitValues(), NULL, ['mid' => $membership['id']]);
 
     $membership = Membership::get()->addSelect('status_id:name')->execute()->single();
-    $this->assertEquals('Current', $membership['status_id:name'], 'Verify correct status id is calculated.');
+    $this->assertSame('Current', $membership['status_id:name'], 'Verify correct status id is calculated.');
   }
 
   /**
@@ -747,7 +747,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $contributions = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1])['values'];
     $this->assertCount(2, $contributions);
-    $this->assertEquals('Debit Card', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $contributions[1]['payment_instrument_id']));
+    $this->assertSame('Debit Card', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $contributions[1]['payment_instrument_id']));
     $this->validateAllPayments();
     $this->validateAllContributions();
   }
@@ -1042,7 +1042,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       ->addSelect('contact_id', 'status_id:name', 'status_id.is_current_member')
       ->addWhere('owner_membership_id', '=', $membership['id'])
       ->execute()->indexBy('contact_id');
-    $this->assertEquals('Current', $inherited[$currentEmployeeID]['status_id:name']);
+    $this->assertSame('Current', $inherited[$currentEmployeeID]['status_id:name']);
     foreach ($formerEmployeeIDs as $formerEmployeeID) {
       $this->assertFalse($inherited[$formerEmployeeID]['status_id.is_current_member'], "Former employee $formerEmployeeID");
     }

@@ -202,7 +202,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'report_id' => 'contact/summary',
       'options' => ['metadata' => ['labels', 'title']],
     ]);
-    $this->assertEquals('Contact Name', $result['metadata']['labels']['civicrm_contact_sort_name']);
+    $this->assertSame('Contact Name', $result['metadata']['labels']['civicrm_contact_sort_name']);
 
     //the second part of this test has been commented out because it relied on the db being reset to
     // it's base state
@@ -1588,7 +1588,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ]);
 
     // Hmm it has styling in it before being sent to the template. If that gets fixed then will need to update this.
-    $this->assertEquals('<strong>10.00</strong>', $rows['values'][$contact]['civicrm_contribution_total_amount'], 'should only include the $10 contribution');
+    $this->assertSame('<strong>10.00</strong>', $rows['values'][$contact]['civicrm_contribution_total_amount'], 'should only include the $10 contribution');
 
     $this->callAPISuccess('Contact', 'delete', ['id' => $contact]);
   }

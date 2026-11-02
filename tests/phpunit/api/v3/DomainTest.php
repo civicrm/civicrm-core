@@ -78,8 +78,8 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $this->assertIsArray($result);
 
     $domain = $result['values'][0];
-    $this->assertEquals("info@EXAMPLE.ORG", $domain['from_email']);
-    $this->assertEquals("FIXME", $domain['from_name']);
+    $this->assertSame("info@EXAMPLE.ORG", $domain['from_email']);
+    $this->assertSame("FIXME", $domain['from_name']);
     // checking other important parts of domain information
     // test will fail if backward incompatible changes happen
     $this->assertArrayHasKey('id', $domain);
@@ -108,8 +108,8 @@ class api_v3_DomainTest extends CiviUnitTestCase {
         continue;
       }
 
-      $this->assertEquals("info@EXAMPLE.ORG", $domain['from_email']);
-      $this->assertEquals("FIXME", $domain['from_name']);
+      $this->assertSame("info@EXAMPLE.ORG", $domain['from_email']);
+      $this->assertSame("FIXME", $domain['from_name']);
 
       // checking other important parts of domain information
       // test will fail if backward incompatible changes happen
@@ -118,9 +118,9 @@ class api_v3_DomainTest extends CiviUnitTestCase {
       $this->assertArrayHasKey('domain_email', $domain);
       $this->assertArrayHasKey('domain_phone', $domain);
       $this->assertArrayHasKey('domain_address', $domain);
-      $this->assertEquals("my@email.com", $domain['domain_email']);
-      $this->assertEquals("456-456", $domain['domain_phone']['phone']);
-      $this->assertEquals("45 Penny Lane", $domain['domain_address']['street_address']);
+      $this->assertSame("my@email.com", $domain['domain_email']);
+      $this->assertSame("456-456", $domain['domain_phone']['phone']);
+      $this->assertSame("45 Penny Lane", $domain['domain_address']['street_address']);
     }
   }
 
@@ -137,12 +137,12 @@ class api_v3_DomainTest extends CiviUnitTestCase {
       'current_domain' => 1,
       'return' => 'name',
     ]);
-    $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE));
+    $this->assertSame('Default Domain Name', $domain, print_r($domain, TRUE));
     $domain = $this->callAPISuccess('domain', 'getvalue', [
       'current_domain' => 1,
       'return' => 'name',
     ]);
-    $this->assertEquals('Default Domain Name', $domain, print_r($domain, TRUE));
+    $this->assertSame('Default Domain Name', $domain, print_r($domain, TRUE));
   }
 
   /**

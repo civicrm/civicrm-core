@@ -57,10 +57,10 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
     $mappings = MappingField::get()
       ->addWhere('mapping_id', '=', $mapping['id'])
       ->execute();
-    $this->assertEquals('Activity.activity_date_time', $mappings[0]['name']);
-    $this->assertEquals('do_not_import', $mappings[1]['name']);
-    $this->assertEquals('TargetContact.email_primary.email', $mappings[2]['name']);
-    $this->assertEquals('SourceContact.id', $mappings[3]['name']);
+    $this->assertSame('Activity.activity_date_time', $mappings[0]['name']);
+    $this->assertSame('do_not_import', $mappings[1]['name']);
+    $this->assertSame('TargetContact.email_primary.email', $mappings[2]['name']);
+    $this->assertSame('SourceContact.id', $mappings[3]['name']);
     $job = UserJob::get(FALSE)->addWhere('id', '=', $userJobID)->execute()->single();
     $this->assertEquals([
       ['name' => 'Activity.activity_date_time'],
@@ -146,9 +146,9 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
     $mappings = MappingField::get()
       ->addWhere('mapping_id', '=', $mapping['id'])
       ->execute();
-    $this->assertEquals('Contact.id', $mappings[0]['name']);
-    $this->assertEquals('Contact.id', $mappings[1]['name']);
-    $this->assertEquals('Contact.id', $mappings[2]['name']);
+    $this->assertSame('Contact.id', $mappings[0]['name']);
+    $this->assertSame('Contact.id', $mappings[1]['name']);
+    $this->assertSame('Contact.id', $mappings[2]['name']);
 
     $templateJob = UserJob::get(FALSE)
       ->addWhere('name', '=', 'import_Membership import')
@@ -234,8 +234,8 @@ class CRM_Upgrade_Incremental_php_SixTwoTest extends CiviUnitTestCase {
     $mappings = MappingField::get()
       ->addWhere('mapping_id', '=', $mapping['id'])
       ->execute();
-    $this->assertEquals('Contact.first_name', $mappings[0]['name']);
-    $this->assertEquals('Contact.first_name', $mappings[1]['name']);
+    $this->assertSame('Contact.first_name', $mappings[0]['name']);
+    $this->assertSame('Contact.first_name', $mappings[1]['name']);
     $job = UserJob::get(FALSE)->addWhere('id', '=', $userJobID)->execute()->single();
     $this->assertEquals($expectedImportMappings, $job['metadata']['import_mappings']);
 

@@ -55,7 +55,7 @@ class CRM_Activity_Page_AJAXTest extends CiviCaseTestCase {
     $caseActivities = $this->callAPISuccess('Activity', 'get', [
       'case_id' => $case['id'],
     ])['values'];
-    $this->assertEquals('test file on case', $caseActivities[$newActivityId]['subject']);
+    $this->assertSame('test file on case', $caseActivities[$newActivityId]['subject']);
     // This should be a different physical activity, not the same db record as the original.
     $this->assertNotEquals($activity['id'], $caseActivities[$newActivityId]['id']);
   }
@@ -100,7 +100,7 @@ class CRM_Activity_Page_AJAXTest extends CiviCaseTestCase {
       'case_id' => $case2['id'],
       'return' => ['id', 'subject', 'target_contact_id'],
     ])['values'];
-    $this->assertEquals('To be copied to case', $caseActivities[$newActivityId]['subject']);
+    $this->assertSame('To be copied to case', $caseActivities[$newActivityId]['subject']);
     $this->assertEquals($contact2, $caseActivities[$newActivityId]['target_contact_id'][0]);
     // This should be a different physical activity, not the same db record as the original.
     $this->assertNotEquals($activity['id'], $caseActivities[$newActivityId]['id']);
@@ -154,7 +154,7 @@ class CRM_Activity_Page_AJAXTest extends CiviCaseTestCase {
       'case_id' => $case2['id'],
       'return' => ['id', 'subject', 'target_contact_id'],
     ])['values'];
-    $this->assertEquals('To be moved to case', $caseActivities[$newActivityId]['subject']);
+    $this->assertSame('To be moved to case', $caseActivities[$newActivityId]['subject']);
     $this->assertEquals($contact2, $caseActivities[$newActivityId]['target_contact_id'][0]);
     // This should be a different physical activity, not the same db record as the original.
     $this->assertNotEquals($activity['id'], $caseActivities[$newActivityId]['id']);
@@ -347,7 +347,7 @@ class CRM_Activity_Page_AJAXTest extends CiviCaseTestCase {
       'id' => $newActivityId,
     ])['values'];
     $this->assertCount(1, $caseActivities);
-    $this->assertEquals('Meeting for case', $caseActivities[$newActivityId]['subject']);
+    $this->assertSame('Meeting for case', $caseActivities[$newActivityId]['subject']);
   }
 
   /**

@@ -223,7 +223,7 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
     $rows = [];
     $obj->buildRows($sql, $rows);
     $obj->formatDisplay($rows);
-    $this->assertEquals('CiviTest Custom Location Type', $rows[0]['civicrm_address_address_location_type_id']);
+    $this->assertSame('CiviTest Custom Location Type', $rows[0]['civicrm_address_address_location_type_id']);
   }
 
 }

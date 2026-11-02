@@ -23,12 +23,12 @@ class FinancialAccountTest extends BaseTestClass {
     $this->assertCount(14, $financialAccounts);
     $restrictedAccounts = FinancialAccount::get()->addOrderBy('name')->execute();
     $this->assertCount(6, $restrictedAccounts);
-    $this->assertEquals('Accounts Receivable', $restrictedAccounts[0]['name']);
-    $this->assertEquals('Banking Fees', $restrictedAccounts[1]['name']);
-    $this->assertEquals('Deposit Bank Account', $restrictedAccounts[2]['name']);
-    $this->assertEquals('Donation', $restrictedAccounts[3]['name']);
-    $this->assertEquals('Payment Processor Account', $restrictedAccounts[4]['name']);
-    $this->assertEquals('Premiums', $restrictedAccounts[5]['name']);
+    $this->assertSame('Accounts Receivable', $restrictedAccounts[0]['name']);
+    $this->assertSame('Banking Fees', $restrictedAccounts[1]['name']);
+    $this->assertSame('Deposit Bank Account', $restrictedAccounts[2]['name']);
+    $this->assertSame('Donation', $restrictedAccounts[3]['name']);
+    $this->assertSame('Payment Processor Account', $restrictedAccounts[4]['name']);
+    $this->assertSame('Premiums', $restrictedAccounts[5]['name']);
   }
 
 }

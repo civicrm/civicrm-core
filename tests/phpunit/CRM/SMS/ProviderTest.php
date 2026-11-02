@@ -52,7 +52,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
     $this->individualCreate(['phone' => [1 => ['phone_type_id' => 'Phone', 'location_type_id' => 'Home', 'phone' => '+61487654321']]]);
     $provider = new CiviTestSMSProvider('CiviTestSMSProvider');
     $result = $provider->processInbound('+61412345678', 'This is a test message', '+61487654321');
-    $this->assertEquals('This is a test message', $result->details);
+    $this->assertSame('This is a test message', $result->details);
     $this->assertEquals('+61412345678', $result->phone_number);
   }
 
@@ -62,7 +62,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
   public function testProcessInboundNoTo(): void {
     $provider = new CiviTestSMSProvider('CiviTestSMSProvider');
     $result = $provider->processInbound('+61412345678', 'This is a test message', NULL, '12345');
-    $this->assertEquals('This is a test message', $result->details);
+    $this->assertSame('This is a test message', $result->details);
     $this->assertEquals('+61412345678', $result->phone_number);
     $this->assertEquals('12345', $result->result);
     $activity = $this->callAPISuccess('activity', 'getsingle', ['id' => $result->id, 'return' => ['source_contact_id', 'target_contact_id', 'assignee_contact_id']]);
@@ -79,7 +79,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
     $provider = new CiviTestSMSProvider('CiviTestSMSProvider');
     $this->hookClass->setHook('civicrm_inboundSMS', [$this, 'smsHookTest']);
     $result = $provider->processInbound('+61412345678', 'This is a test message', NULL, '12345');
-    $this->assertEquals('This is a test message', $result->details);
+    $this->assertSame('This is a test message', $result->details);
     $this->assertEquals('+61412345678', $result->phone_number);
     $this->assertEquals('12345', $result->result);
     $contact = $this->callAPISuccess('contact', 'getsingle', ['phone' => '+61487654321']);
@@ -98,8 +98,8 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
       ->addWhere('phone', '=', '61412345678')
       ->addSelect('phone_type_id:name', 'location_type_id:name')
       ->execute()->single();
-    $this->assertEquals('Mobile', $phone['phone_type_id:name']);
-    $this->assertEquals('Home', $phone['location_type_id:name']);
+    $this->assertSame('Mobile', $phone['phone_type_id:name']);
+    $this->assertSame('Home', $phone['location_type_id:name']);
   }
 
   /**

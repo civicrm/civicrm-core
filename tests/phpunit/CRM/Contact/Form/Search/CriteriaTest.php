@@ -31,7 +31,7 @@ class CRM_Contact_Form_Search_CriteriaTest extends CiviUnitTestCase {
     $form->preProcess();
     $form->buildQuickForm();
     $onHoldElemenClass = (get_class($form->_elements[$form->_elementIndex['email_on_hold']]));
-    $this->assertEquals('HTML_QuickForm_select', $onHoldElemenClass, 'civimail_multiple_bulk_emails setting = 1, so email_on_hold should be a select element.');
+    $this->assertSame('HTML_QuickForm_select', $onHoldElemenClass, 'civimail_multiple_bulk_emails setting = 1, so email_on_hold should be a select element.');
 
     // If setting is disabled, criteria should be a checkbox.
     Civi::settings()->set('civimail_multiple_bulk_emails', 0);
@@ -40,7 +40,7 @@ class CRM_Contact_Form_Search_CriteriaTest extends CiviUnitTestCase {
     $form->preProcess();
     $form->buildQuickForm();
     $onHoldElemenClass = (get_class($form->_elements[$form->_elementIndex['email_on_hold']]));
-    $this->assertEquals('HTML_QuickForm_advcheckbox', $onHoldElemenClass, 'civimail_multiple_bulk_emails setting = 0, so email_on_hold should be a checkbox.');
+    $this->assertSame('HTML_QuickForm_advcheckbox', $onHoldElemenClass, 'civimail_multiple_bulk_emails setting = 0, so email_on_hold should be a checkbox.');
   }
 
 }

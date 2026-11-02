@@ -250,7 +250,7 @@ class CRM_Import_ParserTest extends CiviUnitTestCase {
         ],
       ]);
       $result = Invasive::call([$parser, 'getTransformedFieldValue'], ['financial_type_id', 'Donation']);
-      $this->assertEquals('invalid_import_value', $result);
+      $this->assertSame('invalid_import_value', $result);
     }
     finally {
       if ($ft2ID) {

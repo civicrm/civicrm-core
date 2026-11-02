@@ -81,7 +81,7 @@ class PaymentTest extends \CiviUnitTestCase {
       ->addWhere('id', '=', $contributionID)
       ->addSelect('contribution_status_id:name')
       ->execute()->single();
-    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+    $this->assertSame('Completed', $contribution['contribution_status_id:name']);
   }
 
   /**

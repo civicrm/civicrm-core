@@ -82,7 +82,7 @@ class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
       'id' => $result['id'],
       'return' => "custom_$field1Id,custom_$field2Id,custom_$field3Id",
     ]);
-    $this->assertEquals('correct value', $contact["custom_$field1Id"]);
+    $this->assertSame('correct value', $contact["custom_$field1Id"]);
     $this->assertEquals(456, $contact["custom_$field2Id"]);
     $this->assertEquals(TRUE, $contact["custom_$field3Id"]);
 
@@ -98,7 +98,7 @@ class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
     CRM_Utils_Hook::pre('create', 'Individual', NULL, $params);
 
     // The weird format should be preserved
-    $this->assertEquals('correct value', $params["custom_{$field1Id}_-1"]);
+    $this->assertSame('correct value', $params["custom_{$field1Id}_-1"]);
     $this->assertEquals(456, $params["custom_{$field2Id}_-1"]);
     $this->assertEquals(TRUE, $params["custom_{$field3Id}_-1"]);
     $this->assertEquals(['M', 'V'], $params["custom_{$field4Id}_-1"]);

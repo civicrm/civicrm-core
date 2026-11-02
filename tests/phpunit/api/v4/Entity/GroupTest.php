@@ -458,7 +458,7 @@ class GroupTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', '=', $reservedGroup['id'])
       ->addValue('title', 'Legit Admin Update')
       ->execute()->single();
-    $this->assertEquals('Legit Admin Update', $updated['title']);
+    $this->assertSame('Legit Admin Update', $updated['title']);
 
     // User CAN un-reserve a group
     $unreserved = Group::update(TRUE)

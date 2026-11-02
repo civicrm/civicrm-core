@@ -26,7 +26,7 @@ class CaseTypeTest extends Api4TestBase {
       ->addWhere('name', '=', 'housing_support')
       ->execute()->single();
 
-    $this->assertEquals('Open Case', $caseType['definition']['activityTypes'][0]['name']);
+    $this->assertSame('Open Case', $caseType['definition']['activityTypes'][0]['name']);
   }
 
   public function testGetCaseTypeDefinitionViaJoin(): void {
@@ -44,7 +44,7 @@ class CaseTypeTest extends Api4TestBase {
       ->execute()->first();
 
     $definition = $get['case.case_type_id.definition'];
-    $this->assertEquals('Open Case', $definition['activityTypes'][0]['name']);
+    $this->assertSame('Open Case', $definition['activityTypes'][0]['name']);
   }
 
   public function testGetCaseTypeDefinitionViaTagJoin(): void {
@@ -67,7 +67,7 @@ class CaseTypeTest extends Api4TestBase {
       ->execute()->first();
 
     $definition = $get['case.case_type_id.definition'];
-    $this->assertEquals('Open Case', $definition['activityTypes'][0]['name']);
+    $this->assertSame('Open Case', $definition['activityTypes'][0]['name']);
   }
 
   public function testGetStatusIdPerCaseType(): void {
@@ -141,7 +141,7 @@ class CaseTypeTest extends Api4TestBase {
       ->addWhere('id', '=', $id)
       ->execute()->single();
 
-    $this->assertEquals('Open Case', $caseType['definition']['activityTypes'][0]['name']);
+    $this->assertSame('Open Case', $caseType['definition']['activityTypes'][0]['name']);
   }
 
 }

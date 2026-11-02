@@ -37,7 +37,7 @@ class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
     $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', [])['values'];
     foreach ($financialTypes as $financialType) {
       $accountID = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialType['id'], 'Accounts Receivable Account is');
-      $this->assertEquals('Accounts Receivable', $financialAccounts[$accountID]['name']);
+      $this->assertSame('Accounts Receivable', $financialAccounts[$accountID]['name']);
       $accountIDFromBetterFunction = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship(
         $financialType['id'],
         'Accounts Receivable Account is'
@@ -67,10 +67,10 @@ class CRM_Contribute_PseudoConstantTest extends CiviUnitTestCase {
     foreach ($paymentInstruments as $paymentInstrumentID => $paymentInstrumentName) {
       $financialAccountID = CRM_Financial_BAO_EntityFinancialAccount::getInstrumentFinancialAccount($paymentInstrumentID);
       if (in_array($paymentInstrumentName, ['Credit Card', 'Debit Card'])) {
-        $this->assertEquals('Payment Processor Account', $financialAccounts[$financialAccountID]['name']);
+        $this->assertSame('Payment Processor Account', $financialAccounts[$financialAccountID]['name']);
       }
       else {
-        $this->assertEquals('Deposit Bank Account', $financialAccounts[$financialAccountID]['name']);
+        $this->assertSame('Deposit Bank Account', $financialAccounts[$financialAccountID]['name']);
       }
     }
   }

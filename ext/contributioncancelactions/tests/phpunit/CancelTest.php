@@ -286,9 +286,9 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       ->addWhere('id', '=', $this->ids['Contribution'][0])
       ->addSelect('contribution_status_id:name')
       ->execute()->first();
-    $this->assertEquals('Cancelled', $contribution['contribution_status_id:name']);
+    $this->assertSame('Cancelled', $contribution['contribution_status_id:name']);
     $membership = $this->callAPISuccessGetSingle('Membership', []);
-    $this->assertEquals('Cancelled', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
+    $this->assertSame('Cancelled', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
     $this->assertEquals(TRUE, $membership['is_override']);
     $membershipSignupActivity = Activity::get()
       ->addSelect('subject', 'source_record_id', 'status_id')
@@ -296,13 +296,13 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       ->execute();
     $this->assertCount(1, $membershipSignupActivity);
     $this->assertEquals($membership['id'], $membershipSignupActivity->first()['source_record_id']);
-    $this->assertEquals('General - Payment - Status: Pending', $membershipSignupActivity->first()['subject']);
+    $this->assertSame('General - Payment - Status: Pending', $membershipSignupActivity->first()['subject']);
     $activity = Activity::get()
       ->addSelect('subject', 'source_record_id', 'status_id')
       ->addWhere('activity_type_id:name', '=', 'Change Membership Status')
       ->execute();
     $this->assertCount(1, $activity);
-    $this->assertEquals('Status changed from Pending to Cancelled', $activity->first()['subject']);
+    $this->assertSame('Status changed from Pending to Cancelled', $activity->first()['subject']);
   }
 
   /**

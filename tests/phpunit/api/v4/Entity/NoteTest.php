@@ -143,8 +143,8 @@ class NoteTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->indexBy('id');
     $this->assertCount(2, $visibleNotes);
-    $this->assertEquals('Not private', $visibleNotes[$notes[0]]['note']);
-    $this->assertEquals('Private', $visibleNotes[$notes[1]]['note']);
+    $this->assertSame('Not private', $visibleNotes[$notes[0]]['note']);
+    $this->assertSame('Private', $visibleNotes[$notes[1]]['note']);
     // ACL clause should have been inserted only once because entity_table was specified
     $this->assertEquals(1, substr_count($visibleNotes->debug['sql'][0], 'civicrm_acl_contact_cache'));
   }
@@ -257,7 +257,7 @@ class NoteTest extends Api4TestBase implements TransactionalInterface {
       $this->fail('Other user should not be able to un-privatize a private note');
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('ACL check failed', $e->getMessage());
+      $this->assertSame('ACL check failed', $e->getMessage());
     }
 
     try {
@@ -269,7 +269,7 @@ class NoteTest extends Api4TestBase implements TransactionalInterface {
       $this->fail('Other user should not be able to edit a private note');
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('ACL check failed', $e->getMessage());
+      $this->assertSame('ACL check failed', $e->getMessage());
     }
   }
 

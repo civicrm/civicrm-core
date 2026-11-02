@@ -65,12 +65,12 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $params = ['id' => $id];
     $membershipType = $this->callAPISuccess('membership_type', 'get', $params);
     $membershipType = $membershipType['values'][$id];
-    $this->assertEquals('General', $membershipType['name']);
+    $this->assertSame('General', $membershipType['name']);
     $this->assertEquals($membershipType['member_of_contact_id'], $this->_contactID);
-    $this->assertEquals('Member Dues', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_MembershipType', 'financial_type_id', $membershipType['financial_type_id']));
-    $this->assertEquals('year', $membershipType['duration_unit']);
+    $this->assertSame('Member Dues', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_MembershipType', 'financial_type_id', $membershipType['financial_type_id']));
+    $this->assertSame('year', $membershipType['duration_unit']);
     $this->assertEquals('1', $membershipType['duration_interval']);
-    $this->assertEquals('rolling', $membershipType['period_type']);
+    $this->assertSame('rolling', $membershipType['period_type']);
     $this->membershipTypeDelete($params);
   }
 
@@ -296,8 +296,8 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $this->membershipTypeCreate(['title' => 'disabled cheap-skates', 'is_active' => 0]);
     $result = $this->callAPISuccess('MembershipType', 'getlist', []);
     $this->assertEquals(2, $result['count']);
-    $this->assertEquals('cheap-skates', $result['values'][0]['label']);
-    $this->assertEquals('General', $result['values'][1]['label']);
+    $this->assertSame('cheap-skates', $result['values'][0]['label']);
+    $this->assertSame('General', $result['values'][1]['label']);
   }
 
   /**

@@ -564,7 +564,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $submitParams['frequency_interval'] = '';
     $submitParams['frequency_unit'] = '';
     $errors = $this->callAPISuccess('ContributionPage', 'validate', $submitParams)['values'];
-    $this->assertEquals('Please enter a number for how often you want to make this recurring contribution (EXAMPLE: Every 3 months).', $errors['frequency_interval']);
+    $this->assertSame('Please enter a number for how often you want to make this recurring contribution (EXAMPLE: Every 3 months).', $errors['frequency_interval']);
   }
 
   /**

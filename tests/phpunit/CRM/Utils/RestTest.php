@@ -100,7 +100,7 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
     ];
     $output = CRM_Utils_REST::process($args, $params);
     $this->assertEquals(1, $output['is_error']);
-    $this->assertEquals('unauthorized', $output['error_code']);
+    $this->assertSame('unauthorized', $output['error_code']);
 
     // Test that a nested chain is also forced to use permissions.
     unset($params['api_contact_create']);

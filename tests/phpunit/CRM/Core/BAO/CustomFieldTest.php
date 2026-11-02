@@ -55,7 +55,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertNull(CRM_Core_BAO_CustomField::getLongNameFromShortName("abc_$customFieldID"));
     $this->assertNull(CRM_Core_BAO_CustomField::getLongNameFromShortName('custom_1234567890'));
 
-    $this->assertEquals('testFld', CRM_Core_BAO_CustomField::getField($customFieldID)['name']);
+    $this->assertSame('testFld', CRM_Core_BAO_CustomField::getField($customFieldID)['name']);
     $this->assertEquals($customFieldID, CRM_Core_BAO_CustomField::getFieldByName('new_custom_group.testFld')['id']);
 
     $this->customGroupDelete($customGroup['id']);
@@ -310,7 +310,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $contact2 = $this->individualCreate(['custom_' . $createdField['id'] => $contact1]);
     $contact1Details = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contact1]);
     $this->assertEquals($contact1Details['display_name'], CRM_Core_BAO_CustomField::displayValue($contact2, $createdField['id']));
-    $this->assertEquals("Bob", CRM_Core_BAO_CustomField::displayValue("Bob", $createdField['id']));
+    $this->assertSame("Bob", CRM_Core_BAO_CustomField::displayValue("Bob", $createdField['id']));
 
     $this->contactDelete($contact2);
     $this->contactDelete($contact1);
@@ -503,14 +503,14 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     [$tableName, $columnName, $groupID] = CRM_Core_BAO_CustomField::getTableColumnGroup($field1ID);
     $this->assertEquals($group1['table_name'], $tableName);
     $this->assertEquals($group1['id'], $groupID);
-    $this->assertEquals("testfld_{$field1ID}", $columnName);
+    $this->assertSame("testfld_{$field1ID}", $columnName);
 
     $this->customGroupDelete($group1['id']);
 
     [$tableName, $columnName, $groupID] = CRM_Core_BAO_CustomField::getTableColumnGroup($field2ID);
     $this->assertEquals($group2['table_name'], $tableName);
     $this->assertEquals($group2['id'], $groupID);
-    $this->assertEquals("testfld_{$field2ID}", $columnName);
+    $this->assertSame("testfld_{$field2ID}", $columnName);
 
     // Field1 has been deleted.
     $this->expectException(CRM_Core_Exception::class);
@@ -1180,7 +1180,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     ])['id'];
     $contactId = $this->individualCreate(['custom_' . $fieldId => 'Test']);
 
-    $this->assertEquals('Test', $this->callAPISuccessGetValue('Contact',
+    $this->assertSame('Test', $this->callAPISuccessGetValue('Contact',
       ['id' => $contactId, 'return' => "custom_{$fieldId}"]
     ));
 
@@ -1194,7 +1194,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
     // CRM_Core_BAO_UFGroup::getValues() invokes CRM_Core_BAO_CustomField::displayValue() function.
     CRM_Core_BAO_UFGroup::getValues($contactId, $fields, $values);
-    $this->assertEquals('New value', $values['Alter CF Field']);
+    $this->assertSame('New value', $values['Alter CF Field']);
   }
 
   /**
@@ -1228,7 +1228,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       'id' => $contactId,
       'return' => 'custom_' . $fieldId,
     ]);
-    $this->assertEquals('Y', $value);
+    $this->assertSame('Y', $value);
   }
 
   /**
@@ -1293,7 +1293,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
     $form = new CRM_Core_Form();
     $element = CRM_Core_BAO_CustomField::addQuickFormElement($form, 'custom_' . $field['id'], $field['id']);
-    $this->assertEquals('Find sites', $element->getAttribute('placeholder'));
+    $this->assertSame('Find sites', $element->getAttribute('placeholder'));
   }
 
 }

@@ -57,7 +57,7 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
       'validate any authx credential',
     ]);
     $validate = AuthxCredential::validate()->setCred($jwt[0]['cred'])->execute();
-    $this->assertEquals('jwt', $validate[0]['credType']);
+    $this->assertSame('jwt', $validate[0]['credType']);
     $this->assertEquals($contactRecord['id'], $validate[0]['contactId']);
     $this->assertEquals('cid:' . $contactRecord['id'], $validate[0]['jwt']['sub']);
 
@@ -67,7 +67,7 @@ class AuthxCredentialTest extends TestCase implements HeadlessInterface, Transac
       $this->fail('Expected exception for expired token');
     }
     catch (AuthxException $e) {
-      $this->assertEquals('Expired token', $e->getMessage());
+      $this->assertSame('Expired token', $e->getMessage());
     }
     finally {
       JWT::$timestamp = NULL;

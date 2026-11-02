@@ -144,7 +144,7 @@ class FinancialTypeTest extends BaseTestClass {
       $this->fail('Missed expected exception');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('You do not have permission to access this page.', $e->getMessage());
+      $this->assertSame('You do not have permission to access this page.', $e->getMessage());
     }
 
     $this->setPermissions([

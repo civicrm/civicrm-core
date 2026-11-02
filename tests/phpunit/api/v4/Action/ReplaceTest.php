@@ -83,27 +83,27 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
     foreach ($replaced as $id => $item) {
       $expected = $id === $e1 ? 'firstedited@example.com' : 'third@example.com';
       $this->assertEquals($expected, $item['email']);
-      $this->assertEquals('Emails, Lotsa', $item['contact_id.sort_name']);
+      $this->assertSame('Emails, Lotsa', $item['contact_id.sort_name']);
     }
     // Verify contact now has the new email records
     $results = Email::get()
       ->addWhere('contact_id', '=', $cid1)
       ->execute()
       ->indexBy('id');
-    $this->assertEquals('firstedited@example.com', $results[$e1]['email']);
+    $this->assertSame('firstedited@example.com', $results[$e1]['email']);
     $this->assertEquals(2, $results->count());
     $this->assertArrayNotHasKey($e2, (array) $results);
     $this->assertArrayNotHasKey($e0, (array) $results);
     unset($results[$e1]);
     foreach ($results as $result) {
-      $this->assertEquals('third@example.com', $result['email']);
+      $this->assertSame('third@example.com', $result['email']);
     }
     // Validate our other contact's email did not get deleted
     $c2email = Email::get()
       ->addWhere('contact_id', '=', $cid2)
       ->execute()
       ->first();
-    $this->assertEquals('nosomany@example.com', $c2email['email']);
+    $this->assertSame('nosomany@example.com', $c2email['email']);
   }
 
   public function testCustomValueReplace(): void {
@@ -180,10 +180,10 @@ class ReplaceTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->indexBy('id');
 
-    $this->assertEquals('new one', $newRecords->last()['Custom1']);
-    $this->assertEquals('new two', $newRecords->last()['Custom2']);
-    $this->assertEquals('changed one', $newRecords[$cid1Records[0]['id']]['Custom1']);
-    $this->assertEquals('changed two', $newRecords[$cid1Records[0]['id']]['Custom2']);
+    $this->assertSame('new one', $newRecords->last()['Custom1']);
+    $this->assertSame('new two', $newRecords->last()['Custom2']);
+    $this->assertSame('changed one', $newRecords[$cid1Records[0]['id']]['Custom1']);
+    $this->assertSame('changed two', $newRecords[$cid1Records[0]['id']]['Custom2']);
   }
 
   public function testReplaceEntityTag(): void {

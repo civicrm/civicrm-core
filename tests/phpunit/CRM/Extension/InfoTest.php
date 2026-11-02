@@ -28,9 +28,9 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     file_put_contents($this->file, "<extension key='test.foo' type='module'><file>foo</file><typeInfo><extra>zamboni</extra></typeInfo></extension>");
 
     $info = CRM_Extension_Info::loadFromFile($this->file);
-    $this->assertEquals('test.foo', $info->key);
-    $this->assertEquals('foo', $info->file);
-    $this->assertEquals('zamboni', $info->typeInfo['extra']);
+    $this->assertSame('test.foo', $info->key);
+    $this->assertSame('foo', $info->file);
+    $this->assertSame('zamboni', $info->typeInfo['extra']);
   }
 
   public function testBad_file(): void {
@@ -52,9 +52,9 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $data = "<extension key='test.foo' type='module'><file>foo</file><typeInfo><extra>zamboni</extra></typeInfo></extension>";
 
     $info = CRM_Extension_Info::loadFromString($data);
-    $this->assertEquals('test.foo', $info->key);
-    $this->assertEquals('foo', $info->file);
-    $this->assertEquals('zamboni', $info->typeInfo['extra']);
+    $this->assertSame('test.foo', $info->key);
+    $this->assertSame('foo', $info->file);
+    $this->assertSame('zamboni', $info->typeInfo['extra']);
     $this->assertEquals(NULL, $info->upgrader);
     $this->assertEquals([], $info->requires);
   }
@@ -71,15 +71,15 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     ";
 
     $info = CRM_Extension_Info::loadFromString($data);
-    $this->assertEquals('test.bar', $info->key);
-    $this->assertEquals('testbar', $info->file);
-    $this->assertEquals('Civi\\', $info->classloader[0]['prefix']);
-    $this->assertEquals('Civi', $info->classloader[0]['path']);
-    $this->assertEquals('psr4', $info->classloader[0]['type']);
-    $this->assertEquals('CRM_', $info->classloader[1]['prefix']);
-    $this->assertEquals('', $info->classloader[1]['path']);
-    $this->assertEquals('psr0', $info->classloader[1]['type']);
-    $this->assertEquals('CRM_Foo_Upgrader', $info->upgrader);
+    $this->assertSame('test.bar', $info->key);
+    $this->assertSame('testbar', $info->file);
+    $this->assertSame('Civi\\', $info->classloader[0]['prefix']);
+    $this->assertSame('Civi', $info->classloader[0]['path']);
+    $this->assertSame('psr4', $info->classloader[0]['type']);
+    $this->assertSame('CRM_', $info->classloader[1]['prefix']);
+    $this->assertSame('', $info->classloader[1]['path']);
+    $this->assertSame('psr0', $info->classloader[1]['type']);
+    $this->assertSame('CRM_Foo_Upgrader', $info->upgrader);
     $this->assertEquals(['org.civicrm.a', 'org.civicrm.b'], $info->requires);
   }
 
@@ -87,7 +87,7 @@ class CRM_Extension_InfoTest extends CiviUnitTestCase {
     $info = CRM_Extension_Info::loadFromFile(Civi::paths()->getPath('[civicrm.root]/tests/extensions/test.extension.parenttest/ext/childtest/info.xml'));
     $this->assertTrue(in_array('mgmt:enable-when-satisfied', $info->tags), 'childtest is marked as submodule');
     // For submodules, <parent>X</parent> implies <requires><ext>X</ext></requires>.
-    $this->assertEquals('test.extension.parenttest', $info->parent);
+    $this->assertSame('test.extension.parenttest', $info->parent);
     $this->assertTrue(in_array('test.extension.parenttest', $info->requires));
   }
 

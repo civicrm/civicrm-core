@@ -64,8 +64,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $manager = $this->_createManager([
       self::TESTING_TYPE => $testingTypeManager,
     ]);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager
       ->expects($this->exactly(2))
@@ -74,8 +74,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->exactly(2))
       ->method('onPostInstall');
     $manager->install(['test.whiz.bang', 'test.foo.bar']);
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager
       ->expects($this->once())
@@ -84,9 +84,9 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->once())
       ->method('onPostDisable');
     $manager->disable(['test.foo.bar']);
-    $this->assertEquals('disabled', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('disabled', $manager->getStatus('test.foo.bar'));
     // no side-effect
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager
       ->expects($this->once())
@@ -95,9 +95,9 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->once())
       ->method('onPostUninstall');
     $manager->uninstall(['test.foo.bar']);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.bar'));
     // no side-effect
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.whiz.bang'));
   }
 
   /**
@@ -110,9 +110,9 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $manager = $this->_createManager([
       self::TESTING_TYPE => $testingTypeManager,
     ]);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.downstream'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.downstream'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager->expects($this->exactly(2))->method('onPreInstall');
     $testingTypeManager->expects($this->exactly(2))->method('onPostInstall');
@@ -120,25 +120,25 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       $manager->findInstallRequirements(['test.foo.downstream']));
     $manager->install(
       $manager->findInstallRequirements(['test.foo.downstream']));
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager->expects($this->once())->method('onPreDisable');
     $testingTypeManager->expects($this->once())->method('onPostDisable');
     $this->assertEquals(['test.foo.downstream'],
       $manager->findDisableRequirements(['test.foo.downstream']));
     $manager->disable(['test.foo.downstream']);
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('disabled', $manager->getStatus('test.foo.downstream'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('disabled', $manager->getStatus('test.foo.downstream'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager->expects($this->once())->method('onPreUninstall');
     $testingTypeManager->expects($this->once())->method('onPostUninstall');
     $manager->uninstall(['test.foo.downstream']);
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.downstream'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.downstream'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
   }
 
   /**
@@ -151,9 +151,9 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $manager = $this->_createManager([
       self::TESTING_TYPE => $testingTypeManager,
     ]);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.downstream'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.downstream'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager->expects($this->exactly(2))->method('onPreInstall');
     $testingTypeManager->expects($this->exactly(2))->method('onPostInstall');
@@ -161,18 +161,18 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       $manager->findInstallRequirements(['test.foo.downstream']));
     $manager->install(
       $manager->findInstallRequirements(['test.foo.downstream']));
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
 
     // And install a second time...
     $testingTypeManager->expects($this->exactly(0))->method('onPreInstall');
     $testingTypeManager->expects($this->exactly(0))->method('onPostInstall');
     $manager->install(
       $manager->findInstallRequirements(['test.foo.downstream']));
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
   }
 
   public function test_InstallAuto_DisableUpstream(): void {
@@ -180,9 +180,9 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $manager = $this->_createManager([
       self::TESTING_TYPE => $testingTypeManager,
     ]);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.downstream'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.downstream'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager->expects($this->exactly(2))->method('onPreInstall');
     $testingTypeManager->expects($this->exactly(2))->method('onPostInstall');
@@ -190,9 +190,9 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       $manager->findInstallRequirements(['test.foo.downstream']));
     $manager->install(
       $manager->findInstallRequirements(['test.foo.downstream']));
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager->expects($this->never())->method('onPreDisable');
     $testingTypeManager->expects($this->never())->method('onPostDisable');
@@ -208,9 +208,9 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     }
 
     // Status unchanged
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
   }
 
   /**
@@ -222,16 +222,16 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $manager = $this->_createManager([
       self::TESTING_TYPE => $testingTypeManager,
     ]);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.bar'));
 
     $manager->install(['test.foo.bar']);
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
 
     $this->assertTrue(file_exists("{$this->basedir}/weird/foobar/info.xml"));
     CRM_Utils_File::cleanDir("{$this->basedir}/weird/foobar", TRUE, FALSE);
     $this->assertFalse(file_exists("{$this->basedir}/weird/foobar/info.xml"));
     $manager->refresh();
-    $this->assertEquals('installed-missing', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed-missing', $manager->getStatus('test.foo.bar'));
 
     $testingTypeManager
       ->expects($this->once())
@@ -240,7 +240,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->once())
       ->method('onPostDisable');
     $manager->disable(['test.foo.bar']);
-    $this->assertEquals('disabled-missing', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('disabled-missing', $manager->getStatus('test.foo.bar'));
 
     $testingTypeManager
       ->expects($this->once())
@@ -249,7 +249,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->once())
       ->method('onPostUninstall');
     $manager->uninstall(['test.foo.bar']);
-    $this->assertEquals('unknown', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('unknown', $manager->getStatus('test.foo.bar'));
   }
 
   /**
@@ -260,8 +260,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $manager = $this->_createManager([
       self::TESTING_TYPE => $testingTypeManager,
     ]);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager
       ->expects($this->exactly(2))
@@ -270,8 +270,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->exactly(2))
       ->method('onPostInstall');
     $manager->install(['test.whiz.bang', 'test.foo.bar']);
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager
       ->expects($this->once())
@@ -280,8 +280,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->once())
       ->method('onPostDisable');
     $manager->disable(['test.foo.bar']);
-    $this->assertEquals('disabled', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('disabled', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager
       ->expects($this->once())
@@ -290,8 +290,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->once())
       ->method('onPostEnable');
     $manager->enable(['test.foo.bar']);
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.whiz.bang'));
   }
 
   /**
@@ -302,7 +302,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $manager = $this->_createManager([
       self::TESTING_TYPE => $testingTypeManager,
     ]);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.bar'));
 
     $testingTypeManager
       ->expects($this->once())
@@ -311,7 +311,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->once())
       ->method('onPostInstall');
     $manager->install(['test.foo.bar']);
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
 
     $testingTypeManager
       ->expects($this->once())
@@ -320,7 +320,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->once())
       ->method('onPostDisable');
     $manager->disable(['test.foo.bar']);
-    $this->assertEquals('disabled', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('disabled', $manager->getStatus('test.foo.bar'));
 
     $testingTypeManager
       ->expects($this->once())
@@ -330,7 +330,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->method('onPostEnable');
     // install() instead of enable()
     $manager->install(['test.foo.bar']);
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
   }
 
   /**
@@ -341,7 +341,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $manager = $this->_createManager([
       self::TESTING_TYPE => $testingTypeManager,
     ]);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.foo.bar'));
 
     $testingTypeManager
       ->expects($this->once())
@@ -357,7 +357,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->method('onPostEnable');
     // enable not install
     $manager->enable(['test.foo.bar']);
-    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertSame('installed', $manager->getStatus('test.foo.bar'));
   }
 
   /**
@@ -370,7 +370,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $manager = $this->_createManager([
       self::TESTING_TYPE => $testingTypeManager,
     ]);
-    $this->assertEquals('unknown', $manager->getStatus('test.foo.bar.whiz.bang'));
+    $this->assertSame('unknown', $manager->getStatus('test.foo.bar.whiz.bang'));
   }
 
   /**
@@ -381,7 +381,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $manager = $this->_createManager([
       self::TESTING_TYPE => $testingTypeManager,
     ]);
-    $this->assertEquals('unknown', $manager->getStatus('test.newextension'));
+    $this->assertSame('unknown', $manager->getStatus('test.newextension'));
 
     $download = $this->createDownload('test.newextension', 'newextension');
 
@@ -394,11 +394,11 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->never())
       ->method('onPostReplace');
     $manager->replace($download);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.newextension'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.newextension'));
     $this->assertTrue(file_exists("{$this->basedir}/test.newextension/info.xml"));
     $this->assertTrue(file_exists("{$this->basedir}/test.newextension/newextension.php"));
     $this->assertEquals(self::TESTING_TYPE, $this->mapper->keyToInfo('test.newextension')->type);
-    $this->assertEquals('newextension', $this->mapper->keyToInfo('test.newextension')->file);
+    $this->assertSame('newextension', $this->mapper->keyToInfo('test.newextension')->file);
   }
 
   /**
@@ -409,8 +409,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $manager = $this->_createManager([
       self::TESTING_TYPE => $testingTypeManager,
     ]);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
-    $this->assertEquals('oddball', $this->mapper->keyToInfo('test.whiz.bang')->file);
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('oddball', $this->mapper->keyToInfo('test.whiz.bang')->file);
 
     $download = $this->createDownload('test.whiz.bang', 'newextension');
 
@@ -423,12 +423,12 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->never())
       ->method('onPostReplace');
     $manager->replace($download);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
     $this->assertTrue(file_exists("{$this->basedir}/weird/whizbang/info.xml"));
     $this->assertTrue(file_exists("{$this->basedir}/weird/whizbang/newextension.php"));
     $this->assertFalse(file_exists("{$this->basedir}/weird/whizbang/oddball.php"));
     $this->assertEquals(self::TESTING_TYPE, $this->mapper->keyToInfo('test.whiz.bang')->type);
-    $this->assertEquals('newextension', $this->mapper->keyToInfo('test.whiz.bang')->file);
+    $this->assertSame('newextension', $this->mapper->keyToInfo('test.whiz.bang')->file);
   }
 
   /**
@@ -442,12 +442,12 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $manager = $this->_createManager([
       self::TESTING_TYPE => $testingTypeManager,
     ]);
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
-    $this->assertEquals('oddball', $this->mapper->keyToInfo('test.whiz.bang')->file);
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('oddball', $this->mapper->keyToInfo('test.whiz.bang')->file);
 
     $manager->install(['test.whiz.bang']);
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
-    $this->assertEquals('oddball', $this->mapper->keyToInfo('test.whiz.bang')->file);
+    $this->assertSame('installed', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('oddball', $this->mapper->keyToInfo('test.whiz.bang')->file);
     $this->assertDBQuery('oddball', 'SELECT file FROM civicrm_extension WHERE full_name ="test.whiz.bang"');
 
     $download = $this->createDownload('test.whiz.bang', 'newextension');
@@ -459,11 +459,11 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->once())
       ->method('onPostReplace');
     $manager->replace($download);
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.whiz.bang'));
     $this->assertTrue(file_exists("{$this->basedir}/weird/whizbang/info.xml"));
     $this->assertTrue(file_exists("{$this->basedir}/weird/whizbang/newextension.php"));
     $this->assertFalse(file_exists("{$this->basedir}/weird/whizbang/oddball.php"));
-    $this->assertEquals('newextension', $this->mapper->keyToInfo('test.whiz.bang')->file);
+    $this->assertSame('newextension', $this->mapper->keyToInfo('test.whiz.bang')->file);
     $this->assertDBQuery('newextension', 'SELECT file FROM civicrm_extension WHERE full_name ="test.whiz.bang"');
   }
 
@@ -493,16 +493,16 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     ]);
 
     // initial installation
-    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('uninstalled', $manager->getStatus('test.whiz.bang'));
     $manager->install(['test.whiz.bang']);
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.whiz.bang'));
 
     // dirty remove
     $this->assertTrue(file_exists("{$this->basedir}/weird/whizbang/info.xml"));
     CRM_Utils_File::cleanDir("{$this->basedir}/weird/whizbang", TRUE, FALSE);
     $this->assertFalse(file_exists("{$this->basedir}/weird/whizbang/info.xml"));
     $manager->refresh();
-    $this->assertEquals('installed-missing', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed-missing', $manager->getStatus('test.whiz.bang'));
 
     // download and reinstall
     $download = $this->createDownload('test.whiz.bang', 'newextension');
@@ -514,10 +514,10 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->expects($this->once())
       ->method('onPostReplace');
     $manager->replace($download);
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
+    $this->assertSame('installed', $manager->getStatus('test.whiz.bang'));
     $this->assertTrue(file_exists("{$this->basedir}/test.whiz.bang/info.xml"));
     $this->assertTrue(file_exists("{$this->basedir}/test.whiz.bang/newextension.php"));
-    $this->assertEquals('newextension', $this->mapper->keyToInfo('test.whiz.bang')->file);
+    $this->assertSame('newextension', $this->mapper->keyToInfo('test.whiz.bang')->file);
     $this->assertDBQuery('newextension', 'SELECT file FROM civicrm_extension WHERE full_name ="test.whiz.bang"');
   }
 

@@ -102,17 +102,17 @@ class ContributionSoftTest extends BaseTestClass {
   public function testGetSoftContributionTotals(): void {
     $this->createTwoSoftCredits();
     $totals = CRM_Contribute_BAO_ContributionSoft::getSoftContributionTotals($this->ids['Contact']['credited']);
-    $this->assertEquals('$ 300.00', $totals[2], 'test total of completed soft credits');
-    $this->assertEquals('$ 150.00', $totals[3], 'test average of completed soft credits');
-    $this->assertEquals('', $totals[4], 'test count of cancelled soft credits');
+    $this->assertSame('$ 300.00', $totals[2], 'test total of completed soft credits');
+    $this->assertSame('$ 150.00', $totals[3], 'test average of completed soft credits');
+    $this->assertSame('', $totals[4], 'test count of cancelled soft credits');
 
     // And again, with ACLs enabled.
     $this->setupLoggedInUserWithLimitedFinancialTypeAccess();
 
     $totals = CRM_Contribute_BAO_ContributionSoft::getSoftContributionTotals($this->ids['Contact']['credited']);
-    $this->assertEquals('$ 100.00', $totals[2], 'test total of completed soft credits');
-    $this->assertEquals('$ 100.00', $totals[3], 'test average of completed soft credits');
-    $this->assertEquals('', $totals[4], 'test count of cancelled soft credits');
+    $this->assertSame('$ 100.00', $totals[2], 'test total of completed soft credits');
+    $this->assertSame('$ 100.00', $totals[3], 'test average of completed soft credits');
+    $this->assertSame('', $totals[4], 'test count of cancelled soft credits');
   }
 
   /**

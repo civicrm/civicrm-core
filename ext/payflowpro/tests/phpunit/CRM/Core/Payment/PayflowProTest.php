@@ -134,7 +134,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
       $this->fail('Test was meant to throw an exception');
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-      $this->assertEquals('Your transaction was declined   ', $e->getMessage());
+      $this->assertSame('Your transaction was declined   ', $e->getMessage());
       $this->assertEquals(9009, $e->getErrorCode());
     }
   }

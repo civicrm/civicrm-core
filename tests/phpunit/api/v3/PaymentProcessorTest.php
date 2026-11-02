@@ -163,7 +163,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     $results = $this->callAPISuccess('payment_processor', 'get', $params);
 
     $this->assertEquals(1, $results['count']);
-    $this->assertEquals('test@test.com', $results['values'][$results['id']]['user_name']);
+    $this->assertSame('test@test.com', $results['values'][$results['id']]['user_name']);
   }
 
 }

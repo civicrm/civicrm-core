@@ -40,7 +40,7 @@ class RequestSpecTest extends Api4TestBase {
     $requiredFields = $spec->getRequiredFields();
 
     $this->assertCount(1, $requiredFields);
-    $this->assertEquals('name', array_shift($requiredFields)->getName());
+    $this->assertSame('name', array_shift($requiredFields)->getName());
   }
 
   public function testGettingFieldNames(): void {

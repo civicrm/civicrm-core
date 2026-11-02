@@ -91,7 +91,7 @@ EOHTML;
       $this->fail();
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Illegal value for Existing Individual.', $e->getMessage());
+      $this->assertSame('Illegal value for Existing Individual.', $e->getMessage());
     }
 
     // Submit with a valid ID, it should work
@@ -204,7 +204,7 @@ EOHTML;
       $this->fail();
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Illegal value for test_af_fields: contact_ref.', $e->getMessage());
+      $this->assertSame('Illegal value for test_af_fields: contact_ref.', $e->getMessage());
     }
 
     // Submit with a valid ID, it should work
@@ -310,7 +310,7 @@ EOHTML;
       $this->fail();
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Illegal value for test_address_fields: contact_ref.', $e->getMessage());
+      $this->assertSame('Illegal value for test_address_fields: contact_ref.', $e->getMessage());
     }
 
     // Submit with a valid ID, it should work
@@ -429,8 +429,8 @@ EOHTML;
       ->execute();
 
     $this->assertCount(2, $result);
-    $this->assertEquals('Blue', $result[0]['label']);
-    $this->assertEquals('Yellow', $result[1]['label']);
+    $this->assertSame('Blue', $result[0]['label']);
+    $this->assertSame('Yellow', $result[1]['label']);
   }
 
   /**

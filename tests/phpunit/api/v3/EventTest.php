@@ -391,7 +391,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'return.custom_' . $ids['custom_field_id'] => 1,
       'id' => $result['id'],
     ]);
-    $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+    $this->assertSame("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
@@ -643,10 +643,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('id', $result['values'][$result['id']]);
     $result = $this->callAPISuccess($this->_entity, 'Get', ['id' => $result['id']]);
     $this->callAPISuccess($this->_entity, 'Delete', ['id' => $result['id']]);
-    $this->assertEquals('2008-10-21 00:00:00', $result['values'][$result['id']]['start_date'], 'start date is not set');
-    $this->assertEquals('2008-10-23 00:00:00', $result['values'][$result['id']]['end_date'], 'end date is not set');
-    $this->assertEquals('2008-06-01 00:00:00', $result['values'][$result['id']]['registration_start_date'], 'start date is not set');
-    $this->assertEquals('2008-10-15 00:00:00', $result['values'][$result['id']]['registration_end_date'], 'end date is not set');
+    $this->assertSame('2008-10-21 00:00:00', $result['values'][$result['id']]['start_date'], 'start date is not set');
+    $this->assertSame('2008-10-23 00:00:00', $result['values'][$result['id']]['end_date'], 'end date is not set');
+    $this->assertSame('2008-06-01 00:00:00', $result['values'][$result['id']]['registration_start_date'], 'start date is not set');
+    $this->assertSame('2008-10-15 00:00:00', $result['values'][$result['id']]['registration_end_date'], 'end date is not set');
   }
 
   /**
@@ -664,10 +664,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'Get', ['id' => $result['id']]);
     $this->callAPISuccess($this->_entity, 'Delete', ['id' => $result['id']]);
 
-    $this->assertEquals('2008-10-21 00:00:00', $result['values'][$result['id']]['start_date'], 'start date is not set in line ' . __LINE__);
-    $this->assertEquals('2008-10-23 00:00:00', $result['values'][$result['id']]['end_date'], 'end date is not set in line ' . __LINE__);
-    $this->assertEquals('2008-06-01 00:00:00', $result['values'][$result['id']]['registration_start_date'], 'start date is not set in line ' . __LINE__);
-    $this->assertEquals('2008-10-15 00:00:00', $result['values'][$result['id']]['registration_end_date'], 'end date is not set in line ' . __LINE__);
+    $this->assertSame('2008-10-21 00:00:00', $result['values'][$result['id']]['start_date'], 'start date is not set in line ' . __LINE__);
+    $this->assertSame('2008-10-23 00:00:00', $result['values'][$result['id']]['end_date'], 'end date is not set in line ' . __LINE__);
+    $this->assertSame('2008-06-01 00:00:00', $result['values'][$result['id']]['registration_start_date'], 'start date is not set in line ' . __LINE__);
+    $this->assertSame('2008-10-15 00:00:00', $result['values'][$result['id']]['registration_end_date'], 'end date is not set in line ' . __LINE__);
     $this->assertEquals($this->_params[0]['event_title'], $result['values'][$result['id']]['title'], 'end date is not set in line ' . __LINE__);
   }
 
@@ -686,7 +686,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->callAPISuccess('Event', 'Create', $params);
     $updated = $this->callAPISuccess('Event', 'Get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(150, $updated['values'][$result['id']]['max_participants']);
-    $this->assertEquals('Annual CiviCRM meet 2', $updated['values'][$result['id']]['title']);
+    $this->assertSame('Annual CiviCRM meet 2', $updated['values'][$result['id']]['title']);
     $this->callAPISuccess($this->_entity, 'Delete', ['id' => $result['id']]);
   }
 
@@ -857,7 +857,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = ['action' => 'create'];
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals('is_active', $result['values']['is_active']['name']);
+    $this->assertSame('is_active', $result['values']['is_active']['name']);
   }
 
   /**
@@ -875,7 +875,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   public function testgetfieldsGet(): void {
     $params = ['action' => 'get'];
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals('title', $result['values']['event_title']['name']);
+    $this->assertSame('title', $result['values']['event_title']['name']);
   }
 
   /**

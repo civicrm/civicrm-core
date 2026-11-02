@@ -50,7 +50,7 @@ class RecentItemsTest extends Api4TestBase implements TransactionalInterface {
     $recentItem = RecentItem::get(FALSE)->execute()->first();
     $this->assertStringContainsString('Hello recent!', $recentItem['title']);
     $this->assertStringContainsString("id=$aid1", $recentItem['view_url']);
-    $this->assertEquals('fa-slideshare', $recentItem['icon']);
+    $this->assertSame('fa-slideshare', $recentItem['icon']);
 
     $aid2 = Activity::create(FALSE)
       ->addValue('activity_type_id:name', 'Meeting')

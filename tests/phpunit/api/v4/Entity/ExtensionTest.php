@@ -33,13 +33,13 @@ class ExtensionTest extends Api4TestBase implements TransactionalInterface {
     $moduleTest = Extension::get(FALSE)
       ->addWhere('key', '=', 'test.extension.manager.moduletest')
       ->execute()->single();
-    $this->assertEquals('test_extension_manager_moduletest', $moduleTest['label']);
+    $this->assertSame('test_extension_manager_moduletest', $moduleTest['label']);
     $this->assertEquals(['mgmt:hidden', 'mock'], $moduleTest['tags']);
 
     $moduleTest = Extension::get(FALSE)
       ->addWhere('file', '=', 'moduletest')
       ->execute()->single();
-    $this->assertEquals('test_extension_manager_moduletest', $moduleTest['label']);
+    $this->assertSame('test_extension_manager_moduletest', $moduleTest['label']);
     $this->assertEquals(['mgmt:hidden', 'mock'], $moduleTest['tags']);
   }
 

@@ -42,8 +42,8 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
     $parsed = $converter->convertHtmlToArray($filteredHtml);
 
     $myField = $parsed[0]['#children'][1]['#children'][0];
-    $this->assertEquals('af-field', $myField['#tag']);
-    $this->assertEquals('First Name', $myField['defn']['label']);
+    $this->assertSame('af-field', $myField['#tag']);
+    $this->assertSame('First Name', $myField['defn']['label']);
   }
 
   public function testDefnInjectionNested(): void {
@@ -54,8 +54,8 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
     $parsed = $converter->convertHtmlToArray($filteredHtml);
 
     $myField = $parsed[0]['#children'][1]['#children'][0]['#children'][0]['#children'][0];
-    $this->assertEquals('af-field', $myField['#tag']);
-    $this->assertEquals('First Name', $myField['defn']['label']);
+    $this->assertSame('af-field', $myField['#tag']);
+    $this->assertSame('First Name', $myField['defn']['label']);
   }
 
   public function testDefnOverrideTitle(): void {
@@ -66,9 +66,9 @@ class FilterTest extends \PHPUnit\Framework\TestCase implements HeadlessInterfac
     $parsed = $converter->convertHtmlToArray($filteredHtml);
 
     $myField = $parsed[0]['#children'][1]['#children'][0];
-    $this->assertEquals('af-field', $myField['#tag']);
-    $this->assertEquals('Given name', $myField['defn']['label']);
-    $this->assertEquals('Text', $myField['defn']['input_type']);
+    $this->assertSame('af-field', $myField['#tag']);
+    $this->assertSame('Given name', $myField['defn']['label']);
+    $this->assertSame('Text', $myField['defn']['input_type']);
   }
 
 }

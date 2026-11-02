@@ -425,7 +425,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $message = '';
     $result = $this->processor->updateSubscriptionBillingInfo($message, $params);
     $requests = $this->getRequestBodies();
-    $this->assertEquals('I00001: Successful.', $message);
+    $this->assertSame('I00001: Successful.', $message);
     $this->assertTrue($result);
     $this->assertEquals($this->getExpectedUpdateRequest(), $requests[0]);
   }
@@ -453,7 +453,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
     $message = '';
     $result = $this->processor->changeSubscriptionAmount($message, $params);
     $requests = $this->getRequestBodies();
-    $this->assertEquals('I00001: Successful.', $message);
+    $this->assertSame('I00001: Successful.', $message);
     $this->assertTrue($result);
     $this->assertEquals($this->getExpectedChangeSubscriptionRequest(), $requests[0]);
   }

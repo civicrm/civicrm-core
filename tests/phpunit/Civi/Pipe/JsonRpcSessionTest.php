@@ -42,7 +42,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     ]);
     $decode = json_decode($responseLines[1], 1);
     $this->assertEquals('2.0', $decode['jsonrpc']);
-    $this->assertEquals('Method not found', $decode['error']['message']);
+    $this->assertSame('Method not found', $decode['error']['message']);
     $this->assertEquals(-32601, $decode['error']['code']);
   }
 
@@ -52,7 +52,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     ]);
     $decode = json_decode($responseLines[1], 1);
     $this->assertEquals('2.0', $decode['jsonrpc']);
-    $this->assertEquals('Invalid params', $decode['error']['message']);
+    $this->assertSame('Invalid params', $decode['error']['message']);
     $this->assertEquals(-32602, $decode['error']['code']);
   }
 
@@ -74,12 +74,12 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $decode = json_decode($responseLines[1], 1);
 
     $this->assertEquals('2.0', $decode[0]['jsonrpc']);
-    $this->assertEquals('a', $decode[0]['id']);
-    $this->assertEquals('Method not found', $decode[0]['error']['message']);
+    $this->assertSame('a', $decode[0]['id']);
+    $this->assertSame('Method not found', $decode[0]['error']['message']);
     $this->assertEquals(-32601, $decode[0]['error']['code']);
 
     $this->assertEquals('2.0', $decode[1]['jsonrpc']);
-    $this->assertEquals('b', $decode[1]['id']);
+    $this->assertSame('b', $decode[1]['id']);
     $this->assertEquals([123], $decode[1]['result']);
   }
 
@@ -87,7 +87,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $responses = $this->runLines(['{"jsonrpc":"2.0","id":"b","method":"session.nope","params":[]}']);
     $decode = json_decode($responses[1], 1);
     $this->assertEquals('2.0', $decode['jsonrpc']);
-    $this->assertEquals('Method not found', $decode['error']['message']);
+    $this->assertSame('Method not found', $decode['error']['message']);
   }
 
   public function testControl(): void {
@@ -105,7 +105,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
 
     $decode = json_decode($responses[1], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
-    $this->assertEquals('a3', $decode['id']);
+    $this->assertSame('a3', $decode['id']);
     $this->assertEquals(\CRM_Utils_System::version(), $decode['result']['values'][0]['version']);
   }
 
@@ -122,17 +122,17 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
 
     $decode = json_decode($responses[1], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
-    $this->assertEquals('bad1', $decode['id']);
+    $this->assertSame('bad1', $decode['id']);
     $this->assertMatchesRegularExpression(';API.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
 
     $decode = json_decode($responses[2], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
-    $this->assertEquals('o', $decode['id']);
-    $this->assertEquals('array', $decode['result']['apiError']);
+    $this->assertSame('o', $decode['id']);
+    $this->assertSame('array', $decode['result']['apiError']);
 
     $decode = json_decode($responses[3], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
-    $this->assertEquals('bad2', $decode['id']);
+    $this->assertSame('bad2', $decode['id']);
     $this->assertEquals(1, $decode['result']['is_error']);
     $this->assertMatchesRegularExpression(';API.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
   }
@@ -144,10 +144,10 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
 
     $decode = json_decode($responses[1], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
-    $this->assertEquals('a4', $decode['id']);
+    $this->assertSame('a4', $decode['id']);
     $this->assertTrue(is_array($decode['result']));
     $fields = \CRM_Utils_Array::index(['name'], $decode['result']);
-    $this->assertEquals('Number', $fields['id']['input_type']);
+    $this->assertSame('Number', $fields['id']['input_type']);
   }
 
   public function testApi4Authz(): void {
@@ -211,17 +211,17 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
 
     $decode = json_decode($responses[1], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
-    $this->assertEquals('bad1', $decode['id']);
+    $this->assertSame('bad1', $decode['id']);
     $this->assertMatchesRegularExpression(';Api.*System.*zznnzznnzz.*not exist;', $decode['error']['message']);
 
     $decode = json_decode($responses[2], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
-    $this->assertEquals('o', $decode['id']);
-    $this->assertEquals('array', $decode['result']['apiError']);
+    $this->assertSame('o', $decode['id']);
+    $this->assertSame('array', $decode['result']['apiError']);
 
     $decode = json_decode($responses[3], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
-    $this->assertEquals('bad2', $decode['id']);
+    $this->assertSame('bad2', $decode['id']);
     $this->assertEquals(1, $decode['result']['is_error']);
     $this->assertMatchesRegularExpression(';Api.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
   }

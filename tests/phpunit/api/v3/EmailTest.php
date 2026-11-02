@@ -442,7 +442,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->assertEquals(1, $get['count'], 'Incorrect email count at ' . __LINE__);
     $this->assertEquals(1, $get['values'][$emailID]['is_primary']);
     $this->assertEquals(1, $get['values'][$emailID]['on_hold']);
-    $this->assertEquals('1-2@example.com', $get['values'][$emailID]['email']);
+    $this->assertSame('1-2@example.com', $get['values'][$emailID]['email']);
   }
 
   /**
@@ -570,7 +570,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'contact_id' => $attacker,
       'check_permissions' => 1,
     ]);
-    $this->assertEquals('Permission denied to modify contact record', $result['error_message']);
+    $this->assertSame('Permission denied to modify contact record', $result['error_message']);
 
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit all contacts'];
     $owner = (int) CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_email WHERE id = %1', [1 => [$email, 'Integer']]);

@@ -99,16 +99,16 @@ EOHTML;
     $firstNameNodes = $doc->find('af-field[name="first_name"]');
     $this->assertCount(1, $firstNameNodes);
     $firstNameDefn = \CRM_Utils_JS::decode($firstNameNodes->attr('defn'));
-    $this->assertEquals('First Name', $firstNameDefn['label']);
-    $this->assertEquals('String', $firstNameDefn['data_type']);
-    $this->assertEquals('Text', $firstNameDefn['input_type']);
-    $this->assertEquals('~/af/fields/Text.html', $firstNameDefn['template']);
+    $this->assertSame('First Name', $firstNameDefn['label']);
+    $this->assertSame('String', $firstNameDefn['data_type']);
+    $this->assertSame('Text', $firstNameDefn['input_type']);
+    $this->assertSame('~/af/fields/Text.html', $firstNameDefn['template']);
 
     // Inspect gender_id field
     $genderNodes = $doc->find('af-field[name="gender_id"]');
     $genderDefn = \CRM_Utils_JS::decode($genderNodes->attr('defn'));
-    $this->assertEquals('Gender', $genderDefn['label']);
-    $this->assertEquals('Integer', $genderDefn['data_type']);
+    $this->assertSame('Gender', $genderDefn['label']);
+    $this->assertSame('Integer', $genderDefn['data_type']);
     $options = array_column($genderDefn['options'], 'id', 'label');
     // data_type is Integer so keys will be int
     $this->assertSame(1, $options['Female']);
@@ -117,8 +117,8 @@ EOHTML;
     // Inspect custom select field
     $customSelectNodes = $doc->find('af-field[name="testcustom.testselect"]');
     $customSelectDefn = \CRM_Utils_JS::decode($customSelectNodes->attr('defn'));
-    $this->assertEquals('~/af/fields/Select.html', $customSelectDefn['template']);
-    $this->assertEquals('String', $customSelectDefn['data_type']);
+    $this->assertSame('~/af/fields/Select.html', $customSelectDefn['template']);
+    $this->assertSame('String', $customSelectDefn['data_type']);
     $options = array_column($customSelectDefn['options'], 'id', 'label');
     // data_type is String so keys will be string
     $this->assertSame('1', $options['First']);

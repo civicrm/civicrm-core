@@ -276,7 +276,7 @@ EOHTML;
       ->addSelect('first_name', 'last_name')
       ->addWhere('id', '=', $contactId)
       ->execute()->first();
-    $this->assertEquals('A', $contact['first_name']);
+    $this->assertSame('A', $contact['first_name']);
     $this->assertEmpty($contact['last_name']);
 
     // first_name = B, last_name = 'Smith' -> passes (not disabled), last_name must be saved!
@@ -296,8 +296,8 @@ EOHTML;
       ->addSelect('first_name', 'last_name')
       ->addWhere('id', '=', $contactId)
       ->execute()->first();
-    $this->assertEquals('B', $contact['first_name']);
-    $this->assertEquals('Smith', $contact['last_name']);
+    $this->assertSame('B', $contact['first_name']);
+    $this->assertSame('Smith', $contact['last_name']);
 
     // first_name = B, last_name = empty -> should fail (not disabled, but required)
     $submission = [

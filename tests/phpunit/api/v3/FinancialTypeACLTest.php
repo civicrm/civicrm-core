@@ -95,7 +95,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'edit contributions',
     ]);
     $result = $this->callAPIFailure('contribution', 'create', $p);
-    $this->assertEquals('You do not have permission to create this contribution', $result['error_message']);
+    $this->assertSame('You do not have permission to create this contribution', $result['error_message']);
     $this->addFinancialAclPermissions([['add', 'Donation']]);
 
     $contribution = $this->callAPISuccess('contribution', 'create', $p);

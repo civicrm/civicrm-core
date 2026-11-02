@@ -88,7 +88,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $newFile = CRM_Utils_File::duplicate("/tmp/$fileName");
     $this->assertNotEquals("/tmp/$fileName", $newFile);
     $contents = file_get_contents($newFile);
-    $this->assertEquals('test file content', $contents);
+    $this->assertSame('test file content', $contents);
     unlink("/tmp/$fileName");
     unlink($newFile);
   }
@@ -399,8 +399,8 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     // Therefore, we have to do that part of the test in a sub-process.
     // If you run directly in the same-process, then (eg) `phpunit` will have trouble writing error-data to JUnit XML files.
     [$exitCode, $stdout, $stderr] = $this->runStaticMethodAsScript(__CLASS__, 'doIsDirWithOpenBasedir', [$a_dir, $open_base_dirs, $input, $expected]);
-    $this->assertEquals('"OK"', trim($stdout), 'doIsDirWithOpenBasedir() should return OK');
-    $this->assertEquals('', trim($stderr), 'doIsDirWithOpenBasedir() should not generate warnings');
+    $this->assertSame('"OK"', trim($stdout), 'doIsDirWithOpenBasedir() should return OK');
+    $this->assertSame('', trim($stderr), 'doIsDirWithOpenBasedir() should not generate warnings');
     $this->assertEquals(0, $exitCode, 'doIsDirWithOpenBasedir() should exit normally');
 
     unlink("{$a_dir}/isDirTest/ok/ok.txt");

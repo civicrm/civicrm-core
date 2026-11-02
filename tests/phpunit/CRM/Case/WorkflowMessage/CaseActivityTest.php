@@ -74,7 +74,7 @@ class CRM_Case_WorkflowMessage_CaseActivityTest extends CiviUnitTestCase {
       ->single();
     $this->assertEquals($name, $get['name']);
     $this->assertEquals(0, $get['data']['modelProps']['contact']['id']);
-    $this->assertEquals('myrole', $get['data']['modelProps']['contact']['role']);
+    $this->assertSame('myrole', $get['data']['modelProps']['contact']['role']);
   }
 
 }

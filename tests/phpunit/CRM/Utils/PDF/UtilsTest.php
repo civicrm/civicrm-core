@@ -22,7 +22,7 @@ class CRM_Utils_PDF_UtilsTest extends CiviUnitTestCase {
 
     $pdf_output = CRM_Utils_PDF_Utils::html2pdf('<p>Some output</p>', 'civicrm.pdf', TRUE);
     // Not much of a test but this isn't the main thing we're testing.
-    $this->assertEquals('%PDF', substr($pdf_output, 0, 4));
+    $this->assertSame('%PDF', substr($pdf_output, 0, 4));
 
     // If the setting worked, we should have some debug output in this file.
     // The exact contents might change between dompdf versions but it's likely

@@ -179,7 +179,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectOneHttpRequest(self::$webResponses['first-valid-response'])
     );
     $doc1 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>First valid response</h1>', $doc1['messages'][0]['markup']);
+    $this->assertSame('<h1>First valid response</h1>', $doc1['messages'][0]['markup']);
     $this->assertEqualsWithDelta(strtotime('2013-03-01 10:10:00'), $doc1['expires'], self::APPROX_TIME_EQUALITY);
 
     // second try, $doc1 hasn't expired yet, so still use it
@@ -189,7 +189,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectNoHttpRequest()
     );
     $doc2 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>First valid response</h1>', $doc2['messages'][0]['markup']);
+    $this->assertSame('<h1>First valid response</h1>', $doc2['messages'][0]['markup']);
     $this->assertEqualsWithDelta(strtotime('2013-03-01 10:10:00'), $doc2['expires'], self::APPROX_TIME_EQUALITY);
 
     // third try, $doc1 expired, update it
@@ -200,7 +200,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectOneHttpRequest(self::$webResponses['second-valid-response'])
     );
     $doc3 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Second valid response</h1>', $doc3['messages'][0]['markup']);
+    $this->assertSame('<h1>Second valid response</h1>', $doc3['messages'][0]['markup']);
     $this->assertEqualsWithDelta(strtotime('2013-03-01 12:10:02'), $doc3['expires'], self::APPROX_TIME_EQUALITY);
   }
 
@@ -243,7 +243,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectOneHttpRequest(self::$webResponses['first-valid-response'])
     );
     $doc3 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>First valid response</h1>', $doc3['messages'][0]['markup']);
+    $this->assertSame('<h1>First valid response</h1>', $doc3['messages'][0]['markup']);
     $this->assertTrue($doc3['expires'] > CRM_Utils_Time::time());
   }
 
@@ -268,7 +268,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectOneHttpRequest(self::$webResponses['first-valid-response'])
     );
     $doc1 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>First valid response</h1>', $doc1['messages'][0]['markup']);
+    $this->assertSame('<h1>First valid response</h1>', $doc1['messages'][0]['markup']);
     $this->assertEqualsWithDelta(strtotime('2013-03-01 10:10:00'), $doc1['expires'], self::APPROX_TIME_EQUALITY);
 
     // second try, $doc1 has expired; bad response; keep old data
@@ -279,7 +279,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectOneHttpRequest($badWebResponse)
     );
     $doc2 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>First valid response</h1>', $doc2['messages'][0]['markup']);
+    $this->assertSame('<h1>First valid response</h1>', $doc2['messages'][0]['markup']);
     $this->assertTrue($doc2['expires'] > CRM_Utils_Time::time());
 
     // third try, $doc2 hasn't expired yet; no request; keep old data
@@ -289,7 +289,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectNoHttpRequest()
     );
     $doc3 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>First valid response</h1>', $doc3['messages'][0]['markup']);
+    $this->assertSame('<h1>First valid response</h1>', $doc3['messages'][0]['markup']);
     $this->assertEquals($doc2['expires'], $doc3['expires']);
 
     // fourth try, $doc2 has expired yet; new request; replace data
@@ -299,7 +299,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectOneHttpRequest(self::$webResponses['second-valid-response'])
     );
     $doc4 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>Second valid response</h1>', $doc4['messages'][0]['markup']);
+    $this->assertSame('<h1>Second valid response</h1>', $doc4['messages'][0]['markup']);
     $this->assertEqualsWithDelta(strtotime('2013-03-01 12:20:05'), $doc4['expires'], self::APPROX_TIME_EQUALITY);
   }
 
@@ -312,8 +312,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectOneHttpRequest(self::$webResponses['two-messages'])
     );
     $doc1 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>One</h1>', $doc1['messages'][0]['markup']);
-    $this->assertEquals('<h1>Two</h1>', $doc1['messages'][1]['markup']);
+    $this->assertSame('<h1>One</h1>', $doc1['messages'][0]['markup']);
+    $this->assertSame('<h1>Two</h1>', $doc1['messages'][1]['markup']);
 
     // randomly pick many times
     $trials = 80;
@@ -340,8 +340,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->expectOneHttpRequest(self::$webResponses['two-messages-halfbadcomp'])
     );
     $doc1 = $communityMessages->getDocument();
-    $this->assertEquals('<h1>One</h1>', $doc1['messages'][0]['markup']);
-    $this->assertEquals('<h1>Two</h1>', $doc1['messages'][1]['markup']);
+    $this->assertSame('<h1>One</h1>', $doc1['messages'][0]['markup']);
+    $this->assertSame('<h1>Two</h1>', $doc1['messages'][1]['markup']);
 
     // randomly pick many times
     $trials = 10;
@@ -360,7 +360,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
       $this->cache,
       $this->expectNoHttpRequest()
     );
-    $this->assertEquals('cms=UnitTests cms=UnitTests', $communityMessages->evalMarkup('cms=%%uf%% cms={{uf}}'));
+    $this->assertSame('cms=UnitTests cms=UnitTests', $communityMessages->evalMarkup('cms=%%uf%% cms={{uf}}'));
   }
 
   /**

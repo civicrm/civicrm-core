@@ -85,9 +85,9 @@ class CustomValueTest extends Api4TestBase {
     $this->assertEquals(['CustomValue', 'DAOEntity'], $entity['type']);
     $this->assertEquals(['id'], $entity['primary_key']);
     $this->assertEquals($customGroup['table_name'], $entity['table_name']);
-    $this->assertEquals('Civi\Api4\CustomValue', $entity['class']);
+    $this->assertSame('Civi\Api4\CustomValue', $entity['class']);
     $this->assertEquals([$group], $entity['class_args']);
-    $this->assertEquals('secondary', $entity['searchable']);
+    $this->assertSame('secondary', $entity['searchable']);
 
     // Retrieve and check the fields of CustomValue = Custom_$group
     $fields = CustomValue::getFields($group, FALSE)->setLoadOptions(TRUE)->execute();
@@ -226,7 +226,7 @@ class CustomValueTest extends Api4TestBase {
       ->addWhere("id", "=", 1)
       ->execute()
       ->first();
-    $this->assertEquals('b', $result[$colorFieldName]);
+    $this->assertSame('b', $result[$colorFieldName]);
     $this->assertEquals(NULL, $result[$refFieldName]);
 
     // CASE 3: Test CustomValue::replace

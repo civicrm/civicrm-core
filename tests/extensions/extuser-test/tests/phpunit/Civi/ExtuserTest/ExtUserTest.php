@@ -86,7 +86,7 @@ class ExtUserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterfa
       "role" => "staff",
       "sketch" => hash("sha256", $secret),
     ]);
-    $this->assertEquals('staff', $userdb->get($username)['role']);
+    $this->assertSame('staff', $userdb->get($username)['role']);
     return [$username, $secret];
   }
 

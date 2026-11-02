@@ -35,7 +35,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('MailingContact', 'getfields', [
       'action' => 'get',
     ]);
-    $this->assertEquals('Delivered', $result['values']['type']['api.default']);
+    $this->assertSame('Delivered', $result['values']['type']['api.default']);
   }
 
   /**
@@ -56,7 +56,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $count);
     $this->assertFalse(empty($result['values']));
     $this->assertEquals($mailingID, $result['values'][$mailingID]['mailing_id']);
-    $this->assertEquals("Some Subject", $result['values'][$mailingID]['subject']);
+    $this->assertSame("Some Subject", $result['values'][$mailingID]['subject']);
     $this->assertEquals(CRM_Core_Session::getLoggedInContactID(), $result['values'][$mailingID]['creator_id']);
   }
 
@@ -78,7 +78,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('MailingContact', 'get', $params)['values'];
     $this->assertCount(1, $result);
     $this->assertEquals($mailingID, $result[$mailingID]['mailing_id']);
-    $this->assertEquals('Some Subject', $result[$mailingID]['subject']);
+    $this->assertSame('Some Subject', $result[$mailingID]['subject']);
     $this->assertEquals(CRM_Core_Session::getLoggedInContactID(), $result[$mailingID]['creator_id'], 3);
   }
 

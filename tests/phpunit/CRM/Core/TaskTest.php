@@ -41,23 +41,23 @@ class CRM_Core_TaskTest extends CiviUnitTestCase {
     $examples = [
       'CRM_Activity_Task' => function(array $tasks): void {
         $this->assertArrayHasKey(CRM_Activity_Task::TASK_SMS, $tasks);
-        $this->assertEquals('CRM_Activity_Form_Task_FileOnCase', $tasks[CRM_Activity_Task::TASK_SMS]['class']);
+        $this->assertSame('CRM_Activity_Form_Task_FileOnCase', $tasks[CRM_Activity_Task::TASK_SMS]['class']);
       },
 
       'CRM_Contact_Task' => function(array $tasks): void {
         $this->assertArrayHasKey(CRM_Contact_Task::GROUP_ADD, $tasks);
-        $this->assertEquals('CRM_Contact_Form_Task_AddToGroup', $tasks[CRM_Contact_Task::GROUP_ADD]['class']);
+        $this->assertSame('CRM_Contact_Form_Task_AddToGroup', $tasks[CRM_Contact_Task::GROUP_ADD]['class']);
       },
 
       'CRM_Contribute_Task' => function(array $tasks): void {
         $this->assertArrayHasKey(CRM_Contribute_Task::TASK_EXPORT, $tasks);
         $this->assertIsArray($tasks[CRM_Contribute_Task::TASK_EXPORT]['class']);
-        $this->assertEquals('CRM_Contribute_Export_Form_Select', $tasks[CRM_Contribute_Task::TASK_EXPORT]['class'][0]);
+        $this->assertSame('CRM_Contribute_Export_Form_Select', $tasks[CRM_Contribute_Task::TASK_EXPORT]['class'][0]);
       },
 
       'CRM_Event_Task' => function(array $tasks): void {
         $this->assertArrayHasKey(CRM_Event_Task::CANCEL_REGISTRATION, $tasks);
-        $this->assertEquals('CRM_Event_Form_Task_Cancel', $tasks[CRM_Event_Task::CANCEL_REGISTRATION]['class']);
+        $this->assertSame('CRM_Event_Form_Task_Cancel', $tasks[CRM_Event_Task::CANCEL_REGISTRATION]['class']);
       },
 
       // For these, assert the shared "Print selected rows" task exists and looks like the expected Print form.

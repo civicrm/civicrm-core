@@ -51,7 +51,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     }
 
     $goodExample = $cryptoToken->encrypt('mess with me', 'UNIT-TEST');
-    $this->assertEquals('mess with me', $cryptoToken->decrypt($goodExample));
+    $this->assertSame('mess with me', $cryptoToken->decrypt($goodExample));
 
     try {
       $badExample = preg_replace(';CTK\?;', 'ctk9', $goodExample);
@@ -103,7 +103,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
 
     $first = $cryptoToken->encrypt("hello world", 'UNIT-TEST');
     $this->assertMatchesRegularExpression(';k=asdf-key-1;', $first);
-    $this->assertEquals('hello world', $cryptoToken->decrypt($first));
+    $this->assertSame('hello world', $cryptoToken->decrypt($first));
 
     // If the keys haven't changed yet, then rekey() is a null-op.
     $second = $cryptoToken->rekey($first, 'UNIT-TEST');
@@ -118,7 +118,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     $third = $cryptoToken->rekey($first, 'UNIT-TEST');
     $this->assertDoesNotMatchRegularExpression(';k=asdf-key-1;', $third);
     $this->assertMatchesRegularExpression(';k=new-key;', $third);
-    $this->assertEquals('hello world', $cryptoToken->decrypt($third));
+    $this->assertSame('hello world', $cryptoToken->decrypt($third));
   }
 
   public function testRekeyUpgradeDowngradePlaintext(): void {
@@ -130,8 +130,8 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     // In the first pass, we have no real key.
     $cryptoRegistry->addPlainText(['tags' => ['APPLE'], 'weight' => -1]);
     $first = $cryptoToken->encrypt("hello world", 'APPLE');
-    $this->assertEquals('hello world', $first);
-    $this->assertEquals('hello world', $cryptoToken->decrypt($first));
+    $this->assertSame('hello world', $first);
+    $this->assertSame('hello world', $cryptoToken->decrypt($first));
 
     // If the keys haven't changed yet, then rekey() is a null-op.
     $second = $cryptoToken->rekey($first, 'APPLE');
@@ -145,13 +145,13 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     ]);
     $third = $cryptoToken->rekey($first, 'APPLE');
     $this->assertMatchesRegularExpression(';k=interim-key;', $third);
-    $this->assertEquals('hello world', $cryptoToken->decrypt($third));
+    $this->assertSame('hello world', $cryptoToken->decrypt($third));
 
     // But if we add another key with earlier priority,
     $cryptoRegistry->addPlainText(['tags' => ['APPLE'], 'weight' => -4]);
     $fourth = $cryptoToken->rekey($third, 'APPLE');
-    $this->assertEquals('hello world', $fourth);
-    $this->assertEquals('hello world', $cryptoToken->decrypt($fourth));
+    $this->assertSame('hello world', $fourth);
+    $this->assertSame('hello world', $cryptoToken->decrypt($fourth));
 
   }
 
@@ -159,7 +159,7 @@ class CryptoTokenTest extends \CiviUnitTestCase {
     // This is performance optimization - don't initialize crypto.registry unless
     // you actually need it.
     $this->assertFalse(\Civi::container()->initialized('crypto.registry'));
-    $this->assertEquals("Hello world", \Civi::service('crypto.token')->decrypt("Hello world"));
+    $this->assertSame("Hello world", \Civi::service('crypto.token')->decrypt("Hello world"));
     $this->assertFalse(\Civi::container()->initialized('crypto.registry'));
   }
 

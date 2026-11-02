@@ -417,7 +417,7 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $this->assertIsArray($e->errorData);
-      $this->assertEquals('123 Main St', $e->errorData['onbehalf_street_address-' . $this->getLocationTypeID('Home')]['value'] ?? NULL);
+      $this->assertSame('123 Main St', $e->errorData['onbehalf_street_address-' . $this->getLocationTypeID('Home')]['value'] ?? NULL);
     }
   }
 
@@ -439,7 +439,7 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $this->assertIsArray($e->errorData);
-      $this->assertEquals('123 Main St', $e->errorData['onbehalf_street_address-' . $this->getLocationTypeID('Home')]['value'] ?? NULL);
+      $this->assertSame('123 Main St', $e->errorData['onbehalf_street_address-' . $this->getLocationTypeID('Home')]['value'] ?? NULL);
     }
   }
 

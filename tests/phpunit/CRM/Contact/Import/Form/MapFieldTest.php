@@ -237,10 +237,10 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $this->assertEquals($this->getLocationTypeID('Home'), $processor->getLocationTypeID(10));
     $this->assertEquals(2, $processor->getWebsiteTypeID(8));
     $this->assertEquals($this->getRelationshipTypeID('Sibling of') . '_a_b', $processor->getRelationshipKey(9));
-    $this->assertEquals('addressee', $processor->getFieldName(0));
-    $this->assertEquals('street_address', $processor->getFieldName(3));
+    $this->assertSame('addressee', $processor->getFieldName(0));
+    $this->assertSame('street_address', $processor->getFieldName(3));
     $this->assertEquals($this->getCustomFieldName('text'), $processor->getFieldName(4));
-    $this->assertEquals('url', $processor->getFieldName(8));
+    $this->assertSame('url', $processor->getFieldName(8));
   }
 
   /**

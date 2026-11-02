@@ -74,9 +74,9 @@ EOHTML;
       ->setLayoutFormat('shallow')
       ->setFormatWhitespace(TRUE)
       ->execute()->single();
-    $this->assertEquals('afblock-custom-my-things', $block['directive_name']);
-    $this->assertEquals('my_text', $block['layout'][0]['name']);
-    $this->assertEquals('my_friend', $block['layout'][1]['name']);
+    $this->assertSame('afblock-custom-my-things', $block['directive_name']);
+    $this->assertSame('my_text', $block['layout'][0]['name']);
+    $this->assertSame('my_friend', $block['layout'][1]['name']);
 
     $cid1 = $this->createTestRecord('Individual')['id'];
     $cid2 = $this->createTestRecord('Individual')['id'];
@@ -113,9 +113,9 @@ EOHTML;
       ->addSelect('Custom_MyThings.my_text', 'Custom_MyThings.my_friend')
       ->addOrderBy('Custom_MyThings.id')
       ->execute();
-    $this->assertEquals('One', $contact[0]['Custom_MyThings.my_text']);
+    $this->assertSame('One', $contact[0]['Custom_MyThings.my_text']);
     $this->assertEquals($cid1, $contact[0]['Custom_MyThings.my_friend']);
-    $this->assertEquals('Two', $contact[1]['Custom_MyThings.my_text']);
+    $this->assertSame('Two', $contact[1]['Custom_MyThings.my_text']);
     $this->assertEquals($cid2, $contact[1]['Custom_MyThings.my_friend']);
     $this->assertTrue(empty($contact[2]));
   }

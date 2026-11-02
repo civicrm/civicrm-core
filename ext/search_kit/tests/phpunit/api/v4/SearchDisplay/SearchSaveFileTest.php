@@ -68,8 +68,8 @@ class SearchSaveFileTest extends \PHPUnit\Framework\TestCase implements Headless
     // Assert file creation.
     // ---------------------------------
     // Make sure report name is correct.
-    $this->assertEquals('Save File Test', $file->description);
-    $this->assertEquals('application/json', $file->mime_type);
+    $this->assertSame('Save File Test', $file->description);
+    $this->assertSame('application/json', $file->mime_type);
 
     // The following directory and name checks may not be needed if the
     // overall file exists check passes, it would mean these aren't needed.
@@ -100,7 +100,7 @@ class SearchSaveFileTest extends \PHPUnit\Framework\TestCase implements Headless
     $this->assertCount(1, $entityFiles);
 
     // Make sure we are getting back the correct entity_table.
-    $this->assertEquals('civicrm_saved_search', $entityFiles->first()['entity_table']);
+    $this->assertSame('civicrm_saved_search', $entityFiles->first()['entity_table']);
 
     // Make sure the file_id matches.
     $this->assertEquals($file->id, $entityFiles->first()['file_id']);

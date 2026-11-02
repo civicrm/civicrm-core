@@ -35,13 +35,13 @@ class ActionScheduleTest extends Api4TestBase {
     $this->assertContainsEquals(['id' => 'week', 'name' => 'week', 'label' => 'weeks'], $fields['repetition_frequency_unit']['options']);
     $this->assertContainsEquals(['id' => 'month', 'name' => 'month', 'label' => 'months'], $fields['end_frequency_unit']['options']);
 
-    $this->assertEquals('manual', $fields['recipient']['options'][0]['name']);
-    $this->assertEquals('group', $fields['recipient']['options'][1]['name']);
+    $this->assertSame('manual', $fields['recipient']['options'][0]['name']);
+    $this->assertSame('group', $fields['recipient']['options'][1]['name']);
 
     $this->assertEquals('1', $fields['limit_to']['options'][0]['id']);
-    $this->assertEquals('limit', $fields['limit_to']['options'][0]['name']);
+    $this->assertSame('limit', $fields['limit_to']['options'][0]['name']);
     $this->assertEquals('2', $fields['limit_to']['options'][1]['id']);
-    $this->assertEquals('add', $fields['limit_to']['options'][1]['name']);
+    $this->assertSame('add', $fields['limit_to']['options'][1]['name']);
 
     $this->assertEquals(['name', 'label', 'icon'], $fields['mapping_id']['suffixes']);
   }
@@ -53,9 +53,9 @@ class ActionScheduleTest extends Api4TestBase {
       ->execute()
       ->indexBy('name');
 
-    $this->assertEquals('Activity Type', $fields['entity_value']['label']);
+    $this->assertSame('Activity Type', $fields['entity_value']['label']);
     $this->assertContains('Meeting', $fields['entity_value']['options']);
-    $this->assertEquals('Activity Status', $fields['entity_status']['label']);
+    $this->assertSame('Activity Status', $fields['entity_status']['label']);
     $this->assertContains('Scheduled', $fields['entity_status']['options']);
     $this->assertArrayHasKey('activity_date_time', $fields['start_action_date']['options']);
     $this->assertArrayHasKey('1', $fields['limit_to']['options']);

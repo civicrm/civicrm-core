@@ -64,24 +64,24 @@ class CRM_Batch_Import_Parser_BatchTest extends CiviUnitTestCase {
 
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
     $row = $dataSource->getRow();
-    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertSame('ERROR', $row['_status']);
 
     $batches = Batch::get(FALSE)
       ->addSelect('title', 'description', 'status_id:name', 'total', 'item_count')
       ->addOrderBy('id')
       ->execute();
     $this->assertCount(2, $batches);
-    $this->assertEquals('Batch One', $batches[0]['title']);
-    $this->assertEquals('First test batch', $batches[0]['description']);
-    $this->assertEquals('Open', $batches[0]['status_id:name']);
+    $this->assertSame('Batch One', $batches[0]['title']);
+    $this->assertSame('First test batch', $batches[0]['description']);
+    $this->assertSame('Open', $batches[0]['status_id:name']);
     $this->assertEquals('100.00', $batches[0]['total']);
     $this->assertEquals(10, $batches[0]['item_count']);
-    $this->assertEquals('Batch Two', $batches[1]['title']);
-    $this->assertEquals('Closed', $batches[1]['status_id:name']);
+    $this->assertSame('Batch Two', $batches[1]['title']);
+    $this->assertSame('Closed', $batches[1]['status_id:name']);
   }
 
   /**
@@ -103,24 +103,24 @@ class CRM_Batch_Import_Parser_BatchTest extends CiviUnitTestCase {
 
     $dataSource = new Spreadsheet($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
     $row = $dataSource->getRow();
-    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertSame('ERROR', $row['_status']);
 
     $batches = Batch::get(FALSE)
       ->addSelect('title', 'description', 'status_id:name', 'total', 'item_count')
       ->addOrderBy('id')
       ->execute();
     $this->assertCount(2, $batches);
-    $this->assertEquals('Batch One', $batches[0]['title']);
-    $this->assertEquals('First test batch', $batches[0]['description']);
-    $this->assertEquals('Open', $batches[0]['status_id:name']);
+    $this->assertSame('Batch One', $batches[0]['title']);
+    $this->assertSame('First test batch', $batches[0]['description']);
+    $this->assertSame('Open', $batches[0]['status_id:name']);
     $this->assertEquals('100.00', $batches[0]['total']);
     $this->assertEquals(10, $batches[0]['item_count']);
-    $this->assertEquals('Batch Two', $batches[1]['title']);
-    $this->assertEquals('Closed', $batches[1]['status_id:name']);
+    $this->assertSame('Batch Two', $batches[1]['title']);
+    $this->assertSame('Closed', $batches[1]['status_id:name']);
   }
 
   /**
@@ -153,7 +153,7 @@ class CRM_Batch_Import_Parser_BatchTest extends CiviUnitTestCase {
     );
     for ($i = 0; $i < 3; $i++) {
       $row = $dataSource->getRow();
-      $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+      $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
     }
 
     $batches = Batch::get(FALSE)

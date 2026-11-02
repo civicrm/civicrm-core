@@ -37,7 +37,7 @@ class StateTest extends \PHPUnit\Framework\TestCase implements
     ]);
     $state = \Civi::service('oauth2.state')->load($stateId);
     $this->assertEquals(123, $state['clientId']);
-    $this->assertEquals('OAuthSysToken', $state['storage']);
+    $this->assertSame('OAuthSysToken', $state['storage']);
     // PHPUnit runs in CLI... so any state we generate is attached to wildcard session.
     $this->assertEquals(OAuthState::SESSION_WILDCARD, $state['session']);
 
@@ -70,14 +70,14 @@ class StateTest extends \PHPUnit\Framework\TestCase implements
     ]);
     $state = \Civi::service('oauth2.state')->load($stateId);
     $this->assertEquals(123, $state['clientId']);
-    $this->assertEquals('green eggs', $state['breakfast']);
+    $this->assertSame('green eggs', $state['breakfast']);
 
     $state['breakfast'] = 'green eggs and ham';
     \Civi::service('oauth2.state')->store($state, $stateId);
 
     $state2 = \Civi::service('oauth2.state')->load($stateId);
     $this->assertEquals(123, $state2['clientId']);
-    $this->assertEquals('green eggs and ham', $state2['breakfast']);
+    $this->assertSame('green eggs and ham', $state2['breakfast']);
   }
 
 }

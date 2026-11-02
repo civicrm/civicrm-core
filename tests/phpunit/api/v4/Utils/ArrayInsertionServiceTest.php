@@ -78,7 +78,7 @@ class ArrayInsertionServiceTest extends Api4TestBase {
     }
 
     $locationType = $contacts[0]['emails'][0]['location']['name'];
-    $this->assertEquals('Home', $locationType);
+    $this->assertSame('Home', $locationType);
   }
 
 }

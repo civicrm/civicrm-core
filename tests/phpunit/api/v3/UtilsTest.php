@@ -167,7 +167,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       civicrm_api3_verify_mandatory($params, 'CRM_Core_BAO_Note', ['note', 'subject']);
     }
     catch (Exception $expected) {
-      $this->assertEquals('Mandatory key(s) missing from params array: note, subject', $expected->getMessage());
+      $this->assertSame('Mandatory key(s) missing from params array: note, subject', $expected->getMessage());
       return;
     }
 
@@ -192,7 +192,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       civicrm_api3_verify_one_mandatory($params, 'CRM_Core_BAO_Note', ['note', 'subject']);
     }
     catch (Exception $expected) {
-      $this->assertEquals('Mandatory key(s) missing from params array: one of (note, subject)', $expected->getMessage());
+      $this->assertSame('Mandatory key(s) missing from params array: one of (note, subject)', $expected->getMessage());
       return;
     }
 
@@ -272,7 +272,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $fields = civicrm_api3('relationship', 'getfields', ['action' => 'get']);
     _civicrm_api3_validate_fields('relationship', 'get', $params, $fields['values']);
     $this->assertEquals('20101220000000', $params['relationship_start_date']);
-    $this->assertEquals('', $params['relationship_end_date']);
+    $this->assertSame('', $params['relationship_end_date']);
   }
 
   public function test_civicrm_api3_validate_fields_membership(): void {
@@ -285,9 +285,9 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     ];
     $fields = civicrm_api3('Membership', 'getfields', ['action' => 'get']);
     _civicrm_api3_validate_fields('Membership', 'get', $params, $fields['values']);
-    $this->assertEquals('2010-12-20', $params['start_date']);
+    $this->assertSame('2010-12-20', $params['start_date']);
     $this->assertEquals('20101220000000', $params['membership_start_date']);
-    $this->assertEquals('', $params['end_date']);
+    $this->assertSame('', $params['end_date']);
     $this->assertEquals('20101220000000', $params['membership_join_date'], 'join_date not set in line ' . __LINE__);
   }
 
@@ -303,7 +303,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     _civicrm_api3_validate_fields('event', 'create', $params, $fields['values']);
     $this->assertEquals('20101220000000', $params['start_date']);
     $this->assertEquals('20081015000000', $params['registration_end_date']);
-    $this->assertEquals('', $params['end_date']);
+    $this->assertSame('', $params['end_date']);
     $this->assertEquals('20080601000000', $params['registration_start_date']);
   }
 
@@ -316,7 +316,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       _civicrm_api3_validate_fields('Membership', 'get', $params, $fields['values']);
     }
     catch (Exception$expected) {
-      $this->assertEquals('membership_join_date is not a valid date: abc', $expected->getMessage());
+      $this->assertSame('membership_join_date is not a valid date: abc', $expected->getMessage());
     }
   }
 
@@ -335,7 +335,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
         'get_options' => 'all',
       ],
     ]);
-    $this->assertEquals('Household', $result['values']['contact_type']['options']['Household']);
+    $this->assertSame('Household', $result['values']['contact_type']['options']['Household']);
   }
 
   public static function basicArrayCases() {
@@ -519,7 +519,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       _civicrm_api3_validate_constraint('Blah', 'financial_type_id', $fieldInfo, 'Contribution');
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertEquals("'Blah' is not a valid option for field financial_type_id", $e->getMessage());
+      $this->assertSame("'Blah' is not a valid option for field financial_type_id", $e->getMessage());
       return;
     }
     $this->fail('Last function call should have thrown an exception');

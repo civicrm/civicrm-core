@@ -375,7 +375,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $customGroup = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, ['extends' => ['ParticipantEventType', [4]]]));
     $result = array_shift($customGroup['values']);
     $this->assertEquals(3, $result['extends_entity_column_id']);
-    $this->assertEquals('Participant', $result['extends']);
+    $this->assertSame('Participant', $result['extends']);
     $this->customGroupDelete($result['id']);
   }
 
@@ -386,12 +386,12 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $customGroup = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, ['extends' => ['ParticipantEventType', [4]]]));
     $result = array_shift($customGroup['values']);
     $this->assertEquals(3, $result['extends_entity_column_id']);
-    $this->assertEquals('Participant', $result['extends']);
+    $this->assertSame('Participant', $result['extends']);
     $customGroup = $this->callAPISuccess($this->_entity, 'create', ['id' => $customGroup['id'], 'extends' => ['Individual', []]]);
     $result = array_shift($customGroup['values']);
     $this->assertTrue(empty($result['extends_entity_column_id']));
     $this->assertTrue(empty($result['extends_entity_column_value']));
-    $this->assertEquals('Individual', $result['extends']);
+    $this->assertSame('Individual', $result['extends']);
     $this->customGroupDelete($result['id']);
   }
 

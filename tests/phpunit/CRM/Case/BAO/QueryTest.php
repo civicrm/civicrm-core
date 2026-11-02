@@ -170,8 +170,8 @@ class CRM_Case_BAO_QueryTest extends CiviCaseTestCase {
     $rows = CRM_Core_DAO::executeQuery(implode(' ', $sql))->fetchAll();
     // Check expected results.
     $this->assertCount(1, $rows);
-    $this->assertEquals('Alexa', $rows[0]['first_name']);
-    $this->assertEquals('Clarke', $rows[0]['last_name']);
+    $this->assertSame('Alexa', $rows[0]['first_name']);
+    $this->assertSame('Clarke', $rows[0]['last_name']);
   }
 
 }

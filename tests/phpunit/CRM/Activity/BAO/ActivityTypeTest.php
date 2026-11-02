@@ -31,8 +31,8 @@ class CRM_Activity_BAO_ActivityTypeTest extends CiviUnitTestCase {
     $activityTypeObj = new CRM_Activity_BAO_ActivityType($activity_type_id);
     $keyValuePair = $activityTypeObj->getActivityType();
 
-    $this->assertEquals('abc123', $keyValuePair['machineName']);
-    $this->assertEquals('Write Unit Test', $keyValuePair['displayLabel']);
+    $this->assertSame('abc123', $keyValuePair['machineName']);
+    $this->assertSame('Write Unit Test', $keyValuePair['displayLabel']);
 
     // cleanup
     $this->callAPISuccess('option_value', 'delete', ['id' => $result['id']]);

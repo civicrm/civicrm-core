@@ -83,10 +83,10 @@ class CRM_Contribute_Form_ContributionPageTranslationTest extends CiviUnitTestCa
 
     $json = json_decode($uf['module_data'], TRUE);
 
-    $this->assertEquals('In Honor Title EN', $json['soft_credit']['en_US']['honor_block_title']);
-    $this->assertEquals('In Honor Text EN', $json['soft_credit']['en_US']['honor_block_text']);
-    $this->assertEquals('In Honor Title FR', $json['soft_credit']['fr_FR']['honor_block_title']);
-    $this->assertEquals('In Honor Text FR', $json['soft_credit']['fr_FR']['honor_block_text']);
+    $this->assertSame('In Honor Title EN', $json['soft_credit']['en_US']['honor_block_title']);
+    $this->assertSame('In Honor Text EN', $json['soft_credit']['en_US']['honor_block_text']);
+    $this->assertSame('In Honor Title FR', $json['soft_credit']['fr_FR']['honor_block_title']);
+    $this->assertSame('In Honor Text FR', $json['soft_credit']['fr_FR']['honor_block_text']);
   }
 
 }

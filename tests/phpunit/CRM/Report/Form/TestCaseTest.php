@@ -177,15 +177,15 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
 
     Invasive::set([$reportForm, '_params'], ['groups' => 4]);
     $reportForm->processReportMode();
-    $this->assertEquals('group', Invasive::get([$reportForm, '_outputMode']));
+    $this->assertSame('group', Invasive::get([$reportForm, '_outputMode']));
 
     Invasive::set([$reportForm, '_params'], ['task' => 'copy']);
     $reportForm->processReportMode();
-    $this->assertEquals('copy', Invasive::get([$reportForm, '_outputMode']));
+    $this->assertSame('copy', Invasive::get([$reportForm, '_outputMode']));
 
     Invasive::set([$reportForm, '_params'], ['task' => 'print']);
     $reportForm->processReportMode();
-    $this->assertEquals('print', Invasive::get([$reportForm, '_outputMode']));
+    $this->assertSame('print', Invasive::get([$reportForm, '_outputMode']));
   }
 
 }

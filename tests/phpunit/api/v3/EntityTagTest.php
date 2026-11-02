@@ -320,8 +320,8 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
       'entity_id' => $org['id'],
       'entity_table' => "civicrm_contact",
     ]);
-    $this->assertEquals('Org123', $result['entity_id.organization_name']);
-    $this->assertEquals('EntityTagTest', $result['tag_id.name']);
+    $this->assertSame('Org123', $result['entity_id.organization_name']);
+    $this->assertSame('EntityTagTest', $result['tag_id.name']);
     // This should return no results by restricting contact_type
     $result = $this->callAPISuccess('EntityTag', 'get', [
       'return' => ["entity_id.organization_name"],

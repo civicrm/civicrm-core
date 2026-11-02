@@ -188,18 +188,18 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
     $this->assertEquals(date('Y-m-d', strtotime('first day of January 2013')), $memberships[0]['start_date']);
-    $this->assertEquals('2013-02-03', $memberships[1]['start_date']);
-    $this->assertEquals('2013-12-31', $memberships[1]['end_date']);
+    $this->assertSame('2013-02-03', $memberships[1]['start_date']);
+    $this->assertSame('2013-12-31', $memberships[1]['end_date']);
 
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered
     $this->assertEquals(date('Y-m-d', strtotime('last day of December 2013')), $memberships[0]['end_date']);
     $this->assertEquals(date('Y-m-d', strtotime('last day of December 2013')), $memberships[1]['end_date']);
-    $this->assertEquals('2013-12-01', $memberships[2]['end_date']);
+    $this->assertSame('2013-12-01', $memberships[2]['end_date']);
 
     //check start dates #1 should default to 1 Jan this year, #2 should be as entered, 3 is from receive_date
     $this->assertEquals(date('Y-m-d', strtotime('07/22/2013')), $memberships[0]['join_date']);
     $this->assertEquals(date('Y-m-d', strtotime('07/03/2013')), $memberships[1]['join_date']);
-    $this->assertEquals('2013-07-17', $memberships[2]['join_date']);
+    $this->assertSame('2013-07-17', $memberships[2]['join_date']);
     $memberships = $this->callAPISuccess('Contribution', 'get', ['return' => ['total_amount', 'trxn_id']]);
     $this->assertEquals(3, $memberships['count']);
     foreach (array_values($memberships['values']) as $index => $contribution) {
@@ -306,7 +306,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertEquals($frozenTodayDate, $result[0]['start_date']);
     $endDate = date('Y-m-d', strtotime($frozenTodayDate . " +1 year -1 day"));
     $this->assertEquals($endDate, $result[0]['end_date']);
-    $this->assertEquals('2013-07-22', $result[0]['join_date']);
+    $this->assertSame('2013-07-22', $result[0]['join_date']);
     $this->assertEquals($params['field'][1]['member_campaign_id'], $result[0]['campaign_id']);
     $membershipLog = MembershipLog::get()->addWhere('membership_id', '=', $result[0]['id'])
       ->addOrderBy('id', 'DESC')
@@ -315,17 +315,17 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertEquals($frozenTodayDate, $membershipLog['start_date']);
 
     // verify if the modified dates asserts with the dates passed above
-    $this->assertEquals('2016-04-01', $result[1]['start_date']);
-    $this->assertEquals('2017-03-31', $result[1]['end_date']);
+    $this->assertSame('2016-04-01', $result[1]['start_date']);
+    $this->assertSame('2017-03-31', $result[1]['end_date']);
     $this->assertTrue(empty($result[1]['campaign_id']));
 
     $membershipLog = MembershipLog::get()->addWhere('membership_id', '=', $result[2]['id'])
       ->addOrderBy('id', 'DESC')
       ->setLimit(1)->execute()->first();
-    $this->assertEquals('2026-12-31', $membershipLog['end_date']);
-    $this->assertEquals('2015-01-01', $membershipLog['start_date']);
-    $this->assertEquals('2026-12-31', $result[2]['end_date']);
-    $this->assertEquals('2015-01-01', $result[2]['start_date']);
+    $this->assertSame('2026-12-31', $membershipLog['end_date']);
+    $this->assertSame('2015-01-01', $membershipLog['start_date']);
+    $this->assertSame('2026-12-31', $result[2]['end_date']);
+    $this->assertSame('2015-01-01', $result[2]['start_date']);
   }
 
   /**

@@ -323,7 +323,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertIsNumeric($fileId);
     $this->assertEquals($entity_table, $createResult['values'][$fileId]['entity_table']);
     $this->assertEquals($entity->id, $createResult['values'][$fileId]['entity_id']);
-    $this->assertEquals('My test description', $createResult['values'][$fileId]['description']);
+    $this->assertSame('My test description', $createResult['values'][$fileId]['description']);
     $this->assertMatchesRegularExpression('/\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d/', $createResult['values'][$fileId]['upload_date']);
     $this->assertNotTrue(isset($createResult['values'][$fileId]['content']));
     $this->assertNotEmpty($createResult['values'][$fileId]['url']);
@@ -414,7 +414,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertIsNumeric($fileId);
     $this->assertEquals(self::getFilePrefix() . 'weird_na_me.txt', $createResult['values'][$fileId]['name']);
     // Check for appropriate icon
-    $this->assertEquals('fa-file-text-o', $createResult['values'][$fileId]['icon']);
+    $this->assertSame('fa-file-text-o', $createResult['values'][$fileId]['icon']);
   }
 
   public function testCreateShouldSetCreatedIdAsTheLoggedInUser(): void {
@@ -664,7 +664,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       'entity_id' => $entity->id,
     ]);
     $fileId = $createResult['id'];
-    $this->assertEquals('fa-file-word-o', $createResult['values'][$fileId]['icon']);
+    $this->assertSame('fa-file-word-o', $createResult['values'][$fileId]['icon']);
 
     $createResult = $this->callAPISuccess('Attachment', 'create', [
       'name' => self::getFilePrefix() . 'hasIcon.jpg',
@@ -675,7 +675,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       'entity_id' => $entity->id,
     ]);
     $fileId = $createResult['id'];
-    $this->assertEquals('fa-file-image-o', $createResult['values'][$fileId]['icon']);
+    $this->assertSame('fa-file-image-o', $createResult['values'][$fileId]['icon']);
   }
 
   /**

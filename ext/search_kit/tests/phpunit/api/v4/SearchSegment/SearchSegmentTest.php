@@ -93,9 +93,9 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->setLoadOptions(TRUE)
       ->execute()->single();
 
-    $this->assertEquals('Giving Tier', $getField['label']);
-    $this->assertEquals('Extra', $getField['type']);
-    $this->assertEquals('Select', $getField['input_type']);
+    $this->assertSame('Giving Tier', $getField['label']);
+    $this->assertSame('Extra', $getField['type']);
+    $this->assertSame('Select', $getField['input_type']);
     $this->assertEquals(['Low ball', 'Minor league', 'Major league', 'Heavy hitter'], $getField['options']);
 
     $params = [
@@ -125,19 +125,19 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertCount(4, $result);
 
     // Results should be in alphabetical order by giving tier
-    $this->assertEquals('Heavy hitter', $result[0]['columns'][0]['val']);
+    $this->assertSame('Heavy hitter', $result[0]['columns'][0]['val']);
     $this->assertEquals(56.0, $result[0]['data']['AVG_total_amount']);
     $this->assertEquals(1, $result[0]['data']['COUNT_total_amount']);
 
-    $this->assertEquals('Low ball', $result[1]['columns'][0]['val']);
+    $this->assertSame('Low ball', $result[1]['columns'][0]['val']);
     $this->assertEquals(1.5, $result[1]['data']['AVG_total_amount']);
     $this->assertEquals(1, $result[1]['data']['COUNT_total_amount']);
 
-    $this->assertEquals('Major league', $result[2]['columns'][0]['val']);
+    $this->assertSame('Major league', $result[2]['columns'][0]['val']);
     $this->assertEquals(30.0, $result[2]['data']['AVG_total_amount']);
     $this->assertEquals(3, $result[2]['data']['COUNT_total_amount']);
 
-    $this->assertEquals('Minor league', $result[3]['columns'][0]['val']);
+    $this->assertSame('Minor league', $result[3]['columns'][0]['val']);
     $this->assertEquals(15.0, $result[3]['data']['AVG_total_amount']);
     $this->assertEquals(2, $result[3]['data']['COUNT_total_amount']);
   }
@@ -195,7 +195,7 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->addWhere('name', '=', 'segment_Activity_Cluster')
       ->setLoadOptions(TRUE)
       ->execute()->single();
-    $this->assertEquals('Activity Cluster', $getField['label']);
+    $this->assertSame('Activity Cluster', $getField['label']);
     $this->assertEquals(['Primary Color', 'Secondary Color', 'Not a Color!'], $getField['options']);
 
     $params = [
@@ -231,13 +231,13 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(3, $result);
 
-    $this->assertEquals('Not a Color!', $result[0]['columns'][0]['val']);
+    $this->assertSame('Not a Color!', $result[0]['columns'][0]['val']);
     $this->assertEquals(3, $result[0]['data']['COUNT_id']);
 
-    $this->assertEquals('Primary Color', $result[1]['columns'][0]['val']);
+    $this->assertSame('Primary Color', $result[1]['columns'][0]['val']);
     $this->assertEquals(2, $result[1]['data']['COUNT_id']);
 
-    $this->assertEquals('Secondary Color', $result[2]['columns'][0]['val']);
+    $this->assertSame('Secondary Color', $result[2]['columns'][0]['val']);
     $this->assertEquals(1, $result[2]['data']['COUNT_id']);
   }
 
@@ -287,7 +287,7 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $field = Individual::getFields(FALSE)
       ->addWhere('name', '=', 'segment_Age_Range')
       ->execute()->single();
-    $this->assertEquals('Age Range', $field['label']);
+    $this->assertSame('Age Range', $field['label']);
 
     $params = [
       'checkPermissions' => FALSE,
@@ -322,16 +322,16 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(4, $result);
 
-    $this->assertEquals('Child', $result[0]['columns'][0]['val']);
+    $this->assertSame('Child', $result[0]['columns'][0]['val']);
     $this->assertEquals(2, $result[0]['data']['COUNT_id']);
 
-    $this->assertEquals('Baby', $result[1]['columns'][0]['val']);
+    $this->assertSame('Baby', $result[1]['columns'][0]['val']);
     $this->assertEquals(1, $result[1]['data']['COUNT_id']);
 
-    $this->assertEquals('Adult', $result[2]['columns'][0]['val']);
+    $this->assertSame('Adult', $result[2]['columns'][0]['val']);
     $this->assertEquals(2, $result[2]['data']['COUNT_id']);
 
-    $this->assertEquals('', $result[3]['columns'][0]['val']);
+    $this->assertSame('', $result[3]['columns'][0]['val']);
     $this->assertEquals(1, $result[3]['data']['COUNT_id']);
   }
 
@@ -430,7 +430,7 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       'loadOptions' => TRUE,
     ])->single();
 
-    $this->assertEquals('Participant Role Cluster', $getField['label']);
+    $this->assertSame('Participant Role Cluster', $getField['label']);
     $this->assertEquals(['Worker', 'Non-Worker'], $getField['options']);
 
     $params = [
@@ -459,11 +459,11 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertCount(2, $result);
 
     // Non-Worker cluster should have 2 participants (Attendee only)
-    $this->assertEquals('Non-Worker', $result[0]['columns'][0]['val']);
+    $this->assertSame('Non-Worker', $result[0]['columns'][0]['val']);
     $this->assertEquals(2, $result[0]['data']['COUNT_id']);
 
     // Worker cluster should have 3 participants (Volunteer, Host+Speaker, Attendee+Volunteer)
-    $this->assertEquals('Worker', $result[1]['columns'][0]['val']);
+    $this->assertSame('Worker', $result[1]['columns'][0]['val']);
     $this->assertEquals(3, $result[1]['data']['COUNT_id']);
 
     // Test second segment using CONTAINS / NOT CONTAINS operators
@@ -475,11 +475,11 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertCount(2, $result);
 
     // Non-Volunteer cluster should have 3 participants (Host+Speaker, Attendee, Attendee)
-    $this->assertEquals('No', $result[0]['columns'][0]['val']);
+    $this->assertSame('No', $result[0]['columns'][0]['val']);
     $this->assertEquals(3, $result[0]['data']['COUNT_id']);
 
     // Volunteer cluster should have 2 participants (Volunteer, Attendee+Volunteer)
-    $this->assertEquals('Yes', $result[1]['columns'][0]['val']);
+    $this->assertSame('Yes', $result[1]['columns'][0]['val']);
     $this->assertEquals(2, $result[1]['data']['COUNT_id']);
   }
 
@@ -526,7 +526,7 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->addWhere('id', '=', $lineItem['id']);
 
     $result = $query->execute()->first();
-    $this->assertEquals('Org', $result['con.contact_id.segment_Contact_Org_Type:label']);
+    $this->assertSame('Org', $result['con.contact_id.segment_Contact_Org_Type:label']);
   }
 
 }

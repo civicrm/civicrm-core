@@ -234,9 +234,9 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
       ->execute();
 
     $this->assertCount(3, $result);
-    $this->assertEquals('A_B', $result[0]['DIR']);
-    $this->assertEquals('A_B', $result[1]['DIR']);
-    $this->assertEquals('B_A', $result[2]['DIR']);
+    $this->assertSame('A_B', $result[0]['DIR']);
+    $this->assertSame('A_B', $result[1]['DIR']);
+    $this->assertSame('B_A', $result[2]['DIR']);
     $this->assertEquals($contacts[2], $result[0]['contact_id_b']);
     $this->assertEquals($contacts[3], $result[1]['contact_id_b']);
     $this->assertEquals($contacts[0], $result[2]['contact_id_b']);
@@ -258,8 +258,8 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
       ->addOrderBy('id')
       ->execute();
     $this->assertCount(2, $result);
-    $this->assertEquals('Household', $result[1]['parent_id:name']);
-    $this->assertEquals('Household', $result[0]['name']);
+    $this->assertSame('Household', $result[1]['parent_id:name']);
+    $this->assertSame('Household', $result[0]['name']);
 
     $result = EntitySet::get(FALSE)
       ->addSelect('id', 'name', 'label', 'parent_id:name', 'is_parent')
@@ -278,8 +278,8 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->assertEquals($subType['id'], $result[0]['id']);
     $this->assertIsInt($result[1]['id']);
     $this->assertFalse($result[0]['is_parent']);
-    $this->assertEquals('Household', $result[0]['parent_id:name']);
-    $this->assertEquals('Household', $result[1]['name']);
+    $this->assertSame('Household', $result[0]['parent_id:name']);
+    $this->assertSame('Household', $result[1]['name']);
   }
 
   public function testGroupByInsideSet(): void {
@@ -444,8 +444,8 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
     $this->assertEquals(2, $resultWithFields->countFetched());
     $this->assertEquals(5, $resultWithFields->rowCount);
     $this->assertEquals(5, $resultWithFields->countMatched());
-    $this->assertEquals('1G', $resultWithFields[0]['title']);
-    $this->assertEquals('1T', $resultWithFields[1]['title']);
+    $this->assertSame('1G', $resultWithFields[0]['title']);
+    $this->assertSame('1T', $resultWithFields[1]['title']);
   }
 
   public function testUnionWithNullPadding(): void {
@@ -475,7 +475,7 @@ class EntitySetUnionTest extends Api4TestBase implements TransactionalInterface 
       ->execute();
 
     $this->assertCount(2, $result);
-    $this->assertEquals('Individual sub', $result[0]['label']);
+    $this->assertSame('Individual sub', $result[0]['label']);
     $this->assertNull($result[1]['label']);
     $this->assertNull($result[1]['name']);
   }

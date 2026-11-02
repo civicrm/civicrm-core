@@ -47,7 +47,7 @@ class CRM_Utils_AddressTest extends CiviUnitTestCase {
       'supplemental_address_3' => 'line 3',
     ];
     $result = CRM_Utils_Address::formatVcard($address);
-    $this->assertEquals('<div class="location vcard"><span class="adr"><span class="address-name">Big house</span>
+    $this->assertSame('<div class="location vcard"><span class="adr"><span class="address-name">Big house</span>
 <span class="street-address">1 Happy Place</span>
 <span class="extended-address">line 1</span>
 line 2
@@ -76,12 +76,12 @@ line 3
     $addFormat = '{contact.state_province}';
     Civi::settings()->set('address_format', $addFormat);
     $formatted_address = CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params);
-    $this->assertEquals("AL\n", $formatted_address);
+    $this->assertSame("AL\n", $formatted_address);
 
     $addFormat = '{contact.state_province_name}';
     Civi::settings()->set('address_format', $addFormat);
     $formatted_address = CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params);
-    $this->assertEquals("Alabama\n", $formatted_address);
+    $this->assertSame("Alabama\n", $formatted_address);
 
     // Test using alternate names for state/province field.
     unset($params["state_province-$billingLocationTypeID"]);
@@ -90,7 +90,7 @@ line 3
     $addFormat = '{contact.state_province_name}';
     Civi::settings()->set('address_format', $addFormat);
     $formatted_address = CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params);
-    $this->assertEquals("Alabama\n", $formatted_address);
+    $this->assertSame("Alabama\n", $formatted_address);
 
     unset($params["state_province-$billingLocationTypeID"]);
     // alternate name 2
@@ -98,7 +98,7 @@ line 3
     $addFormat = '{contact.state_province_name}';
     Civi::settings()->set('address_format', $addFormat);
     $formatted_address = CRM_Utils_Address::getFormattedBillingAddressFieldsFromParameters($params);
-    $this->assertEquals("Alabama\n", $formatted_address);
+    $this->assertSame("Alabama\n", $formatted_address);
   }
 
 }

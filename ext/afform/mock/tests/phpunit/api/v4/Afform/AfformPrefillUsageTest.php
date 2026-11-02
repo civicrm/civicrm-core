@@ -67,17 +67,17 @@ EOHTML;
 
     // Form entity has `max="3"`
     $this->assertCount(3, $prefill['Individual1']['values']);
-    $this->assertEquals('A', $prefill['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEquals('_A, A', $prefill['Individual1']['values'][0]['fields']['sort_name']);
+    $this->assertSame('A', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertSame('_A, A', $prefill['Individual1']['values'][0]['fields']['sort_name']);
     $this->assertEquals([1, 3], $prefill['Individual1']['values'][0]['fields']['preferred_communication_method']);
-    $this->assertEquals('B', $prefill['Individual1']['values'][1]['fields']['first_name']);
-    $this->assertEquals('_B, B', $prefill['Individual1']['values'][1]['fields']['sort_name']);
-    $this->assertEquals('C', $prefill['Individual1']['values'][2]['fields']['first_name']);
-    $this->assertEquals('_C, C', $prefill['Individual1']['values'][2]['fields']['sort_name']);
+    $this->assertSame('B', $prefill['Individual1']['values'][1]['fields']['first_name']);
+    $this->assertSame('_B, B', $prefill['Individual1']['values'][1]['fields']['sort_name']);
+    $this->assertSame('C', $prefill['Individual1']['values'][2]['fields']['first_name']);
+    $this->assertSame('_C, C', $prefill['Individual1']['values'][2]['fields']['sort_name']);
 
     // One email should have been filled
     $this->assertCount(1, $prefill['Individual1']['values'][1]['joins']['Email']);
-    $this->assertEquals('b@afform.test', $prefill['Individual1']['values'][1]['joins']['Email'][0]['email']);
+    $this->assertSame('b@afform.test', $prefill['Individual1']['values'][1]['joins']['Email'][0]['email']);
     $joins = $prefill['Individual1']['values'][0]['joins'];
     $this->assertEmpty($joins['Email']);
     $this->assertEmpty($prefill['Individual1']['values'][2]['joins']['Email']);
@@ -85,7 +85,7 @@ EOHTML;
     // Phone join has `max="2"`
     $this->assertCount(2, $joins['Phone']);
     $this->assertCount(1, $prefill['Individual1']['values'][2]['joins']['Phone']);
-    $this->assertEquals('2-1', $prefill['Individual1']['values'][2]['joins']['Phone'][0]['phone']);
+    $this->assertSame('2-1', $prefill['Individual1']['values'][2]['joins']['Phone'][0]['phone']);
     $this->assertEmpty($prefill['Individual1']['values'][1]['joins']['Phone']);
 
     // Prefill a specific contact for the af-repeat entity
@@ -96,10 +96,10 @@ EOHTML;
       ->execute()
       ->indexBy('name');
     $this->assertCount(1, $prefill['Individual1']['values']);
-    $this->assertEquals('D', $prefill['Individual1']['values'][1]['fields']['first_name']);
-    $this->assertEquals('_D', $prefill['Individual1']['values'][1]['fields']['last_name']);
-    $this->assertEquals('d@afform.test', $prefill['Individual1']['values'][1]['joins']['Email'][0]['email']);
-    $this->assertEquals('3-1', $prefill['Individual1']['values'][1]['joins']['Phone'][0]['phone']);
+    $this->assertSame('D', $prefill['Individual1']['values'][1]['fields']['first_name']);
+    $this->assertSame('_D', $prefill['Individual1']['values'][1]['fields']['last_name']);
+    $this->assertSame('d@afform.test', $prefill['Individual1']['values'][1]['joins']['Email'][0]['email']);
+    $this->assertSame('3-1', $prefill['Individual1']['values'][1]['joins']['Phone'][0]['phone']);
 
     // Form entity has `max="3"` so a forth contact (index 3) is out-of-bounds
     $prefill = Afform::prefill()
@@ -168,23 +168,23 @@ EOHTML;
 
     // Form entity has `max="3"`
     $this->assertCount(3, $prefill['Individual1']['values']);
-    $this->assertEquals('A', $prefill['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEquals('B', $prefill['Individual1']['values'][1]['fields']['first_name']);
-    $this->assertEquals('C', $prefill['Individual1']['values'][2]['fields']['first_name']);
+    $this->assertSame('A', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertSame('B', $prefill['Individual1']['values'][1]['fields']['first_name']);
+    $this->assertSame('C', $prefill['Individual1']['values'][2]['fields']['first_name']);
 
     // Emails should have been filled for A & C
     $this->assertCount(2, $prefill['Individual1']['values'][0]['joins']['Email']);
     $this->assertCount(2, $prefill['Individual1']['values'][1]['joins']['Email']);
     $this->assertCount(2, $prefill['Individual1']['values'][2]['joins']['Email']);
     // 2 Emails for contact 0
-    $this->assertEquals('a1@test.com', $prefill['Individual1']['values'][0]['joins']['Email'][0]['email']);
-    $this->assertEquals('a2@test.com', $prefill['Individual1']['values'][0]['joins']['Email'][1]['email']);
+    $this->assertSame('a1@test.com', $prefill['Individual1']['values'][0]['joins']['Email'][0]['email']);
+    $this->assertSame('a2@test.com', $prefill['Individual1']['values'][0]['joins']['Email'][1]['email']);
     // 0 Emails for contact 1
     $this->assertEmpty($prefill['Individual1']['values'][1]['joins']['Email'][0]);
     $this->assertEmpty($prefill['Individual1']['values'][1]['joins']['Email'][1]);
     // 1 Email for contact 2
     $this->assertEmpty($prefill['Individual1']['values'][2]['joins']['Email'][0]);
-    $this->assertEquals('c2@test.com', $prefill['Individual1']['values'][2]['joins']['Email'][1]['email']);
+    $this->assertSame('c2@test.com', $prefill['Individual1']['values'][2]['joins']['Email'][1]['email']);
   }
 
   public function testPrefillByRelationship(): void {
@@ -294,8 +294,8 @@ EOHTML;
 
     $this->assertTrue($listenerCalled);
     $this->assertNotEmpty($prefill['Individual1']['values']);
-    $this->assertEquals('Custom', $prefill['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEquals('ListenerTest', $prefill['Individual1']['values'][0]['fields']['last_name']);
+    $this->assertSame('Custom', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertSame('ListenerTest', $prefill['Individual1']['values'][0]['fields']['last_name']);
   }
 
   public function testPrefillEventSetValuesDirectly(): void {
@@ -329,8 +329,8 @@ EOHTML;
         $event->setValue('first_name', 'DirectFirst');
         $event->setValues(['last_name' => 'DirectLast', 'job_title' => 'DirectJob']);
 
-        $this->assertEquals('DirectFirst', $event->getValue('first_name'));
-        $this->assertEquals('DirectLast', $event->getValue('last_name'));
+        $this->assertSame('DirectFirst', $event->getValue('first_name'));
+        $this->assertSame('DirectLast', $event->getValue('last_name'));
         $this->assertEquals([
           'first_name' => 'DirectFirst',
           'last_name' => 'DirectLast',
@@ -351,9 +351,9 @@ EOHTML;
     $this->assertArrayNotHasKey('Organization1', $prefill);
 
     $fields = $prefill['Individual1']['values'][0]['fields'];
-    $this->assertEquals('DirectFirst', $fields['first_name']);
-    $this->assertEquals('DirectLast', $fields['last_name']);
-    $this->assertEquals('DirectJob', $fields['job_title']);
+    $this->assertSame('DirectFirst', $fields['first_name']);
+    $this->assertSame('DirectLast', $fields['last_name']);
+    $this->assertSame('DirectJob', $fields['job_title']);
   }
 
 }

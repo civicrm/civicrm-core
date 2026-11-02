@@ -30,7 +30,7 @@ class IndexTest extends Api4TestBase {
     // Results indexed by name
     $resultByName = civicrm_api4('Activity', 'getActions', [], 'name');
     $this->assertInstanceOf('Civi\Api4\Generic\Result', $resultByName);
-    $this->assertEquals('get', $resultByName['get']['name']);
+    $this->assertSame('get', $resultByName['get']['name']);
 
     // Get result at index 0
     $firstResult = civicrm_api4('Activity', 'getActions', [], 0);

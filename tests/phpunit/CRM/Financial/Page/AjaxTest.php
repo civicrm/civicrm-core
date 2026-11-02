@@ -316,8 +316,8 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
       CRM_Financial_Page_AJAX::getBatchSummary();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('Data Entry', $e->errorData['status']);
-      $this->assertEquals('Cash', $e->errorData['payment_instrument']);
+      $this->assertSame('Data Entry', $e->errorData['status']);
+      $this->assertSame('Cash', $e->errorData['payment_instrument']);
       $this->assertEquals(5, $e->errorData['item_count']);
     }
   }
@@ -380,7 +380,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
       CRM_Financial_Page_AJAX::assignRemove();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('record-updated-success', $e->errorData['status']);
+      $this->assertSame('record-updated-success', $e->errorData['status']);
     }
 
     $updatedBatch = \Civi\Api4\Batch::get(FALSE)
@@ -388,7 +388,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
       ->addSelect('status_id:name')
       ->execute()
       ->first();
-    $this->assertEquals('Closed', $updatedBatch['status_id:name']);
+    $this->assertSame('Closed', $updatedBatch['status_id:name']);
   }
 
   /**

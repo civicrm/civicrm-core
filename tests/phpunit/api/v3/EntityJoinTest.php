@@ -34,8 +34,8 @@ class api_v3_EntityJoinTest extends CiviUnitTestCase {
       'contact_id.last_name' => $last,
       'contact_id.first_name' => $first,
     ]);
-    $this->assertEquals('Employer of one', $result['contact_id.employer_id.display_name']);
-    $this->assertEquals('Female', $result['contact_id.gender_id.label']);
+    $this->assertSame('Employer of one', $result['contact_id.employer_id.display_name']);
+    $this->assertSame('Female', $result['contact_id.gender_id.label']);
   }
 
 }

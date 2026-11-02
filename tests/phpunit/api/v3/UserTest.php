@@ -36,7 +36,7 @@ class api_v3_UserTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
     $this->assertEquals($this->contactID, $result['values'][0]['contact_id']);
     $this->assertEquals(6, $result['values'][0]['id']);
-    $this->assertEquals('superman', $result['values'][0]['name']);
+    $this->assertSame('superman', $result['values'][0]['name']);
   }
 
   /**

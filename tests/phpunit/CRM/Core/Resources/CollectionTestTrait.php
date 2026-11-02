@@ -305,11 +305,11 @@ trait CRM_Core_Resources_CollectionTestTrait {
       'aliases' => 'bang',
     ]);
 
-    $this->assertEquals('foo', $b->get('foo')['name']);
-    $this->assertEquals('foo', $b->get('bar')['name']);
-    $this->assertEquals('foo', $b->get('borg')['name']);
-    $this->assertEquals('whiz', $b->get('whiz')['name']);
-    $this->assertEquals('whiz', $b->get('bang')['name']);
+    $this->assertSame('foo', $b->get('foo')['name']);
+    $this->assertSame('foo', $b->get('bar')['name']);
+    $this->assertSame('foo', $b->get('borg')['name']);
+    $this->assertSame('whiz', $b->get('whiz')['name']);
+    $this->assertSame('whiz', $b->get('bang')['name']);
     $this->assertEquals(NULL, $b->get('snafu'));
 
     // Go back+forth, updating with one name then reading with the other.
@@ -318,13 +318,13 @@ trait CRM_Core_Resources_CollectionTestTrait {
     $this->assertEquals(TRUE, $b->get('foo')['borgify']);
 
     $b->get('foo')['d'] = 'ie';
-    $this->assertEquals('ie', $b->get('borg')['d']);
+    $this->assertSame('ie', $b->get('borg')['d']);
 
     $b->update('bang', ['b52' => 'love shack']);
-    $this->assertEquals('love shack', $b->get('whiz')['b52']);
+    $this->assertSame('love shack', $b->get('whiz')['b52']);
 
     $b->update('whiz', ['golly' => 'gee']);
-    $this->assertEquals('gee', $b->get('bang')['golly']);
+    $this->assertSame('gee', $b->get('bang')['golly']);
   }
 
   /**
@@ -369,10 +369,10 @@ trait CRM_Core_Resources_CollectionTestTrait {
       'parent' => ['groceries'],
     ];
     $this->assertEquals($expectSettings, $parent->getSettings());
-    $this->assertEquals('http://example.com/child.js', $parent->get('http://example.com/child.js')['scriptUrl']);
-    $this->assertEquals('http://example.com/child.css', $parent->get('http://example.com/child.css')['styleUrl']);
-    $this->assertEquals('http://example.com/parent.js', $parent->get('http://example.com/parent.js')['scriptUrl']);
-    $this->assertEquals('http://example.com/parent.css', $parent->get('http://example.com/parent.css')['styleUrl']);
+    $this->assertSame('http://example.com/child.js', $parent->get('http://example.com/child.js')['scriptUrl']);
+    $this->assertSame('http://example.com/child.css', $parent->get('http://example.com/child.css')['styleUrl']);
+    $this->assertSame('http://example.com/parent.js', $parent->get('http://example.com/parent.js')['scriptUrl']);
+    $this->assertSame('http://example.com/parent.css', $parent->get('http://example.com/parent.css')['styleUrl']);
   }
 
   public function testAddBundle(): void {

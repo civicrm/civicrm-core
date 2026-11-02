@@ -116,7 +116,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
 
     // check subject
     $activity = $activities['values'][$activities['id']];
-    $this->assertEquals('Testing 4 attachments', $activity['subject']);
+    $this->assertSame('Testing 4 attachments', $activity['subject']);
 
     // Check target is our recipient
     $targets = $this->callAPISuccess('ActivityContact', 'get', [
@@ -264,7 +264,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
 
     // The source contact should be our catchall not the original From contact.
     $activity = $this->callAPISuccess('Activity', 'getsingle', ['source_contact_id' => $catchall_id]);
-    $this->assertEquals('This is for hooks', $activity['subject']);
+    $this->assertSame('This is for hooks', $activity['subject']);
   }
 
   /**
@@ -286,7 +286,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
 
     // The source contact should be our individual not the catchall
     $activity = $this->callAPISuccess('Activity', 'getsingle', ['source_contact_id' => $contact_id]);
-    $this->assertEquals('This is for hooks', $activity['subject']);
+    $this->assertSame('This is for hooks', $activity['subject']);
   }
 
   /**
@@ -312,7 +312,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
 
     // The source contact should be the org not the individual
     $activity = $this->callAPISuccess('Activity', 'getsingle', ['source_contact_id' => $catchall_id]);
-    $this->assertEquals('This is for hooks', $activity['subject']);
+    $this->assertSame('This is for hooks', $activity['subject']);
   }
 
 }

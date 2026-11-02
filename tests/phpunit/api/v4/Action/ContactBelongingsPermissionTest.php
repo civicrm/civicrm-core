@@ -814,7 +814,7 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
       'checkPermissions' => FALSE,
       'where' => [['id', '=', $customRecord]],
     ])->first();
-    $this->assertEquals('Updated Data', $saved[$fieldName]);
+    $this->assertSame('Updated Data', $saved[$fieldName]);
   }
 
   /**

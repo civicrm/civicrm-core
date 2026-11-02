@@ -106,11 +106,11 @@ class FullTextTest extends TestCase implements HeadlessInterface, HookInterface 
       $count++;
       if ($dao->table_name == 'Activity') {
         $this->assertEquals($contactId, $dao->contact_id);
-        $this->assertEquals('$ 10.00 - gambling debt recovery', $dao->subject);
+        $this->assertSame('$ 10.00 - gambling debt recovery', $dao->subject);
       }
       elseif ($dao->table_name == 'Contribution') {
         $this->assertEquals($contactId, $dao->contact_id);
-        $this->assertEquals('gambling debt recovery', $dao->contribution_source);
+        $this->assertSame('gambling debt recovery', $dao->contribution_source);
         $this->assertEquals('10.00', $dao->contribution_total_amount);
       }
       else {

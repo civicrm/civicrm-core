@@ -33,7 +33,7 @@ class CoreUtilTest extends Api4TestBase {
   /**
    */
   public function testGetApiNameFromTableName(): void {
-    $this->assertEquals('Contact', CoreUtil::getApiNameFromTableName('civicrm_contact'));
+    $this->assertSame('Contact', CoreUtil::getApiNameFromTableName('civicrm_contact'));
     $this->assertNull(CoreUtil::getApiNameFromTableName('civicrm_nothing'));
 
     $singleGroup = $this->createTestRecord('CustomGroup', [
@@ -59,8 +59,8 @@ class CoreUtilTest extends Api4TestBase {
   }
 
   public function testGetApiClass(): void {
-    $this->assertEquals('Civi\Api4\Contact', CoreUtil::getApiClass('Contact'));
-    $this->assertEquals('Civi\Api4\CiviCase', CoreUtil::getApiClass('Case'));
+    $this->assertSame('Civi\Api4\Contact', CoreUtil::getApiClass('Contact'));
+    $this->assertSame('Civi\Api4\CiviCase', CoreUtil::getApiClass('Case'));
     $this->assertNull(CoreUtil::getApiClass('NothingAtAll'));
 
     $singleGroup = $this->createTestRecord('CustomGroup', [
@@ -76,7 +76,7 @@ class CoreUtilTest extends Api4TestBase {
       'is_multiple' => TRUE,
     ]);
 
-    $this->assertEquals('Civi\Api4\CustomValue', CoreUtil::getApiClass('Custom_' . $multiGroup['name']));
+    $this->assertSame('Civi\Api4\CustomValue', CoreUtil::getApiClass('Custom_' . $multiGroup['name']));
   }
 
   public static function getNamespaceExamples(): array {

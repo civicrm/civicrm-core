@@ -201,7 +201,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     ], $input);
     $rows = $this->callAPISuccess('ReportTemplate', 'getrows', $params)['values'];
     $this->assertCount(1, $rows);
-    $this->assertEquals('$ 150.00', $rows[0]['civicrm_contribution_total_amount']);
+    $this->assertSame('$ 150.00', $rows[0]['civicrm_contribution_total_amount']);
 
     $statistics = $this->callAPISuccess('ReportTemplate', 'getstatistics', $params)['values'];
     $this->assertEquals([
@@ -340,7 +340,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     $rows = $this->callAPISuccess('ReportTemplate', 'getrows', $params)['values'];
 
     $this->assertCount(1, $rows);
-    $this->assertEquals('some_title', $rows[0]['civicrm_value_extension_tng55_extension_tng55_title']);
+    $this->assertSame('some_title', $rows[0]['civicrm_value_extension_tng55_extension_tng55_title']);
 
   }
 

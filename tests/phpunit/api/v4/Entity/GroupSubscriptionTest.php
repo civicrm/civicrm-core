@@ -63,8 +63,8 @@ class GroupSubscriptionTest extends Api4TestBase {
 
     // Verify subscription history
     $history = $this->getTestRecord('SubscriptionHistory', ['contact_id' => $contact['id']]);
-    $this->assertEquals('Web', $history['method']);
-    $this->assertEquals('Added', $history['status']);
+    $this->assertSame('Web', $history['method']);
+    $this->assertSame('Added', $history['status']);
 
     // Unsubscribe
     GroupSubscription::create(FALSE)
@@ -84,7 +84,7 @@ class GroupSubscriptionTest extends Api4TestBase {
       ->addWhere('contact_id', '=', $contact['id'])
       ->addWhere('status', '=', 'Removed')
       ->execute()->single();
-    $this->assertEquals('Form', $history['method']);
+    $this->assertSame('Form', $history['method']);
 
     // Re-subscribe
     GroupSubscription::create(FALSE)
@@ -104,8 +104,8 @@ class GroupSubscriptionTest extends Api4TestBase {
       ->addWhere('status', '=', 'Added')
       ->addOrderBy('id', 'DESC')
       ->execute();
-    $this->assertEquals('API', $history[0]['method']);
-    $this->assertEquals('Added', $history[0]['status']);
+    $this->assertSame('API', $history[0]['method']);
+    $this->assertSame('Added', $history[0]['status']);
   }
 
   public function testDoubleOptIn(): void {
@@ -130,8 +130,8 @@ class GroupSubscriptionTest extends Api4TestBase {
       ->addSelect('status', 'group_id.name')
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute()->column('status', 'group_id.name');
-    $this->assertEquals('Pending', $groupContact[$publicGroup]);
-    $this->assertEquals('Added', $groupContact[$privateGroup]);
+    $this->assertSame('Pending', $groupContact[$publicGroup]);
+    $this->assertSame('Added', $groupContact[$privateGroup]);
 
     $mailingEvent = MailingEventSubscribe::get(FALSE)
       ->addSelect('group_id.name')

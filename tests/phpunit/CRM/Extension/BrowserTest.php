@@ -51,10 +51,10 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
     $keys = array_keys($exts);
     sort($keys);
     $this->assertEquals(['test.crm.extension.browsertest.a', 'test.crm.extension.browsertest.b'], $keys);
-    $this->assertEquals('report', $exts['test.crm.extension.browsertest.a']->type);
-    $this->assertEquals('module', $exts['test.crm.extension.browsertest.b']->type);
-    $this->assertEquals('http://example.com/test.crm.extension.browsertest.a-0.1.zip', $exts['test.crm.extension.browsertest.a']->downloadUrl);
-    $this->assertEquals('http://example.com/test.crm.extension.browsertest.b-1.2.zip', $exts['test.crm.extension.browsertest.b']->downloadUrl);
+    $this->assertSame('report', $exts['test.crm.extension.browsertest.a']->type);
+    $this->assertSame('module', $exts['test.crm.extension.browsertest.b']->type);
+    $this->assertSame('http://example.com/test.crm.extension.browsertest.a-0.1.zip', $exts['test.crm.extension.browsertest.a']->downloadUrl);
+    $this->assertSame('http://example.com/test.crm.extension.browsertest.b-1.2.zip', $exts['test.crm.extension.browsertest.b']->downloadUrl);
   }
 
   public function testGetExtension_good(): void {
@@ -63,8 +63,8 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->setupMockHandler();
     $info = $this->browser->getExtension('test.crm.extension.browsertest.b');
-    $this->assertEquals('module', $info->type);
-    $this->assertEquals('http://example.com/test.crm.extension.browsertest.b-1.2.zip', $info->downloadUrl);
+    $this->assertSame('module', $info->type);
+    $this->assertSame('http://example.com/test.crm.extension.browsertest.b-1.2.zip', $info->downloadUrl);
   }
 
   public function testGetExtension_nonexistent(): void {

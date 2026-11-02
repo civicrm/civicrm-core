@@ -143,7 +143,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ]);
     $this->assertContains('display', array_values($this->csv->getHeader()));
     $row = $this->csv->nth(0);
-    $this->assertEquals('This is a test', $row['display']);
+    $this->assertSame('This is a test', $row['display']);
   }
 
   /**
@@ -189,11 +189,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->assertCount(3, $this->csv);
     $row = $this->csv->nth(0);
     $this->assertEquals(95, $row['Net Amount']);
-    $this->assertEquals('', $row['Soft Credit Amount']);
+    $this->assertSame('', $row['Soft Credit Amount']);
     $row = $this->csv->nth(1);
     $this->assertEquals(95, $row['Net Amount']);
     $this->assertEquals(5, $row['Soft Credit Amount']);
-    $this->assertEquals('Anderson, Anthony II', $row['Soft Credit For']);
+    $this->assertSame('Anderson, Anthony II', $row['Soft Credit For']);
     $this->assertEquals($this->contributionIDs[0], $row['Soft Credit For Contribution ID']);
 
     // Ideally we would use a randomised temp table name & use generic temp cleanup for cleanup - but
@@ -555,7 +555,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'create', ['id' => $this->contactIDs[0], 'gender_id' => 678]);
     $this->doExportTest(['fields' => $selectedFields, 'ids' => $this->contactIDs]);
     $row = $this->csv->nth(0);
-    $this->assertEquals('Really long string', $row['Gender']);
+    $this->assertSame('Really long string', $row['Gender']);
   }
 
   /**
@@ -582,7 +582,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'componentClause' => 'contact_a.id IN (' . implode(',', $this->contactIDs) . ')',
     ]);
     $row = $this->csv->nth(0);
-    $this->assertEquals('Big campaign and kinda long too', $row['Campaign Title']);
+    $this->assertSame('Big campaign and kinda long too', $row['Campaign Title']);
     $this->assertEquals($campaign, $row['Campaign ID']);
   }
 
@@ -611,14 +611,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ]);
 
     $row = $this->csv->nth(0);
-    $this->assertEquals('one', $row['First Name']);
-    $this->assertEquals('Org 1', $row['Employee of-Organization Name']);
-    $this->assertEquals('pretty legal', $row['Employee of-Legal Name']);
-    $this->assertEquals('friend who took a law paper once', $row['Employee of-Contact Source']);
+    $this->assertSame('one', $row['First Name']);
+    $this->assertSame('Org 1', $row['Employee of-Organization Name']);
+    $this->assertSame('pretty legal', $row['Employee of-Legal Name']);
+    $this->assertSame('friend who took a law paper once', $row['Employee of-Contact Source']);
 
     $row = $this->csv->nth(1);
-    $this->assertEquals('Org 2', $row['Employee of-Organization Name']);
-    $this->assertEquals('well dodgey', $row['Employee of-Legal Name']);
+    $this->assertSame('Org 2', $row['Employee of-Organization Name']);
+    $this->assertSame('well dodgey', $row['Employee of-Legal Name']);
   }
 
   /**
@@ -653,10 +653,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ]);
     $row = $this->csv->nth(0);
     $this->assertCount(1, $this->csv);
-    $this->assertEquals('Portland', $row['City']);
-    $this->assertEquals('ME', $row['State']);
+    $this->assertSame('Portland', $row['City']);
+    $this->assertSame('ME', $row['State']);
     $this->assertEquals($householdID, $row['Household ID']);
-    $this->assertEquals('household sauce', $row['Contact Source']);
+    $this->assertSame('household sauce', $row['Contact Source']);
   }
 
   /**
@@ -704,12 +704,12 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->doExportTest(['ids' => $this->contactIDs, 'mergeSameHousehold' => TRUE]);
     $row = $this->csv->nth(0);
     $this->assertCount(1, $this->csv);
-    $this->assertEquals('Unit Test household', $row['Display Name']);
-    $this->assertEquals('Portland', $row['City']);
-    $this->assertEquals('ME', $row['State']);
+    $this->assertSame('Unit Test household', $row['Display Name']);
+    $this->assertSame('Portland', $row['City']);
+    $this->assertSame('ME', $row['State']);
     $this->assertEquals($householdID, $row['Household ID']);
-    $this->assertEquals('Unit Test household', $row['Addressee']);
-    $this->assertEquals('Dear Unit Test household', $row['Postal Greeting']);
+    $this->assertSame('Unit Test household', $row['Addressee']);
+    $this->assertSame('Dear Unit Test household', $row['Postal Greeting']);
   }
 
   /**
@@ -762,11 +762,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     ]);
     $row = $this->csv->nth(0);
     $this->assertEquals($longString, $row['Enter text here']);
-    $this->assertEquals('Waipu', $row['Billing-City']);
-    $this->assertEquals("Lao People's Democratic Republic", $row['Country']);
+    $this->assertSame('Waipu', $row['Billing-City']);
+    $this->assertSame("Lao People's Democratic Republic", $row['Country']);
     $this->assertEquals($longString, $row['Pick Color']);
     $this->assertEquals($longUrl, $row['test_link']);
-    $this->assertEquals("Lilac, Purple, Mauve, Violet", $row['Pick Shade']);
+    $this->assertSame("Lilac, Purple, Mauve, Violet", $row['Pick Shade']);
     $this->assertEquals($longString, $row['Integer radio']);
     $this->assertEquals($longString . 'very', $row['Number select']);
   }
@@ -926,10 +926,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->doExportTest(['fields' => $fields, 'ids' => [$this->contactIDs[0]]]);
     foreach ($this->csv->getRecords() as $row) {
       $this->assertEquals('BillingMobile' . $this->contactIDs[0], $row['Billing-Phone-Much Much longer than just phone']);
-      $this->assertEquals('', $row['Billing-Phone-Phone']);
-      $this->assertEquals('Much Much longer than just phone', $row['Spouse of-Phone Type']);
-      $this->assertEquals('Much Much longer than just phone', $row['Phone Type']);
-      $this->assertEquals('Much Much longer than just phone', $row['Billing-Phone Type']);
+      $this->assertSame('', $row['Billing-Phone-Phone']);
+      $this->assertSame('Much Much longer than just phone', $row['Spouse of-Phone Type']);
+      $this->assertSame('Much Much longer than just phone', $row['Phone Type']);
+      $this->assertSame('Much Much longer than just phone', $row['Billing-Phone Type']);
     }
   }
 
@@ -1260,7 +1260,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         'mergeSameAddress' => TRUE,
       ],
     ]);
-    $this->assertEquals('Contact ID', $this->csv->getHeader()[0]);
+    $this->assertSame('Contact ID', $this->csv->getHeader()[0]);
   }
 
   /**
@@ -1305,7 +1305,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     $this->assertCount(1, $this->csv);
     $this->csv->nth(0);
-    $this->assertEquals('Household', $this->csv->nth(0)['Contact Type']);
+    $this->assertSame('Household', $this->csv->nth(0)['Contact Type']);
   }
 
   /**
@@ -1383,7 +1383,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $row = $this->csv->nth(0);
 
     $this->assertNotContains('Stage', $this->processor->getHeaderRows());
-    $this->assertEquals('Dear John', $row['Email Greeting']);
+    $this->assertSame('Dear John', $row['Email Greeting']);
     $this->assertCount(1, $this->csv);
   }
 
@@ -3088,8 +3088,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'exportMode' => CRM_Export_Form_Select::CONTACT_EXPORT,
     ]);
     $row = $this->csv->nth(0);
-    $this->assertEquals('Yellow', $row['Autocomplete Color']);
-    $this->assertEquals('Yellow, Green', $row['Autocomplete Colors']);
+    $this->assertSame('Yellow', $row['Autocomplete Color']);
+    $this->assertSame('Yellow, Green', $row['Autocomplete Colors']);
   }
 
 }

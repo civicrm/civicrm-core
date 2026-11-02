@@ -44,8 +44,8 @@ class CustomFlowsTest extends AbstractFlowsTest {
       $report = $withCv(sprintf('return authx_login(%s);', var_export($loginArgs, 1)));
       $this->assertEquals($this->getDemoCID(), $report['contactId'], $msg);
       $this->assertEquals($this->getDemoUID(), $report['userId'], $msg);
-      $this->assertEquals('script', $report['flow'], $msg);
-      $this->assertEquals('assigned', $report['credType'], $msg);
+      $this->assertSame('script', $report['flow'], $msg);
+      $this->assertSame('assigned', $report['credType'], $msg);
       $this->assertEquals(FALSE, $report['useSession'], $msg);
     }
 
@@ -67,7 +67,7 @@ class CustomFlowsTest extends AbstractFlowsTest {
 
   public function testCliPipeTrustedLogin() {
     $rpc = new BasicPipeClient('cv ev \'Civi::pipe("tl");\'');
-    $this->assertEquals('trusted', $rpc->getWelcome()['t']);
+    $this->assertSame('trusted', $rpc->getWelcome()['t']);
     $this->assertEquals(['login'], $rpc->getWelcome()['l']);
 
     $login = $rpc->call('login', ['userId' => $this->getDemoUID()]);
@@ -80,7 +80,7 @@ class CustomFlowsTest extends AbstractFlowsTest {
 
   public function testCliPipeUntrustedLogin() {
     $rpc = new BasicPipeClient('cv ev \'Civi::pipe("ul");\'');
-    $this->assertEquals('untrusted', $rpc->getWelcome()['u']);
+    $this->assertSame('untrusted', $rpc->getWelcome()['u']);
     $this->assertEquals(['login'], $rpc->getWelcome()['l']);
 
     try {

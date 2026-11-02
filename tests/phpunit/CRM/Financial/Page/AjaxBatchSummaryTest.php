@@ -29,8 +29,8 @@ class CRM_Financial_Page_AjaxBatchSummaryTest extends CiviUnitTestCase {
 
     $makeBatchSummary = CRM_Financial_Page_AJAX::makeBatchSummary($batch['id']);
 
-    $this->assertEquals('Open', $makeBatchSummary['status']);
-    $this->assertEquals('Cash', $makeBatchSummary['payment_instrument']);
+    $this->assertSame('Open', $makeBatchSummary['status']);
+    $this->assertSame('Cash', $makeBatchSummary['payment_instrument']);
   }
 
 }

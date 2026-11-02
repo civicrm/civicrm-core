@@ -312,8 +312,8 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
 
     // Check the smarty template has the correct values assigned.
     $keyValuePair = $form->getTemplate()->getTemplateVars('activityTypeNameAndLabel');
-    $this->assertEquals('47395hc', $keyValuePair['machineName']);
-    $this->assertEquals('Hide Cookies', $keyValuePair['displayLabel']);
+    $this->assertSame('47395hc', $keyValuePair['machineName']);
+    $this->assertSame('Hide Cookies', $keyValuePair['displayLabel']);
 
     // cleanup
     $this->callAPISuccess('option_value', 'delete', ['id' => $result['id']]);

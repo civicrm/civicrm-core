@@ -42,30 +42,30 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     // Make sure that each entity has 1+ present field and 1+ missing (already-used) field
     // already used
     $this->assertFalse(isset($fields['Contact']['do_not_sms']));
-    $this->assertEquals('city', $fields['Contact']['city']['name']);
+    $this->assertSame('city', $fields['Contact']['city']['name']);
 
     // already used
     $this->assertFalse(isset($fields['Individual']['first_name']));
-    $this->assertEquals('birth_date', $fields['Individual']['birth_date']['name']);
+    $this->assertSame('birth_date', $fields['Individual']['birth_date']['name']);
 
-    $this->assertEquals('organization_name', $fields['Organization']['organization_name']['name']);
-    $this->assertEquals('legal_name', $fields['Organization']['legal_name']['name']);
+    $this->assertSame('organization_name', $fields['Organization']['organization_name']['name']);
+    $this->assertSame('legal_name', $fields['Organization']['legal_name']['name']);
 
     // already used
     $this->assertFalse(isset($fields['Contribution']['amount_level']));
-    $this->assertEquals('cancel_reason', $fields['Contribution']['cancel_reason']['name']);
+    $this->assertSame('cancel_reason', $fields['Contribution']['cancel_reason']['name']);
 
     // already used
     $this->assertFalse(isset($fields['Participant']['participant_note']));
-    $this->assertEquals('participant_role', $fields['Participant']['participant_role']['name']);
+    $this->assertSame('participant_role', $fields['Participant']['participant_role']['name']);
 
     // already used
     $this->assertFalse(isset($fields['Membership']['membership_join_date']));
-    $this->assertEquals('end_date', $fields['Membership']['membership_end_date']['name']);
+    $this->assertSame('end_date', $fields['Membership']['membership_end_date']['name']);
 
     // already used
     $this->assertFalse(isset($fields['Activity']['activity_date_time']));
-    $this->assertEquals('subject', $fields['Activity']['activity_subject']['name']);
+    $this->assertSame('subject', $fields['Activity']['activity_subject']['name']);
 
     // Make sure that some of the blacklisted fields don't appear
     $this->assertFalse(isset($fields['Contribution']['is_pay_later']));
@@ -73,7 +73,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->assertFalse(isset($fields['Membership']['membership_type_id']));
 
     // This behavior is not necessarily desirable, but it's the status quo
-    $this->assertEquals('first_name', $fields['Staff']['first_name']['name']);
+    $this->assertSame('first_name', $fields['Staff']['first_name']['name']);
   }
 
   /**
@@ -96,11 +96,11 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
 
     // already used
     $this->assertFalse(isset($fields['Contact']['do_not_sms']));
-    $this->assertEquals('city', $fields['Contact']['city']['name']);
+    $this->assertSame('city', $fields['Contact']['city']['name']);
 
     // used by me
-    $this->assertEquals('first_name', $fields['Individual']['first_name']['name']);
-    $this->assertEquals('birth_date', $fields['Individual']['birth_date']['name']);
+    $this->assertSame('first_name', $fields['Individual']['first_name']['name']);
+    $this->assertSame('birth_date', $fields['Individual']['birth_date']['name']);
   }
 
   /**
@@ -130,26 +130,26 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $fields = CRM_Core_BAO_UFField::getAvailableFields();
 
     // Make sure that each entity appears with at least one field
-    $this->assertEquals('do_not_sms', $fields['Contact']['do_not_sms']['name']);
-    $this->assertEquals('city', $fields['Contact']['city']['name']);
+    $this->assertSame('do_not_sms', $fields['Contact']['do_not_sms']['name']);
+    $this->assertSame('city', $fields['Contact']['city']['name']);
 
-    $this->assertEquals('first_name', $fields['Individual']['first_name']['name']);
-    $this->assertEquals('birth_date', $fields['Individual']['birth_date']['name']);
+    $this->assertSame('first_name', $fields['Individual']['first_name']['name']);
+    $this->assertSame('birth_date', $fields['Individual']['birth_date']['name']);
 
-    $this->assertEquals('organization_name', $fields['Organization']['organization_name']['name']);
-    $this->assertEquals('legal_name', $fields['Organization']['legal_name']['name']);
+    $this->assertSame('organization_name', $fields['Organization']['organization_name']['name']);
+    $this->assertSame('legal_name', $fields['Organization']['legal_name']['name']);
 
-    $this->assertEquals('amount_level', $fields['Contribution']['amount_level']['name']);
-    $this->assertEquals('cancel_reason', $fields['Contribution']['cancel_reason']['name']);
+    $this->assertSame('amount_level', $fields['Contribution']['amount_level']['name']);
+    $this->assertSame('cancel_reason', $fields['Contribution']['cancel_reason']['name']);
 
-    $this->assertEquals('participant_note', $fields['Participant']['participant_note']['name']);
-    $this->assertEquals('participant_role', $fields['Participant']['participant_role']['name']);
+    $this->assertSame('participant_note', $fields['Participant']['participant_note']['name']);
+    $this->assertSame('participant_role', $fields['Participant']['participant_role']['name']);
 
-    $this->assertEquals('join_date', $fields['Membership']['membership_join_date']['name']);
-    $this->assertEquals('end_date', $fields['Membership']['membership_end_date']['name']);
+    $this->assertSame('join_date', $fields['Membership']['membership_join_date']['name']);
+    $this->assertSame('end_date', $fields['Membership']['membership_end_date']['name']);
 
-    $this->assertEquals('activity_date_time', $fields['Activity']['activity_date_time']['name']);
-    $this->assertEquals('subject', $fields['Activity']['activity_subject']['name']);
+    $this->assertSame('activity_date_time', $fields['Activity']['activity_date_time']['name']);
+    $this->assertSame('subject', $fields['Activity']['activity_subject']['name']);
 
     // Make sure that some of the blacklisted fields don't appear
     $this->assertFalse(isset($fields['Contribution']['is_pay_later']));
@@ -157,7 +157,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->assertFalse(isset($fields['Membership']['membership_type_id']));
 
     // This behavior is not necessarily desirable, but it's the status quo
-    $this->assertEquals('first_name', $fields['Staff']['first_name']['name']);
+    $this->assertSame('first_name', $fields['Staff']['first_name']['name']);
   }
 
   /**
@@ -167,26 +167,26 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $fields = CRM_Core_BAO_UFField::getAvailableFieldsFlat();
 
     // Make sure that each entity appears with at least one field
-    $this->assertEquals('Contact', $fields['do_not_sms']['field_type']);
-    $this->assertEquals('Contact', $fields['city']['field_type']);
+    $this->assertSame('Contact', $fields['do_not_sms']['field_type']);
+    $this->assertSame('Contact', $fields['city']['field_type']);
 
-    $this->assertEquals('Individual', $fields['first_name']['field_type']);
-    $this->assertEquals('Individual', $fields['birth_date']['field_type']);
+    $this->assertSame('Individual', $fields['first_name']['field_type']);
+    $this->assertSame('Individual', $fields['birth_date']['field_type']);
 
-    $this->assertEquals('Organization', $fields['organization_name']['field_type']);
-    $this->assertEquals('Organization', $fields['legal_name']['field_type']);
+    $this->assertSame('Organization', $fields['organization_name']['field_type']);
+    $this->assertSame('Organization', $fields['legal_name']['field_type']);
 
-    $this->assertEquals('Contribution', $fields['amount_level']['field_type']);
-    $this->assertEquals('Contribution', $fields['cancel_reason']['field_type']);
+    $this->assertSame('Contribution', $fields['amount_level']['field_type']);
+    $this->assertSame('Contribution', $fields['cancel_reason']['field_type']);
 
-    $this->assertEquals('Participant', $fields['participant_note']['field_type']);
-    $this->assertEquals('Participant', $fields['participant_role']['field_type']);
+    $this->assertSame('Participant', $fields['participant_note']['field_type']);
+    $this->assertSame('Participant', $fields['participant_role']['field_type']);
 
-    $this->assertEquals('Membership', $fields['membership_join_date']['field_type']);
-    $this->assertEquals('Membership', $fields['membership_end_date']['field_type']);
+    $this->assertSame('Membership', $fields['membership_join_date']['field_type']);
+    $this->assertSame('Membership', $fields['membership_end_date']['field_type']);
 
-    $this->assertEquals('Activity', $fields['activity_date_time']['field_type']);
-    $this->assertEquals('Activity', $fields['activity_subject']['field_type']);
+    $this->assertSame('Activity', $fields['activity_date_time']['field_type']);
+    $this->assertSame('Activity', $fields['activity_subject']['field_type']);
 
     // Make sure that some of the blacklisted fields don't appear
     $this->assertFalse(isset($fields['is_pay_later']));
@@ -235,8 +235,8 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_alterUFFields', [$this, 'modifyUFFields']);
     $fields = CRM_Core_BAO_UFField::getAvailableFieldsFlat();
 
-    $this->assertEquals('Foo', $fields['foo_id']['field_type']);
-    $this->assertEquals('contact_id', $fields['foo_contact_id']['name']);
+    $this->assertSame('Foo', $fields['foo_id']['field_type']);
+    $this->assertSame('contact_id', $fields['foo_contact_id']['name']);
   }
 
   public function modifyUFFields(&$fields): void {

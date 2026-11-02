@@ -161,7 +161,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'option_group_id' => 'from_email_address',
       'value' => $email1['value'],
     ]);
-    $this->assertEquals('"Legacy Test" <my@1.com>', $getSingle['label']);
+    $this->assertSame('"Legacy Test" <my@1.com>', $getSingle['label']);
 
     // Test sorting by weight (really sorts by display_name)
     $result = $this->callAPISuccess('option_value', 'get', [
@@ -205,7 +205,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'value' => $email2['value'],
       'return' => 'label',
     ]);
-    $this->assertEquals('"An Updated Address" <new@2.com>', $getValue);
+    $this->assertSame('"An Updated Address" <new@2.com>', $getValue);
 
     $optionValue = $this->callAPISuccess('option_value', 'get', [
       'sequential' => 1,
@@ -214,8 +214,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'return' => ['domain_id', 'label', 'name'],
       'api.option_value.delete' => [],
     ])['values'][0];
-    $this->assertEquals('"Legacy Test" <my@1.com>', $optionValue['label']);
-    $this->assertEquals('"Legacy Test" <my@1.com>', $optionValue['name']);
+    $this->assertSame('"Legacy Test" <my@1.com>', $optionValue['label']);
+    $this->assertSame('"Legacy Test" <my@1.com>', $optionValue['name']);
     $this->assertEquals(1, $optionValue['domain_id']);
     $this->assertEquals(1, $optionValue['api.site_email_address.delete']['count']);
 
@@ -226,7 +226,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'return' => 'domain_id,label',
       'api.option_value.delete' => [],
     ])['values'][0];
-    $this->assertEquals('"An Updated Address" <new@2.com>', $optionValue['label']);
+    $this->assertSame('"An Updated Address" <new@2.com>', $optionValue['label']);
     $this->assertEquals(2, $optionValue['domain_id']);
     $this->assertEquals(1, $optionValue['api.site_email_address.delete']['count']);
 

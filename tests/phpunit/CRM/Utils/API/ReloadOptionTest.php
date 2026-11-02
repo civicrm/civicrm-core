@@ -28,9 +28,9 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
       'last_name' => 'Last',
       'nick_name' => 'Firstie',
     ]);
-    $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
+    $this->assertSame('First', $result['values'][$result['id']]['first_name']);
     // munged by hook, but we haven't realized it
-    $this->assertEquals('Firstie', $result['values'][$result['id']]['nick_name']);
+    $this->assertSame('Firstie', $result['values'][$result['id']]['nick_name']);
   }
 
   /**
@@ -62,8 +62,8 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
         'reload' => 1,
       ],
     ]);
-    $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
-    $this->assertEquals('munged', $result['values'][$result['id']]['nick_name']);
+    $this->assertSame('First', $result['values'][$result['id']]['first_name']);
+    $this->assertSame('munged', $result['values'][$result['id']]['nick_name']);
   }
 
   /**
@@ -83,8 +83,8 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
         'reload' => 1,
       ],
     ]);
-    $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
-    $this->assertEquals('munged', $result['values'][$result['id']]['nick_name']);
+    $this->assertSame('First', $result['values'][$result['id']]['first_name']);
+    $this->assertSame('munged', $result['values'][$result['id']]['nick_name']);
     $this->assertAPISuccess($result['values'][$result['id']]['api.Email.create']);
   }
 
@@ -106,8 +106,8 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
         'reload' => 1,
       ],
     ]);
-    $this->assertEquals('First', $result['values'][0]['first_name']);
-    $this->assertEquals('munged', $result['values'][0]['nick_name']);
+    $this->assertSame('First', $result['values'][0]['first_name']);
+    $this->assertSame('munged', $result['values'][0]['nick_name']);
     $this->assertAPISuccess($result['values'][0]['api.Email.create']);
   }
 

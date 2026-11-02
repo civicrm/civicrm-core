@@ -41,7 +41,7 @@ class GroupContactTest extends Api4TestBase {
       'group_id' => $group['id'],
       'contact_id' => $contact['id'],
     ]);
-    $this->assertEquals('Added', $result['status']);
+    $this->assertSame('Added', $result['status']);
 
     $count = Group::get(FALSE)
       ->addWhere('id', '=', $group['id'])

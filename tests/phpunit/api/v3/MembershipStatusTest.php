@@ -105,14 +105,14 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('membership_status', 'create', $params);
     $id = $result['id'];
     $result = $this->callAPISuccess('membership_status', 'get', $params);
-    $this->assertEquals('test membership status', $result['values'][$id]['name']);
+    $this->assertSame('test membership status', $result['values'][$id]['name']);
     $newParams = [
       'id' => $id,
       'name' => 'renamed',
     ];
     $this->callAPISuccess('MembershipStatus', 'create', $newParams);
     $result = $this->callAPISuccess('MembershipStatus', 'get', ['id' => $id]);
-    $this->assertEquals('renamed', $result['values'][$id]['name']);
+    $this->assertSame('renamed', $result['values'][$id]['name']);
   }
 
   ///////////////// civicrm_membership_status_delete methods

@@ -183,7 +183,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
     $cacheWrapper = Invasive::get([$instance, 'cache']);
     $cacheClass = Invasive::get([$cacheWrapper, 'delegate']);
     $this->assertInstanceOf(\CRM_Utils_Cache_SqlGroup::class, $cacheClass);
-    $this->assertEquals('extension_browser', Invasive::get([$cacheWrapper, 'serviceName']));
+    $this->assertSame('extension_browser', Invasive::get([$cacheWrapper, 'serviceName']));
     $this->assertStringStartsWith('extension_browser/', Invasive::get([$cacheClass, 'group']));
   }
 
@@ -412,11 +412,11 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
     });
 
     $first = \Civi::service('TestTwoManualServices.1');
-    $this->assertEquals('first', $first->myName);
+    $this->assertSame('first', $first->myName);
     $this->assertInstanceOf(LoggerInterface::class, $first->log);
 
     $second = \Civi::service('TestTwoManualServices.2');
-    $this->assertEquals('second', $second->myName);
+    $this->assertSame('second', $second->myName);
     $this->assertInstanceOf(LoggerInterface::class, $second->log);
   }
 

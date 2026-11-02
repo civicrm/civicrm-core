@@ -45,7 +45,7 @@ class KernelTest extends \CiviUnitTestCase {
       ['name' => 'civi.api.respond', 'class' => 'Civi\API\Event\RespondEvent'],
     ];
     $this->assertEquals($expectedEventSequence, $this->actualEventSequence);
-    $this->assertEquals('frob', $result['values'][98]);
+    $this->assertSame('frob', $result['values'][98]);
   }
 
   public function testResolveException(): void {
@@ -54,7 +54,7 @@ class KernelTest extends \CiviUnitTestCase {
       throw new \CRM_Core_Exception('Oh My God', 'omg', ['the' => 'badzes']);
     }, Events::W_EARLY);
     $this->dispatcher->addListener('civi.api.exception', function (\Civi\API\Event\ExceptionEvent $event) use ($test) {
-      $test->assertEquals('Oh My God', $event->getException()->getMessage());
+      $test->assertSame('Oh My God', $event->getException()->getMessage());
     });
 
     $this->kernel->registerApiProvider($this->createWidgetFrobnicateProvider());
@@ -67,15 +67,15 @@ class KernelTest extends \CiviUnitTestCase {
       ['name' => 'civi.api.exception', 'class' => 'Civi\API\Event\ExceptionEvent'],
     ];
     $this->assertEquals($expectedEventSequence, $this->actualEventSequence);
-    $this->assertEquals('Oh My God', $result['error_message']);
-    $this->assertEquals('omg', $result['error_code']);
-    $this->assertEquals('badzes', $result['the']);
+    $this->assertSame('Oh My God', $result['error_message']);
+    $this->assertSame('omg', $result['error_code']);
+    $this->assertSame('badzes', $result['the']);
   }
 
   public function testExceptionException(): void {
     $test = $this;
     $this->dispatcher->addListener('civi.api.exception', function (\Civi\API\Event\ExceptionEvent $event) use ($test) {
-      $test->assertEquals('Frobnication encountered an exception', $event->getException()->getMessage());
+      $test->assertSame('Frobnication encountered an exception', $event->getException()->getMessage());
     });
 
     $this->kernel->registerApiProvider($this->createWidgetFrobnicateProvider());
@@ -91,7 +91,7 @@ class KernelTest extends \CiviUnitTestCase {
       ['name' => 'civi.api.exception', 'class' => 'Civi\API\Event\ExceptionEvent'],
     ];
     $this->assertEquals($expectedEventSequence, $this->actualEventSequence);
-    $this->assertEquals('Frobnication encountered an exception', $result['error_message']);
+    $this->assertSame('Frobnication encountered an exception', $result['error_message']);
     $this->assertEquals(1, $result['is_error']);
   }
 
@@ -112,7 +112,7 @@ class KernelTest extends \CiviUnitTestCase {
     catch (\TypeError $e) {
     }
 
-    $this->assertEquals('civi.api.exception', end($this->actualEventSequence)['name']);
+    $this->assertSame('civi.api.exception', end($this->actualEventSequence)['name']);
     $this->assertSame([$e], $exceptions);
   }
 

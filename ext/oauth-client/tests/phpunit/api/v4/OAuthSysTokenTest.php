@@ -56,8 +56,8 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
     $token = $createToken->first();
     $this->assertTrue(is_numeric($token['id']));
     $this->assertEquals($client['id'], $token['client_id']);
-    $this->assertEquals("example-access-token-$random", $token['access_token']);
-    $this->assertEquals("example-refresh-token-$random", $token['refresh_token']);
+    $this->assertSame("example-access-token-$random", $token['access_token']);
+    $this->assertSame("example-refresh-token-$random", $token['refresh_token']);
 
     $usePerms(['manage OAuth client', 'manage OAuth client secrets']);
     $getTokens = Civi\Api4\OAuthSysToken::get()->execute();
@@ -65,8 +65,8 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
     // ^^ Started at 0, added 1.
     $token = $getTokens->first();
     $this->assertEquals($client['id'], $token['client_id']);
-    $this->assertEquals("example-access-token-$random", $token['access_token']);
-    $this->assertEquals("example-refresh-token-$random", $token['refresh_token']);
+    $this->assertSame("example-access-token-$random", $token['access_token']);
+    $this->assertSame("example-refresh-token-$random", $token['refresh_token']);
 
     $usePerms(['manage OAuth client', 'manage OAuth client secrets']);
     $updateToken = Civi\Api4\OAuthSysToken::update()
@@ -79,8 +79,8 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
     $this->assertEquals(1, count($getTokens));
     $token = $getTokens->first();
     $this->assertEquals($client['id'], $token['client_id']);
-    $this->assertEquals("revised-access-token-$random", $token['access_token']);
-    $this->assertEquals("example-refresh-token-$random", $token['refresh_token']);
+    $this->assertSame("revised-access-token-$random", $token['access_token']);
+    $this->assertSame("example-refresh-token-$random", $token['refresh_token']);
   }
 
   /**
@@ -126,8 +126,8 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
     $token = $createTokenFull->first();
     $this->assertTrue(is_numeric($token['id']));
     $this->assertEquals($client['id'], $token['client_id']);
-    $this->assertEquals("example-access-token-$random", $token['access_token']);
-    $this->assertEquals("example-refresh-token-$random", $token['refresh_token']);
+    $this->assertSame("example-access-token-$random", $token['access_token']);
+    $this->assertSame("example-refresh-token-$random", $token['refresh_token']);
 
     $usePerms(['manage OAuth client']);
     $getTokens = Civi\Api4\OAuthSysToken::get()->execute();
@@ -155,8 +155,8 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
     $this->assertEquals(1, count($getTokens));
     $token = $getTokens->first();
     $this->assertEquals($client['id'], $token['client_id']);
-    $this->assertEquals("example-access-token-$random", $token['access_token']);
-    $this->assertEquals("example-refresh-token-$random", $token['refresh_token']);
+    $this->assertSame("example-access-token-$random", $token['access_token']);
+    $this->assertSame("example-refresh-token-$random", $token['refresh_token']);
   }
 
   public function testGetByScope(): void {
@@ -185,8 +185,8 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
     $token = $createToken->first();
     $this->assertTrue(is_numeric($token['id']));
     $this->assertEquals($client['id'], $token['client_id']);
-    $this->assertEquals("example-access-token-$random", $token['access_token']);
-    $this->assertEquals("example-refresh-token-$random", $token['refresh_token']);
+    $this->assertSame("example-access-token-$random", $token['access_token']);
+    $this->assertSame("example-refresh-token-$random", $token['refresh_token']);
     $this->assertEquals(['foo', 'bar'], $token['scopes']);
 
     $usePerms(['manage OAuth client']);

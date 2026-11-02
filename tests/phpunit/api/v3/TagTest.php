@@ -196,7 +196,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
   public function testTagGetfields(): void {
     $params = ['action' => 'create'];
     $result = $this->callAPISuccess('tag', 'getfields', $params);
-    $this->assertEquals('civicrm_contact', $result['values']['used_for']['api.default']);
+    $this->assertSame('civicrm_contact', $result['values']['used_for']['api.default']);
   }
 
   public function testTagGetList(): void {

@@ -52,7 +52,7 @@ class DomainTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('is_active', '=', TRUE)
       ->execute()->single();
 
-    $this->assertEquals('Currently the current domain', $getCurrent['name']);
+    $this->assertSame('Currently the current domain', $getCurrent['name']);
 
     $getAll = Domain::get(FALSE)
       ->addSelect('*', 'is_active')

@@ -132,7 +132,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $result = $this->getTestRecord('Address', $address['id']);
     // Should still retain master id
     $this->assertEquals($master['id'], $result['master_id']);
-    $this->assertEquals('Somewhere 234', $result['street_address']);
+    $this->assertSame('Somewhere 234', $result['street_address']);
 
     // Unlink child address
     Address::update(FALSE)
@@ -144,7 +144,7 @@ class AddressTest extends Api4TestBase implements TransactionalInterface {
     $result = $this->getTestRecord('Address', $address['id']);
     // Should still retain master id
     $this->assertNull($result['master_id']);
-    $this->assertEquals('Somewhere 234', $result['street_address']);
+    $this->assertSame('Somewhere 234', $result['street_address']);
   }
 
   public function testMasterAddressJoin(): void {

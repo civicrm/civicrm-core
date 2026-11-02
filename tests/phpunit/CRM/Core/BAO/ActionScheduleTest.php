@@ -2047,7 +2047,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     //check if reference date is set to membership's join date
     //as per the action_start_date chosen for current schedule reminder
-    $this->assertEquals('2012-03-15 00:00:00',
+    $this->assertSame('2012-03-15 00:00:00',
       CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $membership['contact_id'], 'reference_date', 'contact_id')
     );
 
@@ -2553,7 +2553,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       $this->fail('Expected TypeError');
     }
     catch (TypeError $e) {
-      $this->assertEquals('Ruh-roh', $e->getMessage());
+      $this->assertSame('Ruh-roh', $e->getMessage());
     }
     finally {
       \Civi::dispatcher()->removeListener('civi.actionSchedule.getMappings', $fail);

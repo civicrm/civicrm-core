@@ -164,8 +164,8 @@ class OptionValueTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('option_group_id.name', '=', 'from_email_address')
       ->execute()->indexBy('id');
 
-    $this->assertEquals('"Legacy Test1" <spaces@get.removed>', $allEmails[$email1['id']]['label']);
-    $this->assertEquals('"Legacy Test2" <no@space.ok>', $allEmails[$email2['id']]['name']);
+    $this->assertSame('"Legacy Test1" <spaces@get.removed>', $allEmails[$email1['id']]['label']);
+    $this->assertSame('"Legacy Test2" <no@space.ok>', $allEmails[$email2['id']]['name']);
     $this->assertEquals(\CRM_Core_Config::domainID(), $allEmails[$email1['id']]['domain_id']);
 
     $result = OptionValue::get(FALSE)
@@ -174,7 +174,7 @@ class OptionValueTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('value', '=', $email1['id'])
       ->addOrderBy('weight')
       ->execute()->single();
-    $this->assertEquals('"Legacy Test1" <spaces@get.removed>', $result['label']);
+    $this->assertSame('"Legacy Test1" <spaces@get.removed>', $result['label']);
     $this->assertEquals('1', $result['weight']);
 
     $result = OptionValue::update(FALSE)
@@ -187,7 +187,7 @@ class OptionValueTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('option_group_id.name', '=', 'from_email_address')
       ->addWhere('value', '=', $email1['id'])
       ->execute()->single();
-    $this->assertEquals('"Updated Test1" <my@new.email>', $result['label']);
+    $this->assertSame('"Updated Test1" <my@new.email>', $result['label']);
   }
 
   /**

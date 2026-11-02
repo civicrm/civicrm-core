@@ -242,7 +242,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
         $this->assertEquals($selectedValue, $customValue['values'][$customId]['latest']);
       }
       if ($key > 2) {
-        $this->assertEquals("Test String Value for {$this->customFieldID}", $customValue['values'][$this->customFieldID]['latest']);
+        $this->assertSame("Test String Value for {$this->customFieldID}", $customValue['values'][$this->customFieldID]['latest']);
       }
     }
 
@@ -408,7 +408,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       'return' => [$selectName, $multiSelectName, $controlFieldName, $radioName],
     ]);
     // Ensure the relevant fields have been updated
-    $this->assertEquals('one-modified', $result[$selectName]);
+    $this->assertSame('one-modified', $result[$selectName]);
     $this->assertEquals(['one-modified', $params[$radioName], $params[$controlFieldName]], $result[$multiSelectName]);
     // This field should not have changed because we didn't alter this option
     $this->assertEquals($params[$radioName], $result[$radioName]);
@@ -446,7 +446,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     // Verify values are formatted correctly
     $tree = $this->callAPISuccess('CustomValue', 'gettree', ['entity_type' => 'Contact', 'entity_id' => $contact]);
     $this->assertEquals(['2', '3'], $tree['values']['TestGettree']['fields']['got_options']['value']['data']);
-    $this->assertEquals('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
+    $this->assertSame('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
 
     // Try limiting the return params
     $tree = $this->callAPISuccess('CustomValue', 'gettree', [
@@ -458,7 +458,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       ],
     ]);
     $this->assertEquals(['2', '3'], $tree['values']['TestGettree']['fields']['got_options']['value']['data']);
-    $this->assertEquals('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
+    $this->assertSame('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
     $this->assertEquals(['id', 'fields'], array_keys($tree['values']['TestGettree']));
 
     // Ensure display values are returned even if data is not
@@ -469,7 +469,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
         'custom_value.display',
       ],
     ]);
-    $this->assertEquals('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
+    $this->assertSame('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
     $this->assertFalse(isset($tree['values']['TestGettree']['fields']['got_options']['value']['data']));
 
     // Verify that custom set appears for individuals even who don't have any custom data
@@ -489,9 +489,9 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $fields = $fields['values'];
     $this->assertTrue((bool) $fields['entity_id']['api.required']);
     $this->assertTrue((bool) $fields['entity_type']['api.required']);
-    $this->assertEquals('custom_group.id', $fields['custom_group.id']['name']);
-    $this->assertEquals('custom_field.id', $fields['custom_field.id']['name']);
-    $this->assertEquals('custom_value.id', $fields['custom_value.id']['name']);
+    $this->assertSame('custom_group.id', $fields['custom_group.id']['name']);
+    $this->assertSame('custom_field.id', $fields['custom_field.id']['name']);
+    $this->assertSame('custom_value.id', $fields['custom_value.id']['name']);
   }
 
   /**

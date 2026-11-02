@@ -65,7 +65,7 @@ class CRM_Contribute_Form_CancelSubscriptionTest extends CiviUnitTestCase {
 
     $actions = CRM_Contribute_Page_Tab::recurLinks($this->getContributionRecurID());
     // Using "Cancel Recurring" form
-    $this->assertEquals('civicrm/contribute/unsubscribe', $actions[CRM_Core_Action::DISABLE]['url']);
+    $this->assertSame('civicrm/contribute/unsubscribe', $actions[CRM_Core_Action::DISABLE]['url']);
   }
 
 }

@@ -147,7 +147,7 @@ class SchemaHelperTest extends \CiviUnitTestCase {
        AND COLUMN_NAME = 'parent_id'"
     );
     $result->fetch();
-    $this->assertEquals('Column altered by test.', $result->COLUMN_COMMENT);
+    $this->assertSame('Column altered by test.', $result->COLUMN_COMMENT);
   }
 
   public function testDropSchemaFieldWithForeignKey(): void {

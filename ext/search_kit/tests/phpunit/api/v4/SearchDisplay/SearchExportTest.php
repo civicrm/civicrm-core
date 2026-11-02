@@ -61,21 +61,21 @@ class SearchExportTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
 
     $this->assertCount(2, $export);
     // Default update policy should be 'unmodified'
-    $this->assertEquals('unmodified', $export->first()['update']);
-    $this->assertEquals('unmodified', $export->itemAt(1)['update']);
+    $this->assertSame('unmodified', $export->first()['update']);
+    $this->assertSame('unmodified', $export->itemAt(1)['update']);
     // Default cleanup policy should be 'unused'
-    $this->assertEquals('unused', $export->first()['cleanup']);
-    $this->assertEquals('unused', $export->itemAt(1)['cleanup']);
+    $this->assertSame('unused', $export->first()['cleanup']);
+    $this->assertSame('unused', $export->itemAt(1)['cleanup']);
     // The savedSearch should be first before its reference entities
-    $this->assertEquals('SavedSearch', $export->first()['entity']);
+    $this->assertSame('SavedSearch', $export->first()['entity']);
     // Ensure api version is set to 4
     $this->assertEquals(4, $export['SavedSearch_TestSearchToExport']['params']['version']);
-    $this->assertEquals('Contact', $export['SavedSearch_TestSearchToExport']['params']['values']['api_entity']);
+    $this->assertSame('Contact', $export['SavedSearch_TestSearchToExport']['params']['values']['api_entity']);
     // Ensure FK is set correctly
     $this->assertArrayNotHasKey('saved_search_id', $export['SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport']['params']['values']);
-    $this->assertEquals('TestSearchToExport', $export['SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport']['params']['values']['saved_search_id.name']);
+    $this->assertSame('TestSearchToExport', $export['SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport']['params']['values']['saved_search_id.name']);
     // Ensure value is used instead of pseudoconstant
-    $this->assertEquals('table', $export['SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport']['params']['values']['type']);
+    $this->assertSame('table', $export['SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport']['params']['values']['type']);
     $this->assertArrayNotHasKey('type:name', $export['SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport']['params']['values']);
     // Readonly fields should not be included
     $this->assertArrayNotHasKey('created_date', $export['SavedSearch_TestSearchToExport_SearchDisplay_TestDisplayToExport']['params']['values']);
@@ -113,11 +113,11 @@ class SearchExportTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
       ->indexBy('name');
 
     $this->assertCount(3, $export);
-    $this->assertEquals('always', $export->first()['cleanup']);
-    $this->assertEquals('never', $export->first()['update']);
-    $this->assertEquals('always', $export->last()['cleanup']);
-    $this->assertEquals('never', $export->last()['update']);
-    $this->assertEquals('TestSearchToExport', $export['SavedSearch_TestSearchToExport_SearchDisplay_SecondDisplayToExport']['params']['values']['saved_search_id.name']);
+    $this->assertSame('always', $export->first()['cleanup']);
+    $this->assertSame('never', $export->first()['update']);
+    $this->assertSame('always', $export->last()['cleanup']);
+    $this->assertSame('never', $export->last()['update']);
+    $this->assertSame('TestSearchToExport', $export['SavedSearch_TestSearchToExport_SearchDisplay_SecondDisplayToExport']['params']['values']['saved_search_id.name']);
   }
 
   /**

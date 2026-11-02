@@ -50,7 +50,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
       // If the DB is multilingual the locales value must be not-null for all domains
       // to ensure the db can be accessed (I suspect it must be the same for all locales but
       // if null then the database layer attempts to access non-existent fields 'label' not label_en_us'.
-      $this->assertEquals('en_US', $domain['locales']);
+      $this->assertSame('en_US', $domain['locales']);
     }
     $skip_tests = FALSE;
     if (in_array($table, ['civicrm_option_group', 'civicrm_event'])) {
@@ -61,19 +61,19 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     // Test problematic query as per CRM-20427
     $query = "Select * FROM {$table}";
     $new_query = CRM_Core_I18n_Schema::rewriteQuery($query);
-    $this->assertEquals("Select * FROM {$expectedRewrite}", $new_query);
+    $this->assertSame("Select * FROM {$expectedRewrite}", $new_query);
     // Test query where table is not at the end
     $query2 = "Select * FROM {$table} LIMIT 1";
     $new_query2 = CRM_Core_I18n_Schema::rewriteQuery($query2);
-    $this->assertEquals("Select * FROM {$expectedRewrite} LIMIT 1", $new_query2);
+    $this->assertSame("Select * FROM {$expectedRewrite} LIMIT 1", $new_query2);
     // Test query where there is a 2nd table that shouldn't be re-writen
     $query3 = "SELECT * FROM {$table} JOIN civicrm_contact LIMIT 1";
     $new_query3 = CRM_Core_I18n_Schema::rewriteQuery($query3);
-    $this->assertEquals("SELECT * FROM {$expectedRewrite} JOIN civicrm_contact LIMIT 1", $new_query3);
+    $this->assertSame("SELECT * FROM {$expectedRewrite} JOIN civicrm_contact LIMIT 1", $new_query3);
     // Test table when name is escaped
     $query4 = "SELECT * FROM `{$table}` WHERE id = 123";
     $new_query4 = CRM_Core_I18n_Schema::rewriteQuery($query4);
-    $this->assertEquals("SELECT * FROM `{$expectedRewrite}` WHERE id = 123", $new_query4);
+    $this->assertSame("SELECT * FROM `{$expectedRewrite}` WHERE id = 123", $new_query4);
     // Test where translatable table is quoted
     // The `$table` appears in a string -- it should not be rewritten.
     $query5 = 'SELECT id FROM civicrm_activity WHERE subject = "civicrm_option_group"';
@@ -94,7 +94,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     // Test different verbs
     $query8 = "DELETE FROM {$table}";
     $new_query8 = CRM_Core_I18n_Schema::rewriteQuery($query8);
-    $this->assertEquals("DELETE FROM {$expectedRewrite}", $new_query8);
+    $this->assertSame("DELETE FROM {$expectedRewrite}", $new_query8);
     // Test Currently skipped for civicrm_option_group and civicrm_event due to issues with the regex.
     // Agreed as not a blocker for CRM-20427 as an issue previously
     if (!$skip_tests) {

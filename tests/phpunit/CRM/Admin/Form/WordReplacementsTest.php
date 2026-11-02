@@ -66,8 +66,8 @@ class CRM_Admin_Form_WordReplacementsTest extends CiviUnitTestCase {
 
     $overrides = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings('en_US');
     $this->assertNotEmpty($overrides);
-    $this->assertEquals('<em>sample</em>', $overrides['enabled']['exactMatch']['<p>test</p>']);
-    $this->assertEquals('<strong>Supporter</strong>', $overrides['enabled']['wildcardMatch']['Donor']);
+    $this->assertSame('<em>sample</em>', $overrides['enabled']['exactMatch']['<p>test</p>']);
+    $this->assertSame('<strong>Supporter</strong>', $overrides['enabled']['wildcardMatch']['Donor']);
   }
 
   /**
@@ -107,8 +107,8 @@ class CRM_Admin_Form_WordReplacementsTest extends CiviUnitTestCase {
     $enOverrides = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings('en_US');
     $frOverrides = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings('fr_CA');
 
-    $this->assertEquals('Gift', $enOverrides['enabled']['wildcardMatch']['Contribution']);
-    $this->assertEquals('Don', $frOverrides['enabled']['wildcardMatch']['Contribution']);
+    $this->assertSame('Gift', $enOverrides['enabled']['wildcardMatch']['Contribution']);
+    $this->assertSame('Don', $frOverrides['enabled']['wildcardMatch']['Contribution']);
   }
 
   /**
@@ -152,7 +152,7 @@ class CRM_Admin_Form_WordReplacementsTest extends CiviUnitTestCase {
     $frOverrides = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings('fr_CA');
 
     $this->assertEmpty($enOverrides);
-    $this->assertEquals('Adhérent', $frOverrides['enabled']['wildcardMatch']['Member']);
+    $this->assertSame('Adhérent', $frOverrides['enabled']['wildcardMatch']['Member']);
   }
 
   /**

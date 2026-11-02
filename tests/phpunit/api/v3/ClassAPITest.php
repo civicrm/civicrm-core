@@ -38,11 +38,11 @@ class class_api_test extends CiviUnitTestCase {
     // Check non-empty server string is remote, check default uri
     $api = new civicrm_api3(['server' => 'http://my_server'] + $keys);
     $this->assertEquals(FALSE, $api->local);
-    $this->assertEquals('http://my_server/sites/all/modules/civicrm/extern/rest.php', $api->uri);
+    $this->assertSame('http://my_server/sites/all/modules/civicrm/extern/rest.php', $api->uri);
 
     // Check path in uri
     $api = new civicrm_api3(['server' => 'http://my_server', 'path' => 'wibble'] + $keys);
-    $this->assertEquals('http://my_server/wibble', $api->uri);
+    $this->assertSame('http://my_server/wibble', $api->uri);
 
   }
 

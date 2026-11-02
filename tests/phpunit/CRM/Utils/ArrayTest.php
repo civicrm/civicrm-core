@@ -220,13 +220,13 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
     $x = 'hello';
     $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
-    $this->assertEquals('hello', CRM_Utils_Array::pathGet($x, $emptyPath));
-    $this->assertEquals('hello', $x);
+    $this->assertSame('hello', CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertSame('hello', $x);
 
     CRM_Utils_Array::pathSet($x, $emptyPath, 'bon jour');
     $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
-    $this->assertEquals('bon jour', CRM_Utils_Array::pathGet($x, $emptyPath));
-    $this->assertEquals('bon jour', $x);
+    $this->assertSame('bon jour', CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertSame('bon jour', $x);
 
     CRM_Utils_Array::pathUnset($x, $emptyPath);
     $this->assertEquals(FALSE, CRM_Utils_Array::pathIsset($x, $emptyPath));
@@ -235,8 +235,8 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
     CRM_Utils_Array::pathSet($x, $emptyPath, 'buenos dias');
     $this->assertEquals(TRUE, CRM_Utils_Array::pathIsset($x, $emptyPath));
-    $this->assertEquals('buenos dias', CRM_Utils_Array::pathGet($x, $emptyPath));
-    $this->assertEquals('buenos dias', $x);
+    $this->assertSame('buenos dias', CRM_Utils_Array::pathGet($x, $emptyPath));
+    $this->assertSame('buenos dias', $x);
   }
 
   public static function getSortExamples() {
@@ -517,10 +517,10 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $list = ['a' => 'apple', 'b' => 'banana', 'c' => NULL];
 
     // array key exists; value is not null
-    $this->assertEquals('apple', CRM_Utils_Array::value('a', $list, 'fruit'));
+    $this->assertSame('apple', CRM_Utils_Array::value('a', $list, 'fruit'));
 
     // array key does not exist
-    $this->assertEquals('fruit', CRM_Utils_Array::value(999, $list, 'fruit'));
+    $this->assertSame('fruit', CRM_Utils_Array::value(999, $list, 'fruit'));
 
     // array key exists; value is null
     // This is the one situation in which the function's behavior differs from
@@ -606,17 +606,17 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     // Test filtering by active status
     $activeUsers = CRM_Utils_Array::findAll($data, ['active' => TRUE]);
     $this->assertCount(4, $activeUsers);
-    $this->assertEquals('Alice', $activeUsers[0]['name']);
-    $this->assertEquals('Charlie', $activeUsers[1]['name']);
-    $this->assertEquals('Billy', $activeUsers[2]['name']);
-    $this->assertEquals('Walter', $activeUsers[3]['name']);
+    $this->assertSame('Alice', $activeUsers[0]['name']);
+    $this->assertSame('Charlie', $activeUsers[1]['name']);
+    $this->assertSame('Billy', $activeUsers[2]['name']);
+    $this->assertSame('Walter', $activeUsers[3]['name']);
 
     // Test filtering by age greater than 28
     $olderUsers = CRM_Utils_Array::findAll($data, fn($item) => ($item['age'] ?? 0) > 28);
     $this->assertCount(3, $olderUsers);
-    $this->assertEquals('Alice', $olderUsers[0]['name']);
-    $this->assertEquals('Charlie', $olderUsers[1]['name']);
-    $this->assertEquals('Walter', $olderUsers[2]['name']);
+    $this->assertSame('Alice', $olderUsers[0]['name']);
+    $this->assertSame('Charlie', $olderUsers[1]['name']);
+    $this->assertSame('Walter', $olderUsers[2]['name']);
 
     // Test filtering with no matches
     $noMatches = CRM_Utils_Array::findAll($data, fn($item) => ($item['age'] ?? 0) > 100);
@@ -633,8 +633,8 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
     $childrenKeyExists = CRM_Utils_Array::findAll($data, 'children');
     $this->assertCount(2, $childrenKeyExists);
-    $this->assertEquals('David', $childrenKeyExists[0]['name']);
-    $this->assertEquals('Eve', $childrenKeyExists[1]['name']);
+    $this->assertSame('David', $childrenKeyExists[0]['name']);
+    $this->assertSame('Eve', $childrenKeyExists[1]['name']);
   }
 
   public function testRemoveRecursive(): void {
@@ -658,16 +658,16 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $dataClone = $data;
     CRM_Utils_Array::removeRecursive($dataClone, ['active' => FALSE]);
     $this->assertCount(3, $dataClone);
-    $this->assertEquals('Alice', $dataClone[0]['name']);
-    $this->assertEquals('Charlie', $dataClone[2]['name']);
+    $this->assertSame('Alice', $dataClone[0]['name']);
+    $this->assertSame('Charlie', $dataClone[2]['name']);
     $this->assertCount(1, $dataClone[4]['children']);
 
     // Test removing by age greater than 30
     $dataClone = $data;
     CRM_Utils_Array::removeRecursive($dataClone, fn($item) => $item['age'] > 30);
     $this->assertCount(3, $dataClone);
-    $this->assertEquals('Bob', $dataClone[1]['name']);
-    $this->assertEquals('David', $dataClone[3]['name']);
+    $this->assertSame('Bob', $dataClone[1]['name']);
+    $this->assertSame('David', $dataClone[3]['name']);
     $this->assertCount(2, $dataClone[4]['children']);
 
     // Test removing with no matches
@@ -691,10 +691,10 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $dataClone = $data;
     CRM_Utils_Array::removeRecursive($dataClone, 'children');
     $this->assertCount(4, $dataClone);
-    $this->assertEquals('Alice', $dataClone[0]['name']);
-    $this->assertEquals('Bob', $dataClone[1]['name']);
-    $this->assertEquals('Charlie', $dataClone[2]['name']);
-    $this->assertEquals('David', $dataClone[3]['name']);
+    $this->assertSame('Alice', $dataClone[0]['name']);
+    $this->assertSame('Bob', $dataClone[1]['name']);
+    $this->assertSame('Charlie', $dataClone[2]['name']);
+    $this->assertSame('David', $dataClone[3]['name']);
   }
 
 }

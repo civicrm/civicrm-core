@@ -62,21 +62,21 @@ class CustomProfileFieldTest extends Api4TestBase {
 
     $this->assertCount(4, $export);
 
-    $this->assertEquals('UFGroup', $export[0]['entity']);
+    $this->assertSame('UFGroup', $export[0]['entity']);
     // First Name field should not use pseudoconstant
-    $this->assertEquals('first_name', $export[1]['params']['values']['field_name']);
+    $this->assertSame('first_name', $export[1]['params']['values']['field_name']);
     $this->assertArrayNotHasKey('field_name:name', $export[1]['params']['values']);
-    $this->assertEquals('First Name', $export[1]['params']['values']['label']);
+    $this->assertSame('First Name', $export[1]['params']['values']['label']);
 
     // Custom fields should use pseudoconstants
-    $this->assertEquals('ProfileGroup.F1', $export[2]['params']['values']['field_name:name']);
+    $this->assertSame('ProfileGroup.F1', $export[2]['params']['values']['field_name:name']);
     $this->assertArrayNotHasKey('field_name', $export[2]['params']['values']);
-    $this->assertEquals('F1', $export[2]['params']['values']['label']);
+    $this->assertSame('F1', $export[2]['params']['values']['label']);
 
     // Custom fields should use pseudoconstants
-    $this->assertEquals('ProfileGroup.F2', $export[3]['params']['values']['field_name:name']);
+    $this->assertSame('ProfileGroup.F2', $export[3]['params']['values']['field_name:name']);
     $this->assertArrayNotHasKey('field_name', $export[3]['params']['values']);
-    $this->assertEquals('F2', $export[3]['params']['values']['label']);
+    $this->assertSame('F2', $export[3]['params']['values']['label']);
   }
 
 }

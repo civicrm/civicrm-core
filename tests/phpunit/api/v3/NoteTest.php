@@ -261,8 +261,8 @@ class api_v3_NoteTest extends CiviUnitTestCase {
     $this->assertEquals($note['values'][$this->_noteID]['entity_table'], 'civicrm_contact');
     $this->assertEquals($note['values'][$this->_noteID]['note_date'], $params['note_date']);
     $this->assertEquals(date('Y-m-d', strtotime($note['values'][$this->_noteID]['created_date'])), date('Y-m-d'));
-    $this->assertEquals('Hello World', $note['values'][$this->_noteID]['subject']);
-    $this->assertEquals('Note1', $note['values'][$this->_noteID]['note']);
+    $this->assertSame('Hello World', $note['values'][$this->_noteID]['subject']);
+    $this->assertSame('Note1', $note['values'][$this->_noteID]['note']);
   }
 
   /**
@@ -319,8 +319,8 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'entity_id' => $org['id'],
       'entity_table' => "civicrm_contact",
     ]);
-    $this->assertEquals('Org123', $result['entity_id.organization_name']);
-    $this->assertEquals('Hello join', $result['note']);
+    $this->assertSame('Org123', $result['entity_id.organization_name']);
+    $this->assertSame('Hello join', $result['note']);
     // This should return no results by restricting contact_type
     $result = $this->callAPISuccess('Note', 'get', [
       'return' => ['entity_id.organization_name'],
