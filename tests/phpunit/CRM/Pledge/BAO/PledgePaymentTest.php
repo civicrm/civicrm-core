@@ -305,8 +305,8 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $contributionID = $this->contributionCreate([
       'contact_id' => $contact_id,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
-      'invoice_id' => 46,
-      'trxn_id' => 46,
+      'invoice_id' => '46',
+      'trxn_id' => '46',
       'total_amount' => 404.70,
       'fee_amount' => 0.00,
       'net_amount' => 404.70,
@@ -395,8 +395,8 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $contributionID = $this->contributionCreate([
       'contact_id' => $contact_id,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
-      'invoice_id' => 47,
-      'trxn_id' => 47,
+      'invoice_id' => '47',
+      'trxn_id' => '47',
       'total_amount' => 100.00,
       'fee_amount' => 0.00,
       'net_amount' => 100.00,

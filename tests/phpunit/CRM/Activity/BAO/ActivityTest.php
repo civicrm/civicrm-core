@@ -1488,7 +1488,7 @@ $text
       'name' => 'CiviTestSMSProvider',
       'api_type' => 1,
       'username' => 1,
-      'password' => 1,
+      'password' => '1',
       'api_url' => 1,
       'api_params' => 'a=1',
       'is_default' => 1,
@@ -1540,7 +1540,7 @@ $text
         // Create a fixed phone number
         $phone = civicrm_api3('Phone', 'create', [
           'contact_id' => $contactId,
-          'phone' => 654321,
+          'phone' => '654321',
           'phone_type_id' => 'Phone',
         ]);
         if ($passPhoneTypeInContactDetails) {
@@ -2638,7 +2638,7 @@ $textValue
   protected function createMobilePhone(int $contactId, bool $passPhoneTypeInContactDetails, $contactDetails): array {
     $phone = civicrm_api3('Phone', 'create', [
       'contact_id' => $contactId,
-      'phone' => 123456,
+      'phone' => '123456',
       'phone_type_id' => 'Mobile',
     ]);
     if ($passPhoneTypeInContactDetails) {

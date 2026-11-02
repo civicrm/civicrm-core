@@ -529,7 +529,7 @@ Czech Republic
         'financial_type_id' => 'Member dues',
         'processor_id' => 'abc',
         'payment_processor_id' => $paymentProcessorID,
-        'trxn_id' => 123,
+        'trxn_id' => '123',
         'invoice_id' => 'inv123',
         'sequential' => 1,
         'failure_retry_date' => '2020-01-03',
@@ -937,7 +937,7 @@ my field';
       'smarty' => FALSE,
     ]);
     $contactID = \Civi\Api4\Domain::get()->addSelect('contact_id')->execute()->first()['contact_id'];
-    Address::create()->setValues(['contact_id' => $contactID, 'city' => 'Beverley Hills', 'state_province_id:label' => 'California', 'country_id:label' => 'United States', 'postal_code' => 90210])->execute();
+    Address::create()->setValues(['contact_id' => $contactID, 'city' => 'Beverley Hills', 'state_province_id:label' => 'California', 'country_id:label' => 'United States', 'postal_code' => '90210'])->execute();
     $this->assertEquals($tokens, $tokenProcessor->listTokens());
     $tokenProcessor->addMessage('message', implode("\n", array_keys($tokens)), 'text/plain');
     $tokenProcessor->addRow();
@@ -1184,8 +1184,8 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       'supplemental_address_1' => 'up the road',
       'city' => 'Emerald City',
       'state_province_id:label' => 'Maine',
-      'postal_code' => 90210,
-      'postal_code_suffix' => 1234,
+      'postal_code' => '90210',
+      'postal_code_suffix' => '1234',
     ])->execute()->first()['id'];
     \Civi::settings()->set('mailing_format', '{contact.street_address}{ }{contact.supplemental_address_1}{ }{contact.supplemental_address_2}{ }{contact.city}{ }{contact.state_province}{ }{contact.postal_code}');
     $phoneID = Phone::create()

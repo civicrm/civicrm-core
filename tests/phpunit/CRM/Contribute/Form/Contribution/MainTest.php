@@ -60,7 +60,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
-      'cvv2' => 123,
+      'cvv2' => '123',
       'auto_renew' => 1,
       'priceSetId' => $this->ids['PriceSet']['membership'],
     ];

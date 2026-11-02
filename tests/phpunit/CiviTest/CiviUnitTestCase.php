@@ -563,7 +563,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
           'city' => 'Collinsville',
           'country_id' => 1228,
           'state_province_id' => 1003,
-          'postal_code' => 6022,
+          'postal_code' => '6022',
         ],
       ]);
       \Civi\Api4\SiteEmailAddress::save(FALSE)
@@ -2465,7 +2465,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
         'is_test' => 1,
         'financial_type_id' => $this->getFinancialTypeID('Donation'),
         'invoice_id' => 'abcd',
-        'trxn_id' => 345,
+        'trxn_id' => '345',
         'receive_date' => '2019-07-25 07:34:23',
       ]);
     }

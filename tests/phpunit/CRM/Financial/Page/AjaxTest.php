@@ -40,7 +40,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
    */
   public function testGetFinancialTransactionsList(): void {
     $individualID = $this->individualCreate();
-    $contributionID = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => 12345]);
+    $contributionID = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => '12345']);
     $financialTrxnIDs = \Civi\Api4\FinancialTrxn::get(FALSE)->addOrderBy('id')->execute()->column('id');
     $batch = $this->callAPISuccess('Batch', 'create', ['title' => 'test', 'status_id' => 'Open']);
     $this->createTestEntity('EntityBatch', [
@@ -64,7 +64,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
    */
   public function testGetFinancialTransactionsListOpenBatch(): void {
     $individualID = $this->individualCreate();
-    $contributionID = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => 12345]);
+    $contributionID = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => '12345']);
     $financialTrxnIDs = \Civi\Api4\FinancialTrxn::get(FALSE)->addOrderBy('id')->execute()->column('id');
     $batch = $this->callAPISuccess('Batch', 'create', ['title' => 'test', 'status_id' => 'Open']);
     $this->createTestEntity('EntityBatch', [
@@ -156,7 +156,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     ]);
 
     $individualID = $this->individualCreate();
-    $contributionId = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => 998877]);
+    $contributionId = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => '998877']);
     $financialTrxnId = CRM_Core_DAO::singleValueQuery(
       "SELECT financial_trxn_id FROM civicrm_entity_financial_trxn WHERE entity_table = 'civicrm_contribution' AND entity_id = %1",
       [1 => [$contributionId, 'Positive']]

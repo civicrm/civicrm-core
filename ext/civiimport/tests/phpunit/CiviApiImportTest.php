@@ -87,7 +87,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     $this->assertEquals('abc', $importFields[4]['table_name']);
 
     Import::create($userJobID)->setValues([
-      'external_identifier' => 678,
+      'external_identifier' => '678',
       'amount_given' => 80,
       'receive_date' => NULL,
       '_status' => 'NEW',
@@ -109,7 +109,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
 
     Import::save($userJobID)->setRecords([
       [
-        'external_identifier' => 999,
+        'external_identifier' => '999',
         'amount_given' => 9,
         '_status' => 'ERROR',
         '_id' => $rowID,
@@ -121,7 +121,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
 
     Import::save($userJobID)->setRecords([
       [
-        'external_identifier' => 777,
+        'external_identifier' => '777',
         '_id' => $rowID,
         '_status' => 'ERROR',
       ],

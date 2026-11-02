@@ -123,8 +123,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'non_deductible_amount' => 10.00,
       'fee_amount' => 5.00,
       'net_amount' => 95.00,
-      'trxn_id' => 23456,
-      'invoice_id' => 78910,
+      'trxn_id' => '23456',
+      'invoice_id' => '78910',
       'source' => 'SSF',
       'contribution_status_id' => 'Completed',
     ];
@@ -271,8 +271,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $params = array_merge($params, [
       'id' => $contributionID,
       'invoice_number' => Civi::settings()->get('invoice_prefix') . $contributionID,
-      'trxn_id' => 12345,
-      'invoice_id' => 6789,
+      'trxn_id' => '12345',
+      'invoice_id' => '6789',
     ]);
     $contributionID = $this->contributionCreate($params);
 
@@ -347,8 +347,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'non_deductible_amount' => 10.00,
       'fee_amount' => 5.00,
       'net_amount' => 95.00,
-      'trxn_id' => 23456,
-      'invoice_id' => 78910,
+      'trxn_id' => '23456',
+      'invoice_id' => '78910',
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ];
@@ -456,8 +456,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
       'net_amount' => 90.00,
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
+      'trxn_id' => '12345',
+      'invoice_id' => '67890',
       'source' => 'SSF',
       'contribution_status_id' => 1,
       'skipLineItem' => 1,
@@ -488,8 +488,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
       'net_amount' => 90.00,
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
+      'trxn_id' => '12345',
+      'invoice_id' => '67890',
       'source' => 'SSF',
       'contribution_status_id' => 'Pending',
       'skipLineItem' => 1,
@@ -528,8 +528,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'receive_date' => '20120511',
       'total_amount' => 100.00,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
+      'trxn_id' => '12345',
+      'invoice_id' => '67890',
       'source' => 'SSF',
       'contribution_status_id' => 1,
       'sequential' => 1,
@@ -650,7 +650,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    */
   public function testGetCreditNoteCaseInsensitive(): void {
     $this->contributionCreate(['contact_id' => $this->individualID]);
-    $this->contributionCreate(['creditnote_id' => 'cN1234', 'contact_id' => $this->individualID, 'invoice_id' => 91011, 'trxn_id' => 456]);
+    $this->contributionCreate(['creditnote_id' => 'cN1234', 'contact_id' => $this->individualID, 'invoice_id' => '91011', 'trxn_id' => '456']);
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['creditnote_id' => 'CN1234', 'return' => 'creditnote_id']);
     $this->assertEquals('cN1234', $contribution['creditnote_id']);
   }
@@ -782,8 +782,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
       'net_amount' => 90.00,
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
+      'trxn_id' => '12345',
+      'invoice_id' => '67890',
       'contribution_source' => 'SSF',
       'contribution_status_id' => 1,
     ];
@@ -849,8 +849,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
       'net_amount' => 90.00,
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
+      'trxn_id' => '12345',
+      'invoice_id' => '67890',
       'contribution_source' => 'SSF',
       'contribution_status_id' => 1,
     ];
@@ -871,8 +871,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
       'net_amount' => 90.00,
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
+      'trxn_id' => '12345',
+      'invoice_id' => '67890',
       'source' => 'SSF',
       'contribution_status_id' => 1,
       'note' => 'my contribution note',
@@ -901,8 +901,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'non_deductible_amount' => 10.00,
       'fee_amount' => 50.00,
       'net_amount' => 90.00,
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
+      'trxn_id' => '12345',
+      'invoice_id' => '67890',
       'source' => 'SSF',
       'contribution_status_id' => 1,
       'contribution_note' => 'my contribution note',
@@ -999,8 +999,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 100.00,
       'fee_amount' => 50,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
+      'trxn_id' => '12345',
+      'invoice_id' => '67890',
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ];
@@ -1050,8 +1050,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_page_id' => $contributionPage['id'],
       'payment_processor' => $this->ids['PaymentProcessor']['dummy'],
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
+      'trxn_id' => '12345',
+      'invoice_id' => '67890',
       'source' => 'SSF',
       'contribution_status_id' => 1,
 
@@ -1088,9 +1088,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 100.00,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_page_id' => $contributionPage['id'],
-      'trxn_id' => 12345,
+      'trxn_id' => '12345',
       'is_pay_later' => 1,
-      'invoice_id' => 67890,
+      'invoice_id' => '67890',
       'source' => 'SSF',
       'contribution_status_id' => 'Pending',
 
@@ -1120,8 +1120,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 100.00,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'contribution_page_id' => $contributionPage['id'],
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
+      'trxn_id' => '12345',
+      'invoice_id' => '67890',
       'source' => 'SSF',
       'contribution_status_id' => 2,
     ];
@@ -1667,7 +1667,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testCreateUpdateContribution(): void {
     $contributionID = $this->contributionCreate([
       'contact_id' => $this->individualID,
-      'trxn_id' => 212355,
+      'trxn_id' => '212355',
       'financial_type_id' => $this->financialTypeID,
       'invoice_id' => 'old_invoice',
     ]);
@@ -1831,8 +1831,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'non_deductible_amount' => 10.00,
       'fee_amount' => 5.00,
       'net_amount' => 95.00,
-      'trxn_id' => 23456,
-      'invoice_id' => 78910,
+      'trxn_id' => '23456',
+      'invoice_id' => '78910',
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ];
@@ -1877,8 +1877,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 200.00,
       'financial_type_id' => $this->financialTypeID,
       'non_deductible_amount' => 20.00,
-      'trxn_id' => 5454565,
-      'invoice_id' => 1212124,
+      'trxn_id' => '5454565',
+      'invoice_id' => '1212124',
       'fee_amount' => 50.00,
       'net_amount' => 60.00,
       'contribution_status_id' => 2,
@@ -2156,7 +2156,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $originalContribution = $this->setUpRepeatTransaction([], 'single', ['total_amount' => 500, 'net_amount' => 495]);
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'trxn_id' => 4567,
+      'trxn_id' => '4567',
     ]);
     Payment::create(FALSE)
       ->setNotificationForCompleteOrder(FALSE)
@@ -2255,7 +2255,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $originalContribution = $this->setUpRepeatTransaction([], 'multiple');
     $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'trxn_id' => 1234,
+      'trxn_id' => '1234',
     ]);
     Payment::create(FALSE)
       ->setNotificationForCompleteOrder(FALSE)
@@ -2331,7 +2331,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
       'contribution_status_id' => 'Pending',
-      'trxn_id' => 1234,
+      'trxn_id' => '1234',
     ]);
     $this->callAPISuccessGetCount('Contribution', ['contribution_status_id' => 2], 1);
   }
@@ -2359,7 +2359,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $contributionRecur['id'],
-      'trxn_id' => 1234,
+      'trxn_id' => '1234',
     ]);
     Payment::create(FALSE)
       ->setNotificationForCompleteOrder(FALSE)
@@ -2435,7 +2435,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $contributionRecur['id'],
-      'trxn_id' => 1234,
+      'trxn_id' => '1234',
     ]);
     $contributions = $this->callAPISuccess('contribution', 'get', [
       'contribution_recur_id' => $contributionRecur['id'],
@@ -2624,7 +2624,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'trxn_id' => 1234,
+      'trxn_id' => '1234',
       'total_amount' => '400',
       'fee_amount' => 50,
     ]);
@@ -2678,7 +2678,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'trxn_id' => 789,
+      'trxn_id' => '789',
     ]);
     Payment::create(FALSE)
       ->setNotificationForCompleteOrder(FALSE)
@@ -2689,7 +2689,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $this->callAPISuccessGetSingle('contribution', [
       'total_amount' => 300,
-      'trxn_id' => 789,
+      'trxn_id' => '789',
     ]);
   }
 
@@ -2704,7 +2704,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'trxn_id' => 12345,
+      'trxn_id' => '12345',
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
     ]);
     Payment::create(FALSE)
@@ -2832,7 +2832,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $originalContribution['values'][$originalContribution['id']]['contribution_recur_id'],
-      'trxn_id' => 234,
+      'trxn_id' => '234',
     ]);
     Payment::create(FALSE)
       ->setNotificationForCompleteOrder(FALSE)
@@ -2909,7 +2909,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'trxn_id' => 2345,
+      'trxn_id' => '2345',
       'campaign_id' => $campaignID2,
     ]);
     Payment::create(FALSE)
@@ -2956,7 +2956,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'trxn_id' => 789,
+      'trxn_id' => '789',
     ]);
     Payment::create(FALSE)
       ->setNotificationForCompleteOrder(FALSE)
@@ -2985,7 +2985,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('line_item', 'create', ['id' => $lineItemID, 'financial_type_id' => $this->getFinancialTypeID('Event Fee')]);
     $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $originalContribution['values'][$originalContribution['id']]['contribution_recur_id'],
-      'trxn_id' => 1234,
+      'trxn_id' => '1234',
     ]);
     Payment::create(FALSE)
       ->setNotificationForCompleteOrder(FALSE)
@@ -3682,7 +3682,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $orderParams['api.PaymentProcessor.pay'] = [
       'payment_processor_id' => $this->ids['PaymentProcessor']['dummy'],
       'credit_card_type' => 'Visa',
-      'credit_card_number' => 41111111111111,
+      'credit_card_number' => '41111111111111',
       'amount' => 5,
     ];
 
@@ -4315,7 +4315,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'contribution_recur_id' => $contributionRecur['id'],
         'financial_type_id' => 'Member Dues',
         'api.Payment.create' => ['total_amount' => 100, 'payment_instrument_id' => 'Credit card'],
-        'invoice_id' => 2345,
+        'invoice_id' => '2345',
         'line_items' => [
           [
             'line_item' => [
@@ -4452,7 +4452,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $repeatedContribution = $this->callAPISuccess('contribution', 'repeattransaction', [
       'contribution_recur_id' => $originalContribution['values'][$originalContribution['id']]['contribution_recur_id'],
       'contribution_status_id' => 'Pending',
-      'trxn_id' => 1234,
+      'trxn_id' => '1234',
     ]);
     $membershipStatusId = $this->callAPISuccess('membership', 'getvalue', [
       'id' => $membership['id'],
@@ -4579,7 +4579,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $contribution = $this->setUpRepeatTransaction([], 'single');
     $contribution2 = $this->callAPISuccess('contribution', 'repeattransaction', [
-      'trxn_id' => 7890,
+      'trxn_id' => '7890',
       'original_contribution_id' => $contribution['id'],
     ]);
     Payment::create(FALSE)
@@ -4627,7 +4627,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ])
     );
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
-      'trxn_id' => 5678,
+      'trxn_id' => '5678',
       'original_contribution_id' => $originalContribution['id'],
     ]
     );
@@ -4661,7 +4661,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     }
     $domain = $this->callAPISuccess('domain', 'getsingle', ['id' => CRM_Core_Config::domainID()]);
     $contribution = $this->callAPISuccess('contribution', 'repeattransaction', [
-      'trxn_id' => 4567,
+      'trxn_id' => '4567',
       'original_contribution_id' => $originalContribution['id'],
     ]);
     Payment::create(FALSE)
@@ -4713,7 +4713,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'payment_instrument' => 'Credit Card',
       'card_type_id' => $creditCardTypeIDs['Visa'],
-      'pan_truncation' => 4567,
+      'pan_truncation' => '4567',
     ];
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
@@ -4728,7 +4728,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(4567, $financialTrxn['pan_truncation']);
     $params = [
       'id' => $contribution['id'],
-      'pan_truncation' => 2345,
+      'pan_truncation' => '2345',
       'card_type_id' => $creditCardTypeIDs['Amex'],
     ];
     $this->callAPISuccess('Contribution', 'create', $params);
@@ -4752,7 +4752,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $originalContribution = $this->setUpRepeatTransaction(['currency' => 'AUD'], 'single', ['currency' => 'AUD']);
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'original_contribution_id' => $originalContribution['id'],
-      'trxn_id' => 3456,
+      'trxn_id' => '3456',
     ]);
     Payment::create(FALSE)
       ->setNotificationForCompleteOrder(FALSE)

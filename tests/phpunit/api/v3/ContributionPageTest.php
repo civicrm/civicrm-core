@@ -662,7 +662,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'credit_card_number' => '4111111111111111',
       'credit_card_type' => 'Visa',
       'credit_card_exp_date' => ['M' => 9, 'Y' => 2040],
-      'cvv2' => 123,
+      'cvv2' => '123',
     ];
   }
 

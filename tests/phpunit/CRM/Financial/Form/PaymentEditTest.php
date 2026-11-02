@@ -63,7 +63,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
     $params = [
       'payment_instrument_id' => $this->getPaymentInstrumentID('Credit Card'),
       'card_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialTrxn', 'card_type_id', 'Visa'),
-      'pan_truncation' => 1111,
+      'pan_truncation' => '1111',
       'trxn_id' => 'txn_12',
       'trxn_date' => date('Y-m-d H:i:s'),
     ];

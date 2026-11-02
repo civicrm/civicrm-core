@@ -456,7 +456,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     $contact2ID = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID]);
-    $this->contributionCreate(['contact_id' => $contact2ID, 'invoice_id' => '2', 'trxn_id' => 2]);
+    $this->contributionCreate(['contact_id' => $contact2ID, 'invoice_id' => '2', 'trxn_id' => '2']);
     $this->contactMembershipCreate(['contact_id' => $contactID]);
     $this->contactMembershipCreate(['contact_id' => $contact2ID]);
     $this->activityCreate(['source_contact_id' => $contactID, 'target_contact_id' => $contactID, 'assignee_contact_id' => $contactID]);
@@ -700,8 +700,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testBatchMergesAddressesHook(array $dataSet): void {
     $contactID1 = $this->individualCreate();
     $contactID2 = $this->individualCreate();
-    $this->contributionCreate(['contact_id' => $contactID1, 'receive_date' => '2010-01-01', 'invoice_id' => 1, 'trxn_id' => 1]);
-    $this->contributionCreate(['contact_id' => $contactID2, 'receive_date' => '2012-01-01', 'invoice_id' => 2, 'trxn_id' => 2]);
+    $this->contributionCreate(['contact_id' => $contactID1, 'receive_date' => '2010-01-01', 'invoice_id' => '1', 'trxn_id' => '1']);
+    $this->contributionCreate(['contact_id' => $contactID2, 'receive_date' => '2012-01-01', 'invoice_id' => '2', 'trxn_id' => '2']);
     foreach ($dataSet['contact_1'] as $address) {
       $this->callAPISuccess($dataSet['entity'], 'create', array_merge(['contact_id' => $contactID1], $address));
     }

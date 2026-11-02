@@ -215,7 +215,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $result = \CRM_Contact_BAO_Contact::findDuplicates([
       'civicrm_contact' => ['first_name' => 'Bob', 'nick_name' => 'Bob', 'last_name' => 'Smith'],
       'civicrm_address' => ['city' => 'Bobville', 'street_address' => 'sesame street'],
-      'civicrm_phone' => ['phone' => 123],
+      'civicrm_phone' => ['phone' => '123'],
       'rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general'],
       'contact_type' => 'Individual',
     ]);
@@ -271,7 +271,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $result = \CRM_Contact_BAO_Contact::findDuplicates([
       'civicrm_contact' => ['first_name' => 'Bob', 'nick_name' => 'Bob', 'last_name' => 'Smith'],
       'civicrm_address' => ['city' => 'Bobville', 'street_address' => 'sesame street'],
-      'civicrm_phone' => ['phone' => 123],
+      'civicrm_phone' => ['phone' => '123'],
       'rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general'],
       'contact_type' => 'Individual',
     ]);

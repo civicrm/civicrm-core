@@ -325,7 +325,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
     $order = $this->callAPISuccess('Order', 'create', [
       'contact_id' => $this->ids['contact'][0],
       'financial_type_id' => 'Donation',
-      'invoice_id' => 123,
+      'invoice_id' => '123',
       'line_items' => [
         [
           'line_item' => [
