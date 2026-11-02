@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\Api4\Activity;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
+use Civi\Api4\Contribution;
 use Civi\Api4\Email;
 use Civi\Api4\EntityTag;
 use Civi\Api4\LineItem;
@@ -603,6 +604,62 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('entity_id', '=', $subject)
       ->execute();
     $this->assertEquals([$editor], $result->column('modified_id'));
+  }
+
+  public function testJoinOnUniqueNameFromFieldWithoutFkMetadata(): void {
+    \CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
+    $name = uniqid('edition_');
+    $campaign = $this->createTestRecord('Campaign', ['name' => $name, 'title' => 'Edition by name']);
+    $activity = $this->createTestRecord('Activity', [
+      'activity_type_id:name' => 'Meeting',
+      'subject' => $name,
+    ]);
+
+    // Activity.campaign_id must not be added as a guessed join condition: the activity has no campaign
+    $result = Activity::get(FALSE)
+      ->addSelect('edition.id')
+      ->addJoin('Campaign AS edition', 'LEFT', ['subject', '=', 'edition.name'])
+      ->addWhere('id', '=', $activity['id'])
+      ->execute();
+    $this->assertEquals($campaign['id'], $result->single()['edition.id']);
+  }
+
+  public function testJoinOnUniqueExternalIdentifierFromFieldWithoutFkMetadata(): void {
+    $externalId = uniqid('ref_');
+    $payer = $this->createTestRecord('Contact', ['first_name' => 'Payer']);
+    $referrer = $this->createTestRecord('Contact', ['first_name' => 'Referrer', 'external_identifier' => $externalId]);
+    $contribution = $this->createTestRecord('Contribution', [
+      'contact_id' => $payer['id'],
+      'financial_type_id:name' => 'Donation',
+      'total_amount' => 10,
+      'source' => $externalId,
+    ]);
+
+    $result = Contribution::get(FALSE)
+      ->addSelect('referrer.id')
+      ->addJoin('Contact AS referrer', 'INNER', ['source', '=', 'referrer.external_identifier'])
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute();
+    $this->assertEquals($referrer['id'], $result->single()['referrer.id']);
+  }
+
+  public function testJoinOnNonUniqueFieldKeepsInferredCondition(): void {
+    $payer = $this->createTestRecord('Contact', ['first_name' => 'Namesake']);
+    $this->createTestRecord('Contact', ['first_name' => 'Namesake']);
+    $contribution = $this->createTestRecord('Contribution', [
+      'contact_id' => $payer['id'],
+      'financial_type_id:name' => 'Donation',
+      'total_amount' => 10,
+      'source' => 'Namesake',
+    ]);
+
+    // first_name is not unique, so Contribution.contact_id = contact.id is still inferred
+    $result = Contribution::get(FALSE)
+      ->addSelect('contact.id')
+      ->addJoin('Contact AS contact', 'INNER', ['source', '=', 'contact.first_name'])
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute();
+    $this->assertEquals([$payer['id']], $result->column('contact.id'));
   }
 
 }
