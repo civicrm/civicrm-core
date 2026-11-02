@@ -512,11 +512,13 @@ div.crm-summary-contactname-block+.crm-actions-ribbon {
 .crm-container div.crm-summary-row {
   display: grid;
   grid-template-columns: var(--crm-input-label-width) 1fr;
+  flex-wrap: wrap; /* when space is tight, wrap labels onto next row */
 }
 
 /* unbold the labels */
 .crm-container div.crm-summary-row div.crm-label {
   font-weight: normal !important; /* important overrides contactSummary.css that comes after this stylesheet */
+  color: var(--crm-c-blue-darker);
 }
 
 /* instead bold the values */
@@ -546,18 +548,9 @@ div.crm-summary-contactname-block+.crm-actions-ribbon {
   width: auto;
 }
 
-/* when space is tight, wrap labels onto next row */
-.crm-container div.crm-summary-row {
-  flex-wrap: wrap;
-}
-
 /* Contact summary tags block */
 #contact-summary .crm-tag-item {
   border-radius: var(--crm-r-1);
-}
-
-.crm-container div.crm-summary-row div.crm-label {
-  color: var(--crm-c-blue-darker);
 }
 
 /* INLINE EDIT */
@@ -794,9 +787,6 @@ ul.crm-quickSearch-results a:active {
   &.status-error {
     background-color: var(--crm-c-red-dark);
   }
-}
-.crm-status-box-outer.status-start .crm-status-box-inner {
-  padding-left: 2.5ch;
 }
 .crm-status-box-outer.status-start .crm-status-box-inner::before {
   position: absolute;
