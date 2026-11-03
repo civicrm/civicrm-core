@@ -115,4 +115,33 @@ class CRM_Core_Permission_BaseTest extends CiviUnitTestCase {
     );
   }
 
+  /**
+   * Test CRM_Core_Permission::customGroupAdmin().
+   */
+  public function testCustomGroupAdmin(): void {
+    $this->createLoggedInUser();
+
+    $this->setPermissions(['access all custom data']);
+    $this->assertTrue(CRM_Core_Permission::customGroupAdmin());
+
+    $this->setPermissions(['administer CiviCRM data']);
+    $this->assertTrue(CRM_Core_Permission::customGroupAdmin());
+
+    $this->setPermissions(['administer CiviCRM']);
+    $this->assertTrue(CRM_Core_Permission::customGroupAdmin());
+
+    $this->setPermissions(['all CiviCRM permissions and ACLs']);
+    $this->assertTrue(CRM_Core_Permission::customGroupAdmin());
+
+    // This will only return true if multi-site is enabled
+    $this->setPermissions(['administer Multiple Organizations']);
+    $this->assertFalse(CRM_Core_Permission::customGroupAdmin());
+
+    $this->setPermissions(['access CiviCRM', 'view all contacts']);
+    $this->assertFalse(CRM_Core_Permission::customGroupAdmin());
+
+    $this->setPermissions([]);
+    $this->assertFalse(CRM_Core_Permission::customGroupAdmin());
+  }
+
 }

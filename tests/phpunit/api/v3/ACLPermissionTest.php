@@ -1151,7 +1151,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $this->assertCount(1, $customValues);
     $this->assertEquals($c1, $customValues[0]['entity_id']);
 
-    $this->setPermissions(['access CiviCRM', 'access deleted contacts', 'view debug output', 'access all custom data']);
+    $this->setPermissions(['access CiviCRM', 'access deleted contacts', 'view debug output', 'administer CiviCRM data']);
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereHookAllResults']);
     $this->cleanupCachedPermissions();
 

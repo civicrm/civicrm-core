@@ -273,7 +273,7 @@ class CRM_Core_Permission {
       return TRUE;
     }
 
-    return self::check('administer CiviCRM data', $userId);
+    return FALSE;
   }
 
   /**
@@ -997,6 +997,7 @@ class CRM_Core_Permission {
         'implies' => [
           'edit message templates',
           'administer dedupe rules',
+          'access all custom data',
         ],
       ],
       // This is a very special permission that supersedes all others;
