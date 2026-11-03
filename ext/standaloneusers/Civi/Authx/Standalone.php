@@ -30,7 +30,7 @@ class Standalone extends AutoService implements AuthxInterface {
    * The password is never verified, so the policy check below rejects the
    * credential without revealing whether the password was right.
    *
-   * @param \Civi\Authx\CheckPolicyEvent $check
+   * @param \Civi\Authx\CheckCredentialEvent $check
    */
   #[CiviEventListener(event: 'civi.authx.checkCredential', priority: CheckCredential::PRIORITY_BASIC_USER + 1)]
   public function skipBasicAuthIfMFAEnabled(CheckCredentialEvent $check): void {
