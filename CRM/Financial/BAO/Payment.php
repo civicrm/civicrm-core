@@ -130,11 +130,12 @@ class CRM_Financial_BAO_Payment {
     $paymentTrxnParams['to_financial_account_id'] = CRM_Contribute_BAO_Contribution::getToFinancialAccount($contribution, $params);
     $paymentTrxnParams['from_financial_account_id'] = $accountsReceivableAccount;
 
-    if ($params['total_amount'] > 0) {
-      $paymentTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Completed');
-    }
-    elseif ($params['total_amount'] < 0) {
+    if ($params['total_amount'] < 0) {
       $paymentTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
+    }
+    else {
+      // A payment of 0 settles a $0 order, so it completes like any other payment that is not a refund.
+      $paymentTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Completed');
     }
 
     //If Payment is recorded on Failed contribution, update it to Pending.
@@ -266,9 +267,10 @@ class CRM_Financial_BAO_Payment {
         ->addWhere('id', '=', $contribution['id'])
         ->execute()
         ->first()['paid_amount'];
-      if ($contributionPaidAmount === 0.0) {
+      if ($contributionPaidAmount === 0.0 && (float) $contribution['total_amount'] !== 0.0) {
         // If the contribution has previously been Completed (fully paid) and now has total payments adding up to 0
         //  change status to 'refunded'.
+        // A $0 order is fully paid at 0, so payments adding up to 0 leave it Completed, not Refunded.
         // Note: If refunds add up to more than total amount it'll get set to "Partially paid" - see below.
         self::updateContributionStatus($contribution['id'], 'Refunded');
       }
