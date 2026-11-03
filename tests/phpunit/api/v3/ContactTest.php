@@ -3938,7 +3938,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'return' => "contact_is_deleted",
       'id' => $contact1,
     ]);
-    $this->assertEquals(TRUE, $contact1IsDeletedAfterMerge);
+    $this->assertSame('1', $contact1IsDeletedAfterMerge);
     $mergedContact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact2, 'return' => $customFieldKeys]);
     foreach ($customFieldKeys as $key) {
       $this->assertEquals($contact1CustomFieldValues[$key], $mergedContact[$key]);
@@ -4441,8 +4441,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $contact = $this->callAPISuccess('Contact', 'create', ['organization_name' => 'Alan\'s Show', 'contact_type' => 'Organization']);
     $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => "postal_greeting$keyString, addressee$keyString, email_greeting$keyString"]);
-    $this->assertEquals('', $contact['postal_greeting_display']);
-    $this->assertEquals('', $contact['email_greeting_display']);
+    $this->assertSame($version === 4 ? NULL : '', $contact['postal_greeting_display']);
+    $this->assertSame($version === 4 ? NULL : '', $contact['email_greeting_display']);
     $this->assertSame('Alan\'s Show', $contact['addressee_display']);
   }
 
@@ -4479,7 +4479,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // Set contact to have no postal greeting & check it is correct.
     $this->callAPISuccess('Contact', 'create', ['id' => $contact['id'], 'postal_greeting_id' => 'null']);
     $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => 'postal_greeting' . $keyString]);
-    $this->assertEquals('', $contact['postal_greeting_display']);
+    $this->assertSame($version === 4 ? NULL : '', $contact['postal_greeting_display']);
 
     //Cleanup
     $this->callAPISuccess('OptionValue', 'create', ['id' => $postalOption['id'], 'name' => 'Dear {contact.first_name}']);

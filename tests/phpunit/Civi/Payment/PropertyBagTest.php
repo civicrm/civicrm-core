@@ -189,7 +189,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $propertyBag = new PropertyBag();
     $propertyBag->setCustomProperty('customThingForMyProcessor', 'fidget');
     $this->assertSame('fidget', $propertyBag->getCustomProperty('customThingForMyProcessor'));
-    $this->assertEquals('', $propertyBag->lastWarning);
+    $this->assertNull($propertyBag->lastWarning);
 
     // Test we can do this with array, although we should get a warning.
     $propertyBag = new PropertyBag();

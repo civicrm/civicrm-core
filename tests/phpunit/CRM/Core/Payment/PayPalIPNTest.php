@@ -74,7 +74,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->_contributionID = $this->contributionCreate($params);
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $this->_contributionID, 'sequential' => 1]);
     // assert that contribution created before handling payment via paypal standard has no transaction id set and pending status
-    $this->assertEquals(NULL, $contribution['values'][0]['trxn_id']);
+    $this->assertSame('', $contribution['values'][0]['trxn_id']);
     $this->assertEquals($pendingStatusID, $contribution['values'][0]['contribution_status_id']);
 
     global $_REQUEST;
@@ -290,7 +290,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->createCustomField();
     $contribution = $this->callAPISuccessGetSingle('contribution', ['id' => $this->_contributionID]);
     // assert that contribution created before handling payment via paypal standard has no transaction id set and pending status
-    $this->assertEquals(NULL, $contribution['trxn_id']);
+    $this->assertSame('', $contribution['trxn_id']);
     $this->assertEquals($pendingStatusID, $contribution['contribution_status_id']);
     $this->hookClass->setHook('civicrm_postIPNProcess', [$this, 'hookCiviCRMAlterIPNData']);
     global $_REQUEST;
@@ -328,7 +328,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $this->_contributionID = $this->contributionCreate($params);
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $this->_contributionID, 'sequential' => 1]);
     // assert that contribution created before handling payment via paypal standard has no transaction id set and pending status
-    $this->assertEquals(NULL, $contribution['values'][0]['trxn_id']);
+    $this->assertSame('', $contribution['values'][0]['trxn_id']);
     $this->assertEquals($pendingStatusID, $contribution['values'][0]['contribution_status_id']);
     $payPalIPNParams = $this->getPaypalTransaction();
     $payPalIPNParams['contactID'] = $contactTobeDeleted;
