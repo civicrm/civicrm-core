@@ -682,4 +682,44 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     // $this->assertCount(2, $beginsWithF);
   }
 
+  public function testQuicksearchWithInteger(): void {
+    Setting::set(FALSE)
+      ->addValue('search_mysql_fts', TRUE)
+      ->addValue('includeEmailInName', TRUE)
+      ->execute();
+
+    $contacts = $this->saveTestRecords('Contact', [
+      'records' => [
+        [
+          'first_name' => 'Studio',
+          'last_name' => '54',
+          'email_primary.email' => 'studio54@example.com',
+        ],
+        [
+          'first_name' => 'John',
+          'last_name' => 'Doe',
+          'email_primary.email' => 'contact18@example.com',
+        ],
+      ],
+    ]);
+
+    $results = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setInput('18')
+      ->execute();
+
+    $this->assertCount(1, $results);
+    $this->assertEquals($contacts[1]['id'], $results[0]['id']);
+
+    $results54 = Contact::autocomplete(FALSE)
+      ->setFormName('crmMenubar')
+      ->setFieldName('crm-qsearch-input')
+      ->setInput('54')
+      ->execute();
+
+    $this->assertCount(1, $results54);
+    $this->assertEquals($contacts[0]['id'], $results54[0]['id']);
+  }
+
 }

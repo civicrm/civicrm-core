@@ -85,11 +85,11 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         if ($useFtsForSortName) {
           // strip FULLTEXT BOOLEAN special characters to avoid invalid expression
           // (assumes they are not valid in names)
-          $ftsNameInput = \preg_replace('/[%@+-<>~]/', '', $input);
+          $ftsNameInput = \preg_replace('/[*()\"%@+\-<>~]/', '', $input);
           // add trailing wildcards in between each word
           // NOTE trailing wildcard will be added to the very end
           // when the apiParams are composed below
-          $ftsNameInput = \str_replace(' ', '% ', $ftsNameInput);
+          $ftsNameInput = \preg_replace('/\s+/', '% ', trim($ftsNameInput));
           $filterValues['contact_names'] = $ftsNameInput;
         }
         else {
