@@ -73,8 +73,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->first();
 
     $this->assertTrue(4 === $agg['count']);
-    $this->assertEquals(200, $agg['second_amount']);
-    $this->assertEquals(300, $agg['second_to_last_amount']);
+    $this->assertSame(200.0, $agg['second_amount']);
+    $this->assertSame(300.0, $agg['second_to_last_amount']);
     $this->assertSame('Donation', $agg['first_type']);
     $this->assertSame('Member Dues', $agg['third_type']);
     $this->assertSame('Event Fee', $agg['last_type']);
@@ -248,12 +248,12 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addHaving('receive_date', '<', '2020-04-01')
       ->execute();
     $this->assertCount(2, $result);
-    $this->assertEquals(150, $result[0]['average']);
-    $this->assertEquals(300, $result[1]['average']);
-    $this->assertEquals(300, $result[0]['SUM:total_amount']);
-    $this->assertEquals(300, $result[1]['SUM:total_amount']);
-    $this->assertEquals(200, $result[0]['MAX:total_amount']);
-    $this->assertEquals(100, $result[0]['MIN:total_amount']);
+    $this->assertSame(150.0, $result[0]['average']);
+    $this->assertSame(300.0, $result[1]['average']);
+    $this->assertSame(300.0, $result[0]['SUM:total_amount']);
+    $this->assertSame(300.0, $result[1]['SUM:total_amount']);
+    $this->assertSame(200.0, $result[0]['MAX:total_amount']);
+    $this->assertSame(100.0, $result[0]['MIN:total_amount']);
     $this->assertSame(2, $result[0]['count']);
     $this->assertSame(1, $result[1]['count']);
 

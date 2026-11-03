@@ -599,9 +599,9 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     $this->assertEquals($import[0]['_entity_id'], $contributions[0]['id']);
     $this->assertEquals($import[1]['_entity_id'], $contributions[1]['id']);
-    $this->assertEquals(100, $contributions[0]['total_amount']);
-    $this->assertEquals(200, $contributions[1]['total_amount']);
-    $this->assertEquals(300, $contributions[2]['total_amount']);
+    $this->assertSame(100.0, $contributions[0]['total_amount']);
+    $this->assertSame(200.0, $contributions[1]['total_amount']);
+    $this->assertSame(300.0, $contributions[2]['total_amount']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contributions[0]['financial_type_id']);
     $this->assertEquals($this->getFinancialTypeID('Member Dues'), $contributions[1]['financial_type_id']);
     $this->assertSame('Jane', $contributions[0]['contact_id.first_name']);
@@ -614,7 +614,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       'where' => [['contribution_id', '=', $contributions[0]['id']]],
     ])->single();
     $this->assertEquals($softCreditContactId, $contributionSoft['contact_id']);
-    $this->assertEquals(10, $contributionSoft['amount']);
+    $this->assertSame(10.0, $contributionSoft['amount']);
     // This value was set in the ON clause & should have carried through
     $this->assertSame('in_honor_of', $contributionSoft['soft_credit_type_id:name']);
 
@@ -623,7 +623,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       'where' => [['contribution_id', '=', $contributions[2]['id']]],
     ])->single();
     // Not specified in 2nd contribution but implied by the total_amount
-    $this->assertEquals(300, $contributionSoft['amount']);
+    $this->assertSame(300.0, $contributionSoft['amount']);
   }
 
 }
