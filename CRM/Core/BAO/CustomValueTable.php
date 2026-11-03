@@ -36,7 +36,6 @@ class CRM_Core_BAO_CustomValueTable {
     }
 
     $paramFieldsExtendContactForEntities = [];
-    $VS = CRM_Core_DAO::VALUE_SEPARATOR;
 
     foreach ($customParams as $tableName => $tables) {
       foreach ($tables as $fields) {
@@ -75,112 +74,10 @@ class CRM_Core_BAO_CustomValueTable {
         );
 
         foreach ($fields as $field) {
-          // fix the value before we store it
-          $serialize = $field['serialize'] ?? NULL;
-          $value = $serialize ? CRM_Core_DAO::serializeField($field['value'], $serialize) : $field['value'];
-          $type = $field['type'];
-
-          // Trim string inputs
-          if (in_array($field['html_type'] ?? NULL, ['Text', 'Email', 'Link'], TRUE) && is_string($value)) {
-            $value = mb_trim($value);
+          if ($field['type'] === 'File' && !empty($field['id'])) {
+            self::deleteFile($field);
           }
-
-          switch ($type) {
-            case 'StateProvince':
-            case 'Country':
-              $type = $serialize ? 'String' : 'Integer';
-              if (!$value) {
-                // CRM-3415
-                // using type of timestamp allows us to sneak in a null into db
-                // gross but effective hack
-                $value = NULL;
-                $type = 'Timestamp';
-              }
-              break;
-
-            case 'File':
-              if (!empty($field['id'])) {
-                self::deleteFile($field);
-              }
-              if (!$field['file_id']) {
-                $value = 'null';
-                break;
-              }
-              $value = $field['file_id'];
-              $type = 'Integer';
-              break;
-
-            case 'Date':
-              $value = CRM_Utils_Date::isoToMysql($value);
-              break;
-
-            case 'Int':
-              if (is_numeric($value)) {
-                $type = 'Integer';
-              }
-              else {
-                $type = 'Timestamp';
-              }
-              break;
-
-            case 'ContactReference':
-              if ($serialize) {
-                $type = 'String';
-                // Validate the string contains only integers and value-separators
-                $validChars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, $VS];
-                if (str_replace($validChars, '', $value)) {
-                  throw new CRM_Core_Exception('Contact ID must be of type Integer');
-                }
-                // Prevent saving an empty "array" which results in a fatal error on render.
-                if ($value === '' || $value === $VS . $VS) {
-                  $value = NULL;
-                }
-              }
-              else {
-                $type = 'Integer';
-              }
-              // An empty value should be stored as NULL
-              if (!$value) {
-                $type = 'Timestamp';
-                $value = NULL;
-              }
-              break;
-
-            case 'EntityReference':
-              $type = self::getDataTypeForField($field['custom_field_id'], $type);
-              // An empty value should be stored as NULL
-              if (!$value) {
-                $type = 'Timestamp';
-                $value = NULL;
-              }
-              break;
-
-            case 'RichTextEditor':
-            case 'Currency':
-              $type = 'String';
-              break;
-
-            case 'Boolean':
-              if ($field['html_type'] === 'Toggle') {
-                $value = (int) $value;
-              }
-              else {
-                // fix for CRM-3290
-                $value = CRM_Utils_String::strtoboolstr($value);
-              }
-              if ($value === FALSE) {
-                $type = 'Timestamp';
-              }
-              break;
-
-            default:
-              // An empty value should be stored as NULL
-              if (!isset($value) || $value === '') {
-                $type = 'Timestamp';
-                $value = NULL;
-              }
-              break;
-          }
+          [$value, $type] = self::getStorageValue($field);
           if ($value === 'null') {
             // when unsetting a value to null, we don't need to validate the type
             // https://projectllr.atlassian.net/browse/VGQBMP-20
@@ -296,6 +193,124 @@ class CRM_Core_BAO_CustomValueTable {
       return 'Integer';
     }
     return self::getDataTypeForPrimaryKey($customField['fk_entity']);
+  }
+
+  /**
+   * Convert one formatted custom field value into the value and bind type it is stored with.
+   *
+   * @param array $field
+   *   One field of the formatted custom params.
+   *
+   * @return array
+   *   [value, type]
+   * @throws \CRM_Core_Exception
+   */
+  public static function getStorageValue(array $field): array {
+    $VS = CRM_Core_DAO::VALUE_SEPARATOR;
+    // fix the value before we store it
+    $serialize = $field['serialize'] ?? NULL;
+    $value = $serialize ? CRM_Core_DAO::serializeField($field['value'], $serialize) : $field['value'];
+    $type = $field['type'];
+
+    // Trim string inputs
+    if (in_array($field['html_type'] ?? NULL, ['Text', 'Email', 'Link'], TRUE) && is_string($value)) {
+      $value = mb_trim($value);
+    }
+
+    switch ($type) {
+      case 'StateProvince':
+      case 'Country':
+        $type = $serialize ? 'String' : 'Integer';
+        if (!$value) {
+          // CRM-3415
+          // using type of timestamp allows us to sneak in a null into db
+          // gross but effective hack
+          $value = NULL;
+          $type = 'Timestamp';
+        }
+        break;
+
+      case 'File':
+        if (!$field['file_id']) {
+          $value = 'null';
+          break;
+        }
+        $value = $field['file_id'];
+        $type = 'Integer';
+        break;
+
+      case 'Date':
+        $value = CRM_Utils_Date::isoToMysql($value);
+        break;
+
+      case 'Int':
+        if (is_numeric($value)) {
+          $type = 'Integer';
+        }
+        else {
+          $type = 'Timestamp';
+        }
+        break;
+
+      case 'ContactReference':
+        if ($serialize) {
+          $type = 'String';
+          // Validate the string contains only integers and value-separators
+          $validChars = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, $VS];
+          if (str_replace($validChars, '', $value)) {
+            throw new CRM_Core_Exception('Contact ID must be of type Integer');
+          }
+          // Prevent saving an empty "array" which results in a fatal error on render.
+          if ($value === '' || $value === $VS . $VS) {
+            $value = NULL;
+          }
+        }
+        else {
+          $type = 'Integer';
+        }
+        // An empty value should be stored as NULL
+        if (!$value) {
+          $type = 'Timestamp';
+          $value = NULL;
+        }
+        break;
+
+      case 'EntityReference':
+        $type = self::getDataTypeForField($field['custom_field_id'], $type);
+        // An empty value should be stored as NULL
+        if (!$value) {
+          $type = 'Timestamp';
+          $value = NULL;
+        }
+        break;
+
+      case 'RichTextEditor':
+      case 'Currency':
+        $type = 'String';
+        break;
+
+      case 'Boolean':
+        if ($field['html_type'] === 'Toggle') {
+          $value = (int) $value;
+        }
+        else {
+          // fix for CRM-3290
+          $value = CRM_Utils_String::strtoboolstr($value);
+        }
+        if ($value === FALSE) {
+          $type = 'Timestamp';
+        }
+        break;
+
+      default:
+        // An empty value should be stored as NULL
+        if (!isset($value) || $value === '') {
+          $type = 'Timestamp';
+          $value = NULL;
+        }
+        break;
+    }
+    return [$value, $type];
   }
 
   /**

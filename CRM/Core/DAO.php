@@ -2103,11 +2103,17 @@ LIKE %1
    *
    * @param string $daoClass
    * @param int $sourceEntityID
+   * @param int|null $targetEntityID
+   *   An existing entity whose values are emptied where the source has none. File fields keep their file.
    * @return array
    */
-  protected static function buildCustomFieldCopyParams(string $daoClass, int $sourceEntityID): array {
+  protected static function buildCustomFieldCopyParams(string $daoClass, int $sourceEntityID, ?int $targetEntityID = NULL): array {
     $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoClass);
     $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($sourceEntityID, $entity);
+    if ($targetEntityID) {
+      $targetValues = array_filter(CRM_Core_BAO_CustomValueTable::getEntityValues($targetEntityID, $entity), fn($value, $field) => is_int($field) && $value !== NULL, ARRAY_FILTER_USE_BOTH);
+      $customValues += array_fill_keys(array_keys($targetValues), NULL);
+    }
     if (empty($customValues)) {
       return [];
     }
@@ -2122,7 +2128,10 @@ LIKE %1
 
     $customParams = [];
     foreach ($customValues as $field => $value) {
-      if ($value !== NULL) {
+      if ($value === NULL && $targetEntityID && !in_array($field, $htmlType)) {
+        $customParams["custom_{$field}_-1"] = '';
+      }
+      elseif ($value !== NULL) {
         if (in_array($field, $htmlType)) {
           $fileValues = CRM_Core_BAO_File::path($value, $sourceEntityID);
           $customParams["custom_{$field}_-1"] = [
@@ -2148,11 +2157,12 @@ LIKE %1
    * @param int $entityID
    * @param int $newEntityID
    * @param string $parentOperation
+   *   'edit' makes an existing entity match the source, emptying values the source does not have.
    */
   public function copyCustomFields($entityID, $newEntityID, $parentOperation = NULL) {
     $tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(get_class($this));
     $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($this));
-    $customParams = self::buildCustomFieldCopyParams(get_class($this), $entityID);
+    $customParams = self::buildCustomFieldCopyParams(get_class($this), $entityID, $parentOperation === 'edit' ? (int) $newEntityID : NULL);
     if (!empty($customParams)) {
       CRM_Core_BAO_CustomValueTable::postProcess($customParams, $tableName, $newEntityID, $entity, $parentOperation ?? 'create');
     }

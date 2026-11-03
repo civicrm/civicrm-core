@@ -843,6 +843,232 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
   }
 
   /**
+   * Test Address::update can resubmit the master_id an address already shares.
+   */
+  public function testAddressCanKeepSharedAddressOfForbiddenContact(): void {
+    [$masterAddress, $sharedAddress] = $this->setupAddressSharedFromForbiddenContact();
+
+    \Civi\Api4\Address::update()
+      ->addWhere('id', '=', $sharedAddress)
+      ->addValue('master_id', $masterAddress)
+      ->addValue('is_billing', TRUE)
+      ->execute();
+
+    $address = \Civi\Api4\Address::get(FALSE)
+      ->addSelect('master_id', 'is_billing')
+      ->addWhere('id', '=', $sharedAddress)
+      ->execute()->single();
+    $this->assertEquals($masterAddress, $address['master_id']);
+    $this->assertTrue($address['is_billing']);
+  }
+
+  /**
+   * Test Address::update accepts shared values that differ from the stored ones only in representation.
+   */
+  public function testAddressCanResubmitEquivalentValuesOfSharedAddress(): void {
+    [$masterAddress, $sharedAddress] = $this->setupAddressSharedFromForbiddenContact();
+
+    \Civi\Api4\Address::update()
+      ->addWhere('id', '=', $sharedAddress)
+      ->addValue('street_address', '123 Secret Lane')
+      ->addValue('street_unit', '')
+      ->addValue('postal_code', '01234')
+      ->addValue('geo_code_1', '52.50')
+      ->addValue('manual_geo_code', 0)
+      ->addValue('is_billing', TRUE)
+      ->execute();
+
+    $address = \Civi\Api4\Address::get(FALSE)
+      ->addSelect('master_id', 'is_billing')
+      ->addWhere('id', '=', $sharedAddress)
+      ->execute()->single();
+    $this->assertEquals($masterAddress, $address['master_id']);
+    $this->assertTrue($address['is_billing']);
+  }
+
+  /**
+   * Test Address::update refuses to change a shared address of a contact the user cannot edit, and writes nothing.
+   */
+  public function testAddressCannotChangeSharedAddressOfForbiddenContact(): void {
+    [$masterAddress, $sharedAddress] = $this->setupAddressSharedFromForbiddenContact();
+
+    try {
+      \Civi\Api4\Address::update()
+        ->addWhere('id', '=', $sharedAddress)
+        ->addValue('street_address', '999 Changed Street')
+        ->execute();
+      $this->fail('Expected UnauthorizedException');
+    }
+    catch (UnauthorizedException $e) {
+      $this->assertEquals('Permission denied to modify shared upstream address.', $e->getMessage());
+    }
+
+    $streets = \Civi\Api4\Address::get(FALSE)
+      ->addWhere('id', 'IN', [$masterAddress, $sharedAddress])
+      ->execute()->column('street_address', 'id');
+    $this->assertEquals([$masterAddress => '123 Secret Lane', $sharedAddress => '123 Secret Lane'], $streets);
+  }
+
+  /**
+   * Test a refused Address::update leaves the primary address of the contact untouched.
+   */
+  public function testAddressRefusedChangeKeepsPrimaryAddress(): void {
+    [, $sharedAddress] = $this->setupAddressSharedFromForbiddenContact();
+    $userContact = \Civi\Api4\Address::get(FALSE)->addWhere('id', '=', $sharedAddress)->execute()->single()['contact_id'];
+    $ownAddress = \Civi\Api4\Address::create(FALSE)
+      ->addValue('contact_id', $userContact)
+      ->addValue('location_type_id:name', 'Work')
+      ->addValue('is_primary', TRUE)
+      ->execute()->first()['id'];
+
+    try {
+      \Civi\Api4\Address::update()
+        ->addWhere('id', '=', $sharedAddress)
+        ->addValue('street_address', '999 Changed Street')
+        ->addValue('is_primary', TRUE)
+        ->execute();
+      $this->fail('Expected UnauthorizedException');
+    }
+    catch (UnauthorizedException $e) {
+      $this->assertEquals('Permission denied to modify shared upstream address.', $e->getMessage());
+    }
+
+    $primary = \Civi\Api4\Address::get(FALSE)
+      ->addWhere('id', 'IN', [$ownAddress, $sharedAddress])
+      ->execute()->column('is_primary', 'id');
+    $this->assertEquals([$ownAddress => TRUE, $sharedAddress => FALSE], $primary);
+  }
+
+  /**
+   * Test Address::update accepts a master_id that points to another address sharing the same master.
+   */
+  public function testAddressCanKeepSharedAddressThroughChainedMaster(): void {
+    [$masterAddress, $sharedAddress] = $this->setupAddressSharedFromForbiddenContact();
+    $masterContact = \Civi\Api4\Address::get(FALSE)->addWhere('id', '=', $masterAddress)->execute()->single()['contact_id'];
+    $siblingAddress = \Civi\Api4\Address::create(FALSE)
+      ->addValue('contact_id', $masterContact)
+      ->addValue('location_type_id:name', 'Work')
+      ->addValue('master_id', $masterAddress)
+      ->execute()->first()['id'];
+
+    \Civi\Api4\Address::update()
+      ->addWhere('id', '=', $sharedAddress)
+      ->addValue('master_id', $siblingAddress)
+      ->addValue('is_billing', TRUE)
+      ->execute();
+
+    $this->assertEquals($masterAddress, \Civi\Api4\Address::get(FALSE)->addWhere('id', '=', $sharedAddress)->execute()->single()['master_id']);
+  }
+
+  /**
+   * Test Address::update accepts HTML-encoded master text resubmitted unchanged.
+   */
+  public function testAddressCanResubmitEncodedTextOfSharedAddress(): void {
+    [$masterAddress, $sharedAddress] = $this->setupAddressSharedFromForbiddenContact();
+    \Civi\Api4\Address::update(FALSE)
+      ->addWhere('id', '=', $masterAddress)
+      ->addValue('supplemental_address_1', 'c/o <Smith>')
+      ->execute();
+
+    \Civi\Api4\Address::update()
+      ->addWhere('id', '=', $sharedAddress)
+      ->addValue('master_id', $masterAddress)
+      ->addValue('is_billing', TRUE)
+      ->execute();
+
+    $this->assertTrue(\Civi\Api4\Address::get(FALSE)->addWhere('id', '=', $sharedAddress)->execute()->single()['is_billing']);
+  }
+
+  /**
+   * Test an unchecked change by a user who cannot edit the master stops sharing instead of diverging from it.
+   */
+  public function testAddressChangeWithoutPermissionCheckStopsSharing(): void {
+    [$masterAddress, $sharedAddress] = $this->setupAddressSharedFromForbiddenContact();
+
+    \Civi\Api4\Address::update(FALSE)
+      ->addWhere('id', '=', $sharedAddress)
+      ->addValue('street_address', '999 Own Street')
+      ->execute();
+
+    $addresses = \Civi\Api4\Address::get(FALSE)
+      ->addSelect('street_address', 'master_id')
+      ->addWhere('id', 'IN', [$masterAddress, $sharedAddress])
+      ->execute()->indexBy('id');
+    $this->assertEquals('123 Secret Lane', $addresses[$masterAddress]['street_address']);
+    $this->assertEquals('999 Own Street', $addresses[$sharedAddress]['street_address']);
+    $this->assertNull($addresses[$sharedAddress]['master_id']);
+  }
+
+  /**
+   * Test an unchecked save without a change keeps sharing.
+   */
+  public function testAddressUnchangedWithoutPermissionCheckKeepsSharing(): void {
+    [$masterAddress, $sharedAddress] = $this->setupAddressSharedFromForbiddenContact();
+
+    \Civi\Api4\Address::update(FALSE)
+      ->addWhere('id', '=', $sharedAddress)
+      ->addValue('street_address', '123 Secret Lane')
+      ->addValue('is_billing', TRUE)
+      ->execute();
+
+    $this->assertEquals($masterAddress, \Civi\Api4\Address::get(FALSE)->addWhere('id', '=', $sharedAddress)->execute()->single()['master_id']);
+  }
+
+  /**
+   * Test an unchanged legacy save without manual_geo_code keeps sharing a manually geocoded address.
+   */
+  public function testLegacySaveKeepsSharingManuallyGeocodedAddress(): void {
+    [$masterAddress, $sharedAddress] = $this->setupAddressSharedFromForbiddenContact();
+    \Civi\Api4\Address::update(FALSE)
+      ->addWhere('id', '=', $masterAddress)
+      ->addValue('manual_geo_code', TRUE)
+      ->execute();
+    $address = \Civi\Api4\Address::get(FALSE)->addWhere('id', '=', $sharedAddress)->execute()->single();
+
+    \CRM_Core_BAO_Address::legacyCreate([
+      'contact_id' => $address['contact_id'],
+      'address' => [
+        1 => [
+          'id' => $sharedAddress,
+          'location_type_id' => $address['location_type_id'],
+          'street_address' => '123 Secret Lane',
+          'postal_code' => '01234',
+        ],
+      ],
+    ], FALSE);
+
+    $this->assertEquals($masterAddress, \Civi\Api4\Address::get(FALSE)->addWhere('id', '=', $sharedAddress)->execute()->single()['master_id']);
+  }
+
+  /**
+   * Create an address of a contact the user cannot view and an address of the user sharing it.
+   *
+   * @return int[] [masterAddressId, sharedAddressId]
+   */
+  private function setupAddressSharedFromForbiddenContact(): array {
+    [$userContact, $otherContact] = $this->setupTestContacts();
+    $masterAddress = \Civi\Api4\Address::create(FALSE)
+      ->addValue('contact_id', $otherContact)
+      ->addValue('location_type_id:name', 'Home')
+      ->addValue('street_address', '123 Secret Lane')
+      ->addValue('postal_code', '01234')
+      ->addValue('geo_code_1', 52.5)
+      ->execute()->first()['id'];
+    $sharedAddress = \Civi\Api4\Address::create(FALSE)
+      ->addValue('contact_id', $userContact)
+      ->addValue('location_type_id:name', 'Home')
+      ->addValue('master_id', $masterAddress)
+      ->execute()->first()['id'];
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+    return [$masterAddress, $sharedAddress];
+  }
+
+  /**
    * Test Contact::update cannot set employer_id to an organization the user cannot view.
    */
   public function testContactCannotSetEmployerToForbiddenOrganization(): void {
