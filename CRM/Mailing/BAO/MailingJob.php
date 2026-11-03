@@ -292,6 +292,8 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    *
    * dev/core#6911 fixed one cause of missing recipients. Feel free to remove this
    * stopgap after November 2027 if it has not been reported to create jobs since.
+   * Before removing it, note that it also queues the new address of a recipient whose email
+   * changed in a rebuilt recipient list; FlexMailer's DefaultBatcher skips the old queue row.
    *
    * @see https://lab.civicrm.org/dev/core/-/work_items/6678
    *
