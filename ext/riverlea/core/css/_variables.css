@@ -394,6 +394,7 @@
   --crm-icon-warning-color: inherit;
   --crm-icon-info-color: inherit;
   --crm-loading-spinner-size: 48px;
+  --crm-icon-remove-block: "\f2ed";
 /* Form Builder UI */
   --crm-fb-header-bg-color: var(--crm-layer2-bg-color);
 /* Wizard */
