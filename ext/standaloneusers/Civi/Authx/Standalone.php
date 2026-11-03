@@ -36,6 +36,7 @@ class Standalone extends AutoService implements AuthxInterface {
   public function skipBasicAuthIfMFAEnabled(CheckCredentialEvent $check): void {
     if ($check->credFormat === 'Basic' && MFABase::getAvailableClasses()) {
       $check->stopPropagation();
+     }
   }
 
   /**
