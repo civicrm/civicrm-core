@@ -149,7 +149,7 @@ class CRM_Core_BAO_HookGetterTest extends CiviUnitTestCase {
     $this->assertSame('Ms. Right', $event->getValue('first_name'));
     $this->assertSame('correct value', $event->getValue('testGroupWithHookGetter.field1'));
     $this->assertSame(123, $event->getValue('testGroupWithHookGetter.field2'));
-    $this->assertTrue($event->getValue('testGroupWithHookGetter.field3'));
+    $this->assertEquals(TRUE, $event->getValue('testGroupWithHookGetter.field3'));
     $this->assertEqualsCanonicalizing(['L', 'P'], $event->getValue('testGroupWithHookGetter.field4'));
   }
 

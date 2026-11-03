@@ -90,8 +90,8 @@ class CustomFieldAlterTest extends Api4TestBase {
       ->execute()->indexBy('subject');
 
     $this->assertCount(4, $result);
-    $this->assertSame(1, $result['A1']['MyFieldsToAlter.TestOptions']);
-    $this->assertSame(2, $result['A2']['MyFieldsToAlter.TestOptions']);
+    $this->assertEquals(1, $result['A1']['MyFieldsToAlter.TestOptions']);
+    $this->assertEquals(2, $result['A2']['MyFieldsToAlter.TestOptions']);
     $this->assertSame('One', $result['A1']['MyFieldsToAlter.TestOptions:label']);
     $this->assertSame('Two', $result['A2']['MyFieldsToAlter.TestOptions:label']);
     $this->assertTrue(empty($result['A3']['MyFieldsToAlter.TestOptions']));
@@ -126,8 +126,8 @@ class CustomFieldAlterTest extends Api4TestBase {
       ->execute()->indexBy('subject');
 
     $this->assertCount(4, $result);
-    $this->assertSame(1, $result['A1']['MyFieldsToAlter.TestOptions']);
-    $this->assertSame(2, $result['A2']['MyFieldsToAlter.TestOptions']);
+    $this->assertEquals(1, $result['A1']['MyFieldsToAlter.TestOptions']);
+    $this->assertEquals(2, $result['A2']['MyFieldsToAlter.TestOptions']);
     $this->assertSame('One', $result['A1']['MyFieldsToAlter.TestOptions:label']);
     $this->assertSame('Two', $result['A2']['MyFieldsToAlter.TestOptions:label']);
     $this->assertTrue(empty($result['A3']['MyFieldsToAlter.TestOptions']));

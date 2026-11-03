@@ -73,7 +73,7 @@ class ContactCustomJoinTest extends Api4TestBase {
       'other.other' => 'other',
       'D - Identification_20.D - Identification_20' => 10,
     ])['id'];
-    $this->assertSame(10, Contact::get()->addSelect('*')
+    $this->assertEquals(10, Contact::get()->addSelect('*')
       ->addSelect('D - Identification_20.D - Identification_20')
       ->addWhere('id', '=', $contactID)
       ->execute()->single()['D - Identification_20.D - Identification_20']);

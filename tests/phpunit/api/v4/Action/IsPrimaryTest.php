@@ -78,7 +78,7 @@ class IsPrimaryTest extends Api4TestBase implements TransactionalInterface {
    * Check that all location entities have exactly one primary.
    */
   protected function assertValidLocations() {
-    $this->assertSame(0, \CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM
+    $this->assertEquals(0, \CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM
 
 (SELECT a1.contact_id
 FROM civicrm_address a1

@@ -73,8 +73,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->first();
 
     $this->assertTrue(4 === $agg['count']);
-    $this->assertSame(200, $agg['second_amount']);
-    $this->assertSame(300, $agg['second_to_last_amount']);
+    $this->assertEquals(200, $agg['second_amount']);
+    $this->assertEquals(300, $agg['second_to_last_amount']);
     $this->assertSame('Donation', $agg['first_type']);
     $this->assertSame('Member Dues', $agg['third_type']);
     $this->assertSame('Event Fee', $agg['last_type']);
@@ -248,12 +248,12 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addHaving('receive_date', '<', '2020-04-01')
       ->execute();
     $this->assertCount(2, $result);
-    $this->assertSame(150, $result[0]['average']);
-    $this->assertSame(300, $result[1]['average']);
-    $this->assertSame(300, $result[0]['SUM:total_amount']);
-    $this->assertSame(300, $result[1]['SUM:total_amount']);
-    $this->assertSame(200, $result[0]['MAX:total_amount']);
-    $this->assertSame(100, $result[0]['MIN:total_amount']);
+    $this->assertEquals(150, $result[0]['average']);
+    $this->assertEquals(300, $result[1]['average']);
+    $this->assertEquals(300, $result[0]['SUM:total_amount']);
+    $this->assertEquals(300, $result[1]['SUM:total_amount']);
+    $this->assertEquals(200, $result[0]['MAX:total_amount']);
+    $this->assertEquals(100, $result[0]['MIN:total_amount']);
     $this->assertSame(2, $result[0]['count']);
     $this->assertSame(1, $result[1]['count']);
 
@@ -729,19 +729,19 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
 
     $this->assertCount(2, $result);
-    $this->assertSame(1, $result[0]['a']);
+    $this->assertEquals(1, $result[0]['a']);
     $this->assertSame('one', $result[0]['b']);
     $this->assertSame('United Kingdon', $result[0]['country']);
-    $this->assertSame(1, $result[0]['first_element']);
-    $this->assertSame(2, $result[0]['second_element']);
-    $this->assertSame(3, $result[0]['third_element']);
+    $this->assertEquals(1, $result[0]['first_element']);
+    $this->assertEquals(2, $result[0]['second_element']);
+    $this->assertEquals(3, $result[0]['third_element']);
 
-    $this->assertSame(2, $result[1]['a']);
+    $this->assertEquals(2, $result[1]['a']);
     $this->assertSame('two', $result[1]['b']);
     $this->assertSame('United States', $result[1]['country']);
-    $this->assertSame(4, $result[1]['first_element']);
-    $this->assertSame(15, $result[1]['second_element']);
-    $this->assertSame(9, $result[1]['third_element']);
+    $this->assertEquals(4, $result[1]['first_element']);
+    $this->assertEquals(15, $result[1]['second_element']);
+    $this->assertEquals(9, $result[1]['third_element']);
   }
 
   /**

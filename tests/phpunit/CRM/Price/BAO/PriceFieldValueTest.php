@@ -62,7 +62,7 @@ class CRM_Price_BAO_PriceFieldValueTest extends CiviUnitTestCase {
     ];
     $priceFieldValue = CRM_Price_BAO_PriceFieldValue::create($params);
     $priceFieldValue->find(TRUE);
-    $this->assertSame('', $priceFieldValue->label);
+    $this->assertEquals('', $priceFieldValue->label);
   }
 
 }

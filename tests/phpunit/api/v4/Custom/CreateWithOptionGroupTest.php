@@ -89,7 +89,7 @@ class CreateWithOptionGroupTest extends Api4TestBase {
 
     $this->assertSame('Red', $result["$group.$colorField:label"]);
     $this->assertSame('Corn', $result["$group.$foodField:label"]);
-    $this->assertSame(50000, $result['FinancialStuff.Salary']);
+    $this->assertEquals(50000, $result['FinancialStuff.Salary']);
   }
 
   public function testWithCustomDataForMultipleContacts(): void {

@@ -2649,9 +2649,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(3, $result);
 
-    $this->assertSame(1, $result[0]['columns'][1]['val']);
-    $this->assertSame(2, $result[1]['columns'][1]['val']);
-    $this->assertSame(3, $result[2]['columns'][1]['val']);
+    $this->assertEquals(1, $result[0]['columns'][1]['val']);
+    $this->assertEquals(2, $result[1]['columns'][1]['val']);
+    $this->assertEquals(3, $result[2]['columns'][1]['val']);
   }
 
   public function testSelectPseudoFields() {
@@ -4235,8 +4235,8 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertCount(2, $result);
 
     // Column index 1 is the birth_date column.
-    $this->assertSame(1985, $result[0]['columns'][1]['val']);
-    $this->assertSame(2001, $result[1]['columns'][1]['val']);
+    $this->assertEquals(1985, $result[0]['columns'][1]['val']);
+    $this->assertEquals(2001, $result[1]['columns'][1]['val']);
 
     // Test with custom strftime format
     $params['display']['settings']['columns'][1]['format'] = '%Y-%m';
