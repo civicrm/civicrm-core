@@ -104,7 +104,7 @@ class SearchRunWithCustomFieldTest extends Api4TestBase {
     ];
 
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $this->assertStringContainsString('id=' . $file['id'], $result[0]['data']['TestSearchFields.MyFile']);
+    $this->assertEquals($file['id'], $result[0]['data']['TestSearchFields.MyFile']);
     $this->assertStringContainsString('id=' . $file['id'], $result[0]['columns'][1]['img']['src']);
     $this->assertEmpty($result[1]['data']['TestSearchFields.MyFile']);
     // Placeholder image
