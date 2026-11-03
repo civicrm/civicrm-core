@@ -3779,12 +3779,19 @@ class CRM_Report_Form extends CRM_Core_Form {
   public function legacySlowGroupFilterClause($field, $value, $op) {
     $smartGroupQuery = "";
 
+    if (!is_array($value)) {
+      $value = [$value];
+    }
+    // Include child groups (all levels) before looking for smart groups, so
+    // smart groups nested under a selected parent group are included too.
+    $value = array_unique(array_merge($value, CRM_Contact_BAO_Group::getChildGroupIds($value)));
+
     $group = new CRM_Contact_DAO_Group();
     $group->is_active = 1;
     $group->find();
     $smartGroups = [];
     while ($group->fetch()) {
-      if (in_array($group->id, (array) $this->_params['gid_value']) &&
+      if (in_array($group->id, $value) &&
         $group->saved_search_id
       ) {
         $smartGroups[] = $group->id;
@@ -3807,11 +3814,6 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
 
     $sqlOp = $this->getSQLOperator($op);
-    if (!is_array($value)) {
-      $value = [$value];
-    }
-    //include child groups if any
-    $value = array_merge($value, CRM_Contact_BAO_Group::getChildGroupIds($value));
 
     $clause = "{$field['dbAlias']} IN (" . implode(', ', $value) . ")";
 
