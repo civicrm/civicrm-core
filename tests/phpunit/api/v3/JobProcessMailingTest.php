@@ -208,6 +208,84 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->assertSame('Complete', Mailing::get(FALSE)->addWhere('id', '=', $mailing['id'])->execute()->single()['status']);
   }
 
+  /**
+   * Recipients who become undeliverable after being queued are not sent to.
+   */
+  public function testRecipientUndeliverableAfterQueueingIsNotSent(): void {
+    $this->createContactsInGroup(6, $this->_groupID);
+    Civi::settings()->add(['mailerBatchLimit' => 1]);
+    $this->callAPISuccess('Mailing', 'create', $this->_params);
+    $this->runProcessMailing(1);
+    $this->_mut->assertRecipients($this->getRecipients(1, 1));
+
+    Email::update(FALSE)->addWhere('email', '=', 'mail2@nul.example.com')->addValue('on_hold', 1)->execute();
+    $this->updateContactByEmail('mail3@nul.example.com', ['do_not_email' => TRUE]);
+    $this->updateContactByEmail('mail4@nul.example.com', ['is_deleted' => TRUE]);
+    $this->updateContactByEmail('mail5@nul.example.com', ['is_deceased' => TRUE]);
+
+    $this->runProcessMailing(8);
+
+    $this->_mut->assertRecipients([['mail1@nul.example.com'], ['mail6@nul.example.com']]);
+  }
+
+  /**
+   * The send-time check honours criteria changed by hook_civicrm_alterMailingRecipients.
+   */
+  public function testSendTimeCheckHonoursRecipientHook(): void {
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_alterMailingRecipients', [$this, 'hookAllowDeceased']);
+    $this->createContactsInGroup(2, $this->_groupID);
+    Civi::settings()->add(['mailerBatchLimit' => 1]);
+    $this->callAPISuccess('Mailing', 'create', $this->_params);
+    $this->runProcessMailing(1);
+    $this->updateContactByEmail('mail2@nul.example.com', ['is_deceased' => TRUE]);
+
+    $this->runProcessMailing(3);
+
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+  }
+
+  /**
+   * Editing a running mailing rebuilds its recipient list: a recipient whose address changed gets
+   * exactly one mail, at the address in the rebuilt list.
+   */
+  public function testRecipientListRebuildSendsOnceToCurrentAddress(): void {
+    $this->createContactsInGroup(2, $this->_groupID);
+    Civi::settings()->add(['mailerBatchLimit' => 1]);
+    $mailingID = $this->callAPISuccess('Mailing', 'create', $this->_params)['id'];
+    $this->runProcessMailing(1);
+    $contactID = Email::get(FALSE)->addWhere('email', '=', 'mail2@nul.example.com')->execute()->single()['contact_id'];
+    $this->createTestEntity('Email', ['contact_id' => $contactID, 'email' => 'new2@nul.example.com', 'is_primary' => TRUE]);
+    $this->callAPISuccess('Mailing', 'create', ['id' => $mailingID, 'subject' => 'Edited while running']);
+
+    $this->runProcessMailing(3);
+
+    $this->_mut->assertRecipients([['mail1@nul.example.com'], ['new2@nul.example.com']]);
+  }
+
+  public function hookAllowDeceased(&$mailingObject, &$criteria, $context): void {
+    if ($context === 'mailingQuery') {
+      $criteria['contact_join'] = CRM_Utils_SQL_Select::fragment()->join('c', 'INNER JOIN civicrm_contact c ON (c.id = r.contact_id
+        AND c.is_deleted = 0 AND c.do_not_email = 0 AND c.is_opt_out = 0)');
+    }
+  }
+
+  /**
+   * A test send still reaches an address that is on hold.
+   */
+  public function testTestSendReachesOnHoldAddress(): void {
+    $this->individualCreate(['email' => 'tester@nul.example.com']);
+    Email::update(FALSE)->addWhere('email', '=', 'tester@nul.example.com')->addValue('on_hold', 1)->execute();
+    $mailing = $this->callAPISuccess('Mailing', 'create', ['scheduled_date' => NULL] + $this->_params);
+
+    $this->callAPISuccess('Mailing', 'send_test', ['mailing_id' => $mailing['id'], 'test_email' => 'tester@nul.example.com']);
+
+    $this->_mut->assertRecipients([['tester@nul.example.com']]);
+  }
+
+  private function updateContactByEmail(string $email, array $values): void {
+    Contact::update(FALSE)->addWhere('email_primary.email', '=', $email)->setValues($values)->execute();
+  }
+
   private function runProcessMailing(int $times): void {
     for ($i = 0; $i < $times; $i++) {
       CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
