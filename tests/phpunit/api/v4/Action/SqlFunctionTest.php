@@ -729,19 +729,19 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
 
     $this->assertCount(2, $result);
-    $this->assertEquals(1, $result[0]['a']);
+    $this->assertSame('1', $result[0]['a']);
     $this->assertSame('one', $result[0]['b']);
     $this->assertSame('United Kingdon', $result[0]['country']);
-    $this->assertEquals(1, $result[0]['first_element']);
-    $this->assertEquals(2, $result[0]['second_element']);
-    $this->assertEquals(3, $result[0]['third_element']);
+    $this->assertSame('1', $result[0]['first_element']);
+    $this->assertSame('2', $result[0]['second_element']);
+    $this->assertSame('3', $result[0]['third_element']);
 
-    $this->assertEquals(2, $result[1]['a']);
+    $this->assertSame('2', $result[1]['a']);
     $this->assertSame('two', $result[1]['b']);
     $this->assertSame('United States', $result[1]['country']);
-    $this->assertEquals(4, $result[1]['first_element']);
-    $this->assertEquals(15, $result[1]['second_element']);
-    $this->assertEquals(9, $result[1]['third_element']);
+    $this->assertSame('4', $result[1]['first_element']);
+    $this->assertSame('15', $result[1]['second_element']);
+    $this->assertSame('9', $result[1]['third_element']);
   }
 
   /**
