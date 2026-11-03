@@ -208,6 +208,63 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
   }
 
   /**
+   * A rebuild that fails part way leaves no routes behind, so the next request rebuilds the
+   * table instead of routing on a partial one.
+   */
+  public function testFailedRebuildLeavesNoPartialTable(): void {
+    $saved = 0;
+    CRM_Utils_Hook::singleton()->setHook('civicrm_postSave_civicrm_menu', function ($dao) use (&$saved) {
+      if (++$saved === 100) {
+        throw new CRM_Core_Exception('Simulated failure while saving routes');
+      }
+    });
+
+    CRM_Core_Menu::clear();
+    try {
+      CRM_Core_Menu::rebuild();
+      $this->fail('rebuild() should pass on the failure');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertSame('Simulated failure while saving routes', $e->getMessage());
+    }
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_menu'));
+  }
+
+  /**
+   * A rebuild that fails inside a caller's transaction leaves the caller's work to the caller.
+   */
+  public function testFailedRebuildKeepsCallerTransaction(): void {
+    CRM_Utils_Hook::singleton()->setHook('civicrm_postSave_civicrm_menu', function ($dao) {
+      throw new CRM_Core_Exception('Simulated failure while saving routes');
+    });
+
+    CRM_Core_Menu::clear();
+    $transaction = new CRM_Core_Transaction();
+    $contactId = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Route'])['id'];
+    try {
+      CRM_Core_Menu::rebuild();
+      $this->fail('rebuild() should pass on the failure');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertSame('Simulated failure while saving routes', $e->getMessage());
+    }
+    $transaction->commit();
+
+    $this->assertSame(1, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_contact WHERE id = %1', [1 => [$contactId, 'Integer']]));
+  }
+
+  public function tearDown(): void {
+    $this->resetHooks();
+    try {
+      CRM_Core_Menu::clear();
+      CRM_Core_Menu::rebuild();
+    }
+    finally {
+      parent::tearDown();
+    }
+  }
+
+  /**
    * rebuild rebuilds an empty route table but leaves a populated one alone.
    */
   public function testRebuildOnlyIfEmpty(): void {

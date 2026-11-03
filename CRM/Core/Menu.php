@@ -415,7 +415,7 @@ class CRM_Core_Menu {
         // NOTE: dont trust this check if we dont have the lock, a previous save may have stalled
         return;
       }
-      self::save();
+      self::save($lock->isAcquired());
     }
     finally {
       $lock->release();
@@ -431,13 +431,35 @@ class CRM_Core_Menu {
    * This function recomputes routes from xml and saves them to the civicrm_menu database table
    *
    * Unlocked; go through self::rebuild(), which holds REBUILD_LOCK around this.
+   *
+   * @param bool $atomic
+   *   Write all routes in one transaction, unless a caller's transaction is open: that
+   *   transaction then decides when the routes become visible.
    */
-  private static function save(): void {
+  private static function save(bool $atomic): void {
     $menuArray = self::items(TRUE);
     self::build($menuArray);
 
     $daoFields = CRM_Core_DAO_Menu::fields();
 
+    if (!$atomic || CRM_Core_Transaction::isActive()) {
+      self::saveItems($menuArray, $daoFields);
+      return;
+    }
+    // One transaction, so a concurrent request never routes on a partly written table: it sees
+    // the empty table, calls self::rebuild() and waits on REBUILD_LOCK until the commit.
+    $transaction = new CRM_Core_Transaction();
+    try {
+      self::saveItems($menuArray, $daoFields);
+    }
+    catch (Throwable $e) {
+      $transaction->rollback();
+      throw $e;
+    }
+    $transaction->commit();
+  }
+
+  private static function saveItems(array $menuArray, array $daoFields): void {
     // TODO: can we save these in bulk rather than one at a time
     foreach ($menuArray as $path => $item) {
       $menu = new CRM_Core_DAO_Menu();
