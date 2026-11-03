@@ -229,9 +229,9 @@ class CRM_Report_Form_Instance {
   </head>
   <body><div id=\"crm-container\">";
 
-    $defaults['report_footer'] = $report_footer = "<p><img src=\"{$userFrameworkResourceURL}i/powered_by.png\" /></p></div></body>
-</html>
-";
+    $defaults['report_footer'] = \Civi::settings()->get('empoweredBy') ?
+      "<p><img src=\"{$userFrameworkResourceURL}i/powered_by.png\" /></p></div></body></html>" :
+      "</div></body></html>";
 
     // CRM-17225 view_mode currently supports 'view' or 'criteria'.
     // Prior to 4.7 'view' meant reset=1 in the url & if not set
