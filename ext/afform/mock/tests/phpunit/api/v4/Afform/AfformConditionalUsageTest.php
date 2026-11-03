@@ -238,6 +238,166 @@ EOHTML;
   }
 
   /**
+   * Required field based on a Date field falling before/after "today"
+   */
+  public function testConditionalRequiredFieldRelativeToToday(): void {
+    \CRM_Utils_Time::setTime('2026-06-15 12:00:00');
+    try {
+      $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{source: 'TestConditionals'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+    <af-field name="birth_date" />
+    <af-field name="last_name" af-required="([[&amp;quot;Individual1[0][fields][birth_date]&amp;quot;,&amp;quot;&gt;&amp;quot;,&amp;quot;\&amp;quot;@now\&amp;quot;&amp;quot;]])" defn="{required: false, input_attrs: {}}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()" ng-if="afform.showSubmitButton">Submit</button>
+</af-form>
+EOHTML;
+      $this->useValues([
+        'layout' => $layout,
+        'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      ]);
+
+      // Dynamic rule is that last_name is required if birth_date is after "today" (frozen at 2026-06-15)
+
+      // birth_date after today, last_name empty -> should fail
+      $submission = [
+        ['fields' => ['first_name' => 'A', 'birth_date' => '2026-06-20', 'last_name' => '']],
+      ];
+      try {
+        Afform::submit()
+          ->setName($this->formName)
+          ->setValues(['Individual1' => $submission])
+          ->execute();
+        $this->fail('Expected validation error for missing last_name under relative-date condition.');
+      }
+      catch (\CRM_Core_Exception $e) {
+        $this->assertStringContainsString('Last Name is a required field.', $e->getMessage());
+      }
+
+      // birth_date before today, last_name empty -> should pass
+      $submission = [
+        ['fields' => ['first_name' => 'B', 'birth_date' => '2026-06-10', 'last_name' => '']],
+      ];
+      $result = Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => $submission])
+        ->execute();
+
+      $this->assertGreaterThan(0, $result[0]['Individual1'][0]['id']);
+    }
+    finally {
+      \CRM_Utils_Time::resetTime();
+    }
+  }
+
+  /**
+   * Required field based on a Date field falling within a range of offsets from "today"
+   */
+  public function testConditionalRequiredFieldBetweenRelativeDates(): void {
+    \CRM_Utils_Time::setTime('2026-06-15 12:00:00');
+    try {
+      $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{source: 'TestConditionals'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+    <af-field name="birth_date" />
+    <af-field name="last_name" af-required="([[&amp;quot;Individual1[0][fields][birth_date]&amp;quot;,&amp;quot;BETWEEN&amp;quot;,&amp;quot;[\&amp;quot;@now-7\&amp;quot;,\&amp;quot;@now+7\&amp;quot;]&amp;quot;]])" defn="{required: false, input_attrs: {}}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()" ng-if="afform.showSubmitButton">Submit</button>
+</af-form>
+EOHTML;
+      $this->useValues([
+        'layout' => $layout,
+        'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      ]);
+
+      // Dynamic rule is that last_name is required if birth_date is within 7 days of "today" (frozen at 2026-06-15)
+
+      // birth_date within the relative range, last_name empty -> should fail
+      $submission = [
+        ['fields' => ['first_name' => 'A', 'birth_date' => '2026-06-18', 'last_name' => '']],
+      ];
+      try {
+        Afform::submit()
+          ->setName($this->formName)
+          ->setValues(['Individual1' => $submission])
+          ->execute();
+        $this->fail('Expected validation error for missing last_name under relative BETWEEN condition.');
+      }
+      catch (\CRM_Core_Exception $e) {
+        $this->assertStringContainsString('Last Name is a required field.', $e->getMessage());
+      }
+
+      // birth_date outside the relative range, last_name empty -> should pass
+      $submission = [
+        ['fields' => ['first_name' => 'B', 'birth_date' => '2026-07-01', 'last_name' => '']],
+      ];
+      $result = Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => $submission])
+        ->execute();
+
+      $this->assertGreaterThan(0, $result[0]['Individual1'][0]['id']);
+    }
+    finally {
+      \CRM_Utils_Time::resetTime();
+    }
+  }
+
+  /**
+   * Required field based on a Date field falling within a range of offsets from another field
+   */
+  public function testConditionalRequiredFieldRelativeToAnotherField(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{source: 'TestConditionals'}" type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <af-field name="first_name" />
+    <af-field name="deceased_date" />
+    <af-field name="birth_date" />
+    <af-field name="last_name" af-required="([[&amp;quot;Individual1[0][fields][birth_date]&amp;quot;,&amp;quot;BETWEEN&amp;quot;,&amp;quot;[\&amp;quot;@field:Individual1[0][fields][deceased_date]-30\&amp;quot;,\&amp;quot;@field:Individual1[0][fields][deceased_date]+30\&amp;quot;]&amp;quot;]])" defn="{required: false, input_attrs: {}}" />
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()" ng-if="afform.showSubmitButton">Submit</button>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    // Dynamic rule is that last_name is required if birth_date is within 30 days of deceased_date
+
+    // birth_date within range of deceased_date, last_name empty -> should fail
+    $submission = [
+      ['fields' => ['first_name' => 'A', 'deceased_date' => '2026-08-01', 'birth_date' => '2026-08-05', 'last_name' => '']],
+    ];
+    try {
+      Afform::submit()
+        ->setName($this->formName)
+        ->setValues(['Individual1' => $submission])
+        ->execute();
+      $this->fail('Expected validation error for missing last_name under field-relative condition.');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('Last Name is a required field.', $e->getMessage());
+    }
+
+    // birth_date outside range of deceased_date, last_name empty -> should pass
+    $submission = [
+      ['fields' => ['first_name' => 'B', 'deceased_date' => '2026-08-01', 'birth_date' => '2026-12-25', 'last_name' => '']],
+    ];
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => $submission])
+      ->execute();
+
+    $this->assertGreaterThan(0, $result[0]['Individual1'][0]['id']);
+  }
+
+  /**
    * Disabled field based on af-disabled attribute directly on the field
    */
   public function testConditionalDisabledField(): void {
