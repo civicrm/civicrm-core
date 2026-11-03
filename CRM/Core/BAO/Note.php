@@ -254,7 +254,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note implements \Civi\Core\HookInte
     $privacy = (int) ($record['privacy'] ?? ($id ? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'privacy') : 0));
     $storedPrivacy = $id ? (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'privacy') : 0;
     if ($privacy === 1 || $storedPrivacy === 1) {
-      $authorId = (int) ($id ? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'contact_id') : ($record['contact_id'] ?? 0));
+      $authorId = (int) ($id ? CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Note', $id, 'contact_id') : ($record['contact_id'] ?? $userId));
       if (!$userId || $authorId !== (int) $userId) {
         $e->setAuthorized(FALSE);
         $e->stopPropagation();

@@ -29,7 +29,25 @@ class CRM_Contact_Form_Inline_ContactInfo extends CRM_Contact_Form_Inline {
     // Build contact type specific fields
     $class = 'CRM_Contact_Form_Edit_' . $this->_contactType;
     $class::buildQuickForm($this, 2);
-    $this->addFormRule([$class, 'formRule'], $this);
+    if ($this->_contactType === 'Individual') {
+      $this->addFormRule([__CLASS__, 'formRule'], $this);
+    }
+  }
+
+  /**
+   * Global validation rules for the form.
+   *
+   * @param array $fields
+   *   Posted values of the form.
+   * @param array $files
+   * @param self $form
+   *
+   * @return array|bool
+   */
+  public static function formRule($fields, $files, $form) {
+    $errors = [];
+    CRM_Contact_Form_Edit_Individual::validateEmployer($fields, $errors, $form->getContactID());
+    return empty($errors) ? TRUE : $errors;
   }
 
   /**

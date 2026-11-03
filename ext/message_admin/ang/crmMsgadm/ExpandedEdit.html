@@ -1,6 +1,6 @@
 <div id="bootstrap-theme" crm-dialog="expandedEditDlg" ng-controller="MsgtpluiGenericCtrl">
 
-  <form name="expandedEditForm">
+  <form name="expandedEditForm" crm-ui-id-scope>
 
     <nav class="navbar navbar-default">
       <div class="container-fluid">
@@ -22,12 +22,11 @@
             </button>
 
             <input class="form-control crm-action-menu fa-code"
-                   ng-if="!model.isDiff"
+                   ng-show="!model.isDiff"
                    tabindex="-1"
                    style="z-index:1"
                    crm-ui-select="{placeholder: ts('Token'), data: model.tokenList, width: '12em', dropdownAutoWidth: true}"
                    on-crm-ui-select="$broadcast('insert:expanded', selection)"
-                   ng-disabled="model.isRichText() && !isEditing"
             />
 
             <button type="button" class="btn btn-default" ng-click="expandedEditDlg.close()">
@@ -40,12 +39,15 @@
       </div>
     </nav>
 
-    <civi-rich-text-input ng-if="model.isRichText()"
-         ng-model="model.record[model.field]"
-         crm-custom-element-model
-         crm-msgadm-richtext-editing="isEditing"
-         crm-msgadm-richtext-insert-rx="insert:expanded"
-    ></civi-rich-text-input>
+    <div ng-if="model.isRichText()">
+      <textarea crm-ui-id="expandedEditForm.richtext"
+           class="crm-msgadm-richtext"
+           crm-ui-richtext
+           crm-ui-insert-rx="insert:expanded"
+           ng-model="model.record[model.field]"
+           data-preset="civimail"
+      ></textarea>
+    </div>
     <div ng-if="!model.isRichText()"
          ng-model="model.record[model.field]"
          crm-monaco="model.monacoOptions"

@@ -423,7 +423,7 @@
         link: function (scope, elm, attr, ngModel) {
 
           // Wait for #id to stabilize so the wysiwyg doesn't init with an id like `cke_{{:: fieldId }}`
-          $timeout(function() {
+          const init = $timeout(function() {
             const editor = CRM.wysiwyg.create(elm);
 
             if (!ngModel) {
@@ -443,6 +443,11 @@
                 CRM.wysiwyg.setVal(elm, ngModel.$viewValue || '');
               });
             };
+          });
+
+          scope.$on('$destroy', () => {
+            $timeout.cancel(init);
+            CRM.wysiwyg.destroy(elm);
           });
         }
       };
