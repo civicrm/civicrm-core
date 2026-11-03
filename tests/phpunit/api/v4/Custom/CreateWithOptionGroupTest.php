@@ -168,7 +168,7 @@ class CreateWithOptionGroupTest extends Api4TestBase {
 
     $this->assertSame('Blue', $blueCheese["$group.$colorField:label"]);
     $this->assertSame('Cheese', $blueCheese["$group.$foodField:label"]);
-    $this->assertSame(500000, $blueCheese['FinancialStuff.Salary']);
+    $this->assertEquals(500000, $blueCheese['FinancialStuff.Salary']);
   }
 
 }

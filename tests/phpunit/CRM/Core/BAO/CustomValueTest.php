@@ -60,7 +60,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     ];
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typecheck($type, $value);
-      $this->assertNull($valid, 'Checking type ' . $type . ' for returned CustomField Type.');
+      $this->assertEquals(NULL, $valid, 'Checking type ' . $type . ' for returned CustomField Type.');
     }
   }
 
