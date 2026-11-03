@@ -257,10 +257,12 @@ class CRM_Extension_Mapper {
    *
    * @param bool $fresh
    *   whether to forcibly reload extensions list from canonical store.
+   * @param bool $withPaths
+   *   FALSE to skip resolving filePaths, which may require an extension scan.
    * @return array
    *   array(array('prefix' => $, 'fullName' => $, 'filePath' => $))
    */
-  public function getActiveModuleFiles($fresh = FALSE) {
+  public function getActiveModuleFiles($fresh = FALSE, bool $withPaths = TRUE) {
     if (!defined('CIVICRM_DSN')) {
       // hmm, ok
       return [];
@@ -314,23 +316,25 @@ class CRM_Extension_Mapper {
       }
     }
 
-    // Since we're not caching the full path we add it now.
-    array_walk($moduleExtensions, function(&$value, $key) {
-      try {
-        if (!$value['filePath']) {
-          $value['filePath'] = $this->keyToPath($value['fullName']);
+    if ($withPaths) {
+      // Since we're not caching the full path we add it now.
+      array_walk($moduleExtensions, function (&$value, $key) {
+        try {
+          if (!$value['filePath']) {
+            $value['filePath'] = $this->keyToPath($value['fullName']);
+          }
         }
-      }
-      catch (CRM_Extension_Exception $e) {
-        // Putting a stub here provides more consistency
-        // in how getActiveModuleFiles when racing between
-        // dirty file-removals and cache-clears.
-        CRM_Core_Session::setStatus(htmlentities($e->getMessage()), '', 'error', purify: FALSE);
-        $value['filePath'] = NULL;
-      }
-    });
+        catch (CRM_Extension_Exception $e) {
+          // Putting a stub here provides more consistency
+          // in how getActiveModuleFiles when racing between
+          // dirty file-removals and cache-clears.
+          CRM_Core_Session::setStatus(htmlentities($e->getMessage()), '', 'error', purify: FALSE);
+          $value['filePath'] = NULL;
+        }
+      });
 
-    Civi::$statics[__CLASS__]['moduleExtensions'] = $moduleExtensions;
+      Civi::$statics[__CLASS__]['moduleExtensions'] = $moduleExtensions;
+    }
 
     return $moduleExtensions;
   }
