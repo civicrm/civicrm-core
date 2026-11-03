@@ -25,16 +25,31 @@ use Civi\Standalone\Event\LogoutEvent;
 class Standalone extends AutoService implements AuthxInterface {
 
   /**
-   * Disallow HTTP "Basic" credential as `username:password` when MFA is required.
+   * Leave a HTTP "Basic" credential unchecked when MFA is required.
+   *
+   * The password is never verified, so the policy check below rejects the
+   * credential without revealing whether the password was right.
    *
    * @param \Civi\Authx\CheckCredentialEvent $check
    */
   #[CiviEventListener(event: 'civi.authx.checkCredential', priority: CheckCredential::PRIORITY_BASIC_USER + 1)]
-  public function disallowBasicAuthIfMFAEnabled(CheckCredentialEvent $check): void {
-    if ($check->credFormat === 'Basic') {
-      if (MFABase::getAvailableClasses()) {
-        $check->reject("Basic credentials not supported on systems with MFA enabled.");
-      }
+  public function skipBasicAuthIfMFAEnabled(CheckCredentialEvent $check): void {
+    if ($check->credFormat === 'Basic' && MFABase::getAvailableClasses()) {
+      $check->stopPropagation();
+     }
+  }
+
+  /**
+   * Disallow HTTP "Basic" credential as `username:password` when MFA is required.
+   *
+   * Note this run after ignoreImprovisedFirewall.
+   *
+   * @param \Civi\Authx\CheckPolicyEvent $check
+   */
+  #[CiviEventListener(event: 'civi.authx.checkPolicy', priority: -600)]
+  public function disallowBasicAuthIfMFAEnabled(CheckPolicyEvent $check): void {
+    if (str_starts_with((string) $check->target->cred, 'Basic ') && MFABase::getAvailableClasses()) {
+      $check->reject("Basic credentials not supported on systems with MFA enabled.");
     }
   }
 
