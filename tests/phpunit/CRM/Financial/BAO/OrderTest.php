@@ -637,6 +637,104 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Updating a contribution must not alter the tax amounts of its line items.
+   *
+   * 15.00 including 19% tax is 12.61 + 2.39. Recalculating the tax from the
+   * rounded line total would give 19% of 12.61 = 2.3959, which is stored as
+   * 2.40, so the line items would add up to 15.01 instead of 15.00.
+   */
+  public function testUpdateContributionKeepsLineItemTaxAmount(): void {
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID('Donation'), ['tax_rate' => 19]);
+    $order = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Donation',
+      ])
+      ->addLineItem(['line_total_inclusive' => 15])->execute()->single();
+    $this->assertEquals(15, $order['total_amount']);
+    $this->assertEquals(2.39, $order['tax_amount']);
+    $this->assertLineItemAmounts($order['id'], 12.61, 2.39);
+
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $order['id'])
+      ->addValue('source', 'updated')
+      ->execute();
+    $this->assertLineItemAmounts($order['id'], 12.61, 2.39);
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $order['id'],
+      'source' => 'updated again',
+    ]);
+    $this->assertLineItemAmounts($order['id'], 12.61, 2.39);
+  }
+
+  /**
+   * Changing the total amount of a contribution must recalculate the tax.
+   *
+   * The stored tax amount of the line item must only be kept as long as the
+   * amount stays the same.
+   *
+   * 20.00 including 19% tax is 16.81 + 3.19, 30.00 is 25.21 + 4.79.
+   */
+  public function testUpdateContributionTotalAmountRecalculatesLineItemTaxAmount(): void {
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID('Donation'), ['tax_rate' => 19]);
+    $order = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Donation',
+      ])
+      ->addLineItem(['line_total_inclusive' => 15])->execute()->single();
+    $this->assertLineItemAmounts($order['id'], 12.61, 2.39);
+
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $order['id'])
+      ->addValue('total_amount', 20)
+      ->execute();
+    $this->assertLineItemAmounts($order['id'], 16.81, 3.19);
+    $this->assertContributionAmounts($order['id'], 20, 3.19);
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $order['id'],
+      'total_amount' => 30,
+    ]);
+    $this->assertLineItemAmounts($order['id'], 25.21, 4.79);
+    $this->assertContributionAmounts($order['id'], 30, 4.79);
+  }
+
+  /**
+   * Assert the stored total and tax amount of a contribution.
+   *
+   * @param int $contributionID
+   * @param float $totalAmount
+   * @param float $taxAmount
+   */
+  private function assertContributionAmounts(int $contributionID, float $totalAmount, float $taxAmount): void {
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contributionID)
+      ->addSelect('total_amount', 'tax_amount')
+      ->execute()->single();
+    $this->assertEquals($totalAmount, $contribution['total_amount']);
+    $this->assertEquals($taxAmount, $contribution['tax_amount']);
+  }
+
+  /**
+   * Assert the stored amounts of the single line item of a contribution.
+   *
+   * @param int $contributionID
+   * @param float $lineTotal
+   * @param float $taxAmount
+   */
+  private function assertLineItemAmounts(int $contributionID, float $lineTotal, float $taxAmount): void {
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contributionID)
+      ->execute()->single();
+    $this->assertEquals($lineTotal, $lineItem['line_total']);
+    $this->assertEquals($taxAmount, $lineItem['tax_amount']);
+  }
+
+  /**
    *
    */
   public function setUpMembershipPriceSet(): void {

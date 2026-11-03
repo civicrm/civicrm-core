@@ -1200,9 +1200,12 @@ class CRM_Financial_BAO_Order {
       // requires it for line retrieval but we want to fix that as it
       // should not be required at that point.
       $this->setPriceSetIDFromSelectedField($lineItem['price_field_id']);
+      $storedTaxAmount = $lineItem['tax_amount'] ?? NULL;
       // Set any pre-calculation to zero as we will calculate.
       $lineItem['tax_amount'] = 0;
+      $isFinancialTypeOverridden = FALSE;
       if ($this->isOverrideLineItemFinancialType($lineItem['financial_type_id']) !== FALSE) {
+        $isFinancialTypeOverridden = (int) $lineItem['financial_type_id'] !== (int) $this->getOverrideFinancialTypeID();
         $lineItem['financial_type_id'] = $this->getOverrideFinancialTypeID();
       }
       $lineItem['tax_rate'] = $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
@@ -1236,6 +1239,14 @@ class CRM_Financial_BAO_Order {
         $lineItem['qty'] = 1;
         $lineItem['unit_price'] = $lineItem['line_total'];
 
+      }
+      elseif ($taxRate && $storedTaxAmount !== NULL && !$isFinancialTypeOverridden
+        && $this->getExistingContributionID() && !$this->getTemplateContributionID()
+      ) {
+        // Keep the tax amount of existing line items, as it has already been
+        // booked. Recalculating it from the rounded line total may differ by a
+        // cent.
+        $lineItem['tax_amount'] = (float) $storedTaxAmount;
       }
       elseif ($taxRate) {
         $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
