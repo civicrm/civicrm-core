@@ -94,7 +94,7 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
   public function testGetHttps_invalid_verify(): void {
     [$status, $data] = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
     $this->assertEquals(CRM_Utils_HttpClient::STATUS_DL_ERROR, $status);
-    $this->assertEquals('', $data);
+    $this->assertNull($data);
   }
 
   public function testGetHttps_invalid_noVerify(): void {
