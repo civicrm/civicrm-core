@@ -82,6 +82,10 @@
 .crm-search-form-block .form-layout label {
   width: auto;
 }
+.crm-container .crm-marker {
+  color: var(--crm-input-required-color);
+  font-size: var(--crm-input-required-font-size);
+}
 .crm-container .description:not(#help),
 .crm-container td.description {
   color: var(--crm-input-description);
