@@ -148,6 +148,12 @@ class FullTextSearchQueryTest extends Api4TestBase {
     $this->assertSame(1, $results->count());
     // the best match should be first
     $this->assertSame('Johannes Kahn', $results->first()['display_name']);
+
+    // wildcard-only search should not cause MySQL syntax error
+    $results = \Civi\Api4\Contact::get(FALSE)
+      ->addWhere('contact_names', 'LIKE', '%')
+      ->execute();
+    $this->assertSame(0, $results->count());
   }
 
   public function testInteractionWithExplicitOrderBy(): void {
