@@ -107,9 +107,10 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         }
 
         if ($includeEmailWithName) {
-          $filterValues['email_primary.email'] = $wildcardAtStart . $input;
-          $selectFields[] = 'email_primary.email';
-          $columns[] = ['type' => 'field', 'key' => 'email_primary.email'];
+          $filterValues['Email.email'] = $wildcardAtStart . $input;
+          $selectFields[] = 'Email.email';
+          $columns[] = ['type' => 'field', 'key' => 'Email.email'];
+          $apiParams['join'][] = ['Email AS Email', 'LEFT'];
         }
       }
       else {
@@ -149,7 +150,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
 
       // Map contact_autocomplete_options settings to v4 format
       $autocompleteOptionsMap = [
-        2 => 'email_primary.email',
+        2 => 'Email.email',
         3 => 'phone_primary.phone',
         4 => 'address_primary.street_address',
         5 => 'address_primary.city',
@@ -197,6 +198,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         $params['where'][] = [$field, $operator, $value];
         // Strip all suffixes from inner select array (pseudoconstants will be evaluated by the outer query)
         $params['select'] = array_map(fn ($field) => explode(':', $field)[0], $params['select']);
+        $params['join'] = $apiParams['join'] ?? [];
         $savedSearch['api_params']['sets'][] = ['UNION DISTINCT', 'Contact', 'get', $params];
       }
 
