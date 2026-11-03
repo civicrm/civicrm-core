@@ -16,6 +16,7 @@ class GetTemplateFields extends \Civi\Api4\Generic\BasicGetAction {
   /**
    * @var string
    * @required
+   * @dynamicFieldControl
    */
   protected $workflow;
 
@@ -26,6 +27,7 @@ class GetTemplateFields extends \Civi\Api4\Generic\BasicGetAction {
    *
    * @var string
    * @options metadata,example
+   * @dynamicFieldControl
    */
   protected $format = 'metadata';
 
@@ -64,6 +66,57 @@ class GetTemplateFields extends \Civi\Api4\Generic\BasicGetAction {
       default:
         throw new \RuntimeException("Unrecognized format");
     }
+  }
+
+  /**
+   * Describe the records this action returns, which are not fields of a
+   * workflow but of one workflow's message model.
+   *
+   * Without this, `select: ['*']` expands to the fields of a workflow and
+   * every column of the returned records is dropped.
+   *
+   * @param \Civi\Api4\Generic\BasicGetFieldsAction $getFields
+   *
+   * @return array
+   */
+  public function fields($getFields = NULL) {
+    $format = $getFields ? $getFields->getFormat() : NULL;
+    $workflow = $getFields ? $getFields->getWorkflow() : NULL;
+
+    if ($format === 'example') {
+      // One record, keyed by the model's own field names.
+      if (!$workflow) {
+        return [];
+      }
+      $fields = [];
+      foreach (\Civi\WorkflowMessage\WorkflowMessage::create($workflow)->getFields() as $name => $spec) {
+        $fields[] = [
+          'name' => $name,
+          'title' => $spec->getTitle() ?: $name,
+          'description' => $spec->getDescription(),
+          'data_type' => $spec->getDataType(),
+        ];
+      }
+      return $fields;
+    }
+
+    // Columns of a Civi\WorkflowMessage\FieldSpec, whatever they happen to be:
+    // toArray() reflects over the spec's public properties, so deriving the
+    // list here keeps the two from drifting apart.
+    $described = [
+      'scope' => ts('Subsystems this field is shared with, keyed by subsystem: tokenContext, tplParams or envelope.'),
+      'type' => ts('PHP types accepted by this field, as declared by its @var annotation.'),
+      'comment' => ts('Remainder of the docblock, after the description.'),
+    ];
+    $fields = [];
+    foreach (array_keys((new \Civi\WorkflowMessage\FieldSpec())->toArray()) as $name) {
+      $field = ['name' => $name];
+      if (isset($described[$name])) {
+        $field['description'] = $described[$name];
+      }
+      $fields[] = $field;
+    }
+    return $fields;
   }
 
 }

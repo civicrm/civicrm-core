@@ -261,14 +261,32 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
     $this->assertNotEmpty($fields);
     $this->assertArrayHasKey('activity', $fields);
 
-    // Format 'example'
+    // The metadata is the FieldSpec, not the fields of a workflow. Without the
+    // scope, nothing downstream can tell which token context or Smarty
+    // variable a model property feeds.
+    $this->assertEquals(['tokenContext' => 'contactId', 'tplParams' => 'contactID'], $fields['contactID']['scope']);
+    $this->assertEquals(['int'], $fields['contactID']['type']);
+    $this->assertEquals('Integer', $fields['contactID']['data_type']);
+    $this->assertEquals('Contact', $fields['contactID']['fk_entity']);
+    $this->assertEquals(['tokenContext' => 'activity'], $fields['activity']['scope']);
+
+    // Format 'example' is a single record keyed by the model's own field
+    // names, ready to hand back to Render::$values.
     $example = WorkflowMessage::getTemplateFields(FALSE)
       ->setWorkflow('case_activity')
       ->setFormat('example')
       ->execute()
       ->single();
     $this->assertNotEmpty($example);
-    $this->assertArrayHasKey('name', $example);
+    $this->assertArrayHasKey('contactID', $example);
+    $this->assertArrayHasKey('activity', $example);
+    // The example carries a value for every field the metadata describes
+    // (ksorted, where the metadata keeps the model's declaration order).
+    $metadataNames = array_keys((array) $fields);
+    $exampleNames = array_keys($example);
+    sort($metadataNames);
+    sort($exampleNames);
+    $this->assertEquals($metadataNames, $exampleNames);
 
     // Required workflow parameter validation
     try {
