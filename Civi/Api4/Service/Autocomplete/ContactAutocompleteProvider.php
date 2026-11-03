@@ -74,22 +74,22 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
       $ftsIndices = array_keys(\Civi::service('civi.schema.fts')->getIndicesForEntity('Contact'));
       $allFilterFields = array_column(\CRM_Core_SelectValues::getQuicksearchOptions(), NULL, 'key');
       $enabledFilterFields = \array_intersect_key($allFilterFields, array_flip(\Civi::settings()->get('quicksearch_options')));
+      $wildcardAtStart = \Civi::settings()->get('includeWildCardInName') ? '%' : '';
 
       if (!$filterInputs) {
         // this is the default option: Name (and Email)
         $useFtsForSortName = \in_array('contact_names', $ftsIndices);
         $includeNickName = $useFtsForSortName || \Civi::settings()->get('includeNickNameInName');
         $includeEmailWithName = \Civi::settings()->get('includeEmailInName');
-        $wildcardAtStart = \Civi::settings()->get('includeWildCardInName') ? '%' : '';
 
         if ($useFtsForSortName) {
           // strip FULLTEXT BOOLEAN special characters to avoid invalid expression
           // (assumes they are not valid in names)
-          $ftsNameInput = \preg_replace('/[%@+-<>~]/', '', $input);
+          $ftsNameInput = \preg_replace('/[*()\"%@+\-<>~]/', '', $input);
           // add trailing wildcards in between each word
           // NOTE trailing wildcard will be added to the very end
           // when the apiParams are composed below
-          $ftsNameInput = \str_replace(' ', '% ', $ftsNameInput);
+          $ftsNameInput = \preg_replace('/\s+/', '% ', trim($ftsNameInput));
           $filterValues['contact_names'] = $ftsNameInput;
         }
         else {
@@ -120,7 +120,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
             continue;
           }
           if ($filterField === 'Phone.phone_numeric') {
-            $val = preg_replace('/\D/', '', $val);
+            $val = $wildcardAtStart . preg_replace('/[^%\d]/', '', $val);
           }
           // Add trusted filter
           $filterValues[$filterField] = $val;

@@ -101,16 +101,17 @@ class FullTextSearchFilterSpecProvider extends \Civi\Core\Service\AutoService im
           $wildcardPos = strpos($word, '%');
           // if no wildcards leave as is
           if ($wildcardPos === FALSE) {
-            return '+' . $word;
+            return strlen($word) ? '+' . $word : '';
           }
           // trailing wildcard replace with FTS wildcard *
           if ($wildcardPos === (strlen($word) - 1)) {
-            return '+' . rtrim($word, '%') . '*';
+            $term = rtrim($word, '%');
+            return strlen($term) ? '+' . $term . '*' : '';
           }
           // if non-trailing wildcards then FTS can't handle
           // Q: should we just log?
           throw new \CRM_Core_Exception("Invalid wildcard in FTS query expression {$fieldAlias} LIKE {$word} - ignoring");
-        }, $words));
+        }, $words), fn($word) => $word !== '' && $word !== NULL);
 
         $value = implode(' ', $words);
 
