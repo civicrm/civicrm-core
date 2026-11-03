@@ -139,6 +139,11 @@
         {* CRM-7362 --add campaign to contributions *}
         {include file="CRM/Campaign/Form/addCampaignToComponent.tpl" campaignTrClass="crm-contribution-form-block-campaign_id"}
 
+        <tr class="crm-contribution-form-block-contribution_page">
+          <td class="label">{$form.contribution_page_id.label} {help id="contribution_page_id"}</td>
+          <td{$valueStyle}>{$form.contribution_page_id.html|crmAddClass:twenty}</td>
+        </tr>
+
         {if (empty($is_template) && (!$contributionMode || $payNow))}
           <tr class="crm-contribution-form-block-contribution_status_id">
             <td class="label">{$form.contribution_status_id.label}</td>
