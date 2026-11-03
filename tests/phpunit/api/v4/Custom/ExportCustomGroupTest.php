@@ -62,14 +62,14 @@ class ExportCustomGroupTest extends Api4TestBase {
 
     // 1 custom group + 1 option group + 3 options + 3 fields
     $this->assertCount(8, $export);
-    $this->assertEquals('CustomGroup', $export[0]['entity']);
-    $this->assertEquals('OptionGroup', $export[1]['entity']);
-    $this->assertEquals('OptionValue', $export[2]['entity']);
-    $this->assertEquals('OptionValue', $export[3]['entity']);
-    $this->assertEquals('OptionValue', $export[4]['entity']);
-    $this->assertEquals('CustomField', $export[5]['entity']);
-    $this->assertEquals('CustomField', $export[6]['entity']);
-    $this->assertEquals('CustomField', $export[7]['entity']);
+    $this->assertSame('CustomGroup', $export[0]['entity']);
+    $this->assertSame('OptionGroup', $export[1]['entity']);
+    $this->assertSame('OptionValue', $export[2]['entity']);
+    $this->assertSame('OptionValue', $export[3]['entity']);
+    $this->assertSame('OptionValue', $export[4]['entity']);
+    $this->assertSame('CustomField', $export[5]['entity']);
+    $this->assertSame('CustomField', $export[6]['entity']);
+    $this->assertSame('CustomField', $export[7]['entity']);
     // 2 fields share an option group
     $this->assertEquals($export[5]['params']['values']['option_group_id.name'], $export[7]['params']['values']['option_group_id.name']);
     // Option group name matches

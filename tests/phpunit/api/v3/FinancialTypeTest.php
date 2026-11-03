@@ -115,7 +115,7 @@ class api_v3_FinancialTypeTest extends CiviUnitTestCase {
       'name' => 'Lottery Tickets',
     ]);
     $this->assertNotEmpty($result['id'], 'Financial account with same name as type did not get created.');
-    $this->assertEquals('INC', $result['account_type_code'], 'Financial account created is not an income account.');
+    $this->assertSame('INC', $result['account_type_code'], 'Financial account created is not an income account.');
   }
 
   public function testMatchFinancialTypeOptions(): void {

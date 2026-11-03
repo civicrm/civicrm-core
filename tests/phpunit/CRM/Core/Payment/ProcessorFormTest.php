@@ -218,8 +218,8 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
       'custom'
     );
 
-    $this->assertEquals(TRUE, $canBeHiddenWithTheStandardProfile);
-    $this->assertEquals(FALSE, $canBeHiddenWithTheCustomProfile);
+    $this->assertTrue($canBeHiddenWithTheStandardProfile);
+    $this->assertFalse($canBeHiddenWithTheCustomProfile);
   }
 
   /**
@@ -232,7 +232,7 @@ class CRM_Core_Payment_ProcessorFormTest extends CiviUnitTestCase {
       "custom"
     );
 
-    $this->assertEquals(TRUE, $canBeHiddenWithTheCustomProfile);
+    $this->assertTrue($canBeHiddenWithTheCustomProfile);
   }
 
 }

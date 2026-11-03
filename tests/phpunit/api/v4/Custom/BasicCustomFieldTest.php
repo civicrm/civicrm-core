@@ -55,7 +55,7 @@ class BasicCustomFieldTest extends Api4TestBase {
 
     // Individual fields should show up when contact_type = null|Individual but not other contact types
     $getFields = Contact::getFields(FALSE);
-    $this->assertEquals('Custom', $getFields->execute()->indexBy('name')['MyIndividualFields.MyLink']['type']);
+    $this->assertSame('Custom', $getFields->execute()->indexBy('name')['MyIndividualFields.MyLink']['type']);
     $this->assertContains('MyIndividualFields.MyLink', $getFields->setValues(['contact_type' => 'Individual'])->execute()->column('name'));
     $this->assertNotContains('MyIndividualFields.MyLink', $getFields->setValues(['contact_type:name' => 'Household'])->execute()->column('name'));
 
@@ -74,7 +74,7 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->execute()
       ->first();
 
-    $this->assertEquals('http://example.com/?q=123&a=456', $contact['MyIndividualFields.MyLink']);
+    $this->assertSame('http://example.com/?q=123&a=456', $contact['MyIndividualFields.MyLink']);
 
     $veryLongLink = 'http://example.com/?a=' . str_repeat('a', 500) . '&b=' . str_repeat('b', 500) . '&c=' . str_repeat('c', 500) . '&d=' . str_repeat('d', 500);
     Contact::update()
@@ -100,7 +100,7 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->addWhere('id', '=', $contactId)
       ->execute()
       ->first();
-    $this->assertEquals(NULL, $contact['MyIndividualFields.MyLink']);
+    $this->assertNull($contact['MyIndividualFields.MyLink']);
 
     // Disable the field and it disappears from getFields and from the API output.
     CustomField::update(FALSE)
@@ -202,7 +202,7 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->execute()
       ->first();
     $this->assertArrayHasKey('MyContactFields._Color', $contact);
-    $this->assertEquals('Red', $contact['MyContactFields._Color']);
+    $this->assertSame('Red', $contact['MyContactFields._Color']);
 
     // By default custom fields are not returned
     $contact = Contact::get(FALSE)
@@ -224,10 +224,10 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->addWhere('id', '=', $contactId1)
       ->execute()
       ->first();
-    $this->assertEquals('Red', $contact['MyContactFields._Color']);
-    $this->assertEquals('Orange', $contact['MyContactFields_._Color']);
-    $this->assertEquals('Cherry', $contact['MyContactFields._Food']);
-    $this->assertEquals('Tangerine', $contact['MyContactFields_._Food']);
+    $this->assertSame('Red', $contact['MyContactFields._Color']);
+    $this->assertSame('Orange', $contact['MyContactFields_._Color']);
+    $this->assertSame('Cherry', $contact['MyContactFields._Food']);
+    $this->assertSame('Tangerine', $contact['MyContactFields_._Food']);
 
     // Update 1st set and ensure 2st hasn't changed
     Contact::update()
@@ -239,10 +239,10 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->addWhere('id', '=', $contactId1)
       ->execute()
       ->first();
-    $this->assertEquals('Blue', $contact['MyContactFields._Color']);
-    $this->assertEquals('Orange', $contact['MyContactFields_._Color']);
-    $this->assertEquals('Cherry', $contact['MyContactFields._Food']);
-    $this->assertEquals('Tangerine', $contact['MyContactFields_._Food']);
+    $this->assertSame('Blue', $contact['MyContactFields._Color']);
+    $this->assertSame('Orange', $contact['MyContactFields_._Color']);
+    $this->assertSame('Cherry', $contact['MyContactFields._Food']);
+    $this->assertSame('Tangerine', $contact['MyContactFields_._Food']);
 
     $search = Contact::get(FALSE)
       ->addClause('OR', ['MyContactFields._Color', '=', 'Blue'], ['MyContactFields._Food', '=', 'Grapes'])
@@ -331,7 +331,7 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->execute();
 
     $this->assertCount(2, $results);
-    $this->assertEquals('Buddy', $results[0]["$cgName.PetName"]);
+    $this->assertSame('Buddy', $results[0]["$cgName.PetName"]);
 
     $childOfID = $this->getRelationshipTypeID('Child of');
 
@@ -342,8 +342,8 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->addWhere('id', '=', $parent)
       ->addWhere('relative.relationship_type_id', '=', $childOfID)
       ->execute()->single();
-    $this->assertEquals('Child Tester', $result['relative.display_name']);
-    $this->assertEquals('Buddy', $result["relative.$cgName.PetName"]);
+    $this->assertSame('Child Tester', $result['relative.display_name']);
+    $this->assertSame('Buddy', $result["relative.$cgName.PetName"]);
 
     // Test get via bridge LEFT join
     $result = Contact::get(FALSE)
@@ -352,8 +352,8 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->addWhere('id', '=', $parent)
       ->addWhere('relative.relationship_type_id', '=', $childOfID)
       ->execute()->single();
-    $this->assertEquals('Child Tester', $result['relative.display_name']);
-    $this->assertEquals('Buddy', $result["relative.$cgName.PetName"]);
+    $this->assertSame('Child Tester', $result['relative.display_name']);
+    $this->assertSame('Buddy', $result["relative.$cgName.PetName"]);
   }
 
   public function testMultipleJoinsToCustomTable(): void {
@@ -396,10 +396,10 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->execute();
 
     $this->assertCount(1, $results);
-    $this->assertEquals('Parent', $results[0]['first_name']);
-    $this->assertEquals('Child', $results[0]['child.first_name']);
-    $this->assertEquals('Purple', $results[0]["$cgName.FavColor"]);
-    $this->assertEquals('Cyan', $results[0]["child.$cgName.FavColor"]);
+    $this->assertSame('Parent', $results[0]['first_name']);
+    $this->assertSame('Child', $results[0]['child.first_name']);
+    $this->assertSame('Purple', $results[0]["$cgName.FavColor"]);
+    $this->assertSame('Cyan', $results[0]["child.$cgName.FavColor"]);
   }
 
   /**
@@ -570,9 +570,9 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->addWhere('id', '=', $cid)
       ->execute()->first();
     // Date field should only return date part
-    $this->assertEquals('2025-05-10', $contact["$cgName.DateOnly"]);
+    $this->assertSame('2025-05-10', $contact["$cgName.DateOnly"]);
     // Date time field should return all
-    $this->assertEquals('2025-06-11 12:15:30', $contact["$cgName.DateTime"]);
+    $this->assertSame('2025-06-11 12:15:30', $contact["$cgName.DateTime"]);
   }
 
   public function testExtendsIdFilter(): void {
@@ -590,9 +590,9 @@ class BasicCustomFieldTest extends Api4TestBase {
     $this->assertEquals($fieldUnfiltered['options'], $fieldFilteredByParticipant['options']);
 
     $participantOptions = array_column($fieldFilteredByParticipant['options'], 'grouping', 'name');
-    $this->assertEquals('event_id', $participantOptions['ParticipantEventName']);
-    $this->assertEquals('event_id.event_type_id', $participantOptions['ParticipantEventType']);
-    $this->assertEquals('role_id', $participantOptions['ParticipantRole']);
+    $this->assertSame('event_id', $participantOptions['ParticipantEventName']);
+    $this->assertSame('event_id.event_type_id', $participantOptions['ParticipantEventType']);
+    $this->assertSame('role_id', $participantOptions['ParticipantRole']);
 
     $fieldFilteredByContact = CustomGroup::getFields(FALSE)
       ->setLoadOptions(['id', 'name', 'grouping'])
@@ -610,8 +610,8 @@ class BasicCustomFieldTest extends Api4TestBase {
     $options = array_column($field['options'], 'grouping', 'id');
     $this->assertArrayNotHasKey('ParticipantRole', $options);
     $this->assertArrayHasKey('Participant', $options);
-    $this->assertEquals('contact_sub_type', $options['Individual']);
-    $this->assertEquals('case_type_id', $options['Case']);
+    $this->assertSame('contact_sub_type', $options['Individual']);
+    $this->assertSame('case_type_id', $options['Case']);
 
     // Test contribution type
     $financialType = $this->createTestRecord('FinancialType', [
@@ -672,9 +672,9 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->addWhere('name', '=', 'extends_entity_column_value')
       ->execute()->first();
     $eventOptions = array_column($field['options'], 'label', 'id');
-    $this->assertEquals('Test Fun Event', $eventOptions[$event1['id']]);
-    $this->assertEquals('Test Fun Event2', $eventOptions[$event2['id']]);
-    $this->assertEquals('Test Me Event', $eventOptions[$event3['id']]);
+    $this->assertSame('Test Fun Event', $eventOptions[$event1['id']]);
+    $this->assertSame('Test Fun Event2', $eventOptions[$event2['id']]);
+    $this->assertSame('Test Me Event', $eventOptions[$event3['id']]);
 
     $field = CustomGroup::getFields(FALSE)
       ->setLoadOptions(['id', 'name', 'label'])
@@ -728,14 +728,14 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->addSelect('custom.*')
       ->addWhere('id', '=', $cid)
       ->execute()->first();
-    $this->assertEquals('<em>Hello</em><br />APIv4 & RichText!', $contact["$cgName.RichText"]);
-    $this->assertEquals('<em>Hello</em><br />APIv4 & TextArea!', $contact["$cgName.TextArea"]);
+    $this->assertSame('<em>Hello</em><br />APIv4 & RichText!', $contact["$cgName.RichText"]);
+    $this->assertSame('<em>Hello</em><br />APIv4 & TextArea!', $contact["$cgName.TextArea"]);
 
     // The html should have been stored unescaped
     $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$field1['column_name']} FROM {$custom['table_name']}");
-    $this->assertEquals('<em>Hello</em><br />APIv4 & RichText!', $dbVal);
+    $this->assertSame('<em>Hello</em><br />APIv4 & RichText!', $dbVal);
     $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$field2['column_name']} FROM {$custom['table_name']}");
-    $this->assertEquals('<em>Hello</em><br />APIv4 & TextArea!', $dbVal);
+    $this->assertSame('<em>Hello</em><br />APIv4 & TextArea!', $dbVal);
 
     // APIv3 should work the same way
     civicrm_api3('Contact', 'create', [
@@ -744,9 +744,9 @@ class BasicCustomFieldTest extends Api4TestBase {
       "custom_{$field2['id']}" => '<em>Hello</em><br />APIv3 & TextArea!',
     ]);
     $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$field1['column_name']} FROM {$custom['table_name']}");
-    $this->assertEquals('<em>Hello</em><br />APIv3 & RichText!', $dbVal);
+    $this->assertSame('<em>Hello</em><br />APIv3 & RichText!', $dbVal);
     $dbVal = \CRM_Core_DAO::singleValueQuery("SELECT {$field2['column_name']} FROM {$custom['table_name']}");
-    $this->assertEquals('<em>Hello</em><br />APIv3 & TextArea!', $dbVal);
+    $this->assertSame('<em>Hello</em><br />APIv3 & TextArea!', $dbVal);
   }
 
   public function testMismatchedHtmlTypeAndDataType(): void {

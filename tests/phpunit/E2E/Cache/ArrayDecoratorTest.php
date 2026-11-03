@@ -32,7 +32,7 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
 
   public function testDoubleLifeWithDelete(): void {
     $this->assertFalse($this->a->has('foo'));
-    $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
+    $this->assertSame('dfl-1', $this->a->get('foo', 'dfl-1'));
 
     $this->cache->set('foo', 100);
 
@@ -47,12 +47,12 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
     $this->cache->delete('foo');
 
     $this->assertFalse($this->a->has('foo'));
-    $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
+    $this->assertSame('dfl-1', $this->a->get('foo', 'dfl-1'));
   }
 
   public function testDoubleLifeWithClear(): void {
     $this->assertFalse($this->a->has('foo'));
-    $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
+    $this->assertSame('dfl-1', $this->a->get('foo', 'dfl-1'));
 
     $this->cache->set('foo', 100);
 
@@ -62,7 +62,7 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
     $this->cache->clear();
 
     $this->assertFalse($this->a->has('foo'));
-    $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
+    $this->assertSame('dfl-1', $this->a->get('foo', 'dfl-1'));
   }
 
   public function testSetTtl(): void {
@@ -74,7 +74,7 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
     }
     $result = $this->cache->set('key1', 'value', 1);
     $this->assertTrue($result, 'set() must return true if success');
-    $this->assertEquals('value', $this->cache->get('key1'));
+    $this->assertSame('value', $this->cache->get('key1'));
     sleep(2);
     $this->assertNull($this->cache->get('key1'), 'Value must expire after ttl.');
 
@@ -85,7 +85,7 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
       var_dump($this->cache);
       print_r(date('u') . 'Current UNIX timestamp');
     }
-    $this->assertEquals('value', $key2Value);
+    $this->assertSame('value', $key2Value);
     sleep(2);
     $this->assertNull($this->cache->get('key2'), 'Value must expire after ttl.');
   }

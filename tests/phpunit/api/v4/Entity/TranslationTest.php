@@ -205,7 +205,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
       'checkPermissions' => FALSE,
       'values' => $record,
     ]);
-    $this->assertEquals(1, $createResults->count());
+    $this->assertSame(1, $createResults->count());
     foreach ($createResults as $createResult) {
       $badUpdate = $this->fillRecord($badUpdate);
       try {

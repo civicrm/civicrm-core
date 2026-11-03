@@ -181,7 +181,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // later on, hook returns an extra managed entity ('bar')
@@ -189,10 +189,10 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
     $bar = $this->getManagedEntity('com.example.one', 'bar');
-    $this->assertEquals('CRM_Example_One_Bar', $bar['name']);
+    $this->assertSame('CRM_Example_One_Bar', $bar['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Bar"');
 
     // and then hook changes its mind, removing 'foo' (first of two entities)
@@ -203,7 +203,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $this->assertTrue($foo === NULL);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
     $bar = $this->getManagedEntity('com.example.one', 'bar');
-    $this->assertEquals('CRM_Example_One_Bar', $bar['name']);
+    $this->assertSame('CRM_Example_One_Bar', $bar['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Bar"');
 
     // and then hook changes its mind, removing 'bar' (the last remaining entity)
@@ -230,7 +230,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // later on, hook specification changes
@@ -238,7 +238,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo2 = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertEquals('CRM_Example_One_Foobar', $foo2['name']);
+    $this->assertSame('CRM_Example_One_Foobar', $foo2['name']);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_FooBar"');
     $this->assertEquals($foo['id'], $foo2['id']);
@@ -259,7 +259,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // later on, hook specification changes
@@ -267,7 +267,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo2 = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertEquals('CRM_Example_One_Foo', $foo2['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo2['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_FooBar"');
     $this->assertEquals($foo['id'], $foo2['id']);
@@ -289,7 +289,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // later on, entity definition disappears; but we decide not to do any cleanup (per policy)
@@ -297,7 +297,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo2 = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertEquals('CRM_Example_One_Foo', $foo2['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo2['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
     $this->assertEquals($foo['id'], $foo2['id']);
   }
@@ -333,7 +333,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
     // Check we can still read the value from the field
     $value = \Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $contactId)->addSelect('test_custom_group.test_custom_field')->execute()->single()['test_custom_group.test_custom_field'];
-    $this->assertEquals('test_value', $value);
+    $this->assertSame('test_value', $value);
 
     // Now delete the data
     \Civi\Api4\Contact::update(FALSE)->addWhere('id', '=', $contactId)->addValue('test_custom_group.test_custom_field', NULL)->execute();
@@ -366,7 +366,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // Override 'getrefcount' ==> The refcount is 1
@@ -385,7 +385,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo2 = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertEquals('CRM_Example_One_Foo', $foo2['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo2['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
     $this->assertEquals($foo['id'], $foo2['id']);
 
@@ -542,7 +542,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
     $this->assertEquals(1, $foo['is_active']);
-    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // now deactivate module, which has no declarations and which cascades to managed object
@@ -554,7 +554,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
     $this->assertEquals(0, $foo['is_active']);
-    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(0, 'SELECT is_active FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // and reactivate module, which again provides decls and which cascades to managed object
@@ -567,7 +567,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
     $this->assertEquals(1, $foo['is_active']);
-    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // Special case: Job entities.
@@ -583,7 +583,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me->reconcile();
     $job = $this->getManagedEntity('com.example.one', 'Job');
     $this->assertEquals(1, $job['is_active']);
-    $this->assertEquals('test_job', $job['name']);
+    $this->assertSame('test_job', $job['name']);
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
     // Reset context.
     $manager->setProcessesForTesting([]);
@@ -597,7 +597,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me->reconcile();
     $job = $this->getManagedEntity('com.example.one', 'Job');
     $this->assertEquals(0, $job['is_active']);
-    $this->assertEquals('test_job', $job['name']);
+    $this->assertSame('test_job', $job['name']);
     $this->assertDBQuery(0, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
 
     // and reactivate module
@@ -609,7 +609,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me->reconcile();
     $job = $this->getManagedEntity('com.example.one', 'Job');
     $this->assertEquals(1, $job['is_active']);
-    $this->assertEquals('test_job', $job['name']);
+    $this->assertSame('test_job', $job['name']);
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
 
     // Currently: module enabled, job enabled.
@@ -637,7 +637,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
       $me->reconcile();
       $job = $this->getManagedEntity('com.example.one', 'Job');
       $this->assertEquals(1, $job['is_active']);
-      $this->assertEquals('test_job', $job['name']);
+      $this->assertSame('test_job', $job['name']);
       $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
     }
 
@@ -670,7 +670,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertEquals('CRM_Example_One_Foo', $foo['name']);
+    $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
     // then destroy module

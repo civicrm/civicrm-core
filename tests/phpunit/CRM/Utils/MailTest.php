@@ -93,7 +93,7 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
       'text' => 'Hello',
     ];
     [$headers, $message] = CRM_Utils_Mail::setEmailHeaders($params);
-    $this->assertEquals('<foo@bar.com>, <baz@bar.com>', $headers['To']);
+    $this->assertSame('<foo@bar.com>, <baz@bar.com>', $headers['To']);
   }
 
   /**
@@ -110,7 +110,7 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
     ]);
 
     $this->assertFalse(CRM_Utils_Mail::send($params));
-    $this->assertEquals('Unable to send email. Please report this message to the site administrator', CRM_Core_Session::singleton()->getStatus()[0]['text']);
+    $this->assertSame('Unable to send email. Please report this message to the site administrator', CRM_Core_Session::singleton()->getStatus()[0]['text']);
   }
 
   public function testEmptyText(): void {

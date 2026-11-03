@@ -85,10 +85,10 @@ class ExportTest extends Api4TestBase implements TransactionalInterface {
       ->setId($pageLink['id'])
       ->execute()->single();
 
-    $this->assertEquals('test_export_page', $pageExport['params']['values']['entity_id.name']);
+    $this->assertSame('test_export_page', $pageExport['params']['values']['entity_id.name']);
     $this->assertArrayNotHasKey('entity_id', $pageExport['params']['values']);
     $this->assertArrayNotHasKey('entity_table', $pageExport['params']['values']);
-    $this->assertEquals('ContributionPage', $pageExport['params']['values']['entity_table:name']);
+    $this->assertSame('ContributionPage', $pageExport['params']['values']['entity_table:name']);
 
     $eventExport = PriceSetEntity::export(FALSE)
       ->setId($eventLink['id'])

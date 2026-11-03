@@ -15,19 +15,19 @@ class CRM_Utils_LazyArrayTest extends CiviUnitTestCase {
     $l = $this->createFruitBasket();
     $this->assertFalse($l->isLoaded());
 
-    $this->assertEquals('apple', $l['a']);
-    $this->assertEquals('banana', $l['b']);
+    $this->assertSame('apple', $l['a']);
+    $this->assertSame('banana', $l['b']);
     $this->assertTrue($l->isLoaded());
     $this->assertEquals(3, count($l));
     $this->assertTrue(isset($l['c']));
     $this->assertFalse(isset($l['d']));
 
     $l['a'] = 'apricot';
-    $this->assertEquals('apricot', $l['a']);
+    $this->assertSame('apricot', $l['a']);
     $this->assertEquals(3, count($l));
 
     $l['d'] = 'date';
-    $this->assertEquals('date', $l['d']);
+    $this->assertSame('date', $l['d']);
     $this->assertEquals(4, count($l));
 
     $keys = [];
@@ -42,8 +42,8 @@ class CRM_Utils_LazyArrayTest extends CiviUnitTestCase {
     $l = $this->createSeaRecords();
     $this->assertFalse($l->isLoaded());
 
-    $this->assertEquals('aegean', $l[0]['name']);
-    $this->assertEquals('caspian', $l[2]['name']);
+    $this->assertSame('aegean', $l[0]['name']);
+    $this->assertSame('caspian', $l[2]['name']);
     $this->assertTrue($l->isLoaded());
     $this->assertEquals(3, count($l));
     $this->assertTrue(isset($l[2]));
@@ -54,7 +54,7 @@ class CRM_Utils_LazyArrayTest extends CiviUnitTestCase {
     $this->assertEquals(3, count($l));
 
     $l[] = ['name' => 'weddell', 'area' => 2800];
-    $this->assertEquals('weddell', $l[3]['name']);
+    $this->assertSame('weddell', $l[3]['name']);
     $this->assertEquals(4, count($l));
 
     $keys = [];

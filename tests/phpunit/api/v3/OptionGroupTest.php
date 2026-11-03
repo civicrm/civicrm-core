@@ -83,7 +83,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
       ],
     ];
     $result = $this->callAPISuccess('OptionGroup', 'create', $params);
-    $this->assertEquals('civicrm_event.amount.560', $result['values'][0]['name']);
+    $this->assertSame('civicrm_event.amount.560', $result['values'][0]['name']);
     $this->assertTrue(is_int($result['values'][0]['api.OptionValue.create']));
     $this->assertGreaterThan(0, $result['values'][0]['api.OptionValue.create']);
     $this->callAPISuccess('OptionGroup', 'delete', ['id' => $result['id']]);

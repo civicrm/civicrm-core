@@ -135,10 +135,10 @@ class EntityDisplayTest extends Api4TestBase {
       // created_date and modified_date should be NULLable and have no default/extra
       $this->assertEmpty($schema[4]['Default']);
       $this->assertEmpty($schema[4]['Extra']);
-      $this->assertEquals('YES', $schema[4]['Null']);
+      $this->assertSame('YES', $schema[4]['Null']);
       $this->assertEmpty($schema[5]['Default']);
       $this->assertEmpty($schema[5]['Extra']);
-      $this->assertEquals('YES', $schema[5]['Null']);
+      $this->assertSame('YES', $schema[5]['Null']);
 
       $createTableDao = \CRM_Core_DAO::executeQuery('SHOW CREATE TABLE civicrm_sk_my_new_entity');
       $createTableDao->fetch();
@@ -179,8 +179,8 @@ class EntityDisplayTest extends Api4TestBase {
 
     $rows = \CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_sk_my_new_entity ORDER BY first')->fetchAll();
     $this->assertCount(3, $rows);
-    $this->assertEquals('A', $rows[0]['first']);
-    $this->assertEquals('C', $rows[2]['first']);
+    $this->assertSame('A', $rows[0]['first']);
+    $this->assertSame('C', $rows[2]['first']);
     $this->assertEquals($lastName, $rows[2]['last_name']);
 
     // Add a contact
@@ -196,12 +196,12 @@ class EntityDisplayTest extends Api4TestBase {
       'orderBy' => ['first' => 'ASC'],
     ]);
     $this->assertCount(4, $rows);
-    $this->assertEquals('A', $rows[0]['first']);
-    $this->assertEquals('Dr.', $rows[1]['prefix_id:label']);
-    $this->assertEquals('B', $rows[1]['first']);
-    $this->assertEquals('B2', $rows[2]['first']);
-    $this->assertEquals('C', $rows[3]['first']);
-    $this->assertEquals('Ms.', $rows[3]['prefix_id:label']);
+    $this->assertSame('A', $rows[0]['first']);
+    $this->assertSame('Dr.', $rows[1]['prefix_id:label']);
+    $this->assertSame('B', $rows[1]['first']);
+    $this->assertSame('B2', $rows[2]['first']);
+    $this->assertSame('C', $rows[3]['first']);
+    $this->assertSame('Ms.', $rows[3]['prefix_id:label']);
 
     // Ensure entity_permission setting is enforced
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
@@ -778,7 +778,7 @@ class EntityDisplayTest extends Api4TestBase {
       ],
     ]);
 
-    $this->assertEquals('VIEW', \CRM_Core_BAO_SchemaHandler::getTableType('civicrm_sk_test_column_index_view'));
+    $this->assertSame('VIEW', \CRM_Core_BAO_SchemaHandler::getTableType('civicrm_sk_test_column_index_view'));
     $savedViewDisplay = SearchDisplay::get(FALSE)
       ->addWhere('id', '=', $viewDisplay['id'])
       ->execute()->single();

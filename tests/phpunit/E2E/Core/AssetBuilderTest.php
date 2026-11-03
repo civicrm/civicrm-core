@@ -185,7 +185,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
     catch (\GuzzleHttp\Exception\ClientException $e) {
       $this->assertNotEmpty(preg_match(';404;', $e->getMessage()),
         'Expect to find HTTP 404. Found: ' . json_encode(preg_match(';^HTTP;', $e->getMessage())));
-      $this->assertEquals('Unrecognized asset name: invalid.json', $e->getResponse()->getBody());
+      $this->assertSame('Unrecognized asset name: invalid.json', $e->getResponse()->getBody());
     }
   }
 

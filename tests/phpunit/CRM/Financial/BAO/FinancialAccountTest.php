@@ -48,7 +48,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
       'Database check on updated financial type record.'
     );
 
-    $this->assertEquals($result, 'Donations', 'Verify financial type name.');
+    $this->assertSame('Donations', $result, 'Verify financial type name.');
   }
 
   /**
@@ -65,7 +65,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
 
     $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
 
-    $this->assertEquals($result->name, 'Donations', 'Verify financial account name.');
+    $this->assertSame('Donations', $result->name, 'Verify financial account name.');
   }
 
   /**
@@ -366,7 +366,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
       $this->fail("Missed expected exception");
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertEquals('Revenue Recognition Date cannot be processed unless there is a Deferred Revenue account setup for the Financial Type. Please remove Revenue Recognition Date, select a different Financial Type with a Deferred Revenue account setup for it, or setup a Deferred Revenue account for this Financial Type.', $e->getMessage());
+      $this->assertSame('Revenue Recognition Date cannot be processed unless there is a Deferred Revenue account setup for the Financial Type. Please remove Revenue Recognition Date, select a different Financial Type with a Deferred Revenue account setup for it, or setup a Deferred Revenue account for this Financial Type.', $e->getMessage());
     }
   }
 

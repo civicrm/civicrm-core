@@ -43,23 +43,23 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
       'guid' => "example-id-$random" ,
       'secret' => "example-secret-$random",
     ])->execute();
-    $this->assertEquals(1, $create->count());
+    $this->assertSame(1, $create->count());
     $client = $create->first();
-    $this->assertEquals("example-id-$random", $client['guid']);
-    $this->assertEquals("example-secret-$random", $client['secret']);
+    $this->assertSame("example-id-$random", $client['guid']);
+    $this->assertSame("example-secret-$random", $client['secret']);
 
     $usePerms(['manage OAuth client']);
     // If we can tighten perm model: $usePerms(['manage OAuth client', 'manage OAuth client secrets']);
     $get = Civi\Api4\OAuthClient::get(FALSE)->addWhere('guid', '=', "example-id-$random")->execute();
-    $this->assertEquals(1, $get->count());
+    $this->assertSame(1, $get->count());
     $client = $get->first();
-    $this->assertEquals("example-id-$random", $client['guid']);
-    $this->assertEquals("example-secret-$random", $client['secret']);
+    $this->assertSame("example-id-$random", $client['guid']);
+    $this->assertSame("example-secret-$random", $client['secret']);
 
     $usePerms(['manage OAuth client']);
     Civi\Api4\OAuthClient::delete(FALSE)->addWhere('guid', '=', "example-id-$random")->execute();
     $get = Civi\Api4\OAuthClient::get(FALSE)->addWhere('guid', '=', "example-id-$random")->execute();
-    $this->assertEquals(0, $get->count());
+    $this->assertSame(0, $get->count());
   }
 
   /**
@@ -83,10 +83,10 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
       'guid' => "example-id-$random" ,
       'secret' => "example-secret-$random",
     ])->execute();
-    $this->assertEquals(1, $create->count());
+    $this->assertSame(1, $create->count());
     $client = $create->first();
-    $this->assertEquals("example-id-$random", $client['guid']);
-    $this->assertEquals("example-secret-$random", $client['secret']);
+    $this->assertSame("example-id-$random", $client['guid']);
+    $this->assertSame("example-secret-$random", $client['secret']);
 
     // With some perms, we can view the client... but not the secret...
     $usePerms(['administer payment processors']);
@@ -94,7 +94,7 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
       ->addWhere('provider', '=', 'test_example_3')
       ->execute()
       ->single();
-    $this->assertEquals("example-id-$random", $client['guid']);
+    $this->assertSame("example-id-$random", $client['guid']);
     $this->assertTrue(empty($client['secret']), 'Should not have read access to secret');
 
     // And if we don't check perms, then the secret is visible...
@@ -103,8 +103,8 @@ class api_v4_OAuthClientTest extends \PHPUnit\Framework\TestCase implements Head
       ->addWhere('provider', '=', 'test_example_3')
       ->execute()
       ->single();
-    $this->assertEquals("example-id-$random", $client['guid']);
-    $this->assertEquals("example-secret-$random", $client['secret']);
+    $this->assertSame("example-id-$random", $client['guid']);
+    $this->assertSame("example-secret-$random", $client['secret']);
   }
 
   public function testCreateBadProvider() {

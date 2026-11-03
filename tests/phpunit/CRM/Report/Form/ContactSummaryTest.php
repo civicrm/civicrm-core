@@ -183,7 +183,7 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
       // check the order of contact IDs
       $this->assertEquals($case['expected_contact_ids'], CRM_Utils_Array::collect('civicrm_contact_id', $rows));
       // check the order clause
-      $this->assertEquals(TRUE, !empty(strstr($sql, $case['expected_orderby_clause'])));
+      $this->assertTrue(!empty(strstr($sql, $case['expected_orderby_clause'])));
       // Ensure that we are only fetching primary fields.
       foreach ($rows as $row) {
         if ($row['civicrm_contact_id'] == $contactIDs['even_street_number_2']) {
@@ -223,7 +223,7 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
     $rows = [];
     $obj->buildRows($sql, $rows);
     $obj->formatDisplay($rows);
-    $this->assertEquals('CiviTest Custom Location Type', $rows[0]['civicrm_address_address_location_type_id']);
+    $this->assertSame('CiviTest Custom Location Type', $rows[0]['civicrm_address_address_location_type_id']);
   }
 
 }

@@ -83,9 +83,9 @@ class MembershipTest extends Api4TestBase implements TransactionalInterface {
     $fields = MembershipType::getFields(FALSE)
       ->setLoadOptions(['name', 'id', 'label'])
       ->execute()->indexBy('name');
-    $this->assertEquals('rolling', $fields['period_type']['options'][0]['name']);
-    $this->assertEquals('rolling', $fields['period_type']['options'][0]['id']);
-    $this->assertEquals('Rolling', $fields['period_type']['options'][0]['label']);
+    $this->assertSame('rolling', $fields['period_type']['options'][0]['name']);
+    $this->assertSame('rolling', $fields['period_type']['options'][0]['id']);
+    $this->assertSame('Rolling', $fields['period_type']['options'][0]['label']);
   }
 
   public function testGetIsMembershipNew() : void {

@@ -112,7 +112,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->setInput('a')
       ->execute();
     $this->assertCount(2, $result);
-    $this->assertEquals('Black', $result[0]['label']);
+    $this->assertSame('Black', $result[0]['label']);
     $this->assertEquals('777777', $result[1]['color']);
     $this->assertEquals($entities[1]['identifier'], $result[1]['id']);
     $this->assertEquals($entities[2]['identifier'], $result[0]['id']);
@@ -122,8 +122,8 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->execute();
     $this->assertCount(1, $result);
     $this->assertEquals($entities[0]['identifier'], $result[0]['id']);
-    $this->assertEquals('ffffff', $result[0]['color']);
-    $this->assertEquals('White', $result[0]['label']);
+    $this->assertSame('ffffff', $result[0]['color']);
+    $this->assertSame('White', $result[0]['label']);
   }
 
   public function testContactIconAutocomplete(): void {
@@ -164,11 +164,11 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
 
     // Contacts will be returned in order by sort_name
     $this->assertStringEndsWith('Both', $result[0]['label']);
-    $this->assertEquals('fa-star', $result[0]['icon']);
+    $this->assertSame('fa-star', $result[0]['icon']);
     $this->assertStringEndsWith('No icon', $result[1]['label']);
-    $this->assertEquals('fa-user', $result[1]['icon']);
+    $this->assertSame('fa-user', $result[1]['icon']);
     $this->assertStringEndsWith('Starry', $result[2]['label']);
-    $this->assertEquals('fa-star', $result[2]['icon']);
+    $this->assertSame('fa-star', $result[2]['icon']);
   }
 
   public function testAutocompleteValidation(): void {
@@ -213,7 +213,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     catch (UnauthorizedException $e) {
       $msg = $e->getMessage();
     }
-    $this->assertEquals('Access denied', $msg);
+    $this->assertSame('Access denied', $msg);
 
     // With hook callback, permissions can be overridden by injecting a trusted filter
     $this->hookCallback = function(\Civi\Api4\Generic\AutocompleteAction $action) {
@@ -239,11 +239,11 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->execute();
 
     $result = $this->runAutocomplete('MockBasicEntity', ['input' => 'est']);
-    $this->assertEquals(3, $this->autocompleteRunCount);
+    $this->assertSame(3, $this->autocompleteRunCount);
     $this->assertCount(count($sampleData), $result);
-    $this->assertEquals('Test 1', $result[0]['label']);
-    $this->assertEquals('Test 11', $result[10]['label']);
-    $this->assertEquals('Test 21', $result[20]['label']);
+    $this->assertSame('Test 1', $result[0]['label']);
+    $this->assertSame('Test 11', $result[10]['label']);
+    $this->assertSame('Test 21', $result[20]['label']);
   }
 
   public function testAutocompleteWithDifferentKey(): void {
@@ -262,17 +262,17 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->setKey('name')
       ->execute();
 
-    $this->assertEquals('a', $result1[0]['id']);
-    $this->assertEquals('b', $result1[1]['id']);
-    $this->assertEquals('c', $result1[2]['id']);
+    $this->assertSame('a', $result1[0]['id']);
+    $this->assertSame('b', $result1[1]['id']);
+    $this->assertSame('c', $result1[2]['id']);
 
     // Try searching by ID - should only get one result
     $result1 = SavedSearch::autocomplete()
       ->setInput((string) $sample['b']['id'])
       ->setKey('name')
       ->execute();
-    $this->assertEquals(1, $result1->countFetched());
-    $this->assertEquals('b', $result1[0]['id']);
+    $this->assertSame(1, $result1->countFetched());
+    $this->assertSame('b', $result1[0]['id']);
 
     // This key won't be used since api_entity is not a unique index
     $result2 = SavedSearch::autocomplete()
@@ -354,7 +354,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->setFormName('crmMailing.1')
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('Second Star', $result[0]['label']);
+    $this->assertSame('Second Star', $result[0]['label']);
   }
 
   public function testMailingAutocompleteWithSpecialCharacter(): void {
@@ -372,7 +372,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->setFormName('crmMailing.1')
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('Donors contributed > $100', $result[0]['label']);
+    $this->assertSame('Donors contributed > $100', $result[0]['label']);
   }
 
   public function testMailingRecipientsAutocomplete(): void {
@@ -471,7 +471,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
     ]);
 
     $this->assertCount(1, $result);
-    $this->assertEquals('Able, Alpha - Righto', $result[0]['label']);
+    $this->assertSame('Able, Alpha - Righto', $result[0]['label']);
     $this->assertEquals('#' . $customValues[0]['id'], $result[0]['description'][0]);
   }
 
@@ -661,12 +661,12 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
 
     // Results should be ordered by start_date DESC (most recent first)
     $this->assertEquals($events[1]['id'], $result[0]['id']);
-    $this->assertEquals("$title Beta", $result[0]['label']);
+    $this->assertSame("$title Beta", $result[0]['label']);
     $this->assertEquals(\CRM_Utils_Date::customFormat('2026-06-20 14:00:00'), $result[0]['description'][1]);
     $this->assertNotContains('Beta Description', $result[0]['description']);
 
     $this->assertEquals($events[0]['id'], $result[1]['id']);
-    $this->assertEquals("$title Alpha", $result[1]['label']);
+    $this->assertSame("$title Alpha", $result[1]['label']);
     $this->assertEquals(\CRM_Utils_Date::customFormat('2026-01-15 10:00:00'), $result[1]['description'][1]);
     $this->assertNotContains('Alpha Description', $result[1]['description']);
   }

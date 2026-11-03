@@ -36,7 +36,7 @@ class RequiredFieldTest extends Api4TestBase implements TransactionalInterface {
     catch (\CRM_Core_Exception $e) {
       $msg = $e->getMessage();
     }
-    $this->assertEquals('Mandatory values missing from Api4 Event::create: title, event_type_id, start_date', $msg);
+    $this->assertSame('Mandatory values missing from Api4 Event::create: title, event_type_id, start_date', $msg);
   }
 
 }

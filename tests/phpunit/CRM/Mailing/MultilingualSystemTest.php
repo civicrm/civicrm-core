@@ -193,7 +193,7 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
     // Now extract the unsubscribe details.
     $message = end($allMessages);
     $this->assertTrue($message->body instanceof ezcMailText);
-    $this->assertEquals('plain', $message->body->subType);
+    $this->assertSame('plain', $message->body->subType);
     $this->assertEquals(1, preg_match(
       '@mailing/unsubscribe.*jid=(\d+)&qid=(\d+)&h=([0-9a-z]+)@',
       $message->body->text,

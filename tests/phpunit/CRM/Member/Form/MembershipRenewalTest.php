@@ -330,7 +330,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       ->processForm();
 
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual'], 'membership_type_id' => $this->ids['MembershipType']['annual_fixed']]);
-    $this->assertEquals('2020-04-13', $membership['join_date']);
+    $this->assertSame('2020-04-13', $membership['join_date']);
     $this->assertEquals(CRM_Utils_Time::date('Y-01-01'), $membership['start_date']);
     $nextYear = (int) CRM_Utils_Time::date('Y') + 1;
     $this->assertEquals(CRM_Utils_Time::date($nextYear . '-01-31'), $membership['end_date']);
@@ -367,7 +367,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals($paymentInstrumentID, $contribution['payment_instrument_id']);
 
-    $this->assertEquals('kettles boil water', $contribution['trxn_id']);
+    $this->assertSame('kettles boil water', $contribution['trxn_id']);
     $this->assertEquals(.29, $contribution['fee_amount']);
     $this->assertEquals(7800.90, $contribution['total_amount']);
     $this->assertEquals(7800.61, $contribution['net_amount']);
@@ -663,7 +663,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       ->addSelect('contact_id', 'contribution_status_id:name')
       ->addWhere('contact_id', '=', $payerID)
       ->execute()->single();
-    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+    $this->assertSame('Completed', $contribution['contribution_status_id:name']);
     $this->assertEquals($this->ids['Contact']['individual'], ContributionSoft::get(FALSE)
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single()['contact_id']);
@@ -878,7 +878,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     ], ['cid' => $this->ids['Contact']['individual'], 'id' => $originalMembership['id']])
       ->processForm();
     $renewedMembership = $this->callAPISuccessGetSingle('Membership', ['id' => $originalMembership['id']]);
-    $this->assertEquals('sauce', $renewedMembership['source']);
+    $this->assertSame('sauce', $renewedMembership['source']);
     $this->assertEquals(CRM_Utils_Time::date('Y-01-01'), $renewedMembership['start_date']);
     $this->assertEquals(CRM_Utils_Time::date('2019-03-01'), $renewedMembership['join_date']);
     $this->assertEquals(CRM_Utils_Time::date('Y-12-31'), $renewedMembership['end_date']);

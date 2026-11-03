@@ -52,18 +52,18 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
     else {
       $result = Civi\Api4\OAuthClient::authorizationCode()->addWhere('id', '=', $client['id'])->execute();
     }
-    $this->assertEquals(1, $result->count());
+    $this->assertSame(1, $result->count());
     foreach ($result as $ac) {
-      $this->assertEquals('query', $ac['response_mode']);
+      $this->assertSame('query', $ac['response_mode']);
       $url = parse_url($ac['url']);
-      $this->assertEquals('example.com', $url['host']);
-      $this->assertEquals('/one/auth', $url['path']);
+      $this->assertSame('example.com', $url['host']);
+      $this->assertSame('/one/auth', $url['path']);
       \parse_str($url['query'], $actualQuery);
-      $this->assertEquals('code', $actualQuery['response_type']);
+      $this->assertSame('code', $actualQuery['response_type']);
       $this->assertMatchesRegularExpression(';^CC_[a-zA-Z0-9]+$;', $actualQuery['state']);
       $this->assertEquals($scopeToUse ?: 'scope-1-foo,scope-1-bar', $actualQuery['scope']);
       // ? // $this->assertEquals('auto', $actualQuery['approval_prompt']);
-      $this->assertEquals('example-id', $actualQuery['client_id']);
+      $this->assertSame('example-id', $actualQuery['client_id']);
       $this->assertTrue(empty($actualQuery['response_mode']), 'response_mode should be empty');
       $this->assertMatchesRegularExpression(';civicrm/oauth-client/return;', $actualQuery['redirect_uri']);
     }
@@ -97,20 +97,20 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       ->addWhere('id', '=', $client['id'])
       ->setResponseMode('web_message')
       ->execute();
-    $this->assertEquals(1, $result->count());
+    $this->assertSame(1, $result->count());
     foreach ($result as $ac) {
-      $this->assertEquals('web_message', $ac['response_mode']);
+      $this->assertSame('web_message', $ac['response_mode']);
 
       $url = parse_url($ac['url']);
-      $this->assertEquals('example.com', $url['host']);
-      $this->assertEquals('/three/auth', $url['path']);
+      $this->assertSame('example.com', $url['host']);
+      $this->assertSame('/three/auth', $url['path']);
       \parse_str($url['query'], $actualQuery);
-      $this->assertEquals('code', $actualQuery['response_type']);
+      $this->assertSame('code', $actualQuery['response_type']);
       $this->assertMatchesRegularExpression(';^CC_[a-zA-Z0-9]+$;', $actualQuery['state']);
-      $this->assertEquals('scope-3-foo,scope-3-bar', $actualQuery['scope']);
+      $this->assertSame('scope-3-foo,scope-3-bar', $actualQuery['scope']);
       // ? // $this->assertEquals('auto', $actualQuery['approval_prompt']);
-      $this->assertEquals('example-id', $actualQuery['client_id']);
-      $this->assertEquals('web_message', $actualQuery['response_mode']);
+      $this->assertSame('example-id', $actualQuery['client_id']);
+      $this->assertSame('web_message', $actualQuery['response_mode']);
       $this->assertMatchesRegularExpression(';civicrm/oauth-client/return;', $actualQuery['redirect_uri']);
       $this->assertEquals($actualQuery['redirect_uri'], $ac['redirect_uri']);
     }
@@ -208,7 +208,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       return;
     }
 
-    $this->assertEquals('civicrm/oauth-client/start', $this->extractRoute($ac['url']), "Expected URL for start page");
+    $this->assertSame('civicrm/oauth-client/start', $this->extractRoute($ac['url']), "Expected URL for start page");
     $this->assertStringContainsString('state=CC_', $ac['url']);
 
     try {
@@ -263,7 +263,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       ->addWhere('id', '=', $client['id'])
       ->execute()
       ->single();
-    $this->assertEquals('test_example_3', $get['provider']);
+    $this->assertSame('test_example_3', $get['provider']);
 
     // But we cannot add new tokens... with any of the standard grant-types...
 
@@ -304,7 +304,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
       'guid' => "example-id",
       'secret' => "example-secret",
     ])->execute();
-    $this->assertEquals(1, $create->count());
+    $this->assertSame(1, $create->count());
     $client = $create->first();
     $this->assertTrue(!empty($client['id']));
     return $client;

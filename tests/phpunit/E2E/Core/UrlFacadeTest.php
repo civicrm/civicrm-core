@@ -114,10 +114,10 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
     ];
     foreach ($invalidEmails as $email) {
       $localRender = (string) Civi::url('mailto:' . $email);
-      $this->assertEquals('', $localRender, "(Local render) Invalid mailto for '$email' should render as empty string");
+      $this->assertSame('', $localRender, "(Local render) Invalid mailto for '$email' should render as empty string");
 
       $remoteRender = $this->remote(__FUNCTION__, fn($e) => (string) Civi::url('mailto:' . $e), [$email]);
-      $this->assertEquals('', $remoteRender, "(Remote render) Invalid mailto for '$email' should render as empty string");
+      $this->assertSame('', $remoteRender, "(Remote render) Invalid mailto for '$email' should render as empty string");
     }
   }
 
@@ -295,9 +295,9 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
         ->merge($url, ['path', 'query', 'fragment', 'fragmentQuery', 'flags']);
     });
 
-    $this->assertEquals('https://example.com/base/foo', Civi::url('custom://foo')->__toString());
-    $this->assertEquals('https://example.com/base/foo/bar?x=1', Civi::url('custom://foo/bar?x=1')->__toString());
-    $this->assertEquals('https://example.com/base/foo/bar#whiz', Civi::url('custom://foo/bar#whiz')->__toString());
+    $this->assertSame('https://example.com/base/foo', Civi::url('custom://foo')->__toString());
+    $this->assertSame('https://example.com/base/foo/bar?x=1', Civi::url('custom://foo/bar?x=1')->__toString());
+    $this->assertSame('https://example.com/base/foo/bar#whiz', Civi::url('custom://foo/bar#whiz')->__toString());
   }
 
   public function testCustomSchemeDirty(): void {
@@ -307,22 +307,22 @@ class UrlFacadeTest extends \CiviEndToEndTestCase {
         ->merge($url, ['query', 'fragment', 'fragmentQuery', 'flags']);
     });
 
-    $this->assertEquals('https://example.com/dirty.jsp?q=foo', Civi::url('custom://foo')->__toString());
-    $this->assertEquals('https://example.com/dirty.jsp?q=foo%2Fbar&x=1', Civi::url('custom://foo/bar?x=1')->__toString());
-    $this->assertEquals('https://example.com/dirty.jsp?q=foo%2Fbar#whiz', Civi::url('custom://foo/bar#whiz')->__toString());
+    $this->assertSame('https://example.com/dirty.jsp?q=foo', Civi::url('custom://foo')->__toString());
+    $this->assertSame('https://example.com/dirty.jsp?q=foo%2Fbar&x=1', Civi::url('custom://foo/bar?x=1')->__toString());
+    $this->assertSame('https://example.com/dirty.jsp?q=foo%2Fbar#whiz', Civi::url('custom://foo/bar#whiz')->__toString());
   }
 
   public function testNonSslRequestKeepsScheme(): void {
     $this->addPlainRenderers();
     $this->pushGlobals(['_SERVER' => ['HTTPS' => 'off', 'HTTP_X_FORWARDED_PROTO' => '']]);
-    $this->assertEquals('https://example.com/foo', (string) Civi::url('plainhttps://foo'));
-    $this->assertEquals('http://example.com/foo', (string) Civi::url('plainhttp://foo'));
+    $this->assertSame('https://example.com/foo', (string) Civi::url('plainhttps://foo'));
+    $this->assertSame('http://example.com/foo', (string) Civi::url('plainhttp://foo'));
   }
 
   public function testSslRequestUpgradesToHttps(): void {
     $this->addPlainRenderers();
     $this->pushGlobals(['_SERVER' => ['HTTPS' => 'on']]);
-    $this->assertEquals('https://example.com/foo', (string) Civi::url('plainhttp://foo'));
+    $this->assertSame('https://example.com/foo', (string) Civi::url('plainhttp://foo'));
   }
 
   /**

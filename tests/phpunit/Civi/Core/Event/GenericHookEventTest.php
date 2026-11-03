@@ -16,7 +16,7 @@ class GenericHookEventTest extends \CiviUnitTestCase {
       'nothingZero' => 0,
     ]);
     $this->assertEquals(123, $event->ab);
-    $this->assertEquals('bar', $event->cd['foo']);
+    $this->assertSame('bar', $event->cd['foo']);
     $this->assertTrue($event->hasField('ab'));
     $this->assertTrue(isset($event->ab));
     $this->assertFalse($event->hasField('abc'));
@@ -32,7 +32,7 @@ class GenericHookEventTest extends \CiviUnitTestCase {
       [456, ['whiz' => 'bang'], NULL, 0, $null]
     );
     $this->assertEquals(456, $event->alpha);
-    $this->assertEquals('bang', $event->beta['whiz']);
+    $this->assertSame('bang', $event->beta['whiz']);
     $this->assertTrue($event->hasField('alpha'));
     $this->assertTrue(isset($event->alpha));
     $this->assertFalse($event->hasField('ab'));
@@ -57,12 +57,12 @@ class GenericHookEventTest extends \CiviUnitTestCase {
 
     $returnValue = $this->hookStub($roString, $rwString, $roArray, $rwArray, $plainObj, $refObj);
 
-    $this->assertEquals('readonly', $roString);
-    $this->assertEquals('readwrite added-string-via-event added-string-via-hook', $rwString);
+    $this->assertSame('readonly', $roString);
+    $this->assertSame('readwrite added-string-via-event added-string-via-hook', $rwString);
     $this->assertEquals(['readonly'], $roArray);
     $this->assertEquals(['readwrite', 'added-to-array-via-event', 'added-to-array-via-hook'], $rwArray);
-    $this->assertEquals('added-to-object-via-hook', $plainObj->prop1);
-    $this->assertEquals('added-to-object-via-hook', $refObj->prop2);
+    $this->assertSame('added-to-object-via-hook', $plainObj->prop1);
+    $this->assertSame('added-to-object-via-hook', $refObj->prop2);
     $this->assertEquals(['early-running-result', 'late-running-result'], $returnValue);
   }
 

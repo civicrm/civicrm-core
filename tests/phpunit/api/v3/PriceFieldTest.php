@@ -139,7 +139,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
   public function testGetFieldsPriceField(int $version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
-    $this->assertEquals('number of options per line for checkbox and radio', $result['values']['options_per_line']['description']);
+    $this->assertSame('number of options per line for checkbox and radio', $result['values']['options_per_line']['description']);
   }
 
   /**

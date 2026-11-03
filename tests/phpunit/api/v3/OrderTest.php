@@ -282,7 +282,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
         ['line_item.contribution_id', '=', $order['id']]
       )
       ->addSelect('status_id')->execute() as $item) {
-      $this->assertEquals('Paid', CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialItem', 'status_id', $item['status_id']));
+      $this->assertSame('Paid', CRM_Core_PseudoConstant::getName('CRM_Financial_BAO_FinancialItem', 'status_id', $item['status_id']));
     }
   }
 
@@ -524,7 +524,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $this->checkPaymentResult($order, $expectedResult);
     $paymentParticipant = $this->callAPISuccessGetSingle('ParticipantPayment', ['contribution_id' => $order['id']]);
     $participant = $this->callAPISuccessGetSingle('Participant', ['participant_id' => $paymentParticipant['participant_id']]);
-    $this->assertEquals('Pending (incomplete transaction)', $participant['participant_status']);
+    $this->assertSame('Pending (incomplete transaction)', $participant['participant_status']);
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $order['id'],
     ]);
@@ -567,7 +567,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $paymentParticipant = $this->callAPISuccess('ParticipantPayment', 'get', $orderParams)['values'];
     $this->assertCount(2, $paymentParticipant, 'Expected two participant payments');
     $participant = $this->callAPISuccessGetSingle('Participant', ['participant_id' => end($paymentParticipant)['participant_id']]);
-    $this->assertEquals('Pending from approval', $participant['participant_status']);
+    $this->assertSame('Pending from approval', $participant['participant_status']);
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $order['id'],
     ]);
@@ -842,7 +842,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
    */
   public function testCreateWithChainedPayment(): void {
     $contributionID = $this->callAPISuccess('Order', 'create', ['contact_id' => $this->ids['Contact']['individual_0'], 'total_amount' => 5, 'financial_type_id' => $this->getFinancialTypeID('Member Dues'), 'contribution_status_id' => 'Pending', 'api.Payment.create' => ['total_amount' => 5]])['id'];
-    $this->assertEquals('Completed', $this->callAPISuccessGetValue('Contribution', ['id' => $contributionID, 'return' => 'contribution_status']));
+    $this->assertSame('Completed', $this->callAPISuccessGetValue('Contribution', ['id' => $contributionID, 'return' => 'contribution_status']));
   }
 
   /**

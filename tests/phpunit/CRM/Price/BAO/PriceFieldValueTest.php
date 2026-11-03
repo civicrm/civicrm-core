@@ -23,7 +23,7 @@ class CRM_Price_BAO_PriceFieldValueTest extends CiviUnitTestCase {
     $fields = CRM_Price_DAO_PriceFieldValue::fields();
 
     $this->assertArrayKeyExists('visibility_id', $fields);
-    $this->assertEquals('visibility', $fields['visibility_id']['pseudoconstant']['optionGroupName']);
+    $this->assertSame('visibility', $fields['visibility_id']['pseudoconstant']['optionGroupName']);
   }
 
   public function testEmptyStringLabel(): void {

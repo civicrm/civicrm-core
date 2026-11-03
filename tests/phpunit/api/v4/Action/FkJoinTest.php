@@ -148,8 +148,8 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('country_id:name', 'country_id:label')
       ->execute()
       ->first();
-    $this->assertEquals('FR', $address['country_id:name']);
-    $this->assertEquals('France', $address['country_id:label']);
+    $this->assertSame('FR', $address['country_id:name']);
+    $this->assertSame('France', $address['country_id:label']);
   }
 
   public function testImplicitJoinOnExplicitJoin(): void {
@@ -165,7 +165,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('id', 'address.country_id.iso_code')
       ->execute();
     $this->assertCount(1, $contacts);
-    $this->assertEquals('US', $contacts[0]['address.country_id.iso_code']);
+    $this->assertSame('US', $contacts[0]['address.country_id.iso_code']);
   }
 
   public function testExcludeJoin(): void {
@@ -189,7 +189,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     catch (\CRM_Core_Exception $e) {
       $message = $e->getMessage();
     }
-    $this->assertEquals('Illegal join alias: "a"', $message);
+    $this->assertSame('Illegal join alias: "a"', $message);
 
     // Not allowed to use dots in the alias
     try {
@@ -198,7 +198,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     catch (\CRM_Core_Exception $e) {
       $message = $e->getMessage();
     }
-    $this->assertEquals('Illegal join alias: "add.ress"', $message);
+    $this->assertSame('Illegal join alias: "add.ress"', $message);
 
     // Not allowed to use an alias > 256 characters
     try {
@@ -208,7 +208,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     catch (\CRM_Core_Exception $e) {
       $message = $e->getMessage();
     }
-    $this->assertEquals("Illegal join alias: \"$longAlias\"", $message);
+    $this->assertSame("Illegal join alias: \"$longAlias\"", $message);
 
     // Alpha-numeric with dashes 256 characters long - weird but allowed
     $okAlias = str_repeat('-0_a-9Z_', 32);
@@ -247,11 +247,11 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->setDebug(TRUE)
       ->execute();
     $this->assertCount(5, $contacts);
-    $this->assertEquals('Home', $contacts[0]['any_email.location_type_id:name']);
-    $this->assertEquals('yoohoo@yahoo.test', $contacts[1]['primary_email.email']);
-    $this->assertEquals('1@test.test', $contacts[2]['primary_email.email']);
-    $this->assertEquals('1@test.test', $contacts[3]['primary_email.email']);
-    $this->assertEquals('1@test.test', $contacts[4]['primary_email.email']);
+    $this->assertSame('Home', $contacts[0]['any_email.location_type_id:name']);
+    $this->assertSame('yoohoo@yahoo.test', $contacts[1]['primary_email.email']);
+    $this->assertSame('1@test.test', $contacts[2]['primary_email.email']);
+    $this->assertSame('1@test.test', $contacts[3]['primary_email.email']);
+    $this->assertSame('1@test.test', $contacts[4]['primary_email.email']);
   }
 
   public function testBridgeJoinTags(): void {
@@ -320,18 +320,18 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', 'IN', [$cid1, $cid2, $cid3])
       ->addGroupBy('id')
       ->execute()->indexBy('id');
-    $this->assertEquals(1, (int) $grouped[$cid1]['tag_count']);
-    $this->assertEquals(2, (int) $grouped[$cid2]['tag_count']);
-    $this->assertEquals(0, (int) $grouped[$cid3]['tag_count']);
+    $this->assertSame(1, (int) $grouped[$cid1]['tag_count']);
+    $this->assertSame(2, (int) $grouped[$cid2]['tag_count']);
+    $this->assertSame(0, (int) $grouped[$cid3]['tag_count']);
 
     $reverse = Tag::get(FALSE)
       ->addJoin('Contact', FALSE, 'EntityTag', ['contact.id', 'IN', [$cid1, $cid2, $cid3]])
       ->addGroupBy('id')
       ->addSelect('name', 'COUNT(contact.id) AS contacts')
       ->execute()->indexBy('name');
-    $this->assertEquals(2, (int) $reverse[$tag1]['contacts']);
-    $this->assertEquals(1, (int) $reverse[$tag2]['contacts']);
-    $this->assertEquals(1, (int) $reverse[$tag3]['contacts']);
+    $this->assertSame(2, (int) $reverse[$tag1]['contacts']);
+    $this->assertSame(1, (int) $reverse[$tag2]['contacts']);
+    $this->assertSame(1, (int) $reverse[$tag3]['contacts']);
   }
 
   public function testBridgeJoinRelationshipContactActivity(): void {
@@ -449,8 +449,8 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       $this->assertEquals($cid1, $result[0]['id']);
       $this->assertEquals($cid2, $result[1]['id']);
       $this->assertEquals($cid3, $result[1]['Contact_RelationshipCache_Contact_01.id']);
-      $this->assertEquals(TRUE, $result[0]['Contact_RelationshipCache_Contact_01.is_current']);
-      $this->assertEquals(FALSE, $result[1]['Contact_RelationshipCache_Contact_01.is_current']);
+      $this->assertTrue($result[0]['Contact_RelationshipCache_Contact_01.is_current']);
+      $this->assertFalse($result[1]['Contact_RelationshipCache_Contact_01.is_current']);
     }
   }
 
@@ -473,14 +473,14 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('employer_id', 'employer_id.display_name')
       ->execute()->first();
     $this->assertEquals($employer, $contactGet['employer_id']);
-    $this->assertEquals('TesterCo', $contactGet['employer_id.display_name']);
+    $this->assertSame('TesterCo', $contactGet['employer_id.display_name']);
 
     $emailGet = Email::get(FALSE)
       ->addWhere('id', '=', $email)
       ->addSelect('contact_id.employer_id', 'contact_id.employer_id.display_name')
       ->execute()->first();
     $this->assertEquals($employer, $emailGet['contact_id.employer_id']);
-    $this->assertEquals('TesterCo', $emailGet['contact_id.employer_id.display_name']);
+    $this->assertSame('TesterCo', $emailGet['contact_id.employer_id.display_name']);
   }
 
   public function testJoinWithExpression(): void {

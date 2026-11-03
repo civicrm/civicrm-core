@@ -85,9 +85,9 @@ class CustomValueTest extends Api4TestBase {
     $this->assertEquals(['CustomValue', 'DAOEntity'], $entity['type']);
     $this->assertEquals(['id'], $entity['primary_key']);
     $this->assertEquals($customGroup['table_name'], $entity['table_name']);
-    $this->assertEquals('Civi\Api4\CustomValue', $entity['class']);
+    $this->assertSame('Civi\Api4\CustomValue', $entity['class']);
     $this->assertEquals([$group], $entity['class_args']);
-    $this->assertEquals('secondary', $entity['searchable']);
+    $this->assertSame('secondary', $entity['searchable']);
 
     // Retrieve and check the fields of CustomValue = Custom_$group
     $fields = CustomValue::getFields($group, FALSE)->setLoadOptions(TRUE)->execute();
@@ -182,7 +182,7 @@ class CustomValueTest extends Api4TestBase {
       ->execute();
 
     // check if two custom values are created
-    $this->assertEquals(2, count($result));
+    $this->assertSame(2, count($result));
     $expectedResult = [
       [
         'id' => 1,
@@ -226,8 +226,8 @@ class CustomValueTest extends Api4TestBase {
       ->addWhere("id", "=", 1)
       ->execute()
       ->first();
-    $this->assertEquals('b', $result[$colorFieldName]);
-    $this->assertEquals(NULL, $result[$refFieldName]);
+    $this->assertSame('b', $result[$colorFieldName]);
+    $this->assertNull($result[$refFieldName]);
 
     // CASE 3: Test CustomValue::replace
     // create a second contact which will be used to replace the custom values, created earlier
@@ -247,7 +247,7 @@ class CustomValueTest extends Api4TestBase {
     $result = CustomValue::get($group)
       ->addSelect('id', 'entity_id', $colorFieldName, $colorFieldName . ':label', $multiFieldName, $multiFieldName . ':label', $refFieldName)
       ->execute();
-    $this->assertEquals(1, count($result));
+    $this->assertSame(1, count($result));
 
     $expectedResult = [
       [
@@ -281,7 +281,7 @@ class CustomValueTest extends Api4TestBase {
     CustomValue::delete($group)->addWhere("id", "=", 3)->execute();
     $result = CustomValue::get($group)->execute();
     // check that there are no custom values present
-    $this->assertEquals(0, count($result));
+    $this->assertSame(0, count($result));
   }
 
   /**

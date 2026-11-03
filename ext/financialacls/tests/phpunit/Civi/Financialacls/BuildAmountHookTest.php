@@ -39,7 +39,7 @@ class BuildAmountHookTest extends BaseTestClass {
     $fields = $form->getPriceFieldMetadata();
     $priceField = reset($fields);
     $this->assertCount(1, $priceField['options']);
-    $this->assertEquals('a', reset($priceField['options'])['name']);
+    $this->assertSame('a', reset($priceField['options'])['name']);
   }
 
 }

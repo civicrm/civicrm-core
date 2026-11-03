@@ -54,9 +54,9 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
     CRM_Extension_System::singleton()->getBrowser()->refresh();
 
     $result = $this->callAPISuccess('extension', 'getremote', []);
-    $this->assertEquals('org.civicrm.module.cividiscount', $result['values'][0]['key']);
-    $this->assertEquals('module', $result['values'][0]['type']);
-    $this->assertEquals('CiviDiscount', $result['values'][0]['name']);
+    $this->assertSame('org.civicrm.module.cividiscount', $result['values'][0]['key']);
+    $this->assertSame('module', $result['values'][0]['type']);
+    $this->assertSame('CiviDiscount', $result['values'][0]['name']);
 
     $this->assertEquals(['http://localhost:9999/fake-repo/single'], $this->getRequestUrls());
   }
@@ -67,9 +67,9 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    */
   public function testExtensionGetSingleExtension(): void {
     $result = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.moduletest']);
-    $this->assertEquals('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
-    $this->assertEquals('module', $result['values'][$result['id']]['type']);
-    $this->assertEquals('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
+    $this->assertSame('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
+    $this->assertSame('module', $result['values'][$result['id']]['type']);
+    $this->assertSame('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
   }
 
   /**
@@ -78,10 +78,10 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    */
   public function testSingleExtensionGetWithReturnFields(): void {
     $result = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.moduletest', 'return' => ['name', 'status', 'key']]);
-    $this->assertEquals('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
+    $this->assertSame('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
     $this->assertFalse(isset($result['values'][$result['id']]['type']));
-    $this->assertEquals('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
-    $this->assertEquals('uninstalled', $result['values'][$result['id']]['status']);
+    $this->assertSame('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
+    $this->assertSame('uninstalled', $result['values'][$result['id']]['status']);
   }
 
   /**

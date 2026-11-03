@@ -101,7 +101,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input);
     $this->assertIsArray($msg, 'Message returned as an array in line');
-    $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
+    $this->assertSame('Mr. Anthony Anderson II', $msg['to']);
     $this->assertStringContainsString('General', $msg['html']);
   }
 
@@ -117,7 +117,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input);
-    $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
+    $this->assertSame('Mr. Anthony Anderson II', $msg['to']);
     $this->assertStringContainsString('General', $msg['html']);
 
     $this->ids['contact'] = $this->_contactId = $this->_contributionParams['contact_id'] = $this->individualCreate(['prefix_id' => 'Dr.', 'first_name' => 'Donald', 'last_name' => 'Duck', 'email' => 'the-don@duckville.com']);
@@ -130,7 +130,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input);
-    $this->assertEquals('Dr. Donald Duck II', $msg['to']);
+    $this->assertSame('Dr. Donald Duck II', $msg['to']);
     $this->assertStringContainsString('Fowl', $msg['html']);
   }
 
@@ -145,7 +145,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input);
     $this->assertIsArray($msg, 'Message not returned as an array');
-    $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
+    $this->assertSame('Mr. Anthony Anderson II', $msg['to']);
     $this->assertStringContainsString('General', $msg['html']);
   }
 
@@ -157,7 +157,7 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $this->_contributionId;
     $msg = $contribution->composeMessageArray($this->input);
-    $this->assertEquals('Mr. Anthony Anderson II', $msg['to']);
+    $this->assertSame('Mr. Anthony Anderson II', $msg['to']);
     $this->assertStringContainsString('Thank you for your registration', $msg['html']);
   }
 

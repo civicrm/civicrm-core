@@ -83,7 +83,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
     $this->assertEquals(self::$_recordedValues, []);
     $this->assertQueueStats(3, 3, 0, $this->queue);
     $result = $runner->runAll();
-    $this->assertEquals(TRUE, $result);
+    $this->assertTrue($result);
     $this->assertEquals(self::$_recordedValues, ['a', 'b', 'c']);
     $this->assertQueueStats(0, 0, 0, $this->queue);
   }
@@ -119,7 +119,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
     $this->assertEquals(self::$_recordedValues, []);
     $this->assertQueueStats(3, 3, 0, $this->queue);
     $result = $runner->runAll();
-    $this->assertEquals(TRUE, $result);
+    $this->assertTrue($result);
     $this->assertEquals(self::$_recordedValues, ['a', 1, 2, 3, 'b']);
     $this->assertQueueStats(0, 0, 0, $this->queue);
   }
@@ -156,7 +156,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
 
     $result = $runner->runAll();
     // FIXME useless return
-    $this->assertEquals(TRUE, $result);
+    $this->assertTrue($result);
     $this->assertEquals(self::$_recordedValues, ['a', 'c']);
     $this->assertQueueStats(0, 0, 0, $this->queue);
   }

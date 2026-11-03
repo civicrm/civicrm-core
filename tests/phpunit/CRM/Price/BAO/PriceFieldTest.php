@@ -112,7 +112,7 @@ class CRM_Price_BAO_PriceFieldTest extends CiviUnitTestCase {
       $this->fail('The error should reach the caller');
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertEquals('Ruh-roh', $e->getMessage());
+      $this->assertSame('Ruh-roh', $e->getMessage());
     }
     $this->assertDBQuery(0, 'SELECT COUNT(*) FROM civicrm_price_field WHERE price_set_id = %1', [1 => [$priceSetID, 'Integer']]);
   }

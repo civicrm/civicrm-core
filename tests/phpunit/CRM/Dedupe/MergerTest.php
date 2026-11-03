@@ -838,7 +838,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'other' => 'SMS, Fax',
       'title' => 'Preferred Communication Method',
     ], $rows['move_preferred_communication_method']);
-    $this->assertEquals('45', $rowsElementsAndInfo['migration_info']['move_preferred_communication_method']);
+    $this->assertSame('45', $rowsElementsAndInfo['migration_info']['move_preferred_communication_method']);
   }
 
   /**
@@ -1713,10 +1713,10 @@ WHERE
       'contact_id_b' => $organizationToKeepID,
     ]);
     $employerName = Contact::get()->addSelect('organization_name')->addWhere('id', '=', $individualToKeepID)->execute()->first()['organization_name'];
-    $this->assertEquals('remove', $employerName);
+    $this->assertSame('remove', $employerName);
     $this->mergeContacts($individualToKeepID, $individualToRemoveID, ['move_employer_id' => $organizationToKeepID, 'move_rel_table_relationships' => TRUE]);
     $employerName = Contact::get()->addSelect('organization_name')->addWhere('id', '=', $individualToKeepID)->execute()->first()['organization_name'];
-    $this->assertEquals('keep', $employerName);
+    $this->assertSame('keep', $employerName);
   }
 
   /**
@@ -1731,10 +1731,10 @@ WHERE
       'contact_id_b' => $organizationToRemoveID,
     ]);
     $employerName = Contact::get()->addSelect('organization_name')->addWhere('id', '=', $individualID)->execute()->first()['organization_name'];
-    $this->assertEquals('remove', $employerName);
+    $this->assertSame('remove', $employerName);
     $this->callAPISuccess('Contact', 'merge', ['to_keep_id' => $organizationToKeepID, 'to_remove_id' => $organizationToRemoveID, 'mode' => 'aggressive']);
     $employerName = Contact::get()->addSelect('organization_name')->addWhere('id', '=', $individualID)->execute()->first()['organization_name'];
-    $this->assertEquals('keep', $employerName);
+    $this->assertSame('keep', $employerName);
   }
 
   /**

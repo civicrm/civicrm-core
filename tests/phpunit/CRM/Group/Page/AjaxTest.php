@@ -91,7 +91,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
       $groups = $e->errorData;
     }
     $this->assertEquals(1, $groups['recordsTotal']);
-    $this->assertEquals('not-me-active', $groups['data'][0]['title']);
+    $this->assertSame('not-me-active', $groups['data'][0]['title']);
     // Search on just smart groups keeping the title filter
     $_GET['savedSearch'] = 1;
     try {
@@ -110,7 +110,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
       $groups = $e->errorData;
     }
     $this->assertEquals(1, $groups['recordsTotal']);
-    $this->assertEquals('not-me-active', $groups['data'][0]['title']);
+    $this->assertSame('not-me-active', $groups['data'][0]['title']);
     unset($_GET['title'], $_GET['savedSearch']);
 
     // Check on status.
@@ -122,7 +122,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
       $groups = $e->errorData;
     }
     foreach ($groups['data'] as $val) {
-      $this->assertEquals('crm-entity disabled', $val['DT_RowClass']);
+      $this->assertSame('crm-entity disabled', $val['DT_RowClass']);
     }
   }
 
@@ -134,8 +134,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(2, $groups['recordsTotal']);
-    $this->assertEquals('not-me-active', $groups['data'][0]['title']);
-    $this->assertEquals('pick-me-active', $groups['data'][1]['title']);
+    $this->assertSame('not-me-active', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][1]['title']);
   }
 
   /**
@@ -171,8 +171,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(2, $groups['recordsTotal']);
-    $this->assertEquals('pick-me-active', $groups['data'][0]['title']);
-    $this->assertEquals('pick-me-disabled', $groups['data'][1]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-disabled', $groups['data'][1]['title']);
   }
 
   /**
@@ -194,8 +194,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(2, $groups['recordsTotal']);
-    $this->assertEquals('not-me-active', $groups['data'][0]['title']);
-    $this->assertEquals('pick-me-active', $groups['data'][1]['title']);
+    $this->assertSame('not-me-active', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][1]['title']);
   }
 
   /**
@@ -207,8 +207,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(2, $groups['recordsTotal']);
-    $this->assertEquals('not-me-active', $groups['data'][0]['title']);
-    $this->assertEquals('pick-me-active', $groups['data'][1]['title']);
+    $this->assertSame('not-me-active', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][1]['title']);
   }
 
   /**
@@ -220,8 +220,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(2, $groups['recordsTotal']);
-    $this->assertEquals('not-me-disabled', $groups['data'][0]['title']);
-    $this->assertEquals('pick-me-disabled', $groups['data'][1]['title']);
+    $this->assertSame('not-me-disabled', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-disabled', $groups['data'][1]['title']);
   }
 
   /**
@@ -234,7 +234,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(1, $groups['recordsTotal']);
-    $this->assertEquals('not-me-disabled', $groups['data'][0]['title']);
+    $this->assertSame('not-me-disabled', $groups['data'][0]['title']);
   }
 
   /**
@@ -247,7 +247,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(1, $groups['recordsTotal']);
-    $this->assertEquals('pick-me-disabled', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-disabled', $groups['data'][0]['title']);
   }
 
   /**
@@ -259,10 +259,10 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(4, $groups['recordsTotal']);
-    $this->assertEquals('not-me-active', $groups['data'][0]['title']);
-    $this->assertEquals('not-me-disabled', $groups['data'][1]['title']);
-    $this->assertEquals('pick-me-active', $groups['data'][2]['title']);
-    $this->assertEquals('pick-me-disabled', $groups['data'][3]['title']);
+    $this->assertSame('not-me-active', $groups['data'][0]['title']);
+    $this->assertSame('not-me-disabled', $groups['data'][1]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][2]['title']);
+    $this->assertSame('pick-me-disabled', $groups['data'][3]['title']);
   }
 
   /**
@@ -271,7 +271,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
   public function testGroupListAccessCiviCRM(): void {
     $this->setPermissionAndRequest('access CiviCRM');
     $permissionClause = CRM_Contact_BAO_Group::getPermissionClause();
-    $this->assertEquals('1 = 0', $permissionClause);
+    $this->assertSame('1 = 0', $permissionClause);
     $params = $this->_params;
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(0, count($groups['data']));
@@ -345,7 +345,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(1, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $groups['recordsTotal'], 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][0]['title']);
   }
 
   public function testTraditionalACLNotFoundTitle(): void {
@@ -365,8 +365,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(2, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(2, $groups['recordsTotal'], 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups['data'][0]['title']);
-    $this->assertEquals('pick-me-disabled', $groups['data'][1]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-disabled', $groups['data'][1]['title']);
   }
 
   public function testTraditionalACLDisabled(): void {
@@ -377,7 +377,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(1, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $groups['recordsTotal'], 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-disabled', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-disabled', $groups['data'][0]['title']);
   }
 
   public function testTraditionalACLDisabledFoundTitle(): void {
@@ -389,7 +389,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(1, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $groups['recordsTotal'], 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-disabled', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-disabled', $groups['data'][0]['title']);
   }
 
   public function testTraditionalACLDisabledNotFoundTitle(): void {
@@ -410,7 +410,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(1, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $groups['recordsTotal'], 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][0]['title']);
   }
 
   public function testTraditionalACLAll(): void {
@@ -421,8 +421,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(2, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(2, $groups['recordsTotal'], 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups['data'][0]['title']);
-    $this->assertEquals('pick-me-disabled', $groups['data'][1]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-disabled', $groups['data'][1]['title']);
   }
 
   /**
@@ -435,7 +435,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(1, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $groups['recordsTotal'], 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-disabled', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-disabled', $groups['data'][0]['title']);
   }
 
   /**
@@ -449,7 +449,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(1, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $groups['recordsTotal'], 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-disabled', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-disabled', $groups['data'][0]['title']);
   }
 
   /**
@@ -474,7 +474,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(1, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $groups['recordsTotal'], 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][0]['title']);
   }
 
   /**
@@ -499,8 +499,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(2, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(2, $groups['recordsTotal'], 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups['data'][0]['title']);
-    $this->assertEquals('pick-me-disabled', $groups['data'][1]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-disabled', $groups['data'][1]['title']);
   }
 
   /**
@@ -513,8 +513,8 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(2, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(2, $groups['recordsTotal'], 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups['data'][0]['title']);
-    $this->assertEquals('pick-me-disabled', $groups['data'][1]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-disabled', $groups['data'][1]['title']);
   }
 
   /**
@@ -527,7 +527,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $groups = CRM_Contact_BAO_Group::getGroupListSelector($params);
     $this->assertEquals(1, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(1, $groups['recordsTotal'], 'Total needs to be set correctly');
-    $this->assertEquals('pick-me-active', $groups['data'][0]['title']);
+    $this->assertSame('pick-me-active', $groups['data'][0]['title']);
   }
 
   /**

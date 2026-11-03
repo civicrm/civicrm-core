@@ -103,12 +103,12 @@ class SearchTimeoutTest extends Api4TestBase implements TransactionalInterface {
       // 2. Test site-wide setting.
       \Civi::settings()->set('search_kit_timeout', 123);
       civicrm_api4('SearchDisplay', 'run', $params);
-      $this->assertEquals(123, $this->assertedMaxExecutionTime);
+      $this->assertSame(123, $this->assertedMaxExecutionTime);
 
       // 3. Test SavedSearch per-search timeout override takes precedence.
       $params['savedSearch']['timeout'] = 45;
       civicrm_api4('SearchDisplay', 'run', $params);
-      $this->assertEquals(45, $this->assertedMaxExecutionTime);
+      $this->assertSame(45, $this->assertedMaxExecutionTime);
 
       // 4. Test SavedSearch timeout override of 0 disables timeout.
       $params['savedSearch']['timeout'] = 0;
@@ -137,7 +137,7 @@ class SearchTimeoutTest extends Api4TestBase implements TransactionalInterface {
           $this->fail("Expected search timeout exception for code {$errorCode} was not thrown.");
         }
         catch (\CRM_Core_Exception $e) {
-          $this->assertEquals('search_timeout', $e->getErrorCode());
+          $this->assertSame('search_timeout', $e->getErrorCode());
           $this->assertStringContainsString('The search query timed out', $e->getMessage());
         }
       }

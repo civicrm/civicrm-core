@@ -39,7 +39,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
       'name', 'id',
       'Database check on updated membership status record.'
     );
-    $this->assertEquals($result, 'added', 'Verify membership status is_active.');
+    $this->assertSame('added', $result, 'Verify membership status is_active.');
   }
 
   /**
@@ -336,7 +336,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $membershipStatus = CRM_Member_BAO_MembershipStatus::add($params);
     $result = CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent();
 
-    $this->assertEquals(empty($result), FALSE, 'Verify membership status records is_current_member.');
+    $this->assertFalse(empty($result), 'Verify membership status records is_current_member.');
 
     $this->callAPISuccess('MembershipStatus', 'Delete', ['id' => $membershipStatus->id]);
   }

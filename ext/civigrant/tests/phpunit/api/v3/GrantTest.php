@@ -72,7 +72,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
       'sequential' => 1,
       'full_name' => "civi_contribute",
     ])['values'][0];
-    $this->assertEquals('installed', $civiContribute['status']);
+    $this->assertSame('installed', $civiContribute['status']);
   }
 
   /**
@@ -172,7 +172,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
     ]);
     $this->createTestEntity('Grant', $this->params);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertEquals('NZD', $contribution['currency']);
+    $this->assertSame('NZD', $contribution['currency']);
   }
 
   /**
@@ -192,7 +192,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
       'id' => $contributionID,
       'return' => 'financial_type_id',
     ]));
-    $this->assertEquals('NZD', $this->callAPISuccessGetValue('Contribution', [
+    $this->assertSame('NZD', $this->callAPISuccessGetValue('Contribution', [
       'id' => $contributionID,
       'return' => 'currency',
     ]));

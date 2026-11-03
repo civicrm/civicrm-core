@@ -82,9 +82,9 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
 
   public function testGetInfo(): void {
     $info = MockBasicEntity::getInfo();
-    $this->assertEquals('MockBasicEntity', $info['name']);
+    $this->assertSame('MockBasicEntity', $info['name']);
     $this->assertEquals(['identifier'], $info['primary_key']);
-    $this->assertEquals('identifier', CoreUtil::getIdFieldName('MockBasicEntity'));
+    $this->assertSame('identifier', CoreUtil::getIdFieldName('MockBasicEntity'));
   }
 
   public function testCrud(): void {
@@ -101,7 +101,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->execute()->first()['identifier'];
 
     $result = MockBasicEntity::get()->selectRowCount()->execute();
-    $this->assertEquals(2, $result->count());
+    $this->assertSame(2, $result->count());
 
     // Updating a single record should support identifier either in the values or the where clause
     // Test both styles of update
@@ -112,9 +112,9 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     // The object's count() method will account for all results, ignoring limit, while the array results are limited
     $this->assertCount(2, $result);
     $this->assertCount(1, (array) $result);
-    $this->assertEquals('new', $result->first()['foo']);
-    $this->assertEquals('red', $result->first()['color']);
-    $this->assertEquals('one', $result->first()['group']);
+    $this->assertSame('new', $result->first()['foo']);
+    $this->assertSame('red', $result->first()['color']);
+    $this->assertSame('one', $result->first()['group']);
 
     $result = MockBasicEntity::save()
       ->addRecord(['identifier' => $id1, 'foo' => 'one updated', 'weight' => '5'])
@@ -126,42 +126,42 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->indexBy('identifier');
 
     // 3 total records saved
-    $this->assertEquals(3, $result->countFetched());
+    $this->assertSame(3, $result->countFetched());
     // 2 records updated
-    $this->assertEquals(2, $result->countMatched());
+    $this->assertSame(2, $result->countMatched());
 
     // Check updated values
     $this->assertTrue(5 === $result[$id1]['weight']);
-    $this->assertEquals('new', $result[$id2]['foo']);
-    $this->assertEquals('two', $result[$id2]['group:name']);
+    $this->assertSame('new', $result[$id2]['foo']);
+    $this->assertSame('two', $result[$id2]['group:name']);
     // We didn't select this field in the `reload` param
     $this->assertFalse(isset($result[$id2]['group:label']));
-    $this->assertEquals('three', $result->last()['foo']);
+    $this->assertSame('three', $result->last()['foo']);
     $this->assertCount(3, $result);
     foreach ($result as $item) {
-      $this->assertEquals('pink', $item['color']);
+      $this->assertSame('pink', $item['color']);
     }
 
     $ent1 = MockBasicEntity::get()->addWhere('identifier', '=', $id1)->execute()->first();
-    $this->assertEquals('one updated', $ent1['foo']);
+    $this->assertSame('one updated', $ent1['foo']);
     $this->assertFalse(isset($ent1['group:label']));
 
     $ent2 = MockBasicEntity::get()->addWhere('group:label', '=', 'Second')->addSelect('group:label', 'group')->execute()->first();
-    $this->assertEquals('two', $ent2['group']);
-    $this->assertEquals('Second', $ent2['group:label']);
+    $this->assertSame('two', $ent2['group']);
+    $this->assertSame('Second', $ent2['group:label']);
     // We didn't select this
     $this->assertFalse(isset($ent2['group:name']));
 
     // With no SELECT, all fields should be returned but not suffixy stuff like group:name
     $ent2 = MockBasicEntity::get()->addWhere('group:label', '=', 'Second')->execute()->first();
-    $this->assertEquals('two', $ent2['group']);
+    $this->assertSame('two', $ent2['group']);
     $this->assertFalse(isset($ent2['group:name']));
     // This one wasn't selected but did get used by the WHERE clause; ensure it isn't returned
     $this->assertFalse(isset($ent2['group:label']));
 
     MockBasicEntity::delete()->addWhere('identifier', '=', $id2);
     $result = MockBasicEntity::get()->execute();
-    $this->assertEquals('one updated', $result->first()['foo']);
+    $this->assertSame('one updated', $result->first()['foo']);
   }
 
   public function testReplace(): void {
@@ -187,13 +187,13 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
 
     $this->assertCount(4, $newObjects);
 
-    $this->assertEquals('yellow', $newObjects->first()['color']);
+    $this->assertSame('yellow', $newObjects->first()['color']);
 
-    $this->assertEquals('not blue', $newObjects[$objects[1]['identifier']]['color']);
+    $this->assertSame('not blue', $newObjects[$objects[1]['identifier']]['color']);
 
     // Ensure group two hasn't been altered
-    $this->assertEquals('orange', $newObjects[$objects[3]['identifier']]['color']);
-    $this->assertEquals('two', $newObjects[$objects[3]['identifier']]['group']);
+    $this->assertSame('orange', $newObjects[$objects[3]['identifier']]['color']);
+    $this->assertSame('two', $newObjects[$objects[3]['identifier']]['group']);
   }
 
   public function testBatchFrobnicate(): void {
@@ -206,7 +206,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->replaceRecords($objects);
 
     $result = MockBasicEntity::batchFrobnicate()->addWhere('color', '=', 'blue')->execute();
-    $this->assertEquals(2, count($result));
+    $this->assertSame(2, count($result));
     $this->assertEquals([400, 1600], \CRM_Utils_Array::collect('frobnication', (array) $result));
   }
 
@@ -238,9 +238,9 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $getFields = MockBasicEntity::getFields()->execute()->indexBy('name');
 
     $this->assertCount(8, $getFields);
-    $this->assertEquals('Identifier', $getFields['identifier']['title']);
+    $this->assertSame('Identifier', $getFields['identifier']['title']);
     // Ensure default data type is "String" when not specified
-    $this->assertEquals('String', $getFields['color']['data_type']);
+    $this->assertSame('String', $getFields['color']['data_type']);
 
     // Getfields should default to loadOptions = false and reduce them to bool
     $this->assertTrue($getFields['group']['options']);
@@ -261,7 +261,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $this->assertArrayHasKey('one', $getFields['group']['options']);
     // Complex options should be reduced to simple array
     $this->assertArrayHasKey(1, $getFields['fruit']['options']);
-    $this->assertEquals('Banana', $getFields['fruit']['options'][3]);
+    $this->assertSame('Banana', $getFields['fruit']['options'][3]);
 
     // Load complex options
     $getFields = MockBasicEntity::getFields()
@@ -271,14 +271,14 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
 
     // Simple options should be expanded to non-assoc array
     $this->assertCount(2, $getFields);
-    $this->assertEquals('one', $getFields['group']['options'][0]['id']);
+    $this->assertSame('one', $getFields['group']['options'][0]['id']);
     // Name is interchangeable with id
-    $this->assertEquals('one', $getFields['group']['options'][0]['name']);
-    $this->assertEquals('First', $getFields['group']['options'][0]['label']);
+    $this->assertSame('one', $getFields['group']['options'][0]['name']);
+    $this->assertSame('First', $getFields['group']['options'][0]['label']);
     $this->assertFalse(isset($getFields['group']['options'][0]['color']));
     // Complex options should give all requested properties
-    $this->assertEquals('Banana', $getFields['fruit']['options'][2]['label']);
-    $this->assertEquals('yellow', $getFields['fruit']['options'][2]['color']);
+    $this->assertSame('Banana', $getFields['fruit']['options'][2]['label']);
+    $this->assertSame('yellow', $getFields['fruit']['options'][2]['color']);
   }
 
   public function testPseudoconstantFallbackIsCached(): void {
@@ -292,7 +292,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       $this->assertEquals($expected, $options);
     }
 
-    $this->assertEquals(1, $this->getFieldsCallCount);
+    $this->assertSame(1, $this->getFieldsCallCount);
   }
 
   public function testPseudoconstantFallbackDoesNotCacheMissingOptions(): void {
@@ -311,7 +311,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       }
     }
 
-    $this->assertEquals(2, $this->getFieldsCallCount);
+    $this->assertSame(2, $this->getFieldsCallCount);
   }
 
   public function testPseudoconstantFallbackIsLocaleScoped(): void {
@@ -324,11 +324,11 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     try {
       $tsLocale = 'en_US';
       FormattingUtil::getPseudoconstantList($field, 'group:label');
-      $this->assertEquals(1, $this->getFieldsCallCount);
+      $this->assertSame(1, $this->getFieldsCallCount);
 
       $tsLocale = 'fr_FR';
       FormattingUtil::getPseudoconstantList($field, 'group:label');
-      $this->assertEquals(2, $this->getFieldsCallCount);
+      $this->assertSame(2, $this->getFieldsCallCount);
     }
     finally {
       $tsLocale = $originalLocale;
@@ -458,19 +458,19 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->addWhere('fruit:name', 'CONTAINS', 'apple')
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('one', $result->first()['group']);
+    $this->assertSame('one', $result->first()['group']);
 
     $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'CONTAINS', ['apple', 'pear'])
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('one', $result->first()['group']);
+    $this->assertSame('one', $result->first()['group']);
 
     $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'CONTAINS ONE OF', 'apple')
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('one', $result->first()['group']);
+    $this->assertSame('one', $result->first()['group']);
 
     $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'CONTAINS ONE OF', ['apple', 'pear'])
@@ -481,7 +481,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->addWhere('fruit:name', 'NOT CONTAINS', 'apple')
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('two', $result->first()['group']);
+    $this->assertSame('two', $result->first()['group']);
 
     $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'NOT CONTAINS ONE OF', ['apple', 'pear'])
@@ -492,7 +492,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->addWhere('fruit:name', 'NOT CONTAINS ONE OF', 'apple')
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('two', $result->first()['group']);
+    $this->assertSame('two', $result->first()['group']);
 
     $result = MockBasicEntity::get()
       ->addWhere('fruit:name', 'NOT CONTAINS ONE OF', ['apple', 'apple'])
@@ -543,25 +543,25 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->addWhere('fruit:label', 'CONTAINS', 'Banana')
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('two', $result->first()['group']);
+    $this->assertSame('two', $result->first()['group']);
 
     $result = MockBasicEntity::get()
       ->addWhere('fruit:label', 'NOT CONTAINS', 'Banana')
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('one', $result->first()['group']);
+    $this->assertSame('one', $result->first()['group']);
 
     $result = MockBasicEntity::get()
       ->addWhere('weight', 'CONTAINS', 2)
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('two', $result->first()['group']);
+    $this->assertSame('two', $result->first()['group']);
 
     $result = MockBasicEntity::get()
       ->addWhere('weight', 'NOT CONTAINS', 2)
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('one', $result->first()['group']);
+    $this->assertSame('one', $result->first()['group']);
   }
 
   public function testRegexpOperators(): void {
@@ -576,14 +576,14 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->addWhere('color', 'REGEXP', '^b')
       ->execute();
     $this->assertCount(2, $result);
-    $this->assertEquals('blue', $result[0]['color']);
-    $this->assertEquals('brown', $result[1]['color']);
+    $this->assertSame('blue', $result[0]['color']);
+    $this->assertSame('brown', $result[1]['color']);
 
     $result = MockBasicEntity::get()
       ->addWhere('color', 'NOT REGEXP', '^b')
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('red', $result[0]['color']);
+    $this->assertSame('red', $result[0]['color']);
   }
 
   public function testPseudoconstantMatch(): void {
@@ -598,20 +598,20 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
       ->addOrderBy('fruit:color', "DESC")
       ->execute();
 
-    $this->assertEquals('round', $results[0]['shape']);
-    $this->assertEquals('one', $results[0]['group']);
-    $this->assertEquals('First', $results[0]['group:label']);
-    $this->assertEquals('one', $results[0]['group:name']);
-    $this->assertEquals(3, $results[0]['fruit']);
-    $this->assertEquals('Banana', $results[0]['fruit:label']);
-    $this->assertEquals('banana', $results[0]['fruit:name']);
-    $this->assertEquals('yellow', $results[0]['fruit:color']);
+    $this->assertSame('round', $results[0]['shape']);
+    $this->assertSame('one', $results[0]['group']);
+    $this->assertSame('First', $results[0]['group:label']);
+    $this->assertSame('one', $results[0]['group:name']);
+    $this->assertSame(3, $results[0]['fruit']);
+    $this->assertSame('Banana', $results[0]['fruit:label']);
+    $this->assertSame('banana', $results[0]['fruit:name']);
+    $this->assertSame('yellow', $results[0]['fruit:color']);
 
     // Reverse order
     $results = MockBasicEntity::get()
       ->addOrderBy('fruit:color')
       ->execute();
-    $this->assertEquals('two', $results[0]['group']);
+    $this->assertSame('two', $results[0]['group']);
 
     // Cannot match to a non-unique option property like :color on create
     try {

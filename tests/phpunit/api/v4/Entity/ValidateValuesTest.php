@@ -60,15 +60,15 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
       }
 
       $hookCount++;
-      $this->assertEquals('create', $e->getActionName());
-      $this->assertEquals('Alice', $e->records[0]['first_name']);
-      $this->assertEquals('Alison', $e->records[0]['last_name']);
+      $this->assertSame('create', $e->getActionName());
+      $this->assertSame('Alice', $e->records[0]['first_name']);
+      $this->assertSame('Alison', $e->records[0]['last_name']);
 
       $this->assertFalse($e->diffs->isLoaded());
-      $this->assertEquals(1, count($e->diffs));
-      $this->assertEquals(NULL, $e->diffs[0]['old']);
-      $this->assertEquals('Alice', $e->diffs[0]['new']['first_name']);
-      $this->assertEquals('Alison', $e->diffs[0]['new']['last_name']);
+      $this->assertSame(1, count($e->diffs));
+      $this->assertNull($e->diffs[0]['old']);
+      $this->assertSame('Alice', $e->diffs[0]['new']['first_name']);
+      $this->assertSame('Alison', $e->diffs[0]['new']['last_name']);
 
     });
     $created = Contact::create()->setValues([
@@ -77,7 +77,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
       'last_name' => 'Alison',
     ])->execute()->single();
     $this->assertTrue(is_numeric($created['id']));
-    $this->assertEquals(1, $hookCount);
+    $this->assertSame(1, $hookCount);
 
     // Step 2: `save()` a couple records for Ms. Alice Alison and Mr. Bob Bobmom.
     $this->setValidator(function (ValidateValuesEvent $e) use (&$hookCount) {
@@ -87,24 +87,24 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
       }
 
       $hookCount++;
-      $this->assertEquals('save', $e->getActionName());
-      $this->assertEquals('Alicia', $e->records[0]['first_name']);
-      $this->assertEquals('Bob', $e->records[1]['first_name']);
+      $this->assertSame('save', $e->getActionName());
+      $this->assertSame('Alicia', $e->records[0]['first_name']);
+      $this->assertSame('Bob', $e->records[1]['first_name']);
 
       $this->assertFalse($e->diffs->isLoaded());
-      $this->assertEquals(2, count($e->diffs));
-      $this->assertEquals('Alice', $e->diffs[0]['old']['first_name']);
-      $this->assertEquals('Alicia', $e->diffs[0]['new']['first_name']);
-      $this->assertEquals(NULL, $e->diffs[1]['old']);
-      $this->assertEquals('Bob', $e->diffs[1]['new']['first_name']);
+      $this->assertSame(2, count($e->diffs));
+      $this->assertSame('Alice', $e->diffs[0]['old']['first_name']);
+      $this->assertSame('Alicia', $e->diffs[0]['new']['first_name']);
+      $this->assertNull($e->diffs[1]['old']);
+      $this->assertSame('Bob', $e->diffs[1]['new']['first_name']);
 
     });
     $saved = Contact::save()->setRecords([
       ['id' => $created['id'], 'first_name' => 'Alicia'],
       ['contact_type' => 'Individual', 'first_name' => 'Bob', 'last_name' => 'Bobmom'],
     ])->execute();
-    $this->assertEquals(2, $saved->count());
-    $this->assertEquals(2, $hookCount);
+    $this->assertSame(2, $saved->count());
+    $this->assertSame(2, $hookCount);
 
     // Step 3: `update()` a record for Mr. Bob Bobmom
     $this->setValidator(function (ValidateValuesEvent $e) use (&$hookCount) {
@@ -114,21 +114,21 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
       }
 
       $hookCount++;
-      $this->assertEquals('update', $e->getActionName());
-      $this->assertEquals('Bobby', $e->records[0]['first_name']);
+      $this->assertSame('update', $e->getActionName());
+      $this->assertSame('Bobby', $e->records[0]['first_name']);
 
       $this->assertFalse($e->diffs->isLoaded());
-      $this->assertEquals(1, count($e->diffs));
-      $this->assertEquals('Bob', $e->diffs[0]['old']['first_name']);
-      $this->assertEquals('Bobmom', $e->diffs[0]['old']['last_name']);
-      $this->assertEquals('Bobby', $e->diffs[0]['new']['first_name']);
+      $this->assertSame(1, count($e->diffs));
+      $this->assertSame('Bob', $e->diffs[0]['old']['first_name']);
+      $this->assertSame('Bobmom', $e->diffs[0]['old']['last_name']);
+      $this->assertSame('Bobby', $e->diffs[0]['new']['first_name']);
     });
     $updated = Contact::update()
       ->setValues(['first_name' => 'Bobby'])
       ->addWhere('last_name', '=', 'Bobmom')
       ->execute();
-    $this->assertEquals(1, $updated->count());
-    $this->assertEquals(3, $hookCount);
+    $this->assertSame(1, $updated->count());
+    $this->assertSame(3, $hookCount);
   }
 
   public function testRaiseError(): void {
@@ -161,7 +161,7 @@ class ValidateValuesTest extends Api4TestBase implements TransactionalInterface 
       $this->fail('Expected an exception due to validation error');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals(1, $hookCount);
+      $this->assertSame(1, $hookCount);
       $this->assertMatchesRegularExpression(';not sufficiently namey;', $e->getMessage());
       $this->assertMatchesRegularExpression(';tongue twister;', $e->getMessage());
       $this->assertMatchesRegularExpression(';disagree with the spelling;', $e->getMessage());

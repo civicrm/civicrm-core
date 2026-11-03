@@ -37,43 +37,43 @@ class CRM_Extension_BrowserTest extends CiviUnitTestCase {
 
   public function testDisabled(): void {
     $this->browser = new CRM_Extension_Browser(FALSE, '/index.html');
-    $this->assertEquals(FALSE, $this->browser->isEnabled());
+    $this->assertFalse($this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->assertEquals([], $this->browser->getExtensions());
   }
 
   public function testGetExtensions_good(): void {
     $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL);
-    $this->assertEquals(TRUE, $this->browser->isEnabled());
+    $this->assertTrue($this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->setupMockHandler();
     $exts = $this->browser->getExtensions();
     $keys = array_keys($exts);
     sort($keys);
     $this->assertEquals(['test.crm.extension.browsertest.a', 'test.crm.extension.browsertest.b'], $keys);
-    $this->assertEquals('report', $exts['test.crm.extension.browsertest.a']->type);
-    $this->assertEquals('module', $exts['test.crm.extension.browsertest.b']->type);
-    $this->assertEquals('http://example.com/test.crm.extension.browsertest.a-0.1.zip', $exts['test.crm.extension.browsertest.a']->downloadUrl);
-    $this->assertEquals('http://example.com/test.crm.extension.browsertest.b-1.2.zip', $exts['test.crm.extension.browsertest.b']->downloadUrl);
+    $this->assertSame('report', $exts['test.crm.extension.browsertest.a']->type);
+    $this->assertSame('module', $exts['test.crm.extension.browsertest.b']->type);
+    $this->assertSame('http://example.com/test.crm.extension.browsertest.a-0.1.zip', $exts['test.crm.extension.browsertest.a']->downloadUrl);
+    $this->assertSame('http://example.com/test.crm.extension.browsertest.b-1.2.zip', $exts['test.crm.extension.browsertest.b']->downloadUrl);
   }
 
   public function testGetExtension_good(): void {
     $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL);
-    $this->assertEquals(TRUE, $this->browser->isEnabled());
+    $this->assertTrue($this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->setupMockHandler();
     $info = $this->browser->getExtension('test.crm.extension.browsertest.b');
-    $this->assertEquals('module', $info->type);
-    $this->assertEquals('http://example.com/test.crm.extension.browsertest.b-1.2.zip', $info->downloadUrl);
+    $this->assertSame('module', $info->type);
+    $this->assertSame('http://example.com/test.crm.extension.browsertest.b-1.2.zip', $info->downloadUrl);
   }
 
   public function testGetExtension_nonexistent(): void {
     $this->browser = new CRM_Extension_Browser('file://' . dirname(__FILE__) . '/dataset/good-repository', NULL);
-    $this->assertEquals(TRUE, $this->browser->isEnabled());
+    $this->assertTrue($this->browser->isEnabled());
     $this->assertEquals([], $this->browser->checkRequirements());
     $this->setupMockHandler();
     $info = $this->browser->getExtension('test.crm.extension.browsertest.nonexistent');
-    $this->assertEquals(NULL, $info);
+    $this->assertNull($info);
   }
 
 }

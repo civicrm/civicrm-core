@@ -49,9 +49,9 @@ class ActivityInlineEditBrowserTest extends Civi\Test\MinkBase {
       ->addSelect('is_auto', 'subject', 'status_id:name', 'activity_type_id:name')
       ->addWhere('id', 'IN', $timeline)
       ->execute()->indexBy('activity_type_id:name');
-    $this->assertEquals('Completed', $after['Meeting']['status_id:name']);
+    $this->assertSame('Completed', $after['Meeting']['status_id:name']);
     $this->assertFalse($after['Meeting']['is_auto']);
-    $this->assertEquals('Called back', $after['Phone Call']['subject']);
+    $this->assertSame('Called back', $after['Phone Call']['subject']);
     $this->assertFalse($after['Phone Call']['is_auto']);
     $this->assertTrue($after['Follow up']['is_auto']);
   }
@@ -75,7 +75,7 @@ class ActivityInlineEditBrowserTest extends Civi\Test\MinkBase {
       ->addSelect('is_auto', 'status_id:name')
       ->addWhere('id', '=', $meetingId)
       ->execute()->single();
-    $this->assertEquals('Completed', $meeting['status_id:name']);
+    $this->assertSame('Completed', $meeting['status_id:name']);
     $this->assertFalse($meeting['is_auto']);
   }
 

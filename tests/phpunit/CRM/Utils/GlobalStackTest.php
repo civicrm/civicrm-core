@@ -44,7 +44,7 @@ class CRM_Utils_GlobalStackTest extends CiviUnitTestCase {
 
     $this->assertEquals(1, $_FOO['bar']);
     $this->assertEquals(1, $_FOO['whiz']);
-    $this->assertEquals(NULL, $_FOO['bang']);
+    $this->assertNull($_FOO['bang']);
     $this->assertEquals(1, $_EXTRA);
   }
 

@@ -95,7 +95,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     ];
     $groupsHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($params, NULL, '&nbsp;&nbsp;', TRUE);
     // check if child group is present in the tree with formatted group title prepended with spacer '&nbsp;&nbsp;'
-    $this->assertEquals('&nbsp;&nbsp;Child Group C', $groupsHierarchy[$group3->id]);
+    $this->assertSame('&nbsp;&nbsp;Child Group C', $groupsHierarchy[$group3->id]);
 
     // Disable parent group A and ensure that child group C is not present as both of its parent groups are disabled
     CRM_Contact_BAO_Group::writeRecord([

@@ -205,12 +205,12 @@ class PathUrlTest extends \CiviEndToEndTestCase {
 
     $parts = parse_url($url);
     parse_str($parts['query'], $queryParts);
-    $this->assertEquals('CiviCRM', $queryParts['page']);
-    $this->assertEquals('civicrm/contribute', $queryParts['q']);
+    $this->assertSame('CiviCRM', $queryParts['page']);
+    $this->assertSame('civicrm/contribute', $queryParts['q']);
     $this->assertEquals('1', $queryParts['reset']);
 
     // As an E2E test for wp-demo, this assertion is specifically valid for wp-demo.
-    $this->assertEquals('/wp-admin/admin.php', $parts['path']);
+    $this->assertSame('/wp-admin/admin.php', $parts['path']);
   }
 
 }

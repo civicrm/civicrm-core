@@ -147,7 +147,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
     $this->participantCreate(['contact_id' => $this->ids['Contact']['individual_0'], 'event_id' => $this->getEventID()]);
     $eventFull = CRM_Event_BAO_Participant::eventFull($this->getEventID());
 
-    $this->assertEquals('Sorry! We are already full', $eventFull, 'Checking if Event is full.');
+    $this->assertSame('Sorry! We are already full', $eventFull, 'Checking if Event is full.');
   }
 
   /**
@@ -278,7 +278,7 @@ class CRM_Event_BAO_ParticipantTest extends CiviUnitTestCase {
   public function testFixEventLevel(): void {
     $fee = CRM_Core_DAO::VALUE_SEPARATOR . 'Blah' . CRM_Core_DAO::VALUE_SEPARATOR . 'blah' . CRM_Core_DAO::VALUE_SEPARATOR;
     CRM_Event_BAO_Participant::fixEventLevel($fee);
-    $this->assertEquals('Blah, blah', $fee);
+    $this->assertSame('Blah, blah', $fee);
   }
 
   /**

@@ -156,10 +156,10 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $qActive = Civi::queue('test/my-active', [
       'template' => 'test/template',
     ]);
-    $this->assertEquals('test/my-active', $qActive->getName());
-    $this->assertEquals('SqlParallel', $qActive->getSpec('type'));
-    $this->assertEquals('task', $qActive->getSpec('runner'));
-    $this->assertEquals('delete', $qActive->getSpec('error'));
+    $this->assertSame('test/my-active', $qActive->getName());
+    $this->assertSame('SqlParallel', $qActive->getSpec('type'));
+    $this->assertSame('task', $qActive->getSpec('runner'));
+    $this->assertSame('delete', $qActive->getSpec('error'));
     $this->assertDBQuery('active', "SELECT status FROM civicrm_queue WHERE name = 'test/my-active'");
     $this->assertDBQuery(0, "SELECT is_template FROM civicrm_queue WHERE name = 'test/my-active'");
 
@@ -167,10 +167,10 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
       'template' => 'test/template',
       'status' => 'draft',
     ]);
-    $this->assertEquals('test/my-draft', $qDraft->getName());
-    $this->assertEquals('SqlParallel', $qDraft->getSpec('type'));
-    $this->assertEquals('task', $qDraft->getSpec('runner'));
-    $this->assertEquals('delete', $qDraft->getSpec('error'));
+    $this->assertSame('test/my-draft', $qDraft->getName());
+    $this->assertSame('SqlParallel', $qDraft->getSpec('type'));
+    $this->assertSame('task', $qDraft->getSpec('runner'));
+    $this->assertSame('delete', $qDraft->getSpec('error'));
     $this->assertDBQuery('draft', "SELECT status FROM civicrm_queue WHERE name = 'test/my-draft'");
     $this->assertDBQuery(0, "SELECT is_template FROM civicrm_queue WHERE name = 'test/my-active'");
   }
@@ -203,14 +203,14 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
 
     $item = $this->queue->claimItem();
     $this->assertQueueStats(3, 2, 1, $this->queue);
-    $this->assertEquals('a', $item->data['test-key']);
+    $this->assertSame('a', $item->data['test-key']);
     $this->assertEquals(1, $item->run_count);
     $this->queue->deleteItem($item);
 
     $this->assertQueueStats(2, 2, 0, $this->queue);
     $item = $this->queue->claimItem();
     $this->assertQueueStats(2, 1, 1, $this->queue);
-    $this->assertEquals('b', $item->data['test-key']);
+    $this->assertSame('b', $item->data['test-key']);
     $this->assertEquals(1, $item->run_count);
     $this->queue->deleteItem($item);
     $this->assertQueueStats(1, 1, 0, $this->queue);
@@ -223,13 +223,13 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
 
     $item = $this->queue->claimItem();
     $this->assertQueueStats(2, 1, 1, $this->queue);
-    $this->assertEquals('c', $item->data['test-key']);
+    $this->assertSame('c', $item->data['test-key']);
     $this->assertEquals(1, $item->run_count);
     $this->queue->deleteItem($item);
 
     $this->assertQueueStats(1, 1, 0, $this->queue);
     $item = $this->queue->claimItem();
-    $this->assertEquals('d', $item->data['test-key']);
+    $this->assertSame('d', $item->data['test-key']);
     $this->assertEquals(1, $item->run_count);
     $this->queue->deleteItem($item);
 
@@ -251,14 +251,14 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     ]);
 
     $item = $this->queue->claimItem();
-    $this->assertEquals('a', $item->data['test-key']);
+    $this->assertSame('a', $item->data['test-key']);
     $this->assertEquals(1, $item->run_count);
     $this->assertQueueStats(1, 0, 1, $this->queue);
     $this->queue->releaseItem($item);
 
     $this->assertQueueStats(1, 1, 0, $this->queue);
     $item = $this->queue->claimItem();
-    $this->assertEquals('a', $item->data['test-key']);
+    $this->assertSame('a', $item->data['test-key']);
     $this->assertEquals(2, $item->run_count);
     $this->queue->deleteItem($item);
 
@@ -283,7 +283,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertQueueStats(1, 1, 0, $this->queue);
 
     $item = $this->queue->claimItem();
-    $this->assertEquals('a', $item->data['test-key']);
+    $this->assertSame('a', $item->data['test-key']);
     $this->assertEquals(1, $item->run_count);
     $this->assertQueueStats(1, 0, 1, $this->queue);
     // forget to release
@@ -296,7 +296,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     // pass expiration mark
     CRM_Utils_Time::setTime('2012-04-01 2:00:03');
     $item3 = $this->queue->claimItem();
-    $this->assertEquals('a', $item3->data['test-key']);
+    $this->assertSame('a', $item3->data['test-key']);
     $this->assertEquals(2, $item3->run_count);
     $this->assertQueueStats(1, 0, 1, $this->queue);
     $this->queue->deleteItem($item3);
@@ -320,7 +320,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     ]);
 
     $item = $this->queue->claimItem();
-    $this->assertEquals('a', $item->data['test-key']);
+    $this->assertSame('a', $item->data['test-key']);
     $this->assertEquals(1, $item->run_count);
     $this->assertQueueStats(1, 0, 1, $this->queue);
     // forget to release
@@ -332,7 +332,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
 
     // but stealItem works
     $item3 = $this->queue->stealItem();
-    $this->assertEquals('a', $item3->data['test-key']);
+    $this->assertSame('a', $item3->data['test-key']);
     $this->assertEquals(2, $item3->run_count);
     $this->assertQueueStats(1, 0, 1, $this->queue);
     $this->queue->deleteItem($item3);
@@ -458,7 +458,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertQueueStats(2, 2, 0, $queue2);
 
     $item = $queue2->claimItem();
-    $this->assertEquals('a', $item->data['test-key']);
+    $this->assertSame('a', $item->data['test-key']);
     $queue2->releaseItem($item);
   }
 
@@ -483,7 +483,7 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertQueueStats(2, 2, 0, $queue2);
 
     $item = $queue2->claimItem();
-    $this->assertEquals('a', $item->data['test-key']);
+    $this->assertSame('a', $item->data['test-key']);
     $queue2->releaseItem($item);
   }
 

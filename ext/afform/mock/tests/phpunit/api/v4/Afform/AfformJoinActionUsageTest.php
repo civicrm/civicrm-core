@@ -87,8 +87,8 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
       ->addOrderBy('Custom_MyThings.id')
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('Bob', $result[0]['first_name']);
-    $this->assertEquals('One', $result[0]['Custom_MyThings.my_text']);
+    $this->assertSame('Bob', $result[0]['first_name']);
+    $this->assertSame('One', $result[0]['Custom_MyThings.my_text']);
 
     $values = [
       'Individual1' => [
@@ -123,16 +123,16 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
       ->execute();
 
     $this->assertCount(3, $result);
-    $this->assertEquals('Bobby', $result[0]['first_name']);
-    $this->assertEquals('One', $result[0]['Custom_MyThings.my_text']);
-    $this->assertEquals('Two', $result[1]['Custom_MyThings.my_text']);
-    $this->assertEquals('Three', $result[2]['Custom_MyThings.my_text']);
+    $this->assertSame('Bobby', $result[0]['first_name']);
+    $this->assertSame('One', $result[0]['Custom_MyThings.my_text']);
+    $this->assertSame('Two', $result[1]['Custom_MyThings.my_text']);
+    $this->assertSame('Three', $result[2]['Custom_MyThings.my_text']);
 
     $emails = Email::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute();
     $this->assertCount(1, $emails);
-    $this->assertEquals('1234@example.com', $emails[0]['email']);
+    $this->assertSame('1234@example.com', $emails[0]['email']);
   }
 
   /**
@@ -172,15 +172,15 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
       ->addOrderBy('Custom_MyThings.id')
       ->execute();
     $this->assertCount(2, $result);
-    $this->assertEquals('Bob', $result[0]['first_name']);
-    $this->assertEquals('One', $result[0]['Custom_MyThings.my_text']);
-    $this->assertEquals('Two', $result[1]['Custom_MyThings.my_text']);
+    $this->assertSame('Bob', $result[0]['first_name']);
+    $this->assertSame('One', $result[0]['Custom_MyThings.my_text']);
+    $this->assertSame('Two', $result[1]['Custom_MyThings.my_text']);
 
     $emails = Email::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute();
     $this->assertCount(1, $emails);
-    $this->assertEquals('123@example.com', $emails[0]['email']);
+    $this->assertSame('123@example.com', $emails[0]['email']);
 
     $values = [
       'Individual1' => [
@@ -214,15 +214,15 @@ class AfformJoinActionUsageTest extends AfformUsageTestCase {
       ->execute();
 
     $this->assertCount(1, $result);
-    $this->assertEquals('Bobby', $result[0]['first_name']);
-    $this->assertEquals('Three', $result[0]['Custom_MyThings.my_text']);
+    $this->assertSame('Bobby', $result[0]['first_name']);
+    $this->assertSame('Three', $result[0]['Custom_MyThings.my_text']);
 
     $emails = Email::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute();
     $this->assertCount(2, $emails);
-    $this->assertEquals('123@example.com', $emails[0]['email']);
-    $this->assertEquals('1234@example.com', $emails[1]['email']);
+    $this->assertSame('123@example.com', $emails[0]['email']);
+    $this->assertSame('1234@example.com', $emails[1]['email']);
   }
 
 }

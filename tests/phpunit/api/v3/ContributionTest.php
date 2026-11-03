@@ -148,8 +148,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(23456, $contribution['trxn_id']);
     $this->assertEquals(78910, $contribution['invoice_id']);
     $this->assertMatchesRegularExpression('/INV_\d+/', $contribution['invoice_number']);
-    $this->assertEquals('SSF', $contribution['contribution_source']);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertSame('SSF', $contribution['contribution_source']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
     // Create a second contribution - we are testing that 'id' gets the right contribution id (not the contact id).
     $p['trxn_id'] = '3847';
     $p['invoice_id'] = '3847';
@@ -218,7 +218,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contributionID,
       'return' => 'check_number',
     ])['values'][$contributionID];
-    $this->assertEquals('bouncer', $getResult['check_number']);
+    $this->assertSame('bouncer', $getResult['check_number']);
     $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
       'entity_id' => $contributionID,
       'entity_table' => 'civicrm_contribution',
@@ -229,7 +229,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         'id' => $eft['financial_trxn_id'],
         'return' => 'check_number',
       ]);
-      $this->assertEquals('bouncer', $financialTrxn['values'][$financialTrxn['id']]['check_number']);
+      $this->assertSame('bouncer', $financialTrxn['values'][$financialTrxn['id']]['check_number']);
     }
   }
 
@@ -277,8 +277,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contributionID = $this->contributionCreate($params);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID]);
-    $this->assertEquals('bouncer', $contribution['check_number']);
-    $this->assertEquals('bouncer', $contribution['contribution_check_number']);
+    $this->assertSame('bouncer', $contribution['check_number']);
+    $this->assertSame('bouncer', $contribution['contribution_check_number']);
 
     $fields = CRM_Contribute_BAO_Contribution::fields();
     // Do not check for tax_amount as this test has not enabled invoicing
@@ -316,7 +316,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     foreach ($entityFinancialTrxn['values'] as $eft) {
       $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', ['id' => $eft['financial_trxn_id'], 'return' => 'check_number']);
-      $this->assertEquals('bouncer', $financialTrxn['values'][$financialTrxn['id']]['check_number']);
+      $this->assertSame('bouncer', $financialTrxn['values'][$financialTrxn['id']]['check_number']);
     }
   }
 
@@ -372,8 +372,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(95.00, $contribution['net_amount']);
     $this->assertEquals(23456, $contribution['trxn_id']);
     $this->assertEquals(78910, $contribution['invoice_id']);
-    $this->assertEquals('SSF', $contribution['contribution_source']);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertSame('SSF', $contribution['contribution_source']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
 
     // Create a second contribution - we are testing that 'id' gets the right contribution id (not the contact id).
     $p['trxn_id'] = '3847';
@@ -570,7 +570,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
     $this->assertEquals(12345, $contribution['trxn_id']);
     $this->assertEquals(67890, $contribution['invoice_id']);
-    $this->assertEquals('SSF', $contribution['source']);
+    $this->assertSame('SSF', $contribution['source']);
     $this->assertEquals(1, $contribution['contribution_status_id']);
     $lineItems = $this->callAPISuccess('LineItem', 'get', [
       'entity_id' => $contribution['id'],
@@ -598,7 +598,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return' => 'payment_instrument',
     ]);
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
-    $this->assertEquals('EFT', $contribution['values'][0]['payment_instrument']);
+    $this->assertSame('EFT', $contribution['values'][0]['payment_instrument']);
 
     $this->callAPISuccess('Contribution', 'create', [
       'id' => $contribution['id'],
@@ -610,7 +610,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return' => 'payment_instrument',
     ]);
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
-    $this->assertEquals('Credit Card', $contribution['values'][0]['payment_instrument']);
+    $this->assertSame('Credit Card', $contribution['values'][0]['payment_instrument']);
   }
 
   /**
@@ -627,11 +627,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return' => 'payment_instrument',
     ]);
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
-    $this->assertEquals('Cash', $contribution['values'][0]['payment_instrument']);
+    $this->assertSame('Cash', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
     $contribution = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1, 'payment_instrument' => 'Cash', 'return' => 'payment_instrument']);
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
-    $this->assertEquals('Cash', $contribution['values'][0]['payment_instrument']);
+    $this->assertSame('Cash', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'sequential' => 1,
@@ -639,7 +639,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return' => 'payment_instrument',
     ]);
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
-    $this->assertEquals('EFT', $contribution['values'][0]['payment_instrument']);
+    $this->assertSame('EFT', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'sequential' => 1,
@@ -647,7 +647,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return' => 'payment_instrument',
     ]);
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
-    $this->assertEquals('EFT', $contribution['values'][0]['payment_instrument']);
+    $this->assertSame('EFT', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
     $contribution = $this->callAPISuccess('contribution', 'create', [
       'id' => $contribution['id'],
@@ -660,7 +660,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return' => 'payment_instrument',
     ]);
     $this->assertArrayHasKey('payment_instrument', $contribution['values'][0]);
-    $this->assertEquals('Credit Card', $contribution['values'][0]['payment_instrument']);
+    $this->assertSame('Credit Card', $contribution['values'][0]['payment_instrument']);
     $this->assertEquals(1, $contribution['count']);
   }
 
@@ -681,7 +681,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->contributionCreate(['contact_id' => $this->individualID]);
     $this->contributionCreate(['creditnote_id' => 'cN1234', 'contact_id' => $this->individualID, 'invoice_id' => '91011', 'trxn_id' => '456']);
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['creditnote_id' => 'CN1234', 'return' => 'creditnote_id']);
-    $this->assertEquals('cN1234', $contribution['creditnote_id']);
+    $this->assertSame('cN1234', $contribution['creditnote_id']);
   }
 
   /**
@@ -819,7 +819,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->assertEquals(100.00, $contribution['values'][$contribution['id']]['total_amount']);
-    $this->assertEquals('SSF', $contribution['values'][$contribution['id']]['source']);
+    $this->assertSame('SSF', $contribution['values'][$contribution['id']]['source']);
   }
 
   /**
@@ -914,7 +914,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'sequential' => 1,
       'return' => 'note',
     ]);
-    $this->assertEquals('my contribution note', $result['values'][0]['note']);
+    $this->assertSame('my contribution note', $result['values'][0]['note']);
     $this->callAPISuccess('contribution', 'delete', ['id' => $contribution['id']]);
   }
 
@@ -944,7 +944,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'sequential' => 1,
       'return' => 'note',
     ]);
-    $this->assertEquals('my contribution note', $result['values'][0]['note']);
+    $this->assertSame('my contribution note', $result['values'][0]['note']);
   }
 
   /**
@@ -1012,7 +1012,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // Legacy mode in create api (honor_contact_id param) uses the standard "In Honor of" soft credit type
     $this->assertEquals($this->_params['total_amount'], $result['values'][0]['soft_credit'][1]['amount']);
     $softCreditValueTypeID = $result['values'][0]['soft_credit'][1]['soft_credit_type'];
-    $this->assertEquals('in_honor_of', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $softCreditValueTypeID));
+    $this->assertSame('in_honor_of', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_ContributionSoft', 'soft_credit_type_id', $softCreditValueTypeID));
 
     $this->callAPISuccess('contribution', 'delete', ['id' => $contribution['id']]);
     $this->callAPISuccess('contact', 'delete', ['id' => $contact2['id']]);
@@ -1042,7 +1042,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->getFinancialTypeID('Donation'));
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 12345);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 67890);
-    $this->assertEquals($contribution['values'][$contribution['id']]['source'], 'SSF');
+    $this->assertSame('SSF', $contribution['values'][$contribution['id']]['source']);
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status_id'], 1);
 
     $lineItems = $this->callAPISuccess('line_item', 'get', [
@@ -1093,7 +1093,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
     $this->assertEquals(12345, $contribution['trxn_id']);
     $this->assertEquals(67890, $contribution['invoice_id']);
-    $this->assertEquals('SSF', $contribution['source']);
+    $this->assertSame('SSF', $contribution['source']);
     $this->assertEquals(1, $contribution['contribution_status_id']);
     $contribution['payment_instrument_id'] = $this->callAPISuccessGetValue('PaymentProcessor', [
       'id' => $this->ids['PaymentProcessor']['dummy'],
@@ -1132,7 +1132,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
     $this->assertEquals(12345, $contribution['trxn_id']);
     $this->assertEquals(67890, $contribution['invoice_id']);
-    $this->assertEquals('SSF', $contribution['source']);
+    $this->assertSame('SSF', $contribution['source']);
     $this->assertEquals(2, $contribution['contribution_status_id']);
     $this->_checkFinancialRecords($contribution, 'payLater');
   }
@@ -1162,7 +1162,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
     $this->assertEquals(12345, $contribution['trxn_id']);
     $this->assertEquals(67890, $contribution['invoice_id']);
-    $this->assertEquals('SSF', $contribution['source']);
+    $this->assertSame('SSF', $contribution['source']);
     $this->assertEquals(2, $contribution['contribution_status_id']);
     $this->_checkFinancialRecords($contribution, 'pending');
   }
@@ -1179,7 +1179,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return' => ['contribution_status_id', 'payment_instrument'],
     ]);
     $this->assertEquals(1, $contribution['contribution_status_id']);
-    $this->assertEquals('Check', $contribution['payment_instrument']);
+    $this->assertSame('Check', $contribution['payment_instrument']);
     $this->callAPISuccessGetCount('Contribution', ['id' => $contribution['id']], 0);
   }
 
@@ -1357,7 +1357,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->_checkFinancialTrxn($contribution, 'refund');
     $this->_checkFinancialItem($contribution['id'], 'refund');
-    $this->assertEquals('original_payment', $this->callAPISuccessGetValue('Contribution', [
+    $this->assertSame('original_payment', $this->callAPISuccessGetValue('Contribution', [
       'id' => $contribution['id'],
       'return' => 'trxn_id',
     ]));
@@ -1500,7 +1500,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->_checkFinancialTrxn($contribution, 'refund');
     $this->_checkFinancialItem($contribution['id'], 'refund');
-    $this->assertEquals('the refund', $this->callAPISuccessGetValue('Contribution', [
+    $this->assertSame('the refund', $this->callAPISuccessGetValue('Contribution', [
       'id' => $contribution['id'],
       'return' => 'trxn_id',
     ]));
@@ -1535,7 +1535,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->_checkFinancialTrxn($contribution, 'refund');
     $this->_checkFinancialItem($contribution['id'], 'refund');
-    $this->assertEquals('cont id', $this->callAPISuccessGetValue('Contribution', [
+    $this->assertSame('cont id', $this->callAPISuccessGetValue('Contribution', [
       'id' => $contribution['id'],
       'return' => 'trxn_id',
     ]));
@@ -1570,7 +1570,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->_checkFinancialTrxn($contribution, 'refund', NULL, ['trxn_id' => NULL]);
     $this->_checkFinancialItem($contribution['id'], 'refund');
-    $this->assertEquals('cont id', $this->callAPISuccessGetValue('Contribution', [
+    $this->assertSame('cont id', $this->callAPISuccessGetValue('Contribution', [
       'id' => $contribution['id'],
       'return' => 'trxn_id',
     ]));
@@ -1719,9 +1719,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     //check against values in CiviUnitTestCase::createContribution()
     $this->assertEquals($old_contact_id, $this->individualID);
     $this->assertEquals($old_fee_amount, 5.00);
-    $this->assertEquals($old_source, 'SSF');
+    $this->assertSame('SSF', $old_source);
     $this->assertEquals($old_trxn_id, 212355);
-    $this->assertEquals($old_invoice_id, 'old_invoice');
+    $this->assertSame('old_invoice', $old_invoice_id);
     $params = [
       'id' => $contributionID,
       'contact_id' => $this->individualID,
@@ -1741,14 +1741,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($this->individualID, $contribution['contact_id']);
     $this->assertEquals(105.00, $contribution['total_amount']);
     $this->assertEquals($this->financialTypeID, $contribution['financial_type_id']);
-    $this->assertEquals('Donation', $contribution['financial_type']);
+    $this->assertSame('Donation', $contribution['financial_type']);
     $this->assertEquals($old_payment_instrument, $contribution['instrument_id']);
     $this->assertEquals(22.00, $contribution['non_deductible_amount']);
     $this->assertEquals(7.00, $contribution['fee_amount']);
     $this->assertEquals($old_trxn_id, $contribution['trxn_id']);
     $this->assertEquals($old_invoice_id, $contribution['invoice_id']);
     $this->assertEquals($old_source, $contribution['contribution_source']);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
 
     $this->assertEquals($contribution['net_amount'], $contribution['total_amount'] - $contribution['fee_amount']);
 
@@ -1881,7 +1881,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($p['invoice_id'], $res['invoice_id']);
     $this->assertEquals($p['source'], $res['contribution_source']);
     // contribution_status_id = 1 => Completed
-    $this->assertEquals('Completed', $res['contribution_status']);
+    $this->assertSame('Completed', $res['contribution_status']);
 
     $this->contributionDelete($contribution['id']);
   }
@@ -1951,8 +1951,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
     ]);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $contribution['id']]);
-    $this->assertEquals('SSF', $contribution['contribution_source']);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertSame('SSF', $contribution['contribution_source']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receipt_date'])));
     $mut->checkMailLog([
       'email:::anthony_anderson@civicrm.org',
@@ -1985,14 +1985,14 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
 
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $contribution['id']]);
-    $this->assertEquals('SSF', $contribution['contribution_source']);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertSame('SSF', $contribution['contribution_source']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receipt_date'])));
 
     $entityFinancialTransactions = $this->getFinancialTransactionsForContribution($contribution['id']);
     $entityFinancialTransaction = reset($entityFinancialTransactions);
     $financialTrxn = $this->callAPISuccessGetSingle('FinancialTrxn', ['id' => $entityFinancialTransaction['financial_trxn_id']]);
-    $this->assertEquals('EUR', $financialTrxn['currency']);
+    $this->assertSame('EUR', $financialTrxn['currency']);
 
     $mut->checkMailLog([
       'email:::anthony_anderson@civicrm.org',
@@ -2115,7 +2115,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'trxn_id' => '7778888',
     ]);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $contribution['id'], 'sequential' => 1]);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
     $this->assertEquals('7778888', $contribution['trxn_id']);
     $this->assertEquals('0.56', $contribution['fee_amount']);
     $this->assertEquals('99.44', $contribution['net_amount']);
@@ -2254,7 +2254,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ->addSelect('Custom_Group.Enter_text_here')
       ->addSelect('id')
       ->execute()->first();
-    $this->assertEquals('first', $contribution['Custom_Group.Enter_text_here']);
+    $this->assertSame('first', $contribution['Custom_Group.Enter_text_here']);
 
     Contribution::update()->setValues(['Custom_Group.Enter_text_here' => 'second'])->addWhere('id', '=', $contribution['id'])->execute();
 
@@ -2273,7 +2273,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ->addWhere('trxn_id', '=', 'number_3')
       ->setSelect(['id', 'Custom_Group.Enter_text_here'])
       ->execute()->first();
-    $this->assertEquals('second', $contribution['Custom_Group.Enter_text_here']);
+    $this->assertSame('second', $contribution['Custom_Group.Enter_text_here']);
   }
 
   /**
@@ -2513,10 +2513,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $membership['id'],
     ]);
 
-    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membershipStatusId));
+    $this->assertSame('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membershipStatusId));
 
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
-    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+    $this->assertSame('civicrm_membership', $lineItem['entity_table']);
     $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id'], 'version' => 3]);
   }
 
@@ -2556,7 +2556,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     // If this date calculation winds up being flakey the spirit of the test would be maintained by just checking
     // date is greater than today.
     $this->assertEquals(date('Y-m-d', strtotime('+ 1 month -1 day')), $membership['end_date']);
-    $this->assertEquals('Current', $membership['status_id.name']);
+    $this->assertSame('Current', $membership['status_id.name']);
   }
 
   /**
@@ -2604,7 +2604,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($this->getMembershipStatusID('Expired'), $updatedMembership['status_id']);
 
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
-    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+    $this->assertSame('civicrm_membership', $lineItem['entity_table']);
     $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id'], 'version' => 3]);
   }
 
@@ -2790,7 +2790,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testContributionOrder(): void {
     $this->createContributionAndMembershipOrder();
     $contribution = $this->callAPISuccess('contribution', 'get')['values'][$this->ids['Contribution'][0]];
-    $this->assertEquals('Pending Label**', $contribution['contribution_status']);
+    $this->assertSame('Pending Label**', $contribution['contribution_status']);
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['order']]);
 
     $this->callAPISuccess('Payment', 'create', [
@@ -2799,7 +2799,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'total_amount' => 300,
     ]);
     $contribution = $this->callAPISuccess('contribution', 'get')['values'][$this->ids['Contribution'][0]];
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
 
     $lineItem = $this->callAPISuccess('LineItem', 'get', [
       'sequential' => 1,
@@ -2807,13 +2807,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ])['values'];
     $this->assertCount(2, $lineItem);
     $this->assertEquals($this->ids['Contribution'][0], $lineItem[0]['entity_id']);
-    $this->assertEquals('civicrm_contribution', $lineItem[0]['entity_table']);
+    $this->assertSame('civicrm_contribution', $lineItem[0]['entity_table']);
     $this->assertEquals($this->ids['Contribution'][0], $lineItem[0]['contribution_id']);
     $this->assertEquals($this->ids['Contribution'][0], $lineItem[1]['contribution_id']);
     $this->assertEquals('100.00', $lineItem[0]['line_total']);
     $this->assertEquals('200.00', $lineItem[1]['line_total']);
     $this->assertEquals($membership['id'], $lineItem[1]['entity_id']);
-    $this->assertEquals('civicrm_membership', $lineItem[1]['entity_table']);
+    $this->assertSame('civicrm_membership', $lineItem[1]['entity_table']);
   }
 
   /**
@@ -3075,7 +3075,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
     ]);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $contribution['id']]);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
     $this->assertEquals(($contribution['total_amount'] - $contribution['net_amount']), $contribution['fee_amount']);
   }
 
@@ -3090,9 +3090,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->callAPISuccess('contribution', 'completetransaction', ['id' => $contribution['id'], 'trxn_date' => date('Y-m-d')]);
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id'], 'sequential' => 1]);
-    $this->assertEquals('Completed', $contribution['values'][0]['contribution_status']);
+    $this->assertSame('Completed', $contribution['values'][0]['contribution_status']);
     // Make sure receive_date is original date and make sure payment date is today
-    $this->assertEquals('2012-05-11', date('Y-m-d', strtotime($contribution['values'][0]['receive_date'])));
+    $this->assertSame('2012-05-11', date('Y-m-d', strtotime($contribution['values'][0]['receive_date'])));
     $payment = $this->callAPISuccess('payment', 'get', ['contribution_id' => $contribution['id'], 'sequential' => 1]);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($payment['values'][0]['trxn_date'])));
     $mut->checkMailLog([
@@ -3121,7 +3121,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     // Check if a receipt was issued
     $receipt_date = $this->callAPISuccess('Contribution', 'getvalue', ['id' => $contribution['id'], 'return' => 'receipt_date']);
-    $this->assertEquals('', $receipt_date);
+    $this->assertSame('', $receipt_date);
   }
 
   /**
@@ -3357,7 +3357,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $pledge = $this->callAPISuccessGetSingle('Pledge', [
       'id' => $this->ids['Pledge']['default'],
     ]);
-    $this->assertEquals('Completed', $pledge['pledge_status']);
+    $this->assertSame('Completed', $pledge['pledge_status']);
 
     $status = $this->callAPISuccessGetValue('PledgePayment', [
       'pledge_id' => $this->ids['Pledge']['default'],
@@ -3394,7 +3394,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contributionID,
       'trxn_date' => '1 Feb 2013',
     ]);
-    $this->assertEquals('In Progress', Pledge::get()
+    $this->assertSame('In Progress', Pledge::get()
       ->addWhere('id', '=', $this->ids['Pledge']['default'])
       ->addSelect('status_id:name')->execute()->first()['status_id:name']
     );
@@ -3409,7 +3409,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
       ->execute();
 
-    $this->assertEquals('Completed', Pledge::get()
+    $this->assertSame('Completed', Pledge::get()
       ->addWhere('id', '=', $this->ids['Pledge']['default'])
       ->addSelect('status_id:name')->execute()->first()['status_id:name']
     );
@@ -3433,7 +3433,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('contribution', 'completetransaction', ['id' => $contributionID]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID, 'return' => ['contribution_source']]);
-    $this->assertEquals('Online Event Registration: Annual CiviCRM meet', $contribution['contribution_source']);
+    $this->assertSame('Online Event Registration: Annual CiviCRM meet', $contribution['contribution_source']);
     $participantStatus = $this->callAPISuccessGetValue('participant', [
       'id' => $this->_ids['participant'],
       'return' => 'participant_status_id',
@@ -3573,10 +3573,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'status_id' => 'Completed',
     ]);
     $this->assertEquals(1, $activity['count']);
-    $this->assertEquals('Status changed from Pending to New', $activity['values'][$activity['id']]['subject']);
+    $this->assertSame('Status changed from Pending to New', $activity['values'][$activity['id']]['subject']);
     $membershipLogs = $this->callAPISuccess('MembershipLog', 'get', ['sequential' => 1])['values'];
-    $this->assertEquals('Pending', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membershipLogs[0]['status_id']));
-    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membershipLogs[1]['status_id']));
+    $this->assertSame('Pending', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membershipLogs[0]['status_id']));
+    $this->assertSame('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membershipLogs[1]['status_id']));
     //Create another pending contribution for renewal
     $this->setUpPendingContribution($this->ids['PriceFieldValue']['one_term_membership'], 'second', [], ['entity_id' => $this->getMembershipID()], ['id' => $this->getMembershipID()]);
 
@@ -3733,7 +3733,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->checkCreditCardDetails($mut, $order['id']);
     $mut->stop();
     $tplVars = CRM_Core_Smarty::singleton()->getTemplateVars();
-    $this->assertEquals('USD', $tplVars['currency']);
+    $this->assertSame('USD', $tplVars['currency']);
   }
 
   /**
@@ -4134,7 +4134,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
       // Generic checks.
       $this->assertEquals(1, $financialTrxn['is_payment']);
-      $this->assertEquals('USD', $financialTrxn['currency']);
+      $this->assertSame('USD', $financialTrxn['currency']);
       $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($financialTrxn['trxn_date'])));
     }
   }
@@ -4365,7 +4365,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ], $generalParams)
     );
     $lineItem = $this->callAPISuccess('LineItem', 'getsingle', []);
-    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+    $this->assertSame('civicrm_membership', $lineItem['entity_table']);
     $membership = $this->callAPISuccess('Membership', 'getsingle', ['id' => $lineItem['entity_id']]);
     $this->callAPISuccess('LineItem', 'getsingle', []);
     $this->callAPISuccessGetCount('MembershipPayment', ['membership_id' => $membership['id'], 'version' => 3], 1);
@@ -4463,7 +4463,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ->addValue('total_amount', 100)
       ->addValue('trxn_date', $contribution2['values'][$contribution2['id']]['receive_date'])
       ->execute();
-    $this->assertEquals('Debit Card', CRM_Contribute_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $contribution2['values'][$contribution2['id']]['payment_instrument_id']));
+    $this->assertSame('Debit Card', CRM_Contribute_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $contribution2['values'][$contribution2['id']]['payment_instrument_id']));
   }
 
   /**
@@ -4494,13 +4494,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(2, $membershipPayments['count']);
 
-    $this->assertEquals('Expired', CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membershipStatusId));
+    $this->assertSame('Expired', CRM_Core_PseudoConstant::getLabel('CRM_Member_BAO_Membership', 'status_id', $membershipStatusId));
     $this->callAPISuccess('Contribution', 'completetransaction', ['id' => $repeatedContribution['id']]);
     $membership = $this->callAPISuccessGetSingle('membership', [
       'id' => $membership['id'],
       'return' => 'status_id, end_date',
     ]);
-    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
+    $this->assertSame('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $membership['status_id']));
     $this->assertEquals(date('Y-m-d', strtotime('yesterday + 1 month')), $membership['end_date']);
   }
 
@@ -4790,7 +4790,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ->addValue('trxn_date', $contribution['values'][$contribution['id']]['receive_date'])
       ->execute();
 
-    $this->assertEquals('AUD', $contribution['values'][$contribution['id']]['currency']);
+    $this->assertSame('AUD', $contribution['values'][$contribution['id']]['currency']);
   }
 
   /**
@@ -4887,13 +4887,13 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Contribution', 'getoptions', [
       'field' => 'currency',
     ]);
-    $this->assertEquals('US Dollar', $result['values']['USD']);
+    $this->assertSame('US Dollar', $result['values']['USD']);
     $this->assertNotContains('$', $result['values']);
     $result = $this->callAPISuccess('Contribution', 'getoptions', [
       'field' => 'currency',
       'context' => 'abbreviate',
     ]);
-    $this->assertEquals('$', $result['values']['USD']);
+    $this->assertSame('$', $result['values']['USD']);
     $this->assertNotContains('US Dollar', $result['values']);
   }
 
@@ -4915,7 +4915,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return' => ['id', 'custom_' . $this->ids['CustomField']['text'], 'custom_' . $this->ids['CustomField']['int']],
     ]);
     $this->assertEquals(5, $getContribution['values'][$contribution['id']][$this->getCustomFieldName('int')]);
-    $this->assertEquals('Some Text', $getContribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['text']]);
+    $this->assertSame('Some Text', $getContribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['text']]);
     $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['text']]);
     $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['int']]);
     $this->callAPISuccess('CustomGroup', 'delete', ['id' => $this->ids['CustomGroup']['Custom Group']]);
@@ -4990,7 +4990,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return' => ['next_sched_contribution_date', 'contribution_status_id'],
     ]);
     // Check that next_sched_contribution_date is empty
-    $this->assertEquals('', $contributionRecur['next_sched_contribution_date'] ?? '');
+    $this->assertSame('', $contributionRecur['next_sched_contribution_date'] ?? '');
 
     $contribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_recur_id' => $contributionRecur['id'],
@@ -5124,7 +5124,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'getSingle', [
       'id' => $contributionID,
     ]);
-    $this->assertEquals('2020-02-02 00:00:00', $contribution['receive_date']);
+    $this->assertSame('2020-02-02 00:00:00', $contribution['receive_date']);
   }
 
   /**
@@ -5157,7 +5157,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'id' => $contributionID,
     ]);
     // payment status should be 'Partially paid'
-    $this->assertEquals('Partially paid', $contribution['contribution_status']);
+    $this->assertSame('Partially paid', $contribution['contribution_status']);
 
     // Record the the Payment with instrument other than Check, e.g Cash (pay all remaining amount)
     $paymentParams = [
@@ -5172,8 +5172,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'getSingle', [
       'id' => $contributionID,
     ]);
-    $this->assertEquals('Cash', $contribution['payment_instrument']);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertSame('Cash', $contribution['payment_instrument']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
   }
 
   /**

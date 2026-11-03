@@ -118,8 +118,8 @@ class CRM_Mailing_MailingHeaderFooterTest extends CiviUnitTestCase {
       'sms_provider_id' => $smsProvider,
     ]);
 
-    $this->assertEquals($mailing['values'][0]['header_id'], NULL);
-    $this->assertEquals($mailing['values'][0]['footer_id'], NULL);
+    $this->assertEquals(NULL, $mailing['values'][0]['header_id']);
+    $this->assertEquals(NULL, $mailing['values'][0]['footer_id']);
   }
 
 }

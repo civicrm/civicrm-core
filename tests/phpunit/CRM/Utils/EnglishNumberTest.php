@@ -25,27 +25,27 @@ class CRM_Utils_EnglishNumberTest extends CiviUnitTestCase {
   }
 
   public function testCamel(): void {
-    $this->assertEquals('Seven', CRM_Utils_EnglishNumber::toCamelCase(7));
-    $this->assertEquals('Nineteen', CRM_Utils_EnglishNumber::toCamelCase(19));
-    $this->assertEquals('Thirty', CRM_Utils_EnglishNumber::toCamelCase(30));
-    $this->assertEquals('FiftyFour', CRM_Utils_EnglishNumber::toCamelCase(54));
-    $this->assertEquals('NinetyNine', CRM_Utils_EnglishNumber::toCamelCase(99));
-    $this->assertEquals('OneHundred', CRM_Utils_EnglishNumber::toCamelCase(100));
-    $this->assertEquals('OneOhFive', CRM_Utils_EnglishNumber::toCamelCase(105));
-    $this->assertEquals('OneTwelve', CRM_Utils_EnglishNumber::toCamelCase(112));
-    $this->assertEquals('TwoFiftyTwo', CRM_Utils_EnglishNumber::toCamelCase(252));
+    $this->assertSame('Seven', CRM_Utils_EnglishNumber::toCamelCase(7));
+    $this->assertSame('Nineteen', CRM_Utils_EnglishNumber::toCamelCase(19));
+    $this->assertSame('Thirty', CRM_Utils_EnglishNumber::toCamelCase(30));
+    $this->assertSame('FiftyFour', CRM_Utils_EnglishNumber::toCamelCase(54));
+    $this->assertSame('NinetyNine', CRM_Utils_EnglishNumber::toCamelCase(99));
+    $this->assertSame('OneHundred', CRM_Utils_EnglishNumber::toCamelCase(100));
+    $this->assertSame('OneOhFive', CRM_Utils_EnglishNumber::toCamelCase(105));
+    $this->assertSame('OneTwelve', CRM_Utils_EnglishNumber::toCamelCase(112));
+    $this->assertSame('TwoFiftyTwo', CRM_Utils_EnglishNumber::toCamelCase(252));
   }
 
   public function testHyphen(): void {
-    $this->assertEquals('seven', CRM_Utils_EnglishNumber::toHyphen(7));
-    $this->assertEquals('nineteen', CRM_Utils_EnglishNumber::toHyphen(19));
-    $this->assertEquals('thirty', CRM_Utils_EnglishNumber::toHyphen(30));
-    $this->assertEquals('fifty-four', CRM_Utils_EnglishNumber::toHyphen(54));
-    $this->assertEquals('ninety-nine', CRM_Utils_EnglishNumber::toHyphen(99));
-    $this->assertEquals('one-hundred', CRM_Utils_EnglishNumber::toHyphen(100));
-    $this->assertEquals('one-oh-five', CRM_Utils_EnglishNumber::toHyphen(105));
-    $this->assertEquals('one-twelve', CRM_Utils_EnglishNumber::toHyphen(112));
-    $this->assertEquals('two-fifty-two', CRM_Utils_EnglishNumber::toHyphen(252));
+    $this->assertSame('seven', CRM_Utils_EnglishNumber::toHyphen(7));
+    $this->assertSame('nineteen', CRM_Utils_EnglishNumber::toHyphen(19));
+    $this->assertSame('thirty', CRM_Utils_EnglishNumber::toHyphen(30));
+    $this->assertSame('fifty-four', CRM_Utils_EnglishNumber::toHyphen(54));
+    $this->assertSame('ninety-nine', CRM_Utils_EnglishNumber::toHyphen(99));
+    $this->assertSame('one-hundred', CRM_Utils_EnglishNumber::toHyphen(100));
+    $this->assertSame('one-oh-five', CRM_Utils_EnglishNumber::toHyphen(105));
+    $this->assertSame('one-twelve', CRM_Utils_EnglishNumber::toHyphen(112));
+    $this->assertSame('two-fifty-two', CRM_Utils_EnglishNumber::toHyphen(252));
   }
 
   public function testIsNumeric(): void {

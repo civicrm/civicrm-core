@@ -37,11 +37,11 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayHasKey('SUM', $functions);
     $this->assertArrayNotHasKey('', $functions);
     $this->assertArrayNotHasKey('SqlFunction', $functions);
-    $this->assertEquals(1, $functions['MAX']['params'][0]['min_expr']);
-    $this->assertEquals(1, $functions['MAX']['params'][0]['max_expr']);
+    $this->assertSame(1, $functions['MAX']['params'][0]['min_expr']);
+    $this->assertSame(1, $functions['MAX']['params'][0]['max_expr']);
     $this->assertFalse($functions['YEAR']['options']);
-    $this->assertEquals(1, $functions['MONTH']['options'][0]['id']);
-    $this->assertEquals(12, $functions['MONTH']['options'][11]['id']);
+    $this->assertSame(1, $functions['MONTH']['options'][0]['id']);
+    $this->assertSame(12, $functions['MONTH']['options'][11]['id']);
   }
 
   public function testGroupAggregates(): void {
@@ -75,11 +75,11 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertTrue(4 === $agg['count']);
     $this->assertEquals(200, $agg['second_amount']);
     $this->assertEquals(300, $agg['second_to_last_amount']);
-    $this->assertEquals('Donation', $agg['first_type']);
-    $this->assertEquals('Member Dues', $agg['third_type']);
-    $this->assertEquals('Event Fee', $agg['last_type']);
+    $this->assertSame('Donation', $agg['first_type']);
+    $this->assertSame('Member Dues', $agg['third_type']);
+    $this->assertSame('Event Fee', $agg['last_type']);
     $this->assertNull($agg['fifth_type']);
-    $this->assertEquals('February', $agg['second_month']);
+    $this->assertSame('February', $agg['second_month']);
 
     // Test AVG, SUM, MAX, MIN, COUNT
     $agg = Contribution::get(FALSE)
@@ -144,8 +144,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->first();
 
     $this->assertTrue(4 === $agg['count']);
-    $this->assertEquals('Donation', $agg['financial_type_1']);
-    $this->assertEquals('January', $agg['months']);
+    $this->assertSame('Donation', $agg['financial_type_1']);
+    $this->assertSame('January', $agg['months']);
     $this->assertTrue($agg['is_donation_1']);
     $this->assertFalse($agg['is_donation_4']);
   }
@@ -254,8 +254,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(300, $result[1]['SUM:total_amount']);
     $this->assertEquals(200, $result[0]['MAX:total_amount']);
     $this->assertEquals(100, $result[0]['MIN:total_amount']);
-    $this->assertEquals(2, $result[0]['count']);
-    $this->assertEquals(1, $result[1]['count']);
+    $this->assertSame(2, $result[0]['count']);
+    $this->assertSame(1, $result[1]['count']);
 
     $result = (array) civicrm_api4('Contribution', 'get', [
       'checkPermissions' => FALSE,
@@ -302,7 +302,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addHaving('first_date', '>', '2020-01-01')
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('2020-02-02 00:00:00', $result[0]['first_date']);
+    $this->assertSame('2020-02-02 00:00:00', $result[0]['first_date']);
 
     // Same query but the HAVING filter should correctly exclude when the earliest date is not
     // actually after the filter.
@@ -335,7 +335,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addHaving('first_birth', '>', '2020-01-01')
       ->execute();
     $this->assertCount(1, $result);
-    $this->assertEquals('2020-02-02', $result[0]['first_birth']);
+    $this->assertSame('2020-02-02', $result[0]['first_birth']);
   }
 
   public function testComparisonFunctions(): void {
@@ -370,41 +370,41 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->indexBy('id');
 
     $this->assertCount(3, $result);
-    $this->assertEquals(0, $result[$aids[0]]['trashed']);
-    $this->assertEquals(1, $result[$aids[1]]['trashed']);
-    $this->assertEquals(0, $result[$aids[2]]['trashed']);
+    $this->assertSame(0, $result[$aids[0]]['trashed']);
+    $this->assertSame(1, $result[$aids[1]]['trashed']);
+    $this->assertSame(0, $result[$aids[2]]['trashed']);
 
-    $this->assertEquals(NULL, $result[$aids[0]]['nullif_subject_is_location']);
-    $this->assertEquals('xyz', $result[$aids[1]]['nullif_subject_is_location']);
-    $this->assertEquals('def', $result[$aids[2]]['nullif_subject_is_location']);
+    $this->assertNull($result[$aids[0]]['nullif_subject_is_location']);
+    $this->assertSame('xyz', $result[$aids[1]]['nullif_subject_is_location']);
+    $this->assertSame('def', $result[$aids[2]]['nullif_subject_is_location']);
 
-    $this->assertEquals(123, $result[$aids[0]]['nullif_duration_is_456']);
-    $this->assertEquals(NULL, $result[$aids[1]]['nullif_duration_is_456']);
-    $this->assertEquals(NULL, $result[$aids[2]]['nullif_duration_is_456']);
+    $this->assertSame(123, $result[$aids[0]]['nullif_duration_is_456']);
+    $this->assertNull($result[$aids[1]]['nullif_duration_is_456']);
+    $this->assertNull($result[$aids[2]]['nullif_duration_is_456']);
 
     $this->assertEquals('123', $result[$aids[0]]['coalesce_duration_location']);
-    $this->assertEquals('abc', $result[$aids[1]]['coalesce_duration_location']);
+    $this->assertSame('abc', $result[$aids[1]]['coalesce_duration_location']);
     $this->assertEquals('456', $result[$aids[2]]['coalesce_duration_location']);
 
-    $this->assertEquals(200, $result[$aids[0]]['greatest_of_duration_or_200']);
-    $this->assertEquals(NULL, $result[$aids[1]]['greatest_of_duration_or_200']);
-    $this->assertEquals(456, $result[$aids[2]]['greatest_of_duration_or_200']);
+    $this->assertSame(200, $result[$aids[0]]['greatest_of_duration_or_200']);
+    $this->assertNull($result[$aids[1]]['greatest_of_duration_or_200']);
+    $this->assertSame(456, $result[$aids[2]]['greatest_of_duration_or_200']);
 
-    $this->assertEquals(123, $result[$aids[0]]['least_of_duration_and_300']);
-    $this->assertEquals(NULL, $result[$aids[1]]['least_of_duration_and_300']);
-    $this->assertEquals(300, $result[$aids[2]]['least_of_duration_and_300']);
+    $this->assertSame(123, $result[$aids[0]]['least_of_duration_and_300']);
+    $this->assertNull($result[$aids[1]]['least_of_duration_and_300']);
+    $this->assertSame(300, $result[$aids[2]]['least_of_duration_and_300']);
 
-    $this->assertEquals(FALSE, $result[$aids[0]]['duration_isnull']);
-    $this->assertEquals(TRUE, $result[$aids[1]]['duration_isnull']);
-    $this->assertEquals(FALSE, $result[$aids[2]]['duration_isnull']);
+    $this->assertFalse($result[$aids[0]]['duration_isnull']);
+    $this->assertTrue($result[$aids[1]]['duration_isnull']);
+    $this->assertFalse($result[$aids[2]]['duration_isnull']);
 
-    $this->assertEquals(TRUE, $result[$aids[0]]['duration_isnotnull']);
-    $this->assertEquals(FALSE, $result[$aids[1]]['duration_isnotnull']);
-    $this->assertEquals(TRUE, $result[$aids[2]]['duration_isnotnull']);
+    $this->assertTrue($result[$aids[0]]['duration_isnotnull']);
+    $this->assertFalse($result[$aids[1]]['duration_isnotnull']);
+    $this->assertTrue($result[$aids[2]]['duration_isnotnull']);
 
-    $this->assertEquals(123, $result[$aids[0]]['ifnull_duration_2']);
-    $this->assertEquals(2, $result[$aids[1]]['ifnull_duration_2']);
-    $this->assertEquals(456, $result[$aids[2]]['ifnull_duration_2']);
+    $this->assertSame(123, $result[$aids[0]]['ifnull_duration_2']);
+    $this->assertSame(2, $result[$aids[1]]['ifnull_duration_2']);
+    $this->assertSame(456, $result[$aids[2]]['ifnull_duration_2']);
 
     // Calculate expected TIMESTAMPDIFF
     foreach ($aids as $aid) {
@@ -448,13 +448,13 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('SUBSTRING(last_name, 2, 3) AS sub_last')
       ->execute()->first();
 
-    $this->assertEquals('abc|Q|tester1', $result['concat_ws']);
-    $this->assertEquals('abcdef', $result['new_first']);
-    $this->assertEquals('ABC', $result['UPPER:first_name']);
-    $this->assertEquals('q', $result['LOWER:middle_name']);
-    $this->assertEquals('tes', $result['left_last']);
-    $this->assertEquals('er1', $result['right_last']);
-    $this->assertEquals('est', $result['sub_last']);
+    $this->assertSame('abc|Q|tester1', $result['concat_ws']);
+    $this->assertSame('abcdef', $result['new_first']);
+    $this->assertSame('ABC', $result['UPPER:first_name']);
+    $this->assertSame('q', $result['LOWER:middle_name']);
+    $this->assertSame('tes', $result['left_last']);
+    $this->assertSame('er1', $result['right_last']);
+    $this->assertSame('est', $result['sub_last']);
   }
 
   public function testDateFunctions(): void {
@@ -483,29 +483,29 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addOrderBy('id')
       ->execute();
 
-    $this->assertEquals(51, $result[0]['diff']);
-    $this->assertEquals(2009, $result[0]['year']);
-    $this->assertEquals(4, $result[0]['quarter']);
-    $this->assertEquals(11, $result[0]['month']);
-    $this->assertEquals('November', $result[0]['month_name']);
-    $this->assertEquals('November', $result[0]['MONTH:birth_date:label']);
+    $this->assertSame(51, $result[0]['diff']);
+    $this->assertSame(2009, $result[0]['year']);
+    $this->assertSame(4, $result[0]['quarter']);
+    $this->assertSame(11, $result[0]['month']);
+    $this->assertSame('November', $result[0]['month_name']);
+    $this->assertSame('November', $result[0]['MONTH:birth_date:label']);
     $this->assertEquals('200911', $result[0]['year_month']);
-    $this->assertEquals('2008-11-11', $result[0]['birth_date_minus_1_year']);
-    $this->assertEquals('2010-11-11', $result[0]['birth_date_plus_1_year']);
-    $this->assertEquals(4, $result[0]['day_number']);
-    $this->assertEquals('Wednesday', $result[0]['day_name']);
+    $this->assertSame('2008-11-11', $result[0]['birth_date_minus_1_year']);
+    $this->assertSame('2010-11-11', $result[0]['birth_date_plus_1_year']);
+    $this->assertSame(4, $result[0]['day_number']);
+    $this->assertSame('Wednesday', $result[0]['day_name']);
 
-    $this->assertEquals(0, $result[1]['diff']);
-    $this->assertEquals(2010, $result[1]['year']);
-    $this->assertEquals(1, $result[1]['quarter']);
-    $this->assertEquals(1, $result[1]['month']);
-    $this->assertEquals('January', $result[1]['month_name']);
-    $this->assertEquals('January', $result[1]['MONTH:birth_date:label']);
+    $this->assertSame(0, $result[1]['diff']);
+    $this->assertSame(2010, $result[1]['year']);
+    $this->assertSame(1, $result[1]['quarter']);
+    $this->assertSame(1, $result[1]['month']);
+    $this->assertSame('January', $result[1]['month_name']);
+    $this->assertSame('January', $result[1]['MONTH:birth_date:label']);
     $this->assertEquals('201001', $result[1]['year_month']);
-    $this->assertEquals('2009-01-01', $result[1]['birth_date_minus_1_year']);
-    $this->assertEquals('2011-01-01', $result[1]['birth_date_plus_1_year']);
-    $this->assertEquals(6, $result[1]['day_number']);
-    $this->assertEquals('Friday', $result[1]['day_name']);
+    $this->assertSame('2009-01-01', $result[1]['birth_date_minus_1_year']);
+    $this->assertSame('2011-01-01', $result[1]['birth_date_plus_1_year']);
+    $this->assertSame(6, $result[1]['day_number']);
+    $this->assertSame('Friday', $result[1]['day_name']);
   }
 
   public function testAnniversaryFunctions(): void {
@@ -527,8 +527,8 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addOrderBy('id')
       ->execute();
 
-    $this->assertEquals('2001-02-28', $result[0]['birth_date']);
-    $this->assertEquals('2000-02-29', $result[1]['birth_date']);
+    $this->assertSame('2001-02-28', $result[0]['birth_date']);
+    $this->assertSame('2000-02-29', $result[1]['birth_date']);
     $this->assertNotNull($result[0]['next_birthday']);
     $this->assertNotNull($result[1]['next_birthday']);
     $this->assertNotNull($result[0]['next_birthday_count']);
@@ -541,18 +541,18 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     // Check upcoming birthday is a date in the future
     $this->assertGreaterThanOrEqual(date('Y-m-d'), $result[0]['next_birthday_date']);
     [$y, $md] = explode('-', $result[0]['next_birthday_date'], 2);
-    $this->assertEquals('02-28', $md);
+    $this->assertSame('02-28', $md);
 
     // This birthday falls on a leap year.
     [$y, $md] = explode('-', $result[1]['next_birthday_date'], 2);
     $this->assertGreaterThanOrEqual(date('Y'), $y);
     // If the upcoming date falls on a leap year, we expect feb 29 to be returned
     if ((new \IntlGregorianCalendar())->isLeapYear($y)) {
-      $this->assertEquals('02-29', $md);
+      $this->assertSame('02-29', $md);
     }
     // Otherwise it should return feb 28
     else {
-      $this->assertEquals('02-28', $md);
+      $this->assertSame('02-28', $md);
     }
   }
 
@@ -564,7 +564,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       $this->fail('Api should have thrown exception');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Missing param 2 for SQL function IF', $e->getMessage());
+      $this->assertSame('Missing param 2 for SQL function IF', $e->getMessage());
     }
 
     try {
@@ -574,7 +574,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       $this->fail('Api should have thrown exception');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Too many arguments given for SQL function NULLIF', $e->getMessage());
+      $this->assertSame('Too many arguments given for SQL function NULLIF', $e->getMessage());
     }
 
     try {
@@ -584,7 +584,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       $this->fail('Api should have thrown exception');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Too few arguments to param 2 for SQL function CONCAT_WS', $e->getMessage());
+      $this->assertSame('Too few arguments to param 2 for SQL function CONCAT_WS', $e->getMessage());
     }
   }
 
@@ -667,7 +667,7 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('MONTH(birth_date)', '=', 'MONTH("2030-11-12")', TRUE)
       ->addSelect('birth_date')
       ->execute()->single();
-    $this->assertEquals('2009-11-11', $result['birth_date']);
+    $this->assertSame('2009-11-11', $result['birth_date']);
 
     // Try in GROUP_BY
     $result = Contact::get(FALSE)
@@ -730,15 +730,15 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
 
     $this->assertCount(2, $result);
     $this->assertEquals(1, $result[0]['a']);
-    $this->assertEquals('one', $result[0]['b']);
-    $this->assertEquals('United Kingdon', $result[0]['country']);
+    $this->assertSame('one', $result[0]['b']);
+    $this->assertSame('United Kingdon', $result[0]['country']);
     $this->assertEquals(1, $result[0]['first_element']);
     $this->assertEquals(2, $result[0]['second_element']);
     $this->assertEquals(3, $result[0]['third_element']);
 
     $this->assertEquals(2, $result[1]['a']);
-    $this->assertEquals('two', $result[1]['b']);
-    $this->assertEquals('United States', $result[1]['country']);
+    $this->assertSame('two', $result[1]['b']);
+    $this->assertSame('United States', $result[1]['country']);
     $this->assertEquals(4, $result[1]['first_element']);
     $this->assertEquals(15, $result[1]['second_element']);
     $this->assertEquals(9, $result[1]['third_element']);

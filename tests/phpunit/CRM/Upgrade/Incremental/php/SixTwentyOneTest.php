@@ -99,14 +99,14 @@ class CRM_Upgrade_Incremental_php_SixTwentyOneTest extends CiviUnitTestCase {
       ->execute()
       ->first();
     $this->assertEquals(['@report:987'], (array) $updatedDashlet['permission']);
-    $this->assertEquals('AND', $updatedDashlet['permission_operator']);
+    $this->assertSame('AND', $updatedDashlet['permission_operator']);
 
     $updatedNav = Navigation::get(FALSE)
       ->addWhere('id', '=', $nav['id'])
       ->execute()
       ->first();
     $this->assertEquals(['@report:987'], (array) $updatedNav['permission']);
-    $this->assertEquals('AND', $updatedNav['permission_operator']);
+    $this->assertSame('AND', $updatedNav['permission_operator']);
   }
 
 }

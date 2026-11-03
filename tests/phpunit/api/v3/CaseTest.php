@@ -227,7 +227,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'return.custom_' . $ids['custom_field_id'] => 1,
       'id' => $result['id'],
     ]);
-    $this->assertEquals("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
+    $this->assertSame("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
@@ -302,7 +302,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'version' => 3,
       'id' => $result['id'],
     ]);
-    $this->assertEquals("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
+    $this->assertSame("custom string", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
     $fields = $this->callAPISuccess('Case', 'getfields', ['version' => $this->_apiversion]);
     $this->assertTrue(is_array($fields['values']['custom_' . $ids['custom_field_id']]));
 
@@ -319,7 +319,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'version' => 3,
       'id' => $result['id'],
     ]);
-    $this->assertEquals("Updated my test data", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
+    $this->assertSame("Updated my test data", $result['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
   }
 
   /**
@@ -409,7 +409,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'activity_id' => $activity,
       'return' => 'activities',
     ]);
-    $this->assertEquals(FALSE, empty($result['values'][$id]));
+    $this->assertFalse(empty($result['values'][$id]));
     $this->assertEquals($result['values'][$id], $case);
   }
 
@@ -494,7 +494,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'target_contact_id' => $this->_params['contact_id'],
     ];
     $result = $this->callAPISuccess('Activity', 'create', $params);
-    $this->assertEquals('Follow up', CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $result['values'][$result['id']]['activity_type_id']));
+    $this->assertSame('Follow up', CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $result['values'][$result['id']]['activity_type_id']));
 
     // might need this for other tests that piggyback on this one
     $this->_caseActivityId = $result['values'][$result['id']]['id'];
@@ -581,7 +581,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $caseType = $this->callAPISuccess('CaseType', 'get', ['id' => $this->caseTypeId]);
     $newCaseType = $caseType['values'][$this->caseTypeId];
     // Sanity check that we're changing what we think we're changing.
-    $this->assertEquals('Homeless Services Coordinator', $newCaseType['definition']['caseRoles'][0]['name']);
+    $this->assertSame('Homeless Services Coordinator', $newCaseType['definition']['caseRoles'][0]['name']);
     // string '0' to match what actually happens when you do it in UI
     $newCaseType['definition']['caseRoles'][0]['creator'] = '0';
     unset($newCaseType['id']);
@@ -604,7 +604,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     // There should only be the client role.
     $this->assertCount(1, $result['contacts']);
     $contact = $result['contacts'][0];
-    $this->assertEquals('Client', $contact['role']);
+    $this->assertSame('Client', $contact['role']);
     // For good measure
     $this->assertNotEquals(1, $contact['creator'] ?? NULL);
     $this->assertNotEquals(1, $contact['manager'] ?? NULL);
@@ -666,7 +666,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'tag_id' => $tag1['id'],
       'return' => 'tag_id.name',
     ]);
-    $this->assertEquals('CaseTag1', $result['tag_id'][$tag1['id']]['tag_id.name']);
+    $this->assertSame('CaseTag1', $result['tag_id'][$tag1['id']]['tag_id.name']);
   }
 
   /**
@@ -884,7 +884,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     ]);
     // Created case should only have 1 activity per the spec
     $result = $this->callAPISuccessGetSingle('Activity', ['case_id' => $case['id'], 'return' => 'activity_type_id.name']);
-    $this->assertEquals('Open Case', $result['activity_type_id.name']);
+    $this->assertSame('Open Case', $result['activity_type_id.name']);
     // Add timeline.
     $this->callAPISuccess('Case', 'addtimeline', [
       'case_id' => $case['id'],
@@ -897,7 +897,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       'options' => ['sort' => 'id'],
     ]);
     $this->assertEquals(2, $result['count']);
-    $this->assertEquals('Follow up', $result['values'][1]['activity_type_id.name']);
+    $this->assertSame('Follow up', $result['values'][1]['activity_type_id.name']);
   }
 
   /**

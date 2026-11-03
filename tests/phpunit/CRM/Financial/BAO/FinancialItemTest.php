@@ -245,7 +245,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $financialItem['id'])
       ->addSelect('description', 'status_id', 'amount', 'financial_account_id')
       ->execute()->single();
-    $this->assertEquals('Contribution Amount', $result['description']);
+    $this->assertSame('Contribution Amount', $result['description']);
     $this->assertEquals(1, $result['status_id']);
     $this->assertEquals(100.00, $result['amount']);
     $this->assertEquals($this->getFinancialAccountID('Donation'), $result['financial_account_id']);

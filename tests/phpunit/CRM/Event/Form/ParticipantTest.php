@@ -129,7 +129,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->addOrderBy('id', 'DESC')
       ->execute()
       ->first();
-    $this->assertEquals('Random thing', $participant[$this->getCustomFieldName('text', 4)]);
+    $this->assertSame('Random thing', $participant[$this->getCustomFieldName('text', 4)]);
   }
 
   /**
@@ -438,7 +438,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->assertCount(3, $financialItems);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertEquals('Partially paid', $contribution['contribution_status']);
+    $this->assertSame('Partially paid', $contribution['contribution_status']);
 
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $contribution['id'],
@@ -474,12 +474,12 @@ Baltimore, NY 10545<br />
 United States<br />',
     ]);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
-    $this->assertEquals('2018-09-04 00:00:00', $participant['participant_register_date']);
-    $this->assertEquals('Offline Registration for Event: Annual CiviCRM meet by:', $participant['participant_source']);
+    $this->assertSame('2018-09-04 00:00:00', $participant['participant_register_date']);
+    $this->assertSame('Offline Registration for Event: Annual CiviCRM meet by:', $participant['participant_source']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(20, $contribution['total_amount']);
     $this->assertEquals(['Family Deal - 1'], $contribution['amount_level']);
-    $this->assertEquals('Debit Card', $contribution['payment_instrument']);
+    $this->assertSame('Debit Card', $contribution['payment_instrument']);
     $this->assertNotEmpty($contribution['receipt_date']);
     // Just check it's not something weird like 1970 without getting into flakey-precise.
     $this->assertGreaterThan(strtotime('yesterday'), strtotime($contribution['receipt_date']));
@@ -539,7 +539,7 @@ United States<br />',
     $this->submitForm(['is_monetary' => 1, 'financial_type_id' => $this->getFinancialTypeID('Donation')], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
 
     $contribution = Contribution::get(FALSE)->addSelect('contribution_status_id:name')->execute()->single();
-    $this->assertEquals('Pending', $contribution['contribution_status_id:name']);
+    $this->assertSame('Pending', $contribution['contribution_status_id:name']);
     $payments = Payment::get(FALSE)->execute();
     $this->assertCount(0, $payments);
   }

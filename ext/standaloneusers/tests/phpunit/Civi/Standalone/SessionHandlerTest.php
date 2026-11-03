@@ -40,7 +40,7 @@ class SessionHandlerTest extends TestCase implements EndToEndInterface {
     // Try to read data from the session
     $data = $session_handler->read($session_id);
     // Should return an empty string because the session doesn't exist yet
-    $this->assertEquals('', $data);
+    $this->assertSame('', $data);
 
     // Write to the session
     $session_handler->write($session_id, 'CiviCRM|a:1:{s:4:"ufID";i:1}');
@@ -51,7 +51,7 @@ class SessionHandlerTest extends TestCase implements EndToEndInterface {
     // Check the stored session
     $session = self::getSession($session_id);
     $this->assertIsArray($session);
-    $this->assertEquals('CiviCRM|a:1:{s:4:"ufID";i:1}', $session['data']);
+    $this->assertSame('CiviCRM|a:1:{s:4:"ufID";i:1}', $session['data']);
 
     $original_timestamp = $session['last_accessed'];
 
@@ -65,7 +65,7 @@ class SessionHandlerTest extends TestCase implements EndToEndInterface {
 
     // Read from the session
     $data = $session_handler->read($session_id);
-    $this->assertEquals('CiviCRM|a:1:{s:4:"ufID";i:1}', $data, 'Session should have stored data');
+    $this->assertSame('CiviCRM|a:1:{s:4:"ufID";i:1}', $data, 'Session should have stored data');
 
     // Update the session timestamp
     $session_handler->updateTimestamp($session_id, 'CiviCRM|a:1:{s:4:"ufID";i:1}');
@@ -76,7 +76,7 @@ class SessionHandlerTest extends TestCase implements EndToEndInterface {
     // Check the stored session
     $session = self::getSession($session_id);
     $this->assertIsArray($session);
-    $this->assertEquals('CiviCRM|a:1:{s:4:"ufID";i:1}', $session['data']);
+    $this->assertSame('CiviCRM|a:1:{s:4:"ufID";i:1}', $session['data']);
 
     $updated_timestamp = $session['last_accessed'];
 
@@ -96,7 +96,7 @@ class SessionHandlerTest extends TestCase implements EndToEndInterface {
 
     // Read from the session
     $data = $session_handler->read($session_id);
-    $this->assertEquals('CiviCRM|a:1:{s:4:"ufID";i:1}', $data, 'Session data should not have changed');
+    $this->assertSame('CiviCRM|a:1:{s:4:"ufID";i:1}', $data, 'Session data should not have changed');
 
     // Destroy the session
     $session_handler->destroy($session_id);
@@ -169,7 +169,7 @@ class SessionHandlerTest extends TestCase implements EndToEndInterface {
     // Make sure the session has not been affected by the transaction rollback
     $session = self::getSession($session_id);
     $this->assertIsArray($session);
-    $this->assertEquals('CiviCRM|a:1:{s:4:"ufID";i:1}', $session['data']);
+    $this->assertSame('CiviCRM|a:1:{s:4:"ufID";i:1}', $session['data']);
   }
 
   private static function getSession($session_id) {

@@ -19,19 +19,19 @@ class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
       }
     }
 
-    $this->assertEquals('Individual', $schema['IndividualModel']['schema']['first_name']['civiFieldType']);
+    $this->assertSame('Individual', $schema['IndividualModel']['schema']['first_name']['civiFieldType']);
     $this->assertTrue(empty($schema['IndividualModel']['schema']['first_name']['civiIsLocation']));
     $this->assertTrue(empty($schema['IndividualModel']['schema']['first_name']['civiIsPhone']));
 
-    $this->assertEquals('Contact', $schema['IndividualModel']['schema']['street_address']['civiFieldType']);
+    $this->assertSame('Contact', $schema['IndividualModel']['schema']['street_address']['civiFieldType']);
     $this->assertNotEmpty($schema['IndividualModel']['schema']['street_address']['civiIsLocation']);
     $this->assertTrue(empty($schema['IndividualModel']['schema']['street_address']['civiIsPhone']));
 
-    $this->assertEquals('Contact', $schema['IndividualModel']['schema']['phone_and_ext']['civiFieldType']);
+    $this->assertSame('Contact', $schema['IndividualModel']['schema']['phone_and_ext']['civiFieldType']);
     $this->assertNotEmpty($schema['IndividualModel']['schema']['phone_and_ext']['civiIsLocation']);
     $this->assertNotEmpty($schema['IndividualModel']['schema']['phone_and_ext']['civiIsPhone']);
 
-    $this->assertEquals('Activity', $schema['ActivityModel']['schema']['activity_subject']['civiFieldType']);
+    $this->assertSame('Activity', $schema['ActivityModel']['schema']['activity_subject']['civiFieldType']);
     $this->assertTrue(empty($schema['ActivityModel']['schema']['activity_subject']['civiIsLocation']));
     $this->assertTrue(empty($schema['ActivityModel']['schema']['activity_subject']['civiIsPhone']));
 
@@ -48,7 +48,7 @@ class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
   public function testGetSchemaWithHooks(): void {
     CRM_Utils_Hook::singleton()->setHook('civicrm_alterUFFields', [$this, 'hook_civicrm_alterUFFIelds']);
     $schema = CRM_UF_Page_ProfileEditor::getSchema(['IndividualModel', 'GrantModel']);
-    $this->assertEquals('Grant', $schema['GrantModel']['schema']['grant_id']['civiFieldType']);
+    $this->assertSame('Grant', $schema['GrantModel']['schema']['grant_id']['civiFieldType']);
   }
 
   /**

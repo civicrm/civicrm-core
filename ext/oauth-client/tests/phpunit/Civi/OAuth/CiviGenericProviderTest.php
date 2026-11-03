@@ -89,9 +89,9 @@ class CiviGenericProviderTest extends \PHPUnit\Framework\TestCase implements
     // Test tenancy token rewrite
     $provider = \Civi::service('oauth2.league')->createProvider($this->clients['with-tenancy']);
     $computedAuthorizationURL = $provider->getBaseAuthorizationUrl();
-    $this->assertEquals('https://dummy/123-456-789/authorize', $computedAuthorizationURL);
+    $this->assertSame('https://dummy/123-456-789/authorize', $computedAuthorizationURL);
     $computedTokenURL = $provider->getBaseAccessTokenUrl([]);
-    $this->assertEquals('https://dummy/123-456-789/token', $computedTokenURL);
+    $this->assertSame('https://dummy/123-456-789/token', $computedTokenURL);
 
   }
 

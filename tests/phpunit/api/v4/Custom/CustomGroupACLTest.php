@@ -241,7 +241,7 @@ class CustomGroupACLTest extends Api4TestBase {
       ->addWhere('id', '=', $cid)
       ->addSelect('first_name', 'custom.*')
       ->execute()->single();
-    $this->assertEquals('test1234', $result['first_name']);
+    $this->assertSame('test1234', $result['first_name']);
     $this->assertEquals('1234', $result['MyReadWriteSingle.MyField']);
     $this->assertEquals('456', $result['MyReadOnlySingle.MyField']);
     $this->assertEquals('789', $result['MySuperSecretSingle.MyField']);
@@ -263,7 +263,7 @@ class CustomGroupACLTest extends Api4TestBase {
       ->addWhere('id', '=', $cid)
       ->addSelect('first_name', 'custom.*')
       ->execute()->single();
-    $this->assertEquals('test12345', $result['first_name']);
+    $this->assertSame('test12345', $result['first_name']);
     $this->assertEquals('12345', $result['MyReadWriteSingle.MyField']);
     $this->assertEquals('456', $result['MyReadOnlySingle.MyField']);
     $this->assertEquals('789', $result['MySuperSecretSingle.MyField']);

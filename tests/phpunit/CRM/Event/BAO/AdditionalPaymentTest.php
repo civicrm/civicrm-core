@@ -126,10 +126,10 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       $this->assertEquals($actualPaidAmt, $contribution['paid_amount'], 'Amount paid is not correct');
       $this->assertEquals(100 - $actualPaidAmt, $contribution['balance_amount'], 'Balance is not correct');
       if ($actualPaidAmt > 0) {
-        $this->assertEquals('Partially paid', $contribution['contribution_status_id:label'], 'Contribution status is not correct');
+        $this->assertSame('Partially paid', $contribution['contribution_status_id:label'], 'Contribution status is not correct');
       }
       else {
-        $this->assertEquals('Pending Label**', $contribution['contribution_status_id:label'], 'Contribution status is not correct');
+        $this->assertSame('Pending Label**', $contribution['contribution_status_id:label'], 'Contribution status is not correct');
       }
     }
     catch (CRM_Core_Exception $e) {
@@ -187,7 +187,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals(100, $contribution['total_amount']);
     $this->assertEquals(100, $contribution['paid_amount'], 'Amount paid is not correct');
     $this->assertEquals(0, $contribution['balance_amount'], 'Balance is not correct');
-    $this->assertEquals('Completed', $contribution['contribution_status_id:label'], 'Contribution status is not correct');
+    $this->assertSame('Completed', $contribution['contribution_status_id:label'], 'Contribution status is not correct');
 
     OptionValue::delete(FALSE)
       ->addWhere('option_group_id:name', '=', 'payment_instrument')
@@ -239,13 +239,13 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $amtPaid = (float) 60;
     $result = $this->addParticipantWithPayment($amtPaid);
-    $this->assertEquals('Partially paid', $result['participant']['participant_status']);
+    $this->assertSame('Partially paid', $result['participant']['participant_status']);
 
     // Check the record payment link has the right id and that it doesn't
     // match by accident.
     $this->assertNotEquals($this->ids['Contribution']['PaidEvent'], $result['participant']['id']);
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->ids['Contribution']['PaidEvent']);
-    $this->assertEquals('Record Payment', $paymentInfo['payment_links'][0]['title']);
+    $this->assertSame('Record Payment', $paymentInfo['payment_links'][0]['title']);
     $this->assertEquals($this->ids['Contribution']['PaidEvent'], $paymentInfo['payment_links'][0]['qs']['id']);
   }
 
@@ -286,13 +286,13 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     // Assert all transaction(owed and refund) are listed on view payments.
     $this->assertCount(3, $transaction, 'Transaction Details is not proper');
     $this->assertEquals(80.00, $transaction[0]['total_amount']);
-    $this->assertEquals('Completed', $transaction[0]['status']);
+    $this->assertSame('Completed', $transaction[0]['status']);
 
     $this->assertEquals(20.00, $transaction[1]['total_amount']);
-    $this->assertEquals('Completed', $transaction[1]['status']);
+    $this->assertSame('Completed', $transaction[1]['status']);
 
     $this->assertEquals(-50.00, $transaction[2]['total_amount']);
-    $this->assertEquals('Refunded Label**', $transaction[2]['status']);
+    $this->assertSame('Refunded Label**', $transaction[2]['status']);
   }
 
 }

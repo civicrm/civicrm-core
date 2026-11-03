@@ -50,10 +50,10 @@ class CRM_Core_Resources_BundleTest extends CiviUnitTestCase {
       'region' => ['groceries'],
     ];
     $this->assertEquals($expectSettings, $region->getSettings());
-    $this->assertEquals('http://example.com/bundle.js', $region->get('http://example.com/bundle.js')['scriptUrl']);
-    $this->assertEquals('http://example.com/bundle.css', $region->get('http://example.com/bundle.css')['styleUrl']);
-    $this->assertEquals('http://example.com/region.js', $region->get('http://example.com/region.js')['scriptUrl']);
-    $this->assertEquals('http://example.com/region.css', $region->get('http://example.com/region.css')['styleUrl']);
+    $this->assertSame('http://example.com/bundle.js', $region->get('http://example.com/bundle.js')['scriptUrl']);
+    $this->assertSame('http://example.com/bundle.css', $region->get('http://example.com/bundle.css')['styleUrl']);
+    $this->assertSame('http://example.com/region.js', $region->get('http://example.com/region.js')['scriptUrl']);
+    $this->assertSame('http://example.com/region.css', $region->get('http://example.com/region.css')['styleUrl']);
   }
 
   /**
@@ -67,9 +67,9 @@ class CRM_Core_Resources_BundleTest extends CiviUnitTestCase {
 
     $bundle->fillDefaults();
 
-    $this->assertEquals('html-header', $bundle->get('http://example.com/myscript.js')['region']);
-    $this->assertEquals('yonder', $bundle->get('http://example.com/yonder-style.css')['region']);
-    $this->assertEquals('page-header', $bundle->get('cheese')['region']);
+    $this->assertSame('html-header', $bundle->get('http://example.com/myscript.js')['region']);
+    $this->assertSame('yonder', $bundle->get('http://example.com/yonder-style.css')['region']);
+    $this->assertSame('page-header', $bundle->get('cheese')['region']);
   }
 
   /**
@@ -79,9 +79,9 @@ class CRM_Core_Resources_BundleTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     $config->customCSSURL = "http://example.com/css/custom.css";
     $bundle = CRM_Core_Resources_Common::createStyleBundle('coreStyles');
-    $this->assertEquals('civicrm:css/civicrm.css', $bundle->get('civicrm:css/civicrm.css')['name']);
-    $this->assertEquals('civicrm:css/crm-i.css', $bundle->get('civicrm:css/crm-i.css')['name']);
-    $this->assertEquals('civicrm:css/custom.css', $bundle->get('civicrm:css/custom.css')['name']);
+    $this->assertSame('civicrm:css/civicrm.css', $bundle->get('civicrm:css/civicrm.css')['name']);
+    $this->assertSame('civicrm:css/crm-i.css', $bundle->get('civicrm:css/crm-i.css')['name']);
+    $this->assertSame('civicrm:css/custom.css', $bundle->get('civicrm:css/custom.css')['name']);
   }
 
 }

@@ -23,7 +23,7 @@ class CRM_Case_Form_CaseViewTest extends CiviCaseTestCase {
     $form->buildForm();
     $options = $form->getElement('activity_type_filter_id')->_options;
     // We don't care about the first one, just check it's what we expect
-    $this->assertEquals('- select activity type -', $options[0]['text']);
+    $this->assertSame('- select activity type -', $options[0]['text']);
     unset($options[0]);
     $expected = [];
     foreach ([

@@ -117,7 +117,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ]
     );
     $this->assertEquals($paymentProcessorID, $financialTrxn['payment_processor_id']);
-    $this->assertEquals('Visa', $financialTrxn['card_type_id.label']);
+    $this->assertSame('Visa', $financialTrxn['card_type_id.label']);
     $this->assertEquals(1111, $financialTrxn['pan_truncation']);
 
     // This looks like it's missing an item for the main contribution - but just locking in current behaviour.
@@ -294,7 +294,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ]);
 
     $source = Participant::get(FALSE)->addSelect('source')->execute()->single()['source'];
-    $this->assertEquals('Referred by a friend', $source);
+    $this->assertSame('Referred by a friend', $source);
   }
 
   /**
@@ -312,7 +312,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $waitlistParticipantID = $this->participantCreate(['event_id' => $event['id'], 'contact_id' => $waitlistContactID, 'status_id.name' => 'On waitlist']);
 
     $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantID, 'return' => ['participant_status']]);
-    $this->assertEquals('On waitlist', $waitlistParticipant['participant_status'], 'Invalid participant status. Expecting: On waitlist');
+    $this->assertSame('On waitlist', $waitlistParticipant['participant_status'], 'Invalid participant status. Expecting: On waitlist');
     $this->submitForm($this->getEventID(), [
       'first_name' => 'bob',
       'last_name' => 'smith',
@@ -341,7 +341,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'hidden_processor' => 1,
     ], 'live');
     $waitlistParticipant = $this->callAPISuccess('Participant', 'getsingle', ['id' => $waitlistParticipantID, 'return' => ['participant_status']]);
-    $this->assertEquals('Registered', $waitlistParticipant['participant_status'], 'Invalid participant status. Expecting: Registered');
+    $this->assertSame('Registered', $waitlistParticipant['participant_status'], 'Invalid participant status. Expecting: Registered');
   }
 
   /**
@@ -373,7 +373,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ->addSelect('status_id:name', 'is_pay_later')
       ->execute()->single();
 
-    $this->assertEquals('On waitlist', $participant['status_id:name']);
+    $this->assertSame('On waitlist', $participant['status_id:name']);
     $this->assertEquals(0, $participant['is_pay_later']);
   }
 
@@ -501,7 +501,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ->indexBy('id');
 
     $this->assertNotEquals('Cancelled', $statuses[$keepParticipantID]['status_id:name']);
-    $this->assertEquals('Cancelled', $statuses[$dropParticipantID]['status_id:name']);
+    $this->assertSame('Cancelled', $statuses[$dropParticipantID]['status_id:name']);
   }
 
   public function checkPaymentParameters($paymentObject, $parameters): void {
@@ -1069,7 +1069,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ->addSelect('status_id:name')
       ->execute()->single();
 
-    $this->assertEquals('On waitlist', $participant['status_id:name']);
+    $this->assertSame('On waitlist', $participant['status_id:name']);
   }
 
   /**

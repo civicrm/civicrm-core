@@ -87,9 +87,9 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
       'schema' => ['mailingId'],
     ]);
     $listedTokens = $tokenProcessor->listTokens();
-    $this->assertEquals('Mailing ID', $listedTokens['{mailing.id}']);
-    $this->assertEquals('Subject', $listedTokens['{mailing.subject}']);
-    $this->assertEquals('Approval Note', $listedTokens['{mailing.approval_note}']);
+    $this->assertSame('Mailing ID', $listedTokens['{mailing.id}']);
+    $this->assertSame('Subject', $listedTokens['{mailing.subject}']);
+    $this->assertSame('Approval Note', $listedTokens['{mailing.approval_note}']);
   }
 
   /**
@@ -240,7 +240,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     $p->evaluate();
 
     $rendered = $p->getRow(0)->render('test_msg');
-    $this->assertEquals(
+    $this->assertSame(
       'Note: Custom Note Value | Code: high_prio | Label: High Priority | Author: Jane Author',
       $rendered
     );

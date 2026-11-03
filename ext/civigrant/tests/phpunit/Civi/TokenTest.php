@@ -57,12 +57,12 @@ class TokenTest extends TestCase implements HeadlessInterface, TransactionalInte
     ]);
     $tokenProcessor = new TokenProcessor(\Civi::dispatcher(), ['schema' => ['grantId']]);
     $tokens = $tokenProcessor->listTokens();
-    $this->assertEquals('Grant Report Due Date', $tokens['{grant.grant_due_date}']);
+    $this->assertSame('Grant Report Due Date', $tokens['{grant.grant_due_date}']);
     $tokenProcessor->addMessage('html', '{grant.application_received_date} {grant.status_id:label} {grant.rationale}', 'text/html');
     $tokenProcessor->addRow(['grantId' => $this->ids['Grant']['default']]);
     $tokenProcessor->evaluate();
     $row = $tokenProcessor->getRow(0);
-    $this->assertEquals('May 7th, 2024 Submitted Just Because', $text = $row->render('html'));
+    $this->assertSame('May 7th, 2024 Submitted Just Because', $text = $row->render('html'));
   }
 
 }

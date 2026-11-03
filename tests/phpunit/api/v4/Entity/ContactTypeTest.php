@@ -35,7 +35,7 @@ use Civi\Test\TransactionalInterface;
 class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
 
   public function testMetadata(): void {
-    $this->assertEquals('parent_id', CoreUtil::getInfoItem('ContactType', 'parent_field'));
+    $this->assertSame('parent_id', CoreUtil::getInfoItem('ContactType', 'parent_field'));
   }
 
   public function testMenuItemWillBeCreatedAndDeleted(): void {
@@ -46,7 +46,7 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
     // Menu item should have been auto-created
     $nav = $this->getTestRecord('Navigation', ['name' => 'New Tester']);
-    $this->assertEquals('New Tèstër', $nav['label']);
+    $this->assertSame('New Tèstër', $nav['label']);
 
     ContactType::update(FALSE)
       ->addWhere('name', '=', 'Tester')
@@ -55,7 +55,7 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
 
     // Menu item should have been updated
     $nav = $this->getTestRecord('Navigation', ['name' => 'New Tester']);
-    $this->assertEquals('New Wëll Téstęd!', $nav['label']);
+    $this->assertSame('New Wëll Téstęd!', $nav['label']);
 
     ContactType::delete(FALSE)
       ->addWhere('name', '=', 'Tester')
@@ -116,7 +116,7 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayNotHasKey('first_name', $result[$org]);
     $this->assertArrayNotHasKey('first_name', $result[$hh]);
 
-    $this->assertEquals('Dr.', $result[$indiv]['prefix_id:label']);
+    $this->assertSame('Dr.', $result[$indiv]['prefix_id:label']);
     $this->assertArrayNotHasKey('prefix_id:label', $result[$org]);
     $this->assertArrayNotHasKey('prefix_id:label', $result[$hh]);
 
@@ -142,7 +142,7 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
     $this->assertArrayNotHasKey('contact_id.first_name', $emails[$org]);
     $this->assertArrayNotHasKey('contact_id.first_name', $emails[$hh]);
 
-    $this->assertEquals('Dr.', $emails[$indiv]['contact_id.prefix_id:label']);
+    $this->assertSame('Dr.', $emails[$indiv]['contact_id.prefix_id:label']);
     $this->assertArrayNotHasKey('contact_id.prefix_id:label', $emails[$org]);
     $this->assertArrayNotHasKey('contact_id.prefix_id:label', $emails[$hh]);
 
@@ -165,13 +165,13 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
     $result = Contact::create(FALSE)
       ->addValue('contact_type:name', 'Household')
       ->execute()->first();
-    $this->assertEquals('Household', $result['contact_type']);
+    $this->assertSame('Household', $result['contact_type']);
 
     // Contact type should be inferred by the type of name given
     $result = Contact::save(FALSE)
       ->addRecord(['organization_name' => 'Foo'])
       ->execute()->first();
-    $this->assertEquals('Organization', $result['contact_type']);
+    $this->assertSame('Organization', $result['contact_type']);
   }
 
   public function testContactTypeWontChange(): void {
@@ -201,7 +201,7 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
 
     $household = $this->getTestRecord('Contact', $hhId);
 
-    $this->assertEquals('Household', $household['contact_type']);
+    $this->assertSame('Household', $household['contact_type']);
     $this->assertTrue(empty($household['organization_name']));
   }
 

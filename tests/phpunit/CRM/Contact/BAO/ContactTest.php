@@ -100,10 +100,10 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($params['suffix_id'], $contact->suffix_id, 'Check for suffix_id creation.');
     $this->assertEquals($params['job_title'], $contact->job_title, 'Check for job_title creation.');
     $this->assertEquals($params['gender_id'], $contact->gender_id, 'Check for gender_id creation.');
-    $this->assertEquals('135', $contact->preferred_communication_method);
+    $this->assertSame('135', $contact->preferred_communication_method);
     $this->assertEquals(1, $createdContact['is_deceased'], 'Check is_deceased');
-    $this->assertEquals('1961-06-06', $createdContact['birth_date'], 'Check birth_date');
-    $this->assertEquals('1991-07-07', $createdContact['deceased_date'], 'Check deceased_date');
+    $this->assertSame('1961-06-06', $createdContact['birth_date'], 'Check birth_date');
+    $this->assertSame('1991-07-07', $createdContact['deceased_date'], 'Check deceased_date');
 
     $updateParams = [
       'contact_type' => 'Individual',
@@ -559,7 +559,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       //Now check values of Relationship organization.
       $this->assertEquals($organizationID, $val['contact_id_b'], 'Check for organization');
       //Now check values of Relationship type.
-      $this->assertEquals('Employee of', $val['relation'], 'Check for relationship type');
+      $this->assertSame('Employee of', $val['relation'], 'Check for relationship type');
       //delete the organization.
       $this->contactDelete($val['contact_id_b']);
     }
@@ -821,7 +821,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       //Now check values of Relationship organization.
       $this->assertEquals($profileParams['organization_name'], $val['name'], 'Check for organization');
       //Now check values of Relationship type.
-      $this->assertEquals('Employee of', $val['relation'], 'Check for relationship type');
+      $this->assertSame('Employee of', $val['relation'], 'Check for relationship type');
       //delete the organization.
       $this->contactDelete($val['cid']);
     }
@@ -1025,7 +1025,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       //Now check values of Relationship organization.
       $this->assertEquals($updatePfParams['organization_name'], $val['name'], 'Check for organization');
       //Now check values of Relationship type.
-      $this->assertEquals('Employee of', $val['relation'], 'Check for relationship type');
+      $this->assertSame('Employee of', $val['relation'], 'Check for relationship type');
       //delete the organization.
       $this->contactDelete($val['cid']);
     }
@@ -1330,7 +1330,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $this->ids['Contact']['mod'])
       ->addSelect('modified_date')
       ->execute()->first();
-    $this->assertEquals('2023-01-09 00:00:00', $contact['modified_date']);
+    $this->assertSame('2023-01-09 00:00:00', $contact['modified_date']);
     Contact::delete(FALSE)
       ->setUseTrash(TRUE)
       ->addWhere('id', '=', $contact['id'])->execute();

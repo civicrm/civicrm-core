@@ -116,11 +116,11 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
 
     $row = $dataSource->getRow();
     if ($expectedOutcome === 1) {
-      $this->assertEquals('IMPORTED', $row['_status']);
+      $this->assertSame('IMPORTED', $row['_status']);
       return CRM_Import_Parser::VALID;
     }
     if ($expectedOutcome === 4) {
-      $this->assertEquals('ERROR', $row['_status'], $row['_status_message']);
+      $this->assertSame('ERROR', $row['_status'], $row['_status_message']);
       return $row['_status_message'];
     }
   }
@@ -352,7 +352,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
     ], [], 'create', ['TargetContact' => ['dedupe_rule' => ['unique_email_match'], 'contact_type' => NULL]]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
     $this->callAPISuccessGetSingle('Activity', ['priority_id' => 'Urgent']);
   }
 
@@ -380,7 +380,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->assertSame('IMPORTED', $row['_status']);
     $activity = $this->callAPISuccessGetSingle('Activity', ['priority_id' => 'Urgent']);
     $activityContacts = ActivityContact::get(FALSE)
       ->addWhere('activity_id', '=', $activity['id'])

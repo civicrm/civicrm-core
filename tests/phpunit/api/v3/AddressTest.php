@@ -85,9 +85,9 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('address', 'create', $params);
     $this->assertEquals(54, $result['values'][$result['id']]['street_number']);
-    $this->assertEquals('A', $result['values'][$result['id']]['street_number_suffix']);
-    $this->assertEquals('Excelsior Ave.', $result['values'][$result['id']]['street_name']);
-    $this->assertEquals('Apt 1C', $result['values'][$result['id']]['street_unit']);
+    $this->assertSame('A', $result['values'][$result['id']]['street_number_suffix']);
+    $this->assertSame('Excelsior Ave.', $result['values'][$result['id']]['street_name']);
+    $this->assertSame('Apt 1C', $result['values'][$result['id']]['street_unit']);
     $this->callAPISuccess('address', 'delete', ['id' => $result['id']]);
 
   }
@@ -332,7 +332,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Address', 'Get', $params);
     $this->assertEquals(2, $result['count']);
-    $this->assertEquals('Ambachtstraat 23', $result['values'][1]['street_address']);
+    $this->assertSame('Ambachtstraat 23', $result['values'][1]['street_address']);
   }
 
   /**
@@ -350,7 +350,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Address', 'Get', $params);
     $this->assertEquals(1, $result['count']);
-    $this->assertEquals('Ambachtstraat 23', $result['values'][0]['street_address']);
+    $this->assertSame('Ambachtstraat 23', $result['values'][0]['street_address']);
   }
 
   /**
@@ -385,7 +385,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $getParams = ['id' => $result['id'], 'return' => ['custom']];
     $check = $this->callAPISuccess($this->_entity, 'get', $getParams);
 
-    $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+    $this->assertSame("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
@@ -465,7 +465,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'street_address' => __FUNCTION__,
       'return' => 'contact_id.contact_type',
     ]);
-    $this->assertEquals('Individual', $result['contact_id.contact_type']);
+    $this->assertSame('Individual', $result['contact_id.contact_type']);
   }
 
   /**
@@ -558,7 +558,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     ]);
     $result = $this->callAPIFailure('address', 'getoptions', ['field' => 'state_province_id']);
     // confirm that we hit our error not a SQLI.
-    $this->assertEquals('Failed encoding non-numeric value (#countryLimit)', $result['error_message']);
+    $this->assertSame('Failed encoding non-numeric value (#countryLimit)', $result['error_message']);
     $this->callAPISuccess('setting', 'create', [
       'provinceLimit' => [1228],
     ]);
@@ -579,7 +579,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     ]);
     $result = $this->callAPIFailure('address', 'getoptions', ['field' => 'country_id']);
     // confirm that we hit our error not a SQLI.
-    $this->assertEquals('Failed encoding non-numeric value (#countryLimit)', $result['error_message']);
+    $this->assertSame('Failed encoding non-numeric value (#countryLimit)', $result['error_message']);
     $this->callAPISuccess('setting', 'create', [
       'countryLimit' => [1228],
     ]);
@@ -593,12 +593,12 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'field' => 'county_id',
       'state_province_id' => "abcd;ef",
     ]);
-    $this->assertEquals('Failed encoding non-numeric value (#stateProvince)', $result['error_message']);
+    $this->assertSame('Failed encoding non-numeric value (#stateProvince)', $result['error_message']);
     $goodResult = $this->callAPISuccess('Address', 'getoptions', [
       'field' => 'county_id',
       'state_province_id' => 1004,
     ]);
-    $this->assertEquals('San Francisco', $goodResult['values'][4]);
+    $this->assertSame('San Francisco', $goodResult['values'][4]);
   }
 
   public function testGetOptionsAbbr(): void {

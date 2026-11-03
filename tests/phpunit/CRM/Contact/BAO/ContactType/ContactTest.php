@@ -96,8 +96,8 @@ DELETE FROM civicrm_contact_type
     }
     catch (Exception $expected) {
     }
-    $this->assertEquals($contact->first_name, 'Anne');
-    $this->assertEquals($contact->contact_type, 'Individual');
+    $this->assertSame('Anne', $contact->first_name);
+    $this->assertSame('Individual', $contact->contact_type);
     $this->contactDelete($contact->id);
 
     //check for Type:Organization
@@ -110,8 +110,8 @@ DELETE FROM civicrm_contact_type
     }
     catch (Exception $expected) {
     }
-    $this->assertEquals($contact->organization_name, 'Compumentor');
-    $this->assertEquals($contact->contact_type, 'Organization');
+    $this->assertSame('Compumentor', $contact->organization_name);
+    $this->assertSame('Organization', $contact->contact_type);
     $this->contactDelete($contact->id);
 
     //check for Type:Household
@@ -124,8 +124,8 @@ DELETE FROM civicrm_contact_type
     }
     catch (Exception $expected) {
     }
-    $this->assertEquals($contact->household_name, 'John Does home');
-    $this->assertEquals($contact->contact_type, 'Household');
+    $this->assertSame('John Does home', $contact->household_name);
+    $this->assertSame('Household', $contact->contact_type);
     $this->contactDelete($contact->id);
 
     //check for Type:Individual, Subtype:Student
@@ -140,8 +140,8 @@ DELETE FROM civicrm_contact_type
     }
     catch (Exception $expected) {
     }
-    $this->assertEquals($contact->first_name, 'Bill');
-    $this->assertEquals($contact->contact_type, 'Individual');
+    $this->assertSame('Bill', $contact->first_name);
+    $this->assertSame('Individual', $contact->contact_type);
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $contact->contact_sub_type), $this->student);
     $this->contactDelete($contact->id);
 
@@ -156,8 +156,8 @@ DELETE FROM civicrm_contact_type
     }
     catch (Exception $expected) {
     }
-    $this->assertEquals($contact->organization_name, 'Conservation Corp');
-    $this->assertEquals($contact->contact_type, 'Organization');
+    $this->assertSame('Conservation Corp', $contact->organization_name);
+    $this->assertSame('Organization', $contact->contact_type);
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $contact->contact_sub_type), $this->sponsor);
     $this->contactDelete($contact->id);
   }
@@ -189,7 +189,7 @@ DELETE FROM civicrm_contact_type
     catch (Exception $expected) {
     }
     $this->assertEquals($updatedContact->id, $contact->id);
-    $this->assertEquals($updatedContact->contact_type, 'Individual');
+    $this->assertSame('Individual', $updatedContact->contact_type);
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->student);
     $this->contactDelete($contact->id);
 
@@ -214,7 +214,7 @@ DELETE FROM civicrm_contact_type
     catch (Exception $expected) {
     }
     $this->assertEquals($updatedContact->id, $contact->id);
-    $this->assertEquals($updatedContact->contact_type, 'Organization');
+    $this->assertSame('Organization', $updatedContact->contact_type);
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->sponsor);
     $this->contactDelete($contact->id);
   }
@@ -247,7 +247,7 @@ DELETE FROM civicrm_contact_type
     catch (Exception $expected) {
     }
     $this->assertEquals($updatedContact->id, $contact->id);
-    $this->assertEquals($updatedContact->contact_type, 'Individual');
+    $this->assertSame('Individual', $updatedContact->contact_type);
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->parent);
     $this->contactDelete($contact->id);
 
@@ -274,7 +274,7 @@ DELETE FROM civicrm_contact_type
     }
 
     $this->assertEquals($updatedContact->id, $contact->id);
-    $this->assertEquals($updatedContact->contact_type, 'Organization');
+    $this->assertSame('Organization', $updatedContact->contact_type);
     $this->assertEquals(str_replace(CRM_Core_DAO::VALUE_SEPARATOR, '', $updatedContact->contact_sub_type), $this->team);
     $this->contactDelete($contact->id);
 
@@ -302,8 +302,8 @@ DELETE FROM civicrm_contact_type
     }
 
     $this->assertEquals($updatedContact->id, $contact->id);
-    $this->assertEquals($updatedContact->contact_type, 'Individual');
-    $this->assertEquals($updatedContact->contact_sub_type, 'null');
+    $this->assertSame('Individual', $updatedContact->contact_type);
+    $this->assertSame('null', $updatedContact->contact_sub_type);
     $this->contactDelete($contact->id);
   }
 

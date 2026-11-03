@@ -105,7 +105,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
         'metadata' => ['fields'],
       ],
     ]);
-    $this->assertEquals('Website', $result['metadata']['fields']['url']['title']);
+    $this->assertSame('Website', $result['metadata']['fields']['url']['title']);
   }
 
   /**

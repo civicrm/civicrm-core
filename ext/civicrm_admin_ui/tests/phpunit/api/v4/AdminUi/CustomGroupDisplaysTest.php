@@ -62,8 +62,8 @@ class CustomGroupDisplaysTest extends \PHPUnit\Framework\TestCase implements Hea
       'column1',
       'column4',
     ], array_column($mgd[1]['params']['values']['settings']['columns'], 'key'));
-    $this->assertEquals('Custom_testGetSearchKit', $mgd[1]['params']['values']['settings']['toolbar'][0]['entity']);
-    $this->assertEquals('add', $mgd[1]['params']['values']['settings']['toolbar'][0]['action']);
+    $this->assertSame('Custom_testGetSearchKit', $mgd[1]['params']['values']['settings']['toolbar'][0]['entity']);
+    $this->assertSame('add', $mgd[1]['params']['values']['settings']['toolbar'][0]['action']);
 
     // check the search kit exists
     $search = \Civi\Api4\SavedSearch::get(FALSE)
@@ -113,7 +113,7 @@ class CustomGroupDisplaysTest extends \PHPUnit\Framework\TestCase implements Hea
 
     $dateCol = array_values(array_filter($mgd[1]['params']['values']['settings']['columns'], fn($col) => ($col['key'] ?? NULL) === 'date_col'))[0] ?? NULL;
     $this->assertNotNull($dateCol);
-    $this->assertEquals('%Y', $dateCol['format']);
+    $this->assertSame('%Y', $dateCol['format']);
   }
 
 }

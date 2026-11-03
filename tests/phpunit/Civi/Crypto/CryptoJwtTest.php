@@ -51,7 +51,7 @@ class CryptoJwtTest extends \CiviUnitTestCase {
     $retroFuture = strtotime('2099-12-31 23:59:59 UTC');
 
     $decoded = $cryptoJwt->decode($oldToken, 'SIGN-TEST');
-    $this->assertEquals('test', $decoded['scope'], 'Old token should decode with proper scopes');
+    $this->assertSame('test', $decoded['scope'], 'Old token should decode with proper scopes');
     $this->assertEquals($retroFuture, $decoded['exp'], 'Old token should decode with proper expiration');
     // ^^ These two assertions are the most important part of interoperability...
 
@@ -73,7 +73,7 @@ class CryptoJwtTest extends \CiviUnitTestCase {
 
     $dec = $cryptoJwt->decode($enc, 'SIGN-TEST');
     $this->assertTrue(is_array($dec) && !empty($dec));
-    $this->assertEquals('me', $dec['sub']);
+    $this->assertSame('me', $dec['sub']);
 
     JWT::$timestamp = \CRM_Utils_Time::time() + 90;
     try {
@@ -122,7 +122,7 @@ class CryptoJwtTest extends \CiviUnitTestCase {
     ]);
     $dec = $cryptoJwt->decode($enc, 'ASYMMETRIC-EXAMPLE');
     $this->assertTrue(is_array($dec) && !empty($dec));
-    $this->assertEquals('me', $dec['sub']);
+    $this->assertSame('me', $dec['sub']);
     $this->assertEquals($registeredPublicKey['id'], $registeredKeyPair['id'], 'Keypair and public-key should default to same KID.');
   }
 
@@ -156,7 +156,7 @@ class CryptoJwtTest extends \CiviUnitTestCase {
     if ($expectOk) {
       $dec = $cryptoJwt->decode($enc, $decKey);
       $this->assertTrue(is_array($dec) && !empty($dec));
-      $this->assertEquals('me', $dec['sub']);
+      $this->assertSame('me', $dec['sub']);
     }
     else {
       try {
@@ -170,8 +170,8 @@ class CryptoJwtTest extends \CiviUnitTestCase {
   }
 
   public function testSuiteToAlg(): void {
-    $this->assertEquals('HS256', Invasive::call([CryptoJwt::class, 'suiteToAlg'], ['jwt-hs256']));
-    $this->assertEquals(NULL, Invasive::call([CryptoJwt::class, 'suiteToAlg'], ['aes-cbc']));
+    $this->assertSame('HS256', Invasive::call([CryptoJwt::class, 'suiteToAlg'], ['jwt-hs256']));
+    $this->assertNull(Invasive::call([CryptoJwt::class, 'suiteToAlg'], ['aes-cbc']));
   }
 
 }

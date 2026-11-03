@@ -57,7 +57,7 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
    */
   public function testFormatLocaleNumericRoundedByCurrency(): void {
     $result = CRM_Utils_Money::formatLocaleNumericRoundedByCurrency(8950.3678, 'NZD');
-    $this->assertEquals('8,950.37', $result);
+    $this->assertSame('8,950.37', $result);
   }
 
   /**
@@ -70,7 +70,7 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
   public function testFormatLocaleNumericRoundedByCurrencyEuroThousand(): void {
     $this->setCurrencySeparators('.');
     $result = CRM_Utils_Money::formatLocaleNumericRoundedByCurrency(8950.3678, 'NZD');
-    $this->assertEquals('8.950,37', $result);
+    $this->assertSame('8.950,37', $result);
     $this->setCurrencySeparators(',');
   }
 

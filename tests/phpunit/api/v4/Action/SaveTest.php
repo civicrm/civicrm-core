@@ -154,7 +154,7 @@ class SaveTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->single();
 
     self::assertEquals($original['id'], $saved['id']);
-    self::assertEquals('Updated', $saved['label']);
+    self::assertSame('Updated', $saved['label']);
 
     $all = Navigation::get(FALSE)
       ->addWhere('name', '=', 'test_match_default')

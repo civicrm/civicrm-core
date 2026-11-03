@@ -64,8 +64,8 @@ EOHTML;
       ->execute();
 
     $this->assertCount(2, $saved);
-    $this->assertEquals('Firsty2', $saved[0]['contact_id_a.first_name']);
-    $this->assertEquals('Firsty3', $saved[1]['contact_id_a.first_name']);
+    $this->assertSame('Firsty2', $saved[0]['contact_id_a.first_name']);
+    $this->assertSame('Firsty3', $saved[1]['contact_id_a.first_name']);
     $this->assertEquals($childOfID, $saved[0]['relationship_type_id']);
     $this->assertEquals($childOfID, $saved[1]['relationship_type_id']);
   }
@@ -138,9 +138,9 @@ EOHTML;
       ->addOrderBy('relationship_type_id')
       ->execute();
 
-    $this->assertEquals("Hello $lastName", $saved[0]['contact_id_a.organization_name']);
+    $this->assertSame("Hello $lastName", $saved[0]['contact_id_a.organization_name']);
     $this->assertEquals($typeIds[0], $saved[0]['relationship_type_id']);
-    $this->assertEquals("Hello $lastName", $saved[1]['contact_id_a.organization_name']);
+    $this->assertSame("Hello $lastName", $saved[1]['contact_id_a.organization_name']);
     $this->assertEquals($typeIds[1], $saved[1]['relationship_type_id']);
     $this->assertCount(2, $saved);
   }
@@ -194,10 +194,10 @@ EOHTML;
       ->execute()
       ->indexBy('name');
 
-    $this->assertEquals('Employer', $prefill['Organization1']['values'][0]['fields']['organization_name']);
-    $this->assertEquals('Parent', $prefill['Individual2']['values'][0]['fields']['first_name']);
-    $this->assertEquals('Child1', $prefill['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEquals('Child4', $prefill['Individual1']['values'][1]['fields']['first_name']);
+    $this->assertSame('Employer', $prefill['Organization1']['values'][0]['fields']['organization_name']);
+    $this->assertSame('Parent', $prefill['Individual2']['values'][0]['fields']['first_name']);
+    $this->assertSame('Child1', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertSame('Child4', $prefill['Individual1']['values'][1]['fields']['first_name']);
     // No room on form for a 3rd child because af-repeat max=2
     $this->assertCount(2, $prefill['Individual1']['values']);
   }

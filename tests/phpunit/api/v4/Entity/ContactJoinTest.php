@@ -116,15 +116,15 @@ class ContactJoinTest extends Api4TestBase {
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute();
     $this->assertCount(1, $addr);
-    $this->assertEquals('Hello', $contact['address_billing.city']);
-    $this->assertEquals(1001, $contact['address_billing.state_province_id']);
-    $this->assertEquals(1228, $contact['address_billing.country_id']);
+    $this->assertSame('Hello', $contact['address_billing.city']);
+    $this->assertSame(1001, $contact['address_billing.state_province_id']);
+    $this->assertSame(1228, $contact['address_billing.country_id']);
     $emails = Email::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute();
     $this->assertCount(2, $emails);
-    $this->assertEquals('a@test.com', $contact['email_primary.email']);
-    $this->assertEquals('b@test.com', $contact['email_billing.email']);
+    $this->assertSame('a@test.com', $contact['email_primary.email']);
+    $this->assertSame('b@test.com', $contact['email_billing.email']);
   }
 
   /**
@@ -140,15 +140,15 @@ class ContactJoinTest extends Api4TestBase {
       'address_billing.country_id:abbr' => 'NG',
     ]);
     $addr = $this->getTestRecord('Address', ['contact_id' => $contact['id']], ['country_id:label', 'state_province_id:label']);
-    $this->assertEquals('Hello', $contact['address_billing.city']);
-    $this->assertEquals('Akwa Ibom', $addr['state_province_id:label']);
-    $this->assertEquals('Nigeria', $addr['country_id:label']);
+    $this->assertSame('Hello', $contact['address_billing.city']);
+    $this->assertSame('Akwa Ibom', $addr['state_province_id:label']);
+    $this->assertSame('Nigeria', $addr['country_id:label']);
     $emails = Email::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute();
     $this->assertCount(2, $emails);
-    $this->assertEquals('a@test.com', $contact['email_primary.email']);
-    $this->assertEquals('b@test.com', $contact['email_billing.email']);
+    $this->assertSame('a@test.com', $contact['email_primary.email']);
+    $this->assertSame('b@test.com', $contact['email_billing.email']);
   }
 
   public function testUpdateDeletePrimaryAndBilling(): void {
@@ -204,7 +204,7 @@ class ContactJoinTest extends Api4TestBase {
       ->addSelect('contact_id.email_primary.email')
       ->addSelect('contact_id.email_billing')
       ->execute()->single();
-    $this->assertEquals('a@test.com', $result['contact_id.email_primary.email']);
+    $this->assertSame('a@test.com', $result['contact_id.email_primary.email']);
     $this->assertEquals($emails[1], $result['contact_id.email_billing']);
   }
 

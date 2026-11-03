@@ -27,7 +27,7 @@ class CRM_Contact_Form_Task_UseraddTest extends CiviUnitTestCase {
     // matter what.
     $this->getTestForm('CRM_Contact_Form_Task_Useradd', [])->postProcess();
     $statuses = CRM_Core_Session::singleton()->getStatus(TRUE);
-    $this->assertEquals('alert', $statuses[0]['type']);
+    $this->assertSame('alert', $statuses[0]['type']);
   }
 
 }

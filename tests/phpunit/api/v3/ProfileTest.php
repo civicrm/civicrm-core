@@ -111,7 +111,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     foreach ($expected as $profileField => $value) {
       $this->assertEquals($value, $result[$this->_profileID][$profileField], ' error message: ' . "missing/mismatching value for $profileField");
     }
-    $this->assertEquals('abc1', $result[$nameAndAddressProfileID]['first_name'], ' error message: ' . 'missing/mismatching value for first name');
+    $this->assertSame('abc1', $result[$nameAndAddressProfileID]['first_name'], ' error message: ' . 'missing/mismatching value for first name');
     $this->assertArrayNotHasKey('email-Primary', $result[$nameAndAddressProfileID], 'profile 1 does not include email');
     $this->assertEquals([
       'billing_first_name' => 'abc1',
@@ -148,7 +148,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPIV3Success('profile', 'get', $params)['values'];
-    $this->assertEquals('abc1', $result[$nameAndAddressProfileID]['first_name']);
+    $this->assertSame('abc1', $result[$nameAndAddressProfileID]['first_name']);
     $this->assertEquals([
       'billing_first_name' => 'abc1',
       'billing_middle_name' => 'J.',
@@ -190,7 +190,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPIV3Success('profile', 'get', $params);
-    $this->assertEquals('abc1', $result['values'][$nameAndAddressProfileID]['first_name']);
+    $this->assertSame('abc1', $result['values'][$nameAndAddressProfileID]['first_name']);
     $this->assertEquals([
       'billing_first_name' => 'abc1',
       'billing_middle_name' => 'J.',
@@ -382,14 +382,14 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     ]);
     $this->assertArrayKeyExists('first_name', $result['values']);
     $this->assertEquals('2', $result['values']['first_name']['type']);
-    $this->assertEquals('Email', $result['values']['email-primary']['title']);
-    $this->assertEquals('phone', $result['values']['phone-primary-1']['entity']);
-    $this->assertEquals('phone', $result['values']["phone_and_ext-$homeLocationTypeID-2"]['entity']);
-    $this->assertEquals('civicrm_state_province', $result['values']["state_province-$homeLocationTypeID"]['pseudoconstant']['table']);
-    $this->assertEquals('defaultValue', $result['values']['custom_' . $customFieldID]['default_value']);
+    $this->assertSame('Email', $result['values']['email-primary']['title']);
+    $this->assertSame('phone', $result['values']['phone-primary-1']['entity']);
+    $this->assertSame('phone', $result['values']["phone_and_ext-$homeLocationTypeID-2"]['entity']);
+    $this->assertSame('civicrm_state_province', $result['values']["state_province-$homeLocationTypeID"]['pseudoconstant']['table']);
+    $this->assertSame('defaultValue', $result['values']['custom_' . $customFieldID]['default_value']);
     $this->assertArrayNotHasKey('participant_status', $result['values']);
-    $this->assertEquals('website', $result['values']['url-1']['entity']);
-    $this->assertEquals('im', $result['values']['im-primary']['entity']);
+    $this->assertSame('website', $result['values']['url-1']['entity']);
+    $this->assertSame('im', $result['values']['im-primary']['entity']);
   }
 
   /**
@@ -402,7 +402,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'get_options' => 'all',
     ]);
     $this->assertArrayHasKey('participant_status_id', $result['values']);
-    $this->assertEquals('Attended', $result['values']['participant_status_id']['options'][$this->getParticipantStatusID('Attended')]);
+    $this->assertSame('Attended', $result['values']['participant_status_id']['options'][$this->getParticipantStatusID('Attended')]);
     $this->assertEquals(['participant_status'], $result['values']['participant_status_id']['api.aliases']);
   }
 
@@ -541,7 +541,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $params['email-Primary'] = 'my@mail.com';
     $this->callAPIV3Success('profile', 'submit', $params);
     $profileDetails = $this->callAPIV3Success('profile', 'get', $getParams);
-    $this->assertEquals('my@mail.com', $profileDetails['values']['email-Primary']);
+    $this->assertSame('my@mail.com', $profileDetails['values']['email-Primary']);
   }
 
   /**
@@ -616,7 +616,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     // contribution_status_id => 1 (Completed) was requested; since Order::create()
     // always creates a Pending contribution, submit() should have recorded a
     // Payment to bring it to Completed.
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
 
     // The contribution & membership should be linked via a line item, not
     // just two independent records.
@@ -813,7 +813,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->callAPIV3Success('profile', 'submit', $params);
 
     $note = $this->callAPISuccessGetSingle('note', ['entity_id' => $contactId]);
-    $this->assertEquals('Hello 123', $note['note']);
+    $this->assertSame('Hello 123', $note['note']);
   }
 
   /**
@@ -848,7 +848,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     // Api3 will not return custom greeting field so resorting to this
     $greeting = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactId, 'email_greeting_custom');
 
-    $this->assertEquals('Hello fool!', $greeting);
+    $this->assertSame('Hello fool!', $greeting);
   }
 
   /**

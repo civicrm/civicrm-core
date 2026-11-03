@@ -142,10 +142,10 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       ->execute()->first()['id'];
     $this->assertGreaterThan(0, $this->adminUserID);
     $user = User::get(FALSE)->addWhere('id', '=', $this->adminUserID)->execute()->single();
-    $this->assertEquals('user_one', $user['username']);
+    $this->assertSame('user_one', $user['username']);
     $this->assertEquals($this->adminContactID, $user['contact_id']);
     $this->assertEquals($this->adminUserID, $user['uf_id']);
-    $this->assertEquals('user_one@example.org', $user['uf_name']);
+    $this->assertSame('user_one@example.org', $user['uf_name']);
     $this->assertStringStartsWith('$', $user['hashed_password']);
     // The bundled admin role has lots of permissions including 'administer users'.
     $result = UserRole::create(FALSE)
@@ -330,7 +330,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       ->addValue('hashed_password', '$shhh')
       ->addWhere('id', '=', $user['id'])
       ->execute()->first();
-    $this->assertEquals('$shhh', $updatedUser['hashed_password']);
+    $this->assertSame('$shhh', $updatedUser['hashed_password']);
 
     // Test we can saving a new password. (This also resets the fixture's nonadmin user's password to secret2)
     $updatedUser = User::update(FALSE)
@@ -372,7 +372,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("Expected UnauthorizedException got none.");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Not allowed to change hashed_password', $e->getMessage());
+      $this->assertSame('Not allowed to change hashed_password', $e->getMessage());
     }
 
     // If we don't supply OUR correct password, we're not allowed to update the user's password.
@@ -385,7 +385,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("Expected UnauthorizedException got none.");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Incorrect password', $e->getMessage());
+      $this->assertSame('Incorrect password', $e->getMessage());
     }
 
     // If we don't supply OUR password at all, we're not allowed to update the user's password.
@@ -397,7 +397,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("Expected UnauthorizedException got none.");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Unauthorized', $e->getMessage());
+      $this->assertSame('Unauthorized', $e->getMessage());
     }
 
   }
@@ -431,7 +431,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("Expected UnauthorizedException got none.");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Incorrect password', $e->getMessage());
+      $this->assertSame('Incorrect password', $e->getMessage());
     }
 
     // If we don't supply OUR password at all, we're not allowed to update the user's password.
@@ -443,7 +443,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("Expected UnauthorizedException got none.");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('Unauthorized', $e->getMessage());
+      $this->assertSame('Unauthorized', $e->getMessage());
     }
 
     // We're not allowed to update the admin user's password, since we are not an admin.
@@ -456,7 +456,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("Expected UnauthorizedException got none.");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals("User.update called without 'cms:administer users' permission and without a where clause limiting to logged-in user.", $e->getMessage());
+      $this->assertSame("User.update called without 'cms:administer users' permission and without a where clause limiting to logged-in user.", $e->getMessage());
     }
 
     // We're allowed to use User.save to update our account, IF we provide our password.
@@ -486,7 +486,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       ])
       ->execute()->first();
     $updatedUser = User::get(FALSE)->addWhere('id', '=', $this->nonAdminUserID)->execute()->first();
-    $this->assertEquals('nonadmin2', $updatedUser['username']);
+    $this->assertSame('nonadmin2', $updatedUser['username']);
 
     // We cannot create via save
     $this->loginUser($this->nonAdminUserID);
@@ -500,7 +500,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("User::save should have thrown exception");
     }
     catch (\Exception $e) {
-      $this->assertEquals("You are not permitted to change other users' accounts.", $e->getMessage());
+      $this->assertSame("You are not permitted to change other users' accounts.", $e->getMessage());
     }
 
     // We cannot update other users via save
@@ -515,10 +515,10 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("User::save should have thrown exception");
     }
     catch (\Exception $e) {
-      $this->assertEquals("You are not permitted to change other users' accounts.", $e->getMessage());
+      $this->assertSame("You are not permitted to change other users' accounts.", $e->getMessage());
     }
     $updatedUser = User::get(FALSE)->addWhere('id', '=', $this->nonAdminUserID)->execute()->first();
-    $this->assertEquals('nonadmin2', $updatedUser['username'], "The save should NOT have updated the nonadmin user; the whole save operation should have been aborted.");
+    $this->assertSame('nonadmin2', $updatedUser['username'], "The save should NOT have updated the nonadmin user; the whole save operation should have been aborted.");
   }
 
   public function testPermissionedSaveAsAdmin() {
@@ -555,7 +555,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("Should not be allowed to delete logged in User");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('ACL check failed', $e->getMessage());
+      $this->assertSame('ACL check failed', $e->getMessage());
     }
 
     // Admin should be able to delete other accounts.
@@ -722,7 +722,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("User::update should have thrown exception");
     }
     catch (\Exception $e) {
-      $this->assertEquals("Not allowed to change roles", $e->getMessage());
+      $this->assertSame("Not allowed to change roles", $e->getMessage());
     }
 
     // via editing own user and pseudoconstant suffix
@@ -734,7 +734,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("User::update should have thrown exception");
     }
     catch (\Exception $e) {
-      $this->assertEquals("Not allowed to change roles", $e->getMessage());
+      $this->assertSame("Not allowed to change roles", $e->getMessage());
     }
   }
 
@@ -833,7 +833,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("We were able to delete the '$roleName' role and we should not be allowed to.");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('ACL check failed', $e->getMessage());
+      $this->assertSame('ACL check failed', $e->getMessage());
     }
   }
 
@@ -846,7 +846,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
       $this->fail("We were able to update the '$roleName' role and we should not be allowed to.");
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('ACL check failed', $e->getMessage());
+      $this->assertSame('ACL check failed', $e->getMessage());
     }
   }
 

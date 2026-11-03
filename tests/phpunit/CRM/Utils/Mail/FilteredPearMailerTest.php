@@ -33,10 +33,10 @@ class CRM_Utils_Mail_FilteredPearMailerTest extends CiviUnitTestCase {
     });
     $r = $fm->send(['recip'], ['Subject' => 'Fruit loops'], 'body');
 
-    $this->assertEquals('Fruit loops', $mock->buf['headers']['Subject']);
-    $this->assertEquals('Cavendish', $mock->buf['headers']['Banana']);
-    $this->assertEquals('body with apples!', $mock->buf['body']);
-    $this->assertEquals('all the fruits in the basket', $r);
+    $this->assertSame('Fruit loops', $mock->buf['headers']['Subject']);
+    $this->assertSame('Cavendish', $mock->buf['headers']['Banana']);
+    $this->assertSame('body with apples!', $mock->buf['body']);
+    $this->assertSame('all the fruits in the basket', $r);
   }
 
   public function testFilter_shortCircuit(): void {
@@ -53,7 +53,7 @@ class CRM_Utils_Mail_FilteredPearMailerTest extends CiviUnitTestCase {
       return 'the triumph of veggies over fruits';
     });
     $r = $fm->send(['recip'], ['Subject' => 'Fruit loops'], 'body');
-    $this->assertEquals('the triumph of veggies over fruits', $r);
+    $this->assertSame('the triumph of veggies over fruits', $r);
   }
 
 }

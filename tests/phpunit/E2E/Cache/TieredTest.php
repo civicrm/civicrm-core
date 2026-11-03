@@ -43,8 +43,8 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
   public function testDoubleLifeWithDelete(): void {
     $this->assertFalse($this->a->has('foo'));
     $this->assertFalse($this->b->has('foo'));
-    $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
-    $this->assertEquals('dfl-2', $this->b->get('foo', 'dfl-2'));
+    $this->assertSame('dfl-1', $this->a->get('foo', 'dfl-1'));
+    $this->assertSame('dfl-2', $this->b->get('foo', 'dfl-2'));
 
     $this->cache->set('foo', 100);
 
@@ -66,15 +66,15 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
 
     $this->assertFalse($this->a->has('foo'));
     $this->assertFalse($this->b->has('foo'));
-    $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
-    $this->assertEquals('dfl-2', $this->b->get('foo', 'dfl-2'));
+    $this->assertSame('dfl-1', $this->a->get('foo', 'dfl-1'));
+    $this->assertSame('dfl-2', $this->b->get('foo', 'dfl-2'));
   }
 
   public function testDoubleLifeWithClear(): void {
     $this->assertFalse($this->a->has('foo'));
     $this->assertFalse($this->b->has('foo'));
-    $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
-    $this->assertEquals('dfl-2', $this->b->get('foo', 'dfl-2'));
+    $this->assertSame('dfl-1', $this->a->get('foo', 'dfl-1'));
+    $this->assertSame('dfl-2', $this->b->get('foo', 'dfl-2'));
 
     $this->cache->set('foo', 100);
 
@@ -88,8 +88,8 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
 
     $this->assertFalse($this->a->has('foo'));
     $this->assertFalse($this->b->has('foo'));
-    $this->assertEquals('dfl-1', $this->a->get('foo', 'dfl-1'));
-    $this->assertEquals('dfl-2', $this->b->get('foo', 'dfl-2'));
+    $this->assertSame('dfl-1', $this->a->get('foo', 'dfl-1'));
+    $this->assertSame('dfl-2', $this->b->get('foo', 'dfl-2'));
   }
 
   public function testTieredTimeout_default(): void {
@@ -106,7 +106,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->assertEqualsWithDelta(NULL, $this->a->getExpires('foo'), self::TOLERANCE);
     $this->assertEqualsWithDelta($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
 
-    $this->assertEquals('bar', $this->cache->get('foo'));
+    $this->assertSame('bar', $this->cache->get('foo'));
     $this->assertEqualsWithDelta($start + 100, $this->a->getExpires('foo'), self::TOLERANCE);
     $this->assertEqualsWithDelta($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
   }
@@ -125,7 +125,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->assertEqualsWithDelta(NULL, $this->a->getExpires('foo'), self::TOLERANCE);
     $this->assertEqualsWithDelta($start + 50, $this->b->getExpires('foo'), self::TOLERANCE);
 
-    $this->assertEquals('bar', $this->cache->get('foo'));
+    $this->assertSame('bar', $this->cache->get('foo'));
     $this->assertEqualsWithDelta($start + 50, $this->a->getExpires('foo'), self::TOLERANCE);
     $this->assertEqualsWithDelta($start + 50, $this->b->getExpires('foo'), self::TOLERANCE);
   }
@@ -144,7 +144,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
     $this->assertEqualsWithDelta(NULL, $this->a->getExpires('foo'), self::TOLERANCE);
     $this->assertEqualsWithDelta($start + 500, $this->b->getExpires('foo'), self::TOLERANCE);
 
-    $this->assertEquals('bar', $this->cache->get('foo'));
+    $this->assertSame('bar', $this->cache->get('foo'));
     $this->assertEqualsWithDelta($start + 100, $this->a->getExpires('foo'), self::TOLERANCE);
     $this->assertEqualsWithDelta($start + 500, $this->b->getExpires('foo'), self::TOLERANCE);
   }
@@ -165,7 +165,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
 
     sleep(self::TOLERANCE);
 
-    $this->assertEquals('bar', $this->cache->get('foo'));
+    $this->assertSame('bar', $this->cache->get('foo'));
     $this->assertEqualsWithDelta($start + 100 + self::TOLERANCE, $this->a->getExpires('foo'), self::TOLERANCE);
     $this->assertEqualsWithDelta($start + 1000, $this->b->getExpires('foo'), self::TOLERANCE);
   }

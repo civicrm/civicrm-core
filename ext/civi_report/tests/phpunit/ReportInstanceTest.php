@@ -115,7 +115,7 @@ class ReportInstanceTest extends TestCase implements HeadlessInterface, HookInte
       ->addWhere('permission', '=', "@report:{$instance->id}")
       ->execute()
       ->first();
-    $this->assertEquals('AND', $nav['permission_operator']);
+    $this->assertSame('AND', $nav['permission_operator']);
 
     // Verify Dashboard item
     $dashlet = Dashboard::get(FALSE)
@@ -123,7 +123,7 @@ class ReportInstanceTest extends TestCase implements HeadlessInterface, HookInte
       ->execute()
       ->first();
     $this->assertEquals(["@report:{$instance->id}"], (array) $dashlet['permission']);
-    $this->assertEquals('AND', $dashlet['permission_operator']);
+    $this->assertSame('AND', $dashlet['permission_operator']);
   }
 
   /**
@@ -220,9 +220,9 @@ class ReportInstanceTest extends TestCase implements HeadlessInterface, HookInte
       ->first();
 
     $this->assertNotEmpty($perm);
-    $this->assertEquals('report', $perm['group']);
+    $this->assertSame('report', $perm['group']);
     $this->assertTrue($perm['is_synthetic']);
-    $this->assertEquals('CiviReport: Perm List Test Report', $perm['title']);
+    $this->assertSame('CiviReport: Perm List Test Report', $perm['title']);
     $this->assertStringEndsWith("$instance->id", $perm['description']);
   }
 

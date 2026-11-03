@@ -388,8 +388,8 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->assertEquals(1, $templateContribution->count());
     $templateContribution = $templateContribution->first();
     $this->assertNotNull($templateContribution['template.field']);
-    $this->assertEquals('Second and most recent Contribution', $templateContribution['template.field']);
-    $this->assertEquals('Template contribution custom data inserted by hook', $templateContribution['template.field2']);
+    $this->assertSame('Second and most recent Contribution', $templateContribution['template.field']);
+    $this->assertSame('Template contribution custom data inserted by hook', $templateContribution['template.field2']);
     $this->callAPISuccess('CustomField', 'delete', ['id' => $custom_field['id']]);
     $this->callAPISuccess('CustomGroup', 'delete', ['id' => $custom_group['id']]);
   }
@@ -448,8 +448,8 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $repeatContribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_recur_id' => $contributionRecur['id'],
     ]);
-    $this->assertEquals('Template Contribution', $repeatContribution['values'][$repeatContribution['id']]['source']);
-    $this->assertEquals('AUD', $repeatContribution['values'][$repeatContribution['id']]['currency']);
+    $this->assertSame('Template Contribution', $repeatContribution['values'][$repeatContribution['id']]['source']);
+    $this->assertSame('AUD', $repeatContribution['values'][$repeatContribution['id']]['currency']);
   }
 
   /**
@@ -485,7 +485,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $contributionRecur['id'])
       ->execute()
       ->first();
-    $this->assertEquals('USD', $updatedContributionRecur['currency']);
+    $this->assertSame('USD', $updatedContributionRecur['currency']);
     $this->assertEquals('2.00', $updatedContributionRecur['amount']);
     $this->assertGreaterThan(
       strtotime($contributionRecur['modified_date']),
@@ -649,7 +649,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
         'id' => $mId,
         'return' => 'end_date',
       ]);
-      $this->assertEquals("{$expectedDate['year']}-{$expectedDate['month']}-27", $endDate, ts('End date incorrect.'));
+      $this->assertSame("{$expectedDate['year']}-{$expectedDate['month']}-27", $endDate, ts('End date incorrect.'));
     }
 
     // At this moment Contact 2 is deceased, but we wait until payment is recorded in civi before marking the contact deceased.
@@ -713,7 +713,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'return' => 'end_date',
     ]);
     $expectedDate = $this->getYearAndMonthFromOffset(5);
-    $this->assertEquals("{$expectedDate['year']}-{$expectedDate['month']}-27", $endDate, ts('End date incorrect.'));
+    $this->assertSame("{$expectedDate['year']}-{$expectedDate['month']}-27", $endDate, ts('End date incorrect.'));
     // check line item and membership payment count.
     $this->validateAllCounts($membershipId1, 6);
     $this->validateAllCounts($membershipId2, 4);

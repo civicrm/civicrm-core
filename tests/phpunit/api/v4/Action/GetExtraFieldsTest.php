@@ -70,8 +70,8 @@ class GetExtraFieldsTest extends Api4TestBase {
     $this->assertArrayNotHasKey('sic_code', $individualFields);
     $this->assertArrayNotHasKey('contact_type', $individualFields);
     $this->assertArrayHasKey('last_name', $individualFields);
-    $this->assertEquals('Individual', $individualFields['birth_date']['entity']);
-    $this->assertEquals('Individual', $individualFields['age_years']['entity']);
+    $this->assertSame('Individual', $individualFields['birth_date']['entity']);
+    $this->assertSame('Individual', $individualFields['age_years']['entity']);
   }
 
   public function testGetOptionsAddress(): void {
@@ -96,9 +96,9 @@ class GetExtraFieldsTest extends Api4TestBase {
       ->indexBy('name');
 
     $this->assertCount(4, $fields);
-    $this->assertEquals('Participant', $fields['event_id']['entity']);
-    $this->assertEquals('Event', $fields['event_id.created_id']['entity']);
-    $this->assertEquals('Contact', $fields['event_id.created_id.sort_name']['entity']);
+    $this->assertSame('Participant', $fields['event_id']['entity']);
+    $this->assertSame('Event', $fields['event_id.created_id']['entity']);
+    $this->assertSame('Contact', $fields['event_id.created_id.sort_name']['entity']);
     $this->assertGreaterThan(1, count($fields['contact_id.gender_id']['options']));
   }
 
@@ -109,9 +109,9 @@ class GetExtraFieldsTest extends Api4TestBase {
       ->addValue('address_id.country_id', 1039)
       ->execute()->single();
 
-    $this->assertEquals('Address', $field['entity']);
-    $this->assertEquals('address_id.state_province_id', $field['name']);
-    $this->assertEquals('address_id.country_id', $field['input_attrs']['control_field']);
+    $this->assertSame('Address', $field['entity']);
+    $this->assertSame('address_id.state_province_id', $field['name']);
+    $this->assertSame('address_id.country_id', $field['input_attrs']['control_field']);
     $this->assertContains('Manitoba', $field['options']);
     $this->assertNotContains('Alabama', $field['options']);
   }
@@ -142,7 +142,7 @@ class GetExtraFieldsTest extends Api4TestBase {
       ->setLoadOptions(['name', 'color'])
       ->execute()->first();
     $actTags = array_column($actField['options'], 'color', 'name');
-    $this->assertEquals('#aaaaaa', $actTags[$actTag['name']]);
+    $this->assertSame('#aaaaaa', $actTags[$actTag['name']]);
     $this->assertArrayNotHasKey($conTag['name'], $actTags);
     $this->assertArrayNotHasKey($tagSet['name'], $actTags);
     $this->assertArrayNotHasKey($setChild['name'], $actTags);
@@ -152,7 +152,7 @@ class GetExtraFieldsTest extends Api4TestBase {
       ->setLoadOptions(['name', 'color'])
       ->execute()->first();
     $conTags = array_column($conField['options'], 'color', 'name');
-    $this->assertEquals('#cccccc', $conTags[$conTag['name']]);
+    $this->assertSame('#cccccc', $conTags[$conTag['name']]);
     $this->assertArrayNotHasKey($actTag['name'], $conTags);
     $this->assertArrayNotHasKey($tagSet['name'], $conTags);
     $this->assertArrayHasKey($setChild['name'], $conTags);

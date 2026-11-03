@@ -32,7 +32,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
     $result = $this->client->get('frontend://civicrm/route-test/static-text-and-exit');
     $this->assertEquals(200, $result->getStatusCode());
     $this->assertContentType('text/plain', $result);
-    $this->assertEquals('Text and Exit', (string) $result->getBody());
+    $this->assertSame('Text and Exit', (string) $result->getBody());
   }
 
   /**
@@ -47,7 +47,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
     [, , $resultPath64] = explode(' ', $resultData);
     $resultPath = base64_decode($resultPath64);
     // CRM_Utils_System::currentPath() provides the decoded path, so %2A (etc) is replaced.
-    $this->assertEquals('civicrm/route-test/path-with-data/foo*bar%whiz/bang', $resultPath);
+    $this->assertSame('civicrm/route-test/path-with-data/foo*bar%whiz/bang', $resultPath);
   }
 
   /**
@@ -64,7 +64,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
 
     // PSR7 getPath() provides the encoded-path, so we see %2A and %25. However, Civi normalizes %2F as /.
     // (Civi has clean+dirty URLs across multiple CMSs, and we can't guarantee %2F-vs-/ distinction across all configurations.)
-    $this->assertEquals('/civicrm/route-test/psr7-path-with-data/foo%2Abar%25whiz/bang', $resultPath);
+    $this->assertSame('/civicrm/route-test/psr7-path-with-data/foo%2Abar%25whiz/bang', $resultPath);
   }
 
   /**
@@ -77,7 +77,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
     ]);
     $this->assertEquals(200, $result->getStatusCode());
     $this->assertContentType('text/plain', $result);
-    $this->assertEquals('OK 123.45', (string) $result->getBody());
+    $this->assertSame('OK 123.45', (string) $result->getBody());
   }
 
   /**
@@ -88,7 +88,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
     $this->assertEquals(200, $result->getStatusCode());
     $this->assertContentType('application/json', $result);
     $parsed = json_decode((string) $result->getBody(), TRUE);
-    $this->assertEquals('OK', $parsed['ajaxReturnJsonResponse']);
+    $this->assertSame('OK', $parsed['ajaxReturnJsonResponse']);
   }
 
   /**
@@ -99,7 +99,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
     $this->assertEquals(429, $result->getStatusCode());
     $this->assertContentType('application/json', $result);
     $parsed = json_decode((string) $result->getBody(), TRUE);
-    $this->assertEquals('OK', $parsed['systemSendJsonResponse']);
+    $this->assertSame('OK', $parsed['systemSendJsonResponse']);
   }
 
   /**
@@ -111,11 +111,11 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
       \GuzzleHttp\RequestOptions::JSON => ['number' => 456.78],
     ]);
     $this->assertEquals(428, $result->getStatusCode());
-    $this->assertEquals('Bar', $result->getHeader('X-Foo')[0]);
+    $this->assertSame('Bar', $result->getHeader('X-Foo')[0]);
     $this->assertContentType('application/json', $result);
     $parsed = json_decode((string) $result->getBody(), TRUE);
-    $this->assertEquals('hello 456.78', $parsed['psr7']);
-    $this->assertEquals('bang', $parsed['input']);
+    $this->assertSame('hello 456.78', $parsed['psr7']);
+    $this->assertSame('bang', $parsed['input']);
   }
 
   /**
@@ -127,11 +127,11 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
       \GuzzleHttp\RequestOptions::JSON => ['number' => 111],
     ]);
     $this->assertEquals(200, $result->getStatusCode());
-    $this->assertEquals('Bar', $result->getHeader('X-Foo')[0]);
+    $this->assertSame('Bar', $result->getHeader('X-Foo')[0]);
     $this->assertContentType('application/json', $result);
     $parsed = json_decode((string) $result->getBody(), TRUE);
-    $this->assertEquals('hello 111', $parsed['psr7OldInput']);
-    $this->assertEquals('bang', $parsed['input']);
+    $this->assertSame('hello 111', $parsed['psr7OldInput']);
+    $this->assertSame('bang', $parsed['input']);
   }
 
 }

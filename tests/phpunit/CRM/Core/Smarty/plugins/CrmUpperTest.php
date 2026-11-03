@@ -16,7 +16,7 @@ class CRM_Core_Smarty_plugins_CrmUpperTest extends CiviUnitTestCase {
    */
   public function testUpper(): void {
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{assign var="nom" value="Pièrre"}{$nom|crmUpper}');
-    $this->assertEquals('PIÈRRE', $actual);
+    $this->assertSame('PIÈRRE', $actual);
   }
 
 }

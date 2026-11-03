@@ -60,7 +60,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $lineItem = LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single();
-    $this->assertEquals('civicrm_participant', $lineItem['entity_table']);
+    $this->assertSame('civicrm_participant', $lineItem['entity_table']);
     $participant = Participant::get()
       ->addWhere('id', '=', $lineItem['entity_id'])
       ->execute()->single();
@@ -95,7 +95,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->addSelect('contribution_status_id:name')
       ->addWhere('id', '=', $contribution['id'])
       ->execute()->single();
-    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+    $this->assertSame('Completed', $contribution['contribution_status_id:name']);
   }
 
   /**
@@ -139,7 +139,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->execute();
     $this->assertCount(2, $lineItems);
     $this->assertEquals($lineItems[0]['entity_id'], $lineItems[1]['entity_id']);
-    $this->assertEquals('civicrm_participant', $lineItems[1]['entity_table']);
+    $this->assertSame('civicrm_participant', $lineItems[1]['entity_table']);
 
     $participant = Participant::get()
       ->addWhere('id', '=', $lineItems[0]['entity_id'])
@@ -242,7 +242,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $lineItem = LineItem::get()
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single();
-    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+    $this->assertSame('civicrm_membership', $lineItem['entity_table']);
 
     // The line item links the membership to the contribution.
     $this->assertEquals(1, $lineItem['membership_num_terms']);
@@ -253,7 +253,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $membership = Membership::get()
       ->addWhere('id', '=', $lineItem['entity_id'])
       ->execute()->single();
-    $this->assertEquals('2006-12-21', $membership['end_date']);
+    $this->assertSame('2006-12-21', $membership['end_date']);
     // A membership payment should have been created for legacy compatibility.
     $this->callAPISuccessGetSingle('MembershipPayment', ['version' => 3, 'membership_id' => $lineItem['entity_id'], 'contribution_id' => $contribution['id']]);
   }
@@ -286,7 +286,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $lineItem = LineItem::get()
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single();
-    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+    $this->assertSame('civicrm_membership', $lineItem['entity_table']);
 
     // The line item links the membership to the contribution.
     $this->assertEquals(1, $lineItem['membership_num_terms']);
@@ -298,10 +298,10 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->addSelect('join_date', 'start_date', 'end_date', 'status_id:name')
       ->addWhere('id', '=', $lineItem['entity_id'])
       ->execute()->single();
-    $this->assertEquals('2010-01-20', $membership['join_date']);
-    $this->assertEquals('2010-01-20', $membership['start_date']);
-    $this->assertEquals('2011-01-19', $membership['end_date']);
-    $this->assertEquals('Pending', $membership['status_id:name']);
+    $this->assertSame('2010-01-20', $membership['join_date']);
+    $this->assertSame('2010-01-20', $membership['start_date']);
+    $this->assertSame('2011-01-19', $membership['end_date']);
+    $this->assertSame('Pending', $membership['status_id:name']);
   }
 
   /**
@@ -339,7 +339,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $lineItem = LineItem::get()
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single();
-    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+    $this->assertSame('civicrm_membership', $lineItem['entity_table']);
 
     // The line item links the membership to the contribution.
     $this->assertEquals(1, $lineItem['membership_num_terms']);
@@ -350,7 +350,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $membership = Membership::get()
       ->addWhere('id', '=', $lineItem['entity_id'])
       ->execute()->single();
-    $this->assertEquals('2006-12-21', $membership['end_date']);
+    $this->assertSame('2006-12-21', $membership['end_date']);
     $this->assertEquals($contributionRecurID, $membership['contribution_recur_id']);
 
     $contributionRecur = \Civi\Api4\ContributionRecur::get()
@@ -359,7 +359,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['contact_id'], $contributionRecur['contact_id']);
     $this->assertEquals($contribution['total_amount'], $contributionRecur['amount']);
     $this->assertEquals($contribution['currency'], $contributionRecur['currency']);
-    $this->assertEquals('year', $contributionRecur['frequency_unit']);
+    $this->assertSame('year', $contributionRecur['frequency_unit']);
     $this->assertEquals(1, $contributionRecur['frequency_interval']);
     $this->assertEquals($contribution['financial_type_id'], $contributionRecur['financial_type_id']);
     $this->assertEquals(0, $contributionRecur['is_email_receipt']);
@@ -466,7 +466,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->addWhere('line_item.contribution_id', '=', $contribution['id'])
       ->addSelect('status_id:name', 'is_override', 'status_override_end_date')
       ->execute()->single();
-    $this->assertEquals('New', $membership['status_id:name']);
+    $this->assertSame('New', $membership['status_id:name']);
     $this->assertFalse($membership['is_override']);
     $this->assertNull($membership['status_override_end_date']);
   }

@@ -81,12 +81,12 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $this->assertCount(3, CRM_Core_BAO_CustomGroup::getAll(['extends_entity_column_value' => [1, NULL]]));
 
     // Test getGroup by id
-    $this->assertEquals('ActiveGroup', CRM_Core_BAO_CustomGroup::getGroup(['id' => $activeGroup['id']])['title']);
-    $this->assertEquals('ActivityTypeGroup', CRM_Core_BAO_CustomGroup::getGroup(['id' => $activityTypeGroup['id']])['title']);
+    $this->assertSame('ActiveGroup', CRM_Core_BAO_CustomGroup::getGroup(['id' => $activeGroup['id']])['title']);
+    $this->assertSame('ActivityTypeGroup', CRM_Core_BAO_CustomGroup::getGroup(['id' => $activityTypeGroup['id']])['title']);
     // Test getGroup by other criteria
     $this->assertFalse(CRM_Core_BAO_CustomGroup::getGroup(['name' => 'InactiveGroup'])['is_active']);
-    $this->assertEquals('InactiveGroup', CRM_Core_BAO_CustomGroup::getGroup(['name' => 'InactiveGroup', 'is_active' => FALSE])['title']);
-    $this->assertEquals('ActivityTypeGroup', CRM_Core_BAO_CustomGroup::getGroup(['name' => 'ActivityTypeGroup', 'extends' => 'Activity', 'is_active' => TRUE])['title']);
+    $this->assertSame('InactiveGroup', CRM_Core_BAO_CustomGroup::getGroup(['name' => 'InactiveGroup', 'is_active' => FALSE])['title']);
+    $this->assertSame('ActivityTypeGroup', CRM_Core_BAO_CustomGroup::getGroup(['name' => 'ActivityTypeGroup', 'extends' => 'Activity', 'is_active' => TRUE])['title']);
   }
 
   /**
@@ -96,7 +96,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customGroup = $this->CustomGroupCreate();
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $result = CRM_Core_BAO_CustomGroup::getTree('Individual', NULL, $customGroup['id']);
-    $this->assertEquals('Custom Field', $result[$customGroup['id']]['fields'][$customField['id']]['label']);
+    $this->assertSame('Custom Field', $result[$customGroup['id']]['fields'][$customField['id']]['label']);
   }
 
   /**
@@ -110,7 +110,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customGroup = $this->CustomGroupCreate(['extends' => 'Organization', 'extends_entity_column_value' => ['Big_Bank']]);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $result1 = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, ['Big_Bank']);
-    $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
+    $this->assertSame('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
     $result = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, CRM_Core_DAO::VALUE_SEPARATOR . 'Big_Bank' . CRM_Core_DAO::VALUE_SEPARATOR);
     $this->assertEquals($result1, $result);
     $result = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, 'Big_Bank');
@@ -137,7 +137,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customGroup = $this->CustomGroupCreate(['extends' => 'Organization', 'extends_entity_column_value' => ['Big_Bank']]);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $result1 = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, ['Big_Bank']);
-    $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
+    $this->assertSame('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
     $this->customGroupDelete($customGroup['id']);
     $this->callAPISuccess('ContactType', 'delete', ['id' => $contactType['id']]);
   }
@@ -151,7 +151,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $this->callAPISuccess('ContactType', 'create', ['id' => $contactType['id'], 'is_active' => 0]);
     $result1 = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, ['Big_Bank']);
-    $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
+    $this->assertSame('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
     $this->customGroupDelete($customGroup['id']);
     $this->callAPISuccess('ContactType', 'delete', ['id' => $contactType['id']]);
   }
@@ -165,7 +165,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customGroup = $this->CustomGroupCreate(['extends' => 'Organization', 'extends_entity_column_value' => ['Big_Bank', 'Small_Bank']]);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $result1 = CRM_Core_BAO_CustomGroup::getTree('Organization', NULL, NULL, NULL, CRM_Core_DAO::VALUE_SEPARATOR . 'Big_Bank' . CRM_Core_DAO::VALUE_SEPARATOR . 'Small_Bank' . CRM_Core_DAO::VALUE_SEPARATOR);
-    $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
+    $this->assertSame('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
     $this->customGroupDelete($customGroup['id']);
     $this->callAPISuccess('ContactType', 'delete', ['id' => $contactType1['id']]);
     $this->callAPISuccess('ContactType', 'delete', ['id' => $contactType2['id']]);
@@ -187,7 +187,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     ]);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $result1 = CRM_Core_BAO_CustomGroup::getTree('Campaign', NULL, NULL, NULL, '12');
-    $this->assertEquals('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
+    $this->assertSame('Custom Field', $result1[$customGroup['id']]['fields'][$customField['id']]['label']);
     $this->customGroupDelete($customGroup['id']);
   }
 
@@ -198,7 +198,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customGroup = $this->CustomGroupCreate(['extends' => 'Activity', 'extends_entity_column_value' => 1]);
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id']]);
     $result = CRM_Core_BAO_CustomGroup::getTree('Activity', NULL, NULL, NULL, 1);
-    $this->assertEquals('Custom Field', $result[$customGroup['id']]['fields'][$customField['id']]['label']);
+    $this->assertSame('Custom Field', $result[$customGroup['id']]['fields'][$customField['id']]['label']);
   }
 
   /**
@@ -220,7 +220,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
         $this->fail('Should have thrown an exception');
       }
       catch (CRM_Core_Exception $e) {
-        $this->assertEquals('Invalid Filter', $e->getMessage());
+        $this->assertSame('Invalid Filter', $e->getMessage());
       }
     }
     else {
@@ -382,7 +382,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $isDelete = CRM_Core_BAO_CustomGroup::deleteGroup($groupObject);
 
     // Check it worked!
-    $this->assertEquals(TRUE, $isDelete);
+    $this->assertTrue($isDelete);
     $this->assertDBNull('CRM_Core_DAO_CustomGroup', $customGroup['id'], 'title', 'id',
       'Database check for custom group record.'
     );
@@ -455,12 +455,12 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $usedFor = CRM_Core_BAO_CustomGroup::checkCustomField(
       $customFieldId, ['Individual']
     );
-    $this->assertEquals(FALSE, $usedFor);
+    $this->assertFalse($usedFor);
 
     $usedFor = CRM_Core_BAO_CustomGroup::checkCustomField(
       $customFieldId, ['Contribution', 'Membership', 'Participant']
     );
-    $this->assertEquals(TRUE, $usedFor);
+    $this->assertTrue($usedFor);
   }
 
   /**
@@ -518,8 +518,8 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $customGroupID)
       ->addSelect('title', 'table_name')
       ->execute()->first();
-    $this->assertEquals('Test_Group_2', $group['title']);
-    $this->assertEquals('test_otherTableName', $group['table_name']);
+    $this->assertSame('Test_Group_2', $group['title']);
+    $this->assertSame('test_otherTableName', $group['table_name']);
   }
 
   /**
@@ -540,7 +540,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $customGroupId = $customGroup['id'];
     $isEmptyGroup = CRM_Core_BAO_CustomGroup::isGroupEmpty($customGroupId);
 
-    $this->assertEquals($isEmptyGroup, TRUE, 'Check that custom Group is Empty.');
+    $this->assertTrue($isEmptyGroup, 'Check that custom Group is Empty.');
     $this->customGroupDelete($customGroup['id']);
   }
 
@@ -627,9 +627,9 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
 
     $groupTitles = CRM_Core_BAO_CustomGroup::getGroupTitles([$customFieldId]);
 
-    $this->assertEquals('Test Group', $groupTitles[$customFieldId]['groupTitle']);
+    $this->assertSame('Test Group', $groupTitles[$customFieldId]['groupTitle']);
     $this->assertEquals($customGroup['id'], $groupTitles[$customFieldId]['groupID']);
-    $this->assertEquals('Custom Field', $groupTitles[$customFieldId]['fieldLabel']);
+    $this->assertSame('Custom Field', $groupTitles[$customFieldId]['fieldLabel']);
     $this->assertEquals($customField['id'], $groupTitles[$customFieldId]['fieldID']);
   }
 
@@ -673,7 +673,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $_GET[$fieldName] = '2017-06-13';
     $extractedGetParams = CRM_Core_BAO_CustomGroup::extractGetParams($form, 'Individual');
 
-    $this->assertEquals($extractedGetParams[$fieldName], '2017-06-13');
+    $this->assertSame('2017-06-13', $extractedGetParams[$fieldName]);
   }
 
   /**
@@ -725,10 +725,10 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
   }
 
   public function testMapTableName(): void {
-    $this->assertEquals('civicrm_case', CRM_Core_BAO_CustomGroup::mapTableName('Case'));
-    $this->assertEquals('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Contact'));
-    $this->assertEquals('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Individual'));
-    $this->assertEquals('civicrm_participant', CRM_Core_BAO_CustomGroup::mapTableName('Participant'));
+    $this->assertSame('civicrm_case', CRM_Core_BAO_CustomGroup::mapTableName('Case'));
+    $this->assertSame('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Contact'));
+    $this->assertSame('civicrm_contact', CRM_Core_BAO_CustomGroup::mapTableName('Individual'));
+    $this->assertSame('civicrm_participant', CRM_Core_BAO_CustomGroup::mapTableName('Participant'));
   }
 
 }

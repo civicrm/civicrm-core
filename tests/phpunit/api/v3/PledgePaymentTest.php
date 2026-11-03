@@ -83,18 +83,18 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'id' => $this->_pledgeID,
       'return' => 'pledge_status',
     ]);
-    $this->assertEquals('Pending Label**', $checkStatus['pledge_status']);
+    $this->assertSame('Pending Label**', $checkStatus['pledge_status']);
 
     //Execute process_pledge job log.
     $result = $this->callApiV3Success('Job', 'process_pledge', []);
-    $this->assertEquals("Checking if status update is needed for Pledge Id: $this->_pledgeID (current status is Pending)\n\r- status updated to: Overdue\n\r1 records updated.", $result['values']);
+    $this->assertSame("Checking if status update is needed for Pledge Id: $this->_pledgeID (current status is Pending)\n\r- status updated to: Overdue\n\r1 records updated.", $result['values']);
 
     //Status should be 'Overdue' after processing.
     $statusAfterProcessing = $this->callAPISuccess('Pledge', 'getsingle', [
       'id' => $this->_pledgeID,
       'return' => 'pledge_status',
     ]);
-    $this->assertEquals('Overdue', $statusAfterProcessing['pledge_status']);
+    $this->assertSame('Overdue', $statusAfterProcessing['pledge_status']);
   }
 
   /**
@@ -106,7 +106,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'id' => $this->_pledgeID,
       'return' => 'pledge_status',
     ]);
-    $this->assertEquals('Pending Label**', $checkStatus['pledge_status']);
+    $this->assertSame('Pending Label**', $checkStatus['pledge_status']);
 
     //Make first payment.
     $paymentParams = [
@@ -122,7 +122,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'id' => $this->_pledgeID,
       'return' => 'pledge_status',
     ]);
-    $this->assertEquals('In Progress', $checkStatus['pledge_status']);
+    $this->assertSame('In Progress', $checkStatus['pledge_status']);
 
     //Cancel the Pledge.
     $paymentStatusTypes = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -134,14 +134,14 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
 
     //Status should be calculated as Cancelled.
     $pledgeStatus = CRM_Pledge_BAO_PledgePayment::calculatePledgeStatus($this->_pledgeID);
-    $this->assertEquals('Cancelled', $paymentStatusTypes[$pledgeStatus]);
+    $this->assertSame('Cancelled', $paymentStatusTypes[$pledgeStatus]);
 
     //Already completed payments should not be cancelled.
     $checkPaymentStatus = $this->callAPISuccess('PledgePayment', 'getsingle', [
       'id' => $firstPayment['id'],
       'return' => 'status_id',
     ]);
-    $this->assertEquals('Completed', CRM_Core_PseudoConstant::getName('CRM_Pledge_BAO_Pledge', 'status_id', $checkPaymentStatus['status_id']));
+    $this->assertSame('Completed', CRM_Core_PseudoConstant::getName('CRM_Pledge_BAO_Pledge', 'status_id', $checkPaymentStatus['status_id']));
   }
 
   /**
@@ -189,7 +189,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $getIndPayment = $this->callAPISuccess('PledgePayment', 'get', $getParams);
     $this->assertEquals(1, $getIndPayment['count']);
     $this->assertEquals(20, $getIndPayment['values'][$result['id']]['actual_amount']);
-    $this->assertEquals('USD', $getIndPayment['values'][$result['id']]['currency']);
+    $this->assertSame('USD', $getIndPayment['values'][$result['id']]['currency']);
 
     //create a second pledge payment - need a contribution first &can't use the CiviUnitTest case function as invoice is hard-coded
     $contributionParams = [

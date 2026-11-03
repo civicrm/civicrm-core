@@ -41,7 +41,7 @@ class CRM_Contribute_BAO_ContributionTypeTest extends CiviUnitTestCase {
       'Database check on updated financial type record.'
     );
 
-    $this->assertEquals($result, 'Donations', 'Verify financial type name.');
+    $this->assertSame('Donations', $result, 'Verify financial type name.');
   }
 
 }

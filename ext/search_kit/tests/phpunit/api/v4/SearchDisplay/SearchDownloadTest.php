@@ -94,15 +94,15 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
     $download = (array) civicrm_api4('SearchDisplay', 'download', $params);
     $header = array_shift($download);
 
-    $this->assertEquals('Duration Subject', $header[0]);
-    $this->assertEquals('Details', $header[1]);
+    $this->assertSame('Duration Subject', $header[0]);
+    $this->assertSame('Details', $header[1]);
 
     foreach ($download as $rowNum => $data) {
       $this->assertEquals($sampleData[$rowNum]['duration'] . ' ' . $subject, $data[0]);
     }
     // Markup should be formatted as plain text
-    $this->assertEquals('Markup', $download[0][1]);
-    $this->assertEquals('Plain & simple', $download[1][1]);
+    $this->assertSame('Markup', $download[0][1]);
+    $this->assertSame('Plain & simple', $download[1][1]);
   }
 
   /**

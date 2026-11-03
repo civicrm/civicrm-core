@@ -59,12 +59,12 @@ class SqlExpressionParserTest extends Api4TestBase implements TransactionalInter
 
     $sqlFn = SqlExpression::convert($fnName . '(DISTINCT stuff)');
     $this->assertEquals($fnName, $sqlFn->getName());
-    $this->assertEquals("Civi\Api4\Query\SqlFunction$fnName", get_class($sqlFn));
+    $this->assertSame("Civi\Api4\Query\SqlFunction$fnName", get_class($sqlFn));
     $this->assertEquals($params, $sqlFn->getParams());
     $this->assertEquals(['stuff'], $sqlFn->getFields());
     $args = $sqlFn->getArgs();
     $this->assertCount(1, $args);
-    $this->assertEquals('DISTINCT', $args[0]['prefix'][0]);
+    $this->assertSame('DISTINCT', $args[0]['prefix'][0]);
     $this->assertEmpty($args[0]['suffix']);
     $this->assertTrue(is_a($args[0]['expr'][0], 'Civi\Api4\Query\SqlField'));
 

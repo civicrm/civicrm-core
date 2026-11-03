@@ -31,8 +31,8 @@ class MailingABTest extends Api4TestBase implements TransactionalInterface {
       ->first();
 
     $this->assertNotNull($mailingAB['id']);
-    $this->assertEquals('Test Mailing AB', $mailingAB['name']);
-    $this->assertEquals('Draft', $mailingAB['status']);
+    $this->assertSame('Test Mailing AB', $mailingAB['name']);
+    $this->assertSame('Draft', $mailingAB['status']);
 
     // Read
     $read = MailingAB::get(FALSE)
@@ -40,7 +40,7 @@ class MailingABTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->first();
 
-    $this->assertEquals('Test Mailing AB', $read['name']);
+    $this->assertSame('Test Mailing AB', $read['name']);
 
     // Update
     MailingAB::update(FALSE)
@@ -53,7 +53,7 @@ class MailingABTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->first();
 
-    $this->assertEquals('Updated Mailing AB', $updated['name']);
+    $this->assertSame('Updated Mailing AB', $updated['name']);
 
     // Delete
     MailingAB::delete(FALSE)

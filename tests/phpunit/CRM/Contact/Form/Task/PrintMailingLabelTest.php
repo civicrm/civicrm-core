@@ -76,7 +76,7 @@ class CRM_Contact_Form_Task_PrintMailingLabelTest extends CiviUnitTestCase {
     // No merge handling is done on the token - this test was added to lock
     // in token merge handling as at the time of writing, not to weigh in on
     // or change behaviour.
-    $this->assertEquals('Mr. Anthony J. Collins II
+    $this->assertSame('Mr. Anthony J. Collins II
 Mr. Antonia J. D`souza II
 Main Street 231
 Brummen, 6971 BN

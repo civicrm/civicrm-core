@@ -157,7 +157,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertSame('ERROR', $row['_status']);
   }
 
   /**
@@ -183,14 +183,14 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     ], [], 'update');
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
     $participant = Participant::get(FALSE)
       ->addWhere('id', '=', $row['_entity_id'])
       ->addSelect($this->getCustomFieldName('radio', 4))
       ->execute()->first();
-    $this->assertEquals(TRUE, $participant[$this->getCustomFieldName('radio', 4)]);
+    $this->assertTrue($participant[$this->getCustomFieldName('radio', 4)]);
     $row = $dataSource->getRow();
-    $this->assertEquals('ERROR', $row['_status']);
+    $this->assertSame('ERROR', $row['_status']);
     $this->assertEquals('Participant record not found for id ' . $missingParticipantID, $row['_status_message']);
   }
 
@@ -221,8 +221,8 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_UPDATE]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('ERROR', $row['_status']);
-    $this->assertEquals('Missing required fields: Participant ID OR Event ID', $row['_status_message']);
+    $this->assertSame('ERROR', $row['_status']);
+    $this->assertSame('Missing required fields: Participant ID OR Event ID', $row['_status_message']);
   }
 
   /**
@@ -259,9 +259,9 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ->execute()->first();
     $this->assertEquals($row['event_title'], $participant['event_id.title']);
     $this->assertEquals($row['fee_amount'], $participant['fee_amount']);
-    $this->assertEquals('Phoned up', $participant['source']);
+    $this->assertSame('Phoned up', $participant['source']);
     $this->assertEquals($row['participant_status'], $participant['status_id:label']);
-    $this->assertEquals('2022-12-07 00:00:00', $participant['register_date']);
+    $this->assertSame('2022-12-07 00:00:00', $participant['register_date']);
     $this->assertEquals(['Attendee', 'Volunteer'], $participant['role_id:label']);
     $this->assertEquals(0, $participant['is_pay_later']);
     $this->assertEquals(['P', 'M'], $participant[$this->getCustomFieldName('checkbox', 4)]);
@@ -297,9 +297,9 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('DUPLICATE', $row['_status'], $row['_status_message']);
+    $this->assertSame('DUPLICATE', $row['_status'], $row['_status_message']);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->assertSame('IMPORTED', $row['_status']);
     $participants = Participant::get()
       ->addWhere('contact_id', '=', $contactID)
       ->addSelect('event_id.title')
@@ -307,9 +307,9 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
       ->execute();
     $this->assertCount(2, $participants);
     $participant = $participants->first();
-    $this->assertEquals('Rain-forest Cup Youth Soccer Tournament', $participant['event_id.title']);
+    $this->assertSame('Rain-forest Cup Youth Soccer Tournament', $participant['event_id.title']);
     $participant = $participants->last();
-    $this->assertEquals('Second event', $participant['event_id.title']);
+    $this->assertSame('Second event', $participant['event_id.title']);
   }
 
   /**
@@ -342,9 +342,9 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     ], ['onDuplicate' => CRM_Import_Parser::DUPLICATE_NOCHECK]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->assertSame('IMPORTED', $row['_status']);
     $participant = Participant::get()
       ->addWhere('contact_id', '=', $contactID)
       ->addSelect('event_id.title')
@@ -416,7 +416,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->importCSV('participant_with_multiple_identifiers.csv', $mapper, ['onDuplicate' => CRM_Import_Parser::DUPLICATE_NOCHECK, 'saveMapping' => FALSE]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->assertSame('IMPORTED', $row['_status']);
   }
 
   public static function requiredFields(): array {

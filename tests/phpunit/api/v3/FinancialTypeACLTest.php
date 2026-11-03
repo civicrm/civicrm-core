@@ -95,7 +95,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'edit contributions',
     ]);
     $result = $this->callAPIFailure('contribution', 'create', $p);
-    $this->assertEquals('You do not have permission to create this contribution', $result['error_message']);
+    $this->assertSame('You do not have permission to create this contribution', $result['error_message']);
     $this->addFinancialAclPermissions([['add', 'Donation']]);
 
     $contribution = $this->callAPISuccess('contribution', 'create', $p);
@@ -123,8 +123,8 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['net_amount'], 95.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 23456);
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 78910);
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_source'], 'SSF');
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
+    $this->assertSame('SSF', $contribution['values'][$contribution['id']]['contribution_source']);
+    $this->assertSame('Completed', $contribution['values'][$contribution['id']]['contribution_status']);
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $contribution['id'],
     ]);

@@ -50,10 +50,10 @@ class AddressingTraitTest extends \CiviUnitTestCase {
 
     $export = $wfm->export('envelope');
 
-    $this->assertEquals('Foo', $export['toName']);
-    $this->assertEquals('foo@example.com', $export['toEmail']);
-    $this->assertEquals('cc1@example.com, Bob <cc2@example.com>', $export['cc']);
-    $this->assertEquals('Nobody <nobody@example.com>', $export['replyTo']);
+    $this->assertSame('Foo', $export['toName']);
+    $this->assertSame('foo@example.com', $export['toEmail']);
+    $this->assertSame('cc1@example.com, Bob <cc2@example.com>', $export['cc']);
+    $this->assertSame('Nobody <nobody@example.com>', $export['replyTo']);
   }
 
   /**
@@ -66,7 +66,7 @@ class AddressingTraitTest extends \CiviUnitTestCase {
       ->addCc('"Third" <cc3@example.com>')
       ->addCc(['email' => 'cc4@example.com', 'name' => 'Fourth\'s']);
 
-    $this->assertEquals('cc1@example.com, Bob <cc2@example.com>, Third <cc3@example.com>, "Fourth\'s" <cc4@example.com>', $wfm->getCc('rfc822'));
+    $this->assertSame('cc1@example.com, Bob <cc2@example.com>, Third <cc3@example.com>, "Fourth\'s" <cc4@example.com>', $wfm->getCc('rfc822'));
   }
 
   /**
@@ -85,10 +85,10 @@ class AddressingTraitTest extends \CiviUnitTestCase {
 
     $export = $wfm->export('envelope');
 
-    $this->assertEquals('Foo', $export['toName']);
-    $this->assertEquals('foo@example.com', $export['toEmail']);
-    $this->assertEquals('cc1@example.com, Bob <cc2@example.com>', $export['cc']);
-    $this->assertEquals('Nobody <nobody@example.com>', $export['replyTo']);
+    $this->assertSame('Foo', $export['toName']);
+    $this->assertSame('foo@example.com', $export['toEmail']);
+    $this->assertSame('cc1@example.com, Bob <cc2@example.com>', $export['cc']);
+    $this->assertSame('Nobody <nobody@example.com>', $export['replyTo']);
   }
 
   /**
@@ -149,7 +149,7 @@ class AddressingTraitTest extends \CiviUnitTestCase {
         foreach (array_keys($equivalenceSet) as $inFormat) {
           foreach (array_keys($equivalenceSet) as $outFormat) {
             $ex->{$setter}(NULL);
-            $this->assertEquals(NULL, $ex->{$getter}(), "Field ($field) should start at empty");
+            $this->assertNull($ex->{$getter}(), "Field ($field) should start at empty");
 
             $ex->{$setter}($equivalenceSet[$inFormat]);
             $this->assertEquals($equivalenceSet[$outFormat], $ex->{$getter}($outFormat), "Field ($field) should return equivalent result (method=setter, in=$inFormat, out=$outFormat)");
@@ -159,7 +159,7 @@ class AddressingTraitTest extends \CiviUnitTestCase {
               $this->assertEquals($equivalenceSet['rfc822'], $export[$field], 'export() always produces header format');
 
               $ex->{$setter}(NULL);
-              $this->assertEquals(NULL, $ex->{$getter}(), "Field ($field) should start at empty");
+              $this->assertNull($ex->{$getter}(), "Field ($field) should start at empty");
 
               $ex->import('envelope', [$field => $equivalenceSet[$inFormat]]);
               $this->assertEquals($equivalenceSet[$outFormat], $ex->{$getter}($outFormat), "Field ($field) should return equivalent result (method=import, in=$inFormat, out=$outFormat)");
@@ -200,13 +200,13 @@ class AddressingTraitTest extends \CiviUnitTestCase {
         foreach (array_keys($equivalenceSet) as $inFormat) {
           foreach (array_keys($equivalenceSet) as $outFormat) {
             $ex->{$setter}(NULL);
-            $this->assertEquals(NULL, $ex->{$getter}(), "Field ($field) should start at empty");
+            $this->assertNull($ex->{$getter}(), "Field ($field) should start at empty");
 
             $ex->{$setter}($equivalenceSet[$inFormat]);
             $this->assertEquals($equivalenceSet[$outFormat], $ex->{$getter}($outFormat), "Field ($field) should return equivalent result (method=setter, in=$inFormat, out=$outFormat)");
 
             $ex->{$setter}(NULL);
-            $this->assertEquals(NULL, $ex->{$getter}(), "Field ($field) should start at empty");
+            $this->assertNull($ex->{$getter}(), "Field ($field) should start at empty");
 
             $ex->import('envelope', [$field => $equivalenceSet[$inFormat]]);
             $this->assertEquals($equivalenceSet[$outFormat], $ex->{$getter}($outFormat), "Field ($field) should return equivalent result (method=import, in=$inFormat, out=$outFormat)");

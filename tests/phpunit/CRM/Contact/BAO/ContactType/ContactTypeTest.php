@@ -110,10 +110,10 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEmpty($result);
 
     // Test getBasicType with string input
-    $this->assertEquals('Individual', CRM_Contact_BAO_ContactType::getBasicType('sub1_individual'));
-    $this->assertEquals('Individual', CRM_Contact_BAO_ContactType::getBasicType('sub2_individual'));
-    $this->assertEquals('Organization', CRM_Contact_BAO_ContactType::getBasicType('sub_organization'));
-    $this->assertEquals('Household', CRM_Contact_BAO_ContactType::getBasicType('sub_household'));
+    $this->assertSame('Individual', CRM_Contact_BAO_ContactType::getBasicType('sub1_individual'));
+    $this->assertSame('Individual', CRM_Contact_BAO_ContactType::getBasicType('sub2_individual'));
+    $this->assertSame('Organization', CRM_Contact_BAO_ContactType::getBasicType('sub_organization'));
+    $this->assertSame('Household', CRM_Contact_BAO_ContactType::getBasicType('sub_household'));
     $this->assertNull(CRM_Contact_BAO_ContactType::getBasicType('invalid'));
 
     // Test getBasicTypes with array input
@@ -127,8 +127,8 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
 
     // Test getSelectElements
     $selectElements = CRM_Contact_BAO_ContactType::getSelectElements();
-    $this->assertEquals('- Sub1 Individual', $selectElements['Individual__sub1_individual']);
-    $this->assertEquals('- Sub Organization', $selectElements['Organization__sub_organization']);
+    $this->assertSame('- Sub1 Individual', $selectElements['Individual__sub1_individual']);
+    $this->assertSame('- Sub Organization', $selectElements['Organization__sub_organization']);
     $selectOrder = array_flip(array_keys($selectElements));
     // Individual is always first
     $this->assertEquals(0, $selectOrder['Individual']);

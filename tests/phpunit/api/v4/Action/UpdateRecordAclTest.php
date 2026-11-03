@@ -68,7 +68,7 @@ class UpdateRecordAclTest extends Api4TestBase implements TransactionalInterface
     catch (UnauthorizedException $e) {
       $error = $e->getMessage();
     }
-    $this->assertEquals('ACL check failed', $error);
+    $this->assertSame('ACL check failed', $error);
     $this->assertEquals($cid[0], $this->ownerOf($email), 'Foreign email must not be reassigned.');
   }
 
@@ -90,7 +90,7 @@ class UpdateRecordAclTest extends Api4TestBase implements TransactionalInterface
     catch (UnauthorizedException $e) {
       $error = $e->getMessage();
     }
-    $this->assertEquals('ACL check failed', $error);
+    $this->assertSame('ACL check failed', $error);
     $this->assertEquals($cid[0], $this->ownerOf($email), 'Foreign email must not be reassigned.');
   }
 
@@ -111,7 +111,7 @@ class UpdateRecordAclTest extends Api4TestBase implements TransactionalInterface
       ->addWhere('id', '=', $email)
       ->addValue('email', 'me2@example.org')
       ->execute();
-    $this->assertEquals('me2@example.org', Email::get(FALSE)
+    $this->assertSame('me2@example.org', Email::get(FALSE)
       ->addWhere('id', '=', $email)->addSelect('email')->execute()->single()['email']);
 
     // Reassigning between contacts is allowed for users with edit all contacts.

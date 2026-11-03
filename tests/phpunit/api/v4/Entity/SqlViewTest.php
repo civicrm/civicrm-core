@@ -49,8 +49,8 @@ class SqlViewTest extends Api4TestBase {
       ->setLoadOptions(TRUE)
       ->execute()->indexBy('name');
     $this->assertCount(5, $fields);
-    $this->assertEquals('String', $fields['full_name']['data_type']);
-    $this->assertEquals('Contact', $fields['contact_id']['fk_entity']);
+    $this->assertSame('String', $fields['full_name']['data_type']);
+    $this->assertSame('Contact', $fields['contact_id']['fk_entity']);
     $this->assertContains('Home', $fields['email_location_type_id']['options']);
   }
 

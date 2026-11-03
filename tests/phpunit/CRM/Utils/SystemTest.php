@@ -32,9 +32,9 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   }
 
   public function testEvalUrl(): void {
-    $this->assertEquals(FALSE, CRM_Utils_System::evalUrl(FALSE));
-    $this->assertEquals('http://example.com/', CRM_Utils_System::evalUrl('http://example.com/'));
-    $this->assertEquals('http://example.com/?cms=UnitTests', CRM_Utils_System::evalUrl('http://example.com/?cms={uf}'));
+    $this->assertFalse(CRM_Utils_System::evalUrl(FALSE));
+    $this->assertSame('http://example.com/', CRM_Utils_System::evalUrl('http://example.com/'));
+    $this->assertSame('http://example.com/?cms=UnitTests', CRM_Utils_System::evalUrl('http://example.com/?cms={uf}'));
   }
 
   /**
@@ -152,7 +152,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
    * @param string $hookName
    */
   public function hook_civicrm_alterExternUrl(\Civi\Core\Event\GenericHookEvent $event, $hookName) {
-    $this->assertEquals('hook_civicrm_alterExternUrl', $hookName);
+    $this->assertSame('hook_civicrm_alterExternUrl', $hookName);
     $this->assertTrue($event->hasField('url'));
     $this->assertTrue($event->hasField('path'));
     $this->assertTrue($event->hasField('query'));

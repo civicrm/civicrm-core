@@ -67,7 +67,7 @@ class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
 
     $this->assertSame('correct value', $contact['testGroupWithHookPre.field1']);
     $this->assertSame(456, $contact['testGroupWithHookPre.field2']);
-    $this->assertEquals(TRUE, $contact['testGroupWithHookPre.field3']);
+    $this->assertTrue($contact['testGroupWithHookPre.field3']);
 
     // Try with api3 using the old custom_id syntax
     $result = civicrm_api3('Contact', 'create', [
@@ -82,7 +82,7 @@ class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
       'id' => $result['id'],
       'return' => "custom_$field1Id,custom_$field2Id,custom_$field3Id",
     ]);
-    $this->assertEquals('correct value', $contact["custom_$field1Id"]);
+    $this->assertSame('correct value', $contact["custom_$field1Id"]);
     $this->assertEquals(456, $contact["custom_$field2Id"]);
     $this->assertEquals(TRUE, $contact["custom_$field3Id"]);
 
@@ -98,9 +98,9 @@ class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
     CRM_Utils_Hook::pre('create', 'Individual', NULL, $params);
 
     // The weird format should be preserved
-    $this->assertEquals('correct value', $params["custom_{$field1Id}_-1"]);
+    $this->assertSame('correct value', $params["custom_{$field1Id}_-1"]);
     $this->assertEquals(456, $params["custom_{$field2Id}_-1"]);
-    $this->assertEquals(TRUE, $params["custom_{$field3Id}_-1"]);
+    $this->assertTrue($params["custom_{$field3Id}_-1"]);
     $this->assertEquals(['M', 'V'], $params["custom_{$field4Id}_-1"]);
   }
 
@@ -116,7 +116,7 @@ class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
     $this->assertSame('Mr. Right', $event->getValue('first_name'));
     $this->assertSame('correct value', $event->getValue('testGroupWithHookPre.field1'));
     $this->assertSame(456, $event->getValue('testGroupWithHookPre.field2'));
-    $this->assertEquals(TRUE, $event->getValue('testGroupWithHookPre.field3'));
+    $this->assertTrue($event->getValue('testGroupWithHookPre.field3'));
     $this->assertEquals(['M', 'V'], $event->getValue('testGroupWithHookPre.field4'));
 
     // Inspect the custom array
@@ -128,7 +128,7 @@ class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
     $this->assertEquals(array_values($fieldIds), array_keys($customData));
     $this->assertSame('correct value', $customData[$fieldIds['field1']][-1]['value']);
     $this->assertSame(456, $customData[$fieldIds['field2']][-1]['value']);
-    $this->assertEquals(TRUE, $customData[$fieldIds['field3']][-1]['value']);
+    $this->assertTrue($customData[$fieldIds['field3']][-1]['value']);
     $this->assertEquals(CRM_Utils_Array::implodePadded(['M', 'V']), $customData[$fieldIds['field4']][-1]['value']);
 
     // getValues() should return all custom fields in longName format as-set by the hook

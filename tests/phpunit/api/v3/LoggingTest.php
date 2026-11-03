@@ -235,7 +235,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   protected function checkLogTableCreated() {
     $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_contact");
     $dao->fetch();
-    $this->assertEquals('log_civicrm_contact', $dao->Table);
+    $this->assertSame('log_civicrm_contact', $dao->Table);
     $tableField = 'Create_Table';
     $this->assertMatchesRegularExpression(';`log_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(\(\))?,;i', $dao->$tableField);
     // MySQL tends to report `CURRENT_TIMESTAMP`, but MariaDB tends to report `current_timestamp()`.
@@ -342,7 +342,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     ]);
     $email = $this->callAPISuccessGetSingle('email', ['email' => 'dopey@mail.com']);
     $this->callAPISuccess('Logging', 'revert', ['log_conn_id' => 'Wot woot']);
-    $this->assertEquals('Anthony', $this->callAPISuccessGetValue('contact', ['id' => $contactId, 'return' => 'first_name']));
+    $this->assertSame('Anthony', $this->callAPISuccessGetValue('contact', ['id' => $contactId, 'return' => 'first_name']));
     $this->callAPISuccessGetCount('Email', ['id' => $email['id']], 0);
   }
 
@@ -361,9 +361,9 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
 
     $contactId = $this->individualCreate(['address' => [['street_address' => '27 Cool way', 'location_type_id' => $this->getLocationTypeID('Home')]]]);
     $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contactId]);
-    $this->assertEquals('Anthony', $contact['first_name']);
-    $this->assertEquals('anthony_anderson@civicrm.org', $contact['email']);
-    $this->assertEquals('27 Cool way', $contact['street_address']);
+    $this->assertSame('Anthony', $contact['first_name']);
+    $this->assertSame('anthony_anderson@civicrm.org', $contact['email']);
+    $this->assertSame('27 Cool way', $contact['street_address']);
 
     sleep(1);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'bitty bot bot'");
@@ -375,23 +375,23 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
       'api.contribution.create' => ['financial_type_id' => 'Donation', 'receive_date' => 'now', 'total_amount' => 10],
     ]);
     $contact = $this->callAPISuccessGetSingle('contact', ['id' => $contactId, 'return' => ['first_name', 'email', 'modified_date', 'street_address']]);
-    $this->assertEquals('Dopey', $contact['first_name']);
-    $this->assertEquals('dopey@mail.com', $contact['email']);
-    $this->assertEquals('25 Dorky way', $contact['street_address']);
+    $this->assertSame('Dopey', $contact['first_name']);
+    $this->assertSame('dopey@mail.com', $contact['email']);
+    $this->assertSame('25 Dorky way', $contact['street_address']);
     $modifiedDate = $contact['modified_date'];
     // To protect against the modified date not changing due to the updates being too close together.
     sleep(1);
     $loggings = $this->callAPISuccess('Logging', 'get', ['log_conn_id' => 'bitty bot bot', 'tables' => ['civicrm_address']]);
-    $this->assertEquals('civicrm_address', $loggings['values'][0]['table'], json_encode(CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray()));
+    $this->assertSame('civicrm_address', $loggings['values'][0]['table'], json_encode(CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray()));
     $this->assertEquals(1, $loggings['count'], json_encode(CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray()));
-    $this->assertEquals('27 Cool way', $loggings['values'][0]['from']);
-    $this->assertEquals('25 Dorky way', $loggings['values'][0]['to']);
+    $this->assertSame('27 Cool way', $loggings['values'][0]['from']);
+    $this->assertSame('25 Dorky way', $loggings['values'][0]['to']);
     $this->callAPISuccess('Logging', 'revert', ['log_conn_id' => 'bitty bot bot', 'tables' => ['civicrm_address']]);
 
     $contact = $this->callAPISuccessGetSingle('contact', ['id' => $contactId, 'return' => ['first_name', 'email', 'modified_date', 'street_address']]);
-    $this->assertEquals('Dopey', $contact['first_name']);
-    $this->assertEquals('dopey@mail.com', $contact['email']);
-    $this->assertEquals('27 Cool way', $contact['street_address']);
+    $this->assertSame('Dopey', $contact['first_name']);
+    $this->assertSame('dopey@mail.com', $contact['email']);
+    $this->assertSame('27 Cool way', $contact['street_address']);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactId], 1);
     $this->assertTrue(strtotime($modifiedDate) < strtotime($contact['modified_date']));
   }

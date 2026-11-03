@@ -43,7 +43,7 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
     $this->assertNotNull($result['id'], 'In line ' . __LINE__);
     $id = $result['id'];
-    $this->assertEquals('test_check', $result['values'][$id]['name'], 'In line ' . __LINE__);
+    $this->assertSame('test_check', $result['values'][$id]['name'], 'In line ' . __LINE__);
     $this->assertEquals(4, $result['values'][$id]['ignore_severity'], 'In line ' . __LINE__);
 
     $this->callAPISuccess('StatusPreference', 'delete', ['id' => $result['id']]);
@@ -89,7 +89,7 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('StatusPreference', 'Get', $params);
     $this->assertEquals($statusPreference['values'][$id]['name'], $result['values'][$id]['name'], 'In line ' . __LINE__);
     $this->assertEquals($statusPreference['values'][$id]['domain_id'], $result['values'][$id]['domain_id'], 'In line ' . __LINE__);
-    $this->assertEquals('2015-12-12', $result['values'][$id]['hush_until'], 'In line ' . __LINE__);
+    $this->assertSame('2015-12-12', $result['values'][$id]['hush_until'], 'In line ' . __LINE__);
     $this->assertEquals($statusPreference['values'][$id]['ignore_severity'], $result['values'][$id]['ignore_severity'], 'In line ' . __LINE__);
   }
 

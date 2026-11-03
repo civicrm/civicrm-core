@@ -73,15 +73,15 @@ class CheckoutTest extends TestCase implements HeadlessInterface {
     $options = \Civi::service('civi.checkout')->getOptions();
 
     // we should have at least the PayLater option
-    $this->assertEquals(TRUE, !empty($options));
+    $this->assertTrue(!empty($options));
 
     // the pay later option should be a checkout option interface
     foreach ($options as $name => $option) {
 
       // all options should have name keys
-      $this->assertEquals(TRUE, is_string($name));
+      $this->assertTrue(is_string($name));
       // all options should implement CheckoutOptionInterface
-      $this->assertEquals(TRUE, is_a($option, CheckoutOptionInterface::class));
+      $this->assertTrue(is_a($option, CheckoutOptionInterface::class));
     }
   }
 
@@ -107,13 +107,13 @@ class CheckoutTest extends TestCase implements HeadlessInterface {
       ->first();
 
     // check the contribution is updated
-    $this->assertEquals('Pending', $contribution['contribution_status_id:name']);
-    $this->assertEquals(TRUE, $contribution['is_pay_later']);
+    $this->assertSame('Pending', $contribution['contribution_status_id:name']);
+    $this->assertTrue($contribution['is_pay_later']);
 
     // check the session is successful
     $this->assertEquals(CheckoutSession::STATUS_SUCCESS, $checkoutSession->getStatus());
     // check the session tells us to go to the thank you page now
-    $this->assertEquals("https://thank.you", $checkoutSession->getNextUrl());
+    $this->assertSame("https://thank.you", $checkoutSession->getNextUrl());
 
     // we should be able to tokenise the session
     $token = $checkoutSession->tokenise();

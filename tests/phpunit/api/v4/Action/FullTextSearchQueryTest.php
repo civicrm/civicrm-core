@@ -79,23 +79,23 @@ class FullTextSearchQueryTest extends Api4TestBase {
       ->addWhere('contact_names', 'CONTAINS', 'Jonathon')
       ->execute();
 
-    $this->assertEquals(2, $results->count());
+    $this->assertSame(2, $results->count());
 
     // match multiple words, check better matches come first
     $results = \Civi\Api4\Contact::get(FALSE)
       ->addWhere('contact_names', 'CONTAINS', 'Boris Johnson')
       ->execute();
 
-    $this->assertEquals('Alexander', $results[0]['first_name']);
-    $this->assertEquals('Samuel', $results[1]['first_name']);
+    $this->assertSame('Alexander', $results[0]['first_name']);
+    $this->assertSame('Samuel', $results[1]['first_name']);
 
     // check it wasn't coincidentally first
     $results = \Civi\Api4\Contact::get(FALSE)
       ->addWhere('contact_names', 'CONTAINS', 'Samuel Johnson')
       ->execute();
 
-    $this->assertEquals('Samuel', $results[0]['first_name']);
-    $this->assertEquals('Alexander', $results[1]['first_name']);
+    $this->assertSame('Samuel', $results[0]['first_name']);
+    $this->assertSame('Alexander', $results[1]['first_name']);
   }
 
   public function testMatchesQueries(): void {
@@ -106,16 +106,16 @@ class FullTextSearchQueryTest extends Api4TestBase {
       ->addWhere('contact_names', 'MATCHES', '+Jonny +Rotten')
       ->execute();
 
-    $this->assertEquals(1, $results->count());
-    $this->assertEquals('Jonny Rotten', $results->single()['display_name']);
+    $this->assertSame(1, $results->count());
+    $this->assertSame('Jonny Rotten', $results->single()['display_name']);
 
     // include exclude - only match should be Jonny Boy
     $results = \Civi\Api4\Contact::get(FALSE)
       ->addWhere('contact_names', 'MATCHES', '+Jonny -Rotten')
       ->execute();
 
-    $this->assertEquals(1, $results->count());
-    $this->assertEquals('Jonny Boy', $results->single()['display_name']);
+    $this->assertSame(1, $results->count());
+    $this->assertSame('Jonny Boy', $results->single()['display_name']);
   }
 
   public function testLikeQueries(): void {
@@ -126,7 +126,7 @@ class FullTextSearchQueryTest extends Api4TestBase {
       ->addWhere('contact_names', 'LIKE', 'Jon%')
       ->execute();
 
-    $this->assertEquals(3, $results->count());
+    $this->assertSame(3, $results->count());
 
     // only trailing wildcards are supported
     try {
@@ -145,9 +145,9 @@ class FullTextSearchQueryTest extends Api4TestBase {
       ->addWhere('contact_names', 'LIKE', 'Joh% Kah%')
       ->execute();
 
-    $this->assertEquals(1, $results->count());
+    $this->assertSame(1, $results->count());
     // the best match should be first
-    $this->assertEquals('Johannes Kahn', $results->first()['display_name']);
+    $this->assertSame('Johannes Kahn', $results->first()['display_name']);
   }
 
   public function testInteractionWithExplicitOrderBy(): void {
@@ -159,7 +159,7 @@ class FullTextSearchQueryTest extends Api4TestBase {
       ->execute();
 
     // birth date should take precedence over the better FTS match
-    $this->assertEquals('Samuel', $results->first()['first_name']);
+    $this->assertSame('Samuel', $results->first()['first_name']);
   }
 
 }

@@ -25,8 +25,8 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
     $this->assertTrue(array_key_exists('civicrm_contact', $refsByTarget));
     $contactRef = $refsByTarget['civicrm_contact'];
-    $this->assertEquals('contact_id', $contactRef->getReferenceKey());
-    $this->assertEquals('id', $contactRef->getTargetKey());
+    $this->assertSame('contact_id', $contactRef->getReferenceKey());
+    $this->assertSame('id', $contactRef->getTargetKey());
     $this->assertInstanceOf(\CRM_Core_Reference_Basic::class, $contactRef);
   }
 
@@ -34,27 +34,27 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     // CRM_Core_DAO_EntityTag has an example of all 3 types of references
     $referenceColumns = [];
     foreach (CRM_Core_DAO_EntityTag::getReferenceColumns() as $reference) {
-      $this->assertEquals('civicrm_entity_tag', $reference->getReferenceTable());
+      $this->assertSame('civicrm_entity_tag', $reference->getReferenceTable());
       $referenceColumns[$reference->getReferenceKey()] = $reference;
     }
 
     $reference = $referenceColumns['entity_table'];
     $this->assertInstanceOf(\CRM_Core_Reference_OptionValue::class, $reference);
     $this->assertNull($reference->getTypeColumn());
-    $this->assertEquals('civicrm_option_value', $reference->getTargetTable());
-    $this->assertEquals('value', $reference->getTargetKey());
+    $this->assertSame('civicrm_option_value', $reference->getTargetTable());
+    $this->assertSame('value', $reference->getTargetKey());
 
     $reference = $referenceColumns['tag_id'];
     $this->assertInstanceOf(\CRM_Core_Reference_Basic::class, $reference);
     $this->assertNull($reference->getTypeColumn());
-    $this->assertEquals('civicrm_tag', $reference->getTargetTable());
-    $this->assertEquals('id', $reference->getTargetKey());
+    $this->assertSame('civicrm_tag', $reference->getTargetTable());
+    $this->assertSame('id', $reference->getTargetKey());
 
     $reference = $referenceColumns['entity_id'];
     $this->assertInstanceOf(\CRM_Core_Reference_Dynamic::class, $reference);
-    $this->assertEquals('entity_table', $reference->getTypeColumn());
+    $this->assertSame('entity_table', $reference->getTypeColumn());
     $this->assertNull($reference->getTargetTable());
-    $this->assertEquals('id', $reference->getTargetKey());
+    $this->assertSame('id', $reference->getTargetKey());
   }
 
   public function testGetReferencesToTable(): void {
@@ -65,10 +65,10 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
     $this->assertTrue(array_key_exists('civicrm_entity_financial_account', $refsBySource));
     $genericRef = $refsBySource['civicrm_entity_financial_account'];
-    $this->assertEquals('entity_id', $genericRef->getReferenceKey());
-    $this->assertEquals('entity_table', $genericRef->getTypeColumn());
-    $this->assertEquals('id', $genericRef->getTargetKey());
-    $this->assertEquals('CRM_Core_Reference_Dynamic', get_class($genericRef));
+    $this->assertSame('entity_id', $genericRef->getReferenceKey());
+    $this->assertSame('entity_table', $genericRef->getTypeColumn());
+    $this->assertSame('id', $genericRef->getTargetKey());
+    $this->assertSame('CRM_Core_Reference_Dynamic', get_class($genericRef));
   }
 
   public function testFindReferences(): void {
@@ -462,7 +462,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $g = CRM_Core_DAO::executeQuery('SELECT contact_type FROM civicrm_contact WHERE contact_type = "Individual" LIMIT 3')
       ->fetchGenerator();
     foreach ($g as $row) {
-      $this->assertEquals('Individual', $row->contact_type);
+      $this->assertSame('Individual', $row->contact_type);
       $count++;
     }
     $this->assertEquals(3, $count);
@@ -476,7 +476,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $g = CRM_Core_DAO::executeQuery('SELECT contact_type FROM civicrm_contact WHERE contact_type = "Individual" LIMIT 3')
       ->fetchGenerator('array');
     foreach ($g as $row) {
-      $this->assertEquals('Individual', $row['contact_type']);
+      $this->assertSame('Individual', $row['contact_type']);
       $count++;
     }
     $this->assertEquals(3, $count);
@@ -545,7 +545,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_domain');
     }
     catch (PEAR_Exception $e) {
-      $this->assertEquals(
+      $this->assertSame(
         "SELECT * FROM civicrm_domain [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your $dbNameString server version for the right syntax to use near '/* Forgot trailing comment markerSELECT * FROM civicrm_domain' at line 1]",
         $e->getCause()->getUserInfo()
       );
@@ -570,7 +570,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
 
     $activityFields = CRM_Activity_DAO_Activity::getSupportedFields();
     // Fields should be indexed by name not unique_name (which is "activity_id")
-    $this->assertEquals('id', $activityFields['id']['name']);
+    $this->assertSame('id', $activityFields['id']['name']);
 
     $customGroupFields = CRM_Core_DAO_CustomGroup::getSupportedFields();
     $this->assertArrayHasKey('icon', $customGroupFields);
@@ -623,7 +623,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $dao->id = $id;
     $dao->find(TRUE);
     // sanity check we got the right one since otherwise checking null might falsely be true
-    $this->assertEquals('Test Schedule', $dao->title);
+    $this->assertSame('Test Schedule', $dao->title);
     $this->assertNull($dao->effective_end_date);
 
     $dao->title = 'Updated Test Schedule';
@@ -634,7 +634,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $dao = new CRM_Core_DAO_ActionSchedule();
     $dao->id = $id;
     $dao->find(TRUE);
-    $this->assertEquals('Updated Test Schedule', $dao->title);
+    $this->assertSame('Updated Test Schedule', $dao->title);
     $this->assertNull($dao->effective_end_date);
   }
 
@@ -720,29 +720,29 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       'first_name' => '   John Doe   ',
       'organization_name' => " \t Acme Corp \n ",
     ]);
-    $this->assertEquals('John Doe', $contact->first_name);
-    $this->assertEquals('Acme Corp', $contact->organization_name);
+    $this->assertSame('John Doe', $contact->first_name);
+    $this->assertSame('Acme Corp', $contact->organization_name);
 
     // Whitespace-only strings should trim to empty and be normalized to 'null'
     $blankContact = new CRM_Contact_DAO_Contact();
     $blankContact->copyValues([
       'first_name' => '    ',
     ]);
-    $this->assertEquals('null', $blankContact->first_name);
+    $this->assertSame('null', $blankContact->first_name);
 
     // 2. Email input_type
     $email = new CRM_Core_DAO_Email();
     $email->copyValues([
       'email' => '   user@example.com  ',
     ]);
-    $this->assertEquals('user@example.com', $email->email);
+    $this->assertSame('user@example.com', $email->email);
 
     // 3. Url input_type
     $website = new CRM_Core_DAO_Website();
     $website->copyValues([
       'url' => '   https://civicrm.org   ',
     ]);
-    $this->assertEquals('https://civicrm.org', $website->url);
+    $this->assertSame('https://civicrm.org', $website->url);
 
     // 4. Password and TextArea should NOT be trimmed
     $processor = new CRM_Financial_DAO_PaymentProcessor();
@@ -750,8 +750,8 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       'password' => '  secret_password  ',
       'signature' => "\n  indented signature \n",
     ]);
-    $this->assertEquals('  secret_password  ', $processor->password);
-    $this->assertEquals("\n  indented signature \n", $processor->signature);
+    $this->assertSame('  secret_password  ', $processor->password);
+    $this->assertSame("\n  indented signature \n", $processor->signature);
   }
 
   /**
@@ -764,20 +764,20 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'email' => '   jane.doe@example.com   ',
     ]);
-    $this->assertEquals('Jane', $contact['values'][$contact['id']]['first_name']);
-    $this->assertEquals('Doe', $contact['values'][$contact['id']]['last_name']);
+    $this->assertSame('Jane', $contact['values'][$contact['id']]['first_name']);
+    $this->assertSame('Doe', $contact['values'][$contact['id']]['last_name']);
 
     // Check directly from DB
     $dbContact = new CRM_Contact_DAO_Contact();
     $dbContact->id = $contact['id'];
     $dbContact->find(TRUE);
-    $this->assertEquals('Jane', $dbContact->first_name);
-    $this->assertEquals('Doe', $dbContact->last_name);
+    $this->assertSame('Jane', $dbContact->first_name);
+    $this->assertSame('Doe', $dbContact->last_name);
 
     $dbEmail = new CRM_Core_DAO_Email();
     $dbEmail->contact_id = $contact['id'];
     $dbEmail->find(TRUE);
-    $this->assertEquals('jane.doe@example.com', $dbEmail->email);
+    $this->assertSame('jane.doe@example.com', $dbEmail->email);
   }
 
 }

@@ -1100,8 +1100,8 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'return' => ['id', $createdFirstName],
       'id' => ['IN' => [$tag1, $tag2]],
     ]);
-    $this->assertEquals('Main', $result['values'][$tag1][$createdFirstName]);
-    $this->assertEquals('Other', $result['values'][$tag2][$createdFirstName]);
+    $this->assertSame('Main', $result['values'][$tag1][$createdFirstName]);
+    $this->assertSame('Other', $result['values'][$tag2][$createdFirstName]);
     $this->allowedContactId = $main;
     $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereOnlyOne']);
     $this->cleanupCachedPermissions();
@@ -1110,7 +1110,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'return' => ['id', $createdFirstName],
       'id' => ['IN' => [$tag1, $tag2]],
     ]);
-    $this->assertEquals('Main', $result['values'][$tag1][$createdFirstName]);
+    $this->assertSame('Main', $result['values'][$tag1][$createdFirstName]);
     $this->assertEquals($tag2, $result['values'][$tag2]['id']);
     $this->assertFalse(isset($result['values'][$tag2][$createdFirstName]));
   }
@@ -1165,7 +1165,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $customValues = CustomValue::get($group)->addSelect('*', 'entity_id.first_name')->execute();
     $this->assertCount(1, $customValues);
     $this->assertEquals($c2, $customValues[0]['entity_id']);
-    $this->assertEquals('C2', $customValues[0]['entity_id.first_name']);
+    $this->assertSame('C2', $customValues[0]['entity_id.first_name']);
 
     $customValues = Contact::get()
       ->addJoin('Custom_' . $group . ' AS cf')
@@ -1173,7 +1173,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       ->addWhere('is_deleted', '=', TRUE)
       ->execute();
     $this->assertCount(1, $customValues);
-    $this->assertEquals('C2', $customValues[0]['first_name']);
+    $this->assertSame('C2', $customValues[0]['first_name']);
     $this->assertEquals('2', $customValues[0]['cf.' . $textField]);
   }
 
@@ -1232,7 +1232,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       ->addWhere('name', 'LIKE', 'extra_group_%.extra_field_%')
       ->execute();
     $this->assertCount(1, $getFields);
-    $this->assertEquals('extra_group_2.extra_field_2', $getFields[0]['name']);
+    $this->assertSame('extra_group_2.extra_field_2', $getFields[0]['name']);
 
     // Group 2 is not multi-valued, so no custom entities are visible
     $getEntities = Entity::get()
@@ -1249,7 +1249,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       ->addWhere('type', 'CONTAINS', 'CustomValue')
       ->execute();
     $this->assertCount(1, $getEntities);
-    $this->assertEquals('Custom_extra_group_4', $getEntities[0]['name']);
+    $this->assertSame('Custom_extra_group_4', $getEntities[0]['name']);
   }
 
   /**

@@ -140,7 +140,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
     $csvObject = new CRM_Import_DataSource_CSV($form->getUserJobID());
 
     $json = json_encode($csvObject->getRow()['email']);
-    $this->assertEquals('"yogi@yellowstone.park"', $json);
+    $this->assertSame('"yogi@yellowstone.park"', $json);
     $csvObject->purge();
   }
 

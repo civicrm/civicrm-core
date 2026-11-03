@@ -97,7 +97,7 @@ class PermissionCheckTest extends Api4TestBase implements TransactionalInterface
       ->execute()
       ->first();
 
-    $this->assertEquals('ABC123 Event', $participant['event_id.title']);
+    $this->assertSame('ABC123 Event', $participant['event_id.title']);
     $this->assertEquals($name, $participant['contact_id.first_name']);
 
     // Remove access to view events
@@ -152,7 +152,7 @@ class PermissionCheckTest extends Api4TestBase implements TransactionalInterface
       ->execute()
       ->first();
 
-    $this->assertEquals('ABC321 Event', $participant['event1.title']);
+    $this->assertSame('ABC321 Event', $participant['event1.title']);
     $this->assertEquals($name, $participant['contact1.first_name']);
 
     // Remove access to view events

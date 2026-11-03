@@ -58,8 +58,8 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->setInput('Aaa, A')
       ->execute()->indexBy('id');
 
-    $this->assertEquals('Aaa, A', $result[$contacts[0]['id']]['label']);
-    $this->assertEquals('a@a.a', $result[$contacts[0]['id']]['description'][0]);
+    $this->assertSame('Aaa, A', $result[$contacts[0]['id']]['label']);
+    $this->assertSame('a@a.a', $result[$contacts[0]['id']]['description'][0]);
     // Non-matching contacts should not be included
     $this->assertArrayNotHasKey($contacts[1]['id'], $result);
     $this->assertArrayNotHasKey($contacts[2]['id'], $result);
@@ -77,9 +77,9 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->setInput('Bbb, b')
       ->execute()->indexBy('id');
 
-    $this->assertEquals('Bbb, B', $result[$contacts[1]['id']]['label']);
-    $this->assertEquals('b@b.b', $result[$contacts[1]['id']]['description'][0]);
-    $this->assertEquals('B Town', $result[$contacts[1]['id']]['description'][1]);
+    $this->assertSame('Bbb, B', $result[$contacts[1]['id']]['label']);
+    $this->assertSame('b@b.b', $result[$contacts[1]['id']]['description'][0]);
+    $this->assertSame('B Town', $result[$contacts[1]['id']]['description'][1]);
     $this->assertArrayNotHasKey($contacts[0]['id'], $result);
     $this->assertArrayNotHasKey($contacts[2]['id'], $result);
 
@@ -93,8 +93,8 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     // Contact email is identical to the display name. Ensure only 1 result is returned.
     $this->assertCount(1, $result);
     $this->assertStringContainsString('UNION DISTINCT', $result->debug['sql'][0]);
-    $this->assertEquals('c@c.c', $result[0]['label']);
-    $this->assertEquals('c@c.c', $result[0]['description'][0]);
+    $this->assertSame('c@c.c', $result[0]['label']);
+    $this->assertSame('c@c.c', $result[0]['description'][0]);
 
     // Search by email to match non-primary email address
     $result = Contact::autocomplete(FALSE)
@@ -104,10 +104,10 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->execute();
 
     $this->assertCount(1, $result);
-    $this->assertEquals('c@c.c :: bill@c.c', $result[0]['label']);
+    $this->assertSame('c@c.c :: bill@c.c', $result[0]['label']);
     // Duplicate email removed
     $this->assertCount(1, $result[0]['description']);
-    $this->assertEquals('C Town', $result[0]['description'][0]);
+    $this->assertSame('C Town', $result[0]['description'][0]);
   }
 
   public function testQuicksearchAutocompleteWithMultiRecordCustomField(): void {
@@ -150,7 +150,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->setFilters([$customFieldName => 'Right'])
       ->execute()->indexBy('id');
 
-    $this->assertEquals('Aaa, A :: Righto', $result[$contacts[0]['id']]['label']);
+    $this->assertSame('Aaa, A :: Righto', $result[$contacts[0]['id']]['label']);
     $this->assertArrayNotHasKey($contacts[1]['id'], $result);
     $this->assertArrayNotHasKey($contacts[2]['id'], $result);
   }
@@ -193,8 +193,8 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->setInput('Smith, Robert')
       ->execute()->indexBy('id');
 
-    $this->assertEquals('Smith, Robert "Bob"', $result[$contacts[0]['id']]['label']);
-    $this->assertEquals('bob@example.com', $result[$contacts[0]['id']]['description'][0]);
+    $this->assertSame('Smith, Robert "Bob"', $result[$contacts[0]['id']]['label']);
+    $this->assertSame('bob@example.com', $result[$contacts[0]['id']]['description'][0]);
     $this->assertArrayNotHasKey($contacts[1]['id'], $result);
     $this->assertArrayNotHasKey($contacts[2]['id'], $result);
 
@@ -205,8 +205,8 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->setInput('Smith, Mary')
       ->execute()->indexBy('id');
 
-    $this->assertEquals('Smith, Mary', $result[$contacts[2]['id']]['label']);
-    $this->assertEquals('mary@example.com', $result[$contacts[2]['id']]['description'][0]);
+    $this->assertSame('Smith, Mary', $result[$contacts[2]['id']]['label']);
+    $this->assertSame('mary@example.com', $result[$contacts[2]['id']]['description'][0]);
     $this->assertArrayNotHasKey($contacts[0]['id'], $result);
     $this->assertArrayNotHasKey($contacts[1]['id'], $result);
 
@@ -217,8 +217,8 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->setInput('Bill')
       ->execute()->indexBy('id');
 
-    $this->assertEquals('Jones, William "Bill"', $result[$contacts[1]['id']]['label']);
-    $this->assertEquals('bill@example.com', $result[$contacts[1]['id']]['description'][0]);
+    $this->assertSame('Jones, William "Bill"', $result[$contacts[1]['id']]['label']);
+    $this->assertSame('bill@example.com', $result[$contacts[1]['id']]['description'][0]);
     $this->assertArrayNotHasKey($contacts[0]['id'], $result);
     $this->assertArrayNotHasKey($contacts[2]['id'], $result);
 
@@ -230,8 +230,8 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->execute()->indexBy('id');
 
     $this->assertCount(2, $result);
-    $this->assertEquals('Smith, Robert "Bob"', $result[$contacts[0]['id']]['label']);
-    $this->assertEquals('Smith, Mary', $result[$contacts[2]['id']]['label']);
+    $this->assertSame('Smith, Robert "Bob"', $result[$contacts[0]['id']]['label']);
+    $this->assertSame('Smith, Mary', $result[$contacts[2]['id']]['label']);
   }
 
   public function testQuicksearchAutocompleteWithWildcard(): void {
@@ -273,9 +273,9 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
 
     // Should return all contacts containing 'TestXYZsmith' in alphabetical order
     $this->assertCount(2, $result);
-    $this->assertEquals('AttestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
-    $this->assertEquals('bob@example.com', $result[$contacts[0]['id']]['description'][0]);
-    $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
+    $this->assertSame('AttestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
+    $this->assertSame('bob@example.com', $result[$contacts[0]['id']]['description'][0]);
+    $this->assertSame('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
 
     // Test that exact match still works
     $result = Contact::autocomplete(FALSE)
@@ -285,7 +285,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->execute()->indexBy('id');
 
     $this->assertCount(1, $result);
-    $this->assertEquals('AttestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
+    $this->assertSame('AttestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
 
     // Turn off email. Now it won't use a UNION but should behave the same
     Setting::set(FALSE)
@@ -302,9 +302,9 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
 
     // Should return all contacts containing 'TestXYZsmith' in alphabetical order
     $this->assertCount(2, $result);
-    $this->assertEquals('AttestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
+    $this->assertSame('AttestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
     $this->assertEmpty($result[$contacts[0]['id']]['description']);
-    $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
+    $this->assertSame('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
 
     // Turn off leading wildcard and verify behavior change
     Setting::set(FALSE)
@@ -319,7 +319,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
 
     // Should return TestXYZsmith... but *not* AttestXYZsmith
     $this->assertCount(1, $result);
-    $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
+    $this->assertSame('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
   }
 
   public function testQuicksearchFullTextSearch(): void {
@@ -370,8 +370,8 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
 
     $this->assertCount(1, $results);
     $result = $results->first();
-    $this->assertEquals('TestXYZsmithson, William', $result['label']);
-    $this->assertEquals(1, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
+    $this->assertSame('TestXYZsmithson, William', $result['label']);
+    $this->assertSame(1, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
 
     // find contacts by nick_name - note with FTS
     // we ignore the "includeNickNameInName" setting
@@ -384,8 +384,8 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
 
     $this->assertCount(1, $results);
     $result = $results->first();
-    $this->assertEquals('TestXYZblacksmith, Mary "Mags"', $result['label']);
-    $this->assertEquals(2, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
+    $this->assertSame('TestXYZblacksmith, Mary "Mags"', $result['label']);
+    $this->assertSame(2, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
 
     // find contacts by legal_name
     $results = Contact::autocomplete(FALSE)
@@ -396,8 +396,8 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
 
     $this->assertCount(1, $results);
     $result = $results->first();
-    $this->assertEquals('TestXYZsmithson, William', $result['label']);
-    $this->assertEquals(1, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
+    $this->assertSame('TestXYZsmithson, William', $result['label']);
+    $this->assertSame(1, array_find_key((array) $contacts, fn ($contact) => $contact['id'] === $result['id']));
   }
 
   public function testAddressFieldQuickSearch(): void {
@@ -445,12 +445,12 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->execute()
       ->indexBy('id');
     $this->assertCount(2, $result);
-    $this->assertEquals('TestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
-    $this->assertEquals('bob@example.com', $result[$contacts[0]['id']]['description'][0]);
-    $this->assertEquals('1270 Marigold Lane', $result[$contacts[0]['id']]['description'][1]);
-    $this->assertEquals('FL', $result[$contacts[0]['id']]['description'][2]);
-    $this->assertEquals('United States', $result[$contacts[0]['id']]['description'][3]);
-    $this->assertEquals('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
+    $this->assertSame('TestXYZsmith, Robert', $result[$contacts[0]['id']]['label']);
+    $this->assertSame('bob@example.com', $result[$contacts[0]['id']]['description'][0]);
+    $this->assertSame('1270 Marigold Lane', $result[$contacts[0]['id']]['description'][1]);
+    $this->assertSame('FL', $result[$contacts[0]['id']]['description'][2]);
+    $this->assertSame('United States', $result[$contacts[0]['id']]['description'][3]);
+    $this->assertSame('TestXYZsmithson, William', $result[$contacts[1]['id']]['label']);
 
     // Search by non-primary address
     $result = Contact::autocomplete()
@@ -460,7 +460,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->execute()
       ->indexBy('id');
     $this->assertCount(1, $result);
-    $this->assertEquals('TestXYZblacksmith, Mary :: 1600 Marigold Lane', $result[$contacts[2]['id']]['label']);
+    $this->assertSame('TestXYZblacksmith, Mary :: 1600 Marigold Lane', $result[$contacts[2]['id']]['label']);
   }
 
   public function testQuicksearchAutocompleteWithNonNumericPhone(): void {

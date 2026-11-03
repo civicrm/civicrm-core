@@ -92,8 +92,8 @@ class CustomFieldAlterTest extends Api4TestBase {
     $this->assertCount(4, $result);
     $this->assertEquals(1, $result['A1']['MyFieldsToAlter.TestOptions']);
     $this->assertEquals(2, $result['A2']['MyFieldsToAlter.TestOptions']);
-    $this->assertEquals('One', $result['A1']['MyFieldsToAlter.TestOptions:label']);
-    $this->assertEquals('Two', $result['A2']['MyFieldsToAlter.TestOptions:label']);
+    $this->assertSame('One', $result['A1']['MyFieldsToAlter.TestOptions:label']);
+    $this->assertSame('Two', $result['A2']['MyFieldsToAlter.TestOptions:label']);
     $this->assertTrue(empty($result['A3']['MyFieldsToAlter.TestOptions']));
     $this->assertTrue(empty($result['A4']['MyFieldsToAlter.TestOptions']));
 
@@ -128,8 +128,8 @@ class CustomFieldAlterTest extends Api4TestBase {
     $this->assertCount(4, $result);
     $this->assertEquals(1, $result['A1']['MyFieldsToAlter.TestOptions']);
     $this->assertEquals(2, $result['A2']['MyFieldsToAlter.TestOptions']);
-    $this->assertEquals('One', $result['A1']['MyFieldsToAlter.TestOptions:label']);
-    $this->assertEquals('Two', $result['A2']['MyFieldsToAlter.TestOptions:label']);
+    $this->assertSame('One', $result['A1']['MyFieldsToAlter.TestOptions:label']);
+    $this->assertSame('Two', $result['A2']['MyFieldsToAlter.TestOptions:label']);
     $this->assertTrue(empty($result['A3']['MyFieldsToAlter.TestOptions']));
     $this->assertTrue(empty($result['A4']['MyFieldsToAlter.TestOptions']));
 
@@ -145,7 +145,7 @@ class CustomFieldAlterTest extends Api4TestBase {
       ->execute()->indexBy('subject');
     $this->assertCount(1, $result);
     // The two values originally entered will now be one value
-    $this->assertEquals(1228, $result['A4']['MyFieldsToAlter.TestCountry']);
+    $this->assertSame(1228, $result['A4']['MyFieldsToAlter.TestCountry']);
 
     // Change country field from single to multiselect
     CustomField::update(FALSE)
@@ -216,7 +216,7 @@ class CustomFieldAlterTest extends Api4TestBase {
     // is_searchable defaults to FALSE, so no index
     $query = "SHOW INDEX FROM {$customGroup['table_name']} WHERE Key_name = 'INDEX_{$field['column_name']}'";
     $dao = \CRM_Core_DAO::executeQuery($query);
-    $this->assertEquals(0, $dao->N);
+    $this->assertSame(0, $dao->N);
 
     // Change is_searchable to TRUE
     CustomField::update(FALSE)
@@ -226,7 +226,7 @@ class CustomFieldAlterTest extends Api4TestBase {
 
     // Index added now that field is_searchable
     $dao = \CRM_Core_DAO::executeQuery($query);
-    $this->assertEquals(1, $dao->N);
+    $this->assertSame(1, $dao->N);
 
     // Disable the field
     CustomField::update(FALSE)
@@ -236,7 +236,7 @@ class CustomFieldAlterTest extends Api4TestBase {
 
     // Index removed when field was disabled
     $dao = \CRM_Core_DAO::executeQuery($query);
-    $this->assertEquals(0, $dao->N);
+    $this->assertSame(0, $dao->N);
   }
 
   public function testSerializedFieldSearchIndex(): void {
@@ -257,7 +257,7 @@ class CustomFieldAlterTest extends Api4TestBase {
     // No index should be created because the field is serialized
     $query = "SHOW INDEX FROM {$customGroup['table_name']} WHERE Key_name = 'INDEX_{$field['column_name']}'";
     $dao = \CRM_Core_DAO::executeQuery($query);
-    $this->assertEquals(0, $dao->N);
+    $this->assertSame(0, $dao->N);
 
     // Change serialize to FALSE (0)
     CustomField::update(FALSE)
@@ -267,7 +267,7 @@ class CustomFieldAlterTest extends Api4TestBase {
 
     // Index should now be added because it is no longer serialized
     $dao = \CRM_Core_DAO::executeQuery($query);
-    $this->assertEquals(1, $dao->N);
+    $this->assertSame(1, $dao->N);
 
     // Change serialize back to TRUE (1)
     CustomField::update(FALSE)
@@ -277,7 +277,7 @@ class CustomFieldAlterTest extends Api4TestBase {
 
     // Index should be removed now that it is serialized again
     $dao = \CRM_Core_DAO::executeQuery($query);
-    $this->assertEquals(0, $dao->N);
+    $this->assertSame(0, $dao->N);
   }
 
 }

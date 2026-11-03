@@ -73,7 +73,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
     Civi::dispatcher()->addListener('hook_civicrm_alterBundle', $alter);
     $b = CRM_Core_Resources_Common::createBasicBundle('cheese', $init);
-    $this->assertEquals('cheese', $b->name);
+    $this->assertSame('cheese', $b->name);
     $this->assertEquals(['init_cheese', 'alter_cheese'], $hits);
     $this->assertEquals(['doStuff();', 'alert();'], array_values(CRM_Utils_Array::collect('script', $b->getAll())));
   }
@@ -217,7 +217,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function testAddSettingHook(): void {
     $test = $this;
     Civi::dispatcher()->addListener('hook_civicrm_alterResourceSettings', function($event) use ($test) {
-      $test->assertEquals('apple', $event->data['fruit']['mine']);
+      $test->assertSame('apple', $event->data['fruit']['mine']);
       $event->data['fruit']['mine'] = 'banana';
     });
     $this->res->addSetting(['fruit' => ['mine' => 'apple']]);
@@ -259,10 +259,10 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
   public function testCrmJS(): void {
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmScript ext="com.example.ext" file="foo%20bar.js" region="testCrmJS"}');
-    $this->assertEquals('', $actual);
+    $this->assertSame('', $actual);
 
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmScript url="/whiz/foo%20bar.js" region="testCrmJS" weight=1}');
-    $this->assertEquals('', $actual);
+    $this->assertSame('', $actual);
 
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testCrmJS"}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
@@ -316,10 +316,10 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
   public function testCrmCSS(): void {
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmStyle ext="com.example.ext" file="foo%20bar.css" region=testCrmCSS}');
-    $this->assertEquals('', $actual);
+    $this->assertSame('', $actual);
 
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmStyle url="/whiz/foo%20bar.css" region="testCrmCSS" weight=1}');
-    $this->assertEquals('', $actual);
+    $this->assertSame('', $actual);
 
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmRegion name="testCrmCSS"}{/crmRegion}');
     // stable ordering: alphabetical by (snippet.weight,snippet.name)
@@ -330,19 +330,19 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   }
 
   public function testGetURL(): void {
-    $this->assertEquals(
+    $this->assertSame(
       'http://core-app/dir/file%20name.txt',
       $this->res->getURL('civicrm', 'dir/file%20name.txt')
     );
-    $this->assertEquals(
+    $this->assertSame(
       'http://ext-dir/com.example.ext/dir/file%20name.txt',
       $this->res->getURL('com.example.ext', 'dir/file%20name.txt')
     );
-    $this->assertEquals(
+    $this->assertSame(
       'http://core-app/',
       $this->res->getURL('civicrm')
     );
-    $this->assertEquals(
+    $this->assertSame(
       'http://ext-dir/com.example.ext/',
       $this->res->getURL('com.example.ext')
     );
@@ -350,13 +350,13 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
   public function testCrmResURL(): void {
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmResURL ext="com.example.ext" file="foo%20bar.png"}');
-    $this->assertEquals('http://ext-dir/com.example.ext/foo%20bar.png', $actual);
+    $this->assertSame('http://ext-dir/com.example.ext/foo%20bar.png', $actual);
 
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmResURL ext="com.example.ext" file="foo%20bar.png" addCacheCode=1}');
-    $this->assertEquals('http://ext-dir/com.example.ext/foo%20bar.png?r=resTesten_US', $actual);
+    $this->assertSame('http://ext-dir/com.example.ext/foo%20bar.png?r=resTesten_US', $actual);
 
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmResURL ext="com.example.ext"}');
-    $this->assertEquals('http://ext-dir/com.example.ext/', $actual);
+    $this->assertSame('http://ext-dir/com.example.ext/', $actual);
 
     $actual = CRM_Utils_String::parseOneOffStringThroughSmarty('{crmResURL expr="[civicrm.root]/foo"}');
     $this->assertEquals(Civi::paths()->getUrl('[civicrm.root]/foo'), $actual);
@@ -482,7 +482,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     # hooked item should be added
     $contactLinks = $data['links']['Contact'];
     $this->assertEquals(count($contactLinks), 4);
-    $this->assertEquals($contactLinks[3]['url'], '/civicrm/profile/create&reset=1&context=dialog&gid=5');
+    $this->assertSame('/civicrm/profile/create&reset=1&context=dialog&gid=5', $contactLinks[3]['url']);
 
     # links and filters need to be JSON arrays, ie use sequential keys
     $this->assertArrayValuesEqual(array_keys($contactLinks), array_keys(array_values($contactLinks)));

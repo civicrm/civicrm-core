@@ -238,7 +238,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
 
     $this->assertArrayHasKey($idField, $fields, $errMsg);
     // Hmm, not true of every primary key... what about Afform.name?
-    $this->assertEquals('Integer', $fields[$idField]['data_type']);
+    $this->assertSame('Integer', $fields[$idField]['data_type']);
 
     // The underlying schema is not 100% consistent, but this is the standard in APIv4
     if (isset($fields['is_active'])) {
@@ -289,7 +289,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
     \Civi::dispatcher()->addListener('civi.api4.validate::' . $entityName, $onValidate);
 
     $this->setCheckAccessGrants(["{$entityName}::create" => TRUE]);
-    $this->assertEquals(0, $this->checkAccessCounts["{$entityName}::create"]);
+    $this->assertSame(0, $this->checkAccessCounts["{$entityName}::create"]);
 
     $requiredParams = $this->getRequiredValuesToCreate($entityName);
     $createResult = civicrm_api4($entityName, 'create', [
@@ -305,11 +305,11 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
     $id = $createResult[$primaryKeys[0]];
     $this->assertGreaterThanOrEqual(1, $id, "$entityName ID not positive");
     if (!$isReadOnly) {
-      $this->assertEquals(1, $this->checkAccessCounts["{$entityName}::create"]);
+      $this->assertSame(1, $this->checkAccessCounts["{$entityName}::create"]);
     }
     $this->resetCheckAccess();
 
-    $this->assertEquals(2, $hookLog[$entityName]['create']);
+    $this->assertSame(2, $hookLog[$entityName]['create']);
     \Civi::dispatcher()->removeListener('civi.api4.validate', $onValidate);
     \Civi::dispatcher()->removeListener('civi.api4.validate::' . $entityName, $onValidate);
 
@@ -322,7 +322,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    */
   protected function checkCreationDenied(string $entityName, $entityClass): void {
     $this->setCheckAccessGrants(["{$entityName}::create" => FALSE]);
-    $this->assertEquals(0, $this->checkAccessCounts["{$entityName}::create"]);
+    $this->assertSame(0, $this->checkAccessCounts["{$entityName}::create"]);
 
     $requiredParams = $this->getRequiredValuesToCreate($entityName);
 
@@ -336,7 +336,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
       // OK, expected exception
     }
     if (!$this->isReadOnly($entityName)) {
-      $this->assertEquals(1, $this->checkAccessCounts["{$entityName}::create"]);
+      $this->assertSame(1, $this->checkAccessCounts["{$entityName}::create"]);
     }
     $this->resetCheckAccess();
   }
@@ -406,7 +406,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
     $errMsg = sprintf('Failed to fetch a %s after creation', $entityName);
     $idField = CoreUtil::getIdFieldName($entityName);
     $this->assertEquals($id, $getResult->first()[$idField], $errMsg);
-    $this->assertEquals(1, $getResult->count(), $errMsg);
+    $this->assertSame(1, $getResult->count(), $errMsg);
     $this->resetCheckAccess();
   }
 
@@ -421,7 +421,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
       ->selectRowCount()
       ->execute();
     $errMsg = sprintf('%s getCount failed', $entityName);
-    $this->assertEquals(1, $getResult->count(), $errMsg);
+    $this->assertSame(1, $getResult->count(), $errMsg);
 
     $getResult = $entityClass::get(FALSE)
       ->selectRowCount()
@@ -469,7 +469,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    */
   protected function checkDeletionAllowed($entityClass, $entityKeys, $entityName) {
     $this->setCheckAccessGrants(["{$entityName}::delete" => TRUE]);
-    $this->assertEquals(0, $this->checkAccessCounts["{$entityName}::delete"]);
+    $this->assertSame(0, $this->checkAccessCounts["{$entityName}::delete"]);
     $isReadOnly = $this->isReadOnly($entityName);
 
     $deleteAction = $entityClass::delete()
@@ -493,7 +493,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
       // should get back an array of deleted id
       $this->assertEquals([$entityKeys], (array) $deleteResult);
       if (!$isReadOnly) {
-        $this->assertEquals(1, $this->checkAccessCounts["{$entityName}::delete"]);
+        $this->assertSame(1, $this->checkAccessCounts["{$entityName}::delete"]);
       }
     }
     $this->resetCheckAccess();
@@ -508,7 +508,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
    */
   protected function checkDeletionDenied($entityClass, array $entityKeys, $entityName) {
     $this->setCheckAccessGrants(["{$entityName}::delete" => FALSE]);
-    $this->assertEquals(0, $this->checkAccessCounts["{$entityName}::delete"]);
+    $this->assertSame(0, $this->checkAccessCounts["{$entityName}::delete"]);
 
     try {
       $entityClass::delete()
@@ -521,7 +521,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
     }
 
     if (!$this->isReadOnly($entityName)) {
-      $this->assertEquals(1, $this->checkAccessCounts["{$entityName}::delete"]);
+      $this->assertSame(1, $this->checkAccessCounts["{$entityName}::delete"]);
     }
     $this->resetCheckAccess();
   }
@@ -537,7 +537,7 @@ class ConformanceTest extends Api4TestBase implements HookInterface {
       ->execute();
 
     $errMsg = sprintf('Entity "%s" was not deleted', $entityName);
-    $this->assertEquals(0, count($getDeletedResult), $errMsg);
+    $this->assertSame(0, count($getDeletedResult), $errMsg);
   }
 
   /**

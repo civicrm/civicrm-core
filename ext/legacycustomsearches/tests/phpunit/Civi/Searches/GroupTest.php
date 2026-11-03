@@ -393,7 +393,7 @@ class GroupTest extends TestCase implements HeadlessInterface, HookInterface, Tr
       \CRM_Core_Form::CB_PREFIX . 23 => TRUE,
     ];
     $obj = new \CRM_Contact_Form_Search_Custom_Group($formValues);
-    $this->assertEquals(' (1) ', $obj->where());
+    $this->assertSame(' (1) ', $obj->where());
   }
 
   /**
@@ -406,7 +406,7 @@ class GroupTest extends TestCase implements HeadlessInterface, HookInterface, Tr
       \CRM_Core_Form::CB_PREFIX . 23 => TRUE,
     ];
     $obj = new \CRM_Contact_Form_Search_Custom_Group($formValues);
-    $this->assertEquals(' (1) ', $obj->where(FALSE));
+    $this->assertSame(' (1) ', $obj->where(FALSE));
   }
 
   /**
@@ -419,7 +419,7 @@ class GroupTest extends TestCase implements HeadlessInterface, HookInterface, Tr
       \CRM_Core_Form::CB_PREFIX . 23 => TRUE,
     ];
     $obj = new \CRM_Contact_Form_Search_Custom_Group($formValues);
-    $this->assertEquals(' (1)  AND contact_a.id IN ( 17, 23 )', $obj->where(TRUE));
+    $this->assertSame(' (1)  AND contact_a.id IN ( 17, 23 )', $obj->where(TRUE));
   }
 
   /**

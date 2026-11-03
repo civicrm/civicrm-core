@@ -140,11 +140,11 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     foreach ($links['all'] as $link) {
       if ($link['name'] == 'URL for this Page') {
         $found = TRUE;
-        $this->assertEquals($link['url'], 'https://civicrm.org/mih');
+        $this->assertSame('https://civicrm.org/mih', $link['url']);
       }
     }
 
-    $this->assertEquals($found, TRUE);
+    $this->assertTrue($found);
   }
 
   /**

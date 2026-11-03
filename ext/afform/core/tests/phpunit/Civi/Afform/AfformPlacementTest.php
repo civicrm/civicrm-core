@@ -86,13 +86,13 @@ class AfformPlacementTest extends TestCase implements HeadlessInterface {
     $this->assertArrayNotHasKey('test0', $tabs);
     $this->assertArrayHasKey('test3', $tabs);
     $this->assertArrayNotHasKey('test4', $tabs);
-    $this->assertEquals('Test C', $tabs['test1']['title']);
+    $this->assertSame('Test C', $tabs['test1']['title']);
     $this->assertEquals(['Individual'], $tabs['test1']['contact_type']);
     $this->assertEquals(['Individual'], $tabs['test3']['contact_type']);
-    $this->assertEquals('Test A', $tabs['test2']['title']);
-    $this->assertEquals('crm-i smiley-face', $tabs['test1']['icon']);
+    $this->assertSame('Test A', $tabs['test2']['title']);
+    $this->assertSame('crm-i smiley-face', $tabs['test1']['icon']);
     // Fallback icon
-    $this->assertEquals('crm-i fa-list-alt', $tabs['test2']['icon']);
+    $this->assertSame('crm-i fa-list-alt', $tabs['test2']['icon']);
     // Forms should have count => FALSE so core does not execute legacy count queries
     $this->assertFalse($tabs['test1']['count']);
     $this->assertFalse($tabs['test2']['count']);

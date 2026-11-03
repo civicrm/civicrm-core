@@ -91,9 +91,9 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertEquals(3, $softCreditList['recordsTotal']);
     $this->assertEquals(3, $amountSortedList['recordsTotal']);
 
-    $this->assertEquals('$600.00', $amountSortedList['data'][0]['amount']);
-    $this->assertEquals('$150.00', $amountSortedList['data'][1]['amount']);
-    $this->assertEquals('$100.00', $amountSortedList['data'][2]['amount']);
+    $this->assertSame('$600.00', $amountSortedList['data'][0]['amount']);
+    $this->assertSame('$150.00', $amountSortedList['data'][1]['amount']);
+    $this->assertSame('$100.00', $amountSortedList['data'][2]['amount']);
 
     // sort with soft credit types
     $_GET['order'][0]['column'] = 1;
@@ -104,9 +104,9 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
       $softTypeSortedList = $e->errorData;
     }
 
-    $this->assertEquals('Workplace Giving', $softTypeSortedList['data'][0]['sct_label']);
-    $this->assertEquals('Solicited', $softTypeSortedList['data'][1]['sct_label']);
-    $this->assertEquals('In Memory of', $softTypeSortedList['data'][2]['sct_label']);
+    $this->assertSame('Workplace Giving', $softTypeSortedList['data'][0]['sct_label']);
+    $this->assertSame('Solicited', $softTypeSortedList['data'][1]['sct_label']);
+    $this->assertSame('In Memory of', $softTypeSortedList['data'][2]['sct_label']);
   }
 
   /**
@@ -172,9 +172,9 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
       $softCreditList = $e->errorData;
     }
     $this->assertEquals(1, $softCreditList['recordsTotal']);
-    $this->assertEquals('Gift', $softCreditList['data'][0]['sct_label']);
-    $this->assertEquals('$100.00', $softCreditList['data'][0]['amount']);
-    $this->assertEquals('Member Dues', $softCreditList['data'][0]['financial_type']);
+    $this->assertSame('Gift', $softCreditList['data'][0]['sct_label']);
+    $this->assertSame('$100.00', $softCreditList['data'][0]['amount']);
+    $this->assertSame('Member Dues', $softCreditList['data'][0]['financial_type']);
   }
 
   /**

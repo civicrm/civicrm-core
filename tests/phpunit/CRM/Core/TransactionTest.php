@@ -189,31 +189,31 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   public function testIsActive(): void {
-    $this->assertEquals(FALSE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
+    $this->assertFalse(CRM_Core_Transaction::isActive());
+    $this->assertTrue(CRM_Core_Transaction::willCommit());
     $tx = new CRM_Core_Transaction();
-    $this->assertEquals(TRUE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
+    $this->assertTrue(CRM_Core_Transaction::isActive());
+    $this->assertTrue(CRM_Core_Transaction::willCommit());
     $tx = NULL;
-    $this->assertEquals(FALSE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
+    $this->assertFalse(CRM_Core_Transaction::isActive());
+    $this->assertTrue(CRM_Core_Transaction::willCommit());
   }
 
   public function testIsActive_rollback(): void {
-    $this->assertEquals(FALSE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
+    $this->assertFalse(CRM_Core_Transaction::isActive());
+    $this->assertTrue(CRM_Core_Transaction::willCommit());
 
     $tx = new CRM_Core_Transaction();
-    $this->assertEquals(TRUE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
+    $this->assertTrue(CRM_Core_Transaction::isActive());
+    $this->assertTrue(CRM_Core_Transaction::willCommit());
 
     $tx->rollback();
-    $this->assertEquals(TRUE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(FALSE, CRM_Core_Transaction::willCommit());
+    $this->assertTrue(CRM_Core_Transaction::isActive());
+    $this->assertFalse(CRM_Core_Transaction::willCommit());
 
     $tx = NULL;
-    $this->assertEquals(FALSE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
+    $this->assertFalse(CRM_Core_Transaction::isActive());
+    $this->assertTrue(CRM_Core_Transaction::willCommit());
   }
 
   public function testCallback_commit(): void {
@@ -335,7 +335,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
       $this->fail('The error should reach the caller');
     }
     catch (TypeError $e) {
-      $this->assertEquals('Ruh-roh', $e->getMessage());
+      $this->assertSame('Ruh-roh', $e->getMessage());
     }
     $this->assertContactsExistByOffset([0 => FALSE]);
   }

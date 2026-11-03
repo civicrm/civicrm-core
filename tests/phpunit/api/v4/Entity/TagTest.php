@@ -118,7 +118,7 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
     $byType = $tagged->indexBy('entity_type');
     $this->assertStringContainsString('Lookup', $byType['Contact']['label']);
     $this->assertStringContainsString('cid=' . $contact['id'], $byType['Contact']['url']);
-    $this->assertEquals('Tag Test Form', $byType['Afform']['label']);
+    $this->assertSame('Tag Test Form', $byType['Afform']['label']);
     $this->assertStringContainsString('afform#/edit/' . $this->afformName, $byType['Afform']['url']);
 
     // A nonexistent tag ID is an empty result, not an error.
@@ -304,7 +304,7 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', '=', $tagA['id'])
       ->addSelect('label', 'used_for')
       ->execute()->first();
-    $this->assertEquals('Merged Label', $mergedTag['label']);
+    $this->assertSame('Merged Label', $mergedTag['label']);
     $this->assertEqualsCanonicalizing(['civicrm_contact', 'civicrm_activity'], $mergedTag['used_for']);
 
     // Tag B no longer exists.

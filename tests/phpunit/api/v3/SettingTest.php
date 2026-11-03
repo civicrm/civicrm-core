@@ -183,7 +183,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $_testOnChange_hookCalls['count']);
     $this->assertEquals(['First', 'Value'], $_testOnChange_hookCalls['newValue']);
-    $this->assertEquals('List of Components', $_testOnChange_hookCalls['metadata']['title']);
+    $this->assertSame('List of Components', $_testOnChange_hookCalls['metadata']['title']);
 
     // change value
     $_testOnChange_hookCalls = ['count' => 0];
@@ -193,7 +193,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->assertEquals(1, $_testOnChange_hookCalls['count']);
     $this->assertEquals(['First', 'Value'], $_testOnChange_hookCalls['oldValue']);
     $this->assertEquals(['Second', 'Value'], $_testOnChange_hookCalls['newValue']);
-    $this->assertEquals('List of Components', $_testOnChange_hookCalls['metadata']['title']);
+    $this->assertSame('List of Components', $_testOnChange_hookCalls['metadata']['title']);
   }
 
   /**
@@ -384,9 +384,9 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $fields = $this->callAPISuccess('setting', 'getfields');
     $this->assertArrayHasKey('test_key', $fields['values']);
     $this->callAPISuccess('setting', 'create', ['test_key' => 'key_set']);
-    $this->assertEquals('key_set', Civi::settings()->get('test_key'));
+    $this->assertSame('key_set', Civi::settings()->get('test_key'));
     $result = $this->callAPISuccess('setting', 'getvalue', ['name' => 'test_key']);
-    $this->assertEquals('key_set', $result);
+    $this->assertSame('key_set', $result);
   }
 
   /**
@@ -402,7 +402,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'name' => 'defaultCurrency',
       'sequential' => 1,
     ]);
-    $this->assertEquals('USD', $settings['values'][0]['defaultCurrency']);
+    $this->assertSame('USD', $settings['values'][0]['defaultCurrency']);
   }
 
   /**
@@ -426,8 +426,8 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'return' => 'defaultCurrency',
       'domain_id' => 'all',
     ]);
-    $this->assertEquals('USD', $settings['values'][$this->currentDomain]['defaultCurrency']);
-    $this->assertEquals('CAD', $settings['values'][$this->domainID2]['defaultCurrency'],
+    $this->assertSame('USD', $settings['values'][$this->currentDomain]['defaultCurrency']);
+    $this->assertSame('CAD', $settings['values'][$this->domainID2]['defaultCurrency'],
       "second domain (id $this->domainID2 ) should be set to CAD. First dom was $this->currentDomain & was USD");
 
   }
@@ -446,7 +446,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'group' => 'Localization Setting',
     ];
     $result = $this->callAPISuccess('setting', 'getvalue', $params);
-    $this->assertEquals(',', $result);
+    $this->assertSame(',', $result);
   }
 
   /**
@@ -462,7 +462,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('setting', 'getvalue', $params);
-    $this->assertEquals('#1b1b1b', $result);
+    $this->assertSame('#1b1b1b', $result);
   }
 
   /**
@@ -473,10 +473,10 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'name' => 'address_format',
     ];
     $result = $this->callAPISuccess('Setting', 'getdefaults', $params);
-    $this->assertEquals("{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['address_format']);
+    $this->assertSame("{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['address_format']);
     $params = ['name' => 'mailing_format'];
     $result = $this->callAPISuccess('setting', 'getdefaults', $params);
-    $this->assertEquals("{contact.addressee}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['mailing_format']);
+    $this->assertSame("{contact.addressee}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['mailing_format']);
     $this->assertArrayHasKey(CRM_Core_Config::domainID(), $result['values']);
   }
 
@@ -500,17 +500,17 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('setting', 'get');
     //make sure it's set
-    $this->assertEquals('xyz', $result['values'][CRM_Core_Config::domainID()]['address_format']);
+    $this->assertSame('xyz', $result['values'][CRM_Core_Config::domainID()]['address_format']);
     $this->callAPISuccess('setting', 'revert', $revertParams);
     //make sure it's reverted
     $result = $this->callAPISuccess('setting', 'get');
-    $this->assertEquals("{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['address_format']);
+    $this->assertSame("{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['address_format']);
     $params = [
       'return' => ['mailing_format'],
     ];
     $result = $this->callAPISuccess('setting', 'get', $params);
     //make sure it's unchanged
-    $this->assertEquals('bcs', $result['values'][CRM_Core_Config::domainID()]['mailing_format']);
+    $this->assertSame('bcs', $result['values'][CRM_Core_Config::domainID()]['mailing_format']);
   }
 
   /**
@@ -526,13 +526,13 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $revertParams = [];
     $result = $this->callAPISuccess('Setting', 'get', $params);
     //make sure it's set
-    $this->assertEquals('xyz', $result['values'][CRM_Core_Config::domainID()]['address_format']);
+    $this->assertSame('xyz', $result['values'][CRM_Core_Config::domainID()]['address_format']);
 
     $this->callAPISuccess('Setting', 'revert', $revertParams);
     //make sure it's reverted
     $result = $this->callAPISuccess('setting', 'get', ['group' => 'core']);
-    $this->assertEquals("{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['address_format']);
-    $this->assertEquals("{contact.addressee}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['mailing_format']);
+    $this->assertSame("{contact.address_name}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['address_format']);
+    $this->assertSame("{contact.addressee}\n{contact.street_address}\n{contact.supplemental_address_1}\n{contact.supplemental_address_2}\n{contact.supplemental_address_3}\n{contact.city}{, }{contact.state_province}{ }{contact.postal_code}\n{contact.country}", $result['values'][CRM_Core_Config::domainID()]['mailing_format']);
   }
 
   /**
@@ -559,7 +559,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('setting', 'get', $params);
     $this->assertAPISuccess($result);
-    $this->assertEquals('over-cms-menu', $result['values'][$domain['id']]['menubar_position']);
+    $this->assertSame('over-cms-menu', $result['values'][$domain['id']]['menubar_position']);
 
     // The 'fill' operation is no longer necessary, but third parties might still use it, so let's
     // make sure it doesn't do anything weird (crashing or breaking values).
@@ -572,7 +572,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     // Setting has NULL default. Not returned.
     //$this->assertArrayHasKey('extensionsDir', $result['values'][$dom['id']]);
 
-    $this->assertEquals('over-cms-menu', $result['values'][$domain['id']]['menubar_position']);
+    $this->assertSame('over-cms-menu', $result['values'][$domain['id']]['menubar_position']);
   }
 
   /**
@@ -596,12 +596,12 @@ class api_v3_SettingTest extends CiviUnitTestCase {
       'group' => 'Developer Preferences',
     ];
     $result = $this->callAPISuccess('Setting', 'getvalue', $params);
-    $this->assertEquals('Staging', $result);
+    $this->assertSame('Staging', $result);
 
     $civicrm_setting[CRM_Core_BAO_Setting::DEVELOPER_PREFERENCES_NAME]['environment'] = 'Production';
     Civi::service('settings_manager')->useMandatory();
     $result = $this->callAPISuccess('Setting', 'getvalue', $params);
-    $this->assertEquals('Production', $result);
+    $this->assertSame('Production', $result);
   }
 
 }

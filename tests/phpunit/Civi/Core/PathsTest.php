@@ -96,9 +96,9 @@ class PathsTest extends \CiviUnitTestCase {
     $p = \Civi::paths();
     $cmsRoot = rtrim($p->getVariable('cms.root', 'url'), '/');
 
-    $this->assertEquals("$cmsRoot/foo/bar", $p->getUrl('foo/bar'));
-    $this->assertEquals("$cmsRoot/foo/", $p->getUrl('foo/'));
-    $this->assertEquals("$cmsRoot/foo", $p->getUrl('foo'));
+    $this->assertSame("$cmsRoot/foo/bar", $p->getUrl('foo/bar'));
+    $this->assertSame("$cmsRoot/foo/", $p->getUrl('foo/'));
+    $this->assertSame("$cmsRoot/foo", $p->getUrl('foo'));
   }
 
   /**
@@ -137,17 +137,17 @@ class PathsTest extends \CiviUnitTestCase {
     });
 
     // The test.base works as explicitly defined...
-    $this->assertEquals('/var/foo', $paths->getPath('[test.base]/.'));
-    $this->assertEquals('http://example.com/foo', $paths->getUrl('[test.base]/.', 'absolute'));
-    $this->assertEquals('/foo', $paths->getUrl('[test.base]/.', 'relative'));
+    $this->assertSame('/var/foo', $paths->getPath('[test.base]/.'));
+    $this->assertSame('http://example.com/foo', $paths->getUrl('[test.base]/.', 'absolute'));
+    $this->assertSame('/foo', $paths->getUrl('[test.base]/.', 'relative'));
 
     // The test.goodsub works as expected...
-    $this->assertEquals('/var/foo/good', $paths->getPath('[test.goodsub]/.'));
-    $this->assertEquals('http://example.com/foo/good', $paths->getUrl('[test.goodsub]/.', 'absolute'));
-    $this->assertEquals('/foo/good', $paths->getUrl('[test.goodsub]/.', 'relative'));
+    $this->assertSame('/var/foo/good', $paths->getPath('[test.goodsub]/.'));
+    $this->assertSame('http://example.com/foo/good', $paths->getUrl('[test.goodsub]/.', 'absolute'));
+    $this->assertSame('/foo/good', $paths->getUrl('[test.goodsub]/.', 'relative'));
 
     // The test.badsub doesn't work as expected.
-    $this->assertEquals('/var/foo/bad', $paths->getPath('[test.badsub]/.'));
+    $this->assertSame('/var/foo/bad', $paths->getPath('[test.badsub]/.'));
     $this->assertNotEquals('http://example.com/foo/bad', $paths->getUrl('[test.badsub]/.', 'absolute'));
     $this->assertNotEquals('/foo/bad', $paths->getUrl('[test.badsub]/.', 'relative'));
   }

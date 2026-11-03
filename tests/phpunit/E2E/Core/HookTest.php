@@ -30,8 +30,8 @@ class HookTest extends \CiviEndToEndTestCase {
       $b = new \stdClass();
       $this->hookStub(['a', 'b'], $a, $b);
       $this->assertEquals(1, $calls);
-      $this->assertEquals('a.name', $a['foo']);
-      $this->assertEquals('b.name', $b->bar);
+      $this->assertSame('a.name', $a['foo']);
+      $this->assertSame('b.name', $b->bar);
     }
     finally {
       \Civi::dispatcher()->removeListener('hook_civicrm_e2eHookExample', $hookExample);

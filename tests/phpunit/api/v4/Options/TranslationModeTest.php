@@ -120,8 +120,8 @@ class TranslationModeTest extends Api4TestBase implements TransactionalInterface
       ->setTranslationMode('fuzzy')
       ->execute()->single();
 
-    $this->assertEquals('Active English Subject', $fallbackResult['msg_subject']);
-    $this->assertEquals('en_US', $fallbackResult['actual_language']);
+    $this->assertSame('Active English Subject', $fallbackResult['msg_subject']);
+    $this->assertSame('en_US', $fallbackResult['actual_language']);
 
     // Case 2: The requested language itself has a translation.
     $this->addTranslation();
@@ -173,9 +173,9 @@ class TranslationModeTest extends Api4TestBase implements TransactionalInterface
    * @param $contribution_online_receipt
    */
   private function assertFrenchTranslationRetrieved($contribution_online_receipt): void {
-    $this->assertEquals('Bonjour', $contribution_online_receipt['msg_subject']);
-    $this->assertEquals('Voila!', $contribution_online_receipt['msg_html']);
-    $this->assertEquals('fr_FR', $contribution_online_receipt['actual_language']);
+    $this->assertSame('Bonjour', $contribution_online_receipt['msg_subject']);
+    $this->assertSame('Voila!', $contribution_online_receipt['msg_html']);
+    $this->assertSame('fr_FR', $contribution_online_receipt['actual_language']);
   }
 
 }

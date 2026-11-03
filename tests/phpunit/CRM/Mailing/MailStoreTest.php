@@ -41,7 +41,7 @@ class CRM_Mailing_MailStoreTest extends \CiviUnitTestCase {
       ->addListener('hook_civicrm_alterMailStore', function ($e) {
         if ($e->params['protocol'] === 'Maildir') {
           $e->params['factory'] = function ($mailSettings) {
-            $this->assertEquals('testMaildirHook', $mailSettings['name']);
+            $this->assertSame('testMaildirHook', $mailSettings['name']);
             // Make a fake object that technically meets the contract of 'MailStore'
             return new class extends CRM_Mailing_MailStore {
 
@@ -62,7 +62,7 @@ class CRM_Mailing_MailStoreTest extends \CiviUnitTestCase {
     // The hook gave us an unusual instance of MailStore.
     $this->assertTrue($store instanceof CRM_Mailing_MailStore);
     $this->assertFalse($store instanceof CRM_Mailing_MailStore_Maildir);
-    $this->assertEquals('totally', $store->frobnicate());
+    $this->assertSame('totally', $store->frobnicate());
   }
 
   /**

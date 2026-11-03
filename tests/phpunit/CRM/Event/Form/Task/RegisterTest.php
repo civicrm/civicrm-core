@@ -16,7 +16,7 @@ class CRM_Event_Form_Task_RegisterTest extends CiviUnitTestCase {
   public function testGet(): void {
     /** @var CRM_Event_Form_Task_Register $form */
     $form = $this->getFormObject('CRM_Event_Form_Task_Register');
-    $this->assertEquals(FALSE, $form->_single);
+    $this->assertFalse($form->_single);
   }
 
   /**
@@ -40,11 +40,11 @@ class CRM_Event_Form_Task_RegisterTest extends CiviUnitTestCase {
       ->processForm();
     $message = CRM_Core_Session::singleton()->getStatus();
     if ($isDuplicate) {
-      $this->assertEquals('1 contacts have already been assigned to this event. They were not added a second time.', $message[0]['text']);
-      $this->assertEquals('No participants were added.', $message[1]['text']);
+      $this->assertSame('1 contacts have already been assigned to this event. They were not added a second time.', $message[0]['text']);
+      $this->assertSame('No participants were added.', $message[1]['text']);
     }
     else {
-      $this->assertEquals('Total Participant(s) added to event: 1.', $message[0]['text']);
+      $this->assertSame('Total Participant(s) added to event: 1.', $message[0]['text']);
     }
   }
 

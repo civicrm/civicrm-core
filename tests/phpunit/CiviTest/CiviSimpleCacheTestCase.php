@@ -177,7 +177,7 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
 
     $result = $this->cache->set('key', 'value');
     $this->assertTrue($result, 'set() must return true if success');
-    $this->assertEquals('value', $this->cache->get('key'));
+    $this->assertSame('value', $this->cache->get('key'));
   }
 
   /**
@@ -190,10 +190,10 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
 
     $result = $this->cache->set('key1', 'value', 2);
     $this->assertTrue($result, 'set() must return true if success');
-    $this->assertEquals('value', $this->cache->get('key1'));
+    $this->assertSame('value', $this->cache->get('key1'));
 
     $this->cache->set('key2', 'value', new \DateInterval('PT2S'));
-    $this->assertEquals('value', $this->cache->get('key2'));
+    $this->assertSame('value', $this->cache->get('key2'));
 
     $this->advanceTime(3);
 
@@ -222,10 +222,10 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
     }
 
     $this->assertNull($this->cache->get('key'));
-    $this->assertEquals('foo', $this->cache->get('key', 'foo'));
+    $this->assertSame('foo', $this->cache->get('key', 'foo'));
 
     $this->cache->set('key', 'value');
-    $this->assertEquals('value', $this->cache->get('key', 'foo'));
+    $this->assertSame('value', $this->cache->get('key', 'foo'));
   }
 
   public function testDelete(): void {
@@ -257,8 +257,8 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
 
     $result = $this->cache->setMultiple(['key0' => 'value0', 'key1' => 'value1']);
     $this->assertTrue($result, 'setMultiple() must return true if success');
-    $this->assertEquals('value0', $this->cache->get('key0'));
-    $this->assertEquals('value1', $this->cache->get('key1'));
+    $this->assertSame('value0', $this->cache->get('key0'));
+    $this->assertSame('value1', $this->cache->get('key1'));
   }
 
   public function testSetMultipleWithIntegerArrayKey(): void {
@@ -268,7 +268,7 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
 
     $result = $this->cache->setMultiple(['0' => 'value0']);
     $this->assertTrue($result, 'setMultiple() must return true if success');
-    $this->assertEquals('value0', $this->cache->get('0'));
+    $this->assertSame('value0', $this->cache->get('0'));
   }
 
   /**
@@ -280,11 +280,11 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
     }
 
     $this->cache->setMultiple(['key2' => 'value2', 'key3' => 'value3'], 2);
-    $this->assertEquals('value2', $this->cache->get('key2'));
-    $this->assertEquals('value3', $this->cache->get('key3'));
+    $this->assertSame('value2', $this->cache->get('key2'));
+    $this->assertSame('value3', $this->cache->get('key3'));
 
     $this->cache->setMultiple(['key4' => 'value4'], new \DateInterval('PT2S'));
-    $this->assertEquals('value4', $this->cache->get('key4'));
+    $this->assertSame('value4', $this->cache->get('key4'));
 
     $this->advanceTime(3);
     $this->assertNull($this->cache->get('key2'), 'Value must expire after ttl.');
@@ -313,8 +313,8 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
     };
 
     $this->cache->setMultiple($gen());
-    $this->assertEquals('value0', $this->cache->get('key0'));
-    $this->assertEquals('value1', $this->cache->get('key1'));
+    $this->assertSame('value0', $this->cache->get('key0'));
+    $this->assertSame('value1', $this->cache->get('key1'));
   }
 
   public function testGetMultiple(): void {
@@ -337,10 +337,10 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
     foreach ($result as $key => $r) {
       $keys[] = $key;
       if ($key === 'key3') {
-        $this->assertEquals('value', $r);
+        $this->assertSame('value', $r);
       }
       else {
-        $this->assertEquals('foo', $r);
+        $this->assertSame('foo', $r);
       }
     }
     sort($keys);
@@ -363,7 +363,7 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
     foreach ($result as $key => $r) {
       $keys[] = $key;
       if ($key === 'key0') {
-        $this->assertEquals('value0', $r);
+        $this->assertSame('value0', $r);
       }
       elseif ($key === 'key1') {
         $this->assertNull($r);
@@ -374,7 +374,7 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
     }
     sort($keys);
     $this->assertSame(['key0', 'key1'], $keys);
-    $this->assertEquals('value0', $this->cache->get('key0'));
+    $this->assertSame('value0', $this->cache->get('key0'));
     $this->assertNull($this->cache->get('key1'));
   }
 
@@ -684,7 +684,7 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
     }
 
     $this->cache->set($key, 'foobar');
-    $this->assertEquals('foobar', $this->cache->get($key));
+    $this->assertSame('foobar', $this->cache->get($key));
   }
 
   /**
@@ -701,7 +701,7 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
     foreach ($result as $i => $r) {
       $keys[] = $i;
       $this->assertEquals($key, $i);
-      $this->assertEquals('foobar', $r);
+      $this->assertSame('foobar', $r);
     }
     $this->assertSame([$key], $keys);
   }
@@ -757,7 +757,7 @@ abstract class CiviSimpleCacheTestCase extends TestCase {
     $obj->foo = 'changed';
 
     $cacheObject = $this->cache->get('key');
-    $this->assertEquals('value', $cacheObject->foo, 'Object in cache should not have their values changed.');
+    $this->assertSame('value', $cacheObject->foo, 'Object in cache should not have their values changed.');
   }
 
 }

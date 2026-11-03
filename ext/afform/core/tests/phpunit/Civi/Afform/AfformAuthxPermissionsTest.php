@@ -62,9 +62,9 @@ class AfformAuthxPermissionsTest extends \PHPUnit\Framework\TestCase implements 
       ->addWhere('name', '=', $this->formName)
       ->execute()->single();
 
-    $this->assertEquals('Authx Perm Test Form Updated', $saved['title']);
+    $this->assertSame('Authx Perm Test Form Updated', $saved['title']);
     $this->assertEquals(10, $saved['authx_timeout']);
-    $this->assertEquals('civicrm/custom-redirect', $saved['authx_redirect']);
+    $this->assertSame('civicrm/custom-redirect', $saved['authx_redirect']);
   }
 
   /**
@@ -135,7 +135,7 @@ EOHTML;
     $claims = $jwt->decode($jwtString);
 
     $this->assertEquals('cid:' . $contactId, $claims['sub']);
-    $this->assertEquals('afform', $claims['scope']);
+    $this->assertSame('afform', $claims['scope']);
     $this->assertEquals($msgFormName, $claims['afform']);
 
     $expectedExp = \CRM_Utils_Time::time() + ($timeoutDays * 24 * 60 * 60);
@@ -191,8 +191,8 @@ EOHTML;
       ->indexBy('name');
 
     $this->assertArrayHasKey('Individual1', $prefillResult);
-    $this->assertEquals('Anonymous', $prefillResult['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEquals('TokenUser', $prefillResult['Individual1']['values'][0]['fields']['last_name']);
+    $this->assertSame('Anonymous', $prefillResult['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertSame('TokenUser', $prefillResult['Individual1']['values'][0]['fields']['last_name']);
 
     // Anonymous user submit with checkPermissions = TRUE
     $submission = [
@@ -216,8 +216,8 @@ EOHTML;
       ->execute()
       ->single();
 
-    $this->assertEquals('UpdatedAnon', $updatedContact['first_name']);
-    $this->assertEquals('SubmittedUser', $updatedContact['last_name']);
+    $this->assertSame('UpdatedAnon', $updatedContact['first_name']);
+    $this->assertSame('SubmittedUser', $updatedContact['last_name']);
   }
 
 }

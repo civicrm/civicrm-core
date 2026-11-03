@@ -625,7 +625,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $activity = CRM_Utils_Array::first($result['values']);
 
     $this->assertNotNull($activity);
-    $this->assertEquals('My Default Subject', $activity['subject']);
+    $this->assertSame('My Default Subject', $activity['subject']);
   }
 
   /**
@@ -664,7 +664,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
 
     $defaults = CRM_Case_Form_Activity_OpenCase::setDefaultValues($form);
 
-    $this->assertEquals('Form Default Subject', $defaults['activity_subject'] ?? NULL);
+    $this->assertSame('Form Default Subject', $defaults['activity_subject'] ?? NULL);
 
     CRM_Case_BAO_CaseType::deleteRecord(['id' => $caseType->id]);
   }
