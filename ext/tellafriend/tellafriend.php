@@ -56,6 +56,7 @@ function tellafriend_civicrm_tabset($tabsetName, &$tabs, $context) {
       'icon' => FALSE,
       'url' => '',
       'field' => 'friend',
+      'weight' => 0,
     ];
     $isFromBrowsePage = ($tabs['settings']['url'] ?? '') === 'civicrm/event/manage/settings' && empty($tabs['friend']);
     if ($isFromBrowsePage) {
