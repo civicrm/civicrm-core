@@ -1467,7 +1467,7 @@ $text
   public function testSendSMSMobileInToProviderParamWithDoNotSMS(): void {
     $sent = $this->createSendSmsTest(FALSE, 2, TRUE, ['do_not_sms' => 1]);
     foreach ($sent as $error) {
-      $this->assertEquals('Contact Does not accept SMS', $error);
+      $this->assertSame('Contact Does not accept SMS', $error->getMessage());
     }
     $this->assertCount(1, $sent, 'Expected sent should a PEAR Error');
   }

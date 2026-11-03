@@ -20,8 +20,8 @@ class api_v4_OAuthSysTokenTest extends \PHPUnit\Framework\TestCase implements He
 
   public function setUp(): void {
     parent::setUp();
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client WHERE guid <> "{civi_connect}"'));
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_systoken'));
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client WHERE guid <> "{civi_connect}"'));
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_systoken'));
   }
 
   public function tearDown(): void {
