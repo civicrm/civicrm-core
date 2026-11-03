@@ -20,13 +20,6 @@
     <component>CiviContribute</component>
   </item>
   <item>
-    <path>civicrm/contribute/chart</path>
-    <title>Contribution Summary - Chart View</title>
-    <page_callback>CRM_Contribute_Form_ContributionCharts</page_callback>
-    <access_arguments>access CiviContribute</access_arguments>
-    <component>CiviContribute</component>
-  </item>
-  <item>
     <path>civicrm/contribute/transact</path>
     <title>CiviContribute</title>
     <page_callback>CRM_Contribute_Controller_Contribution</page_callback>
@@ -194,13 +187,6 @@
     <weight>510</weight>
   </item>
   <item>
-    <path>civicrm/contribute/searchBatch</path>
-    <page_callback>CRM_Contribute_Controller_SearchBatch</page_callback>
-    <access_arguments>access CiviContribute</access_arguments>
-    <page_type>1</page_type>
-    <weight>588</weight>
-  </item>
-  <item>
     <path>civicrm/admin/contribute/manage</path>
     <title>Manage Contribution Pages</title>
     <page_callback>CRM_Contribute_Page_ContributionPage</page_callback>
@@ -225,11 +211,6 @@
     <path>civicrm/contribute/unsubscribe</path>
     <title>Cancel Subscription</title>
     <page_callback>CRM_Contribute_Form_CancelSubscription</page_callback>
-    <access_arguments>make online contributions</access_arguments>
-  </item>
-  <item>
-    <path>civicrm/contribute/onbehalf</path>
-    <page_callback>CRM_Contribute_Form_Contribution_OnBehalfOf</page_callback>
     <access_arguments>make online contributions</access_arguments>
   </item>
   <item>
