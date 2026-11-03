@@ -1031,7 +1031,6 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
       'title' => 'Test Contribution Page',
       'financial_type_id:name' => 'Donation',
       'currency' => 'USD',
-      'financial_account_id' => $this->getFinancialAccountID('Donation'),
       'is_active' => 1,
       'is_allow_other_amount' => 1,
       'min_amount' => 10,

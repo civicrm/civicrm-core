@@ -44,7 +44,10 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
   public function testInvokeDashboardWithGettingStartedDashlet(): void {
     $user_id = $this->createLoggedInUser();
     $this->callAPISuccess('DashboardContact', 'create', [
-      'dashboard_id' => 2,
+      'dashboard_id' => \Civi\Api4\Dashboard::get(FALSE)
+        ->addWhere('name', '=', 'getting-started')
+        ->addWhere('domain_id', '=', CRM_Core_Config::domainID())
+        ->execute()->single()['id'],
       'contact_id' => $user_id,
     ]);
 
