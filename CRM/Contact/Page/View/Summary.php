@@ -439,7 +439,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'class' => 'livePage',
         'icon' => 'crm-i ' . ($group['icon'] ?: 'fa-gear'),
       ];
-      $getCountParams[$id] = [$id, $this->_contactId, $group['table_name']];
+      $getCountParams[$id] = [$id, $this->_contactId];
       $weight += 10;
     }
 
@@ -463,10 +463,11 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       $tab['hideCount'] ??= !$showTabCounts;
       // Get tab counts last to avoid wasting time; skip if a tab was removed or count was hidden.
       if (!isset($tab['count']) && empty($tab['hideCount']) && isset($getCountParams[$tab['id']])) {
-        $tab['count'] = call_user_func_array([
-          'CRM_Contact_BAO_Contact',
-          'getCountComponent',
-        ], $getCountParams[$tab['id']]);
+        $tab['count'] = CRM_Contact_BAO_Contact::getCountComponent(
+          $getCountParams[$tab['id']][0],
+          $getCountParams[$tab['id']][1],
+          FALSE
+        );
       }
     }
     unset($tab);
