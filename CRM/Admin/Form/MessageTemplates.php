@@ -198,7 +198,8 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Core_DAO_MessageTemplate', 'msg_subject')
     );
 
-    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => ['contactId']]);
+    $schema = CRM_Core_BAO_MessageTemplate::resolveTokenSchema($this->_values);
+    $tokenProcessor = new TokenProcessor(Civi::dispatcher(), ['schema' => $schema]);
     $tokens = $tokenProcessor->listTokens();
 
     $this->assign('tokens', CRM_Utils_Token::formatTokensForDisplay($tokens));
@@ -234,6 +235,19 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Core_Form {
         'null' => ts('- default -'),
       ] + CRM_Core_BAO_PdfFormat::getList(TRUE), FALSE
     );
+
+    // Only User Driven templates (no workflow_id/workflow_name) can have an
+    // explicit usage: for System Workflow templates the relevant schema is
+    // always derived live from the workflow, so a stored value here would
+    // be silently overridden and just confusing to expose.
+    if (!$this->_workflow_id && empty($this->_values['workflow_name'])) {
+      $this->addField('usage', [
+        'entity' => 'MessageTemplate',
+        'context' => 'create',
+        'label' => ts('Usage'),
+        'multiple' => TRUE,
+      ]);
+    }
 
     $this->addToggle('is_active', ts('Enabled'));
     $this->addFormRule([__CLASS__, 'formRule'], $this);
