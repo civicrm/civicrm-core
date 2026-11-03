@@ -84,3 +84,18 @@ function _ts(...$args) {
   $f = 'ts';
   return $f(...$args);
 }
+
+/**
+ * Register specialized classloader(s) for CiviCRM.
+ *
+ * This is similar to calling `CRM_Core_ClassLoader::singleton()->register()`, but
+ * this helper is easier to use. It only works if your environment has preloaded
+ * the rules from `civicrm-core:composer.json` (as on, say, Drupal 10).
+ *
+ * @return void
+ */
+function civicrm_classloader_register(): void {
+  $classLoader = implode(DIRECTORY_SEPARATOR, [__DIR__, 'CRM', 'Core', 'ClassLoader.php']);
+  require_once $classLoader;
+  \CRM_Core_ClassLoader::singleton()->register();
+}
