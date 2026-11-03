@@ -290,6 +290,9 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * This shouldn't be needed, but it's been reported that the initial mailing job sometimes misses recipients.
    * This searches for any missing recipients and creates a child mailing job for them.
    *
+   * dev/core#6911 fixed one cause of missing recipients. Feel free to remove this
+   * stopgap after November 2027 if it has not been reported to create jobs since.
+   *
    * @see https://lab.civicrm.org/dev/core/-/work_items/6678
    *
    * @param int $mailingID
