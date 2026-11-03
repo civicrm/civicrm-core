@@ -28,6 +28,12 @@
     <p>{ts}Click 'Import Now' if you are ready to proceed.{/ts}</p>
  </div>
 
+ {if $validationSkipped}
+    <div class="alert alert-warning">
+      <p>{ts 1=$largeFileSize}Validation has been skipped as you are importing a large file (greater than %1 rows). We recommend you manually check that the file you are importing is correct. You can import regardless, and validation will be happen during the import (any invalid rows will not be imported).{/ts}</p>
+    </div>
+  {/if}
+
  {* Summary Preview (record counts) *}
  <table id="preview-counts" class="report">
     <tr><td class="label crm-grid-cell">{ts}Total Rows{/ts}</td>
@@ -46,10 +52,12 @@
     </tr>
     {/if}
 
-    <tr><td class="label crm-grid-cell">{ts}Valid Rows{/ts}</td>
-        <td class="data">{$validRowCount}</td>
-        <td class="explanation">{ts}Total rows to be imported.{/ts}</td>
-    </tr>
+    {if $validRowCount}
+      <tr><td class="label crm-grid-cell">{ts}Valid Rows{/ts}</td>
+          <td class="data">{$validRowCount}</td>
+          <td class="explanation">{ts}Total rows to be imported.{/ts}</td>
+      </tr>
+    {/if}
  </table>
  <br />
 
