@@ -2,6 +2,8 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Api4\Generic\Result;
+
 /**
  * Class Prefill
  *
@@ -9,7 +11,7 @@ namespace Civi\Api4\Action\Afform;
  */
 class Prefill extends AbstractProcessor {
 
-  protected function processForm() {
+  protected function processForm(Result $result) {
     $entityValues = $this->_entityValues;
     return \CRM_Utils_Array::makeNonAssociative($entityValues, 'name', 'values');
   }

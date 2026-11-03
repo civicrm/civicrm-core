@@ -4,6 +4,7 @@ namespace Civi\Api4\Action\Afform;
 
 use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\AfformSubmission;
+use Civi\Api4\Generic\Result;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
@@ -60,7 +61,7 @@ class SubmitFile extends AbstractProcessor {
    */
   protected $joinIndex;
 
-  protected function processForm() {
+  protected function processForm(Result $result) {
     if (empty($_FILES['file'])) {
       throw new \CRM_Core_Exception('File upload required');
     }

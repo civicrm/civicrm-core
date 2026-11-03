@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Api4\Generic\Result;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\Utils\FormattingUtil;
 
@@ -46,7 +47,7 @@ class GetOptions extends AbstractProcessor {
    * @return array
    * @throws \CRM_Core_Exception
    */
-  protected function processForm() {
+  protected function processForm(Result $result) {
     $formEntity = $this->_formDataModel->getEntity($this->modelName);
     $searchDisplay = $this->_formDataModel->getSearchDisplay($this->modelName);
     $fieldName = $this->fieldName;
