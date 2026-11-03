@@ -180,9 +180,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
     if (!Civi::cache('metadata')->has($cacheKey)) {
       $event = Event::get($this->checkPermissions)->addWhere('id', '=', $eventID)
         ->setSelect(array_merge([
-          'loc_block_id.address_id.*',
-          'loc_block_id.address_id.state_province_id:label',
-          'loc_block_id.address_id.country_id:label',
+          'loc_block_id.address_id.display',
           'loc_block_id.email_id.email',
           'loc_block_id.email_2_id.email',
           'loc_block_id.phone_id.phone',
@@ -211,13 +209,7 @@ class CRM_Event_Tokens extends CRM_Core_EntityTokens {
           'custom.*',
         ], $this->getExposedFields()))
         ->execute()->first();
-      $addressValues = ['address_name' => $event['loc_block_id.address_id.name']];
-      foreach ($event as $key => $value) {
-        if (str_starts_with($key, 'loc_block_id.address_id.')) {
-          $addressValues[str_replace('loc_block_id.address_id.', '', $key)] = $value;
-        }
-      }
-      $tokens['location']['text/plain'] = \CRM_Utils_Address::format($addressValues);
+      $tokens['location']['text/plain'] = $event['loc_block_id.address_id.display'];
       $tokens['info_url']['text/html'] = \CRM_Utils_System::url('civicrm/event/info', 'reset=1&id=' . $eventID, TRUE, NULL, FALSE, TRUE);
       $tokens['registration_url']['text/html'] = \CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $eventID, TRUE, NULL, FALSE, TRUE);
       $tokens['start_date']['text/html'] = !empty($event['start_date']) ? new DateTime($event['start_date']) : '';

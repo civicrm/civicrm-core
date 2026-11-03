@@ -471,7 +471,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'Junko Adams<br/>',
       '790L Lincoln St S<br />
 Baltimore, NY 10545<br />
-United States<br />',
+United States',
     ]);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $this->assertSame('2018-09-04 00:00:00', $participant['participant_register_date']);
