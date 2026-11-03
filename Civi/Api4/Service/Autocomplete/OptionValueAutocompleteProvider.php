@@ -12,25 +12,12 @@
 
 namespace Civi\Api4\Service\Autocomplete;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\HookInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * @service
- * @internal
- */
-class OptionValueAutocompleteProvider extends \Civi\Core\Service\AutoService implements HookInterface, EventSubscriberInterface {
+class OptionValueAutocompleteProvider {
 
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api.prepare' => ['onApiPrepare', 200],
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.api.prepare', priority: 200)]
   public function onApiPrepare(\Civi\API\Event\PrepareEvent $event): void {
     $apiRequest = $event->getApiRequest();
     if (is_object($apiRequest) && is_a($apiRequest, 'Civi\Api4\Generic\AutocompleteAction')) {
@@ -50,6 +37,7 @@ class OptionValueAutocompleteProvider extends \Civi\Core\Service\AutoService imp
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay')]
   public static function on_civi_search_defaultDisplay(GenericHookEvent $e) {
     if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || $e->savedSearch['api_entity'] !== 'OptionValue') {
       return;

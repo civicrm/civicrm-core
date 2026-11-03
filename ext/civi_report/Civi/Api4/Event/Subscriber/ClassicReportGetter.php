@@ -10,20 +10,15 @@
  */
 namespace Civi\Api4\Event\Subscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoSubscriber;
 
 /**
  * Expose classic ReportInstance reports to civi.api4.report.get
  */
-class ClassicReportGetter extends AutoSubscriber {
+class ClassicReportGetter {
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api4.report.get' => 'onGetReports',
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.api4.report.get')]
   public function onGetReports(GenericHookEvent $e) {
     $reportInstances = (array) \Civi\Api4\ReportInstance::get(FALSE)
       ->addSelect(

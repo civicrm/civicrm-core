@@ -12,19 +12,10 @@
 namespace Civi\Api4\Service\Links;
 
 use Civi\API\Event\RespondEvent;
+use Civi\Core\Attribute\CiviEventListener;
 
-/**
- * @service
- * @internal
- */
-class OptionValueLinksProvider extends \Civi\Core\Service\AutoSubscriber {
+class OptionValueLinksProvider {
   use LinksProviderTrait;
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api.respond' => ['alterOptionValueLinksResult', -50],
-    ];
-  }
 
   /**
    * Customize OptionValue activity links
@@ -33,6 +24,7 @@ class OptionValueLinksProvider extends \Civi\Core\Service\AutoSubscriber {
    * @return void
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'civi.api.respond', priority: -50)]
   public static function alterOptionValueLinksResult(RespondEvent $e): void {
     $request = $e->getApiRequest();
     if ($request['version'] == 4 && $request->getEntityName() === 'OptionValue' && is_a($request, '\Civi\Api4\Action\GetLinks')) {

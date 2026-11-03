@@ -11,8 +11,8 @@
 
 namespace Civi\Authx;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\HookInterface;
 use Civi\Core\Service\AutoService;
 use GuzzleHttp\Psr7\Response;
 
@@ -23,7 +23,7 @@ use GuzzleHttp\Psr7\Response;
  * @package Civi\Authx
  * @service authx.authenticator
  */
-class Authenticator extends AutoService implements HookInterface {
+class Authenticator extends AutoService {
 
   /**
    * When 'CRM_Core_Invoke' fires 'civi.invoke.auth', we should check for credentials.
@@ -32,6 +32,7 @@ class Authenticator extends AutoService implements HookInterface {
    * @return bool|void
    * @throws \Exception
    */
+  #[CiviEventListener(event: 'civi.invoke.auth')]
   public function on_civi_invoke_auth(GenericHookEvent $e) {
     $params = ($_SERVER['REQUEST_METHOD'] === 'GET') ? $_GET : $_POST;
     $siteKey = $_SERVER['HTTP_X_CIVI_KEY'] ?? $params['_authxSiteKey'] ?? NULL;

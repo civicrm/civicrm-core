@@ -1,12 +1,14 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
+
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -18,7 +20,9 @@
 /**
  * SiteEmailAddress business logic
  */
-class CRM_Core_BAO_SiteEmailAddress extends CRM_Core_DAO_SiteEmailAddress implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_SiteEmailAddress extends CRM_Core_DAO_SiteEmailAddress {
+
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
 
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     // When setting default, ensure other records for this domain are not the default

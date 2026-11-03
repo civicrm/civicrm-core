@@ -11,11 +11,11 @@
 
 namespace Civi\ChartKit;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi;
 use CRM_Core_Resources_Bundle;
 use CRM_ChartKit_ExtensionUtil as E;
 use CRM_Utils_Hook;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This class defines the `chart_kit.js` assets, which combines `dc.js`,
@@ -26,7 +26,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  * @service bundle.chart_kit
  */
-class Bundle extends CRM_Core_Resources_Bundle implements EventSubscriberInterface, Civi\Core\Service\AutoServiceInterface {
+class Bundle extends CRM_Core_Resources_Bundle implements Civi\Core\Service\AutoServiceInterface {
 
   use Civi\Core\Service\AutoServiceTrait;
 
@@ -35,12 +35,6 @@ class Bundle extends CRM_Core_Resources_Bundle implements EventSubscriberInterfa
   const CSS_FILE = 'chart_kit.css';
 
   protected $initialized;
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_buildAsset' => [['buildAssetJs', 0], ['buildAssetCss', 0]],
-    ];
-  }
 
   public function __construct() {
     parent::__construct(static::NAME,
@@ -88,6 +82,7 @@ class Bundle extends CRM_Core_Resources_Bundle implements EventSubscriberInterfa
    * @see CRM_Utils_hook::buildAsset()
    * @see \Civi\Core\AssetBuilder
    */
+  #[CiviEventListener(event: 'hook_civicrm_buildAsset')]
   public static function buildAssetJs($event) {
     if ($event->asset !== static::JS_FILE) {
       return;
@@ -128,6 +123,7 @@ class Bundle extends CRM_Core_Resources_Bundle implements EventSubscriberInterfa
    * @see CRM_Utils_hook::buildAsset()
    * @see \Civi\Core\AssetBuilder
    */
+  #[CiviEventListener(event: 'hook_civicrm_buildAsset')]
   public static function buildAssetCss($event) {
     if ($event->asset !== static::CSS_FILE) {
       return;

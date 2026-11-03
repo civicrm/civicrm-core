@@ -2,31 +2,22 @@
 
 namespace Civi\Managed;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Domain;
-use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * If an extension defines a record that should exist on all domains, replicate it across domains.
- *
- * @service
- * @internal
  */
-class MultisiteManaged extends AutoService implements EventSubscriberInterface {
+class MultisiteManaged {
 
   private $entities = [];
   private $domains;
-
-  public static function getSubscribedEvents(): array {
-    return [
-      '&hook_civicrm_managed' => ['generateDomainEntities', -1000],
-    ];
-  }
 
   /**
    * @implements \CRM_Utils_Hook::managed()
    * @param array $managedRecords
    */
+  #[CiviEventListener(event: '&hook_civicrm_managed', priority: -1000)]
   public function generateDomainEntities(array &$managedRecords): void {
     // Clear the domains cache in case we added/removed domains (mostly happens in tests)
     unset($this->domains);

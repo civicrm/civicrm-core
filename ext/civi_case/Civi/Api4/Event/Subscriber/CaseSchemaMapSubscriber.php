@@ -2,28 +2,20 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Event\SchemaMapBuildEvent;
 use Civi\Api4\Service\Schema\Joinable\ExtraJoinable;
 use Civi\Api4\Service\Schema\Joinable\Joinable;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @service civi.api4.civiCaseSchema
  */
-class CaseSchemaMapSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'api.schema_map.build' => 'onSchemaBuild',
-    ];
-  }
+class CaseSchemaMapSubscriber extends \Civi\Core\Service\AutoService {
 
   /**
    * @param \Civi\Api4\Event\SchemaMapBuildEvent $event
    */
+  #[CiviEventListener(event: 'api.schema_map.build')]
   public function onSchemaBuild(SchemaMapBuildEvent $event): void {
     $schema = $event->getSchemaMap();
     $table = $schema->getTableByName('civicrm_activity');

@@ -2,23 +2,17 @@
 
 namespace Civi\LegacyFinder;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoSubscriber;
 
-class Finder extends AutoSubscriber {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_findExistingDuplicates' => ['findExistingDuplicates', -150],
-      'hook_civicrm_findDuplicates' => ['findDuplicates', -150],
-    ];
-  }
+class Finder {
 
   /**
    * This function exists to provide legacy hook support for finding duplicates.
    *
    * @return void
    */
+  #[CiviEventListener(event: 'hook_civicrm_findExistingDuplicates', priority: -150)]
   public static function findExistingDuplicates(GenericHookEvent $event): void {
     $event->stopPropagation();
     $ruleGroupIDs = $event->ruleGroupIDs;
@@ -72,6 +66,7 @@ class Finder extends AutoSubscriber {
     \CRM_Core_DAO::executeQuery('DROP TEMPORARY TABLE IF EXISTS dedupe');
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_findDuplicates', priority: -150)]
   public static function findDuplicates(GenericHookEvent $event): void {
     $event->stopPropagation();
 

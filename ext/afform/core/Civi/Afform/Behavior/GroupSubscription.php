@@ -1,29 +1,18 @@
 <?php
 namespace Civi\Afform\Behavior;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Afform\Event\AfformSubmitEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
  * @service
  * @internal
  */
-class GroupSubscription extends AbstractBehavior implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.afform.sort.prefill' => 'onAfformSortPrefill',
-      'civi.afform.prefill' => ['onAfformPrefill', 99],
-      'civi.afform.submit' => ['onAfformSubmit', 101],
-    ];
-  }
+class GroupSubscription extends AbstractBehavior {
 
   public static function getEntities(): array {
     return ['GroupSubscription'];
@@ -61,6 +50,7 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     return $modes;
   }
 
+  #[CiviEventListener(event: 'civi.afform.sort.prefill')]
   public static function onAfformSortPrefill(AfformEntitySortEvent $event): void {
     $formEntities = $event->getFormDataModel()->getEntities();
     foreach ($formEntities as $entityName => $entity) {
@@ -70,6 +60,7 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     }
   }
 
+  #[CiviEventListener(event: 'civi.afform.prefill', priority: 99)]
   public static function onAfformPrefill(AfformPrefillEvent $event): void {
     if ($event->getEntityType() !== 'GroupSubscription') {
       return;
@@ -93,6 +84,7 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     }
   }
 
+  #[CiviEventListener(event: 'civi.afform.submit', priority: 101)]
   public static function onAfformSubmit(AfformSubmitEvent $event) {
     if ($event->getEntityType() !== 'GroupSubscription') {
       return;

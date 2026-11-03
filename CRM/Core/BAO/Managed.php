@@ -1,12 +1,14 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
+
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -18,7 +20,7 @@
 /**
  * This class contains functions for managed entities.
  */
-class CRM_Core_BAO_Managed extends CRM_Core_DAO_Managed implements Civi\Core\HookInterface {
+class CRM_Core_BAO_Managed extends CRM_Core_DAO_Managed {
 
   /**
    * Scan core `civicrm/managed` directory for entity declarations.
@@ -31,6 +33,7 @@ class CRM_Core_BAO_Managed extends CRM_Core_DAO_Managed implements Civi\Core\Hoo
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @implements CRM_Utils_Hook::managed
    */
+  #[CiviEventListener(event: 'hook_civicrm_managed')]
   public static function on_hook_civicrm_managed(\Civi\Core\Event\GenericHookEvent $e) {
     if ($e->modules && !in_array('civicrm', $e->modules, TRUE)) {
       return;
@@ -49,6 +52,7 @@ class CRM_Core_BAO_Managed extends CRM_Core_DAO_Managed implements Civi\Core\Hoo
    * Callback for hook_civicrm_post().
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post')]
   public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     // When an entity is deleted by the user, nullify 'entity_id' from corresponding Managed record
     // This tells the ManagedEntity system that the entity was manually deleted,

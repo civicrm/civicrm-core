@@ -11,26 +11,17 @@
 
 namespace Civi\Api4\Service\Links;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class MembershipStatusLinksProvider extends \Civi\Core\Service\AutoSubscriber {
+class MembershipStatusLinksProvider {
   use LinksProviderTrait;
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api4.getLinks' => 'alterMembershipStatusLinks',
-      'hook_civicrm_searchKitTasks' => 'alterMembershipStatusTasks',
-    ];
-  }
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @return void
    */
+  #[CiviEventListener(event: 'civi.api4.getLinks')]
   public static function alterMembershipStatusLinks(GenericHookEvent $e): void {
     if ($e->entity === 'MembershipStatus') {
       foreach ($e->links as $index => $link) {
@@ -45,6 +36,7 @@ class MembershipStatusLinksProvider extends \Civi\Core\Service\AutoSubscriber {
   /**
    * @param \Civi\Core\Event\GenericHookEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_searchKitTasks')]
   public function alterMembershipStatusTasks(GenericHookEvent $event): void {
     if (!empty($event->tasks['MembershipStatus'])) {
       // Reserved membership status should not be edited via UI

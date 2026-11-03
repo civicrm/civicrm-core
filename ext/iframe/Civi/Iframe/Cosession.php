@@ -1,9 +1,9 @@
 <?php
 namespace Civi\Iframe;
 
+use Civi\Core\Attribute\CiviEventListener;
 use CRM_Iframe_ExtensionUtil as E;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * The co-session provides a long (real) session built on top of short (fake) sessions.
@@ -24,19 +24,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @service iframe.cosession
  */
-class Cosession extends AutoService implements EventSubscriberInterface {
+class Cosession extends AutoService {
 
   protected $ttl = '+3 hour';
-
-  public static function getSubscribedEvents(): array {
-    return [
-      '&civi.invoke.auth' => ['onInvoke', 100],
-      '&civi.session.storeObjects' => ['export', 0],
-      '&hook_civicrm_buildForm' => ['onBuildForm', 0],
-      '&hook_civicrm_alterRedirect' => ['onRedirect', 0],
-      '&hook_civicrm_activeTheme' => ['pickTheme', 0],
-    ];
-  }
 
   /**
    * @var \Civi\Crypto\CryptoJwt
@@ -79,6 +69,7 @@ class Cosession extends AutoService implements EventSubscriberInterface {
     return $this->sessionId;
   }
 
+  #[CiviEventListener(event: '&civi.invoke.auth', priority: 100)]
   public function onInvoke(array $path) {
     if (!defined('CIVICRM_IFRAME') || !$this->isEmbeddable(implode('/', $path))) {
       return;
@@ -113,6 +104,7 @@ class Cosession extends AutoService implements EventSubscriberInterface {
    * @return void
    * @see \CRM_Utils_Hook::activeTheme()
    */
+  #[CiviEventListener(event: '&hook_civicrm_activeTheme')]
   public function pickTheme(&$themeKey, $context): void {
     if (!(defined('CIVICRM_IFRAME') && CIVICRM_IFRAME)) {
       return;
@@ -144,6 +136,7 @@ class Cosession extends AutoService implements EventSubscriberInterface {
   /**
    * @see \CRM_Utils_Hook::buildForm()
    */
+  #[CiviEventListener(event: '&hook_civicrm_buildForm')]
   public function onBuildForm($formName, $form) {
     if (!$this->findCreateSessionId()) {
       return;
@@ -152,6 +145,7 @@ class Cosession extends AutoService implements EventSubscriberInterface {
     $form->addElement('hidden', '_cosession', $this->createToken($this->sessionId));
   }
 
+  #[CiviEventListener(event: '&hook_civicrm_alterRedirect')]
   public function onRedirect(\Psr\Http\Message\UriInterface &$redirectUrl, &$context) {
     if (!$this->findCreateSessionId()) {
       return;
@@ -182,6 +176,7 @@ class Cosession extends AutoService implements EventSubscriberInterface {
   /**
    * Export data from the short-lived CMS session. Save it to the co-session.
    */
+  #[CiviEventListener(event: '&civi.session.storeObjects')]
   public function export() {
     if (!$this->findCreateSessionId()) {
       return;

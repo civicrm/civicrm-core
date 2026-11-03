@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 use Civi\Api4\Event\AuthorizeRecordEvent;
 
@@ -19,7 +20,7 @@ use Civi\Api4\Event\AuthorizeRecordEvent;
 /**
  * Business object for Saved searches.
  */
-class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements \Civi\Core\HookInterface {
+class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   use CRM_Core_OwnershipAccessTrait;
 
   protected static function checkOwnerAdminPermission(?int $userID = NULL): bool {
@@ -256,6 +257,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    *
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
     if ($event->action === 'create' || $event->action === 'edit') {
       $event->params['modified_id'] ??= CRM_Core_Session::getLoggedInContactID();
@@ -438,6 +440,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch implements
    * Check SavedSearch access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     if (CRM_Core_Permission::check('administer search_kit')) {
       // User has  access to manage all records.

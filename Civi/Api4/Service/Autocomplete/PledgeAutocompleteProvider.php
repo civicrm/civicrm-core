@@ -12,20 +12,17 @@
 
 namespace Civi\Api4\Service\Autocomplete;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\HookInterface;
 
-/**
- * @service
- * @internal
- */
-class PledgeAutocompleteProvider extends \Civi\Core\Service\AutoService implements HookInterface {
+class PledgeAutocompleteProvider {
 
   /**
    * Provide default SavedSearch for Pledge autocompletes
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.autocompleteDefault')]
   public static function on_civi_search_autocompleteDefault(GenericHookEvent $e) {
     if (!is_array($e->savedSearch) || $e->savedSearch['api_entity'] !== 'Pledge') {
       return;
@@ -53,6 +50,7 @@ class PledgeAutocompleteProvider extends \Civi\Core\Service\AutoService implemen
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay')]
   public static function on_civi_search_defaultDisplay(GenericHookEvent $e) {
     if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || $e->savedSearch['api_entity'] !== 'Pledge') {
       return;

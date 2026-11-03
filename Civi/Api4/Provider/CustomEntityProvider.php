@@ -11,31 +11,18 @@
 
 namespace Civi\Api4\Provider;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\CustomValue;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoService;
 use Civi\Schema\EntityRepository;
 use CRM_Core_BAO_CustomGroup;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * @service
- * @internal
- */
-class CustomEntityProvider extends AutoService implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api4.entityTypes' => ['addCustomEntities', 100],
-    ];
-  }
+class CustomEntityProvider {
 
   /**
    * Get custom-field pseudo-entities
    */
+  #[CiviEventListener(event: 'civi.api4.entityTypes', priority: 100)]
   public static function addCustomEntities(GenericHookEvent $e) {
     $baseInfo = CustomValue::getInfo();
     foreach (\CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {

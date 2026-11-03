@@ -12,21 +12,13 @@
 
 namespace Civi\Api4\Service\Links;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\API\Event\RespondEvent;
 
-/**
- * @service
- * @internal
- */
-class MailSettingsLinksProvider extends \Civi\Core\Service\AutoSubscriber {
+class MailSettingsLinksProvider {
   use LinksProviderTrait;
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api.respond' => 'alterLinksResult',
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.api.respond')]
   public static function alterLinksResult(RespondEvent $e): void {
     $request = $e->getApiRequest();
     if ($request['version'] == 4 && is_a($request, '\Civi\Api4\Action\GetLinks') && $request->getEntityName() === 'MailSettings') {

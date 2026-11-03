@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
@@ -14,12 +15,13 @@ use Civi\Api4\Event\AuthorizeRecordEvent;
 /**
  * Search Display BAO
  */
-class CRM_Search_BAO_SearchDisplay extends CRM_Search_DAO_SearchDisplay implements \Civi\Core\HookInterface {
+class CRM_Search_BAO_SearchDisplay extends CRM_Search_DAO_SearchDisplay {
 
   /**
    * Event fired after saving a SearchDisplay.
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     $display = $event->object;
     $params = $event->params;
@@ -51,6 +53,7 @@ class CRM_Search_BAO_SearchDisplay extends CRM_Search_DAO_SearchDisplay implemen
   /**
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord')]
   public static function on_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $recordType = $e->getEntityName();
     $record = $e->getRecord();

@@ -11,20 +11,11 @@
 
 namespace Civi\Api4\Service\Links;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\API\Event\RespondEvent;
 
-/**
- * @service
- * @internal
- */
-class ParticipantLinksProvider extends \Civi\Core\Service\AutoSubscriber {
+class ParticipantLinksProvider {
   use LinksProviderTrait;
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api.respond' => ['alterParticipantLinksResult', -50],
-    ];
-  }
 
   /**
    * Customize event participant links
@@ -33,6 +24,7 @@ class ParticipantLinksProvider extends \Civi\Core\Service\AutoSubscriber {
    * @return void
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'civi.api.respond', priority: -50)]
   public static function alterParticipantLinksResult(RespondEvent $e): void {
     $request = $e->getApiRequest();
     if ($request['version'] == 4 && $request->getEntityName() === 'Participant' && is_a($request, '\Civi\Api4\Action\GetLinks')) {

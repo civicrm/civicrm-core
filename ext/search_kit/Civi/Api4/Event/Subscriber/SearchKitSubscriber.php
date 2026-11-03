@@ -11,24 +11,13 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * Event subscriber to check extra permission for SavedSearches
  * @service civi.api4.searchKit
  */
-class SearchKitSubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api.authorize' => [
-        ['onApiAuthorize', -200],
-      ],
-    ];
-  }
+class SearchKitSubscriber extends \Civi\Core\Service\AutoService {
 
   /**
    * Alters APIv4 permissions to allow users with 'manage own search_kit' to create/delete a SavedSearch
@@ -36,6 +25,7 @@ class SearchKitSubscriber extends \Civi\Core\Service\AutoService implements Even
    * @param \Civi\API\Event\AuthorizeEvent $event
    *   API authorization event.
    */
+  #[CiviEventListener(event: 'civi.api.authorize', priority: -200)]
   public function onApiAuthorize(\Civi\API\Event\AuthorizeEvent $event) {
     /** @var \Civi\Api4\Generic\AbstractAction $apiRequest */
     $apiRequest = $event->getApiRequest();

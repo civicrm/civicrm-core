@@ -2,31 +2,18 @@
 
 namespace Civi;
 
+use Civi\Core\Attribute\CiviEventListener;
 use CRM_Recaptcha_ExtensionUtil as E;
 use Civi\Afform\AHQ;
 use Civi\Afform\Event\AfformValidateEvent;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Provides ReCaptcha2 validation element to Afform
- * @internal
- * @service
  */
-class AfformReCaptcha2 extends AutoService implements EventSubscriberInterface {
+class AfformReCaptcha2 {
 
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.afform_admin.metadata' => ['onAfformGetMetadata'],
-      'hook_civicrm_alterAngular' => ['alterAngular'],
-      'civi.afform.validate' => ['onAfformValidate'],
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.afform_admin.metadata')]
   public static function onAfformGetMetadata(GenericHookEvent $event) {
     $event->elements['recaptcha2'] = [
       'title' => E::ts('ReCaptcha2'),
@@ -39,6 +26,7 @@ class AfformReCaptcha2 extends AutoService implements EventSubscriberInterface {
     ];
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_alterAngular')]
   public static function alterAngular(GenericHookEvent $event) {
     $changeSet = \Civi\Angular\ChangeSet::create('reCaptcha2')
       ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
@@ -53,6 +41,7 @@ class AfformReCaptcha2 extends AutoService implements EventSubscriberInterface {
     $event->angular->add($changeSet);
   }
 
+  #[CiviEventListener(event: 'civi.afform.validate')]
   public static function onAfformValidate(AfformValidateEvent $event) {
     $layout = AHQ::makeRoot($event->getAfform()['layout']);
     if (AHQ::getTags($layout, 'crm-recaptcha2')) {

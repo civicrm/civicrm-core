@@ -15,12 +15,13 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Core\Attribute\CiviEventListener;
 use When\When;
 
 /**
  * Class CRM_Core_BAO_RecurringEntity.
  */
-class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
+class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
   const RUNNING = 1;
   public $schedule = [];
@@ -98,14 +99,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
   const MODE_THIS_ENTITY_ONLY = 1;
   const MODE_NEXT_ALL_ENTITY = 2;
   const MODE_ALL_ENTITY_IN_SERIES = 3;
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.dao.postInsert' => 'triggerInsert',
-      'civi.dao.postUpdate' => 'triggerUpdate',
-      'civi.dao.postDelete' => 'triggerDelete',
-    ];
-  }
 
   /**
    * Getter for status.
@@ -562,6 +555,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
    * @param object $event
    *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just updated.
    */
+  #[CiviEventListener(event: 'civi.dao.postUpdate')]
   public static function triggerUpdate($event) {
     static $processedEntities = [];
     $obj =& $event->object;
@@ -621,6 +615,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
    * @param object $event
    *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just inserted.
    */
+  #[CiviEventListener(event: 'civi.dao.postInsert')]
   public static function triggerInsert($event) {
     $obj =& $event->object;
     if (!array_key_exists($obj->__table, self::$_linkedEntitiesInfo)) {
@@ -719,6 +714,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity implemen
    * @param object $event
    *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just deleted.
    */
+  #[CiviEventListener(event: 'civi.dao.postDelete')]
   public static function triggerDelete($event) {
     $obj =& $event->object;
 

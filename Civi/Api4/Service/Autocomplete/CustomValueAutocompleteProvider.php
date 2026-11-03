@@ -12,21 +12,18 @@
 
 namespace Civi\Api4\Service\Autocomplete;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\HookInterface;
 
-/**
- * @service
- * @internal
- */
-class CustomValueAutocompleteProvider extends \Civi\Core\Service\AutoService implements HookInterface {
+class CustomValueAutocompleteProvider {
 
   /**
    * Provide default SearchDisplay for autocompletes of multi-record custom values
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay')]
   public static function on_civi_search_defaultDisplay(GenericHookEvent $e) {
     if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || !str_starts_with($e->savedSearch['api_entity'], 'Custom_')) {
       return;

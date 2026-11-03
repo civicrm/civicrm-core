@@ -16,25 +16,18 @@
  */
 
 use Civi\Api4\Utils\CoreUtil;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * Business object for managing custom data groups.
  */
-class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements EventSubscriberInterface {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_pre::CustomGroup' => '_self_hook_civicrm_pre',
-      'hook_civicrm_post' => ['_hook_civicrm_post', 500],
-      'hook_civicrm_selectWhereClause' => '_hook_civicrm_selectWhereClause',
-    ];
-  }
+class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
 
   /**
    * @param \Civi\Core\Event\PreEvent $e
    * @see CRM_Utils_Hook::pre()
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function _self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $e): void {
     $params = &$e->params;
     // Assign new weight
@@ -77,6 +70,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
    * @param \Civi\Core\Event\PostEvent $e
    * @see CRM_Utils_Hook::post()
    */
+  #[CiviEventListener(event: 'hook_civicrm_post', priority: 500)]
   public static function _hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
     $params = $e->params;
     if ($e->entity === 'CustomGroup') {
@@ -101,6 +95,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
    * Get the number of value columns in the value table for this CustomGroup
    * - this will prevent automatic cleanup of the CustomGroup if there is data for it
    */
+  #[CiviEventListener(event: 'hook_civicrm_referenceCounts')]
   public static function on_hook_civicrm_referenceCounts($e) {
     $dao = $e->dao;
     if (!is_a($dao, \CRM_Core_DAO_CustomGroup::class)) {
@@ -2093,6 +2088,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup implements Event
   /**
    * Enforce ACLs for custom Groups and Fields
    */
+  #[CiviEventListener(event: 'hook_civicrm_selectWhereClause')]
   public static function _hook_civicrm_selectWhereClause(\Civi\Core\Event\GenericHookEvent $hook): void {
     if (($hook->entity === 'CustomGroup' || $hook->entity === 'CustomField') && !CRM_Core_Permission::customGroupAdmin($hook->userId)) {
       $idField = $hook->entity === 'CustomGroup' ? 'id' : 'custom_group_id';

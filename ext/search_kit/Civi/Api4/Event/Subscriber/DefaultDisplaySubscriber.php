@@ -11,35 +11,17 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\API\Request;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Provides default display for type 'table' and type 'autocomplete'
  *
  * Other extensions can override or modify these defaults on a per-type or per-entity basis.
- *
- * @service
- * @internal
  */
-class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.search.defaultDisplay' => [
-        // Responding in-between W_MIDDLE and W_LATE so that other subscribers can either:
-        // 1. Override these defaults (W_MIDDLE and earlier)
-        // 2. Supplement these defaults (W_LATE)
-        ['autocompleteDefault', -10],
-        ['fallbackDefault', -20],
-      ],
-    ];
-  }
+class DefaultDisplaySubscriber {
 
   /**
    * Defaults for Autocomplete display type.
@@ -49,6 +31,7 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay', priority: -10)]
   public static function autocompleteDefault(GenericHookEvent $e) {
     // Only fill autocomplete defaults if another subscriber hasn't already done the work
     if ($e->display['settings'] || $e->display['type'] !== 'autocomplete') {
@@ -124,6 +107,7 @@ class DefaultDisplaySubscriber extends \Civi\Core\Service\AutoService implements
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay', priority: -20)]
   public static function fallbackDefault(GenericHookEvent $e) {
     // Early return if another subscriber has already done the work
     if ($e->display['settings']) {
