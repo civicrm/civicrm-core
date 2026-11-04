@@ -52,7 +52,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($params);
 
-    $this->assertEquals(0, $values['is_error'], 'Verify that is_error = 0 (success).');
+    $this->assertSame(0, $values['is_error'], 'Verify that is_error = 0 (success).');
     $this->assertEquals($values['custom_' . $fieldID . '_1'],
       CRM_Utils_Date::mysqlToIso($date),
       'Verify that the date value is stored for contact ' . $contactID

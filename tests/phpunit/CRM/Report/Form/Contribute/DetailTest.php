@@ -90,7 +90,7 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     }
     $reportObj = $this->getReportObject($reportClass, $inputParams);
     $pager = $reportObj::getTemplate()->getTemplateVars('pager');
-    $this->assertEquals(2, $pager->_response['numPages'], 'Pages in Pager');
+    $this->assertSame(2, $pager->_response['numPages'], 'Pages in Pager');
   }
 
   /**

@@ -68,7 +68,7 @@ class SimpleFilterTest extends \CiviUnitTestCase {
       $test->assertInstanceOf('Civi\FlexMailer\Event\ComposeBatchEvent', $e);
       $test->assertSame('eat more cheese', $values[0]);
       $test->assertSame('eat more ice cream', $values[1]);
-      $test->assertEquals(2, count($values));
+      $test->assertSame(2, count($values));
       return preg_replace('/more/', 'thoughtfully considered quantities of', $values);
     });
 

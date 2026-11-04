@@ -211,11 +211,11 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($this->ids['Contact']['individual'], $contribution['contact_id']);
     $this->assertEquals(120.00, $contribution['total_amount']);
     $this->assertEquals($this->financialTypeID, $contribution['financial_type_id']);
-    $this->assertEquals(12345, $contribution['trxn_id']);
-    $this->assertEquals(67890, $contribution['invoice_id']);
+    $this->assertSame(12345, $contribution['trxn_id']);
+    $this->assertSame(67890, $contribution['invoice_id']);
     $this->assertSame('SSF', $contribution['source']);
-    $this->assertEquals(20, $contribution['tax_amount']);
-    $this->assertEquals(1, $contribution['contribution_status_id']);
+    $this->assertSame(20, $contribution['tax_amount']);
+    $this->assertSame(1, $contribution['contribution_status_id']);
     $this->_checkFinancialRecords($contribution, 'online');
   }
 
@@ -266,7 +266,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_contribution',
       'sequential' => 1,
     ]);
-    $this->assertEquals(2, $lineItems['count']);
+    $this->assertSame(2, $lineItems['count']);
   }
 
   /**
@@ -291,11 +291,11 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['contact_id'], $this->ids['Contact']['individual']);
     $this->assertEquals(120.00, $contribution['total_amount']);
     $this->assertEquals($this->financialTypeID, $contribution['financial_type_id']);
-    $this->assertEquals(12345, $contribution['trxn_id']);
-    $this->assertEquals(67890, $contribution['invoice_id']);
+    $this->assertSame(12345, $contribution['trxn_id']);
+    $this->assertSame(67890, $contribution['invoice_id']);
     $this->assertSame('SSF', $contribution['source']);
-    $this->assertEquals(20, $contribution['tax_amount']);
-    $this->assertEquals(2, $contribution['contribution_status_id']);
+    $this->assertSame(20, $contribution['tax_amount']);
+    $this->assertSame(2, $contribution['contribution_status_id']);
     $this->_checkFinancialRecords($contribution, 'payLater');
   }
 
@@ -330,11 +330,11 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($this->ids['Contact']['individual'], $contribution['contact_id']);
     $this->assertEquals(120.00, $contribution['total_amount']);
     $this->assertEquals($this->financialTypeID, $contribution['financial_type_id']);
-    $this->assertEquals(12345, $contribution['trxn_id']);
-    $this->assertEquals(67890, $contribution['invoice_id']);
+    $this->assertSame(12345, $contribution['trxn_id']);
+    $this->assertSame(67890, $contribution['invoice_id']);
     $this->assertSame('SSF', $contribution['source']);
-    $this->assertEquals(20, $contribution['tax_amount']);
-    $this->assertEquals(2, $contribution['contribution_status_id']);
+    $this->assertSame(20, $contribution['tax_amount']);
+    $this->assertSame(2, $contribution['contribution_status_id']);
     $trxn = $this->getFinancialTransactionsForContribution($contribution['id']);
     $this->assertCount(0, $trxn, 'No Trxn to be created until IPN callback');
 

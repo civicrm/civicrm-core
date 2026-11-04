@@ -122,7 +122,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
         ->execute()
         ->first();
 
-      $this->assertEquals(100, $contribution['total_amount']);
+      $this->assertSame(100, $contribution['total_amount']);
       $this->assertEquals($actualPaidAmt, $contribution['paid_amount'], 'Amount paid is not correct');
       $this->assertEquals(100 - $actualPaidAmt, $contribution['balance_amount'], 'Balance is not correct');
       if ($actualPaidAmt > 0) {
@@ -184,9 +184,9 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       ->execute()
       ->first();
 
-    $this->assertEquals(100, $contribution['total_amount']);
-    $this->assertEquals(100, $contribution['paid_amount'], 'Amount paid is not correct');
-    $this->assertEquals(0, $contribution['balance_amount'], 'Balance is not correct');
+    $this->assertSame(100, $contribution['total_amount']);
+    $this->assertSame(100, $contribution['paid_amount'], 'Amount paid is not correct');
+    $this->assertSame(0, $contribution['balance_amount'], 'Balance is not correct');
     $this->assertSame('Completed', $contribution['contribution_status_id:label'], 'Contribution status is not correct');
 
     OptionValue::delete(FALSE)

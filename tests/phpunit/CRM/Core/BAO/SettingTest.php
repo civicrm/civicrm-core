@@ -99,8 +99,8 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
   public function testDefaults(): void {
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_setting WHERE name = "max_attachments"');
     Civi::service('settings_manager')->flush();
-    $this->assertEquals(3, Civi::settings()->get('max_attachments'));
-    $this->assertEquals(3, CRM_Core_Config::singleton()->maxAttachments);
+    $this->assertSame(3, Civi::settings()->get('max_attachments'));
+    $this->assertSame(3, CRM_Core_Config::singleton()->maxAttachments);
   }
 
   /**
@@ -137,14 +137,14 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     // set initial value
     $_testOnChange_hookCalls = ['count' => 0];
     Civi::settings()->set('onChangeExample', ['First', 'Value']);
-    $this->assertEquals(1, $_testOnChange_hookCalls['count']);
+    $this->assertSame(1, $_testOnChange_hookCalls['count']);
     $this->assertEquals(['First', 'Value'], $_testOnChange_hookCalls['newValue']);
     $this->assertSame('List of Components', $_testOnChange_hookCalls['metadata']['title']);
 
     // change value
     $_testOnChange_hookCalls = ['count' => 0];
     Civi::settings()->set('onChangeExample', ['Second', 'Value']);
-    $this->assertEquals(1, $_testOnChange_hookCalls['count']);
+    $this->assertSame(1, $_testOnChange_hookCalls['count']);
     $this->assertEquals(['First', 'Value'], $_testOnChange_hookCalls['oldValue']);
     $this->assertEquals(['Second', 'Value'], $_testOnChange_hookCalls['newValue']);
     $this->assertSame('List of Components', $_testOnChange_hookCalls['metadata']['title']);
@@ -174,21 +174,21 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
     // never saved, leaves the default
     $_testOnChange_hookCalls = ['count' => 0];
     Civi::settings()->set('postChangeExample', FALSE);
-    $this->assertEquals(1, $_testOnChange_hookCalls['count']);
+    $this->assertSame(1, $_testOnChange_hookCalls['count']);
     $this->assertTrue($_testOnChange_hookCalls['oldValue']);
     $this->assertFalse($_testOnChange_hookCalls['newValue']);
 
     // revert, returns to the default
     $_testOnChange_hookCalls = ['count' => 0];
     Civi::settings()->revert('postChangeExample');
-    $this->assertEquals(1, $_testOnChange_hookCalls['count']);
+    $this->assertSame(1, $_testOnChange_hookCalls['count']);
     $this->assertFalse($_testOnChange_hookCalls['oldValue']);
     $this->assertTrue($_testOnChange_hookCalls['newValue']);
 
     // saving the default over a missing value, so listeners can sync to it
     $_testOnChange_hookCalls = ['count' => 0];
     Civi::settings()->set('postChangeExample', TRUE);
-    $this->assertEquals(1, $_testOnChange_hookCalls['count']);
+    $this->assertSame(1, $_testOnChange_hookCalls['count']);
     $this->assertTrue($_testOnChange_hookCalls['oldValue']);
     $this->assertTrue($_testOnChange_hookCalls['newValue']);
   }

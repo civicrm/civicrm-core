@@ -499,11 +499,11 @@ emo
 </table>", $html[$contributionIDs[1]]);
 
     $activities = $this->callAPISuccess('Activity', 'get', ['activity_type_id' => 'Print PDF Letter', 'sequential' => 1]);
-    $this->assertEquals(2, $activities['count']);
+    $this->assertSame(2, $activities['count']);
     $this->assertEquals($html[$contributionIDs[0]], $activities['values'][0]['details']);
     $this->assertEquals($html[$contributionIDs[1]], $activities['values'][1]['details']);
     // Checking the cacheable hook is not called multiple times.
-    $this->assertEquals(1, $this->hookTokensCalled);
+    $this->assertSame(1, $this->hookTokensCalled);
     $mailUtil->checkAllMailLog($html);
 
   }

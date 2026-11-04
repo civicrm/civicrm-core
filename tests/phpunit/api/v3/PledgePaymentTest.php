@@ -48,7 +48,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   public function testGetPledgePayment(): void {
     $params = [];
     $result = $this->callAPISuccess('PledgePayment', 'get', $params);
-    $this->assertEquals(5, $result['count']);
+    $this->assertSame(5, $result['count']);
   }
 
   /**
@@ -62,7 +62,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'status_id' => 1,
     ]);
     $result = $this->callAPISuccess('PledgePayment', 'get', ['contribution_id' => $this->_contributionID]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
   }
 
   /**
@@ -159,7 +159,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('PledgePayment', 'get', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
   }
 
   /**
@@ -168,7 +168,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
   public function testCreatePledgePayment(): void {
     //check that 5 pledge payments exist at the start
     $beforeAdd = $this->callAPISuccess('PledgePayment', 'get', []);
-    $this->assertEquals(5, $beforeAdd['count']);
+    $this->assertSame(5, $beforeAdd['count']);
 
     //test the pledge_payment_create function
     $params = [
@@ -182,13 +182,13 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
 
     //check existing updated not new one created - 'create' means add contribution_id in this context
     $afterAdd = $this->callAPISuccess('PledgePayment', 'get', []);
-    $this->assertEquals(5, $afterAdd['count']);
+    $this->assertSame(5, $afterAdd['count']);
 
     //get the created payment & check it out
     $getParams['id'] = $result['id'];
     $getIndPayment = $this->callAPISuccess('PledgePayment', 'get', $getParams);
-    $this->assertEquals(1, $getIndPayment['count']);
-    $this->assertEquals(20, $getIndPayment['values'][$result['id']]['actual_amount']);
+    $this->assertSame(1, $getIndPayment['count']);
+    $this->assertSame(20, $getIndPayment['values'][$result['id']]['actual_amount']);
     $this->assertSame('USD', $getIndPayment['values'][$result['id']]['currency']);
 
     //create a second pledge payment - need a contribution first &can't use the CiviUnitTest case function as invoice is hard-coded
@@ -204,7 +204,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     //make sure original is untouched & has not been updated
     $this->assertGreaterThan($result['id'], $resultCont2['id']);
     $getIndPaymentAgain = $this->callAPISuccess('PledgePayment', 'get', $getParams);
-    $this->assertEquals(1, $getIndPaymentAgain['count']);
+    $this->assertSame(1, $getIndPaymentAgain['count']);
     $this->assertEquals($this->_contributionID, $getIndPaymentAgain['values'][$result['id']]['contribution_id']);
   }
 
@@ -240,7 +240,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'pledge_id' => $this->_pledgeID,
     ]);
     // the last one above should result in an error
-    $this->assertEquals(5, $result['count']);
+    $this->assertSame(5, $result['count']);
 
     $params['option.create_new'] = 1;
     $params['scheduled_amount'] = 20;
@@ -250,7 +250,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'pledge_id' => $this->_pledgeID,
     ]);
 
-    $this->assertEquals(6, $result['count']);
+    $this->assertSame(6, $result['count']);
   }
 
   /**
@@ -295,7 +295,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $afterAdd = $this->callAPISuccess('PledgePayment', 'get', [
       'contribution_id' => $contributionID,
     ]);
-    $this->assertEquals(1, $afterAdd['count']);
+    $this->assertSame(1, $afterAdd['count']);
   }
 
   /**

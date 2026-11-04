@@ -408,9 +408,9 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
 
     $result = CRM_Contact_BAO_Relationship::createMultiple($params, 'a');
 
-    $this->assertEquals(1, $result['valid']);
-    $this->assertEquals(1, $result['duplicate']);
-    $this->assertEquals(1, $result['invalid']);
+    $this->assertSame(1, $result['valid']);
+    $this->assertSame(1, $result['duplicate']);
+    $this->assertSame(1, $result['invalid']);
     $this->assertCount(1, $result['relationship_ids']);
 
     // Verify created relationship in DB
@@ -442,9 +442,9 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
 
     $resultB = CRM_Contact_BAO_Relationship::createMultiple($paramsB, 'b');
 
-    $this->assertEquals(1, $resultB['valid']);
-    $this->assertEquals(1, $resultB['duplicate']);
-    $this->assertEquals(2, $resultB['invalid']);
+    $this->assertSame(1, $resultB['valid']);
+    $this->assertSame(1, $resultB['duplicate']);
+    $this->assertSame(2, $resultB['invalid']);
     $this->assertCount(1, $resultB['relationship_ids']);
 
     $createdRelB = Relationship::get(FALSE)

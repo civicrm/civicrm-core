@@ -36,16 +36,16 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
 
   public function testCreateParticipantStatusType(): void {
     $result = $this->callAPISuccess('participant_status_type', 'create', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
   public function testGetParticipantStatusType(): void {
     $result = $this->callAPISuccess('participant_status_type', 'create', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     $result = $this->callAPISuccess('participant_status_type', 'get', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->id = $result['id'];
   }

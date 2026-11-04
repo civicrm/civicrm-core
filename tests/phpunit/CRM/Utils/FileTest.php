@@ -401,7 +401,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     [$exitCode, $stdout, $stderr] = $this->runStaticMethodAsScript(__CLASS__, 'doIsDirWithOpenBasedir', [$a_dir, $open_base_dirs, $input, $expected]);
     $this->assertSame('"OK"', trim($stdout), 'doIsDirWithOpenBasedir() should return OK');
     $this->assertSame('', trim($stderr), 'doIsDirWithOpenBasedir() should not generate warnings');
-    $this->assertEquals(0, $exitCode, 'doIsDirWithOpenBasedir() should exit normally');
+    $this->assertSame(0, $exitCode, 'doIsDirWithOpenBasedir() should exit normally');
 
     unlink("{$a_dir}/isDirTest/ok/ok.txt");
     rmdir("{$a_dir}/isDirTest/ok");

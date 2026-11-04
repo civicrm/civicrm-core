@@ -40,53 +40,53 @@ trait CryptoTestTrait {
       'weight' => 10,
       'id' => 'asdf-key-0',
     ]);
-    $this->assertEquals(10, $key['weight']);
+    $this->assertSame(10, $key['weight']);
 
     $key = $registry->addSymmetricKey($registry->parseKey($examples[1]) + [
       'tags' => ['UNIT-TEST'],
       'weight' => -10,
       'id' => 'asdf-key-1',
     ]);
-    $this->assertEquals(-10, $key['weight']);
+    $this->assertSame(-10, $key['weight']);
 
     $key = $registry->addSymmetricKey($registry->parseKey($examples[2]) + [
       'tags' => ['UNIT-TEST'],
       'id' => 'asdf-key-2',
     ]);
-    $this->assertEquals(0, $key['weight']);
+    $this->assertSame(0, $key['weight']);
 
     $key = $registry->addSymmetricKey($registry->parseKey($examples[3]) + [
       'tags' => ['UNIT-TEST'],
       'id' => 'asdf-key-3',
     ]);
-    $this->assertEquals(0, $key['weight']);
+    $this->assertSame(0, $key['weight']);
 
     $key = $registry->addSymmetricKey($registry->parseKey($examples[4]) + [
       'tags' => ['SIGN-TEST'],
       'id' => 'sign-key-1',
       'weight' => 1,
     ]);
-    $this->assertEquals(1, $key['weight']);
+    $this->assertSame(1, $key['weight']);
 
     $key = $registry->addSymmetricKey($registry->parseKey($examples[4]) + [
       'tags' => ['SIGN-TEST'],
       'id' => 'sign-key-0',
     ]);
-    $this->assertEquals(0, $key['weight']);
+    $this->assertSame(0, $key['weight']);
 
     $key = $registry->addSymmetricKey($registry->parseKey($examples[4]) + [
       'tags' => ['SIGN-TEST-ALT'],
       'id' => 'sign-key-alt',
     ]);
-    $this->assertEquals(0, $key['weight']);
+    $this->assertSame(0, $key['weight']);
 
     $key = $registry->addKey($registry->parseKey($examples[7]) + [
       'tags' => ['SIGN-TEST-EDDSA'],
       'id' => 'sign-key-eddsa',
     ]);
-    $this->assertEquals(0, $key['weight']);
+    $this->assertSame(0, $key['weight']);
 
-    $this->assertEquals(8, count($examples));
+    $this->assertSame(8, count($examples));
     $this->assertEquals(8 + $origCount, count($registry->getKeys()));
   }
 

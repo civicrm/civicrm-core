@@ -188,14 +188,14 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
     $importer->run($inputXmlFilePath);
 
     $customGroups = $this->callAPISuccess('custom_group', 'get', ['title' => $expectCustomGroup['title']]);
-    $this->assertEquals(1, $customGroups['count']);
+    $this->assertSame(1, $customGroups['count']);
     $customGroup = array_shift($customGroups['values']);
     foreach ($expectCustomGroup as $expectKey => $expectValue) {
       $this->assertEquals($expectValue, $customGroup[$expectKey]);
     }
 
     $customFields = $this->callAPISuccess('custom_field', 'get', ['label' => $expectCustomField['label']]);
-    $this->assertEquals(1, $customFields['count']);
+    $this->assertSame(1, $customFields['count']);
     $customField = array_shift($customFields['values']);
     foreach ($expectCustomField as $expectKey => $expectValue) {
       $this->assertEquals($expectValue, $customField[$expectKey]);

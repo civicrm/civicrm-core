@@ -94,7 +94,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
     $getResult = $this->callAPISuccess('ContributionPage', 'get', $getParams);
-    $this->assertEquals(1, $getResult['count']);
+    $this->assertSame(1, $getResult['count']);
   }
 
   /**
@@ -108,7 +108,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
     $getResult = $this->callAPISuccess('ContributionPage', 'get', $getParams);
-    $this->assertEquals(1, $getResult['count']);
+    $this->assertSame(1, $getResult['count']);
   }
 
   /**
@@ -128,7 +128,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testGetFieldsContributionPage(): void {
     $result = $this->callAPISuccess('ContributionPage', 'getfields', ['action' => 'create']);
-    $this->assertEquals(12, $result['values']['start_date']['type']);
+    $this->assertSame(12, $result['values']['start_date']['type']);
   }
 
   /**

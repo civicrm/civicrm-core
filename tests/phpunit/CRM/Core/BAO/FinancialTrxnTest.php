@@ -86,9 +86,9 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $contribution = $contribution['values'][$contribution['id']];
 
     $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
-    $this->assertEquals(0, $totalPaymentAmount, 'Amount not matching.');
+    $this->assertSame(0, $totalPaymentAmount, 'Amount not matching.');
 
-    $this->assertEquals(0, Contribution::get()->addWhere('id', '=', $contribution['id'])
+    $this->assertSame(0, Contribution::get()->addWhere('id', '=', $contribution['id'])
       ->addSelect('paid_amount')->execute()->first()['paid_amount']);
     $params['id'] = $contribution['id'];
     $params['contribution_status_id'] = 1;
@@ -184,8 +184,8 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
         'return' => ['card_type_id', 'pan_truncation'],
       ]
     );
-    $this->assertEquals(2, $financialTrxn['card_type_id']);
-    $this->assertEquals(4567, $financialTrxn['pan_truncation']);
+    $this->assertSame(2, $financialTrxn['card_type_id']);
+    $this->assertSame(4567, $financialTrxn['pan_truncation']);
   }
 
   /**

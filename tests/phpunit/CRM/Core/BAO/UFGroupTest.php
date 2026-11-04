@@ -53,7 +53,7 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     ]);
     // Assert that pre hook implementation was called.
     $ufGroup = UFGroup::get()->addWhere('title', '=', 'testPreHookIsCalledForCreate')->execute()->first();
-    $this->assertEquals(0, $ufGroup['is_active'], 'Is active should be 0');
+    $this->assertSame(0, $ufGroup['is_active'], 'Is active should be 0');
   }
 
   /**
@@ -77,7 +77,7 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
       'level' => 'info',
     ]);
 
-    $this->assertEquals(1, $systemLogCount, 'There should be one system log entry with message "CRM_Core_BAO_UFGroupTest::implementHookPre ' . $ufGroupID . '"');
+    $this->assertSame(1, $systemLogCount, 'There should be one system log entry with message "CRM_Core_BAO_UFGroupTest::implementHookPre ' . $ufGroupID . '"');
   }
 
   /**
@@ -94,7 +94,7 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
 
     // Assert that pre hook implementation was called.
     $this->assertSame('testPostHookIsCalledForCreate', $ufGroup['title']);
-    $this->assertEquals(0, $ufGroup['is_active'], 'Is active should be 0');
+    $this->assertSame(0, $ufGroup['is_active'], 'Is active should be 0');
   }
 
   /**
@@ -118,7 +118,7 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
       'level' => 'info',
     ]);
 
-    $this->assertEquals(1, $systemLogCount, 'There should be one system log entry with message "CRM_Core_BAO_UFGroupTest::implementHookPost ' . $ufGroupID . '"');
+    $this->assertSame(1, $systemLogCount, 'There should be one system log entry with message "CRM_Core_BAO_UFGroupTest::implementHookPost ' . $ufGroupID . '"');
   }
 
   public function implementHookUFGroupTypes(&$ufGroupTypes): void {

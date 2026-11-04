@@ -395,7 +395,7 @@ class CancelTest extends TestCase implements HeadlessInterface, HookInterface, T
       'source_record_id' => ['IN' => [$participantID, $additionalParticipantID]],
     ]);
 
-    $this->assertEquals(2, $cancelledActivatesCount['count']);
+    $this->assertSame(2, $cancelledActivatesCount['count']);
   }
 
 }

@@ -232,10 +232,10 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mapping['id']);
     $processor->setMetadata($parser->getFieldsMetadata());
-    $this->assertEquals(3, $processor->getPhoneOrIMTypeID(10));
-    $this->assertEquals(3, $processor->getPhoneTypeID(10));
+    $this->assertSame(3, $processor->getPhoneOrIMTypeID(10));
+    $this->assertSame(3, $processor->getPhoneTypeID(10));
     $this->assertEquals($this->getLocationTypeID('Home'), $processor->getLocationTypeID(10));
-    $this->assertEquals(2, $processor->getWebsiteTypeID(8));
+    $this->assertSame(2, $processor->getWebsiteTypeID(8));
     $this->assertEquals($this->getRelationshipTypeID('Sibling of') . '_a_b', $processor->getRelationshipKey(9));
     $this->assertSame('addressee', $processor->getFieldName(0));
     $this->assertSame('street_address', $processor->getFieldName(3));

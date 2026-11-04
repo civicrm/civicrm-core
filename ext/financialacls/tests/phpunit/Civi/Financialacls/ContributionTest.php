@@ -30,14 +30,14 @@ class ContributionTest extends BaseTestClass {
     $sql = \CRM_Contribute_BAO_Contribution::getAnnualQuery([$this->ids['Contact']['logged_in']]);
     $result = \CRM_Core_DAO::executeQuery($sql);
     $result->fetch();
-    $this->assertEquals(0, $result->N);
+    $this->assertSame(0, $result->N);
 
     // It didn't find any rows cos it is restricted to only find contributions where all lines are visible.
     \CRM_Core_DAO::executeQuery('UPDATE civicrm_line_item SET financial_type_id = ' . $this->getFinancialTypeID('Donation'));
     $result = \CRM_Core_DAO::executeQuery($sql);
     $result->fetch();
-    $this->assertEquals(300, $result->amount);
-    $this->assertEquals(1, $result->count);
+    $this->assertSame(300, $result->amount);
+    $this->assertSame(1, $result->count);
   }
 
   /**

@@ -57,7 +57,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
 
     $result = $this->callAPISuccess('Phone', 'create', $this->_params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
 
     $this->callAPISuccess('phone', 'delete', ['id' => $result['id']]);
@@ -91,12 +91,12 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $create = $this->callAPISuccess('phone', 'create', $this->_params);
 
     $result = $this->callAPISuccess('phone', 'delete', ['id' => $create['id']]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $get = $this->callAPISuccess('phone', 'get', [
       'id' => $create['id'],
       'location_type_id' => $this->_locationType,
     ]);
-    $this->assertEquals(0, $get['count'], 'Phone not successfully deleted In line ' . __LINE__);
+    $this->assertSame(0, $get['count'], 'Phone not successfully deleted In line ' . __LINE__);
   }
 
   /**
@@ -170,7 +170,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
       'is_primary' => 1,
       'id' => $phone1['id'],
     ]);
-    $this->assertEquals(1, $check);
+    $this->assertSame(1, $check);
   }
 
   /**
@@ -187,7 +187,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
       'is_primary' => 1,
       'contact_id' => $this->_contactID,
     ]);
-    $this->assertEquals(1, $check);
+    $this->assertSame(1, $check);
     $this->callAPISuccess('Phone', 'create', ['id' => $phone1['id'], 'is_primary' => TRUE]);
   }
 

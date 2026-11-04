@@ -22,10 +22,10 @@ class CRM_Utils_GlobalStackTest extends CiviUnitTestCase {
     $_FOO['whiz'] = 1;
     $_EXTRA = 1;
 
-    $this->assertEquals(1, $_FOO['bar']);
-    $this->assertEquals(1, $_FOO['whiz']);
+    $this->assertSame(1, $_FOO['bar']);
+    $this->assertSame(1, $_FOO['whiz']);
     $this->assertFalse(isset($_FOO['bang']));
-    $this->assertEquals(1, $_EXTRA);
+    $this->assertSame(1, $_EXTRA);
 
     CRM_Utils_GlobalStack::singleton()->push([
       '_FOO' => [
@@ -35,17 +35,17 @@ class CRM_Utils_GlobalStackTest extends CiviUnitTestCase {
       '_EXTRA' => 2,
     ]);
 
-    $this->assertEquals(2, $_FOO['bar']);
-    $this->assertEquals(1, $_FOO['whiz']);
-    $this->assertEquals(2, $_FOO['bang']);
-    $this->assertEquals(2, $_EXTRA);
+    $this->assertSame(2, $_FOO['bar']);
+    $this->assertSame(1, $_FOO['whiz']);
+    $this->assertSame(2, $_FOO['bang']);
+    $this->assertSame(2, $_EXTRA);
 
     CRM_Utils_GlobalStack::singleton()->pop();
 
-    $this->assertEquals(1, $_FOO['bar']);
-    $this->assertEquals(1, $_FOO['whiz']);
+    $this->assertSame(1, $_FOO['bar']);
+    $this->assertSame(1, $_FOO['whiz']);
     $this->assertNull($_FOO['bang']);
-    $this->assertEquals(1, $_EXTRA);
+    $this->assertSame(1, $_EXTRA);
   }
 
 }

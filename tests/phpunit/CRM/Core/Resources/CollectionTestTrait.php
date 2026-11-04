@@ -285,7 +285,7 @@ trait CRM_Core_Resources_CollectionTestTrait {
       $this->assertSameSnippet($expectSnippet, $getSnippet, 'getAll() method should return snippet with properly computed defaults');
       $count++;
     }
-    $this->assertEquals(1, $count, 'Expect one registered snippet');
+    $this->assertSame(1, $count, 'Expect one registered snippet');
   }
 
   /**
@@ -333,15 +333,15 @@ trait CRM_Core_Resources_CollectionTestTrait {
   public function testClear(): void {
     $b = $this->createEmptyCollection();
     $b->addScriptUrl('http://example.com/child.js');
-    $this->assertEquals(1, count($b->getAll()));
+    $this->assertSame(1, count($b->getAll()));
     $b->addStyleUrl('http://example.com/child.css');
-    $this->assertEquals(2, count($b->getAll()));
+    $this->assertSame(2, count($b->getAll()));
 
     $b->clear();
-    $this->assertEquals(0, count($b->getAll()));
+    $this->assertSame(0, count($b->getAll()));
 
     $b->addScriptUrl('http://example.com/encore.js');
-    $this->assertEquals(1, count($b->getAll()));
+    $this->assertSame(1, count($b->getAll()));
   }
 
   /**

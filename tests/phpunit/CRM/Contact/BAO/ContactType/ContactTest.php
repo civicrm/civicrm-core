@@ -358,12 +358,12 @@ DELETE FROM civicrm_contact_type
 
     // Check with correct value to assert that custom data is not deleted
     $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customFieldId => 'value 1']);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals($contact->id, $result['id']);
 
     //Check with incorrect custom value that our previous assertion was correct
     $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customFieldId => 'wrong value']);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
   }
 
 }

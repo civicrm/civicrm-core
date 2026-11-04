@@ -78,7 +78,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
     // Since we're not passing in a location type to createIndividual above, CRM_Contact_BAO_Contact::createProfileContact uses default location
     // type for first phone and sets that to primary.
     $this->assertSame('(415) 222-1011 x 221', $firstPhoneValue[0]['phone'], "Confirm primary Phone value ( {$firstPhoneValue[0]['phone']} ).");
-    $this->assertEquals(1, $firstPhoneValue[0]['is_primary'], 'Confirm first Phone is primary.');
+    $this->assertSame(1, $firstPhoneValue[0]['is_primary'], 'Confirm first Phone is primary.');
 
     $this->contactDelete($contactId);
   }

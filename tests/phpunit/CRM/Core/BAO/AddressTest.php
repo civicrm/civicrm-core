@@ -975,11 +975,11 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     // default country is set, so first country should be Netherlands, then rest from pinned countries.
 
     // Netherlands
-    $this->assertEquals(1152, $availableCountries[0]);
+    $this->assertSame(1152, $availableCountries[0]);
     // Guyana
-    $this->assertEquals(1093, $availableCountries[1]);
+    $this->assertSame(1093, $availableCountries[1]);
     // United States
-    $this->assertEquals(1228, $availableCountries[2]);
+    $this->assertSame(1228, $availableCountries[2]);
   }
 
   /**
@@ -1000,11 +1000,11 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     // no default country, so sequnece should be present as per pinned countries.
 
     // Guyana
-    $this->assertEquals(1093, $availableCountries[0]);
+    $this->assertSame(1093, $availableCountries[0]);
     // Netherlands
-    $this->assertEquals(1152, $availableCountries[1]);
+    $this->assertSame(1152, $availableCountries[1]);
     // United States
-    $this->assertEquals(1228, $availableCountries[2]);
+    $this->assertSame(1228, $availableCountries[2]);
   }
 
   public function testPinnedCountryWithEntity(): void {

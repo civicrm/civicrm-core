@@ -310,7 +310,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     $sql = "SELECT COUNT(*) FROM $table WHERE entity_id = $contactID AND " . implode(' IS NULL AND ', $columns) . ' IS NULL';
 
     CRM_Core_BAO_CustomValueTable::setValues($params);
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery($sql));
+    $this->assertSame(0, CRM_Core_DAO::singleValueQuery($sql));
 
     foreach (array_keys($params) as $key) {
       if ($key !== 'entityID') {
@@ -318,7 +318,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
       }
     }
     CRM_Core_BAO_CustomValueTable::setValues($params);
-    $this->assertEquals(1, CRM_Core_DAO::singleValueQuery($sql));
+    $this->assertSame(1, CRM_Core_DAO::singleValueQuery($sql));
   }
 
   public static function emptyValues(): array {

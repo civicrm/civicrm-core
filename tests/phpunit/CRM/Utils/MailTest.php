@@ -210,7 +210,7 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
 
     $this->assertTrue(is_a($result, 'PEAR_Error'));
     $this->assertStringContainsString('Outbound Email', $result->getMessage());
-    $this->assertEquals(550, $result->getCode());
+    $this->assertSame(550, $result->getCode());
   }
 
   /**

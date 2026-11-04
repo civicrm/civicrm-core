@@ -67,7 +67,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create', $this->params);
     $getParams = ['amount' => '500'];
     $result = $this->callAPISuccess($this->_entity, 'get', $getParams);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
   }
 
   /**
@@ -85,7 +85,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     ]);
     $params['payment_token_id'] = $token['id'];
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
   }
@@ -108,7 +108,7 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
    */
   public function testGetFieldsContributionRecur(): void {
     $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
-    $this->assertEquals(12, $result['values']['start_date']['type']);
+    $this->assertSame(12, $result['values']['start_date']['type']);
   }
 
   /**

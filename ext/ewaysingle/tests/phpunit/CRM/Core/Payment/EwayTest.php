@@ -105,7 +105,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
       $this->assertSame('Error: [24] - Do Not Honour(Test Gateway).', $e->getMessage());
-      $this->assertEquals(9008, $e->getErrorCode());
+      $this->assertSame(9008, $e->getErrorCode());
     }
   }
 

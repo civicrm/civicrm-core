@@ -88,8 +88,8 @@ class LocaleTest extends \CiviEndToEndTestCase {
       'language' => $civiLocale,
     ]);
     $this->assertTrue(count($contacts) > 0, 'The API call should return successfully.');
-    $this->assertEquals(1, count($actualLocales), 'We should observed one UF locale.');
-    $this->assertEquals(1, count($actualStrings), 'We should observed one UF translation.');
+    $this->assertSame(1, count($actualLocales), 'We should observed one UF locale.');
+    $this->assertSame(1, count($actualStrings), 'We should observed one UF translation.');
     $this->assertEquals($expectUfLocale . ':' . $expectString, $actualLocales[0] . ':' . $actualStrings[0],
       "Expected UF to report locale as '$expectUfLocale:$expectString'.");
   }

@@ -209,13 +209,13 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
       'activity_type_id' => 'SMS delivery',
       'status_id' => 'Completed',
     ]);
-    $this->assertEquals(1, $activity['count'], 'SMS job generates one activity');
+    $this->assertSame(1, $activity['count'], 'SMS job generates one activity');
     $activityValues = array_pop($activity['values']);
     $activityContacts = \Civi\Api4\ActivityContact::get(TRUE)
       ->addWhere('activity_id', '=', $activityValues['id'])
       ->addWhere('contact_id', '=', $contactId)
       ->execute();
-    $this->assertEquals(1, $activityContacts->count(), 'SMS job is with the right contact');
+    $this->assertSame(1, $activityContacts->count(), 'SMS job is with the right contact');
   }
 
 }

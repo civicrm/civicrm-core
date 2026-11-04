@@ -37,12 +37,12 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
     $this->cache->set('foo', 100);
 
     $this->assertTrue($this->a->has('foo'));
-    $this->assertEquals(100, $this->a->get('foo', 'dfl-1')[1]);
+    $this->assertSame(100, $this->a->get('foo', 'dfl-1')[1]);
 
     $this->cache->set('foo', 200);
 
     $this->assertTrue($this->a->has('foo'));
-    $this->assertEquals(200, $this->a->get('foo', 'dfl-1')[1]);
+    $this->assertSame(200, $this->a->get('foo', 'dfl-1')[1]);
 
     $this->cache->delete('foo');
 
@@ -57,7 +57,7 @@ class E2E_Cache_ArrayDecoratorTest extends E2E_Cache_CacheTestCase {
     $this->cache->set('foo', 100);
 
     $this->assertTrue($this->a->has('foo'));
-    $this->assertEquals(100, $this->a->get('foo', 'dfl-1')[1]);
+    $this->assertSame(100, $this->a->get('foo', 'dfl-1')[1]);
 
     $this->cache->clear();
 

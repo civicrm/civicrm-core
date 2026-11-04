@@ -145,12 +145,12 @@ NETHERLANDS S', $rows[$this->ids['Contact']['collins']][0]);
     $this->createTestAddresses();
 
     $pdf = $this->submitFormGetPdf([]);
-    $this->assertEquals(0, $pdf->countX);
-    $this->assertEquals(2, $pdf->countY);
+    $this->assertSame(0, $pdf->countX);
+    $this->assertSame(2, $pdf->countY);
 
     $pdf = $this->submitFormGetPdf(['fill_across' => 1]);
-    $this->assertEquals(2, $pdf->countX);
-    $this->assertEquals(0, $pdf->countY);
+    $this->assertSame(2, $pdf->countX);
+    $this->assertSame(0, $pdf->countY);
   }
 
   /**

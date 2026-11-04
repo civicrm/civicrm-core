@@ -56,7 +56,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
       'workflow_name' => 'contribution_invoice_receipt',
       'is_default' => 1,
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
@@ -69,7 +69,7 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
     $checkDeleted = $this->callAPISuccess($this->entity, 'get', [
       'id' => $entity['id'],
     ]);
-    $this->assertEquals(0, $checkDeleted['count']);
+    $this->assertSame(0, $checkDeleted['count']);
   }
 
   /**

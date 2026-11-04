@@ -168,7 +168,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $optionValueCount = $this->callAPISuccess('option_value', 'getcount', [
       'option_group_id' => $optionGroupID,
     ]);
-    $this->assertEquals(0, $optionValueCount);
+    $this->assertSame(0, $optionValueCount);
   }
 
   /**
@@ -525,7 +525,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('CustomGroup', 'create', $params);
     $result = array_shift($result['values']);
 
-    $this->assertEquals(0, $result['is_active']);
+    $this->assertSame(0, $result['is_active']);
 
     $this->customGroupDelete($customGroup['id']);
   }

@@ -78,7 +78,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
       'frequency_interval' => 1,
     ]);
     $this->getAndCheck($params, $result['id'], 'PaymentProcessor');
-    $this->assertEquals(2, $result['values'][$result['id']]['payment_instrument_id']);
+    $this->assertSame(2, $result['values'][$result['id']]['payment_instrument_id']);
   }
 
   /**
@@ -162,7 +162,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     ];
     $results = $this->callAPISuccess('payment_processor', 'get', $params);
 
-    $this->assertEquals(1, $results['count']);
+    $this->assertSame(1, $results['count']);
     $this->assertSame('test@test.com', $results['values'][$results['id']]['user_name']);
   }
 

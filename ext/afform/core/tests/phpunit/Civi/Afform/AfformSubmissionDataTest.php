@@ -102,8 +102,8 @@ EOHTML;
     $this->assertArrayHasKey('Individual1.0.Email.0.id', $fields);
 
     // Metadata assertions
-    $this->assertEquals(1, $fields['Individual1.0.preferred_communication_method']['serialize']);
-    $this->assertEquals(1, $fields['Individual1.0.contact_sub_type']['serialize']);
+    $this->assertSame(1, $fields['Individual1.0.preferred_communication_method']['serialize']);
+    $this->assertSame(1, $fields['Individual1.0.contact_sub_type']['serialize']);
     $this->assertSame('Integer', $fields['Individual1.0.gender_id']['data_type']);
 
     // Extra fields (unindexed)

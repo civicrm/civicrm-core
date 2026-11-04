@@ -908,7 +908,7 @@ my field';
       'messageTemplate' => ['msg_html' => $input],
       'tokenContext' => array_merge(['participantId' => $this->ids['participant'][0]], ['schema' => ['participantId', 'eventId']]),
     ])['html'];
-    $this->assertEquals(99999, $tokenHtml);
+    $this->assertSame(99999, $tokenHtml);
   }
 
   /**

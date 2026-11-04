@@ -37,11 +37,11 @@ class ExtUserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterfa
     ]);
 
     $this->assertNull($getUserId($username), 'User does not exist yet.');
-    $this->assertEquals(0, $getMailCount("$username@127.0.0.1"));
+    $this->assertSame(0, $getMailCount("$username@127.0.0.1"));
 
     $loginUserId = \_authx_uf()->checkPassword($username, $secret);
     $this->assertEquals($loginUserId, $getUserId($username), 'User is autoloaded.');
-    $this->assertEquals(1, $getMailCount("$username@127.0.0.1"));
+    $this->assertSame(1, $getMailCount("$username@127.0.0.1"));
 
     // That succeeded. Now, what if the external data changes... will we use the new external data?
 
@@ -54,8 +54,8 @@ class ExtUserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterfa
 
     $reloginUserId = \_authx_uf()->checkPassword($username, "new$secret");
     $this->assertEquals($reloginUserId, $loginUserId, 'User is found again.');
-    $this->assertEquals(1, $getMailCount("$username@new.example.com"), "New email should be added");
-    $this->assertEquals(0, $getMailCount("$username@127.0.0.1"), "Old email should be removed");
+    $this->assertSame(1, $getMailCount("$username@new.example.com"), "New email should be added");
+    $this->assertSame(0, $getMailCount("$username@127.0.0.1"), "Old email should be removed");
   }
 
   public function testAuthxInitialFailure(): void {

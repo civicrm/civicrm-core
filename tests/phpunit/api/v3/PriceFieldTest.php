@@ -80,7 +80,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
   public function testCreatePriceField(int $version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
   }
@@ -103,7 +103,7 @@ class api_v3_PriceFieldTest extends CiviUnitTestCase {
       'name' => 'contribution_amount',
     ];
     $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
-    $this->assertEquals(1, $getResult['count']);
+    $this->assertSame(1, $getResult['count']);
     $this->callAPISuccess('price_field', 'delete', ['id' => $createResult['id']]);
   }
 

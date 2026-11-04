@@ -31,7 +31,7 @@ class FinancialTypeTest extends BaseTestClass {
     $financialTypeMessages = array_filter($statusMessages, function ($msg) {
         return str_starts_with($msg['text'], 'Changing the name of a Financial Type');
     });
-    $this->assertEquals(1, count($financialTypeMessages));
+    $this->assertSame(1, count($financialTypeMessages));
   }
 
   /**

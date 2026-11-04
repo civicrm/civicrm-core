@@ -66,10 +66,10 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $get = $this->callAPISuccess('email', 'get', [
       'location_type_id' => $this->_locationTypeID,
     ]);
-    $this->assertEquals(0, $get['count'], 'Contact not successfully deleted.');
+    $this->assertSame(0, $get['count'], 'Contact not successfully deleted.');
 
     $result = $this->callAPISuccess('email', 'create', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['id']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('email', 'delete', ['id' => $result['id']]);
@@ -132,7 +132,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'is_primary' => 1,
       'contact_id' => $this->_contactID,
     ]);
-    $this->assertEquals(1, $check);
+    $this->assertSame(1, $check);
   }
 
   /**
@@ -184,17 +184,17 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $get = $this->callAPISuccess('email', 'get', [
       'location_type_id' => $this->_locationTypeID,
     ]);
-    $this->assertEquals(0, $get['count'], 'email already exists');
+    $this->assertSame(0, $get['count'], 'email already exists');
 
     //create one
     $create = $this->callAPISuccess('email', 'create', $params);
 
     $result = $this->callAPISuccess('email', 'delete', ['id' => $create['id']]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $get = $this->callAPISuccess('email', 'get', [
       'location_type_id' => $this->_locationTypeID,
     ]);
-    $this->assertEquals(0, $get['count'], 'Contact not successfully deleted');
+    $this->assertSame(0, $get['count'], 'Contact not successfully deleted');
   }
 
   /**
@@ -209,7 +209,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $get = $this->callAPISuccess('email', 'get', [
       'contact_id' => $this->_contactID,
     ]);
-    $this->assertEquals(0, $get['count'], 'email already exists');
+    $this->assertSame(0, $get['count'], 'email already exists');
 
     // initialize email list with three emails at loc #1 and two emails at loc #2
     $replace1Params = [
@@ -243,13 +243,13 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       ],
     ];
     $replace1 = $this->callAPISuccess('email', 'replace', $replace1Params);
-    $this->assertEquals(5, $replace1['count']);
+    $this->assertSame(5, $replace1['count']);
 
     // check emails at location #1 or #2
     $get = $this->callAPISuccess('email', 'get', [
       'contact_id' => $this->_contactID,
     ]);
-    $this->assertEquals(5, $get['count'], 'Incorrect email count');
+    $this->assertSame(5, $get['count'], 'Incorrect email count');
 
     // replace the subset of emails in location #1, but preserve location #2
     $replace2Params = [
@@ -263,14 +263,14 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       ],
     ];
     $replace2 = $this->callAPISuccess('email', 'replace', $replace2Params);
-    $this->assertEquals(1, $replace2['count']);
+    $this->assertSame(1, $replace2['count']);
 
     // check emails at location #1 -- all three replaced by one
     $get = $this->callAPISuccess('email', 'get', [
       'contact_id' => $this->_contactID,
       'location_type_id' => $this->_locationTypeID,
     ]);
-    $this->assertEquals(1, $get['count'], 'Incorrect email count');
+    $this->assertSame(1, $get['count'], 'Incorrect email count');
 
     // check emails at location #2 -- preserve the original two
     $get = $this->callAPISuccess('email', 'get', [
@@ -278,7 +278,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'location_type_id' => $this->locationType2ID,
     ]);
 
-    $this->assertEquals(2, $get['count'], 'Incorrect email count');
+    $this->assertSame(2, $get['count'], 'Incorrect email count');
 
     // replace the set of emails with an empty set
     $replace3Params = [
@@ -286,7 +286,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'values' => [],
     ];
     $replace3 = $this->callAPISuccess('email', 'replace', $replace3Params);
-    $this->assertEquals(0, $replace3['count']);
+    $this->assertSame(0, $replace3['count']);
 
     // check emails
     $get = $this->callAPISuccess('email', 'get', [
@@ -294,7 +294,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
     ]);
     $this->assertAPISuccess($get);
-    $this->assertEquals(0, $get['count'], 'Incorrect email count');
+    $this->assertSame(0, $get['count'], 'Incorrect email count');
   }
 
   /**
@@ -311,7 +311,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
     ]);
     $this->assertAPISuccess($get);
-    $this->assertEquals(0, $get['count'], 'email already exists');
+    $this->assertSame(0, $get['count'], 'email already exists');
     // initialize email list with three emails at loc #1 and two emails at loc #2
     $getReplace1Params = [
 
@@ -347,13 +347,13 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       ],
     ];
     $getReplace1 = $this->callAPISuccess('contact', 'get', $getReplace1Params);
-    $this->assertEquals(5, $getReplace1['values'][$this->_contactID]['api.email.replace']['count']);
+    $this->assertSame(5, $getReplace1['values'][$this->_contactID]['api.email.replace']['count']);
 
     // check emails at location #1 or #2
     $get = $this->callAPISuccess('email', 'get', [
       'contact_id' => $this->_contactID,
     ]);
-    $this->assertEquals(5, $get['count'], 'Incorrect email count');
+    $this->assertSame(5, $get['count'], 'Incorrect email count');
 
     // replace the subset of emails in location #1, but preserve location #2
     $getReplace2Params = [
@@ -369,8 +369,8 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       ],
     ];
     $getReplace2 = $this->callAPISuccess('contact', 'get', $getReplace2Params);
-    $this->assertEquals(0, $getReplace2['values'][$this->_contactID]['api.email.replace']['is_error']);
-    $this->assertEquals(1, $getReplace2['values'][$this->_contactID]['api.email.replace']['count']);
+    $this->assertSame(0, $getReplace2['values'][$this->_contactID]['api.email.replace']['is_error']);
+    $this->assertSame(1, $getReplace2['values'][$this->_contactID]['api.email.replace']['count']);
 
     // check emails at location #1 -- all three replaced by one
     $get = $this->callAPISuccess('email', 'get', [
@@ -378,14 +378,14 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'location_type_id' => $this->_locationTypeID,
     ]);
 
-    $this->assertEquals(1, $get['count'], 'Incorrect email count');
+    $this->assertSame(1, $get['count'], 'Incorrect email count');
 
     // check emails at location #2 -- preserve the original two
     $get = $this->callAPISuccess('email', 'get', [
       'contact_id' => $this->_contactID,
       'location_type_id' => $this->locationType2ID,
     ]);
-    $this->assertEquals(2, $get['count'], 'Incorrect email count');
+    $this->assertSame(2, $get['count'], 'Incorrect email count');
   }
 
   /**
@@ -400,7 +400,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $get = $this->callAPISuccess('email', 'get', [
       'contact_id' => $this->_contactID,
     ]);
-    $this->assertEquals(0, $get['count'], 'email already exists ' . __LINE__);
+    $this->assertSame(0, $get['count'], 'email already exists ' . __LINE__);
 
     // initialize email address
     $replace1Params = [
@@ -415,7 +415,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       ],
     ];
     $replace1 = $this->callAPISuccess('email', 'replace', $replace1Params);
-    $this->assertEquals(1, $replace1['count']);
+    $this->assertSame(1, $replace1['count']);
 
     $keys = array_keys($replace1['values']);
     $emailID = array_shift($keys);
@@ -431,7 +431,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       ],
     ];
     $replace2 = $this->callAPISuccess('email', 'replace', $replace2Params);
-    $this->assertEquals(1, $replace2['count']);
+    $this->assertSame(1, $replace2['count']);
 
     // ensure the 'email' was updated while other fields were preserved
     $get = $this->callAPISuccess('email', 'get', [
@@ -439,9 +439,9 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'location_type_id' => $this->_locationTypeID,
     ]);
 
-    $this->assertEquals(1, $get['count'], 'Incorrect email count at ' . __LINE__);
-    $this->assertEquals(1, $get['values'][$emailID]['is_primary']);
-    $this->assertEquals(1, $get['values'][$emailID]['on_hold']);
+    $this->assertSame(1, $get['count'], 'Incorrect email count at ' . __LINE__);
+    $this->assertSame(1, $get['values'][$emailID]['is_primary']);
+    $this->assertSame(1, $get['values'][$emailID]['on_hold']);
     $this->assertSame('1-2@example.com', $get['values'][$emailID]['email']);
   }
 
@@ -457,10 +457,10 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'on_hold' => '2',
     ];
     $result = $this->callAPISuccess('email', 'create', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['id']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->assertEquals(2, $result['values'][$result['id']]['on_hold']);
+    $this->assertSame(2, $result['values'][$result['id']]['on_hold']);
     $this->assertEquals(date('Y-m-d H:i'), date('Y-m-d H:i', strtotime($result['values'][$result['id']]['hold_date'])));
 
     // set on_hold is '0'
@@ -473,7 +473,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
       'on_hold' => '0',
     ];
     $result_change = $this->callAPISuccess('email', 'create', $params_change + ['action' => 'get']);
-    $this->assertEquals(1, $result_change['count']);
+    $this->assertSame(1, $result_change['count']);
     $this->assertEquals($result['id'], $result_change['id']);
     $this->assertEmpty($result_change['values'][$result_change['id']]['on_hold']);
     $this->assertEquals(date('Y-m-d H:i'), date('Y-m-d H:i', strtotime($result_change['values'][$result_change['id']]['reset_date'])));
@@ -490,14 +490,14 @@ class api_v3_EmailTest extends CiviUnitTestCase {
   public function testSetBulkEmail(): void {
     $individualID = $this->individualCreate([]);
     $email = $this->callAPISuccessGetSingle('Email', ['contact_id' => $individualID]);
-    $this->assertEquals(0, $email['is_bulkmail']);
+    $this->assertSame(0, $email['is_bulkmail']);
     $this->callAPISuccess('Email', 'create', ['id' => $email['id'], 'is_bulkmail' => 1]);
     $email = $this->callAPISuccessGetSingle('Email', ['contact_id' => $individualID]);
-    $this->assertEquals(1, $email['is_bulkmail']);
+    $this->assertSame(1, $email['is_bulkmail']);
     $email2 = $this->callAPISuccess('Email', 'create', ['contact_id' => $individualID, 'email' => 'mail@Example.com', 'is_bulkmail' => 1]);
     $emails = $this->callAPISuccess('Email', 'get', ['contact_id' => $individualID])['values'];
-    $this->assertEquals(0, $emails[$email['id']]['is_bulkmail']);
-    $this->assertEquals(1, $emails[$email2['id']]['is_bulkmail']);
+    $this->assertSame(0, $emails[$email['id']]['is_bulkmail']);
+    $this->assertSame(1, $emails[$email2['id']]['is_bulkmail']);
   }
 
   /**

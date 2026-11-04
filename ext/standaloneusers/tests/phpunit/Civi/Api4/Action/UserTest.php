@@ -626,12 +626,12 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
     $this->loginUser($this->nonAdminUserID);
 
     $user = User::get(TRUE)->execute();
-    $this->assertEquals(1, $user->countFetched());
+    $this->assertSame(1, $user->countFetched());
     $this->assertArrayNotHasKey('hashed_password', $user->first());
     $this->assertArrayNotHasKey('password_reset_token', $user->first());
 
     $user = User::get(TRUE)->addWhere('id', '=', $this->adminUserID)->execute();
-    $this->assertEquals(0, $user->countFetched());
+    $this->assertSame(0, $user->countFetched());
 
     $user = User::get(FALSE)->execute();
     $this->assertGreaterThan(1, $user->countFetched());
@@ -796,7 +796,7 @@ class UserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterface,
         $this->assertGreaterThan(0, $count, "Admin should find 1+ $entity entities");
       }
       else {
-        $this->assertEquals(0, $count, "Not expecting a session to be present in this context.");
+        $this->assertSame(0, $count, "Not expecting a session to be present in this context.");
         // ^^ This assertion is liable to fail in local testing, but it passes in CI context. Maybe reconsider...?
       }
     }

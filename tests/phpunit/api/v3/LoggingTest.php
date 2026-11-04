@@ -50,7 +50,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    * @throws \Civi\Core\Exception\DBQueryException
    */
   public function testEnableDisableLogging(): void {
-    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', ['name' => 'logging']));
+    $this->assertSame(0, $this->callAPISuccessGetValue('Setting', ['name' => 'logging']));
     $this->assertLoggingEnabled(FALSE);
 
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
@@ -60,14 +60,14 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     // Create a contact to make sure they aren't borked.
     $this->individualCreate();
     $this->assertTrue((bool) $this->callAPISuccessGetValue('Setting', ['name' => 'logging']));
-    $this->assertEquals(1, $this->callAPISuccessGetValue('Setting', ['name' => 'logging_all_tables_uniquid']));
+    $this->assertSame(1, $this->callAPISuccessGetValue('Setting', ['name' => 'logging_all_tables_uniquid']));
     $this->assertEquals(
       date('Y-m-d'),
       date('Y-m-d', strtotime($this->callAPISuccessGetValue('Setting', ['name' => 'logging_uniqueid_date'])))
     );
 
     $this->callAPISuccess('Setting', 'create', ['logging' => FALSE]);
-    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', ['name' => 'logging']));
+    $this->assertSame(0, $this->callAPISuccessGetValue('Setting', ['name' => 'logging']));
     $this->assertLoggingEnabled(FALSE);
   }
 
@@ -100,7 +100,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->createLegacyStyleContactLogTable();
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
     $this->checkTriggersCreated(FALSE);
-    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', ['name' => 'logging_all_tables_uniquid']));
+    $this->assertSame(0, $this->callAPISuccessGetValue('Setting', ['name' => 'logging_all_tables_uniquid']));
     $this->assertEmpty($this->callAPISuccessGetValue('Setting', ['name' => 'logging_uniqueid_date']));
   }
 
@@ -115,7 +115,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->callAPISuccess('System', 'updatelogtables');
     $this->checkLogTableCreated();
     $this->checkTriggersCreated(TRUE);
-    $this->assertEquals(0, $this->callAPISuccessGetValue('Setting', ['name' => 'logging_all_tables_uniquid']));
+    $this->assertSame(0, $this->callAPISuccessGetValue('Setting', ['name' => 'logging_all_tables_uniquid']));
     $this->assertEquals(
       date('Y-m-d'),
       date('Y-m-d', strtotime($this->callAPISuccessGetValue('Setting', ['name' => 'logging_uniqueid_date'])))
@@ -383,7 +383,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     sleep(1);
     $loggings = $this->callAPISuccess('Logging', 'get', ['log_conn_id' => 'bitty bot bot', 'tables' => ['civicrm_address']]);
     $this->assertSame('civicrm_address', $loggings['values'][0]['table'], json_encode(CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray()));
-    $this->assertEquals(1, $loggings['count'], json_encode(CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray()));
+    $this->assertSame(1, $loggings['count'], json_encode(CRM_Core_DAO::executeQuery('SELECT * FROM log_civicrm_address')->toArray()));
     $this->assertSame('27 Cool way', $loggings['values'][0]['from']);
     $this->assertSame('25 Dorky way', $loggings['values'][0]['to']);
     $this->callAPISuccess('Logging', 'revert', ['log_conn_id' => 'bitty bot bot', 'tables' => ['civicrm_address']]);

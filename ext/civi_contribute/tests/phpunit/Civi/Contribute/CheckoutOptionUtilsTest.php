@@ -34,7 +34,7 @@ class CheckoutOptionUtilsTest extends TestCase implements HeadlessInterface {
     // Original expiry_ prefixed keys should still be present - this is
     // an additive mapping, not a rename.
     $this->assertEquals('04', $mapped['expiry_month']);
-    $this->assertEquals(10, $mapped['amount']);
+    $this->assertSame(10, $mapped['amount']);
   }
 
   public function testMapCardParamsLeavesUnrelatedParamsUntouched(): void {

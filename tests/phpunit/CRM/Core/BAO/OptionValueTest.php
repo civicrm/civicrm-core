@@ -106,12 +106,12 @@ class CRM_Core_BAO_OptionValueTest extends CiviUnitTestCase {
   public function testEnsureOptionValueExistsDisabled(): void {
     $optionValue = CRM_Core_BAO_OptionValue::ensureOptionValueExists(['name' => 'Crashed', 'option_group_id' => 'contribution_status', 'is_active' => 0]);
     $value = $this->callAPISuccessGetSingle('OptionValue', ['name' => 'Crashed', 'option_group_id' => 'contribution_status']);
-    $this->assertEquals(0, $value['is_active']);
+    $this->assertSame(0, $value['is_active']);
     $this->assertEquals($value['id'], $optionValue['id']);
 
     $optionValue = CRM_Core_BAO_OptionValue::ensureOptionValueExists(['name' => 'Crashed', 'option_group_id' => 'contribution_status']);
     $value = $this->callAPISuccessGetSingle('OptionValue', ['name' => 'Crashed', 'option_group_id' => 'contribution_status']);
-    $this->assertEquals(0, $value['is_active']);
+    $this->assertSame(0, $value['is_active']);
     $this->assertEquals($value['id'], $optionValue['id']);
   }
 

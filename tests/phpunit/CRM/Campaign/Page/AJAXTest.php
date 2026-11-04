@@ -139,7 +139,7 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       ->addSelect('is_deleted')
       ->execute()
       ->first();
-    $this->assertEquals(1, $activityAfter['is_deleted']);
+    $this->assertSame(1, $activityAfter['is_deleted']);
   }
 
   /**
@@ -206,7 +206,7 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       ->addSelect('is_deleted')
       ->execute()
       ->first();
-    $this->assertEquals(1, $activityAfter['is_deleted']);
+    $this->assertSame(1, $activityAfter['is_deleted']);
   }
 
   /**
@@ -316,7 +316,7 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       ->addSelect('is_deleted')
       ->execute()
       ->first();
-    $this->assertEquals(0, $activityAfterRelease['is_deleted']);
+    $this->assertSame(0, $activityAfterRelease['is_deleted']);
 
     // 2. GOTV should fail and not alter status
     $_POST = $_REQUEST = [
@@ -358,7 +358,7 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       ->addSelect('is_deleted')
       ->execute()
       ->first();
-    $this->assertEquals(1, $activityAfterReserve['is_deleted']);
+    $this->assertSame(1, $activityAfterReserve['is_deleted']);
   }
 
   /**

@@ -44,7 +44,7 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
    */
   public function testCreatePaymentToken(): void {
     $result = $this->callAPISuccess('payment_token', 'create', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->params, $result['id'], 'payment_token', TRUE);
   }
@@ -59,7 +59,7 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
   public function testGetPaymentToken(): void {
     $this->callAPISuccess('payment_token', 'create', $this->params);
     $result = $this->callAPISuccess('payment_token', 'get', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
@@ -77,7 +77,7 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
     $this->callAPISuccess('payment_token', 'delete', $delete);
 
     $checkDeleted = $this->callAPISuccess('payment_token', 'get', []);
-    $this->assertEquals(0, $checkDeleted['count']);
+    $this->assertSame(0, $checkDeleted['count']);
   }
 
 }

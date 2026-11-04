@@ -92,7 +92,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
   public function testCreateGrant(): void {
     $result = $this->callAPISuccess('Grant', 'create', $this->params);
     $this->ids['Grant'][0] = $result['id'];
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
@@ -202,7 +202,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', ['id' => $result['id']]);
-    $this->assertEquals(0, $checkDeleted['count']);
+    $this->assertSame(0, $checkDeleted['count']);
   }
 
   /**
@@ -241,7 +241,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
       'contact_sub_type_op' => 'in',
       'contact_sub_type_value' => ['Student'],
     ]);
-    $this->assertEquals(1, $rows['count']);
+    $this->assertSame(1, $rows['count']);
   }
 
 }

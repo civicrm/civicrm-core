@@ -43,7 +43,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $decode = json_decode($responseLines[1], 1);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertSame('Method not found', $decode['error']['message']);
-    $this->assertEquals(-32601, $decode['error']['code']);
+    $this->assertSame(-32601, $decode['error']['code']);
   }
 
   public function testInvalid_MalformedParams(): void {
@@ -53,7 +53,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $decode = json_decode($responseLines[1], 1);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertSame('Invalid params', $decode['error']['message']);
-    $this->assertEquals(-32602, $decode['error']['code']);
+    $this->assertSame(-32602, $decode['error']['code']);
   }
 
   public function testEcho(): void {
@@ -76,7 +76,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $this->assertEquals('2.0', $decode[0]['jsonrpc']);
     $this->assertSame('a', $decode[0]['id']);
     $this->assertSame('Method not found', $decode[0]['error']['message']);
-    $this->assertEquals(-32601, $decode[0]['error']['code']);
+    $this->assertSame(-32601, $decode[0]['error']['code']);
 
     $this->assertEquals('2.0', $decode[1]['jsonrpc']);
     $this->assertSame('b', $decode[1]['id']);
@@ -133,7 +133,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $decode = json_decode($responses[3], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertSame('bad2', $decode['id']);
-    $this->assertEquals(1, $decode['result']['is_error']);
+    $this->assertSame(1, $decode['result']['is_error']);
     $this->assertMatchesRegularExpression(';API.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
   }
 
@@ -222,7 +222,7 @@ class JsonRpcSessionTest extends \CiviUnitTestCase {
     $decode = json_decode($responses[3], TRUE);
     $this->assertEquals('2.0', $decode['jsonrpc']);
     $this->assertSame('bad2', $decode['id']);
-    $this->assertEquals(1, $decode['result']['is_error']);
+    $this->assertSame(1, $decode['result']['is_error']);
     $this->assertMatchesRegularExpression(';Api.*System.*zznnzznnzz.*not exist;', $decode['result']['error_message']);
   }
 

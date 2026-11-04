@@ -112,7 +112,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
     $activities = $this->callAPISuccess('Activity', 'get', [
       'source_contact_id' => $senderContact['id'],
     ]);
-    $this->assertEquals(1, $activities['count']);
+    $this->assertSame(1, $activities['count']);
 
     // check subject
     $activity = $activities['values'][$activities['id']];
@@ -130,7 +130,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
       'entity_id' => $activity['id'],
       'entity_table' => 'civicrm_activity',
     ]);
-    $this->assertEquals(4, $attachments['count']);
+    $this->assertSame(4, $attachments['count']);
 
     // reset in case it was different from defaults
     Civi::settings()->set('max_attachments', $currentUIMax);

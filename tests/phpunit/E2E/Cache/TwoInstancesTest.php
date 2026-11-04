@@ -69,13 +69,13 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
 
     $a = $this->a = CRM_Utils_Cache::create($cacheDef);
     $a->set('foo', 1234);
-    $this->assertEquals(1234, $a->get('foo'));
+    $this->assertSame(1234, $a->get('foo'));
 
     $b = $this->b = CRM_Utils_Cache::create($cacheDef + ['prefetch' => TRUE]);
-    $this->assertEquals(1234, $b->get('foo'));
+    $this->assertSame(1234, $b->get('foo'));
 
     $b = $this->b = CRM_Utils_Cache::create($cacheDef + ['prefetch' => FALSE]);
-    $this->assertEquals(1234, $b->get('foo'));
+    $this->assertSame(1234, $b->get('foo'));
   }
 
   /**
@@ -111,12 +111,12 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
     [$a, $b] = $this->createTwoCaches($cacheA, $cacheB);
     $a->set('foo', 1234);
     $b->set('foo', 5678);
-    $this->assertEquals(1234, $a->get('foo'), 'Check value A after initial setup');
-    $this->assertEquals(5678, $b->get('foo'), 'Check value B after initial setup');
+    $this->assertSame(1234, $a->get('foo'), 'Check value A after initial setup');
+    $this->assertSame(5678, $b->get('foo'), 'Check value B after initial setup');
 
     $a->clear();
     $this->assertNull($a->get('foo'), 'Check value A after clearing A');
-    $this->assertEquals(5678, $b->get('foo'), 'Check value B after clearing A');
+    $this->assertSame(5678, $b->get('foo'), 'Check value B after clearing A');
   }
 
   /**
@@ -132,11 +132,11 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
     [$a, $b] = $this->createTwoCaches($cacheA, $cacheB);
     $a->set('foo', 1234);
     $b->set('foo', 5678);
-    $this->assertEquals(1234, $a->get('foo'), 'Check value A after initial setup');
-    $this->assertEquals(5678, $b->get('foo'), 'Check value B after initial setup');
+    $this->assertSame(1234, $a->get('foo'), 'Check value A after initial setup');
+    $this->assertSame(5678, $b->get('foo'), 'Check value B after initial setup');
 
     $b->clear();
-    $this->assertEquals(1234, $a->get('foo'), 'Check value A after clearing B');
+    $this->assertSame(1234, $a->get('foo'), 'Check value A after clearing B');
     $this->assertNull($b->get('foo'), 'Check value B after clearing B');
   }
 
@@ -153,12 +153,12 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
     [$a, $b] = $this->createTwoCaches($cacheA, $cacheB);
     $a->set('foo', 1234);
     $b->set('foo', 5678);
-    $this->assertEquals(1234, $a->get('foo'), 'Check value A after initial setup');
-    $this->assertEquals(5678, $b->get('foo'), 'Check value B after initial setup');
+    $this->assertSame(1234, $a->get('foo'), 'Check value A after initial setup');
+    $this->assertSame(5678, $b->get('foo'), 'Check value B after initial setup');
 
     [$a, $b] = $this->createTwoCaches($cacheA, $cacheB);
-    $this->assertEquals(1234, $a->get('foo'), 'Check value A after initial setup');
-    $this->assertEquals(5678, $b->get('foo'), 'Check value B after initial setup');
+    $this->assertSame(1234, $a->get('foo'), 'Check value A after initial setup');
+    $this->assertSame(5678, $b->get('foo'), 'Check value B after initial setup');
   }
 
   /**

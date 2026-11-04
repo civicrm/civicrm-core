@@ -52,8 +52,8 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('MailingContact', 'get', $params);
     $count = $this->callAPISuccess('MailingContact', 'getcount', $params);
-    $this->assertEquals(1, $result['count']);
-    $this->assertEquals(1, $count);
+    $this->assertSame(1, $result['count']);
+    $this->assertSame(1, $count);
     $this->assertFalse(empty($result['values']));
     $this->assertEquals($mailingID, $result['values'][$mailingID]['mailing_id']);
     $this->assertSame("Some Subject", $result['values'][$mailingID]['subject']);

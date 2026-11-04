@@ -26,7 +26,7 @@ class CRM_Activity_Selector_SearchTest extends CiviUnitTestCase {
     $this->setPermissions(['access CiviCRM', 'edit all contacts', 'access CiviContribute']);
     $queryParams = [['activity_location', '=', 'Baker Street', '', '']];
     $searchSelector = new CRM_Activity_Selector_Search($queryParams, CRM_Core_Action::VIEW);
-    $this->assertEquals(2, $searchSelector->getTotalCount(NULL));
+    $this->assertSame(2, $searchSelector->getTotalCount(NULL));
     $queryObject = $searchSelector->getQuery();
     $this->assertSame("civicrm_activity.location = 'Baker Street'", $queryObject->_where[''][0]);
   }

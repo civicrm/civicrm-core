@@ -35,7 +35,7 @@ class SessionHandlerTest extends TestCase implements EndToEndInterface {
 
     // Create a unique session ID
     $session_id = $session_handler->create_sid();
-    $this->assertEquals(64, strlen($session_id));
+    $this->assertSame(64, strlen($session_id));
 
     // Try to read data from the session
     $data = $session_handler->read($session_id);

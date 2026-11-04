@@ -44,8 +44,8 @@ class CRM_Report_Form_MembershipContributionTest extends CiviReportTestCase {
     ])->getResultSet();
 
     $this->assertCount(1, $rows);
-    $this->assertEquals(1, $rows[0]['civicrm_contribution_total_amount_count']);
-    $this->assertEquals(100, $rows[0]['civicrm_contribution_total_amount_sum']);
+    $this->assertSame(1, $rows[0]['civicrm_contribution_total_amount_count']);
+    $this->assertSame(100, $rows[0]['civicrm_contribution_total_amount_sum']);
   }
 
   /**
@@ -74,8 +74,8 @@ class CRM_Report_Form_MembershipContributionTest extends CiviReportTestCase {
       'group_bys' => ['membership_type_id'],
     ])->getResultSet();
 
-    $this->assertEquals(2, $rows[0]['civicrm_contribution_total_amount_count']);
-    $this->assertEquals(130, $rows[0]['civicrm_contribution_total_amount_sum']);
+    $this->assertSame(2, $rows[0]['civicrm_contribution_total_amount_count']);
+    $this->assertSame(130, $rows[0]['civicrm_contribution_total_amount_sum']);
   }
 
   public function testMemberDetailListsContributionOnce(): void {

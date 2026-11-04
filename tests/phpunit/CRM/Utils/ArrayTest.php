@@ -181,8 +181,8 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals('2', CRM_Utils_Array::pathGet($arr, ['two', 'half']));
     $this->assertNull(CRM_Utils_Array::pathGet($arr, ['zoo', 'half']));
     CRM_Utils_Array::pathSet($arr, ['zoo', 'half'], '3');
-    $this->assertEquals(3, CRM_Utils_Array::pathGet($arr, ['zoo', 'half']));
-    $this->assertEquals(3, $arr['zoo']['half']);
+    $this->assertSame(3, CRM_Utils_Array::pathGet($arr, ['zoo', 'half']));
+    $this->assertSame(3, $arr['zoo']['half']);
 
     $arrCopy = $arr;
     $this->assertFalse(CRM_Utils_Array::pathUnset($arr, ['does-not-exist']));
@@ -199,17 +199,17 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
 
     // pathMove(): Change location of an item
     $arr = $arrOrig;
-    $this->assertEquals(2, $arr['two']['half']);
+    $this->assertSame(2, $arr['two']['half']);
     $this->assertTrue(!isset($arr['verb']['double']['half']));
-    $this->assertEquals(1, CRM_Utils_Array::pathMove($arr, ['two'], ['verb', 'double']));
-    $this->assertEquals(2, $arr['verb']['double']['half']);
+    $this->assertSame(1, CRM_Utils_Array::pathMove($arr, ['two'], ['verb', 'double']));
+    $this->assertSame(2, $arr['verb']['double']['half']);
     $this->assertTrue(!isset($arr['two']['half']));
 
     // pathMove(): If item doesn't exist, return 0.
     $arr = $arrOrig;
     $this->assertTrue(!isset($arr['not-a-src']));
     $this->assertTrue(!isset($arr['not-a-dest']));
-    $this->assertEquals(0, CRM_Utils_Array::pathMove($arr, ['not-a-src'], ['not-a-dest']));
+    $this->assertSame(0, CRM_Utils_Array::pathMove($arr, ['not-a-src'], ['not-a-dest']));
     $this->assertTrue(!isset($arr['not-a-src']));
     $this->assertTrue(!isset($arr['not-a-dest']));
 
@@ -510,7 +510,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
       }
     }
 
-    $this->assertEquals(0, $todoCount);
+    $this->assertSame(0, $todoCount);
   }
 
   public function testValue() {

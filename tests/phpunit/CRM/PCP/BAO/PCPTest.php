@@ -70,7 +70,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
 
     $this->assertInstanceOf('CRM_PCP_DAO_PCP', $pcp, 'Check for created object');
     $this->assertEquals($params['contact_id'], $pcp->contact_id, 'Check for entity table.');
-    $this->assertEquals(0, $pcp->status_id, 'Check for zero status when no status_id passed.');
+    $this->assertSame(0, $pcp->status_id, 'Check for zero status when no status_id passed.');
     $this->assertEquals($params['title'], $pcp->title, 'Check for title.');
     $this->assertEquals($params['intro_text'], $pcp->intro_text, 'Check for intro_text.');
     $this->assertEquals($params['page_text'], $pcp->page_text, 'Check for page_text.');

@@ -199,7 +199,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'create', $params);
     $this->callAPISuccess('financial_type', 'create', ['is_active' => 0, 'id' => $finType['id']]);
     $contributionCount = CRM_Contribute_BAO_Contribution::contributionCount($contactId);
-    $this->assertEquals(1, $contributionCount);
+    $this->assertSame(1, $contributionCount);
   }
 
   /**
@@ -803,7 +803,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         'return' => ['total_amount'],
       ]
     );
-    $this->assertEquals(8000, $financialTrxn['total_amount'], 'Invalid amount.');
+    $this->assertSame(8000, $financialTrxn['total_amount'], 'Invalid amount.');
   }
 
   /**
@@ -830,7 +830,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertCount(1, $financialItemIds, 'Invalid count.');
     $this->assertCount(1, $taxItems, 'Invalid count.');
     foreach ($taxItems as $value) {
-      $this->assertEquals(10, $value['amount'], 'Invalid tax amount.');
+      $this->assertSame(10, $value['amount'], 'Invalid tax amount.');
     }
   }
 
@@ -883,7 +883,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'financial_trxn_id' => $lastFinancialTrxnId['financialTrxnId'],
     ];
     $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'Get', $eftParams);
-    $this->assertEquals(2, $entityFinancialTrxn['count'], 'Invalid count.');
+    $this->assertSame(2, $entityFinancialTrxn['count'], 'Invalid count.');
     $testAmount = [10, 100];
     foreach ($entityFinancialTrxn['values'] as $value) {
       $this->assertEquals($value['amount'], array_pop($testAmount), 'Invalid amount stored in civicrm_entity_financial_trxn.');
@@ -940,7 +940,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contact_type' => 'Organization',
       'organization_name' => 'test organization 1',
     ]);
-    $this->assertEquals(1, $orgCount);
+    $this->assertSame(1, $orgCount);
 
     $values = $params = [];
     $originalBehalfOrganization = $behalfOrganization = [
@@ -987,7 +987,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contact_type' => 'Organization',
       'organization_name' => 'test organization 1',
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     //Assert all org values are updated.
     foreach ($orgInfo as $key => $val) {
@@ -997,7 +997,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     //Check if alert is assigned to params if more than 1 dupe exists.
     $this->organizationCreate(['organization_name' => 'test organization 1', 'email' => 'testorg@gmail.com']);
     CRM_Contribute_Form_Contribution_Confirm::processOnBehalfOrganization($originalBehalfOrganization, $originalContactId, $values, $params, $fields);
-    $this->assertEquals(1, $params['onbehalf_dupe_alert']);
+    $this->assertSame(1, $params['onbehalf_dupe_alert']);
   }
 
   /**
@@ -1109,7 +1109,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'return' => ['financial_account_id.name', 'amount', 'description'],
     ]);
 
-    $this->assertEquals(3, $financialItems['count'], 'Count mismatch.');
+    $this->assertSame(3, $financialItems['count'], 'Count mismatch.');
 
     $toCheck = [
       ['Donation', 100.00],
@@ -1142,7 +1142,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'entity_id' => $contributionId,
       'sequential' => 1,
     ]);
-    $this->assertEquals(3, $financialTransactions['count'], 'Count mismatch.');
+    $this->assertSame(3, $financialTransactions['count'], 'Count mismatch.');
 
     foreach ($financialTransactions['values'] as $key => $values) {
       $this->callAPISuccessGetCount('EntityFinancialTrxn', [
@@ -1208,7 +1208,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $pledgePayments = $this->callAPISuccess('PledgePayment', 'get')['values'];
     $this->callAPISuccess('PledgePayment', 'create', ['id' => key($pledgePayments), 'pledge_id' => $pledgeID, 'contribution_id' => $orderID, 'status_id' => 'Completed', 'actual_amount' => 2]);
     $beforePledge = $this->callAPISuccessGetSingle('Pledge', ['id' => $pledgeID]);
-    $this->assertEquals(2, $beforePledge['pledge_total_paid']);
+    $this->assertSame(2, $beforePledge['pledge_total_paid']);
     $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
 
     $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
@@ -1328,7 +1328,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       HAVING SUM(cli.line_total) != total_amount
     ', [1 => [$contributionId, 'Integer']]);
 
-    $this->assertEquals(0, $count);
+    $this->assertSame(0, $count);
 
     $this->callAPISuccess('Contribution', 'create', [
       'id' => $contributionId,
@@ -1344,7 +1344,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       HAVING SUM(cli.line_total) != total_amount
     ', [1 => [$contributionId, 'Integer']]);
 
-    $this->assertEquals(0, $count);
+    $this->assertSame(0, $count);
   }
 
   /**

@@ -34,7 +34,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
 
     $this->assertEquals($params['title'], $values['title'], 'Verify contribution title.');
     $this->assertEquals($this->getFinancialTypeID('Donation'), $values['financial_type_id'], 'Verify financial types id.');
-    $this->assertEquals(1, $values['is_active'], 'Verify contribution is_active value.');
+    $this->assertSame(1, $values['is_active'], 'Verify contribution is_active value.');
     $this->callAPISuccess('ContributionPage', 'delete', ['id' => $contributionPage->id]);
   }
 
@@ -64,7 +64,7 @@ class CRM_Contribute_BAO_ContributionPageTest extends CiviUnitTestCase {
     $contributionPage = CRM_Contribute_BAO_ContributionPage::writeRecord($params);
     $copyContributionPage = CRM_Contribute_BAO_ContributionPage::copy($contributionPage->id);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $copyContributionPage->financial_type_id, 'Check for Financial type id.');
-    $this->assertEquals(400, $copyContributionPage->goal_amount, 'Check for goal amount.');
+    $this->assertSame(400, $copyContributionPage->goal_amount, 'Check for goal amount.');
     $this->callAPISuccess('ContributionPage', 'delete', ['id' => $contributionPage->id]);
     $this->callAPISuccess('ContributionPage', 'delete', ['id' => $copyContributionPage->id]);
   }

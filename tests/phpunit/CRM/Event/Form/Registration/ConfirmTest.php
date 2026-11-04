@@ -100,10 +100,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ] + $this->getCreditCardParameters($paymentProcessorID), $event['id']);
     $form->processForm();
     $this->assertNotEmpty($form->getLineItems());
-    $this->assertEquals(300, $form->getTotalAmount());
+    $this->assertSame(300, $form->getTotalAmount());
     $this->callAPISuccessGetCount('Participant', [], 1);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertEquals(300, $contribution['total_amount']);
+    $this->assertSame(300, $contribution['total_amount']);
     $this->assertEquals(1.67, $contribution['fee_amount']);
     $this->assertEquals(298.33, $contribution['net_amount']);
     $this->assertNotEmpty($contribution['receipt_date']);
@@ -118,7 +118,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     );
     $this->assertEquals($paymentProcessorID, $financialTrxn['payment_processor_id']);
     $this->assertSame('Visa', $financialTrxn['card_type_id.label']);
-    $this->assertEquals(1111, $financialTrxn['pan_truncation']);
+    $this->assertSame(1111, $financialTrxn['pan_truncation']);
 
     // This looks like it's missing an item for the main contribution - but just locking in current behaviour.
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', [
@@ -374,7 +374,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ->execute()->single();
 
     $this->assertSame('On waitlist', $participant['status_id:name']);
-    $this->assertEquals(0, $participant['is_pay_later']);
+    $this->assertSame(0, $participant['is_pay_later']);
   }
 
   /**
@@ -396,8 +396,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         'return' => ['tax_amount', 'total_amount', 'amount_level'],
       ]
     );
-    $this->assertEquals(50, $contribution['tax_amount'], 'Invalid Tax amount.');
-    $this->assertEquals(550, $contribution['total_amount'], 'Invalid Tax amount.');
+    $this->assertSame(50, $contribution['tax_amount'], 'Invalid Tax amount.');
+    $this->assertSame(550, $contribution['total_amount'], 'Invalid Tax amount.');
   }
 
   /**
@@ -435,7 +435,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
 
     $this->callAPISuccessGetCount('Participant', [], 1);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['return' => ['total_amount', 'amount_level']]);
-    $this->assertEquals(300, $contribution['total_amount']);
+    $this->assertSame(300, $contribution['total_amount']);
     $this->assertEquals(['Standard Rate - 1'], $contribution['amount_level']);
   }
 
@@ -530,8 +530,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       ]
     );
     $this->assertContains(' (multiple participants)', $contribution['amount_level']);
-    $this->assertEquals(60, $contribution['tax_amount'], 'Invalid Tax amount.');
-    $this->assertEquals(660, $contribution['total_amount'], 'Invalid Tax amount.');
+    $this->assertSame(60, $contribution['tax_amount'], 'Invalid Tax amount.');
+    $this->assertSame(660, $contribution['total_amount'], 'Invalid Tax amount.');
     $mailSent = $this->sentMail;
     $this->assertCount(3, $mailSent, 'Three mails should have been sent to the 3 participants.');
 
@@ -1126,7 +1126,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['id'], $form->getContributionID());
 
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['contribution_id' => $contribution['id']]);
-    $this->assertEquals(300, $lineItem['line_total']);
+    $this->assertSame(300, $lineItem['line_total']);
   }
 
   public function testRegistrationWithoutCiviContributeEnabled(): void {

@@ -63,7 +63,7 @@ class AfformAuthxPermissionsTest extends \PHPUnit\Framework\TestCase implements 
       ->execute()->single();
 
     $this->assertSame('Authx Perm Test Form Updated', $saved['title']);
-    $this->assertEquals(10, $saved['authx_timeout']);
+    $this->assertSame(10, $saved['authx_timeout']);
     $this->assertSame('civicrm/custom-redirect', $saved['authx_redirect']);
   }
 

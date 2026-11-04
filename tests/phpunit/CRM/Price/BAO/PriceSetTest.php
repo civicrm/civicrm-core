@@ -57,14 +57,14 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
     $priceSet = CRM_Price_BAO_PriceSet::getCachedPriceSetDetail($priceSetId);
     $firstPriceField = array_values($priceSet['fields'])[0];
     $secondPriceField = array_values($priceSet['fields'])[1];
-    $this->assertEquals(1, $firstPriceField['weight']);
-    $this->assertEquals(2, $secondPriceField['weight']);
+    $this->assertSame(1, $firstPriceField['weight']);
+    $this->assertSame(2, $secondPriceField['weight']);
 
     $priceValues = $priceSet['fields'][$radioPriceFieldId]['options'];
     $firstPriceFieldValue = array_values($priceValues)[0];
     $secondPriceFieldValue = array_values($priceValues)[1];
-    $this->assertEquals(1, $firstPriceFieldValue['weight']);
-    $this->assertEquals(2, $secondPriceFieldValue['weight']);
+    $this->assertSame(1, $firstPriceFieldValue['weight']);
+    $this->assertSame(2, $secondPriceFieldValue['weight']);
   }
 
   /**
@@ -164,10 +164,10 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
     ]);
     $occurences = CRM_Price_BAO_PriceSet::getMembershipCount($sameOrgPriceFieldIDs);
     // total number of membership type occurences of same organisation is one
-    $this->assertEquals(1, count($occurences));
+    $this->assertSame(1, count($occurences));
     $this->assertTrue(array_key_exists($organization1, $occurences));
     // assert that two membership types were chosen from same organisation
-    $this->assertEquals(2, $occurences[$organization1]);
+    $this->assertSame(2, $occurences[$organization1]);
 
     // CASE 2: when two price field value IDs of membership type that belong to different organizations, are chosen
     $differentOrgPriceFieldIDs = implode(', ', [
@@ -176,12 +176,12 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
     ]);
     $occurences = CRM_Price_BAO_PriceSet::getMembershipCount($differentOrgPriceFieldIDs);
     // total number of membership type occurences of different organisation is two
-    $this->assertEquals(2, count($occurences));
+    $this->assertSame(2, count($occurences));
     $this->assertTrue(array_key_exists($organization1, $occurences));
     $this->assertTrue(array_key_exists($organization2, $occurences));
     // assert that two membership types were chosen from different organisation
-    $this->assertEquals(1, $occurences[$organization1]);
-    $this->assertEquals(1, $occurences[$organization2]);
+    $this->assertSame(1, $occurences[$organization1]);
+    $this->assertSame(1, $occurences[$organization2]);
   }
 
 }

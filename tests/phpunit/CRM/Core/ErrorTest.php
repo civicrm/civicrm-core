@@ -90,7 +90,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
   public function assertLogRegexp($pattern): void {
     $config = CRM_Core_Config::singleton();
     $logFiles = glob($config->configAndLogDir . '/CiviCRM*.log');
-    $this->assertEquals(1, count($logFiles), 'Expect to find 1 file matching: ' . $config->configAndLogDir . '/CiviCRM*log*/');
+    $this->assertSame(1, count($logFiles), 'Expect to find 1 file matching: ' . $config->configAndLogDir . '/CiviCRM*log*/');
     foreach ($logFiles as $logFile) {
       $this->assertMatchesRegularExpression($pattern, file_get_contents($logFile));
     }
@@ -112,7 +112,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     // Date format should be ISO
     $this->assertMatchesRegularExpression('/^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d[+-]\d\d\d\d$/', substr($fileContents, 0, 24));
     // Check the text starts at the expected position
-    $this->assertEquals(26, strpos($fileContents, '[info] Mary had a little lamb'));
+    $this->assertSame(26, strpos($fileContents, '[info] Mary had a little lamb'));
     $this->assertStringContainsString('[info] Little lamb', $fileContents);
   }
 
@@ -128,7 +128,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
       CRM_Core_DAO::executeQuery($testData['sql']);
     }
     catch (DBQueryException $e) {
-      $this->assertEquals(0, $e->getCode());
+      $this->assertSame(0, $e->getCode());
       $this->assertInstanceOf('DB_Error', $e->getCause());
       $this->assertEquals($testData['message'], $e->getMessage());
       $this->assertEquals($testData['error_code'], $e->getErrorCode());

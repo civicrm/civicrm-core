@@ -43,7 +43,7 @@ class ChangeSetTest extends \CiviUnitTestCase {
       '<span><p class="foo">Hello</p><p ng-if="alpha.beta() && true">world</p><p class="bar">Goodbye</p><p>cruel world</p></span>',
       $results['~/foo.html']
     );
-    $this->assertEquals(2, $counts['~/foo.html']);
+    $this->assertSame(2, $counts['~/foo.html']);
   }
 
   /**
@@ -74,7 +74,7 @@ class ChangeSetTest extends \CiviUnitTestCase {
       '<span><p class="foo">Hello<p ng-if="!!gamma()">world</p></p><p class="bar"><span>Cruel world,</span>Goodbye</p></span>',
       $results['~/foo.html']
     );
-    $this->assertEquals(2, $counts['~/foo.html']);
+    $this->assertSame(2, $counts['~/foo.html']);
   }
 
   /**
@@ -100,7 +100,7 @@ class ChangeSetTest extends \CiviUnitTestCase {
       '<a class="foo" ng-href="#/bar/{{:: row.a + \'?params=\' + row.b }}" foos="{{:: row.bars }}"></a>',
       $results['~/foo.html']
     );
-    $this->assertEquals(1, $counts['~/foo.html']);
+    $this->assertSame(1, $counts['~/foo.html']);
   }
 
   protected function assertHtmlEquals($expected, $actual, $message = '') {

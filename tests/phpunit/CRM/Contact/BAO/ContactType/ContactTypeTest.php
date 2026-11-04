@@ -131,7 +131,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
     $this->assertSame('- Sub Organization', $selectElements['Organization__sub_organization']);
     $selectOrder = array_flip(array_keys($selectElements));
     // Individual is always first
-    $this->assertEquals(0, $selectOrder['Individual']);
+    $this->assertSame(0, $selectOrder['Individual']);
     // Sub-types should come after the primary type, but before the next primary type
     $this->assertGreaterThan($selectOrder['Individual__sub1_individual'], $selectOrder['Individual__sub2_individual']);
     $this->assertGreaterThan($selectOrder['Individual__sub1_individual'], $selectOrder['Organization']);

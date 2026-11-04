@@ -101,7 +101,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($params['job_title'], $contact->job_title, 'Check for job_title creation.');
     $this->assertEquals($params['gender_id'], $contact->gender_id, 'Check for gender_id creation.');
     $this->assertSame('135', $contact->preferred_communication_method);
-    $this->assertEquals(1, $createdContact['is_deceased'], 'Check is_deceased');
+    $this->assertSame(1, $createdContact['is_deceased'], 'Check is_deceased');
     $this->assertSame('1961-06-06', $createdContact['birth_date'], 'Check birth_date');
     $this->assertSame('1991-07-07', $createdContact['deceased_date'], 'Check deceased_date');
 
@@ -545,7 +545,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     );
 
     //Now check values of Note Count.
-    $this->assertEquals(1, $values['noteTotalCount'], 'Check for total note count');
+    $this->assertSame(1, $values['noteTotalCount'], 'Check for total note count');
 
     foreach ($values['note'] as $key => $val) {
       $retrieveNote = $val['note'];
@@ -554,7 +554,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     }
 
     //Now check values of Relationship Count.
-    $this->assertEquals(1, $values['relationship']['totalCount'], 'Check for total relationship count');
+    $this->assertSame(1, $values['relationship']['totalCount'], 'Check for total relationship count');
     foreach ($values['relationship']['data'] as $key => $val) {
       //Now check values of Relationship organization.
       $this->assertEquals($organizationID, $val['contact_id_b'], 'Check for organization');
@@ -816,7 +816,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $searchParams = ['contact_id' => $contactId];
     $relationship = CRM_Contact_BAO_Relationship::getValues($searchParams, $values);
     //Now check values of Relationship Count.
-    $this->assertEquals(0, $values['relationship']['totalCount'], 'Check for total relationship count');
+    $this->assertSame(0, $values['relationship']['totalCount'], 'Check for total relationship count');
     foreach ($values['relationship']['data'] as $key => $val) {
       //Now check values of Relationship organization.
       $this->assertEquals($profileParams['organization_name'], $val['name'], 'Check for organization');
@@ -1020,7 +1020,7 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $searchParams = ['contact_id' => $contactId];
     $relationship = CRM_Contact_BAO_Relationship::getValues($searchParams, $values);
     //Now check values of Relationship Count.
-    $this->assertEquals(0, $values['relationship']['totalCount'], 'Check for total relationship count');
+    $this->assertSame(0, $values['relationship']['totalCount'], 'Check for total relationship count');
     foreach ($values['relationship']['data'] as $key => $val) {
       //Now check values of Relationship organization.
       $this->assertEquals($updatePfParams['organization_name'], $val['name'], 'Check for organization');

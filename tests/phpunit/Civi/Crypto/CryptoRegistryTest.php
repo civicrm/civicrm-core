@@ -37,17 +37,17 @@ class CryptoRegistryTest extends \CiviUnitTestCase {
     $this->assertSame('aes-cbc', $key0['suite']);
 
     $key1 = $registry->parseKey($examples[1]);
-    $this->assertEquals(32, strlen($key1['key']));
+    $this->assertSame(32, strlen($key1['key']));
     $this->assertSame('aes-cbc', $key1['suite']);
     $this->assertSame('0ao5eC7C/rwwk2qii4oLd6eG3KJq8ZDX2K9zWbvaLdo=', base64_encode($key1['key']));
 
     $key2 = $registry->parseKey($examples[2]);
-    $this->assertEquals(32, strlen($key2['key']));
+    $this->assertSame(32, strlen($key2['key']));
     $this->assertSame('aes-ctr', $key2['suite']);
     $this->assertSame('0ao5eC7C/rwwk2qii4oLd6eG3KJq8ZDX2K9zWbvaLdo=', base64_encode($key2['key']));
 
     $key3 = $registry->parseKey($examples[3]);
-    $this->assertEquals(32, strlen($key3['key']));
+    $this->assertSame(32, strlen($key3['key']));
     $this->assertSame('aes-cbc-hs', $key3['suite']);
     $this->assertSame('0ao5eC7C/rwwk2qii4oLd6eG3KJq8ZDX2K9zWbvaLdo=', base64_encode($key3['key']));
   }
@@ -57,23 +57,23 @@ class CryptoRegistryTest extends \CiviUnitTestCase {
     $registry = \Civi::service('crypto.registry');
 
     $key = $registry->findKey('asdf-key-0');
-    $this->assertEquals(32, strlen($key['key']));
+    $this->assertSame(32, strlen($key['key']));
     $this->assertSame('aes-cbc', $key['suite']);
 
     $key = $registry->findKey('asdf-key-1');
-    $this->assertEquals(32, strlen($key['key']));
+    $this->assertSame(32, strlen($key['key']));
     $this->assertSame('aes-cbc', $key['suite']);
 
     $key = $registry->findKey('asdf-key-2');
-    $this->assertEquals(32, strlen($key['key']));
+    $this->assertSame(32, strlen($key['key']));
     $this->assertSame('aes-ctr', $key['suite']);
 
     $key = $registry->findKey('asdf-key-3');
-    $this->assertEquals(32, strlen($key['key']));
+    $this->assertSame(32, strlen($key['key']));
     $this->assertSame('aes-cbc-hs', $key['suite']);
 
     $key = $registry->findKey('UNIT-TEST');
-    $this->assertEquals(32, strlen($key['key']));
+    $this->assertSame(32, strlen($key['key']));
     $this->assertSame('asdf-key-1', $key['id']);
   }
 

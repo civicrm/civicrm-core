@@ -122,7 +122,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
 
   public function testGetMultipleExtensions(): void {
     $result = $this->callAPISuccess('extension', 'get', ['key' => ['test.extension.manager.moduletest', 'test.extension.manager.moduleupgtest']]);
-    $this->assertEquals(2, $result['count']);
+    $this->assertSame(2, $result['count']);
   }
 
   /**
@@ -130,7 +130,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    */
   public function testGetMultipleExtensionsApiExplorer(): void {
     $result = $this->callAPISuccess('extension', 'get', ['full_name' => ['test.extension.manager.moduletest', 'test.extension.manager.moduleupgtest']]);
-    $this->assertEquals(2, $result['count']);
+    $this->assertSame(2, $result['count']);
   }
 
   /**
@@ -139,7 +139,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   public function testGetExtensionByID(): void {
     $extensionID = $this->callAPISuccess('extension', 'get', ['options' => ['limit' => 1]])['id'];
     $result = $this->callAPISuccess('extension', 'get', ['id' => $extensionID, 'return' => ['label']]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
   }
 
 }

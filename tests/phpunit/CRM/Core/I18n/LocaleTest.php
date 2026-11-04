@@ -146,7 +146,7 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
     $this->assertSame('tr_TR.utf8', setlocale(LC_ALL, 'tr_TR.utf8'));
     $dao = new CRM_Core_DAO();
     // When query() uses strtolower this returns NULL instead
-    $this->assertEquals(1, $dao->query("INSERT INTO foo VALUES ('Turkish Delight')"));
+    $this->assertSame(1, $dao->query("INSERT INTO foo VALUES ('Turkish Delight')"));
     setlocale(LC_ALL, 'en_US.utf8');
     CRM_Core_DAO::executeQuery("DROP TABLE foo");
   }

@@ -326,18 +326,18 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS civicrm_my_isam');
 
     // A manually created MyISAM table should raise a redflag.
-    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
+    $this->assertSame(0, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery('CREATE TABLE civicrm_my_isam (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM');
-    $this->assertEquals(1, CRM_Core_DAO::isDBMyISAM());
+    $this->assertSame(1, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery('DROP TABLE civicrm_my_isam');
 
     // A temp table should not raise flag.
     $tempTableName = CRM_Utils_SQL_TempTable::build()->setCategory('myisam')->getName();
     // A temp table should not raise flag (randomized naming).
-    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
+    $this->assertSame(0, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery("CREATE TABLE $tempTableName (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM");
     // Ignore temp tables
-    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
+    $this->assertSame(0, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery("DROP TABLE $tempTableName");
   }
 
@@ -465,7 +465,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       $this->assertSame('Individual', $row->contact_type);
       $count++;
     }
-    $this->assertEquals(3, $count);
+    $this->assertSame(3, $count);
   }
 
   public function testFetchGeneratorArray(): void {
@@ -479,7 +479,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       $this->assertSame('Individual', $row['contact_type']);
       $count++;
     }
-    $this->assertEquals(3, $count);
+    $this->assertSame(3, $count);
   }
 
   /**
@@ -504,7 +504,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       $cloned = clone($dao);
       unset($cloned);
     }
-    $this->assertEquals(2, $i);
+    $this->assertSame(2, $i);
   }
 
   /**
@@ -704,7 +704,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
   public function testSetMaxExecutionTime() {
     $original = CRM_Core_DAO::getMaxExecutionTime();
     $autoClean = CRM_Utils_AutoClean::swapMaxExecutionTime(800);
-    $this->assertEquals(800, CRM_Core_DAO::getMaxExecutionTime());
+    $this->assertSame(800, CRM_Core_DAO::getMaxExecutionTime());
     $autoClean->cleanup();
     $this->assertEquals($original, CRM_Core_DAO::getMaxExecutionTime());
   }

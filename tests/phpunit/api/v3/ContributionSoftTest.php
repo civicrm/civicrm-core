@@ -88,7 +88,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
       'id' => $softContribution['id'],
     ];
     $softContribution = $this->callAPISuccess('contribution_soft', 'get', $params);
-    $this->assertEquals(1, $softContribution['count']);
+    $this->assertSame(1, $softContribution['count']);
     $this->assertEquals($softContribution['values'][$softContribution['id']]['contribution_id'], $this->_contributionId);
     $this->assertEquals($softContribution['values'][$softContribution['id']]['contact_id'], $this->_softIndividual1Id);
     $this->assertEquals($softContribution['values'][$softContribution['id']]['amount'], '10.00');
@@ -101,13 +101,13 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
     // now we have 2 - test getcount
     $softContributionCount = $this->callAPISuccess('contribution_soft', 'getcount', []);
-    $this->assertEquals(2, $softContributionCount);
+    $this->assertSame(2, $softContributionCount);
 
     //check first contribution
     $result = $this->callAPISuccess('contribution_soft', 'get', [
       'id' => $softContribution['id'],
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals($softContribution['id'], $result['id']);
 
     //test id only format - second soft credit
@@ -121,7 +121,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contribution_soft', 'get', [
       'contact_id' => $this->_softIndividual2Id,
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     $this->callAPISuccess('contribution_soft', 'Delete', [
       'id' => $softContribution['id'],

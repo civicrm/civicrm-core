@@ -159,7 +159,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'mailerBatchLimit' => 2,
     ]);
     $mailing = $this->callAPISuccess('mailing', 'create', $this->_params);
-    $this->assertEquals(3, $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']])['count']);
+    $this->assertSame(3, $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']])['count']);
     $this->_mut->assertRecipients([]);
     $this->callAPISuccess('Contact', 'create', ['id' => $contactID, 'is_deceased' => 1, 'contact_type' => 'Individual']);
     $this->callApiV3Success('Job', 'process_mailing', []);
@@ -181,7 +181,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->runProcessMailing(3);
 
     $this->_mut->assertRecipients($this->getRecipients(1, 2));
-    $this->assertEquals(0, MailingEventQueue::get(FALSE)
+    $this->assertSame(0, MailingEventQueue::get(FALSE)
       ->addWhere('mailing_id', '=', $mailing['id'])
       ->addWhere('contact_id', '=', $doNotEmailContactID)
       ->execute()->count());
@@ -239,7 +239,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'status' => 'Added',
     ]);
     $mailing = $this->callAPISuccess('mailing', 'create', $this->_params);
-    $this->assertEquals(2, $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']])['count']);
+    $this->assertSame(2, $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']])['count']);
     $this->callApiV3Success('Job', 'process_mailing', []);
     $this->_mut->assertRecipients([['mail1@example.org'], ['mail2@example.org']]);
     // Don't leave data lying around for other tests to screw up on.
@@ -603,7 +603,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'apiResults' => $allApiResults,
     ], TRUE));
     $this->_mut->assertRecipients($this->getRecipients(1, $expectedTotal / $settings['mailings'], 'nul.example.com', $settings['mailings']));
-    $this->assertEquals(0, $apiCalls->getRunningCount());
+    $this->assertSame(0, $apiCalls->getRunningCount());
   }
 
   /**

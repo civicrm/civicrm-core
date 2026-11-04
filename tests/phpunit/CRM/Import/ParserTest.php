@@ -142,7 +142,7 @@ class CRM_Import_ParserTest extends CiviUnitTestCase {
       // Ignored: we only care about the hook execution before save
     }
 
-    $this->assertEquals(1, $hookCalled);
+    $this->assertSame(1, $hookCalled);
     $expectedEntities = [
       '' => [
         'entity' => 'Activity',

@@ -11,7 +11,7 @@ class CRM_Core_ExceptionTest extends CiviUnitTestCase {
 
     $this->assertSame($previous, $exception->getPrevious());
     $this->assertSame('Failed', $exception->getMessage());
-    $this->assertEquals(7, $exception->getCode());
+    $this->assertSame(7, $exception->getCode());
   }
 
   public function testPreviousExceptionWithDatabaseError(): void {

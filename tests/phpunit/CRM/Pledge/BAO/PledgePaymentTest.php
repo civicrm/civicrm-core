@@ -447,12 +447,12 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
         $this->assertEquals(100.00, $pp['actual_amount']);
       }
       else {
-        $this->assertEquals(0, $pp['scheduled_amount']);
-        $this->assertEquals(0, $pp['actual_amount']);
+        $this->assertSame(0, $pp['scheduled_amount']);
+        $this->assertSame(0, $pp['actual_amount']);
       }
 
       // All pledge payments must be set as 'completed'.
-      $this->assertEquals(1, $pp['status_id']);
+      $this->assertSame(1, $pp['status_id']);
     }
 
     $this->assertEquals(count($pledgePayments['values']), CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge['id'], 2));

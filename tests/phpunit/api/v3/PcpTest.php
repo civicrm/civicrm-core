@@ -71,7 +71,7 @@ class api_v3_PcpTest extends CiviUnitTestCase {
   public function testGetPcp(): void {
     $this->createTestEntity('PCP', $this->params);
     $result = $this->callAPISuccess('Pcp', 'get', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
@@ -82,12 +82,12 @@ class api_v3_PcpTest extends CiviUnitTestCase {
     $entity = $this->createTestEntity('PCP', $this->params);
     $checkCreated = $this->callAPISuccess($this->entity, 'get',
       ['id' => $entity['id']]);
-    $this->assertEquals(1, $checkCreated['count']);
+    $this->assertSame(1, $checkCreated['count']);
     $this->callAPISuccess('Pcp', 'delete',
         ['id' => $entity['id']]);
     $checkDeleted = $this->callAPISuccess($this->entity, 'get',
         ['id' => $entity['id']]);
-    $this->assertEquals(0, $checkDeleted['count']);
+    $this->assertSame(0, $checkDeleted['count']);
   }
 
   /**
@@ -97,7 +97,7 @@ class api_v3_PcpTest extends CiviUnitTestCase {
     $params = ['title' => 'Pcp title', 'api.Pcp.delete' => 1];
     $this->callAPISuccess('Pcp', 'create', $this->params);
     $this->callAPISuccess('Pcp', 'get', $params);
-    $this->assertEquals(0, $this->callAPISuccess('Pcp', 'getcount', []));
+    $this->assertSame(0, $this->callAPISuccess('Pcp', 'getcount', []));
   }
 
 }

@@ -135,7 +135,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualID,
     ];
     $result = $this->callAPISuccess('entity_tag', 'get', $paramsEntity);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals($this->_tagID, $result['values'][$result['id']]['tag_id']);
   }
 
@@ -329,7 +329,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
       'entity_table' => "civicrm_contact",
       'entity_id.contact_type' => "Individual",
     ]);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
   }
 
 }

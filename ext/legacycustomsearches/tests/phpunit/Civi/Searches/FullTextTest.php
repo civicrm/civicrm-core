@@ -117,7 +117,7 @@ class FullTextTest extends TestCase implements HeadlessInterface, HookInterface 
         $this->fail('Unexpected table in results: ' . $dao->table_name);
       }
     }
-    $this->assertEquals(2, $count, 'Should be exactly 2 records in the results');
+    $this->assertSame(2, $count, 'Should be exactly 2 records in the results');
   }
 
 }

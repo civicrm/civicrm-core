@@ -42,7 +42,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
   public function testCreateWebsite($version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
@@ -55,7 +55,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $result = $this->callAPISuccess($this->_entity, 'get', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('website', 'delete', ['id' => $result['id']]);
   }

@@ -233,7 +233,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     $second = $this->callAPISuccess('RelationshipType', 'Create', $secondRelTypeParams);
     $results = $this->callAPISuccess('relationship_type', 'get', []);
 
-    $this->assertEquals(2, $results['count']);
+    $this->assertSame(2, $results['count']);
   }
 
   /**
@@ -273,8 +273,8 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     ];
     $results = $this->callAPISuccess('relationship_type', 'get', $params);
 
-    $this->assertEquals(1, $results['count'], ' in line ' . __LINE__);
-    $this->assertEquals(1, $results['values'][$results['id']]['is_active'], ' in line ' . __LINE__);
+    $this->assertSame(1, $results['count'], ' in line ' . __LINE__);
+    $this->assertSame(1, $results['values'][$results['id']]['is_active'], ' in line ' . __LINE__);
   }
 
   /**

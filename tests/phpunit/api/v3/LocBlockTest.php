@@ -53,7 +53,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $id = $result['id'];
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$id]['id']);
     $this->getAndCheck($params, $id, $this->_entity);
   }
@@ -82,7 +82,7 @@ class api_v3_LocBlockTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $id = $result['id'];
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     // Now check our results using the return param 'all'.
     $getParams = [

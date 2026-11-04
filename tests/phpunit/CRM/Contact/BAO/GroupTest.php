@@ -363,7 +363,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
 
     CRM_Mailing_BAO_Mailing::getRecipients($mailingID);
     $recipients = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailingID]);
-    $this->assertEquals(1, $recipients['count'], 'Check recipient count');
+    $this->assertSame(1, $recipients['count'], 'Check recipient count');
   }
 
   /**

@@ -41,7 +41,7 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
     $query = new CRM_Contact_BAO_Query($params, NULL, NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS);
     $sql = $query->query(FALSE);
     $result = CRM_Core_DAO::executeQuery(implode(' ', $sql));
-    $this->assertEquals(1, $result->N);
+    $this->assertSame(1, $result->N);
   }
 
   /**
@@ -79,7 +79,7 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
     $sql = $query->query(FALSE);
     $result = CRM_Core_DAO::executeQuery(implode(' ', $sql));
 
-    $this->assertEquals(1, $result->N);
+    $this->assertSame(1, $result->N);
     $result->fetch();
 
     $this->assertEquals($contactId, $result->contact_id);

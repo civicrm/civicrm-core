@@ -171,7 +171,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     $checkSyncFields = ['subject', 'body_text'];
 
     $result = $this->groupContactCreate($this->_groupID, 20, TRUE);
-    $this->assertEquals(20, $result['added'], "in line " . __LINE__);
+    $this->assertSame(20, $result['added'], "in line " . __LINE__);
 
     $params = $this->_params;
     $params['group_percentage'] = 10;

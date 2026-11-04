@@ -114,7 +114,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
 
-    $this->assertEquals(1, $contribution['count']);
+    $this->assertSame(1, $contribution['count']);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->getFinancialTypeID('Donation'));
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
@@ -205,7 +205,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
 
     // Check that the entire contribution has rolled back.
     $contribution = $this->callAPISuccess('contribution', 'get', []);
-    $this->assertEquals(0, $contribution['count']);
+    $this->assertSame(0, $contribution['count']);
 
     $this->addFinancialAclPermissions([
       ['add', 'Member Dues'],
@@ -221,10 +221,10 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'sequential' => 1,
     ];
     $lineItems = $this->callAPISuccess('LineItem', 'get', $lineItemParams);
-    $this->assertEquals(3, $lineItems['count']);
+    $this->assertSame(3, $lineItems['count']);
     $this->assertEquals(100.00, $lineItems['values'][0]['line_total']);
-    $this->assertEquals(20, $lineItems['values'][1]['line_total']);
-    $this->assertEquals(80, $lineItems['values'][2]['line_total']);
+    $this->assertSame(20, $lineItems['values'][1]['line_total']);
+    $this->assertSame(80, $lineItems['values'][2]['line_total']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $lineItems['values'][0]['financial_type_id']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $lineItems['values'][1]['financial_type_id']);
     $this->assertEquals($this->getFinancialTypeID('Member Dues'), $lineItems['values'][2]['financial_type_id']);
@@ -287,7 +287,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->addFinancialAclPermissions([['delete', 'Donation']]);
     $contribution = $this->callAPISuccess('Contribution', 'delete', $params);
 
-    $this->assertEquals(1, $contribution['count']);
+    $this->assertSame(1, $contribution['count']);
   }
 
   public function testMembershipTypeACLFinancialTypeACL(): void {
@@ -302,9 +302,9 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'add contributions of type Donation',
       'view contributions of type Donation',
     ]);
-    $this->assertEquals(0, CRM_Member_BAO_Membership::getContactMembershipCount($contactID));
+    $this->assertSame(0, CRM_Member_BAO_Membership::getContactMembershipCount($contactID));
     $this->addFinancialAclPermissions([['view', 'Member Dues']]);
-    $this->assertEquals(1, CRM_Member_BAO_Membership::getContactMembershipCount($contactID));
+    $this->assertSame(1, CRM_Member_BAO_Membership::getContactMembershipCount($contactID));
   }
 
 }

@@ -133,7 +133,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ->addSelect('failure_count')
       ->addWhere('id', '=', $contributionRecur['id'])
       ->execute()->first();
-    $this->assertEquals(3, $updatedRecur['failure_count']);
+    $this->assertSame(3, $updatedRecur['failure_count']);
   }
 
   /**
@@ -385,7 +385,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->assertEquals($templateContributionId, $fetchedTemplate['id']);
     $this->assertTrue($fetchedTemplate['is_template']);
     $this->assertFalse($fetchedTemplate['is_test']);
-    $this->assertEquals(1, $templateContribution->count());
+    $this->assertSame(1, $templateContribution->count());
     $templateContribution = $templateContribution->first();
     $this->assertNotNull($templateContribution['template.field']);
     $this->assertSame('Second and most recent Contribution', $templateContribution['template.field']);
@@ -498,10 +498,10 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ->setValues(['amount' => 6])
       ->execute();
 
-    $this->assertEquals(6, Contribution::get()
+    $this->assertSame(6, Contribution::get()
       ->addWhere('id', '=', $templateContribution['id'])
       ->addSelect('total_amount')->execute()->first()['total_amount']);
-    $this->assertEquals(6, LineItem::get()
+    $this->assertSame(6, LineItem::get()
       ->addWhere('contribution_id', '=', $templateContribution['id'])
       ->addGroupBy('contribution_id')
       ->addSelect('SUM(line_total) AS total_amount')->execute()->first()['total_amount']);

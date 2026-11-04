@@ -50,16 +50,16 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
 
     $this->assertTrue($this->a->has('foo'));
     $this->assertTrue($this->b->has('foo'));
-    $this->assertEquals(100, $this->a->get('foo', 'dfl-1')[1]);
-    $this->assertEquals(100, $this->b->get('foo', 'dfl-2')[1]);
+    $this->assertSame(100, $this->a->get('foo', 'dfl-1')[1]);
+    $this->assertSame(100, $this->b->get('foo', 'dfl-2')[1]);
     $this->assertEquals($this->a->get('foo'), $this->b->get('foo'));
 
     $this->cache->set('foo', 200);
 
     $this->assertTrue($this->a->has('foo'));
     $this->assertTrue($this->b->has('foo'));
-    $this->assertEquals(200, $this->a->get('foo', 'dfl-1')[1]);
-    $this->assertEquals(200, $this->b->get('foo', 'dfl-2')[1]);
+    $this->assertSame(200, $this->a->get('foo', 'dfl-1')[1]);
+    $this->assertSame(200, $this->b->get('foo', 'dfl-2')[1]);
     $this->assertEquals($this->a->get('foo'), $this->b->get('foo'));
 
     $this->cache->delete('foo');
@@ -80,8 +80,8 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
 
     $this->assertTrue($this->a->has('foo'));
     $this->assertTrue($this->b->has('foo'));
-    $this->assertEquals(100, $this->a->get('foo', 'dfl-1')[1]);
-    $this->assertEquals(100, $this->b->get('foo', 'dfl-2')[1]);
+    $this->assertSame(100, $this->a->get('foo', 'dfl-1')[1]);
+    $this->assertSame(100, $this->b->get('foo', 'dfl-2')[1]);
     $this->assertEquals($this->a->get('foo'), $this->b->get('foo'));
 
     $this->cache->clear();

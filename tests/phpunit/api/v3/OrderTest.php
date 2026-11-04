@@ -58,7 +58,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
     $order = $this->callAPISuccess('Order', 'get', $params);
 
-    $this->assertEquals(1, $order['count']);
+    $this->assertSame(1, $order['count']);
     $expectedResult = [
       $contribution['id'] => [
         'total_amount' => 100,
@@ -610,7 +610,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'entity_id' => $order['id'],
     ];
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $this->assertEquals(300, $eft['values'][$eft['id']]['amount']);
+    $this->assertSame(300, $eft['values'][$eft['id']]['amount']);
     $params = [
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $eft['values'][$eft['id']]['financial_trxn_id'],
@@ -644,7 +644,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ]);
       $this->callAPISuccess('order', 'delete', $params);
       $order = $this->callAPISuccess('order', 'get', $params);
-      $this->assertEquals(0, $order['count']);
+      $this->assertSame(0, $order['count']);
     }
   }
 
@@ -663,8 +663,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'sequential' => 1,
       'tax_amount' => 5,
     ])['values'][0];
-    $this->assertEquals(105, $order['total_amount']);
-    $this->assertEquals(5, $order['tax_amount']);
+    $this->assertSame(105, $order['total_amount']);
+    $this->assertSame(5, $order['tax_amount']);
   }
 
   /**
@@ -681,8 +681,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'contact_id' => $this->individualCreate(),
       'sequential' => 1,
     ])['values'][0];
-    $this->assertEquals(105, $order['total_amount']);
-    $this->assertEquals(5, $order['tax_amount']);
+    $this->assertSame(105, $order['total_amount']);
+    $this->assertSame(5, $order['tax_amount']);
   }
 
   /**
@@ -701,8 +701,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'sequential' => 1,
       'tax_amount' => 5,
     ])['values'][0];
-    $this->assertEquals(105, $order['total_amount']);
-    $this->assertEquals(5, $order['tax_amount']);
+    $this->assertSame(105, $order['total_amount']);
+    $this->assertSame(5, $order['tax_amount']);
   }
 
   /**
@@ -829,7 +829,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     ];
 
     $order = $this->callAPISuccess('Order', 'create', $params);
-    $this->assertEquals(1, $order['count']);
+    $this->assertSame(1, $order['count']);
   }
 
   /**

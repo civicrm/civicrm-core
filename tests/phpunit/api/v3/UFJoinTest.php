@@ -55,7 +55,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     $ufJoin = $this->callAPISuccess('UFJoin', 'create', $params)['values'][0];
     $this->assertSame('CiviContribute', $ufJoin['module']);
     $this->assertEquals($ufGroupID, $ufJoin['uf_group_id']);
-    $this->assertEquals(1, $ufJoin['is_active']);
+    $this->assertSame(1, $ufJoin['is_active']);
 
     $params = [
       'id' => $ufJoin['id'],
@@ -70,7 +70,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     $ufJoinUpdated = $this->callAPISuccess('uf_join', 'create', $params)['values'][0];
     $this->assertSame('CiviContribute', $ufJoinUpdated['module']);
     $this->assertEquals($ufGroupID, $ufJoinUpdated['uf_group_id']);
-    $this->assertEquals(0, $ufJoinUpdated['is_active']);
+    $this->assertSame(0, $ufJoinUpdated['is_active']);
   }
 
   /**
@@ -99,7 +99,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     $ufJoin = $this->callAPISuccess('UFJoin', 'create', $params)['values'][0];
     $this->assertSame('CiviCampaign', $ufJoin['module']);
     $this->assertEquals($params['uf_group_id'], $ufJoin['uf_group_id']);
-    $this->assertEquals(1, $ufJoin['is_active']);
+    $this->assertSame(1, $ufJoin['is_active']);
   }
 
 }

@@ -143,7 +143,7 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
    */
   public function testMaxlengthCannotExceedFieldLimit(): void {
     $inputAttrs = $this->getMergedInputAttrs('{input_attrs: {maxlength: 500}}', ['maxlength' => 255]);
-    $this->assertEquals(255, $inputAttrs['maxlength']);
+    $this->assertSame(255, $inputAttrs['maxlength']);
   }
 
   /**
@@ -152,10 +152,10 @@ class AfformMetadataTest extends \PHPUnit\Framework\TestCase implements Headless
    */
   public function testMaxlengthBelowFieldLimitIsPreserved(): void {
     $inputAttrs = $this->getMergedInputAttrs('{input_attrs: {maxlength: 100}}', ['maxlength' => 255]);
-    $this->assertEquals(100, $inputAttrs['maxlength']);
+    $this->assertSame(100, $inputAttrs['maxlength']);
 
     $inputAttrs = $this->getMergedInputAttrs('{input_attrs: {maxlength: 100}}', []);
-    $this->assertEquals(100, $inputAttrs['maxlength']);
+    $this->assertSame(100, $inputAttrs['maxlength']);
   }
 
   /**

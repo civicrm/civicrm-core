@@ -98,15 +98,15 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
     $this->assertEquals($openIdURLOne, $openIds[$openIdOne]['openid'],
       'Confirm first openid value.'
     );
-    $this->assertEquals(1, $openIds[$openIdOne]['is_primary'], 'Confirm is_primary field value.');
-    $this->assertEquals(1, $openIds[$openIdOne]['allowed_to_login'], 'Confirm allowed_to_login field value.');
+    $this->assertSame(1, $openIds[$openIdOne]['is_primary'], 'Confirm is_primary field value.');
+    $this->assertSame(1, $openIds[$openIdOne]['allowed_to_login'], 'Confirm allowed_to_login field value.');
 
     // check second openid values
     $this->assertEquals($openIdURLTwo, $openIds[$openIdTwo]['openid'],
       'Confirm second openid value.'
     );
-    $this->assertEquals(0, $openIds[$openIdTwo]['is_primary'], 'Confirm is_primary field value for second openid.');
-    $this->assertEquals(0, $openIds[$openIdTwo]['allowed_to_login'], 'Confirm allowed_to_login field value for second openid.');
+    $this->assertSame(0, $openIds[$openIdTwo]['is_primary'], 'Confirm is_primary field value for second openid.');
+    $this->assertSame(0, $openIds[$openIdTwo]['allowed_to_login'], 'Confirm allowed_to_login field value for second openid.');
   }
 
 }

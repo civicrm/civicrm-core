@@ -221,7 +221,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
     $this->assertQueueStats(3, 3, 0, $this->queue);
 
     $result = $runner->runAll();
-    $this->assertEquals(1, $result['is_error']);
+    $this->assertSame(1, $result['is_error']);
     // nothing from 'c'
     $this->assertEquals(self::$_recordedValues, ['a']);
     // 'b' and 'c' remain
@@ -258,7 +258,7 @@ class CRM_Queue_RunnerTest extends CiviUnitTestCase {
     $this->assertEquals(self::$_recordedValues, []);
     $this->assertQueueStats(3, 3, 0, $this->queue);
     $result = $runner->runAll();
-    $this->assertEquals(1, $result['is_error']);
+    $this->assertSame(1, $result['is_error']);
     // nothing from 'c'
     $this->assertEquals(self::$_recordedValues, ['a']);
     // 'b' and 'c' remain

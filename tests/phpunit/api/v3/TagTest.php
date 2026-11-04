@@ -50,7 +50,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = ['name' => 'Wrong Tag Name'];
     $result = $this->callAPISuccess('tag', 'get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
   }
 
   /**
@@ -112,7 +112,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
       'description' => 'This is description for New Tag 02',
     ];
     $result = $this->callAPISuccess('tag', 'create', $params);
-    $this->assertEquals(10, $result['id']);
+    $this->assertSame(10, $result['id']);
   }
 
   /**

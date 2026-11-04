@@ -268,12 +268,12 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->assertSame('blah', $result['values'][$result['id']]['description']);
 
     $result = $this->callAPISuccess('relationship', 'create', ['id' => $relID, 'is_permission_b_a' => 1]);
-    $this->assertEquals(1, $result['values'][$result['id']]['is_permission_b_a']);
+    $this->assertSame(1, $result['values'][$result['id']]['is_permission_b_a']);
     $result = $this->callAPISuccess('relationship', 'create', ['id' => $result['id'], 'is_active' => 0]);
     $result = $this->callAPISuccess('relationship', 'get', ['id' => $result['id']]);
-    $this->assertEquals(0, $result['values'][$result['id']]['is_active']);
+    $this->assertSame(0, $result['values'][$result['id']]['is_active']);
     $this->assertSame('blah', $result['values'][$result['id']]['description']);
-    $this->assertEquals(1, $result['values'][$result['id']]['is_permission_b_a']);
+    $this->assertSame(1, $result['values'][$result['id']]['is_permission_b_a']);
   }
 
   /**
@@ -458,7 +458,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $result_2 = $this->callAPISuccess('relationship', 'create', $params_2);
 
     $this->assertNotNull($result_2['id']);
-    $this->assertEquals(0, $result_2['is_error']);
+    $this->assertSame(0, $result_2['is_error']);
   }
 
   /**
@@ -525,7 +525,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $result_2 = $this->callAPISuccess('relationship', 'create', $params_2);
 
     $this->assertNotNull($result_2['id']);
-    $this->assertEquals(0, $result_2['is_error']);
+    $this->assertSame(0, $result_2['is_error']);
   }
 
   /**
@@ -584,9 +584,9 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('relationship', 'get', $params);
 
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $relationship = CRM_Utils_Array::first($result['values']);
-    $this->assertEquals(1, $relationship['api.Contact.get']['count']);
+    $this->assertSame(1, $relationship['api.Contact.get']['count']);
     $contact = CRM_Utils_Array::first($relationship['api.Contact.get']['values']);
     $this->assertEquals($this->_cId_b, $contact['id']);
   }
@@ -614,11 +614,11 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('contact', 'get', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $contact = CRM_Utils_Array::first($result['values']);
-    $this->assertEquals(1, $contact['api.Relationship.get']['count']);
+    $this->assertSame(1, $contact['api.Relationship.get']['count']);
     $relationship = CRM_Utils_Array::first($contact['api.Relationship.get']['values']);
-    $this->assertEquals(1, $relationship['api.Contact.get']['count']);
+    $this->assertSame(1, $relationship['api.Contact.get']['count']);
     $contact = CRM_Utils_Array::first($relationship['api.Contact.get']['values']);
     $this->assertEquals($this->_cId_b, $contact['id']);
   }
@@ -839,12 +839,12 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'contact_id' => $this->_cId_a,
       'relationship_type_id' => $this->relationshipTypeID,
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $result = $this->callAPISuccess($this->entity, 'get', [
       'contact_id' => $this->_cId_a,
       'relationship_type_id' => $this->getRelationshipTypeID('Child of'),
     ]);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
     $this->callAPISuccess($this->entity, 'delete', ['id' => $created['id']]);
   }
 
@@ -889,7 +889,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'relationship_type_id' => ['IN' => [$this->relationshipTypeID, $relType3]],
     ]);
 
-    $this->assertEquals(2, $result['count']);
+    $this->assertSame(2, $result['count']);
     foreach ($result['values'] as $value) {
       $this->assertContainsEquals($value['relationship_type_id'], [$this->relationshipTypeID, $relType3]);
     }
@@ -930,7 +930,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'relationship_type_id' => ['IN' => [$this->relationshipTypeID, $relType3]],
     ]);
 
-    $this->assertEquals(2, $result['count']);
+    $this->assertSame(2, $result['count']);
     foreach ($result['values'] as $key => $value) {
       $this->assertTrue(in_array($value['relationship_type_id'], [$this->relationshipTypeID, $relType3]));
     }
@@ -997,7 +997,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'version' => 3,
     ]);
     // although our contact has more than one relationship we have passed them in as contact_id_a & can't get reciprocal
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     foreach ($result['values'] as $key => $value) {
       $this->assertContainsEquals($value['relationship_type_id'], [$relType1]);
     }
@@ -1062,7 +1062,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'version' => 3,
     ]);
     // Although our contact has more than one relationship we have passed them in as contact_id_a & can't get reciprocal
-    $this->assertEquals(2, $result['count']);
+    $this->assertSame(2, $result['count']);
 
     foreach ($result['values'] as $key => $value) {
       $this->assertTrue(in_array($value['relationship_type_id'], [$relType1, $relType3]));

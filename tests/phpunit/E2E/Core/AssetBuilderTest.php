@@ -116,7 +116,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
    */
   public function testRender($asset, $params, $expectedMimeType, $expectedContent) {
     $asset = \Civi::service('asset_builder')->render($asset, $params);
-    $this->assertEquals(1, $this->fired['hook_civicrm_buildAsset']);
+    $this->assertSame(1, $this->fired['hook_civicrm_buildAsset']);
     $this->assertEquals($expectedMimeType, $asset['mimeType']);
     $this->assertEquals($expectedContent, $asset['content']);
   }
@@ -135,7 +135,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
   public function testGetUrl_cached($asset, $params, $expectedMimeType, $expectedContent) {
     \Civi::service('asset_builder')->setCacheEnabled(TRUE);
     $url = \Civi::service('asset_builder')->getUrl($asset, $params);
-    $this->assertEquals(1, $this->fired['hook_civicrm_buildAsset']);
+    $this->assertSame(1, $this->fired['hook_civicrm_buildAsset']);
     $this->assertMatchesRegularExpression(';^https?:.*dyn/square.[0-9a-f]+.(txt|js)$;', $url);
     $response = $this->createGuzzle()->get($url);
     // Note: This actually relies on httpd to determine MIME type.
@@ -158,7 +158,7 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
   public function testGetUrl_uncached($asset, $params, $expectedMimeType, $expectedContent) {
     \Civi::service('asset_builder')->setCacheEnabled(FALSE);
     $url = \Civi::service('asset_builder')->getUrl($asset, $params);
-    $this->assertEquals(0, $this->fired['hook_civicrm_buildAsset']);
+    $this->assertSame(0, $this->fired['hook_civicrm_buildAsset']);
     // Ex: Traditional URLs on D7 have "/". Traditional URLs on WP have "%2F".
     $this->assertMatchesRegularExpression(';^https?:.*civicrm(/|%2F)asset(/|%2F)builder.*square.(txt|js);', $url);
 

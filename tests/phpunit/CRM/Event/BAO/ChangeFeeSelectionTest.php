@@ -223,7 +223,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'entity_id' => $cancelledLineItem['id'],
       'entity_table' => 'civicrm_line_item',
     ]);
-    $this->assertEquals(2, $financialItems['count'], 'Financial Items for Cancelled fee is not proper');
+    $this->assertSame(2, $financialItems['count'], 'Financial Items for Cancelled fee is not proper');
 
     $expectedAmount = 100.00;
     foreach ($financialItems['values'] as $financialItem) {
@@ -404,7 +404,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'entity_id' => $cancelledLineItem['id'],
       'entity_table' => 'civicrm_line_item',
     ]);
-    $this->assertEquals(2, $financialItems['count'], 'Financial Items for Cancelled fee is not proper');
+    $this->assertSame(2, $financialItems['count'], 'Financial Items for Cancelled fee is not proper');
 
     $expectedAmount = 100.00;
     foreach ($financialItems['values'] as $financialItem) {

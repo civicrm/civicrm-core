@@ -212,7 +212,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     $groupNesting = $this->callAPISuccess('GroupNesting', 'get', ['child_group_id' => $group3['id']]);
     // 2 Group nesting entries - one for direct parent & one for grandparent.
-    $this->assertEquals(2, $groupNesting['count']);
+    $this->assertSame(2, $groupNesting['count']);
     $this->groupDelete($group2['id']);
     $this->groupDelete($group3['id']);
   }
@@ -265,7 +265,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $params = [];
     $params['title'] = 'No such group Exist';
     $group = $this->callAPISuccess('group', 'get', $params);
-    $this->assertEquals(0, $group['count']);
+    $this->assertSame(0, $group['count']);
   }
 
   /**
@@ -305,7 +305,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'title' => 'Test illegal Group',
       'parents' => ['IS NOT NULL' => 1],
     ]);
-    $this->assertEquals(0, $group1['count']);
+    $this->assertSame(0, $group1['count']);
     $params['title'] = 'Test illegal Group 2';
     $params['parents'] = [];
     $params['parents'][$this->_groupID] = 'test Group';
@@ -438,7 +438,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'is_reserved' => 0,
       'check_permissions' => 1,
     ]);
-    $this->assertEquals(0, $unreserved['values'][$reservedGroup]['is_reserved']);
+    $this->assertSame(0, $unreserved['values'][$reservedGroup]['is_reserved']);
 
     // User CAN create a reserved group
     $newReserved = $this->callAPISuccess('Group', 'create', [
@@ -446,7 +446,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'is_reserved' => 1,
       'check_permissions' => 1,
     ]);
-    $this->assertEquals(1, $newReserved['values'][$newReserved['id']]['is_reserved']);
+    $this->assertSame(1, $newReserved['values'][$newReserved['id']]['is_reserved']);
 
     // User CAN delete reserved group
     $this->callAPISuccess('Group', 'delete', [

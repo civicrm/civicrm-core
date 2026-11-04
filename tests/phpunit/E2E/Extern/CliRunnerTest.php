@@ -79,9 +79,9 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
 
       $report = print_r(['anon' => $anon, 'demo' => $demo, 'admin' => $admin], 1);
 
-      $this->assertEquals(1, count(array_unique($anon)), "For permission \"$perm\" of anon(cid=$anonId), permissions should be consistent: " . $report);
-      $this->assertEquals(1, count(array_unique($demo)), "For permission \"$perm\" of demo(cid=$demoId), permissions should be consistent: " . $report);
-      $this->assertEquals(1, count(array_unique($admin)), "For permission \"$perm\" of admin(cid=$adminId), permissions should be consistent: " . $report);
+      $this->assertSame(1, count(array_unique($anon)), "For permission \"$perm\" of anon(cid=$anonId), permissions should be consistent: " . $report);
+      $this->assertSame(1, count(array_unique($demo)), "For permission \"$perm\" of demo(cid=$demoId), permissions should be consistent: " . $report);
+      $this->assertSame(1, count(array_unique($admin)), "For permission \"$perm\" of admin(cid=$adminId), permissions should be consistent: " . $report);
     }
   }
 
@@ -220,7 +220,7 @@ class E2E_Extern_CliRunnerTest extends CiviEndToEndTestCase {
     $vars['@PHP'] = escapeshellarg($phpStmt);
     $cmd = strtr($runner, $vars);
     exec($cmd, $output, $val);
-    $this->assertEquals(0, $val, "Command returned error ($cmd) ($val)");
+    $this->assertSame(0, $val, "Command returned error ($cmd) ($val)");
     return implode("", $output);
   }
 
