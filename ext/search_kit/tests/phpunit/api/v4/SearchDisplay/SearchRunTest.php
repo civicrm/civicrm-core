@@ -2649,9 +2649,9 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(3, $result);
 
-    $this->assertEquals(1, $result[0]['columns'][1]['val']);
-    $this->assertEquals(2, $result[1]['columns'][1]['val']);
-    $this->assertEquals(3, $result[2]['columns'][1]['val']);
+    $this->assertSame(1.0, $result[0]['columns'][1]['val']);
+    $this->assertSame(2.0, $result[1]['columns'][1]['val']);
+    $this->assertSame(3.0, $result[2]['columns'][1]['val']);
   }
 
   public function testSelectPseudoFields() {
