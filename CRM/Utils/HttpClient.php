@@ -99,7 +99,8 @@ class CRM_Utils_HttpClient {
    * @param string $remoteFile
    *   URL of remote file.
    * @return array
-   *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
+   *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string|null)
+   *   The data is NULL if the status is STATUS_DL_ERROR.
    */
   public function get($remoteFile) {
     // Download extension zip file ...
@@ -121,7 +122,7 @@ class CRM_Utils_HttpClient {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
-      return [self::STATUS_DL_ERROR, $data];
+      return [self::STATUS_DL_ERROR, NULL];
     }
 
     return [self::STATUS_OK, $data];
@@ -135,7 +136,8 @@ class CRM_Utils_HttpClient {
    * @param array $params
    *
    * @return array
-   *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
+   *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string|null)
+   *   The data is NULL if the status is STATUS_DL_ERROR.
    */
   public function post($remoteFile, $params) {
     // Download extension zip file ...
@@ -155,7 +157,7 @@ class CRM_Utils_HttpClient {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
-      return [self::STATUS_DL_ERROR, $data];
+      return [self::STATUS_DL_ERROR, NULL];
     }
 
     return [self::STATUS_OK, $data];

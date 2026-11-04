@@ -195,8 +195,9 @@ abstract class CRM_Queue_Queue {
    * @param int|null $lease_time
    *   Hold a lease on the claimed item for $X seconds.
    *   If NULL, inherit a default.
-   * @return object
-   *   with key 'data' that matches the inputted data
+   * @return object|null
+   *   with key 'data' that matches the inputted data, or NULL if no item
+   *   is available
    */
   abstract public function claimItem($lease_time = NULL);
 
@@ -206,8 +207,9 @@ abstract class CRM_Queue_Queue {
    * @param int $lease_time
    *   Seconds.
    *
-   * @return object
-   *   with key 'data' that matches the inputted data
+   * @return object|null
+   *   with key 'data' that matches the inputted data, or NULL if no item
+   *   is available
    */
   abstract public function stealItem($lease_time = NULL);
 

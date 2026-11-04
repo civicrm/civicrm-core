@@ -49,16 +49,13 @@ trait EntityParamsTrait {
    */
   private function findValue(string $paramName): array {
     $params = $this->params ?? [];
+    $customField = $this->getCustomFieldByLongName($paramName);
 
     if (array_key_exists($paramName, $params)) {
-      return [TRUE, $params[$paramName]];
+      $value = $params[$paramName];
+      return [TRUE, $customField ? $this->formatCustomValue($customField, $value) : $value];
     }
 
-    // If this looks like the name of a custom field, try to find it.
-    if (substr_count($paramName, '.') !== 1 || str_starts_with($paramName, '.') || str_ends_with($paramName, '.')) {
-      return [FALSE, NULL];
-    }
-    $customField = \CRM_Core_BAO_CustomField::getFieldByName($paramName);
     if (!$customField) {
       return [FALSE, NULL];
     }
@@ -100,6 +97,9 @@ trait EntityParamsTrait {
           unset($values[$key]);
         }
       }
+      elseif ($customField = $this->getCustomFieldByLongName($key)) {
+        $values[$key] = $this->formatCustomValue($customField, $value);
+      }
     }
 
     // Collect custom values from $params['custom'] and add to params as their long names.
@@ -114,9 +114,22 @@ trait EntityParamsTrait {
     return $values;
   }
 
+  /**
+   * Get a custom field if $name looks like a long name (CustomGroup.CustomField).
+   */
+  private function getCustomFieldByLongName(string $name): ?array {
+    if (substr_count($name, '.') !== 1 || str_starts_with($name, '.') || str_ends_with($name, '.')) {
+      return NULL;
+    }
+    return \CRM_Core_BAO_CustomField::getFieldByName($name);
+  }
+
   private function formatCustomValue(array $customField, mixed $value) {
     if ($customField['serialize'] && is_string($value)) {
       return \CRM_Core_DAO::unSerializeField($value, $customField['serialize']);
+    }
+    if ($customField['data_type'] === 'Boolean' && $value !== NULL && $value !== '') {
+      return (bool) $value;
     }
     return $value;
   }

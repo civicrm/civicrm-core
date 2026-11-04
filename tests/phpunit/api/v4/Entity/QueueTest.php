@@ -416,7 +416,7 @@ class QueueTest extends Api4TestBase {
 
     // Not available... yet...
     $claim1 = $queue->claimItem();
-    $this->assertEquals(NULL, $claim1);
+    $this->assertNull($claim1);
 
     // OK, it'll come in a few seconds...
     $claim2 = $this->waitForClaim(0.5, 6, $queueName);
