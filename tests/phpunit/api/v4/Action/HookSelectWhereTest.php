@@ -158,7 +158,7 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
     $this->assertCount(1, $result);
     $this->assertEquals('111 Allowed', $result[0]['address_primary.street_address']);
 
-    $selectWhereCount = substr_count($result->debug['sql'][0], '`location_type_id` IN (1,2)');
+    $selectWhereCount = substr_count($result->debug['sql'][0], "`location_type_id` IN ($homeID,$workID)");
     $this->assertEquals(1, $selectWhereCount);
 
     $aclCount = substr_count($result->debug['sql'][0], 'civicrm_acl_contact_cache');
