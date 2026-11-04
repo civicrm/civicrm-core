@@ -162,7 +162,9 @@
         // Set up watches to refresh search results when needed.
         // Because `angular.$watch` runs immediately as well as on subsequent changes,
         // this also kicks off the first run of the search (if there's no search button).
+        let watchesSetUp = false;
         function setUpWatches() {
+          watchesSetUp = true;
           if (ctrl.afFieldset && !isSubsearch) {
             $scope.$watch(ctrl.afFieldset.getFilterValues, onChangeFilters, true);
           }
@@ -196,17 +198,24 @@
         // - there is a counter (e.g. a contact summary tab)
         // - and the search is hidden or not set to auto-run
         // - or afform filters are present which would interfere with an accurate total
-        // (wait a brief timeout to allow more important things to happen first)
-        $timeout(function() {
-          if (hasCounter && (!(ctrl.loading || ctrl.results) || !angular.equals({}, ctrl.getAfformFilters()))) {
+        // (wait until the browser is idle, at most 900ms, to allow more important things to happen first)
+        const fetchTotalCount = () => {
+          // A visible display without search button is about to run and will set the count itself
+          const willRunSoon = watchesSetUp && !ctrl.settings.button;
+          if (hasCounter && ((!(ctrl.loading || ctrl.results) && !willRunSoon) || !angular.equals({}, ctrl.getAfformFilters()))) {
             const params = ctrl.getApiParams('row_count');
             // Exclude afform filters
             params.filters = ctrl.filters;
-            crmApi4('SearchDisplay', 'run', params).then(function(result) {
-              setTotalCount(result.count);
-            });
+            crmApi4('SearchDisplay', 'run', params).then(result => setTotalCount(result.count));
           }
-        }, 900);
+        };
+        let countTimer, countIdleHandle;
+        if (window.requestIdleCallback) {
+          countIdleHandle = window.requestIdleCallback(() => countTimer = $timeout(fetchTotalCount), {timeout: 900});
+        }
+        else {
+          countTimer = $timeout(fetchTotalCount, 900);
+        }
 
         // Clean up the form handler, visibility poller and pending debounced
         // searches, which are not released by the $scope itself
@@ -217,6 +226,10 @@
           if (checkVisibility) {
             $interval.cancel(checkVisibility);
           }
+          if (countIdleHandle) {
+            window.cancelIdleCallback(countIdleHandle);
+          }
+          $timeout.cancel(countTimer);
           ctrl.getResultsPronto.cancel();
           ctrl.getResultsSoon.cancel();
         });
