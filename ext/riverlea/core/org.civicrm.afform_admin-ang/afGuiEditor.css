@@ -190,7 +190,7 @@
   position: relative;
   margin: 0;
   border-bottom: 0;
-  font-family: sans-serif,'FontAwesome';
+  font-family: sans-serif,FontAwesome;
 }
 .af-gui-entity-palette-select-list {
   border: var(--crm-border);
@@ -246,11 +246,10 @@
   justify-content: space-between;
   align-items: center;
 }
-#afGuiEditor [ui-sortable] .af-gui-bar:before,
-#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover:before,
-#afGuiEditor af-gui-edit-options.af-gui-content-editing-area [ui-sortable] li:before {
+#afGuiEditor [ui-sortable] .af-gui-bar::before,
+#afGuiEditor .af-gui-entity-palette-select-list [ui-sortable] > div:not(.disabled):hover::before,
+#afGuiEditor af-gui-edit-options.af-gui-content-editing-area [ui-sortable] li::before {
   background: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSIjODg4Ij48L3JlY3Q+Cjwvc3ZnPg==");
-  width: var(--crm-l-medium);
   height: calc(100% - var(--crm-l-medium));
   content: ' ';
   width: 10px;
@@ -292,8 +291,7 @@ body.af-gui-dragging #civicrm-menu {
 }
 /* Disable scrollbars while dragging */
 body.af-gui-dragging {
-  overflow-x: hidden;
-  overflow-y: hidden;
+  overflow: hidden;
 }
 af-gui-container > .af-gui-bar,
 .af-gui-element > .af-gui-bar,
@@ -401,7 +399,7 @@ af-gui-container > .af-gui-bar,
   cursor: auto;
 }
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:hover > span,
-#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button[aria-expanded=true] > span,
+#afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button[aria-expanded="true"] > span,
 #afGuiEditor #afGuiEditor-canvas .af-entity-selected > .af-gui-bar > .form-inline > .btn-group > .btn-group > button:focus > span {
   color: var(--crm-link-color);
 }
@@ -420,17 +418,17 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor .af-gui-container-title span:empty {
   font-weight: lighter;
 }
-#afGuiEditor .af-gui-field-required:after {
+#afGuiEditor .af-gui-field-required::after {
   content: '*';
   color: var(--crm-notify-danger-color);
   position: relative;
   left: -4px;
 }
 /* For editing field placeholder text */
-#afGuiEditor .af-gui-field-input input[type=text].form-control {
+#afGuiEditor .af-gui-field-input input[type="text"].form-control {
   color: var(--crm-text-color);
 }
-#afGuiEditor .af-gui-field-input-type-number input[type=text].form-control {
+#afGuiEditor .af-gui-field-input-type-number input[type="text"].form-control {
   background-image: url('data:image/svg+xml,<svg fill="%23000000" width="30px" height="30px" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M 18.179688 16.47 L 19.24 17.54 L 15 21.78 L 10.76 17.54 L 11.82 16.47 L 15 19.66 Z M 15 10.34 L 18.18 13.53 L 19.24 12.46 L 15 8.22 L 10.76 12.46 L 11.82 13.53 Z M 15 10.34"/></svg>');
   background-repeat: no-repeat;
   background-position: center right;
@@ -446,7 +444,7 @@ af-gui-container > .af-gui-bar,
   font-weight: normal;
   margin-right: 10px;
 }
-#afGuiEditor .af-gui-field-input-type-radio label.radio input[type=radio] {
+#afGuiEditor .af-gui-field-input-type-radio label.radio input[type="radio"] {
   margin: 0;
 }
 #afGuiEditor .form-inline:has(label.btn) {
@@ -455,8 +453,8 @@ af-gui-container > .af-gui-bar,
   gap: 4px;
   align-items: center;
 }
-#afGuiEditor label.btn input[type=radio],
-#afGuiEditor label.btn input[type=checkbox] {
+#afGuiEditor label.btn input[type="radio"],
+#afGuiEditor label.btn input[type="checkbox"] {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -492,7 +490,7 @@ af-gui-container > .af-gui-bar,
 #afGuiEditor.af-gui-editing-content .af-gui-bar {
   visibility: hidden;
 }
-#afGuiEditor.af-gui-editing-content .af-gui-bar:before {
+#afGuiEditor.af-gui-editing-content .af-gui-bar::before {
   background: none;
 }
 #afGuiEditor .af-gui-dropzone {
@@ -640,7 +638,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
   padding: 1px;
   margin-left: var(--crm-l-xsmall-2);
 }
-#afGuiEditor li .af-gui-field-select-in-dropdown input[type=number] {
+#afGuiEditor li .af-gui-field-select-in-dropdown input[type="number"] {
   width: 50px;
   padding-inline: var(--crm-l-small) 0;
   height: auto;
@@ -678,7 +676,7 @@ i.crm-i.af-gui-conditional-dialog-move-icon {
   background-image: url('data:image/svg+xml,<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="2.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/><rect x="2.5" y="25.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/><rect x="2.5" y="48.5" width="59" height="13" rx="3.5" stroke="black" stroke-width="5" stroke-linejoin="round"/></svg>');
 }
 
-/* Misc - aka stuff I can't identify but don't want to risk removing*/
+/* Misc - aka stuff I can't identify but don't want to risk removing */
 #bootstrap-theme #afGuiEditor .af-gui-bar .btn.active {
   background-color: color-mix(in srgb, var(--crm-fb-header-bg-color) 80%, #000);
 }

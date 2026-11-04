@@ -39,7 +39,7 @@ body {
   animation-delay: 0.25s;
 }
 
-@-webkit-keyframes slide {
+@keyframes slide {
   100% {
     left: 0;
     color: #000;
@@ -286,7 +286,7 @@ body {
     overflow-x: auto;
     white-space: nowrap;
     width: 95%;
-    margin: 10px 2% 10px 2%;
+    margin: 10px 2%;
   }
 }
 

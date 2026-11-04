@@ -26,7 +26,7 @@
 }
 
 .crm-container crm-dashlet > details.crm-accordion-bold > .crm-dashlet-content {
-  background-color: #ffffff;
+  background-color: #fff;
   border: 0 none;
   border-radius: 0;
   padding: 0.5em;
@@ -34,8 +34,8 @@
   min-height: 10em;
 }
 
-crm-dashlet[is-fullscreen=true] > details,
-crm-dashlet[is-fullscreen=true] > details > .crm-dashlet-content {
+crm-dashlet[is-fullscreen="true"] > details,
+crm-dashlet[is-fullscreen="true"] > details > .crm-dashlet-content {
   height: calc(100% - 1em);
 }
 

@@ -71,7 +71,7 @@
   box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
 }
 
-#bootstrap-theme.crm-search ul.nav-stacked li[role=separator] {
+#bootstrap-theme.crm-search ul.nav-stacked li[role="separator"] {
   height: 12px;
   border-top: 1px solid lightgrey;
   margin-top: 8px;
@@ -179,11 +179,11 @@
   width: 235px;
 }
 
-#bootstrap-theme.crm-search input[type=number] {
+#bootstrap-theme.crm-search input[type="number"] {
   width: 90px;
 }
 /* For display.settings.limit field */
-#bootstrap-theme.crm-search .checkbox-inline.form-control input[type=number] {
+#bootstrap-theme.crm-search .checkbox-inline.form-control input[type="number"] {
   position: relative;
   top: -5px;
   right: -9px;
@@ -241,8 +241,8 @@
   border: 2px dashed grey !important;
 }
 /* Undo Shoreditch add-ons */
-#bootstrap-theme.crm-search .crm-editable-enabled:before,
-#bootstrap-theme.crm-search .crm-editable-enabled:after {
+#bootstrap-theme.crm-search .crm-editable-enabled::before,
+#bootstrap-theme.crm-search .crm-editable-enabled::after {
   content: '';
   display: none;
 }

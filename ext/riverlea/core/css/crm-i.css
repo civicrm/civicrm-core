@@ -7,7 +7,7 @@ is loaded before font-awesome.css so that .fa-XXX classes can modify it. */
 .crm-container .replace-plain::before,
 .crm-i {
   display: inline-block;
-  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome";
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", FontAwesome;
   font-weight: 400;
   font-size: inherit;
   font-style: normal;
@@ -33,7 +33,7 @@ is loaded before font-awesome.css so that .fa-XXX classes can modify it. */
   height: 1rem;
   width: 1rem;
   vertical-align: middle;
-  background-color: currentColor;
+  background-color: currentcolor;
   mask: var(--icon);
   mask-size: cover;
 }

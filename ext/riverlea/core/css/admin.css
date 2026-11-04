@@ -146,10 +146,10 @@
   display: block;
   cursor: pointer;
 }
-label.crm-delete-file input[type=checkbox],
-label.crm-delete-file:has(input[type=checkbox]:not(:checked)) + input[type=file] {
+label.crm-delete-file input[type="checkbox"],
+label.crm-delete-file:has(input[type="checkbox"]:not(:checked)) + input[type="file"] {
   display: none;
 }
-label.crm-delete-file input[type=checkbox]:checked + span {
+label.crm-delete-file input[type="checkbox"]:checked + span {
   text-decoration: line-through;
 }

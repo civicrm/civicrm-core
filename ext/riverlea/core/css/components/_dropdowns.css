@@ -79,8 +79,8 @@
   content: '';
   display: inline-block;
   position: absolute;
-  width: 0px;
-  height: 0px;
+  width: 0;
+  height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-bottom: 5px solid var(--crm-dropdown-bg-color);
@@ -116,7 +116,7 @@
 /* In-table dropdown */
 
 .crm-container .btn-slide::after {
-  font-family: "FontAwesome";
+  font-family: FontAwesome;
   content: "\f0da";
   padding-left: 0.5ch;
 }
@@ -199,7 +199,7 @@
   background-color: var(--crm-container-bg-color);
   border: none;
   color: var(--crm-text-color);
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   width: 100%;
 }
 .crm-container .crm-tooltip-wrapper .crm-tooltip .crm-table-group-summary > tbody > tr > td {

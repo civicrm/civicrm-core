@@ -3,7 +3,7 @@ This is separate to avoid conflict with a site theme's implementation of FA.  It
 is loaded before fontawesome.css so that .fa-XXX classes can modify it. */
 .ui-icon[class*=" fa-"],
 .crm-container a.helpicon,
-.crm-container .replace-plain:before,
+.crm-container .replace-plain::before,
 .crm-i {
   display: var(--fa-display, inline-block);
   font-family: var(--fa-style-family, "Font Awesome 6 Free", "Font Awesome 6 Brands");
@@ -47,7 +47,7 @@ i.crm-i {
   width: 1em;
   vertical-align: middle;
   /* In order to inherit the font color, set background and use the SVG as a mask */
-  background-color: currentColor;
+  background-color: currentcolor;
   /* Many browsers require -webkit prefixes. To avoid repeating long SVG strings, use a css variable */
   mask: var(--icon);
   mask-size: cover;
@@ -59,7 +59,7 @@ i.crm-i {
 
 /* Font Awesome with reduced unicode range to prevent usage for regular characters. */
 @font-face {
-  font-family: "FontAwesomeSafe";
+  font-family: FontAwesomeSafe;
   font-display: block;
   src: url("../bower_components/font-awesome/webfonts/fa-solid-900.woff2") format("woff2"), url("../bower_components/font-awesome/webfonts/fa-solid-900.ttf") format("truetype");
   unicode-range: U+F002;

@@ -5,9 +5,8 @@
 /* SearchKit grid layout styling */
 .crm-search-display-grid-container {
   display: grid;
-  grid-gap: var(--crm-flex-gap);
-  align-items: center;
-  justify-items: center;
+  gap: var(--crm-flex-gap);
+  place-items: center center;
 }
 .crm-search-display-grid-layout-2 {
   grid-template-columns: repeat(2, 1fr);

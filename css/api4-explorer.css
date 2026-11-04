@@ -164,7 +164,7 @@
 #bootstrap-theme .form-inline div.checkbox {
   margin-right: 1em;
 }
-#bootstrap-theme .form-inline div.checkbox label input[type=checkbox] {
+#bootstrap-theme .form-inline div.checkbox label input[type="checkbox"] {
   margin: 0;
 }
 

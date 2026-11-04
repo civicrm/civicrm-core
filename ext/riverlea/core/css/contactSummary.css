@@ -224,7 +224,7 @@ div.crm-inline-edit-form div.crm-clear {
   border-bottom: var(--crm-border);
   border-width: 2px;
 }
-.crm-container .crm-summary-row:after {
+.crm-container .crm-summary-row::after {
   clear: both;
   content: ".";
   display: block;
@@ -255,7 +255,7 @@ div.crm-inline-edit-form div.crm-clear {
   overflow: auto; /* adds scroll for values wider than container */
 }
 .crm-container #customFields .contact_panel td {
-  border-bottom: 1px solid #ffffff;
+  border-bottom: 1px solid #fff;
   padding: 4px;
   vertical-align: top;
 }

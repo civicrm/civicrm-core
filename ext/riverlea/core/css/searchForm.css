@@ -33,8 +33,7 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     width: 100%;
-    column-gap: var(--crm-l-reg);
-    row-gap: var(--crm-l-small);
+    gap: var(--crm-l-small) var(--crm-l-reg);
   }
 }
 .advanced-search-fields .search-field__span-2 {

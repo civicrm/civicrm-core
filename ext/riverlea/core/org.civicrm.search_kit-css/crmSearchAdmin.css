@@ -71,7 +71,7 @@
   border-right: 0 none;
   box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
 }
-.crm-search ul.nav-stacked li[role=separator] {
+.crm-search ul.nav-stacked li[role="separator"] {
   height: var(--crm-l-medium-2);
   border-top: var(--crm-border);
   margin: var(--crm-l-medium) var(--crm-l-large) 0 var(--crm-l-reg);
@@ -142,7 +142,7 @@
 .crm-search fieldset fieldset {
   padding-top: 0;
   border: var(--crm-border);
-  border-width: 0 1px 1px 1px;
+  border-width: 0 1px 1px;
 }
 #bootstrap-theme.crm-search fieldset legend {
   font-size: inherit;
@@ -295,7 +295,7 @@
   opacity: 1;
 }
 /* For display.settings.limit field */
-.crm-search .checkbox-inline.form-control input[type=number] {
+.crm-search .checkbox-inline.form-control input[type="number"] {
   position: relative;
   top: -5px;
   right: -9px;
@@ -356,7 +356,7 @@ crm-search-admin-tags.btn-group-xs .crm-search-admin-tags-btn-label {
   padding-left: 5px;
   padding-right: 5px;
 }
-.crm-container li .form-inline input[type=color] {
+.crm-container li .form-inline input[type="color"] {
   width: 30px;
   padding: 2px 4px;
 }

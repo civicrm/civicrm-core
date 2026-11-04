@@ -11,7 +11,7 @@
 
 .crm-container div#searchForm table.form-layout td {
   padding: 4px;
-  border: 1px solid #dddddd;
+  border: 1px solid #ddd;
 }
 
 /* top submit button on advanced search */
@@ -40,7 +40,7 @@
   background-color: transparent;
   background-image: none;
   border: none;
-  color: #aaaaaa;
+  color: #aaa;
   display: inline;
   font-size: 15px;
   font-weight: normal;
