@@ -143,6 +143,54 @@ class EventScannerTest extends \CiviUnitTestCase {
     $this->assertArrayNotHasKey('hook_civicrm_post::', $listeners);
   }
 
+  /**
+   * The exact same function does not register the same listener more than once
+   * if both legacy interfaces (HookInterface / EventSubscriberInterface) and
+   * #[CiviEventListener] are present, or if duplicate attributes exist.
+   */
+  public function testDuplicateListenersAreDeduplicated(): void {
+    $this->hookClass->setHook('civicrm_entityTypes', function (array &$entityTypes): void {
+      $entityTypes['EventScannerDuplicateThing'] = [
+        'name' => 'EventScannerDuplicateThing',
+        'table' => 'civicrm_event_scanner_duplicate_thing',
+        'class' => EventScannerTest_DAO_DuplicateThing::class,
+        'module' => 'civicrm',
+        'getInfo' => fn() => ['title' => 'Event Scanner Duplicate Thing'],
+        'getFields' => fn() => [
+          'id' => [
+            'sql_type' => 'int unsigned',
+            'input_type' => 'Number',
+            'required' => TRUE,
+            'primary_key' => TRUE,
+            'auto_increment' => TRUE,
+          ],
+        ],
+      ];
+    });
+    EntityRepository::flush();
+
+    // 1. HookInterface + #[CiviEventListener] on the same method in a BAO
+    $baoMap = EventScanner::findListeners(EventScannerTest_BAO_DuplicateThing::class);
+    $this->assertEquals([
+      'hook_civicrm_pre::EventScannerDuplicateThing' => [['self_hook_civicrm_pre', 50]],
+    ], $baoMap);
+
+    // 2. EventSubscriberInterface + #[CiviEventListener] on the same method, plus duplicate in getSubscribedEvents()
+    $subMap = EventScanner::findListeners(EventScannerTest_DuplicateSubscriber::class);
+    $this->assertEquals([
+      'civi.test.duplicate_subscriber' => [['onTestEvent', 50]],
+      'civi.test.duplicate_in_subscriber' => [['onTestEvent', 20]],
+    ], $subMap);
+
+    // 3. Duplicate #[CiviEventListener] attributes on the same method for the same event
+    $attrMap = EventScanner::findListeners(EventScannerTest_DuplicateAttribute::class);
+    $this->assertEquals([
+      'civi.test.dup_attr' => [['onDupAttr', 20]],
+      'civi.test.attr_a' => [['onMultipleEvents', 0]],
+      'civi.test.attr_b' => [['onMultipleEvents', 0]],
+    ], $attrMap);
+  }
+
   public function addScannedFixtures(GenericHookEvent $event): void {
     $event->classes = array_merge($event->classes, $this->scannedFixtures);
   }
@@ -252,4 +300,44 @@ class EventScannerTestConcreteListener extends EventScannerTestAbstractBaseListe
 }
 
 class EventScannerTestChildOfConcreteListener extends EventScannerTestConcreteListener {
+}
+
+class EventScannerTest_DAO_DuplicateThing extends \CRM_Core_DAO_Base {
+}
+
+class EventScannerTest_BAO_DuplicateThing extends EventScannerTest_DAO_DuplicateThing implements HookInterface {
+
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}', priority: 50)]
+  public static function self_hook_civicrm_pre(PreEvent $event): void {
+  }
+
+}
+
+class EventScannerTest_DuplicateSubscriber implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
+
+  public static function getSubscribedEvents(): array {
+    return [
+      'civi.test.duplicate_subscriber' => ['onTestEvent', 10],
+      'civi.test.duplicate_in_subscriber' => [['onTestEvent', 10], ['onTestEvent', 20]],
+    ];
+  }
+
+  #[CiviEventListener(event: 'civi.test.duplicate_subscriber', priority: 50)]
+  public function onTestEvent(): void {
+  }
+
+}
+
+class EventScannerTest_DuplicateAttribute {
+
+  #[CiviEventListener(event: 'civi.test.dup_attr', priority: 10)]
+  #[CiviEventListener(event: 'civi.test.dup_attr', priority: 20)]
+  public function onDupAttr(): void {
+  }
+
+  #[CiviEventListener(event: 'civi.test.attr_a')]
+  #[CiviEventListener(event: 'civi.test.attr_b')]
+  public function onMultipleEvents(): void {
+  }
+
 }

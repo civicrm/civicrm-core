@@ -198,12 +198,31 @@ class EventScanner {
     return $r;
   }
 
+  /**
+   * Merge two listener maps, ensuring that the same function is not registered
+   * more than once for the same event.
+   *
+   * @param array $left
+   * @param array $right
+   * @return array
+   */
   protected static function mergeListenerMap(array $left, array $right): array {
-    if ($left === []) {
-      return $right;
-    }
     foreach ($right as $eventName => $listeners) {
-      $left[$eventName] = array_merge($left[$eventName] ?? [], $listeners);
+      if (!isset($left[$eventName])) {
+        $left[$eventName] = [];
+      }
+      $registeredFuncs = array_map(fn($l) => is_array($l) ? $l[0] : $l, $left[$eventName]);
+      foreach ($listeners as $listener) {
+        $func = is_array($listener) ? $listener[0] : $listener;
+        $key = array_search($func, $registeredFuncs, TRUE);
+        if ($key === FALSE) {
+          $left[$eventName][] = $listener;
+          $registeredFuncs[] = $func;
+        }
+        else {
+          $left[$eventName][$key] = $listener;
+        }
+      }
     }
     return $left;
   }
