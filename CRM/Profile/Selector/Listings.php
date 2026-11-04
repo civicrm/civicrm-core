@@ -760,6 +760,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
       $this->_multiRecordTableName
         = $multiRecordTableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupId, 'table_name');
     }
-  } //func close
+  }
 
 }
