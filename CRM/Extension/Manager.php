@@ -628,7 +628,7 @@ class CRM_Extension_Manager {
    *
    * @return array
    */
-  public function getActiveProcesses(string $key) :Array {
+  public function getActiveProcesses(string $key): array {
     return $this->processes[$key] ?? [];
   }
 
