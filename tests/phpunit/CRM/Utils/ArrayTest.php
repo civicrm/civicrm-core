@@ -177,8 +177,8 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
         'second-third' => '2/3',
       ],
     ];
-    $this->assertEquals('1', CRM_Utils_Array::pathGet($arr, ['one']));
-    $this->assertEquals('2', CRM_Utils_Array::pathGet($arr, ['two', 'half']));
+    $this->assertSame('1', CRM_Utils_Array::pathGet($arr, ['one']));
+    $this->assertSame('2', CRM_Utils_Array::pathGet($arr, ['two', 'half']));
     $this->assertNull(CRM_Utils_Array::pathGet($arr, ['zoo', 'half']));
     CRM_Utils_Array::pathSet($arr, ['zoo', 'half'], '3');
     $this->assertSame(3, CRM_Utils_Array::pathGet($arr, ['zoo', 'half']));

@@ -3131,7 +3131,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $params = ['id' => $contactID];
     $result = $this->callAPISuccess('Contact', 'GetCount', $params);
-    $this->assertEquals('1', $result);
+    $this->assertSame('1', $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
 
@@ -3865,7 +3865,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     $contact = $this->doMerge($isReverse);
     $this->assertSame('Mexico', $contact['country']);
-    $this->assertEquals('90210', $contact['postal_code']);
+    $this->assertSame('90210', $contact['postal_code']);
     $this->assertSame('First on the left after you cross the border', $contact['street_address']);
   }
 

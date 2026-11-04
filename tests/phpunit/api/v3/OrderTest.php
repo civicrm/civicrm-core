@@ -909,8 +909,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ->addWhere('trxn_id', '=', 'WooCommerce Order - 1859')
       ->setSelect(['tax_amount', 'total_amount'])->execute()->first();
 
-    $this->assertEquals('9.69', $contribution['tax_amount']);
-    $this->assertEquals('109.69', $contribution['total_amount']);
+    $this->assertSame('9.69', $contribution['tax_amount']);
+    $this->assertSame('109.69', $contribution['total_amount']);
     Contribution::update()->setValues([
       'source' => 'new one',
       'financial_type_id' => $this->ids['FinancialType']['woo'],
@@ -920,8 +920,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ->addWhere('trxn_id', '=', 'WooCommerce Order - 1859')
       ->setSelect(['tax_amount', 'total_amount'])->execute()->first();
 
-    $this->assertEquals('9.69', $contribution['tax_amount']);
-    $this->assertEquals('109.69', $contribution['total_amount']);
+    $this->assertSame('9.69', $contribution['tax_amount']);
+    $this->assertSame('109.69', $contribution['total_amount']);
   }
 
 }

@@ -242,7 +242,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertSame(1, $checkResult['count']);
     $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_table' => 'civicrm_contribution', 'entity_id' => $checkResult['id']]);
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', ['id' => $entityFinancialTrxn['values'][$entityFinancialTrxn['id']]['financial_trxn_id']]);
-    $this->assertEquals('1234', $financialTrxn['values'][$financialTrxn['id']]['check_number']);
+    $this->assertSame('1234', $financialTrxn['values'][$financialTrxn['id']]['check_number']);
   }
 
   /**

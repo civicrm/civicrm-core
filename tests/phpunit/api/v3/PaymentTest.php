@@ -1192,7 +1192,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   public function testNetAmount(): void {
     $order = $this->createPendingParticipantOrder();
     $payment = $this->callAPISuccess('Payment', 'create', ['order_id' => $order['id'], 'total_amount' => 10, 'fee_amount' => .25]);
-    $this->assertEquals('9.75', $this->callAPISuccessGetValue('Payment', ['id' => $payment['id'], 'return' => 'net_amount']));
+    $this->assertSame('9.75', $this->callAPISuccessGetValue('Payment', ['id' => $payment['id'], 'return' => 'net_amount']));
   }
 
   /**

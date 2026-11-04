@@ -297,7 +297,7 @@ contribution.contribution_page_id.receipt_text :Text in
     $tokenProcessor->evaluate();
     $this->assertSame('€5,990.99', $tokenProcessor->getRow(0)->render('not_specified'));
     $this->assertSame('€5,990.99', $tokenProcessor->getRow(0)->render('money'));
-    $this->assertEquals('5990.99', $tokenProcessor->getRow(0)->render('raw'));
+    $this->assertSame('5990.99', $tokenProcessor->getRow(0)->render('raw'));
   }
 
   /**
@@ -708,7 +708,7 @@ contribution_recur.payment_instrument_id:name :Check
       $this->getCustomFieldName('radio', 4) => 4,
     ]);
     $text = $this->renderText(['membershipId' => $membershipID], '{membership.' . $this->getCustomFieldName('radio', 4) . ':label}');
-    $this->assertEquals('100', $text);
+    $this->assertSame('100', $text);
   }
 
   public function testPledgeTokens(): void {

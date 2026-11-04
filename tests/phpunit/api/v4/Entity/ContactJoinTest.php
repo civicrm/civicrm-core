@@ -161,8 +161,8 @@ class ContactJoinTest extends Api4TestBase {
     ]);
     // Ensure billing phone was assigned to contact
     $contactGet = $this->getTestRecord('Contact', $contact['id'], ['phone_primary.phone', 'phone_billing.phone']);
-    $this->assertEquals('12345', $contactGet['phone_primary.phone']);
-    $this->assertEquals('54321', $contactGet['phone_billing.phone']);
+    $this->assertSame('12345', $contactGet['phone_primary.phone']);
+    $this->assertSame('54321', $contactGet['phone_billing.phone']);
     $billingPhone = $this->getTestRecord('Phone', $billingPhone['id']);
     $this->assertTrue($billingPhone['is_billing']);
     Contact::update(FALSE)
@@ -172,14 +172,14 @@ class ContactJoinTest extends Api4TestBase {
       ->addValue('phone_billing.phone', 99999)
       ->execute();
     $phone = $this->getTestRecord('Phone', ['contact_id' => $contact['id']]);
-    $this->assertEquals('99999', $phone['phone']);
+    $this->assertSame('99999', $phone['phone']);
     $this->assertTrue($phone['is_billing']);
     // Contact only has one phone now, so it should be auto-set to primary
     $this->assertTrue($phone['is_primary']);
 
     $get = $this->getTestRecord('Contact', $contact['id'], ['phone_primary.*', 'phone_billing.*']);
-    $this->assertEquals('99999', $get['phone_primary.phone']);
-    $this->assertEquals('99999', $get['phone_billing.phone']);
+    $this->assertSame('99999', $get['phone_primary.phone']);
+    $this->assertSame('99999', $get['phone_billing.phone']);
     $this->assertEquals($get['phone_primary.id'], $get['phone_billing.id']);
   }
 

@@ -1174,7 +1174,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       ->execute();
     $this->assertCount(1, $customValues);
     $this->assertSame('C2', $customValues[0]['first_name']);
-    $this->assertEquals('2', $customValues[0]['cf.' . $textField]);
+    $this->assertSame('2', $customValues[0]['cf.' . $textField]);
   }
 
   /**

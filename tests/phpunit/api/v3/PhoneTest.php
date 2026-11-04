@@ -150,7 +150,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $id = $result['id'];
     $params = ['id' => $id, 'return.phone_numeric' => 1];
     $result = $this->callAPISuccess('phone', 'get', $params);
-    $this->assertEquals('1234567890', $result['values'][$id]['phone_numeric']);
+    $this->assertSame('1234567890', $result['values'][$id]['phone_numeric']);
   }
 
   /**

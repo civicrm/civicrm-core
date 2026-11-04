@@ -89,8 +89,8 @@ class CRM_Oembed_Page_OembedTest extends \PHPUnit\Framework\TestCase implements 
 
     $this->assertSame('rich', (string) $xml->type);
     $this->assertMatchesRegularExpression(';iframe.*src=.*contribute;', $xml->html);
-    $this->assertEquals('600', $xml->width);
-    $this->assertEquals('400', $xml->height);
+    $this->assertSame('600', $xml->width);
+    $this->assertSame('400', $xml->height);
   }
 
 }

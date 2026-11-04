@@ -311,15 +311,15 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertSame('NO', $ci['test_id']['IS_NULLABLE']);
     $this->assertSame('auto_increment', $ci['test_id']['EXTRA']);
     if (!$this->isMySQL8()) {
-      $this->assertEquals('10', $ci['test_id']['LENGTH']);
+      $this->assertSame('10', $ci['test_id']['LENGTH']);
     }
 
     $this->assertSame('varchar', $ci['test_varchar']['DATA_TYPE']);
-    $this->assertEquals('42', $ci['test_varchar']['LENGTH']);
+    $this->assertSame('42', $ci['test_varchar']['LENGTH']);
 
     $this->assertSame('int', $ci['test_integer']['DATA_TYPE']);
     if (!$this->isMySQL8()) {
-      $this->assertEquals('8', $ci['test_integer']['LENGTH']);
+      $this->assertSame('8', $ci['test_integer']['LENGTH']);
     }
     $this->assertSame('YES', $ci['test_integer']['IS_NULLABLE']);
 
@@ -330,7 +330,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertSame("'A','B','C'", $ci['test_enum']['ENUM_VALUES']);
     $this->assertArrayNotHasKey('LENGTH', $ci['test_enum']);
 
-    $this->assertEquals('42', $ci['test_integer_default']['COLUMN_DEFAULT']);
+    $this->assertSame('42', $ci['test_integer_default']['COLUMN_DEFAULT']);
 
     $this->assertSame('date', $ci['test_date']['DATA_TYPE']);
   }

@@ -53,9 +53,9 @@ class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->first();
     $this->assertSame('bob', $result['first_name']);
-    $this->assertEquals('123', $result['123']);
-    $this->assertEquals('-55', $result['neg']);
-    $this->assertEquals('45.678', $result['45_678']);
+    $this->assertSame('123', $result['123']);
+    $this->assertSame('-55', $result['neg']);
+    $this->assertSame('45.678', $result['45_678']);
   }
 
   public function testSelectStrings(): void {
@@ -121,13 +121,13 @@ class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
       ->first();
     $this->assertSame('Yes', $result['is_bob']);
     $this->assertSame('No', $result['is_fred']);
-    $this->assertEquals('55', $result['5_11']);
+    $this->assertSame('55', $result['5_11']);
     $this->assertFalse($result['five_greater_eleven']);
     $this->assertTrue($result['five_less_eleven']);
     $this->assertTrue($result['is_between']);
     $this->assertArrayNotHasKey('illegal_stuff', $result);
-    $this->assertEquals('5', $result['null_plus_five']);
-    $this->assertEquals('1', $result['one_is_odd']);
+    $this->assertSame('5', $result['null_plus_five']);
+    $this->assertSame('1', $result['one_is_odd']);
   }
 
 }

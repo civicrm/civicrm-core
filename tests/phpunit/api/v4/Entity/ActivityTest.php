@@ -96,7 +96,7 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
         ['activity.record_type_id:name', '=', '"Activity Source"']
       )
       ->execute()->single();
-    $this->assertEquals('1234', $contactGet['activity.subject']);
+    $this->assertSame('1234', $contactGet['activity.subject']);
     $this->assertEquals($sourceContactId, $contactGet['activity.source_contact_id']);
     $this->assertEquals($targetContactIds, $contactGet['activity.target_contact_id']);
     $this->assertEquals($expectedAssigneeContactIds, $contactGet['activity.assignee_contact_id']);

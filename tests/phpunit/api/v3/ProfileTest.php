@@ -381,7 +381,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'profile_id' => $profile['id'],
     ]);
     $this->assertArrayKeyExists('first_name', $result['values']);
-    $this->assertEquals('2', $result['values']['first_name']['type']);
+    $this->assertSame('2', $result['values']['first_name']['type']);
     $this->assertSame('Email', $result['values']['email-primary']['title']);
     $this->assertSame('phone', $result['values']['phone-primary-1']['entity']);
     $this->assertSame('phone', $result['values']["phone_and_ext-$homeLocationTypeID-2"]['entity']);

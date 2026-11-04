@@ -363,10 +363,10 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $lineItem = LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->first();
-    $this->assertEquals('100', $lineItem['line_total']);
-    $this->assertEquals('20', $lineItem['tax_amount']);
+    $this->assertSame('100', $lineItem['line_total']);
+    $this->assertSame('20', $lineItem['tax_amount']);
     $trxnAmount = $this->getFinancialTrxnAmount($contribution['id']);
-    $this->assertEquals('120.00', $trxnAmount);
+    $this->assertSame('120.00', $trxnAmount);
 
     Contribution::update(FALSE)
       ->addWhere('id', '=', $contribution['id'])
@@ -378,14 +378,14 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single();
 
-    $this->assertEquals('300.00', $lineItem['line_total']);
+    $this->assertSame('300.00', $lineItem['line_total']);
     $financialTransactions = EntityFinancialTrxn::get()
       ->addSelect('*', 'financial_trxn_id.amount')
       ->addWhere('entity_table', '=', 'civicrm_contribution')
       ->addWhere('entity_id', '=', $contribution['id'])
       ->execute();
     $this->assertCount(3, $financialTransactions);
-    $this->assertEquals('300.00', $this->getFinancialTrxnAmount($contribution['id']));
+    $this->assertSame('300.00', $this->getFinancialTrxnAmount($contribution['id']));
     $financialItems = FinancialItem::get(FALSE)
       ->addWhere('entity_id', '=', $lineItem['id'])
       ->addWhere('entity_table', '=', 'civicrm_line_item')

@@ -203,8 +203,8 @@ class CustomGroupACLTest extends Api4TestBase {
       ->addWhere('id', '=', $cid)
       ->addSelect('custom.*')
       ->execute()->single();
-    $this->assertEquals('123', $result['MyReadWriteSingle.MyField']);
-    $this->assertEquals('456', $result['MyReadOnlySingle.MyField']);
+    $this->assertSame('123', $result['MyReadWriteSingle.MyField']);
+    $this->assertSame('456', $result['MyReadOnlySingle.MyField']);
     $this->assertArrayNotHasKey('MySuperSecretSingle.MyField', $result);
 
     // Ensure ACLs apply to APIv4 Individual.get
@@ -212,8 +212,8 @@ class CustomGroupACLTest extends Api4TestBase {
       ->addWhere('id', '=', $cid)
       ->addSelect('custom.*')
       ->execute()->single();
-    $this->assertEquals('123', $result['MyReadWriteSingle.MyField']);
-    $this->assertEquals('456', $result['MyReadOnlySingle.MyField']);
+    $this->assertSame('123', $result['MyReadWriteSingle.MyField']);
+    $this->assertSame('456', $result['MyReadOnlySingle.MyField']);
     $this->assertArrayNotHasKey('MySuperSecretSingle.MyField', $result);
 
     // Ensure ACLs apply to APIv3 get
@@ -222,9 +222,9 @@ class CustomGroupACLTest extends Api4TestBase {
       'check_permissions' => 1,
       'return' => [$v3['single']['readWrite'], $v3['single']['readOnly'], $v3['single']['superSecret']],
     ])['values'][$cid];
-    $this->assertEquals('123', $result[$v3['single']['readWrite']]);
+    $this->assertSame('123', $result[$v3['single']['readWrite']]);
     $this->assertArrayNotHasKey($v3['single']['superSecret'], $result);
-    $this->assertEquals('456', $result[$v3['single']['readOnly']]);
+    $this->assertSame('456', $result[$v3['single']['readOnly']]);
 
     // Try to update all fields - ACLs will restrict based on write access
     Individual::update()->setValues([
@@ -242,9 +242,9 @@ class CustomGroupACLTest extends Api4TestBase {
       ->addSelect('first_name', 'custom.*')
       ->execute()->single();
     $this->assertSame('test1234', $result['first_name']);
-    $this->assertEquals('1234', $result['MyReadWriteSingle.MyField']);
-    $this->assertEquals('456', $result['MyReadOnlySingle.MyField']);
-    $this->assertEquals('789', $result['MySuperSecretSingle.MyField']);
+    $this->assertSame('1234', $result['MyReadWriteSingle.MyField']);
+    $this->assertSame('456', $result['MyReadOnlySingle.MyField']);
+    $this->assertSame('789', $result['MySuperSecretSingle.MyField']);
 
     // Try updating all fields with APIv3 - ACLs will restrict based on write access
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view all contacts', 'edit all contacts'];
@@ -264,9 +264,9 @@ class CustomGroupACLTest extends Api4TestBase {
       ->addSelect('first_name', 'custom.*')
       ->execute()->single();
     $this->assertSame('test12345', $result['first_name']);
-    $this->assertEquals('12345', $result['MyReadWriteSingle.MyField']);
-    $this->assertEquals('456', $result['MyReadOnlySingle.MyField']);
-    $this->assertEquals('789', $result['MySuperSecretSingle.MyField']);
+    $this->assertSame('12345', $result['MyReadWriteSingle.MyField']);
+    $this->assertSame('456', $result['MyReadOnlySingle.MyField']);
+    $this->assertSame('789', $result['MySuperSecretSingle.MyField']);
 
     // TEST MULTI-VALUE CUSTOM GROUPS
 

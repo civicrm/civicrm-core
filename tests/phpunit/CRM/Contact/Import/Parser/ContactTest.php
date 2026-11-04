@@ -1889,7 +1889,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contacts = $this->getImportedContacts();
     $this->assertCount(4, $contacts);
     $this->assertCount(1, $contacts['Susie Jones']['phone']);
-    $this->assertEquals('123', $contacts['Susie Jones']['phone'][0]['phone_ext']);
+    $this->assertSame('123', $contacts['Susie Jones']['phone'][0]['phone_ext']);
     $this->assertCount(2, $contacts['Mum Jones']['phone']);
     $this->assertCount(1, $contacts['sis@example.com']['phone']);
     $this->assertCount(0, $contacts['Soccer Superstars']['phone']);

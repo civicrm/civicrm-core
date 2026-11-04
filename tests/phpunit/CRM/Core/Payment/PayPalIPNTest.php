@@ -302,7 +302,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     // assert that contribution is completed after getting response from paypal standard which has transaction id set and completed status
     $this->assertEquals($_REQUEST['txn_id'], $contribution['trxn_id']);
     $this->assertEquals($completedStatusID, $contribution['contribution_status_id']);
-    $this->assertEquals('5.00', $contribution['fee_amount']);
+    $this->assertSame('5.00', $contribution['fee_amount']);
     $this->assertSame('test12345', $contribution['custom_' . $this->ids['CustomField']['Contribution']]);
   }
 
@@ -371,7 +371,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $contribution1 = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->_contributionID]);
     $this->assertSame(1, $contribution1['contribution_status_id']);
     $this->assertSame('8XA571746W2698126', $contribution1['trxn_id']);
-    $this->assertEquals('0.63', $contribution1['fee_amount']);
+    $this->assertSame('0.63', $contribution1['fee_amount']);
     // source gets set by processor
     $this->assertSame('Online Contribution:', substr($contribution1['contribution_source'], 0, 20));
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);

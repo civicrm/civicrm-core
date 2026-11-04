@@ -93,7 +93,7 @@ class LocBlockTest extends Api4TestBase implements TransactionalInterface {
     $updatedLocBlock = $this->getTestRecord('LocBlock', $locBlockId, ['*', 'address_id.street_address', 'phone_id.phone', 'email_id.email']);
 
     $this->assertEquals($locBlock['address_id'], $updatedLocBlock['address_id']);
-    $this->assertEquals('123', $updatedLocBlock['address_id.street_address']);
+    $this->assertSame('123', $updatedLocBlock['address_id.street_address']);
     $this->assertNull($updatedLocBlock['phone_id.phone']);
     $this->assertNull($updatedLocBlock['email_id.email']);
   }

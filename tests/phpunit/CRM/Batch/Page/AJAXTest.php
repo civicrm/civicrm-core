@@ -56,7 +56,7 @@ class CRM_Batch_Page_AJAXTest extends CiviUnitTestCase {
     $savedData = CRM_Core_DAO::getFieldValue('CRM_Batch_DAO_Batch', $batch['id'], 'data');
     $this->assertNotEmpty($savedData);
     $decoded = json_decode($savedData, TRUE);
-    $this->assertEquals('100.00', $decoded['values']['field_1_total_amount']);
+    $this->assertSame('100.00', $decoded['values']['field_1_total_amount']);
     $this->assertArrayNotHasKey('qfKey', $decoded['values']);
   }
 

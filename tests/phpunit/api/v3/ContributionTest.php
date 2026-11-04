@@ -1210,10 +1210,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'sequential' => 1,
       'return' => 'line_total',
     ]);
-    $this->assertEquals('100.00', $lineItems);
+    $this->assertSame('100.00', $lineItems);
     $trxnAmount = $this->_getFinancialTrxnAmount($contribution['id']);
     // Financial trxn SUM = 100 + 5 (fee)
-    $this->assertEquals('105.00', $trxnAmount);
+    $this->assertSame('105.00', $trxnAmount);
     $newParams = [
 
       'id' => $contribution['id'],
@@ -1229,12 +1229,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'return' => 'line_total',
     ]);
 
-    $this->assertEquals('125.00', $lineItems);
+    $this->assertSame('125.00', $lineItems);
     $trxnAmount = $this->_getFinancialTrxnAmount($contribution['id']);
 
     // Financial trxn SUM = 125 + 5 (fee).
-    $this->assertEquals('130.00', $trxnAmount);
-    $this->assertEquals('125.00', $this->_getFinancialItemAmount($contribution['id']));
+    $this->assertSame('130.00', $trxnAmount);
+    $this->assertSame('125.00', $this->_getFinancialItemAmount($contribution['id']));
   }
 
   /**
@@ -1259,7 +1259,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $contribution = $contribution['values'][$contribution['id']];
-    $this->assertEquals('1', $contribution['contribution_status_id']);
+    $this->assertSame('1', $contribution['contribution_status_id']);
     $lineItems = LineItem::get(FALSE)->addWhere('contribution_id', '=', $contribution['id'])
       ->execute();
     foreach ($lineItems as $item) {
@@ -2116,9 +2116,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $contribution['id'], 'sequential' => 1]);
     $this->assertSame('Completed', $contribution['contribution_status']);
-    $this->assertEquals('7778888', $contribution['trxn_id']);
-    $this->assertEquals('0.56', $contribution['fee_amount']);
-    $this->assertEquals('99.44', $contribution['net_amount']);
+    $this->assertSame('7778888', $contribution['trxn_id']);
+    $this->assertSame('0.56', $contribution['fee_amount']);
+    $this->assertSame('99.44', $contribution['net_amount']);
   }
 
   /**
@@ -2167,8 +2167,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contributionPostPayment = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID, 'return' => ['tax_amount', 'fee_amount', 'net_amount']]);
     $this->assertEquals(4.76, $contributionPrePayment['tax_amount']);
     $this->assertEquals(4.76, $contributionPostPayment['tax_amount']);
-    $this->assertEquals('6.00', $contributionPostPayment['fee_amount']);
-    $this->assertEquals('94.00', $contributionPostPayment['net_amount']);
+    $this->assertSame('6.00', $contributionPostPayment['fee_amount']);
+    $this->assertSame('94.00', $contributionPostPayment['net_amount']);
     $this->validateAllContributions();
     $this->validateAllPayments();
   }
@@ -2810,8 +2810,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertSame('civicrm_contribution', $lineItem[0]['entity_table']);
     $this->assertEquals($this->ids['Contribution'][0], $lineItem[0]['contribution_id']);
     $this->assertEquals($this->ids['Contribution'][0], $lineItem[1]['contribution_id']);
-    $this->assertEquals('100.00', $lineItem[0]['line_total']);
-    $this->assertEquals('200.00', $lineItem[1]['line_total']);
+    $this->assertSame('100.00', $lineItem[0]['line_total']);
+    $this->assertSame('200.00', $lineItem[1]['line_total']);
     $this->assertEquals($membership['id'], $lineItem[1]['entity_id']);
     $this->assertSame('civicrm_membership', $lineItem[1]['entity_table']);
   }
@@ -5192,10 +5192,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $id = $this->callAPISuccess('Contribution', 'create', $params)['id'];
     // Reading the return values of the API isn't reliable here; get the data from the db.
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $id]);
-    $this->assertEquals('100.00', $contribution['total_amount']);
-    $this->assertEquals('20.00', $contribution['fee_amount']);
-    $this->assertEquals('80.00', $contribution['net_amount']);
-    $this->assertEquals('80.00', $contribution['non_deductible_amount']);
+    $this->assertSame('100.00', $contribution['total_amount']);
+    $this->assertSame('20.00', $contribution['fee_amount']);
+    $this->assertSame('80.00', $contribution['net_amount']);
+    $this->assertSame('80.00', $contribution['non_deductible_amount']);
   }
 
   /**

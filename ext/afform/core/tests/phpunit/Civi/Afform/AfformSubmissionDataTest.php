@@ -211,7 +211,7 @@ EOHTML;
     // By default, dynamic fields at index 0 should be populated
     $this->assertSame('John', $record['Individual1.0.first_name']);
     $this->assertSame('Doe', $record['Individual1.0.last_name']);
-    $this->assertEquals('2', $record['Individual1.0.gender_id']);
+    $this->assertSame('2', $record['Individual1.0.gender_id']);
     $this->assertEquals(['1', '2'], $record['Individual1.0.preferred_communication_method']);
     $this->assertEquals(['Student', 'Staff'], $record['Individual1.0.contact_sub_type:name']);
     $this->assertSame('john.doe1@example.com', $record['Individual1.0.Email.0.email']);

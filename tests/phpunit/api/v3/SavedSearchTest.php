@@ -58,7 +58,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
 
     $this->assertEquals($contactID, $savedSearch['created_id']);
     $this->assertEquals($contactID, $savedSearch['modified_id']);
-    $this->assertEquals('20210808000000', $savedSearch['expires_date']);
+    $this->assertSame('20210808000000', $savedSearch['expires_date']);
 
     $this->assertNotNull($savedSearch['id']);
 

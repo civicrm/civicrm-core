@@ -1092,8 +1092,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'Database check for created contact address.'
     );
 
-    $this->assertEquals('41.70130897956', $addAddress->geo_code_1, 'In line' . __LINE__);
-    $this->assertEquals('-73.9194186863', $addAddress->geo_code_2, 'In line' . __LINE__);
+    $this->assertSame('41.70130897956', $addAddress->geo_code_1, 'In line' . __LINE__);
+    $this->assertSame('-73.9194186863', $addAddress->geo_code_2, 'In line' . __LINE__);
   }
 
   /**

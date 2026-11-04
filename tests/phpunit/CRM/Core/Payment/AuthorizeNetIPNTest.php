@@ -157,7 +157,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertRecurStatus('In Progress');
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->ids['Contribution']['default']]);
     $this->assertSame(1, $contribution['contribution_status_id']);
-    $this->assertEquals('6511143069', $contribution['trxn_id']);
+    $this->assertSame('6511143069', $contribution['trxn_id']);
     // source gets set by processor
     $this->assertSame(strpos($contribution['contribution_source'], 'Online Contribution:'), 0);
 
@@ -216,7 +216,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->ids['Contribution']['default']]);
     $this->assertSame(1, $contribution['contribution_status_id']);
-    $this->assertEquals('6511143069', $contribution['trxn_id']);
+    $this->assertSame('6511143069', $contribution['trxn_id']);
     // source gets set by processor
     $this->assertSame('Online Contribution:', substr($contribution['contribution_source'], 0, 20));
     $this->assertRecurStatus('In Progress');
@@ -233,7 +233,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->ids['Contribution']['default']]);
     $this->assertSame(1, $contribution['contribution_status_id']);
-    $this->assertEquals('6511143069', $contribution['trxn_id']);
+    $this->assertSame('6511143069', $contribution['trxn_id']);
     // source gets set by processor
     $this->assertSame('Online Contribution:', substr($contribution['contribution_source'], 0, 20));
 
@@ -261,7 +261,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->ids['Contribution'][0]]);
     $this->assertSame(1, $contribution['contribution_status_id']);
-    $this->assertEquals('6511143069', $contribution['trxn_id']);
+    $this->assertSame('6511143069', $contribution['trxn_id']);
 
     // source gets set by processor
     $this->assertSame('Online Contribution:', substr($contribution['contribution_source'], 0, 20));
@@ -453,7 +453,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertRecurStatus('In Progress');
     $contribution = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->ids['Contribution']['default']]);
     $this->assertSame(1, $contribution['contribution_status_id']);
-    $this->assertEquals('6511143069', $contribution['trxn_id']);
+    $this->assertSame('6511143069', $contribution['trxn_id']);
     // source gets set by processor
     $this->assertSame(strpos($contribution['contribution_source'], 'Online Contribution:'), 0);
     $this->callAPISuccess('Contribution', 'create', [

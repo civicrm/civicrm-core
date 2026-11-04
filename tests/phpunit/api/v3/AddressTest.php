@@ -486,7 +486,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     unset($params['street_number']);
     $address1 = $this->callAPISuccess('address', 'create', $params);
     // should find state_province_id of 1019, Maryland, United States ... NOT 3497, Maryland, Liberia
-    $this->assertEquals('1019', $address1['values'][0]['state_province_id']);
+    $this->assertSame('1019', $address1['values'][0]['state_province_id']);
 
     // Now try it in Liberia
     $params = $this->_params;

@@ -29,11 +29,11 @@ class CheckoutOptionUtilsTest extends TestCase implements HeadlessInterface {
       'amount' => 10,
     ]);
 
-    $this->assertEquals('04', $mapped['month']);
+    $this->assertSame('04', $mapped['month']);
     $this->assertEquals($currentYear + 1, $mapped['year']);
     // Original expiry_ prefixed keys should still be present - this is
     // an additive mapping, not a rename.
-    $this->assertEquals('04', $mapped['expiry_month']);
+    $this->assertSame('04', $mapped['expiry_month']);
     $this->assertSame(10, $mapped['amount']);
   }
 

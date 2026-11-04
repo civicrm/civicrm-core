@@ -78,7 +78,7 @@ class CRM_Batch_Import_Parser_BatchTest extends CiviUnitTestCase {
     $this->assertSame('Batch One', $batches[0]['title']);
     $this->assertSame('First test batch', $batches[0]['description']);
     $this->assertSame('Open', $batches[0]['status_id:name']);
-    $this->assertEquals('100.00', $batches[0]['total']);
+    $this->assertSame('100.00', $batches[0]['total']);
     $this->assertSame(10, $batches[0]['item_count']);
     $this->assertSame('Batch Two', $batches[1]['title']);
     $this->assertSame('Closed', $batches[1]['status_id:name']);
@@ -117,7 +117,7 @@ class CRM_Batch_Import_Parser_BatchTest extends CiviUnitTestCase {
     $this->assertSame('Batch One', $batches[0]['title']);
     $this->assertSame('First test batch', $batches[0]['description']);
     $this->assertSame('Open', $batches[0]['status_id:name']);
-    $this->assertEquals('100.00', $batches[0]['total']);
+    $this->assertSame('100.00', $batches[0]['total']);
     $this->assertSame(10, $batches[0]['item_count']);
     $this->assertSame('Batch Two', $batches[1]['title']);
     $this->assertSame('Closed', $batches[1]['status_id:name']);
@@ -161,14 +161,14 @@ class CRM_Batch_Import_Parser_BatchTest extends CiviUnitTestCase {
       ->addOrderBy('id')
       ->execute();
     $this->assertCount(3, $batches);
-    $this->assertEquals('100093', $batches[0]['title']);
-    $this->assertEquals('5400.00', $batches[0]['total']);
+    $this->assertSame('100093', $batches[0]['title']);
+    $this->assertSame('5400.00', $batches[0]['total']);
     $this->assertSame(8, $batches[0]['item_count']);
-    $this->assertEquals('100094', $batches[1]['title']);
-    $this->assertEquals('215.00', $batches[1]['total']);
+    $this->assertSame('100094', $batches[1]['title']);
+    $this->assertSame('215.00', $batches[1]['total']);
     $this->assertSame(4, $batches[1]['item_count']);
-    $this->assertEquals('100095', $batches[2]['title']);
-    $this->assertEquals('50.00', $batches[2]['total']);
+    $this->assertSame('100095', $batches[2]['title']);
+    $this->assertSame('50.00', $batches[2]['total']);
     $this->assertSame(2, $batches[2]['item_count']);
 
     unlink($file);

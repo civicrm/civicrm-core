@@ -387,7 +387,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 'Completed',
     ]);
-    $this->assertEquals('50.00', $contribution['total_amount']);
+    $this->assertSame('50.00', $contribution['total_amount']);
     $this->assertEquals(.08, $contribution['fee_amount']);
     $this->assertEquals(49.92, $contribution['net_amount']);
     $this->assertSame('tx', $contribution['trxn_id']);
@@ -437,7 +437,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact'][0],
       'contribution_status_id' => 'Completed',
     ]);
-    $this->assertEquals('50.00', $contribution['total_amount']);
+    $this->assertSame('50.00', $contribution['total_amount']);
     $this->assertSame(0, $contribution['non_deductible_amount']);
   }
 
@@ -470,14 +470,14 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 'Failed',
     ], 1);
     $lineItem = $this->callAPISuccessGetSingle('line_item', []);
-    $this->assertEquals('50.00', $lineItem['unit_price'] * $lineItem['qty']);
-    $this->assertEquals('50.00', $lineItem['line_total']);
+    $this->assertSame('50.00', $lineItem['unit_price'] * $lineItem['qty']);
+    $this->assertSame('50.00', $lineItem['line_total']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $lineItem['financial_type_id']);
     $financialItem = $this->callAPISuccessGetSingle('financial_item', [
       'civicrm_line_item' => $lineItem['id'],
       'entity_id' => $lineItem['id'],
     ]);
-    $this->assertEquals('50.00', $financialItem['amount']);
+    $this->assertSame('50.00', $financialItem['amount']);
     $this->assertSame(3, $financialItem['status_id']);
     $this->assertPrematureExit();
   }
@@ -976,7 +976,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($this->getPaymentInstrumentID('Check'), $reversedTrxn['payment_instrument_id']);
 
     $this->assertEquals(1200.55, $latestTrxn['total_amount']);
-    $this->assertEquals('1011', $latestTrxn['pan_truncation']);
+    $this->assertSame('1011', $latestTrxn['pan_truncation']);
     $this->assertEquals($this->getPaymentInstrumentID('Credit Card'), $latestTrxn['payment_instrument_id']);
     $this->callAPISuccessGetSingle('LineItem', []);
   }

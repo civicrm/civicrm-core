@@ -260,8 +260,8 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
 
     $membershipRenewDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership['id']);
 
-    $this->assertEquals('20060121', $membershipRenewDates['start_date'], 'Verify membership renewal start date.');
-    $this->assertEquals('20080120', $membershipRenewDates['end_date'], 'Verify membership renewal end date.');
+    $this->assertSame('20060121', $membershipRenewDates['start_date'], 'Verify membership renewal start date.');
+    $this->assertSame('20080120', $membershipRenewDates['end_date'], 'Verify membership renewal end date.');
 
     $this->membershipDelete($membership['id']);
     $this->membershipTypeDelete(['id' => $membershipTypeID]);

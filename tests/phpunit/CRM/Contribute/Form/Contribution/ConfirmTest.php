@@ -527,7 +527,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', [
       'id' => $financialTrxnId,
     ])['values'][$financialTrxnId];
-    $this->assertEquals('1111', $financialTrxn['pan_truncation']);
+    $this->assertSame('1111', $financialTrxn['pan_truncation']);
     $this->assertSame(1, $financialTrxn['card_type_id']);
 
     $form->checkTemplateVariable('is_separate_payment', TRUE);
