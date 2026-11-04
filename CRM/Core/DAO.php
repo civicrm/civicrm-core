@@ -1,12 +1,12 @@
 <?php
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -3298,14 +3298,25 @@ SELECT contact_id
     $bao = new static();
     $tableAlias ??= $bao->tableName();
     $entityName ??= CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($bao));
-    $finalClauses = [];
-    $fields = static::getSupportedFields();
     $selectWhereClauses = $bao->addSelectWhereClause($entityName, $userId, $conditions);
+    return self::formatSelectWhereClauses($selectWhereClauses, $tableAlias, static::getSupportedFields());
+  }
+
+  /**
+   * Format raw selectWhereClauses into SQL strings per field.
+   *
+   * @param array $selectWhereClauses
+   * @param string $tableAlias
+   * @param array $fields
+   * @return array
+   */
+  public static function formatSelectWhereClauses(array $selectWhereClauses, string $tableAlias, array $fields): array {
+    $finalClauses = [];
     foreach ($selectWhereClauses as $fieldName => $fieldClauses) {
       $finalClauses[$fieldName] = NULL;
       if ($fieldClauses) {
         if (!is_array($fieldClauses)) {
-          CRM_Core_Error::deprecatedWarning('Expected array of selectWhereClauses for ' . $bao->tableName() . '.' . $fieldName . ', instead got ' . json_encode($fieldClauses));
+          CRM_Core_Error::deprecatedWarning('Expected array of selectWhereClauses for ' . $tableAlias . '.' . $fieldName . ', instead got ' . json_encode($fieldClauses));
           $fieldClauses = (array) $fieldClauses;
         }
         $formattedClauses = [];
@@ -3318,9 +3329,11 @@ SELECT contact_id
             $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . $subClause . ')';
           }
         }
-        $finalClauses[$fieldName] = '(' . implode(' AND ', $formattedClauses) . ')';
-        if (empty($fields[$fieldName]['required'])) {
-          $finalClauses[$fieldName] = "(`$tableAlias`.`$fieldName` IS NULL OR {$finalClauses[$fieldName]})";
+        if ($formattedClauses) {
+          $finalClauses[$fieldName] = '(' . implode(' AND ', $formattedClauses) . ')';
+          if (empty($fields[$fieldName]['required'])) {
+            $finalClauses[$fieldName] = "(`$tableAlias`.`$fieldName` IS NULL OR {$finalClauses[$fieldName]})";
+          }
         }
       }
     }
