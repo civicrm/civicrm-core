@@ -55,7 +55,7 @@
   }
 
   /* For adminimal_admin_menu */
-  body.crm-menubar-visible.crm-menubar-over-cms-menu.admin-menu.adminimal-menu:before {
+  body.crm-menubar-visible.crm-menubar-over-cms-menu.admin-menu.adminimal-menu::before {
     height: 0;
   }
   body.crm-menubar-visible.crm-menubar-below-cms-menu.admin-menu.adminimal-menu.menu-render-newline #civicrm-menu-nav #civicrm-menu {
@@ -71,10 +71,10 @@
     display: none;
   }
   body.crm-menubar-visible.crm-menubar-below-cms-menu.admin-menu.adminimal-menu {
-    padding-top: 0px !important;
+    padding-top: 0 !important;
   }
   body.crm-menubar-below-cms-menu.admin-menu.adminimal-menu > #civicrm-menu-nav #civicrm-menu {
-    top: 0px !important;
+    top: 0 !important;
   }
 }
 

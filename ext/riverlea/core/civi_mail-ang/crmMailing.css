@@ -1,5 +1,5 @@
 .crmMailing select,
-.crmMailing input[type=text] {
+.crmMailing input[type="text"] {
   width: 36em;
 }
 .crmMailing textarea {
@@ -14,8 +14,8 @@
   text-align: center;
 }
 .crmMailing input.crm-form-date,
-.crmMailing input[name=preview_test_email],
-.crmMailing-preview select[name=preview_test_group] {
+.crmMailing input[name="preview_test_email"],
+.crmMailing-preview select[name="preview_test_group"] {
   width: var(--crm-input-width);
 }
 .crmMailing .crmMailing-preview {
@@ -41,7 +41,7 @@
   width: var(--crm-input-large-width);
   margin: auto;
 }
-input[name=preview_test_email]::placeholder {
+input[name="preview_test_email"]::placeholder {
   text-align: center;
 }
 .crmMailing-inactive {

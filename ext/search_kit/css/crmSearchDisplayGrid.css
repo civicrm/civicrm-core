@@ -1,9 +1,8 @@
 /* SearchKit grid layout styling */
 .crm-search-display-grid-container {
   display: grid;
-  grid-gap: 1em;
-  align-items: center;
-  justify-items: center;
+  gap: 1em;
+  place-items: center center;
 }
 
 .crm-search-display-grid-layout-2 {

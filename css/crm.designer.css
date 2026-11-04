@@ -89,7 +89,7 @@
 .crm-designer-palette .crm-designer-palette-tree .jstree-hovered {
   background: transparent;
   border: 1px transparent;
-  padding: 1px 2px 0 2px;
+  padding: 1px 2px 0;
 }
 
 .crm-designer-canvas {
@@ -239,8 +239,7 @@ button#crm-designer-add-custom-set {
 
 .crm-profile-selector-preview-pane,
 .crm-designer-dialog .crm-designer .scroll {
-  overflow-x: auto;
-  overflow-y: scroll;
+  overflow: auto scroll;
 }
 
 .ui-dialog {

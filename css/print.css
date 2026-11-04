@@ -1,6 +1,6 @@
 /* CiviCRM Print Media Stylesheet */
 
-/* Hide any buttons or other form items when printing*/
+/* Hide any buttons or other form items when printing */
 #crm-container .buttons,
 #crm-container .crm-submit-buttons,
 #crm-container .crm-actions-ribbon,
@@ -12,7 +12,7 @@ table.form-layout td,
 table.form-layout th {
   border: 1px solid grey;
   padding: 4px;
-  margin: 0px;
+  margin: 0;
 }
 
 .form-item .element-right {
@@ -20,13 +20,13 @@ table.form-layout th {
 }
 #crm-container {
   overflow: visible !important;
-  font-family: DejaVu Sans, sans-serif;
-  margin: 0px 10px 0px 10px;
+  font-family: "DejaVu Sans", sans-serif;
+  margin: 0 10px;
 }
 
 /* CSS for Print and PDF of Reports */
 #crm-container .report-layout {
-  border: 1px groove #dddddd;
+  border: 1px groove #ddd;
   width: 100%;
   border-collapse: collapse;
 }
@@ -49,19 +49,19 @@ table.form-layout th {
 }
 
 #crm-container .report-contents {
-  border: 1px groove #dddddd;
+  border: 1px groove #ddd;
   padding: 4px;
   width: 20%;
 }
 
 #crm-container .report-contents-right {
-  border: 1px groove #dddddd;
+  border: 1px groove #ddd;
   padding: 4px;
   text-align: right;
 }
 
 #crm-container table.report-layout td {
-  border: 1px groove #dddddd;
+  border: 1px groove #ddd;
   padding: 4px;
 }
 
@@ -79,7 +79,7 @@ table.form-layout th {
 }
 
 #crm-container div.page-break {
-  page-break-before: always;
+  break-before: page;
   height: 0;
 }
 
@@ -91,7 +91,7 @@ table.form-layout th {
 #crm-container table.report-layout th {
   padding: 4px;
   background-color: #dcdcdc;
-  /*text-align       : left;*/
+  /* text-align       : left; */
   vertical-align: top;
 }
 
@@ -132,5 +132,5 @@ table.form-layout th {
 
 /* Fix for CRM-19869 */
 tr {
-  page-break-inside: avoid;
+  break-inside: avoid;
 }

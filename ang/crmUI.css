@@ -18,7 +18,7 @@
   min-height: 1em;
   min-width: 3em;
 }
-.crm-container [crm-ui-editable]:empty:before {
+.crm-container [crm-ui-editable]:empty::before {
   content: attr(placeholder);
   color: #9a9a9a;
 }

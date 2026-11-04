@@ -19,7 +19,7 @@ form.crm-search-display-page {
 }
 .crm-search-display th.crm-sortable-col span {
   white-space: break-spaces;
-  word-wrap: initial;
+  overflow-wrap: initial;
 }
 .crm-search-display th i.fa-sort-desc,
 .crm-search-display th i.fa-sort-asc {
@@ -104,7 +104,7 @@ form.crm-search-display-page {
 }
 .crm-editable-enabled:has(span.crm-search-field-value:empty)::before {
   content: "\f303";
-  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome";
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", FontAwesome;
   font-weight: 400;
   font-size: inherit;
   font-style: normal;
@@ -128,13 +128,13 @@ form.crm-search-display-page {
   gap: 0;
 }
 #bootstrap-theme .crm-search-field-editing
-:where(input,.select2-container):where(:not(.crm-form-date,.crm-form-time):not([type="checkbox"]):not([type="radio"])) {
+:where(input,.select2-container):where(:not(.crm-form-date, .crm-form-time, [type="checkbox"], [type="radio"])) {
   width: 12ch !important /* vs inline width */;
 }
 #bootstrap-theme .crm-search-field-editing .crm-ajax-select {
   width: 16ch !important /* vs inline width */;
 }
-#bootstrap-theme .crm-search-field-editing input[type=number] {
+#bootstrap-theme .crm-search-field-editing input[type="number"] {
   width: 9ch;
 }
 .crm-search-display tr:has(.crm-search-field-editing) td.crm-search-ctrl-column:has(.btn-group) { /* Controls for full-row edit */

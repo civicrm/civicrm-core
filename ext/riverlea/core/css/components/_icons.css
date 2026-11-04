@@ -10,7 +10,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container .messages.crm-empty-table::before,
 .crm-search-display-table > table.table > thead > tr > th i.crm-search-table-column-sort-icon,
 .crm-credit_card_type-icons a::before {
-  font: normal normal var(--crm-font-size) "Font Awesome 6 Free", "FontAwesome";
+  font: normal normal var(--crm-font-size) "Font Awesome 6 Free", FontAwesome;
   text-rendering: auto;
   margin: 0 var(--crm-l-medium) 0 0;
 }
@@ -31,7 +31,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
   display: none;
 }
 input#crm-qsearch-input::placeholder {
-  font-family: sans-serif, 'FontAwesome'; /* Fix for type in placeholders */
+  font-family: sans-serif, FontAwesome; /* Fix for type in placeholders */
 }
 
 /* Notification icons */
@@ -165,7 +165,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 .crm-container th.crm-sortable-col i.crm-search-table-column-sort-icon::before,
 .crm-container table.dataTable thead th:is(.sorting,.sorting_asc,.sorting_desc)::before,
 .jstree-default .jstree-icon {
-  font-family: "Font Awesome 6 Free", "FontAwesome";
+  font-family: "Font Awesome 6 Free", FontAwesome;
   font-style: normal;
   text-rendering: auto;
   font-size: var(--crm-contact-icon-size);
