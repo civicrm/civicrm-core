@@ -49,7 +49,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     $values = ['check1' => 'chk'];
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typecheck($type, $value);
-      $this->assertEquals(NULL, $valid, 'Checking invalid type for returned CustomField Type.');
+      $this->assertFalse($valid, 'Checking invalid type for returned CustomField Type.');
     }
   }
 
@@ -60,7 +60,7 @@ class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
     ];
     foreach ($values as $type => $value) {
       $valid = CRM_Core_BAO_CustomValue::typecheck($type, $value);
-      $this->assertEquals(NULL, $valid, 'Checking type ' . $type . ' for returned CustomField Type.');
+      $this->assertFalse($valid, 'Checking type ' . $type . ' for returned CustomField Type.');
     }
   }
 

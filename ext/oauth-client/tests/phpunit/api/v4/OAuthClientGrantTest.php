@@ -21,7 +21,7 @@ class api_v4_OAuthClientGrantTest extends \PHPUnit\Framework\TestCase implements
 
   public function setUp(): void {
     parent::setUp();
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client WHERE guid <> "{civi_connect}"'));
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_oauth_client WHERE guid <> "{civi_connect}"'));
   }
 
   public function tearDown(): void {
