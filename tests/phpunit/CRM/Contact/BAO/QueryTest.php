@@ -627,7 +627,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       $resultDAO = $queryObj->searchQuery();
 
       if ($searchPrimary) {
-        $this->assertEquals($resultDAO->N, 0);
+        $this->assertSame(0, $resultDAO->N);
       }
       else {
         //Assert secondary email gets included in search results.

@@ -481,7 +481,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
 
     # hooked item should be added
     $contactLinks = $data['links']['Contact'];
-    $this->assertEquals(count($contactLinks), 4);
+    $this->assertSame(4, count($contactLinks));
     $this->assertSame('/civicrm/profile/create&reset=1&context=dialog&gid=5', $contactLinks[3]['url']);
 
     # links and filters need to be JSON arrays, ie use sequential keys

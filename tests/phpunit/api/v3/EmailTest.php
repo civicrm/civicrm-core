@@ -156,11 +156,11 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess('email', 'create', $this->_params);
     $get = $this->callAPISuccess('email', 'create', $this->_params);
-    $this->assertEquals($get['count'], 1);
+    $this->assertSame(1, $get['count']);
     $get = $this->callAPISuccess('email', 'create', $this->_params + ['debug' => 1]);
-    $this->assertEquals($get['count'], 1);
+    $this->assertSame(1, $get['count']);
     $get = $this->callAPISuccess('email', 'create', $this->_params + ['debug' => 1, 'action' => 'get']);
-    $this->assertEquals($get['count'], 1);
+    $this->assertSame(1, $get['count']);
     $this->callAPISuccess('email', 'delete', ['id' => $result['id']]);
   }
 

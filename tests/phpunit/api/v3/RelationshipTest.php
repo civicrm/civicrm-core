@@ -548,18 +548,18 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'contact_id' => $this->_cId_b,
     ];
     $result = $this->callAPISuccess('relationship', 'get', $params);
-    $this->assertEquals($result['count'], 1);
+    $this->assertSame(1, $result['count']);
     $params = [
       'contact_id_a' => $this->_cId_a,
     ];
     $result = $this->callAPISuccess('relationship', 'get', $params);
-    $this->assertEquals($result['count'], 1);
+    $this->assertSame(1, $result['count']);
     // contact_id_a is wrong so should be no matches
     $params = [
       'contact_id_a' => $this->_cId_b,
     ];
     $result = $this->callAPISuccess('relationship', 'get', $params);
-    $this->assertEquals($result['count'], 0);
+    $this->assertSame(0, $result['count']);
   }
 
   /**
@@ -668,7 +668,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
     $getParams = ['filters' => ['is_current' => 1]];
     $result = $this->callAPISuccess('relationship', 'get', $getParams);
-    $this->assertEquals($result['count'], 1);
+    $this->assertSame(1, $result['count']);
     $this->AssertEquals($rel1['id'], $result['id']);
 
     // now try not started
@@ -682,7 +682,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $rel3 = $this->callAPISuccess('relationship', 'create', $rel2Params);
 
     $result = $this->callAPISuccess('relationship', 'get', $getParams);
-    $this->assertEquals($result['count'], 1);
+    $this->assertSame(1, $result['count']);
     $this->AssertEquals($rel1['id'], $result['id']);
 
     foreach ([$rel0, $rel1, $rel2, $rel3] as $rel) {
@@ -742,28 +742,28 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('relationship', 'get', $getParams);
-    $this->assertEquals($result['count'], 2);
+    $this->assertSame(2, $result['count']);
     $this->AssertEquals([$rel2['id'], $rel3['id']], array_keys($result['values']));
 
     $getParams = [
       'relationship_type_id' => ['NOT IN' => [$relationType2, $relationType3]],
     ];
     $result = $this->callAPISuccess('relationship', 'get', $getParams);
-    $this->assertEquals($result['count'], 2);
+    $this->assertSame(2, $result['count']);
     $this->assertEquals([$rel1['id'], $rel4['id']], array_keys($result['values']));
 
     $getParams = [
       'relationship_type_id' => ['BETWEEN' => [$relationType2, $relationType4]],
     ];
     $result = $this->callAPISuccess('relationship', 'get', $getParams);
-    $this->assertEquals($result['count'], 3);
+    $this->assertSame(3, $result['count']);
     $this->AssertEquals([$rel2['id'], $rel3['id'], $rel4['id']], array_keys($result['values']));
 
     $getParams = [
       'relationship_type_id' => ['NOT BETWEEN' => [$relationType2, $relationType4]],
     ];
     $result = $this->callAPISuccess('relationship', 'get', $getParams);
-    $this->assertEquals($result['count'], 1);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals([$rel1['id']], array_keys($result['values']));
 
     foreach ([$relationType2, $relationType3, $relationType4] as $id) {

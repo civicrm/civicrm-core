@@ -413,7 +413,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'id' => $ov['id'],
       'return' => 'is_active',
     ]);
-    $this->assertEquals($val, 0, "update with no group id is not proper" . __LINE__);
+    $this->assertSame(0, $val, "update with no group id is not proper" . __LINE__);
   }
 
   /**
@@ -440,7 +440,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'id' => $ov['id'],
       'return' => 'is_active',
     ]);
-    $this->assertEquals($val, 0, "update with group id is not proper " . __LINE__);
+    $this->assertSame(0, $val, "update with group id is not proper " . __LINE__);
   }
 
   /**

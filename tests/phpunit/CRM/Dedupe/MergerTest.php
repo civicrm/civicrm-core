@@ -195,7 +195,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // will   - dale - will@example.com
     // will   - dale - will@example.com
     // so 3 pairs for - first + last + mail
-    $this->assertEquals(count($foundDupes), 3, 'Check Individual-Supervised dupe rule for dupesInGroup().');
+    $this->assertSame(3, count($foundDupes), 'Check Individual-Supervised dupe rule for dupesInGroup().');
 
     // Run dedupe finder as the browser would
     //avoid invalid key error
@@ -222,7 +222,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     // batch merge selected dupes
     $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->_groupId, 'safe', 5, 1);
-    $this->assertEquals(count($result['merged']), 2, 'Check number of merged pairs.');
+    $this->assertSame(2, count($result['merged']), 'Check number of merged pairs.');
 
     $stats = $this->callAPISuccess('Dedupe', 'getstatistics', [
       'group_id' => $this->_groupId,
@@ -233,7 +233,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     // retrieve pairs from prev next cache table
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
-    $this->assertEquals(count($pnDupePairs), 1, 'Check number of remaining dupe pairs in prev next cache.');
+    $this->assertSame(1, count($pnDupePairs), 'Check number of remaining dupe pairs in prev next cache.');
 
     $this->deleteDupeContacts();
   }
@@ -245,7 +245,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->createDupeContacts();
 
     // verify that all contacts have been created separately
-    $this->assertEquals(count($this->_contactIds), 9, 'Check for number of contacts.');
+    $this->assertSame(9, count($this->_contactIds), 'Check for number of contacts.');
 
     $dao = new CRM_Dedupe_DAO_DedupeRuleGroup();
     $dao->contact_type = 'Individual';
@@ -265,7 +265,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // will   - dale - will@example.com
     // will   - dale - will@example.com
     // so 3 pairs for - first + last + mail
-    $this->assertEquals(count($foundDupes), 3, 'Check Individual-Supervised dupe rule for dupesInGroup().');
+    $this->assertSame(3, count($foundDupes), 'Check Individual-Supervised dupe rule for dupesInGroup().');
 
     // Run dedupe finder as the browser would
     //avoid invalid key error
@@ -286,7 +286,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     // batch merge all dupes
     $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->_groupId, 'safe', 5, 2);
-    $this->assertEquals(count($result['merged']), 3, 'Check number of merged pairs.');
+    $this->assertSame(3, count($result['merged']), 'Check number of merged pairs.');
 
     $stats = $this->callAPISuccess('Dedupe', 'getstatistics', [
       'rule_group_id' => $dao->id,
@@ -294,7 +294,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     ]);
     // retrieve pairs from prev next cache table
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
-    $this->assertEquals(count($pnDupePairs), 0, 'Check number of remaining dupe pairs in prev next cache.');
+    $this->assertSame(0, count($pnDupePairs), 'Check number of remaining dupe pairs in prev next cache.');
 
     $this->deleteDupeContacts();
   }

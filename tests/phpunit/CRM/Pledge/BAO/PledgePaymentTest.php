@@ -69,7 +69,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $paymentid = CRM_Pledge_BAO_PledgePayment::deletePayments($payment->pledge_id);
 
-    $this->assertEquals($paymentid, 1, "Deleted one payment");
+    $this->assertSame(1, $paymentid, "Deleted one payment");
   }
 
   /**
@@ -82,7 +82,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
 
     // No payments should be retrieved
     $pledgePayment = CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
-    $this->assertEquals(count($pledgePayment), 0, "Checking for empty array");
+    $this->assertSame(0, count($pledgePayment), "Checking for empty array");
   }
 
   /**
@@ -344,17 +344,17 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     ]);
 
     // The status of the first 3 pledges should be set to complete
-    $this->assertEquals($pledgePayments['values'][0]['status_id'], 1);
+    $this->assertSame(1, $pledgePayments['values'][0]['status_id']);
     $this->assertEquals($pledgePayments['values'][0]['actual_amount'], 404.70);
 
-    $this->assertEquals($pledgePayments['values'][1]['status_id'], 1);
-    $this->assertEquals($pledgePayments['values'][1]['actual_amount'], 0);
+    $this->assertSame(1, $pledgePayments['values'][1]['status_id']);
+    $this->assertSame(0, $pledgePayments['values'][1]['actual_amount']);
 
-    $this->assertEquals($pledgePayments['values'][2]['status_id'], 1);
-    $this->assertEquals($pledgePayments['values'][2]['actual_amount'], 0);
+    $this->assertSame(1, $pledgePayments['values'][2]['status_id']);
+    $this->assertSame(0, $pledgePayments['values'][2]['actual_amount']);
 
     // Fourth pledge should still be pending
-    $this->assertEquals($pledgePayments['values'][3]['status_id'], 2);
+    $this->assertSame(2, $pledgePayments['values'][3]['status_id']);
   }
 
   /**

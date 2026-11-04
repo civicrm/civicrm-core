@@ -71,7 +71,7 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
 
     $Phones = CRM_Core_BAO_Phone::allPhones($contactId);
 
-    $this->assertEquals(count($Phones), 2, 'Checking number of returned Phones.');
+    $this->assertSame(2, count($Phones), 'Checking number of returned Phones.');
 
     $firstPhoneValue = array_slice($Phones, 0, 1);
 

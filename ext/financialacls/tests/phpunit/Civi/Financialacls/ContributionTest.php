@@ -137,7 +137,7 @@ class ContributionTest extends BaseTestClass {
     ]);
     $this->createLoggedInUser();
     $visibleFTs = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search');
-    $this->assertEquals(count($visibleFTs), 0);
+    $this->assertSame(0, count($visibleFTs));
 
     // With financial ACLs.
     $permissions = array_merge(\CRM_Core_Config::singleton()->userPermissionClass->permissions, [
@@ -150,7 +150,7 @@ class ContributionTest extends BaseTestClass {
     // Clear pseudoconstant lookup cache.
     unset(\Civi::$statics['CRM_Core_PseudoConstant']);
     $visibleFTs = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search');
-    $this->assertEquals(count($visibleFTs), 4);
+    $this->assertSame(4, count($visibleFTs));
   }
 
 }

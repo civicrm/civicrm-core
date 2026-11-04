@@ -566,8 +566,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
       foreach ($activities as $key => $value) {
         $this->assertSame("subject {$datasetActivityIDs[$key]}", $value['subject'], 'Verify activity subject is correct.');
-        $this->assertEquals($value['activity_type_id'], 2, 'Verify activity type is correct.');
-        $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
+        $this->assertSame(2, $value['activity_type_id'], 'Verify activity type is correct.');
+        $this->assertSame(1, $value['status_id'], 'Verify all activities are scheduled.');
       }
     }
 
@@ -636,8 +636,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
       foreach ($activities as $key => $value) {
         $this->assertSame("subject {$datasetActivityIDs[$key]}", $value['subject'], 'Verify activity subject is correct.');
-        $this->assertEquals($value['activity_type_id'], 2, 'Verify activity type is correct.');
-        $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
+        $this->assertSame(2, $value['activity_type_id'], 'Verify activity type is correct.');
+        $this->assertSame(1, $value['status_id'], 'Verify all activities are scheduled.');
 
         if ($datasetActivityIDs[$key] == 3) {
           $this->assertArrayHasKey($contactID, $value['target_contact_name']);
@@ -745,10 +745,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $this->assertSame("subject {$datasetID}", $value['subject'], 'Verify activity subject is correct.');
 
       if ($datasetID > 8) {
-        $this->assertEquals($value['status_id'], 2, 'Verify all activities are scheduled.');
+        $this->assertSame(2, $value['status_id'], 'Verify all activities are scheduled.');
       }
       else {
-        $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
+        $this->assertSame(1, $value['status_id'], 'Verify all activities are scheduled.');
       }
 
       if ($datasetID === 12) {
@@ -759,10 +759,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         $this->assertTrue(in_array($targetContactID, [$this->getXMLDataSetID('civicrm_contact', 10), $this->getXMLDataSetID('civicrm_contact', 11)]));
       }
       elseif ($datasetID > 8) {
-        $this->assertEquals($value['activity_type_id'], 1, 'Verify activity type is correct.');
+        $this->assertSame(1, $value['activity_type_id'], 'Verify activity type is correct.');
       }
       else {
-        $this->assertEquals($value['activity_type_id'], 2, 'Verify activity type is correct.');
+        $this->assertSame(2, $value['activity_type_id'], 'Verify activity type is correct.');
       }
 
       if ($datasetID == 3) {

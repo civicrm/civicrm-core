@@ -121,8 +121,8 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 5.00);
     $this->assertEquals($contribution['values'][$contribution['id']]['net_amount'], 95.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['trxn_id'], 23456);
-    $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 78910);
+    $this->assertSame(23456, $contribution['values'][$contribution['id']]['trxn_id']);
+    $this->assertSame(78910, $contribution['values'][$contribution['id']]['invoice_id']);
     $this->assertSame('SSF', $contribution['values'][$contribution['id']]['contribution_source']);
     $this->assertSame('Completed', $contribution['values'][$contribution['id']]['contribution_status']);
     $this->callAPISuccess('Contribution', 'Delete', [
@@ -150,7 +150,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'check_permissions' => TRUE,
     ];
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
-    $this->assertEquals($contribution['count'], 0);
+    $this->assertSame(0, $contribution['count']);
 
     $this->addFinancialAclPermissions([['view', 'Donation']]);
     $this->callAPISuccessGetSingle('contribution', $params);

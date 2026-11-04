@@ -52,7 +52,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'Database check on updated financial trxn record.'
     );
 
-    $this->assertEquals($result, 10, 'Verify financial trxn total_amount.');
+    $this->assertSame(10, $result, 'Verify financial trxn total_amount.');
   }
 
   /**
@@ -220,8 +220,8 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
         'return' => ['card_type_id', 'pan_truncation'],
       ]
     );
-    $this->assertEquals($financialTrxn['card_type_id'], 2);
-    $this->assertEquals($financialTrxn['pan_truncation'], 4567);
+    $this->assertSame(2, $financialTrxn['card_type_id']);
+    $this->assertSame(4567, $financialTrxn['pan_truncation']);
   }
 
   /**

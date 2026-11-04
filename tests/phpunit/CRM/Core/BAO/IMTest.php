@@ -40,7 +40,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
     IM::update(FALSE)->addWhere('id', '=', $imId)->setValues($params)->execute();
 
     $isEditIM = $this->assertDBNotNull('CRM_Core_DAO_IM', $imId, 'provider_id', 'id', 'Database check on updated IM provider_name record.');
-    $this->assertEquals($isEditIM, 3, 'Verify IM provider_id value is 3.');
+    $this->assertSame(3, $isEditIM, 'Verify IM provider_id value is 3.');
     $isEditIM = $this->assertDBNotNull('CRM_Core_DAO_IM', $imId, 'name', 'id', 'Database check on updated IM name record.');
     $this->assertSame('doe.jane', $isEditIM, 'Verify IM provider_id value is doe.jane.');
 
@@ -56,7 +56,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
     $contactId = $this->getXMLDataSetID('civicrm_contact', 69);
     $IMs = CRM_Core_BAO_IM::allIMs($contactId);
 
-    $this->assertEquals(count($IMs), 3, 'Checking number of returned IMs.');
+    $this->assertSame(3, count($IMs), 'Checking number of returned IMs.');
 
     $firstIMValue = array_slice($IMs, 0, 1);
 

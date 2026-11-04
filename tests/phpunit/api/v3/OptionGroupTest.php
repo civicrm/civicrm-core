@@ -41,7 +41,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   public function testGetOptionGroupGetFieldsCreateAction(): void {
     $result = $this->callAPISuccess('option_group', 'getfields', ['action' => 'create']);
     $this->assertFalse(empty($result['values']));
-    $this->assertEquals($result['values']['name']['api.unique'], 1);
+    $this->assertSame(1, $result['values']['name']['api.unique']);
   }
 
   public function testGetOptionGroupByID(): void {

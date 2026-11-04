@@ -241,7 +241,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('event', 'create', $params);
     $this->assertSame(1, $result['values'][0]['payment_processor'][0], "handing of payment processor compatibility");
     $result = $this->callAPISuccess('event', 'get', $params);
-    $this->assertEquals($result['values'][0]['payment_processor_id'], 1, "handing get payment processor compatibility");
+    $this->assertSame(1, $result['values'][0]['payment_processor_id'], "handing get payment processor compatibility");
   }
 
   /**
@@ -768,7 +768,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'sequential' => 1,
     ];
     $result = $this->callAPISuccess('event', 'get', $getParams);
-    $this->assertEquals($result['count'], 3);
+    $this->assertSame(3, $result['count']);
     $res = $result['values'][0];
     $this->assertArrayKeyExists('title', $res);
     $this->assertEquals($res['event_type_id'], $this->_params[1]['event_type_id']);

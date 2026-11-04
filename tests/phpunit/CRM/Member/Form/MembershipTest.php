@@ -1377,7 +1377,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact']['individual_0'],
       'contribution_status_id' => 2,
     ]);
-    $this->assertEquals($contribution['trxn_id'], 777);
+    $this->assertSame(777, $contribution['trxn_id']);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
@@ -1445,7 +1445,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact']['individual_0'],
       'contribution_status_id' => 2,
     ]);
-    $this->assertEquals($contribution['trxn_id'], 777);
+    $this->assertSame(777, $contribution['trxn_id']);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],

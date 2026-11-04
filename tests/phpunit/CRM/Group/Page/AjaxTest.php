@@ -570,7 +570,7 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
     $params = [1 => [$group->id, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
-    $this->assertEquals($dao->N, 1, '1 record should be found in smart group');
+    $this->assertSame(1, $dao->N, '1 record should be found in smart group');
 
     // Load the Manage Group page code and we should get a count from our
     // group because the cache is fresh.

@@ -97,7 +97,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
   public function testAddDouble(): void {
 
     $result = $this->callAPISuccess('entity_tag', 'create', $this->_params);
-    $this->assertEquals($result['added'], 1);
+    $this->assertSame(1, $result['added']);
 
     $params = [
       'contact_id_i' => $this->_individualID,
@@ -106,8 +106,8 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('entity_tag', 'create', $params);
-    $this->assertEquals($result['added'], 1);
-    $this->assertEquals($result['not_added'], 1);
+    $this->assertSame(1, $result['added']);
+    $this->assertSame(1, $result['not_added']);
   }
 
   /**
@@ -164,7 +164,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     ];
 
     $householdEntity = $this->callAPISuccess('entity_tag', 'create', $params);
-    $this->assertEquals($householdEntity['added'], 1);
+    $this->assertSame(1, $householdEntity['added']);
   }
 
   /**
@@ -210,9 +210,9 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('entity_tag', 'delete', $params);
 
-    $this->assertEquals($result['not_removed'], 0);
-    $this->assertEquals($result['removed'], 2);
-    $this->assertEquals($result['total_count'], 2);
+    $this->assertSame(0, $result['not_removed']);
+    $this->assertSame(2, $result['removed']);
+    $this->assertSame(2, $result['total_count']);
   }
 
   public function testEntityTagDeleteINDHH(): void {
@@ -231,7 +231,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('entity_tag', 'delete', $params);
 
-    $this->assertEquals($result['removed'], 2);
+    $this->assertSame(2, $result['removed']);
   }
 
   public function testEntityTagDeleteHH(): void {
@@ -248,7 +248,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('entity_tag', 'delete', $params);
-    $this->assertEquals($result['removed'], 1);
+    $this->assertSame(1, $result['removed']);
   }
 
   public function testEntityTagDeleteHHORG(): void {
@@ -266,8 +266,8 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('entity_tag', 'delete', $params);
-    $this->assertEquals($result['removed'], 1);
-    $this->assertEquals($result['not_removed'], 1);
+    $this->assertSame(1, $result['removed']);
+    $this->assertSame(1, $result['not_removed']);
   }
 
   public function testEntityTagCommonDeleteHH(): void {
@@ -284,7 +284,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('entity_tag', 'delete', $params);
-    $this->assertEquals($result['removed'], 1);
+    $this->assertSame(1, $result['removed']);
   }
 
   public function testEntityTagCommonDeleteHHORG(): void {
@@ -302,8 +302,8 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('entity_tag', 'delete', $params);
-    $this->assertEquals($result['removed'], 1);
-    $this->assertEquals($result['not_removed'], 1);
+    $this->assertSame(1, $result['removed']);
+    $this->assertSame(1, $result['not_removed']);
   }
 
   public function testEntityTagJoin(): void {

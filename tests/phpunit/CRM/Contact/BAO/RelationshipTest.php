@@ -306,7 +306,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals($relationshipObj->relationship_type_id, $relationship_type_id_1);
     $this->assertEquals($relationshipObj->contact_id_a, $contact_id_1);
     $this->assertEquals($relationshipObj->contact_id_b, $contact_id_2);
-    $this->assertEquals($relationshipObj->is_active, 1);
+    $this->assertSame(1, $relationshipObj->is_active);
 
     // demonstrate PR 15103 - should fail before the patch and pass after
     $today = date('Ymd');
@@ -318,7 +318,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals($relationshipObj->relationship_type_id, $relationship_type_id_1);
     $this->assertEquals($relationshipObj->contact_id_a, $contact_id_1);
     $this->assertEquals($relationshipObj->contact_id_b, $contact_id_2);
-    $this->assertEquals($relationshipObj->is_active, 1);
+    $this->assertSame(1, $relationshipObj->is_active);
     $this->assertEquals($relationshipObj->end_date, $today);
   }
 

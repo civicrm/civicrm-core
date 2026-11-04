@@ -49,7 +49,7 @@ class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
     $allowedToLogin = $this->assertDBNotNull('CRM_Core_DAO_OpenID', $openId, 'allowed_to_login', 'id',
       'Database check on updated OpenID record.'
     );
-    $this->assertEquals($allowedToLogin, 1, 'Verify allowed_to_login value is 1.');
+    $this->assertSame(1, $allowedToLogin, 'Verify allowed_to_login value is 1.');
   }
 
   /**

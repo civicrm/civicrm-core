@@ -49,7 +49,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     $isBulkMail = $this->assertDBNotNull('CRM_Core_DAO_Email', $emailId, 'is_bulkmail', 'id',
       'Database check on updated email record.'
     );
-    $this->assertEquals($isBulkMail, 1, 'Verify bulkmail value is 1.');
+    $this->assertSame(1, $isBulkMail, 'Verify bulkmail value is 1.');
 
     $this->contactDelete($contactId);
   }
@@ -167,7 +167,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
 
     $emails = CRM_Core_BAO_Email::allEmails($contactId);
 
-    $this->assertEquals(count($emails), 3, 'Checking number of returned emails.');
+    $this->assertSame(3, count($emails), 'Checking number of returned emails.');
 
     $firstEmailValue = array_slice($emails, 0, 1);
 
