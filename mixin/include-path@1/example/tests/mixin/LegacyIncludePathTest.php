@@ -23,6 +23,21 @@ class LegacyIncludePathTest extends \PHPUnit\Framework\Assert {
       return rtrim($p, DIRECTORY_SEPARATOR);
     }, explode(PATH_SEPARATOR, $includePath));
     $this->assertContains($extPath, $dirs, 'Extension root directory should be present in PHP include_path when installed.');
+
+    // Repeated boots within one process must not grow include_path.
+    if (!$cv->isLocal()) {
+      return;
+    }
+    $counts = $cv->phpEval('
+      $count = fn() => count(explode(PATH_SEPARATOR, get_include_path()));
+      $before = $count();
+      for ($i = 0; $i < 3; $i++) {
+        \Civi::reset();
+        \CRM_Core_Config::singleton(TRUE, TRUE);
+      }
+      return [$before, $count()];
+    ');
+    $this->assertSame($counts[0], $counts[1], 'Rebooting the container should not grow include_path.');
   }
 
   public function testDisabled(object $cv): void {

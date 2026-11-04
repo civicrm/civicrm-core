@@ -32,6 +32,8 @@
  */
 return function ($mixInfo, $bootCache) {
   $extRoot = $mixInfo->getPath() . DIRECTORY_SEPARATOR;
-  $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
-  set_include_path($include_path);
+  // The mixin runs again on every container boot; add the path only once.
+  if (!in_array($extRoot, explode(PATH_SEPARATOR, get_include_path()), TRUE)) {
+    set_include_path($extRoot . PATH_SEPARATOR . get_include_path());
+  }
 };
