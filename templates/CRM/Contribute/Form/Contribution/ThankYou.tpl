@@ -12,18 +12,13 @@
 {/if}
 {* Please keep Confirm.tpl and ThankYou.tpl somewhat in sync *}
 <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-thankyou-form-block" data-page-id="{$contributionPageID}" data-page-template="thankyou">
-  {if $thankyou_text}
-    <div id="thankyou_text" class="crm-section thankyou_text-section">
-      {$thankyou_text}
-    </div>
-  {/if}
-
-  {* Show link to Tell a Friend (CRM-2153) *}
-  {if $friendText}
-    <div id="tell-a-friend" class="crm-section friend_link-section">
-      <a href="{$friendURL}" title="{$friendText|escape:'html'}" class="button"><span><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> {$friendText}</span></a>
-    </div>{if !$linkText}<br /><br />{/if}
-  {/if}
+  {crmRegion name="contribution-thankyou-text"}
+    {if $thankyou_text}
+      <div id="thankyou_text" class="crm-section thankyou_text-section">
+        {$thankyou_text}
+      </div>
+    {/if}
+  {/crmRegion}
   {* Add button for donor to create their own Personal Campaign page *}
   {if $linkText}
     <div class="crm-section create_pcp_link-section">
