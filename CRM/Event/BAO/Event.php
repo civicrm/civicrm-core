@@ -2071,6 +2071,7 @@ WHERE  ce.loc_block_id = $locBlockId";
     {$extraWhereClause}
   GROUP BY  participant.event_id";
 
+    CRM_Utils_Hook::alterCountQuery($query, $eventId, $extraWhereClause);
     return (int) CRM_Core_DAO::singleValueQuery($query, [1 => [$eventId, 'Positive']]);
   }
 
