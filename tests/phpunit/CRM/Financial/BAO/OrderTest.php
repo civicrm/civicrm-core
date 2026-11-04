@@ -259,6 +259,50 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * A free membership order is completed on creation, so the membership is
+   * activated, and a later payment of 0 leaves the contribution Completed.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateFreeOrderForMembershipCompletesOrder(): void {
+    $this->setUpMembershipPriceSet(0);
+    $contribution = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        'entity_id.source' => 'Test',
+      ])
+      ->execute()->single();
+    $this->assertEquals(0, $contribution['total_amount']);
+
+    $membershipID = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single()['entity_id'];
+    $getContributionStatus = fn() => Contribution::get(FALSE)
+      ->addSelect('contribution_status_id:name')
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute()->single()['contribution_status_id:name'];
+    $getMembershipStatus = fn() => Membership::get(FALSE)
+      ->addSelect('status_id:name')
+      ->addWhere('id', '=', $membershipID)
+      ->execute()->single()['status_id:name'];
+
+    $this->assertEquals('Completed', $getContributionStatus());
+    $this->assertEquals('New', $getMembershipStatus());
+
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 0)
+      ->execute();
+
+    $this->assertEquals('Completed', $getContributionStatus());
+    $this->assertEquals('New', $getMembershipStatus());
+  }
+
+  /**
    * Test create Order API for membership.
    * Specifically testing status_id:name and membership dates using Contribution.receive_date
    *
@@ -737,7 +781,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   /**
    *
    */
-  public function setUpMembershipPriceSet(): void {
+  public function setUpMembershipPriceSet(float $amount = 100): void {
     $this->membershipTypeCreate(['title' => 'First'], 'first');
     $this->membershipTypeCreate(['title' => 'Second'], 'second');
     $this->createTestEntity('PriceSet', [
@@ -757,7 +801,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       'price_field_id.name' => 'membership_first',
       'name' => 'membership_first',
       'label' => 'Membership Type',
-      'amount' => 100,
+      'amount' => $amount,
       'financial_type_id:name' => 'Member Dues',
       'membership_type_id.name' => 'First',
     ], 'membership_first');
