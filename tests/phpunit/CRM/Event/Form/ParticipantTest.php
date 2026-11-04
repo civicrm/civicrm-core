@@ -184,7 +184,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'note' => 'I wrote a note',
       'event_id' => $this->getEventID(),
     ], ['cid' => $this->individualCreate()])
-      ->postProcess();;
+      ->postProcess();
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['version' => 4]);
     $this->assertEquals(2, $contribution['contribution_status_id']);
