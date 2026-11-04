@@ -22,7 +22,7 @@
  * `include_path`, then you should enable the mixin instead.
  *
  * @mixinName include-path
- * @mixinVersion 1.0.0
+ * @mixinVersion 1.0.1
  * @since 6.19
  *
  * @param CRM_Extension_MixInfo $mixInfo
