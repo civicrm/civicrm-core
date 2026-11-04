@@ -1956,10 +1956,18 @@ class CRM_Financial_BAO_Order {
 
     $result = Contribution::create(FALSE)
       ->setValues($this->contributionValues)->execute();
-    $this->saveOrderCompletionMetadata((int) $result->first()['id']);
+    $contributionID = (int) $result->first()['id'];
+    $this->saveOrderCompletionMetadata($contributionID);
     if ($this->contributionValues['total_amount'] == 0.0) {
-      // A $0 order has nothing to pay, so don't leave it pending.
-      CRM_Contribute_BAO_Contribution::writeRecord(['id' => $result->first()['id'], 'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')]);
+      // The order is created Pending, but a $0 order has nothing to pay, so record
+      // the payment of 0 that settles it. That completes the order through the same
+      // path a paid order takes, activating its memberships and participants.
+      CRM_Financial_BAO_Payment::create([
+        'contribution_id' => $contributionID,
+        'total_amount' => 0,
+        'trxn_date' => CRM_Utils_Time::getTime('YmdHis'),
+        'is_send_contribution_notification' => FALSE,
+      ]);
     }
     return $result;
   }
