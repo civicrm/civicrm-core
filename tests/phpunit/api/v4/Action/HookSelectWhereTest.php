@@ -23,6 +23,7 @@ use api\v4\Api4TestBase;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\Phone;
+use Civi\Api4\Website;
 use Civi\Core\HookInterface;
 use Civi\Test\ACLPermissionTrait;
 
@@ -141,6 +142,22 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
     $aclCount = substr_count($result->debug['sql'][0], 'civicrm_acl_contact_cache');
     $this->assertEquals(1, $aclCount);
 
+    // Try with implicit join via contact
+    $result = Contact::get()
+      ->addWhere('id', '=', $cidAllowed)
+      ->addSelect('id', 'first_name', 'address_primary.street_address')
+      ->setDebug(TRUE)
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals('111 Allowed', $result[0]['address_primary.street_address']);
+
+    $selectWhereCount = substr_count($result->debug['sql'][0], '`location_type_id` IN (1,2)');
+    $this->assertEquals(1, $selectWhereCount);
+
+    $aclCount = substr_count($result->debug['sql'][0], 'civicrm_acl_contact_cache');
+    $this->assertEquals(1, $aclCount);
+
     // Try joining through another entity
     $phone = $this->createTestRecord('Phone', [
       'contact_id' => $cidAllowed,
@@ -167,6 +184,71 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
     $this->assertEquals(1, $selectWhereCount);
 
     // We only want to see one contact ACL where clause
+    $aclCount = substr_count($result->debug['sql'][0], 'civicrm_acl_contact_cache');
+    $this->assertEquals(1, $aclCount);
+
+    // Website has its own ACL on contact_id and joins Contact implicitly or explicitly
+    $this->createTestRecord('Website', [
+      'contact_id' => $cidAllowed,
+      'url' => 'https://allowed.example.com',
+      'website_type_id' => 1,
+    ]);
+    $this->createTestRecord('Website', [
+      'contact_id' => $cidDisallowed,
+      'url' => 'https://disallowed.example.com',
+      'website_type_id' => 1,
+    ]);
+    $this->createTestRecord('Website', [
+      'contact_id' => $cidAllowed,
+      'url' => 'https://other.example.com',
+      'website_type_id' => 2,
+    ]);
+
+    $this->hookEntity = 'Website';
+    $this->hookCondition = [
+      'website_type_id' => ['= 1'],
+    ];
+
+    // No joins
+    $result = Website::get()
+      ->addSelect('id', 'url')
+      ->setDebug(TRUE)
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals('https://allowed.example.com', $result[0]['url']);
+
+    // Implicit join
+    $result = Website::get()
+      ->addSelect('id', 'url', 'contact_id.first_name')
+      ->setDebug(TRUE)
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals('https://allowed.example.com', $result[0]['url']);
+    $this->assertEquals('Allowed', $result[0]['contact_id.first_name']);
+
+    $selectWhereCount = substr_count($result->debug['sql'][0], '`website_type_id` = 1');
+    $this->assertEquals(1, $selectWhereCount);
+
+    // We only want to see one contact ACL where clause
+    $aclCount = substr_count($result->debug['sql'][0], 'civicrm_acl_contact_cache');
+    $this->assertEquals(1, $aclCount);
+
+    // Explicit join
+    $result = Website::get()
+      ->addSelect('id', 'url', 'contact.first_name')
+      ->addJoin('Contact AS contact', 'INNER', ['contact.id', '=', 'contact_id'])
+      ->setDebug(TRUE)
+      ->execute();
+
+    $this->assertCount(1, $result);
+    $this->assertEquals('https://allowed.example.com', $result[0]['url']);
+    $this->assertEquals('Allowed', $result[0]['contact.first_name']);
+
+    $selectWhereCount = substr_count($result->debug['sql'][0], '`website_type_id` = 1');
+    $this->assertEquals(1, $selectWhereCount);
+
     $aclCount = substr_count($result->debug['sql'][0], 'civicrm_acl_contact_cache');
     $this->assertEquals(1, $aclCount);
   }
