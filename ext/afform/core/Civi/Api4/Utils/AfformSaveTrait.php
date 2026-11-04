@@ -80,7 +80,7 @@ trait AfformSaveTrait {
     }
 
     if (Utils::shouldClearMenuCache($item, $orig ?? [])) {
-      \Civi::router()->clear();;
+      \Civi::router()->clear();
     }
 
     $item['module_name'] = _afform_angular_module_name($item['name'], 'camel');

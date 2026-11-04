@@ -650,7 +650,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   public function checkPaymentResult(array $payment, array $expectedResult): void {
     $refreshedPayment = $this->callAPISuccessGetSingle('Payment', ['financial_trxn_id' => $payment['id']]);
     foreach ($expectedResult[$payment['id']] as $key => $value) {
-      $this->assertEquals($refreshedPayment[$key], $value, 'mismatch on ' . $key);      $this->assertEquals($refreshedPayment[$key], $value, 'mismatch on ' . $key);
+      $this->assertEquals($refreshedPayment[$key], $value, 'mismatch on ' . $key);
     }
   }
 

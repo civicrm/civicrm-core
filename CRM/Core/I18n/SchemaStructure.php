@@ -68,7 +68,7 @@ class CRM_Core_I18n_SchemaStructure {
           if (array_intersect_key($localizableFields, $indexInfo['fields'])) {
             $index = [
               'name' => $indexName,
-              'field' => array_keys($indexInfo['fields'])
+              'field' => array_keys($indexInfo['fields']),
             ];
             if (!empty($indexInfo['unique'])) {
               $index['unique'] = 1;
