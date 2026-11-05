@@ -33,7 +33,7 @@ class CRM_Contact_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getSubscribedEvents(): array {
     return [

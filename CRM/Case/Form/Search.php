@@ -262,14 +262,14 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
     $caseFromDate = CRM_Utils_Request::retrieve('pstart', 'Date');
     if ($caseFromDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($caseFromDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($caseFromDate);
       $this->_formValues['case_start_date_low'] = $date;
       $this->_defaults['case_start_date_low'] = $date;
     }
 
     $caseToDate = CRM_Utils_Request::retrieve('pend', 'Date');
     if ($caseToDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($caseToDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($caseToDate);
       $this->_formValues['case_start_date_high'] = $date;
       $this->_defaults['case_start_date_high'] = $date;
     }
@@ -279,7 +279,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');
       if ($cid > 0) {
         $this->_formValues['contact_id'] = $cid;
-        list($display, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
+        [$display, $image] = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
         $this->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid,
           'sort_name'
         );

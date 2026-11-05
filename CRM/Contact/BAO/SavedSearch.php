@@ -463,7 +463,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function writeRecord(array $record): CRM_Contact_DAO_SavedSearch {
     if ((!empty($record['check_permission']) || !empty($record['check_permissions'])) && !CRM_Core_Permission::check('administer search_kit') && !empty($record['id'])) {
@@ -473,7 +473,7 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function deleteRecord(array $record): CRM_Contact_DAO_SavedSearch {
     if ((!empty($record['check_permission']) || !empty($record['check_permissions'])) && !CRM_Core_Permission::check('administer search_kit')) {

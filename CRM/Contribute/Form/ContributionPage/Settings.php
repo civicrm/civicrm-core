@@ -258,9 +258,7 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
         'entity_id' => $contributionPageId,
       ];
 
-      list($contributionProfiles['custom_pre_id'],
-        $contributionProfiles['custom_post_id']
-        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+      [$contributionProfiles['custom_pre_id'], $contributionProfiles['custom_post_id']] = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       $conProfileType = NULL;
       if ($contributionProfiles['custom_pre_id']) {

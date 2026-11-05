@@ -59,7 +59,7 @@ trait CRM_Contact_Form_Edit_EmailBlockTrait {
         $this->existingEmails = $this->getExistingBlocks('Email');
       }
     }
-    return isset($this->existingEmails) ? $this->existingEmails : new Result();
+    return $this->existingEmails ?? new Result();
   }
 
   /**

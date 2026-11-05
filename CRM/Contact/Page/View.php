@@ -196,12 +196,12 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
    *   contact fields in fixed order
    */
   public static function getContactDetails($contactId) {
-    return list($displayName,
+    return [$displayName,
       $contactImage,
       $contactType,
       $contactSubtype,
-      $contactImageUrl
-      ) = CRM_Contact_BAO_Contact::getDisplayAndImage($contactId,
+      $contactImageUrl,
+    ] = CRM_Contact_BAO_Contact::getDisplayAndImage($contactId,
       TRUE,
       TRUE
       );

@@ -26,7 +26,7 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
   protected $keyword = 'campaign';
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @return array
    */
   public function getInfo() {
@@ -40,7 +40,7 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getPermissions(): array {
     $permissions = [
@@ -81,7 +81,7 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @return null
    */
   public function getUserDashboardElement() {
@@ -98,7 +98,7 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @return null
    */
   public function registerTab() {
@@ -107,7 +107,7 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @return string
    */
   public function getIcon() {
@@ -115,7 +115,7 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @return null
    */
   public function registerAdvancedSearchPane() {
@@ -124,7 +124,7 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getActivityTypes() {
     return NULL;

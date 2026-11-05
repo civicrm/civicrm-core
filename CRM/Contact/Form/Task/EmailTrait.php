@@ -1101,7 +1101,7 @@ trait CRM_Contact_Form_Task_EmailTrait {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function autocompleteFilters($mainEntityId = NULL): array {
     $filters = [

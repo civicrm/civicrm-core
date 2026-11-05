@@ -459,7 +459,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getQILL() {
     return $this->_query->qill();

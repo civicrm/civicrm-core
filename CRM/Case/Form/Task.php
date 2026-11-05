@@ -38,7 +38,7 @@ class CRM_Case_Form_Task extends CRM_Core_Form_Task {
   public $_caseIds = NULL;
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setContactIDs() {
     $this->_contactIds = $this->getContactIDs();

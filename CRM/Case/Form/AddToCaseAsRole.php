@@ -6,7 +6,7 @@
 class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function buildQuickForm() {
 
@@ -61,7 +61,7 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function postProcess() {
     $values = $this->controller->exportValues();

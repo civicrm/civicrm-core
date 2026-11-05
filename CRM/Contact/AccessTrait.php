@@ -115,7 +115,7 @@ trait CRM_Contact_AccessTrait {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addSelectWhereClause(?string $entityName = NULL, ?int $userId = NULL, array $conditions = []): array {
     $entityName ??= CRM_Core_DAO_AllCoreTables::getEntityNameForClass(static::class);
