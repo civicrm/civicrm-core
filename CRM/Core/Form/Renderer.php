@@ -28,7 +28,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    *
    * @var object
    */
-  static private $_singleton = NULL;
+  private static $_singleton = NULL;
 
   /**
    * The converter from array size to css class.

@@ -37,22 +37,22 @@ class CRM_Contact_BAO_ProximityQuery {
   /**
    * @var float
    */
-  static protected $_earthFlattening;
+  protected static $_earthFlattening;
 
   /**
    * @var float
    */
-  static protected $_earthRadiusSemiMinor;
+  protected static $_earthRadiusSemiMinor;
 
   /**
    * @var float
    */
-  static protected $_earthRadiusSemiMajor;
+  protected static $_earthRadiusSemiMajor;
 
   /**
    * @var float
    */
-  static protected $_earthEccentricitySQ;
+  protected static $_earthEccentricitySQ;
 
   public static function initialize() {
     static $_initialized = FALSE;

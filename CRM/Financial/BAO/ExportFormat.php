@@ -32,7 +32,7 @@ abstract class CRM_Financial_BAO_ExportFormat {
    * smarty template.
    * @var CRM_Core_Smarty
    */
-  static protected $_template;
+  protected static $_template;
 
   /**
    * Download Exported file.

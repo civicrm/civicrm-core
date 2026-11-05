@@ -77,7 +77,7 @@ class CRM_Utils_QueryFormatter {
    *
    * @var \CRM_Utils_QueryFormatter|null
    */
-  static protected $singleton;
+  protected static $singleton;
 
   /**
    * @param bool $fresh

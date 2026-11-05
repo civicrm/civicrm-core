@@ -38,7 +38,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    * This includes the submitted values of the search form
    * @var array
    */
-  static protected $_searchFormValues;
+  protected static $_searchFormValues;
 
   /**
    * Build all the data structures needed to build the form.

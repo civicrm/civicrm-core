@@ -39,7 +39,7 @@ class CRM_Utils_Check {
    *
    * @var object
    */
-  static private $_singleton = NULL;
+  private static $_singleton = NULL;
 
   /**
    * Provide static instance of CRM_Utils_Check.
