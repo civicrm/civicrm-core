@@ -50,7 +50,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
    * @throws \Civi\Core\Exception\DBQueryException
    */
   public function testEnableDisableLogging(): void {
-    $this->assertSame(0, $this->callAPISuccessGetValue('Setting', ['name' => 'logging']));
+    $this->assertSame('0', $this->callAPISuccessGetValue('Setting', ['name' => 'logging']));
     $this->assertLoggingEnabled(FALSE);
 
     $this->callAPISuccess('Setting', 'create', ['logging' => TRUE]);
@@ -67,7 +67,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     );
 
     $this->callAPISuccess('Setting', 'create', ['logging' => FALSE]);
-    $this->assertSame(0, $this->callAPISuccessGetValue('Setting', ['name' => 'logging']));
+    $this->assertFalse($this->callAPISuccessGetValue('Setting', ['name' => 'logging']));
     $this->assertLoggingEnabled(FALSE);
   }
 

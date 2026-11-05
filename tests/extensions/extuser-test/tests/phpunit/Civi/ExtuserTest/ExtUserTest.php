@@ -32,12 +32,12 @@ class ExtUserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterfa
     $getUserId = fn($name) => \CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_uf_match WHERE username = %1", [
       1 => [$name, 'String'],
     ]);
-    $getMailCount = fn($mail) => \CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_uf_match WHERE uf_name = %1', [
+    $getMailCount = fn($mail) => (int) \CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_uf_match WHERE uf_name = %1', [
       1 => [$mail, 'String'],
     ]);
 
     $this->assertNull($getUserId($username), 'User does not exist yet.');
-    $this->assertSame('0', $getMailCount("$username@127.0.0.1"));
+    $this->assertSame(0, $getMailCount("$username@127.0.0.1"));
 
     $loginUserId = \_authx_uf()->checkPassword($username, $secret);
     $this->assertEquals($loginUserId, $getUserId($username), 'User is autoloaded.');

@@ -55,7 +55,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $group = $group["values"];
     $this->assertNotNull(count($group));
     $this->assertSame("Test Group 1", $group[$this->_groupID]['name']);
-    $this->assertSame(1, $group[$this->_groupID]['is_active']);
+    $this->assertEquals('1', $group[$this->_groupID]['is_active']);
     $this->assertSame('Public Pages', $group[$this->_groupID]['visibility']);
   }
 
@@ -89,7 +89,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       $this->assertSame("Test Group 1", $v['name']);
       $this->assertSame('New Test Group Created', $v['title']);
       $this->assertSame('New Test Group Created', $v['description']);
-      $this->assertSame(1, $v['is_active']);
+      $this->assertEquals('1', $v['is_active']);
       $this->assertSame('Public Pages', $v['visibility']);
     }
   }
@@ -111,7 +111,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       $this->assertEquals($v['id'], $this->_groupID);
       $this->assertSame('New Test Group Created', $v['title']);
       $this->assertSame('New Test Group Created', $v['description']);
-      $this->assertSame(1, $v['is_active']);
+      $this->assertEquals('1', $v['is_active']);
       $this->assertSame('Public Pages', $v['visibility']);
     }
   }
@@ -147,7 +147,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       $this->assertEquals($v['id'], $this->_groupID);
       $this->assertSame("Test Group 1", $v['name']);
       $this->assertSame('New Test Group Created', $v['description']);
-      $this->assertSame(1, $v['is_active']);
+      $this->assertEquals('1', $v['is_active']);
       $this->assertSame('Public Pages', $v['visibility']);
     }
   }
@@ -171,7 +171,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Group', 'create', $params);
     $group = $result['values'][$result['id']];
     $this->assertSame("Test Group type", $group['name']);
-    $this->assertSame(1, $group['is_active']);
+    $this->assertSame('1', $group['is_active']);
     $this->assertSame("", $group['parents']);
     $this->assertEquals($group['group_type'], $params['group_type']);
 
@@ -438,7 +438,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'is_reserved' => 0,
       'check_permissions' => 1,
     ]);
-    $this->assertSame(0, $unreserved['values'][$reservedGroup]['is_reserved']);
+    $this->assertSame('0', $unreserved['values'][$reservedGroup]['is_reserved']);
 
     // User CAN create a reserved group
     $newReserved = $this->callAPISuccess('Group', 'create', [
@@ -446,7 +446,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'is_reserved' => 1,
       'check_permissions' => 1,
     ]);
-    $this->assertSame(1, $newReserved['values'][$newReserved['id']]['is_reserved']);
+    $this->assertSame('1', $newReserved['values'][$newReserved['id']]['is_reserved']);
 
     // User CAN delete reserved group
     $this->callAPISuccess('Group', 'delete', [

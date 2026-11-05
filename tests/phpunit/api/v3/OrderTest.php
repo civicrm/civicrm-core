@@ -610,7 +610,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'entity_id' => $order['id'],
     ];
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $this->assertSame(300, $eft['values'][$eft['id']]['amount']);
+    $this->assertSame('300.00', $eft['values'][$eft['id']]['amount']);
     $params = [
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $eft['values'][$eft['id']]['financial_trxn_id'],
@@ -663,8 +663,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'sequential' => 1,
       'tax_amount' => 5,
     ])['values'][0];
-    $this->assertSame(105, $order['total_amount']);
-    $this->assertSame(5, $order['tax_amount']);
+    $this->assertSame('105.00', $order['total_amount']);
+    $this->assertSame('5.00', $order['tax_amount']);
   }
 
   /**
@@ -681,8 +681,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'contact_id' => $this->individualCreate(),
       'sequential' => 1,
     ])['values'][0];
-    $this->assertSame(105, $order['total_amount']);
-    $this->assertSame(5, $order['tax_amount']);
+    $this->assertSame('105.00', $order['total_amount']);
+    $this->assertSame('5.00', $order['tax_amount']);
   }
 
   /**
@@ -701,8 +701,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'sequential' => 1,
       'tax_amount' => 5,
     ])['values'][0];
-    $this->assertSame(105, $order['total_amount']);
-    $this->assertSame(5, $order['tax_amount']);
+    $this->assertSame('105.00', $order['total_amount']);
+    $this->assertSame('5.00', $order['tax_amount']);
   }
 
   /**
@@ -909,8 +909,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ->addWhere('trxn_id', '=', 'WooCommerce Order - 1859')
       ->setSelect(['tax_amount', 'total_amount'])->execute()->first();
 
-    $this->assertSame('9.69', $contribution['tax_amount']);
-    $this->assertSame('109.69', $contribution['total_amount']);
+    $this->assertSame(9.69, $contribution['tax_amount']);
+    $this->assertSame(109.69, $contribution['total_amount']);
     Contribution::update()->setValues([
       'source' => 'new one',
       'financial_type_id' => $this->ids['FinancialType']['woo'],
@@ -920,8 +920,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ->addWhere('trxn_id', '=', 'WooCommerce Order - 1859')
       ->setSelect(['tax_amount', 'total_amount'])->execute()->first();
 
-    $this->assertSame('9.69', $contribution['tax_amount']);
-    $this->assertSame('109.69', $contribution['total_amount']);
+    $this->assertSame(9.69, $contribution['tax_amount']);
+    $this->assertSame(109.69, $contribution['total_amount']);
   }
 
 }

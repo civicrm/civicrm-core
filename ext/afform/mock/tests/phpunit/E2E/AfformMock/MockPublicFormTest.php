@@ -90,7 +90,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $this->assertSame('LastBegin', $get['last_name']);
 
     // Instead of updating original, a new contact was created.
-    $this->assertSame(1, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact WHERE first_name=%1', [1 => ["Firsty{$r}", 'String']]));
+    $this->assertSame(1, (int) CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact WHERE first_name=%1', [1 => ["Firsty{$r}", 'String']]));
   }
 
   /**

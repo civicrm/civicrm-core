@@ -348,7 +348,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertSame('2009-01-21', $result['start_date']);
     $this->assertSame('2009-12-21', $result['end_date']);
     $this->assertSame('Payment', $result['source']);
-    $this->assertSame(1, $result['is_override']);
+    $this->assertSame('1', $result['is_override']);
   }
 
   /**

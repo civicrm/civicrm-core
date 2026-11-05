@@ -69,7 +69,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     $this->assertEquals($membershipType['member_of_contact_id'], $this->_contactID);
     $this->assertSame('Member Dues', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_MembershipType', 'financial_type_id', $membershipType['financial_type_id']));
     $this->assertSame('year', $membershipType['duration_unit']);
-    $this->assertSame('1', $membershipType['duration_interval']);
+    $this->assertEquals(1, $membershipType['duration_interval']);
     $this->assertSame('rolling', $membershipType['period_type']);
     $this->membershipTypeDelete($params);
   }
@@ -154,11 +154,11 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('membership_type', 'create', ['domain_id' => 2, 'id' => $membershipType['id']]);
     $domainID = $this->callAPISuccessGetValue('MembershipType', ['return' => 'domain_id', 'id' => $membershipType['id']]);
-    $this->assertSame(2, $domainID);
+    $this->assertEquals('2', $domainID);
 
     $this->callAPISuccess('membership_type', 'create', ['id' => $membershipType['id'], 'description' => 'Cool member']);
     $domainID = $this->callAPISuccessGetValue('MembershipType', ['return' => 'domain_id', 'id' => $membershipType['id']]);
-    $this->assertSame(2, $domainID);
+    $this->assertEquals('2', $domainID);
 
   }
 

@@ -216,7 +216,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     ])['values'][0];
     $this->assertSame('"Legacy Test" <my@1.com>', $optionValue['label']);
     $this->assertSame('"Legacy Test" <my@1.com>', $optionValue['name']);
-    $this->assertSame(1, $optionValue['domain_id']);
+    $this->assertSame('1', $optionValue['domain_id']);
     $this->assertSame(1, $optionValue['api.site_email_address.delete']['count']);
 
     $optionValue = $this->callAPISuccess('option_value', 'get', [
@@ -227,7 +227,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'api.option_value.delete' => [],
     ])['values'][0];
     $this->assertSame('"An Updated Address" <new@2.com>', $optionValue['label']);
-    $this->assertSame(2, $optionValue['domain_id']);
+    $this->assertSame('2', $optionValue['domain_id']);
     $this->assertSame(1, $optionValue['api.site_email_address.delete']['count']);
 
     // Option was deleted via chaining
@@ -413,7 +413,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'id' => $ov['id'],
       'return' => 'is_active',
     ]);
-    $this->assertSame(0, $val, "update with no group id is not proper" . __LINE__);
+    $this->assertSame('0', $val, "update with no group id is not proper" . __LINE__);
   }
 
   /**
@@ -440,7 +440,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'id' => $ov['id'],
       'return' => 'is_active',
     ]);
-    $this->assertSame(0, $val, "update with group id is not proper " . __LINE__);
+    $this->assertSame('0', $val, "update with group id is not proper " . __LINE__);
   }
 
   /**

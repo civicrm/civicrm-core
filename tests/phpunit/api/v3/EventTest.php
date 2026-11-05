@@ -963,7 +963,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $template = $this->callAPISuccess('Event', 'create', ['is_template' => 1, 'template_title' => 'Test tpl'] + $templateParams);
     $this->callAPISuccess('Event', 'create', ['id' => $template['id'], 'is_public' => 0]);
     $template = $this->callAPISuccess('Event', 'get', ['id' => $template['id']])['values'][$template['id']];
-    $this->assertSame(1, $template['is_template']);
+    $this->assertEquals('1', $template['is_template']);
   }
 
 }
