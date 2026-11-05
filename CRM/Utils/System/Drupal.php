@@ -21,7 +21,7 @@
 class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function createUser(&$params, $mailParam) {
     $form_state = form_state_defaults();
@@ -86,7 +86,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function updateCMSName($ufID, $ufName) {
     // CRM-5555
@@ -100,7 +100,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addUfRole(int $ufID, string $role): bool {
     $user = user_load($ufID);
@@ -118,7 +118,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function removeUfRole(int $ufID, string $role): bool {
     $user = user_load($ufID);
@@ -138,7 +138,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     if ($drupal_errors = form_get_errors()) {
@@ -182,7 +182,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? ['destination' => $destination] : NULL;
@@ -190,7 +190,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (arg(0) == 'civicrm') {
@@ -203,7 +203,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function appendBreadCrumb($breadCrumbs) {
     $breadCrumb = drupal_get_breadcrumb();
@@ -228,7 +228,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function resetBreadCrumb() {
     $bc = [];
@@ -236,7 +236,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @internal
    */
   public function addHTMLHead($header) {
@@ -252,7 +252,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addScriptUrl($url, $region) {
     $params = ['group' => JS_LIBRARY, 'weight' => 10];
@@ -272,7 +272,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addScript($code, $region) {
     $params = ['type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10];
@@ -290,7 +290,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addStyleUrl($url, $region) {
     if ($region != 'html-header') {
@@ -304,7 +304,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addStyle($code, $region) {
     if ($region != 'html-header') {
@@ -316,7 +316,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function mapConfigToSSL() {
     global $base_url;
@@ -337,7 +337,7 @@ class CRM_Utils_System_Drupal extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     require_once 'DB.php';
@@ -426,7 +426,7 @@ AND    u.status = 1
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function loadUser($username) {
     global $user;
@@ -653,7 +653,7 @@ AND    u.status = 1
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isUserLoggedIn() {
     $isloggedIn = FALSE;
@@ -665,7 +665,7 @@ AND    u.status = 1
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoggedInUfID() {
     $ufID = NULL;
@@ -680,7 +680,7 @@ AND    u.status = 1
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
@@ -745,7 +745,7 @@ AND    u.status = 1
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getTimeZoneString() {
     global $user;
@@ -763,14 +763,14 @@ AND    u.status = 1
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setHttpHeader($name, $value) {
     drupal_add_http_header($name, $value);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function synchronizeUsers() {
     $config = CRM_Core_Config::singleton();
@@ -824,7 +824,7 @@ AND    u.status = 1
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function viewsIntegration(): string {
     global $databases;
@@ -872,7 +872,7 @@ AND    u.status = 1
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function renderMaintenanceMessage(string $content): void {
     drupal_set_breadcrumb('');
@@ -885,7 +885,7 @@ AND    u.status = 1
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function ipAddress():?string {
     // Drupal function handles the server being behind a proxy securely. We

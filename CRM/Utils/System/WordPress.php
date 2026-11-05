@@ -185,7 +185,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
@@ -258,7 +258,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function appendBreadCrumb($breadCrumbs) {
     $breadCrumb = wp_get_breadcrumb();
@@ -285,7 +285,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function resetBreadCrumb() {
     $bc = [];
@@ -293,7 +293,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @internal
    * @deprecated
    */
@@ -323,7 +323,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function url(
     $path = NULL,
@@ -479,7 +479,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getNotifyUrl(
     $path = NULL,
@@ -543,7 +543,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     /* Before we do any loading, let's start the session and write to it.
@@ -635,14 +635,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function postLogoutUrl(): string {
     return wp_login_url();
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUFLocale() {
     /*
@@ -700,7 +700,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setUFLocale($civicrm_language) {
     // TODO (probably not possible with WPML?)
@@ -877,7 +877,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function createUser(&$params, $mailParam) {
     $user_data = [
@@ -1020,7 +1020,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function updateCMSName($ufID, $ufName) {
     // CRM-10620
@@ -1036,7 +1036,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     if (!empty($params['name'])) {
@@ -1061,7 +1061,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isUserLoggedIn() {
     $isloggedIn = FALSE;
@@ -1073,7 +1073,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isUserRegistrationPermitted() {
     if (!get_option('users_can_register')) {
@@ -1083,7 +1083,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isPasswordUserGenerated() {
     return FALSE;
@@ -1102,7 +1102,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoggedInUfID() {
     $ufID = NULL;
@@ -1111,7 +1111,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoggedInUniqueIdentifier() {
     $user = $this->getLoggedInUserObject();
@@ -1130,14 +1130,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUniqueIdentifierFromUserObject($user) {
     return empty($user->user_email) ? NULL : $user->user_email;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoginURL($destination = '') {
     return wp_login_url($destination);
@@ -1179,7 +1179,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getVersion() {
     if (function_exists('get_bloginfo')) {
@@ -1191,7 +1191,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getTimeZoneString() {
     // Return the timezone string when set.
@@ -1228,7 +1228,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
@@ -1249,7 +1249,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) {
     // Set menubar breakpoint to match WP admin theme
@@ -1259,14 +1259,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function checkPermissionAddUser() {
     return current_user_can('create_users');
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function synchronizeUsers() {
     $config = CRM_Core_Config::singleton();
@@ -1384,7 +1384,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addUfRole(int $ufID, string $role): bool {
     if (!wp_roles()->is_role($role)) {
@@ -1399,7 +1399,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function removeUfRole(int $ufID, string $role): bool {
     if (!wp_roles()->is_role($role)) {
@@ -1738,14 +1738,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function canSetBasePage():bool {
     return TRUE;
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function theme($content, $print = FALSE, $maintenance = FALSE): void {
     if ($maintenance) {
@@ -1760,7 +1760,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    * be removed
    */
   public function renderMaintenanceMessage(string $content): void {
@@ -1771,7 +1771,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getContactDetailsFromUser($uf_match):array {
     $contactParameters = [];
@@ -1789,7 +1789,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function modifyStandaloneProfile($profile, $params):string {
     $urlReplaceWith = 'civicrm/profile/create&amp;gid=' . $params['gid'] . '&amp;reset=1';

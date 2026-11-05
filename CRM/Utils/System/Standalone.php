@@ -83,7 +83,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    *
    * In Standalone the UF is CiviCRM, so we're never
    * running without it
@@ -93,7 +93,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getDefaultFileStorage() {
     return [
@@ -103,7 +103,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function createUser(&$params, $emailParam) {
     try {
@@ -193,7 +193,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function updateCMSName($ufID, $email) {
     \Civi\Api4\User::update(FALSE)
@@ -203,7 +203,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     if (!$this->isUserExtensionAvailable()) {
@@ -237,7 +237,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? ['destination' => $destination] : [];
@@ -245,7 +245,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
@@ -257,7 +257,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function appendBreadCrumb($breadcrumbs) {
     if (!is_array($breadcrumbs)) {
@@ -271,7 +271,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function resetBreadCrumb() {
     \Civi::$statics[__CLASS__]['breadcrumb'] = [];
@@ -279,7 +279,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * Note: Standalone renders the html-header region directly in its smarty page template
    * so this should never be called
@@ -289,7 +289,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    *
    * No such things as CMS-rendering in Standalone => always return FALSE
    */
@@ -298,7 +298,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    *
    * No such things as CMS-rendering in Standalone => always return FALSE
    */
@@ -338,7 +338,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function url(
     $path = '',
@@ -373,7 +373,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * Authenticate the user against the CMS db.
    *
    * I think this is only used by CLI so setting the session
@@ -419,14 +419,14 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function postLogoutUrl(): string {
     return '/civicrm/login?justLoggedOut';
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * Standalone offers different HTML templates for front and back-end routes.
    *
@@ -442,7 +442,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function renderMaintenanceMessage(string $content): void {
     // wrap in a minimal header
@@ -540,7 +540,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function loadUser($username) {
     $userID = $this->getUfId($username) ?? NULL;
@@ -568,7 +568,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getCiviSourceStorage(): array {
     return [
@@ -594,21 +594,21 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isUserLoggedIn() {
     return !empty($this->getLoggedInUfID());
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isUserRegistrationPermitted() {
     return (bool) Civi::settings()->get('standaloneusers_allow_public_registration');
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isPasswordUserGenerated() {
     // We always generate a password for new users and then email them a password reset link.
@@ -616,14 +616,14 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function updateCategories() {
     // @todo Is anything necessary?
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * If the User extension isn't available
    * then no one is logged in
@@ -636,7 +636,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * In Standalone our user object is just an array from a User::get() call.
    */
@@ -654,7 +654,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setMessage($message) {
     // @todo This function is for displaying messages on public pages
@@ -671,7 +671,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getTimeZoneString() {
     $userId = $this->getLoggedInUfID();
@@ -686,7 +686,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUFLocale(): ?string {
     $userId = $this->getLoggedInUfID();
@@ -701,7 +701,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @todo implement language negotiation for Standalone?
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
@@ -848,7 +848,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function theme($content, $print = FALSE, $maintenance = FALSE): void {
     \Civi\Standalone\ErrorHandler::renderErrors($content);
@@ -877,7 +877,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addUfRole(int $ufID, string $role): bool {
     if (!$this->isUserExtensionAvailable() || !$this->getUserById($ufID)) {
@@ -902,7 +902,7 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function removeUfRole(int $ufID, string $role): bool {
     if (!$this->isUserExtensionAvailable() || !$this->getUserById($ufID)) {

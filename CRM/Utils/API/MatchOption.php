@@ -59,7 +59,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function fromApiInput($apiRequest) {
 
@@ -149,7 +149,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function toApiOutput($apiRequest, $result) {
     return $result;

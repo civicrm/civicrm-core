@@ -41,7 +41,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function url($path = NULL, $query = NULL, $absolute = TRUE, $fragment = NULL, $frontend = FALSE, $forceBackend = FALSE, $htmlize = TRUE) {
     if (isset(self::$ufClass)) {
@@ -72,7 +72,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function authenticate($name, $pass) {
     /* Before we do any loading, let's start the session and write to it.
@@ -123,7 +123,7 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getCiviSourceStorage():array {
     global $civicrm_root;

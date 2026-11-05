@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function createUser(&$params, $mailParam) {
     $user = \Drupal::currentUser();
@@ -109,7 +109,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function updateCMSName($ufID, $email) {
     $user = \Drupal::entityTypeManager()->getStorage('user')->load($ufID);
@@ -126,7 +126,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     // If we are given a name, let's check to see if it already exists.
@@ -167,7 +167,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? ['destination' => $destination] : [];
@@ -175,7 +175,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
@@ -185,7 +185,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function appendBreadCrumb($breadcrumbs) {
     $civicrmPageState = \Drupal::service('civicrm.page_state');
@@ -204,14 +204,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function resetBreadCrumb() {
     \Drupal::service('civicrm.page_state')->resetBreadcrumbs();
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @deprecated
    */
   public function addHTMLHead($header) {
@@ -220,7 +220,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addStyleUrl($url, $region) {
     if ($region != 'html-header') {
@@ -238,7 +238,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addStyle($code, $region) {
     if ($region != 'html-header') {
@@ -285,7 +285,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function url(
     $path = '',
@@ -322,7 +322,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     /* Before we do any loading, let's start the session and write to it.
@@ -348,7 +348,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function loadUser($username) {
     $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties(['name' => $username]);
@@ -385,7 +385,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function permissionDenied() {
     \Drupal::service('civicrm.page_state')->setAccessDenied();
@@ -500,14 +500,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isUserLoggedIn() {
     return \Drupal::currentUser()->isAuthenticated();
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isUserRegistrationPermitted() {
     if (\Drupal::config('user.settings')->get('register') == 'admin_only') {
@@ -517,7 +517,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isPasswordUserGenerated() {
     if (\Drupal::config('user.settings')->get('verify_mail') == TRUE) {
@@ -527,14 +527,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function updateCategories() {
     // @todo Is anything necessary?
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoggedInUfID() {
     if ($id = \Drupal::currentUser()->id()) {
@@ -543,14 +543,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getDefaultBlockLocation() {
     return 'sidebar_first';
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function logger($message, $priority = NULL) {
     if (CRM_Core_Config::singleton()->userFrameworkLogging) {
@@ -563,7 +563,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function flush() {
     $container = \Drupal::getContainer();
@@ -583,7 +583,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getModules() {
     $modules = [];
@@ -600,7 +600,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUser($contactID) {
     $user_details = parent::getUser($contactID);
@@ -610,21 +610,21 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUniqueIdentifierFromUserObject($user) {
     return $user->get('mail')->value;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUserIDFromUserObject($user) {
     return $user->get('uid')->value;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function synchronizeUsers() {
     $config = CRM_Core_Config::singleton();
@@ -677,7 +677,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setMessage($message) {
     // CiviCRM sometimes includes markup in messages (ex: Event Cart)
@@ -770,7 +770,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getTimeZoneString() {
     $timezone = date_default_timezone_get();
@@ -778,7 +778,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setUFLocale($civicrm_language) {
     $langcode = substr(str_replace('_', '', $civicrm_language), 0, 2);
@@ -800,7 +800,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
@@ -873,7 +873,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addUfRole(int $ufID, string $role): bool {
     // The anonymous/authenticated roles are implicit and cannot be assigned;
@@ -893,7 +893,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function removeUfRole(int $ufID, string $role): bool {
     $user = \Drupal\user\Entity\User::load($ufID);
@@ -940,7 +940,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getSessionId() {
     if (\Drupal::hasContainer()) {
@@ -982,7 +982,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function suppressProfileFormErrors():bool {
     // Suppress the errors if they are displayed using
@@ -996,14 +996,14 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function viewsIntegration(): string {
     return '<p><strong>' . ts('To enable CiviCRM Views integration, install the <a %1>CiviCRM Entity</a> module.', [1 => 'href="https://www.drupal.org/project/civicrm_entity"']) . '</strong></p>';
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function ipAddress():?string {
     // dev/core#4756 fallback if checking before CMS bootstrap
@@ -1014,7 +1014,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function mailingWorkflowIsEnabled():bool {
     if (!\Drupal::moduleHandler()->moduleExists('rules')) {
@@ -1027,7 +1027,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function clearResourceCache() {
     $cleared = FALSE;
@@ -1050,7 +1050,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function isMaintenanceMode(): bool {
     try {

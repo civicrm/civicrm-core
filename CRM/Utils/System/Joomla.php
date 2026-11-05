@@ -42,7 +42,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function createUser(&$params, $mailParam) {
     $baseDir = JPATH_SITE;
@@ -104,7 +104,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function updateCMSName($ufID, $ufName) {
     $ufID = CRM_Utils_Type::escape($ufID, 'Integer');
@@ -119,7 +119,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
     $config = CRM_Core_Config::singleton();
@@ -174,7 +174,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    *
    * Joomla has a very slightly different main template
    * from the shared CMSPrint.tpl
@@ -192,7 +192,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setTitle($title, $pageTitle = NULL) {
     if (!$pageTitle) {
@@ -207,7 +207,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function appendBreadCrumb($breadCrumbs) {
     $template = CRM_Core_Smarty::singleton();
@@ -233,13 +233,13 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function resetBreadCrumb() {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @internal
    */
   public function addHTMLHead($string = NULL) {
@@ -250,7 +250,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addStyleUrl($url, $region) {
     if ($region == 'html-header') {
@@ -262,7 +262,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addStyle($code, $region) {
     if ($region == 'html-header') {
@@ -274,7 +274,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function url(
     $path = NULL,
@@ -366,7 +366,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     require_once 'DB.php';
@@ -574,14 +574,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function postLogoutUrl(): string {
     return "/index.php";
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUFLocale() {
     if (defined('_JEXEC')) {
@@ -594,7 +594,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setUFLocale($civicrm_language) {
     // TODO
@@ -602,7 +602,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getVersion() {
     if (class_exists('JVersion')) {
@@ -728,7 +728,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isUserLoggedIn() {
     $user = $this->getCurrentJoomlaUser();
@@ -736,7 +736,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isUserRegistrationPermitted() {
     if (version_compare(JVERSION, '4.0', 'lt')) {
@@ -752,14 +752,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isPasswordUserGenerated() {
     return TRUE;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoggedInUfID() {
     $user = $this->getCurrentJoomlaUser();
@@ -767,7 +767,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoggedInUniqueIdentifier() {
     $user = $this->getCurrentJoomlaUser();
@@ -775,7 +775,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUser($contactID) {
     $user_details = parent::getUser($contactID);
@@ -785,7 +785,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUserIDFromUserObject($user) {
     // See notes in getJoomlaUserById() about possible combinations of $user->guest and $user->id
@@ -798,14 +798,14 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUniqueIdentifierFromUserObject($user) {
     return (empty($user->email) || !empty($user->guest)) ? NULL : $user->email;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getTimeZoneString() {
     $factoryClassName = $this->factoryClassName();
@@ -843,7 +843,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoginURL($destination = '') {
     $config = CRM_Core_Config::singleton();
@@ -859,7 +859,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoginDestination(&$form) {
     $args = NULL;
@@ -913,7 +913,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getDefaultSiteSettings($dir = NULL) {
     $config = CRM_Core_Config::singleton();
@@ -943,7 +943,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
@@ -959,7 +959,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function checkPermissionAddUser() {
     if ($this->getCurrentJoomlaUser()->authorise('core.create', 'com_users')) {
@@ -969,7 +969,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function synchronizeUsers() {
     $config = CRM_Core_Config::singleton();
@@ -1098,7 +1098,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getContactDetailsFromUser($uf_match):array {
     $contactParameters = [];
@@ -1112,7 +1112,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function modifyStandaloneProfile($profile, $params):string {
     $urlReplaceWith = 'civicrm/profile/create&amp;gid=' . $params['gid'] . '&amp;reset=1';
@@ -1236,7 +1236,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addUfRole(int $ufID, string $role): bool {
     $groupID = $this->getUfRoleGroupId($role);
@@ -1247,7 +1247,7 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function removeUfRole(int $ufID, string $role): bool {
     $groupID = $this->getUfRoleGroupId($role);

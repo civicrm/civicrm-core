@@ -37,7 +37,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isEnabled() {
     return CRM_Core_Component::isEnabled('CiviCase');

@@ -67,7 +67,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $retVal = [1, 1, 12345];
@@ -87,7 +87,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getCiviSourceStorage(): array {
     global $civicrm_root;
@@ -103,7 +103,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function mapConfigToSSL() {
     global $base_url;
@@ -111,14 +111,14 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function postURL($action) {
     return NULL;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function url(
     $path = NULL,
@@ -191,7 +191,7 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function logout() {
     session_destroy();
@@ -199,14 +199,14 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoginURL($destination = '') {
     throw new Exception("Method not implemented: getLoginURL");
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function mailingWorkflowIsEnabled():bool {
     $enableWorkflow = Civi::settings()->get('civimail_workflow');

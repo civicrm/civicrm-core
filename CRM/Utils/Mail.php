@@ -32,7 +32,7 @@ class CRM_Utils_Mail {
   public static function createMailer() {
     $mailingInfo = Civi::settings()->get('mailing_backend');
 
-    /*@var Mail $mailer*/
+    /**@var Mail $mailer*/
     if ($mailingInfo['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_REDIRECT_TO_DB ||
       (defined('CIVICRM_MAILER_SPOOL') && CIVICRM_MAILER_SPOOL)
     ) {
@@ -239,7 +239,7 @@ class CRM_Utils_Mail {
       return FALSE;
     }
 
-    list($headers, $message) = self::setEmailHeaders($params);
+    [$headers, $message] = self::setEmailHeaders($params);
 
     $to = [$params['toEmail']];
     $mailer = \Civi::service('pear_mail');
@@ -316,7 +316,7 @@ class CRM_Utils_Mail {
     CRM_Utils_Hook::alterMailParams($params, 'testEmail');
     $to = $params['toEmail'];
 
-    list($headers, $message) = self::setEmailHeaders($params);
+    [$headers, $message] = self::setEmailHeaders($params);
 
     $from = self::pluckEmailFromHeader($headers['From']);
 

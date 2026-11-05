@@ -42,7 +42,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getDefaultFileStorage() {
     $config = CRM_Core_Config::singleton();
@@ -63,7 +63,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getDefaultSiteSettings($dir) {
     $config = CRM_Core_Config::singleton();
@@ -209,28 +209,28 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUserIDFromUserObject($user) {
     return !empty($user->uid) ? $user->uid : NULL;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setMessage($message) {
     drupal_set_message($message);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUniqueIdentifierFromUserObject($user) {
     return empty($user->mail) ? NULL : $user->mail;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoggedInUniqueIdentifier() {
     global $user;
@@ -238,14 +238,14 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function permissionDenied() {
     drupal_access_denied();
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
@@ -256,18 +256,18 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
       ])
     ) {
       return $this->url('user/' . $uid);
-    };
+    }
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function checkPermissionAddUser() {
     return CRM_Core_Permission::check('administer users');
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function logger($message, $priority = NULL) {
     if (CRM_Core_Config::singleton()->userFrameworkLogging && function_exists('watchdog')) {
@@ -276,7 +276,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function clearResourceCache() {
     // Sometimes metadata gets cleared while the cms isn't bootstrapped.
@@ -311,7 +311,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getModules() {
     $result = [];
@@ -345,7 +345,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getCiviSourceStorage():array {
     global $civicrm_root;
@@ -383,7 +383,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function languageNegotiationURL($url, $addLanguagePart = TRUE, $removeLanguagePart = FALSE) {
     if (empty($url)) {
@@ -442,14 +442,14 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getVersion() {
     return defined('VERSION') ? VERSION : 'Unknown';
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isUserRegistrationPermitted() {
     if (!variable_get('user_register', TRUE)) {
@@ -459,7 +459,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isPasswordUserGenerated() {
     if (variable_get('user_email_verification', TRUE)) {
@@ -469,7 +469,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function updateCategories() {
     // copied this from profile.module. Seems a bit inefficient, but i don't know a better way
@@ -478,7 +478,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getUFLocale() {
     // return CiviCRM’s xx_YY locale that either matches Drupal’s Chinese locale
@@ -506,7 +506,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setUFLocale($civicrm_language) {
     global $language;
@@ -542,7 +542,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLoginDestination(&$form) {
     $args = NULL;
@@ -590,7 +590,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function hasUsersTable():bool {
     return TRUE;
@@ -787,7 +787,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function suppressProfileFormErrors():bool {
     // Suppress the errors if they are displayed using
@@ -799,7 +799,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function mailingWorkflowIsEnabled():bool {
     if (!module_exists('rules')) {
@@ -812,7 +812,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getContactDetailsFromUser($uf_match):array {
     $contactParameters = [];
@@ -822,7 +822,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function modifyStandaloneProfile($profile, $params):string {
     $config = CRM_Core_Config::singleton();
@@ -836,7 +836,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    *
    * We support sending CiviCRM logs to Watchdog
    */

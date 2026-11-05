@@ -463,8 +463,8 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     $filePathMarker = $this->getFilePathMarker();
     $config = CRM_Core_Config::singleton();
 
-    list($heuristicBaseUrl) = explode($filePathMarker, $config->imageUploadURL);
-    list(, $heuristicSuffix) = array_pad(explode($filePathMarker, str_replace('\\', '/', $targetDir)), 2, '');
+    [$heuristicBaseUrl] = explode($filePathMarker, $config->imageUploadURL);
+    [, $heuristicSuffix] = array_pad(explode($filePathMarker, str_replace('\\', '/', $targetDir)), 2, '');
     return $heuristicBaseUrl . $filePathMarker . $heuristicSuffix;
   }
 
