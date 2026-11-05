@@ -47,7 +47,7 @@ class CRM_Core_Session {
    *
    * @var \CRM_Core_Session
    */
-  static private $_singleton;
+  private static $_singleton;
 
   /**
    * Constructor.

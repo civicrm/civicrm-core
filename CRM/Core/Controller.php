@@ -112,7 +112,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *
    * @var CRM_Core_Session
    */
-  static protected $_session;
+  protected static $_session;
 
   /**
    * The parent of this form if embedded.

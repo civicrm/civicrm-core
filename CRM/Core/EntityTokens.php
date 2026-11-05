@@ -92,7 +92,7 @@ class CRM_Core_EntityTokens extends AbstractTokenSubscriber {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {

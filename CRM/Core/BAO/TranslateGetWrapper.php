@@ -36,14 +36,14 @@ class CRM_Core_BAO_TranslateGetWrapper {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function fromApiInput($apiRequest) {
     return $apiRequest;
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function toApiOutput($apiRequest, $result) {
     foreach ($result as &$value) {

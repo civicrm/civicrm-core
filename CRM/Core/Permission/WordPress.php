@@ -84,7 +84,7 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function checkGroupRole($array) {
     // Determine access by role.
@@ -106,7 +106,7 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getAvailablePermissions() {
     // We want to list *only* WordPress perms, so we'll *skip* Civi perms.
@@ -136,14 +136,14 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isModulePermissionSupported() {
     return TRUE;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function upgradePermissions($permissions) {
   }

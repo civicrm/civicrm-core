@@ -51,7 +51,7 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
    *
    * @var object
    */
-  static private $_singleton = NULL;
+  private static $_singleton = NULL;
 
   /**
    * Backup frames.

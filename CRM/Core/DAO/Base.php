@@ -27,7 +27,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function keys(): array {
     $keys = [];
@@ -49,7 +49,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getEntityPaths(): array {
     return static::getEntityProvider()->getMeta('paths');
@@ -60,49 +60,49 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getEntityDescription(): ?string {
     return static::getEntityProvider()->getMeta('description');
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getTableName() {
     return static::getEntityProvider()->getMeta('table');
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLog(): bool {
     return static::getEntityProvider()->getMeta('log');
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getEntityIcon(string $entityName, ?int $entityId = NULL): ?string {
     return static::getEntityProvider()->getMeta('icon');
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected static function getTableAddVersion(): string {
     return static::getEntityProvider()->getMeta('add') ?? '1.0';
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getExtensionName(): ?string {
     return static::getEntityProvider()->getMeta('module');
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function &fields() {
     $fields = [];
@@ -236,7 +236,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function indices(bool $localize = TRUE): array {
     $entityProvider = static::getEntityProvider();

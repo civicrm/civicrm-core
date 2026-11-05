@@ -228,7 +228,7 @@ class CRM_Core_Page_AJAX {
     if (isset($_GET['columns'])) {
       foreach ($_GET['columns'] as $key => $value) {
         $sortMapper[$key] = CRM_Utils_Type::validate($value['data'], 'MysqlColumnNameOrAlias');
-      };
+      }
     }
 
     $offset = isset($_GET['start']) ? CRM_Utils_Type::validate($_GET['start'], 'Integer') : $defaultOffset;

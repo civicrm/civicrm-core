@@ -267,7 +267,7 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function cleanup() {
     // Redis already handles cleaning up stale keys.

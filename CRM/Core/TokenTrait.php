@@ -32,7 +32,7 @@ trait CRM_Core_TokenTrait {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getActiveTokens(TokenValueEvent $e) {
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();

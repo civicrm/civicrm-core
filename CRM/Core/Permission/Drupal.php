@@ -77,7 +77,7 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getAvailablePermissions() {
     // We want to list *only* Drupal perms, so we'll *skip* Civi perms.
@@ -102,14 +102,14 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function isModulePermissionSupported() {
     return TRUE;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function upgradePermissions($permissions) {
     if (empty($permissions)) {

@@ -102,7 +102,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
       return $perm;
     }
 
-    list ($civiPrefix, $name) = CRM_Utils_String::parsePrefix(':', $perm, NULL);
+    [$civiPrefix, $name] = CRM_Utils_String::parsePrefix(':', $perm, NULL);
     switch ($civiPrefix) {
       case 'Joomla':
         return explode(':', $name);
@@ -161,7 +161,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function upgradePermissions($permissions) {
     $translatedPerms = [];

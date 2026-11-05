@@ -236,7 +236,7 @@ class CRM_Core_Selector_Controller {
     }
 
     $this->_pager = new CRM_Utils_Pager($params);
-    list($this->_pagerOffset, $this->_pagerRowCount) = $this->_pager->getOffsetAndRowCount();
+    [$this->_pagerOffset, $this->_pagerRowCount] = $this->_pager->getOffsetAndRowCount();
   }
 
   /**

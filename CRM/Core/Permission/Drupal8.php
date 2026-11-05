@@ -109,7 +109,7 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function upgradePermissions($permissions) {
     // @todo - this should probably call getCoreAndComponentPermissions.

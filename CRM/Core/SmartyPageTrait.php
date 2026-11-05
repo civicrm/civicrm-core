@@ -28,7 +28,7 @@ trait CRM_Core_SmartyPageTrait {
    * @var CRM_Core_Smarty
    * @see CRM_Core_Smarty::singleton()
    */
-  static protected $_template;
+  protected static $_template;
 
   /**
    * @return CRM_Core_Smarty

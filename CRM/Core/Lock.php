@@ -132,7 +132,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
     if (defined('CIVICRM_LOCK_DEBUG')) {
       \Civi::log()->debug('trying to construct lock for ' . $this->_name . '(' . $this->_id . ')');
     }
-    $this->_timeout = $timeout !== NULL ? $timeout : self::TIMEOUT;
+    $this->_timeout = $timeout ?? self::TIMEOUT;
   }
 
   public function __destruct() {

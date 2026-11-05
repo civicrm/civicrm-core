@@ -164,9 +164,7 @@ abstract class CRM_Core_Payment {
    * @return int
    */
   public function getPaymentInstrumentID() {
-    return isset($this->paymentInstrumentID)
-      ? $this->paymentInstrumentID
-      : (int) ($this->_paymentProcessor['payment_instrument_id'] ?? 0);
+    return $this->paymentInstrumentID ?? (int) ($this->_paymentProcessor['payment_instrument_id'] ?? 0);
   }
 
   /**

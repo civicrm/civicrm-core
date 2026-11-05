@@ -266,7 +266,7 @@ ORDER BY id
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function cleanup() {
     // clean up all prev next caches older than $cacheTimeIntervalDays days

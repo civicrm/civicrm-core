@@ -35,7 +35,7 @@ class CRM_Core_Permission_Standalone extends CRM_Core_Permission_Base {
   public $permissions = NULL;
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    * on Standalone we don't want to add any "synthetic" cms permissions
    * because we have concrete equivalents, provided by e.g. standaloneusers extension
    * so we override the base class to suppress the synthetic ones

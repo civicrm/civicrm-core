@@ -86,7 +86,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob {
     $newStatus = 'completed';
     $dataSource = $userJob['metadata']['submitted_values']['dataSource'] ?? NULL;
     if ($dataSource) {
-      /* @var \CRM_Import_DataSource $dataSource */
+      /** @var \CRM_Import_DataSource $dataSource */
       $dataSource = new $dataSource();
       $dataSource->setUserJobID($userJobId);
       if ($dataSource->getRowCount(['new'])) {
