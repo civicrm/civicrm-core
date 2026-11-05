@@ -178,7 +178,7 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
           'name' => ts('Assign'),
           'ref' => 'disable-action',
           'title' => ts('Assign Transaction'),
-          'extra' => 'onclick = "assignRemove( %%id%%,\'' . 'assign' . '\' );"',
+          'extra' => 'onclick = "assignRemove( %%id%%,\'assign\' );"',
           'weight' => 50,
         ],
       ];

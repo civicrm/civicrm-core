@@ -107,7 +107,7 @@ case.status_id:label :Ongoing
 case.is_deleted:label :No
 case.created_date :' . CRM_Utils_Date::customFormat($this->case['created_date']) . '
 case.modified_date :' . CRM_Utils_Date::customFormat($this->case['modified_date']) . '
-case.Custom_Group.Life_Cycle_Status :' . '
+case.Custom_Group.Life_Cycle_Status :
 ';
   }
 

@@ -1000,7 +1000,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         $absoluteDate = CRM_Utils_Date::setDateDefaults($scheduleReminderDetails['absolute_date']);
         // absolute_date column of scheduled-reminder table is of type date (and not datetime)
         // and we always want the date to be included, and therefore appending 23:59
-        $endDate = new DateTime($absoluteDate[0] . ' ' . '23:59');
+        $endDate = new DateTime($absoluteDate[0] . ' 23:59');
         $r->until($endDate);
       }
 

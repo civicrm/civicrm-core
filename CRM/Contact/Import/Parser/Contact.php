@@ -613,7 +613,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
         foreach ($locationParams as $key => $locationParam) {
           // Even though we might not be using 'primary' we 'pretend' here
           // since the apiv4 code expects that...
-          $params[$locationEntity . '_primary' . '.' . $key] = $locationParam;
+          $params[$locationEntity . '_primary.' . $key] = $locationParam;
         }
         unset($params[$locationEntity]);
       }

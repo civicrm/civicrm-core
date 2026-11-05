@@ -451,7 +451,7 @@ class TokenProcessor {
           return '';
         };
         $quoteOptions = implode('|', $quoteStrings);
-        $quotedRegex = ':' . '(?:' . $quoteOptions . ')' . '(.+?(?=' . $quoteOptions . ')+)' . '(?:' . $quoteOptions . ')';
+        $quotedRegex = ':(?:' . $quoteOptions . ')(.+?(?=' . $quoteOptions . ')+)(?:' . $quoteOptions . ')';
         $unmatched = preg_replace_callback_array([
           '/^(\w+)/' => $enqueue,
           ';' . $quotedRegex . ';' => $enqueue,

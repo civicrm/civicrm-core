@@ -238,7 +238,7 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       'settle_amount' => '95.00',
       'module' => 'contribute',
       'payer_id' => 'FV5ZW7TL874',
-      'payment_date' => date('H:i:s M d, Y' . ' PST'),
+      'payment_date' => date('H:i:s M d, Y PST'),
       'payment_status' => 'Completed',
       'receiver_email' => 'sunil._1183377782_biz_api1.webaccess.co.in',
       'txn_type' => 'web_accept',

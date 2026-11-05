@@ -763,8 +763,8 @@ class CRM_GCD {
       $lastName = $individual->last_name;
 
       // need to name the household and nick name appropriately
-      $contact->household_name = "$firstName $lastName" . "'s home";
-      $contact->nick_name = "$lastName" . "'s home";
+      $contact->household_name = "$firstName $lastName's home";
+      $contact->nick_name = "$lastName's home";
 
       $contact->id = $this->household[($id - 1)];
       // need to update the sort name for the main contact table

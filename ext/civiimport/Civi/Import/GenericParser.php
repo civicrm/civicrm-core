@@ -67,7 +67,7 @@ class GenericParser extends ImportParser {
         $field['entity_prefix'] = 'Contribution.';
         $fields[$this->getBaseEntity() . '.' . $field['name']] = $field;
       }
-      if (isset($fields[$this->getBaseEntity() . '.' . 'contact_id'])) {
+      if (isset($fields[$this->getBaseEntity() . '.contact_id'])) {
         $fields += $this->getContactFields($this->getContactType(), 'Contact');
         unset($fields[$this->getBaseEntity() . '.contact_id']);
       }

@@ -122,7 +122,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
       unset($params['mailing_relative']);
     }
     elseif (!empty($params['mailing_high'])) {
-      $params['mailing_high'] .= ' ' . '23:59:59';
+      $params['mailing_high'] .= ' 23:59:59';
     }
 
     $parent = $this->controller->getParent();
