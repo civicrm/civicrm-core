@@ -276,7 +276,7 @@ class CiviContributeProcessor {
                 'M' => 'month',
                 'Y' => 'year',
               ];
-              list($frequency_interval, $frequency_unit) = explode(' ', $val);
+              [$frequency_interval, $frequency_unit] = explode(' ', $val);
               $transaction['frequency_interval'] = $frequency_interval;
               $transaction['frequency_unit'] = $freqUnits[$frequency_unit];
               break;

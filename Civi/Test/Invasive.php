@@ -23,7 +23,7 @@ class Invasive {
    * @return mixed
    */
   public static function call($callable, $args = []) {
-    list ($class, $object, $member) = self::parseRef($callable);
+    [$class, $object, $member] = self::parseRef($callable);
     $reflection = new \ReflectionMethod($class, $member);
     return $reflection->invokeArgs($object, $args);
   }
@@ -40,7 +40,7 @@ class Invasive {
    * @return mixed
    */
   public static function get($ref) {
-    list ($class, $object, $member) = self::parseRef($ref);
+    [$class, $object, $member] = self::parseRef($ref);
     $reflection = new \ReflectionProperty($class, $member);
     return $reflection->getValue($object);
   }
@@ -58,7 +58,7 @@ class Invasive {
    * @return mixed
    */
   public static function set($ref, $value) {
-    list ($class, $object, $member) = self::parseRef($ref);
+    [$class, $object, $member] = self::parseRef($ref);
     $reflection = new \ReflectionProperty($class, $member);
     $reflection->setValue($object, $value);
   }
@@ -72,7 +72,7 @@ class Invasive {
    */
   private static function parseRef($callable) {
     if (is_string($callable)) {
-      list ($class, $member) = explode('::', $callable);
+      [$class, $member] = explode('::', $callable);
       return [$class, NULL, $member];
     }
     elseif (is_string($callable[0])) {

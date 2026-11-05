@@ -151,7 +151,7 @@ class CRM_Utils_Chart {
       case 'week':
       case 'yearweek':
         foreach ($rows['receive_date'] as $key => $val) {
-          list($year, $month) = explode('-', $val);
+          [$year, $month] = explode('-', $val);
           $dateKeys[] = substr($rows[$interval][$key], 0, 3) . ' of ' . $year;
         }
         $legend = $intervalLabels[$lcInterval];
@@ -159,7 +159,7 @@ class CRM_Utils_Chart {
 
       default:
         foreach ($rows['receive_date'] as $key => $val) {
-          list($year, $month) = explode('-', $val);
+          [$year, $month] = explode('-', $val);
           $dateKeys[] = $year;
         }
         $legend = $label;

@@ -60,7 +60,7 @@ class CRM_Profile_Form_Search extends CRM_Profile_Form {
         }
       }
       elseif (in_array($key, ['birth_date', 'deceased_date'])) {
-        list($value) = CRM_Utils_Date::setDateDefaults($value);
+        [$value] = CRM_Utils_Date::setDateDefaults($value);
       }
 
       $defaults[$key] = $value;

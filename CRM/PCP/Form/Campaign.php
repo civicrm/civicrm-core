@@ -296,7 +296,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $this->assign('managePCPUrl', $managePCPUrl);
 
       //get the default domain email address.
-      list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
+      [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
       if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
         $fixUrl = CRM_Utils_System::url('civicrm/admin/options/site_email_address');
@@ -312,7 +312,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       unset($emailArray[0]);
       $cc = implode(',', $emailArray);
 
-      list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
+      [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate(
         [
           'groupName' => 'msg_tpl_workflow_contribution',
           'workflow' => 'pcp_notify',

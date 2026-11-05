@@ -96,7 +96,7 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
    */
   public function _getHtml($url) {
     $httpClient = new CRM_Utils_HttpClient(self::CHECK_TIMEOUT);
-    list ($status, $html) = $httpClient->get($url);
+    [$status, $html] = $httpClient->get($url);
 
     if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
       return NULL;

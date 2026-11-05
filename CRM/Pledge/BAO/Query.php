@@ -244,7 +244,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
       // $this->buildRelativeDateQuery($values);
       return;
     }
-    list($name, $op, $value, $grouping, $wildcard) = $values;
+    [$name, $op, $value, $grouping, $wildcard] = $values;
 
     switch ($name) {
       case 'pledge_amount':
@@ -302,7 +302,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
           $value,
           'Integer'
         );
-        list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue($qillDAO, $qillField, $value, $op);
+        [$qillop, $qillVal] = CRM_Contact_BAO_Query::buildQillForFieldValue($qillDAO, $qillField, $value, $op);
         $query->_qill[$grouping][] = ts('%1 %2 %3', [1 => $label, 2 => $qillop, 3 => $qillVal]);
         return;
 
@@ -367,7 +367,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
       case 'pledge_campaign_id':
         $name = str_replace('pledge_', '', $name);
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_pledge.$name", $op, $value, 'Integer');
-        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Pledge_DAO_Pledge', $name, $value, $op);
+        [$op, $value] = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Pledge_DAO_Pledge', $name, $value, $op);
         $label = ($name == 'campaign_id') ? 'Campaign' : 'Contact ID';
         $query->_qill[$grouping][] = ts('%1 %2 %3', [1 => $label, 2 => $op, 3 => $value]);
         $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;

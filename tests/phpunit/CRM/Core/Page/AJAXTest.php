@@ -60,7 +60,7 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     $cases[] = ['invalidtype', 'CRM_Foo_Page_AJAX::method', FALSE];
 
     foreach ($cases as $case) {
-      list ($type, $className, $expectedResult) = $case;
+      [$type, $className, $expectedResult] = $case;
       $actualResult = CRM_Core_Page_AJAX::checkAuthz($type, $className);
       $this->assertEquals($expectedResult, $actualResult,
         sprintf('Check type=[%s] value=[%s]', $type, $className));

@@ -104,7 +104,7 @@ function _civicrm_api3_pledge_create_spec(&$params) {
 function civicrm_api3_pledge_get($params) {
   $mode = CRM_Contact_BAO_Query::MODE_PLEDGE;
 
-  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, 'Pledge');
+  [$dao, $query] = _civicrm_api3_get_query_object($params, $mode, 'Pledge');
 
   $pledge = [];
   while ($dao->fetch()) {

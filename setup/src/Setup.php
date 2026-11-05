@@ -116,8 +116,8 @@ class Setup {
     if (version_compare(self::PROTOCOL, $expectedVersion, '<')) {
       throw new InitException(sprintf("civicrm-setup is running protocol v%s. This application expects civicrm-setup to support protocol v%s.", self::PROTOCOL, $expectedVersion));
     }
-    list ($actualFirst) = explode('.', self::PROTOCOL);
-    list ($expectedFirst) = explode('.', $expectedVersion);
+    [$actualFirst] = explode('.', self::PROTOCOL);
+    [$expectedFirst] = explode('.', $expectedVersion);
     if ($actualFirst > $expectedFirst) {
       throw new InitException(sprintf("civicrm-setup is running protocol v%s. This application expects civicrm-setup to support protocol v%s.", self::PROTOCOL, $expectedVersion));
     }

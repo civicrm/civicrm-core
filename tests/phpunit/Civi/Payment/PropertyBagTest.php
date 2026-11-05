@@ -276,7 +276,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Using the setter and getter, check we can pass stuff in and get expected out.
     foreach ($valid_values as $_) {
-      list($given, $expect) = $_;
+      [$given, $expect] = $_;
       $propertyBag = new PropertyBag();
       try {
         $propertyBag->$setter($given);
@@ -314,7 +314,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     error_reporting($ignoreUserDeprecatedErrors);
     foreach (array_merge([$prop], $legacy_names) as $name) {
       foreach ($valid_values as $_) {
-        list($given, $expect) = $_;
+        [$given, $expect] = $_;
         $propertyBag = new PropertyBag();
         $propertyBag[$name] = $given;
         $this->assertEquals($expect, $propertyBag->$getter(), "Failed to set $prop via array access on $name");

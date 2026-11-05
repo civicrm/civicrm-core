@@ -178,7 +178,7 @@ class CRM_Utils_QueryFormatter {
       $tableName = $tableAlias = $table;
     }
     else {
-      list ($tableName, $tableAlias) = explode(' ', $table);
+      [$tableName, $tableAlias] = explode(' ', $table);
     }
     if (is_scalar($columns)) {
       $columns = [$columns];

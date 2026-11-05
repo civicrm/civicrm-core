@@ -40,7 +40,7 @@ namespace _CiviVersion_ {
       }
       else {
         // guess CMS name from the current path
-        list($cmsType,) = self::findCMSRootPath();
+        [$cmsType] = self::findCMSRootPath();
 
         if (!empty($cmsType)) {
           return $cmsType;

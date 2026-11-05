@@ -134,7 +134,7 @@ class CRM_SMS_BAO_SmsProvider extends CRM_SMS_DAO_SmsProvider {
         $inputVals = [];
         foreach ($inputLines as $value) {
           if ($value) {
-            list($key, $val) = explode("=", $value);
+            [$key, $val] = explode("=", $value);
             $inputVals[trim($key)] = trim($val);
           }
         }

@@ -118,7 +118,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
     $params = $this->_formValues;
 
     if (!empty($params['mailing_relative'])) {
-      list($params['mailing_low'], $params['mailing_high']) = CRM_Utils_Date::getFromTo($params['mailing_relative'], $params['mailing_low'], $params['mailing_high']);
+      [$params['mailing_low'], $params['mailing_high']] = CRM_Utils_Date::getFromTo($params['mailing_relative'], $params['mailing_low'], $params['mailing_high']);
       unset($params['mailing_relative']);
     }
     elseif (!empty($params['mailing_high'])) {

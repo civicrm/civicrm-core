@@ -38,10 +38,10 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    list ($this->basedir, $this->container) = $this->_createContainer();
+    [$this->basedir, $this->container] = $this->_createContainer();
     $this->mapper = new CRM_Extension_Mapper($this->container);
 
-    list ($this->basedir2, $this->containerWithSlash) = $this->_createContainer(NULL, NULL, '/');
+    [$this->basedir2, $this->containerWithSlash] = $this->_createContainer(NULL, NULL, '/');
     $this->mapperWithSlash = new CRM_Extension_Mapper($this->containerWithSlash);
   }
 

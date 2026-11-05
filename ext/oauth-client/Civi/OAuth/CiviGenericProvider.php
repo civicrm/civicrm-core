@@ -145,7 +145,7 @@ class CiviGenericProvider extends \League\OAuth2\Client\Provider\GenericProvider
   }
 
   private function decodeUnauthenticatedJwt($t) {
-    list ($header, $payload) = explode('.', $t);
+    [$header, $payload] = explode('.', $t);
 
     return [
       'header' => json_decode(base64_decode($header), 1),

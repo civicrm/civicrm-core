@@ -191,9 +191,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $valuesForForm = CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
     $form->assignVariables($valuesForForm, ['credit_card_exp_date', 'credit_card_type', 'credit_card_number']);
 
-    list($contributorDisplayName,
-      $contributorEmail
-      ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
+    [$contributorDisplayName, $contributorEmail] = CRM_Contact_BAO_Contact_Location::getEmailDetails($params['contact_id']);
 
     [$sendReceipt] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [

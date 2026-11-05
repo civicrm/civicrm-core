@@ -258,7 +258,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
       $cancelled = $cancelled + $cancelledDao->count;
 
       $activeSql = "SELECT count(*) as count FROM civicrm_contribution_recur WHERE payment_instrument_id = $paymentInstrumentId";
-      list($from, $to) = $this->getFromTo($startDateRelative, $startDateFrom, $startDateTo);
+      [$from, $to] = $this->getFromTo($startDateRelative, $startDateFrom, $startDateTo);
       // To find active recurring contribution start date must be >= to start of selected date-range AND
       // end date or cancel date must be >= to end of selected date-range if NOT null OR end date is null
       if (!empty($from)) {

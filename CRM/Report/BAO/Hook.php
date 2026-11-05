@@ -72,7 +72,7 @@ class CRM_Report_BAO_Hook {
   public function logDiffClause(&$reportObj, $table) {
     $contactIdClause = $join = '';
     foreach (self::getSearchQueryObjects() as $obj) {
-      list($cidClause, $joinClause) = $obj->logDiffClause($reportObj, $table);
+      [$cidClause, $joinClause] = $obj->logDiffClause($reportObj, $table);
       if ($joinClause) {
         $join .= $joinClause;
       }

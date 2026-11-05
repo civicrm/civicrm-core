@@ -145,8 +145,8 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
     $mailParams['message'] = $params['suggested_message'] ?? NULL;
 
     // Default "from email address" is default domain address.
-    list($_, $mailParams['email_from']) = CRM_Core_BAO_Domain::getNameAndEmail();
-    list($username, $mailParams['domain']) = explode('@', $mailParams['email_from']);
+    [$_, $mailParams['email_from']] = CRM_Core_BAO_Domain::getNameAndEmail();
+    [$username, $mailParams['domain']] = explode('@', $mailParams['email_from']);
 
     $default = [];
     $findProperties = ['id' => $params['entity_id']];
@@ -260,7 +260,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @return void
    */
   public static function sendMail($contactID, &$values) {
-    list($fromName, $email) = CRM_Contact_BAO_Contact::getContactDetails($contactID);
+    [$fromName, $email] = CRM_Contact_BAO_Contact::getContactDetails($contactID);
     // if no $fromName (only email collected from originating contact) - list returns single space
     if (trim($fromName) == '') {
       $fromName = $email;
@@ -275,7 +275,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
     // If we have no "email_from" when we get to here, explicitly set it to the default domain email.
     if (empty($values['email_from'])) {
-      list($domainFromName, $domainEmail) = CRM_Core_BAO_Domain::getNameAndEmail();
+      [$domainFromName, $domainEmail] = CRM_Core_BAO_Domain::getNameAndEmail();
       $values['email_from'] = $domainEmail;
       $values['domain'] = $domainFromName;
     }
