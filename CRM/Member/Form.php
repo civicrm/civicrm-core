@@ -652,14 +652,9 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
   /**
    * Get the details for the selected price set.
-   *
-   * @param array $params
-   *   Parameters submitted to the form.
-   *
-   * @return array
    */
-  protected function getPriceSetDetails(array $params): ?array {
-    $priceSetID = $params['price_set_id'] ?? NULL;
+  protected function getPriceSetDetails(): ?array {
+    $priceSetID = $this->getPriceSetID();
     if ($priceSetID) {
       return CRM_Price_BAO_PriceSet::getSetDetail($priceSetID);
     }
@@ -729,8 +724,8 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
     $formValues = $this->getSubmittedValues();
     $this->ensurePriceParamsAreSet($formValues);
-    $priceSetDetails = $this->getPriceSetDetails($formValues);
-    $this->_priceSet = $priceSetDetails[$this->_priceSetId];
+    $priceSetDetails = $this->getPriceSetDetails();
+    $this->_priceSet = $priceSetDetails[$this->getPriceSetID()];
 
     if ($this->getSubmittedValue('total_amount')) {
       $this->order->setOverrideTotalAmount((float) $this->getSubmittedValue('total_amount'));
