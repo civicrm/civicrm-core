@@ -440,8 +440,8 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     ]);
 
     $this->assertSame(1, $get['count'], 'Incorrect email count at ' . __LINE__);
-    $this->assertEquals(1, $get['values'][$emailID]['is_primary']);
-    $this->assertEquals(1, $get['values'][$emailID]['on_hold']);
+    $this->assertSame($this->apiValue(TRUE), $get['values'][$emailID]['is_primary']);
+    $this->assertSame($this->apiValue(1), $get['values'][$emailID]['on_hold']);
     $this->assertSame('1-2@example.com', $get['values'][$emailID]['email']);
   }
 

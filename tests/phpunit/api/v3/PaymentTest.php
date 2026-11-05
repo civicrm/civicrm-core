@@ -103,7 +103,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'id' => $contributionID,
     ]);
-    $this->assertEquals(1, $contribution['contribution_status_id']);
+    $this->assertSame($this->apiValue(1), $contribution['contribution_status_id']);
 
     //Get Payment using options
     switch ($apiVersion) {

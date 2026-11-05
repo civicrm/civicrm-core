@@ -78,7 +78,7 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
       'frequency_interval' => 1,
     ]);
     $this->getAndCheck($params, $result['id'], 'PaymentProcessor');
-    $this->assertEquals(2, $result['values'][$result['id']]['payment_instrument_id']);
+    $this->assertSame($this->apiValue(2), $result['values'][$result['id']]['payment_instrument_id']);
   }
 
   /**

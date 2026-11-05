@@ -685,7 +685,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccess('Event', 'Create', $params);
     $updated = $this->callAPISuccess('Event', 'Get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals(150, $updated['values'][$result['id']]['max_participants']);
+    $this->assertSame($this->apiValue(150), $updated['values'][$result['id']]['max_participants']);
     $this->assertSame('Annual CiviCRM meet 2', $updated['values'][$result['id']]['title']);
     $this->callAPISuccess($this->_entity, 'Delete', ['id' => $result['id']]);
   }
@@ -927,7 +927,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     }
 
     // check the newly created event is an event, not a template
-    $this->assertEquals(0, $eventResult['is_template'], print_r($eventResult, 1));
+    $this->assertSame($this->apiValue(FALSE), $eventResult['is_template'], print_r($eventResult, 1));
   }
 
   public function testGetListLeadingZero(): void {
@@ -963,7 +963,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $template = $this->callAPISuccess('Event', 'create', ['is_template' => 1, 'template_title' => 'Test tpl'] + $templateParams);
     $this->callAPISuccess('Event', 'create', ['id' => $template['id'], 'is_public' => 0]);
     $template = $this->callAPISuccess('Event', 'get', ['id' => $template['id']])['values'][$template['id']];
-    $this->assertEquals('1', $template['is_template']);
+    $this->assertSame($this->apiValue(TRUE), $template['is_template']);
   }
 
 }

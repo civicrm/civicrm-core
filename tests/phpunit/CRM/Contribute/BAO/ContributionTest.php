@@ -1328,7 +1328,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       HAVING SUM(cli.line_total) != total_amount
     ', [1 => [$contributionId, 'Integer']]);
 
-    $this->assertEquals(0, $count);
+    $this->assertSame(0, (int) $count);
 
     $this->callAPISuccess('Contribution', 'create', [
       'id' => $contributionId,
@@ -1344,7 +1344,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       HAVING SUM(cli.line_total) != total_amount
     ', [1 => [$contributionId, 'Integer']]);
 
-    $this->assertEquals(0, $count);
+    $this->assertSame(0, (int) $count);
   }
 
   /**

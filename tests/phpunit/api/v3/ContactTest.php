@@ -3083,7 +3083,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $organization = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name', 'is_deceased'], 'id' => $organizationID]);
     $this->assertSame('Steppenwolf wuz here', $organization['display_name']);
     $this->assertSame('Steppenwolf wuz here', $organization['sort_name']);
-    $this->assertEquals(1, $organization['is_deceased']);
+    $this->assertSame($this->apiValue(TRUE), $organization['is_deceased']);
 
     $householdID = $this->householdCreate();
     $household = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name'], 'id' => $householdID]);
@@ -4391,7 +4391,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ]);
     $result = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Doe']);
-    $this->assertEquals(1, $result['communication_style_id']);
+    $this->assertSame($this->apiValue(1), $result['communication_style_id']);
   }
 
   /**

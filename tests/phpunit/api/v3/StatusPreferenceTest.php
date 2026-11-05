@@ -44,7 +44,7 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     $this->assertNotNull($result['id'], 'In line ' . __LINE__);
     $id = $result['id'];
     $this->assertSame('test_check', $result['values'][$id]['name'], 'In line ' . __LINE__);
-    $this->assertEquals(4, $result['values'][$id]['ignore_severity'], 'In line ' . __LINE__);
+    $this->assertSame($this->apiValue(4), $result['values'][$id]['ignore_severity'], 'In line ' . __LINE__);
 
     $this->callAPISuccess('StatusPreference', 'delete', ['id' => $result['id']]);
   }
@@ -122,7 +122,7 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     $this->_params['ignore_severity'] = 'cRItical';
     $result = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
     $id = $result['id'];
-    $this->assertEquals(5, $result['values'][$id]['ignore_severity'], 'In line ' . __LINE__);
+    $this->assertSame($this->apiValue(5), $result['values'][$id]['ignore_severity'], 'In line ' . __LINE__);
   }
 
   /**

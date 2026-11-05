@@ -358,12 +358,12 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('activity', 'create', $params);
 
     $result = $this->callAPISuccess('Activity', 'getsingle', ['id' => $result['id'], 'return' => array_merge(array_keys($params), ['priority_id'])]);
-    $this->assertEquals(120, $result['duration']);
+    $this->assertSame($this->apiValue(120), $result['duration']);
     $this->assertSame('Make-it-Happen Meeting', $result['subject']);
     $this->assertSame('2011-03-16 00:00:00', $result['activity_date_time']);
     $this->assertSame('Pennsylvania', $result['location']);
     $this->assertSame('a test activity', $result['details']);
-    $this->assertEquals(1, $result['status_id']);
+    $this->assertSame($this->apiValue(1), $result['status_id']);
 
     $priorities = $this->callAPISuccess('activity', 'getoptions', ['field' => 'priority_id']);
     $this->assertEquals($result['priority_id'], array_search('Normal', $priorities['values']));
