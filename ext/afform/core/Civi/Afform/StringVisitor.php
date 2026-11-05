@@ -51,7 +51,7 @@ class StringVisitor {
       return;
     }
 
-    $formFields = ['title', 'confirmation_message', 'redirect'];
+    $formFields = ['title', 'confirmation_message', 'redirect', 'verification_confirmation_message', 'verification_redirect'];
     foreach ($formFields as $field) {
       if (!empty($form[$field])) {
         $form[$field] = $callback($form[$field]);
