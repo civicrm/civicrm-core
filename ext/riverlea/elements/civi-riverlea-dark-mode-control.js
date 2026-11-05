@@ -1,6 +1,6 @@
 (function () {
 
-  class CiviRiverleaUserControls extends HTMLElement {
+  class CiviRiverleaDarkModeControl extends HTMLElement {
 
      /* jshint ignore:start */
     static MODES = {
@@ -30,8 +30,8 @@
 
     render() {
       this.innerHTML = `
-        <span class="civi-riverlea-user-controls-wrap">
-          <button type="button" role="switch" class="civi-riverlea-color-scheme-switch">
+        <span class="civi-riverlea-dark-mode-control-wrap">
+          <button type="button" role="switch" class="civi-riverlea-dark-mode-switch">
             <i class="crm-i" role="img" aria-disabled="true"></i>
           </button>
         </span>
@@ -39,7 +39,7 @@
     }
 
     nextMode() {
-      this.setMode(CiviRiverleaUserControls.MODES[this.mode].next);
+      this.setMode(CiviRiverleaDarkModeControl.MODES[this.mode].next);
     }
 
     setMode(mode) {
@@ -53,7 +53,7 @@
     }
 
     renderMode() {
-      const details = CiviRiverleaUserControls.MODES[this.mode];
+      const details = CiviRiverleaDarkModeControl.MODES[this.mode];
 
       // swap the icon class
       this.querySelector('.crm-i').classList.remove('fa-sun', 'fa-moon', 'fa-circle-half-stroke');
@@ -69,43 +69,15 @@
     }
 
     saveMode() {
-      window.localStorage.setItem('civi-riverlea-user-controls-color-scheme', this.mode);
+      window.localStorage.setItem('civi-riverlea-user-controls-dark-mode', this.mode);
     }
 
     loadMode() {
-      const saved = window.localStorage.getItem('civi-riverlea-user-controls-color-scheme');
+      const saved = window.localStorage.getItem('civi-riverlea-user-controls-dark-mode');
       this.setMode(saved ? saved : 'auto');
     }
   }
 
-  customElements.define('civi-riverlea-user-controls', CiviRiverleaUserControls);
-
-  function appendWrappedControl(container) {
-    const wrapper = document.createElement('li');
-    wrapper.className = 'civi-riverlea-user-controls-item';
-
-    const controls = document.createElement('civi-riverlea-user-controls');
-    wrapper.append(controls);
-
-    container.append(wrapper);
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const menu = document.getElementById('civicrm-menu');
-    if (menu) {
-      appendWrappedControl(menu);
-      return;
-    }
-
-    const observer = new MutationObserver(() => {
-      const menu = document.getElementById('civicrm-menu');
-      if (menu) {
-    appendWrappedControl(menu);
-
-        observer.disconnect();
-      }
-    });
-    observer.observe(document.body, {childList: true, subtree: true});
-  });
+  customElements.define('civi-riverlea-dark-mode-control', CiviRiverleaDarkModeControl);
 
 })();

@@ -1,19 +1,14 @@
-#civicrm-menu > .civi-riverlea-user-controls-item {
-  float: right;
-  padding-left: var(--crm-padding-small);
-}
-
-civi-riverlea-user-controls {
+civi-riverlea-dark-mode-control {
   display: block;
 
-  .civi-riverlea-user-controls-wrap {
+  .civi-riverlea-dark-mode-control-wrap {
     padding-inline: var(--crm-padding-medium);
     height: 42px;
     display: flex;
     align-items: center;
   }
 
-  .civi-riverlea-color-scheme-switch {
+  .civi-riverlea-dark-mode-switch {
     position: relative;
     width: var(--crm-l-large-1);
     height: 28px;
@@ -51,31 +46,25 @@ civi-riverlea-user-controls {
     color: var(--crm-c-yellow);
   }
 
-  .civi-riverlea-color-scheme-switch[data-mode="light"] {
+  .civi-riverlea-dark-mode-switch[data-mode="light"] {
     background: var(--crm-input-toggle-disabled-bg);
   }
-  .civi-riverlea-color-scheme-switch[data-mode="auto"] {
+  .civi-riverlea-dark-mode-switch[data-mode="auto"] {
     background: var(--crm-input-toggle-enabled-bg);
   }
-  .civi-riverlea-color-scheme-switch[data-mode="auto"] .crm-i {
+  .civi-riverlea-dark-mode-switch[data-mode="auto"] .crm-i {
     left: var(--crm-l-medium-2);
   }
-  .civi-riverlea-color-scheme-switch[data-mode="dark"] {
+  .civi-riverlea-dark-mode-switch[data-mode="dark"] {
     background: var(--crm-paper);
   }
-  .civi-riverlea-color-scheme-switch[data-mode="dark"] .crm-i {
+  .civi-riverlea-dark-mode-switch[data-mode="dark"] .crm-i {
     left: 21px;
     background: var(--crm-c-darkest);
     border: 1px solid var(--crm-c-gray-800)
   }
-  .civi-riverlea-color-scheme-switch:focus-visible {
+  .civi-riverlea-dark-mode-switch:focus-visible {
     box-shadow: 0 0 0 2px var(--crm-focus-color);
   }
 
-}
-
-@media (max-width: 991px) {
-  .civi-riverlea-user-controls-item {
-    padding-left: 12px;
-  }
 }
