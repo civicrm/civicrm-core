@@ -423,6 +423,23 @@
     $(settings.target).crmSnippet(settings).crmSnippet('refresh');
     return $(settings.target);
   };
+  // Print the dialog as currently rendered. Reloading its url in print mode (snippet=1)
+  // does not load javascript, so content rendered client-side (e.g. Angular) would be blank.
+  // Modifier+click still follows the link to the print-mode url.
+  $(document).on('click', 'a.crm-dialog-titlebar-print', (e) => {
+    if (e.ctrlKey || e.metaKey || e.shiftKey) {
+      return;
+    }
+    e.preventDefault();
+    const $dialog = $(e.currentTarget).closest('.ui-dialog');
+    $('body').addClass('crm-dialog-printing');
+    $dialog.addClass('crm-dialog-print-target');
+    $(window).one('afterprint', () => {
+      $('body').removeClass('crm-dialog-printing');
+      $dialog.removeClass('crm-dialog-print-target');
+    });
+    window.print();
+  });
   CRM.loadForm = function(url, options) {
     var formErrors = [], settings = {
       crmForm: {
