@@ -1894,7 +1894,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       ], $required);
     }
     elseif ($fieldName === 'contact_sub_type') {
-      $gId = $form->get('gid') ?:  $field['group_id'] ?? NULL;
+      $gId = $form->get('gid') ?: $field['group_id'] ?? NULL;
       if ($usedFor == 'onbehalf') {
         $profileType = 'Organization';
       }
@@ -1936,7 +1936,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     }
     elseif (in_array($fieldName, CRM_Contact_BAO_Contact::$_greetingTypes)) {
       // Get contact type for greeting selector
-      $gId = $form->get('gid') ?:  $field['group_id'] ?? NULL;
+      $gId = $form->get('gid') ?: $field['group_id'] ?? NULL;
       $profileType = CRM_Core_BAO_UFField::getProfileType($gId, TRUE, FALSE, TRUE);
 
       if (!$profileType || in_array($profileType, ['Contact', 'Contribution', 'Participant', 'Membership'])) {

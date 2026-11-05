@@ -12,7 +12,6 @@
 use Civi\Api4\Campaign;
 use Civi\Api4\Contact;
 use Civi\Api4\DedupeRuleGroup;
-use Civi\Api4\Email;
 use Civi\Api4\Event;
 use Civi\Api4\UserJob;
 use Civi\UserJob\UserJobInterface;

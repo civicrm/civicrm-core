@@ -2,7 +2,6 @@
 
 namespace Civi\Core;
 
-use Brick\Money\Currency;
 use Brick\Money\Money;
 use Brick\Math\RoundingMode;
 use Civi;

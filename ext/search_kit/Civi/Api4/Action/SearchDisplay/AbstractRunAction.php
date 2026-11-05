@@ -1790,7 +1790,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
                   if ($field2['entity'] === $joinEntityField['fk_entity']) {
                     $currencyEntityPrefix = substr($field2['path'], 0, strrpos($field2['path'], $field2['name']));
                     return $this->currencyFields[$select] = $currencyEntityPrefix . $controlFieldName;
-                  };
+                  }
                 }
               }
             }
