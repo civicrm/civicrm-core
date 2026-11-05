@@ -33,7 +33,7 @@ class CRM_Utils_Color {
    * @return string
    */
   public static function getContrast($color, $black = 'black', $white = 'white') {
-    list($r, $g, $b) = self::getRgb($color);
+    [$r, $g, $b] = self::getRgb($color);
     $yiq = (($r * 299) + ($g * 587) + ($b * 114)) / 1000;
     return ($yiq >= 128) ? $black : $white;
   }

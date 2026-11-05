@@ -683,7 +683,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         $date_suffixes = ['relative', 'from', 'to'];
         foreach ($date_suffixes as $suffix) {
           if (!empty($this->_params['activity_date_time_' . $suffix])) {
-            list($from, $to)
+            [$from, $to]
               = $this->getFromTo(
                 $this->_params["activity_date_time_relative"] ?? NULL,
                 $this->_params["activity_date_time_from"] ?? NULL,

@@ -623,7 +623,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
         'module' => 'CiviCampaign',
       ];
 
-      list($first, $second) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+      [$first, $second] = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
       if ($first) {
         $ufIDs[$surveyId] = [$first];

@@ -633,7 +633,7 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
 
     $primaryContributions = $this->buildContributionRows($contactIds);
 
-    list($relationshipRows, $relatedContactIds) = $this->buildRelationshipRows($contactIds);
+    [$relationshipRows, $relatedContactIds] = $this->buildRelationshipRows($contactIds);
 
     if (empty($relatedContactIds)) {
       $rows = $primaryContributions;

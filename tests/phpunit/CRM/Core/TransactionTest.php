@@ -467,7 +467,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
     $generalOffset = count($this->cids);
     foreach ($callbacks as $callback) {
-      list ($cbNesting, $cbInsert, $cbOutcome) = $callback;
+      [$cbNesting, $cbInsert, $cbOutcome] = $callback;
       $this->createContactWithTransaction($cbNesting, $cbInsert, $cbOutcome);
     }
 

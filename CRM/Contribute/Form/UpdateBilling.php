@@ -184,7 +184,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     $processorParams = [];
     foreach ($params as $key => $val) {
       $key = str_replace('billing_', '', $key);
-      list($key) = explode('-', $key);
+      [$key] = explode('-', $key);
       $processorParams[$key] = $val;
     }
     $processorParams['billingStateProvince'] = $processorParams['state_province'] = CRM_Core_PseudoConstant::stateProvince($params["billing_state_province_id-{$billingLocationID}"], FALSE);
@@ -306,7 +306,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       }
       CRM_Activity_BAO_Activity::create($activityParams);
 
-      list($donorDisplayName, $donorEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->getSubscriptionDetails()->contact_id);
+      [$donorDisplayName, $donorEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->getSubscriptionDetails()->contact_id);
       $tplParams['contact'] = ['display_name' => $donorDisplayName];
 
       $tplParams = array_merge($tplParams, CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($processorParams));
@@ -322,7 +322,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
         'toName' => $donorDisplayName,
         'toEmail' => $donorEmail,
       ];
-      list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+      [$sent] = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
     }
     else {
       $status = ts('There was some problem updating the billing details.');

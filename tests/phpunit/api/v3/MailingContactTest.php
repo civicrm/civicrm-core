@@ -42,7 +42,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    * Test that the API returns a mailing properly when there is only one.
    */
   public function testMailingContactDelivered(): void {
-    list($contactID, $mailingID, $eventQueueID) = $this->setupEventQueue();
+    [$contactID, $mailingID, $eventQueueID] = $this->setupEventQueue();
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_mailing_event_delivered (event_queue_id) VALUES(%1)", [1 => [$eventQueueID, 'Integer']]);
 
     $params = [
@@ -67,7 +67,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testMailingContactBounced(): void {
-    list($contactID, $mailingID, $eventQueueID) = $this->setupEventQueue();
+    [$contactID, $mailingID, $eventQueueID] = $this->setupEventQueue();
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_mailing_event_bounce (event_queue_id, bounce_type_id) VALUES(%1, 6)", [1 => [$eventQueueID, 'Integer']]);
 
     $params = [

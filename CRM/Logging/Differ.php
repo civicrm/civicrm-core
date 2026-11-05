@@ -118,7 +118,7 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
           }
 
           // allow tables to be extended by report hook query objects
-          list($contactIdClause, $join) = CRM_Report_BAO_Hook::singleton()->logDiffClause($this, $table);
+          [$contactIdClause, $join] = CRM_Report_BAO_Hook::singleton()->logDiffClause($this, $table);
 
           if (empty($contactIdClause)) {
             $contactTables = CRM_Core_DAO::getReferencesToContactTable();
@@ -325,7 +325,7 @@ WHERE lt.log_conn_id = %1
         }
       }
       elseif (substr($table, 0, 14) == 'civicrm_value_') {
-        list($titles[$table], $values[$table]) = $this->titlesAndValuesForCustomDataTable($table, $referenceDate);
+        [$titles[$table], $values[$table]] = $this->titlesAndValuesForCustomDataTable($table, $referenceDate);
       }
       else {
         $titles[$table] = $values[$table] = [];

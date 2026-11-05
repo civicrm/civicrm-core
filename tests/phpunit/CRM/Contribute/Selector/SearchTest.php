@@ -23,7 +23,7 @@ class CRM_Contribute_Selector_SearchTest extends CiviUnitTestCase {
     $queryParams = [['contribution_or_softcredits', '=', 'both_related', 0, 0]];
     $searchSelector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::VIEW);
 
-    list($select, $from, $where, $having) = $searchSelector->getQuery()->query();
+    [$select, $from, $where, $having] = $searchSelector->getQuery()->query();
     $this->assertStringContainsString('civicrm_contribution_soft.amount', $select);
   }
 
@@ -34,7 +34,7 @@ class CRM_Contribute_Selector_SearchTest extends CiviUnitTestCase {
     $queryParams = [['contribution_or_softcredits', '=', 'only_contribs', 0, 0]];
     $searchSelector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::VIEW);
 
-    list($select, $from, $where, $having) = $searchSelector->getQuery()->query();
+    [$select, $from, $where, $having] = $searchSelector->getQuery()->query();
     $this->assertStringNotContainsString('civicrm_contribution_soft.amount', $select);
   }
 

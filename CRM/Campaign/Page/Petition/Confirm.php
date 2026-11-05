@@ -48,7 +48,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
       // $this->assign( 'group'  , $result );
     }
 
-    list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contact_id);
+    [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($contact_id);
     $this->assign('display_name', $displayName);
     $this->assign('email', $email);
     $this->assign('petition_id', $petition_id);

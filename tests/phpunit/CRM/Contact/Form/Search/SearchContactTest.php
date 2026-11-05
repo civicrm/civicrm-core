@@ -66,7 +66,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     }
     CRM_Contact_BAO_Query::convertFormValues($formValues);
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
-    list($select, $from, $where, $having) = $query->query();
+    [$select, $from, $where, $having] = $query->query();
     // get and assert contact count
     $contactsResult = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id %s %s', $from, $where))->fetchAll();
     foreach ($contactsResult as $key => $value) {
@@ -108,7 +108,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     $formValues['group_type'] = $groupTypes['Access Control'];
     CRM_Contact_BAO_Query::convertFormValues($formValues);
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
-    list($select, $from, $where, $having) = $query->query();
+    [$select, $from, $where, $having] = $query->query();
     // get and assert contact count
     $contactsResult = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id %s %s', $from, $where));
     // assert the contacts count
@@ -118,7 +118,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     $formValues['group_type'] = $groupTypes['Mailing List'];
     CRM_Contact_BAO_Query::convertFormValues($formValues);
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
-    list($select, $from, $where, $having) = $query->query();
+    [$select, $from, $where, $having] = $query->query();
     // get and assert contact count
     $contactsResult = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id %s %s', $from, $where));
     // assert the contacts count

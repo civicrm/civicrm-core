@@ -66,7 +66,7 @@ class DbUtil {
    * @return \mysqli
    */
   public static function softConnect($db) {
-    list($host, $port, $socket) = self::decodeHostPort($db['server']);
+    [$host, $port, $socket] = self::decodeHostPort($db['server']);
     if (empty($db['ssl_params'])) {
       $conn = @mysqli_connect($host, $db['username'], $db['password'], $db['database'], $port, $socket);
     }

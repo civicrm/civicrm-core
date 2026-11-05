@@ -512,7 +512,7 @@ WHERE      a.id = %1
    * @return array|null
    */
   public function getCustomData($clientID, $activityDAO, &$activityTypeInfo) {
-    list($typeValues, $options, $sql) = $this->getActivityTypeCustomSQL($activityTypeInfo['id'], '%Y-%m-%d');
+    [$typeValues, $options, $sql] = $this->getActivityTypeCustomSQL($activityTypeInfo['id'], '%Y-%m-%d');
 
     $params = [1 => [$activityDAO->id, 'Integer']];
 

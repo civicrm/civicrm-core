@@ -425,7 +425,7 @@ AND         cp.page_type = 'contribute'
     $whereClause = $this->whereClause($params, TRUE);
     $this->pager($whereClause, $params);
 
-    list($offset, $rowCount) = $this->_pager->getOffsetAndRowCount();
+    [$offset, $rowCount] = $this->_pager->getOffsetAndRowCount();
 
     //check for delete CRM-4418
     $allowToDelete = CRM_Core_Permission::check('delete in CiviContribute');

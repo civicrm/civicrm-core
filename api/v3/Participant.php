@@ -144,7 +144,7 @@ function _civicrm_api3_participant_create_spec(&$params) {
 function civicrm_api3_participant_get($params) {
   $mode = CRM_Contact_BAO_Query::MODE_EVENT;
 
-  list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, 'Participant');
+  [$dao, $query] = _civicrm_api3_get_query_object($params, $mode, 'Participant');
 
   $participant = [];
   while ($dao->fetch()) {

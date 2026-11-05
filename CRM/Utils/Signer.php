@@ -125,7 +125,7 @@ class CRM_Utils_Signer {
    * @return bool, TRUE iff all $paramNames for the submitted validate($params) and the original sign($params)
    */
   public function validate($token, $params) {
-    list ($salt, $signature) = explode($this->signDelim, $token);
+    [$salt, $signature] = explode($this->signDelim, $token);
     if (strlen($salt) != self::SALT_LEN) {
       throw new Exception("Token contains invalid salt [" . urlencode($token) . "]");
     }

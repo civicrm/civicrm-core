@@ -954,9 +954,7 @@ class CRM_GCD {
 
     // some more random skips
     // hack add lat / long for US based addresses
-    list($addressDAO->country_id, $addressDAO->state_province_id, $addressDAO->city,
-      $addressDAO->postal_code, $addressDAO->geo_code_1, $addressDAO->geo_code_2
-    ) = self::getZipCodeInfo();
+    [$addressDAO->country_id, $addressDAO->state_province_id, $addressDAO->city, $addressDAO->postal_code, $addressDAO->geo_code_1, $addressDAO->geo_code_2] = self::getZipCodeInfo();
 
     //$addressDAO->county_id = 1;
 

@@ -72,7 +72,7 @@ class CRM_Utils_HttpClient {
       throw new CRM_Core_Exception('Cannot install this extension - curl is not installed!');
     }
 
-    list($ch, $caConfig) = $this->createCurl($remoteFile);
+    [$ch, $caConfig] = $this->createCurl($remoteFile);
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
       throw new CRM_Core_Exception('Cannot install this extension - does not support SSL');
     }
@@ -113,7 +113,7 @@ class CRM_Utils_HttpClient {
       return [self::STATUS_DL_ERROR, NULL];
     }
 
-    list($ch, $caConfig) = $this->createCurl($remoteFile);
+    [$ch, $caConfig] = $this->createCurl($remoteFile);
 
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
       return [self::STATUS_DL_ERROR, NULL];
@@ -145,7 +145,7 @@ class CRM_Utils_HttpClient {
       return [self::STATUS_DL_ERROR, NULL];
     }
 
-    list($ch, $caConfig) = $this->createCurl($remoteFile);
+    [$ch, $caConfig] = $this->createCurl($remoteFile);
 
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
       return [self::STATUS_DL_ERROR, NULL];

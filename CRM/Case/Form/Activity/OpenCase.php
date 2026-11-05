@@ -205,7 +205,7 @@ class CRM_Case_Form_Activity_OpenCase {
     $form->addRule('duration', ts('Please enter the duration as number of minutes (integers only).'), 'positiveInteger');
 
     if ($form->_currentlyViewedContactId) {
-      list($displayName) = CRM_Contact_BAO_Contact::getDisplayAndImage($form->_currentlyViewedContactId);
+      [$displayName] = CRM_Contact_BAO_Contact::getDisplayAndImage($form->_currentlyViewedContactId);
     }
     $form->assign('clientName', $displayName ?? NULL);
 

@@ -169,9 +169,7 @@ WHERE  inst.report_id = %1";
       return FALSE;
     }
 
-    list($domainEmailName,
-      $domainEmailAddress
-      ) = CRM_Core_BAO_Domain::getNameAndEmail();
+    [$domainEmailName, $domainEmailAddress] = CRM_Core_BAO_Domain::getNameAndEmail();
 
     $params = ['id' => $instanceID];
     $instanceInfo = [];

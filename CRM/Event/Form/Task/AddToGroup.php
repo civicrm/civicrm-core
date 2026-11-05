@@ -224,7 +224,7 @@ class CRM_Event_Form_Task_AddToGroup extends CRM_Event_Form_Task {
       $groupName = $group[$groupID];
     }
 
-    list($total, $added, $notAdded) = CRM_Contact_BAO_GroupContact::addContactsToGroup($this->_contactIds, $groupID);
+    [$total, $added, $notAdded] = CRM_Contact_BAO_GroupContact::addContactsToGroup($this->_contactIds, $groupID);
 
     $status = [
       ts('%count contact added to group', [

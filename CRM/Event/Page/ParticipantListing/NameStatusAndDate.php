@@ -66,7 +66,7 @@ WHERE    civicrm_event.id = %1";
     $this->pager($fromClause, $whereClause, $params);
     $orderBy = $this->orderBy();
 
-    list($offset, $rowCount) = $this->_pager->getOffsetAndRowCount();
+    [$offset, $rowCount] = $this->_pager->getOffsetAndRowCount();
 
     $query = "
 SELECT   civicrm_contact.id                as contact_id    ,

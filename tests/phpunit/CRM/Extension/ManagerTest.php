@@ -34,7 +34,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    list($this->basedir, $this->container) = $this->createContainer();
+    [$this->basedir, $this->container] = $this->createContainer();
     $this->mapper = new CRM_Extension_Mapper($this->container);
   }
 

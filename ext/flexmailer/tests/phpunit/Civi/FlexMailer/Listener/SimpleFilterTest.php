@@ -44,7 +44,7 @@ class SimpleFilterTest extends \CiviUnitTestCase {
    */
   public function testByValue(): void {
     $test = $this;
-    list($tasks, $e) = $this->createExampleBatch();
+    [$tasks, $e] = $this->createExampleBatch();
 
     SimpleFilter::byValue($e, 'text', function ($value, $t, $e) use ($test) {
       $test->assertInstanceOf('Civi\FlexMailer\FlexMailerTask', $t);
@@ -62,7 +62,7 @@ class SimpleFilterTest extends \CiviUnitTestCase {
    */
   public function testByColumn(): void {
     $test = $this;
-    list($tasks, $e) = $this->createExampleBatch();
+    [$tasks, $e] = $this->createExampleBatch();
 
     SimpleFilter::byColumn($e, 'text', function ($values, $e) use ($test) {
       $test->assertInstanceOf('Civi\FlexMailer\Event\ComposeBatchEvent', $e);

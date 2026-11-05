@@ -57,7 +57,7 @@ class CRM_Campaign_BAO_Query {
           continue;
         }
 
-        list($name, $op, $value, $grouping, $wildcard) = $values;
+        [$name, $op, $value, $grouping, $wildcard] = $values;
         if ($name == 'campaign_survey_id') {
           self::$_applySurveyClause = TRUE;
           break;
@@ -151,7 +151,7 @@ class CRM_Campaign_BAO_Query {
       return;
     }
 
-    list($name, $op, $value, $grouping, $wildcard) = $values;
+    [$name, $op, $value, $grouping, $wildcard] = $values;
 
     switch ($name) {
       case 'campaign_survey_id':

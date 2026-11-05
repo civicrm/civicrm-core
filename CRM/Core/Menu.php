@@ -820,11 +820,7 @@ class CRM_Core_Menu {
       $params = explode(';', $arr['urlToSession']);
       $count = 0;
       foreach ($params as $keyVal) {
-        list($urlToSession[$count]['urlVar'],
-          $urlToSession[$count]['sessionVar'],
-          $urlToSession[$count]['type'],
-          $urlToSession[$count]['default']
-          ) = explode(':', $keyVal);
+        [$urlToSession[$count]['urlVar'], $urlToSession[$count]['sessionVar'], $urlToSession[$count]['type'], $urlToSession[$count]['default']] = explode(':', $keyVal);
         $count++;
       }
       $arr['urlToSession'] = $urlToSession;

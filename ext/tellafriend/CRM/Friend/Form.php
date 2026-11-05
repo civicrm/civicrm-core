@@ -144,7 +144,7 @@ class CRM_Friend_Form extends CRM_Core_Form {
     $this->assign('message', $defaults['suggested_message'] ?? NULL);
     $this->assign('entityID', $this->_entityId);
 
-    list($fromName, $fromEmail) = CRM_Contact_BAO_Contact::getContactDetails($this->_contactID);
+    [$fromName, $fromEmail] = CRM_Contact_BAO_Contact::getContactDetails($this->_contactID);
 
     $defaults['from_name'] = $fromName;
     $defaults['from_email'] = $fromEmail;

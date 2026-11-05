@@ -239,7 +239,7 @@ class CRM_Utils_Mail {
       return FALSE;
     }
 
-    list($headers, $message) = self::setEmailHeaders($params);
+    [$headers, $message] = self::setEmailHeaders($params);
 
     $to = [$params['toEmail']];
     $mailer = \Civi::service('pear_mail');
@@ -316,7 +316,7 @@ class CRM_Utils_Mail {
     CRM_Utils_Hook::alterMailParams($params, 'testEmail');
     $to = $params['toEmail'];
 
-    list($headers, $message) = self::setEmailHeaders($params);
+    [$headers, $message] = self::setEmailHeaders($params);
 
     $from = self::pluckEmailFromHeader($headers['From']);
 
