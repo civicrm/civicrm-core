@@ -1632,9 +1632,9 @@ $text
     $campaign_id = $result['id'];
 
     // Add contact tokens in subject, html , text.
-    $subject = __FUNCTION__ . ' subject' . '{contact.display_name}';
-    $html = __FUNCTION__ . ' html' . '{contact.display_name}';
-    $text = __FUNCTION__ . ' text' . '{contact.display_name}';
+    $subject = __FUNCTION__ . ' subject{contact.display_name}';
+    $html = __FUNCTION__ . ' html{contact.display_name}';
+    $text = __FUNCTION__ . ' text{contact.display_name}';
 
     $this->getTestForm('CRM_Contact_Form_Task_Email', [
       'subject' => $subject,
@@ -1679,10 +1679,10 @@ $textValue
     $this->createLoggedInUser();
 
     // Add contact tokens in subject, html , text.
-    $subject = 'subject:' . '{contact.display_name}';
-    $html = 'html:' . '{contact.display_name}';
+    $subject = 'subject:{contact.display_name}';
+    $html = 'html:{contact.display_name}';
     // Check the smarty doesn't mess stuff up.
-    $text = 'text:' . '{contact.display_name} {$contact.first_name}';
+    $text = 'text:{contact.display_name} {$contact.first_name}';
 
     $filepath = CRM_Core_Config::singleton()->customFileUploadDir;
     $fileName = 'test_email_create.txt';

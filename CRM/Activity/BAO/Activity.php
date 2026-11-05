@@ -1966,7 +1966,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
             }
 
             if ($extraCount = $values['target_contact_count'] - 1) {
-              $activity['target_contact_name'] .= ";<br />" . "(" . ts('%1 more', [1 => $extraCount]) . ")";
+              $activity['target_contact_name'] .= ";<br />(" . ts('%1 more', [1 => $extraCount]) . ")";
             }
             if ($showContactOverlay) {
               $activity['target_contact_name'] .= "</div> ";

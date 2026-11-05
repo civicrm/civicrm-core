@@ -212,7 +212,7 @@ class CRM_Activity_Page_AJAX {
       $typeLabel = $row['relation'];
       // Add "<br />(Case Manager)" to label
       if (!empty($row['relation_type']) && !empty($row['relationship_direction']) && $row['relation_type'] . '_' . $row['relationship_direction'] == $managerRoleId) {
-        $row['relation'] .= '<br />' . '(' . ts('Case Manager') . ')';
+        $row['relation'] .= '<br />(' . ts('Case Manager') . ')';
       }
       // view user links
       if (!empty($row['cid'])) {

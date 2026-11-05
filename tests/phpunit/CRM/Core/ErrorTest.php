@@ -107,7 +107,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     $log->log('Little lamb');
     $fileName = CRM_Core_Error::generateLogFileName('my-test');
     $config = CRM_Core_Config::singleton();
-    $this->assertEquals($config->configAndLogDir . 'CiviCRM.' . CIVICRM_DOMAIN_ID . '.' . 'my-test.' . CRM_Core_Error::generateLogFileHash($config) . '.log', $fileName);
+    $this->assertEquals($config->configAndLogDir . 'CiviCRM.' . CIVICRM_DOMAIN_ID . '.my-test.' . CRM_Core_Error::generateLogFileHash($config) . '.log', $fileName);
     $fileContents = file_get_contents($fileName);
     // Date format should be ISO
     $this->assertMatchesRegularExpression('/^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d[+-]\d\d\d\d$/', substr($fileContents, 0, 24));

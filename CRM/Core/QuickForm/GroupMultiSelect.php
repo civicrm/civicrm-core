@@ -65,7 +65,7 @@ class CRM_Core_QuickForm_GroupMultiSelect extends CRM_Core_QuickForm_NestedAdvMu
           // The item is *unselected* so we want to put it
           $checked = '';
         }
-        $strHtmlSelected .= $tab . '<label' . $this->_getAttrString($labelAttributes) . '>' . '<input type="checkbox"' . ' id="' . $this->getName() . '"' . ' name="' . $selectName . '"' . $checked . $this->_getAttrString($option['attr']) . ' />' . $option['text'] . '</label>' . PHP_EOL;
+        $strHtmlSelected .= $tab . '<label' . $this->_getAttrString($labelAttributes) . '><input type="checkbox" id="' . $this->getName() . '" name="' . $selectName . '"' . $checked . $this->_getAttrString($option['attr']) . ' />' . $option['text'] . '</label>' . PHP_EOL;
       }
       $strHtmlSelected .= $tab . '</div>' . PHP_EOL;
 

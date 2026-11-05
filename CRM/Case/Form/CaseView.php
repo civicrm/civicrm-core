@@ -291,7 +291,7 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form implements CRM_Case_Form_Case
     //adding case manager.CRM-4510.
     $managerRoleId = $xmlProcessor->getCaseManagerRoleId($this->_caseType);
     if (!empty($managerRoleId)) {
-      $caseRoles[$managerRoleId] = $caseRoles[$managerRoleId] . '<br />' . '(' . ts('Case Manager') . ')';
+      $caseRoles[$managerRoleId] = $caseRoles[$managerRoleId] . '<br />(' . ts('Case Manager') . ')';
     }
 
     $aTypes = $xmlProcessor->get($this->_caseType, 'ActivityTypes', TRUE);

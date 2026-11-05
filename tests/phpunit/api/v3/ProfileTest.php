@@ -111,7 +111,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     foreach ($expected as $profileField => $value) {
       $this->assertEquals($value, $result[$this->_profileID][$profileField], ' error message: ' . "missing/mismatching value for $profileField");
     }
-    $this->assertSame('abc1', $result[$nameAndAddressProfileID]['first_name'], ' error message: ' . 'missing/mismatching value for first name');
+    $this->assertSame('abc1', $result[$nameAndAddressProfileID]['first_name'], ' error message: missing/mismatching value for first name');
     $this->assertArrayNotHasKey('email-Primary', $result[$nameAndAddressProfileID], 'profile 1 does not include email');
     $this->assertEquals([
       'billing_first_name' => 'abc1',
