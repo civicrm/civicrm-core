@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types = 1);
 
 use CRM_RouterTest_ExtensionUtil as E;
