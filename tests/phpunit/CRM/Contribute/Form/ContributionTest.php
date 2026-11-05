@@ -122,8 +122,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $firstParticipantDetailsAfter = $this->callAPISuccessGetSingle('Participant', ['id' => $firstParticipant['id']]);
     $secondParticipantDetailsAfter = $this->callAPISuccessGetSingle('Participant', ['id' => $secondParticipant['id']]);
 
-    $this->assertEquals($firstParticipant['fee_amount'], $firstParticipantDetailsAfter['participant_fee_amount']);
-    $this->assertEquals($secondParticipant['fee_amount'], $secondParticipantDetailsAfter['participant_fee_amount']);
+    $this->assertEquals(CRM_Utils_Money::format($contribution['total_amount'] / count($orderParams['line_items']), NULL, NULL, TRUE), $firstParticipantDetailsAfter['participant_fee_amount']);
+    $this->assertEquals(CRM_Utils_Money::format($contribution['total_amount'] / count($orderParams['line_items']), NULL, NULL, TRUE), $secondParticipantDetailsAfter['participant_fee_amount']);
   }
 
   /**
