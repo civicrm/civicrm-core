@@ -77,7 +77,7 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     return !empty($processor->context['mailingId']) || !empty($processor->context['mailing'])
@@ -112,7 +112,7 @@ class CRM_Mailing_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL): void {
     $bespokeTokens = array_keys($this->getBespokeTokens());

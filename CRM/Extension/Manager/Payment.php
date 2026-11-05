@@ -28,7 +28,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    * @throws CRM_Core_Exception
@@ -91,7 +91,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -100,7 +100,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -122,7 +122,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -135,7 +135,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -146,7 +146,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */

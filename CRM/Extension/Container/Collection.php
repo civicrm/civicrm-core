@@ -76,7 +76,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @return array
    */
@@ -89,7 +89,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @return array
    */
@@ -99,7 +99,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param string $key
    *
@@ -110,7 +110,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param string $key
    *
@@ -121,7 +121,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function refresh() {
     if ($this->cache) {

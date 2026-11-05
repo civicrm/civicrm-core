@@ -392,7 +392,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
           'name' => ts('Save and New'),
           'subName' => 'new',
         ];
-      };
+      }
       $buttons[] = [
         'type' => 'cancel',
         'name' => ts('Cancel'),

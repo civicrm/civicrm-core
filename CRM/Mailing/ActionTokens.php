@@ -50,7 +50,7 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor): bool {
     return !empty($processor->context['mailingEventQueueId']) || !empty($processor->context['mailingId']) || !empty($processor->context['mailing'])
@@ -58,7 +58,7 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function evaluateToken(
     TokenRow $row,

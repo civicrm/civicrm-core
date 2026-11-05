@@ -34,7 +34,7 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function alterActionScheduleQuery(MailingQueryEvent $e): void {
     if ($e->mapping->getEntityTable($e->actionSchedule) !== $this->getExtendableTableName()) {
@@ -100,7 +100,7 @@ class CRM_Activity_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getActiveTokens(TokenValueEvent $e) {
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();

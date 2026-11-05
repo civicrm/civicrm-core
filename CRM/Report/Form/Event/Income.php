@@ -222,7 +222,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function limit($rowCount = NULL) {
     $rowCount ??= $this->getRowCount();

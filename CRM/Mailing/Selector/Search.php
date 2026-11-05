@@ -172,7 +172,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    */
   public static function &links() {
     if (!(self::$_links)) {
-      list($context, $key) = func_get_args();
+      [$context, $key] = func_get_args();
       $extraParams = ($key) ? "&key={$key}" : NULL;
       $searchContext = ($context) ? "&context=$context" : NULL;
 
@@ -306,7 +306,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getQILL() {
     return $this->_query->qill();

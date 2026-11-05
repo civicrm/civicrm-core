@@ -60,7 +60,7 @@ class CRM_Event_ParticipantTokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @throws \CRM_Core_Exception
    */
   public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL) {

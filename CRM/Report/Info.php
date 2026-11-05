@@ -25,7 +25,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
   protected $keyword = 'report';
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * Provides base information about the component.
    * Needs to be implemented in component's information
    * class.
@@ -44,7 +44,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getPermissions(): array {
     $permissions = [
@@ -84,7 +84,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * Provides information about user dashboard element
    * offered by this component.
    *
@@ -113,7 +113,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * Provides information about user dashboard element
    * offered by this component.
    *
@@ -131,7 +131,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @return string
    */
   public function getIcon() {
@@ -139,7 +139,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * Provides information about advanced search pane
    * offered by this component.
    *
@@ -157,7 +157,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * Provides potential activity types that this
    * component might want to register in activity history.
    * Needs to be implemented in component's information

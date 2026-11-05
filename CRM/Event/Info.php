@@ -26,7 +26,7 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   protected $keyword = 'event';
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @return array
    */
   public function getInfo() {
@@ -40,7 +40,7 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getPermissions(): array {
     $permissions = [
@@ -92,7 +92,7 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @return array
    */
   public function getUserDashboardElement() {
@@ -105,7 +105,7 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @return array
    */
   public function registerTab() {
@@ -118,7 +118,7 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @return string
    */
   public function getIcon() {
@@ -126,7 +126,7 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @return array
    */
   public function registerAdvancedSearchPane() {
@@ -137,7 +137,7 @@ class CRM_Event_Info extends CRM_Core_Component_Info {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @return array
    */
   public function getActivityTypes() {

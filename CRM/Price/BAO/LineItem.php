@@ -299,7 +299,7 @@ WHERE li.contribution_id = %1";
 
     foreach ($params["price_{$fid}"] as $oid => $qty) {
       $qty = (float) $qty;
-      $price = (float) ($amount_override === NULL ? $options[$oid]['amount'] : $amount_override);
+      $price = (float) ($amount_override ?? $options[$oid]['amount']);
 
       $participantsPerField = (int) ($options[$oid]['count'] ?? 0);
 

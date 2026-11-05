@@ -56,7 +56,7 @@ class CRM_Member_Tokens extends CRM_Core_EntityTokens {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @throws \CRM_Core_Exception
    */
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {

@@ -314,7 +314,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
     $this->pager($whereClause, $params);
 
-    list($offset, $rowCount) = $this->_pager->getOffsetAndRowCount();
+    [$offset, $rowCount] = $this->_pager->getOffsetAndRowCount();
 
     // get all custom groups sorted by weight
     $manageEvent = [];

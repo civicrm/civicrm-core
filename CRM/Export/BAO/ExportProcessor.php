@@ -1267,7 +1267,7 @@ class CRM_Export_BAO_ExportProcessor {
         CRM_Contact_BAO_Query::MODE_MEMBER => 'membership_id',
         CRM_Contact_BAO_Query::MODE_PLEDGE => 'pledge_payment_id',
       ];
-      return isset($mapping[$this->getQueryMode()]) ? $mapping[$this->getQueryMode()] : '';
+      return $mapping[$this->getQueryMode()] ?? '';
     }
     elseif ($this->hasRequestedComponentPaymentFields()) {
       return 'participant_id';

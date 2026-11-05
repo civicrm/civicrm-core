@@ -93,7 +93,7 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
    */
   protected function getFeed($url) {
     $httpClient = new CRM_Utils_HttpClient(self::CHECK_TIMEOUT);
-    list ($status, $rawFeed) = $httpClient->get($url);
+    [$status, $rawFeed] = $httpClient->get($url);
     if ($status !== CRM_Utils_HttpClient::STATUS_OK) {
       return NULL;
     }

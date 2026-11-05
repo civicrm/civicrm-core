@@ -181,7 +181,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
       'jcb' => '(?:3[0-9]{15}|(2131|1800)[0-9]{11})',
       'unionpay' => '62(?:[0-9]{14}|[0-9]{17})',
     ];
-    return isset($cardMappings[strtolower($key)]) ? $cardMappings[strtolower($key)] : '';
+    return $cardMappings[strtolower($key)] ?? '';
   }
 
 }

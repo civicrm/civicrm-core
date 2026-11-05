@@ -104,7 +104,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @return array
    */
@@ -128,7 +128,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @return array_keys
    */
@@ -137,14 +137,14 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getPath($key) {
     return $this->baseDir . $this->getRelPath($key);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getResUrl($key) {
     if (!$this->baseUrl) {
@@ -162,7 +162,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function refresh() {
     $this->relPaths = NULL;

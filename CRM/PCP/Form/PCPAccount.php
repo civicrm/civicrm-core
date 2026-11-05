@@ -283,7 +283,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
     if (!$this->_contactID && isset($params['cms_create_account'])) {
       foreach ($params as $key => $value) {
         if (substr($key, 0, 5) == 'email' && !empty($value)) {
-          list($fieldName, $locTypeId) = CRM_Utils_System::explode('-', $key, 2);
+          [$fieldName, $locTypeId] = CRM_Utils_System::explode('-', $key, 2);
           $isPrimary = 0;
           if ($locTypeId == 'Primary') {
             $locTypeDefault = CRM_Core_BAO_LocationType::getDefault();

@@ -63,7 +63,7 @@ AND      civicrm_participant.status_id IN ( 1, 2 )";
     $this->pager($fromClause, $whereClause, $params);
     $orderBy = $this->orderBy();
 
-    list($offset, $rowCount) = $this->_pager->getOffsetAndRowCount();
+    [$offset, $rowCount] = $this->_pager->getOffsetAndRowCount();
 
     $query = "
 SELECT   civicrm_contact.id           as contact_id    ,

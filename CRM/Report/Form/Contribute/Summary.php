@@ -906,7 +906,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         $endDate = new DateTime($dateStart);
         $dateEnd = [];
 
-        list($dateEnd['Y'], $dateEnd['M'], $dateEnd['d']) = explode(':', $endDate->format('Y:m:d'));
+        [$dateEnd['Y'], $dateEnd['M'], $dateEnd['d']] = explode(':', $endDate->format('Y:m:d'));
 
         switch (strtolower($this->_params['group_bys_freq']['receive_date'])) {
           case 'month':

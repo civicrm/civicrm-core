@@ -34,7 +34,7 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -42,7 +42,7 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -50,7 +50,7 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -58,7 +58,7 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -66,7 +66,7 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -74,7 +74,7 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -82,7 +82,7 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -90,7 +90,7 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -98,7 +98,7 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $info
    */
@@ -106,7 +106,7 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $oldInfo
    * @param CRM_Extension_Info $newInfo
@@ -119,7 +119,7 @@ class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param CRM_Extension_Info $oldInfo
    * @param CRM_Extension_Info $newInfo

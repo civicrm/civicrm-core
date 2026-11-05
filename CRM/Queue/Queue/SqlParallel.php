@@ -35,7 +35,7 @@ class CRM_Queue_Queue_SqlParallel extends CRM_Queue_Queue implements CRM_Queue_Q
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function claimItem($lease_time = NULL) {
     $items = $this->claimItems(1, $lease_time);
@@ -43,7 +43,7 @@ class CRM_Queue_Queue_SqlParallel extends CRM_Queue_Queue implements CRM_Queue_Q
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function claimItems(int $limit, ?int $lease_time = NULL): array {
     $lease_time = $lease_time ?: $this->getSpec('lease_time') ?: static::DEFAULT_LEASE_TIME;

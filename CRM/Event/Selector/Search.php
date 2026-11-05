@@ -435,7 +435,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getQILL() {
     return $this->_query->qill();

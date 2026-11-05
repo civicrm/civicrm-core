@@ -161,12 +161,12 @@ class CRM_Financial_BAO_Payment {
         'trxnParams' => [
           'trxn_date' => $paymentTrxnParams['trxn_date'],
           'currency' => $paymentTrxnParams['currency'],
-          'trxn_id' => isset($paymentTrxnParams['trxn_id']) ? $paymentTrxnParams['trxn_id'] : NULL,
-          'payment_instrument_id' => isset($paymentTrxnParams['payment_instrument_id']) ? $paymentTrxnParams['payment_instrument_id'] : NULL,
-          'check_number' => isset($paymentTrxnParams['check_number']) ? $paymentTrxnParams['check_number'] : NULL,
-          'pan_truncation' => isset($paymentTrxnParams['pan_truncation']) ? $paymentTrxnParams['pan_truncation'] : NULL,
-          'card_type_id' => isset($paymentTrxnParams['card_type_id']) ? $paymentTrxnParams['card_type_id'] : NULL,
-          'payment_processor_id' => isset($paymentTrxnParams['payment_processor_id']) ? $paymentTrxnParams['payment_processor_id'] : NULL,
+          'trxn_id' => $paymentTrxnParams['trxn_id'] ?? NULL,
+          'payment_instrument_id' => $paymentTrxnParams['payment_instrument_id'] ?? NULL,
+          'check_number' => $paymentTrxnParams['check_number'] ?? NULL,
+          'pan_truncation' => $paymentTrxnParams['pan_truncation'] ?? NULL,
+          'card_type_id' => $paymentTrxnParams['card_type_id'] ?? NULL,
+          'payment_processor_id' => $paymentTrxnParams['payment_processor_id'] ?? NULL,
         ],
       ];
 
