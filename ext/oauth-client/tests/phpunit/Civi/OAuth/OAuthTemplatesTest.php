@@ -86,4 +86,22 @@ class OAuthTemplatesTest extends \PHPUnit\Framework\TestCase implements Headless
     $this->assertTrue($actual['localpart'] === NULL);
   }
 
+  /**
+   * Bounces go to "<localpart>b.<job>.<queue>.<hash>@<domain>", which only
+   * reaches the mailbox via plus-addressing.
+   */
+  public function testShippedMailSettingsTemplatesUsePlusAddressing(): void {
+    $providers = \Civi\Api4\OAuthProvider::get(FALSE)
+      ->addWhere('name', 'IN', ['gmail', 'ms-exchange'])
+      ->execute();
+    $this->assertCount(2, $providers);
+
+    $vars = ['token' => ['resource_owner' => ['email' => 'bounces@example.org']]];
+    foreach ($providers as $provider) {
+      $actual = \Civi::service('oauth_client.templates')->evaluate($provider['mailSettingsTemplate'], $vars);
+      $this->assertEquals('bounces+', $actual['localpart'], $provider['name']);
+      $this->assertEquals('example.org', $actual['domain'], $provider['name']);
+    }
+  }
+
 }
