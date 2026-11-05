@@ -53,15 +53,8 @@ function standaloneusers_civicrm_config(&$config) {
   // set system timezone based on logged in user
   \CRM_Utils_System::setTimeZone();
 
-  $sess = CRM_Core_Session::singleton();
-
-  if (!empty($sess->get('ufID'))) {
-    // Logged in user is making a request.
-    if (empty($sess->get('lastAccess')) || (time() - $sess->get('lastAccess')) >= 60) {
-      // Once a minute, update the when_last_accessed field
-      CRM_Standaloneusers_BAO_User::updateLastAccessed();
-    }
-  }
+  // update last accessed if appropriate
+  \CRM_Standaloneusers_BAO_User::updateLastAccessed();
 }
 
 /**
