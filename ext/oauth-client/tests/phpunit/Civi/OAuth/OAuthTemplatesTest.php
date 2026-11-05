@@ -99,8 +99,8 @@ class OAuthTemplatesTest extends \PHPUnit\Framework\TestCase implements Headless
     $vars = ['token' => ['resource_owner' => ['email' => 'bounces@example.org']]];
     foreach ($providers as $provider) {
       $actual = \Civi::service('oauth_client.templates')->evaluate($provider['mailSettingsTemplate'], $vars);
-      $this->assertEquals('bounces+', $actual['localpart'], $provider['name']);
-      $this->assertEquals('example.org', $actual['domain'], $provider['name']);
+      $this->assertSame('bounces+', $actual['localpart'], $provider['name']);
+      $this->assertSame('example.org', $actual['domain'], $provider['name']);
     }
   }
 

@@ -74,7 +74,7 @@ class CRM_Utils_Mail_FilteredPearMailerTest extends CiviUnitTestCase {
     $r = $fm->send(['recip'], ['Subject' => 'Fruit loops'], 'body');
 
     $this->assertTrue(is_a($r, 'PEAR_Error'));
-    $this->assertEquals('ripe banana', $r->getMessage());
+    $this->assertSame('ripe banana', $r->getMessage());
   }
 
   public function testResultFilter_leavesUnmatchedResultsAlone(): void {
@@ -94,7 +94,7 @@ class CRM_Utils_Mail_FilteredPearMailerTest extends CiviUnitTestCase {
     });
     $r = $fm->send(['recip'], ['Subject' => 'Fruit loops'], 'body');
 
-    $this->assertEquals('all the fruits in the basket', $r);
+    $this->assertSame('all the fruits in the basket', $r);
   }
 
 }

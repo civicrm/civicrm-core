@@ -104,9 +104,9 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
       ->execute();
 
     $this->assertCount(1, $result);
-    $this->assertEquals('c@c.c', $result[0]['label']);
-    $this->assertEquals('bill@c.c', $result[0]['description'][0]);
-    $this->assertEquals('C Town', $result[0]['description'][1]);
+    $this->assertSame('c@c.c', $result[0]['label']);
+    $this->assertSame('bill@c.c', $result[0]['description'][0]);
+    $this->assertSame('C Town', $result[0]['description'][1]);
 
     // Search by email to match non-primary email address
     $result = Contact::autocomplete(FALSE)

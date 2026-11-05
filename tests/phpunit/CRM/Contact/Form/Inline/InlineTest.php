@@ -910,7 +910,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $userContact)
       ->execute()->first();
     $this->assertEquals($secretOrg['id'], $userRecord['employer_id']);
-    $this->assertEquals('Organizer', $userRecord['job_title']);
+    $this->assertSame('Organizer', $userRecord['job_title']);
   }
 
   /**
@@ -1056,7 +1056,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $sharedAddress['id'])
       ->execute()->single();
     $this->assertEquals($masterAddress['id'], $address['master_id']);
-    $this->assertEquals('500 Shared Lane', $address['street_address']);
+    $this->assertSame('500 Shared Lane', $address['street_address']);
   }
 
 }

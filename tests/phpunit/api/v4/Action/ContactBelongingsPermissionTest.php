@@ -900,7 +900,7 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
       $this->fail('Expected UnauthorizedException');
     }
     catch (UnauthorizedException $e) {
-      $this->assertEquals('Permission denied to modify shared upstream address.', $e->getMessage());
+      $this->assertSame('Permission denied to modify shared upstream address.', $e->getMessage());
     }
 
     $streets = \Civi\Api4\Address::get(FALSE)
@@ -930,7 +930,7 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
       $this->fail('Expected UnauthorizedException');
     }
     catch (UnauthorizedException $e) {
-      $this->assertEquals('Permission denied to modify shared upstream address.', $e->getMessage());
+      $this->assertSame('Permission denied to modify shared upstream address.', $e->getMessage());
     }
 
     $primary = \Civi\Api4\Address::get(FALSE)
@@ -994,8 +994,8 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
       ->addSelect('street_address', 'master_id')
       ->addWhere('id', 'IN', [$masterAddress, $sharedAddress])
       ->execute()->indexBy('id');
-    $this->assertEquals('123 Secret Lane', $addresses[$masterAddress]['street_address']);
-    $this->assertEquals('999 Own Street', $addresses[$sharedAddress]['street_address']);
+    $this->assertSame('123 Secret Lane', $addresses[$masterAddress]['street_address']);
+    $this->assertSame('999 Own Street', $addresses[$sharedAddress]['street_address']);
     $this->assertNull($addresses[$sharedAddress]['master_id']);
   }
 
@@ -1122,7 +1122,7 @@ class ContactBelongingsPermissionTest extends Api4TestBase implements Transactio
       ->addWhere('id', '=', $userContact)
       ->execute()->single();
     $this->assertEquals($otherOrg, $contact['employer_id']);
-    $this->assertEquals('Organizer', $contact['job_title']);
+    $this->assertSame('Organizer', $contact['job_title']);
   }
 
 }

@@ -156,13 +156,13 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
       ->execute();
 
     $this->assertCount(1, $result);
-    $this->assertEquals('111 Allowed', $result[0]['address_primary.street_address']);
+    $this->assertSame('111 Allowed', $result[0]['address_primary.street_address']);
 
     $selectWhereCount = substr_count($result->debug['sql'][0], "`location_type_id` IN ($homeID,$workID)");
-    $this->assertEquals(1, $selectWhereCount);
+    $this->assertSame(1, $selectWhereCount);
 
     $aclCount = substr_count($result->debug['sql'][0], 'civicrm_acl_contact_cache');
-    $this->assertEquals(1, $aclCount);
+    $this->assertSame(1, $aclCount);
 
     // Try joining through another entity
     $phone = $this->createTestRecord('Phone', [
@@ -222,7 +222,7 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
       ->execute();
 
     $this->assertCount(1, $result);
-    $this->assertEquals('https://allowed.example.com', $result[0]['url']);
+    $this->assertSame('https://allowed.example.com', $result[0]['url']);
 
     // Implicit join
     $result = Website::get()
@@ -231,15 +231,15 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
       ->execute();
 
     $this->assertCount(1, $result);
-    $this->assertEquals('https://allowed.example.com', $result[0]['url']);
-    $this->assertEquals('Allowed', $result[0]['contact_id.first_name']);
+    $this->assertSame('https://allowed.example.com', $result[0]['url']);
+    $this->assertSame('Allowed', $result[0]['contact_id.first_name']);
 
     $selectWhereCount = substr_count($result->debug['sql'][0], '`website_type_id` = 1');
-    $this->assertEquals(1, $selectWhereCount);
+    $this->assertSame(1, $selectWhereCount);
 
     // We only want to see one contact ACL where clause
     $aclCount = substr_count($result->debug['sql'][0], 'civicrm_acl_contact_cache');
-    $this->assertEquals(1, $aclCount);
+    $this->assertSame(1, $aclCount);
 
     // Explicit join
     $result = Website::get()
@@ -249,14 +249,14 @@ class HookSelectWhereTest extends Api4TestBase implements HookInterface {
       ->execute();
 
     $this->assertCount(1, $result);
-    $this->assertEquals('https://allowed.example.com', $result[0]['url']);
-    $this->assertEquals('Allowed', $result[0]['contact.first_name']);
+    $this->assertSame('https://allowed.example.com', $result[0]['url']);
+    $this->assertSame('Allowed', $result[0]['contact.first_name']);
 
     $selectWhereCount = substr_count($result->debug['sql'][0], '`website_type_id` = 1');
-    $this->assertEquals(1, $selectWhereCount);
+    $this->assertSame(1, $selectWhereCount);
 
     $aclCount = substr_count($result->debug['sql'][0], 'civicrm_acl_contact_cache');
-    $this->assertEquals(1, $aclCount);
+    $this->assertSame(1, $aclCount);
   }
 
   /**

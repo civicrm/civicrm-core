@@ -363,7 +363,7 @@ Czech Republic
       ['contribution' => ['address_id.display' => 'CANNED ADDRESS STRING']],
       FALSE
     );
-    $this->assertEquals('CANNED ADDRESS STRING', $text);
+    $this->assertSame('CANNED ADDRESS STRING', $text);
   }
 
   /**

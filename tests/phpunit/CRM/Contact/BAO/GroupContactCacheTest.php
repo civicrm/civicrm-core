@@ -283,7 +283,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       $this->fail('Expected the hook error to propagate');
     }
     catch (TypeError $e) {
-      $this->assertEquals('Ruh-roh', $e->getMessage());
+      $this->assertSame('Ruh-roh', $e->getMessage());
     }
     $this->hookClass->reset();
 
@@ -304,13 +304,13 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       $this->fail('Expected the hook error to propagate');
     }
     catch (TypeError $e) {
-      $this->assertEquals('Ruh-roh', $e->getMessage());
+      $this->assertSame('Ruh-roh', $e->getMessage());
     }
     $this->hookClass->reset();
 
     CRM_Contact_BAO_GroupContactCache::populateTemporaryTableWithContactsInGroups([$group->id], $tempTable->getName());
     $this->assertCacheMatches([$deceased[0], $deceased[1], $deceased[2]], $group->id);
-    $this->assertEquals(3, CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM ' . $tempTable->getName()));
+    $this->assertSame(3, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM ' . $tempTable->getName()));
     $tempTable->drop();
   }
 

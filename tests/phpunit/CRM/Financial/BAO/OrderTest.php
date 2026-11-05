@@ -276,7 +276,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
         'entity_id.source' => 'Test',
       ])
       ->execute()->single();
-    $this->assertEquals(0, $contribution['total_amount']);
+    $this->assertSame(0.0, $contribution['total_amount']);
 
     $membershipID = LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contribution['id'])
@@ -290,16 +290,16 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $membershipID)
       ->execute()->single()['status_id:name'];
 
-    $this->assertEquals('Completed', $getContributionStatus());
-    $this->assertEquals('New', $getMembershipStatus());
+    $this->assertSame('Completed', $getContributionStatus());
+    $this->assertSame('New', $getMembershipStatus());
 
     Payment::create(FALSE)
       ->addValue('contribution_id', $contribution['id'])
       ->addValue('total_amount', 0)
       ->execute();
 
-    $this->assertEquals('Completed', $getContributionStatus());
-    $this->assertEquals('New', $getMembershipStatus());
+    $this->assertSame('Completed', $getContributionStatus());
+    $this->assertSame('New', $getMembershipStatus());
   }
 
   /**

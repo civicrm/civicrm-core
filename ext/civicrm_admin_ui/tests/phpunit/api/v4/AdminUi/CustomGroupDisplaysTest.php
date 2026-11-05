@@ -191,8 +191,8 @@ class CustomGroupDisplaysTest extends \PHPUnit\Framework\TestCase implements Hea
     // Activity reference has a view path, so it should have a link, icons, empty_value
     $actCol = array_values(array_filter($columns, fn($c) => ($c['key'] ?? NULL) === 'my_activity_ref.subject'))[0] ?? NULL;
     $this->assertNotNull($actCol);
-    $this->assertEquals('(no subject)', $actCol['empty_value'] ?? NULL);
-    $this->assertEquals('my_activity_ref.activity_type_id:icon', $actCol['icons'][0]['field'] ?? NULL);
+    $this->assertSame('(no subject)', $actCol['empty_value'] ?? NULL);
+    $this->assertSame('my_activity_ref.activity_type_id:icon', $actCol['icons'][0]['field'] ?? NULL);
     $this->assertEquals([
       'entity' => 'Activity',
       'action' => 'view',
@@ -233,7 +233,7 @@ class CustomGroupDisplaysTest extends \PHPUnit\Framework\TestCase implements Hea
     $columns = $mgd[1]['params']['values']['settings']['columns'];
     $contribCol = array_values(array_filter($columns, fn($c) => ($c['key'] ?? NULL) === 'my_contrib_ref.contact_id.sort_name'))[0] ?? NULL;
     $this->assertNotNull($contribCol);
-    $this->assertEquals('[my_contrib_ref.contact_id.sort_name] - [my_contrib_ref.total_amount]', $contribCol['rewrite']);
+    $this->assertSame('[my_contrib_ref.contact_id.sort_name] - [my_contrib_ref.total_amount]', $contribCol['rewrite']);
     $this->assertEquals([
       'entity' => 'Contribution',
       'action' => 'view',

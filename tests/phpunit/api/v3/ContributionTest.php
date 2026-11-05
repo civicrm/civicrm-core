@@ -463,8 +463,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'financial_type_id' => 'Donation',
       $customKey => 'second',
     ]);
-    $this->assertEquals('second', $this->callAPISuccessGetValue('Contribution', ['id' => $second['id'], 'return' => $customKey]));
-    $this->assertEquals('first', $this->callAPISuccessGetValue('Contribution', ['id' => $first['id'], 'return' => $customKey]));
+    $this->assertSame('second', $this->callAPISuccessGetValue('Contribution', ['id' => $second['id'], 'return' => $customKey]));
+    $this->assertSame('first', $this->callAPISuccessGetValue('Contribution', ['id' => $first['id'], 'return' => $customKey]));
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
   }

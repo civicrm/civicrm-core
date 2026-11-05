@@ -92,7 +92,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
       $key => 'from webform',
     ]);
 
-    $this->assertEquals('from webform', $this->callAPISuccessGetValue('Case', [
+    $this->assertSame('from webform', $this->callAPISuccessGetValue('Case', [
       'id' => $case['id'],
       'return' => $key,
     ]));

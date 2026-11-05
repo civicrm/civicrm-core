@@ -1750,7 +1750,7 @@ WHERE
       $this->fail('Expected the hook error to propagate');
     }
     catch (TypeError $e) {
-      $this->assertEquals('Ruh-roh', $e->getMessage());
+      $this->assertSame('Ruh-roh', $e->getMessage());
     }
     $this->assertTrue(CRM_Core_Config::isPermitCacheFlushMode());
 

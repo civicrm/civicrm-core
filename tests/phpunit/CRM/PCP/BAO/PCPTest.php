@@ -157,8 +157,8 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     CRM_PCP_BAO_PCP::$_pcpLinks = NULL;
     $links = CRM_PCP_BAO_PCP::pcpLinks(1);
     $this->assertArrayHasKey(CRM_Core_Action::DETACH, $links['all']);
-    $this->assertEquals('civicrm/friend', $links['all'][CRM_Core_Action::DETACH]['url']);
-    $this->assertEquals('Tell Friends', $links['all'][CRM_Core_Action::DETACH]['name']);
+    $this->assertSame('civicrm/friend', $links['all'][CRM_Core_Action::DETACH]['url']);
+    $this->assertSame('Tell Friends', $links['all'][CRM_Core_Action::DETACH]['name']);
   }
 
   /**
