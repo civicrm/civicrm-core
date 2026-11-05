@@ -442,7 +442,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
     $importOptions = $this->getTemplateJob() ? $this->getTemplateJob()['metadata']['import_options'] : [];
     if (isset($submittedValues['dateFormats'])) {
       $importOptions['date_format'] = $submittedValues['dateFormats'];
-    };
+    }
 
     $id = UserJob::create(FALSE)
       ->setValues([
@@ -787,7 +787,7 @@ class CRM_Import_Forms extends CRM_Core_Form {
         $classObject = new $className();
         $classObject->setUserJobID($this->getUserJobID());
         return $classObject;
-      };
+      }
     }
     return NULL;
   }

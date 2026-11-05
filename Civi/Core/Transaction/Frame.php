@@ -115,7 +115,7 @@ class Frame {
   public function begin() {
     if ($this->state !== self::F_NEW) {
       throw new \CRM_Core_Exception('State is not F_NEW');
-    };
+    }
 
     $this->state = self::F_ACTIVE;
     if ($this->beginStmt) {
@@ -136,7 +136,7 @@ class Frame {
     }
     if ($this->state !== self::F_ACTIVE) {
       throw new \CRM_Core_Exception('State is not F_ACTIVE');
-    };
+    }
 
     $this->state = $newState;
 

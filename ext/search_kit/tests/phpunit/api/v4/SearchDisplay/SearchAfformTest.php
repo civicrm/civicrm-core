@@ -1,7 +1,6 @@
 <?php
 namespace api\v4\SearchDisplay;
 
-use Civi\Api4\Action\Afform\Save;
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;

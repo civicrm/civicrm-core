@@ -3,7 +3,6 @@
 namespace Civi\Standalone;
 
 use CRM_Standaloneusers_BAO_Session as Session;
-use DB;
 use SessionHandlerInterface;
 use SessionIdInterface;
 use SessionUpdateTimestampHandlerInterface;

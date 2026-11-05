@@ -498,7 +498,7 @@ ORDER BY log_date
 
     if (civicrm_api3('Setting', 'getvalue', ['name' => 'logging_all_tables_uniquid', 'group' => 'CiviCRM Preferences'])) {
       return TRUE;
-    };
+    }
     $uniqueDate = civicrm_api3('Setting', 'getvalue', [
       'name' => 'logging_uniqueid_date',
       'group' => 'CiviCRM Preferences',
