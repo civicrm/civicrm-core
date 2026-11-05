@@ -381,11 +381,15 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Import_Parser {
     }
 
     // Resetting and rebuilding cache could be expensive.
+    $permitCacheFlush = CRM_Core_Config::isPermitCacheFlushMode();
     CRM_Core_Config::setPermitCacheFlushMode(FALSE);
-    $contact = civicrm_api3('Contact', 'create', $formatted);
+    try {
+      $contact = civicrm_api3('Contact', 'create', $formatted);
+    }
+    finally {
+      CRM_Core_Config::setPermitCacheFlushMode($permitCacheFlush);
+    }
     $cid = $contact['id'];
-
-    CRM_Core_Config::setPermitCacheFlushMode(TRUE);
 
     $contact = [
       'contact_id' => $cid,
