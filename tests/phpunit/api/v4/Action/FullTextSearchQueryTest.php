@@ -156,6 +156,26 @@ class FullTextSearchQueryTest extends Api4TestBase {
     $this->assertSame(0, $results->count());
   }
 
+  /**
+   * dev/core#6901 - stopwords like "of" must not stop a record being found.
+   */
+  public function testLikeQueriesWithStopwords(): void {
+    $this->saveTestRecords('Contact', [
+      'records' => [
+        ['contact_type' => 'Organization', 'organization_name' => 'London School of Economics'],
+      ],
+    ]);
+    \Civi::settings()->set('search_mysql_fts', TRUE);
+
+    foreach (['London School of Economics', 'London School Economics', 'School of Econ%', 'London% School% of% Economics%'] as $search) {
+      $results = \Civi\Api4\Contact::get(FALSE)
+        ->addWhere('contact_names', 'LIKE', $search)
+        ->execute();
+      $this->assertCount(1, $results, "Searching for '$search'");
+      $this->assertEquals('London School of Economics', $results->single()['display_name']);
+    }
+  }
+
   public function testInteractionWithExplicitOrderBy(): void {
     $this->saveTestContacts();
 

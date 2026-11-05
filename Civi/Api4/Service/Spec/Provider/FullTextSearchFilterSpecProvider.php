@@ -95,7 +95,9 @@ class FullTextSearchFilterSpecProvider extends \Civi\Core\Service\AutoService im
       // LIKE = we aim to provide interop with Mysql LIKE syntax though
       // this only works with trailing wildcard
       case 'LIKE':
-        $words = explode(' ', $value);
+        // dev/core#6901 - a required stopword (+of) can never match, so leave them out
+        $stopwords = \CRM_Core_DAO::executeQuery('SELECT value FROM INFORMATION_SCHEMA.INNODB_FT_DEFAULT_STOPWORD')->fetchMap('value', 'value');
+        $words = array_filter(explode(' ', $value), fn ($word) => !isset($stopwords[strtolower(rtrim($word, '%'))]));
 
         $words = array_filter(array_map(function ($word) use ($fieldAlias) {
           $wildcardPos = strpos($word, '%');
