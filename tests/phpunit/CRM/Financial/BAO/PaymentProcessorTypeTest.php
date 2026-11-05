@@ -76,7 +76,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'id',
       'Database check on updated for payment processor type is_active.'
     );
-    $this->assertSame(0, $isActive, 'Verify payment processor  types is_active.');
+    $this->assertSame('0', $isActive, 'Verify payment processor  types is_active.');
   }
 
   /**

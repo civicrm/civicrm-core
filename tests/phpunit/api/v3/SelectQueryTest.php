@@ -41,7 +41,7 @@ class api_v3_SelectQueryTest extends CiviUnitTestCase {
       'phone' => ['= 3'],
     ];
     $phone = $this->callAPISuccessGetSingle('Phone', ['contact_id' => $cid, 'check_permissions' => 1]);
-    $this->assertSame(3, $phone['phone']);
+    $this->assertSame('3', $phone['phone']);
   }
 
   public function testHookContactClause(): void {

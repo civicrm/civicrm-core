@@ -40,7 +40,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
     IM::update(FALSE)->addWhere('id', '=', $imId)->setValues($params)->execute();
 
     $isEditIM = $this->assertDBNotNull('CRM_Core_DAO_IM', $imId, 'provider_id', 'id', 'Database check on updated IM provider_name record.');
-    $this->assertSame(3, $isEditIM, 'Verify IM provider_id value is 3.');
+    $this->assertSame('3', $isEditIM, 'Verify IM provider_id value is 3.');
     $isEditIM = $this->assertDBNotNull('CRM_Core_DAO_IM', $imId, 'name', 'id', 'Database check on updated IM name record.');
     $this->assertSame('doe.jane', $isEditIM, 'Verify IM provider_id value is doe.jane.');
 
@@ -61,7 +61,7 @@ class CRM_Core_BAO_IMTest extends CiviUnitTestCase {
     $firstIMValue = array_slice($IMs, 0, 1);
 
     $this->assertSame('alan1.smith1', $firstIMValue[0]['name'], 'Confirm primary IM value.');
-    $this->assertSame(1, $firstIMValue[0]['is_primary'], 'Confirm first IM is primary.');
+    $this->assertSame('1', $firstIMValue[0]['is_primary'], 'Confirm first IM is primary.');
 
     $this->contactDelete($contactId);
   }

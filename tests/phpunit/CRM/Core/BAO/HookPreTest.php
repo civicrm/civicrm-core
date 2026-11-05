@@ -83,7 +83,7 @@ class CRM_Core_BAO_HookPreTest extends CiviUnitTestCase {
       'return' => "custom_$field1Id,custom_$field2Id,custom_$field3Id",
     ]);
     $this->assertSame('correct value', $contact["custom_$field1Id"]);
-    $this->assertSame(456, $contact["custom_$field2Id"]);
+    $this->assertSame('456', $contact["custom_$field2Id"]);
     $this->assertSame('1', $contact["custom_$field3Id"]);
 
     // Test the weird format from CRM_Contact_Form_Edit

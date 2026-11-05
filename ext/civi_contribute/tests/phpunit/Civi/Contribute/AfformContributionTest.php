@@ -217,7 +217,7 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
       ->single();
 
     // check expected amount
-    $this->assertSame(15, $contribution['total_amount']);
+    $this->assertSame(15.0, $contribution['total_amount']);
 
     // get line items
     $lineItems = \Civi\Api4\LineItem::get(FALSE)
@@ -447,7 +447,7 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
       ->execute()
       ->single();
     // Only the admin ticket option (amount 20) contributes to the total.
-    $this->assertSame(20, $contribution['total_amount']);
+    $this->assertSame(20.0, $contribution['total_amount']);
   }
 
   /**

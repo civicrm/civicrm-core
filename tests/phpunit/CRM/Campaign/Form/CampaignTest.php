@@ -57,7 +57,7 @@ class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
     $values['includeGroups'] = [];
     CRM_Campaign_Form_Campaign::submit($values, new CRM_Campaign_Form_Campaign());
 
-    $this->assertSame(1, CRM_Core_DAO::singleValueQuery(
+    $this->assertSame(1, (int) CRM_Core_DAO::singleValueQuery(
       'SELECT COUNT(*) FROM civicrm_campaign_group WHERE campaign_id = %1',
       [1 => [$existing['id'], 'Positive']]
     ));

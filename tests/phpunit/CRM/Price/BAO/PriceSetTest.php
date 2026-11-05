@@ -167,7 +167,7 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
     $this->assertSame(1, count($occurences));
     $this->assertTrue(array_key_exists($organization1, $occurences));
     // assert that two membership types were chosen from same organisation
-    $this->assertSame(2, $occurences[$organization1]);
+    $this->assertSame('2', $occurences[$organization1]);
 
     // CASE 2: when two price field value IDs of membership type that belong to different organizations, are chosen
     $differentOrgPriceFieldIDs = implode(', ', [
@@ -180,8 +180,8 @@ class CRM_Price_BAO_PriceSetTest extends CiviUnitTestCase {
     $this->assertTrue(array_key_exists($organization1, $occurences));
     $this->assertTrue(array_key_exists($organization2, $occurences));
     // assert that two membership types were chosen from different organisation
-    $this->assertSame(1, $occurences[$organization1]);
-    $this->assertSame(1, $occurences[$organization2]);
+    $this->assertSame('1', $occurences[$organization1]);
+    $this->assertSame('1', $occurences[$organization2]);
   }
 
 }

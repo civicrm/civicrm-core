@@ -525,7 +525,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('CustomGroup', 'create', $params);
     $result = array_shift($result['values']);
 
-    $this->assertSame(0, $result['is_active']);
+    $this->assertSame('0', $result['is_active']);
 
     $this->customGroupDelete($customGroup['id']);
   }

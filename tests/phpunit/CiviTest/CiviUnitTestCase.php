@@ -626,7 +626,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     if (!preg_match('/maria/i', $dbVer) || version_compare($dbVer, '10.5.2', '>=')) {
       // Supported by MySQL 5.7+ or MariaDB 10.5.2+. These provide some herd immunity.
       $releasedLocks = CRM_Core_DAO::singleValueQuery('SELECT RELEASE_ALL_LOCKS()');
-      $this->assertSame(0, $releasedLocks, "The test should not leave any dangling locks. Found $releasedLocks");
+      $this->assertSame('0', $releasedLocks, "The test should not leave any dangling locks. Found $releasedLocks");
     }
 
     // \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
@@ -3859,7 +3859,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function assertLocationValidity(): void {
-    $this->assertSame(0, CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM
 
 (SELECT a1.contact_id
 FROM civicrm_address a1

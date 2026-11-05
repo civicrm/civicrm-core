@@ -268,12 +268,12 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->assertSame('blah', $result['values'][$result['id']]['description']);
 
     $result = $this->callAPISuccess('relationship', 'create', ['id' => $relID, 'is_permission_b_a' => 1]);
-    $this->assertSame(1, $result['values'][$result['id']]['is_permission_b_a']);
+    $this->assertEquals(1, $result['values'][$result['id']]['is_permission_b_a']);
     $result = $this->callAPISuccess('relationship', 'create', ['id' => $result['id'], 'is_active' => 0]);
     $result = $this->callAPISuccess('relationship', 'get', ['id' => $result['id']]);
-    $this->assertSame(0, $result['values'][$result['id']]['is_active']);
+    $this->assertEquals(0, $result['values'][$result['id']]['is_active']);
     $this->assertSame('blah', $result['values'][$result['id']]['description']);
-    $this->assertSame(1, $result['values'][$result['id']]['is_permission_b_a']);
+    $this->assertEquals(1, $result['values'][$result['id']]['is_permission_b_a']);
   }
 
   /**

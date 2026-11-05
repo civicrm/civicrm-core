@@ -268,7 +268,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       ->execute()->single();
 
     $this->assertEquals(date('Y-m-d'), substr($contribution['receive_date'], 0, 10));
-    $this->assertSame(60, $contribution['total_amount']);
+    $this->assertSame(60.0, $contribution['total_amount']);
   }
 
   public function testOnBehalf(): void {
@@ -460,7 +460,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'id' => $this->getContributionPageID(),
     ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
-    $this->assertSame(655, $contribution['total_amount']);
+    $this->assertSame(655.0, $contribution['total_amount']);
   }
 
   /**
@@ -506,7 +506,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
     $this->assertEquals(9.09, $contribution['tax_amount']);
-    $this->assertSame(200, $contribution['total_amount']);
+    $this->assertSame(200.0, $contribution['total_amount']);
   }
 
   /**
@@ -855,9 +855,9 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_table' => 'civicrm_membership']);
     $this->assertEquals($membership['id'], $lineItem['entity_id']);
     $this->assertEquals($membershipPayment['contribution_id'], $lineItem['contribution_id']);
-    $this->assertSame(1, $lineItem['qty']);
-    $this->assertSame(100, $lineItem['unit_price']);
-    $this->assertSame(100, $lineItem['line_total']);
+    $this->assertSame(1.0, $lineItem['qty']);
+    $this->assertSame(100.0, $lineItem['unit_price']);
+    $this->assertSame(100.0, $lineItem['line_total']);
     foreach ($contributions as $contribution) {
       $this->assertEquals(.72, $contribution['fee_amount']);
       $this->assertEquals($contribution['total_amount'] - .72, $contribution['net_amount']);
@@ -1518,9 +1518,9 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
         'api.ContributionRecur.getsingle' => [],
         'version' => 3,
       ]);
-      $this->assertSame(1, $contribution['values'][0]['api.ContributionRecur.getsingle']['frequency_interval']);
-      $this->assertSame(1, $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_interval']);
-      $this->assertSame(12, $contribution['values'][2]['api.ContributionRecur.getsingle']['frequency_interval']);
+      $this->assertSame('1', $contribution['values'][0]['api.ContributionRecur.getsingle']['frequency_interval']);
+      $this->assertSame('1', $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_interval']);
+      $this->assertSame('12', $contribution['values'][2]['api.ContributionRecur.getsingle']['frequency_interval']);
 
       $this->assertSame('month', $contribution['values'][0]['api.ContributionRecur.getsingle']['frequency_unit']);
       $this->assertSame('year', $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_unit']);
@@ -1581,7 +1581,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'return' => ['trxn_id', 'total_amount', 'fee_amount', 'net_amount'],
     ]);
     $this->assertSame('create_first_success', $contribution['trxn_id']);
-    $this->assertSame(10, $contribution['total_amount']);
+    $this->assertSame(10.0, $contribution['total_amount']);
     $this->assertEquals(.85, $contribution['fee_amount']);
     $this->assertEquals(9.15, $contribution['net_amount']);
 
@@ -1689,7 +1689,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       ],
     ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
-    $this->assertSame(10, $contribution['total_amount']);
+    $this->assertSame(10.0, $contribution['total_amount']);
     // Ensure that Honoree details have been pritned
     $this->assertMailSentContainingStrings(
       [

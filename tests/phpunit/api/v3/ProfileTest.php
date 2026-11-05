@@ -381,7 +381,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'profile_id' => $profile['id'],
     ]);
     $this->assertArrayKeyExists('first_name', $result['values']);
-    $this->assertSame('2', $result['values']['first_name']['type']);
+    $this->assertSame(2, $result['values']['first_name']['type']);
     $this->assertSame('Email', $result['values']['email-primary']['title']);
     $this->assertSame('phone', $result['values']['phone-primary-1']['entity']);
     $this->assertSame('phone', $result['values']["phone_and_ext-$homeLocationTypeID-2"]['entity']);
@@ -611,7 +611,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertEquals($this->_membershipTypeID, $membership['membership_type_id']);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_contactID]);
-    $this->assertSame(10, $contribution['total_amount']);
+    $this->assertSame('10.00', $contribution['total_amount']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
     // contribution_status_id => 1 (Completed) was requested; since Order::create()
     // always creates a Pending contribution, submit() should have recorded a

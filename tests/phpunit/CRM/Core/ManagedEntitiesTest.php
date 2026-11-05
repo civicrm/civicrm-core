@@ -562,7 +562,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertSame(1, $foo['is_active']);
+    $this->assertSame('1', $foo['is_active']);
     $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
@@ -574,7 +574,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertSame(0, $foo['is_active']);
+    $this->assertSame('0', $foo['is_active']);
     $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(0, 'SELECT is_active FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
@@ -587,7 +587,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $foo = $this->getManagedEntity('com.example.one', 'foo');
-    $this->assertSame(1, $foo['is_active']);
+    $this->assertSame('1', $foo['is_active']);
     $this->assertSame('CRM_Example_One_Foo', $foo['name']);
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_option_value WHERE name = "CRM_Example_One_Foo"');
 
@@ -603,7 +603,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $job = $this->getManagedEntity('com.example.one', 'Job');
-    $this->assertSame(1, $job['is_active']);
+    $this->assertSame('1', $job['is_active']);
     $this->assertSame('test_job', $job['name']);
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
     // Reset context.
@@ -617,7 +617,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $job = $this->getManagedEntity('com.example.one', 'Job');
-    $this->assertSame(0, $job['is_active']);
+    $this->assertSame('0', $job['is_active']);
     $this->assertSame('test_job', $job['name']);
     $this->assertDBQuery(0, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
 
@@ -629,7 +629,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $manager->setProcessesForTesting(['com.example.one' => ['enable']]);
     $me->reconcile();
     $job = $this->getManagedEntity('com.example.one', 'Job');
-    $this->assertSame(1, $job['is_active']);
+    $this->assertSame('1', $job['is_active']);
     $this->assertSame('test_job', $job['name']);
     $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
 
@@ -645,7 +645,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $me = new CRM_Core_ManagedEntities($this->modules);
     $me->reconcile();
     $job = $this->getManagedEntity('com.example.one', 'Job');
-    $this->assertSame(0, $job['is_active'], "Job that was manually set inactive should not have been set active again, but it was.");
+    $this->assertSame('0', $job['is_active'], "Job that was manually set inactive should not have been set active again, but it was.");
     $this->assertDBQuery(0, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
 
     // Now call reconcile again, but in the context of the job's extension being installed/enabled. This should re-enable the job.
@@ -657,7 +657,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
       $me = new CRM_Core_ManagedEntities($this->modules);
       $me->reconcile();
       $job = $this->getManagedEntity('com.example.one', 'Job');
-      $this->assertSame(1, $job['is_active']);
+      $this->assertSame('1', $job['is_active']);
       $this->assertSame('test_job', $job['name']);
       $this->assertDBQuery(1, 'SELECT is_active FROM civicrm_job WHERE name = "test_job"');
     }

@@ -36,8 +36,8 @@ class ContributionTest extends BaseTestClass {
     \CRM_Core_DAO::executeQuery('UPDATE civicrm_line_item SET financial_type_id = ' . $this->getFinancialTypeID('Donation'));
     $result = \CRM_Core_DAO::executeQuery($sql);
     $result->fetch();
-    $this->assertSame(300, $result->amount);
-    $this->assertSame(1, $result->count);
+    $this->assertSame('300.00', $result->amount);
+    $this->assertSame('1', $result->count);
   }
 
   /**

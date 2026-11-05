@@ -263,7 +263,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals($row['participant_status'], $participant['status_id:label']);
     $this->assertSame('2022-12-07 00:00:00', $participant['register_date']);
     $this->assertEquals(['Attendee', 'Volunteer'], $participant['role_id:label']);
-    $this->assertSame(0, $participant['is_pay_later']);
+    $this->assertFalse($participant['is_pay_later']);
     $this->assertEquals(['P', 'M'], $participant[$this->getCustomFieldName('checkbox', 4)]);
   }
 

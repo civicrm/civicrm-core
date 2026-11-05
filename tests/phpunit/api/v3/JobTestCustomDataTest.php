@@ -282,7 +282,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $this->assertSame(1, count($result['values']['merged']));
     $this->assertSame(0, count($result['values']['skipped']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
-    $this->assertSame(20, $contact[$customFieldLabel]);
+    $this->assertSame('20', $contact[$customFieldLabel]);
   }
 
   /**
@@ -296,7 +296,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $this->assertSame(0, count($result['values']['merged']));
     $this->assertSame(1, count($result['values']['skipped']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
-    $this->assertSame(20, $contact[$customFieldLabel]);
+    $this->assertSame('20', $contact[$customFieldLabel]);
   }
 
   /**
@@ -310,7 +310,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $this->assertSame(0, count($result['values']['merged']));
     $this->assertSame(1, count($result['values']['skipped']));
     $contact = $this->callAPISuccess('Contact', 'getsingle', ['id' => $contactID, 'return' => $customFieldLabel]);
-    $this->assertSame(0, $contact[$customFieldLabel]);
+    $this->assertSame('0', $contact[$customFieldLabel]);
   }
 
   /**
@@ -370,8 +370,8 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
       'id' => $contactID,
       'return' => [$customFieldLabel, 'custom_' . $this->customBoolFieldID],
     ]);
-    $this->assertSame(1, $contact[$customFieldLabel]);
-    $this->assertSame(1, $contact['custom_' . $this->customBoolFieldID]);
+    $this->assertSame('1', $contact[$customFieldLabel]);
+    $this->assertSame('1', $contact['custom_' . $this->customBoolFieldID]);
   }
 
   /**
@@ -420,7 +420,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     $result = $this->callApiV3Success('Job', 'process_batch_merge', []);
     $this->assertCount(1, $result['values']['merged']);
     $this->assertCount(0, $result['values']['skipped']);
-    $this->assertSame(1, $this->callAPISuccessGetValue('Contact', ['id' => $contactID, 'return' => 'custom_' . $this->customBoolFieldID]));
+    $this->assertSame('1', $this->callAPISuccessGetValue('Contact', ['id' => $contactID, 'return' => 'custom_' . $this->customBoolFieldID]));
   }
 
 }

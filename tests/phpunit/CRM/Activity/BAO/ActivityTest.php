@@ -99,7 +99,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'activity_type_id',
       'subject', 'Database check on updated activity record.'
     );
-    $this->assertSame(3, $activityTypeId, 'Verify activity type id is 3.');
+    $this->assertSame('3', $activityTypeId, 'Verify activity type id is 3.');
 
     $this->contactDelete($contactId);
   }
@@ -141,11 +141,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activity = CRM_Activity_BAO_Activity::retrieve($params, $defaults);
 
     $this->assertSame('Scheduling Meeting', $activity->subject, 'Verify activity subject is correct.');
-    $this->assertSame(2, $activity->activity_type_id, 'Verify activity type id is correct.');
+    $this->assertSame('2', $activity->activity_type_id, 'Verify activity type id is correct.');
     $this->assertEquals($defaults['source_contact_id'], $contactId, 'Verify source contact id is correct.');
 
     $this->assertSame('Scheduling Meeting', $defaults['subject'], 'Verify activity subject is correct.');
-    $this->assertSame(2, $defaults['activity_type_id'], 'Verify activity type id is correct.');
+    $this->assertSame('2', $defaults['activity_type_id'], 'Verify activity type id is correct.');
 
     $this->assertEquals($defaults['target_contact'][0], $targetContactId, 'Verify target contact id is correct.');
 
@@ -194,7 +194,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     // Note that because there is a target contact but it is not accessible the output is an empty string not n/a
     $this->assertSame('', $activities['data'][0]['target_contact_name']);
     // verify that doing the underlying query shows we get a target contact_id
-    $this->assertSame(1, CRM_Activity_BAO_Activity::getActivities(['contact_id' => $contactId])[$activityID]['target_contact_count']);
+    $this->assertSame('1', CRM_Activity_BAO_Activity::getActivities(['contact_id' => $contactId])[$activityID]['target_contact_count']);
     $this->cleanUpAfterACLs();
   }
 
@@ -566,8 +566,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
       foreach ($activities as $key => $value) {
         $this->assertSame("subject {$datasetActivityIDs[$key]}", $value['subject'], 'Verify activity subject is correct.');
-        $this->assertSame(2, $value['activity_type_id'], 'Verify activity type is correct.');
-        $this->assertSame(1, $value['status_id'], 'Verify all activities are scheduled.');
+        $this->assertSame('2', $value['activity_type_id'], 'Verify activity type is correct.');
+        $this->assertSame('1', $value['status_id'], 'Verify all activities are scheduled.');
       }
     }
 
@@ -636,8 +636,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
       foreach ($activities as $key => $value) {
         $this->assertSame("subject {$datasetActivityIDs[$key]}", $value['subject'], 'Verify activity subject is correct.');
-        $this->assertSame(2, $value['activity_type_id'], 'Verify activity type is correct.');
-        $this->assertSame(1, $value['status_id'], 'Verify all activities are scheduled.');
+        $this->assertSame('2', $value['activity_type_id'], 'Verify activity type is correct.');
+        $this->assertSame('1', $value['status_id'], 'Verify all activities are scheduled.');
 
         if ($datasetActivityIDs[$key] == 3) {
           $this->assertArrayHasKey($contactID, $value['target_contact_name']);
@@ -745,10 +745,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $this->assertSame("subject {$datasetID}", $value['subject'], 'Verify activity subject is correct.');
 
       if ($datasetID > 8) {
-        $this->assertSame(2, $value['status_id'], 'Verify all activities are scheduled.');
+        $this->assertSame('2', $value['status_id'], 'Verify all activities are scheduled.');
       }
       else {
-        $this->assertSame(1, $value['status_id'], 'Verify all activities are scheduled.');
+        $this->assertSame('1', $value['status_id'], 'Verify all activities are scheduled.');
       }
 
       if ($datasetID === 12) {
@@ -759,10 +759,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
         $this->assertTrue(in_array($targetContactID, [$this->getXMLDataSetID('civicrm_contact', 10), $this->getXMLDataSetID('civicrm_contact', 11)]));
       }
       elseif ($datasetID > 8) {
-        $this->assertSame(1, $value['activity_type_id'], 'Verify activity type is correct.');
+        $this->assertSame('1', $value['activity_type_id'], 'Verify activity type is correct.');
       }
       else {
-        $this->assertSame(2, $value['activity_type_id'], 'Verify activity type is correct.');
+        $this->assertSame('2', $value['activity_type_id'], 'Verify activity type is correct.');
       }
 
       if ($datasetID == 3) {
@@ -881,7 +881,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           $this->assertSame(3, count($activities));
           $this->assertSame(3, $activityCount);
           // ensure activity type id is 2
-          $this->assertSame(2, $activities[$this->getXMLDataSetID('civicrm_activity', 1)]['activity_type_id']);
+          $this->assertSame('2', $activities[$this->getXMLDataSetID('civicrm_activity', 1)]['activity_type_id']);
           $this->assertEquals($this->getXMLDataSetID('civicrm_contact', 3), $activities[$this->getXMLDataSetID('civicrm_activity', 3)]['source_contact_id']);
           // @todo review inconsistency between 2 versions.
           // $this->assertEquals(TRUE, array_key_exists(3, $activities[8]['target_contact_name']));

@@ -54,7 +54,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
 
     $query_params = [1 => [$this->deleted_contact_id, 'Integer']];
     $is_deleted = CRM_Core_DAO::singleValueQuery("SELECT is_deleted FROM civicrm_contact WHERE id = %1", $query_params);
-    $this->assertSame(1, $is_deleted);
+    $this->assertSame('1', $is_deleted);
 
     $session_status = CRM_Core_Session::singleton()->getStatus();
     $this->assertSame('Mr. Delete Me has been moved to the trash.', $session_status[0]['text']);
@@ -85,7 +85,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
 
     $query_params = [1 => [$this->deleted_contact_id, 'Integer']];
     $is_deleted = CRM_Core_DAO::singleValueQuery("SELECT is_deleted FROM civicrm_contact WHERE id = %1", $query_params);
-    $this->assertSame(0, $is_deleted);
+    $this->assertSame('0', $is_deleted);
 
     $session_status = CRM_Core_Session::singleton()->getStatus();
     $this->assertSame('Mr. Delete Me has been restored from the trash.', $session_status[0]['text']);

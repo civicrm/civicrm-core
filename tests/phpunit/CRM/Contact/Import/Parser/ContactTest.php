@@ -802,7 +802,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, $mapper);
     $address = $this->callAPISuccessGetSingle('Address', ['street_address' => 'Big Mansion']);
     $this->assertEquals($this->getLocationTypeID('Home'), $address['location_type_id']);
-    $this->assertSame(1, $address['is_primary']);
+    $this->assertSame('1', $address['is_primary']);
 
     $phone = $this->callAPISuccessGetSingle('Phone', ['phone' => '12334']);
     $this->assertEquals($this->getLocationTypeID('Home'), $phone['location_type_id']);
@@ -1093,7 +1093,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccessGetSingle('Contact', $contactValues);
     $this->assertSame('1910-12-17', $contact['birth_date']);
     $this->assertSame('2010-12-17', $contact['deceased_date']);
-    $this->assertSame(1, $contact['is_deceased']);
+    $this->assertSame('1', $contact['is_deceased']);
     $this->callAPISuccess('Contact', 'delete', ['id' => $contact['id']]);
   }
 
@@ -1121,20 +1121,20 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $address = $this->callAPISuccess('Address', 'get', ['contact_id' => $contact['id'], 'sequential' => 1]);
 
     $this->assertEquals($this->getLocationTypeID('Main'), $address['values'][0]['location_type_id']);
-    $this->assertSame(0, $address['values'][0]['is_primary']);
+    $this->assertSame('0', $address['values'][0]['is_primary']);
     $this->assertSame('Teeny Mansion', $address['values'][0]['street_address']);
 
     $this->assertEquals($this->getLocationTypeID('Home'), $address['values'][1]['location_type_id']);
-    $this->assertSame(1, $address['values'][1]['is_primary']);
+    $this->assertSame('1', $address['values'][1]['is_primary']);
     $this->assertSame('Big Mansion', $address['values'][1]['street_address']);
 
     $phone = $this->callAPISuccess('Phone', 'get', ['contact_id' => $contact['id'], 'sequential' => 1]);
     $this->assertEquals($this->getLocationTypeID('Home'), $phone['values'][0]['location_type_id']);
-    $this->assertSame(1, $phone['values'][0]['is_primary']);
-    $this->assertSame(12334, $phone['values'][0]['phone']);
+    $this->assertSame('1', $phone['values'][0]['is_primary']);
+    $this->assertSame('12334', $phone['values'][0]['phone']);
     $this->assertEquals($this->getLocationTypeID('Main'), $phone['values'][1]['location_type_id']);
-    $this->assertSame(0, $phone['values'][1]['is_primary']);
-    $this->assertSame(4444, $phone['values'][1]['phone']);
+    $this->assertSame('0', $phone['values'][1]['is_primary']);
+    $this->assertSame('4444', $phone['values'][1]['phone']);
 
     $this->callAPISuccess('Contact', 'delete', ['id' => $contact['id']]);
   }
@@ -1191,20 +1191,20 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $address = $this->callAPISuccess('Address', 'get', ['contact_id' => $contact['id'], 'sequential' => 1])['values'];
 
     $this->assertEquals($this->getLocationTypeID('Home'), $address[1]['location_type_id']);
-    $this->assertSame(1, $address[1]['is_primary']);
+    $this->assertSame('1', $address[1]['is_primary']);
     $this->assertSame('Teeny Mansion', $address[1]['street_address']);
 
     $this->assertEquals($this->getLocationTypeID('Main'), $address[0]['location_type_id']);
-    $this->assertSame(0, $address[0]['is_primary']);
+    $this->assertSame('0', $address[0]['is_primary']);
     $this->assertSame('Big Mansion', $address[0]['street_address']);
 
     $phone = $this->callAPISuccess('Phone', 'get', ['contact_id' => $contact['id'], 'sequential' => 1, 'options' => ['sort' => 'is_primary DESC']])['values'];
     $this->assertEquals($this->getLocationTypeID('Main'), $phone[1]['location_type_id']);
-    $this->assertSame(0, $phone[1]['is_primary']);
-    $this->assertSame(12334, $phone[1]['phone']);
+    $this->assertSame('0', $phone[1]['is_primary']);
+    $this->assertSame('12334', $phone[1]['phone']);
     $this->assertEquals($this->getLocationTypeID('Home'), $phone[0]['location_type_id']);
-    $this->assertSame(1, $phone[0]['is_primary']);
-    $this->assertSame(4444, $phone[0]['phone']);
+    $this->assertSame('1', $phone[0]['is_primary']);
+    $this->assertSame('4444', $phone[0]['phone']);
 
     $this->callAPISuccess('Contact', 'delete', ['id' => $contact['id']]);
   }
@@ -1605,7 +1605,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $dataSource->setOffset(4);
     $dataSource->setLimit(1);
     $row = $dataSource->getRow();
-    $this->assertSame(1, $row['_related_contact_matched']);
+    $this->assertSame('1', $row['_related_contact_matched']);
   }
 
   /**
@@ -2095,7 +2095,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Texter']);
 
     $this->assertEquals([4, 1], $contact['preferred_communication_method'], 'Import multiple preferred communication methods using labels.');
-    $this->assertSame(1, $contact['gender_id'], 'Import gender with label.');
+    $this->assertSame('1', $contact['gender_id'], 'Import gender with label.');
     $this->assertSame('da_DK', $contact['preferred_language'], 'Import preferred language with label.');
     $this->callAPISuccess('Contact', 'delete', ['id' => $contact['id']]);
 
@@ -2105,7 +2105,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $contact = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Texter']);
 
     $this->assertEquals([4, 1], $contact['preferred_communication_method'], 'Import multiple preferred communication methods using values.');
-    $this->assertSame(1, $contact['gender_id'], 'Import gender with id.');
+    $this->assertSame('1', $contact['gender_id'], 'Import gender with id.');
     $this->assertSame('da_DK', $contact['preferred_language'], 'Import preferred language with value.');
   }
 

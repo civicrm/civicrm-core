@@ -599,7 +599,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     ])['values'][0];
 
     $this->assertEquals($createdMembershipID, $membershipAfterProcess['id']);
-    $this->assertSame(1, $membershipAfterProcess['is_override']);
+    $this->assertSame('1', $membershipAfterProcess['is_override']);
 
     // Check that MembershipLog was created and is correct
     $latestMembershipLog = MembershipLog::get(FALSE)

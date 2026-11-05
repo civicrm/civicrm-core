@@ -326,18 +326,18 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS civicrm_my_isam');
 
     // A manually created MyISAM table should raise a redflag.
-    $this->assertSame(0, CRM_Core_DAO::isDBMyISAM());
+    $this->assertSame('0', CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery('CREATE TABLE civicrm_my_isam (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM');
-    $this->assertSame(1, CRM_Core_DAO::isDBMyISAM());
+    $this->assertSame('1', CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery('DROP TABLE civicrm_my_isam');
 
     // A temp table should not raise flag.
     $tempTableName = CRM_Utils_SQL_TempTable::build()->setCategory('myisam')->getName();
     // A temp table should not raise flag (randomized naming).
-    $this->assertSame(0, CRM_Core_DAO::isDBMyISAM());
+    $this->assertSame('0', CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery("CREATE TABLE $tempTableName (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM");
     // Ignore temp tables
-    $this->assertSame(0, CRM_Core_DAO::isDBMyISAM());
+    $this->assertSame('0', CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery("DROP TABLE $tempTableName");
   }
 

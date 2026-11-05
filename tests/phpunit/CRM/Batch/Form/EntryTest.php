@@ -208,7 +208,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         'return' => 'line_total',
 
       ]), $contribution['total_amount']);
-      $this->assertSame(1500, $contribution['total_amount']);
+      $this->assertSame(1500.0, $contribution['total_amount']);
       $this->assertEquals($params['field'][$index + 1]['trxn_id'], $contribution['trxn_id']);
     }
   }
@@ -299,7 +299,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       ->processForm();
     $batch = Batch::get()
       ->execute()->single();
-    $this->assertSame(4500, $batch['total']);
+    $this->assertSame(4500.0, $batch['total']);
     $result = $this->callAPISuccess('Membership', 'get', ['sequential' => 1])['values'];
 
     // renewal dates should be from current if start_date and end_date is passed as NULL

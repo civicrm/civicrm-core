@@ -26,7 +26,7 @@ class CRM_Core_LockTest extends CiviUnitTestCase {
     $dsn = DB::parseDSN(CRM_Utils_SQL::autoSwitchDSN(CRM_Core_Config::singleton()->dsn));
     $this->otherConnection = new mysqli($dsn['hostspec'], $dsn['username'], $dsn['password'], $dsn['database'], (int) ($dsn['port'] ?: 3306), $dsn['socket'] ?: NULL);
     $result = $this->otherConnection->query("SELECT GET_LOCK('$lockId', 0)");
-    $this->assertSame(1, $result->fetch_row()[0]);
+    $this->assertSame('1', $result->fetch_row()[0]);
   }
 
 }

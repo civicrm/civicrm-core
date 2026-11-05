@@ -121,13 +121,13 @@ class SqlExpressionTest extends Api4TestBase implements TransactionalInterface {
       ->first();
     $this->assertSame('Yes', $result['is_bob']);
     $this->assertSame('No', $result['is_fred']);
-    $this->assertSame('55', $result['5_11']);
+    $this->assertSame(55.0, $result['5_11']);
     $this->assertFalse($result['five_greater_eleven']);
     $this->assertTrue($result['five_less_eleven']);
     $this->assertTrue($result['is_between']);
     $this->assertArrayNotHasKey('illegal_stuff', $result);
-    $this->assertSame('5', $result['null_plus_five']);
-    $this->assertSame('1', $result['one_is_odd']);
+    $this->assertSame(5.0, $result['null_plus_five']);
+    $this->assertSame(1.0, $result['one_is_odd']);
   }
 
 }

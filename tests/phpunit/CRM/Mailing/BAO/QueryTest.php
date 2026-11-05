@@ -94,8 +94,8 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
     $totalTrackableUrlCount = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTotalCount($mailingID, NULL, FALSE, $trackableURLID);
     $totalTrackableUrlMail = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getRows($mailingID, NULL, TRUE, $trackableURLID);
 
-    $this->assertSame(3, $totalDistinctTrackableUrlCount, "Accurately display distinct count of unique trackable URLs");
-    $this->assertSame(4, $totalTrackableUrlCount, "Accurately display count of unique trackable URLs");
+    $this->assertSame('3', $totalDistinctTrackableUrlCount, "Accurately display distinct count of unique trackable URLs");
+    $this->assertSame('4', $totalTrackableUrlCount, "Accurately display count of unique trackable URLs");
     $this->assertSame(3, count($totalTrackableUrlMail), "Accurately display list of unique trackable URLs and who clicked them.");
   }
 

@@ -199,7 +199,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'create', $params);
     $this->callAPISuccess('financial_type', 'create', ['is_active' => 0, 'id' => $finType['id']]);
     $contributionCount = CRM_Contribute_BAO_Contribution::contributionCount($contactId);
-    $this->assertSame(1, $contributionCount);
+    $this->assertSame('1', $contributionCount);
   }
 
   /**
@@ -803,7 +803,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         'return' => ['total_amount'],
       ]
     );
-    $this->assertSame(8000, $financialTrxn['total_amount'], 'Invalid amount.');
+    $this->assertSame('8000.00', $financialTrxn['total_amount'], 'Invalid amount.');
   }
 
   /**
@@ -830,7 +830,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertCount(1, $financialItemIds, 'Invalid count.');
     $this->assertCount(1, $taxItems, 'Invalid count.');
     foreach ($taxItems as $value) {
-      $this->assertSame(10, $value['amount'], 'Invalid tax amount.');
+      $this->assertSame('10.00', $value['amount'], 'Invalid tax amount.');
     }
   }
 
@@ -1208,7 +1208,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $pledgePayments = $this->callAPISuccess('PledgePayment', 'get')['values'];
     $this->callAPISuccess('PledgePayment', 'create', ['id' => key($pledgePayments), 'pledge_id' => $pledgeID, 'contribution_id' => $orderID, 'status_id' => 'Completed', 'actual_amount' => 2]);
     $beforePledge = $this->callAPISuccessGetSingle('Pledge', ['id' => $pledgeID]);
-    $this->assertSame(2, $beforePledge['pledge_total_paid']);
+    $this->assertSame('2.00', $beforePledge['pledge_total_paid']);
     $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
 
     $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
@@ -1328,7 +1328,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       HAVING SUM(cli.line_total) != total_amount
     ', [1 => [$contributionId, 'Integer']]);
 
-    $this->assertSame(0, $count);
+    $this->assertEquals(0, $count);
 
     $this->callAPISuccess('Contribution', 'create', [
       'id' => $contributionId,
@@ -1344,7 +1344,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       HAVING SUM(cli.line_total) != total_amount
     ', [1 => [$contributionId, 'Integer']]);
 
-    $this->assertSame(0, $count);
+    $this->assertEquals(0, $count);
   }
 
   /**

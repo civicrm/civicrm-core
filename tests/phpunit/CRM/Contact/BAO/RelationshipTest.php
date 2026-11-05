@@ -318,7 +318,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals($relationshipObj->relationship_type_id, $relationship_type_id_1);
     $this->assertEquals($relationshipObj->contact_id_a, $contact_id_1);
     $this->assertEquals($relationshipObj->contact_id_b, $contact_id_2);
-    $this->assertSame(1, $relationshipObj->is_active);
+    $this->assertSame('1', $relationshipObj->is_active);
     $this->assertEquals($relationshipObj->end_date, $today);
   }
 

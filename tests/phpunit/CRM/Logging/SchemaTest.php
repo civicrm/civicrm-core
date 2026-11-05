@@ -362,7 +362,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $ci = Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // length should increase
     if (!$this->isMySQL8()) {
-      $this->assertSame(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+      $this->assertSame('6', $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
     }
     $this->assertSame('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
     CRM_Core_DAO::executeQuery(
@@ -374,7 +374,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $ci = Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // length should not decrease
     if (!$this->isMySQL8()) {
-      $this->assertSame(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+      $this->assertSame('6', $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
     }
     $this->assertSame('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
   }

@@ -119,7 +119,7 @@ class CRM_Campaign_BAO_PetitionTest extends CiviUnitTestCase {
 
     // Test confirm signature
     $this->assertTrue($bao->confirmSignature($activity->id, $this->ids['Contact']['unconfirmed'], $this->ids['Survey']['petition']), 'Signature not confirmed');
-    $this->assertSame(2, $this->callAPISuccessGetValue('Activity', ['id' => $activity->id, 'return' => 'status_id']), 'Activity status not changed');
+    $this->assertSame('2', $this->callAPISuccessGetValue('Activity', ['id' => $activity->id, 'return' => 'status_id']), 'Activity status not changed');
     // Check Unconfirmed tag removed
     $this->callAPISuccessGetCount('EntityTag', [
       'tag_id' => $tag['id'],

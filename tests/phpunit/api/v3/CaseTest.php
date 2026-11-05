@@ -335,14 +335,14 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     // Check result - also check that 'case_id' works as well as 'id'
     $result = $this->callAPISuccess('case', 'get', ['case_id' => $id]);
-    $this->assertSame(1, $result['values'][$id]['is_deleted']);
+    $this->assertSame('1', $result['values'][$id]['is_deleted']);
 
     // Restore Case from Trash
     $this->callAPISuccess('case', 'restore', ['id' => $id]);
 
     // Check result
     $result = $this->callAPISuccess('case', 'get', ['case_id' => $id]);
-    $this->assertSame(0, $result['values'][$id]['is_deleted']);
+    $this->assertSame('0', $result['values'][$id]['is_deleted']);
 
     // Delete Case Permanently
     $this->callAPISuccess('case', 'delete', ['case_id' => $id]);
@@ -564,8 +564,8 @@ class api_v3_CaseTest extends CiviCaseTestCase {
         $this->assertEquals($this->ids['Contact']['case_subject'], $contact['contact_id']);
       }
       elseif ($contact['role'] == 'Homeless Services Coordinator is') {
-        $this->assertSame(1, $contact['creator']);
-        $this->assertSame(1, $contact['manager']);
+        $this->assertSame('1', $contact['creator']);
+        $this->assertSame('1', $contact['manager']);
         $foundManager = TRUE;
       }
     }
@@ -923,7 +923,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
     $this->callAPISuccess('Case', 'merge', ['case_id_1' => $case1['id'], 'case_id_2' => $case2['id']]);
 
     $result = $this->callAPISuccess('Case', 'getsingle', ['id' => $case2['id']]);
-    $this->assertSame(1, $result['is_deleted']);
+    $this->assertSame('1', $result['is_deleted']);
   }
 
   public function testTimestamps(): void {

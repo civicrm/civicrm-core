@@ -188,11 +188,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->assertEquals(array_values(array_merge($this->getBasicHeaderDefinition(FALSE), self::getContributeHeaderDefinition())), $this->csv->getHeader());
     $this->assertCount(3, $this->csv);
     $row = $this->csv->nth(0);
-    $this->assertSame(95, $row['Net Amount']);
+    $this->assertSame('95.00', $row['Net Amount']);
     $this->assertSame('', $row['Soft Credit Amount']);
     $row = $this->csv->nth(1);
-    $this->assertSame(95, $row['Net Amount']);
-    $this->assertSame(5, $row['Soft Credit Amount']);
+    $this->assertSame('95.00', $row['Net Amount']);
+    $this->assertSame('5.00', $row['Soft Credit Amount']);
     $this->assertSame('Anderson, Anthony II', $row['Soft Credit For']);
     $this->assertEquals($this->contributionIDs[0], $row['Soft Credit For Contribution ID']);
 

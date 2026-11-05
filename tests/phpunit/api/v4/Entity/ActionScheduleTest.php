@@ -38,9 +38,9 @@ class ActionScheduleTest extends Api4TestBase {
     $this->assertSame('manual', $fields['recipient']['options'][0]['name']);
     $this->assertSame('group', $fields['recipient']['options'][1]['name']);
 
-    $this->assertSame('1', $fields['limit_to']['options'][0]['id']);
+    $this->assertSame(1, $fields['limit_to']['options'][0]['id']);
     $this->assertSame('limit', $fields['limit_to']['options'][0]['name']);
-    $this->assertSame('2', $fields['limit_to']['options'][1]['id']);
+    $this->assertSame(2, $fields['limit_to']['options'][1]['id']);
     $this->assertSame('add', $fields['limit_to']['options'][1]['name']);
 
     $this->assertEquals(['name', 'label', 'icon'], $fields['mapping_id']['suffixes']);

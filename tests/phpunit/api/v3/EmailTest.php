@@ -440,8 +440,8 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     ]);
 
     $this->assertSame(1, $get['count'], 'Incorrect email count at ' . __LINE__);
-    $this->assertSame(1, $get['values'][$emailID]['is_primary']);
-    $this->assertSame(1, $get['values'][$emailID]['on_hold']);
+    $this->assertEquals(1, $get['values'][$emailID]['is_primary']);
+    $this->assertEquals(1, $get['values'][$emailID]['on_hold']);
     $this->assertSame('1-2@example.com', $get['values'][$emailID]['email']);
   }
 
@@ -460,7 +460,7 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['id']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->assertSame(2, $result['values'][$result['id']]['on_hold']);
+    $this->assertSame('2', $result['values'][$result['id']]['on_hold']);
     $this->assertEquals(date('Y-m-d H:i'), date('Y-m-d H:i', strtotime($result['values'][$result['id']]['hold_date'])));
 
     // set on_hold is '0'
@@ -490,14 +490,14 @@ class api_v3_EmailTest extends CiviUnitTestCase {
   public function testSetBulkEmail(): void {
     $individualID = $this->individualCreate([]);
     $email = $this->callAPISuccessGetSingle('Email', ['contact_id' => $individualID]);
-    $this->assertSame(0, $email['is_bulkmail']);
+    $this->assertSame('0', $email['is_bulkmail']);
     $this->callAPISuccess('Email', 'create', ['id' => $email['id'], 'is_bulkmail' => 1]);
     $email = $this->callAPISuccessGetSingle('Email', ['contact_id' => $individualID]);
-    $this->assertSame(1, $email['is_bulkmail']);
+    $this->assertSame('1', $email['is_bulkmail']);
     $email2 = $this->callAPISuccess('Email', 'create', ['contact_id' => $individualID, 'email' => 'mail@Example.com', 'is_bulkmail' => 1]);
     $emails = $this->callAPISuccess('Email', 'get', ['contact_id' => $individualID])['values'];
-    $this->assertSame(0, $emails[$email['id']]['is_bulkmail']);
-    $this->assertSame(1, $emails[$email2['id']]['is_bulkmail']);
+    $this->assertSame('0', $emails[$email['id']]['is_bulkmail']);
+    $this->assertSame('1', $emails[$email2['id']]['is_bulkmail']);
   }
 
   /**

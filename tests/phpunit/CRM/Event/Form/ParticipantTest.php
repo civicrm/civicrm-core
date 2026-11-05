@@ -195,15 +195,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->addWhere('entity_table', '=', 'civicrm_participant')
       ->addOrderBy('id')
       ->execute()->first();
-    $this->assertSame(100, $lineItem['line_total']);
+    $this->assertSame(100.0, $lineItem['line_total']);
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', []);
     $sum = 0;
     foreach ($financialItems['values'] as $financialItem) {
       $sum += $financialItem['amount'];
     }
-    $this->assertSame(100, $sum);
+    $this->assertSame(100.0, $sum);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
-    $this->assertSame(100, $participant['participant_fee_amount']);
+    $this->assertSame('100.00', $participant['participant_fee_amount']);
 
     $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
       $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
@@ -222,7 +222,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->addOrderBy('id')
       ->execute();
     // Participants is updated to 0 but line remains.
-    $this->assertSame(0, $lineItems[0]['line_total']);
+    $this->assertSame(0.0, $lineItems[0]['line_total']);
     $this->assertEquals(1550.55, $lineItems[1]['line_total']);
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', []);
 
@@ -271,7 +271,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->processForm();
 
     $contribution = Contribution::get(FALSE)->addSelect('non_deductible_amount')->execute()->single();
-    $this->assertSame(30, $contribution['non_deductible_amount']);
+    $this->assertSame(30.0, $contribution['non_deductible_amount']);
   }
 
   /**
@@ -299,13 +299,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->getTestForm('CRM_Event_Form_Participant', $params)->processForm();
 
     $participant = $this->callAPISuccessGetSingle('Participant', []);
-    $this->assertSame(100, $participant['participant_fee_amount']);
+    $this->assertSame('100.00', $participant['participant_fee_amount']);
 
     $params[$this->getPriceFieldKey()] = $this->ids['PriceFieldValue']['PaidEvent_standard'];
     $this->getTestForm('CRM_Event_Form_Participant', $params, ['id' => $participant['id']])->processForm();
 
     $participant = $this->callAPISuccessGetSingle('Participant', ['id' => $participant['id']]);
-    $this->assertSame(300, $participant['participant_fee_amount']);
+    $this->assertSame('300.00', $participant['participant_fee_amount']);
   }
 
   /**
@@ -338,7 +338,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->getTestForm('CRM_Event_Form_Participant', $params)->processForm();
 
     $participant = Participant::get()->addWhere('event_id', '=', $this->getEventID())->execute()->single();
-    $this->assertSame(100, $participant['fee_amount']);
+    $this->assertSame(100.0, $participant['fee_amount']);
 
     $lineItems = LineItem::get()
       ->addWhere('entity_id', '=', $participant['id'])
@@ -434,7 +434,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     foreach ($financialItems as $financialItem) {
       $sum += $financialItem['amount'];
     }
-    $this->assertSame(105, $sum);
+    $this->assertSame(105.0, $sum);
     $this->assertCount(3, $financialItems);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
@@ -450,7 +450,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     ]);
 
     $result = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_table' => 'civicrm_financial_item', 'sequential' => 1, 'return' => ['entity_table', 'amount']])['values'];
-    $this->assertSame(40, $result[2]['amount']);
+    $this->assertSame('40.00', $result[2]['amount']);
     $this->assertCount(4, $result);
   }
 
@@ -477,7 +477,7 @@ United States',
     $this->assertSame('2018-09-04 00:00:00', $participant['participant_register_date']);
     $this->assertSame('Offline Registration for Event: Annual CiviCRM meet by:', $participant['participant_source']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertSame(20, $contribution['total_amount']);
+    $this->assertSame('20.00', $contribution['total_amount']);
     $this->assertEquals(['Family Deal - 1'], $contribution['amount_level']);
     $this->assertSame('Debit Card', $contribution['payment_instrument']);
     $this->assertNotEmpty($contribution['receipt_date']);

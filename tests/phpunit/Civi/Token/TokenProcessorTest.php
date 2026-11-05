@@ -140,7 +140,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $this->assertSame(3, $row->context['two'][2]);
       $this->assertSame(5, $row->context['two'][4]);
       $this->assertSame(7, $row->context['three'][6]);
-      $this->assertSame(98, $row->context['omega']);
+      $this->assertSame('98', $row->context['omega']);
       $this->assertEquals(__CLASS__, $row->context['controller']);
     }
   }

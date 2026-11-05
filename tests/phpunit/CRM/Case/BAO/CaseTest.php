@@ -1370,8 +1370,8 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
       'subject' => 'backdated',
       'case_id' => $this->ids['Case']['form-created'],
     ]);
-    $this->assertSame(0, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'upcoming'], 'dashboard', TRUE));
-    $this->assertSame(1, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'recent'], 'dashboard', TRUE));
+    $this->assertSame('0', CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'upcoming'], 'dashboard', TRUE));
+    $this->assertSame('1', CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'recent'], 'dashboard', TRUE));
   }
 
   private function countCaseActivities(int $caseId, int $activityId): int {

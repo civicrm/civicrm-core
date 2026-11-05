@@ -239,9 +239,9 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params['payment_processor_id'] = 1;
     $params['sequential'] = 1;
     $result = $this->callAPISuccess('event', 'create', $params);
-    $this->assertSame(1, $result['values'][0]['payment_processor'][0], "handing of payment processor compatibility");
+    $this->assertSame('1', $result['values'][0]['payment_processor'][0], "handing of payment processor compatibility");
     $result = $this->callAPISuccess('event', 'get', $params);
-    $this->assertSame(1, $result['values'][0]['payment_processor_id'], "handing get payment processor compatibility");
+    $this->assertSame('1', $result['values'][0]['payment_processor_id'], "handing get payment processor compatibility");
   }
 
   /**
@@ -275,8 +275,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ];
 
     $currentEvent = $this->callAPISuccess('Event', 'getsingle', $getEventParams);
-    $this->assertSame(0, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
-    $this->assertSame(1, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
+    $this->assertSame('0', $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
+    $this->assertSame('1', $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
     $participant = $this->callAPISuccess('Participant', 'create', [
       'participant_status' => $this->getParticipantStatusID('Registered'),
       'role_id' => 1,
@@ -284,8 +284,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'event_id' => $this->_eventIds[0],
     ]);
     $currentEvent = $this->callAPISuccess('Event', 'getsingle', $getEventParams);
-    $this->assertSame(1, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
-    $this->assertSame(0, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
+    $this->assertSame('1', $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
+    $this->assertSame('0', $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
 
     $this->contactDelete($contactID);
   }
@@ -685,7 +685,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccess('Event', 'Create', $params);
     $updated = $this->callAPISuccess('Event', 'Get', $params, __FUNCTION__, __FILE__);
-    $this->assertSame(150, $updated['values'][$result['id']]['max_participants']);
+    $this->assertEquals(150, $updated['values'][$result['id']]['max_participants']);
     $this->assertSame('Annual CiviCRM meet 2', $updated['values'][$result['id']]['title']);
     $this->callAPISuccess($this->_entity, 'Delete', ['id' => $result['id']]);
   }
@@ -927,7 +927,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     }
 
     // check the newly created event is an event, not a template
-    $this->assertSame(0, $eventResult['is_template'], print_r($eventResult, 1));
+    $this->assertEquals(0, $eventResult['is_template'], print_r($eventResult, 1));
   }
 
   public function testGetListLeadingZero(): void {

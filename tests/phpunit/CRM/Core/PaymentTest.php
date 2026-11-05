@@ -45,7 +45,7 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
 
     $dummyPayment->setBackOffice(FALSE);
     $paymentMetaData = $dummyPayment->getPaymentFormFieldsMetadata();
-    $this->assertSame(1, $paymentMetaData["cvv2"]["is_required"], "CVV should always be required for front office.");
+    $this->assertTrue($paymentMetaData["cvv2"]["is_required"], "CVV should always be required for front office.");
 
     Civi::settings()->set('cvv_backoffice_required', 1);
 
@@ -55,7 +55,7 @@ class CRM_Core_PaymentTest extends CiviUnitTestCase {
 
     $dummyPayment->setBackOffice(FALSE);
     $paymentMetaData = $dummyPayment->getPaymentFormFieldsMetadata();
-    $this->assertSame(1, $paymentMetaData["cvv2"]["is_required"], "CVV should always be required for front office.");
+    $this->assertTrue($paymentMetaData["cvv2"]["is_required"], "CVV should always be required for front office.");
   }
 
   /**

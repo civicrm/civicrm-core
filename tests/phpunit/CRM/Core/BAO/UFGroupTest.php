@@ -53,7 +53,7 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     ]);
     // Assert that pre hook implementation was called.
     $ufGroup = UFGroup::get()->addWhere('title', '=', 'testPreHookIsCalledForCreate')->execute()->first();
-    $this->assertSame(0, $ufGroup['is_active'], 'Is active should be 0');
+    $this->assertFalse($ufGroup['is_active'], 'Is active should be 0');
   }
 
   /**
@@ -94,7 +94,7 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
 
     // Assert that pre hook implementation was called.
     $this->assertSame('testPostHookIsCalledForCreate', $ufGroup['title']);
-    $this->assertSame(0, $ufGroup['is_active'], 'Is active should be 0');
+    $this->assertFalse($ufGroup['is_active'], 'Is active should be 0');
   }
 
   /**

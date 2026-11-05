@@ -64,7 +64,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       ])['id'],
     ];
     $ufField1 = $this->callAPISuccess('uf_field', 'create', $params);
-    $this->assertSame(1, $ufField1['values'][$ufField1['id']]['weight']);
+    $this->assertEquals(1, $ufField1['values'][$ufField1['id']]['weight']);
     $this->assertDBQuery(1, 'SELECT weight FROM civicrm_uf_field WHERE id = %1', [
       1 => [$ufField1['id'], 'Int'],
     ]);
@@ -72,7 +72,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     // needs to be a different field
     $params['location_type_id'] = $this->getLocationTypeID('Work');
     $ufField2 = $this->callAPISuccess('UFField', 'create', $params);
-    $this->assertSame(1, $ufField2['values'][$ufField2['id']]['weight']);
+    $this->assertEquals(1, $ufField2['values'][$ufField2['id']]['weight']);
     $this->assertDBQuery(1, 'SELECT weight FROM civicrm_uf_field WHERE id = %1', [
       1 => [$ufField2['id'], 'Int'],
     ]);

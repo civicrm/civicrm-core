@@ -160,13 +160,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->putGroupContactCacheInClearableState($groupID, $contact);
 
     $this->callAPISuccess('contact', 'create', ['id' => $contact['id']]);
-    $this->assertSame(0, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_group_contact_cache'));
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_group_contact_cache'));
 
     // Rinse & repeat, but with the option.
     $this->putGroupContactCacheInClearableState($groupID, $contact);
     CRM_Core_Config::setPermitCacheFlushMode(FALSE);
     $this->callAPISuccess('contact', 'create', ['id' => $contact['id']]);
-    $this->assertSame(1, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_group_contact_cache'));
+    $this->assertSame(1, (int) CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_group_contact_cache'));
     CRM_Core_Config::setPermitCacheFlushMode(TRUE);
   }
 
@@ -498,8 +498,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertArrayKeyExists('prefix_id', $result);
     $this->assertArrayKeyExists('suffix_id', $result);
     $this->assertArrayKeyExists('gender_id', $result);
-    $this->assertSame(4, $result['prefix_id']);
-    $this->assertSame(1, $result['suffix_id']);
+    $this->assertSame('4', $result['prefix_id']);
+    $this->assertSame('1', $result['suffix_id']);
   }
 
   /**
@@ -526,8 +526,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertArrayKeyExists('prefix_id', $result);
     $this->assertArrayKeyExists('suffix_id', $result);
     $this->assertArrayKeyExists('gender_id', $result);
-    $this->assertSame(4, $result['prefix_id']);
-    $this->assertSame(1, $result['suffix_id']);
+    $this->assertSame('4', $result['prefix_id']);
+    $this->assertSame('1', $result['suffix_id']);
   }
 
   /**
@@ -916,7 +916,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $customFldTime = date('His', strtotime($result['values'][$result['id']]['api.CustomValue.get']['values'][0]['latest']));
     $this->assertNotNull($customFldDate);
     $this->assertEquals($dateTime, $customFldDate);
-    $this->assertSame(000000, $customFldTime);
+    $this->assertSame('000000', $customFldTime);
     $this->callAPISuccess('Contact', 'create', $params);
   }
 
@@ -978,7 +978,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]));
     //check is_active is now 1
     $relationship = $this->callAPISuccess('relationship', 'getsingle', ['return' => 'is_active']);
-    $this->assertSame(1, $relationship['is_active']);
+    $this->assertSame('1', $relationship['is_active']);
   }
 
   /**
@@ -2365,11 +2365,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contact', 'getsingle', ['id' => $contact['id']]);
 
     $this->assertSame('en_US', $result['preferred_language']);
-    $this->assertSame(1, $result['communication_style_id']);
-    $this->assertSame(1, $result['gender_id']);
+    $this->assertSame('1', $result['communication_style_id']);
+    $this->assertSame('1', $result['gender_id']);
     $this->assertSame('Female', $result['gender']);
     $this->assertSame('Mrs.', $result['individual_prefix']);
-    $this->assertSame(1, $result['prefix_id']);
+    $this->assertSame('1', $result['prefix_id']);
     $this->assertSame('II', $result['individual_suffix']);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', 'suffix_id', 'II'), $result['suffix_id']);
     $this->callAPISuccess('contact', 'delete', $contact);
@@ -3083,7 +3083,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $organization = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name', 'is_deceased'], 'id' => $organizationID]);
     $this->assertSame('Steppenwolf wuz here', $organization['display_name']);
     $this->assertSame('Steppenwolf wuz here', $organization['sort_name']);
-    $this->assertSame(1, $organization['is_deceased']);
+    $this->assertEquals(1, $organization['is_deceased']);
 
     $householdID = $this->householdCreate();
     $household = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name'], 'id' => $householdID]);
@@ -3131,7 +3131,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $params = ['id' => $contactID];
     $result = $this->callAPISuccess('Contact', 'GetCount', $params);
-    $this->assertSame('1', $result);
+    $this->assertSame(1, $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
 
@@ -3464,11 +3464,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
     $refCountsIdx = CRM_Utils_Array::index(['name'], $refCounts['values']);
 
-    $this->assertSame(1, $refCountsIdx['sql:civicrm_email:contact_id']['count']);
+    $this->assertSame('1', $refCountsIdx['sql:civicrm_email:contact_id']['count']);
     $this->assertSame('civicrm_email', $refCountsIdx['sql:civicrm_email:contact_id']['table']);
-    $this->assertSame(2, $refCountsIdx['sql:civicrm_phone:contact_id']['count']);
+    $this->assertSame('2', $refCountsIdx['sql:civicrm_phone:contact_id']['count']);
     $this->assertSame('civicrm_phone', $refCountsIdx['sql:civicrm_phone:contact_id']['table']);
-    $this->assertSame(3, $refCountsIdx['sql:civicrm_entity_tag:entity_id']['count']);
+    $this->assertSame('3', $refCountsIdx['sql:civicrm_entity_tag:entity_id']['count']);
     $this->assertSame('civicrm_entity_tag', $refCountsIdx['sql:civicrm_entity_tag:entity_id']['table']);
     $this->assertNotTrue(isset($refCountsIdx['sql:civicrm_address:contact_id']));
   }
@@ -4391,7 +4391,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ]);
     $result = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'Doe']);
-    $this->assertSame(1, $result['communication_style_id']);
+    $this->assertEquals(1, $result['communication_style_id']);
   }
 
   /**

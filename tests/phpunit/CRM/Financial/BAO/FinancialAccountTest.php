@@ -133,7 +133,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase implements
     $financialAccountid = $this->getFinancialAccountID('Donations');
     CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountid, 'accounting_code', '4800');
     $accountingCode = CRM_Financial_BAO_FinancialAccount::getAccountingCode($financialType->id);
-    $this->assertSame(4800, $accountingCode, 'Verify accounting code.');
+    $this->assertSame('4800', $accountingCode, 'Verify accounting code.');
   }
 
   /**

@@ -166,7 +166,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
     ];
     $result = $this->callAPISuccess('PriceFieldValue', 'create', $params);
-    $this->assertSame(2, $result['values'][$result['id']]['membership_num_terms']);
+    $this->assertSame('2', $result['values'][$result['id']]['membership_num_terms']);
     $this->assertSame(1, $result['count']);
     $this->callAPISuccess('PriceFieldValue', 'delete', ['id' => $result['id']]);
   }

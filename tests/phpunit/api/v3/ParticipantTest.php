@@ -111,7 +111,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Participant', 'get', $params);
     //Assert all the returned participants has a role_id of 2
     foreach ($result['values'] as $values) {
-      $this->assertSame(2, $values['participant_role_id']);
+      $this->assertSame('2', $values['participant_role_id']);
     }
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_participant SET role_id = NULL WHERE id = ' . $this->ids['Participant']['primary']);
@@ -509,13 +509,13 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     // technically incorrect.
 
     $lineItem = array_pop($lineItems['values']);
-    $this->assertSame(2, $lineItem['qty']);
-    $this->assertSame(5, $lineItem['unit_price']);
+    $this->assertSame('2.00', $lineItem['qty']);
+    $this->assertSame('5.00', $lineItem['unit_price']);
     $this->assertSame('price_field_value_2', $lineItem['label']);
 
     $lineItem = array_pop($lineItems['values']);
-    $this->assertSame(2, $lineItem['qty']);
-    $this->assertSame(20, $lineItem['unit_price']);
+    $this->assertSame('2.00', $lineItem['qty']);
+    $this->assertSame('20.00', $lineItem['unit_price']);
     $this->assertSame('price_field_value_1', $lineItem['label']);
     $this->callAPISuccess('PriceFieldValue', 'create', ['id' => $pfv2['id'], 'label' => 'Price Field Value 2 Label']);
     $participantGet = $this->callAPISuccess('Participant', 'get', ['id' => $participant['id']]);
@@ -539,13 +539,13 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     // technically incorrect.
 
     $lineItem = array_pop($lineItems['values']);
-    $this->assertSame(2, $lineItem['qty']);
-    $this->assertSame(5, $lineItem['unit_price']);
+    $this->assertSame('2.00', $lineItem['qty']);
+    $this->assertSame('5.00', $lineItem['unit_price']);
     $this->assertSame('Price Field Value 2 Label', $lineItem['label']);
 
     $lineItem = array_pop($lineItems['values']);
-    $this->assertSame(2, $lineItem['qty']);
-    $this->assertSame(20, $lineItem['unit_price']);
+    $this->assertSame('2.00', $lineItem['qty']);
+    $this->assertSame('20.00', $lineItem['unit_price']);
     $this->assertSame('price_field_value_1', $lineItem['label']);
 
     // Cleanup

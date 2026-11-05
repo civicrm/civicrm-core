@@ -76,8 +76,8 @@ trait CRMTraits_Event_ScenarioTrait {
       ])
       ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
       ->processForm();
-    $this->assertSame(660, $form->getTotalAmount());
-    $this->assertSame(60, $form->getTotalTaxAmount());
+    $this->assertSame(660.0, $form->getTotalAmount());
+    $this->assertSame(60.0, $form->getTotalTaxAmount());
     $this->sentMail = $form->getMail();
     $participants = Participant::get(FALSE)
       ->addWhere('event_id', '=', $this->getEventID('PaidEvent'))
@@ -140,8 +140,8 @@ trait CRMTraits_Event_ScenarioTrait {
       ])
       ->addSubsequentForm('CRM_Event_Form_Registration_Confirm')
       ->processForm();
-    $this->assertSame(550, $form->getTotalAmount());
-    $this->assertSame(50, $form->getTotalTaxAmount());
+    $this->assertSame(550.0, $form->getTotalAmount());
+    $this->assertSame(50.0, $form->getTotalTaxAmount());
     $this->sentMail = $form->getMail();
     $participants = Participant::get(FALSE)
       ->addWhere('event_id', '=', $this->getEventID('PaidEvent'))

@@ -134,8 +134,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $this->assertSame('Editorial Dept', $addAddress->supplemental_address_1, 'In line' . __LINE__);
     $this->assertSame('El Paso', $addAddress->city, 'In line' . __LINE__);
     $this->assertSame('88575', $addAddress->postal_code, 'In line' . __LINE__);
-    $this->assertSame('31.694842', $addAddress->geo_code_1, 'In line' . __LINE__);
-    $this->assertSame('-106.29998', $addAddress->geo_code_2, 'In line' . __LINE__);
+    $this->assertSame(31.694842, $addAddress->geo_code_1, 'In line' . __LINE__);
+    $this->assertSame(-106.29998, $addAddress->geo_code_2, 'In line' . __LINE__);
     $this->assertSame('1228', $addAddress->country_id, 'In line' . __LINE__);
     $this->contactDelete($contactId);
   }
@@ -189,12 +189,12 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     $address = CRM_Core_BAO_Address::getValues($entityBlock);
 
     $this->assertEquals($address[1]['contact_id'], $contactId);
-    $this->assertSame(1, $address[1]['is_primary'], 'In line ' . __LINE__);
-    $this->assertSame(1, $address[1]['is_billing'], 'In line ' . __LINE__);
+    $this->assertSame('1', $address[1]['is_primary'], 'In line ' . __LINE__);
+    $this->assertSame('1', $address[1]['is_billing'], 'In line ' . __LINE__);
 
     $this->assertEquals($address[2]['contact_id'], $contactId);
     $this->assertSame(0, $address[2]['is_primary'], 'In line ' . __LINE__);
-    $this->assertSame(0, $address[2]['is_billing'], 'In line ' . __LINE__);
+    $this->assertSame('0', $address[2]['is_billing'], 'In line ' . __LINE__);
 
     $this->contactDelete($contactId);
   }
@@ -262,11 +262,11 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
     // Validate both results, remember that the keys have been reset to 0 after usort
     $this->assertEquals($addresses[0]['contact_id'], $contactId);
     $this->assertSame(0, $addresses[0]['is_primary'], 'In line ' . __LINE__);
-    $this->assertSame(0, $addresses[0]['is_billing'], 'In line ' . __LINE__);
+    $this->assertSame('0', $addresses[0]['is_billing'], 'In line ' . __LINE__);
 
     $this->assertEquals($addresses[1]['contact_id'], $contactId);
-    $this->assertSame(1, $addresses[1]['is_primary'], 'In line ' . __LINE__);
-    $this->assertSame(1, $addresses[1]['is_billing'], 'In line ' . __LINE__);
+    $this->assertSame('1', $addresses[1]['is_primary'], 'In line ' . __LINE__);
+    $this->assertSame('1', $addresses[1]['is_billing'], 'In line ' . __LINE__);
 
     $this->contactDelete($contactId);
   }
@@ -1092,8 +1092,8 @@ class CRM_Core_BAO_AddressTest extends CiviUnitTestCase {
       'Database check for created contact address.'
     );
 
-    $this->assertSame('41.70130897956', $addAddress->geo_code_1, 'In line' . __LINE__);
-    $this->assertSame('-73.9194186863', $addAddress->geo_code_2, 'In line' . __LINE__);
+    $this->assertSame(41.70130897956, $addAddress->geo_code_1, 'In line' . __LINE__);
+    $this->assertSame(-73.9194186863, $addAddress->geo_code_2, 'In line' . __LINE__);
   }
 
   /**

@@ -267,10 +267,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
     ]);
     $this->callApiV3Success('Job', 'send_reminder');
     $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
-    $this->assertSame(1, $successfulCronCount);
+    $this->assertSame('1', $successfulCronCount);
     $sentToID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_action_log');
     $this->assertEquals($sentToID, $theChosenOneID);
-    $this->assertSame(0, CRM_Core_DAO::singleValueQuery('SELECT is_error FROM civicrm_action_log'));
+    $this->assertSame('0', CRM_Core_DAO::singleValueQuery('SELECT is_error FROM civicrm_action_log'));
     $this->setupForSmsTests(TRUE);
   }
 
@@ -332,7 +332,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
     $this->callApiV3Success('Job', 'send_reminder');
     $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
-    $this->assertSame(0, $successfulCronCount);
+    $this->assertSame('0', $successfulCronCount);
   }
 
   /**
@@ -365,7 +365,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
     $this->callApiV3Success('Job', 'send_reminder');
     $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
-    $this->assertSame(0, $successfulCronCount);
+    $this->assertSame('0', $successfulCronCount);
   }
 
   /**
@@ -397,11 +397,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->callAPISuccess('SmsProvider', 'delete', ['id' => $provider['id']]);
     $this->callApiV3Success('Job', 'send_reminder');
     $cronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
-    $this->assertSame(1, $cronCount);
+    $this->assertSame('1', $cronCount);
     $sentToID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_action_log');
     $this->assertEquals($sentToID, $theChosenOneID);
     $cronLog = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_action_log')->fetchAll()[0];
-    $this->assertSame(1, $cronLog['is_error']);
+    $this->assertSame('1', $cronLog['is_error']);
     $this->assertSame('SMS reminder cannot be sent because the SMS provider has been deleted.', $cronLog['message']);
     $this->setupForSmsTests(TRUE);
   }
@@ -1205,14 +1205,14 @@ ENDSQLUPDATE;
     $this->assertCount(1, $result['values']['merged']);
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
-    $this->assertSame(0, $mouse['custom_' . $customField['id']]);
+    $this->assertSame('0', $mouse['custom_' . $customField['id']]);
 
     $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => NULL]));
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(1, $result['values']['merged']);
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
-    $this->assertSame(0, $mouse['custom_' . $customField['id']]);
+    $this->assertSame('0', $mouse['custom_' . $customField['id']]);
   }
 
   /**

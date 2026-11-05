@@ -524,8 +524,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
         'return' => ['card_type_id', 'pan_truncation'],
       ]
     );
-    $this->assertSame(1, $financialTrxn['card_type_id']);
-    $this->assertSame(1111, $financialTrxn['pan_truncation']);
+    $this->assertSame('1', $financialTrxn['card_type_id']);
+    $this->assertSame('1111', $financialTrxn['pan_truncation']);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
@@ -806,9 +806,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     // Check the contribution status on membership type change whose minimum fee was less than earlier membership
     $this->assertSame('Pending refund', $contribution['contribution_status']);
     // Earlier paid amount
-    $this->assertSame(50, $payment['paid']);
+    $this->assertSame(50.0, $payment['paid']);
     // balance remaining
-    $this->assertSame(-25, $payment['balance']);
+    $this->assertSame(-25.0, $payment['balance']);
 
     //Update to lifetime membership.
     $params['membership_type_id'] = [$this->ids['Contact']['organization'], $this->ids['MembershipType']['lifetime']];
@@ -1048,14 +1048,14 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     $updatedContributionLine = $this->callAPISuccessGetSingle('LineItem', ['id' => $contributionLine['id'], 'version' => 4]);
     $this->assertSame(
-      2,
+      2.0,
       $updatedContributionLine['qty'],
       'The untouched Contribution field line item must survive a membership type change on the same contribution.'
     );
-    $this->assertSame(176, $updatedContributionLine['line_total']);
+    $this->assertSame(176.0, $updatedContributionLine['line_total']);
 
     $oldMembershipLine = $this->callAPISuccessGetSingle('LineItem', ['id' => $membershipLine['id'], 'version' => 4]);
-    $this->assertSame(0, $oldMembershipLine['qty'], 'The old membership type selection should still be cancelled by the type change.');
+    $this->assertSame(0.0, $oldMembershipLine['qty'], 'The old membership type selection should still be cancelled by the type change.');
   }
 
   /**
@@ -1377,7 +1377,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact']['individual_0'],
       'contribution_status_id' => 2,
     ]);
-    $this->assertSame(777, $contribution['trxn_id']);
+    $this->assertSame('777', $contribution['trxn_id']);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
@@ -1394,7 +1394,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($this->getMembershipStatusID('Pending'), $membership['status_id']);
 
     // Check if Contribution is_pay_later flag is set.
-    $this->assertSame(1, $contribution['is_pay_later']);
+    $this->assertSame('1', $contribution['is_pay_later']);
   }
 
   /**
@@ -1445,7 +1445,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact']['individual_0'],
       'contribution_status_id' => 2,
     ]);
-    $this->assertSame(777, $contribution['trxn_id']);
+    $this->assertSame('777', $contribution['trxn_id']);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
@@ -1462,7 +1462,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($this->getMembershipStatusID('Pending'), $membership['status_id']);
 
     // Check if Contribution is_pay_later flag is set.
-    $this->assertSame(1, $contribution['is_pay_later']);
+    $this->assertSame('1', $contribution['is_pay_later']);
   }
 
   /**
@@ -1913,7 +1913,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership']);
-    $this->assertSame(1, $lineItem['qty']);
+    $this->assertSame('1.00', $lineItem['qty']);
     $this->assertEquals(50.00, $lineItem['unit_price']);
     $this->assertEquals(50.00, $lineItem['line_total']);
     $this->assertEquals(5.00, $lineItem['tax_amount']);
@@ -1928,7 +1928,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     // ensure that the LineItem data remain the same
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership']);
-    $this->assertSame(1, $lineItem['qty']);
+    $this->assertSame('1.00', $lineItem['qty']);
     $this->assertEquals(50.00, $lineItem['unit_price']);
     $this->assertEquals(50.00, $lineItem['line_total']);
     $this->assertEquals(5.00, $lineItem['tax_amount']);

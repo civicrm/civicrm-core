@@ -217,8 +217,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     CRM_Core_DAO::singleValueQuery("UPDATE civicrm_prevnext_cache SET is_selected = 1 WHERE id IN ({$pnDupePairs[0]['prevnext_id']}, {$pnDupePairs[1]['prevnext_id']})");
 
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
-    $this->assertSame(1, $pnDupePairs[0]['is_selected'], 'Check if first record in dupe pairs is marked as selected.');
-    $this->assertSame(1, $pnDupePairs[0]['is_selected'], 'Check if second record in dupe pairs is marked as selected.');
+    $this->assertSame('1', $pnDupePairs[0]['is_selected'], 'Check if first record in dupe pairs is marked as selected.');
+    $this->assertSame('1', $pnDupePairs[0]['is_selected'], 'Check if second record in dupe pairs is marked as selected.');
 
     // batch merge selected dupes
     $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->_groupId, 'safe', 5, 1);
@@ -2192,7 +2192,7 @@ WHERE
       CRM_Core_DAO::executeQuery($sql);
     }
 
-    $this->assertSame(0, CRM_Core_DAO::singleValueQuery(
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery(
       'SELECT COUNT(*) FROM civicrm_contribution WHERE id = %1',
       [1 => [$contributionID, 'Integer']]
     ));

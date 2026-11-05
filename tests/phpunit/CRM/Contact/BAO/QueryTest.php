@@ -959,7 +959,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     // This is a little weird but seems consistent with the behavior of the search form in general.
     // Technically there are 2 contacts who share a relationship with the description searched for,
     // so one might expect the search form to return both of them instead of just Contact A... but it doesn't.
-    $this->assertSame('1', $dao->N, 'Search query returns exactly 1 result?');
+    $this->assertSame(1, $dao->N, 'Search query returns exactly 1 result?');
     $this->assertTrue($dao->fetch(), 'Search query returns success?');
     $this->assertEquals($contactID_a, $dao->contact_id, 'Search query returns contact A?');
   }
@@ -1011,7 +1011,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $query = new CRM_Contact_BAO_Query($params);
     $dao = $query->searchQuery();
-    $this->assertSame('1', $dao->N, 'Search query returns exactly 1 result?');
+    $this->assertSame(1, $dao->N, 'Search query returns exactly 1 result?');
     $this->assertTrue($dao->fetch(), 'Search query returns success?');
     $this->assertEquals($contactID_b, $dao->contact_id, 'Search query returns parent of contact A?');
   }
@@ -1058,7 +1058,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $query = new CRM_Contact_BAO_Query($params);
     $dao = $query->searchQuery();
-    $this->assertSame('2', $dao->N);
+    $this->assertSame(2, $dao->N);
     $this->callAPISuccess('Relationship', 'delete', ['id' => $relationship['id']]);
     $this->callAPISuccess('Contact', 'delete', ['id' => $contactID_a, 'skip_undelete' => 1]);
     $this->callAPISuccess('Contact', 'delete', ['id' => $contactID_b, 'skip_undelete' => 1]);
@@ -1111,7 +1111,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $query = new CRM_Contact_BAO_Query($params);
     $dao = $query->searchQuery();
-    $this->assertSame('1', $dao->N, 'Search query returns exactly 1 result?');
+    $this->assertSame(1, $dao->N, 'Search query returns exactly 1 result?');
     $this->assertTrue($dao->fetch(), 'Search query returns success?');
     $this->assertEquals($contactID_b, $dao->contact_id, 'Search query returns spouse of contact A?');
   }

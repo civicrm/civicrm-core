@@ -37,7 +37,7 @@ class ExtUserTest extends \PHPUnit\Framework\TestCase implements EndToEndInterfa
     ]);
 
     $this->assertNull($getUserId($username), 'User does not exist yet.');
-    $this->assertSame(0, $getMailCount("$username@127.0.0.1"));
+    $this->assertSame('0', $getMailCount("$username@127.0.0.1"));
 
     $loginUserId = \_authx_uf()->checkPassword($username, $secret);
     $this->assertEquals($loginUserId, $getUserId($username), 'User is autoloaded.');

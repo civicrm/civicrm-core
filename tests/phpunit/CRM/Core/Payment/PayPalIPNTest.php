@@ -124,12 +124,12 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $mut->checkMailLog(['https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_subscr-find'], ['civicrm/contribute/unsubscribe', 'civicrm/contribute/updatebilling']);
     $mut->stop();
     $contribution1 = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->_contributionID]);
-    $this->assertSame(1, $contribution1['contribution_status_id']);
+    $this->assertSame('1', $contribution1['contribution_status_id']);
     $this->assertSame('8XA571746W2698126', $contribution1['trxn_id']);
     // source gets set by processor
     $this->assertSame('Online Contribution:', substr($contribution1['contribution_source'], 0, 20));
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
-    $this->assertSame(5, $contributionRecur['contribution_status_id']);
+    $this->assertSame('5', $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurSubsequentTransaction());
     $paypalIPN->main();
     $contributions = $this->callAPISuccess('contribution', 'get', [
@@ -169,12 +169,12 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
     $membershipEndDate = $this->callAPISuccessGetValue('membership', ['return' => 'end_date']);
-    $this->assertSame(1, $contribution['contribution_status_id']);
+    $this->assertSame('1', $contribution['contribution_status_id']);
     $this->assertSame('8XA571746W2698126', $contribution['trxn_id']);
     // source gets set by processor
     $this->assertSame(substr($contribution['contribution_source'], 0, 20), 'Online Contribution:');
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
-    $this->assertSame(5, $contributionRecur['contribution_status_id']);
+    $this->assertSame('5', $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurSubsequentTransaction($paypalRecurParams));
     $paypalIPN->main();
     $renewedMembershipEndDate = $this->membershipRenewalDate($durationUnit, $membershipEndDate);
@@ -369,13 +369,13 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
       ->execute()->first();
     $this->assertSame('In Progress', $recur['contribution_status_id:name']);
     $contribution1 = $this->callAPISuccess('Contribution', 'getsingle', ['id' => $this->_contributionID]);
-    $this->assertSame(1, $contribution1['contribution_status_id']);
+    $this->assertSame('1', $contribution1['contribution_status_id']);
     $this->assertSame('8XA571746W2698126', $contribution1['trxn_id']);
     $this->assertSame('0.63', $contribution1['fee_amount']);
     // source gets set by processor
     $this->assertSame('Online Contribution:', substr($contribution1['contribution_source'], 0, 20));
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
-    $this->assertSame(5, $contributionRecur['contribution_status_id']);
+    $this->assertSame('5', $contributionRecur['contribution_status_id']);
   }
 
   /**

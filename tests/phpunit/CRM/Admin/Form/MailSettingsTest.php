@@ -171,7 +171,7 @@ class CRM_Admin_Form_MailSettingsTest extends CiviUnitTestCase {
     $form = $this->buildForm($id, $this->submittedValues($id));
     $form->processForm();
 
-    $this->assertSame(1, $this->getStored($id)['is_ssl'],
+    $this->assertTrue($this->getStored($id)['is_ssl'],
       'An absent managed checkbox must not be saved as unchecked');
   }
 

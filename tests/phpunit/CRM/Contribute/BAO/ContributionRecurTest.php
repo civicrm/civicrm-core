@@ -486,7 +486,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ->execute()
       ->first();
     $this->assertSame('USD', $updatedContributionRecur['currency']);
-    $this->assertSame('2.00', $updatedContributionRecur['amount']);
+    $this->assertSame(2.0, $updatedContributionRecur['amount']);
     $this->assertGreaterThan(
       strtotime($contributionRecur['modified_date']),
       strtotime($updatedContributionRecur['modified_date'])
@@ -498,10 +498,10 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ->setValues(['amount' => 6])
       ->execute();
 
-    $this->assertSame(6, Contribution::get()
+    $this->assertSame(6.0, Contribution::get()
       ->addWhere('id', '=', $templateContribution['id'])
       ->addSelect('total_amount')->execute()->first()['total_amount']);
-    $this->assertSame(6, LineItem::get()
+    $this->assertSame(6.0, LineItem::get()
       ->addWhere('contribution_id', '=', $templateContribution['id'])
       ->addGroupBy('contribution_id')
       ->addSelect('SUM(line_total) AS total_amount')->execute()->first()['total_amount']);

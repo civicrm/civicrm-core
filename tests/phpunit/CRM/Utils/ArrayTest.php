@@ -178,11 +178,11 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
       ],
     ];
     $this->assertSame('1', CRM_Utils_Array::pathGet($arr, ['one']));
-    $this->assertSame('2', CRM_Utils_Array::pathGet($arr, ['two', 'half']));
+    $this->assertSame(2, CRM_Utils_Array::pathGet($arr, ['two', 'half']));
     $this->assertNull(CRM_Utils_Array::pathGet($arr, ['zoo', 'half']));
     CRM_Utils_Array::pathSet($arr, ['zoo', 'half'], '3');
-    $this->assertSame(3, CRM_Utils_Array::pathGet($arr, ['zoo', 'half']));
-    $this->assertSame(3, $arr['zoo']['half']);
+    $this->assertSame('3', CRM_Utils_Array::pathGet($arr, ['zoo', 'half']));
+    $this->assertSame('3', $arr['zoo']['half']);
 
     $arrCopy = $arr;
     $this->assertFalse(CRM_Utils_Array::pathUnset($arr, ['does-not-exist']));

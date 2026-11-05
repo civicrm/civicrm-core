@@ -188,7 +188,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $getParams['id'] = $result['id'];
     $getIndPayment = $this->callAPISuccess('PledgePayment', 'get', $getParams);
     $this->assertSame(1, $getIndPayment['count']);
-    $this->assertSame(20, $getIndPayment['values'][$result['id']]['actual_amount']);
+    $this->assertSame('20.00', $getIndPayment['values'][$result['id']]['actual_amount']);
     $this->assertSame('USD', $getIndPayment['values'][$result['id']]['currency']);
 
     //create a second pledge payment - need a contribution first &can't use the CiviUnitTest case function as invoice is hard-coded

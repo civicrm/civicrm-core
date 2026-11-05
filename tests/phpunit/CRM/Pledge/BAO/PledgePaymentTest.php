@@ -69,7 +69,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $paymentid = CRM_Pledge_BAO_PledgePayment::deletePayments($payment->pledge_id);
 
-    $this->assertSame(1, $paymentid, "Deleted one payment");
+    $this->assertTrue($paymentid, "Deleted one payment");
   }
 
   /**
@@ -344,17 +344,17 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     ]);
 
     // The status of the first 3 pledges should be set to complete
-    $this->assertSame(1, $pledgePayments['values'][0]['status_id']);
+    $this->assertSame('1', $pledgePayments['values'][0]['status_id']);
     $this->assertEquals($pledgePayments['values'][0]['actual_amount'], 404.70);
 
-    $this->assertSame(1, $pledgePayments['values'][1]['status_id']);
-    $this->assertSame(0, $pledgePayments['values'][1]['actual_amount']);
+    $this->assertSame('1', $pledgePayments['values'][1]['status_id']);
+    $this->assertSame('0.00', $pledgePayments['values'][1]['actual_amount']);
 
-    $this->assertSame(1, $pledgePayments['values'][2]['status_id']);
-    $this->assertSame(0, $pledgePayments['values'][2]['actual_amount']);
+    $this->assertSame('1', $pledgePayments['values'][2]['status_id']);
+    $this->assertSame('0.00', $pledgePayments['values'][2]['actual_amount']);
 
     // Fourth pledge should still be pending
-    $this->assertSame(2, $pledgePayments['values'][3]['status_id']);
+    $this->assertSame('2', $pledgePayments['values'][3]['status_id']);
   }
 
   /**
@@ -447,12 +447,12 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
         $this->assertEquals(100.00, $pp['actual_amount']);
       }
       else {
-        $this->assertSame(0, $pp['scheduled_amount']);
-        $this->assertSame(0, $pp['actual_amount']);
+        $this->assertSame('0.00', $pp['scheduled_amount']);
+        $this->assertSame('0.00', $pp['actual_amount']);
       }
 
       // All pledge payments must be set as 'completed'.
-      $this->assertSame(1, $pp['status_id']);
+      $this->assertSame('1', $pp['status_id']);
     }
 
     $this->assertEquals(count($pledgePayments['values']), CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge['id'], 2));

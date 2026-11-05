@@ -483,7 +483,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT is_selected FROM civicrm_prevnext_cache WHERE id = %1",
       [1 => [$pnid, 'Integer']]
     );
-    $this->assertSame(1, $isSelected);
+    $this->assertSame('1', $isSelected);
   }
 
   /**
@@ -533,7 +533,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT count(*) FROM civicrm_prevnext_cache WHERE cachekey = %1 AND is_selected = 1",
       [1 => [$cacheKey, 'String']]
     );
-    $this->assertSame(2, $selectedCount);
+    $this->assertSame('2', $selectedCount);
   }
 
   /**
@@ -573,7 +573,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT is_selected FROM civicrm_prevnext_cache WHERE id = %1",
       [1 => [$pnid, 'Integer']]
     );
-    $this->assertSame(0, $isSelected, 'Row should not be updated when cacheKey is only a prefix.');
+    $this->assertSame('0', $isSelected, 'Row should not be updated when cacheKey is only a prefix.');
   }
 
   /**
@@ -623,7 +623,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT count(*) FROM civicrm_dedupe_exception WHERE contact_id1 = %1 AND contact_id2 = %2",
       [1 => [$c1, 'Positive'], 2 => [$c2, 'Positive']]
     );
-    $this->assertSame(1, $exceptionExists);
+    $this->assertSame('1', $exceptionExists);
 
     // 2. Remove exception
     $_POST = $_REQUEST = [
@@ -643,7 +643,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT count(*) FROM civicrm_dedupe_exception WHERE contact_id1 = %1 AND contact_id2 = %2",
       [1 => [$c1, 'Positive'], 2 => [$c2, 'Positive']]
     );
-    $this->assertSame(0, $exceptionExistsAfter);
+    $this->assertSame('0', $exceptionExistsAfter);
   }
 
   /**

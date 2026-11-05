@@ -180,7 +180,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT count(*) FROM civicrm_entity_batch WHERE entity_table = 'civicrm_financial_trxn' AND entity_id = %1 AND batch_id = %2",
       [1 => [$financialTrxnId, 'Positive'], 2 => [$batch['id'], 'Positive']]
     );
-    $this->assertSame(1, $assigned);
+    $this->assertSame('1', $assigned);
 
     // 2. Remove transaction from batch
     $_POST = $_REQUEST = [
@@ -200,7 +200,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT count(*) FROM civicrm_entity_batch WHERE entity_table = 'civicrm_financial_trxn' AND entity_id = %1 AND batch_id = %2",
       [1 => [$financialTrxnId, 'Positive'], 2 => [$batch['id'], 'Positive']]
     );
-    $this->assertSame(0, $assignedAfter);
+    $this->assertSame('0', $assignedAfter);
   }
 
   /**

@@ -293,7 +293,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('activity', 'create', $params);
-    $this->assertSame(1, $result['values'][$result['id']]['priority_id']);
+    $this->assertSame('1', $result['values'][$result['id']]['priority_id']);
   }
 
   /**
@@ -325,12 +325,12 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->callAPISuccess('Activity', 'create', $this->_params);
     $params = array_merge($this->_params, ['return' => array_keys($this->_params)]);
     $result = $this->callAPISuccessGetSingle('Activity', $params);
-    $this->assertSame(120, $result['duration']);
+    $this->assertSame('120', $result['duration']);
     $this->assertSame('test activity type id', $result['subject']);
     $this->assertSame('2011-06-02 14:36:13', $result['activity_date_time']);
     $this->assertSame('Pennsylvania', $result['location']);
     $this->assertSame('a test activity', $result['details']);
-    $this->assertSame(2, $result['status_id']);
+    $this->assertSame('2', $result['status_id']);
   }
 
   /**
@@ -358,12 +358,12 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('activity', 'create', $params);
 
     $result = $this->callAPISuccess('Activity', 'getsingle', ['id' => $result['id'], 'return' => array_merge(array_keys($params), ['priority_id'])]);
-    $this->assertSame(120, $result['duration']);
+    $this->assertEquals(120, $result['duration']);
     $this->assertSame('Make-it-Happen Meeting', $result['subject']);
     $this->assertSame('2011-03-16 00:00:00', $result['activity_date_time']);
     $this->assertSame('Pennsylvania', $result['location']);
     $this->assertSame('a test activity', $result['details']);
-    $this->assertSame(1, $result['status_id']);
+    $this->assertEquals(1, $result['status_id']);
 
     $priorities = $this->callAPISuccess('activity', 'getoptions', ['field' => 'priority_id']);
     $this->assertEquals($result['priority_id'], array_search('Normal', $priorities['values']));
@@ -582,7 +582,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('activity', 'create', $params);
-    $this->assertSame(120, $result['values'][$result['id']]['duration']);
+    $this->assertSame('120', $result['values'][$result['id']]['duration']);
     $this->assertSame('Make-it-Happen Meeting', $result['values'][$result['id']]['subject']);
     $this->assertEquals($result['values'][$result['id']]['activity_date_time'], date('Ymd') . '000000');
     $this->assertSame('Pennsylvania', $result['values'][$result['id']]['location']);
@@ -1246,7 +1246,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('Activity', 'create', $params);
     $this->assertSame('Hurry update works', $result['values'][$activity['id']]['subject']);
-    $this->assertSame(1, $result['values'][$activity['id']]['status_id']
+    $this->assertSame('1', $result['values'][$activity['id']]['status_id']
     );
   }
 
@@ -1361,8 +1361,8 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals($ids, array_keys($overdueFirst['values']));
 
     // Test return value
-    $this->assertSame(1, $overdueFirst['values'][$overdueAct['id']]['is_overdue']);
-    $this->assertSame(0, $overdueFirst['values'][$completedAct['id']]['is_overdue']);
+    $this->assertSame('1', $overdueFirst['values'][$overdueAct['id']]['is_overdue']);
+    $this->assertSame('0', $overdueFirst['values'][$completedAct['id']]['is_overdue']);
 
     // Test filtering
     $onlyOverdue = $this->callAPISuccess('Activity', 'get', [

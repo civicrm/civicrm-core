@@ -544,7 +544,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ]);
     $this->assertNumberOfContactsInResult(3, $rows, $template);
     if ($template === 'contribute/summary') {
-      $this->assertSame(3, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+      $this->assertSame('3', $rows['values'][0]['civicrm_contribution_total_amount_count']);
     }
   }
 
@@ -565,7 +565,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'gid_op' => 'notin',
       'options' => ['metadata' => ['sql']],
     ]);
-    $this->assertSame(2, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+    $this->assertSame('2', $rows['values'][0]['civicrm_contribution_total_amount_count']);
   }
 
   /**
@@ -715,7 +715,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'gid_op' => 'in',
       'options' => ['metadata' => ['sql']],
     ]);
-    $this->assertSame(4, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+    $this->assertSame('4', $rows['values'][0]['civicrm_contribution_total_amount_count']);
   }
 
   /**
@@ -843,7 +843,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'gid_op' => 'in',
       'options' => ['metadata' => ['sql']],
     ]);
-    $this->assertSame(7, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+    $this->assertSame('7', $rows['values'][0]['civicrm_contribution_total_amount_count']);
   }
 
   /**
@@ -1549,7 +1549,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ]);
     $values = $rows['values'][0];
     $this->assertEquals(100.00, $values['civicrm_contribution_soft_amount_1_sum'], 'Total committed should be $100');
-    $this->assertSame(2, $values['civicrm_contribution_soft_soft_id_count'], 'Total donors should be 2');
+    $this->assertSame('2', $values['civicrm_contribution_soft_soft_id_count'], 'Total donors should be 2');
   }
 
   /**

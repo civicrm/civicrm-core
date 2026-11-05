@@ -52,7 +52,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'Database check on updated financial trxn record.'
     );
 
-    $this->assertSame(10, $result, 'Verify financial trxn total_amount.');
+    $this->assertSame('10.00', $result, 'Verify financial trxn total_amount.');
   }
 
   /**
@@ -86,9 +86,9 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $contribution = $contribution['values'][$contribution['id']];
 
     $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
-    $this->assertSame(0, $totalPaymentAmount, 'Amount not matching.');
+    $this->assertSame(0.0, $totalPaymentAmount, 'Amount not matching.');
 
-    $this->assertSame(0, Contribution::get()->addWhere('id', '=', $contribution['id'])
+    $this->assertSame(0.0, Contribution::get()->addWhere('id', '=', $contribution['id'])
       ->addSelect('paid_amount')->execute()->first()['paid_amount']);
     $params['id'] = $contribution['id'];
     $params['contribution_status_id'] = 1;
@@ -96,10 +96,10 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
 
     $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
-    $this->assertSame('200.00', Contribution::get()->addWhere('id', '=', $contribution['id'])
+    $this->assertSame(200.0, Contribution::get()->addWhere('id', '=', $contribution['id'])
       ->addSelect('paid_amount')->execute()->first()['paid_amount']);
 
-    $this->assertSame('200.00', $totalPaymentAmount, 'Amount not matching.');
+    $this->assertSame(200.0, $totalPaymentAmount, 'Amount not matching.');
 
   }
 
@@ -116,7 +116,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccess('Payment', 'create', $params);
     $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($orderID);
-    $this->assertSame('250.00', $totalPaymentAmount, 'Amount does not match.');
+    $this->assertSame(250.0, $totalPaymentAmount, 'Amount does not match.');
   }
 
   /**
@@ -184,8 +184,8 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
         'return' => ['card_type_id', 'pan_truncation'],
       ]
     );
-    $this->assertSame(2, $financialTrxn['card_type_id']);
-    $this->assertSame(4567, $financialTrxn['pan_truncation']);
+    $this->assertSame('2', $financialTrxn['card_type_id']);
+    $this->assertSame('4567', $financialTrxn['pan_truncation']);
   }
 
   /**
@@ -220,8 +220,8 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
         'return' => ['card_type_id', 'pan_truncation'],
       ]
     );
-    $this->assertSame(2, $financialTrxn['card_type_id']);
-    $this->assertSame(4567, $financialTrxn['pan_truncation']);
+    $this->assertSame('2', $financialTrxn['card_type_id']);
+    $this->assertSame('4567', $financialTrxn['pan_truncation']);
   }
 
   /**
