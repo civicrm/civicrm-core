@@ -91,7 +91,7 @@ class CRM_Contribute_Form_ContributionViewTest extends CiviUnitTestCase {
       CRM_Core_Invoke::runItem($item);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals(0, $e->errorData['error_code']);
+      $this->assertSame(0, $e->errorData['error_code']);
       $this->assertSame('pdf', $e->errorData['output']);
       $this->assertSame("INV_{$this->contribution['id']}", $e->errorData['fileName']);
       $this->assertStringContainsString('INVOICE', $e->errorData['html']);

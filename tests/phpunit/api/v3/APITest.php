@@ -40,10 +40,10 @@ class api_v3_APITest extends CiviUnitTestCase {
       'villain' => '$value.api.tag.create.values.0.api_tag_get.display',
     ];
     _civicrm_api_replace_variables($params, $result);
-    $this->assertEquals(999, $params['number']);
-    $this->assertEquals(8, $params['tag_id']);
-    $this->assertEquals(6, $params['activity_type_id']);
-    $this->assertEquals(7, $params['tag1_id']);
+    $this->assertSame(999, $params['number']);
+    $this->assertSame(8, $params['tag_id']);
+    $this->assertSame(6, $params['activity_type_id']);
+    $this->assertSame(7, $params['tag1_id']);
     $this->assertSame('superman', $params['tag3_id']);
     $this->assertSame('batman', $params['display']);
     $this->assertSame('krypton', $params['big_rock']);
@@ -178,7 +178,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     ]);
 
     // Check return format.
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     foreach ($result['values'] as $resultValue) {
       $this->assertSame('New title', $resultValue['title']);
       // BUG: $resultValue['location'] === 'null'.

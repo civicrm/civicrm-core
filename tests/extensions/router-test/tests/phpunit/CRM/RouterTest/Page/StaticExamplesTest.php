@@ -30,7 +30,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
    */
   public function testTextAndExit(): void {
     $result = $this->client->get('frontend://civicrm/route-test/static-text-and-exit');
-    $this->assertEquals(200, $result->getStatusCode());
+    $this->assertSame(200, $result->getStatusCode());
     $this->assertContentType('text/plain', $result);
     $this->assertSame('Text and Exit', (string) $result->getBody());
   }
@@ -40,7 +40,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
    */
   public function testPathWithData(): void {
     $result = $this->client->get('frontend://civicrm/route-test/path-with-data/foo%2Abar%25whiz%2Fbang');
-    $this->assertEquals(200, $result->getStatusCode());
+    $this->assertSame(200, $result->getStatusCode());
     $this->assertContentType('text/plain', $result);
     $resultData = (string) $result->getBody();
     $this->assertTrue(str_starts_with($resultData, 'Path Data '), "Response should start with 'Path Data'. Received: $resultData");
@@ -55,7 +55,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
    */
   public function testPsr7PathWithData(): void {
     $result = $this->client->get('frontend://civicrm/route-test/psr7-path-with-data/foo%2Abar%25whiz%2Fbang');
-    $this->assertEquals(200, $result->getStatusCode());
+    $this->assertSame(200, $result->getStatusCode());
     $this->assertContentType('text/plain', $result);
     $resultData = (string) $result->getBody();
     $this->assertTrue(str_starts_with($resultData, 'Path Data '), "Response should start with 'Path Data'. Received: $resultData");
@@ -75,7 +75,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
       'authx_user' => NULL,
       \GuzzleHttp\RequestOptions::JSON => ['number' => 123.45],
     ]);
-    $this->assertEquals(200, $result->getStatusCode());
+    $this->assertSame(200, $result->getStatusCode());
     $this->assertContentType('text/plain', $result);
     $this->assertSame('OK 123.45', (string) $result->getBody());
   }
@@ -85,7 +85,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
    */
   public function testAjaxReturnJsonResponse(): void {
     $result = $this->client->get('frontend://civicrm/route-test/ajax-return-json-response');
-    $this->assertEquals(200, $result->getStatusCode());
+    $this->assertSame(200, $result->getStatusCode());
     $this->assertContentType('application/json', $result);
     $parsed = json_decode((string) $result->getBody(), TRUE);
     $this->assertSame('OK', $parsed['ajaxReturnJsonResponse']);
@@ -96,7 +96,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
    */
   public function testSystemSendJsonResponse(): void {
     $result = $this->client->get('frontend://civicrm/route-test/system-send-json-response', ['http_errors' => FALSE]);
-    $this->assertEquals(429, $result->getStatusCode());
+    $this->assertSame(429, $result->getStatusCode());
     $this->assertContentType('application/json', $result);
     $parsed = json_decode((string) $result->getBody(), TRUE);
     $this->assertSame('OK', $parsed['systemSendJsonResponse']);
@@ -110,7 +110,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
       'http_errors' => FALSE,
       \GuzzleHttp\RequestOptions::JSON => ['number' => 456.78],
     ]);
-    $this->assertEquals(428, $result->getStatusCode());
+    $this->assertSame(428, $result->getStatusCode());
     $this->assertSame('Bar', $result->getHeader('X-Foo')[0]);
     $this->assertContentType('application/json', $result);
     $parsed = json_decode((string) $result->getBody(), TRUE);
@@ -126,7 +126,7 @@ class CRM_RouterTest_Page_StaticExamplesTest extends \PHPUnit\Framework\TestCase
       'http_errors' => FALSE,
       \GuzzleHttp\RequestOptions::JSON => ['number' => 111],
     ]);
-    $this->assertEquals(200, $result->getStatusCode());
+    $this->assertSame(200, $result->getStatusCode());
     $this->assertSame('Bar', $result->getHeader('X-Foo')[0]);
     $this->assertContentType('application/json', $result);
     $parsed = json_decode((string) $result->getBody(), TRUE);

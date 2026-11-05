@@ -53,7 +53,7 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
     $provider = new CiviTestSMSProvider('CiviTestSMSProvider');
     $result = $provider->processInbound('+61412345678', 'This is a test message', '+61487654321');
     $this->assertSame('This is a test message', $result->details);
-    $this->assertEquals('+61412345678', $result->phone_number);
+    $this->assertSame('+61412345678', $result->phone_number);
   }
 
   /**
@@ -63,8 +63,8 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
     $provider = new CiviTestSMSProvider('CiviTestSMSProvider');
     $result = $provider->processInbound('+61412345678', 'This is a test message', NULL, '12345');
     $this->assertSame('This is a test message', $result->details);
-    $this->assertEquals('+61412345678', $result->phone_number);
-    $this->assertEquals('12345', $result->result);
+    $this->assertSame('+61412345678', $result->phone_number);
+    $this->assertSame('12345', $result->result);
     $activity = $this->callAPISuccess('activity', 'getsingle', ['id' => $result->id, 'return' => ['source_contact_id', 'target_contact_id', 'assignee_contact_id']]);
     $contact = $this->callAPISuccess('contact', 'getsingle', ['phone' => '61412345678']);
     // Verify that when no to is passed in by default the same contact is used for the source and target.
@@ -80,8 +80,8 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
     $this->hookClass->setHook('civicrm_inboundSMS', [$this, 'smsHookTest']);
     $result = $provider->processInbound('+61412345678', 'This is a test message', NULL, '12345');
     $this->assertSame('This is a test message', $result->details);
-    $this->assertEquals('+61412345678', $result->phone_number);
-    $this->assertEquals('12345', $result->result);
+    $this->assertSame('+61412345678', $result->phone_number);
+    $this->assertSame('12345', $result->result);
     $contact = $this->callAPISuccess('contact', 'getsingle', ['phone' => '+61487654321']);
     $activity = $this->callAPISuccess('activity', 'getsingle', ['id' => $result->id, 'return' => ['source_contact_id', 'target_contact_id', 'assignee_contact_id']]);
     $this->assertEquals($contact['id'], $activity['source_contact_id']);
@@ -209,13 +209,13 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
       'activity_type_id' => 'SMS delivery',
       'status_id' => 'Completed',
     ]);
-    $this->assertEquals(1, $activity['count'], 'SMS job generates one activity');
+    $this->assertSame(1, $activity['count'], 'SMS job generates one activity');
     $activityValues = array_pop($activity['values']);
     $activityContacts = \Civi\Api4\ActivityContact::get(TRUE)
       ->addWhere('activity_id', '=', $activityValues['id'])
       ->addWhere('contact_id', '=', $contactId)
       ->execute();
-    $this->assertEquals(1, $activityContacts->count(), 'SMS job is with the right contact');
+    $this->assertSame(1, $activityContacts->count(), 'SMS job is with the right contact');
   }
 
 }

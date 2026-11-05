@@ -63,7 +63,7 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
     $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_dashboard');
     $this->assertEquals($oldCount + 1, $newCount);
     $this->DashboardDelete($dashboard['id'], $oldCount);
-    $this->assertEquals($dashboard['values'][$dashboard['id']]['is_active'], 1);
+    $this->assertEquals(1, $dashboard['values'][$dashboard['id']]['is_active']);
   }
 
   /**
@@ -86,7 +86,7 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
     $this->assertTrue($dashboard['id'] > 0, "In line " . __LINE__);
 
     $this->callAPISuccess('dashboard', 'create', $params);
-    $this->assertEquals($dashboard['values'][$dashboard['id']]['is_active'], 1);
+    $this->assertEquals(1, $dashboard['values'][$dashboard['id']]['is_active']);
   }
 
   /**
@@ -104,7 +104,7 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
       'is_active' => 0,
     ];
     $dashboard = $this->callAPISuccess('dashboard', 'create', $params);
-    $this->assertEquals($dashboard['values'][$dashboard['id']]['is_active'], 0);
+    $this->assertEquals(0, $dashboard['values'][$dashboard['id']]['is_active']);
   }
 
   /**

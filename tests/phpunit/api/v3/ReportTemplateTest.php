@@ -63,7 +63,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'component' => 'CiviCase',
     ]);
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $entityId = $result['id'];
     $this->assertIsNumeric($entityId);
     $caseComponentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Component', 'CiviCase', 'id', 'name');
@@ -80,7 +80,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'component' => '',
     ]);
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -94,7 +94,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'is_active' => 0,
     ]);
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -107,7 +107,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'is_active' => 1,
     ]);
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       AND option_group_id IN (SELECT id from civicrm_option_group WHERE name = "report_template") ');
@@ -118,7 +118,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'id' => $entityId,
     ]);
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertDBQuery(0, 'SELECT count(*) FROM civicrm_option_value
       WHERE name = "CRM_Report_Form_Examplez"
       ');
@@ -230,7 +230,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
     ]);
-    $this->assertEquals(14, $result['count']);
+    $this->assertSame(14, $result['count']);
 
     // Check total rows with distinct
     $_REQUEST['distinct'] = 1;
@@ -238,7 +238,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
     ]);
-    $this->assertEquals(5, $result['count']);
+    $this->assertSame(5, $result['count']);
 
     // Check total rows with distinct by passing NULL value to distinct parameter
     $_REQUEST['distinct'] = NULL;
@@ -246,7 +246,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'report_id' => 'Mailing/opened',
       'options' => ['metadata' => ['labels', 'title']],
     ]);
-    $this->assertEquals(5, $result['count']);
+    $this->assertSame(5, $result['count']);
   }
 
   /**
@@ -430,7 +430,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'yid_op' => 'calendar',
       'options' => ['metadata' => ['sql']],
     ]);
-    $this->assertEquals(1, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
+    $this->assertSame(1, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
   }
 
   /**
@@ -452,7 +452,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ];
 
     $rows = $this->callAPISuccess('report_template', 'getrows', $params);
-    $this->assertEquals(0, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
+    $this->assertSame(0, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
 
     CRM_Utils_Hook::singleton()->reset();
   }
@@ -479,7 +479,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->assertEquals(2, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
+    $this->assertSame(2, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
     $inUseCollation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
     $expected = preg_replace('/\s+/', ' ', 'COLLATE ' . $inUseCollation . ' AS
       SELECT SQL_CALC_FOUND_ROWS contact_civireport.id as cid  FROM civicrm_contact contact_civireport    INNER JOIN civicrm_contribution contribution_civireport USE index (received_date) ON contribution_civireport.contact_id = contact_civireport.id
@@ -520,7 +520,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->assertEquals(2, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
+    $this->assertSame(2, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
   }
 
   /**
@@ -544,7 +544,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ]);
     $this->assertNumberOfContactsInResult(3, $rows, $template);
     if ($template === 'contribute/summary') {
-      $this->assertEquals(3, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+      $this->assertSame('3', $rows['values'][0]['civicrm_contribution_total_amount_count']);
     }
   }
 
@@ -565,7 +565,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'gid_op' => 'notin',
       'options' => ['metadata' => ['sql']],
     ]);
-    $this->assertEquals(2, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+    $this->assertSame('2', $rows['values'][0]['civicrm_contribution_total_amount_count']);
   }
 
   /**
@@ -715,7 +715,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'gid_op' => 'in',
       'options' => ['metadata' => ['sql']],
     ]);
-    $this->assertEquals(4, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+    $this->assertSame('4', $rows['values'][0]['civicrm_contribution_total_amount_count']);
   }
 
   /**
@@ -826,7 +826,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'gid_op' => 'in',
       'options' => ['metadata' => ['sql']],
     ]);
-    $this->assertEquals(1, $rows['count']);
+    $this->assertSame(1, $rows['count']);
   }
 
   /**
@@ -843,7 +843,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'gid_op' => 'in',
       'options' => ['metadata' => ['sql']],
     ]);
-    $this->assertEquals(7, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+    $this->assertSame('7', $rows['values'][0]['civicrm_contribution_total_amount_count']);
   }
 
   /**
@@ -1074,7 +1074,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $rows = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'contribute/deferredrevenue',
     ]);
-    $this->assertEquals(2, $rows['count'], 'Report failed to get row count');
+    $this->assertSame(2, $rows['count'], 'Report failed to get row count');
     $count = [2, 1];
     foreach ($rows['values'] as $row) {
       $this->assertCount(array_pop($count), $row['rows'], 'Report failed to get row count');
@@ -1375,7 +1375,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'contact_type_op' => 'eq',
       'contact_type_value' => 'Individual',
     ]);
-    $this->assertEquals(1, $rows['count']);
+    $this->assertSame(1, $rows['count']);
   }
 
   /**
@@ -1392,7 +1392,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'contact_type_op' => 'eq',
       'contact_type_value' => 'Individual',
     ]);
-    $this->assertEquals(1, $rows['count']);
+    $this->assertSame(1, $rows['count']);
   }
 
   /**
@@ -1409,7 +1409,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'contact_type_op' => 'in',
       'contact_type_value' => 'Individual',
     ]);
-    $this->assertEquals(1, $rows['count']);
+    $this->assertSame(1, $rows['count']);
   }
 
   /**
@@ -1426,7 +1426,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'contact_type_op' => 'in',
       'contact_type_value' => 'Individual',
     ]);
-    $this->assertEquals(1, $rows['count']);
+    $this->assertSame(1, $rows['count']);
   }
 
   /**
@@ -1549,7 +1549,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ]);
     $values = $rows['values'][0];
     $this->assertEquals(100.00, $values['civicrm_contribution_soft_amount_1_sum'], 'Total committed should be $100');
-    $this->assertEquals(2, $values['civicrm_contribution_soft_soft_id_count'], 'Total donors should be 2');
+    $this->assertSame('2', $values['civicrm_contribution_soft_soft_id_count'], 'Total donors should be 2');
   }
 
   /**

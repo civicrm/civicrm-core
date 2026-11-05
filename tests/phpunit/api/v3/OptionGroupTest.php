@@ -41,20 +41,20 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
   public function testGetOptionGroupGetFieldsCreateAction(): void {
     $result = $this->callAPISuccess('option_group', 'getfields', ['action' => 'create']);
     $this->assertFalse(empty($result['values']));
-    $this->assertEquals($result['values']['name']['api.unique'], 1);
+    $this->assertSame(1, $result['values']['name']['api.unique']);
   }
 
   public function testGetOptionGroupByID(): void {
     $optionGroupID = $this->getOptionGroupID('preferred_communication_method');
     $result = $this->callAPISuccess('option_group', 'get', ['id' => $optionGroupID]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals($optionGroupID, $result['id']);
   }
 
   public function testGetOptionGroupByName(): void {
     $params = ['name' => 'preferred_communication_method'];
     $result = $this->callAPISuccess('option_group', 'get', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals($this->getOptionGroupID('preferred_communication_method'), $result['id']);
   }
 
@@ -65,7 +65,7 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
 
   public function testGetOptionDoesNotExist(): void {
     $result = $this->callAPISuccess('option_group', 'get', ['name' => 'FSIGUBSFGOMUUBSFGMOOUUBSFGMOOBUFSGMOOIIB']);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
   }
 
   public function testGetOptionCreateSuccess(): void {

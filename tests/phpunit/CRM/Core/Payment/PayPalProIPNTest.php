@@ -92,14 +92,14 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     // source gets set by processor
     $contributionRecur = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $this->ids['ContributionRecur']['default']]);
     $this->assertSame('I-8XHAKBG12SFP', $contributionRecur['processor_id']);
-    $this->assertEquals(5, $contributionRecur['contribution_status_id']);
+    $this->assertSame('5', $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction($paypalRecurParams));
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('Contribution', 'get', [
       'contribution_recur_id' => $this->_contributionRecurID,
       'sequential' => 1,
     ]);
-    $this->assertEquals(2, $contribution['count']);
+    $this->assertSame(2, $contribution['count']);
     $this->assertSame('second-one', $contribution['values'][1]['trxn_id']);
     $this->assertSame('Debit Card', $contribution['values'][1]['payment_instrument']);
   }
@@ -124,12 +124,12 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
     $membershipEndDate = $this->callAPISuccessGetValue('membership', ['return' => 'end_date']);
-    $this->assertEquals(1, $contribution['contribution_status_id']);
+    $this->assertSame('1', $contribution['contribution_status_id']);
     $this->assertSame('8XA571746W2698126', $contribution['trxn_id']);
     // source gets set by processor
     $this->assertSame('Online Contribution:', substr($contribution['contribution_source'], 0, 20));
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
-    $this->assertEquals(5, $contributionRecur['contribution_status_id']);
+    $this->assertSame('5', $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction($paypalRecurParams));
     $paypalIPN->main();
 
@@ -139,7 +139,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'contribution_recur_id' => $this->_contributionRecurID,
       'sequential' => 1,
     ]);
-    $this->assertEquals(2, $contribution['count']);
+    $this->assertSame(2, $contribution['count']);
     $this->assertSame('second-one', $contribution['values'][1]['trxn_id']);
     $this->callAPISuccessGetCount('line_item', [
       'entity_id' => $this->ids['membership'],
@@ -173,17 +173,17 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $paypalIPN->main();
 
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
-    $this->assertEquals(2, $contribution['contribution_status_id']);
+    $this->assertSame('2', $contribution['contribution_status_id']);
     $this->assertSame('', $contribution['trxn_id']);
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $this->_contributionRecurID]);
-    $this->assertEquals(2, $contributionRecur['contribution_status_id']);
+    $this->assertSame('2', $contributionRecur['contribution_status_id']);
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction());
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', [
       'contribution_recur_id' => $this->_contributionRecurID,
       'sequential' => 1,
     ]);
-    $this->assertEquals(1, $contribution['count']);
+    $this->assertSame(1, $contribution['count']);
     $this->assertSame('second-one', $contribution['values'][0]['trxn_id']);
     $payment = Payment::get(FALSE)
       ->addWhere('contribution_id', '=', $contribution['values'][0]['id'])
@@ -213,7 +213,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'getsingle', ['id' => $this->_contributionID]);
     // no change
-    $this->assertEquals(2, $contribution['contribution_status_id']);
+    $this->assertSame('2', $contribution['contribution_status_id']);
   }
 
   /**

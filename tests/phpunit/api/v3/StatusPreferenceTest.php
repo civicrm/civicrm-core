@@ -58,12 +58,12 @@ class api_v3_StatusPreferenceTest extends CiviUnitTestCase {
     $create = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
 
     $result = $this->callAPISuccess('StatusPreference', 'delete', ['id' => $create['id']]);
-    $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
+    $this->assertSame(1, $result['count'], 'In line ' . __LINE__);
 
     $get = $this->callAPISuccess('StatusPreference', 'get', [
       'id' => $create['id'],
     ]);
-    $this->assertEquals(0, $get['count'], 'Status Preference not successfully deleted In line ' . __LINE__);
+    $this->assertSame(0, $get['count'], 'Status Preference not successfully deleted In line ' . __LINE__);
   }
 
   /**

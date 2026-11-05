@@ -73,7 +73,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
       $contactsResult[$key] = $value['id'];
     }
     // assert the contacts count
-    $this->assertEquals(1, count($contactsResult));
+    $this->assertSame(1, count($contactsResult));
     // assert the contact IDs
     $expectedResult = [$contacts['id']];
     $this->checkArrayEquals($expectedResult, $contactsResult);
@@ -112,7 +112,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     // get and assert contact count
     $contactsResult = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id %s %s', $from, $where));
     // assert the contacts count
-    $this->assertEquals(5, $contactsResult->N);
+    $this->assertSame(5, $contactsResult->N);
 
     // Find Contacts of Group type == Mailing List
     $formValues['group_type'] = $groupTypes['Mailing List'];
@@ -122,7 +122,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     // get and assert contact count
     $contactsResult = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id %s %s', $from, $where));
     // assert the contacts count
-    $this->assertEquals(0, $contactsResult->N);
+    $this->assertSame(0, $contactsResult->N);
   }
 
 }

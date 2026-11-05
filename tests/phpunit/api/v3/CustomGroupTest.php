@@ -347,7 +347,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('CustomGroup', 'create', $params);
     $result = array_shift($result['values']);
 
-    $this->assertEquals(0, $result['is_active']);
+    $this->assertSame('0', $result['is_active']);
 
     // Create second group with same weight
     $params = [
@@ -374,7 +374,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   public function testParticipantEntityCustomGroup(): void {
     $customGroup = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, ['extends' => ['ParticipantEventType', [4]]]));
     $result = array_shift($customGroup['values']);
-    $this->assertEquals(3, $result['extends_entity_column_id']);
+    $this->assertSame('3', $result['extends_entity_column_id']);
     $this->assertSame('Participant', $result['extends']);
     $this->customGroupDelete($result['id']);
   }
@@ -385,7 +385,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   public function testChangeEntityCustomGroup(): void {
     $customGroup = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, ['extends' => ['ParticipantEventType', [4]]]));
     $result = array_shift($customGroup['values']);
-    $this->assertEquals(3, $result['extends_entity_column_id']);
+    $this->assertSame('3', $result['extends_entity_column_id']);
     $this->assertSame('Participant', $result['extends']);
     $customGroup = $this->callAPISuccess($this->_entity, 'create', ['id' => $customGroup['id'], 'extends' => ['Individual', []]]);
     $result = array_shift($customGroup['values']);

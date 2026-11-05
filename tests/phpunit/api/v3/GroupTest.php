@@ -55,7 +55,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $group = $group["values"];
     $this->assertNotNull(count($group));
     $this->assertSame("Test Group 1", $group[$this->_groupID]['name']);
-    $this->assertEquals($group[$this->_groupID]['is_active'], 1);
+    $this->assertEquals('1', $group[$this->_groupID]['is_active']);
     $this->assertSame('Public Pages', $group[$this->_groupID]['visibility']);
   }
 
@@ -89,7 +89,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       $this->assertSame("Test Group 1", $v['name']);
       $this->assertSame('New Test Group Created', $v['title']);
       $this->assertSame('New Test Group Created', $v['description']);
-      $this->assertEquals($v['is_active'], 1);
+      $this->assertEquals('1', $v['is_active']);
       $this->assertSame('Public Pages', $v['visibility']);
     }
   }
@@ -111,7 +111,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       $this->assertEquals($v['id'], $this->_groupID);
       $this->assertSame('New Test Group Created', $v['title']);
       $this->assertSame('New Test Group Created', $v['description']);
-      $this->assertEquals($v['is_active'], 1);
+      $this->assertEquals('1', $v['is_active']);
       $this->assertSame('Public Pages', $v['visibility']);
     }
   }
@@ -147,7 +147,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       $this->assertEquals($v['id'], $this->_groupID);
       $this->assertSame("Test Group 1", $v['name']);
       $this->assertSame('New Test Group Created', $v['description']);
-      $this->assertEquals($v['is_active'], 1);
+      $this->assertEquals('1', $v['is_active']);
       $this->assertSame('Public Pages', $v['visibility']);
     }
   }
@@ -171,7 +171,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Group', 'create', $params);
     $group = $result['values'][$result['id']];
     $this->assertSame("Test Group type", $group['name']);
-    $this->assertEquals($group['is_active'], 1);
+    $this->assertSame('1', $group['is_active']);
     $this->assertSame("", $group['parents']);
     $this->assertEquals($group['group_type'], $params['group_type']);
 
@@ -212,7 +212,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     $groupNesting = $this->callAPISuccess('GroupNesting', 'get', ['child_group_id' => $group3['id']]);
     // 2 Group nesting entries - one for direct parent & one for grandparent.
-    $this->assertEquals(2, $groupNesting['count']);
+    $this->assertSame(2, $groupNesting['count']);
     $this->groupDelete($group2['id']);
     $this->groupDelete($group3['id']);
   }
@@ -265,7 +265,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $params = [];
     $params['title'] = 'No such group Exist';
     $group = $this->callAPISuccess('group', 'get', $params);
-    $this->assertEquals(0, $group['count']);
+    $this->assertSame(0, $group['count']);
   }
 
   /**
@@ -305,7 +305,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'title' => 'Test illegal Group',
       'parents' => ['IS NOT NULL' => 1],
     ]);
-    $this->assertEquals(0, $group1['count']);
+    $this->assertSame(0, $group1['count']);
     $params['title'] = 'Test illegal Group 2';
     $params['parents'] = [];
     $params['parents'][$this->_groupID] = 'test Group';
@@ -438,7 +438,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'is_reserved' => 0,
       'check_permissions' => 1,
     ]);
-    $this->assertEquals(0, $unreserved['values'][$reservedGroup]['is_reserved']);
+    $this->assertSame('0', $unreserved['values'][$reservedGroup]['is_reserved']);
 
     // User CAN create a reserved group
     $newReserved = $this->callAPISuccess('Group', 'create', [
@@ -446,7 +446,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'is_reserved' => 1,
       'check_permissions' => 1,
     ]);
-    $this->assertEquals(1, $newReserved['values'][$newReserved['id']]['is_reserved']);
+    $this->assertSame('1', $newReserved['values'][$newReserved['id']]['is_reserved']);
 
     // User CAN delete reserved group
     $this->callAPISuccess('Group', 'delete', [

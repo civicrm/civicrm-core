@@ -15,7 +15,7 @@ class GenericHookEventTest extends \CiviUnitTestCase {
       'nothingNull' => NULL,
       'nothingZero' => 0,
     ]);
-    $this->assertEquals(123, $event->ab);
+    $this->assertSame(123, $event->ab);
     $this->assertSame('bar', $event->cd['foo']);
     $this->assertTrue($event->hasField('ab'));
     $this->assertTrue(isset($event->ab));
@@ -31,7 +31,7 @@ class GenericHookEventTest extends \CiviUnitTestCase {
       ['alpha', 'beta', 'nothingNull', 'nothingZero'],
       [456, ['whiz' => 'bang'], NULL, 0, $null]
     );
-    $this->assertEquals(456, $event->alpha);
+    $this->assertSame(456, $event->alpha);
     $this->assertSame('bang', $event->beta['whiz']);
     $this->assertTrue($event->hasField('alpha'));
     $this->assertTrue(isset($event->alpha));
@@ -39,7 +39,7 @@ class GenericHookEventTest extends \CiviUnitTestCase {
     $this->assertFalse(isset($event->ab));
     $this->assertTrue(!isset($event->nothingNull) && empty($event->nothingNull));
     $this->assertTrue(isset($event->nothingZero) && empty($event->nothingZero));
-    $this->assertEquals(4, count($event->getHookValues()));
+    $this->assertSame(4, count($event->getHookValues()));
   }
 
   public function testDispatch(): void {

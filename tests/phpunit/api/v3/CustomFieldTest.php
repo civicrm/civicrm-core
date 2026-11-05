@@ -168,7 +168,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $optionValueCount = $this->callAPISuccess('option_value', 'getcount', [
       'option_group_id' => $optionGroupID,
     ]);
-    $this->assertEquals(0, $optionValueCount);
+    $this->assertSame(0, $optionValueCount);
   }
 
   /**
@@ -525,7 +525,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('CustomGroup', 'create', $params);
     $result = array_shift($result['values']);
 
-    $this->assertEquals(0, $result['is_active']);
+    $this->assertSame('0', $result['is_active']);
 
     $this->customGroupDelete($customGroup['id']);
   }
@@ -711,7 +711,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->assertCount(1, $result['values']);
     $this->assertSame('MultiSelectSP', $result['values'][0]['label']);
     $this->assertSame('Multi-Select State/Province', $result['values'][0]['html_type']);
-    $this->assertEquals('1', $result['values'][0]['serialize']);
+    $this->assertSame('1', $result['values'][0]['serialize']);
 
     $result = $this->callAPISuccess('CustomField', 'get', [
       'custom_group_id' => 'testCustomGroup',
@@ -721,7 +721,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->assertCount(1, $result['values']);
     $this->assertSame('MultiSelectCountry', $result['values'][0]['label']);
     $this->assertSame('Multi-Select Country', $result['values'][0]['html_type']);
-    $this->assertEquals('1', $result['values'][0]['serialize']);
+    $this->assertSame('1', $result['values'][0]['serialize']);
 
     $result = $this->callAPISuccess('CustomField', 'get', [
       'custom_group_id' => 'testCustomGroup',
@@ -731,7 +731,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->assertCount(1, $result['values']);
     $this->assertSame('CountrySelect', $result['values'][0]['label']);
     $this->assertSame('Select Country', $result['values'][0]['html_type']);
-    $this->assertEquals('0', $result['values'][0]['serialize']);
+    $this->assertSame('0', $result['values'][0]['serialize']);
 
     $result = $this->callAPISuccess('CustomField', 'get', [
       'custom_group_id' => 'testCustomGroup',
@@ -741,7 +741,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $this->assertCount(1, $result['values']);
     $this->assertSame('StateSelect', $result['values'][0]['label']);
     $this->assertSame('Select State/Province', $result['values'][0]['html_type']);
-    $this->assertEquals('0', $result['values'][0]['serialize']);
+    $this->assertSame('0', $result['values'][0]['serialize']);
   }
 
 }

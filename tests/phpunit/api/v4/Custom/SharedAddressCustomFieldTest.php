@@ -94,7 +94,7 @@ class SharedAddressCustomFieldTest extends Api4TestBase {
       ->addWhere('id', '=', $ownAddress)
       ->execute()->single();
     $this->assertEquals($masterAddress, $address['master_id']);
-    $this->assertEquals('A-1', $address['SharedExtra.Code']);
+    $this->assertSame('A-1', $address['SharedExtra.Code']);
   }
 
   public function testAddressFormKeepsCustomValuesOfSharedAddress(): void {
@@ -190,7 +190,7 @@ class SharedAddressCustomFieldTest extends Api4TestBase {
       $this->fail('Expected UnauthorizedException');
     }
     catch (UnauthorizedException $e) {
-      $this->assertEquals('Permission denied to modify shared upstream address.', $e->getMessage());
+      $this->assertSame('Permission denied to modify shared upstream address.', $e->getMessage());
     }
 
     $codes = Address::get(FALSE)

@@ -96,7 +96,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
 
     $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->execute()->first();
     $rowID = $import['_id'];
-    $this->assertEquals('80', $import['amount_given']);
+    $this->assertSame('80', $import['amount_given']);
 
     Import::update($userJobID)->setValues([
       'amount_given' => NULL,
@@ -117,7 +117,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     ])->execute();
 
     $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->addWhere('_id', '=', $rowID)->execute()->first();
-    $this->assertEquals(9, $import['amount_given']);
+    $this->assertSame('9', $import['amount_given']);
 
     Import::save($userJobID)->setRecords([
       [
@@ -128,7 +128,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     ])->execute();
 
     $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->addWhere('_id', '=', $rowID)->execute()->first();
-    $this->assertEquals(777, $import['external_identifier']);
+    $this->assertSame('777', $import['external_identifier']);
 
     $validate = Import::validate($userJobID)->addWhere('_id', '=', $rowID)->setLimit(1)->execute()->first();
     $this->assertSame('Missing required fields: Contribution ID OR Invoice Reference OR Transaction ID OR Financial Type ID', $validate['_status_message']);

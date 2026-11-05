@@ -217,7 +217,7 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
       ->single();
 
     // check expected amount
-    $this->assertEquals(15, $contribution['total_amount']);
+    $this->assertSame(15.0, $contribution['total_amount']);
 
     // get line items
     $lineItems = \Civi\Api4\LineItem::get(FALSE)
@@ -225,11 +225,11 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
       ->execute();
 
     // should have 2 line items
-    $this->assertEquals(2, $lineItems->count());
+    $this->assertSame(2, $lineItems->count());
 
     // should have 1 participant line item
     $participantLineItems = array_filter((array) $lineItems, fn ($lineItem) => $lineItem['entity_table'] === 'civicrm_participant');
-    $this->assertEquals(1, count($participantLineItems));
+    $this->assertSame(1, count($participantLineItems));
 
     // should be linked to the participant
     $participantLineItem = array_values($participantLineItems)[0];
@@ -447,7 +447,7 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
       ->execute()
       ->single();
     // Only the admin ticket option (amount 20) contributes to the total.
-    $this->assertEquals(20, $contribution['total_amount']);
+    $this->assertSame(20.0, $contribution['total_amount']);
   }
 
   /**

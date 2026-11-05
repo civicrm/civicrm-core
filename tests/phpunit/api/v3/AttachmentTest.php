@@ -333,7 +333,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       'entity_table' => $entity_table,
       'entity_id' => $entity->id,
     ]);
-    $this->assertEquals(1, $getResult['count']);
+    $this->assertSame(1, $getResult['count']);
     foreach (['id', 'entity_table', 'entity_id', 'url'] as $field) {
       $this->assertEquals($createResult['values'][$fileId][$field], $getResult['values'][$fileId][$field], "Expect field $field to match");
     }

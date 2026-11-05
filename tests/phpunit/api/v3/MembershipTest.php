@@ -247,13 +247,13 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => ['IN' => [$this->_membershipID, $this->_membershipID3]],
     ];
     $membership = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(2, $membership['count']);
+    $this->assertSame(2, $membership['count']);
     $this->assertEquals([$this->_membershipID, $this->_membershipID3], array_keys($membership['values']));
     $params = [
       'id' => ['NOT IN' => [$this->_membershipID, $this->_membershipID3]],
     ];
     $membership = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(1, $membership['count']);
+    $this->assertSame(1, $membership['count']);
     $this->assertEquals([$this->_membershipID2], array_keys($membership['values']));
   }
 
@@ -271,13 +271,13 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => ['IN' => [$this->_contactID, $contact3]],
     ];
     $membership = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(2, $membership['count']);
+    $this->assertSame(2, $membership['count']);
     $this->assertEquals([$this->_membershipID, $this->_membershipID3], array_keys($membership['values']));
     $params = [
       'contact_id' => ['NOT IN' => [$this->_contactID, $contact3]],
     ];
     $membership = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(1, $membership['count']);
+    $this->assertSame(1, $membership['count']);
     $this->assertEquals([$this->_membershipID2], array_keys($membership['values']));
   }
 
@@ -348,7 +348,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertSame('2009-01-21', $result['start_date']);
     $this->assertSame('2009-12-21', $result['end_date']);
     $this->assertSame('Payment', $result['source']);
-    $this->assertEquals(1, $result['is_override']);
+    $this->assertSame('1', $result['is_override']);
   }
 
   /**
@@ -454,7 +454,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('membership', 'get', $params);
 
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $result = $result['values'][$result['id']];
     $this->assertEquals($OrganizationMembershipID, $result['owner_membership_id']);
 
@@ -468,7 +468,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('membership', 'get', $params);
     // If it fails here CRM-14758 is not fixed
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $result = $result['values'][$result['id']];
     $this->assertEquals($OrganizationMembershipID, $result['owner_membership_id']);
 
@@ -481,7 +481,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeId,
     ];
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
 
     // Increase max_related for the employer's membership
     $params = [
@@ -497,7 +497,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeId,
     ];
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $result = $result['values'][$result['id']];
     $this->assertEquals($OrganizationMembershipID, $result['owner_membership_id']);
 
@@ -515,7 +515,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeId,
     ];
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
 
     //Create pay_later membership for organization.
     $employerId[2] = $this->organizationCreate([], 1);
@@ -548,27 +548,27 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     // Deactivate relationship using create and assert membership is not inherited
     $this->callAPISuccess('relationship', 'create', ['id' => $relationship1['id'], 'is_active' => 0]);
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
 
     // Re-enable relationship using create and assert membership is inherited
     $this->callAPISuccess('relationship', 'create', ['id' => $relationship1['id'], 'is_active' => 1]);
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     // Deactivate relationship using setvalue and assert membership is not inherited
     $this->callAPISuccess('relationship', 'setvalue', ['id' => $relationship1['id'], 'field' => 'is_active', 'value' => 0]);
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
 
     // Re-enable relationship using setvalue and assert membership is inherited
     $this->callAPISuccess('relationship', 'setvalue', ['id' => $relationship1['id'], 'field' => 'is_active', 'value' => 1]);
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     // Delete relationship and assert membership is not inherited
     $this->callAPISuccess('relationship', 'delete', ['id' => $relationship1['id']]);
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
 
     // Check Membership is granted via inheritance when:
     // there is an inactive existing membership of the
@@ -603,7 +603,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     // Check no current membership
     $result = $this->callAPISuccess('membership', 'get', $getActiveMembershipParams);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
 
     // Add new employer relationship to contact
     $this->callAPISuccess('Contact', 'create', ['id' => $memberContactId[4], 'employer_id' => $employerId[3]]);
@@ -611,7 +611,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     // Add inherited membership
     $this->contactMembershipCreate($activeMembershipParams);
     $result = $this->callAPISuccess('membership', 'get', $getActiveMembershipParams);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     // Tear down - reverse of creation to be safe
     $this->contactDelete($memberContactId[4]);
@@ -839,7 +839,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $check = $this->callAPISuccess('Membership', 'get', [
       'custom_' . $ids['custom_field_id'] => 'CRM-16036',
     ]);
-    $this->assertEquals(0, $check['count']);
+    $this->assertSame(0, $check['count']);
   }
 
   /**
@@ -882,7 +882,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       ],
       'checkPermissions' => FALSE,
     ])->indexBy('activity_id')->getArrayCopy();
-    $this->assertEquals(2, count($activities));
+    $this->assertSame(2, count($activities));
     $activityNames = array_flip(CRM_Utils_Array::collect('activity_id.activity_type_id:label', $activities));
     $this->assertArrayHasKey('Membership Signup', $activityNames);
     $this->assertArrayHasKey('Change Membership Status', $activityNames);

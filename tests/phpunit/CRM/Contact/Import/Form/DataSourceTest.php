@@ -82,7 +82,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
     // The user job holds the name of the table  - which should have 5 rows of bob.
     $this->assertNotEmpty($userJob['metadata']['DataSource']['table_name']);
     $sqlTableName = $userJob['metadata']['DataSource']['table_name'];
-    $this->assertEquals(5, CRM_Core_DAO::singleValueQuery(
+    $this->assertSame(5, (int) CRM_Core_DAO::singleValueQuery(
       'SELECT count(*) FROM ' . $sqlTableName
       . " WHERE first_name = 'Bob'"
     ));
@@ -113,7 +113,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
     $this->assertEquals($csvFormValues, array_filter($userJob['metadata']['submitted_values']));
 
     $csvTableName = $userJob['metadata']['DataSource']['table_name'];
-    $this->assertEquals(1, CRM_Core_DAO::singleValueQuery(
+    $this->assertSame(1, (int) CRM_Core_DAO::singleValueQuery(
       'SELECT count(*) FROM ' . $csvTableName
       . " WHERE first_name = 'yogi'"
     ));
@@ -169,7 +169,7 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
     $this->assertSame('contact_import', $userJob['job_type']);
     $this->assertEmpty($userJob['metadata']['import_mappings'] ?? []);
     $this->assertEmpty($userJob['metadata']['template_id'] ?? NULL);
-    $this->assertEquals(3, $userJob['metadata']['DataSource']['number_of_columns']);
+    $this->assertSame(3, $userJob['metadata']['DataSource']['number_of_columns']);
     $this->assertCount(3, $userJob['metadata']['DataSource']['column_headers']);
     $this->assertArrayNotHasKey('Contribution', $userJob['metadata']['entity_configuration'] ?? []);
   }

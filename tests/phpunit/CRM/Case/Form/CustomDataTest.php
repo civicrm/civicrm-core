@@ -401,7 +401,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
       'activity_type_id' => 'Change Custom Data',
       'case_id' => $caseId,
     ]);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
   }
 
 }

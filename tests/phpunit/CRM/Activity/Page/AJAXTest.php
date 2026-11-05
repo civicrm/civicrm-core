@@ -110,7 +110,7 @@ class CRM_Activity_Page_AJAXTest extends CiviCaseTestCase {
       'id' => $activity['id'],
       'return' => ['is_deleted', 'case_id'],
     ]);
-    $this->assertEquals(0, $originalActivity['is_deleted']);
+    $this->assertSame('0', $originalActivity['is_deleted']);
     $this->assertEquals($case1['id'], $originalActivity['case_id'][0]);
   }
 
@@ -164,7 +164,7 @@ class CRM_Activity_Page_AJAXTest extends CiviCaseTestCase {
       'id' => $activity['id'],
       'return' => ['is_deleted', 'case_id'],
     ]);
-    $this->assertEquals(1, $originalActivity['is_deleted']);
+    $this->assertSame('1', $originalActivity['is_deleted']);
     $this->assertEquals($case1['id'], $originalActivity['case_id'][0]);
   }
 

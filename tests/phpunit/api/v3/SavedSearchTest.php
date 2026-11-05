@@ -58,7 +58,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
 
     $this->assertEquals($contactID, $savedSearch['created_id']);
     $this->assertEquals($contactID, $savedSearch['modified_id']);
-    $this->assertEquals('20210808000000', $savedSearch['expires_date']);
+    $this->assertSame('20210808000000', $savedSearch['expires_date']);
 
     $this->assertNotNull($savedSearch['id']);
 
@@ -83,7 +83,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
         $this->_entity, 'get', ['id' => $create_result['id']]);
 
     // Assert:
-    $this->assertEquals(1, $get_result['count']);
+    $this->assertSame(1, $get_result['count']);
     $this->assertNotNull($get_result['values'][$get_result['id']]['id']);
 
     // just check the relationship type ID of the form values.
@@ -111,7 +111,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
     $get_result = $this->callAPISuccess('Contact', 'get', ['group' => $group_id]);
 
     // Expect our contact to be there.
-    $this->assertEquals(1, $get_result['count']);
+    $this->assertSame(1, $get_result['count']);
     $this->assertEquals($contact_id, $get_result['values'][$contact_id]['id']);
   }
 
@@ -132,7 +132,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Contact', 'get', ['group' => $group_id]);
 
     // Expect our contact to be there.
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals($contact_id, $result['values'][$contact_id]['id']);
 
     $this->callAPISuccess('Group', 'delete', ['id' => $group_id]);

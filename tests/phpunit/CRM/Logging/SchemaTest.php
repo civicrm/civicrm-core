@@ -207,7 +207,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     while ($log_table->fetch()) {
       $this->assertStringContainsString('UPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.entity_id;', $log_table->Statement, "Contact modification update should be in the trigger :\n" . $log_table->Statement);
       $this->assertStringNotContainsString('civicrm_mailing', $log_table->Statement, 'Contact field should not update mailing table');
-      $this->assertEquals(1, substr_count($log_table->Statement, 'SET modified_date'), 'Modified date should only be updated on one table (here it is contact)');
+      $this->assertSame(1, substr_count($log_table->Statement, 'SET modified_date'), 'Modified date should only be updated on one table (here it is contact)');
     }
   }
 
@@ -311,15 +311,15 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertSame('NO', $ci['test_id']['IS_NULLABLE']);
     $this->assertSame('auto_increment', $ci['test_id']['EXTRA']);
     if (!$this->isMySQL8()) {
-      $this->assertEquals('10', $ci['test_id']['LENGTH']);
+      $this->assertSame('10', $ci['test_id']['LENGTH']);
     }
 
     $this->assertSame('varchar', $ci['test_varchar']['DATA_TYPE']);
-    $this->assertEquals('42', $ci['test_varchar']['LENGTH']);
+    $this->assertSame('42', $ci['test_varchar']['LENGTH']);
 
     $this->assertSame('int', $ci['test_integer']['DATA_TYPE']);
     if (!$this->isMySQL8()) {
-      $this->assertEquals('8', $ci['test_integer']['LENGTH']);
+      $this->assertSame('8', $ci['test_integer']['LENGTH']);
     }
     $this->assertSame('YES', $ci['test_integer']['IS_NULLABLE']);
 
@@ -330,7 +330,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertSame("'A','B','C'", $ci['test_enum']['ENUM_VALUES']);
     $this->assertArrayNotHasKey('LENGTH', $ci['test_enum']);
 
-    $this->assertEquals('42', $ci['test_integer_default']['COLUMN_DEFAULT']);
+    $this->assertSame('42', $ci['test_integer_default']['COLUMN_DEFAULT']);
 
     $this->assertSame('date', $ci['test_date']['DATA_TYPE']);
   }
@@ -362,7 +362,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $ci = Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // length should increase
     if (!$this->isMySQL8()) {
-      $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+      $this->assertSame('6', $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
     }
     $this->assertSame('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
     CRM_Core_DAO::executeQuery(
@@ -374,7 +374,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $ci = Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // length should not decrease
     if (!$this->isMySQL8()) {
-      $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+      $this->assertSame('6', $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
     }
     $this->assertSame('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
   }

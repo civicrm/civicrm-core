@@ -271,7 +271,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $params = ['relationship_start_date' => '2010-12-20', 'relationship_end_date' => ''];
     $fields = civicrm_api3('relationship', 'getfields', ['action' => 'get']);
     _civicrm_api3_validate_fields('relationship', 'get', $params, $fields['values']);
-    $this->assertEquals('20101220000000', $params['relationship_start_date']);
+    $this->assertSame('20101220000000', $params['relationship_start_date']);
     $this->assertSame('', $params['relationship_end_date']);
   }
 
@@ -286,9 +286,9 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $fields = civicrm_api3('Membership', 'getfields', ['action' => 'get']);
     _civicrm_api3_validate_fields('Membership', 'get', $params, $fields['values']);
     $this->assertSame('2010-12-20', $params['start_date']);
-    $this->assertEquals('20101220000000', $params['membership_start_date']);
+    $this->assertSame('20101220000000', $params['membership_start_date']);
     $this->assertSame('', $params['end_date']);
-    $this->assertEquals('20101220000000', $params['membership_join_date'], 'join_date not set in line ' . __LINE__);
+    $this->assertSame('20101220000000', $params['membership_join_date'], 'join_date not set in line ' . __LINE__);
   }
 
   public function test_civicrm_api3_validate_fields_event(): void {
@@ -301,10 +301,10 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     ];
     $fields = civicrm_api3('Event', 'getfields', ['action' => 'create']);
     _civicrm_api3_validate_fields('event', 'create', $params, $fields['values']);
-    $this->assertEquals('20101220000000', $params['start_date']);
-    $this->assertEquals('20081015000000', $params['registration_end_date']);
+    $this->assertSame('20101220000000', $params['start_date']);
+    $this->assertSame('20081015000000', $params['registration_end_date']);
     $this->assertSame('', $params['end_date']);
-    $this->assertEquals('20080601000000', $params['registration_start_date']);
+    $this->assertSame('20080601000000', $params['registration_start_date']);
   }
 
   public function test_civicrm_api3_validate_fields_exception(): void {

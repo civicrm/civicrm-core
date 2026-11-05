@@ -183,14 +183,14 @@ class CustomFieldAlterTest extends Api4TestBase {
       WHERE table_schema = DATABASE()
       AND table_name = '{$customGroup['table_name']}'
       AND column_name IN ('{$field1['column_name']}', '{$field2['column_name']}', '{$field3['column_name']}', '{$field4['column_name']}')";
-    $this->assertEquals('4', \CRM_Core_DAO::singleValueQuery($columnCheck));
+    $this->assertSame('4', \CRM_Core_DAO::singleValueQuery($columnCheck));
 
     CustomGroup::delete(FALSE)
       ->addWhere('id', '=', $customGroup['id'])
       ->execute();
 
     // All columns should be gone
-    $this->assertEquals('0', \CRM_Core_DAO::singleValueQuery($columnCheck));
+    $this->assertSame('0', \CRM_Core_DAO::singleValueQuery($columnCheck));
 
     // Option group should be gone
     $this->assertCount(0, OptionGroup::get(FALSE)

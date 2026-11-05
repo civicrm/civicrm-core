@@ -201,14 +201,14 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d', strtotime('07/03/2013')), $memberships[1]['join_date']);
     $this->assertSame('2013-07-17', $memberships[2]['join_date']);
     $memberships = $this->callAPISuccess('Contribution', 'get', ['return' => ['total_amount', 'trxn_id']]);
-    $this->assertEquals(3, $memberships['count']);
+    $this->assertSame(3, $memberships['count']);
     foreach (array_values($memberships['values']) as $index => $contribution) {
       $this->assertEquals($this->callAPISuccess('LineItem', 'getvalue', [
         'contribution_id' => $contribution['id'],
         'return' => 'line_total',
 
       ]), $contribution['total_amount']);
-      $this->assertEquals(1500, $contribution['total_amount']);
+      $this->assertSame(1500.0, $contribution['total_amount']);
       $this->assertEquals($params['field'][$index + 1]['trxn_id'], $contribution['trxn_id']);
     }
   }
@@ -239,10 +239,10 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       $this->assertEquals($lineItem['financial_type_id'], $contribution['financial_type_id']);
     }
     $checkResult = $this->callAPISuccess('Contribution', 'get', ['check_number' => ['IS NOT NULL' => 1]]);
-    $this->assertEquals(1, $checkResult['count']);
+    $this->assertSame(1, $checkResult['count']);
     $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_table' => 'civicrm_contribution', 'entity_id' => $checkResult['id']]);
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', ['id' => $entityFinancialTrxn['values'][$entityFinancialTrxn['id']]['financial_trxn_id']]);
-    $this->assertEquals('1234', $financialTrxn['values'][$financialTrxn['id']]['check_number']);
+    $this->assertSame('1234', $financialTrxn['values'][$financialTrxn['id']]['check_number']);
   }
 
   /**
@@ -299,7 +299,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       ->processForm();
     $batch = Batch::get()
       ->execute()->single();
-    $this->assertEquals(4500, $batch['total']);
+    $this->assertSame(4500.0, $batch['total']);
     $result = $this->callAPISuccess('Membership', 'get', ['sequential' => 1])['values'];
 
     // renewal dates should be from current if start_date and end_date is passed as NULL

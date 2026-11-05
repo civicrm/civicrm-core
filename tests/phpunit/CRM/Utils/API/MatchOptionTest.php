@@ -34,10 +34,10 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       'return' => ['email'],
       'api.Address.get' => 1,
     ]);
-    $this->assertEquals(1, count($noise['values']));
+    $this->assertSame(1, count($noise['values']));
     foreach ($noise['values'] as $value) {
       $this->assertSame('ignore1@example.com', $value['email']);
-      $this->assertEquals(1, count($value['api.Address.get']['values']));
+      $this->assertSame(1, count($value['api.Address.get']['values']));
     }
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_address WHERE contact_id=%1', [
       1 => [$this->noise['individual'], 'Positive'],
@@ -196,10 +196,10 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
         ],
       ],
     ]);
-    $this->assertEquals(1, $createResult['count']);
+    $this->assertSame(1, $createResult['count']);
     foreach ($createResult['values'] as $value) {
       $this->assertAPISuccess($value['api.Email.replace']);
-      $this->assertEquals(2, $value['api.Email.replace']['count']);
+      $this->assertSame(2, $value['api.Email.replace']['count']);
       foreach ($value['api.Email.replace']['values'] as $v2) {
         $this->assertEquals($createResult['id'], $v2['contact_id']);
       }
@@ -218,10 +218,10 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
         ],
       ],
     ]);
-    $this->assertEquals(1, $updateResult['count']);
+    $this->assertSame(1, $updateResult['count']);
     foreach ($updateResult['values'] as $value) {
       $this->assertAPISuccess($value['api.Email.replace']);
-      $this->assertEquals(2, $value['api.Email.replace']['count']);
+      $this->assertSame(2, $value['api.Email.replace']['count']);
       foreach ($value['api.Email.replace']['values'] as $v2) {
         $this->assertEquals($createResult['id'], $v2['contact_id']);
       }
@@ -232,7 +232,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
     $getResult = $this->callAPISuccess('Email', 'get', [
       'contact_id' => $createResult['id'],
     ]);
-    $this->assertEquals(2, $getResult['count']);
+    $this->assertSame(2, $getResult['count']);
     $getValues = array_values($getResult['values']);
 
     // The first email (j1@example.com) is updated (same ID#) because it matched on contact_id+location_type_id.
@@ -282,10 +282,10 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
         ],
       ],
     ]);
-    $this->assertEquals(1, $createResult['count']);
+    $this->assertSame(1, $createResult['count']);
     foreach ($createResult['values'] as $value) {
       $this->assertAPISuccess($value['api.Address.replace']);
-      $this->assertEquals(2, $value['api.Address.replace']['count']);
+      $this->assertSame(2, $value['api.Address.replace']['count']);
       foreach ($value['api.Address.replace']['values'] as $v2) {
         $this->assertEquals($createResult['id'], $v2['contact_id']);
       }
@@ -304,10 +304,10 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
         ],
       ],
     ]);
-    $this->assertEquals(1, $updateResult['count']);
+    $this->assertSame(1, $updateResult['count']);
     foreach ($updateResult['values'] as $value) {
       $this->assertAPISuccess($value['api.Address.replace']);
-      $this->assertEquals(2, $value['api.Address.replace']['count']);
+      $this->assertSame(2, $value['api.Address.replace']['count']);
       foreach ($value['api.Address.replace']['values'] as $v2) {
         $this->assertEquals($createResult['id'], $v2['contact_id']);
       }
@@ -318,7 +318,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
     $getResult = $this->callAPISuccess('Address', 'get', [
       'contact_id' => $createResult['id'],
     ]);
-    $this->assertEquals(2, $getResult['count']);
+    $this->assertSame(2, $getResult['count']);
     $getValues = array_values($getResult['values']);
 
     // The first street_address (j1 Example Ave) is updated (same ID#) because it matched on contact_id+location_type_id.

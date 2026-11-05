@@ -381,7 +381,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'profile_id' => $profile['id'],
     ]);
     $this->assertArrayKeyExists('first_name', $result['values']);
-    $this->assertEquals('2', $result['values']['first_name']['type']);
+    $this->assertSame(2, $result['values']['first_name']['type']);
     $this->assertSame('Email', $result['values']['email-primary']['title']);
     $this->assertSame('phone', $result['values']['phone-primary-1']['entity']);
     $this->assertSame('phone', $result['values']["phone_and_ext-$homeLocationTypeID-2"]['entity']);
@@ -424,7 +424,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'financial_type',
     ], $result['values']['financial_type_id']['api.aliases']);
     $this->assertArrayNotHasKey('financial_type', $result['values']);
-    $this->assertEquals(12, $result['values']['receive_date']['type']);
+    $this->assertSame(12, $result['values']['receive_date']['type']);
   }
 
   /**
@@ -611,7 +611,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->assertEquals($this->_membershipTypeID, $membership['membership_type_id']);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->_contactID]);
-    $this->assertEquals(10, $contribution['total_amount']);
+    $this->assertSame('10.00', $contribution['total_amount']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
     // contribution_status_id => 1 (Completed) was requested; since Order::create()
     // always creates a Pending contribution, submit() should have recorded a
@@ -773,19 +773,19 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->callAPIV3Success('profile', 'submit', $params);
 
     $tags = $this->callAPISuccess('entityTag', 'get', ['entity_id' => $contactId]);
-    $this->assertEquals(2, $tags['count']);
+    $this->assertSame(2, $tags['count']);
 
     $params['tag'] = [$tag_1];
     $this->callAPIV3Success('profile', 'submit', $params);
 
     $tags = $this->callAPISuccess('entityTag', 'get', ['entity_id' => $contactId]);
-    $this->assertEquals(1, $tags['count']);
+    $this->assertSame(1, $tags['count']);
 
     $params['tag'] = '';
     $this->callAPIV3Success('profile', 'submit', $params);
 
     $tags = $this->callAPISuccess('entityTag', 'get', ['entity_id' => $contactId]);
-    $this->assertEquals(0, $tags['count']);
+    $this->assertSame(0, $tags['count']);
 
   }
 
@@ -1009,7 +1009,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $keys = array_keys($contact['values']);
     $contactId = array_pop($keys);
 
-    $this->assertEquals(0, $contact['values'][$contactId]['api.address.create']['is_error'], ' error message: ' . ($contact['values'][$contactId]['api.address.create']['error_message'] ?? '')
+    $this->assertSame(0, $contact['values'][$contactId]['api.address.create']['is_error'], ' error message: ' . ($contact['values'][$contactId]['api.address.create']['error_message'] ?? '')
     );
 
     $activityParams = [

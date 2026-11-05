@@ -123,7 +123,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
   public function testCreatePriceFieldValue(): void {
     $result = $this->callAPISuccess('PriceFieldValue', 'create', $this->params);
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->params, $result['id'], 'PriceFieldValue');
   }
@@ -135,7 +135,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'name' => 'contribution_amount',
     ];
     $getResult = $this->callAPISuccess('PriceFieldValue', 'get', $getParams);
-    $this->assertEquals(1, $getResult['count']);
+    $this->assertSame(1, $getResult['count']);
     $this->callAPISuccess('price_field_value', 'delete', ['id' => $createResult['id']]);
   }
 
@@ -151,7 +151,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
 
   public function testGetFieldsPriceFieldValue(): void {
     $result = $this->callAPISuccess('PriceFieldValue', 'getfields', ['action' => 'create']);
-    $this->assertEquals(1, $result['values']['max_value']['type']);
+    $this->assertSame(1, $result['values']['max_value']['type']);
   }
 
   public function testCreatePriceFieldValuewithMultipleTerms(): void {
@@ -166,8 +166,8 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
       'financial_type_id' => $this->getFinancialTypeID('Member Dues'),
     ];
     $result = $this->callAPISuccess('PriceFieldValue', 'create', $params);
-    $this->assertEquals($result['values'][$result['id']]['membership_num_terms'], 2);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame('2', $result['values'][$result['id']]['membership_num_terms']);
+    $this->assertSame(1, $result['count']);
     $this->callAPISuccess('PriceFieldValue', 'delete', ['id' => $result['id']]);
   }
 
@@ -195,7 +195,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $result1 = $this->callAPISuccess('PriceFieldValue', 'create', $params2);
     $result2 = $this->callAPISuccess('PriceFieldValue', 'create', $params2);
     $result = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $this->priceFieldID2]);
-    $this->assertEquals(2, $result['count']);
+    $this->assertSame(2, $result['count']);
     $this->callAPISuccess('PriceFieldValue', 'delete', ['id' => $result1['id']]);
     $this->callAPISuccess('PriceFieldValue', 'delete', ['id' => $result2['id']]);
   }
@@ -225,7 +225,7 @@ class api_v3_PriceFieldValueTest extends CiviUnitTestCase {
     $params['is_default'] = 1;
     $result = $this->callAPISuccess('PriceFieldValue', 'create', $params);
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($params, $result['id'], 'PriceFieldValue');
   }

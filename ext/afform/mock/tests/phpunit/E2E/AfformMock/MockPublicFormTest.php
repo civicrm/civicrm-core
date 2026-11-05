@@ -90,7 +90,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
     $this->assertSame('LastBegin', $get['last_name']);
 
     // Instead of updating original, a new contact was created.
-    $this->assertEquals(1, CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact WHERE first_name=%1', [1 => ["Firsty{$r}", 'String']]));
+    $this->assertSame(1, (int) CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact WHERE first_name=%1', [1 => ["Firsty{$r}", 'String']]));
   }
 
   /**
@@ -348,7 +348,7 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
 
   protected function callApi4AuthTokenFailure(array $auth, string $entity, string $action, $params = []): string {
     $httpResponse = $this->callApi4AuthToken($auth, $entity, $action, $params);
-    $this->assertEquals(401, $httpResponse->getStatusCode(), "HTTP status code should be 401");
+    $this->assertSame(401, $httpResponse->getStatusCode(), "HTTP status code should be 401");
     return (string) $httpResponse->getBody();
   }
 

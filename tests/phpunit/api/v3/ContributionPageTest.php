@@ -94,7 +94,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
     $getResult = $this->callAPISuccess('ContributionPage', 'get', $getParams);
-    $this->assertEquals(1, $getResult['count']);
+    $this->assertSame(1, $getResult['count']);
   }
 
   /**
@@ -108,7 +108,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
     ];
     $getResult = $this->callAPISuccess('ContributionPage', 'get', $getParams);
-    $this->assertEquals(1, $getResult['count']);
+    $this->assertSame(1, $getResult['count']);
   }
 
   /**
@@ -128,7 +128,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
    */
   public function testGetFieldsContributionPage(): void {
     $result = $this->callAPISuccess('ContributionPage', 'getfields', ['action' => 'create']);
-    $this->assertEquals(12, $result['values']['start_date']['type']);
+    $this->assertSame(12, $result['values']['start_date']['type']);
   }
 
   /**
@@ -270,8 +270,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     ], $this->getContributionPageID());
     $contributions = $this->callAPISuccess('Contribution', 'get', ['contribution_page_id' => $this->getContributionPageID(), 'sequential' => TRUE])['values'];
     $this->assertCount(2, $contributions);
-    $this->assertEquals('88.00', $contributions[0]['total_amount']);
-    $this->assertEquals('50.00', $contributions[1]['total_amount']);
+    $this->assertSame('88.00', $contributions[0]['total_amount']);
+    $this->assertSame('50.00', $contributions[1]['total_amount']);
     $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', ['version' => 3, 'return' => ['membership_id', 'contribution_id']]);
     $this->assertEquals($contributions[1]['id'], $membershipPayment['contribution_id']);
     $membership = $this->callAPISuccessGetSingle('membership', ['id' => $membershipPayment['membership_id'], 'return' => 'contact_id']);

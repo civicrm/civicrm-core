@@ -115,7 +115,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
    */
   public function testGetMembershipStatusByDateMore($input, $expected) {
     // Sanity check we have something close to the stock install.
-    $this->assertEquals(7, $this->callAPISuccess('MembershipStatus', 'getcount'));
+    $this->assertSame(7, $this->callAPISuccess('MembershipStatus', 'getcount'));
     // The data provider runs before the statuses exist, so it gives the name; look up the id.
     $expected['id'] = (string) $this->getMembershipStatusID($expected['name']);
 

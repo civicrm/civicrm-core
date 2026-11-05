@@ -43,7 +43,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
    */
   public function testCreatePriceSet(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
   }
@@ -68,7 +68,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
     ]);
 
     // Count the number of items in 'extends'.
-    $this->assertEquals(2, count($result['extends']));
+    $this->assertSame(2, count($result['extends']));
   }
 
   /**
@@ -87,7 +87,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
       'name' => 'default_contribution_amount',
     ];
     $getResult = $this->callAPISuccess($this->_entity, 'get', $getParams);
-    $this->assertEquals(1, $getResult['count']);
+    $this->assertSame(1, $getResult['count']);
   }
 
   public function testEventPriceSet(): void {
@@ -124,7 +124,7 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
 
   public function testGetFieldsPriceSet(): void {
     $result = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
-    $this->assertEquals(16, $result['values']['is_quick_config']['type']);
+    $this->assertSame(16, $result['values']['is_quick_config']['type']);
   }
 
   public static function tearDownAfterClass(): void {

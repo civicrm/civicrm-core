@@ -213,7 +213,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
     $message = end($allMessages);
     $this->assertInstanceOf(ezcMailText::class, $message->body);
     $this->assertSame('plain', $message->body->subType);
-    $this->assertEquals(1, preg_match(
+    $this->assertSame(1, preg_match(
       '@mailing/unsubscribe.*jid=(\d+)&qid=(\d+)&h=([0-9a-z]+)@',
       $message->body->text,
       $matches
@@ -267,7 +267,7 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_MailingSystemTestBase {
     $this->assertCount(1, $allMessages);
 
     $message = end($allMessages);
-    $this->assertEquals(1, preg_match(
+    $this->assertSame(1, preg_match(
       '@mailing/unsubscribe.*jid=(\d+)&qid=(\d+)&h=([0-9a-z]+)@',
       $message->body->text,
       $matches

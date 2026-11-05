@@ -181,7 +181,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->callAPISuccess('setting', 'create', [
       'onChangeExample' => ['First', 'Value'],
     ]);
-    $this->assertEquals(1, $_testOnChange_hookCalls['count']);
+    $this->assertSame(1, $_testOnChange_hookCalls['count']);
     $this->assertEquals(['First', 'Value'], $_testOnChange_hookCalls['newValue']);
     $this->assertSame('List of Components', $_testOnChange_hookCalls['metadata']['title']);
 
@@ -190,7 +190,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->callAPISuccess('setting', 'create', [
       'onChangeExample' => ['Second', 'Value'],
     ]);
-    $this->assertEquals(1, $_testOnChange_hookCalls['count']);
+    $this->assertSame(1, $_testOnChange_hookCalls['count']);
     $this->assertEquals(['First', 'Value'], $_testOnChange_hookCalls['oldValue']);
     $this->assertEquals(['Second', 'Value'], $_testOnChange_hookCalls['newValue']);
     $this->assertSame('List of Components', $_testOnChange_hookCalls['metadata']['title']);

@@ -114,7 +114,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 1,
       'return' => 'display_name',
     ]);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
   }
 
   /**
@@ -141,7 +141,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 1,
       'return' => 'display_name',
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
   }
 
   /**
@@ -250,7 +250,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
         'contact_id' => $disallowedContact,
         'check_permissions' => 1,
       ]);
-      $this->assertEquals(0, $results['count']);
+      $this->assertSame(0, $results['count']);
 
       // We should be allowed to create and get for contacts we do have permission on
       $params['contact_id'] = $this->allowedContactId;
@@ -282,7 +282,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
         'entity_table' => 'civicrm_contact',
         'check_permissions' => 1,
       ]);
-      $this->assertEquals(0, $results['count']);
+      $this->assertSame(0, $results['count']);
 
       // We should be allowed to create and get for entities we do have permission on
       $params['entity_id'] = $this->allowedContactId;
@@ -314,7 +314,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'return' => 'display_name',
     ]);
 
-    $this->assertEquals(2, $result['count']);
+    $this->assertSame(2, $result['count']);
   }
 
   /**
@@ -335,7 +335,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 1,
       'return' => 'display_name',
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
   }
 
   /**
@@ -356,7 +356,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 1,
       'return' => 'display_name',
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
   }
 
   /**
@@ -372,7 +372,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 0,
       'return' => 'display_name',
     ]);
-    $this->assertEquals(2, $result['count']);
+    $this->assertSame(2, $result['count']);
   }
 
   /**
@@ -394,7 +394,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 1,
     ]);
 
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals($this->ids['Contact']['test'], $result['id']);
   }
 
@@ -429,7 +429,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'return' => $expectedReturnElements,
       'sequential' => 1,
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     foreach ($expectedReturnElements as $element) {
       $this->assertArrayHasKey($element, $result['values'][0]);
     }
@@ -475,7 +475,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'pledge_id' => 1,
       'sequential' => 1,
     ]);
-    $this->assertEquals(2, $result['count']);
+    $this->assertSame(2, $result['count']);
   }
 
   /**
@@ -537,7 +537,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 0,
       'return' => 'contact_id',
     ]);
-    $this->assertEquals(2, $result['count'], "failed with entity : $entity and api version $apiVersion");
+    $this->assertSame(2, $result['count'], "failed with entity : $entity and api version $apiVersion");
   }
 
   /**
@@ -560,7 +560,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 0,
       'return' => 'contact_id',
     ]);
-    $this->assertEquals(2, $result['count'], "failed with entity : $entity and api version $apiVersion");
+    $this->assertSame(2, $result['count'], "failed with entity : $entity and api version $apiVersion");
   }
 
   /**
@@ -578,7 +578,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => 1,
       'return' => 'contact_id',
     ]);
-    $this->assertEquals(0, $result['count'], "failed with entity : $entity and api version $apiVersion");
+    $this->assertSame(0, $result['count'], "failed with entity : $entity and api version $apiVersion");
   }
 
   /**
@@ -600,7 +600,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($entity, 'get', [
       'check_permission' => 1,
     ]);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
   }
 
   /**
@@ -962,7 +962,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => TRUE,
     ];
     $result = $this->callAPISuccess('activity', 'get', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->callAPIFailure('activity', 'getsingle', array_merge($params, [
       'id' => [
         'IN' => [$activity2['id']],
@@ -996,7 +996,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       'check_permissions' => TRUE,
     ];
     $result = $this->callAPISuccess('activity', 'get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
   }
 
   /**
@@ -1064,7 +1064,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       ],
       'check_permissions' => 0,
     ]);
-    $this->assertEquals(2, $dupes['count']);
+    $this->assertSame(2, $dupes['count']);
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
 
     $dupes = $this->callAPISuccess('Contact', 'duplicatecheck', [
@@ -1076,7 +1076,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       ],
       'check_permissions' => 1,
     ]);
-    $this->assertEquals(1, $dupes['count']);
+    $this->assertSame(1, $dupes['count']);
 
   }
 
@@ -1174,7 +1174,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       ->execute();
     $this->assertCount(1, $customValues);
     $this->assertSame('C2', $customValues[0]['first_name']);
-    $this->assertEquals('2', $customValues[0]['cf.' . $textField]);
+    $this->assertSame('2', $customValues[0]['cf.' . $textField]);
   }
 
   /**

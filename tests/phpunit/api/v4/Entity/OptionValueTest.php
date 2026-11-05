@@ -175,7 +175,7 @@ class OptionValueTest extends Api4TestBase implements TransactionalInterface {
       ->addOrderBy('weight')
       ->execute()->single();
     $this->assertSame('"Legacy Test1" <spaces@get.removed>', $result['label']);
-    $this->assertEquals('1', $result['weight']);
+    $this->assertSame('1', $result['weight']);
 
     $result = OptionValue::update(FALSE)
       ->addWhere('option_group_id:name', '=', 'from_email_address')

@@ -15,22 +15,22 @@ class InvasiveTest extends \CiviUnitTestCase {
 
   public function testPrivate(): void {
     $tgt = new InvasiveExample();
-    $this->assertEquals(10, Invasive::get([$tgt, 'privateField']));
-    $this->assertEquals(10, Invasive::call([$tgt, 'getPrivateField']));
+    $this->assertSame(10, Invasive::get([$tgt, 'privateField']));
+    $this->assertSame(10, Invasive::call([$tgt, 'getPrivateField']));
     Invasive::call([$tgt, 'setPrivateField'], [11]);
-    $this->assertEquals(11, Invasive::call([$tgt, 'getPrivateField']));
+    $this->assertSame(11, Invasive::call([$tgt, 'getPrivateField']));
 
     $theRef = NULL;
-    $this->assertEquals(110000, Invasive::call([$tgt, 'twiddlePrivateField'], [&$theRef]));
-    $this->assertEquals(1100, $theRef);
+    $this->assertSame(110000, Invasive::call([$tgt, 'twiddlePrivateField'], [&$theRef]));
+    $this->assertSame(1100, $theRef);
   }
 
   public function testProtectedStatic(): void {
     $tgt = InvasiveExample::class;
-    $this->assertEquals(20, Invasive::get([$tgt, 'protectedStaticField']));
-    $this->assertEquals(20, Invasive::call([$tgt, 'getProtectedStaticField']));
+    $this->assertSame(20, Invasive::get([$tgt, 'protectedStaticField']));
+    $this->assertSame(20, Invasive::call([$tgt, 'getProtectedStaticField']));
     Invasive::call([$tgt, 'setProtectedStaticField'], [21]);
-    $this->assertEquals(21, Invasive::call([$tgt, 'getProtectedStaticField']));
+    $this->assertSame(21, Invasive::call([$tgt, 'getProtectedStaticField']));
   }
 
 }

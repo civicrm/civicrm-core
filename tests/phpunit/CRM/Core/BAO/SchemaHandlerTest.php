@@ -46,7 +46,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
         CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_uf_join DROP INDEX ' . $dao->Key_name);
       }
     }
-    $this->assertEquals(1, $count);
+    $this->assertSame(1, $count);
   }
 
   /**
@@ -86,7 +86,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     foreach (array_keys($indexes) as $index) {
       CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_uf_join DROP INDEX ' . $index);
     }
-    $this->assertEquals(2, $weightCount);
+    $this->assertSame(2, $weightCount);
   }
 
   /**
@@ -148,7 +148,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
       'civicrm_acl' => 1,
       'civicrm_domain' => 2,
     ], CRM_Core_BAO_SchemaHandler::getRowCountForTables(['civicrm_domain', 'civicrm_acl', 'random_name', 'civicrm_worldregion']));
-    $this->assertEquals(2, CRM_Core_BAO_SchemaHandler::getRowCountForTable('civicrm_domain'));
+    $this->assertSame(2, CRM_Core_BAO_SchemaHandler::getRowCountForTable('civicrm_domain'));
   }
 
   /**

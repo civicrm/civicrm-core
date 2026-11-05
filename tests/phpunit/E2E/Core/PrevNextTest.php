@@ -61,8 +61,8 @@ class PrevNextTest extends \CiviEndToEndTestCase {
       "fillWithSql should return TRUE on success"
     );
 
-    $this->assertEquals(25, $this->prevNext->getCount($this->cacheKey));
-    $this->assertEquals(0, $this->prevNext->getCount('not-a-key-' . $this->cacheKey));
+    $this->assertSame(25, $this->prevNext->getCount($this->cacheKey));
+    $this->assertSame(0, $this->prevNext->getCount('not-a-key-' . $this->cacheKey));
 
     $all = $this->prevNext->getSelection($this->cacheKey, 'getall')[$this->cacheKey];
     $this->assertCount($prefillLimit, $all);
@@ -91,8 +91,8 @@ class PrevNextTest extends \CiviEndToEndTestCase {
       "fillWithArray should return TRUE on success"
     );
 
-    $this->assertEquals(4, $this->prevNext->getCount($this->cacheKey));
-    $this->assertEquals(0, $this->prevNext->getCount('not-a-key-' . $this->cacheKey));
+    $this->assertSame(4, $this->prevNext->getCount($this->cacheKey));
+    $this->assertSame(0, $this->prevNext->getCount('not-a-key-' . $this->cacheKey));
 
     $all = $this->assertSelections([100, 400, 200, 300], 'getall', $this->cacheKey);
     $this->assertEquals([1], array_unique(array_values($all)));

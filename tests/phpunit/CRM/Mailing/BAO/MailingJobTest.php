@@ -130,7 +130,7 @@ class CRM_Mailing_BAO_MailingJobTest extends CiviUnitTestCase {
       2 => [$emailID, 'Integer'],
       3 => [$contactID, 'Integer'],
     ]);
-    $this->assertEquals(1, $queuedCount, 'Unqueued recipient should now be present in event queue');
+    $this->assertSame('1', $queuedCount, 'Unqueued recipient should now be present in event queue');
 
     // Second check: no more unqueued recipients
     $reconciledAgain = Invasive::call(['CRM_Mailing_BAO_MailingJob', 'queueMissingRecipients'], [$mailingID, $parentJobID]);

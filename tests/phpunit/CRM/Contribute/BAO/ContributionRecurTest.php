@@ -133,7 +133,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ->addSelect('failure_count')
       ->addWhere('id', '=', $contributionRecur['id'])
       ->execute()->first();
-    $this->assertEquals(3, $updatedRecur['failure_count']);
+    $this->assertSame(3, $updatedRecur['failure_count']);
   }
 
   /**
@@ -385,7 +385,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->assertEquals($templateContributionId, $fetchedTemplate['id']);
     $this->assertTrue($fetchedTemplate['is_template']);
     $this->assertFalse($fetchedTemplate['is_test']);
-    $this->assertEquals(1, $templateContribution->count());
+    $this->assertSame(1, $templateContribution->count());
     $templateContribution = $templateContribution->first();
     $this->assertNotNull($templateContribution['template.field']);
     $this->assertSame('Second and most recent Contribution', $templateContribution['template.field']);
@@ -486,7 +486,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ->execute()
       ->first();
     $this->assertSame('USD', $updatedContributionRecur['currency']);
-    $this->assertEquals('2.00', $updatedContributionRecur['amount']);
+    $this->assertSame(2.0, $updatedContributionRecur['amount']);
     $this->assertGreaterThan(
       strtotime($contributionRecur['modified_date']),
       strtotime($updatedContributionRecur['modified_date'])
@@ -498,10 +498,10 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ->setValues(['amount' => 6])
       ->execute();
 
-    $this->assertEquals(6, Contribution::get()
+    $this->assertSame(6.0, Contribution::get()
       ->addWhere('id', '=', $templateContribution['id'])
       ->addSelect('total_amount')->execute()->first()['total_amount']);
-    $this->assertEquals(6, LineItem::get()
+    $this->assertSame(6.0, LineItem::get()
       ->addWhere('contribution_id', '=', $templateContribution['id'])
       ->addGroupBy('contribution_id')
       ->addSelect('SUM(line_total) AS total_amount')->execute()->first()['total_amount']);
@@ -839,7 +839,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $recurring1 = $this->callAPISuccess('ContributionRecur', 'create', $createParams);
     $recurring1Get = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $recurring1['id']]);
     // default is_email_receipt column value is 1
-    $this->assertEquals('1', $recurring1Get['is_email_receipt']);
+    $this->assertSame('1', $recurring1Get['is_email_receipt']);
 
     // pass empty value to is_email_receipt
     $createParams['is_email_receipt'] = '';
@@ -851,7 +851,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $createParams['is_email_receipt'] = 0;
     $recurring3 = $this->callAPISuccess('ContributionRecur', 'create', $createParams);
     $recurring3Get = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $recurring3['id']]);
-    $this->assertEquals('0', $recurring3Get['is_email_receipt']);
+    $this->assertSame('0', $recurring3Get['is_email_receipt']);
   }
 
   /**

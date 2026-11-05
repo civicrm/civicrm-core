@@ -268,7 +268,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       ->execute()->single();
 
     $this->assertEquals(date('Y-m-d'), substr($contribution['receive_date'], 0, 10));
-    $this->assertEquals(60, $contribution['total_amount']);
+    $this->assertSame(60.0, $contribution['total_amount']);
   }
 
   public function testOnBehalf(): void {
@@ -460,7 +460,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'id' => $this->getContributionPageID(),
     ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
-    $this->assertEquals(655, $contribution['total_amount']);
+    $this->assertSame(655.0, $contribution['total_amount']);
   }
 
   /**
@@ -506,7 +506,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
     $this->assertEquals(9.09, $contribution['tax_amount']);
-    $this->assertEquals(200, $contribution['total_amount']);
+    $this->assertSame(200.0, $contribution['total_amount']);
   }
 
   /**
@@ -527,8 +527,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', [
       'id' => $financialTrxnId,
     ])['values'][$financialTrxnId];
-    $this->assertEquals('1111', $financialTrxn['pan_truncation']);
-    $this->assertEquals(1, $financialTrxn['card_type_id']);
+    $this->assertSame('1111', $financialTrxn['pan_truncation']);
+    $this->assertSame(1, $financialTrxn['card_type_id']);
 
     $form->checkTemplateVariable('is_separate_payment', TRUE);
     // Two emails were sent - check both. The first is a contribution
@@ -806,7 +806,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $lineItems = $this->callAPISuccess('LineItem', 'get', [
       'contribution_id' => $contribution['id'],
     ]);
-    $this->assertEquals(2, $lineItems['count']);
+    $this->assertSame(2, $lineItems['count']);
     $totalLineAmount = 0;
     foreach ($lineItems['values'] as $lineItem) {
       $totalLineAmount += $lineItem['line_total'];
@@ -855,9 +855,9 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_table' => 'civicrm_membership']);
     $this->assertEquals($membership['id'], $lineItem['entity_id']);
     $this->assertEquals($membershipPayment['contribution_id'], $lineItem['contribution_id']);
-    $this->assertEquals(1, $lineItem['qty']);
-    $this->assertEquals(100, $lineItem['unit_price']);
-    $this->assertEquals(100, $lineItem['line_total']);
+    $this->assertSame(1.0, $lineItem['qty']);
+    $this->assertSame(100.0, $lineItem['unit_price']);
+    $this->assertSame(100.0, $lineItem['line_total']);
     foreach ($contributions as $contribution) {
       $this->assertEquals(.72, $contribution['fee_amount']);
       $this->assertEquals($contribution['total_amount'] - .72, $contribution['net_amount']);
@@ -1253,18 +1253,18 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
     // Check if pledge payments created.
     $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', ['pledge_id' => $pledge['id'], 'sequential' => 1]);
-    $this->assertEquals(3, $pledgePayment['count']);
+    $this->assertSame(3, $pledgePayment['count']);
     $this->assertEquals(date('Ymd', strtotime($pledgePayment['values'][0]['scheduled_date'])), date('Ymd', strtotime('+1 month')));
     $this->assertEquals(10.00, $pledgePayment['values'][0]['scheduled_amount']);
     // Will be pending when actual payment processor is used (dummy processor does not support future payments).
-    $this->assertEquals(1, $pledgePayment['values'][0]['status_id']);
+    $this->assertSame(1, $pledgePayment['values'][0]['status_id']);
 
     // Check contribution recur record.
     $recur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
     $this->assertEquals(date('Ymd', strtotime($recur['start_date'])), date('Ymd', strtotime('+1 month')));
     $this->assertEquals(10.00, $recur['amount']);
     // In progress status.
-    $this->assertEquals(5, $recur['contribution_status_id']);
+    $this->assertSame(5, $recur['contribution_status_id']);
   }
 
   /**
@@ -1281,7 +1281,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'pledge_id' => $pledge['id'],
       'sequential' => 1,
     ])['values'][1];
-    $this->assertEquals(2, $secondPledgePayment['status_id']);
+    $this->assertSame(2, $secondPledgePayment['status_id']);
 
     $this->submitOnlineContributionForm([
       'pledge_amount' => [$secondPledgePayment['id'] => 1],
@@ -1307,7 +1307,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
 
     $this->assertEquals(10.00, $contribution['total_amount']);
     $pledgePayment = $this->callAPISuccess('PledgePayment', 'get', ['pledge_id' => $pledge['id']])['values'];
-    $this->assertEquals(1, $pledgePayment[$secondPledgePayment['id']]['status_id'], 'This pledge payment should have been completed');
+    $this->assertSame(1, $pledgePayment[$secondPledgePayment['id']]['status_id'], 'This pledge payment should have been completed');
     $this->assertEquals($contribution['id'], $pledgePayment[$secondPledgePayment['id']]['contribution_id']);
   }
 
@@ -1428,7 +1428,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     }
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
     $this->assertEquals($processor['payment_instrument_id'], $recurringContribution['payment_instrument_id']);
-    $this->assertEquals(5, $recurringContribution['contribution_status_id']);
+    $this->assertSame(5, $recurringContribution['contribution_status_id']);
   }
 
   /**
@@ -1498,7 +1498,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('Membership', []);
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['id' => $membership['contribution_recur_id']]);
     $this->assertSame('month', $contributionRecur['frequency_unit']);
-    $this->assertEquals(1, $contributionRecur['frequency_interval']);
+    $this->assertSame(1, $contributionRecur['frequency_interval']);
 
     $submitParams['price_' . $this->ids['PriceField']['membership_amount']] = $this->ids['PriceFieldValue']['membership_yearly'];
     $this->submitOnlineContributionForm($submitParams,
@@ -1506,7 +1506,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('Membership', ['membership_type_id' => $this->ids['MembershipType']['yearly']]);
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['id' => $membership['contribution_recur_id']]);
     $this->assertSame('year', $contributionRecur['frequency_unit']);
-    $this->assertEquals(1, $contributionRecur['frequency_interval']);
+    $this->assertSame(1, $contributionRecur['frequency_interval']);
 
     if (!$isQuickConfig) {
       $submitParams['price_' . $this->ids['PriceField']['membership_amount']] = $this->ids['PriceFieldValue']['membership_12_months'];
@@ -1518,9 +1518,9 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
         'api.ContributionRecur.getsingle' => [],
         'version' => 3,
       ]);
-      $this->assertEquals(1, $contribution['values'][0]['api.ContributionRecur.getsingle']['frequency_interval']);
-      $this->assertEquals(1, $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_interval']);
-      $this->assertEquals(12, $contribution['values'][2]['api.ContributionRecur.getsingle']['frequency_interval']);
+      $this->assertSame('1', $contribution['values'][0]['api.ContributionRecur.getsingle']['frequency_interval']);
+      $this->assertSame('1', $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_interval']);
+      $this->assertSame('12', $contribution['values'][2]['api.ContributionRecur.getsingle']['frequency_interval']);
 
       $this->assertSame('month', $contribution['values'][0]['api.ContributionRecur.getsingle']['frequency_unit']);
       $this->assertSame('year', $contribution['values'][1]['api.ContributionRecur.getsingle']['frequency_unit']);
@@ -1533,7 +1533,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('Membership', ['membership_type_id' => $this->ids['MembershipType']['bi_monthly']]);
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', ['id' => $membership['contribution_recur_id']]);
     $this->assertSame('month', $contributionRecur['frequency_unit']);
-    $this->assertEquals(2, $contributionRecur['frequency_interval']);
+    $this->assertSame(2, $contributionRecur['frequency_interval']);
   }
 
   /**
@@ -1581,7 +1581,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'return' => ['trxn_id', 'total_amount', 'fee_amount', 'net_amount'],
     ]);
     $this->assertSame('create_first_success', $contribution['trxn_id']);
-    $this->assertEquals(10, $contribution['total_amount']);
+    $this->assertSame(10.0, $contribution['total_amount']);
     $this->assertEquals(.85, $contribution['fee_amount']);
     $this->assertEquals(9.15, $contribution['net_amount']);
 
@@ -1689,7 +1689,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       ],
     ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
-    $this->assertEquals(10, $contribution['total_amount']);
+    $this->assertSame(10.0, $contribution['total_amount']);
     // Ensure that Honoree details have been pritned
     $this->assertMailSentContainingStrings(
       [
@@ -2031,7 +2031,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'contribution_status_id:name' => 'Completed',
       'version' => 4,
     ]);
-    $this->assertEquals(2, $contribution['payment_instrument_id']);
+    $this->assertSame(2, $contribution['payment_instrument_id']);
 
     $this->assertSame('create_first_success', $contribution['trxn_id']);
     $membershipPayments = $this->callAPISuccess('membership_payment', 'get', [
@@ -2039,7 +2039,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'version' => 3,
     ]);
-    $this->assertEquals(2, $membershipPayments['count']);
+    $this->assertSame(2, $membershipPayments['count']);
     $lines = $this->validateTripleLines($contribution['id'], $preExistingMembershipID);
     $this->assertEquals($preExistingMembershipID + 2, $lines[2]['entity_id']);
 
@@ -2343,7 +2343,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     //no renewal as the date hasn't changed
     $this->assertEquals($membership['end_date'], $renewedMembership['end_date']);
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $newContribution['contribution_recur_id']]);
-    $this->assertEquals(2, $recurringContribution['contribution_status_id']);
+    $this->assertSame(2, $recurringContribution['contribution_status_id']);
   }
 
   /**
@@ -2401,7 +2401,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals($expectedEndDate, $renewedMembership['end_date']);
     $recurringContribution = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
     $this->assertEquals($processor['payment_instrument_id'], $recurringContribution['payment_instrument_id']);
-    $this->assertEquals(5, $recurringContribution['contribution_status_id']);
+    $this->assertSame(5, $recurringContribution['contribution_status_id']);
   }
 
   /**

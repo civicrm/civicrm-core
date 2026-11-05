@@ -360,7 +360,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
       'return' => ['assignee_contact_id', 'target_contact_id', 'activity_type_id', 'status_id', 'source_contact_name', 'campaign_id'],
     ]);
 
-    $this->assertEquals(3, $activity['activity_type_id']);
+    $this->assertSame('3', $activity['activity_type_id']);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_status_id', 'Scheduled'), $activity['status_id']);
     $this->assertSame('to@test.test', $activity['source_contact_name']);
     $assigneeID = $activity['assignee_contact_id'][0];

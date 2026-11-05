@@ -297,7 +297,7 @@ contribution.contribution_page_id.receipt_text :Text in
     $tokenProcessor->evaluate();
     $this->assertSame('€5,990.99', $tokenProcessor->getRow(0)->render('not_specified'));
     $this->assertSame('€5,990.99', $tokenProcessor->getRow(0)->render('money'));
-    $this->assertEquals('5990.99', $tokenProcessor->getRow(0)->render('raw'));
+    $this->assertSame('5990.99', $tokenProcessor->getRow(0)->render('raw'));
   }
 
   /**
@@ -363,7 +363,7 @@ Czech Republic
       ['contribution' => ['address_id.display' => 'CANNED ADDRESS STRING']],
       FALSE
     );
-    $this->assertEquals('CANNED ADDRESS STRING', $text);
+    $this->assertSame('CANNED ADDRESS STRING', $text);
   }
 
   /**
@@ -708,7 +708,7 @@ contribution_recur.payment_instrument_id:name :Check
       $this->getCustomFieldName('radio', 4) => 4,
     ]);
     $text = $this->renderText(['membershipId' => $membershipID], '{membership.' . $this->getCustomFieldName('radio', 4) . ':label}');
-    $this->assertEquals('100', $text);
+    $this->assertSame('100', $text);
   }
 
   public function testPledgeTokens(): void {
@@ -908,7 +908,7 @@ my field';
       'messageTemplate' => ['msg_html' => $input],
       'tokenContext' => array_merge(['participantId' => $this->ids['participant'][0]], ['schema' => ['participantId', 'eventId']]),
     ])['html'];
-    $this->assertEquals(99999, $tokenHtml);
+    $this->assertSame('99999', $tokenHtml);
   }
 
   /**

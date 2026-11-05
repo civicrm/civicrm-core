@@ -128,7 +128,7 @@ class CRM_Core_FormTest extends CiviUnitTestCase {
 
     $_REQUEST['cs'] = 'abc';
     $form = $this->getFormObject('CRM_Core_Form');
-    $this->assertEquals(0, $form->getAuthenticatedContactID());
+    $this->assertSame(0, $form->getAuthenticatedContactID());
 
     $form = $this->getFormObject('CRM_Core_Form');
     $this->createLoggedInUser();

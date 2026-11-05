@@ -69,7 +69,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     $payment = CRM_Core_DAO::createTestObject('CRM_Pledge_BAO_PledgePayment');
     $paymentid = CRM_Pledge_BAO_PledgePayment::deletePayments($payment->pledge_id);
 
-    $this->assertEquals($paymentid, 1, "Deleted one payment");
+    $this->assertTrue($paymentid, "Deleted one payment");
   }
 
   /**
@@ -82,7 +82,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
 
     // No payments should be retrieved
     $pledgePayment = CRM_Pledge_BAO_PledgePayment::getPledgePayments($pledgeId);
-    $this->assertEquals(count($pledgePayment), 0, "Checking for empty array");
+    $this->assertSame(0, count($pledgePayment), "Checking for empty array");
   }
 
   /**
@@ -114,7 +114,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     ];
 
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
-    $this->assertEquals('20110515000000', $date);
+    $this->assertSame('20110515000000', $date);
   }
 
   /**
@@ -129,7 +129,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     ];
 
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
-    $this->assertEquals('20110510000000', $date);
+    $this->assertSame('20110510000000', $date);
   }
 
   /**
@@ -145,25 +145,25 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     ];
 
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
-    $this->assertEquals('20110509000000', $date);
+    $this->assertSame('20110509000000', $date);
     $params['frequency_day'] = 2;
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
-    $this->assertEquals('20110510000000', $date);
+    $this->assertSame('20110510000000', $date);
     $params['frequency_day'] = 3;
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
-    $this->assertEquals('20110511000000', $date);
+    $this->assertSame('20110511000000', $date);
     $params['frequency_day'] = 4;
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
-    $this->assertEquals('20110512000000', $date);
+    $this->assertSame('20110512000000', $date);
     $params['frequency_day'] = 5;
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
-    $this->assertEquals('20110513000000', $date);
+    $this->assertSame('20110513000000', $date);
     $params['frequency_day'] = 6;
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
-    $this->assertEquals('20110514000000', $date);
+    $this->assertSame('20110514000000', $date);
     $params['frequency_day'] = 7;
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
-    $this->assertEquals('20110515000000', $date);
+    $this->assertSame('20110515000000', $date);
   }
 
   /**
@@ -178,7 +178,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     ];
 
     $date = CRM_Pledge_BAO_PledgePayment::calculateBaseScheduleDate($params);
-    $this->assertEquals('20110510000000', $date);
+    $this->assertSame('20110510000000', $date);
   }
 
   /**
@@ -193,7 +193,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     ];
 
     $date = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 1);
-    $this->assertEquals('20130510000000', $date);
+    $this->assertSame('20130510000000', $date);
   }
 
   /**
@@ -208,57 +208,57 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'frequency_interval' => 1,
     ];
     $nextScheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 2);
-    $this->assertEquals('20110731000000', $nextScheduleDate);
+    $this->assertSame('20110731000000', $nextScheduleDate);
     // assert pledge scheduled date for month february.
     $nextScheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 9);
-    $this->assertEquals('20120229000000', $nextScheduleDate);
+    $this->assertSame('20120229000000', $nextScheduleDate);
 
     //Case: Frequency day = 31 and scheduled date = 31st of any month
     $params['scheduled_date'] = '20110131';
     $params['frequency_day'] = 31;
     $nextScheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 1);
-    $this->assertEquals('20110228000000', $nextScheduleDate);
+    $this->assertSame('20110228000000', $nextScheduleDate);
 
     //Case: Frequency day = 30 and scheduled date = 30th of any month
     $params['scheduled_date'] = '20110130';
     $params['frequency_day'] = 30;
     $nextScheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 3);
-    $this->assertEquals('20110430000000', $nextScheduleDate);
+    $this->assertSame('20110430000000', $nextScheduleDate);
 
     //Case: Frequency day = 30 and scheduled date = any day of month
     $params['scheduled_date'] = '20110110';
     $params['frequency_day'] = 30;
     $nextScheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 4);
-    $this->assertEquals('20110530000000', $nextScheduleDate);
+    $this->assertSame('20110530000000', $nextScheduleDate);
 
     //Case: Frequency day = any and scheduled date = 31st of any month
     $params['scheduled_date'] = '20110131';
     $params['frequency_day'] = 5;
     $nextScheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 5);
-    $this->assertEquals('20110605000000', $nextScheduleDate);
+    $this->assertSame('20110605000000', $nextScheduleDate);
 
     //Case: Frequency day = any AND scheduled date = 30th of any month
     $params['scheduled_date'] = '20110130';
     $params['frequency_day'] = 10;
     $nextScheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 6);
-    $this->assertEquals('20110710000000', $nextScheduleDate);
+    $this->assertSame('20110710000000', $nextScheduleDate);
 
     //Case: Frequency day = any AND scheduled date = any day month
     $params['scheduled_date'] = '20110124';
     $params['frequency_day'] = 6;
     $nextScheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 7);
-    $this->assertEquals('20110806000000', $nextScheduleDate);
+    $this->assertSame('20110806000000', $nextScheduleDate);
 
     //Case: Frequency day = 31 AND scheduled date = 29 Feb
     $params['scheduled_date'] = '20160229';
     $params['frequency_day'] = 31;
     $nextScheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 5);
-    $this->assertEquals('20160731000000', $nextScheduleDate);
+    $this->assertSame('20160731000000', $nextScheduleDate);
     $nextScheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 6);
-    $this->assertEquals('20160831000000', $nextScheduleDate);
+    $this->assertSame('20160831000000', $nextScheduleDate);
     //check date for february
     $nextScheduleDate = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 12);
-    $this->assertEquals('20170228000000', $nextScheduleDate);
+    $this->assertSame('20170228000000', $nextScheduleDate);
   }
 
   /**
@@ -273,7 +273,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     ];
 
     $date = CRM_Pledge_BAO_PledgePayment::calculateNextScheduledDate($params, 3, '20080510');
-    $this->assertEquals('20140510000000', $date);
+    $this->assertSame('20140510000000', $date);
   }
 
   /**
@@ -344,17 +344,17 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     ]);
 
     // The status of the first 3 pledges should be set to complete
-    $this->assertEquals($pledgePayments['values'][0]['status_id'], 1);
+    $this->assertSame('1', $pledgePayments['values'][0]['status_id']);
     $this->assertEquals($pledgePayments['values'][0]['actual_amount'], 404.70);
 
-    $this->assertEquals($pledgePayments['values'][1]['status_id'], 1);
-    $this->assertEquals($pledgePayments['values'][1]['actual_amount'], 0);
+    $this->assertSame('1', $pledgePayments['values'][1]['status_id']);
+    $this->assertSame('0.00', $pledgePayments['values'][1]['actual_amount']);
 
-    $this->assertEquals($pledgePayments['values'][2]['status_id'], 1);
-    $this->assertEquals($pledgePayments['values'][2]['actual_amount'], 0);
+    $this->assertSame('1', $pledgePayments['values'][2]['status_id']);
+    $this->assertSame('0.00', $pledgePayments['values'][2]['actual_amount']);
 
     // Fourth pledge should still be pending
-    $this->assertEquals($pledgePayments['values'][3]['status_id'], 2);
+    $this->assertSame('2', $pledgePayments['values'][3]['status_id']);
   }
 
   /**
@@ -447,12 +447,12 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
         $this->assertEquals(100.00, $pp['actual_amount']);
       }
       else {
-        $this->assertEquals(0, $pp['scheduled_amount']);
-        $this->assertEquals(0, $pp['actual_amount']);
+        $this->assertSame('0.00', $pp['scheduled_amount']);
+        $this->assertSame('0.00', $pp['actual_amount']);
       }
 
       // All pledge payments must be set as 'completed'.
-      $this->assertEquals(1, $pp['status_id']);
+      $this->assertSame('1', $pp['status_id']);
     }
 
     $this->assertEquals(count($pledgePayments['values']), CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge['id'], 2));

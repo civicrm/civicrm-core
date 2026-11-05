@@ -41,15 +41,15 @@ class api_v3_ExceptionTest extends CiviUnitTestCase {
       'options' => ['limit' => 1],
     ]);
     $dupes = $this->callAPISuccess('Dedupe', 'getduplicates', ['rule_group_id' => $defaultRuleGroupID]);
-    $this->assertEquals(1, $dupes['count']);
+    $this->assertSame(1, $dupes['count']);
     $this->callAPISuccess('Exception', 'create', ['contact_id1' => $contact1, 'contact_id2' => $contact2]);
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery('
       SELECT count(*) FROM civicrm_prevnext_cache
       WHERE (entity_id1 = ' . $contact1 . ' AND entity_id2 = ' . $contact2 . ')
       OR (entity_id1 = ' . $contact2 . ' AND entity_id2 = ' . $contact1 . ')'
     ));
     $dupes = $this->callAPISuccess('Dedupe', 'getduplicates', ['rule_group_id' => $defaultRuleGroupID]);
-    $this->assertEquals(0, $dupes['count']);
+    $this->assertSame(0, $dupes['count']);
   }
 
   /**

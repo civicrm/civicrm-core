@@ -780,7 +780,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testNotImplemented_get($Entity) {
     $result = civicrm_api($Entity, 'Get', ['version' => 3]);
-    $this->assertEquals(1, $result['is_error']);
+    $this->assertSame(1, $result['is_error']);
     // $this->assertStringContainsString("API ($Entity, Get) does not exist", $result['error_message']);
     $this->assertMatchesRegularExpression('/API (.*) does not exist/', $result['error_message']);
   }
@@ -821,7 +821,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $this->assertStringContainsString('id', $result['error_message']);
     }
     else {
-      $this->assertEquals(3, $result['version']);
+      $this->assertSame(3, $result['version']);
       $this->assertArrayHasKey('count', $result);
       $this->assertArrayHasKey('values', $result);
     }
@@ -933,7 +933,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       $this->assertSame("only id should be enough", $result['error_message']);
     }
     if (!in_array($Entity, $this->getOnlyIDNonZeroCount(), TRUE)) {
-      $this->assertEquals(0, $result['count']);
+      $this->assertSame(0, $result['count']);
     }
   }
 
@@ -1181,7 +1181,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     $this->assertTrue(!empty($result['values'][$baoObj1->id]), 'Should find first object by id');
     $this->assertEquals($baoObj1->id, $result['values'][$baoObj1->id]['id'], 'Should find id on first object');
-    $this->assertEquals(1, count($result['values']));
+    $this->assertSame(1, count($result['values']));
 
     // fetch second by ID
     $result = civicrm_api($entityName, 'get', [
@@ -1191,7 +1191,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
     $this->assertTrue(!empty($result['values'][$baoObj2->id]), 'Should find second object by id');
     $this->assertEquals($baoObj2->id, $result['values'][$baoObj2->id]['id'], 'Should find id on second object');
-    $this->assertEquals(1, count($result['values']));
+    $this->assertSame(1, count($result['values']));
   }
 
   /**
@@ -1213,9 +1213,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     }
 
     $this->assertArrayHasKey('version', $result);
-    $this->assertEquals(3, $result['version']);
+    $this->assertSame(3, $result['version']);
     if (!in_array($Entity, $this->getOnlyIDNonZeroCount(), TRUE)) {
-      $this->assertEquals(0, $result['count']);
+      $this->assertSame(0, $result['count']);
     }
   }
 
@@ -1233,7 +1233,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    */
   public function testNotImplementedCreate($Entity) {
     $result = civicrm_api($Entity, 'Create', ['version' => 3]);
-    $this->assertEquals(1, $result['is_error']);
+    $this->assertSame(1, $result['is_error']);
     $this->assertStringContainsString(strtolower("API ($Entity, Create) does not exist"), strtolower($result['error_message']));
   }
 
@@ -1528,7 +1528,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   public function testNotImplemented_delete($Entity) {
     $nonExistantID = 151416349;
     $result = civicrm_api($Entity, 'Delete', ['version' => 3, 'id' => $nonExistantID]);
-    $this->assertEquals(1, $result['is_error']);
+    $this->assertSame(1, $result['is_error']);
     $this->assertStringContainsString(strtolower("API ($Entity, Delete) does not exist"), strtolower($result['error_message']));
   }
 
@@ -1547,7 +1547,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       return;
     }
     $result = civicrm_api($Entity, 'Delete', []);
-    $this->assertEquals(1, $result['is_error']);
+    $this->assertSame(1, $result['is_error']);
     $this->assertStringContainsString("Unknown api version", $result['error_message']);
   }
 

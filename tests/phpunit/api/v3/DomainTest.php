@@ -150,7 +150,7 @@ class api_v3_DomainTest extends CiviUnitTestCase {
    */
   public function testCreate(): void {
     $result = $this->callAPISuccess('domain', 'create', $this->params);
-    $this->assertEquals($result['count'], 1);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['id']);
     $this->assertEquals($result['values'][$result['id']]['name'], $this->params['name']);
     $this->assertEquals($result['values'][$result['id']]['domain_version'], $this->params['domain_version']);

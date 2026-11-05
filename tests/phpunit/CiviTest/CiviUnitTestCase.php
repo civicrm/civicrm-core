@@ -626,7 +626,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     if (!preg_match('/maria/i', $dbVer) || version_compare($dbVer, '10.5.2', '>=')) {
       // Supported by MySQL 5.7+ or MariaDB 10.5.2+. These provide some herd immunity.
       $releasedLocks = CRM_Core_DAO::singleValueQuery('SELECT RELEASE_ALL_LOCKS()');
-      $this->assertEquals(0, $releasedLocks, "The test should not leave any dangling locks. Found $releasedLocks");
+      $this->assertSame('0', $releasedLocks, "The test should not leave any dangling locks. Found $releasedLocks");
     }
 
     // \CRM_Core_BAO_ConfigSetting::setEnabledComponents(\Civi::settings()->getDefault('enable_components'));
@@ -3807,7 +3807,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
   protected function basicCreateTest(int $version): void {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
   }
@@ -3825,7 +3825,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     $deleteParams = ['id' => $result['id']];
     $this->callAPISuccess($this->_entity, 'delete', $deleteParams);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
-    $this->assertEquals(0, $checkDeleted['count']);
+    $this->assertSame(0, $checkDeleted['count']);
   }
 
   /**
@@ -3859,7 +3859,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function assertLocationValidity(): void {
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM
 
 (SELECT a1.contact_id
 FROM civicrm_address a1

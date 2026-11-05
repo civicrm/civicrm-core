@@ -865,10 +865,10 @@ EOHTML;
     $this->assertCount(2, $phoneValues);
     $this->assertSame(1, $phoneValues[0]['location_type_id']);
     $this->assertSame('1-1-1', $phoneValues[0]['phone']);
-    $this->assertEquals('111', $phoneValues[0]['phone_ext']);
+    $this->assertSame('111', $phoneValues[0]['phone_ext']);
     $this->assertSame(2, $phoneValues[1]['location_type_id']);
     $this->assertSame('2-2-2', $phoneValues[1]['phone']);
-    $this->assertEquals('222', $phoneValues[1]['phone_ext']);
+    $this->assertSame('222', $phoneValues[1]['phone_ext']);
 
     // Create a new contact with no phones
     $cid = $this->createTestRecord('Individual', [
@@ -901,10 +901,10 @@ EOHTML;
 
     $this->assertCount(2, $phoneValues);
     $this->assertSame(1, $phoneValues[0]['location_type_id']);
-    $this->assertEquals('1', $phoneValues[0]['phone']);
-    $this->assertEquals('111', $phoneValues[0]['phone_ext']);
+    $this->assertSame('1', $phoneValues[0]['phone']);
+    $this->assertSame('111', $phoneValues[0]['phone_ext']);
     $this->assertSame(2, $phoneValues[1]['location_type_id']);
-    $this->assertEquals('2', $phoneValues[1]['phone']);
+    $this->assertSame('2', $phoneValues[1]['phone']);
 
     $prefill = Afform::prefill()
       ->setName($this->formName)
@@ -915,10 +915,10 @@ EOHTML;
 
     $this->assertCount(1, $prefill['Individual1']['values']);
     $this->assertSame('Two', $prefill['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEquals('1', $prefill['Individual1']['values'][0]['joins']['Phone'][0]['phone']);
+    $this->assertSame('1', $prefill['Individual1']['values'][0]['joins']['Phone'][0]['phone']);
     $this->assertEquals($phoneValues[0]['id'], $prefill['Individual1']['values'][0]['joins']['Phone'][0]['id']);
-    $this->assertEquals('111', $prefill['Individual1']['values'][0]['joins']['Phone'][0]['phone_ext']);
-    $this->assertEquals('2', $prefill['Individual1']['values'][0]['joins']['Phone'][1]['phone']);
+    $this->assertSame('111', $prefill['Individual1']['values'][0]['joins']['Phone'][0]['phone_ext']);
+    $this->assertSame('2', $prefill['Individual1']['values'][0]['joins']['Phone'][1]['phone']);
     $this->assertEquals($phoneValues[1]['id'], $prefill['Individual1']['values'][0]['joins']['Phone'][1]['id']);
 
   }

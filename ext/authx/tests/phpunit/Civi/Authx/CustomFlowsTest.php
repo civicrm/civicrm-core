@@ -28,7 +28,7 @@ class CustomFlowsTest extends AbstractFlowsTest {
       $cmd = strtr('cv ev -v @PHP', ['@PHP' => escapeshellarg($phpStmt)]);
       exec($cmd, $output, $val);
       $fullOutput = implode("\n", $output);
-      $this->assertEquals(0, $val, "Command returned error ($cmd) ($val):\n\"$fullOutput\"");
+      $this->assertSame(0, $val, "Command returned error ($cmd) ($val):\n\"$fullOutput\"");
       return json_decode($fullOutput, TRUE);
     };
 

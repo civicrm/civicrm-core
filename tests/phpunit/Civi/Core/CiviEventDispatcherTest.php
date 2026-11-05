@@ -21,7 +21,7 @@ class CiviEventDispatcherTest extends \CiviUnitTestCase {
       $calls['hook_civicrm_fakeRunnable'] = 1;
     });
     $d->dispatch('hook_civicrm_fakeRunnable', GenericHookEvent::create([]));
-    $this->assertEquals(1, $calls['hook_civicrm_fakeRunnable']);
+    $this->assertSame(1, $calls['hook_civicrm_fakeRunnable']);
   }
 
   public function testDispatchPolicy_drop(): void {
@@ -64,7 +64,7 @@ class CiviEventDispatcherTest extends \CiviUnitTestCase {
     });
     $d->dispatch('testBasicEventObject', (object) ['number' => 100]);
     $d->dispatch('testBasicEventObject', (object) ['number' => 200]);
-    $this->assertEquals(300, $count, '100 + 200 = 300.');
+    $this->assertSame(300, $count, '100 + 200 = 300.');
   }
 
 }

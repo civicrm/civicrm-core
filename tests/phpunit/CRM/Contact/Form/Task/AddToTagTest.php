@@ -56,7 +56,7 @@ class CRM_Contact_Form_Task_AddToTagTest extends CiviUnitTestCase {
       ->addWhere('tag_id', '=', $childTag['id'])
       ->execute()
       ->count();
-    $this->assertEquals(1, $tagCount);
+    $this->assertSame(1, $tagCount);
   }
 
   /**

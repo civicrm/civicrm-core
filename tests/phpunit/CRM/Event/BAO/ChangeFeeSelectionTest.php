@@ -223,7 +223,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'entity_id' => $cancelledLineItem['id'],
       'entity_table' => 'civicrm_line_item',
     ]);
-    $this->assertEquals(2, $financialItems['count'], 'Financial Items for Cancelled fee is not proper');
+    $this->assertSame(2, $financialItems['count'], 'Financial Items for Cancelled fee is not proper');
 
     $expectedAmount = 100.00;
     foreach ($financialItems['values'] as $financialItem) {
@@ -348,19 +348,19 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $this->submitForm($this->getCheapFeeID());
     $this->validateContribution($this->_cheapFee, 'Pending refund');
     $lineItem = $this->getParticipantLineItems();
-    $this->assertEquals('0.00', $lineItem[1]['line_total']);
+    $this->assertSame(0.0, $lineItem[1]['line_total']);
     $this->assertEquals($this->_cheapFee, $lineItem[0]['line_total']);
 
     $this->submitForm($this->getExpensiveValueID());
     $this->validateContribution($this->_expensiveFee, 'Completed');
     $lineItem = $this->getParticipantLineItems();
     $this->assertEquals($this->_expensiveFee, $lineItem[1]['line_total']);
-    $this->assertEquals('0.00', $lineItem[0]['line_total']);
+    $this->assertSame(0.0, $lineItem[0]['line_total']);
 
     $this->submitForm($this->getVeryExpensiveID());
     $lineItem = $this->getParticipantLineItems();
-    $this->assertEquals('0.00', $lineItem[1]['line_total']);
-    $this->assertEquals('0.00', $lineItem[2]['line_total']);
+    $this->assertSame(0.0, $lineItem[1]['line_total']);
+    $this->assertSame(0.0, $lineItem[2]['line_total']);
     $this->assertEquals($this->_veryExpensive, $lineItem[0]['line_total']);
     $this->validateContribution($this->_veryExpensive, 'Partially paid');
   }
@@ -404,7 +404,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       'entity_id' => $cancelledLineItem['id'],
       'entity_table' => 'civicrm_line_item',
     ]);
-    $this->assertEquals(2, $financialItems['count'], 'Financial Items for Cancelled fee is not proper');
+    $this->assertSame(2, $financialItems['count'], 'Financial Items for Cancelled fee is not proper');
 
     $expectedAmount = 100.00;
     foreach ($financialItems['values'] as $financialItem) {

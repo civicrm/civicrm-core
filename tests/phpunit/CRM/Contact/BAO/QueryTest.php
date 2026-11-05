@@ -627,7 +627,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       $resultDAO = $queryObj->searchQuery();
 
       if ($searchPrimary) {
-        $this->assertEquals($resultDAO->N, 0);
+        $this->assertSame(0, $resultDAO->N);
       }
       else {
         //Assert secondary email gets included in search results.
@@ -846,7 +846,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $sql = $query->query();
     $result = CRM_Core_DAO::executeQuery(implode(' ', $sql));
-    $this->assertEquals(2, $result->N);
+    $this->assertSame(2, $result->N);
 
     // We save this as a smart group and then load it. With mysql warnings on & CRM-14720 this
     // results in mysql warnings & hence fatal errors.
@@ -917,7 +917,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $sql = $query->query(FALSE);
     $this->assertSame("WHERE  ( civicrm_address.postal_code = 'EH10 4RB-889' )  AND (contact_a.is_deleted = 0)", $sql[2]);
     $result = CRM_Core_DAO::executeQuery(implode(' ', $sql));
-    $this->assertEquals(1, $result->N);
+    $this->assertSame(1, $result->N);
 
   }
 
@@ -959,7 +959,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     // This is a little weird but seems consistent with the behavior of the search form in general.
     // Technically there are 2 contacts who share a relationship with the description searched for,
     // so one might expect the search form to return both of them instead of just Contact A... but it doesn't.
-    $this->assertEquals('1', $dao->N, 'Search query returns exactly 1 result?');
+    $this->assertSame(1, $dao->N, 'Search query returns exactly 1 result?');
     $this->assertTrue($dao->fetch(), 'Search query returns success?');
     $this->assertEquals($contactID_a, $dao->contact_id, 'Search query returns contact A?');
   }
@@ -1011,7 +1011,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $query = new CRM_Contact_BAO_Query($params);
     $dao = $query->searchQuery();
-    $this->assertEquals('1', $dao->N, 'Search query returns exactly 1 result?');
+    $this->assertSame(1, $dao->N, 'Search query returns exactly 1 result?');
     $this->assertTrue($dao->fetch(), 'Search query returns success?');
     $this->assertEquals($contactID_b, $dao->contact_id, 'Search query returns parent of contact A?');
   }
@@ -1058,7 +1058,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $query = new CRM_Contact_BAO_Query($params);
     $dao = $query->searchQuery();
-    $this->assertEquals('2', $dao->N);
+    $this->assertSame(2, $dao->N);
     $this->callAPISuccess('Relationship', 'delete', ['id' => $relationship['id']]);
     $this->callAPISuccess('Contact', 'delete', ['id' => $contactID_a, 'skip_undelete' => 1]);
     $this->callAPISuccess('Contact', 'delete', ['id' => $contactID_b, 'skip_undelete' => 1]);
@@ -1111,7 +1111,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $query = new CRM_Contact_BAO_Query($params);
     $dao = $query->searchQuery();
-    $this->assertEquals('1', $dao->N, 'Search query returns exactly 1 result?');
+    $this->assertSame(1, $dao->N, 'Search query returns exactly 1 result?');
     $this->assertTrue($dao->fetch(), 'Search query returns success?');
     $this->assertEquals($contactID_b, $dao->contact_id, 'Search query returns spouse of contact A?');
   }
@@ -1251,15 +1251,15 @@ civicrm_relationship.is_active = 1 AND
     $this->callAPISuccess('GroupContact', 'create', ['id' => $groupContactID, 'status' => 'Removed']);
     $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0], ['group_contact_status', 'IN', ['Removed' => 1], 0, 0]]);
     $resultDAO = $queryObj->searchQuery();
-    $this->assertEquals(1, $resultDAO->N);
+    $this->assertSame(1, $resultDAO->N);
 
     $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0], ['group_contact_status', 'IN', ['Added' => 1], 0, 0]]);
     $resultDAO = $queryObj->searchQuery();
-    $this->assertEquals(2, $resultDAO->N);
+    $this->assertSame(2, $resultDAO->N);
 
     $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0]]);
     $resultDAO = $queryObj->searchQuery();
-    $this->assertEquals(2, $resultDAO->N);
+    $this->assertSame(2, $resultDAO->N);
   }
 
   /**
@@ -1276,11 +1276,11 @@ civicrm_relationship.is_active = 1 AND
 
     $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0], ['group_contact_status', 'IN', ['Removed' => 1], 0, 0]]);
     $resultDAO = $queryObj->searchQuery();
-    $this->assertEquals(1, $resultDAO->N);
+    $this->assertSame(1, $resultDAO->N);
 
     $queryObj = new CRM_Contact_BAO_Query([['group', 'IS NOT EMPTY', '', 0, 0], ['group_contact_status', 'IN', ['Removed' => 1], 0, 0]]);
     $resultDAO = $queryObj->searchQuery();
-    $this->assertEquals(1, $resultDAO->N);
+    $this->assertSame(1, $resultDAO->N);
   }
 
   /**
@@ -1309,7 +1309,7 @@ civicrm_relationship.is_active = 1 AND
     );
 
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $this->assertEquals(3, $dao->N);
+    $this->assertSame(3, $dao->N);
     $this->assertFalse(strstr($sql, ' OR '));
 
     $sql = CRM_Contact_BAO_Query::getQuery(
@@ -1318,7 +1318,7 @@ civicrm_relationship.is_active = 1 AND
     );
 
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $this->assertEquals(3, $dao->N);
+    $this->assertSame(3, $dao->N);
     $this->assertFalse(strstr($sql, ' OR '), 'Query does not include or');
     while ($dao->fetch()) {
       $this->assertTrue(($dao->groups == $groupID || $dao->groups == ',' . $groupID || $dao->groups == $groupID . ',' . $groupID), $dao->groups . ' includes ' . $groupID);

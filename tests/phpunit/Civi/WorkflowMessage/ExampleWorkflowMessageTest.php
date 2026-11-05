@@ -160,8 +160,8 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $ex = static::createExample();
 
     $ex->setmyProtectedInt(5);
-    $this->assertEquals(5, $ex->getmyProtectedInt());
-    $this->assertEquals(5, Invasive::get([$ex, 'myProtectedInt']));
+    $this->assertSame(5, $ex->getmyProtectedInt());
+    $this->assertSame(5, Invasive::get([$ex, 'myProtectedInt']));
 
     $ex->setMyPublicString('hello');
     $this->assertSame('hello', $ex->getMyPublicString());
@@ -182,17 +182,17 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     ]);
 
     $this->assertSame('hello world', $ex->getMyPublicString());
-    $this->assertEquals(10, $ex->getMyProtectedInt());
-    $this->assertEquals(20, $ex->getDeepValue());
+    $this->assertSame(10, $ex->getMyProtectedInt());
+    $this->assertSame(20, $ex->getDeepValue());
 
     $ex->myPublicString .= ' and stuff';
     $ex->setDeepValue(22);
 
     $tpl = $ex->export('tplParams');
     $this->assertSame('hello world and stuff', $tpl['my_public_string']);
-    $this->assertEquals(10, $tpl['my_int']);
-    $this->assertEquals(22, $tpl['some']['deep']['thing']);
-    $this->assertEquals(100, $tpl['some_extra_tpl_stuff']);
+    $this->assertSame(10, $tpl['my_int']);
+    $this->assertSame(22, $tpl['some']['deep']['thing']);
+    $this->assertSame(100, $tpl['some_extra_tpl_stuff']);
 
     $envelope = $ex->export('envelope');
     $this->assertSame('my_example_wf', $envelope['workflow']);
@@ -251,7 +251,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $this->assertTrue($ex instanceof GenericWorkflowMessage);
 
     $tpl = $ex->export('tplParams');
-    $this->assertEquals(456, $tpl['myImpromputInt']);
+    $this->assertSame(456, $tpl['myImpromputInt']);
     $this->assertEquals(['is not mentioned anywhere'], $tpl['impromptu_smarty_data']);
     $this->assertTrue(!isset($tpl['workflow']));
 
@@ -261,7 +261,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $this->assertTrue(!isset($envelope['myProtectedInt']));
 
     $tokenCtx = $ex->export('tokenContext');
-    $this->assertEquals(123, $tokenCtx['contactId']);
+    $this->assertSame(123, $tokenCtx['contactId']);
     $this->assertTrue(!isset($envelope['myProtectedInt']));
   }
 
@@ -275,13 +275,13 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
       $hookCount++;
       $this->assertSame('my_example_wf', $e->params['workflow'], 'ExampleWorkflow::WORKFLOW should propagate to params[workflow]');
     });
-    $this->assertEquals(0, $hookCount);
+    $this->assertSame(0, $hookCount);
     $rendered = $ex->renderTemplate([
       'messageTemplate' => [
         'msg_subject' => 'Hello {contact.display_name}',
       ],
     ]);
-    $this->assertEquals(1, $hookCount);
+    $this->assertSame(1, $hookCount);
     $this->assertEquals('Hello Foo Bar' . $rand, $rendered['subject']);
   }
 
@@ -297,13 +297,13 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
       $hookCount++;
       $this->assertSame('some_impromptu_wf', $e->params['workflow'], 'Adhoc name should propagate to params[workflow]');
     });
-    $this->assertEquals(0, $hookCount);
+    $this->assertSame(0, $hookCount);
     $rendered = $ex->renderTemplate([
       'messageTemplate' => [
         'msg_subject' => 'Hello {contact.display_name}',
       ],
     ]);
-    $this->assertEquals(1, $hookCount);
+    $this->assertSame(1, $hookCount);
     $this->assertEquals('Hello Foo Bar' . $rand, $rendered['subject']);
   }
 
@@ -337,9 +337,9 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
       $hookCount++;
       $this->assertSame('temporary', $e->params['workflow']);
     });
-    $this->assertEquals(0, $hookCount);
+    $this->assertSame(0, $hookCount);
     $rendered = $example->renderTemplate();
-    $this->assertEquals(1, $hookCount);
+    $this->assertSame(1, $hookCount);
     $this->assertStringContainsString('Foo Bar', $rendered['subject']);
     $this->assertStringContainsString('Thank you for signing The Fake Petition', $rendered['html']);
     $this->assertStringContainsString('Thank you for signing The Fake Petition', $rendered['text']);

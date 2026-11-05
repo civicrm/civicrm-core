@@ -48,7 +48,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $this->callAPISuccessGetCount('mail_settings', [], 1);
     $result = $this->callAPISuccess('MailSettings', 'create', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('MailSettings', 'delete', ['id' => $result['id']]);
     $this->callAPISuccessGetCount('mail_settings', [], 1);
@@ -82,7 +82,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $this->callAPISuccess('MailSettings', 'create', $this->params);
     $result = $this->callAPISuccess('MailSettings', 'get', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('MailSettings', 'delete', ['id' => $result['id']]);
     $this->callAPISuccessGetCount('mail_settings', [], 1);
@@ -118,7 +118,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccess('MailSettings', 'create', ['name' => "delete this setting"] + $this->params);
     $result = $this->callAPISuccess('MailSettings', 'get', $params);
-    $this->assertEquals(0, $this->callAPISuccess('MailSettings', 'getcount', ['name' => "delete this setting"]));
+    $this->assertSame(0, $this->callAPISuccess('MailSettings', 'getcount', ['name' => "delete this setting"]));
   }
 
 }

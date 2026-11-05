@@ -30,14 +30,14 @@ class ContributionTest extends BaseTestClass {
     $sql = \CRM_Contribute_BAO_Contribution::getAnnualQuery([$this->ids['Contact']['logged_in']]);
     $result = \CRM_Core_DAO::executeQuery($sql);
     $result->fetch();
-    $this->assertEquals(0, $result->N);
+    $this->assertSame(0, $result->N);
 
     // It didn't find any rows cos it is restricted to only find contributions where all lines are visible.
     \CRM_Core_DAO::executeQuery('UPDATE civicrm_line_item SET financial_type_id = ' . $this->getFinancialTypeID('Donation'));
     $result = \CRM_Core_DAO::executeQuery($sql);
     $result->fetch();
-    $this->assertEquals(300, $result->amount);
-    $this->assertEquals(1, $result->count);
+    $this->assertSame('300.00', $result->amount);
+    $this->assertSame('1', $result->count);
   }
 
   /**
@@ -137,7 +137,7 @@ class ContributionTest extends BaseTestClass {
     ]);
     $this->createLoggedInUser();
     $visibleFTs = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search');
-    $this->assertEquals(count($visibleFTs), 0);
+    $this->assertSame(0, count($visibleFTs));
 
     // With financial ACLs.
     $permissions = array_merge(\CRM_Core_Config::singleton()->userPermissionClass->permissions, [
@@ -150,7 +150,7 @@ class ContributionTest extends BaseTestClass {
     // Clear pseudoconstant lookup cache.
     unset(\Civi::$statics['CRM_Core_PseudoConstant']);
     $visibleFTs = \CRM_Contribute_BAO_Contribution::buildOptions('financial_type_id', 'search');
-    $this->assertEquals(count($visibleFTs), 4);
+    $this->assertSame(4, count($visibleFTs));
   }
 
 }

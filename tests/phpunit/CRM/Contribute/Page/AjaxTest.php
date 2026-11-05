@@ -88,8 +88,8 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
       $amountSortedList = $e->errorData;
     }
 
-    $this->assertEquals(3, $softCreditList['recordsTotal']);
-    $this->assertEquals(3, $amountSortedList['recordsTotal']);
+    $this->assertSame(3, $softCreditList['recordsTotal']);
+    $this->assertSame(3, $amountSortedList['recordsTotal']);
 
     $this->assertSame('$600.00', $amountSortedList['data'][0]['amount']);
     $this->assertSame('$150.00', $amountSortedList['data'][1]['amount']);
@@ -171,7 +171,7 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $softCreditList = $e->errorData;
     }
-    $this->assertEquals(1, $softCreditList['recordsTotal']);
+    $this->assertSame(1, $softCreditList['recordsTotal']);
     $this->assertSame('Gift', $softCreditList['data'][0]['sct_label']);
     $this->assertSame('$100.00', $softCreditList['data'][0]['amount']);
     $this->assertSame('Member Dues', $softCreditList['data'][0]['financial_type']);

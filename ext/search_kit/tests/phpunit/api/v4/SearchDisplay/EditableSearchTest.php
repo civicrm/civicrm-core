@@ -156,7 +156,7 @@ class EditableSearchTest extends Api4TestBase {
     $this->assertSame('', $result[1]['columns'][1]['val']);
     $this->assertTrue($result[1]['columns'][1]['edit']);
     // Contact 2 phone can be updated
-    $this->assertEquals('123456', $result[1]['columns'][2]['val']);
+    $this->assertSame('123456', $result[1]['columns'][2]['val']);
     $this->assertTrue($result[1]['columns'][2]['edit']);
     // Contact 2 address can be created
     $this->assertSame('', $result[1]['columns'][4]['val']);
@@ -201,7 +201,7 @@ class EditableSearchTest extends Api4TestBase {
     $result = civicrm_api4('SearchDisplay', 'inlineEdit', $params);
     $this->assertCount(1, $result);
     $this->assertEquals($cids[0], $result[0]['key']);
-    $this->assertEquals('654321', $result[0]['columns'][2]['val']);
+    $this->assertSame('654321', $result[0]['columns'][2]['val']);
 
     // Create new email for contact 1
     $params['rowKey'] = $cids[1];

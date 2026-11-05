@@ -29,13 +29,13 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
   public function testGetOptionValueByID(): void {
     $optionValueID = $this->getOptionValueID('preferred_communication_method', 'Phone');
     $result = $this->callAPISuccess('option_value', 'get', ['id' => $optionValueID]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals($optionValueID, $result['id']);
   }
 
   public function testGetOptionValueByValue(): void {
     $result = $this->callAPISuccess('option_value', 'get', ['option_group_id' => 'preferred_communication_method', 'value' => '1']);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals($this->getOptionValueID('preferred_communication_method', 'Phone'), $result['id']);
   }
 
@@ -48,7 +48,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $this->assertGreaterThan(1, $result['count'], "Check more than one exists In line " . __LINE__);
     $params['options']['limit'] = 1;
     $result = $this->callAPISuccess('option_value', 'get', $params);
-    $this->assertEquals(1, $result['count'], "Check only 1 retrieved " . __LINE__);
+    $this->assertSame(1, $result['count'], "Check only 1 retrieved " . __LINE__);
   }
 
   /**
@@ -132,7 +132,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
 
   public function testGetOptionDoesNotExist(): void {
     $result = $this->callAPISuccess('option_value', 'get', ['label' => 'FSIGUBSFGOMUUBSFGMOOUUBSFGMOOBUFSGMOOIIB']);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
   }
 
   /**
@@ -198,7 +198,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'label' => '"Legacy Test" <my@2.com>',
       'option_group_id' => 'from_email_address',
     ]);
-    $this->assertEquals(0, $optionValue['count']);
+    $this->assertSame(0, $optionValue['count']);
 
     $getValue = $this->callAPISuccess('option_value', 'getvalue', [
       'option_group_id' => 'from_email_address',
@@ -216,8 +216,8 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     ])['values'][0];
     $this->assertSame('"Legacy Test" <my@1.com>', $optionValue['label']);
     $this->assertSame('"Legacy Test" <my@1.com>', $optionValue['name']);
-    $this->assertEquals(1, $optionValue['domain_id']);
-    $this->assertEquals(1, $optionValue['api.site_email_address.delete']['count']);
+    $this->assertSame('1', $optionValue['domain_id']);
+    $this->assertSame(1, $optionValue['api.site_email_address.delete']['count']);
 
     $optionValue = $this->callAPISuccess('option_value', 'get', [
       'sequential' => 1,
@@ -227,15 +227,15 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'api.option_value.delete' => [],
     ])['values'][0];
     $this->assertSame('"An Updated Address" <new@2.com>', $optionValue['label']);
-    $this->assertEquals(2, $optionValue['domain_id']);
-    $this->assertEquals(1, $optionValue['api.site_email_address.delete']['count']);
+    $this->assertSame('2', $optionValue['domain_id']);
+    $this->assertSame(1, $optionValue['api.site_email_address.delete']['count']);
 
     // Option was deleted via chaining
     $optionValue = $this->callAPISuccess('option_value', 'get', [
       'label' => '"An Updated Address" <new@2.com>',
       'option_group_id' => 'from_email_address',
     ]);
-    $this->assertEquals(0, $optionValue['count']);
+    $this->assertSame(0, $optionValue['count']);
   }
 
   /**
@@ -413,7 +413,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'id' => $ov['id'],
       'return' => 'is_active',
     ]);
-    $this->assertEquals($val, 0, "update with no group id is not proper" . __LINE__);
+    $this->assertSame('0', $val, "update with no group id is not proper" . __LINE__);
   }
 
   /**
@@ -440,7 +440,7 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
       'id' => $ov['id'],
       'return' => 'is_active',
     ]);
-    $this->assertEquals($val, 0, "update with group id is not proper " . __LINE__);
+    $this->assertSame('0', $val, "update with group id is not proper " . __LINE__);
   }
 
   /**

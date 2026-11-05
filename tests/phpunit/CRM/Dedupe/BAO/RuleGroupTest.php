@@ -370,7 +370,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
     }
 
     // verify that all contacts have been created separately
-    $this->assertEquals(count($this->contactIDs), 2, 'Check for number of contacts.');
+    $this->assertSame(2, count($this->contactIDs), 'Check for number of contacts.');
 
     // Create our RuleGroup with one rule.
     $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [

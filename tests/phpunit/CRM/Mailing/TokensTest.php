@@ -77,7 +77,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
       $this->assertMatchesRegularExpression($expectRegex, $row->render('example'));
       $count++;
     }
-    $this->assertEquals(1, $count);
+    $this->assertSame(1, $count);
   }
 
   public function testListTokens() {
@@ -126,7 +126,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
       $this->assertMatchesRegularExpression($expectRegex, $row->render('example'));
       $count++;
     }
-    $this->assertEquals(1, $count);
+    $this->assertSame(1, $count);
   }
 
   public static function getExampleTokensForUseWithoutMailingJob() {

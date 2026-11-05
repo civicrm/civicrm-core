@@ -77,7 +77,7 @@ class api_v3_ContactBelongingsPermissionTest extends CiviUnitTestCase implements
       'id' => $email['id'],
       'check_permissions' => 1,
     ]);
-    $this->assertEquals(0, $result['is_error']);
+    $this->assertSame(0, $result['is_error']);
 
     $exists = Email::get(FALSE)->addWhere('id', '=', $email['id'])->execute()->first();
     $this->assertEmpty($exists);

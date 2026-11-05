@@ -139,10 +139,10 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
       ]
     );
 
-    $this->assertEquals(1, $repo->getActivityReferenceCount('Single Activity Type'));
-    $this->assertEquals(0, $repo->getActivityReferenceCount('First Activity Type'));
-    $this->assertEquals(0, $repo->getActivityReferenceCount('Second Activity Type'));
-    $this->assertEquals(0, $repo->getActivityReferenceCount('Third Activity Type'));
+    $this->assertSame(1, $repo->getActivityReferenceCount('Single Activity Type'));
+    $this->assertSame(0, $repo->getActivityReferenceCount('First Activity Type'));
+    $this->assertSame(0, $repo->getActivityReferenceCount('Second Activity Type'));
+    $this->assertSame(0, $repo->getActivityReferenceCount('Third Activity Type'));
   }
 
   public function testGetActivityReferenceCount_23(): void {
@@ -156,10 +156,10 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
       ]
     );
 
-    $this->assertEquals(0, $repo->getActivityReferenceCount('Single Activity Type'));
-    $this->assertEquals(2, $repo->getActivityReferenceCount('First Activity Type'));
-    $this->assertEquals(2, $repo->getActivityReferenceCount('Second Activity Type'));
-    $this->assertEquals(1, $repo->getActivityReferenceCount('Third Activity Type'));
+    $this->assertSame(0, $repo->getActivityReferenceCount('Single Activity Type'));
+    $this->assertSame(2, $repo->getActivityReferenceCount('First Activity Type'));
+    $this->assertSame(2, $repo->getActivityReferenceCount('Second Activity Type'));
+    $this->assertSame(1, $repo->getActivityReferenceCount('Third Activity Type'));
   }
 
   public function testGetRoleReferenceCount_1(): void {
@@ -172,10 +172,10 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
       ]
     );
 
-    $this->assertEquals(1, $repo->getRelationshipReferenceCount('Single Role'));
-    $this->assertEquals(0, $repo->getRelationshipReferenceCount('First Role'));
-    $this->assertEquals(0, $repo->getRelationshipReferenceCount('Second Role'));
-    $this->assertEquals(0, $repo->getRelationshipReferenceCount('Third Role'));
+    $this->assertSame(1, $repo->getRelationshipReferenceCount('Single Role'));
+    $this->assertSame(0, $repo->getRelationshipReferenceCount('First Role'));
+    $this->assertSame(0, $repo->getRelationshipReferenceCount('Second Role'));
+    $this->assertSame(0, $repo->getRelationshipReferenceCount('Third Role'));
   }
 
   public function testGetRoleReferenceCount_23(): void {
@@ -189,10 +189,10 @@ class CRM_Case_XMLRepositoryTest extends CiviUnitTestCase {
       ]
     );
 
-    $this->assertEquals(0, $repo->getRelationshipReferenceCount('Single Role'));
-    $this->assertEquals(2, $repo->getRelationshipReferenceCount('First Role'));
-    $this->assertEquals(2, $repo->getRelationshipReferenceCount('Second Role'));
-    $this->assertEquals(1, $repo->getRelationshipReferenceCount('Third Role'));
+    $this->assertSame(0, $repo->getRelationshipReferenceCount('Single Role'));
+    $this->assertSame(2, $repo->getRelationshipReferenceCount('First Role'));
+    $this->assertSame(2, $repo->getRelationshipReferenceCount('Second Role'));
+    $this->assertSame(1, $repo->getRelationshipReferenceCount('Third Role'));
   }
 
 }

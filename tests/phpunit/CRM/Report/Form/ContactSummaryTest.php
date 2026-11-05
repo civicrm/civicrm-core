@@ -187,7 +187,7 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
       // Ensure that we are only fetching primary fields.
       foreach ($rows as $row) {
         if ($row['civicrm_contact_id'] == $contactIDs['even_street_number_2']) {
-          $this->assertEquals(4, $row['civicrm_address_address_street_number']);
+          $this->assertSame('4', $row['civicrm_address_address_street_number']);
         }
       }
     }

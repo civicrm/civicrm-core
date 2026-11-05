@@ -119,7 +119,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       trim($queryObject->_where[0][0])
     );
     $this->assertSame('Test Date - greater than or equal to "June 6th, 2014 12:00 AM" AND less than or equal to "June 6th, 2015 11:59 PM"', $queryObject->_qill[0][0]);
-    $this->assertEquals(1, $queryObject->_whereTables['civicrm_contact']);
+    $this->assertSame(1, $queryObject->_whereTables['civicrm_contact']);
     $this->assertEquals('LEFT JOIN ' . $this->getCustomGroupTable() . ' ON ' . $this->getCustomGroupTable() . '.entity_id = `contact_a`.id', trim($queryObject->_whereTables[$this->getCustomGroupTable()]));
   }
 
@@ -157,7 +157,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       preg_replace('/\s+/', ' ', trim($queryObject->_fromClause))
     );
     $this->assertSame('Test Date - greater than or equal to "June 6th, 2014 12:00 AM"', $queryObject->_qill[0][0]);
-    $this->assertEquals(1, $queryObject->_whereTables['civicrm_contact']);
+    $this->assertSame(1, $queryObject->_whereTables['civicrm_contact']);
     $this->assertEquals('LEFT JOIN ' . $this->getCustomGroupTable() . ' ON ' . $this->getCustomGroupTable() . '.entity_id = `contact_a`.id', trim($queryObject->_whereTables[$this->getCustomGroupTable()]));
   }
 
@@ -538,7 +538,7 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
 
     $this->assertEquals([], $queryObject->_where[0]);
     $this->assertEquals($tableName . '.' . $fieldName . ' = 5', implode(', ', $queryObject->_where[1]));
-    $this->assertEquals(1, $queryObject->_whereTables['civicrm_contact']);
+    $this->assertSame(1, $queryObject->_whereTables['civicrm_contact']);
     $this->assertEquals("LEFT JOIN civicrm_address `Home-address` ON (`Home-address`.contact_id = contact_a.id AND `Home-address`.location_type_id = $homeLocationTypeID)", trim($queryObject->_whereTables['Home-address']));
     $this->assertSame("LEFT JOIN {$tableName} ON {$tableName}.entity_id = `Home-address`.id", trim($queryObject->_whereTables[$tableName]));
     $this->assertEquals([], $queryObject->_qill[0]);

@@ -84,10 +84,10 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
     $this->createTestEntity('SmsProvider', $values, 1);
     $this->createTestEntity('SmsProvider', array_merge($values, ['domain_id' => 2]), 2);
     $result = CRM_SMS_BAO_SmsProvider::activeProviderCount();
-    $this->assertEquals(1, $result);
+    $this->assertSame(1, $result);
     $this->createTestEntity('SmsProvider', array_merge($values, ['domain_id' => 1]), 3);
     $result = CRM_SMS_BAO_SmsProvider::activeProviderCount();
-    $this->assertEquals(2, $result);
+    $this->assertSame(2, $result);
   }
 
   /**

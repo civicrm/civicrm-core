@@ -29,21 +29,21 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     // Do things proper.
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID(123);
-    $this->assertEquals(123, $propertyBag->getContactID());
+    $this->assertSame(123, $propertyBag->getContactID());
 
     // Same but this time set contact ID with string.
     // (php should throw its own warnings about this because of the signature)
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID('123');
     $this->assertIsInt($propertyBag->getContactID());
-    $this->assertEquals(123, $propertyBag->getContactID());
+    $this->assertSame(123, $propertyBag->getContactID());
 
     // Test we can have different labels
     $propertyBag = new PropertyBag();
     $propertyBag->setContactID(123);
     $propertyBag->setContactID(456, 'new');
-    $this->assertEquals(123, $propertyBag->getContactID());
-    $this->assertEquals(456, $propertyBag->getContactID('new'));
+    $this->assertSame(123, $propertyBag->getContactID());
+    $this->assertSame(456, $propertyBag->getContactID('new'));
   }
 
   /**
@@ -130,7 +130,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       error_reporting($ignoreUserDeprecatedErrors);
       $propertyBag[$prop] = 123;
       error_reporting($oldLevel);
-      $this->assertEquals(123, $propertyBag->getContactID());
+      $this->assertSame(123, $propertyBag->getContactID());
 
       // Getting by array access should also cause deprecation error.
       try {
@@ -142,7 +142,7 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
       // But again, it should work.
       error_reporting($ignoreUserDeprecatedErrors);
-      $this->assertEquals(123, $propertyBag[$prop], "Getting '$prop' by array access should work");
+      $this->assertSame(123, $propertyBag[$prop], "Getting '$prop' by array access should work");
       error_reporting($oldLevel);
     }
   }
@@ -174,8 +174,8 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
       'contactID' => 123,
       'contributionRecurID' => 456,
     ]);
-    $this->assertEquals(123, $propertyBag->getContactID());
-    $this->assertEquals(456, $propertyBag->getContributionRecurID());
+    $this->assertSame(123, $propertyBag->getContactID());
+    $this->assertSame(456, $propertyBag->getContributionRecurID());
   }
 
   /**
@@ -362,10 +362,10 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $oldLevel = error_reporting();
     $ignoreUserDeprecatedErrors = $oldLevel & ~E_USER_DEPRECATED;
     error_reporting($ignoreUserDeprecatedErrors);
-    $this->assertEquals(123, \CRM_Utils_Array::value('contact_id', $propertyBag));
+    $this->assertSame(123, \CRM_Utils_Array::value('contact_id', $propertyBag));
 
     // Test that using utils array value to get a nonexistent property returns the default.
-    $this->assertEquals(456, \CRM_Utils_Array::value('ISawAManWhoWasntThere', $propertyBag, 456));
+    $this->assertSame(456, \CRM_Utils_Array::value('ISawAManWhoWasntThere', $propertyBag, 456));
     error_reporting($oldLevel);
   }
 
@@ -538,16 +538,16 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $propertyBag = new PropertyBag();
 
     $propertyBag->setter('contactID', 123);
-    $this->assertEquals(123, $propertyBag->getContactID(), "Failed testing that a valid property was set correctly");
+    $this->assertSame(123, $propertyBag->getContactID(), "Failed testing that a valid property was set correctly");
 
     $result = $propertyBag->getter('contactID');
-    $this->assertEquals(123, $result, "Failed testing the getter on a set property");
+    $this->assertSame(123, $result, "Failed testing the getter on a set property");
 
     $result = $propertyBag->getter('contactID', TRUE, 456);
-    $this->assertEquals(123, $result, "Failed testing the getter on a set property when providing a default");
+    $this->assertSame(123, $result, "Failed testing the getter on a set property when providing a default");
 
     $result = $propertyBag->getter('contributionRecurID', TRUE, 456);
-    $this->assertEquals(456, $result, "Failed testing the getter on an unset property when providing a default");
+    $this->assertSame(456, $result, "Failed testing the getter on an unset property when providing a default");
 
     try {
       $result = $propertyBag->getter('contributionRecurID', FALSE);
@@ -587,9 +587,9 @@ class PropertyBagTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     // Test labels.
     $propertyBag->setter('contactID', '100', 'original');
-    $this->assertEquals(123, $propertyBag->getContactID(), "Looks like the setter did not respect the label.");
-    $this->assertEquals(100, $propertyBag->getContactID('original'), "Failed to retrieve the labelled property");
-    $this->assertEquals(100, $propertyBag->getter('contactID', FALSE, NULL, 'original'), "Failed using the getter to retrieve the labelled property");
+    $this->assertSame(123, $propertyBag->getContactID(), "Looks like the setter did not respect the label.");
+    $this->assertSame(100, $propertyBag->getContactID('original'), "Failed to retrieve the labelled property");
+    $this->assertSame(100, $propertyBag->getter('contactID', FALSE, NULL, 'original'), "Failed using the getter to retrieve the labelled property");
 
   }
 

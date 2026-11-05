@@ -85,7 +85,7 @@ class SettingsBagTest extends \CiviUnitTestCase {
     $settingsBag = \Civi::settings();
 
     $settingsBag->set("enable_innodb_fts", "0");
-    $this->assertEquals(0, $settingsBag->get('enable_innodb_fts'));
+    $this->assertSame('0', $settingsBag->get('enable_innodb_fts'));
   }
 
   public function testMaxFileSizeDefault(): void {

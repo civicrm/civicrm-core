@@ -291,7 +291,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       CRM_Core_DAO::executeQuery('SET SESSION group_concat_max_len = ' . $originalMaxLen);
     }
 
-    $this->assertEquals(0, $added, 'Contacts already in the group were added again.');
+    $this->assertSame(0, $added, 'Contacts already in the group were added again.');
     $this->assertEquals(count($contactIDs), $notAdded);
     $this->assertEquals(count($contactIDs), $this->getSubscriptionHistoryCount($groupID),
       'A truncated presence check appended duplicate subscription history.');

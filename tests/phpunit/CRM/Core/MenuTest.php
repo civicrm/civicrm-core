@@ -27,7 +27,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $this->assertSame('The foo is one with the bar.', $menu['civicrm/foo/bar']['desc']);
     $this->assertSame('CRM_Foo_Page_Bar', $menu['civicrm/foo/bar']['page_callback']);
     $this->assertSame('Customize Data and Screens', $menu['civicrm/foo/bar']['adminGroup']);
-    $this->assertEquals('10', $menu['civicrm/foo/bar']['weight']);
+    $this->assertSame('10', $menu['civicrm/foo/bar']['weight']);
     $this->assertTrue(!isset($menu['civicrm/foo/bar']['ids_arguments']));
   }
 

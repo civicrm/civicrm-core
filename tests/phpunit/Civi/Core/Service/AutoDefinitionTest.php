@@ -471,7 +471,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
     $content = 'initial';
     $object = NULL;
     \CRM_Utils_Hook::alterContent($content, 'page', 'test.tpl', $object);
-    $this->assertEquals('initial[hookStyle]', $content);
+    $this->assertSame('initial[hookStyle]', $content);
   }
 
   /**

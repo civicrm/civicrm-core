@@ -33,9 +33,9 @@ class api_v3_UserTest extends CiviUnitTestCase {
 
   public function testUserGet(): void {
     $result = $this->callAPISuccess($this->_entity, 'get', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals($this->contactID, $result['values'][0]['contact_id']);
-    $this->assertEquals(6, $result['values'][0]['id']);
+    $this->assertSame('6', $result['values'][0]['id']);
     $this->assertSame('superman', $result['values'][0]['name']);
   }
 

@@ -133,7 +133,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
     $this->assertCount(1, $contacts);
     $this->assertEquals($contact1['id'], $contacts[0]['id']);
-    $this->assertEquals('+35355439483', $contacts[0]['phone.phone']);
+    $this->assertSame('+35355439483', $contacts[0]['phone.phone']);
     $this->assertEquals($this->getLocationTypeID('Home'), $contacts[0]['phone.location_type_id']);
   }
 
@@ -500,7 +500,7 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
     $this->assertCount(1, $contacts);
     $this->assertEquals($contact1['id'], $contacts[0]['id']);
-    $this->assertEquals('654321', $contacts[0]['phone.phone']);
+    $this->assertSame('654321', $contacts[0]['phone.phone']);
   }
 
   public function testJoinCaseRoles(): void {

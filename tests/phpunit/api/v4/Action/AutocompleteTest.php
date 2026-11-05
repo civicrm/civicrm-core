@@ -113,7 +113,7 @@ class AutocompleteTest extends Api4TestBase implements HookInterface, Transactio
       ->execute();
     $this->assertCount(2, $result);
     $this->assertSame('Black', $result[0]['label']);
-    $this->assertEquals('777777', $result[1]['color']);
+    $this->assertSame('777777', $result[1]['color']);
     $this->assertEquals($entities[1]['identifier'], $result[1]['id']);
     $this->assertEquals($entities[2]['identifier'], $result[0]['id']);
 

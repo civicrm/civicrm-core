@@ -129,8 +129,8 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
       ->execute();
 
     // Start condition: We have a few people "Added"
-    $this->assertEquals(2, $getMembers('Added')->count());
-    $this->assertEquals(0, $getMembers('Removed')->count());
+    $this->assertSame(2, $getMembers('Added')->count());
+    $this->assertSame(0, $getMembers('Removed')->count());
 
     foreach ($allMessages as $k => $message) {
       // Extract the unsubscribe URL(s)
@@ -147,19 +147,19 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
       // Older clients (RFC 2369 only) will open a browser for the unsubscribe page.
       // Let's make sure it shows a suitable web-page.
       $get = $client->sendRequest(new Request('GET', $url));
-      $this->assertEquals(200, $get->getStatusCode());
+      $this->assertSame(200, $get->getStatusCode());
       $this->assertMatchesRegularExpression(';You are requesting to unsubscribe;', (string) $get->getBody());
 
       // Newer clients (RFC 8058) will send headless HTTP POST.
       // This is how we will actually unsubscribe.
       $post = $client->sendRequest(new Request('POST', $url, [], $message->headers['List-Unsubscribe-Post'][0]));
-      $this->assertEquals(200, $post->getStatusCode());
+      $this->assertSame(200, $post->getStatusCode());
       $this->assertSame('OK', trim((string) $post->getBody()));
     }
 
     // The HTTP POSTs removed the members.
-    $this->assertEquals(0, $getMembers('Added')->count());
-    $this->assertEquals(2, $getMembers('Removed')->count());
+    $this->assertSame(0, $getMembers('Added')->count());
+    $this->assertSame(2, $getMembers('Removed')->count());
   }
 
   /**

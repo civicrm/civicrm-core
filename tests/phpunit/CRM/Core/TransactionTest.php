@@ -286,7 +286,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
       $this->fail('The error should reach the caller');
     }
     catch (RuntimeException $e) {
-      $this->assertEquals('Pre-commit failed', $e->getMessage());
+      $this->assertSame('Pre-commit failed', $e->getMessage());
     }
     $this->assertContactsExistByOffset([0 => FALSE]);
     $this->assertEquals([['_postRollback', 'lkj', ';']], $this->callbackLog);

@@ -176,10 +176,10 @@ AFFORM;
     // Legacy contact_type should have been converted to entity type
     $this->assertSame('Organization', $entity[0]['type']);
     $this->assertCount(1, $entity[0]['data']);
-    $this->assertEquals(1, $entity[0]['data']['num']);
+    $this->assertSame(1, $entity[0]['data']['num']);
     $this->assertSame('Household', $entity[1]['type']);
     $this->assertCount(1, $entity[1]['data']);
-    $this->assertEquals(2, $entity[1]['data']['thing']);
+    $this->assertSame(2, $entity[1]['data']['thing']);
     $this->assertSame('Individual', $entity[2]['type']);
     $this->assertCount(0, $entity[2]['data']);
   }

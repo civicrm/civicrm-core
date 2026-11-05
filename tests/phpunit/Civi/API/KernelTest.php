@@ -92,7 +92,7 @@ class KernelTest extends \CiviUnitTestCase {
     ];
     $this->assertEquals($expectedEventSequence, $this->actualEventSequence);
     $this->assertSame('Frobnication encountered an exception', $result['error_message']);
-    $this->assertEquals(1, $result['is_error']);
+    $this->assertSame(1, $result['is_error']);
   }
 
   public function testErrorException(): void {

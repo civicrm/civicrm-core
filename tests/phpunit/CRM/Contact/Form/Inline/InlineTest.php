@@ -144,7 +144,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
-    $this->assertEquals(0, $this->getForContact('Email')->count());
+    $this->assertSame(0, $this->getForContact('Email')->count());
   }
 
   /**
@@ -294,7 +294,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
-    $this->assertEquals(0, $this->getForContact('Phone')->count());
+    $this->assertSame(0, $this->getForContact('Phone')->count());
   }
 
   /**
@@ -394,7 +394,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
-    $this->assertEquals(0, $this->getForContact('Im')->count());
+    $this->assertSame(0, $this->getForContact('Im')->count());
   }
 
   /**
@@ -485,7 +485,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
-    $this->assertEquals(0, $this->getForContact('OpenID')->count());
+    $this->assertSame(0, $this->getForContact('OpenID')->count());
   }
 
   /**
@@ -563,7 +563,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
-    $this->assertEquals(0, $this->getForContact('Website')->count());
+    $this->assertSame(0, $this->getForContact('Website')->count());
   }
 
   /**
@@ -702,7 +702,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $formWrapper->processForm();
 
     $updated = $this->getForContact('Contact')->first();
-    $this->assertEquals(1, $updated['gender_id']);
+    $this->assertSame(1, $updated['gender_id']);
     $this->assertSame('1951-01-01', $updated['birth_date']);
     $this->assertTrue((bool) $updated['is_deceased']);
     $this->assertSame('2020-05-15', $updated['deceased_date']);
@@ -910,7 +910,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $userContact)
       ->execute()->first();
     $this->assertEquals($secretOrg['id'], $userRecord['employer_id']);
-    $this->assertEquals('Organizer', $userRecord['job_title']);
+    $this->assertSame('Organizer', $userRecord['job_title']);
   }
 
   /**
@@ -1056,7 +1056,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $sharedAddress['id'])
       ->execute()->single();
     $this->assertEquals($masterAddress['id'], $address['master_id']);
-    $this->assertEquals('500 Shared Lane', $address['street_address']);
+    $this->assertSame('500 Shared Lane', $address['street_address']);
   }
 
 }

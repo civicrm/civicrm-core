@@ -306,7 +306,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals($relationshipObj->relationship_type_id, $relationship_type_id_1);
     $this->assertEquals($relationshipObj->contact_id_a, $contact_id_1);
     $this->assertEquals($relationshipObj->contact_id_b, $contact_id_2);
-    $this->assertEquals($relationshipObj->is_active, 1);
+    $this->assertSame(1, $relationshipObj->is_active);
 
     // demonstrate PR 15103 - should fail before the patch and pass after
     $today = date('Ymd');
@@ -318,7 +318,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->assertEquals($relationshipObj->relationship_type_id, $relationship_type_id_1);
     $this->assertEquals($relationshipObj->contact_id_a, $contact_id_1);
     $this->assertEquals($relationshipObj->contact_id_b, $contact_id_2);
-    $this->assertEquals($relationshipObj->is_active, 1);
+    $this->assertSame('1', $relationshipObj->is_active);
     $this->assertEquals($relationshipObj->end_date, $today);
   }
 
@@ -408,9 +408,9 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
 
     $result = CRM_Contact_BAO_Relationship::createMultiple($params, 'a');
 
-    $this->assertEquals(1, $result['valid']);
-    $this->assertEquals(1, $result['duplicate']);
-    $this->assertEquals(1, $result['invalid']);
+    $this->assertSame(1, $result['valid']);
+    $this->assertSame(1, $result['duplicate']);
+    $this->assertSame(1, $result['invalid']);
     $this->assertCount(1, $result['relationship_ids']);
 
     // Verify created relationship in DB
@@ -442,9 +442,9 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
 
     $resultB = CRM_Contact_BAO_Relationship::createMultiple($paramsB, 'b');
 
-    $this->assertEquals(1, $resultB['valid']);
-    $this->assertEquals(1, $resultB['duplicate']);
-    $this->assertEquals(2, $resultB['invalid']);
+    $this->assertSame(1, $resultB['valid']);
+    $this->assertSame(1, $resultB['duplicate']);
+    $this->assertSame(2, $resultB['invalid']);
     $this->assertCount(1, $resultB['relationship_ids']);
 
     $createdRelB = Relationship::get(FALSE)

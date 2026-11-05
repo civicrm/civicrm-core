@@ -49,7 +49,7 @@ class api_v3_EntityBatchTest extends CiviUnitTestCase {
    */
   public function testCreateEntityBatch(): void {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
@@ -60,7 +60,7 @@ class api_v3_EntityBatchTest extends CiviUnitTestCase {
   public function testGetEntityBatch(): void {
     $this->callAPISuccess($this->_entity, 'create', $this->params);
     $result = $this->callAPISuccess($this->_entity, 'get', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
   }
@@ -73,7 +73,7 @@ class api_v3_EntityBatchTest extends CiviUnitTestCase {
     $deleteParams = ['id' => $result['id']];
     $this->callAPISuccess($this->_entity, 'delete', $deleteParams);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
-    $this->assertEquals(0, $checkDeleted['count']);
+    $this->assertSame(0, $checkDeleted['count']);
   }
 
   /**
@@ -97,7 +97,7 @@ class api_v3_EntityBatchTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_financial_trxn',
     ];
     $result = $this->callAPISuccess($this->_entity, 'create', $firstEntityBatchParams);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $secondContributionId = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'currency' => 'CAD']);
 
     $secondFinancialTrxnId = array_values($this->callAPISuccess('EntityFinancialTrxn', 'get', [

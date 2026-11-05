@@ -81,8 +81,8 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $daoReloaded->id = $dao->id;
     $daoReloaded->find(TRUE);
     $data = unserialize($daoReloaded->data);
-    $this->assertEquals(2, $data['srcID']);
-    $this->assertEquals(1, $data['dstID']);
+    $this->assertSame(2, $data['srcID']);
+    $this->assertSame(1, $data['dstID']);
 
     // Also test single scalar pnid
     $_REQUEST['pnid'] = $dao->id;
@@ -98,8 +98,8 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $daoReloaded->id = $dao->id;
     $daoReloaded->find(TRUE);
     $data = unserialize($daoReloaded->data);
-    $this->assertEquals(1, $data['srcID']);
-    $this->assertEquals(2, $data['dstID']);
+    $this->assertSame(1, $data['srcID']);
+    $this->assertSame(2, $data['dstID']);
   }
 
   /**
@@ -354,7 +354,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $parentTagTreeResult = CRM_Admin_Page_AJAX::getTagTree();
     foreach ($parentTagTreeResult as $result) {
       if ($result['id'] == $parentTag['id']) {
-        $this->assertEquals(1, $result['data']['usages']);
+        $this->assertSame(1, $result['data']['usages']);
       }
     }
 
@@ -362,13 +362,13 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     //  as it should include the count of added one contact
     $_GET['parent_id'] = $parentTag['id'];
     $childTagTree = CRM_Admin_Page_AJAX::getTagTree();
-    $this->assertEquals(1, $childTagTree[0]['data']['usages']);
+    $this->assertSame(1, $childTagTree[0]['data']['usages']);
 
     // CASE 2 : check the usage count of child tag at level 2
     //which needs to be 1 as it has no child tag
     $_GET['parent_id'] = $childTag1['id'];
     $childTagTree = CRM_Admin_Page_AJAX::getTagTree();
-    $this->assertEquals(1, $childTagTree[0]['data']['usages']);
+    $this->assertSame(1, $childTagTree[0]['data']['usages']);
 
     // CASE 3 : check the tag IDs returned on searching with 'Level'
     //  which needs to array('parent tag id', 'level 1 child tag id', 'level 2 child tag id')
@@ -483,7 +483,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT is_selected FROM civicrm_prevnext_cache WHERE id = %1",
       [1 => [$pnid, 'Integer']]
     );
-    $this->assertEquals(1, $isSelected);
+    $this->assertSame('1', $isSelected);
   }
 
   /**
@@ -533,7 +533,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT count(*) FROM civicrm_prevnext_cache WHERE cachekey = %1 AND is_selected = 1",
       [1 => [$cacheKey, 'String']]
     );
-    $this->assertEquals(2, $selectedCount);
+    $this->assertSame('2', $selectedCount);
   }
 
   /**
@@ -573,7 +573,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT is_selected FROM civicrm_prevnext_cache WHERE id = %1",
       [1 => [$pnid, 'Integer']]
     );
-    $this->assertEquals(0, $isSelected, 'Row should not be updated when cacheKey is only a prefix.');
+    $this->assertSame('0', $isSelected, 'Row should not be updated when cacheKey is only a prefix.');
   }
 
   /**
@@ -623,7 +623,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT count(*) FROM civicrm_dedupe_exception WHERE contact_id1 = %1 AND contact_id2 = %2",
       [1 => [$c1, 'Positive'], 2 => [$c2, 'Positive']]
     );
-    $this->assertEquals(1, $exceptionExists);
+    $this->assertSame('1', $exceptionExists);
 
     // 2. Remove exception
     $_POST = $_REQUEST = [
@@ -643,7 +643,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT count(*) FROM civicrm_dedupe_exception WHERE contact_id1 = %1 AND contact_id2 = %2",
       [1 => [$c1, 'Positive'], 2 => [$c2, 'Positive']]
     );
-    $this->assertEquals(0, $exceptionExistsAfter);
+    $this->assertSame('0', $exceptionExistsAfter);
   }
 
   /**

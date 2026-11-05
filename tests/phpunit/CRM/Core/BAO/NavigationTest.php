@@ -202,9 +202,9 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     CRM_Core_BAO_Navigation::fixNavigationMenu($output);
 
     $this->assertNull($output[10]['attributes']['parentID']);
-    $this->assertEquals(10, $output[10]['attributes']['navID']);
-    $this->assertEquals(10, $output[10]['child'][11]['attributes']['parentID']);
-    $this->assertEquals(11, $output[10]['child'][11]['attributes']['navID']);
+    $this->assertSame(10, $output[10]['attributes']['navID']);
+    $this->assertSame(10, $output[10]['child'][11]['attributes']['parentID']);
+    $this->assertSame(11, $output[10]['child'][11]['attributes']['navID']);
   }
 
   /**
@@ -241,15 +241,15 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
 
     $this->assertSame('Custom Menu Entry', $output[10]['attributes']['label']);
     $this->assertNull($output[10]['attributes']['parentID']);
-    $this->assertEquals(10, $output[10]['attributes']['navID']);
+    $this->assertSame(10, $output[10]['attributes']['navID']);
 
     $this->assertSame('Custom Child Menu', $output[10]['child'][101]['attributes']['label']);
-    $this->assertEquals(10, $output[10]['child'][101]['attributes']['parentID']);
-    $this->assertEquals(101, $output[10]['child'][101]['attributes']['navID']);
+    $this->assertSame(10, $output[10]['child'][101]['attributes']['parentID']);
+    $this->assertSame(101, $output[10]['child'][101]['attributes']['navID']);
 
     $this->assertSame('Custom Child Menu 2', $output[10]['child'][100]['attributes']['label']);
-    $this->assertEquals(10, $output[10]['child'][100]['attributes']['parentID']);
-    $this->assertEquals(100, $output[10]['child'][100]['attributes']['navID']);
+    $this->assertSame(10, $output[10]['child'][100]['attributes']['parentID']);
+    $this->assertSame(100, $output[10]['child'][100]['attributes']['navID']);
   }
 
   public function testFixNavigationMenu_inferIDs_deep(): void {
@@ -283,15 +283,15 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
 
     $this->assertSame('Custom Menu Entry', $output[10]['attributes']['label']);
     $this->assertNull($output[10]['attributes']['parentID']);
-    $this->assertEquals(10, $output[10]['attributes']['navID']);
+    $this->assertSame(10, $output[10]['attributes']['navID']);
 
     $this->assertSame('Custom Child Menu', $output[10]['child'][101]['attributes']['label']);
-    $this->assertEquals(10, $output[10]['child'][101]['attributes']['parentID']);
-    $this->assertEquals(101, $output[10]['child'][101]['attributes']['navID']);
+    $this->assertSame(10, $output[10]['child'][101]['attributes']['parentID']);
+    $this->assertSame(101, $output[10]['child'][101]['attributes']['navID']);
 
     $this->assertSame('Custom Child Menu 2', $output[10]['child'][101]['child'][100]['attributes']['label']);
-    $this->assertEquals(101, $output[10]['child'][101]['child'][100]['attributes']['parentID']);
-    $this->assertEquals(100, $output[10]['child'][101]['child'][100]['attributes']['navID']);
+    $this->assertSame(101, $output[10]['child'][101]['child'][100]['attributes']['parentID']);
+    $this->assertSame(100, $output[10]['child'][101]['child'][100]['attributes']['navID']);
   }
 
   /**

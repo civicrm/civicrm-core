@@ -107,14 +107,14 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
     $params['contribution_payment_instrument_id']
       = $this->getPaymentInstrumentID('Check');
     $result = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId, $returnvalues, $notPresent, $params, TRUE)->fetchAll();
-    $this->assertEquals(count($result), 1, 'In line' . __LINE__);
+    $this->assertSame(1, count($result), 'In line' . __LINE__);
     $this->assertEquals($result[0]['payment_method'], $this->getPaymentInstrumentID('Check'), 'In line' . __LINE__);
     $params['financial_type_id'] = implode(',', [
       $this->getFinancialTypeID('Donation'),
       $this->getFinancialTypeID('Member Dues'),
     ]);
     $result = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId, $returnvalues, $notPresent, $params, TRUE)->fetchAll();
-    $this->assertEquals(count($result), 1, 'In line' . __LINE__);
+    $this->assertSame(1, count($result), 'In line' . __LINE__);
   }
 
   /**

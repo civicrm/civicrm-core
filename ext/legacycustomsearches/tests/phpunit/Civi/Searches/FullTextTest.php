@@ -111,13 +111,13 @@ class FullTextTest extends TestCase implements HeadlessInterface, HookInterface 
       elseif ($dao->table_name == 'Contribution') {
         $this->assertEquals($contactId, $dao->contact_id);
         $this->assertSame('gambling debt recovery', $dao->contribution_source);
-        $this->assertEquals('10.00', $dao->contribution_total_amount);
+        $this->assertSame('10.00', $dao->contribution_total_amount);
       }
       else {
         $this->fail('Unexpected table in results: ' . $dao->table_name);
       }
     }
-    $this->assertEquals(2, $count, 'Should be exactly 2 records in the results');
+    $this->assertSame(2, $count, 'Should be exactly 2 records in the results');
   }
 
 }

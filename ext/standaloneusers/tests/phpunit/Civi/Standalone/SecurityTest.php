@@ -237,7 +237,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ->setPassword('fingersCrossed')
       ->execute();
 
-    $this->assertEquals(1, $result['success']);
+    $this->assertSame(1, $result['success']);
     $user = User::get(FALSE)->addWhere('id', '=', $userID)->execute()->single();
     $this->assertTrue($security->checkPassword(['password' => 'fingersCrossed'], $user));
 

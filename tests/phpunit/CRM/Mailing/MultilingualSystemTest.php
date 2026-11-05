@@ -157,7 +157,7 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
 
     $allMessages = $mut->getAllMessages('ezc');
     // There are exactly two contacts produced by setUp().
-    $this->assertEquals(2, count($allMessages));
+    $this->assertSame(2, count($allMessages));
 
     // We need a new group
     $group_2 = $this->createTestEntity('Group', [
@@ -187,14 +187,14 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
 
     $allMessages = $mut->getAllMessages('ezc');
     // We should have 2+2 messages sent by the mail system now.
-    $this->assertEquals(4, count($allMessages));
+    $this->assertSame(4, count($allMessages));
 
     // So far so good.
     // Now extract the unsubscribe details.
     $message = end($allMessages);
     $this->assertTrue($message->body instanceof ezcMailText);
     $this->assertSame('plain', $message->body->subType);
-    $this->assertEquals(1, preg_match(
+    $this->assertSame(1, preg_match(
       '@mailing/unsubscribe.*jid=(\d+)&qid=(\d+)&h=([0-9a-z]+)@',
       $message->body->text,
       $matches

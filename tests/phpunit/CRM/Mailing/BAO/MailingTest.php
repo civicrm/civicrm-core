@@ -415,7 +415,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
     $mailing = Mailing::create(FALSE)->setValues(['name' => 'bob', 'scheduled_date' => 'tomorrow'])->execute()->first();
     $jobs = MailingJob::get(FALSE)->execute();
-    $this->assertEquals(0, $jobs->rowCount);
+    $this->assertSame(0, $jobs->rowCount);
     MailingJob::create(FALSE)->setValues([
       'mailing_id' => $mailing['id'],
     ])->execute();
@@ -580,7 +580,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $recipients = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']]);
 
     // Check the count is correct
-    $this->assertEquals(3, $recipients['count'], 'Check recipient count');
+    $this->assertSame(3, $recipients['count'], 'Check recipient count');
 
     // Check we got the 'primary' mobile for contacts or the other phone when the primary was no SMS capable.
     foreach ($recipients['values'] as $value) {
@@ -671,7 +671,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
           'return' => 'email',
         ],
       ]);
-      $this->assertEquals(1, $mailingRecipients['count'], 'Check recipient count');
+      $this->assertSame(1, $mailingRecipients['count'], 'Check recipient count');
       $this->assertSame('ghi@test.com', $mailingRecipients['values'][$mailingRecipients['id']]['api.Email.getvalue'], 'Check if recipient email belong to deceased contact');
     }
   }

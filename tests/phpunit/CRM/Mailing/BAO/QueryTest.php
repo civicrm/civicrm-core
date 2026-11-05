@@ -75,8 +75,8 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
     $totalOpenedMailCount = CRM_Mailing_Event_BAO_MailingEventOpened::getTotalCount($mailingID, NULL, TRUE);
     $totalOpenedMail = CRM_Mailing_Event_BAO_MailingEventOpened::getRows($mailingID, NULL, TRUE);
 
-    $this->assertEquals(4, $totalOpenedMailCount);
-    $this->assertEquals(4, count($totalOpenedMail));
+    $this->assertSame(4, $totalOpenedMailCount);
+    $this->assertSame(4, count($totalOpenedMail));
   }
 
   /**
@@ -94,9 +94,9 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
     $totalTrackableUrlCount = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getTotalCount($mailingID, NULL, FALSE, $trackableURLID);
     $totalTrackableUrlMail = CRM_Mailing_Event_BAO_MailingEventTrackableURLOpen::getRows($mailingID, NULL, TRUE, $trackableURLID);
 
-    $this->assertEquals(3, $totalDistinctTrackableUrlCount, "Accurately display distinct count of unique trackable URLs");
-    $this->assertEquals(4, $totalTrackableUrlCount, "Accurately display count of unique trackable URLs");
-    $this->assertEquals(3, count($totalTrackableUrlMail), "Accurately display list of unique trackable URLs and who clicked them.");
+    $this->assertSame('3', $totalDistinctTrackableUrlCount, "Accurately display distinct count of unique trackable URLs");
+    $this->assertSame('4', $totalTrackableUrlCount, "Accurately display count of unique trackable URLs");
+    $this->assertSame(3, count($totalTrackableUrlMail), "Accurately display list of unique trackable URLs and who clicked them.");
   }
 
 }

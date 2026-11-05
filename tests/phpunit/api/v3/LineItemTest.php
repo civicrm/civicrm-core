@@ -71,8 +71,8 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
     $this->params['financial_type_id'] = 'Donation';
     $result = $this->callAPISuccess('LineItem', 'create', $this->params);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['id' => $result['id']]);
-    $this->assertEquals(5, $lineItem['tax_amount']);
-    $this->assertEquals(50, $lineItem['line_total']);
+    $this->assertEquals('5.00', $lineItem['tax_amount']);
+    $this->assertEquals('50.00', $lineItem['line_total']);
   }
 
   /**
@@ -111,7 +111,7 @@ class api_v3_LineItemTest extends CiviUnitTestCase {
    */
   public function testGetFieldsLineItem(): void {
     $result = $this->callAPISuccess('LineItem', 'getfields', ['action' => 'create']);
-    $this->assertEquals(1, $result['values']['entity_id']['api.required']);
+    $this->assertSame(1, $result['values']['entity_id']['api.required']);
   }
 
 }

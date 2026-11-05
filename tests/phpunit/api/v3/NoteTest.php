@@ -328,7 +328,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_contact',
       'entity_id.contact_type' => 'Individual',
     ]);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
   }
 
   /**

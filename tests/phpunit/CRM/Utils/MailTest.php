@@ -176,7 +176,7 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
       'Return-Path' => 'bounce@example.com',
     ], 'body text');
 
-    $this->assertEquals('-fbounce@example.com', $mockDelegate->_params);
+    $this->assertSame('-fbounce@example.com', $mockDelegate->_params);
   }
 
   /**
@@ -192,7 +192,7 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
       'From' => 'Bob <bob@example.com>',
     ], 'body text');
 
-    $this->assertEquals('-fbob@example.com', $mockDelegate->_params);
+    $this->assertSame('-fbob@example.com', $mockDelegate->_params);
   }
 
   /**
@@ -210,7 +210,7 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
 
     $this->assertTrue(is_a($result, 'PEAR_Error'));
     $this->assertStringContainsString('Outbound Email', $result->getMessage());
-    $this->assertEquals(550, $result->getCode());
+    $this->assertSame(550, $result->getCode());
   }
 
   /**
@@ -225,7 +225,7 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
     $result = $mailer->send('to@example.com', ['To' => 'to@example.com'], 'body text');
 
     $this->assertTrue(is_a($result, 'PEAR_Error'));
-    $this->assertEquals('Failed to set sender', $result->getMessage());
+    $this->assertSame('Failed to set sender', $result->getMessage());
   }
 
   /**

@@ -46,7 +46,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     ];
 
     $generatedEntities = $recursion->generate();
-    $this->assertEquals(5, count($generatedEntities['civicrm_activity']), "Cehck if number of iterations are 5");
+    $this->assertSame(5, count($generatedEntities['civicrm_activity']), "Cehck if number of iterations are 5");
     $expectedDates = [
       '20141025103000',
       '20150124103000',
@@ -75,7 +75,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       $actualDates[] = date('YmdHis', strtotime(CRM_Core_DAO::getFieldValue('CRM_Activity_DAO_Activity', $entityID, 'activity_date_time', 'id')));
     }
     $resultDates = array_diff($actualDates, $expectedDates);
-    $this->assertEquals(0, count($resultDates), "Check if all the value in expected array matches actual array");
+    $this->assertSame(0, count($resultDates), "Check if all the value in expected array matches actual array");
 
   }
 
@@ -140,8 +140,8 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       'financial_type_id:name' => 'Event Fee',
     ], 'second')['id'];
     $finalResult = CRM_Core_BAO_RecurringEntity::updateModeAndPriceSet($entity_id, $entity_table, CRM_Core_BAO_RecurringEntity::MODE_ALL_ENTITY_IN_SERIES, [], $priceSetID);
-    $this->assertEquals(2, count($recurringEntities["civicrm_event"]), "Recurring events not created.");
-    $this->assertEquals(2, count($recurringEntities["civicrm_price_set_entity"]), "Recurring price sets not created.");
+    $this->assertSame(2, count($recurringEntities["civicrm_event"]), "Recurring events not created.");
+    $this->assertSame(2, count($recurringEntities["civicrm_price_set_entity"]), "Recurring price sets not created.");
     $priceSetOne = CRM_Price_BAO_PriceSet::getFor($entity_table, $recurringEntities["civicrm_event"][0]);
     $priceSetTwo = CRM_Price_BAO_PriceSet::getFor($entity_table, $recurringEntities["civicrm_event"][1]);
     $this->assertEquals($priceSetID, $priceSetOne, "Price set id of the recurring event is not updated.");
@@ -223,7 +223,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     }
 
     $resultDates = array_diff($actualDates, $expectedDates);
-    $this->assertEquals(0, count($resultDates), "Check if all the value in expected array matches actual array");
+    $this->assertSame(0, count($resultDates), "Check if all the value in expected array matches actual array");
 
     foreach ($generatedEntities['civicrm_pcp_block'] as $key => $val) {
       $this->assertDBNotNull('CRM_PCP_DAO_PCPBlock', $val, 'id', 'id', 'Check if PCP blocks were created in loop');
@@ -353,7 +353,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $generatedEntities = $recursion->generate();
     $generatedActivities = $generatedEntities['civicrm_activity'];
 
-    $this->assertEquals(3, count($generatedActivities), "Check if number of iterations are 3");
+    $this->assertSame(3, count($generatedActivities), "Check if number of iterations are 3");
 
     foreach ($generatedActivities as $generatedActivityId) {
 
@@ -409,7 +409,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
       ->addWhere('subject', '=', 'minute unit test')
       ->execute()
       ->column('activity_date_time');
-    $this->assertEquals(5, count($activities));
+    $this->assertSame(5, count($activities));
     $expectedTimestamps = ['2021-11-11 15:00:00', '2021-11-11 15:20:00', '2021-11-11 15:40:00', '2021-11-11 16:00:00', '2021-11-11 16:20:00'];
     $this->assertEquals($expectedTimestamps, $activities);
   }

@@ -782,7 +782,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     // 2nd link is to delete
     $this->assertSame('fa-trash', $result[0]['columns'][1]['links'][1]['icon']);
     // Ensure "empty" titles are still returned
-    $this->assertEquals('0', $result[0]['columns'][1]['links'][1]['title']);
+    $this->assertSame('0', $result[0]['columns'][1]['links'][1]['title']);
     // 3rd link is the disable task for active relationships or the enable task for inactive ones
     $this->assertSame('disable', $result[0]['columns'][1]['links'][2]['task']);
     $this->assertSame('disable', $result[1]['columns'][1]['links'][2]['task']);
@@ -1992,7 +1992,7 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result);
     $this->assertSame(6, $result[0]['data']['COUNT_id']);
-    $this->assertEquals('123', $result[0]['data']['Contact_Address_contact_id_01.street_address']);
+    $this->assertSame('123', $result[0]['data']['Contact_Address_contact_id_01.street_address']);
     sort($result[0]['data']['GROUP_CONCAT_contact_type_label']);
     $this->assertEquals(['Household', 'Individual', 'Organization'], $result[0]['data']['GROUP_CONCAT_contact_type_label']);
   }

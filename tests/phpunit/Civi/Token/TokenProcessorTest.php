@@ -136,11 +136,11 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       ]);
     $gotRow = $p->getRow(0);
     foreach ([$createdRow, $gotRow] as $row) {
-      $this->assertEquals(1, $row->context['one']);
-      $this->assertEquals(3, $row->context['two'][2]);
-      $this->assertEquals(5, $row->context['two'][4]);
-      $this->assertEquals(7, $row->context['three'][6]);
-      $this->assertEquals(98, $row->context['omega']);
+      $this->assertSame(1, $row->context['one']);
+      $this->assertSame(3, $row->context['two'][2]);
+      $this->assertSame(5, $row->context['two'][4]);
+      $this->assertSame(7, $row->context['three'][6]);
+      $this->assertSame('98', $row->context['omega']);
       $this->assertEquals(__CLASS__, $row->context['controller']);
     }
   }
@@ -179,11 +179,11 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       ->tokens('four', 8, 9);
     $gotRow = $p->getRow(0);
     foreach ([$createdRow, $gotRow] as $row) {
-      $this->assertEquals(1, $row->tokens['one']);
-      $this->assertEquals(3, $row->tokens['two'][2]);
-      $this->assertEquals(5, $row->tokens['two'][4]);
-      $this->assertEquals(7, $row->tokens['three'][6]);
-      $this->assertEquals(9, $row->tokens['four'][8]);
+      $this->assertSame(1, $row->tokens['one']);
+      $this->assertSame(3, $row->tokens['two'][2]);
+      $this->assertSame(5, $row->tokens['two'][4]);
+      $this->assertSame(7, $row->tokens['three'][6]);
+      $this->assertSame(9, $row->tokens['four'][8]);
     }
   }
 
@@ -231,7 +231,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $this->assertEquals($expectText[$key], $row->render('text'));
       $rowCount++;
     }
-    $this->assertEquals(3, $rowCount);
+    $this->assertSame(3, $rowCount);
   }
 
   public function testRenderLocalizedHookToken(): void {
@@ -275,7 +275,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $this->assertEquals($expectText[$key], $row->render('text'));
       $rowCount++;
     }
-    $this->assertEquals(3, $rowCount);
+    $this->assertSame(3, $rowCount);
   }
 
   /**
@@ -354,7 +354,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $this->assertEquals($expectText[$key], $row->render('text'));
       $rowCount++;
     }
-    $this->assertEquals(1, $rowCount);
+    $this->assertSame(1, $rowCount);
   }
 
   /**
@@ -391,7 +391,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $this->assertEquals($expectText[$key], $row->render('text'));
       $rowCount++;
     }
-    $this->assertEquals(1, $rowCount);
+    $this->assertSame(1, $rowCount);
   }
 
   public function testGetMessageTokens(): void {
@@ -461,10 +461,10 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $this->assertEquals($expectText[$key], $row->render('greeting_text'));
       $rowCount++;
     }
-    $this->assertEquals(3, $rowCount);
+    $this->assertSame(3, $rowCount);
     // This may change in the future.
-    $this->assertEquals(0, $this->counts['onListTokens']);
-    $this->assertEquals(1, $this->counts['onEvalTokens']);
+    $this->assertSame(0, $this->counts['onListTokens']);
+    $this->assertSame(1, $this->counts['onEvalTokens']);
   }
 
   public static function getFilterExamples(): array {
@@ -718,7 +718,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
         $this->assertSame('!!!!', $row->render('not_real_4'));
       }
     }
-    $this->assertEquals(2, $loops);
+    $this->assertSame(2, $loops);
   }
 
   /**
