@@ -62,7 +62,7 @@ class ActionObjectProvider extends AutoService implements ProviderInterface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    *
    * @param \Civi\Api4\Generic\AbstractAction $action
    *
@@ -147,7 +147,7 @@ class ActionObjectProvider extends AutoService implements ProviderInterface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @param int $version
    * @return array
    */
@@ -156,7 +156,7 @@ class ActionObjectProvider extends AutoService implements ProviderInterface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @param int $version
    * @param string $entity
    * @return array

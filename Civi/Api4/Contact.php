@@ -127,7 +127,7 @@ class Contact extends Generic\DAOEntity {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getInfo(): array {
     $info = parent::getInfo();

@@ -563,7 +563,7 @@ trait ContributionPageTestTrait {
    */
   public function setDummyProcessorResult(array $result): \CRM_Core_Payment_Dummy {
     try {
-      /* @var \CRM_Core_Payment_Dummy $dummyPaymentProcessor */
+      /** @var \CRM_Core_Payment_Dummy $dummyPaymentProcessor */
       $dummyPaymentProcessor = System::singleton()->getById($this->ids['PaymentProcessor']['dummy']);
       $dummyPaymentProcessor->setDoDirectPaymentResult($result);
       return $dummyPaymentProcessor;

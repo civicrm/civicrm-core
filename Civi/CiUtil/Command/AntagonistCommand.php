@@ -16,7 +16,7 @@ class AntagonistCommand {
       print "usage: {$argv[0]} <TargetTest::testFunc> </path/to/suite>\n";
       exit(1);
     }
-    list ($program, $target, $suite) = $argv;
+    [$program, $target, $suite] = $argv;
 
     $candidateTests = \Civi\CiUtil\PHPUnitScanner::findTestsByPath([$suite]);
     //    $candidateTests = array(

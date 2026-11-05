@@ -44,7 +44,7 @@ trait PhpDataTypeSpecTrait {
       $this->required = FALSE;
     }
     $type = preg_grep('/null/i', $type, PREG_GREP_INVERT);
-    // If there is one `@var` type, then attempt to infer the `dataType` and `serialize` type.
+    /** If there is one `@var` type, then attempt to infer the `dataType` and `serialize` type. */
     if (count($type) === 1) {
       switch ($type[0]) {
         case 'string[]':

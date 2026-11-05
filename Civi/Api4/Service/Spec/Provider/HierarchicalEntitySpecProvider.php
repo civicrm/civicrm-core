@@ -51,7 +51,7 @@ class HierarchicalEntitySpecProvider extends \Civi\Core\Service\AutoService impl
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $action === 'get' && CoreUtil::isType($entity, 'HierarchicalEntity');

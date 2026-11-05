@@ -21,14 +21,14 @@ use Civi\Api4\Service\Spec\RequestSpec;
 class ACLCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('entity_table')->setDefaultValue('civicrm_acl_role');
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $entity === 'ACL' && $action === 'create';

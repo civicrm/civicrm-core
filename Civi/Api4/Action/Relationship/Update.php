@@ -13,7 +13,7 @@
 namespace Civi\Api4\Action\Relationship;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  */
 class Update extends \Civi\Api4\Generic\DAOUpdateAction {
   use RelationshipSaveTrait;

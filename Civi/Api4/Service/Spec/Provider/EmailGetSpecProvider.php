@@ -25,7 +25,7 @@ use Civi\Api4\Service\Spec\RequestSpec;
 class EmailGetSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     foreach ($spec->getFields() as $field) {
@@ -36,7 +36,7 @@ class EmailGetSpecProvider extends \Civi\Core\Service\AutoService implements Gen
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $action === 'get';

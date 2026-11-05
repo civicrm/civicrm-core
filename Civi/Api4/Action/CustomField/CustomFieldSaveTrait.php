@@ -18,7 +18,7 @@ namespace Civi\Api4\Action\CustomField;
 trait CustomFieldSaveTrait {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function write(array $items) {
     foreach ($items as &$field) {

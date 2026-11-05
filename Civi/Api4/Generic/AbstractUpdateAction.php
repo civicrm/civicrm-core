@@ -61,7 +61,7 @@ abstract class AbstractUpdateAction extends AbstractBatchAction {
   abstract protected function updateRecords(array $items): array;
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function _run(Result $result) {
     $primaryKeys = CoreUtil::getInfoItem($this->getEntityName(), 'primary_key');

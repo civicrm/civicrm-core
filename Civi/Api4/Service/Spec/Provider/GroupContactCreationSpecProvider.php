@@ -21,14 +21,14 @@ use Civi\Api4\Service\Spec\RequestSpec;
 class GroupContactCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('status')->setDefaultValue('Added');
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $entity === 'GroupContact' && $action === 'create';

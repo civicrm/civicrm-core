@@ -41,7 +41,7 @@ class TitleFieldSpecProvider extends AutoService implements Generic\SpecProvider
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action): bool {
     return in_array($entity, ['PaymentProcessor', 'ContributionPage', 'Group', 'UFGroup', 'MembershipType']) && $action === 'create';

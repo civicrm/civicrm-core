@@ -112,7 +112,7 @@ abstract class SqlView extends AbstractEntity implements EventSubscriberInterfac
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getInfo(): array {
     $info = parent::getInfo();

@@ -21,14 +21,14 @@ use Civi\Api4\Service\Spec\RequestSpec;
 class IMCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('is_primary')->setRequired(FALSE);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $entity === 'IM' && $action === 'create';

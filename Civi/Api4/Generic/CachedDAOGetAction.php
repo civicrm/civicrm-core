@@ -17,7 +17,7 @@ use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  *
  */
 class CachedDAOGetAction extends \Civi\Api4\Generic\DAOGetAction {

@@ -151,7 +151,7 @@ abstract class SelectQuery {
             $result_entities[$result_dao->id][$returnName] = $result_entities[$result_dao->id][$spec['name']];
           }
         }
-      };
+      }
     }
     return $result_entities;
   }

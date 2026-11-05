@@ -21,7 +21,7 @@ use Civi\Api4\Service\Spec\RequestSpec;
 class DashboardCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     // Arguably this is a bad default in the schema
@@ -29,7 +29,7 @@ class DashboardCreationSpecProvider extends \Civi\Core\Service\AutoService imple
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return in_array($entity, ['Dashboard', 'DashboardContact'], TRUE) && $action === 'create';

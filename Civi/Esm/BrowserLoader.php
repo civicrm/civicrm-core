@@ -31,7 +31,7 @@ class BrowserLoader extends \Civi\Core\Service\AutoService implements EventSubsc
   use BasicLoaderTrait;
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function renderImportMap(array $importMap): string {
     $flags = JSON_UNESCAPED_SLASHES;
@@ -42,14 +42,14 @@ class BrowserLoader extends \Civi\Core\Service\AutoService implements EventSubsc
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function renderModuleScript(array $snippet): string {
     return sprintf("<script type=\"module\">\n%s\n</script>\n", $snippet['script']);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function renderModuleUrl(array $snippet): string {
     return sprintf("<script type=\"module\" src=\"%s\">\n</script>\n", $snippet['scriptUrl']);

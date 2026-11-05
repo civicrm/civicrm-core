@@ -15,7 +15,7 @@ namespace Civi\Api4\Action\File;
 trait FileSaveTrait {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function write(array $items) {
     foreach ($items as &$file) {

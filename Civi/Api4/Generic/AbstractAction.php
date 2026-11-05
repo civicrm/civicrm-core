@@ -363,14 +363,14 @@ abstract class AbstractAction implements \ArrayAccess {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function offsetExists($offset): bool {
     return in_array($offset, ['entity', 'action', 'params', 'version', 'check_permissions', 'id']) || isset($this->_arrayStorage[$offset]);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   #[\ReturnTypeWillChange]
   public function &offsetGet($offset) {
@@ -396,7 +396,7 @@ abstract class AbstractAction implements \ArrayAccess {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function offsetSet($offset, $value): void {
     if (in_array($offset, ['entity', 'action', 'entityName', 'actionName', 'params', 'version', 'id'])) {
@@ -411,7 +411,7 @@ abstract class AbstractAction implements \ArrayAccess {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function offsetUnset($offset): void {
     if (in_array($offset, ['entity', 'action', 'entityName', 'actionName', 'params', 'check_permissions', 'version', 'id'])) {

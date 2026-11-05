@@ -42,7 +42,7 @@ class SmartyErrorEvent extends GenericHookEvent {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getHookValues() {
     return [$this->errorMsg, $this->errorType];

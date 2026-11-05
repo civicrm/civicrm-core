@@ -42,7 +42,7 @@ class SqlFunctionSUM extends SqlFunction {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    *
    * Sums of Boolean fields will yield integers
    *

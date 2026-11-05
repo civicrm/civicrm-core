@@ -33,7 +33,7 @@ class FieldCurrencySpecProvider extends \Civi\Core\Service\AutoService implement
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $action === 'create';

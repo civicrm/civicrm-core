@@ -33,7 +33,7 @@ class SortableEntitySpecProvider extends \Civi\Core\Service\AutoService implemen
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $action === 'create' && CoreUtil::isType($entity, 'SortableEntity');

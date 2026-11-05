@@ -34,7 +34,7 @@ class NavigationSpecProvider extends \Civi\Core\Service\AutoService implements G
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $entity === 'Navigation' && in_array($action, ['create', 'get']);

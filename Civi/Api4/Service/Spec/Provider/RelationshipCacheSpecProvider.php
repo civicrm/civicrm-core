@@ -72,7 +72,7 @@ class RelationshipCacheSpecProvider extends \Civi\Core\Service\AutoService imple
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $entity === 'RelationshipCache' && $action === 'get';

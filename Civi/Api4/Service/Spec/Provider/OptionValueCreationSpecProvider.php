@@ -21,7 +21,7 @@ use Civi\Api4\Service\Spec\RequestSpec;
 class OptionValueCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('weight')->setRequired(FALSE);
@@ -29,7 +29,7 @@ class OptionValueCreationSpecProvider extends \Civi\Core\Service\AutoService imp
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $entity === 'OptionValue' && $action === 'create';

@@ -13,7 +13,7 @@
 namespace Civi\Api4\Action\CustomField;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  */
 class Update extends \Civi\Api4\Generic\DAOUpdateAction {
   use CustomFieldSaveTrait;

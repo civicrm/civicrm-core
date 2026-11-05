@@ -19,7 +19,7 @@ class Api3SelectQuery extends SelectQuery {
   protected $apiVersion = 3;
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function buildWhereClause() {
     $filters = [];
@@ -128,7 +128,7 @@ class Api3SelectQuery extends SelectQuery {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function getFields() {
     // Call this function directly instead of using the api wrapper to force unique field names off

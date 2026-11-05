@@ -53,7 +53,7 @@ class AuthorizeRecordEvent extends GenericHookEvent {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getHookValues() {
     return [$this->getApiRequest(), $this->record, &$this->authorized];

@@ -21,7 +21,7 @@ use Civi\Api4\Service\Spec\RequestSpec;
 class PhoneCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('phone')->setRequired(TRUE);
@@ -29,7 +29,7 @@ class PhoneCreationSpecProvider extends \Civi\Core\Service\AutoService implement
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $entity === 'Phone' && $action === 'create';

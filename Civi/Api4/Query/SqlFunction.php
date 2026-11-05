@@ -211,7 +211,7 @@ abstract class SqlFunction extends SqlExpression {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getAlias(): string {
     return $this->alias ?? $this->getName() . ':' . implode('_', $this->fields) . ($this->suffix ? ':' . $this->suffix : '');

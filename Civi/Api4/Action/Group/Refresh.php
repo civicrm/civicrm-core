@@ -15,7 +15,7 @@ namespace Civi\Api4\Action\Group;
 use Civi\Api4\Generic\Result;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  */
 class Refresh extends \Civi\Api4\Generic\BasicBatchAction {
 

@@ -13,7 +13,7 @@
 namespace Civi\Api4\Action\CustomField;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  */
 class Get extends \Civi\Api4\Generic\CachedDAOGetAction {
 
@@ -36,7 +36,7 @@ class Get extends \Civi\Api4\Generic\CachedDAOGetAction {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    *
    * Flatten field records from the CustomGroup cache,
    * formatted as CustomField + implicit joins to CustomGroup

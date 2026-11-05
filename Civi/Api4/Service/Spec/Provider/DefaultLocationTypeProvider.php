@@ -21,7 +21,7 @@ use Civi\Api4\Service\Spec\RequestSpec;
 class DefaultLocationTypeProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     $locationField = $spec->getFieldByName('location_type_id')->setRequired(TRUE);
@@ -32,7 +32,7 @@ class DefaultLocationTypeProvider extends \Civi\Core\Service\AutoService impleme
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $action === 'create' && in_array($entity, ['Address', 'Email', 'IM', 'OpenID', 'Phone']);

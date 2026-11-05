@@ -107,7 +107,7 @@ class ValidateValuesEvent extends GenericHookEvent {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getHookValues() {
     return [$this->getApiRequest(), $this->records, &$this->errors];

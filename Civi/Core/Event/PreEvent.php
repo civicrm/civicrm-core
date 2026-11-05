@@ -57,7 +57,7 @@ class PreEvent extends GenericHookEvent {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getHookValues() {
     return [$this->action, $this->entity, $this->id, &$this->params];

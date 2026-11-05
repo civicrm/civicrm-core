@@ -5,7 +5,7 @@ namespace Civi\WorkflowMessage\GenericWorkflowMessage;
 class Alex extends \Civi\WorkflowMessage\WorkflowMessageExample {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getExamples(): iterable {
     yield [
@@ -15,7 +15,7 @@ class Alex extends \Civi\WorkflowMessage\WorkflowMessageExample {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function build(array &$example): void {
     $example['data'] = [

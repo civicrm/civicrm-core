@@ -44,7 +44,7 @@ class SqlFunctionDAYSTOANNIV extends SqlFunction {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function renderExpression(string $output): string {
     $anniversarySql = \CRM_Utils_Date::getAnniversarySql($output);

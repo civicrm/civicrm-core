@@ -66,7 +66,7 @@ class PostEvent extends GenericHookEvent {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getHookValues() {
     return [$this->action, $this->entity, $this->id, &$this->object, $this->params];

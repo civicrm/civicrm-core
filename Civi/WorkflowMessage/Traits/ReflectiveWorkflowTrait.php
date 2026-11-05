@@ -64,7 +64,7 @@ trait ReflectiveWorkflowTrait {
   protected $_extras = [];
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see \Civi\WorkflowMessage\WorkflowMessageInterface::getFields()
    */
   public function getFields(): array {
@@ -108,7 +108,7 @@ trait ReflectiveWorkflowTrait {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see \Civi\WorkflowMessage\WorkflowMessageInterface::export()
    */
   public function export(?string $format = NULL): ?array {
@@ -139,7 +139,7 @@ trait ReflectiveWorkflowTrait {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @see \Civi\WorkflowMessage\WorkflowMessageInterface::import()
    */
   public function import(string $format, array $values) {

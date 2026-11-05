@@ -31,7 +31,7 @@ class PipeSession {
   protected $trusted;
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function onConnect(string $negotiationFlags): ?string {
     \CRM_Core_Session::useFakeSession();
@@ -73,7 +73,7 @@ class PipeSession {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function onRequest(string $requestLine): ?string {
     return JsonRpc::run($requestLine, function(string $method, array $params) {
@@ -91,7 +91,7 @@ class PipeSession {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function onException(string $requestLine, \Throwable $t): ?string {
     $error = JsonRpc::createResponseError([], $t);

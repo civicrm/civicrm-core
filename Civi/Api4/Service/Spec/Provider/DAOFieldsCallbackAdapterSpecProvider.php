@@ -31,7 +31,7 @@ use Civi\Schema\EntityRepository;
 class DAOFieldsCallbackAdapterSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     $entityName = $spec->getEntity();
@@ -205,7 +205,7 @@ class DAOFieldsCallbackAdapterSpecProvider extends \Civi\Core\Service\AutoServic
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return TRUE;

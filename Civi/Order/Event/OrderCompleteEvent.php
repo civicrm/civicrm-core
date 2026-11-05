@@ -52,7 +52,7 @@ class OrderCompleteEvent extends GenericHookEvent {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getHookValues() {
     return [$this->contributionID, $this->params];

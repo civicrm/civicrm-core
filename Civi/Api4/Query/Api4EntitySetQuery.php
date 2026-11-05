@@ -243,7 +243,7 @@ class Api4EntitySetQuery extends Api4Query {
       // Convert NULL to SQL NULL, giving each a unique alias
       $nullCount = 0;
       $set[3]['select'] = array_map(function($item) use (&$nullCount) {
-        return $item === NULL ? 'NULL AS `_null_' . ($nullCount++) . '`' : $item;
+        return $item ?? 'NULL AS `_null_' . ($nullCount++) . '`';
       }, $select);
     }
   }

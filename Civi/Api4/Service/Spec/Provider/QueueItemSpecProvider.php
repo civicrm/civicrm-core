@@ -30,7 +30,7 @@ use Civi\Core\Service\AutoService;
 class QueueItemSpecProvider extends AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec): void {
     $spec->getFieldByName('data')->setPermission([\CRM_Core_Permission::ALWAYS_DENY_PERMISSION]);
@@ -48,7 +48,7 @@ class QueueItemSpecProvider extends AutoService implements Generic\SpecProviderI
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action): bool {
     // Currently we do for all actions - it might be OK to select - but it fails anyway as

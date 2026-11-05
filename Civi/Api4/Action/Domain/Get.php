@@ -15,7 +15,7 @@ namespace Civi\Api4\Action\Domain;
 use Civi\Api4\Generic\Result;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  */
 class Get extends \Civi\Api4\Generic\DAOGetAction {
 
@@ -27,7 +27,7 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
   protected $currentDomain = FALSE;
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function getObjects(Result $result) {
     if ($this->currentDomain) {

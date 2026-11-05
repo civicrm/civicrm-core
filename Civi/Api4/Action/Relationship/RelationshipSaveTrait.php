@@ -15,7 +15,7 @@ namespace Civi\Api4\Action\Relationship;
 use Civi\Api4\Generic\Result;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  */
 trait RelationshipSaveTrait {
 
@@ -30,7 +30,7 @@ trait RelationshipSaveTrait {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function write(array $items) {
     $result = [];

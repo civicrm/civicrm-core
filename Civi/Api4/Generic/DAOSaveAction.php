@@ -15,13 +15,13 @@ namespace Civi\Api4\Generic;
 use Civi\Api4\Utils\CoreUtil;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  */
 class DAOSaveAction extends AbstractSaveAction {
   use Traits\DAOActionTrait;
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function _run(Result $result) {
     $idField = CoreUtil::getIdFieldName($this->getEntityName());

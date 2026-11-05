@@ -231,7 +231,7 @@ trait DAOActionTrait {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function formatWriteValues(&$record, $entityName = NULL, $actionName = NULL) {
     $this->resolveFKValues($record);

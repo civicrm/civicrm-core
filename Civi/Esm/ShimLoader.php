@@ -75,7 +75,7 @@ class ShimLoader extends \Civi\Core\Service\AutoService implements EventSubscrib
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function renderImportMap(array $importMap): string {
     $shimUrl = Civi::paths()->getUrl('[civicrm.bower]/es-module-shims/dist/es-module-shims.js');
@@ -89,14 +89,14 @@ class ShimLoader extends \Civi\Core\Service\AutoService implements EventSubscrib
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function renderModuleScript(array $snippet): string {
     return sprintf("<script type=\"%s\">\n%s\n</script>\n", htmlentities($this->scriptTypes['module']), $snippet['script']);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function renderModuleUrl(array $snippet): string {
     return sprintf("<script type=\"%s\" src=\"%s\">\n</script>\n", htmlentities($this->scriptTypes['module']), $snippet['scriptUrl']);

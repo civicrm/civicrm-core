@@ -3,7 +3,6 @@ namespace Civi\Token;
 
 use Civi\Token\Event\TokenRenderEvent;
 use Civi\Token\Event\TokenValueEvent;
-use Money\Money;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -15,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class TokenCompatSubscriber implements EventSubscriberInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getSubscribedEvents(): array {
     return [

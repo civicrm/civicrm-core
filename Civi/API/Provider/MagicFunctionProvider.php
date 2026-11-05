@@ -64,7 +64,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @param array $apiRequest
    * @return array
    */
@@ -94,7 +94,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @param int $version
    * @return array
    */
@@ -140,7 +140,7 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @param int $version
    * @param string $entity
    * @return array

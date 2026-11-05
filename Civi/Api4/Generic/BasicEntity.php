@@ -139,7 +139,7 @@ abstract class BasicEntity extends AbstractEntity {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getInfo() {
     $info = parent::getInfo();

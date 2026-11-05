@@ -13,7 +13,7 @@
 namespace Civi\Api4\Action\CustomField;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  */
 class Create extends \Civi\Api4\Generic\DAOCreateAction {
   use CustomFieldSaveTrait;

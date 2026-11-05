@@ -35,7 +35,7 @@ trait CustomValueActionTrait {
   private $customGroup;
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getEntityName() {
     return 'Custom_' . $this->getCustomGroup();
@@ -61,7 +61,7 @@ trait CustomValueActionTrait {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function writeObjects($items) {
     $fields = $this->entityFields();
@@ -91,7 +91,7 @@ trait CustomValueActionTrait {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function deleteObjects($items) {
     $customTable = CoreUtil::getTableName($this->getEntityName());
@@ -109,7 +109,7 @@ trait CustomValueActionTrait {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function fillDefaults(&$params) {
     foreach ($this->entityFields() as $name => $field) {

@@ -94,7 +94,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @param array $apiRequest
    * @return array
    * @throws \CRM_Core_Exception
@@ -118,7 +118,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @param int $version
    * @return array
    */
@@ -127,7 +127,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @param int $version
    * @param string $entity
    * @return array

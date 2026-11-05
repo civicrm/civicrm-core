@@ -25,7 +25,7 @@ class EventFormOnline extends FormWrapper {
     while (!empty($this->subsequentForms['Participant_' . $formNumber])) {
       $formNumber++;
     }
-    /* @var \CRM_Core_Form */
+    /** @var \CRM_Core_Form */
     $form = new $formName(NULL, \CRM_Core_Action::NONE, 'post', 'Participant_' . $formNumber);
     $form->controller = $this->form->controller;
     $form->_submitValues = $formValues;

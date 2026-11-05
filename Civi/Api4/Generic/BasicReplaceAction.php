@@ -75,7 +75,7 @@ class BasicReplaceAction extends AbstractBatchAction {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function _run(Result $result) {
     $items = $this->getBatchRecords();

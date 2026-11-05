@@ -16,7 +16,7 @@ use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  * @method bool getIncludeCustom()
  */
 class DAOGetFieldsAction extends BasicGetFieldsAction {

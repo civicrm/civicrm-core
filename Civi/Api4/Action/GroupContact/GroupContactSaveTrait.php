@@ -13,7 +13,7 @@
 namespace Civi\Api4\Action\GroupContact;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  *
  * @method $this setMethod(string $method) Indicate who added/removed the group.
  * @method string getMethod()
@@ -38,7 +38,7 @@ trait GroupContactSaveTrait {
   protected $tracking = '';
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function write(array $items) {
     foreach ($items as &$item) {

@@ -196,7 +196,7 @@ class FormWrapper {
    * @return $this
    */
   public function addSubsequentForm(string $formName, array $formValues = []): FormWrapper {
-    /* @var \CRM_Core_Form $form */
+    /** @var \CRM_Core_Form $form */
     if ($formName === 'CRM_Event_Form_Registration_AdditionalParticipant') {
       // Each additional participant page needs a distinct name matching the real
       // wizard's convention (Participant_1, Participant_2, ...) - otherwise every

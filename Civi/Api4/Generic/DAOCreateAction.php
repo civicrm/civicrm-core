@@ -24,7 +24,7 @@ class DAOCreateAction extends AbstractCreateAction {
   use Traits\DAOActionTrait;
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function _run(Result $result) {
     $this->formatWriteValues($this->values);

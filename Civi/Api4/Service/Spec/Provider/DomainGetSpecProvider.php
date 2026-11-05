@@ -22,7 +22,7 @@ use Civi\Api4\Service\Spec\RequestSpec;
 class DomainGetSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     $field = new FieldSpec('is_active', $spec->getEntity(), 'Boolean');
@@ -36,7 +36,7 @@ class DomainGetSpecProvider extends \Civi\Core\Service\AutoService implements Ge
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $entity === 'Domain' && $action === 'get';

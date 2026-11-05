@@ -21,7 +21,7 @@ use Civi\Api4\Service\Spec\RequestSpec;
 class DomainCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('name')->setRequired(TRUE);
@@ -29,7 +29,7 @@ class DomainCreationSpecProvider extends \Civi\Core\Service\AutoService implemen
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $entity === 'Domain' && $action === 'create';

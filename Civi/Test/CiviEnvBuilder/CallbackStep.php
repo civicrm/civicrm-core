@@ -12,7 +12,7 @@ class CallbackStep implements StepInterface {
    */
   public function __construct($callback, $sig = NULL) {
     $this->callback = $callback;
-    $this->sig = $sig === NULL ? md5(var_export($callback, 1)) : $sig;
+    $this->sig = $sig ?? md5(var_export($callback, 1));
   }
 
   public function getSig() {

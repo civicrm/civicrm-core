@@ -15,7 +15,7 @@ namespace Civi\Api4\Generic;
 use Civi\API\Exception\NotImplementedException;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  */
 class BasicSaveAction extends AbstractSaveAction {
 

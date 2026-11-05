@@ -46,7 +46,7 @@ trait AddressSaveTrait {
   protected $fixAddress = TRUE;
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function write(array $items) {
     $saved = [];

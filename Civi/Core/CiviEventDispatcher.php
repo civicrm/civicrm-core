@@ -110,21 +110,21 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function addSubscriber(EventSubscriberInterface $subscriber) {
     return $this->dispatcher->addSubscriber($subscriber);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function removeSubscriber(EventSubscriberInterface $subscriber) {
     return $this->dispatcher->removeSubscriber($subscriber);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getListenerPriority($eventName, $listener) {
     return $this->dispatcher->getListenerPriority($eventName, $listener);
@@ -207,7 +207,7 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function dispatch($eventName, $event = NULL) {
     // Dispatch policies add systemic overhead and (normally) should not be evaluated. JNZ.
@@ -264,7 +264,7 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getListeners($eventName = NULL) {
     $this->bindPatterns($eventName);
@@ -272,14 +272,14 @@ class CiviEventDispatcher implements CiviEventDispatcherInterface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function removeListener($eventName, $listener) {
     return $this->dispatcher->removeListener($eventName, $listener);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function hasListeners($eventName = NULL) {
     // All hook_* events have default listeners, so hasListeners(NULL) is a truism.

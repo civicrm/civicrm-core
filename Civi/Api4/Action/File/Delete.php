@@ -13,7 +13,7 @@
 namespace Civi\Api4\Action\File;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  */
 class Delete extends \Civi\Api4\Generic\DAODeleteAction {
 

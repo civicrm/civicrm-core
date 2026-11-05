@@ -188,7 +188,7 @@ class GenericHookEvent extends \Symfony\Contracts\EventDispatcher\Event {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function &__get($name) {
     if (isset($this->hookFieldsFlip[$name])) {
@@ -197,7 +197,7 @@ class GenericHookEvent extends \Symfony\Contracts\EventDispatcher\Event {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function __set($name, $value) {
     if (isset($this->hookFieldsFlip[$name])) {
@@ -206,14 +206,14 @@ class GenericHookEvent extends \Symfony\Contracts\EventDispatcher\Event {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function __isset($name) {
     return isset($this->hookFieldsFlip[$name], $this->hookValues[$this->hookFieldsFlip[$name]]);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function __unset($name) {
     if (isset($this->hookFieldsFlip[$name])) {

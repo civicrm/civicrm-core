@@ -21,7 +21,7 @@ use Civi\Api4\Service\Spec\RequestSpec;
 class GetActionDefaultsProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     // Exclude deleted records from api Get by default
@@ -43,7 +43,7 @@ class GetActionDefaultsProvider extends \Civi\Core\Service\AutoService implement
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $action === 'get';

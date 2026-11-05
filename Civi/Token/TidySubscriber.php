@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class TidySubscriber implements EventSubscriberInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getSubscribedEvents(): array {
     return [

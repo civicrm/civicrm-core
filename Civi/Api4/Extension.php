@@ -111,7 +111,7 @@ class Extension extends Generic\AbstractEntity {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getInfo() {
     $info = parent::getInfo();

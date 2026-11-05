@@ -111,7 +111,7 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @param array $apiRequest
    * @return array|mixed
    */
@@ -120,7 +120,7 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @param int $version
    * @return array
    */
@@ -129,7 +129,7 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    * @param int $version
    * @param string $entity
    * @return array

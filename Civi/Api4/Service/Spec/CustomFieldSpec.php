@@ -29,7 +29,7 @@ class CustomFieldSpec extends FieldSpec {
   public $type = 'Custom';
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function setDataType($dataType) {
     switch ($dataType) {

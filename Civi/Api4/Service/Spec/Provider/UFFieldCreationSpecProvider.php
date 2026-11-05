@@ -21,14 +21,14 @@ use Civi\Api4\Service\Spec\RequestSpec;
 class UFFieldCreationSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     $spec->getFieldByName('label')->setRequired(FALSE);
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return $entity === 'UFField' && $action === 'create';

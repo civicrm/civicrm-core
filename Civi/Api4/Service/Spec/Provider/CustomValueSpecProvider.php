@@ -23,7 +23,7 @@ use Civi\Api4\Utils\CoreUtil;
 class CustomValueSpecProvider extends \Civi\Core\Service\AutoService implements Generic\SpecProviderInterface {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function modifySpec(RequestSpec $spec) {
     $action = $spec->getAction();
@@ -59,7 +59,7 @@ class CustomValueSpecProvider extends \Civi\Core\Service\AutoService implements 
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function applies($entity, $action) {
     return str_starts_with($entity, 'Custom_');
