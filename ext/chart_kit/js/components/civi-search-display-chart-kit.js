@@ -629,12 +629,11 @@
       return ((layerName) => finalColors[layerName]);
     }
 
-    downloadImageUrl(mime, url, ext) {
+    downloadImageUrl(url, ext) {
       const filename = (this._settings.format.title ? this._settings.format.title : 'chart').replace(/[^a-zA-Z0-9-]+/g, '') + '.' + ext;
       const downloadLink = document.createElement('a');
       downloadLink.download = filename;
       downloadLink.href = url;
-      downloadLink.downloadurl = [mime, downloadLink.download, url].join(':');
       this.chartContainer.append(downloadLink);
       downloadLink.click();
       this.chartContainer.removeChild(downloadLink);
@@ -648,7 +647,7 @@
     }
 
     downloadSVG() {
-      this.downloadImageUrl('image/svg+xml', this.getSvgData(), 'svg');
+      this.downloadImageUrl(this.getSvgData(), 'svg');
     }
 
     downloadPNG() {
@@ -665,7 +664,7 @@
         canvas.getContext('2d').drawImage(img, 0, 0);
         // canvas.style.display = 'block';
         const imgURL = canvas.toDataURL('image/png');
-        this.downloadImageUrl('image/png', imgURL, 'png');
+        this.downloadImageUrl(imgURL, 'png');
         this.chartContainer.removeChild(canvas);
       };
       img.src = svgData;
