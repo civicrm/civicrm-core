@@ -639,7 +639,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $errors = [];
 
     $priceSetId = $self->getPriceSetID();
-    $priceSetDetails = $self->getPriceSetDetails($params);
+    $priceSetDetails = $self->getPriceSetDetails();
 
     $selectedMemberships = self::getSelectedMemberships($priceSetDetails[$priceSetId], $params);
 
@@ -978,7 +978,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     // substitute for $this->_priceSet here - getPriceFieldIDs() needs that
     // key to map submitted price_N checkbox values back to membership types
     // when membership_type_id itself isn't submitted directly.
-    $this->getOrder();
+    $this->initializeOrder();
     $selectedMemberships = $this->_memTypeSelected = self::getSelectedMemberships(
       $this->_priceSet,
       $formValues
@@ -1374,6 +1374,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $contribution = CRM_Contribute_BAO_Contribution::create($contributionParams);
+    $this->ids['Contribution'] = $contribution->id;
+    $this->setMembershipIDsFromOrder((array) $contribution);
 
     //CRM-13981, create new soft-credit record as to record payment from different person for this membership
     if (!empty($contributionSoftParams)) {
