@@ -34,7 +34,7 @@ class CRM_Contact_Form_Search_BasicTest extends CiviUnitTestCase {
    * trying it, logging an error, and then trying something that does work.
    */
   public function testBasicSearch(): void {
-    /* @var CRM_Contact_Form_Search_Basic $form */
+    /** @var CRM_Contact_Form_Search_Basic $form */
     $form = $this->getFormObject('CRM_Contact_Form_Search_Basic');
     $form->setAction(CRM_Core_Action::BASIC);
     // Order by the 5th field (ie country) descending.

@@ -32,7 +32,7 @@ use Civi\Api4\CustomField;
 class CachedGetTest extends Api4TestBase {
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function setUp(): void {
     parent::setUp();
@@ -53,7 +53,7 @@ class CachedGetTest extends Api4TestBase {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function tearDown(): void {
     CustomField::delete(FALSE)

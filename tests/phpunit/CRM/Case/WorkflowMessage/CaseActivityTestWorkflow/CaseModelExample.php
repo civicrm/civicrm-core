@@ -2,7 +2,7 @@
 class CRM_Case_WorkflowMessage_CaseActivityTestWorkflow_CaseModelExample extends \Civi\WorkflowMessage\WorkflowMessageExample {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getExamples(): iterable {
     if (!class_exists($this->wfClass)) {
@@ -16,7 +16,7 @@ class CRM_Case_WorkflowMessage_CaseActivityTestWorkflow_CaseModelExample extends
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function build(array &$example): void {
     $alex = \Civi\Test::example('workflow/generic/Alex');

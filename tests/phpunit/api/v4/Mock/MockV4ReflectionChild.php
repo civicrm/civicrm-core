@@ -20,7 +20,7 @@
 namespace api\v4\Mock;
 
 /**
- * @inheritDoc
+ * {@inheritDoc}
  */
 class MockV4ReflectionChild extends MockV4ReflectionBase {
   /**

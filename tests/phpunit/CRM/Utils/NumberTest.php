@@ -30,7 +30,7 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
    * @dataProvider randomDecimalCases
    */
   public function testCreateRandomDecimal($precision, $expectedMinInclusive, $expectedMaxExclusive) {
-    list ($sigFigs, $decFigs) = $precision;
+    [$sigFigs, $decFigs] = $precision;
     for ($i = 0; $i < 10; $i++) {
       $decimal = CRM_Utils_Number::createRandomDecimal($precision);
       // print "Assert $decimal between $expectedMinInclusive and $expectedMaxExclusive\n";
@@ -38,7 +38,7 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
       if (!str_contains($decimal, '.')) {
         $decimal .= '.';
       }
-      list ($before, $after) = explode('.', $decimal);
+      [$before, $after] = explode('.', $decimal);
       $this->assertTrue(strlen($before) + strlen($after) <= $sigFigs, "Assert $decimal [$before;$after] has <= $sigFigs sigFigs");
       $this->assertTrue(strlen($after) <= $decFigs, "Assert $decimal [$before;$after] has <= $decFigs decFigs");
     }
@@ -66,7 +66,7 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
    * @dataProvider truncDecimalCases
    */
   public function testCreateTruncatedDecimal($value, $precision, $expectedValue) {
-    list ($sigFigs, $decFigs) = $precision;
+    [$sigFigs, $decFigs] = $precision;
     $this->assertEquals($expectedValue, CRM_Utils_Number::createTruncatedDecimal($value, $precision),
       "assert createTruncatedValue($value, ($sigFigs,$decFigs)) == $expectedValue"
     );

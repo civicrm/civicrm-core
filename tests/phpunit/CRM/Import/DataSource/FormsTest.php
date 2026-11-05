@@ -50,7 +50,7 @@ class CRM_Import_FormsTest extends CiviUnitTestCase {
 
     // Now we want to submit this form without updating the mapping used & make sure the mapping_id
     // is still saved in the metadata.
-    /* @var CRM_Contribute_Import_Form_MapField $mapFieldForm */
+    /** @var CRM_Contribute_Import_Form_MapField $mapFieldForm */
     $mapFieldValues = [
       'dataSource' => 'CRM_Import_DataSource_SQL',
       'sqlQuery' => 'SELECT id, source FROM civicrm_contact',

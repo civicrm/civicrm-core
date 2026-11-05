@@ -36,7 +36,7 @@ class MockBasicEntity extends Generic\BasicEntity {
   protected static $deleter = [MockEntityDataStorage::class, 'delete'];
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getFields($checkPermissions = TRUE) {
     return (new Generic\BasicGetFieldsAction(__CLASS__, __FUNCTION__, function() {

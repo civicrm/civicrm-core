@@ -2,7 +2,6 @@
 
 namespace E2E\Core;
 
-use Civi\Core\Url;
 use Civi\Test\HttpTestTrait;
 
 /**

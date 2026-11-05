@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types = 1);
+
 use Civi\Api4\Activity;
 use Civi\Api4\Address;
 use Civi\Api4\Contribution;

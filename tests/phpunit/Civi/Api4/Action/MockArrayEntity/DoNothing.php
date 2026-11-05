@@ -10,7 +10,7 @@ use Civi\Api4\Generic\Result;
 class DoNothing extends \Civi\Api4\Generic\AbstractAction {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function _run(Result $result) {
     // Doing exactly as advertised.

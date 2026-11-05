@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types = 1);
+
 use Civi\Api4\Contact;
 use Civi\Api4\DedupeRuleGroup;
 use Civi\Api4\DedupeRule;

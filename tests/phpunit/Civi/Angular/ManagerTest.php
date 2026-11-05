@@ -27,7 +27,7 @@ class ManagerTest extends \CiviUnitTestCase {
   protected $res;
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected function setUp(): void {
     parent::setUp();

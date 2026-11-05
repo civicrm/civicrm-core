@@ -1397,7 +1397,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     PriceSetEntity::create(FALSE)->setValues(['entity_id' => $_REQUEST['id'], 'entity_table' => 'civicrm_contribution_page', 'price_set_id:name' => 'default_contribution_amount'])->execute();
     // Execute CRM_Contribute_Form_ContributionBase preProcess (via child class).
     // Check the assignment of payment processors.
-    /* @var \CRM_Contribute_Form_Contribution_Main $form */
+    /** @var \CRM_Contribute_Form_Contribution_Main $form */
     $form = $this->getFormObject('CRM_Contribute_Form_Contribution_Main', ['payment_processor_id' => 0]);
 
     $form->preProcess();

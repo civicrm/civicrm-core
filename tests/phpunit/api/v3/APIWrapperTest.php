@@ -63,7 +63,7 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
 class api_v3_APIWrapperTest_Impl implements API_Wrapper {
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function fromApiInput($apiRequest) {
     if ($apiRequest['entity'] == 'Contact' && $apiRequest['action'] == 'create') {
@@ -75,7 +75,7 @@ class api_v3_APIWrapperTest_Impl implements API_Wrapper {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function toApiOutput($apiRequest, $result) {
     if ($apiRequest['entity'] == 'Contact' && $apiRequest['action'] == 'create') {

@@ -68,7 +68,7 @@ class CRM_Report_FormTest extends CiviUnitTestCase {
     $cases = $this->fromToData();
     foreach ($cases as $caseDescription => $case) {
       $obj = new CRM_Report_Form();
-      list($calculatedFrom, $calculatedTo) = $obj->getFromTo($case['relative'], $case['from'], $case['to']);
+      [$calculatedFrom, $calculatedTo] = $obj->getFromTo($case['relative'], $case['from'], $case['to']);
       $this->assertEquals([$case['expectedFrom'], $case['expectedTo']], [$calculatedFrom, $calculatedTo], "fail on data set '{$caseDescription}'. Local php time is " . date('Y-m-d H:i:s') . ' and mysql time is ' . CRM_Core_DAO::singleValueQuery('SELECT NOW()'));
     }
   }

@@ -36,7 +36,7 @@ class RequestTest extends \CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testCreateRequest_EntityActionMunging($input, $expected) {
-    list ($inEntity, $inAction, $inVersion) = $input;
+    [$inEntity, $inAction, $inVersion] = $input;
     $apiRequest = Request::create($inEntity, $inAction, ['version' => $inVersion]);
     $this->assertEquals($expected, [$apiRequest['entity'], $apiRequest['action'], $apiRequest['version']]);
   }
