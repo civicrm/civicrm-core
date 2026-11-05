@@ -71,7 +71,7 @@ class CRM_Core_Page {
    *
    * @var CRM_Core_Session
    */
-  static protected $_session;
+  protected static $_session;
 
   /**
    * What to return to the client if in ajax mode (snippet=json)

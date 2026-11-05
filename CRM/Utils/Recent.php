@@ -41,13 +41,13 @@ class CRM_Utils_Recent {
    *
    * @var array
    */
-  static private $_recent = NULL;
+  private static $_recent = NULL;
 
   /**
    * Maximum stack size
    * @var int
    */
-  static private $_maxItems = 10;
+  private static $_maxItems = 10;
 
   /**
    * Initialize this class and set the static variables.
