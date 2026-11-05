@@ -95,7 +95,7 @@ function civicrm_api3_attachment_create($params) {
   }
 
   $config = CRM_Core_Config::singleton();
-  list($id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent) = _civicrm_api3_attachment_parse_params($params);
+  [$id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent] = _civicrm_api3_attachment_parse_params($params);
 
   $fileDao = new CRM_Core_BAO_File();
   $entityFileDao = new CRM_Core_DAO_EntityFile();
@@ -186,7 +186,7 @@ function _civicrm_api3_attachment_get_spec(&$spec) {
  * @throws CRM_Core_Exception validation errors
  */
 function civicrm_api3_attachment_get($params) {
-  list($id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent) = _civicrm_api3_attachment_parse_params($params);
+  [$id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent] = _civicrm_api3_attachment_parse_params($params);
 
   $dao = __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTrusted);
   $result = [];
@@ -232,7 +232,7 @@ function civicrm_api3_attachment_delete($params) {
   }
 
   $config = CRM_Core_Config::singleton();
-  list($id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent) = _civicrm_api3_attachment_parse_params($params);
+  [$id, $file, $entityFile, $name, $content, $moveFile, $isTrusted, $returnContent] = _civicrm_api3_attachment_parse_params($params);
   $dao = __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTrusted);
 
   $filePaths = [];

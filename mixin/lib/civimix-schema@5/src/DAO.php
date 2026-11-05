@@ -25,7 +25,7 @@ return new class() extends \CRM_Core_DAO {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function keys(): array {
     $keys = [];
@@ -43,7 +43,7 @@ return new class() extends \CRM_Core_DAO {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getEntityPaths(): array {
     $definition = static::getEntityDefinition();
@@ -58,49 +58,49 @@ return new class() extends \CRM_Core_DAO {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getEntityDescription(): ?string {
     return static::getEntityInfo()['description'] ?? NULL;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getTableName() {
     return static::getEntityDefinition()['table'];
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public function getLog(): bool {
     return static::getEntityInfo()['log'] ?? FALSE;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getEntityIcon(string $entityName, ?int $entityId = NULL): ?string {
     return static::getEntityInfo()['icon'] ?? NULL;
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   protected static function getTableAddVersion(): string {
     return static::getEntityInfo()['add'] ?? '1.0';
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function getExtensionName(): ?string {
     return static::getEntityDefinition()['module'];
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function &fields() {
     $fields = [];
@@ -245,7 +245,7 @@ return new class() extends \CRM_Core_DAO {
   }
 
   /**
-   * @inheritDoc
+   * {@inheritDoc}
    */
   public static function indices(bool $localize = TRUE): array {
     $definition = static::getEntityDefinition();

@@ -220,7 +220,7 @@ function civicrm_api3_activity_get($params) {
 
     foreach ($sort as $index => &$sortString) {
       // Get sort field and direction
-      list($sortField, $dir) = array_pad(explode(' ', $sortString), 2, 'ASC');
+      [$sortField, $dir] = array_pad(explode(' ', $sortString), 2, 'ASC');
       if ($sortField == 'is_overdue') {
         $incomplete = implode(',', array_keys(CRM_Activity_BAO_Activity::getStatusesByType(CRM_Activity_BAO_Activity::INCOMPLETE)));
         $sql->orderBy("IF((a.activity_date_time >= NOW() OR a.status_id NOT IN ($incomplete)), 0, 1) $dir", NULL, $index);
