@@ -170,6 +170,20 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
   }
 
   /**
+   * A failing emailProcessor hook does not leave the bounce in the mailbox.
+   */
+  public function testBounceProcessingHookError(): void {
+    $this->setUpMailing();
+    $this->hookClass->setHook('civicrm_emailProcessor', function () {
+      throw new TypeError('Ruh-roh');
+    });
+    copy(__DIR__ . '/data/bounces/bounce_no_verp.txt', __DIR__ . '/data/mail/bounce_no_verp.txt');
+    $this->callApiV3Success('Job', 'fetch_bounces', []);
+    $this->assertFileDoesNotExist(__DIR__ . '/data/mail/bounce_no_verp.txt');
+    $this->checkMailingBounces(1);
+  }
+
+  /**
    * Wrapper to check for mailing bounces.
    *
    * Normally we would call $this->callAPISuccessGetCount but there is not one

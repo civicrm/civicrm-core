@@ -176,18 +176,23 @@ class CRM_Core_JobManager {
       $params = $job->apiParams;
     }
 
-    CRM_Utils_Hook::preJob($job, $params);
-    if (array_key_exists('runInNonProductionEnvironment', $params)) {
-      $params['runInNonProductionEnvironment'] = (bool) $params['runInNonProductionEnvironment'];
-    }
     try {
+      CRM_Utils_Hook::preJob($job, $params);
+      if (array_key_exists('runInNonProductionEnvironment', $params)) {
+        $params['runInNonProductionEnvironment'] = (bool) $params['runInNonProductionEnvironment'];
+      }
       $result = civicrm_api($job->api_entity, $job->api_action, $params);
     }
     catch (\Throwable $e) {
       $this->logger->error('Error while executing ' . $job->name . ': ' . $e->getMessage(), $this->createLogContext());
       $result = $e;
     }
-    CRM_Utils_Hook::postJob($job, $params, $result);
+    try {
+      CRM_Utils_Hook::postJob($job, $params, $result);
+    }
+    catch (\Throwable $e) {
+      $this->logger->error('Error in postJob hook for ' . $job->name . ': ' . $e->getMessage(), $this->createLogContext());
+    }
     $logLevel = ($result instanceof \Throwable || !empty($result['is_error'])) ? \Psr\Log\LogLevel::ERROR : \Psr\Log\LogLevel::INFO;
     $this->logger->log($logLevel, 'Finished execution of ' . $job->name . ' with result: ' . $this->apiResultToMessage($result), $this->createLogContext());
     $this->currentJob = FALSE;
