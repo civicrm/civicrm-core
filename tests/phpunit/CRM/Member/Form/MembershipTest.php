@@ -25,6 +25,7 @@ use Civi\Api4\MembershipType;
 use Civi\Api4\Order;
 use Civi\Api4\PriceFieldValue;
 use Civi\Test\FormTrait;
+use Civi\Test\FormWrapper;
 
 /**
  *  Test CRM_Member_Form_Membership functions.
@@ -1218,6 +1219,33 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('civicrm_membership', $lines[0]['entity_table']);
     $this->assertEquals('civicrm_membership', $lines[1]['entity_table']);
 
+  }
+
+  /**
+   * Choosing a price set renders its price block.
+   *
+   * The 'Choose price set' selector reloads the price block as a snippet of
+   * this form, passing the chosen price set in the url and submitting
+   * nothing. The price set the form is working with therefore has to be
+   * resolved from the url rather than from the submitted values, which are
+   * empty on that request.
+   */
+  public function testBuildPriceBlockForChosenPriceSet(): void {
+    $this->createLoggedInUser();
+    $this->createMembershipPriceSet();
+
+    $form = $this->getTestForm('CRM_Member_Form_Membership', [], [
+      'cid' => $this->ids['Contact']['individual_0'],
+      'action' => 'add',
+      'context' => 'standalone',
+      'priceSetId' => $this->getPriceSetID(),
+    ])->processForm(FormWrapper::BUILT);
+
+    $this->assertEquals($this->getPriceSetID(), $form->getTemplateVariable('priceSet')['id']);
+    $this->assertEquals(
+      $this->ids['MembershipType']['AnnualRolling'],
+      $form->getTemplateVariable('optionsMembershipTypes')[$this->ids['PriceFieldValue']['AnnualRolling']]
+    );
   }
 
   /**
