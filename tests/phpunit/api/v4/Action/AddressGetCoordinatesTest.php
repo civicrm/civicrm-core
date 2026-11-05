@@ -44,8 +44,8 @@ class AddressGetCoordinatesTest extends Api4TestBase implements TransactionalInt
 
   public function testGetCoordinatesWhiteHouse(): void {
     $coordinates = Address::getCoordinates()->setAddress(\CRM_Utils_Geocode_TestProvider::ADDRESS)->execute()->first();
-    $this->assertEquals(\CRM_Utils_Geocode_TestProvider::GEO_CODE_1, $coordinates['geo_code_1']);
-    $this->assertEquals(\CRM_Utils_Geocode_TestProvider::GEO_CODE_2, $coordinates['geo_code_2']);
+    $this->assertSame(\CRM_Utils_Geocode_TestProvider::GEO_CODE_1, $coordinates['geo_code_1']);
+    $this->assertSame(\CRM_Utils_Geocode_TestProvider::GEO_CODE_2, $coordinates['geo_code_2']);
   }
 
   public function testGetCoordinatesNoAddress(): void {

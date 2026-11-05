@@ -397,7 +397,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->assertSame('uninstalled', $manager->getStatus('test.newextension'));
     $this->assertTrue(file_exists("{$this->basedir}/test.newextension/info.xml"));
     $this->assertTrue(file_exists("{$this->basedir}/test.newextension/newextension.php"));
-    $this->assertEquals(self::TESTING_TYPE, $this->mapper->keyToInfo('test.newextension')->type);
+    $this->assertSame(self::TESTING_TYPE, $this->mapper->keyToInfo('test.newextension')->type);
     $this->assertSame('newextension', $this->mapper->keyToInfo('test.newextension')->file);
   }
 
@@ -427,7 +427,7 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->assertTrue(file_exists("{$this->basedir}/weird/whizbang/info.xml"));
     $this->assertTrue(file_exists("{$this->basedir}/weird/whizbang/newextension.php"));
     $this->assertFalse(file_exists("{$this->basedir}/weird/whizbang/oddball.php"));
-    $this->assertEquals(self::TESTING_TYPE, $this->mapper->keyToInfo('test.whiz.bang')->type);
+    $this->assertSame(self::TESTING_TYPE, $this->mapper->keyToInfo('test.whiz.bang')->type);
     $this->assertSame('newextension', $this->mapper->keyToInfo('test.whiz.bang')->file);
   }
 
@@ -469,9 +469,9 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
 
   public function testComponentExtensionSync(): void {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCampaign');
-    $this->assertEquals(CRM_Extension_Manager::STATUS_INSTALLED, CRM_Extension_System::singleton()->getManager()->getStatus('civi_campaign'));
+    $this->assertSame(CRM_Extension_Manager::STATUS_INSTALLED, CRM_Extension_System::singleton()->getManager()->getStatus('civi_campaign'));
     CRM_Core_BAO_ConfigSetting::disableComponent('CiviCampaign');
-    $this->assertEquals(CRM_Extension_Manager::STATUS_DISABLED, CRM_Extension_System::singleton()->getManager()->getStatus('civi_campaign'));
+    $this->assertSame(CRM_Extension_Manager::STATUS_DISABLED, CRM_Extension_System::singleton()->getManager()->getStatus('civi_campaign'));
     $this->assertFalse(CRM_Core_Component::isEnabled('CiviCampaign'));
     CRM_Extension_System::singleton()->getManager()->install('civi_campaign');
     $this->assertTrue(CRM_Core_Component::isEnabled('CiviCampaign'));

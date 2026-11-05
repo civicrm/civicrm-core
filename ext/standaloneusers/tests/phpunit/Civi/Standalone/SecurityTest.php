@@ -221,7 +221,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $token = PasswordReset::updateToken($userID);
     $decodedToken = \Civi::service('crypto.jwt')->decode($token);
     $this->assertEquals('uid:' . $userID, $decodedToken['sub']);
-    $this->assertEquals(PasswordReset::PASSWORD_RESET_SCOPE, $decodedToken['scope']);
+    $this->assertSame(PasswordReset::PASSWORD_RESET_SCOPE, $decodedToken['scope']);
 
     // Check it works, but only once.
     $extractedUserID = PasswordReset::checkPasswordResetToken($token);

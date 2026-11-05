@@ -117,10 +117,10 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->assertSame(1, $contribution['count']);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->_individualId);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->getFinancialTypeID('Donation'));
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['non_deductible_amount'], 10.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 5.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['net_amount'], 95.00);
+    $this->assertSame('100.00', $contribution['values'][$contribution['id']]['total_amount']);
+    $this->assertSame('10.00', $contribution['values'][$contribution['id']]['non_deductible_amount']);
+    $this->assertSame('5.00', $contribution['values'][$contribution['id']]['fee_amount']);
+    $this->assertSame('95.00', $contribution['values'][$contribution['id']]['net_amount']);
     $this->assertSame('23456', $contribution['values'][$contribution['id']]['trxn_id']);
     $this->assertSame('78910', $contribution['values'][$contribution['id']]['invoice_id']);
     $this->assertSame('SSF', $contribution['values'][$contribution['id']]['contribution_source']);
@@ -222,7 +222,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     ];
     $lineItems = $this->callAPISuccess('LineItem', 'get', $lineItemParams);
     $this->assertSame(3, $lineItems['count']);
-    $this->assertEquals(100.00, $lineItems['values'][0]['line_total']);
+    $this->assertSame('100.00', $lineItems['values'][0]['line_total']);
     $this->assertSame('20.00', $lineItems['values'][1]['line_total']);
     $this->assertSame('80.00', $lineItems['values'][2]['line_total']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $lineItems['values'][0]['financial_type_id']);
@@ -258,7 +258,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->addFinancialAclPermissions([['edit', 'Donation']]);
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
 
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 200.00);
+    $this->assertSame('200.00', $contribution['values'][$contribution['id']]['total_amount']);
   }
 
   /**

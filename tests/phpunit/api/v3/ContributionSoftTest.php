@@ -232,7 +232,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     //check against original values
     $this->assertEquals($old_contribution_id, $this->_contributionId);
     $this->assertEquals($old_contact_id, $this->_softIndividual1Id);
-    $this->assertEquals($old_amount, 10.00);
+    $this->assertSame('10.00', $old_amount);
     $this->assertSame('USD', $old_currency);
     $this->assertSame('6', $old_soft_credit_type_id);
     $params = [
@@ -253,7 +253,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     //check against original values
     $this->assertEquals($softContribution['values'][$softContributionID]['contribution_id'], $this->_contributionId);
     $this->assertEquals($softContribution['values'][$softContributionID]['contact_id'], $this->_softIndividual1Id);
-    $this->assertEquals($softContribution['values'][$softContributionID]['amount'], 7.00);
+    $this->assertSame('7.00', $softContribution['values'][$softContributionID]['amount']);
     $this->assertSame('CAD', $softContribution['values'][$softContributionID]['currency']);
     $this->assertSame('7', $softContribution['values'][$softContributionID]['soft_credit_type_id']);
 

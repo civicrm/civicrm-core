@@ -56,7 +56,7 @@ class E2E_Extern_WidgetTest extends CiviEndToEndTestCase {
       $query = ['cpageId' => $contributionPage['id'], 'widgetId' => $widget->id, 'format' => 3];
       $client = CRM_Utils_HttpClient::singleton();
       [$status, $data] = $client->post($this->url, $query);
-      $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+      $this->assertSame(CRM_Utils_HttpClient::STATUS_OK, $status);
       $check = substr(trim(substr($data, strpos($data, '{'))), 0, -1);
       $decodedData = json_decode($check, TRUE);
       $expected = [

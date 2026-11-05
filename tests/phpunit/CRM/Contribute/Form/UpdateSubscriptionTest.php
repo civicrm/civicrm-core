@@ -80,12 +80,12 @@ class CRM_Contribute_Form_UpdateSubscriptionTest extends CiviUnitTestCase {
     $contributionRecur = ContributionRecur::get(FALSE)
       ->addWhere('id', '=', $this->getContributionRecurID())
       ->execute()->single();
-    $this->assertEquals(25.50, $contributionRecur['amount']);
+    $this->assertSame(25.50, $contributionRecur['amount']);
     $templateContribution = Contribution::get(FALSE)
       ->addWhere('contribution_recur_id', '=', $this->getContributionRecurID())
       ->addWhere('is_template', '=', TRUE)
       ->execute()->single();
-    $this->assertEquals(25.50, $templateContribution['total_amount']);
+    $this->assertSame(25.50, $templateContribution['total_amount']);
     $activity = Activity::get(FALSE)
       ->addWhere('activity_type_id:name', '=', 'Update Recurring Contribution')
       ->addWhere('source_contact_id', '=', $this->getContactID())

@@ -1548,7 +1548,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       ],
     ]);
     $values = $rows['values'][0];
-    $this->assertEquals(100.00, $values['civicrm_contribution_soft_amount_1_sum'], 'Total committed should be $100');
+    $this->assertSame('100.00', $values['civicrm_contribution_soft_amount_1_sum'], 'Total committed should be $100');
     $this->assertSame('2', $values['civicrm_contribution_soft_soft_id_count'], 'Total donors should be 2');
   }
 

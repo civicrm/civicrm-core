@@ -68,7 +68,7 @@ class CRM_Core_Payment_PaypalStdTest extends CiviUnitTestCase {
       $this->assertSame('/cgi-bin/webscr', $redirectValues['path']);
       $query = [];
       parse_str($redirectValues['query'], $query);
-      $this->assertEquals(5.24, $query['amount']);
+      $this->assertSame(5.24, $query['amount']);
       $this->assertSame('CiviCRM_SP', $query['bn']);
     }
   }

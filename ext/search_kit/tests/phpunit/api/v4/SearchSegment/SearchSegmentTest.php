@@ -126,19 +126,19 @@ class SearchSegmentTest extends \PHPUnit\Framework\TestCase implements HeadlessI
 
     // Results should be in alphabetical order by giving tier
     $this->assertSame('Heavy hitter', $result[0]['columns'][0]['val']);
-    $this->assertEquals(56.0, $result[0]['data']['AVG_total_amount']);
+    $this->assertSame(56.0, $result[0]['data']['AVG_total_amount']);
     $this->assertSame(1, $result[0]['data']['COUNT_total_amount']);
 
     $this->assertSame('Low ball', $result[1]['columns'][0]['val']);
-    $this->assertEquals(1.5, $result[1]['data']['AVG_total_amount']);
+    $this->assertSame(1.5, $result[1]['data']['AVG_total_amount']);
     $this->assertSame(1, $result[1]['data']['COUNT_total_amount']);
 
     $this->assertSame('Major league', $result[2]['columns'][0]['val']);
-    $this->assertEquals(30.0, $result[2]['data']['AVG_total_amount']);
+    $this->assertSame(30.0, $result[2]['data']['AVG_total_amount']);
     $this->assertSame(3, $result[2]['data']['COUNT_total_amount']);
 
     $this->assertSame('Minor league', $result[3]['columns'][0]['val']);
-    $this->assertEquals(15.0, $result[3]['data']['AVG_total_amount']);
+    $this->assertSame(15.0, $result[3]['data']['AVG_total_amount']);
     $this->assertSame(2, $result[3]['data']['COUNT_total_amount']);
   }
 

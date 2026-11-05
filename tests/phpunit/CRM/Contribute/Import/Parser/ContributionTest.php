@@ -125,8 +125,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contributionsOfMainContact = Contribution::get()->addWhere('contact_id', '=', $mainContactID)->execute();
     // Although there are 2 rows in the csv, 1 should fail each time due to conflicting money formats.
     $this->assertCount(1, $contributionsOfMainContact, 'Wrong number of contributions imported');
-    $this->assertEquals(1230.99, $contributionsOfMainContact->first()['total_amount']);
-    $this->assertEquals(1230.99, $contributionsOfMainContact->first()['net_amount']);
+    $this->assertSame(1230.99, $contributionsOfMainContact->first()['total_amount']);
+    $this->assertSame(1230.99, $contributionsOfMainContact->first()['net_amount']);
     $this->assertSame(0.0, $contributionsOfMainContact->first()['fee_amount']);
 
     $contributionsOfSoftContact = ContributionSoft::get()->addWhere('contact_id', '=', $softCreditContactID)->execute();

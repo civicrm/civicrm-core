@@ -141,10 +141,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $contributions['values'][$contributions['id']];
     $this->assertEquals($this->ids['Contact']['individual_0'], $contribution['contact_id']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
-    $this->assertEquals(100.00, $contribution['total_amount']);
-    $this->assertEquals(10.00, $contribution['non_deductible_amount']);
-    $this->assertEquals(5.00, $contribution['fee_amount']);
-    $this->assertEquals(95.00, $contribution['net_amount']);
+    $this->assertSame('100.00', $contribution['total_amount']);
+    $this->assertSame('10.00', $contribution['non_deductible_amount']);
+    $this->assertSame('5.00', $contribution['fee_amount']);
+    $this->assertSame('95.00', $contribution['net_amount']);
     $this->assertSame('23456', $contribution['trxn_id']);
     $this->assertSame('78910', $contribution['invoice_id']);
     $this->assertMatchesRegularExpression('/INV_\d+/', $contribution['invoice_number']);
@@ -366,10 +366,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['contact_id'], $this->ids['Contact']['individual_0']);
     $this->assertEquals($this->financialTypeID, $contribution['financial_type_id']);
     $this->assertEquals($this->financialTypeID, $contribution['contribution_type_id']);
-    $this->assertEquals(100.00, $contribution['total_amount']);
-    $this->assertEquals(10.00, $contribution['non_deductible_amount']);
-    $this->assertEquals(5.00, $contribution['fee_amount']);
-    $this->assertEquals(95.00, $contribution['net_amount']);
+    $this->assertSame('100.00', $contribution['total_amount']);
+    $this->assertSame('10.00', $contribution['non_deductible_amount']);
+    $this->assertSame('5.00', $contribution['fee_amount']);
+    $this->assertSame('95.00', $contribution['net_amount']);
     $this->assertSame('23456', $contribution['trxn_id']);
     $this->assertSame('78910', $contribution['invoice_id']);
     $this->assertSame('SSF', $contribution['contribution_source']);
@@ -566,7 +566,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
     $this->assertEquals($this->individualID, $contribution['contact_id']);
-    $this->assertEquals(100.00, $contribution['total_amount']);
+    $this->assertSame('100.00', $contribution['total_amount']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
     $this->assertSame('12345', $contribution['trxn_id']);
     $this->assertSame('67890', $contribution['invoice_id']);
@@ -818,7 +818,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ];
 
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
-    $this->assertEquals(100.00, $contribution['values'][$contribution['id']]['total_amount']);
+    $this->assertSame('100.00', $contribution['values'][$contribution['id']]['total_amount']);
     $this->assertSame('SSF', $contribution['values'][$contribution['id']]['source']);
   }
 
@@ -842,8 +842,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $contribution = $this->callAPISuccessGetSingle('contribution', ['id' => $contribution['id']]);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['receive_date'])));
-    $this->assertEquals(5000.77, $contribution['total_amount'], 'failed to handle ' . $this->formatMoneyInput(5000.77));
-    $this->assertEquals(.77, $contribution['fee_amount']);
+    $this->assertSame('5000.77', $contribution['total_amount'], 'failed to handle ' . $this->formatMoneyInput(5000.77));
+    $this->assertSame('0.77', $contribution['fee_amount']);
     $this->assertSame('5000.00', $contribution['net_amount']);
   }
 
@@ -1036,9 +1036,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
     $this->assertEquals($contribution['values'][$contribution['id']]['contact_id'], $this->individualID);
-    $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['fee_amount'], 50.00);
-    $this->assertEquals($contribution['values'][$contribution['id']]['net_amount'], 50.00);
+    $this->assertSame('100.00', $contribution['values'][$contribution['id']]['total_amount']);
+    $this->assertSame('50.00', $contribution['values'][$contribution['id']]['fee_amount']);
+    $this->assertSame('50.00', $contribution['values'][$contribution['id']]['net_amount']);
     $this->assertEquals($contribution['values'][$contribution['id']]['financial_type_id'], $this->getFinancialTypeID('Donation'));
     $this->assertSame('12345', $contribution['values'][$contribution['id']]['trxn_id']);
     $this->assertSame('67890', $contribution['values'][$contribution['id']]['invoice_id']);
@@ -1089,7 +1089,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
     $contribution = $contribution['values'][$contribution['id']];
     $this->assertEquals($params['contact_id'], $contribution['contact_id']);
-    $this->assertEquals(100.00, $contribution['total_amount']);
+    $this->assertSame('100.00', $contribution['total_amount']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
     $this->assertSame('12345', $contribution['trxn_id']);
     $this->assertSame('67890', $contribution['invoice_id']);
@@ -1128,7 +1128,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
     $contribution = $contribution['values'][$contribution['id']];
     $this->assertEquals($contribution['contact_id'], $this->individualID);
-    $this->assertEquals(100.00, $contribution['total_amount']);
+    $this->assertSame('100.00', $contribution['total_amount']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
     $this->assertSame('12345', $contribution['trxn_id']);
     $this->assertSame('67890', $contribution['invoice_id']);
@@ -1158,7 +1158,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
     $contribution = $contribution['values'][$contribution['id']];
     $this->assertEquals($contribution['contact_id'], $this->ids['Contact']['individual_0']);
-    $this->assertEquals(100.00, $contribution['total_amount']);
+    $this->assertSame('100.00', $contribution['total_amount']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contribution['financial_type_id']);
     $this->assertSame('12345', $contribution['trxn_id']);
     $this->assertSame('67890', $contribution['invoice_id']);
@@ -1395,7 +1395,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $contribution['id'])
       ->addSelect('paid_amount')
       ->execute()->single()['paid_amount'];
-    $this->assertEquals(0.0, (float) $paidAmount, 'paid_amount should reflect the chargeback reversal.');
+    $this->assertSame(0.0, (float) $paidAmount, 'paid_amount should reflect the chargeback reversal.');
   }
 
   /**
@@ -1718,7 +1718,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     //check against values in CiviUnitTestCase::createContribution()
     $this->assertEquals($old_contact_id, $this->individualID);
-    $this->assertEquals($old_fee_amount, 5.00);
+    $this->assertSame('5.00', $old_fee_amount);
     $this->assertSame('SSF', $old_source);
     $this->assertSame('212355', $old_trxn_id);
     $this->assertSame('old_invoice', $old_invoice_id);
@@ -1739,12 +1739,12 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ]);
 
     $this->assertEquals($this->individualID, $contribution['contact_id']);
-    $this->assertEquals(105.00, $contribution['total_amount']);
+    $this->assertSame('105.00', $contribution['total_amount']);
     $this->assertEquals($this->financialTypeID, $contribution['financial_type_id']);
     $this->assertSame('Donation', $contribution['financial_type']);
     $this->assertEquals($old_payment_instrument, $contribution['instrument_id']);
-    $this->assertEquals(22.00, $contribution['non_deductible_amount']);
-    $this->assertEquals(7.00, $contribution['fee_amount']);
+    $this->assertSame('22.00', $contribution['non_deductible_amount']);
+    $this->assertSame('7.00', $contribution['fee_amount']);
     $this->assertEquals($old_trxn_id, $contribution['trxn_id']);
     $this->assertEquals($old_invoice_id, $contribution['invoice_id']);
     $this->assertEquals($old_source, $contribution['contribution_source']);
@@ -2165,8 +2165,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'sequential' => 1,
     ]);
     $contributionPostPayment = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID, 'return' => ['tax_amount', 'fee_amount', 'net_amount']]);
-    $this->assertEquals(4.76, $contributionPrePayment['tax_amount']);
-    $this->assertEquals(4.76, $contributionPostPayment['tax_amount']);
+    $this->assertSame('4.76', $contributionPrePayment['tax_amount']);
+    $this->assertSame('4.76', $contributionPostPayment['tax_amount']);
     $this->assertSame('6.00', $contributionPostPayment['fee_amount']);
     $this->assertSame('94.00', $contributionPostPayment['net_amount']);
     $this->validateAllContributions();
@@ -4880,7 +4880,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['sequential' => 1, 'trxn_id' => 'test-2', 'return' => ['total_amount', 'tax_amount']]);
     $this->assertSame('200.00', $contribution['total_amount']);
-    $this->assertEquals(18.18, $contribution['tax_amount']);
+    $this->assertSame('18.18', $contribution['tax_amount']);
   }
 
   public function testGetCurrencyOptions(): void {

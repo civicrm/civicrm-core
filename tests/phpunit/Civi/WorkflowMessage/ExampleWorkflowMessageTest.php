@@ -139,12 +139,12 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $field = $fields['implicitStringArray'];
     $this->assertEquals(['string[]'], $field->getType());
     $this->assertSame('Blob', $field->getDataType());
-    $this->assertEquals(\CRM_Core_DAO::SERIALIZE_JSON, $field->getSerialize());
+    $this->assertSame(\CRM_Core_DAO::SERIALIZE_JSON, $field->getSerialize());
 
     $field = $fields['explicitStringArray'];
     $this->assertEquals(['string[]'], $field->getType());
     $this->assertSame('Text', $field->getDataType());
-    $this->assertEquals(\CRM_Core_DAO::SERIALIZE_COMMA, $field->getSerialize());
+    $this->assertSame(\CRM_Core_DAO::SERIALIZE_COMMA, $field->getSerialize());
 
     $field = $fields['myProtectedInt'];
     $this->assertEquals(['int'], $field->getType());

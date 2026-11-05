@@ -671,7 +671,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ])
       ->addLineItem(['line_total_inclusive' => 500])->execute()->single();
     $this->assertSame(500.0, $order['total_amount']);
-    $this->assertEquals(45.45, round($order['tax_amount'], 2));
+    $this->assertSame(45.45, round($order['tax_amount'], 2));
     // There is some long-standing messiness with rounding, that is believed to require
     // a schema change. However, it seems reasonable to expect that this
     // should calculate the same as just passing in total_amount to the contribution
@@ -697,7 +697,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ])
       ->addLineItem(['line_total_inclusive' => 15])->execute()->single();
     $this->assertSame(15.0, $order['total_amount']);
-    $this->assertEquals(2.39, $order['tax_amount']);
+    $this->assertSame(2.39, $order['tax_amount']);
     $this->assertLineItemAmounts($order['id'], 12.61, 2.39);
 
     Contribution::update(FALSE)

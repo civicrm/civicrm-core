@@ -39,7 +39,7 @@ class StateTest extends \PHPUnit\Framework\TestCase implements
     $this->assertSame(123, $state['clientId']);
     $this->assertSame('OAuthSysToken', $state['storage']);
     // PHPUnit runs in CLI... so any state we generate is attached to wildcard session.
-    $this->assertEquals(OAuthState::SESSION_WILDCARD, $state['session']);
+    $this->assertSame(OAuthState::SESSION_WILDCARD, $state['session']);
 
     \CRM_Utils_Time::setTime('2025-11-02 06:01:00');
     try {

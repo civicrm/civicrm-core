@@ -90,7 +90,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
     $this->publicFieldParams['option_visibility_id'][1] = $this->visibilityOptionsKeys['public'];
     $priceField = $form->submit($this->publicFieldParams);
     $priceOptions = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField->id]);
-    $this->assertEquals(123456789.987654321, $priceOptions['values'][$priceOptions['id']]['amount']);
+    $this->assertSame('123456789.987654321', $priceOptions['values'][$priceOptions['id']]['amount']);
   }
 
   private function initializeFieldParameters($params) {

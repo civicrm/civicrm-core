@@ -540,7 +540,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
     $amounts = [100.00, 50.00];
     while ($dao->fetch()) {
-      $this->assertEquals(150.00, $dao->total_amount, 'Mismatch of total amount paid.');
+      $this->assertSame(150.00, $dao->total_amount, 'Mismatch of total amount paid.');
       $this->assertEquals($dao->amount, array_pop($amounts), 'Mismatch of amount proportionally assigned to financial item');
     }
   }
@@ -863,8 +863,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       ->addWhere('financial_trxn_id', '=', $financialTrxn['id'])
       ->addOrderBy('amount')->execute();
     $this->assertCount(2, $entityFinancialTrxns, '2 EntityFinancialTrxns should be created (one for tax).');
-    $this->assertEquals(4.55, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
-    $this->assertEquals(45.45, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
+    $this->assertSame(4.55, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertSame(45.45, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
   }
 
   /**
@@ -1088,8 +1088,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'return' => ['financial_type_id.name', 'line_total'],
     ]);
 
-    $this->assertEquals(
-      100.00,
+    $this->assertSame(
+      '100.00',
       $lineItem['line_total'],
       'Invalid line amount.'
     );
