@@ -1,3 +1,9 @@
+/* ensure element that wraps tables allow scrolling in case the table overflows. */
+.crm-table-container {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .crm-container table:not(.crm-inline-edit-form,
 .crm-table-group-summary) {
   border: var(--crm-table-outside-border);
