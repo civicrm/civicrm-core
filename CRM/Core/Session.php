@@ -404,7 +404,7 @@ class CRM_Core_Session {
   public function popUserContext() {
     $this->createScope(self::USER_CONTEXT);
 
-    return array_pop($this->_session[$this->_key][self::USER_CONTEXT]);
+    return $this->localizeUserContext(array_pop($this->_session[$this->_key][self::USER_CONTEXT]));
   }
 
   /**
@@ -418,7 +418,18 @@ class CRM_Core_Session {
 
     $config = CRM_Core_Config::singleton();
     $lastElement = count($this->_session[$this->_key][self::USER_CONTEXT]) - 1;
-    return $lastElement >= 0 ? $this->_session[$this->_key][self::USER_CONTEXT][$lastElement] : $config->userFrameworkBaseURL;
+    return $lastElement >= 0 ? $this->localizeUserContext($this->_session[$this->_key][self::USER_CONTEXT][$lastElement]) : $config->userFrameworkBaseURL;
+  }
+
+  /**
+   * Stored user contexts have the CMS language of the request that pushed them.
+   *
+   * @param string|null $userContext
+   *
+   * @return string|null
+   */
+  private function localizeUserContext($userContext) {
+    return is_string($userContext) && $userContext !== '' ? CRM_Utils_System::localizeUrl($userContext) : $userContext;
   }
 
   /**
