@@ -31,8 +31,8 @@
                   {$element.field_value|nl2br|purify}
                 {elseif $element.field_data_type == 'Money' && $element.field_type == 'Text'}
                   {$element.data|crmMoney}
-                {elseif $element.field_data_type == 'ContactReference' && $element.contact_ref_links}
-                  {$element.contact_ref_links|join:', '}
+                {elseif !empty($element.ref_links)}
+                  {$element.ref_links|join:', '}
                 {elseif $element.field_type eq 'File' || $element.field_type eq 'TextArea' || $element.field_type eq 'RichTextEditor' || $element.field_type === 'Link'}
                   {$element.field_value|purify}
                 {else}

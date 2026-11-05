@@ -27,10 +27,9 @@
           </div>
         {else}
           <div class="crm-label">{$element.field_title|escape}</div>
-          {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
-            {*Contact ref id passed if user has sufficient permissions - so make a link.*}
-            <div class="crm-content crm-custom-data crm-contact-reference">
-              {$element.contact_ref_links|join:', '}
+          {if !empty($element.ref_links)}
+            <div class="crm-content crm-custom-data">
+              {$element.ref_links|join:', '}
             </div>
           {elseif $element.field_type eq 'File' || $element.field_type eq 'TextArea' || $element.field_type eq 'RichTextEditor' || $element.field_type === 'Link'}
             <div class="crm-content crm-custom-data">{$element.field_value|purify}</div>
