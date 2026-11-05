@@ -784,6 +784,8 @@ EOHTML;
   }
 
   public function testMultipleLocationJoins(): void {
+    $homeID = $this->getLocationTypeID('Home');
+    $workID = $this->getLocationTypeID('Work');
     $layout = <<<EOHTML
 <af-form ctrl="afform">
   <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" url-autofill="1" />
@@ -794,13 +796,13 @@ EOHTML;
         <af-field name="last_name" />
       </div>
     </div>
-    <div af-join="Phone" actions="{update: true, delete: true}" data="{location_type_id: 1}">
+    <div af-join="Phone" actions="{update: true, delete: true}" data="{location_type_id: $homeID}">
       <div class="af-container af-layout-inline">
         <af-field name="phone" defn="{required: false, input_attrs: {}}" />
         <af-field name="phone_ext" />
       </div>
     </div>
-    <div af-join="Phone" actions="{update: true, delete: true}" data="{location_type_id: 2}">
+    <div af-join="Phone" actions="{update: true, delete: true}" data="{location_type_id: $workID}">
       <div class="af-container af-layout-inline">
         <af-field name="phone" defn="{required: false, input_attrs: {}}" />
       </div>
@@ -822,7 +824,7 @@ EOHTML;
 
     $phone2 = $this->createTestRecord('Phone', [
       'phone' => '2-2',
-      'location_type_id' => 2,
+      'location_type_id' => $workID,
       'phone_ext' => '222',
       'contact_id' => $cid,
     ])['id'];
@@ -863,10 +865,10 @@ EOHTML;
       ->execute();
 
     $this->assertCount(2, $phoneValues);
-    $this->assertSame(1, $phoneValues[0]['location_type_id']);
+    $this->assertSame($homeID, $phoneValues[0]['location_type_id']);
     $this->assertSame('1-1-1', $phoneValues[0]['phone']);
     $this->assertSame('111', $phoneValues[0]['phone_ext']);
-    $this->assertSame(2, $phoneValues[1]['location_type_id']);
+    $this->assertSame($workID, $phoneValues[1]['location_type_id']);
     $this->assertSame('2-2-2', $phoneValues[1]['phone']);
     $this->assertSame('222', $phoneValues[1]['phone_ext']);
 
@@ -900,10 +902,10 @@ EOHTML;
       ->execute();
 
     $this->assertCount(2, $phoneValues);
-    $this->assertSame(1, $phoneValues[0]['location_type_id']);
+    $this->assertSame($homeID, $phoneValues[0]['location_type_id']);
     $this->assertSame('1', $phoneValues[0]['phone']);
     $this->assertSame('111', $phoneValues[0]['phone_ext']);
-    $this->assertSame(2, $phoneValues[1]['location_type_id']);
+    $this->assertSame($workID, $phoneValues[1]['location_type_id']);
     $this->assertSame('2', $phoneValues[1]['phone']);
 
     $prefill = Afform::prefill()
