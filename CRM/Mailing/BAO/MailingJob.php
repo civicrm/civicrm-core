@@ -662,19 +662,69 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
   }
 
   /**
-   * Unschedule a mailing
+   * Unschedule a mailing whose delivery has not started.
+   *
+   * Test jobs are kept: they are the record of test sends, which a draft may have.
    *
    * @param int $mailingID
    *   The id of the mailing to be unscheduled.
+   *
+   * @throws CRM_Core_Exception
+   *   If the mailing is not scheduled, or its delivery has started or is starting.
    */
   public static function revert($mailingID) {
-    Mailing::update(FALSE)
-      ->setValues(['status:name' => 'Draft', 'scheduled_id' => NULL, 'scheduled_date' => NULL])
-      ->addWhere('id', '=', $mailingID)
-      ->execute();
-    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_mailing_job WHERE mailing_id = %1 ", [
-      1 => [$mailingID, 'Integer'],
-    ]);
+    $locks = [];
+    try {
+      $parentJobIDs = self::getNonTestParentJobIDs($mailingID);
+      // runJobs_pre() holds this lock while it splits a parent job and moves it to Running.
+      foreach ($parentJobIDs as $jobID) {
+        $locks[] = $lock = Civi::lockManager()->acquire("data.mailing.job.{$jobID}");
+        if (!$lock->isAcquired()) {
+          throw new CRM_Core_Exception(ts('This mailing is being processed right now, so it was not unscheduled. Please try again in a moment.'));
+        }
+      }
+      $status = Mailing::get(FALSE)
+        ->addSelect('status:name')
+        ->addWhere('id', '=', $mailingID)
+        ->execute()
+        ->first()['status:name'] ?? NULL;
+      $startedJobs = MailingJob::get(FALSE)
+        ->selectRowCount()
+        ->addWhere('mailing_id', '=', $mailingID)
+        ->addWhere('is_test', '=', FALSE)
+        ->addClause('OR', ['job_type', '=', 'child'], ['status:name', '!=', 'Scheduled'], ['start_date', 'IS NOT NULL'])
+        ->execute()
+        ->countMatched();
+      if ($status !== 'Scheduled' || $startedJobs) {
+        throw new CRM_Core_Exception(ts('Only a scheduled mailing whose delivery has not started can be unscheduled.'));
+      }
+      // A parent created since the read above is not locked, so cron could be starting it.
+      if (self::getNonTestParentJobIDs($mailingID) != $parentJobIDs) {
+        throw new CRM_Core_Exception(ts('This mailing is being processed right now, so it was not unscheduled. Please try again in a moment.'));
+      }
+      Mailing::update(FALSE)
+        ->setValues(['status:name' => 'Draft', 'scheduled_id' => NULL, 'scheduled_date' => NULL])
+        ->addWhere('id', '=', $mailingID)
+        ->execute();
+      CRM_Core_DAO::executeQuery("DELETE FROM civicrm_mailing_job WHERE mailing_id = %1 AND is_test = 0", [
+        1 => [$mailingID, 'Integer'],
+      ]);
+    }
+    finally {
+      foreach ($locks as $lock) {
+        $lock->release();
+      }
+    }
+  }
+
+  private static function getNonTestParentJobIDs($mailingID): array {
+    return MailingJob::get(FALSE)
+      ->addWhere('mailing_id', '=', $mailingID)
+      ->addWhere('is_test', '=', FALSE)
+      ->addClause('OR', ['job_type', 'IS NULL'], ['job_type', '!=', 'child'])
+      ->addOrderBy('id')
+      ->execute()
+      ->column('id');
   }
 
   /**
