@@ -54,10 +54,11 @@ class DbUtilTest extends \CiviUnitTestCase {
    * @param string $username
    * @param string $password
    * @param string $database
+   * @param string $server
    */
-  public function testEncodeDsnRoundTrip(string $username, string $password, string $database) {
+  public function testEncodeDsnRoundTrip(string $username, string $password, string $database, string $server = 'db.example.org:3306') {
     $db = [
-      'server' => 'db.example.org:3306',
+      'server' => $server,
       'username' => $username,
       'password' => $password,
       'database' => $database,
@@ -88,6 +89,9 @@ class DbUtilTest extends \CiviUnitTestCase {
       'space' => ['civicrm', 'pa ss', 'civicrm'],
       'plus' => ['civicrm', 'pa+ss', 'civicrm'],
       'special database' => ['civicrm', 'secret', 'db name'],
+      'socket' => ['civicrm', 'secret', 'civicrm', 'unix(/var/lib/mysql/mysql.sock)'],
+      'socket with special password' => ['civicrm', 'pa ss', 'civicrm', 'unix(/var/lib/mysql/mysql.sock)'],
+      'socket with special database' => ['civicrm', 'secret', 'db name', 'unix(/var/lib/mysql/mysql.sock)'],
     ];
   }
 
