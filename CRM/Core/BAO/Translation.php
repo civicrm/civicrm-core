@@ -139,7 +139,7 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation {
       $dao = new $daoClass();
       $dao->id = $record['entity_id'];
 
-      $field = $dao->getFieldSpec($record['entity_field']);
+      $field = $daoClass::getFieldSpec($record['entity_field']);
       if (!$field || !in_array($field['type'] ?? '', $dataTypes) || !in_array($field['html']['type'] ?? '', $htmlTypes)) {
         $e->addError($r, 'entity_field', 'bad_field', ts('Entity reference specifies a non-existent or non-translatable field'));
       }

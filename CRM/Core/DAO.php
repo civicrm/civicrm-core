@@ -2963,13 +2963,13 @@ SELECT contact_id
    * @param string $fieldName
    * @return bool|array
    */
-  public function getFieldSpec($fieldName) {
-    $fields = $this->fields();
+  public static function getFieldSpec($fieldName) {
+    $fields = static::fields();
 
     // Support "unique names" as well as sql names
     $fieldKey = $fieldName;
     if (empty($fields[$fieldKey])) {
-      $fieldKeys = $this->fieldKeys();
+      $fieldKeys = static::fieldKeys();
       $fieldKey = $fieldKeys[$fieldName] ?? NULL;
     }
     // If neither worked then this field doesn't exist. Return false.
