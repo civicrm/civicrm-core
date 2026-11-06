@@ -32,15 +32,9 @@
   };
 
   /**
-   * Replace angular terms from stored expressions
+   * Backwards compatibility for angularjs-ish expressions
    *
-   * Data references previously stored in quoteless javascript array notation
-   * are converted to our token format:
-   * - Individual1[0][fields][first_name] => [Individual1.0.first_name]
-   * - Individual1[1][joins][Email][0][location_type_id] => [Individual1.0.Email.0.location_type_id:name]
-   *
-   * Quotations are removed from string literals:
-   * - "John" => John
+   * @see FormDataModel::replaceAngularTerms
    */
   const replaceAngularTerms = (expression) => {
     if (Array.isArray(expression)) {
@@ -55,13 +49,20 @@
           .replace('.fields.', '.');
         expression = `[${expression}]`;
       }
-      // check for double encoded arrays
+      // see above only arrays and strings
       try {
-        expression = JSON.parse(expression);
-        expression = replaceAngularTerms(expression);
+        const parsed = JSON.parse(expression);
+        if (Array.isArray(parsed) || typeof parsed === 'string' || typeof parsed === 'boolean') {
+          expression = parsed;
+          // recurse into arrays/strings
+          expression = replaceAngularTerms(expression);
+        }
+        else {
+          // numeric string or similar, leave as is
+        }
       }
       catch (e) {
-        // no worries leave as is
+        // not JSON, no worries
       }
     }
     return expression;

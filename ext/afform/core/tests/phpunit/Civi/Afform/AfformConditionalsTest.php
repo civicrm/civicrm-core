@@ -3,7 +3,6 @@ namespace Civi\Afform;
 
 use Civi\Api4\Action\Afform\AbstractProcessor;
 use Civi\Test\HeadlessInterface;
-use Override;
 
 /**
  * @group headless
@@ -19,6 +18,7 @@ class AfformConditionalsTest extends \PHPUnit\Framework\TestCase implements Head
    */
   protected function getConditionalProcessor() {
     return new class extends AbstractProcessor {
+
       public function __construct() {
         // no entity name needed
       }
@@ -37,6 +37,7 @@ class AfformConditionalsTest extends \PHPUnit\Framework\TestCase implements Head
         $this->_entityValues = $entityValues;
         return $this->checkAfformConditional(FormDataModel::parseExpression(\html_entity_decode($expression)));
       }
+
     };
   }
 
