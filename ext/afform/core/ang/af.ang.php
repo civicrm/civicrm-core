@@ -8,7 +8,8 @@ return [
   ],
   // 'css' => ['ang/af.css'],
   'partials' => ['ang/af'],
-  'requires' => ['crmUtil'],
+  'requires' => ['crmUtil', 'crmUi'],
+  'settingsFactory' => ['\Civi\Afform\DuplicateContactCheck', 'getSettings'],
   'basePages' => [],
   'exports' => [
     'af-entity' => 'E',
