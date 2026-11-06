@@ -43,7 +43,7 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
     }
 
     try {
-      $this->sendMessage($record);
+      $sendDetails = $this->sendMessage($record);
     }
     catch (\CRM_Core_Exception $e) {
       $error = $e->getMessage();
@@ -58,12 +58,16 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
       ];
     }
 
+    $extra = array_merge($record['extra'] ?? [], $sendDetails);
+
     \Civi\Api4\EmailMessage::update(FALSE)
       ->addWhere('id', '=', $record['id'])
       ->addValue('date_sent', 'now')
+      ->addValue('extra', $extra)
       ->execute();
 
     return [
+      'id' => $record['id'],
       'status' => 'sent',
     ];
   }
@@ -148,9 +152,10 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
   /**
    * Attempt to send email for a given record
    *
+   * @return array details of send
    * @throws \CRM_Core_Exception
    */
-  private function sendMessage(array $record): void {
+  private function sendMessage(array $record): array {
 
     $fromAddress = $this->renderFromAddress($record);
 
@@ -195,6 +200,21 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
     if (!$result) {
       throw new \CRM_Core_Exception("Error sending email to {$recipient['name']} <{$recipient['email']}>");
     }
+
+    // take final details from $mailParams
+    // in case altered by alterMailParams
+    $fromAddress = $mailParams['from'];
+    // extract email part
+    $fromEmail = trim(substr($fromAddress, strrpos($fromAddress, '<')), '<>');
+
+    return [
+      'final_addresses' => [
+        'from' => $fromEmail,
+        'to' => [$mailParams['toEmail']],
+        // 'cc' => [],
+        // 'bcc' => [],
+      ],
+    ];
   }
 
 }
