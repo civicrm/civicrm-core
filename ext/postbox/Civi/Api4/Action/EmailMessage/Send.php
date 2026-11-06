@@ -38,7 +38,7 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
     }
 
     try {
-      $this->sendMessage($record);
+      $sendDetails = $this->sendMessage($record);
     }
     catch (\CRM_Core_Exception $e) {
       $error = $e->getMessage();
@@ -47,6 +47,7 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
         ->addWhere('id', '=', $record['id'])
         ->addValue('error_message', $error)
         ->execute();
+
       return [
         'status' => 'error',
         'message' => $error,
@@ -58,7 +59,17 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
       ->addValue('date_sent', 'now')
       ->execute();
 
+    // save final email addresses
+    \Civi\Api4\EmailMessageRecipient::save(FALSE)
+      ->setRecords(array_map(fn ($recipient) => [
+        'id' => $recipient['id'],
+        'email_address' => $recipient['email_address'],
+      ], $sendDetails['recipients']))
+      ->setMatch(['id'])
+      ->execute();
+
     return [
+      'id' => $record['id'],
       'status' => 'sent',
     ];
   }
@@ -88,32 +99,22 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
     return '"' . $fromName . '" <' . $fromEmail . '>';
   }
 
-  private function renderRecipient(array $record, ?string $locationType = NULL): array {
-    // remove join prefix from contact details
-    $contactRecord = [
-      'id' => $record['contact_id'],
-      'display_name' => $record['contact_id.display_name'],
-      'email_primary.email' => $record['contact_id.email_primary.email'],
-      'email_primary.on_hold' => $record['contact_id.email_primary.on_hold'],
-      'do_not_email' => $record['contact_id.do_not_email'],
-      'is_deceased' => $record['contact_id.is_deceased'],
-      'is_deleted' => $record['contact_id.is_deleted'],
-    ];
-
-    if ($contactRecord["do_not_email"] || $contactRecord["is_deceased"] || $contactRecord["is_deleted"]) {
+  private function checkDoNotEmail(array $recipient): void {
+    if ($recipient['contact_id.do_not_email'] || $recipient['contact_id.is_deceased'] || $recipient['contact_id.is_deleted']) {
       throw new \CRM_Core_Exception("Recipient is deceased, deleted, or has opted out from all mailings");
     }
+  }
 
-    $name = $contactRecord["display_name"];
-    $email = $contactRecord["email_primary.email"];
-    $onHold = $contactRecord["email_primary.on_hold"];
+  private function lookupEmailAddress(array $recipient, ?string $locationType = NULL): string {
+    $email = $recipient['contact_id.email_primary.email'];
+    $onHold = $recipient['contact_id.email_primary.on_hold'];
 
     // check for location type specific email
     if ($locationType) {
       $locationEmail = \Civi\Api4\Email::get(FALSE)
         ->addSelect('email')
         ->addWhere('location_type_id:name', '=', $locationType)
-        ->addWhere('contact_id', '=', $contactRecord["id"])
+        ->addWhere('contact_id', '=', $recipient['contact_id'])
         ->addWhere('on_hold', '=', FALSE)
         ->addOrderBy('id', 'DESC')
         ->execute()
@@ -125,7 +126,7 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
         $onHold = FALSE;
       }
       else {
-        \Civi::log('postbox')->debug("Postbox: No active email address for {$contactRecord['id']} with location type {$locationType}. Falling back to primary email.");
+        \Civi::log('postbox')->debug("Postbox: No active email address for {$recipient['contact_id']} with location type {$locationType}. Falling back to primary email.");
       }
     }
 
@@ -133,12 +134,7 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
       throw new \CRM_Core_Exception("Recipient email is blank or on hold so not sending.");
     }
 
-    return [
-      'id' => $contactRecord['id'],
-      'email' => $email,
-      'name' => ($name !== '') ? $name : $email,
-      'type' => $record['recipient_type'],
-    ];
+    return $email;
   }
 
   private function renderMessage(array $record): array {
@@ -155,22 +151,44 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
   /**
    * Attempt to send email for a given record
    *
+   * @return array details of send
    * @throws \CRM_Core_Exception
    */
-  private function sendMessage(array $record): void {
+  private function sendMessage(array $record): array {
 
     $fromAddress = $this->renderFromAddress($record);
 
-    $recipientRecords = (array) \Civi\Api4\EmailMessageRecipient::get(FALSE)
+    $recipients = (array) \Civi\Api4\EmailMessageRecipient::get(FALSE)
       ->addWhere('email_message_id', '=', $record['id'])
-      ->addSelect('recipient_type', 'contact_id', 'contact_id.display_name', 'contact_id.email_primary.email', 'contact_id.email_primary.on_hold', 'contact_id.is_deceased', 'contact_id.is_deleted')
+      ->addSelect(
+        'recipient_type',
+        'email_address',
+        'contact_id',
+        'contact_id.display_name',
+        'contact_id.email_primary.email',
+        'contact_id.email_primary.on_hold',
+        'contact_id.is_deceased',
+        'contact_id.is_deleted',
+        'contact_id.do_not_email'
+      )
       ->execute();
 
-    $recipients = array_map(fn ($recipientRecord) => $this->renderRecipient($recipientRecord, $record['location_type']), $recipientRecords);
+    foreach ($recipients as &$recipient) {
+      // check for do not emails
+      $this->checkDoNotEmail($recipient);
+
+      if (!$recipient['email_address']) {
+        $recipient['email_address'] = $this->lookupEmailAddress($recipient, $record['location_type']);
+      }
+
+      // if email is specified directly, there may be no contact display name
+      // so fall back to using the raw email address
+      $recipient['display_name'] = $recipient['contact_id.display_name'] ?? $recipient['email_address'];
+    }
 
     // NOTE: we currently only support a single TO recipient, due to the constraints
     // of CRM_Utils_Mail::send. Additional TO recipients will be ignored
-    $toRecipient = array_find($recipients, fn ($recipient) => ($recipient['type'] === 'to'));
+    $toRecipient = array_find($recipients, fn ($recipient) => ($recipient['recipient_type'] === 'to'));
 
     if (!$toRecipient) {
       throw new \CRM_Core_Exception(E::ts('No TO recipients found for Email Message %1', [1 => $record['id']]));
@@ -184,22 +202,22 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
       'groupName' => 'Postbox',
       'from' => $fromAddress,
       // recipient details
-      'contactId' => $toRecipient['id'],
-      'toName' => $toRecipient['name'],
-      'toEmail' => $toRecipient['email'],
+      'contactId' => $toRecipient['contact_id'],
+      'toName' => $toRecipient['display_name'],
+      'toEmail' => $toRecipient['email_address'],
       // message content
       'subject' => $message['subject'],
       'html' => $message['html'],
       'text' => $message['text'],
     ];
 
-    $ccRecipients = array_filter($recipients, fn ($recipient) => ($recipient['type'] === 'cc'));
+    $ccRecipients = array_filter($recipients, fn ($recipient) => ($recipient['recipient_type'] === 'cc'));
     if ($ccRecipients) {
-      $mailParams['cc'] = \array_column($ccRecipients, 'email');
+      $mailParams['cc'] = \implode(',', \array_column($ccRecipients, 'email_address'));
     }
-    $bccRecipients = array_filter($recipients, fn ($recipient) => ($recipient['type'] === 'bcc'));
+    $bccRecipients = array_filter($recipients, fn ($recipient) => ($recipient['recipient_type'] === 'bcc'));
     if ($bccRecipients) {
-      $mailParams['bcc'] = \array_column($bccRecipients, 'email');
+      $mailParams['bcc'] = \implode(',', \array_column($bccRecipients, 'email_address'));
     }
 
     // Try to send the email.
@@ -209,6 +227,10 @@ class Send extends \Civi\Api4\Generic\BasicBatchAction {
     if (!$result) {
       throw new \CRM_Core_Exception("Error sending email to {$toRecipient['name']} <{$toRecipient['email']}>");
     }
+
+    return [
+      'recipients' => $recipients,
+    ];
   }
 
 }

@@ -54,6 +54,12 @@ return [
         'callback' => ['CRM_Postbox_BAO_EmailMessageRecipient', 'getTypes'],
       ],
     ],
+    'email_address' => [
+      'title' => E::ts('Email Address'),
+      'sql_type' => 'varchar(320)',
+      'input_type' => 'Text',
+      'description' => E::ts('The email address to use for sending. Usually this is determined automatically from the contact_id at send time, but can be specified directly if desired.'),
+    ],
   ],
   'getIndices' => fn() => [],
   'getPaths' => fn() => [],
