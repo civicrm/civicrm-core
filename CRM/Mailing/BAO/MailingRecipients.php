@@ -69,14 +69,6 @@ WHERE  mailing_id = %1
     $mailingID,
     $offset = NULL, $limit = NULL
   ) {
-    $limitString = NULL;
-    if ($limit && $offset !== NULL) {
-      $offset = CRM_Utils_Type::escape($offset, 'Int');
-      $limit = CRM_Utils_Type::escape($limit, 'Int');
-
-      $limitString = "LIMIT $offset, $limit";
-    }
-
     $sqlObject = CRM_Utils_SQL_Select::from('civicrm_mailing_recipients r')
       ->select('r.contact_id')
       ->select('r.email_id')
@@ -85,8 +77,14 @@ WHERE  mailing_id = %1
       ->where('r.mailing_id = #mailingID')
       ->param('#mailingID', $mailingID)
       ->orderBy('r.id ASC');
-    if ($limitString) {
-      $sqlObject->limit($limit, $offset);
+    if ($limit && $offset !== NULL) {
+      // Page over the unfiltered recipient list: it stays fixed while child jobs run, whereas
+      // deliverability changes (opt-outs, bounces) would shift a window over the filtered rows.
+      $sqlObject->join('page', 'INNER JOIN (
+          SELECT id FROM civicrm_mailing_recipients WHERE mailing_id = #mailingID ORDER BY id LIMIT #limit OFFSET #offset
+        ) page ON page.id = r.id')
+        ->param('#limit', (int) $limit)
+        ->param('#offset', (int) $offset);
     }
     $sql = $sqlObject->toSQL();
     return CRM_Core_DAO::executeQuery($sql);
