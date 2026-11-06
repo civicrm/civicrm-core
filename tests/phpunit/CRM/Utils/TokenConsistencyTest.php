@@ -414,7 +414,7 @@ Czech Republic
       'is_billing' => TRUE,
       'street_address' => 'Heartbreak Motel',
       'supplemental_address_1' => 'Lonely Avenue',
-      'country_id:name' => 'United States',
+      'country_id:name' => 'US',
       'state_province_id:name' => 'California',
     ], 'billing');
     $template = '{contact.first_name} {contact.email_primary.email} {contact.address_primary.street_address} {contact.address_billing.supplemental_address_1} {contact.address_billing.state_province_id:abbr}';
