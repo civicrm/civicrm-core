@@ -47,6 +47,28 @@ class DbUtilTest extends \CiviUnitTestCase {
   }
 
   /**
+   * @dataProvider serverProvider
+   * @param string $server
+   * @param string $expected
+   */
+  public function testEncodeServer(string $server, string $expected) {
+    $this->assertSame($expected, \Civi\Setup\DbUtil::encodeServer($server));
+  }
+
+  /**
+   * Data provider for testEncodeServer
+   * @return array
+   */
+  public static function serverProvider():array {
+    return [
+      'host only' => ['localhost', 'localhost'],
+      'host and port' => ['localhost:3306', 'localhost:3306'],
+      'host needing encoding' => ['my host:3306', 'my%20host:3306'],
+      'socket is left alone' => ['unix(/var/lib/mysql/mysql.sock)', 'unix(/var/lib/mysql/mysql.sock)'],
+    ];
+  }
+
+  /**
    * encodeDsn() and parseDsn() must be inverses of each other, and the string
    * they agree on must also be readable by PEAR::DB at runtime.
    *
