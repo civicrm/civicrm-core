@@ -1796,7 +1796,16 @@ if (!CRM.vars) CRM.vars = {};
     }, label;
     if ($(this).length) {
       if (title === '') {
-        label = $('label[for="' + $(this).attr('name') + '"], label[for="' + $(this).attr('id') + '"]').not('[generated=true]');
+        var $el = $(this),
+            isGroup = $el.is(':radio, :checkbox'),
+            selector = 'label[for="' + $el.attr('name') + '"]';
+        if (!isGroup) {
+          selector += ', label[for="' + $el.attr('id') + '"]';
+        }
+        label = $(selector).not('[generated=true]').first();
+        if (!label.length && isGroup) {
+          label = $el.closest('tr, .crm-section').find('> .label, > td.label').first();
+        }
         if (label.length) {
           label.addClass('crm-error');
           var $label = label.clone();
