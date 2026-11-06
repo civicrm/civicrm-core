@@ -401,7 +401,12 @@ class FormattingUtil {
     $valueType = self::getSuffix($fieldAlias);
     // For create actions, only unique identifiers can be used.
     // For get actions any valid suffix is ok.
-    if (!$valueType || ($action === 'create' && !isset(self::$pseudoConstantContexts[$valueType]))) {
+    if ($action === 'create' && (!$valueType || !isset(self::$pseudoConstantContexts[$valueType]))) {
+      $suffix = substr($fieldAlias, strrpos($fieldAlias, ':') + 1);
+      $validSuffixes = array_map(fn($suffix) => ":$suffix", array_keys(self::$pseudoConstantContexts));
+      throw new \CRM_Core_Exception(sprintf('Suffix ":%s" cannot be used to write %s; use %s', $suffix, $field['name'], implode(', ', $validSuffixes)));
+    }
+    if (!$valueType) {
       throw new \CRM_Core_Exception('Illegal expression');
     }
     $fieldPath = self::removeSuffix($fieldAlias);

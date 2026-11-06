@@ -69,7 +69,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
         'language' => 'fr_CA',
         'string' => 'Hello world',
       ],
-      '/Invalid status/',
+      '/Invalid value for status_id:name: "jumping"/',
     ];
 
     $es['malformedField'] = [
