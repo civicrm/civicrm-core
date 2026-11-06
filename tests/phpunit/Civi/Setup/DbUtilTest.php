@@ -186,6 +186,26 @@ class DbUtilTest extends \CiviUnitTestCase {
           'ssl_params' => [],
         ],
       ],
+      'unix socket with query' => [
+        'mysql://user:pass@unix(/var/lib/mysql/mysql.sock)/db?new_link=true&ssl=1',
+        [
+          'server' => 'unix(/var/lib/mysql/mysql.sock)',
+          'username' => 'user',
+          'password' => 'pass',
+          'database' => 'db',
+          'ssl_params' => ['ssl' => '1'],
+        ],
+      ],
+      'unix socket with query and no database' => [
+        'mysql://user:pass@unix(/var/lib/mysql/mysql.sock)?new_link=true',
+        [
+          'server' => 'unix(/var/lib/mysql/mysql.sock)',
+          'username' => 'user',
+          'password' => 'pass',
+          'database' => NULL,
+          'ssl_params' => [],
+        ],
+      ],
     ];
   }
 

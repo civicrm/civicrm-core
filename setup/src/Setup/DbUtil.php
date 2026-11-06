@@ -25,7 +25,7 @@ class DbUtil {
     //   ...
     // ]
     if ($parsed['host'] == 'unix(') {
-      preg_match('/(unix\(.*\))(\/(.+)?)?$/', $dsn, $matches);
+      preg_match('/(unix\([^)]+\))(\/([^?]+)?)?(\?.*)?$/', $dsn, $matches, PREG_UNMATCHED_AS_NULL);
       $server = $matches[1];
       $database = isset($matches[3]) ? rawurldecode($matches[3]) : NULL;
     }
