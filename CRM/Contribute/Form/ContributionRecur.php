@@ -252,6 +252,9 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
           $this->_mid = $membership['id'];
         }
       }
+      else {
+        $this->_mid = $this->lookup('Membership', 'id');
+      }
     }
     return $this->_mid;
   }
