@@ -17,6 +17,18 @@ When testing forms, use `Civi\Test\FormTrait::getTestForm($formName, $submittedV
 
 Cleanup belongs in `tearDown()`, not in the test method.
 
+Compare strictly. `assertEquals()` uses `==`, so `assertEquals(1, '1')` passes:
+
+- When the expected value is a literal, use `assertSame()`, or `assertTrue()` / `assertFalse()` / `assertNull()`. Put the expected value first.
+- Match the type the code returns: APIv4 returns typed values (ints, floats for money, booleans); APIv3 returns strings (`'1'`, `'100.00'`).
+- In tests run under both APIv3 and APIv4 (`@dataProvider versionThreeAndFour`), give the APIv4 value to `$this->apiValue()`, e.g. `$this->assertSame($this->apiValue(TRUE), $result['is_active'])`.
+- Cast SQL counts: `$this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) ...'))`.
+
+Don't assume record ids. Seeded and test-created rows don't start at id 1 (see `Civi\Test\Schema::setAutoIncrement()`), so a hard-coded id may point at the wrong record, or at none:
+
+- Use the id from the record the test created: `createTestEntity()` returns the record, and `getTestEntityID($entity, $identifier)` gets its id later.
+- For seeded records, use names: `'financial_type_id:name' => 'Donation'` in APIv4, or the lookup helpers in `Civi\Test\LookupHelperTrait` (e.g. `$this->getFinancialTypeID('Donation')`, `$this->getLocationTypeID('Home')`) where a name isn't accepted.
+
 Try to use methods and variable names to carry the meaning. Add comments if they genuinely add something. Don't use comments to explain the difference between WIP approaches that were tried along the way — comment the code as it stands.
 
 ## JavaScript & AngularJS
