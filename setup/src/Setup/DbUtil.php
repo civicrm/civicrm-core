@@ -27,7 +27,7 @@ class DbUtil {
     if ($parsed['host'] == 'unix(') {
       preg_match('/(unix\(.*\))(\/(.+)?)?$/', $dsn, $matches);
       $server = $matches[1];
-      $database = $matches[3] ?? NULL;
+      $database = isset($matches[3]) ? rawurldecode($matches[3]) : NULL;
     }
     else {
       $server = self::encodeHostPort($parsed['host'], $parsed['port'] ?? NULL);
