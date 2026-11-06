@@ -122,6 +122,17 @@ class PseudoconstantTest extends Api4TestBase {
       $this->assertSame('Invalid value for preferred_communication_method:name: "Carrier_Pigeon"', $e->getMessage());
     }
 
+    try {
+      Contact::create(FALSE)
+        ->addValue('first_name', 'Unknown')
+        ->addValue('gender_id:nam', 'Female')
+        ->execute();
+      $this->fail('Expected an exception for the misspelled suffix gender_id:nam');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertSame('Suffix ":nam" cannot be used to write gender_id; use :name, :abbr, :label', $e->getMessage());
+    }
+
     // An empty value still clears the field.
     $cid = $this->createTestRecord('Contact', ['first_name' => 'Known', 'gender_id:name' => 'Female'])['id'];
     Contact::update(FALSE)

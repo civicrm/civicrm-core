@@ -619,7 +619,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     }
     catch (\CRM_Core_Exception $createError) {
     }
-    $this->assertStringContainsString('Illegal expression', $createError->getMessage());
+    $this->assertSame('Suffix ":color" cannot be used to write fruit; use :name, :abbr, :label', $createError->getMessage());
   }
 
 }
