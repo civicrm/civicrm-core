@@ -237,6 +237,107 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
   }
 
   /**
+   * A contact allowed only by relationship must not be dropped when its array key equals an ACL-allowed contact ID.
+   */
+  public function testAllowListKeyMatchingAllowedContactID(): void {
+    $contacts = $this->createScenarioRelations();
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'hook_civicrm_aclWhereClause']);
+    $config = CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = [];
+    $config->secondDegRelPermissions = FALSE;
+    // contacts[4] is allowed by ACL only, contacts[8] by relationship only.
+    $this->allowedContactsACL = [$contacts[4]];
+
+    $result = CRM_Contact_BAO_Contact_Permission::allowList([0 => $contacts[4], $contacts[4] => $contacts[8]]);
+    sort($result);
+    $expected = [$contacts[4], $contacts[8]];
+    sort($expected);
+    $this->assertSame($expected, $result);
+  }
+
+  /**
+   * Test that allowList() prevents any ACL or relationship privilege escalation.
+   */
+  public function testAllowListNoAclEscalation(): void {
+    $contacts = $this->createScenarioRelations();
+    $unrelatedContact = $this->createTestEntity('Contact', [
+      'first_name' => 'Completely',
+      'last_name' => 'Unauthorized',
+      'contact_type' => 'Individual',
+    ], 'unrelated');
+
+    // Register ACL hook
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'hook_civicrm_aclWhereClause']);
+
+    $config = CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = [];
+    $config->secondDegRelPermissions = FALSE;
+
+    // Grant ACL VIEW permission to contacts[4] ONLY, no EDIT permission
+    $this->allowedContactsACL = [
+      CRM_Core_Permission::VIEW => [$contacts[4]],
+      CRM_Core_Permission::EDIT => [],
+    ];
+
+    // In createScenarioRelations with secondDegRelPermissions = FALSE:
+    // contacts[4] has VIEW ACL only (no relationship since secondDeg is disabled).
+    // contacts[5] has VIEW relationship only (is_permission_b_a = 2), NO ACL.
+    // contacts[8] has EDIT relationship (is_permission_a_b = 1), NO ACL.
+    // contacts[3] has NO relationship and NO ACL.
+    // $unrelatedContact['id'] has NO relationship and NO ACL.
+
+    $checkContacts = [
+      $contacts[4],
+      $contacts[5],
+      $contacts[8],
+      $contacts[3],
+      $unrelatedContact['id'],
+    ];
+
+    // 1. Check VIEW permissions: contacts[4], contacts[5], contacts[8] must be allowed.
+    // contacts[3] and $unrelatedContact must be strictly rejected.
+    $viewResult = CRM_Contact_BAO_Contact_Permission::allowList($checkContacts, CRM_Core_Permission::VIEW);
+    sort($viewResult);
+    $expectedView = [$contacts[4], $contacts[5], $contacts[8]];
+    sort($expectedView);
+    $this->assertSame($expectedView, $viewResult);
+    $this->assertNotContains($contacts[3], $viewResult, 'Unauthorized contact must not be granted VIEW access.');
+    $this->assertNotContains($unrelatedContact['id'], $viewResult, 'Unrelated contact must not be granted VIEW access.');
+
+    // 2. Check EDIT permissions: ONLY contacts[8] has EDIT permission (via relationship).
+    // contacts[4] (VIEW ACL only) and contacts[5] (VIEW relationship only) MUST NOT escalate to EDIT!
+    $editResult = CRM_Contact_BAO_Contact_Permission::allowList($checkContacts, CRM_Core_Permission::EDIT);
+    $this->assertSame([$contacts[8]], $editResult, 'Only contact with explicit EDIT permission should be returned; VIEW must not escalate to EDIT.');
+    $this->assertNotContains($contacts[4], $editResult, 'VIEW-only ACL contact must NOT escalate to EDIT permission.');
+    $this->assertNotContains($contacts[5], $editResult, 'VIEW-only relationship contact must NOT escalate to EDIT permission.');
+    $this->assertNotContains($contacts[3], $editResult, 'Unauthorized contact must NOT be granted EDIT access.');
+    $this->assertNotContains($unrelatedContact['id'], $editResult, 'Unrelated contact must NOT be granted EDIT access.');
+
+    // 3. Check passing ONLY unauthorized contacts returns empty array (no data leak or index confusion).
+    $this->assertSame([], CRM_Contact_BAO_Contact_Permission::allowList([$contacts[3], $unrelatedContact['id']], CRM_Core_Permission::VIEW));
+    $this->assertSame([], CRM_Contact_BAO_Contact_Permission::allowList([$unrelatedContact['id']], CRM_Core_Permission::EDIT));
+
+    // 4. Check passing array with arbitrary non-sequential keys does not cause key/value mismatch or escalation.
+    $associativeInput = [
+      42 => $contacts[4],
+      99 => $contacts[3],
+      105 => $contacts[5],
+      999 => $unrelatedContact['id'],
+    ];
+    $assocViewResult = CRM_Contact_BAO_Contact_Permission::allowList($associativeInput, CRM_Core_Permission::VIEW);
+    sort($assocViewResult);
+    $expectedAssoc = [$contacts[4], $contacts[5]];
+    sort($expectedAssoc);
+    $this->assertSame($expectedAssoc, $assocViewResult);
+    $this->assertNotContains(42, $assocViewResult);
+    $this->assertNotContains(99, $assocViewResult);
+    $this->assertNotContains(105, $assocViewResult);
+    $this->assertNotContains(999, $assocViewResult);
+    $this->assertNotContains($contacts[3], $assocViewResult);
+    $this->assertNotContains($unrelatedContact['id'], $assocViewResult);
+  }
+
+  /**
    * Test access related to the 'access deleted contact' permission
    */
   public function testPermissionCompare(): void {
@@ -405,8 +506,16 @@ class CRM_ACL_ListTest extends CiviUnitTestCase {
    */
   public function hook_civicrm_aclWhereClause($type, &$tables, &$whereTables, &$contactID, &$where) {
     if (!empty($this->allowedContactsACL)) {
-      $contact_id_list = implode(',', $this->allowedContactsACL);
-      $where = " contact_a.id IN ($contact_id_list)";
+      if (!array_is_list($this->allowedContactsACL)) {
+        $allowed = $this->allowedContactsACL[$type] ?? [];
+      }
+      else {
+        $allowed = $this->allowedContactsACL;
+      }
+      if (!empty($allowed)) {
+        $contact_id_list = implode(',', (array) $allowed);
+        $where = " contact_a.id IN ($contact_id_list)";
+      }
     }
   }
 
