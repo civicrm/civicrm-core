@@ -13,7 +13,7 @@
   <td class="html-adjust">{$form.option_type.html}</td>
 </tr>
 
-<tr id="option_group" {if empty($form.option_group_id)}class="hiddenElement"{/if}>
+<tr id="option_group">
   <td class="label">{$form.option_group_id.label}</td>
   <td class="html-adjust">{$form.option_group_id.html}</td>
 </tr>
