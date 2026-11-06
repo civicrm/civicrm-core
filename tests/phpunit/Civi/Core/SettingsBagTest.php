@@ -62,15 +62,16 @@ class SettingsBagTest extends \CiviUnitTestCase {
   /**
    * @param string $password
    * @param string $database
+   * @param string $username
    * @return \Civi\Core\SettingsBag
    */
-  private function makeDsnBag(string $password, string $database): SettingsBag {
+  private function makeDsnBag(string $password, string $database, string $username = 'civicrm'): SettingsBag {
     $bag = new SettingsBag(0, NULL);
     $bag->loadDefaults([
       'civicrm_db_host' => 'db.example.org',
       'civicrm_db_port' => 3306,
       'civicrm_db_name' => $database,
-      'civicrm_db_user' => 'civicrm',
+      'civicrm_db_user' => $username,
       'civicrm_db_password' => $password,
     ]);
     $bag->loadMandatory([]);
@@ -130,6 +131,41 @@ class SettingsBagTest extends \CiviUnitTestCase {
     $this->assertSame($defaultValue, (int) $api3Value, "Check value consistency. Report: $report");
     $this->assertSame($defaultValue, $api4Value, "Check value consistency. Report: $report");
     $this->assertSame($defaultValue, $bagGetRedux, "Check value consistency. Report: $report");
+  }
+
+  /**
+   * A DSN composed from the CIVICRM_DB_* environment variables must survive
+   * being read back by DB::parseDSN(), which decodes with rawurldecode().
+   *
+   * @dataProvider dsnComponentProvider
+   * @param string $username
+   * @param string $password
+   * @param string $database
+   */
+  public function testInterpolateDsnRoundTrip(string $username, string $password, string $database): void {
+    $parsed = \DB::parseDSN($this->makeDsnBag($password, $database, $username)->get('civicrm_db_dsn'));
+
+    $this->assertSame($username, $parsed['username']);
+    $this->assertSame($password, $parsed['password']);
+    $this->assertSame($database, $parsed['database']);
+    $this->assertSame('db.example.org', $parsed['hostspec']);
+  }
+
+  /**
+   * Data provider for testInterpolateDsnRoundTrip.
+   * @return array
+   */
+  public static function dsnComponentProvider(): array {
+    return [
+      'plain' => ['civicrm', 'secret', 'civicrm'],
+      'hash' => ['civicrm', 'pa#ss', 'civicrm'],
+      'slash' => ['civicrm', 'pa/ss', 'civicrm'],
+      'at sign' => ['civicrm', 'pa@ss', 'civicrm'],
+      'percent' => ['civicrm', 'pa%ss', 'civicrm'],
+      'space' => ['civicrm', 'pa ss', 'civicrm'],
+      'plus' => ['civicrm', 'pa+ss', 'civicrm'],
+      'special database' => ['civicrm', 'secret', 'db name'],
+    ];
   }
 
 }
