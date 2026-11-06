@@ -84,7 +84,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
     ];
     $result = $this->callAPISuccess('address', 'create', $params);
-    $this->assertEquals(54, $result['values'][$result['id']]['street_number']);
+    $this->assertSame($this->apiValue(54), $result['values'][$result['id']]['street_number']);
     $this->assertSame('A', $result['values'][$result['id']]['street_number_suffix']);
     $this->assertSame('Excelsior Ave.', $result['values'][$result['id']]['street_name']);
     $this->assertSame('Apt 1C', $result['values'][$result['id']]['street_unit']);
@@ -103,7 +103,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     unset($params['is_primary']);
     $result = $this->callAPISuccess('address', 'create', $params);
     $this->assertSame(1, $result['count']);
-    $this->assertEquals(1, $result['values'][$result['id']]['is_primary']);
+    $this->assertSame($this->apiValue(TRUE), $result['values'][$result['id']]['is_primary']);
     $this->getAndCheck($this->_params, $result['id'], 'address');
   }
 
@@ -246,7 +246,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->callAPISuccess('Address', 'create', $params);
     $result = $this->callAPISuccess('Address', 'get', ['contact_id' => $params['contact_id'], 'return' => 'is_primary']);
     $this->assertSame(1, $result['count']);
-    $this->assertEquals(1, $result['values'][$result['id']]['is_primary']);
+    $this->assertSame($this->apiValue(TRUE), $result['values'][$result['id']]['is_primary']);
     $this->getAndCheck($params, $result['id'], 'address');
   }
 

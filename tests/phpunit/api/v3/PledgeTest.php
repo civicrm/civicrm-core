@@ -104,12 +104,12 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($this->_individualId, $pledge['contact_id']);
     $this->assertEquals($this->_pledge['id'], $pledge['pledge_id']);
     $this->assertEquals(date('Y-m-d') . ' 00:00:00', $pledge['pledge_create_date']);
-    $this->assertEquals(100.00, $pledge['pledge_amount']);
+    $this->assertSame('100.00', $pledge['pledge_amount']);
     $this->assertSame('Pending Label**', $pledge['pledge_status']);
     $this->assertSame('5', $pledge['pledge_frequency_interval']);
     $this->assertSame('year', $pledge['pledge_frequency_unit']);
     $this->assertEquals(date('Y-m-d', strtotime($this->scheduled_date)) . ' 00:00:00', $pledge['pledge_next_pay_date']);
-    $this->assertEquals($pledge['pledge_next_pay_amount'], 20.00);
+    $this->assertSame('20.00', $pledge['pledge_next_pay_amount']);
 
     $params2 = [
       'pledge_id' => $this->_pledge['id'],
@@ -248,7 +248,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   public function testCreatePledge(): void {
 
     $result = $this->callAPISuccess('pledge', 'create', $this->_params);
-    $this->assertEquals($result['values'][0]['amount'], 100.00);
+    $this->assertSame('100', $result['values'][0]['amount']);
     $this->assertSame('5', $result['values'][0]['installments']);
     $this->assertSame('year', $result['values'][0]['frequency_unit']);
     $this->assertSame('5', $result['values'][0]['frequency_interval']);
@@ -347,7 +347,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('pledge', 'create', $params);
     $pledgeDetails = $this->callAPISuccess('Pledge', 'Get', ['id' => $result['id'], 'sequential' => 1]);
     $pledge = $pledgeDetails['values'][0];
-    $this->assertEquals(100.00, $pledge['pledge_amount']);
+    $this->assertSame('100.00', $pledge['pledge_amount']);
     $this->assertSame('year', $pledge['pledge_frequency_unit']);
     $this->assertSame('5', $pledge['pledge_frequency_interval']);
     $this->assertSame('20.00', $pledge['pledge_next_pay_amount']);

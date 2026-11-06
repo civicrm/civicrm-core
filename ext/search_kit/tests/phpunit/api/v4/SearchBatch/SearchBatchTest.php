@@ -280,7 +280,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $columnsByKey = array_column($savedDisplay['settings']['columns'], NULL, 'key');
 
     $targetSpec = $columnsByKey['target_contact_id']['spec'] ?? [];
-    $this->assertEquals(
+    $this->assertSame(
       \CRM_Core_DAO::SERIALIZE_COMMA,
       $targetSpec['serialize'] ?? NULL,
       'target_contact_id column spec must have serialize set; without the fix it is NULL'
@@ -297,7 +297,7 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     );
 
     $assigneeSpec = $columnsByKey['assignee_contact_id']['spec'] ?? [];
-    $this->assertEquals(
+    $this->assertSame(
       \CRM_Core_DAO::SERIALIZE_COMMA,
       $assigneeSpec['serialize'] ?? NULL,
       'assignee_contact_id column spec must have serialize set; without the fix it is NULL'

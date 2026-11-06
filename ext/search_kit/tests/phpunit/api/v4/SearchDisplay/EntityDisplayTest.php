@@ -540,12 +540,12 @@ class EntityDisplayTest extends Api4TestBase {
     $this->assertSame('String', $fields['GROUP_CONCAT_contact_id_sort_name']['data_type']);
     $this->assertSame('Text', $fields['GROUP_CONCAT_contact_id_sort_name']['input_type']);
     $this->assertFalse($fields['GROUP_CONCAT_contact_id_sort_name']['options']);
-    $this->assertEquals(\CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED, $fields['GROUP_CONCAT_contact_id_sort_name']['serialize']);
+    $this->assertSame(\CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED, $fields['GROUP_CONCAT_contact_id_sort_name']['serialize']);
 
     $this->assertSame('Integer', $fields['GROUP_CONCAT_financial_type_id_label']['data_type']);
     $this->assertSame('Select', $fields['GROUP_CONCAT_financial_type_id_label']['input_type']);
     $this->assertContains('Donation', $fields['GROUP_CONCAT_financial_type_id_label']['options']);
-    $this->assertEquals(\CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED, $fields['GROUP_CONCAT_financial_type_id_label']['serialize']);
+    $this->assertSame(\CRM_Core_DAO::SERIALIZE_SEPARATOR_TRIMMED, $fields['GROUP_CONCAT_financial_type_id_label']['serialize']);
 
     $result = civicrm_api4('SK_MajorDonorsEntityTestDbEntity1', 'get', [
       'select' => ['*', 'GROUP_CONCAT_financial_type_id_label:name'],

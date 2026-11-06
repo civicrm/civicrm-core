@@ -123,7 +123,7 @@ class PriceFieldUtilsTest extends TestCase implements HeadlessInterface {
     $specs = PriceFieldUtils::getPriceFieldSpecs()['Contribution'];
 
     $this->assertSame(25.0, $specs[self::SET_NAME . '.tickets']['amount']);
-    $this->assertEquals(12.5, $specs[self::SET_NAME . '.meals']['amount']);
+    $this->assertSame(12.5, $specs[self::SET_NAME . '.meals']['amount']);
     $this->assertArrayNotHasKey('options', $specs[self::SET_NAME . '.tickets']);
   }
 

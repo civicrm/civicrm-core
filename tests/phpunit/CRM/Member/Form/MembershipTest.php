@@ -761,8 +761,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->ids['Contact']['individual_0'],
     ]);
     $this->assertSame('Completed', $contribution['contribution_status']);
-    $this->assertEquals(50.00, $contribution['total_amount']);
-    $this->assertEquals(50.00, $contribution['net_amount']);
+    $this->assertSame('50.00', $contribution['total_amount']);
+    $this->assertSame('50.00', $contribution['net_amount']);
 
     // Step 2: Change the membership type whose minimum free is less than earlier membership
     $secondMembershipType = $this->createTestEntity('MembershipType', [
@@ -1610,7 +1610,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'is_test' => TRUE,
     ]);
 
-    $this->assertEquals(.14, $contribution['fee_amount']);
+    $this->assertSame('0.14', $contribution['fee_amount']);
     $this->assertSame('kettles boil water', $contribution['trxn_id']);
     $this->assertEquals($processorDetail['payment_instrument_id'], $contribution['payment_instrument_id']);
 
@@ -1742,7 +1742,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     foreach ($lineItemResult['values'] as $lineItem) {
       $this->assertEquals(round($lineItem['line_total'] * .1, 2), $lineItem['tax_amount']);
       if (str_starts_with($lineItem['label'], 'Long Haired Goat')) {
-        $this->assertEquals(15.0, $lineItem['line_total']);
+        $this->assertSame('15.00', $lineItem['line_total']);
         $this->assertSame('Long Haired Goat - one leg free!', $lineItem['label']);
         $discountedItems++;
       }
@@ -1914,9 +1914,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->ids['Contact']['individual_0']]);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership']);
     $this->assertSame('1.00', $lineItem['qty']);
-    $this->assertEquals(50.00, $lineItem['unit_price']);
-    $this->assertEquals(50.00, $lineItem['line_total']);
-    $this->assertEquals(5.00, $lineItem['tax_amount']);
+    $this->assertSame('50.00', $lineItem['unit_price']);
+    $this->assertSame('50.00', $lineItem['line_total']);
+    $this->assertSame('5.00', $lineItem['tax_amount']);
 
     // Simply save the 'Edit Contribution' form
     $this->getTestForm('CRM_Contribute_Form_Contribution', [
@@ -1929,9 +1929,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     // ensure that the LineItem data remain the same
     $lineItem = $this->callAPISuccessGetSingle('LineItem', ['entity_id' => $membership['id'], 'entity_table' => 'civicrm_membership']);
     $this->assertSame('1.00', $lineItem['qty']);
-    $this->assertEquals(50.00, $lineItem['unit_price']);
-    $this->assertEquals(50.00, $lineItem['line_total']);
-    $this->assertEquals(5.00, $lineItem['tax_amount']);
+    $this->assertSame('50.00', $lineItem['unit_price']);
+    $this->assertSame('50.00', $lineItem['line_total']);
+    $this->assertSame('5.00', $lineItem['tax_amount']);
 
     // ensure that the LineItem data add up to the data at the Contribution level
     $contribution = $this->callAPISuccessGetSingle('Contribution',

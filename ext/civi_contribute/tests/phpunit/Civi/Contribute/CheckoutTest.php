@@ -96,7 +96,7 @@ class CheckoutTest extends TestCase implements HeadlessInterface {
     $checkoutSession->setSuccessUrl("https://thank.you");
 
     // check the session is pending
-    $this->assertEquals(CheckoutSession::STATUS_PENDING, $checkoutSession->getStatus());
+    $this->assertSame(CheckoutSession::STATUS_PENDING, $checkoutSession->getStatus());
 
     $checkoutSession->startCheckout();
 
@@ -111,7 +111,7 @@ class CheckoutTest extends TestCase implements HeadlessInterface {
     $this->assertTrue($contribution['is_pay_later']);
 
     // check the session is successful
-    $this->assertEquals(CheckoutSession::STATUS_SUCCESS, $checkoutSession->getStatus());
+    $this->assertSame(CheckoutSession::STATUS_SUCCESS, $checkoutSession->getStatus());
     // check the session tells us to go to the thank you page now
     $this->assertSame("https://thank.you", $checkoutSession->getNextUrl());
 

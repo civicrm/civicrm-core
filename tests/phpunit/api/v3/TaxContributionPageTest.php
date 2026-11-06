@@ -209,7 +209,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
     $this->assertEquals($this->ids['Contact']['individual'], $contribution['contact_id']);
-    $this->assertEquals(120.00, $contribution['total_amount']);
+    $this->assertSame('120.00', $contribution['total_amount']);
     $this->assertEquals($this->financialTypeID, $contribution['financial_type_id']);
     $this->assertSame('12345', $contribution['trxn_id']);
     $this->assertSame('67890', $contribution['invoice_id']);
@@ -289,7 +289,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     ];
     $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
     $this->assertEquals($contribution['contact_id'], $this->ids['Contact']['individual']);
-    $this->assertEquals(120.00, $contribution['total_amount']);
+    $this->assertSame('120.00', $contribution['total_amount']);
     $this->assertEquals($this->financialTypeID, $contribution['financial_type_id']);
     $this->assertSame('12345', $contribution['trxn_id']);
     $this->assertSame('67890', $contribution['invoice_id']);
@@ -328,7 +328,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $params)['values'][0];
     $this->assertEquals($this->ids['Contact']['individual'], $contribution['contact_id']);
-    $this->assertEquals(120.00, $contribution['total_amount']);
+    $this->assertSame('120.00', $contribution['total_amount']);
     $this->assertEquals($this->financialTypeID, $contribution['financial_type_id']);
     $this->assertSame('12345', $contribution['trxn_id']);
     $this->assertSame('67890', $contribution['invoice_id']);

@@ -22,7 +22,7 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
     $barValue = 45.78;
     $a->set('bar', $barValue);
     $this->assertDBQuery(2, 'SELECT count(*) FROM civicrm_cache WHERE group_name = "testSameInstance"');
-    $this->assertEquals($a->get('bar'), 45.78);
+    $this->assertSame(45.78, $a->get('bar'));
 
     $a->delete('foo');
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_cache WHERE group_name = "testSameInstance"');

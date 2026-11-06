@@ -2392,9 +2392,9 @@ ENDSQLUPDATE;
     $parts = $message->fetchParts(NULL, TRUE);
     $this->assertCount(3, $parts);
     $this->assertStringContainsString('<title>CiviCRM Report</title>', $parts[1]->text);
-    $this->assertEquals(ezcMailFilePart::CONTENT_TYPE_APPLICATION, $parts[2]->contentType);
+    $this->assertSame(ezcMailFilePart::CONTENT_TYPE_APPLICATION, $parts[2]->contentType);
     $this->assertSame('pdf', $parts[2]->mimeType);
-    $this->assertEquals(ezcMailFilePart::DISPLAY_ATTACHMENT, $parts[2]->dispositionType);
+    $this->assertSame(ezcMailFilePart::DISPLAY_ATTACHMENT, $parts[2]->dispositionType);
     $this->assertGreaterThan(0, filesize($parts[2]->fileName));
 
     $mut->clearMessages();

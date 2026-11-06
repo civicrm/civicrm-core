@@ -209,7 +209,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $financialItem['id'])
       ->addSelect('amount')
       ->execute()->single();
-    $this->assertEquals(200.00, $result['amount'], 'The amounts do not match.');
+    $this->assertSame(200.00, $result['amount'], 'The amounts do not match.');
   }
 
   /**
@@ -247,7 +247,7 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
       ->execute()->single();
     $this->assertSame('Contribution Amount', $result['description']);
     $this->assertSame(1, $result['status_id']);
-    $this->assertEquals(100.00, $result['amount']);
+    $this->assertSame(100.00, $result['amount']);
     $this->assertEquals($this->getFinancialAccountID('Donation'), $result['financial_account_id']);
   }
 

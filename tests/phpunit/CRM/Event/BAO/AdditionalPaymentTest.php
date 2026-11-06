@@ -285,13 +285,13 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
     // Assert all transaction(owed and refund) are listed on view payments.
     $this->assertCount(3, $transaction, 'Transaction Details is not proper');
-    $this->assertEquals(80.00, $transaction[0]['total_amount']);
+    $this->assertSame('80.00', $transaction[0]['total_amount']);
     $this->assertSame('Completed', $transaction[0]['status']);
 
-    $this->assertEquals(20.00, $transaction[1]['total_amount']);
+    $this->assertSame('20.00', $transaction[1]['total_amount']);
     $this->assertSame('Completed', $transaction[1]['status']);
 
-    $this->assertEquals(-50.00, $transaction[2]['total_amount']);
+    $this->assertSame('-50.00', $transaction[2]['total_amount']);
     $this->assertSame('Refunded Label**', $transaction[2]['status']);
   }
 

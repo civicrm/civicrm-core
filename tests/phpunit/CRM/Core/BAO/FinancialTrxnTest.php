@@ -251,7 +251,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $this->callAPISuccess('Payment', 'create', $params);
     //amount owed should be one cent
     $amountOwed = CRM_Contribute_BAO_Contribution::getContributionBalance($contribution['id']);
-    $this->assertEquals(0.01, $amountOwed, 'Amount does not match');
+    $this->assertSame(0.01, $amountOwed, 'Amount does not match');
   }
 
   /**

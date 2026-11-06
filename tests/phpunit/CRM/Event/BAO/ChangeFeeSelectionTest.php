@@ -615,7 +615,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
 
     $lineItem = $this->getLineItemForPriceFieldValue($this->ids['PriceFieldValue']['thirty_five_euros']);
     $amounts = $this->getFinancialItemAmountsForLineItem($lineItem['id']);
-    $this->assertEquals(1.0, (float) $lineItem['qty']);
+    $this->assertSame(1.0, (float) $lineItem['qty']);
     $this->assertEqualsWithDelta(
       (float) $lineItem['line_total'],
       array_sum($amounts),
@@ -636,8 +636,8 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $this->submitForm(NULL, [$this->getPriceFieldFormLabel('thirty_five_euros') => $this->ids['PriceFieldValue']['thirty_five_euros']]);
 
     $lineItem = $this->getLineItemForPriceFieldValue($this->ids['PriceFieldValue']['ten_euros']);
-    $this->assertEquals(0.0, (float) $lineItem['qty']);
-    $this->assertEquals(0.0, (float) $lineItem['line_total']);
+    $this->assertSame(0.0, (float) $lineItem['qty']);
+    $this->assertSame(0.0, (float) $lineItem['line_total']);
     $this->assertEquals(
       [-10.00, 10.00],
       $this->getFinancialItemAmountsForLineItem($lineItem['id']),
@@ -661,8 +661,8 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $this->submitForm(NULL, [$this->getPriceFieldFormLabel('ten_euros') => $this->ids['PriceFieldValue']['ten_euros']]);
 
     $lineItem = $this->getLineItemForPriceFieldValue($this->ids['PriceFieldValue']['discount_five_euros']);
-    $this->assertEquals(0.0, (float) $lineItem['qty']);
-    $this->assertEquals(0.0, (float) $lineItem['line_total']);
+    $this->assertSame(0.0, (float) $lineItem['qty']);
+    $this->assertSame(0.0, (float) $lineItem['line_total']);
     $this->assertEquals(
       [-5.00, 5.00],
       $this->getFinancialItemAmountsForLineItem($lineItem['id']),
@@ -688,8 +688,8 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $this->submitForm(NULL, [$this->getPriceFieldFormLabel('thirty_five_euros') => $this->ids['PriceFieldValue']['thirty_five_euros']]);
 
     $lineItem = $this->getLineItemForPriceFieldValue($this->ids['PriceFieldValue']['ten_euros']);
-    $this->assertEquals(0.0, (float) $lineItem['qty']);
-    $this->assertEquals(0.0, (float) $lineItem['line_total']);
+    $this->assertSame(0.0, (float) $lineItem['qty']);
+    $this->assertSame(0.0, (float) $lineItem['line_total']);
     $this->assertEquals(
       [-10.00, -1.00, 1.00, 10.00],
       $this->getFinancialItemAmountsForLineItem($lineItem['id']),
@@ -730,7 +730,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $this->ids['Contribution']['order'])
       ->addSelect('total_amount')
       ->execute()->single();
-    $this->assertEquals(85.00, (float) $contribution['total_amount'], 'The swap should not change what is owed.');
+    $this->assertSame(85.00, (float) $contribution['total_amount'], 'The swap should not change what is owed.');
 
     $this->assertEquals(
       [85.00],

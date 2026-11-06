@@ -46,19 +46,19 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
 
   public function testFetchHttp(): void {
     $result = $this->client->fetch(self::VALID_HTTP_URL, $this->tmpFile);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $result);
+    $this->assertSame(CRM_Utils_HttpClient::STATUS_OK, $result);
     $this->assertMatchesRegularExpression(self::VALID_HTTP_REGEX, file_get_contents($this->tmpFile));
   }
 
   public function testFetchHttps_valid(): void {
     $result = $this->client->fetch(self::VALID_HTTPS_URL, $this->tmpFile);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $result);
+    $this->assertSame(CRM_Utils_HttpClient::STATUS_OK, $result);
     $this->assertMatchesRegularExpression(self::VALID_HTTPS_REGEX, file_get_contents($this->tmpFile));
   }
 
   public function testFetchHttps_invalid_verify(): void {
     $result = $this->client->fetch(self::SELF_SIGNED_HTTPS_URL, $this->tmpFile);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_DL_ERROR, $result);
+    $this->assertSame(CRM_Utils_HttpClient::STATUS_DL_ERROR, $result);
     $this->assertSame('', file_get_contents($this->tmpFile));
   }
 
@@ -70,30 +70,30 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
 
     $result = $this->client->fetch(self::SELF_SIGNED_HTTPS_URL, $this->tmpFile);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $result);
+    $this->assertSame(CRM_Utils_HttpClient::STATUS_OK, $result);
     $this->assertMatchesRegularExpression(self::SELF_SIGNED_HTTPS_REGEX, file_get_contents($this->tmpFile));
   }
 
   public function testFetchHttp_badOutFile(): void {
     $result = $this->client->fetch(self::VALID_HTTP_URL, '/ba/d/path/too/utput');
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_WRITE_ERROR, $result);
+    $this->assertSame(CRM_Utils_HttpClient::STATUS_WRITE_ERROR, $result);
   }
 
   public function testGetHttp(): void {
     [$status, $data] = $this->client->get(self::VALID_HTTP_URL);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $this->assertSame(CRM_Utils_HttpClient::STATUS_OK, $status);
     $this->assertMatchesRegularExpression(self::VALID_HTTP_REGEX, $data);
   }
 
   public function testGetHttps_valid(): void {
     [$status, $data] = $this->client->get(self::VALID_HTTPS_URL);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $this->assertSame(CRM_Utils_HttpClient::STATUS_OK, $status);
     $this->assertMatchesRegularExpression(self::VALID_HTTPS_REGEX, $data);
   }
 
   public function testGetHttps_invalid_verify(): void {
     [$status, $data] = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_DL_ERROR, $status);
+    $this->assertSame(CRM_Utils_HttpClient::STATUS_DL_ERROR, $status);
     $this->assertNull($data);
   }
 
@@ -105,7 +105,7 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
 
     [$status, $data] = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
-    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $this->assertSame(CRM_Utils_HttpClient::STATUS_OK, $status);
     $this->assertMatchesRegularExpression(self::SELF_SIGNED_HTTPS_REGEX, $data);
   }
 

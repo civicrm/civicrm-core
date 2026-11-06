@@ -331,7 +331,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', $params);
     //Assert if outbound mail is disabled.
     $mailingBackend = Civi::settings()->get('mailing_backend');
-    $this->assertEquals($mailingBackend['outBound_option'], CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED);
+    $this->assertSame(CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED, $mailingBackend['outBound_option']);
 
     $this->createContactsInGroup(10, $this->_groupID);
     Civi::settings()->add([
@@ -376,7 +376,7 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
 
     //Assert if outbound mail is still disabled.
     $mailingBackend = Civi::settings()->get('mailing_backend');
-    $this->assertEquals($mailingBackend['outBound_option'], CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED);
+    $this->assertSame(CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED, $mailingBackend['outBound_option']);
 
     // Test in production mode.
     Civi::settings()->set('mailing_backend', $origMailingBackend);

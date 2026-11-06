@@ -388,8 +388,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 'Completed',
     ]);
     $this->assertSame('50.00', $contribution['total_amount']);
-    $this->assertEquals(.08, $contribution['fee_amount']);
-    $this->assertEquals(49.92, $contribution['net_amount']);
+    $this->assertSame('0.08', $contribution['fee_amount']);
+    $this->assertSame('49.92', $contribution['net_amount']);
     $this->assertSame('tx', $contribution['trxn_id']);
     $this->assertEmpty($contribution['amount_level']);
   }
@@ -919,15 +919,15 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
     ], $contribution['id']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
-    $this->assertEquals(5200.20, $contribution['total_amount'], 2);
+    $this->assertSame('5200.20', $contribution['total_amount'], 2);
 
     $financialTransactions = $this->callAPISuccess('FinancialTrxn', 'get', ['sequential' => TRUE])['values'];
     $this->assertCount(2, $financialTransactions);
-    $this->assertEquals(6100.10, $financialTransactions[0]['total_amount']);
-    $this->assertEquals(-899.90, $financialTransactions[1]['total_amount']);
-    $this->assertEquals(-899.90, $financialTransactions[1]['net_amount']);
+    $this->assertSame('6100.10', $financialTransactions[0]['total_amount']);
+    $this->assertSame('-899.90', $financialTransactions[1]['total_amount']);
+    $this->assertSame('-899.90', $financialTransactions[1]['net_amount']);
     $lineItem = $this->callAPISuccessGetSingle('LineItem', []);
-    $this->assertEquals(5200.20, $lineItem['line_total']);
+    $this->assertSame('5200.20', $lineItem['line_total']);
   }
 
   /**
@@ -960,22 +960,22 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
     ], $contribution['id']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->ids['Contact'][0]]);
-    $this->assertEquals(1200.55, $contribution['total_amount']);
+    $this->assertSame('1200.55', $contribution['total_amount']);
 
     $financialTransactions = $this->callAPISuccess('FinancialTrxn', 'get', ['sequential' => TRUE]);
     $this->assertSame(3, $financialTransactions['count']);
 
     [$oldTrxn, $reversedTrxn, $latestTrxn] = $financialTransactions['values'];
 
-    $this->assertEquals(1200.55, $oldTrxn['total_amount']);
+    $this->assertSame('1200.55', $oldTrxn['total_amount']);
     $this->assertSame('123AX', $oldTrxn['check_number']);
     $this->assertEquals($this->getPaymentInstrumentID('Check'), $oldTrxn['payment_instrument_id']);
 
-    $this->assertEquals(-1200.55, $reversedTrxn['total_amount']);
+    $this->assertSame('-1200.55', $reversedTrxn['total_amount']);
     $this->assertSame('123AX', $reversedTrxn['check_number']);
     $this->assertEquals($this->getPaymentInstrumentID('Check'), $reversedTrxn['payment_instrument_id']);
 
-    $this->assertEquals(1200.55, $latestTrxn['total_amount']);
+    $this->assertSame('1200.55', $latestTrxn['total_amount']);
     $this->assertSame('1011', $latestTrxn['pan_truncation']);
     $this->assertEquals($this->getPaymentInstrumentID('Credit Card'), $latestTrxn['payment_instrument_id']);
     $this->callAPISuccessGetSingle('LineItem', []);
@@ -1139,7 +1139,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'return' => ['line_total', 'tax_amount'],
     ]);
     $this->assertSame('100.00', $lineItem['line_total']);
-    $this->assertEquals(0.00, $lineItem['tax_amount']);
+    $this->assertSame('0.00', $lineItem['tax_amount']);
   }
 
   /**

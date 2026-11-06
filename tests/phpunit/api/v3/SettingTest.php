@@ -280,17 +280,17 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $params = ['contact_undelete' => '0'];
     $this->callAPISuccess('Setting', 'create', $params);
     $getResult = $this->callAPISuccess('Setting', 'get');
-    $this->assertEquals(0, $getResult['values'][$this->currentDomain]['contact_undelete']);
+    $this->assertSame($this->apiValue(0), $getResult['values'][$this->currentDomain]['contact_undelete']);
 
     $getResult = $this->callAPISuccess('Setting', 'get');
-    $this->assertEquals(0, $getResult['values'][$this->currentDomain]['contact_undelete']);
+    $this->assertSame($this->apiValue(0), $getResult['values'][$this->currentDomain]['contact_undelete']);
     $params = [
       'domain_id' => $this->domainID2,
       'contact_undelete' => '1',
     ];
     $this->callAPISuccess('Setting', 'create', $params);
     $getResult = $this->callAPISuccess('Setting', 'get', ['domain_id' => $this->domainID2]);
-    $this->assertEquals(1, $getResult['values'][$this->domainID2]['contact_undelete']);
+    $this->assertSame($this->apiValue(1), $getResult['values'][$this->domainID2]['contact_undelete']);
 
     $params = [
       'domain_id' => $this->domainID2,
@@ -299,7 +299,7 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     $this->callAPISuccess('Setting', 'create', $params);
     $getResult = $this->callAPISuccess('Setting', 'get', ['domain_id' => $this->domainID2]);
 
-    $this->assertEquals(1, $getResult['values'][$this->domainID2]['contact_undelete'], 'check TRUE is converted to 1');
+    $this->assertSame($this->apiValue(1), $getResult['values'][$this->domainID2]['contact_undelete'], 'check TRUE is converted to 1');
   }
 
   /**
@@ -315,10 +315,10 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('setting', 'create', $params);
 
-    $this->assertEquals(1, $result['values'][$this->domainID2]['uniq_email_per_site']);
-    $this->assertEquals(1, $result['values'][$this->currentDomain]['uniq_email_per_site']);
+    $this->assertSame($this->apiValue(1), $result['values'][$this->domainID2]['uniq_email_per_site']);
+    $this->assertSame($this->apiValue(1), $result['values'][$this->currentDomain]['uniq_email_per_site']);
     $this->assertArrayHasKey($this->domainID3, $result['values'], 'Domain create probably failed Debug this IF domain test is passing');
-    $this->assertEquals(1, $result['values'][$this->domainID3]['uniq_email_per_site'], 'failed to set setting for domain 3.');
+    $this->assertSame($this->apiValue(1), $result['values'][$this->domainID3]['uniq_email_per_site'], 'failed to set setting for domain 3.');
 
     $params = [
       'domain_id' => 'all',
@@ -327,9 +327,9 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     // we'll check it with a 'get'
     $result = $this->callAPISuccess('setting', 'get', $params);
 
-    $this->assertEquals(1, $result['values'][$this->domainID2]['uniq_email_per_site']);
-    $this->assertEquals(1, $result['values'][$this->currentDomain]['uniq_email_per_site']);
-    $this->assertEquals(1, $result['values'][$this->domainID3]['uniq_email_per_site']);
+    $this->assertSame($this->apiValue(1), $result['values'][$this->domainID2]['uniq_email_per_site']);
+    $this->assertSame($this->apiValue(1), $result['values'][$this->currentDomain]['uniq_email_per_site']);
+    $this->assertSame($this->apiValue(1), $result['values'][$this->domainID3]['uniq_email_per_site']);
 
     $params = [
       'domain_id' => [$this->currentDomain, $this->domainID3],
@@ -337,15 +337,15 @@ class api_v3_SettingTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('setting', 'create', $params);
 
-    $this->assertEquals(0, $result['values'][$this->domainID3]['uniq_email_per_site']);
-    $this->assertEquals(0, $result['values'][$this->currentDomain]['uniq_email_per_site']);
+    $this->assertSame($this->apiValue(0), $result['values'][$this->domainID3]['uniq_email_per_site']);
+    $this->assertSame($this->apiValue(0), $result['values'][$this->currentDomain]['uniq_email_per_site']);
     $params = [
       'domain_id' => [$this->currentDomain, $this->domainID2],
       'return' => ['uniq_email_per_site'],
     ];
     $result = $this->callAPISuccess('setting', 'get', $params);
-    $this->assertEquals(1, $result['values'][$this->domainID2]['uniq_email_per_site']);
-    $this->assertEquals(0, $result['values'][$this->currentDomain]['uniq_email_per_site']);
+    $this->assertSame($this->apiValue(1), $result['values'][$this->domainID2]['uniq_email_per_site']);
+    $this->assertSame($this->apiValue(0), $result['values'][$this->currentDomain]['uniq_email_per_site']);
 
   }
 

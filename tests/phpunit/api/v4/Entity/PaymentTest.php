@@ -75,7 +75,7 @@ class PaymentTest extends \CiviUnitTestCase {
       ->addSelect('fee_amount')
       ->execute()
       ->column('fee_amount'));
-    $this->assertEquals(2.50, $totalFeeAmount, 'The fee should be recorded once, not doubled by the duplicate call.');
+    $this->assertSame(2.50, $totalFeeAmount, 'The fee should be recorded once, not doubled by the duplicate call.');
 
     $contribution = Contribution::get(FALSE)
       ->addWhere('id', '=', $contributionID)

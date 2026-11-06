@@ -229,7 +229,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
     $errors = $result->getErrors();
     $this->assertCount(2, $errors);
     $this->assertInstanceOf(\Civi\Api4\Generic\Error::class, $errors[0]);
-    $this->assertEquals(\Psr\Log\LogLevel::ERROR, $errors[0]->getLevel());
+    $this->assertSame(\Psr\Log\LogLevel::ERROR, $errors[0]->getLevel());
     $this->assertSame($message, $errors[0]->getMessage());
     $this->assertSame(999, $errors[0]->getCode());
   }

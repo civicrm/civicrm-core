@@ -225,7 +225,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     // And the rest of the CRM-21200 protections still hold.
     $this->assertEquals($contributionPageID1, $contribution['contribution_page_id']);
     $this->assertSame('Completed', $contribution['contribution_status_id:name']);
-    $this->assertEquals(100.00, $contribution['total_amount']);
+    $this->assertSame(100.00, $contribution['total_amount']);
 
     // The payment itself is recorded against today, not against the original
     // receive_date - the money did arrive today.
@@ -480,8 +480,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
-    $this->assertEquals(2.5, $contribution['tax_amount']);
-    $this->assertEquals(127.5, $contribution['total_amount']);
+    $this->assertSame(2.5, $contribution['tax_amount']);
+    $this->assertSame(127.5, $contribution['total_amount']);
   }
 
   /**
@@ -505,7 +505,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ] + $this->getBillingSubmitValues(), $this->getContributionPageID());
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contribution_page_id' => $this->getContributionPageID(), 'version' => 4]);
-    $this->assertEquals(9.09, $contribution['tax_amount']);
+    $this->assertSame(9.09, $contribution['tax_amount']);
     $this->assertSame(200.0, $contribution['total_amount']);
   }
 
@@ -733,7 +733,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
     ]);
     $contribution = $this->getCreatedContribution();
-    $this->assertEquals(5.00, $contribution['non_deductible_amount']);
+    $this->assertSame(5.00, $contribution['non_deductible_amount']);
   }
 
   /**
@@ -765,7 +765,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'price_' . $this->ids['PriceField']['text_field_2.95'] => 3,
     ]);
     $contribution = $this->getCreatedContribution();
-    $this->assertEquals(3.00, $contribution['non_deductible_amount']);
+    $this->assertSame(3.00, $contribution['non_deductible_amount']);
   }
 
   /**
@@ -802,7 +802,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     );
 
     $contribution = Contribution::get()->addWhere('contribution_page_id', '=', $this->getContributionPageID())->execute()->first();
-    $this->assertEquals(47.29, $contribution['total_amount']);
+    $this->assertSame(47.29, $contribution['total_amount']);
     $lineItems = $this->callAPISuccess('LineItem', 'get', [
       'contribution_id' => $contribution['id'],
     ]);
@@ -811,7 +811,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     foreach ($lineItems['values'] as $lineItem) {
       $totalLineAmount += $lineItem['line_total'];
     }
-    $this->assertEquals(43.90, $totalLineAmount);
+    $this->assertSame(43.90, $totalLineAmount);
     $this->assertMailSentContainingStrings([
       \Civi::format()->money(3.39),
       'Tax Rate',
@@ -859,7 +859,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     $this->assertSame(100.0, $lineItem['unit_price']);
     $this->assertSame(100.0, $lineItem['line_total']);
     foreach ($contributions as $contribution) {
-      $this->assertEquals(.72, $contribution['fee_amount']);
+      $this->assertSame(.72, $contribution['fee_amount']);
       $this->assertEquals($contribution['total_amount'] - .72, $contribution['net_amount']);
     }
     $this->assertMailSentContainingStrings(['$15.00', 'Contribution Information'], 0);
@@ -1249,20 +1249,20 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     // Check if pledge created.
     $pledge = Pledge::get()->execute()->single();
     $this->assertEquals(date('Ymd', strtotime($pledge['start_date'])), date('Ymd', strtotime('+1 month')));
-    $this->assertEquals(30.00, $pledge['amount']);
+    $this->assertSame(30.00, $pledge['amount']);
 
     // Check if pledge payments created.
     $pledgePayment = $this->callAPISuccess('pledge_payment', 'get', ['pledge_id' => $pledge['id'], 'sequential' => 1]);
     $this->assertSame(3, $pledgePayment['count']);
     $this->assertEquals(date('Ymd', strtotime($pledgePayment['values'][0]['scheduled_date'])), date('Ymd', strtotime('+1 month')));
-    $this->assertEquals(10.00, $pledgePayment['values'][0]['scheduled_amount']);
+    $this->assertSame(10.00, $pledgePayment['values'][0]['scheduled_amount']);
     // Will be pending when actual payment processor is used (dummy processor does not support future payments).
     $this->assertSame(1, $pledgePayment['values'][0]['status_id']);
 
     // Check contribution recur record.
     $recur = $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
     $this->assertEquals(date('Ymd', strtotime($recur['start_date'])), date('Ymd', strtotime('+1 month')));
-    $this->assertEquals(10.00, $recur['amount']);
+    $this->assertSame(10.00, $recur['amount']);
     // In progress status.
     $this->assertSame(5, $recur['contribution_status_id']);
   }
@@ -1305,7 +1305,7 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'contribution_recur_id' => ['IS NULL' => 1],
     ]);
 
-    $this->assertEquals(10.00, $contribution['total_amount']);
+    $this->assertSame(10.00, $contribution['total_amount']);
     $pledgePayment = $this->callAPISuccess('PledgePayment', 'get', ['pledge_id' => $pledge['id']])['values'];
     $this->assertSame(1, $pledgePayment[$secondPledgePayment['id']]['status_id'], 'This pledge payment should have been completed');
     $this->assertEquals($contribution['id'], $pledgePayment[$secondPledgePayment['id']]['contribution_id']);
@@ -1582,8 +1582,8 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
     ]);
     $this->assertSame('create_first_success', $contribution['trxn_id']);
     $this->assertSame(10.0, $contribution['total_amount']);
-    $this->assertEquals(.85, $contribution['fee_amount']);
-    $this->assertEquals(9.15, $contribution['net_amount']);
+    $this->assertSame(.85, $contribution['fee_amount']);
+    $this->assertSame(9.15, $contribution['net_amount']);
 
     $trxn = \Civi\Api4\EntityFinancialTrxn::get(FALSE)
       ->addWhere('entity_id', '=', $contribution['id'])

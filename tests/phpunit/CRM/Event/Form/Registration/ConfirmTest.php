@@ -104,8 +104,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Participant', [], 1);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertSame('300.00', $contribution['total_amount']);
-    $this->assertEquals(1.67, $contribution['fee_amount']);
-    $this->assertEquals(298.33, $contribution['net_amount']);
+    $this->assertSame('1.67', $contribution['fee_amount']);
+    $this->assertSame('298.33', $contribution['net_amount']);
     $this->assertNotEmpty($contribution['receipt_date']);
     $this->assertNotContains(' (multiple participants)', $contribution['amount_level']);
     $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
@@ -181,11 +181,11 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ], $event['id']);
     $form->processForm();
 
-    $this->assertEquals(150.0, $form->getTotalAmount());
+    $this->assertSame(150.0, $form->getTotalAmount());
     $participant = Participant::get(FALSE)
       ->addSelect('fee_amount', 'fee_level', 'discount_id')
       ->execute()->single();
-    $this->assertEquals(150.0, $participant['fee_amount']);
+    $this->assertSame(150.0, $participant['fee_amount']);
     $this->assertEquals($this->ids['Discount']['discount'], $participant['discount_id']);
     $this->assertStringContainsString('Standard Rate', implode(' ', $participant['fee_level']));
   }

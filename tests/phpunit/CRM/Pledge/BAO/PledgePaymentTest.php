@@ -345,7 +345,7 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
 
     // The status of the first 3 pledges should be set to complete
     $this->assertSame('1', $pledgePayments['values'][0]['status_id']);
-    $this->assertEquals($pledgePayments['values'][0]['actual_amount'], 404.70);
+    $this->assertSame('404.70', $pledgePayments['values'][0]['actual_amount']);
 
     $this->assertSame('1', $pledgePayments['values'][1]['status_id']);
     $this->assertSame('0.00', $pledgePayments['values'][1]['actual_amount']);
@@ -443,8 +443,8 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
     foreach ($pledgePayments['values'] as $key => $pp) {
       if ($key == 0) {
         // First pledge payment has the full amount.
-        $this->assertEquals(8.33, $pp['scheduled_amount']);
-        $this->assertEquals(100.00, $pp['actual_amount']);
+        $this->assertSame('8.33', $pp['scheduled_amount']);
+        $this->assertSame('100.00', $pp['actual_amount']);
       }
       else {
         $this->assertSame('0.00', $pp['scheduled_amount']);

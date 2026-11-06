@@ -181,7 +181,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
 
     $importObject = $this->createImportObject(['Contact.email_primary.email', 'Membership.membership_type_id', 'Membership.start_date', 'Membership.join_date']);
     foreach ($params as $values) {
-      $this->assertEquals(CRM_Import_Parser::VALID, $importObject->import($values), $values[0]);
+      $this->assertSame(CRM_Import_Parser::VALID, $importObject->import($values), $values[0]);
     }
     $result = $this->callAPISuccess('membership', 'get', ['sequential' => 1])['values'];
     $this->assertCount(2, $result);
@@ -241,7 +241,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ];
 
     $importResponse = $membershipImporter->import($importValues);
-    $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
+    $this->assertSame(CRM_Import_Parser::VALID, $importResponse);
   }
 
   public function testImportOverriddenMembershipWithValidOverrideEndDate(): void {
@@ -265,7 +265,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ];
 
     $importResponse = $membershipImporter->import($importValues);
-    $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
+    $this->assertSame(CRM_Import_Parser::VALID, $importResponse);
     $contacts = $this->callAPISuccess('Contact', 'get', ['email_primary.email' => 'anthony_anderson4@civicrm.org'])['values'];
     $this->assertCount(1, $contacts);
   }
@@ -329,7 +329,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ];
 
     $importResponse = $membershipImporter->import($importValues);
-    $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
+    $this->assertSame(CRM_Import_Parser::VALID, $importResponse);
     $createdStatusID = $this->callAPISuccessGetValue('Membership', ['return' => 'status_id']);
     $this->assertEquals($this->getMembershipStatusID('New'), $createdStatusID);
     $this->callAPISuccess('MembershipStatus', 'get', [
@@ -421,7 +421,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     ];
 
     $importResponse = $membershipImporter->import($importValues);
-    $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
+    $this->assertSame(CRM_Import_Parser::VALID, $importResponse);
     $membership = $this->callAPISuccessGetSingle('Membership', ['return' => [$this->getCustomFieldName('text', 4), $this->getCustomFieldName('select_string', 4)]]);
     $this->assertSame('blah', $membership[$this->getCustomFieldName('text')]);
     $this->assertSame('R', $membership[$this->getCustomFieldName('select_string')]);

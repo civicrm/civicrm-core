@@ -164,7 +164,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       ->processForm();
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $this->ids['Contact']['individual'], 'is_test' => TRUE, 'return' => ['total_amount', 'tax_amount']]);
     $this->assertSame('50.00', $contribution['total_amount']);
-    $this->assertEquals(4.55, $contribution['tax_amount']);
+    $this->assertSame('4.55', $contribution['tax_amount']);
   }
 
   /**
@@ -368,9 +368,9 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $this->assertEquals($paymentInstrumentID, $contribution['payment_instrument_id']);
 
     $this->assertSame('kettles boil water', $contribution['trxn_id']);
-    $this->assertEquals(.29, $contribution['fee_amount']);
-    $this->assertEquals(7800.90, $contribution['total_amount']);
-    $this->assertEquals(7800.61, $contribution['net_amount']);
+    $this->assertSame('0.29', $contribution['fee_amount']);
+    $this->assertSame('7800.90', $contribution['total_amount']);
+    $this->assertSame('7800.61', $contribution['net_amount']);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
@@ -454,7 +454,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'return' => ['tax_amount', 'trxn_id'],
     ]);
     $this->assertSame('777', $contribution['trxn_id']);
-    $this->assertEquals(0.00, $contribution['tax_amount']);
+    $this->assertSame('0.00', $contribution['tax_amount']);
 
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
@@ -560,7 +560,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     ]);
 
     $this->assertSame('777', $contribution['trxn_id']);
-    $this->assertEquals(.5, $contribution['fee_amount']);
+    $this->assertSame('0.50', $contribution['fee_amount']);
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
       'entity_table' => 'civicrm_membership',
@@ -741,7 +741,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     ]);
 
     $this->assertSame('777', $contribution['trxn_id']);
-    $this->assertEquals(.5, $contribution['fee_amount']);
+    $this->assertSame('0.50', $contribution['fee_amount']);
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
       'entity_table' => 'civicrm_membership',
@@ -802,7 +802,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     ]);
 
     $this->assertSame('777', $contribution['trxn_id']);
-    $this->assertEquals(.5, $contribution['fee_amount']);
+    $this->assertSame('0.50', $contribution['fee_amount']);
     $this->callAPISuccessGetCount('LineItem', [
       'entity_id' => $membership['id'],
       'entity_table' => 'civicrm_membership',

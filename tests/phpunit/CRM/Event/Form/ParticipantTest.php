@@ -223,14 +223,14 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->execute();
     // Participants is updated to 0 but line remains.
     $this->assertSame(0.0, $lineItems[0]['line_total']);
-    $this->assertEquals(1550.55, $lineItems[1]['line_total']);
+    $this->assertSame(1550.55, $lineItems[1]['line_total']);
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', []);
 
     $sum = 0;
     foreach ($financialItems['values'] as $financialItem) {
       $sum += $financialItem['amount'];
     }
-    $this->assertEquals(1550.55, $sum);
+    $this->assertSame(1550.55, $sum);
   }
 
   /**
