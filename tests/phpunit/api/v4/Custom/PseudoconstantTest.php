@@ -99,6 +99,38 @@ class PseudoconstantTest extends Api4TestBase {
     $this->assertTrue(is_numeric($act[0]['activity_type_id']));
   }
 
+  public function testUnknownPseudoconstantValueIsRejected(): void {
+    try {
+      Contact::create(FALSE)
+        ->addValue('first_name', 'Unknown')
+        ->addValue('gender_id:name', 'Not_A_Gender')
+        ->execute();
+      $this->fail('Expected an exception for an unknown gender_id:name');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertSame('Invalid value for gender_id:name: "Not_A_Gender"', $e->getMessage());
+    }
+
+    try {
+      Contact::create(FALSE)
+        ->addValue('first_name', 'Unknown')
+        ->addValue('preferred_communication_method:name', ['Phone', 'Carrier_Pigeon'])
+        ->execute();
+      $this->fail('Expected an exception for an unknown preferred_communication_method:name');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertSame('Invalid value for preferred_communication_method:name: "Carrier_Pigeon"', $e->getMessage());
+    }
+
+    // An empty value still clears the field.
+    $cid = $this->createTestRecord('Contact', ['first_name' => 'Known', 'gender_id:name' => 'Female'])['id'];
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $cid)
+      ->addValue('gender_id:name', NULL)
+      ->execute();
+    $this->assertNull(Contact::get(FALSE)->addWhere('id', '=', $cid)->addSelect('gender_id')->execute()->single()['gender_id']);
+  }
+
   public function testAddressOptions(): void {
     $cid = $this->createTestRecord('Contact', ['first_name', 'addr'])['id'];
     $addressData = [

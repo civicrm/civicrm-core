@@ -592,6 +592,11 @@ abstract class AbstractAction implements \ArrayAccess {
     foreach ($optionFields as $info) {
       $options = FormattingUtil::getPseudoconstantList($info['field'], $info['expr'], $record, 'create');
       $record[$info['name']] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
+      // An unrecognized value would otherwise be silently saved as NULL (or dropped from a multi-value field)
+      $unmatched = array_filter((array) $info['val'], fn($val) => $val !== NULL && $val !== '' && array_search($val, (array) $options) === FALSE);
+      if ($unmatched) {
+        throw new \CRM_Core_Exception(sprintf('Invalid value for %s: "%s"', $info['expr'], implode('", "', $unmatched)), 'invalid_pseudoconstant', ['field' => $info['name'], 'values' => array_values($unmatched)]);
+      }
     }
     // The DAO works better with ints than booleans. See https://github.com/civicrm/civicrm-core/pull/23970
     if (CoreUtil::getInfoItem($this->getEntityName(), 'table_name')) {
