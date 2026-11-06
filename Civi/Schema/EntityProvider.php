@@ -17,23 +17,16 @@ use Civi\Core\Event\GenericHookEvent;
 final class EntityProvider {
 
   /**
-   * @var string
-   */
-  private string $entityName;
-
-  /**
    * @var EntityMetadataInterface
    */
-  private $meta;
+  private EntityMetadataInterface $meta;
 
   /**
    * @var EntityStorageInterface
    */
-  private $storage;
+  private EntityStorageInterface $storage;
 
-  public function __construct(string $entityName) {
-    $this->entityName = $entityName;
-  }
+  public function __construct(private string $entityName) {}
 
   public function getMeta(string $property) {
     return $this->getMetaProvider()->getProperty($property);
@@ -120,15 +113,17 @@ final class EntityProvider {
     if (!isset($this->meta)) {
       $entity = EntityRepository::getEntity($this->entityName);
       if (isset($entity['metaProvider'])) {
-        return new $entity['metaProvider']($this->entityName);
+        $this->meta = new $entity['metaProvider']($this->entityName);
       }
-      if (isset($entity['getFields'])) {
-        return new SqlEntityMetadata($this->entityName);
+      elseif (isset($entity['getFields'])) {
+        $this->meta = new SqlEntityMetadata($this->entityName);
       }
-      if (isset($entity['table'])) {
-        return new LegacySqlEntityMetadata($this->entityName);
+      elseif (isset($entity['table'])) {
+        $this->meta = new LegacySqlEntityMetadata($this->entityName);
       }
-      throw new \CRM_Core_Exception("Unknown entity $this->entityName");
+      else {
+        throw new \CRM_Core_Exception("Unknown entity $this->entityName");
+      }
     }
     return $this->meta;
   }
@@ -137,12 +132,14 @@ final class EntityProvider {
     if (!isset($this->storage)) {
       $entity = EntityRepository::getEntity($this->entityName);
       if (isset($entity['storageProvider'])) {
-        return new $entity['storageProvider']($this->entityName);
+        $this->storage = new $entity['storageProvider']($this->entityName);
       }
-      if (isset($entity['table'])) {
-        return new SqlEntityStorage($this->entityName);
+      elseif (isset($entity['table'])) {
+        $this->storage = new SqlEntityStorage($this->entityName);
       }
-      throw new \CRM_Core_Exception("Unknown entity $this->entityName");
+      else {
+        throw new \CRM_Core_Exception("Unknown entity $this->entityName");
+      }
     }
     return $this->storage;
   }
