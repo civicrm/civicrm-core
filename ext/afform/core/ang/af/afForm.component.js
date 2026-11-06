@@ -254,6 +254,9 @@
         if (conditions[0] === 'OR') {
           return conditions[1].some((subcondition) => this.evaluateBooleanExpression(subcondition));
         }
+        if (conditions[0] === 'NOT') {
+          return conditions[1].every((subcondition) => !this.evaluateBooleanExpression(subcondition));
+        }
         return compareConditions(conditions[0], conditions[1], conditions[2]);
       };
 

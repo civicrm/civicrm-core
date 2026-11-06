@@ -1173,6 +1173,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     if ($conditional[0] === 'OR') {
       return array_any($conditional[1], fn ($subcondition) => self::checkAfformConditional($subcondition));
     }
+    if ($conditional[0] === 'NOT') {
+      return array_all($conditional[1], fn ($subcondition) => !self::checkAfformConditional($subcondition));
+    }
     return self::checkAfformConditionalClause($conditional[0], $conditional[1], $conditional[2] ?? '');
   }
 
