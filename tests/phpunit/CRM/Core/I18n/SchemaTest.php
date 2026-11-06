@@ -90,7 +90,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     // Test where table is part of a sub query
     $query7 = "SELECT * FROM civicrm_foo WHERE foo_id = (SELECT value FROM {$table})";
     $new_query7 = CRM_Core_I18n_Schema::rewriteQuery($query7);
-    $this->assertEquals("SELECT * FROM civicrm_foo WHERE foo_id = (SELECT value FROM {$expectedRewrite})", $new_query7);
+    $this->assertSame("SELECT * FROM civicrm_foo WHERE foo_id = (SELECT value FROM {$expectedRewrite})", $new_query7);
     // Test different verbs
     $query8 = "DELETE FROM {$table}";
     $new_query8 = CRM_Core_I18n_Schema::rewriteQuery($query8);
