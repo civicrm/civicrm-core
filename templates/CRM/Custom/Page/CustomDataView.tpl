@@ -56,7 +56,7 @@
                         {if $element.options_per_line != 0}
                           {* sort by fails for option per line. Added a variable to iterate through the element array*}
                           {foreach from=$element.field_value item=val}
-                            {$val}
+                            {$val|escapeOrPurify}
                             <br/>
                           {/foreach}
                         {else}
@@ -64,15 +64,13 @@
                             {if $element.field_type == 'Text'}
                               {$element.data|crmMoney}
                             {else}
-                              {$element.field_value}
+                              {$element.field_value|escapeOrPurify}
                             {/if}
                           {else}
                             {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
                               {$element.contact_ref_links|join:', '}
-                            {elseif $element.field_type eq 'File' || $element.field_type eq 'TextArea' || $element.field_type eq 'RichTextEditor' || $element.field_type === 'Link'}
-                              {$element.field_value|purify}
                             {else}
-                              {$element.field_value|escape}
+                              {$element.field_value|escapeOrPurify}
                             {/if}
                           {/if}
                         {/if}
@@ -98,7 +96,7 @@
               <div class="content">
               {* sort by fails for option per line. Added a variable to iterate through the element array*}
               {foreach from=$element.field_value item=val}
-                {$val}
+                {$val|escapeOrPurify}
                 <br/>
               {/foreach}
               </div>
@@ -107,7 +105,7 @@
               {if $element.field_type == 'File'}
                 <div class="content">
                 {if $element.field_value}
-                  {$element.field_value}
+                  {$element.field_value|escapeOrPurify}
                 {else}
                   <br/>
                 {/if}
@@ -117,16 +115,14 @@
                   {if $element.field_type == 'Text'}
                     <div class="content">{if $element.field_value}{$element.field_value|crmMoney}{else}<br/>{/if}</div>
                   {else}
-                    <div class="content">{if $element.field_value}{$element.field_value}{else}<br/>{/if}</div>
+                    <div class="content">{if $element.field_value}{$element.field_value|escapeOrPurify}{else}<br/>{/if}</div>
                   {/if}
                 {else}
                   <div class="content">
                     {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
                       {$element.contact_ref_links|join:', '}
-                    {elseif $element.field_type eq 'File' || $element.field_type eq 'TextArea' || $element.field_type eq 'RichTextEditor' || $element.field_type === 'Link'}
-                      {$element.field_value|purify}
                     {else}
-                      {if $element.field_value}{$element.field_value|escape} {else}<br/>{/if}
+                      {if $element.field_value}{$element.field_value|escapeOrPurify} {else}<br/>{/if}
                     {/if}
                   </div>
                 {/if}
