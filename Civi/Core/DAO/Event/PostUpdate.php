@@ -11,11 +11,15 @@
 
 namespace Civi\Core\DAO\Event;
 
+use Civi\Core\Event\EntityParamsTrait;
+
 /**
  * Class PostUpdate
  * @package Civi\Core\DAO\Event
  */
 class PostUpdate extends \Civi\Core\Event\GenericHookEvent {
+
+  use EntityParamsTrait;
 
   /**
    * @var \CRM_Core_DAO
@@ -33,12 +37,19 @@ class PostUpdate extends \Civi\Core\Event\GenericHookEvent {
   public $eventID;
 
   /**
-   * @param $object
-   * @param $result
+   * @var array
    */
-  public function __construct($object, $result) {
+  public $params;
+
+  /**
+   * @param \CRM_Core_DAO $object
+   * @param mixed $result
+   * @param array $params
+   */
+  public function __construct($object, $result, array $params = []) {
     $this->object = $object;
     $this->result = $result;
+    $this->params = $params;
   }
 
 }

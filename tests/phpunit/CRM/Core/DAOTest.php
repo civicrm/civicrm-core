@@ -802,11 +802,9 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       ->execute()->single();
 
     $seen = [];
-    $listener = function ($event) use (&$seen, $customGroup, $customField) {
+    $listener = function ($event) use (&$seen) {
       if ($event->object instanceof CRM_Core_DAO_Address) {
-        $seen[] = CRM_Core_DAO::singleValueQuery("SELECT {$customField['column_name']} FROM {$customGroup['table_name']} WHERE entity_id = %1", [
-          1 => [$event->object->id, 'Integer'],
-        ]);
+        $seen[] = $event->getValue('address_extra.Note');
       }
     };
     \Civi::dispatcher()->addListener('civi.dao.postInsert', $listener);

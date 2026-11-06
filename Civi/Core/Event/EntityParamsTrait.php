@@ -57,6 +57,10 @@ trait EntityParamsTrait {
     }
 
     if (!$customField) {
+      // DAO PreUpdate event uses an object
+      if (isset($this->object) && is_object($this->object) && property_exists($this->object, $paramName)) {
+        return [TRUE, $this->object->$paramName];
+      }
       return [FALSE, NULL];
     }
     $customFieldId = $customField['id'];
