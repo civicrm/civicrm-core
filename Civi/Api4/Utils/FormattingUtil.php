@@ -281,13 +281,36 @@ class FormattingUtil {
         $formatKeys[$key] = $key;
       }
 
+      $suffix = self::getSuffix($fieldName);
+      $controlFields = [];
+      $isContextDependent = FALSE;
+      if ($suffix) {
+        $currentField = $field;
+        $pos = isset($field['name']) ? strrpos($fieldName, $field['name']) : FALSE;
+        $prefix = $pos ? substr($fieldName, 0, $pos) : '';
+        while (!empty($currentField['input_attrs']['control_field'])) {
+          $ctrl = $currentField['input_attrs']['control_field'];
+          if (in_array($ctrl, $controlFields, TRUE)) {
+            break;
+          }
+          $controlFields[] = $ctrl;
+          $ctrlPrefixed = str_starts_with($ctrl, $prefix) ? $ctrl : $prefix . $ctrl;
+          $currentField = $fields[$ctrlPrefixed] ?? NULL;
+        }
+        $isContextDependent = !empty($controlFields)
+          || !empty($field['pseudoconstant']['condition_provider']);
+      }
+
       return [
         'expr' => $fieldExpr,
         'name' => $fieldName,
         'field' => $field,
-        'suffix' => self::getSuffix($fieldName),
+        'suffix' => $suffix,
         'dataType' => $field['data_type'] ?? ($fieldName == 'id' ? 'Integer' : NULL),
         'isContactType' => ($field['entity'] ?? NULL) === 'Contact' && ($field['name'] ?? NULL) === 'contact_type',
+        'isContextDependent' => $isContextDependent,
+        'controlFields' => $controlFields,
+        'options' => [],
       ];
     };
 
@@ -330,7 +353,7 @@ class FormattingUtil {
         // Evaluate pseudoconstant suffixes
         $fieldOptions = NULL;
         if (isset($value) && $columnMeta[$key]['suffix']) {
-          $fieldOptions = self::getPseudoconstantList($field, $fieldName, $rawValues, $action);
+          $fieldOptions = self::getCachedPseudoconstantList($columnMeta[$key], $rawValues, $action);
           $dataType = NULL;
         }
         // Store contact_type value before replacing pseudoconstant (e.g. transforming it to contact_type:label)
@@ -365,7 +388,7 @@ class FormattingUtil {
   /**
    * Get options associated with an entity field
    *
-   * @return void
+   * @return array|null
    * @throws \CRM_Core_Exception
    */
   public static function getFieldOptions(array $field, array $values = [], bool $includeDisabled = FALSE, bool $checkPermissions = FALSE, ?int $userId = NULL): ?array {
@@ -383,6 +406,53 @@ class FormattingUtil {
 
     $entity = \Civi::entity($entityName);
     return $entity->getOptions($fieldName, $values, $includeDisabled, $checkPermissions, $userId);
+  }
+
+  /**
+   * Retrieves pseudoconstant options for a column, using two-tier caching:
+   * 1. Context-free pseudoconstants are fetched once and cached under '*'.
+   * 2. Context-dependent pseudoconstants with control_field(s) are cached under their compound context key.
+   * 3. Fields with missing control_field values in rawValues bypass caching to allow per-row DB lookups.
+   *
+   * @param array $colMeta
+   * @param array $rawValues
+   * @param string $action
+   * @return array|null
+   * @throws \CRM_Core_Exception
+   */
+  private static function getCachedPseudoconstantList(array &$colMeta, array $rawValues, string $action): ?array {
+    $field = $colMeta['field'];
+    $fieldName = $colMeta['name'];
+
+    // Cache context-free pseudoconstants - they only need to be looked up once
+    if (!$colMeta['isContextDependent']) {
+      return $colMeta['options']['*'] ??= self::getPseudoconstantList($field, $fieldName, [], $action);
+    }
+    // Cache context-dependent pseudoconstants based on the value of their control_field(s)
+    if ($colMeta['controlFields']) {
+      $fieldPath = self::removeSuffix($fieldName);
+      $entityValues = self::filterByPath($rawValues, $fieldPath, $field['name']);
+      $isMissingControl = FALSE;
+      $contextVals = [];
+      foreach ($colMeta['controlFields'] as $ctrl) {
+        $shortCtrl = str_contains($ctrl, '.') ? substr($ctrl, strrpos($ctrl, '.') + 1) : $ctrl;
+        if (!array_key_exists($ctrl, $entityValues) && !array_key_exists($shortCtrl, $entityValues) && !array_key_exists($ctrl, $rawValues)) {
+          $isMissingControl = TRUE;
+        }
+        $contextVals[] = $entityValues[$ctrl] ?? $entityValues[$shortCtrl] ?? $rawValues[$ctrl] ?? NULL;
+      }
+      // If any control_field was not selected, callbacks may do per-row DB lookups by ID; do not share cache across records.
+      if ($isMissingControl) {
+        return self::getPseudoconstantList($field, $fieldName, $rawValues, $action);
+      }
+      $contextKey = count($contextVals) === 1 && !is_array($contextVals[0])
+        ? (string) $contextVals[0]
+        : serialize($contextVals);
+      return $colMeta['options'][$contextKey] ??= self::getPseudoconstantList($field, $fieldName, $rawValues, $action);
+    }
+    // No controlField but context-dependent = no caching
+    // FIXME: Improve the metadata of these pseudoconstants to give caching hints like control_field
+    return self::getPseudoconstantList($field, $fieldName, $rawValues, $action);
   }
 
   /**

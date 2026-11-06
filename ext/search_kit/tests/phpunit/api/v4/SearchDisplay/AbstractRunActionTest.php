@@ -22,6 +22,11 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
       ->apply();
   }
 
+  public function tearDown(): void {
+    CustomGroup::delete(FALSE)->addWhere('name', '=', 'Foods')->execute();
+    parent::tearDown();
+  }
+
   public function testReplaceTokens() {
     CustomGroup::create(FALSE)
       ->addValue('title', 'Foods')
@@ -537,6 +542,38 @@ class AbstractRunActionTest extends \PHPUnit\Framework\TestCase implements Headl
       }
     }
     $this->assertEquals(['Individual', 'Organization'], $seenTypes);
+  }
+
+  public function testAugmentSelectClauseChainedControlFields(): void {
+    $display = [
+      'type' => 'table',
+      'name' => 'test_display',
+      'acl_bypass' => TRUE,
+      'settings' => [
+        'columns' => [
+          ['type' => 'field', 'key' => 'entity_status:label'],
+        ],
+      ],
+    ];
+    $savedSearch = [
+      'api_entity' => 'ActionSchedule',
+      'api_params' => [
+        'version' => 4,
+        'select' => ['entity_status:label'],
+      ],
+      'displays' => [$display],
+    ];
+
+    $run = \Civi\Api4\SearchDisplay::run(FALSE)
+      ->setCheckPermissions(FALSE)
+      ->setSavedSearch($savedSearch)
+      ->setDisplay($display);
+    $run->execute();
+
+    $selectKeys = array_keys($run->getSelectClause());
+    $this->assertContains('entity_status:label', $selectKeys);
+    $this->assertContains('entity_value', $selectKeys);
+    $this->assertContains('mapping_id', $selectKeys);
   }
 
 }
