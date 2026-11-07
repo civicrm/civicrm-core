@@ -1121,4 +1121,27 @@ class CRM_Utils_String {
     return $string;
   }
 
+  /**
+   * Auto-detect whether input string is plain or markup, and escape or purify accordingly
+   *
+   * @param string $text
+   *   Input text, potentially containing markup or plain text.
+   *
+   * @since 6.22
+   *
+   * @return string
+   */
+  public static function escapeOrPurify(string $text): string {
+    if ($text === '') {
+      return '';
+    }
+    $text = (string) $text;
+    // If it looks like markup, purify it
+    if (str_contains($text, '<') && strpos($text, '>', strpos($text, '<')) !== FALSE) {
+      return CRM_Utils_String::purifyHTML($text);
+    }
+    // Escape without double-encoding existing html entities
+    return htmlspecialchars($text, flags: ENT_QUOTES | ENT_SUBSTITUTE, double_encode: FALSE);
+  }
+
 }
