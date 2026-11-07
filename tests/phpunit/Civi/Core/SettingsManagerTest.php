@@ -8,8 +8,14 @@ class SettingsManagerTest extends \CiviUnitTestCase {
   protected $mandates;
   protected $origSetting;
 
+  /**
+   * @var string|false
+   */
+  protected $origExtRepoUrlEnv;
+
   protected function setUp(): void {
     $this->origSetting = $GLOBALS['civicrm_setting'];
+    $this->origExtRepoUrlEnv = getenv('CIVICRM_EXT_REPO_URL');
 
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -40,6 +46,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
 
   public function tearDown(): void {
     $GLOBALS['civicrm_setting'] = $this->origSetting;
+    putenv($this->origExtRepoUrlEnv === FALSE ? 'CIVICRM_EXT_REPO_URL' : "CIVICRM_EXT_REPO_URL={$this->origExtRepoUrlEnv}");
     parent::tearDown();
   }
 
@@ -154,6 +161,68 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     $dSettings->set('test_setting', ['hello' => 'World']);
     $test_setting = $dSettings->get('test_setting');
     $this->assertEquals(['hello' => 'World'], $test_setting);
+  }
+
+  public static function envValueProvider(): array {
+    return [
+      'boolean true' => [['type' => 'Boolean'], 'true', TRUE],
+      'boolean on' => [['type' => 'Boolean'], 'on', TRUE],
+      'boolean 0' => [['type' => 'Boolean'], '0', FALSE],
+      'boolean no' => [['type' => 'Boolean'], 'no', FALSE],
+      'integer' => [['type' => 'Integer'], '42', 42],
+      'string stays a string' => [['type' => 'String'], 'false', 'false'],
+      'env_false' => [['type' => 'String', 'env_false' => TRUE], 'FALSE', FALSE],
+      'env_false keeps other strings' => [['type' => 'String', 'env_false' => TRUE], 'https://example.org/feed', 'https://example.org/feed'],
+    ];
+  }
+
+  /**
+   * @dataProvider envValueProvider
+   */
+  public function testCastEnvValue(array $spec, string $envValue, $expected): void {
+    $this->assertSame($expected, SettingsManager::castEnvValue($spec + ['global_name' => 'CIVICRM_X'], $envValue));
+  }
+
+  public static function invalidEnvValueProvider(): array {
+    return [
+      'boolean' => ['Boolean', 'maybe'],
+      'integer' => ['Integer', '4x'],
+    ];
+  }
+
+  /**
+   * @dataProvider invalidEnvValueProvider
+   */
+  public function testCastEnvValueRejectsInvalid(string $type, string $envValue): void {
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage("Environment variable CIVICRM_X is not a valid {$type}: \"{$envValue}\"");
+    SettingsManager::castEnvValue(['type' => $type, 'global_name' => 'CIVICRM_X'], $envValue);
+  }
+
+  public function testExtRepoUrlFalseFromEnv(): void {
+    unset($GLOBALS['civicrm_setting']['domain']['ext_repo_url']);
+    putenv('CIVICRM_EXT_REPO_URL');
+    $domain = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
+    $this->assertNotFalse($this->createManager()->bootComplete()->getBagByDomain($domain->id)->get('ext_repo_url'));
+
+    putenv('CIVICRM_EXT_REPO_URL=false');
+    $this->assertFalse($this->createManager()->bootComplete()->getBagByDomain($domain->id)->get('ext_repo_url'));
+  }
+
+  public static function constantMessageProvider(): array {
+    return [
+      'env-loadable' => ['ext_repo_url', 'ext_repo_url is a system constant. It can only be set in civicrm.settings.php or with the environment variable CIVICRM_EXT_REPO_URL.'],
+      'settings file only' => ['uploadDir', 'uploadDir is a system constant. It can only be set in civicrm.settings.php.'],
+    ];
+  }
+
+  /**
+   * @dataProvider constantMessageProvider
+   */
+  public function testSetConstantNamesWhereToSetIt(string $key, string $message): void {
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage($message);
+    \Civi::settings()->set($key, 'x');
   }
 
 }

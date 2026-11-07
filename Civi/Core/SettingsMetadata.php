@@ -62,6 +62,7 @@ class SettingsMetadata {
    *   - pseudoconstant
    *   - global_name (name for php constant / environment variable corresponding to this setting)
    *   - is_env_loadable (whether this setting should be read from corresponding environment variable)
+   *   - env_false (whether the environment variable's value "false" means boolean FALSE)
    *   - is_constant (whether a PHP constant should be defined for this setting)
    */
   public static function getMetadata($filters = [], $domainID = NULL, $loadOptions = FALSE, $bootOnly = FALSE, $resolveCallbacks = FALSE) {

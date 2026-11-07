@@ -360,12 +360,45 @@ class SettingsManager {
       if ($fqn) {
         $envValue = getenv($fqn);
         if ($envValue !== FALSE) {
-          $settings[$key] = $envValue;
+          $settings[$key] = self::castEnvValue($spec, $envValue);
         }
       }
     }
 
     return $settings;
+  }
+
+  /**
+   * Convert an environment variable's string to the type its setting declares.
+   *
+   * @param array $spec
+   *   Setting metadata: `type`, `global_name` and, optionally, `env_false`.
+   * @param string $envValue
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   *   When the string is not a valid value of that type.
+   * @internal
+   */
+  public static function castEnvValue(array $spec, string $envValue) {
+    if (!empty($spec['env_false']) && strtolower($envValue) === 'false') {
+      return FALSE;
+    }
+    switch ($spec['type'] ?? NULL) {
+      case 'Boolean':
+        $value = filter_var($envValue, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        break;
+
+      case 'Integer':
+        $value = filter_var($envValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        break;
+
+      default:
+        return $envValue;
+    }
+    if ($value === NULL) {
+      throw new \CRM_Core_Exception(sprintf('Environment variable %s is not a valid %s: "%s"', $spec['global_name'], $spec['type'], $envValue));
+    }
+    return $value;
   }
 
   /**
