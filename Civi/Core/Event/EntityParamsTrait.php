@@ -57,7 +57,7 @@ trait EntityParamsTrait {
     }
 
     if (!$customField) {
-      return [FALSE, NULL];
+      return $this->findObjectValue($paramName);
     }
     $customFieldId = $customField['id'];
     $shortName = "custom_$customFieldId";
@@ -74,6 +74,15 @@ trait EntityParamsTrait {
         return [TRUE, $this->formatCustomValue($customField, $value)];
       }
     }
+    return [FALSE, NULL];
+  }
+
+  /**
+   * Looks up a non-custom parameter that is not in $params.
+   *
+   * @return array [if parameter is present, value or NULL].
+   */
+  protected function findObjectValue(string $paramName): array {
     return [FALSE, NULL];
   }
 

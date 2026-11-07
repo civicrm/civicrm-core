@@ -144,6 +144,16 @@ class CRM_Core_DAO extends DB_DataObject {
   protected $_options = [];
 
   /**
+   * Custom data to be saved by $this->save().
+   *
+   * Stored by save() so it is in the database before post-save events fire.
+   *
+   * @var array
+   * @internal
+   */
+  protected $_customParams = [];
+
+  /**
    * Class constructor.
    *
    * @return static
@@ -809,15 +819,20 @@ class CRM_Core_DAO extends DB_DataObject {
     $primaryField = $this->getFirstPrimaryKey();
     if (!empty($this->$primaryField)) {
       if ($hook) {
-        $preEvent = new PreUpdate($this);
+        $preEvent = new PreUpdate($this, ['custom' => $this->_customParams]);
         $preEvent->eventID = $eventID;
         \Civi::dispatcher()->dispatch('civi.dao.preUpdate', $preEvent);
+        if (isset($preEvent->params['custom'])) {
+          $this->_customParams = $preEvent->params['custom'];
+        }
       }
 
+      $savedCustomParams = $this->_customParams;
       $result = $this->update();
+      $this->saveCustomParams('edit');
 
       if ($hook) {
-        $event = new PostUpdate($this, $result);
+        $event = new PostUpdate($this, $result, ['custom' => $savedCustomParams]);
         $event->eventID = $eventID;
         \Civi::dispatcher()->dispatch('civi.dao.postUpdate', $event);
       }
@@ -825,15 +840,20 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     else {
       if ($hook) {
-        $preEvent = new PreUpdate($this);
+        $preEvent = new PreUpdate($this, ['custom' => $this->_customParams]);
         $preEvent->eventID = $eventID;
         \Civi::dispatcher()->dispatch("civi.dao.preInsert", $preEvent);
+        if (isset($preEvent->params['custom'])) {
+          $this->_customParams = $preEvent->params['custom'];
+        }
       }
 
+      $savedCustomParams = $this->_customParams;
       $result = $this->insert();
+      $this->saveCustomParams('create');
 
       if ($hook) {
-        $event = new PostUpdate($this, $result);
+        $event = new PostUpdate($this, $result, ['custom' => $savedCustomParams]);
         $event->eventID = $eventID;
         \Civi::dispatcher()->dispatch("civi.dao.postInsert", $event);
       }
@@ -844,6 +864,37 @@ class CRM_Core_DAO extends DB_DataObject {
     }
 
     return $this;
+  }
+
+  /**
+   * Get custom parameters staged to be saved.
+   *
+   * @return array
+   */
+  public function getCustomParams(): array {
+    return $this->_customParams;
+  }
+
+  /**
+   * Set custom parameters to be saved by save().
+   *
+   * @param array $customParams
+   * @return static
+   */
+  public function setCustomParams(array $customParams): static {
+    $this->_customParams = $customParams;
+    return $this;
+  }
+
+  /**
+   * @param string $op
+   *   'create' or 'edit'.
+   */
+  protected function saveCustomParams(string $op): void {
+    if ($this->_customParams) {
+      CRM_Core_BAO_CustomValueTable::store($this->_customParams, $this->tableName(), $this->{$this->getFirstPrimaryKey()}, $op);
+      $this->_customParams = [];
+    }
   }
 
   /**
@@ -1142,11 +1193,10 @@ class CRM_Core_DAO extends DB_DataObject {
     if (empty($values[$idField]) && array_key_exists('name', $fields) && empty($values['name'])) {
       $instance->makeNameFromLabel();
     }
-    $instance->save();
-
     if (!empty($record['custom']) && is_array($record['custom'])) {
-      CRM_Core_BAO_CustomValueTable::store($record['custom'], static::getTableName(), $instance->$idField, $op);
+      $instance->setCustomParams($record['custom']);
     }
+    $instance->save();
 
     \CRM_Utils_Hook::post($op, $entityName, $instance->$idField, $instance, $record);
 
