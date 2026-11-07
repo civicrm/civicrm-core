@@ -407,6 +407,8 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Generate and assign an arbitrary value to a field of a test object.
    *
+   * FIXME: Move to test class
+   *
    * @param string $fieldName
    * @param array $fieldDef
    * @param int $counter
@@ -497,13 +499,10 @@ class CRM_Core_DAO extends DB_DataObject {
               $this->$dbName = $fieldDef['default'];
             }
             else {
-              $options = CRM_Core_PseudoConstant::get($daoName, $fieldName);
+              $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoName);
+              $options = $entityName ? \Civi::entity($entityName)->getOptions($fieldName) : NULL;
               if (is_array($options)) {
-                $this->$dbName = $options[0] ?? NULL;
-              }
-              else {
-                $defaultValues = explode(',', $options);
-                $this->$dbName = $defaultValues[0];
+                $this->$dbName = $options[0]['id'] ?? NULL;
               }
             }
           }
