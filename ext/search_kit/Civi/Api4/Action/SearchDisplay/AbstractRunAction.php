@@ -1719,16 +1719,26 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if ($clause && $clause['expr']->getType() === 'SqlField' && !empty($clause['fields'])) {
         $fieldAlias = array_keys($clause['fields'])[0];
         $field = $clause['fields'][$fieldAlias];
-        if (!empty($field['input_attrs']['control_field']) && strpos($fieldAlias, ':')) {
+        if (strpos($fieldAlias, ':')) {
           $prefix = substr($fieldAlias, 0, strrpos($fieldAlias, $field['name']));
-          $controlField = $prefix . $field['input_attrs']['control_field'];
-          if (
-            // Don't need to add the field if a suffixed version already exists
-            !array_intersect(array_keys($this->getSelectClause()), ["$controlField:label", "$controlField:name"]) &&
-            // Don't add if it would cause aggregation problems
-            !$this->canAggregate($controlField)
-          ) {
-            $this->addSelectExpression($controlField);
+          $currentField = $field;
+          $seenControls = [];
+          while (!empty($currentField['input_attrs']['control_field'])) {
+            $ctrlName = $currentField['input_attrs']['control_field'];
+            if (in_array($ctrlName, $seenControls, TRUE)) {
+              break;
+            }
+            $seenControls[] = $ctrlName;
+            $controlField = str_contains($ctrlName, '.') ? $ctrlName : $prefix . $ctrlName;
+            if (
+              // Don't need to add the field if a suffixed version already exists
+              !array_intersect(array_keys($this->getSelectClause()), ["$controlField:label", "$controlField:name"]) &&
+              // Don't add if it would cause aggregation problems
+              !$this->canAggregate($controlField)
+            ) {
+              $this->addSelectExpression($controlField);
+            }
+            $currentField = $this->getField($controlField);
           }
         }
       }

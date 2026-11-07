@@ -22,6 +22,8 @@ use Civi\Api4\ActionSchedule;
  */
 class ActionScheduleTest extends Api4TestBase {
 
+  protected ?array $enableComponents = ['*'];
+
   public function testGetOptionsBasic(): void {
     $fields = ActionSchedule::getFields(FALSE)
       ->setLoadOptions(['id', 'name', 'label', 'icon'])
@@ -62,6 +64,54 @@ class ActionScheduleTest extends Api4TestBase {
     $this->assertArrayNotHasKey('2', $fields['limit_to']['options']);
 
     $this->assertSame(0, $fields['start_action_offset']['input_attrs']['min']);
+  }
+
+  /**
+   * Tests that pseudoconstant caching correctly differentiates records with different
+   * control_field chains (e.g. entity_status depends on entity_value which depends on mapping_id).
+   */
+  public function testPseudoconstantsWithChainedControlFields(): void {
+    $activitySchedule = $this->createTestRecord('ActionSchedule', [
+      'title' => 'Test Activity Reminder',
+      'mapping_id' => 1,
+      'entity_value' => [3],
+      'entity_status' => [1],
+      'absolute_date' => '2026-12-01',
+      'is_active' => FALSE,
+    ]);
+
+    $participantSchedule = $this->createTestRecord('ActionSchedule', [
+      'title' => 'Test Participant Reminder',
+      'mapping_id' => 2,
+      'entity_value' => [3],
+      'entity_status' => [1],
+      'absolute_date' => '2026-12-01',
+      'is_active' => FALSE,
+    ]);
+
+    $ids = [$activitySchedule['id'], $participantSchedule['id']];
+
+    // Case 1: mapping_id and entity_value are both in the select clause
+    $resultsWithMapping = ActionSchedule::get(FALSE)
+      ->addWhere('id', 'IN', $ids)
+      ->addOrderBy('id', 'ASC')
+      ->addSelect('id', 'mapping_id', 'entity_value', 'entity_status:label')
+      ->execute()
+      ->indexBy('id');
+
+    $this->assertSame(['Scheduled'], $resultsWithMapping[$activitySchedule['id']]['entity_status:label']);
+    $this->assertSame(['Registered'], $resultsWithMapping[$participantSchedule['id']]['entity_status:label']);
+
+    // Case 2: mapping_id is omitted from the select clause (relies on DAO lookup)
+    $resultsWithoutMapping = ActionSchedule::get(FALSE)
+      ->addWhere('id', 'IN', $ids)
+      ->addOrderBy('id', 'ASC')
+      ->addSelect('id', 'entity_value', 'entity_status:label')
+      ->execute()
+      ->indexBy('id');
+
+    $this->assertSame(['Scheduled'], $resultsWithoutMapping[$activitySchedule['id']]['entity_status:label']);
+    $this->assertSame(['Registered'], $resultsWithoutMapping[$participantSchedule['id']]['entity_status:label']);
   }
 
 }
