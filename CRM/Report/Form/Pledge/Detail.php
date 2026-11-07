@@ -380,12 +380,11 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
     $rows = $payment = [];
 
     $dao = CRM_Core_DAO::executeQuery($sql);
-
-    // Set pager for the Main Query only which displays basic information
-    $this->setPager();
     $this->assign('columnHeaders', $this->_columnHeaders);
 
+    $fetched = 0;
     while ($dao->fetch()) {
+      $fetched++;
       $pledgeID = $dao->civicrm_pledge_id;
       foreach ($this->_columnHeaders as $columnHeadersKey => $columnHeadersValue) {
         $row = [];
@@ -395,6 +394,8 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
       }
       $pledgeIDArray[] = $pledgeID;
     }
+    $this->setRowsFound($sql, $fetched);
+    $this->setPager();
 
     // Add Special headers
     $this->_columnHeaders['scheduled_date'] = [

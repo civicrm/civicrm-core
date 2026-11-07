@@ -381,11 +381,11 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   /**
    * Get an count of contacts with changes.
    *
-   * @return mixed
+   * @return int
    */
   public function getCountOfAllContactChangesForConnection() {
     if (empty($this->log_conn_id)) {
-      return [];
+      return 0;
     }
     $this->setDiffer();
     try {

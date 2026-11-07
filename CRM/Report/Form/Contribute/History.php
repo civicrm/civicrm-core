@@ -614,17 +614,14 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     $this->limit();
     $getContacts = "SELECT {$this->_aliases['civicrm_contact']}.id as cid, SUM({$this->_aliases['civicrm_contribution']}.total_amount) as civicrm_contribution_total_amount_sum {$this->_from} {$this->_where} {$addWhere} GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_having}";
 
-    // Run it without limit/offset first to get the right number of rows for
-    // the pager.
-    CRM_Core_DAO::executeQuery($getContacts);
-    $this->setPager();
-
     $getContacts .= ' ' . $this->_limit;
     $dao = CRM_Core_DAO::executeQuery($getContacts);
 
     while ($dao->fetch()) {
       $contactIds[] = $dao->cid;
     }
+    $this->setRowsFound($getContacts, count($contactIds));
+    $this->setPager();
 
     $relationshipRows = [];
     if (empty($contactIds)) {

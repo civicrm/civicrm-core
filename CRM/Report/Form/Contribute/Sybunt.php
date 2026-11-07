@@ -350,13 +350,14 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $rows = $contactIds = [];
     if (empty($this->_params['charts'])) {
       $this->limit();
-      $getContacts = "SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where} GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_limit}";
+      $getContacts = "SELECT {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where} GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_limit}";
 
       $dao = CRM_Core_DAO::executeQuery($getContacts);
 
       while ($dao->fetch()) {
         $contactIds[] = $dao->cid;
       }
+      $this->setRowsFound($getContacts, count($contactIds));
       $this->setPager();
     }
 
