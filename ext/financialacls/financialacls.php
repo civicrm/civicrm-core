@@ -525,11 +525,10 @@ function financialacls_civicrm_links(string $op, ?string $objectName, $objectID,
     $hasEditPermission = CRM_Core_Permission::check('edit contributions of type ' . $financialType);
     $hasDeletePermission = CRM_Core_Permission::check('delete contributions of type ' . $financialType);
     if (!$hasDeletePermission || !$hasEditPermission) {
+      $editActions = CRM_Core_Action::UPDATE | CRM_Core_Action::ENABLE | CRM_Core_Action::DISABLE;
       foreach ($links as $index => $link) {
-        if (!$hasEditPermission && in_array($link['name'], ['Edit', 'Enable', 'Disable'], TRUE)) {
-          unset($links[$index]);
-        }
-        if (!$hasDeletePermission && $link['name'] === 'Delete') {
+        $action = $link['bit'] ?? 0;
+        if ((!$hasEditPermission && ($action & $editActions)) || (!$hasDeletePermission && ($action & CRM_Core_Action::DELETE))) {
           unset($links[$index]);
         }
       }
