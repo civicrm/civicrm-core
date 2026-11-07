@@ -31,10 +31,19 @@ class CRM_Core_DAO_AllCoreTables {
    *   [EntityName => [table => table_name, class => CRM_DAO_ClassName]][]
    */
   public static function getEntities(): array {
-    $allEntities = EntityRepository::getEntities();
-    // Filter out entities without a table or class
+    return array_filter(EntityRepository::getEntities(), [self::class, 'hasTableAndClass']);
+  }
 
-    return array_filter($allEntities, fn($entity) => (!empty($entity['table']) && !empty($entity['class'])));
+  /**
+   * One entry of getEntities(), looked up without filtering the full list.
+   */
+  private static function getEntity(?string $entityName): ?array {
+    $entity = EntityRepository::getEntity((string) $entityName);
+    return $entity && self::hasTableAndClass($entity) ? $entity : NULL;
+  }
+
+  private static function hasTableAndClass(array $entity): bool {
+    return !empty($entity['table']) && !empty($entity['class']);
   }
 
   /**
@@ -284,7 +293,7 @@ class CRM_Core_DAO_AllCoreTables {
       $tableName = str_replace($dbLocale, '', $tableName);
     }
     $entityName = self::getEntitiesByTable()[$tableName] ?? '';
-    return self::getEntities()[$entityName]['class'] ?? NULL;
+    return self::getEntity($entityName)['class'] ?? NULL;
   }
 
   /**
@@ -296,7 +305,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   Ex: 'CRM_Contact_DAO_Contact'.
    */
   public static function getDAONameForEntity(?string $entityName) {
-    return self::getEntities()[$entityName]['class'] ?? NULL;
+    return self::getEntity($entityName)['class'] ?? NULL;
   }
 
   /**
@@ -333,7 +342,7 @@ class CRM_Core_DAO_AllCoreTables {
    */
   public static function getTableForClass($className) {
     $entityName = self::getEntityNameForClass($className);
-    return self::getEntities()[$entityName]['table'] ?? FALSE;
+    return self::getEntity($entityName)['table'] ?? FALSE;
   }
 
   /**
@@ -346,7 +355,7 @@ class CRM_Core_DAO_AllCoreTables {
    *   e.g. 'civicrm_activity'
    */
   public static function getTableForEntityName($entityName): ?string {
-    return self::getEntities()[$entityName]['table'] ?? NULL;
+    return self::getEntity($entityName)['table'] ?? NULL;
   }
 
   /**
