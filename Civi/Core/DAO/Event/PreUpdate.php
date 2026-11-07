@@ -77,7 +77,7 @@ class PreUpdate extends \Civi\Core\Event\GenericHookEvent {
       $value,
       NULL,
       NULL,
-      $this->object->{$this->object->getFirstPrimaryKey()} ?? NULL,
+      $this->object->id ?? NULL,
       FALSE,
       FALSE,
       TRUE,
@@ -92,6 +92,18 @@ class PreUpdate extends \Civi\Core\Event\GenericHookEvent {
     foreach ($values as $key => $value) {
       $this->setValue($key, $value);
     }
+  }
+
+  /**
+   * Core fields are read from the DAO, where NULL means "not being saved".
+   */
+  protected function findObjectValue(string $paramName): array {
+    if (!isset($this->object->$paramName)) {
+      return [FALSE, NULL];
+    }
+    // The DAO uses the string 'null' to write a NULL.
+    $value = $this->object->$paramName;
+    return [TRUE, $value === 'null' ? NULL : $value];
   }
 
 }

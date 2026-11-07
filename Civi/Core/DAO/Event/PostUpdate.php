@@ -52,4 +52,16 @@ class PostUpdate extends \Civi\Core\Event\GenericHookEvent {
     $this->params = $params;
   }
 
+  /**
+   * Core fields are read from the DAO, where NULL means "not being saved".
+   */
+  protected function findObjectValue(string $paramName): array {
+    if (!isset($this->object->$paramName)) {
+      return [FALSE, NULL];
+    }
+    // The DAO uses the string 'null' to write a NULL.
+    $value = $this->object->$paramName;
+    return [TRUE, $value === 'null' ? NULL : $value];
+  }
+
 }
