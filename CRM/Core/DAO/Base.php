@@ -114,7 +114,7 @@ abstract class CRM_Core_DAO_Base extends CRM_Core_DAO {
     return $fields;
   }
 
-  private static function getSchemaFields(): array {
+  protected static function getSchemaFields(): array {
     if (!isset(Civi::$statics[static::class]['fields'])) {
       Civi::$statics[static::class]['fields'] = static::loadSchemaFields();
       // Note: `fields_callback` is now deprecated in favor of the `civi.entity.fields` event.

@@ -68,15 +68,16 @@ final class EntityProvider {
    */
   public function getSupportedFields(): array {
     $fields = $this->getFields();
-    if ($this->getMeta('module') === 'civicrm') {
+    if ($this->getMeta('module') === 'civicrm' && version_compare($dbVer = \CRM_Core_BAO_Domain::version(), \CRM_Utils_System::version()) < 0) {
       // Exclude fields yet not added by pending upgrades
-      $dbVer = \CRM_Core_BAO_Domain::version();
       $fields = array_filter($fields, function($field) use ($dbVer) {
-        $add = $field['add'] ?? '1.0.0';
-        if (substr_count($add, '.') < 2) {
-          $add .= '.alpha1';
+        if (!isset($field['add'])) {
+          return TRUE;
         }
-        return version_compare($dbVer, $add, '>=');
+        if (substr_count($field['add'], '.') < 2) {
+          $field['add'] .= '.alpha1';
+        }
+        return version_compare($dbVer, $field['add'], '>=');
       });
     }
     return $fields;
