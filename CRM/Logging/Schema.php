@@ -253,18 +253,18 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     // Sort the table names so the sql output is consistent for those sites
     // loading it asynchronously (using the setting 'logging_no_trigger_permission')
     asort($tableNames);
+    // Without the TRIGGER privilege SHOW TRIGGERS lists nothing, so the queued script drops every possible name.
+    $existingTriggers = Civi::settings()->get('logging_no_trigger_permission') ? NULL : CRM_Core_DAO::executeQuery('SHOW TRIGGERS')->fetchMap('Trigger', 'Trigger');
     foreach ($tableNames as $table) {
       $validName = CRM_Core_DAO::shortenSQLName($table, 48, TRUE);
-
-      // before triggers
-      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_before_insert");
-      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_before_update");
-      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_before_delete");
-
-      // after triggers
-      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_after_insert");
-      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_after_update");
-      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_after_delete");
+      foreach (['before', 'after'] as $when) {
+        foreach (['insert', 'update', 'delete'] as $event) {
+          $triggerName = "{$validName}_{$when}_{$event}";
+          if ($existingTriggers === NULL || isset($existingTriggers[$triggerName])) {
+            $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$triggerName}");
+          }
+        }
+      }
     }
 
     // now lets also be safe and drop all triggers that start with
