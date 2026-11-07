@@ -103,15 +103,16 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @return bool
    *
    * @throws \CRM_Core_Exception
-   * @throws \CRM_Utils_Cache_CacheException
    * @throws \CRM_Utils_Cache_InvalidArgumentException
    */
   public function set($key, $value, $ttl = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
 
-    $lock = Civi::lockManager()->acquire("cache.{$this->group}_{$key}._null");
+    // The caller already has the value, so a contended write is skipped at once rather than
+    // waited for: a writer inside a transaction holds the lock until it commits.
+    $lock = Civi::lockManager()->acquire("cache.{$this->group}_{$key}._null", 0);
     if (!$lock->isAcquired()) {
-      throw new \CRM_Utils_Cache_CacheException("SqlGroup: Failed to acquire lock on cache key.");
+      return FALSE;
     }
 
     if (is_int($ttl) && $ttl <= 0) {

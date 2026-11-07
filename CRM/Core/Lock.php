@@ -165,6 +165,7 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    * @todo document naming convention for CiviMail locks as this is key to ensuring they work properly.
    *
    * @param int|null $timeout
+   *   Seconds to wait; 0 returns immediately, NULL uses the lock's default.
    *
    * @return bool
    * @throws \CRM_Core_Exception
