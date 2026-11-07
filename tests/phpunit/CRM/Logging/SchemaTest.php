@@ -212,6 +212,25 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   }
 
   /**
+   * Dropping one table's triggers removes exactly those and leaves other tables' triggers in place.
+   */
+  public function testDropTriggersForOneTable(): void {
+    Civi::settings()->set('logging', TRUE);
+    $this->assertNotEmpty($this->getTriggerNames('civicrm_activity'));
+    $contactTriggers = $this->getTriggerNames('civicrm_contact');
+    $this->assertNotEmpty($contactTriggers);
+
+    (new CRM_Logging_Schema())->dropTriggers('civicrm_activity');
+
+    $this->assertSame([], $this->getTriggerNames('civicrm_activity'));
+    $this->assertSame($contactTriggers, $this->getTriggerNames('civicrm_contact'));
+  }
+
+  private function getTriggerNames(string $table): array {
+    return array_keys(CRM_Core_DAO::executeQuery('SHOW TRIGGERS LIKE %1', [1 => [$table, 'String']])->fetchMap('Trigger', 'Trigger'));
+  }
+
+  /**
    * Test that autoincrement keys are handled sensibly in logging table reconciliation.
    */
   public function testAutoIncrementNonIdColumn(): void {
