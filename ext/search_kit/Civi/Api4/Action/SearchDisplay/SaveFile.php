@@ -71,7 +71,7 @@ class SaveFile extends AbstractRunAction {
       $apiParams['limit'] = $settings['limit'];
     }
     $apiParams['orderBy'] = $this->getOrderByFromSort();
-    $this->augmentSelectClause($apiParams, $settings);
+    $this->augmentSelectClause();
 
     $this->applyFilters();
 

@@ -62,7 +62,7 @@ class Run extends AbstractRunAction {
     $autoClean = $this->applyTimeout();
 
     $this->preprocessLinks();
-    $this->augmentSelectClause($apiParams);
+    $this->augmentSelectClause();
     $this->applyFilters();
 
     switch ($runMode) {
