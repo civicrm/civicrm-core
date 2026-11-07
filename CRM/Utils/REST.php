@@ -304,7 +304,7 @@ class CRM_Utils_REST {
       'action' => 1,
     ];
 
-    if (array_key_exists('json', $requestParams) && $requestParams['json'][0] == "{") {
+    if (array_key_exists('json', $requestParams) && is_string($requestParams['json']) && str_starts_with($requestParams['json'], '{')) {
       $params = json_decode($requestParams['json'], TRUE);
       if ($params === NULL) {
         CRM_Utils_JSON::output([
@@ -485,7 +485,13 @@ class CRM_Utils_REST {
    */
   public static function processMultiple() {
     $output = [];
-    foreach (json_decode($_REQUEST['json'], TRUE) as $key => $call) {
+    try {
+      $calls = CRM_Utils_Request::retrieveJson('json') ?? [];
+    }
+    catch (CRM_Core_Exception $e) {
+      return self::error($e->getMessage());
+    }
+    foreach ($calls as $key => $call) {
       $args = [
         'civicrm',
         $call[0],
