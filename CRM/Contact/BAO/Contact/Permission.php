@@ -160,16 +160,17 @@ WHERE contact_id IN ({$contact_id_list})
       return TRUE;
     }
 
-    // FIXME: push this somewhere below, to not give this permission so many rights
-    $isDeleted = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'is_deleted');
-    if (CRM_Core_Permission::check('access deleted contacts', $userID) && $isDeleted) {
-      return TRUE;
-    }
-
     // short circuit for admin rights here so we avoid unneeeded queries
     // some duplication of code, but we skip 3-5 queries
     if (CRM_Core_Permission::check('edit all contacts', $userID) ||
       ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view all contacts', $userID))
+    ) {
+      return TRUE;
+    }
+
+    // FIXME: push this somewhere below, to not give this permission so many rights
+    if (CRM_Core_Permission::check('access deleted contacts', $userID) &&
+      CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'is_deleted')
     ) {
       return TRUE;
     }
