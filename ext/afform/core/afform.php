@@ -244,7 +244,8 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   ], 0);
 
   // Translate Metadata
-  (new StringVisitor())->visitMetadata($formMetaData, fn($s) => _ts($s));
+  $domain = \Civi\Afform\Translator::getDomain($formMetaData['name']);
+  (new StringVisitor())->visitMetadata($formMetaData, fn($s) => _ts($s, ['domain' => $domain]));
 
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [

@@ -5,6 +5,7 @@ namespace Civi\AfformMock;
 use Civi\Test\LocaleTestTrait;
 use CRM_AfformMock_ExtensionUtil as E;
 use Civi\Afform\StringVisitor;
+use Civi\Afform\Translator;
 use Civi\Api4\Afform;
 
 /**
@@ -99,6 +100,11 @@ class MockTranslateTest extends \PHPUnit\Framework\TestCase implements \Civi\Tes
       \CRM_Core_I18n::singleton()->setLocale('en_US');
     }
     $this->assertEquals(trim($expectHtml), trim($rendered), 'Rendered HTML should have translations applied');
+  }
+
+  public function testDomainIsTheProvidingExtensionThenCore(): void {
+    $this->assertSame([E::LONG_NAME, NULL], Translator::getDomain('afex'));
+    $this->assertNull(Translator::getDomain('afformNoSuchForm'));
   }
 
   /**
