@@ -236,6 +236,25 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
     return $record;
   }
 
+  public function testTsUsesTranslationSavedInSameRequest(): void {
+    $source = 'Translation test source string';
+    $this->assertSame($source, ts('Translation test source string'));
+
+    $sourceKey = \CRM_Core_BAO_TranslationSource::createGuid($source);
+    $this->createTestRecord('TranslationSource', [
+      'source' => $source,
+      'source_key' => $sourceKey,
+      'entity' => 'test',
+    ]);
+    $this->createTestRecord('Translation', [
+      'source_key' => $sourceKey,
+      'language' => 'en_US',
+      'string' => 'Translated test string',
+      'status_id:name' => 'active',
+    ]);
+    $this->assertSame('Translated test string', ts('Translation test source string'));
+  }
+
   /**
    * Mark these fields as translatable.
    *
