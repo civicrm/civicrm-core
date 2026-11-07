@@ -423,6 +423,72 @@ class EntityDisplayTest extends Api4TestBase {
   }
 
   /**
+   * Column specs must not depend on the current user's permissions:
+   * managed entity displays are saved by install, upgrade or cron without a privileged user.
+   *
+   * @dataProvider getDataModes
+   */
+  public function testEntityDisplayWithAggregateJoinWithoutPermissions(string $dataMode): void {
+    $lastName = uniqid('NoPerms');
+    $contact = $this->createTestRecord('Individual', ['last_name' => $lastName]);
+    $this->saveTestRecords('Contribution', [
+      'records' => [
+        ['contact_id' => $contact['id'], 'total_amount' => 10, 'receive_date' => '2024-01-01'],
+        ['contact_id' => $contact['id'], 'total_amount' => 15, 'receive_date' => '2025-06-30'],
+      ],
+    ]);
+
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'label' => __FUNCTION__,
+      'api_entity' => 'Contact',
+      'api_params' => [
+        'version' => 4,
+        'select' => [
+          'id',
+          'SUM(Contact_Contribution_contact_id_01.total_amount) AS SUM_total_amount',
+          'MAX(Contact_Contribution_contact_id_01.receive_date) AS MAX_receive_date',
+          'COUNT(DISTINCT Contact_Contribution_contact_id_01.id) AS COUNT_contribution_id',
+        ],
+        'where' => [['last_name', '=', $lastName]],
+        'groupBy' => ['id'],
+        'join' => [
+          ['Contribution AS Contact_Contribution_contact_id_01', 'LEFT', ['id', '=', 'Contact_Contribution_contact_id_01.contact_id']],
+        ],
+      ],
+    ]);
+
+    // No permissions at all, like an anonymous cron or CLI run
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    SearchDisplay::create(FALSE)
+      ->addValue('saved_search_id', $savedSearch['id'])
+      ->addValue('type', 'entity')
+      ->addValue('label', 'MyUnprivilegedEntity')
+      ->addValue('name', 'MyUnprivilegedEntity')
+      ->addValue('settings', [
+        'data_mode' => $dataMode,
+        'columns' => [
+          ['key' => 'id', 'label' => 'Contact ID', 'type' => 'field'],
+          ['key' => 'SUM_total_amount', 'label' => 'Total', 'type' => 'field'],
+          ['key' => 'MAX_receive_date', 'label' => 'Last Contribution', 'type' => 'field'],
+          ['key' => 'COUNT_contribution_id', 'label' => 'Contributions', 'type' => 'field'],
+        ],
+      ])
+      ->execute();
+
+    $fields = civicrm_api4('SK_MyUnprivilegedEntity', 'getFields', ['checkPermissions' => FALSE], 'name');
+    $this->assertSame('Money', $fields['SUM_total_amount']['data_type']);
+    $this->assertSame('Timestamp', $fields['MAX_receive_date']['data_type']);
+    $this->assertSame('Integer', $fields['COUNT_contribution_id']['data_type']);
+
+    civicrm_api4('SK_MyUnprivilegedEntity', 'refresh', ['checkPermissions' => FALSE]);
+    $row = civicrm_api4('SK_MyUnprivilegedEntity', 'get', ['checkPermissions' => FALSE])->single();
+    $this->assertEquals(25, $row['SUM_total_amount']);
+    $this->assertSame('2025-06-30 00:00:00', $row['MAX_receive_date']);
+    $this->assertSame(2, $row['COUNT_contribution_id']);
+  }
+
+  /**
    * @dataProvider getDataModes
    */
   public function testEntityWithSqlFunctions(string $dataMode): void {
