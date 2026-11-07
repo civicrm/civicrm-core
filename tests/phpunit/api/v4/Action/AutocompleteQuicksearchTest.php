@@ -367,7 +367,7 @@ class AutocompleteQuicksearchTest extends \api\v4\Api4TestBase {
     $results = Contact::autocomplete(FALSE)
       ->setFormName('crmMenubar')
       ->setFieldName('crm-qsearch-input')
-      ->setInput('test')
+      ->setInput('testxyz')
       ->execute();
 
     // find 2 contacts with partial leading match
