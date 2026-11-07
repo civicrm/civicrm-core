@@ -38,7 +38,7 @@ class OrderCompleteSubscriber extends AutoService {
     try {
       self::updateMembershipBasedOnCompletionOfContribution($event->contributionID, $event->params['effective_date'] ?? NULL);
     }
-    catch (\Exception $e) {
+    catch (\Throwable $e) {
       \Civi::log()->error('civi_membership_order_complete: Error updating membership for contributionID: ' . $event->contributionID . ': ' . $e->getMessage());
     }
   }
