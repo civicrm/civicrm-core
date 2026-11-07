@@ -35,6 +35,10 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_EXT_REPO_URL',
+    // Boolean FALSE turns off the extension feed and its update checks.
+    'env_false' => TRUE,
   ],
   'ext_max_depth' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
