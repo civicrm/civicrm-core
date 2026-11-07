@@ -26,6 +26,25 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     }
   }
 
+  public function testGetCaseActivityCountsAllActivitiesOnMiddlePage(): void {
+    $this->createLoggedInUser();
+    $caseID = $this->ids['Case']['fixture'];
+    civicrm_api3('Case', 'addtimeline', ['case_id' => $caseID, 'timeline' => 'standard_timeline']);
+    $contactID = (int) CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_case_contact WHERE case_id = %1', [1 => [$caseID, 'Integer']]);
+
+    $allParams = ['page' => 1, 'rp' => 100];
+    $all = CRM_Case_BAO_Case::getCaseActivity($caseID, $allParams, $contactID);
+    $activityCount = count($all['data']);
+    $this->assertGreaterThan(3, $activityCount);
+    $this->assertSame($activityCount, $all['recordsTotal']);
+
+    $pageParams = ['page' => 2, 'rp' => 2];
+    $page = CRM_Case_BAO_Case::getCaseActivity($caseID, $pageParams, $contactID);
+    $this->assertCount(2, $page['data']);
+    $this->assertSame($activityCount, $page['recordsTotal']);
+    $this->assertSame($activityCount, $page['recordsFiltered']);
+  }
+
   /**
    * Test that passing an invalid sort parameter (SQL injection payload) to getCases throws an exception.
    */

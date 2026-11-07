@@ -433,7 +433,6 @@ class CRM_Contact_Page_AJAX {
     }
 
     $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $whereClause, $offset, $rowCount, $select, $orderByClause, TRUE, $queryParams);
-    $iFilteredTotal = CRM_Core_DAO::singleValueQuery("SELECT FOUND_ROWS()");
 
     $count = 0;
     foreach ($dupePairs as $key => $pairInfo) {
@@ -493,7 +492,7 @@ class CRM_Contact_Page_AJAX {
     $dupePairs = [
       'data'            => $searchRows,
       'recordsTotal'    => $iTotal,
-      'recordsFiltered' => $iFilteredTotal,
+      'recordsFiltered' => $iTotal,
     ];
     if (!empty($_REQUEST['is_unit_test'])) {
       return $dupePairs;

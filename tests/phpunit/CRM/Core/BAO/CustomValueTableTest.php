@@ -257,6 +257,35 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     );
   }
 
+  public function testGetEntityValuesCountsAllRecordsOnMiddlePage(): void {
+    $contactID = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Multi'])['id'];
+    $customGroup = $this->createTestEntity('CustomGroup', [
+      'title' => 'Paged records',
+      'extends' => 'Contact',
+      'is_multiple' => TRUE,
+      'style' => 'Tab',
+    ]);
+    $customField = $this->createTestEntity('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Record',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ]);
+    $params = [
+      'entityID' => $contactID,
+      'custom_' . $customField['id'] . '_-1' => 'First',
+      'custom_' . $customField['id'] . '_-2' => 'Second',
+      'custom_' . $customField['id'] . '_-3' => 'Third',
+      'custom_' . $customField['id'] . '_-4' => 'Fourth',
+    ];
+    CRM_Core_BAO_CustomValueTable::setValues($params);
+
+    $result = CRM_Core_BAO_CustomValueTable::getEntityValues($contactID, NULL, [$customField['id']], TRUE, ['offset' => 1, 'rowCount' => 2]);
+    $this->assertSame(4, $result['count']);
+    unset($result['count']);
+    $this->assertCount(2, $result);
+  }
+
   public function testCustomGroupMultiple(): void {
     $contactID = $this->individualCreate();
     $customGroup = $this->customGroupCreate();

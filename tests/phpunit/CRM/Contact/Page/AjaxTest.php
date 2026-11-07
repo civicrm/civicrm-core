@@ -49,6 +49,30 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertEquals(['data' => [], 'recordsTotal' => 0, 'recordsFiltered' => 0], $result);
   }
 
+  public function testGetDedupesCountsAllPairsOnMiddlePage(): void {
+    foreach (['a', 'b', 'c'] as $identifier) {
+      $this->createTestEntity('Contact', [
+        'contact_type' => 'Individual',
+        'first_name' => 'Dupe',
+        'last_name' => 'Pager',
+        'email_primary.email' => 'dupe.pager@example.org',
+      ], $identifier);
+    }
+    $ruleGroupID = (int) CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_dedupe_rule_group WHERE contact_type = 'Individual' AND used = 'Supervised'");
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs($ruleGroupID, NULL, TRUE, 0, FALSE);
+    $this->assertCount(3, $pairs);
+
+    $_REQUEST['rgid'] = $ruleGroupID;
+    $_REQUEST['columns'] = [];
+    $_REQUEST['start'] = 1;
+    $_REQUEST['length'] = 1;
+    $_REQUEST['is_unit_test'] = TRUE;
+    $result = CRM_Contact_Page_AJAX::getDedupes();
+    $this->assertCount(1, $result['data']);
+    $this->assertSame(3, (int) $result['recordsTotal']);
+    $this->assertSame(3, (int) $result['recordsFiltered']);
+  }
+
   /**
    * Test flipDupePairs works via route invocation.
    */
