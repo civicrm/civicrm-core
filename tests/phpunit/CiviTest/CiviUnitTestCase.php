@@ -1784,14 +1784,16 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
 
     $tablesToTruncate = array_unique(array_merge($this->_tablesToTruncate, $tablesToTruncate));
 
-    CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 0;');
+    // DELETE on these near-empty tables is far cheaper than TRUNCATE, which
+    // recreates each InnoDB table. Logging triggers are suppressed so the cleanup leaves no audit rows.
+    $loggingDisabled = CRM_Core_DAO::singleValueQuery('SELECT @civicrm_disable_logging');
+    CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 0, @civicrm_disable_logging = 1');
     foreach ($tablesToTruncate as $table) {
-      $sql = "TRUNCATE TABLE $table";
-      CRM_Core_DAO::executeQuery($sql);
+      CRM_Core_DAO::executeQuery("DELETE FROM $table");
     }
-    CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1;');
+    CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1, @civicrm_disable_logging = ' . ($loggingDisabled === NULL ? 'NULL' : (int) $loggingDisabled));
 
-    // Truncate resets the autoincrements, so re-apply separation
+    // Reset the emptied tables' autoincrements to their separated offsets.
     \Civi\Test::schema()->setAutoIncrement($tablesToTruncate);
   }
 
