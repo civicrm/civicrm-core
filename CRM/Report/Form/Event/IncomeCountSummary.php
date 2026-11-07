@@ -290,9 +290,6 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
 
     $dao = CRM_Core_DAO::executeQuery($sql);
 
-    //set pager before execution of query in function participantInfo()
-    $this->setPager();
-
     $rows = [];
 
     while ($dao->fetch()) {
@@ -326,6 +323,8 @@ class CRM_Report_Form_Event_IncomeCountSummary extends CRM_Report_Form {
       }
       $rows[] = $row;
     }
+    $this->setRowsFound($sql, count($rows));
+    $this->setPager();
 
     // do not call pager here
     $this->formatDisplay($rows, FALSE);
