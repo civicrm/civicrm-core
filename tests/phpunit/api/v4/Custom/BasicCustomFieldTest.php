@@ -25,6 +25,7 @@ use Civi\Api4\Contribution;
 use Civi\Api4\CustomField;
 use Civi\Api4\CustomGroup;
 use Civi\Api4\OptionGroup;
+use Civi\Api4\OptionValue;
 use Civi\Api4\RelationshipCache;
 
 /**
@@ -434,6 +435,33 @@ class BasicCustomFieldTest extends Api4TestBase {
       ->execute();
 
     $this->assertEquals($optionGroupCount, OptionGroup::get(FALSE)->selectRowCount()->execute()->count());
+  }
+
+  /**
+   * Deleting a custom field that uses a reserved option group must not delete the group.
+   */
+  public function testDeleteFieldKeepsReservedOptionGroup(): void {
+    $genderValueCount = OptionValue::get(FALSE)
+      ->addWhere('option_group_id:name', '=', 'gender')
+      ->selectRowCount()->execute()->count();
+    $this->createTestRecord('CustomGroup', [
+      'title' => 'MyGenderFields',
+      'extends' => 'Contact',
+    ]);
+    $field = $this->createTestRecord('CustomField', [
+      'label' => 'MyGender',
+      'custom_group_id.name' => 'MyGenderFields',
+      'html_type' => 'Select',
+      'data_type' => 'Int',
+      'option_group_id:name' => 'gender',
+    ]);
+
+    CustomField::delete(FALSE)->addWhere('id', '=', $field['id'])->execute();
+
+    $this->assertCount(1, OptionGroup::get(FALSE)->addWhere('name', '=', 'gender')->execute());
+    $this->assertSame($genderValueCount, OptionValue::get(FALSE)
+      ->addWhere('option_group_id:name', '=', 'gender')
+      ->selectRowCount()->execute()->count());
   }
 
   /**

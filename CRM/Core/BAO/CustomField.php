@@ -2423,7 +2423,9 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
   }
 
   /**
-   * Check if option group is related to more than one custom field.
+   * Delete the option group if no other custom field uses it.
+   *
+   * Reserved option groups are never deleted.
    *
    * @param int $optionGroupId
    *   Option group id.
@@ -2431,6 +2433,10 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
    *   Set to 1 if the field still exists, 0 otherwise
    */
   public static function checkOptionGroup($optionGroupId, int $max = 1) {
+    // Reserved option groups (e.g. gender) belong to core, not to the custom field
+    if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroupId, 'is_reserved')) {
+      return;
+    }
     $query = "
 SELECT count(*)
 FROM   civicrm_custom_field
