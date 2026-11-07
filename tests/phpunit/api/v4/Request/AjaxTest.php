@@ -29,6 +29,8 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
    */
   protected $originalRequest = [];
 
+  private \CRM_Utils_AutoClean $debugSetting;
+
   public function setUp(): void {
     parent::setUp();
     $this->originalRequest = [
@@ -40,6 +42,8 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     ];
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
     $_SERVER['HTTP_REFERER'] ??= NULL;
+    // Debug mode skips the request checks, and defaults to on for localhost sites.
+    $this->debugSetting = \CRM_Utils_AutoClean::swapSettings(['debug_enabled' => FALSE]);
   }
 
   public function tearDown(): void {
@@ -48,6 +52,7 @@ class AjaxTest extends Api4TestBase implements TransactionalInterface {
     $_REQUEST = $this->originalRequest['request'];
     $_SERVER['REQUEST_METHOD'] = $this->originalRequest['method'];
     $_SERVER['HTTP_X_REQUESTED_WITH'] = $this->originalRequest['httpx'];
+    $this->debugSetting->cleanup();
     parent::tearDown();
   }
 

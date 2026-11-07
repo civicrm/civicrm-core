@@ -21,13 +21,13 @@ namespace api\v4\Spec;
 
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
+use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\Service\Spec\SpecGatherer;
 use Civi\Api4\Utils\CoreUtil;
 use api\v4\Traits\OptionCleanupTrait;
 use api\v4\Api4TestBase;
 use api\v4\Traits\TableDropperTrait;
 use Civi\Test\Invasive;
-use Prophecy\Argument;
 
 /**
  * @group headless
@@ -51,14 +51,17 @@ class SpecGathererTest extends Api4TestBase {
   public function testWithSpecProvider(): void {
     $gather = new SpecGatherer();
 
-    $provider = $this->prophesize(SpecProviderInterface::class);
-    $provider->applies('Contact', 'create')->willReturn(TRUE);
-    $provider->modifySpec(Argument::any())->will(function ($args) {
-      /** @var \Civi\Api4\Service\Spec\RequestSpec $spec */
-      $spec = $args[0];
-      $spec->addFieldSpec(new FieldSpec('foo', 'Contact'));
+    $gather->addSpecProvider(new class implements SpecProviderInterface {
+
+      public function modifySpec(RequestSpec $spec): void {
+        $spec->addFieldSpec(new FieldSpec('foo', 'Contact'));
+      }
+
+      public function applies(string $entity, string $action): bool {
+        return $entity === 'Contact' && $action === 'create';
+      }
+
     });
-    $gather->addSpecProvider($provider->reveal());
 
     $spec = Invasive::call([$gather, 'getSpec'], ['Contact', 'create']);
     $fieldNames = $spec->getFieldNames();
