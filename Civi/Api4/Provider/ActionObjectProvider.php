@@ -28,6 +28,8 @@ use Civi\Api4\Generic\EntityInterface;
  */
 class ActionObjectProvider extends AutoService implements ProviderInterface {
 
+  private const CLASS_ENTITIES_CACHE_KEY = 'api4.entities.classInfo';
+
   /**
    * @param \Civi\API\Event\ResolveEvent $event
    *   API resolution event.
@@ -174,28 +176,7 @@ class ActionObjectProvider extends AutoService implements ProviderInterface {
     $entities = $cache->get('api4.entities.info', []);
 
     if (!$entities) {
-      // Load entities declared in API files
-      //
-      // NOTE: this is slightly subtle in how it respects the boundary between core
-      // and extensions
-      //
-      // It *should* align with EntityRepository::loadAll which listens to hook_civicrm_entityType
-      //
-      // In restricted circumstances (like upgrade) extension entities are not picked
-      // up there because hook_civicrm_entityType is blocked by the dispatch policy
-      //
-      // They are not picked up here because hook_civicrm_scanClasses is not called, so
-      // their classes are not found by the ClassScanner
-      //
-      // I think it would be *better* if the extension entities always came through
-      // civi.api4.entityTypes here, but can't see how to distinguish extension
-      // classes from core classes with the ClassScanner
-      //
-      $entityClasses = ClassScanner::get(['interface' => EntityInterface::class]);
-      foreach ($entityClasses as $class) {
-        $info = $class::getInfo();
-        $entities[$info['name']] = $info;
-      }
+      $entities = $this->getClassEntities();
       // Allow extensions to modify the list of entities
       $event = GenericHookEvent::create(['entities' => &$entities]);
       \Civi::dispatcher()->dispatch('civi.api4.entityTypes', $event);
@@ -205,6 +186,52 @@ class ActionObjectProvider extends AutoService implements ProviderInterface {
     }
 
     return $entities;
+  }
+
+  /**
+   * Get entities declared by APIv4 classes, cached in `long` because they depend on code,
+   * not data; data-driven entities belong in the `civi.api4.entityTypes` event.
+   */
+  private function getClassEntities(): array {
+    // Upgrades scan a restricted set of classes, so they neither read nor write the cache.
+    $useCache = !\CRM_Core_Config::isUpgradeMode();
+    $locale = \CRM_Core_I18n::getLocale();
+    $cached = $useCache ? (\Civi::cache('long')->get(self::CLASS_ENTITIES_CACHE_KEY) ?: []) : [];
+    if (isset($cached[$locale])) {
+      return $cached[$locale];
+    }
+    // NOTE: this is slightly subtle in how it respects the boundary between core
+    // and extensions
+    //
+    // It *should* align with EntityRepository::loadAll which listens to hook_civicrm_entityType
+    //
+    // In restricted circumstances (like upgrade) extension entities are not picked
+    // up there because hook_civicrm_entityType is blocked by the dispatch policy
+    //
+    // They are not picked up here because hook_civicrm_scanClasses is not called, so
+    // their classes are not found by the ClassScanner
+    //
+    // I think it would be *better* if the extension entities always came through
+    // civi.api4.entityTypes here, but can't see how to distinguish extension
+    // classes from core classes with the ClassScanner
+    //
+    $entities = [];
+    foreach (ClassScanner::get(['interface' => EntityInterface::class]) as $class) {
+      $info = $class::getInfo();
+      $entities[$info['name']] = $info;
+    }
+    if ($useCache) {
+      $cached[$locale] = $entities;
+      \Civi::cache('long')->set(self::CLASS_ENTITIES_CACHE_KEY, $cached);
+    }
+    return $entities;
+  }
+
+  /**
+   * Forget the entities declared by APIv4 classes, for when data read by a getInfo() changes.
+   */
+  public static function flushClassEntities(): void {
+    \Civi::cache('long')->delete(self::CLASS_ENTITIES_CACHE_KEY);
   }
 
   public function fillEntityDefaults(array &$entities) {

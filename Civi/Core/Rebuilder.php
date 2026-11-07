@@ -128,6 +128,7 @@ class Rebuilder {
     }
     if (!empty($targets['metadata'])) {
       Civi::cache('metadata')->clear();
+      \Civi\Api4\Provider\ActionObjectProvider::flushClassEntities();
       CRM_Core_DAO_AllCoreTables::flush();
     }
     if (!empty($targets['system'])) {

@@ -161,6 +161,8 @@ class CRM_Core_BAO_Translation extends CRM_Core_DAO_Translation {
     unset(Civi::$statics[__CLASS__]);
     // ts() keeps the active translations in a per-request lookup table.
     unset(Civi::$statics['CRM_Core_I18n']);
+    // APIv4 entity info is built with ts() and cached across requests.
+    \Civi\Api4\Provider\ActionObjectProvider::flushClassEntities();
   }
 
   /**
