@@ -191,25 +191,33 @@ trait SavedSearchInspectorTrait {
     if (!isset($this->_selectClause)) {
       $this->_selectClause = [];
       foreach ($this->_apiParams['select'] as $selectExpr) {
-        $expr = SqlExpression::convert($selectExpr, TRUE);
-        $item = [
-          'fields' => [],
-          'expr' => $expr,
-          'dataType' => $expr->getDataType(),
-        ];
-        foreach ($expr->getFields() as $fieldAlias) {
-          $fieldMeta = $this->getField($fieldAlias);
-          if ($fieldMeta) {
-            $item['fields'][$fieldAlias] = $fieldMeta;
-          }
-        }
-        if (!isset($item['dataType']) && $item['fields']) {
-          $item['dataType'] = \CRM_Utils_Array::first($item['fields'])['data_type'];
-        }
-        $this->_selectClause[$expr->getAlias()] = $item;
+        $this->_selectClause += $this->parseSelectExpression($selectExpr);
       }
     }
     return $this->_selectClause;
+  }
+
+  /**
+   * @param string $selectExpr
+   * @return array
+   */
+  private function parseSelectExpression(string $selectExpr): array {
+    $expr = SqlExpression::convert($selectExpr, TRUE);
+    $item = [
+      'fields' => [],
+      'expr' => $expr,
+      'dataType' => $expr->getDataType(),
+    ];
+    foreach ($expr->getFields() as $fieldAlias) {
+      $fieldMeta = $this->getField($fieldAlias);
+      if ($fieldMeta) {
+        $item['fields'][$fieldAlias] = $fieldMeta;
+      }
+    }
+    if (!isset($item['dataType']) && $item['fields']) {
+      $item['dataType'] = \CRM_Utils_Array::first($item['fields'])['data_type'];
+    }
+    return [$expr->getAlias() => $item];
   }
 
   /**

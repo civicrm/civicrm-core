@@ -1854,15 +1854,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param string $expr
    */
-  protected function addSelectExpression(string $expr):void {
+  protected function addSelectExpression(string $expr): void {
     if (!$this->getSelectExpression($expr)) {
       // Tokens for aggregated columns get formatted with 'MIN_' by $this->preprocessLink()
       if (str_starts_with($expr, 'MIN_')) {
         $expr = 'MIN(' . $this->getJoinFromAlias(explode('_', $expr, 2)[1]) . ') AS ' . $expr;
       }
       $this->_apiParams['select'][] = $expr;
-      // Force-reset cache so it gets rebuilt with the new select param
-      $this->_selectClause = NULL;
+      $this->_selectClause += $this->parseSelectExpression($expr);
     }
   }
 
