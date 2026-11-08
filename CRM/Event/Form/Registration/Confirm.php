@@ -1128,17 +1128,4 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     return $contribution;
   }
 
-  /**
-   * @return string|null
-   * @throws \CRM_Core_Exception
-   */
-  private function getReceiptDate(): ?string {
-    $receiptDate = NULL;
-
-    if ($this->getEventValue('is_email_confirm')) {
-      $receiptDate = date('YmdHis');
-    }
-    return $receiptDate;
-  }
-
 }
