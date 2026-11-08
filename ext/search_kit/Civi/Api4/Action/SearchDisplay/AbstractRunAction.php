@@ -1804,27 +1804,6 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   }
 
   /**
-   * Return all fields for this entity with a foreign key
-   *
-   * @param string $entityName
-   * @return string[]
-   */
-  private function findFKFields(string $entityName): array {
-    $entityDao = CoreUtil::getInfoItem($entityName, 'dao');
-    $fkFields = [];
-    if ($entityDao) {
-      // Check for a pseudoconstant that points to civicrm_currency.
-      foreach ($entityDao::getSupportedFields() as $fieldName => $field) {
-        $fkEntity = !empty($field['FKClassName']) ? CoreUtil::getApiNameFromBAO($field['FKClassName']) : NULL;
-        if ($fkEntity) {
-          $fkFields[$fieldName] = $fkEntity;
-        }
-      }
-    }
-    return $fkFields;
-  }
-
-  /**
    * Add an expression to the select clause.
    *
    * @param string $expr
