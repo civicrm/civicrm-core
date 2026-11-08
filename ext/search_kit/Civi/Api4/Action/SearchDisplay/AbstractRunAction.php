@@ -1613,10 +1613,8 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
 
   /**
    * Adds additional fields to the select clause required to render the display
-   *
-   * @param array $apiParams
    */
-  protected function augmentSelectClause(&$apiParams): void {
+  protected function augmentSelectClause(): void {
     $isEditable = FALSE;
     // Don't mess with EntitySets
     if ($this->savedSearch['api_entity'] === 'EntitySet') {
@@ -1707,7 +1705,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       $this->addSelectExpression($addition);
     }
 
-    foreach ($apiParams['select'] as $select) {
+    foreach ($this->_apiParams['select'] as $select) {
       // When selecting monetary fields, also select currency
       $currencyFieldName = $this->getCurrencyField($select);
       // Only select currency field if it doesn't break ONLY_FULL_GROUP_BY
@@ -1719,20 +1717,47 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if ($clause && $clause['expr']->getType() === 'SqlField' && !empty($clause['fields'])) {
         $fieldAlias = array_keys($clause['fields'])[0];
         $field = $clause['fields'][$fieldAlias];
-        if (!empty($field['input_attrs']['control_field']) && strpos($fieldAlias, ':')) {
+        if (strpos($fieldAlias, ':')) {
           $prefix = substr($fieldAlias, 0, strrpos($fieldAlias, $field['name']));
-          $controlField = $prefix . $field['input_attrs']['control_field'];
-          if (
-            // Don't need to add the field if a suffixed version already exists
-            !array_intersect(array_keys($this->getSelectClause()), ["$controlField:label", "$controlField:name"]) &&
-            // Don't add if it would cause aggregation problems
-            !$this->canAggregate($controlField)
-          ) {
-            $this->addSelectExpression($controlField);
+          $currentField = $field;
+          $seenControls = [];
+          while (!empty($currentField['input_attrs']['control_field'])) {
+            $ctrlName = $prefix . $currentField['input_attrs']['control_field'];
+            if (in_array($ctrlName, $seenControls, TRUE)) {
+              break;
+            }
+            $seenControls[] = $ctrlName;
+            if (
+              // Don't need to add the field if a suffixed version already exists
+              !$this->isSelected($ctrlName) &&
+              // Don't add if it would cause aggregation problems
+              !$this->canAggregate($ctrlName)
+            ) {
+              $this->addSelectExpression($ctrlName);
+            }
+            $currentField = $this->getField($ctrlName);
           }
         }
       }
     }
+  }
+
+  /**
+   * Returns TRUE if $field or any suffixed variant of $field is in the SELECT clause
+   *
+   * @param string $fieldName
+   * @return bool
+   */
+  private function isSelected(string $fieldName): bool {
+    if (in_array($fieldName, $this->_apiParams['select'], TRUE)) {
+      return TRUE;
+    }
+    foreach (\CRM_Core_SelectValues::optionAttributes() as $suffix => $label) {
+      if (in_array("$fieldName:$suffix", $this->_apiParams['select'], TRUE)) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   /**
@@ -1829,15 +1854,14 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @param string $expr
    */
-  protected function addSelectExpression(string $expr):void {
+  protected function addSelectExpression(string $expr): void {
     if (!$this->getSelectExpression($expr)) {
       // Tokens for aggregated columns get formatted with 'MIN_' by $this->preprocessLink()
       if (str_starts_with($expr, 'MIN_')) {
         $expr = 'MIN(' . $this->getJoinFromAlias(explode('_', $expr, 2)[1]) . ') AS ' . $expr;
       }
       $this->_apiParams['select'][] = $expr;
-      // Force-reset cache so it gets rebuilt with the new select param
-      $this->_selectClause = NULL;
+      $this->_selectClause += $this->parseSelectExpression($expr);
     }
   }
 
