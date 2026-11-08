@@ -281,6 +281,25 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   }
 
   /**
+   * flushBaseURLCache() makes the base URLs get recomputed, e.g. for a new CMS language.
+   */
+  public function testFlushBaseURLCache(): void {
+    $config = CRM_Core_Config::singleton();
+    $baseUrl = $config->userFrameworkBaseURL;
+    $relativeBase = $config->useFrameworkRelativeBase;
+    $cmsUrl = CRM_Utils_System::baseCMSURL();
+
+    $config->userFrameworkBaseURL = 'http://stale.example.org/xx/';
+    $config->useFrameworkRelativeBase = '/xx/';
+    Civi::$statics['CRM_Utils_System']['baseCMSURL'] = 'http://stale.example.org/xx/';
+    CRM_Utils_System::flushBaseURLCache();
+
+    $this->assertEquals($baseUrl, $config->userFrameworkBaseURL);
+    $this->assertEquals($relativeBase, $config->useFrameworkRelativeBase);
+    $this->assertEquals($cmsUrl, CRM_Utils_System::baseCMSURL());
+  }
+
+  /**
    * Test that flushing cache clears the asset cache.
    */
   public function testFlushCacheClearsAssetCache(): void {

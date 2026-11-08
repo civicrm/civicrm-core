@@ -446,6 +446,22 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
       'timeInputFormat' => $settings->get('timeInputFormat'),
       'moneyFormat' => CRM_Utils_Money::format(1234.56),
       'weekBegins' => $settings->get('weekBegins'),
+    ] + self::getUrlTemplates();
+  }
+
+  /**
+   * Get the URL templates used by CRM.url().
+   *
+   * They are part of the crm-l10n.js params (and so its cache key) because the CMS may vary
+   * them, e.g. with a language prefix such as /fr/civicrm/...
+   *
+   * @return array
+   */
+  private static function getUrlTemplates(): array {
+    $template = ['p' => 'civicrm/crmajax-placeholder-url-path', 'q' => 'civicrm-placeholder-url-query=1', 'h' => 0];
+    return [
+      'urlBack' => CRM_Utils_System::crmURL($template + ['fb' => 1]),
+      'urlFront' => CRM_Utils_System::crmURL($template + ['fe' => 1]),
     ];
   }
 
@@ -459,7 +475,7 @@ class CRM_Core_Resources implements CRM_Core_Resources_CollectionAdderInterface 
       return;
     }
     $e->mimeType = 'application/javascript';
-    $params = $e->params;
+    $params = $e->params + self::getUrlTemplates();
     $params += [
       'contactSearch' => json_encode(!empty($params['includeEmailInName']) ? ts('Search by name/email or id...') : ts('Search by name or id...')),
       'otherSearch' => json_encode(ts('Enter search term or id...')),

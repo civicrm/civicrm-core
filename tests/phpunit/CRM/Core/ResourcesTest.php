@@ -503,4 +503,18 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * The CRM.url() templates are crm-l10n.js params, so they are part of its cache key.
+   */
+  public function testL10nJsUrlTemplates(): void {
+    $params = CRM_Core_Resources::getL10nJsParams();
+    $template = ['p' => 'civicrm/crmajax-placeholder-url-path', 'q' => 'civicrm-placeholder-url-query=1', 'h' => 0];
+    $this->assertEquals(CRM_Utils_System::crmURL($template + ['fb' => 1]), $params['urlBack']);
+    $this->assertEquals(CRM_Utils_System::crmURL($template + ['fe' => 1]), $params['urlFront']);
+
+    $params['urlBack'] = '/xx/civicrm/crmajax-placeholder-url-path?civicrm-placeholder-url-query=1';
+    $asset = Civi::service('asset_builder')->render('crm-l10n.js', $params);
+    $this->assertStringContainsString('back: ' . json_encode($params['urlBack']), $asset['content']);
+  }
+
 }
