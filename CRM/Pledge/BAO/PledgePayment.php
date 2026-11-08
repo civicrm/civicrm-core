@@ -204,8 +204,6 @@ WHERE     pledge_id = %1
     if ($payment->find(TRUE)) {
       $payment->contribution_id = 'null';
       $payment->status_id = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Pending');
-      $payment->scheduled_date = NULL;
-      $payment->reminder_date = NULL;
       $payment->scheduled_amount = $payment->actual_amount;
       $payment->actual_amount = 'null';
       $payment->save();
@@ -682,8 +680,6 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
         if ($payment->find(TRUE)) {
           $payment->contribution_id = 'null';
           $payment->status_id = array_search('Pending', $allStatus);
-          $payment->scheduled_date = NULL;
-          $payment->reminder_date = NULL;
           $payment->scheduled_amount = $pledgeScheduledAmount;
           $payment->actual_amount = 'null';
           $payment->save();
