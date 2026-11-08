@@ -892,7 +892,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     // wrapped in case settings/log aren't available yet
     try {
-      $messageWithDetails = $message . ' ' . $pearError->getUserInfo();
+      $messageWithDetails = $message . ' ' . self::getUserInfoForLog($pearError);
 
       \Civi::log()->debug($messageWithDetails . "\n\n" . static::formatter('text')->formatBacktrace($pearError->getBacktrace()));
     }
@@ -906,6 +906,25 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       throw new DBQueryException($message, $code, ['exception' => $pearError]);
     }
     throw new CRM_Core_Exception($message, $code, ['exception' => $pearError]);
+  }
+
+  /**
+   * Get the error's user info, with the middle of an over-long SQL statement cut out.
+   *
+   * A DB_Error's user info is the SQL followed by the database error,
+   * e.g. `INSERT ... [nativecode=1114 ** The table 'x' is full]`, so both the
+   * start and the end are kept.
+   *
+   * @param PEAR_Error $pearError
+   * @return mixed
+   */
+  private static function getUserInfoForLog($pearError) {
+    $userInfo = $pearError->getUserInfo();
+    // 600 is enough for the database error at the end, which is capped at 512 bytes.
+    if ($pearError instanceof DB_Error && mb_strlen($userInfo) >= 5600) {
+      return mb_substr($userInfo, 0, 5000) . '...' . mb_substr($userInfo, -600);
+    }
+    return $userInfo;
   }
 
   /**

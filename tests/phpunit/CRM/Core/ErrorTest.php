@@ -142,6 +142,24 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
   }
 
   /**
+   * Long SQL is shortened in the debug log, keeping the database error after it.
+   */
+  public function testDBErrorLogShortensLongSQL(): void {
+    $sql = 'SELECT fake_column FROM civicrm_contact WHERE id IN (' . implode(', ', range(1, 2000)) . ')';
+    try {
+      CRM_Core_DAO::executeQuery($sql);
+    }
+    catch (DBQueryException $e) {
+      $this->assertSame($sql, $e->getSQL());
+      $userInfo = $e->getUserInfo();
+      $this->assertStringContainsString("[nativecode=1054 ** Unknown column 'fake_column'", substr($userInfo, -600));
+      $this->assertLogRegexp('/' . preg_quote(substr($userInfo, 0, 5000) . '...' . substr($userInfo, -600), '/') . '/');
+      return;
+    }
+    $this->fail();
+  }
+
+  /**
    * Data provider for sql error testing.
    *
    * @return array[]
