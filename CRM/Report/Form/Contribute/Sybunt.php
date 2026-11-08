@@ -341,6 +341,17 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     return $statistics;
   }
 
+  /**
+   * postProcess() skips the rollup's grand total row, so the last row is always a donor.
+   *
+   * @param array $rows
+   *
+   * @return bool
+   */
+  public function grandTotal(&$rows) {
+    return FALSE;
+  }
+
   public function postProcess() {
     // get ready with post process params
     $this->beginPostProcess();
