@@ -310,29 +310,6 @@ class CRM_Core_CodeGen_GenerateData {
   }
 
   /**
-   * Get a randomly generated string.
-   *
-   * @param int $size
-   *
-   * @return string
-   */
-  private function randomString($size = 32) {
-    $string = "";
-
-    // get an ascii code for each character
-    for ($i = 0; $i < $size; $i++) {
-      $random_int = $this->randomInt(65, 122);
-      if (($random_int < 97) && ($random_int > 90)) {
-        // if ascii code between 90 and 97 substitute with space
-        $random_int = 32;
-      }
-      $random_char = chr($random_int);
-      $string .= $random_char;
-    }
-    return $string;
-  }
-
-  /**
    * @return string
    */
   private function randomChar() {
