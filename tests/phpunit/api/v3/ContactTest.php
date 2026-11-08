@@ -1609,7 +1609,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ];
     $create_result_3 = $this->callAPISuccess('contact', 'create', $create_params);
 
-    // Get Jos and his children.
+    // Get Jos and their children.
     $get_params = [
       'sequential' => 1,
       'id' => $create_result_2['id'],
@@ -3598,6 +3598,30 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Contact', 'getlist', ['input' => $organizationID2, 'params' => ['contact_type' => 'Organization']]);
     $this->assertSame(1, $result['count']);
     $this->assertEquals($organizationID2, $result['values'][0]['id']);
+  }
+
+  /**
+   * A PHP error inside replace must not leave half of the replacement committed.
+   */
+  public function testReplaceRollsBackOnError(): void {
+    $contactID = $this->individualCreate();
+    try {
+      civicrm_api3('Website', 'replace', [
+        'contact_id' => $contactID,
+        'values' => [
+          ['url' => 'https://replacement.example.org'],
+          'not an array',
+        ],
+      ]);
+      $this->fail('The error from replace should propagate.');
+    }
+    catch (\TypeError $e) {
+      $this->assertStringContainsString('array_merge', $e->getMessage());
+    }
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery(
+      'SELECT COUNT(*) FROM civicrm_website WHERE contact_id = %1',
+      [1 => [$contactID, 'Positive']]
+    ));
   }
 
   /**

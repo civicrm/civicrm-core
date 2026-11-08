@@ -1873,6 +1873,10 @@ function _civicrm_api3_generic_replace($entity, $params) {
     $transaction->rollback();
     return civicrm_api3_create_error($e->getMessage());
   }
+  catch (\Throwable $e) {
+    $transaction->rollback();
+    throw $e;
+  }
 }
 
 /**

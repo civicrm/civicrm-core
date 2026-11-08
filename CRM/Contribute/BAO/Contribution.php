@@ -578,7 +578,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     try {
       $contribution = self::add($params);
     }
-    catch (CRM_Core_Exception $e) {
+    catch (\Throwable $e) {
       $transaction->rollback();
       throw $e;
     }
