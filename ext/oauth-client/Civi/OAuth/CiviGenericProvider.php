@@ -97,23 +97,13 @@ class CiviGenericProvider extends \League\OAuth2\Client\Provider\GenericProvider
    * @return string
    */
   private function replaceUrlToken($str) {
-    if (str_contains($str, '{{tenant}}')) {
-      $tenant = !empty($this->tenant) ? $this->tenant : 'common';
-      $str = str_replace('{{tenant}}', $tenant, $str);
-    }
-    if (str_contains($str, '{{url}}')) {
-      $url = !empty($this->url) ? $this->url : '';
-      if (str_ends_with($url, '/')) {
-        // Remove the ending slash
-        $url = substr($url, 0, -1);
-      }
-      $str = str_replace('{{url}}', $url, $str);
-    }
-    if (str_contains($str, '{{realm}}')) {
-      $realm = !empty($this->realm) ? $this->realm : 'master';
-      $str = str_replace('{{realm}}', $realm, $str);
-    }
-    return $str;
+    $vars = [
+      // The !empty() seems a bit verbose, but `??` is strictly different, and this is how it was.
+      '{{tenant}}' => !empty($this->tenant) ? $this->tenant : 'common',
+      '{{url}}' => !empty($this->url) ? rtrim($this->url, '/') : '',
+      '{{realm}}' => !empty($this->realm) ? $this->realm : 'master',
+    ];
+    return strtr($str, $vars);
   }
 
   /**
