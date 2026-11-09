@@ -531,7 +531,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    */
   protected static function getJoinWhereClause(FormDataModel $formDataModel, string $mainEntityName, string $joinEntityType, $mainEntityId): ?array {
     $entity = $formDataModel->getEntity($mainEntityName);
-    $mainEntityType = CoreUtil::isContact($entity['type']) ? 'Contact' : $entity['type'];
+    $mainEntityType = CoreUtil::resolveFacade($entity['type']);
     $params = [];
 
     // Forward FK e.g. Event.loc_block_id => LocBlock
@@ -569,10 +569,8 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   }
 
   protected static function getFkField($mainEntity, $otherEntity): ?array {
-    $fkEntities = [$otherEntity];
-    if ($otherEntity !== 'Contact' && CoreUtil::isContact($otherEntity)) {
-      $fkEntities[] = 'Contact';
-    }
+    // A facade (e.g. Individual) can be referenced by FKs to its parent (e.g. Contact)
+    $fkEntities = array_unique([$otherEntity, CoreUtil::resolveFacade($otherEntity)]);
     foreach (self::getEntityFields($mainEntity) as $field) {
       if ($field['type'] === 'Field' && empty($field['custom_field_id']) &&
         (in_array($field['fk_entity'], $fkEntities, TRUE) || array_intersect($fkEntities, $field['dfk_entities'] ?? []))

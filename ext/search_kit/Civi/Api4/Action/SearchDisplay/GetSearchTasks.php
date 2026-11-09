@@ -135,7 +135,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       }
 
       $taggable = \CRM_Core_OptionGroup::values('tag_used_for', FALSE, FALSE, FALSE, NULL, 'name');
-      if (CoreUtil::isContact($entity['name']) || in_array($entity['name'], $taggable, TRUE)) {
+      if (in_array(CoreUtil::resolveFacade($entity['name']), $taggable, TRUE)) {
         $tasks[$entity['name']]['tag'] = [
           'module' => 'crmSearchTasks',
           'title' => E::ts('Tag - Add/Remove Tags'),
@@ -282,9 +282,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       $this->savedSearch, $this->display, $null, 'civicrm_searchKitTasks'
     );
 
-    // If the entity is Individual, Organization, or Household, add the "Contact" actions
-    if (CoreUtil::isContact($entity['name'])) {
-      $tasks[$entity['name']] = array_merge($tasks[$entity['name']], $tasks['Contact'] ?? []);
+    // If the entity is a facade (e.g. Individual), add the actions of its parent (e.g. Contact)
+    $facadeParent = CoreUtil::resolveFacade($entity['name']);
+    if ($facadeParent !== $entity['name']) {
+      $tasks[$entity['name']] = array_merge($tasks[$entity['name']], $tasks[$facadeParent] ?? []);
     }
 
     foreach ($tasks[$entity['name']] as $name => &$task) {

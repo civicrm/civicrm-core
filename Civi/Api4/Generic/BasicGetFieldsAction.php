@@ -152,13 +152,7 @@ class BasicGetFieldsAction extends BasicGetAction {
       }
       $field = array_diff_key($field, $internalProps);
     }
-    // Hide the 'contact_type' field from Individual,Organization,Household pseudo-entities
-    if (!$isInternal && $this->getEntityName() !== 'Contact' && CoreUtil::isContact($this->getEntityName())) {
-      $values = array_filter($values, function($field) {
-        return $field['name'] !== 'contact_type';
-      });
-    }
-    // Hide fields which have a fixed value in a facade
+    // Hide fields which have a fixed value in a facade (e.g. 'contact_type' for Individual)
     if (!$isInternal && EntityRepository::getFacadeParent($this->getEntityName())) {
       $fixedFields = EntityRepository::getFacades()[$this->getEntityName()]['where'];
       $values = array_filter($values, fn($field) => !array_key_exists($field['name'], $fixedFields));

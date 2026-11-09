@@ -284,10 +284,8 @@ class LoadAdminData extends \Civi\Api4\Generic\AbstractAction {
     if (!$this->skipEntities) {
       $entities[] = '*';
     }
-    // A block of type "Contact" also applies to "Individual", "Organization" & "Household".
-    if (array_intersect($entities, \CRM_Contact_BAO_ContactType::basicTypes())) {
-      $entities[] = 'Contact';
-    }
+    // A block for an entity also applies to its facades, e.g. a "Contact" block applies to "Individual".
+    $entities = array_values(array_unique(array_merge($entities, array_map([CoreUtil::class, 'resolveFacade'], $entities))));
     if ($entities) {
       $blockInfo = Afform::get($this->checkPermissions)
         ->addSelect('name', 'title', 'entity_type', 'join_entity', 'directive_name')

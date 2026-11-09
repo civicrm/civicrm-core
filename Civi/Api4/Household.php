@@ -15,9 +15,9 @@ namespace Civi\Api4;
  *
  * This api is a facade for the Contact entity.
  * In most ways it acts exactly like the Contact entity, plus it injects [contact_type => Household]
- * into get, create, and batch actions (however, when updating or deleting a single Contact by id,
+ * into get, create, and batch actions (however, when updating a single Contact by id,
  * this will transparently pass-through to the Contact entity, so don't rely on this facade to enforce
- * contact type for single-record-by-id write operations).
+ * contact type for single-record-by-id updates).
  *
  * @inheritDoc
  * @searchable secondary
@@ -25,9 +25,5 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class Household extends Contact {
-
-  protected static function getEntityTitle(bool $plural = FALSE): string {
-    return $plural ? ts('Households') : ts('Household');
-  }
 
 }

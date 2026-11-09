@@ -180,18 +180,14 @@ class SpecGatherer extends AutoService {
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   private function addCoreFields(string $entityName, RequestSpec $spec) {
-    // If values select one of the entity's facades (e.g. type = widget), use that facade's fields
-    $fieldsEntity = $this->getFacadeForValues($entityName, $spec) ?? $entityName;
-    $entity = \Civi::entity(CoreUtil::isContact($fieldsEntity) ? 'Contact' : $fieldsEntity);
+    // If values select one of the entity's facades (e.g. contact_type = Individual), use that facade's fields
+    $entity = \Civi::entity($this->getFacadeForValues($entityName, $spec) ?? $entityName);
     $daoClass = $entity->getMeta('class');
     if ($daoClass) {
       $baoClass = \CRM_Core_DAO_AllCoreTables::getBAOClassName($daoClass);
     }
 
     foreach ($entity->getSupportedFields() as $name => $field) {
-      if (isset($field['contact_type']) && $spec->getValue('contact_type') && $field['contact_type'] !== $spec->getValue('contact_type')) {
-        continue;
-      }
       if (!empty($field['component']) && !\CRM_Core_Component::isEnabled($field['component'])) {
         continue;
       }
@@ -233,11 +229,7 @@ class SpecGatherer extends AutoService {
 
   public function getCustomGroupFilters(RequestSpec $spec): ?array {
     $entityName = $spec->getEntity();
-    // If contact type is given, treat it as the api entity
-    if ($entityName === 'Contact' && $spec->getValue('contact_type')) {
-      $entityName = $spec->getValue('contact_type');
-    }
-    // If values select one of the entity's facades (e.g. type = widget), use that facade's custom fields
+    // If values select one of the entity's facades (e.g. contact_type = Individual), use that facade's custom fields
     $entityName = $this->getFacadeForValues($entityName, $spec) ?? $entityName;
 
     $customInfo = CoreUtil::getCustomGroupExtends($entityName);
@@ -292,7 +284,7 @@ class SpecGatherer extends AutoService {
     if ($filters === NULL) {
       return;
     }
-    $entity = \Civi::entity(CoreUtil::isContact($entityName) ? 'Contact' : $entityName);
+    $entity = \Civi::entity(CoreUtil::resolveFacade($entityName));
     $customFields = $entity->getCustomFields($filters);
     foreach ($customFields as $name => $customField) {
       $customField['name'] = $name;
@@ -354,7 +346,7 @@ class SpecGatherer extends AutoService {
       'is_active' => TRUE,
       'id' => $customGroup['id'],
     ];
-    $entity = \Civi::entity(CoreUtil::isContact($baseEntityName) ? 'Contact' : $baseEntityName);
+    $entity = \Civi::entity(CoreUtil::resolveFacade($baseEntityName));
     $customFields = $entity->getCustomFields($filters);
     foreach ($customFields as $name => $customField) {
       $field = SpecFormatter::arrayToField($name, $customField, 'Custom_' . $customGroupName);

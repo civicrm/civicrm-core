@@ -26,11 +26,8 @@ class FullTextSearchFilterSpecProvider extends \Civi\Core\Service\AutoService im
    * @param \Civi\Api4\Service\Spec\RequestSpec $spec
    */
   public function modifySpec(RequestSpec $spec) {
-    $entity = $dbEntity = $spec->getEntity();
-    if (CoreUtil::isContact($entity)) {
-      $dbEntity = 'Contact';
-    }
-    $indices = \Civi::service('civi.schema.fts')->getIndicesForEntity($dbEntity);
+    $entity = $spec->getEntity();
+    $indices = \Civi::service('civi.schema.fts')->getIndicesForEntity(CoreUtil::resolveFacade($entity));
 
     foreach ($indices as $name => $index) {
       $field = new FieldSpec($name, $entity, 'String');
@@ -63,10 +60,7 @@ class FullTextSearchFilterSpecProvider extends \Civi\Core\Service\AutoService im
     }
     // TO CHECK: is checking here helpful? we have to look up indexNames again in modifySpec
     // in order to loop over them -- if there are none modifySpec will be a no-op
-    if (CoreUtil::isContact($entity)) {
-      $entity = 'Contact';
-    }
-    return !!\Civi::service('civi.schema.fts')->getIndicesForEntity($entity);
+    return !!\Civi::service('civi.schema.fts')->getIndicesForEntity(CoreUtil::resolveFacade($entity));
   }
 
   /**

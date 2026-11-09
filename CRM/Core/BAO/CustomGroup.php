@@ -1839,10 +1839,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    * @see self::getCustomGroupExtendsOptions
    */
   public static function getEntityFromExtends(string $extends): string {
-    if ($extends === 'Contact' || in_array($extends, \CRM_Contact_BAO_ContactType::basicTypes(TRUE))) {
-      return 'Contact';
-    }
-    // A custom group extending a facade (e.g. TestWidget) stores values for the parent entity (e.g. TestThing)
+    // A custom group extending a facade (e.g. Individual) stores values for the parent entity (e.g. Contact)
     return CoreUtil::resolveFacade($extends);
   }
 

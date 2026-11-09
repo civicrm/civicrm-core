@@ -159,10 +159,7 @@ class SchemaMapBuilder extends AutoService {
    * @return string|null
    */
   private static function getTableName(string $entityName): ?string {
-    if (CoreUtil::isContact($entityName)) {
-      return 'civicrm_contact';
-    }
-    return AllCoreTables::getEntities()[$entityName]['table'] ?? NULL;
+    return AllCoreTables::getEntities()[CoreUtil::resolveFacade($entityName)]['table'] ?? NULL;
   }
 
 }

@@ -121,31 +121,8 @@ class Contact extends Generic\DAOEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
-  protected static function getDaoName(): string {
-    // Child classes (Individual, Organization, Household) need this.
-    return 'CRM_Contact_DAO_Contact';
-  }
-
   /**
    * @inheritDoc
-   */
-  public static function getInfo(): array {
-    $info = parent::getInfo();
-    $contactType = static::getEntityName();
-    // Adjust info for child classes (Individual, Organization, Household)
-    if ($contactType !== 'Contact') {
-      $contactTypeInfo = \CRM_Contact_BAO_ContactType::getContactType($contactType);
-      $info['icon'] = $contactTypeInfo['icon'] ?? $info['icon'];
-      $info['type'] = ['DAOEntity', 'ContactType'];
-      $info['description'] = ts('Contacts of type %1.', [1 => $contactTypeInfo['label']]);
-      // This forces the value into get and create api actions
-      $info['where'] = ['contact_type' => $contactType];
-    }
-    return $info;
-  }
-
-  /**
-   * Override base method so it can be shared with Individual, Household, Organization APIs.
    */
   public static function permissions() {
     $allPermissions = \CRM_Core_Permission::getEntityActionPermissions();

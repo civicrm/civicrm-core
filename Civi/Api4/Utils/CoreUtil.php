@@ -42,9 +42,6 @@ class CoreUtil {
     else {
       $dao = AllCoreTables::getDAONameForEntity(self::resolveFacade($entityName));
     }
-    if (!$dao && self::isContact($entityName)) {
-      $dao = 'CRM_Contact_DAO_Contact';
-    }
     // Last resort (added for the sake of SqlView APIs which are not registered with AllCoreTables).
     // Again, all this could be avoided if we could just call self::getInfoItem.
     $className = 'Civi\Api4\\' . $entityName;
@@ -80,10 +77,10 @@ class CoreUtil {
   }
 
   /**
-   * Returns TRUE if `entityName` is 'Contact', 'Individual', 'Organization' or 'Household'
+   * Returns TRUE if `entityName` is 'Contact' or one of its facades: 'Individual', 'Organization' or 'Household'
    */
   public static function isContact(string $entityName): bool {
-    return $entityName === 'Contact' || in_array($entityName, \CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE);
+    return self::resolveFacade($entityName) === 'Contact';
   }
 
   /**
