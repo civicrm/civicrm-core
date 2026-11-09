@@ -61,7 +61,10 @@ class Run extends AbstractRunAction {
     // The CRM_Utils_AutoClean instance must be stored or it will be destoyed immediately.
     $autoClean = $this->applyTimeout();
 
-    $this->preprocessLinks();
+    // A row count discards the select clause (unless there's a HAVING clause), so links are only needed if they could allow a filter
+    if ($runMode !== 'row_count' || !empty($apiParams['having']) || !$this->areFiltersAllowedByAfform()) {
+      $this->preprocessLinks();
+    }
     $this->augmentSelectClause();
     $this->applyFilters();
 
