@@ -591,60 +591,6 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
-   * @param bool $isSeparateMembershipPayment
-   *
-   * @deprecated see testSeparatePaymentWithTax for preferred way to get valid config.
-   *
-   * @return \Civi\Test\FormWrapper|\Civi\Test\FormWrappers\EventFormOnline|\Civi\Test\FormWrappers\EventFormParticipant|null
-   */
-  private function submitFormWithMembershipAndContribution(bool $isSeparateMembershipPayment) {
-    $billingLocationTypeID = $this->getLocationTypeID('Billing');
-    $paymentProcessorID = $this->paymentProcessorCreate([
-      'payment_processor_type_id' => 'Dummy',
-      'is_test' => FALSE,
-    ]);
-    $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID], FALSE);
-
-    if (empty($this->ids['MembershipType'])) {
-      $membershipTypeParams = ['minimum_fee' => 1000];
-      $this->ids['MembershipType'] = [$this->membershipTypeCreate($membershipTypeParams)];
-    }
-    $this->setUpMembershipBlockPriceSet();
-    $this->createTestEntity('PriceSetEntity', [
-      'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => $contributionPageID,
-      'price_set_id' => $this->ids['PriceSet']['membership_block'],
-    ]);
-
-    $this->callAPISuccess('MembershipBlock', 'create', [
-      'entity_id' => $contributionPageID,
-      'entity_table' => 'civicrm_contribution_page',
-      'is_required' => TRUE,
-      'is_active' => TRUE,
-      'is_separate_payment' => $isSeparateMembershipPayment,
-      'membership_type_default' => $this->ids['MembershipType'],
-    ]);
-
-    $submittedValues = [
-      'credit_card_number' => '4111111111111111',
-      'cvv2' => '234',
-      'credit_card_exp_date' => [
-        'M' => 2,
-        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
-      ],
-      'price_' . $this->ids['PriceField']['membership'] => $this->ids['PriceFieldValue']['membership_general'],
-      'price_' . $this->ids['PriceField']['contribution'] => $this->ids['PriceFieldValue']['contribution'],
-      'priceSetId' => $this->ids['PriceSet']['membership_block'],
-      'credit_card_type' => 'Visa',
-      "email-$billingLocationTypeID" => 'test@test.com',
-      'payment_processor_id' => $paymentProcessorID,
-      'year' => 2021,
-      'month' => 2,
-    ];
-    return $this->submitOnlineContributionForm($submittedValues, $contributionPageID);
-  }
-
-  /**
    * Test Tax Amount is calculated properly when using PriceSet with Field Type = Text/Numeric Quantity
    *
    * This test creates a pending (pay later) contribution with 3 line items
