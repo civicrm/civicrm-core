@@ -96,7 +96,7 @@ class SpecGatherer extends AutoService {
     return json_encode([
       $entityName,
       $actionName,
-      \Civi::settings()->get('lcMessages'),
+      \CRM_Core_I18n::getLocale(),
       array_intersect_key($values, $cacheValueKeys),
     ]);
   }
