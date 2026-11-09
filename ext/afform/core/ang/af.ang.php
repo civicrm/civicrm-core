@@ -8,7 +8,7 @@ return [
   ],
   // 'css' => ['ang/af.css'],
   'partials' => ['ang/af'],
-  'requires' => ['crmUtil', 'crmUi'],
+  'requires' => ['crmUtil', 'crmUi', 'api4'],
   'settingsFactory' => ['\Civi\Afform\DuplicateContactCheck', 'getSettings'],
   'basePages' => [],
   'exports' => [
