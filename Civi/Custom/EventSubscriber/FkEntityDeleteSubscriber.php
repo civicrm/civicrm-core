@@ -3,8 +3,10 @@ declare(strict_types = 1);
 
 namespace Civi\Custom\EventSubscriber;
 
+use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\PreEvent;
+use Civi\Schema\EntityRepository;
 
 final class FkEntityDeleteSubscriber {
 
@@ -49,19 +51,15 @@ final class FkEntityDeleteSubscriber {
    * @phpstan-return list<string>
    */
   private function getFkEntityTypes(string $fkEntity): array {
-    $contactTypes = \CRM_Contact_BAO_ContactType::basicTypes(TRUE);
+    $parent = CoreUtil::resolveFacade($fkEntity);
 
-    // "Contact" should include all contact types (Individual, Organization, Household)
-    if ($fkEntity === 'Contact') {
-      return array_merge(['Contact'], $contactTypes);
+    // A facade (e.g. "Individual") should include its parent ("Contact")
+    if ($parent !== $fkEntity) {
+      return [$parent, $fkEntity];
     }
 
-    // A contact type (e.g. "Individual") should include "Contact"
-    if (in_array($fkEntity, $contactTypes, TRUE)) {
-      return ['Contact', $fkEntity];
-    }
-
-    return [$fkEntity];
+    // An entity (e.g. "Contact") should include all its facades (Individual, Organization, Household)
+    return array_merge([$fkEntity], EntityRepository::getFacadesOf($fkEntity));
   }
 
 }

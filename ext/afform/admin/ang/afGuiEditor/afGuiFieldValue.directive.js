@@ -68,10 +68,13 @@
                 options.push('user_contact_id');
               }
               (ctrl.editor ? ctrl.editor.getEntities() : []).forEach((entity) => {
-                let filtersMatch = (entity.type === field.fk_entity) || (field.fk_entity === 'Contact' && ['Individual', 'Household', 'Organization'].includes(entity.type));
-                // Check if field filters match entity data (e.g. contact_type)
+                // A reference to an entity (e.g. Contact) also accepts its facades (e.g. Individual)
+                let filtersMatch = [entity.type, afGui.resolveFacade(entity.type)].includes(field.fk_entity);
+                // Check if field filters match entity data, including values implied by a facade
+                // (e.g. an Individual's contact_type doesn't match a filter for Organizations)
+                const entityValues = {...(afGui.getEntity(entity.type)?.where || {}), ...(entity.data || {})};
                 Object.entries(filters).forEach(([key, value]) => {
-                  if (entity.data && entity.data[key] && entity.data[key] != value) {
+                  if (entityValues[key] && entityValues[key] != value) {
                     filtersMatch = false;
                   }
                 });

@@ -158,7 +158,7 @@ class Meta {
         $spec['input_type'] = 'EntityRef';
       }
       else {
-        $originalEntity = CoreUtil::isContact($field['entity']) ? 'Contact' : $field['entity'];
+        $originalEntity = CoreUtil::resolveFacade($field['entity']);
         // API-only pseudo-fields (e.g. Activity.target_contact_id) don't exist
         // in the schema definition, so fall back to the APIv4 field spec which
         // is already resolved in $field via getSelectClause().
@@ -221,7 +221,7 @@ class Meta {
     if (empty($field['fk_entity']) && $field['name'] === CoreUtil::getIdFieldName($field['entity'])) {
       return ['entity' => $field['entity']];
     }
-    $originalEntity = CoreUtil::isContact($field['entity']) ? 'Contact' : $field['entity'];
+    $originalEntity = CoreUtil::resolveFacade($field['entity']);
     // API-only pseudo-fields (e.g. Activity.target_contact_id) don't exist
     // in the schema definition, so fall back to the APIv4 field spec which
     // is already resolved in $field via getSelectClause().

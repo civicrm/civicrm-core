@@ -121,9 +121,10 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     foreach ($targetEntities as $alias => $targetInfo) {
       $entityName = $targetInfo['entity'];
       $entityTasks = $tasks[$entityName] ?? [];
-      // If the entity is Individual, Organization, or Household, add the "Contact" actions
-      if (CoreUtil::isContact($entityName)) {
-        $entityTasks = array_merge($entityTasks, $tasks['Contact'] ?? []);
+      // If the entity is a facade (e.g. Individual), add the actions of its parent (e.g. Contact)
+      $facadeParent = CoreUtil::resolveFacade($entityName);
+      if ($facadeParent !== $entityName) {
+        $entityTasks = array_merge($entityTasks, $tasks[$facadeParent] ?? []);
       }
 
       $aliasTasks = [];
@@ -176,8 +177,9 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
     // Add the global "Download Spreadsheet" task once when actions menu is enabled and not removed by hook/subscriber
     if (!empty($enabledActions)) {
       $downloadTask = $tasks[$mainEntityName]['download'] ?? NULL;
-      if ($downloadTask && CoreUtil::isContact($mainEntityName) && !empty($tasks['Contact']['download'])) {
-        $downloadTask = array_merge($downloadTask, $tasks['Contact']['download']);
+      $mainFacadeParent = CoreUtil::resolveFacade($mainEntityName);
+      if ($downloadTask && $mainFacadeParent !== $mainEntityName && !empty($tasks[$mainFacadeParent]['download'])) {
+        $downloadTask = array_merge($downloadTask, $tasks[$mainFacadeParent]['download']);
       }
       if ($downloadTask) {
         unset($downloadTask['_filteredBySubscriber']);
@@ -289,7 +291,7 @@ class GetSearchTasks extends \Civi\Api4\Generic\AbstractAction {
       }
 
       $taggable = \CRM_Core_OptionGroup::values('tag_used_for', FALSE, FALSE, FALSE, NULL, 'name');
-      if (CoreUtil::isContact($entity['name']) || in_array($entity['name'], $taggable, TRUE)) {
+      if (in_array(CoreUtil::resolveFacade($entity['name']), $taggable, TRUE)) {
         $tasks[$entity['name']]['tag'] = [
           'module' => 'crmSearchTasks',
           'title' => E::ts('Tag - Add/Remove Tags'),

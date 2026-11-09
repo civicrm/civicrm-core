@@ -52,10 +52,10 @@
         });
         // Quick-add links for autocompletes
         this.quickAddLinks = [];
-        let allowedEntity = (ctrl.getFkEntity() || {}).entity;
-        let allowedEntities = (allowedEntity === 'Contact') ? ['Individual', 'Household', 'Organization'] : [allowedEntity];
+        const allowedEntity = (ctrl.getFkEntity() || {}).entity;
         (CRM.config.quickAdd || []).forEach((link) => {
-          if (allowedEntities.includes(link.entity)) {
+          // A reference to an entity (e.g. Contact) also accepts its facades (e.g. Individual)
+          if (allowedEntity && [link.entity, afGui.resolveFacade(link.entity)].includes(allowedEntity)) {
             this.quickAddLinks.push({
               id: link.path,
               icon: link.icon,
@@ -230,9 +230,8 @@
         if (ctrl.getDefn().input_type === 'EntityRef') {
           // Build a list of all entities in this form that can be referenced by this field.
           const fkEntity = ctrl.getDefn().fk_entity;
-          const allowedTypes = fkEntity === 'Contact' ? ['Individual', 'Household', 'Organization'] : [fkEntity];
           const newOptions = ctrl.editor.getEntities()
-            .filter((entity) => allowedTypes.includes(entity.type))
+            .filter((entity) => [entity.type, afGui.resolveFacade(entity.type)].includes(fkEntity))
             .map((entity) => ({id: entity.name, label: entity.label}));
           // Store it in a stable variable for the sake of ng-repeat
           if (!angular.equals(newOptions, entityRefOptions)) {

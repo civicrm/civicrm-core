@@ -103,8 +103,8 @@ class AfformAutocompleteSubscriber {
     $fullDefn = FormDataModel::getField($apiEntity, $fieldName, $entity ? 'create' : 'get') ?? [];
     $fieldEntities = array_values($fullDefn['dfk_entities'] ?? []);
     $fieldEntities[] = $formField['fk_entity'] ?? $fullDefn['fk_entity'] ?? $apiEntity;
-    $withoutContactType = fn($name) => CoreUtil::isContact($name) ? 'Contact' : $name;
-    if (!in_array($withoutContactType($apiRequest->getEntityName()), array_map($withoutContactType, $fieldEntities), TRUE)) {
+    $resolve = [CoreUtil::class, 'resolveFacade'];
+    if (!in_array($resolve($apiRequest->getEntityName()), array_map($resolve, $fieldEntities), TRUE)) {
       throw new UnauthorizedException(E::ts('Field %1 does not refer to %2.', [1 => $fieldName, 2 => $apiRequest->getEntityName()]));
     }
 
@@ -148,13 +148,9 @@ class AfformAutocompleteSubscriber {
     }
     switch ($fieldName) {
       case 'autocompleteSavedSearch':
-        if (CoreUtil::isContact($apiRequest->getFilters()['api_entity'])) {
-          $filter = ['Contact', $apiRequest->getFilters()['api_entity']];
-          $apiRequest->addFilter('api_entity', $filter);
-        }
-        else {
-          $apiRequest->addFilter('api_entity', $apiRequest->getFilters()['api_entity']);
-        }
+        // A facade (e.g. Individual) can also use searches of its parent entity (e.g. Contact)
+        $apiEntity = $apiRequest->getFilters()['api_entity'];
+        $apiRequest->addFilter('api_entity', array_unique([CoreUtil::resolveFacade($apiEntity), $apiEntity]));
         $apiRequest->addFilter('is_template', FALSE);
         return;
 
