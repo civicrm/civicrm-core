@@ -103,8 +103,8 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
     $this->assign('paymentFields', $paymentFields);
 
     $paymentInstrumentFields = [];
-    foreach (array_keys(CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialTrxn', 'payment_instrument_id', ['onlyActive' => FALSE])) as $id) {
-      $paymentInstrumentFields[$id] = CRM_Contribute_BAO_Contribution::getPaymentInstrumentFields($id);
+    foreach (\Civi::entity('FinancialTrxn')->getOptions('payment_instrument_id', values: [], includeDisabled: TRUE) ?? [] as $option) {
+      $paymentInstrumentFields[$option['id']] = CRM_Contribute_BAO_Contribution::getPaymentInstrumentFields($option['id']);
     }
     $this->assign('paymentInstrumentFields', $paymentInstrumentFields);
 

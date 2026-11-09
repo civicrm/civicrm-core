@@ -56,13 +56,8 @@ class CRM_Event_Page_ParticipantListing extends CRM_Core_Page {
     $this->preProcess();
 
     // get the class name from the participantListingID
-    $className = CRM_Utils_Array::value($this->_participantListingID,
-      CRM_Core_PseudoConstant::get(
-        'CRM_Event_BAO_Event',
-        'participant_listing_id',
-        ['keyColumn' => 'value', 'labelColumn' => 'description']
-      )
-    );
+    $participantListings = array_column(\Civi::entity('Event')->getOptions('participant_listing_id'), 'description', 'id');
+    $className = $participantListings[$this->_participantListingID] ?? NULL;
     if ($className == 'CRM_Event_Page_ParticipantListing') {
       CRM_Core_Error::statusBounce(ts("Participant listing code file cannot be '%1'",
         [1 => $className]

@@ -236,9 +236,8 @@ WHERE cft.id = %1
    *
    */
   public static function getfinancialAccountRelations($flip = FALSE) {
-    $params = ['labelColumn' => 'name'];
-    $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
-    $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', $params);
+    $financialAccountType = array_column(\Civi::entity('FinancialAccount')->getOptions('financial_account_type_id') ?? [], 'name', 'id');
+    $accountRelationships = array_column(\Civi::entity('EntityFinancialAccount')->getOptions('account_relationship') ?? [], 'name', 'id');
     $Links = [
       'Expense Account is' => 'Expenses',
       'Accounts Receivable Account is' => 'Asset',
@@ -299,8 +298,7 @@ WHERE ce.entity_table = 'civicrm_financial_type' AND ce.account_relationship = %
 INNER JOIN civicrm_financial_item fi ON fi.financial_account_id = f.id
 WHERE f.id = %1 AND f.financial_account_type_id IN (%2)
 LIMIT 1";
-    $params = ['labelColumn' => 'name'];
-    $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
+    $financialAccountType = array_column(\Civi::entity('FinancialAccount')->getOptions('financial_account_type_id') ?? [], 'name', 'id');
     $params = [
       1 => [$financialAccountId, 'Integer'],
       2 => [
