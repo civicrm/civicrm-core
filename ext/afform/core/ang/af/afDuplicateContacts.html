@@ -1,0 +1,7 @@
+<em>{{:: ts('If the contact you were trying to add is listed below, click their name to view or edit their record') }}:</em>
+<ul class="matching-contacts-actions">
+  <li ng-repeat="contact in ::contacts">
+    <a href="{{:: crmUrl('civicrm/contact/view', {reset: 1, cid: contact.id}) }}">{{:: contact.display_name }}</a>
+    {{:: contact['email_primary.email'] }}
+  </li>
+</ul>

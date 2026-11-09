@@ -263,11 +263,13 @@ class Schema {
     $dbName = \Civi\Test::dsn('database');
 
     $pdo = \Civi\Test::pdo();
-    // Only tables with an auto-increment column (AUTO_INCREMENT is NULL for the others).
+    // Only tables with an auto-increment column.
+    // Query INFORMATION_SCHEMA.COLUMNS because TABLES.AUTO_INCREMENT can be NULL
+    // on MySQL 8.x when stats are not cached or tables are empty.
     // Order by name so each table gets the same offset on every call.
     $query = sprintf(
-      "SELECT table_name FROM INFORMATION_SCHEMA.TABLES
-        WHERE TABLE_SCHEMA = %s AND TABLE_TYPE = 'BASE TABLE' AND AUTO_INCREMENT IS NOT NULL
+      "SELECT DISTINCT table_name FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = %s AND EXTRA LIKE '%%auto_increment%%'
         ORDER BY table_name",
       $pdo->quote($dbName)
     );
