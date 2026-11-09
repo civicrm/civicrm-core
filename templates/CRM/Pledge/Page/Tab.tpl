@@ -40,12 +40,5 @@
        </div>
 {/if}
 
-{if $honor}
-    <div class="solid-border-top">
-        <br /><label>{ts 1=$displayName}Contributions made in honor of %1{/ts}</label>
-    </div>
-    {include file="CRM/Contribute/Page/ContributionHonor.tpl"}
-{/if}
-
 {/if}
 </div>
