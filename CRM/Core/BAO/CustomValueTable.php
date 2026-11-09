@@ -543,13 +543,11 @@ class CRM_Core_BAO_CustomValueTable {
         }
       }
 
-      // Only query SQL_CALC_FOUND_ROWS if $DTparams is passed
-      // FIXME: Remove this entirely after switching the old custom datatable to SearchKit
-      $calcRows = !empty($DTparams) ? 'SQL_CALC_FOUND_ROWS ' : '';
-      $query = "SELECT {$calcRows}id, " . implode(', ', $clauses) . " FROM $tableName WHERE entity_id = $entityID {$orderBy} {$limit}";
+      $query = "SELECT id, " . implode(', ', $clauses) . " FROM $tableName WHERE entity_id = $entityID {$orderBy} {$limit}";
       $dao = CRM_Core_DAO::executeQuery($query);
       if (!empty($DTparams)) {
-        $result['count'] = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
+        // FIXME: Remove this entirely after switching the old custom datatable to SearchKit
+        $result['count'] = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM $tableName WHERE entity_id = $entityID");
       }
       while ($dao->fetch()) {
         foreach ($fields[$tableName] as $fieldID) {
