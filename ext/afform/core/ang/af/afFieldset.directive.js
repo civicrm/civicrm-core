@@ -21,21 +21,19 @@
         const joinOffsets = {};
         const ts = $scope.ts = CRM.ts('org.civicrm.afform');
 
-        this.getData = function() {
-          return ctrl.afFormCtrl ? ctrl.afFormCtrl.getData(ctrl.modelName) : localData;
-        };
+        // A search fieldset (`af-fieldset=""`) holds its own filter values, even
+        // when it sits inside an <af-form> alongside entity fieldsets.
+        const isEntityFieldset = () => Boolean(this.afFormCtrl && this.modelName);
+
+        this.getData = () => isEntityFieldset() ? this.afFormCtrl.getData(this.modelName) : localData;
         // Get name of afform entity or search display
         this.getName = function() {
           return this.modelName ||
             // If there is no Afform entity, get the name of embedded search display
             $element.find('[search-name][display-name]').attr('display-name');
         };
-        this.getEntity = function() {
-          return this.afFormCtrl ? this.afFormCtrl.getEntity(this.modelName) : null;
-        };
-        this.getEntityType = function() {
-          return this.afFormCtrl ? this.afFormCtrl.getEntity(this.modelName)?.type : null;
-        };
+        this.getEntity = () => isEntityFieldset() ? this.afFormCtrl.getEntity(this.modelName) : null;
+        this.getEntityType = () => this.getEntity()?.type ?? null;
         this.getFieldData = function() {
           const data = ctrl.getData();
           // afRepeat will handle adding items itself
