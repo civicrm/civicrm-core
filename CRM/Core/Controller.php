@@ -630,55 +630,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   }
 
   /**
-   * Output HTTP headers for Word document
-   * (note .doc, not the newer .docx format)
-   *
-   * @deprecated
-   *
-   * @param string|null $fileName
-   * @return void
-   */
-  public function setWord($fileName = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning();
-
-    //Mark as a CSV file.
-    CRM_Utils_System::setHttpHeader('Content-Type', 'application/vnd.ms-word');
-
-    //Force a download and name the file using the current timestamp.
-    if (!$fileName) {
-      $fileName = 'Contacts_' . $_SERVER['REQUEST_TIME'] . '.doc';
-    }
-    CRM_Utils_System::setHttpHeader("Content-Disposition", "attachment; filename=Contacts_$fileName");
-  }
-
-  /**
-   * Output HTTP headers for Excel document
-   * (note .xls, not the newer .xlsx format)
-   *
-   * @deprecated
-   *
-   * @param string|null $fileName
-   * @return void
-   */
-  public function setExcel($fileName = NULL) {
-    CRM_Core_Error::deprecatedFunctionWarning();
-
-    //Mark as an excel file.
-    CRM_Utils_System::setHttpHeader('Content-Type', 'application/vnd.ms-excel');
-
-    //Force a download and name the file using the current timestamp.
-    if (!$fileName) {
-      $fileName = 'Contacts_' . $_SERVER['REQUEST_TIME'] . '.xls';
-    }
-
-    CRM_Utils_System::setHttpHeader("Content-Disposition", "attachment; filename=Contacts_$fileName");
-  }
-
-  /**
    * Setter for print.
-   *
-   * Historically the $print argument has also accepted a string (xls or doc),
-   * but this usage is now deprecated.
    *
    * @param int|string $print
    *   Should match a CRM_Core_Smarty::PRINT_* constant,
@@ -687,12 +639,6 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * @return void
    */
   public function setPrint($print) {
-    if ($print === "xls") {
-      $this->setExcel();
-    }
-    elseif ($print === "doc") {
-      $this->setWord();
-    }
     $this->_print = $print;
   }
 

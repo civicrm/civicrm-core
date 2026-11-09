@@ -83,8 +83,6 @@ abstract class CRM_Utils_System_Base {
 
       CRM_Core_Smarty::PRINT_PAGE => 'CRM/common/print.tpl',
 
-      'xls', 'doc' => 'CRM/Contact/Form/Task/Excel.tpl',
-
       // Ex: CRM_Core_Smarty::PRINT_JSON
       default => 'CRM/common/snippet.tpl',
     };
