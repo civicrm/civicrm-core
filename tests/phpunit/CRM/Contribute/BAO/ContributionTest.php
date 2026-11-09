@@ -97,6 +97,36 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * A PHP error while saving must not leave a committed contribution.
+   */
+  public function testCreateRollsBackOnError(): void {
+    $contactID = $this->individualCreate();
+    $this->hookClass->setHook('civicrm_post', function ($op, $objectName): void {
+      if ($objectName === 'Contribution') {
+        throw new \TypeError('Failure in post hook');
+      }
+    });
+    $params = [
+      'contact_id' => $contactID,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
+      'total_amount' => 10,
+      'receive_date' => '20260101',
+      'contribution_status_id' => 1,
+    ];
+    try {
+      CRM_Contribute_BAO_Contribution::create($params);
+      $this->fail('The error from the hook should propagate.');
+    }
+    catch (\TypeError $e) {
+      $this->assertSame('Failure in post hook', $e->getMessage());
+    }
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery(
+      'SELECT COUNT(*) FROM civicrm_contribution WHERE contact_id = %1',
+      [1 => [$contactID, 'Positive']]
+    ));
+  }
+
+  /**
    * Create() method with custom data.
    *
    * @throws \CRM_Core_Exception
