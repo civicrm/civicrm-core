@@ -14,7 +14,22 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
+use CRM_OAuth_ExtensionUtil as E;
+
 class CRM_OAuth_BAO_OAuthClient extends CRM_OAuth_DAO_OAuthClient {
+
+  /**
+   * @return array
+   *   List of methods. "Auto" comes first. All other options are sorted by preference (best to worst).
+   */
+  public static function getPkceMethods(): array {
+    return [
+      'auto' => E::ts('Auto'),
+      'S256' => E::ts('S256'),
+      'plain' => E::ts('Plain'),
+      'none' => E::ts('None'),
+    ];
+  }
 
   /**
    * @return array
