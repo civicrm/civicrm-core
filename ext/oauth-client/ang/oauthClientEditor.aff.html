@@ -1,4 +1,5 @@
 <div oauth-util-import="CRM.oauthUtil.providers" to="theProviders"></div>
+<div oauth-util-import="CRM.oauthUtil.pkceMethods" to="thePkceMethods"></div>
 
 <div ng-form="update" class="form-horizontal">
   <div class="form-group">
@@ -31,6 +32,18 @@
     <div class="crm-section">
       <div class="label"><label for=secret{{options.client.id}}">{{ts('Client Secret')}}</label></div>
       <div class="content"><input class="form-control huge" ng-model="options.client.secret" type="text" id="secret{{options.client.id}}"/></div>
+    </div>
+    <div class="crm-section">
+      <div class="label"><label for="pkce_method{{options.client.id}}">{{ts('PKCE Method')}}</label></div>
+      <div class="content">
+        <select id="pkce_method"
+                class="huge form-control"
+                ng-model="options.client.pkce_method"
+                ng-init="options.client.pkce_method = options.client.pkce_method || 'auto'">
+          <option value="auto">{{thePkceMethods.auto}}</option>
+          <option ng-repeat="item in theProviders[options.client.provider].pkceMethods">{{thePkceMethods[item]}}</option>
+        </select>
+      </div>
     </div>
     <div class="crm-section" ng-if="options.client.created_date">
       <div class="label"><label for="created_date{{options.client.id}}">{{ts('Created Date')}}</label></div>
