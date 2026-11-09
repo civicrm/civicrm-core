@@ -53,6 +53,7 @@ use Civi\Payment\System;
 use Civi\Api4\OptionValue;
 use Civi\Test\Api3TestTrait;
 use Civi\Test\ContactTestTrait;
+use Civi\Test\CustomDataCleanup;
 use Civi\Test\DbTestTrait;
 use Civi\Test\EventTestTrait;
 use Civi\Test\FormTrait;
@@ -124,6 +125,12 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @var CRM_Core_Transaction
    */
   private $tx;
+
+  /**
+   * @var int[]|null
+   * @see \Civi\Test\CustomDataCleanup::snapshot()
+   */
+  private $customDataSnapshot;
 
   /**
    * @var array
@@ -605,6 +612,8 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
     if ($this->tx) {
       $this->tx->rollback()->commit();
       $this->tx = NULL;
+      CustomDataCleanup::cleanup($this->customDataSnapshot);
+      $this->customDataSnapshot = NULL;
 
       CRM_Core_Transaction::forceRollbackIfEnabled();
       Manager::singleton(TRUE);
@@ -2500,7 +2509,9 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * call this at the beginning of setUp().
    *
    * Note: Recall that TRUNCATE and ALTER will force-commit transactions, so
-   * this option does not work with, e.g., custom-data.
+   * this option does not work with, e.g., custom-data. Custom groups and
+   * fields created during the test are deleted in tearDown(), but other rows
+   * written before the implicit commit remain.
    *
    * WISHLIST: Monitor SQL queries in unit-tests and generate an exception
    * if TRUNCATE or ALTER is called while using a transaction.
@@ -2510,6 +2521,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   public function useTransaction($nest = TRUE) {
     if (!$this->tx) {
+      $this->customDataSnapshot = CustomDataCleanup::snapshot();
       $this->tx = new CRM_Core_Transaction($nest);
       $this->tx->rollback();
     }
