@@ -269,18 +269,13 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
   }
 
   public function testContactAclBypassViaDashboardJoin(): void {
-    $firstDash = $this->createTestRecord('Dashboard')['id'];
-    $indId = 0;
-    $allInds = [];
-    while ($indId < $firstDash + 4 || count($allInds) < 4) {
-      $indId = $this->createTestRecord('Individual')['id'];
-      $allInds[] = $indId;
-    }
-    $cid = array_slice($allInds, -4);
-
-    $dashId = $firstDash;
-    while ($dashId < max($cid)) {
-      $dashId = $this->createTestRecord('Dashboard')['id'];
+    $cid = $this->saveTestRecords('Individual', ['records' => 4])->column('id');
+    // The join under test matches ids across tables, and their auto-increment counters are far apart.
+    foreach ($cid as $id) {
+      \CRM_Core_DAO::executeQuery('INSERT INTO civicrm_dashboard (id, domain_id, name) VALUES (%1, 1, %2)', [
+        1 => [$id, 'Integer'],
+        2 => ["dashboard$id", 'String'],
+      ]);
     }
 
     // Grant access to all but contact 0
@@ -304,18 +299,13 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
   }
 
   public function testActivityAclBypassViaGroupJoin(): void {
-    $firstGroup = $this->createTestRecord('Group')['id'];
-    $actId = 0;
-    $allActs = [];
-    while ($actId < $firstGroup + 4 || count($allActs) < 4) {
-      $actId = $this->createTestRecord('Activity')['id'];
-      $allActs[] = $actId;
-    }
-    $activities = array_slice($allActs, -4);
-
-    $groupId = $firstGroup;
-    while ($groupId < max($activities)) {
-      $groupId = $this->createTestRecord('Group')['id'];
+    $activities = $this->saveTestRecords('Activity', ['records' => 4])->column('id');
+    // The join under test matches ids across tables, and their auto-increment counters are far apart.
+    foreach ($activities as $id) {
+      \CRM_Core_DAO::executeQuery('INSERT INTO civicrm_group (id, name, title, frontend_title) VALUES (%1, %2, %2, %2)', [
+        1 => [$id, 'Integer'],
+        2 => ["group$id", 'String'],
+      ]);
     }
 
     $allowedActivities = array_slice($activities, 0, 2);
