@@ -1296,4 +1296,38 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertSame('Find sites', $element->getAttribute('placeholder'));
   }
 
+  /**
+   * A long-text field is a plain text box in a search form, whether it is
+   * edited as a TextArea or with the rich-text editor, so an empty editor
+   * cannot submit markup as a search value.
+   *
+   * @dataProvider longTextHtmlTypes
+   */
+  public function testLongTextFieldIsPlainTextInSearchForm(string $htmlType): void {
+    $customGroupId = $this->customGroupCreate(['extends' => 'Event'])['id'];
+    $field = CustomField::create(FALSE)
+      ->addValue('custom_group_id', $customGroupId)
+      ->addValue('label', 'Sponsors')
+      ->addValue('data_type', 'Memo')
+      ->addValue('html_type', $htmlType)
+      ->execute()->single();
+
+    $searchForm = new CRM_Core_Form();
+    $element = CRM_Core_BAO_CustomField::addQuickFormElement($searchForm, 'custom_' . $field['id'], $field['id'], FALSE, TRUE);
+    $this->assertSame('text', $element->getType());
+    $this->assertStringNotContainsString('crm-form-wysiwyg', (string) $element->getAttribute('class'));
+
+    $editForm = new CRM_Core_Form();
+    $element = CRM_Core_BAO_CustomField::addQuickFormElement($editForm, 'custom_' . $field['id'], $field['id']);
+    $this->assertSame('textarea', $element->getType());
+    $this->assertSame($htmlType === 'RichTextEditor', str_contains((string) $element->getAttribute('class'), 'crm-form-wysiwyg'));
+  }
+
+  public static function longTextHtmlTypes(): array {
+    return [
+      'TextArea' => ['TextArea'],
+      'RichTextEditor' => ['RichTextEditor'],
+    ];
+  }
+
 }
