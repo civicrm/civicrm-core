@@ -17,12 +17,18 @@ class api_v4_OAuthProviderTest extends \PHPUnit\Framework\TestCase implements He
     return \Civi\Test::headless()->install('oauth-client')->apply();
   }
 
+  private $providers = [];
+
   public function setUp(): void {
     parent::setUp();
   }
 
   public function tearDown(): void {
     parent::tearDown();
+  }
+
+  public function hook_civicrm_oauthProviders(&$providers) {
+    $providers = array_merge($providers, $this->providers);
   }
 
   /**
@@ -110,6 +116,47 @@ class api_v4_OAuthProviderTest extends \PHPUnit\Framework\TestCase implements He
 
     $this->assertSame('My\Example2', $examples->single()['class']);
     $this->assertSame('https://example.com/two', $examples->single()['options']['urlAuthorize']);
+  }
+
+  public function testPkceUndeclared(): void {
+    $this->providers['pkce_undeclared'] = [
+      'name' => 'pkce_undeclared',
+      'title' => 'PKCE Undeclared Provider',
+      'options' => [
+        'urlAuthorize' => 'https://pkce.example.com/auth',
+        'urlAccessToken' => 'https://pkce.example.com/token',
+        'urlResourceOwnerDetails' => 'https://pkce.example.com/owner',
+      ],
+    ];
+    \Civi::cache('long')->delete('OAuthProvider_list');
+
+    $provider = Civi\Api4\OAuthProvider::get(FALSE)
+      ->addWhere('name', '=', 'pkce_undeclared')
+      ->execute()
+      ->single();
+
+    $this->assertSame(['S256', 'plain', 'none'], $provider['pkceMethods']);
+  }
+
+  public function testPkceRequireS256(): void {
+    $this->providers['pkce_s256_only'] = [
+      'name' => 'pkce_s256_only',
+      'title' => 'PKCE S256 Only Provider',
+      'pkceMethods' => ['S256'],
+      'options' => [
+        'urlAuthorize' => 'https://pkce.example.com/auth',
+        'urlAccessToken' => 'https://pkce.example.com/token',
+        'urlResourceOwnerDetails' => 'https://pkce.example.com/owner',
+      ],
+    ];
+    \Civi::cache('long')->delete('OAuthProvider_list');
+
+    $provider = Civi\Api4\OAuthProvider::get(FALSE)
+      ->addWhere('name', '=', 'pkce_s256_only')
+      ->execute()
+      ->single();
+
+    $this->assertSame(['S256'], $provider['pkceMethods']);
   }
 
 }
