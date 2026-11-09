@@ -39,8 +39,6 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
    */
   protected $groupFilterNotOptimised = TRUE;
 
-  protected $tableName;
-
   /**
    * Class constructor.
    */
@@ -445,13 +443,15 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
   public function from() {
     $this->_from = "
-              FROM {$this->tableName}
-              INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-                      ON ({$this->tableName}.contribution_id = {$this->_aliases['civicrm_contribution']}.id)
-              LEFT JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
-                      ON ({$this->tableName}.membership_id = {$this->_aliases['civicrm_membership']}.id)
+              FROM civicrm_contribution {$this->_aliases['civicrm_contribution']}
               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                      ON ({$this->tableName}.contact_id = {$this->_aliases['civicrm_contact']}.id)
+                      ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
+                      AND {$this->_aliases['civicrm_contribution']}.is_test = 0 AND {$this->_aliases['civicrm_contribution']}.is_template = 0
+              LEFT JOIN " . $this->getMembershipContributionTableSql() . " membership_contribution
+                      ON membership_contribution.contribution_id = {$this->_aliases['civicrm_contribution']}.id
+              LEFT JOIN civicrm_membership {$this->_aliases['civicrm_membership']}
+                      ON {$this->_aliases['civicrm_membership']}.id = membership_contribution.membership_id
+                      AND {$this->_aliases['civicrm_membership']}.is_test = 0
               LEFT  JOIN civicrm_membership_status {$this->_aliases['civicrm_membership_status']}
                           ON {$this->_aliases['civicrm_membership_status']}.id =
                              {$this->_aliases['civicrm_membership']}.status_id
@@ -506,36 +506,11 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
 
   /**
    * @param bool $applyLimit
-   */
-  public function tempTable($applyLimit = TRUE) {
-    // create temp table with contact ids,contribtuion id,membership id
-    $this->tableName = $this->createTemporaryTable('table', '
-            contribution_id int, INDEX USING HASH(contribution_id), contact_id int, INDEX USING HASH(contact_id),
-            membership_id int, INDEX USING HASH(membership_id), payment_id int, INDEX USING HASH(payment_id)', TRUE, TRUE);
-
-    $fillTemp = "
-          INSERT INTO {$this->tableName} (contribution_id, contact_id, membership_id)
-          SELECT contribution.id, {$this->_aliases['civicrm_contact']}.id, m.id
-          FROM civicrm_contribution contribution
-          INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
-                ON {$this->_aliases['civicrm_contact']}.id = contribution.contact_id AND contribution.is_test = 0 AND contribution.is_template = 0
-          LEFT JOIN " . $this->getMembershipContributionTableSql() . " mp
-                ON contribution.id = mp.contribution_id
-          LEFT JOIN civicrm_membership m
-                ON mp.membership_id = m.id AND m.is_test = 0 ";
-
-    CRM_Core_DAO::executeQuery($fillTemp);
-  }
-
-  /**
-   * @param bool $applyLimit
    *
    * @return string
    */
   public function buildQuery($applyLimit = TRUE) {
     $this->select();
-    //create temp table to be used as base table
-    $this->tempTable();
     $this->from();
     $this->customDataFrom();
     $this->buildPermissionClause();
