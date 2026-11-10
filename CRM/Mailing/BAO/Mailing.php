@@ -408,7 +408,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
     $safeParams = [];
     $fieldPerms = CRM_Mailing_BAO_Mailing::getWorkflowFieldPerms();
     foreach (array_keys($params) as $field) {
-      if (CRM_Core_Permission::check($fieldPerms[$field])) {
+      if (!isset($fieldPerms[$field]) || CRM_Core_Permission::check($fieldPerms[$field])) {
         $safeParams[$field] = $params[$field];
       }
     }
@@ -473,7 +473,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
    * regard for external users.
    */
   public static function refreshMailingGroupCache(int $mailingID): void {
-    $mailingGroups = MailingGroup::get()
+    $mailingGroups = MailingGroup::get(FALSE)
       ->addSelect('group.id')
       ->addJoin('Group AS group', 'LEFT', ['entity_id', '=', 'group.id'])
       ->addWhere('mailing_id', '=', $mailingID)
@@ -933,6 +933,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
 
     if (!empty($params['check_permissions']) && CRM_Mailing_Info::workflowEnabled()) {
       $params = self::processWorkflowPermissions($params);
+    }
+    if (CRM_Mailing_Info::workflowEnabled() && !CRM_Utils_System::isNull($params['scheduled_date'] ?? NULL) && CRM_Utils_System::isNull($params['approval_status_id'] ?? NULL)) {
+      $params['approval_date'] = '';
+      $params['approver_id'] = '';
+      $params['approval_status_id'] = '';
+      $params['approval_note'] = '';
     }
     if (
       ((!$id && empty($params['replyto_email'])) || !isset($params['replyto_email'])) &&
