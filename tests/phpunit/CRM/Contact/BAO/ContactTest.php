@@ -1809,4 +1809,13 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $invalid = TRUE;
   }
 
+  public function testChecksumValidAsOfEarlierTime(): void {
+    $contactID = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'AsOf'])['id'];
+    $issued = strtotime('-2 hours');
+    $checksum = CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, $issued, 1);
+
+    $this->assertFalse(CRM_Contact_BAO_Contact_Utils::validChecksum($contactID, $checksum));
+    $this->assertTrue(CRM_Contact_BAO_Contact_Utils::validChecksum($contactID, $checksum, asOf: $issued + 1800));
+  }
+
 }

@@ -20,6 +20,7 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Contact;
 use Civi\Test\TransactionalInterface;
 
@@ -68,6 +69,32 @@ class ContactChecksumTest extends Api4TestBase implements TransactionalInterface
       ->execute()
       ->first();
     $this->assertFalse($result2['valid']);
+  }
+
+  public function testValidateChecksumAsOf(): void {
+    $cid = $this->createTestRecord('Contact', ['first_name' => 'AsOf'])['id'];
+    $issued = strtotime('-2 hours');
+    $expiredCs = \CRM_Contact_BAO_Contact_Utils::generateChecksum($cid, $issued, 1);
+
+    $valid = Contact::validateChecksum(FALSE)
+      ->setContactId($cid)
+      ->setChecksum($expiredCs)
+      ->setAsOf($issued + 1800)
+      ->execute()
+      ->first()['valid'];
+    $this->assertTrue($valid);
+  }
+
+  public function testValidateChecksumAsOfRefusedForPublicCalls(): void {
+    $cid = $this->createTestRecord('Contact', ['first_name' => 'AsOf'])['id'];
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    $this->expectException(UnauthorizedException::class);
+    Contact::validateChecksum()
+      ->setContactId($cid)
+      ->setChecksum(\CRM_Contact_BAO_Contact_Utils::generateChecksum($cid))
+      ->setAsOf(time())
+      ->execute();
   }
 
 }
