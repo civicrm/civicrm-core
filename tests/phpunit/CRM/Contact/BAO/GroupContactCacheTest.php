@@ -552,6 +552,32 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that contactGroup only returns smart groups with saved_search_id.
+   */
+  public function testContactGroupOnlyReturnsSmartGroups(): void {
+    $contact = $this->createTestEntity('Contact', ['first_name' => 'Smart', 'last_name' => 'Member'], 'contact1');
+    $staticGroup = $this->createTestEntity('Group', ['title' => 'Static Group', 'saved_search_id' => NULL], 'static_group');
+    $smartGroup = $this->createSmartGroup([
+      'title' => 'Smart Group',
+      'formValues' => ['first_name' => 'Smart'],
+    ]);
+
+    CRM_Contact_BAO_GroupContactCache::load($smartGroup);
+
+    // Simulate orphaned cache entry for the static group
+    CRM_Core_DAO::executeQuery('INSERT INTO civicrm_group_contact_cache (group_id, contact_id) VALUES (%1, %2)', [
+      1 => [$staticGroup['id'], 'Integer'],
+      2 => [$contact['id'], 'Integer'],
+    ]);
+
+    $contactGroups = CRM_Contact_BAO_GroupContactCache::contactGroup($contact['id']);
+    $this->assertNotEmpty($contactGroups['group']);
+    $groupIds = array_map('intval', array_column($contactGroups['group'], 'id'));
+    $this->assertContains((int) $smartGroup->id, $groupIds);
+    $this->assertNotContains((int) $staticGroup['id'], $groupIds);
+  }
+
+  /**
    * Creates two entities: a Group and a SavedSearch
    *
    * @param array $params

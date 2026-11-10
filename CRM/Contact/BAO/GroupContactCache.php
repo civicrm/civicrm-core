@@ -458,6 +458,7 @@ FROM       civicrm_group_contact_cache gc
 INNER JOIN civicrm_group g ON g.id = gc.group_id
 WHERE      gc.contact_id = $contactID
             AND g.is_hidden = 0
+            AND g.saved_search_id IS NOT NULL
 ORDER BY   gc.contact_id, g.children
 ";
 
