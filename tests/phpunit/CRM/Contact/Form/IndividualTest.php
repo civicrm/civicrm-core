@@ -1,10 +1,17 @@
 <?php
 
+use Civi\Api4\OptionValue;
+
 /**
  * Class CRM_Contact_Form_IndividualTest
  * @group headless
  */
 class CRM_Contact_Form_IndividualTest extends CiviUnitTestCase {
+
+  public function tearDown(): void {
+    Civi::settings()->revert('contact_edit_options');
+    parent::tearDown();
+  }
 
   /**
    * Similar to tests in CRM_Core_FormTest where it's just testing there's no
@@ -111,6 +118,34 @@ class CRM_Contact_Form_IndividualTest extends CiviUnitTestCase {
     // Check who owns $otherEmail['id'] now
     $emailOwner = \CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Email', $otherEmail['id'], 'contact_id');
     $this->assertEquals($otherContact['id'], $emailOwner, 'Email contact_id must not be reassigned to the user contact');
+  }
+
+  /**
+   * Legal name is on the individual form only when it is switched on in Display Preferences.
+   */
+  public function testLegalNameFollowsContactEditOptions(): void {
+    $this->assertStringNotContainsString('<label for="legal_name">', $this->renderNewIndividualForm());
+
+    $legalNameOption = OptionValue::get(FALSE)
+      ->addWhere('option_group_id:name', '=', 'contact_edit_options')
+      ->addWhere('name', '=', 'Legal Name')
+      ->execute()->single();
+    $editOptions = Civi::settings()->get('contact_edit_options');
+    $editOptions[] = $legalNameOption['value'];
+    Civi::settings()->set('contact_edit_options', $editOptions);
+
+    $this->assertStringContainsString('<label for="legal_name">', $this->renderNewIndividualForm());
+  }
+
+  private function renderNewIndividualForm(): string {
+    $_REQUEST['reset'] = 1;
+    $_REQUEST['ct'] = 'Individual';
+    $form = $this->getFormObject('CRM_Contact_Form_Contact');
+    $form->assign('urlIsPublic');
+    $form->assign('linkButtons', []);
+    ob_start();
+    $form->controller->_actions['display']->perform($form, 'display');
+    return ob_get_clean();
   }
 
 }
