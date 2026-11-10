@@ -3593,6 +3593,31 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * The first payment for a new membership must not add a term, even if the membership has left Pending.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCompleteTransactionNewMembershipOutOfPendingKeepsDates(): void {
+    $this->createPriceSetWithPage();
+    $this->setUpPendingContribution($this->ids['PriceFieldValue']['one_term_membership'], 'new');
+    $before = $this->callAPISuccess('Membership', 'getsingle', ['id' => $this->_ids['membership']]);
+    // An extension recalculating the status can move the membership out of Pending before it is paid.
+    CRM_Core_DAO::setFieldValue('CRM_Member_DAO_Membership', $this->_ids['membership'], 'status_id', CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'));
+
+    $this->callAPISuccess('Contribution', 'completetransaction', ['id' => $this->ids['Contribution']['new']]);
+
+    $after = $this->callAPISuccess('Membership', 'getsingle', ['id' => $this->_ids['membership']]);
+    $this->assertEquals($before['start_date'], $after['start_date']);
+    $this->assertEquals($before['end_date'], $after['end_date']);
+    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $after['status_id']));
+    $this->callAPISuccessGetCount('Activity', [
+      'activity_type_id' => 'Membership Signup',
+      'source_record_id' => $this->_ids['membership'],
+      'status_id' => 'Completed',
+    ], 1);
+  }
+
+  /**
    * Test membership is renewed for 2 terms when transaction completed based on the line item having 2 terms as qty.
    *
    * Also check that altering the qty for the most recent contribution results in repeattransaction picking it up.

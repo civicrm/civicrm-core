@@ -2,9 +2,11 @@
 namespace Civi\Membership;
 
 use Civi\Core\Attribute\CiviEventListener;
+use Civi\Api4\Activity;
 use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
+use Civi\Api4\MembershipLog;
 use Civi\Api4\MembershipType;
 use Civi\Api4\OrderCompletionMetadata;
 use Civi\Core\Service\AutoService;
@@ -104,7 +106,7 @@ class OrderCompleteSubscriber extends AutoService {
         }
         $membershipParams['membership_type_id'] = $membershipLineItem['price_field_value.membership_type_id'];
       }
-      if (empty($membership['end_date']) || $membership['status_id:name'] !== 'Pending') {
+      if (empty($membership['end_date']) || ($membership['status_id:name'] !== 'Pending' && !self::isFirstPaymentForSignup($membership['id'], $contributionID))) {
         // Passing num_terms to the api triggers date calculations, but for pending memberships these may be already calculated.
         // sigh - they should  be  consistent but removing the end date check causes test failures & maybe UI too?
         // The api assumes num_terms is a special sauce for 'is_renewal' so we need to not pass it when updating a pending to completed.
@@ -156,6 +158,50 @@ class OrderCompleteSubscriber extends AutoService {
 
       Membership::update(FALSE)->setValues($membershipParams)->execute();
     }
+  }
+
+  /**
+   * Is this the first payment for a new membership whose dates were already set at signup?
+   *
+   * The signup activity stays Scheduled until the signup is paid, even if the membership has left Pending.
+   * A membership created in Grace also keeps a Scheduled signup activity, so it must have been created Pending.
+   *
+   * @param int $membershipID
+   * @param int $contributionID
+   *
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  private static function isFirstPaymentForSignup(int $membershipID, int $contributionID): bool {
+    $signupAwaitingPayment = Activity::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('source_record_id', '=', $membershipID)
+      ->addWhere('activity_type_id:name', '=', 'Membership Signup')
+      ->addWhere('status_id:name', '=', 'Scheduled')
+      ->execute()
+      ->count();
+    if (!$signupAwaitingPayment) {
+      return FALSE;
+    }
+    $firstLog = MembershipLog::get(FALSE)
+      ->addSelect('status_id.name')
+      ->addWhere('membership_id', '=', $membershipID)
+      ->addOrderBy('id', 'ASC')
+      ->setLimit(1)
+      ->execute()
+      ->first();
+    if (($firstLog['status_id.name'] ?? NULL) !== 'Pending') {
+      return FALSE;
+    }
+    $otherCompletedPayments = LineItem::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('entity_table', '=', 'civicrm_membership')
+      ->addWhere('entity_id', '=', $membershipID)
+      ->addWhere('contribution_id', '!=', $contributionID)
+      ->addWhere('contribution_id.contribution_status_id:name', '=', 'Completed')
+      ->execute()
+      ->count();
+    return !$otherCompletedPayments;
   }
 
   /**
