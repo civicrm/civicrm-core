@@ -103,7 +103,7 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
       ],
     ];
 
-    require_once 'tests/fixtures/DummyProvider.php';
+    require_once __DIR__ . '/../../../fixtures/DummyProvider.php';
 
     return $this->providers;
   }
@@ -388,6 +388,96 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertSame('example-access-token-value', $tokenRecord['access_token']);
     $this->assertSame('example-refresh-token-value', $tokenRecord['refresh_token']);
     $this->assertTrue(!isset($tokenRecord['contact_id']));
+  }
+
+  public function testPkceProviderJson() {
+    $this->makeDummyProviderThatGetsAToken();
+    $this->providers['dummy']['pkce'] = TRUE;
+    \Civi::cache('long')->delete('OAuthProvider_list');
+
+    $client = $this->makeDummyProviderClient();
+
+    $result = \Civi\Api4\OAuthClient::authorizationCode(FALSE)
+      ->addWhere('id', '=', $client['id'])
+      ->execute()
+      ->single();
+
+    $this->assertStringContainsString('code_challenge=', $result['url']);
+    $this->assertStringContainsString('code_challenge_method=S256', $result['url']);
+
+    // Extract stateId from URL
+    parse_str(parse_url($result['url'], PHP_URL_QUERY), $query);
+    $stateId = $query['state'];
+    $state = \Civi::service('oauth2.state')->load($stateId);
+
+    $this->assertNotEmpty($state['code_verifier']);
+
+    // It would be nice to assert that CRM_OAuth_Page_Return has the effect of
+    // calling urlToken with the `?code_verifier=X`. But it's hard to do in a meaningful way.
+  }
+
+  public function testPkceAutoSelection() {
+    $this->makeDummyProviderThatGetsAToken();
+    $this->providers['dummy']['pkceMethods'] = ['unrecognized_algo', 'plain', 'S256'];
+    \Civi::cache('long')->delete('OAuthProvider_list');
+
+    $client = $this->makeDummyProviderClient();
+
+    // Client pkce_method defaults to 'auto'
+    $result = \Civi\Api4\OAuthClient::authorizationCode(FALSE)
+      ->addWhere('id', '=', $client['id'])
+      ->execute()
+      ->single();
+
+    $this->assertStringContainsString('code_challenge=', $result['url']);
+    $this->assertStringContainsString('code_challenge_method=plain', $result['url']);
+  }
+
+  public function testPkceAutoSelectionThrowsExceptionWhenNoFamiliarMethod() {
+    $this->makeDummyProviderThatGetsAToken();
+    $this->providers['dummy']['pkceMethods'] = ['unknown_method_1', 'unknown_method_2'];
+    \Civi::cache('long')->delete('OAuthProvider_list');
+
+    $client = $this->makeDummyProviderClient();
+
+    $this->expectException(\Civi\OAuth\OAuthException::class);
+    $this->expectExceptionMessage('No supported PKCE method found for provider "dummy".');
+
+    \Civi\Api4\OAuthClient::authorizationCode(FALSE)
+      ->addWhere('id', '=', $client['id'])
+      ->execute();
+  }
+
+  public function testPkceExplicitMethods() {
+    $this->makeDummyProviderThatGetsAToken();
+    $this->providers['dummy']['pkceMethods'] = ['S256', 'plain'];
+    \Civi::cache('long')->delete('OAuthProvider_list');
+
+    // Create client with explicit 'plain' despite provider preferring 'S256'
+    $clientPlain = \Civi\Api4\OAuthClient::create(FALSE)->setValues([
+      'provider' => 'dummy',
+      'guid' => 'dummy-client-plain',
+      'secret' => 'secret',
+      'pkce_method' => 'plain',
+    ])->execute()->first();
+    $resultPlain = \Civi\Api4\OAuthClient::authorizationCode(FALSE)
+      ->addWhere('id', '=', $clientPlain['id'])
+      ->execute()
+      ->single();
+    $this->assertStringContainsString('code_challenge_method=plain', $resultPlain['url']);
+
+    // Create client with explicit 'S256' which agrees with provider preferring 'S256'
+    $clientS256 = \Civi\Api4\OAuthClient::create(FALSE)->setValues([
+      'provider' => 'dummy',
+      'guid' => 'dummy-client-s256',
+      'secret' => 'secret',
+      'pkce_method' => 'S256',
+    ])->execute()->first();
+    $resultS256 = \Civi\Api4\OAuthClient::authorizationCode(FALSE)
+      ->addWhere('id', '=', $clientS256['id'])
+      ->execute()
+      ->single();
+    $this->assertStringContainsString('code_challenge_method=S256', $resultS256['url']);
   }
 
 }
