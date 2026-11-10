@@ -234,12 +234,14 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => $optionYear,
             'default' => '',
+            'type' => CRM_Utils_Type::T_INT,
           ],
           'other_year' => [
             'title' => ts('Other Years'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => $optionYear,
             'default' => '',
+            'type' => CRM_Utils_Type::T_INT,
           ],
           'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'receipt_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
@@ -585,10 +587,10 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
 
   public function fixReportParams() {
     if (!empty($this->_params['this_year_value'])) {
-      $this->_referenceYear['this_year'] = $this->_params['this_year_value'];
+      $this->_referenceYear['this_year'] = CRM_Utils_Type::escape($this->_params['this_year_value'], 'Integer');
     }
     if (!empty($this->_params['other_year_value'])) {
-      $this->_referenceYear['other_year'] = $this->_params['other_year_value'];
+      $this->_referenceYear['other_year'] = CRM_Utils_Type::escape($this->_params['other_year_value'], 'Integer');
     }
   }
 

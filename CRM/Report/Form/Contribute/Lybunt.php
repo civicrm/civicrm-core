@@ -422,7 +422,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    * @return string
    */
   public function getCurrentYear() {
-    return $this->_params['yid_value'];
+    return CRM_Utils_Type::escape($this->_params['yid_value'], 'Integer');
   }
 
   /**
