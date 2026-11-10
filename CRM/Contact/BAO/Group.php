@@ -1502,4 +1502,27 @@ WHERE {$whereClause}";
     }
   }
 
+  /**
+   * Validation callback for group_multiple_parents setting.
+   *
+   * @param mixed $value
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function validateGroupMultipleParents($value): bool {
+    if (!$value) {
+      $sql = "SELECT COUNT(*)
+        FROM `civicrm_group`
+        WHERE `parents` LIKE '%,%'";
+      $count = (int) CRM_Core_DAO::singleValueQuery($sql);
+      if ($count > 0) {
+        throw new CRM_Core_Exception(ts('Cannot disable multiple group parents because 1 group with multiple parents exists.', [
+          'count' => $count,
+          'plural' => 'Cannot disable multiple group parents because %count groups with multiple parents exist.',
+        ]));
+      }
+    }
+    return TRUE;
+  }
+
 }

@@ -11,6 +11,7 @@
 
 use Civi\Api4\Group;
 use Civi\Api4\SavedSearch;
+use Civi\Api4\Setting;
 
 /**
  * Test class for CRM_Contact_BAO_Group BAO
@@ -402,6 +403,51 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     // Check recent items list.
     $recentItems = CRM_Utils_Recent::get();
     $this->assertEquals($checkParams['title'], $recentItems[0]['title']);
+  }
+
+  /**
+   * Test validation callback for group_multiple_parents setting.
+   */
+  public function testValidateGroupMultipleParents(): void {
+    // Should be able to toggle the setting when no groups have multiple parents
+    Setting::set(FALSE)->addValue('group_multiple_parents', TRUE)->execute();
+    $this->assertTrue(Civi::settings()->get('group_multiple_parents'));
+
+    Setting::set(FALSE)->addValue('group_multiple_parents', FALSE)->execute();
+    $this->assertFalse(Civi::settings()->get('group_multiple_parents'));
+
+    $parent1 = $this->createTestEntity('Group', ['title' => 'Parent 1'], 'parent1');
+    $parent2 = $this->createTestEntity('Group', ['title' => 'Parent 2'], 'parent2');
+    $this->createTestEntity('Group', [
+      'title' => 'Child 1',
+      'parents' => [$parent1['id'], $parent2['id']],
+    ], 'child1');
+
+    // Should still be able to enable the setting
+    Setting::set(FALSE)->addValue('group_multiple_parents', TRUE)->execute();
+    $this->assertTrue(Civi::settings()->get('group_multiple_parents'));
+
+    // Should not be able to disable the setting when groups with multiple parents exist
+    try {
+      Setting::set(FALSE)->addValue('group_multiple_parents', FALSE)->execute();
+      $this->fail('Expected CRM_Core_Exception not thrown');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertSame('Cannot disable multiple group parents because 1 group with multiple parents exists.', $e->getMessage());
+    }
+
+    $this->createTestEntity('Group', [
+      'title' => 'Child 2',
+      'parents' => [$parent1['id'], $parent2['id']],
+    ], 'child2');
+
+    try {
+      Setting::set(FALSE)->addValue('group_multiple_parents', FALSE)->execute();
+      $this->fail('Expected CRM_Core_Exception not thrown');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertSame('Cannot disable multiple group parents because 2 groups with multiple parents exist.', $e->getMessage());
+    }
   }
 
 }
