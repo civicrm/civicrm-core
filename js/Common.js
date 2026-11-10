@@ -1969,6 +1969,7 @@ if (!CRM.vars) CRM.vars = {};
       })
       // Handle accordions
       .on('click.crmAccordions', 'div.crm-accordion-header, fieldset.crm-accordion-header, .crm-collapsible .collapsible-title', function (e) {
+        warnDeprecatedOnce('Deprecated accordion markup (.crm-accordion-header or .crm-collapsible .collapsible-title) will stop working in a future release. Use <details><summary> instead: ' + accordionDocsUrl, this);
         if ($(this).parent().hasClass('collapsed')) {
           $(this).next().css('display', 'none').slideDown(200);
         }
@@ -1998,12 +1999,24 @@ if (!CRM.vars) CRM.vars = {};
     $().crmtooltip();
   });
 
+  const accordionDocsUrl = 'https://docs.civicrm.org/dev/en/latest/framework/ui/#accordions';
+  const deprecationsWarned = new Set();
+
+  // Once per page, so a legacy accordion clicked repeatedly doesn't flood the console.
+  function warnDeprecatedOnce(message, element) {
+    if (!deprecationsWarned.has(message)) {
+      deprecationsWarned.add(message);
+      CRM.console('warn', message, element);
+    }
+  }
+
   /**
    * Collapse or expand an accordion
    * @deprecated
    * @param speed
    */
   $.fn.crmAccordionToggle = function (speed) {
+    warnDeprecatedOnce('crmAccordionToggle() is deprecated and will be removed in a future release. Set the open property of the <details> element instead: ' + accordionDocsUrl, this);
     $(this).each(function () {
       // Backward-compat, for when this older function is used on a newer <details> element
       if ($(this).is('details')) {
