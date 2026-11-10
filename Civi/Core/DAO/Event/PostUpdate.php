@@ -11,15 +11,13 @@
 
 namespace Civi\Core\DAO\Event;
 
-use Civi\Core\Event\EntityParamsTrait;
-
 /**
  * Class PostUpdate
  * @package Civi\Core\DAO\Event
  */
 class PostUpdate extends \Civi\Core\Event\GenericHookEvent {
 
-  use EntityParamsTrait;
+  use DAOParamsTrait;
 
   /**
    * @var \CRM_Core_DAO

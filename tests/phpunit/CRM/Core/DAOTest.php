@@ -785,21 +785,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * Custom data passed to writeRecord() should be saved before post-save events fire.
    */
   public function testWriteRecordSavesCustomDataBeforePostEvents(): void {
-    $customGroup = CustomGroup::create(FALSE)
-      ->setValues([
-        'name' => 'address_extra',
-        'title' => 'Address Extra',
-        'extends' => 'Address',
-      ])
-      ->execute()->single();
-    $customField = CustomField::create(FALSE)
-      ->setValues([
-        'custom_group_id' => $customGroup['id'],
-        'label' => 'Note',
-        'data_type' => 'String',
-        'html_type' => 'Text',
-      ])
-      ->execute()->single();
+    $this->createAddressNoteField();
 
     $seen = [];
     $listener = function ($event) use (&$seen) {
@@ -828,6 +814,77 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     }
 
     $this->assertEquals(['First', 'Second'], $seen);
+  }
+
+  /**
+   * DAO pre-save listeners can change core and custom values; post-save getValues() sees both.
+   */
+  public function testDAOEventSettersAndGetValues(): void {
+    $this->createAddressNoteField();
+    $addressID = Address::create(FALSE)
+      ->addValue('contact_id', $this->individualCreate())
+      ->addValue('location_type_id:name', 'Home')
+      ->addValue('street_address', '1 Example Street')
+      ->addValue('address_extra.Note', 'First')
+      ->execute()->single()['id'];
+
+    $postValues = NULL;
+    $preListener = function ($event) {
+      if ($event->object instanceof CRM_Core_DAO_Address) {
+        $event->setValue('street_address', NULL);
+        $event->setValue('address_extra.Note', 'Changed');
+      }
+    };
+    $postListener = function ($event) use (&$postValues) {
+      if ($event->object instanceof CRM_Core_DAO_Address) {
+        $postValues = $event->getValues();
+      }
+    };
+    \Civi::dispatcher()->addListener('civi.dao.preUpdate', $preListener);
+    \Civi::dispatcher()->addListener('civi.dao.postUpdate', $postListener);
+    try {
+      Address::update(FALSE)
+        ->addWhere('id', '=', $addressID)
+        ->addValue('supplemental_address_1', 'Flat 1')
+        ->execute();
+    }
+    finally {
+      \Civi::dispatcher()->removeListener('civi.dao.preUpdate', $preListener);
+      \Civi::dispatcher()->removeListener('civi.dao.postUpdate', $postListener);
+    }
+
+    $address = Address::get(FALSE)
+      ->addWhere('id', '=', $addressID)
+      ->addSelect('street_address', 'supplemental_address_1', 'address_extra.Note')
+      ->execute()->single();
+    $this->assertNull($address['street_address']);
+    $this->assertEquals('Flat 1', $address['supplemental_address_1']);
+    $this->assertEquals('Changed', $address['address_extra.Note']);
+
+    $this->assertEquals('Flat 1', $postValues['supplemental_address_1']);
+    $this->assertArrayHasKey('street_address', $postValues);
+    $this->assertNull($postValues['street_address']);
+    $this->assertEquals('Changed', $postValues['address_extra.Note']);
+    $this->assertArrayNotHasKey('city', $postValues);
+  }
+
+  private function createAddressNoteField(): void {
+    $customGroup = CustomGroup::create(FALSE)
+      ->setValues([
+        'name' => 'address_extra',
+        'title' => 'Address Extra',
+        'extends' => 'Address',
+      ])
+      ->execute()->single();
+    CustomField::create(FALSE)
+      ->setValues([
+        'custom_group_id' => $customGroup['id'],
+        'name' => 'Note',
+        'label' => 'Note',
+        'data_type' => 'String',
+        'html_type' => 'Text',
+      ])
+      ->execute();
   }
 
 }

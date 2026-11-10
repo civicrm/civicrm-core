@@ -11,15 +11,21 @@
 
 namespace Civi\Core\DAO\Event;
 
-use Civi\Core\Event\EntityParamsTrait;
+use Civi\Core\Event\EntityParamsSetterTrait;
 
 /**
  * Class PreUpdate
+ *
+ * Custom values set here are stored by save(). BAOs that store $params['custom']
+ * themselves after save() (e.g. Contact, Contribution) overwrite any field the
+ * caller also passed; use hook_civicrm_pre for those.
+ *
  * @package Civi\Core\DAO\Event
  */
 class PreUpdate extends \Civi\Core\Event\GenericHookEvent {
 
-  use EntityParamsTrait;
+  use DAOParamsTrait;
+  use EntityParamsSetterTrait;
 
   /**
    * @var \CRM_Core_DAO
@@ -45,53 +51,13 @@ class PreUpdate extends \Civi\Core\Event\GenericHookEvent {
     $this->params = $params;
   }
 
-  /**
-   * Sets a parameter value.
-   *
-   * Custom fields are expected to be in long-name (CustomGroup.CustomField) format.
-   */
-  public function setValue(string $name, $value): void {
-    $this->params[$name] = $value;
-    $customField = \CRM_Core_BAO_CustomField::getFieldByName($name);
-    if (!$customField) {
-      if (property_exists($this->object, $name)) {
-        $this->object->$name = $value;
-      }
-      return;
-    }
-    $customFieldId = $customField['id'];
-    $shortName = "custom_$customFieldId";
-    // Update any existing param with that custom field id
-    foreach (array_keys($this->params) as $key) {
-      if ($key === $shortName || str_starts_with($key, $shortName . '_')) {
-        $this->params[$key] = $value;
-        break;
-      }
-    }
-    // Update the 'custom' array with the new param.
-    $this->params += ['custom' => []];
-    unset($this->params['custom'][$customFieldId]);
-    \CRM_Core_BAO_CustomField::formatCustomField(
-      $customFieldId,
-      $this->params['custom'],
-      $value,
-      NULL,
-      NULL,
-      $this->object->{$this->object->getFirstPrimaryKey()} ?? NULL,
-      FALSE,
-      FALSE,
-      TRUE,
-      FALSE
-    );
+  protected function setObjectValue(string $name, $value): void {
+    // Format the value as writeRecord() does. copyValues() skips NULL, so NULL is passed as '' to clear the field.
+    $this->object->copyValues([$name => $value ?? '']);
   }
 
-  /**
-   * Sets multiple parameter values.
-   */
-  public function mergeValues(array $values): void {
-    foreach ($values as $key => $value) {
-      $this->setValue($key, $value);
-    }
+  protected function getEntityId(): ?int {
+    return $this->object->id ? (int) $this->object->id : NULL;
   }
 
 }

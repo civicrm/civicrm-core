@@ -148,8 +148,8 @@ class CRM_Core_DAO extends DB_DataObject {
    *
    * Stored by save() so it is in the database before post-save events fire.
    *
-   * @internal
    * @var array
+   * @internal
    */
   protected $_customParams = [];
 
