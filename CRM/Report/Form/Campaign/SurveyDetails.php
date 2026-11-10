@@ -374,6 +374,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
     if (CRM_Utils_System::isNull($surveyIds)) {
       return $coverSheet;
     }
+    $surveyIds = CRM_Utils_Type::escapeAll((array) $surveyIds, 'Integer');
 
     $fieldIds = [];
 
@@ -504,6 +505,7 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
     ) {
       return;
     }
+    $surveyIds = CRM_Utils_Type::escapeAll((array) $surveyIds, 'Integer');
 
     //swap the survey result label w/ value.
     $query = '
@@ -673,6 +675,7 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
     ) {
       return;
     }
+    $surveyIds = CRM_Utils_Type::escapeAll((array) $surveyIds, 'Integer');
 
     $responseFields = [];
     foreach ($surveyIds as $surveyId) {

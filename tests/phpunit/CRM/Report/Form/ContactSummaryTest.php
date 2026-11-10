@@ -108,7 +108,7 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
           $contactIDs['even_street_number_1'],
           $contactIDs['no_street_number'],
         ],
-        'expected_orderby_clause' => 'ORDER BY (address_civireport.street_number % 2) DESC, address_civireport.street_number DESC',
+        'expected_orderby_clause' => 'ORDER BY (address_civireport.street_number % 2) desc, address_civireport.street_number desc',
       ],
       // CASE B: Sorting by odd street number in asc order + street number in desc order
       [
@@ -129,7 +129,7 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
           $contactIDs['odd_street_number_2'],
           $contactIDs['odd_street_number_1'],
         ],
-        'expected_orderby_clause' => 'ORDER BY (address_civireport.street_number % 2) ASC, address_civireport.street_number DESC',
+        'expected_orderby_clause' => 'ORDER BY (address_civireport.street_number % 2) asc, address_civireport.street_number desc',
       ],
       // CASE C: Sorting by odd street number in desc order + street number in asc order
       [
@@ -150,7 +150,7 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
           $contactIDs['even_street_number_2'],
           $contactIDs['no_street_number'],
         ],
-        'expected_orderby_clause' => 'ORDER BY (address_civireport.street_number % 2) DESC, address_civireport.street_number ASC',
+        'expected_orderby_clause' => 'ORDER BY (address_civireport.street_number % 2) desc, address_civireport.street_number asc',
       ],
       // CASE A: Sorting by odd street number in asc order + street number in asc order
       [
@@ -171,7 +171,7 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
           $contactIDs['odd_street_number_1'],
           $contactIDs['odd_street_number_2'],
         ],
-        'expected_orderby_clause' => 'ORDER BY (address_civireport.street_number % 2) ASC, address_civireport.street_number ASC',
+        'expected_orderby_clause' => 'ORDER BY (address_civireport.street_number % 2) asc, address_civireport.street_number asc',
       ],
     ];
 

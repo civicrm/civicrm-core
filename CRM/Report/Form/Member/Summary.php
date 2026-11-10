@@ -334,15 +334,16 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
               if (!empty($table['group_bys'][$fieldName]['frequency']) &&
                 !empty($this->_params['group_bys_freq'][$fieldName])
               ) {
-
+                $freq = strtoupper($this->_params['group_bys_freq'][$fieldName]);
+                if (!array_key_exists($freq, $this->_groupByDateFreq)) {
+                  throw new CRM_Core_Exception(ts('Invalid frequency'));
+                }
                 $append = "YEAR({$field['dbAlias']})";
-                if (in_array(strtolower($this->_params['group_bys_freq'][$fieldName]),
-                  ['year']
-                )) {
+                if ($freq === 'YEAR') {
                   $append = '';
                 }
                 $this->_groupByArray[] = $append;
-                $this->_groupByArray[] = "{$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
+                $this->_groupByArray[] = "{$freq}({$field['dbAlias']})";
                 $append = TRUE;
               }
               else {

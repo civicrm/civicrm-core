@@ -179,4 +179,168 @@ class CRM_Report_FormTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Test whereClause quotes T_TEXT and T_LONGTEXT fields to prevent SQL injection.
+   */
+  public function testWhereClauseQuotesTextFields(): void {
+    $form = new CRM_Report_Form();
+
+    // T_TEXT with eq operator
+    $field = [
+      'name' => 'details',
+      'dbAlias' => 'civicrm_activity.details',
+      'type' => CRM_Utils_Type::T_TEXT,
+    ];
+    $clause = $form->whereClause($field, 'eq', 'NULL OR 1=1', NULL, NULL);
+    $this->assertEquals("( civicrm_activity.details = 'NULL OR 1=1' )", $clause);
+
+    // T_LONGTEXT with neq operator and single quote
+    $fieldLong = [
+      'name' => 'body',
+      'dbAlias' => 'civicrm_email.body',
+      'type' => CRM_Utils_Type::T_LONGTEXT,
+    ];
+    $clause = $form->whereClause($fieldLong, 'neq', "foo' OR 1=1 --", NULL, NULL);
+    $this->assertEquals("( civicrm_email.body != 'foo\' OR 1=1 --' )", $clause);
+
+    // T_TEXT with in operator
+    $clause = $form->whereClause($field, 'in', 'NULL) OR (1=1,second', NULL, NULL);
+    $this->assertEquals("( ( civicrm_activity.details IN ( 'NULL) OR (1=1' , 'second') ) )", $clause);
+
+    // T_TEXT with between operator
+    $clause = $form->whereClause($field, 'bw', NULL, 'aaa', 'zzz');
+    $this->assertEquals("( civicrm_activity.details >= 'aaa' ) AND ( civicrm_activity.details <= 'zzz' )", $clause);
+  }
+
+  /**
+   * Test whereClause validates integer values for 'in' / 'notin' filters.
+   */
+  public function testWhereClauseValidatesInteger(): void {
+    $form = new CRM_Report_Form();
+
+    $field = [
+      'name' => 'event_id',
+      'dbAlias' => 'civicrm_participant.event_id',
+      'type' => CRM_Utils_Type::T_INT,
+    ];
+
+    // Valid integer list as string
+    $clause = $form->whereClause($field, 'in', '1, 2, 3', NULL, NULL);
+    $this->assertEquals('( civicrm_participant.event_id IN (1, 2, 3) )', $clause);
+
+    // Valid integer list as array
+    $clause = $form->whereClause($field, 'in', [1, 2, 3], NULL, NULL);
+    $this->assertEquals('( civicrm_participant.event_id IN (1, 2, 3) )', $clause);
+
+    // SQL injection attempt throws exception
+    $this->expectException(CRM_Core_Exception::class);
+    $form->whereClause($field, 'in', '0) OR (1=1', NULL, NULL);
+  }
+
+  /**
+   * Test whereClause validates integer array for 'in' / 'notin' filters.
+   */
+  public function testWhereClauseValidatesIntegerArray(): void {
+    $form = new CRM_Report_Form();
+    $field = [
+      'name' => 'event_id',
+      'dbAlias' => 'civicrm_participant.event_id',
+      'type' => CRM_Utils_Type::T_INT,
+    ];
+    $this->expectException(CRM_Core_Exception::class);
+    $form->whereClause($field, 'in', ['0) OR (1=1'], NULL, NULL);
+  }
+
+  /**
+   * Test whereSubtypeClause escapes strings to prevent injection and does not double-escape via whereClause.
+   */
+  public function testWhereSubtypeClauseEscaping(): void {
+    $form = new CRM_Report_Form();
+    $field = [
+      'name' => 'contact_sub_type',
+      'dbAlias' => 'civicrm_contact.contact_sub_type',
+      'type' => CRM_Utils_Type::T_STRING,
+    ];
+
+    $sep = CRM_Core_DAO::VALUE_SEPARATOR;
+    $clause = $form->whereSubtypeClause($field, ["' OR '1'='1"], 'in');
+    $this->assertEquals("( ( civicrm_contact.contact_sub_type LIKE '%{$sep}\' OR \'1\'=\'1{$sep}%' ) )", $clause);
+
+    $clauseFromWhereClause = $form->whereClause($field, 'in', ["' OR '1'='1"], NULL, NULL);
+    $this->assertEquals("( ( civicrm_contact.contact_sub_type LIKE '%{$sep}\' OR \'1\'=\'1{$sep}%' ) )", $clauseFromWhereClause);
+  }
+
+  /**
+   * Test tag and membership where clauses sanitize integer inputs.
+   */
+  public function testEntityFilterClausesSanitizeIntegers(): void {
+    $form = new CRM_Report_Form();
+    $form->_aliases = [
+      'civicrm_contact' => 'civicrm_contact',
+      'civicrm_tag' => 'civicrm_tag',
+    ];
+
+    $field = ['dbAlias' => 'civicrm_entity_tag.tag_id'];
+
+    // Valid integer produces valid clause
+    $clause = $form->whereTagClause($field, '1, 2', 'in');
+    $this->assertStringContainsString('civicrm_entity_tag.tag_id IN (1, 2)', $clause);
+
+    // Injection attempt throws exception
+    try {
+      $form->whereTagClause($field, '0) OR (1=1', 'in');
+      $this->fail('Expected CRM_Core_Exception for whereTagClause injection');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertTrue(TRUE);
+    }
+
+    try {
+      $form->whereMembershipOrgClause('0) OR (1=1', 'in');
+      $this->fail('Expected CRM_Core_Exception for whereMembershipOrgClause injection');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertTrue(TRUE);
+    }
+
+    try {
+      $form->whereMembershipTypeClause('0) OR (1=1', 'in');
+      $this->fail('Expected CRM_Core_Exception for whereMembershipTypeClause injection');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertTrue(TRUE);
+    }
+  }
+
+  /**
+   * Test storeOrderByArray validates order direction.
+   */
+  public function testStoreOrderByArrayValidatesDirection(): void {
+    $form = new CRM_Report_Form_Activity();
+    $form->setParams([
+      'order_bys' => [
+        1 => [
+          'column' => 'activity_date_time',
+          'order' => 'ASC, (SELECT 1)',
+        ],
+      ],
+    ]);
+
+    $this->expectException(CRM_Core_Exception::class);
+    $form->storeOrderByArray();
+  }
+
+  /**
+   * Test Event_Summary::getEventFilter sanitizes event IDs.
+   */
+  public function testEventSummaryGetEventFilterSanitizesIntegers(): void {
+    $form = new CRM_Report_Form_Event_Summary();
+    $form->setParams(['id_value' => '1, 2']);
+    $this->assertEquals(' AND civicrm_participant.event_id IN ( 1,2) ', $form->getEventFilter());
+
+    $form->setParams(['id_value' => '0) OR (1=1']);
+    $this->expectException(CRM_Core_Exception::class);
+    $form->getEventFilter();
+  }
+
 }

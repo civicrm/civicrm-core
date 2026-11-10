@@ -55,7 +55,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
    * @param array $eventIDs
    */
   public function buildEventReport($eventIDs) {
-
+    $eventIDs = CRM_Utils_Type::escapeAll(array_map(fn($v) => is_string($v) ? trim($v) : $v, (array) $eventIDs), 'Integer');
     $this->assign('events', $eventIDs);
     $this->eventIDs = $eventIDs;
     $eventID = implode(',', $this->eventIDs);
@@ -285,6 +285,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
     elseif (!is_array($this->_params['id_value'])) {
       $this->_params['id_value'] = explode(',', $this->_params['id_value']);
     }
+    $this->_params['id_value'] = CRM_Utils_Type::escapeAll(array_map(fn($v) => is_string($v) ? trim($v) : $v, (array) $this->_params['id_value']), 'Integer');
 
     $this->_rowsFound = count($this->_params['id_value']);
 

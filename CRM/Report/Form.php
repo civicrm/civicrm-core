@@ -2055,6 +2055,11 @@ class CRM_Report_Form extends CRM_Core_Form {
     if (!$type) {
       trigger_error('Type is not defined for field ' . $field['name'], E_USER_WARNING);
     }
+    $isText = in_array($field['type'] ?? NULL, [
+      CRM_Utils_Type::T_STRING,
+      CRM_Utils_Type::T_TEXT,
+      CRM_Utils_Type::T_LONGTEXT,
+    ], TRUE) || in_array($type, ['String', 'Text'], TRUE);
     $clause = NULL;
 
     switch ($op) {
@@ -2066,6 +2071,9 @@ class CRM_Report_Form extends CRM_Core_Form {
           $clauses = [];
           if ($min) {
             $min = CRM_Utils_Type::escape($min, $type);
+            if ($isText) {
+              $min = "'{$min}'";
+            }
             if ($op == 'bw') {
               $clauses[] = "( {$field['dbAlias']} >= $min )";
             }
@@ -2075,6 +2083,9 @@ class CRM_Report_Form extends CRM_Core_Form {
           }
           if ($max) {
             $max = CRM_Utils_Type::escape($max, $type);
+            if ($isText) {
+              $max = "'{$max}'";
+            }
             if ($op == 'bw') {
               $clauses[] = "( {$field['dbAlias']} <= $max )";
             }
@@ -2097,15 +2108,15 @@ class CRM_Report_Form extends CRM_Core_Form {
       case 'has':
       case 'nhas':
         if ($value !== NULL && strlen($value) > 0) {
-          $value = CRM_Utils_Type::escape($value, $type);
-          if (!str_contains($value, '%')) {
-            $value = "'%{$value}%'";
+          $escapedValue = CRM_Utils_Type::escape($value, $type);
+          if (!str_contains($escapedValue, '%')) {
+            $escapedValue = "'%{$escapedValue}%'";
           }
           else {
-            $value = "'{$value}'";
+            $escapedValue = "'{$escapedValue}'";
           }
           $sqlOP = $this->getSQLOperator($op);
-          $clause = "( {$field['dbAlias']} $sqlOP $value )";
+          $clause = "( {$field['dbAlias']} $sqlOP $escapedValue )";
         }
         break;
 
@@ -2115,21 +2126,22 @@ class CRM_Report_Form extends CRM_Core_Form {
           $value = explode(',', $value);
         }
         if ($value !== NULL && is_array($value) && count($value) > 0) {
+          $value = array_filter(array_map(fn($v) => is_string($v) ? trim($v) : $v, $value), fn($v) => !CRM_Utils_System::isNull($v));
+        }
+        if (!empty($value)) {
           $sqlOP = $this->getSQLOperator($op);
-          if (($field['type'] ?? NULL) ==
-            CRM_Utils_Type::T_STRING
-          ) {
-            //cycle through selections and escape values
-            foreach ($value as $key => $selection) {
-              $value[$key] = CRM_Utils_Type::escape($selection, $type);
-            }
+          $escapedValues = [];
+          foreach ($value as $key => $selection) {
+            $escapedValues[$key] = CRM_Utils_Type::escape($selection, $type);
+          }
+          if ($isText) {
             $clause
-              = "( {$field['dbAlias']} $sqlOP ( '" . implode("' , '", $value) .
+              = "( {$field['dbAlias']} $sqlOP ( '" . implode("' , '", $escapedValues) .
               "') )";
           }
           else {
             // for numerical values
-            $clause = "{$field['dbAlias']} $sqlOP (" . implode(', ', $value) .
+            $clause = "{$field['dbAlias']} $sqlOP (" . implode(', ', $escapedValues) .
               ")";
           }
           if ($op == 'notin') {
@@ -2145,9 +2157,9 @@ class CRM_Report_Form extends CRM_Core_Form {
       case 'mnot':
         // multiple has or multiple not
         if ($value !== NULL && count($value) > 0) {
-          $value = CRM_Utils_Type::escapeAll($value, $type);
+          $escapedValues = CRM_Utils_Type::escapeAll((array) $value, $type);
           $operator = $op == 'mnot' ? 'NOT' : '';
-          $regexp = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', (array) $value) . "([[:cntrl:]]|$)";
+          $regexp = "([[:cntrl:]]|^)" . implode('([[:cntrl:]]|$)|([[:cntrl:]]|^)', $escapedValues) . "([[:cntrl:]]|$)";
           $clause = "{$field['dbAlias']} {$operator} REGEXP '{$regexp}'";
         }
         break;
@@ -2155,25 +2167,25 @@ class CRM_Report_Form extends CRM_Core_Form {
       case 'sw':
       case 'ew':
         if ($value !== NULL && strlen($value) > 0) {
-          $value = CRM_Utils_Type::escape($value, $type);
-          if (!str_contains($value, '%')) {
+          $escapedValue = CRM_Utils_Type::escape($value, $type);
+          if (!str_contains($escapedValue, '%')) {
             if ($op == 'sw') {
-              $value = "'{$value}%'";
+              $escapedValue = "'{$escapedValue}%'";
             }
             else {
-              $value = "'%{$value}'";
+              $escapedValue = "'%{$escapedValue}'";
             }
           }
           else {
-            $value = "'{$value}'";
+            $escapedValue = "'{$escapedValue}'";
           }
           $sqlOP = $this->getSQLOperator($op);
-          $clause = "( {$field['dbAlias']} $sqlOP $value )";
+          $clause = "( {$field['dbAlias']} $sqlOP $escapedValue )";
         }
         break;
 
       case 'nll':
-        if ($type == 'String') {
+        if ($isText) {
           $sqlOP = $this->getSQLOperator($op);
           $clause = "( {$field['dbAlias']} $sqlOP OR {$field['dbAlias']} = '' )";
         }
@@ -2184,7 +2196,7 @@ class CRM_Report_Form extends CRM_Core_Form {
         break;
 
       case 'nnll':
-        if ($type == 'String') {
+        if ($isText) {
           $sqlOP = $this->getSQLOperator($op);
           $clause = "( {$field['dbAlias']} $sqlOP AND {$field['dbAlias']} <> '' )";
         }
@@ -2210,12 +2222,12 @@ class CRM_Report_Form extends CRM_Core_Form {
             $clause = $field['clause'];
           }
           elseif (!is_array($value)) {
-            $value = CRM_Utils_Type::escape($value, $type);
+            $escapedValue = CRM_Utils_Type::escape($value, $type);
             $sqlOP = $this->getSQLOperator($op);
-            if ($field['type'] == CRM_Utils_Type::T_STRING) {
-              $value = "'{$value}'";
+            if ($isText) {
+              $escapedValue = "'{$escapedValue}'";
             }
-            $clause = "( {$field['dbAlias']} $sqlOP $value )";
+            $clause = "( {$field['dbAlias']} $sqlOP $escapedValue )";
           }
         }
         break;
@@ -2272,7 +2284,11 @@ class CRM_Report_Form extends CRM_Core_Form {
     }
     else {
       $subclauses = [];
+      if (!is_array($value)) {
+        $value = explode(',', $value);
+      }
       foreach ($value as $item) {
+        $item = CRM_Core_DAO::escapeString($item);
         $subclauses[] = "( {$field['dbAlias']} $sqlOp '%" . CRM_Core_DAO::VALUE_SEPARATOR . $item . CRM_Core_DAO::VALUE_SEPARATOR . "%' )";
       }
       $clause = implode($clauseSeparator, $subclauses);
@@ -3168,16 +3184,17 @@ class CRM_Report_Form extends CRM_Core_Form {
         }
 
         if (!empty($orderByField)) {
+          $orderDirection = !empty($orderBy['order']) ? CRM_Utils_Type::escape($orderBy['order'], 'MysqlOrderByDirection') : '';
           $this->_orderByFields[$orderByField['tplField']] = $orderByField;
           if ($this->groupConcatTested) {
-            $orderBys[$orderByField['tplField']] = "{$orderByField['tplField']} {$orderBy['order']}";
+            $orderBys[$orderByField['tplField']] = "{$orderByField['tplField']} {$orderDirection}";
           }
           else {
             // Not sure when this is preferable to using tplField (which has
             // definitely been tested to work in cases then this does not.
             // in caution not switching unless report has been tested for
             // group concat functionality.
-            $orderBys[$orderByField['tplField']] = "{$orderByField['dbAlias']} {$orderBy['order']}";
+            $orderBys[$orderByField['tplField']] = "{$orderByField['dbAlias']} {$orderDirection}";
           }
 
           // Record any section headers for assignment to the template
@@ -3801,8 +3818,9 @@ class CRM_Report_Form extends CRM_Core_Form {
 
     $sqlOp = $this->getSQLOperator($op);
     if (!is_array($value)) {
-      $value = [$value];
+      $value = explode(',', $value);
     }
+    $value = CRM_Utils_Type::escapeAll(array_map(fn($v) => is_string($v) ? trim($v) : $v, $value), 'Integer');
     //include child groups if any
     $value = array_merge($value, CRM_Contact_BAO_Group::getChildGroupIds($value));
 
@@ -3852,7 +3870,7 @@ class CRM_Report_Form extends CRM_Core_Form {
       return;
     }
     $this->groupTempTable = $this->createTemporaryTable('groups', 'contact_id INT', TRUE);
-    $filteredGroups = (array) $this->_params['gid_value'];
+    $filteredGroups = CRM_Utils_Type::escapeAll(array_map(fn($v) => is_string($v) ? trim($v) : $v, (array) $this->_params['gid_value']), 'Integer');
     CRM_Contact_BAO_GroupContactCache::populateTemporaryTableWithContactsInGroups($filteredGroups, $this->groupTempTable);
     CRM_Core_DAO::executeQuery("ALTER TABLE $this->groupTempTable ADD INDEX contact_id(contact_id)");
   }
@@ -3885,8 +3903,9 @@ class CRM_Report_Form extends CRM_Core_Form {
     // entries.
     $sqlOp = $this->getSQLOperator($op);
     if (!is_array($value)) {
-      $value = [$value];
+      $value = explode(',', $value);
     }
+    $value = CRM_Utils_Type::escapeAll(array_map(fn($v) => is_string($v) ? trim($v) : $v, $value), 'Integer');
     $clause = "{$field['dbAlias']} IN (" . implode(', ', $value) . ")";
     $entity_table = $this->_tagFilterTable;
     return " {$this->_aliases[$entity_table]}.id {$sqlOp} (
@@ -3906,8 +3925,9 @@ class CRM_Report_Form extends CRM_Core_Form {
   public function whereMembershipOrgClause($value, $op) {
     $sqlOp = $this->getSQLOperator($op);
     if (!is_array($value)) {
-      $value = [$value];
+      $value = explode(',', $value);
     }
+    $value = CRM_Utils_Type::escapeAll(array_map(fn($v) => is_string($v) ? trim($v) : $v, $value), 'Integer');
 
     $tmp_membership_org_sql_list = implode(', ', $value);
     return " {$this->_aliases['civicrm_contact']}.id {$sqlOp} (
@@ -3934,8 +3954,9 @@ class CRM_Report_Form extends CRM_Core_Form {
   public function whereMembershipTypeClause($value, $op) {
     $sqlOp = $this->getSQLOperator($op);
     if (!is_array($value)) {
-      $value = [$value];
+      $value = explode(',', $value);
     }
+    $value = CRM_Utils_Type::escapeAll(array_map(fn($v) => is_string($v) ? trim($v) : $v, $value), 'Integer');
 
     $tmp_membership_sql_list = implode(', ', $value);
     return " {$this->_aliases['civicrm_contact']}.id {$sqlOp} (
@@ -6052,8 +6073,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ) {
         $op = $this->_params["{$fieldName}_op"] ?? NULL;
         $value = $this->_params["{$fieldName}_value"] ?? NULL;
+        if ((is_string($value) || is_numeric($value)) && strlen($value)) {
+          $value = explode(',', $value);
+        }
         if (is_array($value) && !empty($value)) {
-          return "(month({$field['dbAlias']}) $op (" . implode(', ', $value) .
+          $sqlOp = $this->getSQLOperator($op);
+          $value = CRM_Utils_Type::escapeAll(array_map(fn($v) => is_string($v) ? trim($v) : $v, $value), 'Integer');
+          return "(month({$field['dbAlias']}) $sqlOp (" . implode(', ', $value) .
             '))';
         }
       }

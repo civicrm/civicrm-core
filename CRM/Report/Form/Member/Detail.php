@@ -349,7 +349,11 @@ HERESQL;
       $clauseParts = [];
       switch ($op) {
         case 'in':
+          if ((is_string($value) || is_numeric($value)) && strlen($value)) {
+            $value = explode(',', $value);
+          }
           if ($value !== NULL && is_array($value) && count($value) > 0) {
+            $value = CRM_Utils_Type::escapeAll(array_map(fn($v) => is_string($v) ? trim($v) : $v, $value), 'Integer');
             $regularOptions = implode(', ', array_diff($value, [0, -1]));
             // None: is null
             if (in_array(0, $value)) {
@@ -372,7 +376,11 @@ HERESQL;
           return;
 
         case 'notin':
+          if ((is_string($value) || is_numeric($value)) && strlen($value)) {
+            $value = explode(',', $value);
+          }
           if ($value !== NULL && is_array($value) && count($value) > 0) {
+            $value = CRM_Utils_Type::escapeAll(array_map(fn($v) => is_string($v) ? trim($v) : $v, $value), 'Integer');
             $regularOptions = implode(', ', array_diff($value, [0, -1]));
             // None: is not null
             if (in_array(0, $value)) {
