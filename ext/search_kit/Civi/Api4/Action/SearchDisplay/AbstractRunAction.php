@@ -1872,14 +1872,15 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return string
    */
   protected function getJoinFromAlias(string $alias) {
+    $matchedJoin = '';
     $result = '';
     foreach ($this->_apiParams['join'] ?? [] as $join) {
       $joinName = explode(' AS ', $join[0])[1];
-      if (str_starts_with($alias, $joinName)) {
-        $parsed = $joinName . '.' . substr($alias, strlen($joinName) + 1);
+      if (str_starts_with($alias, $joinName . '_')) {
         // Ensure we are using the longest match
-        if (strlen($parsed) > strlen($result)) {
-          $result = $parsed;
+        if (strlen($joinName) > strlen($matchedJoin)) {
+          $matchedJoin = $joinName;
+          $result = $joinName . '.' . substr($alias, strlen($joinName) + 1);
         }
       }
     }
