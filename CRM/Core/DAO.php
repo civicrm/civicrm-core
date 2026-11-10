@@ -694,7 +694,14 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return array
    */
   public static function getSupportedFields($checkPermissions = FALSE) {
-    $fields = array_column((array) static::fields(), NULL, 'name');
+    // Call CRM_Core_DAO_Base::getSchemaFields directly if available
+    if (is_callable([static::class, 'getSchemaFields'])) {
+      $fields = static::getSchemaFields();
+    }
+    // Legacy fallback for EFv1 DAOs
+    else {
+      $fields = array_column((array) static::fields(), NULL, 'name');
+    }
 
     // Exclude fields yet not added by pending upgrades
     $dbVer = \CRM_Core_BAO_Domain::version();
