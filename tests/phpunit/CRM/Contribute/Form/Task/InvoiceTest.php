@@ -267,4 +267,47 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     return (int) $this->callAPISuccess('Contribution', 'create', $contributionParams)['id'];
   }
 
+  public function testPDFGenerationPermissionChecks(): void {
+    $params = [
+      'output' => 'pdf_invoice',
+      'forPage' => 1,
+    ];
+
+    $contactID = $this->individualCreate();
+    $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $contactID,
+      'street_address' => '9 Downing Street',
+      'state_province_id' => 'Maine',
+      'supplemental_address_1' => 'Back Alley',
+      'supplemental_address_2' => 'Left corner',
+      'postal_code' => '90990',
+      'city' => 'Auckland',
+      'country_id' => 'US',
+    ]);
+    $contributionParams = [
+      'contact_id' => $contactID,
+      'total_amount' => 100,
+      'financial_type_id' => 'Donation',
+      'source' => 'Donor gift',
+    ];
+    $result = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $loggedInContactID = $this->createLoggedInUser();
+    $this->setPermissions(['view my invoices']);
+    $form = $this->getTestForm('CRM_Contribute_Form_Task_Invoice', $params, ['id' => $result['id'], 'cid' => $loggedInContactID]);
+    try {
+      $form->processForm(\Civi\Test\FormWrapper::VALIDATED);
+    }
+    catch (\CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertStringContainsString('Cannot generate invoices for these contributions. Select only your own contributions', $e->getMessage());
+    }
+    $this->setPermissions(['access CiviContribute']);
+    $form->processForm();
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $result['id'],
+      'contact_id' => $loggedInContactID,
+    ]);
+    $this->setPermissions(['view my invoices']);
+    $form->processForm();
+  }
+
 }
