@@ -480,7 +480,6 @@ class CRM_Core_BAO_CustomValueTable {
    *                                   is set the entityType is ignored
    *
    * @param bool $formatMultiRecordField
-   * @param array $DTparams - FIXME only used for legacy datatable; replace with SearchKit and remove
    *
    * @return array
    *   Array of custom values for the entity with key=>value
@@ -488,7 +487,7 @@ class CRM_Core_BAO_CustomValueTable {
    *                                   Empty array if no custom values found.
    * @throws CRM_Core_Exception
    */
-  public static function getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE, $DTparams = NULL) {
+  public static function getEntityValues($entityID, $entityType = NULL, $fieldIDs = NULL, $formatMultiRecordField = FALSE) {
     if (!$entityID) {
       // adding this here since an empty contact id could have serious repurcussions
       // like looping forever
@@ -502,14 +501,6 @@ class CRM_Core_BAO_CustomValueTable {
     // If no entity or field ids given, assume "Contact"
     elseif (empty($fieldIDs)) {
       $cond['extends'] = 'Contact';
-    }
-
-    $limit = $orderBy = '';
-    if (!empty($DTparams['rowCount']) && $DTparams['rowCount'] > 0) {
-      $limit = " LIMIT " . CRM_Utils_Type::escape($DTparams['offset'], 'Integer') . ", " . CRM_Utils_Type::escape($DTparams['rowCount'], 'Integer');
-    }
-    if (!empty($DTparams['sort'])) {
-      $orderBy = ' ORDER BY ' . CRM_Utils_Type::escape($DTparams['sort'], 'MysqlOrderBy');
     }
 
     // First find all the fields that extend this type of entity.
@@ -532,23 +523,10 @@ class CRM_Core_BAO_CustomValueTable {
       }
     }
 
-    $result = $sortedResult = [];
+    $result = [];
     foreach ($select as $tableName => $clauses) {
-      if (!empty($DTparams['sort'])) {
-        $query = CRM_Core_DAO::executeQuery("SELECT id FROM {$tableName} WHERE entity_id = {$entityID}");
-        $count = 1;
-        while ($query->fetch()) {
-          $sortedResult["{$query->id}"] = $count;
-          $count++;
-        }
-      }
-
-      $query = "SELECT id, " . implode(', ', $clauses) . " FROM $tableName WHERE entity_id = $entityID {$orderBy} {$limit}";
+      $query = "SELECT id, " . implode(', ', $clauses) . " FROM $tableName WHERE entity_id = $entityID";
       $dao = CRM_Core_DAO::executeQuery($query);
-      if (!empty($DTparams)) {
-        // FIXME: Remove this entirely after switching the old custom datatable to SearchKit
-        $result['count'] = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM $tableName WHERE entity_id = $entityID");
-      }
       while ($dao->fetch()) {
         foreach ($fields[$tableName] as $fieldID) {
           $fieldName = "custom_{$fieldID}";
@@ -565,9 +543,6 @@ class CRM_Core_BAO_CustomValueTable {
           }
         }
       }
-    }
-    if (!empty($sortedResult)) {
-      $result['sortedResult'] = $sortedResult;
     }
     return $result;
   }

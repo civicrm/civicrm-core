@@ -1448,6 +1448,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
             $details[$groupID][$values['id']]['collapse_display'] = $group['collapse_display'] ?? NULL;
             $details[$groupID][$values['id']]['collapse_adv_display'] = $group['collapse_adv_display'] ?? NULL;
             $details[$groupID][$values['id']]['style'] = $group['style'] ?? NULL;
+            $details[$groupID][$values['id']]['extends'] = $group['extends'] ?? NULL;
+            $details[$groupID][$values['id']]['is_multiple'] = $group['is_multiple'] ?? NULL;
             $details[$groupID][$values['id']]['fields'][$k] = [
               'field_title' => $properties['label'] ?? NULL,
               'field_type' => $properties['html_type'] ?? NULL,
@@ -1488,6 +1490,14 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
           $details[$groupID][0]['collapse_display'] = $group['collapse_display'] ?? NULL;
           $details[$groupID][0]['collapse_adv_display'] = $group['collapse_adv_display'] ?? NULL;
           $details[$groupID][0]['style'] = $group['style'] ?? NULL;
+          $details[$groupID][0]['extends'] = $group['extends'] ?? NULL;
+          $details[$groupID][0]['is_multiple'] = $group['is_multiple'] ?? NULL;
+          if (!isset($details[$groupID][0]['editable'])) {
+            $details[$groupID][0]['editable'] = FALSE;
+          }
+          if (empty($properties['is_view']) && in_array($key, $editableGroups)) {
+            $details[$groupID][0]['editable'] = TRUE;
+          }
           $details[$groupID][0]['fields'][$k] = ['field_title' => $properties['label'] ?? NULL];
         }
       }
@@ -1509,7 +1519,6 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     }
     else {
       $form->addExpectedSmartyVariables([
-        'multiRecordDisplay',
         'groupId',
         'skipTitle',
       ]);

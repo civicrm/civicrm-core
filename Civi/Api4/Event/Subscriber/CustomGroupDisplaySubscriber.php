@@ -9,23 +9,22 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\AdminUI;
+namespace Civi\Api4\Event\Subscriber;
 
 use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\PostEvent;
-use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 /**
- * Add SearchKit/FormBuilder displays for CustomGroups
+ * Add SearchKit displays for CustomGroups
  *
  * @see \Civi\Api4\Action\CustomGroup\GetSearchKit
  */
-class CustomGroupDisplays {
+class CustomGroupDisplaySubscriber {
 
   #[CiviEventListener(event: 'hook_civicrm_managed', priority: \Civi\API\Events::W_EARLY)]
   public function registerSearchKits(GenericHookEvent $e): void {
-    if ($e->modules && !in_array(E::LONG_NAME, $e->modules, TRUE)) {
+    if ($e->modules && !in_array('civicrm', $e->modules, TRUE)) {
       return;
     }
 
@@ -82,12 +81,12 @@ class CustomGroupDisplays {
       //   (the search might be a bit broken if the group has been deleted - but this
       //   is not uncommon with searchkits)
       \Civi\Api4\Managed::delete(FALSE)
-        ->addWhere('module', '=', E::LONG_NAME)
+        ->addWhere('module', 'IN', ['civicrm', 'civicrm_admin_ui'])
         ->addWhere('name', 'IN', ["SavedSearch_Custom_{$groupName}_Search", "SavedSearch_Custom_{$groupName}_Search_SearchDisplay_Custom_{$groupName}_Tab"])
         ->execute();
       \Civi\Api4\SavedSearch::delete(FALSE)
         ->addWhere('name', '=', "Custom_{$groupName}_Search")
-        ->addWhere('base_module', '=', E::LONG_NAME)
+        ->addWhere('base_module', 'IN', ['civicrm', 'civicrm_admin_ui'])
         ->addWhere('local_modified_date', 'IS EMPTY')
         ->execute();
       return;
@@ -106,21 +105,6 @@ class CustomGroupDisplays {
       ->execute()
       ->first()['name'] ?? NULL;
     $this->reconcileGroup($groupName);
-  }
-
-  /**
-   * @param \Civi\Core\Event\GenericHookEvent $event
-   */
-  #[CiviEventListener(event: 'civi.api4.entityTypes', priority: \Civi\API\Events::W_LATE)]
-  public function addCustomGroupLinks(GenericHookEvent $event) {
-    foreach ($event->entities as $name => $entity) {
-      if (str_starts_with($name, 'Custom_')) {
-        $groupName = substr($name, 7);
-        $event->entities[$name]['paths']['add'] = "civicrm/af/custom/{$groupName}/create#?entity_id=[entity_id]";
-        $event->entities[$name]['paths']['update'] = "civicrm/af/custom/{$groupName}/update#?Record=[id]";
-        $event->entities[$name]['paths']['view'] = "civicrm/af/custom/{$groupName}/view#?Record=[id]";
-      }
-    }
   }
 
 }

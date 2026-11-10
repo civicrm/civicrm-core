@@ -1,26 +1,24 @@
 <?php
-namespace api\v4\AdminUi;
 
-use Civi\Test\HeadlessInterface;
+namespace api\v4\Custom;
+
+use api\v4\Api4TestBase;
+use Civi\Test\CiviEnvBuilder;
 
 /**
  * @group headless
  */
-class CustomGroupDisplaysTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface {
-  use \Civi\Test\Api4TestTrait;
+class CustomGroupDisplaysTest extends Api4TestBase {
 
-  public function setUpHeadless() {
-    return \Civi\Test::headless()
-      ->installMe(__DIR__)
+  public function setUpHeadless(): CiviEnvBuilder {
+    $env = \Civi\Test::headless()
+      ->install(['org.civicrm.search_kit'])
       ->apply();
+    $this->applyComponentSettings();
+    return $env;
   }
 
-  public function tearDown(): void {
-    $this->conditionallyDeleteTestRecords();
-    parent::tearDown();
-  }
-
-  public function testGetSearchKit() {
+  public function testGetSearchKit(): void {
     $this->createTestRecord('CustomGroup', [
       'title' => __FUNCTION__,
       'extends' => 'Contact',
