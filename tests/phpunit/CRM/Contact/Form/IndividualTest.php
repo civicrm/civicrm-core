@@ -1,6 +1,6 @@
 <?php
 
-use Civi\Api4\OptionValue;
+use Civi\Api4\Setting;
 
 /**
  * Class CRM_Contact_Form_IndividualTest
@@ -126,13 +126,13 @@ class CRM_Contact_Form_IndividualTest extends CiviUnitTestCase {
   public function testLegalNameFollowsContactEditOptions(): void {
     $this->assertStringNotContainsString('<label for="legal_name">', $this->renderNewIndividualForm());
 
-    $legalNameOption = OptionValue::get(FALSE)
-      ->addWhere('option_group_id:name', '=', 'contact_edit_options')
-      ->addWhere('name', '=', 'Legal Name')
-      ->execute()->single();
-    $editOptions = Civi::settings()->get('contact_edit_options');
-    $editOptions[] = $legalNameOption['value'];
-    Civi::settings()->set('contact_edit_options', $editOptions);
+    $editOptions = Setting::get(FALSE)
+      ->addSelect('contact_edit_options:name')
+      ->execute()->first()['value'];
+    $editOptions[] = 'Legal Name';
+    Setting::set(FALSE)
+      ->addValue('contact_edit_options:name', $editOptions)
+      ->execute();
 
     $this->assertStringContainsString('<label for="legal_name">', $this->renderNewIndividualForm());
   }
