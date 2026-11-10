@@ -100,12 +100,16 @@ CRM.$(function($) {
   // Add change/init callbacks for specific fields (each() fires the callback on page load)
   $('input[name=extends], input[name=extends_entity_column_id]', $form).change(onChangeEntityId);
   $('input[name=extends]', $form).change(handleExtends).each(handleExtends);
-  $('input[name=extends_entity_column_id]', $form).each(onChangeEntityId);
   $('input#is_multiple', $form).change(handleMultiple).change(onChangeMultiple).each(handleMultiple);
   $('select[name=style]', $form).change(handleStyle).each(handleStyle);
+  handleEntityColumnValue();
 
   // When changing primary `extends` or secondary `entityColumnIdOptions`
   function onChangeEntityId() {
+    // When changing the `extends` field
+    if ($(this).is('input[name=extends]')) {
+      $('[name=extends_entity_column_id]', $form).val('');
+    }
     const values = {
       extends: $('[name=extends]', $form).val(),
     };
@@ -115,10 +119,6 @@ CRM.$(function($) {
     }
     let columnIdOptions = values.extends && entityColumnIdOptions[values.extends];
     const valueColumnIsActive = $('[type=text][name=extends_entity_column_value]', $form).length;
-    // When changing the `extends` field
-    if ($(this).is('input[name=extends]')) {
-      $('[name=extends_entity_column_id]', $form).val('');
-    }
     if (columnIdOptions) {
       $('.field-extends_entity_column_id', $form).show();
       // Only render if type=text (if field is frozen then type=hidden)
@@ -128,12 +128,7 @@ CRM.$(function($) {
     } else {
       $('.field-extends_entity_column_id', $form).hide();
     }
-    // Make value required if id is selected
-    if (columnIdOptions && valueColumnIsActive && entityColumnIdVal) {
-      $('[type=text][name=extends_entity_column_value]', $form).addClass('required').attr('placeholder', ts('Select'));
-    } else if (valueColumnIsActive) {
-      $('[type=text][name=extends_entity_column_value]', $form).removeClass('required').attr('placeholder', ts('Any'));
-    }
+    handleEntityColumnValue();
     if (
       values.extends &&
       (values.extends_entity_column_id || !columnIdOptions) &&
@@ -163,7 +158,23 @@ CRM.$(function($) {
         }
       });
     } else {
+      $('[name=extends_entity_column_value]', $form).val('');
       $('.field-extends_entity_column_value', $form).hide();
+    }
+  }
+
+  // Set required status and placeholder for `extends_entity_column_value` based on `extends_entity_column_id`
+  function handleEntityColumnValue() {
+    const extendsVal = $('[name=extends]', $form).val();
+    const columnIdOptions = extendsVal && entityColumnIdOptions[extendsVal];
+    const entityColumnIdVal = $('[name=extends_entity_column_id]', $form).val();
+    const valueColumnIsActive = $('[type=text][name=extends_entity_column_value]', $form).length;
+
+    // Make value required if id is selected
+    if (columnIdOptions && valueColumnIsActive && entityColumnIdVal) {
+      $('[type=text][name=extends_entity_column_value]', $form).addClass('required').attr('placeholder', ts('Select'));
+    } else if (valueColumnIsActive) {
+      $('[type=text][name=extends_entity_column_value]', $form).removeClass('required').attr('placeholder', ts('Any'));
     }
   }
 
