@@ -121,6 +121,21 @@ describe('civi-search-display', function() {
     expect(onTotalCount).toHaveBeenCalledWith(2);
   });
 
+  it('sends the name of the af-form it is placed directly in', async function() {
+    var afForm = document.createElement('af-form');
+    angular.element(afForm).data('$afFormController', {getFormMeta: () => ({name: 'submissionForm'})});
+    afForm.innerHTML = display;
+    container.appendChild(afForm);
+    await afForm.querySelector('test-civi-search-display').runSearch();
+    expect(JSON.parse(CRM.$.post.calls.mostRecent().args[1].calls).run[2].afform).toBe('submissionForm');
+  });
+
+  it('sends no form name outside any Afform', async function() {
+    container.innerHTML = display;
+    await container.querySelector('test-civi-search-display').runSearch();
+    expect(JSON.parse(CRM.$.post.calls.mostRecent().args[1].calls).run[2].afform).toBe(null);
+  });
+
   it('runs no search for a display that is not in the document', function() {
     var element = document.createElement('test-civi-search-display');
     element.setAttribute('filters', '{{ $ctrl.filters }}');

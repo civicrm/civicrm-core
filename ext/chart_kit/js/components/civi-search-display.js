@@ -256,6 +256,13 @@
       return Object.values(this.getAfformFilters()).some((value) => value !== undefined);
     }
 
+    // Name of the Afform this display is embedded in, which lets SearchDisplay.run
+    // apply the form's filters and permissions (including its secret-link token).
+    // A display placed directly in a submission form has no afFieldset, so fall back to the afForm.
+    getAfformName() {
+      return this.afFieldsetCtrl?.getFormName() ?? angular.element(this).controller('afForm')?.getFormMeta().name ?? null;
+    }
+
     // Generate params for the SearchDisplay.run api
     getApiParams(mode) {
       return {
@@ -266,7 +273,7 @@
         limit: this.limit,
         seed: this.uniqueId,
         filters: this.getFilters(),
-        afform: this.afFieldsetCtrl ? this.afFieldsetCtrl.getFormName() : null
+        afform: this.getAfformName()
       };
     }
 
