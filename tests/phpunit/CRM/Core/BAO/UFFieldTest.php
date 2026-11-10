@@ -173,8 +173,8 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->assertSame('Individual', $fields['first_name']['field_type']);
     $this->assertSame('Individual', $fields['birth_date']['field_type']);
 
-    $this->assertSame('organization_name', $fields['Organization']['organization_name']['name']);
-    $this->assertSame('legal_name', $fields['Contact']['legal_name']['name']);
+    $this->assertSame('Organization', $fields['organization_name']['field_type']);
+    $this->assertSame('Contact', $fields['legal_name']['field_type']);
 
     $this->assertSame('Contribution', $fields['amount_level']['field_type']);
     $this->assertSame('Contribution', $fields['cancel_reason']['field_type']);
