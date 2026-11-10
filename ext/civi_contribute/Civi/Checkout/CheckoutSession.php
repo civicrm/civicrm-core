@@ -337,7 +337,7 @@ class CheckoutSession {
     return (string) \Civi::url('civicrm/checkout/continue')
       ->setQuery(['session' => $this->tokenise()])
       ->setPreferFormat('absolute')
-      ->setScheme('current');
+      ->setScheme('default');
   }
 
   /**
