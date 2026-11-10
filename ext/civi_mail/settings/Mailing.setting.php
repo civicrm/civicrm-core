@@ -77,7 +77,7 @@ return [
     'title' => ts('Enable workflow support for CiviMail'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('Drupal-only. Rules module must be enabled (beta feature - use with caution).'),
+    'help_text' => ts('With this setting enabled, mailings must be approved before they are sent.'),
     'settings_pages' => ['mailing' => ['weight' => 40]],
   ],
   'civimail_server_wide_lock' => [

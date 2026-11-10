@@ -801,19 +801,6 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   /**
    * @inheritdoc
    */
-  public function mailingWorkflowIsEnabled():bool {
-    if (!module_exists('rules')) {
-      return FALSE;
-    }
-
-    $enableWorkflow = Civi::settings()->get('civimail_workflow');
-
-    return (bool) $enableWorkflow;
-  }
-
-  /**
-   * @inheritdoc
-   */
   public function getContactDetailsFromUser($uf_match):array {
     $contactParameters = [];
     $contactParameters['email'] = $uf_match['uniqId'];
