@@ -210,4 +210,16 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $this->assertFalse($rebuilt, 'rebuild() should skip a populated table');
   }
 
+  /**
+   * People seem very determined to blank out the admin console page.
+   */
+  public function testGetAdminLinksAfterSystemFlush(): void {
+    CRM_Core_Menu::clear();
+    CRM_Core_Menu::rebuild();
+    Civi::rebuild(['system' => TRUE])->execute();
+    $this->assertGreaterThan(0, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_menu'));
+    $links = CRM_Core_Menu::getAdminLinks();
+    $this->assertNotEmpty($links['System Settings']['fields'] ?? NULL);
+  }
+
 }
