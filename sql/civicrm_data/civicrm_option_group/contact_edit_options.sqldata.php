@@ -22,4 +22,5 @@ return CRM_Core_CodeGen_OptionGroup::create('contact_edit_options', 'a/0018')
     [ts('Middle Name'), 'Middle Name', 15, 'filter' => 2],
     [ts('Last Name'), 'Last Name', 16, 'filter' => 2],
     [ts('Suffix'), 'Suffix', 17, 'filter' => 2],
+    [ts('Legal Name'), 'Legal Name', 18, 'filter' => 2],
   ]);
