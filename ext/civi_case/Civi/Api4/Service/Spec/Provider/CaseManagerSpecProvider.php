@@ -12,7 +12,6 @@
 
 namespace Civi\Api4\Service\Spec\Provider;
 
-use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\RequestSpec;
 
@@ -43,7 +42,7 @@ class CaseManagerSpecProvider extends \Civi\Core\Service\AutoService implements 
       ->setFkEntity('Contact')
       ->setInputType('EntityRef')
       ->setOperators(['=', '!=', 'IN', 'NOT IN', 'IS EMPTY', 'IS NOT EMPTY', 'IS NULL', 'IS NOT NULL'])
-      ->setSqlRenderer([__CLASS__, 'renderCaseManagerSql']);
+      ->setSqlRenderer(['Civi\Api4\Service\Schema\Joiner', 'getExtraJoinSql']);
     $spec->addFieldSpec($field);
   }
 
@@ -61,11 +60,7 @@ class CaseManagerSpecProvider extends \Civi\Core\Service\AutoService implements 
    *
    * Mirrors the selection logic in CRM_Case_BAO_Case::getCaseManagerContact().
    */
-  public static function renderCaseManagerSql(array $field, Api4SelectQuery $query): string {
-    // $field['sql_name'] is the alias-qualified `id` column (e.g. `a`.`id`)
-    // in whatever context this field is being selected from (main entity or a join).
-    $alias = substr($field['sql_name'], 0, strrpos($field['sql_name'], '.'));
-
+  public static function getCaseManagerSubquery(string $alias): string {
     $xmlProcessor = new \CRM_Case_XMLProcessor_Process();
     $caseTypeNames = \CRM_Case_PseudoConstant::caseType('name');
 
