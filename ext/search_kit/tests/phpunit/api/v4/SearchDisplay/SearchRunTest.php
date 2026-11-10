@@ -794,6 +794,94 @@ class SearchRunTest extends Api4TestBase implements TransactionalInterface {
     $this->assertStringContainsString("id={$case['id']}", $result[3]['columns'][1]['links'][3]['url']);
   }
 
+  public function testCaseManagerJoinedContactLinks(): void {
+    $uid = $this->createLoggedInUser();
+    $client = $this->createTestRecord('Contact');
+    $case = $this->createTestRecord('Case', [
+      'creator_id' => 'user_contact_id',
+      'contact_id' => $client['id'],
+    ]);
+
+    $params = [
+      'checkPermissions' => TRUE,
+      'savedSearch' => [
+        'api_entity' => 'Case',
+        'api_params' => [
+          'version' => 4,
+          'select' => [
+            'id',
+            'GROUP_CONCAT(DISTINCT Case_CaseContact_Contact_01_Contact_RelationshipCache_Contact_01.display_name) AS case_manager_name',
+          ],
+          'join' => [
+            [
+              'Contact AS Case_CaseContact_Contact_01',
+              'LEFT',
+              'CaseContact',
+              ['id', '=', 'Case_CaseContact_Contact_01.case_id'],
+            ],
+            [
+              'Contact AS Case_CaseContact_Contact_01_Contact_RelationshipCache_Contact_01',
+              'LEFT',
+              'RelationshipCache',
+              ['Case_CaseContact_Contact_01.id', '=', 'Case_CaseContact_Contact_01_Contact_RelationshipCache_Contact_01.far_contact_id'],
+              ['Case_CaseContact_Contact_01_Contact_RelationshipCache_Contact_01.near_relation:name', '=', '"Homeless Services Coordinator"'],
+              ['Case_CaseContact_Contact_01_Contact_RelationshipCache_Contact_01.case_id', '=', 'id'],
+            ],
+          ],
+          'where' => [['id', '=', $case['id']]],
+          'groupBy' => ['id'],
+        ],
+      ],
+      'display' => [
+        'type' => 'table',
+        'label' => 'testDisplay',
+        'settings' => [
+          'columns' => [
+            [
+              'key' => 'case_manager_name',
+              'label' => 'Case Manager',
+              'type' => 'field',
+              'link' => [
+                'entity' => 'Contact',
+                'action' => 'view',
+                'join' => 'Case_CaseContact_Contact_01_Contact_RelationshipCache_Contact_01',
+              ],
+            ],
+            [
+              'type' => 'buttons',
+              'links' => [
+                [
+                  'entity' => 'Contact',
+                  'action' => 'view',
+                  'join' => 'Case_CaseContact_Contact_01_Contact_RelationshipCache_Contact_01',
+                  'text' => 'View Contact Button',
+                ],
+              ],
+            ],
+            [
+              'type' => 'menu',
+              'links' => [
+                [
+                  'entity' => 'Contact',
+                  'action' => 'view',
+                  'join' => 'Case_CaseContact_Contact_01_Contact_RelationshipCache_Contact_01',
+                  'text' => 'View Contact Menu',
+                ],
+              ],
+            ],
+          ],
+        ],
+      ],
+    ];
+    $result = civicrm_api4('SearchDisplay', 'run', $params);
+    $this->assertNotEmpty($result[0]['columns'][0]['links']);
+    $this->assertStringContainsString("cid=$uid", $result[0]['columns'][0]['links'][0]['url']);
+    $this->assertNotEmpty($result[0]['columns'][1]['links']);
+    $this->assertStringContainsString("cid=$uid", $result[0]['columns'][1]['links'][0]['url']);
+    $this->assertNotEmpty($result[0]['columns'][2]['links']);
+    $this->assertStringContainsString("cid=$uid", $result[0]['columns'][2]['links'][0]['url']);
+  }
+
   public function testRelatedContactSearch(): void {
     $this->createTestRecord('CustomGroup', [
       'extends' => 'Relationship',
