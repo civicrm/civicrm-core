@@ -47,6 +47,18 @@ Try to use methods and variable names to carry the meaning. Add comments if they
 - `karma.conf.js` shells out to `cv` to build the module list, so the suite only runs against an installed site with `cv` on `PATH`.
 - `npm test` runs karma in watch mode and never exits (`singleRun: false`); for a one-shot run use `node node_modules/karma/bin/karma start --single-run`.
 
+## Translation
+
+- Wrap every user-facing string in `ts()`. In an extension, including those under `ext/`, use `E::ts()` so the extension's own translations are searched before core's.
+- Pass `ts()` a string literal. The string extractor only collects literals, so `ts($label)` never reaches translators. For a value only known at runtime, such as a label read from metadata, use `_ts()`.
+- Use placeholders instead of concatenating: `ts('Contribution %1 refunded', [1 => $id])`. Word order differs between languages, so a sentence built from fragments can't be translated. civilint checks that every `%N` has a replacement and every replacement is used.
+- For counts, pass `plural` and `count` rather than branching on the number: `ts('Record deleted', ['plural' => '%count records deleted', 'count' => $n])`. Some languages have more than two plural forms.
+- Don't use `ts()` on data: contact names, option labels entered by users and other database content are translated through multilingual columns or `civicrm_translation`, not gettext.
+- In Smarty, use `{ts 1=$name}Hello %1{/ts}`. Extension templates need `{crmScope extensionKey='<ext key>'}` around them (or `domain=` on each `{ts}`), or core's translations are used.
+- In extension JS, get a domain-bound function with `const ts = CRM.ts('<ext key>')`; in an Angular controller, expose it as `$scope.ts` for partials.
+- In Afform `*.aff.html`, wrap hand-written text (headings, help text, button labels) in `{{:: ts('...') }}` so the string extractor collects it. Titles and field labels set in the FormBuilder editor (`af-title`, `af-field` `defn`) stay plain: Afform translates them at render time, with the providing extension's translations first.
+- SearchKit displays in `managed/*.mgd.php`: leave their texts bare (labels, descriptions, tooltips, empty values, button and link texts). `SearchDisplay.get` translates them on read with the managing extension's translations; `E::ts()` there runs when the record is reconciled and stores one locale's text in the database. Texts containing markup or Smarty, and the `rewrite` of an `html` column, aren't translated on read.
+
 ## Commits
 
 - Lead the commit subject with `dev/core#NNNN` when the work traces to a GitLab issue (issues live at lab.civicrm.org/dev/core).
