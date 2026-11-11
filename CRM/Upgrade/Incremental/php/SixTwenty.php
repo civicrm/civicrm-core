@@ -340,6 +340,26 @@ class CRM_Upgrade_Incremental_php_SixTwenty extends CRM_Upgrade_Incremental_Base
     $this->addTask('Add index civicrm_msg_template.index_workflow_name', 'addIndex', 'civicrm_msg_template', 'workflow_name');
   }
 
+  /**
+   * Upgrade step; adds tasks.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_6_20_1($rev): void {
+    $this->addTask('Ensure "MailingAB.created_date" is a timestamp defaulting to now', 'alterSchemaField', 'MailingAB', 'created_date', [
+      'title' => ts('AB Test Created Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'description' => ts('When was this item created'),
+      'add' => '4.6',
+      'default' => 'CURRENT_TIMESTAMP',
+      'input_attrs' => [
+        'format_type' => 'mailing',
+      ],
+    ]);
+  }
+
   public static function setContributionStatusDefault(CRM_Queue_TaskContext $ctx): bool {
     $curdefault = CRM_Core_DAO::singleValueQuery("SELECT ov.id FROM civicrm_option_value ov INNER JOIN civicrm_option_group og ON (og.id = ov.option_group_id AND og.name='contribution_status') WHERE ov.is_default = 1");
     if (empty($curdefault)) {
