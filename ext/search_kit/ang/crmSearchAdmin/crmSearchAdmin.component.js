@@ -695,15 +695,74 @@
       ctrl.savedSearch.api_params[name].splice(idx, 1);
     };
 
+    // When a field alias changes, update references to it across search displays
+    const cascadeAliasChange = (oldAlias, newAlias) => {
+      const updateKey = key => key?.replace(new RegExp(`^${oldAlias}(:|$)`), `${newAlias}$1`);
+      const updateTokens = str => str?.replace(new RegExp(`\\[${oldAlias}([:\\]])`, 'g'), `[${newAlias}$1`);
+      const updateClause = clause => {
+        if (Array.isArray(clause)) {
+          clause[0] = updateKey(clause[0]);
+          if (Array.isArray(clause[1])) {
+            clause[1].forEach(updateClause);
+          }
+        }
+      };
+
+      if (ctrl.savedSearch.api_params.orderBy?.[oldAlias]) {
+        ctrl.savedSearch.api_params.orderBy[newAlias] = ctrl.savedSearch.api_params.orderBy[oldAlias];
+        delete ctrl.savedSearch.api_params.orderBy[oldAlias];
+      }
+      ctrl.savedSearch.api_params.having?.forEach(updateClause);
+
+      ctrl.savedSearch.displays?.forEach((display) => {
+        display.settings?.columns?.forEach((col) => {
+          col.key = updateKey(col.key);
+          col.rewrite = updateTokens(col.rewrite);
+          if (col.tally?.rewrite) {
+            col.tally.rewrite = updateTokens(col.tally.rewrite);
+          }
+        });
+        display.settings?.sort?.forEach((sort) => {
+          sort[0] = updateKey(sort[0]);
+        });
+        if (display.settings?.searchFields) {
+          display.settings.searchFields = display.settings.searchFields.map(updateKey);
+        }
+      });
+    };
+
     function onChangeSelect(newSelect, oldSelect) {
+      if (!newSelect || !oldSelect) {
+        return;
+      }
+      // Find columns that were renamed (not added, reordered, or removed)
+      const renamed = [];
+      if (newSelect.length === oldSelect.length) {
+        newSelect.forEach((newExpr, index) => {
+          const oldExpr = oldSelect[index];
+          if (oldExpr !== newExpr && !newSelect.includes(oldExpr) && !oldSelect.includes(newExpr)) {
+            const oldAlias = oldExpr.split(' AS ').at(-1).split(':')[0];
+            const newAlias = newExpr.split(' AS ').at(-1).split(':')[0];
+            if (oldAlias !== newAlias) {
+              renamed.push(oldAlias);
+              cascadeAliasChange(oldAlias, newAlias);
+            }
+          }
+        });
+      }
+
       // When removing a column from SELECT, also remove from ORDER BY & HAVING
-      (oldSelect || []).filter(col => !newSelect.includes(col)).forEach(col => {
-        col = col.split(' AS ').at(-1);
-        delete ctrl.savedSearch.api_params.orderBy[col];
-        if (ctrl.savedSearch.api_params.having && ctrl.savedSearch.api_params.having.length) {
-          ctrl.savedSearch.api_params.having = ctrl.savedSearch.api_params.having.filter(clause =>
-            !clauseUsesFields(clause, [col])
-          );
+      oldSelect.filter(col => !newSelect.includes(col)).forEach(col => {
+        col = col.split(' AS ').at(-1).split(':')[0];
+        if (!renamed.includes(col)) {
+          if (ctrl.savedSearch.api_params.orderBy) {
+            delete ctrl.savedSearch.api_params.orderBy[col];
+          }
+          if (ctrl.savedSearch.api_params.having?.length) {
+            ctrl.savedSearch.api_params.having = ctrl.savedSearch.api_params.having.filter(clause =>
+              !clauseUsesFields(clause, [col])
+            );
+          }
         }
       });
     }
