@@ -4,7 +4,7 @@
     <div class="input-group">
       <input autocomplete="off" class="form-control" placeholder="{{:: ts('Select') }}" title="{{:: ts('Click to add placeholder text') }}" ng-model="getSet('input_attrs.placeholder' + i)" ng-model-options="$ctrl.editor.debounceWithGetterSetter" type="text" />
       <div class="input-group-btn" af-gui-menu>
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="crm-i fa-caret-down" role="img" aria-hidden="true"></i></button>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="crm-i fa-caret-down" role="img" aria-hidden="true"></i><span class="sr-only">{{:: ts('Set default value') }}</span></button>
         <ul class="dropdown-menu" ng-if="menu.open" title="{{:: ts('Set default value') }}">
           <li class="disabled">
             <a><strong>{{:: ts('Default Value:') }}</strong></a>

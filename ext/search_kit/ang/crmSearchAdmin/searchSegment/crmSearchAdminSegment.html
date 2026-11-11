@@ -35,8 +35,9 @@
               <div ng-repeat="condition in item.when" class="form-inline">
                 <input class="form-control crm-auto-width" ng-model="condition[0]" crm-ui-select="{data: $ctrl.selectFields, allowClear: false}" >
                 <crm-search-condition clause="condition" field="$ctrl.getField(condition[0])" offset="1" option-key="$ctrl.getOptionKey(condition[0])" class="form-group"></crm-search-condition>
-                <a class="crm-hover-button" ng-if="$index" ng-click="item.when.splice($index, 1)">
+                <a href class="crm-hover-button" ng-if="$index" ng-click="item.when.splice($index, 1)">
                   <i class="crm-i fa-times" role="img" aria-hidden="true"></i>
+                  <span class="sr-only">{{:: ts('Remove') }}</span>
                 </a>
               </div>
               <div ng-if="item.when && item.when.length">
@@ -52,6 +53,7 @@
             <td class="text-right">
               <button type="button" class="btn btn-xs btn-danger" ng-click="$ctrl.segment.items.splice($index, 1)">
                 <i class="crm-i fa-trash" role="img" aria-hidden="true"></i>
+                <span class="sr-only">{{:: ts('Delete') }}</span>
               </button>
             </td>
           </tr>

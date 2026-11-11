@@ -15,6 +15,7 @@
       <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <i class="crm-i {{ $ctrl.exprTypesByName[arg.type].icon }}" role="img" aria-hidden="true"></i>
         <span class="caret"></span>
+        <span class="sr-only">{{:: ts('Type') }}</span>
       </button>
       <ul class="dropdown-menu">
         <li ng-repeat="exprInfo in $ctrl.sqlExprTypes" ng-if="$ctrl.getParam($parent.$index).must_be.indexOf(exprInfo.type) >= 0">
