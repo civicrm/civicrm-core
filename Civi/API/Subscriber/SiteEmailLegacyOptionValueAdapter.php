@@ -32,7 +32,7 @@ class SiteEmailLegacyOptionValueAdapter {
       return;
     }
     if ($apiRequest['version'] == 3 && $this->isApi3FromEmailOptionValueRequest($apiRequest)) {
-      $this->preprocessApi3SiteEmailOptionValues($apiRequest);
+      $this->preprocessApi3SiteEmailOptionValues($apiRequest, $event->getRequestId());
       $event->setApiRequest($apiRequest);
     }
     elseif ($apiRequest['version'] == 4 && $this->isApi4FromEmailOptionValueRequest($apiRequest)) {
@@ -42,10 +42,11 @@ class SiteEmailLegacyOptionValueAdapter {
 
   #[CiviEventListener(event: 'civi.api.respond', priority: 2000)]
   public function onApiRespond(\Civi\API\Event\RespondEvent $event) {
-    $apiRequest = $event->getApiRequest();
+    $id = $event->getRequestId();
     // If ID was previously stashed by preprocessApi3SiteEmailOptionValues
-    if (isset(self::$apiIds[$apiRequest['id']])) {
-      unset(self::$apiIds[$apiRequest['id']]);
+    if (isset(self::$apiIds[$id])) {
+      unset(self::$apiIds[$id]);
+      $apiRequest = $event->getApiRequest();
       $apiResponse = $event->getResponse();
       $this->postprocessApi3SiteEmailOptionValues($apiRequest, $apiResponse);
       $event->setResponse($apiResponse);
@@ -81,9 +82,9 @@ class SiteEmailLegacyOptionValueAdapter {
     return FALSE;
   }
 
-  private function preprocessApi3SiteEmailOptionValues(&$apiRequest) {
+  private function preprocessApi3SiteEmailOptionValues(&$apiRequest, int $requestId) {
     // Register request id for postprocessing
-    self::$apiIds[$apiRequest['id']] = TRUE;
+    self::$apiIds[$requestId] = TRUE;
     // Modify internal variables of the api request... don't try this at home
     $apiRequest['function'] = str_replace('option_value', 'site_email_address', $apiRequest['function']);
     // Switch request to use SiteEmailAddress entity
