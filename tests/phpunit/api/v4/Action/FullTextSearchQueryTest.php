@@ -156,6 +156,47 @@ class FullTextSearchQueryTest extends Api4TestBase {
     $this->assertSame(0, $results->count());
   }
 
+  /**
+   * dev/core#6901 - short words like "of" are not indexed but should not stop a record being found
+   */
+  public function testLikeQueriesWithShortWords(): void {
+    \Civi::settings()->set('search_mysql_fts', TRUE);
+    $this->saveTestRecords('Contact', [
+      'records' => [
+        ['contact_type' => 'Organization', 'organization_name' => 'London School of Economics'],
+        ['first_name' => 'Will', 'last_name' => 'Smith'],
+      ],
+    ]);
+
+    foreach (['London School of Economics', 'London School Economics', 'School of Econ%', 'London% School% of% Economics%'] as $search) {
+      $results = \Civi\Api4\Contact::get(FALSE)
+        ->addSelect('display_name')
+        ->addWhere('contact_names', 'LIKE', $search)
+        ->execute();
+      $this->assertCount(1, $results, "Searching for '$search'");
+      $this->assertEquals('London School of Economics', $results->single()['display_name']);
+    }
+  }
+
+  /**
+   * "Will" is on the default list of INNODB stopwords :/
+   */
+  public function testLikeQueriesWithStopWords(): void {
+    \Civi::settings()->set('search_mysql_fts', TRUE);
+    $this->saveTestRecords('Contact', [
+      'records' => [
+        ['first_name' => 'Will', 'last_name' => 'Smith'],
+      ],
+    ]);
+
+    $results = \Civi\Api4\Contact::get(FALSE)
+      ->addSelect('display_name')
+      ->addWhere('contact_names', 'LIKE', 'Will')
+      ->execute();
+    $this->assertCount(1, $results, "Searching for 'Will'");
+    $this->assertEquals('Will Smith', $results->single()['display_name']);
+  }
+
   public function testInteractionWithExplicitOrderBy(): void {
     $this->saveTestContacts();
 

@@ -97,16 +97,21 @@ class FullTextSearchFilterSpecProvider extends \Civi\Core\Service\AutoService im
       case 'LIKE':
         $words = explode(' ', $value);
 
-        $words = array_filter(array_map(function ($word) use ($fieldAlias) {
+        // dev/core#6901 - discard words less than innodb_min_token size
+        // NOTE: this can be changed but getting the runtime value isn't necessarily
+        // better as the pertinent value is at the time of index creation
+        $minTokenSize = 3;
+
+        $words = array_filter(array_map(function ($word) use ($fieldAlias, $minTokenSize) {
           $wildcardPos = strpos($word, '%');
           // if no wildcards leave as is
           if ($wildcardPos === FALSE) {
-            return strlen($word) ? '+' . $word : '';
+            return (mb_strlen($word) >= $minTokenSize) ? '+' . $word : '';
           }
           // trailing wildcard replace with FTS wildcard *
           if ($wildcardPos === (strlen($word) - 1)) {
-            $term = rtrim($word, '%');
-            return strlen($term) ? '+' . $term . '*' : '';
+            $word = rtrim($word, '%');
+            return (mb_strlen($word) >= $minTokenSize) ? '+' . $word . '*' : '';
           }
           // if non-trailing wildcards then FTS can't handle
           // Q: should we just log?
