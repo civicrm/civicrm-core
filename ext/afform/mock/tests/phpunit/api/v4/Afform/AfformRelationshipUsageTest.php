@@ -71,6 +71,62 @@ EOHTML;
   }
 
   /**
+   * Tests a relationship type given as a pseudoconstant suffix, on create and on resubmit (update).
+   */
+  public function testRelationshipTypeBySuffix(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual', source: 'Test Rel'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" url-autofill="1" />
+  <af-entity security="FBAC" type="Relationship" name="Relationship1" label="Relationship 1" actions="{create: true, update: true}" data="{contact_id_b: ['Individual1'], contact_id_a: ['Individual2'], 'relationship_type_id:name': 'Child of'}" />
+  <af-entity data="{contact_type: 'Individual', source: 'Test Rel'}" type="Contact" name="Individual2" label="Individual 2" actions="{create: true, update: true}" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <afblock-name-individual></afblock-name-individual>
+  </fieldset>
+  <fieldset af-fieldset="Relationship1" class="af-container"></fieldset>
+  <fieldset af-fieldset="Individual2" class="af-container" af-title="Individual 2">
+    <afblock-name-individual></afblock-name-individual>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $lastName = uniqid(__FUNCTION__);
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [['fields' => ['first_name' => 'Parent', 'last_name' => $lastName]]],
+        'Individual2' => [['fields' => ['first_name' => 'Child', 'last_name' => $lastName]]],
+      ])
+      ->execute();
+
+    $saved = Relationship::get(FALSE)
+      ->addWhere('contact_id_b.last_name', '=', $lastName)
+      ->addSelect('contact_id_a', 'contact_id_b', 'relationship_type_id:name')
+      ->execute();
+    $this->assertCount(1, $saved);
+    $this->assertSame('Child of', $saved[0]['relationship_type_id:name']);
+
+    // Resubmitting for the same contacts should match the existing relationship rather than add another
+    Afform::submit()
+      ->setName($this->formName)
+      ->setArgs(['Individual1' => $saved[0]['contact_id_b'], 'Individual2' => $saved[0]['contact_id_a']])
+      ->setValues([
+        'Individual1' => [['fields' => ['first_name' => 'Parent', 'last_name' => $lastName]]],
+        'Individual2' => [['fields' => ['first_name' => 'Child', 'last_name' => $lastName]]],
+      ])
+      ->execute();
+
+    $this->assertCount(1, Relationship::get(FALSE)
+      ->addWhere('contact_id_b.last_name', '=', $lastName)
+      ->execute());
+  }
+
+  /**
    * Tests creating multiple relationships using af-repeat
    */
   public function testCreateContactsWithMultipleRelationships(): void {
