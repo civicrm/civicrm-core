@@ -6,6 +6,7 @@
     </button>
     <button type="button" ng-click="$ctrl.menuOpen = true;" class="btn btn-sm btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <span class="caret"></span>
+      <span class="sr-only">{{:: ts('Link') }}</span>
     </button>
     <ul class="dropdown-menu {{ $ctrl.link.action || $ctrl.link.task ? '' : 'dropdown-menu-right' }}" style="min-width: 223px;">
       <li ng-repeat="link in $ctrl.links" ng-class="{disabled: link === $ctrl.getLink()}">
