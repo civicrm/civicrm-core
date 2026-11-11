@@ -138,12 +138,14 @@ class CRM_Contact_Page_SavedSearch extends CRM_Core_Page {
           'url' => 'civicrm/contact/search/advanced',
           'qs' => 'reset=1&force=1&ssID=%%id%%',
           'title' => ts('Search'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/search/saved',
           'qs' => 'action=delete&id=%%id%%',
           'extra' => 'onclick="return confirm(\'' . $deleteExtra . '\');"',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }

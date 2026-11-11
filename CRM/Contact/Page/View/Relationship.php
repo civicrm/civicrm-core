@@ -289,6 +289,7 @@ class CRM_Contact_Page_View_Relationship extends CRM_Core_Page {
           'url' => 'civicrm/contact/view/case',
           'qs' => 'action=view&reset=1&cid=%%clientid%%&id=%%caseid%%',
           'title' => ts('Manage Case'),
+          'weight' => 0,
         ],
       ];
     }

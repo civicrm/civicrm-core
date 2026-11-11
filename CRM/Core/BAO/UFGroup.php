@@ -1782,6 +1782,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
           'name' => ts('Delete Contact Image'),
           'url' => 'civicrm/contact/image',
           'qs' => 'reset=1&id=%%id%%&gid=%%gid%%&action=delete',
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
       $deleteURL = CRM_Core_Action::formLink($deleteURL,

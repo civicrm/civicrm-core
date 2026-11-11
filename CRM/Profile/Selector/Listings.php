@@ -207,6 +207,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           'url' => 'civicrm/profile/view',
           'qs' => 'reset=1&id=%%id%%&gid=%%gid%%',
           'title' => ts('View Profile Details'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ];
       }
 
@@ -216,6 +217,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           'url' => 'civicrm/profile/edit',
           'qs' => 'reset=1&id=%%id%%&gid=%%gid%%',
           'title' => ts('Edit'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ];
       }
 
@@ -225,6 +227,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           'url' => 'user/%%ufID%%',
           'qs' => ' ',
           'title' => ts('View Website Profile'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::PROFILE),
         ];
       }
 
@@ -234,6 +237,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           'url' => 'civicrm/profile/map',
           'qs' => 'reset=1&cid=%%id%%&gid=%%gid%%',
           'title' => ts('Map'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::MAP),
         ];
       }
     }
