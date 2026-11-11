@@ -620,6 +620,8 @@ class Submit extends AbstractProcessor {
     // Iterate through multiple relationships (if using af-repeat)
     foreach ($event->records as $relationship) {
       $relationship = $relationship['fields'] ?? [];
+      // For handling suffixed values, particularly relationship_type_id:name since we do reference relationship_type_id specifically here.
+      $event->getApiRequest()->formatWriteValues($relationship, 'Relationship', 'create');
       if (empty($relationship['contact_id_a']) || empty($relationship['contact_id_b']) || empty($relationship['relationship_type_id'])) {
         self::saveRelationshipById($relationship, $event->getEntity(), $api4);
       }
