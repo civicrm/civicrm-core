@@ -99,4 +99,24 @@ class PrepareEventTest extends \CiviUnitTestCase {
     }
   }
 
+  public function testRequestId(): void {
+    $provider = $this->createWidgetFrobnicateProvider();
+
+    $v3Request = \Civi\API\Request::create('Contact', 'get', ['version' => 3]);
+    $v3Event = new PrepareEvent($provider, $v3Request, $this->kernel);
+    $this->assertIsInt($v3Event->getRequestId());
+    $this->assertGreaterThan(0, $v3Event->getRequestId());
+    $this->assertSame($v3Request['id'], $v3Event->getRequestId());
+
+    $v4Request = \Civi\Api4\Contact::get();
+    $v4Event = new PrepareEvent($provider, $v4Request, $this->kernel);
+    $this->assertIsInt($v4Event->getRequestId());
+    $this->assertGreaterThan($v3Event->getRequestId(), $v4Event->getRequestId());
+
+    $v4CloneRequest = clone $v4Request;
+    $v4CloneEvent = new PrepareEvent($provider, $v4CloneRequest, $this->kernel);
+    $this->assertIsInt($v4CloneEvent->getRequestId());
+    $this->assertGreaterThan($v4Event->getRequestId(), $v4CloneEvent->getRequestId());
+  }
+
 }

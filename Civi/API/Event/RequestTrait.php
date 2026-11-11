@@ -64,4 +64,12 @@ trait RequestTrait {
     return $this->apiRequest['action'];
   }
 
+  /**
+   * Return a unique identifier for this API request.
+   * @see \Civi\API\Request::getNextId
+   */
+  public function getRequestId(): int {
+    return $this->apiRequest['id'];
+  }
+
 }

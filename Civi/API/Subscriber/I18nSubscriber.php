@@ -61,7 +61,7 @@ class I18nSubscriber implements EventSubscriberInterface {
     if ($language) {
       $newLocale = Locale::negotiate($language);
       if ($newLocale) {
-        $this->originalLocale[$apiRequest['id']] = Locale::detect();
+        $this->originalLocale[$event->getRequestId()] = Locale::detect();
         $newLocale->apply();
       }
     }
@@ -75,11 +75,10 @@ class I18nSubscriber implements EventSubscriberInterface {
    * @throws \CRM_Core_Exception
    */
   public function onApiRespond(\Civi\API\Event\Event $event) {
-    $apiRequest = $event->getApiRequest();
-
-    if (!empty($this->originalLocale[$apiRequest['id']])) {
-      $this->originalLocale[$apiRequest['id']]->apply();
-      unset($this->originalLocale[$apiRequest['id']]);
+    $id = $event->getRequestId();
+    if (!empty($this->originalLocale[$id])) {
+      $this->originalLocale[$id]->apply();
+      unset($this->originalLocale[$id]);
     }
   }
 

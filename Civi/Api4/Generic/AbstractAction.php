@@ -11,6 +11,7 @@
  */
 namespace Civi\Api4\Generic;
 
+use Civi\API\Request;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Api4\Utils\ReflectionUtils;
@@ -161,7 +162,7 @@ abstract class AbstractAction implements \ArrayAccess {
     else {
       $this->_actionName = $actionName;
     }
-    $this->_id = \Civi\API\Request::getNextId();
+    $this->_id = Request::getNextId();
   }
 
   /**
@@ -485,7 +486,7 @@ abstract class AbstractAction implements \ArrayAccess {
 
     if (empty(\Civi::$statics['Api4EntityFields'][$cacheKey])) {
       $allowedTypes = ['Field', 'Filter', 'Extra'];
-      $getFields = \Civi\API\Request::create($entityName, 'getFields', [
+      $getFields = Request::create($entityName, 'getFields', [
         'version' => 4,
         'checkPermissions' => FALSE,
         'action' => $actionName,
@@ -523,7 +524,7 @@ abstract class AbstractAction implements \ArrayAccess {
   protected function reloadResults(array $savedRecords, mixed $select = TRUE): array {
     $idField = CoreUtil::getIdFieldName($this->getEntityName());
     /** @var AbstractGetAction $get */
-    $get = \Civi\API\Request::create($this->getEntityName(), 'get', ['version' => 4]);
+    $get = Request::create($this->getEntityName(), 'get', ['version' => 4]);
     $get
       ->setCheckPermissions($this->getCheckPermissions())
       ->addWhere($idField, 'IN', array_column($savedRecords, $idField));
@@ -664,6 +665,10 @@ abstract class AbstractAction implements \ArrayAccess {
       $result = array_values(array_intersect($result, $uiLanguages));
     }
     return $result;
+  }
+
+  public function __clone() {
+    $this->_id = Request::getNextId();
   }
 
 }
