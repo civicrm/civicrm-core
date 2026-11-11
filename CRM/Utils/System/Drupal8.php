@@ -1014,19 +1014,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * @inheritdoc
-   */
-  public function mailingWorkflowIsEnabled():bool {
-    if (!\Drupal::moduleHandler()->moduleExists('rules')) {
-      return FALSE;
-    }
-
-    $enableWorkflow = Civi::settings()->get('civimail_workflow');
-
-    return (bool) $enableWorkflow;
-  }
-
-  /**
    * @inheritDoc
    */
   public function clearResourceCache() {
