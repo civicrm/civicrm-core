@@ -306,6 +306,18 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   }
 
   /**
+   * An ON UPDATE CURRENT_TIMESTAMP column is not compared, whatever its name.
+   */
+  public function testTriggerInfoIgnoresAutoUpdatedTimestamp(): void {
+    Civi::settings()->set('logging', TRUE);
+    $info = [];
+    (new CRM_Logging_Schema())->triggerInfo($info, 'civicrm_campaign');
+    $updateSql = implode("\n", array_column(array_filter($info, fn($trigger) => $trigger['event'][0] === 'UPDATE'), 'sql'));
+    $this->assertStringContainsString("IFNULL(OLD.`title`,'') <> IFNULL(NEW.`title`,'')", $updateSql);
+    $this->assertStringNotContainsString("IFNULL(OLD.`last_modified_date`,'') <> IFNULL(NEW.`last_modified_date`,'')", $updateSql);
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    */
   public function testColumnInfo(): void {
