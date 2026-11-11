@@ -882,6 +882,15 @@ LEFT  JOIN civicrm_line_item line  ON ( line.contribution_id = con.id AND line.e
     }
     $updatedRecurParams['modified_date'] = date('Y-m-d H:i:s');
 
+    // A payment can still arrive after cancellation, e.g. one already submitted to the bank.
+    // Recording it must not undo the cancellation or schedule further payments.
+    if ($existingRecur['contribution_status_id:name'] === 'Cancelled') {
+      ContributionRecur::save(FALSE)
+        ->setRecords([$updatedRecurParams])
+        ->execute();
+      return;
+    }
+
     if (!empty($existingRecur['installments']) && self::isComplete($recurringContributionID, $existingRecur['installments'])) {
       // Update Recur to "Completed"
       $updatedRecurParams['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Completed');

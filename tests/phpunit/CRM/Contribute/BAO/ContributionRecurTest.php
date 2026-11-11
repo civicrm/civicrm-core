@@ -100,6 +100,65 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution(['id' => $contributionRecur['id']]);
   }
 
+  public static function cancelledRecurInstallments(): array {
+    return [
+      'payment completes the last instalment' => [1],
+      'instalments remain' => [3],
+      'no instalment limit' => [NULL],
+    ];
+  }
+
+  /**
+   * A payment recorded after the recurring contribution was cancelled must not undo the cancellation.
+   *
+   * @dataProvider cancelledRecurInstallments
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPaymentOnCancelledRecurKeepsItCancelled(?int $installments): void {
+    $contributionRecurID = $this->createTestEntity('ContributionRecur', array_merge($this->_params, [
+      'installments' => $installments,
+      'contribution_status_id:name' => 'Cancelled',
+      'cancel_date' => 'yesterday',
+      'next_sched_contribution_date' => 'yesterday',
+    ]))['id'];
+    $before = ContributionRecur::get(FALSE)
+      ->addSelect('next_sched_contribution_date', 'end_date')
+      ->addWhere('id', '=', $contributionRecurID)
+      ->execute()
+      ->single();
+
+    $contributionID = $this->createTestEntity('Contribution', [
+      'contact_id' => $this->_params['contact_id'],
+      'financial_type_id:name' => 'Donation',
+      'total_amount' => 3,
+      'contribution_status_id:name' => 'Pending',
+      'contribution_recur_id' => $contributionRecurID,
+      'receive_date' => 'yesterday',
+    ])['id'];
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contributionID)
+      ->addValue('total_amount', 3)
+      ->execute();
+
+    $contributionStatus = Contribution::get(FALSE)
+      ->addSelect('contribution_status_id:name')
+      ->addWhere('id', '=', $contributionID)
+      ->execute()
+      ->single()['contribution_status_id:name'];
+    $this->assertSame('Completed', $contributionStatus);
+
+    $after = ContributionRecur::get(FALSE)
+      ->addSelect('contribution_status_id:name', 'next_sched_contribution_date', 'end_date')
+      ->addWhere('id', '=', $contributionRecurID)
+      ->execute()
+      ->single();
+    $this->assertSame('Cancelled', $after['contribution_status_id:name']);
+    $this->assertSame($before['next_sched_contribution_date'], $after['next_sched_contribution_date']);
+    $this->assertSame($before['end_date'], $after['end_date']);
+  }
+
   /**
    * Test that a failed payment increments failure_count.
    *
