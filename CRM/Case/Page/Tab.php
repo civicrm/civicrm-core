@@ -204,12 +204,14 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
           'qs' => 'action=view&reset=1&cid=%%cid%%&id=%%id%%',
           'class' => 'no-popup',
           'title' => ts('Manage Case'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/case',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%',
           'title' => ts('Delete Case'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }
