@@ -139,6 +139,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
             'name' => ts('Delete Contact Image'),
             'url' => 'civicrm/contact/image',
             'qs' => 'reset=1&cid=%%id%%&action=delete&pcp=1',
+            'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
           ],
         ];
         $deleteURL = CRM_Core_Action::formLink($deleteURL,

@@ -611,12 +611,14 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
           'url' => 'civicrm/member/search/',
           'qs' => 'reset=1&force=1&type=%%id%%',
           'title' => ts('Search'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/member/membershipType',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Membership Type'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
       ];
     }

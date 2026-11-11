@@ -177,6 +177,7 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
         'url' => 'civicrm/contact/view/contribution',
         'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%&mode=live',
         'title' => ts('Pay with Credit Card'),
+        'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
       ];
     }
 
@@ -188,6 +189,7 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
             'url' => 'civicrm/payment',
             'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution',
             'title' => ts('Record Refund'),
+            'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
           ];
         }
       }
@@ -197,6 +199,7 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
           'url' => 'civicrm/payment',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution',
           'title' => ts('Record Payment'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::ADD),
         ];
         if (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
           $links[CRM_Core_Action::BASIC] = [
@@ -204,6 +207,7 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
             'url' => 'civicrm/payment/add',
             'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution&mode=live',
             'title' => ts('Submit Credit Card payment'),
+            'weight' => 30,
           ];
         }
       }
