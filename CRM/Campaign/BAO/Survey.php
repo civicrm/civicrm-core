@@ -544,6 +544,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
           'url' => 'civicrm/survey/search',
           'qs' => 'sid=%%id%%&reset=1&op=reserve',
           'title' => ts('Reserve Respondents'),
+          'weight' => 0,
         ];
       }
       if (CRM_Core_Permission::check('interview campaign contacts')) {
@@ -552,6 +553,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
           'url' => 'civicrm/survey/search',
           'qs' => 'sid=%%id%%&reset=1&op=interview&force=1',
           'title' => ts('Interview Respondents'),
+          'weight' => 10,
         ];
       }
       if (CRM_Core_Permission::check('release campaign contacts')) {
@@ -560,6 +562,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
           'url' => 'civicrm/survey/search',
           'qs' => 'sid=%%id%%&reset=1&op=release&force=1',
           'title' => ts('Release Respondents'),
+          'weight' => 20,
         ];
       }
     }
@@ -572,6 +575,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
           'url' => "civicrm/report/instance/{$reportID}",
           'qs' => 'reset=1',
           'title' => ts('View Survey Report'),
+          'weight' => 30,
         ];
       }
     }
