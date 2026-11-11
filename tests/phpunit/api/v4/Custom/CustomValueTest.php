@@ -312,8 +312,7 @@ class CustomValueTest extends Api4TestBase {
     $links = CustomValue::getLinks($groupName, FALSE)
       ->addValue('id', 3)
       ->execute()->indexBy('ui_action');
-    $this->assertStringContainsString('gid=' . $customGroup['id'], $links['view']['path']);
-    $this->assertStringContainsString('recId=3', $links['view']['path']);
+    $this->assertStringContainsString("civicrm/af/custom/$groupName/view#?Record=3", $links['view']['path']);
 
     CustomGroup::update(FALSE)
       ->addWhere('name', '=', $groupName)

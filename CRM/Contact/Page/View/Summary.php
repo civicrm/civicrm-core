@@ -410,7 +410,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $filters = [
       'is_active' => TRUE,
       'extends' => $this->get('contactType'),
-      'style' => ['Tab', 'Tab with table'],
+      'style' => 'Tab',
     ];
     $subTypes = CRM_Utils_Array::explodePadded($this->get('contactSubtype'));
     if ($subTypes) {

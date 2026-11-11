@@ -44,7 +44,9 @@ class CustomEntityProvider {
         'class_args' => [$customGroup['name']],
         'description' => ts('Custom group for %1', [1 => $baseEntityTitle]),
         'paths' => [
-          'view' => "civicrm/contact/view/cd?reset=1&gid={$customGroup['id']}&recId=[id]&multiRecordDisplay=single",
+          'add' => "civicrm/af/custom/{$customGroup['name']}/create#?entity_id=[entity_id]",
+          'update' => "civicrm/af/custom/{$customGroup['name']}/update#?Record=[id]",
+          'view' => "civicrm/af/custom/{$customGroup['name']}/view#?Record=[id]",
         ],
       ] + $baseInfo;
       if (!empty($customGroup['icon'])) {

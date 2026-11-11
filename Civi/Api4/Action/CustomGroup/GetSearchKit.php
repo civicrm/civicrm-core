@@ -4,7 +4,6 @@ namespace Civi\Api4\Action\CustomGroup;
 
 use Civi\Api4\SearchDisplay;
 use Civi\Api4\Utils\CoreUtil;
-use CRM_CivicrmAdminUi_ExtensionUtil as E;
 
 /**
  * For multi-value custom groups, produce managed records
@@ -57,7 +56,7 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
   protected function getSavedSearch(array $group): array {
     $entityName = $group['entity_name'];
     $searchName = $group['search_name'];
-    $searchLabel = E::ts('%1 Search', [1 => $group['title']]);
+    $searchLabel = ts('%1 Search', [1 => $group['title']]);
 
     // select all fields by name
     $select = [];
@@ -86,11 +85,13 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     $select[] = 'entity_id';
 
     return [
-      'module' => E::LONG_NAME,
+      'module' => 'civicrm',
       'name' => "SavedSearch_{$searchName}",
       'entity' => 'SavedSearch',
       'cleanup' => 'unused',
       'update' => 'unmodified',
+      // This api was previously part of the civicrm_admin_ui extension
+      'replaces' => ['module' => 'civicrm_admin_ui'],
       'params' => [
         'version' => 4,
         'values' => [
@@ -131,11 +132,13 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
     $displayLabel = $group['title'];
 
     return [
-      'module' => E::LONG_NAME,
+      'module' => 'civicrm',
       'name' => "SavedSearch_{$searchName}_SearchDisplay_{$displayName}",
       'entity' => 'SearchDisplay',
       'cleanup' => 'unused',
       'update' => 'unmodified',
+      // This api was previously part of the civicrm_admin_ui extension
+      'replaces' => ['module' => 'civicrm_admin_ui'],
       'params' => [
         'version' => 4,
         'values' => [
@@ -162,7 +165,7 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
               [
                 'action' => 'add',
                 'entity' => $group['entity_name'],
-                'text' => E::ts('Add %1', [1 => $group['title']]),
+                'text' => ts('Add %1', [1 => $group['title']]),
                 'icon' => 'fa-plus',
                 'style' => 'default',
                 'target' => 'crm-popup',
@@ -266,7 +269,7 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
           'action' => 'view',
           'target' => 'crm-popup',
           'icon' => 'fa-eye',
-          'text' => E::ts('View'),
+          'text' => 'View',
           'style' => 'default',
         ],
         [
@@ -274,7 +277,7 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
           'action' => 'update',
           'target' => 'crm-popup',
           'icon' => 'fa-pencil',
-          'text' => E::ts('Edit'),
+          'text' => 'Edit',
           'style' => 'default',
         ],
         [
@@ -282,7 +285,7 @@ class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
           'task' => 'delete',
           'target' => 'crm-popup',
           'icon' => 'fa-trash',
-          'text' => E::ts('Delete'),
+          'text' => 'Delete',
           'style' => 'danger',
         ],
       ],
