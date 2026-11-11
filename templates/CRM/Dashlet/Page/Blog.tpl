@@ -13,6 +13,9 @@
     border: 0 none;
     font-family: inherit; // Stops JQueryUI's attempt to make this section Verdana
   }
+  #civicrm-news-feed summary {
+    font-weight: normal;
+  }
   #civicrm-news-feed .crm-news-feed-unread .crm-news-feed-item-title {
     font-weight: bold;
   }
@@ -78,7 +81,7 @@
           $tab = $(this),
           href = $tab.attr('href'),
           $content = $(href),
-          $items = $('.crm-accordion-wrapper', $content),
+          $items = $('details', $content),
           key = href.substring(19),
           count = 0;
         if (!opened[key]) opened[key] = [];
