@@ -3,6 +3,7 @@ namespace api\v4\SearchDisplay;
 
 use Civi\Api4\SavedSearch;
 use Civi\Api4\SearchDisplay;
+use Civi\Api4\TranslationSource;
 use Civi\Test\HeadlessInterface;
 use Civi\Test\TransactionalInterface;
 
@@ -361,6 +362,41 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
       ->addWhere('id', '=', $display['id'])
       ->execute()->single();
     $this->assertSame('No results text', $result['settings']['noResultsText']);
+  }
+
+  public function testSaveRecordsDisplayTextsAsTranslationSources(): void {
+    $savedSearch = $this->createTestRecord('SavedSearch', [
+      'api_entity' => 'Contact',
+      'api_params' => ['version' => 4, 'select' => ['id', 'display_name']],
+    ]);
+    $this->createTestRecord('SearchDisplay', [
+      'saved_search_id' => $savedSearch['id'],
+      'type' => 'table',
+      'label' => 'Source display label',
+      'settings' => [
+        'noResultsText' => 'Source no results',
+        'editableRow' => ['create' => TRUE, 'createLabel' => 'Source add row'],
+        'columns' => [
+          ['type' => 'field', 'key' => 'display_name', 'label' => 'Source column label', 'title' => 'Source column tooltip'],
+          ['type' => 'image', 'image' => ['alt' => 'Source image alt']],
+          ['type' => 'html', 'key' => 'display_name', 'rewrite' => 'Source html rewrite'],
+          ['type' => 'field', 'key' => 'id', 'label' => '[id]', 'rewrite' => 'Source {$smarty}'],
+        ],
+      ],
+    ]);
+
+    $sources = TranslationSource::get(FALSE)
+      ->addWhere('entity', '=', 'search_kit')
+      ->execute()->column('source');
+    $candidates = [
+      'Source display label', 'Source no results', 'Source add row', 'Source column label',
+      'Source column tooltip', 'Source image alt', 'Source html rewrite', '[id]', 'Source {$smarty}',
+    ];
+    // The texts SearchDisplay::get translates, without html rewrites, templates or field tokens
+    $this->assertSame([
+      'Source display label', 'Source no results', 'Source add row', 'Source column label',
+      'Source column tooltip', 'Source image alt',
+    ], array_values(array_intersect($candidates, $sources)));
   }
 
 }

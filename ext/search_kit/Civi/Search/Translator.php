@@ -12,6 +12,70 @@ use Civi\Api4\TranslationSource;
 class Translator extends AutoService {
 
   /**
+   * User-facing texts of a display: TRUE marks a text, an array a nested setting, [0 => spec] a list of them.
+   */
+  public const TEXTS = [
+    'label' => TRUE,
+    'settings' => [
+      'description' => TRUE,
+      'noResultsText' => TRUE,
+      'button' => TRUE,
+      'tally' => ['label' => TRUE],
+      'editableRow' => ['createLabel' => TRUE],
+      'addButton' => ['text' => TRUE],
+      'toolbar' => [['text' => TRUE, 'title' => TRUE]],
+      'columns' => [
+        [
+          'label' => TRUE,
+          'title' => TRUE,
+          'text' => TRUE,
+          'rewrite' => TRUE,
+          'empty_value' => TRUE,
+          'image' => ['alt' => TRUE],
+          'tally' => ['label' => TRUE],
+          'links' => [['text' => TRUE, 'title' => TRUE]],
+        ],
+      ],
+    ],
+  ];
+
+  /**
+   * Call $callback on each user-facing text of a display, replacing the text with its result.
+   *
+   * Markup or Smarty in a text marks it as a template, which a translation could break, so it is skipped.
+   */
+  public static function walkTexts(array &$item, callable $callback, array $texts = self::TEXTS): void {
+    foreach ($texts as $key => $spec) {
+      // The rewrite of an html column is markup, not a text
+      if ($key === 'rewrite' && ($item['type'] ?? NULL) === 'html') {
+        continue;
+      }
+      if ($spec === TRUE) {
+        if (!empty($item[$key]) && is_string($item[$key]) && !self::isTemplate($item[$key])) {
+          $item[$key] = $callback($item[$key]);
+        }
+      }
+      elseif (isset($item[$key]) && is_array($item[$key])) {
+        if (isset($spec[0])) {
+          foreach ($item[$key] as &$child) {
+            if (is_array($child)) {
+              self::walkTexts($child, $callback, $spec[0]);
+            }
+          }
+        }
+        else {
+          self::walkTexts($item[$key], $callback, $spec);
+        }
+      }
+    }
+  }
+
+  private static function isTemplate(string $text): bool {
+    return (str_contains($text, '<') && str_contains($text, '>'))
+      || (str_contains($text, '{') && str_contains($text, '}'));
+  }
+
+  /**
    * When changing to multilingual, ensure we extract all translation source strings
    */
   #[CiviEventListener(event: 'civi.core.makeMultilingual')]
@@ -26,31 +90,17 @@ class Translator extends AutoService {
     self::updateSearchDisplaySources((array) $searchDisplays);
   }
 
-  public static function updateSearchDisplaySources(array $searchDisplay) {
-    // extracting labels as source for translation
-    // similar to Civi\Afform\StringVisitor but simpler
-    $translatableFields = ['label', 'title', 'description', 'text', 'empty_value', 'rewrite'];
+  public static function updateSearchDisplaySources(array $searchDisplays) {
     $strings = [];
-    foreach ($searchDisplay as $item) {
-      $settings = $item['settings'] ?? [];
-      self::extractStrings($strings, $settings, $translatableFields);
+    foreach ($searchDisplays as $display) {
+      self::walkTexts($display, function (string $text) use (&$strings) {
+        if (self::isWorthy($text)) {
+          $strings[trim($text)] = 1;
+        }
+        return $text;
+      });
     }
-    $strings = array_keys($strings);
-    self::saveTranslations($strings);
-  }
-
-  protected static function extractStrings(array &$strings, array $def, array $translatableFields) {
-    foreach ($def as $key => $value) {
-      if (is_array($value)) {
-        self::extractStrings($strings, $value, $translatableFields);
-      }
-      elseif (in_array($key, $translatableFields)
-        // special case of rewrite, exclude html
-        && !($key == 'rewrite' && ($def['type'] ?? '') == 'html')
-        && self::isWorthy($value)) {
-        $strings[$value] = 1;
-      }
-    }
+    self::saveTranslations(array_keys($strings));
   }
 
   protected static function saveTranslations(array $strings) {
