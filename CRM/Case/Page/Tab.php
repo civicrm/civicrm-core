@@ -24,6 +24,8 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * The action links that we need to display for the browse screen.
    *
    * @var array
+   *
+   * @deprecated since 6.22 will be removed around 6.28
    */
   public static $_links = NULL;
   public $_permission = NULL;
@@ -191,11 +193,13 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
   /**
    * Get action links.
    *
+   * @deprecated since 6.22 will be removed around 6.28
+   *
    * @return array
    *   (reference) of action links
    */
   public static function &links() {
-
+    CRM_Core_Error::deprecatedFunctionWarning('no replacement');
     if (!(self::$_links)) {
       self::$_links = [
         CRM_Core_Action::VIEW => [
