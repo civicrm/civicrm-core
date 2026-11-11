@@ -580,7 +580,7 @@ function _civicrm_api3_contact_update($params, $contactID = NULL) {
  * @throws CRM_Core_Exception
  * @throws \CRM_Core_Exception
  */
-function _civicrm_api3_greeting_format_params($params) {
+function _civicrm_api3_greeting_format_params(&$params) {
   $greetingParams = ['', '_id', '_custom'];
   foreach (['email', 'postal', 'addressee'] as $key) {
     $greeting = '_greeting';
@@ -589,10 +589,6 @@ function _civicrm_api3_greeting_format_params($params) {
     }
 
     $formatParams = FALSE;
-    // Unset display value from params.
-    if (isset($params["{$key}{$greeting}_display"])) {
-      unset($params["{$key}{$greeting}_display"]);
-    }
 
     // check if greetings are present in present
     foreach ($greetingParams as $greetingValues) {
@@ -618,7 +614,7 @@ function _civicrm_api3_greeting_format_params($params) {
     $customGreeting = $params["{$key}{$greeting}_custom"] ?? NULL;
 
     if (!$greetingId && $greetingVal) {
-      $params["{$key}{$greeting}_id"] = CRM_Utils_Array::key($params["{$key}{$greeting}"], $greetings);
+      $greetingId = $params["{$key}{$greeting}_id"] = CRM_Utils_Array::key($greetingVal, $greetings);
     }
 
     if ($customGreeting && $greetingId &&

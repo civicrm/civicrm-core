@@ -4471,6 +4471,32 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that a greeting passed by its label is saved as that greeting.
+   */
+  public function testContactGreetingCreateByLabel(): void {
+    $label = $this->callAPISuccessGetValue('OptionValue', ['option_group_id' => 'postal_greeting', 'value' => 2, 'return' => 'label']);
+    $contact = $this->callAPISuccess('Contact', 'create', ['first_name' => 'Alan', 'last_name' => 'MouseMouse', 'contact_type' => 'Individual', 'postal_greeting' => $label]);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact['id'], 'return' => ['postal_greeting_id', 'postal_greeting']]);
+    $this->assertEquals(2, $contact['postal_greeting_id']);
+    $this->assertSame('Dear Alan MouseMouse', $contact['postal_greeting_display']);
+
+    $this->callAPIFailure('Contact', 'create', ['id' => $contact['id'], 'postal_greeting' => 'Customized'], 'Please provide a custom value for postal greeting');
+  }
+
+  /**
+   * Test that a greeting display passed with skip_greeting_processing is saved.
+   */
+  public function testContactCreateKeepsGreetingDisplayWhenSkipped(): void {
+    $contact = $this->callAPISuccess('Contact', 'create', [
+      'first_name' => 'Alan',
+      'contact_type' => 'Individual',
+      'skip_greeting_processing' => 1,
+      'email_greeting_display' => 'Hello Alan',
+    ]);
+    $this->assertSame('Hello Alan', CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contact['id'], 'email_greeting_display'));
+  }
+
+  /**
    * Test that creating a contact with various contact greetings works.
    *
    * @param int $version
