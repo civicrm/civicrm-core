@@ -293,7 +293,7 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
             CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID,
               $name,
               $this->_defaults,
-              $this->_contactId,
+              NULL,
               $this->_mode
             );
           }
