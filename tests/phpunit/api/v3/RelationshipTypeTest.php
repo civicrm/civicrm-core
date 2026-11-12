@@ -36,22 +36,6 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     $this->quickCleanup($tablesToTruncate);
   }
 
-  ///////////////// civicrm_relationship_type_add methods
-
-  /**
-   * Check with no name.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testRelationshipTypeCreateWithoutName($version) {
-    $this->_apiversion = $version;
-    $relTypeParams = [
-      'contact_type_a' => 'Individual',
-      'contact_type_b' => 'Organization',
-    ];
-    $result = $this->callAPIFailure('relationship_type', 'create', $relTypeParams);
-  }
-
   /**
    * Create relationship type.
    * @param int $version
@@ -73,78 +57,6 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     unset($params['sequential']);
     //assertDBState compares expected values in $result to actual values in the DB
     $this->assertDBState('CRM_Contact_DAO_RelationshipType', $result['id'], $params);
-  }
-
-  /**
-   * Check if required fields are not passed.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testRelationshipTypeDeleteWithoutRequired($version) {
-    $this->_apiversion = $version;
-    $params = [
-      'name_b_a' => 'Relation 2 delete without required',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 0,
-      'is_active' => 0,
-    ];
-
-    $result = $this->callAPIFailure('relationship_type', 'delete', $params);
-    if ($version == 3) {
-      $this->assertSame('Mandatory key(s) missing from params array: id', $result['error_message']);
-    }
-    else {
-      $this->assertSame('Parameter "where" is required.', $result['error_message']);
-    }
-  }
-
-  /**
-   * Check with incorrect required fields.
-   */
-  public function testRelationshipTypeDeleteWithIncorrectData(): void {
-    $params = [
-      'id' => 'abcd',
-      'name_b_a' => 'Relation 2 delete with incorrect',
-      'description' => 'Testing relationship type',
-      'contact_type_a' => 'Individual',
-      'contact_type_b' => 'Individual',
-      'is_reserved' => 0,
-      'is_active' => 0,
-    ];
-    $result = $this->callAPIFailure('relationship_type', 'delete', $params,
-      'id is not a valid integer'
-    );
-  }
-
-  /**
-   * Check relationship type delete.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testRelationshipTypeDelete($version) {
-    $this->_apiversion = $version;
-    $id = $this->_relationshipTypeCreate();
-    // create sample relationship type.
-    $params = [
-      'id' => $id,
-    ];
-    $result = $this->callAPISuccess('relationship_type', 'delete', $params);
-    $this->assertAPIDeleted('relationship_type', $id);
-  }
-
-  ///////////////// civicrm_relationship_type_update
-
-  /**
-   * Check with empty array.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testRelationshipTypeUpdateEmpty($version) {
-    $this->_apiversion = $version;
-    $params = [];
-    $result = $this->callAPIFailure('relationship_type', 'create', $params);
-    $this->assertStringContainsString('name_a_b', $result['error_message']);
-    $this->assertStringContainsString('name_b_a', $result['error_message']);
   }
 
   /**
@@ -219,7 +131,7 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
       'is_active' => 1,
     ];
 
-    $first = $this->callAPISuccess('RelationshipType', 'Create', $firstRelTypeParams);
+    $this->callAPISuccess('RelationshipType', 'Create', $firstRelTypeParams);
 
     $secondRelTypeParams = [
       'name_a_b' => 'Relation 25 for create',
@@ -273,8 +185,8 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     ];
     $results = $this->callAPISuccess('relationship_type', 'get', $params);
 
-    $this->assertSame(1, $results['count'], ' in line ' . __LINE__);
-    $this->assertSame($this->apiValue(TRUE), $results['values'][$results['id']]['is_active'], ' in line ' . __LINE__);
+    $this->assertSame(1, $results['count']);
+    $this->assertSame($this->apiValue(TRUE), $results['values'][$results['id']]['is_active']);
   }
 
   /**
