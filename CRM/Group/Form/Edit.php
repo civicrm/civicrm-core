@@ -305,11 +305,9 @@ WHERE  title = %1
   public function postProcess() {
     Civi::rebuild(['system' => TRUE])->execute();
 
-    $updateNestingCache = FALSE;
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Contact_BAO_Group::discard($this->_id);
       CRM_Core_Session::setStatus(ts("The Group '%1' has been deleted.", [1 => $this->_groupValues['title']]), ts('Group Deleted'), 'success');
-      $updateNestingCache = TRUE;
     }
     else {
       // store the submitted values in an array

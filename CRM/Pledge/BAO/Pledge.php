@@ -537,7 +537,7 @@ GROUP BY  currency
       $receiptFrom = "$userName <$userEmail>";
     }
 
-    [$sent, $subject, $message, $html] = CRM_Core_BAO_MessageTemplate::sendTemplate(
+    [, $subject] = CRM_Core_BAO_MessageTemplate::sendTemplate(
       [
         'groupName' => 'msg_tpl_workflow_pledge',
         'workflow' => 'pledge_acknowledge',

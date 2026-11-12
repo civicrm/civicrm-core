@@ -52,7 +52,6 @@ class OptionValueLinksProvider {
       //   'weight' => 80,
       //   'target' => NULL,
       // ];*/
-      $idToken = $optionValueId ?: '[id]';
       $optionValue = \Civi\Api4\OptionValue::get(FALSE)
         ->addSelect('value')
         ->addWhere('id', '=', $optionValueId)
