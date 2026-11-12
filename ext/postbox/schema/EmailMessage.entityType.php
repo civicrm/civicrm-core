@@ -44,17 +44,6 @@ return [
     //   'sql_type' => 'varchar(500)',
     //   'input_type' => 'Text',
     // ],
-    'to_contact_id' => [
-      'title' => E::ts('To Contact ID'),
-      'sql_type' => 'int unsigned',
-      'input_type' => 'EntityRef',
-      'description' => E::ts('FK to TO Contact'),
-      'entity_reference' => [
-        'entity' => 'Contact',
-        'key' => 'id',
-        'on_delete' => 'SET NULL',
-      ],
-    ],
     'location_type' => [
       'title' => E::ts('Location Type'),
       'sql_type' => 'varchar(255)',
