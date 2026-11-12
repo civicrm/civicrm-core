@@ -114,6 +114,11 @@
                 throw "Failed to load AB Test";
               }
               crmMailingAB.ab = abResult.values[abResult.id];
+              // A is the master copy, so a Draft can't be edited without A.
+              if (!['Testing', 'Final'].includes(crmMailingAB.ab.status) && !crmMailingAB.ab.mailing_id_a) {
+                CRM.alert(ts('Mailing A of this A/B test has been deleted, so the test can no longer be edited.'), ts('A/B Test'), 'error');
+                throw new Error('Mailing A of this A/B test has been deleted');
+              }
               return crmMailingAB._loadMailings();
             });
         }
@@ -199,7 +204,7 @@
               });
           }
           else {
-            crmMailingAB.mailings[mkey] = crmMailingMgr.create();
+            crmMailingAB.mailings[mkey] = crmMailingMgr.create({mailing_type: mkey === 'c' ? 'winner' : 'experiment'});
             crmMailingAB.attachments[mkey] = new CrmAttachments(function () {
               return {entity_table: 'civicrm_mailing', entity_id: crmMailingAB.ab['mailing_id_' + mkey]};
             });

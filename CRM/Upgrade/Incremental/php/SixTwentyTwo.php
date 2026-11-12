@@ -30,6 +30,43 @@ class CRM_Upgrade_Incremental_php_SixTwentyTwo extends CRM_Upgrade_Incremental_B
   public function upgrade_6_22_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Set "group_multiple_parents" setting if used', 'setMultipleGroupParents');
+    $this->addTask('Add foreign keys from A/B tests to their mailings', 'addMailingABForeignKeys');
+  }
+
+  /**
+   * Add FKs from Mailing A/B tests to Mailings, so a deleted mailing doesn't
+   * break the A/B test report.
+   *
+   * First null any existing references to deleted mailings, then add the FKs.
+   *
+   * @return bool
+   */
+  public static function addMailingABForeignKeys(): bool {
+    // Adding an FK copies the table, which strict SQL modes refuse if any row
+    // holds a zero date (see dev/core#6701).
+    $sqlModes = CRM_Utils_SQL::getSqlModes();
+    CRM_Utils_SQL::setSqlModes(array_diff($sqlModes, ['NO_ZERO_DATE', 'NO_ZERO_IN_DATE']));
+    try {
+      foreach (['mailing_id_a', 'mailing_id_b', 'mailing_id_c'] as $fieldName) {
+        CRM_Core_DAO::executeQuery("
+          UPDATE `civicrm_mailing_abtest` ab
+          LEFT JOIN `civicrm_mailing` m ON m.`id` = ab.`$fieldName`
+          SET ab.`$fieldName` = NULL
+          WHERE ab.`$fieldName` IS NOT NULL AND m.`id` IS NULL
+        ", i18nRewrite: FALSE);
+        Civi::schemaHelper()->createForeignKey('civicrm_mailing_abtest', $fieldName, [
+          'entity_reference' => [
+            'entity' => 'Mailing',
+            'key' => 'id',
+            'on_delete' => 'SET NULL',
+          ],
+        ]);
+      }
+    }
+    finally {
+      CRM_Utils_SQL::setSqlModes($sqlModes);
+    }
+    return TRUE;
   }
 
   /**

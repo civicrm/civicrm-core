@@ -38,23 +38,38 @@ return [
     'mailing_id_a' => [
       'title' => ts('Mailing ID (A)'),
       'sql_type' => 'int unsigned',
-      'input_type' => 'Number',
+      'input_type' => 'EntityRef',
       'description' => ts('The first experimental mailing ("A" condition)'),
       'add' => '4.6',
+      'entity_reference' => [
+        'entity' => 'Mailing',
+        'key' => 'id',
+        'on_delete' => 'SET NULL',
+      ],
     ],
     'mailing_id_b' => [
       'title' => ts('Mailing ID (B)'),
       'sql_type' => 'int unsigned',
-      'input_type' => 'Number',
+      'input_type' => 'EntityRef',
       'description' => ts('The second experimental mailing ("B" condition)'),
       'add' => '4.6',
+      'entity_reference' => [
+        'entity' => 'Mailing',
+        'key' => 'id',
+        'on_delete' => 'SET NULL',
+      ],
     ],
     'mailing_id_c' => [
       'title' => ts('Mailing ID (C)'),
       'sql_type' => 'int unsigned',
-      'input_type' => 'Number',
+      'input_type' => 'EntityRef',
       'description' => ts('The final, general mailing (derived from A or B)'),
       'add' => '4.6',
+      'entity_reference' => [
+        'entity' => 'Mailing',
+        'key' => 'id',
+        'on_delete' => 'SET NULL',
+      ],
     ],
     'domain_id' => [
       'title' => ts('Domain ID'),
