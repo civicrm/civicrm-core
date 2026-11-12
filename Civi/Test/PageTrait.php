@@ -15,9 +15,6 @@ namespace Civi\Test;
  * Trait for writing tests interacting with QuickForm Pages.
  */
 trait PageTrait {
-  /**
-   * @var \Civi\Test\PageWrapper
-   */
   private PageWrapper $page;
 
   public function getTestPage(string $pageName, array $urlParameters = []): PageWrapper {

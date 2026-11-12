@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Tag;
+
 /**
  *
  * @package CRM
@@ -141,7 +143,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
     $cloneFrom = CRM_Utils_Request::retrieve('clone_from', 'Integer');
     if (empty($this->_id) && $cloneFrom) {
       $params = ['id' => $cloneFrom];
-      CRM_Core_BAO_Tag::retrieve($params, $this->_values);
+      CRM_Core_DAO::commonRetrieve($this->_BAOName, $params, $this->_values);
       $this->_values['label'] .= ' ' . ts('(copy)');
       if (!empty($this->_values['is_reserved']) && !CRM_Core_Permission::check('administer reserved tags')) {
         $this->_values['is_reserved'] = 0;
@@ -163,7 +165,11 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::DELETE) {
       $deleted = 0;
-      $tag = civicrm_api3('tag', 'getsingle', ['id' => $this->_id[0]]);
+      $tag = Tag::get(FALSE)
+        ->addSelect('label', 'is_tagset')
+        ->addWhere('id', '=', $this->_id[0])
+        ->execute()
+        ->single();
       foreach ($this->_id as $id) {
         if (CRM_Core_BAO_Tag::deleteRecord(['id' => $id])) {
           $deleted++;
