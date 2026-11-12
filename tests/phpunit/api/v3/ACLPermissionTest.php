@@ -261,12 +261,9 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
       ]);
       $this->assertGreaterThan(0, $results['count']);
     }
-    $newTag = civicrm_api3('Tag', 'create', [
-      'name' => 'Foo123',
-    ]);
     $relatedEntities = [
       'Note' => ['note' => 'abc'],
-      'EntityTag' => ['tag_id' => $newTag['id']],
+      'EntityTag' => ['tag_id' => $this->createTestEntity('Tag', ['name' => 'Foo123', 'label' => 'Foo123'])['id']],
     ];
     foreach ($relatedEntities as $entity => $params) {
       $params += [
