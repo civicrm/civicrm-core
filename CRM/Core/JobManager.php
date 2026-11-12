@@ -95,7 +95,7 @@ class CRM_Core_JobManager {
     // Get a list of jobs that have not completed previously.
     // This could be because they are a new job that has not yet run or a job that is fatally crashing (eg. OOM).
     // If last_run is NULL the job has never run and will be selected above so exclude it here
-    // If last_run_end is NULL the job has never completed successfully.
+    // If last_run_end is NULL the job has never completed or its latest run did not finish.
     // If last_run_end is < last_run job has completed successfully in the past but is now failing to complete.
     $maybeUnsuccessfulJobs = Job::get(FALSE)
       ->addWhere('is_active', '=', TRUE)

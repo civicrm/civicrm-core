@@ -2574,6 +2574,31 @@ ENDSQLUPDATE;
   }
 
   /**
+   * While a job runs, last_run_end is empty, so a crash leaves no stale end date.
+   */
+  public function testLastRunEndIsClearedWhileJobRuns(): void {
+    \Civi\Api4\Job::update(FALSE)->addWhere('id', 'IS NOT NULL')->addValue('is_active', FALSE)->execute();
+    $jobID = $this->createTestEntity('Job', [
+      'name' => 'Previously completed',
+      'run_frequency' => 'Always',
+      'api_entity' => 'Domain',
+      'api_action' => 'get',
+      'is_active' => TRUE,
+      'last_run' => '2020-01-01 10:00:00',
+      'last_run_end' => '2020-01-01 10:05:00',
+    ])['id'];
+    $lastRunEndDuringRun = 'not captured';
+    $this->hookClass->setHook('civicrm_preJob', function ($job) use ($jobID, &$lastRunEndDuringRun) {
+      if ((int) $job->id === $jobID) {
+        $lastRunEndDuringRun = \Civi\Api4\Job::get(FALSE)->addWhere('id', '=', $jobID)->execute()->single()['last_run_end'];
+      }
+    });
+    $this->callApiV3Success('Job', 'execute');
+    $this->assertNull($lastRunEndDuringRun);
+    $this->assertNotNull(\Civi\Api4\Job::get(FALSE)->addWhere('id', '=', $jobID)->execute()->single()['last_run_end']);
+  }
+
+  /**
    * A failing preJob or postJob hook does not stop the remaining jobs.
    */
   public function testExecuteContinuesAfterHookError(): void {
