@@ -883,7 +883,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'checkPermissions' => FALSE,
     ])->indexBy('activity_id')->getArrayCopy();
     $this->assertSame(2, count($activities));
-    $activityNames = array_flip(CRM_Utils_Array::collect('activity_id.activity_type_id:label', $activities));
+    $activityNames = array_flip(array_column($activities, 'activity_id.activity_type_id:label'));
     $this->assertArrayHasKey('Membership Signup', $activityNames);
     $this->assertArrayHasKey('Change Membership Status', $activityNames);
 

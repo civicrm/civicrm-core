@@ -212,7 +212,7 @@ class CiviMailUtils extends PHPUnit\Framework\TestCase {
   public function assertRecipients($expectedRecipients) {
     $recipients = [];
     foreach ($this->getAllMessages('ezc') as $message) {
-      $recipients[] = CRM_Utils_Array::collect('email', $message->to);
+      $recipients[] = array_column($message->to, 'email');
     }
     $cmp = function($a, $b) {
       if ($a[0] == $b[0]) {

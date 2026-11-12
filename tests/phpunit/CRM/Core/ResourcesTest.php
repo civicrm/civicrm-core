@@ -75,7 +75,7 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $b = CRM_Core_Resources_Common::createBasicBundle('cheese', $init);
     $this->assertSame('cheese', $b->name);
     $this->assertEquals(['init_cheese', 'alter_cheese'], $hits);
-    $this->assertEquals(['doStuff();', 'alert();'], array_values(CRM_Utils_Array::collect('script', $b->getAll())));
+    $this->assertEquals(['doStuff();', 'alert();'], array_column($b->getAll(), 'script'));
   }
 
   /**

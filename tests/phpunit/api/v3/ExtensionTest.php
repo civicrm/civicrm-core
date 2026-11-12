@@ -112,9 +112,9 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
     $this->assertEquals(
       [],
       array_intersect(
-        CRM_Utils_Array::collect('key', $installed['values']),
-        CRM_Utils_Array::collect('key', $uninstalled['values']),
-        CRM_Utils_Array::collect('key', $disabled['values'])
+        array_column($installed['values'], 'key'),
+        array_column($uninstalled['values'], 'key'),
+        array_column($disabled['values'], 'key')
       )
     );
 

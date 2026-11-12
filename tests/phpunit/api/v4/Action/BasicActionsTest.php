@@ -207,7 +207,7 @@ class BasicActionsTest extends Api4TestBase implements HookInterface, Transactio
 
     $result = MockBasicEntity::batchFrobnicate()->addWhere('color', '=', 'blue')->execute();
     $this->assertSame(2, count($result));
-    $this->assertEquals([400, 1600], \CRM_Utils_Array::collect('frobnication', (array) $result));
+    $this->assertEquals([400, 1600], array_column((array) $result, 'frobnication'));
   }
 
   public function testBatchActionErrorHandling(): void {

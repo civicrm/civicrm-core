@@ -434,21 +434,21 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $r1 = $kernel->runSafe('Widget', 'get', $params);
     $this->assertEquals(count($resultIds), $r1['count']);
     $this->assertEquals($resultIds, array_keys($r1['values']));
-    $this->assertEquals($resultIds, array_values(CRM_Utils_Array::collect('snack_id', $r1['values'])));
-    $this->assertEquals($resultIds, array_values(CRM_Utils_Array::collect('id', $r1['values'])));
+    $this->assertEquals($resultIds, array_column($r1['values'], 'snack_id'));
+    $this->assertEquals($resultIds, array_column($r1['values'], 'id'));
 
     $r2 = $kernel->runSafe('Widget', 'get', $params + ['sequential' => 1]);
     $this->assertEquals(count($resultIds), $r2['count']);
-    $this->assertEquals($resultIds, array_values(CRM_Utils_Array::collect('snack_id', $r2['values'])));
-    $this->assertEquals($resultIds, array_values(CRM_Utils_Array::collect('id', $r2['values'])));
+    $this->assertEquals($resultIds, array_column($r2['values'], 'snack_id'));
+    $this->assertEquals($resultIds, array_column($r2['values'], 'id'));
 
     $params['options']['offset'] = 1;
     $params['options']['limit'] = 2;
     $r3 = $kernel->runSafe('Widget', 'get', $params);
     $slice = array_slice($resultIds, 1, 2);
     $this->assertEquals(count($slice), $r3['count']);
-    $this->assertEquals($slice, array_values(CRM_Utils_Array::collect('snack_id', $r3['values'])));
-    $this->assertEquals($slice, array_values(CRM_Utils_Array::collect('id', $r3['values'])));
+    $this->assertEquals($slice, array_column($r3['values'], 'snack_id'));
+    $this->assertEquals($slice, array_column($r3['values'], 'id'));
   }
 
   public function testBasicArrayGetReturn(): void {

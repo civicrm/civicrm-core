@@ -181,7 +181,7 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
       $rows = CRM_Core_DAO::executeQuery($sql)->fetchAll();
 
       // check the order of contact IDs
-      $this->assertEquals($case['expected_contact_ids'], CRM_Utils_Array::collect('civicrm_contact_id', $rows));
+      $this->assertEquals($case['expected_contact_ids'], array_column($rows, 'civicrm_contact_id'));
       // check the order clause
       $this->assertTrue(!empty(strstr($sql, $case['expected_orderby_clause'])));
       // Ensure that we are only fetching primary fields.
