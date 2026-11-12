@@ -202,7 +202,7 @@ div.civicrm-community-messages a.civicrm-community-message-dismiss::before,
 }
 .crm-container .delete-icon::before,
 .crm-container .crm-i.fa-trash::before {
-  content: "\f1f8";
+  content: var(--crm-icon-remove);
   color: var(--crm-icon-danger-color);
 }
 .crm-container .delete-icon:hover::before,
