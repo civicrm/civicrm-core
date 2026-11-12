@@ -28,7 +28,47 @@ trait PageTrait {
   }
 
   /**
-   * Assert that the status set does not contain the given string..
+   * Assert that the page output contains the given string.
+   *
+   * @param string $string
+   */
+  protected function assertOutputContainsString(string $string): void {
+    $this->assertStringContainsString($string, $this->page->getOutput());
+  }
+
+  /**
+   * Assert a variable the page assigned to the template.
+   *
+   * @param string $name
+   * @param mixed $expected
+   */
+  protected function assertPageTemplateVariable(string $name, $expected): void {
+    $this->assertSame($expected, $this->page->getTemplateVariable($name));
+  }
+
+  /**
+   * Get a variable the page assigned to the template.
+   *
+   * @param string $name
+   *
+   * @return mixed
+   */
+  protected function getPageTemplateVariable(string $name): mixed {
+    return $this->page->getTemplateVariable($name);
+  }
+
+  /**
+   * Assert that the page set a status message containing the given string.
+   *
+   * @param string $string
+   */
+  protected function assertPageStatusContainsString(string $string): void {
+    $statusText = implode("\n", array_column($this->page->getStatusMessages(), 'text'));
+    $this->assertStringContainsString($string, $statusText);
+  }
+
+  /**
+   * Assert that the page output does not contain the given string.
    *
    * @param string $string
    */
