@@ -3816,20 +3816,26 @@ WHERE  $smartGroupClause
    * @param array $values
    * @param null $status
    *
-   * @return string
+   * @return string|null
    */
   public function locationType(&$values, $status = NULL) {
     [$name, $op, $value, $grouping, $wildcard] = $values;
 
     if (is_array($value)) {
-      $this->_where[$grouping][] = 'civicrm_address.location_type_id IN (' . implode(',', $value) . ')';
+      $locationTypeIDs = CRM_Core_BAO_Query::cleanIDs($value);
+      if (!$locationTypeIDs) {
+        return NULL;
+      }
+      $this->_where[$grouping][] = 'civicrm_address.location_type_id IN (' . implode(',', $locationTypeIDs) . ')';
       $this->_tables['civicrm_address'] = 1;
       $this->_whereTables['civicrm_address'] = 1;
 
       $locationType = CRM_Core_DAO_Address::buildOptions('location_type_id');
       $names = [];
-      foreach ($value as $id) {
-        $names[] = $locationType[$id];
+      foreach ($locationTypeIDs as $id) {
+        if (isset($locationType[$id])) {
+          $names[] = $locationType[$id];
+        }
       }
 
       $this->_primaryLocation = FALSE;
@@ -4180,6 +4186,10 @@ WHERE  $smartGroupClause
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
     $targetGroup = $this->getWhereValues('relation_target_group', $grouping);
+    if ($targetGroup) {
+      $targetGroup[2] = CRM_Core_BAO_Query::cleanIDs($targetGroup[2]);
+      $targetGroup = $targetGroup[2] ? $targetGroup : NULL;
+    }
 
     $nameClause = $name = NULL;
     if ($targetName) {
@@ -4202,6 +4212,9 @@ WHERE  $smartGroupClause
       $relationType[2] = (array) $relationType[2];
       foreach ($relationType[2] as $relType) {
         $rel = explode('_', $relType);
+        if (!CRM_Utils_Rule::positiveInteger($rel[0])) {
+          continue;
+        }
         self::$_relType = $rel[1];
         $params = ['id' => $rel[0]];
         $typeValues = [];
@@ -4211,7 +4224,7 @@ WHERE  $smartGroupClause
             // if we don't know which end of the relationship we are dealing with we'll create a temp table
             self::$_relType = 'reciprocal';
           }
-          $relTypesIds[] = $rel[0];
+          $relTypesIds[] = (int) $rel[0];
           $relTypes[] = $relType;
         }
       }
@@ -4260,8 +4273,7 @@ WHERE  $smartGroupClause
       //add contacts from static groups
       $this->_tables['civicrm_relationship_group_contact'] = $this->_whereTables['civicrm_relationship_group_contact']
         = " LEFT JOIN civicrm_group_contact civicrm_relationship_group_contact ON civicrm_relationship_group_contact.contact_id = {$groupJoinTable}.{$groupJoinColumn} AND civicrm_relationship_group_contact.status = 'Added'";
-      $groupWhere[] = "( civicrm_relationship_group_contact.group_id IN  (" .
-        implode(",", $targetGroup[2]) . ") ) ";
+      $groupWhere[] = '( civicrm_relationship_group_contact.group_id IN (' . implode(',', $targetGroup[2]) . ') ) ';
 
       //add contacts from saved searches
       $ssWhere = $this->addGroupContactCache($targetGroup[2], "civicrm_relationship_group_contact_cache", $groupJoinTable, $op, $groupJoinColumn);
@@ -4375,6 +4387,8 @@ civicrm_relationship.start_date > {$today}
         // this form value was scalar in previous versions of Civi
         $relPermission[2] = [$relPermission[2]];
       }
+      // 0 (no permission) is a valid choice, so the values are validated rather than cleaned.
+      $relPermission[2] = CRM_Utils_Type::escapeAll($relPermission[2], 'Integer');
       $where[$grouping][] = "(civicrm_relationship.is_permission_a_b IN (" . implode(",", $relPermission[2]) . "))";
 
       $allRelationshipPermissions = CRM_Contact_BAO_Relationship::buildOptions('is_permission_a_b');

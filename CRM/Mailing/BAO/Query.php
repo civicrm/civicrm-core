@@ -239,14 +239,17 @@ class CRM_Mailing_BAO_Query {
 
     switch ($name) {
       case 'mailing_id':
-        $selectedMailings = array_flip($value);
-        $value = "(" . implode(',', $value) . ")";
+        $mailingIDs = CRM_Core_BAO_Query::cleanIDs($value);
+        if (!$mailingIDs) {
+          return;
+        }
         $op = 'IN';
-        $query->_where[$grouping][] = "civicrm_mailing.id $op $value";
+        $query->_where[$grouping][] = 'civicrm_mailing.id ' . $op . ' (' . implode(',', $mailingIDs) . ')';
 
         $mailings = CRM_Mailing_BAO_Mailing::getMailingsList();
-        foreach ($selectedMailings as $id => $dnc) {
-          $selectedMailings[$id] = $mailings[$id];
+        $selectedMailings = [];
+        foreach ($mailingIDs as $id) {
+          $selectedMailings[] = $mailings[$id] ?? $id;
         }
         $selectedMailings = implode(' or ', $selectedMailings);
 
@@ -454,7 +457,7 @@ class CRM_Mailing_BAO_Query {
    *
    * @param $valueTitles
    */
-  public static function mailingEventQueryBuilder(&$query, &$values, $tableName, $fieldName, $fieldTitle, &$valueTitles) {
+  public static function mailingEventQueryBuilder(&$query, $values, $tableName, $fieldName, $fieldTitle, $valueTitles) {
     [$name, $op, $value, $grouping, $wildcard] = $values;
 
     if (empty($value) || $value == 'A') {
@@ -470,8 +473,16 @@ class CRM_Mailing_BAO_Query {
     }
 
     if (is_array($value)) {
-      $query->_where[$grouping][] = "$tableName.$fieldName $op (" . implode(',', $value) . ")";
-      $query->_qill[$grouping][] = "$fieldTitle $op " . implode(', ', array_intersect_key($valueTitles, array_flip($value)));
+      $intValues = CRM_Core_BAO_Query::cleanIDs($value);
+      $op = in_array(strtoupper(trim($op)), ['NOT IN', '!='], TRUE) ? 'NOT IN' : 'IN';
+      $query->_where[$grouping][] = "$tableName.$fieldName $op (" . implode(',', $intValues) . ")";
+      $titles = [];
+      foreach ($intValues as $v) {
+        if (isset($valueTitles[$v])) {
+          $titles[] = $valueTitles[$v];
+        }
+      }
+      $query->_qill[$grouping][] = "$fieldTitle $op " . implode(', ', $titles);
     }
     else {
       $query->_qill[$grouping][] = $fieldTitle . ' - ' . $valueTitles[$value];
