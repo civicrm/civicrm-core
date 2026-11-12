@@ -1040,7 +1040,7 @@ COLS;
         $sqlStmt .= "NEW.$column, ";
         $deleteSQL .= "OLD.$column, ";
       }
-      if (civicrm_api3('Setting', 'getvalue', ['name' => 'logging_uniqueid_date'])) {
+      if (Civi::settings()->get('logging_uniqueid_date')) {
         // Note that when connecting directly via mysql @uniqueID may not be set so a fallback is
         // 'c_' to identify a non-CRM connection + timestamp to the hour + connection_id
         // If the connection_id is longer than 6 chars it will be truncated.

@@ -398,7 +398,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   protected function addSortNameField() {
-    $title = civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']) ? $this->getSortNameLabelWithEmail() : $this->getSortNameLabelWithOutEmail();
+    $title = Civi::settings()->get('includeEmailInName') ? $this->getSortNameLabelWithEmail() : $this->getSortNameLabelWithOutEmail();
     $this->addElement(
       'text',
       'sort_name',

@@ -31,7 +31,7 @@ class CRM_Invoicing_Utils {
     if ($oldValue == $newValue) {
       return;
     }
-    $existingUserViewOptions = civicrm_api3('Setting', 'get', ['return' => 'user_dashboard_options'])['values'][CRM_Core_Config::domainID()]['user_dashboard_options'];
+    $existingUserViewOptions = CRM_Core_DAO::unSerializeField(Civi::settings()->get('user_dashboard_options'), CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND) ?? [];
     $invoiceKey = CRM_Core_OptionGroup::getRowValues('user_dashboard_options', 'Invoices / Credit Notes')['value'];
     $existingIndex = array_search($invoiceKey, $existingUserViewOptions);
 

@@ -32,9 +32,7 @@ class AfformReCaptcha2 {
       ->alterHtml(';\\.aff\\.html$;', function($doc, $path) {
         // Add publicKey to recaptcha elements
         foreach (pq('crm-recaptcha2') as $captcha) {
-          $recaptchaPublicKey = \Civi\Api4\Setting::get(FALSE)
-            ->addSelect('recaptchaPublicKey')
-            ->execute()->first()['value'];
+          $recaptchaPublicKey = \Civi::settings()->get('recaptchaPublicKey');
           pq($captcha)->attr('recaptchakey', $recaptchaPublicKey ?: 'foo');
         }
       });
