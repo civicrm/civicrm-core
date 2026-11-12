@@ -1,6 +1,8 @@
 <?php
 
 use CRM_PayflowPro_ExtensionUtil as E;
+use Civi\Api4\PaymentProcessor;
+use Civi\Api4\PaymentProcessorType;
 use Civi\Test\HeadlessInterface;
 use Civi\Core\HookInterface;
 
@@ -21,7 +23,7 @@ use Civi\Core\HookInterface;
 class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface {
 
   use \Civi\Test\GuzzleTestTrait;
-  use \Civi\Test\Api3TestTrait;
+  use \Civi\Test\EntityTrait;
   use \Civi\Test\LookupHelperTrait;
 
   /**
@@ -29,12 +31,6 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
    * @var CRM_Core_Payment_PayflowPro
    */
   protected $processor;
-
-  /**
-   * Created Object Ids
-   * @var array
-   */
-  public $ids;
 
   public function setUpHeadless() {
     // Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
@@ -51,7 +47,7 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
   }
 
   public function tearDown(): void {
-    $this->callAPISuccess('PaymentProcessor', 'delete', ['id' => $this->ids['PaymentProcessor']['PayflowPro']]);
+    PaymentProcessor::delete(FALSE)->addWhere('id', '=', $this->ids['PaymentProcessor']['PayflowPro'])->execute();
     parent::tearDown();
   }
 
@@ -170,39 +166,29 @@ class CRM_Core_Payment_PayflowProTest extends \PHPUnit\Framework\TestCase implem
   }
 
   public function setUpPayflowProcessor(): void {
-    $paymentProcessorType = $this->callAPISuccess('PaymentProcessorType', 'get', ['name' => 'PayflowPro']);
-    $this->callAPISuccess('PaymentProcessorType', 'create', ['id' => $paymentProcessorType['id'], 'is_active' => 1]);
-    $params = [
+    PaymentProcessorType::update(FALSE)
+      ->addWhere('name', '=', 'PayflowPro')
+      ->addValue('is_active', TRUE)
+      ->execute();
+    $processorID = $this->createTestEntity('PaymentProcessor', [
       'name' => 'demo',
       'title' => 'demo',
       'domain_id' => CRM_Core_Config::domainID(),
-      'payment_processor_type_id' => 'PayflowPro',
-      'is_active' => 1,
-      'is_default' => 0,
-      'is_test' => 0,
+      'payment_processor_type_id:name' => 'PayflowPro',
+      'is_active' => TRUE,
+      'is_default' => FALSE,
+      'is_test' => FALSE,
       'user_name' => 'test',
       'password' => 'test1234',
       'url_site' => 'https://pilot-Payflowpro.paypal.com',
       'class_name' => 'Payment_PayflowPro',
       'billing_mode' => 1,
-      'financial_type_id' => 1,
       'financial_account_id' => $this->getFinancialAccountID('Payment Processor Account'),
       // Credit card = 1 so can pass 'by accident'.
-      'payment_instrument_id' => 'Debit Card',
+      'payment_instrument_id:name' => 'Debit Card',
       'signature' => 'PayPal',
-    ];
-    if (!is_numeric($params['payment_processor_type_id'])) {
-      // really the api should handle this through getoptions but it's not exactly api call so lets just sort it
-      //here
-      $params['payment_processor_type_id'] = $this->callAPISuccess('payment_processor_type', 'getvalue', [
-        'name' => $params['payment_processor_type_id'],
-        'return' => 'id',
-      ], 'integer');
-    }
-    $result = $this->callAPISuccess('payment_processor', 'create', $params);
-    $processorID = $result['id'];
+    ], 'PayflowPro')['id'];
     $this->setupMockHandler($processorID);
-    $this->ids['PaymentProcessor']['PayflowPro'] = $processorID;
   }
 
   /**
