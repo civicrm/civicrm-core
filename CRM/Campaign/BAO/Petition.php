@@ -480,7 +480,7 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
             [
               'groupName' => 'msg_tpl_workflow_petition',
               'workflow' => 'petition_confirmation_needed',
-              'contactId' => $params['contactId'],
+              'modelProps' => ['surveyID' => $surveyID, 'activityID' => $activityID, 'contactID' => $contactID],
               'tplParams' => $tplParams,
               'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
               'toName' => $toName,
