@@ -426,9 +426,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
     ]);
     // Validate autocomplete fields
-    if ($joinResult && !empty($entity['joins'][$joinEntity]['fields'][$joinIdField]['defn']['saved_search'])) {
+    if ($joinResult && !empty($join['fields'][$joinIdField]['defn']['saved_search'])) {
       $keys = array_combine(array_keys($joinResult), array_column($joinResult, $joinIdField));
-      $keys = $this->validateBySavedSearch($entity['name'], $joinEntity, $keys, $joinIdField);
+      $keys = $this->validateBySavedSearch($afEntity['name'] . '+' . $joinEntity, $joinEntity, $keys, $joinIdField);
       $joinResult = array_intersect_key($joinResult, $keys);
     }
     return $joinResult;
