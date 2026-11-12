@@ -156,4 +156,17 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     $this->assertEquals(['hello' => 'World'], $test_setting);
   }
 
+  /**
+   * A boolean setting given as a word in $civicrm_setting is a boolean.
+   */
+  public function testMandatoryCastsBooleanWords(): void {
+    $domain = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
+    $this->mandates['domain'] = ['ajaxPopupsEnabled' => 'false', 'editor_id' => 'false'];
+
+    $settings = $this->createManager()->bootComplete()->getBagByDomain($domain->id);
+
+    $this->assertFalse($settings->get('ajaxPopupsEnabled'));
+    $this->assertSame('false', $settings->get('editor_id'));
+  }
+
 }

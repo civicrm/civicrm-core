@@ -325,6 +325,7 @@ class SettingsManager {
   protected function getMandatory($entity) {
     if ($this->mandatory === NULL) {
       $this->mandatory = self::parseMandatorySettingsGlobalVar($GLOBALS['civicrm_setting'] ?? NULL);
+      $specs = SettingsMetadata::getMetadata([], NULL, FALSE, $this->bootPhase !== self::BOOT_PHASE_COMPLETE);
 
       // merge in settings from env - these take precedence over values from global
       // TODO: should we warn if env var is overriding $civicrm_setting setting?
@@ -333,6 +334,9 @@ class SettingsManager {
             $this->mandatory[$entityKey] ?? [],
             $this->getEnvSettingValues($entityKey)
         );
+        foreach ($this->mandatory[$entityKey] as $key => $value) {
+          $this->mandatory[$entityKey][$key] = SettingsMetadata::castValue($specs[$key] ?? [], $value);
+        }
       }
     }
     return $this->mandatory[$entity];
