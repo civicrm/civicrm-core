@@ -686,8 +686,10 @@ class Submit extends AbstractProcessor {
             $params['id'] = $existing['id'];
             unset($params['contact_id_a'], $params['contact_id_b']);
             // If this is a flipped reciprocal relationship, also flip the permissions
-            $params['is_permission_a_b'] = $relationship['is_permission_b_a'] ?? NULL;
-            $params['is_permission_b_a'] = $relationship['is_permission_a_b'] ?? NULL;
+            if ($existing['contact_id_a'] != $contact_id_a) {
+              $params['is_permission_a_b'] = $relationship['is_permission_b_a'] ?? NULL;
+              $params['is_permission_b_a'] = $relationship['is_permission_a_b'] ?? NULL;
+            }
           }
         }
         $api4('Relationship', 'save', ['records' => [$params]]);

@@ -201,4 +201,98 @@ EOHTML;
     $this->assertCount(2, $prefill['Individual1']['values']);
   }
 
+  /**
+   * Build a form that relates Person1 (a) to Person2 (b) and lets a edit b.
+   */
+  private function useRelationshipFormWithEditPermission(int $typeID): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" data="{}" name="Person1" actions="{create: true, update: true}" security="FBAC" url-autofill="1" />
+  <af-entity type="Individual" data="{}" name="Person2" actions="{create: true, update: true}" security="FBAC" url-autofill="1" />
+  <af-entity type="Relationship" name="Relationship1" actions="{create: true, update: true}" security="FBAC" data="{contact_id_a: ['Person1'], contact_id_b: ['Person2'], relationship_type_id: $typeID, is_permission_a_b: 1}" />
+  <fieldset af-fieldset="Person1"><af-field name="first_name" /></fieldset>
+  <fieldset af-fieldset="Person2"><af-field name="first_name" /></fieldset>
+  <fieldset af-fieldset="Relationship1"><af-field name="description" /></fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+  }
+
+  private function submitRelationshipForm(int $person1, int $person2, string $description): void {
+    Afform::submit()
+      ->setName($this->formName)
+      ->setArgs(['Person1' => $person1, 'Person2' => $person2])
+      ->setValues([
+        'Person1' => [['fields' => ['first_name' => 'One']]],
+        'Person2' => [['fields' => ['first_name' => 'Two']]],
+        'Relationship1' => [['fields' => ['description' => $description]]],
+      ])
+      ->execute();
+  }
+
+  /**
+   * Submitting again for an existing relationship keeps the permission direction.
+   */
+  public function testResubmitKeepsRelationshipPermissionDirection(): void {
+    $typeID = $this->createTestRecord('RelationshipType', [
+      'name_a_b' => 'Mentor of',
+      'name_b_a' => 'Mentored by',
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Individual',
+    ])['id'];
+    $this->useRelationshipFormWithEditPermission($typeID);
+    $mentor = $this->createTestRecord('Individual')['id'];
+    $mentee = $this->createTestRecord('Individual')['id'];
+
+    foreach (['first', 'second'] as $description) {
+      $this->submitRelationshipForm($mentor, $mentee, $description);
+      $relationship = Relationship::get(FALSE)
+        ->addWhere('relationship_type_id', '=', $typeID)
+        ->execute()->single();
+      $this->assertSame($description, $relationship['description']);
+      $this->assertSame($mentor, $relationship['contact_id_a']);
+      $this->assertSame([1, 0], [$relationship['is_permission_a_b'], $relationship['is_permission_b_a']], "after the $description submission");
+    }
+    // Drop the administer grant of the test case, so only the relationship counts.
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+    $this->assertTrue(\CRM_Contact_BAO_Contact_Permission::allow($mentee, \CRM_Core_Permission::EDIT, $mentor));
+    $this->assertFalse(\CRM_Contact_BAO_Contact_Permission::allow($mentor, \CRM_Core_Permission::EDIT, $mentee));
+  }
+
+  /**
+   * A reciprocal relationship stored in the other direction gets the permissions swapped.
+   */
+  public function testFlippedReciprocalRelationshipSwapsPermissions(): void {
+    $typeID = $this->createTestRecord('RelationshipType', [
+      'name_a_b' => 'Peer of',
+      'name_b_a' => 'Peer of',
+      'label_a_b' => 'Peer of',
+      'label_b_a' => 'Peer of',
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Individual',
+    ])['id'];
+    $this->useRelationshipFormWithEditPermission($typeID);
+    $person1 = $this->createTestRecord('Individual')['id'];
+    $person2 = $this->createTestRecord('Individual')['id'];
+    $this->createTestRecord('Relationship', [
+      'relationship_type_id' => $typeID,
+      'contact_id_a' => $person2,
+      'contact_id_b' => $person1,
+    ]);
+
+    foreach (['first', 'second'] as $description) {
+      $this->submitRelationshipForm($person1, $person2, $description);
+      $relationship = Relationship::get(FALSE)
+        ->addWhere('relationship_type_id', '=', $typeID)
+        ->execute()->single();
+      $this->assertSame($description, $relationship['description']);
+      $this->assertSame($person2, $relationship['contact_id_a']);
+      $this->assertSame([0, 1], [$relationship['is_permission_a_b'], $relationship['is_permission_b_a']], "after the $description submission");
+    }
+  }
+
 }
