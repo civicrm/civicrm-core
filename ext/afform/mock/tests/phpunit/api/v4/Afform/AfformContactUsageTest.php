@@ -1090,4 +1090,41 @@ EOHTML;
 
   }
 
+  /**
+   * The dedupe rule does not replace a contact that autofill already identified.
+   */
+  public function testDedupeKeepsAutofilledCurrentUser(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" data="{}" name="Individual1" actions="{create: true, update: true}" security="FBAC" autofill="user" contact-dedupe="Individual.Unsupervised" />
+  <fieldset af-fieldset="Individual1">
+    <af-field name="last_name" />
+    <div af-join="Email" data="{is_primary: true}"><af-field name="email" /></div>
+  </fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $userID = $this->createLoggedInUser();
+    $otherEmail = uniqid('other') . '@example.org';
+    $otherID = $this->createTestRecord('Individual', ['last_name' => 'Other', 'email_primary.email' => $otherEmail])['id'];
+    // Drop the administer grant of the test case: the user has only "access CiviCRM".
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          ['fields' => ['last_name' => 'Changed'], 'joins' => ['Email' => [['email' => $otherEmail]]]],
+        ],
+      ])
+      ->execute();
+
+    $this->assertSame('Other', Contact::get(FALSE)->addWhere('id', '=', $otherID)->execute()->single()['last_name']);
+    $this->assertSame('Changed', Contact::get(FALSE)->addWhere('id', '=', $userID)->execute()->single()['last_name']);
+  }
+
 }
