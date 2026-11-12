@@ -11,14 +11,12 @@
 
 namespace Civi\Test;
 
-use Civi\Civi\Test\PageWrapper;
-
 /**
  * Trait for writing tests interacting with QuickForm Pages.
  */
 trait PageTrait {
   /**
-   * @var \Civi\Civi\Test\PageWrapper
+   * @var \Civi\Test\PageWrapper
    */
   private PageWrapper $page;
 

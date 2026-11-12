@@ -9,7 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Civi\Test;
+namespace Civi\Test;
 
 class PageWrapper {
 
