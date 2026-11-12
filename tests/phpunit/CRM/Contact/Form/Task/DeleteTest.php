@@ -14,6 +14,8 @@
   */
 class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
 
+  use \Civi\Test\FormTrait;
+
   /**
    * @var int
    * The contact we are deleting and resurrecting.
@@ -61,6 +63,48 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
 
     // put settings back
     Civi::settings()->set('contact_undelete', $old_undelete_setting);
+  }
+
+  /**
+   * Deleting from search results is refused when the selection holds a
+   * contact the user may view but not edit.
+   */
+  public function testDeleteFromSearchRequiresEditPermission(): void {
+    $viewOnlyContactID = $this->individualCreate([], 'view_only');
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'delete contacts'];
+    $editable = $this->deleted_contact_id;
+    $this->hookClass->setHook('civicrm_aclWhereClause', function ($type, &$tables, &$whereTables, &$contactID, &$where) use ($editable, $viewOnlyContactID) {
+      $ids = $type == CRM_Core_Permission::EDIT ? [$editable] : [$editable, $viewOnlyContactID];
+      $where = 'contact_a.id IN (' . implode(',', $ids) . ')';
+    });
+
+    $this->getTestForm('CRM_Contact_Form_Search_Basic', ['radio_ts' => 'ts_all'])
+      ->addSubsequentForm('CRM_Contact_Form_Task_Delete', [])
+      ->processForm();
+    $status = CRM_Core_Session::singleton()->getStatus(TRUE);
+    $this->assertStringContainsString('one or more of the selected contacts', $status[0]['text']);
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_contact WHERE is_deleted = 1 AND id IN (%1, %2)', [
+      1 => [$editable, 'Integer'],
+      2 => [$viewOnlyContactID, 'Integer'],
+    ]));
+  }
+
+  /**
+   * Deleting from search results works when every selected contact is editable.
+   */
+  public function testDeleteFromSearchWithEditPermission(): void {
+    $this->createLoggedInUser();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'delete contacts'];
+    $editable = $this->deleted_contact_id;
+    $this->hookClass->setHook('civicrm_aclWhereClause', function ($type, &$tables, &$whereTables, &$contactID, &$where) use ($editable) {
+      $where = 'contact_a.id = ' . $editable;
+    });
+
+    $this->getTestForm('CRM_Contact_Form_Search_Basic', ['radio_ts' => 'ts_all'])
+      ->addSubsequentForm('CRM_Contact_Form_Task_Delete', [])
+      ->processForm();
+    $this->assertSame(1, (int) CRM_Core_DAO::singleValueQuery('SELECT is_deleted FROM civicrm_contact WHERE id = %1', [1 => [$editable, 'Integer']]));
   }
 
   /**
