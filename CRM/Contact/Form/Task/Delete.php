@@ -93,6 +93,10 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     }
     else {
       parent::preProcess();
+      $allowed = CRM_Contact_BAO_Contact_Permission::allowList($this->_contactIds, CRM_Core_Permission::EDIT);
+      if (array_diff($this->_contactIds, $allowed)) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to delete one or more of the selected contacts. Note: you can delete contacts if you can edit them.'));
+      }
     }
 
     if ($this->_restore) {
