@@ -250,12 +250,10 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       $clauses[] = "name LIKE '" . strtolower(CRM_Core_DAO::escapeWildCardString($this->_sortByCharacter)) . "%'";
     }
 
-    $campaignIds = $this->get('campaign_id');
-    if (!CRM_Utils_System::isNull($campaignIds)) {
-      if (!is_array($campaignIds)) {
-        $campaignIds = [$campaignIds];
-      }
-      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campaignIds)) . ' ) )';
+    // The session value is unfiltered form input.
+    $campaignIds = array_filter((array) $this->get('campaign_id'), ['CRM_Utils_Rule', 'positiveInteger']);
+    if ($campaignIds) {
+      $clauses[] = '( campaign_id IN ( ' . implode(' , ', $campaignIds) . ' ) )';
     }
 
     return implode(' AND ', $clauses);

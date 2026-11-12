@@ -641,12 +641,10 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $params[5] = [$createdId, 'Integer'];
     }
 
-    $campaignIds = $this->_parent->get('campaign_id');
-    if (!CRM_Utils_System::isNull($campaignIds)) {
-      if (!is_array($campaignIds)) {
-        $campaignIds = [$campaignIds];
-      }
-      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campaignIds)) . ' ) )';
+    // The session value is unfiltered form input.
+    $campaignIds = array_filter((array) $this->_parent->get('campaign_id'), ['CRM_Utils_Rule', 'positiveInteger']);
+    if ($campaignIds) {
+      $clauses[] = '( campaign_id IN ( ' . implode(' , ', $campaignIds) . ' ) )';
     }
 
     if ($language = $this->_parent->get('language')) {
