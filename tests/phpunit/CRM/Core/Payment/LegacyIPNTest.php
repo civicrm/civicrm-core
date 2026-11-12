@@ -13,7 +13,7 @@
  * Class CRM_Core_Payment_BaseIPNTest
  * @group headless
  */
-class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
+class CRM_Core_Payment_LegacyIPNTest extends CiviUnitTestCase {
   use CRM_Core_Payment_AuthorizeNetTrait;
 
   protected $_financialTypeId;
@@ -34,14 +34,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
    */
   protected $_membershipParams = [];
 
-  /**
-   * IPN instance.
-   *
-   * @var CRM_Core_Payment_BaseIPN
-   */
   protected $IPN;
   protected $_recurId;
-  protected $_membershipId;
   protected $input;
   protected $objects;
 
