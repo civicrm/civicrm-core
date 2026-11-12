@@ -288,7 +288,8 @@ SELECT acl.*
       $aclKeys = array_keys($acls);
       $aclKeys = implode(',', $aclKeys);
 
-      $cacheKey = CRM_Utils_Cache::cleanKey("$type-$tableName-$aclKeys");
+      // The permitted IDs depend on the list of objects that was checked.
+      $cacheKey = CRM_Utils_Cache::cleanKey("$type-$tableName-$aclKeys-" . md5(implode(',', array_keys($allGroups))));
       $cache = CRM_Utils_Cache::singleton();
       $ids = $cache->get($cacheKey);
       if (!is_array($ids)) {
@@ -416,7 +417,7 @@ SELECT acl.*
               }
             }
             else {
-              $ids = array_diff($ids, array_keys($allGroups));
+              $ids = [];
             }
           }
         }
