@@ -315,7 +315,7 @@ class ClassScanner {
           // of interfaces on every page-load.)
           static::$caches[$name] = \CRM_Utils_Cache::create([
             'name' => 'classes',
-            'scope' => 'version',
+            'scope' => 'runtime',
             'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
             'withArray' => 'fast',
           ]);
