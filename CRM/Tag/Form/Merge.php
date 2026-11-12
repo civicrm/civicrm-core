@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Tag;
+
 /**
  *
  * @package CRM
@@ -23,19 +25,22 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
   protected $_tags;
 
   public function preProcess() {
-    $this->_id = CRM_Utils_Request::retrieve('id', 'String', $this, FALSE);
-    $this->_id = explode(',', $this->_id);
+    $this->_id = explode(',', (string) CRM_Utils_Request::retrieve('id', 'CommaSeparatedIntegers', $this, FALSE));
     $url = CRM_Utils_System::url('civicrm/tag');
     if (count($this->_id) < 2) {
       CRM_Core_Error::statusBounce(ts("You must select at least 2 tags for merging."), $url);
     }
-    $tags = civicrm_api3('Tag', 'get', ['id' => ['IN' => $this->_id], 'options' => ['limit' => 0]]);
-    $this->_tags = $tags['values'];
+    $this->_tags = (array) Tag::get(FALSE)
+      ->addSelect('id', 'label', 'is_reserved')
+      ->addWhere('id', 'IN', $this->_id)
+      ->addOrderBy('id')
+      ->execute()
+      ->indexBy('id');
     if (count($this->_id) != count($this->_tags)) {
       CRM_Core_Error::statusBounce(ts("Unknown tag."), $url);
     }
     if (!CRM_Core_Permission::check('administer reserved tags')) {
-      foreach ($tags['values'] as $tag) {
+      foreach ($this->_tags as $tag) {
         if (!empty($tag['is_reserved'])) {
           CRM_Core_Error::statusBounce(ts("You do not have permission to administer reserved tags."), $url);
         }
@@ -48,7 +53,7 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $this->add('text', 'label', ts('Label of combined tag'), NULL, TRUE);
-    $this->assign('tags', CRM_Utils_Array::collect('label', $this->_tags));
+    $this->assign('tags', array_column($this->_tags, 'label', 'id'));
 
     $this->addButtons([
         [
@@ -79,9 +84,9 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
   /**
    * Process the form submission.
    */
-  public function postProcess() {
+  public function postProcess(): void {
     $params = $this->exportValues();
-    $deleted = CRM_Utils_Array::collect('label', $this->_tags);
+    $deleted = array_column($this->_tags, 'label');
     $primary = array_shift($this->_tags);
 
     foreach ($this->_tags as $tag) {
@@ -89,7 +94,10 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
     }
 
     if ($params['label'] != $primary['label']) {
-      civicrm_api3('Tag', 'create', ['id' => $primary['id'], 'label' => $params['label']]);
+      Tag::update(FALSE)
+        ->addWhere('id', '=', $primary['id'])
+        ->addValue('label', $params['label'])
+        ->execute();
     }
 
     CRM_Core_Session::setStatus(

@@ -48,7 +48,6 @@
     </div>
   </div>
 </div>
-{crmAPI entity="Contact" action="getsingle" var="user" return='display_name' id="user_contact_id"}
 {literal}
 <script type="text/javascript">
   (function($) {
@@ -56,7 +55,7 @@
       var $window = $(window),
         renderedTabs = ['tree'],
         tagSets = {/literal}{$tagsets|@json_encode}{literal},
-        user = {/literal}{$user|@json_encode}{literal},
+        userDisplayName = {/literal}{$userDisplayName|@json_encode}{literal},
         usedFor = {/literal}{$usedFor|@json_encode}{literal},
         menuHeight = $('#civicrm-menu').height() + 15,
         YES = {/literal}"{ts escape='js'}Yes{/ts}"{literal},
@@ -191,6 +190,15 @@
         return $el;
       }
 
+      // Saves via APIv4 while showing the usual "Saving..." / "Saved" status.
+      function saveWithStatus(apiCall) {
+        return CRM.status({}, CRM.toJqPromise(apiCall));
+      }
+
+      function updateTag(id, values) {
+        return saveWithStatus(CRM.api4('Tag', 'update', {where: [['id', '=', id]], values: values}));
+      }
+
       function formatTagSet(info) {
         info.date = CRM.utils.formatDate(info.created_date);
         info.used_for_label = info.used_for === undefined ? [] : info.used_for.split(',').map((item) => usedFor[item]);
@@ -219,7 +227,7 @@
           }
           node.data.color = color;
           $('.tag-tree', $panel).jstree(true).redraw(true);
-          CRM.api3('Tag', 'create', {id: id, color: color}, true);
+          updateTag(id, {color: color});
         }
 
         function changeSelection(e, data) {
@@ -265,7 +273,7 @@
           }).get(),
             id = $(this).closest('.crm-entity').data('id');
           if (vals.length) {
-            CRM.api3('Tag', 'create', {id: id, used_for: vals}, true);
+            updateTag(id, {used_for: vals});
             var node = $('.tag-tree', $panel).jstree(true).get_node(id);
             node.data.used_for = vals;
           }
@@ -273,7 +281,7 @@
 
         function moveTag(e, data) {
           if (data.parent != data.old_parent) {
-            CRM.api3('Tag', 'create', {id: data.node.id, parent_id: data.parent.replace('#', '')}, true);
+            updateTag(data.node.id, {parent_id: data.parent.replace('#', '') || null});
           }
         }
 
@@ -320,9 +328,9 @@
             .on('crmConfirm:yes', function() {
               var chosen = parseInt($('#select-tagset').val());
               if (parseInt(tagset) !== chosen) {
-                var apiCalls = selected.map((id) => ['Tag', 'create', {id: id, parent_id: chosen || ''}]);
+                var apiCalls = selected.map((id) => ['Tag', 'update', {where: [['id', '=', id]], values: {parent_id: chosen || null}}]);
                 $('#mainTabContainer').block();
-                CRM.api3(apiCalls, true)
+                saveWithStatus(CRM.api4(apiCalls))
                   .done(function() {
                     $('.tag-tree', $panel).jstree(true).refresh();
                     $('#mainTabContainer').unblock();
@@ -430,7 +438,7 @@
         CRM.loadForm(CRM.url('civicrm/tag/edit', {action: 'add', tagset: 1}))
           .on('crmFormSuccess', function(e, data) {
             tagSets[data.tag.id] = data.tag;
-            tagSets[data.tag.id].display_name = user.display_name;
+            tagSets[data.tag.id].display_name = userDisplayName;
             formatTagSet(tagSets[data.tag.id]);
             $("#new-tagset").before('<div id="tagset-' + data.tag.id + '">');
             $("a[href='#new-tagset']").parent().before('<li class="ui-corner-all crm-tab-button"><a href="#tagset-' + data.tag.id + '"></a></li>');
