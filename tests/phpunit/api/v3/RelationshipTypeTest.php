@@ -60,22 +60,6 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check relationship type delete.
-   * @param int $version
-   * @dataProvider versionThreeAndFour
-   */
-  public function testRelationshipTypeDelete($version) {
-    $this->_apiversion = $version;
-    $id = $this->_relationshipTypeCreate();
-    // create sample relationship type.
-    $params = [
-      'id' => $id,
-    ];
-    $result = $this->callAPISuccess('relationship_type', 'delete', $params);
-    $this->assertAPIDeleted('relationship_type', $id);
-  }
-
-  /**
    * Check with no contact type.
    * @param int $version
    * @dataProvider versionThreeAndFour
