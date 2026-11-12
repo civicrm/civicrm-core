@@ -414,10 +414,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
         if ($contact->find(TRUE)) {
           $otherContactType = $contact->contact_type;
-          //CRM-5125 for contact subtype specific relationshiptypes
-          if ($contact->contact_sub_type) {
-            $otherContactSubType = $contact->contact_sub_type;
-          }
         }
       }
     }
