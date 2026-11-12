@@ -125,7 +125,7 @@ class Submit extends AbstractProcessor {
       $this->setResponseItem('message', $message);
     }
     elseif ($this->_afform['redirect']) {
-      $redirect = $this->replaceTokens($this->_afform['redirect']);
+      $redirect = $this->replaceTokens($this->_afform['redirect'], 'url');
       $this->setResponseItem('redirect', $redirect);
     }
 

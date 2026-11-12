@@ -1007,27 +1007,17 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Except for special case of JWT submission token [token]
    *
    * @param string $text
+   * @param string $format
+   *   Context the values are inserted into: 'html' or 'url'.
    *
    * @return string
    */
-  public function replaceTokens(string $text): string {
-    $matches = [];
-    preg_match_all('/\[[a-zA-Z0-9_]+\.[0-9]+\.[^]]+]/', $text, $matches);
-
-    foreach ($matches[0] as $match) {
-      // strip [ ] and split on .
-      [$entityName, $index, $field] = explode('.', substr($match, 1, -1), 3);
-      if ($field === 'id') {
-        $value = $this->_entityIds[$entityName][$index]['id'];
-      }
-      elseif (isset($this->_submissionTokenValues[$entityName][$index][$field])) {
-        $value = $this->_submissionTokenValues[$entityName][$index][$field];
-      }
-      else {
-        $value = $this->_entityValues[$entityName][$index]['fields'][$field];
-      }
-      $text = str_replace($match, $value, $text);
-    }
+  public function replaceTokens(string $text, string $format = 'html'): string {
+    // Token values are user input: encode them for the context, in a single pass.
+    $text = preg_replace_callback('/\[[a-zA-Z0-9_]+\.[0-9]+\.[^]]+]/', function ($match) use ($format) {
+      $value = $this->getTokenValue($match[0]);
+      return $format === 'url' ? rawurlencode($value) : htmlspecialchars($value);
+    }, $text);
 
     // handle special case of JWT token token
     $text = str_replace('[token]', $this->_response['token'] ?? '', $text);
