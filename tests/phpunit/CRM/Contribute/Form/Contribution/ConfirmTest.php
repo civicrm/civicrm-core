@@ -11,6 +11,7 @@
 
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
+use Civi\Api4\ContributionProduct;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipBlock;
@@ -18,6 +19,7 @@ use Civi\Api4\Pledge;
 use Civi\Api4\PriceFieldValue;
 use Civi\Api4\PriceSet;
 use Civi\Api4\PriceSetEntity;
+use Civi\Api4\Product;
 use Civi\Test\ContributionPageTestTrait;
 use Civi\Test\FormTrait;
 
@@ -865,6 +867,34 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
       'sku-be-do',
       '.97',
     ]);
+  }
+
+  /**
+   * A premium with a fixed period starts on the configured day of the current year.
+   */
+  public function testSubmitWithFixedPeriodPremium(): void {
+    $this->contributionPageWithPriceSetCreate();
+    Product::update(FALSE)->addWhere('id', '=', $this->ids['Product']['ContributionPage'])
+      ->setValues([
+        'period_type' => 'fixed',
+        'fixed_period_start_day' => 101,
+        'duration_unit' => 'year',
+        'duration_interval' => 1,
+      ])
+      ->execute();
+    $this->submitOnlineContributionForm([
+      'id' => $this->getContributionPageID(),
+      'selectProduct' => $this->ids['Product']['ContributionPage'],
+      'options_' . $this->ids['Product']['ContributionPage'] => 'clumsy smurf',
+      'price_' . $this->ids['PriceField']['radio_field'] => $this->ids['PriceFieldValue']['10_dollars'],
+    ] + $this->getBillingSubmitValues());
+
+    $premium = ContributionProduct::get(FALSE)
+      ->addWhere('contribution_id.contribution_page_id', '=', $this->getContributionPageID())
+      ->execute()->single();
+    $year = (int) date('Y');
+    $this->assertEquals($year . '-01-01', substr($premium['start_date'], 0, 10));
+    $this->assertEquals(($year + 1) . '-01-01', substr($premium['end_date'], 0, 10));
   }
 
   /**
