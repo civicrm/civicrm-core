@@ -205,32 +205,6 @@ class Api4SelectQuery extends Api4Query {
   }
 
   /**
-   * Add WHERE clause to query
-   */
-  protected function buildWhereClause() {
-    foreach ($this->getWhere() as $clause) {
-      $sql = $this->treeWalkClauses($clause, 'WHERE');
-      if ($sql) {
-        $this->query->where($sql);
-      }
-    }
-  }
-
-  /**
-   * Add HAVING clause to query
-   *
-   * Every expression referenced must also be in the SELECT clause.
-   */
-  protected function buildHavingClause() {
-    foreach ($this->getHaving() as $clause) {
-      $sql = $this->treeWalkClauses($clause, 'HAVING');
-      if ($sql) {
-        $this->query->having($sql);
-      }
-    }
-  }
-
-  /**
    * Add ORDER BY to query
    */
   protected function buildOrderBy() {
