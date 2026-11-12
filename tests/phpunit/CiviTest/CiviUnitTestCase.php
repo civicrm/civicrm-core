@@ -107,7 +107,7 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    *
    * @var int
    */
-  protected $_apiversion = 3;
+  protected $_apiversion = 4;
 
   /**
    * Track tables we have modified during a test.
