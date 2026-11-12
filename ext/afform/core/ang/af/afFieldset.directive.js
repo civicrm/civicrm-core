@@ -246,6 +246,29 @@
          * Get search param set ID from URL hash param
          */
         this.getSearchParamSetId = () => ($scope && $scope.routeParams) ? $scope.routeParams._s : null;
+
+        /**
+         * Get fields that are facets (ie have defn.show_counts)
+         */
+        this.getFacets = () => {
+          const fieldMeta = this.getFieldMeta();
+          return Object.keys(fieldMeta).filter((key) => fieldMeta[key].show_counts);
+        };
+
+        this.setFacetCounts = (counts) => this.facetCounts = counts;
+
+        this.getFacetCount = (fieldName, optionId) => {
+          if (!this.facetCounts) {
+            // until facets have been fetched show '?'
+            return '?';
+          }
+          // indexes are json-encoded @see \Civi\Api4\Action\SearchDisplay\Run::processFacetCountResult
+          const optionIndex = JSON.stringify(optionId);
+          if (this.facetCounts[fieldName] && this.facetCounts[fieldName][optionIndex]) {
+            return this.facetCounts[fieldName][optionIndex];
+          }
+          return 0;
+        };
       }
     };
   });

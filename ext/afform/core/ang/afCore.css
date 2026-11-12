@@ -186,3 +186,6 @@ af-search-param-sets dl > div > dt {
   opacity: 1;
   box-shadow: none !important; /* vs dropdown-toggle */
 }
+.crm-afform-filter-count {
+  margin-left: var(--crm-l-small, 0.25rem);
+}

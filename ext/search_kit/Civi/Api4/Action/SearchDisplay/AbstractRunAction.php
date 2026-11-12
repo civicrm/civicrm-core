@@ -1884,9 +1884,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * Limited to the current display
    *
-   * @return string[]
+   * @return array[]
    */
-  private function getAfformFilterFields() {
+  protected function getAfformFilterFields() {
     $afform = $this->loadAfform();
     if ($afform) {
       return array_column(\CRM_Utils_Array::findAll(
@@ -1895,6 +1895,12 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       ), NULL, 'name');
     }
     return [];
+  }
+
+  protected function getAfformFacetFields(): array {
+    $filterFields = $this->getAfformFilterFields();
+    $facetFields = array_filter($filterFields, fn ($field) => !empty($field['defn']['show_counts']));
+    return \array_keys($facetFields);
   }
 
   /**

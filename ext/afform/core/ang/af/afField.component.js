@@ -441,11 +441,20 @@
         return ctrl.defn.input_type === 'DisplayOnly';
       };
 
-      ctrl.isDisabled = function() {
-        if (ctrl.isReadonly()) {
+      this.isDisabled = (option) => {
+        if (this.defn.disabled) {
           return true;
         }
-        return (ctrl.defn.input_type === 'EntityRef' && !ctrl.fkEntity) || !!ctrl.defn.disabled;
+        if (this.defn.input_type === 'EntityRef' && !this.fkEntity) {
+          return true;
+        }
+        if (this.isReadonly()) {
+          return true;
+        }
+        if (option && option.count === 0) {
+          return true;
+        }
+        return false;
       };
 
       ctrl.getDisplayValue = function(value) {
@@ -530,6 +539,12 @@
           return [];
         }
 
+        if (this.defn.show_counts) {
+          // update option counts and sort in place
+          fieldOptions.forEach((opt) => opt.count = this.getFacetCount(opt.id));
+          fieldOptions.sort((a, b) => b.count - a.count);
+        }
+
         // check and evaluate any conditionals if present
         return fieldOptions.filter((opt) => {
           if (!opt.if || !opt.if.length) return true;
@@ -565,14 +580,19 @@
         $element.find('input[crm-ui-select]').controller('ngModel')?.$render();
       };
 
-      $scope.select2Options = function() {
-        return {
-          // color/icon/description are what crmSelect2's default formatCrmSelect2 renderer
-          // looks for on each result - carrying them through here is what lets e.g. a tags
-          // filter show the same colored swatches as everywhere else tags are picked.
-          results: $scope.getOptions().map((opt) => ({id: opt.id, text: opt.label, color: opt.color, icon: opt.icon, description: opt.description}))
-        };
-      };
+      $scope.select2Options = () => ({
+        // color/icon/description are what crmSelect2's default formatCrmSelect2 renderer
+        // looks for on each result - carrying them through here is what lets e.g. a tags
+        // filter show the same colored swatches as everywhere else tags are picked.
+        results: $scope.getOptions().map((opt) => ({
+          id: opt.id,
+          text: this.defn.show_counts ? `${opt.label} (${opt.count ?? '?'})` : opt.label,
+          color: opt.color,
+          icon: opt.icon,
+          description: opt.description,
+          disabled: (opt.count === 0)
+        }))
+      });
 
       this.onChangeOperator = function() {
         $scope.dataProvider.getFieldData()[ctrl.fieldName] = {};
@@ -674,6 +694,8 @@
         }
         return defaultDate;
       }
+
+      this.getFacetCount = (optionId) => this.afFieldset?.getFacetCount(this.defn.name, optionId);
 
     }
   });

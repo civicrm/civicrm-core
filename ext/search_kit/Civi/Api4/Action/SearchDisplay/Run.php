@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\SearchDisplay;
 
+use Civi\Api4\Generic\Result;
 use Civi\API\Request;
 use Civi\Api4\Query\Api4SelectQuery;
 use Civi\Api4\Query\SqlExpression;
@@ -57,6 +58,17 @@ class Run extends AbstractRunAction {
       [$runMode, $page] = explode(':', $runMode);
     }
 
+    if ($runMode === 'facet_counts') {
+      $facets = $this->getAfformFacetFields();
+      if (!$facets) {
+        throw new \CRM_Core_Exception("SavedSearch.run return=facet_counts, but there are no facet fields");
+      }
+
+      // we remove facet field values from filters (so we can show the counts if that
+      // option isnt selected)
+      $facetFilters = \array_intersect_key($this->getFilters(), array_flip($facets));
+      $this->setFilters(array_diff_key($this->getFilters(), $facetFilters));
+    }
     // This looks like an unused variable but is not.
     // The CRM_Utils_AutoClean instance must be stored or it will be destoyed immediately.
     $autoClean = $this->applyTimeout();
@@ -69,6 +81,32 @@ class Run extends AbstractRunAction {
     $this->applyFilters();
 
     switch ($runMode) {
+      case 'tally':
+        $result[] = $this->getTally();
+        return;
+
+      case 'facet_counts':
+        if (!empty($apiParams['having'])) {
+          // TODO: facet counting is currently not supported for searches with having filters
+          // because we can't safely manipulate the select / group by
+          // returning no result will just be ignored clientside
+          return;
+        }
+
+        // add facet fields to the group by in order to summarise counts
+        $apiParams['groupBy'] = array_merge($apiParams['groupBy'] ?? [], $facets);
+
+        // select the facet values and the row count
+        $key = CoreUtil::getIdFieldName($entityName);
+        $apiParams['select'] = \array_merge([], $facets, ["COUNT($key)"]);
+
+        // remove unnecessary orders and incompatible limits
+        unset($apiParams['orderBy'], $apiParams['limit']);
+
+        $apiResult = $this->runGet($entityName, $apiParams, $index);
+        $result->exchangeArray($this->processFacetCountResult((array) $apiResult, $key, $facets, $facetFilters));
+        return;
+
       case 'id':
         $keyFields = array_values($this->getRowKeyFields());
         if (!$keyFields) {
@@ -96,10 +134,6 @@ class Run extends AbstractRunAction {
         unset($apiParams['orderBy'], $apiParams['limit']);
         break;
 
-      case 'tally':
-        $result[] = $this->getTally();
-        return;
-
       case 'draggableWeight':
         // Used when refreshing after a drag-sort.
         /* @see InlineEdit::updateDraggableWeight */
@@ -108,7 +142,10 @@ class Run extends AbstractRunAction {
         }
         $idField = CoreUtil::getIdFieldName($entityName);
         $weightField = $this->display['settings']['draggable'];
-        $apiParams['select'] = [$idField, $weightField];
+        if (empty($apiParams['having'])) {
+          $apiParams['select'] = [];
+        }
+        $apiParams['select'] = array_merge($apiParams['select'], [$idField, $weightField]);
         $index = [$idField => $weightField];
         break;
 
@@ -142,24 +179,8 @@ class Run extends AbstractRunAction {
         throw new \CRM_Core_Exception("Unknown search mode '$runMode'");
     }
 
-    try {
-      $apiResult = civicrm_api4($entityName, 'get', $apiParams, $index);
-    }
-    catch (\Civi\Core\Exception\DBQueryException $e) {
-      // MySQL error 3024 = ER_QUERY_TIMEOUT; MariaDB error 1969 = ER_STATEMENT_TIMEOUT
-      if (in_array($e->getSQLErrorCode(), [3024, 1969], TRUE)) {
-        throw new \CRM_Core_Exception(
-          E::ts('The search query timed out. Try narrowing your search or contact your administrator.'),
-          'search_timeout'
-        );
-      }
-      \Civi::log()->error('SearchDisplay.Run error: ' . get_class($e) . ": {$entityName}.get: [display_id] " . ($this->display['id'] ?? 'null') . ' [saved_search_id] ' . ($this->display['saved_search_id'] ?? 'null') . ' [label] ' . ($this->display['label'] ?? '') . ' [error] ' . $e->getMessage());
-      throw $e;
-    }
-    catch (\Throwable $e) {
-      \Civi::log()->error("SearchDisplay.Run error: " . get_class($e) . ": {$entityName}.get: [display_id] " . ($this->display['id'] ?? 'null') . ' [saved_search_id] ' . ($this->display['saved_search_id'] ?? 'null') . ' [label] ' . ($this->display['label'] ?? '') . ' [error] ' . $e->getMessage());
-      throw $e;
-    }
+    $apiResult = $this->runGet($entityName, $apiParams, $index);
+
     // Copy over meta properties to this result
     $result->rowCount = $apiResult->rowCount;
     $result->debug = $apiResult->debug;
@@ -188,6 +209,27 @@ class Run extends AbstractRunAction {
       }
       $result->exchangeArray($this->formatResult($apiResult));
       $result->labels = $this->filterLabels;
+    }
+  }
+
+  protected function runGet($entityName, $apiParams, $index): Result {
+    try {
+      return civicrm_api4($entityName, 'get', $apiParams, $index);
+    }
+    catch (\Civi\Core\Exception\DBQueryException $e) {
+      // MySQL error 3024 = ER_QUERY_TIMEOUT; MariaDB error 1969 = ER_STATEMENT_TIMEOUT
+      if (in_array($e->getSQLErrorCode(), [3024, 1969], TRUE)) {
+        throw new \CRM_Core_Exception(
+          E::ts('The search query timed out. Try narrowing your search or contact your administrator.'),
+          'search_timeout'
+        );
+      }
+      \Civi::log()->error('SearchDisplay.Run error: ' . get_class($e) . ": {$entityName}.get: [display_id] " . ($this->display['id'] ?? 'null') . ' [saved_search_id] ' . ($this->display['saved_search_id'] ?? 'null') . ' [label] ' . ($this->display['label'] ?? '') . ' [error] ' . $e->getMessage());
+      throw $e;
+    }
+    catch (\Throwable $e) {
+      \Civi::log()->error("SearchDisplay.Run error: " . get_class($e) . ": {$entityName}.get: [display_id] " . ($this->display['id'] ?? 'null') . ' [saved_search_id] ' . ($this->display['saved_search_id'] ?? 'null') . ' [label] ' . ($this->display['label'] ?? '') . ' [error] ' . $e->getMessage());
+      throw $e;
     }
   }
 
@@ -327,6 +369,45 @@ class Run extends AbstractRunAction {
         }
       }
     }
+  }
+
+  private function processFacetCountResult(array $getResult, string $countKey, array $facetFields, array $facetFilters): array {
+    $countsByFacetByValue = [];
+
+    foreach ($facetFields as $facetField) {
+
+      $countsByFacetByValue[$facetField] = [];
+
+      $otherFacetFilters = array_diff_key($facetFilters, [$facetField => TRUE]);
+
+      foreach ($getResult as $countRow) {
+        if (!$this->facetCountRowMatchesFilters($countRow, $otherFacetFilters)) {
+          continue;
+        }
+        $facetValue = $countRow[$facetField];
+        foreach ((array) $facetValue as $v) {
+          // stringify to avoid munging false / 0 etc
+          $valueIndex = \json_encode($v);
+          $countsByFacetByValue[$facetField][$valueIndex] ??= 0;
+          $countsByFacetByValue[$facetField][$valueIndex] += $countRow["COUNT:{$countKey}"];
+        }
+      }
+    }
+
+    return $countsByFacetByValue;
+  }
+
+  private function facetCountRowMatchesFilters(array $countRow, array $filters): bool {
+
+    foreach ($filters as $key => $filterValue) {
+      $rowValue = $countRow[$key];
+
+      if (!\array_intersect((array) $rowValue, (array) $filterValue)) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
   }
 
 }
