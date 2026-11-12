@@ -608,6 +608,52 @@ EOHTML,
     $this->assertSame('Processed', $getSubmission($ownSubmission['id'])['status_id:name']);
   }
 
+  public function testDedupeMatchKeepsStoredJoinRecords(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" data="{}" name="Individual1" actions="{create: true, update: true}" security="FBAC" contact-dedupe="Individual.Unsupervised" />
+  <fieldset af-fieldset="Individual1">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+    <div af-join="Email" data="{is_primary: true}"><af-field name="email" /></div>
+    <div af-join="Address" data="{is_primary: true}"><af-field name="street_address" /></div>
+    <div af-join="Phone"><af-field name="phone" /></div>
+  </fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $email = uniqid('stored') . '@example.org';
+    $contactID = $this->createTestRecord('Individual', ['first_name' => 'Stored', 'last_name' => 'Contact', 'email_primary.email' => $email])['id'];
+    $this->createTestRecord('Address', ['contact_id' => $contactID, 'street_address' => '1 Stored Street', 'is_primary' => TRUE]);
+    $this->createTestRecord('Phone', ['contact_id' => $contactID, 'phone' => '111']);
+    $this->createTestRecord('Phone', ['contact_id' => $contactID, 'phone' => '222']);
+    // Submit as an anonymous visitor, without the administer grant of the test case.
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => ['first_name' => 'Stored', 'last_name' => 'Contact'],
+            'joins' => [
+              'Email' => [['email' => $email]],
+              'Address' => [['street_address' => '']],
+              'Phone' => [['phone' => '333']],
+            ],
+          ],
+        ],
+      ])
+      ->execute();
+
+    $this->assertCount(1, Address::get(FALSE)->addWhere('contact_id', '=', $contactID)->execute(), 'An empty address block removes nothing.');
+    $this->assertCount(2, Phone::get(FALSE)->addWhere('contact_id', '=', $contactID)->execute(), 'A filled phone block removes no other phone.');
+  }
+
   public function testFormValidationEntityFields(): void {
     $this->useValues([
       'layout' => self::$layouts['updateInfo'],
