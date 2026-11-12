@@ -29,6 +29,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_contact', 'civicrm_campaign'], TRUE);
+    $_GET = [];
     parent::tearDown();
   }
 
@@ -674,6 +675,60 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
     $extractedGetParams = CRM_Core_BAO_CustomGroup::extractGetParams($form, 'Individual');
 
     $this->assertSame('2017-06-13', $extractedGetParams[$fieldName]);
+  }
+
+  /**
+   * Url values are extracted for custom groups extending any of several
+   * entity types, whether the types are passed as an array or as a quoted
+   * comma-separated string.
+   *
+   * @dataProvider getExtractGetParamsTypes
+   */
+  public function testExtractGetParamsMultipleEntityTypes(array|string $types): void {
+    $this->createTestEntity('CustomGroup', [
+      'title' => 'Individual Group',
+      'extends' => 'Individual',
+      'style' => 'Inline',
+    ], 'individual');
+    $selectField = $this->createTestEntity('CustomField', [
+      'custom_group_id' => $this->ids['CustomGroup']['individual'],
+      'label' => 'Marital Status',
+      'html_type' => 'Select',
+      'data_type' => 'String',
+      'option_values' => ['S' => 'Single', 'M' => 'Married'],
+    ], 'select');
+    $this->createTestEntity('CustomGroup', [
+      'title' => 'Contribution Group',
+      'extends' => 'Contribution',
+      'style' => 'Inline',
+    ], 'contribution');
+    $textField = $this->createTestEntity('CustomField', [
+      'custom_group_id' => $this->ids['CustomGroup']['contribution'],
+      'label' => 'Note',
+      'html_type' => 'Text',
+      'data_type' => 'String',
+    ], 'text');
+
+    $form = new CRM_Contribute_Form_Contribution();
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $form->controller = new CRM_Core_Controller();
+    $_GET = [
+      'custom_' . $selectField['id'] => 'Single',
+      'custom_' . $textField['id'] => 'Hello',
+    ];
+    $extractedGetParams = CRM_Core_BAO_CustomGroup::extractGetParams($form, $types);
+
+    $this->assertSame([
+      'custom_' . $selectField['id'] => 'S',
+      'custom_' . $textField['id'] => 'Hello',
+    ], $extractedGetParams);
+  }
+
+  public static function getExtractGetParamsTypes(): array {
+    return [
+      'array' => [['Contact', 'Individual', 'Contribution']],
+      'quoted string' => ["'Contact', 'Individual', 'Contribution'"],
+    ];
   }
 
   /**

@@ -1177,8 +1177,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    *
    * @param CRM_Core_Form $form
    *   The form object.
-   * @param string $type
-   *   The type of custom group we are using.
+   * @param string|array $type
+   *   The entity type(s) the custom groups extend, e.g. ['Contact', 'Individual'].
+   *   A quoted, comma-separated string ("'Contact', 'Individual'") is also accepted.
    *
    * @return array
    * @throws \CRM_Core_Exception
@@ -1186,6 +1187,9 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   public static function extractGetParams(&$form, $type) {
     if (empty($_GET)) {
       return [];
+    }
+    if (is_string($type) && str_contains($type, "'")) {
+      $type = explode(',', str_replace([' ', "'"], '', $type));
     }
 
     $groupTree = self::getAll(['extends' => $type, 'is_active' => TRUE, 'style' => 'Inline']);
