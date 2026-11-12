@@ -13,6 +13,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\Email;
 use Civi\Api4\Mailing;
 use Civi\Api4\MailingEventQueue;
+use Civi\Api4\MailingJob;
 
 /**
  * File for the CiviCRM APIv3 job functions
@@ -205,6 +206,34 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
     $this->runProcessMailing(5);
 
     $this->_mut->assertRecipients($this->getRecipients(1, 3));
+    $this->assertSame('Complete', Mailing::get(FALSE)->addWhere('id', '=', $mailing['id'])->execute()->single()['status']);
+  }
+
+  /**
+   * A recipient who opts out after the first child job has queued must not
+   * shift the next child job's window and push another recipient out of it.
+   */
+  public function testOptOutBetweenChildJobsSkipsNoRecipient(): void {
+    $this->createContactsInGroup(4, $this->_groupID);
+    Civi::settings()->add(['mailerJobSize' => 2, 'mailerBatchLimit' => 2]);
+    // Child jobs are scheduled a second apart; start in the past so both are due.
+    $mailing = $this->callAPISuccess('Mailing', 'create', ['scheduled_date' => date('YmdHis', strtotime('-1 minute'))] + $this->_params);
+    $this->runProcessMailing(1);
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+    Contact::update(FALSE)
+      ->addWhere('email_primary.email', '=', 'mail1@nul.example.com')
+      ->addValue('is_opt_out', TRUE)
+      ->execute();
+
+    $this->runProcessMailing(3);
+
+    $this->_mut->assertRecipients($this->getRecipients(1, 4));
+    $this->assertSame([2, 2], MailingJob::get(FALSE)
+      ->addSelect('job_limit')
+      ->addWhere('mailing_id', '=', $mailing['id'])
+      ->addWhere('job_type', '=', 'child')
+      ->addOrderBy('id')
+      ->execute()->column('job_limit'), 'No stopgap job is needed for skipped recipients');
     $this->assertSame('Complete', Mailing::get(FALSE)->addWhere('id', '=', $mailing['id'])->execute()->single()['status']);
   }
 
@@ -712,6 +741,8 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   protected function cleanupMailingTest() {
+    Civi::settings()->set('mailerBatchLimit', 0);
+    Civi::settings()->set('mailerJobSize', 0);
     $this->quickCleanup([
       'civicrm_mailing',
       'civicrm_mailing_job',
@@ -727,7 +758,6 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
       'civicrm_activity_contact',
       'civicrm_activity',
     ]);
-    Civi::settings()->set('mailerBatchLimit', 0);
   }
 
   /**
