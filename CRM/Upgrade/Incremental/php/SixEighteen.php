@@ -105,7 +105,7 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
       'default' => NULL,
     ], 'AFTER in_selector');
 
-    $this->addTask(ts('Recreate Mysql Full Text Search indices if necessary'), 'recreateFtsIndexIfNeeded');
+    $this->addTask(ts('Drop early iteration of FTS index if present'), 'dropSixSeventeenFtsIndex');
   }
 
   /**
@@ -163,12 +163,11 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
     return TRUE;
   }
 
-  public static function recreateFtsIndexIfNeeded(CRM_Queue_TaskContext $ctx): bool {
-    // drop `contact_name` index if added with old def in 6.17
+  public static function dropSixSeventeenFtsIndex(CRM_Queue_TaskContext $ctx): bool {
+    // drop `contact_name` index if added with old def when upgrading to 6.17
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_contact', 'contact_name');
-    // ensure `contact_names` index is added (no op if FTS is disable)
-    self::createMissingFtsIndices();
-
+    // creation is moved to 6.20.1
+    // self::createMissingFtsIndices();
     return TRUE;
   }
 
