@@ -252,7 +252,11 @@
         this.setFacetCounts = (counts) => this.facetCounts = counts;
 
         this.getFacetCount = (fieldName, optionId) => {
-          if (this.facetCounts && this.facetCounts[fieldName] && this.facetCounts[fieldName][optionId]) {
+          if (!this.facetCounts) {
+            // until facets have been fetched show '?'
+            return '?';
+          }
+          if (this.facetCounts[fieldName] && this.facetCounts[fieldName][optionId]) {
             return this.facetCounts[fieldName][optionId];
           }
           return 0;
