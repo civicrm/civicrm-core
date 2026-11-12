@@ -95,6 +95,7 @@ class CRM_Upgrade_Incremental_php_SixTwentyOne extends CRM_Upgrade_Incremental_B
       'description' => ts('Variable name/programmatic handle for this batch.'),
       'add' => '3.3',
     ]);
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_mailing_recipients.index_mailing_id_email_id']), 'addIndex', 'civicrm_mailing_recipients', [['mailing_id', 'email_id']]);
   }
 
   /**

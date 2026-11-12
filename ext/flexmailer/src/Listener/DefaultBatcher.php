@@ -44,7 +44,7 @@ class DefaultBatcher extends AutoService {
     // make sure that there's no more than $mailerBatchLimit mails processed in a run
     $mailerBatchLimit = \CRM_Core_Config::singleton()->mailerBatchLimit;
 
-    $eq = $this->findPendingTasks((int) $job->id);
+    $eq = $this->findPendingTasks((int) $job->id, (int) $job->mailing_id, !empty($job->is_test));
     $tasks = [];
     while ($eq->fetch()) {
       if ($mailerBatchLimit > 0 && \CRM_Mailing_BAO_MailingJob::$mailsProcessed >= $mailerBatchLimit) {
@@ -91,12 +91,25 @@ class DefaultBatcher extends AutoService {
    * Search the mailing-event queue for a list of pending delivery tasks.
    *
    * @param int $jobId
+   * @param int $mailingId
+   * @param bool $isTest
    *
    * @return \CRM_Mailing_Event_BAO_MailingEventQueue
    *   A query object whose rows provide ('id', 'contact_id', 'hash') and ('email' or 'phone').
    */
-  private function findPendingTasks(int $jobId): \CRM_Mailing_Event_BAO_MailingEventQueue {
+  private function findPendingTasks(int $jobId, int $mailingId, bool $isTest): \CRM_Mailing_Event_BAO_MailingEventQueue {
     $eq = new \CRM_Mailing_Event_BAO_MailingEventQueue();
+    // Re-check the queue-time deliverability criteria (hook included): recipients may have bounced,
+    // opted out etc. since queueing. Test sends keep their own rules.
+    $stillDeliverable = '';
+    if (!$isTest) {
+      $stillDeliverable = 'AND EXISTS (' . \CRM_Utils_SQL_Select::from('civicrm_mailing_recipients r')
+        ->select('r.id')
+        ->merge(\CRM_Mailing_BAO_MailingRecipients::getDeliverableCriteria($mailingId))
+        ->where('r.mailing_id = #mailingId AND r.email_id = queue.email_id')
+        ->param('#mailingId', $mailingId)
+        ->toSQL() . ')';
+    }
 
     $query = "  SELECT      queue.id,
                                 email.email as email,
@@ -115,7 +128,8 @@ class DefaultBatcher extends AutoService {
                     WHERE       queue.job_id = " . $jobId . "
                         AND     delivered.id IS null
                         AND     bounce.id IS null
-                        AND     contact.is_opt_out = 0";
+                        AND     contact.is_opt_out = 0
+                        $stillDeliverable";
     // note this `query` function leaks memory more than CRM_Core_DAO::ExecuteQuery()
     $eq->query($query);
     return $eq;
