@@ -406,7 +406,7 @@
       $scope.status = 'unsaved';
       /* jshint -W119 */
       if (JSON.stringify(newVal?.api_params?.select) !== JSON.stringify(oldVal?.api_params?.select)) {
-        onChangeSelect();
+        onChangeSelect(newVal?.api_params?.select, oldVal?.api_params?.select);
       }
       // When adding or removing an entity from an EntitySet
       if (ctrl.isEntitySet() && newVal?.api_params?.sets?.length !== oldVal?.api_params?.sets?.length) {

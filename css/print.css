@@ -79,6 +79,8 @@ table.form-layout th {
 }
 
 #crm-container div.page-break {
+  /* stylelint-disable-next-line property-no-deprecated -- dompdf and wkhtmltopdf only support page-break-* */
+  page-break-before: always;
   break-before: page;
   height: 0;
 }
@@ -132,5 +134,7 @@ table.form-layout th {
 
 /* Fix for CRM-19869 */
 tr {
+  /* stylelint-disable-next-line property-no-deprecated -- dompdf and wkhtmltopdf only support page-break-* */
+  page-break-inside: avoid;
   break-inside: avoid;
 }
