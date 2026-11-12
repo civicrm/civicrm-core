@@ -90,6 +90,10 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
       $this->componentID = NULL;
     }
     $this->valueCache = [];
+    // The driver-level default is TRUE: prefetching a group costs one SELECT,
+    // which is usually cheaper than a query per key. Named caches created
+    // through CRM_Utils_Cache::create() pass an explicit value instead
+    // (FALSE by default).
     if ($config['prefetch'] ?? TRUE) {
       $this->prefetch();
     }
