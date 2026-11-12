@@ -1030,7 +1030,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @param string|null $oldMethod
    *   optional description of old method (if not the calling method). eg. CRM_MyClass::myOldMethodToGetTheOptions()
    */
-  public static function deprecatedFunctionWarning(?string $newMethod, ?string $oldMethod = NULL): void {
+  public static function deprecatedFunctionWarning(?string $newMethod = NULL, ?string $oldMethod = NULL): void {
     $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 4);
     if (!$oldMethod) {
       $callerFunction = $backtrace[1]['function'] ?? NULL;
