@@ -380,38 +380,42 @@ class CRM_Import_ImportProcessor {
   }
 
   /**
-   * Get the location types of the mapped fields.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @throws \CRM_Core_Exception
    */
   public function getFieldLocationTypes() {
+    CRM_Core_Error::deprecatedFunctionWarning();
     return CRM_Utils_Array::collect('location_type_id', $this->getMappingFields());
   }
 
   /**
-   * Get the phone types of the mapped fields.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @throws \CRM_Core_Exception
    */
   public function getFieldPhoneTypes() {
+    CRM_Core_Error::deprecatedFunctionWarning();
     return CRM_Utils_Array::collect('phone_type_id', $this->getMappingFields());
   }
 
   /**
-   * Get the names of the im_provider fields.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @throws \CRM_Core_Exception
    */
   public function getFieldIMProviderTypes() {
+    CRM_Core_Error::deprecatedFunctionWarning();
     return CRM_Utils_Array::collect('im_provider_id', $this->getMappingFields());
   }
 
   /**
-   * Get the names of the website fields.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @throws \CRM_Core_Exception
    */
   public function getFieldWebsiteTypes() {
+    CRM_Core_Error::deprecatedFunctionWarning();
     return CRM_Utils_Array::collect('im_provider_id', $this->getMappingFields());
   }
 

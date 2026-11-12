@@ -1573,7 +1573,7 @@ contact_id_a IN ( %1 ) OR contact_id_b IN ( %1 ) AND id IN (" . implode(',', $re
   }
 
   /**
-   * Get Current Employer for Contact.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param array $contactIds
    *   Contact Ids.
@@ -1582,6 +1582,7 @@ contact_id_a IN ( %1 ) OR contact_id_b IN ( %1 ) AND id IN (" . implode(',', $re
    *   array of the current employer
    */
   public static function getCurrentEmployer($contactIds) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $contacts = implode(',', $contactIds);
 
     $query = "

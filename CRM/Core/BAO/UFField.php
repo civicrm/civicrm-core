@@ -238,7 +238,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   }
 
   /**
-   * Enable/disable profile field given a custom group id
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param int $customGroupId
    *   Custom group id.
@@ -246,6 +246,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    *   Value we want to set the is_active field.
    */
   public static function setUFFieldStatus($customGroupId, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     //find the profile id given custom group id
     $queryString = "SELECT civicrm_custom_field.id as custom_field_id
                         FROM   civicrm_custom_field, civicrm_custom_group

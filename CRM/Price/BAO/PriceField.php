@@ -557,12 +557,15 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   }
 
   /**
+   * @deprecated since 6.22 will be removed around 6.28
+   *
    * @param $optionLabel
    * @param int $fid
    *
    * @return mixed
    */
   public static function getOptionId($optionLabel, $fid) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     if (!$optionLabel || !$fid) {
       return;
     }

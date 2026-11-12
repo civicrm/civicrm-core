@@ -138,7 +138,8 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   }
 
   /**
-   * Wrapper aroung getAvailableFinancialTypes to get all FinancialTypes Excluding Disabled ones.
+   * @deprecated since 6.22 will be removed around 6.28
+   *
    * @param int|string $action
    *   the type of action, can be add, view, edit, delete
    * @param bool $resetCache
@@ -147,6 +148,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return array
    */
   public static function getAllEnabledAvailableFinancialTypes($action = CRM_Core_Action::VIEW, $resetCache = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $thisIsAUselessVariableButSolvesPHPError = NULL;
     $financialTypes = self::getAvailableFinancialTypes($thisIsAUselessVariableButSolvesPHPError, $action, $resetCache);
     return $financialTypes;

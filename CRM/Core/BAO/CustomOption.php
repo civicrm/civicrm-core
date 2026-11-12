@@ -67,7 +67,7 @@ class CRM_Core_BAO_CustomOption {
   }
 
   /**
-   * Wrapper for ajax option selector.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param array $params
    *   Associated array for params record id.
@@ -78,6 +78,7 @@ class CRM_Core_BAO_CustomOption {
    *   -page= offset
    */
   public static function getOptionListSelector(&$params) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $options = [];
 
     $field = CRM_Core_BAO_CustomField::getFieldObject($params['fid']);
