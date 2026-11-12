@@ -9,18 +9,28 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\ContributionPage;
+
 /**
  * Verify Contribution Page Widget endpoint works correctly.
  * @group e2e
  */
 class E2E_Extern_WidgetTest extends CiviEndToEndTestCase {
 
-  use \Civi\Test\Api3TestTrait;
+  use \Civi\Test\EntityTrait;
 
   /**
    * @var string
    */
   public $url;
+
+  protected function tearDown(): void {
+    // Deleting the contribution pages also deletes their widgets.
+    if (!empty($this->ids['ContributionPage'])) {
+      ContributionPage::delete(FALSE)->addWhere('id', 'IN', $this->ids['ContributionPage'])->execute();
+    }
+    parent::tearDown();
+  }
 
   /**
    * Return widget Javascript.
@@ -33,10 +43,19 @@ class E2E_Extern_WidgetTest extends CiviEndToEndTestCase {
     $endpoints['normal'] = CRM_Utils_System::url('civicrm/contribute/widget', NULL, TRUE, NULL, FALSE, TRUE);
     foreach ($endpoints as $key => $url) {
       $this->url = $url;
-      $contributionPage = $this->contributionPageCreate();
+      $contributionPage = $this->createTestEntity('ContributionPage', [
+        'title' => 'Test Contribution Page',
+        'financial_type_id:name' => 'Donation',
+        'currency' => 'USD',
+        'is_active' => TRUE,
+        'is_allow_other_amount' => TRUE,
+        'min_amount' => 10,
+        'max_amount' => 1000,
+        'goal_amount' => 10000,
+      ], $key);
       $widgetParams = [
         'is_active' => 1,
-        'title' => $contributionPage['values'][$contributionPage['id']]['title'],
+        'title' => $contributionPage['title'],
         'contribution_page_id' => $contributionPage['id'],
         'button_title' => 'Contribute!',
         'color_title' => '#2786c2',
@@ -90,29 +109,6 @@ class E2E_Extern_WidgetTest extends CiviEndToEndTestCase {
       ];
       $this->assertEquals($expected, $decodedData, 'Data not matched for endpoint ' . $key);
     }
-  }
-
-  /**
-   * Create contribution page.
-   *
-   * @param array $params
-   *
-   * @return array
-   *   Array of contribution page
-   */
-  public function contributionPageCreate($params = []) {
-    $pageParams = array_merge([
-      'title' => 'Test Contribution Page',
-      'financial_type_id' => 1,
-      'currency' => 'USD',
-      'financial_account_id' => 1,
-      'is_active' => 1,
-      'is_allow_other_amount' => 1,
-      'min_amount' => 10,
-      'max_amount' => 1000,
-      'goal_amount' => '10000',
-    ], $params);
-    return $this->callAPISuccess('contribution_page', 'create', $pageParams);
   }
 
 }
