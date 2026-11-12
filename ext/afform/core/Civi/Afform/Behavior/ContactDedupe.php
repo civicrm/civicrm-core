@@ -75,6 +75,7 @@ class ContactDedupe extends AbstractBehavior implements EventSubscriberInterface
       ])->first();
       if (!empty($match['id'])) {
         $event->setEntityId($index, $match['id']);
+        $event->dedupeMatches[$index] = TRUE;
       }
     }
   }

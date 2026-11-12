@@ -707,6 +707,10 @@ class Submit extends AbstractProcessor {
       $mainIdField = CoreUtil::getIdFieldName($mainEntity['type']);
       $joinIdField = CoreUtil::getIdFieldName($joinEntityName);
       $joinAllowedAction = self::getJoinAllowedAction($mainEntity, $joinEntityName);
+      // The submitter of a dedupe match never saw the stored records, so none are removed.
+      if (!empty($event->dedupeMatches[$index])) {
+        $joinAllowedAction['delete'] = FALSE;
+      }
 
       // Forward FK e.g. Event.loc_block_id => LocBlock
       $forwardFkField = self::getFkField($mainEntity['type'], $joinEntityName);
