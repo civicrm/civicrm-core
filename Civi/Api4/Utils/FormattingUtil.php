@@ -155,6 +155,19 @@ class FormattingUtil {
         $format = $operator !== NULL ? 'Y-m-d' : 'Ymd';
         $value = self::formatDateValue($format, $value, $operator, $index);
         break;
+
+      case 'Boolean':
+        // The database would cast a string like 'true' to 0. No operator means a write; pattern operators keep their string.
+        if (is_string($value) && $value !== '' && in_array($operator, [NULL, '=', '!=', '<>', 'IN', 'NOT IN'], TRUE)) {
+          $bool = \CRM_Utils_String::strtoboolstr($value);
+          if ($bool !== FALSE) {
+            $value = (int) $bool;
+          }
+          elseif ($operator === NULL) {
+            throw new \CRM_Core_Exception(sprintf('"%s" is not a valid boolean value for %s.', $value, $fieldSpec['name']));
+          }
+        }
+        break;
     }
 
     $hic = \CRM_Utils_API_HTMLInputCoder::singleton();

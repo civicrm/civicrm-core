@@ -3,6 +3,7 @@
 namespace api\v4\Utils;
 
 use api\v4\Api4TestBase;
+use Civi\Api4\Contact;
 use Civi\Api4\Utils\FormattingUtil;
 use Civi\Test\TransactionalInterface;
 
@@ -38,6 +39,74 @@ class FormattingUtilTest extends Api4TestBase implements TransactionalInterface 
       ['id_foo.id', 'id', $originalValueSets[0], ['id' => 'b', 'name' => 'b_name']],
       ['id.id_foo.id', 'id', $originalValueSets[0], ['id' => 'c', 'name' => 'c_name']],
     ];
+  }
+
+  /**
+   * Boolean fields accept the usual string spellings, when writing and when filtering.
+   *
+   * @dataProvider getBooleanStrings
+   */
+  public function testBooleanStringInput(string $input, bool $expected): void {
+    $optedOut = $this->createTestRecord('Contact', ['is_opt_out' => TRUE])['id'];
+    $optedIn = $this->createTestRecord('Contact', ['is_opt_out' => FALSE])['id'];
+
+    $created = $this->createTestRecord('Contact', ['is_opt_out' => $input])['id'];
+    $this->assertSame($expected, Contact::get(FALSE)->addWhere('id', '=', $created)->addSelect('is_opt_out')->execute()->single()['is_opt_out']);
+
+    Contact::update(FALSE)->addWhere('id', '=', $optedOut)->addValue('do_not_email', $input)->execute();
+    $this->assertSame($expected, Contact::get(FALSE)->addWhere('id', '=', $optedOut)->addSelect('do_not_email')->execute()->single()['do_not_email']);
+
+    $found = Contact::get(FALSE)
+      ->addWhere('id', 'IN', [$optedOut, $optedIn])
+      ->addWhere('is_opt_out', '=', $input)
+      ->execute()->column('id');
+    $this->assertEquals([$expected ? $optedOut : $optedIn], $found);
+
+    $found = Contact::get(FALSE)
+      ->addWhere('id', 'IN', [$optedOut, $optedIn])
+      ->addWhere('is_opt_out', 'IN', [$input])
+      ->execute()->column('id');
+    $this->assertEquals([$expected ? $optedOut : $optedIn], $found);
+  }
+
+  /**
+   * Operators that take a pattern keep their operand as a string.
+   */
+  public function testBooleanFieldPatternFilter(): void {
+    $optedOut = $this->createTestRecord('Contact', ['is_opt_out' => TRUE])['id'];
+    $optedIn = $this->createTestRecord('Contact', ['is_opt_out' => FALSE])['id'];
+    foreach ([['LIKE', '0%'], ['CONTAINS', '0'], ['REGEXP', '^0$']] as [$operator, $pattern]) {
+      $found = Contact::get(FALSE)
+        ->addWhere('id', 'IN', [$optedOut, $optedIn])
+        ->addWhere('is_opt_out', $operator, $pattern)
+        ->execute()->column('id');
+      $this->assertEquals([$optedIn], $found, $operator);
+    }
+    // 'no' stays a substring that neither 0 nor 1 contains.
+    $found = Contact::get(FALSE)
+      ->addWhere('id', 'IN', [$optedOut, $optedIn])
+      ->addWhere('is_opt_out', 'CONTAINS', 'no')
+      ->execute()->column('id');
+    $this->assertEquals([], $found);
+  }
+
+  public static function getBooleanStrings(): array {
+    return [
+      ['true', TRUE],
+      ['TRUE', TRUE],
+      ['yes', TRUE],
+      ['false', FALSE],
+      ['No', FALSE],
+    ];
+  }
+
+  /**
+   * A string that is no boolean spelling is refused, not stored as FALSE.
+   */
+  public function testInvalidBooleanStringInput(): void {
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('"maybe" is not a valid boolean value for is_opt_out.');
+    $this->createTestRecord('Contact', ['is_opt_out' => 'maybe']);
   }
 
   /**
