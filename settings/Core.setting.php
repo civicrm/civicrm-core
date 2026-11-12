@@ -599,6 +599,8 @@ return [
     'add' => '5.43',
     'settings_pages' => ['misc' => ['weight' => 60, 'section' => 'pdf']],
     'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_DOMPDF_FONT_DIR',
   ],
   'dompdf_chroot' => [
     'is_domain' => 1,
@@ -619,6 +621,8 @@ return [
     'add' => '5.43',
     'settings_pages' => ['misc' => ['weight' => 70, 'section' => 'pdf']],
     'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_DOMPDF_CHROOT',
   ],
   'dompdf_enable_remote' => [
     'is_domain' => 1,
@@ -652,6 +656,8 @@ return [
     'default' => NULL,
     'add' => '5.43',
     'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_DOMPDF_LOG_OUTPUT_FILE',
   ],
   'weasyprint_path' => [
     'group_name' => 'CiviCRM Preferences',
@@ -673,6 +679,8 @@ return [
     ],
     'settings_pages' => ['misc' => ['weight' => 90, 'section' => 'pdf']],
     'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_WEASYPRINT_PATH',
   ],
   'wkhtmltopdfPath' => [
     'group_name' => 'CiviCRM Preferences',
@@ -694,6 +702,8 @@ return [
     ],
     'settings_pages' => ['misc' => ['weight' => 95, 'section' => 'pdf']],
     'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_WKHTMLTOPDF_PATH',
   ],
   'checksum_timeout' => [
     'group_name' => 'CiviCRM Preferences',

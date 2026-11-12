@@ -52,6 +52,7 @@ class SettingsStyleTest extends \CiviUnitTestCase {
       $assert($key, $key === $name, 'Should have matching name');
       $type = $spec['type'] ?? 'UNKNOWN';
       $assert($key, in_array($type, $validTypes), 'Should have known type. Found: ' . $type);
+      $assert($key, empty($spec['is_constant']) || !empty($spec['global_name']), 'A constant should have a global_name');
       if (version_compare($add, '5.53', '>=') && !in_array($key, self::NEW_SETTINGS_WITH_OLD_NAMES)) {
         $assert($key, preg_match(';^[a-z0-9]+(_[a-z0-9]+)+$;', $key), 'In 5.53+, names should use snake_case with a group/subsystem prefix.');
       }

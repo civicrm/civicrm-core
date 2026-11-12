@@ -36,6 +36,8 @@ return [
     'help_text' => 'File system path where temporary CiviCRM files - such as import data files - are uploaded.',
     'settings_pages' => ['path' => ['weight' => 40]],
     'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_UPLOAD_DIR',
   ],
   'imageUploadDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
@@ -54,6 +56,8 @@ return [
     'help_text' => ts('File system path where image files are uploaded. Currently, this path is used for images associated with premiums (CiviContribute thank-you gifts).'),
     'settings_pages' => ['path' => ['weight' => 50]],
     'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_IMAGE_UPLOAD_DIR',
   ],
   'customFileUploadDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
@@ -72,6 +76,8 @@ return [
     'help_text' => ts("Path where documents and images which are attachments to contact records are stored (e.g. contact photos, resumes, contracts, etc.). These attachments are defined using 'file' type custom fields."),
     'settings_pages' => ['path' => ['weight' => 60]],
     'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_CUSTOM_FILE_UPLOAD_DIR',
   ],
   'customTemplateDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
@@ -96,6 +102,8 @@ return [
     ],
     'settings_pages' => ['path' => ['weight' => 70]],
     'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_CUSTOM_TEMPLATE_DIR',
   ],
   'customPHPPathDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
@@ -117,6 +125,8 @@ return [
     ],
     'settings_pages' => ['path' => ['weight' => 80]],
     'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_CUSTOM_PHP_PATH_DIR',
   ],
   'extensionsDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',

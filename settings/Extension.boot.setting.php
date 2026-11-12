@@ -35,6 +35,8 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_EXT_REPO_URL',
   ],
   'ext_max_depth' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',

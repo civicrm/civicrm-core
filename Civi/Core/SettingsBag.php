@@ -292,7 +292,11 @@ class SettingsBag {
    */
   public function set($key, $value) {
     if (\array_key_exists($key, $this->constants)) {
-      throw new \CRM_Core_Exception("{$key} is a system constant. It can only be set in civicrm.settings.php or with an environment variable.");
+      $spec = SettingsMetadata::getMetadata(['name' => $key])[$key] ?? [];
+      $where = (!empty($spec['is_env_loadable']) && !empty($spec['global_name']))
+        ? "in civicrm.settings.php or with the environment variable {$spec['global_name']}"
+        : 'in civicrm.settings.php';
+      throw new \CRM_Core_Exception("{$key} is a system constant. It can only be set {$where}.");
     }
     $this->setDb($key, $value);
     return $this;
