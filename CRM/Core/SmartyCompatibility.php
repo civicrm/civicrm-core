@@ -94,27 +94,6 @@ class CRM_Core_SmartyCompatibility extends Smarty {
   }
 
   /**
-   * Registers custom function to be used in templates
-   *
-   * @deprecated
-   *
-   * @param string $function the name of the template function
-   * @param string $function_impl the name of the PHP function to register
-   * @param bool $cacheable
-   * @param null $cache_attrs
-   *
-   * @throws \SmartyException
-   */
-  public function register_function($function, $function_impl, $cacheable = TRUE, $cache_attrs = NULL) {
-    if (method_exists(parent::class, 'register_function')) {
-      parent::register_function($function, $function_impl, $cacheable = TRUE, $cache_attrs = NULL);
-      return;
-    }
-    CRM_Core_Error::deprecatedWarning('registerPlugin');
-    parent::registerPlugin('function', $function, $function, $cacheable, $cache_attrs);
-  }
-
-  /**
    * Returns an array containing template variables
    *
    * @deprecated since 5.69 will be removed around 5.79
