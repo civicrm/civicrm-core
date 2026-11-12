@@ -15,7 +15,7 @@
 class CRM_Core_TaskTest extends CiviUnitTestCase {
 
   public function testTask() {
-    CRM_Core_BAO_ConfigSetting::enableAllComponents();
+    $this->enableAllComponents();
 
     $taskClasses = [
       'CRM_Activity_Task',

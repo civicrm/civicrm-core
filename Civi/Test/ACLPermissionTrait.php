@@ -220,6 +220,35 @@ trait ACLPermissionTrait {
       unset(\Civi::$statics['CRM_Contact_BAO_Contact_Permission']);
     }
     \CRM_Core_DAO::executeQuery('TRUNCATE civicrm_acl_contact_cache');
+    \Civi::cache('metadata')->clear();
+    \Civi::$statics['CRM_ACL_BAO_ACL'] = [];
+    \CRM_ACL_BAO_Cache::resetCache();
+  }
+
+  /**
+   * Set the permissions to the supplied array.
+   *
+   * @param array $permissions
+   */
+  protected function setPermissions(array $permissions): void {
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
+    $this->flushFinancialTypeStatics();
+    $this->cleanupCachedPermissions();
+  }
+
+  /**
+   * Reset after ACLs.
+   */
+  protected function cleanUpAfterACLs() {
+    \CRM_Utils_Hook::singleton()->reset();
+    $this->quickCleanup([
+      'civicrm_acl',
+      'civicrm_acl_cache',
+      'civicrm_acl_entity_role',
+      'civicrm_acl_contact_cache',
+    ]);
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
+    $this->cleanupCachedPermissions();
   }
 
 }

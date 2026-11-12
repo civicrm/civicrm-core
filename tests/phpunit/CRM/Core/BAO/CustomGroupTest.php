@@ -19,7 +19,7 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
+    $this->enableAllComponents();
   }
 
   /**

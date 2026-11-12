@@ -46,7 +46,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   public function setUp(): void {
     parent::setUp();
     // Enable components BEFORE starting the transaction or the cache clearing will break the transaction
-    CRM_Core_BAO_ConfigSetting::enableAllComponents();
+    $this->enableAllComponents();
     $this->useTransaction();
     // DGW
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;

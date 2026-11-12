@@ -1394,15 +1394,13 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    */
   protected function cleanUpAfterACLs() {
     CRM_Utils_Hook::singleton()->reset();
-    $tablesToTruncate = [
+    $this->quickCleanup([
       'civicrm_acl',
       'civicrm_acl_cache',
       'civicrm_acl_entity_role',
       'civicrm_acl_contact_cache',
-    ];
-    $this->quickCleanup($tablesToTruncate);
-    $config = CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = NULL;
+    ]);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = NULL;
   }
 
   /**
@@ -2765,8 +2763,19 @@ class CiviUnitTestCaseCommon extends PHPUnit\Framework\TestCase {
    * @param array $permissions
    */
   protected function setPermissions(array $permissions): void {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
     $this->flushFinancialTypeStatics();
+  }
+
+  /**
+   * Enable all components.
+   *
+   * Enabling components can replace the hook singleton, so $this->hookClass is
+   * refreshed to keep adhoc hooks set on it in effect.
+   */
+  protected function enableAllComponents(): void {
+    CRM_Core_BAO_ConfigSetting::enableAllComponents();
+    $this->hookClass = CRM_Utils_Hook::singleton();
   }
 
   /**
