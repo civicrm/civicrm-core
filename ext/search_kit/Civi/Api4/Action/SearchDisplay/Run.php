@@ -183,7 +183,19 @@ class Run extends AbstractRunAction {
       $counts = [];
       foreach ($facets as $facetField) {
         $counts[$facetField] = [];
-        foreach ($sqlRows as $row) {
+        $otherFacetFilters = \array_diff_key($facetFilters, [$facetField => TRUE]);
+        $rowsMatchingOtherFacets = array_filter($sqlRows, function ($row) use ($otherFacetFilters) {
+          foreach ($otherFacetFilters as $key => $value) {
+            if (is_array($value) && !in_array($row[$key], $value)) {
+              return FALSE;
+            }
+            if (!is_array($value) && ($row[$key] !== $value)) {
+              return FALSE;
+            }
+          }
+          return TRUE;
+        });
+        foreach ($rowsMatchingOtherFacets as $row) {
           $facetValue = $row[$facetField];
           $counts[$facetField][$facetValue] ??= 0;
           $counts[$facetField][$facetValue] += $row["COUNT:{$key}"];
