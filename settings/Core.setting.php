@@ -84,7 +84,7 @@ return [
     'title' => ts('Advanced Search'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('Select the sections that should be included in the Basic and Advanced Search forms. EXAMPLE: If you don\'t track Relationships - then you do not need this section included in the advanced search form. Simplify the form by un-checking this option.'),
+    'help_text' => ts("Select the sections that should be included in the Basic and Advanced Search forms. EXAMPLE: If you don't track Relationships - then you do not need this section included in the advanced search form. Simplify the form by un-checking this option."),
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
     'settings_pages' => ['search' => ['section' => 'legacy', 'weight' => 70]],
   ],
@@ -103,7 +103,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => [
-      ts('Select the sections that should be included in the Contact Dashboard. EXAMPLE: If you don\'t want constituents to view their own contribution history, un-check that option.'),
+      ts("Select the sections that should be included in the Contact Dashboard. EXAMPLE: If you don't want constituents to view their own contribution history, un-check that option."),
       ts('In order to enable logged in users to download invoices and credit notes from the dashboard, please first enable CiviCRM invoicing functionality.'),
     ],
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
@@ -1133,7 +1133,7 @@ return [
     'title' => ts('Sync CMS Email'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('If enabled, then CMS email id will be synchronised with CiviCRM contacts\'s primary email.'),
+    'help_text' => ts("If enabled, then CMS email id will be synchronised with CiviCRM contacts's primary email."),
     'settings_pages' => ['uf' => ['weight' => 20]],
   ],
   'preserve_activity_tab_filter' => [
@@ -1147,7 +1147,7 @@ return [
     'title' => ts('Preserve activity filters as a user preference'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('When enabled, any filter settings a user selects on the contact\'s Activity tab will be remembered as they visit other contacts.'),
+    'help_text' => ts("When enabled, any filter settings a user selects on the contact's Activity tab will be remembered as they visit other contacts."),
     'settings_pages' => ['display' => ['section' => 'activity', 'weight' => 30]],
   ],
   'do_not_notify_assignees_for' => [
@@ -1204,7 +1204,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => [
-      ts('The theme system allows you to change CiviCRM\'s appearance by replacing important CSS files.'),
+      ts("The theme system allows you to change CiviCRM's appearance by replacing important CSS files."),
       ts('On WordPress, Joomla, or a similar CMS, the frontend theme determines the appearance on user-facing screens, such as the "Event Registration" screen.'),
     ],
     'settings_pages' => ['display' => ['section' => 'theme', 'weight' => 30]],
@@ -1228,7 +1228,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => [
-      ts('The theme system allows you to change CiviCRM\'s appearance by replacing important CSS files.'),
+      ts("The theme system allows you to change CiviCRM's appearance by replacing important CSS files."),
       ts('The backend theme determines the appearance on administrative screens, such as the "Manage Event" screen.'),
     ],
     'settings_pages' => ['display' => ['section' => 'theme', 'weight' => 10]],

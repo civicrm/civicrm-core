@@ -185,7 +185,7 @@ return [
     'title' => ts('Search Primary Details Only'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('If enabled, only primary details (eg contact\'s primary email, phone, etc) will be included in Basic and Advanced Search results. Disabling this feature will allow users to match contacts using any email, phone etc detail.'),
+    'help_text' => ts("If enabled, only primary details (eg contact's primary email, phone, etc) will be included in Basic and Advanced Search results. Disabling this feature will allow users to match contacts using any email, phone etc detail."),
     'settings_pages' => ['search' => ['section' => 'legacy', 'weight' => 30]],
   ],
   'quicksearch_options' => [
@@ -274,7 +274,7 @@ return [
     'title' => ts('Use Mysql Full Text Search'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('Mysql Full Text Search allows for faster searching of some fields, such as Contact names. It uses more database storage space, and may slow down large imports. It is generally recommended, but you may wish to turn off to save resources, or if you are using an alternative full text search solution. '),
+    'help_text' => ts('Mysql Full Text Search allows for faster searching of some fields, such as Contact names. It uses more database storage space, and may slow down large imports. It is generally recommended, but you may wish to turn off to save resources, or if you are using an alternative full text search solution.'),
     'settings_pages' => ['search' => ['section' => 'search', 'weight' => 100]],
     'post_change' => [
       '\Civi\Schema\FullTextSearch::createOrDrop',

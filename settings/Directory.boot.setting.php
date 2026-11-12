@@ -78,7 +78,7 @@ return [
     'title' => ts('Custom Files Directory'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('Path where documents and images which are attachments to contact records are stored (e.g. contact photos, resumes, contracts, etc.). These attachments are defined using \'file\' type custom fields.'),
+    'help_text' => ts("Path where documents and images which are attachments to contact records are stored (e.g. contact photos, resumes, contracts, etc.). These attachments are defined using 'file' type custom fields."),
     'settings_pages' => ['path' => ['weight' => 60]],
     'is_constant' => TRUE,
   ],

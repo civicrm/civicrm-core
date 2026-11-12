@@ -309,7 +309,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'weight' => 2,
       'location_type_id' => new Literal('@locationTypeMain'),
       // FIXME: Space
-      'label' => ts('Phone (Main) '),
+      'label' => ts('Phone (Main)') . ' ',
       'field_type' => 'Contact',
       'phone_type_id' => 1,
     ],
@@ -320,7 +320,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_uf_field')
       'weight' => 3,
       'location_type_id' => new Literal('@locationTypeMain'),
       // FIXME: Space
-      'label' => ts('Email (Main) '),
+      'label' => ts('Email (Main)') . ' ',
       'field_type' => 'Contact',
     ],
     [

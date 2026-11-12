@@ -29,4 +29,3 @@ if (fwrite($handle, $data) === FALSE) {
 echo "Successfully created csv for $totalRows contacts and wrote  to file ($filename)\n\r";
 
 fclose($handle);
-

@@ -2,7 +2,6 @@
 
 namespace Civi\PhpStorm;
 
-use Civi\Api4\Entity;
 use Civi\Core\Service\AutoService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

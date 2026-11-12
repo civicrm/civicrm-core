@@ -2,7 +2,6 @@
 
 namespace Civi\PhpStorm;
 
-use Civi\Api4\Entity;
 use Civi\Api4\Route;
 use Civi\Core\Service\AutoService;
 use Civi\Test\Invasive;
@@ -33,11 +32,11 @@ class UrlGenerator extends AutoService implements EventSubscriberInterface {
 
       if (preg_match('/(ajax|ipn)/', $route['path'])) {
         // We should have real metadata for web-service routes, but we'll use this weak guess for now...
-        $urls[] = "service://"  . $route['path'];
+        $urls[] = "service://" . $route['path'];
       }
       $urls[] = (empty($route['is_public']) ? 'backend' : 'frontend') . "://" . $route['path'] . $suffix;
-      $urls[] = "current://"  . $route['path'] . $suffix;
-      $urls[] = "default://"  . $route['path'] . $suffix;
+      $urls[] = "current://" . $route['path'] . $suffix;
+      $urls[] = "default://" . $route['path'] . $suffix;
     }
     foreach (\CRM_Extension_System::singleton()->getFullContainer()->getKeys() as $key) {
       $urls[] = "ext://$key/";
