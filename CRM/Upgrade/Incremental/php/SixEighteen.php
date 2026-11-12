@@ -166,7 +166,7 @@ class CRM_Upgrade_Incremental_php_SixEighteen extends CRM_Upgrade_Incremental_Ba
   public static function dropSixSeventeenFtsIndex(CRM_Queue_TaskContext $ctx): bool {
     // drop `contact_name` index if added with old def when upgrading to 6.17
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_contact', 'contact_name');
-    // creation is moved to 6.20.1
+    // creation is moved to 6.20.2
     // self::createMissingFtsIndices();
     return TRUE;
   }
