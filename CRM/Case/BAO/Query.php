@@ -429,38 +429,22 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'case_taglist':
-        $taglist = $value;
-        $value = [];
-        foreach ($taglist as $val) {
-          if ($val) {
-            $val = explode(',', $val);
-            foreach ($val as $tId) {
-              if (is_numeric($tId)) {
-                $value[$tId] = 1;
-              }
-            }
-          }
-        }
       case 'case_tags':
+        if ($name === 'case_tags' && is_array($value) && !array_is_list($value)) {
+          // Legacy checkbox format: [tagID => 1]
+          $value = array_keys(array_filter($value));
+        }
+        $tagIDs = self::cleanIDs($value);
+        if (!$tagIDs) {
+          return;
+        }
         $tags = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
-
-        if (!empty($value)) {
-          if (is_array($value)) {
-            // Search tag(s) are part of a tag set
-            $val = array_keys($value);
-          }
-          else {
-            // Search tag(s) are part of the tag tree
-            $val = explode(',', $value);
-          }
-          foreach ($val as $v) {
-            if ($v) {
-              $names[] = $tags[$v];
-            }
-          }
+        $names = [];
+        foreach ($tagIDs as $tagID) {
+          $names[] = $tags[$tagID] ?? $tagID;
         }
 
-        $query->_where[$grouping][] = " civicrm_case_tag.tag_id IN (" . implode(',', $val) . " )";
+        $query->_where[$grouping][] = 'civicrm_case_tag.tag_id IN (' . implode(',', $tagIDs) . ')';
         $query->_qill[$grouping][] = ts('Case Tags %1', [1 => $op]) . ' ' . implode(' ' . ts('or') . ' ', $names);
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
         $query->_tables['civicrm_case_contact'] = $query->_whereTables['civicrm_case_contact'] = 1;

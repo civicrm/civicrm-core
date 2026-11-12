@@ -153,15 +153,23 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
         // CRM-15379
         if (!empty($this->_formValues['participant_fee_id'])) {
-          $participant_fee_id = $this->_formValues['participant_fee_id'];
+          $participant_fee_id = CRM_Core_BAO_Query::cleanIDs($this->_formValues['participant_fee_id']);
           $val_regexp = [];
-          foreach ($participant_fee_id as $k => &$val) {
-            $val = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
-            $val_regexp[$k] = CRM_Core_DAO::escapeString(preg_quote(trim($val)));
-            $val = CRM_Core_DAO::escapeString(trim($val));
+          foreach ($participant_fee_id as $val) {
+            if ($val) {
+              $label = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
+              if ($label) {
+                $val_regexp[] = CRM_Core_DAO::escapeString(preg_quote(trim($label)));
+              }
+            }
           }
-          $feeLabel = implode('|', $val_regexp);
-          $seatClause[] = "( participant.fee_level REGEXP '{$feeLabel}' )";
+          if ($val_regexp) {
+            $feeLabel = implode('|', $val_regexp);
+            $seatClause[] = "( participant.fee_level REGEXP '{$feeLabel}' )";
+          }
+          else {
+            $seatClause[] = '( 0 )';
+          }
         }
 
         $seatClause = implode(' AND ', $seatClause);

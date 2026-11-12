@@ -390,11 +390,17 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'participant_fee_id':
-        $labels = [];
-        foreach ($value as $val) {
-          $labels[] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
+        $feeIDs = CRM_Core_BAO_Query::cleanIDs($value);
+        if (!$feeIDs) {
+          return;
         }
-        $query->_where[$grouping][] = "civicrm_line_item.price_field_value_id IN (" . implode(', ', $value) . ")";
+        $labels = [];
+        foreach ($feeIDs as $val) {
+          if ($val) {
+            $labels[] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label') ?: $val;
+          }
+        }
+        $query->_where[$grouping][] = 'civicrm_line_item.price_field_value_id IN (' . implode(', ', $feeIDs) . ')';
         $query->_where[$grouping][] = "civicrm_line_item.qty > 0";
         $query->_qill[$grouping][] = ts("Fee level") . " IN " . implode(', ', $labels);
         $query->_tables['civicrm_participant'] = $query->_tables['civicrm_line_item'] = $query->_whereTables['civicrm_line_item'] = 1;

@@ -32,6 +32,7 @@
  */
 
 use Civi\Api4\OptionValue;
+use Civi\Api4\Tag;
 
 /**
  * Test APIv3 civicrm_activity_* functions
@@ -94,6 +95,9 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
       'civicrm_entity_tag',
     ];
     $this->quickCleanup($tablesToTruncate, TRUE);
+    if (!empty($this->ids['Tag'])) {
+      Tag::delete(FALSE)->addWhere('id', 'IN', $this->ids['Tag'])->execute();
+    }
     OptionValue::delete()->addWhere('name', '=', 'Test activity type')->execute();
     parent::tearDown();
   }
@@ -320,6 +324,30 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
     // Clean up. Don't want to use teardown to wipe the table since then
     // the stock tags get wiped.
     $this->callAPISuccess('Tag', 'delete', ['id' => $tag['id']]);
+  }
+
+  /**
+   * SQL in the activity_tags search value must not reach the query.
+   *
+   * The form field is a plain text input, so the submitted value is
+   * attacker-controlled. An injected tautology would make the search return
+   * every contact.
+   */
+  public function testActivityTagsValueIsNotInjectedIntoQuery(): void {
+    $tag = $this->createTestEntity('Tag', ['name' => 'activity_tag', 'used_for' => ['civicrm_activity']], 'activity_tag');
+    $activity = $this->createTestEntity('Activity', [
+      'source_contact_id' => $this->contactID,
+      'activity_type_id' => $this->params['activity_type_id'],
+      'subject' => __FUNCTION__,
+    ]);
+    $this->createTestEntity('EntityTag', ['entity_table' => 'civicrm_activity', 'entity_id' => $activity['id'], 'tag_id' => $tag['id']]);
+
+    $formValues = ['activity_tags' => "{$tag['id']},0) OR (1=1"];
+    $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
+    [, $from, $where] = $query->query();
+    $this->assertStringNotContainsString('1=1', $where);
+    $rows = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
+    $this->assertEquals([$this->contactID], array_column($rows, 'id'));
   }
 
 }
