@@ -162,7 +162,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
       'Roy, Darric',
       'Pitt, Adam',
     ];
-    $unsortedActualContactNames = CRM_Utils_Array::collect('sort_name', $cases);
+    $unsortedActualContactNames = array_column($cases, 'sort_name');
     foreach ($unsortedExpectedContactNames as $key => $name) {
       // Something has changed recently that has exposed one of the problems with queries that are not full-groupby-compliant. Temporarily commenting this out until figure out what to do since this exact query doesn't seem to come up anywhere on common screens.
       //$this->assertContains($name, $unsortedActualContactNames[$key]);
@@ -210,7 +210,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
       'Pitt, Adam',
       'Roy, Darric',
     ];
-    $sortedActualContactNames = CRM_Utils_Array::collect('sort_name', $cases);
+    $sortedActualContactNames = array_column($cases, 'sort_name');
     foreach ($sortedExpectedContactNames as $key => $name) {
       $this->assertStringContainsString($name, $sortedActualContactNames[$key]);
     }

@@ -296,7 +296,7 @@ abstract class AbstractMappingTestCase extends \CiviUnitTestCase {
         /** @var \ezcMail $message */
         $simpleMessage = [
           'time' => $time,
-          'to' => \CRM_Utils_Array::collect('email', $message->to),
+          'to' => array_column($message->to, 'email'),
           'subject' => $message->subject,
         ];
         sort($simpleMessage['to']);

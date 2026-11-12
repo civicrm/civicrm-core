@@ -85,7 +85,7 @@ class CRM_Contact_Page_View_UserDashboard_GroupContactTest extends CiviUnitTestC
     $page->run();
 
     $groupIn = CRM_Core_Smarty::singleton()->getTemplateVars('groupIn');
-    $groupInTitles = CRM_Utils_Array::collect('title', $groupIn);
+    $groupInTitles = array_column($groupIn, 'title');
     $this->assertContains($publicSmartGroupTitle, $groupInTitles, "Group '$publicSmartGroupTitle' should be in listed groups, but is not.");
     $this->assertContains($publicStdGroupTitle, $groupInTitles, "Group '$publicStdGroupTitle' should be in listed groups, but is not.");
     $this->assertNotContains($adminSmartGroupTitle, $groupInTitles, "Group '$adminSmartGroupTitle' should not be in listed groups, but is.");

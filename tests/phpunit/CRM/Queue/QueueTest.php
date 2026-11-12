@@ -510,8 +510,8 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $claimsB = $this->queue->claimItems(3);
     $this->assertQueueStats(9, 3, 6, $this->queue);
 
-    $this->assertEquals(['x0', 'x1', 'x2'], CRM_Utils_Array::collect('data', $claimsA));
-    $this->assertEquals(['x3', 'x4', 'x5'], CRM_Utils_Array::collect('data', $claimsB));
+    $this->assertEquals(['x0', 'x1', 'x2'], array_column($claimsA, 'data'));
+    $this->assertEquals(['x3', 'x4', 'x5'], array_column($claimsB, 'data'));
 
     $this->queue->deleteItems([$claimsA[0], $claimsA[1]]); /* x0, x1 */
     $this->queue->releaseItems([$claimsA[2]]); /* x2: will retry with next claimItems() */
@@ -520,14 +520,14 @@ class CRM_Queue_QueueTest extends CiviUnitTestCase {
     $this->assertQueueStats(5, 4, 1, $this->queue);
 
     $claimsC = $this->queue->claimItems(3);
-    $this->assertEquals(['x2', 'x6', 'x7'], CRM_Utils_Array::collect('data', $claimsC));
+    $this->assertEquals(['x2', 'x6', 'x7'], array_column($claimsC, 'data'));
     $this->queue->deleteItem($claimsC[0]); /* x2 */
     $this->queue->releaseItem($claimsC[1]); /* x6: will retry with next claimItems() */
     $this->queue->deleteItem($claimsC[2]); /* x7 */
     $this->assertQueueStats(3, 2, 1, $this->queue);
 
     $claimsD = $this->queue->claimItems(3);
-    $this->assertEquals(['x6', 'x8'], CRM_Utils_Array::collect('data', $claimsD));
+    $this->assertEquals(['x6', 'x8'], array_column($claimsD, 'data'));
     $this->queue->deleteItem($claimsD[0]); /* x6 */
     $this->queue->deleteItem($claimsD[1]); /* x8 */
     $this->assertQueueStats(1, 0, 1, $this->queue);

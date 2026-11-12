@@ -207,7 +207,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'option_group_id' => "pledge_status",
     ]);
     $this->assertSame(5, $pledgeOv['count']);
-    $pledgeStatus = CRM_Utils_Array::collect('name', $pledgeOv['values']);
+    $pledgeStatus = array_column($pledgeOv['values'], 'name');
     $expected = ['Completed', 'Pending', 'Cancelled', 'In Progress', 'Overdue'];
     $this->assertEquals($expected, $pledgeStatus);
   }

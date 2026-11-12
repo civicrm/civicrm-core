@@ -3485,7 +3485,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     ])['values'];
 
     $this->assertCount(3, $activities);
-    $activityNames = array_count_values(CRM_Utils_Array::collect('activity_name', $activities));
+    $activityNames = array_count_values(array_column($activities, 'activity_name'));
     // record two activities before and after completing payment for Event registration
     $this->assertSame(2, $activityNames['Event Registration']);
     // update the original 'Contribution' activity created after completing payment
