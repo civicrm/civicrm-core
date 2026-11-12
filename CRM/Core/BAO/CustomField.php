@@ -2335,7 +2335,7 @@ WHERE  id IN ( %1, %2 )
   /**
    * Get custom option groups.
    *
-   * @deprecated Use the API OptionGroup.get
+   * @deprecated in 5.5 will be removed around 6.28. Use the API OptionGroup.get
    *
    * @param array $includeFieldIds
    *   Ids of custom fields for which option groups must be included.
@@ -2346,6 +2346,7 @@ WHERE  id IN ( %1, %2 )
    * @return mixed
    */
   public static function customOptionGroup($includeFieldIds = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('OptionGroup.get');
     static $customOptionGroup = NULL;
 
     $cacheKey = (empty($includeFieldIds)) ? 'onlyActive' : 'force';

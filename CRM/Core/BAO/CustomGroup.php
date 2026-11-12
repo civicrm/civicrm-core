@@ -1599,11 +1599,12 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
   /**
    * Deprecated function, use APIv4 getFields instead.
    *
-   * @deprecated
+   * @deprecated in 5.50 will be removed around 6.28. Use APIv4 getFields instead.
    * @param array $types
    *   Var which should have the list appended.
    */
   public static function getExtendedObjectTypes(&$types = []) {
+    CRM_Core_Error::deprecatedFunctionWarning('APIv4 getFields');
     $cache = Civi::cache('metadata');
     if (!$cache->has(__FUNCTION__)) {
       $objTypes = [];

@@ -28,11 +28,12 @@ class CRM_Core_OptionGroup {
   public static $_domainIDGroups = [];
 
   /**
-   * @deprecated - going forward the optionValue table will not support domain-specific options
+   * @deprecated in 6.0 will be removed around 6.28. Going forward the optionValue table will not support domain-specific options.
    * @param $groupName
    * @return bool
    */
   public static function isDomainOptionGroup($groupName) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     return FALSE;
   }
 

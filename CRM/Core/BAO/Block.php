@@ -292,7 +292,7 @@ class CRM_Core_BAO_Block {
 
   /**
    * Delete block.
-   * @deprecated - just call the BAO / api directly.
+   * @deprecated in 5.31 will be removed around 6.28. Just call the BAO / api directly.
    *
    * @param string $blockName
    *   Block name.
@@ -300,6 +300,7 @@ class CRM_Core_BAO_Block {
    *   Associates array.
    */
   public static function blockDelete($blockName, $params) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $name = self::fixBlockName($blockName);
 
     $baoString = 'CRM_Core_BAO_' . $name;
