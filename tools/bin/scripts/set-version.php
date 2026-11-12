@@ -301,4 +301,3 @@ function syncPackagesBranch($newVersion) {
     }
   }
 }
-

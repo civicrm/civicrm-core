@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Relationship Type'),
     'title_plural' => ts('Relationship Types'),
-    'description' => ts('Relationship types s/b structured with contact_a as the \'subject/child\' contact and contact_b as the \'object/parent\' contact (e.g. Individual A is Employee of Org B).'),
+    'description' => ts("Relationship types s/b structured with contact_a as the 'subject/child' contact and contact_b as the 'object/parent' contact (e.g. Individual A is Employee of Org B)."),
     'log' => TRUE,
     'add' => '1.1',
     'label_field' => 'label_a_b',

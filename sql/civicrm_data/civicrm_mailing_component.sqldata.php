@@ -24,14 +24,21 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_mailing_component')
       'name' => ts("Mailing Footer"),
       "component_type" => "Footer",
       'subject' => ts("Descriptive Title for this Footer."),
-      'body_html' => ts('Sample Footer for HTML formatted content<br/><a href="{action.optOutUrl}">Opt out of any future emails</a>  <br/> {domain.address}'),
-      'body_text' => ts("Opt out of any future emails: {action.optOutUrl}\n{domain.address}"),
+      'body_html' => implode('<br/>', [
+        ts('Sample Footer for HTML formatted content'),
+        '<a href="{action.optOutUrl}">' . ts('Opt out of any future emails') . '</a>  ',
+        ' {domain.address}',
+      ]),
+      'body_text' => implode("\n", [
+        ts('Opt out of any future emails: %1', [1 => '{action.optOutUrl}']),
+        '{domain.address}',
+      ]),
     ],
     [
       'name' => ts('Subscribe Message'),
       "component_type" => 'Subscribe',
       'subject' => ts('Subscription Confirmation Request'),
-      'body_html' => ts("You have a pending subscription to the %1 mailing list. To confirm this subscription, reply to this email or click <a href=\"%2\">here</a>.", [
+      'body_html' => ts('You have a pending subscription to the %1 mailing list. To confirm this subscription, reply to this email or click <a href="%2">here</a>.', [
         1 => $subgroup,
         2 => $suburl,
       ]),
@@ -51,7 +58,7 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_mailing_component')
       'name' => ts('Unsubscribe Message'),
       'component_type' => 'Unsubscribe',
       'subject' => ts('Un-subscribe Confirmation'),
-      'body_html' => ts("You have been un-subscribed from the following groups: %1. You can re-subscribe by mailing %2 or clicking <a href=\"%3\">here</a>.", [
+      'body_html' => ts('You have been un-subscribed from the following groups: %1. You can re-subscribe by mailing %2 or clicking <a href="%3">here</a>.', [
         1 => $unsubgroup,
         2 => $actresub,
         3 => $actresuburl,

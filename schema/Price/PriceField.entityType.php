@@ -200,7 +200,7 @@ return [
       'title' => ts('Price Field Visibility'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Select',
-      'description' => ts('Implicit FK to civicrm_option_group with name = \'visibility\''),
+      'description' => ts("Implicit FK to civicrm_option_group with name = 'visibility'"),
       'add' => '3.2',
       'default' => 1,
       'pseudoconstant' => [

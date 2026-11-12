@@ -26,12 +26,11 @@ class EventGenerator extends AutoService implements EventSubscriberInterface {
     $specialEvents = ['hook_civicrm_post', 'hook_civicrm_pre', 'civi.api4.validate'];
     foreach ($entities as $entity) {
       foreach ($specialEvents as $specialEvent) {
-        $entityEvents [] = "$specialEvent::$entity";
+        $entityEvents[] = "$specialEvent::$entity";
       }
     }
     // PHP 7.4 can simplify:
     // $entityEvents = array_map(fn($pair) => implode('::', $pair), \CRM_Utils_Array::product([$entities, $specialEvents]));
-
 
     $all = array_merge(array_keys($inspector->getAll()), $entityEvents);
 

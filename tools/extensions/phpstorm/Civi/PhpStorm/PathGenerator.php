@@ -2,8 +2,6 @@
 
 namespace Civi\PhpStorm;
 
-use Civi\Api4\Entity;
-use Civi\Api4\Route;
 use Civi\Core\Service\AutoService;
 use Civi\Test\Invasive;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
