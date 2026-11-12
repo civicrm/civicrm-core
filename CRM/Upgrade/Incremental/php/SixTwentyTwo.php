@@ -30,6 +30,7 @@ class CRM_Upgrade_Incremental_php_SixTwentyTwo extends CRM_Upgrade_Incremental_B
   public function upgrade_6_22_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Set "group_multiple_parents" setting if used', 'setMultipleGroupParents');
+    $this->addSimpleExtensionTask('Enable Scheduled Communications extension', ['scheduled_communications']);
   }
 
   /**

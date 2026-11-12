@@ -97,6 +97,7 @@
     </table>
     <div class="spacer"></div>
 
+    {if $isScheduledRemindersEnabled}
     <fieldset><legend>{ts}Renewal Reminders{/ts}</legend>
       <div class="help">
         {capture assign=reminderLink}{crmURL p='civicrm/admin/scheduleReminders' q='reset=1'}{/capture}
@@ -104,6 +105,7 @@
         {ts 1=$reminderLink}Configure membership renewal reminders using <a href="%1">Schedule Reminders</a>. If you have previously configured renewal reminder templates, you can re-use them with your new scheduled reminders.{/ts} {docURL page="user/email/scheduled-reminders"}
       </div>
     </fieldset>
+    {/if}
 
     {include file="CRM/common/customDataBlock.tpl" customDataType='MembershipType' customDataSubType=false cid=false groupID=false}
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

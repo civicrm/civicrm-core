@@ -917,6 +917,56 @@ class ManagedEntityTest extends Api4TestBase implements TransactionalInterface, 
   }
 
   /**
+   * Moving an `update => unmodified` record to another module must not revert local edits.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testMoveManagedEntityKeepsLocalEdits(): void {
+    $moduleA = 'unit.test.fake.extA';
+    $moduleB = 'unit.test.fake.extB';
+    $searchName = 'TestMoveEditedSavedSearch';
+
+    $declarationA = [
+      'module' => $moduleA,
+      'name' => 'testMoveEditedManagedEntity',
+      'entity' => 'SavedSearch',
+      'cleanup' => 'always',
+      'update' => 'unmodified',
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'name' => $searchName,
+          'label' => 'Original label',
+        ],
+        'match' => ['name'],
+      ],
+    ];
+    $allModules = [
+      new CRM_Core_Module($moduleA, TRUE),
+      new CRM_Core_Module($moduleB, TRUE),
+    ];
+
+    $this->_managedEntities = [$declarationA];
+    (new CRM_Core_ManagedEntities($allModules))->reconcile([$moduleA, $moduleB]);
+    SavedSearch::update(FALSE)
+      ->addWhere('name', '=', $searchName)
+      ->addValue('label', 'Locally edited')
+      ->execute();
+
+    $declarationB = $declarationA;
+    $declarationB['module'] = $moduleB;
+    $declarationB['replaces'] = ['module' => $moduleA];
+    $declarationB['params']['values']['label'] = 'Label from module B';
+    $this->_managedEntities = [$declarationB];
+    (new CRM_Core_ManagedEntities($allModules))->reconcile([$moduleA, $moduleB]);
+
+    $search = $this->getTestRecord('SavedSearch', ['name' => $searchName], ['label', 'base_module', 'local_modified_date']);
+    $this->assertEquals('Locally edited', $search['label']);
+    $this->assertEquals($moduleB, $search['base_module']);
+    $this->assertNotEmpty($search['local_modified_date']);
+  }
+
+  /**
    * @dataProvider sampleEntityTypes
    *
    * @param string $entityName

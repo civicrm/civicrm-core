@@ -94,4 +94,8 @@ return CRM_Core_CodeGen_SqlData::create('civicrm_extension', 'INSERT IGNORE INTO
       'full_name' => 'legacybatchentry',
       'name' => 'Legacy Batch Data Entry',
     ],
+    [
+      'full_name' => 'scheduled_communications',
+      'name' => 'Scheduled Communications',
+    ],
   ]);
