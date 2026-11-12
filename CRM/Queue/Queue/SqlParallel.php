@@ -80,7 +80,7 @@ class CRM_Queue_Queue_SqlParallel extends CRM_Queue_Queue implements CRM_Queue_Q
     if ($result) {
       $sql = CRM_Utils_SQL::interpolate('UPDATE civicrm_queue_item SET release_time = FROM_UNIXTIME(UNIX_TIMESTAMP() + #release), run_count = 1+run_count WHERE id IN (#ids)', [
         'release' => CRM_Utils_Time::delta() + $lease_time,
-        'ids' => CRM_Utils_Array::collect('id', $result),
+        'ids' => array_column($result, 'id'),
       ]);
       CRM_Core_DAO::executeQuery($sql);
     }

@@ -102,7 +102,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $arr['fr'] = (object) ['catWord' => 'chat', 'dogWord' => 'chien'];
     $arr['es'] = (object) ['catWord' => 'gato'];
     $expected = ['en' => 'cat', 'fr' => 'chat', 'es' => 'gato'];
-    $this->assertEquals($expected, CRM_Utils_Array::collect('catWord', $arr));
+    $this->assertSame($expected, CRM_Utils_Array::collect('catWord', $arr));
   }
 
   public function testProduct0(): void {
