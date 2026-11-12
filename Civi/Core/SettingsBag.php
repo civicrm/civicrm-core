@@ -423,11 +423,12 @@ class SettingsBag {
    */
   protected function setDb($name, $value) {
     // NOTE: for better or worse, we haven't traditionally validated whether the setting actually exists here
-    $metadata = SettingsMetadata::getMetadata(['name' => $name])[$name] ?? [];
+    $metadata = SettingsMetadata::getMetadata(['name' => $name], $this->domainId)[$name] ?? [];
 
     if (!$metadata) {
       \Civi::log()->debug("undefined setting {$name} - please add metadata or encourage the extension author to do so :)");
     }
+    $value = SettingsMetadata::castValue($metadata, $value);
 
     $dao = new \CRM_Core_DAO_Setting();
     $dao->name = $name;

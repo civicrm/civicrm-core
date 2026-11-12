@@ -24,6 +24,71 @@ class SettingsBagTest extends \CiviUnitTestCase {
   }
 
   /**
+   * Data provider for testSetCastsBooleanWords.
+   * @return array
+   */
+  public static function booleanValueProvider(): array {
+    return [
+      'false' => ['ajaxPopupsEnabled', 'false', FALSE],
+      'No' => ['ajaxPopupsEnabled', 'No', FALSE],
+      'n' => ['ajaxPopupsEnabled', 'n', FALSE],
+      'true' => ['ajaxPopupsEnabled', 'true', TRUE],
+      'YES' => ['ajaxPopupsEnabled', 'YES', TRUE],
+      'numeric string stays' => ['ajaxPopupsEnabled', '0', '0'],
+      'integer stays' => ['ajaxPopupsEnabled', 1, 1],
+      'boolean stays' => ['ajaxPopupsEnabled', FALSE, FALSE],
+      'other string stays' => ['ajaxPopupsEnabled', 'maybe', 'maybe'],
+      'string setting stays' => ['editor_id', 'false', 'false'],
+    ];
+  }
+
+  /**
+   * A boolean setting stores yes/no/true/false strings as booleans.
+   *
+   * @dataProvider booleanValueProvider
+   */
+  public function testSetCastsBooleanWords(string $name, $value, $expected): void {
+    \Civi::settings()->set($name, $value);
+    $this->assertSame($expected, \Civi::settings()->get($name));
+    $this->assertSame($expected, Setting::get(FALSE)->addSelect($name)->execute()->first()['value']);
+  }
+
+  /**
+   * Setting.set answers with the value it stored.
+   */
+  public function testApiSetReturnsCastValue(): void {
+    $result = Setting::set(FALSE)->addValue('ajaxPopupsEnabled', 'false')->execute()->first();
+    $this->assertFalse($result['value']);
+    $result = civicrm_api3('Setting', 'create', ['ajaxPopupsEnabled' => 'no']);
+    $this->assertEmpty($result['values'][\CRM_Core_Config::domainID()]['ajaxPopupsEnabled']);
+    $this->assertFalse(\Civi::settings()->get('ajaxPopupsEnabled'));
+  }
+
+  /**
+   * Data provider for testApiSetWithBoolValidator.
+   * @return array
+   */
+  public static function validatedBooleanProvider(): array {
+    return [
+      'false' => ['false', 0],
+      'No' => ['No', 0],
+      'yes' => ['yes', 1],
+      'zero string' => ['0', 0],
+      'boolean' => [TRUE, 1],
+    ];
+  }
+
+  /**
+   * A setting validated by validateBoolSetting stores 0 for "false" and "no".
+   *
+   * @dataProvider validatedBooleanProvider
+   */
+  public function testApiSetWithBoolValidator($value, int $expected): void {
+    Setting::set(FALSE)->addValue('contact_undelete', $value)->execute();
+    $this->assertSame($expected, \Civi::settings()->get('contact_undelete'));
+  }
+
+  /**
    * A '0' is a usable DSN component, not a missing one.
    *
    * @dataProvider zeroComponentProvider

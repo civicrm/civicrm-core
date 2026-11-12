@@ -279,6 +279,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * @throws \CRM_Core_Exception
    */
   public static function validateSetting(&$value, array $fieldSpec, $convertToSerializedString = TRUE) {
+    $value = \Civi\Core\SettingsMetadata::castValue($fieldSpec, $value);
     // Deprecated guesswork - should use $fieldSpec['serialize']
     if ($convertToSerializedString && $fieldSpec['type'] == 'String' && is_array($value)) {
       $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
@@ -307,12 +308,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     if (!CRM_Utils_Rule::boolean($value)) {
       throw new CRM_Core_Exception("Boolean value required for {$fieldSpec['name']}");
     }
-    if (!$value) {
-      $value = 0;
-    }
-    else {
-      $value = 1;
-    }
+    $value = CRM_Utils_String::strtobool($value) ? 1 : 0;
     return TRUE;
   }
 
