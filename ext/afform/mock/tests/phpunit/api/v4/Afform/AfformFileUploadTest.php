@@ -164,6 +164,61 @@ EOHTML;
     }
   }
 
+  public function testSubmitFileRejectsOtherFields(): void {
+    $this->createTestRecord('CustomGroup', ['name' => 'MyUpload', 'title' => 'My Upload', 'extends' => 'Contact']);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'MyUpload',
+      'name' => 'attachment',
+      'label' => 'Attachment',
+      'data_type' => 'File',
+      'html_type' => 'File',
+    ]);
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" data="{}" name="Individual1" actions="{create: true, update: false}" security="FBAC" contact-dedupe="Individual.Unsupervised" />
+  <fieldset af-fieldset="Individual1">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+    <af-field name="MyUpload.attachment" />
+    <div af-join="Email" data="{is_primary: true}"><af-field name="email" /></div>
+  </fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $email = uniqid('stored') . '@example.org';
+    $contactID = $this->createTestRecord('Individual', ['first_name' => 'Stored', 'last_name' => 'Contact', 'email_primary.email' => $email])['id'];
+    // Submit as an anonymous visitor, without the administer grant of the test case.
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+    $submission = Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          ['fields' => ['first_name' => 'Stored', 'last_name' => 'Contact'], 'joins' => ['Email' => [['email' => $email]]]],
+        ],
+      ])
+      ->execute()->first();
+
+    $this->mockUploadFile();
+    try {
+      Afform::submitFile()
+        ->setName($this->formName)
+        ->setToken($submission['token'])
+        ->setModelName('Individual1')
+        ->setFieldName('first_name')
+        ->setEntityIndex(0)
+        ->execute();
+      $this->fail('A field that is not a file field of the form is rejected.');
+    }
+    catch (UnauthorizedException $e) {
+      $this->assertStringContainsString('first_name', $e->getMessage());
+    }
+    $this->assertSame('Stored', Contact::get(FALSE)->addWhere('id', '=', $contactID)->execute()->single()['first_name']);
+  }
+
   /**
    * A file id sent with the submission is refused unless the file belongs to the field or to the user
    */

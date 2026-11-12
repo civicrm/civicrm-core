@@ -72,6 +72,7 @@ class SubmitFile extends AbstractProcessor {
       $entityId = $this->getEntityId();
     }
 
+    $this->assertFormFileField();
     $fileField = $this->_formDataModel->getField($this->getEntityApiName(), $this->fieldName, 'create');
 
     $file = civicrm_api4('File', 'create', [
@@ -128,6 +129,21 @@ class SubmitFile extends AbstractProcessor {
   private function getEntityApiName(): string {
     $afformEntity = $this->_formDataModel->getEntity($this->modelName);
     return $this->joinEntity ?: $afformEntity['type'];
+  }
+
+  /**
+   * Only a file field placed on the form may receive an upload.
+   */
+  private function assertFormFileField(): void {
+    $afformEntity = $this->_formDataModel->getEntity($this->modelName);
+    $formFields = $this->joinEntity ? ($afformEntity['joins'][$this->joinEntity]['fields'] ?? []) : ($afformEntity['fields'] ?? []);
+    $fileFields = self::getFileFields($this->getEntityApiName(), $formFields);
+    if (isset($formFields['image_URL']) && !$this->joinEntity) {
+      $fileFields['image_URL'] = 'image_URL';
+    }
+    if (!isset($fileFields[$this->fieldName])) {
+      throw new UnauthorizedException('Not a file field of this form: ' . $this->fieldName);
+    }
   }
 
   private function getEntityId(): mixed {
