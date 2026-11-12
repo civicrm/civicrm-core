@@ -19,15 +19,6 @@
  */
 
 return [
-  // This setting was included in SettingsManager::getSystemDefaults but not in settings meta files - unsure if still needed/used?
-  'resourceBase' => [
-    'name' => 'resourceBase',
-    'add' => '4.1',
-    'title' => 'Resource Base',
-    'type' => 'String',
-    'default' => '[civicrm.root]/',
-    'is_constant' => TRUE,
-  ],
   'uploadDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap.',
     'group_name' => 'Directory Preferences',
