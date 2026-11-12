@@ -1,6 +1,6 @@
 (function(angular, $) {
   // A modified version of ngIf to use afform.checkConditions
-  angular.module('af').directive('afIf', function($compile, $animate, $parse) {
+  angular.module('af').directive('afIf', function($compile, $animate) {
     return {
       multiElement: true,
       transclude: 'element',
@@ -12,46 +12,48 @@
       link: function($scope, $element, $attr, ctrl, $transclude) {
         let block, childScope, previousElements;
 
-        function watcher() {
-          const conditions = $parse($attr.afIf)();
-          return ctrl[0].checkConditions(conditions);
-        }
+        const expression = CRM.afform.parseExpression($attr.afIf);
 
-        $scope.$watch(watcher, function(value) {
-          if (value) {
-            if (!childScope) {
-              $transclude(function(clone, newScope) {
-                childScope = newScope;
-                clone[clone.length++] = $compile.$$createComment('end afIf', $attr.afIf);
-                // Note: We only need the first/last node of the cloned nodes.
-                // However, we need to keep the reference to the jqlite wrapper as it might be changed later
-                // by a directive with templateUrl when its template arrives.
-                block = {
-                  clone: clone
-                };
-                $animate.enter(clone, $element.parent(), $element);
-              });
-            }
-          } else {
-            if (previousElements) {
-              previousElements.remove();
-              previousElements = null;
-            }
-            if (childScope) {
-              // Alert afFields that they are about to be destroyed
-              childScope.$broadcast('afIfDestroy');
-              childScope.$destroy();
-              childScope = null;
-            }
-            if (block) {
-              previousElements = getBlockNodes(block.clone);
-              $animate.leave(previousElements).done(function(response) {
-                if (response !== false) previousElements = null;
-              });
-              block = null;
-            }
+        $scope.$watch(
+          () => ctrl[0].evaluateExpression(expression),
+          (value) => value ? addElement() : removeElement()
+        );
+
+        const addElement = () => {
+          if (!childScope) {
+            $transclude(function(clone, newScope) {
+              childScope = newScope;
+              clone[clone.length++] = $compile.$$createComment('end afIf', $attr.afIf);
+              // Note: We only need the first/last node of the cloned nodes.
+              // However, we need to keep the reference to the jqlite wrapper as it might be changed later
+              // by a directive with templateUrl when its template arrives.
+              block = {
+                clone: clone
+              };
+              $animate.enter(clone, $element.parent(), $element);
+            });
           }
-        });
+        };
+
+        const removeElement = () => {
+          if (previousElements) {
+            previousElements.remove();
+            previousElements = null;
+          }
+          if (childScope) {
+            // Alert afFields that they are about to be destroyed
+            childScope.$broadcast('afIfDestroy');
+            childScope.$destroy();
+            childScope = null;
+          }
+          if (block) {
+            previousElements = getBlockNodes(block.clone);
+            $animate.leave(previousElements).done(function(response) {
+              if (response !== false) previousElements = null;
+            });
+            block = null;
+          }
+        };
       }
     };
   });

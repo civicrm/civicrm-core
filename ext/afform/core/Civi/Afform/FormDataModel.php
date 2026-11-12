@@ -164,21 +164,18 @@ class FormDataModel {
       }
       $nodeAfIfConditions = $afIfConditions;
       if (!empty($node['af-if'])) {
-        $conditional = substr($node['af-if'], 1, -1);
-        $nodeAfIfConditions[] = json_decode(html_entity_decode($conditional));
+        $nodeAfIfConditions[] = self::parseExpression($node['af-if']);
       }
       if ($node['#tag'] === 'af-field' && $nodeAfIfConditions) {
         $node['af-if'] = $nodeAfIfConditions;
       }
 
       if ($node['#tag'] === 'af-field' && !empty($node['af-required'])) {
-        $conditional = substr($node['af-required'], 1, -1);
-        $node['af-required'] = [json_decode(html_entity_decode($conditional))];
+        $node['af-required'] = self::parseExpression($node['af-required']);
       }
 
       if ($node['#tag'] === 'af-field' && !empty($node['af-disabled'])) {
-        $conditional = substr($node['af-disabled'], 1, -1);
-        $node['af-disabled'] = [json_decode(html_entity_decode($conditional))];
+        $node['af-disabled'] = self::parseExpression($node['af-disabled']);
       }
 
       if (isset($node['af-fieldset'])) {
@@ -417,6 +414,64 @@ class FormDataModel {
    */
   public function getSearchDisplay(string $displayName): ?array {
     return $this->searchDisplays[$displayName] ?? NULL;
+  }
+
+  /**
+   * Get the canonical representation of an expression
+   *
+   * Handles backwards compatibility with angularjs-ish expressions
+   *
+   * @return array|string
+   */
+  public static function parseExpression(string $expression) {
+    $expression = \trim($expression, '()');
+    $expression = \html_entity_decode($expression);
+    $expression = \json_decode($expression);
+    $expression = self::replaceAngularTerms($expression);
+    return $expression;
+  }
+
+  /**
+   * Data references previously stored in quoteless javascript array notation
+   * are converted to our token format:
+   * - Individual1[0][fields][first_name] => [Individual1.0.first_name]
+   * - Individual1[1][joins][Email][0][location_type_id] => [Individual1.0.Email.0.location_type_id:name]
+   *
+   * Strings that have been double JSON-encoded are extracted:
+   * - '"John"' => 'John'
+   *
+   * Likewise, Arrays that have been double JSON-encoded:
+   * - '["a","b"]' => ["a", "b"]
+   *
+   * Likewise, Boolean literals:
+   * - 'false' => false
+   *
+   * But *don't* overextract other JSON scalars:
+   * - '123' =x=> 123
+   *
+   * @todo at some point in the distance future this could be removed
+   */
+  private static function replaceAngularTerms(mixed $expression) {
+    if (is_array($expression)) {
+      return array_map(fn ($item) => self::replaceAngularTerms($item), $expression);
+    }
+    if (is_string($expression)) {
+      if (\str_contains($expression, '[joins]') || \str_contains($expression, '[fields]')) {
+        $expression = \str_replace(']', '', $expression);
+        $expression = \str_replace('[', '.', $expression);
+        $expression = \str_replace('.fields.', '.', $expression);
+        $expression = \str_replace('.joins.', '.', $expression);
+        $expression = "[{$expression}]";
+      }
+      if (\json_validate($expression)) {
+        $parsed = \json_decode($expression);
+        if (is_array($parsed) || \is_string($parsed) || \is_bool($parsed)) {
+          $expression = $parsed;
+          $expression = self::replaceAngularTerms($expression);
+        }
+      }
+    }
+    return $expression;
   }
 
 }
