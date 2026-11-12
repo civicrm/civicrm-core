@@ -12,11 +12,7 @@ use Civi\Api4\UFMatch;
  *
  * @package Civi\Test
  *
- * This trait defines a number of helper functions for managing
- * test contacts. Historicallly, it depends on having access to the
- * API test functions ($this->callAPISuccess()) but that is now the exception.
- * It requires the standard PHPUnit assertions ($this->assertEquals). It should
- * not impose any other requirements for the downstream consumer class.
+ * This trait defines a number of helper functions for managing test contacts.
  */
 trait ContactTestTrait {
 
@@ -191,7 +187,6 @@ trait ContactTestTrait {
    *   id of contact created
    */
   private function _contactCreate(array $params, string $identifier = 'Contact'): int {
-    $version = $this->_apiversion;
     $defaultVersion = 4;
     // Assume api v4 is the default unless there are no incoming parameters that we
     // can easily ascertain as api v4. (Currently not checking more than email & contact
@@ -230,11 +225,25 @@ trait ContactTestTrait {
       }
     }
 
-    $this->_apiversion = $params['version'] ?? $defaultVersion;
-    $result = $this->callAPISuccess('Contact', 'create', $params);
-    $this->_apiversion = $version;
-    $this->ids['Contact'][$identifier] = (int) $result['id'];
-    return (int) $result['id'];
+    if ((int) ($params['version'] ?? $defaultVersion) === 4) {
+      unset($params['version']);
+      // Callers may pass an option name or label (eg. 'prefix_id' => 'Dr.') for an integer option field.
+      foreach ($params as $name => $value) {
+        $field = $this->apiV4Fields[$params['contact_type']][$name] ?? [];
+        if (!empty($field['options']) && ($field['data_type'] ?? NULL) === 'Integer' && is_string($value) && !is_numeric($value)) {
+          $params[$name] = \CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $name, $value);
+        }
+      }
+      return $this->createTestEntity('Contact', $params, $identifier)['id'];
+    }
+    try {
+      $contactID = (int) civicrm_api3('Contact', 'create', $params)['id'];
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->fail('Failed to create Contact : ' . $e->getMessage());
+    }
+    $this->ids['Contact'][$identifier] = $contactID;
+    return $contactID;
   }
 
   /**
