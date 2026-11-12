@@ -29,7 +29,7 @@
       {/foreach}
       {crmPermission has='administer Tagsets'}
         <li role="tab" class="ui-corner-all crm-tab-button" title="{ts escape='htmlattribute'}Add Tag Set{/ts}">
-          <a href="#new-tagset"><i class="crm-i fa-plus" role="img" aria-hidden="true"></i></a>
+          <a href="#new-tagset">{icon icon="fa-plus"}{ts}Add Tag Set{/ts}{/icon}</a>
         </li>
       {/crmPermission}
     </ul>
