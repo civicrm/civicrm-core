@@ -298,7 +298,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
         $field->setAttribute('data-entity-value', json_encode($result['values']));
       }
       // CRM-15803 - Remove invalid values
-      $val = array_intersect($val, CRM_Utils_Array::collect('id', $result['values']));
+      $val = array_intersect($val, array_column($result['values'], 'id'));
     }
     // Convert array values back to a string
     $field->setValue(implode(',', $val));

@@ -1664,14 +1664,15 @@ class ACLGetTest extends \CiviUnitTestCase {
       'view my contact',
     ];
     $this->addContactToGroup($userID, $aclGroup);
-    $contacts = Contact::get()->addWhere('id', 'IN', [$contact1, $contact2])->execute();
+    $contacts = Contact::get()->addWhere('id', 'IN', [$contact1, $contact2])
+      ->execute()->column('id');
     $this->assertCount(1, $contacts);
-    $this->assertEquals($contact1, $contacts[0]['id']);
+    $this->assertSame($contact1, $contacts[0]);
     // Note that whilst Contact2 is in both groups it should be excluded by virtue of the deny rule having a higher priority
-    $this->assertFalse(in_array($contact2, \CRM_Utils_Array::collect('id', $contacts)));
+    $this->assertNotContains($contact2, $contacts);
     $groups = \CRM_ACL_API::group(\CRM_ACL_API::EDIT);
     // Check that the deny group isn't in the list of permissiable groups.
-    $this->assertFALSE(in_array($excludeGroup, $groups));
+    $this->assertNotContains($excludeGroup, $groups);
   }
 
   /**
@@ -1799,12 +1800,12 @@ class ACLGetTest extends \CiviUnitTestCase {
     $this->cleanupCachedPermissions();
     $contacts = Contact::get()->addWhere('id', 'IN', [$contact1, $contact2])->execute();
     $this->assertCount(2, $contacts);
-    $this->assertEquals($contact1, $contacts[0]['id']);
+    $this->assertSame($contact1, $contacts[0]['id']);
     // Note that whilst Contact2 is in both groups it should be included by virtue of the allow rule having a higher priority
-    $this->assertTrue(in_array($contact2, $contacts->column('id')));
+    $this->assertContains($contact2, $contacts->column('id'));
     $groups = \CRM_ACL_API::group(\CRM_ACL_API::EDIT);
     // Check that the deny group isn't in the list of permissiable groups.
-    $this->assertFALSE(in_array($excludeGroup, $groups));
+    $this->assertNotContains($excludeGroup, $groups);
   }
 
   /**

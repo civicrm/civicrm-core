@@ -235,7 +235,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
-            if ($tableName == 'civicrm_email' || in_array('email', CRM_Utils_Array::collect('column', $this->_params['order_bys']))) {
+            if ($tableName == 'civicrm_email' || in_array('email', array_column($this->_params['order_bys'], 'column'))) {
               $this->_emailField = TRUE;
             }
             if ($tableName == 'civicrm_phone') {
