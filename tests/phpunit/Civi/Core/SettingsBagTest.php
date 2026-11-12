@@ -24,6 +24,89 @@ class SettingsBagTest extends \CiviUnitTestCase {
   }
 
   /**
+   * Data provider for testSetCastsBooleanWords.
+   * @return array
+   */
+  public static function booleanValueProvider(): array {
+    return [
+      'false' => ['ajaxPopupsEnabled', 'false', FALSE],
+      'FALSE' => ['ajaxPopupsEnabled', 'FALSE', FALSE],
+      'true' => ['ajaxPopupsEnabled', 'true', TRUE],
+      'True' => ['ajaxPopupsEnabled', 'True', TRUE],
+      'no stays' => ['ajaxPopupsEnabled', 'no', 'no'],
+      'y stays' => ['ajaxPopupsEnabled', 'y', 'y'],
+      'numeric string stays' => ['ajaxPopupsEnabled', '0', '0'],
+      'integer stays' => ['ajaxPopupsEnabled', 1, 1],
+      'boolean stays' => ['ajaxPopupsEnabled', FALSE, FALSE],
+      'other string stays' => ['ajaxPopupsEnabled', 'maybe', 'maybe'],
+      'string setting stays' => ['editor_id', 'false', 'false'],
+    ];
+  }
+
+  /**
+   * A boolean setting stores 'true' and 'false' strings as booleans.
+   *
+   * @dataProvider booleanValueProvider
+   */
+  public function testSetCastsBooleanWords(string $name, $value, $expected): void {
+    \Civi::settings()->set($name, $value);
+    $this->assertSame($expected, \Civi::settings()->get($name));
+    $this->assertSame($expected, Setting::get(FALSE)->addSelect($name)->execute()->first()['value']);
+  }
+
+  /**
+   * Setting.set answers with the value it stored.
+   */
+  public function testApiSetReturnsCastValue(): void {
+    $result = Setting::set(FALSE)->addValue('ajaxPopupsEnabled', 'false')->execute()->first();
+    $this->assertFalse($result['value']);
+    $result = civicrm_api3('Setting', 'create', ['ajaxPopupsEnabled' => 'FALSE']);
+    $this->assertEmpty($result['values'][\CRM_Core_Config::domainID()]['ajaxPopupsEnabled']);
+    $this->assertFalse(\Civi::settings()->get('ajaxPopupsEnabled'));
+  }
+
+  /**
+   * Data provider for testApiSetWithBoolValidator.
+   * @return array
+   */
+  public static function validatedBooleanProvider(): array {
+    return [
+      'false' => ['false', 0],
+      'No' => ['No', 0],
+      'yes' => ['yes', 1],
+      'zero string' => ['0', 0],
+      'boolean' => [TRUE, 1],
+    ];
+  }
+
+  /**
+   * A setting validated by validateBoolSetting stores 0 for "false" and "no".
+   *
+   * @dataProvider validatedBooleanProvider
+   */
+  public function testApiSetWithBoolValidator($value, int $expected): void {
+    Setting::set(FALSE)->addValue('contact_undelete', $value)->execute();
+    $this->assertSame($expected, \Civi::settings()->get('contact_undelete'));
+  }
+
+  /**
+   * A bag casts with the setting metadata of its own domain.
+   */
+  public function testSetUsesMetadataOfBagDomain(): void {
+    $domainID = $this->createTestEntity('Domain', ['name' => 'Settings bag domain', 'version' => \CRM_Utils_System::version()])['id'];
+    $this->hookClass->setHook('civicrm_alterSettingsMetaData', function (&$settingsMetadata, $hookDomainID) use ($domainID): void {
+      if ((int) $hookDomainID === $domainID) {
+        $settingsMetadata['bag_domain_flag'] = ['name' => 'bag_domain_flag', 'type' => 'Boolean', 'is_domain' => 1, 'default' => TRUE];
+      }
+    });
+    \Civi::cache('settings')->clear();
+
+    \Civi::settings($domainID)->set('bag_domain_flag', 'false');
+
+    $this->assertFalse(\Civi::settings($domainID)->get('bag_domain_flag'));
+  }
+
+  /**
    * A '0' is a usable DSN component, not a missing one.
    *
    * @dataProvider zeroComponentProvider
