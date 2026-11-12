@@ -10,7 +10,7 @@ declare(strict_types = 1);
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-namespace Civi\Entity\ACL;
+namespace Civi\Permission;
 
 use Civi\Api4\Contact;
 use Civi\Test\ACLPermissionTrait;
@@ -93,8 +93,9 @@ class ACLListTest extends \CiviUnitTestCase {
   /**
    * Test access based on relationships.
    *
+   * The relationship graph is described on createScenarioRelations().
+   *
    * @throws \CRM_Core_Exception
-   * @see createScenarioRelations() for the relationship graph.
    */
   public function testPermissionByRelation(): void {
     $contacts = $this->createScenarioRelations();

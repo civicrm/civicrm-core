@@ -10,7 +10,7 @@ declare(strict_types = 1);
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
-namespace Civi\Entity\ACL;
+namespace Civi\Permission;
 
 use Civi\Api4\ACLEntityRole;
 use Civi\Api4\ActivityContact;
