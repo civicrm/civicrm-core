@@ -286,7 +286,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
         $totalAmount = CRM_Utils_Money::format($dao->amount, $dao->currency);
         $average = CRM_Utils_Money::format($dao->avg, $dao->currency);
         $count = $dao->count;
-        $totalCount .= $count;
+        $totalCount += $count;
         $statistics['counts']['amount' . $index] = [
           'title' => ts('Total Pledged') . ' (' . $dao->currency . ')',
           'value' => $totalAmount,
