@@ -215,6 +215,21 @@ class NoteTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame([0, 0, 1, 2, 2, 1, 2], $notes->column('_depth'));
     $this->assertSame([0, 5, 2, 0, 0, 1, 0], $notes->column('_descendents'));
 
+    // Get paginated hierarchy with deferred hydration across DFK
+    $page = Note::get(FALSE)
+      ->addSelect('id', 'subject', 'note', '_depth', '_descendents')
+      ->addWhere('entity_id', 'IN', [$c1['id']])
+      ->addWhere('entity_table', 'IN', ['civicrm_contact'])
+      ->addOrderBy('subject', 'ASC')
+      ->setLimit(3)
+      ->setOffset(1)
+      ->execute();
+    $this->assertCount(3, $page);
+    $this->assertSame(['Top B', 'Mid A', 'Bottom A'], $page->column('subject'));
+    $this->assertSame([$text, $text, $text], $page->column('note'));
+    $this->assertSame([0, 1, 2], $page->column('_depth'));
+    $this->assertSame([5, 2, 0], $page->column('_descendents'));
+
     // Get entire hierarchy
     $notes = Note::get(FALSE)
       ->addSelect('id', 'subject', '_depth', '_descendents')
