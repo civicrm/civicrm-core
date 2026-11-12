@@ -197,14 +197,13 @@
         // - and the search is hidden or not set to auto-run
         // - or afform filters are present which would interfere with an accurate total
         // (wait a brief timeout to allow more important things to happen first)
-        $timeout(function() {
-          if (hasCounter && (!(ctrl.loading || ctrl.results) || !angular.equals({}, ctrl.getAfformFilters()))) {
-            const params = ctrl.getApiParams('row_count');
+        $timeout(() => {
+          if (hasCounter && (!(this.loading || this.results) || !angular.equals({}, this.getAfformFilters()))) {
+            const params = this.getApiParams('row_count');
             // Exclude afform filters
-            params.filters = ctrl.filters;
-            crmApi4('SearchDisplay', 'run', params).then(function(result) {
-              setTotalCount(result.count);
-            });
+            params.filters = this.filters;
+            crmApi4('SearchDisplay', 'run', params)
+              .then((result) => setTotalCount(result.count));
           }
         }, 900);
 
@@ -217,8 +216,8 @@
           if (checkVisibility) {
             $interval.cancel(checkVisibility);
           }
-          ctrl.getResultsPronto.cancel();
-          ctrl.getResultsSoon.cancel();
+          this.getResultsPronto.cancel();
+          this.getResultsSoon.cancel();
         });
       },
 
@@ -279,12 +278,7 @@
           afform: this.getAfformName()
         };
         // Add toggleColumns if any columns are disabled
-        const toggleColumns = this.columns.reduce((indices, col, index) => {
-          if (col.enabled) {
-            indices.push(index);
-          }
-          return indices;
-        }, []);
+        const toggleColumns = this.columns.map((col, index) => col.enabled ? index : -1).filter((i) => i >= 0);
         if (toggleColumns.length < this.columns.length) {
           apiParams.toggleColumns = toggleColumns;
         }
@@ -301,7 +295,6 @@
 
       // Call SearchDisplay.run and update ctrl.results and ctrl.rowCount
       runSearch: function(apiCalls, statusParams, editedRow) {
-        const ctrl = this;
         const requestId = ++this._runCount;
         const apiParams = this.getApiParams();
         if (!statusParams) {
@@ -310,44 +303,45 @@
         apiCalls = apiCalls || {};
         apiCalls.run = ['SearchDisplay', 'run', apiParams];
         // Run all preRun callbacks
-        ctrl.onPreRun.forEach(callback => callback.call(ctrl, apiCalls));
+        this.onPreRun.forEach(callback => callback.call(this, apiCalls));
         const apiRequest = crmApi4(apiCalls);
-        apiRequest.then(function(apiResults) {
-          if (requestId < ctrl._runCount) {
+        apiRequest.then((apiResults) => {
+          if (requestId < this._runCount) {
             return; // Another request started after this one
           }
-          ctrl.results = apiResults.run;
-          ctrl.loading = false;
-          ctrl.serverError = null;
+          this.results = apiResults.run;
+          this.loading = false;
+          this.serverError = null;
           // Update rowCount if running for the first time or during an update op
-          if (!ctrl.rowCount || editedRow) {
+          if (!this.rowCount || editedRow) {
             // No need to fetch count if on page 1 and result count is under the limit
-            if (!ctrl.limit || (ctrl.results.length < ctrl.limit && ctrl.page === 1)) {
-              ctrl.rowCount = ctrl.results.length;
-            } else if (ctrl.settings.pager || ctrl.settings.headerCount) {
-              const params = ctrl.getApiParams('row_count');
-              crmApi4('SearchDisplay', apiCalls.run[1], params).then(function(result) {
-                if (requestId < ctrl._runCount || !angular.equals(params.filters, ctrl.getFilters())) {
+            if (!this.limit || (this.results.length < this.limit && this.page === 1)) {
+              this.rowCount = this.results.length;
+            }
+            else if (this.settings.pager || this.settings.headerCount) {
+              const params = this.getApiParams('row_count');
+              crmApi4('SearchDisplay', 'run', params).then((result) => {
+                if (requestId < this._runCount || !angular.equals(params.filters, this.getFilters())) {
                   return; // Another request started, or the filters changed, after this one
                 }
 
-                ctrl.rowCount = result.count;
+                this.rowCount = result.count;
               });
             }
           }
           // Run all postRun callbacks on success
-          ctrl.onPostRun.forEach(callback => callback.call(ctrl, apiResults, 'success', editedRow));
-        }, function(error) {
-          if (requestId < ctrl._runCount) {
+          this.onPostRun.forEach(callback => callback.call(this, apiResults, 'success', editedRow));
+        }, (error) => {
+          if (requestId < this._runCount) {
             return; // Another request started after this one
           }
-          ctrl.results = [];
-          ctrl.rowCount = null;
-          ctrl.loading = false;
+          this.results = [];
+          this.rowCount = null;
+          this.loading = false;
           // Show error message if e.g. query timed out
-          ctrl.serverError = error?.run?.error_message ?? ts('Connection error');
+          this.serverError = error?.run?.error_message ?? ts('Connection error');
           // Run all postRun callbacks on error
-          ctrl.onPostRun.forEach(callback => callback.call(ctrl, error, 'error', editedRow));
+          this.onPostRun.forEach(callback => callback.call(this, error, 'error', editedRow));
         });
         if (statusParams) {
           crmStatus(statusParams, apiRequest);
