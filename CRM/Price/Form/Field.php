@@ -597,14 +597,6 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
       if (empty($fields['option_amount']) && empty($fields['option_label'])) {
         return TRUE;
       }
-
-      if (empty($fields['option_name'])) {
-        $fields['option_amount'] = [];
-      }
-
-      if (empty($fields['option_label'])) {
-        $fields['option_label'] = [];
-      }
     }
 
     return empty($errors) ? TRUE : $errors;
