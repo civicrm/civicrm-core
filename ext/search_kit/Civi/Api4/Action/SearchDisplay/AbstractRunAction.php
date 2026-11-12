@@ -1872,7 +1872,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    *
    * @return string[]
    */
-  private function getAfformFilterFields() {
+  protected function getAfformFilterFields() {
     $afform = $this->loadAfform();
     if ($afform) {
       return array_column(\CRM_Utils_Array::findAll(

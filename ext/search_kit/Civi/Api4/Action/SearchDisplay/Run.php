@@ -57,6 +57,14 @@ class Run extends AbstractRunAction {
       [$runMode, $page] = explode(':', $runMode);
     }
 
+    if ($runMode === 'facet_counts') {
+      $facets = $this->getFacetFields();
+
+      // we remove facet field values from filters (so we can show the counts if that
+      // option isnt selected)
+      $facetFilters = \array_intersect_key($this->getFilters(), array_flip($facets));
+      $this->setFilters(array_diff_key($this->getFilters(), $facetFilters));
+    }
     // This looks like an unused variable but is not.
     // The CRM_Utils_AutoClean instance must be stored or it will be destoyed immediately.
     $autoClean = $this->applyTimeout();
@@ -80,6 +88,25 @@ class Run extends AbstractRunAction {
           $apiParams['select'][] = $key;
         }
         unset($apiParams['orderBy'], $apiParams['limit']);
+        break;
+
+      case 'facet_counts':
+        // add facet fields to the group by
+        $apiParams['groupBy'] = array_merge($apiParams['groupBy'] ?? [], $facets);
+
+        // get the count key
+        $key = CoreUtil::getIdFieldName($entityName);
+
+        // if there is no having we can discard the usual selects
+        // (otherwise we need to keep some having filters work)
+        $select = empty($apiParams['having']) ? [] : $apiParams['select'];
+
+        // add the facet columns and the count column
+        $apiParams['select'] = \array_merge($select, $facets, ["COUNT($key)"]);
+
+        // remove unnecessary orders/limits
+        unset($apiParams['orderBy'], $apiParams['limit']);
+
         break;
 
       case 'tally':
@@ -150,7 +177,21 @@ class Run extends AbstractRunAction {
     $result->rowCount = $apiResult->rowCount;
     $result->debug = $apiResult->debug;
 
-    if (in_array($runMode, ['row_count', 'id', 'draggableWeight'], TRUE)) {
+    if ($runMode === 'facet_counts') {
+      // group the things
+      $sqlRows = $apiResult->getArrayCopy();
+      $counts = [];
+      foreach ($facets as $facetField) {
+        $counts[$facetField] = [];
+        foreach ($sqlRows as $row) {
+          $facetValue = $row[$facetField];
+          $counts[$facetField][$facetValue] ??= 0;
+          $counts[$facetField][$facetValue] += $row["COUNT:{$key}"];
+        }
+      }
+      $result->exchangeArray($counts);
+    }
+    elseif (in_array($runMode, ['row_count', 'id', 'draggableWeight'], TRUE)) {
       $result->exchangeArray($apiResult->getArrayCopy());
     }
     else {
@@ -303,6 +344,12 @@ class Run extends AbstractRunAction {
         }
       }
     }
+  }
+
+  protected function getFacetFields(): array {
+    $filterFields = $this->getAfformFilterFields();
+    $facetFields = array_filter($filterFields, fn ($field) => $field['defn']['show_counts']);
+    return \array_column($facetFields, 'name');
   }
 
 }

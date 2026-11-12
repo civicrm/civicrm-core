@@ -240,6 +240,23 @@
          * Get search param set ID from URL hash param
          */
         this.getSearchParamSetId = () => ($scope && $scope.routeParams) ? $scope.routeParams._s : null;
+
+        /**
+         * Get fields that are facets (ie have defn.show_counts)
+         */
+        this.getFacets = () => {
+          const fieldMeta = this.getFieldMeta();
+          return Object.keys(fieldMeta).filter((key) => fieldMeta[key].show_counts);
+        };
+
+        this.setFacetCounts = (counts) => this.facetCounts = counts;
+
+        this.getFacetCount = (fieldName, optionId) => {
+          if (this.facetCounts && this.facetCounts[fieldName] && this.facetCounts[fieldName][optionId]) {
+            return this.facetCounts[fieldName][optionId];
+          }
+          return 0;
+        };
       }
     };
   });
