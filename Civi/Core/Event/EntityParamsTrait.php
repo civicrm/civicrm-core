@@ -57,7 +57,7 @@ trait EntityParamsTrait {
     }
 
     if (!$customField) {
-      return [FALSE, NULL];
+      return $this->findObjectValue($paramName);
     }
     $customFieldId = $customField['id'];
     $shortName = "custom_$customFieldId";
@@ -78,6 +78,22 @@ trait EntityParamsTrait {
   }
 
   /**
+   * Looks up a non-custom parameter that is not in $params.
+   *
+   * @return array [if parameter is present, value or NULL].
+   */
+  protected function findObjectValue(string $paramName): array {
+    return [FALSE, NULL];
+  }
+
+  /**
+   * Non-custom values held outside $params, keyed by name.
+   */
+  protected function getObjectValues(): array {
+    return [];
+  }
+
+  /**
    * Retrieves all parameter values. Custom fields are in long name format (CustomGroup.CustomField).
    *
    * Note: unless all values are needed, getValue() is more performant.
@@ -85,7 +101,7 @@ trait EntityParamsTrait {
    * @since 6.15
    */
   public function getValues(): array {
-    $values = $this->params ?? [];
+    $values = ($this->params ?? []) + $this->getObjectValues();
     unset($values['custom']);
 
     // Transform any custom values with shortNames (`custom_X`) to long name.
