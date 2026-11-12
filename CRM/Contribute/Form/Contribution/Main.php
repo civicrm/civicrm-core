@@ -285,7 +285,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               if (!CRM_Core_BAO_CustomGroup::checkCustomField($customFieldID, ['Membership'])
               ) {
                 CRM_Core_BAO_CustomField::setProfileDefaults($customFieldID, $name, $this->_defaults,
-                  $existingMembershipTypeID, CRM_Profile_Form::MODE_REGISTER
+                  $this->getRenewableMembershipValue('id'), CRM_Profile_Form::MODE_REGISTER
                 );
               }
             }
