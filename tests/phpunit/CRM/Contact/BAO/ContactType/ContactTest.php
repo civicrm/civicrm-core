@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Contact;
+
 /**
  * Class CRM_Contact_BAO_ContactType_ContactTest
  * @group headless
@@ -317,25 +319,23 @@ DELETE FROM civicrm_contact_type
     $subtypesToPreserve = [$this->student, $this->parent];
 
     // Create custom group that extends student and parent subtype
-    $apiParams = [
+    $customGroupId = $this->createTestEntity('CustomGroup', [
+      'name' => 'subtype_group',
       'title' => 'custom group',
-      'extends' => ['Individual', $subtypesToPreserve],
+      'extends' => 'Individual',
+      'extends_entity_column_value' => $subtypesToPreserve,
       'is_active' => TRUE,
-    ];
-    $result = civicrm_api3('customGroup', 'create', $apiParams);
-    $customGroupId = $result['id'];
+    ])['id'];
 
     // Create desired custom field
-    $apiParams = [
-      'debug' => 1,
-      'custom_group_id' => $result['id'],
+    $this->createTestEntity('CustomField', [
+      'custom_group_id' => $customGroupId,
+      'name' => 'subtype_field',
       'label' => 'custom field',
       'html_type' => 'Text',
       'data_type' => 'String',
       'is_active' => TRUE,
-    ];
-    $result = civicrm_api3('custom_field', 'create', $apiParams);
-    $customFieldId = $result['id'];
+    ]);
 
     // Create contact of subtype parent and student
     $params = [
@@ -347,23 +347,23 @@ DELETE FROM civicrm_contact_type
     $contact = CRM_Contact_BAO_Contact::add($params);
 
     // Record custom value for desired customGroup
-    $this->callAPISuccess('CustomValue', 'create', [
-      'entity_id' => $contact->id,
-      'custom_' . $customFieldId => 'value 1',
-    ]);
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $contact->id)
+      ->addValue('subtype_group.subtype_field', 'value 1')
+      ->execute();
 
     // Subtype to be removed from customGroup setting
     $subtypesToBeRemoved = [$this->student];
     CRM_Contact_BAO_ContactType::deleteCustomRowsOfSubtype($customGroupId, $subtypesToBeRemoved, $subtypesToPreserve);
 
     // Check with correct value to assert that custom data is not deleted
-    $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customFieldId => 'value 1']);
-    $this->assertSame(1, $result['count']);
-    $this->assertEquals($contact->id, $result['id']);
+    $result = Contact::get(FALSE)->addWhere('subtype_group.subtype_field', '=', 'value 1')->execute();
+    $this->assertCount(1, $result);
+    $this->assertEquals($contact->id, $result->first()['id']);
 
     //Check with incorrect custom value that our previous assertion was correct
-    $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customFieldId => 'wrong value']);
-    $this->assertSame(0, $result['count']);
+    $result = Contact::get(FALSE)->addWhere('subtype_group.subtype_field', '=', 'wrong value')->execute();
+    $this->assertCount(0, $result);
   }
 
 }

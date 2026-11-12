@@ -40,7 +40,7 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testAddToGroup(): void {
-    $contact = $this->callAPISuccess('Contact', 'create', [
+    $contact = $this->createTestEntity('Contact', [
       'contact_type' => 'Individual',
       'first_name' => 'John',
       'last_name' => 'Doe',
@@ -119,7 +119,7 @@ class CRM_Contact_Form_Task_AddToGroupTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testAddToNewGroupWithCustomField(): void {
-    $contact = $this->callAPISuccess('Contact', 'create', [
+    $contact = $this->createTestEntity('Contact', [
       'contact_type' => 'Individual',
       'first_name' => 'Pete',
       'last_name' => 'Johnson',

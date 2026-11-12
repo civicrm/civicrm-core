@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Contact;
+
 /**
  * Class CRM_Contact_BAO_ContactType_ContactSearchTest
  * @group headless
@@ -167,61 +169,58 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
   public function testSearchWithType(): void {
 
     // for type:Individual
-    $params = ['contact_type' => 'Individual', 'version' => 3];
-    $result = civicrm_api('contact', 'get', $params);
+    $result = Contact::get(FALSE)->addWhere('contact_type', '=', 'Individual')->execute()->indexBy('id');
 
-    $individual = $result['values'][$this->individual];
-    $individualStudent = $result['values'][$this->individualStudent];
-    $individualParent = $result['values'][$this->individualParent];
+    $individual = $result[$this->individual];
+    $individualStudent = $result[$this->individualStudent];
+    $individualParent = $result[$this->individualParent];
 
     //asserts for type:Individual
-    $this->assertEquals($individual['contact_id'], $this->individual);
-    $this->assertEquals($individual['first_name'], $this->individualParams['first_name']);
-    $this->assertEquals($individual['contact_type'], $this->individualParams['contact_type']);
-    $this->assertNotContains('contact_sub_type', $individual);
+    $this->assertEquals($this->individual, $individual['id']);
+    $this->assertEquals($this->individualParams['first_name'], $individual['first_name']);
+    $this->assertEquals($this->individualParams['contact_type'], $individual['contact_type']);
+    $this->assertEmpty($individual['contact_sub_type']);
 
     //asserts for type:Individual subtype:Student
-    $this->assertEquals($individualStudent['contact_id'], $this->individualStudent);
-    $this->assertEquals($individualStudent['first_name'], $this->individualStudentParams['first_name']);
-    $this->assertEquals($individualStudent['contact_type'], $this->individualStudentParams['contact_type']);
-    $this->assertEquals(end($individualStudent['contact_sub_type']), $this->individualStudentParams['contact_sub_type']);
+    $this->assertEquals($this->individualStudent, $individualStudent['id']);
+    $this->assertEquals($this->individualStudentParams['first_name'], $individualStudent['first_name']);
+    $this->assertEquals($this->individualStudentParams['contact_type'], $individualStudent['contact_type']);
+    $this->assertEquals($this->individualStudentParams['contact_sub_type'], end($individualStudent['contact_sub_type']));
 
     //asserts for type:Individual subtype:Parent
-    $this->assertEquals($individualParent['contact_id'], $this->individualParent);
-    $this->assertEquals($individualParent['first_name'], $this->individualParentParams['first_name']);
-    $this->assertEquals($individualParent['contact_type'], $this->individualParentParams['contact_type']);
-    $this->assertEquals(end($individualParent['contact_sub_type']), $this->individualParentParams['contact_sub_type']);
+    $this->assertEquals($this->individualParent, $individualParent['id']);
+    $this->assertEquals($this->individualParentParams['first_name'], $individualParent['first_name']);
+    $this->assertEquals($this->individualParentParams['contact_type'], $individualParent['contact_type']);
+    $this->assertEquals($this->individualParentParams['contact_sub_type'], end($individualParent['contact_sub_type']));
 
     // for type:Organization
-    $params = ['contact_type' => 'Organization', 'version' => 3];
-    $result = civicrm_api('contact', 'get', $params);
+    $result = Contact::get(FALSE)->addWhere('contact_type', '=', 'Organization')->execute()->indexBy('id');
 
-    $organization = $result['values'][$this->organization];
-    $organizationSponsor = $result['values'][$this->organizationSponsor];
+    $organization = $result[$this->organization];
+    $organizationSponsor = $result[$this->organizationSponsor];
 
     //asserts for type:Organization
-    $this->assertEquals($organization['contact_id'], $this->organization);
-    $this->assertEquals($organization['organization_name'], $this->organizationParams['organization_name']);
-    $this->assertEquals($organization['contact_type'], $this->organizationParams['contact_type']);
-    $this->assertNotContains('contact_sub_type', $organization);
+    $this->assertEquals($this->organization, $organization['id']);
+    $this->assertEquals($this->organizationParams['organization_name'], $organization['organization_name']);
+    $this->assertEquals($this->organizationParams['contact_type'], $organization['contact_type']);
+    $this->assertEmpty($organization['contact_sub_type']);
 
     //asserts for type:Organization subtype:Sponsor
-    $this->assertEquals($organizationSponsor['contact_id'], $this->organizationSponsor);
-    $this->assertEquals($organizationSponsor['organization_name'], $this->organizationSponsorParams['organization_name']);
-    $this->assertEquals($organizationSponsor['contact_type'], $this->organizationSponsorParams['contact_type']);
-    $this->assertEquals(end($organizationSponsor['contact_sub_type']), $this->organizationSponsorParams['contact_sub_type']);
+    $this->assertEquals($this->organizationSponsor, $organizationSponsor['id']);
+    $this->assertEquals($this->organizationSponsorParams['organization_name'], $organizationSponsor['organization_name']);
+    $this->assertEquals($this->organizationSponsorParams['contact_type'], $organizationSponsor['contact_type']);
+    $this->assertEquals($this->organizationSponsorParams['contact_sub_type'], end($organizationSponsor['contact_sub_type']));
 
     // for type:Household
-    $params = ['contact_type' => 'Household', 'version' => 3];
-    $result = civicrm_api('contact', 'get', $params);
+    $result = Contact::get(FALSE)->addWhere('contact_type', '=', 'Household')->execute()->indexBy('id');
 
-    $household = $result['values'][$this->household];
+    $household = $result[$this->household];
 
     //asserts for type:Household
-    $this->assertEquals($household['contact_id'], $this->household);
-    $this->assertEquals($household['household_name'], $this->householdParams['household_name']);
-    $this->assertEquals($household['contact_type'], $this->householdParams['contact_type']);
-    $this->assertNotContains('contact_sub_type', $household);
+    $this->assertEquals($this->household, $household['id']);
+    $this->assertEquals($this->householdParams['household_name'], $household['household_name']);
+    $this->assertEquals($this->householdParams['contact_type'], $household['contact_type']);
+    $this->assertEmpty($household['contact_sub_type']);
   }
 
   /**
@@ -232,44 +231,42 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
   public function testSearchWithSubype(): void {
 
     // for subtype:Student
-    $params = ['contact_sub_type' => $this->student, 'version' => 3];
-    $result = civicrm_api('contact', 'get', $params);
+    $result = Contact::get(FALSE)->addWhere('contact_sub_type', 'CONTAINS', $this->student)->execute()->indexBy('id');
 
-    $individualStudent = $result['values'][$this->individualStudent];
+    $individualStudent = $result[$this->individualStudent];
 
     //asserts for type:Individual subtype:Student
-    $this->assertEquals($individualStudent['contact_id'], $this->individualStudent);
-    $this->assertEquals($individualStudent['first_name'], $this->individualStudentParams['first_name']);
-    $this->assertEquals($individualStudent['contact_type'], $this->individualStudentParams['contact_type']);
-    $this->assertEquals(end($individualStudent['contact_sub_type']), $this->individualStudentParams['contact_sub_type']);
+    $this->assertEquals($this->individualStudent, $individualStudent['id']);
+    $this->assertEquals($this->individualStudentParams['first_name'], $individualStudent['first_name']);
+    $this->assertEquals($this->individualStudentParams['contact_type'], $individualStudent['contact_type']);
+    $this->assertEquals($this->individualStudentParams['contact_sub_type'], end($individualStudent['contact_sub_type']));
 
     //all other contact(rather than subtype:student) should not
     //exists
-    $this->assertNotContains($this->individual, $result['values']);
-    $this->assertNotContains($this->individualParent, $result['values']);
-    $this->assertNotContains($this->organization, $result['values']);
-    $this->assertNotContains($this->organizationSponsor, $result['values']);
-    $this->assertNotContains($this->household, $result['values']);
+    $this->assertArrayNotHasKey($this->individual, $result);
+    $this->assertArrayNotHasKey($this->individualParent, $result);
+    $this->assertArrayNotHasKey($this->organization, $result);
+    $this->assertArrayNotHasKey($this->organizationSponsor, $result);
+    $this->assertArrayNotHasKey($this->household, $result);
 
     // for subtype:Sponsor
-    $params = ['contact_sub_type' => $this->sponsor, 'version' => 3];
-    $result = civicrm_api('contact', 'get', $params);
+    $result = Contact::get(FALSE)->addWhere('contact_sub_type', 'CONTAINS', $this->sponsor)->execute()->indexBy('id');
 
-    $organizationSponsor = $result['values'][$this->organizationSponsor];
+    $organizationSponsor = $result[$this->organizationSponsor];
 
     //asserts for type:Organization subtype:Sponsor
-    $this->assertEquals($organizationSponsor['contact_id'], $this->organizationSponsor);
-    $this->assertEquals($organizationSponsor['organization_name'], $this->organizationSponsorParams['organization_name']);
-    $this->assertEquals($organizationSponsor['contact_type'], $this->organizationSponsorParams['contact_type']);
-    $this->assertEquals(end($organizationSponsor['contact_sub_type']), $this->organizationSponsorParams['contact_sub_type']);
+    $this->assertEquals($this->organizationSponsor, $organizationSponsor['id']);
+    $this->assertEquals($this->organizationSponsorParams['organization_name'], $organizationSponsor['organization_name']);
+    $this->assertEquals($this->organizationSponsorParams['contact_type'], $organizationSponsor['contact_type']);
+    $this->assertEquals($this->organizationSponsorParams['contact_sub_type'], end($organizationSponsor['contact_sub_type']));
 
     //all other contact(rather than subtype:Sponsor) should not
     //exists
-    $this->assertNotContains($this->individual, $result['values']);
-    $this->assertNotContains($this->individualStudent, $result['values']);
-    $this->assertNotContains($this->individualParent, $result['values']);
-    $this->assertNotContains($this->organization, $result['values']);
-    $this->assertNotContains($this->household, $result['values']);
+    $this->assertArrayNotHasKey($this->individual, $result);
+    $this->assertArrayNotHasKey($this->individualStudent, $result);
+    $this->assertArrayNotHasKey($this->individualParent, $result);
+    $this->assertArrayNotHasKey($this->organization, $result);
+    $this->assertArrayNotHasKey($this->household, $result);
   }
 
   /**
@@ -280,44 +277,48 @@ class CRM_Contact_BAO_ContactType_ContactSearchTest extends CiviUnitTestCase {
   public function testSearchWithTypeSubype(): void {
 
     // for type:individual subtype:Student
-    $params = ['contact_sub_type' => $this->student, 'version' => 3];
-    $result = civicrm_api('contact', 'get', $params);
+    $result = Contact::get(FALSE)
+      ->addWhere('contact_type', '=', 'Individual')
+      ->addWhere('contact_sub_type', 'CONTAINS', $this->student)
+      ->execute()->indexBy('id');
 
-    $individualStudent = $result['values'][$this->individualStudent];
+    $individualStudent = $result[$this->individualStudent];
 
     //asserts for type:Individual subtype:Student
-    $this->assertEquals($individualStudent['contact_id'], $this->individualStudent);
-    $this->assertEquals($individualStudent['first_name'], $this->individualStudentParams['first_name']);
-    $this->assertEquals($individualStudent['contact_type'], $this->individualStudentParams['contact_type']);
-    $this->assertEquals(end($individualStudent['contact_sub_type']), $this->individualStudentParams['contact_sub_type']);
+    $this->assertEquals($this->individualStudent, $individualStudent['id']);
+    $this->assertEquals($this->individualStudentParams['first_name'], $individualStudent['first_name']);
+    $this->assertEquals($this->individualStudentParams['contact_type'], $individualStudent['contact_type']);
+    $this->assertEquals($this->individualStudentParams['contact_sub_type'], end($individualStudent['contact_sub_type']));
 
     //all other contact(rather than subtype:student) should not
     //exists
-    $this->assertNotContains($this->individual, $result['values']);
-    $this->assertNotContains($this->individualParent, $result['values']);
-    $this->assertNotContains($this->organization, $result['values']);
-    $this->assertNotContains($this->organizationSponsor, $result['values']);
-    $this->assertNotContains($this->household, $result['values']);
+    $this->assertArrayNotHasKey($this->individual, $result);
+    $this->assertArrayNotHasKey($this->individualParent, $result);
+    $this->assertArrayNotHasKey($this->organization, $result);
+    $this->assertArrayNotHasKey($this->organizationSponsor, $result);
+    $this->assertArrayNotHasKey($this->household, $result);
 
     // for type:Organization subtype:Sponsor
-    $params = ['contact_sub_type' => $this->sponsor, 'version' => 3];
-    $result = civicrm_api('contact', 'get', $params);
+    $result = Contact::get(FALSE)
+      ->addWhere('contact_type', '=', 'Organization')
+      ->addWhere('contact_sub_type', 'CONTAINS', $this->sponsor)
+      ->execute()->indexBy('id');
 
-    $organizationSponsor = $result['values'][$this->organizationSponsor];
+    $organizationSponsor = $result[$this->organizationSponsor];
 
     //asserts for type:Organization subtype:Sponsor
-    $this->assertEquals($organizationSponsor['contact_id'], $this->organizationSponsor);
-    $this->assertEquals($organizationSponsor['organization_name'], $this->organizationSponsorParams['organization_name']);
-    $this->assertEquals($organizationSponsor['contact_type'], $this->organizationSponsorParams['contact_type']);
-    $this->assertEquals(end($organizationSponsor['contact_sub_type']), $this->organizationSponsorParams['contact_sub_type']);
+    $this->assertEquals($this->organizationSponsor, $organizationSponsor['id']);
+    $this->assertEquals($this->organizationSponsorParams['organization_name'], $organizationSponsor['organization_name']);
+    $this->assertEquals($this->organizationSponsorParams['contact_type'], $organizationSponsor['contact_type']);
+    $this->assertEquals($this->organizationSponsorParams['contact_sub_type'], end($organizationSponsor['contact_sub_type']));
 
     //all other contact(rather than subtype:Sponsor) should not
     //exists
-    $this->assertNotContains($this->individual, $result['values']);
-    $this->assertNotContains($this->individualStudent, $result['values']);
-    $this->assertNotContains($this->individualParent, $result['values']);
-    $this->assertNotContains($this->organization, $result['values']);
-    $this->assertNotContains($this->household, $result['values']);
+    $this->assertArrayNotHasKey($this->individual, $result);
+    $this->assertArrayNotHasKey($this->individualStudent, $result);
+    $this->assertArrayNotHasKey($this->individualParent, $result);
+    $this->assertArrayNotHasKey($this->organization, $result);
+    $this->assertArrayNotHasKey($this->household, $result);
   }
 
 }

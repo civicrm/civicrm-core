@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Domain;
 use Civi\Api4\Group;
 use Civi\Api4\SavedSearch;
 use Civi\Api4\Setting;
@@ -305,25 +306,25 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     ];
     $group1 = CRM_Contact_BAO_Group::writeRecord($params);
 
-    $domain1 = $this->callAPISuccess('Domain', 'get', ['id' => 1]);
+    $domain1 = Domain::get(FALSE)->addWhere('id', '=', 1)->execute()->single();
     $params2 = [
       'name' => uniqid(),
       'title' => 'Group B',
       'description' => 'Group Two',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-      'organization_id' => $domain1['values'][1]['contact_id'],
+      'organization_id' => $domain1['contact_id'],
     ];
     $group2 = CRM_Contact_BAO_Group::writeRecord($params2);
 
-    $domain2 = $this->callAPISuccess('Domain', 'get', ['id' => 2]);
+    $domain2 = Domain::get(FALSE)->addWhere('id', '=', 2)->execute()->single();
     $params3 = [
       'name' => uniqid(),
       'title' => 'Group C',
       'description' => 'Group Three',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-      'organization_id' => $domain2['values'][2]['contact_id'],
+      'organization_id' => $domain2['contact_id'],
     ];
     $group3 = CRM_Contact_BAO_Group::writeRecord($params3);
     $params2['id'] = $group2->id;
@@ -354,8 +355,8 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     ];
     [$smartGroupID, $savedSearchID] = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
 
-    $mailingID = $this->callAPISuccess('Mailing', 'create', [])['id'];
-    $this->callAPISuccess('MailingGroup', 'create', [
+    $mailingID = $this->createTestEntity('Mailing', [])['id'];
+    $this->createTestEntity('MailingGroup', [
       'mailing_id' => $mailingID,
       'group_type' => 'Include',
       'entity_table' => 'civicrm_group',
@@ -390,7 +391,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     CRM_Contact_BAO_Group::writeRecord($newParams);
 
     // Check it against original array, except description.
-    $result = $this->callAPISuccess('Group', 'getsingle', ['id' => $group->id]);
+    $result = Group::get(FALSE)->addWhere('id', '=', $group->id)->execute()->single();
     foreach ($checkParams as $key => $value) {
       if ($key === 'description') {
         $this->assertEquals($newParams[$key], $result[$key], "$key doesn't match");
