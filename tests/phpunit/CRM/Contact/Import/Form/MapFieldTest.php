@@ -476,7 +476,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
         'mapping_id' => $mapping['id'],
         'grouping' => 1,
         'contact_type' => 'Individual',
-      ], $mappingField));
+      ], $mappingField), 'column_' . $mappingField['column_number']);
     }
     return $mapping;
   }

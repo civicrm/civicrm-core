@@ -184,7 +184,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'saved_search_id' => $savedSearchID,
       'parents' => [$parentGroupID],
     ])->execute()->first()['id'];
-    $this->callAPISuccess('Contact', 'get', ['group' => $childGroupID]);
+    $this->callApiV3Success('Contact', 'get', ['group' => $childGroupID]);
   }
 
   /**
@@ -364,7 +364,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     ]);
 
     CRM_Mailing_BAO_Mailing::getRecipients($mailingID);
-    $recipients = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailingID]);
+    $recipients = $this->callApiV3Success('MailingRecipients', 'get', ['mailing_id' => $mailingID]);
     $this->assertSame(1, $recipients['count'], 'Check recipient count');
   }
 
