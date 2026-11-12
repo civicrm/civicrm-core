@@ -24,6 +24,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\Contact;
 use Civi\Api4\Contribution;
 use Civi\Api4\CustomGroup;
+use Civi\Api4\Query\SqlFunctionFILESIZE;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Test\TransactionalInterface;
 
@@ -742,6 +743,56 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertSame('4', $result[1]['first_element']);
     $this->assertSame('15', $result[1]['second_element']);
     $this->assertSame('9', $result[1]['third_element']);
+  }
+
+  public function testFileSizeFormat(): void {
+    $cases = [
+      [0, '0 B'],
+      [1023, '1,023 B'],
+      [1024, '1 KiB'],
+      [1536, '1.5 KiB'],
+      [1024 ** 2 - 1, '1 MiB'],
+      [1023.6 * 1024, '1 MiB'],
+      [1023.5, '1 KiB'],
+      [1023.4 * 1024, '1,023 KiB'],
+      [9.44 * 1024 ** 3, '9.4 GiB'],
+      [9.96 * 1024 ** 3, '10 GiB'],
+      [13000 * 1024 ** 2, '13 GiB'],
+      [-300 * 1024 ** 2, '-300 MiB'],
+      [2.5 * 1024 ** 4, '2.5 TiB'],
+    ];
+    foreach ($cases as [$bytes, $expected]) {
+      $this->assertSame($expected, SqlFunctionFILESIZE::format($bytes), "$bytes bytes");
+    }
+  }
+
+  public function testFileSizeSortsByNumber(): void {
+    $cid = Contact::create(FALSE)->addValue('first_name', 'bill')->execute()->first()['id'];
+    Contribution::save(FALSE)
+      ->setDefaults(['contact_id' => $cid, 'financial_type_id:name' => 'Donation'])
+      ->setRecords([
+        ['total_amount' => 13000],
+        ['total_amount' => 850],
+        ['total_amount' => 9626, 'financial_type_id:name' => 'Member Dues'],
+      ])
+      ->execute();
+
+    $result = Contribution::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addSelect('FILESIZE(MiB, total_amount) AS size', 'FILESIZE(KiB, (total_amount - 850)) AS over')
+      ->addOrderBy('size', 'DESC')
+      ->execute();
+    // As text, "850 MiB" would sort first.
+    $this->assertSame(['13 GiB', '9.4 GiB', '850 MiB'], $result->column('size'));
+    $this->assertSame(['12 MiB', '8.6 MiB', '0 B'], $result->column('over'));
+
+    $result = Contribution::get(FALSE)
+      ->addWhere('contact_id', '=', $cid)
+      ->addSelect('financial_type_id', 'FILESIZE(MiB, SUM(total_amount)) AS size')
+      ->addGroupBy('financial_type_id')
+      ->addOrderBy('size', 'ASC')
+      ->execute();
+    $this->assertSame(['9.4 GiB', '14 GiB'], $result->column('size'));
   }
 
   /**
