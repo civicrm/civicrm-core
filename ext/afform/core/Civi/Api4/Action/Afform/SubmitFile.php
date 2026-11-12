@@ -74,6 +74,7 @@ class SubmitFile extends AbstractProcessor {
       $this->assertEntityActionAllowed();
     }
 
+    $this->assertFormFileField();
     $fileField = $this->_formDataModel->getField($this->getEntityApiName(), $this->fieldName, 'create');
 
     $file = civicrm_api4('File', 'create', [
