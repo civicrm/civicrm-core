@@ -72,20 +72,15 @@
                             <br/>
                           {/foreach}
                         {else}
-                          {if $element.field_data_type == 'Money'}
-                            {if $element.field_type == 'Text'}
-                              {$element.data|crmMoney}
-                            {else}
-                              {$element.field_value}
-                            {/if}
+                          {if $element.field_data_type == 'Money' && $element.field_type == 'Text'}
+                            {* todo: roll into CRM_Core_BAO_CustomField::displayValue *}
+                            {$element.data|crmMoney}
+                          {elseif $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
+                            {* todo: roll into CRM_Core_BAO_CustomField::displayValue *}
+                            {$element.contact_ref_links|join:', '}
                           {else}
-                            {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
-                              {$element.contact_ref_links|join:', '}
-                            {elseif $element.field_type eq 'File' || $element.field_type eq 'TextArea' || $element.field_type eq 'RichTextEditor' || $element.field_type === 'Link'}
-                              {$element.field_value|purify}
-                            {else}
-                              {$element.field_value|escape}
-                            {/if}
+                            {* should be escaped / purified by CRM_Core_BAO_CustomField::displayValue *}
+                            {$element.field_value}
                           {/if}
                         {/if}
                       </td>

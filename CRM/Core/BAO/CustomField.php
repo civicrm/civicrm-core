@@ -1140,7 +1140,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return string
    * @throws \CRM_Core_Exception|\Brick\Money\Exception\UnknownCurrencyException
    */
-  public static function displayValue($value, $fieldID, $entityID = NULL) {
+  public static function displayValue($value, $fieldID, $entityID = NULL): string {
     if (!is_numeric($fieldID)) {
       // Deprecated support for a non-id value.
       $fieldID = is_object($fieldID) ? $fieldID->id : (int) str_replace('custom_', '', $fieldID);
@@ -1148,10 +1148,38 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $fieldInfo = self::getField($fieldID);
     $fieldInfo['options'] = self::getFieldOptions($fieldID, $fieldInfo['option_group_id'], $fieldInfo['data_type'], $fieldInfo['custom_group']['extends']);
     $displayValue = self::formatDisplayValue($value, $fieldInfo, $entityID);
+    $contentType = self::getContentType($fieldInfo['data_type'], $fieldInfo['html_type']);
     // Call hook to alter display value.
-    CRM_Utils_Hook::alterCustomFieldDisplayValue($displayValue, $value, $entityID, $fieldInfo);
+    CRM_Utils_Hook::alterCustomFieldDisplayValue($displayValue, $value, $entityID, $fieldInfo, $contentType);
 
-    return $displayValue;
+    if (!$displayValue) {
+      return '';
+    }
+
+    switch ($contentType) {
+      case 'html':
+        // purify to remove nasty HTML
+        return CRM_Utils_String::purifyHTML(nl2br($displayValue));
+
+      default:
+        // escape html chars to allow rendering as text
+        return \htmlspecialchars($displayValue, flags: ENT_QUOTES | ENT_SUBSTITUTE, double_encode: FALSE);
+    }
+  }
+
+  private static function getContentType(string $dataType, string $htmlType): string {
+    switch ($dataType) {
+      case 'Memo':
+        return 'html';
+    }
+    switch ($htmlType) {
+      case 'File':
+      case 'TextArea':
+      case 'RichTextEditor':
+      case 'Link':
+        return 'html';
+    }
+    return 'text';
   }
 
   /**

@@ -12,13 +12,6 @@
   {$instance.field_title}
 </div>
 <div class="crm-content crm-custom_data">
-  {if $instance.field_input_type === 'RichTextEditor' || $instance.field_input_type === 'Link' || $instance.field_input_type === 'File'}
-    {$instance.field_value|purify nofilter}
-  {else}
-    {* This would be too strict for some types - eg. contact reference.
-    Fortunately the Address custom data is currently not creating links for them
-    as it should so we can address when we fix that.
-    *}
-    {$instance.field_value|escape:html nofilter}
-  {/if}
+  {* should be escaped / purified by CRM_Core_BAO_CustomField::displayValue *}
+  {$instance.field_value}
 </div>
