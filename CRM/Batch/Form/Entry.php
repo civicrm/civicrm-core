@@ -195,6 +195,10 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       // get the profile id associated with this batch type
       $this->_profileId = CRM_Batch_BAO_Batch::getProfileId($this->_batchInfo['type_id']);
     }
+    $status = CRM_Core_PseudoConstant::getName('CRM_Batch_BAO_Batch', 'status_id', $this->_batchInfo['status_id']);
+    if (in_array($status, ['Closed', 'Exported'], TRUE) || !CRM_Batch_BAO_Batch::checkBatchPermission('edit', $this->_batchInfo['created_id'] ?? NULL)) {
+      CRM_Utils_System::permissionDenied();
+    }
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/Batch/Form/Entry.js', 1, 'html-header')
       ->addSetting(['batch' => ['type_id' => $this->_batchInfo['type_id']]])
