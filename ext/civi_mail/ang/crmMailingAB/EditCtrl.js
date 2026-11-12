@@ -12,10 +12,15 @@
     $scope.mailingFields = mailingFields;
 
     $scope.isSubmitted = function isSubmitted() {
-      return Object.keys(abtest.mailings.a.jobs || {}).length > 0 || Object.keys(abtest.mailings.b.jobs || {}).length > 0;
+      return ['Testing', 'Final'].includes(abtest.ab.status) ||
+        Object.keys(abtest.mailings.a.jobs || {}).length > 0 || Object.keys(abtest.mailings.b.jobs || {}).length > 0;
     };
 
     $scope.sync = function sync() {
+      // Once submitted, we don't need to sync anymore.
+      if (['Testing', 'Final'].includes(abtest.ab.status)) {
+        return true;
+      }
       abtest.mailings.a.name = ts('Test A (%1)', {1: abtest.ab.name});
       abtest.mailings.b.name = ts('Test B (%1)', {1: abtest.ab.name});
       abtest.mailings.c.name = ts('Final (%1)', {1: abtest.ab.name});
@@ -97,9 +102,10 @@
             return crmStatus({
               start: ts('Submitting...'),
               success: ts('Submitted')
-            }, myAutosave.suspend(abtest.submitTest()));
-            // Note: We're going to leave, so we don't care that submit() modifies several server-side records.
-            // If we stayed on this page, then we'd care about updating and call: abtest.submitTest().then(...abtest.load()...)
+            }, myAutosave.suspend(abtest.submitTest().then(() => {
+              // Rebuild the report's mailing list, so we get mailing details.
+              delete abtest.$CrmMailingABReportCnt;
+            })));
           })
       );
     };
