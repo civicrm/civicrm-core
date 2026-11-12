@@ -62,6 +62,12 @@
         {$form.nick_name.label}<br />
         {$form.nick_name.html}
       </td>
+      {if !empty($form.legal_name)}
+      <td>
+        {$form.legal_name.label}<br />
+        {$form.legal_name.html}
+      </td>
+      {/if}
       {if !empty($form.contact_sub_type)}
       <td>
         {$form.contact_sub_type.label}<br />

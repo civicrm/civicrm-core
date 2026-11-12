@@ -142,6 +142,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
           'image_URL' => 'Image',
           'legal_identifier' => 'Legal Identifier',
           'nick_name' => 'Nickname',
+          'legal_name' => 'Legal Name',
           'is_opt_out' => 'Is Opt Out',
           'postal_greeting_custom' => 'Postal Greeting Custom',
           'preferred_communication_method' => 'Preferred Communication Method',
@@ -181,7 +182,6 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
     ];
     $contactTypeFields = [
       'Organization' => [
-        'legal_name' => 'Legal Name',
         'organization_name' => 'Organization Name',
         'sic_code' => 'SIC Code',
       ],

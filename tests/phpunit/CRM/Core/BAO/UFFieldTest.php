@@ -49,7 +49,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->assertSame('birth_date', $fields['Individual']['birth_date']['name']);
 
     $this->assertSame('organization_name', $fields['Organization']['organization_name']['name']);
-    $this->assertSame('legal_name', $fields['Organization']['legal_name']['name']);
+    $this->assertSame('legal_name', $fields['Contact']['legal_name']['name']);
 
     // already used
     $this->assertFalse(isset($fields['Contribution']['amount_level']));
@@ -137,7 +137,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->assertSame('birth_date', $fields['Individual']['birth_date']['name']);
 
     $this->assertSame('organization_name', $fields['Organization']['organization_name']['name']);
-    $this->assertSame('legal_name', $fields['Organization']['legal_name']['name']);
+    $this->assertSame('legal_name', $fields['Contact']['legal_name']['name']);
 
     $this->assertSame('amount_level', $fields['Contribution']['amount_level']['name']);
     $this->assertSame('cancel_reason', $fields['Contribution']['cancel_reason']['name']);
@@ -174,7 +174,7 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $this->assertSame('Individual', $fields['birth_date']['field_type']);
 
     $this->assertSame('Organization', $fields['organization_name']['field_type']);
-    $this->assertSame('Organization', $fields['legal_name']['field_type']);
+    $this->assertSame('Contact', $fields['legal_name']['field_type']);
 
     $this->assertSame('Contribution', $fields['amount_level']['field_type']);
     $this->assertSame('Contribution', $fields['cancel_reason']['field_type']);

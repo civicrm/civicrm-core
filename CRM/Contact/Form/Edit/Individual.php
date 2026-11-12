@@ -53,6 +53,10 @@ class CRM_Contact_Form_Edit_Individual {
       }
 
       foreach ($nameFields as $name) {
+        if ($name === 'legal_name') {
+          // Added below, next to nick name, rather than in the name row.
+          continue;
+        }
         $props = [];
         if ($name == 'prefix_id' || $name == 'suffix_id') {
           //override prefix/suffix label name as Prefix/Suffix respectively and adjust select size
@@ -65,6 +69,11 @@ class CRM_Contact_Form_Edit_Individual {
     if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
       $form->addField('nick_name');
+
+      $editOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'contact_edit_options');
+      if (!empty($editOptions['Legal Name'])) {
+        $form->addField('legal_name');
+      }
 
       // job title
       // override the size for UI to look better
