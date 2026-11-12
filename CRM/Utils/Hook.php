@@ -454,6 +454,25 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called before event total seats occupied are calculated
+   *
+   * @param string $query
+   *   query to calculate of event total seats occupied in an event
+   * @param int $eventId
+   *   The event ID for which the calculation is done.
+   * @param string $extraWhereClause
+   *   The extraWhereClause used for the query.
+   *
+   * @return string
+   */
+  public static function alterCountQuery(&$query, $eventId, $extraWhereClause) {
+    return self::singleton()->invoke(['query', 'eventId', 'extraWhereClause'], $query, $eventId,
+      $extraWhereClause, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterCountQuery'
+    );
+  }
+
+  /**
    * This hook is invoked during the CiviCRM form preProcess phase.
    *
    * @param string $formName
