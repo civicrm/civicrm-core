@@ -58,6 +58,9 @@ body.admin.com_civicrm.layout-default {
 body.admin.com_civicrm.layout-default .breadcrumb {
   background: transparent;
 }
+body.admin.com_civicrm.layout-default .crm-container .form-group {
+  margin-bottom: 0 !important; /* overwrites Joomla's important tagged margin */
+}
 body.admin.com_civicrm.task-civicrmcontactview .breadcrumb, /* Hides breadcrumb on contact dashboard */
 body.admin.com_civicrm.layout-default .crm-container .dropdown-toggle::after {
   display: none;
@@ -66,8 +69,10 @@ body.admin.com_civicrm.layout-default .container-main {
   padding-bottom: 0; /* removes bottom space */
 }
 body.admin.com_civicrm.layout-default #content,
-body.admin.com_civicrm.layout-default #content > .row > .col-md-12 {
+body.admin.com_civicrm.layout-default #content > .row > .col-md-12,
+body.admin.com_civicrm.layout-default #content div.form-control {
   padding: 0;
+  border: 0;
 }
 body.admin.com_civicrm.layout-default #content > .row {
   margin-inline: 0;
