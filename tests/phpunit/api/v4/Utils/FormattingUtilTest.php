@@ -101,6 +101,15 @@ class FormattingUtilTest extends Api4TestBase implements TransactionalInterface 
   }
 
   /**
+   * The string 'null' still unsets a boolean field.
+   */
+  public function testBooleanFieldAcceptsNullString(): void {
+    $params = ['is_override' => 'null'];
+    FormattingUtil::formatWriteParams($params, ['is_override' => ['name' => 'is_override', 'data_type' => 'Boolean']]);
+    $this->assertSame('Null', $params['is_override']);
+  }
+
+  /**
    * A string that is no boolean spelling is refused, not stored as FALSE.
    */
   public function testInvalidBooleanStringInput(): void {

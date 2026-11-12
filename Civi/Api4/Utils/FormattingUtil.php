@@ -158,7 +158,8 @@ class FormattingUtil {
 
       case 'Boolean':
         // The database would cast a string like 'true' to 0. No operator means a write; pattern operators keep their string.
-        if (is_string($value) && $value !== '' && in_array($operator, [NULL, '=', '!=', '<>', 'IN', 'NOT IN'], TRUE)) {
+        // 'Null' is what formatWriteParams() passes on to unset a value.
+        if (is_string($value) && $value !== '' && $value !== 'Null' && in_array($operator, [NULL, '=', '!=', '<>', 'IN', 'NOT IN'], TRUE)) {
           $bool = \CRM_Utils_String::strtoboolstr($value);
           if ($bool !== FALSE) {
             $value = (int) $bool;
