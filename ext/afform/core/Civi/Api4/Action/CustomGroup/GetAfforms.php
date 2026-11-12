@@ -56,15 +56,6 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
   protected function doTask($item) {
     $forms = [];
 
-    // Custom group - extended entity's API is missing when its component is disabled
-    $baseEntity = \CRM_Core_BAO_CustomGroup::getEntityFromExtends($item['extends']);
-    if (!$baseEntity || !CoreUtil::entityExists($baseEntity)) {
-      return [
-        'id' => $item['id'],
-        'forms' => $forms,
-      ];
-    }
-
     // Get all enabled fields
     $customGroup = \CRM_Core_BAO_CustomGroup::getGroup(['id' => $item['id']]);
     $item['fields'] = array_filter($customGroup['fields'], function ($field) {
@@ -371,7 +362,9 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
   }
 
   public static function getCustomGroupAfforms($event) {
+    $activeEntities = array_keys(\Civi::service('action_object_provider')->getEntities());
     $formGenerate = \Civi\Api4\CustomGroup::getAfforms(FALSE)
+      ->addWhere('extends', 'IN', $activeEntities)
       ->addWhere('is_active', '=', TRUE);
 
     // only generate layout if this is required by the Afform.get
