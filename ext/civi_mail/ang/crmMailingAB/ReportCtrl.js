@@ -3,6 +3,15 @@
   angular.module('crmMailingAB').controller('CrmMailingABReportCtrl', function($scope, crmApi, crmMailingStats) {
     const ts = $scope.ts = CRM.ts('civi_mail');
 
+    const mailingIds = {};
+    ['a', 'b', 'c'].forEach((mkey) => {
+      if ($scope.abtest.ab['mailing_id_' + mkey]) {
+        mailingIds[mkey] = $scope.abtest.ab['mailing_id_' + mkey];
+      }
+    });
+    // The final mailing can only be sent while A, B and C all exist.
+    $scope.hasAllMailings = () => ['a', 'b', 'c'].every((mkey) => mkey in mailingIds);
+
     let CrmMailingABReportCnt = 1;
     let activeMailings = null;
     $scope.getActiveMailings = function() {
@@ -30,15 +39,17 @@
             attachments: $scope.abtest.attachments.c
           });
         }
+        activeMailings.forEach((am) => {
+          am.deleted = !(am.name in mailingIds);
+          if (am.deleted) {
+            am.title = ts('%1 (deleted)', {1: am.title});
+          }
+        });
       }
       return activeMailings;
     };
 
-    crmMailingStats.getStats({
-      a: $scope.abtest.ab.mailing_id_a,
-      b: $scope.abtest.ab.mailing_id_b,
-      c: $scope.abtest.ab.mailing_id_c
-    }).then(function(stats) {
+    crmMailingStats.getStats(mailingIds).then(function(stats) {
       $scope.stats = stats;
     });
     $scope.rateStats = {
