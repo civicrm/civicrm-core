@@ -188,6 +188,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
     if (empty($groupIds)) {
       return [];
     }
+    $groupIds = CRM_Utils_Type::escapeAll($groupIds, 'Positive');
     $dao = new CRM_Contact_DAO_GroupNesting();
     $query = "SELECT child_group_id, parent_group_id FROM civicrm_group_nesting WHERE parent_group_id IN (" . implode(',', $groupIds) . ")";
     $dao->query($query);

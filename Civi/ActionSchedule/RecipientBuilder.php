@@ -363,7 +363,8 @@ class RecipientBuilder {
       return $query->where(implode(" OR ", $groupWhereCLause));
     }
     elseif (!empty($actionSchedule->recipient_manual)) {
-      $rList = \CRM_Utils_Type::escape($actionSchedule->recipient_manual, 'String');
+      // A stored value that is no contact ID is dropped: an exception would stop every reminder.
+      $rList = implode(',', array_filter(explode(',', $actionSchedule->recipient_manual), ['CRM_Utils_Rule', 'positiveInteger'])) ?: 0;
       return \CRM_Utils_SQL_Select::fragment()
         ->where("{$contactIdField} IN ({$rList})");
     }

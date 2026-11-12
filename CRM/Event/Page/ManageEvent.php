@@ -549,12 +549,10 @@ ORDER BY start_date desc
       $clauses[] = "title LIKE '" . strtolower(CRM_Core_DAO::escapeWildCardString($this->_sortByCharacter)) . "%'";
     }
 
-    $campaignIds = $this->get('campaign_id');
-    if (!CRM_Utils_System::isNull($campaignIds)) {
-      if (!is_array($campaignIds)) {
-        $campaignIds = [$campaignIds];
-      }
-      $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campaignIds)) . ' ) )';
+    // The session value is unfiltered form input.
+    $campaignIds = array_filter((array) $this->get('campaign_id'), ['CRM_Utils_Rule', 'positiveInteger']);
+    if ($campaignIds) {
+      $clauses[] = '( campaign_id IN ( ' . implode(' , ', $campaignIds) . ' ) )';
     }
 
     // don't do a the below assignment when doing a

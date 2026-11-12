@@ -647,6 +647,7 @@ ORDER BY   gc.contact_id, g.children
     if (empty($groupIDs)) {
       return;
     }
+    $groupIDs = CRM_Utils_Type::escapeAll($groupIDs, 'Positive');
     $childAndParentGroupIDs = array_merge($groupIDs, CRM_Contact_BAO_GroupNesting::getDescendentGroupIds($groupIDs));
     $smartGroups = \Civi\Api4\Group::get(FALSE)
       ->addSelect('id')
