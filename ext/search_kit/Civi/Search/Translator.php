@@ -94,8 +94,9 @@ class Translator extends AutoService {
     $strings = [];
     foreach ($searchDisplays as $display) {
       self::walkTexts($display, function (string $text) use (&$strings) {
-        if (self::isWorthy($text)) {
-          $strings[trim($text)] = 1;
+        $source = trim($text);
+        if (self::isWorthy($source)) {
+          $strings[$source] = 1;
         }
         return $text;
       });

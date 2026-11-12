@@ -377,7 +377,7 @@ class SearchDisplayTest extends \PHPUnit\Framework\TestCase implements HeadlessI
         'noResultsText' => 'Source no results',
         'editableRow' => ['create' => TRUE, 'createLabel' => 'Source add row'],
         'columns' => [
-          ['type' => 'field', 'key' => 'display_name', 'label' => 'Source column label', 'title' => 'Source column tooltip'],
+          ['type' => 'field', 'key' => 'display_name', 'label' => 'Source column label', 'title' => 'Source column tooltip', 'empty_value' => ' '],
           ['type' => 'image', 'image' => ['alt' => 'Source image alt']],
           ['type' => 'html', 'key' => 'display_name', 'rewrite' => 'Source html rewrite'],
           ['type' => 'field', 'key' => 'id', 'label' => '[id]', 'rewrite' => 'Source {$smarty}'],
