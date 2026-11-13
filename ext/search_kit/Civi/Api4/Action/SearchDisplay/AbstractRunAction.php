@@ -1894,27 +1894,51 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
     }
     $filterKeys = [];
     // Get filters passed into search display directive from Afform markup
-    $filterAttr = $afform['searchDisplay']['filters'] ?? NULL;
-    if ($filterAttr && is_string($filterAttr) && $filterAttr[0] === '{') {
-      foreach (\CRM_Utils_JS::decode($filterAttr) as $filterKey => $filterVal) {
-        // Automatically apply filters from the markup if they have a value
-        // Only do this if there's one instance of the display on the form
-        if ($afform['searchDisplay']['count'] === 1 && $filterVal !== NULL) {
-          unset($this->filters[$filterKey]);
-          if ($this->hasValue($filterVal)) {
-            $this->applyFilter(explode(',', $filterKey), $filterVal);
-          }
+    foreach ($this->getInstanceFilters($afform['searchDisplay']) as $filterKey => $filterVal) {
+      // Automatically apply filters from the markup if they have a value
+      if ($filterVal !== NULL) {
+        unset($this->filters[$filterKey]);
+        if ($this->hasValue($filterVal)) {
+          $this->applyFilter(explode(',', $filterKey), $filterVal);
         }
-        // If it's a javascript variable it will have come back from decode() as NULL;
-        // Or if there's more than one instance of the display on the form, they might
-        // use different filters.
-        // Just whitelist it so the value passed in will be accepted.
-        else {
-          $filterKeys[] = $filterKey;
-        }
+      }
+      // If it's a javascript variable it will have come back from decode() as NULL;
+      // Just whitelist it so the value passed in will be accepted.
+      else {
+        $filterKeys[] = $filterKey;
       }
     }
     return $filterKeys;
+  }
+
+  /**
+   * Returns the directive filters of the display instance this request belongs to.
+   *
+   * With several instances on the form, the request must repeat the literal
+   * filter values of one of them.
+   *
+   * @param array $searchDisplay
+   * @return array
+   * @throws UnauthorizedException
+   */
+  private function getInstanceFilters(array $searchDisplay): array {
+    $instances = [];
+    foreach ($searchDisplay['instanceFilters'] ?? [] as $filterAttr) {
+      $isObject = $filterAttr && is_string($filterAttr) && $filterAttr[0] === '{';
+      $instances[] = $isObject ? \CRM_Utils_JS::decode($filterAttr) : [];
+    }
+    if (count($instances) < 2) {
+      return $instances[0] ?? [];
+    }
+    foreach ($instances as $filters) {
+      foreach ($filters as $filterKey => $filterVal) {
+        if ($filterVal !== NULL && ($this->filters[$filterKey] ?? NULL) != $filterVal) {
+          continue 2;
+        }
+      }
+      return $filters;
+    }
+    throw new UnauthorizedException('Filters do not match any instance of this search display');
   }
 
   /**
@@ -1937,6 +1961,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         return FALSE;
       }
       $afform['searchDisplay'] = NULL;
+      $instanceFilters = [];
       // Get all search display fieldsets (which will have an empty value for the af-fieldset attribute)
       $fieldsets = \CRM_Utils_Array::findAll($afform['layout'], ['af-fieldset' => '']);
       // As a fallback, search the entire afform in case the search display is not in a fieldset
@@ -1953,6 +1978,9 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         );
         if (!$displays) {
           continue;
+        }
+        foreach ($displays as $instance) {
+          $instanceFilters[] = $instance['filters'] ?? NULL;
         }
         // Already found, just increment the count
         if ($afform['searchDisplay']) {
@@ -2006,6 +2034,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       if (!$afform['searchDisplay']) {
         throw new UnauthorizedException('Afform does not contain search display');
       }
+      $afform['searchDisplay']['instanceFilters'] = $instanceFilters;
       $this->_afform = $afform;
     }
     return $this->_afform;
