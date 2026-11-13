@@ -1605,8 +1605,8 @@ WHERE id IN ( {$contacts} )
    *
    * @param int $contactID
    *   contact id whose permissioned contacts are to be found.
-   * @param int $relTypeId
-   *   one or more relationship type id's.
+   * @param string|int $relTypeId
+   *   One relationship type id or a comma-separated list of them.
    * @param string $name
    * @param string $contactType
    *
@@ -1619,10 +1619,8 @@ WHERE id IN ( {$contacts} )
     $relationshipTypeClause = $contactTypeClause = '';
 
     if ($relTypeId) {
-      // @todo relTypeId is only ever passed in as an int. Change this to reflect that -
-      // probably being overly conservative by not doing so but working on stable release.
       $relationshipTypeClause = 'AND cr.relationship_type_id IN (%2) ';
-      $args[2] = [$relTypeId, 'String'];
+      $args[2] = [$relTypeId, 'CommaSeparatedIntegers'];
     }
 
     if ($contactType) {
