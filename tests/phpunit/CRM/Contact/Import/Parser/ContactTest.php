@@ -1032,19 +1032,19 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'option_values' => [
         [
           'label' => 'Red',
-          'value' => '1',
+          'id' => '1',
           'weight' => 1,
           'is_active' => 1,
         ],
         [
           'label' => 'Yellow',
-          'value' => '2',
+          'id' => '2',
           'weight' => 2,
           'is_active' => 1,
         ],
         [
           'label' => 'Blue',
-          'value' => '3',
+          'id' => '3',
           'weight' => 3,
           'is_active' => 1,
         ],
