@@ -185,6 +185,7 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
     $cid = Contact::create(FALSE)
       ->setValues([
         'first_name' => 'Test',
+        'last_name' => '= Is not an excel formula',
         'birth_date' => '2020-05-23',
         'do_not_email' => FALSE,
         'do_not_mail' => TRUE,
@@ -218,6 +219,11 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
               'link' => [
                 'path' => 'civicrm/contact/view?reset=1&cid=[id]',
               ],
+            ],
+            [
+              'type' => 'field',
+              'key' => 'last_name',
+              'label' => 'Last Name',
             ],
             [
               'type' => 'field',
@@ -259,7 +265,7 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
       $sheet = $spreadsheet->getSheet(0);
 
       static::assertSame(2, $sheet->getHighestRow());
-      static::assertSame('E', $sheet->getHighestColumn());
+      static::assertSame('F', $sheet->getHighestColumn());
 
       static::assertSame('Contact ID', $sheet->getCell('A1')->getValue());
       static::assertSame($cid, $sheet->getCell('A2')->getValue());
@@ -272,18 +278,22 @@ class SearchDownloadTest extends \PHPUnit\Framework\TestCase implements Headless
       static::assertTrue($sheet->getCell('B2')->hasHyperlink());
       static::assertSame((string) \Civi::url('civicrm/contact/view?reset=1&cid=' . $cid, 'a'), $sheet->getCell('B2')->getHyperlink()->getUrl());
 
-      static::assertSame('Birth Date', $sheet->getCell('C1')->getValue());
-      static::assertSame(43974.0, $sheet->getCell('C2')->getValue());
-      static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('C2')->getDataType());
-      static::assertSame('mmmm d, yyyy', $sheet->getCell('C2')->getStyle()->getNumberFormat()->getFormatCode());
+      static::assertSame('Last Name', $sheet->getCell('C1')->getValue());
+      static::assertSame('= Is not an excel formula', $sheet->getCell('C2')->getValue());
+      static::assertSame(DataType::TYPE_STRING, $sheet->getCell('C2')->getDataType());
 
-      static::assertSame('Do Not Email', $sheet->getCell('D1')->getValue());
-      static::assertFalse($sheet->getCell('D2')->getValue());
-      static::assertSame(DataType::TYPE_BOOL, $sheet->getCell('D2')->getDataType());
+      static::assertSame('Birth Date', $sheet->getCell('D1')->getValue());
+      static::assertSame(43974.0, $sheet->getCell('D2')->getValue());
+      static::assertSame(DataType::TYPE_NUMERIC, $sheet->getCell('D2')->getDataType());
+      static::assertSame('mmmm d, yyyy', $sheet->getCell('D2')->getStyle()->getNumberFormat()->getFormatCode());
 
-      static::assertSame('Do Not Mail (rewrite)', $sheet->getCell('E1')->getValue());
-      static::assertSame('rewrite: 1', $sheet->getCell('E2')->getValue());
-      static::assertSame(DataType::TYPE_STRING, $sheet->getCell('E2')->getDataType());
+      static::assertSame('Do Not Email', $sheet->getCell('E1')->getValue());
+      static::assertFalse($sheet->getCell('E2')->getValue());
+      static::assertSame(DataType::TYPE_BOOL, $sheet->getCell('E2')->getDataType());
+
+      static::assertSame('Do Not Mail (rewrite)', $sheet->getCell('F1')->getValue());
+      static::assertSame('rewrite: 1', $sheet->getCell('F2')->getValue());
+      static::assertSame(DataType::TYPE_STRING, $sheet->getCell('F2')->getDataType());
     }
     finally {
       unlink($tmpFile);
