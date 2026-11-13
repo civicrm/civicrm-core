@@ -54,7 +54,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    */
   public function testStoreFile(): void {
     $contactID = $this->individualCreate();
-    $file = $this->callAPISuccess('File', 'create', ['uri' => 'dummy_data']);
+    $file = $this->createTestEntity('File', ['file_name' => 'dummy_data.txt', 'mime_type' => 'text/plain']);
     $customGroup = $this->customGroupCreate();
     $fields = [
       'custom_group_id' => $customGroup['id'],
@@ -79,6 +79,9 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     ];
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
+    $tableName = $customGroup['values'][$customGroup['id']]['table_name'];
+    $columnName = $customField['values'][$customField['id']]['column_name'];
+    $this->assertSame((string) $file['id'], CRM_Core_DAO::singleValueQuery("SELECT $columnName FROM $tableName WHERE entity_id = %1", [1 => [$contactID, 'Integer']]));
   }
 
   /**

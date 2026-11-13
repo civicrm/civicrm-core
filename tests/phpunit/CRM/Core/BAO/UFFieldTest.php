@@ -8,6 +8,13 @@ use Civi\Api4\UFGroup;
  */
 class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
 
+  public function tearDown(): void {
+    if (isset($this->ids['UFGroup']['test'])) {
+      UFGroup::delete(FALSE)->addWhere('id', '=', $this->ids['UFGroup']['test'])->execute();
+    }
+    parent::tearDown();
+  }
+
   /**
    * When passing in an id, fields should be omitted if they already appear in the group.
    */
@@ -217,11 +224,11 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
         'visibility' => 'Public Pages and Listings',
         'weight' => 1,
         'label' => 'Label for ' . $field['field_name'],
-        'is_searchable' => 1,
-        'is_active' => 1,
+        'is_searchable' => TRUE,
+        'is_active' => TRUE,
         'location_type_id' => NULL,
       ];
-      $this->callAPISuccess('UFField', 'create', array_merge($field, $defaults));
+      $this->createTestEntity('UFField', array_merge($field, $defaults), $field['field_name']);
     }
 
     return $this->ids['UFGroup']['test'];

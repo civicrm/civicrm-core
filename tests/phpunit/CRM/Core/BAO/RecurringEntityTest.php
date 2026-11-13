@@ -9,6 +9,9 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Activity;
+use Civi\Api4\Tag;
+
 /**
  * Class CRM_Core_BAO_RecurringEntityTest
  * @group headless
@@ -17,6 +20,10 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_entity_tag', 'civicrm_recurring_entity']);
+    if (isset($this->ids['Tag']['default'])) {
+      Tag::delete(FALSE)->addWhere('id', '=', $this->ids['Tag']['default'])->execute();
+    }
     parent::tearDown();
   }
 
@@ -317,6 +324,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $tag = $this->tagCreate([
       'used_for' => 'Activities',
     ]);
+    $this->ids['Tag']['default'] = $tag['id'];
 
     // Create original activity
     $customFieldValue = 'Custom Value';
@@ -329,7 +337,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $activityId = $activityId['id'];
 
     // Assign tag to a activity.
-    $this->callAPISuccess('EntityTag', 'create', [
+    $this->createTestEntity('EntityTag', [
       'entity_table' => 'civicrm_activity',
       'entity_id' => $activityId,
       'tag_id' => $tag['id'],
@@ -353,7 +361,7 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $generatedEntities = $recursion->generate();
     $generatedActivities = $generatedEntities['civicrm_activity'];
 
-    $this->assertSame(3, count($generatedActivities), "Check if number of iterations are 3");
+    $this->assertCount(3, $generatedActivities, 'Check if number of iterations are 3');
 
     foreach ($generatedActivities as $generatedActivityId) {
 
@@ -366,14 +374,13 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
        */
 
       // Validate custom data in recurring activity
-      $activity = $this->callAPISuccess('activity', 'getsingle', [
-        'return' => [
-          'custom_' . $customField['id'],
-        ],
-        'id' => $generatedActivityId,
-      ]);
+      $customFieldKey = $customGroup['values'][$customGroup['id']]['name'] . '.' . $customField['values'][$customField['id']]['name'];
+      $activity = Activity::get(FALSE)
+        ->addSelect($customFieldKey)
+        ->addWhere('id', '=', $generatedActivityId)
+        ->execute()->single();
 
-      $this->assertEquals($customFieldValue, $activity['custom_' . $customField['id']], 'Custom field value should be ' . $customFieldValue);
+      $this->assertSame($customFieldValue, $activity[$customFieldKey], 'Custom field value should be ' . $customFieldValue);
 
     }
   }

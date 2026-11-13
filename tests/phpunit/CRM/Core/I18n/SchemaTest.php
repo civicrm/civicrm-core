@@ -8,6 +8,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Api4\Domain;
+
 /**
  * Class CRM_Core_I18n_SchemaTest
  * @group headless
@@ -44,13 +47,13 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
    */
   public function testI18nSchemaRewrite(string $table, string $expectedRewrite): void {
     $this->enableMultilingual();
-    $domains = $this->callAPISuccess('Domain', 'get')['values'];
+    $domains = Domain::get(FALSE)->addSelect('locales')->execute();
     $this->assertGreaterThan(1, count($domains));
     foreach ($domains as $domain) {
       // If the DB is multilingual the locales value must be not-null for all domains
       // to ensure the db can be accessed (I suspect it must be the same for all locales but
       // if null then the database layer attempts to access non-existent fields 'label' not label_en_us'.
-      $this->assertSame('en_US', $domain['locales']);
+      $this->assertSame(['en_US'], $domain['locales']);
     }
     $skip_tests = FALSE;
     if (in_array($table, ['civicrm_option_group', 'civicrm_event'])) {
@@ -78,14 +81,14 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     // The `$table` appears in a string -- it should not be rewritten.
     $query5 = 'SELECT id FROM civicrm_activity WHERE subject = "civicrm_option_group"';
     $new_query5 = CRM_Core_I18n_Schema::rewriteQuery($query5);
-    $this->assertEquals($query5, $new_query5);
+    $this->assertSame($query5, $new_query5);
     // Test where table is not the last thing to be in a quoted string
     // Test Currently skipped for civicrm_option_group and civicrm_event due to issues with the regex.
     // Agreed as not a blocker for CRM-20427 as an issue previously.
     if (!$skip_tests) {
       $query6 = 'SELECT "' . "Fixed the the {$table} ticket" . '"';
       $new_query6 = CRM_Core_I18n_Schema::rewriteQuery($query6);
-      $this->assertEquals($query6, $new_query6);
+      $this->assertSame($query6, $new_query6);
     }
     // Test where table is part of a sub query
     $query7 = "SELECT * FROM civicrm_foo WHERE foo_id = (SELECT value FROM {$table})";
