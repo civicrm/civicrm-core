@@ -36,6 +36,11 @@ class PseudoconstantTest extends Api4TestBase {
 
   protected ?array $enableComponents = ['*'];
 
+  public function tearDown(): void {
+    \Civi\Api4\Setting::revert(FALSE)->addSelect('provinceLimit')->execute();
+    parent::tearDown();
+  }
+
   public function testOptionValue(): void {
     $cid = $this->createTestRecord('Contact', ['first_name', 'bill'])['id'];
     $subject = uniqid('subject');
@@ -189,6 +194,42 @@ class PseudoconstantTest extends Api4TestBase {
     $this->assertSame('Cádiz', $addr[2]['state_province_id:name']);
     $this->assertSame('ES', $addr[2]['country_id:name']);
     $this->assertSame('Spain', $addr[2]['country_id:label']);
+  }
+
+  /**
+   * 'Florida' is a state in the United States and a department in Uruguay.
+   */
+  public function testAmbiguousPseudoconstantValue(): void {
+    $cid = $this->createTestRecord('Contact', ['first_name' => 'addr'])['id'];
+    $countryOfState = fn(array $values) => Address::get(FALSE)
+      ->addWhere('id', '=', Address::create(FALSE)->setValues($values + ['contact_id' => $cid])->execute()->single()['id'])
+      ->addSelect('state_province_id.country_id.iso_code')
+      ->execute()->single()['state_province_id.country_id.iso_code'];
+
+    // The value alone cannot be resolved.
+    foreach (['state_province_id:label' => 'Florida', 'state_province_id:abbr' => 'FL'] as $expr => $value) {
+      try {
+        Address::create(FALSE)
+          ->addValue('contact_id', $cid)
+          ->addValue($expr, $value)
+          ->execute();
+        $this->fail("Expected an exception for a $expr that exists in more than one country");
+      }
+      catch (\CRM_Core_Exception $e) {
+        $this->assertSame("Ambiguous value for $expr: \"$value\"", $e->getMessage());
+        $this->assertSame('ambiguous_pseudoconstant', $e->getErrorCode());
+      }
+    }
+    // A given country decides.
+    $this->assertSame('US', $countryOfState(['state_province_id:label' => 'Florida', 'country_id:abbr' => 'US']));
+    $this->assertSame('UY', $countryOfState(['state_province_id:label' => 'Florida', 'country_id:abbr' => 'UY']));
+
+    // So do the states a site makes available.
+    $unitedStates = \Civi\Api4\Country::get(FALSE)->addWhere('iso_code', '=', 'US')->execute()->single()['id'];
+    \Civi::settings()->set('provinceLimit', [$unitedStates]);
+    $this->assertSame('US', $countryOfState(['state_province_id:label' => 'Florida']));
+    $this->assertSame('US', $countryOfState(['state_province_id:abbr' => 'FL']));
+    $this->assertSame('UY', $countryOfState(['state_province_id:label' => 'Florida', 'country_id:abbr' => 'UY']));
   }
 
   public function testCustomOptions(): void {

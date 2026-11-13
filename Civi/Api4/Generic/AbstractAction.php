@@ -597,6 +597,23 @@ abstract class AbstractAction implements \ArrayAccess {
       if ($unmatched) {
         throw new \CRM_Core_Exception(sprintf('Invalid value for %s: "%s"', $info['expr'], implode('", "', $unmatched)), 'invalid_pseudoconstant', ['field' => $info['name'], 'values' => array_values($unmatched)]);
       }
+      // A value matching several options would otherwise be saved as whichever of them comes first.
+      // The enabled options are narrowed by site defaults, e.g. states to those of the default country.
+      $ambiguous = array_filter((array) $info['val'], fn($val) => $val !== NULL && $val !== '' && count(array_keys((array) $options, $val)) > 1);
+      if ($ambiguous) {
+        $enabled = FormattingUtil::getPseudoconstantList($info['field'], $info['expr'], $record, 'create', FALSE);
+        foreach ($ambiguous as $index => $val) {
+          $matches = array_keys($enabled, $val);
+          if (count($matches) === 1) {
+            $options = array_diff($options, [$val]) + [$matches[0] => $val];
+            unset($ambiguous[$index]);
+          }
+        }
+        if ($ambiguous) {
+          throw new \CRM_Core_Exception(sprintf('Ambiguous value for %s: "%s"', $info['expr'], implode('", "', $ambiguous)), 'ambiguous_pseudoconstant', ['field' => $info['name'], 'values' => array_values($ambiguous)]);
+        }
+        $record[$info['name']] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
+      }
     }
     // The DAO works better with ints than booleans. See https://github.com/civicrm/civicrm-core/pull/23970
     if (CoreUtil::getInfoItem($this->getEntityName(), 'table_name')) {

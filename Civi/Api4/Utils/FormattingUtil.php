@@ -394,10 +394,12 @@ class FormattingUtil {
    * @param array $values
    *   Other values for this object
    * @param string $action
+   * @param bool $includeDisabled
+   *   FALSE leaves out disabled options and applies the limits a site sets on a list.
    * @return array
    * @throws \CRM_Core_Exception
    */
-  public static function getPseudoconstantList(array $field, string $fieldAlias, $values = [], $action = 'get') {
+  public static function getPseudoconstantList(array $field, string $fieldAlias, $values = [], $action = 'get', bool $includeDisabled = TRUE) {
     $valueType = self::getSuffix($fieldAlias);
     // For create actions, only unique identifiers can be used.
     // For get actions any valid suffix is ok.
@@ -413,7 +415,7 @@ class FormattingUtil {
 
     $entityValues = self::filterByPath($values, $fieldPath, $field['name']);
     try {
-      $options = self::getFieldOptions($field, $entityValues, TRUE);
+      $options = self::getFieldOptions($field, $entityValues, $includeDisabled);
     }
     catch (\CRM_Core_Exception $e) {
       // Entity not in Civi (api-only) will use fallback below
