@@ -445,6 +445,10 @@ class Submit extends AbstractProcessor {
    * @param \Civi\Afform\Event\AfformSubmitEvent $event
    */
   public static function preprocessParentFormValues(AfformSubmitEvent $event): void {
+    // Only a quick-add form takes over values from the form it was opened from.
+    if (!str_starts_with($event->getAfform()['server_route'] ?? '', 'civicrm/quick-add/')) {
+      return;
+    }
     $entityType = $event->getEntityType();
     $apiRequest = $event->getApiRequest();
     $args = $apiRequest->getArgs();
@@ -464,9 +468,11 @@ class Submit extends AbstractProcessor {
         if (!$entity || $entity['type'] !== $entityType || empty($entity['data'])) {
           return;
         }
+        // Values preset on this form are not replaced
+        $parentData = array_diff_key($entity['data'], $event->getEntity()['data'] ?? []);
         $records = $event->getRecords();
         foreach ($records as &$record) {
-          $record['fields'] = $entity['data'] + $record['fields'];
+          $record['fields'] = $parentData + $record['fields'];
         }
         $event->setRecords($records);
       }
