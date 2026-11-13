@@ -1,6 +1,7 @@
 <?php
 namespace api\v4\Afform;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Address;
 use Civi\Api4\Afform;
 use Civi\Api4\AfformSubmission;
@@ -529,6 +530,69 @@ EOHTML;
 
     $this->assertCount(1, Address::get(FALSE)->addWhere('contact_id', '=', $contactID)->execute(), 'An empty address block removes nothing.');
     $this->assertCount(2, Phone::get(FALSE)->addWhere('contact_id', '=', $contactID)->execute(), 'A filled phone block removes no other phone.');
+  }
+
+  public function testSubmissionIdFromClientNeedsAccessToTheSubmission(): void {
+    $this->useValues([
+      'layout' => <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="me" actions="{create: true, update: false}" security="FBAC" />
+  <fieldset af-fieldset="me">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+  </fieldset>
+</af-form>
+EOHTML,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'create_submission' => TRUE,
+      'manual_processing' => TRUE,
+    ]);
+    $lastName = uniqid(__FUNCTION__);
+    $values = ['me' => [['fields' => ['first_name' => 'Unapproved', 'last_name' => $lastName]]]];
+    $storedData = ['me' => [['fields' => ['first_name' => 'Stored', 'last_name' => $lastName]]]];
+    $ownSubmission = $this->createTestRecord('AfformSubmission', [
+      'afform_name' => $this->formName,
+      'data' => $storedData,
+      'status_id:name' => 'Pending',
+    ]);
+    $otherFormSubmission = $this->createTestRecord('AfformSubmission', [
+      'afform_name' => 'some_other_form',
+      'data' => $storedData,
+      'status_id:name' => 'Pending',
+    ]);
+    $getSubmission = fn(int $id) => AfformSubmission::get(FALSE)
+      ->addWhere('id', '=', $id)
+      ->addSelect('status_id:name', 'data')
+      ->execute()->single();
+    $submitWithSubmissionId = function (int $id) use ($values) {
+      try {
+        Afform::submit()
+          ->setName($this->formName)
+          ->setArgs(['sid' => $id])
+          ->setValues($values)
+          ->execute();
+        return 'processed';
+      }
+      catch (UnauthorizedException $e) {
+        return 'refused';
+      }
+    };
+
+    // An anonymous visitor cannot complete a submission that awaits approval
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+    $this->assertSame('refused', $submitWithSubmissionId($ownSubmission['id']));
+    $this->assertSame('Pending', $getSubmission($ownSubmission['id'])['status_id:name']);
+
+    // Nobody can complete the submission of another form through this one
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer afform'];
+    $this->assertSame('refused', $submitWithSubmissionId($otherFormSubmission['id']));
+    $this->assertSame(['status_id:name' => 'Pending', 'data' => $storedData], array_diff_key($getSubmission($otherFormSubmission['id']), ['id' => 1]));
+    $this->assertCount(0, Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute());
+
+    // A form administrator can
+    $this->assertSame('processed', $submitWithSubmissionId($ownSubmission['id']));
+    $this->assertSame('Processed', $getSubmission($ownSubmission['id'])['status_id:name']);
   }
 
   public function testFormValidationEntityFields(): void {
