@@ -112,9 +112,14 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     $inUseCollation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
     $testCreateTable = CRM_Core_DAO::executeQuery('SHOW create table civicrm_price_set', [], TRUE, NULL, FALSE, FALSE);
     while ($testCreateTable->fetch()) {
-      $this->assertStringContainsString("`title_en_US` varchar(255) COLLATE {$inUseCollation} NOT NULL DEFAULT '' COMMENT '", $testCreateTable->Create_Table);
-      $this->assertMatchesRegularExpression(";`help_pre_en_US` text COLLATE {$inUseCollation} (DEFAULT NULL )?COMMENT 'Description and/or help text to display before fields in form.';", $testCreateTable->Create_Table);
+      // MariaDB 11 omits a column's COLLATE when it equals the table default.
+      $this->assertMatchesRegularExpression(";`title_en_US` varchar\(255\) (COLLATE {$inUseCollation} )?NOT NULL DEFAULT '' COMMENT ';", $testCreateTable->Create_Table);
+      $this->assertMatchesRegularExpression(";`help_pre_en_US` text (COLLATE {$inUseCollation} )?(DEFAULT NULL )?COMMENT 'Description and/or help text to display before fields in form.';", $testCreateTable->Create_Table);
     }
+    $collations = CRM_Core_DAO::executeQuery("SELECT COLUMN_NAME, COLLATION_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'civicrm_price_set' AND COLUMN_NAME IN ('title_en_US', 'help_pre_en_US')")
+      ->fetchMap('COLUMN_NAME', 'COLLATION_NAME');
+    ksort($collations);
+    $this->assertSame(['help_pre_en_US' => $inUseCollation, 'title_en_US' => $inUseCollation], $collations);
   }
 
   public function testMultilingualCustomFieldCreation(): void {
