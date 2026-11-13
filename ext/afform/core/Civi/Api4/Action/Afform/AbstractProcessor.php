@@ -395,7 +395,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         $joinInfo = $afEntity['joins'][$joinEntity] ?? [];
         foreach ($joins as $joinIndex => $join) {
           foreach ($join as $fieldName => $fieldValue) {
-            if (!empty($joinInfo['fields'][$fieldName])) {
+            // Only "existing entity" fields may be used to look up a record
+            $fieldDefn = $this->_formDataModel->getField($joinEntity, $fieldName, 'create');
+            if (!empty($joinInfo['fields'][$fieldName]) && !empty($fieldDefn['input_attrs']['autofill'])) {
               $where = [[$fieldName, '=', $fieldValue]];
               $joinResult = \CRM_Utils_Array::first($this->getJoinResult($afEntity, $joinEntity, $joinInfo, $where, 1));
               if ($joinResult) {

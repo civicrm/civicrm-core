@@ -111,6 +111,46 @@ EOHTML;
   }
 
   /**
+   * A join record may only be looked up through an "existing entity" field,
+   * not through any other field of the join block.
+   */
+  public function testJoinPrefillIgnoresOrdinaryFields(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="Individual1" actions="{create: true, update: false}" security="FBAC" />
+  <fieldset af-fieldset="Individual1">
+    <af-field name="first_name" />
+    <div af-join="Address">
+      <af-field name="street_address" />
+      <af-field name="city" />
+    </div>
+  </fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $otherContact = $this->createTestRecord('Individual');
+    $this->createTestRecord('Address', [
+      'contact_id' => $otherContact['id'],
+      'street_address' => '1 Elsewhere Street',
+      'city' => 'Elsewhere',
+    ]);
+
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('join')
+      ->setArgs(['Individual1' => [['joins' => ['Address' => [['city' => 'Elsewhere']]]]]])
+      ->execute();
+    $this->assertCount(0, $prefill);
+  }
+
+  /**
    * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch
    */
   public function testPrefillByLocationType(): void {
