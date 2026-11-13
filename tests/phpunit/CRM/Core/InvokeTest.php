@@ -19,6 +19,7 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
   public function tearDown(): void {
     unset($_SERVER['HTTP_X_REQUESTED_WITH'], $_SERVER['REQUEST_URI'], $_GET['q']);
     \Civi::router()->clear();
+    $this->quickCleanup(['civicrm_dashboard_contact']);
     parent::tearDown();
   }
 
@@ -43,7 +44,7 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
    */
   public function testInvokeDashboardWithGettingStartedDashlet(): void {
     $user_id = $this->createLoggedInUser();
-    $this->callAPISuccess('DashboardContact', 'create', [
+    $this->createTestEntity('DashboardContact', [
       'dashboard_id' => \Civi\Api4\Dashboard::get(FALSE)
         ->addWhere('name', '=', 'getting-started')
         ->addWhere('domain_id', '=', CRM_Core_Config::domainID())

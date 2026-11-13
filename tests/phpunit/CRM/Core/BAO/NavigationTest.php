@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Navigation;
+
 /**
  * Class CRM_Core_BAO_NavigationTest.
  * @group headless
@@ -57,12 +59,23 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    * by rebuilding reports.
    */
   public function testNoDuplicateAllReportsLink(): void {
-    $existing_links = $this->callAPISuccess('Navigation', 'get', ['label' => 'All Reports', 'sequential' => 1]);
-    $this->assertNotEquals($existing_links['values'][0]['parent_id'], $existing_links['values'][1]['parent_id']);
+    $existing_links = $this->getAllReportsParentIDs();
+    $this->assertCount(2, $existing_links);
+    $this->assertNotSame($existing_links[0], $existing_links[1]);
     CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
-    $new_links = $this->callAPISuccess('Navigation', 'get', ['label' => 'All Reports', 'sequential' => 1]);
-    $this->assertEquals($existing_links['values'][0]['parent_id'], $new_links['values'][0]['parent_id']);
-    $this->assertEquals($existing_links['values'][1]['parent_id'], $new_links['values'][1]['parent_id']);
+    $new_links = $this->getAllReportsParentIDs();
+    $this->assertSame($existing_links[0], $new_links[0]);
+    $this->assertSame($existing_links[1], $new_links[1]);
+  }
+
+  /**
+   * Get the parent ids of the 'All Reports' navigation items, ordered by id.
+   */
+  private function getAllReportsParentIDs(): array {
+    return Navigation::get(FALSE)
+      ->addWhere('label', '=', 'All Reports')
+      ->addOrderBy('id')
+      ->execute()->column('parent_id');
   }
 
   /**

@@ -520,11 +520,11 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
   public function testAddressCustomFields(): void {
     $this->createCustomGroupWithFieldOfType(['extends' => 'Address'], 'int');
     $individualID = $this->individualCreate();
-    $this->callAPISuccess('Address', 'create', [
+    $this->createTestEntity('Address', [
       'contact_id' => $individualID,
       'street_address' => '10 Downing Street',
-      'location_type_id' => 'Home',
-      $this->getCustomFieldName('int') => 5,
+      'location_type_id:name' => 'Home',
+      $this->getCustomFieldName('int', 4) => 5,
     ]);
 
     $homeLocationTypeID = $this->getLocationTypeID('Home');
@@ -536,13 +536,13 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
     $tableName = $this->getCustomGroupTable();
     $fieldName = $this->getCustomFieldColumnName('int');
 
-    $this->assertEquals([], $queryObject->_where[0]);
-    $this->assertEquals($tableName . '.' . $fieldName . ' = 5', implode(', ', $queryObject->_where[1]));
+    $this->assertSame([], $queryObject->_where[0]);
+    $this->assertSame($tableName . '.' . $fieldName . ' = 5', implode(', ', $queryObject->_where[1]));
     $this->assertSame(1, $queryObject->_whereTables['civicrm_contact']);
     $this->assertSame("LEFT JOIN civicrm_address `Home-address` ON (`Home-address`.contact_id = contact_a.id AND `Home-address`.location_type_id = $homeLocationTypeID)", trim($queryObject->_whereTables['Home-address']));
     $this->assertSame("LEFT JOIN {$tableName} ON {$tableName}.entity_id = `Home-address`.id", trim($queryObject->_whereTables[$tableName]));
-    $this->assertEquals([], $queryObject->_qill[0]);
-    $this->assertEquals(['Enter integer here = 5'], $queryObject->_qill[1]);
+    $this->assertSame([], $queryObject->_qill[0]);
+    $this->assertSame(['Enter integer here = 5'], $queryObject->_qill[1]);
   }
 
 }

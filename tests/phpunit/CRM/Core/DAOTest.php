@@ -78,16 +78,16 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ];
 
-    $contactID = $this->callAPISuccess('Contact', 'create', $params)['id'];
+    $contactID = $this->createTestEntity('Contact', $params)['id'];
 
     $params = [
       'email' => 'spam@dev.null',
       'contact_id' => $contactID,
-      'is_primary' => 0,
-      'location_type_id' => $this->getLocationTypeID('Home'),
+      'is_primary' => FALSE,
+      'location_type_id:name' => 'Home',
     ];
 
-    $this->callAPISuccess('Email', 'create', $params);
+    $this->createTestEntity('Email', $params);
 
     $contact = new CRM_Contact_BAO_Contact();
     $contact->id = $contactID;
@@ -97,7 +97,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       $refsByTable[$refObj->__table] = $refObj;
     }
 
-    $this->assertTrue(array_key_exists('civicrm_email', $refsByTable));
+    $this->assertArrayHasKey('civicrm_email', $refsByTable);
     $refDao = $refsByTable['civicrm_email'];
     $refDao->find(TRUE);
     $this->assertEquals($contactID, $refDao->contact_id);
@@ -352,7 +352,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ];
 
-    $contact = $this->callAPISuccess('Contact', 'create', $params);
+    $contact = $this->createTestEntity('Contact', $params);
     $query = "SELECT contact_type, display_name FROM civicrm_contact WHERE id={$contact['id']}";
     $toArray = [
       'contact_type' => 'Individual',
@@ -376,9 +376,8 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * CRM-17748: Test internal DAO options
    */
   public function testDBOptions(): void {
-    $contactIDs = [];
     for ($i = 0; $i < 10; $i++) {
-      $contactIDs[] = $this->individualCreate([
+      $this->individualCreate([
         'first_name' => 'Alan' . bin2hex(random_bytes(4)),
         'last_name' => 'Smith' . bin2hex(random_bytes(2)),
       ]);
@@ -386,11 +385,6 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
 
     // Test option 'result_buffering'
     $this->_testMemoryUsageForUnbufferedQuery();
-
-    // cleanup
-    foreach ($contactIDs as $contactID) {
-      $this->callAPISuccess('Contact', 'delete', ['id' => $contactID]);
-    }
   }
 
   /**
@@ -758,14 +752,13 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * Test that contact names and email addresses are trimmed when saved.
    */
   public function testContactSaveTrimsName(): void {
-    $contact = $this->callAPISuccess('Contact', 'create', [
+    $contact = $this->createTestEntity('Individual', [
       'first_name' => '   Jane   ',
       'last_name' => '   Doe   ',
-      'contact_type' => 'Individual',
-      'email' => '   jane.doe@example.com   ',
+      'email_primary.email' => '   jane.doe@example.com   ',
     ]);
-    $this->assertSame('Jane', $contact['values'][$contact['id']]['first_name']);
-    $this->assertSame('Doe', $contact['values'][$contact['id']]['last_name']);
+    $this->assertSame('Jane', $contact['first_name']);
+    $this->assertSame('Doe', $contact['last_name']);
 
     // Check directly from DB
     $dbContact = new CRM_Contact_DAO_Contact();
