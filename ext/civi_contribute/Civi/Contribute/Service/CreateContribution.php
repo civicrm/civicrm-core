@@ -198,6 +198,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
       ->first();
 
     $event->setEntityId(0, $savedContribution['id']);
+    $event->setEntityAction(0, 'create');
 
     // Prior to 6.18 the form was configured to set recur_period,
     // but after it sets the :name version. Therefore we need to check
