@@ -123,8 +123,15 @@ class GroupSubscription extends AbstractBehavior implements EventSubscriberInter
     }
     $contactSubscriptions = [];
     foreach ($contactIds as $cid) {
-      $submittedValues['contact_id'] = $cid;
-      $contactSubscriptions[] = $submittedValues;
+      // Opting out takes more than a dedupe match: anyone who knows the matching values could do it.
+      $isOwnChoice = !$event->getApiRequest()->isDedupeMatchedContact((int) $cid);
+      $subscriptions = $isOwnChoice ? $submittedValues : array_filter($submittedValues);
+      if ($subscriptions) {
+        $contactSubscriptions[] = $subscriptions + ['contact_id' => $cid];
+      }
+    }
+    if (!$contactSubscriptions) {
+      return;
     }
 
     \Civi\Api4\GroupSubscription::save(FALSE)

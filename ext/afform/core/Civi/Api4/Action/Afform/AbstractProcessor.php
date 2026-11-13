@@ -83,6 +83,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected $_entityActions = [];
 
   /**
+   * Ids of contacts identified by a dedupe rule instead of by the submitter.
+   *
+   * @var int[]
+   */
+  protected $_dedupeMatchedContactIds = [];
+
+  /**
    * Values of each entity that is submitted on the form.
    * Eg. $entityValues['Contribution1'][0]['fields']['field1' => 1, 'field2' => 2]
    *
@@ -97,6 +104,20 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @var array
    */
   protected $_submissionTokenValues = [];
+
+  /**
+   * Record that a contact was identified by a dedupe rule.
+   */
+  public function addDedupeMatchedContactId(int $contactId): void {
+    $this->_dedupeMatchedContactIds[] = $contactId;
+  }
+
+  /**
+   * A dedupe match shows that the submitter knows the matching values, not that they are this contact.
+   */
+  public function isDedupeMatchedContact(int $contactId): bool {
+    return in_array($contactId, $this->_dedupeMatchedContactIds, TRUE);
+  }
 
   /**
    * Get the submitted values from all the entities on the form

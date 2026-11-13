@@ -79,6 +79,7 @@ class ContactDedupe extends AbstractBehavior implements EventSubscriberInterface
       if (!empty($match['id'])) {
         $event->setEntityId($index, $match['id']);
         $event->dedupeMatches[$index] = TRUE;
+        $event->getApiRequest()->addDedupeMatchedContactId((int) $match['id']);
       }
     }
   }

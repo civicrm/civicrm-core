@@ -2,6 +2,7 @@
 namespace api\v4\Afform;
 
 use Civi\Api4\Afform;
+use Civi\Api4\GroupContact;
 use Civi\Api4\SubscriptionHistory;
 use Civi\Test\TransactionalInterface;
 
@@ -101,6 +102,63 @@ EOHTML;
       ->execute()->single();
     $this->assertEquals('127.0.0.1', $history['tracking']);
     $this->assertEquals('Form', $history['method']);
+  }
+
+  /**
+   * A contact found by a dedupe rule can be subscribed but not unsubscribed
+   */
+  public function testDedupeMatchIsNotUnsubscribed(): void {
+    $groupName = __FUNCTION__;
+    $otherGroupName = __FUNCTION__ . 'Other';
+    $groupId = $this->createTestRecord('Group', ['title' => 'Test Group', 'name' => $groupName])['id'];
+    $otherGroupId = $this->createTestRecord('Group', ['title' => 'Other Test Group', 'name' => $otherGroupName])['id'];
+    $email = uniqid(__FUNCTION__) . '@example.org';
+    $storedContactId = $this->createTestRecord('Individual', [
+      'first_name' => 'Stored',
+      'last_name' => 'Contact',
+      'email_primary.email' => $email,
+    ])['id'];
+    $this->createTestRecord('GroupContact', ['contact_id' => $storedContactId, 'group_id' => $groupId, 'status' => 'Added']);
+
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="Individual1" actions="{create: true, update: false}" security="FBAC" contact-dedupe="Individual.Unsupervised" />
+  <af-entity data="{contact_id: 'Individual1'}" actions="{create: true, update: true}" security="FBAC" type="GroupSubscription" name="GroupSubscription1" group-subscription="no-confirm" />
+  <fieldset af-fieldset="Individual1">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+    <div af-join="Email" data="{is_primary: true}"><af-field name="email" /></div>
+  </fieldset>
+  <fieldset af-fieldset="GroupSubscription1">
+    <af-field name="$groupName" />
+    <af-field name="$otherGroupName" />
+  </fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          ['fields' => ['first_name' => 'Stored', 'last_name' => 'Contact'], 'joins' => ['Email' => [['email' => $email]]]],
+        ],
+        'GroupSubscription1' => [
+          ['fields' => [$groupName => FALSE, $otherGroupName => TRUE]],
+        ],
+      ])
+      ->execute();
+
+    $statuses = GroupContact::get(FALSE)
+      ->addWhere('contact_id', '=', $storedContactId)
+      ->addSelect('group_id', 'status')
+      ->execute()->column('status', 'group_id');
+    $this->assertSame([$groupId => 'Added', $otherGroupId => 'Added'], $statuses);
   }
 
 }
