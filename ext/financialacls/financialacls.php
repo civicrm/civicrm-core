@@ -500,7 +500,12 @@ function financialacls_civicrm_links(string $op, ?string $objectName, $objectID,
   if ($objectName === 'MembershipType') {
     $financialType = CRM_Core_PseudoConstant::getName('CRM_Member_BAO_MembershipType', 'financial_type_id', CRM_Member_BAO_MembershipType::getMembershipType($objectID)['financial_type_id']);
   }
-  if ($objectName === 'Contribution') {
+  if ($objectName === 'Contribution' && in_array($op, ['contribution.selector.recurring', 'contribution.dashboard.recurring'], TRUE)) {
+    // These ops pass the ID of a recurring contribution, which has no line items of its own.
+    $financialTypeID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionRecur', $objectID, 'financial_type_id');
+    $financialType = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_ContributionRecur', 'financial_type_id', $financialTypeID);
+  }
+  elseif ($objectName === 'Contribution') {
     // Now check for lineItems
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID((int) $objectID);
     foreach ($lineItems as $item) {
