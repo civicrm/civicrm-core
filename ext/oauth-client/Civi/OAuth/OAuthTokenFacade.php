@@ -74,13 +74,20 @@ class OAuthTokenFacade {
       'storage' => $options['storage'],
     ];
 
-    try {
-      $owner = $provider->getResourceOwner($accessToken);
-      $tokenRecord['resource_owner_name'] = $this->findName($owner);
-      $tokenRecord['resource_owner'] = $owner->toArray();
+    if ($provider instanceof CiviOpenIdProvider && $options['grant_type'] === 'authorization_code') {
+      $tokenRecord['resource_owner'] = $provider->verifiedClaims($accessToken, $options['oidc_nonce'] ?? '');
+      $claims = $tokenRecord['resource_owner'];
+      $tokenRecord['resource_owner_name'] = is_string($claims['preferred_username'] ?? NULL) ? $claims['preferred_username'] : $claims['sub'];
     }
-    catch (\Throwable $e) {
-      \Civi::log()->warning("Failed to resolve resource_owner");
+    elseif (!$provider instanceof CiviOpenIdProvider) {
+      try {
+        $owner = $provider->getResourceOwner($accessToken);
+        $tokenRecord['resource_owner_name'] = $this->findName($owner);
+        $tokenRecord['resource_owner'] = $owner->toArray();
+      }
+      catch (\Throwable $e) {
+        \Civi::log()->warning("Failed to resolve resource_owner");
+      }
     }
 
     \CRM_OAuth_Hook::oauthToken('init', $options['storage'], $tokenRecord);

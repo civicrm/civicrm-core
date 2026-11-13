@@ -116,6 +116,11 @@ class AuthorizationCode extends AbstractGrantAction {
       'scopes' => $scopes,
       'tag' => $this->getTag(),
     ];
+    if ($provider instanceof \Civi\OAuth\CiviOpenIdProvider) {
+      $state['oidc_nonce'] = bin2hex(random_bytes(32));
+      $scopes = array_unique(array_merge((array) $scopes, ['openid']));
+      $state['scopes'] = $scopes;
+    }
     $stateId = \Civi::service('oauth2.state')->store($state);
     $authOptions = [
       'state' => $stateId,
@@ -123,6 +128,9 @@ class AuthorizationCode extends AbstractGrantAction {
     ];
     if ($this->prompt !== NULL) {
       $authOptions['prompt'] = $this->prompt;
+    }
+    if (isset($state['oidc_nonce'])) {
+      $authOptions['nonce'] = $state['oidc_nonce'];
     }
 
     $allowResponseModes = is_callable([$provider, 'getResponseModes']) ? $provider->getResponseModes() : ['query'];

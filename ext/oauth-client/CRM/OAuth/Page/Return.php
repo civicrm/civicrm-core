@@ -23,6 +23,7 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
       try {
         $tokenRecord = Civi::service('oauth2.token')->init([
           'client' => $client,
+          'oidc_nonce' => $state['oidc_nonce'] ?? NULL,
           'scope' => $state['scopes'],
           'tag' => $state['tag'],
           'storage' => $state['storage'],
@@ -41,6 +42,14 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
           'error_description' => is_array($body) ? ($body['error_description'] ?? NULL) : NULL,
           'error_uri' => is_array($body) ? ($body['error_uri'] ?? NULL) : NULL,
         ], $state);
+        parent::run();
+        return;
+      }
+      catch (\Civi\OAuth\OAuthException $e) {
+        if (!isset($state['oidc_nonce'])) {
+          throw $e;
+        }
+        $this->assign('error', ['error' => 'invalid_token', 'error_description' => ts('The authorization response could not be verified.'), 'error_uri' => NULL]);
         parent::run();
         return;
       }
