@@ -758,7 +758,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       if (!$entity['type']) {
         $records = [$records];
       }
-      foreach ($records as $values) {
+      foreach ($records as $recordIndex => $values) {
         if (!is_array($values)) {
           // For "extra" we might have $values['fields'] if we added any extra fields.
           // But, if we have eg. recaptcha we will have $values['recaptcha2'] and might
@@ -781,10 +781,17 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           unset($values['extras']);
         }
         // Special handling for file fields
+        $formDefaults = $this->getForcedDefaultValues($entity['fields']) + $this->getHiddenDefaultValues($entity['fields']);
+        $recordId = $entity['type'] ? ($values['fields'][CoreUtil::getIdFieldName($entity['type'])] ?? NULL) : NULL;
         foreach ($fileFields as $fileFieldName) {
+          $assertKnownFileId = fn($fileId) => $this->assertKnownFileId($fileId, $entityName, $entity['type'], $recordId, $fileFieldName, $formDefaults[$fileFieldName] ?? NULL);
+          if (!empty($values['fields'][$fileFieldName]) && is_scalar($values['fields'][$fileFieldName])) {
+            $assertKnownFileId($values['fields'][$fileFieldName]);
+          }
           if (isset($values['fields'][$fileFieldName]) && is_array($values['fields'][$fileFieldName])) {
             // Keep file id
             if (isset($values['fields'][$fileFieldName]['id'])) {
+              $assertKnownFileId($values['fields'][$fileFieldName]['id']);
               $values['fields'][$fileFieldName] = $values['fields'][$fileFieldName]['id'];
             }
             // File was deleted
@@ -824,9 +831,16 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
                 elseif (array_key_exists('file_name', $joinValues[$index][$fileFieldName])) {
                   $joinValues[$index][$fileFieldName] = '';
                 }
+                else {
+                  $joinValues[$index][$fileFieldName] = $joinValues[$index][$fileFieldName]['id'] ?? '';
+                }
+              }
+              $idField = CoreUtil::getIdFieldName($joinEntity);
+              if (!empty($joinValues[$index][$fileFieldName]) && is_scalar($joinValues[$index][$fileFieldName])) {
+                $joinDefaults = $this->getForcedDefaultValues($entity['joins'][$joinEntity]['fields'] ?? []) + $this->getHiddenDefaultValues($entity['joins'][$joinEntity]['fields'] ?? []);
+                $this->assertKnownFileId($joinValues[$index][$fileFieldName], $entityName, $joinEntity, $joinValues[$index][$idField] ?? NULL, $fileFieldName, $joinDefaults[$fileFieldName] ?? NULL, $joinEntity);
               }
               // Creating new record, add placeholder value so the file upload will have an id
-              $idField = CoreUtil::getIdFieldName($joinEntity);
               if (empty($joinValues[$index][$idField])) {
                 $joinValues[$index][$fileFieldName] = '';
               }
@@ -859,6 +873,57 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     }
 
     return $entityValues;
+  }
+
+  /**
+   * A file id sent by the client is kept only if the file is already in that field or was uploaded by the current user.
+   *
+   * @param mixed $fileId
+   * @param string $entityName
+   *   Name of the form entity, e.g. 'Individual1'
+   * @param string $apiEntity
+   *   Entity that holds the field: the form entity's type, or the join entity
+   * @param mixed $recordId
+   *   Id of the submitted record, if it exists already
+   * @param string $fieldName
+   * @param mixed $formDefault
+   *   Value the form itself sets for this field
+   * @param string|null $joinEntity
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function assertKnownFileId($fileId, string $entityName, string $apiEntity, $recordId, string $fieldName, $formDefault = NULL, ?string $joinEntity = NULL): void {
+    $fileIdOf = fn($value) => is_array($value) ? ($value['id'] ?? NULL) : $value;
+    $knownIds = [$fileIdOf($formDefault)];
+    // Records loaded for this form
+    foreach ($this->_entityValues[$entityName] ?? [] as $loaded) {
+      $loadedRecords = $joinEntity ? ($loaded['joins'][$joinEntity] ?? []) : [$loaded['fields'] ?? []];
+      foreach ($loadedRecords as $loadedRecord) {
+        $knownIds[] = $fileIdOf($loadedRecord[$fieldName] ?? NULL);
+      }
+    }
+    $isKnown = function () use (&$knownIds, $fileId) {
+      return in_array((string) $fileId, array_map('strval', array_filter($knownIds)), TRUE);
+    };
+    if (!$isKnown() && $recordId) {
+      $stored = civicrm_api4($apiEntity, 'get', [
+        'checkPermissions' => FALSE,
+        'select' => [$fieldName],
+        'where' => [[CoreUtil::getIdFieldName($apiEntity), '=', $recordId]],
+      ])->first();
+      $knownIds[] = $fileIdOf($stored[$fieldName] ?? NULL);
+    }
+    $userId = \CRM_Core_Session::getLoggedInContactID();
+    if (!$isKnown() && $userId) {
+      // A file the user uploaded, e.g. to a draft of this form
+      $knownIds[] = File::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('id', '=', $fileId)
+        ->addWhere('created_id', '=', $userId)
+        ->execute()->first()['id'] ?? NULL;
+    }
+    if (!$isKnown()) {
+      throw new UnauthorizedException(E::ts('File %1 is not attached to this record.', [1 => $fileId]));
+    }
   }
 
   /**

@@ -21,6 +21,12 @@ class Process extends AbstractProcessor {
     return $this->submissionId;
   }
 
+  /**
+   * The stored values passed this check when they were submitted.
+   */
+  protected function assertKnownFileId($fileId, string $entityName, string $apiEntity, $recordId, string $fieldName, $formDefault = NULL, ?string $joinEntity = NULL): void {
+  }
+
   protected function processForm() {
     // get the submitted data
     $afformSubmissionData = AfformSubmission::get(FALSE)
