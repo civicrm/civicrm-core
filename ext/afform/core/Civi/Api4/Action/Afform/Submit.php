@@ -588,8 +588,10 @@ class Submit extends AbstractProcessor {
       }
       try {
         $idField = CoreUtil::getIdFieldName($event->getEntityType());
+        $actionTaken = empty($record['fields'][$idField]) ? 'create' : 'update';
         $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
         $event->setEntityId($index, $saved[$idField]);
+        $event->setEntityAction($index, $actionTaken);
         $event->setSaved($index, $saved);
         self::saveJoins($event, $index, $saved[$idField], $record['joins'] ?? []);
       }
@@ -726,6 +728,7 @@ class Submit extends AbstractProcessor {
         if ($hasOtherFields && !empty($values[0][$joinIdField]) && (!$joinAllowedAction['update'] || $values[0][$joinIdField] != $existingId)) {
           unset($values[0][$joinIdField]);
         }
+        $joinAction = empty($values[0][$joinIdField]) ? 'create' : 'update';
         $result = civicrm_api4($joinEntityName, 'save', [
           // Disable permission checks because the main entity has already been vetted
           'checkPermissions' => FALSE,
@@ -738,6 +741,7 @@ class Submit extends AbstractProcessor {
         ]);
         $indexedResult = array_combine(array_keys($values), (array) $result);
         $event->setJoinIds($index, $joinEntityName, $indexedResult);
+        $event->setJoinActions($index, $joinEntityName, [array_key_first($values) => $joinAction]);
       }
 
       // Reverse FK e.g. Contact <= Email.contact_id
@@ -763,6 +767,10 @@ class Submit extends AbstractProcessor {
             unset($values[$key][$joinIdField]);
           }
         }
+        $joinActions = array_map(
+          fn($value) => empty($value[$joinIdField]) ? 'create' : 'update',
+          $values
+        );
         // Use REPLACE action if update+delete are both allowed (only need to check for 'delete' as it implies 'update')
         if ($joinAllowedAction['delete']) {
           $result = civicrm_api4($joinEntityName, 'replace', [
@@ -783,6 +791,7 @@ class Submit extends AbstractProcessor {
         }
         $indexedResult = array_combine(array_keys($values), (array) $result);
         $event->setJoinIds($index, $joinEntityName, $indexedResult);
+        $event->setJoinActions($index, $joinEntityName, $joinActions);
       }
       // REPLACE doesn't work if there are no records, have to use DELETE
       elseif ($joinAllowedAction['delete']) {
@@ -872,7 +881,11 @@ class Submit extends AbstractProcessor {
       'exp' => $expires,
       // Note: Scope is not the same as "authx" scope. "Authx" tokens are user-login tokens. This one is a more limited access token.
       'scope' => 'afformPostSubmit',
-      'civiAfformSubmission' => ['name' => $this->name, 'data' => $this->_entityIds],
+      'civiAfformSubmission' => [
+        'name' => $this->name,
+        'data' => $this->_entityIds,
+        'actions' => $this->_entityActions,
+      ],
     ]);
   }
 
