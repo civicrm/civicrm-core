@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Activity;
 use Civi\Test\FormTrait;
 
 require_once 'CiviTest/CiviTestSMSProvider.php';
@@ -101,14 +102,13 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
   public function testQuickFormMobileNumbersDisplay(): void {
     $this->createLoggedInUser();
     $this->createTestEntity('OptionValue', ['option_group_id:name' => 'sms_provider_name', 'name' => 'dummy sms', 'label' => 'Dummy']);
-    $sms_provider = $this->callAPISuccess('SmsProvider', 'create', [
-      'sequential' => 1,
+    $this->createTestEntity('SmsProvider', [
       'name' => 'CiviTestSMSProvider',
-      'title' => "Test",
-      'username' => "Test",
-      'password' => "Test",
+      'title' => 'Test',
+      'username' => 'Test',
+      'password' => 'Test',
       'api_type' => 1,
-      'is_active' => 1,
+      'is_active' => TRUE,
       'api_params' => 'From=+1234567890',
     ]);
     $form = $this->getTestForm('CRM_Contact_Form_Search_Basic', [
@@ -130,8 +130,8 @@ class CRM_Contact_Form_Task_SMSCommonTest extends CiviUnitTestCase {
         'sms_text_message' => 'Do not forget',
       ]);
     $form->processForm();
-    $activities = $this->callAPISuccess('Activity', 'get', ['sequential' => 1])['values'];
-    $this->assertSame('Your SMS Reminder', $activities[0]['subject']);
+    $activity = Activity::get(FALSE)->addSelect('subject')->addOrderBy('id')->execute()->first();
+    $this->assertSame('Your SMS Reminder', $activity['subject']);
   }
 
 }

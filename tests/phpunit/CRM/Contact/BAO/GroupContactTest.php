@@ -38,8 +38,8 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     ], 'child');
 
     // create smart group based on saved criteria Gender = Male
-    $batch = $this->callAPISuccess('SavedSearch', 'create', [
-      'form_values' => 'a:1:{i:0;a:5:{i:0;s:9:"gender_id";i:1;s:1:"=";i:2;i:2;i:3;i:0;i:4;i:0;}}',
+    $batch = $this->createTestEntity('SavedSearch', [
+      'form_values' => [['gender_id', '=', 2, 0, 0]],
     ]);
     // Create contact with Gender - Male
     $childSmartGroupContact = $this->individualCreate([
@@ -47,14 +47,14 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       'first_name' => 'C',
     ], 1);
     // then create smart group
-    $childSmartGroup = $this->callAPISuccess('Group', 'create', [
+    $childSmartGroup = $this->createTestEntity('Group', [
       'title' => 'Child Smart Group',
       'description' => 'Child Smart Group',
       'visibility' => 'User and User Admin Only',
       'saved_search_id' => $batch['id'],
       'is_active' => 1,
-      'parents' => $parentGroup['id'],
-    ]);
+      'parents' => [$parentGroup['id']],
+    ], 'child_smart');
 
     // Create a contact within parent group.
     $parentContactParams = [
@@ -62,7 +62,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       'last_name' => 'Parent1 Last name',
     ];
     $parentContact = $this->individualCreate($parentContactParams);
-    $this->createTestEntity('GroupContact', ['group_id' => $parentGroup['id'], 'contact_id' => $parentContact, 'status' => 'Added']);
+    $this->createTestEntity('GroupContact', ['group_id' => $parentGroup['id'], 'contact_id' => $parentContact, 'status' => 'Added'], 'parent');
 
     // Create a contact within child group.
     $childContactParams = [
@@ -70,7 +70,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       'last_name' => 'Child2 Last name',
     ];
     $childContact = $this->individualCreate($childContactParams);
-    $this->createTestEntity('GroupContact', ['group_id' => $childGroup['id'], 'contact_id' => $childContact, 'status' => 'Added']);
+    $this->createTestEntity('GroupContact', ['group_id' => $childGroup['id'], 'contact_id' => $childContact, 'status' => 'Added'], 'child');
 
     // Check if searching by parent group  returns both parent and child group contacts.
     $contacts = $this->callAPIV3Success('Contact', 'get', [
@@ -117,12 +117,12 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
    */
   public function testContactCombineGroupSearch(): void {
     // create regular group based
-    $regularGroup = $this->callAPISuccess('Group', 'create', [
+    $regularGroup = $this->createTestEntity('Group', [
       'title' => 'Regular Group',
       'description' => 'Regular Group',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-    ]);
+    ], 'regular');
 
     // Create contact with Gender - Male
     $contact1 = $this->individualCreate([
@@ -135,26 +135,26 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
       'gender_id:name' => 'Male',
       'first_name' => 'B',
     ], 1);
-    $this->createTestEntity('GroupContact', ['group_id' => $regularGroup['id'], 'contact_id' => $contact2, 'status' => 'Added']);
+    $this->createTestEntity('GroupContact', ['group_id' => $regularGroup['id'], 'contact_id' => $contact2, 'status' => 'Added'], 'contact2');
 
     // Create contact with Gender - Female and in regular group
     $contact3 = $this->individualCreate([
       'gender_id:name' => 'Female',
       'first_name' => 'C',
     ], 1);
-    $this->createTestEntity('GroupContact', ['group_id' => $regularGroup['id'], 'contact_id' => $contact3, 'status' => 'Added']);
+    $this->createTestEntity('GroupContact', ['group_id' => $regularGroup['id'], 'contact_id' => $contact3, 'status' => 'Added'], 'contact3');
 
     // create smart group based on saved criteria Gender = Male
-    $batch = $this->callAPISuccess('SavedSearch', 'create', [
-      'form_values' => 'a:1:{i:0;a:5:{i:0;s:9:"gender_id";i:1;s:1:"=";i:2;i:2;i:3;i:0;i:4;i:0;}}',
+    $batch = $this->createTestEntity('SavedSearch', [
+      'form_values' => [['gender_id', '=', 2, 0, 0]],
     ]);
-    $smartGroup = $this->callAPISuccess('Group', 'create', [
+    $smartGroup = $this->createTestEntity('Group', [
       'title' => 'Smart Group',
       'description' => 'Smart Group',
       'visibility' => 'User and User Admin Only',
       'saved_search_id' => $batch['id'],
       'is_active' => 1,
-    ]);
+    ], 'smart');
 
     $useCases = [
       //Case 1: Find all contacts in regular group
@@ -199,20 +199,20 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $accessControlGT = array_search('Access Control', $groupTypes, TRUE);
 
     // create group with group type - Mailing list
-    $group1 = $this->callAPISuccess('Group', 'create', [
+    $group1 = $this->createTestEntity('Group', [
       'title' => 'Group 1',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-      'group_type' => $mailingListGT,
-    ]);
+      'group_type' => [$mailingListGT],
+    ], 'group1');
 
     // create group with group type - Access Control
-    $group2 = $this->callAPISuccess('Group', 'create', [
+    $group2 = $this->createTestEntity('Group', [
       'title' => 'Group 2',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-      'group_type' => $accessControlGT,
-    ]);
+      'group_type' => [$accessControlGT],
+    ], 'group2');
 
     // create contact in 'Group 1'
     $contact1 = $this->individualCreate([
@@ -268,7 +268,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
    * site the ids past the cut look absent and get re-written on every call.
    */
   public function testBulkAddIsIdempotentWhenPresenceCheckTruncates(): void {
-    $groupID = (int) $this->callAPISuccess('Group', 'create', [
+    $groupID = (int) $this->createTestEntity('Group', [
       'title' => 'Presence check truncation',
       'is_active' => 1,
     ])['id'];

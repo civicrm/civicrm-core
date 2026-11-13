@@ -28,7 +28,7 @@ class CRM_Contact_Form_Task_AddToTagTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testAddToTagFromTaglistOnly(): void {
-    $contact = $this->callAPISuccess('Contact', 'create', [
+    $contact = $this->createTestEntity('Contact', [
       'contact_type' => 'Individual',
       'first_name' => 'John',
       'last_name' => 'Doe',
@@ -66,7 +66,7 @@ class CRM_Contact_Form_Task_AddToTagTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testAddToTagWithNoSelectionFails(): void {
-    $this->callAPISuccess('Contact', 'create', [
+    $this->createTestEntity('Contact', [
       'contact_type' => 'Individual',
       'first_name' => 'Jane',
       'last_name' => 'Doe',

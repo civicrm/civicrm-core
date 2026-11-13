@@ -76,12 +76,16 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery('DROP TABLE civicrm_tmp_d_import_job_xxx');
     if (!empty($expecteds)) {
       foreach ($expecteds as $expected) {
-        $result = $this->callAPISuccess($expected['entity'], 'get', array_merge($expected['values'], ['sequential' => 1]));
-        $this->assertEquals($expected['count'], $result['count']);
+        $where = [];
+        foreach ($expected['values'] as $field => $value) {
+          $where[] = [$field, '=', $value];
+        }
+        $result = civicrm_api4($expected['entity'], 'get', ['where' => $where, 'orderBy' => ['id' => 'ASC'], 'checkPermissions' => FALSE]);
+        $this->assertCount($expected['count'], $result);
         if (isset($expected['result'])) {
           foreach ($expected['result'] as $key => $expectedValues) {
             foreach ($expectedValues as $valueKey => $value) {
-              $this->assertEquals($value, $result['values'][$key][$valueKey]);
+              $this->assertEquals($value, $result[$key][$valueKey]);
             }
           }
         }
@@ -121,10 +125,9 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
           3 => [0 => 'street_address', 1 => 'Work'],
         ],
         [
-          ['entity' => 'mapping', 'count' => 1, 'values' => ['name' => 'new mapping']],
+          ['entity' => 'Mapping', 'count' => 1, 'values' => ['name' => 'new mapping']],
           [
-            'entity' =>
-            'mapping_field',
+            'entity' => 'MappingField',
             'count' => 4,
             'values' => [],
             'result' => [
@@ -206,8 +209,8 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
       $fieldSpec['location_type_id'] = $this->getLocationTypeID($fieldSpec['location_type_id']);
       $expectedDefaults['mapper[0]'][1] = $fieldSpec['location_type_id'];
     }
-    $mapping = $this->callAPISuccess('Mapping', 'create', ['name' => 'my test']);
-    $this->callAPISuccess('MappingField', 'create', array_merge(['mapping_id' => $mapping['id']], $fieldSpec));
+    $mapping = $this->createTestEntity('Mapping', ['name' => 'my test']);
+    $this->createTestEntity('MappingField', array_merge(['mapping_id' => $mapping['id']], $fieldSpec));
     $this->form = $this->form = $this->getMapFieldFormObject(['savedMapping' => $mapping['id'], 'sqlQuery' => 'SELECT nada FROM civicrm_tmp_d_import_job_xxx']);
     $expectedJS = "<script type='text/javascript'>
 " . $expectedJS . '</script>';
@@ -401,10 +404,10 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    */
   private function storeComplexMapping(bool $legacyMode = FALSE): array {
     $this->createCustomGroupWithFieldOfType(['title' => 'My Field']);
-    $mapping = $this->callAPISuccess('Mapping', 'create', [
+    $mapping = $this->createTestEntity('Mapping', [
       'name' => 'my test',
       'label' => 'Special custom',
-      'mapping_type_id' => 'Import Contact',
+      'mapping_type_id:name' => 'Import Contact',
     ]);
     foreach (
       [
@@ -469,11 +472,11 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
           'phone_type_id' => '3',
         ],
       ] as $mappingField) {
-      $this->callAPISuccess('MappingField', 'create', array_merge([
+      $this->createTestEntity('MappingField', array_merge([
         'mapping_id' => $mapping['id'],
         'grouping' => 1,
         'contact_type' => 'Individual',
-      ], $mappingField));
+      ], $mappingField), 'column_' . $mappingField['column_number']);
     }
     return $mapping;
   }
