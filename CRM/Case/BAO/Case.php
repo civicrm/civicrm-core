@@ -2684,11 +2684,12 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * Get all the encounter medium ids currently in use.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @return array
    */
   public static function getUsedEncounterMediums() {
+    CRM_Core_Error::deprecatedFunctionWarning();
     static $mediumIds;
 
     if (!is_array($mediumIds)) {

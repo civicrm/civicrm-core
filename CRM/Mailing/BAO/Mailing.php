@@ -1817,13 +1817,14 @@ LEFT JOIN civicrm_mailing_group g ON g.mailing_id   = m.id
   }
 
   /**
-   * Show detail Mailing report.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param int $id
    *
    * @return string
    */
   public static function showEmailDetails($id) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     return CRM_Utils_System::url('civicrm/mailing/report', "mid=$id");
   }
 

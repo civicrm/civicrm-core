@@ -2133,7 +2133,7 @@ WHERE {$whereClause}";
   }
 
   /**
-   * Get all Cancelled Membership(s) for a contact
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param int $contactID
    *   Contact id.
@@ -2144,6 +2144,7 @@ WHERE {$whereClause}";
    *   Array of membership type
    */
   public static function getContactsCancelledMembership($contactID, $isTest = FALSE) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     if (!$contactID) {
       return [];
     }

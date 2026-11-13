@@ -2399,7 +2399,7 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
   }
 
   /**
-   * Find the contact details associated with an OpenID.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param string $openId
    *   OpenId of the contact.
@@ -2410,6 +2410,7 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
    *   $dao contact details
    */
   public static function matchContactOnOpenId($openId, $ctype = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $openId = $strtolower(trim($openId));
     $query = "

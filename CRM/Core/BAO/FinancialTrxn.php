@@ -194,8 +194,7 @@ WHERE  ef2.financial_trxn_id =%1
   }
 
   /**
-   * Given an entity_id and entity_table, check for corresponding entity_financial_trxn and financial_trxn record.
-   * NOTE: This should be moved to separate BAO for EntityFinancialTrxn when we start adding more code for that object.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param $entity_id
    *   Id of the entity usually the contactID.
@@ -207,6 +206,7 @@ WHERE  ef2.financial_trxn_id =%1
    *
    */
   public static function getFinancialTrxnLineTotal($entity_id, $entity_table = 'civicrm_contribution') {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $query = "SELECT lt.price_field_value_id AS id, ft.financial_trxn_id,ft.amount AS amount FROM civicrm_entity_financial_trxn AS ft
 LEFT JOIN civicrm_financial_item AS fi ON fi.id = ft.entity_id AND fi.entity_table = 'civicrm_line_item' AND ft.entity_table = 'civicrm_financial_item'
 LEFT JOIN civicrm_line_item AS lt ON lt.id = fi.entity_id AND lt.entity_table = %2

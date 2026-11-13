@@ -1570,11 +1570,14 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
   }
 
   /**
+   * @deprecated since 6.22 will be removed around 6.28
+   *
    * @param int $pageID
    *
    * @return array
    */
   public static function getCurrentandGoalAmount($pageID) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $query = "
 SELECT p.goal_amount as goal, sum( c.total_amount ) as total
   FROM civicrm_contribution_page p,

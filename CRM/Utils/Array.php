@@ -1328,9 +1328,10 @@ class CRM_Utils_Array {
    * @param string $valueField
    *   Ex: 'value'.
    * @return array
-   * @deprecated
+   * @deprecated in 5.5 will be removed around 6.28.
    */
   public static function toKeyValueRows($array, $keyField = 'key', $valueField = 'value') {
+    CRM_Core_Error::deprecatedFunctionWarning();
     return self::makeNonAssociative($array, $keyField, $valueField);
   }
 

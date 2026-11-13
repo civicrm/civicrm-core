@@ -277,11 +277,12 @@ class CRM_Core_Smarty extends CRM_Core_SmartyCompatibility {
   }
 
   /**
-   * @deprecated
+   * @deprecated in 5.82 will be removed around 6.28.
    * Directly apply self::setRequiredTemplateTabKeys to the tabHeader
    * variable
    */
   public function addExpectedTabHeaderKeys(): void {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $tabs = $this->getTemplateVars('tabHeader');
     $tabs = self::setRequiredTabTemplateKeys($tabs);
     $this->assign('tabHeader', $tabs);

@@ -89,10 +89,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * Get un-indexed array of the field values for the given mapping id.
-   *
-   * For example if passing a mapping ID & name the returned array would look like
-   *   ['First field name', 'second field name']
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param int $mappingID
    * @param string $fieldName
@@ -101,11 +98,12 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @throws \CRM_Core_Exception
    */
   public static function getMappingFieldValues($mappingID, $fieldName) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     return array_merge(CRM_Utils_Array::collect($fieldName, civicrm_api3('MappingField', 'get', ['mapping_id' => $mappingID, 'return' => $fieldName])['values']));
   }
 
   /**
-   * Function returns associated array of elements, that will be passed for search.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param int $smartGroupId
    *   Smart group id.
@@ -114,6 +112,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *   associated array of elements
    */
   public static function getFormattedFields($smartGroupId) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $returnFields = [];
 
     //get the fields from mapping table

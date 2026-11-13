@@ -38,9 +38,10 @@ class CRM_Contact_BAO_Contact_Permission {
    *
    * @return bool
    *
-   * @deprecated
+   * @deprecated in 5.45 will be removed around 6.28.
    */
   public static function getUseTemporaryTable() {
+    CRM_Core_Error::deprecatedFunctionWarning();
     return self::$useTempTable;
   }
 

@@ -127,11 +127,14 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
   }
 
   /**
+   * @deprecated since 6.22 will be removed around 6.28
+   *
    * @param int $contactID
    *
    * @return mixed
    */
   public static function getFirstLastDetails($contactID) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     static $_cache;
 
     if (!$_cache) {
