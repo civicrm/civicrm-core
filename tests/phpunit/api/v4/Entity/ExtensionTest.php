@@ -65,6 +65,19 @@ class ExtensionTest extends Api4TestBase implements TransactionalInterface {
 
     // Optimization should have prevented Mapper from loading more than the 1 requested extension
     $this->assertCount(1, Invasive::get([$mapper, 'infos']));
+
+    // Selecting only key and status should skip Mapper info loading altogether
+    Invasive::set([$mapper, 'infos'], []);
+    $result = Extension::get(FALSE)
+      ->addSelect('key', 'status')
+      ->addWhere('key', '=', 'test.extension.manager.moduletest')
+      ->addOrderBy('status')
+      ->execute()->single();
+    $this->assertSame([
+      'key' => 'test.extension.manager.moduletest',
+      'status' => $status,
+    ], $result);
+    $this->assertCount(0, Invasive::get([$mapper, 'infos']));
   }
 
 }
