@@ -84,6 +84,7 @@ return new class() extends EventCheck implements HookInterface {
     'contributionId' => ['type' => 'int', 'for' => 'messageTemplate'],
     'petitionId' => ['type' => 'int', 'for' => 'messageTemplate'],
     'petitionTitle' => ['type' => 'string', 'for' => 'messageTemplate'],
+    'confirmUrl' => ['type' => 'string', 'for' => 'messageTemplate'],
     'table' => ['type' => 'string', 'for' => 'messageTemplate', 'regex' => '/civicrm_msg_template/'],
     'entity' => ['type' => 'string|NULL', 'for' => 'singleEmail'],
     'entity_id' => ['type' => 'int|NULL', 'for' => 'singleEmail'],

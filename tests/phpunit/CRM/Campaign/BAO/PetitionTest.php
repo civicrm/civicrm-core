@@ -76,6 +76,42 @@ class CRM_Campaign_BAO_PetitionTest extends CiviUnitTestCase {
   }
 
   /**
+   * The confirmation mail resolves survey and activity tokens.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPetitionConfirmationEmailWithSurveyTokens(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    MessageTemplate::update()->addWhere('workflow_name', '=', 'petition_confirmation_needed')
+      ->addWhere('is_default', '=', 1)
+      ->setValues(['msg_html' => 'Survey: {survey.title}. Activity: {activity.subject}.'])->execute();
+    $contactID = $this->individualCreate();
+    $this->createTestEntity('Email', ['contact_id' => $contactID, 'email' => 'testpetitioncontact@civicrm.org']);
+    $survey = $this->createTestEntity('Survey', [
+      'title' => 'Test Confirm Petition',
+      'activity_type_id:name' => 'Petition',
+    ]);
+    $activity = $this->createTestEntity('Activity', [
+      'activity_type_id:name' => 'Petition',
+      'status_id:name' => 'Scheduled',
+      'subject' => 'Test Confirm Petition',
+      'source_record_id' => $survey['id'],
+      'source_contact_id' => $contactID,
+      'target_contact_id' => [$contactID],
+    ]);
+    CRM_Campaign_BAO_Petition::sendEmail([
+      'sid' => $survey['id'],
+      'contactId' => $contactID,
+      'activityId' => $activity['id'],
+      'email-Primary' => 'testpetitioncontact@civicrm.org',
+    ], CRM_Campaign_Form_Petition_Signature::EMAIL_CONFIRM);
+    $mut->checkMailLog([
+      'Survey: Test Confirm Petition.',
+      'Activity: Test Confirm Petition.',
+    ]);
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    */
   public function testCreateAndConfirmSignatures(): void {
