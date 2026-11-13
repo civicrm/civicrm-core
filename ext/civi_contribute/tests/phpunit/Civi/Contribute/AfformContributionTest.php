@@ -169,6 +169,23 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
   }
 
   /**
+   * The submission token lets Afform.submitFile attach files to the new contribution.
+   */
+  public function testContributionCreateIsRecordedInToken(): void {
+    $submission = Afform::submit(FALSE)
+      ->setName('testAfformContribution')
+      ->setValues([
+        'Individual1' => [['fields' => ['first_name' => 'Test', 'last_name' => 'Contact']]],
+        'Participant1' => [['fields' => ['event_id' => $this->eventId, 'participant_fields.ticket_option' => $this->inPersonPriceFieldValueId]]],
+        'Contribution1' => [['fields' => ['source' => __FUNCTION__, 'donation_options.additional_donation' => 5]]],
+      ])
+      ->execute()->single();
+
+    $payload = json_decode(json_encode(\Civi::service('crypto.jwt')->decode($submission['token'])), TRUE);
+    $this->assertSame('create', $payload['civiAfformSubmission']['actions']['Contribution1'][0]['action'] ?? NULL);
+  }
+
+  /**
    * @throws \CRM_Core_Exception
    */
   public function testContributionCreate(): void {
