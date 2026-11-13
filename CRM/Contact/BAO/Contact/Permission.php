@@ -423,6 +423,9 @@ AND domain_id = %2
       $is_perm_condition = ' = ' . CRM_Contact_BAO_Relationship::EDIT;
     }
 
+    // A relationship grants permission only between its start and end date
+    $isCurrent = fn(string $alias) => "($alias.start_date IS NULL OR $alias.start_date <= CURDATE()) AND ($alias.end_date IS NULL OR $alias.end_date >= CURDATE())";
+
     // NORMAL/SINGLE DEGREE RELATIONSHIPS
     foreach ($directions as $direction) {
       $user_id_column    = "contact_id_{$direction['from']}";
@@ -442,6 +445,7 @@ SELECT civicrm_relationship.{$contact_id_column} AS contact_id
  WHERE civicrm_relationship.{$user_id_column} = {$userID}
    AND civicrm_relationship.{$contact_id_column} IN ({$contact_id_list})
    AND civicrm_relationship.is_active = 1
+   AND {$isCurrent('civicrm_relationship')}
    AND civicrm_relationship.is_permission_{$direction['from']}_{$direction['to']} {$is_perm_condition}
    $AND_CAN_ACCESS_DELETED";
     }
@@ -468,8 +472,10 @@ SELECT second_degree_relationship.contact_id_{$second_direction['to']} AS contac
  WHERE first_degree_relationship.contact_id_{$first_direction['from']} = {$userID}
    AND second_degree_relationship.contact_id_{$second_direction['to']} IN ({$contact_id_list})
    AND first_degree_relationship.is_active = 1
+   AND {$isCurrent('first_degree_relationship')}
    AND first_degree_relationship.is_permission_{$first_direction['from']}_{$first_direction['to']} {$is_perm_condition}
    AND second_degree_relationship.is_active = 1
+   AND {$isCurrent('second_degree_relationship')}
    AND second_degree_relationship.is_permission_{$second_direction['from']}_{$second_direction['to']} {$is_perm_condition}
    $AND_CAN_ACCESS_DELETED";
         }
