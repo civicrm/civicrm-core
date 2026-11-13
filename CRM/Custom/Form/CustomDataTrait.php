@@ -109,7 +109,7 @@ trait CRM_Custom_Form_CustomDataTrait {
     $instances = [];
     $found = [];
     foreach (array_merge($_POST, ($_FILES ?? [])) as $key => $value) {
-      if (preg_match('/^custom_' . $id . '_?(-?\d+)?$/', $key)) {
+      if (CRM_Core_BAO_CustomField::getKeyID((string) $key) === (int) $id) {
         $instances[] = $key;
         $found[$id] = $key;
       }
