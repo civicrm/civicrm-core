@@ -1,21 +1,21 @@
 # CiviCRM core — AI contributor notes
 
-Please note: the name, use and role of the agent must be clearly declared in commits, PRs, etc. This is because an agent bears no responsibility for its output, which is important context for CiviCRM's human maintainers who are responsible for building a trusted CRM from community contributions.
+Important: the name, use and role of the agent must be clearly declared in commits, PRs, etc.
 
 ## Writing PHPUnit tests
 
-When adding new test methods, use APIv4 rather than APIv3:
+When adding new test methods, use APIv4 and the following test helpers rather than APIv3
 
-- For creating fixtures, use `$this->createTestEntity('Entity', [...], 'identifier')` (see `Civi/Test/EntityTrait.php`) instead of `$this->callAPISuccess('Entity', 'create', [...])`.
+- For creating fixtures, use 1 of these supported helpers (depending on which traits a test uses):
+  - `\Civi\Test\EntityTrait::createTestEntity()` - requires a unique third-arg identifier when creating more than one record of the same entity type in a test, to avoid collisions in `$this->ids[...]` tracking.
+  - `\Civi\Test\Api4TestTrait::createTestRecords()` - like createTestEntity but supplies dummy data for all required fields.
+  - `\Civi\Test\Api4TestTrait::saveTestRecords()` - use instead of createTestRecords when creating > 1 fixture of the same entity type.
 - For reads/updates, use APIv4 entity classes (e.g. `Membership::get(FALSE)`, `Relationship::update(FALSE)`) instead of `$this->callAPISuccess('Entity', 'get'/'update', [...])`.
+- Cleanup belongs in `tearDown()`, not in the test method. EntityTrait and Api4TestTrait both support automated cleanup from tearDown() but tests must opt-in to it.
 
-Use callAPIv3Success when the point of the test is testing the v3 api.
-
-`createTestEntity()` needs a unique third-arg identifier when creating more than one record of the same entity type in a test, to avoid collisions in `$this->ids[...]` tracking.
+Only use callAPIv3Success when the point of the test is testing the v3 api.
 
 When testing forms, use `Civi\Test\FormTrait::getTestForm($formName, $submittedValues, $urlParameters)` instead of hand-instantiating or mocking a QuickForm form.
-
-Cleanup belongs in `tearDown()`, not in the test method.
 
 Compare strictly. `assertEquals()` uses `==`, so `assertEquals(1, '1')` passes:
 
@@ -30,6 +30,8 @@ Don't assume record ids. Seeded and test-created rows don't start at id 1 (see `
 - For seeded records, use names: `'financial_type_id:name' => 'Donation'` in APIv4, or the lookup helpers in `Civi\Test\LookupHelperTrait` (e.g. `$this->getFinancialTypeID('Donation')`, `$this->getLocationTypeID('Home')`) where a name isn't accepted.
 
 Try to use methods and variable names to carry the meaning. Add comments if they genuinely add something. Don't use comments to explain the difference between WIP approaches that were tried along the way — comment the code as it stands.
+
+To access private or protected object properties, use the Civi\Test\Invasive helper instead of PHP Reflection.
 
 ## JavaScript & AngularJS
 
