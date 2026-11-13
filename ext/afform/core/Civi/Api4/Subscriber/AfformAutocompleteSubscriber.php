@@ -11,7 +11,9 @@
 
 namespace Civi\Api4\Subscriber;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Core\Attribute\CiviEventListener;
+use CRM_Afform_ExtensionUtil as E;
 use Civi\Api4\SavedSearch;
 use Civi\Afform\FormDataModel;
 use Civi\Api4\Afform;
@@ -95,6 +97,15 @@ class AfformAutocompleteSubscriber {
       $apiEntity = $entity['type'];
       $isId = $fieldName === CoreUtil::getIdFieldName($apiEntity);
       $formField = $entity['fields'][$fieldName]['defn'] ?? [];
+    }
+
+    // The field's saved search and security setting are for the entity it refers to; nothing else is searched through it.
+    $fullDefn = FormDataModel::getField($apiEntity, $fieldName, $entity ? 'create' : 'get') ?? [];
+    $fieldEntities = array_values($fullDefn['dfk_entities'] ?? []);
+    $fieldEntities[] = $formField['fk_entity'] ?? $fullDefn['fk_entity'] ?? $apiEntity;
+    $withoutContactType = fn($name) => CoreUtil::isContact($name) ? 'Contact' : $name;
+    if (!in_array($withoutContactType($apiRequest->getEntityName()), array_map($withoutContactType, $fieldEntities), TRUE)) {
+      throw new UnauthorizedException(E::ts('Field %1 does not refer to %2.', [1 => $fieldName, 2 => $apiRequest->getEntityName()]));
     }
 
     // Set standard fieldName so core AutocompleteFieldSubscriber can handle filters from the schema
