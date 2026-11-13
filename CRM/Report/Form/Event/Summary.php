@@ -296,9 +296,6 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
 
     $dao = CRM_Core_DAO::executeQuery($sql);
 
-    //set pager before exicution of query in function participantInfo()
-    $this->setPager();
-
     $rows = $graphRows = [];
     $count = 0;
     while ($dao->fetch()) {
@@ -318,6 +315,8 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
       }
       $rows[] = $row;
     }
+    $this->setRowsFound($sql, count($rows));
+    $this->setPager();
     if (!empty($rows)) {
       $participant_info = $this->participantInfo();
       foreach ($rows as $key => $value) {

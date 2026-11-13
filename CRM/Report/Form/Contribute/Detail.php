@@ -525,7 +525,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
   public function buildQuery($applyLimit = FALSE) {
     if ($this->isTempTableBuilt) {
       $this->limit();
-      return "SELECT SQL_CALC_FOUND_ROWS * FROM {$this->temporaryTables['civireport_contribution_detail_temp3']['name']} $this->_orderBy $this->_limit";
+      return "SELECT * FROM {$this->temporaryTables['civireport_contribution_detail_temp3']['name']} $this->_orderBy $this->_limit";
     }
     return parent::buildQuery($applyLimit);
   }
@@ -580,13 +580,6 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
     CRM_Utils_Hook::alterReportVar('sql', $this, $this);
     $sql = "{$select} {$this->_from} {$this->_where} $this->_groupBy";
     $this->createTemporaryTable('civireport_contribution_detail_temp2', $sql);
-
-    if (($this->_params['contribution_or_soft_value'] ?? NULL) ==
-      'soft_credits_only'
-    ) {
-      // revise pager : prev, next based on soft-credits only
-      $this->setPager();
-    }
 
     // copy _from for later use of stats calculation for soft credits, and reset $this->_from to main query
     $this->_softFrom = $this->_from;
@@ -866,8 +859,7 @@ WHERE  civicrm_contribution_contribution_id={$row['civicrm_contribution_contribu
 
     if (!empty($this->_sections)) {
       // build the query with no LIMIT clause
-      $select = str_ireplace('SELECT SQL_CALC_FOUND_ROWS ', 'SELECT ', $this->_select);
-      $sql = "{$select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy}";
+      $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy}";
 
       // pull section aliases out of $this->_sections
       $sectionAliases = array_keys($this->_sections);

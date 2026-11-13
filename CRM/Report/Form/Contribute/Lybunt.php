@@ -543,14 +543,10 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     $this->resetFormSqlAndWhereHavingClauses();
 
     $this->contactTempTable = $this->createTemporaryTable('rptlybunt', "
-      SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from}
+      SELECT {$this->_aliases['civicrm_contact']}.id as cid {$this->_from}
       {$this->_where}
       GROUP BY {$this->_aliases['civicrm_contact']}.id"
     );
-    $this->limit();
-    if (empty($this->_params['charts'])) {
-      $this->setPager();
-    }
 
     // Reset where clauses to be regenerated in postProcess.
     $this->_whereClauses = [];
@@ -600,8 +596,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       foreach ($this->_orderByFields as $field) {
         $this->_orderBy = str_replace($field['dbAlias'], $field['tplField'], $this->_orderBy);
       }
-      $sql = str_replace('SQL_CALC_FOUND_ROWS', '', $sql);
-      $sql = "SELECT SQL_CALC_FOUND_ROWS  * FROM ( $sql ) as inner_query {$this->_orderBy} $this->_limit";
+      $sql = "SELECT * FROM ( $sql ) as inner_query {$this->_orderBy} $this->_limit";
     }
 
     CRM_Utils_Hook::alterReportVar('sql', $this, $this);

@@ -482,7 +482,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertSame(2, $rows['count'], 'Report failed - the sql used to generate the results was ' . print_r($rows['metadata']['sql'], TRUE));
     $inUseCollation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
     $expected = preg_replace('/\s+/', ' ', 'COLLATE ' . $inUseCollation . ' AS
-      SELECT SQL_CALC_FOUND_ROWS contact_civireport.id as cid  FROM civicrm_contact contact_civireport    INNER JOIN civicrm_contribution contribution_civireport USE index (received_date) ON contribution_civireport.contact_id = contact_civireport.id
+      SELECT contact_civireport.id as cid  FROM civicrm_contact contact_civireport    INNER JOIN civicrm_contribution contribution_civireport USE index (received_date) ON contribution_civireport.contact_id = contact_civireport.id
          AND contribution_civireport.is_test = 0
          AND contribution_civireport.is_template = 0
          AND contribution_civireport.receive_date BETWEEN \'20140701000000\' AND \'20150630235959\'
