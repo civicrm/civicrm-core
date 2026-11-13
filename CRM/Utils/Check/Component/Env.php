@@ -664,8 +664,11 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       $requiredMessage->addAction(
         ts('Enable %1', [1 => implode(', ', $missingRequired)]),
         '',
-        'api3',
-        ['Extension', 'install', ['keys' => array_keys($missingRequired)]]
+        'api4',
+        ['Extension', 'enable', [
+          'where' => [['key', 'IN', array_keys($missingRequired)]],
+        ],
+        ],
       );
       $messages[] = $requiredMessage;
     }
@@ -852,9 +855,10 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
   public function checkLoggingHasCiviReport(): array {
     if (Civi::settings()->get('logging')) {
       $isEnabledCiviReport = (bool) Extension::get(FALSE)
+        ->selectRowCount()
         ->addWhere('key', '=', 'civi_report')
         ->addWhere('status', '=', 'installed')
-        ->execute()->countFetched();
+        ->execute()->count();
       return $isEnabledCiviReport ? [] : [
         new CRM_Utils_Check_Message(
           __FUNCTION__,

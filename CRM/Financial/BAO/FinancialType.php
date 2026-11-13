@@ -307,8 +307,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @internal transitional function.
    */
   public static function isFinancialTypeAclExtensionInstalled(): bool {
-    $financialAclExtension = civicrm_api3('extension', 'get', ['key' => 'financialacls', 'sequential' => 1])['values'];
-    return !empty($financialAclExtension) && $financialAclExtension[0]['status'] === 'installed';
+    $financialAclExtension = \Civi\Api4\Extension::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('key', '=', 'financialacls')
+      ->addWhere('status', '=', CRM_Extension_Manager::STATUS_INSTALLED)
+      ->execute();
+    return (bool) $financialAclExtension->count();
   }
 
 }

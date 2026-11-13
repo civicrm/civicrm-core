@@ -37,12 +37,11 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    $this->callApiV3Success('Extension', 'enable', ['keys' => ['eventcart']]);
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'eventcart')->execute();
   }
 
   public function tearDown(): void {
-    $this->callApiV3Success('Extension', 'disable', ['keys' => ['eventcart']]);
-    $this->callApiV3Success('Extension', 'uninstall', ['keys' => ['eventcart']]);
+    \Civi\Api4\Extension::uninstall(FALSE)->addWhere('key', '=', 'eventcart')->execute();
     parent::tearDown();
   }
 
@@ -53,7 +52,7 @@ class CRM_Financial_Form_PaymentFormsTest extends CiviUnitTestCase {
    */
   public function testEventPaymentForms(): void {
     $billingLocationTypeID = $this->getLocationTypeID('Billing');
-    $this->callApiV3Success('Extension', 'install', ['keys' => ['eventcart']]);
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'eventcart')->execute();
     $this->createAuthorizeNetProcessor();
     $processors = [$this->ids['PaymentProcessor']['anet']];
     $eventID = $this->eventCreatePaid([

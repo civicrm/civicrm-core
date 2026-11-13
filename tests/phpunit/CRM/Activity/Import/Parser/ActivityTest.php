@@ -39,7 +39,7 @@ class CRM_Activity_Import_Parser_ActivityTest extends CiviUnitTestCase {
   public function setUp():void {
     parent::setUp();
     $this->createLoggedInUser();
-    $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'civiimport')->execute();
   }
 
   /**

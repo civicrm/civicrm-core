@@ -64,7 +64,7 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
    * Set ACLs for Financial Types()
    */
   public function setACL(): void {
-    $this->callAPISuccess('extension', 'install', ['version' => 3, 'key' => 'financialacls', 'sequential' => 1])['values'];
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'financialacls')->execute();
   }
 
   /**

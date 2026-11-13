@@ -61,7 +61,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
   protected function setUp(): void {
     parent::setUp();
-    $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'civiimport')->execute();
     $this->enableBackgroundQueueOriginalValue = Civi::settings()->get('enableBackgroundQueue');
   }
 

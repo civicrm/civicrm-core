@@ -32,12 +32,7 @@ class CRM_Import_ParserTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    $extension = \Civi\Api4\Extension::get(FALSE)
-      ->addWhere('key', '=', 'civiimport')
-      ->execute()->first();
-    if (empty($extension['status']) || $extension['status'] !== 'installed') {
-      $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
-    }
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'civiimport')->execute();
   }
 
   /**

@@ -1,6 +1,7 @@
 <?php
 
 use Civi\Api4\Contact;
+use Civi\Api4\Extension;
 
 /**
  * Class CRM_Event_Cart_Form_Checkout_Payment
@@ -730,10 +731,12 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @throws \CRM_Core_Exception
    */
   protected function apply_discount($discountCode, &$price_set_amount, &$cost, $event_id) {
-    $extensions = civicrm_api3('Extension', 'get', [
-      'full_name' => 'org.civicrm.module.cividiscount',
-    ]);
-    if (empty($extensions['id']) || ($extensions['values'][$extensions['id']]['status'] !== 'installed')) {
+    $extension = Extension::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('key', '=', 'org.civicrm.module.cividiscount')
+      ->addWhere('status', '=', \CRM_Extension_Manager::STATUS_INSTALLED)
+      ->execute();
+    if (!$extension->count()) {
       return FALSE;
     }
 
