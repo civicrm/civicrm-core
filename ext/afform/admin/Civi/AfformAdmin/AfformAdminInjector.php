@@ -118,7 +118,7 @@ class AfformAdminInjector extends AutoSubscriber {
             $linksMarkup .= <<<HTML
               <li ng-if="checkLinkPerm('{$link['permission']}', {$link['created_id']})">
                 <a href="{$link['url']}" target="_blank">
-                  <i class="crm-i fa-fw {$link['icon']}" role="img" aria-hidden="true"></i> {$link['text']}
+                  <i class="crm-i fa-fw {$link['icon']}" role="img" aria-hidden="true"></i> <span ng-non-bindable>{$link['text']}</span>
                 </a>
               </li>
             HTML;
