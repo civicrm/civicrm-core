@@ -395,6 +395,10 @@ class CRM_Utils_System {
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
+    // handle legacy null params
+    $path ??= '';
+    $query ??= '';
+
     $config = CRM_Core_Config::singleton();
     $query = self::makeQueryString($query);
     return $config->userSystem->getNotifyUrl($path, $query, $absolute, $fragment, $frontend, $forceBackend);
