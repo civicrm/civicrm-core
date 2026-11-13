@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\OptionValue;
+
 /**
  * Class CRM_Utils_FileTest
  * @group headless
@@ -7,7 +9,10 @@
 class CRM_Utils_FileTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
-    $this->callAPISuccess('OptionValue', 'get', ['option_group_id' => 'safe_file_extension', 'value' => 17, 'api.option_value.delete' => ['id' => "\$value.id"]]);
+    OptionValue::delete(FALSE)
+      ->addWhere('option_group_id:name', '=', 'safe_file_extension')
+      ->addWhere('value', '=', 17)
+      ->execute();
     parent::tearDown();
   }
 
@@ -718,15 +723,15 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * @dataProvider safeFileExtensionExamples
    */
   public function testSafeFileExtensionValidation($extension, $standardInstallCheck, $afterModificationCheck): void {
-    $this->assertEquals($standardInstallCheck, CRM_Utils_File::isExtensionSafe($extension));
-    $optionValue = $this->callAPISuccess('OptionValue', 'create', [
-      'option_group_id' => 'safe_file_extension',
+    $this->assertSame($standardInstallCheck, CRM_Utils_File::isExtensionSafe($extension));
+    $this->createTestEntity('OptionValue', [
+      'option_group_id:name' => 'safe_file_extension',
       'label' => $extension,
       'name' => $extension,
       'value' => 17,
     ]);
     unset(Civi::$statics['CRM_Utils_File']['file_extensions']);
-    $this->assertEquals($standardInstallCheck, CRM_Utils_File::isExtensionSafe($extension));
+    $this->assertSame($afterModificationCheck, CRM_Utils_File::isExtensionSafe($extension));
   }
 
   public function testCleanDir(): void {

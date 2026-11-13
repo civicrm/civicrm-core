@@ -7,26 +7,25 @@
 class CRM_Utils_AddressTest extends CiviUnitTestCase {
 
   public function testAddressFormat(): void {
-    $contact = $this->callAPISuccess('Contact', 'create', [
+    $contact = $this->createTestEntity('Contact', [
       'first_name' => 'Micky',
       'last_name' => 'mouse',
       'contact_type' => 'Individual',
     ]);
-    $address = $this->callAPISuccess('Address', 'create', [
+    $addressDetails = $this->createTestEntity('Address', [
       'street_address' => '1 Happy Place',
       'city' => 'Miami',
-      'state_province' => 'Florida',
-      'country' => 'United States',
+      'state_province_id:label' => 'Florida',
+      'country_id:label' => 'United States',
       'postal_code' => '33101',
       'contact_id' => $contact['id'],
       'location_type_id' => $this->getLocationTypeID('Billing'),
-      'is_primary' => 1,
+      'is_primary' => TRUE,
     ]);
-    $addressDetails = $address['values'][$address['id']];
     $countries = CRM_Core_PseudoConstant::country();
     $addressDetails['country_id:label'] = $countries[$addressDetails['country_id']];
     $formatted_address = CRM_Utils_Address::formatMailingLabel($addressDetails);
-    $this->assertTrue((bool) strstr($formatted_address, 'UNITED STATES'));
+    $this->assertStringContainsString('UNITED STATES', $formatted_address);
   }
 
   public function testVcardFormat(): void {

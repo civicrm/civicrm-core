@@ -30,11 +30,7 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
 
     $this->tmpFile = $this->createTempDir() . '/example.txt';
 
-    $result = civicrm_api('Setting', 'create', [
-      'version' => 3,
-      'verifySSL' => TRUE,
-    ]);
-    $this->assertAPISuccess($result);
+    \Civi::settings()->set('verifySSL', TRUE);
     $this->client = new CRM_Utils_HttpClient();
   }
 
@@ -63,11 +59,7 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
   }
 
   public function testFetchHttps_invalid_noVerify(): void {
-    $result = civicrm_api('Setting', 'create', [
-      'version' => 3,
-      'verifySSL' => FALSE,
-    ]);
-    $this->assertAPISuccess($result);
+    \Civi::settings()->set('verifySSL', FALSE);
 
     $result = $this->client->fetch(self::SELF_SIGNED_HTTPS_URL, $this->tmpFile);
     $this->assertSame(CRM_Utils_HttpClient::STATUS_OK, $result);
@@ -98,11 +90,7 @@ class CRM_Utils_HttpClientTest extends CiviUnitTestCase {
   }
 
   public function testGetHttps_invalid_noVerify(): void {
-    $result = civicrm_api('Setting', 'create', [
-      'version' => 3,
-      'verifySSL' => FALSE,
-    ]);
-    $this->assertAPISuccess($result);
+    \Civi::settings()->set('verifySSL', FALSE);
 
     [$status, $data] = $this->client->get(self::SELF_SIGNED_HTTPS_URL);
     $this->assertSame(CRM_Utils_HttpClient::STATUS_OK, $status);

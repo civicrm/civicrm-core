@@ -2714,8 +2714,8 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   }
 
   public function testWeekDayArrayOrder(): void {
-    $this->callAPISuccess('Setting', 'create', ['weekBegins' => 1]);
-    $this->assertEquals([
+    \Civi::settings()->set('weekBegins', 1);
+    $this->assertSame([
       1 => 'Monday',
       2 => 'Tuesday',
       3 => 'Wednesday',
