@@ -1,5 +1,8 @@
 <?php
 
+use Civi\Api4\CustomField;
+use Civi\Api4\CustomGroup;
+
 /**
  * Class CRM_Utils_Migrate_ImportExportTest
  * @group headless
@@ -158,7 +161,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
     ]);
     $customGroup = $this->customGroupCreate($customGroupParams);
     $fieldParams['custom_group_id'] = $customGroup['id'];
-    $customField = $this->callAPISuccess('custom_field', 'create', $fieldParams);
+    $customField = $this->createTestEntity('CustomField', $fieldParams);
 
     $exporter = new CRM_Utils_Migrate_Export();
     $exporter->buildCustomGroups([$customGroup['id']]);
@@ -166,9 +169,6 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
     $expectedXml = preg_replace('#<column_name>(\w+)_1</column_name>#', '<column_name>${1}_' . $customField['id'] . '</column_name>', file_get_contents($expectedXmlFilePath));
     $expectedXml = str_replace('<table_name>civicrm_value_example_1</table_name>', '<table_name>civicrm_value_example_' . $customGroup['id'] . '</table_name>', $expectedXml);
     $this->assertEquals($expectedXml, $exporter->toXML());
-
-    $this->callAPISuccess('custom_field', 'delete', ['id' => $customField['id']]);
-    $this->callAPISuccess('custom_group', 'delete', ['id' => $customGroup['id']]);
   }
 
   /**
@@ -187,16 +187,16 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
     $importer = new CRM_Utils_Migrate_Import();
     $importer->run($inputXmlFilePath);
 
-    $customGroups = $this->callAPISuccess('custom_group', 'get', ['title' => $expectCustomGroup['title']]);
-    $this->assertSame(1, $customGroups['count']);
-    $customGroup = array_shift($customGroups['values']);
+    $customGroup = CustomGroup::get(FALSE)
+      ->addWhere('title', '=', $expectCustomGroup['title'])
+      ->execute()->single();
     foreach ($expectCustomGroup as $expectKey => $expectValue) {
       $this->assertEquals($expectValue, $customGroup[$expectKey]);
     }
 
-    $customFields = $this->callAPISuccess('custom_field', 'get', ['label' => $expectCustomField['label']]);
-    $this->assertSame(1, $customFields['count']);
-    $customField = array_shift($customFields['values']);
+    $customField = CustomField::get(FALSE)
+      ->addWhere('label', '=', $expectCustomField['label'])
+      ->execute()->single();
     foreach ($expectCustomField as $expectKey => $expectValue) {
       $this->assertEquals($expectValue, $customField[$expectKey]);
     }

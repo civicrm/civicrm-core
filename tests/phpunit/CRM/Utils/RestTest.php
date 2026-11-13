@@ -51,19 +51,19 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
       ->addValue('contact_type', 'Individual')
       ->execute()->first()['id'];
 
-    $jobLogID = civicrm_api3('JobLog', 'create', [
+    $jobLogID = $this->createTestEntity('JobLog', [
       'name' => 'test',
-      'domain_id' => 1,
+      'domain_id' => CRM_Core_Config::domainID(),
     ])['id'];
     $params = ['id' => $jobLogID, 'version' => 3, 'sequential' => 1, 'check_permissions' => 0];
     $args = ['civicrm', 'JobLog', 'get'];
 
     // Check we can load the email without checking perms.
-    $r = civicrm_api('JobLog', 'get', $params);
+    $r = $this->callApiV3Success('JobLog', 'get', $params);
     $this->assertSame(1, $r['count']);
 
     // Check we can still load it with checking permission (because we allow it in hook)
-    $r = civicrm_api('JobLog', 'get', ['check_permissions' => 1] + $params);
+    $r = $this->callApiV3Success('JobLog', 'get', ['check_permissions' => 1] + $params);
     $this->assertSame(1, $r['count']);
 
     // Now check we can load it via the rest endpoint which should enforce permissions.
@@ -78,7 +78,7 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
       'return' => 'display_name',
     ];
     $output = CRM_Utils_REST::process($args, $params);
-    $this->assertEquals($jobLogID, $output['id']);
+    $this->assertSame($jobLogID, $output['id']);
     $chain = $output['values'][0]['api.contact.get'];
     $this->assertSame(0, $chain['count'], "Vulnerable.");
 
@@ -87,7 +87,7 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
     // we can just use get for testing.)
     $params['api.contact.get'] = [$params['api.contact.get']];
     $output = CRM_Utils_REST::process($args, $params);
-    $this->assertEquals($jobLogID, $output['id']);
+    $this->assertSame($jobLogID, $output['id']);
     $chainResult = $output['values'][0]['api.contact.get'];
     $this->assertIsArray($chainResult);
     $this->assertCount(1, $chainResult);
@@ -114,7 +114,7 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
       ],
     ];
     $output = CRM_Utils_REST::process($args, $params);
-    $this->assertEquals($jobLogID, $output['id']);
+    $this->assertSame($jobLogID, $output['id']);
     $chain = $output['values'][0]['api.job_log.get'];
     $this->assertSame(1, $chain['count'], "Expected the first chain to work.");
     // Check the inner contact.get returned nothing
