@@ -6,6 +6,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\MailingComponent;
 use Civi\Api4\OptionValue;
 
 /**
@@ -33,7 +34,10 @@ class CRM_Mailing_MailingHeaderFooterTest extends CiviUnitTestCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function tearDown(): void {
-    $this->quickCleanup(['civicrm_group']);
+    $this->quickCleanup(['civicrm_group', 'civicrm_sms_provider', 'civicrm_mailing', 'civicrm_mailing_group', 'civicrm_mailing_job']);
+    if (!empty($this->ids['MailingComponent'])) {
+      MailingComponent::delete(FALSE)->addWhere('id', 'IN', $this->ids['MailingComponent'])->execute();
+    }
     OptionValue::delete(FALSE)->addWhere('name', '=', 'CiviTestSMSProvider')->execute();
     parent::tearDown();
   }
@@ -42,7 +46,7 @@ class CRM_Mailing_MailingHeaderFooterTest extends CiviUnitTestCase {
    * Test that a new email has the default header and footer.
    */
   public function testNewEmailHasDefaultHeaderFooter() : void {
-    $mailing = $this->callAPISuccess('Mailing', 'create', [
+    $mailing = $this->callApiV3Success('Mailing', 'create', [
       'sequential' => 1,
       'name' => 'mailing name',
       'created_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
@@ -54,8 +58,8 @@ class CRM_Mailing_MailingHeaderFooterTest extends CiviUnitTestCase {
 
     $defaultHeader = CRM_Mailing_PseudoConstant::defaultComponent('Header', '');
     $defaultFooter = CRM_Mailing_PseudoConstant::defaultComponent('Footer', '');
-    $this->assertEquals($mailing['values'][0]['header_id'], $defaultHeader);
-    $this->assertEquals($mailing['values'][0]['footer_id'], $defaultFooter);
+    $this->assertSame($defaultHeader, $mailing['values'][0]['header_id']);
+    $this->assertSame($defaultFooter, $mailing['values'][0]['footer_id']);
   }
 
   /**
@@ -65,17 +69,17 @@ class CRM_Mailing_MailingHeaderFooterTest extends CiviUnitTestCase {
     $mailingComponentHeader = $this->createTestEntity('MailingComponent', [
       'name' => 'Custom Header',
       'component_type' => 'Header',
-      'is_active' => 1,
-      'is_default' => 0,
-    ]);
+      'is_active' => TRUE,
+      'is_default' => FALSE,
+    ], 'header');
     $mailingComponentFooter = $this->createTestEntity('MailingComponent', [
       'name' => 'Custom Footer',
       'component_type' => 'Footer',
-      'is_active' => 1,
-      'is_default' => 0,
-    ]);
+      'is_active' => TRUE,
+      'is_default' => FALSE,
+    ], 'footer');
 
-    $mailing = $this->callAPISuccess('Mailing', 'create', [
+    $mailing = $this->callApiV3Success('Mailing', 'create', [
       'sequential' => 1,
       'name' => 'mailing name',
       'created_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,
@@ -87,27 +91,27 @@ class CRM_Mailing_MailingHeaderFooterTest extends CiviUnitTestCase {
       'body_text' => 'Hello world',
     ]);
 
-    $this->assertEquals($mailing['values'][0]['header_id'], $mailingComponentHeader['id']);
-    $this->assertEquals($mailing['values'][0]['footer_id'], $mailingComponentFooter['id']);
+    $this->assertSame((string) $mailingComponentHeader['id'], $mailing['values'][0]['header_id']);
+    $this->assertSame((string) $mailingComponentFooter['id'], $mailing['values'][0]['footer_id']);
   }
 
   /**
    * Test that a new sms has no header and footer
    */
   public function testNewSMSNoHeaderFooter() : void {
-    $smsProvider = civicrm_api3('SmsProvider', 'create', [
+    $smsProvider = $this->createTestEntity('SmsProvider', [
       'name' => 'CiviTestSMSProvider',
-      'api_type' => 1,
+      'api_type:name' => 'http',
       'username' => 1,
       'password' => '1',
       'api_url' => 1,
       'api_params' => 'a=1',
-      'is_default' => 1,
-      'is_active' => 1,
-      'domain_id' => 1,
+      'is_default' => TRUE,
+      'is_active' => TRUE,
+      'domain_id' => CRM_Core_Config::domainID(),
     ])['id'];
 
-    $mailing = $this->callAPISuccess('Mailing', 'create', [
+    $mailing = $this->callApiV3Success('Mailing', 'create', [
       'sequential' => 1,
       'name' => 'mailing name',
       'created_id' => CRM_Core_BAO_Domain::getDomain()->contact_id,

@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\MailSettings;
+
 /**
  * @group headless
  * @group civimail
@@ -32,8 +34,7 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
     $this->createContactsInGroup(2, $this->_groupID);
 
     $this->_mut = new CiviMailUtils($this, TRUE);
-    $this->callAPISuccess('mail_settings', 'get',
-      ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
+    MailSettings::update(FALSE)->addValue('domain', 'chaos.org')->addWhere('id', '>', 0)->execute();
   }
 
   public function tearDown(): void {
@@ -130,11 +131,8 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
       'description' => 'New Test Group Created',
       'is_active' => 1,
       'visibility' => 'Public Pages',
-      'group_type' => [
-        '1' => 1,
-        '2' => 1,
-      ],
-    ], 'group')['id'];
+      'group_type:name' => ['Access Control', 'Mailing List'],
+    ], 'group_1')['id'];
     $this->createContactsInGroup(2, $group_1);
 
     // Also _mut is private to the parent, so we have to make our own:
@@ -151,13 +149,13 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
     ];
 
     // The following code is exactly the same as runMailingSuccess() except that we store the ID of the mailing.
-    $mailing_1 = $this->callAPISuccess('mailing', 'create', $mailingParams);
+    $mailing_1 = $this->callApiV3Success('Mailing', 'create', $mailingParams);
     $mut->assertRecipients([]);
     $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $mut->getAllMessages('ezc');
     // There are exactly two contacts produced by setUp().
-    $this->assertSame(2, count($allMessages));
+    $this->assertCount(2, $allMessages);
 
     // We need a new group
     $group_2 = $this->createTestEntity('Group', [
@@ -166,11 +164,8 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
       'description' => 'New Test Group Created',
       'is_active' => 1,
       'visibility' => 'Public Pages',
-      'group_type' => [
-        '1' => 1,
-        '2' => 1,
-      ],
-    ], 'group')['id'];
+      'group_type:name' => ['Access Control', 'Mailing List'],
+    ], 'group_2')['id'];
     // Now create the 2nd mailing to the recipients of the first,
     // excluding our new albeit empty group.
     $mailingParams = [
@@ -182,17 +177,17 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
       'scheduled_date' => 'now',
       'body_text'      => 'Please just {action.unsubscribeUrl}',
     ];
-    $this->callAPISuccess('mailing', 'create', $mailingParams);
-    $_ = $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
+    $this->callApiV3Success('Mailing', 'create', $mailingParams);
+    $this->callApiV3Success('Job', 'process_mailing', ['runInNonProductionEnvironment' => TRUE]);
 
     $allMessages = $mut->getAllMessages('ezc');
     // We should have 2+2 messages sent by the mail system now.
-    $this->assertSame(4, count($allMessages));
+    $this->assertCount(4, $allMessages);
 
     // So far so good.
     // Now extract the unsubscribe details.
     $message = end($allMessages);
-    $this->assertTrue($message->body instanceof ezcMailText);
+    $this->assertInstanceOf(ezcMailText::class, $message->body);
     $this->assertSame('plain', $message->body->subType);
     $this->assertSame(1, preg_match(
       '@mailing/unsubscribe.*jid=(\d+)&qid=(\d+)&h=([0-9a-z]+)@',
@@ -207,19 +202,16 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
       'description' => 'New Test Group Created',
       'is_active' => 1,
       'visibility' => 'Public Pages',
-      'group_type' => [
-        '1' => 1,
-        '2' => 1,
-      ],
-    ], 'group')['id'];
+      'group_type:name' => ['Access Control', 'Mailing List'],
+    ], 'group_3')['id'];
     // Add contacts from group 1 to group 3.
     $gcQuery = new CRM_Contact_BAO_GroupContact();
     $gcQuery->group_id = $group_1;
     $gcQuery->status = 'Added';
     $gcQuery->find();
     while ($gcQuery->fetch()) {
-      $this->callAPISuccess('group_contact', 'create',
-        ['group_id' => $group_3, 'contact_id' => $gcQuery->contact_id, 'status' => 'Added']);
+      $this->createTestEntity('GroupContact',
+        ['group_id' => $group_3, 'contact_id' => $gcQuery->contact_id, 'status' => 'Added'], 'group_3_contact_' . $gcQuery->contact_id);
     }
 
     // Part of the issue is caused by the fact that (at time of writing) the
@@ -227,14 +219,11 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
     // be a group, but actually it could be a mailing.
     // The difficulty in testing this is that because all our IDs are very low
     // and contiguous the SQL looking for a match for 'mailing 1' does match a
-    // group ID of '1', which is created in this class's parent's setUp().
-    // Strictly speaking we don't know that it has ID 1, but as we can't access _groupID
-    // we'll have to assume that.
-    //
+    // group created in setUp().
     // So by deleting that group the SQL then matches nothing which is what we
     // need for this case.
     $_ = new CRM_Contact_BAO_Group();
-    $_->id = 1;
+    $_->id = $this->_groupID;
     $_->delete();
 
     $hooks = \CRM_Utils_Hook::singleton();
@@ -254,14 +243,14 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
     );
 
     // We expect that our group_1 was found.
-    $this->assertEquals(['groups' => [$group_1], 'baseGroups' => []], $found);
+    $this->assertSame(['groups' => [$group_1], 'baseGroups' => []], $found);
 
     // We *should* get an array with just our $group_1 since this is the only group
     // that we have included.
     // $group_2 was only used to exclude people.
     // $group_3 has nothing to do with this mailing and should not be there.
     $this->assertNotEmpty($groups, "We should have received an array.");
-    $this->assertEquals([$group_1], array_keys($groups),
+    $this->assertSame([$group_1], array_keys($groups),
       "We should have received an array with our group 1 in it.");
 
     if ($isMultiLingual) {
@@ -276,14 +265,14 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
       );
 
       // We expect that our group_1 was found.
-      $this->assertEquals(['groups' => [$group_1], 'baseGroups' => []], $found);
+      $this->assertSame(['groups' => [$group_1], 'baseGroups' => []], $found);
 
       // We *should* get an array with just our $group_1 since this is the only group
       // that we have included.
       // $group_2 was only used to exclude people.
       // $group_3 has nothing to do with this mailing and should not be there.
       $this->assertNotEmpty($groups, "We should have received an array.");
-      $this->assertEquals([$group_1], array_keys($groups),
+      $this->assertSame([$group_1], array_keys($groups),
         "We should have received an array with our group 1 in it.");
       global $dbLocale;
       $dbLocale = '_en_US';
@@ -310,11 +299,11 @@ class CRM_Mailing_MultilingualSystemTest extends CiviUnitTestCase {
         'first_name' => "Foo{$i}",
         'email' => 'mail' . $i . '@' . $domain,
       ]);
-      $this->callAPISuccess('group_contact', 'create', [
+      $this->createTestEntity('GroupContact', [
         'contact_id' => $contactID,
         'group_id' => $groupID,
         'status' => 'Added',
-      ]);
+      ], 'group_' . $groupID . '_contact_' . $i);
     }
   }
 
