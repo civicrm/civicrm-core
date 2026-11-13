@@ -87,6 +87,11 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
   private $_afform;
 
   /**
+   * @var bool
+   */
+  private $_linksPreprocessed = FALSE;
+
+  /**
    * @var array
    */
   private $tasks;
@@ -1026,6 +1031,7 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
         $this->preprocessLink($button);
       }
     }
+    $this->_linksPreprocessed = TRUE;
   }
 
   /**
@@ -1131,6 +1137,10 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
    * @return array
    */
   private function getLinkTokens(array $link): array {
+    // Link paths are only resolved by preprocessLinks(); without it there are no tokens to add
+    if (!$this->_linksPreprocessed) {
+      return [];
+    }
     $tokens = [];
     if (!$link['path'] && !empty($link['task'])) {
       $tokens[] = $link['prefix'] . $this->getIdKeyName($link['entity']);
@@ -1918,6 +1928,36 @@ abstract class AbstractRunAction extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     return $filterKeys;
+  }
+
+  /**
+   * Checks whether every filter is allowed by the Afform alone (field or directive filter),
+   * so that applyFilters() does not depend on fields that only links add to the SELECT clause.
+   *
+   * Unlike getAfformDirectiveFilters(), this has no side effects.
+   *
+   * @return bool
+   */
+  protected function areFiltersAllowedByAfform(): bool {
+    $filters = array_filter($this->filters, [$this, 'hasValue']);
+    if (!$filters) {
+      return TRUE;
+    }
+    $afform = $this->loadAfform();
+    if (!$afform) {
+      return FALSE;
+    }
+    $allowedFilters = array_keys($this->getAfformFilterFields());
+    $filterAttr = $afform['searchDisplay']['filters'] ?? NULL;
+    if ($filterAttr && is_string($filterAttr) && $filterAttr[0] === '{') {
+      $allowedFilters = array_merge($allowedFilters, array_keys(\CRM_Utils_JS::decode($filterAttr)));
+    }
+    foreach (array_keys($filters) as $key) {
+      if (!in_array($key, $allowedFilters, TRUE) && array_diff(explode(',', $key), $allowedFilters)) {
+        return FALSE;
+      }
+    }
+    return TRUE;
   }
 
   /**
