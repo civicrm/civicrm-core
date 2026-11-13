@@ -85,10 +85,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
    * @throws \CRM_Core_Exception
    */
   public function preProcess() {
-    $this->addExpectedSmartyVariables([
-      'parent_groups',
-      'editSmartGroupURL',
-    ]);
+    $this->addExpectedSmartyVariable('editSmartGroupURL');
     // current set id
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     if ($this->_id) {
@@ -234,7 +231,7 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     $this->add('select', 'visibility', ts('Visibility'), CRM_Core_SelectValues::groupVisibility(), TRUE);
 
     //CRM-14190
-    $parentGroups = self::buildParentGroups($this);
+    self::buildParentGroups($this);
     self::buildGroupOrganizations($this);
 
     // is_reserved property CRM-9936
@@ -250,7 +247,6 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
 
     $options = [
       'selfObj' => $this,
-      'parentGroups' => $parentGroups,
     ];
     $this->addFormRule(['CRM_Group_Form_Edit', 'formRule'], $options);
   }
@@ -358,58 +354,36 @@ WHERE  title = %1
    * Build parent groups form elements.
    *
    * @param CRM_Core_Form $form
-   *
-   * @return array
-   *   parent groups
    */
-  public static function buildParentGroups(&$form) {
+  public static function buildParentGroups($form) {
     $groupNames = CRM_Core_PseudoConstant::group(textFormat: 'plain');
-    $parentGroups = $parentGroupElements = [];
-    if (isset($form->_id) && !empty($form->_groupValues['parents'])) {
-      $parentGroupIds = explode(',', $form->_groupValues['parents']);
-      foreach ($parentGroupIds as $parentGroupId) {
-        $parentGroups[$parentGroupId] = $groupNames[$parentGroupId];
-        if (array_key_exists($parentGroupId, $groupNames)) {
-          $parentGroupElements[$parentGroupId] = $groupNames[$parentGroupId];
-        }
-      }
-    }
-    $form->assign('parent_groups', $parentGroupElements);
 
-    if (isset($form->_id)) {
-      $potentialParentGroupIds = CRM_Contact_BAO_GroupNestingCache::getPotentialCandidates($form->_id, $groupNames);
-      // put back current groups because they are selected by default
-      if (!empty($parentGroupIds)) {
-        $potentialParentGroupIds = array_merge($potentialParentGroupIds, $parentGroupIds);
+    if (!empty($form->_id)) {
+      $candidates = CRM_Contact_BAO_GroupNestingCache::getPotentialCandidates($form->_id, $groupNames);
+      if (!empty($form->_groupValues['parents'])) {
+        $candidates = array_merge($candidates, explode(',', $form->_groupValues['parents']));
       }
+      $parentGroupSelectValues = array_intersect_key($groupNames, array_flip($candidates));
     }
     else {
-      $potentialParentGroupIds = array_keys($groupNames);
+      $parentGroupSelectValues = $groupNames;
     }
 
-    $parentGroupSelectValues = [];
-    foreach ($potentialParentGroupIds as $potentialParentGroupId) {
-      if (array_key_exists($potentialParentGroupId, $groupNames)) {
-        $parentGroupSelectValues[$potentialParentGroupId] = $groupNames[$potentialParentGroupId];
-      }
-    }
-
-    if (count($parentGroupSelectValues) > 1) {
+    if ($parentGroupSelectValues) {
       if (CRM_Core_Permission::isMultisiteEnabled()) {
-        $required = !isset($form->_id) || ($form->_id && CRM_Core_BAO_Domain::isDomainGroup($form->_id)) ? FALSE : empty($parentGroups);
+        $required = !empty($form->_id) && !CRM_Core_BAO_Domain::isDomainGroup($form->_id) && empty($form->_groupValues['parents']);
       }
       else {
         $required = FALSE;
       }
       $multiple = Civi::settings()->get('group_multiple_parents');
-      $form->add('select', 'parents', ts('Parents'), $parentGroupSelectValues, $required, [
+      $label = $multiple ? ts('Parent Groups') : ts('Parent Group');
+      $form->add('select', 'parents', $label, $parentGroupSelectValues, $required, [
         'placeholder' => ts('- none -'),
         'class' => 'crm-select2',
         'multiple' => $multiple,
       ]);
     }
-
-    return $parentGroups;
   }
 
   /**
