@@ -9,7 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\Api4\CustomField;
+use Civi\Api4\CustomGroup;
 use Civi\Api4\OptionGroup;
 
 /**
@@ -27,12 +27,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function tearDown(): void {
-    // The parent tearDown will delete the linked option group (gender)
-    // if we don't do it more carefully here.
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_custom_field f
-      INNER JOIN civicrm_option_group g ON g.id = option_group_id
-      SET option_group_id = NULL WHERE g.name = "gender"');
-    CustomField::delete()
+    CustomGroup::delete()
       ->addWhere('id', '>', 0)
       ->execute();
     $this->quickCleanup([
