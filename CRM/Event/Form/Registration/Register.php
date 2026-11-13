@@ -244,7 +244,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     //         $this->_defaults['credit_card_exp_date'] = array( 'Y' => '2010', 'M' => '05' );
 
     // to process Custom data that are appended to URL
-    $getDefaults = CRM_Core_BAO_CustomGroup::extractGetParams($this, "'Contact', 'Individual', 'Contribution', 'Participant'");
+    $getDefaults = CRM_Core_BAO_CustomGroup::extractGetParams($this, ['Contact', 'Individual', 'Contribution', 'Participant']);
     if (!empty($getDefaults)) {
       $this->_defaults = array_merge($this->_defaults, $getDefaults);
     }
