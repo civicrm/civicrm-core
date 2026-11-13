@@ -2,6 +2,7 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Generic\Traits\ArrayQueryActionTrait;
 use CRM_Afform_ExtensionUtil as E;
 use Civi\Afform\Event\AfformSubmitEvent;
@@ -31,17 +32,17 @@ class Submit extends AbstractProcessor {
     // preprocess submitted values
     $this->_entityValues = $this->preprocessSubmittedValues($this->values);
 
-    // get the submission information if we have submission id.
-    // currently we don't support processing of already processed forms
-    // return validation error in those cases
+    // A stored submission is completed only by someone allowed to see it, and only once.
     if (!empty($this->args['sid'])) {
-      $afformSubmissionData = \Civi\Api4\AfformSubmission::get(FALSE)
+      $storedSubmission = AfformSubmission::get($this->getCheckPermissions())
         ->addWhere('id', '=', $this->args['sid'])
         ->addWhere('afform_name', '=', $this->name)
-        ->addWhere('status_id:name', '=', 'Processed')
-        ->execute()->count();
-
-      if ($afformSubmissionData > 0) {
+        ->addSelect('status_id:name')
+        ->execute()->first();
+      if (!$storedSubmission) {
+        throw new UnauthorizedException(E::ts('Submission %1 is not available to process.', [1 => $this->args['sid']]));
+      }
+      if ($storedSubmission['status_id:name'] === 'Processed') {
         throw new \CRM_Core_Exception(ts('Submission Processed'), 0, ['validation' => ts('Submission is already processed.')]);
       }
     }
