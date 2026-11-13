@@ -338,14 +338,18 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * Clear db cache.
    */
   public static function clearDBCache(): void {
+    // Use DELETE rather than TRUNCATE: TRUNCATE is DDL, so it force-commits and
+    // recreates the table. A concurrent transaction that reads one of these
+    // tables then fails with MySQL error 1412 ("Table definition has changed"),
+    // or the cache clear waits on its metadata lock and blocks other requests.
     $queries = [
-      'TRUNCATE TABLE civicrm_acl_cache',
-      'TRUNCATE TABLE civicrm_acl_contact_cache',
+      'DELETE FROM civicrm_acl_cache',
+      'DELETE FROM civicrm_acl_contact_cache',
       // Do not truncate, reduce risks of losing a quickform session
       'DELETE FROM civicrm_cache WHERE group_name NOT LIKE "CiviCRM%Session"',
-      'TRUNCATE TABLE civicrm_prevnext_cache',
+      'DELETE FROM civicrm_prevnext_cache',
       'UPDATE civicrm_group SET cache_date = NULL',
-      'TRUNCATE TABLE civicrm_group_contact_cache',
+      'DELETE FROM civicrm_group_contact_cache',
       'UPDATE civicrm_setting SET value = NULL WHERE name="navigation" AND contact_id IS NOT NULL',
     ];
 
