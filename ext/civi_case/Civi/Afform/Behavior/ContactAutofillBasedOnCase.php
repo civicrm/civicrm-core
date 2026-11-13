@@ -122,6 +122,14 @@ class ContactAutofillBasedOnCase {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   private static function getCaseRoleModes(string $contactType, array $modes): array {
+    // The case types and relationship types this builds from don't change within
+    // a request, but this can be called once per contact type for every Afform
+    // parsed in that request (e.g. while reconciling managed entities), so cache
+    // the result to avoid re-running the CaseType/RelationshipType queries each time.
+    $cacheKey = $contactType . ':' . md5(serialize($modes));
+    if (isset(\Civi::$statics[__CLASS__]['caseRoleModes'][$cacheKey])) {
+      return \Civi::$statics[__CLASS__]['caseRoleModes'][$cacheKey];
+    }
     $modes[] = [
       'name' => 'role_on_case:client',
       'label' => E::ts('Is client of case'),
@@ -185,6 +193,7 @@ class ContactAutofillBasedOnCase {
       'description' => E::ts('Contact has any role on the case'),
       'icon' => 'fa-folder-open',
     ];
+    \Civi::$statics[__CLASS__]['caseRoleModes'][$cacheKey] = $modes;
     return $modes;
   }
 
