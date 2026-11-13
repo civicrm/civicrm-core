@@ -58,7 +58,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     parent::setUp();
     $this->financialTypeID = $this->getFinancialTypeID('Donation');
     $this->createLoggedInUser();
-    $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'civiimport')->execute();
     $this->individualCreate([], 0);
     $this->_params = [
       'contact_id' => $this->ids['Contact'][0],

@@ -34,7 +34,7 @@ class CRM_Event_Import_Parser_ParticipantTest extends CiviUnitTestCase {
 
   protected function setUp(): void {
     parent::setUp();
-    $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'civiimport')->execute();
   }
 
   /**

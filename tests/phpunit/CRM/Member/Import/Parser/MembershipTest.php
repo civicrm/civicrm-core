@@ -79,7 +79,7 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
    */
   public function setUp(): void {
     parent::setUp();
-    $this->callAPISuccess('Extension', 'install', ['keys' => 'civiimport', 'version' => 3]);
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'civiimport')->execute();
     $this->relationshipTypeCreate([
       'contact_type_a' => 'Individual',
       'contact_type_b' => 'Organization',

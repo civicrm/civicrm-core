@@ -42,12 +42,12 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
   public function run() {
 
     $civiContribute = \Civi\Api4\Extension::get(FALSE)
+      ->selectRowCount()
       ->addWhere('status', '=', 'installed')
       ->addWhere('key', '=', 'civi_contribute')
-      ->execute()
-      ->first();
+      ->execute();
 
-    if (!$civiContribute) {
+    if (!$civiContribute->count()) {
       $extensionsAdminUrl = \Civi::url('backend://civicrm/admin/extensions?reset=1');
       \CRM_Core_Error::statusBounce(ts('You must enable CiviContribute before configuring Payment Processors'), $extensionsAdminUrl);
       return;

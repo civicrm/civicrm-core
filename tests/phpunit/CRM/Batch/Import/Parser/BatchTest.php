@@ -31,7 +31,7 @@ class CRM_Batch_Import_Parser_BatchTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'civiimport')->execute();
     Civi::dispatcher()->addListener('hook_civicrm_scanClasses', [$this, 'registerBatchSummaryReportDataSource']);
     // ClassScanner's interface index is cached across tests, so if an earlier
     // test already scanned for DataSourceInterface the listener just added
