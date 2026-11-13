@@ -92,16 +92,26 @@ class AfformSubmitEvent extends AfformBaseEvent {
   }
 
   /**
-   * Set the saved values
+   * Record that an entity instance has been saved, along with its ID and action taken.
    *
    * @param int $index
    *   Index of the record for which the saved values are set.
    * @param array $savedValues
    *   The saved values. (Probably the return values from the API4 Save action)
+   * @param string|null $action
+   *   Action taken ('create' or 'update'). Auto-detected from `$this->records` if omitted.
    * @return $this
    */
-  public function setSaved(int $index, array $savedValues) {
+  public function setSaved(int $index, array $savedValues, ?string $action = NULL): self {
     $this->saved[$index] = $savedValues;
+    $idField = $this->getIdFieldName();
+    if ($action !== NULL || !isset($this->entityActions[$this->entityName][$index]['action'])) {
+      $action ??= empty($this->records[$index]['fields'][$idField]) ? 'create' : 'update';
+      $this->setEntityAction($index, $action);
+    }
+    if (isset($savedValues[$idField])) {
+      $this->setEntityId($index, $savedValues[$idField]);
+    }
     return $this;
   }
 
