@@ -1,6 +1,9 @@
 <?php
 require_once 'CiviTest/CiviCaseTestCase.php';
 
+use Civi\Api4\Activity;
+use Civi\Api4\Relationship;
+
 /**
  * Class CRM_Case_PseudoConstantTest
  * @group headless
@@ -105,12 +108,12 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
       'name_b_a' => 'Instructor',
       'label_b_a' => 'Instructor',
     ]);
-    foreach ($relationships as $relationship) {
+    foreach ($relationships as $key => $relationship) {
       $this->createTestEntity('Relationship', [
         'contact_id_a' => $relationship['contact_id_a'],
         'contact_id_b' => $relationship['contact_id_b'],
         'relationship_type_id:name' => $relationship['name_a_b'],
-      ]);
+      ], $key);
     }
   }
 
@@ -236,12 +239,12 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     // Make another case and add a case role with the same relationship we
     // want, but a different person.
     $caseObj = $this->createCase($this->ids['Contact']['ana'], $this->getLoggedInUser());
-    $this->callAPISuccess('Relationship', 'create', [
+    $this->createTestEntity('Relationship', [
       'contact_id_a' => $this->ids['Contact']['ana'],
       'contact_id_b' => $this->ids['Contact']['carlos'],
       'relationship_type_id' => $this->ids['RelationshipType']['Pupil of'],
       'case_id' => $caseObj->id,
-    ]);
+    ], 'ana_pupil_of_carlos_on_case');
 
     $this->activityTypeXml->default_assignee_type = $this->defaultAssigneeOptionsValues['BY_RELATIONSHIP'];
     $this->activityTypeXml->default_assignee_relationship = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Relationship', 'relationship_type_id', 'Pupil of') . '_b_a';
@@ -250,26 +253,26 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     // We can't use assertActivityAssignedToContactExists because it assumes
     // there's only one activity in the database, but we have several from the
     // second case. We want the one we just created on the first case.
-    $result = $this->callAPISuccess('Activity', 'get', [
-      'case_id' => $this->activityParams['caseID'],
-      'return' => ['assignee_contact_id'],
-    ])['values'];
+    $result = Activity::get(FALSE)
+      ->addSelect('assignee_contact_id')
+      ->addWhere('case_id', '=', $this->activityParams['caseID'])
+      ->execute();
     $this->assertCount(1, $result);
     foreach ($result as $activity) {
       // Note the first parameter is turned into an array to match the second.
-      $this->assertEquals([$this->ids['Contact']['beto']], $activity['assignee_contact_id']);
+      $this->assertSame([$this->ids['Contact']['beto']], $activity['assignee_contact_id']);
     }
 
     // Now remove the non-case relationship.
-    $result = $this->callAPISuccess('Relationship', 'get', [
-      'case_id' => ['IS NULL' => 1],
-      'relationship_type_id' => $this->ids['RelationshipType']['Pupil of'],
-      'contact_id_a' => $this->ids['Contact']['ana'],
-      'contact_id_b' => $this->ids['Contact']['beto'],
-    ])['values'];
+    $result = Relationship::get(FALSE)
+      ->addWhere('case_id', 'IS NULL')
+      ->addWhere('relationship_type_id', '=', $this->ids['RelationshipType']['Pupil of'])
+      ->addWhere('contact_id_a', '=', $this->ids['Contact']['ana'])
+      ->addWhere('contact_id_b', '=', $this->ids['Contact']['beto'])
+      ->execute();
     $this->assertCount(1, $result);
-    foreach ($result as $activity) {
-      $this->callAPISuccess('Relationship', 'delete', ['id' => $activity['id']]);
+    foreach ($result as $relationship) {
+      Relationship::delete(FALSE)->addWhere('id', '=', $relationship['id'])->execute();
     }
 
     // Create another activity on the first case. Make it a different activity
@@ -280,11 +283,11 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->activityTypeXml->default_assignee_relationship = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Relationship', 'relationship_type_id', 'Pupil of') . '_b_a';
     $this->process->createActivity($activityXmlElement, $this->activityParams);
 
-    $result = $this->callAPISuccess('Activity', 'get', [
-      'case_id' => $this->activityParams['caseID'],
-      'activity_type_id' => 'Follow up',
-      'return' => ['assignee_contact_id'],
-    ])['values'];
+    $result = Activity::get(FALSE)
+      ->addSelect('assignee_contact_id')
+      ->addWhere('case_id', '=', $this->activityParams['caseID'])
+      ->addWhere('activity_type_id:name', '=', 'Follow up')
+      ->execute();
     $this->assertCount(1, $result);
     foreach ($result as $activity) {
       // It should be empty, not the contact from the second case.
@@ -405,14 +408,14 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    */
   protected function assertActivityAssignedToContactExists(?int $assigneeContactId) {
     $expectedContact = $assigneeContactId === NULL ? [] : [$assigneeContactId];
-    $result = $this->callAPISuccess('Activity', 'get', [
-      'target_contact_id' => $this->activityParams['clientID'],
-      'return' => ['assignee_contact_id'],
-    ]);
-    $activity = CRM_Utils_Array::first($result['values']);
+    $activity = Activity::get(FALSE)
+      ->addSelect('assignee_contact_id')
+      ->addWhere('target_contact_id', 'CONTAINS', $this->activityParams['clientID'])
+      ->addOrderBy('id')
+      ->execute()->first();
 
     $this->assertNotNull($activity, 'Target contact has no activities assigned to them');
-    $this->assertEquals($expectedContact, $activity['assignee_contact_id'], 'Activity is not assigned to expected contact');
+    $this->assertSame($expectedContact, $activity['assignee_contact_id'] ?? [], 'Activity is not assigned to expected contact');
   }
 
   /**
@@ -618,11 +621,11 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
 
     $this->process->createActivity($activityTypeXml, $this->activityParams);
 
-    $result = $this->callAPISuccess('Activity', 'get', [
-      'target_contact_id' => $this->activityParams['clientID'],
-      'return' => ['subject'],
-    ]);
-    $activity = CRM_Utils_Array::first($result['values']);
+    $activity = Activity::get(FALSE)
+      ->addSelect('subject')
+      ->addWhere('target_contact_id', 'CONTAINS', $this->activityParams['clientID'])
+      ->addOrderBy('id')
+      ->execute()->first();
 
     $this->assertNotNull($activity);
     $this->assertSame('My Default Subject', $activity['subject']);

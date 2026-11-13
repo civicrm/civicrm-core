@@ -137,13 +137,13 @@ class CRM_Case_Form_TaskTest extends CiviCaseTestCase {
   public function testOpenFileOnCaseForm($input) {
     // Create a case and an activity to use
     $client_id = $this->individualCreate([], 0, TRUE);
-    $case = $this->createCase($client_id, $this->getLoggedInUser());
+    $this->createCase($client_id, $this->getLoggedInUser());
     // create 2 cases since "move"/"copy" aren't available actions otherwise
     $case = $this->createCase($this->individualCreate([], 1, TRUE), $this->getLoggedInUser());
     $activity_params = [
-      'activity_type_id' => 'Inbound Email',
+      'activity_type_id:name' => 'Inbound Email',
       'source_contact_id' => $client_id,
-      'target_id' => $this->getLoggedInUser(),
+      'target_contact_id' => [$this->getLoggedInUser()],
       'subject' => $input['subject'] ?? NULL,
       'details' => 'test test test',
       'activity_date_time' => date('Ymdhis'),
@@ -153,7 +153,7 @@ class CRM_Case_Form_TaskTest extends CiviCaseTestCase {
       // activity.
       $activity_params['case_id'] = $case->id;
     }
-    $activity = $this->callAPISuccess('Activity', 'create', $activity_params);
+    $activity = $this->createTestEntity('Activity', $activity_params);
 
     $form = new CRM_Case_Form_ActivityToCase();
     $form->controller = new CRM_Core_Controller_Simple('CRM_Case_Form_ActivityToCase', 'Case Thing');

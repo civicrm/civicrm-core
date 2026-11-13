@@ -1,5 +1,8 @@
 <?php
 
+use Civi\Api4\Contact;
+use Civi\Api4\Email;
+
 /**
  * @group headless
  */
@@ -45,9 +48,13 @@ class CRM_Case_Form_EmailTest extends CiviCaseTestCase {
     $caseObj = $this->createCase($clientId, $this->getLoggedInUser());
 
     $anotherPersonId = $this->individualCreate([], 1);
-    $anotherPersonInfo = $this->callAPISuccess('Contact', 'getsingle', ['id' => $anotherPersonId]);
+    $anotherPersonInfo = Contact::get(FALSE)
+      ->addWhere('id', '=', $anotherPersonId)
+      ->execute()->single();
 
-    $senderEmail = $this->callAPISuccess('Email', 'getsingle', ['contact_id' => $this->getLoggedInUser()]);
+    $senderEmail = Email::get(FALSE)
+      ->addWhere('contact_id', '=', $this->getLoggedInUser())
+      ->execute()->single();
 
     $mut = new CiviMailUtils($this);
 
@@ -55,11 +62,13 @@ class CRM_Case_Form_EmailTest extends CiviCaseTestCase {
     // but the "to" field below is where we've changed the recipient.
     $_GET['cid'] = $_REQUEST['cid'] = $clientId;
     $_GET['caseid'] = $_REQUEST['caseid'] = $caseObj->id;
-    $_GET['atype'] = $_REQUEST['atype'] = 3;
+    $_GET['atype'] = $_REQUEST['atype'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email');
     $_GET['action'] = $_REQUEST['action'] = 'add';
 
     $form = $this->getFormObject('CRM_Case_Form_Task_Email', [
-      'to' => (string) $this->callAPISuccess('Email', 'getsingle', ['contact_id' => $anotherPersonId])['id'],
+      'to' => (string) Email::get(FALSE)
+        ->addWhere('contact_id', '=', $anotherPersonId)
+        ->execute()->single()['id'],
       'cc_id' => '',
       'bcc_id' => '',
       'subject' => 'abc',

@@ -40,32 +40,36 @@ class CRM_Case_Form_CaseViewTest extends CiviCaseTestCase {
     $mappedOptions = array_map(function($v) {
       return [$v['attr']['value'] => $v['text']];
     }, $options);
-    $this->assertEquals($expected, array_values($mappedOptions));
+    $this->assertSame($expected, array_values($mappedOptions));
 
     // Now add some activities where the type might not even be in the config.
-    $this->callAPISuccess('Activity', 'create', [
+    $this->createTestEntity('Activity', [
       'case_id' => $caseObj->id,
+      'source_contact_id' => $this->getLoggedInUser(),
       'subject' => 'aaaa',
-      'activity_type_id' => 'Inbound Email',
-    ]);
-    $this->callAPISuccess('Activity', 'create', [
+      'activity_type_id:name' => 'Inbound Email',
+    ], 'inbound_email');
+    $this->createTestEntity('Activity', [
       'case_id' => $caseObj->id,
+      'source_contact_id' => $this->getLoggedInUser(),
       'subject' => 'bbbb',
-      'activity_type_id' => 'Email',
-    ]);
-    $this->callAPISuccess('Activity', 'create', [
+      'activity_type_id:name' => 'Email',
+    ], 'email');
+    $this->createTestEntity('Activity', [
       'case_id' => $caseObj->id,
+      'source_contact_id' => $this->getLoggedInUser(),
       'subject' => 'cccc',
-      'activity_type_id' => 'Meeting',
-    ]);
+      'activity_type_id:name' => 'Meeting',
+    ], 'meeting');
 
     // And let's delete one since we still want it to be available as a filter
-    $this->callAPISuccess('Activity', 'create', [
+    $this->createTestEntity('Activity', [
       'case_id' => $caseObj->id,
+      'source_contact_id' => $this->getLoggedInUser(),
       'subject' => 'dddd',
-      'activity_type_id' => 'Phone Call',
-      'is_deleted' => 1,
-    ]);
+      'activity_type_id:name' => 'Phone Call',
+      'is_deleted' => TRUE,
+    ], 'phone_call');
 
     $form = $this->getFormObject('CRM_Case_Form_CaseView');
     $form->set('cid', $client_id);
@@ -76,7 +80,7 @@ class CRM_Case_Form_CaseViewTest extends CiviCaseTestCase {
     $mappedOptions = array_map(function($v) {
       return $v['text'];
     }, $options);
-    $this->assertEquals([
+    $this->assertSame([
       'Email',
       'Follow up',
       'Inbound Email',
