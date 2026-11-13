@@ -98,6 +98,33 @@ class SearchDisplay extends Generic\DAOEntity {
       ->setCheckPermissions($checkPermissions);
   }
 
+  /**
+   * @param bool $checkPermissions
+   * @return DAOSaveAction
+   */
+  public static function save($checkPermissions = TRUE) {
+    return (new Action\SearchDisplay\Save(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return DAOCreateAction
+   */
+  public static function create($checkPermissions = TRUE) {
+    return (new Action\SearchDisplay\Create(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return DAOUpdateAction
+   */
+  public static function update($checkPermissions = TRUE) {
+    return (new Action\SearchDisplay\Update(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
   public static function permissions() {
     $permissions = parent::permissions();
     $permissions['default'] = ['manage own search_kit'];

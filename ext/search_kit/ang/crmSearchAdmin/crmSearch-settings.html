@@ -31,3 +31,9 @@
     <span class="crm-form-toggle-text crm-form-toggle-text-on">{{:: ts('Enabled') }}</span>
   </div>
 </label>
+<div class="form-group" ng-if="$ctrl.locales && $ctrl.locales.length">
+  <label for="locale">
+    {{:: ts('Locale') }} <span class="crm-marker">*</span>
+  </label>
+  <input ng-list crm-ui-select="{multiple: false, data: $ctrl.locales}" class="form-control" id="locale" ng-model="$ctrl.savedSearch.form_values.locale">
+</div>

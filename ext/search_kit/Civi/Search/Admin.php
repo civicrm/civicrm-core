@@ -91,6 +91,7 @@ class Admin {
         \NumberFormatter::MAX_FRACTION_DIGITS => E::ts('Max Decimal Places'),
         \NumberFormatter::MIN_FRACTION_DIGITS => E::ts('Min Decimal Places'),
       ],
+      'locales' => \CRM_Core_I18n::getActiveLocalesOptions(),
     ];
     return $data;
   }
