@@ -354,10 +354,9 @@
         return ufFieldModel.getSignature();
       });
       this.each(function(ufFieldModel){
-        const length = ufFieldModelsByKey[ufFieldModel.getSignature()].length > 1;
-        // Allow multiple free html fields, but note this would only work on an English install, and only if the field label hasn't been changed.
-        const label = ufFieldModelsByKey[ufFieldModel.getSignature()][0].attributes.label !== 'Free HTML';
-        const is_duplicate = length && label;
+        // Multiple free html fields are allowed.
+        const is_duplicate = ufFieldModelsByKey[ufFieldModel.getSignature()].length > 1 &&
+          ufFieldModel.get('field_name').indexOf('formatting') !== 0;
         if (is_duplicate !== ufFieldModel.get('is_duplicate')) {
           ufFieldModel.set('is_duplicate', is_duplicate);
         }
