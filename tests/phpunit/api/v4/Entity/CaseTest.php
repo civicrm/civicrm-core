@@ -90,6 +90,27 @@ class CaseTest extends Api4TestBase {
     $this->assertEquals($uid, $result['case_manager_id']);
   }
 
+  public function testCaseManagerImplicitJoinContact(): void {
+    $uid = $this->createLoggedInUser();
+    $userContact = \Civi\Api4\Contact::get(FALSE)->addWhere('id', '=', $uid)->execute()->single();
+    $contactID = $this->createTestRecord('Contact')['id'];
+
+    $case = $this->createTestRecord('Case', [
+      'creator_id' => 'user_contact_id',
+      'contact_id' => $contactID,
+    ]);
+
+    $result = CiviCase::get(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('case_manager_id', 'case_manager_id.display_name')
+      ->execute()
+      ->single();
+
+    $this->assertEquals($uid, $result['case_manager_id']);
+    $this->assertArrayHasKey('case_manager_id.display_name', $result);
+    $this->assertEquals($userContact['display_name'], $result['case_manager_id.display_name']);
+  }
+
   public function testCaseManagerIdNullWhenCaseTypeHasNoManagerRole(): void {
     $uid = $this->createLoggedInUser();
     $contactID = $this->createTestRecord('Contact')['id'];
