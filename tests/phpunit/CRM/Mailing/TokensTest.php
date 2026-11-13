@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\MailSettings;
 use Civi\Token\TokenProcessor;
 
 /**
@@ -10,8 +11,7 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->useTransaction();
-    $this->callAPISuccess('mail_settings', 'get',
-      ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
+    MailSettings::update(FALSE)->addValue('domain', 'chaos.org')->addWhere('id', '>', 0)->execute();
   }
 
   public static function getExampleTokens(): array {
@@ -179,27 +179,27 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
    * Test Api4-style custom field tokens, option labels, and chained entity reference tokens for mailings.
    */
   public function testApi4CustomFieldTokens(): void {
-    $targetContact = $this->callAPISuccess('Contact', 'create', [
+    $targetContact = $this->createTestEntity('Contact', [
       'contact_type' => 'Individual',
       'first_name' => 'Jane',
       'last_name' => 'Author',
     ]);
 
-    $customGroup = $this->callAPISuccess('CustomGroup', 'create', [
+    $customGroup = $this->createTestEntity('CustomGroup', [
       'title' => 'Mailing Extra Info',
       'name' => 'mailing_extra_info',
       'extends' => 'Mailing',
     ]);
 
-    $this->callAPISuccess('CustomField', 'create', [
+    $this->createTestEntity('CustomField', [
       'custom_group_id' => $customGroup['id'],
       'label' => 'Special Note',
       'name' => 'special_note',
       'html_type' => 'Text',
       'data_type' => 'String',
-    ]);
+    ], 'special_note');
 
-    $this->callAPISuccess('CustomField', 'create', [
+    $this->createTestEntity('CustomField', [
       'custom_group_id' => $customGroup['id'],
       'label' => 'Priority Level',
       'name' => 'priority_level',
@@ -209,15 +209,15 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
         'high_prio' => 'High Priority',
         'low_prio' => 'Low Priority',
       ],
-    ]);
+    ], 'priority_level');
 
-    $this->callAPISuccess('CustomField', 'create', [
+    $this->createTestEntity('CustomField', [
       'custom_group_id' => $customGroup['id'],
       'label' => 'Assigned Author',
       'name' => 'assigned_author',
       'html_type' => 'Autocomplete-Select',
       'data_type' => 'ContactReference',
-    ]);
+    ], 'assigned_author');
 
     Civi::cache('metadata')->flush();
 

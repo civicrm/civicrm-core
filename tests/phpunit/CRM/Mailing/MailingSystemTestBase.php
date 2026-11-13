@@ -65,8 +65,7 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
       ])->execute();
     }
     $this->_mut = new CiviMailUtils($this, TRUE);
-    $this->callAPISuccess('mail_settings', 'get',
-      ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
+    MailSettings::update(FALSE)->addValue('domain', 'chaos.org')->addWhere('id', '>', 0)->execute();
     Civi::settings()->set('civimail_unsubscribe_methods', ['mailto', 'http', 'oneclick']);
   }
 
@@ -469,11 +468,11 @@ United States
         'first_name' => "Foo{$i}",
         'email' => 'mail' . $i . '@' . $domain,
       ]);
-      $this->callAPISuccess('group_contact', 'create', [
+      $this->createTestEntity('GroupContact', [
         'contact_id' => $contactID,
         'group_id' => $groupID,
         'status' => 'Added',
-      ]);
+      ], 'group_' . $groupID . '_contact_' . $i);
     }
   }
 
@@ -514,11 +513,11 @@ United States
 
   public function testModifyMailingRecipientsIgnoreOptOut(): void {
     $optOutContact = $this->individualCreate(['is_opt_out' => 1, 'email_primary.email' => 'testoptout@example.com'], 'opt_out_individual');
-    $this->callAPISuccess('GroupContact', 'create', [
+    $this->createTestEntity('GroupContact', [
       'contact_id' => $optOutContact,
       'group_id' => $this->_groupID,
       'status' => 'Added',
-    ]);
+    ], 'opt_out_contact');
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailingRecipients', [$this, 'hook_alterMailingReceipientsIgnoreOptOut']);
     $mailingParams = array_merge($this->defaultParams, [
