@@ -217,6 +217,95 @@ EOHTML;
     $this->assertSame('Stored', Contact::get(FALSE)->addWhere('id', '=', $contactID)->execute()->single()['first_name']);
   }
 
+  public function testSubmitFileDedupeActionCheck(): void {
+    $this->createTestRecord('CustomGroup', ['name' => 'MyUpload', 'title' => 'My Upload', 'extends' => 'Contact']);
+    $this->createTestRecord('CustomField', [
+      'custom_group_id.name' => 'MyUpload',
+      'name' => 'attachment',
+      'label' => 'Attachment',
+      'data_type' => 'File',
+      'html_type' => 'File',
+    ]);
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" data="{}" name="Individual1" actions="{create: true, update: false}" security="FBAC" contact-dedupe="Individual.Unsupervised" />
+  <fieldset af-fieldset="Individual1">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+    <af-field name="MyUpload.attachment" />
+    <div af-join="Email" data="{is_primary: true}"><af-field name="email" /></div>
+  </fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $existingEmail = uniqid('stored') . '@example.org';
+    $existingContactID = $this->createTestRecord('Individual', ['first_name' => 'Stored', 'last_name' => 'Contact', 'email_primary.email' => $existingEmail])['id'];
+
+    // Submit as an anonymous visitor, without the administer grant of the test case.
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    // 1. Matched contact with update: false -> no action taken, submitFile must reject.
+    $matchedSubmission = Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          ['fields' => ['first_name' => 'Stored', 'last_name' => 'Contact'], 'joins' => ['Email' => [['email' => $existingEmail]]]],
+        ],
+      ])
+      ->execute()->first();
+
+    /** @var \Civi\Crypto\CryptoJwt $jwt */
+    $jwt = \Civi::service('crypto.jwt');
+    $matchedPayload = json_decode(json_encode($jwt->decode($matchedSubmission['token'])), TRUE);
+    $this->assertArrayHasKey('actions', $matchedPayload['civiAfformSubmission']);
+    $this->assertArrayNotHasKey('Individual1', $matchedPayload['civiAfformSubmission']['actions']);
+
+    $this->mockUploadFile();
+    try {
+      Afform::submitFile()
+        ->setName($this->formName)
+        ->setToken($matchedSubmission['token'])
+        ->setModelName('Individual1')
+        ->setFieldName('MyUpload.attachment')
+        ->setEntityIndex(0)
+        ->execute();
+      $this->fail('Uploading to a matched contact with update: false should be rejected.');
+    }
+    catch (UnauthorizedException $e) {
+      $this->assertStringContainsString('not created or updated', $e->getMessage());
+    }
+    $this->assertNull(Contact::get(FALSE)->addSelect('MyUpload.attachment')->addWhere('id', '=', $existingContactID)->execute()->single()['MyUpload.attachment']);
+
+    // 2. Newly created contact with create: true, update: false -> action is 'create', submitFile succeeds.
+    $newEmail = uniqid('new') . '@example.org';
+    $createdSubmission = Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          ['fields' => ['first_name' => 'New', 'last_name' => 'Contact'], 'joins' => ['Email' => [['email' => $newEmail]]]],
+        ],
+      ])
+      ->execute()->first();
+
+    $createdPayload = json_decode(json_encode($jwt->decode($createdSubmission['token'])), TRUE);
+    $this->assertSame('create', $createdPayload['civiAfformSubmission']['actions']['Individual1'][0]['action']);
+
+    $this->mockUploadFile();
+    $fileResult = Afform::submitFile()
+      ->setName($this->formName)
+      ->setToken($createdSubmission['token'])
+      ->setModelName('Individual1')
+      ->setFieldName('MyUpload.attachment')
+      ->setEntityIndex(0)
+      ->execute()->first();
+    $newContactID = $createdSubmission['Individual1'][0]['id'];
+    $this->assertSame($fileResult['id'], Contact::get(FALSE)->addSelect('MyUpload.attachment')->addWhere('id', '=', $newContactID)->execute()->single()['MyUpload.attachment']);
+  }
+
   /**
    * Mock a file being uploaded
    */

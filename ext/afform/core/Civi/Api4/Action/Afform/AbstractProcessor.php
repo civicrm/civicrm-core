@@ -76,6 +76,13 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected $_entityIds = [];
 
   /**
+   * Action taken ('create' or 'update') for each saved entity and join.
+   *
+   * @var array
+   */
+  protected $_entityActions = [];
+
+  /**
    * Values of each entity that is submitted on the form.
    * Eg. $entityValues['Contribution1'][0]['fields']['field1' => 1, 'field2' => 2]
    *
@@ -909,7 +916,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
       $records = $this->replaceRelativeDates($entityType, $records);
       $this->fillIdFields($records, $entityName);
-      $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
+      $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds, $this->_entityActions);
       try {
         \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
       }

@@ -38,6 +38,13 @@ class AfformSubmitEvent extends AfformBaseEvent {
   public $dedupeMatches = [];
 
   /**
+   * Action taken ('create' or 'update') for each saved entity and join.
+   *
+   * @var array
+   */
+  private $entityActions;
+
+  /**
    * AfformSubmitEvent constructor.
    *
    * @param array $afform
@@ -47,13 +54,15 @@ class AfformSubmitEvent extends AfformBaseEvent {
    * @param string|null $entityType
    * @param string $entityName
    * @param array $entityIds
+   * @param array $entityActions
    */
-  public function __construct(array $afform, FormDataModel $formDataModel, AbstractProcessor $apiRequest, &$records, ?string $entityType, string $entityName, array &$entityIds) {
+  public function __construct(array $afform, FormDataModel $formDataModel, AbstractProcessor $apiRequest, &$records, ?string $entityType, string $entityName, array &$entityIds, array &$entityActions = []) {
     parent::__construct($afform, $formDataModel, $apiRequest);
     $this->records =& $records;
     $this->entityType = $entityType;
     $this->entityName = $entityName;
     $this->entityIds =& $entityIds;
+    $this->entityActions =& $entityActions;
   }
 
   /**
@@ -93,6 +102,31 @@ class AfformSubmitEvent extends AfformBaseEvent {
    */
   public function setSaved(int $index, array $savedValues) {
     $this->saved[$index] = $savedValues;
+    return $this;
+  }
+
+  /**
+   * Record the action taken ('create' or 'update') on an entity instance.
+   *
+   * @param int $index
+   * @param string $action
+   * @return $this
+   */
+  public function setEntityAction(int $index, string $action): self {
+    $this->entityActions[$this->entityName][$index]['action'] = $action;
+    return $this;
+  }
+
+  /**
+   * Record the action taken ('create' or 'update') on join entity instances.
+   *
+   * @param int $index
+   * @param string $joinEntity
+   * @param array $joinActions
+   * @return $this
+   */
+  public function setJoinActions(int $index, string $joinEntity, array $joinActions): self {
+    $this->entityActions[$this->entityName][$index]['joins'][$joinEntity] = $joinActions;
     return $this;
   }
 
