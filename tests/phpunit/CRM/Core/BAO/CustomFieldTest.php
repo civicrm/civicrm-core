@@ -112,6 +112,32 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     }
   }
 
+  public function testGetKeyID(): void {
+    $cases = [
+      ['custom_123', 123, ['123', NULL]],
+      ['custom_123_45', 123, ['123', '45']],
+      ['custom_123_-1', 123, ['123', '-1']],
+      ['custom_123_0', 123, ['123', '0']],
+      ['custom_123-456', NULL, [NULL, NULL]],
+      ['custom_123__1', NULL, [NULL, NULL]],
+      ['custom_123_from', NULL, [NULL, NULL]],
+      ['custom_123_id', NULL, [NULL, NULL]],
+      ['custom_123_1_2', NULL, [NULL, NULL]],
+      ['custom_123_', NULL, [NULL, NULL]],
+      ['custom_0', NULL, [NULL, NULL]],
+      ['custom_-1', NULL, [NULL, NULL]],
+      ['custom_0123', NULL, [NULL, NULL]],
+      ['custom_123_04', NULL, [NULL, NULL]],
+      ['first_name', NULL, [NULL, NULL]],
+      ['my_custom_123', NULL, [NULL, NULL]],
+      ['', NULL, [NULL, NULL]],
+    ];
+    foreach ($cases as [$key, $expectedId, $expectedAll]) {
+      $this->assertSame($expectedId, CRM_Core_BAO_CustomField::getKeyID($key), "Testing getKeyID('{$key}')");
+      $this->assertSame($expectedAll, CRM_Core_BAO_CustomField::getKeyID($key, TRUE), "Testing getKeyID('{$key}', TRUE)");
+    }
+  }
+
   /**
    * Test custom field create accepts passed column name.
    */

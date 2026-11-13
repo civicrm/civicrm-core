@@ -2180,11 +2180,13 @@ SELECT count(*)
       // The custom_xx contains the display name of the contact, instead of the contact id.
       // The contact id is then available in custom_xx_id.
       foreach ($membershipValues as $field => $value) {
-        if (stripos($field, 'custom_') === 0) {
+        if (str_starts_with($field, 'custom_')) {
           unset($membershipValues[$field]);
           // If it is an entity reference custom field ignore the label value in favour of the id value.
-          if (!array_key_exists($field . '_id', $membershipValues) && !array_key_exists(CRM_Core_BAO_CustomField::getLongNameFromShortName($field), $membershipValues)) {
-            $membershipValues[CRM_Core_BAO_CustomField::getLongNameFromShortName($field)] = $value;
+          $shortName = str_ends_with($field, '_id') ? substr($field, 0, -3) : $field;
+          $longName = CRM_Core_BAO_CustomField::getLongNameFromShortName($shortName);
+          if ($longName && !array_key_exists($field . '_id', $membershipValues) && !array_key_exists($longName, $membershipValues)) {
+            $membershipValues[$longName] = $value;
           }
         }
       }
