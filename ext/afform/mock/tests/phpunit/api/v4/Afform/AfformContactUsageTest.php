@@ -15,6 +15,19 @@ use Civi\Api4\Phone;
  */
 class AfformContactUsageTest extends AfformUsageTestCase {
 
+  /**
+   * @var string|null
+   */
+  private $otherFormName;
+
+  public function tearDown(): void {
+    if ($this->otherFormName) {
+      Afform::revert(FALSE)->addWhere('name', '=', $this->otherFormName)->execute();
+      $this->otherFormName = NULL;
+    }
+    parent::tearDown();
+  }
+
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
     self::$layouts['aboutMe'] = <<<EOHTML
@@ -892,6 +905,49 @@ EOHTML;
     // This first submit we did not specify a parent form, so got a generic individual
     $contact = $this->getTestRecord('Individual', ['first_name' => 'John', 'last_name' => $lastName]);
     $this->assertEquals([$contactType], $contact['contact_sub_type']);
+  }
+
+  /**
+   * Only a quick-add form takes preset values from the form named as its parent
+   */
+  public function testParentFormValuesOnlyApplyToQuickAddForms(): void {
+    $this->otherFormName = uniqid('otherForm');
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" data="{source: '%s', job_title: '%s'}" name="Individual1" actions="{create: true, update: false}" security="FBAC" />
+  <fieldset af-fieldset="Individual1">
+      <af-field name="first_name" />
+      <af-field name="last_name" />
+  </fieldset>
+</af-form>
+EOHTML;
+    Afform::create(FALSE)
+      ->setLayoutFormat('html')
+      ->setValues([
+        'name' => $this->otherFormName,
+        'title' => 'Other form',
+        'layout' => sprintf($layout, 'Other form', 'Set by other form'),
+        'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      ])
+      ->execute();
+    $this->useValues([
+      'layout' => sprintf($layout, 'This form', 'Set by this form'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid(__FUNCTION__);
+
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => [['fields' => ['first_name' => 'Jane', 'last_name' => $lastName]]]])
+      ->setArgs([
+        'parentFormName' => "afform:$this->otherFormName",
+        'parentFormFieldName' => 'Individual1:first_name',
+      ])
+      ->execute();
+
+    $contact = $this->getTestRecord('Individual', ['last_name' => $lastName]);
+    $this->assertSame('This form', $contact['source']);
+    $this->assertSame('Set by this form', $contact['job_title']);
   }
 
   public function testMultipleLocationJoins(): void {
