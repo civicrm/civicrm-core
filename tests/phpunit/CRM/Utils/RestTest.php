@@ -123,6 +123,46 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
   }
 
   /**
+   * A PHP error in an api call is returned as an api error, not a fatal page.
+   */
+  public function testProcessPhpError(): void {
+    $_SERVER['REQUEST_METHOD'] = 'POST';
+    $this->hookClass->setHook('civicrm_alterAPIPermissions', fn() => throw new TypeError('Ruh-roh'));
+    $args = ['civicrm', 'Contact', 'get'];
+    $output = CRM_Utils_REST::process($args, ['version' => 3, 'check_permissions' => 1]);
+    $this->assertEquals(1, $output['is_error']);
+    $this->assertStringContainsString('Error ID:', $output['error_message']);
+    $this->assertStringNotContainsString('Ruh-roh', $output['error_message']);
+  }
+
+  /**
+   * A PHP error in an api call made through CRM.api3() gets a json error response.
+   */
+  public function testAjaxJsonPhpError(): void {
+    $this->hookClass->setHook('civicrm_alterAPIPermissions', fn() => throw new TypeError('Ruh-roh'));
+    $originalGet = $_GET;
+    $originalServer = $_SERVER;
+    $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_GET = ['entity' => 'Contact', 'action' => 'get', 'json' => json_encode(['sequential' => 1])];
+    ob_start();
+    try {
+      CRM_Utils_REST::ajaxJson();
+      $this->fail('ajaxJson() should have called civiExit()');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $output = json_decode(ob_get_contents(), TRUE);
+    }
+    finally {
+      ob_end_clean();
+      $_GET = $originalGet;
+      $_SERVER = $originalServer;
+    }
+    $this->assertEquals(1, $output['is_error']);
+    $this->assertStringContainsString('Error ID:', $output['error_message']);
+  }
+
+  /**
    */
   public function alterAPIPermissions($entity, $action, &$params, &$permissions) {
     if ($entity === 'job_log' && $action === 'get') {
