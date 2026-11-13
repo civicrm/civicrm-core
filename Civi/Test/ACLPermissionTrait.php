@@ -26,10 +26,14 @@ trait ACLPermissionTrait {
   protected $allowedContactId = 0;
 
   /**
-   * Array of allowed contactIds
-   * @var array
+   * Contact IDs allowed by aclWhereMultipleContacts().
+   *
+   * Either a list of IDs allowed for all operations, or lists keyed by
+   * operation (CRM_Core_Permission::VIEW, CRM_Core_Permission::EDIT).
+   *
+   * @var int[]|int[][]
    */
-  protected $allowedContacts = [];
+  protected array $allowedContacts = [];
 
   /**
    * Ids created for the scenario in use.
@@ -121,18 +125,23 @@ trait ACLPermissionTrait {
   }
 
   /**
-   * Only specified contact returned.
+   * Only the contacts in $this->allowedContacts returned.
    *
    * @implements CRM_Utils_Hook::aclWhereClause
    *
-   * @param $type
-   * @param $tables
-   * @param $whereTables
-   * @param $contactID
-   * @param $where
+   * @param string $type
+   * @param array $tables
+   * @param array $whereTables
+   * @param int|null $contactID
+   * @param string|null $where
+   *
+   * @noinspection PhpUnusedParameterInspection
    */
-  public function aclWhereMultipleContacts($type, &$tables, &$whereTables, &$contactID, &$where) {
-    $where = " contact_a.id IN (" . implode(', ', $this->allowedContacts) . ")";
+  public function aclWhereMultipleContacts(string $type, array &$tables, array &$whereTables, ?int &$contactID, ?string &$where): void {
+    $allowed = array_is_list($this->allowedContacts) ? $this->allowedContacts : ($this->allowedContacts[$type] ?? []);
+    if ($allowed) {
+      $where = ' contact_a.id IN (' . implode(', ', array_map('intval', $allowed)) . ')';
+    }
   }
 
   /**
@@ -228,9 +237,10 @@ trait ACLPermissionTrait {
   /**
    * Set the permissions to the supplied array.
    *
-   * @param array $permissions
+   * @param array|null $permissions
+   *   NULL grants all permissions.
    */
-  protected function setPermissions(array $permissions): void {
+  protected function setPermissions(?array $permissions): void {
     \CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
     $this->flushFinancialTypeStatics();
     $this->cleanupCachedPermissions();
@@ -239,7 +249,7 @@ trait ACLPermissionTrait {
   /**
    * Reset after ACLs.
    */
-  protected function cleanUpAfterACLs() {
+  protected function cleanUpAfterACLs(): void {
     \CRM_Utils_Hook::singleton()->reset();
     $this->quickCleanup([
       'civicrm_acl',
