@@ -30,4 +30,16 @@ class CRM_OAuth_Upgrader extends CRM_Extension_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   * Add support for PKCE method
+   *
+   * @return bool
+   * @throws Exception
+   */
+  public function upgrade_6220(): bool {
+    $this->ctx->log->info('Applying oauth-client update 6000. Adding pkce_method column to the civicrm_oauth_client table.');
+    $this->addTask('Add PKCE Method to civicrm_oauth_client', 'addColumn', 'civicrm_oauth_client', 'pkce_method', 'varchar(16) NULL DEFAULT "auto" COMMENT "PKCE Method" AFTER tenant');
+    return TRUE;
+  }
+
 }

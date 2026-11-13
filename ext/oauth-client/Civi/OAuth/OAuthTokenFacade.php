@@ -39,6 +39,13 @@ class OAuthTokenFacade {
     $scopeSeparator = $this->callProtected($provider, 'getScopeSeparator');
 
     $sendOptions = $options['cred'] ?? [];
+
+    // We can choose two ways to pass the `$options['cred']['code_verifier']` -- either
+    // invoke `$provider->setPkceCode(...)` or pass-through `$sendOptions['code_verifier']`.
+    // They're exactly the same. Some scenarios already work with the latter (eg ext/paypal).
+    // RFC 7636 doesn't foreshadow any further processing on `code_verifier` (_no value-add for setPkecCode_).
+    // So let's keep it simple.
+
     if (isset($options['scope']) && $options['scope'] !== NULL) {
       switch ($options['grant_type']) {
         case 'authorization_code':
