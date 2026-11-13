@@ -30,6 +30,7 @@ class CRM_Upgrade_Incremental_php_SixTwentyTwo extends CRM_Upgrade_Incremental_B
   public function upgrade_6_22_alpha1($rev): void {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Set "group_multiple_parents" setting if used', 'setMultipleGroupParents');
+    $this->addTask(ts('Create index %1', [1 => 'civicrm_mailing_recipients.index_mailing_id_contact_id']), 'addIndex', 'civicrm_mailing_recipients', [['mailing_id', 'contact_id']], 'index');
   }
 
   /**
