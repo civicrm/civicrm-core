@@ -32,6 +32,7 @@ class Process extends AbstractProcessor {
     $afformSubmissionData = AfformSubmission::get(FALSE)
       ->addSelect('data')
       ->addWhere('id', '=', $this->submissionId)
+      ->addWhere('afform_name', '=', $this->name)
       ->addWhere('status_id:name', '=', 'Pending')
       ->execute()->first();
 
