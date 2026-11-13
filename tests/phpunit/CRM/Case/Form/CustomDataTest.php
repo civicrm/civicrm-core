@@ -1,6 +1,9 @@
 <?php
 require_once 'CiviTest/CiviCaseTestCase.php';
 
+use Civi\Api4\Activity;
+use Civi\Api4\CiviCase;
+
 /**
  * Class CRM_Case_Form_CustomDataTest
  * @group headless
@@ -39,20 +42,20 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
    */
   public function testChangeCustomDataFormattedDetails(array $input, array $expected) {
     // set up custom field, with any overrides from input params
-    $custom_field = $this->callAPISuccess('custom_field', 'create', array_merge([
+    $custom_field = $this->createTestEntity('CustomField', array_merge([
       'custom_group_id' => $this->custom_group['id'],
       'label' => 'What?',
       'data_type' => 'String',
       'html_type' => 'Text',
-      'is_active' => 1,
+      'is_active' => TRUE,
     ], $input['custom_field_params']));
-    $custom_field = $custom_field['values'][$custom_field['id']];
 
     // set up case and set the custom field initial value
     $client_id = $this->individualCreate([], 0, TRUE);
     $caseObj = $this->createCase($client_id, $this->getLoggedInUser());
     if (isset($input['custom_field_oldvalue'])) {
-      $this->callAPISuccess('CustomValue', 'create', [
+      // APIv3 stores an empty Money value as 0.00, which data set 5 expects.
+      $this->callApiV3Success('CustomValue', 'create', [
         "custom_{$custom_field['id']}" => $input['custom_field_oldvalue'],
         'entity_id' => $caseObj->id,
       ]);
@@ -86,7 +89,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
 
     // compute and compare
     $output = $form->formatCustomDataChangesForDetail($formValues);
-    $this->assertEquals($expected['string'], $output);
+    $this->assertSame($expected['string'], $output);
   }
 
   /**
@@ -122,15 +125,15 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
               [
                 'name' => 'Red',
                 'label' => 'Red',
-                'value' => '1',
-                'is_active' => 1,
+                'id' => '1',
+                'is_active' => TRUE,
                 'weight' => 1,
               ],
               [
                 'name' => 'Green',
                 'label' => 'Green',
-                'value' => '2',
-                'is_active' => 1,
+                'id' => '2',
+                'is_active' => TRUE,
                 'weight' => 2,
               ],
             ],
@@ -151,15 +154,15 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
               [
                 'name' => 'Red',
                 'label' => 'Red',
-                'value' => '1',
-                'is_active' => 1,
+                'id' => '1',
+                'is_active' => TRUE,
                 'weight' => 1,
               ],
               [
                 'name' => 'Green',
                 'label' => 'Green',
-                'value' => '2',
-                'is_active' => 1,
+                'id' => '2',
+                'is_active' => TRUE,
                 'weight' => 2,
               ],
             ],
@@ -180,15 +183,15 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
               [
                 'name' => 'Red',
                 'label' => 'Red',
-                'value' => '1',
-                'is_active' => 1,
+                'id' => '1',
+                'is_active' => TRUE,
                 'weight' => 1,
               ],
               [
                 'name' => 'Green',
                 'label' => 'Green',
-                'value' => '2',
-                'is_active' => 1,
+                'id' => '2',
+                'is_active' => TRUE,
                 'weight' => 2,
               ],
             ],
@@ -209,15 +212,15 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
               [
                 'name' => 'Red',
                 'label' => 'Red',
-                'value' => '1',
-                'is_active' => 1,
+                'id' => '1',
+                'is_active' => TRUE,
                 'weight' => 1,
               ],
               [
                 'name' => 'Green',
                 'label' => 'Green',
-                'value' => '2',
-                'is_active' => 1,
+                'id' => '2',
+                'is_active' => TRUE,
                 'weight' => 2,
               ],
             ],
@@ -345,23 +348,22 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
    */
   public function testCustomDataNoChangeNoActivity(): void {
     // Create a custom group and field
-    $customField = $this->callAPISuccess('custom_field', 'create', [
+    $customField = $this->createTestEntity('CustomField', [
       'custom_group_id' => $this->custom_group['id'],
       'label' => 'What?',
       'data_type' => 'String',
       'html_type' => 'Text',
-      'is_active' => 1,
+      'is_active' => TRUE,
     ]);
-    $customField = $customField['values'][$customField['id']];
 
     // Create a case and set the custom field to something
     $individual = $this->individualCreate();
     $caseObj = $this->createCase($individual, $this->getLoggedInUser());
     $caseId = $caseObj->id;
-    $this->callAPISuccess('CustomValue', 'create', [
-      "custom_{$customField['id']}" => 'immutable text',
-      'entity_id' => $caseId,
-    ]);
+    CiviCase::update(FALSE)
+      ->addWhere('id', '=', $caseId)
+      ->addValue("{$this->custom_group['name']}.{$customField['name']}", 'immutable text')
+      ->execute();
 
     // Run the form.
     $_REQUEST = [
@@ -369,7 +371,7 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
       'groupID' => $this->custom_group['id'],
       'entityID' => $caseId,
       // Sub-type is the case type.
-      'subType' => 1,
+      'subType' => $this->caseTypeId,
     ];
     $form = new CRM_Case_Form_CustomData();
     $form->controller = new CRM_Core_Controller_Simple('CRM_Case_Form_CustomData', 'Case Data');
@@ -397,11 +399,12 @@ class CRM_Case_Form_CustomDataTest extends CiviCaseTestCase {
     $this->assertTrue($hadException);
 
     // there shouldn't be an activity of type Change Custom Data on the case
-    $result = $this->callAPISuccess('Activity', 'get', [
-      'activity_type_id' => 'Change Custom Data',
-      'case_id' => $caseId,
-    ]);
-    $this->assertSame(0, $result['count']);
+    $result = Activity::get(FALSE)
+      ->selectRowCount()
+      ->addWhere('activity_type_id:name', '=', 'Change Custom Data')
+      ->addWhere('case_id', '=', $caseId)
+      ->execute();
+    $this->assertSame(0, $result->count());
   }
 
 }
