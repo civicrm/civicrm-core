@@ -8,8 +8,14 @@ class SettingsManagerTest extends \CiviUnitTestCase {
   protected $mandates;
   protected $origSetting;
 
+  /**
+   * @var string|false
+   */
+  protected $origExtRepoUrlEnv;
+
   protected function setUp(): void {
     $this->origSetting = $GLOBALS['civicrm_setting'];
+    $this->origExtRepoUrlEnv = getenv('CIVICRM_SETTING_EXT_REPO_URL');
 
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -40,6 +46,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
 
   public function tearDown(): void {
     $GLOBALS['civicrm_setting'] = $this->origSetting;
+    putenv($this->origExtRepoUrlEnv === FALSE ? 'CIVICRM_SETTING_EXT_REPO_URL' : "CIVICRM_SETTING_EXT_REPO_URL={$this->origExtRepoUrlEnv}");
     parent::tearDown();
   }
 
@@ -154,6 +161,33 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     $dSettings->set('test_setting', ['hello' => 'World']);
     $test_setting = $dSettings->get('test_setting');
     $this->assertEquals(['hello' => 'World'], $test_setting);
+  }
+
+  public function testExtRepoUrlFromEnv(): void {
+    unset($GLOBALS['civicrm_setting']['domain']['ext_repo_url']);
+    putenv('CIVICRM_SETTING_EXT_REPO_URL');
+    $domain = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
+    $this->assertNotEquals('https://example.org/feed', $this->createManager()->bootComplete()->getBagByDomain($domain->id)->get('ext_repo_url'));
+
+    putenv('CIVICRM_SETTING_EXT_REPO_URL=https://example.org/feed');
+    $this->assertEquals('https://example.org/feed', $this->createManager()->bootComplete()->getBagByDomain($domain->id)->get('ext_repo_url'));
+  }
+
+  public function testSetConstantNamesEnvironmentVariable(): void {
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('ext_repo_url is a system constant. It can only be set in civicrm.settings.php or with the environment variable CIVICRM_SETTING_EXT_REPO_URL.');
+    \Civi::settings()->set('ext_repo_url', 'x');
+  }
+
+  /**
+   * A constant without an environment variable, as an extension may declare it.
+   */
+  public function testSetConstantWithoutEnvironmentVariable(): void {
+    $bag = new SettingsBag(1, NULL);
+    $bag->updateConstant('editor_id', 'x');
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('editor_id is a system constant. It can only be set in civicrm.settings.php.');
+    $bag->set('editor_id', 'y');
   }
 
 }

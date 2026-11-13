@@ -62,7 +62,7 @@ class SettingsMetadata {
    *   - pseudoconstant
    *   - global_name (name for php constant / environment variable corresponding to this setting)
    *   - is_env_loadable (whether this setting should be read from corresponding environment variable)
-   *   - is_constant (whether a PHP constant should be defined for this setting)
+   *   - is_constant (whether the value is fixed at boot; a boot setting is also defined as the PHP constant global_name)
    */
   public static function getMetadata($filters = [], $domainID = NULL, $loadOptions = FALSE, $bootOnly = FALSE, $resolveCallbacks = FALSE) {
     $settingsMetadata = $bootOnly ? self::getBootMetadata() : self::getFullMetadata($domainID);
