@@ -593,11 +593,7 @@ class Submit extends AbstractProcessor {
         continue;
       }
       try {
-        $idField = CoreUtil::getIdFieldName($event->getEntityType());
-        $actionTaken = empty($record['fields'][$idField]) ? 'create' : 'update';
         $saved = $api4($event->getEntityType(), 'save', ['records' => [$record['fields']]])->first();
-        $event->setEntityId($index, $saved[$idField]);
-        $event->setEntityAction($index, $actionTaken);
         $event->setSaved($index, $saved);
         self::saveJoins($event, $index, $event->getEntityId($index), $record['joins'] ?? []);
       }
