@@ -128,6 +128,71 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
   }
 
   /**
+   * dev/core#6202: wrapping a long line of HTML must not break inside a
+   * quoted attribute value, or email clients drop the whole style.
+   */
+  public function testWrapLongLinesKeepsQuotedAttributeValuesWhole(): void {
+    $style = 'style="font-family: \'Open Sans\', Arial, sans-serif; padding: 10px 20px; border: 1px solid #cccccc;"';
+    $html = '<table><tr>' . str_repeat('<td ' . $style . '>Some text in a cell</td>', 60) . '</tr></table>';
+    // Plain wordwrap() cuts some of these values.
+    $this->assertLessThan(60, substr_count(wordwrap($html, 750), $style));
+
+    $wrapped = CRM_Utils_Mail::wrapLongLines($html, TRUE);
+    $this->assertSame(60, substr_count($wrapped, $style));
+    $this->assertSame($html, str_replace("\n", ' ', $wrapped));
+    $this->assertLessThanOrEqual(750, max(array_map('strlen', explode("\n", $wrapped))));
+  }
+
+  /**
+   * dev/core#6202: strings in a <style> block are kept whole too.
+   */
+  public function testWrapLongLinesKeepsStyleBlockStringsWhole(): void {
+    $html = '<style type="text/css">' . str_repeat('p.note { font-family: \'Open Sans\', "Helvetica Neue", Arial; } ', 30) . '</style><p>Hi</p>';
+    $wrapped = CRM_Utils_Mail::wrapLongLines($html, TRUE);
+    $this->assertSame(30, substr_count($wrapped, "'Open Sans'"));
+    $this->assertSame(30, substr_count($wrapped, '"Helvetica Neue"'));
+    $this->assertSame($html, str_replace("\n", ' ', $wrapped));
+  }
+
+  /**
+   * A line whose only spaces are inside quotes is still kept within the
+   * SMTP line limit.
+   */
+  public function testWrapLongLinesStaysWithinSmtpLimit(): void {
+    $html = '<p style="' . str_repeat('color: red; ', 150) . '">Text</p>';
+    $wrapped = CRM_Utils_Mail::wrapLongLines($html, TRUE);
+    $this->assertLessThanOrEqual(998, max(array_map('strlen', explode("\n", $wrapped))));
+  }
+
+  /**
+   * Plain text is wrapped exactly as before.
+   */
+  public function testWrapLongLinesText(): void {
+    $text = str_repeat('Some "quoted words" in a long line of text. ', 60);
+    $this->assertSame(wordwrap($text, 750), CRM_Utils_Mail::wrapLongLines($text));
+  }
+
+  /**
+   * dev/core#6202: a sent email keeps its long styled HTML intact.
+   */
+  public function testSendKeepsLongHtmlStylesWhole(): void {
+    $mut = new CiviMailUtils($this, TRUE);
+    $style = 'style="font-family: \'Open Sans\', Arial, sans-serif; padding: 10px 20px;"';
+    $params = [
+      'toEmail' => 'a@example.com',
+      'from' => 'b@example.com',
+      'subject' => 'Long line',
+      'html' => '<table><tr>' . str_repeat('<td ' . $style . '>Some text in a cell</td>', 60) . '</tr></table>',
+      'text' => 'Long line',
+    ];
+    CRM_Utils_Mail::send($params);
+    $raw = $mut->getMostRecentEmail('raw');
+    $this->assertSame(60, substr_count($raw, $style));
+    $this->assertLessThanOrEqual(998, max(array_map(fn($line) => strlen(rtrim($line, "\r")), explode("\n", $raw))));
+    $mut->stop();
+  }
+
+  /**
    * CRM-1367: every mailer built by CRM_Utils_Mail::_createMailer() should
    * backfill a Date header on any message that doesn't already have one,
    * rather than relying on a vendor patch to pear/mail.
