@@ -369,26 +369,40 @@ WHERE  id IN ( $groupIDs )
     $groupID = (int) $group->id;
     if ($force) {
       CRM_Core_Error::deprecatedWarning('use invalidate group contact cache first.');
-      self::invalidateGroupContactCache($group->id);
+      self::invalidateGroupContactCache($groupID);
     }
 
-    $lockedGroups = self::getLocksForRefreshableGroupsTo([$groupID]);
-    foreach ($lockedGroups as $groupID) {
+    $refreshed = self::loadGroupContactCache([$groupID]);
+    return in_array($groupID, $refreshed);
+  }
+
+  /**
+   * Load the smart group cache for multiple groups.
+   *
+   * @param int[] $groupIDs
+   *
+   * @return int[]
+   *   IDs of groups that were successfully refreshed.
+   * @throws \CRM_Core_Exception
+   */
+  public static function loadGroupContactCache(array $groupIDs): array {
+    $lockedGroups = self::getLocksForRefreshableGroupsTo($groupIDs);
+    if (!empty($lockedGroups)) {
       $startTime = microtime(TRUE);
       $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()
         ->setCategory('gccache')
         ->setMemory();
       try {
-        self::buildGroupContactTempTable([$groupID], $groupContactsTempTable);
-        self::clearGroupContactCache([$groupID]);
-        self::updateCacheFromTempTable($groupContactsTempTable, [$groupID], $startTime);
+        self::buildGroupContactTempTable($lockedGroups, $groupContactsTempTable);
+        self::clearGroupContactCache($lockedGroups);
+        self::updateCacheFromTempTable($groupContactsTempTable, $lockedGroups, $startTime);
       }
       finally {
-        self::releaseGroupLocks([$groupID]);
+        self::releaseGroupLocks($lockedGroups);
         $groupContactsTempTable->drop();
       }
     }
-    return in_array($groupID, $lockedGroups);
+    return $lockedGroups;
   }
 
   /**
@@ -398,9 +412,9 @@ WHERE  id IN ( $groupIDs )
    * 1) the cache date in the database is null or stale
    * 2) a mysql lock can be acquired for the group.
    *
-   * @param array $groupIDs
+   * @param int[] $groupIDs
    *
-   * @return array
+   * @return int[]
    * @throws \CRM_Core_Exception
    */
   protected static function getLocksForRefreshableGroupsTo(array $groupIDs): array {
@@ -723,17 +737,14 @@ ORDER BY   gc.contact_id, g.children
    * @param array|null $groupIDs
    * @param int $limit
    *
-   * @return array
+   * @return int[]
    */
   protected static function getGroupsNeedingRefreshing(?array $groupIDs, int $limit = 0): array {
     $groupIDClause = NULL;
     // ensure that all the smart groups are loaded
     // this function is expensive and should be sparingly used if groupIDs is empty
     if (!empty($groupIDs)) {
-      // note escapeString is a must here and we can't send the imploded value as second argument to
-      // the executeQuery(), since that would put single quote around the string and such a string
-      // of comma separated integers would not work.
-      $groupIDString = CRM_Core_DAO::escapeString(implode(', ', $groupIDs));
+      $groupIDString = implode(', ', array_map('intval', $groupIDs));
       $groupIDClause = "g.id IN ({$groupIDString})";
     }
 
@@ -753,7 +764,7 @@ ORDER BY   gc.contact_id, g.children
     $dao = CRM_Core_DAO::executeQuery($query);
     $processGroupIDs = [];
     while ($dao->fetch()) {
-      $processGroupIDs[] = $dao->id;
+      $processGroupIDs[] = (int) $dao->id;
     }
     return $processGroupIDs;
   }
