@@ -152,10 +152,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       is_array($this->getSubmittedValue('onbehalf'))
     ) {
       foreach ($this->getSubmittedValue('onbehalf') as $key => $value) {
-        if (str_contains($key, 'custom_')) {
-          $customFieldId = explode('_', $key);
+        $customFieldId = CRM_Core_BAO_CustomField::getKeyID($key);
+        if ($customFieldId) {
           CRM_Core_BAO_CustomField::formatCustomField(
-            $customFieldId[1],
+            $customFieldId,
             $customFieldsFormatted,
             $value,
             'Membership',
@@ -2209,7 +2209,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
       if (is_array($params['onbehalf']) && !empty($params['onbehalf'])) {
         foreach ($params['onbehalf'] as $onBehalfField => $values) {
-          if (str_contains($onBehalfField, 'custom_')) {
+          if (CRM_Core_BAO_CustomField::getKeyID($onBehalfField)) {
             $behalfOrganization[$onBehalfField] = $values;
           }
           elseif (!str_contains($onBehalfField, '-')) {
@@ -2362,7 +2362,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         is_array($paymentParams['onbehalf'])
       ) {
         foreach ($paymentParams['onbehalf'] as $key => $value) {
-          if (str_contains($key, 'custom_')) {
+          if (CRM_Core_BAO_CustomField::getKeyID($key)) {
             $this->_params[$key] = $value;
           }
         }

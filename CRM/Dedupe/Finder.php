@@ -233,9 +233,7 @@ class CRM_Dedupe_Finder {
 
       $v = NULL;
       foreach ($fields as $key => $val) {
-        if (preg_match('/^custom_(\d+)_?(-?\d+)?$/', $key, $match) &&
-          $match[1] == $field['id']
-        ) {
+        if (CRM_Core_BAO_CustomField::getKeyID($key) === (int) $field['id']) {
           $v = $val;
         }
       }

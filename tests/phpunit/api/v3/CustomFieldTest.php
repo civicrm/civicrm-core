@@ -548,10 +548,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
    * @return array
    */
   public function getCustomFieldKeys($getFieldsResult) {
-    $isCustom = function ($key) {
-      return 0 === strpos($key, 'custom_');
-    };
-    $r = array_values(array_filter(array_keys($getFieldsResult['values']), $isCustom));
+    $r = array_values(array_filter(array_keys($getFieldsResult['values']), ['CRM_Core_BAO_CustomField', 'getKeyID']));
     sort($r);
     return $r;
   }

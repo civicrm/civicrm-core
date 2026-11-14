@@ -667,7 +667,7 @@ class CRM_Contact_BAO_Query {
       if (empty($value[0])) {
         continue;
       }
-      $cfID = CRM_Core_BAO_CustomField::getKeyID(str_replace(['_relative', '_low', '_high', '_to', '_high'], '', $value[0]));
+      $cfID = CRM_Core_BAO_CustomField::getKeyID(preg_replace('/(?<!_)-\d+$/', '', str_replace(['_relative', '_low', '_high', '_to', '_high'], '', $value[0])));
       if ($cfID) {
         if (!array_key_exists($cfID, $this->_cfIDs)) {
           $this->_cfIDs[$cfID] = [];
@@ -1807,7 +1807,7 @@ class CRM_Contact_BAO_Query {
     // @todo also handle _low, _high generically here with if ($query->buildDateRangeQuery($values)) {return}
 
     // do not process custom fields or prefixed contact ids or component params
-    if (CRM_Core_BAO_CustomField::getKeyID($values[0]) ||
+    if (CRM_Core_BAO_CustomField::getKeyID(preg_replace('/(?<!_)-\d+$/', '', $values[0])) ||
       (substr($values[0], 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) ||
       (substr($values[0], 0, 13) === 'contribution_') ||
       (substr($values[0], 0, 6) === 'event_') ||
@@ -6431,7 +6431,7 @@ AND   displayRelType.is_active = 1
         }
 
       }
-      $cfID = CRM_Core_BAO_CustomField::getKeyID($field);
+      $cfID = CRM_Core_BAO_CustomField::getKeyID(preg_replace('/(?<!_)-\d+$/', '', $field));
       // add to cfIDs array if not present
       if (!empty($cfID) && !array_key_exists($cfID, $this->_cfIDs)) {
         $this->_cfIDs[$cfID] = [];
