@@ -179,6 +179,10 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    */
   public static function getAll(array $filters = [], ?int $permissionType = NULL, ?int $userId = NULL): array {
     $allGroups = self::loadAll();
+    if (isset($filters['id'])) {
+      $allGroups = array_intersect_key($allGroups, array_flip((array) $filters['id']));
+      unset($filters['id']);
+    }
     if (isset($permissionType)) {
       if (!in_array($permissionType, [CRM_Core_Permission::EDIT, CRM_Core_Permission::VIEW], TRUE)) {
         throw new CRM_Core_Exception('permissionType must be CRM_Core_Permission::VIEW or CRM_Core_Permission::EDIT');

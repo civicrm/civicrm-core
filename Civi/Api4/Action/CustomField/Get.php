@@ -44,12 +44,16 @@ class Get extends \Civi\Api4\Generic\CachedDAOGetAction {
   protected function getCachedRecords(): array {
     $records = [];
     $groups = \CRM_Core_BAO_CustomGroup::getAll([], $this->getCheckPermissions() ? \CRM_Core_Permission::VIEW : NULL);
+    $idsToGet = array_flip($this->_itemsToGet('id') ?? []);
     foreach ($groups as $group) {
-      $groupInfo = $group;
-      unset($groupInfo['fields']);
-      $groupInfo = \CRM_Utils_Array::prefixKeys($groupInfo, 'custom_group_id.');
-      foreach ($group['fields'] as $field) {
-        $records[] = $field + $groupInfo;
+      // Use fast array key matching if fetching fields by ID.
+      $fields = $idsToGet ? array_intersect_key($group['fields'], $idsToGet) : $group['fields'];
+      if ($fields) {
+        unset($group['fields']);
+        $group = \CRM_Utils_Array::prefixKeys($group, 'custom_group_id.');
+        foreach ($fields as $field) {
+          $records[] = $field + $group;
+        }
       }
     }
     return $records;

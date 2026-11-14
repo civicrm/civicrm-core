@@ -111,7 +111,7 @@ abstract class AbstractGetAction extends AbstractQueryAction {
   protected function _itemsToGet(string $field): ?array {
     foreach ($this->where as $clause) {
       if (
-        $clause[0] == $field &&
+        isset($clause[2]) && $clause[0] == $field &&
         // Clause is not set to match an expression
         empty($clause[3]) &&
         // Clause uses exact-match operators (=, IN, or LIKE with no wildcard)
