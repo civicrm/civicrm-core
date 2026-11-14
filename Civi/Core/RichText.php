@@ -131,7 +131,7 @@ class RichText extends \Civi\Core\Service\AutoService {
   }
 
   protected function loadFormats(): array {
-    $formats = \CRM_Utils_Array::rekey($this->createDefaultFormats(), 'name');
+    $formats = array_column($this->createDefaultFormats(), NULL, 'name');
     $event = GenericHookEvent::create(['formats' => &$formats]);
     Civi::dispatcher()->dispatch('civi.richtext.formats', $event);
     return $formats;
