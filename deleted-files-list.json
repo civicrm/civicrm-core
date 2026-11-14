@@ -672,7 +672,6 @@
     "Civi/Api4/Action/Contact/GetFields.php",
     "Civi/Api4/Action/Contribution/*",
     "Civi/Api4/Action/ContributionRecur/*",
-    "Civi/Api4/Action/CustomGroup/Get.php",
     "Civi/Api4/Action/CustomValue/GetActions.php",
     "Civi/Api4/Action/CustomValue/GetFields.php",
     "Civi/Api4/Action/CustomValue/Replace.php",
