@@ -133,6 +133,37 @@ class ACLListTest extends \CiviUnitTestCase {
   }
 
   /**
+   * A permissioned relationship grants access only between its start and end date.
+   */
+  public function testPermissionByRelationDates(): void {
+    $contacts = $this->createScenarioPlain();
+    $dates = [
+      1 => ['end_date' => '-1 day'],
+      2 => ['start_date' => '+1 day'],
+      3 => ['start_date' => '-1 year', 'end_date' => '+1 year'],
+      4 => ['start_date' => 'today', 'end_date' => 'today'],
+      5 => [],
+      // Second degree, reached through the expired relationship to contact 1.
+      6 => [],
+    ];
+    foreach ($dates as $index => $range) {
+      $this->createTestEntity('Relationship', [
+        'relationship_type_id:name' => 'Sibling of',
+        'contact_id_a' => $contacts[$index === 6 ? 1 : 0],
+        'contact_id_b' => $contacts[$index],
+        'is_permission_a_b' => 1,
+        'is_active' => TRUE,
+      ] + array_map(fn($date) => date('Y-m-d', strtotime($date)), $range), "dates-$index");
+    }
+    $this->setPermissions([]);
+
+    foreach ([FALSE, TRUE] as $secondDegree) {
+      \Civi::settings()->set('secondDegRelPermissions', $secondDegree);
+      $this->assertAllowedContacts($contacts, Permission::EDIT, [3 => TRUE, 4 => TRUE, 5 => TRUE], 'Edit');
+    }
+  }
+
+  /**
    * Test access based on ACL.
    */
   public function testPermissionByACL(): void {
