@@ -1130,7 +1130,8 @@ class CRM_Core_DAO extends DB_DataObject {
       return $value === 'null' ? '' : $value;
     }, $record);
 
-    \CRM_Utils_Hook::pre($op, $entityName, $record[$idField] ?? NULL, $record);
+    // APIv4 sends an absent id as '': hooks are promised an int or NULL.
+    \CRM_Utils_Hook::pre($op, $entityName, ($record[$idField] ?? NULL) ?: NULL, $record);
 
     // Fill defaults after pre hook to accept any hook modifications
     self::setDefaultsFromCallback($entityName, $record);
