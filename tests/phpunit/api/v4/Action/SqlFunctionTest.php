@@ -223,6 +223,30 @@ class SqlFunctionTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals(['test1@example.org', 'test2@example.org'], $result[0]['email']);
   }
 
+  /**
+   * An unknown option value keeps its position in a GROUP_CONCAT of labels.
+   */
+  public function testGroupConcatLabelWithUnknownOption(): void {
+    $lastName = uniqid();
+    $this->saveTestRecords('Contact', [
+      'records' => [
+        ['last_name' => $lastName, 'preferred_language' => 'en_US'],
+        ['last_name' => $lastName, 'preferred_language' => 'en_XX'],
+        ['last_name' => $lastName, 'preferred_language' => 'fr_FR'],
+      ],
+    ]);
+
+    $result = Contact::get(FALSE)
+      ->addWhere('last_name', '=', $lastName)
+      ->addGroupBy('last_name')
+      ->addSelect('GROUP_CONCAT(preferred_language:label ORDER BY preferred_language) AS labels')
+      ->addSelect('GROUP_CONCAT(preferred_language ORDER BY preferred_language) AS codes')
+      ->execute()->single();
+
+    $this->assertSame(['en_US', 'en_XX', 'fr_FR'], $result['codes']);
+    $this->assertSame(['English (United States)', NULL, 'French (France)'], $result['labels']);
+  }
+
   public function testGroupHaving(): void {
     $cid = Contact::create(FALSE)->addValue('first_name', 'donor')->execute()->first()['id'];
     Contribution::save(FALSE)
