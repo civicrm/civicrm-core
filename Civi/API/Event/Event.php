@@ -33,7 +33,7 @@ class Event extends \Civi\Core\Event\GenericHookEvent {
   /**
    * @param \Civi\API\Provider\ProviderInterface $apiProvider
    *   The API responsible for executing the request.
-   * @param array $apiRequest
+   * @param array|\Civi\Api4\Generic\AbstractAction $apiRequest
    *   The full description of the API request.
    * @param \Civi\API\Kernel $apiKernel
    */

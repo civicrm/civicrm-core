@@ -22,39 +22,18 @@ return [
             'description',
             'group_type:label',
             'visibility:label',
-            'COUNT(Group_GroupContact_Contact_01.display_name) AS COUNT_Group_GroupContact_Contact_01_display_name',
+            'contact_count',
+            'cache_expired',
             'saved_search_id',
             'is_active',
             'frontend_title',
-            'name',
           ],
           'orderBy' => [],
           'where' => [
             ['is_hidden', '=', FALSE],
           ],
-          'groupBy' => ['id'],
-          'join' => [
-            [
-              'Contact AS Group_GroupContact_Contact_01',
-              'LEFT',
-              'GroupContact',
-              [
-                'id',
-                '=',
-                'Group_GroupContact_Contact_01.group_id',
-              ],
-              [
-                'Group_GroupContact_Contact_01.status:name',
-                '=',
-                '"Added"',
-              ],
-              [
-                'Group_GroupContact_Contact_01.is_deleted',
-                '=',
-                FALSE,
-              ],
-            ],
-          ],
+          'groupBy' => [],
+          'join' => [],
           'having' => [],
         ],
       ],
@@ -93,7 +72,6 @@ return [
               'sortable' => TRUE,
               'rewrite' => '',
               'editable' => TRUE,
-              'icons' => [],
             ],
             [
               'type' => 'field',
@@ -147,10 +125,10 @@ return [
             ],
             [
               'type' => 'field',
-              'key' => 'COUNT_Group_GroupContact_Contact_01_display_name',
+              'key' => 'contact_count',
               'label' => 'Count',
               'sortable' => TRUE,
-              'rewrite' => '{if "[saved_search_id]"}{else}[COUNT_Group_GroupContact_Contact_01_display_name]{/if}',
+              'rewrite' => '{if !$cache_expired}[contact_count]{else}?{/if}',
               'icons' => [
                 [
                   'icon' => 'fa-lightbulb',
@@ -159,6 +137,14 @@ return [
                     'saved_search_id',
                     'IS NOT EMPTY',
                   ],
+                ],
+              ],
+              'cssRules' => [
+                [
+                  'disabled',
+                  'cache_expired',
+                  '=',
+                  TRUE,
                 ],
               ],
             ],
@@ -207,6 +193,14 @@ return [
                   'text' => 'Disable',
                   'style' => 'default',
                   'condition' => [],
+                ],
+                [
+                  'text' => E::ts('Refresh Group Cache'),
+                  'task' => 'refresh',
+                  'entity' => 'Group',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-lightbulb',
+                  'style' => 'default',
                 ],
                 [
                   'entity' => 'Group',
