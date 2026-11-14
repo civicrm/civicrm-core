@@ -58,7 +58,8 @@ class EntityTest extends Api4TestBase {
     }
 
     foreach (['Individual', 'Organization', 'Household'] as $contactType) {
-      $this->assertContains('ContactType', $result[$contactType]['type']);
+      $this->assertContains('EntityFacade', $result[$contactType]['type']);
+      $this->assertSame('Contact', $result[$contactType]['facade_of']);
       $this->assertEquals($contactType, $result[$contactType]['where']['contact_type']);
     }
 

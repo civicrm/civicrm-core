@@ -733,6 +733,59 @@ WHERE ($subtypeClause)";
   }
 
   /**
+   * Get entity info for an Individual, Organization or Household facade of Contact.
+   *
+   * Label and icon are editable so they are looked up when the info is requested.
+   *
+   * @internal
+   * @see schema/Contact/Individual.entityType.php
+   * @param string $contactType
+   * @return array
+   */
+  public static function getFacadeInfo(string $contactType): array {
+    $contactTypeInfo = self::getContactType($contactType);
+    $label = $contactTypeInfo['label'] ?? $contactType;
+    // There is no plural label, so the core contact types use translated strings (which an admin who
+    // renames a type can change with a word replacement). Any other contact type uses its label.
+    $titlePlural = match ($contactType) {
+      'Individual' => ts('Individuals'),
+      'Organization' => ts('Organizations'),
+      'Household' => ts('Households'),
+      default => $label,
+    };
+    return array_filter([
+      'title' => $label,
+      'title_plural' => $titlePlural,
+      'description' => ts('Contacts of type %1.', [1 => $label]),
+      'icon' => $contactTypeInfo['icon'] ?? NULL,
+    ]);
+  }
+
+  /**
+   * Get the Contact fields which belong to only one contact type.
+   *
+   * Derived from the fields of the Individual, Organization and Household facades.
+   *
+   * @internal
+   * @return string[]
+   *   e.g. ['first_name' => 'Individual', 'organization_name' => 'Organization', ...]
+   */
+  public static function getTypeSpecificFields(): array {
+    // Cached as it may be called e.g. once per row of an import
+    if (!isset(Civi::$statics[__CLASS__][__FUNCTION__])) {
+      $fieldTypes = [];
+      foreach (\Civi\Schema\EntityRepository::getFacadesOf('Contact') as $contactType) {
+        foreach (array_keys(Civi::entity($contactType)->getFields()) as $fieldName) {
+          $fieldTypes[$fieldName][] = $contactType;
+        }
+      }
+      $typeSpecificFields = array_filter($fieldTypes, fn($contactTypes) => count($contactTypes) === 1);
+      Civi::$statics[__CLASS__][__FUNCTION__] = array_map(fn($contactTypes) => $contactTypes[0], $typeSpecificFields);
+    }
+    return Civi::$statics[__CLASS__][__FUNCTION__];
+  }
+
+  /**
    * Check write access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */

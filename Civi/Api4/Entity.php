@@ -132,6 +132,11 @@ class Entity extends Generic\AbstractEntity {
       'description' => 'Constant values which will be force-set when reading/writing this entity (e.g. [contact_type => Individual])',
     ],
     [
+      'name' => 'facade_of',
+      'data_type' => 'String',
+      'description' => 'For a facade entity (e.g. Individual), the entity whose records it presents (e.g. Contact)',
+    ],
+    [
       'name' => 'bridge',
       'data_type' => 'Array',
       'description' => 'Connecting fields for EntityBridge types',

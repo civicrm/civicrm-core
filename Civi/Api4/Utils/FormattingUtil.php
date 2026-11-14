@@ -379,9 +379,9 @@ class FormattingUtil {
       $entityName = \CRM_Core_BAO_CustomGroup::getEntityForGroup($customGroupName);
       $fieldName = $customGroupName . '.' . $fieldName;
     }
-    // TODO: Teach Civi::entity to return contact-type pseudo-entities
-    elseif (CoreUtil::isContact($entityName)) {
-      $entityName = 'Contact';
+    // Options belong to the parent of a facade (e.g. Contact rather than Individual)
+    else {
+      $entityName = CoreUtil::resolveFacade($entityName);
     }
 
     $entity = \Civi::entity($entityName);

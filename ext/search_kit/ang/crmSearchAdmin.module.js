@@ -553,7 +553,7 @@
             const entity = getEntity(joinInfo.entity);
             const prefix = joinInfo.alias ? joinInfo.alias + '.' : '';
             entity?.fields?.forEach(field => {
-              if (field && ((['Contact', 'Individual', 'Household', 'Organization'].includes(entity.name) && field.name === 'id') || field.fk_entity === 'Contact')) {
+              if (field && (((entity.name === 'Contact' || entity.facade_of === 'Contact') && field.name === 'id') || field.fk_entity === 'Contact')) {
                 columns.push({
                   id: prefix + field.name,
                   text: (joinInfo.label ? joinInfo.label + ': ' : '') + field.label,

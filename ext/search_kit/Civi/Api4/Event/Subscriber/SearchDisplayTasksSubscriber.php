@@ -33,8 +33,10 @@ class SearchDisplayTasksSubscriber {
       if ($entityName) {
         $event->tasks[$entityName] = array_intersect_key($event->tasks[$entityName] ?? [], array_flip($enabledActions));
       }
-      if (CoreUtil::isContact($entityName)) {
-        $event->tasks['Contact'] = array_intersect_key($event->tasks['Contact'] ?? [], array_flip($enabledActions));
+      // A facade (e.g. Individual) also gets the tasks of its parent (e.g. Contact)
+      $facadeParent = $entityName ? CoreUtil::resolveFacade($entityName) : NULL;
+      if ($facadeParent && $facadeParent !== $entityName) {
+        $event->tasks[$facadeParent] = array_intersect_key($event->tasks[$facadeParent] ?? [], array_flip($enabledActions));
       }
     }
 
