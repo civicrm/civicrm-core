@@ -797,7 +797,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
     $this->assign('mode', $this->_mode);
     $this->assign('isHideFieldSet', ($this->_mode === self::MODE_CREATE || $this->_mode === self::MODE_EDIT));
     $this->assign('action', $this->_action);
-    $this->assign('fields', $this->_fields);
     $this->assign('fieldset', '');
 
     // should we restrict what we display
@@ -859,11 +858,18 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $addToGroupId = $field['add_to_group_id'];
       }
 
+      // buildProfile() does not build view-only fields in register mode, CRM-4632
+      if ($this->_mode == self::MODE_REGISTER && !empty($field['is_view'])) {
+        unset($this->_fields[$name]);
+        continue;
+      }
+
       if (($name == 'email-Primary') || ($name == 'email-' . ($primaryLocationType ?? ""))) {
         $emailPresent = TRUE;
         $this->_mail = $name;
       }
     }
+    $this->assign('fields', $this->_fields);
 
     if ($this->_mode == self::MODE_CREATE) {
       if ($this->_gid) {
