@@ -22,6 +22,7 @@ class GetProviders extends BasicGetAction {
         if (!isset($provider['class'])) {
           $provider['class'] = CiviGenericProvider::class;
         }
+        $provider['pkceMethods'] ??= array_values(array_diff(array_keys(\CRM_OAuth_BAO_OAuthClient::getPkceMethods()), ['auto']));
       }
 
       $cache->set('OAuthProvider_list', $providers, OAuthProvider::TTL);

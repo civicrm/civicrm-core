@@ -39,6 +39,13 @@ class OAuthTokenFacade {
     $scopeSeparator = $this->callProtected($provider, 'getScopeSeparator');
 
     $sendOptions = $options['cred'] ?? [];
+
+    // We can choose two ways to pass the `$options['cred']['code_verifier']` -- either
+    // invoke `$provider->setPkceCode(...)` or pass-through `$sendOptions['code_verifier']`.
+    // They're exactly the same. Some scenarios already work with the latter (eg ext/paypal).
+    // RFC 7636 doesn't foreshadow any further processing on `code_verifier` (_no value-add for setPkecCode_).
+    // So let's keep it simple.
+
     if (isset($options['scope']) && $options['scope'] !== NULL) {
       switch ($options['grant_type']) {
         case 'authorization_code':
@@ -67,13 +74,20 @@ class OAuthTokenFacade {
       'storage' => $options['storage'],
     ];
 
-    try {
-      $owner = $provider->getResourceOwner($accessToken);
-      $tokenRecord['resource_owner_name'] = $this->findName($owner);
-      $tokenRecord['resource_owner'] = $owner->toArray();
+    if ($provider instanceof CiviOpenIdProvider && $options['grant_type'] === 'authorization_code') {
+      $tokenRecord['resource_owner'] = $provider->verifiedClaims($accessToken, $options['oidc_nonce'] ?? '');
+      $claims = $tokenRecord['resource_owner'];
+      $tokenRecord['resource_owner_name'] = is_string($claims['preferred_username'] ?? NULL) ? $claims['preferred_username'] : $claims['sub'];
     }
-    catch (\Throwable $e) {
-      \Civi::log()->warning("Failed to resolve resource_owner");
+    elseif (!$provider instanceof CiviOpenIdProvider) {
+      try {
+        $owner = $provider->getResourceOwner($accessToken);
+        $tokenRecord['resource_owner_name'] = $this->findName($owner);
+        $tokenRecord['resource_owner'] = $owner->toArray();
+      }
+      catch (\Throwable $e) {
+        \Civi::log()->warning("Failed to resolve resource_owner");
+      }
     }
 
     \CRM_OAuth_Hook::oauthToken('init', $options['storage'], $tokenRecord);

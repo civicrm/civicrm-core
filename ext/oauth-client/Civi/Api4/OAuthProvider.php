@@ -44,6 +44,11 @@ class OAuthProvider extends Generic\AbstractEntity {
           'data_type' => 'Array',
         ],
         [
+          'name' => 'pkceMethods',
+          'data_type' => 'Array',
+          'description' => 'Ordered list of PKCE methods supported by the provider. Sort by preference (best to worst).',
+        ],
+        [
           'name' => 'contactTemplate',
           // TODO: Migrate to templates['Contact']
         ],

@@ -11,6 +11,8 @@ $loader->add('CRM_', __DIR__);
 $loader->add('Civi\\', __DIR__);
 $loader->add('api_', __DIR__);
 $loader->add('api\\', __DIR__);
+// Plain PHPUnit tests do not install the extension through the headless listener.
+$loader->addPsr4('Civi\\OAuth\\', dirname(__DIR__, 2) . '/Civi/OAuth');
 $loader->register();
 
 /**

@@ -36,6 +36,12 @@ class OAuthLeagueFacade {
     $localOptions['clientId'] = $clientDef['guid'];
     $localOptions['tenant'] = !empty($clientDef['tenant']) ? $clientDef['tenant'] : '';
     $localOptions['clientSecret'] = $clientDef['secret'];
+
+    $effectivePkce = static::resolvePkceMethod($clientDef, $providerDef);
+    if ($effectivePkce !== 'none') {
+      $localOptions['pkceMethod'] = $effectivePkce;
+    }
+
     $options = array_merge(
       $providerDef['options'] ?? [],
       $clientDef['options'] ?? [],
@@ -44,6 +50,41 @@ class OAuthLeagueFacade {
     $options['redirectUri'] ??= \CRM_OAuth_BAO_OAuthClient::getRedirectUri();
 
     return [$class, $options];
+  }
+
+  /**
+   * Determine the effective PKCE method ('S256', 'plain', or 'none').
+   *
+   * If the OAuthClient has a specific value, use that.
+   * Otherwise, pick the best recognized option from the provider's compatibility list.
+   *
+   * @param array $clientDef
+   * @param array $providerDef
+   * @return string 'S256'|'plain'|'none'
+   * @throws OAuthException
+   */
+  public static function resolvePkceMethod(array $clientDef, array $providerDef): string {
+    $requestedMethod = $clientDef['pkce_method'] ?? 'auto';
+
+    if ($requestedMethod === 'auto') {
+      $knownMethods = \CRM_OAuth_BAO_OAuthClient::getPkceMethods();
+      unset($knownMethods['auto']);
+
+      foreach ($providerDef['pkceMethods'] as $availableMethod) {
+        if (isset($knownMethods[$availableMethod])) {
+          return $availableMethod;
+        }
+      }
+
+      $providerName = $providerDef['name'] ?? $clientDef['provider'] ?? 'unknown';
+      throw new OAuthException(sprintf('No supported PKCE method found for provider "%s".', $providerName));
+    }
+    elseif (in_array($requestedMethod, $providerDef['pkceMethods'], TRUE)) {
+      return $requestedMethod;
+    }
+    else {
+      throw new OAuthException(sprintf('Invalid PKCE method "%s".', $requestedMethod));
+    }
   }
 
   /**
