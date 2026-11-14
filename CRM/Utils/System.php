@@ -387,8 +387,8 @@ class CRM_Utils_System {
    *   The Notification URL.
    */
   public static function getNotifyUrl(
-    $path = NULL,
-    $query = NULL,
+    $path = '',
+    $query = '',
     $absolute = FALSE,
     $fragment = NULL,
     $htmlize = NULL,
