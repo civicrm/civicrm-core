@@ -385,6 +385,18 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
         // Meh, close enough. May need to be updated if HTMLPurifier gets prettier handing of booleans like `open`.
         '<details class="foo" open="open"><summary>hello</summary>world</details>',
       ],
+      'scroll box' => [
+        '<div class="scrollbox" style="height:200px; overflow-y:auto;"><p>Terms</p></div>',
+        '<div class="scrollbox" style="height:200px;overflow-y:auto;"><p>Terms</p></div>',
+      ],
+      'overflow and overflow-x' => [
+        '<div style="overflow:hidden; overflow-x:scroll;">text</div>',
+        '<div style="overflow:hidden;overflow-x:scroll;">text</div>',
+      ],
+      'only valid overflow values, and no display or visibility' => [
+        '<div style="display:none; visibility:hidden; overflow-y:expression(alert(1)); overflow:url(javascript:alert(1));">text</div>',
+        '<div>text</div>',
+      ],
     ];
   }
 
