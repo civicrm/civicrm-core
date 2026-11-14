@@ -320,7 +320,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'parent' => 'Individual',
         'parent_label' => 'Individual',
         'image_URL' => NULL,
-        'icon' => 'fa-user',
+        'icon' => NULL,
       ],
       'sub2_individual' => [
         'id' => $this->ids['ContactType'][1],
@@ -333,7 +333,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'parent' => 'Individual',
         'parent_label' => 'Individual',
         'image_URL' => NULL,
-        'icon' => 'fa-user',
+        'icon' => NULL,
       ],
       'sub_organization' => [
         'id' => $this->ids['ContactType'][2],
@@ -346,7 +346,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'parent' => 'Organization',
         'parent_label' => 'Organization',
         'image_URL' => NULL,
-        'icon' => 'fa-building',
+        'icon' => NULL,
       ],
       'sub_household' => [
         'id' => $this->ids['ContactType'][3],
@@ -359,7 +359,7 @@ class CRM_Contact_BAO_ContactType_ContactTypeTest extends CiviUnitTestCase {
         'parent' => 'Household',
         'parent_label' => 'Household',
         'image_URL' => NULL,
-        'icon' => 'fa-home',
+        'icon' => NULL,
       ],
     ];
   }

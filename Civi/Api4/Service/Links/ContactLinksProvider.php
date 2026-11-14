@@ -72,8 +72,9 @@ class ContactLinksProvider {
     }
     $link = $addTemplate;
     $link['text'] = ts('Add %1', [1 => \CRM_Contact_BAO_ContactType::getLabel($contactType)]);
+    $parentIcon = CoreUtil::getInfoItem($contactType, 'icon');
     if (array_key_exists('icon', $addTemplate)) {
-      $link['icon'] = CoreUtil::getInfoItem($contactType, 'icon');
+      $link['icon'] = $parentIcon;
     }
     $newLinks[] = $link;
     // Links to contact sub-types
@@ -89,7 +90,7 @@ class ContactLinksProvider {
         $link['path'] .= '&cst=' . $subType['name'];
       }
       if (array_key_exists('icon', $addTemplate)) {
-        $link['icon'] = $subType['icon'] ?? $link['icon'];
+        $link['icon'] = $subType['icon'] ?? $parentIcon;
       }
       $link['text'] = ts('Add %1', [1 => $subType['label']]);
       $link['api_values']['contact_sub_type'] = $subType['name'];
