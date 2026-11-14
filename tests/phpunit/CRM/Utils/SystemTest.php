@@ -38,6 +38,17 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   }
 
   /**
+   * A fragment in the query string goes to the end of the URL and leaves the path alone.
+   */
+  public function testUrlQueryWithFragment(): void {
+    $this->assertSame('/index.php?q=civicrm/foo/bar&foo=ab#details',
+      CRM_Utils_System::url('civicrm/foo/bar', 'foo=ab#details', FALSE, NULL, FALSE));
+    // Only the first '#' starts the fragment: a later one stays in it.
+    $this->assertSame('/index.php?q=civicrm/foo/bar&foo=ab#x#y',
+      CRM_Utils_System::url('civicrm/foo/bar', 'foo=ab#x#y', FALSE, NULL, FALSE));
+  }
+
+  /**
    * Test the redirect hook.
    *
    * @param string $url
