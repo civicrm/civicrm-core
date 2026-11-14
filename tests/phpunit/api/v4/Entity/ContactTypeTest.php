@@ -224,7 +224,8 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
       ->addOrderBy('name', 'ASC')
       ->setLimit(5)
       ->setOffset(1)
-      ->execute()->column('_depth', 'name');
+      ->setDebug(TRUE)
+      ->execute();
 
     $expected = [
       'Individual' => 0,
@@ -233,7 +234,32 @@ class ContactTypeTest extends Api4TestBase implements TransactionalInterface {
       'Organization' => 0,
       '1Org' => 1,
     ];
-    $this->assertEquals($expected, $result);
+    $this->assertEquals($expected, $result->column('_depth', 'name'));
+    $this->assertTrue($result->debug['useCache']);
+  }
+
+  public function testCachedGet(): void {
+    $this->saveTestRecords('ContactType', [
+      'records' => [
+        ['parent_id.name' => 'Individual', 'name' => 'CachedSubtype', 'label' => 'Cached Subtype'],
+      ],
+    ]);
+
+    $result = ContactType::get(FALSE)
+      ->addSelect('id', 'name', 'label', 'icon', 'parent_id', 'parent_id.name', 'parent_id.label')
+      ->addWhere('parent_id.name', '=', 'Individual')
+      ->addWhere('name', '=', 'CachedSubtype')
+      ->setDebug(TRUE)
+      ->execute();
+
+    $this->assertTrue($result->debug['useCache']);
+    $this->assertCount(1, $result);
+    $row = $result->first();
+    $this->assertSame('CachedSubtype', $row['name']);
+    $this->assertSame('Cached Subtype', $row['label']);
+    $this->assertNull($row['icon']);
+    $this->assertSame('Individual', $row['parent_id.name']);
+    $this->assertSame('Individual', $row['parent_id.label']);
   }
 
 }

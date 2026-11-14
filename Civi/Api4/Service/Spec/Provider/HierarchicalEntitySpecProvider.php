@@ -35,6 +35,7 @@ class HierarchicalEntitySpecProvider extends \Civi\Core\Service\AutoService impl
       ->setDescription(ts('Depth in the nested hierarchy'))
       ->setType('Extra')
       ->setReadonly(TRUE)
+      ->setDefaultValue(0)
       ->setSqlRenderer([__CLASS__, 'getZero']);
     $spec->addFieldSpec($field);
 
@@ -46,6 +47,7 @@ class HierarchicalEntitySpecProvider extends \Civi\Core\Service\AutoService impl
       ->setDescription(ts('Number of descendents in the nested hierarchy'))
       ->setType('Extra')
       ->setReadonly(TRUE)
+      ->setDefaultValue(0)
       ->setSqlRenderer([__CLASS__, 'getZero']);
     $spec->addFieldSpec($field);
   }
