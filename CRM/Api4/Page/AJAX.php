@@ -65,7 +65,10 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       // Received single-call format
       $entity = $this->urlPath[3];
       $action = $this->urlPath[4];
-      $params = $this->getParamsFromRequest($entity, $action);
+      $params = static::parseRequestParams($entity, $action);
+      if ($params === NULL) {
+        $this->sendMalformedJsonResponse('params');
+      }
       $index = CRM_Utils_Request::retrieve('index', 'String');
       $response = $this->execute($entity, $action, $params, $index);
     }
@@ -73,12 +76,22 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     CRM_Utils_System::sendJSONResponse($response, $this->httpResponseCode);
   }
 
-  private function getParamsFromRequest(string $entity, string $action): array {
+  /**
+   * Examine the request ($_REQUEST, $_GET) to extract any APIv4 `$params`.
+   *
+   * @param string $entity
+   * @param string $action
+   * @return array|null
+   *   NULL if the request parameters have syntactic errors. Otherwise, an array with the params.
+   * @internal
+   *   This may be referenced in civicrm-core but is not intended for third-party usage.
+   */
+  public static function parseRequestParams(string $entity, string $action): ?array {
     $config = CRM_Core_Config::singleton();
     $params = CRM_Utils_Request::retrieve('params', 'String');
     $params = $params ? json_decode($params, TRUE) : [];
     if (!is_array($params)) {
-      $this->sendMalformedJsonResponse('params');
+      return NULL;
     }
 
     // Add query params if they are not in the params json and if they are allowed by the api action
