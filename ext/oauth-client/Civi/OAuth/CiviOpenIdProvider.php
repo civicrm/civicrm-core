@@ -7,7 +7,8 @@ use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
 use League\OAuth2\Client\Token\AccessToken;
 
-/** OpenID Connect authorization code provider using signed ID tokens. */
+/**
+ * OpenID Connect authorization code provider using signed ID tokens. */
 class CiviOpenIdProvider extends CiviGenericProvider {
 
   private array $metadata;
@@ -65,8 +66,7 @@ class CiviOpenIdProvider extends CiviGenericProvider {
     $keys = array_filter($jwks['keys'], static fn($k) =>
       is_array($k) &&
       ($k['kty'] ?? '') === 'RSA' && ($k['alg'] ?? 'RS256') === 'RS256'
-      && ($k['use'] ?? 'sig') === 'sig'
-      && is_array($k['key_ops'] ?? ['verify']) && in_array('verify', $k['key_ops'] ?? ['verify'], TRUE)
+      && ($k['use'] ?? 'sig') === 'sig' && in_array('verify', $k['key_ops'] ?? ['verify'], TRUE)
     );
     try {
       $claims = (array) JWT::decode($jwt, JWK::parseKeySet(['keys' => array_values($keys)], 'RS256'));

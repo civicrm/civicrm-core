@@ -12,7 +12,8 @@ use PHPUnit\Framework\TestCase;
 
 class CiviOpenIdProviderTest extends TestCase {
 
-  /** @dataProvider verificationCases */
+  /**
+   * @dataProvider verificationCases */
   public function testTransaction(string $case): void {
     $issuer = 'https://id.example.org/realm';
     $metadata = [
@@ -23,10 +24,16 @@ class CiviOpenIdProviderTest extends TestCase {
     ];
     $key = openssl_pkey_new(['private_key_bits' => 2048]);
     $public = openssl_pkey_get_details($key)['rsa'];
-    $jwks = ['keys' => [[
-      'kid' => 'test', 'kty' => 'RSA', 'alg' => 'RS256',
-      'n' => JWT::urlsafeB64Encode($public['n']), 'e' => JWT::urlsafeB64Encode($public['e']),
-    ]]];
+    $jwks = [
+      'keys' => [[
+        'kid' => 'test',
+        'kty' => 'RSA',
+        'alg' => 'RS256',
+        'n' => JWT::urlsafeB64Encode($public['n']),
+        'e' => JWT::urlsafeB64Encode($public['e']),
+      ],
+      ],
+    ];
     $responses = [new Response(200, [], json_encode($jwks))];
     $options = ['discovery' => $metadata];
     if ($case !== 'inline') {
@@ -36,8 +43,12 @@ class CiviOpenIdProviderTest extends TestCase {
     $http = new Client(['handler' => HandlerStack::create(new MockHandler($responses))]);
     $provider = new CiviOpenIdProvider(['clientId' => 'test'] + $options, ['httpClient' => $http]);
     $claims = [
-      'iss' => $issuer, 'sub' => 'alice', 'aud' => 'test', 'nonce' => 'transaction',
-      'iat' => time(), 'exp' => time() + 60,
+      'iss' => $issuer,
+      'sub' => 'alice',
+      'aud' => 'test',
+      'nonce' => 'transaction',
+      'iat' => time(),
+      'exp' => time() + 60,
     ];
     switch ($case) {
       case 'wrong-issuer':
