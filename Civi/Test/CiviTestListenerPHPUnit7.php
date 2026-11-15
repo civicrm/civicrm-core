@@ -169,8 +169,8 @@ class CiviTestListenerPHPUnit7 implements \PHPUnit\Framework\TestListener {
     }
 
     $blurb = "Tip: Run the headless tests and end-to-end tests separately, e.g.\n"
-    . "  $ phpunit5 --group headless\n"
-    . "  $ phpunit5 --group e2e  \n";
+    . "  $ phpunit9 --group headless\n"
+    . "  $ phpunit9 --group e2e  \n";
 
     if (!empty($byInterface['HeadlessInterface']) && CIVICRM_UF !== 'UnitTests') {
       $testNames = implode(', ', array_keys($byInterface['HeadlessInterface']));
