@@ -342,20 +342,18 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     // recreates the table. A concurrent transaction that reads one of these
     // tables then fails with MySQL error 1412 ("Table definition has changed"),
     // or the cache clear waits on its metadata lock and blocks other requests.
-    $queries = [
-      'DELETE FROM civicrm_acl_cache',
-      'DELETE FROM civicrm_acl_contact_cache',
-      // Do not truncate, reduce risks of losing a quickform session
-      'DELETE FROM civicrm_cache WHERE group_name NOT LIKE "CiviCRM%Session"',
-      'DELETE FROM civicrm_prevnext_cache',
-      'UPDATE civicrm_group SET cache_date = NULL',
-      'DELETE FROM civicrm_group_contact_cache',
-      'UPDATE civicrm_setting SET value = NULL WHERE name="navigation" AND contact_id IS NOT NULL',
-    ];
-
-    foreach ($queries as $query) {
-      CRM_Core_DAO::executeQuery($query);
-    }
+    // The tables that can grow large are emptied in chunks, see deleteInChunks().
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_acl_cache');
+    self::deleteInChunks('civicrm_acl_contact_cache');
+    // Do not truncate, reduce risks of losing a quickform session
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_cache WHERE group_name NOT LIKE "CiviCRM%Session"');
+    self::deleteInChunks('civicrm_prevnext_cache');
+    self::deleteInChunks('civicrm_group_contact_cache');
+    // Reset cache_date only after civicrm_group_contact_cache has been emptied. A smart group that
+    // is rebuilt while the table is being emptied would otherwise keep a fresh cache_date while
+    // some of its rows have been deleted, and show too few contacts until the cache expires.
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_group SET cache_date = NULL');
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_setting SET value = NULL WHERE name="navigation" AND contact_id IS NOT NULL');
 
     // Clear the route table through CRM_Core_Menu::clear() rather than a bare TRUNCATE, so it
     // takes the data.core.menu lock and drops the derived route cache. Otherwise this cache clear
@@ -369,6 +367,35 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
 
     // also delete all the import and export temp tables
     self::clearTempTables();
+  }
+
+  /**
+   * Empty a cache table in chunks rather than with one DELETE.
+   *
+   * A single DELETE of a large table is one long transaction: it holds row locks until it ends,
+   * so other requests that write to the table wait (and can hit a lock wait timeout), and a
+   * replica applies it as one event, so it falls behind by about as long again. Short chunks
+   * avoid both.
+   *
+   * The number of rounds is bounded by the row count at the start, so this ends even when other
+   * requests keep adding rows meanwhile. Rows added during the clear may remain; they were built
+   * after the clear started.
+   *
+   * @internal
+   *
+   * @param string $table
+   *   One of the cache tables; not escaped.
+   * @param int $chunkSize
+   */
+  public static function deleteInChunks(string $table, int $chunkSize = 10000): void {
+    $rows = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM $table");
+    $rounds = intdiv($rows, $chunkSize) + 1;
+    for ($round = 0; $round < $rounds; $round++) {
+      $dao = CRM_Core_DAO::executeQuery("DELETE FROM $table LIMIT $chunkSize");
+      if ($dao->affectedRows() < $chunkSize) {
+        break;
+      }
+    }
   }
 
   /**
