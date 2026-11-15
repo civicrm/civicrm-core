@@ -41,7 +41,7 @@ class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
     $values = $this->getCorrectFormFields($thousandSeparator);
     $result = CRM_Campaign_Form_Campaign::Submit($values, $form);
     $campaign = $this->callAPISuccess('campaign', 'get', ['id' => $result['id']]);
-    $this->assertEquals('10000.00', $campaign['values'][$campaign['id']]['goal_revenue']);
+    $this->assertSame('10000.00', $campaign['values'][$campaign['id']]['goal_revenue']);
   }
 
   /**
@@ -57,7 +57,7 @@ class CRM_Campaign_Form_CampaignTest extends CiviUnitTestCase {
     $values['includeGroups'] = [];
     CRM_Campaign_Form_Campaign::submit($values, new CRM_Campaign_Form_Campaign());
 
-    $this->assertEquals(1, CRM_Core_DAO::singleValueQuery(
+    $this->assertSame(1, (int) CRM_Core_DAO::singleValueQuery(
       'SELECT COUNT(*) FROM civicrm_campaign_group WHERE campaign_id = %1',
       [1 => [$existing['id'], 'Positive']]
     ));

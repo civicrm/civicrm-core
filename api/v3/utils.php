@@ -1060,7 +1060,7 @@ function _civicrm_api3_custom_format_params($params, &$values, $extends, $entity
     // provides transitional support.
     return;
   }
-  $entityId ??= $params['id'] ?? $params['contact_id'] ?? NULL;
+  $entityId ??= $params['id'] ?? NULL;
   $values['custom'] = [];
   $checkCheckBoxField = FALSE;
   $entity = $extends;
@@ -1872,6 +1872,10 @@ function _civicrm_api3_generic_replace($entity, $params) {
   catch (Exception $e) {
     $transaction->rollback();
     return civicrm_api3_create_error($e->getMessage());
+  }
+  catch (\Throwable $e) {
+    $transaction->rollback();
+    throw $e;
   }
 }
 

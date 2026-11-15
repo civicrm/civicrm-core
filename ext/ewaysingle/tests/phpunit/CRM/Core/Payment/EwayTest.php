@@ -104,8 +104,8 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
       $this->fail('Test was meant to throw an exception');
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
-      $this->assertEquals('Error: [24] - Do Not Honour(Test Gateway).', $e->getMessage());
-      $this->assertEquals(9008, $e->getErrorCode());
+      $this->assertSame('Error: [24] - Do Not Honour(Test Gateway).', $e->getMessage());
+      $this->assertSame(9008, $e->getErrorCode());
     }
   }
 
@@ -128,7 +128,7 @@ class CRM_Core_Payment_EwayTest extends \PHPUnit\Framework\TestCase implements H
       "billing_postal_code-$billingLocationTypeID" => 5010,
       "billing_country_id-$billingLocationTypeID" => 1228,
       'credit_card_number' => '4444333322221111',
-      'cvv2' => 123,
+      'cvv2' => '123',
       'credit_card_exp_date' => [
         'M' => 9,
         'Y' => 2025,

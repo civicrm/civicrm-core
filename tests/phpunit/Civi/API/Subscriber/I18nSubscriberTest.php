@@ -25,7 +25,7 @@ class I18nSubscriberTest extends \CiviUnitTestCase {
       $this->fail('Expected exception from hook');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Ruh-roh', $e->getMessage());
+      $this->assertSame('Ruh-roh', $e->getMessage());
     }
 
     $this->assertEquals($before, Locale::detect()->nominal);
@@ -47,7 +47,7 @@ class I18nSubscriberTest extends \CiviUnitTestCase {
       $this->fail('Expected exception from hook');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Ruh-roh', $e->getMessage());
+      $this->assertSame('Ruh-roh', $e->getMessage());
     }
 
     $this->assertEquals($before, Locale::detect()->nominal);
@@ -84,7 +84,7 @@ class I18nSubscriberTest extends \CiviUnitTestCase {
       ->addValue('first_name', 'Outer')
       ->execute();
 
-    $this->assertEquals('fr_FR', $localeAfterInnerFailure);
+    $this->assertSame('fr_FR', $localeAfterInnerFailure);
     $this->assertEquals($before, Locale::detect()->nominal);
   }
 

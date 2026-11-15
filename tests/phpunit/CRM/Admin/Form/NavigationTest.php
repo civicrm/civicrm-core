@@ -58,8 +58,8 @@ class CRM_Admin_Form_NavigationTest extends CiviUnitTestCase {
       ->first();
 
     $this->assertNotEmpty($nav);
-    $this->assertEquals('https://example.org/docs', $nav['url']);
-    $this->assertEquals('_blank', $nav['target']);
+    $this->assertSame('https://example.org/docs', $nav['url']);
+    $this->assertSame('_blank', $nav['target']);
 
     // Verify AJAX output in CRM_Admin_Page_AJAX::navMenu()
     $_SERVER['REQUEST_METHOD'] = 'POST';
@@ -78,8 +78,8 @@ class CRM_Admin_Form_NavigationTest extends CiviUnitTestCase {
     $this->assertNotEmpty($data['menu']);
 
     $menuItem = CRM_Utils_Array::findAll($data['menu'], ['label' => 'Test link in new tab'])[0];
-    $this->assertEquals('https://example.org/docs', $menuItem['url']);
-    $this->assertEquals('_blank', $menuItem['target']);
+    $this->assertSame('https://example.org/docs', $menuItem['url']);
+    $this->assertSame('_blank', $menuItem['target']);
   }
 
 }

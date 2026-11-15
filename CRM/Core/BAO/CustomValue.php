@@ -16,11 +16,12 @@
  */
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
+use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * Business objects for managing custom data values.
  */
-class CRM_Core_BAO_CustomValue extends CRM_Core_DAO implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
 
   /**
    * Validate a value against a CustomField type.
@@ -246,6 +247,7 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO implements \Civi\Core\HookIn
    * Access check for multi-record custom pseudo-entities
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord')]
   public static function on_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $groupName = \Civi\Api4\Utils\CoreUtil::getCustomGroupName($e->getEntityName());
     if (!$groupName) {

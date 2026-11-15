@@ -28,7 +28,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
       $rows++;
       $this->assertTrue(is_numeric($dao->cnt), "Expect query to execute");
     }
-    $this->assertEquals(1, $rows);
+    $this->assertSame(1, $rows);
   }
 
   public function testExecute_OK_fetchValue(): void {
@@ -337,7 +337,7 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
   public function testArrayGet(): void {
     $select = CRM_Utils_SQL_Select::from("foo")
       ->param('hello', 'world');
-    $this->assertEquals('world', $select['hello']);
+    $this->assertSame('world', $select['hello']);
   }
 
   public function testInsertInto_WithDupes(): void {

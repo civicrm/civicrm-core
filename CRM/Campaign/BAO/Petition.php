@@ -141,13 +141,14 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   }
 
   /**
-   * Get Petition Signature Total.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param int $surveyId
    *
    * @return array
    */
   public static function getPetitionSignatureTotalbyCountry($surveyId) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $countries = [];
     $sql = "
             SELECT count(civicrm_address.country_id) as total,
@@ -183,13 +184,14 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
   }
 
   /**
-   * Get Petition Signature Total.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param int $surveyId
    *
    * @return array
    */
   public static function getPetitionSignatureTotal($surveyId) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $surveyInfo = CRM_Campaign_BAO_Petition::getSurveyInfo((int) $surveyId);
     //$activityTypeID = $surveyInfo['activity_type_id'];
     $sql = "
@@ -480,7 +482,7 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
             [
               'groupName' => 'msg_tpl_workflow_petition',
               'workflow' => 'petition_confirmation_needed',
-              'contactId' => $params['contactId'],
+              'modelProps' => ['surveyID' => $surveyID, 'activityID' => $activityID, 'contactID' => $contactID],
               'tplParams' => $tplParams,
               'from' => "\"{$domainEmailName}\" <{$domainEmailAddress}>",
               'toName' => $toName,

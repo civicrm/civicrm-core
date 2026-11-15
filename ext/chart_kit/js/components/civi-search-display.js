@@ -126,12 +126,13 @@
       // Integrations can push a callback to `onTotalCount` to keep track of the number of results returned
       // FIXME: Additional hack to directly update tabHeader for contact summary tab. It would be better to
       // decouple the contactTab code into a separate directive that uses onTotalCount.
+      const isSubsearch = this.closest('.crm-search-col-type-subsearch');
       const tabPanel = this.closest('.crm-contact-page .ui-tabs-panel');
       const firstDisplay = tabPanel ? tabPanel.querySelector('[search][display]') : null;
       // Only the first display in a tab gets to control the count; its Angular wrapper element counts as this display
-      const contactTab = firstDisplay && (firstDisplay === this || firstDisplay === this.parentElement) ? tabPanel.id : null;
+      const contactTab = firstDisplay && (firstDisplay === this || firstDisplay === this.parentElement) && (CRM.tabHeader?.hasCount?.(tabPanel.id.replace('contact-', '#tab_')) !== false) ? tabPanel.id : null;
       // Callbacks are added after the element connects, so this is checked when a count is due
-      const hasCounter = () => this.constructor.reportsRowCount && (contactTab || this.onTotalCount.length);
+      const hasCounter = () => !isSubsearch && this.constructor.reportsRowCount && (contactTab || this.onTotalCount.length);
 
       const setTotalCount = (rowCount) => {
         this.onTotalCount.forEach((callback) => callback(rowCount));
@@ -255,6 +256,13 @@
       return Object.values(this.getAfformFilters()).some((value) => value !== undefined);
     }
 
+    // Name of the Afform this display is embedded in, which lets SearchDisplay.run
+    // apply the form's filters and permissions (including its secret-link token).
+    // A display placed directly in a submission form has no afFieldset, so fall back to the afForm.
+    getAfformName() {
+      return this.afFieldsetCtrl?.getFormName() ?? angular.element(this).controller('afForm')?.getFormMeta().name ?? null;
+    }
+
     // Generate params for the SearchDisplay.run api
     getApiParams(mode) {
       return {
@@ -265,7 +273,7 @@
         limit: this.limit,
         seed: this.uniqueId,
         filters: this.getFilters(),
-        afform: this.afFieldsetCtrl ? this.afFieldsetCtrl.getFormName() : null
+        afform: this.getAfformName()
       };
     }
 

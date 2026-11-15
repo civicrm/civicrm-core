@@ -139,10 +139,10 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertTrue(is_numeric($tokenRecord['id']));
     $this->assertEquals($client['id'], $tokenRecord['client_id']);
     $this->assertEquals(['foo'], $tokenRecord['scopes']);
-    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
-    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
-    $this->assertEquals('Bearer', $tokenRecord['token_type']);
-    $this->assertEquals('test@baz.biff', $tokenRecord['resource_owner_name']);
+    $this->assertSame('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertSame('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertSame('Bearer', $tokenRecord['token_type']);
+    $this->assertSame('test@baz.biff', $tokenRecord['resource_owner_name']);
     $this->assertEquals(
       [
         'iss' => 'https://dummy',
@@ -189,8 +189,8 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertTrue(is_numeric($tokenRecord['id']));
     $this->assertEquals($client['id'], $tokenRecord['client_id']);
     $this->assertEquals(['foo'], $tokenRecord['scopes']);
-    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
-    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertSame('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertSame('example-refresh-token-value', $tokenRecord['refresh_token']);
     $this->assertEquals($notLoggedInContactID, $tokenRecord['contact_id']);
   }
 
@@ -218,8 +218,8 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertTrue(is_numeric($tokenRecord['id']));
     $this->assertEquals($client['id'], $tokenRecord['client_id']);
     $this->assertEquals(['foo'], $tokenRecord['scopes']);
-    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
-    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertSame('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertSame('example-refresh-token-value', $tokenRecord['refresh_token']);
     $this->assertTrue(!isset($tokenRecord['contact_id']));
   }
 
@@ -253,15 +253,15 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertTrue(is_numeric($tokenRecord['id']));
     $this->assertEquals($client['id'], $tokenRecord['client_id']);
     $this->assertEquals(['foo'], $tokenRecord['scopes']);
-    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
-    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertSame('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertSame('example-refresh-token-value', $tokenRecord['refresh_token']);
     $this->assertGreaterThan($notLoggedInContactID, $tokenRecord['contact_id']);
     $contact = \Civi\Api4\Contact::get(FALSE)
       ->addWhere('id', '=', $tokenRecord['contact_id'])
       ->addJoin('Email AS email')
       ->addSelect('email.email')
       ->execute()->single();
-    $this->assertEquals('test@baz.biff', $contact['email.email']);
+    $this->assertSame('test@baz.biff', $contact['email.email']);
   }
 
   public function testContactToken_LoggedInUser_Default() {
@@ -287,8 +287,8 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertTrue(is_numeric($tokenRecord['id']));
     $this->assertEquals($client['id'], $tokenRecord['client_id']);
     $this->assertEquals(['foo'], $tokenRecord['scopes']);
-    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
-    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertSame('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertSame('example-refresh-token-value', $tokenRecord['refresh_token']);
     $this->assertEquals($loggedInContactID, $tokenRecord['contact_id']);
   }
 
@@ -322,8 +322,8 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertTrue(is_numeric($tokenRecord['id']));
     $this->assertEquals($client['id'], $tokenRecord['client_id']);
     $this->assertEquals(['foo'], $tokenRecord['scopes']);
-    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
-    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertSame('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertSame('example-refresh-token-value', $tokenRecord['refresh_token']);
     $this->assertEquals($notLoggedInContactID, $tokenRecord['contact_id']);
   }
 
@@ -350,15 +350,15 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertTrue(is_numeric($tokenRecord['id']));
     $this->assertEquals($client['id'], $tokenRecord['client_id']);
     $this->assertEquals(['foo'], $tokenRecord['scopes']);
-    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
-    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertSame('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertSame('example-refresh-token-value', $tokenRecord['refresh_token']);
     $this->assertGreaterThan($loggedInContactID, $tokenRecord['contact_id']);
     $contact = \Civi\Api4\Contact::get(FALSE)
       ->addWhere('id', '=', $tokenRecord['contact_id'])
       ->addJoin('Email AS email')
       ->addSelect('email.email')
       ->execute()->single();
-    $this->assertEquals('test@baz.biff', $contact['email.email']);
+    $this->assertSame('test@baz.biff', $contact['email.email']);
   }
 
   public function testContactToken_LoggedInUser_SetNullContactId() {
@@ -385,8 +385,8 @@ class AuthCodeFlowTest extends \PHPUnit\Framework\TestCase implements
     $this->assertTrue(is_numeric($tokenRecord['id']));
     $this->assertEquals($client['id'], $tokenRecord['client_id']);
     $this->assertEquals(['foo'], $tokenRecord['scopes']);
-    $this->assertEquals('example-access-token-value', $tokenRecord['access_token']);
-    $this->assertEquals('example-refresh-token-value', $tokenRecord['refresh_token']);
+    $this->assertSame('example-access-token-value', $tokenRecord['access_token']);
+    $this->assertSame('example-refresh-token-value', $tokenRecord['refresh_token']);
     $this->assertTrue(!isset($tokenRecord['contact_id']));
   }
 

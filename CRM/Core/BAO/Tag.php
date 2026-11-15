@@ -442,12 +442,13 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   }
 
   /**
-   * Get the tags that are not children of a tagset.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @return array
    *   associated array of tag name and id
    */
   public static function getTagsNotInTagset() {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $tags = $tagSets = [];
     // first get all the tag sets
     $query = "SELECT id FROM civicrm_tag WHERE is_tagset=1 AND parent_id IS NULL";

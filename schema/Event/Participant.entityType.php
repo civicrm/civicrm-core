@@ -8,7 +8,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Participant'),
     'title_plural' => ts('Participants'),
-    'description' => ts('Records of contacts\' attendance and roles in events.'),
+    'description' => ts("Records of contacts' attendance and roles in events."),
     'log' => TRUE,
     'add' => '1.7',
     'icon' => 'fa-ticket',

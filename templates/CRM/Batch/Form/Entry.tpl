@@ -95,7 +95,7 @@
             <div class="compressed crm-grid-cell">{$form.soft_credit_type.$rowNumber.html}</div>
           {elseif $n eq 'contribution_soft_credit_pcp_id'}
             <div class="compressed crm-grid-cell">
-              <div>{$form.pcp_made_through_id.$rowNumber.html}{$form.pcp_made_through.$rowNumber.html}</div>
+              <div>{$form.pcp_made_through_id.$rowNumber.html}</div>
               <div>{$form.pcp_display_in_roll.$rowNumber.label}&nbsp;{$form.pcp_display_in_roll.$rowNumber.html}</div>
               <div class="pcp_roll_display">{$form.pcp_roll_nickname.$rowNumber.label}&nbsp;{$form.pcp_roll_nickname.$rowNumber.html}</div>
               <div class="pcp_roll_display">{$form.pcp_personal_note.$rowNumber.label}&nbsp;{$form.pcp_personal_note.$rowNumber.html}</div>

@@ -1782,7 +1782,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * @throws CRM_Core_Exception
    */
   protected function getMembershipType($membershipTypeID): array {
-    return $this->getMembershipTypes()[$membershipTypeID];
+    return $this->getMembershipTypes()[$membershipTypeID] ?? [];
   }
 
   /**

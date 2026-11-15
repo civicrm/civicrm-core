@@ -74,7 +74,11 @@ class Angular {
     ]);
     $enabledLanguages = \CRM_Core_I18n::languages(TRUE);
     $isMultiLingual = (count($enabledLanguages) > 1);
-    $requiredTokens = \Civi\Core\Resolver::singleton()->call('call://civi_flexmailer_required_tokens/getRequiredTokens', []);
+    // Avoid hard fail if there is a caching issue leaving the flexmailer service unavailable.
+    // https://lab.civicrm.org/dev/core/-/work_items/6853
+    $requiredTokens = \Civi::container()->has('civi_flexmailer_required_tokens')
+      ? \Civi\Core\Resolver::singleton()->call('call://civi_flexmailer_required_tokens/getRequiredTokens', [])
+      : [];
     $default_email = \Civi\Api4\Email::get(TRUE)
       ->addWhere('contact_id', '=', 'user_contact_id')
       ->addWhere('is_primary', '=', TRUE)

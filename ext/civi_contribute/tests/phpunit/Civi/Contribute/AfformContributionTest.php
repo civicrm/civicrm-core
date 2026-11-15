@@ -205,11 +205,11 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
 
     // check a valid contribution ID
     $contributionId = $response->single()['Contribution1'][0]['id'];
-    $this->assertEquals(TRUE, $contributionId > 0);
+    $this->assertTrue($contributionId > 0);
 
     // check a valid participant ID
     $participantId = $response->single()['Participant1'][0]['id'];
-    $this->assertEquals(TRUE, $participantId > 0);
+    $this->assertTrue($participantId > 0);
 
     $contribution = \Civi\Api4\Contribution::get(FALSE)
       ->addWhere('id', '=', $contributionId)
@@ -217,7 +217,7 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
       ->single();
 
     // check expected amount
-    $this->assertEquals(15, $contribution['total_amount']);
+    $this->assertSame(15.0, $contribution['total_amount']);
 
     // get line items
     $lineItems = \Civi\Api4\LineItem::get(FALSE)
@@ -225,11 +225,11 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
       ->execute();
 
     // should have 2 line items
-    $this->assertEquals(2, $lineItems->count());
+    $this->assertSame(2, $lineItems->count());
 
     // should have 1 participant line item
     $participantLineItems = array_filter((array) $lineItems, fn ($lineItem) => $lineItem['entity_table'] === 'civicrm_participant');
-    $this->assertEquals(1, count($participantLineItems));
+    $this->assertSame(1, count($participantLineItems));
 
     // should be linked to the participant
     $participantLineItem = array_values($participantLineItems)[0];
@@ -274,7 +274,7 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
       $this->fail('Afform::submit should have failed');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals(TRUE, \str_contains($e->getMessage(), 'No line items'));
+      $this->assertTrue(\str_contains($e->getMessage(), 'No line items'));
     }
 
   }
@@ -447,7 +447,7 @@ class AfformContributionTest extends TestCase implements HeadlessInterface {
       ->execute()
       ->single();
     // Only the admin ticket option (amount 20) contributes to the total.
-    $this->assertEquals(20, $contribution['total_amount']);
+    $this->assertSame(20.0, $contribution['total_amount']);
   }
 
   /**

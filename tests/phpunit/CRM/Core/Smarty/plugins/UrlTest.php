@@ -22,7 +22,7 @@ class CRM_Core_Smarty_plugins_UrlTest extends CiviUnitTestCase {
       ],
       'Here, we assign the plain-text variable and then use it for JS expression' => [
         'expected' => 'window.location = ".*q=civicrm/profile/view&id=123&gid=456"',
-        'input' => '{url assign=myUrl flags=t}//civicrm/profile/view?id=123&gid=456{/url}' . 'window.location = "{$myUrl}";',
+        'input' => '{url assign=myUrl flags=t}//civicrm/profile/view?id=123&gid=456{/url}window.location = "{$myUrl}";',
         'is_escape' => FALSE,
       ],
       'another one ...' => [
@@ -39,7 +39,7 @@ class CRM_Core_Smarty_plugins_UrlTest extends CiviUnitTestCase {
       ],
       'We have a Smarty variable which already included escaped data. Smarty should do substitution.' => [
         'q=civicrm/profile/view&amp;id=123&amp;message=this+%2B+that',
-        '{assign var=msg value="this+%2B+that"}' . '{url flags="%"}//civicrm/profile/view?id=123&message={$msg}{/url}',
+        '{assign var=msg value="this+%2B+that"}{url flags="%"}//civicrm/profile/view?id=123&message={$msg}{/url}',
       ],
       'Generate client-side route (with Angular path and params)' => [
         'expected' => 'q=civicrm/a/#/mailing/100?angularDebug=1',

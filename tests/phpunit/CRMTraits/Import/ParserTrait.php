@@ -110,7 +110,7 @@ trait CRMTraits_Import_ParserTrait {
         'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
       ]);
       $result = $runner->runAll();
-      $this->assertEquals(TRUE, $result, $result === TRUE ? '' : CRM_Core_Error::formatTextException($result['exception']));
+      $this->assertTrue($result, $result === TRUE ? '' : CRM_Core_Error::formatTextException($result['exception']));
     }
     else {
       throw new CRM_Core_Exception('nothing queued');
@@ -180,7 +180,7 @@ trait CRMTraits_Import_ParserTrait {
       ->addSelect('id', 'threshold')
       ->execute()
       ->first();
-    $this->assertEquals(10, $dedupeRuleGroup['threshold']);
+    $this->assertSame(10, $dedupeRuleGroup['threshold']);
     $dedupeRuleGroupID = $this->ids['DedupeRule']['unsupervised'] = $dedupeRuleGroup['id'];
     $this->callAPISuccess('Rule', 'create', [
       'dedupe_rule_group_id' => $dedupeRuleGroupID,

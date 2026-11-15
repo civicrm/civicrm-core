@@ -177,11 +177,11 @@ class ThemesTest extends \CiviUnitTestCase {
     }
 
     foreach ($expectedUrls as $inputFile => $expectedUrl) {
-      list ($ext, $file) = explode('-', $inputFile, 2);
+      [$ext, $file] = explode('-', $inputFile, 2);
       $actualUrl = $themeSvc->resolveUrls($themeSvc->getActiveThemeKey(), $ext, $file);
       foreach (array_keys($actualUrl) as $k) {
         // Ignore cache revision key (`?r=abcd1234`).
-        list ($actualUrl[$k]) = explode('?', $actualUrl[$k], 2);
+        [$actualUrl[$k]] = explode('?', $actualUrl[$k], 2);
       }
       $this->assertEquals($expectedUrl, $actualUrl, "Check URL for $inputFile");
     }

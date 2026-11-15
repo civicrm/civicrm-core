@@ -32,9 +32,42 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   }
 
   public function testEvalUrl(): void {
-    $this->assertEquals(FALSE, CRM_Utils_System::evalUrl(FALSE));
-    $this->assertEquals('http://example.com/', CRM_Utils_System::evalUrl('http://example.com/'));
-    $this->assertEquals('http://example.com/?cms=UnitTests', CRM_Utils_System::evalUrl('http://example.com/?cms={uf}'));
+    $this->assertFalse(CRM_Utils_System::evalUrl(FALSE));
+    $this->assertSame('http://example.com/', CRM_Utils_System::evalUrl('http://example.com/'));
+    $this->assertSame('http://example.com/?cms=UnitTests', CRM_Utils_System::evalUrl('http://example.com/?cms={uf}'));
+  }
+
+  /**
+   * A fragment in the query string goes to the end of the URL and leaves the path alone.
+   */
+  public function testUrlQueryWithFragment(): void {
+    $this->assertSame('/index.php?q=civicrm/foo/bar&foo=ab#details',
+      CRM_Utils_System::url('civicrm/foo/bar', 'foo=ab#details', FALSE, NULL, FALSE));
+    // Only the first '#' starts the fragment: a later one stays in it.
+    $this->assertSame('/index.php?q=civicrm/foo/bar&foo=ab#x#y',
+      CRM_Utils_System::url('civicrm/foo/bar', 'foo=ab#x#y', FALSE, NULL, FALSE));
+  }
+
+  /**
+   * A fragment in the path goes to the end of the URL, after the query.
+   */
+  public function testUrlPathWithFragment(): void {
+    $this->assertSame('/index.php?q=civicrm/foo/bar&foo=ab#details',
+      CRM_Utils_System::url('civicrm/foo/bar#details', 'foo=ab', FALSE, NULL, FALSE));
+    // Only the first '#' starts the fragment: a later one stays in it.
+    $this->assertSame('/index.php?q=civicrm/foo/bar&foo=ab#x#y',
+      CRM_Utils_System::url('civicrm/foo/bar#x#y', 'foo=ab', FALSE, NULL, FALSE));
+  }
+
+  /**
+   * A query in the path goes before the query string.
+   */
+  public function testUrlPathWithQuery(): void {
+    $this->assertSame('/index.php?q=civicrm/foo/bar&foo=ab&bar=cd',
+      CRM_Utils_System::url('civicrm/foo/bar?foo=ab', 'bar=cd', FALSE, NULL, FALSE));
+    // Only the first '?' starts the query: a later one stays in it.
+    $this->assertSame('/index.php?q=civicrm/foo/bar&foo=a?b&bar=cd',
+      CRM_Utils_System::url('civicrm/foo/bar?foo=a?b', 'bar=cd', FALSE, NULL, FALSE));
   }
 
   /**
@@ -152,7 +185,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
    * @param string $hookName
    */
   public function hook_civicrm_alterExternUrl(\Civi\Core\Event\GenericHookEvent $event, $hookName) {
-    $this->assertEquals('hook_civicrm_alterExternUrl', $hookName);
+    $this->assertSame('hook_civicrm_alterExternUrl', $hookName);
     $this->assertTrue($event->hasField('url'));
     $this->assertTrue($event->hasField('path'));
     $this->assertTrue($event->hasField('query'));

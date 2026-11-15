@@ -132,14 +132,14 @@ class CRM_Event_Form_SelfSvcTransferTest extends CiviUnitTestCase {
       ->addWhere('entity_id', '=', $toLineItem['id'])
       ->execute()->single();
     $this->assertEquals($this->ids['Contact']['to_contact'], $toFinancialItem['contact_id']);
-    $this->assertEquals(50, $toFinancialItem['amount']);
+    $this->assertSame(50.0, $toFinancialItem['amount']);
 
     $trxnAmounts = EntityFinancialTrxn::get(FALSE)
       ->addWhere('entity_table', '=', 'civicrm_financial_item')
       ->addSelect('amount')
       ->execute()
       ->column('amount');
-    $this->assertEquals(50, array_sum($trxnAmounts));
+    $this->assertSame(50.0, array_sum($trxnAmounts));
   }
 
   /**
@@ -163,7 +163,7 @@ class CRM_Event_Form_SelfSvcTransferTest extends CiviUnitTestCase {
       'cs' => CRM_Contact_BAO_Contact_Utils::generateChecksum($this->ids['Contact']['individual_0']),
       'is_backoffice' => 0,
     ])->processForm();
-    $this->assertEquals('Registration Transferred', CRM_Core_Session::singleton()->getStatus()[1]['title']);
+    $this->assertSame('Registration Transferred', CRM_Core_Session::singleton()->getStatus()[1]['title']);
   }
 
 }

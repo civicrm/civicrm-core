@@ -401,7 +401,7 @@ ORDER BY contact_a.sort_name';
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact') {
-    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+    [$this->_aclFrom, $this->_aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
   /**

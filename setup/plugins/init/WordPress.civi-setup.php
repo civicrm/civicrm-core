@@ -51,7 +51,7 @@ if (!defined('CIVI_SETUP')) {
     $model->templateCompilePath = implode(DIRECTORY_SEPARATOR, [$uploadDir['basedir'], 'civicrm', 'templates_c']);
 
     // Compute DSN.
-    list(/*$host*/, /*$port*/, $socket) = Civi\Setup\DbUtil::decodeHostPort(DB_HOST);
+    [/*$host*/, /*$port*/, $socket] = Civi\Setup\DbUtil::decodeHostPort(DB_HOST);
     $model->db = $model->cmsDb = [
       'server' => $socket ? sprintf('unix(%s)', $socket) : DB_HOST,
       'username' => DB_USER,

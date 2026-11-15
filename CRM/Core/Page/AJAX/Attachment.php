@@ -152,7 +152,7 @@ class CRM_Core_Page_AJAX_Attachment {
    * @throws Exception
    */
   public static function checkToken($token) {
-    list ($signature, $ts) = explode(';;;', $token);
+    [$signature, $ts] = explode(';;;', $token);
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), ['for', 'ts']);
     if (!is_numeric($ts) || CRM_Utils_Time::time() > $ts + self::ATTACHMENT_TOKEN_TTL) {
       return FALSE;

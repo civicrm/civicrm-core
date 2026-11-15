@@ -12,20 +12,17 @@
 
 namespace Civi\Api4\Service\Autocomplete;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\HookInterface;
 
-/**
- * @service
- * @internal
- */
-class ContributionRecurAutocompleteProvider extends \Civi\Core\Service\AutoService implements HookInterface {
+class ContributionRecurAutocompleteProvider {
 
   /**
    * Provide default SavedSearch for Contribution autocompletes
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.autocompleteDefault')]
   public static function on_civi_search_autocompleteDefault(GenericHookEvent $e) {
     if (!is_array($e->savedSearch) || $e->savedSearch['api_entity'] !== 'ContributionRecur') {
       return;
@@ -55,6 +52,7 @@ class ContributionRecurAutocompleteProvider extends \Civi\Core\Service\AutoServi
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay')]
   public static function on_civi_search_defaultDisplay(GenericHookEvent $e) {
     if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || $e->savedSearch['api_entity'] !== 'ContributionRecur') {
       return;

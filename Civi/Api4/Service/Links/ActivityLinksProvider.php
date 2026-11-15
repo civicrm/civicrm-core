@@ -14,20 +14,12 @@ namespace Civi\Api4\Service\Links;
 
 use Civi\API\Event\RespondEvent;
 use Civi\Api4\OptionValue;
+use Civi\Core\Attribute\CiviEventListener;
 
-/**
- * @service
- * @internal
- */
-class ActivityLinksProvider extends \Civi\Core\Service\AutoSubscriber {
+class ActivityLinksProvider {
   use LinksProviderTrait;
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api.respond' => 'alterActivityLinksResult',
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.api.respond')]
   public static function alterActivityLinksResult(RespondEvent $e): void {
     $request = $e->getApiRequest();
     if ($request['version'] == 4 && $request->getEntityName() === 'Activity' && is_a($request, '\Civi\Api4\Action\GetLinks')) {

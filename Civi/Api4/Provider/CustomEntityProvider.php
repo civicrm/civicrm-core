@@ -11,31 +11,18 @@
 
 namespace Civi\Api4\Provider;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Api4\CustomValue;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\Service\AutoService;
 use Civi\Schema\EntityRepository;
 use CRM_Core_BAO_CustomGroup;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * @service
- * @internal
- */
-class CustomEntityProvider extends AutoService implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api4.entityTypes' => ['addCustomEntities', 100],
-    ];
-  }
+class CustomEntityProvider {
 
   /**
    * Get custom-field pseudo-entities
    */
+  #[CiviEventListener(event: 'civi.api4.entityTypes', priority: 100)]
   public static function addCustomEntities(GenericHookEvent $e) {
     $baseInfo = CustomValue::getInfo();
     foreach (\CRM_Core_BAO_CustomGroup::getAll() as $customGroup) {
@@ -57,7 +44,9 @@ class CustomEntityProvider extends AutoService implements EventSubscriberInterfa
         'class_args' => [$customGroup['name']],
         'description' => ts('Custom group for %1', [1 => $baseEntityTitle]),
         'paths' => [
-          'view' => "civicrm/contact/view/cd?reset=1&gid={$customGroup['id']}&recId=[id]&multiRecordDisplay=single",
+          'add' => "civicrm/af/custom/{$customGroup['name']}/create#?entity_id=[entity_id]",
+          'update' => "civicrm/af/custom/{$customGroup['name']}/update#?Record=[id]",
+          'view' => "civicrm/af/custom/{$customGroup['name']}/view#?Record=[id]",
         ],
       ] + $baseInfo;
       if (!empty($customGroup['icon'])) {

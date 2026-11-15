@@ -354,58 +354,6 @@ class CRM_Utils_REST {
   }
 
   /**
-   * used to load a template "inline", eg. for ajax, without having to build a menu for each template
-   */
-  public static function loadTemplate() {
-    $request = CRM_Utils_Request::retrieve('q', 'String');
-    if (FALSE !== strpos($request, '..')) {
-      die("SECURITY FATAL: the url can't contain '..'. Please report the issue on the forum at civicrm.org");
-    }
-
-    $request = explode('/', $request);
-    $entity = _civicrm_api_get_camel_name($request[2]);
-    $tplfile = _civicrm_api_get_camel_name($request[3]);
-
-    $tpl = 'CRM/' . $entity . '/Page/Inline/' . $tplfile . '.tpl';
-    $smarty = CRM_Core_Smarty::singleton();
-    CRM_Utils_System::setTitle("$entity::$tplfile inline $tpl");
-    if (!$smarty->template_exists($tpl)) {
-      CRM_Utils_System::setHttpHeader("Status", "404 Not Found");
-      die("Can't find the requested template file templates/$tpl");
-    }
-    // special treatmenent, because it's often used
-    if (array_key_exists('id', $_GET)) {
-      // an id is always positive
-      $smarty->assign('id', (int) $_GET['id']);
-    }
-    $pos = strpos(implode(array_keys($_GET)), '<');
-
-    if ($pos !== FALSE) {
-      die("SECURITY FATAL: one of the param names contains &lt;");
-    }
-    $param = array_map('htmlentities', $_GET);
-    unset($param['q']);
-    $smarty->assign("request", $param);
-
-    if (!self::isWebServiceRequest()) {
-
-      $smarty->assign('tplFile', $tpl);
-      $config = CRM_Core_Config::singleton();
-      $content = $smarty->fetch('CRM/common/' . strtolower($config->userFramework) . '.tpl');
-      CRM_Utils_System::appendTPLFile($tpl, $content);
-
-      CRM_Utils_System::theme($content);
-      return;
-    }
-    else {
-      $content = "<!-- .tpl file embedded: $tpl -->\n";
-      CRM_Utils_System::appendTPLFile($tpl, $content);
-      echo $content . $smarty->fetch($tpl);
-      CRM_Utils_System::civiExit();
-    }
-  }
-
-  /**
    * This is a wrapper so you can call an api via json (it returns json too)
    * http://example.org/civicrm/api/json?entity=Contact&action=Get"&json={"contact_type":"Individual","email.get.email":{}}
    * to take all the emails from individuals.

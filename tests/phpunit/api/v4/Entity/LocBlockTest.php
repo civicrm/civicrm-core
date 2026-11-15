@@ -42,8 +42,8 @@ class LocBlockTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', '=', $locBlock1['id'])
       ->addSelect('email_id', 'email_2_id', 'email_id.email', 'email_2_id.email')
       ->execute()->first();
-    $this->assertEquals('first@e.mail', $locBlock['email_id.email']);
-    $this->assertEquals('second@e.mail', $locBlock['email_2_id.email']);
+    $this->assertSame('first@e.mail', $locBlock['email_id.email']);
+    $this->assertSame('second@e.mail', $locBlock['email_2_id.email']);
     $this->assertEquals($locBlock1['email_id'], $locBlock['email_id']);
     $this->assertEquals($locBlock1['email_2_id'], $locBlock['email_2_id']);
 
@@ -93,7 +93,7 @@ class LocBlockTest extends Api4TestBase implements TransactionalInterface {
     $updatedLocBlock = $this->getTestRecord('LocBlock', $locBlockId, ['*', 'address_id.street_address', 'phone_id.phone', 'email_id.email']);
 
     $this->assertEquals($locBlock['address_id'], $updatedLocBlock['address_id']);
-    $this->assertEquals('123', $updatedLocBlock['address_id.street_address']);
+    $this->assertSame('123', $updatedLocBlock['address_id.street_address']);
     $this->assertNull($updatedLocBlock['phone_id.phone']);
     $this->assertNull($updatedLocBlock['email_id.email']);
   }

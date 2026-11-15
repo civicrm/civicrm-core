@@ -14,27 +14,26 @@
         self.afFormCtrl = ctrls[1];
         self.afRepeatCtrl = ctrls[2];
       },
-      controller: function($scope, $element, crmApi4) {
+      controller: function($scope, $element, $timeout, crmApi4, afDuplicateContacts) {
         const ctrl = this;
         const localData = [];
+        let duplicateCheckTimer;
         const joinOffsets = {};
         const ts = $scope.ts = CRM.ts('org.civicrm.afform');
 
-        this.getData = function() {
-          return ctrl.afFormCtrl ? ctrl.afFormCtrl.getData(ctrl.modelName) : localData;
-        };
+        // A search fieldset (`af-fieldset=""`) holds its own filter values, even
+        // when it sits inside an <af-form> alongside entity fieldsets.
+        const isEntityFieldset = () => Boolean(this.afFormCtrl && this.modelName);
+
+        this.getData = () => isEntityFieldset() ? this.afFormCtrl.getData(this.modelName) : localData;
         // Get name of afform entity or search display
         this.getName = function() {
           return this.modelName ||
             // If there is no Afform entity, get the name of embedded search display
             $element.find('[search-name][display-name]').attr('display-name');
         };
-        this.getEntity = function() {
-          return this.afFormCtrl ? this.afFormCtrl.getEntity(this.modelName) : null;
-        };
-        this.getEntityType = function() {
-          return this.afFormCtrl ? this.afFormCtrl.getEntity(this.modelName)?.type : null;
-        };
+        this.getEntity = () => isEntityFieldset() ? this.afFormCtrl.getEntity(this.modelName) : null;
+        this.getEntityType = () => this.getEntity()?.type ?? null;
         this.getFieldData = function() {
           const data = ctrl.getData();
           // afRepeat will handle adding items itself
@@ -95,6 +94,32 @@
           return this.reloadedStoredValues[fieldName];
         };
 
+        // Values to compare against existing contacts, or null when the check
+        // does not apply: not a contact entity, or an existing record.
+        const duplicateCheckValues = () => {
+          const entity = ctrl.getEntity();
+          if (!afDuplicateContacts.enabled() || !entity || entity.id || !entity.dupeCheckRule) {
+            return null;
+          }
+          const item = ctrl.getData()[0] || {};
+          const fields = item.fields || {};
+          const email = (item.joins?.Email?.[0] || {}).email;
+          const values = {};
+          // Fields named by the rule that this form doesn't collect are simply skipped.
+          (CRM.af.dedupeRuleFields[entity.dupeCheckRule] || []).forEach((name) => {
+            if (name === 'email' && email) {
+              values.email = email;
+            }
+            else if (fields[name]) {
+              values[name] = fields[name];
+            }
+          });
+          return {
+            contactType: entity.type === 'Contact' ? (entity.data || {}).contact_type : entity.type,
+            values: values
+          };
+        };
+
         this.$onInit = () => {
           if (typeof this.fieldData === 'object') {
             localData.push({
@@ -112,6 +137,19 @@
           }, true);
 
           $scope.$watch(this.getSearchParamSetId, () => this.fetchSearchParamSetValues());
+
+          const checkDuplicates = afDuplicateContacts.createChecker();
+          $scope.$watch(duplicateCheckValues, (check) => {
+            if (!check) {
+              return;
+            }
+            $timeout.cancel(duplicateCheckTimer);
+            duplicateCheckTimer = $timeout(() => checkDuplicates(check.contactType, check.values), 500);
+          }, true);
+        };
+
+        this.$onDestroy = () => {
+          $timeout.cancel(duplicateCheckTimer);
         };
 
         /**

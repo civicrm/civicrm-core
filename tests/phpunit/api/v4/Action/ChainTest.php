@@ -47,7 +47,7 @@ class ChainTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->indexBy('name');
 
-    $this->assertEquals('Array', $actions['getActions']['fields']['params']['data_type']);
+    $this->assertSame('Array', $actions['getActions']['fields']['params']['data_type']);
   }
 
   public function testGetEntityWithActions(): void {
@@ -120,8 +120,8 @@ class ChainTest extends Api4TestBase implements TransactionalInterface {
       0)
       ->execute()->first();
 
-    $this->assertEquals('Fav', $found['contact']['first_name']);
-    $this->assertEquals('Fav', $found['contact2']['first_name']);
+    $this->assertSame('Fav', $found['contact']['first_name']);
+    $this->assertSame('Fav', $found['contact2']['first_name']);
   }
 
   /**

@@ -43,8 +43,8 @@ class TokenCompatSubscriberTest extends CiviUnitTestCase {
         'msg_html' => '<p>Dear {contact.first_name|default:"donor"}</p>',
       ],
     ]);
-    $this->assertEquals('Dear donor', $rendered['subject']);
-    $this->assertEquals('<p>Dear donor</p>', $rendered['html']);
+    $this->assertSame('Dear donor', $rendered['subject']);
+    $this->assertSame('<p>Dear donor</p>', $rendered['html']);
   }
 
 }

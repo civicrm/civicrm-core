@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\OptionValue;
+
 /**
  * Test class for CRM_Contact_BAO_Group BAO
  *
@@ -24,18 +26,12 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
    */
   public function testContactSubtype(): void {
     foreach (['Contact_sub_type', 'Contact2__sub__type'] as $contactSubType) {
-      $subType = $this->callAPISuccess('ContactType', 'create', [
+      $this->createTestEntity('ContactType', [
         'name' => $contactSubType,
         'label' => $contactSubType,
-        'is_active' => 1,
-        'parent_id' => 'Individual',
-      ]);
-      // Contact Type api munge name in create mode
-      // Therefore updating the name in update mode
-      $this->callAPISuccess('ContactType', 'create', [
-        'name' => $contactSubType,
-        'id' => $subType['id'],
-      ]);
+        'is_active' => TRUE,
+        'parent_id:name' => 'Individual',
+      ], $contactSubType);
     }
     $this->searchContacts('Contact_sub_type');
     $this->searchContacts('Contact2__sub__type');
@@ -52,9 +48,9 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
       'first_name' => 'Peter' . bin2hex(random_bytes(2)),
       'last_name' => 'Lastname',
       'contact_type' => 'Individual',
-      'contact_sub_type' => $contactSubType,
+      'contact_sub_type' => [$contactSubType],
     ];
-    $contacts = $this->callAPISuccess('Contact', 'create', $params);
+    $contacts = $this->createTestEntity('Contact', $params, $contactSubType);
     $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(TRUE);
     foreach ($contactTypes as $contactType => $ignore) {
       if (str_contains($contactType, $contactSubType)) {
@@ -66,20 +62,20 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     }
     CRM_Contact_BAO_Query::convertFormValues($formValues);
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
-    list($select, $from, $where, $having) = $query->query();
+    [$select, $from, $where, $having] = $query->query();
     // get and assert contact count
     $contactsResult = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id %s %s', $from, $where))->fetchAll();
     foreach ($contactsResult as $key => $value) {
       $contactsResult[$key] = $value['id'];
     }
     // assert the contacts count
-    $this->assertEquals(1, count($contactsResult));
+    $this->assertSame(1, count($contactsResult));
     // assert the contact IDs
     $expectedResult = [$contacts['id']];
     $this->checkArrayEquals($expectedResult, $contactsResult);
     // get and assert qill string
     $qill = trim(implode($query->getOperator(), $query->qill()[0]));
-    $this->assertEquals("Contact Type In IndividualANDContact Subtype Like {$contactSubType}", $qill);
+    $this->assertSame("Contact Type In IndividualANDContact Subtype Like {$contactSubType}", $qill);
   }
 
   /**
@@ -89,11 +85,10 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testContactSearchOnGroupType(): void {
-    $groupTypes = $this->callAPISuccess('OptionValue', 'get', [
-      'return' => ['id', 'name'],
-      'option_group_id' => 'group_type',
-    ])['values'];
-    $groupTypes = array_column($groupTypes, 'id', 'name');
+    $groupTypes = OptionValue::get(FALSE)
+      ->addSelect('id', 'name')
+      ->addWhere('option_group_id:name', '=', 'group_type')
+      ->execute()->column('id', 'name');
 
     // Create group with empty group type as Access Control.
     $groupId = $this->groupCreate([
@@ -108,21 +103,21 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     $formValues['group_type'] = $groupTypes['Access Control'];
     CRM_Contact_BAO_Query::convertFormValues($formValues);
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
-    list($select, $from, $where, $having) = $query->query();
+    [$select, $from, $where, $having] = $query->query();
     // get and assert contact count
     $contactsResult = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id %s %s', $from, $where));
     // assert the contacts count
-    $this->assertEquals(5, $contactsResult->N);
+    $this->assertSame(5, $contactsResult->N);
 
     // Find Contacts of Group type == Mailing List
     $formValues['group_type'] = $groupTypes['Mailing List'];
     CRM_Contact_BAO_Query::convertFormValues($formValues);
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
-    list($select, $from, $where, $having) = $query->query();
+    [$select, $from, $where, $having] = $query->query();
     // get and assert contact count
     $contactsResult = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id %s %s', $from, $where));
     // assert the contacts count
-    $this->assertEquals(0, $contactsResult->N);
+    $this->assertSame(0, $contactsResult->N);
   }
 
 }

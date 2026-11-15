@@ -112,7 +112,7 @@ class CRM_Report_Utils_ReportTest extends CiviUnitTestCase {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $contents = $e->errorData['html'];
-      $this->assertEquals('pdf', $e->errorData['output']);
+      $this->assertSame('pdf', $e->errorData['output']);
     }
     $this->assertStringContainsString("id_value={$last_contact['id']}", $contents);
   }

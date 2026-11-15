@@ -101,7 +101,7 @@
 .crm-search-display .form-inline:not(:has(*)) {
   display: none;
 }
-.crm-container .crm-summary-row.primary .crm-label:after {
+.crm-container .crm-summary-row.primary .crm-label::after {
   content: '\f005';
   font-family: 'Font Awesome 5 Free', sans-serif;
   opacity: 0.5;
@@ -206,7 +206,7 @@ select.crm-error {
   box-shadow: none;
 }
 .crm-container input.crm-placeholder-icon::placeholder {
-  font-family: "FontAwesome";
+  font-family: FontAwesome;
   text-align: right;
 }
 .crm-icon-picker-button {
@@ -228,7 +228,7 @@ select.crm-error {
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  grid-gap: var(--crm-l-medium-2);
+  gap: var(--crm-l-medium-2);
 
   & input[type="checkbox"].crm-form-toggle {
     appearance: none;
@@ -333,9 +333,9 @@ select.crm-error {
 .crm-editable-enabled:has(span.crm-search-field-value:empty) {
   opacity: .5;
 }
-.crm-container .replace-plain a:active:before,
-.crm-container .replace-plain:focus:before,
-.crm-container .replace-plain:hover:before,
+.crm-container .replace-plain a:active::before,
+.crm-container .replace-plain:focus::before,
+.crm-container .replace-plain:hover::before,
 .crm-container .crm-editable-enabled:hover .crm-i,
 .crm-container .crm-editable-enabled:focus .crm-i,
 .crm-editable-enabled:has(span.crm-search-field-value:empty):hover,
@@ -343,7 +343,7 @@ select.crm-error {
   opacity: 1;
 }
 .crm-container .crm-editable-saving {
-  background: #ffffcc!important;
+  background: #ffc!important;
   opacity: 0.8;
 }
 .crm-editable-form {
@@ -501,7 +501,7 @@ input.crm-form-checkbox) + label {
 }
 .crm-container .select2-container-multi .select2-choices::before,
 .crm-container .select2-container .select2-choice .select2-arrow::before {
-  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "FontAwesome";
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", FontAwesome;
   font-style: normal;
   text-rendering: auto;
   color: var(--crm-text-color);
@@ -637,10 +637,9 @@ span.crm-select-item-color {
   padding: var(--crm-l-small);
 }
 .select2-search::after {
-  font-family: "FontAwesome";
+  font-family: FontAwesome;
   font-style: normal;
   text-rendering: auto;
-  font-size: .8em;
   color: var(--crm-text-color);
   content: "";
   font-size: 14px;
@@ -727,11 +726,11 @@ span.crm-select-item-color {
 .select2-drop.collapsible-optgroups-enabled .select2-result-with-children.optgroup-expanded .select2-result-sub {
   display: block;
 }
-.select2-drop.collapsible-optgroups-enabled .select2-result-with-children.optgroup-expanded > .select2-result-label:before {
+.select2-drop.collapsible-optgroups-enabled .select2-result-with-children.optgroup-expanded > .select2-result-label::before {
   transform: var(--crm-accordion-transform);
   transition: var(--crm-accordion-transition);
 }
-.select2-drop.collapsible-optgroups-enabled .select2-result-with-children > .select2-result-label:before {
+.select2-drop.collapsible-optgroups-enabled .select2-result-with-children > .select2-result-label::before {
   font-size: var(--crm-font-size);
   content: var(--crm-accordion-icon);
   color: var(--crm-accordion-icon-color);
@@ -814,7 +813,7 @@ span.crm-select-item-color {
   border: 0 solid transparent;
 }
 #ui-datepicker-div .ui-datepicker-header :is(.ui-datepicker-prev,.ui-datepicker-next)::before {
-  font-family: "FontAwesome";
+  font-family: FontAwesome;
   color: var(--crm-text-color);
   font-size: var(--crm-font-small-size);
   line-height: var(--crm-l-large);
@@ -892,7 +891,7 @@ span.crm-select-item-color {
   color: var(--crm-text-light-color);
 }
 .crm-container .ui-spinner a.ui-spinner-button span::before {
-  font-family: "FontAwesome";
+  font-family: FontAwesome;
   font-style: normal;
   font-weight: normal;
   font-size: var(--crm-l-medium-3);

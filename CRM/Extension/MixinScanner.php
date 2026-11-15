@@ -130,7 +130,7 @@ class CRM_Extension_MixinScanner {
     foreach ($this->mixInfos as $ext) {
       /** @var \CRM_Extension_MixInfo $ext */
       foreach ($ext->mixins as $verExpr) {
-        list ($name, $expectVer) = explode('@', $verExpr);
+        [$name, $expectVer] = explode('@', $verExpr);
         $matchFile = NULL;
         // NOTE: allFuncs[$name] is sorted by increasing version number. Choose highest satisfactory match.
         foreach ($allFuncs[$name] ?? [] as $availVer => $availFile) {

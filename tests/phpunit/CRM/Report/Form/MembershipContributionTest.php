@@ -26,12 +26,20 @@ class CRM_Report_Form_MembershipContributionTest extends CiviReportTestCase {
    */
   private $contributionID;
 
+  /**
+   * @var int|null
+   */
+  private $originalHeapLimit;
+
   public function setUp(): void {
     parent::setUp();
     $this->createMembershipPaidOverTwoLineItems();
   }
 
   public function tearDown(): void {
+    if ($this->originalHeapLimit !== NULL) {
+      CRM_Core_DAO::executeQuery('SET SESSION max_heap_table_size = %1', [1 => [$this->originalHeapLimit, 'Integer']]);
+    }
     $this->quickCleanUpFinancialEntities();
     Civi::cache('long')->clear();
     parent::tearDown();
@@ -44,8 +52,8 @@ class CRM_Report_Form_MembershipContributionTest extends CiviReportTestCase {
     ])->getResultSet();
 
     $this->assertCount(1, $rows);
-    $this->assertEquals(1, $rows[0]['civicrm_contribution_total_amount_count']);
-    $this->assertEquals(100, $rows[0]['civicrm_contribution_total_amount_sum']);
+    $this->assertSame('1', $rows[0]['civicrm_contribution_total_amount_count']);
+    $this->assertSame('100.00', $rows[0]['civicrm_contribution_total_amount_sum']);
   }
 
   /**
@@ -74,8 +82,8 @@ class CRM_Report_Form_MembershipContributionTest extends CiviReportTestCase {
       'group_bys' => ['membership_type_id'],
     ])->getResultSet();
 
-    $this->assertEquals(2, $rows[0]['civicrm_contribution_total_amount_count']);
-    $this->assertEquals(130, $rows[0]['civicrm_contribution_total_amount_sum']);
+    $this->assertSame('2', $rows[0]['civicrm_contribution_total_amount_count']);
+    $this->assertSame('130.00', $rows[0]['civicrm_contribution_total_amount_sum']);
   }
 
   public function testMemberDetailListsContributionOnce(): void {
@@ -95,6 +103,44 @@ class CRM_Report_Form_MembershipContributionTest extends CiviReportTestCase {
 
     $this->assertEquals([$this->contributionID], array_column($rows, 'civicrm_contribution_contribution_id'));
     $this->assertNotEmpty($rows[0]['civicrm_membership_membership_type_id']);
+  }
+
+  public function testMemberContributionDetailSkipsTestAndTemplateContributions(): void {
+    $contactID = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Test'])['id'];
+    foreach (['is_test', 'is_template'] as $flag) {
+      $this->createTestEntity('Contribution', [
+        'contact_id' => $contactID,
+        'financial_type_id:name' => 'Donation',
+        'total_amount' => 10,
+        'receive_date' => 'now',
+        $flag => TRUE,
+      ], $flag);
+    }
+
+    $rows = $this->getReportObject('CRM_Report_Form_Member_ContributionDetail', [
+      'fields' => ['membership_start_date'],
+    ])->getResultSet();
+
+    $this->assertEquals([$this->contributionID], array_column($rows, 'civicrm_contribution_contribution_id'));
+  }
+
+  public function testMemberContributionDetailRunsWithMoreContributionsThanTheHeapLimitHolds(): void {
+    // 16 KB is the smallest heap limit; about a thousand contributions exceed it.
+    $this->originalHeapLimit = (int) CRM_Core_DAO::singleValueQuery('SELECT @@SESSION.max_heap_table_size');
+    CRM_Core_DAO::executeQuery('SET SESSION max_heap_table_size = 16384');
+    for ($i = 0; $i < 10; $i++) {
+      CRM_Core_DAO::executeQuery('INSERT INTO civicrm_contribution (contact_id, financial_type_id, total_amount, receive_date, contribution_status_id, currency)
+        SELECT contact_id, financial_type_id, total_amount, receive_date, contribution_status_id, currency FROM civicrm_contribution');
+    }
+    $this->assertGreaterThan(1000, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_contribution'));
+
+    $membershipTypeID = \Civi\Api4\Membership::get(FALSE)->addWhere('id', '=', $this->membershipID)->addSelect('membership_type_id')->execute()->single()['membership_type_id'];
+    $rows = $this->getReportObject('CRM_Report_Form_Member_ContributionDetail', [
+      'fields' => ['membership_start_date'],
+      'filters' => ['tid_op' => 'in', 'tid_value' => $membershipTypeID],
+    ])->getResultSet();
+
+    $this->assertEquals([$this->contributionID], array_column($rows, 'civicrm_contribution_contribution_id'));
   }
 
   public function testBookkeepingFindsMembership(): void {

@@ -60,7 +60,7 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     $cases[] = ['invalidtype', 'CRM_Foo_Page_AJAX::method', FALSE];
 
     foreach ($cases as $case) {
-      list ($type, $className, $expectedResult) = $case;
+      [$type, $className, $expectedResult] = $case;
       $actualResult = CRM_Core_Page_AJAX::checkAuthz($type, $className);
       $this->assertEquals($expectedResult, $actualResult,
         sprintf('Check type=[%s] value=[%s]', $type, $className));
@@ -272,6 +272,61 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test updateMode succeeds for an activity when user has permission.
+   */
+  public function testUpdateModeActivityWithPermissionSuccess(): void {
+    $loggedInUserId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'edit all contacts']);
+
+    $activity = $this->createTestEntity('Activity', [
+      'source_contact_id' => $loggedInUserId,
+      'activity_type_id:name' => 'Meeting',
+      'subject' => 'Recurring Activity Permitted',
+      'status_id:name' => 'Scheduled',
+    ], 'act_rec');
+
+    $_GET = $_REQUEST = [
+      'mode' => 1,
+      'entityId' => $activity['id'],
+      'entityTable' => 'civicrm_activity',
+    ];
+
+    try {
+      CRM_Core_Page_AJAX_RecurringEntity::updateMode();
+      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->assertIsArray($e->errorData);
+    }
+  }
+
+  /**
+   * Test updateMode is denied for an activity when user lacks permission.
+   */
+  public function testUpdateModeActivityWithoutPermissionDenied(): void {
+    $otherContact = $this->individualCreate([], 'other_act_creator');
+    $activity = $this->createTestEntity('Activity', [
+      'source_contact_id' => $otherContact,
+      'activity_type_id:name' => 'Meeting',
+      'subject' => 'Recurring Activity Without Perm',
+      'status_id:name' => 'Scheduled',
+    ], 'act_rec_denied');
+
+    $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM']);
+
+    $_GET = $_REQUEST = [
+      'mode' => 1,
+      'entityId' => $activity['id'],
+      'entityTable' => 'civicrm_activity',
+    ];
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Core_Page_AJAX_RecurringEntity::updateMode();
+  }
+
+  /**
    * Set up fixtures for getPermissionedLocation tests.
    *
    * @return array
@@ -417,7 +472,7 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $this->assertIsArray($e->errorData);
-      $this->assertEquals('123 Main St', $e->errorData['onbehalf_street_address-' . $this->getLocationTypeID('Home')]['value'] ?? NULL);
+      $this->assertSame('123 Main St', $e->errorData['onbehalf_street_address-' . $this->getLocationTypeID('Home')]['value'] ?? NULL);
     }
   }
 
@@ -439,7 +494,7 @@ class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $this->assertIsArray($e->errorData);
-      $this->assertEquals('123 Main St', $e->errorData['onbehalf_street_address-' . $this->getLocationTypeID('Home')]['value'] ?? NULL);
+      $this->assertSame('123 Main St', $e->errorData['onbehalf_street_address-' . $this->getLocationTypeID('Home')]['value'] ?? NULL);
     }
   }
 

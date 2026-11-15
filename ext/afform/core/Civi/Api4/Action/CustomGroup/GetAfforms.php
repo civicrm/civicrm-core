@@ -92,12 +92,6 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
       }
     }
 
-    // restrict forms other than block to if Admin UI is enabled
-    $hasAdminUi = \CRM_Extension_System::singleton()->getMapper()->isActiveModule('civicrm_admin_ui');
-    if (!$hasAdminUi) {
-      $this->formTypes = array_intersect(['block'], $this->formTypes);
-    }
-
     foreach ($this->formTypes as $type) {
       switch ($type) {
         case 'block':
@@ -368,7 +362,9 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
   }
 
   public static function getCustomGroupAfforms($event) {
+    $activeEntities = array_keys(\Civi::service('action_object_provider')->getEntities());
     $formGenerate = \Civi\Api4\CustomGroup::getAfforms(FALSE)
+      ->addWhere('extends', 'IN', $activeEntities)
       ->addWhere('is_active', '=', TRUE);
 
     // only generate layout if this is required by the Afform.get
@@ -401,9 +397,7 @@ class GetAfforms extends \Civi\Api4\Generic\BasicBatchAction {
 
     foreach ($forms as $form) {
       $form['has_base'] = TRUE;
-      // blocks are provided by this module, but others are effectively provided
-      // by `civicrm_admin_ui` at this stage
-      $form['base_module'] = ($form['type'] === 'block') ? E::LONG_NAME : 'civicrm_admin_ui';
+      $form['base_module'] = E::LONG_NAME;
       $event->afforms[$form['name']] = $form;
     }
   }

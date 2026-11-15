@@ -105,7 +105,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'id' => $this->_events[1]['id'],
     ];
     $result = $this->callAPISuccess('event', 'get', $params);
-    $this->assertEquals($result['values'][$this->_eventIds[1]]['event_title'], 'Annual CiviCRM meet 2');
+    $this->assertSame('Annual CiviCRM meet 2', $result['values'][$this->_eventIds[1]]['event_title']);
   }
 
   /**
@@ -128,13 +128,13 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccess('Event', 'create', $params);
     $result = CRM_Event_BAO_Event::getLocationEvents();
-    $this->assertEquals(1, count($result));
+    $this->assertSame(1, count($result));
     $this->assertStringContainsString('California', reset($result));
     $this->assertStringContainsString('1234567', reset($result));
 
     $this->hookClass->setHook('civicrm_selectWhereClause', [$this, 'selectWhereClauseHook']);
     $result = CRM_Event_BAO_Event::getLocationEvents();
-    $this->assertEquals(0, count($result));
+    $this->assertSame(0, count($result));
   }
 
   public function testGetEventByEventTitle(): void {
@@ -145,7 +145,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('event', 'get', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals($result['values'][0]['id'], $this->_eventIds[0]);
   }
 
@@ -159,7 +159,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'title' => 'No event with that title',
     ];
     $result = $this->callAPISuccess('Event', 'Get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
   }
 
   /**
@@ -225,8 +225,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Event', 'Get', $params);
     $allEvents = $this->callAPISuccess('Event', 'Get', []);
     $this->callAPISuccess('Event', 'Delete', ['id' => $currentEvent['id']]);
-    $this->assertEquals(1, $result['count'], 'confirm only one event found in line ' . __LINE__);
-    $this->assertEquals(3, $allEvents['count'], 'confirm three events exist (ie. two not found) ' . __LINE__);
+    $this->assertSame(1, $result['count'], 'confirm only one event found in line ' . __LINE__);
+    $this->assertSame(3, $allEvents['count'], 'confirm three events exist (ie. two not found) ' . __LINE__);
     $this->assertEquals($currentEvent['id'], $result['id'], '');
   }
 
@@ -239,9 +239,9 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $params['payment_processor_id'] = 1;
     $params['sequential'] = 1;
     $result = $this->callAPISuccess('event', 'create', $params);
-    $this->assertEquals(1, $result['values'][0]['payment_processor'][0], "handing of payment processor compatibility");
+    $this->assertSame('1', $result['values'][0]['payment_processor'][0], "handing of payment processor compatibility");
     $result = $this->callAPISuccess('event', 'get', $params);
-    $this->assertEquals($result['values'][0]['payment_processor_id'], 1, "handing get payment processor compatibility");
+    $this->assertSame('1', $result['values'][0]['payment_processor_id'], "handing get payment processor compatibility");
   }
 
   /**
@@ -275,8 +275,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ];
 
     $currentEvent = $this->callAPISuccess('Event', 'getsingle', $getEventParams);
-    $this->assertEquals(0, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
-    $this->assertEquals(1, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
+    $this->assertSame('0', $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
+    $this->assertSame('1', $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
     $participant = $this->callAPISuccess('Participant', 'create', [
       'participant_status' => $this->getParticipantStatusID('Registered'),
       'role_id' => 1,
@@ -284,8 +284,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'event_id' => $this->_eventIds[0],
     ]);
     $currentEvent = $this->callAPISuccess('Event', 'getsingle', $getEventParams);
-    $this->assertEquals(1, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
-    $this->assertEquals(0, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
+    $this->assertSame('1', $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
+    $this->assertSame('0', $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
 
     $this->contactDelete($contactID);
   }
@@ -342,7 +342,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
     // assert
     $this->assertEquals($eventId, $check['id'], ' in line ' . __LINE__);
-    $this->assertEquals(1, $check['api.LocBlock.get']['count'], ' in line ' . __LINE__);
+    $this->assertSame(1, $check['api.LocBlock.get']['count'], ' in line ' . __LINE__);
     $this->assertEquals($locBlockId, $check['api.LocBlock.get']['id'], ' in line ' . __LINE__);
 
     // cleanup
@@ -391,7 +391,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'return.custom_' . $ids['custom_field_id'] => 1,
       'id' => $result['id'],
     ]);
-    $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+    $this->assertSame("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
@@ -416,7 +416,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'custom_' . $ids['custom_field_id'] => 'CRM-16036',
     ]);
 
-    $this->assertEquals(0, $check['count']);
+    $this->assertSame(0, $check['count']);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
@@ -570,7 +570,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'api.LocBlock.get' => ["id" => '$value.loc_block_id'],
     ]);
 
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
@@ -643,10 +643,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertArrayHasKey('id', $result['values'][$result['id']]);
     $result = $this->callAPISuccess($this->_entity, 'Get', ['id' => $result['id']]);
     $this->callAPISuccess($this->_entity, 'Delete', ['id' => $result['id']]);
-    $this->assertEquals('2008-10-21 00:00:00', $result['values'][$result['id']]['start_date'], 'start date is not set');
-    $this->assertEquals('2008-10-23 00:00:00', $result['values'][$result['id']]['end_date'], 'end date is not set');
-    $this->assertEquals('2008-06-01 00:00:00', $result['values'][$result['id']]['registration_start_date'], 'start date is not set');
-    $this->assertEquals('2008-10-15 00:00:00', $result['values'][$result['id']]['registration_end_date'], 'end date is not set');
+    $this->assertSame('2008-10-21 00:00:00', $result['values'][$result['id']]['start_date'], 'start date is not set');
+    $this->assertSame('2008-10-23 00:00:00', $result['values'][$result['id']]['end_date'], 'end date is not set');
+    $this->assertSame('2008-06-01 00:00:00', $result['values'][$result['id']]['registration_start_date'], 'start date is not set');
+    $this->assertSame('2008-10-15 00:00:00', $result['values'][$result['id']]['registration_end_date'], 'end date is not set');
   }
 
   /**
@@ -664,10 +664,10 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'Get', ['id' => $result['id']]);
     $this->callAPISuccess($this->_entity, 'Delete', ['id' => $result['id']]);
 
-    $this->assertEquals('2008-10-21 00:00:00', $result['values'][$result['id']]['start_date'], 'start date is not set in line ' . __LINE__);
-    $this->assertEquals('2008-10-23 00:00:00', $result['values'][$result['id']]['end_date'], 'end date is not set in line ' . __LINE__);
-    $this->assertEquals('2008-06-01 00:00:00', $result['values'][$result['id']]['registration_start_date'], 'start date is not set in line ' . __LINE__);
-    $this->assertEquals('2008-10-15 00:00:00', $result['values'][$result['id']]['registration_end_date'], 'end date is not set in line ' . __LINE__);
+    $this->assertSame('2008-10-21 00:00:00', $result['values'][$result['id']]['start_date'], 'start date is not set in line ' . __LINE__);
+    $this->assertSame('2008-10-23 00:00:00', $result['values'][$result['id']]['end_date'], 'end date is not set in line ' . __LINE__);
+    $this->assertSame('2008-06-01 00:00:00', $result['values'][$result['id']]['registration_start_date'], 'start date is not set in line ' . __LINE__);
+    $this->assertSame('2008-10-15 00:00:00', $result['values'][$result['id']]['registration_end_date'], 'end date is not set in line ' . __LINE__);
     $this->assertEquals($this->_params[0]['event_title'], $result['values'][$result['id']]['title'], 'end date is not set in line ' . __LINE__);
   }
 
@@ -685,8 +685,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccess('Event', 'Create', $params);
     $updated = $this->callAPISuccess('Event', 'Get', $params, __FUNCTION__, __FILE__);
-    $this->assertEquals(150, $updated['values'][$result['id']]['max_participants']);
-    $this->assertEquals('Annual CiviCRM meet 2', $updated['values'][$result['id']]['title']);
+    $this->assertSame($this->apiValue(150), $updated['values'][$result['id']]['max_participants']);
+    $this->assertSame('Annual CiviCRM meet 2', $updated['values'][$result['id']]['title']);
     $this->callAPISuccess($this->_entity, 'Delete', ['id' => $result['id']]);
   }
 
@@ -768,7 +768,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'sequential' => 1,
     ];
     $result = $this->callAPISuccess('event', 'get', $getParams);
-    $this->assertEquals($result['count'], 3);
+    $this->assertSame(3, $result['count']);
     $res = $result['values'][0];
     $this->assertArrayKeyExists('title', $res);
     $this->assertEquals($res['event_type_id'], $this->_params[1]['event_type_id']);
@@ -790,7 +790,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('event', 'get', $params);
 
     $this->assertEquals($result['values'][$this->_eventIds[0]]['id'], $this->_eventIds[0]);
-    $this->assertEquals($result['values'][$this->_eventIds[0]]['title'], 'Annual CiviCRM meet');
+    $this->assertSame('Annual CiviCRM meet', $result['values'][$this->_eventIds[0]]['title']);
   }
 
   /**
@@ -822,7 +822,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('event', 'get', $params);
     $this->assertAPISuccess($result);
-    $this->assertEquals(2, $result['count'], ' 2 results returned In line ' . __LINE__);
+    $this->assertSame(2, $result['count'], ' 2 results returned In line ' . __LINE__);
   }
 
   /**
@@ -857,7 +857,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = ['action' => 'create'];
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals('is_active', $result['values']['is_active']['name']);
+    $this->assertSame('is_active', $result['values']['is_active']['name']);
   }
 
   /**
@@ -866,7 +866,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   public function testgetfieldsRest(): void {
     $params = ['api_action' => 'create'];
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals(1, $result['values']['is_active']['api.default']);
+    $this->assertSame(1, $result['values']['is_active']['api.default']);
   }
 
   /**
@@ -875,7 +875,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   public function testgetfieldsGet(): void {
     $params = ['action' => 'get'];
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals('title', $result['values']['event_title']['name']);
+    $this->assertSame('title', $result['values']['event_title']['name']);
   }
 
   /**
@@ -884,7 +884,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
   public function testgetfieldsDelete(): void {
     $params = ['action' => 'delete'];
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals(1, $result['values']['id']['api.required']);
+    $this->assertSame(1, $result['values']['id']['api.required']);
   }
 
   /**
@@ -927,7 +927,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     }
 
     // check the newly created event is an event, not a template
-    $this->assertEquals(0, $eventResult['is_template'], print_r($eventResult, 1));
+    $this->assertSame($this->apiValue(FALSE), $eventResult['is_template'], print_r($eventResult, 1));
   }
 
   public function testGetListLeadingZero(): void {
@@ -939,7 +939,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Event', 'getlist', [
       'input' => "0765",
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
   }
 
   /**
@@ -963,7 +963,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $template = $this->callAPISuccess('Event', 'create', ['is_template' => 1, 'template_title' => 'Test tpl'] + $templateParams);
     $this->callAPISuccess('Event', 'create', ['id' => $template['id'], 'is_public' => 0]);
     $template = $this->callAPISuccess('Event', 'get', ['id' => $template['id']])['values'][$template['id']];
-    $this->assertEquals(1, $template['is_template']);
+    $this->assertSame($this->apiValue(TRUE), $template['is_template']);
   }
 
 }

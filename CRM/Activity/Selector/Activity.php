@@ -279,6 +279,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
           'url' => 'civicrm/mailing/report',
           'qs' => "mid={$sourceRecordId}&reset=1&cid=%%cid%%&context=activitySelector",
           'title' => ts('View Mailing Report'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::BROWSE),
         ],
       ];
     }

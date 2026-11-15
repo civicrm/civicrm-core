@@ -211,7 +211,7 @@ civicrm_contact AS contact_a {$this->_aclFrom}
     }
 
     if ($dateParams['receive_date_relative']) {
-      list($relativeFrom, $relativeTo) = CRM_Utils_Date::getFromTo($dateParams['receive_date_relative'], $dateParams['receive_date_low'], $dateParams['receive_date_high']);
+      [$relativeFrom, $relativeTo] = CRM_Utils_Date::getFromTo($dateParams['receive_date_relative'], $dateParams['receive_date_low'], $dateParams['receive_date_high']);
     }
     else {
       if (strlen($dateParams['receive_date_low']) == 10) {
@@ -328,7 +328,7 @@ civicrm_contact AS contact_a {$this->_aclFrom}
    * @param string $tableAlias
    */
   public function buildACLClause($tableAlias = 'contact') {
-    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+    [$this->_aclFrom, $this->_aclWhere] = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 
 }

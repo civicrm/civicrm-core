@@ -61,7 +61,7 @@ class CRM_Core_PageTest extends CiviUnitTestCase {
    * @dataProvider iconTestData
    */
   public function testMakeIcons($expectedMarkup, $params, $smartyFunc = '') {
-    list($icon, $text, $condition, $attribs) = $params;
+    [$icon, $text, $condition, $attribs] = $params;
     $this->assertEquals($expectedMarkup, CRM_Core_Page::crmIcon($icon, $text, $condition, $attribs));
     if (!empty($smartyFunc)) {
       $actual = CRM_Utils_String::parseOneOffStringThroughSmarty($smartyFunc);

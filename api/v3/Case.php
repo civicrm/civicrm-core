@@ -294,8 +294,8 @@ function civicrm_api3_case_get($params, $sql = NULL) {
         $contactSort = $sortString;
         $sortString = '(1)';
         // Get sort field and direction
-        list($sortField, $dir) = array_pad(explode(' ', $contactSort), 2, 'ASC');
-        list(, $sortField) = array_pad(explode('.', $sortField), 2, 'id');
+        [$sortField, $dir] = array_pad(explode(' ', $contactSort), 2, 'ASC');
+        [, $sortField] = array_pad(explode('.', $sortField), 2, 'id');
         // Validate inputs
         if (!array_key_exists($sortField, CRM_Contact_DAO_Contact::fieldKeys()) || ($dir != 'ASC' && $dir != 'DESC')) {
           throw new CRM_Core_Exception("Unknown field specified for sort. Cannot order by '$contactSort'");
@@ -604,7 +604,7 @@ function _civicrm_api3_case_read(&$cases, $options) {
     // Properly render this joined field
     if (!empty($options['return']['case_type_id.definition'])) {
       if (!empty($case['case_type_id.definition'])) {
-        list($xml) = CRM_Utils_XML::parseString($case['case_type_id.definition']);
+        [$xml] = CRM_Utils_XML::parseString($case['case_type_id.definition']);
       }
       else {
         $caseTypeId = !empty($case['case_type_id']) ? $case['case_type_id'] : CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $case['id'], 'case_type_id');

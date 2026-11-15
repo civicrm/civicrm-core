@@ -26,9 +26,9 @@ foreach ($importEntities as $importEntity) {
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'Import' . '_' . $importEntity['user_job_id'],
+        'name' => 'Import_' . $importEntity['user_job_id'],
         'label' => $importEntity['title'] . ' ' . $importEntity['description'],
-        'api_entity' => 'Import' . '_' . $importEntity['user_job_id'],
+        'api_entity' => 'Import_' . $importEntity['user_job_id'],
         'api_params' => [
           'version' => 4,
           'select' => array_keys($fields),
@@ -70,9 +70,9 @@ foreach ($importEntities as $importEntity) {
     'params' => [
       'version' => 4,
       'values' => [
-        'name' => 'Import' . '_' . $importEntity['user_job_id'],
+        'name' => 'Import_' . $importEntity['user_job_id'],
         'label' => $importEntity['title'] . ' ' . $importEntity['description'],
-        'saved_search_id.name' => 'Import' . '_' . $importEntity['user_job_id'],
+        'saved_search_id.name' => 'Import_' . $importEntity['user_job_id'],
         'type' => 'table',
         'settings' => [
           'actions' => TRUE,

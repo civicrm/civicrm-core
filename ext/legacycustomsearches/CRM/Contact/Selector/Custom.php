@@ -131,7 +131,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    * @return array
    */
   public static function &links() {
-    list($key) = func_get_args();
+    [$key] = func_get_args();
     $searchContext = "&context=custom";
     $extraParams = ($key) ? "&key={$key}" : NULL;
 

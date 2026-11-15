@@ -204,14 +204,6 @@
      <weight>930</weight>
   </item>
   <item>
-     <path>civicrm/event/manage/friend</path>
-     <title>Tell a Friend</title>
-     <page_callback>CRM_Friend_Form_Event</page_callback>
-     <access_arguments>access CiviEvent</access_arguments>
-     <is_ssl>true</is_ssl>
-     <weight>940</weight>
-  </item>
-  <item>
      <path>civicrm/event/manage/reminder</path>
      <title>Schedule Reminders</title>
      <page_callback>CRM_Event_Form_ManageEvent_ScheduleReminders</page_callback>

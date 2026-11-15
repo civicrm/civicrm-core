@@ -170,7 +170,7 @@ class AfformRepeatExtrasTest extends \PHPUnit\Framework\TestCase implements Head
       ->setAfformName($this->formName)
       ->execute()
       ->single();
-    $this->assertEquals('newsletter', $record['extra.campaign_source']);
+    $this->assertSame('newsletter', $record['extra.campaign_source']);
   }
 
   /**
@@ -215,7 +215,7 @@ class AfformRepeatExtrasTest extends \PHPUnit\Framework\TestCase implements Head
       ->setAfformName($this->formName)
       ->execute()
       ->single();
-    $this->assertEquals('newsletter', $record['extra.campaign_source']);
+    $this->assertSame('newsletter', $record['extra.campaign_source']);
   }
 
   /**

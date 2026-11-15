@@ -12,6 +12,6 @@
   <div class="crm-inline-button">
     {include file="CRM/common/formButtons.tpl" location=''}
   </div>
-  {include file="CRM/Custom/Form/Edit/CustomData.tpl" skipTitle=true customDataEntity='' isSingleRecordEdit=false}
+  {include file="CRM/Custom/Form/Edit/CustomData.tpl" skipTitle=true customDataEntity=''}
   {include file="CRM/Form/attachmentjs.tpl"}
 </div>

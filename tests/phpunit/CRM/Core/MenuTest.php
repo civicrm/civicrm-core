@@ -23,11 +23,11 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $menu = [];
     CRM_Core_Menu::readXML($xml, $menu);
     $this->assertTrue(isset($menu['civicrm/foo/bar']));
-    $this->assertEquals('Foo Bar', $menu['civicrm/foo/bar']['title']);
-    $this->assertEquals('The foo is one with the bar.', $menu['civicrm/foo/bar']['desc']);
-    $this->assertEquals('CRM_Foo_Page_Bar', $menu['civicrm/foo/bar']['page_callback']);
-    $this->assertEquals('Customize Data and Screens', $menu['civicrm/foo/bar']['adminGroup']);
-    $this->assertEquals('10', $menu['civicrm/foo/bar']['weight']);
+    $this->assertSame('Foo Bar', $menu['civicrm/foo/bar']['title']);
+    $this->assertSame('The foo is one with the bar.', $menu['civicrm/foo/bar']['desc']);
+    $this->assertSame('CRM_Foo_Page_Bar', $menu['civicrm/foo/bar']['page_callback']);
+    $this->assertSame('Customize Data and Screens', $menu['civicrm/foo/bar']['adminGroup']);
+    $this->assertSame('10', $menu['civicrm/foo/bar']['weight']);
     $this->assertTrue(!isset($menu['civicrm/foo/bar']['ids_arguments']));
   }
 
@@ -49,7 +49,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $menu = [];
     CRM_Core_Menu::readXML($xml, $menu);
     $this->assertTrue(isset($menu['civicrm/foo/bar']));
-    $this->assertEquals('Foo Bar', $menu['civicrm/foo/bar']['title']);
+    $this->assertSame('Foo Bar', $menu['civicrm/foo/bar']['title']);
     $this->assertEquals(['alpha', 'beta'], $menu['civicrm/foo/bar']['ids_arguments']['json']);
     $this->assertEquals(['gamma'], $menu['civicrm/foo/bar']['ids_arguments']['exceptions']);
     $this->assertEquals([], $menu['civicrm/foo/bar']['ids_arguments']['html']);
@@ -83,7 +83,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     \Civi::router()->clear();
     $item = \Civi::router()->get('civicrm/case');
     $this->assertTrue(in_array('foobar', $item['ids_arguments']['exceptions']));
-    $this->assertEquals('godliness', $item['whimsy']);
+    $this->assertSame('godliness', $item['whimsy']);
   }
 
   /**
@@ -98,8 +98,8 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
 
     \Civi::router()->clear();
     $item = \Civi::router()->get('civicrm/dashboard');
-    $this->assertEquals('civicrm/dashboard', $item['path']);
-    $this->assertEquals('CRM_Contact_Page_DashBoard', $item['page_callback']);
+    $this->assertSame('civicrm/dashboard', $item['path']);
+    $this->assertSame('CRM_Contact_Page_DashBoard', $item['page_callback']);
   }
 
   /**
@@ -161,8 +161,8 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
   }
 
   public function testIsPublicRoute(): void {
-    $this->assertEquals(FALSE, \CRM_Core_Menu::isPublicRoute('civicrm/contribute'));
-    $this->assertEquals(TRUE, \CRM_Core_Menu::isPublicRoute('civicrm/contribute/transact'));
+    $this->assertFalse(\CRM_Core_Menu::isPublicRoute('civicrm/contribute'));
+    $this->assertTrue(\CRM_Core_Menu::isPublicRoute('civicrm/contribute/transact'));
   }
 
   /**
@@ -208,6 +208,63 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
   }
 
   /**
+   * A rebuild that fails part way leaves no routes behind, so the next request rebuilds the
+   * table instead of routing on a partial one.
+   */
+  public function testFailedRebuildLeavesNoPartialTable(): void {
+    $saved = 0;
+    CRM_Utils_Hook::singleton()->setHook('civicrm_postSave_civicrm_menu', function ($dao) use (&$saved) {
+      if (++$saved === 100) {
+        throw new CRM_Core_Exception('Simulated failure while saving routes');
+      }
+    });
+
+    CRM_Core_Menu::clear();
+    try {
+      CRM_Core_Menu::rebuild();
+      $this->fail('rebuild() should pass on the failure');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertSame('Simulated failure while saving routes', $e->getMessage());
+    }
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_menu'));
+  }
+
+  /**
+   * A rebuild that fails inside a caller's transaction leaves the caller's work to the caller.
+   */
+  public function testFailedRebuildKeepsCallerTransaction(): void {
+    CRM_Utils_Hook::singleton()->setHook('civicrm_postSave_civicrm_menu', function ($dao) {
+      throw new CRM_Core_Exception('Simulated failure while saving routes');
+    });
+
+    CRM_Core_Menu::clear();
+    $transaction = new CRM_Core_Transaction();
+    $contactId = $this->createTestEntity('Contact', ['contact_type' => 'Individual', 'first_name' => 'Route'])['id'];
+    try {
+      CRM_Core_Menu::rebuild();
+      $this->fail('rebuild() should pass on the failure');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertSame('Simulated failure while saving routes', $e->getMessage());
+    }
+    $transaction->commit();
+
+    $this->assertSame(1, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_contact WHERE id = %1', [1 => [$contactId, 'Integer']]));
+  }
+
+  public function tearDown(): void {
+    $this->resetHooks();
+    try {
+      CRM_Core_Menu::clear();
+      CRM_Core_Menu::rebuild();
+    }
+    finally {
+      parent::tearDown();
+    }
+  }
+
+  /**
    * rebuild rebuilds an empty route table but leaves a populated one alone.
    */
   public function testRebuildOnlyIfEmpty(): void {
@@ -224,6 +281,18 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $rebuilt = FALSE;
     CRM_Core_Menu::rebuild();
     $this->assertFalse($rebuilt, 'rebuild() should skip a populated table');
+  }
+
+  /**
+   * People seem very determined to blank out the admin console page.
+   */
+  public function testGetAdminLinksAfterSystemFlush(): void {
+    CRM_Core_Menu::clear();
+    CRM_Core_Menu::rebuild();
+    Civi::rebuild(['system' => TRUE])->execute();
+    $this->assertGreaterThan(0, (int) CRM_Core_DAO::singleValueQuery('SELECT COUNT(*) FROM civicrm_menu'));
+    $links = CRM_Core_Menu::getAdminLinks();
+    $this->assertNotEmpty($links['System Settings']['fields'] ?? NULL);
   }
 
 }

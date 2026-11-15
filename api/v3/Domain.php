@@ -77,9 +77,7 @@ function civicrm_api3_domain_get($params) {
         }
       }
 
-      list($domain['from_name'],
-        $domain['from_email']
-      ) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
+      [$domain['from_name'], $domain['from_email']] = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
 
       // Rename version to domain_version, see CRM-17430.
       $domain['domain_version'] = $domain['version'];

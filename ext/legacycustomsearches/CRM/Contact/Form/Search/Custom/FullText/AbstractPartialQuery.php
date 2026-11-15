@@ -163,7 +163,7 @@ $sqlStatement
             'text' => CRM_Utils_QueryFormatter::singleton()
               ->format($queryText, CRM_Utils_QueryFormatter::LANG_SOLR),
           ];
-          list($intLimit, $intOffset) = $this->parseLimitOffset($limit);
+          [$intLimit, $intOffset] = $this->parseLimitOffset($limit);
           $files = $searcher->search($query, $intLimit, $intOffset);
           $matches = [];
           foreach ($files as $file) {
@@ -297,7 +297,7 @@ GROUP BY {$tableValues['id']}
    */
   public function toLimit($limit) {
     if (is_array($limit)) {
-      list ($limit, $offset) = $limit;
+      [$limit, $offset] = $limit;
     }
     if (empty($limit)) {
       return '';
@@ -319,7 +319,7 @@ GROUP BY {$tableValues['id']}
       $intLimit = $limit;
     }
     else {
-      list ($intLimit, $intOffset) = $limit;
+      [$intLimit, $intOffset] = $limit;
     }
     if (!$intOffset) {
       $intOffset = 0;

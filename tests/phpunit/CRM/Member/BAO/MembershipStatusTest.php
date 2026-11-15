@@ -39,7 +39,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
       'name', 'id',
       'Database check on updated membership status record.'
     );
-    $this->assertEquals($result, 'added', 'Verify membership status is_active.');
+    $this->assertSame('added', $result, 'Verify membership status is_active.');
   }
 
   /**
@@ -115,7 +115,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
    */
   public function testGetMembershipStatusByDateMore($input, $expected) {
     // Sanity check we have something close to the stock install.
-    $this->assertEquals(7, $this->callAPISuccess('MembershipStatus', 'getcount'));
+    $this->assertSame(7, $this->callAPISuccess('MembershipStatus', 'getcount'));
     // The data provider runs before the statuses exist, so it gives the name; look up the id.
     $expected['id'] = (string) $this->getMembershipStatusID($expected['name']);
 
@@ -336,7 +336,7 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $membershipStatus = CRM_Member_BAO_MembershipStatus::add($params);
     $result = CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent();
 
-    $this->assertEquals(empty($result), FALSE, 'Verify membership status records is_current_member.');
+    $this->assertFalse(empty($result), 'Verify membership status records is_current_member.');
 
     $this->callAPISuccess('MembershipStatus', 'Delete', ['id' => $membershipStatus->id]);
   }

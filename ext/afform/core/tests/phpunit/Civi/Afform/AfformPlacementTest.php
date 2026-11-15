@@ -86,13 +86,13 @@ class AfformPlacementTest extends TestCase implements HeadlessInterface {
     $this->assertArrayNotHasKey('test0', $tabs);
     $this->assertArrayHasKey('test3', $tabs);
     $this->assertArrayNotHasKey('test4', $tabs);
-    $this->assertEquals('Test C', $tabs['test1']['title']);
+    $this->assertSame('Test C', $tabs['test1']['title']);
     $this->assertEquals(['Individual'], $tabs['test1']['contact_type']);
     $this->assertEquals(['Individual'], $tabs['test3']['contact_type']);
-    $this->assertEquals('Test A', $tabs['test2']['title']);
-    $this->assertEquals('crm-i smiley-face', $tabs['test1']['icon']);
+    $this->assertSame('Test A', $tabs['test2']['title']);
+    $this->assertSame('crm-i smiley-face', $tabs['test1']['icon']);
     // Fallback icon
-    $this->assertEquals('crm-i fa-list-alt', $tabs['test2']['icon']);
+    $this->assertSame('crm-i fa-list-alt', $tabs['test2']['icon']);
     // Forms should have count => FALSE so core does not execute legacy count queries
     $this->assertFalse($tabs['test1']['count']);
     $this->assertFalse($tabs['test2']['count']);
@@ -100,7 +100,7 @@ class AfformPlacementTest extends TestCase implements HeadlessInterface {
     // Forms should be sorted by title alphabetically
     $this->assertGreaterThan($tabs['test2']['weight'], $tabs['test1']['weight']);
     // Should respect explicit weight
-    $this->assertEquals(99, $tabs['test3']['weight']);
+    $this->assertSame(99, $tabs['test3']['weight']);
   }
 
   public function testContactSummaryTabsFollowSavedAndRevertedForms(): void {
@@ -288,7 +288,7 @@ class AfformPlacementTest extends TestCase implements HeadlessInterface {
     $blockB = $getFromRegion($this->formNames[1]);
     $this->assertStringContainsString("&quot;contact_id&quot;:$cid", $blockB['markup']);
     $this->assertStringContainsString("&quot;case_id&quot;:{$cases[0]['id']}", $blockB['markup']);
-    $this->assertEquals(3, $blockB['weight']);
+    $this->assertSame(3, $blockB['weight']);
 
     $blockC = $getFromRegion($this->formNames[2]);
     $this->assertEmpty($blockC);
@@ -296,7 +296,7 @@ class AfformPlacementTest extends TestCase implements HeadlessInterface {
     $blockD = $getFromRegion($this->formNames[3]);
     $this->assertStringContainsString("&quot;contact_id&quot;:$cid", $blockD['markup']);
     $this->assertStringContainsString("&quot;case_id&quot;:{$cases[0]['id']}", $blockD['markup']);
-    $this->assertEquals(1, $blockD['weight']);
+    $this->assertSame(1, $blockD['weight']);
   }
 
 }

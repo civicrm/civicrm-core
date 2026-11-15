@@ -288,7 +288,7 @@ class CRM_Event_Form_Registration_RegisterTest extends CiviUnitTestCase {
 
     // Check how many participants are registered. Should remain 1.
     $count = $this->callAPISuccessGetCount('Participant', ['event_id' => $event['id']]);
-    $this->assertEquals(1, $count, 'Should not exceed the max_participants limit.');
+    $this->assertSame(1, $count, 'Should not exceed the max_participants limit.');
 
     // Also verify that a validation error was present.
     $this->assertNotEmpty($innerForm->_errors, 'Should have validation errors on the form.');

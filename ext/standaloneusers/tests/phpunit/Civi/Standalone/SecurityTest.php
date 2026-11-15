@@ -221,7 +221,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $token = PasswordReset::updateToken($userID);
     $decodedToken = \Civi::service('crypto.jwt')->decode($token);
     $this->assertEquals('uid:' . $userID, $decodedToken['sub']);
-    $this->assertEquals(PasswordReset::PASSWORD_RESET_SCOPE, $decodedToken['scope']);
+    $this->assertSame(PasswordReset::PASSWORD_RESET_SCOPE, $decodedToken['scope']);
 
     // Check it works, but only once.
     $extractedUserID = PasswordReset::checkPasswordResetToken($token);
@@ -237,7 +237,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       ->setPassword('fingersCrossed')
       ->execute();
 
-    $this->assertEquals(1, $result['success']);
+    $this->assertSame(1, $result['success']);
     $user = User::get(FALSE)->addWhere('id', '=', $userID)->execute()->single();
     $this->assertTrue($security->checkPassword(['password' => 'fingersCrossed'], $user));
 
@@ -250,7 +250,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
       $this->fail("Should not have been able to reuse token");
     }
     catch (\Exception $e) {
-      $this->assertEquals('Invalid token.', $e->getMessage());
+      $this->assertSame('Invalid token.', $e->getMessage());
     }
 
     // Check the message template generation
@@ -260,7 +260,7 @@ class SecurityTest extends \PHPUnit\Framework\TestCase implements EndToEndInterf
     $result = $workflow->renderTemplate();
 
     $this->assertMatchesRegularExpression(';https?://[^/]+/civicrm/login/password.*' . $token . ';', $result['html']);
-    $this->assertEquals('Password reset link for Demonstrators Anonymous', $result['subject']);
+    $this->assertSame('Password reset link for Demonstrators Anonymous', $result['subject']);
     $this->assertStringContainsString('This link expires 60 minutes after the date of this email.', $result['html']);
 
     // Fake an expired token

@@ -61,8 +61,8 @@ class PrevNextTest extends \CiviEndToEndTestCase {
       "fillWithSql should return TRUE on success"
     );
 
-    $this->assertEquals(25, $this->prevNext->getCount($this->cacheKey));
-    $this->assertEquals(0, $this->prevNext->getCount('not-a-key-' . $this->cacheKey));
+    $this->assertSame(25, $this->prevNext->getCount($this->cacheKey));
+    $this->assertSame(0, $this->prevNext->getCount('not-a-key-' . $this->cacheKey));
 
     $all = $this->prevNext->getSelection($this->cacheKey, 'getall')[$this->cacheKey];
     $this->assertCount($prefillLimit, $all);
@@ -91,8 +91,8 @@ class PrevNextTest extends \CiviEndToEndTestCase {
       "fillWithArray should return TRUE on success"
     );
 
-    $this->assertEquals(4, $this->prevNext->getCount($this->cacheKey));
-    $this->assertEquals(0, $this->prevNext->getCount('not-a-key-' . $this->cacheKey));
+    $this->assertSame(4, $this->prevNext->getCount($this->cacheKey));
+    $this->assertSame(0, $this->prevNext->getCount('not-a-key-' . $this->cacheKey));
 
     $all = $this->assertSelections([100, 400, 200, 300], 'getall', $this->cacheKey);
     $this->assertEquals([1], array_unique(array_values($all)));
@@ -129,7 +129,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     call_user_func([$this, $fillFunction]);
 
     $all = $this->prevNext->getSelection($this->cacheKey, 'getall')[$this->cacheKey];
-    list ($id1, $id2) = array_keys($all);
+    [$id1, $id2] = array_keys($all);
     $this->prevNext->markSelection($this->cacheKey, 'select', $id1);
 
     $this->assertSelections([$id1]);
@@ -147,7 +147,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     call_user_func([$this, $fillFunction]);
 
     $all = $this->prevNext->getSelection($this->cacheKey, 'getall')[$this->cacheKey];
-    list ($id1, $id2, $id3) = array_keys($all);
+    [$id1, $id2, $id3] = array_keys($all);
 
     $this->prevNext->markSelection($this->cacheKey, 'select', [$id1, $id3]);
     $this->assertSelections([$id1, $id3]);
@@ -171,7 +171,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     call_user_func([$this, $fillFunction]);
 
     $all = $this->prevNext->getSelection($this->cacheKey, 'getall')[$this->cacheKey];
-    list ($id1, $id2, $id3) = array_keys($all);
+    [$id1, $id2, $id3] = array_keys($all);
 
     $pos = $this->prevNext->getPositions($this->cacheKey, $id1);
 
@@ -192,7 +192,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     call_user_func([$this, $fillFunction]);
 
     $all = $this->prevNext->getSelection($this->cacheKey, 'getall')[$this->cacheKey];
-    list ($id1, $id2, $id3) = array_keys($all);
+    [$id1, $id2, $id3] = array_keys($all);
 
     $pos = $this->prevNext->getPositions($this->cacheKey, $id2);
     $this->assertTrue((bool) $pos['foundEntry']);
@@ -213,7 +213,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     call_user_func([$this, $fillFunction]);
 
     $all = $this->prevNext->getSelection($this->cacheKey, 'getall')[$this->cacheKey];
-    list ($idLast, $idPrev) = array_reverse(array_keys($all));
+    [$idLast, $idPrev] = array_reverse(array_keys($all));
 
     $pos = $this->prevNext->getPositions($this->cacheKey, $idLast);
     $this->assertTrue((bool) $pos['foundEntry']);
@@ -253,7 +253,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
 
     $all = $this->assertSelections([100, 400, 200, 300], 'getall', $this->cacheKey);
 
-    list ($id1, $id2, $id3) = array_keys($all);
+    [$id1, $id2, $id3] = array_keys($all);
     $this->prevNext->markSelection($this->cacheKey, 'select', [$id1, $id3]);
     $this->assertSelections([$id1, $id3], 'get', $this->cacheKey);
 

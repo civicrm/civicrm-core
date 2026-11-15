@@ -43,8 +43,8 @@ class UpdateContactTest extends Api4TestBase implements TransactionalInterface {
       ->addValue('first_name', 'Testy')
       ->execute()
       ->first();
-    $this->assertEquals('Testy', $contact['first_name']);
-    $this->assertEquals('Tester', $contact['last_name']);
+    $this->assertSame('Testy', $contact['first_name']);
+    $this->assertSame('Tester', $contact['last_name']);
   }
 
   public function testUpdateWithIdInValues(): void {
@@ -61,8 +61,8 @@ class UpdateContactTest extends Api4TestBase implements TransactionalInterface {
       ->execute();
     $this->assertCount(1, $contact);
     $this->assertEquals($contactId, $contact[0]['id']);
-    $this->assertEquals('Billy', $contact[0]['first_name']);
-    $this->assertEquals('Tester', $contact[0]['last_name']);
+    $this->assertSame('Billy', $contact[0]['first_name']);
+    $this->assertSame('Tester', $contact[0]['last_name']);
   }
 
 }

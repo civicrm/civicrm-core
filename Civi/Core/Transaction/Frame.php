@@ -115,7 +115,7 @@ class Frame {
   public function begin() {
     if ($this->state !== self::F_NEW) {
       throw new \CRM_Core_Exception('State is not F_NEW');
-    };
+    }
 
     $this->state = self::F_ACTIVE;
     if ($this->beginStmt) {
@@ -136,24 +136,36 @@ class Frame {
     }
     if ($this->state !== self::F_ACTIVE) {
       throw new \CRM_Core_Exception('State is not F_ACTIVE');
-    };
+    }
 
     $this->state = $newState;
 
     if ($this->doCommit) {
-      $this->invokeCallbacks(\CRM_Core_Transaction::PHASE_PRE_COMMIT);
+      try {
+        $this->invokeCallbacks(\CRM_Core_Transaction::PHASE_PRE_COMMIT);
+      }
+      catch (\Throwable $e) {
+        // The frame is already deregistered, so nothing else would end the SQL transaction.
+        $this->doCommit = FALSE;
+        $this->runRollback();
+        throw $e;
+      }
       if ($this->commitStmt) {
         $this->dao->query($this->commitStmt);
       }
       $this->invokeCallbacks(\CRM_Core_Transaction::PHASE_POST_COMMIT);
     }
     else {
-      $this->invokeCallbacks(\CRM_Core_Transaction::PHASE_PRE_ROLLBACK);
-      if ($this->rollbackStmt) {
-        $this->dao->query($this->rollbackStmt);
-      }
-      $this->invokeCallbacks(\CRM_Core_Transaction::PHASE_POST_ROLLBACK);
+      $this->runRollback();
     }
+  }
+
+  private function runRollback(): void {
+    $this->invokeCallbacks(\CRM_Core_Transaction::PHASE_PRE_ROLLBACK);
+    if ($this->rollbackStmt) {
+      $this->dao->query($this->rollbackStmt);
+    }
+    $this->invokeCallbacks(\CRM_Core_Transaction::PHASE_POST_ROLLBACK);
   }
 
   public function forceRollback() {

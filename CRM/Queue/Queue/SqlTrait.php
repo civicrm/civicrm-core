@@ -120,7 +120,7 @@ trait CRM_Queue_Queue_SqlTrait {
       return;
     }
     $sql = CRM_Utils_SQL::interpolate('DELETE FROM civicrm_queue_item WHERE id IN (#ids) AND queue_name = @name', [
-      'ids' => CRM_Utils_Array::collect('id', $items),
+      'ids' => array_column($items, 'id'),
       'name' => $this->getName(),
     ]);
     CRM_Core_DAO::executeQuery($sql);
@@ -177,7 +177,7 @@ trait CRM_Queue_Queue_SqlTrait {
       ? 'UPDATE civicrm_queue_item SET release_time = NULL WHERE id IN (#ids) AND queue_name = @name'
       : 'UPDATE civicrm_queue_item SET release_time = DATE_ADD(NOW(), INTERVAL #retry SECOND) WHERE id IN (#ids) AND queue_name = @name';
     CRM_Core_DAO::executeQuery(CRM_Utils_SQL::interpolate($sql, [
-      'ids' => CRM_Utils_Array::collect('id', $items),
+      'ids' => array_column($items, 'id'),
       'name' => $this->getName(),
       'retry' => $this->queueSpec['retry_interval'] ?? NULL,
     ]));
@@ -192,7 +192,7 @@ trait CRM_Queue_Queue_SqlTrait {
    */
   public function relinquishItems($items): void {
     $sql = CRM_Utils_SQL::interpolate('UPDATE civicrm_queue_item SET release_time = NULL, run_count = run_count - 1 WHERE id IN (#ids) AND queue_name = @name', [
-      'ids' => CRM_Utils_Array::collect('id', $items),
+      'ids' => array_column($items, 'id'),
       'name' => $this->getName(),
     ]);
     CRM_Core_DAO::executeQuery($sql);

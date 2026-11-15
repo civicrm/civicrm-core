@@ -6,6 +6,7 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Api4\MailSettings;
 
 /**
  * Class CRM_Mailing_MailingUnsubscribeTest
@@ -20,7 +21,7 @@ class CRM_Mailing_MailingUnsubscribeTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction();
     // Need to set this to prevent error when calling Job process_mailing
-    $this->callAPISuccess('mail_settings', 'get', ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
+    MailSettings::update(FALSE)->addValue('domain', 'chaos.org')->addWhere('id', '>', 0)->execute();
     $this->indivId = $this->individualCreate(['last_name' => 'Testy']);
   }
 
@@ -237,7 +238,7 @@ class CRM_Mailing_MailingUnsubscribeTest extends CiviUnitTestCase {
 
   private function addIndivToGroups(...$groups) {
     foreach ($groups as $group) {
-      $this->callAPISuccess('GroupContact', 'create', ['contact_id' => $this->indivId, 'group_id' => $this->groupIds[$group]]);
+      $this->createTestEntity('GroupContact', ['contact_id' => $this->indivId, 'group_id' => $this->groupIds[$group]], $group);
     }
   }
 

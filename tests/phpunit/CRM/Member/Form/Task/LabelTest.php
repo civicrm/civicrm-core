@@ -50,7 +50,7 @@ class CRM_Member_Form_Task_LabelTest extends CiviUnitTestCase {
       $form->postProcess();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals(3475, $e->errorData['format']);
+      $this->assertSame(3475, $e->errorData['format']);
     }
   }
 

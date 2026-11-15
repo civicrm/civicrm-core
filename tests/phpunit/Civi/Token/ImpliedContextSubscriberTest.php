@@ -15,7 +15,7 @@ class ImpliedContextSubscriberTest extends \CiviUnitTestCase {
       ['text' => 'Go to {event.title}!'],
       ['participantId' => $participantId]
     );
-    $this->assertEquals('Go to Annual CiviCRM meet!', $messages['text']);
+    $this->assertSame('Go to Annual CiviCRM meet!', $messages['text']);
   }
 
   public function testParticipantExplicitEvent(): void {
@@ -26,7 +26,7 @@ class ImpliedContextSubscriberTest extends \CiviUnitTestCase {
       ['text' => 'You may also like {event.title}!'],
       ['participantId' => $participantId, 'eventId' => $otherEventId]
     );
-    $this->assertEquals('You may also like Alternate Event!', $messages['text']);
+    $this->assertSame('You may also like Alternate Event!', $messages['text']);
   }
 
 }

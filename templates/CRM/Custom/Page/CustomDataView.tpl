@@ -16,15 +16,20 @@
     {if $cd_edit.help_pre}
       <div class="messages help">{$cd_edit.help_pre|purify}</div>
     {/if}
-    {if $multiRecordDisplay neq 'single'}
     <table class="no-border">
       {assign var='index' value=$groupId|cat:"_$cvID"}
       {if $showEdit && $cd_edit.editable && $groupId && $editPermission}
         <tr>
           <td>
-            <a
-              href="{crmURL p="civicrm/contact/view/cd/edit" q="tableId=`$contactId`&cid=`$contactId`&groupID=`$groupId`&action=update&reset=1"}"
-              class="button" style="margin-left: 6px;"><span><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts 1=$cd_edit.title}Edit %1{/ts}</span></a>
+            {if $cd_edit.is_multiple}
+              <a
+                href="{crmURL p="civicrm/af/custom/`$cd_edit.name`/create" f="?entity_id=`$contactId`"}"
+                class="button crm-popup" style="margin-left: 6px;"><span><i class="crm-i fa-plus" role="img" aria-hidden="true"></i> {ts 1=$cd_edit.title}Add %1{/ts}</span></a>
+            {else}
+              <a
+                href="{crmURL p="civicrm/af/custom/`$cd_edit.name`/update" f="?`$cd_edit.extends`1=`$contactId`"}"
+                class="button crm-popup" style="margin-left: 6px;"><span><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts 1=$cd_edit.title}Edit %1{/ts}</span></a>
+            {/if}
           </td>
         </tr>
       {/if}
@@ -40,6 +45,13 @@
             <div class="crm-accordion-body">
               {if $groupId and $cvID and $editPermission and $cd_edit.editable}
                 <div class="crm-submit-buttons">
+                  {if $cd_edit.is_multiple}
+                    <a href="{crmURL p="civicrm/af/custom/`$cd_edit.name`/update" f="?Record=`$cvID`"}"
+                       class="crm-hover-button crm-popup"
+                       title="{ts escape='htmlattribute' 1=$cd_edit.title|cat:" `$rowCount`"}Edit %1{/ts}">
+                      <i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Edit{/ts}
+                    </a>
+                  {/if}
                   <a href="#" class="crm-hover-button crm-custom-value-del"
                      data-post='{ldelim}"valueID": "{$cvID}", "groupID": "{$customGroupId}", "contactId": "{$contactId}", "key": "{crmKey name='civicrm/ajax/customvalue'}"{rdelim}'
                      title="{ts escape='htmlattribute' 1=$cd_edit.title|cat:" `$rowCount`"}Delete %1{/ts}">
@@ -90,51 +102,6 @@
         </td>
       </tr>
     </table>
-    {else}
-      {foreach from=$cd_edit.fields item=element key=field_id}
-        <div class="crm-section">
-          {if $element.options_per_line != 0}
-              <div class="label">{$element.field_title|escape}</div>
-              <div class="content">
-              {* sort by fails for option per line. Added a variable to iterate through the element array*}
-              {foreach from=$element.field_value item=val}
-                {$val}
-                <br/>
-              {/foreach}
-              </div>
-          {else}
-              <div class="label">{$element.field_title}</div>
-              {if $element.field_type == 'File'}
-                <div class="content">
-                {if $element.field_value}
-                  {$element.field_value}
-                {else}
-                  <br/>
-                {/if}
-                </div>
-              {else}
-                {if $element.field_data_type == 'Money'}
-                  {if $element.field_type == 'Text'}
-                    <div class="content">{if $element.field_value}{$element.field_value|crmMoney}{else}<br/>{/if}</div>
-                  {else}
-                    <div class="content">{if $element.field_value}{$element.field_value}{else}<br/>{/if}</div>
-                  {/if}
-                {else}
-                  <div class="content">
-                    {if $element.field_data_type EQ 'ContactReference' && $element.contact_ref_links}
-                      {$element.contact_ref_links|join:', '}
-                    {elseif $element.field_type eq 'File' || $element.field_type eq 'TextArea' || $element.field_type eq 'RichTextEditor' || $element.field_type === 'Link'}
-                      {$element.field_value|purify}
-                    {else}
-                      {if $element.field_value}{$element.field_value|escape} {else}<br/>{/if}
-                    {/if}
-                  </div>
-                {/if}
-              {/if}
-            {/if}
-          </div>
-        {/foreach}
-      {/if}
       {if $cd_edit.help_post}
         <div class="messages help">{$cd_edit.help_post|purify}</div>
       {/if}

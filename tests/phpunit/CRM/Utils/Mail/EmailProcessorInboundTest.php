@@ -77,21 +77,14 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
       Civi::settings()->set('max_attachments_backend', CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND);
     }
 
-    // create some contacts
-    $senderContactId = $this->individualCreate([], 1);
-    $senderContact = $this->callAPISuccess('Contact', 'getsingle', [
-      'id' => $senderContactId,
-    ]);
-    $recipientContactId = $this->individualCreate([], 2);
-    $recipientContact = $this->callAPISuccess('Contact', 'getsingle', [
-      'id' => $recipientContactId,
-    ]);
+    $this->individualCreate(['email_primary.email' => 'sender@example.org', 'first_name' => 'sender'], 'sender');
+    $this->individualCreate(['email_primary.email' => 'recipient@example.org'], 'recipient');
 
     $templateFillData = [
       'the_date' => date('r'),
-      'from_name' => $senderContact['display_name'],
-      'from_email' => $senderContact['email'],
-      'to_email' => $recipientContact['email'],
+      'from_name' => 'sender',
+      'from_email' => 'sender@example.org',
+      'to_email' => 'recipient@example.org',
     ];
 
     // Retrieve the template and insert our data like current dates
@@ -110,27 +103,28 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
 
     // get the filed activity, by sender contact id
     $activities = $this->callAPISuccess('Activity', 'get', [
-      'source_contact_id' => $senderContact['id'],
+      'source_contact_id' => $this->ids['Contact']['sender'],
+      'version' => 4,
     ]);
-    $this->assertEquals(1, $activities['count']);
+    $this->assertSame(1, $activities['count']);
 
     // check subject
     $activity = $activities['values'][$activities['id']];
-    $this->assertEquals('Testing 4 attachments', $activity['subject']);
+    $this->assertSame('Testing 4 attachments', $activity['subject']);
 
     // Check target is our recipient
     $targets = $this->callAPISuccess('ActivityContact', 'get', [
       'activity_id' => $activity['id'],
       'record_type_id' => 'Activity Targets',
     ]);
-    $this->assertEquals($recipientContact['id'], $targets['values'][$targets['id']]['contact_id']);
+    $this->assertEquals($this->ids['Contact']['recipient'], $targets['values'][$targets['id']]['contact_id']);
 
     // Check we have 4 attachments
     $attachments = $this->callAPISuccess('Attachment', 'get', [
       'entity_id' => $activity['id'],
       'entity_table' => 'civicrm_activity',
     ]);
-    $this->assertEquals(4, $attachments['count']);
+    $this->assertSame(4, $attachments['count']);
 
     // reset in case it was different from defaults
     Civi::settings()->set('max_attachments', $currentUIMax);
@@ -264,7 +258,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
 
     // The source contact should be our catchall not the original From contact.
     $activity = $this->callAPISuccess('Activity', 'getsingle', ['source_contact_id' => $catchall_id]);
-    $this->assertEquals('This is for hooks', $activity['subject']);
+    $this->assertSame('This is for hooks', $activity['subject']);
   }
 
   /**
@@ -286,7 +280,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
 
     // The source contact should be our individual not the catchall
     $activity = $this->callAPISuccess('Activity', 'getsingle', ['source_contact_id' => $contact_id]);
-    $this->assertEquals('This is for hooks', $activity['subject']);
+    $this->assertSame('This is for hooks', $activity['subject']);
   }
 
   /**
@@ -312,7 +306,7 @@ class CRM_Utils_Mail_EmailProcessorInboundTest extends CiviUnitTestCase {
 
     // The source contact should be the org not the individual
     $activity = $this->callAPISuccess('Activity', 'getsingle', ['source_contact_id' => $catchall_id]);
-    $this->assertEquals('This is for hooks', $activity['subject']);
+    $this->assertSame('This is for hooks', $activity['subject']);
   }
 
 }

@@ -1,30 +1,19 @@
 <?php
 namespace Civi\Afform\Behavior;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Afform\AbstractBehavior;
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Token\TokenRow;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use CRM_Afform_ExtensionUtil as E;
 
 /**
  * @service
  * @internal
  */
-class ContactAutofill extends AbstractBehavior implements EventSubscriberInterface {
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.afform.sort.prefill' => 'onAfformSortPrefill',
-      'civi.afform.prefill' => ['onAfformPrefill', 99],
-      '&civi.afform.createToken' => ['onCreateToken', 99],
-    ];
-  }
+class ContactAutofill extends AbstractBehavior {
 
   public static function getEntities():array {
     return \CRM_Contact_BAO_ContactType::basicTypes();
@@ -94,6 +83,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
     return $modes;
   }
 
+  #[CiviEventListener(event: 'civi.afform.sort.prefill')]
   public static function onAfformSortPrefill(AfformEntitySortEvent $event): void {
     $entities = $event->getFormDataModel()->getEntities();
     foreach ($entities as $entityName => $entity) {
@@ -105,6 +95,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
     }
   }
 
+  #[CiviEventListener(event: 'civi.afform.prefill', priority: 99)]
   public static function onAfformPrefill(AfformPrefillEvent $event): void {
     /* @var \Civi\Api4\Action\Afform\Prefill $apiRequest */
     $apiRequest = $event->getApiRequest();
@@ -152,6 +143,7 @@ class ContactAutofill extends AbstractBehavior implements EventSubscriberInterfa
     }
   }
 
+  #[CiviEventListener(event: '&civi.afform.createToken', priority: 99)]
   public function onCreateToken(TokenRow $row, array &$afformArgs) {
     if (!empty($row->context['contactId'])) {
       $afformArgs['contact_id'] = $row->context['contactId'];

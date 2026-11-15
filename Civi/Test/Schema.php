@@ -207,18 +207,22 @@ class Schema {
   public const SEED_TABLES_TO_OFFSET = [
     'civicrm_component',
     'civicrm_contact_type',
+    'civicrm_dashboard',
     'civicrm_dedupe_rule',
     'civicrm_dedupe_rule_group',
     'civicrm_entity_financial_account',
+    'civicrm_extension',
     'civicrm_financial_account',
     'civicrm_financial_type',
     'civicrm_job',
     'civicrm_location_type',
+    'civicrm_mail_settings',
     'civicrm_mailing_bounce_pattern',
     'civicrm_mailing_bounce_type',
     'civicrm_mailing_component',
     'civicrm_membership_status',
     'civicrm_msg_template',
+    'civicrm_navigation',
     'civicrm_option_group',
     'civicrm_option_value',
     'civicrm_participant_status_type',
@@ -227,7 +231,11 @@ class Schema {
     'civicrm_price_field',
     'civicrm_price_field_value',
     'civicrm_price_set',
+    'civicrm_print_label',
     'civicrm_relationship_type',
+    'civicrm_report_instance',
+    'civicrm_saved_search',
+    'civicrm_search_display',
     'civicrm_site_email_address',
     'civicrm_site_token',
     'civicrm_tag',
@@ -255,11 +263,13 @@ class Schema {
     $dbName = \Civi\Test::dsn('database');
 
     $pdo = \Civi\Test::pdo();
-    // Only tables with an auto-increment column (AUTO_INCREMENT is NULL for the others).
+    // Only tables with an auto-increment column.
+    // Query INFORMATION_SCHEMA.COLUMNS because TABLES.AUTO_INCREMENT can be NULL
+    // on MySQL 8.x when stats are not cached or tables are empty.
     // Order by name so each table gets the same offset on every call.
     $query = sprintf(
-      "SELECT table_name FROM INFORMATION_SCHEMA.TABLES
-        WHERE TABLE_SCHEMA = %s AND TABLE_TYPE = 'BASE TABLE' AND AUTO_INCREMENT IS NOT NULL
+      "SELECT DISTINCT table_name FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = %s AND EXTRA LIKE '%%auto_increment%%'
         ORDER BY table_name",
       $pdo->quote($dbName)
     );

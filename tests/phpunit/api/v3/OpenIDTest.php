@@ -102,7 +102,7 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
     $deleteParams = ['id' => $result['id']];
     $this->callAPISuccess($this->_entity, 'delete', $deleteParams);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get');
-    $this->assertEquals(0, $checkDeleted['count']);
+    $this->assertSame(0, $checkDeleted['count']);
   }
 
   /**
@@ -117,7 +117,7 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
     $deleteParams = ['id' => 600];
     $this->callAPIFailure($this->_entity, 'delete', $deleteParams);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get');
-    $this->assertEquals(1, $checkDeleted['count']);
+    $this->assertSame(1, $checkDeleted['count']);
   }
 
 }

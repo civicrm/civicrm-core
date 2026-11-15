@@ -13,15 +13,15 @@ class EntityLookupTest extends \CiviUnitTestCase {
     $this->define('Contact', 'Jan', ['external_identifier' => $jan['external_identifier']]);
     $this->assertTrue($this->isDefined('Jan'));
     $this->assertEquals($bob['id'], $this->getDefinition('Bob')['identifier']['id']);
-    $this->assertEquals('Contact', $this->getDefinition('Jan')['entityName']);
+    $this->assertSame('Contact', $this->getDefinition('Jan')['entityName']);
     $this->assertNull($this->getDefinition('Jim'));
     $this->assertFalse($this->isDefined('Jim'));
-    $this->assertEquals('One', $this->lookup('Bob', 'last_name'));
-    $this->assertEquals('bob@one.test', $this->lookup('Bob', 'email_primary.email'));
-    $this->assertEquals('Male', $this->lookup('Bob', 'gender_id:name'));
+    $this->assertSame('One', $this->lookup('Bob', 'last_name'));
+    $this->assertSame('bob@one.test', $this->lookup('Bob', 'email_primary.email'));
+    $this->assertSame('Male', $this->lookup('Bob', 'gender_id:name'));
     $this->assertEquals($jan['id'], $this->lookup('Jan', 'id'));
-    $this->assertEquals('Two', $this->lookup('Jan', 'last_name'));
-    $this->assertEquals('Female', $this->lookup('Jan', 'gender_id:name'));
+    $this->assertSame('Two', $this->lookup('Jan', 'last_name'));
+    $this->assertSame('Female', $this->lookup('Jan', 'gender_id:name'));
   }
 
 }

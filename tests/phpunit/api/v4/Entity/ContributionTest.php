@@ -64,7 +64,7 @@ class ContributionTest extends Api4TestBase implements TransactionalInterface {
       ],
     ];
     $result = civicrm_api4('Contribution', 'get', $apiParams);
-    $this->assertEquals(3, $result[0]['COUNT_id']);
+    $this->assertSame(3, $result[0]['COUNT_id']);
   }
 
   public function testGetByDate(): void {
@@ -85,7 +85,7 @@ class ContributionTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('receive_date', '=', '2020-02-02')
       ->execute();
 
-    $this->assertEquals(2, count($result));
+    $this->assertSame(2, count($result));
   }
 
 }

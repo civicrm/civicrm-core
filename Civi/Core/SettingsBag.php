@@ -48,7 +48,17 @@ class SettingsBag {
    * @var array
    *   Array(string $settingName => mixed $value).
    */
+
   protected $mandatory;
+
+  /**
+   * Constants are like mandatory settings except they cannot
+   * be changed post boot
+   *
+   * @var array
+   *   Array(string $settingName => mixed $value).
+   */
+  protected array $constants = [];
 
   /**
    * The result of combining default values, mandatory
@@ -104,6 +114,25 @@ class SettingsBag {
   }
 
   /**
+   * Fix values for constant settings so they cannot
+   * be tinkered with during runtime
+   *
+   * @param string[] $constantKeys
+   * @return SettingsBag
+   */
+  public function freezeConstants($constantKeys) {
+    if ($this->constants) {
+      throw new \CRM_Core_Exception('Constants cannot be reloaded post boot');
+    }
+    $values = $this->all();
+    foreach ($constantKeys as $key) {
+      $this->constants[$key] = $values[$key] ?? NULL;
+    }
+    $this->combined = NULL;
+    return $this;
+  }
+
+  /**
    * Load all explicit settings that apply to this domain or contact.
    *
    * @return SettingsBag
@@ -151,7 +180,7 @@ class SettingsBag {
   public function all() {
     if ($this->combined === NULL) {
       $this->combined = $this->combine(
-        [$this->defaults, $this->values, $this->mandatory]
+        [$this->defaults, $this->values, $this->mandatory, $this->constants]
       );
       // computeVirtual() depends on completion of preceding pass.
       $this->combined = $this->combine(
@@ -206,6 +235,10 @@ class SettingsBag {
     return $this->mandatory[$key] ?? NULL;
   }
 
+  public function isFixed(string $key) {
+    return \array_key_exists($key, $this->constants) || \array_key_exists($key, $this->mandatory);
+  }
+
   /**
    * Alias of hasExplicit retained for backwards compatibility
    *
@@ -258,7 +291,35 @@ class SettingsBag {
    * @return SettingsBag
    */
   public function set($key, $value) {
+    if (\array_key_exists($key, $this->constants)) {
+      $spec = SettingsMetadata::getMetadata(['name' => $key])[$key] ?? [];
+      $where = (!empty($spec['is_env_loadable']) && !empty($spec['global_name']))
+        ? "in civicrm.settings.php or with the environment variable {$spec['global_name']}"
+        : 'in civicrm.settings.php';
+      throw new \CRM_Core_Exception("{$key} is a system constant. It can only be set {$where}.");
+    }
     $this->setDb($key, $value);
+    return $this;
+  }
+
+  /**
+   * Update a constant setting. This is only allowed during
+   * UnitTests - in normal operation constants are fixed at boot
+   * for security purposes
+   *
+   * @param string $key
+   *   The simple name of the setting.
+   * @param mixed $value
+   *   The new, explicit value of the setting.
+   * @return SettingsBag
+   */
+  public function updateConstant($key, $value) {
+    if (CIVICRM_UF !== 'UnitTests') {
+      throw new \CRM_Core_Exception('Constants should not be altered after system boot!');
+    }
+    $this->constants = array_merge($this->constants, [$key => $value]);
+    // ensure final values are recomputed
+    $this->combined = NULL;
     return $this;
   }
 
@@ -370,18 +431,6 @@ class SettingsBag {
 
     if (!$metadata) {
       \Civi::log()->debug("undefined setting {$name} - please add metadata or encourage the extension author to do so :)");
-    }
-
-    // this should probably be higher in the Setting api layer as well
-    if ($metadata['is_constant'] ?? FALSE) {
-      $error = "{$metadata['title']} is a system constant. It can only be set in civicrm.settings.php";
-
-      if ($metadata['is_env_loadable'] ?? FALSE) {
-        $fqn = $metadata['global_name'] ?? '(ENV VAR NAME MISSING)';
-        $error .= " or using the environment variable {$fqn}";
-      }
-      $error .= ".";
-      throw new \CRM_Core_Exception($error);
     }
 
     $dao = new \CRM_Core_DAO_Setting();
@@ -580,7 +629,9 @@ class SettingsBag {
         // Compared strictly: '0' is a usable password, not a missing one.
         return [];
       }
-      $componentValues[$componentKey] = urlencode($value);
+      // This DSN is read back with DB::parseDSN(), which decodes using
+      // rawurldecode() - so a '+' here would mean a literal '+', not a space.
+      $componentValues[$componentKey] = rawurlencode($value);
     }
 
     $dsn = "mysql://{$componentValues['user']}:{$componentValues['password']}@{$componentValues['host']}:{$componentValues['port']}/{$componentValues['name']}?new_link=true";

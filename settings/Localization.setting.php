@@ -373,7 +373,7 @@ return [
     ],
     'default' => ',',
     'title' => ts('Import / Export Field Separator'),
-    'help_text' => ts('Global CSV separator character. Modify this setting to enable import and export of different kinds of CSV files (for example: \',\' \';\' \':\' \'|\' ).'),
+    'help_text' => ts("Global CSV separator character. Modify this setting to enable import and export of different kinds of CSV files (for example: ',' ';' ':' '|' )."),
     'settings_pages' => ['localization' => ['section' => 'advanced', 'weight' => 130]],
   ],
   'fiscalYearStart' => [

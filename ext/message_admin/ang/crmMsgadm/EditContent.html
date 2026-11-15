@@ -54,7 +54,6 @@
              crm-ui-select="{placeholder: ts('Token'), data: $ctrl.tokenList, width: '12em', dropdownAutoWidth: true}"
              on-crm-ui-select="$broadcast('insert:msg_html', selection)"
              ng-show="accordions.msg_html && !$ctrl.isDisabled()"
-             ng-disabled="$ctrl.isRichText('msg_html') && !$ctrl.isMsgHtmlEditing"
       />
       <div class="clearfix"></div>
     </div>
@@ -63,13 +62,15 @@
         {{:: ts('This content is a full HTML document (it has its own doctype/html/head/body). Switching to the rich text editor will discard that wrapper and keep only what is inside the body. This is normally fine for a User-Driven message, since CiviMail sends it as the body between a separate Header and Footer. If anything in this document\'s head is required - for example a style block used for a responsive email layout - stay in Raw HTML mode instead, since that would be lost.') }}
         <a href="https://docs.civicrm.org/user/en/latest/email/message-templates/#full-html-documents" target="_blank" class="crm-doc-link no-popup">{{:: ts('Learn more...') }}</a>
       </div>
-      <civi-rich-text-input ng-if="$ctrl.isRichText('msg_html')"
-           ng-model="$ctrl.msgtpl.msg_html"
-           crm-custom-element-model
-           crm-msgadm-richtext-editing="$ctrl.isMsgHtmlEditing"
-           crm-msgadm-richtext-insert-rx="insert:msg_html"
-           ng-disabled="$ctrl.isDisabled()"
-      ></civi-rich-text-input>
+      <div ng-if="$ctrl.isRichText('msg_html')">
+        <textarea crm-ui-id="contentForm.msg_html"
+             class="crm-msgadm-richtext"
+             crm-ui-richtext
+             crm-ui-insert-rx="insert:msg_html"
+             ng-model="$ctrl.msgtpl.msg_html"
+             data-preset="civimail"
+        ></textarea>
+      </div>
       <div ng-if="!$ctrl.isRichText('msg_html')"
            ng-model="$ctrl.msgtpl.msg_html"
            crm-monaco="$ctrl.monacoOptions({language: 'html', crmHeightPct: 0.5})"

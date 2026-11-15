@@ -137,9 +137,9 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('GroupContact', 'create', $params);
-    $this->assertEquals(1, $result['not_added']);
-    $this->assertEquals(1, $result['added']);
-    $this->assertEquals(2, $result['total_count']);
+    $this->assertSame(1, $result['not_added']);
+    $this->assertSame(1, $result['added']);
+    $this->assertSame(2, $result['total_count']);
   }
 
   /**
@@ -181,7 +181,7 @@ class api_v3_GroupContactTest extends CiviUnitTestCase {
     foreach ($groups['values'] as $groupContactID => $groupContactRecord) {
       $this->assertEquals($groupContactRecord['group_id'], CRM_Core_DAO::singleValueQuery("SELECT group_id FROM civicrm_group_contact WHERE id = $groupContactID"), 'Group contact record mis-returned for id ' . $groupContactID);
     }
-    $this->assertEquals(3, $groups['count']);
+    $this->assertSame(3, $groups['count']);
 
   }
 

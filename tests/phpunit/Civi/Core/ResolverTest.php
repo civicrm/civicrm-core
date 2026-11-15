@@ -41,7 +41,7 @@ namespace Civi\Core {
     public function testGlobalFunc(): void {
       // Note: civi_core_callback_dummy is implemented at the bottom of this file.
       $cb = $this->resolver->get('civi_core_callback_dummy');
-      $this->assertEquals('civi_core_callback_dummy', $cb);
+      $this->assertSame('civi_core_callback_dummy', $cb);
 
       $expected = 'global dummy received foo';
       $actual = call_user_func($cb, 'foo');
@@ -49,7 +49,7 @@ namespace Civi\Core {
 
       $ref = $this->resolver->getReflector('civi_core_callback_dummy');
       $this->assertInstanceOf(\ReflectionFunction::class, $ref);
-      $this->assertEquals('civi_core_callback_dummy', $ref->getName());
+      $this->assertSame('civi_core_callback_dummy', $ref->getName());
     }
 
     /**
@@ -65,8 +65,8 @@ namespace Civi\Core {
 
       $ref = $this->resolver->getReflector('Civi\Core\ResolverTest::dummy');
       $this->assertInstanceOf(\ReflectionMethod::class, $ref);
-      $this->assertEquals('Civi\Core\ResolverTest', $ref->getDeclaringClass()->getName());
-      $this->assertEquals('dummy', $ref->getName());
+      $this->assertSame('Civi\Core\ResolverTest', $ref->getDeclaringClass()->getName());
+      $this->assertSame('dummy', $ref->getName());
     }
 
     /**
@@ -111,8 +111,8 @@ namespace Civi\Core {
       $_GET['resolverTest'] = 123;
       $cb = $this->resolver->get('global://_GET/resolverTest?getter');
       $_GET['resolverTest'] = 456;
-      $this->assertEquals(456, call_user_func($cb, 'side-effect-free'));
-      $this->assertEquals(456, $_GET['resolverTest']);
+      $this->assertSame(456, call_user_func($cb, 'side-effect-free'));
+      $this->assertSame(456, $_GET['resolverTest']);
       unset($_GET['resolverTest']);
     }
 
@@ -120,7 +120,7 @@ namespace Civi\Core {
       $GLOBALS['resolverTest2'] = 78;
       $cb = $this->resolver->get('global://resolverTest2?setter');
       call_user_func($cb, 90);
-      $this->assertEquals(90, $GLOBALS['resolverTest2']);
+      $this->assertSame(90, $GLOBALS['resolverTest2']);
     }
 
     /**

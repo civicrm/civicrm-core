@@ -39,8 +39,7 @@ class ValidateFieldsSubscriber extends Generic\AbstractPrepareSubscriber {
     /** @var \Civi\Api4\Generic\AbstractAction $apiRequest */
     $apiRequest = $event->getApiRequest();
     if (is_a($apiRequest, 'Civi\Api4\Generic\AbstractAction')) {
-      $paramInfo = $apiRequest->getParamInfo();
-      foreach ($paramInfo as $param => $info) {
+      foreach ($apiRequest->getParamRules() as $param => $info) {
         $getParam = 'get' . ucfirst($param);
         $value = $apiRequest->$getParam();
         // Required fields

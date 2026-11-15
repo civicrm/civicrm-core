@@ -99,14 +99,14 @@ return [
       'title' => ts('Status Preferences'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
-      'description' => ts('These settings are per-check, and can\'t be compared across checks.'),
+      'description' => ts("These settings are per-check, and can't be compared across checks."),
       'add' => '4.7',
     ],
     'check_info' => [
       'title' => ts('Check Info'),
       'sql_type' => 'varchar(255)',
       'input_type' => 'Text',
-      'description' => ts('These values are per-check, and can\'t be compared across checks.'),
+      'description' => ts("These values are per-check, and can't be compared across checks."),
       'add' => '4.7',
     ],
     'is_active' => [

@@ -152,7 +152,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
         'pageComponent' => $this->_component,
       ];
 
-      if (!function_exists('tellafriend_civicrm_config') || !$pcpBlock->is_tellfriend_enabled || ($pcpInfo['status_id'] ?? NULL) != $approvedId) {
+      if (!$pcpBlock->is_tellfriend_enabled || ($pcpInfo['status_id'] ?? NULL) != $approvedId) {
         unset($link['all'][CRM_Core_Action::DETACH]);
       }
 
@@ -312,10 +312,10 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
   /**
    * @return string
    */
-  public function getTemplateFileName() {
+  public function getTemplateFileName(): string {
     if ($this->_id) {
       $templateFile = "CRM/PCP/Page/{$this->_id}/PCPInfo.tpl";
-      $template = &CRM_Core_Page::getTemplate();
+      $template = CRM_Core_Page::getTemplate();
       if ($template->template_exists($templateFile)) {
         return $templateFile;
       }

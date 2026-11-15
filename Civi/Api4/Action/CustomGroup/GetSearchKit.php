@@ -1,0 +1,302 @@
+<?php
+
+namespace Civi\Api4\Action\CustomGroup;
+
+use Civi\Api4\SearchDisplay;
+use Civi\Api4\Utils\CoreUtil;
+
+/**
+ * For multi-value custom groups, produce managed records
+ * to generate a search kit SavedSearch and SearchDisplays
+ * for listing the custom records
+ *
+ * @package Civi\Api4\Action\CustomGroup
+ */
+class GetSearchKit extends \Civi\Api4\Generic\BasicBatchAction {
+
+  protected function getSelect(): array {
+    return ['id', 'name', 'title', 'is_multiple', 'style'];
+  }
+
+  protected function doTask($item): array {
+    // searches only apply to multi-record CustomGroups
+    if (!$item['is_multiple'] || ($item['style'] !== 'Tab with table')) {
+      return [
+        'id' => $item['id'],
+        'managed' => [],
+      ];
+    }
+
+    // derive the entity name for later use
+    $item['entity_name'] = 'Custom_' . $item['name'];
+    // derive the search name here - must be consistent between
+    // SavedSearch and SearchDisplays
+    $item['search_name'] = $item['entity_name'] . '_Search';
+
+    // get Active + Display In Table fields for this group to include as columns
+    $groupFields = \CRM_Core_BAO_CustomGroup::getGroup(['id' => $item['id']])['fields'];
+    // note: `in_selector` is the field key for "display in table"
+    $item['fields'] = array_filter($groupFields, fn ($field) => $field['in_selector'] && $field['is_active']);
+
+    $managed = [];
+
+    // Get SavedSearch
+    $managed[] = $this->getSavedSearch($item);
+
+    foreach ($this->getSearchDisplays($item) as $display) {
+      $managed[] = $display;
+    }
+
+    return [
+      'id' => $item['id'],
+      'managed' => $managed,
+    ];
+  }
+
+  protected function getSavedSearch(array $group): array {
+    $entityName = $group['entity_name'];
+    $searchName = $group['search_name'];
+    $searchLabel = ts('%1 Search', [1 => $group['title']]);
+
+    // select all fields by name
+    $select = [];
+    $join = [];
+
+    // TODO: finish https://github.com/civicrm/civicrm-core/pull/34192 and then use
+    // wildcard select to select all fields at runtime
+    foreach ($group['fields'] as $field) {
+      // Join on custom file fields
+      if ($field['data_type'] === 'File') {
+        $alias = $this->getJoinAlias($group, $field);
+        $select[] = "$alias.file_name";
+        $join[] = [
+          "File AS $alias",
+          'LEFT',
+          [$field['name'], '=', "$alias.id"],
+        ];
+      }
+      else {
+        $select[] = $field['name'];
+      }
+    }
+
+    // add id and entity_id - always useful
+    $select[] = 'id';
+    $select[] = 'entity_id';
+
+    return [
+      'module' => 'civicrm',
+      'name' => "SavedSearch_{$searchName}",
+      'entity' => 'SavedSearch',
+      'cleanup' => 'unused',
+      'update' => 'unmodified',
+      // This api was previously part of the civicrm_admin_ui extension
+      'replaces' => ['module' => 'civicrm_admin_ui'],
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'name' => $searchName,
+          'label' => $searchLabel,
+          'api_entity' => $entityName,
+          'api_params' => [
+            'version' => 4,
+            'select' => $select,
+            'join' => $join,
+          ],
+        ],
+        'match' => ['name'],
+      ],
+    ];
+  }
+
+  protected function getSearchDisplays(array $group): array {
+    $searchDisplays = [];
+
+    // most columns are reusable across displays
+    $columns = [];
+
+    // TODO: use can we just use default columns now?
+    foreach ($group['fields'] as $field) {
+      $columns[] = $this->getColumnForField($group, $field);
+    }
+    $columns[] = $this->getButtonColumn($group);
+
+    $searchDisplays[] = $this->getTabSearchDisplay($group, $columns);
+
+    return $searchDisplays;
+  }
+
+  protected function getTabSearchDisplay(array $group, array $columns, string $displayType = 'table'): array {
+    $searchName = $group['search_name'];
+    $displayName = $group['entity_name'] . '_Tab';
+    $displayLabel = $group['title'];
+
+    return [
+      'module' => 'civicrm',
+      'name' => "SavedSearch_{$searchName}_SearchDisplay_{$displayName}",
+      'entity' => 'SearchDisplay',
+      'cleanup' => 'unused',
+      'update' => 'unmodified',
+      // This api was previously part of the civicrm_admin_ui extension
+      'replaces' => ['module' => 'civicrm_admin_ui'],
+      'params' => [
+        'version' => 4,
+        'values' => [
+          'name' => $displayName,
+          'label' => $displayLabel,
+          'saved_search_id.name' => $searchName,
+          'type' => $displayType,
+          'settings' => [
+            'placeholder' => 5,
+            'columns' => $columns,
+            'pager' => [
+              'show_count' => TRUE,
+              'expose_limit' => TRUE,
+              'hide_single' => TRUE,
+            ],
+            'headerCount' => TRUE,
+            // only for table but harmless otherwise
+            'actions' => TRUE,
+            'classes' => ['table', 'table-striped'],
+            'actions_display_mode' => 'menu',
+            // only for grid but harmless otherwise
+            'colno' => '3',
+            'toolbar' => [
+              [
+                'action' => 'add',
+                'entity' => $group['entity_name'],
+                'text' => ts('Add %1', [1 => $group['title']]),
+                'icon' => 'fa-plus',
+                'style' => 'default',
+                'target' => 'crm-popup',
+                'join' => '',
+                'task' => '',
+                //'condition' => ['check user permission', TRUE],
+              ],
+            ],
+          ],
+        ],
+        'match' => [
+          'saved_search_id',
+          'name',
+        ],
+      ],
+    ];
+  }
+
+  protected function getColumnForField(array $group, array $field): array {
+    $column = [
+      'type' => 'field',
+      'key' => $field['name'],
+      'label' => $field['label'],
+      'sortable' => TRUE,
+      'break' => TRUE,
+    ];
+
+    // Format pseudoconstant values
+    if ($field['option_group_id']) {
+      $column['key'] .= ':label';
+    }
+    // Format custom file fields
+    elseif ($field['data_type'] === 'File') {
+      $alias = $this->getJoinAlias($group, $field);
+      $column['key'] = "$alias.file_name";
+      $column['icons'] = [
+        ['field' => "$alias.icon", 'side' => 'left'],
+      ];
+      $column['link'] = [
+        'path' => "[$alias.url]",
+      ];
+    }
+    elseif ($field['data_type'] === 'Date') {
+      if (!empty($field['date_format']) || !empty($field['time_format'])) {
+        $column['format'] = \CRM_Utils_Date::datePluginToStrftime($field['date_format'] ?? '', $field['time_format'] ?? NULL);
+      }
+    }
+    // Show display name of ContactReference fields
+    elseif ($field['data_type'] === 'ContactReference') {
+      $column['key'] .= '.display_name';
+      $column['link'] = [
+        'entity' => 'Contact',
+        'action' => 'view',
+        'join' => $field['name'],
+      ];
+    }
+    // Display value of EntityReference fields based on Autocomplete settings
+    elseif ($field['data_type'] === 'EntityReference' && !empty($field['fk_entity'])) {
+      $defaultDisplay = SearchDisplay::getDefault(FALSE)
+        ->setSavedSearch(['api_entity' => $field['fk_entity']])
+        ->setType('autocomplete')
+        ->execute()->first();
+      $defaultCol = $defaultDisplay['settings']['columns'][0] ?? [];
+      if (!empty($defaultCol['key'])) {
+        $column['key'] = $field['name'] . '.' . $defaultCol['key'];
+      }
+      if (!empty($defaultCol['rewrite'])) {
+        $column['rewrite'] = preg_replace('/\[([^\]]+)\]/', '[' . $field['name'] . '.$1]', $defaultCol['rewrite']);
+      }
+      if (!empty($defaultCol['empty_value'])) {
+        $column['empty_value'] = preg_replace('/\[([^\]]+)\]/', '[' . $field['name'] . '.$1]', $defaultCol['empty_value']);
+      }
+      if (!empty($defaultCol['icons'])) {
+        $column['icons'] = [];
+        foreach ($defaultCol['icons'] as $icon) {
+          if (!empty($icon['field'])) {
+            $icon['field'] = $field['name'] . '.' . $icon['field'];
+          }
+          $column['icons'][] = $icon;
+        }
+      }
+      if (isset(CoreUtil::getInfoItem($field['fk_entity'], 'paths')['view'])) {
+        $column['link'] = [
+          'entity' => $field['fk_entity'],
+          'action' => 'view',
+          'join' => $field['name'],
+        ];
+      }
+    }
+
+    return $column;
+  }
+
+  protected function getButtonColumn(array $group): array {
+    $entityName = $group['entity_name'];
+    return [
+      'size' => 'btn-xs',
+      'links' => [
+        [
+          'entity' => $entityName,
+          'action' => 'view',
+          'target' => 'crm-popup',
+          'icon' => 'fa-eye',
+          'text' => 'View',
+          'style' => 'default',
+        ],
+        [
+          'entity' => $entityName,
+          'action' => 'update',
+          'target' => 'crm-popup',
+          'icon' => 'fa-pencil',
+          'text' => 'Edit',
+          'style' => 'default',
+        ],
+        [
+          'entity' => $entityName,
+          'task' => 'delete',
+          'target' => 'crm-popup',
+          'icon' => 'fa-trash',
+          'text' => 'Delete',
+          'style' => 'danger',
+        ],
+      ],
+      'type' => 'buttons',
+      'alignment' => 'text-right',
+    ];
+  }
+
+  private function getJoinAlias(array $group, array $field): string {
+    $fkEntity = $field['fk_entity'] ?? $field['data_type'];
+    return "{$group['entity_name']}_{$fkEntity}_{$field['name']}_01";
+  }
+
+}

@@ -12,6 +12,7 @@
 use Civi\Api4\Group;
 use Civi\Api4\GroupContact;
 use Civi\Api4\Mailing;
+use Civi\Api4\MailingComponent;
 use Civi\Api4\MailingEventSubscribe;
 use Civi\Api4\MailingGroup;
 use Civi\Api4\SubscriptionHistory;
@@ -22,10 +23,23 @@ use Civi\Api4\SubscriptionHistory;
 class CRM_Mailing_BAO_ConfirmTest extends CiviUnitTestCase {
 
   /**
+   * The Welcome component as it was before the test changed it.
+   *
+   * @var array|null
+   */
+  private ?array $originalWelcome = NULL;
+
+  /**
    * Cleanup after test.
    */
   public function tearDown(): void {
     $this->quickCleanup(['civicrm_group', 'civicrm_group_contact', 'civicrm_mailing', 'civicrm_mailing_group', 'civicrm_mailing_event_subscribe']);
+    if ($this->originalWelcome) {
+      MailingComponent::update(FALSE)
+        ->addWhere('id', '=', $this->originalWelcome['id'])
+        ->setValues(array_diff_key($this->originalWelcome, ['id' => TRUE]))
+        ->execute();
+    }
     parent::tearDown();
   }
 
@@ -56,15 +70,17 @@ class CRM_Mailing_BAO_ConfirmTest extends CiviUnitTestCase {
       'entity_id' => $groupID,
     ])->execute()->first()['id'];
 
-    $mailingComponentID = $this->callAPISuccess('MailingComponent', 'get', ['component_type' => 'Welcome'])['id'];
-    $this->callAPISuccess('MailingComponent', 'create', [
-      'is_default' => 1,
+    $this->originalWelcome = MailingComponent::get(FALSE)
+      ->addSelect('id', 'is_default', 'body_html', 'body_text')
+      ->addWhere('component_type', '=', 'Welcome')
+      ->execute()->single();
+    MailingComponent::update(FALSE)->addWhere('id', '=', $this->originalWelcome['id'])->setValues([
+      'is_default' => TRUE,
       // Swap {welcome.group} to {group.frontend_title} which is the standardised token.
       // The intent is to make this version the default, but need to ensure it is required.
       'body_html' => 'Welcome. Your subscription to the {group.frontend_title} mailing list has been activated.',
       'body_text' => 'Welcome. Your subscription to the {group.frontend_title} mailing list has been activated.',
-      'id' => $mailingComponentID,
-    ]);
+    ])->execute();
     $hash = 4;
     $subscribeID = MailingEventSubscribe::create(FALSE)->setValues([
       'group_id' => $groupID,

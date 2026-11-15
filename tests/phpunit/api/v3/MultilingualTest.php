@@ -26,7 +26,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    CRM_Core_BAO_ConfigSetting::enableAllComponents();
+    $this->enableAllComponents();
     $this->useTransaction(TRUE);
   }
 
@@ -72,7 +72,7 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
       'name' => 'IM',
     ]);
 
-    $this->assertEquals($french['label'], 'Messagerie instantanée');
+    $this->assertSame('Messagerie instantanée', $french['label']);
     $this->assertEquals($default['label'], $english_original['label']);
   }
 

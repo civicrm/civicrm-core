@@ -22,12 +22,14 @@
  */
 class api_v3_ExtensionTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
+  private $defaultExtRepoUrl;
 
   use \Civi\Test\GuzzleTestTrait;
 
   public function setUp(): void {
     parent::setUp();
-    Civi::settings()->set('ext_repo_url', 'http://localhost:9999/fake-repo');
+    $this->defaultExtRepoUrl = \Civi::settings()->get('ext_repo_url');
+    \Civi::settings()->updateConstant('ext_repo_url', 'http://localhost:9999/fake-repo');
     if (!defined('CIVICRM_EXTENSION_DOWNLOAD_TRUSTED_HOSTS')) {
       define('CIVICRM_EXTENSION_DOWNLOAD_TRUSTED_HOSTS', ['localhost']);
     }
@@ -39,7 +41,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   }
 
   public function tearDown(): void {
-    Civi::settings()->revert('ext_repo_url');
+    \Civi::settings()->updateConstant('ext_repo_url', $this->defaultExtRepoUrl);
     parent::tearDown();
   }
 
@@ -54,9 +56,9 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
     CRM_Extension_System::singleton()->getBrowser()->refresh();
 
     $result = $this->callAPISuccess('extension', 'getremote', []);
-    $this->assertEquals('org.civicrm.module.cividiscount', $result['values'][0]['key']);
-    $this->assertEquals('module', $result['values'][0]['type']);
-    $this->assertEquals('CiviDiscount', $result['values'][0]['name']);
+    $this->assertSame('org.civicrm.module.cividiscount', $result['values'][0]['key']);
+    $this->assertSame('module', $result['values'][0]['type']);
+    $this->assertSame('CiviDiscount', $result['values'][0]['name']);
 
     $this->assertEquals(['http://localhost:9999/fake-repo/single'], $this->getRequestUrls());
   }
@@ -67,9 +69,9 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    */
   public function testExtensionGetSingleExtension(): void {
     $result = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.moduletest']);
-    $this->assertEquals('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
-    $this->assertEquals('module', $result['values'][$result['id']]['type']);
-    $this->assertEquals('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
+    $this->assertSame('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
+    $this->assertSame('module', $result['values'][$result['id']]['type']);
+    $this->assertSame('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
   }
 
   /**
@@ -78,10 +80,10 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    */
   public function testSingleExtensionGetWithReturnFields(): void {
     $result = $this->callAPISuccess('extension', 'get', ['key' => 'test.extension.manager.moduletest', 'return' => ['name', 'status', 'key']]);
-    $this->assertEquals('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
+    $this->assertSame('test.extension.manager.moduletest', $result['values'][$result['id']]['key']);
     $this->assertFalse(isset($result['values'][$result['id']]['type']));
-    $this->assertEquals('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
-    $this->assertEquals('uninstalled', $result['values'][$result['id']]['status']);
+    $this->assertSame('test_extension_manager_moduletest', $result['values'][$result['id']]['name']);
+    $this->assertSame('uninstalled', $result['values'][$result['id']]['status']);
   }
 
   /**
@@ -110,9 +112,9 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
     $this->assertEquals(
       [],
       array_intersect(
-        CRM_Utils_Array::collect('key', $installed['values']),
-        CRM_Utils_Array::collect('key', $uninstalled['values']),
-        CRM_Utils_Array::collect('key', $disabled['values'])
+        array_column($installed['values'], 'key'),
+        array_column($uninstalled['values'], 'key'),
+        array_column($disabled['values'], 'key')
       )
     );
 
@@ -122,7 +124,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
 
   public function testGetMultipleExtensions(): void {
     $result = $this->callAPISuccess('extension', 'get', ['key' => ['test.extension.manager.moduletest', 'test.extension.manager.moduleupgtest']]);
-    $this->assertEquals(2, $result['count']);
+    $this->assertSame(2, $result['count']);
   }
 
   /**
@@ -130,7 +132,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
    */
   public function testGetMultipleExtensionsApiExplorer(): void {
     $result = $this->callAPISuccess('extension', 'get', ['full_name' => ['test.extension.manager.moduletest', 'test.extension.manager.moduleupgtest']]);
-    $this->assertEquals(2, $result['count']);
+    $this->assertSame(2, $result['count']);
   }
 
   /**
@@ -139,7 +141,7 @@ class api_v3_ExtensionTest extends CiviUnitTestCase {
   public function testGetExtensionByID(): void {
     $extensionID = $this->callAPISuccess('extension', 'get', ['options' => ['limit' => 1]])['id'];
     $result = $this->callAPISuccess('extension', 'get', ['id' => $extensionID, 'return' => ['label']]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
   }
 
 }

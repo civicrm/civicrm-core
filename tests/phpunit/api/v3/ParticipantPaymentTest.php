@@ -116,8 +116,8 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
 
     //Check if participant payment is correctly retrieved.
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->participantID4, 'event');
-    $this->assertEquals('Completed', $paymentInfo['contribution_status']);
-    $this->assertEquals('100.00', $paymentInfo['total']);
+    $this->assertSame('Completed', $paymentInfo['contribution_status']);
+    $this->assertSame('100.00', $paymentInfo['total']);
   }
 
   /**

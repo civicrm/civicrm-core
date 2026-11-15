@@ -56,9 +56,9 @@ class CustomEntityReferenceTest extends Api4TestBase {
       ->addWhere('name', '=', 'EntityRefFields.TestActivityReference')
       ->execute()->single();
     $this->assertNull($spec['suffixes']);
-    $this->assertEquals('EntityRef', $spec['input_type']);
-    $this->assertEquals('Activity', $spec['fk_entity']);
-    $this->assertEquals('id', $spec['fk_column']);
+    $this->assertSame('EntityRef', $spec['input_type']);
+    $this->assertSame('Activity', $spec['fk_entity']);
+    $this->assertSame('id', $spec['fk_column']);
     $this->assertEquals($subject, $spec['input_attrs']['filter']['subject']);
     // Check results
     $activities = $this->saveTestRecords('Activity', [
@@ -99,8 +99,8 @@ class CustomEntityReferenceTest extends Api4TestBase {
       ->addWhere('name', '=', 'EntityRefFields.TestOrgRef')
       ->execute()->single();
     $this->assertNull($spec['suffixes']);
-    $this->assertEquals('EntityRef', $spec['input_type']);
-    $this->assertEquals('Organization', $spec['fk_entity']);
+    $this->assertSame('EntityRef', $spec['input_type']);
+    $this->assertSame('Organization', $spec['fk_entity']);
     // Check results
     $contacts = $this->saveTestRecords('Contact', [
       'records' => [

@@ -407,7 +407,7 @@ AND        v.name = %1
 
         // fix field name
         if (substr($profileField->field_name, 0, 7) == 'custom.') {
-          list($dontCare, $tableName, $columnName) = explode('.', $profileField->field_name);
+          [$dontCare, $tableName, $columnName] = explode('.', $profileField->field_name);
           $sql = "
 SELECT     f.id
 FROM       civicrm_custom_field f

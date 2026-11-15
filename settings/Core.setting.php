@@ -37,6 +37,20 @@ return [
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
     'settings_pages' => ['display' => ['section' => 'contact', 'weight' => 10]],
   ],
+  'contact_summary_tab_counts' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'contact_summary_tab_counts',
+    'type' => 'Boolean',
+    'html_type' => 'toggle',
+    'default' => 1,
+    'add' => '6.21',
+    'title' => ts('Contact Summary Tab Counts'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'help_text' => ts('Display record counts on contact summary tabs. Disabling this improves performance on large databases by eliminating count queries.'),
+    'settings_pages' => ['display' => ['section' => 'contact', 'weight' => 15]],
+  ],
   'contact_edit_options' => [
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
@@ -70,7 +84,7 @@ return [
     'title' => ts('Advanced Search'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('Select the sections that should be included in the Basic and Advanced Search forms. EXAMPLE: If you don\'t track Relationships - then you do not need this section included in the advanced search form. Simplify the form by un-checking this option.'),
+    'help_text' => ts("Select the sections that should be included in the Basic and Advanced Search forms. EXAMPLE: If you don't track Relationships - then you do not need this section included in the advanced search form. Simplify the form by un-checking this option."),
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
     'settings_pages' => ['search' => ['section' => 'legacy', 'weight' => 70]],
   ],
@@ -89,7 +103,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => [
-      ts('Select the sections that should be included in the Contact Dashboard. EXAMPLE: If you don\'t want constituents to view their own contribution history, un-check that option.'),
+      ts("Select the sections that should be included in the Contact Dashboard. EXAMPLE: If you don't want constituents to view their own contribution history, un-check that option."),
       ts('In order to enable logged in users to download invoices and credit notes from the dashboard, please first enable CiviCRM invoicing functionality.'),
     ],
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
@@ -263,6 +277,22 @@ return [
     'is_contact' => 0,
     'help_text' => ts('If enabled, some operations will be transferred to background workers. This requires configuring a background service.'),
     'settings_pages' => ['misc' => ['weight' => 30, 'section' => 'performance']],
+  ],
+  'group_multiple_parents' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'group_multiple_parents',
+    'type' => 'Boolean',
+    'html_type' => 'toggle',
+    'quick_form_type' => 'YesNo',
+    'default' => 0,
+    'add' => '6.22',
+    'title' => ts('Allow multiple group parents'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'help_text' => ts('When enabled, a group can inherit from multiple other groups (this setting has performance implications)'),
+    'validate_callback' => 'CRM_Contact_BAO_Group::validateGroupMultipleParents',
+    'settings_pages' => ['misc' => ['weight' => 40, 'section' => 'performance']],
   ],
   'defaultExternUrl' => [
     'group_name' => 'CiviCRM Preferences',
@@ -568,6 +598,9 @@ return [
     'default' => NULL,
     'add' => '5.43',
     'settings_pages' => ['misc' => ['weight' => 60, 'section' => 'pdf']],
+    'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_DOMPDF_FONT_DIR',
   ],
   'dompdf_chroot' => [
     'is_domain' => 1,
@@ -587,6 +620,9 @@ return [
     'default' => NULL,
     'add' => '5.43',
     'settings_pages' => ['misc' => ['weight' => 70, 'section' => 'pdf']],
+    'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_DOMPDF_CHROOT',
   ],
   'dompdf_enable_remote' => [
     'is_domain' => 1,
@@ -619,6 +655,9 @@ return [
     ],
     'default' => NULL,
     'add' => '5.43',
+    'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_DOMPDF_LOG_OUTPUT_FILE',
   ],
   'weasyprint_path' => [
     'group_name' => 'CiviCRM Preferences',
@@ -639,6 +678,9 @@ return [
       'url' => 'https://weasyprint.org/',
     ],
     'settings_pages' => ['misc' => ['weight' => 90, 'section' => 'pdf']],
+    'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_WEASYPRINT_PATH',
   ],
   'wkhtmltopdfPath' => [
     'group_name' => 'CiviCRM Preferences',
@@ -659,6 +701,9 @@ return [
       'url' => 'https://wkhtmltopdf.org/',
     ],
     'settings_pages' => ['misc' => ['weight' => 95, 'section' => 'pdf']],
+    'is_constant' => TRUE,
+    'is_env_loadable' => TRUE,
+    'global_name' => 'CIVICRM_SETTING_WKHTMLTOPDF_PATH',
   ],
   'checksum_timeout' => [
     'group_name' => 'CiviCRM Preferences',
@@ -947,6 +992,10 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('CiviCRM will use this setting as path to bootstrap WP.'),
+    // it would make a lot of sense for this to be a constant, but the wordpress
+    // plugin currently sets it during runtime
+    // TODO: use a default here instead, then use is_constant
+    // 'is_constant' => TRUE,
   ],
   'secure_cache_timeout_minutes' => [
     'group_name' => 'CiviCRM Preferences',
@@ -1094,7 +1143,7 @@ return [
     'title' => ts('Sync CMS Email'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('If enabled, then CMS email id will be synchronised with CiviCRM contacts\'s primary email.'),
+    'help_text' => ts("If enabled, then CMS email id will be synchronised with CiviCRM contacts's primary email."),
     'settings_pages' => ['uf' => ['weight' => 20]],
   ],
   'preserve_activity_tab_filter' => [
@@ -1108,7 +1157,7 @@ return [
     'title' => ts('Preserve activity filters as a user preference'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'help_text' => ts('When enabled, any filter settings a user selects on the contact\'s Activity tab will be remembered as they visit other contacts.'),
+    'help_text' => ts("When enabled, any filter settings a user selects on the contact's Activity tab will be remembered as they visit other contacts."),
     'settings_pages' => ['display' => ['section' => 'activity', 'weight' => 30]],
   ],
   'do_not_notify_assignees_for' => [
@@ -1165,7 +1214,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => [
-      ts('The theme system allows you to change CiviCRM\'s appearance by replacing important CSS files.'),
+      ts("The theme system allows you to change CiviCRM's appearance by replacing important CSS files."),
       ts('On WordPress, Joomla, or a similar CMS, the frontend theme determines the appearance on user-facing screens, such as the "Event Registration" screen.'),
     ],
     'settings_pages' => ['display' => ['section' => 'theme', 'weight' => 30]],
@@ -1189,7 +1238,7 @@ return [
     'is_domain' => 1,
     'is_contact' => 0,
     'help_text' => [
-      ts('The theme system allows you to change CiviCRM\'s appearance by replacing important CSS files.'),
+      ts("The theme system allows you to change CiviCRM's appearance by replacing important CSS files."),
       ts('The backend theme determines the appearance on administrative screens, such as the "Manage Event" screen.'),
     ],
     'settings_pages' => ['display' => ['section' => 'theme', 'weight' => 10]],

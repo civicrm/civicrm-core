@@ -8,6 +8,9 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Api4\Domain;
+
 /**
  * Class CRM_Core_I18n_SchemaTest
  * @group headless
@@ -44,13 +47,13 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
    */
   public function testI18nSchemaRewrite(string $table, string $expectedRewrite): void {
     $this->enableMultilingual();
-    $domains = $this->callAPISuccess('Domain', 'get')['values'];
+    $domains = Domain::get(FALSE)->addSelect('locales')->execute();
     $this->assertGreaterThan(1, count($domains));
     foreach ($domains as $domain) {
       // If the DB is multilingual the locales value must be not-null for all domains
       // to ensure the db can be accessed (I suspect it must be the same for all locales but
       // if null then the database layer attempts to access non-existent fields 'label' not label_en_us'.
-      $this->assertEquals('en_US', $domain['locales']);
+      $this->assertSame(['en_US'], $domain['locales']);
     }
     $skip_tests = FALSE;
     if (in_array($table, ['civicrm_option_group', 'civicrm_event'])) {
@@ -61,40 +64,40 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     // Test problematic query as per CRM-20427
     $query = "Select * FROM {$table}";
     $new_query = CRM_Core_I18n_Schema::rewriteQuery($query);
-    $this->assertEquals("Select * FROM {$expectedRewrite}", $new_query);
+    $this->assertSame("Select * FROM {$expectedRewrite}", $new_query);
     // Test query where table is not at the end
     $query2 = "Select * FROM {$table} LIMIT 1";
     $new_query2 = CRM_Core_I18n_Schema::rewriteQuery($query2);
-    $this->assertEquals("Select * FROM {$expectedRewrite} LIMIT 1", $new_query2);
+    $this->assertSame("Select * FROM {$expectedRewrite} LIMIT 1", $new_query2);
     // Test query where there is a 2nd table that shouldn't be re-writen
     $query3 = "SELECT * FROM {$table} JOIN civicrm_contact LIMIT 1";
     $new_query3 = CRM_Core_I18n_Schema::rewriteQuery($query3);
-    $this->assertEquals("SELECT * FROM {$expectedRewrite} JOIN civicrm_contact LIMIT 1", $new_query3);
+    $this->assertSame("SELECT * FROM {$expectedRewrite} JOIN civicrm_contact LIMIT 1", $new_query3);
     // Test table when name is escaped
     $query4 = "SELECT * FROM `{$table}` WHERE id = 123";
     $new_query4 = CRM_Core_I18n_Schema::rewriteQuery($query4);
-    $this->assertEquals("SELECT * FROM `{$expectedRewrite}` WHERE id = 123", $new_query4);
+    $this->assertSame("SELECT * FROM `{$expectedRewrite}` WHERE id = 123", $new_query4);
     // Test where translatable table is quoted
     // The `$table` appears in a string -- it should not be rewritten.
     $query5 = 'SELECT id FROM civicrm_activity WHERE subject = "civicrm_option_group"';
     $new_query5 = CRM_Core_I18n_Schema::rewriteQuery($query5);
-    $this->assertEquals($query5, $new_query5);
+    $this->assertSame($query5, $new_query5);
     // Test where table is not the last thing to be in a quoted string
     // Test Currently skipped for civicrm_option_group and civicrm_event due to issues with the regex.
     // Agreed as not a blocker for CRM-20427 as an issue previously.
     if (!$skip_tests) {
-      $query6 = 'SELECT ' . '"' . "Fixed the the {$table} ticket" . '"';
+      $query6 = 'SELECT "' . "Fixed the the {$table} ticket" . '"';
       $new_query6 = CRM_Core_I18n_Schema::rewriteQuery($query6);
-      $this->assertEquals($query6, $new_query6);
+      $this->assertSame($query6, $new_query6);
     }
     // Test where table is part of a sub query
     $query7 = "SELECT * FROM civicrm_foo WHERE foo_id = (SELECT value FROM {$table})";
     $new_query7 = CRM_Core_I18n_Schema::rewriteQuery($query7);
-    $this->assertEquals("SELECT * FROM civicrm_foo WHERE foo_id = (SELECT value FROM {$expectedRewrite})", $new_query7);
+    $this->assertSame("SELECT * FROM civicrm_foo WHERE foo_id = (SELECT value FROM {$expectedRewrite})", $new_query7);
     // Test different verbs
     $query8 = "DELETE FROM {$table}";
     $new_query8 = CRM_Core_I18n_Schema::rewriteQuery($query8);
-    $this->assertEquals("DELETE FROM {$expectedRewrite}", $new_query8);
+    $this->assertSame("DELETE FROM {$expectedRewrite}", $new_query8);
     // Test Currently skipped for civicrm_option_group and civicrm_event due to issues with the regex.
     // Agreed as not a blocker for CRM-20427 as an issue previously
     if (!$skip_tests) {
@@ -112,9 +115,14 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     $inUseCollation = CRM_Core_BAO_SchemaHandler::getInUseCollation();
     $testCreateTable = CRM_Core_DAO::executeQuery('SHOW create table civicrm_price_set', [], TRUE, NULL, FALSE, FALSE);
     while ($testCreateTable->fetch()) {
-      $this->assertStringContainsString("`title_en_US` varchar(255) COLLATE {$inUseCollation} NOT NULL DEFAULT '' COMMENT '", $testCreateTable->Create_Table);
-      $this->assertMatchesRegularExpression(";`help_pre_en_US` text COLLATE {$inUseCollation} (DEFAULT NULL )?COMMENT 'Description and/or help text to display before fields in form.';", $testCreateTable->Create_Table);
+      // MariaDB 11 omits a column's COLLATE when it equals the table default.
+      $this->assertMatchesRegularExpression(";`title_en_US` varchar\(255\) (COLLATE {$inUseCollation} )?NOT NULL DEFAULT '' COMMENT ';", $testCreateTable->Create_Table);
+      $this->assertMatchesRegularExpression(";`help_pre_en_US` text (COLLATE {$inUseCollation} )?(DEFAULT NULL )?COMMENT 'Description and/or help text to display before fields in form.';", $testCreateTable->Create_Table);
     }
+    $collations = CRM_Core_DAO::executeQuery("SELECT COLUMN_NAME, COLLATION_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'civicrm_price_set' AND COLUMN_NAME IN ('title_en_US', 'help_pre_en_US')")
+      ->fetchMap('COLUMN_NAME', 'COLLATION_NAME');
+    ksort($collations);
+    $this->assertSame(['help_pre_en_US' => $inUseCollation, 'title_en_US' => $inUseCollation], $collations);
   }
 
   public function testMultilingualCustomFieldCreation(): void {

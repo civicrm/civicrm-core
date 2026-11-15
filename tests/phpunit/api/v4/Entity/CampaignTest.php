@@ -44,7 +44,7 @@ class CampaignTest extends Api4TestBase {
         'reload' => TRUE,
       ])->single();
 
-      $this->assertEquals('new', $updated[$entityName]['title']);
+      $this->assertSame('new', $updated[$entityName]['title']);
       $this->assertEquals($cid1, $updated[$entityName]['created_id']);
       $this->assertEquals($cid2, $updated[$entityName]['last_modified_id']);
       $this->assertEquals($created[$entityName]['created_date'], $updated[$entityName]['created_date']);

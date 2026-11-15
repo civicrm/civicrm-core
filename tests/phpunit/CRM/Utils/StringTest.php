@@ -123,21 +123,21 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     // test utf-8 string, CRM-18997
     $input = 'Registro de eventos on-line: Taller: "Onboarding - Cómo integrar exitosamente a los nuevos talentos dentro de su organización - Formación práctica."';
     $maxLen = 128;
-    $this->assertEquals(TRUE, mb_check_encoding(CRM_Utils_String::ellipsify($input, $maxLen), 'UTF-8'));
+    $this->assertTrue(mb_check_encoding(CRM_Utils_String::ellipsify($input, $maxLen), 'UTF-8'));
 
     $input = 'Hello world is the greatest greeting in the world';
     $actual = CRM_Utils_String::ellipsify($input, 11, ' (...)');
-    $this->assertEquals('Hello (...)', $actual);
+    $this->assertSame('Hello (...)', $actual);
   }
 
   public function testRandom(): void {
     for ($i = 0; $i < 4; $i++) {
       $actual = CRM_Utils_String::createRandom(4, 'abc');
-      $this->assertEquals(4, strlen($actual));
+      $this->assertSame(4, strlen($actual));
       $this->assertMatchesRegularExpression('/^[abc]+$/', $actual);
 
       $actual = CRM_Utils_String::createRandom(6, '12345678');
-      $this->assertEquals(6, strlen($actual));
+      $this->assertSame(6, strlen($actual));
       $this->assertMatchesRegularExpression('/^[12345678]+$/', $actual);
     }
   }

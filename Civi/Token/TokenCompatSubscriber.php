@@ -3,7 +3,6 @@ namespace Civi\Token;
 
 use Civi\Token\Event\TokenRenderEvent;
 use Civi\Token\Event\TokenValueEvent;
-use Money\Money;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

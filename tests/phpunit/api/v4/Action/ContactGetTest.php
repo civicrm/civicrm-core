@@ -677,9 +677,9 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
 
     $results = civicrm_api4('Contact', 'get', $params);
     $result = $results->single();
-    $this->assertEquals('Run Amok', $result['display_name']);
-    $this->assertEquals('Guy Amok', $result['Contact_RelationshipCache_Contact_01.display_name']);
-    $this->assertEquals('Employer of', $result['Contact_RelationshipCache_Contact_01.far_relation:label']);
+    $this->assertSame('Run Amok', $result['display_name']);
+    $this->assertSame('Guy Amok', $result['Contact_RelationshipCache_Contact_01.display_name']);
+    $this->assertSame('Employer of', $result['Contact_RelationshipCache_Contact_01.far_relation:label']);
     $this->assertEquals(['Student'], $result['Contact_RelationshipCache_Contact_01.contact_sub_type:label']);
   }
 
@@ -726,7 +726,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('first_name', '=', 'Hi 😁')
       ->addHaving('first_name', '=', 'last_name', TRUE)
       ->execute()->column('first_name', 'id');
-    $this->assertEquals('Hi 😁', $result[$same['id']]);
+    $this->assertSame('Hi 😁', $result[$same['id']]);
     $this->assertArrayNotHasKey($diff['id'], $result);
   }
 
@@ -753,13 +753,13 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
         $adjustForLeapYear = -1;
       }
     }
-    $this->assertEquals(1, $result['abc']['age_years']);
+    $this->assertSame(1, $result['abc']['age_years']);
     $this->assertEquals(3 + $adjustForLeapYear, $result['abc']['next_birthday']);
     $this->assertEquals(3 + $adjustForLeapYear, $result['abc']['DAYSTOANNIV:birth_date']);
-    $this->assertEquals(21, $result['def']['age_years']);
-    $this->assertEquals(0, $result['ghi']['age_years']);
-    $this->assertEquals(0, $result['ghi']['next_birthday']);
-    $this->assertEquals(0, $result['ghi']['DAYSTOANNIV:birth_date']);
+    $this->assertSame(21, $result['def']['age_years']);
+    $this->assertSame(0, $result['ghi']['age_years']);
+    $this->assertSame(0, $result['ghi']['next_birthday']);
+    $this->assertSame(0, $result['ghi']['DAYSTOANNIV:birth_date']);
 
     Contact::get(FALSE)
       ->addWhere('age_years', '=', 21)
@@ -786,7 +786,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
       ->setLimit(10)
       ->execute();
 
-    $this->assertEquals(20, $get1->count());
+    $this->assertSame(20, $get1->count());
     $this->assertCount(10, (array) $get1);
 
   }
@@ -815,8 +815,8 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals($email, $results[0]['email_primary.email']);
     $this->assertEquals($phone, $results[0]['phone_primary.phone']);
     $this->assertEquals($im, $results[1]['im_primary.name']);
-    $this->assertEquals('Somewhere', $results[1]['address_primary.city']);
-    $this->assertEquals('123 Street', $results[1]['address_primary.street_address']);
+    $this->assertSame('Somewhere', $results[1]['address_primary.city']);
+    $this->assertSame('123 Street', $results[1]['address_primary.street_address']);
     $this->assertNull($results[0]['im_primary.name']);
     $this->assertNull($results[2]['email_primary.email']);
     $this->assertNull($results[2]['phone_primary.phone']);
@@ -900,7 +900,7 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
   public function testContactImageURLNotEncoded(): void {
     $cid = $this->createTestRecord('Contact', ['last_name' => uniqid(__FUNCTION__), 'image_URL' => 'http://joomla-empty/index.php?option=com_civicrm&amp;task=civicrm/contact/imagefile&amp;photo=image000001_22d61d381164e043bbed2dd014f0ab2c.jpg']);
     $get = Contact::get(FALSE)->addWhere('id', '=', $cid['id'])->execute()->first();
-    $this->assertEquals('http://joomla-empty/index.php?option=com_civicrm&task=civicrm/contact/imagefile&photo=image000001_22d61d381164e043bbed2dd014f0ab2c.jpg', $get['image_URL']);
+    $this->assertSame('http://joomla-empty/index.php?option=com_civicrm&task=civicrm/contact/imagefile&photo=image000001_22d61d381164e043bbed2dd014f0ab2c.jpg', $get['image_URL']);
   }
 
 }

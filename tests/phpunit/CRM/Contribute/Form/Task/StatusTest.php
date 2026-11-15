@@ -66,10 +66,10 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'get', ['id' => $contributionId]);
     $updatedContribution = $contribution['values'][$contributionId];
 
-    $this->assertEquals('', $updatedContribution['contribution_source']);
+    $this->assertSame('', $updatedContribution['contribution_source']);
     $this->assertEquals(date("Y-m-d"), date("Y-m-d", strtotime($updatedContribution['receive_date'])));
     $this->assertNotEquals("00:00:00", date("H:i:s", strtotime($updatedContribution['receive_date'])));
-    $this->assertEquals('Completed', $updatedContribution['contribution_status']);
+    $this->assertSame('Completed', $updatedContribution['contribution_status']);
 
     $msg = $mut->getMostRecentEmail();
     $this->assertNotEmpty($msg);
@@ -114,10 +114,10 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'get', ['id' => $contributionId]);
     $updatedContribution = $contribution['values'][$contributionId];
 
-    $this->assertEquals('', $updatedContribution['contribution_source']);
+    $this->assertSame('', $updatedContribution['contribution_source']);
     $this->assertEquals(date("Y-m-d"), date("Y-m-d", strtotime($updatedContribution['receive_date'])));
     $this->assertNotEquals("00:00:00", date("H:i:s", strtotime($updatedContribution['receive_date'])));
-    $this->assertEquals('Completed', $updatedContribution['contribution_status']);
+    $this->assertSame('Completed', $updatedContribution['contribution_status']);
 
     $mut->assertMailLogEmpty();
     $mut->stop();

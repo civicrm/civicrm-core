@@ -186,7 +186,7 @@ div#crm-contact-thumbnail {
   height: 25px;
 }
 
-.crm-container .crm-summary-row:after {
+.crm-container .crm-summary-row::after {
   clear: both;
   content: ".";
   display: block;
@@ -196,7 +196,7 @@ div#crm-contact-thumbnail {
 
 #crm-container div.crm-summary-row {
   background-color: #f4f4ed;
-  border-top: 1px solid #ffffff;
+  border-top: 1px solid #fff;
   margin-bottom: 1px;
   min-height: 17px;
 }
@@ -216,7 +216,7 @@ div#crm-contact-thumbnail {
 }
 
 .crm-container #customFields div.contact_panel td {
-  border-bottom: 1px solid #ffffff;
+  border-bottom: 1px solid #fff;
   padding: 4px;
   vertical-align: top;
 }

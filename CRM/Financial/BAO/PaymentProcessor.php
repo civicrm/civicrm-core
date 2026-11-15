@@ -1,12 +1,14 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
+
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -18,7 +20,7 @@
 /**
  * This class contains payment processor related functions.
  */
-class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProcessor implements \Civi\Core\HookInterface {
+class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProcessor {
   /**
    * Static holder for the default payment processor
    * @var object
@@ -55,6 +57,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
   /**
    * @implements CRM_Utils_Hook::fieldOptions
    */
+  #[CiviEventListener(event: '&hook_civicrm_fieldOptions')]
   public static function hook_civicrm_fieldOptions($entityName, $fieldName, &$options, $params) {
     if ($entityName === 'PaymentProcessor' && $fieldName === 'financial_account_id') {
       // Pseudo-field - let's help out.
@@ -95,6 +98,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    *
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
     if ($event->action === 'create') {
       // Supply defaults for `title` and `frontend_title`
@@ -126,6 +130,7 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
    * Callback for hook_civicrm_post().
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     if ($event->action === 'create' || $event->action === 'edit') {
       // CRM-11826, add entry in civicrm_entity_financial_account

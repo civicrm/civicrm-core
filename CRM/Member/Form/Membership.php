@@ -766,7 +766,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $errors = [];
 
     $priceSetId = $self->getPriceSetID();
-    $priceSetDetails = $self->getPriceSetDetails($params);
+    $priceSetDetails = $self->getPriceSetDetails();
 
     $selectedMemberships = self::getSelectedMemberships($priceSetDetails[$priceSetId], $params);
 
@@ -1077,6 +1077,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $originalMembershipType = $this->getMembershipValue('membership_type_id');
     $hasContribution = $this->_mode || $this->getSubmittedValue('record_contribution');
+    $this->initializeOrder();
 
     if ($hasContribution) {
       $contribution = $this->saveOrder();

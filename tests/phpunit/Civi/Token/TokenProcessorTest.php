@@ -74,7 +74,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       });
       $this->assertCount(1, $log, "Should receive one callback on expression: $input");
       $this->assertEquals($expected, $log[0]);
-      $this->assertEquals('Replaced!', $filtered);
+      $this->assertSame('Replaced!', $filtered);
     }
   }
 
@@ -89,8 +89,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       ->context('two', 'Banana');
     $gotRow = $p->getRow(0);
     foreach ([$createdRow, $gotRow] as $row) {
-      $this->assertEquals('Apple', $row->context['one']);
-      $this->assertEquals('Banana', $row->context['two']);
+      $this->assertSame('Apple', $row->context['one']);
+      $this->assertSame('Banana', $row->context['two']);
     }
   }
 
@@ -107,13 +107,13 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     ]);
     $gotRow0 = $p->getRow(0);
     foreach ([$createdRows[0], $gotRow0] as $row) {
-      $this->assertEquals('Apple', $row->context['one']);
-      $this->assertEquals('Banana', $row->context['two']);
+      $this->assertSame('Apple', $row->context['one']);
+      $this->assertSame('Banana', $row->context['two']);
     }
     $gotRow1 = $p->getRow(1);
     foreach ([$createdRows[1], $gotRow1] as $row) {
-      $this->assertEquals('Pomme', $row->context['one']);
-      $this->assertEquals('Banane', $row->context['two']);
+      $this->assertSame('Pomme', $row->context['one']);
+      $this->assertSame('Banane', $row->context['two']);
     }
   }
 
@@ -136,11 +136,11 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       ]);
     $gotRow = $p->getRow(0);
     foreach ([$createdRow, $gotRow] as $row) {
-      $this->assertEquals(1, $row->context['one']);
-      $this->assertEquals(3, $row->context['two'][2]);
-      $this->assertEquals(5, $row->context['two'][4]);
-      $this->assertEquals(7, $row->context['three'][6]);
-      $this->assertEquals(98, $row->context['omega']);
+      $this->assertSame(1, $row->context['one']);
+      $this->assertSame(3, $row->context['two'][2]);
+      $this->assertSame(5, $row->context['two'][4]);
+      $this->assertSame(7, $row->context['three'][6]);
+      $this->assertSame('98', $row->context['omega']);
       $this->assertEquals(__CLASS__, $row->context['controller']);
     }
   }
@@ -179,11 +179,11 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       ->tokens('four', 8, 9);
     $gotRow = $p->getRow(0);
     foreach ([$createdRow, $gotRow] as $row) {
-      $this->assertEquals(1, $row->tokens['one']);
-      $this->assertEquals(3, $row->tokens['two'][2]);
-      $this->assertEquals(5, $row->tokens['two'][4]);
-      $this->assertEquals(7, $row->tokens['three'][6]);
-      $this->assertEquals(9, $row->tokens['four'][8]);
+      $this->assertSame(1, $row->tokens['one']);
+      $this->assertSame(3, $row->tokens['two'][2]);
+      $this->assertSame(5, $row->tokens['two'][4]);
+      $this->assertSame(7, $row->tokens['three'][6]);
+      $this->assertSame(9, $row->tokens['four'][8]);
     }
   }
 
@@ -231,7 +231,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $this->assertEquals($expectText[$key], $row->render('text'));
       $rowCount++;
     }
-    $this->assertEquals(3, $rowCount);
+    $this->assertSame(3, $rowCount);
   }
 
   public function testRenderLocalizedHookToken(): void {
@@ -275,7 +275,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $this->assertEquals($expectText[$key], $row->render('text'));
       $rowCount++;
     }
-    $this->assertEquals(3, $rowCount);
+    $this->assertSame(3, $rowCount);
   }
 
   /**
@@ -294,13 +294,13 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $contactID = $this->individualCreate();
     $websiteID = Website::create()->setValues(['contact_id' => $contactID, 'url' => 'https://example.com'])->execute()->first()['id'];
     $row = $this->renderUrlMessage($contactID);
-    $this->assertEquals('<a href="https://example.com">blah</a>', $row->render('one'));
-    $this->assertEquals('<a href="https://example.com">blah</a>', $row->render('two'));
+    $this->assertSame('<a href="https://example.com">blah</a>', $row->render('one'));
+    $this->assertSame('<a href="https://example.com">blah</a>', $row->render('two'));
 
     Website::update()->setValues(['url' => 'http://example.com'])->addWhere('id', '=', $websiteID)->execute();
     $row = $this->renderUrlMessage($contactID);
-    $this->assertEquals('<a href="http://example.com">blah</a>', $row->render('one'));
-    $this->assertEquals('<a href="http://example.com">blah</a>', $row->render('two'));
+    $this->assertSame('<a href="http://example.com">blah</a>', $row->render('one'));
+    $this->assertSame('<a href="http://example.com">blah</a>', $row->render('two'));
   }
 
   /**
@@ -354,7 +354,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $this->assertEquals($expectText[$key], $row->render('text'));
       $rowCount++;
     }
-    $this->assertEquals(1, $rowCount);
+    $this->assertSame(1, $rowCount);
   }
 
   /**
@@ -391,7 +391,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $this->assertEquals($expectText[$key], $row->render('text'));
       $rowCount++;
     }
-    $this->assertEquals(1, $rowCount);
+    $this->assertSame(1, $rowCount);
   }
 
   public function testGetMessageTokens(): void {
@@ -461,10 +461,10 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $this->assertEquals($expectText[$key], $row->render('greeting_text'));
       $rowCount++;
     }
-    $this->assertEquals(3, $rowCount);
+    $this->assertSame(3, $rowCount);
     // This may change in the future.
-    $this->assertEquals(0, $this->counts['onListTokens']);
-    $this->assertEquals(1, $this->counts['onEvalTokens']);
+    $this->assertSame(0, $this->counts['onListTokens']);
+    $this->assertSame(1, $this->counts['onEvalTokens']);
   }
 
   public static function getFilterExamples(): array {
@@ -647,10 +647,10 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $tokenProcessor->evaluate();
 
     foreach ($tokenProcessor->getRows() as $row) {
-      $this->assertEquals('!!Nomnomnomapple!!', $row->render('subject'));
-      $this->assertEquals('!!Nomnomnombanana!!', $row->render('body_html'));
-      $this->assertEquals('!!Nomnomnomcherry!!', $row->render('body_text'));
-      $this->assertEquals('No fruit :(', $row->render('other'));
+      $this->assertSame('!!Nomnomnomapple!!', $row->render('subject'));
+      $this->assertSame('!!Nomnomnombanana!!', $row->render('body_html'));
+      $this->assertSame('!!Nomnomnomcherry!!', $row->render('body_text'));
+      $this->assertSame('No fruit :(', $row->render('other'));
       $looped = TRUE;
     }
     $this->assertTrue(isset($looped));
@@ -709,16 +709,16 @@ class TokenProcessorTest extends \CiviUnitTestCase {
 
       foreach ($tokenProcessor->getRows() as $row) {
         $loops++;
-        $this->assertEquals('!!Fruit of the Tree!!', $row->render('real_dot'));
+        $this->assertSame('!!Fruit of the Tree!!', $row->render('real_dot'));
         $this->assertEquals($expectRealSmartyOutputs[$smarty], $row->render('real_dot_smarty'));
-        $this->assertEquals('Summary of fruits: Apples, Bananas, and Cherries Oh My!', $row->render('real_colon'));
-        $this->assertEquals('!!!!', $row->render('not_real_1'));
-        $this->assertEquals('!!!!', $row->render('not_real_2'));
-        $this->assertEquals('!!!!', $row->render('not_real_3'));
-        $this->assertEquals('!!!!', $row->render('not_real_4'));
+        $this->assertSame('Summary of fruits: Apples, Bananas, and Cherries Oh My!', $row->render('real_colon'));
+        $this->assertSame('!!!!', $row->render('not_real_1'));
+        $this->assertSame('!!!!', $row->render('not_real_2'));
+        $this->assertSame('!!!!', $row->render('not_real_3'));
+        $this->assertSame('!!!!', $row->render('not_real_4'));
       }
     }
-    $this->assertEquals(2, $loops);
+    $this->assertSame(2, $loops);
   }
 
   /**
@@ -742,7 +742,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       'contribution' => [
         'id' => 111,
         'receive_date' => '2012-01-02',
-        'invoice_id' => 11111,
+        'invoice_id' => '11111',
       ],
     ]);
     $p->addRow([
@@ -754,7 +754,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       'contribution' => [
         'id' => 111,
         'receive_date' => '2012-01-02',
-        'invoice_id' => 22222,
+        'invoice_id' => '22222',
       ],
     ]);
     $p->evaluate();
@@ -763,8 +763,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     foreach ($p->getRows() as $row) {
       $outputs[] = $row->render('example');
     }
-    $this->assertEquals('Invoice #11111 for The Override!', $outputs[0]);
-    $this->assertEquals('Invoice #22222 for Another Override!', $outputs[1]);
+    $this->assertSame('Invoice #11111 for The Override!', $outputs[0]);
+    $this->assertSame('Invoice #22222 for Another Override!', $outputs[1]);
   }
 
   /**
@@ -789,7 +789,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       'contribution' => [
         'id' => 333,
         'receive_date' => '2012-01-02',
-        'invoice_id' => 33333,
+        'invoice_id' => '33333',
       ],
     ]);
     $p->addRow([
@@ -797,7 +797,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       'contribution' => [
         'id' => 444,
         'receive_date' => '2012-01-02',
-        'invoice_id' => 44444,
+        'invoice_id' => '44444',
       ],
     ]);
     $p->evaluate();
@@ -806,8 +806,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     foreach ($p->getRows() as $row) {
       $outputs[] = $row->render('example');
     }
-    $this->assertEquals('Invoice #33333!', $outputs[0]);
-    $this->assertEquals('Invoice #44444!', $outputs[1]);
+    $this->assertSame('Invoice #33333!', $outputs[0]);
+    $this->assertSame('Invoice #44444!', $outputs[1]);
 
   }
 
@@ -818,8 +818,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
    * Ex: $tokenContext['oldSmartyVar'] = 'new_entity.new_field';
    */
   public function testSmartyTokenAlias_Contribution(): void {
-    $first = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2010-01-01', 'invoice_id' => 100, 'trxn_id' => 1000]);
-    $second = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2011-02-02', 'invoice_id' => 200, 'trxn_id' => 1]);
+    $first = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2010-01-01', 'invoice_id' => '100', 'trxn_id' => '1000']);
+    $second = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'receive_date' => '2011-02-02', 'invoice_id' => '200', 'trxn_id' => '1']);
     $this->dispatcher->addSubscriber(new TokenCompatSubscriber());
     $this->dispatcher->addSubscriber(new \CRM_Contribute_Tokens());
     $this->dispatcher->addSubscriber(new \CRM_Contact_Tokens());
@@ -841,8 +841,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     foreach ($p->getRows() as $row) {
       $outputs[] = $row->render('example');
     }
-    $this->assertEquals('Invoice #100!', $outputs[0]);
-    $this->assertEquals('Invoice #200!', $outputs[1]);
+    $this->assertSame('Invoice #100!', $outputs[0]);
+    $this->assertSame('Invoice #200!', $outputs[1]);
   }
 
   /**
@@ -942,10 +942,10 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $p->addRow(['contactId' => $contactID, 'participantId' => $zeroParticipantID]);
     $p->evaluate();
 
-    $this->assertEquals('1.234,03|8,5|1.234,03|https://example.org/camp', $p->getRow(0)->render('plain'));
-    $this->assertEquals('1.234,03|8,5|1.234,03|<a href="https://example.org/camp" target="_blank">https://example.org/camp</a>', $p->getRow(0)->render('html'));
+    $this->assertSame('1.234,03|8,5|1.234,03|https://example.org/camp', $p->getRow(0)->render('plain'));
+    $this->assertSame('1.234,03|8,5|1.234,03|<a href="https://example.org/camp" target="_blank">https://example.org/camp</a>', $p->getRow(0)->render('html'));
     // A zero is a value, an unset field is not.
-    $this->assertEquals('0,00||1.234,03|', $p->getRow(1)->render('plain'));
+    $this->assertSame('0,00||1.234,03|', $p->getRow(1)->render('plain'));
 
     $this->customGroupDelete($participantGroup['id']);
     $this->customGroupDelete($contactGroup['id']);

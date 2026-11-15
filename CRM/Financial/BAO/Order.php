@@ -1200,9 +1200,12 @@ class CRM_Financial_BAO_Order {
       // requires it for line retrieval but we want to fix that as it
       // should not be required at that point.
       $this->setPriceSetIDFromSelectedField($lineItem['price_field_id']);
+      $storedTaxAmount = $lineItem['tax_amount'] ?? NULL;
       // Set any pre-calculation to zero as we will calculate.
       $lineItem['tax_amount'] = 0;
+      $isFinancialTypeOverridden = FALSE;
       if ($this->isOverrideLineItemFinancialType($lineItem['financial_type_id']) !== FALSE) {
+        $isFinancialTypeOverridden = (int) $lineItem['financial_type_id'] !== (int) $this->getOverrideFinancialTypeID();
         $lineItem['financial_type_id'] = $this->getOverrideFinancialTypeID();
       }
       $lineItem['tax_rate'] = $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
@@ -1215,7 +1218,7 @@ class CRM_Financial_BAO_Order {
       $lineItem['membership_type_id'] ??= NULL;
       if ($lineItem['membership_type_id']) {
         $lineItem['entity_table'] = 'civicrm_membership';
-        $lineItem['membership_num_terms'] = $lineItem['membership_num_terms'] ?:1;
+        $lineItem['membership_num_terms'] = $lineItem['membership_num_terms'] ?: 1;
       }
       $lineItem['title'] = $this->getLineItemTitle($lineItem);
       $lineItem['tax_rate'] = $taxRate = $this->getTaxRate((int) $lineItem['financial_type_id']);
@@ -1236,6 +1239,14 @@ class CRM_Financial_BAO_Order {
         $lineItem['qty'] = 1;
         $lineItem['unit_price'] = $lineItem['line_total'];
 
+      }
+      elseif ($taxRate && $storedTaxAmount !== NULL && !$isFinancialTypeOverridden
+        && $this->getExistingContributionID() && !$this->getTemplateContributionID()
+      ) {
+        // Keep the tax amount of existing line items, as it has already been
+        // booked. Recalculating it from the rounded line total may differ by a
+        // cent.
+        $lineItem['tax_amount'] = (float) $storedTaxAmount;
       }
       elseif ($taxRate) {
         $lineItem['tax_amount'] = ($taxRate / 100) * $lineItem['line_total'];
@@ -1945,10 +1956,18 @@ class CRM_Financial_BAO_Order {
 
     $result = Contribution::create(FALSE)
       ->setValues($this->contributionValues)->execute();
-    $this->saveOrderCompletionMetadata((int) $result->first()['id']);
+    $contributionID = (int) $result->first()['id'];
+    $this->saveOrderCompletionMetadata($contributionID);
     if ($this->contributionValues['total_amount'] == 0.0) {
-      // A $0 order has nothing to pay, so don't leave it pending.
-      CRM_Contribute_BAO_Contribution::writeRecord(['id' => $result->first()['id'], 'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')]);
+      // The order is created Pending, but a $0 order has nothing to pay, so record
+      // the payment of 0 that settles it. That completes the order through the same
+      // path a paid order takes, activating its memberships and participants.
+      CRM_Financial_BAO_Payment::create([
+        'contribution_id' => $contributionID,
+        'total_amount' => 0,
+        'trxn_date' => CRM_Utils_Time::getTime('YmdHis'),
+        'is_send_contribution_notification' => FALSE,
+      ]);
     }
     return $result;
   }

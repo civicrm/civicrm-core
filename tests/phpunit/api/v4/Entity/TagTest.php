@@ -118,7 +118,7 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
     $byType = $tagged->indexBy('entity_type');
     $this->assertStringContainsString('Lookup', $byType['Contact']['label']);
     $this->assertStringContainsString('cid=' . $contact['id'], $byType['Contact']['url']);
-    $this->assertEquals('Tag Test Form', $byType['Afform']['label']);
+    $this->assertSame('Tag Test Form', $byType['Afform']['label']);
     $this->assertStringContainsString('afform#/edit/' . $this->afformName, $byType['Afform']['url']);
 
     // A nonexistent tag ID is an empty result, not an error.
@@ -304,7 +304,7 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', '=', $tagA['id'])
       ->addSelect('label', 'used_for')
       ->execute()->first();
-    $this->assertEquals('Merged Label', $mergedTag['label']);
+    $this->assertSame('Merged Label', $mergedTag['label']);
     $this->assertEqualsCanonicalizing(['civicrm_contact', 'civicrm_activity'], $mergedTag['used_for']);
 
     // Tag B no longer exists.
@@ -372,6 +372,71 @@ class TagTest extends Api4TestBase implements TransactionalInterface {
       ->setTagIds([$reserved['id']])
       ->execute()->first();
     $this->assertEquals($tagA['id'], $result['id']);
+  }
+
+  public function testTagSaving(): void {
+    // Ensure bypassing permissions works correctly by giving none to the logged-in user
+    $cid = $this->createLoggedInUser();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    $tagA = Tag::create(FALSE)
+      ->addValue('name', uniqid('A'))
+      ->addValue('used_for', 'civicrm_contact')
+      ->addValue('color', '#cccccc')
+      ->execute()->first();
+    $tagB = Tag::create(FALSE)
+      ->addValue('name', uniqid('B'))
+      ->addValue('used_for', 'civicrm_contact')
+      ->execute()->first();
+    $tagC = Tag::create(FALSE)
+      ->addValue('name', uniqid('C'))
+      ->addValue('used_for', 'civicrm_contact')
+      ->execute()->first();
+    $tagD = Tag::create(FALSE)
+      ->addValue('name', uniqid('D'))
+      ->addValue('used_for', 'civicrm_contact')
+      ->execute()->first();
+
+    // create contact1 with two tags
+    $contact = Contact::create(FALSE)
+      ->addValue('tags', [$tagA['id'], $tagB['id']])
+      ->execute()->first();
+
+    $contactTags = (array) EntityTag::get(FALSE)
+      ->addWhere('entity_id', '=', $contact['id'])
+      ->addWhere('entity_table', '=', 'civicrm_contact')
+      ->execute();
+
+    $this->assertCount(2, $contactTags);
+
+    // change to 3 different tags
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addValue('tags', [$tagB['id'], $tagC['id'], $tagD['id']])
+      ->execute();
+
+    $contactTags = (array) EntityTag::get(FALSE)
+      ->addWhere('entity_id', '=', $contact['id'])
+      ->addWhere('entity_table', '=', 'civicrm_contact')
+      ->execute();
+
+    $this->assertCount(3, $contactTags);
+    // ensure tag A has been removed
+    $this->assertCount(0, array_filter($contactTags, fn ($et) => $et['tag_id'] === $tagA['id']));
+
+    // set tags by name
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $contact['id'])
+      ->addValue('tags:name', [$tagA['name'], $tagB['name']])
+      ->execute();
+
+    $contactTags = (array) EntityTag::get(FALSE)
+      ->addWhere('entity_id', '=', $contact['id'])
+      ->addWhere('entity_table', '=', 'civicrm_contact')
+      ->execute();
+
+    $this->assertCount(2, $contactTags);
+    $this->assertSame([$tagA['id'], $tagB['id']], array_map(fn ($et) => $et['tag_id'], $contactTags));
   }
 
 }

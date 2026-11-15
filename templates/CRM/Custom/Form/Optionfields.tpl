@@ -13,7 +13,7 @@
   <td class="html-adjust">{$form.option_type.html}</td>
 </tr>
 
-<tr id="option_group" {if empty($form.option_group_id)}class="hiddenElement"{/if}>
+<tr id="option_group">
   <td class="label">{$form.option_group_id.label}</td>
   <td class="html-adjust">{$form.option_group_id.html}</td>
 </tr>
@@ -40,7 +40,7 @@
   <tr id="optionField_{$index}" class="form-item {cycle values="odd-row,even-row"}">
         <td>
         {if $index GT 1}
-            <a onclick="showHideRow({$index}); return false;" name="optionField_{$index}" href="#" class="form-link"><i class="crm-i fa-trash" title="{ts escape='htmlattribute'}hide field or section{/ts}" role="img" aria-hidden="true"></i></a>
+            <a onclick="showHideRow({$index}); return false;" name="optionField_{$index}" href="#" class="form-link">{icon icon="fa-trash"}{ts}hide field or section{/ts}{/icon}</a>
         {/if}
         </td>
       <td>

@@ -32,18 +32,18 @@ class SettingTest extends Api4TestBase implements TransactionalInterface {
     $setting = Setting::set(FALSE)
       ->addValue('menubar_position', 'above-crm-container')
       ->execute()->first();
-    $this->assertEquals('above-crm-container', $setting['value']);
+    $this->assertSame('above-crm-container', $setting['value']);
     $setting = Setting::get(FALSE)
       ->addSelect('menubar_position')
       ->execute()->first();
-    $this->assertEquals('above-crm-container', $setting['value']);
+    $this->assertSame('above-crm-container', $setting['value']);
 
     $setting = Setting::revert(FALSE)
       ->addSelect('menubar_position')
       ->execute()->column('value', 'name');
     $this->assertEquals(['menubar_position' => 'over-cms-menu'], $setting);
     $setting = civicrm_api4('Setting', 'get', ['select' => ['menubar_position'], 'checkPermissions' => FALSE], 0);
-    $this->assertEquals('over-cms-menu', $setting['value']);
+    $this->assertSame('over-cms-menu', $setting['value']);
   }
 
   public function testInvalidSetting(): void {
@@ -75,7 +75,7 @@ class SettingTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('contact_edit_options:label')
       ->execute()->first();
     $this->assertEquals(['Communication Preferences', 'Custom Data'], $setting['value']);
-    $this->assertEquals('contact_edit_options:label', $setting['name']);
+    $this->assertSame('contact_edit_options:label', $setting['name']);
   }
 
   /**

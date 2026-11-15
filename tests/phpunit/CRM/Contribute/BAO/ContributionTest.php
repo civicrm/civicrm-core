@@ -92,8 +92,38 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       ->addWhere('financial_trxn_id', '=', $feeTrxn['id'])
       ->addWhere('entity_table', '=', 'civicrm_contribution')
       ->execute()->single();
-    $this->assertEquals('civicrm_contribution', $entityFinancialTrxn['entity_table']);
+    $this->assertSame('civicrm_contribution', $entityFinancialTrxn['entity_table']);
     $this->assertEquals($contribution['id'], $entityFinancialTrxn['entity_id']);
+  }
+
+  /**
+   * A PHP error while saving must not leave a committed contribution.
+   */
+  public function testCreateRollsBackOnError(): void {
+    $contactID = $this->individualCreate();
+    $this->hookClass->setHook('civicrm_post', function ($op, $objectName): void {
+      if ($objectName === 'Contribution') {
+        throw new \TypeError('Failure in post hook');
+      }
+    });
+    $params = [
+      'contact_id' => $contactID,
+      'financial_type_id' => $this->getFinancialTypeID('Donation'),
+      'total_amount' => 10,
+      'receive_date' => '20260101',
+      'contribution_status_id' => 1,
+    ];
+    try {
+      CRM_Contribute_BAO_Contribution::create($params);
+      $this->fail('The error from the hook should propagate.');
+    }
+    catch (\TypeError $e) {
+      $this->assertSame('Failure in post hook', $e->getMessage());
+    }
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery(
+      'SELECT COUNT(*) FROM civicrm_contribution WHERE contact_id = %1',
+      [1 => [$contactID, 'Positive']]
+    ));
   }
 
   /**
@@ -161,7 +191,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
       'custom_' . $customFieldID => 1,
     ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($customValueParams);
-    $this->assertEquals('Test custom value', $values['custom_' . $customFieldID], 'Check the custom field value');
+    $this->assertSame('Test custom value', $values['custom_' . $customFieldID], 'Check the custom field value');
 
     $this->assertEquals($params['trxn_id'], $contribution->trxn_id, 'Check for transaction id creation.');
     $this->assertEquals($this->ids['Contact']['individual_0'], $contribution->contact_id);
@@ -199,7 +229,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'create', $params);
     $this->callAPISuccess('financial_type', 'create', ['is_active' => 0, 'id' => $finType['id']]);
     $contributionCount = CRM_Contribute_BAO_Contribution::contributionCount($contactId);
-    $this->assertEquals(1, $contributionCount);
+    $this->assertSame('1', $contributionCount);
   }
 
   /**
@@ -334,7 +364,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
     $contributionID = $this->callAPISuccess('Contribution', 'create', $param)['id'];
     // Display sort name during Update multiple contributions.
-    $this->assertEquals('Watson, Shane II', CRM_Contribute_BAO_Contribution::sortName($contributionID));
+    $this->assertSame('Watson, Shane II', CRM_Contribute_BAO_Contribution::sortName($contributionID));
   }
 
   /**
@@ -359,7 +389,7 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     ];
     $premium = CRM_Contribute_BAO_Product::writeRecord($params);
 
-    $this->assertEquals('TEST Premium', $premium->name, 'Check for premium  name.');
+    $this->assertSame('TEST Premium', $premium->name, 'Check for premium  name.');
 
     $contributionParams = [
       'contact_id' => $contactId,
@@ -540,7 +570,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
     $amounts = [100.00, 50.00];
     while ($dao->fetch()) {
-      $this->assertEquals(150.00, $dao->total_amount, 'Mismatch of total amount paid.');
+      $this->assertSame(150.00, $dao->total_amount, 'Mismatch of total amount paid.');
       $this->assertEquals($dao->amount, array_pop($amounts), 'Mismatch of amount proportionally assigned to financial item');
     }
   }
@@ -664,7 +694,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $activity = Activity::get()->setWhere($activityWhere)->setSelect(['source_record_id', 'subject'])->execute()->first();
 
     $this->assertEquals($contribution['id'], $activity['source_record_id'], 'Check for activity associated with contribution.');
-    $this->assertEquals('$ 100.00 - STUDENT', $activity['subject'], 'Check for total amount in activity.');
+    $this->assertSame('$ 100.00 - STUDENT', $activity['subject'], 'Check for total amount in activity.');
 
     $params['id'] = $contribution['id'];
     $params['total_amount'] = 200;
@@ -678,7 +708,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $activity = Activity::get()->setWhere($activityWhere)->setSelect(['source_record_id', 'subject', 'campaign_id'])->execute()->first();
 
     $this->assertEquals($contribution['id'], $activity['source_record_id'], 'Check for activity associated with contribution.');
-    $this->assertEquals('$ 200.00 - STUDENT', $activity['subject'], 'Check for total amount in activity.');
+    $this->assertSame('$ 200.00 - STUDENT', $activity['subject'], 'Check for total amount in activity.');
     $this->assertEquals($params['campaign_id'], $activity['campaign_id']);
   }
 
@@ -803,7 +833,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         'return' => ['total_amount'],
       ]
     );
-    $this->assertEquals(8000, $financialTrxn['total_amount'], 'Invalid amount.');
+    $this->assertSame('8000.00', $financialTrxn['total_amount'], 'Invalid amount.');
   }
 
   /**
@@ -830,7 +860,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertCount(1, $financialItemIds, 'Invalid count.');
     $this->assertCount(1, $taxItems, 'Invalid count.');
     foreach ($taxItems as $value) {
-      $this->assertEquals(10, $value['amount'], 'Invalid tax amount.');
+      $this->assertSame('10.00', $value['amount'], 'Invalid tax amount.');
     }
   }
 
@@ -863,8 +893,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       ->addWhere('financial_trxn_id', '=', $financialTrxn['id'])
       ->addOrderBy('amount')->execute();
     $this->assertCount(2, $entityFinancialTrxns, '2 EntityFinancialTrxns should be created (one for tax).');
-    $this->assertEquals(4.55, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
-    $this->assertEquals(45.45, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
+    $this->assertSame(4.55, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertSame(45.45, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
   }
 
   /**
@@ -883,7 +913,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'financial_trxn_id' => $lastFinancialTrxnId['financialTrxnId'],
     ];
     $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'Get', $eftParams);
-    $this->assertEquals(2, $entityFinancialTrxn['count'], 'Invalid count.');
+    $this->assertSame(2, $entityFinancialTrxn['count'], 'Invalid count.');
     $testAmount = [10, 100];
     foreach ($entityFinancialTrxn['values'] as $value) {
       $this->assertEquals($value['amount'], array_pop($testAmount), 'Invalid amount stored in civicrm_entity_financial_trxn.');
@@ -940,7 +970,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contact_type' => 'Organization',
       'organization_name' => 'test organization 1',
     ]);
-    $this->assertEquals(1, $orgCount);
+    $this->assertSame(1, $orgCount);
 
     $values = $params = [];
     $originalBehalfOrganization = $behalfOrganization = [
@@ -987,7 +1017,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'contact_type' => 'Organization',
       'organization_name' => 'test organization 1',
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     //Assert all org values are updated.
     foreach ($orgInfo as $key => $val) {
@@ -997,7 +1027,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     //Check if alert is assigned to params if more than 1 dupe exists.
     $this->organizationCreate(['organization_name' => 'test organization 1', 'email' => 'testorg@gmail.com']);
     CRM_Contribute_Form_Contribution_Confirm::processOnBehalfOrganization($originalBehalfOrganization, $originalContactId, $values, $params, $fields);
-    $this->assertEquals(1, $params['onbehalf_dupe_alert']);
+    $this->assertSame(1, $params['onbehalf_dupe_alert']);
   }
 
   /**
@@ -1011,8 +1041,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'receive_date' => '20120511',
       'total_amount' => 100.00,
       'financial_type_id' => 'Event Fee',
-      'trxn_id' => 12345,
-      'invoice_id' => 67890,
+      'trxn_id' => '12345',
+      'invoice_id' => '67890',
       'source' => 'SSF',
       'contribution_status_id' => 'Completed',
       'revenue_recognition_date' => date('Ymd', strtotime('+3 month')),
@@ -1088,13 +1118,13 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'return' => ['financial_type_id.name', 'line_total'],
     ]);
 
-    $this->assertEquals(
-      100.00,
+    $this->assertSame(
+      '100.00',
       $lineItem['line_total'],
       'Invalid line amount.'
     );
 
-    $this->assertEquals(
+    $this->assertSame(
       'Event Fee',
       $lineItem['financial_type_id.name'],
       'Invalid Financial Type stored.'
@@ -1109,7 +1139,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'return' => ['financial_account_id.name', 'amount', 'description'],
     ]);
 
-    $this->assertEquals(3, $financialItems['count'], 'Count mismatch.');
+    $this->assertSame(3, $financialItems['count'], 'Count mismatch.');
 
     $toCheck = [
       ['Donation', 100.00],
@@ -1128,7 +1158,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         $toCheck[$key][1],
         'Amount mismatch.'
       );
-      $this->assertEquals(
+      $this->assertSame(
         'Contribution Amount',
         $values['description'],
         'Description mismatch.'
@@ -1142,7 +1172,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'entity_id' => $contributionId,
       'sequential' => 1,
     ]);
-    $this->assertEquals(3, $financialTransactions['count'], 'Count mismatch.');
+    $this->assertSame(3, $financialTransactions['count'], 'Count mismatch.');
 
     foreach ($financialTransactions['values'] as $key => $values) {
       $this->callAPISuccessGetCount('EntityFinancialTrxn', [
@@ -1208,12 +1238,12 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $pledgePayments = $this->callAPISuccess('PledgePayment', 'get')['values'];
     $this->callAPISuccess('PledgePayment', 'create', ['id' => key($pledgePayments), 'pledge_id' => $pledgeID, 'contribution_id' => $orderID, 'status_id' => 'Completed', 'actual_amount' => 2]);
     $beforePledge = $this->callAPISuccessGetSingle('Pledge', ['id' => $pledgeID]);
-    $this->assertEquals(2, $beforePledge['pledge_total_paid']);
+    $this->assertSame('2.00', $beforePledge['pledge_total_paid']);
     $this->callAPISuccess('Order', 'cancel', ['contribution_id' => $orderID]);
 
     $this->callAPISuccessGetSingle('Contribution', ['contribution_status_id' => 'Cancelled']);
     $afterPledge = $this->callAPISuccessGetSingle('Pledge', ['id' => $pledgeID]);
-    $this->assertEquals('', $afterPledge['pledge_total_paid']);
+    $this->assertSame('', $afterPledge['pledge_total_paid']);
     $payments = PledgePayment::get(FALSE)->addWhere('contribution_id', 'IS NOT NULL')->execute();
     $this->assertCount(0, $payments);
   }
@@ -1328,7 +1358,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       HAVING SUM(cli.line_total) != total_amount
     ', [1 => [$contributionId, 'Integer']]);
 
-    $this->assertEquals(0, $count);
+    $this->assertSame(0, (int) $count);
 
     $this->callAPISuccess('Contribution', 'create', [
       'id' => $contributionId,
@@ -1344,7 +1374,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       HAVING SUM(cli.line_total) != total_amount
     ', [1 => [$contributionId, 'Integer']]);
 
-    $this->assertEquals(0, $count);
+    $this->assertSame(0, (int) $count);
   }
 
   /**
@@ -1448,7 +1478,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'payment_instrument_id' => $checkInstrument['value'],
       'check_number' => 'bouncer',
     ], 'checkContribution');
-    $this->assertEquals('bouncer', Contribution::get(FALSE)
+    $this->assertSame('bouncer', Contribution::get(FALSE)
       ->addSelect('check_number')
       ->addWhere('id', '=', $checkContribution['id'])
       ->execute()->first()['check_number']);

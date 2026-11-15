@@ -65,8 +65,7 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
       ])->execute();
     }
     $this->_mut = new CiviMailUtils($this, TRUE);
-    $this->callAPISuccess('mail_settings', 'get',
-      ['api.mail_settings.create' => ['domain' => 'chaos.org']]);
+    MailSettings::update(FALSE)->addValue('domain', 'chaos.org')->addWhere('id', '>', 0)->execute();
     Civi::settings()->set('civimail_unsubscribe_methods', ['mailto', 'http', 'oneclick']);
   }
 
@@ -96,16 +95,16 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
 
       $offset = $k + 1;
 
-      $this->assertEquals('FIXME', $message->from->name);
-      $this->assertEquals('info@EXAMPLE.ORG', $message->from->email);
-      $this->assertEquals("Mr. Foo{$offset} Anderson II", $message->to[0]->name);
-      $this->assertEquals("mail{$offset}@nul.example.com", $message->to[0]->email);
+      $this->assertSame('FIXME', $message->from->name);
+      $this->assertSame('info@EXAMPLE.ORG', $message->from->email);
+      $this->assertSame("Mr. Foo{$offset} Anderson II", $message->to[0]->name);
+      $this->assertSame("mail{$offset}@nul.example.com", $message->to[0]->email);
 
       $this->assertMatchesRegularExpression('#^text/plain; charset=utf-8#', $message->headers['Content-Type']);
       $this->assertMatchesRegularExpression(';^b\.[\d\.a-z]+@chaos.org$;', $message->headers['Return-Path']);
       $this->assertMatchesRegularExpression(';^b\.[\d\.a-z]+@chaos.org$;', $message->headers['X-CiviMail-Bounce'][0]);
       $this->assertMatchesRegularExpression(';^\<mailto:u\.[\d\.a-z]+@chaos.org\>, \<http.*unsubscribe.*\>$;', $message->headers['List-Unsubscribe'][0]);
-      $this->assertEquals('bulk', $message->headers['Precedence'][0]);
+      $this->assertSame('bulk', $message->headers['Precedence'][0]);
     }
   }
 
@@ -129,13 +128,13 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
       ->execute();
 
     // Start condition: We have a few people "Added"
-    $this->assertEquals(2, $getMembers('Added')->count());
-    $this->assertEquals(0, $getMembers('Removed')->count());
+    $this->assertSame(2, $getMembers('Added')->count());
+    $this->assertSame(0, $getMembers('Removed')->count());
 
     foreach ($allMessages as $k => $message) {
       // Extract the unsubscribe URL(s)
       $this->assertNotEmpty($message->headers['List-Unsubscribe'][0]);
-      $this->assertEquals('List-Unsubscribe=One-Click', $message->headers['List-Unsubscribe-Post'][0]);
+      $this->assertSame('List-Unsubscribe=One-Click', $message->headers['List-Unsubscribe-Post'][0]);
 
       $urls = array_map(
         fn($s) => trim($s, '<>'),
@@ -147,19 +146,19 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
       // Older clients (RFC 2369 only) will open a browser for the unsubscribe page.
       // Let's make sure it shows a suitable web-page.
       $get = $client->sendRequest(new Request('GET', $url));
-      $this->assertEquals(200, $get->getStatusCode());
+      $this->assertSame(200, $get->getStatusCode());
       $this->assertMatchesRegularExpression(';You are requesting to unsubscribe;', (string) $get->getBody());
 
       // Newer clients (RFC 8058) will send headless HTTP POST.
       // This is how we will actually unsubscribe.
       $post = $client->sendRequest(new Request('POST', $url, [], $message->headers['List-Unsubscribe-Post'][0]));
-      $this->assertEquals(200, $post->getStatusCode());
-      $this->assertEquals('OK', trim((string) $post->getBody()));
+      $this->assertSame(200, $post->getStatusCode());
+      $this->assertSame('OK', trim((string) $post->getBody()));
     }
 
     // The HTTP POSTs removed the members.
-    $this->assertEquals(0, $getMembers('Added')->count());
-    $this->assertEquals(2, $getMembers('Removed')->count());
+    $this->assertSame(0, $getMembers('Added')->count());
+    $this->assertSame(2, $getMembers('Removed')->count());
   }
 
   /**
@@ -216,7 +215,7 @@ abstract class CRM_Mailing_MailingSystemTestBase extends CiviUnitTestCase {
 
       $this->assertTrue($message->body instanceof ezcMailText);
 
-      $this->assertEquals('plain', $message->body->subType);
+      $this->assertSame('plain', $message->body->subType);
       $this->assertMatchesRegularExpression(
         ";" .
         // Default header
@@ -252,7 +251,7 @@ United States
 
       [$textPart, $htmlPart] = $message->body->getParts();
 
-      $this->assertEquals('html', $htmlPart->subType);
+      $this->assertSame('html', $htmlPart->subType);
       $this->assertMatchesRegularExpression(
         ";" .
         // Default header
@@ -268,7 +267,7 @@ United States
         $htmlPart->text
       );
 
-      $this->assertEquals('plain', $textPart->subType);
+      $this->assertSame('plain', $textPart->subType);
       $this->assertMatchesRegularExpression(
         ";" .
         // Default header
@@ -302,7 +301,7 @@ United States
 
       [$textPart, $htmlPart] = $message->body->getParts();
 
-      $this->assertEquals('html', $htmlPart->subType);
+      $this->assertSame('html', $htmlPart->subType);
       $this->assertMatchesRegularExpression(
         ";" .
         // body_html
@@ -317,7 +316,7 @@ United States
         $htmlPart->text
       );
 
-      $this->assertEquals('plain', $textPart->subType);
+      $this->assertSame('plain', $textPart->subType);
       $this->assertMatchesRegularExpression(
         ";" .
         //  body_html, filtered
@@ -440,13 +439,13 @@ United States
 
       if ($htmlUrlRegex) {
         $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params, 'htmlUrlRegex' => $htmlUrlRegex, 'htmlPart' => $htmlPart->text], 1);
-        $this->assertEquals('html', $htmlPart->subType, "Should have HTML part in case: $caseName");
+        $this->assertSame('html', $htmlPart->subType, "Should have HTML part in case: $caseName");
         $this->assertMatchesRegularExpression($htmlUrlRegex, $htmlPart->text, "Should have correct HTML in case: $caseName");
       }
 
       if ($textUrlRegex) {
         $caseName = print_r(['inputHtml' => $inputHtml, 'params' => $params, 'textUrlRegex' => $textUrlRegex, 'textPart' => $textPart->text], 1);
-        $this->assertEquals('plain', $textPart->subType, "Should have text part in case: $caseName");
+        $this->assertSame('plain', $textPart->subType, "Should have text part in case: $caseName");
         $this->assertMatchesRegularExpression($textUrlRegex, $textPart->text, "Should have correct text in case: $caseName");
       }
     }
@@ -469,11 +468,11 @@ United States
         'first_name' => "Foo{$i}",
         'email' => 'mail' . $i . '@' . $domain,
       ]);
-      $this->callAPISuccess('group_contact', 'create', [
+      $this->createTestEntity('GroupContact', [
         'contact_id' => $contactID,
         'group_id' => $groupID,
         'status' => 'Added',
-      ]);
+      ], 'group_' . $groupID . '_contact_' . $i);
     }
   }
 
@@ -514,11 +513,11 @@ United States
 
   public function testModifyMailingRecipientsIgnoreOptOut(): void {
     $optOutContact = $this->individualCreate(['is_opt_out' => 1, 'email_primary.email' => 'testoptout@example.com'], 'opt_out_individual');
-    $this->callAPISuccess('GroupContact', 'create', [
+    $this->createTestEntity('GroupContact', [
       'contact_id' => $optOutContact,
       'group_id' => $this->_groupID,
       'status' => 'Added',
-    ]);
+    ], 'opt_out_contact');
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailingRecipients', [$this, 'hook_alterMailingReceipientsIgnoreOptOut']);
     $mailingParams = array_merge($this->defaultParams, [

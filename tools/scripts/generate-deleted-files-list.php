@@ -57,8 +57,7 @@ function parseLog($logString, &$deletedFiles, $prefix = '', $trackedFiles = [], 
         // Recurse up to the top-level deleted directory
         do {
           $dir = array_pop($path);
-        }
-        while ($path && $dir && !isset($trackedDirs[implode('/', $path)]));
+        } while ($path && $dir && !isset($trackedDirs[implode('/', $path)]));
         if ($dir) {
           $deletedFiles[] = implode('/', $path) . ($path ? '/' : '') . "$dir/*";
         }

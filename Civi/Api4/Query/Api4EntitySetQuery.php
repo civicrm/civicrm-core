@@ -201,29 +201,6 @@ class Api4EntitySetQuery extends Api4Query {
     return $field ?: NULL;
   }
 
-  protected function buildWhereClause() {
-    foreach ($this->getWhere() as $clause) {
-      $sql = $this->treeWalkClauses($clause, 'WHERE');
-      if ($sql) {
-        $this->query->where($sql);
-      }
-    }
-  }
-
-  /**
-   * Add HAVING clause to query
-   *
-   * Every expression referenced must also be in the SELECT clause.
-   */
-  protected function buildHavingClause() {
-    foreach ($this->getHaving() as $clause) {
-      $sql = $this->treeWalkClauses($clause, 'HAVING');
-      if ($sql) {
-        $this->query->having($sql);
-      }
-    }
-  }
-
   /**
    * Ensure all sets have the same number of select fields and convert NULL to SQL NULL.
    *

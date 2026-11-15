@@ -244,7 +244,8 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   ], 0);
 
   // Translate Metadata
-  (new StringVisitor())->visitMetadata($formMetaData, fn($s) => _ts($s));
+  $domain = \Civi\Afform\Translator::getDomain($formMetaData['name']);
+  (new StringVisitor())->visitMetadata($formMetaData, fn($s) => _ts($s, ['domain' => $domain]));
 
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [
@@ -486,7 +487,7 @@ function afform_civicrm_post($op, $entityName, $id, $object, $params) {
       // Adding a new custom field to an empty field group may auto-generate afforms with menu routes.
       // @see Civi\Api4\Action\CustomGroup\GetAfforms::getCustomGroupAfforms
       if ($op === 'create' && $entityName === 'CustomField') {
-        \Civi::router()->clear();;
+        \Civi::router()->clear();
       }
     }
   }

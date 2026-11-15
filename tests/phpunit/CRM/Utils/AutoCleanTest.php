@@ -15,19 +15,19 @@ class CRM_Utils_AutoCleanTest extends CiviUnitTestCase {
 
   public function testAutoclean(): void {
     $this->foo = 'orig';
-    $this->assertEquals('orig', $this->foo);
+    $this->assertSame('orig', $this->foo);
     $this->nestedWithArrayCb();
-    $this->assertEquals('orig', $this->foo);
+    $this->assertSame('orig', $this->foo);
     $this->nestedWithFuncCb();
-    $this->assertEquals('orig', $this->foo);
+    $this->assertSame('orig', $this->foo);
     $this->nestedSwap();
-    $this->assertEquals('orig', $this->foo);
+    $this->assertSame('orig', $this->foo);
   }
 
   public function nestedWithArrayCb() {
     $this->foo = 'arraycb';
     $ac = CRM_Utils_AutoClean::with([$this, 'setFoo'], 'orig');
-    $this->assertEquals('arraycb', $this->foo);
+    $this->assertSame('arraycb', $this->foo);
   }
 
   public function nestedWithFuncCb() {
@@ -38,12 +38,12 @@ class CRM_Utils_AutoCleanTest extends CiviUnitTestCase {
       $self->foo = 'orig';
     });
 
-    $this->assertEquals('funccb', $this->foo);
+    $this->assertSame('funccb', $this->foo);
   }
 
   public function nestedSwap() {
     $ac = CRM_Utils_AutoClean::swap([$this, 'getFoo'], [$this, 'setFoo'], 'tmp');
-    $this->assertEquals('tmp', $this->foo);
+    $this->assertSame('tmp', $this->foo);
   }
 
   public function getFoo() {

@@ -47,11 +47,11 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
 
     $result = $this->callAPISuccess('ActivityContact', 'create', $this->_params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
 
     $result = $this->callAPISuccess('ActivityContact', 'create', $this->_params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     $this->callAPISuccess('activity_contact', 'delete', ['id' => $result['id']]);
   }
@@ -67,11 +67,11 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
     $create = $this->callAPISuccess('activity_contact', 'create', $this->_params);
 
     $result = $this->callAPISuccess('activity_contact', 'delete', ['id' => $create['id']]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $get = $this->callAPISuccess('activity_contact', 'get', [
       'id' => $create['id'],
     ]);
-    $this->assertEquals(0, $get['count'], 'ActivityContact not successfully deleted');
+    $this->assertSame(0, $get['count'], 'ActivityContact not successfully deleted');
   }
 
   /**

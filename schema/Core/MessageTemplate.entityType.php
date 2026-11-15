@@ -18,6 +18,14 @@ return [
     'update' => 'civicrm/admin/messageTemplates/add?action=update&id=[id]&reset=1',
     'delete' => 'civicrm/admin/messageTemplates?action=delete&id=[id]&reset=1',
   ],
+  'getIndices' => fn() => [
+    'index_workflow_name' => [
+      'fields' => [
+        'workflow_name' => TRUE,
+      ],
+      'add' => '6.20',
+    ],
+  ],
   'getFields' => fn() => [
     'id' => [
       'title' => ts('Message Template ID'),

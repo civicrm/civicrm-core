@@ -139,8 +139,8 @@
 
 @media print {
   #bootstrap-theme *,
-  #bootstrap-theme *:before,
-  #bootstrap-theme *:after {
+  #bootstrap-theme *::before,
+  #bootstrap-theme *::after {
     color: #000 !important;
     text-shadow: none !important;
     background: transparent !important;
@@ -150,27 +150,27 @@
   #bootstrap-theme a:visited {
     text-decoration: underline;
   }
-  #bootstrap-theme a[href]:after {
+  #bootstrap-theme a[href]::after {
     content: " (" attr(href) ")";
   }
-  #bootstrap-theme abbr[title]:after {
+  #bootstrap-theme abbr[title]::after {
     content: " (" attr(title) ")";
   }
-  #bootstrap-theme a[href^="#"]:after,
-  #bootstrap-theme a[href^="javascript:"]:after {
+  #bootstrap-theme a[href^="#"]::after,
+  #bootstrap-theme a[href^="javascript:"]::after {
     content: "";
   }
   #bootstrap-theme pre,
   #bootstrap-theme blockquote {
     border: 1px solid #999;
-    page-break-inside: avoid;
+    break-inside: avoid;
   }
   #bootstrap-theme thead {
     display: table-header-group;
   }
   #bootstrap-theme tr,
   #bootstrap-theme img {
-    page-break-inside: avoid;
+    break-inside: avoid;
   }
   #bootstrap-theme img {
     max-width: 100% !important;
@@ -183,7 +183,7 @@
   }
   #bootstrap-theme h2,
   #bootstrap-theme h3 {
-    page-break-after: avoid;
+    break-after: avoid;
   }
   #bootstrap-theme .navbar {
     display: none;
@@ -341,12 +341,12 @@
 #bootstrap-theme dd {
   margin-left: 0;
 }
-#bootstrap-theme .dl-horizontal dd:before,
-#bootstrap-theme .dl-horizontal dd:after {
+#bootstrap-theme .dl-horizontal dd::before,
+#bootstrap-theme .dl-horizontal dd::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .dl-horizontal dd:after {
+#bootstrap-theme .dl-horizontal dd::after {
   clear: both;
 }
 @media (min-width: 768px) {
@@ -385,9 +385,9 @@
   line-height: 1.428571429;
   color: #999;
 }
-#bootstrap-theme blockquote footer:before,
-#bootstrap-theme blockquote small:before,
-#bootstrap-theme blockquote .small:before {
+#bootstrap-theme blockquote footer::before,
+#bootstrap-theme blockquote small::before,
+#bootstrap-theme blockquote .small::before {
   content: "— ";
 }
 #bootstrap-theme .blockquote-reverse,
@@ -398,20 +398,20 @@
   border-right: 5px solid #eee;
   border-left: 0;
 }
-#bootstrap-theme .blockquote-reverse footer:before,
-#bootstrap-theme .blockquote-reverse small:before,
-#bootstrap-theme .blockquote-reverse .small:before,
-#bootstrap-theme blockquote.pull-right footer:before,
-#bootstrap-theme blockquote.pull-right small:before,
-#bootstrap-theme blockquote.pull-right .small:before {
+#bootstrap-theme .blockquote-reverse footer::before,
+#bootstrap-theme .blockquote-reverse small::before,
+#bootstrap-theme .blockquote-reverse .small::before,
+#bootstrap-theme blockquote.pull-right footer::before,
+#bootstrap-theme blockquote.pull-right small::before,
+#bootstrap-theme blockquote.pull-right .small::before {
   content: "";
 }
-#bootstrap-theme .blockquote-reverse footer:after,
-#bootstrap-theme .blockquote-reverse small:after,
-#bootstrap-theme .blockquote-reverse .small:after,
-#bootstrap-theme blockquote.pull-right footer:after,
-#bootstrap-theme blockquote.pull-right small:after,
-#bootstrap-theme blockquote.pull-right .small:after {
+#bootstrap-theme .blockquote-reverse footer::after,
+#bootstrap-theme .blockquote-reverse small::after,
+#bootstrap-theme .blockquote-reverse .small::after,
+#bootstrap-theme blockquote.pull-right footer::after,
+#bootstrap-theme blockquote.pull-right small::after,
+#bootstrap-theme blockquote.pull-right .small::after {
   content: " —";
 }
 
@@ -466,12 +466,12 @@
   margin-right: auto;
   margin-left: auto;
 }
-#bootstrap-theme .container:before,
-#bootstrap-theme .container:after {
+#bootstrap-theme .container::before,
+#bootstrap-theme .container::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .container:after {
+#bootstrap-theme .container::after {
   clear: both;
 }
 @media (min-width: 768px) {
@@ -495,24 +495,24 @@
   margin-right: auto;
   margin-left: auto;
 }
-#bootstrap-theme .container-fluid:before,
-#bootstrap-theme .container-fluid:after {
+#bootstrap-theme .container-fluid::before,
+#bootstrap-theme .container-fluid::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .container-fluid:after {
+#bootstrap-theme .container-fluid::after {
   clear: both;
 }
 #bootstrap-theme .row {
   margin-right: -15px;
   margin-left: -15px;
 }
-#bootstrap-theme .row:before,
-#bootstrap-theme .row:after {
+#bootstrap-theme .row::before,
+#bootstrap-theme .row::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .row:after {
+#bootstrap-theme .row::after {
   clear: both;
 }
 #bootstrap-theme .row-no-gutters {
@@ -1279,7 +1279,7 @@
 }
 #bootstrap-theme input[type="search"]::-webkit-search-cancel-button,
 #bootstrap-theme input[type="search"]::-webkit-search-decoration {
-  -webkit-appearance: none;
+  appearance: none;
 }
 #bootstrap-theme textarea {
   overflow: auto;
@@ -1527,12 +1527,12 @@ fieldset[disabled] #bootstrap-theme .form-control {
   margin-right: -15px;
   margin-left: -15px;
 }
-#bootstrap-theme .form-horizontal .form-group:before,
-#bootstrap-theme .form-horizontal .form-group:after {
+#bootstrap-theme .form-horizontal .form-group::before,
+#bootstrap-theme .form-horizontal .form-group::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .form-horizontal .form-group:after {
+#bootstrap-theme .form-horizontal .form-group::after {
   clear: both;
 }
 @media (min-width: 768px) {
@@ -1597,9 +1597,9 @@ fieldset[disabled] #bootstrap-theme .form-control {
 #bootstrap-theme .input-group .form-control {
   display: table-cell;
 }
-#bootstrap-theme .input-group-addon:not(:first-child):not(:last-child),
-#bootstrap-theme .input-group-btn:not(:first-child):not(:last-child),
-#bootstrap-theme .input-group .form-control:not(:first-child):not(:last-child) {
+#bootstrap-theme .input-group-addon:not(:first-child, :last-child),
+#bootstrap-theme .input-group-btn:not(:first-child, :last-child),
+#bootstrap-theme .input-group .form-control:not(:first-child, :last-child) {
   border-radius: 0;
 }
 #bootstrap-theme .input-group-addon,
@@ -1633,7 +1633,7 @@ fieldset[disabled] #bootstrap-theme .form-control {
 #bootstrap-theme .input-group-btn:first-child > .btn,
 #bootstrap-theme .input-group-btn:first-child > .btn-group > .btn,
 #bootstrap-theme .input-group-btn:first-child > .dropdown-toggle,
-#bootstrap-theme .input-group-btn:last-child > .btn:not(:last-child):not(.dropdown-toggle),
+#bootstrap-theme .input-group-btn:last-child > .btn:not(:last-child, .dropdown-toggle),
 #bootstrap-theme .input-group-btn:last-child > .btn-group:not(:last-child) > .btn {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
@@ -1870,12 +1870,12 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
   margin-bottom: 20px;
   border: 1px solid transparent;
 }
-#bootstrap-theme .navbar:before,
-#bootstrap-theme .navbar:after {
+#bootstrap-theme .navbar::before,
+#bootstrap-theme .navbar::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .navbar:after {
+#bootstrap-theme .navbar::after {
   clear: both;
 }
 @media (min-width: 768px) {
@@ -1883,12 +1883,12 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
     border-radius: 4px;
   }
 }
-#bootstrap-theme .navbar-header:before,
-#bootstrap-theme .navbar-header:after {
+#bootstrap-theme .navbar-header::before,
+#bootstrap-theme .navbar-header::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .navbar-header:after {
+#bootstrap-theme .navbar-header::after {
   clear: both;
 }
 @media (min-width: 768px) {
@@ -1904,12 +1904,12 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1);
   -webkit-overflow-scrolling: touch;
 }
-#bootstrap-theme .navbar-collapse:before,
-#bootstrap-theme .navbar-collapse:after {
+#bootstrap-theme .navbar-collapse::before,
+#bootstrap-theme .navbar-collapse::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .navbar-collapse:after {
+#bootstrap-theme .navbar-collapse::after {
   clear: both;
 }
 #bootstrap-theme .navbar-collapse.in {
@@ -1997,7 +1997,7 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
 #bootstrap-theme .navbar-brand {
   float: left;
   height: 50px;
-  padding: 15px 15px;
+  padding: 15px;
   font-size: 18px;
   line-height: 20px;
 }
@@ -2088,13 +2088,10 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
 }
 #bootstrap-theme .navbar-form {
   padding: 10px 15px;
-  margin-right: -15px;
-  margin-left: -15px;
+  margin: 10px -15px;
   border-top: 1px solid transparent;
   border-bottom: 1px solid transparent;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .1), 0 1px 0 rgba(255, 255, 255, .1);
-  margin-top: 10px;
-  margin-bottom: 10px;
 }
 @media (min-width: 768px) {
   #bootstrap-theme .navbar-form .form-group {
@@ -2172,10 +2169,7 @@ fieldset[disabled] #bootstrap-theme .btn-link:focus {
 }
 #bootstrap-theme .navbar-fixed-bottom .navbar-nav > li > .dropdown-menu {
   margin-bottom: 0;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
+  border-radius: 4px 4px 0 0;
 }
 #bootstrap-theme .navbar-btn {
   margin-top: 10px;
@@ -2421,7 +2415,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme .breadcrumb > li {
   display: inline-block;
 }
-#bootstrap-theme .breadcrumb > li + li:before {
+#bootstrap-theme .breadcrumb > li + li::before {
   padding: 0 5px;
   color: #ccc;
   content: "/ ";
@@ -2438,12 +2432,12 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   text-align: center;
   list-style: none;
 }
-#bootstrap-theme .pager:before,
-#bootstrap-theme .pager:after {
+#bootstrap-theme .pager::before,
+#bootstrap-theme .pager::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .pager:after {
+#bootstrap-theme .pager::after {
   clear: both;
 }
 #bootstrap-theme .pager li {
@@ -2944,10 +2938,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme .modal {
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   z-index: 1050;
   display: none;
   overflow: hidden;
@@ -2962,8 +2953,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   transform: translate(0, 0);
 }
 #bootstrap-theme .modal-open .modal {
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden auto;
 }
 #bootstrap-theme .modal-dialog {
   position: relative;
@@ -2982,10 +2972,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 }
 #bootstrap-theme .modal-backdrop {
   position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   z-index: 1040;
   background-color: black;
 }
@@ -2999,12 +2986,12 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   padding: 15px;
   border-bottom: 1px solid #e5e5e5;
 }
-#bootstrap-theme .modal-header:before,
-#bootstrap-theme .modal-header:after {
+#bootstrap-theme .modal-header::before,
+#bootstrap-theme .modal-header::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .modal-header:after {
+#bootstrap-theme .modal-header::after {
   clear: both;
 }
 #bootstrap-theme .modal-header .close {
@@ -3023,12 +3010,12 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   text-align: right;
   border-top: 1px solid #e5e5e5;
 }
-#bootstrap-theme .modal-footer:before,
-#bootstrap-theme .modal-footer:after {
+#bootstrap-theme .modal-footer::before,
+#bootstrap-theme .modal-footer::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .modal-footer:after {
+#bootstrap-theme .modal-footer::after {
   clear: both;
 }
 #bootstrap-theme .modal-footer .btn + .btn {
@@ -3085,7 +3072,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   -ms-word-break: normal;
   word-break: normal;
   word-spacing: normal;
-  word-wrap: normal;
+  overflow-wrap: normal;
   white-space: normal;
   font-size: 12px;
   opacity: 0;
@@ -3200,7 +3187,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   letter-spacing: normal;
   word-break: normal;
   word-spacing: normal;
-  word-wrap: normal;
+  overflow-wrap: normal;
   white-space: normal;
   font-size: 14px;
   background-color: white;
@@ -3226,7 +3213,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   border-width: 11px;
 }
 #bootstrap-theme .popover > .arrow,
-#bootstrap-theme .popover > .arrow:after {
+#bootstrap-theme .popover > .arrow::after {
   position: absolute;
   display: block;
   width: 0;
@@ -3234,7 +3221,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   border-color: transparent;
   border-style: solid;
 }
-#bootstrap-theme .popover > .arrow:after {
+#bootstrap-theme .popover > .arrow::after {
   content: "";
   border-width: 10px;
 }
@@ -3246,7 +3233,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   border-top-color: rgba(0, 0, 0, .25);
   border-bottom-width: 0;
 }
-#bootstrap-theme .popover.top > .arrow:after {
+#bootstrap-theme .popover.top > .arrow::after {
   bottom: 1px;
   margin-left: -10px;
   content: " ";
@@ -3261,7 +3248,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   border-right-color: rgba(0, 0, 0, .25);
   border-left-width: 0;
 }
-#bootstrap-theme .popover.right > .arrow:after {
+#bootstrap-theme .popover.right > .arrow::after {
   bottom: -10px;
   left: 1px;
   content: " ";
@@ -3276,7 +3263,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   border-bottom-color: #999;
   border-bottom-color: rgba(0, 0, 0, .25);
 }
-#bootstrap-theme .popover.bottom > .arrow:after {
+#bootstrap-theme .popover.bottom > .arrow::after {
   top: 1px;
   margin-left: -10px;
   content: " ";
@@ -3291,7 +3278,7 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
   border-left-color: #999;
   border-left-color: rgba(0, 0, 0, .25);
 }
-#bootstrap-theme .popover.left > .arrow:after {
+#bootstrap-theme .popover.left > .arrow::after {
   right: 1px;
   bottom: -10px;
   content: " ";
@@ -3512,12 +3499,12 @@ fieldset[disabled] #bootstrap-theme .navbar-inverse .btn-link:focus {
 #bootstrap-theme template {
   display: none;
 }
-#bootstrap-theme .clearfix:before,
-#bootstrap-theme .clearfix:after {
+#bootstrap-theme .clearfix::before,
+#bootstrap-theme .clearfix::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .clearfix:after {
+#bootstrap-theme .clearfix::after {
   clear: both;
 }
 #bootstrap-theme .center-block {

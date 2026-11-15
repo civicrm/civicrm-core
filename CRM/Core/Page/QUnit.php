@@ -20,7 +20,7 @@ class CRM_Core_Page_QUnit extends CRM_Core_Page {
       throw new \CRM_Core_Exception("QUnit is not available. Please install it in [civicrm.bower]/qunit.");
     }
 
-    list ($ext, $suite) = $this->getRequestExtAndSuite();
+    [$ext, $suite] = $this->getRequestExtAndSuite();
     if (empty($ext) || empty($suite)) {
       throw new CRM_Core_Exception("FIXME: Not implemented: QUnit browser");
     }

@@ -27,7 +27,7 @@ class CRM_Core_Page_AJAX_RecurringEntity {
         }
       }
       elseif ($entityTable === 'civicrm_activity') {
-        if (!CRM_Activity_BAO_Activity::checkPermission($entityId, CRM_Core_Permission::EDIT)) {
+        if (!CRM_Activity_BAO_Activity::checkPermission($entityId, CRM_Core_Action::UPDATE)) {
           CRM_Utils_System::permissionDenied();
         }
       }

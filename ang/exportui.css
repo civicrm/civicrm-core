@@ -4,7 +4,7 @@
   position: relative;
   overflow-x: hidden;
 }
-.crm-export-field-selector-outer:after {
+.crm-export-field-selector-outer::after {
   position: absolute;
   top: 0;
   right: 0;

@@ -232,7 +232,7 @@ trait CRMTraits_Financial_OrderTrait {
       'is_test' => 1,
       'financial_type_id' => $this->getFinancialTypeID('Donation'),
       'invoice_id' => 'abcd',
-      'trxn_id' => 345,
+      'trxn_id' => '345',
       'receive_date' => '2019-07-25 07:34:23',
     ]);
   }

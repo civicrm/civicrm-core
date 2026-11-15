@@ -2,9 +2,9 @@
 
 namespace Civi\OAuth;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Service\AutoService;
 use CRM_OAuth_ExtensionUtil as E;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * OAuth providers that are tagged as `CiviConnect` should have some special behaviors, e.g.
@@ -15,18 +15,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @service oauth_client.civi_connect_providers
  */
-class CiviConnectProviders extends AutoService implements EventSubscriberInterface {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      '&hook_civicrm_oauthProviders' => ['hook_civicrm_oauthProviders', -1000],
-      '&hook_civicrm_initiators::PaymentProcessor' => ['pickDefaultPaymentInitiators', -1000],
-    ];
-  }
+class CiviConnectProviders extends AutoService {
 
   /**
    * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_oauthProviders/
    */
+  #[CiviEventListener(event: '&hook_civicrm_oauthProviders', priority: -1000)]
   public function hook_civicrm_oauthProviders(array &$providers) {
     // Any providers tagged as `CiviConnect` are actually templates.
     $templates = array_filter($providers, fn($p) => in_array('CiviConnect', $p['tags'] ?? []));
@@ -93,6 +87,7 @@ class CiviConnectProviders extends AutoService implements EventSubscriberInterfa
    *
    * @see \CRM_Utils_Hook::initiators()
    */
+  #[CiviEventListener(event: '&hook_civicrm_initiators::PaymentProcessor', priority: -1000)]
   public function pickDefaultPaymentInitiators(array $context, array &$available, &$default): void {
     if (empty($available) || $default !== NULL) {
       return;

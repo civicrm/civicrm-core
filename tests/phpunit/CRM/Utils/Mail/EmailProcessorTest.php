@@ -93,7 +93,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/' . $mail);
     $this->checkMailingBounces(1);
     $activity = $this->callAPISuccessGetSingle('Activity', ['activity_type_id' => 'Bounce']);
-    $this->assertEquals('Bounce type not identified, email will not be put on hold', $activity['details']);
+    $this->assertSame('Bounce type not identified, email will not be put on hold', $activity['details']);
   }
 
   /**
@@ -164,6 +164,20 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
 
     $this->addBounceToMailDirectory('bounce_no_verp.txt');
     $this->assertFileExists(__DIR__ . '/data/mail/bounce_no_verp.txt');
+    $this->callApiV3Success('Job', 'fetch_bounces', []);
+    $this->assertFileDoesNotExist(__DIR__ . '/data/mail/bounce_no_verp.txt');
+    $this->checkMailingBounces(1);
+  }
+
+  /**
+   * A failing emailProcessor hook does not leave the bounce in the mailbox.
+   */
+  public function testBounceProcessingHookError(): void {
+    $this->setUpMailing();
+    $this->hookClass->setHook('civicrm_emailProcessor', function () {
+      throw new TypeError('Ruh-roh');
+    });
+    $this->addBounceToMailDirectory('bounce_no_verp.txt');
     $this->callApiV3Success('Job', 'fetch_bounces', []);
     $this->assertFileDoesNotExist(__DIR__ . '/data/mail/bounce_no_verp.txt');
     $this->checkMailingBounces(1);
@@ -346,13 +360,13 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
       'return' => ['assignee_contact_id', 'target_contact_id', 'activity_type_id', 'status_id', 'source_contact_name', 'campaign_id'],
     ]);
 
-    $this->assertEquals(3, $activity['activity_type_id']);
+    $this->assertSame('3', $activity['activity_type_id']);
     $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_status_id', 'Scheduled'), $activity['status_id']);
-    $this->assertEquals('to@test.test', $activity['source_contact_name']);
+    $this->assertSame('to@test.test', $activity['source_contact_name']);
     $assigneeID = $activity['assignee_contact_id'][0];
-    $this->assertEquals('cc@test.test', $activity['assignee_contact_name'][$assigneeID]);
+    $this->assertSame('cc@test.test', $activity['assignee_contact_name'][$assigneeID]);
     $targetID = $activity['target_contact_id'][0];
-    $this->assertEquals('from@test.test', $activity['target_contact_name'][$targetID]);
+    $this->assertSame('from@test.test', $activity['target_contact_name'][$targetID]);
     $this->assertEquals($params['campaign_id'], $activity['campaign_id']);
   }
 

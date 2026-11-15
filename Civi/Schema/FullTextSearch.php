@@ -2,9 +2,9 @@
 
 namespace Civi\Schema;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This service handles Full Text Search for EFv2
@@ -30,20 +30,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @service civi.schema.fts
  */
-class FullTextSearch extends AutoService implements EventSubscriberInterface {
+class FullTextSearch extends AutoService {
 
   /**
    * @var array
    *   Local cache of the defined indices
    */
   protected ?array $definedIndices = NULL;
-
-  public static function getSubscribedEvents(): array {
-    return [
-      // hook early to allow these to be overridden
-      'civi.schema.fts_indices' => ['setDefaultIndices', 1000],
-    ];
-  }
 
   /**
    * Provide default "out of the box" indices. These can be overridden
@@ -52,6 +45,7 @@ class FullTextSearch extends AutoService implements EventSubscriberInterface {
    * NOTE: this overrides any earlier changes to 'indices' param - downstream
    * listeners should always hook earlier than this
    */
+  #[CiviEventListener(event: 'civi.schema.fts_indices', priority: 1000)]
   public function setDefaultIndices(GenericHookEvent $e): void {
     $e->indices = [
       'Contact' => [
@@ -142,6 +136,10 @@ class FullTextSearch extends AutoService implements EventSubscriberInterface {
       }
       $sqls = array_map(fn ($name) => "ADD FULLTEXT INDEX {$name} (" . implode(',', $indices[$name]['columns']) . ")", $toAdd);
       $sql = "ALTER TABLE {$table} " . \implode(', ', $sqls);
+
+      // stopwords are unhelpful for contact_names, particularly as the default INNODB list contains "Will"
+      // TODO: make this settable per defined index?
+      \CRM_Core_DAO::executeQuery('SET @@SESSION.innodb_ft_enable_stopword = "OFF"');
       \CRM_Core_DAO::executeQuery($sql);
     }
   }

@@ -1,24 +1,24 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 use Civi\Api4\MembershipBlock;
 use Civi\Core\Event\PostEvent;
-use Civi\Core\HookInterface;
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock implements HookInterface {
+class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
 
   /**
    * Update MembershipBlocks if autorenew option is changed.
@@ -38,6 +38,7 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock impl
    *
    * @noinspection PhpUnhandledExceptionInspection
    */
+  #[CiviEventListener(event: 'hook_civicrm_post')]
   public static function on_hook_civicrm_post(PostEvent $event): void {
     if ($event->entity === 'MembershipType' && $event->action === 'edit') {
       $autoRenewOption = $event->object->auto_renew;

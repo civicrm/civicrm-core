@@ -36,8 +36,8 @@ class ActionNameTest extends Api4TestBase {
     // PHP is case-insensitive so this will work <sigh>
     $action = MOCKarrayENTITY::GETFiELDS();
     // Ensure case was converted internally by the action class
-    $this->assertEquals('getFields', $action->getActionName());
-    $this->assertEquals('MockArrayEntity', $action->getEntityName());
+    $this->assertSame('getFields', $action->getActionName());
+    $this->assertSame('MockArrayEntity', $action->getEntityName());
   }
 
   public function testActionCaseSensitiveViaMagicMethod(): void {
@@ -50,14 +50,14 @@ class ActionNameTest extends Api4TestBase {
     // Try it with normal case
     $action = MockArrayEntity::doNothing();
     // Ensure case was converted internally by the action class
-    $this->assertEquals('doNothing', $action->getActionName());
-    $this->assertEquals('MockArrayEntity', $action->getEntityName());
+    $this->assertSame('doNothing', $action->getActionName());
+    $this->assertSame('MockArrayEntity', $action->getEntityName());
 
     // PHP is case-insensitive so this will work <sigh>
     $action = moCKarrayENTIty::DOnothING();
     // Ensure case was converted internally by the action class
-    $this->assertEquals('doNothing', $action->getActionName());
-    $this->assertEquals('MockArrayEntity', $action->getEntityName());
+    $this->assertSame('doNothing', $action->getActionName());
+    $this->assertSame('MockArrayEntity', $action->getEntityName());
   }
 
 }

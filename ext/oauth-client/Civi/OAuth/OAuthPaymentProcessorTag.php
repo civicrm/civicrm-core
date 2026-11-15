@@ -1,13 +1,13 @@
 <?php
 namespace Civi\OAuth;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi;
 use Civi\Api4\OAuthClient;
 use Civi\Api4\OAuthProvider;
 use Civi\Api4\PaymentProcessor;
 use CRM_OAuth_ExtensionUtil as E;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Automatically link an OAuth token with a PaymentProcessor.
@@ -26,23 +26,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @service oauth_client.payment_processor_tag
  */
-class OAuthPaymentProcessorTag extends AutoService implements EventSubscriberInterface {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      // When editing a PaymentProcessor that supports OAuth, offer the "Connect to" buttons.
-      '&hook_civicrm_initiators::PaymentProcessor' => ['onPaymentInitiators', 0],
-
-      // Allow users with `administer payment processors` to make OAuthSysTokens for payment-processors.
-      '&hook_civicrm_oauthGrant' => ['hook_civicrm_oauthGrant', 0],
-
-      // After completing the interactive authorization-grant, go back to PayProc page.
-      '&hook_civicrm_oauthReturn' => ['hook_civicrm_oauthReturn', 0],
-
-      // Whenever the OAuth access-token is initialized or refreshed, we should update the PaymentProcessor.
-      '&hook_civicrm_oauthToken' => ['hook_civicrm_oauthToken', 0],
-    ];
-  }
+class OAuthPaymentProcessorTag extends AutoService {
 
   const PROVIDER_TAG_PREFIX = 'PaymentProcessorType:';
 
@@ -63,6 +47,7 @@ class OAuthPaymentProcessorTag extends AutoService implements EventSubscriberInt
    * @param string|NULL $default
    * @see CRM_Utils_Hook::initiators()
    */
+  #[CiviEventListener(event: '&hook_civicrm_initiators::PaymentProcessor')]
   public function onPaymentInitiators(array $context, array &$available, &$default): void {
     $payProcTag = static::PROVIDER_TAG_PREFIX . $context['payment_processor_type'];
 
@@ -142,6 +127,7 @@ class OAuthPaymentProcessorTag extends AutoService implements EventSubscriberInt
    *
    * @see \CRM_OAuth_Hook::oauthGrant()
    */
+  #[CiviEventListener(event: '&hook_civicrm_oauthGrant')]
   public function hook_civicrm_oauthGrant($action, array $client, bool &$allowed): void {
     if ($this->checkTokenTag($action->getTag() ?? '')
       && \CRM_Core_Permission::check('administer payment processors')
@@ -152,6 +138,7 @@ class OAuthPaymentProcessorTag extends AutoService implements EventSubscriberInt
     }
   }
 
+  #[CiviEventListener(event: '&hook_civicrm_oauthToken')]
   public function hook_civicrm_oauthToken(string $flow, string $type, array &$token): void {
     $payProcId = $this->checkTokenTag($token['tag'] ?? '');
     if (empty($payProcId) || $type !== 'OAuthSysToken' || empty($token['client_id'])) {
@@ -201,6 +188,7 @@ class OAuthPaymentProcessorTag extends AutoService implements EventSubscriberInt
    * @param $nextUrl
    * @return void
    */
+  #[CiviEventListener(event: '&hook_civicrm_oauthReturn')]
   public function hook_civicrm_oauthReturn($token, &$nextUrl): void {
     Civi::log()->info("Received token", ['token' => $token, 'nextUrl' => $nextUrl]);
 

@@ -2,9 +2,9 @@
 
 namespace Civi\Contribute\Service;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Contribute\Utils\PriceFieldUtils;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Attaches an `if:` rule to admin-visibility (non-public) price options in
@@ -33,35 +33,32 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @service civi.contribute.price_option_defn_injector
  */
-class PriceOptionDefnInjector extends AutoService implements EventSubscriberInterface {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_alterAngular' => ['preprocess', -100],
-    ];
-  }
+class PriceOptionDefnInjector extends AutoService {
 
   /**
    * @param \Civi\Core\Event\GenericHookEvent $e
    *
    * @see CRM_Utils_Hook::alterAngular()
    */
+  #[CiviEventListener(event: 'hook_civicrm_alterAngular', priority: -100)]
   public function preprocess(\Civi\Core\Event\GenericHookEvent $e): void {
     $restrictedIds = PriceFieldUtils::getRestrictedPriceFieldValueIds();
     if (!$restrictedIds) {
       return;
     }
-    // Restrict the walk to fields that are actually price fields, so we never
-    // mistake an unrelated field's option id for a PriceFieldValue id.
-    $priceFieldNames = self::getPriceFieldNames();
-    if (!$priceFieldNames) {
-      return;
-    }
     // Fast lookup sets.
     $restricted = array_fill_keys($restrictedIds, TRUE);
 
+    // Restrict to fields that are actually price fields, so we never
+    // mistake an unrelated field's option id for a PriceFieldValue id.
+    $priceFieldNames = NULL;
+
     $changeSet = \Civi\Angular\ChangeSet::create('priceOptionConditionals')
-      ->alterHtml(';\\.aff\\.html$;', function ($doc, $path) use ($priceFieldNames, $restricted) {
+      ->alterHtml(';\\.aff\\.html$;', function ($doc, $path) use (&$priceFieldNames, $restricted) {
+        $priceFieldNames ??= self::getPriceFieldNames();
+        if (!$priceFieldNames) {
+          return;
+        }
         foreach (pq('af-field', $doc) as $afField) {
           /** @var \DOMElement $afField */
           $name = $afField->getAttribute('name');

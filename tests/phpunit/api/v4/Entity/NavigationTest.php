@@ -53,14 +53,14 @@ class NavigationTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', 'IN', [$item1['id'], $item2['id']])
       ->execute()->indexBy('id');
     // Item 2 should have displaced item 1
-    $this->assertEquals(2, $result[$item1['id']]['weight']);
-    $this->assertEquals(1, $result[$item2['id']]['weight']);
+    $this->assertSame(2, $result[$item1['id']]['weight']);
+    $this->assertSame(1, $result[$item2['id']]['weight']);
 
     $item3 = $this->createTestRecord('Navigation', [
       'name' => uniqid(),
       'parent_id' => $item1['id'],
     ]);
-    $this->assertEquals(1, $item3['weight']);
+    $this->assertSame(1, $item3['weight']);
     // Move item2 into item1
     $result = Navigation::update(FALSE)
       ->addValue('id', $item2['id'])
@@ -77,9 +77,9 @@ class NavigationTest extends Api4TestBase implements TransactionalInterface {
     $result = Navigation::get(FALSE)
       ->addWhere('parent_id', '=', $item1['id'])
       ->execute()->indexBy('id');
-    $this->assertEquals(1, $result[$item2['id']]['weight']);
-    $this->assertEquals(2, $result[$item3['id']]['weight']);
-    $this->assertEquals(3, $result[$item4['id']]['weight']);
+    $this->assertSame(1, $result[$item2['id']]['weight']);
+    $this->assertSame(2, $result[$item3['id']]['weight']);
+    $this->assertSame(3, $result[$item4['id']]['weight']);
 
     // Move item4 to the top level
     $result = Navigation::update(FALSE)
@@ -93,8 +93,8 @@ class NavigationTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', 'IN', [$item1['id'], $item4['id']])
       ->execute()->indexBy('id');
     // Item 4 should have displaced item 1
-    $this->assertEquals(3, $result[$item1['id']]['weight']);
-    $this->assertEquals(2, $result[$item4['id']]['weight']);
+    $this->assertSame(3, $result[$item1['id']]['weight']);
+    $this->assertSame(2, $result[$item4['id']]['weight']);
     $this->assertNull($result[$item1['id']]['parent_id']);
     $this->assertNull($result[$item4['id']]['parent_id']);
   }

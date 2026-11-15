@@ -29,7 +29,7 @@
   }
 }
 
-/* Fix title bar icons in crm-popups*/
+/* Fix title bar icons in crm-popups */
 .crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-print::before,
 .crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-print::after,
 .crm-container.ui-dialog .ui-dialog-titlebar-close .ui-icon.fa-compress::before,

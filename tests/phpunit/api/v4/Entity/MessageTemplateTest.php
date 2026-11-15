@@ -162,8 +162,8 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
         ->execute()->first();
       $messageTemplateIDReserved = $reservedTemplate['id'];
 
-      $this->assertEquals('Subject test {if 1 > 2} smarty{/if}', $originalTemplate['msg_subject']);
-      $this->assertEquals('<p>Body test {if 1 > 2} markup{/if}</p>', $originalTemplate['msg_html']);
+      $this->assertSame('Subject test {if 1 > 2} smarty{/if}', $originalTemplate['msg_subject']);
+      $this->assertSame('<p>Body test {if 1 > 2} markup{/if}</p>', $originalTemplate['msg_html']);
       $this->assertNull($originalTemplate['master_id']);
       $this->assertNull($originalTemplate['master_id.msg_subject']);
 
@@ -180,7 +180,7 @@ class MessageTemplateTest extends Api4TestBase implements TransactionalInterface
         ->addWhere('id', '=', $messageTemplateID)
         ->execute()->first();
       // confirm subject is set
-      $this->assertEquals('Hello world', $msgTpl['msg_subject']);
+      $this->assertSame('Hello world', $msgTpl['msg_subject']);
       // message is changed so both of these should be set
       $this->assertEquals($msgTpl['master_id'], $messageTemplateIDReserved);
       $this->assertNotNull($msgTpl['master_id.msg_subject']);

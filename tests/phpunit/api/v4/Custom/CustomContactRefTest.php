@@ -107,7 +107,7 @@ class CustomContactRefTest extends Api4TestBase {
     // First result is contactId1
     $this->assertEquals($contactId1, $results[0]['id']);
     $this->assertEquals($firstName, $results[0]['MyContactRef.FavPerson.first_name']);
-    $this->assertEquals('Person', $results[0]['MyContactRef.FavPerson.last_name']);
+    $this->assertSame('Person', $results[0]['MyContactRef.FavPerson.last_name']);
     // Ensure serialized values are returned in order
     $this->assertEquals([$favPeopleId2, $favPeopleId1], $results[0]['MyContactRef.FavPeople']);
     // Values returned from virtual join should be in the same order

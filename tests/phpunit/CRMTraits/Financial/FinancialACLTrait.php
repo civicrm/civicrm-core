@@ -20,14 +20,14 @@ trait CRMTraits_Financial_FinancialACLTrait {
    * Enable financial ACLs.
    */
   protected function enableFinancialACLs() {
-    $this->callAPISuccess('extension', 'install', ['key' => 'financialacls']);
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'financialacls')->execute();
   }
 
   /**
    * Disable financial ACLs.
    */
   protected function disableFinancialACLs(): void {
-    $this->callAPISuccess('extension', 'disable', ['key' => 'financialacls']);
+    \Civi\Api4\Extension::disable(FALSE)->addWhere('key', '=', 'financialacls')->execute();
   }
 
   /**

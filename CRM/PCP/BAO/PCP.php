@@ -1,12 +1,14 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
+
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -14,7 +16,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP implements \Civi\Core\HookInterface {
+class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
 
   /**
    * The action links that we need to display for the browse screen.
@@ -30,6 +32,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP implements \Civi\Core\HookInterfac
    *
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
     if ($event->action === 'create') {
       // For some reason `status_id` is allowed to be empty
@@ -105,9 +108,9 @@ ORDER BY page_type, page_id';
 
       if ($pcpInfoDao->status_id != $approved || $pcpInfoDao->is_active != 1) {
         $class = 'disabled';
-        if (!function_exists('tellafriend_civicrm_config') || !$pcpInfoDao->is_tellfriend_enabled) {
-          $mask -= CRM_Core_Action::DETACH;
-        }
+      }
+      if (isset($pcpLink[CRM_Core_Action::DETACH]) && (!$pcpInfoDao->is_tellfriend_enabled || $pcpInfoDao->status_id != $approved || $pcpInfoDao->is_active != 1)) {
+        $mask -= CRM_Core_Action::DETACH;
       }
 
       if ($pcpInfoDao->is_active == 1) {
@@ -289,13 +292,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
           'qs' => 'action=update&reset=1&id=%%pcpId%%&component=%%pageComponent%%',
           'title' => ts('Configure'),
           'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
-        ],
-        CRM_Core_Action::DETACH => [
-          'name' => ts('Tell Friends'),
-          'url' => 'civicrm/friend',
-          'qs' => 'eid=%%pcpId%%&blockId=%%pcpBlock%%&reset=1&pcomponent=pcp&component=%%pageComponent%%',
-          'title' => ts('Tell Friends'),
-          'weight' => -15,
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('URL for this Page'),

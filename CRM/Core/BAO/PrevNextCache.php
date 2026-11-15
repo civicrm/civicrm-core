@@ -250,7 +250,7 @@ WHERE  cachekey     = %3 AND
     }
 
     $query = "
-SELECT SQL_CALC_FOUND_ROWS {$selectString}
+SELECT {$selectString}
 FROM   civicrm_prevnext_cache pn
        {$join}
        $where

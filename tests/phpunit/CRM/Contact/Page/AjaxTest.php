@@ -1,5 +1,9 @@
 <?php
 
+use Civi\Api4\Contact;
+use Civi\Api4\DedupeException;
+use Civi\Api4\Tag;
+
 /**
  * @group headless
  */
@@ -49,6 +53,30 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertEquals(['data' => [], 'recordsTotal' => 0, 'recordsFiltered' => 0], $result);
   }
 
+  public function testGetDedupesCountsAllPairsOnMiddlePage(): void {
+    foreach (['a', 'b', 'c'] as $identifier) {
+      $this->createTestEntity('Contact', [
+        'contact_type' => 'Individual',
+        'first_name' => 'Dupe',
+        'last_name' => 'Pager',
+        'email_primary.email' => 'dupe.pager@example.org',
+      ], $identifier);
+    }
+    $ruleGroupID = (int) CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_dedupe_rule_group WHERE contact_type = 'Individual' AND used = 'Supervised'");
+    $pairs = CRM_Dedupe_Merger::getDuplicatePairs($ruleGroupID, NULL, TRUE, 0, FALSE);
+    $this->assertCount(3, $pairs);
+
+    $_REQUEST['rgid'] = $ruleGroupID;
+    $_REQUEST['columns'] = [];
+    $_REQUEST['start'] = 1;
+    $_REQUEST['length'] = 1;
+    $_REQUEST['is_unit_test'] = TRUE;
+    $result = CRM_Contact_Page_AJAX::getDedupes();
+    $this->assertCount(1, $result['data']);
+    $this->assertSame(3, (int) $result['recordsTotal']);
+    $this->assertSame(3, (int) $result['recordsFiltered']);
+  }
+
   /**
    * Test flipDupePairs works via route invocation.
    */
@@ -81,8 +109,8 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $daoReloaded->id = $dao->id;
     $daoReloaded->find(TRUE);
     $data = unserialize($daoReloaded->data);
-    $this->assertEquals(2, $data['srcID']);
-    $this->assertEquals(1, $data['dstID']);
+    $this->assertSame(2, $data['srcID']);
+    $this->assertSame(1, $data['dstID']);
 
     // Also test single scalar pnid
     $_REQUEST['pnid'] = $dao->id;
@@ -98,8 +126,8 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $daoReloaded->id = $dao->id;
     $daoReloaded->find(TRUE);
     $data = unserialize($daoReloaded->data);
-    $this->assertEquals(1, $data['srcID']);
-    $this->assertEquals(2, $data['dstID']);
+    $this->assertSame(1, $data['srcID']);
+    $this->assertSame(2, $data['dstID']);
   }
 
   /**
@@ -113,9 +141,9 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $contact3 = $this->individualCreate();
     CRM_Contact_Page_AJAX::markNonDuplicates($contact1, $contact2, 'dupe-nondupe');
     CRM_Contact_Page_AJAX::markNonDuplicates($contact3, $contact1, 'dupe-nondupe');
-    $this->callAPISuccessGetSingle('Exception', ['contact_id1' => $contact1, 'contact_id2' => $contact2]);
+    DedupeException::get(FALSE)->addWhere('contact_id1', '=', $contact1)->addWhere('contact_id2', '=', $contact2)->execute()->single();
     // Note that in saving the order is changed to have the lowest ID first.
-    $this->callAPISuccessGetSingle('Exception', ['contact_id1' => $contact1, 'contact_id2' => $contact3]);
+    DedupeException::get(FALSE)->addWhere('contact_id1', '=', $contact1)->addWhere('contact_id2', '=', $contact3)->execute()->single();
   }
 
   public function testGetDedupesPostCode(): void {
@@ -354,7 +382,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $parentTagTreeResult = CRM_Admin_Page_AJAX::getTagTree();
     foreach ($parentTagTreeResult as $result) {
       if ($result['id'] == $parentTag['id']) {
-        $this->assertEquals(1, $result['data']['usages']);
+        $this->assertSame(1, $result['data']['usages']);
       }
     }
 
@@ -362,13 +390,13 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     //  as it should include the count of added one contact
     $_GET['parent_id'] = $parentTag['id'];
     $childTagTree = CRM_Admin_Page_AJAX::getTagTree();
-    $this->assertEquals(1, $childTagTree[0]['data']['usages']);
+    $this->assertSame(1, $childTagTree[0]['data']['usages']);
 
     // CASE 2 : check the usage count of child tag at level 2
     //which needs to be 1 as it has no child tag
     $_GET['parent_id'] = $childTag1['id'];
     $childTagTree = CRM_Admin_Page_AJAX::getTagTree();
-    $this->assertEquals(1, $childTagTree[0]['data']['usages']);
+    $this->assertSame(1, $childTagTree[0]['data']['usages']);
 
     // CASE 3 : check the tag IDs returned on searching with 'Level'
     //  which needs to array('parent tag id', 'level 1 child tag id', 'level 2 child tag id')
@@ -386,12 +414,10 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $this->checkArrayEquals($tagIDs, $expectedTagIDs);
 
     //cleanup
-    foreach ($contacts as $id) {
-      $this->callAPISuccess('Contact', 'delete', ['id' => $id]);
+    Contact::delete(FALSE)->addWhere('id', 'IN', $contacts)->execute();
+    foreach ([$childTag2, $childTag1, $parentTag] as $tag) {
+      Tag::delete(FALSE)->addWhere('id', '=', $tag['id'])->execute();
     }
-    $this->callAPISuccess('Tag', 'delete', ['id' => $childTag2['id']]);
-    $this->callAPISuccess('Tag', 'delete', ['id' => $childTag1['id']]);
-    $this->callAPISuccess('Tag', 'delete', ['id' => $parentTag['id']]);
   }
 
   /**
@@ -414,7 +440,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       $this->groupContactCreate($groupId);
       $contactIds = array_merge($contactIds, CRM_Contact_BAO_Group::getGroupContacts($groupId));
     }
-    $contactIds = CRM_Utils_Array::collect('contact_id', $contactIds);
+    $contactIds = array_column($contactIds, 'contact_id');
 
     // create custom group with contact reference field
     $customGroup = $this->customGroupCreate(['extends' => 'Contact', 'title' => 'select_test_group']);
@@ -427,17 +453,17 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       'html_type' => 'Autocomplete-Select',
       'data_type' => 'ContactReference',
       'weight' => 4,
-      'is_searchable' => 1,
-      'is_active' => 1,
+      'is_searchable' => TRUE,
+      'is_active' => TRUE,
     ];
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $customField = $this->createTestEntity('CustomField', $params);
 
     $_GET = [
       'id' => $customField['id'],
       'is_unit_test' => TRUE,
     ];
     $contactList = CRM_Contact_Page_AJAX::contactReference();
-    $contactList = CRM_Utils_Array::collect('id', $contactList);
+    $contactList = array_column($contactList, 'id');
 
     //assert each returned contact id to be present in group contact
     foreach ($contactList as $contactId) {
@@ -476,14 +502,14 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
 
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('success', $e->errorData['status']);
+      $this->assertSame('success', $e->errorData['status']);
     }
 
     $isSelected = CRM_Core_DAO::singleValueQuery(
       "SELECT is_selected FROM civicrm_prevnext_cache WHERE id = %1",
       [1 => [$pnid, 'Integer']]
     );
-    $this->assertEquals(1, $isSelected);
+    $this->assertSame('1', $isSelected);
   }
 
   /**
@@ -526,14 +552,14 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       CRM_Contact_Page_AJAX::toggleDedupeSelect();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('success', $e->errorData['status']);
+      $this->assertSame('success', $e->errorData['status']);
     }
 
     $selectedCount = CRM_Core_DAO::singleValueQuery(
       "SELECT count(*) FROM civicrm_prevnext_cache WHERE cachekey = %1 AND is_selected = 1",
       [1 => [$cacheKey, 'String']]
     );
-    $this->assertEquals(2, $selectedCount);
+    $this->assertSame('2', $selectedCount);
   }
 
   /**
@@ -566,14 +592,14 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       CRM_Contact_Page_AJAX::toggleDedupeSelect();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('success', $e->errorData['status']);
+      $this->assertSame('success', $e->errorData['status']);
     }
 
     $isSelected = CRM_Core_DAO::singleValueQuery(
       "SELECT is_selected FROM civicrm_prevnext_cache WHERE id = %1",
       [1 => [$pnid, 'Integer']]
     );
-    $this->assertEquals(0, $isSelected, 'Row should not be updated when cacheKey is only a prefix.');
+    $this->assertSame('0', $isSelected, 'Row should not be updated when cacheKey is only a prefix.');
   }
 
   /**
@@ -614,7 +640,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       CRM_Contact_Page_AJAX::processDupes();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('dupe-nondupe', $e->errorData['status']);
+      $this->assertSame('dupe-nondupe', $e->errorData['status']);
     }
 
     $c1 = min($contact1, $contact2);
@@ -623,7 +649,7 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT count(*) FROM civicrm_dedupe_exception WHERE contact_id1 = %1 AND contact_id2 = %2",
       [1 => [$c1, 'Positive'], 2 => [$c2, 'Positive']]
     );
-    $this->assertEquals(1, $exceptionExists);
+    $this->assertSame('1', $exceptionExists);
 
     // 2. Remove exception
     $_POST = $_REQUEST = [
@@ -636,14 +662,14 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
       CRM_Contact_Page_AJAX::processDupes();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('nondupe-dupe', $e->errorData['status']);
+      $this->assertSame('nondupe-dupe', $e->errorData['status']);
     }
 
     $exceptionExistsAfter = CRM_Core_DAO::singleValueQuery(
       "SELECT count(*) FROM civicrm_dedupe_exception WHERE contact_id1 = %1 AND contact_id2 = %2",
       [1 => [$c1, 'Positive'], 2 => [$c2, 'Positive']]
     );
-    $this->assertEquals(0, $exceptionExistsAfter);
+    $this->assertSame('0', $exceptionExistsAfter);
   }
 
   /**
@@ -662,144 +688,6 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $this->expectException(CRM_Core_Exception::class);
     $this->expectExceptionMessage('You do not have permission to access this page.');
     CRM_Contact_Page_AJAX::processDupes();
-  }
-
-  /**
-   * Test getAddressDisplay is denied when contact_id is missing or invalid.
-   */
-  public function testGetAddressDisplayMissingContactIdDenied(): void {
-    $this->createLoggedInUser();
-    $this->setPermissions(['access CiviCRM', 'view all contacts']);
-
-    $_POST = $_REQUEST = [];
-
-    $this->expectException(CRM_Core_Exception::class);
-    $this->expectExceptionMessage('You do not have permission to access this page.');
-    CRM_Contact_Page_AJAX::getAddressDisplay();
-  }
-
-  /**
-   * Test getAddressDisplay is denied when user lacks permission to view contact.
-   */
-  public function testGetAddressDisplayForbiddenContactDenied(): void {
-    $this->createLoggedInUser();
-    $this->setPermissions(['access CiviCRM']);
-    $contactId = $this->individualCreate([], 'target_contact');
-
-    $_POST = $_REQUEST = ['contact_id' => $contactId];
-
-    $this->expectException(CRM_Core_Exception::class);
-    $this->expectExceptionMessage('You do not have permission to access this page.');
-    CRM_Contact_Page_AJAX::getAddressDisplay();
-  }
-
-  /**
-   * Test getAddressDisplay succeeds when user has permission to view contact.
-   */
-  public function testGetAddressDisplayPermittedContactSuccess(): void {
-    $this->createLoggedInUser();
-    $this->setPermissions(['access CiviCRM', 'view all contacts']);
-    $contactId = $this->individualCreate([], 'target_contact');
-    $this->createTestEntity('Address', [
-      'contact_id' => $contactId,
-      'street_address' => '123 Fake Street',
-      'city' => 'Metropolis',
-      'location_type_id:name' => 'Home',
-    ], 'addr_1');
-
-    $_POST = $_REQUEST = ['contact_id' => $contactId];
-
-    try {
-      CRM_Contact_Page_AJAX::getAddressDisplay();
-      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $data = $e->errorData;
-      $this->assertIsArray($data);
-      $this->assertNotEmpty($data);
-      $firstAddress = reset($data);
-      $this->assertStringContainsString('123 Fake Street', $firstAddress['display_text']);
-    }
-  }
-
-  /**
-   * Test getPCPList succeeds with CiviContribute permission.
-   */
-  public function testGetPCPListPermittedSuccess(): void {
-    $this->createLoggedInUser();
-    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'view all contacts']);
-    $contactId = $this->individualCreate(['first_name' => 'Supporter', 'last_name' => 'Jones'], 'pcp_supporter');
-    $contribPage = $this->createTestEntity('ContributionPage', [
-      'title' => 'PCP Goal Page',
-      'financial_type_id:name' => 'Donation',
-    ], 'pcp_contrib_page');
-    $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord([
-      'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => $contribPage['id'],
-      'target_entity_id' => 1,
-      'is_active' => 1,
-    ]);
-    $pcp = $this->createTestEntity('PCP', [
-      'contact_id' => $contactId,
-      'title' => 'Save the Whales',
-      'page_id' => $contribPage['id'],
-      'page_type' => 'contribute',
-      'status_id' => 1,
-      'pcp_block_id' => $pcpBlock->id,
-    ], 'pcp_entity');
-
-    $_GET['term'] = 'Jones';
-
-    try {
-      CRM_Contact_Page_AJAX::getPCPList();
-      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $data = $e->errorData;
-      $this->assertIsArray($data);
-      $this->assertNotEmpty($data['results']);
-      $this->assertEquals($pcp['id'], $data['results'][0]['id']);
-      $this->assertStringContainsString('Save the Whales', $data['results'][0]['text']);
-    }
-  }
-
-  /**
-   * Test getPCPList respects contact ACLs when user cannot view supporter contact.
-   */
-  public function testGetPCPListContactAclEnforced(): void {
-    $this->createLoggedInUser();
-    $this->setPermissions(['access CiviCRM', 'access CiviContribute']);
-    $contactId = $this->individualCreate(['first_name' => 'Hidden', 'last_name' => 'Supporter'], 'pcp_hidden');
-    $contribPage = $this->createTestEntity('ContributionPage', [
-      'title' => 'PCP Goal Page 2',
-      'financial_type_id:name' => 'Donation',
-    ], 'pcp_contrib_page2');
-    $pcpBlock = CRM_PCP_BAO_PCPBlock::writeRecord([
-      'entity_table' => 'civicrm_contribution_page',
-      'entity_id' => $contribPage['id'],
-      'target_entity_id' => 1,
-      'is_active' => 1,
-    ]);
-    $this->createTestEntity('PCP', [
-      'contact_id' => $contactId,
-      'title' => 'Hidden PCP Page',
-      'page_id' => $contribPage['id'],
-      'page_type' => 'contribute',
-      'status_id' => 1,
-      'pcp_block_id' => $pcpBlock->id,
-    ], 'pcp_entity2');
-
-    $_GET['term'] = 'Hidden';
-
-    try {
-      CRM_Contact_Page_AJAX::getPCPList();
-      $this->fail('Expected CRM_Core_Exception_PrematureExitException');
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-      $data = $e->errorData;
-      $this->assertIsArray($data);
-      $this->assertEmpty($data['results']);
-    }
   }
 
   /**

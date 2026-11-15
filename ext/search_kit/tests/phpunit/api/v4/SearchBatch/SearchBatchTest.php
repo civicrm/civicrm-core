@@ -106,10 +106,10 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $fields = array_column($schema, NULL, 'Field');
     // Check fields ignoring order
     $this->assertEqualsCanonicalizing($expectedFieldNames, array_keys($fields));
-    $this->assertEquals('text', $fields['first_name']['Type']);
+    $this->assertSame('text', $fields['first_name']['Type']);
     // Fields with options are also text
-    $this->assertEquals('text', $fields['gender_id']['Type']);
-    $this->assertEquals('date', $fields['birth_date']['Type']);
+    $this->assertSame('text', $fields['gender_id']['Type']);
+    $this->assertSame('date', $fields['birth_date']['Type']);
     // Different sql databases report this type differently but they're all acceptable
     $this->assertContains($fields['is_deceased']['Type'], ['tinyint', 'boolean', 'tinyint(1)']);
 
@@ -125,23 +125,23 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     // Check fields ignoring order
     $this->assertEqualsCanonicalizing($expectedFieldNames, array_keys($getFields));
 
-    $this->assertEquals('Your Name', $getFields['first_name']['label']);
+    $this->assertSame('Your Name', $getFields['first_name']['label']);
     $this->assertFalse($getFields['first_name']['nullable']);
-    $this->assertEquals('Import field: Your Name', $getFields['first_name']['title']);
-    $this->assertEquals('Integer', $getFields['gender_id']['data_type']);
+    $this->assertSame('Import field: Your Name', $getFields['first_name']['title']);
+    $this->assertSame('Integer', $getFields['gender_id']['data_type']);
     $this->assertContains('Male', $getFields['gender_id']['options']);
     $this->assertContains('Parent', $getFields['contact_sub_type']['options']);
     $this->assertFalse($getFields['contact_sub_type']['required']);
     $this->assertTrue($getFields['contact_sub_type']['nullable']);
-    $this->assertEquals(1, $getFields['contact_sub_type']['serialize']);
-    $this->assertEquals('Date', $getFields['birth_date']['data_type']);
-    $this->assertEquals('Boolean', $getFields['is_deceased']['data_type']);
-    $this->assertEquals('Integer', $getFields['_id']['data_type']);
-    $this->assertEquals('Individual', $getFields['_entity_id']['fk_entity']);
+    $this->assertSame(1, $getFields['contact_sub_type']['serialize']);
+    $this->assertSame('Date', $getFields['birth_date']['data_type']);
+    $this->assertSame('Boolean', $getFields['is_deceased']['data_type']);
+    $this->assertSame('Integer', $getFields['_id']['data_type']);
+    $this->assertSame('Individual', $getFields['_entity_id']['fk_entity']);
 
     // The table was initialized with one empty row. Now create another.
     $created = civicrm_api4($apiName, 'create')->single();
-    $this->assertEquals(2, $created['_id']);
+    $this->assertSame(2, $created['_id']);
 
     $created = civicrm_api4($apiName, 'get', ['where' => [['_id', '=', 2]]])->single();
     $this->assertNull($created['first_name']);
@@ -173,14 +173,14 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     ]);
     $this->assertCount(3, $run);
     $editable = $run->editable;
-    $this->assertEquals('Text', $editable['first_name']['input_type']);
-    $this->assertEquals('Individual', $editable['first_name']['entity']);
-    $this->assertEquals('Select', $editable['gender_id:label']['input_type']);
+    $this->assertSame('Text', $editable['first_name']['input_type']);
+    $this->assertSame('Individual', $editable['first_name']['entity']);
+    $this->assertSame('Select', $editable['gender_id:label']['input_type']);
     $this->assertNotEmpty($editable['gender_id:label']['options']);
     $this->assertIsArray($editable['gender_id:label']['options']);
-    $this->assertEquals('Select', $editable['contact_sub_type:label']['input_type']);
-    $this->assertEquals('Date', $editable['birth_date']['input_type']);
-    $this->assertEquals('CheckBox', $editable['is_deceased']['input_type']);
+    $this->assertSame('Select', $editable['contact_sub_type:label']['input_type']);
+    $this->assertSame('Date', $editable['birth_date']['input_type']);
+    $this->assertSame('CheckBox', $editable['is_deceased']['input_type']);
 
     $this->assertSame('Test', $run[2]['data']['first_name']);
     $this->assertSame(1, $run[2]['data']['gender_id']);
@@ -280,29 +280,29 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     $columnsByKey = array_column($savedDisplay['settings']['columns'], NULL, 'key');
 
     $targetSpec = $columnsByKey['target_contact_id']['spec'] ?? [];
-    $this->assertEquals(
+    $this->assertSame(
       \CRM_Core_DAO::SERIALIZE_COMMA,
       $targetSpec['serialize'] ?? NULL,
       'target_contact_id column spec must have serialize set; without the fix it is NULL'
     );
-    $this->assertEquals(
+    $this->assertSame(
       'EntityRef',
       $targetSpec['input_type'] ?? NULL,
       'target_contact_id column spec must have input_type=EntityRef; without the fix it is NULL'
     );
-    $this->assertEquals(
+    $this->assertSame(
       'Contact',
       $targetSpec['entity_reference']['entity'] ?? NULL,
       'target_contact_id column spec must reference Contact; without the fix entity_reference is NULL'
     );
 
     $assigneeSpec = $columnsByKey['assignee_contact_id']['spec'] ?? [];
-    $this->assertEquals(
+    $this->assertSame(
       \CRM_Core_DAO::SERIALIZE_COMMA,
       $assigneeSpec['serialize'] ?? NULL,
       'assignee_contact_id column spec must have serialize set; without the fix it is NULL'
     );
-    $this->assertEquals(
+    $this->assertSame(
       'EntityRef',
       $assigneeSpec['input_type'] ?? NULL,
       'assignee_contact_id column spec must have input_type=EntityRef; without the fix it is NULL'
@@ -586,9 +586,9 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
     ];
     $this->assertEquals($expectedEntities, $hookEntities);
     $this->assertCount(3, $import);
-    $this->assertEquals('IMPORTED', $import[0]['_status']);
-    $this->assertEquals('IMPORTED', $import[1]['_status']);
-    $this->assertEquals('IMPORTED', $import[2]['_status']);
+    $this->assertSame('IMPORTED', $import[0]['_status']);
+    $this->assertSame('IMPORTED', $import[1]['_status']);
+    $this->assertSame('IMPORTED', $import[2]['_status']);
 
     $contributions = civicrm_api4('Contribution', 'get', [
       'select' => ['id', 'financial_type_id', 'total_amount', 'contact_id.first_name', 'contact_id.gender_id'],
@@ -599,31 +599,31 @@ class SearchBatchTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
 
     $this->assertEquals($import[0]['_entity_id'], $contributions[0]['id']);
     $this->assertEquals($import[1]['_entity_id'], $contributions[1]['id']);
-    $this->assertEquals(100, $contributions[0]['total_amount']);
-    $this->assertEquals(200, $contributions[1]['total_amount']);
-    $this->assertEquals(300, $contributions[2]['total_amount']);
+    $this->assertSame(100.0, $contributions[0]['total_amount']);
+    $this->assertSame(200.0, $contributions[1]['total_amount']);
+    $this->assertSame(300.0, $contributions[2]['total_amount']);
     $this->assertEquals($this->getFinancialTypeID('Donation'), $contributions[0]['financial_type_id']);
     $this->assertEquals($this->getFinancialTypeID('Member Dues'), $contributions[1]['financial_type_id']);
-    $this->assertEquals('Jane', $contributions[0]['contact_id.first_name']);
-    $this->assertEquals('John', $contributions[1]['contact_id.first_name']);
-    $this->assertEquals(1, $contributions[0]['contact_id.gender_id']);
-    $this->assertEquals(2, $contributions[1]['contact_id.gender_id']);
+    $this->assertSame('Jane', $contributions[0]['contact_id.first_name']);
+    $this->assertSame('John', $contributions[1]['contact_id.first_name']);
+    $this->assertSame(1, $contributions[0]['contact_id.gender_id']);
+    $this->assertSame(2, $contributions[1]['contact_id.gender_id']);
 
     $contributionSoft = civicrm_api4('ContributionSoft', 'get', [
       'select' => ['contact_id', 'amount', 'soft_credit_type_id:name'],
       'where' => [['contribution_id', '=', $contributions[0]['id']]],
     ])->single();
     $this->assertEquals($softCreditContactId, $contributionSoft['contact_id']);
-    $this->assertEquals(10, $contributionSoft['amount']);
+    $this->assertSame(10.0, $contributionSoft['amount']);
     // This value was set in the ON clause & should have carried through
-    $this->assertEquals('in_honor_of', $contributionSoft['soft_credit_type_id:name']);
+    $this->assertSame('in_honor_of', $contributionSoft['soft_credit_type_id:name']);
 
     $contributionSoft = civicrm_api4('ContributionSoft', 'get', [
       'select' => ['contact_id', 'amount', 'soft_credit_type_id:name'],
       'where' => [['contribution_id', '=', $contributions[2]['id']]],
     ])->single();
     // Not specified in 2nd contribution but implied by the total_amount
-    $this->assertEquals(300, $contributionSoft['amount']);
+    $this->assertSame(300.0, $contributionSoft['amount']);
   }
 
 }

@@ -67,10 +67,10 @@ class SelectQueryMultiJoinTest extends Api4TestBase {
     foreach ($results as $id => $email) {
       $displayName = $email['contact_id.display_name'];
       if (in_array($id, $firstContactEmailIds)) {
-        $this->assertEquals('First Contact', $displayName);
+        $this->assertSame('First Contact', $displayName);
       }
       elseif (in_array($id, $secondContactEmailIds)) {
-        $this->assertEquals('Second Contact', $displayName);
+        $this->assertSame('Second Contact', $displayName);
       }
     }
   }

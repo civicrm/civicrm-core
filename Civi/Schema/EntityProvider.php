@@ -17,23 +17,16 @@ use Civi\Core\Event\GenericHookEvent;
 final class EntityProvider {
 
   /**
-   * @var string
-   */
-  private string $entityName;
-
-  /**
    * @var EntityMetadataInterface
    */
-  private $meta;
+  private EntityMetadataInterface $meta;
 
   /**
    * @var EntityStorageInterface
    */
-  private $storage;
+  private EntityStorageInterface $storage;
 
-  public function __construct(string $entityName) {
-    $this->entityName = $entityName;
-  }
+  public function __construct(private string $entityName) {}
 
   public function getMeta(string $property) {
     return $this->getMetaProvider()->getProperty($property);
@@ -75,15 +68,16 @@ final class EntityProvider {
    */
   public function getSupportedFields(): array {
     $fields = $this->getFields();
-    if ($this->getMeta('module') === 'civicrm') {
+    if ($this->getMeta('module') === 'civicrm' && version_compare($dbVer = \CRM_Core_BAO_Domain::version(), \CRM_Utils_System::version()) < 0) {
       // Exclude fields yet not added by pending upgrades
-      $dbVer = \CRM_Core_BAO_Domain::version();
       $fields = array_filter($fields, function($field) use ($dbVer) {
-        $add = $field['add'] ?? '1.0.0';
-        if (substr_count($add, '.') < 2) {
-          $add .= '.alpha1';
+        if (!isset($field['add'])) {
+          return TRUE;
         }
-        return version_compare($dbVer, $add, '>=');
+        if (substr_count($field['add'], '.') < 2) {
+          $field['add'] .= '.alpha1';
+        }
+        return version_compare($dbVer, $field['add'], '>=');
       });
     }
     return $fields;
@@ -120,15 +114,17 @@ final class EntityProvider {
     if (!isset($this->meta)) {
       $entity = EntityRepository::getEntity($this->entityName);
       if (isset($entity['metaProvider'])) {
-        return new $entity['metaProvider']($this->entityName);
+        $this->meta = new $entity['metaProvider']($this->entityName);
       }
-      if (isset($entity['getFields'])) {
-        return new SqlEntityMetadata($this->entityName);
+      elseif (isset($entity['getFields'])) {
+        $this->meta = new SqlEntityMetadata($this->entityName);
       }
-      if (isset($entity['table'])) {
-        return new LegacySqlEntityMetadata($this->entityName);
+      elseif (isset($entity['table'])) {
+        $this->meta = new LegacySqlEntityMetadata($this->entityName);
       }
-      throw new \CRM_Core_Exception("Unknown entity $this->entityName");
+      else {
+        throw new \CRM_Core_Exception("Unknown entity $this->entityName");
+      }
     }
     return $this->meta;
   }
@@ -137,12 +133,14 @@ final class EntityProvider {
     if (!isset($this->storage)) {
       $entity = EntityRepository::getEntity($this->entityName);
       if (isset($entity['storageProvider'])) {
-        return new $entity['storageProvider']($this->entityName);
+        $this->storage = new $entity['storageProvider']($this->entityName);
       }
-      if (isset($entity['table'])) {
-        return new SqlEntityStorage($this->entityName);
+      elseif (isset($entity['table'])) {
+        $this->storage = new SqlEntityStorage($this->entityName);
       }
-      throw new \CRM_Core_Exception("Unknown entity $this->entityName");
+      else {
+        throw new \CRM_Core_Exception("Unknown entity $this->entityName");
+      }
     }
     return $this->storage;
   }

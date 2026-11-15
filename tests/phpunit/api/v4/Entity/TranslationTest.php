@@ -69,7 +69,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
         'language' => 'fr_CA',
         'string' => 'Hello world',
       ],
-      '/Invalid status/',
+      '/Invalid value for status_id:name: "jumping"/',
     ];
 
     $es['malformedField'] = [
@@ -205,7 +205,7 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
       'checkPermissions' => FALSE,
       'values' => $record,
     ]);
-    $this->assertEquals(1, $createResults->count());
+    $this->assertSame(1, $createResults->count());
     foreach ($createResults as $createResult) {
       $badUpdate = $this->fillRecord($badUpdate);
       try {
@@ -234,6 +234,25 @@ class TranslationTest extends Api4TestBase implements TransactionalInterface, Ho
       $record['entity_id'] = $this->ids['*EVENT*'] = $eventId;
     }
     return $record;
+  }
+
+  public function testTsUsesTranslationSavedInSameRequest(): void {
+    $source = 'Translation test source string';
+    $this->assertSame($source, ts('Translation test source string'));
+
+    $sourceKey = \CRM_Core_BAO_TranslationSource::createGuid($source);
+    $this->createTestRecord('TranslationSource', [
+      'source' => $source,
+      'source_key' => $sourceKey,
+      'entity' => 'test',
+    ]);
+    $this->createTestRecord('Translation', [
+      'source_key' => $sourceKey,
+      'language' => 'en_US',
+      'string' => 'Translated test string',
+      'status_id:name' => 'active',
+    ]);
+    $this->assertSame('Translated test string', ts('Translation test source string'));
   }
 
   /**

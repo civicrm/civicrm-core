@@ -171,7 +171,7 @@ class CRM_Note_Form_NotePermissionTest extends CiviUnitTestCase implements Headl
     ])->processForm();
 
     $saved = Note::get(FALSE)->addWhere('id', '=', $note['id'])->execute()->first();
-    $this->assertEquals('Updated text', $saved['note']);
+    $this->assertSame('Updated text', $saved['note']);
     $this->assertEquals($authorUser, $saved['contact_id']);
   }
 

@@ -466,7 +466,7 @@ function getDBFields($daoName) {
         DIRECTORY_SEPARATOR,
         $daoName
       ) . '.php';
-    include_once($daoFile);
+    include_once $daoFile;
 
     $daoFields = &$daoName::fields();
     require_once 'CRM/Utils/Array.php';
@@ -542,4 +542,3 @@ run($values, $contactIDs, $contactIDs);
 $json = json_encode($values);
 echo $json;
 // print_r( json_decode( $json ) );
-

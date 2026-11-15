@@ -116,7 +116,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
 
         $sortChar = $selector->alphabetQuery()->fetchAll();
         // sort name is stored in '<last_name>, <first_name>' format, as per which the first character would be B of Bond
-        $this->assertEquals('B', $sortChar[0]['sort_name']);
+        $this->assertSame('B', $sortChar[0]['sort_name']);
         $this->assertEquals($contactID, key($rows));
 
         CRM_Core_DAO::reenableFullGroupByMode();
@@ -647,7 +647,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
     $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
     $this->assertCount(1, $rows);
     $this->assertEquals($contactID, key($rows));
-    $this->assertEquals('test@test.com', $rows[$contactID]['Non_ASCII_Location_Type-email']);
+    $this->assertSame('test@test.com', $rows[$contactID]['Non_ASCII_Location_Type-email']);
   }
 
   /**
@@ -696,7 +696,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
       );
 
       $sql = $selector->getQueryObject()->query();
-      $this->assertEquals(TRUE, strpos($sql[2], $filtersByWhereClause[$op]));
+      $this->assertStringContainsString($filtersByWhereClause[$op], $sql[2]);
 
       $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
       $this->assertCount(1, $rows);
@@ -809,7 +809,7 @@ AND ( 1 ) AND (contact_a.is_deleted = 0)',
     $whereClause = $selector->getQueryObject()->query()[2];
     $expectedClause = sprintf('( %s.%s IS NOT NULL )', $customGroupTableName, $customFieldColumnName);
     // test the presence of expected date clause
-    $this->assertEquals(TRUE, strpos($whereClause, $expectedClause));
+    $this->assertStringContainsString($expectedClause, $whereClause);
 
     $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
     $this->assertCount(1, $rows);

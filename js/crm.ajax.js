@@ -666,7 +666,7 @@
         // small delay to allow contents to render
         window.setTimeout(function() {
           var currentHeight = $wrapper.outerHeight(),
-            padding = currentHeight - $dialog.height(),
+            padding = currentHeight - $dialog.innerHeight(),
             newHeight = $dialog.prop('scrollHeight') + padding,
             menuHeight = $('#civicrm-menu').outerHeight();
           if ($('body').hasClass('crm-menubar-below-cms-menu')) {
@@ -675,10 +675,16 @@
           var maxHeight = $(window).height() - menuHeight;
           newHeight = newHeight > maxHeight ? maxHeight : newHeight;
           if (newHeight > (currentHeight + 15)) {
-            $dialog.dialog('option', {
-              position: {my: 'center', at: 'center center+' + (menuHeight / 2), of: window},
-              height: newHeight
-            });
+            var at = $wrapper.css(['top', 'left']);
+            $dialog.dialog('option', 'height', newHeight);
+            // A theme's !important height can keep the dialog from growing. Setting the height re-applies the
+            // stored position, so a dialog that did not grow is put back where it was
+            if ($wrapper.outerHeight() > currentHeight + 1) {
+              $dialog.dialog('option', 'position', {my: 'center', at: 'center center+' + (menuHeight / 2), of: window});
+            }
+            else {
+              $wrapper.css(at);
+            }
           }
         }, 500);
       });

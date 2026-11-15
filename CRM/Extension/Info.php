@@ -301,7 +301,7 @@ class CRM_Extension_Info {
     $this->type = (string) $info->attributes()->type;
     $this->file = (string) $info->file;
     $this->label = (string) $info->name;
-    $this->upgrader = (string) $info->upgrader;
+    $this->upgrader = isset($info->upgrader) ? (string) $info->upgrader : NULL;
 
     // Convert first level variables to CRM_Core_Extension properties
     // and deeper into arrays. An exception for URLS section, since

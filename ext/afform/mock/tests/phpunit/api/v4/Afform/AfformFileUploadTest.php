@@ -152,11 +152,11 @@ EOHTML;
     // Check that files are properly public or private
     foreach ([0, 1] as $contactIndex) {
       $privateFile = $this->getTestRecord('File', $contacts[$contactIndex]['MyInfo.private_file'], ['*', 'url']);
-      $this->assertEquals(FALSE, $privateFile['is_public']);
+      $this->assertFalse($privateFile['is_public']);
       $this->assertStringNotContainsString($privateFile['uri'], $privateFile['url']);
 
       $publicFile = $this->getTestRecord('File', $contacts[$contactIndex]['MyFiles.public_files'], ['*', 'url']);
-      $this->assertEquals(TRUE, $publicFile['is_public']);
+      $this->assertTrue($publicFile['is_public']);
       $this->assertStringContainsString($publicFile['uri'], $publicFile['url']);
     }
   }

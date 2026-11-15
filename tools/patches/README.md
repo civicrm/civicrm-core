@@ -64,7 +64,8 @@ To publish, use `patchmgr` and [`gcloud`](https://cloud.google.com/sdk/gcloud/):
 
 ```bash
 ./tools/patches/bin/patchmgr build
-gcloud storage rsync -r tools/patches/dist gs://civicrm/patches
+gcloud storage rsync -r --no-clobber tools/patches/dist gs://civicrm/patches
+## Note: Do not delete old patches from CDN. They may still be used in prior branches.
 ```
 
 Now, you can test `composer` with the published patches:

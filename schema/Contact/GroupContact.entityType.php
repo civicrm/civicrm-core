@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Group Contact'),
     'title_plural' => ts('Group Contacts'),
-    'description' => ts('Join table sets membership for \'static\' groups. Also used to store \'opt-out\' entries for \'query\' type groups (status = \'OUT\')'),
+    'description' => ts("Join table sets membership for 'static' groups. Also used to store 'opt-out' entries for 'query' type groups (status = 'OUT')"),
     'log' => TRUE,
     'add' => '1.1',
   ],

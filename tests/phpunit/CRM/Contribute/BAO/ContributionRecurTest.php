@@ -100,6 +100,65 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution(['id' => $contributionRecur['id']]);
   }
 
+  public static function cancelledRecurInstallments(): array {
+    return [
+      'payment completes the last instalment' => [1],
+      'instalments remain' => [3],
+      'no instalment limit' => [NULL],
+    ];
+  }
+
+  /**
+   * A payment recorded after the recurring contribution was cancelled must not undo the cancellation.
+   *
+   * @dataProvider cancelledRecurInstallments
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPaymentOnCancelledRecurKeepsItCancelled(?int $installments): void {
+    $contributionRecurID = $this->createTestEntity('ContributionRecur', array_merge($this->_params, [
+      'installments' => $installments,
+      'contribution_status_id:name' => 'Cancelled',
+      'cancel_date' => 'yesterday',
+      'next_sched_contribution_date' => 'yesterday',
+    ]))['id'];
+    $before = ContributionRecur::get(FALSE)
+      ->addSelect('next_sched_contribution_date', 'end_date')
+      ->addWhere('id', '=', $contributionRecurID)
+      ->execute()
+      ->single();
+
+    $contributionID = $this->createTestEntity('Contribution', [
+      'contact_id' => $this->_params['contact_id'],
+      'financial_type_id:name' => 'Donation',
+      'total_amount' => 3,
+      'contribution_status_id:name' => 'Pending',
+      'contribution_recur_id' => $contributionRecurID,
+      'receive_date' => 'yesterday',
+    ])['id'];
+    Payment::create(FALSE)
+      ->setNotificationForCompleteOrder(FALSE)
+      ->addValue('contribution_id', $contributionID)
+      ->addValue('total_amount', 3)
+      ->execute();
+
+    $contributionStatus = Contribution::get(FALSE)
+      ->addSelect('contribution_status_id:name')
+      ->addWhere('id', '=', $contributionID)
+      ->execute()
+      ->single()['contribution_status_id:name'];
+    $this->assertSame('Completed', $contributionStatus);
+
+    $after = ContributionRecur::get(FALSE)
+      ->addSelect('contribution_status_id:name', 'next_sched_contribution_date', 'end_date')
+      ->addWhere('id', '=', $contributionRecurID)
+      ->execute()
+      ->single();
+    $this->assertSame('Cancelled', $after['contribution_status_id:name']);
+    $this->assertSame($before['next_sched_contribution_date'], $after['next_sched_contribution_date']);
+    $this->assertSame($before['end_date'], $after['end_date']);
+  }
+
   /**
    * Test that a failed payment increments failure_count.
    *
@@ -133,7 +192,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ->addSelect('failure_count')
       ->addWhere('id', '=', $contributionRecur['id'])
       ->execute()->first();
-    $this->assertEquals(3, $updatedRecur['failure_count']);
+    $this->assertSame(3, $updatedRecur['failure_count']);
   }
 
   /**
@@ -385,11 +444,11 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->assertEquals($templateContributionId, $fetchedTemplate['id']);
     $this->assertTrue($fetchedTemplate['is_template']);
     $this->assertFalse($fetchedTemplate['is_test']);
-    $this->assertEquals(1, $templateContribution->count());
+    $this->assertSame(1, $templateContribution->count());
     $templateContribution = $templateContribution->first();
     $this->assertNotNull($templateContribution['template.field']);
-    $this->assertEquals('Second and most recent Contribution', $templateContribution['template.field']);
-    $this->assertEquals('Template contribution custom data inserted by hook', $templateContribution['template.field2']);
+    $this->assertSame('Second and most recent Contribution', $templateContribution['template.field']);
+    $this->assertSame('Template contribution custom data inserted by hook', $templateContribution['template.field2']);
     $this->callAPISuccess('CustomField', 'delete', ['id' => $custom_field['id']]);
     $this->callAPISuccess('CustomGroup', 'delete', ['id' => $custom_group['id']]);
   }
@@ -448,8 +507,8 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $repeatContribution = $this->callAPISuccess('Contribution', 'repeattransaction', [
       'contribution_recur_id' => $contributionRecur['id'],
     ]);
-    $this->assertEquals('Template Contribution', $repeatContribution['values'][$repeatContribution['id']]['source']);
-    $this->assertEquals('AUD', $repeatContribution['values'][$repeatContribution['id']]['currency']);
+    $this->assertSame('Template Contribution', $repeatContribution['values'][$repeatContribution['id']]['source']);
+    $this->assertSame('AUD', $repeatContribution['values'][$repeatContribution['id']]['currency']);
   }
 
   /**
@@ -485,8 +544,8 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $contributionRecur['id'])
       ->execute()
       ->first();
-    $this->assertEquals('USD', $updatedContributionRecur['currency']);
-    $this->assertEquals('2.00', $updatedContributionRecur['amount']);
+    $this->assertSame('USD', $updatedContributionRecur['currency']);
+    $this->assertSame(2.0, $updatedContributionRecur['amount']);
     $this->assertGreaterThan(
       strtotime($contributionRecur['modified_date']),
       strtotime($updatedContributionRecur['modified_date'])
@@ -498,10 +557,10 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       ->setValues(['amount' => 6])
       ->execute();
 
-    $this->assertEquals(6, Contribution::get()
+    $this->assertSame(6.0, Contribution::get()
       ->addWhere('id', '=', $templateContribution['id'])
       ->addSelect('total_amount')->execute()->first()['total_amount']);
-    $this->assertEquals(6, LineItem::get()
+    $this->assertSame(6.0, LineItem::get()
       ->addWhere('contribution_id', '=', $templateContribution['id'])
       ->addGroupBy('contribution_id')
       ->addSelect('SUM(line_total) AS total_amount')->execute()->first()['total_amount']);
@@ -649,7 +708,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
         'id' => $mId,
         'return' => 'end_date',
       ]);
-      $this->assertEquals("{$expectedDate['year']}-{$expectedDate['month']}-27", $endDate, ts('End date incorrect.'));
+      $this->assertSame("{$expectedDate['year']}-{$expectedDate['month']}-27", $endDate, ts('End date incorrect.'));
     }
 
     // At this moment Contact 2 is deceased, but we wait until payment is recorded in civi before marking the contact deceased.
@@ -713,7 +772,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'return' => 'end_date',
     ]);
     $expectedDate = $this->getYearAndMonthFromOffset(5);
-    $this->assertEquals("{$expectedDate['year']}-{$expectedDate['month']}-27", $endDate, ts('End date incorrect.'));
+    $this->assertSame("{$expectedDate['year']}-{$expectedDate['month']}-27", $endDate, ts('End date incorrect.'));
     // check line item and membership payment count.
     $this->validateAllCounts($membershipId1, 6);
     $this->validateAllCounts($membershipId2, 4);
@@ -839,19 +898,19 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $recurring1 = $this->callAPISuccess('ContributionRecur', 'create', $createParams);
     $recurring1Get = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $recurring1['id']]);
     // default is_email_receipt column value is 1
-    $this->assertEquals('1', $recurring1Get['is_email_receipt']);
+    $this->assertSame('1', $recurring1Get['is_email_receipt']);
 
     // pass empty value to is_email_receipt
     $createParams['is_email_receipt'] = '';
     $recurring2 = $this->callAPISuccess('ContributionRecur', 'create', $createParams);
     $recurring2 = ContributionRecur::get(FALSE)->addWhere('id', '=', $recurring2['id'])->addSelect('is_email_receipt')->execute()->first();
-    $this->assertEquals(NULL, $recurring2['is_email_receipt']);
+    $this->assertFalse($recurring2['is_email_receipt']);
 
     // Pass 0 value to is_email_receipt.
     $createParams['is_email_receipt'] = 0;
     $recurring3 = $this->callAPISuccess('ContributionRecur', 'create', $createParams);
     $recurring3Get = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $recurring3['id']]);
-    $this->assertEquals('0', $recurring3Get['is_email_receipt']);
+    $this->assertSame('0', $recurring3Get['is_email_receipt']);
   }
 
   /**

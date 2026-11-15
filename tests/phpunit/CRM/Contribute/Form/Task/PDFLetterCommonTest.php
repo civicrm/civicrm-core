@@ -161,10 +161,10 @@ class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
     $form = $this->getFormObject('CRM_Contribute_Form_Task_PDFLetter');
     [$contributions, $contacts] = $form->buildContributionArray('contact_id', $contributionIDs, $returnProperties, $messageToken, '**', FALSE);
 
-    $this->assertEquals('Anthony', $contacts[$this->_individualId]['first_name']);
-    $this->assertEquals('Donation', $contributions[$result['id']]['financial_type']);
+    $this->assertSame('Anthony', $contacts[$this->_individualId]['first_name']);
+    $this->assertSame('Donation', $contributions[$result['id']]['financial_type']);
     $this->assertEquals($campaignTitle, $contributions[$result['id']]['campaign']);
-    $this->assertEquals('Check', $contributions[$result['id']]['payment_instrument']);
+    $this->assertSame('Check', $contributions[$result['id']]['payment_instrument']);
     // CRM-20359: assert that contribution custom field token is rightfully replaced by its value
     $this->assertEquals($params[$customFieldKey], $contributions[$result['id']][$customFieldKey]);
 
@@ -437,7 +437,7 @@ emo
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $html = $e->errorData['html'];
     }
-    $this->assertEquals("<table border='1' cellpadding='2' cellspacing='0' class='table'>
+    $this->assertSame("<table border='1' cellpadding='2' cellspacing='0' class='table'>
   <tbody>
   <tr>
     <th>Date</th>
@@ -463,7 +463,7 @@ emo
   </tr>
   </tbody>
 </table>", $html[$contributionIDs[0]]);
-    $this->assertEquals("<table border='1' cellpadding='2' cellspacing='0' class='table'>
+    $this->assertSame("<table border='1' cellpadding='2' cellspacing='0' class='table'>
   <tbody>
   <tr>
     <th>Date</th>
@@ -499,11 +499,11 @@ emo
 </table>", $html[$contributionIDs[1]]);
 
     $activities = $this->callAPISuccess('Activity', 'get', ['activity_type_id' => 'Print PDF Letter', 'sequential' => 1]);
-    $this->assertEquals(2, $activities['count']);
+    $this->assertSame(2, $activities['count']);
     $this->assertEquals($html[$contributionIDs[0]], $activities['values'][0]['details']);
     $this->assertEquals($html[$contributionIDs[1]], $activities['values'][1]['details']);
     // Checking the cacheable hook is not called multiple times.
-    $this->assertEquals(1, $this->hookTokensCalled);
+    $this->assertSame(1, $this->hookTokensCalled);
     $mailUtil->checkAllMailLog($html);
 
   }

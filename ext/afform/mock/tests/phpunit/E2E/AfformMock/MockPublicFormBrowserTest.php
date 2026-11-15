@@ -34,7 +34,7 @@ class MockPublicFormBrowserTest extends Civi\Test\MinkBase {
    */
   public function testUpdateMiddleName() {
     $donny = $this->initializeTheodoreKerabatsos();
-    $this->assertEquals('Donald', $this->getContact($donny)['middle_name'], 'Middle name has original value');
+    $this->assertSame('Donald', $this->getContact($donny)['middle_name'], 'Middle name has original value');
 
     $session = $this->mink->getSession();
     $url = $this->renderToken('{form.mockPublicFormUrl}', $donny);
@@ -49,7 +49,7 @@ class MockPublicFormBrowserTest extends Civi\Test\MinkBase {
     $session->wait(2000); /* FIXME: Cannot get wait-condition to be meaningfully used */
 
     $middleName = $this->assertSession()->elementExists('css', 'input#middle-name-1');
-    $this->assertEquals('Donald', $middleName->getValue());
+    $this->assertSame('Donald', $middleName->getValue());
     $middleName->setValue('Donny');
 
     $submit = $this->assertSession()->elementExists('css', 'button.af-button.btn-primary');
@@ -60,7 +60,7 @@ class MockPublicFormBrowserTest extends Civi\Test\MinkBase {
     // $session->wait(5000, 'CRM.$(\'.crm-status-box-msg:contains("Saved")\').length > 1');
     $session->wait(2000); /* FIXME: Cannot get wait-condition to be meaningfully used */
 
-    $this->assertEquals('Donny', $this->getContact($donny)['middle_name'], 'Middle name has been updated');
+    $this->assertSame('Donny', $this->getContact($donny)['middle_name'], 'Middle name has been updated');
   }
 
   protected function renderToken(string $token, int $cid): string {

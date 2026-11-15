@@ -333,7 +333,7 @@ return CRM_Core_CodeGen_OptionGroup::create('report_template', 'a/0039')
       'value' => 'contribute/history',
       'name' => 'CRM_Report_Form_Contribute_History',
       'weight' => 46,
-      'description' => ts('List contact\'s donation history, grouped by year, along with contributions attributed to any of the contact\'s related contacts.'),
+      'description' => ts("List contact's donation history, grouped by year, along with contributions attributed to any of the contact's related contacts."),
       'component_id' => new Literal('@componentCiviContribute'),
     ],
     [

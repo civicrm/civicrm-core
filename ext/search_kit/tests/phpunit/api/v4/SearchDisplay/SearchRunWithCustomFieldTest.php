@@ -242,9 +242,9 @@ class SearchRunWithCustomFieldTest extends Api4TestBase {
     $result = civicrm_api4('SearchDisplay', 'run', $params);
 
     $this->assertEquals(['zero', 'two', 'three'], $result[0]['data']['my_test.my_field:label']);
-    $this->assertEquals("$lastName zero, two, three", $result[0]['columns'][1]['val']);
+    $this->assertSame("$lastName zero, two, three", $result[0]['columns'][1]['val']);
     $this->assertEquals(['zero'], $result[1]['data']['my_test.my_field:label']);
-    $this->assertEquals("$lastName zero", $result[1]['columns'][1]['val']);
+    $this->assertSame("$lastName zero", $result[1]['columns'][1]['val']);
   }
 
   public function testEntityReferenceJoins() {
@@ -267,8 +267,8 @@ class SearchRunWithCustomFieldTest extends Api4TestBase {
       ->addWhere('id', '=', $uncleId)
       ->execute()
       ->first();
-    $this->assertEquals('Donald', $contact['first_name']);
-    $this->assertEquals('Dewey', $contact['EntityRefFields.favorite_nephew.first_name']);
+    $this->assertSame('Donald', $contact['first_name']);
+    $this->assertSame('Dewey', $contact['EntityRefFields.favorite_nephew.first_name']);
 
     $params = [
       'checkPermissions' => FALSE,
@@ -294,7 +294,7 @@ class SearchRunWithCustomFieldTest extends Api4TestBase {
       ],
     ];
     $result = civicrm_api4('SearchDisplay', 'run', $params);
-    $this->assertEquals('Dewey', $result[0]['columns'][0]['val']);
+    $this->assertSame('Dewey', $result[0]['columns'][0]['val']);
   }
 
   public function testJoinWithCustomFieldEndingIn_() {
@@ -377,7 +377,7 @@ class SearchRunWithCustomFieldTest extends Api4TestBase {
     $result = civicrm_api4('SearchDisplay', 'run', $params);
 
     $this->assertArrayHasKey('GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label', $result[0]['data']);
-    $this->assertEquals('Yes', $result[0]['data']['GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label'][0]);
+    $this->assertSame('Yes', $result[0]['data']['GROUP_CONCAT_Contact_ActivityContact_Activity_01_testactivity2_testactivity__label'][0]);
   }
 
 }

@@ -251,7 +251,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     }
 
     $messageTemplate = new CRM_Core_BAO_MessageTemplate();
-    $messageTemplate->orderBy('msg_title' . ' asc');
+    $messageTemplate->orderBy('msg_title asc');
 
     $userTemplates = [];
     $workflowTemplates = [];

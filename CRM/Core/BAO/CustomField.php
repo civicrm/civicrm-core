@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -20,7 +21,7 @@ use Civi\Api4\Utils\CoreUtil;
 /**
  * Class CRM_Core_BAO_CustomField
  */
-class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
   /**
    * Build and retrieve the list of data types and descriptions.
@@ -1065,6 +1066,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    * Callback for hook_civicrm_pre().
    * @param \Civi\Core\Event\PreEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre')]
   public static function on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     // When deleting a custom group, delete all orphaned fields
     if ($event->entity === 'CustomGroup' && $event->action === 'delete') {
@@ -1081,6 +1083,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    * Callback for hook_civicrm_post().
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     if ($event->action === 'delete') {
       Civi::rebuild(['system' => TRUE])->execute();
@@ -1103,6 +1106,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField implements \Civi
    * Get the number of rows in the value table with a not NULL value for this field
    * - this will prevent automatic cleanup of the CustomField if there is data for it
    */
+  #[CiviEventListener(event: 'hook_civicrm_referenceCounts')]
   public static function on_hook_civicrm_referenceCounts($e) {
     $dao = $e->dao;
     if (!is_a($dao, \CRM_Core_DAO_CustomField::class)) {
@@ -2331,7 +2335,7 @@ WHERE  id IN ( %1, %2 )
   /**
    * Get custom option groups.
    *
-   * @deprecated Use the API OptionGroup.get
+   * @deprecated in 5.5 will be removed around 6.28. Use the API OptionGroup.get
    *
    * @param array $includeFieldIds
    *   Ids of custom fields for which option groups must be included.
@@ -2342,6 +2346,7 @@ WHERE  id IN ( %1, %2 )
    * @return mixed
    */
   public static function customOptionGroup($includeFieldIds = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('OptionGroup.get');
     static $customOptionGroup = NULL;
 
     $cacheKey = (empty($includeFieldIds)) ? 'onlyActive' : 'force';
@@ -2419,7 +2424,9 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
   }
 
   /**
-   * Check if option group is related to more than one custom field.
+   * Delete the option group if no other custom field uses it.
+   *
+   * Reserved option groups are never deleted.
    *
    * @param int $optionGroupId
    *   Option group id.
@@ -2427,6 +2434,10 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
    *   Set to 1 if the field still exists, 0 otherwise
    */
   public static function checkOptionGroup($optionGroupId, int $max = 1) {
+    // Reserved option groups (e.g. gender) belong to core, not to the custom field
+    if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', $optionGroupId, 'is_reserved')) {
+      return;
+    }
     $query = "
 SELECT count(*)
 FROM   civicrm_custom_field

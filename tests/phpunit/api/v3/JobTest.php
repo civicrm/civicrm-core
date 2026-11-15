@@ -182,7 +182,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'gt' => 'postal_greeting',
       'ct' => 'Individual',
     ]);
-    $this->assertEquals('Dear Anthony', Contact::get()
+    $this->assertSame('Dear Anthony', Contact::get()
       ->addWhere('id', '=', $contactID)
       ->addSelect('postal_greeting_display')
       ->execute()->first()['postal_greeting_display']
@@ -267,10 +267,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
     ]);
     $this->callApiV3Success('Job', 'send_reminder');
     $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
-    $this->assertEquals(1, $successfulCronCount);
+    $this->assertSame('1', $successfulCronCount);
     $sentToID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_action_log');
     $this->assertEquals($sentToID, $theChosenOneID);
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery('SELECT is_error FROM civicrm_action_log'));
+    $this->assertSame('0', CRM_Core_DAO::singleValueQuery('SELECT is_error FROM civicrm_action_log'));
     $this->setupForSmsTests(TRUE);
   }
 
@@ -293,10 +293,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'end_date' => 'yesterday',
     ]);
     $relationshipID = $result['id'];
-    $this->assertEquals('Hooked', $result['values'][$relationshipID]['description']);
+    $this->assertSame('Hooked', $result['values'][$relationshipID]['description']);
     $this->callApiV3Success('Job', 'disable_expired_relationships');
     $result = $this->callAPISuccess('Relationship', 'get');
-    $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
+    $this->assertSame('Go Go you good thing', $result['values'][$relationshipID]['description']);
     $this->contactDelete($individualID);
     $this->contactDelete($orgID);
   }
@@ -332,7 +332,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
     $this->callApiV3Success('Job', 'send_reminder');
     $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
-    $this->assertEquals(0, $successfulCronCount);
+    $this->assertSame('0', $successfulCronCount);
   }
 
   /**
@@ -365,7 +365,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
     $this->callApiV3Success('Job', 'send_reminder');
     $successfulCronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
-    $this->assertEquals(0, $successfulCronCount);
+    $this->assertSame('0', $successfulCronCount);
   }
 
   /**
@@ -397,12 +397,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->callAPISuccess('SmsProvider', 'delete', ['id' => $provider['id']]);
     $this->callApiV3Success('Job', 'send_reminder');
     $cronCount = CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_action_log');
-    $this->assertEquals(1, $cronCount);
+    $this->assertSame('1', $cronCount);
     $sentToID = CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_action_log');
     $this->assertEquals($sentToID, $theChosenOneID);
     $cronLog = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_action_log')->fetchAll()[0];
-    $this->assertEquals(1, $cronLog['is_error']);
-    $this->assertEquals('SMS reminder cannot be sent because the SMS provider has been deleted.', $cronLog['message']);
+    $this->assertSame('1', $cronLog['is_error']);
+    $this->assertSame('SMS reminder cannot be sent because the SMS provider has been deleted.', $cronLog['message']);
     $this->setupForSmsTests(TRUE);
   }
 
@@ -456,7 +456,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     $contact2ID = $this->individualCreate();
     $this->contributionCreate(['contact_id' => $contactID]);
-    $this->contributionCreate(['contact_id' => $contact2ID, 'invoice_id' => '2', 'trxn_id' => 2]);
+    $this->contributionCreate(['contact_id' => $contact2ID, 'invoice_id' => '2', 'trxn_id' => '2']);
     $this->contactMembershipCreate(['contact_id' => $contactID]);
     $this->contactMembershipCreate(['contact_id' => $contact2ID]);
     $this->activityCreate(['source_contact_id' => $contactID, 'target_contact_id' => $contactID, 'assignee_contact_id' => $contactID]);
@@ -589,7 +589,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertCount(0, $result['values']['skipped']);
     $this->assertCount(1, $result['values']['merged']);
     $groupResult = $this->callAPISuccess('GroupContact', 'get', []);
-    $this->assertEquals(5, $groupResult['count']);
+    $this->assertSame(5, $groupResult['count']);
     $expectedGroups = [
       $groups[0],
       $groups[1],
@@ -599,7 +599,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     ];
     foreach ($groupResult['values'] as $groupValues) {
       $this->assertEquals($contactID, $groupValues['contact_id']);
-      $this->assertEquals('Added', $groupValues['status']);
+      $this->assertSame('Added', $groupValues['status']);
       $this->assertContainsEquals($groupValues['group_id'], $expectedGroups);
 
     }
@@ -700,8 +700,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testBatchMergesAddressesHook(array $dataSet): void {
     $contactID1 = $this->individualCreate();
     $contactID2 = $this->individualCreate();
-    $this->contributionCreate(['contact_id' => $contactID1, 'receive_date' => '2010-01-01', 'invoice_id' => 1, 'trxn_id' => 1]);
-    $this->contributionCreate(['contact_id' => $contactID2, 'receive_date' => '2012-01-01', 'invoice_id' => 2, 'trxn_id' => 2]);
+    $this->contributionCreate(['contact_id' => $contactID1, 'receive_date' => '2010-01-01', 'invoice_id' => '1', 'trxn_id' => '1']);
+    $this->contributionCreate(['contact_id' => $contactID2, 'receive_date' => '2012-01-01', 'invoice_id' => '2', 'trxn_id' => '2']);
     foreach ($dataSet['contact_1'] as $address) {
       $this->callAPISuccess($dataSet['entity'], 'create', array_merge(['contact_id' => $contactID1], $address));
     }
@@ -1082,7 +1082,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertCount(1, $result['values']['merged']);
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
-    $this->assertEquals('blah', $mouse['custom_' . $customField['id']]);
+    $this->assertSame('blah', $mouse['custom_' . $customField['id']]);
   }
 
   /**
@@ -1181,7 +1181,7 @@ ENDSQLUPDATE;
 
     $mouse = $this->callAPISuccess('Contact', 'getsingle', ['id' => $mouseContactId, 'return' => ['custom_' . $customField['id'], 'custom_' . $customFieldDate['id']]]);
     // check the regular field got merged just while we're here
-    $this->assertEquals('blah', $mouse['custom_' . $customField['id']]);
+    $this->assertSame('blah', $mouse['custom_' . $customField['id']]);
     // now check the view-only field. It should be the one that was merged from the duplicate.
     // Note that the original contact will not have a value for the custom date field because there was no corresponding regular custom field value, so we don't have to worry about a timing issue where both date fields happen to have the same timestamp. We've already checked above that both the original is blank and the duplicate has a nonempty value.
     $this->assertEquals($viewOnlyFieldValue, $mouse['custom_' . $customFieldDate['id']]);
@@ -1205,14 +1205,14 @@ ENDSQLUPDATE;
     $this->assertCount(1, $result['values']['merged']);
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
-    $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
+    $this->assertSame('0', $mouse['custom_' . $customField['id']]);
 
     $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => NULL]));
     $result = $this->callApiV3Success('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertCount(1, $result['values']['merged']);
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
-    $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
+    $this->assertSame('0', $mouse['custom_' . $customField['id']]);
   }
 
   /**
@@ -2229,7 +2229,7 @@ ENDSQLUPDATE;
     CRM_Core_DAO::executeQuery('Update civicrm_membership SET is_override = 0 WHERE id = %1', [1 => [$resultCurrent['id'], 'Positive']]);
     $this->assertEquals(array_search('New', $memStatus, TRUE), $resultCurrent['values'][0]['status_id']);
     $jobResult = $this->callApiV3Success('Job', 'process_membership');
-    $this->assertEquals('Processed 1 membership records. Updated 1 records.', $jobResult['values']);
+    $this->assertSame('Processed 1 membership records. Updated 1 records.', $jobResult['values']);
     $this->assertEquals(array_search('Current', $memStatus, TRUE), $this->callAPISuccess('Membership', 'get', ['id' => $resultCurrent['id']])['values'][$resultCurrent['id']]['status_id']);
   }
 
@@ -2351,8 +2351,8 @@ ENDSQLUPDATE;
 
     $message = $mut->getMostRecentEmail('ezc');
 
-    $this->assertEquals('This is the email subject', $message->subject);
-    $this->assertEquals('reportperson@example.com', $message->to[0]->email);
+    $this->assertSame('This is the email subject', $message->subject);
+    $this->assertSame('reportperson@example.com', $message->to[0]->email);
 
     $parts = $message->fetchParts(NULL, TRUE);
     $this->assertCount(2, $parts);
@@ -2386,15 +2386,15 @@ ENDSQLUPDATE;
 
     $message = $mut->getMostRecentEmail('ezc');
 
-    $this->assertEquals('This is the email subject', $message->subject);
-    $this->assertEquals('reportperson@example.com', $message->to[0]->email);
+    $this->assertSame('This is the email subject', $message->subject);
+    $this->assertSame('reportperson@example.com', $message->to[0]->email);
 
     $parts = $message->fetchParts(NULL, TRUE);
     $this->assertCount(3, $parts);
     $this->assertStringContainsString('<title>CiviCRM Report</title>', $parts[1]->text);
-    $this->assertEquals(ezcMailFilePart::CONTENT_TYPE_APPLICATION, $parts[2]->contentType);
-    $this->assertEquals('pdf', $parts[2]->mimeType);
-    $this->assertEquals(ezcMailFilePart::DISPLAY_ATTACHMENT, $parts[2]->dispositionType);
+    $this->assertSame(ezcMailFilePart::CONTENT_TYPE_APPLICATION, $parts[2]->contentType);
+    $this->assertSame('pdf', $parts[2]->mimeType);
+    $this->assertSame(ezcMailFilePart::DISPLAY_ATTACHMENT, $parts[2]->dispositionType);
     $this->assertGreaterThan(0, filesize($parts[2]->fileName));
 
     $mut->clearMessages();
@@ -2431,13 +2431,13 @@ ENDSQLUPDATE;
 
     $message = $mut->getMostRecentEmail('ezc');
 
-    $this->assertEquals('This is the email subject', $message->subject);
-    $this->assertEquals('reportperson@example.com', $message->to[0]->email);
+    $this->assertSame('This is the email subject', $message->subject);
+    $this->assertSame('reportperson@example.com', $message->to[0]->email);
 
     $parts = $message->fetchParts(NULL, TRUE);
     $this->assertCount(3, $parts);
     $this->assertStringContainsString('<title>CiviCRM Report</title>', $parts[1]->text);
-    $this->assertEquals('csv', $parts[2]->subType);
+    $this->assertSame('csv', $parts[2]->subType);
 
     // Pull all the contacts to get our expected output.
     $contacts = $this->callAPISuccess('Contact', 'get', [
@@ -2493,10 +2493,10 @@ ENDSQLUPDATE;
 
     $message = $mut->getMostRecentEmail('ezc');
 
-    $this->assertEquals('This is the email subject', $message->subject);
+    $this->assertSame('This is the email subject', $message->subject);
     $this->assertCount(2, $message->to);
-    $this->assertEquals('person1@example.com', $message->to[0]->email);
-    $this->assertEquals('person2@example.com', $message->to[1]->email);
+    $this->assertSame('person1@example.com', $message->to[0]->email);
+    $this->assertSame('person2@example.com', $message->to[1]->email);
 
     $mut->clearMessages();
     $mut->stop();
@@ -2563,14 +2563,67 @@ ENDSQLUPDATE;
 
     $settings->set('core_maintenance_mode', TRUE);
     $result = $this->callApiV3Success('Job', 'execute');
-    $this->assertEquals($result['skipped'] ?? NULL, 'maintenance_mode');
+    $this->assertSame('maintenance_mode', $result['skipped'] ?? NULL);
 
     $settings->set('core_maintenance_mode', FALSE);
     $result = $this->callApiV3Success('Job', 'execute');
-    $this->assertEquals($result['skipped'] ?? FALSE, FALSE);
+    $this->assertFalse($result['skipped'] ?? FALSE);
 
     // revert
     $settings->set('core_maintenance_mode', $startMode);
+  }
+
+  /**
+   * While a job runs, last_run_end is empty, so a crash leaves no stale end date.
+   */
+  public function testLastRunEndIsClearedWhileJobRuns(): void {
+    \Civi\Api4\Job::update(FALSE)->addWhere('id', 'IS NOT NULL')->addValue('is_active', FALSE)->execute();
+    $jobID = $this->createTestEntity('Job', [
+      'name' => 'Previously completed',
+      'run_frequency' => 'Always',
+      'api_entity' => 'Domain',
+      'api_action' => 'get',
+      'is_active' => TRUE,
+      'last_run' => '2020-01-01 10:00:00',
+      'last_run_end' => '2020-01-01 10:05:00',
+    ])['id'];
+    $lastRunEndDuringRun = 'not captured';
+    $this->hookClass->setHook('civicrm_preJob', function ($job) use ($jobID, &$lastRunEndDuringRun) {
+      if ((int) $job->id === $jobID) {
+        $lastRunEndDuringRun = \Civi\Api4\Job::get(FALSE)->addWhere('id', '=', $jobID)->execute()->single()['last_run_end'];
+      }
+    });
+    $this->callApiV3Success('Job', 'execute');
+    $this->assertNull($lastRunEndDuringRun);
+    $this->assertNotNull(\Civi\Api4\Job::get(FALSE)->addWhere('id', '=', $jobID)->execute()->single()['last_run_end']);
+  }
+
+  /**
+   * A failing preJob or postJob hook does not stop the remaining jobs.
+   */
+  public function testExecuteContinuesAfterHookError(): void {
+    \Civi\Api4\Job::update(FALSE)->addWhere('id', 'IS NOT NULL')->addValue('is_active', FALSE)->execute();
+    foreach (['Fails after', 'Fails before'] as $name) {
+      $this->callAPISuccess('Job', 'create', [
+        'name' => $name,
+        'run_frequency' => 'Always',
+        'api_entity' => 'Domain',
+        'api_action' => 'get',
+        'is_active' => 1,
+      ]);
+    }
+    $this->hookClass->setHook('civicrm_preJob', function ($job) {
+      if ($job->name === 'Fails before') {
+        throw new TypeError('Ruh-roh');
+      }
+    });
+    $this->hookClass->setHook('civicrm_postJob', function ($job) {
+      if ($job->name === 'Fails after') {
+        throw new TypeError('Ruh-roh');
+      }
+    });
+    $this->callApiV3Success('Job', 'execute');
+    $this->assertDBQuery(2, "SELECT COUNT(*) FROM civicrm_job WHERE name IN ('Fails after', 'Fails before') AND last_run_end IS NOT NULL");
   }
 
 }

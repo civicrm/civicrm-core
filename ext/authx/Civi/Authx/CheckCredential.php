@@ -11,16 +11,16 @@
 
 namespace Civi\Authx;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This class is a small collection of common/default credential checkers.
  *
  * @service authx.credentials
  */
-class CheckCredential extends AutoService implements EventSubscriberInterface {
+class CheckCredential extends AutoService {
 
   /**
    * Listener priority for handling credential format of 'Basic' with
@@ -41,24 +41,11 @@ class CheckCredential extends AutoService implements EventSubscriberInterface {
   const PRIORITY_BEARER_JWT = -400;
 
   /**
-   * @inheritdoc
-   *
-   * Set up three subscribers to handle different credential formats ('Basic',
-   * 'Bearer') and different credential types ('pass', 'api_key', 'jwt')
-   */
-  public static function getSubscribedEvents(): array {
-    $events = [];
-    $events['civi.authx.checkCredential'][] = ['basicUser', self::PRIORITY_BASIC_USER];
-    $events['civi.authx.checkCredential'][] = ['bearerApiKey', self::PRIORITY_BEARER_API_KEY];
-    $events['civi.authx.checkCredential'][] = ['bearerJwt', self::PRIORITY_BEARER_JWT];
-    return $events;
-  }
-
-  /**
    * Interpret the HTTP "Basic" credential as `username:password` (CMS user).
    *
    * @param \Civi\Authx\CheckCredentialEvent $check
    */
+  #[CiviEventListener(event: 'civi.authx.checkCredential', priority: self::PRIORITY_BASIC_USER)]
   public function basicUser(CheckCredentialEvent $check): void {
     if ($check->credFormat === 'Basic') {
       [$user, $pass] = explode(':', base64_decode($check->credValue), 2);
@@ -74,6 +61,7 @@ class CheckCredential extends AutoService implements EventSubscriberInterface {
    *
    * @param \Civi\Authx\CheckCredentialEvent $check
    */
+  #[CiviEventListener(event: 'civi.authx.checkCredential', priority: self::PRIORITY_BEARER_API_KEY)]
   public function bearerApiKey(CheckCredentialEvent $check): void {
     if ($check->credFormat === 'Bearer') {
       $c = \CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_contact WHERE api_key = %1', [
@@ -90,6 +78,7 @@ class CheckCredential extends AutoService implements EventSubscriberInterface {
    *
    * @param \Civi\Authx\CheckCredentialEvent $check
    */
+  #[CiviEventListener(event: 'civi.authx.checkCredential', priority: self::PRIORITY_BEARER_JWT)]
   public function bearerJwt(CheckCredentialEvent $check): void {
     if ($check->credFormat === 'Bearer') {
       try {

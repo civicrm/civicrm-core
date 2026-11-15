@@ -184,7 +184,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     foreach ($this->diffs as $diff) {
       $table = $diff['table'];
       if (empty($metadata[$table])) {
-        list($metadata[$table]['titles'], $metadata[$table]['values']) = $this->differ->titlesAndValuesForTable($table, $diff['log_date']);
+        [$metadata[$table]['titles'], $metadata[$table]['values']] = $this->differ->titlesAndValuesForTable($table, $diff['log_date']);
       }
       $values = $metadata[$diff['table']]['values'] ?? [];
       $titles = $metadata[$diff['table']]['titles'];

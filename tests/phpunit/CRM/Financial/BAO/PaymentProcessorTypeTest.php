@@ -34,7 +34,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'name',
       'Database check on added payment processor type record.'
     );
-    $this->assertEquals($result, 'Test Payment Processor', 'Verify Payment Processor Type');
+    $this->assertSame('Test Payment Processor', $result, 'Verify Payment Processor Type');
   }
 
   /**
@@ -50,7 +50,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $defaults = [];
     CRM_Financial_BAO_PaymentProcessorType::create($params);
     $result = CRM_Financial_BAO_PaymentProcessorType::retrieve($params, $defaults);
-    $this->assertEquals($result->name, 'Test_Retrieve_Payment_Processor', 'Verify Payment Processor Type');
+    $this->assertSame('Test_Retrieve_Payment_Processor', $result->name, 'Verify Payment Processor Type');
   }
 
   /**
@@ -67,7 +67,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessorType::create($params);
     $result = CRM_Financial_BAO_PaymentProcessorType::setIsActive($paymentProcessor->id, 0);
-    $this->assertEquals($result, TRUE, 'Verify financial type record updation for is_active.');
+    $this->assertTrue($result, 'Verify financial type record updation for is_active.');
 
     $isActive = $this->assertDBNotNull(
       'CRM_Financial_DAO_PaymentProcessorType',
@@ -76,7 +76,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
       'id',
       'Database check on updated for payment processor type is_active.'
     );
-    $this->assertEquals($isActive, 0, 'Verify payment processor  types is_active.');
+    $this->assertSame('0', $isActive, 'Verify payment processor  types is_active.');
   }
 
   /**
@@ -109,7 +109,7 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
     $params = ['id' => $paymentProcessor->id];
     $result = CRM_Financial_BAO_PaymentProcessorType::retrieve($params, $defaults);
-    $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
+    $this->assertTrue(empty($result), 'Verify financial types record deletion.');
   }
 
 }

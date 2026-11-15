@@ -40,13 +40,13 @@ class api_v3_APITest extends CiviUnitTestCase {
       'villain' => '$value.api.tag.create.values.0.api_tag_get.display',
     ];
     _civicrm_api_replace_variables($params, $result);
-    $this->assertEquals(999, $params['number']);
-    $this->assertEquals(8, $params['tag_id']);
-    $this->assertEquals(6, $params['activity_type_id']);
-    $this->assertEquals(7, $params['tag1_id']);
-    $this->assertEquals('superman', $params['tag3_id']);
-    $this->assertEquals('batman', $params['display']);
-    $this->assertEquals('krypton', $params['big_rock']);
+    $this->assertSame(999, $params['number']);
+    $this->assertSame(8, $params['tag_id']);
+    $this->assertSame(6, $params['activity_type_id']);
+    $this->assertSame(7, $params['tag1_id']);
+    $this->assertSame('superman', $params['tag3_id']);
+    $this->assertSame('batman', $params['display']);
+    $this->assertSame('krypton', $params['big_rock']);
   }
 
   /**
@@ -77,11 +77,11 @@ class api_v3_APITest extends CiviUnitTestCase {
     set_include_path($oldPath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
 
     $result = $this->callAPISuccess('contact', 'example_action1', []);
-    $this->assertEquals($result['values'][0], 'civicrm_api3_generic_example_action1 is ok');
+    $this->assertSame('civicrm_api3_generic_example_action1 is ok', $result['values'][0]);
     $result = $this->callAPISuccess('contact', 'example_action2', []);
-    $this->assertEquals($result['values'][0], 'civicrm_api3_contact_example_action2 is ok');
+    $this->assertSame('civicrm_api3_contact_example_action2 is ok', $result['values'][0]);
     $result = $this->callAPISuccess('test_entity', 'example_action3', []);
-    $this->assertEquals($result['values'][0], 'civicrm_api3_test_entity_example_action3 is ok');
+    $this->assertSame('civicrm_api3_test_entity_example_action3 is ok', $result['values'][0]);
 
     set_include_path($oldPath);
   }
@@ -141,8 +141,8 @@ class api_v3_APITest extends CiviUnitTestCase {
       civicrm_api3('contact', 'create', ['debug' => 1]);
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertEquals('mandatory_missing', $e->getErrorCode());
-      $this->assertEquals('Mandatory key(s) missing from params array: contact_type', $e->getMessage());
+      $this->assertSame('mandatory_missing', $e->getErrorCode());
+      $this->assertSame('Mandatory key(s) missing from params array: contact_type', $e->getMessage());
       $extra = $e->getExtraParams();
       $this->assertArrayHasKey('trace', $extra);
       return;
@@ -178,11 +178,11 @@ class api_v3_APITest extends CiviUnitTestCase {
     ]);
 
     // Check return format.
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     foreach ($result['values'] as $resultValue) {
-      $this->assertEquals('New title', $resultValue['title']);
+      $this->assertSame('New title', $resultValue['title']);
       // BUG: $resultValue['location'] === 'null'.
-      $this->assertEquals('', $resultValue['currency']);
+      $this->assertSame('', $resultValue['currency']);
     }
   }
 

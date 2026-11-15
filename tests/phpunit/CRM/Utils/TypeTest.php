@@ -221,18 +221,18 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
 
       switch ($expectMatches) {
         case 'strictly':
-          $this->assertEquals(TRUE, $strictMatch, sprintf('(%s) Expect value %s to strictly match type %s', $exampleId, json_encode($value), json_encode($types)));
-          $this->assertEquals(TRUE, $relaxedMatch, sprintf('(%s) Expect value %s to laxly match type %s', $exampleId, json_encode($value), json_encode($types)));
+          $this->assertTrue($strictMatch, sprintf('(%s) Expect value %s to strictly match type %s', $exampleId, json_encode($value), json_encode($types)));
+          $this->assertTrue($relaxedMatch, sprintf('(%s) Expect value %s to laxly match type %s', $exampleId, json_encode($value), json_encode($types)));
           break;
 
         case 'lackadaisically':
-          $this->assertEquals(FALSE, $strictMatch, sprintf('(%s) Expect value %s to strictly NOT match type %s', $exampleId, json_encode($value), json_encode($types)));
-          $this->assertEquals(TRUE, $relaxedMatch, sprintf('(%s) Expect value %s to laxly match type %s', $exampleId, json_encode($value), json_encode($types)));
+          $this->assertFalse($strictMatch, sprintf('(%s) Expect value %s to strictly NOT match type %s', $exampleId, json_encode($value), json_encode($types)));
+          $this->assertTrue($relaxedMatch, sprintf('(%s) Expect value %s to laxly match type %s', $exampleId, json_encode($value), json_encode($types)));
           break;
 
         case 'never':
-          $this->assertEquals(FALSE, $strictMatch, sprintf('(%s) Expect value %s to strictly NOT match type %s', $exampleId, json_encode($value), json_encode($types)));
-          $this->assertEquals(FALSE, $relaxedMatch, sprintf('(%s) Expect value %s to laxly NOT match type %s', $exampleId, json_encode($value), json_encode($types)));
+          $this->assertFalse($strictMatch, sprintf('(%s) Expect value %s to strictly NOT match type %s', $exampleId, json_encode($value), json_encode($types)));
+          $this->assertFalse($relaxedMatch, sprintf('(%s) Expect value %s to laxly NOT match type %s', $exampleId, json_encode($value), json_encode($types)));
           break;
 
         default:

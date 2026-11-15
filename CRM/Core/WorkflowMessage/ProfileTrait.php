@@ -42,7 +42,7 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
           ->addOrderBy('weight')
           ->execute();
         $profiles = UFGroup::get(FALSE)
-          ->addWhere('id', 'IN', CRM_Utils_Array::collect('uf_group_id', $joins))
+          ->addWhere('id', 'IN', array_column($joins, 'uf_group_id'))
           ->execute()->indexBy('id');
         foreach ($joins as $join) {
           // The thing we want to order by is on the join not the profile
@@ -115,7 +115,7 @@ trait CRM_Core_WorkflowMessage_ProfileTrait {
           ->addOrderBy('weight')
           ->execute();
         $profiles = UFGroup::get(FALSE)
-          ->addWhere('id', 'IN', CRM_Utils_Array::collect('uf_group_id', $joins))
+          ->addWhere('id', 'IN', array_column($joins, 'uf_group_id'))
           ->execute()->indexBy('id');
         foreach ($joins as $join) {
           // The thing we want to order by is on the join not the profile

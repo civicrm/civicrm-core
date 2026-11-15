@@ -21,10 +21,10 @@ class CRM_Upgrade_SnapshotTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testTableNamesGood(): void {
-    $this->assertEquals('snap_civicrm_v5_45_stuff', CRM_Upgrade_Snapshot::createTableName('civicrm', '5.45', 'stuff'));
-    $this->assertEquals('snap_civicrm_v5_50_stuffy_things', CRM_Upgrade_Snapshot::createTableName('civicrm', '5.50', 'stuffy_things'));
-    $this->assertEquals('snap_oauth_client_v12_34_ext_things', CRM_Upgrade_Snapshot::createTableName('oauth_client', '12.34', 'ext_things'));
-    $this->assertEquals('snap_oauth_client_v0_1234_ext_things', CRM_Upgrade_Snapshot::createTableName('oauth_client', '0.1234', 'ext_things'));
+    $this->assertSame('snap_civicrm_v5_45_stuff', CRM_Upgrade_Snapshot::createTableName('civicrm', '5.45', 'stuff'));
+    $this->assertSame('snap_civicrm_v5_50_stuffy_things', CRM_Upgrade_Snapshot::createTableName('civicrm', '5.50', 'stuffy_things'));
+    $this->assertSame('snap_oauth_client_v12_34_ext_things', CRM_Upgrade_Snapshot::createTableName('oauth_client', '12.34', 'ext_things'));
+    $this->assertSame('snap_oauth_client_v0_1234_ext_things', CRM_Upgrade_Snapshot::createTableName('oauth_client', '0.1234', 'ext_things'));
   }
 
   public function testTableNamesBad(): void {

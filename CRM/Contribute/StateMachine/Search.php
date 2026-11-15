@@ -35,7 +35,7 @@ class CRM_Contribute_StateMachine_Search extends CRM_Core_StateMachine {
     $this->_pages = [];
 
     $this->_pages['CRM_Contribute_Form_Search'] = NULL;
-    list($task, $result) = $this->taskName($controller, 'Search');
+    [$task, $result] = $this->taskName($controller, 'Search');
     $this->_task = $task;
 
     if (is_array($task)) {

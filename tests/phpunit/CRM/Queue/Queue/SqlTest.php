@@ -87,12 +87,12 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
 
     $this->assertQueueStats(3, 3, 0, $this->queue);
     $item = $this->queue->claimItem();
-    $this->assertEquals('a', $item->data['test-key']);
+    $this->assertSame('a', $item->data['test-key']);
     $this->queue->deleteItem($item);
 
     $this->assertQueueStats(2, 2, 0, $this->queue);
     $item = $this->queue->claimItem();
-    $this->assertEquals('b', $item->data['test-key']);
+    $this->assertSame('b', $item->data['test-key']);
     $this->queue->deleteItem($item);
 
     $this->queue->createItem(
@@ -117,22 +117,22 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
 
     $this->assertQueueStats(4, 4, 0, $this->queue);
     $item = $this->queue->claimItem();
-    $this->assertEquals('start', $item->data['test-key']);
+    $this->assertSame('start', $item->data['test-key']);
     $this->queue->deleteItem($item);
 
     $this->assertQueueStats(3, 3, 0, $this->queue);
     $item = $this->queue->claimItem();
-    $this->assertEquals('c', $item->data['test-key']);
+    $this->assertSame('c', $item->data['test-key']);
     $this->queue->deleteItem($item);
 
     $this->assertQueueStats(2, 2, 0, $this->queue);
     $item = $this->queue->claimItem();
-    $this->assertEquals('d', $item->data['test-key']);
+    $this->assertSame('d', $item->data['test-key']);
     $this->queue->deleteItem($item);
 
     $this->assertQueueStats(1, 1, 0, $this->queue);
     $item = $this->queue->claimItem();
-    $this->assertEquals('end', $item->data['test-key']);
+    $this->assertSame('end', $item->data['test-key']);
     $this->queue->deleteItem($item);
 
     $this->assertQueueStats(0, 0, 0, $this->queue);

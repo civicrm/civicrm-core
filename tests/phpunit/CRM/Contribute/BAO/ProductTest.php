@@ -35,7 +35,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
       'Database check on updated product record.'
     );
 
-    $this->assertEquals($result, 'TP-10', 'Verify products sku.');
+    $this->assertSame('TP-10', $result, 'Verify products sku.');
   }
 
   /**
@@ -56,7 +56,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
     $params = ['id' => $product->id];
     $default = [];
     $result = CRM_Contribute_BAO_Product::retrieve($params, $default);
-    $this->assertEquals(empty($result), FALSE, 'Verify products record.');
+    $this->assertFalse(empty($result), 'Verify products record.');
   }
 
   /**
@@ -80,7 +80,7 @@ class CRM_Contribute_BAO_ProductTest extends CiviUnitTestCase {
     $defaults = [];
     $retrievedProduct = CRM_Contribute_BAO_Product::retrieve($params, $defaults);
 
-    $this->assertEquals(empty($retrievedProduct), TRUE, 'Verify product record deletion.');
+    $this->assertTrue(empty($retrievedProduct), 'Verify product record deletion.');
   }
 
 }

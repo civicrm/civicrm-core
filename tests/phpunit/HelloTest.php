@@ -59,7 +59,7 @@ class HelloTest extends PHPUnit\Framework\TestCase {
    */
   public function testHello(): void {
     $result = $this->abc;
-    $this->assertEquals('hello', $result);
+    $this->assertSame('hello', $result);
   }
 
 }

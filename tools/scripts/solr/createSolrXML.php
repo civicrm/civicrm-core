@@ -77,7 +77,6 @@ EOT;
   }
   $result .= "</add>\n";
 
-
   return $result;
 }
 
@@ -261,4 +260,3 @@ while ($dao->fetch()) {
 }
 
 run($contactIDs);
-

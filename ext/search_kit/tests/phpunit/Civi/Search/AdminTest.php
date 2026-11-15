@@ -219,13 +219,13 @@ class AdminTest extends Api4TestBase {
     $this->assertCount(1, $activityToCustomJoins);
     $activityToCustomJoin = reset($activityToCustomJoins);
     $this->assertEquals([['id', '=', 'Activity_Custom_MultiRecordActivity_entity_id.entity_id']], $activityToCustomJoin['conditions']);
-    $this->assertEquals('Multiple Things', $activityToCustomJoin['label']);
+    $this->assertSame('Multiple Things', $activityToCustomJoin['label']);
 
     $customToActivityJoins = \CRM_Utils_Array::filter($joins['Custom_MultiRecordActivity'], ['alias' => 'Custom_MultiRecordActivity_Activity_entity_id']);
     $this->assertCount(1, $customToActivityJoins);
     $customToActivityJoin = reset($customToActivityJoins);
     $this->assertEquals([['entity_id', '=', 'Custom_MultiRecordActivity_Activity_entity_id.id']], $customToActivityJoin['conditions']);
-    $this->assertEquals('Multiple Things Activity', $customToActivityJoin['label']);
+    $this->assertSame('Multiple Things Activity', $customToActivityJoin['label']);
   }
 
   public function testCustomFileFieldGetJoins(): void {
@@ -311,8 +311,8 @@ class AdminTest extends Api4TestBase {
       ['Contact_ACLEntityRole_entity_id.entity_table', '=', "'civicrm_contact'"],
     ], $joins['Contact']['conditions']);
 
-    $this->assertEquals('ACL Role Assignment Contact', $joins['ACLEntityRole']['label']);
-    $this->assertEquals('Contact ACL Role Assignments', $joins['Contact']['label']);
+    $this->assertSame('ACL Role Assignment Contact', $joins['ACLEntityRole']['label']);
+    $this->assertSame('Contact ACL Role Assignments', $joins['Contact']['label']);
 
     // LineItem.entity_id straight join should be suppressed to avoid duplicate with contribution_id
     $lineItem = $schema['LineItem'];

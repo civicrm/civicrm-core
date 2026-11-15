@@ -191,7 +191,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     $elements["custom_{$this->individualFieldID}"] = $entityValues["{$this->individualFieldID}"];
 
     // Check the Value in Database
-    $this->assertEquals($elements["custom_{$this->individualFieldID}"], 'Test String');
+    $this->assertSame('Test String', $elements["custom_{$this->individualFieldID}"]);
   }
 
   /**
@@ -230,7 +230,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
     $elements["custom_{$this->individualStudentFieldID}"] = $entityValues["{$this->individualStudentFieldID}"];
 
     // Check the Value in Database
-    $this->assertEquals($elements["custom_{$this->individualStudentFieldID}"], 'Test String');
+    $this->assertSame('Test String', $elements["custom_{$this->individualStudentFieldID}"]);
   }
 
   /**
@@ -274,7 +274,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
 
     $getContact = $this->callAPISuccess('contact', 'get', $params);
 
-    $this->assertEquals($getContact['values'][$this->individualContactID]["custom_" . $this->individualFieldID], 'Test String');
+    $this->assertSame('Test String', $getContact['values'][$this->individualContactID]["custom_" . $this->individualFieldID]);
   }
 
   /**
@@ -300,7 +300,7 @@ class api_v3_CustomValueContactTypeTest extends CiviUnitTestCase {
 
     $getContact = $this->callAPISuccess('contact', 'get', $params);
 
-    $this->assertEquals($getContact['values'][$this->individualStudentContactID]["custom_{$this->individualStudentFieldID}"], 'Test String');
+    $this->assertSame('Test String', $getContact['values'][$this->individualStudentContactID]["custom_{$this->individualStudentFieldID}"]);
   }
 
 }

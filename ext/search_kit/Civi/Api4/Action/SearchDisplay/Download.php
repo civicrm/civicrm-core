@@ -38,7 +38,7 @@ class Download extends AbstractRunAction {
       $apiParams['limit'] = $settings['limit'];
     }
     $apiParams['orderBy'] = $this->getOrderByFromSort();
-    $this->augmentSelectClause($apiParams);
+    $this->augmentSelectClause();
 
     $this->applyFilters();
 

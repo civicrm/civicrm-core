@@ -75,6 +75,9 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    *
    * @param array $config
    *   An array of configuration params.
+   *   - prefetch: bool, whether to read the whole cache group on construction.
+   *     Default FALSE. Enable it only when the caller expects to read most of
+   *     the keys in the group, e.g. the extension system.
    *
    * @return \CRM_Utils_Cache_FileCache
    */
@@ -86,7 +89,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
       $this->_prefix = $this->cleanPrefix($config['prefix']);
     }
     $this->valueCache = [];
-    if ($config['prefetch'] ?? TRUE) {
+    if ($config['prefetch'] ?? FALSE) {
       $this->prefetch();
     }
   }

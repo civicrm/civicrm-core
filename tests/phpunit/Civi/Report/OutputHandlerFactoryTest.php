@@ -15,15 +15,15 @@ class OutputHandlerFactoryTest extends \CiviUnitTestCase {
     $form = new \CRM_Report_Form_SampleForm();
     $form->setOutputModeForTesting('csv');
     $outputHandler = OutputHandlerFactory::singleton()->create($form);
-    $this->assertEquals('CRM_Report_OutputHandler_Csv', get_class($outputHandler));
+    $this->assertSame('CRM_Report_OutputHandler_Csv', get_class($outputHandler));
 
     $form->setOutputModeForTesting('pdf');
     $outputHandler = OutputHandlerFactory::singleton()->create($form);
-    $this->assertEquals('CRM_Report_OutputHandler_Pdf', get_class($outputHandler));
+    $this->assertSame('CRM_Report_OutputHandler_Pdf', get_class($outputHandler));
 
     $form->setOutputModeForTesting('print');
     $outputHandler = OutputHandlerFactory::singleton()->create($form);
-    $this->assertEquals('CRM_Report_OutputHandler_Print', get_class($outputHandler));
+    $this->assertSame('CRM_Report_OutputHandler_Print', get_class($outputHandler));
   }
 
   /**
@@ -44,7 +44,7 @@ class OutputHandlerFactoryTest extends \CiviUnitTestCase {
     $form = new \CRM_Report_Form_SampleForm();
     $form->setOutputModeForTesting('sample');
     $outputHandler = OutputHandlerFactory::singleton()->create($form);
-    $this->assertEquals('Civi\Report\SampleOutputHandler', get_class($outputHandler));
+    $this->assertSame('Civi\Report\SampleOutputHandler', get_class($outputHandler));
   }
 
   /**

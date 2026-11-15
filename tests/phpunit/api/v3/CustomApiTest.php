@@ -43,9 +43,9 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
     ]);
     $this->callAPISuccess('Mailing', 'create', ['name' => 'CiviMail', 'hash' => 'abx']);
     $result = $this->callAPISuccess('MailingProviderData', 'get', ['return' => ['mailing_identifier.name', 'contact_identifier', 'mailing_identifier']]);
-    $this->assertEquals(1, $result['count']);
-    $this->assertEquals('xyzabx2017-01-01 00:00:00', $result['id']);
-    $this->assertEquals('xyzabx2017-01-01 00:00:00', $result['id']);
+    $this->assertSame(1, $result['count']);
+    $this->assertSame('xyzabx2017-01-01 00:00:00', $result['id']);
+    $this->assertSame('xyzabx2017-01-01 00:00:00', $result['id']);
     $this->assertEquals([
       'contact_identifier' => 'xyz',
       'mailing_identifier' => 'abx',

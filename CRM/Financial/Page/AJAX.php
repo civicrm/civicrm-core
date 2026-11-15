@@ -77,14 +77,13 @@ class CRM_Financial_Page_AJAX {
       }
     }
     else {
-      $action = ($op === 'delete') ? 'delete' : 'edit';
       foreach ($records as $recordID) {
         $batch = Batch::get(FALSE)
           ->addWhere('id', '=', $recordID)
           ->addSelect('created_id')
           ->execute()
           ->first();
-        if (!$batch || !CRM_Batch_BAO_Batch::checkBatchPermission($action, $batch['created_id'])) {
+        if (!$batch || !CRM_Batch_BAO_Batch::checkBatchPermission($op, $batch['created_id'])) {
           CRM_Utils_System::permissionDenied();
         }
       }

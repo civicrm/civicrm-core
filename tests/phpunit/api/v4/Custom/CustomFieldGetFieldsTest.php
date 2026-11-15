@@ -217,7 +217,7 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $field = $fields["$customGroupName.str"];
     $this->assertSame('Text', $field['input_type']);
     $this->assertSame('String', $field['data_type']);
-    $this->assertEquals('Hello', $field['default_value']);
+    $this->assertSame('Hello', $field['default_value']);
     $this->assertSame(123, $field['input_attrs']['maxlength']);
     $this->assertArrayNotHasKey('step', $field['input_attrs']);
     $this->assertArrayNotHasKey('rows', $field['input_attrs']);
@@ -245,8 +245,8 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $field = $fields["$customGroupName.autocomplete"];
     $this->assertSame('EntityRef', $field['input_type']);
     $this->assertSame('String', $field['data_type']);
-    $this->assertEquals('OptionValue', $field['fk_entity']);
-    $this->assertEquals('value', $field['fk_column']);
+    $this->assertSame('OptionValue', $field['fk_entity']);
+    $this->assertSame('value', $field['fk_column']);
     $this->assertNull($field['default_value']);
     $this->assertArrayNotHasKey('step', $field['input_attrs']);
     $this->assertArrayNotHasKey('rows', $field['input_attrs']);
@@ -298,8 +298,8 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $field = $fields["$customGroupName.file"];
     $this->assertSame('File', $field['input_type']);
     $this->assertSame('Integer', $field['data_type']);
-    $this->assertEquals('File', $field['fk_entity']);
-    $this->assertEquals('id', $field['fk_column']);
+    $this->assertSame('File', $field['fk_entity']);
+    $this->assertSame('id', $field['fk_column']);
     $this->assertNull($field['default_value']);
     $this->assertArrayNotHasKey('step', $field['input_attrs']);
     $this->assertArrayNotHasKey('rows', $field['input_attrs']);
@@ -312,8 +312,8 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $field = $fields["$customGroupName.entityref"];
     $this->assertSame('EntityRef', $field['input_type']);
     $this->assertSame('Integer', $field['data_type']);
-    $this->assertEquals('Activity', $field['fk_entity']);
-    $this->assertEquals('id', $field['fk_column']);
+    $this->assertSame('Activity', $field['fk_entity']);
+    $this->assertSame('id', $field['fk_column']);
     $this->assertNull($field['default_value']);
     $this->assertArrayNotHasKey('step', $field['input_attrs']);
     $this->assertArrayNotHasKey('rows', $field['input_attrs']);
@@ -326,8 +326,8 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $field = $fields["$customGroupName.contactref"];
     $this->assertSame('EntityRef', $field['input_type']);
     $this->assertSame('Integer', $field['data_type']);
-    $this->assertEquals('Contact', $field['fk_entity']);
-    $this->assertEquals('id', $field['fk_column']);
+    $this->assertSame('Contact', $field['fk_entity']);
+    $this->assertSame('id', $field['fk_column']);
     $this->assertNull($field['default_value']);
     $this->assertArrayNotHasKey('step', $field['input_attrs']);
     $this->assertArrayNotHasKey('rows', $field['input_attrs']);
@@ -341,8 +341,8 @@ class CustomFieldGetFieldsTest extends Api4TestBase {
     $field = $fields["$customGroupName.currency_field"];
     $this->assertSame('Select', $field['input_type']);
     $this->assertSame('String', $field['data_type']);
-    $this->assertEquals('Currency', $field['fk_entity']);
-    $this->assertEquals('name', $field['fk_column']);
+    $this->assertSame('Currency', $field['fk_entity']);
+    $this->assertSame('name', $field['fk_column']);
     $this->assertTrue($field['options']);
     $this->assertNull($field['operators']);
     $this->assertNull($field['serialize']);

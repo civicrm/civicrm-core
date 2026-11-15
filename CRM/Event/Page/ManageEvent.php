@@ -314,7 +314,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
     $this->pager($whereClause, $params);
 
-    list($offset, $rowCount) = $this->_pager->getOffsetAndRowCount();
+    [$offset, $rowCount] = $this->_pager->getOffsetAndRowCount();
 
     // get all custom groups sorted by weight
     $manageEvent = [];
@@ -408,10 +408,6 @@ ORDER BY start_date desc
         ];
 
         $defaults['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
-
-        if (function_exists('tellafriend_civicrm_config')) {
-          $manageEvent[$dao->id]['friend'] = CRM_Friend_BAO_Friend::getValues($params);
-        }
 
         if (isset($defaults['location']['address'][1]['city'])) {
           $manageEvent[$dao->id]['city'] = $defaults['location']['address'][1]['city'];

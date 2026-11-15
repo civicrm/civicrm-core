@@ -124,7 +124,7 @@ class CRM_Core_Page_HookTest extends CiviUnitTestCase {
       foreach ($hookUsage as $class => $count) {
         $ran = TRUE;
         // The hook should have run once and only once.
-        $this->assertEquals(1, $count, "Checking $pageName: $hook invoked multiple times with $class");
+        $this->assertSame(1, $count, "Checking $pageName: $hook invoked multiple times with $class");
       }
       $this->assertTrue($ran, "$hook never invoked for $pageName");
     }

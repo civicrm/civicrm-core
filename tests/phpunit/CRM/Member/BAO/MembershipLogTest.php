@@ -116,7 +116,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testDel(): void {
-    list($contactID, $membershipID) = $this->setupMembership();
+    [$contactID, $membershipID] = $this->setupMembership();
     // The log is written as a side effect of creating the membership.
     $membershipLogID = MembershipLog::get(FALSE)
       ->addWhere('membership_id', '=', $membershipID)
@@ -136,7 +136,7 @@ class CRM_Member_BAO_MembershipLogTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testResetModifiedID(): void {
-    list($contactID, $membershipID) = $this->setupMembership();
+    [$contactID, $membershipID] = $this->setupMembership();
     CRM_Member_BAO_MembershipLog::resetModifiedID($contactID);
     $this->assertDBNull('CRM_Member_BAO_MembershipLog', $contactID, 'modified_id',
       'modified_id', 'Database check for NULL modified id.'

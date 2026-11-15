@@ -60,10 +60,10 @@ class CiviAfformAdminAfformAdminMetaTest extends \PHPUnit\Framework\TestCase imp
   public function testDynamicForeignKeyMetadata():void {
     $fields = \Civi\AfformAdmin\AfformAdminMeta::getFields('Note');
 
-    $this->assertEquals('entity_table', $fields['entity_id']['input_attrs']['control_field']);
-    $this->assertEquals('Contact', $fields['entity_id']['dfk_entities']['civicrm_contact']);
+    $this->assertSame('entity_table', $fields['entity_id']['input_attrs']['control_field']);
+    $this->assertSame('Contact', $fields['entity_id']['dfk_entities']['civicrm_contact']);
     // A plain foreign key has no map to resolve
-    $this->assertEquals('Contact', $fields['contact_id']['fk_entity']);
+    $this->assertSame('Contact', $fields['contact_id']['fk_entity']);
     $this->assertArrayNotHasKey('dfk_entities', array_filter($fields['contact_id']));
   }
 

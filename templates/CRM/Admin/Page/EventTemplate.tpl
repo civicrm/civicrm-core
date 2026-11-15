@@ -7,10 +7,6 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
 *}
-{if $action eq 1 or $action eq 2 or $action eq 8}
-   {include file="CRM/Admin/Form/EventTemplate.tpl"}
-{/if}
-
 <div class="crm-content-block">
 {if $action ne 1 and $action ne 2}
       <div class="action-link">

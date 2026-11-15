@@ -38,9 +38,10 @@ class CRM_Contact_BAO_Contact_Permission {
    *
    * @return bool
    *
-   * @deprecated
+   * @deprecated in 5.45 will be removed around 6.28.
    */
   public static function getUseTemporaryTable() {
+    CRM_Core_Error::deprecatedFunctionWarning();
     return self::$useTempTable;
   }
 
@@ -126,7 +127,7 @@ WHERE contact_id IN ({$contact_id_list})
 
     // if some have been rejected, double check for permissions inherited by relationship
     if (count($result_set) < count($contact_ids)) {
-      $rejected_contacts = array_diff_key($contact_ids, $result_set);
+      $rejected_contacts = array_keys(array_diff_key(array_flip($contact_ids), $result_set));
       // @todo consider storing these to the acl cache for next time, since we have fetched.
       $allowed_by_relationship = self::relationshipList($rejected_contacts, $type);
       foreach ($allowed_by_relationship as $contact_id) {
@@ -160,16 +161,17 @@ WHERE contact_id IN ({$contact_id_list})
       return TRUE;
     }
 
-    // FIXME: push this somewhere below, to not give this permission so many rights
-    $isDeleted = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'is_deleted');
-    if (CRM_Core_Permission::check('access deleted contacts', $userID) && $isDeleted) {
-      return TRUE;
-    }
-
     // short circuit for admin rights here so we avoid unneeeded queries
     // some duplication of code, but we skip 3-5 queries
     if (CRM_Core_Permission::check('edit all contacts', $userID) ||
       ($type == CRM_Core_Permission::VIEW && CRM_Core_Permission::check('view all contacts', $userID))
+    ) {
+      return TRUE;
+    }
+
+    // FIXME: push this somewhere below, to not give this permission so many rights
+    if (CRM_Core_Permission::check('access deleted contacts', $userID) &&
+      CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'is_deleted')
     ) {
       return TRUE;
     }
@@ -422,6 +424,9 @@ AND domain_id = %2
       $is_perm_condition = ' = ' . CRM_Contact_BAO_Relationship::EDIT;
     }
 
+    // A relationship grants permission only between its start and end date
+    $isCurrent = fn(string $alias) => "($alias.start_date IS NULL OR $alias.start_date <= CURDATE()) AND ($alias.end_date IS NULL OR $alias.end_date >= CURDATE())";
+
     // NORMAL/SINGLE DEGREE RELATIONSHIPS
     foreach ($directions as $direction) {
       $user_id_column    = "contact_id_{$direction['from']}";
@@ -441,6 +446,7 @@ SELECT civicrm_relationship.{$contact_id_column} AS contact_id
  WHERE civicrm_relationship.{$user_id_column} = {$userID}
    AND civicrm_relationship.{$contact_id_column} IN ({$contact_id_list})
    AND civicrm_relationship.is_active = 1
+   AND {$isCurrent('civicrm_relationship')}
    AND civicrm_relationship.is_permission_{$direction['from']}_{$direction['to']} {$is_perm_condition}
    $AND_CAN_ACCESS_DELETED";
     }
@@ -467,8 +473,10 @@ SELECT second_degree_relationship.contact_id_{$second_direction['to']} AS contac
  WHERE first_degree_relationship.contact_id_{$first_direction['from']} = {$userID}
    AND second_degree_relationship.contact_id_{$second_direction['to']} IN ({$contact_id_list})
    AND first_degree_relationship.is_active = 1
+   AND {$isCurrent('first_degree_relationship')}
    AND first_degree_relationship.is_permission_{$first_direction['from']}_{$first_direction['to']} {$is_perm_condition}
    AND second_degree_relationship.is_active = 1
+   AND {$isCurrent('second_degree_relationship')}
    AND second_degree_relationship.is_permission_{$second_direction['from']}_{$second_direction['to']} {$is_perm_condition}
    $AND_CAN_ACCESS_DELETED";
         }

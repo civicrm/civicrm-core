@@ -50,8 +50,8 @@ class RecentItemTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('entity_id', '=', $cid)
       ->execute()->single();
 
-    $this->assertEquals('Hello', $item['title']);
-    $this->assertEquals('fa-user', $item['icon']);
+    $this->assertSame('Hello', $item['title']);
+    $this->assertSame('fa-user', $item['icon']);
     $this->assertEquals(\CRM_Utils_System::url('civicrm/contact/view?reset=1&cid=' . $cid), $item['view_url']);
 
     RecentItem::delete(FALSE)
@@ -80,7 +80,7 @@ class RecentItemTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('entity_type', '=', 'Contact')
       ->addWhere('entity_id', '=', $cid)
       ->execute()->single();
-    $this->assertEquals('Hello', $item['title']);
+    $this->assertSame('Hello', $item['title']);
     $this->assertTrue($item['is_deleted']);
 
     // Delete contact

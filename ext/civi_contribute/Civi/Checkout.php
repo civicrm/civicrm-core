@@ -1,17 +1,17 @@
 <?php
 namespace Civi;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
 use CRM_Core_Session;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use CRM_Contribute_ExtensionUtil as E;
 
 /**
  * @service civi.checkout
  */
-class Checkout extends AutoService implements EventSubscriberInterface {
+class Checkout extends AutoService {
 
   /**
    * @var \Civi\Checkout\CheckoutOptionInterface[]
@@ -19,20 +19,6 @@ class Checkout extends AutoService implements EventSubscriberInterface {
    * Local cache of options
    */
   protected ?array $options = NULL;
-
-  public static function getSubscribedEvents(): array {
-    return [
-      // listen to our own event to add the default pay later option
-      // we add this early so an extension can replace with something
-      // more bespoke if desired
-      'civi.checkout.options' => ['addPayLaterOption', 100],
-      // open access to Contribution.continueCheckout
-      // (authorization uses JWT)
-      'civi.api.authorize' => [
-        ['authorizeContinueCheckout', 100],
-      ],
-    ];
-  }
 
   protected function isEnabled(): bool {
     return !!\Civi::settings()->get('contribute_enable_afform_contributions');
@@ -75,6 +61,7 @@ class Checkout extends AutoService implements EventSubscriberInterface {
     return !!\CRM_Utils_Request::retrieve('testMode', 'Boolean', $session);
   }
 
+  #[CiviEventListener(event: 'civi.checkout.options', priority: 100)]
   public function addPayLaterOption(GenericHookEvent $e) {
     $e->options['pay_later'] = new Checkout\PayLater();
   }
@@ -83,6 +70,7 @@ class Checkout extends AutoService implements EventSubscriberInterface {
    * Contribution.continueCheckout is open to anyone with make online contributions
    * - authentication of the specific checkout is done using JWT param
    */
+  #[CiviEventListener(event: 'civi.api.authorize', priority: 100)]
   public function authorizeContinueCheckout(\Civi\API\Event\AuthorizeEvent $event) {
     if (!$this->isEnabled()) {
       // do nothing

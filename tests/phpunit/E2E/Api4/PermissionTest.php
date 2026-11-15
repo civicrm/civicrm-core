@@ -46,7 +46,7 @@ class PermissionTest extends \CiviEndToEndTestCase {
       $this->assertTrue(is_bool($perm['is_synthetic']), "Permission \"$permName\" should have boolean \"is_synthetic\" ($ser)");
     }
 
-    $groups = array_unique(\CRM_Utils_Array::collect('group', $perms->getArrayCopy()));
+    $groups = array_unique(array_column($perms->getArrayCopy(), 'group'));
     $this->assertTrue(in_array('civicrm', $groups), 'There should be at least one permission in the "civicrm" group.');
     $this->assertTrue(in_array('const', $groups), 'There should be at least one permission in the "const" group.');
 

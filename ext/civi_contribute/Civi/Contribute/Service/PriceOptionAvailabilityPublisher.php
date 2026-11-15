@@ -2,10 +2,10 @@
 
 namespace Civi\Contribute\Service;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Afform\Event\AfformPrefillEvent;
 use Civi\Contribute\Utils\PriceFieldUtils;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Publishes `has_all_price_options` onto each price-bearing entity in the
@@ -25,16 +25,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @service civi.contribute.price_option_availability_publisher
  */
-class PriceOptionAvailabilityPublisher extends AutoService implements EventSubscriberInterface {
+class PriceOptionAvailabilityPublisher extends AutoService {
 
   private const FLAG = PriceFieldUtils::RESTRICTED_OPTIONS_FLAG;
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.afform.prefill' => ['onAfformPrefill', -10],
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.afform.prefill', priority: -10)]
   public function onAfformPrefill(AfformPrefillEvent $event): void {
     // Nothing to reveal if there are no admin-visibility options anywhere.
     if (!PriceFieldUtils::getRestrictedPriceFieldValueIds()) {

@@ -2,23 +2,18 @@
 
 namespace Civi\Oembed;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Emit tags so that downstream users know that pages are embeddable.
  *
  * @service oembed.discovery
  */
-class OembedDiscovery extends AutoService implements EventSubscriberInterface {
+class OembedDiscovery extends AutoService {
 
-  public static function getSubscribedEvents(): array {
-    return [
-      '&civi.invoke.auth' => ['onInvoke', 100],
-    ];
-  }
-
+  #[CiviEventListener(event: '&civi.invoke.auth', priority: 100)]
   public function onInvoke(array $path) {
     if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
       return;

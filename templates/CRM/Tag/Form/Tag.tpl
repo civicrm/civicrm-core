@@ -86,7 +86,7 @@
     <thead>
       <tr>
         <th>{ts}Tag Tree{/ts}</th>
-        {if $tagsetInfo.contact}<th>{ts}Tag Sets{/ts}</th>{/if}
+        {if !empty($tagsetInfo.contact)}<th>{ts}Tag Sets{/ts}</th>{/if}
       </tr>
     </thead>
     <tbody>
@@ -98,7 +98,7 @@
             {include file="CRM/Tag/Form/Tagtree.tpl" level=1}
           </div>
         </td>
-        {if $tagsetInfo.contact}
+        {if !empty($tagsetInfo.contact)}
         <td>
           {include file="CRM/common/Tagset.tpl"}
         </td>

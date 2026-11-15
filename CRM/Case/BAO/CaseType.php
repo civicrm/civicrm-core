@@ -1,12 +1,14 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
+
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -18,7 +20,7 @@
 /**
  * This class contains the functions for Case Type management.
  */
-class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\HookInterface {
+class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
   /**
    * Static field for all the case information that we can potentially export.
@@ -448,6 +450,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     // Before deleting a caseType, check references
     if ($event->action === 'delete') {
@@ -465,6 +468,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType implements \Civi\Core\
    * Callback for hook_civicrm_post().
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     // When a caseType is saved or deleted, flush xml and optionGroup cache
     CRM_Case_XMLRepository::singleton()->flush();

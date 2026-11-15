@@ -149,31 +149,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $this->_submitValues = array_merge($this->_submitValues, $defaults);
     $this->setDefaults($defaults);
 
-    $data = [];
     $extensionHtml = [];
-
-    if (function_exists('tellafriend_civicrm_config')) {
-      // @todo - move this to tellafriend extension
-      $params['entity_id'] = $this->getEventID();
-      $params['entity_table'] = 'civicrm_event';
-      CRM_Friend_BAO_Friend::retrieve($params, $data);
-      if (!empty($data['is_active'])) {
-        $friendText = $data['title'];
-        if ($this->isTest()) {
-          $friendURL = CRM_Utils_System::url('civicrm/friend',
-            "eid={$this->getEventID()}&reset=1&action=preview&pcomponent=event"
-          );
-        }
-        else {
-          $friendURL = CRM_Utils_System::url('civicrm/friend',
-            "eid={$this->getEventID()}&reset=1&pcomponent=event"
-          );
-        }
-        $extensionHtml[] = '<div id="tell-a-friend" class="crm-section tell_friend_link-section">
-            <a href="' . htmlentities($friendURL) . '" title="' . htmlentities($friendText) . '" class="button"><span><i class="crm-i fa-chevron-right" role="img" aria-hidden="true"></i> ' . CRM_Utils_String::purifyHTML($friendText) . '</span></a>
-       </div><br /><br />';
-      }
-    }
 
     $this->assign('extensionHtml', $extensionHtml);
     $this->assign('iCal', CRM_Event_BAO_Event::getICalLinks($this->_eventId));

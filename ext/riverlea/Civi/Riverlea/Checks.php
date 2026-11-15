@@ -2,25 +2,20 @@
 
 namespace Civi\Riverlea;
 
+use Civi\Core\Attribute\CiviEventListener;
 use CRM_Riverlea_ExtensionUtil as E;
 use Civi\Core\Service\AutoService;
 use Psr\Log\LogLevel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @service riverlea.checks
  */
-class Checks extends AutoService implements EventSubscriberInterface {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      '&hook_civicrm_check' => ['checkRiverleaDrupalTheme', 0],
-    ];
-  }
+class Checks extends AutoService {
 
   /**
    * @see \CRM_Utils_Hook::check()
    */
+  #[CiviEventListener(event: '&hook_civicrm_check')]
   public function checkRiverleaDrupalTheme(&$messages, $statusNames = [], $includeDisabled = FALSE) {
     if ($statusNames && !in_array(__FUNCTION__, $statusNames)) {
       return;

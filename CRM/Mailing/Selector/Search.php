@@ -172,7 +172,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
    */
   public static function &links() {
     if (!(self::$_links)) {
-      list($context, $key) = func_get_args();
+      [$context, $key] = func_get_args();
       $extraParams = ($key) ? "&key={$key}" : NULL;
       $searchContext = ($context) ? "&context=$context" : NULL;
 
@@ -182,18 +182,21 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
           'url' => 'civicrm/contact/view',
           'qs' => "reset=1&cid=%%cid%%{$searchContext}{$extraParams}",
           'title' => ts('View Contact Details'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
         CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/add',
           'qs' => "reset=1&action=update&cid=%%cid%%{$searchContext}{$extraParams}",
           'title' => ts('Edit Contact Details'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/delete',
           'qs' => "reset=1&delete=1&cid=%%cid%%{$searchContext}{$extraParams}",
           'title' => ts('Delete Contact'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DELETE),
         ],
       ];
     }

@@ -90,7 +90,6 @@ function &generateSolrJSON($values) {
 
   $result .= "\n]\n";
 
-
   return $result;
 }
 
@@ -384,4 +383,3 @@ while ($dao->fetch()) {
 }
 
 run($contactIDs);
-

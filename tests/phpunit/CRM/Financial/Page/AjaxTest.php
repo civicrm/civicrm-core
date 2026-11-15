@@ -40,7 +40,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
    */
   public function testGetFinancialTransactionsList(): void {
     $individualID = $this->individualCreate();
-    $contributionID = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => 12345]);
+    $contributionID = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => '12345']);
     $financialTrxnIDs = \Civi\Api4\FinancialTrxn::get(FALSE)->addOrderBy('id')->execute()->column('id');
     $batch = $this->callAPISuccess('Batch', 'create', ['title' => 'test', 'status_id' => 'Open']);
     $this->createTestEntity('EntityBatch', [
@@ -64,7 +64,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
    */
   public function testGetFinancialTransactionsListOpenBatch(): void {
     $individualID = $this->individualCreate();
-    $contributionID = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => 12345]);
+    $contributionID = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => '12345']);
     $financialTrxnIDs = \Civi\Api4\FinancialTrxn::get(FALSE)->addOrderBy('id')->execute()->column('id');
     $batch = $this->callAPISuccess('Batch', 'create', ['title' => 'test', 'status_id' => 'Open']);
     $this->createTestEntity('EntityBatch', [
@@ -156,7 +156,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
     ]);
 
     $individualID = $this->individualCreate();
-    $contributionId = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => 998877]);
+    $contributionId = $this->contributionCreate(['contact_id' => $individualID, 'trxn_id' => '998877']);
     $financialTrxnId = CRM_Core_DAO::singleValueQuery(
       "SELECT financial_trxn_id FROM civicrm_entity_financial_trxn WHERE entity_table = 'civicrm_contribution' AND entity_id = %1",
       [1 => [$contributionId, 'Positive']]
@@ -180,7 +180,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT count(*) FROM civicrm_entity_batch WHERE entity_table = 'civicrm_financial_trxn' AND entity_id = %1 AND batch_id = %2",
       [1 => [$financialTrxnId, 'Positive'], 2 => [$batch['id'], 'Positive']]
     );
-    $this->assertEquals(1, $assigned);
+    $this->assertSame('1', $assigned);
 
     // 2. Remove transaction from batch
     $_POST = $_REQUEST = [
@@ -200,7 +200,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
       "SELECT count(*) FROM civicrm_entity_batch WHERE entity_table = 'civicrm_financial_trxn' AND entity_id = %1 AND batch_id = %2",
       [1 => [$financialTrxnId, 'Positive'], 2 => [$batch['id'], 'Positive']]
     );
-    $this->assertEquals(0, $assignedAfter);
+    $this->assertSame('0', $assignedAfter);
   }
 
   /**
@@ -316,9 +316,9 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
       CRM_Financial_Page_AJAX::getBatchSummary();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('Data Entry', $e->errorData['status']);
-      $this->assertEquals('Cash', $e->errorData['payment_instrument']);
-      $this->assertEquals(5, $e->errorData['item_count']);
+      $this->assertSame('Data Entry', $e->errorData['status']);
+      $this->assertSame('Cash', $e->errorData['payment_instrument']);
+      $this->assertSame(5, $e->errorData['item_count']);
     }
   }
 
@@ -363,7 +363,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
    */
   public function testAssignRemoveSuccess(): void {
     $loggedInUserId = $this->createLoggedInUser();
-    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'edit own manual batches']);
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'close own manual batches']);
 
     $batch = $this->createTestEntity('Batch', [
       'title' => 'My Batch To Close',
@@ -380,7 +380,7 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
       CRM_Financial_Page_AJAX::assignRemove();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('record-updated-success', $e->errorData['status']);
+      $this->assertSame('record-updated-success', $e->errorData['status']);
     }
 
     $updatedBatch = \Civi\Api4\Batch::get(FALSE)
@@ -388,7 +388,29 @@ class CRM_Financial_Page_AjaxTest extends CiviUnitTestCase {
       ->addSelect('status_id:name')
       ->execute()
       ->first();
-    $this->assertEquals('Closed', $updatedBatch['status_id:name']);
+    $this->assertSame('Closed', $updatedBatch['status_id:name']);
+  }
+
+  /**
+   * Closing a batch needs the close permission, not the edit permission.
+   */
+  public function testAssignRemoveCloseNeedsClosePermission(): void {
+    $loggedInUserId = $this->createLoggedInUser();
+    $this->setPermissions(['access CiviCRM', 'access CiviContribute', 'edit own manual batches']);
+    $batch = $this->createTestEntity('Batch', [
+      'title' => 'My Batch',
+      'created_id' => $loggedInUserId,
+      'status_id:name' => 'Data Entry',
+    ]);
+
+    $_POST['op'] = 'close';
+    $_POST['recordBAO'] = 'CRM_Batch_BAO_Batch';
+    $_POST['records'] = [$batch['id']];
+    $_REQUEST['qfKey'] = $_POST['qfKey'] = CRM_Core_Key::get('CRM_Financial_Page_AJAX');
+
+    $this->expectException(CRM_Core_Exception::class);
+    $this->expectExceptionMessage('You do not have permission to access this page.');
+    CRM_Financial_Page_AJAX::assignRemove();
   }
 
   /**

@@ -113,28 +113,28 @@ class MailingEventTest extends Api4TestBase implements TransactionalInterface {
       ->addOrderBy('id', 'ASC')
       ->execute();
 
-    $this->assertEquals(2, $mailings[0]['stats_intended_recipients']);
-    $this->assertEquals(2, $mailings[1]['stats_intended_recipients']);
-    $this->assertEquals(1, $mailings[0]['stats_bounces']);
-    $this->assertEquals(0, $mailings[1]['stats_bounces']);
-    $this->assertEquals(1, $mailings[0]['stats_successful']);
-    $this->assertEquals(0, $mailings[1]['stats_successful']);
-    $this->assertEquals(2, $mailings[0]['stats_opens_total']);
-    $this->assertEquals(0, $mailings[1]['stats_opens_total']);
-    $this->assertEquals(1, $mailings[0]['stats_opens_unique']);
-    $this->assertEquals(0, $mailings[1]['stats_opens_unique']);
-    $this->assertEquals(4, $mailings[0]['stats_clicks_total']);
-    $this->assertEquals(0, $mailings[1]['stats_clicks_total']);
-    $this->assertEquals(3, $mailings[0]['stats_clicks_unique']);
-    $this->assertEquals(0, $mailings[1]['stats_clicks_unique']);
-    $this->assertEquals(2, $mailings[0]['stats_replies']);
-    $this->assertEquals(0, $mailings[1]['stats_replies']);
-    $this->assertEquals(1, $mailings[0]['stats_unsubscribes']);
-    $this->assertEquals(0, $mailings[1]['stats_unsubscribes']);
-    $this->assertEquals(1, $mailings[0]['stats_optouts']);
-    $this->assertEquals(0, $mailings[1]['stats_optouts']);
-    $this->assertEquals(2, $mailings[0]['stats_optouts_and_unsubscribes']);
-    $this->assertEquals(0, $mailings[1]['stats_optouts_and_unsubscribes']);
+    $this->assertSame(2, $mailings[0]['stats_intended_recipients']);
+    $this->assertSame(2, $mailings[1]['stats_intended_recipients']);
+    $this->assertSame(1, $mailings[0]['stats_bounces']);
+    $this->assertSame(0, $mailings[1]['stats_bounces']);
+    $this->assertSame(1, $mailings[0]['stats_successful']);
+    $this->assertSame(0, $mailings[1]['stats_successful']);
+    $this->assertSame(2, $mailings[0]['stats_opens_total']);
+    $this->assertSame(0, $mailings[1]['stats_opens_total']);
+    $this->assertSame(1, $mailings[0]['stats_opens_unique']);
+    $this->assertSame(0, $mailings[1]['stats_opens_unique']);
+    $this->assertSame(4, $mailings[0]['stats_clicks_total']);
+    $this->assertSame(0, $mailings[1]['stats_clicks_total']);
+    $this->assertSame(3, $mailings[0]['stats_clicks_unique']);
+    $this->assertSame(0, $mailings[1]['stats_clicks_unique']);
+    $this->assertSame(2, $mailings[0]['stats_replies']);
+    $this->assertSame(0, $mailings[1]['stats_replies']);
+    $this->assertSame(1, $mailings[0]['stats_unsubscribes']);
+    $this->assertSame(0, $mailings[1]['stats_unsubscribes']);
+    $this->assertSame(1, $mailings[0]['stats_optouts']);
+    $this->assertSame(0, $mailings[1]['stats_optouts']);
+    $this->assertSame(2, $mailings[0]['stats_optouts_and_unsubscribes']);
+    $this->assertSame(0, $mailings[1]['stats_optouts_and_unsubscribes']);
   }
 
 }

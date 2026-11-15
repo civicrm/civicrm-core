@@ -6,7 +6,8 @@
     data: '=',
     actions: '=',
     modelName: '@name',
-    label: '@'
+    label: '@',
+    dupeCheckRule: '@contactDupeCheck'
   };
   // Example usage: <af-form><af-entity name="Person" type="Contact" /> ... <fieldset af-fieldset="Person"> ... </fieldset></af-form>
   angular.module('af').component('afEntity', {

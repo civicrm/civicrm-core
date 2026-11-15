@@ -1,19 +1,15 @@
 <?php
 namespace Civi\Iframe;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Url;
 use Civi\Core\Service\AutoService;
 use CRM_Iframe_ExtensionUtil as E;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @service iframe
  */
-class Iframe extends AutoService implements EventSubscriberInterface {
-
-  public static function getSubscribedEvents(): array {
-    return ['&civi.url.render.iframe' => 'onRenderUrl'];
-  }
+class Iframe extends AutoService {
 
   /**
    * Is there a driver that supports IFRAMEs for this environment?
@@ -42,6 +38,7 @@ class Iframe extends AutoService implements EventSubscriberInterface {
    * @param string|null $result
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: '&civi.url.render.iframe')]
   public function onRenderUrl(Url $url, ?string &$result) {
     switch (CIVICRM_UF) {
       case 'WordPress':

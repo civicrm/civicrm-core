@@ -35,11 +35,7 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
     return array_filter($provider->getEntities(), function($entity) {
       // Check custom group permissions
       if ($this->checkPermissions && in_array('CustomValue', $entity['type']) && !\CRM_Core_Permission::customGroupAdmin()) {
-        // Hack to get the id from the "view" url. If that url changes tests should catch it and we'll think of a better way to get that id
-        $params = [];
-        parse_str(parse_url($entity['paths']['view'])['query'], $params);
-        $gid = $params['gid'];
-        return in_array($gid, \CRM_Core_Permission::customGroup());
+        return (bool) \CRM_Core_BAO_CustomGroup::getAll(['table_name' => $entity['table_name']], \CRM_Core_Permission::VIEW);
       }
       return TRUE;
     });

@@ -73,7 +73,7 @@ EOHTML;
     $this->login($admin);
     Afform::process()->setName($this->formName)->setSubmissionId($submissionId)->execute();
 
-    $this->assertEquals('Proposer', $this->getJobTitle($submitter));
+    $this->assertSame('Proposer', $this->getJobTitle($submitter));
     $this->assertNull($this->getJobTitle($admin), 'The processing user must not be written to');
   }
 
@@ -92,7 +92,7 @@ EOHTML;
       ->setValues(['Individual1' => [['fields' => ['job_title' => 'Proposer']]]])
       ->execute();
 
-    $this->assertEquals('Proposer', $this->getJobTitle($submitter));
+    $this->assertSame('Proposer', $this->getJobTitle($submitter));
     $this->assertNull($this->getJobTitle($admin), 'The processing user must not be written to');
   }
 
@@ -109,7 +109,7 @@ EOHTML;
     $this->setPermissions([]);
     Afform::process(FALSE)->setName($this->formName)->setSubmissionId($submissionId)->execute();
 
-    $this->assertEquals('Proposer', $this->getJobTitle($submitter));
+    $this->assertSame('Proposer', $this->getJobTitle($submitter));
   }
 
   /**

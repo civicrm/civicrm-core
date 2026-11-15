@@ -42,7 +42,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'receive_date' => '2010-01-20',
       'total_amount' => 100.00,
       'financial_type_id' => 'Donation',
-      'trxn_id' => 23456,
+      'trxn_id' => '23456',
       'contribution_status_id' => 1,
     ]);
 
@@ -57,12 +57,12 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('payment', 'get', $params);
 
     $payment = $this->callAPISuccess('payment', 'get', $params);
-    $this->assertEquals(1, $payment['count']);
+    $this->assertSame(1, $payment['count']);
 
     $expectedResult = [
       $payment['id'] => [
         'total_amount' => 100,
-        'trxn_id' => 23456,
+        'trxn_id' => '23456',
         'trxn_date' => '2010-01-20 00:00:00',
         'contribution_id' => $contribution['id'],
         'is_payment' => 1,
@@ -103,7 +103,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccessGetSingle('Contribution', [
       'id' => $contributionID,
     ]);
-    $this->assertEquals(1, $contribution['contribution_status_id']);
+    $this->assertSame($this->apiValue(1), $contribution['contribution_status_id']);
 
     //Get Payment using options
     switch ($apiVersion) {
@@ -128,7 +128,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     }
 
     $payments = $this->callAPISuccess('Payment', 'get', $getParams);
-    $this->assertEquals(3, $payments['count']);
+    $this->assertSame(3, $payments['count']);
     foreach ([50, 30, 20] as $key => $total_amount) {
       $this->assertEquals($total_amount, $payments['values'][$key]['total_amount']);
     }
@@ -195,7 +195,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ->addWhere('id', '=', $payment['id'])
       ->execute()
       ->single();
-    $this->assertEquals('Some reference text', $trxn[$customGroupName . '.' . $customFieldName]);
+    $this->assertSame('Some reference text', $trxn[$customGroupName . '.' . $customFieldName]);
 
     // The custom group's table is DDL, not part of the per-test transaction rollback,
     // so it has to be cleaned up explicitly (it would otherwise collide with the
@@ -213,24 +213,24 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $individual2 = $this->individualCreate();
     $params1 = [
       'contact_id' => $this->individualCreate(),
-      'trxn_id' => 111111,
+      'trxn_id' => '111111',
       'total_amount' => 10,
     ];
     $contributionID1 = $this->contributionCreate($params1);
 
     $params2 = [
       'contact_id' => $individual2,
-      'trxn_id' => 222222,
+      'trxn_id' => '222222',
       'total_amount' => 20,
     ];
     $contributionID2 = $this->contributionCreate($params2);
 
-    $paymentParams = ['trxn_id' => 111111];
+    $paymentParams = ['trxn_id' => '111111'];
     $payment = $this->callAPISuccess('payment', 'get', $paymentParams);
     $expectedResult = [
       $payment['id'] => [
         'total_amount' => 10,
-        'trxn_id' => 111111,
+        'trxn_id' => '111111',
         'status_id' => 1,
         'is_payment' => 1,
         'contribution_id' => $contributionID1,
@@ -238,12 +238,12 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ];
     $this->checkPaymentResult($payment, $expectedResult);
 
-    $paymentParams = ['trxn_id' => 222222];
+    $paymentParams = ['trxn_id' => '222222'];
     $payment = $this->callAPISuccess('payment', 'get', $paymentParams);
     $expectedResult = [
       $payment['id'] => [
         'total_amount' => 20,
-        'trxn_id' => 222222,
+        'trxn_id' => '222222',
         'status_id' => 1,
         'is_payment' => 1,
         'contribution_id' => $contributionID2,
@@ -293,7 +293,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->_apiversion = $apiVersion;
     $contributionID1 = $this->contributionCreate([
       'contact_id' => $this->individualCreate(),
-      'trxn_id' => 111111,
+      'trxn_id' => '111111',
       'total_amount' => 10,
     ]);
 
@@ -322,7 +322,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   public function testNegativePaymentWithNegativeContribution(): void {
     $params1 = [
       'contact_id' => $this->individualCreate(),
-      'trxn_id' => 111111,
+      'trxn_id' => '111111',
       'total_amount' => -10,
     ];
     $contributionID1 = $this->contributionCreate($params1);
@@ -544,8 +544,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ->addWhere('entity_table', '=', 'civicrm_financial_item')
       ->addWhere('financial_trxn_id', '=', $payment['id'])
       ->addOrderBy('amount')->execute();
-    $this->assertEquals(16.67, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
-    $this->assertEquals(33.33, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
+    $this->assertSame(16.67, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertSame(33.33, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
 
     // Now create payment to complete total amount of contribution
     $params = [
@@ -568,14 +568,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ->addWhere('entity_table', '=', 'civicrm_financial_item')
       ->addWhere('financial_trxn_id', '=', $payment['id'])
       ->addOrderBy('amount')->execute();
-    $this->assertEquals(33.33, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
-    $this->assertEquals(66.67, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
+    $this->assertSame(33.33, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertSame(66.67, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
 
     // Check contribution for completed status
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id']]);
 
-    $this->assertEquals('Completed', $contribution['values'][$contribution['id']]['contribution_status']);
-    $this->assertEquals(300.00, $contribution['values'][$contribution['id']]['total_amount']);
+    $this->assertSame('Completed', $contribution['values'][$contribution['id']]['contribution_status']);
+    $this->assertSame('300.00', $contribution['values'][$contribution['id']]['total_amount']);
     $paymentParticipant = [
       'contribution_id' => $contribution['id'],
     ];
@@ -619,7 +619,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ->addOrderBy('amount')
       ->execute()->column('amount');
     $this->assertEquals([33.33, 33.33, 33.34], $allocations, 'Allocations should be rounded with the remainder assigned to the last line item');
-    $this->assertEquals(100.00, array_sum($allocations), 'Allocated amounts should add up to the payment total');
+    $this->assertSame(100.00, array_sum($allocations), 'Allocated amounts should add up to the payment total');
 
     // Pay the remaining 200. As this payment completes the contribution each
     // line item should be allocated its exact outstanding balance
@@ -635,10 +635,10 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ->addOrderBy('amount')
       ->execute()->column('amount');
     $this->assertEquals([66.66, 66.67, 66.67], $allocations, 'Completing payment should allocate the outstanding balance of each line item');
-    $this->assertEquals(200.00, array_sum($allocations), 'Allocated amounts should add up to the payment total');
+    $this->assertSame(200.00, array_sum($allocations), 'Allocated amounts should add up to the payment total');
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $order['id']]);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
   }
 
   /**
@@ -650,7 +650,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   public function checkPaymentResult(array $payment, array $expectedResult): void {
     $refreshedPayment = $this->callAPISuccessGetSingle('Payment', ['financial_trxn_id' => $payment['id']]);
     foreach ($expectedResult[$payment['id']] as $key => $value) {
-      $this->assertEquals($refreshedPayment[$key], $value, 'mismatch on ' . $key);      $this->assertEquals($refreshedPayment[$key], $value, 'mismatch on ' . $key);
+      $this->assertEquals($refreshedPayment[$key], $value, 'mismatch on ' . $key);
     }
   }
 
@@ -688,8 +688,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ->addWhere('financial_trxn_id', '=', $payment['id'])
       ->addOrderBy('amount')->execute();
     $this->assertCount(2, $entityFinancialTrxns);
-    $this->assertEquals(10, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
-    $this->assertEquals(40, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
+    $this->assertSame(10.0, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertSame(40.0, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
 
     // Now create payment to complete total amount of contribution
     $params = [
@@ -722,14 +722,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ->addWhere('financial_trxn_id', '=', $payment['id'])
       ->addOrderBy('amount')->execute();
     $this->assertCount(2, $entityFinancialTrxns);
-    $this->assertEquals(20, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
-    $this->assertEquals(80, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
+    $this->assertSame(20.0, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertSame(80.0, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
 
     // Check contribution for completed status
     $contribution = $this->callAPISuccess('Contribution', 'get', ['id' => $contribution['id']]);
 
-    $this->assertEquals('Completed', $contribution['values'][$contribution['id']]['contribution_status']);
-    $this->assertEquals(300.00, $contribution['values'][$contribution['id']]['total_amount']);
+    $this->assertSame('Completed', $contribution['values'][$contribution['id']]['contribution_status']);
+    $this->assertSame('300.00', $contribution['values'][$contribution['id']]['total_amount']);
     $paymentParticipant = [
       'contribution_id' => $contribution['id'],
     ];
@@ -815,7 +815,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'id' => $contributionID,
     ]);
     // We should now have a status of "Partially paid" after refunding a partial amount.
-    $this->assertEquals('Partially paid', $contribution['contribution_status']);
+    $this->assertSame('Partially paid', $contribution['contribution_status']);
 
     //Refund the complete amount.
     $this->callAPISuccess('Payment', 'create', [
@@ -827,7 +827,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'id' => $contributionID,
     ]);
     //Assert if main contribution status is updated to "Refunded".
-    $this->assertEquals('Refunded Label**', $contribution['contribution_status']);
+    $this->assertSame('Refunded Label**', $contribution['contribution_status']);
   }
 
   /**
@@ -852,7 +852,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'id' => $contributionID,
     ]);
     //Assert if main contribution status is updated to "Refunded".
-    $this->assertEquals('Refunded Label**', $contribution['contribution_status']);
+    $this->assertSame('Refunded Label**', $contribution['contribution_status']);
   }
 
   /**
@@ -869,7 +869,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ];
 
     $payment = $this->callAPISuccess('payment', 'get', $params);
-    $this->assertEquals(1, $payment['count']);
+    $this->assertSame(1, $payment['count']);
 
     $cancelParams = [
       'id' => $payment['id'],
@@ -882,7 +882,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('payment', 'cancel', $cancelParams);
 
     $payment = $this->callAPISuccess('payment', 'get', $params);
-    $this->assertEquals(2, $payment['count']);
+    $this->assertSame(2, $payment['count']);
     $amounts = [-150.00, 150.00];
     foreach ($payment['values'] as $value) {
       $this->assertEquals($value['total_amount'], array_pop($amounts), 'Mismatch total amount');
@@ -969,8 +969,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ->addWhere('entity_table', '=', 'civicrm_financial_item')
       ->addWhere('financial_trxn_id', '=', $payment['id'])
       ->addOrderBy('amount')->execute();
-    $this->assertEquals(16.67, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
-    $this->assertEquals(33.33, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
+    $this->assertSame(16.67, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertSame(33.33, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
 
     // update the amount for payment
     $params = [
@@ -993,8 +993,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ->addWhere('financial_trxn_id', '=', ($payment['id'] - 1))
       ->addOrderBy('amount')->execute();
     $this->assertCount(2, $entityFinancialTrxns);
-    $this->assertEquals(-33.33, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
-    $this->assertEquals(-16.67, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
+    $this->assertSame(-33.33, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertSame(-16.67, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
 
     // Check for proportional updated payment against line items.
     $entityFinancialTrxns = EntityFinancialTrxn::get(FALSE)
@@ -1002,17 +1002,17 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       ->addWhere('financial_trxn_id', '=', $payment['id'])
       ->addOrderBy('amount')->execute();
     $this->assertCount(2, $entityFinancialTrxns);
-    $this->assertEquals(33.33, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
-    $this->assertEquals(66.67, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
+    $this->assertSame(33.33, $entityFinancialTrxns->first()['amount'], 'Incorrect tax amount in entity financial trxn');
+    $this->assertSame(66.67, $entityFinancialTrxns->last()['amount'], 'Incorrect tax exclusive amount in entity financial trxn');
 
     $items = $this->callAPISuccess('FinancialItem', 'get', [])['values'];
     $this->assertCount(2, $items);
     $itemSum = 0;
     foreach ($items as $item) {
-      $this->assertEquals('civicrm_line_item', $item['entity_table']);
+      $this->assertSame('civicrm_line_item', $item['entity_table']);
       $itemSum += $item['amount'];
     }
-    $this->assertEquals(300, $itemSum);
+    $this->assertSame(300.0, $itemSum);
 
     $params = [
       'contribution_id' => $contribution['id'],
@@ -1044,7 +1044,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $contributionID = $this->contributionCreate(['contact_id' => $this->individualCreate()]);
     $payment = $this->callAPISuccess('Payment', 'create', ['total_amount' => 5, 'order_id' => $contributionID]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID]);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
     $this->callAPISuccessGetCount('EntityFinancialTrxn', ['financial_trxn_id' => $payment['id'], 'entity_table' => 'civicrm_financial_item'], 0);
     $this->validateAllPayments();
     $this->validateAllContributions();
@@ -1075,7 +1075,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'pan_truncation' => '1234',
       'trxn_result_code' => 'Startling success',
       'payment_processor_id' => $processorID,
-      'trxn_id' => 1234,
+      'trxn_id' => '1234',
     ];
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = [
@@ -1088,7 +1088,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
         'card_type_id' => 1,
         'pan_truncation' => '1234',
         'trxn_result_code' => 'Startling success',
-        'trxn_id' => 1234,
+        'trxn_id' => '1234',
         'payment_instrument_id' => $this->getPaymentInstrumentID('Debit Card'),
       ],
     ];
@@ -1100,17 +1100,17 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'financial_trxn_id' => $payment['id'],
     ];
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $this->assertEquals(100, $eft['values'][$eft['id']]['amount']);
+    $this->assertSame('100.00', $eft['values'][$eft['id']]['amount']);
     $params = [
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $payment['id'],
     ];
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $this->assertEquals(100, $eft['values'][$eft['id']]['amount']);
+    $this->assertSame('100.00', $eft['values'][$eft['id']]['amount']);
     // Check contribution for completed status
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id']]);
-    $this->assertEquals('Completed', $contribution['values'][$contribution['id']]['contribution_status']);
-    $this->assertEquals(100.00, $contribution['values'][$contribution['id']]['total_amount']);
+    $this->assertSame('Completed', $contribution['values'][$contribution['id']]['contribution_status']);
+    $this->assertSame('100.00', $contribution['values'][$contribution['id']]['total_amount']);
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $contribution['id'],
     ]);
@@ -1168,18 +1168,18 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'financial_trxn_id' => $payment['id'],
     ];
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $this->assertEquals(100, $eft['values'][$eft['id']]['amount']);
+    $this->assertSame('100.00', $eft['values'][$eft['id']]['amount']);
     $params = [
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $payment['id'],
     ];
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $this->assertEquals(100, $eft['values'][$eft['id']]['amount']);
+    $this->assertSame('100.00', $eft['values'][$eft['id']]['amount']);
     // Check contribution for completed status
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id']]);
-    $this->assertEquals('Completed', $contribution['values'][$contribution['id']]['contribution_status']);
-    $this->assertEquals('trxn_1,trxn_2', $contribution['values'][$contribution['id']]['trxn_id']);
-    $this->assertEquals(100.00, $contribution['values'][$contribution['id']]['total_amount']);
+    $this->assertSame('Completed', $contribution['values'][$contribution['id']]['contribution_status']);
+    $this->assertSame('trxn_1,trxn_2', $contribution['values'][$contribution['id']]['trxn_id']);
+    $this->assertSame('100.00', $contribution['values'][$contribution['id']]['total_amount']);
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $contribution['id'],
     ]);
@@ -1192,7 +1192,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   public function testNetAmount(): void {
     $order = $this->createPendingParticipantOrder();
     $payment = $this->callAPISuccess('Payment', 'create', ['order_id' => $order['id'], 'total_amount' => 10, 'fee_amount' => .25]);
-    $this->assertEquals('9.75', $this->callAPISuccessGetValue('Payment', ['id' => $payment['id'], 'return' => 'net_amount']));
+    $this->assertSame('9.75', $this->callAPISuccessGetValue('Payment', ['id' => $payment['id'], 'return' => 'net_amount']));
   }
 
   /**
@@ -1265,7 +1265,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_contribution',
     ];
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $this->assertEquals(2, $eft['count']);
+    $this->assertSame(2, $eft['count']);
 
     //Test 2
     //Create a Pending Contribution so an FT record is inserted.
@@ -1311,7 +1311,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_contribution',
     ];
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $this->assertEquals(4, $eft['count']);
+    $this->assertSame(4, $eft['count']);
 
     $this->validateAllPayments();
   }
@@ -1353,7 +1353,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
     $this->assertEquals($eft['values'][$eft['id']]['amount'], $partialAmount);
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contributionID]);
-    $this->assertEquals('Partially paid', $contribution['values'][$contribution['id']]['contribution_status']);
+    $this->assertSame('Partially paid', $contribution['values'][$contribution['id']]['contribution_status']);
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], $totalAmount);
   }
 
@@ -1398,17 +1398,17 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'financial_trxn_id' => $payment['id'],
     ];
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $this->assertEquals(40, $eft['values'][$eft['id']]['amount']);
+    $this->assertSame('40.00', $eft['values'][$eft['id']]['amount']);
     $params = [
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $payment['id'],
     ];
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', $params);
-    $this->assertEquals(40, $eft['values'][$eft['id']]['amount']);
+    $this->assertSame('40.00', $eft['values'][$eft['id']]['amount']);
     // Check contribution for completed status
     $contribution = $this->callAPISuccess('contribution', 'get', ['id' => $contribution['id']]);
-    $this->assertEquals('Unicorn', $contribution['values'][$contribution['id']]['contribution_status']);
-    $this->assertEquals(100.00, $contribution['values'][$contribution['id']]['total_amount']);
+    $this->assertSame('Unicorn', $contribution['values'][$contribution['id']]['contribution_status']);
+    $this->assertSame('100.00', $contribution['values'][$contribution['id']]['total_amount']);
     $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $contribution['id'],
     ]);
@@ -1433,12 +1433,12 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Payment', 'create', ['payment_processor_id' => $processor->getID(), 'total_amount' => 6, 'contribution_id' => $order['id']]);
     $this->callAPISuccess('Payment', 'create', ['payment_processor_id' => $processor2->getID(), 'total_amount' => 15, 'contribution_id' => $order['id']]);
     $payments = $this->callAPISuccess('Payment', 'get', ['sequential' => 1, 'contribution_id' => $order['id']])['values'];
-    $this->assertEquals('Deposit Bank Account', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'to_financial_account_id', $payments[0]['to_financial_account_id']));
-    $this->assertEquals('Payment Processor Account', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'to_financial_account_id', $payments[1]['to_financial_account_id']));
-    $this->assertEquals('Accounts Receivable', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'from_financial_account_id', $payments[0]['from_financial_account_id']));
-    $this->assertEquals('Accounts Receivable', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'from_financial_account_id', $payments[1]['from_financial_account_id']));
-    $this->assertEquals('Cash', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $payments[0]['payment_instrument_id']));
-    $this->assertEquals('EFT', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $payments[1]['payment_instrument_id']));
+    $this->assertSame('Deposit Bank Account', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'to_financial_account_id', $payments[0]['to_financial_account_id']));
+    $this->assertSame('Payment Processor Account', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'to_financial_account_id', $payments[1]['to_financial_account_id']));
+    $this->assertSame('Accounts Receivable', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'from_financial_account_id', $payments[0]['from_financial_account_id']));
+    $this->assertSame('Accounts Receivable', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'from_financial_account_id', $payments[1]['from_financial_account_id']));
+    $this->assertSame('Cash', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $payments[0]['payment_instrument_id']));
+    $this->assertSame('EFT', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $payments[1]['payment_instrument_id']));
     // $order = $this->callAPISuccessGetSingle('Order', ['id' => $processor->getID()]);
     // $this->assertEquals('Cash', CRM_Core_PseudoConstant::getName('CRM_Core_BAO_FinancialTrxn', 'payment_instrument_id', $order['payment_instrument_id']));
   }
@@ -1481,8 +1481,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('Payment', 'getsingle', ['financial_trxn_id' => $paymentID]);
     $this->assertEquals($this->getFinancialAccountID('Accounts Receivable'), $payment['from_financial_account_id']);
     $this->assertEquals($this->getFinancialAccountID('Deposit Bank Account'), $payment['to_financial_account_id']);
-    $this->assertEquals(1, $payment['status_id']);
-    $this->assertEquals(1, $payment['is_payment']);
+    $this->assertSame('1', $payment['status_id']);
+    $this->assertSame('1', $payment['is_payment']);
     $this->assertEquals($amount, $payment['total_amount']);
 
     $eft = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
@@ -1540,9 +1540,9 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ]);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contributionID]);
-    $this->assertEquals('Completed', $contribution['contribution_status']);
-    $this->assertEquals(.2, $contribution['fee_amount']);
-    $this->assertEquals(99.8, $contribution['net_amount']);
+    $this->assertSame('Completed', $contribution['contribution_status']);
+    $this->assertSame('0.20', $contribution['fee_amount']);
+    $this->assertSame('99.80', $contribution['net_amount']);
 
     $this->assertEquals($trxnID, $contribution['trxn_id'],
       'Contribution trxn_id should have been set to that of the payment.');

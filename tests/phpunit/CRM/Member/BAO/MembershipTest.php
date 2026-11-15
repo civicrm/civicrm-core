@@ -115,7 +115,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     // Check count of related memberships. It should be one for individual contact.
     $relatedMembershipsCount = $this->getRelatedMembershipsCount($this->ids['Membership']['first']);
-    $this->assertEquals(1, $relatedMembershipsCount, 'Related membership count should be 1.');
+    $this->assertSame(1, $relatedMembershipsCount, 'Related membership count should be 1.');
 
     // Update membership by changing it's type. New membership type is without relationship.
     $membership["membership_type_id"] = $membershipTypeWithoutRelationship["id"];
@@ -125,7 +125,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     // Check count of related memberships again. It should be zero as we changed the membership type.
     $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
-    $this->assertEquals(0, $relatedMembershipsCount, 'Related membership count should be 0.');
+    $this->assertSame(0, $relatedMembershipsCount, 'Related membership count should be 0.');
   }
 
   /**
@@ -355,7 +355,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     ];
     $membership = $this->callAPISuccess('Membership', 'create', $params);
 
-    $this->assertEquals('Anderson, Anthony II', CRM_Member_BAO_Membership::sortName($membership['id']));
+    $this->assertSame('Anderson, Anthony II', CRM_Member_BAO_Membership::sortName($membership['id']));
   }
 
   /**
@@ -473,7 +473,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     ]);
 
     $membership = Membership::get()->addSelect('status_id:name')->execute()->single();
-    $this->assertEquals('Grace', $membership['status_id:name'], 'Verify correct status id is calculated.');
+    $this->assertSame('Grace', $membership['status_id:name'], 'Verify correct status id is calculated.');
 
     $this->contributionPageQuickConfigCreate();
     $this->submitOnlineContributionForm([
@@ -482,7 +482,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     ] + $this->getBillingSubmitValues(), NULL, ['mid' => $membership['id']]);
 
     $membership = Membership::get()->addSelect('status_id:name')->execute()->single();
-    $this->assertEquals('Current', $membership['status_id:name'], 'Verify correct status id is calculated.');
+    $this->assertSame('Current', $membership['status_id:name'], 'Verify correct status id is calculated.');
   }
 
   /**
@@ -599,7 +599,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     ])['values'][0];
 
     $this->assertEquals($createdMembershipID, $membershipAfterProcess['id']);
-    $this->assertEquals(1, $membershipAfterProcess['is_override']);
+    $this->assertSame('1', $membershipAfterProcess['is_override']);
 
     // Check that MembershipLog was created and is correct
     $latestMembershipLog = MembershipLog::get(FALSE)
@@ -747,7 +747,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $contributions = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1])['values'];
     $this->assertCount(2, $contributions);
-    $this->assertEquals('Debit Card', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $contributions[1]['payment_instrument_id']));
+    $this->assertSame('Debit Card', CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $contributions[1]['payment_instrument_id']));
     $this->validateAllPayments();
     $this->validateAllContributions();
   }
@@ -851,7 +851,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'version'            => 4,
     ]);
     $membership = $membership['values'][$membership["id"]];
-    $this->assertEquals(0, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 0.');
+    $this->assertSame(0, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 0.');
 
     // Create relationship between organization and individual contacts.
     $employees = $this->createContacts(5);
@@ -865,12 +865,12 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       ], 'employee_' . $contactID);
     }
     $this->deleteRelatedMemberships($membership["id"]);
-    $this->assertEquals(0, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 0.');
+    $this->assertSame(0, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 0.');
 
     // Create related memberships for first and last contact.
     $relatedMembership1 = $this->createRelatedMembershipForContact($employees[0], $membership);
     $relatedMembership2 = $this->createRelatedMembershipForContact($employees[4], $membership);
-    $this->assertEquals(2, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 2.');
+    $this->assertSame(2, $this->getRelatedMembershipsCount($membership["id"]), 'Related membership count should be 2.');
 
     // Reset statics.
     unset(Civi::$statics[CRM_Member_BAO_Membership::class]['related_contacts']);
@@ -883,7 +883,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     // Assert nothing has changed.
     $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
-    $this->assertEquals(2, $relatedMembershipsCount, "Related membership count should still be 2, but found $relatedMembershipsCount");
+    $this->assertSame(2, $relatedMembershipsCount, "Related membership count should still be 2, but found $relatedMembershipsCount");
     $this->assertMembershipExists($relatedMembership1['id']);
     $this->assertMembershipExists($relatedMembership2['id']);
   }
@@ -925,7 +925,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     // Check count of related memberships. It should be one for individual contact.
     $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
-    $this->assertEquals(1, $relatedMembershipsCount, 'Related membership count should be 1.');
+    $this->assertSame(1, $relatedMembershipsCount, 'Related membership count should be 1.');
 
     $relatedMembership = $this->callAPISuccess("Membership", "getsingle", [
       'owner_membership_id' => $membership["id"],
@@ -935,7 +935,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $this->callAPISuccess('Relationship', 'delete', ['id' => $this->ids['Relationship']['default']]);
     $relatedMembershipsCount = $this->getRelatedMembershipsCount($membership["id"]);
-    $this->assertEquals(0, $relatedMembershipsCount, 'Related membership count should be 0.');
+    $this->assertSame(0, $relatedMembershipsCount, 'Related membership count should be 0.');
   }
 
   /**
@@ -982,7 +982,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'contact_id_b' => $employerId,
       'is_active' => 1,
     ]);
-    $this->assertEquals(1, $this->getRelatedMembershipsCount($membership['id']));
+    $this->assertSame(1, $this->getRelatedMembershipsCount($membership['id']));
 
     // Deactivate then reactivate the relationship - this is the flow that
     // triggered the fatal error.
@@ -1042,7 +1042,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       ->addSelect('contact_id', 'status_id:name', 'status_id.is_current_member')
       ->addWhere('owner_membership_id', '=', $membership['id'])
       ->execute()->indexBy('contact_id');
-    $this->assertEquals('Current', $inherited[$currentEmployeeID]['status_id:name']);
+    $this->assertSame('Current', $inherited[$currentEmployeeID]['status_id:name']);
     foreach ($formerEmployeeIDs as $formerEmployeeID) {
       $this->assertFalse($inherited[$formerEmployeeID]['status_id.is_current_member'], "Former employee $formerEmployeeID");
     }

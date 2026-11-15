@@ -151,8 +151,8 @@ class ContributionRecurCancelTest extends \CiviUnitTestCase {
       ->execute()
       ->first();
 
-    $this->assertEquals('Cancelled', $updatedRecur['contribution_status_id:name']);
-    $this->assertEquals('I want to cancel', $updatedRecur['cancel_reason']);
+    $this->assertSame('Cancelled', $updatedRecur['contribution_status_id:name']);
+    $this->assertSame('I want to cancel', $updatedRecur['cancel_reason']);
     $this->assertNotEmpty($updatedRecur['cancel_date']);
   }
 
@@ -181,7 +181,7 @@ class ContributionRecurCancelTest extends \CiviUnitTestCase {
       ->addWhere('id', '=', $this->recurs[$this->ids['Contact']['EmberRecur']])
       ->execute()
       ->first();
-    $this->assertEquals('Recurring contribution cancelled', $result['message']);
+    $this->assertSame('Recurring contribution cancelled', $result['message']);
 
     $updatedRecur = ContributionRecur::get(FALSE)
       ->addSelect('cancel_date', 'cancel_reason', 'contribution_status_id:name', 'processor_id')
@@ -189,10 +189,10 @@ class ContributionRecurCancelTest extends \CiviUnitTestCase {
       ->execute()
       ->first();
 
-    $this->assertEquals('Cancelled', $updatedRecur['contribution_status_id:name']);
-    $this->assertEquals('I want to cancel', $updatedRecur['cancel_reason']);
+    $this->assertSame('Cancelled', $updatedRecur['contribution_status_id:name']);
+    $this->assertSame('I want to cancel', $updatedRecur['cancel_reason']);
     $this->assertNotEmpty($updatedRecur['cancel_date']);
-    $this->assertEquals('test-processor-id', $updatedRecur['processor_id']);
+    $this->assertSame('test-processor-id', $updatedRecur['processor_id']);
   }
 
 }

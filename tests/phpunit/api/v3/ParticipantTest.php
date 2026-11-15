@@ -111,7 +111,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Participant', 'get', $params);
     //Assert all the returned participants has a role_id of 2
     foreach ($result['values'] as $values) {
-      $this->assertEquals(2, $values['participant_role_id']);
+      $this->assertSame('2', $values['participant_role_id']);
     }
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_participant SET role_id = NULL WHERE id = ' . $this->ids['Participant']['primary']);
@@ -121,7 +121,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Participant', 'get', $params);
     foreach ($result['values'] as $values) {
-      $this->assertEquals(NULL, $values['participant_role_id']);
+      $this->assertSame('', $values['participant_role_id']);
     }
 
   }
@@ -143,7 +143,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals($result['id'], $result['values'][$result['id']]['id']);
 
     $check = $this->callAPISuccess($this->_entity, 'get', ['id' => $result['id']]);
-    $this->assertEquals('custom string', $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+    $this->assertSame('custom string', $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
@@ -164,8 +164,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('participant', 'get', $params);
     $this->assertEquals($result['values'][$this->ids['Participant']['primary']]['event_id'], $this->getEventID());
-    $this->assertEquals('2007-02-19 00:00:00', $result['values'][$this->ids['Participant']['primary']]['participant_register_date']);
-    $this->assertEquals('Wimbledon', $result['values'][$this->ids['Participant']['primary']]['participant_source']);
+    $this->assertSame('2007-02-19 00:00:00', $result['values'][$this->ids['Participant']['primary']]['participant_register_date']);
+    $this->assertSame('Wimbledon', $result['values'][$this->ids['Participant']['primary']]['participant_source']);
     $params = [
       'id' => $this->ids['Participant']['primary'],
       'return' => 'id,participant_register_date,event_id',
@@ -173,7 +173,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('participant', 'get', $params);
     $this->assertEquals($result['values'][$this->ids['Participant']['primary']]['event_id'], $this->getEventID());
-    $this->assertEquals('2007-02-19 00:00:00', $result['values'][$this->ids['Participant']['primary']]['participant_register_date']);
+    $this->assertSame('2007-02-19 00:00:00', $result['values'][$this->ids['Participant']['primary']]['participant_register_date']);
 
   }
 
@@ -208,8 +208,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('participant', 'get', $params);
     $this->assertEquals($result['values'][$this->ids['Participant']['primary']]['event_id'], $this->getEventID());
-    $this->assertEquals('2007-02-19 00:00:00', $result['values'][$this->ids['Participant']['primary']]['participant_register_date']);
-    $this->assertEquals('Wimbledon', $result['values'][$this->ids['Participant']['primary']]['participant_source']);
+    $this->assertSame('2007-02-19 00:00:00', $result['values'][$this->ids['Participant']['primary']]['participant_register_date']);
+    $this->assertSame('Wimbledon', $result['values'][$this->ids['Participant']['primary']]['participant_source']);
     $this->assertEquals($result['id'], $result['values'][$this->ids['Participant']['primary']]['id']);
   }
 
@@ -230,8 +230,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Participant', 'get', $params)['values'];
     $this->assertEquals($this->getEventID(), $result[$this->ids['Participant']['primary']]['event_id']);
-    $this->assertEquals('2007-02-19 00:00:00', $result[$this->ids['Participant']['primary']]['participant_register_date']);
-    $this->assertEquals('Wimbledon', $result[$this->ids['Participant']['primary']]['participant_source']);
+    $this->assertSame('2007-02-19 00:00:00', $result[$this->ids['Participant']['primary']]['participant_register_date']);
+    $this->assertSame('Wimbledon', $result[$this->ids['Participant']['primary']]['participant_source']);
     $this->assertEquals($this->getEventID(), $result[$this->ids['Participant']['primary']]['api.event.get']['id']);
   }
 
@@ -260,8 +260,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
 
     $this->assertEquals($this->ids['Participant']['primary'], $participant['id']);
     $this->assertEquals($this->getEventID(), $participant['values'][$participant['id']]['event_id']);
-    $this->assertEquals('2007-02-19 00:00:00', $participant['values'][$participant['id']]['participant_register_date']);
-    $this->assertEquals('Wimbledon', $participant['values'][$participant['id']]['participant_source']);
+    $this->assertSame('2007-02-19 00:00:00', $participant['values'][$participant['id']]['participant_register_date']);
+    $this->assertSame('Wimbledon', $participant['values'][$participant['id']]['participant_source']);
     $this->assertEquals($participant['id'], $participant['values'][$participant['id']]['id']);
   }
 
@@ -298,7 +298,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
   public function testSearchEmptyParams(): void {
     $result = $this->callAPISuccess('participant', 'get', []);
     // expecting 3 participant records
-    $this->assertEquals(3, $result['count']);
+    $this->assertSame(3, $result['count']);
   }
 
   /**
@@ -310,8 +310,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
     $participant = $this->callAPISuccess('Participant', 'get', $params);
     $this->assertEquals($participant['values'][$this->ids['Participant']['primary']]['event_id'], $this->getEventID());
-    $this->assertEquals('2007-02-19 00:00:00', $participant['values'][$this->ids['Participant']['primary']]['participant_register_date']);
-    $this->assertEquals('Wimbledon', $participant['values'][$this->ids['Participant']['primary']]['participant_source']);
+    $this->assertSame('2007-02-19 00:00:00', $participant['values'][$this->ids['Participant']['primary']]['participant_register_date']);
+    $this->assertSame('Wimbledon', $participant['values'][$this->ids['Participant']['primary']]['participant_source']);
   }
 
   /**
@@ -324,7 +324,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
     $participant = $this->callAPISuccess('Participant', 'get', $params);
 
-    $this->assertEquals(2, $participant['count']);
+    $this->assertSame(2, $participant['count']);
   }
 
   /**
@@ -342,8 +342,8 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       $this->fail('Event search returned less than expected minimum of 3 records.');
     }
 
-    $this->assertEquals('Anderson', $participant['values'][$this->ids['Participant']['primary']]['last_name']);
-    $this->assertEquals('Annual CiviCRM meet', $participant['values'][$this->ids['Participant']['primary']]['event_title']);
+    $this->assertSame('Anderson', $participant['values'][$this->ids['Participant']['primary']]['last_name']);
+    $this->assertSame('Annual CiviCRM meet', $participant['values'][$this->ids['Participant']['primary']]['event_title']);
   }
 
   /**
@@ -358,7 +358,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
     $participant = $this->callAPISuccess('participant', 'get', $params);
 
-    $this->assertEquals(2, $participant['count']);
+    $this->assertSame(2, $participant['count']);
   }
 
   /**
@@ -370,7 +370,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
     $participant = $this->callAPISuccess('participant', 'get', $params);
 
-    $this->assertEquals(1, $participant['count']);
+    $this->assertSame(1, $participant['count']);
     $this->assertEquals($this->ids['Participant'][2], $participant['id']);
   }
 
@@ -403,7 +403,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'source' => 'a string that is even longer than the 128 character limit that is allowed for this field because sometimes you want, you know, an essay',
     ]);
     $baoCreated = CRM_Event_BAO_Participant::create($params);
-    $this->assertEquals('a string that is even longer than the 128 character limit that is allowed for this field because sometimes you want, you know...', $baoCreated->source);
+    $this->assertSame('a string that is even longer than the 128 character limit that is allowed for this field because sometimes you want, you know...', $baoCreated->source);
     // @todo - currently the api will still reject the long string.
     //$this->callAPISuccess('participant', 'create', $params);
   }
@@ -502,21 +502,21 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'entity_table' => 'civicrm_participant',
     ]);
 
-    $this->assertEquals(2, $lineItems['count']);
+    $this->assertSame(2, $lineItems['count']);
 
     // Check quantity, label and unit price of lines.
     // TODO: These assertions depend on the order of the line items, which is
     // technically incorrect.
 
     $lineItem = array_pop($lineItems['values']);
-    $this->assertEquals(2, $lineItem['qty']);
-    $this->assertEquals(5, $lineItem['unit_price']);
-    $this->assertEquals('price_field_value_2', $lineItem['label']);
+    $this->assertSame('2.00', $lineItem['qty']);
+    $this->assertSame('5.00', $lineItem['unit_price']);
+    $this->assertSame('price_field_value_2', $lineItem['label']);
 
     $lineItem = array_pop($lineItems['values']);
-    $this->assertEquals(2, $lineItem['qty']);
-    $this->assertEquals(20, $lineItem['unit_price']);
-    $this->assertEquals('price_field_value_1', $lineItem['label']);
+    $this->assertSame('2.00', $lineItem['qty']);
+    $this->assertSame('20.00', $lineItem['unit_price']);
+    $this->assertSame('price_field_value_1', $lineItem['label']);
     $this->callAPISuccess('PriceFieldValue', 'create', ['id' => $pfv2['id'], 'label' => 'Price Field Value 2 Label']);
     $participantGet = $this->callAPISuccess('Participant', 'get', ['id' => $participant['id']]);
     $this->assertEquals(['price_field_value_1 - 2', 'price_field_value_2 - 2'], $participantGet['values'][$participant['id']]['participant_fee_level']);
@@ -532,21 +532,21 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
       'entity_id' => $AdditionalParticipant['id'],
       'entity_table' => 'civicrm_participant',
     ]);
-    $this->assertEquals(2, $lineItems['count']);
+    $this->assertSame(2, $lineItems['count']);
 
     // Check quantity, label and unit price of lines.
     // TODO: These assertions depend on the order of the line items, which is
     // technically incorrect.
 
     $lineItem = array_pop($lineItems['values']);
-    $this->assertEquals(2, $lineItem['qty']);
-    $this->assertEquals(5, $lineItem['unit_price']);
-    $this->assertEquals('Price Field Value 2 Label', $lineItem['label']);
+    $this->assertSame('2.00', $lineItem['qty']);
+    $this->assertSame('5.00', $lineItem['unit_price']);
+    $this->assertSame('Price Field Value 2 Label', $lineItem['label']);
 
     $lineItem = array_pop($lineItems['values']);
-    $this->assertEquals(2, $lineItem['qty']);
-    $this->assertEquals(20, $lineItem['unit_price']);
-    $this->assertEquals('price_field_value_1', $lineItem['label']);
+    $this->assertSame('2.00', $lineItem['qty']);
+    $this->assertSame('20.00', $lineItem['unit_price']);
+    $this->assertSame('price_field_value_1', $lineItem['label']);
 
     // Cleanup
     $this->callAPISuccess('Participant', 'delete', ['id' => $participant['id']]);
@@ -643,11 +643,11 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
    */
   public function testNestedDelete(): void {
     $participants = $this->callAPISuccess('Participant', 'Get', []);
-    $this->assertEquals(3, $participants['count']);
+    $this->assertSame(3, $participants['count']);
     $params = ['contact_id' => $this->_contactID2, 'api.participant.delete' => 1];
     $this->callAPISuccess('Participant', 'Get', $params);
     $check = $this->callAPISuccess('participant', 'getcount', []);
-    $this->assertEquals(1, $check, 'only one participant should be left');
+    $this->assertSame(1, $check, 'only one participant should be left');
   }
 
   /**
@@ -675,7 +675,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccess('contact', 'create', $params);
-    $this->assertEquals(1, $result['values'][$result['id']]['api.participant_payment.create']['count']);
+    $this->assertSame(1, $result['values'][$result['id']]['api.participant_payment.create']['count']);
     $this->callAPISuccess('contact', 'delete', ['id' => $result['id']]);
   }
 
@@ -703,7 +703,7 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->callAPISuccess('Participant', 'create', $params);
 
     $result = $this->callAPISuccess('Participant', 'get', ['source' => 'Post Hook Update']);
-    $this->assertEquals(2, $result['count']);
+    $this->assertSame(2, $result['count']);
 
     $expected = [$participantID, $participantID2];
     $actual = array_keys($result['values']);

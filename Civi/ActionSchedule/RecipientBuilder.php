@@ -343,8 +343,6 @@ class RecipientBuilder {
       $childGroupIDs = \CRM_Contact_BAO_Group::getChildGroupIds($actionSchedule->group_id);
       foreach (array_merge([$actionSchedule->group_id], $childGroupIDs) as $groupID) {
         if ($this->isSmartGroup($groupID)) {
-          // Check that the group is in place in the cache and up to date
-          \CRM_Contact_BAO_GroupContactCache::check($groupID);
           $smartGroupIDs[] = $groupID;
         }
         else {
@@ -353,6 +351,8 @@ class RecipientBuilder {
       }
 
       if (!empty($smartGroupIDs)) {
+        // Check that the groups are in place in the cache and up to date
+        \CRM_Contact_BAO_GroupContactCache::check($smartGroupIDs);
         $query->join('sg', "LEFT JOIN civicrm_group_contact_cache sg ON {$contactIdField} = sg.contact_id");
         $groupWhereCLause[] = " sg.group_id IN ( " . implode(', ', $smartGroupIDs) . " ) ";
       }

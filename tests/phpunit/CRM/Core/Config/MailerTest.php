@@ -44,7 +44,7 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
       'send' => function ($recipients, $headers, $body) use ($test) {
         $test->calls['send']++;
         $test->assertEquals(['to@example.org'], $recipients);
-        $test->assertEquals('Subject Example', $headers['Subject']);
+        $test->assertSame('Subject Example', $headers['Subject']);
       },
     ]);
 
@@ -68,14 +68,14 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
     $params['html'] = '<p>Example HTML</p>';
     CRM_Utils_Mail::send($params);
 
-    $this->assertEquals(1, $this->calls['civicrm_alterMailer']);
-    $this->assertEquals(1, $this->calls['send']);
+    $this->assertSame(1, $this->calls['civicrm_alterMailer']);
+    $this->assertSame(1, $this->calls['send']);
 
     // once more, just to make sure the hooks are called right #times
     CRM_Utils_Mail::send($params);
     CRM_Utils_Mail::send($params);
-    $this->assertEquals(1, $this->calls['civicrm_alterMailer']);
-    $this->assertEquals(3, $this->calls['send']);
+    $this->assertSame(1, $this->calls['civicrm_alterMailer']);
+    $this->assertSame(3, $this->calls['send']);
   }
 
 }

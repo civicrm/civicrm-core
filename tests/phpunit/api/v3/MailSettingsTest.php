@@ -48,7 +48,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $this->callAPISuccessGetCount('mail_settings', [], 1);
     $result = $this->callAPISuccess('MailSettings', 'create', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('MailSettings', 'delete', ['id' => $result['id']]);
     $this->callAPISuccessGetCount('mail_settings', [], 1);
@@ -64,9 +64,9 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
   public function testCreateUpdateMailSettings($version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess('MailSettings', 'create', $this->params);
-    $this->assertEquals('setting.com', CRM_Core_BAO_MailSettings::defaultDomain());
+    $this->assertSame('setting.com', CRM_Core_BAO_MailSettings::defaultDomain());
     $this->callAPISuccess('mail_settings', 'create', ['id' => $result['id'], 'domain' => 'updated.com']);
-    $this->assertEquals('updated.com', CRM_Core_BAO_MailSettings::defaultDomain());
+    $this->assertSame('updated.com', CRM_Core_BAO_MailSettings::defaultDomain());
     $this->callAPISuccess('MailSettings', 'delete', ['id' => $result['id']]);
     $this->callAPISuccessGetCount('mail_settings', [], 1);
   }
@@ -82,7 +82,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $this->callAPISuccess('MailSettings', 'create', $this->params);
     $result = $this->callAPISuccess('MailSettings', 'get', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('MailSettings', 'delete', ['id' => $result['id']]);
     $this->callAPISuccessGetCount('mail_settings', [], 1);
@@ -97,10 +97,10 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $this->callAPISuccess('MailSettings', 'create', $this->params);
     $entity = $this->callAPISuccess('MailSettings', 'get', $this->params);
-    $this->assertEquals('setting.com', $entity['values'][$entity['id']]['domain']);
+    $this->assertSame('setting.com', $entity['values'][$entity['id']]['domain']);
     $this->callAPISuccess('MailSettings', 'delete', ['id' => $entity['id']]);
     $checkDeleted = $this->callAPISuccess('MailSettings', 'get', []);
-    $this->assertEquals('EXAMPLE.ORG', $checkDeleted['values'][$checkDeleted['id']]['domain']);
+    $this->assertSame('EXAMPLE.ORG', $checkDeleted['values'][$checkDeleted['id']]['domain']);
   }
 
   /**
@@ -118,7 +118,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccess('MailSettings', 'create', ['name' => "delete this setting"] + $this->params);
     $result = $this->callAPISuccess('MailSettings', 'get', $params);
-    $this->assertEquals(0, $this->callAPISuccess('MailSettings', 'getcount', ['name' => "delete this setting"]));
+    $this->assertSame(0, $this->callAPISuccess('MailSettings', 'getcount', ['name' => "delete this setting"]));
   }
 
 }

@@ -3,6 +3,11 @@
 class CRM_OAuth_MailSetup {
 
   /**
+   * A mail account's token is tagged `MailSettings:{ID}`; there is no foreign key to the client.
+   */
+  const TOKEN_TAG_PREFIX = 'MailSettings:';
+
+  /**
    * Return a list of setup-options based on OAuth2 services.
    *
    * @see CRM_Utils_Hook::mailSetupActions()
@@ -87,7 +92,7 @@ class CRM_OAuth_MailSetup {
 
     \Civi\Api4\OAuthSysToken::update(FALSE)
       ->addWhere('id', '=', $token['id'])
-      ->setValues(['tag' => 'MailSettings:' . $mailSettings['id']])
+      ->setValues(['tag' => self::TOKEN_TAG_PREFIX . $mailSettings['id']])
       ->execute();
 
     CRM_Core_Session::setStatus(
@@ -113,7 +118,7 @@ class CRM_OAuth_MailSetup {
   public static function alterMailStore(&$mailSettings) {
     $token = civicrm_api4('OAuthSysToken', 'refresh', [
       'checkPermissions' => FALSE,
-      'where' => [['tag', '=', 'MailSettings:' . $mailSettings['id']]],
+      'where' => [['tag', '=', self::TOKEN_TAG_PREFIX . $mailSettings['id']]],
       'orderBy' => ['id' => 'DESC'],
     ])->first();
 
@@ -122,7 +127,7 @@ class CRM_OAuth_MailSetup {
       // with the account's (empty) password and fail as an IMAP login error.
       $rejected = \Civi\Api4\OAuthSysToken::get(FALSE)
         ->addSelect('error')
-        ->addWhere('tag', '=', 'MailSettings:' . $mailSettings['id'])
+        ->addWhere('tag', '=', self::TOKEN_TAG_PREFIX . $mailSettings['id'])
         ->addOrderBy('id', 'DESC')
         ->execute()
         ->first();

@@ -271,7 +271,6 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
    */
   public function cleanup() {
     // Redis already handles cleaning up stale keys.
-    return;
   }
 
 }

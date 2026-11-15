@@ -12,7 +12,6 @@
 
 namespace Civi\Afform;
 
-use Civi\Api4\Utils\FormattingUtil;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Search\Display;
 use CRM_Afform_ExtensionUtil as E;
@@ -212,35 +211,6 @@ class Utils {
     return $isChanged('server_route') ||
       $isChanged('is_public') ||
       (!empty($updatedAfform['server_route']) && $isChanged('title'));
-  }
-
-  public static function formatViewValue(string $fieldName, array $fieldInfo, array $values, ?string $entityName = NULL, ?string $formName = NULL): string {
-    $value = $values[$fieldName] ?? NULL;
-    if (isset($value) && $value !== '') {
-      $dataType = $fieldInfo['data_type'] ?? NULL;
-      if (!empty($fieldInfo['options'])) {
-        $value = FormattingUtil::replacePseudoconstant(array_column($fieldInfo['options'], 'label', 'id'), $value);
-      }
-      elseif (!empty($fieldInfo['fk_entity']) && $formName) {
-        $autocomplete = civicrm_api4($fieldInfo['fk_entity'], 'autocomplete', [
-          'checkPermissions' => FALSE,
-          'formName' => "afform:$formName",
-          'fieldName' => "$entityName:$fieldName",
-          'ids' => (array) $value,
-        ]);
-        $value = $autocomplete->column('label');
-      }
-      elseif ($dataType === 'Boolean') {
-        $value = $value ? ts('Yes') : ts('No');
-      }
-      elseif ($dataType === 'Date' || $dataType === 'Timestamp') {
-        $value = \CRM_Utils_Date::customFormat($value);
-      }
-      if (is_array($value)) {
-        $value = implode(', ', $value);
-      }
-    }
-    return $value ?? '';
   }
 
   public static function initSourceTranslations() {

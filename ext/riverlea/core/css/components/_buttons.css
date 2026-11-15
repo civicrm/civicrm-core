@@ -196,7 +196,6 @@
 /* Hover buttons (plain text, button shows on hover) */
 .crm-container a.crm-hover-button {
   border-radius: var(--crm-btn-radius);
-  color: var(--crm-link-color);
   cursor: var(--crm-link-hover-cursor);
   padding: var(--crm-btn-padding-block) var(--crm-btn-padding-inline);
   background-color: var(--crm-primary-color);
@@ -333,12 +332,12 @@
 #bootstrap-theme .btn-toolbar {
   margin-left: -5px;
 }
-#bootstrap-theme .btn-toolbar:before,
-#bootstrap-theme .btn-toolbar:after {
+#bootstrap-theme .btn-toolbar::before,
+#bootstrap-theme .btn-toolbar::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .btn-toolbar:after {
+#bootstrap-theme .btn-toolbar::after {
   clear: both;
 }
 #bootstrap-theme .btn-toolbar .btn,
@@ -351,13 +350,13 @@
 #bootstrap-theme .btn-toolbar > .input-group {
   margin-left: 5px;
 }
-#bootstrap-theme .btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+#bootstrap-theme .btn-group > .btn:not(:first-child, :last-child, .dropdown-toggle) {
   border-radius: 0;
 }
 #bootstrap-theme .btn-group > .btn:first-child {
   margin-left: 0;
 }
-#bootstrap-theme .btn-group > .btn:first-child:not(:last-child):not(.dropdown-toggle) {
+#bootstrap-theme .btn-group > .btn:first-child:not(:last-child, .dropdown-toggle) {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
@@ -369,7 +368,7 @@
 #bootstrap-theme .btn-group > .btn-group {
   float: left;
 }
-#bootstrap-theme .btn-group > .btn-group:not(:first-child):not(:last-child) > .btn {
+#bootstrap-theme .btn-group > .btn-group:not(:first-child, :last-child) > .btn {
   border-radius: 0;
 }
 #bootstrap-theme .btn-group > .btn-group:first-child:not(:last-child) > .btn:last-child,
@@ -418,12 +417,12 @@
   width: 100%;
   max-width: 100%;
 }
-#bootstrap-theme .btn-group-vertical > .btn-group:before,
-#bootstrap-theme .btn-group-vertical > .btn-group:after {
+#bootstrap-theme .btn-group-vertical > .btn-group::before,
+#bootstrap-theme .btn-group-vertical > .btn-group::after {
   display: table;
   content: " ";
 }
-#bootstrap-theme .btn-group-vertical > .btn-group:after {
+#bootstrap-theme .btn-group-vertical > .btn-group::after {
   clear: both;
 }
 #bootstrap-theme .btn-group-vertical > .btn-group > .btn {
@@ -436,22 +435,16 @@
   margin-top: -1px;
   margin-left: 0;
 }
-#bootstrap-theme .btn-group-vertical > .btn:not(:first-child):not(:last-child) {
+#bootstrap-theme .btn-group-vertical > .btn:not(:first-child, :last-child) {
   border-radius: 0;
 }
 #bootstrap-theme .btn-group-vertical > .btn:first-child:not(:last-child) {
-  border-top-left-radius: var(--crm-btn-radius);
-  border-top-right-radius: var(--crm-btn-radius);
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
+  border-radius: var(--crm-btn-radius) var(--crm-btn-radius) 0 0;
 }
 #bootstrap-theme .btn-group-vertical > .btn:last-child:not(:first-child) {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: var(--crm-btn-radius);
-  border-bottom-left-radius: var(--crm-btn-radius);
+  border-radius: 0 0 var(--crm-btn-radius) var(--crm-btn-radius);
 }
-#bootstrap-theme .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .btn {
+#bootstrap-theme .btn-group-vertical > .btn-group:not(:first-child, :last-child) > .btn {
   border-radius: 0;
 }
 #bootstrap-theme .btn-group-vertical > .btn-group:first-child:not(:last-child) > .btn:last-child,

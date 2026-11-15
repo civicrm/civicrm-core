@@ -317,7 +317,7 @@
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-param-value api-input" placeholder="{ts escape='htmlattribute'}Value{/ts}"/>
-      <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
+      <a class="crm-hover-button api-param-remove" href="#">{icon icon="fa-times"}{ts}Remove{/ts}{/icon}</a>
     </td>
   </tr>
 </script>
@@ -345,7 +345,7 @@
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-option-value api-input" placeholder="{ts escape='htmlattribute'}Value{/ts}"/>
-      <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
+      <a class="crm-hover-button api-param-remove" href="#">{icon icon="fa-times"}{ts}Remove{/ts}{/icon}</a>
     </td>
   </tr>
 </script>
@@ -370,7 +370,7 @@
     </td>
     <td>
       <input style="width: 85%;" class="crm-form-text api-param-value api-input" value="{ldelim}{rdelim}" placeholder="{ts escape='htmlattribute'}API Params{/ts}"/>
-      <a class="crm-hover-button api-param-remove" href="#"><i class="crm-i fa-times" role="img" aria-hidden="true"></i></a>
+      <a class="crm-hover-button api-param-remove" href="#">{icon icon="fa-times"}{ts}Remove{/ts}{/icon}</a>
     </td>
   </tr>
 </script>

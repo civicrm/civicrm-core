@@ -26,6 +26,19 @@ class Container {
   const SELF = 'civi_container_factory';
 
   /**
+   * Hooks that createContainer() and compile() dispatch.
+   */
+  const COMPILE_HOOKS = ['hook_civicrm_container', 'hook_civicrm_entityTypes', 'hook_civicrm_scanClasses'];
+
+  /**
+   * Container classes compiled by this test process.
+   *
+   * @var array
+   *   Ex: $testContainers[$envId] = ['class' => 'CachedCiviTestContainer_...', 'file' => '/path/to/templates_c/...'].
+   */
+  private static $testContainers = [];
+
+  /**
    * @param bool $reset
    *   Whether to forcibly rebuild the entire container.
    * @return \Symfony\Component\DependencyInjection\TaggedContainerInterface
@@ -62,7 +75,7 @@ class Container {
     $cacheMode = defined('CIVICRM_CONTAINER_CACHE') ? CIVICRM_CONTAINER_CACHE : 'auto';
 
     // In pre-installation environments, don't bother with caching.
-    if (!defined('CIVICRM_DSN') || defined('CIVICRM_TEST') || CIVICRM_UF === 'UnitTests' || $cacheMode === 'never' || \CRM_Utils_System::isInUpgradeMode()) {
+    if (!defined('CIVICRM_DSN') || $cacheMode === 'never' || \CRM_Utils_System::isInUpgradeMode()) {
       $containerBuilder = $this->createContainer();
       $containerBuilder->compile();
       return $containerBuilder;
@@ -70,8 +83,12 @@ class Container {
 
     $envId = md5(implode(',', array_merge(
       [\CRM_Core_Config_Runtime::getId()],
-      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'prefix')
+      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'prefix'),
+      $GLOBALS['CIVICRM_FORCE_MODULES'] ?? []
     )));
+    if (defined('CIVICRM_TEST') || CIVICRM_UF === 'UnitTests') {
+      return $this->loadTestContainer($envId);
+    }
     $file = \Civi::paths()->getPath("[civicrm.compile]/CachedCiviContainer.{$envId}.php");
     $containerCacheClass = "CachedCiviContainer_{$envId}";
     $containerConfigCache = new ConfigCache($file, $cacheMode === 'auto');
@@ -88,6 +105,47 @@ class Container {
     require_once $file;
     $c = new $containerCacheClass();
     return $c;
+  }
+
+  /**
+   * Compile the container once per test process and environment; each boot gets a fresh instance.
+   *
+   * The compiled class lives in the compile dir, so clearing it (`Civi::rebuild(['files' => TRUE])`)
+   * forces a new compile, as on a live site. A test that listens to one of the COMPILE_HOOKS
+   * gets its own container.
+   *
+   * @param string $envId
+   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   */
+  private function loadTestContainer(string $envId) {
+    $test = $GLOBALS['CIVICRM_TEST_CASE'] ?? NULL;
+    $testListeners = $test instanceof \Civi\Test\HeadlessInterface ? EventScanner::findListeners($test) : [];
+    $testHooks = array_map(fn($event) => ltrim($event, '&'), array_keys($testListeners));
+    if (array_intersect(self::COMPILE_HOOKS, $testHooks)) {
+      $containerBuilder = $this->createContainer();
+      $containerBuilder->compile();
+      return $containerBuilder;
+    }
+
+    if (!isset(self::$testContainers[$envId]) || !is_file(self::$testContainers[$envId]['file'])) {
+      $containerBuilder = $this->createContainer();
+      $containerBuilder->compile();
+      $class = 'CachedCiviTestContainer_' . $envId . '_' . bin2hex(random_bytes(4));
+      $file = \Civi::paths()->getPath("[civicrm.compile]/{$class}.php");
+      file_put_contents($file, (new PhpDumper($containerBuilder))->dump(['class' => $class]));
+      require_once $file;
+      if (empty(self::$testContainers)) {
+        register_shutdown_function(function () {
+          foreach (self::$testContainers as $compiled) {
+            if (is_file($compiled['file'])) {
+              unlink($compiled['file']);
+            }
+          }
+        });
+      }
+      self::$testContainers[$envId] = ['class' => $class, 'file' => $file];
+    }
+    return new self::$testContainers[$envId]['class']();
   }
 
   /**
@@ -371,22 +429,6 @@ class Container {
       []
     ))->addTag('kernel.event_subscriber')->setPublic(TRUE);
 
-    $dispatcherDefn = $container->getDefinition('dispatcher');
-    // Get all declared BAO classes
-    $baoClasses = \CRM_Core_DAO_AllCoreTables::getBaoClasses();
-    // "Extra" BAO classes that don't have a DAO but still need to listen to hooks
-    $baoClasses[] = \CRM_Core_BAO_CustomValue::class;
-    foreach ($baoClasses as $key => $baoClass) {
-      // Key will be a valid entity name for all but the "extra" classes which don't have a DAO entity.
-      $baoEntity = is_numeric($key) ? NULL : $key;
-      $listenerMap = EventScanner::findListeners($baoClass, $baoEntity);
-      if ($listenerMap) {
-        $file = (new \ReflectionClass($baoClass))->getFileName();
-        $container->addResource(new \Symfony\Component\Config\Resource\FileResource($file));
-        $dispatcherDefn->addMethodCall('addListenerMap', [$baoClass, $listenerMap]);
-      }
-    }
-
     // FIXME: Automatically scan BasicServices for ProviderInterface.
     $container->getDefinition('civi_api_kernel')->addMethodCall(
       'registerApiProvider',
@@ -449,18 +491,15 @@ class Container {
 
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\InstallationCanary', 'check']);
     $dispatcher->addListener('civi.core.install', ['\Civi\Core\DatabaseInitializer', 'initialize']);
-    $dispatcher->addListener('&civi.mailing.track', ['CRM_Mailing_BAO_MailingTrackableURL', 'on_civi_mailing_track'], -500);
     $dispatcher->addListener('hook_civicrm_initiators', $aliasFuncEvent('hook_civicrm_initiators', fn($e) => $e->context['for']), 100);
     $dispatcher->addListener('hook_civicrm_post', ['\CRM_Core_Transaction', 'addPostCommit'], -1000);
     $dispatcher->addListener('hook_civicrm_pre', $aliasEvent('hook_civicrm_pre', 'entity'), 100);
-    $dispatcher->addListener('civi.dao.preDelete', ['\CRM_Core_BAO_EntityTag', 'preDeleteOtherEntity']);
     $dispatcher->addListener('hook_civicrm_post', $aliasEvent('hook_civicrm_post', 'entity'), 100);
     $dispatcher->addListener('hook_civicrm_postCommit', $aliasEvent('hook_civicrm_postCommit', 'entity'), 100);
     $dispatcher->addListener('hook_civicrm_post::Activity', ['\Civi\CCase\Events', 'fireCaseChange']);
     $dispatcher->addListener('hook_civicrm_post::Case', ['\Civi\CCase\Events', 'fireCaseChange']);
     $dispatcher->addListener('hook_civicrm_caseChange', ['\Civi\CCase\Events', 'delegateToXmlListeners']);
     $dispatcher->addListener('hook_civicrm_caseChange', ['\Civi\CCase\SequenceListener', 'onCaseChange_static']);
-    $dispatcher->addListener('hook_civicrm_cryptoRotateKey', ['\Civi\Crypto\RotateKeys', 'rotateSmtp']);
     $dispatcher->addListener('hook_civicrm_eventDefs', ['\Civi\Core\CiviEventInspector', 'findBuiltInEvents']);
     // TODO We need a better code-convention for metadata about non-hook events.
     $dispatcher->addListener('hook_civicrm_eventDefs', ['\Civi\API\Events', 'hookEventDefs']);
@@ -474,53 +513,6 @@ class Container {
     $dispatcher->addListener('hook_civicrm_alterExternUrl', ['\CRM_Utils_System', 'migrateExternUrl'], 1000);
     // Not a BAO class so it can't implement hookInterface
     $dispatcher->addListener('hook_civicrm_post', ['CRM_Utils_Recent', 'on_hook_civicrm_post']);
-    $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findConstPermissions'], 975);
-    $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCiviPermissions'], 950);
-    $dispatcher->addListener('hook_civicrm_permissionList', ['CRM_Core_Permission_List', 'findCmsPermissions'], 925);
-    $dispatcher->addListener('hook_civicrm_permission_check', ['CRM_Core_Permission', 'checkConstPermissions'], 1000);
-
-    $dispatcher->addListener('hook_civicrm_postSave_civicrm_domain', ['\CRM_Core_BAO_Domain', 'onPostSave']);
-    $dispatcher->addListener('hook_civicrm_unhandled_exception', [
-      'CRM_Core_LegacyErrorHandler',
-      'handleException',
-    ], -200);
-
-    // Security checks for contact belongings (Address, Email, Phone, etc.)
-    foreach ([
-      'Address' => 'CRM_Core_BAO_Address',
-      'Email' => 'CRM_Core_BAO_Email',
-      'IM' => 'CRM_Core_BAO_IM',
-      'OpenID' => 'CRM_Core_BAO_OpenID',
-      'Phone' => 'CRM_Core_BAO_Phone',
-      'Website' => 'CRM_Core_BAO_Website',
-      'GroupContact' => 'CRM_Contact_BAO_GroupContact',
-    ] as $entity => $bao) {
-      $dispatcher->addListener("hook_civicrm_pre::{$entity}", [$bao, 'checkContactAccessPre']);
-      $dispatcher->addListener("civi.api4.authorizeRecord::{$entity}", [$bao, 'checkContactAccessAuthorizeRecord']);
-    }
-
-    // Security checks for record ownership (Batch, SavedSearch, Note, UserJob, ReportInstance, SearchParamSet)
-    foreach ([
-      'Batch' => 'CRM_Batch_BAO_Batch',
-      'SavedSearch' => 'CRM_Contact_BAO_SavedSearch',
-      'Note' => 'CRM_Core_BAO_Note',
-      'UserJob' => 'CRM_Core_BAO_UserJob',
-      'ReportInstance' => 'CRM_Report_BAO_ReportInstance',
-      'SearchParamSet' => 'CRM_Afform_BAO_SearchParamSet',
-    ] as $entity => $bao) {
-      $dispatcher->addListener("hook_civicrm_pre::{$entity}", [$bao, 'checkOwnershipAccessPre']);
-      $dispatcher->addListener("civi.api4.authorizeRecord::{$entity}", [$bao, 'checkOwnershipAccessAuthorizeRecord']);
-    }
-
-    // Security checks for dynamic foreign keys (EntityTag, Note, Translation)
-    foreach ([
-      'EntityTag' => 'CRM_Core_BAO_EntityTag',
-      'Note' => 'CRM_Core_BAO_Note',
-      'Translation' => 'CRM_Core_BAO_Translation',
-    ] as $entity => $bao) {
-      $dispatcher->addListener("hook_civicrm_pre::{$entity}", [$bao, 'checkDynamicFKAccessPre']);
-      $dispatcher->addListener("civi.api4.authorizeRecord::{$entity}", [$bao, 'checkDynamicFKAccessAuthorizeRecord']);
-    }
 
     return $dispatcher;
   }

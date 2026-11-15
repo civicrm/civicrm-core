@@ -880,14 +880,14 @@ GROUP BY    currency
     ];
 
     // hack to fix title
-    list($from1, $to1) = $this->getFromTo(CRM_Utils_Array::value("receive_date1_relative", $this->_params),
+    [$from1, $to1] = $this->getFromTo(CRM_Utils_Array::value("receive_date1_relative", $this->_params),
       $this->_params["receive_date1_from"] ?? NULL,
       $this->_params["receive_date1_to"] ?? NULL
     );
     $from1 = CRM_Utils_Date::customFormat($from1, NULL, ['d']);
     $to1 = CRM_Utils_Date::customFormat($to1, NULL, ['d']);
 
-    list($from2, $to2) = $this->getFromTo(CRM_Utils_Array::value("receive_date2_relative", $this->_params),
+    [$from2, $to2] = $this->getFromTo(CRM_Utils_Array::value("receive_date2_relative", $this->_params),
       $this->_params["receive_date2_from"] ?? NULL,
       $this->_params["receive_date2_to"] ?? NULL
     );

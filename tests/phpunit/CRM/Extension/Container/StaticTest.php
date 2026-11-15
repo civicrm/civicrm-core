@@ -26,8 +26,8 @@ class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
 
-    $this->assertEquals("/path/to/foo", $c->getPath('test.foo'));
-    $this->assertEquals("/path/to/bar", $c->getPath('test.foo.bar'));
+    $this->assertSame("/path/to/foo", $c->getPath('test.foo'));
+    $this->assertSame("/path/to/bar", $c->getPath('test.foo.bar'));
   }
 
   public function testGetResUrl(): void {
@@ -40,8 +40,8 @@ class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
 
-    $this->assertEquals('http://foo', $c->getResUrl('test.foo'));
-    $this->assertEquals('http://foobar', $c->getResUrl('test.foo.bar'));
+    $this->assertSame('http://foo', $c->getResUrl('test.foo'));
+    $this->assertSame('http://foobar', $c->getResUrl('test.foo.bar'));
   }
 
   /**

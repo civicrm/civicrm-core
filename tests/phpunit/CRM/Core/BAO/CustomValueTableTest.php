@@ -54,7 +54,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
    */
   public function testStoreFile(): void {
     $contactID = $this->individualCreate();
-    $file = $this->callAPISuccess('File', 'create', ['uri' => 'dummy_data']);
+    $file = $this->createTestEntity('File', ['file_name' => 'dummy_data.txt', 'mime_type' => 'text/plain']);
     $customGroup = $this->customGroupCreate();
     $fields = [
       'custom_group_id' => $customGroup['id'],
@@ -79,6 +79,9 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     ];
 
     CRM_Core_BAO_CustomValueTable::store($params, 'civicrm_contact', $contactID);
+    $tableName = $customGroup['values'][$customGroup['id']]['table_name'];
+    $columnName = $customField['values'][$customField['id']]['column_name'];
+    $this->assertSame((string) $file['id'], CRM_Core_DAO::singleValueQuery("SELECT $columnName FROM $tableName WHERE entity_id = %1", [1 => [$contactID, 'Integer']]));
   }
 
   /**
@@ -252,7 +255,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
 
     $entityValues = CRM_Core_BAO_CustomValueTable::getEntityValues($contactID, 'Individual');
 
-    $this->assertEquals('<p><strong>This is a <u>test</u></p>', $entityValues[$customField['id']],
+    $this->assertSame('<p><strong>This is a <u>test</u></p>', $entityValues[$customField['id']],
       'Checking same for returned value.'
     );
   }
@@ -310,7 +313,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
     $sql = "SELECT COUNT(*) FROM $table WHERE entity_id = $contactID AND " . implode(' IS NULL AND ', $columns) . ' IS NULL';
 
     CRM_Core_BAO_CustomValueTable::setValues($params);
-    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery($sql));
+    $this->assertSame('0', CRM_Core_DAO::singleValueQuery($sql));
 
     foreach (array_keys($params) as $key) {
       if ($key !== 'entityID') {
@@ -318,7 +321,7 @@ class CRM_Core_BAO_CustomValueTableTest extends CiviUnitTestCase {
       }
     }
     CRM_Core_BAO_CustomValueTable::setValues($params);
-    $this->assertEquals(1, CRM_Core_DAO::singleValueQuery($sql));
+    $this->assertSame('1', CRM_Core_DAO::singleValueQuery($sql));
   }
 
   public static function emptyValues(): array {

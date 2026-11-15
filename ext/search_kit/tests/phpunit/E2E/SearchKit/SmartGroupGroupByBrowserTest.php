@@ -30,7 +30,7 @@ class SmartGroupGroupByBrowserTest extends Civi\Test\MinkBase {
 
     $this->assertTrue($this->mink->getSession()->wait(5000, '!!document.querySelector(".ui-notify-message") || [...document.querySelectorAll("button")].some(b => b.textContent.trim() === "Saved")'), 'Save finished or refused');
     $stored = SavedSearch::get(FALSE)->addWhere('id', '=', $savedSearchId)->execute()->single();
-    $this->assertEquals('id', $stored['api_params']['select'][0]);
+    $this->assertSame('id', $stored['api_params']['select'][0]);
     $this->assertSession()->elementTextContains('css', '.ui-notify-message', 'must hold contact IDs');
   }
 
@@ -41,7 +41,7 @@ class SmartGroupGroupByBrowserTest extends Civi\Test\MinkBase {
     $this->assertTrue($this->mink->getSession()->wait(5000, '[...document.querySelectorAll("button")].some(b => b.textContent.trim() === "Saved")'), 'Saved');
     $stored = SavedSearch::get(FALSE)->addWhere('id', '=', $savedSearchId)->execute()->single();
     $this->assertEquals(['id'], $stored['api_params']['groupBy']);
-    $this->assertEquals('id', $stored['api_params']['select'][0]);
+    $this->assertSame('id', $stored['api_params']['select'][0]);
   }
 
   private function createSmartGroupSearch(): int {

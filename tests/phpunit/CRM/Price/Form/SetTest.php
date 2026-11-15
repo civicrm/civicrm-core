@@ -33,7 +33,7 @@ class CRM_Price_Form_SetTest extends CiviUnitTestCase {
       'action' => CRM_Core_Action::UPDATE,
     ])->processForm(\Civi\Test\FormWrapper::PREPROCESSED);
 
-    $this->assertEquals('Edit Test-Small (< 20 employees)', $form->getTitle());
+    $this->assertSame('Edit Test-Small (< 20 employees)', $form->getTitle());
   }
 
 }

@@ -39,7 +39,7 @@ class BasicHeaders extends AutoService {
         continue;
       }
 
-      list($verp) = $mailing->getVerpAndUrlsAndHeaders(
+      [$verp] = $mailing->getVerpAndUrlsAndHeaders(
         $e->getJob()->id, $task->getEventQueueId(), $task->getHash());
 
       $mailParams = [];

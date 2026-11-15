@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Address;
+use Civi\Api4\Contact;
 use Civi\Api4\Generic\Result;
 use Civi\Test\FormWrapper;
 
@@ -94,7 +96,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $emails = $this->getForContact('Email', ['id' => 'ASC']);
     $this->assertCount(2, $emails);
-    $this->assertEquals('lobo@example.org', $emails->first()['email']);
+    $this->assertSame('lobo@example.org', $emails->first()['email']);
     // No records were set to primary so the first one should have been automatically picked.
     $this->assertSame(TRUE, $emails->first()['is_primary']);
     $this->assertSame(FALSE, $emails->last()['is_primary']);
@@ -125,7 +127,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $emails = $this->getForContact('Email', ['is_primary' => 'DESC', 'id' => 'ASC']);
     $this->assertCount(3, $emails);
-    $this->assertEquals('lobo.secondary@example.org', $emails->first()['email']);
+    $this->assertSame('lobo.secondary@example.org', $emails->first()['email']);
     $this->assertSame(TRUE, $emails->first()['is_primary']);
     $this->assertEquals($emailId, $emails->column('id', 'email')['lobo.updated@example.org']);
 
@@ -142,7 +144,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
-    $this->assertEquals(0, $this->getForContact('Email')->count());
+    $this->assertSame(0, $this->getForContact('Email')->count());
   }
 
   /**
@@ -244,7 +246,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $phones = $this->getForContact('Phone');
     $this->assertCount(1, $phones);
-    $this->assertEquals('555-0100', $phones->first()['phone']);
+    $this->assertSame('555-0100', $phones->first()['phone']);
     $phoneId = $phones->first()['id'];
 
     // Delete existing phone and add 2 more
@@ -270,7 +272,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $phones = $this->getForContact('Phone');
     $this->assertCount(2, $phones);
-    $this->assertEquals('555-0199', $phones->first()['phone']);
+    $this->assertSame('555-0199', $phones->first()['phone']);
     $this->assertArrayNotHasKey($phoneId, $phones->column(NULL, 'id'));
     // No records were set to primary so the first one should have been automatically picked.
     $this->assertSame(TRUE, $phones->first()['is_primary']);
@@ -292,7 +294,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
-    $this->assertEquals(0, $this->getForContact('Phone')->count());
+    $this->assertSame(0, $this->getForContact('Phone')->count());
   }
 
   /**
@@ -342,7 +344,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $ims = $this->getForContact('Im');
     $this->assertCount(1, $ims);
-    $this->assertEquals('ghopper', $ims->first()['name']);
+    $this->assertSame('ghopper', $ims->first()['name']);
     // No primary was specified so it should automatically be primary
     $this->assertSame(TRUE, $ims->first()['is_primary']);
     $imId = $ims->first()['id'];
@@ -375,7 +377,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $ims = $this->getForContact('Im', ['is_primary' => 'DESC', 'id' => 'ASC']);
     $this->assertCount(3, $ims);
-    $this->assertEquals('aturing', $ims->first()['name']);
+    $this->assertSame('aturing', $ims->first()['name']);
     $this->assertSame(TRUE, $ims->first()['is_primary']);
     $this->assertEquals($imId, $ims->column('id', 'name')['ghopper_updated']);
 
@@ -392,7 +394,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
-    $this->assertEquals(0, $this->getForContact('Im')->count());
+    $this->assertSame(0, $this->getForContact('Im')->count());
   }
 
   /**
@@ -444,7 +446,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $openids = $this->getForContact('OpenID', ['is_primary' => 'DESC']);
     $this->assertCount(2, $openids);
-    $this->assertEquals('https://w3c.openid.example.org', $openids->first()['openid']);
+    $this->assertSame('https://w3c.openid.example.org', $openids->first()['openid']);
     $this->assertSame(TRUE, $openids->first()['is_primary']);
 
     // Update existing OpenIDs switching primary to the other one
@@ -467,7 +469,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $openids = $this->getForContact('OpenID', ['is_primary' => 'DESC']);
     $this->assertCount(2, $openids);
-    $this->assertEquals('https://timbl.updated.openid.example.org', $openids->first()['openid']);
+    $this->assertSame('https://timbl.updated.openid.example.org', $openids->first()['openid']);
     $this->assertSame(TRUE, $openids->first()['is_primary']);
 
     // Delete all OpenIDs by clearing values
@@ -483,7 +485,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
-    $this->assertEquals(0, $this->getForContact('OpenID')->count());
+    $this->assertSame(0, $this->getForContact('OpenID')->count());
   }
 
   /**
@@ -527,7 +529,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $websites = $this->getForContact('Website');
     $this->assertCount(1, $websites);
-    $this->assertEquals('https://example.com', $websites->first()['url']);
+    $this->assertSame('https://example.com', $websites->first()['url']);
     $websiteId = $websites->first()['id'];
 
     // Update existing website and add a second website of different type
@@ -548,7 +550,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $websites = $this->getForContact('Website');
     $this->assertCount(2, $websites);
-    $this->assertEquals('https://example-updated.com', $websites->first()['url']);
+    $this->assertSame('https://example-updated.com', $websites->first()['url']);
     $this->assertEquals($websiteId, $websites->first()['id']);
 
     // Delete all websites by clearing values
@@ -561,7 +563,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     ], ['cid' => $contactId]);
     $formWrapper->processForm();
 
-    $this->assertEquals(0, $this->getForContact('Website')->count());
+    $this->assertSame(0, $this->getForContact('Website')->count());
   }
 
   /**
@@ -579,8 +581,8 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $formWrapper->processForm();
 
     $updated = $this->getForContact('Contact')->first();
-    $this->assertEquals('Donald', $updated['first_name']);
-    $this->assertEquals('Greenberg', $updated['last_name']);
+    $this->assertSame('Donald', $updated['first_name']);
+    $this->assertSame('Greenberg', $updated['last_name']);
 
     // Empty name with no email on contact should fail validation
     $namelessContact = $this->createTestEntity('Contact', [
@@ -616,7 +618,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $formWrapper->processForm();
 
     $updated = $this->getForContact('Contact')->first();
-    $this->assertEquals('Software Director', $updated['job_title']);
+    $this->assertSame('Software Director', $updated['job_title']);
 
     // Test ContactInfo for Organization (organization closed / is_deceased)
     $org = $this->createTestEntity('Contact', [
@@ -637,7 +639,7 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       'checkPermissions' => FALSE,
       'where' => [['id', '=', $orgId]],
     ])->first();
-    $this->assertEquals('Acme Corporation LLC', $orgRecord['legal_name']);
+    $this->assertSame('Acme Corporation LLC', $orgRecord['legal_name']);
     $this->assertTrue((bool) $orgRecord['is_deceased']);
 
     // Uncheck is_deceased (Organization is Closed unchecked)
@@ -653,6 +655,34 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     ])->first();
     $this->assertFalse((bool) $orgRecord['is_deceased']);
     $this->assertEmpty($orgRecord['deceased_date']);
+  }
+
+  /**
+   * ContactInfo for organizations and households doesn't show the name, so
+   * validation must not require it.
+   */
+  public function testContactInfoFormValidatesWithoutName(): void {
+    $org = $this->createTestEntity('Contact', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'Acme Corp',
+    ], 'org_contact');
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_ContactInfo', [
+      'oplock_ts' => $this->getOplockTs($org['id']),
+      'legal_name' => 'Acme Corporation LLC',
+    ], ['cid' => $org['id']]);
+    $formWrapper->processForm(FormWrapper::VALIDATED);
+    $this->assertEmpty($formWrapper->getValidationOutput());
+
+    $household = $this->createTestEntity('Contact', [
+      'contact_type' => 'Household',
+      'household_name' => 'The Smiths',
+    ], 'household_contact');
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_ContactInfo', [
+      'oplock_ts' => $this->getOplockTs($household['id']),
+      'nick_name' => 'Smiths',
+    ], ['cid' => $household['id']]);
+    $formWrapper->processForm(FormWrapper::VALIDATED);
+    $this->assertEmpty($formWrapper->getValidationOutput());
   }
 
   /**
@@ -672,10 +702,10 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
     $formWrapper->processForm();
 
     $updated = $this->getForContact('Contact')->first();
-    $this->assertEquals(1, $updated['gender_id']);
-    $this->assertEquals('1951-01-01', $updated['birth_date']);
+    $this->assertSame(1, $updated['gender_id']);
+    $this->assertSame('1951-01-01', $updated['birth_date']);
     $this->assertTrue((bool) $updated['is_deceased']);
-    $this->assertEquals('2020-05-15', $updated['deceased_date']);
+    $this->assertSame('2020-05-15', $updated['deceased_date']);
 
     // Uncheck is_deceased (simulating unchecked checkbox where is_deceased is omitted)
     $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Demographics', [
@@ -736,8 +766,8 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
 
     $addresses = $this->getForContact('Address');
     $this->assertCount(1, $addresses);
-    $this->assertEquals('100 Innovation Way', $addresses->first()['street_address']);
-    $this->assertEquals('Metropolis', $addresses->first()['city']);
+    $this->assertSame('100 Innovation Way', $addresses->first()['street_address']);
+    $this->assertSame('Metropolis', $addresses->first()['city']);
   }
 
   /**
@@ -848,6 +878,42 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test ContactInfo inline form saves when the current employer is one the user cannot view.
+   */
+  public function testContactInfoFormKeepsEmployerUserCannotView(): void {
+    $userContact = $this->createLoggedInUser();
+    $secretOrg = $this->createTestEntity('Contact', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'Secret Org',
+    ], 'secret_org');
+    Contact::update(FALSE)
+      ->addWhere('id', '=', $userContact)
+      ->addValue('employer_id', $secretOrg['id'])
+      ->execute();
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_ContactInfo', [
+      'oplock_ts' => $this->getOplockTs($userContact),
+      'employer_id' => $secretOrg['id'],
+      'job_title' => 'Organizer',
+    ], ['cid' => $userContact]);
+    $formWrapper->processForm();
+
+    $this->assertEmpty($formWrapper->getValidationOutput());
+    $userRecord = Contact::get(FALSE)
+      ->addSelect('employer_id', 'job_title')
+      ->addWhere('id', '=', $userContact)
+      ->execute()->first();
+    $this->assertEquals($secretOrg['id'], $userRecord['employer_id']);
+    $this->assertSame('Organizer', $userRecord['job_title']);
+  }
+
+  /**
    * Test Address inline form validates master_id permissions and rejects other contacts' address IDs.
    */
   public function testAddressFormPermissions(): void {
@@ -941,6 +1007,56 @@ class CRM_Contact_Form_Inline_InlineTest extends CiviUnitTestCase {
       ['address[1][use_shared_address]' => ts('You do not have permission to share an address from this contact.')],
       $formWrapper->getValidationOutput()
     );
+  }
+
+  /**
+   * Test Address form saves an existing shared address whose master contact the user cannot view.
+   */
+  public function testAddressFormKeepsSharedAddressUserCannotView(): void {
+    $userContact = $this->createLoggedInUser();
+    $homeLocationTypeID = \CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Home');
+    $otherContact = $this->createTestEntity('Contact', [
+      'contact_type' => 'Household',
+      'household_name' => 'Hidden Household',
+    ], 'hidden_household');
+    $masterAddress = $this->createTestEntity('Address', [
+      'contact_id' => $otherContact['id'],
+      'location_type_id' => $homeLocationTypeID,
+      'street_address' => '500 Shared Lane',
+    ], 'master_address');
+    $sharedAddress = $this->createTestEntity('Address', [
+      'contact_id' => $userContact,
+      'location_type_id' => $homeLocationTypeID,
+      'is_primary' => TRUE,
+      'master_id' => $masterAddress['id'],
+    ], 'shared_address');
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [
+      'access CiviCRM',
+      'edit my contact',
+      'view my contact',
+    ];
+
+    $formWrapper = new FormWrapper('CRM_Contact_Form_Inline_Address', [
+      'oplock_ts' => $this->getOplockTs($userContact),
+      'address' => [
+        1 => [
+          'location_type_id' => $homeLocationTypeID,
+          'is_primary' => 1,
+          'use_shared_address' => 1,
+          'master_id' => $masterAddress['id'],
+        ],
+      ],
+    ], ['cid' => $userContact, 'locno' => 1, 'aid' => $sharedAddress['id']]);
+    $formWrapper->processForm();
+
+    $this->assertEmpty($formWrapper->getValidationOutput());
+    $address = Address::get(FALSE)
+      ->addSelect('master_id', 'street_address')
+      ->addWhere('id', '=', $sharedAddress['id'])
+      ->execute()->single();
+    $this->assertEquals($masterAddress['id'], $address['master_id']);
+    $this->assertSame('500 Shared Lane', $address['street_address']);
   }
 
 }

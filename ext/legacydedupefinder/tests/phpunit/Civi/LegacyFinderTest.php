@@ -179,7 +179,7 @@ class LegacyFinderTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
         'last_name' => 'bob@example.org',
       ],
     ]);
-    $this->assertEquals(1, $matches['count']);
+    $this->assertSame(1, $matches['count']);
 
     // Test again on a non-matched one - apiv3 & 4 again.
     $matches = Contact::getDuplicates(FALSE)

@@ -557,12 +557,15 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
   }
 
   /**
+   * @deprecated since 6.22 will be removed around 6.28
+   *
    * @param $optionLabel
    * @param int $fid
    *
    * @return mixed
    */
   public static function getOptionId($optionLabel, $fid) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     if (!$optionLabel || !$fid) {
       return;
     }
@@ -821,10 +824,7 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
   public static function getVisibilityOptionID($visibilityName) {
 
     if (!isset(self::$visibilityOptionsKeys)) {
-      self::$visibilityOptionsKeys = CRM_Core_PseudoConstant::get('CRM_Price_BAO_PriceField', 'visibility_id', [
-        'labelColumn' => 'name',
-        'flip' => TRUE,
-      ]);
+      self::$visibilityOptionsKeys = array_column(\Civi::entity('PriceField')->getOptions('visibility_id'), 'id', 'name');
     }
 
     if (isset(self::$visibilityOptionsKeys[$visibilityName])) {

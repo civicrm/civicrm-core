@@ -252,7 +252,7 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
       // $this->buildRelativeDateQuery($values);
       return;
     }
-    list($name, $op, $value, $grouping, $wildcard) = $values;
+    [$name, $op, $value, $grouping, $wildcard] = $values;
     $fields = CRM_Case_BAO_Case::fields();
     $fieldSpec = $fields[$values[0]] ?? [];
     $val = $names = [];

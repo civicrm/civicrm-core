@@ -59,7 +59,7 @@ class CRM_Contribute_Form_Task_BatchTest extends CiviUnitTestCase {
     $contribution = Contribution::get(FALSE)->addWhere('id', '=', $this->ids['Contribution']['default'])
       ->addSelect('contribution_status_id:name')
       ->execute()->single();
-    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+    $this->assertSame('Completed', $contribution['contribution_status_id:name']);
   }
 
 }

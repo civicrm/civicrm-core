@@ -9,6 +9,8 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\CustomField;
+
 /**
  * Test class for CRM_Contact_BAO_Group BAO
  *
@@ -27,9 +29,11 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
   protected function tearDown(): void {
     if (!empty($this->ids['CustomField'])) {
       foreach ($this->ids['CustomField'] as $type => $id) {
-        $field = civicrm_api3('CustomField', 'getsingle', ['id' => $id]);
-        $group = civicrm_api3('CustomGroup', 'getsingle', ['id' => $field['custom_group_id']]);
-        CRM_Core_DAO::executeQuery("DROP TABLE IF Exists {$group['table_name']}");
+        $field = CustomField::get(FALSE)
+          ->addSelect('custom_group_id.table_name')
+          ->addWhere('id', '=', $id)
+          ->execute()->single();
+        CRM_Core_DAO::executeQuery("DROP TABLE IF Exists {$field['custom_group_id.table_name']}");
       }
     }
     $this->quickCleanup([
@@ -72,7 +76,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
     $defaults = $sg->setDefaultValues();
 
     $this->checkArrayEquals($defaults, $formValues);
-    $this->callAPISuccess('CustomField', 'delete', ['id' => $this->ids['CustomField']['int']]);
+    CustomField::delete(FALSE)->addWhere('id', '=', $this->ids['CustomField']['int'])->execute();
     unset($this->ids['CustomField']['int']);
     $defaults = $sg->setDefaultValues();
     $this->checkArrayEquals($defaults, $formValues);

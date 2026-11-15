@@ -779,7 +779,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     static $lookup;
     if (!$lookup) {
       $lookup = CRM_Contact_BAO_Relationship::buildOptions("is_permission_a_b");
-    };
+    }
     return $lookup[$key] ?? NULL;
   }
 

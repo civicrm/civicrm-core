@@ -3,17 +3,12 @@ declare(strict_types = 1);
 
 namespace Civi\Custom\EventSubscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\PreEvent;
-use Civi\Core\Service\AutoSubscriber;
 
-final class FkEntityDeleteSubscriber extends AutoSubscriber {
+final class FkEntityDeleteSubscriber {
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_pre' => 'onPre',
-    ];
-  }
-
+  #[CiviEventListener(event: 'hook_civicrm_pre')]
   public function onPre(PreEvent $event): void {
     // Set NULL on real deletion is part of the database schema and does not
     // need to be handled here.

@@ -12,23 +12,20 @@
 
 namespace Civi\Api4\Service\Autocomplete;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\API\Event\PrepareEvent;
 use Civi\Api4\Setting;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Event\GenericHookEvent;
-use Civi\Core\HookInterface;
 
-/**
- * @service
- * @internal
- */
-class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService implements HookInterface {
+class ContactAutocompleteProvider {
 
   /**
    * Custom autocomplete for the menubar quicksearch.
    *
    * @param \Civi\API\Event\PrepareEvent $event
    */
+  #[CiviEventListener(event: 'civi.api.prepare')]
   public static function on_civi_api_prepare(PrepareEvent $event) {
     $apiRequest = $event->getApiRequest();
     if (is_object($apiRequest) &&
@@ -74,22 +71,22 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
       $ftsIndices = array_keys(\Civi::service('civi.schema.fts')->getIndicesForEntity('Contact'));
       $allFilterFields = array_column(\CRM_Core_SelectValues::getQuicksearchOptions(), NULL, 'key');
       $enabledFilterFields = \array_intersect_key($allFilterFields, array_flip(\Civi::settings()->get('quicksearch_options')));
+      $wildcardAtStart = \Civi::settings()->get('includeWildCardInName') ? '%' : '';
 
       if (!$filterInputs) {
         // this is the default option: Name (and Email)
         $useFtsForSortName = \in_array('contact_names', $ftsIndices);
         $includeNickName = $useFtsForSortName || \Civi::settings()->get('includeNickNameInName');
         $includeEmailWithName = \Civi::settings()->get('includeEmailInName');
-        $wildcardAtStart = \Civi::settings()->get('includeWildCardInName') ? '%' : '';
 
         if ($useFtsForSortName) {
           // strip FULLTEXT BOOLEAN special characters to avoid invalid expression
           // (assumes they are not valid in names)
-          $ftsNameInput = \preg_replace('/[%@+-<>~]/', '', $input);
+          $ftsNameInput = \preg_replace('/[*()\"%@+\-<>~]/', '', $input);
           // add trailing wildcards in between each word
           // NOTE trailing wildcard will be added to the very end
           // when the apiParams are composed below
-          $ftsNameInput = \str_replace(' ', '% ', $ftsNameInput);
+          $ftsNameInput = \preg_replace('/\s+/', '% ', trim($ftsNameInput));
           $filterValues['contact_names'] = $ftsNameInput;
         }
         else {
@@ -107,9 +104,10 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         }
 
         if ($includeEmailWithName) {
-          $filterValues['email_primary.email'] = $wildcardAtStart . $input;
-          $selectFields[] = 'email_primary.email';
-          $columns[] = ['type' => 'field', 'key' => 'email_primary.email'];
+          $filterValues['Email.email'] = $wildcardAtStart . $input;
+          $selectFields[] = 'Email.email';
+          $columns[] = ['type' => 'field', 'key' => 'Email.email'];
+          $apiParams['join'][] = ['Email AS Email', 'LEFT'];
         }
       }
       else {
@@ -120,7 +118,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
             continue;
           }
           if ($filterField === 'Phone.phone_numeric') {
-            $val = preg_replace('/\D/', '', $val);
+            $val = $wildcardAtStart . preg_replace('/[^%\d]/', '', $val);
           }
           // Add trusted filter
           $filterValues[$filterField] = $val;
@@ -149,7 +147,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
 
       // Map contact_autocomplete_options settings to v4 format
       $autocompleteOptionsMap = [
-        2 => 'email_primary.email',
+        2 => 'Email.email',
         3 => 'phone_primary.phone',
         4 => 'address_primary.street_address',
         5 => 'address_primary.city',
@@ -197,6 +195,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
         $params['where'][] = [$field, $operator, $value];
         // Strip all suffixes from inner select array (pseudoconstants will be evaluated by the outer query)
         $params['select'] = array_map(fn ($field) => explode(':', $field)[0], $params['select']);
+        $params['join'] = $apiParams['join'] ?? [];
         $savedSearch['api_params']['sets'][] = ['UNION DISTINCT', 'Contact', 'get', $params];
       }
 
@@ -218,6 +217,7 @@ class ContactAutocompleteProvider extends \Civi\Core\Service\AutoService impleme
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay')]
   public static function on_civi_search_defaultDisplay(GenericHookEvent $e) {
     if ($e->display['settings'] || $e->display['type'] !== 'autocomplete' || !CoreUtil::isContact($e->savedSearch['api_entity'])) {
       return;

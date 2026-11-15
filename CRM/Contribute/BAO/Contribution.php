@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 use Civi\Api4\Activity;
@@ -28,7 +29,7 @@ use Civi\Order\Event\OrderCompleteEvent;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution implements Civi\Core\HookInterface {
+class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
   /**
    * Static field for all the contribution information that we can potentially import
@@ -577,7 +578,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
     try {
       $contribution = self::add($params);
     }
-    catch (CRM_Core_Exception $e) {
+    catch (\Throwable $e) {
       $transaction->rollback();
       throw $e;
     }
@@ -650,7 +651,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
       );
 
       $financialType = CRM_Contribute_PseudoConstant::financialType($contribution->financial_type_id);
-      $title = CRM_Contact_BAO_Contact::displayName($contribution->contact_id) . ' - (' . CRM_Utils_Money::format($contribution->total_amount, $contribution->currency) . ' ' . ' - ' . $financialType . ')';
+      $title = CRM_Contact_BAO_Contact::displayName($contribution->contact_id) . ' - (' . CRM_Utils_Money::format($contribution->total_amount, $contribution->currency) . '  - ' . $financialType . ')';
 
       $recentOther = [];
       if (CRM_Core_Permission::checkActionPermission('CiviContribute', CRM_Core_Action::UPDATE)) {
@@ -686,6 +687,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
    *
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(PreEvent $event): void {
     if ($event->action === 'create') {
 
@@ -720,6 +722,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution im
    *
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(PostEvent $event): void {
     if ($event->action === 'edit') {
       CRM_Contribute_BAO_ContributionRecur::updateOnTemplateUpdated($event->object);
@@ -1567,11 +1570,14 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
   }
 
   /**
+   * @deprecated since 6.22 will be removed around 6.28
+   *
    * @param int $pageID
    *
    * @return array
    */
   public static function getCurrentandGoalAmount($pageID) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $query = "
 SELECT p.goal_amount as goal, sum( c.total_amount ) as total
   FROM civicrm_contribution_page p,
@@ -2916,7 +2922,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         civicrm_api3('Contribution', 'sendconfirmation', $sendConfirmationParams);
         \Civi::log()->info("Contribution {$contributionID} Receipt sent");
       }
-      catch (Exception $e) {
+      catch (Throwable $e) {
         \Civi::log()->warning("Contribution {$contributionID} Failed to send receipt: " . $e->getMessage());
       }
     }

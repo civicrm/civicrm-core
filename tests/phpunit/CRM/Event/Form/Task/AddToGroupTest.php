@@ -64,7 +64,7 @@ class CRM_Event_Form_Task_AddToGroupTest extends CiviUnitTestCase {
       ->addSelect('id', 'new_custom_group.Custom_Field')
       ->addWhere('title', '=', 'Participants')
       ->execute()->single();
-    $this->assertEquals('Custom Value ABC', $group['new_custom_group.Custom_Field']);
+    $this->assertSame('Custom Value ABC', $group['new_custom_group.Custom_Field']);
     $this->assertCount(1, GroupContact::get(FALSE)
       ->addWhere('group_id', '=', $group['id'])
       ->addWhere('contact_id', '=', $contactID)

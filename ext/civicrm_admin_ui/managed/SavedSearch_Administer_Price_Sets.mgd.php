@@ -71,52 +71,52 @@ return [
           ],
         ],
       ],
-  [
-    'name' => 'SavedSearch_Administer_Price_Sets_SearchDisplay_Administer_Price_Sets',
-    'entity' => 'SearchDisplay',
-    'cleanup' => 'unused',
-    'update' => 'unmodified',
-    'params' => [
-      'version' => 4,
-      'values' => [
-        'name' => 'Administer_Price_Sets',
-        'label' => E::ts('Price Sets'),
-        'saved_search_id.name' => 'Administer_Price_Sets',
-        'type' => 'table',
-        'settings' => [
-          'description' => '',
-          'sort' => [],
-          'limit' => 50,
-          'pager' => [
-            'show_count' => TRUE,
-            'expose_limit' => TRUE,
-            'hide_single' => TRUE,
-          ],
-          'placeholder' => 5,
-          'columns' => [
-            [
-              'type' => 'field',
-              'key' => 'title',
-              'label' => 'Title',
-              'sortable' => TRUE,
-              'editable' => TRUE,
-            ],
-            [
-              'type' => 'field',
-              'key' => 'extends:label',
-              'label' => 'Used For',
-              'sortable' => TRUE,
-            ],
-            [
-              'type' => 'html',
-              'key' => 'GROUP_CONCAT_PriceSet_PriceField_price_set_id_01_label',
-              'label' => 'Fields',
-              'sortable' => TRUE,
-              'rewrite' => '{capture assign=fields}[GROUP_CONCAT_PriceSet_PriceField_price_set_id_01_label]{/capture}{$fields|replace:\',\':\'<br>\'}',
-            ],
-            [
-              'size' => 'btn-xs',
-              'links' => [
+      [
+        'name' => 'SavedSearch_Administer_Price_Sets_SearchDisplay_Administer_Price_Sets',
+        'entity' => 'SearchDisplay',
+        'cleanup' => 'unused',
+        'update' => 'unmodified',
+        'params' => [
+          'version' => 4,
+          'values' => [
+            'name' => 'Administer_Price_Sets',
+            'label' => E::ts('Price Sets'),
+            'saved_search_id.name' => 'Administer_Price_Sets',
+            'type' => 'table',
+            'settings' => [
+              'description' => '',
+              'sort' => [],
+              'limit' => 50,
+              'pager' => [
+                'show_count' => TRUE,
+                'expose_limit' => TRUE,
+                'hide_single' => TRUE,
+              ],
+              'placeholder' => 5,
+              'columns' => [
+              [
+                'type' => 'field',
+                'key' => 'title',
+                'label' => 'Title',
+                'sortable' => TRUE,
+                'editable' => TRUE,
+              ],
+              [
+                'type' => 'field',
+                'key' => 'extends:label',
+                'label' => 'Used For',
+                'sortable' => TRUE,
+              ],
+              [
+                'type' => 'html',
+                'key' => 'GROUP_CONCAT_PriceSet_PriceField_price_set_id_01_label',
+                'label' => 'Fields',
+                'sortable' => TRUE,
+                'rewrite' => '{capture assign=fields}[GROUP_CONCAT_PriceSet_PriceField_price_set_id_01_label]{/capture}{$fields|replace:\',\':\'<br>\'}',
+              ],
+              [
+                'size' => 'btn-xs',
+                'links' => [
                 [
                   'entity' => '',
                   'action' => '',
@@ -130,16 +130,16 @@ return [
                   'task' => '',
                   'conditions' => [],
                 ],
+                ],
+                'type' => 'buttons',
+                'alignment' => 'text-right',
               ],
-              'type' => 'buttons',
-              'alignment' => 'text-right',
-            ],
-            [
-              'text' => '',
-              'style' => 'default',
-              'size' => 'btn-xs',
-              'icon' => 'fa-bars',
-              'links' => [
+              [
+                'text' => '',
+                'style' => 'default',
+                'size' => 'btn-xs',
+                'icon' => 'fa-bars',
+                'links' => [
                 [
                   'entity' => 'PriceSet',
                   'action' => 'update',
@@ -217,38 +217,38 @@ return [
                   'conditions' => [],
                   'target' => '',
                 ],
+                ],
+                'type' => 'menu',
+                'alignment' => 'text-right',
               ],
-              'type' => 'menu',
-              'alignment' => 'text-right',
+              ],
+              'toolbar' => [
+              [
+                'entity' => 'PriceSet',
+                'action' => 'add',
+                'target' => 'crm-popup',
+                'style' => 'primary',
+                'text' => 'Add Price Set',
+                'icon' => 'fa-plus',
+                'autoOpen' => TRUE,
+                'path' => '',
+                'task' => '',
+                'join' => '',
+                'conditions' => [],
+              ],
+              ],
+              'actions' => TRUE,
+              'classes' => ['table', 'table-striped'],
+              'actions_display_mode' => 'menu',
+              'cssRules' => [
+              ['disabled', 'is_active', '=', FALSE],
+              ],
             ],
           ],
-          'toolbar' => [
-            [
-              'entity' => 'PriceSet',
-              'action' => 'add',
-              'target' => 'crm-popup',
-              'style' => 'primary',
-              'text' => 'Add Price Set',
-              'icon' => 'fa-plus',
-              'autoOpen' => TRUE,
-              'path' => '',
-              'task' => '',
-              'join' => '',
-              'conditions' => [],
-            ],
-          ],
-          'actions' => TRUE,
-          'classes' => ['table', 'table-striped'],
-          'actions_display_mode' => 'menu',
-          'cssRules' => [
-            ['disabled', 'is_active', '=', FALSE],
+          'match' => [
+            'saved_search_id',
+            'name',
           ],
         ],
       ],
-      'match' => [
-        'saved_search_id',
-        'name',
-      ],
-    ],
-  ],
 ];

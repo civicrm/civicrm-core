@@ -116,15 +116,15 @@ class ContactJoinTest extends Api4TestBase {
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute();
     $this->assertCount(1, $addr);
-    $this->assertEquals('Hello', $contact['address_billing.city']);
-    $this->assertEquals(1001, $contact['address_billing.state_province_id']);
-    $this->assertEquals(1228, $contact['address_billing.country_id']);
+    $this->assertSame('Hello', $contact['address_billing.city']);
+    $this->assertSame(1001, $contact['address_billing.state_province_id']);
+    $this->assertSame(1228, $contact['address_billing.country_id']);
     $emails = Email::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute();
     $this->assertCount(2, $emails);
-    $this->assertEquals('a@test.com', $contact['email_primary.email']);
-    $this->assertEquals('b@test.com', $contact['email_billing.email']);
+    $this->assertSame('a@test.com', $contact['email_primary.email']);
+    $this->assertSame('b@test.com', $contact['email_billing.email']);
   }
 
   /**
@@ -140,15 +140,15 @@ class ContactJoinTest extends Api4TestBase {
       'address_billing.country_id:abbr' => 'NG',
     ]);
     $addr = $this->getTestRecord('Address', ['contact_id' => $contact['id']], ['country_id:label', 'state_province_id:label']);
-    $this->assertEquals('Hello', $contact['address_billing.city']);
-    $this->assertEquals('Akwa Ibom', $addr['state_province_id:label']);
-    $this->assertEquals('Nigeria', $addr['country_id:label']);
+    $this->assertSame('Hello', $contact['address_billing.city']);
+    $this->assertSame('Akwa Ibom', $addr['state_province_id:label']);
+    $this->assertSame('Nigeria', $addr['country_id:label']);
     $emails = Email::get(FALSE)
       ->addWhere('contact_id', '=', $contact['id'])
       ->execute();
     $this->assertCount(2, $emails);
-    $this->assertEquals('a@test.com', $contact['email_primary.email']);
-    $this->assertEquals('b@test.com', $contact['email_billing.email']);
+    $this->assertSame('a@test.com', $contact['email_primary.email']);
+    $this->assertSame('b@test.com', $contact['email_billing.email']);
   }
 
   public function testUpdateDeletePrimaryAndBilling(): void {
@@ -161,8 +161,8 @@ class ContactJoinTest extends Api4TestBase {
     ]);
     // Ensure billing phone was assigned to contact
     $contactGet = $this->getTestRecord('Contact', $contact['id'], ['phone_primary.phone', 'phone_billing.phone']);
-    $this->assertEquals('12345', $contactGet['phone_primary.phone']);
-    $this->assertEquals('54321', $contactGet['phone_billing.phone']);
+    $this->assertSame('12345', $contactGet['phone_primary.phone']);
+    $this->assertSame('54321', $contactGet['phone_billing.phone']);
     $billingPhone = $this->getTestRecord('Phone', $billingPhone['id']);
     $this->assertTrue($billingPhone['is_billing']);
     Contact::update(FALSE)
@@ -172,14 +172,14 @@ class ContactJoinTest extends Api4TestBase {
       ->addValue('phone_billing.phone', 99999)
       ->execute();
     $phone = $this->getTestRecord('Phone', ['contact_id' => $contact['id']]);
-    $this->assertEquals('99999', $phone['phone']);
+    $this->assertSame('99999', $phone['phone']);
     $this->assertTrue($phone['is_billing']);
     // Contact only has one phone now, so it should be auto-set to primary
     $this->assertTrue($phone['is_primary']);
 
     $get = $this->getTestRecord('Contact', $contact['id'], ['phone_primary.*', 'phone_billing.*']);
-    $this->assertEquals('99999', $get['phone_primary.phone']);
-    $this->assertEquals('99999', $get['phone_billing.phone']);
+    $this->assertSame('99999', $get['phone_primary.phone']);
+    $this->assertSame('99999', $get['phone_billing.phone']);
     $this->assertEquals($get['phone_primary.id'], $get['phone_billing.id']);
   }
 
@@ -204,7 +204,7 @@ class ContactJoinTest extends Api4TestBase {
       ->addSelect('contact_id.email_primary.email')
       ->addSelect('contact_id.email_billing')
       ->execute()->single();
-    $this->assertEquals('a@test.com', $result['contact_id.email_primary.email']);
+    $this->assertSame('a@test.com', $result['contact_id.email_primary.email']);
     $this->assertEquals($emails[1], $result['contact_id.email_billing']);
   }
 

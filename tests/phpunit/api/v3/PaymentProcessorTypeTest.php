@@ -240,8 +240,8 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('payment_processor_type', 'get', $params);
 
     $this->assertAPISuccess($result);
-    $this->assertEquals(1, $result['count'], ' in line ' . __LINE__);
-    $this->assertEquals('CRM_Core_Payment_APITest_12', $result['values'][$result['id']]['class_name'], ' in line ' . __LINE__);
+    $this->assertSame(1, $result['count'], ' in line ' . __LINE__);
+    $this->assertSame('CRM_Core_Payment_APITest_12', $result['values'][$result['id']]['class_name'], ' in line ' . __LINE__);
   }
 
 }

@@ -75,8 +75,8 @@
 .crm-container :is(.crm-dashlet-actions,.crm-dashlet-header) a:is(:hover,:focus) {
   opacity: 1;
 }
-crm-dashlet[is-fullscreen=true] > details,
-crm-dashlet[is-fullscreen=true] > details > .crm-dashlet-content {
+crm-dashlet[is-fullscreen="true"] > details,
+crm-dashlet[is-fullscreen="true"] > details > .crm-dashlet-content {
   height: calc(100% - 1em);
 }
 .crm-container crm-dashlet > details.crm-accordion-bold > .crm-dashlet-content {

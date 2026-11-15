@@ -46,7 +46,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   public function setUp(): void {
     parent::setUp();
     // Enable components BEFORE starting the transaction or the cache clearing will break the transaction
-    CRM_Core_BAO_ConfigSetting::enableAllComponents();
+    $this->enableAllComponents();
     $this->useTransaction();
     // DGW
     CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
@@ -87,7 +87,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->campaignCreate(['name' => 'big campaign', 'title' => 'abc']);
     $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now', 'campaign_id' => 'big campaign']);
     $jobs = $this->callAPISuccess('MailingJob', 'get', ['mailing_id' => $result['id']]);
-    $this->assertEquals(1, $jobs['count']);
+    $this->assertSame(1, $jobs['count']);
     // return isn't working on this in getAndCheck so lets not check it for now
     unset($this->_params['created_id']);
     $this->getAndCheck($this->_params, $result['id'], 'Mailing');
@@ -115,8 +115,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->_params['is_completed'] = 1;
     $result = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now']);
     $jobs = $this->callAPISuccess('mailing_job', 'get', ['mailing_id' => $result['id']]);
-    $this->assertEquals(1, $jobs['count']);
-    $this->assertEquals('Complete', $jobs['values'][$jobs['id']]['status']);
+    $this->assertSame(1, $jobs['count']);
+    $this->assertSame('Complete', $jobs['values'][$jobs['id']]['status']);
     // return isn't working on this in getAndCheck so lets not check it for now
     unset($this->_params['created_id']);
     $this->getAndCheck($this->_params, $result['id'], 'mailing');
@@ -165,18 +165,18 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertDBQuery('{"foo":"bar_1"}', 'SELECT template_options FROM civicrm_mailing WHERE id = %1', [
       1 => [$id, 'Int'],
     ]);
-    $this->assertEquals('bar_1', $createResult['values'][$id]['template_options']['foo']);
+    $this->assertSame('bar_1', $createResult['values'][$id]['template_options']['foo']);
 
     // 2. Get mailing with template_options.
     $getResult = $this->callAPISuccess('mailing', 'get', [
       'id' => $id,
     ]);
-    $this->assertEquals('bar_1', $getResult['values'][$id]['template_options']['foo']);
+    $this->assertSame('bar_1', $getResult['values'][$id]['template_options']['foo']);
     $getValueResult = $this->callAPISuccess('mailing', 'getvalue', [
       'id' => $id,
       'return' => 'template_options',
     ]);
-    $this->assertEquals('bar_1', $getValueResult['foo']);
+    $this->assertSame('bar_1', $getValueResult['foo']);
 
     // 3. Update mailing with template_options.
     $updateResult = $this->callAPISuccess('mailing', 'create', [
@@ -186,7 +186,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertDBQuery('{"foo":"bar_2"}', 'SELECT template_options FROM civicrm_mailing WHERE id = %1', [
       1 => [$id, 'Int'],
     ]);
-    $this->assertEquals('bar_2', $updateResult['values'][$id]['template_options']['foo']);
+    $this->assertSame('bar_2', $updateResult['values'][$id]['template_options']['foo']);
   }
 
   /**
@@ -227,10 +227,10 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $createParams['scheduled_date'] = 'now';
     $createResult = $this->callAPISuccess('Mailing', 'create', $createParams);
     $getGroup1 = $this->callAPISuccess('MailingGroup', 'get', ['mailing_id' => $createResult['id']]);
-    $getGroup1_ids = array_values(CRM_Utils_Array::collect('entity_id', $getGroup1['values']));
+    $getGroup1_ids = array_column($getGroup1['values'], 'entity_id');
     $this->assertEquals([$groupIDs['a']], $getGroup1_ids);
     $getRecipient1 = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $createResult['id']]);
-    $getRecipient1_ids = array_values(CRM_Utils_Array::collect('contact_id', $getRecipient1['values']));
+    $getRecipient1_ids = array_column($getRecipient1['values'], 'contact_id');
     $this->assertEquals([$contactIDs['a']], $getRecipient1_ids);
 
     // ** Pass 2: Update without any changes to groups[include]
@@ -240,10 +240,10 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     unset($nullOpParams['groups']['include']);
     $this->callAPISuccess('Mailing', 'create', $nullOpParams);
     $getGroup2 = $this->callAPISuccess('MailingGroup', 'get', ['mailing_id' => $createResult['id']]);
-    $getGroup2_ids = array_values(CRM_Utils_Array::collect('entity_id', $getGroup2['values']));
+    $getGroup2_ids = array_column($getGroup2['values'], 'entity_id');
     $this->assertEquals([$groupIDs['a']], $getGroup2_ids);
     $getRecipient2 = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $createResult['id']]);
-    $getRecip2_ids = array_values(CRM_Utils_Array::collect('contact_id', $getRecipient2['values']));
+    $getRecip2_ids = array_column($getRecipient2['values'], 'contact_id');
     $this->assertEquals([$contactIDs['a']], $getRecip2_ids);
 
     // ** Pass 3: Update with different groups[include]
@@ -253,10 +253,10 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $updateParams['scheduled_date'] = 'now';
     $this->callAPISuccess('Mailing', 'create', $updateParams);
     $getGroup3 = $this->callAPISuccess('MailingGroup', 'get', ['mailing_id' => $createResult['id']]);
-    $getGroup3_ids = array_values(CRM_Utils_Array::collect('entity_id', $getGroup3['values']));
+    $getGroup3_ids = array_column($getGroup3['values'], 'entity_id');
     $this->assertEquals([$groupIDs['b']], $getGroup3_ids);
     $getRecipient3 = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $createResult['id']]);
-    $getRecipient3_ids = array_values(CRM_Utils_Array::collect('contact_id', $getRecipient3['values']));
+    $getRecipient3_ids = array_column($getRecipient3['values'], 'contact_id');
     $this->assertEquals([$contactIDs['b']], $getRecipient3_ids);
   }
 
@@ -294,7 +294,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     // 'Preview should not create any mailing_recipient records'
     $this->assertDBQuery($maxIDs['recipient'], 'SELECT MAX(id) FROM civicrm_mailing_recipients');
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
-    $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
+    $this->assertSame("Hello $displayName", $previewResult['values']['subject']);
     $this->assertStringContainsString("This is $displayName", $previewResult['values']['body_text']);
     $this->assertStringContainsString("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
     $this->assertMatchesRegularExpression('!civicrm/mailing/optout&amp;reset=1&amp;jid=&amp;qid=&amp;h=\w*!', $previewResult['values']['body_html']);
@@ -313,7 +313,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     // unknown-contact. However, changes should be purposeful, so we'll test
     // for the current behavior (i.e. returning blanks).
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
-    $this->assertEquals('Hello ', $previewResult['values']['subject']);
+    $this->assertSame('Hello ', $previewResult['values']['subject']);
     $this->assertStringContainsString('This is .', $previewResult['values']['body_text']);
     $this->assertStringContainsString('<p>This is .</p>', $previewResult['values']['body_html']);
   }
@@ -372,11 +372,11 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertDBQuery($maxIDs['group'], 'SELECT MAX(id) FROM civicrm_mailing_group');
 
     $preview = $create['values'][$create['id']]['api.MailingRecipients.get'];
-    $previewIds = array_values(CRM_Utils_Array::collect('contact_id', $preview['values']));
+    $previewIds = array_column($preview['values'], 'contact_id');
     $this->assertEquals([(string) $contactIDs['include_me']], $previewIds);
-    $previewEmails = array_values(CRM_Utils_Array::collect('api.email.getvalue', $preview['values']));
+    $previewEmails = array_column($preview['values'], 'api.email.getvalue');
     $this->assertEquals(['include.me@example.org'], $previewEmails);
-    $previewNames = array_values(CRM_Utils_Array::collect('api.contact.getvalue', $preview['values']));
+    $previewNames = array_column($preview['values'], 'api.contact.getvalue');
     $this->assertTrue((bool) preg_match('/Includer Person/', $previewNames[0]), "Name 'Includer Person' should appear in '" . $previewNames[0] . '"');
   }
 
@@ -446,8 +446,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
     //Recipient should not contain duplicate or on_hold emails.
     $preview = $create['values'][$create['id']]['api.MailingRecipients.get'];
-    $this->assertEquals(1, $preview['count']);
-    $previewEmails = array_values(CRM_Utils_Array::collect('api.email.getvalue', $preview['values']));
+    $this->assertSame(1, $preview['count']);
+    $previewEmails = array_column($preview['values'], 'api.email.getvalue');
     $this->assertEquals(['include.me@example.org'], $previewEmails);
   }
 
@@ -475,12 +475,12 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $params['id'] = $mail['id'];
     $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
     // verify mail has been sent to user by count
-    $this->assertEquals(1, $deliveredInfo['count']);
+    $this->assertSame(1, $deliveredInfo['count']);
 
-    $deliveredContacts = array_values(CRM_Utils_Array::collect('contact_id', $deliveredInfo['values']));
+    $deliveredContacts = array_column($deliveredInfo['values'], 'contact_id');
     $this->assertEquals([$contactIDs['alice']], $deliveredContacts);
 
-    $deliveredEmails = array_values(CRM_Utils_Array::collect('email', $deliveredInfo['values']));
+    $deliveredEmails = array_column($deliveredInfo['values'], 'email');
     $this->assertEquals(['alice@example.org'], $deliveredEmails);
   }
 
@@ -525,12 +525,12 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'test_group' => $groupIDs['inc'],
     ]);
     // verify mail has been sent to user by count
-    $this->assertEquals(3, $deliveredInfo['count'], "in line " . __LINE__);
+    $this->assertSame(3, $deliveredInfo['count'], "in line " . __LINE__);
 
-    $deliveredContacts = array_values(CRM_Utils_Array::collect('contact_id', $deliveredInfo['values']));
+    $deliveredContacts = array_column($deliveredInfo['values'], 'contact_id');
     $this->assertEquals([$contactIDs['alice'], $contactIDs['bob'], $contactIDs['carol']], $deliveredContacts);
 
-    $deliveredEmails = array_values(CRM_Utils_Array::collect('email', $deliveredInfo['values']));
+    $deliveredEmails = array_column($deliveredInfo['values'], 'email');
     $this->assertEquals(['alice@example.org', 'bob@example.org', 'carol@example.org'], $deliveredEmails);
   }
 
@@ -770,7 +770,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   public function testMailerStats(): void {
     $result = $this->groupContactCreate($this->_groupID, 100);
     //verify if 100 contacts are added for group
-    $this->assertEquals(100, $result['added']);
+    $this->assertSame(100, $result['added']);
 
     //Create and send test mail first and change the mail job to live,
     //because stats api only works on live mail
@@ -887,9 +887,9 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
 
     // Target groups+mailings are special.
     $cloneGroups = $this->callAPISuccess('MailingGroup', 'get', ['mailing_id' => $cloneId, 'sequential' => 1]);
-    $this->assertEquals(1, $cloneGroups['count']);
-    $this->assertEquals($cloneGroups['values'][0]['group_type'], 'Include');
-    $this->assertEquals($cloneGroups['values'][0]['entity_table'], 'civicrm_group');
+    $this->assertSame(1, $cloneGroups['count']);
+    $this->assertSame('Include', $cloneGroups['values'][0]['group_type']);
+    $this->assertSame('civicrm_group', $cloneGroups['values'][0]['entity_table']);
     $this->assertEquals($cloneGroups['values'][0]['entity_id'], $groupIDs['inc']);
   }
 
@@ -986,7 +986,7 @@ SELECT event_queue_id, time_stamp FROM {$temporaryTableName}";
   public function testUrlWithMissingTrackingHash(): void {
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params + ['scheduled_date' => 'now'], __FUNCTION__, __FILE__);
     $jobs = $this->callAPISuccess('mailing_job', 'get', ['mailing_id' => $mail['id']]);
-    $this->assertEquals(1, $jobs['count']);
+    $this->assertSame(1, $jobs['count']);
 
     $params = ['mailing_id' => $mail['id'], 'test_email' => 'alice@example.org', 'test_group' => NULL];
     $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);

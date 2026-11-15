@@ -282,7 +282,7 @@ class ContributionRecurUpdateAmountTest extends \CiviUnitTestCase {
     catch (\CRM_Core_Exception $e) {
       $message = $e->getMessage();
     }
-    $this->assertEquals('Amount must be greater than 0.0', $message);
+    $this->assertSame('Amount must be greater than 0.0', $message);
   }
 
 }

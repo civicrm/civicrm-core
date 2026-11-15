@@ -134,6 +134,9 @@ class SettingsManager {
       // the value layers as the metadata might have
       // changed
       $this->reloadValues()->reloadDefaults()->useMandatory();
+
+      // finally we freeze all the constants
+      $this->freezeConstants();
     }
     return $this;
   }
@@ -196,6 +199,26 @@ class SettingsManager {
     foreach ($this->bagsByContact as $bag) {
       /** @var SettingsBag $bag */
       $bag->loadMandatory($this->getMandatory('contact'));
+    }
+
+    return $this;
+  }
+
+  /**
+   * Freeze constant values so they cannot be tinkered with
+   * during runtime
+   *
+   * @return SettingsManager
+   */
+  protected function freezeConstants() {
+    foreach ($this->bagsByDomain as $bag) {
+      /** @var SettingsBag $bag */
+      $bag->freezeConstants($this->getConstantKeys('domain'));
+    }
+
+    foreach ($this->bagsByContact as $bag) {
+      /** @var SettingsBag $bag */
+      $bag->freezeConstants($this->getConstantKeys('contact'));
     }
 
     return $this;
@@ -346,6 +369,24 @@ class SettingsManager {
   }
 
   /**
+   * Get keys of settings which are constants - ie should be
+   * fixed at boot time
+   *
+   * @param string $entity
+   *   Ex: 'domain' or 'contact'.
+   *
+   * @return string[] $settingNames
+   */
+  protected function getConstantKeys($entity) {
+    $specs = SettingsMetadata::getMetadata([
+      'is_contact' => ($entity === 'contact' ? 1 : 0),
+      'is_constant' => TRUE,
+    ], NULL);
+
+    return array_keys($specs);
+  }
+
+  /**
    * Parse mandatory settings from global env var.
    *
    * In previous versions, settings were broken down into verbose+dynamic group names, e.g.
@@ -443,17 +484,6 @@ class SettingsManager {
       $value = $envSettingsValues[$key] ?? NULL;
       if ($fqn && !defined($fqn) && !is_null($value)) {
         define($fqn, $value);
-      }
-    }
-
-    // we need to make an exceptional check for if we have a value for DSN that
-    // is composed from consituent parts *before* we load the settings
-    // file in order to ensure the env values take precedence over
-    // define('CIVICRM_DSN'...) in the settings file
-    if (!defined('CIVICRM_DSN')) {
-      $composedDsn = $bootSettingsManager->getBagByDomain(NULL)->get('civicrm_db_dsn');
-      if ($composedDsn) {
-        define('CIVICRM_DSN', $composedDsn);
       }
     }
 

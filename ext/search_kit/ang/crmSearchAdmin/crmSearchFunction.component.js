@@ -70,7 +70,7 @@
         }
       });
 
-      this.addArg = function(sqlExprType, optional) {
+      this.addArg = function(sqlExprType, optional, write = true) {
         const param = ctrl.getParam(ctrl.args.length);
         ctrl.args.push({
           type: ctrl.exprTypesByType[sqlExprType].name,
@@ -80,7 +80,9 @@
           value: '',
           optional: optional,
         });
-        this.writeExpr();
+        if (write) {
+          this.writeExpr();
+        }
       };
 
       function initFunction() {
@@ -95,7 +97,7 @@
             !param.api_default &&
             (!param.optional || param.must_be.length === 1)
           ) {
-            ctrl.addArg(param.must_be[0], param.optional);
+            ctrl.addArg(param.must_be[0], param.optional, false);
           }
         });
       }

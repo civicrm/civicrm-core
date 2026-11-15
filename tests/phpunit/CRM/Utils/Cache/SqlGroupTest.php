@@ -22,7 +22,7 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
     $barValue = 45.78;
     $a->set('bar', $barValue);
     $this->assertDBQuery(2, 'SELECT count(*) FROM civicrm_cache WHERE group_name = "testSameInstance"');
-    $this->assertEquals($a->get('bar'), 45.78);
+    $this->assertSame(45.78, $a->get('bar'));
 
     $a->delete('foo');
     $this->assertDBQuery(1, 'SELECT count(*) FROM civicrm_cache WHERE group_name = "testSameInstance"');
@@ -80,7 +80,7 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
       'prefetch' => FALSE,
     ]);
     // should be NULL b/c value was NOT prefetched
-    $this->assertEquals(NULL, $c->getFromFrontCache('foo'));
+    $this->assertNull($c->getFromFrontCache('foo'));
     // should work b/c value is fetched on demand
     $this->assertEquals($fooValue, $c->get('foo'));
     // should work b/c value was fetched on demand

@@ -8,11 +8,12 @@ class CRM_MessageAdmin_Settings {
     // b) the user has administer CiviCRM permissions
     // note: status = installed actually means enabled :/
     $sendTestEnabled = \CRM_Core_Permission::check('administer CiviCRM')
-      && (bool) \Civi\Api4\Extension::get(FALSE)
+      && \Civi\Api4\Extension::get(FALSE)
+        ->selectRowCount()
         ->addWhere('key', '=', 'postbox')
-        ->addWhere('status:name', '=', 'installed')
+        ->addWhere('status', '=', 'installed')
         ->execute()
-        ->first();
+        ->count();
 
     return self::getTaskSettings() + [
       'sendTestEnabled' => $sendTestEnabled,

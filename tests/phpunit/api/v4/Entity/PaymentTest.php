@@ -68,20 +68,20 @@ class PaymentTest extends \CiviUnitTestCase {
       ->selectRowCount()
       ->execute()
       ->count();
-    $this->assertEquals(1, $paymentCount, 'Only one payment should have been recorded for the contribution.');
+    $this->assertSame(1, $paymentCount, 'Only one payment should have been recorded for the contribution.');
 
     $totalFeeAmount = array_sum(Payment::get(FALSE)
       ->addWhere('contribution_id', '=', $contributionID)
       ->addSelect('fee_amount')
       ->execute()
       ->column('fee_amount'));
-    $this->assertEquals(2.50, $totalFeeAmount, 'The fee should be recorded once, not doubled by the duplicate call.');
+    $this->assertSame(2.50, $totalFeeAmount, 'The fee should be recorded once, not doubled by the duplicate call.');
 
     $contribution = Contribution::get(FALSE)
       ->addWhere('id', '=', $contributionID)
       ->addSelect('contribution_status_id:name')
       ->execute()->single();
-    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+    $this->assertSame('Completed', $contribution['contribution_status_id:name']);
   }
 
   /**
@@ -124,7 +124,7 @@ class PaymentTest extends \CiviUnitTestCase {
       ->selectRowCount()
       ->execute()
       ->count();
-    $this->assertEquals(2, $paymentCount, 'The replay must not create a third row.');
+    $this->assertSame(2, $paymentCount, 'The replay must not create a third row.');
   }
 
   /**

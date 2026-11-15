@@ -28,7 +28,7 @@ class LocaleUtil {
       return $preferredLang;
     }
 
-    list ($first) = explode('_', $preferredLang);
+    [$first] = explode('_', $preferredLang);
 
     // Do we have a hard-coded preference? Use this for real oddballs.
     $overrides = [

@@ -143,10 +143,10 @@ class NoteTest extends Api4TestBase implements TransactionalInterface {
       ->execute()
       ->indexBy('id');
     $this->assertCount(2, $visibleNotes);
-    $this->assertEquals('Not private', $visibleNotes[$notes[0]]['note']);
-    $this->assertEquals('Private', $visibleNotes[$notes[1]]['note']);
+    $this->assertSame('Not private', $visibleNotes[$notes[0]]['note']);
+    $this->assertSame('Private', $visibleNotes[$notes[1]]['note']);
     // ACL clause should have been inserted only once because entity_table was specified
-    $this->assertEquals(1, substr_count($visibleNotes->debug['sql'][0], 'civicrm_acl_contact_cache'));
+    $this->assertSame(1, substr_count($visibleNotes->debug['sql'][0], 'civicrm_acl_contact_cache'));
   }
 
   public function testGetHierarchicalNotes(): void {
@@ -257,7 +257,7 @@ class NoteTest extends Api4TestBase implements TransactionalInterface {
       $this->fail('Other user should not be able to un-privatize a private note');
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('ACL check failed', $e->getMessage());
+      $this->assertSame('ACL check failed', $e->getMessage());
     }
 
     try {
@@ -269,8 +269,28 @@ class NoteTest extends Api4TestBase implements TransactionalInterface {
       $this->fail('Other user should not be able to edit a private note');
     }
     catch (\Civi\API\Exception\UnauthorizedException $e) {
-      $this->assertEquals('ACL check failed', $e->getMessage());
+      $this->assertSame('ACL check failed', $e->getMessage());
     }
+  }
+
+  /**
+   * A private note created without a contact_id is authored by the current user.
+   */
+  public function testPrivateNoteCreateDefaultsAuthorToCurrentUser(): void {
+    $user = $this->createTestRecord('Individual');
+    $targetContact = $this->createTestRecord('Individual');
+    \CRM_Core_Session::singleton()->set('userID', $user['id']);
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit all contacts'];
+
+    $note = Note::create()
+      ->setCheckPermissions(TRUE)
+      ->addValue('entity_table', 'civicrm_contact')
+      ->addValue('entity_id', $targetContact['id'])
+      ->addValue('privacy', 1)
+      ->addValue('note', 'Mine')
+      ->execute()->first();
+
+    $this->assertEquals($user['id'], $note['contact_id']);
   }
 
 }

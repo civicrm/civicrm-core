@@ -32,6 +32,16 @@ class Get extends BasicGetAction {
       $statuses = array_intersect($statuses, $whereStatus);
     }
 
+    if (!$statuses) {
+      return [];
+    }
+
+    // Skip loading full extension info if only key and/or status are needed
+    $extendedFields = array_diff(array_keys($this->entityFields()), ['key', 'status']);
+    if (!$this->_isFieldSelected(...$extendedFields)) {
+      return \CRM_Utils_Array::makeNonAssociative($statuses, 'key', 'status');
+    }
+
     $mapper = \CRM_Extension_System::singleton()->getMapper();
     $result = [];
     foreach ($statuses as $key => $status) {

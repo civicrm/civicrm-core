@@ -1033,47 +1033,53 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $cacheKeyString = $cacheParams['cache_key_string'] ?? NULL;
     $resultStats = ['merged' => [], 'skipped' => []];
 
+    $permitCacheFlush = CRM_Core_Config::isPermitCacheFlushMode();
     // we don't want dupe caching to get reset after every-merge, and therefore set the
     CRM_Core_Config::setPermitCacheFlushMode(FALSE);
-    $deletedContacts = [];
+    try {
+      $deletedContacts = [];
 
-    while (!empty($dupePairs)) {
-      foreach ($dupePairs as $index => $dupes) {
-        if (in_array($dupes['dstID'], $deletedContacts) || in_array($dupes['srcID'], $deletedContacts)) {
-          unset($dupePairs[$index]);
-          continue;
+      while (!empty($dupePairs)) {
+        foreach ($dupePairs as $index => $dupes) {
+          if (in_array($dupes['dstID'], $deletedContacts) || in_array($dupes['srcID'], $deletedContacts)) {
+            unset($dupePairs[$index]);
+            continue;
+          }
+          CRM_Utils_Hook::merge('flip', $dupes, $dupes['dstID'], $dupes['srcID']);
+          if (($result = self::dedupePair((int) $dupes['dstID'], (int) $dupes['srcID'], $mode, $checkPermissions, $cacheKeyString)) === FALSE) {
+            unset($dupePairs[$index]);
+            continue;
+          }
+          if (!empty($result['merged'])) {
+            $deletedContacts[] = $result['merged'][0]['other_id'];
+            $resultStats['merged'][] = ($result['merged'][0]);
+          }
+          else {
+            $resultStats['skipped'][] = ($result['skipped'][0]);
+          }
         }
-        CRM_Utils_Hook::merge('flip', $dupes, $dupes['dstID'], $dupes['srcID']);
-        if (($result = self::dedupePair((int) $dupes['dstID'], (int) $dupes['srcID'], $mode, $checkPermissions, $cacheKeyString)) === FALSE) {
-          unset($dupePairs[$index]);
-          continue;
-        }
-        if (!empty($result['merged'])) {
-          $deletedContacts[] = $result['merged'][0]['other_id'];
-          $resultStats['merged'][] = ($result['merged'][0]);
+
+        if ($cacheKeyString && !$redirectForPerformance) {
+          // retrieve next pair of dupes
+          // @todo call getDuplicatePairs.
+          $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString,
+            $cacheParams['join'],
+            $cacheParams['where'],
+            0,
+            $cacheParams['limit'],
+            [],
+            '',
+            FALSE
+          );
         }
         else {
-          $resultStats['skipped'][] = ($result['skipped'][0]);
+          // do not proceed. Terminate the loop
+          unset($dupePairs);
         }
       }
-
-      if ($cacheKeyString && !$redirectForPerformance) {
-        // retrieve next pair of dupes
-        // @todo call getDuplicatePairs.
-        $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString,
-          $cacheParams['join'],
-          $cacheParams['where'],
-          0,
-          $cacheParams['limit'],
-          [],
-          '',
-          FALSE
-        );
-      }
-      else {
-        // do not proceed. Terminate the loop
-        unset($dupePairs);
-      }
+    }
+    finally {
+      CRM_Core_Config::setPermitCacheFlushMode($permitCacheFlush);
     }
 
     CRM_Dedupe_Merger::updateMergeStats($cacheKeyString, $resultStats);
@@ -1563,7 +1569,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           }
         }
         elseif (substr($key, 0, 15) === 'move_rel_table_' and $value == '0') {
-          $removeTables = array_merge($moveTables, $relTables[substr($key, 5)]['tables']);
+          $removeTables = array_merge($removeTables, $relTables[substr($key, 5)]['tables']);
         }
       }
       $mergeHandler = new CRM_Dedupe_MergeHandler((int) $mainId, (int) $otherId);
@@ -2375,23 +2381,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'checkPermissions' => FALSE,
       'select' => ['*', 'custom.*'],
     ];
+    if ($blockInfo['entity'] === 'Address') {
+      $searchParams['select'][] = 'display';
+    }
     $locationBlock = [];
     $values = civicrm_api4($blockInfo['entity'], 'get', $searchParams);
     if (count($values)) {
       $cnt = 0;
       foreach ($values as $value) {
         $locationBlock[$cnt] = $value;
-        // Fix address display
-        if ($blockInfo['entity'] == 'Address') {
-          // For performance avoid geocoding while merging https://issues.civicrm.org/jira/browse/CRM-21786
-          // we can expect existing geocode values to be retained.
-          $value['skip_geocode'] = TRUE;
-          CRM_Core_BAO_Address::fixAddress($value);
-          unset($value['skip_geocode']);
-          $locationBlock[$cnt]['display'] = CRM_Utils_Address::format($value);
-        }
         // Fix email display
-        elseif ($blockInfo['entity'] == 'Email') {
+        if ($blockInfo['entity'] == 'Email') {
           $locationBlock[$cnt]['display'] = CRM_Utils_Mail::format($value);
         }
 

@@ -43,7 +43,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
     $data = 'abc';
     Civi::cache()->set(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH), $data);
 
-    $this->assertEquals('abc', Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
+    $this->assertSame('abc', Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
 
     $params = [];
     $this->callAPISuccess('system', 'flush', $params);
@@ -60,8 +60,8 @@ class api_v3_SystemTest extends CiviUnitTestCase {
       'sequential' => 1,
       'message' => ['LIKE' => '%Chris%'],
     ]);
-    $this->assertEquals('We wish you a merry Christmas', $result['message']);
-    $this->assertEquals('info', $result['level']);
+    $this->assertSame('We wish you a merry Christmas', $result['message']);
+    $this->assertSame('info', $result['level']);
   }
 
   /**
@@ -73,14 +73,14 @@ class api_v3_SystemTest extends CiviUnitTestCase {
       'sequential' => 1,
       'message' => ['LIKE' => '%Chris%'],
     ]);
-    $this->assertEquals('We wish you a merry Christmas', $result['message']);
-    $this->assertEquals('alert', $result['level']);
+    $this->assertSame('We wish you a merry Christmas', $result['message']);
+    $this->assertSame('alert', $result['level']);
   }
 
   public function testSystemGet(): void {
     $result = $this->callAPISuccess('system', 'get', []);
     $this->assertMatchesRegularExpression('/^[0-9]+\.[0-9]+\.[0-9a-z\-]+$/', $result['values'][0]['version']);
-    $this->assertEquals('UnitTests', $result['values'][0]['uf']);
+    $this->assertSame('UnitTests', $result['values'][0]['uf']);
   }
 
   /**

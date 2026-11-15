@@ -82,7 +82,7 @@ class ContributionRecurTest extends TestCase implements HeadlessInterface, HookI
     $recur = ContributionRecur::create(FALSE)
       ->setValues($values)
       ->execute()->first();
-    $this->assertEquals('USD', $recur['currency']);
+    $this->assertSame('USD', $recur['currency']);
   }
 
 }

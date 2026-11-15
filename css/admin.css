@@ -6,7 +6,7 @@
 }
 
 #crm-container table.selector td.tasklist {
-  border-right: 1px solid #dddddd;
+  border-right: 1px solid #ddd;
   width: 20%;
 }
 
@@ -20,18 +20,18 @@
 
 /* Class for successful upgrade */
 .crm-container .upgrade-success {
-  background-color: #00cc00;
+  background-color: #0c0;
   color: white;
 }
 
 /* Extension management */
 
 .crm-container .extension-upgradable {
-  background-color: #ffffcc !important;
+  background-color: #ffc !important;
 }
 
 .crm-container .extension-installed {
-  background-color: #ddffdd !important;
+  background-color: #dfd !important;
 }
 
 .crm-container .extension-missing {
@@ -90,10 +90,10 @@
   display: block;
   cursor: pointer;
 }
-label.crm-delete-file input[type=checkbox],
-label.crm-delete-file:has(input[type=checkbox]:not(:checked)) + input[type=file] {
+label.crm-delete-file input[type="checkbox"],
+label.crm-delete-file:has(input[type="checkbox"]:not(:checked)) + input[type="file"] {
   display: none;
 }
-label.crm-delete-file input[type=checkbox]:checked + span {
+label.crm-delete-file input[type="checkbox"]:checked + span {
   text-decoration: line-through;
 }

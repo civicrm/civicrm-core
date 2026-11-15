@@ -95,7 +95,7 @@ class CRM_Core_JobManager {
     // Get a list of jobs that have not completed previously.
     // This could be because they are a new job that has not yet run or a job that is fatally crashing (eg. OOM).
     // If last_run is NULL the job has never run and will be selected above so exclude it here
-    // If last_run_end is NULL the job has never completed successfully.
+    // If last_run_end is NULL the job has never completed or its latest run did not finish.
     // If last_run_end is < last_run job has completed successfully in the past but is now failing to complete.
     $maybeUnsuccessfulJobs = Job::get(FALSE)
       ->addWhere('is_active', '=', TRUE)
@@ -176,18 +176,23 @@ class CRM_Core_JobManager {
       $params = $job->apiParams;
     }
 
-    CRM_Utils_Hook::preJob($job, $params);
-    if (array_key_exists('runInNonProductionEnvironment', $params)) {
-      $params['runInNonProductionEnvironment'] = (bool) $params['runInNonProductionEnvironment'];
-    }
     try {
+      CRM_Utils_Hook::preJob($job, $params);
+      if (array_key_exists('runInNonProductionEnvironment', $params)) {
+        $params['runInNonProductionEnvironment'] = (bool) $params['runInNonProductionEnvironment'];
+      }
       $result = civicrm_api($job->api_entity, $job->api_action, $params);
     }
     catch (\Throwable $e) {
       $this->logger->error('Error while executing ' . $job->name . ': ' . $e->getMessage(), $this->createLogContext());
       $result = $e;
     }
-    CRM_Utils_Hook::postJob($job, $params, $result);
+    try {
+      CRM_Utils_Hook::postJob($job, $params, $result);
+    }
+    catch (\Throwable $e) {
+      $this->logger->error('Error in postJob hook for ' . $job->name . ': ' . $e->getMessage(), $this->createLogContext());
+    }
     $logLevel = ($result instanceof \Throwable || !empty($result['is_error'])) ? \Psr\Log\LogLevel::ERROR : \Psr\Log\LogLevel::INFO;
     $this->logger->log($logLevel, 'Finished execution of ' . $job->name . ' with result: ' . $this->apiResultToMessage($result), $this->createLogContext());
     $this->currentJob = FALSE;

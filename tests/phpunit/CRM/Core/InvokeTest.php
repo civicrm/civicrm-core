@@ -19,6 +19,7 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
   public function tearDown(): void {
     unset($_SERVER['HTTP_X_REQUESTED_WITH'], $_SERVER['REQUEST_URI'], $_GET['q']);
     \Civi::router()->clear();
+    $this->quickCleanup(['civicrm_dashboard_contact']);
     parent::tearDown();
   }
 
@@ -43,8 +44,11 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
    */
   public function testInvokeDashboardWithGettingStartedDashlet(): void {
     $user_id = $this->createLoggedInUser();
-    $this->callAPISuccess('DashboardContact', 'create', [
-      'dashboard_id' => 2,
+    $this->createTestEntity('DashboardContact', [
+      'dashboard_id' => \Civi\Api4\Dashboard::get(FALSE)
+        ->addWhere('name', '=', 'getting-started')
+        ->addWhere('domain_id', '=', CRM_Core_Config::domainID())
+        ->execute()->single()['id'],
       'contact_id' => $user_id,
     ]);
 
@@ -118,7 +122,7 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
 
     // No ajax set in the route, should succeed.
     $result = CRM_Core_Invoke::_invoke(['civicrm', 'test-ajax-route']);
-    $this->assertEquals('ajax_success', $result);
+    $this->assertSame('ajax_success', $result);
 
     // Now set is_ajax on route
     $route['is_ajax'] = 1;
@@ -130,7 +134,7 @@ class CRM_Core_InvokeTest extends CiviUnitTestCase {
     $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
     // Ajax set in the route, correct header sent, should succeed.
     $result = CRM_Core_Invoke::_invoke(['civicrm', 'test-ajax-route']);
-    $this->assertEquals('ajax_success', $result);
+    $this->assertSame('ajax_success', $result);
 
     unset($_SERVER['HTTP_X_REQUESTED_WITH']);
 

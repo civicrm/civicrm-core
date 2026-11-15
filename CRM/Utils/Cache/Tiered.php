@@ -112,7 +112,7 @@ class CRM_Utils_Cache_Tiered implements CRM_Utils_Cache_Interface {
       /** @var CRM_Utils_Cache_Interface $tier */
       $wrapped = $tier->get($key, $nack);
       if ($wrapped !== $nack && $wrapped[0] >= CRM_Utils_Time::time()) {
-        list ($parentExpires, $value) = $wrapped;
+        [$parentExpires, $value] = $wrapped;
         // (Re)populate the faster caches; and then return the value we found.
         for ($i = 0; $i < $readTierNum; $i++) {
           $now = CRM_Utils_Time::time();

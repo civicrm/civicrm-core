@@ -45,7 +45,7 @@ class CRM_Core_BAO_NoteTest extends CiviUnitTestCase {
     // Top parent of parentNote is itself
     $topOfParent = CRM_Core_BAO_Note::getTopParent($parentNote['id']);
     $this->assertEquals($parentNote['id'], $topOfParent->id);
-    $this->assertEquals('civicrm_contact', $topOfParent->entity_table);
+    $this->assertSame('civicrm_contact', $topOfParent->entity_table);
     $this->assertEquals($contact['id'], $topOfParent->entity_id);
 
     // Top parent of childNote is parentNote

@@ -133,23 +133,23 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
 
     $field = $fields['myPublicString'];
     $this->assertEquals(['string'], $field->getType());
-    $this->assertEquals('String', $field->getDataType());
-    $this->assertEquals(NULL, $field->getSerialize());
+    $this->assertSame('String', $field->getDataType());
+    $this->assertNull($field->getSerialize());
 
     $field = $fields['implicitStringArray'];
     $this->assertEquals(['string[]'], $field->getType());
-    $this->assertEquals('Blob', $field->getDataType());
-    $this->assertEquals(\CRM_Core_DAO::SERIALIZE_JSON, $field->getSerialize());
+    $this->assertSame('Blob', $field->getDataType());
+    $this->assertSame(\CRM_Core_DAO::SERIALIZE_JSON, $field->getSerialize());
 
     $field = $fields['explicitStringArray'];
     $this->assertEquals(['string[]'], $field->getType());
-    $this->assertEquals('Text', $field->getDataType());
-    $this->assertEquals(\CRM_Core_DAO::SERIALIZE_COMMA, $field->getSerialize());
+    $this->assertSame('Text', $field->getDataType());
+    $this->assertSame(\CRM_Core_DAO::SERIALIZE_COMMA, $field->getSerialize());
 
     $field = $fields['myProtectedInt'];
     $this->assertEquals(['int'], $field->getType());
-    $this->assertEquals('Integer', $field->getDataType());
-    $this->assertEquals(NULL, $field->getSerialize());
+    $this->assertSame('Integer', $field->getDataType());
+    $this->assertNull($field->getSerialize());
   }
 
   /**
@@ -160,12 +160,12 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $ex = static::createExample();
 
     $ex->setmyProtectedInt(5);
-    $this->assertEquals(5, $ex->getmyProtectedInt());
-    $this->assertEquals(5, Invasive::get([$ex, 'myProtectedInt']));
+    $this->assertSame(5, $ex->getmyProtectedInt());
+    $this->assertSame(5, Invasive::get([$ex, 'myProtectedInt']));
 
     $ex->setMyPublicString('hello');
-    $this->assertEquals('hello', $ex->getMyPublicString());
-    $this->assertEquals('hello', $ex->myPublicString);
+    $this->assertSame('hello', $ex->getMyPublicString());
+    $this->assertSame('hello', $ex->myPublicString);
   }
 
   /**
@@ -181,22 +181,22 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
       'some' => ['deep' => ['thing' => 20]],
     ]);
 
-    $this->assertEquals('hello world', $ex->getMyPublicString());
-    $this->assertEquals(10, $ex->getMyProtectedInt());
-    $this->assertEquals(20, $ex->getDeepValue());
+    $this->assertSame('hello world', $ex->getMyPublicString());
+    $this->assertSame(10, $ex->getMyProtectedInt());
+    $this->assertSame(20, $ex->getDeepValue());
 
     $ex->myPublicString .= ' and stuff';
     $ex->setDeepValue(22);
 
     $tpl = $ex->export('tplParams');
-    $this->assertEquals('hello world and stuff', $tpl['my_public_string']);
-    $this->assertEquals(10, $tpl['my_int']);
-    $this->assertEquals(22, $tpl['some']['deep']['thing']);
-    $this->assertEquals(100, $tpl['some_extra_tpl_stuff']);
+    $this->assertSame('hello world and stuff', $tpl['my_public_string']);
+    $this->assertSame(10, $tpl['my_int']);
+    $this->assertSame(22, $tpl['some']['deep']['thing']);
+    $this->assertSame(100, $tpl['some_extra_tpl_stuff']);
 
     $envelope = $ex->export('envelope');
-    $this->assertEquals('my_example_wf', $envelope['workflow']);
-    $this->assertEquals('msg_old_style_grp', $envelope['groupName']);
+    $this->assertSame('my_example_wf', $envelope['workflow']);
+    $this->assertSame('msg_old_style_grp', $envelope['groupName']);
   }
 
   /**
@@ -225,7 +225,7 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
       'implicitStringArray' => ['is not mapped between class and tpl'],
     ]);
 
-    $this->assertEquals(NULL, $ex->getimplicitStringArray());
+    $this->assertNull($ex->getimplicitStringArray());
     $ex->setimplicitStringArray(['this is the real class field']);
 
     $tpl = $ex->export('tplParams');
@@ -251,17 +251,17 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $this->assertTrue($ex instanceof GenericWorkflowMessage);
 
     $tpl = $ex->export('tplParams');
-    $this->assertEquals(456, $tpl['myImpromputInt']);
+    $this->assertSame(456, $tpl['myImpromputInt']);
     $this->assertEquals(['is not mentioned anywhere'], $tpl['impromptu_smarty_data']);
     $this->assertTrue(!isset($tpl['workflow']));
 
     $envelope = $ex->export('envelope');
-    $this->assertEquals('some_impromptu_wf', $envelope['workflow']);
-    $this->assertEquals('foo@example.com', $envelope['from']);
+    $this->assertSame('some_impromptu_wf', $envelope['workflow']);
+    $this->assertSame('foo@example.com', $envelope['from']);
     $this->assertTrue(!isset($envelope['myProtectedInt']));
 
     $tokenCtx = $ex->export('tokenContext');
-    $this->assertEquals(123, $tokenCtx['contactId']);
+    $this->assertSame(123, $tokenCtx['contactId']);
     $this->assertTrue(!isset($envelope['myProtectedInt']));
   }
 
@@ -273,15 +273,15 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     $ex = $this->createExample()->setContactID($cid);
     \Civi::dispatcher()->addListener('hook_civicrm_alterMailParams', function($e) use (&$hookCount) {
       $hookCount++;
-      $this->assertEquals('my_example_wf', $e->params['workflow'], 'ExampleWorkflow::WORKFLOW should propagate to params[workflow]');
+      $this->assertSame('my_example_wf', $e->params['workflow'], 'ExampleWorkflow::WORKFLOW should propagate to params[workflow]');
     });
-    $this->assertEquals(0, $hookCount);
+    $this->assertSame(0, $hookCount);
     $rendered = $ex->renderTemplate([
       'messageTemplate' => [
         'msg_subject' => 'Hello {contact.display_name}',
       ],
     ]);
-    $this->assertEquals(1, $hookCount);
+    $this->assertSame(1, $hookCount);
     $this->assertEquals('Hello Foo Bar' . $rand, $rendered['subject']);
   }
 
@@ -295,15 +295,15 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
     ]);
     \Civi::dispatcher()->addListener('hook_civicrm_alterMailParams', function($e) use (&$hookCount) {
       $hookCount++;
-      $this->assertEquals('some_impromptu_wf', $e->params['workflow'], 'Adhoc name should propagate to params[workflow]');
+      $this->assertSame('some_impromptu_wf', $e->params['workflow'], 'Adhoc name should propagate to params[workflow]');
     });
-    $this->assertEquals(0, $hookCount);
+    $this->assertSame(0, $hookCount);
     $rendered = $ex->renderTemplate([
       'messageTemplate' => [
         'msg_subject' => 'Hello {contact.display_name}',
       ],
     ]);
-    $this->assertEquals(1, $hookCount);
+    $this->assertSame(1, $hookCount);
     $this->assertEquals('Hello Foo Bar' . $rand, $rendered['subject']);
   }
 
@@ -335,11 +335,11 @@ class ExampleWorkflowMessageTest extends \CiviUnitTestCase {
 
     \Civi::dispatcher()->addListener('hook_civicrm_alterMailParams', function($e) use (&$hookCount) {
       $hookCount++;
-      $this->assertEquals('temporary', $e->params['workflow']);
+      $this->assertSame('temporary', $e->params['workflow']);
     });
-    $this->assertEquals(0, $hookCount);
+    $this->assertSame(0, $hookCount);
     $rendered = $example->renderTemplate();
-    $this->assertEquals(1, $hookCount);
+    $this->assertSame(1, $hookCount);
     $this->assertStringContainsString('Foo Bar', $rendered['subject']);
     $this->assertStringContainsString('Thank you for signing The Fake Petition', $rendered['html']);
     $this->assertStringContainsString('Thank you for signing The Fake Petition', $rendered['text']);

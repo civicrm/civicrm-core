@@ -12,7 +12,7 @@ class OAuthLeagueFacade {
    * @return \League\OAuth2\Client\Provider\AbstractProvider
    */
   public function createProvider($clientDef) {
-    list ($class, $options) = $this->createProviderOptions($clientDef);
+    [$class, $options] = $this->createProviderOptions($clientDef);
     return new $class($options);
   }
 

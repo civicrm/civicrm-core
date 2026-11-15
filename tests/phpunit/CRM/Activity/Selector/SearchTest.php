@@ -26,9 +26,9 @@ class CRM_Activity_Selector_SearchTest extends CiviUnitTestCase {
     $this->setPermissions(['access CiviCRM', 'edit all contacts', 'access CiviContribute']);
     $queryParams = [['activity_location', '=', 'Baker Street', '', '']];
     $searchSelector = new CRM_Activity_Selector_Search($queryParams, CRM_Core_Action::VIEW);
-    $this->assertEquals(2, $searchSelector->getTotalCount(NULL));
+    $this->assertSame('2', $searchSelector->getTotalCount(NULL));
     $queryObject = $searchSelector->getQuery();
-    $this->assertEquals("civicrm_activity.location = 'Baker Street'", $queryObject->_where[''][0]);
+    $this->assertSame("civicrm_activity.location = 'Baker Street'", $queryObject->_where[''][0]);
   }
 
   /**
@@ -91,7 +91,7 @@ class CRM_Activity_Selector_SearchTest extends CiviUnitTestCase {
     CRM_Utils_Hook::singleton()
       ->setHook('civicrm_links', [__CLASS__, 'linkHook']);
     $row = $this->getSearchRows()[0];
-    $this->assertEquals('<span></span>', $row['action'], 'Value should be unset by hook');
+    $this->assertSame('<span></span>', $row['action'], 'Value should be unset by hook');
   }
 
   /**

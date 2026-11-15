@@ -162,7 +162,7 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
       'check_permissions' => 0,
       'entity_table' => $this->getTableForTag($entity),
     ]);
-    $this->assertEquals(1, $result['added']);
+    $this->assertSame(1, $result['added']);
     $this->callAPISuccessGetCount('EntityTag', [
       'entity_id' => 1,
       'entity_table' => $this->getTableForTag($entity),

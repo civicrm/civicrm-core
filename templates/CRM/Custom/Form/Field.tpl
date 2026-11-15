@@ -63,7 +63,7 @@
       <td class="html-adjust">{$form.text_length.html}</td>
     </tr>
 
-    <tr id='showoption' {if $action eq 1 or $action eq 2}class="hiddenElement"{/if}>
+    <tr id='showoption'>
       <td colspan="2">
         <table class="form-layout-compressed">
           {* Conditionally show table for setting up selection options - for field types = radio, checkbox or select *}

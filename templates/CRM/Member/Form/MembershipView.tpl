@@ -11,7 +11,7 @@
 <div class="crm-block crm-content-block crm-membership-view-form-block">
     <div class="crm-submit-buttons">
         {* Check permissions and make sure this is not an inherited membership (edit and delete not allowed for inherited memberships) *}
-        {if ! ($owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'edit memberships'))
+        {if !$owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'edit memberships')
           && (call_user_func(array('CRM_Core_Permission', 'check'), "edit contributions of type $financialTypeId") || $noACL)}
       {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context"}
       {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
@@ -19,7 +19,7 @@
       {/if}
             <a class="button" href="{crmURL p='civicrm/contact/view/membership' q=$urlParams}" accesskey="e" id="crm-membership-edit-button-top"><span><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
         {/if}
-        {if ! ($owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviMember'))
+        {if !$owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviMember')
           && (call_user_func(array('CRM_Core_Permission', 'check'), "delete contributions of type $financialTypeId") || $noACL)}
             {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context"}
       {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
@@ -113,7 +113,7 @@
 
     <div class="crm-submit-buttons">
         {* Check permissions and make sure this is not a related membership (edit and delete not allowed for related memberships) *}
-        {if ! ($owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'edit memberships'))
+        {if !$owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'edit memberships')
           && (call_user_func(array('CRM_Core_Permission', 'check'), "edit contributions of type $financialTypeId") || $noACL)}
           {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=update&context=$context"}
           {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}
@@ -121,7 +121,7 @@
           {/if}
           <a class="button" href="{crmURL p='civicrm/contact/view/membership' q=$urlParams}" accesskey="e" id="crm-membership-edit-button-bottom"><span><i class="crm-i fa-pencil" role="img" aria-hidden="true"></i> {ts}Edit{/ts}</span></a>
         {/if}
-        {if ! ($owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviMember'))
+        {if !$owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'delete in CiviMember')
           && (call_user_func(array('CRM_Core_Permission', 'check'), "delete contributions of type $financialTypeId") || $noACL)}
           {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id&action=delete&context=$context"}
           {if ( $context eq 'fulltext' || $context eq 'search' ) && $searchKey}

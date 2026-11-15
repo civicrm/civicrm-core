@@ -7,8 +7,8 @@
 class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
 
   public function testGetTableForClass(): void {
-    $this->assertEquals('civicrm_email', CRM_Core_DAO_AllCoreTables::getTableForClass('CRM_Core_DAO_Email'));
-    $this->assertEquals('civicrm_email', CRM_Core_DAO_AllCoreTables::getTableForClass('CRM_Core_BAO_Email'));
+    $this->assertSame('civicrm_email', CRM_Core_DAO_AllCoreTables::getTableForClass('CRM_Core_DAO_Email'));
+    $this->assertSame('civicrm_email', CRM_Core_DAO_AllCoreTables::getTableForClass('CRM_Core_BAO_Email'));
   }
 
   /**
@@ -30,7 +30,7 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
 
     // 3. And see if the data has changed...
     $fields = CRM_Core_DAO_Email::fields();
-    $this->assertEquals('bar', $fields['location_type_id']['foo']);
+    $this->assertSame('bar', $fields['location_type_id']['foo']);
 
     $exports = CRM_Core_DAO_Email::export();
     $this->assertTrue(is_array($exports['contact_id']));
@@ -67,8 +67,8 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
     // civicrm_group UI_title is localizable
     // Check indices without localization
     $indices = CRM_Core_DAO_AllCoreTables::indices(FALSE);
-    $this->assertEquals($indices['civicrm_group']['UI_title']['name'], 'UI_title');
-    $this->assertEquals($indices['civicrm_group']['UI_title']['sig'], 'civicrm_group::1::title');
+    $this->assertSame('UI_title', $indices['civicrm_group']['UI_title']['name']);
+    $this->assertSame('civicrm_group::1::title', $indices['civicrm_group']['UI_title']['sig']);
 
     // Not sure how we should be setting the locales, but this works for testing purposes
     $domain = new CRM_Core_DAO_Domain();
@@ -78,11 +78,11 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
 
     // Check indices with localization
     $indices = CRM_Core_DAO_AllCoreTables::indices(TRUE);
-    $this->assertEquals($indices['civicrm_group']['UI_title_en_UK']['name'], 'UI_title_en_UK');
-    $this->assertEquals($indices['civicrm_group']['UI_title_en_UK']['sig'], 'civicrm_group::1::title_en_UK');
+    $this->assertSame('UI_title_en_UK', $indices['civicrm_group']['UI_title_en_UK']['name']);
+    $this->assertSame('civicrm_group::1::title_en_UK', $indices['civicrm_group']['UI_title_en_UK']['sig']);
 
-    $this->assertEquals($indices['civicrm_group']['UI_title_fr_FR']['name'], 'UI_title_fr_FR');
-    $this->assertEquals($indices['civicrm_group']['UI_title_fr_FR']['sig'], 'civicrm_group::1::title_fr_FR');
+    $this->assertSame('UI_title_fr_FR', $indices['civicrm_group']['UI_title_fr_FR']['name']);
+    $this->assertSame('civicrm_group::1::title_fr_FR', $indices['civicrm_group']['UI_title_fr_FR']['sig']);
   }
 
   /**
@@ -218,19 +218,19 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
   }
 
   public function testGetBriefName(): void {
-    $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getEntityNameForClass('CRM_Contact_BAO_Contact'));
-    $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getEntityNameForClass('CRM_Contact_DAO_Contact'));
+    $this->assertSame('Contact', CRM_Core_DAO_AllCoreTables::getEntityNameForClass('CRM_Contact_BAO_Contact'));
+    $this->assertSame('Contact', CRM_Core_DAO_AllCoreTables::getEntityNameForClass('CRM_Contact_DAO_Contact'));
     $this->assertNull(CRM_Core_DAO_AllCoreTables::getEntityNameForClass('CRM_Core_DAO_XqZy'));
   }
 
   public function testGetFullName(): void {
-    $this->assertEquals('CRM_Contact_DAO_Contact', CRM_Core_DAO_AllCoreTables::getDAONameForEntity('Contact'));
+    $this->assertSame('CRM_Contact_DAO_Contact', CRM_Core_DAO_AllCoreTables::getDAONameForEntity('Contact'));
     $this->assertNull(CRM_Core_DAO_AllCoreTables::getDAONameForEntity('XqZy'));
   }
 
   public function testGetEntityNameForTable(): void {
-    $this->assertEquals('Contact', CRM_Core_DAO_AllCoreTables::getEntityNameForTable('civicrm_contact'));
-    $this->assertEquals('RelationshipCache', CRM_Core_DAO_AllCoreTables::getEntityNameForTable('civicrm_relationship_cache'));
+    $this->assertSame('Contact', CRM_Core_DAO_AllCoreTables::getEntityNameForTable('civicrm_contact'));
+    $this->assertSame('RelationshipCache', CRM_Core_DAO_AllCoreTables::getEntityNameForTable('civicrm_relationship_cache'));
     $this->assertNull(CRM_Core_DAO_AllCoreTables::getEntityNameForTable('civicrm_invalid_table'));
   }
 

@@ -53,7 +53,7 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     ]);
     // Assert that pre hook implementation was called.
     $ufGroup = UFGroup::get()->addWhere('title', '=', 'testPreHookIsCalledForCreate')->execute()->first();
-    $this->assertEquals(0, $ufGroup['is_active'], 'Is active should be 0');
+    $this->assertFalse($ufGroup['is_active'], 'Is active should be 0');
   }
 
   /**
@@ -77,7 +77,7 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
       'level' => 'info',
     ]);
 
-    $this->assertEquals(1, $systemLogCount, 'There should be one system log entry with message "CRM_Core_BAO_UFGroupTest::implementHookPre ' . $ufGroupID . '"');
+    $this->assertSame(1, $systemLogCount, 'There should be one system log entry with message "CRM_Core_BAO_UFGroupTest::implementHookPre ' . $ufGroupID . '"');
   }
 
   /**
@@ -93,8 +93,8 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     ]);
 
     // Assert that pre hook implementation was called.
-    $this->assertEquals('testPostHookIsCalledForCreate', $ufGroup['title']);
-    $this->assertEquals(0, $ufGroup['is_active'], 'Is active should be 0');
+    $this->assertSame('testPostHookIsCalledForCreate', $ufGroup['title']);
+    $this->assertFalse($ufGroup['is_active'], 'Is active should be 0');
   }
 
   /**
@@ -118,7 +118,7 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
       'level' => 'info',
     ]);
 
-    $this->assertEquals(1, $systemLogCount, 'There should be one system log entry with message "CRM_Core_BAO_UFGroupTest::implementHookPost ' . $ufGroupID . '"');
+    $this->assertSame(1, $systemLogCount, 'There should be one system log entry with message "CRM_Core_BAO_UFGroupTest::implementHookPost ' . $ufGroupID . '"');
   }
 
   public function implementHookUFGroupTypes(&$ufGroupTypes): void {
@@ -201,8 +201,8 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     $formWrapper->processForm(\Civi\Test\FormWrapper::PREPROCESSED);
     $form = Invasive::get([$formWrapper, 'form']);
     $defaults = $form->setDefaultValues();
-    $this->assertEquals('Profile to Copy (Copy)', $defaults['title']);
-    $this->assertEquals('Profile to Copy Public (Copy)', $defaults['frontend_title']);
+    $this->assertSame('Profile to Copy (Copy)', $defaults['title']);
+    $this->assertSame('Profile to Copy Public (Copy)', $defaults['frontend_title']);
 
     $this->getTestForm('CRM_UF_Form_Group', [
       'title' => 'Profile to Copy (Copy)',
@@ -224,8 +224,8 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
       ->addWhere('uf_group_id', '=', $copiedProfile['id'])
       ->execute();
     $this->assertCount(1, $copiedFields);
-    $this->assertEquals('first_name', $copiedFields[0]['field_name']);
-    $this->assertEquals('First Name', $copiedFields[0]['label']);
+    $this->assertSame('first_name', $copiedFields[0]['field_name']);
+    $this->assertSame('First Name', $copiedFields[0]['label']);
   }
 
   /**

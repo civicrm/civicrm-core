@@ -204,8 +204,8 @@ class SendTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface,
       ->addSelect('activity_type_id:name', 'target_contact_id', '*')
       ->addOrderBy('id', 'DESC')
       ->execute()->single();
-    $this->assertEquals("Tomorrow is A's birthday", $activity['details']);
-    $this->assertEquals('SMS', $activity['activity_type_id:name']);
+    $this->assertSame("Tomorrow is A's birthday", $activity['details']);
+    $this->assertSame('SMS', $activity['activity_type_id:name']);
     $this->assertEquals([$cid[0], $cid[2], $cid[3]], $activity['target_contact_id']);
   }
 

@@ -12,27 +12,16 @@
 
 namespace Civi\Api4\Service\Autocomplete;
 
-use Civi\API\Events;
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * @service
- * @internal
- */
-class EventAutocompleteProvider extends \Civi\Core\Service\AutoService implements EventSubscriberInterface {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api.prepare' => ['onApiPrepare', 140],
-      'civi.search.defaultDisplay' => ['alterDefaultDisplay', Events::W_LATE],
-    ];
-  }
+class EventAutocompleteProvider {
 
   /**
    * Add is_template filter to event template autocompletes
    * @param \Civi\API\Event\PrepareEvent $event
    */
+  #[CiviEventListener(event: 'civi.api.prepare', priority: 140)]
   public function onApiPrepare(\Civi\API\Event\PrepareEvent $event): void {
     $apiRequest = $event->getApiRequest();
     if (is_object($apiRequest) && is_a($apiRequest, 'Civi\Api4\Generic\AutocompleteAction')) {
@@ -58,6 +47,7 @@ class EventAutocompleteProvider extends \Civi\Core\Service\AutoService implement
    *
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
+  #[CiviEventListener(event: 'civi.search.defaultDisplay', priority: -100)]
   public static function alterDefaultDisplay(GenericHookEvent $e) {
     if ($e->display['type'] !== 'autocomplete' || $e->savedSearch['api_entity'] !== 'Event') {
       return;

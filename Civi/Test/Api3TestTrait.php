@@ -36,6 +36,33 @@ trait Api3TestTrait {
   protected $_apiversion = 3;
 
   /**
+   * Get the value the current api version returns for a typed value.
+   *
+   * For tests that run under both APIv3 and APIv4: APIv4 returns typed values,
+   * APIv3 returns them as strings ('1'/'0' for booleans, '5.00' for money).
+   *
+   * e.g. $this->assertSame($this->apiValue(TRUE), $result['is_active']);
+   *
+   * @param bool|int|float $value
+   *   The value as APIv4 returns it.
+   *
+   * @return bool|int|float|string
+   */
+  protected function apiValue(bool|int|float $value): bool|int|float|string {
+    if ($this->_apiversion === 4) {
+      return $value;
+    }
+    if (is_bool($value)) {
+      return $value ? '1' : '0';
+    }
+    if (is_float($value)) {
+      // APIv3 returns money fields with two decimal places.
+      return number_format($value, 2, '.', '');
+    }
+    return (string) $value;
+  }
+
+  /**
    * Check that api returned 'is_error' => 1
    * else provide full message
    * @param array $result

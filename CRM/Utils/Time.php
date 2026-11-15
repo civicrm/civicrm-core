@@ -28,7 +28,7 @@ class CRM_Utils_Time {
    *
    * @var callable|null
    */
-  static private $callback = NULL;
+  private static $callback = NULL;
 
   /**
    * Evaluate a time expression (relative to current time).

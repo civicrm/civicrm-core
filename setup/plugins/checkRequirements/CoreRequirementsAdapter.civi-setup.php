@@ -22,7 +22,7 @@ if (!defined('CIVI_SETUP')) {
     _corereqadapter_addMessages($e, 'system', $systemMsgs);
 
     \Civi\Setup::log()->info(sprintf('[%s] Run Requirements::checkDatabase()', basename(__FILE__)));
-    list ($host, $port, $socket) = \Civi\Setup\DbUtil::decodeHostPort($model->db['server']);
+    [$host, $port, $socket] = \Civi\Setup\DbUtil::decodeHostPort($model->db['server']);
     $dbMsgs = $r->checkDatabase([
       'host' => $host,
       'port' => $port,

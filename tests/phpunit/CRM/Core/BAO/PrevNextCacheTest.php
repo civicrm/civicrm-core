@@ -33,8 +33,8 @@ class CRM_Core_BAO_PrevNextCacheTest extends CiviUnitTestCase {
     $dao->id = $prevNextCacheID;
     CRM_Core_BAO_PrevNextCache::flipPair([$prevNextCacheID], 0);
     $dao->find(TRUE);
-    $this->assertEquals(1, $dao->entity_id1);
-    $this->assertEquals(2, $dao->entity_id2);
+    $this->assertSame('1', $dao->entity_id1);
+    $this->assertSame('2', $dao->entity_id2);
     $this->assertEquals(serialize([
       'srcName' => 'Mr. Maurice Mouse II',
       'dstID' => 1,

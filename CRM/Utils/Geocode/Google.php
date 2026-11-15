@@ -25,14 +25,14 @@ class CRM_Utils_Geocode_Google {
    *
    * @var string
    */
-  static protected $_server = 'maps.googleapis.com';
+  protected static $_server = 'maps.googleapis.com';
 
   /**
    * Uri of service.
    *
    * @var string
    */
-  static protected $_uri = '/maps/api/geocode/xml?sensor=false&address=';
+  protected static $_uri = '/maps/api/geocode/xml?sensor=false&address=';
 
   /**
    * Function that takes an address object and gets the latitude / longitude for this

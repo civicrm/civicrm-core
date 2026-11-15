@@ -148,7 +148,6 @@ class CRM_Core_DomainTokens extends AbstractTokenSubscriber {
         ->addWhere('contact_id', '=', $domain->contact_id)
         ->addOrderBy('is_primary', 'DESC')
         ->addSelect('email')->execute()->first()['email'] ?? '';
-      ;
       $tokens['base_url'] = Civi::paths()->getVariable('cms.root', 'url');
       $tokens['empowered_by_civicrm_image_url'] = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'i/civi99.png';
       $tokens['tax_term'] = (string) Civi::settings()->get('tax_term');

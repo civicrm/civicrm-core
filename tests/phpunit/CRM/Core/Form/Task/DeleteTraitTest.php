@@ -23,7 +23,7 @@ class CRM_Core_Form_Task_DeleteTraitTest extends CiviCaseTestCase {
   use Api4TestTrait;
 
   public function setUp(): void {
-    \CRM_Core_BAO_ConfigSetting::enableAllComponents();
+    $this->enableAllComponents();
     parent::setUp();
   }
 

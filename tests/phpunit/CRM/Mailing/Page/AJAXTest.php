@@ -64,9 +64,9 @@ class CRM_Mailing_Page_AJAXTest extends CiviUnitTestCase {
       CRM_Mailing_Page_AJAX::template();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('Hello {contact.display_name}', $e->errorData['subject']);
-      $this->assertEquals('This is test text body.', $e->errorData['msg_text']);
-      $this->assertEquals('<p>This is test HTML body.</p>', $e->errorData['msg_html']);
+      $this->assertSame('Hello {contact.display_name}', $e->errorData['subject']);
+      $this->assertSame('This is test text body.', $e->errorData['msg_text']);
+      $this->assertSame('<p>This is test HTML body.</p>', $e->errorData['msg_html']);
     }
   }
 
@@ -113,9 +113,9 @@ class CRM_Mailing_Page_AJAXTest extends CiviUnitTestCase {
       CRM_Mailing_Page_AJAX::template();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('Workflow Subject', $e->errorData['subject']);
-      $this->assertEquals('Workflow Text', $e->errorData['msg_text']);
-      $this->assertEquals('<p>Workflow HTML</p>', $e->errorData['msg_html']);
+      $this->assertSame('Workflow Subject', $e->errorData['subject']);
+      $this->assertSame('Workflow Text', $e->errorData['msg_text']);
+      $this->assertSame('<p>Workflow HTML</p>', $e->errorData['msg_html']);
     }
   }
 

@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -17,12 +18,11 @@
 
 use Civi\ActionSchedule\Event\MappingRegisterEvent;
 use Civi\ActionSchedule\MappingBase;
-use Civi\Core\HookInterface;
 
 /**
  * This class contains functions for managing Scheduled Reminders
  */
-class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule implements HookInterface {
+class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
   /**
    * @param array $filters
@@ -257,6 +257,7 @@ FROM civicrm_action_schedule cas
    * @param \Civi\Core\Event\PreEvent $event
    * @implements hook_civicrm_pre
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if (in_array($event->action, ['create', 'edit'])) {
       $values =& $event->params;
@@ -363,21 +364,28 @@ FROM civicrm_action_schedule cas
           $dao = $tokenRow->context['actionSearchResult'];
           $errors = [];
 
-          // It's possible, eg, that sendReminderEmail fires Hook::alterMailParams() and that some listener use ts().
-          $swapLocale = empty($tokenRow->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($tokenRow->context['locale']);
+          try {
+            // It's possible, eg, that sendReminderEmail fires Hook::alterMailParams() and that some listener use ts().
+            $swapLocale = empty($tokenRow->context['locale']) ? NULL : \CRM_Utils_AutoClean::swapLocale($tokenRow->context['locale']);
 
-          // FIXME: This can't be right: "If mode is User Preference, send sms unconditionally without checking user preference"!
-          if ($actionSchedule->mode === 'SMS' || $actionSchedule->mode === 'User_Preference') {
-            CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID, $dao->entityID, $alternateRecipients, $bccRecipients));
+            // FIXME: This can't be right: "If mode is User Preference, send sms unconditionally without checking user preference"!
+            if ($actionSchedule->mode === 'SMS' || $actionSchedule->mode === 'User_Preference') {
+              CRM_Utils_Array::extend($errors, self::sendReminderSms($tokenRow, $actionSchedule, $dao->contactID, $dao->entityID, $alternateRecipients, $bccRecipients));
+            }
+            // FIXME: This can't be right: "If mode is User Preference, send email unconditionally without checking user preference"!
+            if ($actionSchedule->mode === 'Email' || $actionSchedule->mode === 'User_Preference') {
+              CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao->contactID, $alternateRecipients, $bccRecipients));
+            }
+            // insert activity log record if needed
+            if ($actionSchedule->record_activity && empty($errors)) {
+              $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
+              CRM_Core_BAO_ActionSchedule::createMailingActivity($tokenRow, $mapping, $dao->contactID, $dao->entityID, $caseID);
+            }
           }
-          // FIXME: This can't be right: "If mode is User Preference, send email unconditionally without checking user preference"!
-          if ($actionSchedule->mode === 'Email' || $actionSchedule->mode === 'User_Preference') {
-            CRM_Utils_Array::extend($errors, self::sendReminderEmail($tokenRow, $actionSchedule, $dao->contactID, $alternateRecipients, $bccRecipients));
-          }
-          // insert activity log record if needed
-          if ($actionSchedule->record_activity && empty($errors)) {
-            $caseID = empty($dao->case_id) ? NULL : $dao->case_id;
-            CRM_Core_BAO_ActionSchedule::createMailingActivity($tokenRow, $mapping, $dao->contactID, $dao->entityID, $caseID);
+          catch (Throwable $e) {
+            // A failing recipient is logged like any other send error, so it is not retried forever.
+            \Civi::log()->error('Error sending scheduled reminder (ActionScheduleID: ' . $actionSchedule->id . ', ActionLogID: ' . $dao->reminderID . '): ' . $e->getMessage());
+            $errors['exception'] = $e->getMessage();
           }
 
           unset($swapLocale);
@@ -687,7 +695,7 @@ FROM civicrm_action_schedule cas
           $entityID
         );
       }
-      catch (CRM_Core_Exception $e) {
+      catch (Throwable $e) {
         $errors[] = $e->getMessage();
       }
     }

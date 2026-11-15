@@ -81,7 +81,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       'title', 'member_of_contact_id',
       'Database check on updated membership record.'
     );
-    $this->assertEquals('test type', $membership, 'Verify membership type title.');
+    $this->assertSame('test type', $membership, 'Verify membership type title.');
   }
 
   /**
@@ -108,7 +108,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $params = ['title' => 'General'];
     $default = [];
     $result = CRM_Member_BAO_MembershipType::retrieve($params, $default);
-    $this->assertEquals('General', $result->title, 'Verify membership type name.');
+    $this->assertSame('General', $result->title, 'Verify membership type name.');
   }
 
   /**
@@ -148,7 +148,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     $membershipType[$membershipTypeID] = $params;
 
     CRM_Member_BAO_MembershipType::convertDayFormat($membershipType);
-    $this->assertEquals('Dec 14', $membershipType[$membershipTypeID]['fixed_period_rollover_day'], 'Verify memberFixed Period Rollover Day.');
+    $this->assertSame('Dec 14', $membershipType[$membershipTypeID]['fixed_period_rollover_day'], 'Verify memberFixed Period Rollover Day.');
   }
 
   /**
@@ -177,7 +177,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       ->addOrderBy('weight', 'ASC')
       ->execute()
       ->column('title', 'id');
-    $this->assertEquals('General', $result[$membershipTypeID], 'Verify membership types.');
+    $this->assertSame('General', $result[$membershipTypeID], 'Verify membership types.');
   }
 
   /**
@@ -193,8 +193,8 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
       ->execute()
       ->first();
 
-    $this->assertEquals('General', $result['name'], 'Verify membership type details.');
-    $this->assertEquals('year', $result['duration_unit'], 'Verify membership types details.');
+    $this->assertSame('General', $result['name'], 'Verify membership type details.');
+    $this->assertSame('year', $result['duration_unit'], 'Verify membership types details.');
   }
 
   /**
@@ -260,8 +260,8 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
 
     $membershipRenewDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType($membership['id']);
 
-    $this->assertEquals('20060121', $membershipRenewDates['start_date'], 'Verify membership renewal start date.');
-    $this->assertEquals('20080120', $membershipRenewDates['end_date'], 'Verify membership renewal end date.');
+    $this->assertSame('20060121', $membershipRenewDates['start_date'], 'Verify membership renewal start date.');
+    $this->assertSame('20080120', $membershipRenewDates['end_date'], 'Verify membership renewal end date.');
 
     $this->membershipDelete($membership['id']);
     $this->membershipTypeDelete(['id' => $membershipTypeID]);
@@ -295,7 +295,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
         'limit' => 0,
       ],
     ])['values'];
-    $this->assertEquals(FALSE, empty($result), 'Verify membership types for organization.');
+    $this->assertFalse(empty($result), 'Verify membership types for organization.');
 
     $result = $this->callAPISuccess('MembershipType', 'get', [
       'member_of_contact_id' => 501,
@@ -303,7 +303,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
         'limit' => 0,
       ],
     ])['values'];
-    $this->assertEquals(TRUE, empty($result), 'Verify membership types for organization.');
+    $this->assertTrue(empty($result), 'Verify membership types for organization.');
   }
 
   /**
@@ -346,20 +346,20 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
   public function testRenewModification(): void {
     $this->contributionPageQuickConfigCreate();
     $autoRenew = MembershipBlock::get(FALSE)->execute()->first()['membership_types'];
-    $this->assertEquals(1, reset($autoRenew));
+    $this->assertSame(1, reset($autoRenew));
 
     // Disable auto-renew on membership type - block should update to 0 (no auto-renew).
     MembershipType::update()
       ->addWhere('name', '=', 'General')
       ->setValues(['auto_renew' => 0])->execute();
     $autoRenew = MembershipBlock::get(FALSE)->execute()->first()['membership_types'];
-    $this->assertEquals(0, reset($autoRenew));
+    $this->assertSame(0, reset($autoRenew));
 
     // Force auto-renew on membership type - block should update to 2 (force auto-renew).
     MembershipType::update()->addWhere('name', '=', 'General')
       ->setValues(['auto_renew' => 2])->execute();
     $autoRenew = MembershipBlock::get(FALSE)->execute()->first()['membership_types'];
-    $this->assertEquals(2, reset($autoRenew));
+    $this->assertSame(2, reset($autoRenew));
 
     // Make auto-renew optional on membership type - block should stay at 2 (force autorenew).
     // If the membership type is optional if can be made more or less restrictive at
@@ -367,7 +367,7 @@ class CRM_Member_BAO_MembershipTypeTest extends CiviUnitTestCase {
     MembershipType::update()->addWhere('name', '=', 'General')
       ->setValues(['auto_renew' => 1])->execute();
     $autoRenew = MembershipBlock::get(FALSE)->execute()->first()['membership_types'];
-    $this->assertEquals(2, reset($autoRenew));
+    $this->assertSame(2, reset($autoRenew));
   }
 
 }

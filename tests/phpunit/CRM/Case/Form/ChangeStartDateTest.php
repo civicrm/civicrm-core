@@ -55,7 +55,7 @@ class CRM_Case_Form_ChangeStartDateTest extends CiviCaseTestCase {
     ]);
     $formatted_old_start_date = CRM_Utils_Date::customFormat($old_start_date, CRM_Core_Config::singleton()->dateformatFull);
     $formatted_new_start_date = CRM_Utils_Date::customFormat($new_start_date, CRM_Core_Config::singleton()->dateformatFull);
-    $this->assertEquals("Change Case Start Date from {$formatted_old_start_date} to {$formatted_new_start_date}", $result['subject']);
+    $this->assertSame("Change Case Start Date from {$formatted_old_start_date} to {$formatted_new_start_date}", $result['subject']);
 
     // Check open case activity was updated.
     $result = $this->callAPISuccess('Activity', 'getsingle', [

@@ -38,7 +38,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
       $priceSets = $this->getPriceSets();
       foreach ($priceSets as $priceSet) {
         yield [
-          'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'],
+          'name' => 'workflow/' . $workflow . '/price_set_' . $priceSet['name'],
           'title' => $priceSet['is_multiple_registrations'] ? ts('Completed Registration (primary participant): %1', [1 => $priceSet['title']]) : ts('Completed Registration: %1', [1 => $priceSet['title']]),
           'tags' => ['preview'],
           'workflow' => $workflow,
@@ -50,7 +50,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
           'is_partially_paid' => FALSE,
         ];
         yield [
-          'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'] . '_partially_paid',
+          'name' => 'workflow/' . $workflow . '/price_set_' . $priceSet['name'] . '_partially_paid',
           'title' => $priceSet['is_multiple_registrations'] ? ts('Partially Paid Registration (primary participant): %1', [1 => $priceSet['title']]) : ts('Partially Paid Registration: %1', [1 => $priceSet['title']]),
           'tags' => ['preview'],
           'workflow' => $workflow,
@@ -63,7 +63,7 @@ class CRM_Event_WorkflowMessage_EventExamples extends WorkflowMessageExample {
         ];
         if ($priceSet['is_multiple_registrations']) {
           yield [
-            'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'] . '/' . 'additional',
+            'name' => 'workflow/' . $workflow . '/price_set_' . $priceSet['name'] . '/additional',
             'title' => ts('Completed Registration (additional participant): %1', [1 => $priceSet['title']]),
             'tags' => ['preview'],
             'workflow' => $workflow,

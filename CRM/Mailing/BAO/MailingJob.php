@@ -249,7 +249,13 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       $anyChildLeft = CRM_Core_DAO::singleValueQuery($child_job_sql, $params);
 
       if (!$anyChildLeft) {
+        $lock = \Civi::lockManager()->acquire("worker.mailing.queueMissingRecipients.{$job->mailing_id}");
+        // Only allow one job process to calulate the missing recipients. Don't mark mailing as complete until that is done.
+        if (!$lock->isAcquired()) {
+          return;
+        }
         $anyChildLeft = self::queueMissingRecipients((int) $job->mailing_id, (int) $job->id);
+        $lock->release();
       }
 
       // all of the child jobs are complete, update
@@ -284,6 +290,9 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * This shouldn't be needed, but it's been reported that the initial mailing job sometimes misses recipients.
    * This searches for any missing recipients and creates a child mailing job for them.
    *
+   * dev/core#6911 fixed one cause of missing recipients. Feel free to remove this
+   * stopgap after November 2027 if it has not been reported to create jobs since.
+   *
    * @see https://lab.civicrm.org/dev/core/-/work_items/6678
    *
    * @param int $mailingID
@@ -292,19 +301,23 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * @return bool True if a new child job was created for unqueued recipients, false otherwise.
    */
   private static function queueMissingRecipients(int $mailingID, int $parentJobID): bool {
+    $smsProviderID = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailingID, 'sms_provider_id');
+    $andClause = "r.email_id IS NOT NULL AND r.email_id = meq.email_id";
+    $whereClause = "r.email_id > 0";
+    if (!empty($smsProviderID)) {
+      $andClause = "r.phone_id IS NOT NULL AND r.phone_id = meq.phone_id";
+      $whereClause = "r.phone_id > 0";
+    }
     $sql = CRM_Utils_SQL_Select::from('civicrm_mailing_recipients r')
       ->select(['r.email_id', 'r.contact_id', 'r.phone_id'])
       ->merge(CRM_Mailing_BAO_MailingRecipients::getDeliverableCriteria($mailingID))
       ->join('meq', 'LEFT JOIN civicrm_mailing_event_queue meq
         ON meq.mailing_id = r.mailing_id
         AND meq.is_test = 0
-        AND (
-          (r.email_id IS NOT NULL AND r.email_id = meq.email_id)
-          OR (r.phone_id IS NOT NULL AND r.phone_id = meq.phone_id)
-        )')
+        AND ' . $andClause)
       ->where('r.mailing_id = #mailingID')
       ->where('meq.id IS NULL')
-      ->where('r.email_id > 0 OR r.phone_id > 0')
+      ->where($whereClause)
       ->param('#mailingID', $mailingID)
       ->toSQL();
 
@@ -824,7 +837,7 @@ AND    civicrm_activity.source_record_id = %2
           $cachedActivityID = $activityResult['id'];
           \Civi::$statics[__METHOD__]['cachedActivityID'][$this->mailing_id] = $cachedActivityID;
         }
-        catch (Exception $e) {
+        catch (Throwable $e) {
           $result = FALSE;
         }
       }
@@ -858,7 +871,7 @@ AND    record_type_id = {$targetRecordID}
         try {
           ActivityContact::save(FALSE)->setRecords($activityTargets)->setDefaults(['activity_id' => $cachedActivityID, 'record_type_id' => $targetRecordID])->execute();
         }
-        catch (Exception $e) {
+        catch (Throwable $e) {
           $result = FALSE;
         }
       }

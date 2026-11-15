@@ -76,7 +76,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     ];
 
     $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
-    $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: extends');
+    $this->assertSame('Mandatory key(s) missing from params array: extends', $customGroup['error_message']);
     $this->assertAPIFailure($customGroup);
   }
 
@@ -98,7 +98,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     ];
 
     $customGroup = $this->callAPIFailure('custom_group', 'create', $params);
-    $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: extends');
+    $this->assertSame('Mandatory key(s) missing from params array: extends', $customGroup['error_message']);
   }
 
   /**
@@ -139,7 +139,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('custom_group', 'create', $params);
     $this->assertNotNull($result['id']);
-    $this->assertEquals($result['values'][$result['id']]['extends'], 'Individual');
+    $this->assertSame('Individual', $result['values'][$result['id']]['extends']);
   }
 
   /**
@@ -176,7 +176,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
     $customGroup = $this->callAPISuccess('custom_group', 'create', $params);
     $this->assertNotNull($customGroup['id']);
-    $this->assertEquals($customGroup['values'][$customGroup['id']]['style'], 'Inline');
+    $this->assertSame('Inline', $customGroup['values'][$customGroup['id']]['style']);
   }
 
   /**
@@ -213,8 +213,8 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
     $customGroup = $this->callAPISuccess('custom_group', 'create', $params);
     $this->assertNotNull($customGroup['id']);
-    $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Household');
-    $this->assertEquals($customGroup['values'][$customGroup['id']]['style'], 'Tab');
+    $this->assertSame('Household', $customGroup['values'][$customGroup['id']]['extends']);
+    $this->assertSame('Tab', $customGroup['values'][$customGroup['id']]['style']);
     $this->assertGreaterThanOrEqual(0, $customGroup['values'][$customGroup['id']]['weight']);
   }
 
@@ -236,7 +236,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
     $customGroup = $this->callAPISuccess('custom_group', 'create', $params);
     $this->assertNotNull($customGroup['id']);
-    $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Contribution');
+    $this->assertSame('Contribution', $customGroup['values'][$customGroup['id']]['extends']);
   }
 
   /**
@@ -258,7 +258,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
     $customGroup = $this->callAPISuccess('CustomGroup', 'create', $params);
     $this->assertNotNull($customGroup['id']);
-    $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Group');
+    $this->assertSame('Group', $customGroup['values'][$customGroup['id']]['extends']);
   }
 
   /**
@@ -295,7 +295,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
 
     $customGroup = $this->callAPISuccess('custom_group', 'create', $params);
     $this->assertNotNull($customGroup['id']);
-    $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Activity');
+    $this->assertSame('Activity', $customGroup['values'][$customGroup['id']]['extends']);
   }
 
   ///////////////// civicrm_custom_group_delete methods
@@ -305,7 +305,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
    */
   public function testCustomGroupDeleteWithoutGroupID(): void {
     $customGroup = $this->callAPIFailure('custom_group', 'delete', []);
-    $this->assertEquals($customGroup['error_message'], 'Mandatory key(s) missing from params array: id');
+    $this->assertSame('Mandatory key(s) missing from params array: id', $customGroup['error_message']);
   }
 
   /**
@@ -347,7 +347,7 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('CustomGroup', 'create', $params);
     $result = array_shift($result['values']);
 
-    $this->assertEquals(0, $result['is_active']);
+    $this->assertSame('0', $result['is_active']);
 
     // Create second group with same weight
     $params = [
@@ -374,8 +374,8 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   public function testParticipantEntityCustomGroup(): void {
     $customGroup = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, ['extends' => ['ParticipantEventType', [4]]]));
     $result = array_shift($customGroup['values']);
-    $this->assertEquals(3, $result['extends_entity_column_id']);
-    $this->assertEquals('Participant', $result['extends']);
+    $this->assertSame('3', $result['extends_entity_column_id']);
+    $this->assertSame('Participant', $result['extends']);
     $this->customGroupDelete($result['id']);
   }
 
@@ -385,13 +385,13 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
   public function testChangeEntityCustomGroup(): void {
     $customGroup = $this->callAPISuccess($this->_entity, 'create', array_merge($this->_params, ['extends' => ['ParticipantEventType', [4]]]));
     $result = array_shift($customGroup['values']);
-    $this->assertEquals(3, $result['extends_entity_column_id']);
-    $this->assertEquals('Participant', $result['extends']);
+    $this->assertSame('3', $result['extends_entity_column_id']);
+    $this->assertSame('Participant', $result['extends']);
     $customGroup = $this->callAPISuccess($this->_entity, 'create', ['id' => $customGroup['id'], 'extends' => ['Individual', []]]);
     $result = array_shift($customGroup['values']);
     $this->assertTrue(empty($result['extends_entity_column_id']));
     $this->assertTrue(empty($result['extends_entity_column_value']));
-    $this->assertEquals('Individual', $result['extends']);
+    $this->assertSame('Individual', $result['extends']);
     $this->customGroupDelete($result['id']);
   }
 

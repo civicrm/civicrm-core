@@ -64,10 +64,66 @@ EOHTML;
       ->execute();
 
     $this->assertCount(2, $saved);
-    $this->assertEquals('Firsty2', $saved[0]['contact_id_a.first_name']);
-    $this->assertEquals('Firsty3', $saved[1]['contact_id_a.first_name']);
+    $this->assertSame('Firsty2', $saved[0]['contact_id_a.first_name']);
+    $this->assertSame('Firsty3', $saved[1]['contact_id_a.first_name']);
     $this->assertEquals($childOfID, $saved[0]['relationship_type_id']);
     $this->assertEquals($childOfID, $saved[1]['relationship_type_id']);
+  }
+
+  /**
+   * Tests a relationship type given as a pseudoconstant suffix, on create and on resubmit (update).
+   */
+  public function testRelationshipTypeBySuffix(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity data="{contact_type: 'Individual', source: 'Test Rel'}" type="Contact" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" url-autofill="1" />
+  <af-entity security="FBAC" type="Relationship" name="Relationship1" label="Relationship 1" actions="{create: true, update: true}" data="{contact_id_b: ['Individual1'], contact_id_a: ['Individual2'], 'relationship_type_id:name': 'Child of'}" />
+  <af-entity data="{contact_type: 'Individual', source: 'Test Rel'}" type="Contact" name="Individual2" label="Individual 2" actions="{create: true, update: true}" security="RBAC" url-autofill="1" />
+  <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+    <afblock-name-individual></afblock-name-individual>
+  </fieldset>
+  <fieldset af-fieldset="Relationship1" class="af-container"></fieldset>
+  <fieldset af-fieldset="Individual2" class="af-container" af-title="Individual 2">
+    <afblock-name-individual></afblock-name-individual>
+  </fieldset>
+  <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+</af-form>
+EOHTML;
+
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $lastName = uniqid(__FUNCTION__);
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [['fields' => ['first_name' => 'Parent', 'last_name' => $lastName]]],
+        'Individual2' => [['fields' => ['first_name' => 'Child', 'last_name' => $lastName]]],
+      ])
+      ->execute();
+
+    $saved = Relationship::get(FALSE)
+      ->addWhere('contact_id_b.last_name', '=', $lastName)
+      ->addSelect('contact_id_a', 'contact_id_b', 'relationship_type_id:name')
+      ->execute();
+    $this->assertCount(1, $saved);
+    $this->assertSame('Child of', $saved[0]['relationship_type_id:name']);
+
+    // Resubmitting for the same contacts should match the existing relationship rather than add another
+    Afform::submit()
+      ->setName($this->formName)
+      ->setArgs(['Individual1' => $saved[0]['contact_id_b'], 'Individual2' => $saved[0]['contact_id_a']])
+      ->setValues([
+        'Individual1' => [['fields' => ['first_name' => 'Parent', 'last_name' => $lastName]]],
+        'Individual2' => [['fields' => ['first_name' => 'Child', 'last_name' => $lastName]]],
+      ])
+      ->execute();
+
+    $this->assertCount(1, Relationship::get(FALSE)
+      ->addWhere('contact_id_b.last_name', '=', $lastName)
+      ->execute());
   }
 
   /**
@@ -138,9 +194,9 @@ EOHTML;
       ->addOrderBy('relationship_type_id')
       ->execute();
 
-    $this->assertEquals("Hello $lastName", $saved[0]['contact_id_a.organization_name']);
+    $this->assertSame("Hello $lastName", $saved[0]['contact_id_a.organization_name']);
     $this->assertEquals($typeIds[0], $saved[0]['relationship_type_id']);
-    $this->assertEquals("Hello $lastName", $saved[1]['contact_id_a.organization_name']);
+    $this->assertSame("Hello $lastName", $saved[1]['contact_id_a.organization_name']);
     $this->assertEquals($typeIds[1], $saved[1]['relationship_type_id']);
     $this->assertCount(2, $saved);
   }
@@ -194,10 +250,10 @@ EOHTML;
       ->execute()
       ->indexBy('name');
 
-    $this->assertEquals('Employer', $prefill['Organization1']['values'][0]['fields']['organization_name']);
-    $this->assertEquals('Parent', $prefill['Individual2']['values'][0]['fields']['first_name']);
-    $this->assertEquals('Child1', $prefill['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEquals('Child4', $prefill['Individual1']['values'][1]['fields']['first_name']);
+    $this->assertSame('Employer', $prefill['Organization1']['values'][0]['fields']['organization_name']);
+    $this->assertSame('Parent', $prefill['Individual2']['values'][0]['fields']['first_name']);
+    $this->assertSame('Child1', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertSame('Child4', $prefill['Individual1']['values'][1]['fields']['first_name']);
     // No room on form for a 3rd child because af-repeat max=2
     $this->assertCount(2, $prefill['Individual1']['values']);
   }

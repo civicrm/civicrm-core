@@ -415,7 +415,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
     $mailing = Mailing::create(FALSE)->setValues(['name' => 'bob', 'scheduled_date' => 'tomorrow'])->execute()->first();
     $jobs = MailingJob::get(FALSE)->execute();
-    $this->assertEquals(0, $jobs->rowCount);
+    $this->assertSame(0, $jobs->rowCount);
     MailingJob::create(FALSE)->setValues([
       'mailing_id' => $mailing['id'],
     ])->execute();
@@ -580,7 +580,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $recipients = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']]);
 
     // Check the count is correct
-    $this->assertEquals(3, $recipients['count'], 'Check recipient count');
+    $this->assertSame(3, $recipients['count'], 'Check recipient count');
 
     // Check we got the 'primary' mobile for contacts or the other phone when the primary was no SMS capable.
     foreach ($recipients['values'] as $value) {
@@ -641,10 +641,10 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       'scheduled_date' => 'now',
     ];
     $mailing = $this->callAPISuccess('Mailing', 'create', $params);
-    $this->assertEquals('Scheduled', $mailing['values'][$mailing['id']]['status']);
+    $this->assertSame('Scheduled', $mailing['values'][$mailing['id']]['status']);
     // Query from the DB as the problem was that the DB was not being updated but the mailing object returned by the API was
     $mailingStatus = CRM_Core_DAO::singleValueQuery("SELECT status FROM civicrm_mailing WHERE id = %1", [1 => [$mailing['id'], 'Positive']]);
-    $this->assertEquals('Scheduled', $mailingStatus);
+    $this->assertSame('Scheduled', $mailingStatus);
   }
 
   /**
@@ -671,8 +671,8 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
           'return' => 'email',
         ],
       ]);
-      $this->assertEquals(1, $mailingRecipients['count'], 'Check recipient count');
-      $this->assertEquals('ghi@test.com', $mailingRecipients['values'][$mailingRecipients['id']]['api.Email.getvalue'], 'Check if recipient email belong to deceased contact');
+      $this->assertSame(1, $mailingRecipients['count'], 'Check recipient count');
+      $this->assertSame('ghi@test.com', $mailingRecipients['values'][$mailingRecipients['id']]['api.Email.getvalue'], 'Check if recipient email belong to deceased contact');
     }
   }
 

@@ -264,14 +264,14 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
     $fromDate = CRM_Utils_Request::retrieve('start', 'Date');
     if ($fromDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($fromDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($fromDate);
       $this->_formValues['pledge_payment_date_low'] = $date;
       $this->_defaults['pledge_payment_date_low'] = $date;
     }
 
     $toDate = CRM_Utils_Request::retrieve('end', 'Date');
     if ($toDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($toDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($toDate);
       $this->_formValues['pledge_payment_date_high'] = $date;
       $this->_defaults['pledge_payment_date_high'] = $date;
     }
@@ -296,13 +296,13 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
     $pledgeFromDate = CRM_Utils_Request::retrieve('pstart', 'Date');
     if ($pledgeFromDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($pledgeFromDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($pledgeFromDate);
       $this->_formValues['pledge_create_date_low'] = $this->_defaults['pledge_create_date_low'] = $date;
     }
 
     $pledgeToDate = CRM_Utils_Request::retrieve('pend', 'Date');
     if ($pledgeToDate) {
-      list($date) = CRM_Utils_Date::setDateDefaults($pledgeToDate);
+      [$date] = CRM_Utils_Date::setDateDefaults($pledgeToDate);
       $this->_formValues['pledge_create_date_high'] = $this->_defaults['pledge_create_date_high'] = $date;
     }
 
@@ -311,7 +311,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
       $cid = CRM_Utils_Type::escape($cid, 'Integer');
       if ($cid > 0) {
         $this->_formValues['contact_id'] = $cid;
-        list($display, $image) = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
+        [$display, $image] = CRM_Contact_BAO_Contact::getDisplayAndImage($cid);
         $this->_defaults['sort_name'] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid,
           'sort_name'
         );

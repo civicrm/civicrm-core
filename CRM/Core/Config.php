@@ -152,7 +152,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     }
     if ($value & 2) {
       // clean upload dir
-      CRM_Utils_File::cleanDir($this->uploadDir);
+      CRM_Utils_File::cleanDir($this->uploadDir, $rmdir, FALSE);
       CRM_Utils_File::createDir($this->uploadDir);
     }
 

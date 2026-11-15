@@ -1,6 +1,7 @@
 <?php
 namespace Civi\Contribute\Service;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Afform\Event\AfformEntitySortEvent;
 use Civi\Afform\Event\AfformSubmitEvent;
 use Civi\Afform\Event\AfformValidateEvent;
@@ -10,14 +11,13 @@ use Civi\Core\Event\PreEvent;
 use Civi\Core\Service\AutoService;
 use CRM_Afform_ArrayHtml;
 use DateTime;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use CRM_Contribute_ExtensionUtil as E;
 
 /**
  * @service civi.afform.create_contribution
  */
-class CreateContribution extends AutoService implements EventSubscriberInterface {
+class CreateContribution extends AutoService {
 
   protected bool $active = TRUE;
 
@@ -54,23 +54,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
     return FALSE;
   }
 
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      // validate afform config
-      'hook_civicrm_pre' => ['validateFormModel', 100],
-      // add dependencies from Contribution to entities with Price Fields
-      'civi.afform.sort.submit' => ['onAfformEntitySort', 0],
-      'civi.afform.validate' => ['validateLineItems', 101],
-      // the GenericEntitySave is a no-op for Contributions
-      // this provides the equivalent functionality for new Contributions
-      // TODO: provide sensible default for existing contributions
-      'civi.afform.submit' => ['saveNewContribution', 0],
-    ];
-  }
-
+  #[CiviEventListener(event: 'hook_civicrm_pre', priority: 100)]
   public function validateFormModel(PreEvent $event) {
     if ($event->entity !== 'Afform') {
       return;
@@ -111,6 +95,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
     // TODO 2: if there is a price field anywhere on the form, ensure there is a Contribution entity
   }
 
+  #[CiviEventListener(event: 'civi.afform.validate', priority: 101)]
   public function validateLineItems(AfformValidateEvent $event) {
     $dataModel = $event->getFormDataModel();
     if (!$this->isActive($dataModel)) {
@@ -174,6 +159,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
     return $lineItems;
   }
 
+  #[CiviEventListener(event: 'civi.afform.submit')]
   public function saveNewContribution(AfformSubmitEvent $event) {
     if ($event->getEntityType() !== 'Contribution') {
       return;
@@ -302,6 +288,7 @@ class CreateContribution extends AutoService implements EventSubscriberInterface
     // or will it be used anyway if no template contribution exists
   }
 
+  #[CiviEventListener(event: 'civi.afform.sort.submit')]
   public function onAfformEntitySort(AfformEntitySortEvent $e): void {
     $formEntities = $e->getFormDataModel()->getEntities();
 

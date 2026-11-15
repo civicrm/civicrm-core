@@ -27,7 +27,7 @@ class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
    *
    * @var object
    */
-  static private $_singleton = NULL;
+  private static $_singleton = NULL;
 
   /**
    * Constructor.

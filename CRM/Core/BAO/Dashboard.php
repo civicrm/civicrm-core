@@ -15,22 +15,13 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Class contains Contact dashboard related functions.
  */
-class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubscriberInterface {
-
-  /**
-   * @inheritdoc
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_angularModules' => ['addDashboardModuleDependencies', -2000],
-    ];
-  }
+class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
 
   /**
    * Create or update Dashboard.
@@ -73,6 +64,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard implements EventSubs
   /**
    * Add modules that provide dashlet directives as dependencies to crmDashboard
    */
+  #[CiviEventListener(event: 'hook_civicrm_angularModules', priority: -2000)]
   public static function addDashboardModuleDependencies(GenericHookEvent $e): void {
     $dashletDirectives = \Civi\Api4\Dashboard::get(FALSE)
       ->addWhere('directive', 'IS NOT EMPTY')

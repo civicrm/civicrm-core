@@ -308,10 +308,7 @@ class CRM_Mailing_BAO_Query {
           'civicrm_mailing_event_bounce',
           'bounce_type_id',
           ts('Bounce type(s)'),
-          CRM_Core_PseudoConstant::get('CRM_Mailing_Event_DAO_MailingEventBounce', 'bounce_type_id', [
-            'keyColumn' => 'id',
-            'labelColumn' => 'name',
-          ])
+          array_column(\Civi::entity('MailingEventBounce')->getOptions('bounce_type_id'), 'name', 'id')
         );
         return;
 
@@ -404,10 +401,7 @@ class CRM_Mailing_BAO_Query {
     ];
     $form->addElement('select', 'mailing_job_status', ts('Mailing Job Status'), $mailingJobStatuses, FALSE);
 
-    $mailingBounceTypes = CRM_Core_PseudoConstant::get(
-      'CRM_Mailing_Event_DAO_MailingEventBounce', 'bounce_type_id',
-      ['keyColumn' => 'id', 'labelColumn' => 'name']
-    );
+    $mailingBounceTypes = array_column(\Civi::entity('MailingEventBounce')->getOptions('bounce_type_id'), 'name', 'id');
     $form->add('select', 'mailing_bounce_types', ts('Bounce Types'), $mailingBounceTypes, FALSE,
       ['id' => 'mailing_bounce_types', 'multiple' => 'multiple', 'class' => 'crm-select2']
     );

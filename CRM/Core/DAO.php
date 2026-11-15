@@ -1,12 +1,12 @@
 <?php
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -407,6 +407,8 @@ class CRM_Core_DAO extends DB_DataObject {
   /**
    * Generate and assign an arbitrary value to a field of a test object.
    *
+   * FIXME: Move to test class
+   *
    * @param string $fieldName
    * @param array $fieldDef
    * @param int $counter
@@ -497,13 +499,10 @@ class CRM_Core_DAO extends DB_DataObject {
               $this->$dbName = $fieldDef['default'];
             }
             else {
-              $options = CRM_Core_PseudoConstant::get($daoName, $fieldName);
+              $entityName = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoName);
+              $options = $entityName ? \Civi::entity($entityName)->getOptions($fieldName) : NULL;
               if (is_array($options)) {
-                $this->$dbName = $options[0] ?? NULL;
-              }
-              else {
-                $defaultValues = explode(',', $options);
-                $this->$dbName = $defaultValues[0];
+                $this->$dbName = $options[0]['id'] ?? NULL;
               }
             }
           }
@@ -695,7 +694,14 @@ class CRM_Core_DAO extends DB_DataObject {
    * @return array
    */
   public static function getSupportedFields($checkPermissions = FALSE) {
-    $fields = array_column((array) static::fields(), NULL, 'name');
+    // Call CRM_Core_DAO_Base::getSchemaFields directly if available
+    if (is_callable([static::class, 'getSchemaFields'])) {
+      $fields = static::getSchemaFields();
+    }
+    // Legacy fallback for EFv1 DAOs
+    else {
+      $fields = array_column((array) static::fields(), NULL, 'name');
+    }
 
     // Exclude fields yet not added by pending upgrades
     $dbVer = \CRM_Core_BAO_Domain::version();
@@ -2103,11 +2109,17 @@ LIKE %1
    *
    * @param string $daoClass
    * @param int $sourceEntityID
+   * @param int|null $targetEntityID
+   *   An existing entity whose values are emptied where the source has none. File fields keep their file.
    * @return array
    */
-  protected static function buildCustomFieldCopyParams(string $daoClass, int $sourceEntityID): array {
+  protected static function buildCustomFieldCopyParams(string $daoClass, int $sourceEntityID, ?int $targetEntityID = NULL): array {
     $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass($daoClass);
     $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($sourceEntityID, $entity);
+    if ($targetEntityID) {
+      $targetValues = array_filter(CRM_Core_BAO_CustomValueTable::getEntityValues($targetEntityID, $entity), fn($value, $field) => is_int($field) && $value !== NULL, ARRAY_FILTER_USE_BOTH);
+      $customValues += array_fill_keys(array_keys($targetValues), NULL);
+    }
     if (empty($customValues)) {
       return [];
     }
@@ -2122,7 +2134,10 @@ LIKE %1
 
     $customParams = [];
     foreach ($customValues as $field => $value) {
-      if ($value !== NULL) {
+      if ($value === NULL && $targetEntityID && !in_array($field, $htmlType)) {
+        $customParams["custom_{$field}_-1"] = '';
+      }
+      elseif ($value !== NULL) {
         if (in_array($field, $htmlType)) {
           $fileValues = CRM_Core_BAO_File::path($value, $sourceEntityID);
           $customParams["custom_{$field}_-1"] = [
@@ -2148,11 +2163,12 @@ LIKE %1
    * @param int $entityID
    * @param int $newEntityID
    * @param string $parentOperation
+   *   'edit' makes an existing entity match the source, emptying values the source does not have.
    */
   public function copyCustomFields($entityID, $newEntityID, $parentOperation = NULL) {
     $tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(get_class($this));
     $entity = CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($this));
-    $customParams = self::buildCustomFieldCopyParams(get_class($this), $entityID);
+    $customParams = self::buildCustomFieldCopyParams(get_class($this), $entityID, $parentOperation === 'edit' ? (int) $newEntityID : NULL);
     if (!empty($customParams)) {
       CRM_Core_BAO_CustomValueTable::postProcess($customParams, $tableName, $newEntityID, $entity, $parentOperation ?? 'create');
     }
@@ -2953,13 +2969,13 @@ SELECT contact_id
    * @param string $fieldName
    * @return bool|array
    */
-  public function getFieldSpec($fieldName) {
-    $fields = $this->fields();
+  public static function getFieldSpec($fieldName) {
+    $fields = static::fields();
 
     // Support "unique names" as well as sql names
     $fieldKey = $fieldName;
     if (empty($fields[$fieldKey])) {
-      $fieldKeys = $this->fieldKeys();
+      $fieldKeys = static::fieldKeys();
       $fieldKey = $fieldKeys[$fieldName] ?? NULL;
     }
     // If neither worked then this field doesn't exist. Return false.
@@ -3288,14 +3304,25 @@ SELECT contact_id
     $bao = new static();
     $tableAlias ??= $bao->tableName();
     $entityName ??= CRM_Core_DAO_AllCoreTables::getEntityNameForClass(get_class($bao));
-    $finalClauses = [];
-    $fields = static::getSupportedFields();
     $selectWhereClauses = $bao->addSelectWhereClause($entityName, $userId, $conditions);
+    return self::formatSelectWhereClauses($selectWhereClauses, $tableAlias, static::getSupportedFields());
+  }
+
+  /**
+   * Format raw selectWhereClauses into SQL strings per field.
+   *
+   * @param array $selectWhereClauses
+   * @param string $tableAlias
+   * @param array $fields
+   * @return array
+   */
+  public static function formatSelectWhereClauses(array $selectWhereClauses, string $tableAlias, array $fields): array {
+    $finalClauses = [];
     foreach ($selectWhereClauses as $fieldName => $fieldClauses) {
       $finalClauses[$fieldName] = NULL;
       if ($fieldClauses) {
         if (!is_array($fieldClauses)) {
-          CRM_Core_Error::deprecatedWarning('Expected array of selectWhereClauses for ' . $bao->tableName() . '.' . $fieldName . ', instead got ' . json_encode($fieldClauses));
+          CRM_Core_Error::deprecatedWarning('Expected array of selectWhereClauses for ' . $tableAlias . '.' . $fieldName . ', instead got ' . json_encode($fieldClauses));
           $fieldClauses = (array) $fieldClauses;
         }
         $formattedClauses = [];
@@ -3308,9 +3335,11 @@ SELECT contact_id
             $formattedClauses[] = "(`$tableAlias`.`$fieldName` " . $subClause . ')';
           }
         }
-        $finalClauses[$fieldName] = '(' . implode(' AND ', $formattedClauses) . ')';
-        if (empty($fields[$fieldName]['required'])) {
-          $finalClauses[$fieldName] = "(`$tableAlias`.`$fieldName` IS NULL OR {$finalClauses[$fieldName]})";
+        if ($formattedClauses) {
+          $finalClauses[$fieldName] = '(' . implode(' AND ', $formattedClauses) . ')';
+          if (empty($fields[$fieldName]['required'])) {
+            $finalClauses[$fieldName] = "(`$tableAlias`.`$fieldName` IS NULL OR {$finalClauses[$fieldName]})";
+          }
         }
       }
     }

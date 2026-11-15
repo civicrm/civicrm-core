@@ -410,7 +410,7 @@ class CRM_Utils_String {
     $params = explode('&', $query);
     foreach ($params as $p) {
       if (strpos($p, '=')) {
-        list($k, $v) = explode('=', $p);
+        [$k, $v] = explode('=', $p);
         if ($k == $urlVar) {
           return $v;
         }
@@ -543,7 +543,7 @@ class CRM_Utils_String {
     $values = explode("\n", $string);
     $result = [];
     foreach ($values as $value) {
-      list($n, $v) = CRM_Utils_System::explode('=', $value, 2);
+      [$n, $v] = CRM_Utils_System::explode('=', $value, 2);
       if (!empty($v)) {
         $result[trim($n)] = trim($v);
       }
@@ -738,7 +738,7 @@ class CRM_Utils_String {
    *   returns the masked Email address
    */
   public static function maskEmail($email, $maskChar = '*', $percent = 50) {
-    list($user, $domain) = preg_split("/@/", $email);
+    [$user, $domain] = preg_split("/@/", $email);
     $len = strlen($user);
     $maskCount = floor($len * $percent / 100);
     $offset = floor(($len - $maskCount) / 2);

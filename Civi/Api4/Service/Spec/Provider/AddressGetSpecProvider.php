@@ -38,6 +38,16 @@ class AddressGetSpecProvider extends \Civi\Core\Service\AutoService implements G
       ->setOperators(['<='])
       ->addSqlFilter([__CLASS__, 'getProximitySql']);
     $spec->addFieldSpec($field);
+
+    // display is a readonly calculated field derived from CRM_Utils_Address::format
+    $field = new FieldSpec('display', 'Address', 'String');
+    $field->setLabel(ts('Display'))
+      ->setTitle(ts('Address Display'))
+      ->setReadonly(TRUE)
+      ->setColumnName('id')
+      ->setDescription(ts('Entire address formatted for display'))
+      ->addOutputFormatter([__CLASS__, 'displayFormat']);
+    $spec->addFieldSpec($field);
   }
 
   /**
@@ -48,6 +58,37 @@ class AddressGetSpecProvider extends \Civi\Core\Service\AutoService implements G
    */
   public function applies($entity, $action) {
     return $entity === 'Address' && $action === 'get';
+  }
+
+  /**
+   * Output formatter for the `display` field.
+   *
+   * The field's column is the address id; replace it with the formatted address.
+   *
+   * @param mixed $value
+   *   On input the address id; replaced with the formatted address string.
+   * @param array $row
+   * @param array $fieldDefn
+   */
+  public static function displayFormat(&$value, array $row, array $fieldDefn): void {
+    if (!$value) {
+      $value = NULL;
+      return;
+    }
+    // TODO: Optimize this list based on the actual tokens in Settings.address_format
+    $fields = [
+      'street_address', 'supplemental_address_1', 'supplemental_address_2', 'supplemental_address_3',
+      'city', 'postal_code', 'postal_code_suffix', 'geo_code_1', 'geo_code_2', 'name',
+      'state_province_id', 'county_id', 'country_id',
+    ];
+    // Only query the database if the row doesn't already contain everything needed
+    if (array_diff_key(array_flip($fields), $row)) {
+      $row = Address::get(FALSE)
+        ->setSelect($fields)
+        ->addWhere('id', '=', $value)
+        ->execute()->first();
+    }
+    $value = $row ? trim(\CRM_Utils_Address::format($row)) : NULL;
   }
 
   /**

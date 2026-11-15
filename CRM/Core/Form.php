@@ -1636,7 +1636,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       return 'delete';
     }
     // If you get this exception try adding more cases above.
-    throw new CRM_Core_Exception("Cannot determine api action for " . get_class($this) . '.' . 'CRM_Core_Action "' . CRM_Core_Action::description($action) . '" not recognized.');
+    throw new CRM_Core_Exception("Cannot determine api action for " . get_class($this) . '.CRM_Core_Action "' . CRM_Core_Action::description($action) . '" not recognized.');
   }
 
   /**

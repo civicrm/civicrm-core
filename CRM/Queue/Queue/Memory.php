@@ -168,11 +168,11 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
       }
       else {
         // item in queue is reserved
-        return FALSE;
+        return NULL;
       }
     }
     // nothing in queue
-    return FALSE;
+    return NULL;
   }
 
   /**
@@ -200,7 +200,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
       return $item;
     }
     // nothing in queue
-    return FALSE;
+    return NULL;
   }
 
   /**

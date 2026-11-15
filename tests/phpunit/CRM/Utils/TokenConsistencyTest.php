@@ -107,7 +107,7 @@ case.status_id:label :Ongoing
 case.is_deleted:label :No
 case.created_date :' . CRM_Utils_Date::customFormat($this->case['created_date']) . '
 case.modified_date :' . CRM_Utils_Date::customFormat($this->case['modified_date']) . '
-case.Custom_Group.Life_Cycle_Status :' . '
+case.Custom_Group.Life_Cycle_Status :
 ';
   }
 
@@ -237,7 +237,7 @@ case.Custom_Group.Life_Cycle_Status :' . '
     $tokenProcessor->addMessage('html', $tokenString, 'text/plain');
     $tokenProcessor->addRow(['contributionId' => $this->ids['Contribution']['default'], 'contribution_productId' => $this->ids['ContributionProduct']['default']]);
     $tokenProcessor->evaluate();
-    $this->assertEquals('product name : Smurf Product Option papa smurf SKU smurfy-sku Sent 09/09/2025', $tokenProcessor->getRow(0)->render('html'));
+    $this->assertSame('product name : Smurf Product Option papa smurf SKU smurfy-sku Sent 09/09/2025', $tokenProcessor->getRow(0)->render('html'));
   }
 
   /**
@@ -263,13 +263,13 @@ case.Custom_Group.Life_Cycle_Status :' . '
     $tokenProcessor->addMessage('html', $tokenString, 'text/html');
     $tokenProcessor->addRow(['contributionId' => $this->contributionCreate(['contribution_page_id' => $this->ids['ContributionPage']['test'], 'contact_id' => $this->individualCreate()])]);
     $tokenProcessor->evaluate();
-    $this->assertEquals('contribution.contribution_page_id.frontend_title :public title
+    $this->assertSame('contribution.contribution_page_id.frontend_title :public title
 contribution.contribution_page_id.pay_later_text :pay later text
 contribution.contribution_page_id.pay_later_receipt :<p>first line</p><p>second line</p>
 contribution.contribution_page_id.is_share :1
 contribution.contribution_page_id.receipt_text :Text in<br />
  non html', $tokenProcessor->getRow(0)->render('html'));
-    $this->assertEquals('contribution.contribution_page_id.frontend_title :public title
+    $this->assertSame('contribution.contribution_page_id.frontend_title :public title
 contribution.contribution_page_id.pay_later_text :pay later text
 contribution.contribution_page_id.pay_later_receipt :first line
 
@@ -295,9 +295,9 @@ contribution.contribution_page_id.receipt_text :Text in
     $tokenProcessor->addMessage('moneyNumber', '{contribution_recur.amount|crmMoneyNumber}', 'text/plain');
     $tokenProcessor->addRow(['contribution_recurId' => $this->getContributionRecurID()]);
     $tokenProcessor->evaluate();
-    $this->assertEquals('€5,990.99', $tokenProcessor->getRow(0)->render('not_specified'));
-    $this->assertEquals('€5,990.99', $tokenProcessor->getRow(0)->render('money'));
-    $this->assertEquals('5990.99', $tokenProcessor->getRow(0)->render('raw'));
+    $this->assertSame('€5,990.99', $tokenProcessor->getRow(0)->render('not_specified'));
+    $this->assertSame('€5,990.99', $tokenProcessor->getRow(0)->render('money'));
+    $this->assertSame('5990.99', $tokenProcessor->getRow(0)->render('raw'));
   }
 
   /**
@@ -321,7 +321,7 @@ contribution.contribution_page_id.receipt_text :Text in
       'locale' => 'nb_NO',
     ]);
     $tokenProcessor->evaluate();
-    $this->assertEquals('€ 5 990,99', $tokenProcessor->getRow(0)
+    $this->assertSame('€ 5 990,99', $tokenProcessor->getRow(0)
       ->render('html'));
   }
 
@@ -336,17 +336,34 @@ contribution.contribution_page_id.receipt_text :Text in
     $contributionID = $this->contributionCreate(['contact_id' => $this->individualCreate(), 'address_id' => $this->ids['Address']['default']]);
     $tokenString = '{contribution.address_id.name} ---- {contribution.address_id.display}';
     $html = $this->renderText(['contributionId' => $contributionID], $tokenString);
-    $this->assertEquals('Bob Smith ---- 123 Sesame Street<br />
+    $this->assertSame('Bob Smith ---- 123 Sesame Street<br />
 The End<br />
 Czech Republic<br />', $html);
     $text = $this->renderText(['contributionId' => $contributionID], $tokenString, [], FALSE);
-    $this->assertEquals('Bob Smith ---- 123 Sesame Street
+    $this->assertSame('Bob Smith ---- 123 Sesame Street
 The End
 Czech Republic
 ', $text);
     $financialTrxn = FinancialTrxn::get()->addWhere('is_payment', '=', TRUE)->execute()->first();
     $text = $this->renderText(['financial_trxnId' => $financialTrxn['id']], '{financial_trxn.total_amount}', [], FALSE);
-    $this->assertEquals('$100.00', $text);
+    $this->assertSame('$100.00', $text);
+  }
+
+  /**
+   * Message-template previews (e.g. CRM_Contribute_WorkflowMessage_Contribution_BasicContribution::build())
+   * fabricate a canned 'address_id.display' string directly in the token context, since a preview contact
+   * has no real address_id to look up. CRM_Contribute_Tokens::getFieldValue() must return that context
+   * value as-is rather than unconditionally re-resolving address_id.display via Address::get(), which
+   * would find nothing for a fabricated/absent address_id and render a blank billing address.
+   */
+  public function testContributionAddressDisplayFromPreviewContext(): void {
+    $text = $this->renderText(
+      ['contributionId' => 0],
+      '{contribution.address_id.display}',
+      ['contribution' => ['address_id.display' => 'CANNED ADDRESS STRING']],
+      FALSE
+    );
+    $this->assertSame('CANNED ADDRESS STRING', $text);
   }
 
   /**
@@ -397,15 +414,15 @@ Czech Republic
       'is_billing' => TRUE,
       'street_address' => 'Heartbreak Motel',
       'supplemental_address_1' => 'Lonely Avenue',
-      'country_id:name' => 'United States',
+      'country_id:name' => 'US',
       'state_province_id:name' => 'California',
     ], 'billing');
     $template = '{contact.first_name} {contact.email_primary.email} {contact.address_primary.street_address} {contact.address_billing.supplemental_address_1} {contact.address_billing.state_province_id:abbr}';
     $text = $this->renderText(['contactId' => $contactID], $template);
-    $this->assertEquals('Anthony me@example.com Heartbreak Hotel Lonely Avenue CA', $text);
+    $this->assertSame('Anthony me@example.com Heartbreak Hotel Lonely Avenue CA', $text);
     Address::delete()->addWhere('id', '=', $this->ids['Address']['billing'])->execute();
     $text = $this->renderText(['contactId' => $contactID], $template);
-    $this->assertEquals('Anthony me@example.com Heartbreak Hotel Lonely Street NY', $text);
+    $this->assertSame('Anthony me@example.com Heartbreak Hotel Lonely Street NY', $text);
   }
 
   /**
@@ -529,7 +546,7 @@ Czech Republic
         'financial_type_id' => 'Member dues',
         'processor_id' => 'abc',
         'payment_processor_id' => $paymentProcessorID,
-        'trxn_id' => 123,
+        'trxn_id' => '123',
         'invoice_id' => 'inv123',
         'sequential' => 1,
         'failure_retry_date' => '2020-01-03',
@@ -608,7 +625,7 @@ contribution_recur.payment_instrument_id:name :Check
     $text = $this->renderText(['contributionId' => $contributionID],
       '{contribution.balance_amount} {contribution.balance_amount|raw} {contribution.balance_amount|boolean} {contribution.tax_amount|boolean}'
     );
-    $this->assertEquals('$99.00 99.00 1 0', $text);
+    $this->assertSame('$99.00 99.00 1 0', $text);
   }
 
   /**
@@ -617,7 +634,7 @@ contribution_recur.payment_instrument_id:name :Check
   public function testCapitalize(): void {
     $this->individualCreate(['first_name' => 'bob m smith']);
     $text = $this->renderText(['contactId' => $this->ids['Contact']['individual_0']], '{contact.first_name|capitalize}');
-    $this->assertEquals('Bob M Smith', $text);
+    $this->assertSame('Bob M Smith', $text);
   }
 
   /**
@@ -691,7 +708,7 @@ contribution_recur.payment_instrument_id:name :Check
       $this->getCustomFieldName('radio', 4) => 4,
     ]);
     $text = $this->renderText(['membershipId' => $membershipID], '{membership.' . $this->getCustomFieldName('radio', 4) . ':label}');
-    $this->assertEquals('100', $text);
+    $this->assertSame('100', $text);
   }
 
   public function testPledgeTokens(): void {
@@ -819,7 +836,7 @@ event.description :event description
 event.location :15 Walton St<br />
 up the road<br />
 Emerald City, ME 90210-1234<br />
-United States<br />
+United States
 event.info_url :' . CRM_Utils_System::url('civicrm/event/info', NULL, TRUE) . '&reset=1&id=' . $this->ids['Event'][0] . '
 event.registration_url :' . CRM_Utils_System::url('civicrm/event/register', NULL, TRUE) . '&reset=1&id=' . $this->ids['Event'][0] . '
 event.pay_later_receipt :Please transfer funds to our bank account.
@@ -891,7 +908,7 @@ my field';
       'messageTemplate' => ['msg_html' => $input],
       'tokenContext' => array_merge(['participantId' => $this->ids['participant'][0]], ['schema' => ['participantId', 'eventId']]),
     ])['html'];
-    $this->assertEquals(99999, $tokenHtml);
+    $this->assertSame('99999', $tokenHtml);
   }
 
   /**
@@ -937,7 +954,7 @@ my field';
       'smarty' => FALSE,
     ]);
     $contactID = \Civi\Api4\Domain::get()->addSelect('contact_id')->execute()->first()['contact_id'];
-    Address::create()->setValues(['contact_id' => $contactID, 'city' => 'Beverley Hills', 'state_province_id:label' => 'California', 'country_id:label' => 'United States', 'postal_code' => 90210])->execute();
+    Address::create()->setValues(['contact_id' => $contactID, 'city' => 'Beverley Hills', 'state_province_id:label' => 'California', 'country_id:label' => 'United States', 'postal_code' => '90210'])->execute();
     $this->assertEquals($tokens, $tokenProcessor->listTokens());
     $tokenProcessor->addMessage('message', implode("\n", array_keys($tokens)), 'text/plain');
     $tokenProcessor->addRow();
@@ -972,7 +989,7 @@ United States', $tokenProcessor->getRow(0)->render('message'));
         'msg_text' => '{domain.now}',
       ],
     ])['text'];
-    $this->assertEquals('September 18th, 2021 11:58 PM', $resolved);
+    $this->assertSame('September 18th, 2021 11:58 PM', $resolved);
 
     // This example is malformed - no quotes
     try {
@@ -1184,8 +1201,8 @@ United States', $tokenProcessor->getRow(0)->render('message'));
       'supplemental_address_1' => 'up the road',
       'city' => 'Emerald City',
       'state_province_id:label' => 'Maine',
-      'postal_code' => 90210,
-      'postal_code_suffix' => 1234,
+      'postal_code' => '90210',
+      'postal_code_suffix' => '1234',
     ])->execute()->first()['id'];
     \Civi::settings()->set('mailing_format', '{contact.street_address}{ }{contact.supplemental_address_1}{ }{contact.supplemental_address_2}{ }{contact.city}{ }{contact.state_province}{ }{contact.postal_code}');
     $phoneID = Phone::create()

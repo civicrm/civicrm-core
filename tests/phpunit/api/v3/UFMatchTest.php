@@ -104,7 +104,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
       'uf_name' => 'blahdyblah@gmail.com',
       'domain_id' => 1,
     ]);
-    $this->assertEquals(1, $this->callAPISuccess('UFMatch', 'getcount', [
+    $this->assertSame(1, $this->callAPISuccess('UFMatch', 'getcount', [
       'id' => $result['id'],
     ]));
     $this->callAPISuccess('UFMatch', 'delete', ['id' => $result['id']]);

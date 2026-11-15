@@ -193,7 +193,7 @@ This is text only
 and has two consecutive lines.
 
 And one blank line.
-ENDDETAILS
+ENDDETAILS,
         ],
         '<span class="crm-frozen-field">This is text only<br />and has two consecutive lines.<br /><br />And one blank line.</span>',
       ],
@@ -207,7 +207,7 @@ This is text only
 and has two consecutive lines.
 
 And one blank line.
-ENDDETAILS
+ENDDETAILS,
         ],
         // Note this is the summary of the actual bulk mailing text. The above details are a bit irrelevant for what we're testing here.
         '<td class="label nowrap">Text Message</td><td>This<br />address<br /><br />is not ours:...<br />',
@@ -222,7 +222,7 @@ This is text only
 and has two consecutive lines.
 
 And one blank line.
-ENDDETAILS
+ENDDETAILS,
         ],
         '<td class="view-value report">                   This is text only<br />and has two consecutive lines.<br /><br />And one blank line.',
       ],
@@ -236,7 +236,7 @@ This is text only
 and has two consecutive lines.
 
 And one blank line.
-ENDDETAILS
+ENDDETAILS,
         ],
         '<span class="crm-frozen-field">This is text only<br />and has two consecutive lines.<br /><br />And one blank line.</span>',
       ],
@@ -252,7 +252,7 @@ ENDDETAILS
 <p>And it usually looks like this.</p>
 
 <p>With p&#39;s and newlines between the p&#39;s.</p>
-ENDDETAILS
+ENDDETAILS,
         ],
         '<span class="crm-frozen-field"><p>This is html only</p><p>And it usually looks like this.</p><p>With p\'s and newlines between the p\'s.</p></span>',
       ],
@@ -267,7 +267,7 @@ ENDDETAILS
 <p>And it usually looks like this.</p>
 
 <p>With p&#39;s and newlines between the p&#39;s.</p>
-ENDDETAILS
+ENDDETAILS,
         ],
         // Note this is the summary of the actual bulk mailing text. The above details are a bit irrelevant for what we're testing here.
         '<td class="label nowrap">Text Message</td><td>This<br />address<br /><br />is not ours:...<br />',
@@ -283,7 +283,7 @@ ENDDETAILS
 <p>And it usually looks like this.</p>
 
 <p>With p&#39;s and newlines between the p&#39;s.</p>
-ENDDETAILS
+ENDDETAILS,
         ],
         '<td class="view-value report">                   <p>This is html only</p><p>And it usually looks like this.</p><p>With p\'s and newlines between the p\'s.</p>',
       ],
@@ -299,7 +299,7 @@ ENDDETAILS
 <p>And it usually looks like this.</p>
 
 <p>With p&#39;s and newlines between the p&#39;s.</p>
-ENDDETAILS
+ENDDETAILS,
         ],
         '<span class="crm-frozen-field"><p>This is html only</p><p>And it usually looks like this.</p><p>With p\'s and newlines between the p\'s.</p></span>',
       ],
@@ -321,7 +321,7 @@ and has two consecutive lines.</p>
 
 <p>And one blank line.</p>
 -ALTERNATIVE END-
-ENDDETAILS
+ENDDETAILS,
         ],
         'This is mixed<br />and has two consecutive lines.<br /><br />And one blank line.',
       ],
@@ -342,7 +342,7 @@ and has two consecutive lines.</p>
 
 <p>And one blank line.</p>
 -ALTERNATIVE END-
-ENDDETAILS
+ENDDETAILS,
         ],
         // Note this is the summary of the actual bulk mailing text. The above details are a bit irrelevant for what we're testing here.
         '<td class="label nowrap">Text Message</td><td>This<br />address<br /><br />is not ours:...<br />',
@@ -364,7 +364,7 @@ and has two consecutive lines.</p>
 
 <p>And one blank line.</p>
 -ALTERNATIVE END-
-ENDDETAILS
+ENDDETAILS,
         ],
         '<td class="view-value report">                   <br />This is mixed<br />and has two consecutive lines.<br /><br />And one blank line.<br />',
       ],
@@ -385,7 +385,7 @@ and has two consecutive lines.</p>
 
 <p>And one blank line.</p>
 -ALTERNATIVE END-
-ENDDETAILS
+ENDDETAILS,
         ],
         '<td class="view-value">       <br />This is mixed<br />and has two consecutive lines.<br /><br />And one blank line.<br />',
       ],
@@ -407,7 +407,7 @@ and has two consecutive lines.
 
 And one blank line.
 -ALTERNATIVE END-
-ENDDETAILS
+ENDDETAILS,
         ],
         '<td class="view-value">       <p>This is mixed<br />and has two consecutive lines.</p><p>And one blank line.</p>',
       ],
@@ -428,7 +428,7 @@ and has two consecutive lines.
 
 And one blank line.
 -ALTERNATIVE END-
-ENDDETAILS
+ENDDETAILS,
         ],
         // Note this is the summary of the actual bulk mailing text. The above details are a bit irrelevant for what we're testing here.
         '<td class="label nowrap">Text Message</td><td>This<br />address<br /><br />is not ours:...<br />',
@@ -450,7 +450,7 @@ and has two consecutive lines.
 
 And one blank line.
 -ALTERNATIVE END-
-ENDDETAILS
+ENDDETAILS,
         ],
         '<p>This is mixed<br />and has two consecutive lines.</p><p>And one blank line.</p>',
       ],
@@ -471,7 +471,7 @@ and has two consecutive lines.
 
 And one blank line.
 -ALTERNATIVE END-
-ENDDETAILS
+ENDDETAILS,
         ],
         '<p>This is mixed<br />and has two consecutive lines.</p><p>And one blank line.</p>',
       ],

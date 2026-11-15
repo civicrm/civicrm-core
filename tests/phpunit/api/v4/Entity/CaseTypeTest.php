@@ -17,7 +17,7 @@ class CaseTypeTest extends Api4TestBase {
 
   public function setUp(): void {
     parent::setUp();
-    \CRM_Core_Dao::executeQuery('DELETE FROM civicrm_case_type WHERE id > 2');
+    \CRM_Core_DAO::executeQuery("DELETE FROM civicrm_case_type WHERE name NOT IN ('housing_support', 'adult_day_care_referral')");
   }
 
   public function testGetCaseTypeDefinition(): void {
@@ -26,7 +26,7 @@ class CaseTypeTest extends Api4TestBase {
       ->addWhere('name', '=', 'housing_support')
       ->execute()->single();
 
-    $this->assertEquals('Open Case', $caseType['definition']['activityTypes'][0]['name']);
+    $this->assertSame('Open Case', $caseType['definition']['activityTypes'][0]['name']);
   }
 
   public function testGetCaseTypeDefinitionViaJoin(): void {
@@ -44,7 +44,7 @@ class CaseTypeTest extends Api4TestBase {
       ->execute()->first();
 
     $definition = $get['case.case_type_id.definition'];
-    $this->assertEquals('Open Case', $definition['activityTypes'][0]['name']);
+    $this->assertSame('Open Case', $definition['activityTypes'][0]['name']);
   }
 
   public function testGetCaseTypeDefinitionViaTagJoin(): void {
@@ -67,7 +67,7 @@ class CaseTypeTest extends Api4TestBase {
       ->execute()->first();
 
     $definition = $get['case.case_type_id.definition'];
-    $this->assertEquals('Open Case', $definition['activityTypes'][0]['name']);
+    $this->assertSame('Open Case', $definition['activityTypes'][0]['name']);
   }
 
   public function testGetStatusIdPerCaseType(): void {
@@ -130,6 +130,7 @@ class CaseTypeTest extends Api4TestBase {
         'definition' => $xmlString,
       ],
     ])->single()['id'];
+    $this->registerTestRecord('CaseType', $id);
 
     $dbDefinition = \CRM_Core_DAO::singleValueQuery('SELECT definition FROM civicrm_case_type WHERE id = ' . $id);
     $this->assertStringContainsString('<CaseType>', $dbDefinition);
@@ -141,7 +142,7 @@ class CaseTypeTest extends Api4TestBase {
       ->addWhere('id', '=', $id)
       ->execute()->single();
 
-    $this->assertEquals('Open Case', $caseType['definition']['activityTypes'][0]['name']);
+    $this->assertSame('Open Case', $caseType['definition']['activityTypes'][0]['name']);
   }
 
 }

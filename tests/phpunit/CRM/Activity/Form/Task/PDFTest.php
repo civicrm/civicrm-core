@@ -116,7 +116,7 @@ class CRM_Activity_Form_Task_PDFTest extends CiviUnitTestCase {
     }
 
     $html_message = "Custom: {activity.$cf}";
-    $activityIds = CRM_Utils_Array::collect('id', $activities);
+    $activityIds = array_column($activities, 'id');
     $form = $this->getFormObject('CRM_Activity_Form_Task_PDF');
     try {
       $form->createDocument($activityIds, $html_message, []);

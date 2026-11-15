@@ -71,8 +71,8 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
     $this->assertCount(1, $pledgePayment);
     $payment = array_pop($pledgePayment);
     // Assert that we actually have no pledge Payments
-    $this->assertEquals(0, CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge['id'], array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'), TRUE)));
-    $this->assertEquals('Pending', $payment['status']);
+    $this->assertSame(0, CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge['id'], array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'), TRUE)));
+    $this->assertSame('Pending', $payment['status']);
     $this->assertEquals($payment['scheduled_date'], date('Y-m-d 00:00:00', strtotime($scheduledDate)));
   }
 
@@ -102,7 +102,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
     ];
 
     $date = CRM_Pledge_BAO_Pledge::getPledgeStartDate($date, $params);
-    $this->assertEquals('06/10/2016', date('m/d/Y', strtotime($date)), 'The two dates do not match');
+    $this->assertSame('06/10/2016', date('m/d/Y', strtotime($date)), 'The two dates do not match');
   }
 
   /**

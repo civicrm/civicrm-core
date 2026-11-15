@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\MappingField;
+
 /**
  * Class CRM_Core_BAO_MappingTest.
  *
@@ -47,9 +49,12 @@ class CRM_Core_BAO_MappingTest extends CiviUnitTestCase {
       }
     }
     unset($expectedField);
-    $mapping = $this->callAPISuccess('Mapping', 'create', ['name' => 'teest']);
+    $mapping = $this->createTestEntity('Mapping', ['name' => 'teest']);
     CRM_Core_BAO_Mapping::saveMappingFields($params, $mapping['id']);
-    $saved = $this->callAPISuccess('MappingField', 'get', ['mapping_id' => $mapping['id'], 'sequential' => 1])['values'];
+    $saved = [];
+    foreach (MappingField::get(FALSE)->addWhere('mapping_id', '=', $mapping['id'])->addOrderBy('id')->execute() as $row) {
+      $saved[] = array_filter($row, fn($value) => $value !== NULL);
+    }
     $expected = array_values($expected);
     foreach ($expected as $index => $mappingField) {
       $expected[$index]['id'] = $saved[$index]['id'];

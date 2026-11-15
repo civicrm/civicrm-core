@@ -81,7 +81,7 @@ return [
       'title' => ts('Activity Contact Type'),
       'sql_type' => 'int unsigned',
       'input_type' => 'Select',
-      'description' => ts('Determines the contact\'s role in the activity (source, target, or assignee).'),
+      'description' => ts("Determines the contact's role in the activity (source, target, or assignee)."),
       'add' => '4.4',
       'input_attrs' => [
         'label' => ts('Contact Role'),

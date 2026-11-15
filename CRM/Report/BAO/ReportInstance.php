@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 use Civi\Core\Event\PreEvent;
@@ -16,7 +17,7 @@ use Civi\Core\Event\PreEvent;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implements Civi\Core\HookInterface {
+class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
   use CRM_Core_OwnershipAccessTrait;
 
   protected static function getOwnerContactIdField(): array {
@@ -171,6 +172,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance implem
    *
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(PreEvent $event): void {
     if ($event->action === 'delete' && $event->id) {
       // When deleting a report, also delete from navigation menu

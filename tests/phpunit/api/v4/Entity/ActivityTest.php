@@ -53,10 +53,10 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->single();
     $this->assertEquals($sourceContactId, $activity['source_contact_id']);
     $this->assertEquals($targetContactIds, $activity['target_contact_id']);
-    $this->assertEquals(2, $activity['target_contact_count']);
+    $this->assertSame(2, $activity['target_contact_count']);
     // This field was not set
     $this->assertNull($activity['assignee_contact_id']);
-    $this->assertEquals(0, $activity['assignee_contact_count']);
+    $this->assertSame(0, $activity['assignee_contact_count']);
 
     // Update to set assignee_contact_id
     $activity = Activity::update(FALSE)
@@ -96,7 +96,7 @@ class ActivityTest extends Api4TestBase implements TransactionalInterface {
         ['activity.record_type_id:name', '=', '"Activity Source"']
       )
       ->execute()->single();
-    $this->assertEquals('1234', $contactGet['activity.subject']);
+    $this->assertSame('1234', $contactGet['activity.subject']);
     $this->assertEquals($sourceContactId, $contactGet['activity.source_contact_id']);
     $this->assertEquals($targetContactIds, $contactGet['activity.target_contact_id']);
     $this->assertEquals($expectedAssigneeContactIds, $contactGet['activity.assignee_contact_id']);

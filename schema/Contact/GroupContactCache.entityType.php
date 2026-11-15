@@ -7,7 +7,7 @@ return [
   'getInfo' => fn() => [
     'title' => ts('Group Contact Cache'),
     'title_plural' => ts('Group Contact Caches'),
-    'description' => ts('Join table cache for \'static\' groups.'),
+    'description' => ts("Join table cache for 'static' groups."),
     'add' => '2.1',
   ],
   'getIndices' => fn() => [

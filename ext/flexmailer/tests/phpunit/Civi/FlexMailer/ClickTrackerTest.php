@@ -42,7 +42,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/foo/bar?a=b&c=d#frag';
     $result = $filter->filterContent($msg, 1, 1);
-    $this->assertEquals('See this: http://example.com/extern?u=1&qid=1', $result);
+    $this->assertSame('See this: http://example.com/extern?u=1&qid=1', $result);
   }
 
   /**
@@ -52,7 +52,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/foo/bar?a=b&cid={contact.id}';
     $result = $filter->filterContent($msg, 1, 1);
-    $this->assertEquals('See this: http://example.com/extern?u=1&qid=1&cid={contact.id}', $result);
+    $this->assertSame('See this: http://example.com/extern?u=1&qid=1&cid={contact.id}', $result);
   }
 
   /**
@@ -62,7 +62,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/foo/bar?cs={contact.checksum}&a=b&cid={contact.id}';
     $result = $filter->filterContent($msg, 1, 1);
-    $this->assertEquals('See this: http://example.com/extern?u=1&qid=1&cs={contact.checksum}&cid={contact.id}', $result);
+    $this->assertSame('See this: http://example.com/extern?u=1&qid=1&cs={contact.checksum}&cid={contact.id}', $result);
   }
 
   /**
@@ -72,7 +72,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $filter = new HtmlClickTracker();
     $msg = '<a href="https://example.com/foo/bar?cs={contact.checksum}&amp;a=b&amp;cid={contact.id}">See this</a>';
     $result = $filter->filterContent($msg, 1, 1);
-    $this->assertEquals('<a href="http://example.com/extern?u=1&amp;qid=1&amp;cs={contact.checksum}&amp;cid={contact.id}" rel=\'nofollow\'>See this</a>', $result);
+    $this->assertSame('<a href="http://example.com/extern?u=1&amp;qid=1&amp;cs={contact.checksum}&amp;cid={contact.id}" rel=\'nofollow\'>See this</a>', $result);
   }
 
   /**
@@ -82,7 +82,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/foo/bar?cid={contact.id}';
     $result = $filter->filterContent($msg, 1, 1);
-    $this->assertEquals('See this: http://example.com/extern?u=1&qid=1&cid={contact.id}', $result);
+    $this->assertSame('See this: http://example.com/extern?u=1&qid=1&cid={contact.id}', $result);
   }
 
   /**
@@ -95,7 +95,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/foo/bar?a=b#cid={contact.id}';
     $result = $filter->filterContent($msg, 1, 1);
-    $this->assertEquals('See this: http://example.com/extern?u=1&qid=1#cid={contact.id}', $result);
+    $this->assertSame('See this: http://example.com/extern?u=1&qid=1#cid={contact.id}', $result);
   }
 
   /**
@@ -108,7 +108,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/foo/bar?a=b&cid={contact.id}#cid={contact.id}';
     $result = $filter->filterContent($msg, 1, 1);
-    $this->assertEquals('See this: http://example.com/extern?u=1&qid=1&cid={contact.id}#cid={contact.id}', $result);
+    $this->assertSame('See this: http://example.com/extern?u=1&qid=1&cid={contact.id}#cid={contact.id}', $result);
   }
 
   /**
@@ -118,7 +118,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $filter = new TextClickTracker();
     $msg = 'See this: https://{some.domain}.com/foo/bar';
     $result = $filter->filterContent($msg, 1, 1);
-    $this->assertEquals('See this: https://{some.domain}.com/foo/bar', $result);
+    $this->assertSame('See this: https://{some.domain}.com/foo/bar', $result);
   }
 
   /**
@@ -128,21 +128,21 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $filter = new TextClickTracker();
     $msg = 'See this: https://example.com/{some.path}';
     $result = $filter->filterContent($msg, 1, 1);
-    $this->assertEquals('See this: https://example.com/{some.path}', $result);
+    $this->assertSame('See this: https://example.com/{some.path}', $result);
   }
 
   public function testLinkWithUnicode(): void {
     $filter = new TextClickTracker();
     $msg = 'See this: https://civińcrm.org';
     $result = $filter->filterContent($msg, 1, 1);
-    $this->assertEquals('See this: http://example.com/extern?u=1&qid=1', $result);
+    $this->assertSame('See this: http://example.com/extern?u=1&qid=1', $result);
   }
 
   public function testHtmlLinkWithUnicode(): void {
     $filter = new HtmlClickTracker();
     $msg = '<p><a href="https://civińcrm.org">See This</a></p>';
     $result = $filter->filterContent($msg, 1, 1);
-    $this->assertEquals('<p><a href="http://example.com/extern?u=1&amp;qid=1" rel=\'nofollow\'>See This</a></p>', $result);
+    $this->assertSame('<p><a href="http://example.com/extern?u=1&amp;qid=1" rel=\'nofollow\'>See This</a></p>', $result);
   }
 
   public function testTraditionalViewMailingTokenFormat(): void {
@@ -150,7 +150,7 @@ class ClickTrackerTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $filter = new HtmlClickTracker();
     $msg = '<p><a href="http://civicrm.org/civicrm/mailing/view?id={mailing.key}&{contact.checksum}&cid={contact.contact_id}">View online</a></p>';
     $result = $filter->filterContent($msg, 1, 1);
-    $this->assertEquals('<p><a href="http://civicrm.org/civicrm/mailing/view?id={mailing.key}&amp;{contact.checksum}&amp;cid={contact.contact_id}" rel=\'nofollow\'>View online</a></p>', $result);
+    $this->assertSame('<p><a href="http://civicrm.org/civicrm/mailing/view?id={mailing.key}&amp;{contact.checksum}&amp;cid={contact.contact_id}" rel=\'nofollow\'>View online</a></p>', $result);
   }
 
 }

@@ -330,15 +330,15 @@ class CRM_Utils_System {
 
     // Extract fragment from path or query if munged together
     if ($query && str_contains($query, '#')) {
-      [$path, $fragment] = explode('#', $query);
+      [$query, $fragment] = explode('#', $query, 2);
     }
     if ($path && str_contains($path, '#')) {
-      [$path, $fragment] = explode('#', $path);
+      [$path, $fragment] = explode('#', $path, 2);
     }
 
     // Extract query from path if munged together
     if ($path && str_contains($path, '?')) {
-      [$path, $extraQuery] = explode('?', $path);
+      [$path, $extraQuery] = explode('?', $path, 2);
       $query = $extraQuery . ($query ? "&$query" : '');
     }
 

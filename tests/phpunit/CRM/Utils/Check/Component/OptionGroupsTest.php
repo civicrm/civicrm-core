@@ -14,13 +14,13 @@ class CRM_Utils_Check_Component_OptionGroupsTest extends CiviUnitTestCase {
   }
 
   public function testCheckOptionGroupValues(): void {
-    $optionGroup = $this->callAPISuccess('OptionGroup', 'create', [
+    $optionGroup = $this->createTestEntity('OptionGroup', [
       'name' => 'testGroup',
       'title' => 'testGroup',
       'data_type' => 'Integer',
     ]);
     // test that zero is a valid integer.
-    $this->callAPISuccess('OptionValue', 'create', [
+    $this->createTestEntity('OptionValue', [
       'option_group_id' => $optionGroup['id'],
       'label' => 'zero',
       'value' => 0,
@@ -34,12 +34,12 @@ class CRM_Utils_Check_Component_OptionGroupsTest extends CiviUnitTestCase {
    * Mismatching values are listed in an escaped table.
    */
   public function testCheckOptionGroupValuesListsMismatch(): void {
-    $optionGroup = $this->callAPISuccess('OptionGroup', 'create', [
+    $optionGroup = $this->createTestEntity('OptionGroup', [
       'name' => 'testGroup',
       'title' => 'Test <group>',
       'data_type' => 'Integer',
     ]);
-    $this->callAPISuccess('OptionValue', 'create', [
+    $this->createTestEntity('OptionValue', [
       'option_group_id' => $optionGroup['id'],
       'label' => 'Not <a> number',
       'value' => 'abc',

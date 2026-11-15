@@ -91,15 +91,17 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     }
     $lang->load('com_users', $baseDir);
 
-    $register = $model->register($values);
-    if (version_compare(JVERSION, '4.0', 'lt')) {
-      $ufID = JUserHelper::getUserId($values['username']);
-      JUserHelper::addUserToGroup($ufID, $userType);
+    $userHelper = version_compare(JVERSION, '4.0', 'lt') ? 'JUserHelper' : '\Joomla\CMS\User\UserHelper';
+    if ($userHelper::getUserId($values['username'])) {
+      return FALSE;
     }
-    else {
-      $ufID = \Joomla\CMS\User\UserHelper::getUserId($values['username']);
-      \Joomla\CMS\User\UserHelper::addUserToGroup($ufID, $userType);
+    // register() also returns FALSE when it created the account but could not send the notification mail.
+    $model->register($values);
+    $ufID = $userHelper::getUserId($values['username']);
+    if (!$ufID) {
+      return FALSE;
     }
+    $userHelper::addUserToGroup($ufID, $userType);
     return $ufID;
   }
 

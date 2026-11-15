@@ -238,7 +238,7 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
       ->setWorkflow($workflow)
       ->execute()
       ->single();
-    $this->assertEquals('hi', $result['text']);
+    $this->assertSame('hi', $result['text']);
 
     $result = WorkflowMessage::render(FALSE)
       ->setWorkflow($workflow)

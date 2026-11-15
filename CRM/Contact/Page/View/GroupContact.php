@@ -53,7 +53,9 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
     $contactSmartGroupSettings = Civi::settings()->get('contact_smart_group_display');
     $this->assign('contactSmartGroupSettings', $contactSmartGroupSettings);
 
-    $this->ajaxResponse['tabCount'] = count($in);
+    if (Civi::settings()->get('contact_summary_tab_counts')) {
+      $this->ajaxResponse['tabCount'] = count($in);
+    }
   }
 
   /**

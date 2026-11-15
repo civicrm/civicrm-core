@@ -69,7 +69,7 @@ class CRM_Contribute_Form_Task_EmailTest extends CiviUnitTestCase {
     ]);
     $form->set('cid', $contact1 . ',' . $contact2);
     $form->buildForm();
-    $this->assertEquals('<br /><br />--Benny, Benny', $form->_defaultValues['html_message']);
+    $this->assertSame('<br /><br />--Benny, Benny', $form->_defaultValues['html_message']);
     $form->postProcess();
     $mut->assertSubjects(['Mr. Anthony Anderson II $999.00', 'Mr. Elton Anderson II $100.00']);
     $mut->checkAllMailLog([

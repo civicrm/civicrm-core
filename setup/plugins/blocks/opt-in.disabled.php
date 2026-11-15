@@ -39,7 +39,6 @@ if (!defined('CIVI_SETUP')) {
     $e->getModel()->extras['opt-in']['versionCheck'] = !empty($values['versionCheck']);
 
      // echo '<pre>'; print_r(['model'=> $e->getModel()->getValues(), 'v'=>$values]); echo '</pre>';
-
   }, \Civi\Setup::PRIORITY_LATE);
 
 \Civi\Setup::dispatcher()

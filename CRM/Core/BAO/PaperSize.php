@@ -247,7 +247,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   }
 
   /**
-   * Save the Paper Size in the DB.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param array $values associative array of name/value pairs
    * @param int $id
@@ -255,6 +255,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    * @throws CRM_Core_Exception
    */
   public function savePaperSize(&$values, $id) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     // get the Option Group ID for Paper Sizes (create one if it doesn't exist)
     $group_id = self::_getGid(TRUE);
 

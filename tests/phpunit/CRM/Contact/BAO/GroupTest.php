@@ -9,8 +9,10 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Domain;
 use Civi\Api4\Group;
 use Civi\Api4\SavedSearch;
+use Civi\Api4\Setting;
 
 /**
  * Test class for CRM_Contact_BAO_Group BAO
@@ -95,7 +97,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     ];
     $groupsHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($params, NULL, '&nbsp;&nbsp;', TRUE);
     // check if child group is present in the tree with formatted group title prepended with spacer '&nbsp;&nbsp;'
-    $this->assertEquals('&nbsp;&nbsp;Child Group C', $groupsHierarchy[$group3->id]);
+    $this->assertSame('&nbsp;&nbsp;Child Group C', $groupsHierarchy[$group3->id]);
 
     // Disable parent group A and ensure that child group C is not present as both of its parent groups are disabled
     CRM_Contact_BAO_Group::writeRecord([
@@ -182,7 +184,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'saved_search_id' => $savedSearchID,
       'parents' => [$parentGroupID],
     ])->execute()->first()['id'];
-    $this->callAPISuccess('Contact', 'get', ['group' => $childGroupID]);
+    $this->callApiV3Success('Contact', 'get', ['group' => $childGroupID]);
   }
 
   /**
@@ -304,25 +306,25 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     ];
     $group1 = CRM_Contact_BAO_Group::writeRecord($params);
 
-    $domain1 = $this->callAPISuccess('Domain', 'get', ['id' => 1]);
+    $domain1 = Domain::get(FALSE)->addWhere('id', '=', 1)->execute()->single();
     $params2 = [
       'name' => uniqid(),
       'title' => 'Group B',
       'description' => 'Group Two',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-      'organization_id' => $domain1['values'][1]['contact_id'],
+      'organization_id' => $domain1['contact_id'],
     ];
     $group2 = CRM_Contact_BAO_Group::writeRecord($params2);
 
-    $domain2 = $this->callAPISuccess('Domain', 'get', ['id' => 2]);
+    $domain2 = Domain::get(FALSE)->addWhere('id', '=', 2)->execute()->single();
     $params3 = [
       'name' => uniqid(),
       'title' => 'Group C',
       'description' => 'Group Three',
       'visibility' => 'User and User Admin Only',
       'is_active' => 1,
-      'organization_id' => $domain2['values'][2]['contact_id'],
+      'organization_id' => $domain2['contact_id'],
     ];
     $group3 = CRM_Contact_BAO_Group::writeRecord($params3);
     $params2['id'] = $group2->id;
@@ -353,8 +355,8 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     ];
     [$smartGroupID, $savedSearchID] = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
 
-    $mailingID = $this->callAPISuccess('Mailing', 'create', [])['id'];
-    $this->callAPISuccess('MailingGroup', 'create', [
+    $mailingID = $this->createTestEntity('Mailing', [])['id'];
+    $this->createTestEntity('MailingGroup', [
       'mailing_id' => $mailingID,
       'group_type' => 'Include',
       'entity_table' => 'civicrm_group',
@@ -362,8 +364,8 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     ]);
 
     CRM_Mailing_BAO_Mailing::getRecipients($mailingID);
-    $recipients = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailingID]);
-    $this->assertEquals(1, $recipients['count'], 'Check recipient count');
+    $recipients = $this->callApiV3Success('MailingRecipients', 'get', ['mailing_id' => $mailingID]);
+    $this->assertSame(1, $recipients['count'], 'Check recipient count');
   }
 
   /**
@@ -389,7 +391,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     CRM_Contact_BAO_Group::writeRecord($newParams);
 
     // Check it against original array, except description.
-    $result = $this->callAPISuccess('Group', 'getsingle', ['id' => $group->id]);
+    $result = Group::get(FALSE)->addWhere('id', '=', $group->id)->execute()->single();
     foreach ($checkParams as $key => $value) {
       if ($key === 'description') {
         $this->assertEquals($newParams[$key], $result[$key], "$key doesn't match");
@@ -402,6 +404,51 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
     // Check recent items list.
     $recentItems = CRM_Utils_Recent::get();
     $this->assertEquals($checkParams['title'], $recentItems[0]['title']);
+  }
+
+  /**
+   * Test validation callback for group_multiple_parents setting.
+   */
+  public function testValidateGroupMultipleParents(): void {
+    // Should be able to toggle the setting when no groups have multiple parents
+    Setting::set(FALSE)->addValue('group_multiple_parents', TRUE)->execute();
+    $this->assertTrue(Civi::settings()->get('group_multiple_parents'));
+
+    Setting::set(FALSE)->addValue('group_multiple_parents', FALSE)->execute();
+    $this->assertFalse(Civi::settings()->get('group_multiple_parents'));
+
+    $parent1 = $this->createTestEntity('Group', ['title' => 'Parent 1'], 'parent1');
+    $parent2 = $this->createTestEntity('Group', ['title' => 'Parent 2'], 'parent2');
+    $this->createTestEntity('Group', [
+      'title' => 'Child 1',
+      'parents' => [$parent1['id'], $parent2['id']],
+    ], 'child1');
+
+    // Should still be able to enable the setting
+    Setting::set(FALSE)->addValue('group_multiple_parents', TRUE)->execute();
+    $this->assertTrue(Civi::settings()->get('group_multiple_parents'));
+
+    // Should not be able to disable the setting when groups with multiple parents exist
+    try {
+      Setting::set(FALSE)->addValue('group_multiple_parents', FALSE)->execute();
+      $this->fail('Expected CRM_Core_Exception not thrown');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertSame('Cannot disable multiple group parents because 1 group with multiple parents exists.', $e->getMessage());
+    }
+
+    $this->createTestEntity('Group', [
+      'title' => 'Child 2',
+      'parents' => [$parent1['id'], $parent2['id']],
+    ], 'child2');
+
+    try {
+      Setting::set(FALSE)->addValue('group_multiple_parents', FALSE)->execute();
+      $this->fail('Expected CRM_Core_Exception not thrown');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertSame('Cannot disable multiple group parents because 2 groups with multiple parents exist.', $e->getMessage());
+    }
   }
 
 }

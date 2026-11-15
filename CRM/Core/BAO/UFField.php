@@ -1,12 +1,14 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
+
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -18,7 +20,7 @@
 /**
  * This class contains function for UFField.
  */
-class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   /**
    * Batch entry fields.
    * @var array
@@ -236,7 +238,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField implements \Civi\Core\Ho
   }
 
   /**
-   * Enable/disable profile field given a custom group id
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param int $customGroupId
    *   Custom group id.
@@ -244,6 +246,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField implements \Civi\Core\Ho
    *   Value we want to set the is_active field.
    */
   public static function setUFFieldStatus($customGroupId, $is_active) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     //find the profile id given custom group id
     $queryString = "SELECT civicrm_custom_field.id as custom_field_id
                         FROM   civicrm_custom_field, civicrm_custom_group
@@ -1087,6 +1090,7 @@ SELECT  id
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre')]
   public static function on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if ($event->action === 'delete' && $event->entity === 'CustomField') {
       \Civi\Api4\UFField::delete(FALSE)

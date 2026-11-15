@@ -153,7 +153,7 @@ class CRM_Core_ScheduledJob {
     $dao = new CRM_Core_DAO_Job();
     $dao->id = $this->id;
     $dao->last_run = CRM_Utils_Date::currentDBDate();
-    $dao->last_run_end = NULL;
+    $dao->last_run_end = 'null';
     $dao->save();
   }
 

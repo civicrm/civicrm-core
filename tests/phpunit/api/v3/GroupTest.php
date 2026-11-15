@@ -54,9 +54,9 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     $group = $group["values"];
     $this->assertNotNull(count($group));
-    $this->assertEquals($group[$this->_groupID]['name'], "Test Group 1");
-    $this->assertEquals($group[$this->_groupID]['is_active'], 1);
-    $this->assertEquals($group[$this->_groupID]['visibility'], 'Public Pages');
+    $this->assertSame("Test Group 1", $group[$this->_groupID]['name']);
+    $this->assertSame($this->apiValue(TRUE), $group[$this->_groupID]['is_active']);
+    $this->assertSame('Public Pages', $group[$this->_groupID]['visibility']);
   }
 
   /**
@@ -86,11 +86,11 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $group = $this->callAPISuccess('group', 'get', $params);
 
     foreach ($group['values'] as $v) {
-      $this->assertEquals($v['name'], "Test Group 1");
-      $this->assertEquals($v['title'], 'New Test Group Created');
-      $this->assertEquals($v['description'], 'New Test Group Created');
-      $this->assertEquals($v['is_active'], 1);
-      $this->assertEquals($v['visibility'], 'Public Pages');
+      $this->assertSame("Test Group 1", $v['name']);
+      $this->assertSame('New Test Group Created', $v['title']);
+      $this->assertSame('New Test Group Created', $v['description']);
+      $this->assertSame($this->apiValue(TRUE), $v['is_active']);
+      $this->assertSame('Public Pages', $v['visibility']);
     }
   }
 
@@ -109,10 +109,10 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     foreach ($group as $v) {
       $this->assertEquals($v['id'], $this->_groupID);
-      $this->assertEquals($v['title'], 'New Test Group Created');
-      $this->assertEquals($v['description'], 'New Test Group Created');
-      $this->assertEquals($v['is_active'], 1);
-      $this->assertEquals($v['visibility'], 'Public Pages');
+      $this->assertSame('New Test Group Created', $v['title']);
+      $this->assertSame('New Test Group Created', $v['description']);
+      $this->assertSame($this->apiValue(TRUE), $v['is_active']);
+      $this->assertSame('Public Pages', $v['visibility']);
     }
   }
 
@@ -127,8 +127,8 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $params['id'] = $this->_groupID;
     $params['return.name'] = 1;
     $group = $this->callAPISuccess('group', 'get', $params);
-    $this->assertEquals($group['values'][$this->_groupID]['name'],
-      "Test Group 1"
+    $this->assertSame("Test Group 1",
+      $group['values'][$this->_groupID]['name']
     );
   }
 
@@ -145,10 +145,10 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     foreach ($group['values'] as $v) {
       $this->assertEquals($v['id'], $this->_groupID);
-      $this->assertEquals($v['name'], "Test Group 1");
-      $this->assertEquals($v['description'], 'New Test Group Created');
-      $this->assertEquals($v['is_active'], 1);
-      $this->assertEquals($v['visibility'], 'Public Pages');
+      $this->assertSame("Test Group 1", $v['name']);
+      $this->assertSame('New Test Group Created', $v['description']);
+      $this->assertSame($this->apiValue(TRUE), $v['is_active']);
+      $this->assertSame('Public Pages', $v['visibility']);
     }
   }
 
@@ -170,9 +170,9 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('Group', 'create', $params);
     $group = $result['values'][$result['id']];
-    $this->assertEquals($group['name'], "Test Group type");
-    $this->assertEquals($group['is_active'], 1);
-    $this->assertEquals($group['parents'], "");
+    $this->assertSame("Test Group type", $group['name']);
+    $this->assertSame('1', $group['is_active']);
+    $this->assertSame("", $group['parents']);
     $this->assertEquals($group['group_type'], $params['group_type']);
 
     //Pass group_type param in checkbox format.
@@ -183,7 +183,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     ]);
     $result = $this->callAPISuccess('Group', 'create', $params);
     $group = $result['values'][$result['id']];
-    $this->assertEquals($group['name'], "Test Checkbox Format");
+    $this->assertSame("Test Checkbox Format", $group['name']);
     $this->assertEquals($group['group_type'], array_keys($params['group_type']));
 
     //assert single value for group_type and parent
@@ -212,7 +212,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     $groupNesting = $this->callAPISuccess('GroupNesting', 'get', ['child_group_id' => $group3['id']]);
     // 2 Group nesting entries - one for direct parent & one for grandparent.
-    $this->assertEquals(2, $groupNesting['count']);
+    $this->assertSame(2, $groupNesting['count']);
     $this->groupDelete($group2['id']);
     $this->groupDelete($group3['id']);
   }
@@ -252,7 +252,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->callAPISuccess('Group', 'create', ['group_type' => ['Mailing List'], 'name' => 'mailing_list', 'title' => 'mailing list']);
     $this->callAPISuccess('Group', 'create', ['group_type' => ['Access Control', 'Mailing List'], 'name' => 'group', 'title' => 'group']);
     $group = $this->callAPISuccessGetSingle('Group', ['return' => 'id,title,group_type', 'group_type' => 'Mailing List']);
-    $this->assertEquals('mailing list', $group['title']);
+    $this->assertSame('mailing list', $group['title']);
   }
 
   /**
@@ -265,7 +265,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $params = [];
     $params['title'] = 'No such group Exist';
     $group = $this->callAPISuccess('group', 'get', $params);
-    $this->assertEquals(0, $group['count']);
+    $this->assertSame(0, $group['count']);
   }
 
   /**
@@ -287,7 +287,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = ['action' => 'create'];
     $result = $this->callAPISuccess('group', 'getfields', $params);
-    $this->assertEquals('is_active', $result['values']['is_active']['name']);
+    $this->assertSame('is_active', $result['values']['is_active']['name']);
   }
 
   public function testIllegalParentsParams(): void {
@@ -305,7 +305,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'title' => 'Test illegal Group',
       'parents' => ['IS NOT NULL' => 1],
     ]);
-    $this->assertEquals(0, $group1['count']);
+    $this->assertSame(0, $group1['count']);
     $params['title'] = 'Test illegal Group 2';
     $params['parents'] = [];
     $params['parents'][$this->_groupID] = 'test Group';
@@ -430,7 +430,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'title' => 'Legit Admin Update',
       'check_permissions' => 1,
     ]);
-    $this->assertEquals('Legit Admin Update', $updated['values'][$reservedGroup]['title']);
+    $this->assertSame('Legit Admin Update', $updated['values'][$reservedGroup]['title']);
 
     // User CAN un-reserve a group
     $unreserved = $this->callAPISuccess('Group', 'create', [
@@ -438,7 +438,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'is_reserved' => 0,
       'check_permissions' => 1,
     ]);
-    $this->assertEquals(0, $unreserved['values'][$reservedGroup]['is_reserved']);
+    $this->assertSame('0', $unreserved['values'][$reservedGroup]['is_reserved']);
 
     // User CAN create a reserved group
     $newReserved = $this->callAPISuccess('Group', 'create', [
@@ -446,7 +446,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'is_reserved' => 1,
       'check_permissions' => 1,
     ]);
-    $this->assertEquals(1, $newReserved['values'][$newReserved['id']]['is_reserved']);
+    $this->assertSame('1', $newReserved['values'][$newReserved['id']]['is_reserved']);
 
     // User CAN delete reserved group
     $this->callAPISuccess('Group', 'delete', [
@@ -477,7 +477,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       'title' => 'Modified Without Permission Check',
       'check_permissions' => 0,
     ]);
-    $this->assertEquals('Modified Without Permission Check', $updated['values'][$reservedGroup]['title']);
+    $this->assertSame('Modified Without Permission Check', $updated['values'][$reservedGroup]['title']);
 
     // Deleting a reserved group without check_permissions is allowed
     $this->callAPISuccess('Group', 'delete', [

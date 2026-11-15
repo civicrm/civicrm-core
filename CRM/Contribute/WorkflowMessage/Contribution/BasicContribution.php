@@ -32,7 +32,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
       $page = $this->getSampleContributionPage();
       if ($page) {
         yield [
-          'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $page['name'],
+          'name' => 'workflow/' . $workflow . '/price_set_' . $page['name'],
           'title' => ts('Completed Contribution: %1', [1 => $page['frontend_title']]),
           'tags' => ['preview'],
           'workflow' => $workflow,
@@ -40,7 +40,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
           'contribution_page' => $page,
         ];
         yield [
-          'name' => 'workflow/' . $workflow . '/' . 'refunded_price_set_' . $page['name'],
+          'name' => 'workflow/' . $workflow . '/refunded_price_set_' . $page['name'],
           'title' => ts('Refunded Contribution: %1', [1 => $page['frontend_title']]),
           'tags' => ['preview'],
           'workflow' => $workflow,
@@ -53,14 +53,14 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
         $priceSet = $this->getNonQuickConfigPriceSet();
         if ($priceSet) {
           yield [
-            'name' => 'workflow/' . $workflow . '/' . 'price_set_' . $priceSet['name'],
+            'name' => 'workflow/' . $workflow . '/price_set_' . $priceSet['name'],
             'title' => ts('Completed Contribution: %1', [1 => $priceSet['title']]),
             'tags' => ['preview'],
             'workflow' => $workflow,
             'is_show_line_items' => TRUE,
           ];
           yield [
-            'name' => 'workflow/' . $workflow . '/' . 'refunded_price_set_' . $priceSet['name'],
+            'name' => 'workflow/' . $workflow . '/refunded_price_set_' . $priceSet['name'],
             'title' => ts('Refunded Contribution: %1', [1 => $priceSet['title']]),
             'tags' => ['preview'],
             'workflow' => $workflow,
@@ -80,7 +80,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
         ];
       }
       yield [
-        'name' => 'workflow/' . $workflow . '/' . 'partially paid' . $currency,
+        'name' => 'workflow/' . $workflow . '/partially paid' . $currency,
         'title' => ts('Partially Paid Contribution: %1', [1 => $currency]),
         'tags' => ['preview'],
         'workflow' => $workflow,
@@ -88,7 +88,7 @@ class CRM_Contribute_WorkflowMessage_Contribution_BasicContribution extends Work
         'contribution_params' => ['contribution_status_id' => \CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid')],
       ];
       yield [
-        'name' => 'workflow/' . $workflow . '/' . 'pending' . $currency,
+        'name' => 'workflow/' . $workflow . '/pending' . $currency,
         'title' => ts('Pending Contribution: %1', [1 => $currency]),
         'tags' => ['preview'],
         'workflow' => $workflow,

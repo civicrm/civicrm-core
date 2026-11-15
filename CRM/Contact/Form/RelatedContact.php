@@ -69,7 +69,7 @@ class CRM_Contact_Form_RelatedContact extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts('You do not have the necessary permission to edit this contact.'));
       }
 
-      list($displayName, $contactImage) = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_contactId);
+      [$displayName, $contactImage] = CRM_Contact_BAO_Contact::getDisplayAndImage($this->_contactId);
       $this->setTitle($displayName, $contactImage . ' ' . $displayName);
     }
     else {

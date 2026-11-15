@@ -594,9 +594,8 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
       $sql .= 'HAVING (' . implode(")\n  AND (", $this->havings) . ")\n";
     }
     if ($this->orderBys) {
-      $orderBys = CRM_Utils_Array::crmArraySortByField($this->orderBys,
-        ['weight', 'guid']);
-      $orderBys = CRM_Utils_Array::collect('value', $orderBys);
+      $orderBys = CRM_Utils_Array::crmArraySortByField($this->orderBys, ['weight', 'guid']);
+      $orderBys = array_column($orderBys, 'value');
       $sql .= "ORDER BY\n  " . implode(",\n  ", $orderBys) . "\n";
     }
     if ($this->limit !== NULL) {

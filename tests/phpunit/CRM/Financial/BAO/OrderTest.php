@@ -56,16 +56,16 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $contribution = Contribution::get(FALSE)
       ->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])
       ->execute()->single();
-    $this->assertEquals(50, $contribution['total_amount']);
+    $this->assertSame(50.0, $contribution['total_amount']);
     $lineItem = LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single();
-    $this->assertEquals('civicrm_participant', $lineItem['entity_table']);
+    $this->assertSame('civicrm_participant', $lineItem['entity_table']);
     $participant = Participant::get()
       ->addWhere('id', '=', $lineItem['entity_id'])
       ->execute()->single();
     $this->assertEquals($this->ids['Contact']['individual_0'], $participant['contact_id']);
-    $this->assertEquals(50, $participant['fee_amount']);
+    $this->assertSame(50.0, $participant['fee_amount']);
     $this->assertEquals(['Student early bird'], $participant['fee_level']);
   }
 
@@ -90,12 +90,12 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
         'price_field_value_id' => $this->ids['PriceFieldValue']['PaidEvent_free'],
       ])
       ->execute()->single();
-    $this->assertEquals(0, $contribution['total_amount']);
+    $this->assertSame(0.0, $contribution['total_amount']);
     $contribution = Contribution::get(FALSE)
       ->addSelect('contribution_status_id:name')
       ->addWhere('id', '=', $contribution['id'])
       ->execute()->single();
-    $this->assertEquals('Completed', $contribution['contribution_status_id:name']);
+    $this->assertSame('Completed', $contribution['contribution_status_id:name']);
   }
 
   /**
@@ -132,20 +132,20 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $contribution = Contribution::get(FALSE)
       ->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])
       ->execute()->single();
-    $this->assertEquals(150, $contribution['total_amount']);
+    $this->assertSame(150.0, $contribution['total_amount']);
     $lineItems = LineItem::get(FALSE)
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->addOrderBy('id')
       ->execute();
     $this->assertCount(2, $lineItems);
     $this->assertEquals($lineItems[0]['entity_id'], $lineItems[1]['entity_id']);
-    $this->assertEquals('civicrm_participant', $lineItems[1]['entity_table']);
+    $this->assertSame('civicrm_participant', $lineItems[1]['entity_table']);
 
     $participant = Participant::get()
       ->addWhere('id', '=', $lineItems[0]['entity_id'])
       ->execute()->single();
     $this->assertEquals($this->ids['Contact']['individual_0'], $participant['contact_id']);
-    $this->assertEquals(150, $participant['fee_amount']);
+    $this->assertSame(150.0, $participant['fee_amount']);
     $this->assertEquals(['Student early bird', 'Student Rate'], $participant['fee_level']);
   }
 
@@ -178,7 +178,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->addWhere('entity_table', '=', 'civicrm_participant')
       ->addWhere('entity_id', '=', $participant['id'])
       ->execute()->single();
-    $this->assertEquals(50, $lineItem['line_total']);
+    $this->assertSame(50.0, $lineItem['line_total']);
     // No new Participant should have been created.
     $this->assertCount(1, Participant::get(FALSE)->execute());
   }
@@ -242,20 +242,64 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $lineItem = LineItem::get()
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single();
-    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+    $this->assertSame('civicrm_membership', $lineItem['entity_table']);
 
     // The line item links the membership to the contribution.
-    $this->assertEquals(1, $lineItem['membership_num_terms']);
-    $this->assertEquals(100, $lineItem['unit_price']);
-    $this->assertEquals(100, $lineItem['line_total']);
-    $this->assertEquals(1, $lineItem['qty']);
+    $this->assertSame(1, $lineItem['membership_num_terms']);
+    $this->assertSame(100.0, $lineItem['unit_price']);
+    $this->assertSame(100.0, $lineItem['line_total']);
+    $this->assertSame(1.0, $lineItem['qty']);
 
     $membership = Membership::get()
       ->addWhere('id', '=', $lineItem['entity_id'])
       ->execute()->single();
-    $this->assertEquals('2006-12-21', $membership['end_date']);
+    $this->assertSame('2006-12-21', $membership['end_date']);
     // A membership payment should have been created for legacy compatibility.
     $this->callAPISuccessGetSingle('MembershipPayment', ['version' => 3, 'membership_id' => $lineItem['entity_id'], 'contribution_id' => $contribution['id']]);
+  }
+
+  /**
+   * A free membership order is completed on creation, so the membership is
+   * activated, and a later payment of 0 leaves the contribution Completed.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateFreeOrderForMembershipCompletesOrder(): void {
+    $this->setUpMembershipPriceSet(0);
+    $contribution = Order::create(FALSE)
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'financial_type_id:name' => 'Member Dues',
+      ])
+      ->addLineItem([
+        'price_field_value_id' => $this->ids['PriceFieldValue']['membership_first'],
+        'entity_id.source' => 'Test',
+      ])
+      ->execute()->single();
+    $this->assertSame(0.0, $contribution['total_amount']);
+
+    $membershipID = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contribution['id'])
+      ->execute()->single()['entity_id'];
+    $getContributionStatus = fn() => Contribution::get(FALSE)
+      ->addSelect('contribution_status_id:name')
+      ->addWhere('id', '=', $contribution['id'])
+      ->execute()->single()['contribution_status_id:name'];
+    $getMembershipStatus = fn() => Membership::get(FALSE)
+      ->addSelect('status_id:name')
+      ->addWhere('id', '=', $membershipID)
+      ->execute()->single()['status_id:name'];
+
+    $this->assertSame('Completed', $getContributionStatus());
+    $this->assertSame('New', $getMembershipStatus());
+
+    Payment::create(FALSE)
+      ->addValue('contribution_id', $contribution['id'])
+      ->addValue('total_amount', 0)
+      ->execute();
+
+    $this->assertSame('Completed', $getContributionStatus());
+    $this->assertSame('New', $getMembershipStatus());
   }
 
   /**
@@ -286,22 +330,22 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $lineItem = LineItem::get()
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single();
-    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+    $this->assertSame('civicrm_membership', $lineItem['entity_table']);
 
     // The line item links the membership to the contribution.
-    $this->assertEquals(1, $lineItem['membership_num_terms']);
-    $this->assertEquals(100, $lineItem['unit_price']);
-    $this->assertEquals(100, $lineItem['line_total']);
-    $this->assertEquals(1, $lineItem['qty']);
+    $this->assertSame(1, $lineItem['membership_num_terms']);
+    $this->assertSame(100.0, $lineItem['unit_price']);
+    $this->assertSame(100.0, $lineItem['line_total']);
+    $this->assertSame(1.0, $lineItem['qty']);
 
     $membership = Membership::get()
       ->addSelect('join_date', 'start_date', 'end_date', 'status_id:name')
       ->addWhere('id', '=', $lineItem['entity_id'])
       ->execute()->single();
-    $this->assertEquals('2010-01-20', $membership['join_date']);
-    $this->assertEquals('2010-01-20', $membership['start_date']);
-    $this->assertEquals('2011-01-19', $membership['end_date']);
-    $this->assertEquals('Pending', $membership['status_id:name']);
+    $this->assertSame('2010-01-20', $membership['join_date']);
+    $this->assertSame('2010-01-20', $membership['start_date']);
+    $this->assertSame('2011-01-19', $membership['end_date']);
+    $this->assertSame('Pending', $membership['status_id:name']);
   }
 
   /**
@@ -339,18 +383,18 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $lineItem = LineItem::get()
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single();
-    $this->assertEquals('civicrm_membership', $lineItem['entity_table']);
+    $this->assertSame('civicrm_membership', $lineItem['entity_table']);
 
     // The line item links the membership to the contribution.
-    $this->assertEquals(1, $lineItem['membership_num_terms']);
-    $this->assertEquals(100, $lineItem['unit_price']);
-    $this->assertEquals(100, $lineItem['line_total']);
-    $this->assertEquals(1, $lineItem['qty']);
+    $this->assertSame(1, $lineItem['membership_num_terms']);
+    $this->assertSame(100.0, $lineItem['unit_price']);
+    $this->assertSame(100.0, $lineItem['line_total']);
+    $this->assertSame(1.0, $lineItem['qty']);
 
     $membership = Membership::get()
       ->addWhere('id', '=', $lineItem['entity_id'])
       ->execute()->single();
-    $this->assertEquals('2006-12-21', $membership['end_date']);
+    $this->assertSame('2006-12-21', $membership['end_date']);
     $this->assertEquals($contributionRecurID, $membership['contribution_recur_id']);
 
     $contributionRecur = \Civi\Api4\ContributionRecur::get()
@@ -359,10 +403,10 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['contact_id'], $contributionRecur['contact_id']);
     $this->assertEquals($contribution['total_amount'], $contributionRecur['amount']);
     $this->assertEquals($contribution['currency'], $contributionRecur['currency']);
-    $this->assertEquals('year', $contributionRecur['frequency_unit']);
-    $this->assertEquals(1, $contributionRecur['frequency_interval']);
+    $this->assertSame('year', $contributionRecur['frequency_unit']);
+    $this->assertSame(1, $contributionRecur['frequency_interval']);
     $this->assertEquals($contribution['financial_type_id'], $contributionRecur['financial_type_id']);
-    $this->assertEquals(0, $contributionRecur['is_email_receipt']);
+    $this->assertFalse($contributionRecur['is_email_receipt']);
   }
 
   /**
@@ -466,7 +510,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       ->addWhere('line_item.contribution_id', '=', $contribution['id'])
       ->addSelect('status_id:name', 'is_override', 'status_override_end_date')
       ->execute()->single();
-    $this->assertEquals('New', $membership['status_id:name']);
+    $this->assertSame('New', $membership['status_id:name']);
     $this->assertFalse($membership['is_override']);
     $this->assertNull($membership['status_override_end_date']);
   }
@@ -556,7 +600,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
     $contribution = Contribution::get(FALSE)
       ->addWhere('contact_id', '=', $this->ids['Contact']['individual_0'])
       ->execute()->single();
-    $this->assertEquals(700, $contribution['total_amount']);
+    $this->assertSame(700.0, $contribution['total_amount']);
     $lineItem = (array) LineItem::get()
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->addSelect('*', 'price_field_value_id.*', 'price_field_id.*')
@@ -609,8 +653,8 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
         'financial_type_id:name' => 'Member Dues',
       ])
       ->addLineItem(['line_total_inclusive' => 500])->execute()->single();
-    $this->assertEquals(500, $order['total_amount']);
-    $this->assertEquals(0, $order['tax_amount']);
+    $this->assertSame(500.0, $order['total_amount']);
+    $this->assertSame(0.0, $order['tax_amount']);
     $this->addTaxAccountToFinancialType($order['financial_type_id']);
     $contribution = Contribution::create()
       ->setValues([
@@ -626,8 +670,8 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
         'financial_type_id:name' => 'Member Dues',
       ])
       ->addLineItem(['line_total_inclusive' => 500])->execute()->single();
-    $this->assertEquals(500, $order['total_amount']);
-    $this->assertEquals(45.45, round($order['tax_amount'], 2));
+    $this->assertSame(500.0, $order['total_amount']);
+    $this->assertSame(45.45, round($order['tax_amount'], 2));
     // There is some long-standing messiness with rounding, that is believed to require
     // a schema change. However, it seems reasonable to expect that this
     // should calculate the same as just passing in total_amount to the contribution
@@ -637,9 +681,107 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Updating a contribution must not alter the tax amounts of its line items.
+   *
+   * 15.00 including 19% tax is 12.61 + 2.39. Recalculating the tax from the
+   * rounded line total would give 19% of 12.61 = 2.3959, which is stored as
+   * 2.40, so the line items would add up to 15.01 instead of 15.00.
+   */
+  public function testUpdateContributionKeepsLineItemTaxAmount(): void {
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID('Donation'), ['tax_rate' => 19]);
+    $order = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Donation',
+      ])
+      ->addLineItem(['line_total_inclusive' => 15])->execute()->single();
+    $this->assertSame(15.0, $order['total_amount']);
+    $this->assertSame(2.39, $order['tax_amount']);
+    $this->assertLineItemAmounts($order['id'], 12.61, 2.39);
+
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $order['id'])
+      ->addValue('source', 'updated')
+      ->execute();
+    $this->assertLineItemAmounts($order['id'], 12.61, 2.39);
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $order['id'],
+      'source' => 'updated again',
+    ]);
+    $this->assertLineItemAmounts($order['id'], 12.61, 2.39);
+  }
+
+  /**
+   * Changing the total amount of a contribution must recalculate the tax.
+   *
+   * The stored tax amount of the line item must only be kept as long as the
+   * amount stays the same.
+   *
+   * 20.00 including 19% tax is 16.81 + 3.19, 30.00 is 25.21 + 4.79.
+   */
+  public function testUpdateContributionTotalAmountRecalculatesLineItemTaxAmount(): void {
+    $this->addTaxAccountToFinancialType($this->getFinancialTypeID('Donation'), ['tax_rate' => 19]);
+    $order = Order::create()
+      ->setContributionValues([
+        'contact_id' => $this->individualCreate(),
+        'receive_date' => '2010-01-20',
+        'financial_type_id:name' => 'Donation',
+      ])
+      ->addLineItem(['line_total_inclusive' => 15])->execute()->single();
+    $this->assertLineItemAmounts($order['id'], 12.61, 2.39);
+
+    Contribution::update(FALSE)
+      ->addWhere('id', '=', $order['id'])
+      ->addValue('total_amount', 20)
+      ->execute();
+    $this->assertLineItemAmounts($order['id'], 16.81, 3.19);
+    $this->assertContributionAmounts($order['id'], 20, 3.19);
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'id' => $order['id'],
+      'total_amount' => 30,
+    ]);
+    $this->assertLineItemAmounts($order['id'], 25.21, 4.79);
+    $this->assertContributionAmounts($order['id'], 30, 4.79);
+  }
+
+  /**
+   * Assert the stored total and tax amount of a contribution.
+   *
+   * @param int $contributionID
+   * @param float $totalAmount
+   * @param float $taxAmount
+   */
+  private function assertContributionAmounts(int $contributionID, float $totalAmount, float $taxAmount): void {
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('id', '=', $contributionID)
+      ->addSelect('total_amount', 'tax_amount')
+      ->execute()->single();
+    $this->assertEquals($totalAmount, $contribution['total_amount']);
+    $this->assertEquals($taxAmount, $contribution['tax_amount']);
+  }
+
+  /**
+   * Assert the stored amounts of the single line item of a contribution.
+   *
+   * @param int $contributionID
+   * @param float $lineTotal
+   * @param float $taxAmount
+   */
+  private function assertLineItemAmounts(int $contributionID, float $lineTotal, float $taxAmount): void {
+    $lineItem = LineItem::get(FALSE)
+      ->addWhere('contribution_id', '=', $contributionID)
+      ->execute()->single();
+    $this->assertEquals($lineTotal, $lineItem['line_total']);
+    $this->assertEquals($taxAmount, $lineItem['tax_amount']);
+  }
+
+  /**
    *
    */
-  public function setUpMembershipPriceSet(): void {
+  public function setUpMembershipPriceSet(float $amount = 100): void {
     $this->membershipTypeCreate(['title' => 'First'], 'first');
     $this->membershipTypeCreate(['title' => 'Second'], 'second');
     $this->createTestEntity('PriceSet', [
@@ -659,7 +801,7 @@ class CRM_Financial_BAO_OrderTest extends CiviUnitTestCase {
       'price_field_id.name' => 'membership_first',
       'name' => 'membership_first',
       'label' => 'Membership Type',
-      'amount' => 100,
+      'amount' => $amount,
       'financial_type_id:name' => 'Member Dues',
       'membership_type_id.name' => 'First',
     ], 'membership_first');

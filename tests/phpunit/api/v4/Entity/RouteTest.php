@@ -29,7 +29,7 @@ class RouteTest extends Api4TestBase {
 
   public function testGet(): void {
     $result = Route::get()->addWhere('path', '=', 'civicrm/admin')->execute();
-    $this->assertEquals(1, $result->count());
+    $this->assertSame(1, $result->count());
 
     $result = Route::get()->addWhere('path', 'LIKE', 'civicrm/admin/%')->execute();
     $this->assertGreaterThan(10, $result->count());

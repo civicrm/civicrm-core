@@ -186,7 +186,7 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', '=', $c1)
       ->execute();
     $this->assertCount(1, $contact);
-    $this->assertEquals(12, $contact[0]['contribution.total_amount']);
+    $this->assertSame(12.0, $contact[0]['contribution.total_amount']);
 
     // Find contributions not from last year
     $contact = \Civi\Api4\Contact::get()
@@ -217,7 +217,7 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', '=', $c1)
       ->execute();
     $this->assertCount(1, $contact);
-    $this->assertEquals(6, $contact[0]['contribution.total_amount']);
+    $this->assertSame(6.0, $contact[0]['contribution.total_amount']);
 
     // Find contributions From start of current calendar year
     $contact = \Civi\Api4\Contact::get()
@@ -228,7 +228,7 @@ class DateTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('id', '=', $c1)
       ->execute();
     $this->assertCount(1, $contact);
-    $this->assertEquals(6, $contact[0]['contribution.total_amount']);
+    $this->assertSame(6.0, $contact[0]['contribution.total_amount']);
 
     // Find contributions not From start of current calendar year
     $contact = \Civi\Api4\Contact::get()

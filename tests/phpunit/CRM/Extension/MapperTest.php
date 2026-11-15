@@ -38,15 +38,15 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    list ($this->basedir, $this->container) = $this->_createContainer();
+    [$this->basedir, $this->container] = $this->_createContainer();
     $this->mapper = new CRM_Extension_Mapper($this->container);
 
-    list ($this->basedir2, $this->containerWithSlash) = $this->_createContainer(NULL, NULL, '/');
+    [$this->basedir2, $this->containerWithSlash] = $this->_createContainer(NULL, NULL, '/');
     $this->mapperWithSlash = new CRM_Extension_Mapper($this->containerWithSlash);
   }
 
   public function testClassToKey(): void {
-    $this->assertEquals("test.foo.bar", $this->mapper->classToKey('test_foo_bar'));
+    $this->assertSame("test.foo.bar", $this->mapper->classToKey('test_foo_bar'));
   }
 
   public function testIsExtensionKey(): void {
@@ -56,20 +56,20 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
   }
 
   public function testKeyToClass(): void {
-    $this->assertEquals("test_foo_bar", $this->mapper->keyToClass('test.foo.bar'));
+    $this->assertSame("test_foo_bar", $this->mapper->keyToClass('test.foo.bar'));
   }
 
   public function testKeyToBasePath(): void {
-    $this->assertEquals("{$this->basedir}/weird/foobar", $this->mapper->keyToBasePath('test.foo.bar'));
-    $this->assertEquals("{$this->basedir2}/weird/foobar", $this->mapperWithSlash->keyToBasePath('test.foo.bar'));
+    $this->assertSame("{$this->basedir}/weird/foobar", $this->mapper->keyToBasePath('test.foo.bar'));
+    $this->assertSame("{$this->basedir2}/weird/foobar", $this->mapperWithSlash->keyToBasePath('test.foo.bar'));
 
     global $civicrm_root;
     $this->assertEquals(rtrim($civicrm_root, '/'), $this->mapper->keyToBasePath('civicrm'));
   }
 
   public function testKeyToUrl(): void {
-    $this->assertEquals("http://example/basedir/weird/foobar", $this->mapper->keyToUrl('test.foo.bar'));
-    $this->assertEquals("http://example/basedir/weird/foobar", $this->mapperWithSlash->keyToUrl('test.foo.bar'));
+    $this->assertSame("http://example/basedir/weird/foobar", $this->mapper->keyToUrl('test.foo.bar'));
+    $this->assertSame("http://example/basedir/weird/foobar", $this->mapperWithSlash->keyToUrl('test.foo.bar'));
 
     $config = CRM_Core_Config::singleton();
     $this->assertEquals(rtrim($config->resourceBase, '/'), $this->mapper->keyToUrl('civicrm'));

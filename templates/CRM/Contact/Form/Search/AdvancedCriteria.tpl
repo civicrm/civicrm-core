@@ -12,7 +12,6 @@
 <script type="text/javascript">
 CRM.$(function($) {
   // Bind first click of accordion header to load crm-accordion-body with snippet
-  // everything else is taken care of by crmAccordions()
   $('.crm-ajax-accordion').on('click', 'summary:not(.active)', function() {
     loadPanes($(this).attr('id'));
   });

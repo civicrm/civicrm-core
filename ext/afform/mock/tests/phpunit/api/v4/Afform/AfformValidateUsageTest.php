@@ -152,7 +152,7 @@ EOHTML;
       ->addWhere('last_name', '=', $lastName)
       ->execute();
     $this->assertCount(1, $saved);
-    $this->assertEquals('Short enough', $saved->single()['LengthTest.notes']);
+    $this->assertSame('Short enough', $saved->single()['LengthTest.notes']);
   }
 
   public function testSubmitWithMinLengthValidation(): void {

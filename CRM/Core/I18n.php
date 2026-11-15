@@ -756,7 +756,7 @@ class CRM_Core_I18n {
    *
    * @return string
    */
-  public static  function getContactDefaultLanguage() {
+  public static function getContactDefaultLanguage() {
     $language = Civi::settings()->get('contact_default_language');
     if (empty($language) || $language === '*default*') {
       $language = civicrm_api3('setting', 'getvalue', [

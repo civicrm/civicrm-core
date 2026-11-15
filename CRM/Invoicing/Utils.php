@@ -49,9 +49,10 @@ class CRM_Invoicing_Utils {
    *
    * Use Civi::settings()->get('invoicing') instead.
    *
-   * @deprecated since 5.68 expected removal time to be added when we add noisy deprecation.
+   * @deprecated in 5.68 will be removed around 6.28.
    */
   public static function isInvoicingEnabled() {
+    CRM_Core_Error::deprecatedFunctionWarning("Civi::settings()->get('invoicing')");
     return Civi::settings()->get('invoicing');
   }
 
@@ -60,9 +61,10 @@ class CRM_Invoicing_Utils {
    *
    * Use Civi::settings()->get('tax_term') instead.
    *
-   * @deprecated since 5.68 expected removal time to be added when we add noisy deprecation.
+   * @deprecated in 5.68 will be removed around 6.28.
    */
   public static function getTaxTerm() {
+    CRM_Core_Error::deprecatedFunctionWarning("Civi::settings()->get('tax_term')");
     return Civi::settings()->get('tax_term');
   }
 

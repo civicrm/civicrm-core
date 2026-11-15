@@ -9,13 +9,15 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Core\Attribute\CiviEventListener;
+
 /**
  * This class contains functions for managing Tag(tag) for a contact
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
   use CRM_Core_DynamicFKAccessTrait;
 
   /**
@@ -498,10 +500,9 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag implements \Civi\Cor
   /**
    * This function deletes entity tags when a related entity is called.
    *
-   * It is registered as a listener in \Civi\Core\Container::createEventDispatcher
-   *
    * @param \Civi\Core\DAO\Event\PreDelete $event
    */
+  #[CiviEventListener(event: 'civi.dao.preDelete')]
   public static function preDeleteOtherEntity($event) {
     if (
       $event->object instanceof CRM_Core_DAO_EntityTag

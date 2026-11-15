@@ -54,10 +54,10 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
 
     $query_params = [1 => [$this->deleted_contact_id, 'Integer']];
     $is_deleted = CRM_Core_DAO::singleValueQuery("SELECT is_deleted FROM civicrm_contact WHERE id = %1", $query_params);
-    $this->assertEquals(1, $is_deleted);
+    $this->assertSame('1', $is_deleted);
 
     $session_status = CRM_Core_Session::singleton()->getStatus();
-    $this->assertEquals('Mr. Delete Me has been moved to the trash.', $session_status[0]['text']);
+    $this->assertSame('Mr. Delete Me has been moved to the trash.', $session_status[0]['text']);
 
     // put settings back
     Civi::settings()->set('contact_undelete', $old_undelete_setting);
@@ -85,10 +85,10 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
 
     $query_params = [1 => [$this->deleted_contact_id, 'Integer']];
     $is_deleted = CRM_Core_DAO::singleValueQuery("SELECT is_deleted FROM civicrm_contact WHERE id = %1", $query_params);
-    $this->assertEquals(0, $is_deleted);
+    $this->assertSame('0', $is_deleted);
 
     $session_status = CRM_Core_Session::singleton()->getStatus();
-    $this->assertEquals('Mr. Delete Me has been restored from the trash.', $session_status[0]['text']);
+    $this->assertSame('Mr. Delete Me has been restored from the trash.', $session_status[0]['text']);
 
     // put settings back
     Civi::settings()->set('contact_undelete', $old_undelete_setting);
@@ -122,7 +122,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
     $this->assertEmpty($contact_id);
 
     $session_status = CRM_Core_Session::singleton()->getStatus();
-    $this->assertEquals('Mr. Delete Me has been permanently deleted.', $session_status[0]['text']);
+    $this->assertSame('Mr. Delete Me has been permanently deleted.', $session_status[0]['text']);
 
     // put settings back
     Civi::settings()->set('contact_undelete', $old_undelete_setting);
@@ -153,7 +153,7 @@ class CRM_Contact_Form_Task_DeleteTest extends CiviUnitTestCase {
     $this->assertEmpty($contact_id);
 
     $session_status = CRM_Core_Session::singleton()->getStatus();
-    $this->assertEquals('Mr. Delete Me has been permanently deleted.', $session_status[0]['text']);
+    $this->assertSame('Mr. Delete Me has been permanently deleted.', $session_status[0]['text']);
 
     // put settings back
     Civi::settings()->set('contact_undelete', $old_undelete_setting);

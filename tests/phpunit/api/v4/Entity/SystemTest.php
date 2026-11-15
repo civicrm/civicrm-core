@@ -58,11 +58,11 @@ class SystemTest extends Api4TestBase implements TransactionalInterface {
     $check = System::check()->addWhere('name', '=', 'checkLastCronAbc')->setIncludeDisabled(TRUE)->execute()->indexBy('name');
     // Will have run our hook too because name wasn't an exact match
     $this->assertCount(2, $check);
-    $this->assertEquals('Ok', $check['hook_civicrm_check']['title']);
+    $this->assertSame('Ok', $check['hook_civicrm_check']['title']);
 
     // We know the cron check has run because it would have left a record marked 'new'
     $record = StatusPreference::get(FALSE)->addWhere('name', '=', 'checkLastCron')->execute()->first();
-    $this->assertEquals('new', $record['prefs']);
+    $this->assertSame('new', $record['prefs']);
 
     // Restore env
     Setting::set()->addValue('environment', $origEnv)->setCheckPermissions(FALSE)->execute();

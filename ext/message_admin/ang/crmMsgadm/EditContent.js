@@ -10,19 +10,19 @@
     return /<!DOCTYPE\s+html|<html[\s>]|<head[\s>]|<body[\s>]/i.test(html || '');
   }
 
-  // <civi-rich-text-input> only syncs its live CKEditor content back into the ng-model
-  // when its own Save button is clicked - reading the model (to save, diff, preview, or
-  // switch editor mode) while a session is still open would otherwise silently use stale
-  // data. Shared between EditContent.js and Edit.js, and searches the whole document (not
-  // just a local $element) since it's also called from the "Open large editor" modal,
-  // which is a separate DOM subtree.
-  angular.module('crmMsgadm').factory('crmMsgadmFlushRichText', function() {
-    return function flushOpenRichTextEditor() {
-      var openEl = document.querySelector('civi-rich-text-input[editing]');
-      if (openEl && typeof openEl.saveAndCloseEditor === 'function') {
-        openEl.saveAndCloseEditor();
+  // Copies each live rich text editor's content into its ng-model. Editors update the model
+  // on their own events, which can lag behind a click (Summernote only updates on blur,
+  // CKEditor 4 misses toolbar changes and token inserts until a delayed blur) - so this is
+  // called before anything reads the model: save, diff, preview, or switching editor mode.
+  // Searches the whole document, since the "Open large editor" dialog is a separate DOM subtree.
+  angular.module('crmMsgadm').factory('crmMsgadmFlushRichText', () => () => {
+    document.querySelectorAll('textarea.crm-msgadm-richtext.crm-wysiwyg-enabled').forEach((el) => {
+      const ngModel = angular.element(el).controller('ngModel');
+      const val = CRM.wysiwyg.getVal(el);
+      if (ngModel && val !== ngModel.$viewValue) {
+        ngModel.$setViewValue(val);
       }
-    };
+    });
   });
 
   angular.module('crmMsgadm').component('crmMsgadmEditContent', {
@@ -49,7 +49,6 @@
       // User-Driven templates default to a WYSIWYG editor, since they're typically composed
       // by non-technical users, but can switch to raw HTML via the toggle button.
       $ctrl.htmlEditorMode = 'richtext';
-      $ctrl.isMsgHtmlEditing = false;
       $ctrl.isFullHtmlDocument = false;
 
       // Re-checked whenever $ctrl.msgtpl points at a different record (e.g. switching between
@@ -100,8 +99,8 @@
       };
 
       $ctrl.openFull = function(title, fld, monacoOptions, isDiff = false) {
-        // Flush any live rich-text session first - otherwise this reads a stale model
-        // value if the user hasn't clicked the rich-text editor's own Save button yet.
+        // Flush any live rich-text editor first - otherwise this reads a stale model
+        // value if the editor hasn't updated the model yet.
         crmMsgadmFlushRichText();
         const model = {
           title: title,
@@ -126,6 +125,7 @@
         var options = CRM.utils.adjustDialogDefaults({
           // show: {effect: 'slideDown'},
           dialogClass: 'crm-msgadm-dialog',
+          beforeClose: crmMsgadmFlushRichText,
           autoOpen: false,
           height: '90%',
           width: '90%'
@@ -142,51 +142,6 @@
       };
 
     }
-  });
-
-  // Two-way binds whether the wrapped <civi-rich-text-input>'s CKEditor session is
-  // actively open (as opposed to its collapsed preview state), so callers can gate things
-  // like token insertion on there actually being a live cursor to insert at. Used by both
-  // the inline editor (EditContent.html) and the "Open large editor" modal (ExpandedEdit.html).
-  // civi-rich-text-input toggles its "editing" attribute from plain native event handlers
-  // (open on click/keydown, close via its own Cancel/Save buttons), not through Angular, so
-  // a $watch alone won't pick up the change until something else happens to trigger a digest -
-  // a MutationObserver is used instead to react to the attribute directly, and $applyAsync to
-  // sync it into Angular's scope.
-  angular.module('crmMsgadm').directive('crmMsgadmRichtextEditing', function($parse) {
-    return {
-      link: function(scope, element, attrs) {
-        const setter = $parse(attrs.crmMsgadmRichtextEditing).assign;
-        function sync() {
-          const isEditing = element[0].hasAttribute('editing');
-          if (setter) {
-            scope.$applyAsync(function() {
-              setter(scope, isEditing);
-            });
-          }
-        }
-        const observer = new MutationObserver(sync);
-        observer.observe(element[0], {attributes: true, attributeFilter: ['editing']});
-        sync();
-        scope.$on('$destroy', function() {
-          observer.disconnect();
-        });
-      }
-    };
-  });
-
-  // Inserts a token into the wrapped <civi-rich-text-input>'s live editor session on the
-  // named broadcast event, mirroring crmMonacoInsertRx's insert-at-cursor for the Monaco
-  // editor. Since only one of the two editors is ever present at a time (toggled via
-  // ng-if), both can listen for the exact same event name without conflict.
-  angular.module('crmMsgadm').directive('crmMsgadmRichtextInsertRx', function() {
-    return {
-      link: function(scope, element, attrs) {
-        scope.$on(attrs.crmMsgadmRichtextInsertRx, function(e, token) {
-          CRM.wysiwyg.insert(element[0].input, token);
-        });
-      }
-    };
   });
 
 })(angular, CRM.$);

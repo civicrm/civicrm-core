@@ -121,7 +121,7 @@
               });
               $element.unblock();
             }, (error) => {
-              disableForm(error.error_message, ts('Sorry'), 'error');
+              disableForm(error.error_message);
               $element.unblock();
             });
         }
@@ -226,7 +226,7 @@
                 setDraftStatus('saved');
               } else {
                 setDraftStatus('unsaved');
-                autoSave(newVal);
+                autoSave();
               }
             }
           },

@@ -1,8 +1,8 @@
-.crmMailing input[name=subject] {
+.crmMailing input[name="subject"] {
   width: 30em;
 }
 .crmMailing select,
-.crmMailing input[type=text] {
+.crmMailing input[type="text"] {
   width: 36em;
 }
 .crmMailing textarea {
@@ -23,8 +23,8 @@
   text-align: center;
 }
 
-.crmMailing input[name=preview_test_email],
-.crmMailing-preview select[name=preview_test_group] {
+.crmMailing input[name="preview_test_email"],
+.crmMailing-preview select[name="preview_test_group"] {
   width: 80%;
 }
 
@@ -52,7 +52,7 @@
   margin: auto;
 }
 
-input[name=preview_test_email]::placeholder {
+input[name="preview_test_email"]::placeholder {
   text-align: center;
 }
 
@@ -74,7 +74,7 @@ input[name=preview_test_email]::placeholder {
   cursor: default;
 }
 .crm-container a.crmMailing-submit-button.blocking div {
-  background: url(../i/loading-2f2f2e.gif) no-repeat left center;
+  background: url("../i/loading-2f2f2e.gif") no-repeat left center;
 }
 
 .crm-container .crm-form-block label {

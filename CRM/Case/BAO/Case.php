@@ -16,12 +16,12 @@
  */
 
 use Civi\Api4\Activity;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * This class contains the functions for Case Management.
  */
-class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInterface {
+class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
 
   /**
    * Static field for all the case information that we can potentially export.
@@ -29,13 +29,6 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInte
    * @var array
    */
   public static $_exportableFields = NULL;
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_pre' => ['_on_hook_civicrm_pre', -200],
-      'hook_civicrm_post' => ['_on_hook_civicrm_post', 200],
-    ];
-  }
 
   /**
    * Create a case object.
@@ -55,6 +48,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInte
     return self::writeRecord($params);
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_pre', priority: -200)]
   public static function _on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $e) {
     if ($e->entity !== 'Case') {
       return;
@@ -84,6 +78,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case implements EventSubscriberInte
   /**
    * @param \Civi\Core\Event\PostEvent $e
    */
+  #[CiviEventListener(event: 'hook_civicrm_post', priority: 200)]
   public static function _on_hook_civicrm_post(\Civi\Core\Event\PostEvent $e): void {
     // FIXME: The EventScanner ought to skip over disabled components when registering HookInterface
     if (!CRM_Core_Component::isEnabled('CiviCase')) {
@@ -910,7 +905,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
     // CRM-5081 - formatting the dates to omit seconds.
     // Note the 00 in the date format string is needed otherwise later on it thinks scheduled ones are overdue.
     $select = "
-           SELECT SQL_CALC_FOUND_ROWS COUNT(ca.id) AS ismultiple,
+           SELECT COUNT(ca.id) AS ismultiple,
                   ca.id AS id,
                   ca.activity_type_id AS type,
                   ca.activity_type_id AS activity_type_id,
@@ -1041,7 +1036,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
     $queryParams = [1 => [$caseID, 'Integer']];
 
     $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
-    $caseCount = CRM_Core_DAO::singleValueQuery('SELECT FOUND_ROWS()');
+    $caseCount = (int) CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM (SELECT 1 $from $where $groupBy) case_activities", $queryParams);
 
     $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, TRUE);
 
@@ -2689,11 +2684,12 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
   }
 
   /**
-   * Get all the encounter medium ids currently in use.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @return array
    */
   public static function getUsedEncounterMediums() {
+    CRM_Core_Error::deprecatedFunctionWarning();
     static $mediumIds;
 
     if (!is_array($mediumIds)) {

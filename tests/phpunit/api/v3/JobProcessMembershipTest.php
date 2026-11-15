@@ -185,7 +185,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
 
     $this->callApiV3Success('Job', 'process_membership', []);
 
-    $this->assertEquals('Grace', $this->getMembershipStatus($testId));
+    $this->assertSame('Grace', $this->getMembershipStatus($testId));
   }
 
   /**
@@ -194,7 +194,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testByDefaultInactiveAreExcluded(): void {
     $oldId = $this->createOldMembershipThatShouldBeCurrent();
     $this->callApiV3Success('Job', 'process_membership', []);
-    $this->assertEquals('Grace', $this->getMembershipStatus($oldId));
+    $this->assertSame('Grace', $this->getMembershipStatus($oldId));
   }
 
   /**
@@ -203,7 +203,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testByDefaultGraceIsConsidered(): void {
     $graceID = $this->createGraceMembershipThatShouldBeCurrent();
     $this->callApiV3Success('Job', 'process_membership', []);
-    $this->assertEquals('Current', $this->getMembershipStatus($graceID));
+    $this->assertSame('Current', $this->getMembershipStatus($graceID));
   }
 
   /**
@@ -215,7 +215,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testByDefaultPendingIsExcluded(): void {
     $pendingID = $this->createPendingMembershipThatShouldBeCurrent();
     $this->callApiV3Success('Job', 'process_membership', []);
-    $this->assertEquals('Pending', $this->getMembershipStatus($pendingID));
+    $this->assertSame('Pending', $this->getMembershipStatus($pendingID));
   }
 
   /**
@@ -224,7 +224,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
   public function testByDefaultDeceasedIsExcluded(): void {
     $deceasedID = $this->createDeceasedMembershipThatShouldBeExpired();
     $this->callApiV3Success('Job', 'process_membership', []);
-    $this->assertEquals('Deceased', $this->getMembershipStatus($deceasedID));
+    $this->assertSame('Deceased', $this->getMembershipStatus($deceasedID));
   }
 
   /**
@@ -241,7 +241,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       'exclude_test_memberships' => FALSE,
     ]);
 
-    $this->assertEquals('Pending', $this->getMembershipStatus($pendingId));
+    $this->assertSame('Pending', $this->getMembershipStatus($pendingId));
   }
 
   /**
@@ -255,7 +255,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       'exclude_test_memberships' => FALSE,
     ]);
 
-    $this->assertEquals('Current', $this->getMembershipStatus($graceId));
+    $this->assertSame('Current', $this->getMembershipStatus($graceId));
   }
 
   /**
@@ -269,7 +269,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       'exclude_test_memberships' => FALSE,
     ]);
 
-    $this->assertEquals('Grace', $this->getMembershipStatus($oldId));
+    $this->assertSame('Grace', $this->getMembershipStatus($oldId));
   }
 
   /**
@@ -283,7 +283,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       'exclude_test_memberships' => FALSE,
     ]);
 
-    $this->assertEquals('Current', $this->getMembershipStatus($testId));
+    $this->assertSame('Current', $this->getMembershipStatus($testId));
   }
 
   /**
@@ -297,7 +297,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       'exclude_test_memberships' => FALSE,
     ]);
 
-    $this->assertEquals('Deceased', $this->getMembershipStatus($deceasedId));
+    $this->assertSame('Deceased', $this->getMembershipStatus($deceasedId));
   }
 
   /**
@@ -314,7 +314,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       'only_active_membership_types' => FALSE,
     ]);
 
-    $this->assertEquals('Pending', $this->getMembershipStatus($pendingId));
+    $this->assertSame('Pending', $this->getMembershipStatus($pendingId));
   }
 
   /**
@@ -328,7 +328,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       'only_active_membership_types' => FALSE,
     ]);
 
-    $this->assertEquals('Current', $this->getMembershipStatus($graceId));
+    $this->assertSame('Current', $this->getMembershipStatus($graceId));
   }
 
   /**
@@ -342,7 +342,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       'only_active_membership_types' => FALSE,
     ]);
 
-    $this->assertEquals('Current', $this->getMembershipStatus($oldId));
+    $this->assertSame('Current', $this->getMembershipStatus($oldId));
   }
 
   /**
@@ -356,7 +356,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       'only_active_membership_types' => FALSE,
     ]);
 
-    $this->assertEquals('Grace', $this->getMembershipStatus($testId));
+    $this->assertSame('Grace', $this->getMembershipStatus($testId));
   }
 
   /**
@@ -370,7 +370,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       'only_active_membership_types' => FALSE,
     ]);
 
-    $this->assertEquals('Deceased', $this->getMembershipStatus($deceasedId));
+    $this->assertSame('Deceased', $this->getMembershipStatus($deceasedId));
   }
 
   /**
@@ -386,7 +386,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->assertEquals('Deceased', $this->getMembershipStatus($deceasedId));
+    $this->assertSame('Deceased', $this->getMembershipStatus($deceasedId));
   }
 
   /**
@@ -402,7 +402,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->assertEquals('Grace', $this->getMembershipStatus($testId));
+    $this->assertSame('Grace', $this->getMembershipStatus($testId));
   }
 
   /**
@@ -418,7 +418,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->assertEquals('Grace', $this->getMembershipStatus($oldId));
+    $this->assertSame('Grace', $this->getMembershipStatus($oldId));
   }
 
   /**
@@ -434,7 +434,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->assertEquals('Current', $this->getMembershipStatus($graceId));
+    $this->assertSame('Current', $this->getMembershipStatus($graceId));
   }
 
   /**
@@ -451,7 +451,7 @@ class api_v3_JobProcessMembershipTest extends CiviUnitTestCase {
       ],
     ]);
 
-    $this->assertEquals('Current', $this->getMembershipStatus($pendingId));
+    $this->assertSame('Current', $this->getMembershipStatus($pendingId));
   }
 
 }

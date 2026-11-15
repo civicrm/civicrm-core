@@ -53,7 +53,7 @@ class CRM_Mailing_Page_Common extends CRM_Core_Page {
 
     $confirm = CRM_Utils_Request::retrieve('confirm', 'Boolean');
 
-    list($displayName, $email) = CRM_Mailing_Event_BAO_MailingEventQueue::getContactInfo($queue_id);
+    [$displayName, $email] = CRM_Mailing_Event_BAO_MailingEventQueue::getContactInfo($queue_id);
     $this->assign('display_name', $displayName);
     $this->assign('email', $email);
     $this->assign('confirm', $confirm);

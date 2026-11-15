@@ -156,8 +156,6 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
    * @param bool $searchDescendentGroups
    * @param string $searchContext
    * @param null $contextMenu
-   *
-   * @return CRM_Contact_Selector
    */
   public function __construct(
     $customSearchClass,
@@ -793,6 +791,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
               'url' => 'civicrm/contact/view/delete',
               'qs' => 'reset=1&cid=%%id%%&restore=1',
               'title' => ts('Restore Contact'),
+              'weight' => 0,
             ],
           ];
           if (CRM_Core_Permission::check('delete contacts')) {

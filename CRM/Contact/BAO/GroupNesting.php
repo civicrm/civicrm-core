@@ -100,7 +100,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
   }
 
   /**
-   * Checks whether groupId has 1 or more parent groups.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param int $groupId
    *   The id of the group to check for parent groups.
@@ -109,6 +109,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
    *   True if 1 or more parent groups are found, false otherwise.
    */
   public static function hasParentGroups($groupId) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $dao = new CRM_Contact_DAO_GroupNesting();
     $query = "SELECT parent_group_id FROM civicrm_group_nesting WHERE child_group_id = $groupId LIMIT 1";
     $dao->query($query);
@@ -198,7 +199,7 @@ class CRM_Contact_BAO_GroupNesting extends CRM_Contact_DAO_GroupNesting {
     }
     while ($dao->fetch()) {
       // make sure we're not following any cyclical references
-      if (!array_key_exists($dao->parent_group_id, $childGroupIds) && $dao->child_group_id != $groupIds[0]) {
+      if (!array_key_exists($dao->parent_group_id, $childGroupIds) && !in_array($dao->child_group_id, $groupIds)) {
         $tmpGroupIds[] = $dao->child_group_id;
       }
     }

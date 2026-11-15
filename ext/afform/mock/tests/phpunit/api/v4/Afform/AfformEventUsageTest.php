@@ -272,7 +272,7 @@ EOHTML;
       ->execute()
       ->first();
 
-    $this->assertEquals('victim@example.com', $victimEmail['email']);
+    $this->assertSame('victim@example.com', $victimEmail['email']);
 
     // Try creating a new event passing the foreign LocBlock id with modified email
     $submissionNewEvent = [
@@ -308,7 +308,7 @@ EOHTML;
       ->execute()
       ->first();
 
-    $this->assertEquals('victim@example.com', $victimEmail['email']);
+    $this->assertSame('victim@example.com', $victimEmail['email']);
   }
 
 }

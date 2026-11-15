@@ -36,7 +36,7 @@ class EntityTest extends Api4TestBase {
     $this->assertArrayHasKey('Entity', $result, "Entity::get missing itself");
 
     // Label fields
-    $this->assertEquals('title', $result['Event']['label_field']);
+    $this->assertSame('title', $result['Event']['label_field']);
     // Search fields
     $this->assertEquals(['sort_name'], $result['Contact']['search_fields']);
     $this->assertEquals(['title'], $result['Event']['search_fields']);
@@ -49,9 +49,9 @@ class EntityTest extends Api4TestBase {
       ->indexBy('name');
 
     foreach (['Contact', 'Individual', 'Organization', 'Household'] as $contactType) {
-      $this->assertEquals('CRM_Contact_DAO_Contact', $result[$contactType]['dao']);
+      $this->assertSame('CRM_Contact_DAO_Contact', $result[$contactType]['dao']);
       $this->assertContains('DAOEntity', $result[$contactType]['type']);
-      $this->assertEquals('display_name', $result[$contactType]['label_field']);
+      $this->assertSame('display_name', $result[$contactType]['label_field']);
       $this->assertEquals(['id'], $result[$contactType]['primary_key']);
       // Contact icon fields
       $this->assertEquals(['contact_sub_type:icon', 'contact_type:icon'], $result[$contactType]['icon_field']);
@@ -62,12 +62,12 @@ class EntityTest extends Api4TestBase {
       $this->assertEquals($contactType, $result[$contactType]['where']['contact_type']);
     }
 
-    $this->assertEquals('Individual', $result['Individual']['title']);
-    $this->assertEquals('Individuals', $result['Individual']['title_plural']);
-    $this->assertEquals('Household', $result['Household']['title']);
-    $this->assertEquals('Households', $result['Household']['title_plural']);
-    $this->assertEquals('Organization', $result['Organization']['title']);
-    $this->assertEquals('Organizations', $result['Organization']['title_plural']);
+    $this->assertSame('Individual', $result['Individual']['title']);
+    $this->assertSame('Individuals', $result['Individual']['title_plural']);
+    $this->assertSame('Household', $result['Household']['title']);
+    $this->assertSame('Households', $result['Household']['title_plural']);
+    $this->assertSame('Organization', $result['Organization']['title']);
+    $this->assertSame('Organizations', $result['Organization']['title_plural']);
   }
 
   public function testEntity(): void {

@@ -1,18 +1,18 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 use Civi\Api4\Contribution;
 use Civi\Api4\Pledge;
 use Civi\Api4\PledgePayment;
-use Civi\Core\HookInterface;
 use Civi\Core\Event\GenericHookEvent;
 
 /**
@@ -20,7 +20,7 @@ use Civi\Core\Event\GenericHookEvent;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment implements HookInterface {
+class CRM_Pledge_BAO_PledgePayment extends CRM_Pledge_DAO_PledgePayment {
 
   /**
    * Get pledge payment details.
@@ -204,8 +204,6 @@ WHERE     pledge_id = %1
     if ($payment->find(TRUE)) {
       $payment->contribution_id = 'null';
       $payment->status_id = CRM_Core_PseudoConstant::getKey('CRM_Pledge_BAO_Pledge', 'status_id', 'Pending');
-      $payment->scheduled_date = NULL;
-      $payment->reminder_date = NULL;
       $payment->scheduled_amount = $payment->actual_amount;
       $payment->actual_amount = 'null';
       $payment->save();
@@ -682,8 +680,6 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
         if ($payment->find(TRUE)) {
           $payment->contribution_id = 'null';
           $payment->status_id = array_search('Pending', $allStatus);
-          $payment->scheduled_date = NULL;
-          $payment->reminder_date = NULL;
           $payment->scheduled_amount = $pledgeScheduledAmount;
           $payment->actual_amount = 'null';
           $payment->save();
@@ -796,6 +792,7 @@ WHERE civicrm_pledge_payment.contribution_id = {$paymentContributionId}
    *
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_post')]
   public static function on_hook_civicrm_post(GenericHookEvent $event): void {
     if (!CRM_Core_Component::isEnabled('CiviPledge')) {
       return;

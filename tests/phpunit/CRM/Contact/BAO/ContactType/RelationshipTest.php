@@ -121,9 +121,9 @@ DELETE FROM civicrm_contact_type
       'contact_sub_type_b' => $this->parent,
     ];
     $result = CRM_Contact_BAO_RelationshipType::writeRecord($params);
-    $this->assertEquals($result->name_a_b, 'indivToparent');
-    $this->assertEquals($result->contact_type_a, 'Individual');
-    $this->assertEquals($result->contact_type_b, 'Individual');
+    $this->assertSame('indivToparent', $result->name_a_b);
+    $this->assertSame('Individual', $result->contact_type_a);
+    $this->assertSame('Individual', $result->contact_type_b);
     $this->assertEquals($result->contact_sub_type_b, $this->parent);
     $this->relationshipTypeDelete($result->id);
   }
@@ -138,10 +138,10 @@ DELETE FROM civicrm_contact_type
       'contact_type_b' => 'Individual',
     ];
     $result = CRM_Contact_BAO_RelationshipType::writeRecord($params);
-    $this->assertEquals($result->name_a_b, 'SponsorToIndiv');
-    $this->assertEquals($result->contact_type_a, 'Organization');
+    $this->assertSame('SponsorToIndiv', $result->name_a_b);
+    $this->assertSame('Organization', $result->contact_type_a);
     $this->assertEquals($result->contact_sub_type_a, $this->sponsor);
-    $this->assertEquals($result->contact_type_b, 'Individual');
+    $this->assertSame('Individual', $result->contact_type_b);
     $this->relationshipTypeDelete($result->id);
   }
 
@@ -156,10 +156,10 @@ DELETE FROM civicrm_contact_type
       'contact_sub_type_b' => $this->sponsor,
     ];
     $result = CRM_Contact_BAO_RelationshipType::writeRecord($params);
-    $this->assertEquals($result->name_a_b, 'StudentToSponser');
-    $this->assertEquals($result->contact_type_a, 'Individual');
+    $this->assertSame('StudentToSponser', $result->name_a_b);
+    $this->assertSame('Individual', $result->contact_type_a);
     $this->assertEquals($result->contact_sub_type_a, $this->student);
-    $this->assertEquals($result->contact_type_b, 'Organization');
+    $this->assertSame('Organization', $result->contact_type_b);
     $this->assertEquals($result->contact_sub_type_b, $this->sponsor);
     $this->relationshipTypeDelete($result->id);
   }

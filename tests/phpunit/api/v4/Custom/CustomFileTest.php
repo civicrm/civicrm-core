@@ -51,7 +51,7 @@ class CustomFileTest extends Api4TestBase {
 
     $getFields = Contact::getFields(FALSE)
       ->execute()->indexBy('name');
-    $this->assertEquals('File', $getFields[$fieldName]['fk_entity']);
+    $this->assertSame('File', $getFields[$fieldName]['fk_entity']);
     $this->assertTrue($getFields[$fieldName]['input_attrs']['file_is_public']);
 
     $contact = $this->createTestRecord('Individual');
@@ -76,8 +76,8 @@ class CustomFileTest extends Api4TestBase {
     $result = $this->getTestRecord('File', $file1['id'], ['uri', 'file_name', 'url', 'content', 'is_public']);
 
     $this->assertEquals($file1['uri'], $result['uri']);
-    $this->assertEquals('test123.txt', $result['file_name']);
-    $this->assertEquals('Hello World 123', $result['content']);
+    $this->assertSame('test123.txt', $result['file_name']);
+    $this->assertSame('Hello World 123', $result['content']);
     $this->assertStringContainsString($result['uri'], $result['url']);
 
     // File has been moved to public dir
@@ -108,8 +108,8 @@ class CustomFileTest extends Api4TestBase {
       ->execute()->single();
 
     $this->assertEquals($file1['uri'], $result["$fieldName.uri"]);
-    $this->assertEquals('test123.txt', $result["$fieldName.file_name"]);
-    $this->assertEquals('Hello World 456', $result["$fieldName.content"]);
+    $this->assertSame('test123.txt', $result["$fieldName.file_name"]);
+    $this->assertSame('Hello World 456', $result["$fieldName.content"]);
     $this->assertStringContainsString($file1['uri'], $result["$fieldName.url"]);
 
     $file2 = $this->createTestRecord('File', [
@@ -195,8 +195,8 @@ class CustomFileTest extends Api4TestBase {
       ->execute()->single();
 
     $this->assertEquals($file['uri'], $result["$fieldName.uri"]);
-    $this->assertEquals('test456.txt', $result["$fieldName.file_name"]);
-    $this->assertEquals('Hello World 12345', $result["$fieldName.content"]);
+    $this->assertSame('test456.txt', $result["$fieldName.file_name"]);
+    $this->assertSame('Hello World 12345', $result["$fieldName.content"]);
     $this->assertStringContainsString("id={$file['id']}&fcs=", $result["$fieldName.url"]);
 
     File::delete(FALSE)

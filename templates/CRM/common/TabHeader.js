@@ -118,12 +118,21 @@
   };
 
   /**
+   * Check if a tab displays counts
+   * @param tab jQuery selector
+   * @returns {Boolean}
+   */
+  CRM.tabHeader.hasCount = (tab) => {
+    return !$(tab).hasClass('crm-tab-hide-count');
+  };
+
+  /**
    * Update the counter in a tab
    * @param tab jQuery selector
    * @param count {Number}
    */
   CRM.tabHeader.updateCount = function(tab, count) {
-    if (typeof count === 'boolean') {
+    if (typeof count === 'boolean' || !CRM.tabHeader.hasCount(tab)) {
       return;
     }
     let oldClass = getCountClass(tab);

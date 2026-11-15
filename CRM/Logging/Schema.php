@@ -253,18 +253,18 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     // Sort the table names so the sql output is consistent for those sites
     // loading it asynchronously (using the setting 'logging_no_trigger_permission')
     asort($tableNames);
+    // Without the TRIGGER privilege SHOW TRIGGERS lists nothing, so the queued script drops every possible name.
+    $existingTriggers = Civi::settings()->get('logging_no_trigger_permission') ? NULL : CRM_Core_DAO::executeQuery('SHOW TRIGGERS')->fetchMap('Trigger', 'Trigger');
     foreach ($tableNames as $table) {
       $validName = CRM_Core_DAO::shortenSQLName($table, 48, TRUE);
-
-      // before triggers
-      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_before_insert");
-      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_before_update");
-      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_before_delete");
-
-      // after triggers
-      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_after_insert");
-      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_after_update");
-      $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$validName}_after_delete");
+      foreach (['before', 'after'] as $when) {
+        foreach (['insert', 'update', 'delete'] as $event) {
+          $triggerName = "{$validName}_{$when}_{$event}";
+          if ($existingTriggers === NULL || isset($existingTriggers[$triggerName])) {
+            $sqlTriggers->enqueueQuery("DROP TRIGGER IF EXISTS {$triggerName}");
+          }
+        }
+      }
     }
 
     // now lets also be safe and drop all triggers that start with
@@ -649,6 +649,18 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
   }
 
   /**
+   * Get the columns of a table that MySQL sets to CURRENT_TIMESTAMP on update.
+   *
+   * @param string $table
+   *
+   * @return string[]
+   */
+  private function getAutoUpdatedColumns(string $table): array {
+    $columns = array_filter($this->columnSpecsOf($table), fn(array $spec): bool => stripos($spec['EXTRA'] ?? '', 'on update') !== FALSE);
+    return array_keys($columns);
+  }
+
+  /**
    * Get an array of columns and their details like DATA_TYPE, IS_NULLABLE, COLUMN_DEFAULT for the given table.
    *
    * @param string $table
@@ -705,7 +717,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
         }
       }
     }
-    return \Civi::$statics[__CLASS__]['columnSpecs'][$table];
+    return \Civi::$statics[__CLASS__]['columnSpecs'][$table] ?? [];
   }
 
   /**
@@ -987,6 +999,10 @@ COLS;
         continue;
       }
       $columns = $this->columnsOf($table, $force);
+      // MariaDB gives an ON UPDATE CURRENT_TIMESTAMP column a new value in the
+      // trigger's NEW row even when an UPDATE changes nothing, so comparing it
+      // would log every no-op save.
+      $autoUpdatedColumns = $this->getAutoUpdatedColumns($table);
 
       // only do the change if any data has changed
       $cond = [];
@@ -994,6 +1010,7 @@ COLS;
         $tableExceptions = array_key_exists('exceptions', $this->logTableSpec[$table]) ? $this->logTableSpec[$table]['exceptions'] : [];
         // ignore modified_date changes
         $tableExceptions[] = 'modified_date';
+        array_push($tableExceptions, ...$autoUpdatedColumns);
         // exceptions may be provided with or without backticks
         $excludeColumn = in_array($column, $tableExceptions) ||
           in_array(str_replace('`', '', $column), $tableExceptions);

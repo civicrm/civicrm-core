@@ -1,12 +1,14 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
+
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -14,7 +16,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\HookInterface {
+class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
   /**
    * Get the list of mappings for a select or select2 element.
@@ -87,10 +89,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
   }
 
   /**
-   * Get un-indexed array of the field values for the given mapping id.
-   *
-   * For example if passing a mapping ID & name the returned array would look like
-   *   ['First field name', 'second field name']
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param int $mappingID
    * @param string $fieldName
@@ -99,11 +98,12 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
    * @throws \CRM_Core_Exception
    */
   public static function getMappingFieldValues($mappingID, $fieldName) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     return array_merge(CRM_Utils_Array::collect($fieldName, civicrm_api3('MappingField', 'get', ['mapping_id' => $mappingID, 'return' => $fieldName])['values']));
   }
 
   /**
-   * Function returns associated array of elements, that will be passed for search.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param int $smartGroupId
    *   Smart group id.
@@ -112,6 +112,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
    *   associated array of elements
    */
   public static function getFormattedFields($smartGroupId) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $returnFields = [];
 
     //get the fields from mapping table
@@ -615,6 +616,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping implements \Civi\Core\Ho
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre')]
   public static function on_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if ($event->action === 'delete' && $event->entity === 'RelationshipType') {
       // CRM-3323 - Delete mappingField records when deleting relationship type

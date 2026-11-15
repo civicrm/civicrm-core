@@ -2,21 +2,16 @@
 
 namespace Civi;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @service ckeditor4.kcfinder
  */
-class Kcfinder extends AutoService implements EventSubscriberInterface {
+class Kcfinder extends AutoService {
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_buildAsset' => [['buildJs', 0], ['buildCss', 0]],
-    ];
-  }
-
+  #[CiviEventListener(event: 'hook_civicrm_buildAsset')]
   public function buildJs(GenericHookEvent $e): void {
     if ($e->asset !== 'kcfinder.js') {
       return;
@@ -34,6 +29,7 @@ class Kcfinder extends AutoService implements EventSubscriberInterface {
     $e->content = $content;
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_buildAsset')]
   public function buildCss(GenericHookEvent $e): void {
     if ($e->asset !== 'kcfinder.css') {
       return;

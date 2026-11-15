@@ -2,12 +2,12 @@
 
 namespace Civi\Afform;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Authx\CheckCredentialEvent;
 use Civi\Authx\CheckPolicyEvent;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
 use Civi\Crypto\Exception\CryptoException;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Allow Afform-based pages to accept page-level access token
@@ -20,15 +20,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  *
  * @service civi.afform.page_token
  */
-class PageTokenCredential extends AutoService implements EventSubscriberInterface {
-
-  public static function getSubscribedEvents(): array {
-    $events = [];
-    $events['civi.invoke.auth'][] = ['onInvoke', 105];
-    $events['civi.authx.checkCredential'][] = ['afformPageToken', -400];
-    $events['civi.authx.checkPolicy'][] = ['afformPagePolicy', 400];
-    return $events;
-  }
+class PageTokenCredential extends AutoService {
 
   /**
    * If you visit a top-level page like "civicrm/my-custom-form?_aff=XXX", then
@@ -37,6 +29,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
    * @param \Civi\Core\Event\GenericHookEvent $e
    * @return void
    */
+  #[CiviEventListener(event: 'civi.invoke.auth', priority: 105)]
   public function onInvoke(GenericHookEvent $e) {
     $token = $_SERVER['HTTP_X_CIVI_AUTH_AFFORM'] ?? $_REQUEST['_aff'] ?? NULL;
 
@@ -84,6 +77,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
    *
    * @return void
    */
+  #[CiviEventListener(event: 'civi.authx.checkCredential', priority: -400)]
   public function afformPageToken(CheckCredentialEvent $check) {
     if ($check->credFormat === 'Bearer') {
       try {
@@ -287,6 +281,7 @@ class PageTokenCredential extends AutoService implements EventSubscriberInterfac
    *
    * Listens to civi.authx.checkPolicy (early on - before policy enforcement)
    */
+  #[CiviEventListener(event: 'civi.authx.checkPolicy', priority: 400)]
   public function afformPagePolicy(CheckPolicyEvent $event): void {
     $jwt = $event->target->jwt; /* previously validated as per docblock */
     if ($event->target->flow === 'afformpage' && !empty($jwt['afform'])) {

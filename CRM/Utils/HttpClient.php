@@ -72,7 +72,7 @@ class CRM_Utils_HttpClient {
       throw new CRM_Core_Exception('Cannot install this extension - curl is not installed!');
     }
 
-    list($ch, $caConfig) = $this->createCurl($remoteFile);
+    [$ch, $caConfig] = $this->createCurl($remoteFile);
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
       throw new CRM_Core_Exception('Cannot install this extension - does not support SSL');
     }
@@ -99,7 +99,8 @@ class CRM_Utils_HttpClient {
    * @param string $remoteFile
    *   URL of remote file.
    * @return array
-   *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
+   *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string|null)
+   *   The data is NULL if the status is STATUS_DL_ERROR.
    */
   public function get($remoteFile) {
     // Download extension zip file ...
@@ -112,7 +113,7 @@ class CRM_Utils_HttpClient {
       return [self::STATUS_DL_ERROR, NULL];
     }
 
-    list($ch, $caConfig) = $this->createCurl($remoteFile);
+    [$ch, $caConfig] = $this->createCurl($remoteFile);
 
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
       return [self::STATUS_DL_ERROR, NULL];
@@ -121,7 +122,7 @@ class CRM_Utils_HttpClient {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
-      return [self::STATUS_DL_ERROR, $data];
+      return [self::STATUS_DL_ERROR, NULL];
     }
 
     return [self::STATUS_OK, $data];
@@ -135,7 +136,8 @@ class CRM_Utils_HttpClient {
    * @param array $params
    *
    * @return array
-   *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string)
+   *   array(0 => STATUS_OK|STATUS_DL_ERROR, 1 => string|null)
+   *   The data is NULL if the status is STATUS_DL_ERROR.
    */
   public function post($remoteFile, $params) {
     // Download extension zip file ...
@@ -143,7 +145,7 @@ class CRM_Utils_HttpClient {
       return [self::STATUS_DL_ERROR, NULL];
     }
 
-    list($ch, $caConfig) = $this->createCurl($remoteFile);
+    [$ch, $caConfig] = $this->createCurl($remoteFile);
 
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
       return [self::STATUS_DL_ERROR, NULL];
@@ -155,7 +157,7 @@ class CRM_Utils_HttpClient {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
-      return [self::STATUS_DL_ERROR, $data];
+      return [self::STATUS_DL_ERROR, NULL];
     }
 
     return [self::STATUS_OK, $data];

@@ -176,7 +176,7 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
     $hypApiRequest['action'] = 'get';
   }
   try {
-    list ($apiProvider, $hypApiRequest) = \Civi::service('civi_api_kernel')->resolve($hypApiRequest);
+    [$apiProvider, $hypApiRequest] = \Civi::service('civi_api_kernel')->resolve($hypApiRequest);
     if (isset($hypApiRequest['function'])) {
       $helper = '_' . $hypApiRequest['function'] . '_spec';
     }

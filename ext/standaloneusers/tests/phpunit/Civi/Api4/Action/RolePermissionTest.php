@@ -18,7 +18,7 @@ class RolePermissionTest extends \PHPUnit\Framework\TestCase implements Headless
   }
 
   public function testMetadata(): void {
-    $this->assertEquals('parent', CoreUtil::getInfoItem('RolePermission', 'parent_field'));
+    $this->assertSame('parent', CoreUtil::getInfoItem('RolePermission', 'parent_field'));
   }
 
   /**

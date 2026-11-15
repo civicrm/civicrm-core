@@ -57,7 +57,7 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
     $groupId = $this->controller->exportValue('RemoveFromGroup', 'group_id');
     $group = CRM_Core_PseudoConstant::group();
 
-    list($total, $removed, $notRemoved) = CRM_Contact_BAO_GroupContact::removeContactsFromGroup($this->_contactIds, $groupId);
+    [$total, $removed, $notRemoved] = CRM_Contact_BAO_GroupContact::removeContactsFromGroup($this->_contactIds, $groupId);
 
     $status = [
       ts("%count contact removed from '%2'", [

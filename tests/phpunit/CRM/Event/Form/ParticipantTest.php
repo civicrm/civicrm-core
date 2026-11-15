@@ -129,7 +129,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->addOrderBy('id', 'DESC')
       ->execute()
       ->first();
-    $this->assertEquals('Random thing', $participant[$this->getCustomFieldName('text', 4)]);
+    $this->assertSame('Random thing', $participant[$this->getCustomFieldName('text', 4)]);
   }
 
   /**
@@ -184,10 +184,10 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'note' => 'I wrote a note',
       'event_id' => $this->getEventID(),
     ], ['cid' => $this->individualCreate()])
-      ->postProcess();;
+      ->postProcess();
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['version' => 4]);
-    $this->assertEquals(2, $contribution['contribution_status_id']);
+    $this->assertSame(2, $contribution['contribution_status_id']);
     $this->callAPISuccessGetSingle('FinancialItem', []);
 
     $lineItem = LineItem::get()
@@ -195,15 +195,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->addWhere('entity_table', '=', 'civicrm_participant')
       ->addOrderBy('id')
       ->execute()->first();
-    $this->assertEquals(100, $lineItem['line_total']);
+    $this->assertSame(100.0, $lineItem['line_total']);
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', []);
     $sum = 0;
     foreach ($financialItems['values'] as $financialItem) {
       $sum += $financialItem['amount'];
     }
-    $this->assertEquals(100, $sum);
+    $this->assertSame(100.0, $sum);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
-    $this->assertEquals(100, $participant['participant_fee_amount']);
+    $this->assertSame('100.00', $participant['participant_fee_amount']);
 
     $this->getTestForm('CRM_Event_Form_ParticipantFeeSelection', [
       $this->getPriceFieldKey() => $this->ids['PriceFieldValue']['PaidEvent_family_package'],
@@ -222,15 +222,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->addOrderBy('id')
       ->execute();
     // Participants is updated to 0 but line remains.
-    $this->assertEquals(0, $lineItems[0]['line_total']);
-    $this->assertEquals(1550.55, $lineItems[1]['line_total']);
+    $this->assertSame(0.0, $lineItems[0]['line_total']);
+    $this->assertSame(1550.55, $lineItems[1]['line_total']);
     $financialItems = $this->callAPISuccess('FinancialItem', 'get', []);
 
     $sum = 0;
     foreach ($financialItems['values'] as $financialItem) {
       $sum += $financialItem['amount'];
     }
-    $this->assertEquals(1550.55, $sum);
+    $this->assertSame(1550.55, $sum);
   }
 
   /**
@@ -271,7 +271,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       ->processForm();
 
     $contribution = Contribution::get(FALSE)->addSelect('non_deductible_amount')->execute()->single();
-    $this->assertEquals(30, $contribution['non_deductible_amount']);
+    $this->assertSame(30.0, $contribution['non_deductible_amount']);
   }
 
   /**
@@ -299,13 +299,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->getTestForm('CRM_Event_Form_Participant', $params)->processForm();
 
     $participant = $this->callAPISuccessGetSingle('Participant', []);
-    $this->assertEquals(100, $participant['participant_fee_amount']);
+    $this->assertSame('100.00', $participant['participant_fee_amount']);
 
     $params[$this->getPriceFieldKey()] = $this->ids['PriceFieldValue']['PaidEvent_standard'];
     $this->getTestForm('CRM_Event_Form_Participant', $params, ['id' => $participant['id']])->processForm();
 
     $participant = $this->callAPISuccessGetSingle('Participant', ['id' => $participant['id']]);
-    $this->assertEquals(300, $participant['participant_fee_amount']);
+    $this->assertSame('300.00', $participant['participant_fee_amount']);
   }
 
   /**
@@ -338,7 +338,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->getTestForm('CRM_Event_Form_Participant', $params)->processForm();
 
     $participant = Participant::get()->addWhere('event_id', '=', $this->getEventID())->execute()->single();
-    $this->assertEquals(100, $participant['fee_amount']);
+    $this->assertSame(100.0, $participant['fee_amount']);
 
     $lineItems = LineItem::get()
       ->addWhere('entity_id', '=', $participant['id'])
@@ -434,11 +434,11 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     foreach ($financialItems as $financialItem) {
       $sum += $financialItem['amount'];
     }
-    $this->assertEquals(105, $sum);
+    $this->assertSame(105.0, $sum);
     $this->assertCount(3, $financialItems);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertEquals('Partially paid', $contribution['contribution_status']);
+    $this->assertSame('Partially paid', $contribution['contribution_status']);
 
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $contribution['id'],
@@ -450,7 +450,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     ]);
 
     $result = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_table' => 'civicrm_financial_item', 'sequential' => 1, 'return' => ['entity_table', 'amount']])['values'];
-    $this->assertEquals(40, $result[2]['amount']);
+    $this->assertSame('40.00', $result[2]['amount']);
     $this->assertCount(4, $result);
   }
 
@@ -471,15 +471,15 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'Junko Adams<br/>',
       '790L Lincoln St S<br />
 Baltimore, NY 10545<br />
-United States<br />',
+United States',
     ]);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
-    $this->assertEquals('2018-09-04 00:00:00', $participant['participant_register_date']);
-    $this->assertEquals('Offline Registration for Event: Annual CiviCRM meet by:', $participant['participant_source']);
+    $this->assertSame('2018-09-04 00:00:00', $participant['participant_register_date']);
+    $this->assertSame('Offline Registration for Event: Annual CiviCRM meet by:', $participant['participant_source']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertEquals(20, $contribution['total_amount']);
+    $this->assertSame('20.00', $contribution['total_amount']);
     $this->assertEquals(['Family Deal - 1'], $contribution['amount_level']);
-    $this->assertEquals('Debit Card', $contribution['payment_instrument']);
+    $this->assertSame('Debit Card', $contribution['payment_instrument']);
     $this->assertNotEmpty($contribution['receipt_date']);
     // Just check it's not something weird like 1970 without getting into flakey-precise.
     $this->assertGreaterThan(strtotime('yesterday'), strtotime($contribution['receipt_date']));
@@ -539,7 +539,7 @@ United States<br />',
     $this->submitForm(['is_monetary' => 1, 'financial_type_id' => $this->getFinancialTypeID('Donation')], $this->getSubmitParamsForCreditCardPayment($paymentProcessorID), TRUE, 'live');
 
     $contribution = Contribution::get(FALSE)->addSelect('contribution_status_id:name')->execute()->single();
-    $this->assertEquals('Pending', $contribution['contribution_status_id:name']);
+    $this->assertSame('Pending', $contribution['contribution_status_id:name']);
     $payments = Payment::get(FALSE)->execute();
     $this->assertCount(0, $payments);
   }
@@ -645,7 +645,7 @@ London,',
     $submittedValues['contact_id'] = $this->ids['Contact']['event'] = $this->individualCreate();
 
     if (!empty($eventParams['is_monetary'])) {
-      $phone = Phone::create()->setValues(['phone' => 1235, 'phone_type_id:name' => 'Mobile', 'phone_ext' => 456])->execute()->first();
+      $phone = Phone::create()->setValues(['phone' => '1235', 'phone_type_id:name' => 'Mobile', 'phone_ext' => '456'])->execute()->first();
       $address = Address::create()->setValues(['street_address' => '8 Baker Street', 'supplemental_address_1' => 'Upstairs', 'city' => 'London'])->execute()->first();
       $locationBlockID = LocBlock::create()->setValues(['phone_id' => $phone['id'], 'address_id' => $address['id']])->execute()->first()['id'];
       $event = $this->eventCreatePaid(array_merge([
@@ -755,8 +755,8 @@ London,',
     return [
       'register_date' => '2018-09-04',
       'status_id' => $this->getParticipantStatusID('Registered'),
-      'credit_card_number' => 4444333322221111,
-      'cvv2' => 123,
+      'credit_card_number' => '4444333322221111',
+      'cvv2' => '123',
       'credit_card_exp_date' => [
         'M' => 9,
         'Y' => date('Y', strtotime('+ 1 year')),
@@ -833,7 +833,7 @@ London,',
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $this->callAPISuccessGetValue('Contribution', ['return' => 'id']),
       'total_amount'  => 20,
-      'check_number' => 879,
+      'check_number' => '879',
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
     ]);
     $this->assertPartialPaymentResult($isQuickConfig, $message, FALSE);
@@ -854,7 +854,7 @@ London,',
     $this->callAPISuccess('Payment', 'create', [
       'contribution_id' => $this->callAPISuccessGetValue('Contribution', ['return' => 'id']),
       'total_amount'  => 20,
-      'check_number' => 879,
+      'check_number' => '879',
       'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
     ]);
     $this->assertPartialPaymentResult($isQuickConfig, $message, FALSE);

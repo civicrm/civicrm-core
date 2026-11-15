@@ -153,7 +153,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     $this->_event_title = CRM_Event_BAO_Event::getFieldValue('CRM_Event_DAO_Event', $this->_event_id, $daoName);
     $daoName = 'start_date';
     $this->_event_start_date = CRM_Event_BAO_Event::getFieldValue('CRM_Event_DAO_Event', $this->_event_id, $daoName);
-    list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contact_id);
+    [$displayName, $email] = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contact_id);
     $this->_contact_name = $displayName;
     $this->_contact_email = $email;
 

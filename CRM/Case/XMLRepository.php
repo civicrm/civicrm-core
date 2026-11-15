@@ -80,7 +80,7 @@ class CRM_Case_XMLRepository {
     $definition = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $caseType, 'definition', 'name');
 
     if (!empty($definition)) {
-      list ($xml, $error) = CRM_Utils_XML::parseString($definition);
+      [$xml, $error] = CRM_Utils_XML::parseString($definition);
       if (!$xml) {
         throw new CRM_Core_Exception("Failed to parse CaseType XML: $error");
       }

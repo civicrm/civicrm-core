@@ -35,14 +35,14 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('MailingContact', 'getfields', [
       'action' => 'get',
     ]);
-    $this->assertEquals('Delivered', $result['values']['type']['api.default']);
+    $this->assertSame('Delivered', $result['values']['type']['api.default']);
   }
 
   /**
    * Test that the API returns a mailing properly when there is only one.
    */
   public function testMailingContactDelivered(): void {
-    list($contactID, $mailingID, $eventQueueID) = $this->setupEventQueue();
+    [$contactID, $mailingID, $eventQueueID] = $this->setupEventQueue();
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_mailing_event_delivered (event_queue_id) VALUES(%1)", [1 => [$eventQueueID, 'Integer']]);
 
     $params = [
@@ -52,11 +52,11 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('MailingContact', 'get', $params);
     $count = $this->callAPISuccess('MailingContact', 'getcount', $params);
-    $this->assertEquals(1, $result['count']);
-    $this->assertEquals(1, $count);
+    $this->assertSame(1, $result['count']);
+    $this->assertSame(1, $count);
     $this->assertFalse(empty($result['values']));
     $this->assertEquals($mailingID, $result['values'][$mailingID]['mailing_id']);
-    $this->assertEquals("Some Subject", $result['values'][$mailingID]['subject']);
+    $this->assertSame("Some Subject", $result['values'][$mailingID]['subject']);
     $this->assertEquals(CRM_Core_Session::getLoggedInContactID(), $result['values'][$mailingID]['creator_id']);
   }
 
@@ -67,7 +67,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    * @throws \CRM_Core_Exception
    */
   public function testMailingContactBounced(): void {
-    list($contactID, $mailingID, $eventQueueID) = $this->setupEventQueue();
+    [$contactID, $mailingID, $eventQueueID] = $this->setupEventQueue();
     CRM_Core_DAO::executeQuery("INSERT INTO civicrm_mailing_event_bounce (event_queue_id, bounce_type_id) VALUES(%1, 6)", [1 => [$eventQueueID, 'Integer']]);
 
     $params = [
@@ -78,7 +78,7 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('MailingContact', 'get', $params)['values'];
     $this->assertCount(1, $result);
     $this->assertEquals($mailingID, $result[$mailingID]['mailing_id']);
-    $this->assertEquals('Some Subject', $result[$mailingID]['subject']);
+    $this->assertSame('Some Subject', $result[$mailingID]['subject']);
     $this->assertEquals(CRM_Core_Session::getLoggedInContactID(), $result[$mailingID]['creator_id'], 3);
   }
 

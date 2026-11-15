@@ -27,8 +27,8 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
 
-    $this->assertEquals("$basedir/foo", $c->getPath('test.foo'));
-    $this->assertEquals("$basedir/foo/bar", $c->getPath('test.foo.bar'));
+    $this->assertSame("$basedir/foo", $c->getPath('test.foo'));
+    $this->assertSame("$basedir/foo/bar", $c->getPath('test.foo.bar'));
   }
 
   public function testGetPath_extraSlashFromConfig(): void {
@@ -41,8 +41,8 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
 
-    $this->assertEquals("$basedir/foo", $c->getPath('test.foo'));
-    $this->assertEquals("$basedir/foo/bar", $c->getPath('test.foo.bar'));
+    $this->assertSame("$basedir/foo", $c->getPath('test.foo'));
+    $this->assertSame("$basedir/foo/bar", $c->getPath('test.foo.bar'));
   }
 
   public function testGetResUrl(): void {
@@ -55,8 +55,8 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
 
-    $this->assertEquals('http://example/basedir/foo', $c->getResUrl('test.foo'));
-    $this->assertEquals('http://example/basedir/foo/bar', $c->getResUrl('test.foo.bar'));
+    $this->assertSame('http://example/basedir/foo', $c->getResUrl('test.foo'));
+    $this->assertSame('http://example/basedir/foo/bar', $c->getResUrl('test.foo.bar'));
   }
 
   public function testGetResUrl_extraSlashFromConfig(): void {
@@ -69,19 +69,19 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     }
     $this->assertTrue(is_object($exc), 'Expected exception');
 
-    $this->assertEquals('http://example/basedir/foo', $c->getResUrl('test.foo'));
-    $this->assertEquals('http://example/basedir/foo/bar', $c->getResUrl('test.foo.bar'));
+    $this->assertSame('http://example/basedir/foo', $c->getResUrl('test.foo'));
+    $this->assertSame('http://example/basedir/foo/bar', $c->getResUrl('test.foo.bar'));
   }
 
   public function testCaching(): void {
     $cache = new CRM_Utils_Cache_ArrayCache([]);
     $this->assertTrue(!is_array($cache->get('basic-scan')));
     [$basedir, $c] = $this->_createContainer($cache, 'basic-scan');
-    $this->assertEquals('http://example/basedir/foo', $c->getResUrl('test.foo'));
+    $this->assertSame('http://example/basedir/foo', $c->getResUrl('test.foo'));
     $this->assertTrue(is_array($cache->get('basic-scan')));
 
     $cacheData = $cache->get('basic-scan');
-    $this->assertEquals('/foo/bar', $cacheData['test.foo.bar']);
+    $this->assertSame('/foo/bar', $cacheData['test.foo.bar']);
   }
 
   /**

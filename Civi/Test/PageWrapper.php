@@ -9,7 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\Civi\Test;
+namespace Civi\Test;
 
 class PageWrapper {
 
@@ -18,7 +18,19 @@ class PageWrapper {
    */
   private \CRM_Core_Page $page;
 
-  private array $statusMessage;
+  /**
+   * Status messages set while the page ran.
+   *
+   * @var array
+   */
+  private array $statusMessages = [];
+
+  /**
+   * Variables assigned to the template while the page ran.
+   *
+   * @var array
+   */
+  private array $templateVariables = [];
 
   /**
    * @var false|string
@@ -45,10 +57,46 @@ class PageWrapper {
     ob_start();
     $this->page->run();
     $this->output = ob_get_clean();
+    $this->templateVariables = \CRM_Core_Smarty::singleton()->getTemplateVars();
+    $this->statusMessages = \CRM_Core_Session::singleton()->getStatus(TRUE);
   }
 
   public function getOutput(): string {
     return $this->output;
+  }
+
+  /**
+   * Get all variables assigned to the template.
+   *
+   * @return array
+   */
+  public function getTemplateVariables(): array {
+    return $this->templateVariables;
+  }
+
+  /**
+   * Get a variable assigned to the template.
+   *
+   * @param string $name
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  public function getTemplateVariable(string $name): mixed {
+    if (!array_key_exists($name, $this->templateVariables)) {
+      throw new \CRM_Core_Exception("Template variable $name was not assigned");
+    }
+    return $this->templateVariables[$name];
+  }
+
+  /**
+   * Get the status messages set while the page ran.
+   *
+   * @return array
+   *   Each message has keys `text`, `title`, `type` and `options`.
+   */
+  public function getStatusMessages(): array {
+    return $this->statusMessages;
   }
 
 }

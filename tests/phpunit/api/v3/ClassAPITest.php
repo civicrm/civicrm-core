@@ -26,23 +26,23 @@ class class_api_test extends CiviUnitTestCase {
 
     // Check no params is local
     $api = new civicrm_api3();
-    $this->assertEquals(TRUE, $api->local);
+    $this->assertTrue($api->local);
 
     // Be sure to include keys otherwise these calls die()
     $keys = ['key' => 'my_site_key', 'api_key' => 'my_api_key'];
 
     // Check empty server string is local
     $api = new civicrm_api3(['server' => ''] + $keys);
-    $this->assertEquals(TRUE, $api->local);
+    $this->assertTrue($api->local);
 
     // Check non-empty server string is remote, check default uri
     $api = new civicrm_api3(['server' => 'http://my_server'] + $keys);
-    $this->assertEquals(FALSE, $api->local);
-    $this->assertEquals('http://my_server/sites/all/modules/civicrm/extern/rest.php', $api->uri);
+    $this->assertFalse($api->local);
+    $this->assertSame('http://my_server/sites/all/modules/civicrm/extern/rest.php', $api->uri);
 
     // Check path in uri
     $api = new civicrm_api3(['server' => 'http://my_server', 'path' => 'wibble'] + $keys);
-    $this->assertEquals('http://my_server/wibble', $api->uri);
+    $this->assertSame('http://my_server/wibble', $api->uri);
 
   }
 

@@ -74,7 +74,7 @@ class CRM_Price_BAO_PriceFieldTest extends CiviUnitTestCase {
     }
     $priceFieldParams['default_option'] = 3;
     $options = $this->callAPISuccess('PriceFieldValue', 'get', ['price_field_id' => $priceField['id']]);
-    $this->assertEquals(3, $options['count']);
+    $this->assertSame(3, $options['count']);
   }
 
   /**
@@ -112,7 +112,7 @@ class CRM_Price_BAO_PriceFieldTest extends CiviUnitTestCase {
       $this->fail('The error should reach the caller');
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertEquals('Ruh-roh', $e->getMessage());
+      $this->assertSame('Ruh-roh', $e->getMessage());
     }
     $this->assertDBQuery(0, 'SELECT COUNT(*) FROM civicrm_price_field WHERE price_set_id = %1', [1 => [$priceSetID, 'Integer']]);
   }

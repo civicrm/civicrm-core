@@ -54,7 +54,7 @@ class CRM_Report_Utils_Get {
       $defaults["{$fieldName}_relative"] = $relative;
     }
     if ($relative) {
-      list($from, $to) = CRM_Utils_Date::getFromTo($relative, NULL, NULL);
+      [$from, $to] = CRM_Utils_Date::getFromTo($relative, NULL, NULL);
       $from = substr($from, 0, 8);
       $to = substr($to, 0, 8);
     }

@@ -207,8 +207,27 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     while ($log_table->fetch()) {
       $this->assertStringContainsString('UPDATE civicrm_contact SET modified_date = CURRENT_TIMESTAMP WHERE id = NEW.entity_id;', $log_table->Statement, "Contact modification update should be in the trigger :\n" . $log_table->Statement);
       $this->assertStringNotContainsString('civicrm_mailing', $log_table->Statement, 'Contact field should not update mailing table');
-      $this->assertEquals(1, substr_count($log_table->Statement, 'SET modified_date'), 'Modified date should only be updated on one table (here it is contact)');
+      $this->assertSame(1, substr_count($log_table->Statement, 'SET modified_date'), 'Modified date should only be updated on one table (here it is contact)');
     }
+  }
+
+  /**
+   * Dropping one table's triggers removes exactly those and leaves other tables' triggers in place.
+   */
+  public function testDropTriggersForOneTable(): void {
+    Civi::settings()->set('logging', TRUE);
+    $this->assertNotEmpty($this->getTriggerNames('civicrm_activity'));
+    $contactTriggers = $this->getTriggerNames('civicrm_contact');
+    $this->assertNotEmpty($contactTriggers);
+
+    (new CRM_Logging_Schema())->dropTriggers('civicrm_activity');
+
+    $this->assertSame([], $this->getTriggerNames('civicrm_activity'));
+    $this->assertSame($contactTriggers, $this->getTriggerNames('civicrm_contact'));
+  }
+
+  private function getTriggerNames(string $table): array {
+    return array_keys(CRM_Core_DAO::executeQuery('SHOW TRIGGERS LIKE %1', [1 => [$table, 'String']])->fetchMap('Trigger', 'Trigger'));
   }
 
   /**
@@ -275,7 +294,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertCount(3, $info);
     foreach ($info as $trigger) {
       // table for trigger should be civicrm_group
-      $this->assertEquals('civicrm_group', $trigger['table'][0]);
+      $this->assertSame('civicrm_group', $trigger['table'][0]);
       if ($trigger['event'][0] == 'UPDATE') {
         // civicrm_group.cache_date should be an exception, i.e. not logged
         $this->assertStringNotContainsString(
@@ -284,6 +303,18 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
         );
       }
     }
+  }
+
+  /**
+   * An ON UPDATE CURRENT_TIMESTAMP column is not compared, whatever its name.
+   */
+  public function testTriggerInfoIgnoresAutoUpdatedTimestamp(): void {
+    Civi::settings()->set('logging', TRUE);
+    $info = [];
+    (new CRM_Logging_Schema())->triggerInfo($info, 'civicrm_campaign');
+    $updateSql = implode("\n", array_column(array_filter($info, fn($trigger) => $trigger['event'][0] === 'UPDATE'), 'sql'));
+    $this->assertStringContainsString("IFNULL(OLD.`title`,'') <> IFNULL(NEW.`title`,'')", $updateSql);
+    $this->assertStringNotContainsString("IFNULL(OLD.`last_modified_date`,'') <> IFNULL(NEW.`last_modified_date`,'')", $updateSql);
   }
 
   /**
@@ -306,33 +337,33 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => FALSE]);
     $ci = Civi::$statics['CRM_Logging_Schema']['columnSpecs']['civicrm_test_column_info'];
 
-    $this->assertEquals('test_id', $ci['test_id']['COLUMN_NAME']);
-    $this->assertEquals('int', $ci['test_id']['DATA_TYPE']);
-    $this->assertEquals('NO', $ci['test_id']['IS_NULLABLE']);
-    $this->assertEquals('auto_increment', $ci['test_id']['EXTRA']);
+    $this->assertSame('test_id', $ci['test_id']['COLUMN_NAME']);
+    $this->assertSame('int', $ci['test_id']['DATA_TYPE']);
+    $this->assertSame('NO', $ci['test_id']['IS_NULLABLE']);
+    $this->assertSame('auto_increment', $ci['test_id']['EXTRA']);
     if (!$this->isMySQL8()) {
-      $this->assertEquals('10', $ci['test_id']['LENGTH']);
+      $this->assertSame('10', $ci['test_id']['LENGTH']);
     }
 
-    $this->assertEquals('varchar', $ci['test_varchar']['DATA_TYPE']);
-    $this->assertEquals('42', $ci['test_varchar']['LENGTH']);
+    $this->assertSame('varchar', $ci['test_varchar']['DATA_TYPE']);
+    $this->assertSame('42', $ci['test_varchar']['LENGTH']);
 
-    $this->assertEquals('int', $ci['test_integer']['DATA_TYPE']);
+    $this->assertSame('int', $ci['test_integer']['DATA_TYPE']);
     if (!$this->isMySQL8()) {
-      $this->assertEquals('8', $ci['test_integer']['LENGTH']);
+      $this->assertSame('8', $ci['test_integer']['LENGTH']);
     }
-    $this->assertEquals('YES', $ci['test_integer']['IS_NULLABLE']);
+    $this->assertSame('YES', $ci['test_integer']['IS_NULLABLE']);
 
-    $this->assertEquals('decimal', $ci['test_decimal']['DATA_TYPE']);
-    $this->assertEquals('20,2', $ci['test_decimal']['LENGTH']);
+    $this->assertSame('decimal', $ci['test_decimal']['DATA_TYPE']);
+    $this->assertSame('20,2', $ci['test_decimal']['LENGTH']);
 
-    $this->assertEquals('enum', $ci['test_enum']['DATA_TYPE']);
-    $this->assertEquals("'A','B','C'", $ci['test_enum']['ENUM_VALUES']);
+    $this->assertSame('enum', $ci['test_enum']['DATA_TYPE']);
+    $this->assertSame("'A','B','C'", $ci['test_enum']['ENUM_VALUES']);
     $this->assertArrayNotHasKey('LENGTH', $ci['test_enum']);
 
-    $this->assertEquals('42', $ci['test_integer_default']['COLUMN_DEFAULT']);
+    $this->assertSame('42', $ci['test_integer_default']['COLUMN_DEFAULT']);
 
-    $this->assertEquals('date', $ci['test_date']['DATA_TYPE']);
+    $this->assertSame('date', $ci['test_date']['DATA_TYPE']);
   }
 
   public function testIndexes(): void {
@@ -362,9 +393,9 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $ci = Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // length should increase
     if (!$this->isMySQL8()) {
-      $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+      $this->assertSame('6', $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
     }
-    $this->assertEquals('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
+    $this->assertSame('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
     CRM_Core_DAO::executeQuery(
       "ALTER TABLE civicrm_test_length_change
       CHANGE COLUMN test_integer test_integer int(4) NULL,
@@ -374,9 +405,9 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $ci = Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // length should not decrease
     if (!$this->isMySQL8()) {
-      $this->assertEquals(6, $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
+      $this->assertSame('6', $ci['log_civicrm_test_length_change']['test_integer']['LENGTH']);
     }
-    $this->assertEquals('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
+    $this->assertSame('22,2', $ci['log_civicrm_test_length_change']['test_decimal']['LENGTH']);
   }
 
   /**
@@ -395,7 +426,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema->fixSchemaDifferences();
     $ci = Civi::$statics['CRM_Logging_Schema']['columnSpecs'];
     // new enum value should be included
-    $this->assertEquals("'A','B','C','D'", $ci['civicrm_test_enum_change']['test_enum']['ENUM_VALUES']);
+    $this->assertSame("'A','B','C','D'", $ci['civicrm_test_enum_change']['test_enum']['ENUM_VALUES']);
   }
 
   /**

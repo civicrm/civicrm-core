@@ -15,18 +15,18 @@ class CRM_Utils_Check_Component_CaseTest extends CiviUnitTestCase {
    * The cross-duplication table shows both sides of the other type.
    */
   public function testCrossDuplicationShowsOtherType(): void {
-    $first = $this->callAPISuccess('RelationshipType', 'create', [
+    $first = $this->createTestEntity('RelationshipType', [
       'name_a_b' => 'Mentor of',
       'name_b_a' => 'Mentee of',
       'label_a_b' => 'Mentor of label',
       'label_b_a' => 'Mentee of label',
-    ]);
-    $second = $this->callAPISuccess('RelationshipType', 'create', [
+    ], 'mentor');
+    $second = $this->createTestEntity('RelationshipType', [
       'name_a_b' => 'coach_of',
       'name_b_a' => 'coached_by',
       'label_a_b' => 'Mentor of',
       'label_b_a' => 'Coached by',
-    ]);
+    ], 'coach');
 
     $check = new CRM_Utils_Check_Component_Case();
     $messages = $check->checkRelationshipTypeProblems();

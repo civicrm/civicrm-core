@@ -43,25 +43,25 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
     $form->buildQuickForm();
     $isPendingOutcome = $form->getTemplateVars('isPendingOutcome');
 
-    $this->assertEquals(FALSE, $isPendingOutcome, 'Outcome should not be pending.');
+    $this->assertFalse($isPendingOutcome, 'Outcome should not be pending.');
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, TRUE, FALSE);
     $form->buildQuickForm();
     $isPendingOutcome = $form->getTemplateVars('isPendingOutcome');
 
-    $this->assertEquals(TRUE, $isPendingOutcome, 'Outcome should be pending.');
+    $this->assertTrue($isPendingOutcome, 'Outcome should be pending.');
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, FALSE, TRUE);
     $form->buildQuickForm();
     $isPendingOutcome = $form->getTemplateVars('isPendingOutcome');
 
-    $this->assertEquals(FALSE, $isPendingOutcome, 'Outcome should not be pending.');
+    $this->assertFalse($isPendingOutcome, 'Outcome should not be pending.');
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, TRUE, TRUE);
     $form->buildQuickForm();
     $isPendingOutcome = $form->getTemplateVars('isPendingOutcome');
 
-    $this->assertEquals(TRUE, $isPendingOutcome, 'Outcome should be pending.');
+    $this->assertTrue($isPendingOutcome, 'Outcome should be pending.');
   }
 
   /**

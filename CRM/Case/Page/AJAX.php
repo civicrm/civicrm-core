@@ -151,7 +151,7 @@ class CRM_Case_Page_AJAX {
       CRM_Utils_System::permissionDenied();
     }
 
-    list($relTypeId, $a, $b) = explode('_', $relType);
+    [$relTypeId, $a, $b] = explode('_', $relType);
 
     CRM_Case_BAO_Case::endCaseRole($caseId, $b, $cid, $relTypeId);
     CRM_Utils_System::civiExit();

@@ -24,13 +24,13 @@ class CRM_Core_KeyTest extends CiviUnitTestCase {
   public function testMalformed(): void {
     $key = CRM_Core_Key::get('CRM_Bread_Butter') . '<script>';
     $this->assertFalse(CRM_Core_Key::valid($key), "Key::get() should generate valid key. Received: $key");
-    $this->assertEquals(NULL, CRM_Core_Key::validate($key, 'CRM_Bread_Butter'));
+    $this->assertNull(CRM_Core_Key::validate($key, 'CRM_Bread_Butter'));
   }
 
   public function testMixedUp(): void {
     $key = CRM_Core_Key::get('CRM_Toast_Jam');
     $this->assertTrue(CRM_Core_Key::valid($key), "Key::get() should generate valid key. Received: $key");
-    $this->assertEquals(NULL, CRM_Core_Key::validate($key, 'CRM_Bread_Butter'));
+    $this->assertNull(CRM_Core_Key::validate($key, 'CRM_Bread_Butter'));
   }
 
 }

@@ -32,8 +32,8 @@ class CRM_Oembed_Page_OembedTest extends \PHPUnit\Framework\TestCase implements 
       'url' => $pageUrl,
     ]);
     $response = $this->client->sendRequest(new Request('GET', (string) $oembedUrl));
-    $this->assertEquals(501, $response->getStatusCode());
-    $this->assertEquals('Unsupported format', (string) $response->getBody());
+    $this->assertSame(501, $response->getStatusCode());
+    $this->assertSame('Unsupported format', (string) $response->getBody());
   }
 
   public function testWrongDomain() {
@@ -42,7 +42,7 @@ class CRM_Oembed_Page_OembedTest extends \PHPUnit\Framework\TestCase implements 
       'url' => $pageUrl,
     ]);
     $response = $this->client->sendRequest(new Request('GET', (string) $oembedUrl));
-    $this->assertEquals(501, $response->getStatusCode());
+    $this->assertSame(501, $response->getStatusCode());
     $this->assertStringContainsString('Unrecognized host', (string) $response->getBody());
   }
 
@@ -52,13 +52,13 @@ class CRM_Oembed_Page_OembedTest extends \PHPUnit\Framework\TestCase implements 
       'url' => $pageUrl,
     ]);
     $response = $this->client->sendRequest(new Request('GET', (string) $oembedUrl));
-    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertSame(200, $response->getStatusCode());
     $responseBody = (string) $response->getBody();
     $data = json_decode($responseBody, TRUE);
-    $this->assertEquals('rich', $data['type']);
+    $this->assertSame('rich', $data['type']);
     $this->assertMatchesRegularExpression(';iframe.*src=.*contribute;', $data['html']);
-    $this->assertEquals(600, $data['width']);
-    $this->assertEquals(400, $data['height']);
+    $this->assertSame(600, $data['width']);
+    $this->assertSame(400, $data['height']);
     $this->assertTrue(is_int($data['width']));
   }
 
@@ -68,13 +68,13 @@ class CRM_Oembed_Page_OembedTest extends \PHPUnit\Framework\TestCase implements 
       'url' => $pageUrl,
     ]);
     $response = $this->client->sendRequest(new Request('GET', (string) $oembedUrl));
-    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertSame(200, $response->getStatusCode());
     $responseBody = (string) $response->getBody();
     $data = json_decode($responseBody, TRUE);
-    $this->assertEquals('rich', $data['type']);
+    $this->assertSame('rich', $data['type']);
     $this->assertMatchesRegularExpression(';iframe.*src=.*contribute;', $data['html']);
-    $this->assertEquals(1024, $data['width']);
-    $this->assertEquals(768, $data['height']);
+    $this->assertSame(1024, $data['width']);
+    $this->assertSame(768, $data['height']);
   }
 
   public function testXml() {
@@ -83,14 +83,14 @@ class CRM_Oembed_Page_OembedTest extends \PHPUnit\Framework\TestCase implements 
       'url' => $pageUrl,
     ]);
     $response = $this->client->sendRequest(new Request('GET', (string) $oembedUrl));
-    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertSame(200, $response->getStatusCode());
     $responseBody = (string) $response->getBody();
     $xml = simplexml_load_string($responseBody);
 
-    $this->assertEquals('rich', $xml->type);
+    $this->assertSame('rich', (string) $xml->type);
     $this->assertMatchesRegularExpression(';iframe.*src=.*contribute;', $xml->html);
-    $this->assertEquals('600', $xml->width);
-    $this->assertEquals('400', $xml->height);
+    $this->assertSame('600', (string) $xml->width);
+    $this->assertSame('400', (string) $xml->height);
   }
 
 }

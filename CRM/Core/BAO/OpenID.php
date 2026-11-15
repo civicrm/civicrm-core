@@ -1,12 +1,14 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
+
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -18,13 +20,14 @@
 /**
  * This class contains function for Open Id
  */
-class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID implements Civi\Core\HookInterface {
+class CRM_Core_BAO_OpenID extends CRM_Core_DAO_OpenID {
   use CRM_Contact_AccessTrait;
 
   /**
    * Event fired before modifying an OpenID.
    * @param \Civi\Core\Event\PreEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if (in_array($event->action, ['create', 'edit'])) {
       CRM_Core_BAO_Block::handlePrimary($event->params, __CLASS__);

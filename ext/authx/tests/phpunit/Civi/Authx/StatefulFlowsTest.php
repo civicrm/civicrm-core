@@ -103,7 +103,7 @@ class StatefulFlowsTest extends AbstractFlowsTest {
     $request = $this->applyAuth($this->requestMyContact(), $credType, $flowType, $this->getDemoCID());
 
     \Civi::settings()->set("authx_{$flowType}_cred", [$credType]);
-    $this->assertEquals(0, $cookieJar->count());
+    $this->assertSame(0, $cookieJar->count());
     $response = $http->send($request);
     $this->assertTrue($cookieJar->count() >= 1);
     $this->assertMyContact($this->getDemoCID(), $this->getDemoUID(), $credType, $flowType, $response);

@@ -139,7 +139,7 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       ->addSelect('is_deleted')
       ->execute()
       ->first();
-    $this->assertEquals(1, $activityAfter['is_deleted']);
+    $this->assertTrue($activityAfter['is_deleted']);
   }
 
   /**
@@ -206,7 +206,7 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       ->addSelect('is_deleted')
       ->execute()
       ->first();
-    $this->assertEquals(1, $activityAfter['is_deleted']);
+    $this->assertTrue($activityAfter['is_deleted']);
   }
 
   /**
@@ -246,7 +246,7 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       ->addSelect('status_id:name')
       ->execute()
       ->first();
-    $this->assertEquals('Completed', $activityAfter['status_id:name']);
+    $this->assertSame('Completed', $activityAfter['status_id:name']);
 
     // 2. Mark as not voted
     $_POST = $_REQUEST = [
@@ -267,7 +267,7 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       ->addSelect('status_id:name')
       ->execute()
       ->first();
-    $this->assertEquals('Scheduled', $activityAfter2['status_id:name']);
+    $this->assertSame('Scheduled', $activityAfter2['status_id:name']);
   }
 
   /**
@@ -316,7 +316,7 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       ->addSelect('is_deleted')
       ->execute()
       ->first();
-    $this->assertEquals(0, $activityAfterRelease['is_deleted']);
+    $this->assertFalse($activityAfterRelease['is_deleted']);
 
     // 2. GOTV should fail and not alter status
     $_POST = $_REQUEST = [
@@ -335,7 +335,7 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       ->addSelect('status_id:name')
       ->execute()
       ->first();
-    $this->assertEquals('Scheduled', $activityAfterGotv['status_id:name']);
+    $this->assertSame('Scheduled', $activityAfterGotv['status_id:name']);
 
     // 3. Reserve should fail and not restore a soft-deleted non-survey activity
     \Civi\Api4\Activity::update(FALSE)
@@ -358,7 +358,7 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       ->addSelect('is_deleted')
       ->execute()
       ->first();
-    $this->assertEquals(1, $activityAfterReserve['is_deleted']);
+    $this->assertTrue($activityAfterReserve['is_deleted']);
   }
 
   /**
@@ -481,7 +481,7 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       CRM_Campaign_Page_AJAX::registerInterview();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('success', $e->errorData['status']);
+      $this->assertSame('success', $e->errorData['status']);
     }
 
     $activityAfter = \Civi\Api4\Activity::get(FALSE)
@@ -490,9 +490,9 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       ->execute()
       ->first();
 
-    $this->assertEquals('Completed', $activityAfter['status_id:name']);
-    $this->assertEquals('Completed interview', $activityAfter['result']);
-    $this->assertEquals('Positive response', $activityAfter['details']);
+    $this->assertSame('Completed', $activityAfter['status_id:name']);
+    $this->assertSame('Completed interview', $activityAfter['result']);
+    $this->assertSame('Positive response', $activityAfter['details']);
   }
 
   /**
@@ -559,9 +559,9 @@ class CRM_Campaign_Page_AJAXTest extends CiviUnitTestCase {
       CRM_Campaign_Page_AJAX::campaignGroups();
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals('success', $e->errorData['status']);
+      $this->assertSame('success', $e->errorData['status']);
       $this->assertIsArray($e->errorData['groups']);
-      $this->assertEquals('', $e->errorData['groups'][0]['value']);
+      $this->assertSame('', $e->errorData['groups'][0]['value']);
     }
   }
 

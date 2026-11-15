@@ -72,7 +72,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
       'sequential' => 1,
       'full_name' => "civi_contribute",
     ])['values'][0];
-    $this->assertEquals('installed', $civiContribute['status']);
+    $this->assertSame('installed', $civiContribute['status']);
   }
 
   /**
@@ -92,7 +92,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
   public function testCreateGrant(): void {
     $result = $this->callAPISuccess('Grant', 'create', $this->params);
     $this->ids['Grant'][0] = $result['id'];
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
@@ -172,7 +172,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
     ]);
     $this->createTestEntity('Grant', $this->params);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertEquals('NZD', $contribution['currency']);
+    $this->assertSame('NZD', $contribution['currency']);
   }
 
   /**
@@ -192,7 +192,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
       'id' => $contributionID,
       'return' => 'financial_type_id',
     ]));
-    $this->assertEquals('NZD', $this->callAPISuccessGetValue('Contribution', [
+    $this->assertSame('NZD', $this->callAPISuccessGetValue('Contribution', [
       'id' => $contributionID,
       'return' => 'currency',
     ]));
@@ -202,7 +202,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
     $checkDeleted = $this->callAPISuccess($this->_entity, 'get', ['id' => $result['id']]);
-    $this->assertEquals(0, $checkDeleted['count']);
+    $this->assertSame(0, $checkDeleted['count']);
   }
 
   /**
@@ -241,7 +241,7 @@ class api_v3_GrantTest extends TestCase implements HeadlessInterface, Transactio
       'contact_sub_type_op' => 'in',
       'contact_sub_type_value' => ['Student'],
     ]);
-    $this->assertEquals(1, $rows['count']);
+    $this->assertSame(1, $rows['count']);
   }
 
 }

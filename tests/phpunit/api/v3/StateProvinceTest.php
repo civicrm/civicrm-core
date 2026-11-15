@@ -35,7 +35,7 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
    */
   public function testCreateStateProvince(): void {
     $result = $this->callAPISuccess('StateProvince', 'create', $this->_params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('StateProvince', 'delete', ['id' => $result['id']]);
   }
@@ -49,11 +49,11 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
 
     // Delete
     $result = $this->callAPISuccess('StateProvince', 'delete', ['id' => $create['id']]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $get = $this->callAPISuccess('StateProvince', 'get', [
       'id' => $create['id'],
     ]);
-    $this->assertEquals(0, $get['count'], 'State/province not successfully deleted');
+    $this->assertSame(0, $get['count'], 'State/province not successfully deleted');
   }
 
   /**
@@ -98,7 +98,7 @@ class api_v3_StateProvinceTest extends CiviUnitTestCase {
     $check = $this->callAPISuccess('StateProvince', 'getcount', [
       'name' => $params['name'],
     ]);
-    $this->assertEquals(1, $check);
+    $this->assertSame(1, $check);
   }
 
 }

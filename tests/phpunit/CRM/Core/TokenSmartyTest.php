@@ -31,7 +31,7 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
       ['contactId' => $this->contactId],
       ['extra' => ['foo' => 'foobar']]
     );
-    $this->assertEquals('First name is Bob. ExtraFoo is foobar.', $rendered['msg_subject']);
+    $this->assertSame('First name is Bob. ExtraFoo is foobar.', $rendered['msg_subject']);
 
     try {
       $modifiers = [
@@ -46,7 +46,7 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
           ['contactId' => $this->contactId],
           ['extra' => ['now' => '2020-02-01 03:04:05']]
         );
-        $this->assertEquals("Now is the token, $expected! No, now is the smarty-pants, $expected!", $rendered['msg_subject']);
+        $this->assertSame("Now is the token, $expected! No, now is the smarty-pants, $expected!", $rendered['msg_subject']);
       }
     }
     finally {
@@ -66,28 +66,28 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
       ['contactId' => $this->contactId],
       []
     );
-    $this->assertEquals('<p>Greeting: Dear Bob!</p>', $rendered['msg_html']);
+    $this->assertSame('<p>Greeting: Dear Bob!</p>', $rendered['msg_html']);
 
     $rendered = CRM_Core_TokenSmarty::render(
       ['msg_html' => '<p>{if !empty("{contact.contact_id}")}Yes CID{else}No CID{/if}</p>'],
       ['contactId' => $this->contactId],
       []
     );
-    $this->assertEquals('<p>Yes CID</p>', $rendered['msg_html']);
+    $this->assertSame('<p>Yes CID</p>', $rendered['msg_html']);
 
     $rendered = CRM_Core_TokenSmarty::render(
       ['msg_html' => '<p>{assign var="greeting" value="hey yo {contact.first_name|upper} {contact.last_name|upper} circa {domain.now|crmDate:"%m/%Y"}"}My Greeting: {$greeting}!</p>'],
       ['contactId' => $this->contactId],
       []
     );
-    $this->assertEquals('<p>My Greeting: hey yo BOB ROBERTS circa 04/2022!</p>', $rendered['msg_html']);
+    $this->assertSame('<p>My Greeting: hey yo BOB ROBERTS circa 04/2022!</p>', $rendered['msg_html']);
 
     $rendered = CRM_Core_TokenSmarty::render(
       ['msg_html' => '<p>{assign var="greeting" value="hey yo {contact.first_name} {contact.last_name|upper} circa {domain.now|crmDate:"shortdate"}"}My Greeting: {$greeting|capitalize}!</p>'],
       ['contactId' => $this->contactId],
       []
     );
-    $this->assertEquals('<p>My Greeting: Hey Yo Bob ROBERTS Circa 04/08/2022!</p>', $rendered['msg_html']);
+    $this->assertSame('<p>My Greeting: Hey Yo Bob ROBERTS Circa 04/08/2022!</p>', $rendered['msg_html']);
   }
 
   /**
@@ -99,7 +99,7 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
       ['contactId' => $this->contactId, 'smarty' => FALSE],
       ['extra' => ['foo' => 'foobar']]
     );
-    $this->assertEquals('First name is Bob. ExtraFoo is {$extra.foo}.', $rendered['msg_subject']);
+    $this->assertSame('First name is Bob. ExtraFoo is {$extra.foo}.', $rendered['msg_subject']);
   }
 
   /**
@@ -143,8 +143,8 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
       ],
       ['contactId' => $cutesyContactId]
     );
-    $this->assertEquals('First name is <b>Ivan&#039;s &quot;The Ter&lt;r&gt;ib`le&quot;</b>.', $rendered['msg_html']);
-    $this->assertEquals('First name is __Ivan\'s "The Ter<r>ib`le"__.', $rendered['msg_text']);
+    $this->assertSame('First name is <b>Ivan&#039;s &quot;The Ter&lt;r&gt;ib`le&quot;</b>.', $rendered['msg_html']);
+    $this->assertSame('First name is __Ivan\'s "The Ter<r>ib`le"__.', $rendered['msg_text']);
   }
 
   /**
@@ -163,7 +163,7 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
       ['contactId' => $cutesyContactId],
       ['extra' => ['foo' => 'foobar']]
     );
-    $this->assertEquals('First name is {$extra.foo}{contact.last_name}. ExtraFoo is foobar.', $rendered['msg_subject']);
+    $this->assertSame('First name is {$extra.foo}{contact.last_name}. ExtraFoo is foobar.', $rendered['msg_subject']);
   }
 
   /**
@@ -175,7 +175,7 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
       ['contactId' => $this->contactId],
       ['extra' => ['foo' => '{contact.last_name}{$extra.foo}']]
     );
-    $this->assertEquals('First name is Bob. ExtraFoo is {contact.last_name}{$extra.foo}.', $rendered['msg_subject']);
+    $this->assertSame('First name is Bob. ExtraFoo is {contact.last_name}{$extra.foo}.', $rendered['msg_subject']);
   }
 
   /**
@@ -196,12 +196,12 @@ class CRM_Core_TokenSmartyTest extends CiviUnitTestCase {
       'body' => 'Body {counter.i} is really {counter.i}.',
     ];
     $rendered = CRM_Core_TokenSmarty::render($templates, ['contactId' => $this->contactId]);
-    $this->assertEquals('Subject eval#1', $rendered['subject']);
-    $this->assertEquals('Body eval#1 is really eval#1.', $rendered['body']);
+    $this->assertSame('Subject eval#1', $rendered['subject']);
+    $this->assertSame('Body eval#1 is really eval#1.', $rendered['body']);
 
     $rendered = CRM_Core_TokenSmarty::render($templates, ['contactId' => $this->contactId]);
-    $this->assertEquals('Subject eval#2', $rendered['subject']);
-    $this->assertEquals('Body eval#2 is really eval#2.', $rendered['body']);
+    $this->assertSame('Subject eval#2', $rendered['subject']);
+    $this->assertSame('Body eval#2 is really eval#2.', $rendered['body']);
 
   }
 

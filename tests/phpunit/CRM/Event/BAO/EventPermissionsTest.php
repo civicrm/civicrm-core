@@ -163,8 +163,8 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
   public function testGetCompleteInfo(): void {
     $this->setupScenarioCoreACLEveryonePermittedToEvent();
     $info = CRM_Event_BAO_Event::getCompleteInfo('20000101');
-    $this->assertEquals('Annual CiviCRM meet', $info[0]['title']);
-    $this->assertEquals('Annual CiviCRM meet', $info[1]['title']);
+    $this->assertSame('Annual CiviCRM meet', $info[0]['title']);
+    $this->assertSame('Annual CiviCRM meet', $info[1]['title']);
   }
 
 }

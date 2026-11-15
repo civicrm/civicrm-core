@@ -67,7 +67,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   public function testGetSurvey(): void {
     $this->createTestEntity('Survey', $this->params);
     $result = $this->callAPISuccess('Survey', 'get', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
@@ -78,7 +78,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
     $entity = $this->createTestEntity('Survey', $this->params);
     $this->callAPISuccess('survey', 'delete', ['id' => $entity['id']]);
     $checkDeleted = $this->callAPISuccess($this->entity, 'get', []);
-    $this->assertEquals(0, $checkDeleted['count']);
+    $this->assertSame(0, $checkDeleted['count']);
   }
 
   /**
@@ -91,7 +91,7 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccess('Survey', 'create', $this->params);
     $this->callAPISuccess('Survey', 'get', $params);
-    $this->assertEquals(0, $this->callAPISuccess('survey', 'getcount', []));
+    $this->assertSame(0, $this->callAPISuccess('survey', 'getcount', []));
   }
 
 }

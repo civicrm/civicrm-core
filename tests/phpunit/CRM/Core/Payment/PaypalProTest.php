@@ -77,7 +77,7 @@ class CRM_Core_Payment_PaypalProTest extends CiviUnitTestCase {
       "billing_postal_code-$billingLocationTypeID" => 5010,
       "billing_country_id-$billingLocationTypeID" => 1228,
       'credit_card_number' => '4444333322221111',
-      'cvv2' => 123,
+      'cvv2' => '123',
       'credit_card_exp_date' => [
         'M' => 9,
         'Y' => 2025,

@@ -51,8 +51,8 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
       'first_name' => 'First',
       'last_name' => 'Last',
     ]);
-    $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
-    $this->assertEquals('MUNGE! First Last', $result['values'][$result['id']]['display_name_munged']);
+    $this->assertSame('First', $result['values'][$result['id']]['first_name']);
+    $this->assertSame('MUNGE! First Last', $result['values'][$result['id']]['display_name_munged']);
   }
 
 }

@@ -70,7 +70,7 @@ class PaymentProcessorTest extends \CiviUnitTestCase {
       $this->fail('Expected CRM_Core_Exception because processor does not support refund');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('Payment Processor does not support refund', $e->getMessage());
+      $this->assertSame('Payment Processor does not support refund', $e->getMessage());
     }
   }
 

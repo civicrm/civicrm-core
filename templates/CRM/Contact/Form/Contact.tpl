@@ -79,7 +79,7 @@
 
     {foreach from = $editOptions item = "title" key="name"}
       {if $name eq 'CustomData'}
-        <div id='customData_{$contactType}'>{include file="CRM/Contact/Form/Edit/CustomData.tpl" isSingleRecordEdit=false skipTitle=false}</div>
+        <div id='customData_{$contactType}'>{include file="CRM/Contact/Form/Edit/CustomData.tpl" skipTitle=false}</div>
       {else}
         {include file="CRM/Contact/Form/Edit/$name.tpl"}
       {/if}

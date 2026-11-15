@@ -1,24 +1,24 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 use Civi\Api4\Event\AuthorizeRecordEvent;
 use Civi\Api4\Group;
-use Civi\Core\HookInterface;
 
 /**
  *
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group implements HookInterface {
+class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
 
   /**
    * @deprecated
@@ -1299,6 +1299,7 @@ WHERE {$whereClause}";
    * Check write access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $userID = $e->getUserID();
@@ -1330,6 +1331,7 @@ WHERE {$whereClause}";
    * Callback for hook_civicrm_post().
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     unset(Civi::$statics[__CLASS__ . '::filterActiveGroups']);
     /** @var CRM_Contact_DAO_Group $group */
@@ -1421,6 +1423,7 @@ WHERE {$whereClause}";
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event): void {
     if (!empty($event->params['check_permissions'])) {
       $id = $event->id ?? $event->params['id'] ?? NULL;
@@ -1497,6 +1500,29 @@ WHERE {$whereClause}";
         }
       }
     }
+  }
+
+  /**
+   * Validation callback for group_multiple_parents setting.
+   *
+   * @param mixed $value
+   * @return bool
+   * @throws \CRM_Core_Exception
+   */
+  public static function validateGroupMultipleParents($value): bool {
+    if (!$value) {
+      $sql = "SELECT COUNT(*)
+        FROM `civicrm_group`
+        WHERE `parents` LIKE '%,%'";
+      $count = (int) CRM_Core_DAO::singleValueQuery($sql);
+      if ($count > 0) {
+        throw new CRM_Core_Exception(ts('Cannot disable multiple group parents because 1 group with multiple parents exists.', [
+          'count' => $count,
+          'plural' => 'Cannot disable multiple group parents because %count groups with multiple parents exist.',
+        ]));
+      }
+    }
+    return TRUE;
   }
 
 }

@@ -2,27 +2,19 @@
 
 namespace Civi\Afform;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Angular\ChangeSet;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * @service civi.afform.translator
  */
-class Translator extends AutoService implements EventSubscriberInterface {
-
-  /**
-   *
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      '&hook_civicrm_alterAngular' => 'translateAfform',
-    ];
-  }
+class Translator extends AutoService {
 
   /**
    * @param \Civi\Angular\Manager $angular
    */
+  #[CiviEventListener(event: '&hook_civicrm_alterAngular')]
   public function translateAfform($angular) {
 
     /**
@@ -35,11 +27,28 @@ class Translator extends AutoService implements EventSubscriberInterface {
 
     $changeSet = ChangeSet::create('translate')
       ->alterHtml(
-        ';\.aff\.html$;', function (\phpQueryObject $doc) {
-          (new StringVisitor())->visit($doc, fn($s) => _ts($s));
+        ';\.aff\.html$;', function (\phpQueryObject $doc, string $path) {
+          $formName = \Civi::service('angular')->getModules()[basename($path, '.aff.html')]['_afform'] ?? NULL;
+          $domain = self::getDomain($formName);
+          (new StringVisitor())->visit($doc, fn($s) => _ts($s, ['domain' => $domain]));
         }
       );
     $angular->add($changeSet);
+  }
+
+  /**
+   * Translation domains for the strings of an Afform: those of the extension
+   * that provides it, falling back to core's.
+   *
+   * @param string|null $formName
+   *   Ex: 'afformFooBar'
+   * @return array|null
+   *   Ex: ['org.example.foo', NULL], or NULL for a form no extension provides.
+   */
+  public static function getDomain(?string $formName): ?array {
+    $paths = $formName ? (\Civi::service('afform_scanner')->findFilePaths()[$formName] ?? []) : [];
+    $baseModule = \CRM_Utils_Array::first(array_filter(array_keys($paths)));
+    return $baseModule ? [$baseModule, NULL] : NULL;
   }
 
 }

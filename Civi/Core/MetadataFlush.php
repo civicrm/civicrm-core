@@ -11,16 +11,12 @@
 
 namespace Civi\Core;
 
+use Civi\Core\Attribute\CiviEventListener;
+
 /**
  * Event subscriber for metadata cache clear events.
  */
-class MetadataFlush extends Service\AutoSubscriber {
-
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.cache.metadata.clear' => 'onClearMetadata',
-    ];
-  }
+class MetadataFlush {
 
   /**
    * When metadata is flushed, client-side resources also must be refreshed.
@@ -30,6 +26,7 @@ class MetadataFlush extends Service\AutoSubscriber {
    * This is to avoid concurrency issues where the user tries to download a resource
    * as it's being deleted.
    */
+  #[CiviEventListener(event: 'civi.cache.metadata.clear')]
   public static function onClearMetadata(): void {
     // APIv3 getfields metadata is cached for the lifetime of the request.
     // Keep it in sync with other metadata caches regardless of how the clear

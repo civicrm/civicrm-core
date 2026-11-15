@@ -62,7 +62,9 @@ class CRM_Contact_Page_View_Log extends CRM_Core_Page {
     }
 
     $this->assign('logCount', count($logEntries));
-    $this->ajaxResponse['tabCount'] = count($logEntries);
+    if (Civi::settings()->get('contact_summary_tab_counts')) {
+      $this->ajaxResponse['tabCount'] = count($logEntries);
+    }
     $this->ajaxResponse += CRM_Contact_Form_Inline::renderFooter($this->_contactId, FALSE);
     $this->assign('log', $logEntries);
   }

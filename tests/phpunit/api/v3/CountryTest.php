@@ -36,7 +36,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
   public function testCreateCountry(): void {
 
     $result = $this->callAPISuccess('country', 'create', $this->_params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
 
     $this->callAPISuccess('country', 'delete', ['id' => $result['id']]);
@@ -50,11 +50,11 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     $create = $this->callAPISuccess('country', 'create', $this->_params);
 
     $result = $this->callAPISuccess('country', 'delete', ['id' => $create['id']]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $get = $this->callAPISuccess('country', 'get', [
       'id' => $create['id'],
     ]);
-    $this->assertEquals(0, $get['count'], 'Country not successfully deleted');
+    $this->assertSame(0, $get['count'], 'Country not successfully deleted');
   }
 
   /**
@@ -102,7 +102,7 @@ class api_v3_CountryTest extends CiviUnitTestCase {
     $check = $this->callAPISuccess('country', 'getcount', [
       'iso_code' => $params['iso_code'],
     ]);
-    $this->assertEquals(1, $check);
+    $this->assertSame(1, $check);
   }
 
   /**

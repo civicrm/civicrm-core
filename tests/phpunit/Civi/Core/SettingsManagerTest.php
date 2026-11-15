@@ -8,8 +8,14 @@ class SettingsManagerTest extends \CiviUnitTestCase {
   protected $mandates;
   protected $origSetting;
 
+  /**
+   * @var string|false
+   */
+  protected $origExtRepoUrlEnv;
+
   protected function setUp(): void {
     $this->origSetting = $GLOBALS['civicrm_setting'];
+    $this->origExtRepoUrlEnv = getenv('CIVICRM_SETTING_EXT_REPO_URL');
 
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -40,6 +46,7 @@ class SettingsManagerTest extends \CiviUnitTestCase {
 
   public function tearDown(): void {
     $GLOBALS['civicrm_setting'] = $this->origSetting;
+    putenv($this->origExtRepoUrlEnv === FALSE ? 'CIVICRM_SETTING_EXT_REPO_URL' : "CIVICRM_SETTING_EXT_REPO_URL={$this->origExtRepoUrlEnv}");
     parent::tearDown();
   }
 
@@ -54,21 +61,21 @@ class SettingsManagerTest extends \CiviUnitTestCase {
 
     $daSettings = $manager->getBagByDomain($da->id);
     $daSettings->set('d1', 'un');
-    $this->assertEquals('un', $daSettings->get('d1'));
-    $this->assertEquals('beta', $daSettings->get('d2'));
-    $this->assertEquals('GAMMA!', $daSettings->get('d3'));
+    $this->assertSame('un', $daSettings->get('d1'));
+    $this->assertSame('beta', $daSettings->get('d2'));
+    $this->assertSame('GAMMA!', $daSettings->get('d3'));
 
     $dbSettings = $manager->getBagByDomain($db->id);
-    $this->assertEquals('alpha', $dbSettings->get('d1'));
-    $this->assertEquals('beta', $dbSettings->get('d2'));
-    $this->assertEquals('GAMMA!', $dbSettings->get('d3'));
+    $this->assertSame('alpha', $dbSettings->get('d1'));
+    $this->assertSame('beta', $dbSettings->get('d2'));
+    $this->assertSame('GAMMA!', $dbSettings->get('d3'));
 
     $managerRedux = $this->createManager()->bootComplete();
 
     $daSettingsRedux = $managerRedux->getBagByDomain($da->id);
-    $this->assertEquals('un', $daSettingsRedux->get('d1'));
-    $this->assertEquals('beta', $daSettingsRedux->get('d2'));
-    $this->assertEquals('GAMMA!', $daSettingsRedux->get('d3'));
+    $this->assertSame('un', $daSettingsRedux->get('d1'));
+    $this->assertSame('beta', $daSettingsRedux->get('d2'));
+    $this->assertSame('GAMMA!', $daSettingsRedux->get('d3'));
   }
 
   /**
@@ -83,22 +90,22 @@ class SettingsManagerTest extends \CiviUnitTestCase {
 
     $caSettings = $manager->getBagByContact($domain->id, $ca->id);
     $caSettings->set('c1', 'un');
-    $this->assertEquals('un', $caSettings->get('c1'));
-    $this->assertEquals('beta', $caSettings->get('c2'));
-    $this->assertEquals('GAMMA MAN!', $caSettings->get('c3'));
+    $this->assertSame('un', $caSettings->get('c1'));
+    $this->assertSame('beta', $caSettings->get('c2'));
+    $this->assertSame('GAMMA MAN!', $caSettings->get('c3'));
 
     $cbSettings = $manager->getBagByContact($domain->id, $cb->id);
-    $this->assertEquals('alpha', $cbSettings->get('c1'));
-    $this->assertEquals('beta', $cbSettings->get('c2'));
-    $this->assertEquals('GAMMA MAN!', $cbSettings->get('c3'));
+    $this->assertSame('alpha', $cbSettings->get('c1'));
+    $this->assertSame('beta', $cbSettings->get('c2'));
+    $this->assertSame('GAMMA MAN!', $cbSettings->get('c3'));
 
     // Read settings from freshly initialized objects.
     $manager = $this->createManager()->bootComplete();
 
     $caSettingsRedux = $manager->getBagByContact($domain->id, $ca->id);
-    $this->assertEquals('un', $caSettingsRedux->get('c1'));
-    $this->assertEquals('beta', $caSettingsRedux->get('c2'));
-    $this->assertEquals('GAMMA MAN!', $caSettingsRedux->get('c3'));
+    $this->assertSame('un', $caSettingsRedux->get('c1'));
+    $this->assertSame('beta', $caSettingsRedux->get('c2'));
+    $this->assertSame('GAMMA MAN!', $caSettingsRedux->get('c3'));
   }
 
   public function testCrossOver(): void {
@@ -111,20 +118,20 @@ class SettingsManagerTest extends \CiviUnitTestCase {
 
     $domainSettings = $manager->getBagByDomain($domain->id);
     $domainSettings->set('monkeywrench', 'from domain');
-    $this->assertEquals('from domain', $domainSettings->get('monkeywrench'));
+    $this->assertSame('from domain', $domainSettings->get('monkeywrench'));
 
     $contactSettings = $manager->getBagByContact($domain->id, $contact->id);
     $contactSettings->set('monkeywrench', 'from contact');
-    $this->assertEquals('from contact', $contactSettings->get('monkeywrench'));
+    $this->assertSame('from contact', $contactSettings->get('monkeywrench'));
 
     // Read settings from freshly initialized objects.
     $manager = $this->createManager()->bootComplete();
 
     $domainSettings = $manager->getBagByDomain($domain->id);
-    $this->assertEquals('from domain', $domainSettings->get('monkeywrench'));
+    $this->assertSame('from domain', $domainSettings->get('monkeywrench'));
 
     $contactSettings = $manager->getBagByContact($domain->id, $contact->id);
-    $this->assertEquals('from contact', $contactSettings->get('monkeywrench'));
+    $this->assertSame('from contact', $contactSettings->get('monkeywrench'));
   }
 
   /**
@@ -154,6 +161,33 @@ class SettingsManagerTest extends \CiviUnitTestCase {
     $dSettings->set('test_setting', ['hello' => 'World']);
     $test_setting = $dSettings->get('test_setting');
     $this->assertEquals(['hello' => 'World'], $test_setting);
+  }
+
+  public function testExtRepoUrlFromEnv(): void {
+    unset($GLOBALS['civicrm_setting']['domain']['ext_repo_url']);
+    putenv('CIVICRM_SETTING_EXT_REPO_URL');
+    $domain = \CRM_Core_DAO::createTestObject('CRM_Core_DAO_Domain');
+    $this->assertNotEquals('https://example.org/feed', $this->createManager()->bootComplete()->getBagByDomain($domain->id)->get('ext_repo_url'));
+
+    putenv('CIVICRM_SETTING_EXT_REPO_URL=https://example.org/feed');
+    $this->assertEquals('https://example.org/feed', $this->createManager()->bootComplete()->getBagByDomain($domain->id)->get('ext_repo_url'));
+  }
+
+  public function testSetConstantNamesEnvironmentVariable(): void {
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('ext_repo_url is a system constant. It can only be set in civicrm.settings.php or with the environment variable CIVICRM_SETTING_EXT_REPO_URL.');
+    \Civi::settings()->set('ext_repo_url', 'x');
+  }
+
+  /**
+   * A constant without an environment variable, as an extension may declare it.
+   */
+  public function testSetConstantWithoutEnvironmentVariable(): void {
+    $bag = new SettingsBag(1, NULL);
+    $bag->updateConstant('editor_id', 'x');
+    $this->expectException(\CRM_Core_Exception::class);
+    $this->expectExceptionMessage('editor_id is a system constant. It can only be set in civicrm.settings.php.');
+    $bag->set('editor_id', 'y');
   }
 
 }

@@ -8,11 +8,19 @@
  | and copyright information, see https://civicrm.org/licensing       |
  +--------------------------------------------------------------------+
  */
+
+use Civi\Api4\SavedSearch;
+
 /**
  * Test class for CRM_Mailing_Form_Task_AdhocMailing.
  * @group headless
  */
 class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {
+
+  public function tearDown(): void {
+    $this->quickCleanup(['civicrm_saved_search', 'civicrm_group', 'civicrm_group_contact', 'civicrm_mailing', 'civicrm_mailing_group']);
+    parent::tearDown();
+  }
 
   /**
    * Test creating a hidden smart group from a search builder search.
@@ -43,9 +51,9 @@ class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {
     catch (CRM_Core_Exception_PrematureExitException $e) {
       // Nothing to see here.
     }
-    $savedSearch = $this->callAPISuccess('SavedSearch', 'get', ['sequential' => 1, 'options' => ['sort' => "id DESC"]]);
-    $this->assertGreaterThan(0, $savedSearch['count']);
-    $this->assertEquals($formValues, $savedSearch['values'][0]['form_values']);
+    $savedSearch = SavedSearch::get(FALSE)->addOrderBy('id', 'DESC')->execute()->first();
+    $this->assertNotNull($savedSearch);
+    $this->assertEquals($formValues, $savedSearch['form_values']);
   }
 
 }

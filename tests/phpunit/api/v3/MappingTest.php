@@ -36,7 +36,7 @@ class api_v3_MappingTest extends CiviUnitTestCase {
 
   public function testCreateMapping(): void {
     $result = $this->callAPISuccess('Mapping', 'create', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->getAndCheck($this->params, $result['id'], 'Mapping');
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
@@ -44,7 +44,7 @@ class api_v3_MappingTest extends CiviUnitTestCase {
   public function testGetMapping(): void {
     $this->callAPISuccess('Mapping', 'create', $this->params);
     $result = $this->callAPISuccess('Mapping', 'get', $this->params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->callAPISuccess('Mapping', 'delete', ['id' => $result['id']]);
   }
@@ -54,7 +54,7 @@ class api_v3_MappingTest extends CiviUnitTestCase {
     $deleteParams = ['id' => $result['id']];
     $this->callAPISuccess('Mapping', 'delete', $deleteParams);
     $checkDeleted = $this->callAPISuccess('Mapping', 'get', []);
-    $this->assertEquals(0, $checkDeleted['count']);
+    $this->assertSame(0, $checkDeleted['count']);
   }
 
   public function testDeleteMappingInvalid(): void {
@@ -62,7 +62,7 @@ class api_v3_MappingTest extends CiviUnitTestCase {
     $deleteParams = ['id' => 600];
     $this->callAPIFailure('Mapping', 'delete', $deleteParams);
     $checkDeleted = $this->callAPISuccess('Mapping', 'get', []);
-    $this->assertEquals(1, $checkDeleted['count']);
+    $this->assertSame(1, $checkDeleted['count']);
   }
 
 }

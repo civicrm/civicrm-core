@@ -83,8 +83,6 @@ abstract class CRM_Utils_System_Base {
 
       CRM_Core_Smarty::PRINT_PAGE => 'CRM/common/print.tpl',
 
-      'xls', 'doc' => 'CRM/Contact/Form/Task/Excel.tpl',
-
       // Ex: CRM_Core_Smarty::PRINT_JSON
       default => 'CRM/common/snippet.tpl',
     };
@@ -593,7 +591,7 @@ abstract class CRM_Utils_System_Base {
    *   Array with user specific data
    */
   public function setUserSession($data) {
-    list($userID, $ufID) = $data;
+    [$userID, $ufID] = $data;
     $session = CRM_Core_Session::singleton();
     $session->set('ufID', $ufID);
     $session->set('userID', $userID);

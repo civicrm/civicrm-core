@@ -7,4 +7,18 @@
     <access_callback>1</access_callback>
     <is_public>true</is_public>
   </item>
+  <item>
+    <path>civicrm/admin/contribute/friend</path>
+    <title>Tell a Friend</title>
+    <page_callback>CRM_Friend_Form_Contribute</page_callback>
+    <access_arguments>access CiviContribute</access_arguments>
+    <weight>440</weight>
+  </item>
+  <item>
+    <path>civicrm/event/manage/friend</path>
+    <title>Tell a Friend</title>
+    <page_callback>CRM_Friend_Form_Event</page_callback>
+    <access_arguments>access CiviEvent</access_arguments>
+    <weight>940</weight>
+  </item>
 </menu>

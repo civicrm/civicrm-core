@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -19,7 +20,6 @@ use Civi\Api4\Queue;
 use Civi\Api4\UserJob;
 use Civi\Core\ClassScanner;
 use Civi\Core\Event\PreEvent;
-use Civi\Core\HookInterface;
 use Civi\UserJob\UserJobInterface;
 use Civi\API\Event\AuthorizeEvent;
 use Civi\Api4\Event\AuthorizeRecordEvent;
@@ -27,7 +27,7 @@ use Civi\Api4\Event\AuthorizeRecordEvent;
 /**
  * This class contains user jobs functionality.
  */
-class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface {
+class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob {
   use \CRM_Core_OwnershipAccessTrait;
 
   protected static function checkOwnerAdminPermission(?int $userID = NULL): bool {
@@ -45,6 +45,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
    * on the specific queue/use-case). We try to be conservative about I/O until we know that
    * we're in a suitable context.
    */
+  #[CiviEventListener(event: 'civi.queue.check')]
   public static function on_civi_queue_check(\Civi\Core\Event\GenericHookEvent $e) {
     /** @var \CRM_Queue_Queue $queue */
     $queue = $e->queue;
@@ -63,6 +64,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
    *
    * @see \CRM_Utils_Hook::queueStatus()
    */
+  #[CiviEventListener(event: '&hook_civicrm_queueStatus')]
   public static function hook_civicrm_queueStatus(CRM_Queue_Queue $queue, string $status): void {
     $userJobId = static::findUserJobId($queue->getName());
     if ($userJobId && $status === 'completed') {
@@ -118,6 +120,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
    * @noinspection PhpUnused
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre')]
   public static function on_hook_civicrm_pre(PreEvent $event): void {
     if ($event->entity === 'UserJob' &&
       (!empty($event->params['is_template'])
@@ -206,6 +209,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
   /**
    * Check to see if the user is the creator of the UserJob to allow for update / create
    */
+  #[CiviEventListener(event: 'civi.api.authorize')]
   public static function on_civi_api_authorize(AuthorizeEvent $event): void {
     $apiRequest = $event->getApiRequest();
     $entity = $apiRequest['entity'];
@@ -244,6 +248,7 @@ class CRM_Core_BAO_UserJob extends CRM_Core_DAO_UserJob implements HookInterface
   /**
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $userID = $e->getUserID();

@@ -1,12 +1,13 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 use Civi\Api4\DedupeRuleGroup;
@@ -18,7 +19,7 @@ use Civi\Token\TokenProcessor;
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact implements Civi\Core\HookInterface {
+class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
   /**
    * SQL function used to format the phone_numeric field via trigger.
@@ -2398,7 +2399,7 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
   }
 
   /**
-   * Find the contact details associated with an OpenID.
+   * @deprecated since 6.22 will be removed around 6.28
    *
    * @param string $openId
    *   OpenId of the contact.
@@ -2409,6 +2410,7 @@ WHERE      civicrm_email.email = %1 AND civicrm_contact.is_deleted=0";
    *   $dao contact details
    */
   public static function matchContactOnOpenId($openId, $ctype = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
     $openId = $strtolower(trim($openId));
     $query = "
@@ -2558,16 +2560,15 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
    *   Type of record to count.
    * @param int $contactId
    *   Input contact id.
-   * @param string|null $tableName
-   *   Deprecated - do not use
+   * @param bool $checkSetting
+   *   Whether to check the contact_summary_tab_counts setting.
    *
    * @return int|false
    *   total number in database
    */
-  public static function getCountComponent(string $type, int $contactId, ?string $tableName = NULL) {
-    if ($tableName) {
-      // TODO: Fix LineItemEditor extension to not use this function, then enable warning
-      // CRM_Core_Error::deprecatedWarning('Deprecated argument $tableName passed to ' . __CLASS__ . '::' . __FUNCTION__);
+  public static function getCountComponent(string $type, int $contactId, bool $checkSetting = TRUE) {
+    if ($checkSetting && !\Civi::settings()->get('contact_summary_tab_counts')) {
+      return FALSE;
     }
     switch ($type) {
       case 'tag':
@@ -2634,12 +2635,13 @@ LEFT JOIN civicrm_email    ON ( civicrm_contact.id = civicrm_email.contact_id )
         return CRM_Mailing_BAO_Mailing::getContactMailingsCount($params);
 
       default:
+        $custom = explode('_', $type);
+        $tableName = CRM_Core_BAO_CustomGroup::getGroup(['id' => $custom[1] ?? 0])['table_name'] ?? NULL;
         if (!$tableName) {
-          $custom = explode('_', $type);
-          $tableName = CRM_Core_BAO_CustomGroup::getGroup(['id' => $custom[1]])['table_name'];
+          throw new CRM_Core_Exception('Unrecognized type');
         }
-        $queryString = "SELECT count(id) FROM $tableName WHERE entity_id = $contactId";
-        return (int) CRM_Core_DAO::singleValueQuery($queryString);
+        $queryString = "SELECT count(*) FROM `$tableName` WHERE `entity_id` = %1";
+        return (int) CRM_Core_DAO::singleValueQuery($queryString, [1 => [$contactId, 'Integer']]);
     }
   }
 
@@ -3338,6 +3340,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * Event fired after modifying any entity.
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post')]
   public static function on_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     // Handle deleting a related entity with is_primary
     $hasPrimary = ['Address', 'Email', 'IM', 'OpenID', 'Phone'];
@@ -3599,6 +3602,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * Check contact access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $userID = $e->getUserID();

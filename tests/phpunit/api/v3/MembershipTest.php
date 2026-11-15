@@ -221,15 +221,15 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $memberships = $this->callAPISuccess('Membership', 'get', ['sort' => 'contact_id', 'sequential' => 1])['values'];
 
     $this->assertEquals($contactId1, $memberships[0]['contact_id']);
-    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[0]['status_id']));
+    $this->assertSame('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[0]['status_id']));
 
     // check for Membership 2
     $this->assertEquals($contactId2, $memberships[1]['contact_id']);
-    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[1]['status_id']));
+    $this->assertSame('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[1]['status_id']));
 
     // check for Membership 3
     $this->assertEquals($contactId3, $memberships[2]['contact_id']);
-    $this->assertEquals('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[2]['status_id']));
+    $this->assertSame('New', CRM_Core_PseudoConstant::getName('CRM_Member_BAO_Membership', 'status_id', $memberships[2]['status_id']));
   }
 
   /**
@@ -247,13 +247,13 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => ['IN' => [$this->_membershipID, $this->_membershipID3]],
     ];
     $membership = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(2, $membership['count']);
+    $this->assertSame(2, $membership['count']);
     $this->assertEquals([$this->_membershipID, $this->_membershipID3], array_keys($membership['values']));
     $params = [
       'id' => ['NOT IN' => [$this->_membershipID, $this->_membershipID3]],
     ];
     $membership = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(1, $membership['count']);
+    $this->assertSame(1, $membership['count']);
     $this->assertEquals([$this->_membershipID2], array_keys($membership['values']));
   }
 
@@ -271,13 +271,13 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => ['IN' => [$this->_contactID, $contact3]],
     ];
     $membership = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(2, $membership['count']);
+    $this->assertSame(2, $membership['count']);
     $this->assertEquals([$this->_membershipID, $this->_membershipID3], array_keys($membership['values']));
     $params = [
       'contact_id' => ['NOT IN' => [$this->_contactID, $contact3]],
     ];
     $membership = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(1, $membership['count']);
+    $this->assertSame(1, $membership['count']);
     $this->assertEquals([$this->_membershipID2], array_keys($membership['values']));
   }
 
@@ -325,7 +325,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $getParams = ['membership_type_id' => $params['membership_type_id'], 'return' => 'custom_' . $ids['custom_field_id']];
     $check = $this->callAPISuccess('Membership', 'get', $getParams);
-    $this->assertEquals('custom string', $check['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
+    $this->assertSame('custom string', $check['values'][$result['id']]['custom_' . $ids['custom_field_id']]);
   }
 
   /**
@@ -340,15 +340,15 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ];
 
     $result = $this->callAPISuccessGetSingle('Membership', $params);
-    $this->assertEquals('2009-01-21', $result['join_date']);
+    $this->assertSame('2009-01-21', $result['join_date']);
     $this->assertEquals($result['contact_id'], $this->_contactID);
     $this->assertEquals($result['membership_type_id'], $this->getMembershipTypeID('General'));
     $this->assertEquals($result['status_id'], $this->ids['MembershipStatus']['test member status']);
 
-    $this->assertEquals('2009-01-21', $result['start_date']);
-    $this->assertEquals('2009-12-21', $result['end_date']);
-    $this->assertEquals('Payment', $result['source']);
-    $this->assertEquals(1, $result['is_override']);
+    $this->assertSame('2009-01-21', $result['start_date']);
+    $this->assertSame('2009-12-21', $result['end_date']);
+    $this->assertSame('Payment', $result['source']);
+    $this->assertSame('1', $result['is_override']);
   }
 
   /**
@@ -454,7 +454,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('membership', 'get', $params);
 
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $result = $result['values'][$result['id']];
     $this->assertEquals($OrganizationMembershipID, $result['owner_membership_id']);
 
@@ -468,7 +468,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('membership', 'get', $params);
     // If it fails here CRM-14758 is not fixed
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $result = $result['values'][$result['id']];
     $this->assertEquals($OrganizationMembershipID, $result['owner_membership_id']);
 
@@ -481,7 +481,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeId,
     ];
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
 
     // Increase max_related for the employer's membership
     $params = [
@@ -497,7 +497,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeId,
     ];
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $result = $result['values'][$result['id']];
     $this->assertEquals($OrganizationMembershipID, $result['owner_membership_id']);
 
@@ -515,7 +515,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'membership_type_id' => $membershipTypeId,
     ];
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
 
     //Create pay_later membership for organization.
     $employerId[2] = $this->organizationCreate([], 1);
@@ -548,27 +548,27 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     // Deactivate relationship using create and assert membership is not inherited
     $this->callAPISuccess('relationship', 'create', ['id' => $relationship1['id'], 'is_active' => 0]);
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
 
     // Re-enable relationship using create and assert membership is inherited
     $this->callAPISuccess('relationship', 'create', ['id' => $relationship1['id'], 'is_active' => 1]);
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     // Deactivate relationship using setvalue and assert membership is not inherited
     $this->callAPISuccess('relationship', 'setvalue', ['id' => $relationship1['id'], 'field' => 'is_active', 'value' => 0]);
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
 
     // Re-enable relationship using setvalue and assert membership is inherited
     $this->callAPISuccess('relationship', 'setvalue', ['id' => $relationship1['id'], 'field' => 'is_active', 'value' => 1]);
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     // Delete relationship and assert membership is not inherited
     $this->callAPISuccess('relationship', 'delete', ['id' => $relationship1['id']]);
     $result = $this->callAPISuccess('membership', 'get', $params);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
 
     // Check Membership is granted via inheritance when:
     // there is an inactive existing membership of the
@@ -603,7 +603,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
 
     // Check no current membership
     $result = $this->callAPISuccess('membership', 'get', $getActiveMembershipParams);
-    $this->assertEquals(0, $result['count']);
+    $this->assertSame(0, $result['count']);
 
     // Add new employer relationship to contact
     $this->callAPISuccess('Contact', 'create', ['id' => $memberContactId[4], 'employer_id' => $employerId[3]]);
@@ -611,7 +611,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     // Add inherited membership
     $this->contactMembershipCreate($activeMembershipParams);
     $result = $this->callAPISuccess('membership', 'get', $getActiveMembershipParams);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     // Tear down - reverse of creation to be safe
     $this->contactDelete($memberContactId[4]);
@@ -820,7 +820,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'id' => $result['id'],
       'contact_id' => $this->_contactID,
     ]);
-    $this->assertEquals("custom string", $check['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+    $this->assertSame("custom string", $check['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
   }
 
   /**
@@ -839,7 +839,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $check = $this->callAPISuccess('Membership', 'get', [
       'custom_' . $ids['custom_field_id'] => 'CRM-16036',
     ]);
-    $this->assertEquals(0, $check['count']);
+    $this->assertSame(0, $check['count']);
   }
 
   /**
@@ -882,8 +882,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       ],
       'checkPermissions' => FALSE,
     ])->indexBy('activity_id')->getArrayCopy();
-    $this->assertEquals(2, count($activities));
-    $activityNames = array_flip(CRM_Utils_Array::collect('activity_id.activity_type_id:label', $activities));
+    $this->assertSame(2, count($activities));
+    $activityNames = array_flip(array_column($activities, 'activity_id.activity_type_id:label'));
     $this->assertArrayHasKey('Membership Signup', $activityNames);
     $this->assertArrayHasKey('Change Membership Status', $activityNames);
 
@@ -1005,7 +1005,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'contact_id' => $this->_contactID,
     ]);
 
-    $this->assertEquals("new custom", $check['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
+    $this->assertSame("new custom", $check['values'][$result['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
     $this->callAPISuccess('Membership', 'Delete', [
       'id' => $check['id'],
     ]);
@@ -1150,8 +1150,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
     $this->assertEquals(date('Y-m-d'), $result['join_date']);
-    $this->assertEquals('2009-01-21', $result['start_date']);
-    $this->assertEquals('2009-12-21', $result['end_date']);
+    $this->assertSame('2009-01-21', $result['start_date']);
+    $this->assertSame('2009-12-21', $result['end_date']);
   }
 
   /**
@@ -1163,9 +1163,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->_params['membership_type_id'] = $this->_membershipTypeID2;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2009-01-21', $result['join_date']);
-    $this->assertEquals('2008-03-01', $result['start_date']);
-    $this->assertEquals('2009-12-21', $result['end_date']);
+    $this->assertSame('2009-01-21', $result['join_date']);
+    $this->assertSame('2008-03-01', $result['start_date']);
+    $this->assertSame('2009-12-21', $result['end_date']);
   }
 
   /**
@@ -1178,9 +1178,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->_params['membership_type_id'] = $this->_membershipTypeID2;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2009-01-21', $result['join_date']);
-    $this->assertEquals('2008-03-01', $result['start_date']);
-    $this->assertEquals('2010-02-28', $result['end_date']);
+    $this->assertSame('2009-01-21', $result['join_date']);
+    $this->assertSame('2008-03-01', $result['start_date']);
+    $this->assertSame('2010-02-28', $result['end_date']);
   }
 
   /**
@@ -1192,9 +1192,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->_params['membership_type_id'] = $this->_membershipTypeID2;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2009-01-21', $result['join_date']);
-    $this->assertEquals('2008-03-01', $result['start_date']);
-    $this->assertEquals('2014-02-28', $result['end_date']);
+    $this->assertSame('2009-01-21', $result['join_date']);
+    $this->assertSame('2008-03-01', $result['start_date']);
+    $this->assertSame('2014-02-28', $result['end_date']);
   }
 
   /**
@@ -1285,9 +1285,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2015-01-28', $result['join_date']);
-    $this->assertEquals('2015-01-01', $result['start_date']);
-    $this->assertEquals('2019-12-31', $result['end_date']);
+    $this->assertSame('2015-01-28', $result['join_date']);
+    $this->assertSame('2015-01-01', $result['start_date']);
+    $this->assertSame('2019-12-31', $result['end_date']);
   }
 
   /**
@@ -1315,9 +1315,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2015-01-28', $result['join_date']);
-    $this->assertEquals('2015-01-28', $result['start_date']);
-    $this->assertEquals('2019-12-31', $result['end_date']);
+    $this->assertSame('2015-01-28', $result['join_date']);
+    $this->assertSame('2015-01-28', $result['start_date']);
+    $this->assertSame('2019-12-31', $result['end_date']);
   }
 
   /**
@@ -1346,9 +1346,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2015-01-28', $result['join_date']);
-    $this->assertEquals('2015-01-01', $result['start_date']);
-    $this->assertEquals('2015-12-31', $result['end_date']);
+    $this->assertSame('2015-01-28', $result['join_date']);
+    $this->assertSame('2015-01-01', $result['start_date']);
+    $this->assertSame('2015-12-31', $result['end_date']);
   }
 
   /**
@@ -1376,9 +1376,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2015-01-28', $result['join_date']);
-    $this->assertEquals('2015-01-28', $result['start_date']);
-    $this->assertEquals('2015-12-31', $result['end_date']);
+    $this->assertSame('2015-01-28', $result['join_date']);
+    $this->assertSame('2015-01-28', $result['start_date']);
+    $this->assertSame('2015-12-31', $result['end_date']);
   }
 
   /**
@@ -1406,9 +1406,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2015-01-28', $result['join_date']);
-    $this->assertEquals('2015-01-28', $result['start_date']);
-    $this->assertEquals('2016-10-31', $result['end_date']);
+    $this->assertSame('2015-01-28', $result['join_date']);
+    $this->assertSame('2015-01-28', $result['start_date']);
+    $this->assertSame('2016-10-31', $result['end_date']);
   }
 
   /**
@@ -1437,9 +1437,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2015-01-28', $result['join_date']);
-    $this->assertEquals('2014-11-01', $result['start_date']);
-    $this->assertEquals('2016-10-31', $result['end_date']);
+    $this->assertSame('2015-01-28', $result['join_date']);
+    $this->assertSame('2014-11-01', $result['start_date']);
+    $this->assertSame('2016-10-31', $result['end_date']);
   }
 
   /**
@@ -1467,9 +1467,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2015-01-28', $result['join_date']);
-    $this->assertEquals('2015-01-28', $result['start_date']);
-    $this->assertEquals('2020-10-31', $result['end_date']);
+    $this->assertSame('2015-01-28', $result['join_date']);
+    $this->assertSame('2015-01-28', $result['start_date']);
+    $this->assertSame('2020-10-31', $result['end_date']);
   }
 
   /**
@@ -1499,9 +1499,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('Membership', 'create', array_merge($this->_params, $dates));
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2015-01-28', $result['join_date']);
-    $this->assertEquals('2014-11-01', $result['start_date']);
-    $this->assertEquals('2020-10-31', $result['end_date']);
+    $this->assertSame('2015-01-28', $result['join_date']);
+    $this->assertSame('2014-11-01', $result['start_date']);
+    $this->assertSame('2020-10-31', $result['end_date']);
   }
 
   /**
@@ -1511,9 +1511,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     unset($this->_params['start_date'], $this->_params['is_override']);
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2009-01-21', $result['join_date']);
-    $this->assertEquals('2009-01-21', $result['start_date']);
-    $this->assertEquals('2009-12-21', $result['end_date']);
+    $this->assertSame('2009-01-21', $result['join_date']);
+    $this->assertSame('2009-01-21', $result['start_date']);
+    $this->assertSame('2009-12-21', $result['end_date']);
   }
 
   /**
@@ -1525,9 +1525,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->_params['membership_type_id'] = $this->_membershipTypeID2;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2009-01-21', $result['join_date']);
-    $this->assertEquals('2008-03-01', $result['start_date']);
-    $this->assertEquals('2010-02-28', $result['end_date']);
+    $this->assertSame('2009-01-21', $result['join_date']);
+    $this->assertSame('2008-03-01', $result['start_date']);
+    $this->assertSame('2010-02-28', $result['end_date']);
   }
 
   /**
@@ -1539,9 +1539,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->_params['membership_type_id'] = $this->_membershipTypeID;
     $result = $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2009-01-21', $result['join_date']);
-    $this->assertEquals('2009-01-21', $result['start_date']);
-    $this->assertEquals('2010-01-20', $result['end_date']);
+    $this->assertSame('2009-01-21', $result['join_date']);
+    $this->assertSame('2009-01-21', $result['start_date']);
+    $this->assertSame('2010-01-20', $result['end_date']);
   }
 
   /**
@@ -1553,9 +1553,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->_params['id'] = $result['id'];
     $this->callAPISuccess('Membership', 'create', $this->_params);
     $result = $this->callAPISuccess('Membership', 'getsingle', ['id' => $result['id']]);
-    $this->assertEquals('2009-01-21', $result['join_date']);
-    $this->assertEquals('2009-01-21', $result['start_date']);
-    $this->assertEquals('2009-12-21', $result['end_date']);
+    $this->assertSame('2009-01-21', $result['join_date']);
+    $this->assertSame('2009-01-21', $result['start_date']);
+    $this->assertSame('2009-12-21', $result['end_date']);
 
   }
 
@@ -1586,9 +1586,9 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function testGetOptionsMembershipTypeID(): void {
     $options = $this->callAPISuccess('Membership', 'getoptions', ['field' => 'membership_type_id']);
-    $this->assertEquals('Another one', array_pop($options['values']));
-    $this->assertEquals('General', array_pop($options['values']));
-    $this->assertEquals(NULL, array_pop($options['values']));
+    $this->assertSame('Another one', array_pop($options['values']));
+    $this->assertSame('General', array_pop($options['values']));
+    $this->assertNull(array_pop($options['values']));
   }
 
   /**
@@ -1600,10 +1600,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($result['contact_id'], $this->_contactID);
     $this->assertEquals($this->getMembershipTypeID('General'), $result['membership_type_id']);
     $this->assertEquals($result['status_id'], $this->ids['MembershipStatus']['test']);
-    $this->assertEquals('2009-01-21', $result['join_date']);
-    $this->assertEquals('2009-01-21', $result['start_date']);
-    $this->assertEquals('2009-12-21', $result['end_date']);
-    $this->assertEquals('Payment', $result['source']);
+    $this->assertSame('2009-01-21', $result['join_date']);
+    $this->assertSame('2009-01-21', $result['start_date']);
+    $this->assertSame('2009-12-21', $result['end_date']);
+    $this->assertSame('Payment', $result['source']);
   }
 
   public function hook_custom($op, $groupID, $entityID, &$params) {

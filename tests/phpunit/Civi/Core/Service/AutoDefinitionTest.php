@@ -11,7 +11,10 @@
 
 namespace Civi\Core\Service;
 
+use Civi\Core\ClassScanner;
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Container;
+use Civi\Core\Event\GenericHookEvent;
 use Civi\Test\Invasive;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -31,6 +34,13 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->useTransaction();
+  }
+
+  protected function tearDown(): void {
+    \Civi::dispatcher()->removeListener('hook_civicrm_scanClasses', [$this, 'scanStandaloneEventListenerFixture']);
+    \Civi::dispatcher()->removeListener('hook_civicrm_scanClasses', [$this, 'scanFakeBaoEventListenerFixture']);
+    ClassScanner::cache('index')->flush();
+    parent::tearDown();
   }
 
   /**
@@ -183,7 +193,7 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
     $cacheWrapper = Invasive::get([$instance, 'cache']);
     $cacheClass = Invasive::get([$cacheWrapper, 'delegate']);
     $this->assertInstanceOf(\CRM_Utils_Cache_SqlGroup::class, $cacheClass);
-    $this->assertEquals('extension_browser', Invasive::get([$cacheWrapper, 'serviceName']));
+    $this->assertSame('extension_browser', Invasive::get([$cacheWrapper, 'serviceName']));
     $this->assertStringStartsWith('extension_browser/', Invasive::get([$cacheClass, 'group']));
   }
 
@@ -412,12 +422,91 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
     });
 
     $first = \Civi::service('TestTwoManualServices.1');
-    $this->assertEquals('first', $first->myName);
+    $this->assertSame('first', $first->myName);
     $this->assertInstanceOf(LoggerInterface::class, $first->log);
 
     $second = \Civi::service('TestTwoManualServices.2');
-    $this->assertEquals('second', $second->myName);
+    $this->assertSame('second', $second->myName);
     $this->assertInstanceOf(LoggerInterface::class, $second->log);
+  }
+
+  /**
+   * An AutoService using `#[CiviEventListener]` attributes on methods
+   * will automatically be tagged as `event_subscriber` and have its listeners registered.
+   */
+  public function testCiviEventListenerAttribute(): void {
+    $this->useExampleService(
+      /**
+       * @service TestCiviEventListener
+       */
+      new class() extends AutoService {
+
+        /**
+         * @var array
+         */
+        public array $log = [];
+
+        #[CiviEventListener(event: 'civi.test.attribute_event', priority: 100)]
+        public function onHighPriority(GenericHookEvent $e): void {
+          $this->log[] = 'onHighPriority';
+        }
+
+        #[CiviEventListener(event: '&hook_civicrm_alterContent')]
+        public function onHookStyle(&$content, $context, $tplName, &$object): void {
+          $content .= '[hookStyle]';
+        }
+
+        #[CiviEventListener(event: 'civi.test.attribute_event', priority: 50)]
+        public function onLowPriority(GenericHookEvent $e): void {
+          $this->log[] = 'onLowPriority';
+        }
+
+      }
+    );
+
+    \Civi::dispatcher()->dispatch('civi.test.attribute_event', GenericHookEvent::create([]));
+    $instance = \Civi::service('TestCiviEventListener');
+    $this->assertEquals(['onHighPriority', 'onLowPriority'], $instance->log);
+
+    $content = 'initial';
+    $object = NULL;
+    \CRM_Utils_Hook::alterContent($content, 'page', 'test.tpl', $object);
+    $this->assertSame('initial[hookStyle]', $content);
+  }
+
+  /**
+   * A standalone class (not extending AutoService or implementing HookInterface)
+   * discovered via ClassScanner with `#[CiviEventListener]` attributes will have both
+   * static and instance listeners automatically registered by EventScannerPass.
+   */
+  public function testStandaloneCiviEventListenerClass(): void {
+    StandaloneEventListenerFixture::$staticLog = [];
+    \Civi::dispatcher()->addListener('hook_civicrm_scanClasses', [$this, 'scanStandaloneEventListenerFixture']);
+    ClassScanner::cache('index')->flush();
+    $this->useCustomContainer(fn() => NULL);
+
+    \Civi::dispatcher()->dispatch('civi.test.standalone_event', GenericHookEvent::create([]));
+    $this->assertEquals(['onStaticEvent'], StandaloneEventListenerFixture::$staticLog);
+    $this->assertEquals(['onInstanceEvent'], \Civi::service(StandaloneEventListenerFixture::class)->instanceLog);
+  }
+
+  public function testBaoCiviEventListenerWithoutHookInterface(): void {
+    FakeBaoEventListenerFixture::$staticLog = [];
+    \Civi::dispatcher()->addListener('hook_civicrm_scanClasses', [$this, 'scanFakeBaoEventListenerFixture']);
+    ClassScanner::cache('index')->flush();
+    $this->useCustomContainer(fn() => NULL);
+
+    \Civi::dispatcher()->dispatch('civi.test.fake_bao_event', GenericHookEvent::create([]));
+    $this->assertEquals(['onBaoEvent'], FakeBaoEventListenerFixture::$staticLog);
+    $this->assertFalse(\Civi::container()->has(FakeBaoEventListenerFixture::class));
+  }
+
+  public function scanStandaloneEventListenerFixture(GenericHookEvent $event): void {
+    $event->classes[] = StandaloneEventListenerFixture::class;
+  }
+
+  public function scanFakeBaoEventListenerFixture(GenericHookEvent $event): void {
+    $event->classes[] = FakeBaoEventListenerFixture::class;
   }
 
   protected function useExampleService($exemplar) {
@@ -432,6 +521,44 @@ class AutoDefinitionTest extends \CiviUnitTestCase {
     $callback($container);
     $container->compile();
     Container::useContainer($container);
+  }
+
+}
+
+class StandaloneEventListenerFixture {
+
+  /**
+   * @var array
+   */
+  public static array $staticLog = [];
+
+  /**
+   * @var array
+   */
+  public array $instanceLog = [];
+
+  #[CiviEventListener(event: 'civi.test.standalone_event', priority: 100)]
+  public static function onStaticEvent(GenericHookEvent $e): void {
+    self::$staticLog[] = 'onStaticEvent';
+  }
+
+  #[CiviEventListener(event: 'civi.test.standalone_event', priority: 50)]
+  public function onInstanceEvent(GenericHookEvent $e): void {
+    $this->instanceLog[] = 'onInstanceEvent';
+  }
+
+}
+
+class FakeBaoEventListenerFixture extends \CRM_Core_DAO {
+
+  /**
+   * @var array
+   */
+  public static array $staticLog = [];
+
+  #[CiviEventListener(event: 'civi.test.fake_bao_event')]
+  public static function onBaoEvent(GenericHookEvent $e): void {
+    self::$staticLog[] = 'onBaoEvent';
   }
 
 }

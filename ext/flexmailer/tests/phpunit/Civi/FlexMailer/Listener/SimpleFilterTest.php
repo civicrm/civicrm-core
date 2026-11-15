@@ -44,7 +44,7 @@ class SimpleFilterTest extends \CiviUnitTestCase {
    */
   public function testByValue(): void {
     $test = $this;
-    list($tasks, $e) = $this->createExampleBatch();
+    [$tasks, $e] = $this->createExampleBatch();
 
     SimpleFilter::byValue($e, 'text', function ($value, $t, $e) use ($test) {
       $test->assertInstanceOf('Civi\FlexMailer\FlexMailerTask', $t);
@@ -53,8 +53,8 @@ class SimpleFilterTest extends \CiviUnitTestCase {
       return preg_replace('/more/', 'thoughtfully considered quantities of', $value);
     });
 
-    $this->assertEquals('eat thoughtfully considered quantities of cheese', $tasks[0]->getMailParam('text'));
-    $this->assertEquals('eat thoughtfully considered quantities of ice cream', $tasks[1]->getMailParam('text'));
+    $this->assertSame('eat thoughtfully considered quantities of cheese', $tasks[0]->getMailParam('text'));
+    $this->assertSame('eat thoughtfully considered quantities of ice cream', $tasks[1]->getMailParam('text'));
   }
 
   /**
@@ -62,18 +62,18 @@ class SimpleFilterTest extends \CiviUnitTestCase {
    */
   public function testByColumn(): void {
     $test = $this;
-    list($tasks, $e) = $this->createExampleBatch();
+    [$tasks, $e] = $this->createExampleBatch();
 
     SimpleFilter::byColumn($e, 'text', function ($values, $e) use ($test) {
       $test->assertInstanceOf('Civi\FlexMailer\Event\ComposeBatchEvent', $e);
-      $test->assertEquals('eat more cheese', $values[0]);
-      $test->assertEquals('eat more ice cream', $values[1]);
-      $test->assertEquals(2, count($values));
+      $test->assertSame('eat more cheese', $values[0]);
+      $test->assertSame('eat more ice cream', $values[1]);
+      $test->assertSame(2, count($values));
       return preg_replace('/more/', 'thoughtfully considered quantities of', $values);
     });
 
-    $this->assertEquals('eat thoughtfully considered quantities of cheese', $tasks[0]->getMailParam('text'));
-    $this->assertEquals('eat thoughtfully considered quantities of ice cream', $tasks[1]->getMailParam('text'));
+    $this->assertSame('eat thoughtfully considered quantities of cheese', $tasks[0]->getMailParam('text'));
+    $this->assertSame('eat thoughtfully considered quantities of ice cream', $tasks[1]->getMailParam('text'));
   }
 
   /**

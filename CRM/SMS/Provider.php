@@ -22,7 +22,7 @@ abstract class CRM_SMS_Provider {
    *
    * @var object
    */
-  static private $_singleton = [];
+  private static $_singleton = [];
   const MAX_SMS_CHAR = 460;
 
   /**

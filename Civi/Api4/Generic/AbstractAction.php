@@ -238,7 +238,7 @@ abstract class AbstractAction implements \ArrayAccess {
           return $this->$param;
 
         case 'set':
-          $this->$param = ReflectionUtils::castTypeSoftly($arguments[0], $this->getParamInfo()[$param] ?? []);
+          $this->$param = ReflectionUtils::castTypeSoftly($arguments[0], $this->getParamRules()[$param] ?? []);
           return $this;
       }
     }
@@ -326,6 +326,32 @@ abstract class AbstractAction implements \ArrayAccess {
       }
     }
     return $param ? $this->_paramInfo[$param] : $this->_paramInfo;
+  }
+
+  /**
+   * The type, required, deprecated and dynamicFieldControl flags of each param, as getParamInfo() reports them.
+   *
+   * Parsed once per class, without the descriptions, defaults and options getParamInfo() builds.
+   *
+   * @return array<string, array{type?: string[], required?: bool, deprecated?: bool, dynamicFieldControl?: bool}>
+   */
+  public function getParamRules(): array {
+    static $rules = [];
+    $class = static::class;
+    if (!isset($rules[$class])) {
+      $rules[$class] = [];
+      foreach ($this->reflect()->getProperties(\ReflectionProperty::IS_PROTECTED) as $property) {
+        $name = $property->getName();
+        if ($name != 'version' && $name[0] != '_') {
+          $docs = ReflectionUtils::getCodeDocs($property, 'Property');
+          if (!empty($docs['type']) && is_array($docs['type'])) {
+            $docs['type'] = array_diff($docs['type'], ['null']);
+          }
+          $rules[$class][$name] = array_intersect_key($docs, ['type' => 1, 'required' => 1, 'deprecated' => 1, 'dynamicFieldControl' => 1]);
+        }
+      }
+    }
+    return $rules[$class];
   }
 
   public function getUiParams(): array {
@@ -474,7 +500,7 @@ abstract class AbstractAction implements \ArrayAccess {
     $actionName = $actionName ?? $this->getActionName();
 
     $dynamicValues = [];
-    foreach ($this->getParamInfo() as $paramName => $info) {
+    foreach ($this->getParamRules() as $paramName => $info) {
       if (!empty($info['dynamicFieldControl']) && isset($this->$paramName)) {
         $dynamicValues[$paramName] = $this->$paramName;
       }
@@ -592,6 +618,28 @@ abstract class AbstractAction implements \ArrayAccess {
     foreach ($optionFields as $info) {
       $options = FormattingUtil::getPseudoconstantList($info['field'], $info['expr'], $record, 'create');
       $record[$info['name']] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
+      // An unrecognized value would otherwise be silently saved as NULL (or dropped from a multi-value field)
+      $unmatched = array_filter((array) $info['val'], fn($val) => $val !== NULL && $val !== '' && array_search($val, (array) $options) === FALSE);
+      if ($unmatched) {
+        throw new \CRM_Core_Exception(sprintf('Invalid value for %s: "%s"', $info['expr'], implode('", "', $unmatched)), 'invalid_pseudoconstant', ['field' => $info['name'], 'values' => array_values($unmatched)]);
+      }
+      // A value matching several options would otherwise be saved as whichever of them comes first.
+      // The enabled options are narrowed by site defaults, e.g. states to those of the default country.
+      $ambiguous = array_filter((array) $info['val'], fn($val) => $val !== NULL && $val !== '' && count(array_keys((array) $options, $val)) > 1);
+      if ($ambiguous) {
+        $enabled = FormattingUtil::getPseudoconstantList($info['field'], $info['expr'], $record, 'create', FALSE);
+        foreach ($ambiguous as $index => $val) {
+          $matches = array_keys($enabled, $val);
+          if (count($matches) === 1) {
+            $options = array_diff($options, [$val]) + [$matches[0] => $val];
+            unset($ambiguous[$index]);
+          }
+        }
+        if ($ambiguous) {
+          throw new \CRM_Core_Exception(sprintf('Ambiguous value for %s: "%s"', $info['expr'], implode('", "', $ambiguous)), 'ambiguous_pseudoconstant', ['field' => $info['name'], 'values' => array_values($ambiguous)]);
+        }
+        $record[$info['name']] = FormattingUtil::replacePseudoconstant($options, $info['val'], TRUE);
+      }
     }
     // The DAO works better with ints than booleans. See https://github.com/civicrm/civicrm-core/pull/23970
     if (CoreUtil::getInfoItem($this->getEntityName(), 'table_name')) {

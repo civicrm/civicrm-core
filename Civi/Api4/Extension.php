@@ -31,6 +31,33 @@ class Extension extends Generic\AbstractEntity {
 
   /**
    * @param bool $checkPermissions
+   * @return Action\Extension\Enable
+   */
+  public static function enable($checkPermissions = TRUE) {
+    return (new Action\Extension\Enable(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Extension\Disable
+   */
+  public static function disable($checkPermissions = TRUE) {
+    return (new Action\Extension\Disable(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
+   * @return Action\Extension\Uninstall
+   */
+  public static function uninstall($checkPermissions = TRUE) {
+    return (new Action\Extension\Uninstall(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
+  /**
+   * @param bool $checkPermissions
    * @return Generic\BasicGetFieldsAction
    */
   public static function getFields($checkPermissions = TRUE) {
@@ -104,6 +131,7 @@ class Extension extends Generic\AbstractEntity {
             \CRM_Extension_Manager::STATUS_INSTALLED => ts('Enabled'),
             \CRM_Extension_Manager::STATUS_DISABLED_MISSING => ts('Disabled (Missing)'),
             \CRM_Extension_Manager::STATUS_INSTALLED_MISSING => ts('Enabled (Missing)'),
+            \CRM_Extension_Manager::STATUS_UNKNOWN => ts('Unknown'),
           ],
         ],
       ];

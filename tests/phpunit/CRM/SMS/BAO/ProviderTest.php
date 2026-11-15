@@ -61,7 +61,7 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
     $values2 = ['title' => 'Test SMS Provider2', 'id' => $provider['id']];
     $this->callAPISuccess('SmsProvider', 'create', $values2);
     $provider = $this->callAPISuccess('SmsProvider', 'getsingle', ['id' => $provider['id']]);
-    $this->assertEquals('Test SMS Provider2', $provider['title']);
+    $this->assertSame('Test SMS Provider2', $provider['title']);
     $domain_id = CRM_Core_DAO::getFieldValue('CRM_SMS_DAO_SmsProvider', $provider['id'], 'domain_id');
     $this->assertNull($domain_id);
     CRM_SMS_BAO_SmsProvider::deleteRecord(['id' => $provider['id']]);
@@ -84,10 +84,10 @@ class CRM_SMS_BAO_ProviderTest extends CiviUnitTestCase {
     $this->createTestEntity('SmsProvider', $values, 1);
     $this->createTestEntity('SmsProvider', array_merge($values, ['domain_id' => 2]), 2);
     $result = CRM_SMS_BAO_SmsProvider::activeProviderCount();
-    $this->assertEquals(1, $result);
+    $this->assertSame(1, $result);
     $this->createTestEntity('SmsProvider', array_merge($values, ['domain_id' => 1]), 3);
     $result = CRM_SMS_BAO_SmsProvider::activeProviderCount();
-    $this->assertEquals(2, $result);
+    $this->assertSame(2, $result);
   }
 
   /**

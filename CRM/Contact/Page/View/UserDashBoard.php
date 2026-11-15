@@ -214,6 +214,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
           'url' => 'civicrm/contact/relatedcontact',
           'qs' => 'action=update&reset=1&cid=%%cbid%%&rcid=%%cid%%',
           'title' => ts('Edit Contact Information'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::UPDATE),
         ],
         CRM_Core_Action::VIEW => [
           'name' => ts('Dashboard'),
@@ -221,6 +222,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
           'class' => 'no-popup',
           'qs' => 'reset=1&id=%%cbid%%',
           'title' => ts('View Contact Dashboard'),
+          'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::VIEW),
         ],
       ];
 
@@ -232,6 +234,7 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
             'qs' => 'action=disable&reset=1&cid=%%cid%%&id=%%id%%&rtype=%%rtype%%&selectedChild=rel&context=dashboard',
             'extra' => 'onclick = "return confirm(\'' . $disableExtra . '\');"',
             'title' => ts('Disable Relationship'),
+            'weight' => CRM_Core_Action::getWeight(CRM_Core_Action::DISABLE),
           ],
         ];
       }

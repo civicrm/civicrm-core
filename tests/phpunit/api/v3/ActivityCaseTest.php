@@ -130,7 +130,7 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
       'case_id' => $this->_case['id'],
       'return' => ['case_id', 'case_id.subject'],
     ]);
-    $this->assertEquals('new case', $activities['values'][0]['case_id.subject']);
+    $this->assertSame('new case', $activities['values'][0]['case_id.subject']);
     // Note - case_id is always an array
     $this->assertEquals($this->_case['id'], $activities['values'][0]['case_id'][0]);
   }

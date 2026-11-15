@@ -1,5 +1,6 @@
 <?php
 
+use Civi\Api4\Country;
 use Civi\Test\Invasive;
 
 /**
@@ -149,14 +150,9 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
 
   public function testGetSiteStats(): void {
     // Create domain address so the domain country will come up in the stats.
-    $country_params = [
-      'sequential' => 1,
-      'options' => [
-        'limit' => 1,
-      ],
-    ];
-    $country_result = civicrm_api3('country', 'get', $country_params);
-    $country = $country_result['values'][0];
+    $country = Country::get(FALSE)
+      ->setLimit(1)
+      ->execute()->first();
 
     $domain_params = [
       'id' => CRM_Core_Config::domainID(),
@@ -166,14 +162,14 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
     $address_params = [
       'contact_id' => $domain_defaults['contact_id'],
       'location_type_id' => $location_type->id,
-      'is_primary' => '1',
-      'is_billing' => '0',
+      'is_primary' => TRUE,
+      'is_billing' => FALSE,
       'street_address' => '1 Main St.',
       'city' => 'Anywhere',
       'postal_code' => '99999',
       'country_id' => $country['id'],
     ];
-    $address_result = civicrm_api3('address', 'create', $address_params);
+    $this->createTestEntity('Address', $address_params);
 
     // Build stats and test them.
     $vc = new CRM_Utils_VersionCheck();
@@ -202,7 +198,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
       $this->assertIsArray($stats['extensions']);
 
       // Assert $stats['domain_isoCode'] is correct.
-      $this->assertEquals($country['iso_code'], $stats['domain_isoCode']);
+      $this->assertSame($country['iso_code'], $stats['domain_isoCode']);
 
       $entity_names = [];
       foreach ($stats['entities'] as $entity) {
@@ -236,7 +232,7 @@ class CRM_Utils_versionCheckTest extends CiviUnitTestCase {
       ];
       sort($entity_names);
       sort($expected_entity_names);
-      $this->assertEquals($expected_entity_names, $entity_names);
+      $this->assertSame($expected_entity_names, $entity_names);
 
       // TODO: Also test for enabled extensions.
     }

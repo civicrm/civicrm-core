@@ -26,6 +26,25 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     }
   }
 
+  public function testGetCaseActivityCountsAllActivitiesOnMiddlePage(): void {
+    $this->createLoggedInUser();
+    $caseID = $this->ids['Case']['fixture'];
+    civicrm_api3('Case', 'addtimeline', ['case_id' => $caseID, 'timeline' => 'standard_timeline']);
+    $contactID = (int) CRM_Core_DAO::singleValueQuery('SELECT contact_id FROM civicrm_case_contact WHERE case_id = %1', [1 => [$caseID, 'Integer']]);
+
+    $allParams = ['page' => 1, 'rp' => 100];
+    $all = CRM_Case_BAO_Case::getCaseActivity($caseID, $allParams, $contactID);
+    $activityCount = count($all['data']);
+    $this->assertGreaterThan(3, $activityCount);
+    $this->assertSame($activityCount, $all['recordsTotal']);
+
+    $pageParams = ['page' => 2, 'rp' => 2];
+    $page = CRM_Case_BAO_Case::getCaseActivity($caseID, $pageParams, $contactID);
+    $this->assertCount(2, $page['data']);
+    $this->assertSame($activityCount, $page['recordsTotal']);
+    $this->assertSame($activityCount, $page['recordsFiltered']);
+  }
+
   /**
    * Test that passing an invalid sort parameter (SQL injection payload) to getCases throws an exception.
    */
@@ -43,7 +62,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     CRM_Case_BAO_CaseContact::writeRecord($params);
 
     $recent = CRM_Utils_Recent::get();
-    $this->assertEquals('Mr. Anthony Anderson II - Housing Support', $recent[0]['title']);
+    $this->assertSame('Mr. Anthony Anderson II - Housing Support', $recent[0]['title']);
   }
 
   /**
@@ -143,7 +162,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
       'Roy, Darric',
       'Pitt, Adam',
     ];
-    $unsortedActualContactNames = CRM_Utils_Array::collect('sort_name', $cases);
+    $unsortedActualContactNames = array_column($cases, 'sort_name');
     foreach ($unsortedExpectedContactNames as $key => $name) {
       // Something has changed recently that has exposed one of the problems with queries that are not full-groupby-compliant. Temporarily commenting this out until figure out what to do since this exact query doesn't seem to come up anywhere on common screens.
       //$this->assertContains($name, $unsortedActualContactNames[$key]);
@@ -191,7 +210,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
       'Pitt, Adam',
       'Roy, Darric',
     ];
-    $sortedActualContactNames = CRM_Utils_Array::collect('sort_name', $cases);
+    $sortedActualContactNames = array_column($cases, 'sort_name');
     foreach ($sortedExpectedContactNames as $key => $name) {
       $this->assertStringContainsString($name, $sortedActualContactNames[$key]);
     }
@@ -224,7 +243,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
 
   public function testGetCaseType(): void {
     $caseTypeLabel = CRM_Case_BAO_Case::getCaseType($this->ids['Case']['fixture']);
-    $this->assertEquals('Housing Support', $caseTypeLabel);
+    $this->assertSame('Housing Support', $caseTypeLabel);
   }
 
   public function testRetrieveCaseIdsByContactId(): void {
@@ -320,7 +339,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
    */
   public function testGetCasesSummary(): void {
     $cases = CRM_Case_BAO_Case::getCasesSummary();
-    $this->assertEquals(1, $cases['rows']['Housing Support']['Ongoing']['count']);
+    $this->assertSame(1, $cases['rows']['Housing Support']['Ongoing']['count']);
   }
 
   /**
@@ -460,7 +479,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     ]);
     $activity = array_shift($result['values']);
 
-    $this->assertEquals($activity['subject'], 'Case status changed from Ongoing to Resolved');
+    $this->assertSame('Case status changed from Ongoing to Resolved', $activity['subject']);
     $this->assertEquals($activity['activity_date_time'], $now_date);
     $this->assertEquals($activity['status_id'], $completed_status);
 
@@ -490,7 +509,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
     $groupInfo = [];
     $groupContacts = CRM_Case_BAO_Case::getGlobalContacts($groupInfo);
-    $this->assertEquals(0, count($groupContacts));
+    $this->assertSame(0, count($groupContacts));
 
     //Verify if contact is returned correctly.
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [
@@ -499,7 +518,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     ];
     $groupInfo = [];
     $groupContacts = CRM_Case_BAO_Case::getGlobalContacts($groupInfo);
-    $this->assertEquals(1, count($groupContacts));
+    $this->assertSame(1, count($groupContacts));
     $this->assertEquals($caseResourceContactID, key($groupContacts));
   }
 
@@ -523,7 +542,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
     $caseType = array_shift($result['values']);
     $activityTypeName = $caseType['definition']['activityTypes'][1]['name'];
     // Sanity check to make sure we'll be testing what we think we're testing.
-    $this->assertEquals('Medical evaluation', $activityTypeName);
+    $this->assertSame('Medical evaluation', $activityTypeName);
 
     // Look up the activity type label - we need it later
     $result = $this->callAPISuccess('OptionValue', 'get', [
@@ -1293,7 +1312,7 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
       ->addWhere('id', '=', $caseObj->id)
       ->execute()->first();
     $this->assertEquals($this->caseTypeId, $caseResult['case_type_id']);
-    $this->assertEquals('Case Subject', $caseResult['subject']);
+    $this->assertSame('Case Subject', $caseResult['subject']);
     $caseContact = \Civi\Api4\CaseContact::get(TRUE)
       ->addWhere('case_id', '=', $caseObj->id)
       ->execute()->first();
@@ -1370,8 +1389,8 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
       'subject' => 'backdated',
       'case_id' => $this->ids['Case']['form-created'],
     ]);
-    $this->assertEquals(0, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'upcoming'], 'dashboard', TRUE));
-    $this->assertEquals(1, CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'recent'], 'dashboard', TRUE));
+    $this->assertSame('0', CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'upcoming'], 'dashboard', TRUE));
+    $this->assertSame('1', CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'recent'], 'dashboard', TRUE));
   }
 
   private function countCaseActivities(int $caseId, int $activityId): int {
@@ -1403,8 +1422,8 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
       ->execute()
       ->first();
 
-    $this->assertEquals(0, $this->countCaseActivities($firstCase->id, $activity['id']));
-    $this->assertEquals(0, $this->countCaseActivities($secondCase->id, $activity['id']));
+    $this->assertSame(0, $this->countCaseActivities($firstCase->id, $activity['id']));
+    $this->assertSame(0, $this->countCaseActivities($secondCase->id, $activity['id']));
 
     // Link the activity to the first case
     \Civi\Api4\Activity::update(FALSE)
@@ -1412,8 +1431,8 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
       ->addValue('case_id', $firstCase->id)
       ->execute();
 
-    $this->assertEquals(1, $this->countCaseActivities($firstCase->id, $activity['id']));
-    $this->assertEquals(0, $this->countCaseActivities($secondCase->id, $activity['id']));
+    $this->assertSame(1, $this->countCaseActivities($firstCase->id, $activity['id']));
+    $this->assertSame(0, $this->countCaseActivities($secondCase->id, $activity['id']));
 
     // Link the activity to the first case again
     \Civi\Api4\Activity::update(FALSE)
@@ -1421,8 +1440,8 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
       ->addValue('case_id', $firstCase->id)
       ->execute();
 
-    $this->assertEquals(1, $this->countCaseActivities($firstCase->id, $activity['id']));
-    $this->assertEquals(0, $this->countCaseActivities($secondCase->id, $activity['id']));
+    $this->assertSame(1, $this->countCaseActivities($firstCase->id, $activity['id']));
+    $this->assertSame(0, $this->countCaseActivities($secondCase->id, $activity['id']));
 
     // Link the activity to the second case
     \Civi\Api4\Activity::update(FALSE)
@@ -1430,8 +1449,8 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
       ->addValue('case_id', $secondCase->id)
       ->execute();
 
-    $this->assertEquals(0, $this->countCaseActivities($firstCase->id, $activity['id']));
-    $this->assertEquals(1, $this->countCaseActivities($secondCase->id, $activity['id']));
+    $this->assertSame(0, $this->countCaseActivities($firstCase->id, $activity['id']));
+    $this->assertSame(1, $this->countCaseActivities($secondCase->id, $activity['id']));
 
     // Unset the case_id of the activity
     \Civi\Api4\Activity::update(FALSE)
@@ -1439,8 +1458,8 @@ class CRM_Case_BAO_CaseTest extends CiviCaseTestCase {
       ->addValue('case_id', NULL)
       ->execute();
 
-    $this->assertEquals(0, $this->countCaseActivities($firstCase->id, $activity['id']));
-    $this->assertEquals(0, $this->countCaseActivities($secondCase->id, $activity['id']));
+    $this->assertSame(0, $this->countCaseActivities($firstCase->id, $activity['id']));
+    $this->assertSame(0, $this->countCaseActivities($secondCase->id, $activity['id']));
   }
 
 }

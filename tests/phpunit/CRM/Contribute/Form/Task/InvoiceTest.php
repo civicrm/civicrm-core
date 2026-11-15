@@ -51,7 +51,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
       'state_province_id' => 'Maine',
       'supplemental_address_1' => 'Back Alley',
       'supplemental_address_2' => 'Left corner',
-      'postal_code' => 90990,
+      'postal_code' => '90990',
       'city' => 'Auckland',
       'country_id' => 'US',
     ]);
@@ -192,7 +192,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
   public function testThatInvoiceShowsTheActualContributionCurrencyInsteadOfTheDefaultOne(): void {
     $this->setDefaultCurrency('USD');
     $contactID = Domain::get()->addSelect('contact_id')->execute()->first()['contact_id'];
-    Address::create()->setValues(['contact_id' => $contactID, 'city' => 'Beverley Hills', 'state_province_id:label' => 'California', 'country_id:label' => 'United States', 'postal_code' => 90210])->execute();
+    Address::create()->setValues(['contact_id' => $contactID, 'city' => 'Beverley Hills', 'state_province_id:label' => 'California', 'country_id:label' => 'United States', 'postal_code' => '90210'])->execute();
     Civi::cache('metadata')->clear();
     $this->_individualId = $this->individualCreate();
 
@@ -224,14 +224,14 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
   public function testInvoiceContactFields(): void {
     $this->swapMessageTemplateForTestTemplate('contribution_invoice_receipt');
     $contactID = $this->individualCreate([
-      'postal_code' => 2345,
+      'postal_code' => '2345',
       'street_address' => 'on my street',
       'supplemental_address_1' => 'and more detail',
       'supplemental_address_2' => 'and more',
       'stateProvinceAbbreviation' => 'ME',
       'city' => 'Baltimore',
       'country' => 'US',
-      'external_identifier' => 2345,
+      'external_identifier' => '2345',
     ]);
     $params = [
       'output' => 'pdf_invoice',

@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\Navigation;
+
 /**
  * Class CRM_Core_BAO_NavigationTest.
  * @group headless
@@ -21,12 +23,13 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    */
   public function testCreateMissingReportMenuItemLink(): void {
     $reportCount = $this->getCountReportInstances();
-    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_navigation WHERE url LIKE 'civicrm/report/instance/1?reset=1%'");
+    $reportInstanceID = $this->getFirstReportInstanceID();
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_navigation WHERE url LIKE 'civicrm/report/instance/{$reportInstanceID}?reset=1%'");
     $this->assertEquals($reportCount - 1, $this->getCountReportInstances());
     CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
 
     $this->assertEquals($reportCount, $this->getCountReportInstances());
-    $url = 'civicrm/report/instance/1';
+    $url = 'civicrm/report/instance/' . $reportInstanceID;
     $url_params = 'reset=1';
     $new_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params);
     $this->assertNotNull($new_nav->id);
@@ -56,12 +59,23 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    * by rebuilding reports.
    */
   public function testNoDuplicateAllReportsLink(): void {
-    $existing_links = $this->callAPISuccess('Navigation', 'get', ['label' => 'All Reports', 'sequential' => 1]);
-    $this->assertNotEquals($existing_links['values'][0]['parent_id'], $existing_links['values'][1]['parent_id']);
+    $existing_links = $this->getAllReportsParentIDs();
+    $this->assertCount(2, $existing_links);
+    $this->assertNotSame($existing_links[0], $existing_links[1]);
     CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
-    $new_links = $this->callAPISuccess('Navigation', 'get', ['label' => 'All Reports', 'sequential' => 1]);
-    $this->assertEquals($existing_links['values'][0]['parent_id'], $new_links['values'][0]['parent_id']);
-    $this->assertEquals($existing_links['values'][1]['parent_id'], $new_links['values'][1]['parent_id']);
+    $new_links = $this->getAllReportsParentIDs();
+    $this->assertSame($existing_links[0], $new_links[0]);
+    $this->assertSame($existing_links[1], $new_links[1]);
+  }
+
+  /**
+   * Get the parent ids of the 'All Reports' navigation items, ordered by id.
+   */
+  private function getAllReportsParentIDs(): array {
+    return Navigation::get(FALSE)
+      ->addWhere('label', '=', 'All Reports')
+      ->addOrderBy('id')
+      ->execute()->column('parent_id');
   }
 
   /**
@@ -70,19 +84,21 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    * Function tests CRM_Core_BAO_Navigation::rebuildReportsNavigation.
    */
   public function testUpdateExistingReportMenuLink(): void {
-    $url = 'civicrm/report/instance/1';
+    $url = 'civicrm/report/instance/' . $this->getFirstReportInstanceID();
     $url_params = 'reset=1';
     $existing_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params);
 
     $this->assertNotEquals(FALSE, $existing_nav);
-    $existing_nav->parent_id = 1;
+    // Move it under some other menu item.
+    $otherParentID = (int) CRM_Core_DAO::singleValueQuery('SELECT MIN(id) FROM civicrm_navigation WHERE domain_id = %1', [1 => [CRM_Core_Config::domainID(), 'Positive']]);
+    $existing_nav->parent_id = $otherParentID;
     $existing_nav->save();
     CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
     $parent_url = 'civicrm/report/list';
     $parent_url_params = 'compid=99&reset=1';
     $reportsMenu = CRM_Core_BAO_Navigation::createOrUpdateTopLevelReportsNavItem(CRM_Core_Config::domainID());
     $parent_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($parent_url, $parent_url_params, $reportsMenu->id);
-    $this->assertNotEquals($parent_nav->id, 1);
+    $this->assertNotEquals($parent_nav->id, $otherParentID);
     $changed_existing_nav = new CRM_Core_BAO_Navigation();
     $changed_existing_nav->id = $existing_nav->id;
     $changed_existing_nav->find(TRUE);
@@ -145,6 +161,16 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    *
    * @return int
    */
+
+  /**
+   * Get the id of the first report instance of the current domain.
+   *
+   * @return int
+   */
+  private function getFirstReportInstanceID(): int {
+    return (int) CRM_Core_DAO::singleValueQuery('SELECT MIN(id) FROM civicrm_report_instance WHERE domain_id = %1', [1 => [CRM_Core_Config::domainID(), 'Positive']]);
+  }
+
   protected function getCountReportInstances() {
     return CRM_Core_DAO::singleValueQuery(
       "SELECT count(*) FROM civicrm_navigation WHERE url LIKE 'civicrm/report/instance/%'");
@@ -188,10 +214,10 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $output = $input;
     CRM_Core_BAO_Navigation::fixNavigationMenu($output);
 
-    $this->assertEquals(NULL, $output[10]['attributes']['parentID']);
-    $this->assertEquals(10, $output[10]['attributes']['navID']);
-    $this->assertEquals(10, $output[10]['child'][11]['attributes']['parentID']);
-    $this->assertEquals(11, $output[10]['child'][11]['attributes']['navID']);
+    $this->assertNull($output[10]['attributes']['parentID']);
+    $this->assertSame(10, $output[10]['attributes']['navID']);
+    $this->assertSame(10, $output[10]['child'][11]['attributes']['parentID']);
+    $this->assertSame(11, $output[10]['child'][11]['attributes']['navID']);
   }
 
   /**
@@ -226,17 +252,17 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $output = $input;
     CRM_Core_BAO_Navigation::fixNavigationMenu($output);
 
-    $this->assertEquals('Custom Menu Entry', $output[10]['attributes']['label']);
-    $this->assertEquals(NULL, $output[10]['attributes']['parentID']);
-    $this->assertEquals(10, $output[10]['attributes']['navID']);
+    $this->assertSame('Custom Menu Entry', $output[10]['attributes']['label']);
+    $this->assertNull($output[10]['attributes']['parentID']);
+    $this->assertSame(10, $output[10]['attributes']['navID']);
 
-    $this->assertEquals('Custom Child Menu', $output[10]['child'][101]['attributes']['label']);
-    $this->assertEquals(10, $output[10]['child'][101]['attributes']['parentID']);
-    $this->assertEquals(101, $output[10]['child'][101]['attributes']['navID']);
+    $this->assertSame('Custom Child Menu', $output[10]['child'][101]['attributes']['label']);
+    $this->assertSame(10, $output[10]['child'][101]['attributes']['parentID']);
+    $this->assertSame(101, $output[10]['child'][101]['attributes']['navID']);
 
-    $this->assertEquals('Custom Child Menu 2', $output[10]['child'][100]['attributes']['label']);
-    $this->assertEquals(10, $output[10]['child'][100]['attributes']['parentID']);
-    $this->assertEquals(100, $output[10]['child'][100]['attributes']['navID']);
+    $this->assertSame('Custom Child Menu 2', $output[10]['child'][100]['attributes']['label']);
+    $this->assertSame(10, $output[10]['child'][100]['attributes']['parentID']);
+    $this->assertSame(100, $output[10]['child'][100]['attributes']['navID']);
   }
 
   public function testFixNavigationMenu_inferIDs_deep(): void {
@@ -268,17 +294,17 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $output = $input;
     CRM_Core_BAO_Navigation::fixNavigationMenu($output);
 
-    $this->assertEquals('Custom Menu Entry', $output[10]['attributes']['label']);
-    $this->assertEquals(NULL, $output[10]['attributes']['parentID']);
-    $this->assertEquals(10, $output[10]['attributes']['navID']);
+    $this->assertSame('Custom Menu Entry', $output[10]['attributes']['label']);
+    $this->assertNull($output[10]['attributes']['parentID']);
+    $this->assertSame(10, $output[10]['attributes']['navID']);
 
-    $this->assertEquals('Custom Child Menu', $output[10]['child'][101]['attributes']['label']);
-    $this->assertEquals(10, $output[10]['child'][101]['attributes']['parentID']);
-    $this->assertEquals(101, $output[10]['child'][101]['attributes']['navID']);
+    $this->assertSame('Custom Child Menu', $output[10]['child'][101]['attributes']['label']);
+    $this->assertSame(10, $output[10]['child'][101]['attributes']['parentID']);
+    $this->assertSame(101, $output[10]['child'][101]['attributes']['navID']);
 
-    $this->assertEquals('Custom Child Menu 2', $output[10]['child'][101]['child'][100]['attributes']['label']);
-    $this->assertEquals(101, $output[10]['child'][101]['child'][100]['attributes']['parentID']);
-    $this->assertEquals(100, $output[10]['child'][101]['child'][100]['attributes']['navID']);
+    $this->assertSame('Custom Child Menu 2', $output[10]['child'][101]['child'][100]['attributes']['label']);
+    $this->assertSame(101, $output[10]['child'][101]['child'][100]['attributes']['parentID']);
+    $this->assertSame(100, $output[10]['child'][101]['child'][100]['attributes']['navID']);
   }
 
   /**

@@ -46,8 +46,8 @@ class AfformSubmitUsageTest extends AfformUsageTestCase {
       ->execute()
       ->indexBy('name');
     $this->assertCount(1, $prefill['Individual1']['values']);
-    $this->assertEquals('One', $prefill['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEquals('Person', $prefill['Individual1']['values'][0]['fields']['last_name']);
+    $this->assertSame('One', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertSame('Person', $prefill['Individual1']['values'][0]['fields']['last_name']);
 
     // Submit with empty first_name: should not hit a validation error because DisplayOnly fields cannot be required
     $submission = [
@@ -239,7 +239,7 @@ EOHTML;
     }
     catch (\CRM_Core_Exception $e) {
     }
-    $this->assertEquals('Email is a required field.', $e->getMessage());
+    $this->assertSame('Email is a required field.', $e->getMessage());
   }
 
   /**
@@ -289,7 +289,7 @@ EOHTML;
       ->addWhere('id', '=', $contactId)
       ->addSelect('birth_date')
       ->execute()->single()['birth_date'];
-    $this->assertEquals('2020-08-01', $birthDate);
+    $this->assertSame('2020-08-01', $birthDate);
   }
 
   /**
@@ -323,7 +323,7 @@ EOHTML;
       $this->fail('Should have thrown exception');
     }
     catch (\Civi\Core\Exception\DBQueryException $e) {
-      $this->assertEquals('Simulated database failure', $e->getMessage());
+      $this->assertSame('Simulated database failure', $e->getMessage());
     }
     $this->assertCount(0, \Civi\Api4\Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute());
 
@@ -443,7 +443,7 @@ EOHTML;
       ->execute()
       ->first();
 
-    $this->assertEquals('bob@example.com', $victimEmail['email']);
+    $this->assertSame('bob@example.com', $victimEmail['email']);
     $this->assertEquals($otherContact['id'], $victimEmail['contact_id']);
   }
 
@@ -496,7 +496,7 @@ EOHTML;
 
     $this->assertNotEmpty($savedDraft);
     $this->assertArrayNotHasKey('first_name', $savedDraft['data']['Individual1'][0]['fields']);
-    $this->assertEquals('DraftModifiedLast', $savedDraft['data']['Individual1'][0]['fields']['last_name']);
+    $this->assertSame('DraftModifiedLast', $savedDraft['data']['Individual1'][0]['fields']['last_name']);
 
     // 2. An admin modifies the display-only field in the database
     Contact::update(FALSE)
@@ -512,8 +512,8 @@ EOHTML;
       ->execute()
       ->indexBy('name');
 
-    $this->assertEquals('AdminUpdatedFirst', $prefill['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEquals('DraftModifiedLast', $prefill['Individual1']['values'][0]['fields']['last_name']);
+    $this->assertSame('AdminUpdatedFirst', $prefill['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertSame('DraftModifiedLast', $prefill['Individual1']['values'][0]['fields']['last_name']);
 
     // 4. Verify Fix 2: Even if an existing draft in DB contains a display-only field (e.g. empty string),
     // prefill should ignore the display-only value from the draft.
@@ -538,8 +538,8 @@ EOHTML;
       ->execute()
       ->indexBy('name');
 
-    $this->assertEquals('AdminUpdatedFirst', $prefillLegacy['Individual1']['values'][0]['fields']['first_name']);
-    $this->assertEquals('LegacyDraftLast', $prefillLegacy['Individual1']['values'][0]['fields']['last_name']);
+    $this->assertSame('AdminUpdatedFirst', $prefillLegacy['Individual1']['values'][0]['fields']['first_name']);
+    $this->assertSame('LegacyDraftLast', $prefillLegacy['Individual1']['values'][0]['fields']['last_name']);
   }
 
 }

@@ -463,7 +463,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
           $join_date = $row['civicrm_membership_join_date_start'] ?? NULL;
           $displayInterval = $row['civicrm_membership_join_date_interval'] ?? NULL;
           if ($join_date) {
-            list($year, $month) = explode('-', $join_date);
+            [$year, $month] = explode('-', $join_date);
           }
           if (!empty($row['civicrm_membership_join_date_subtotal'])) {
 
@@ -543,7 +543,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
         $endDate = new DateTime($dateStart);
         $dateEnd = [];
 
-        list($dateEnd['Y'], $dateEnd['M'], $dateEnd['d']) = explode(':', $endDate->format('Y:m:d'));
+        [$dateEnd['Y'], $dateEnd['M'], $dateEnd['d']] = explode(':', $endDate->format('Y:m:d'));
 
         switch (strtolower($this->_params['group_bys_freq']['join_date'])) {
           case 'month':

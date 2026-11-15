@@ -39,18 +39,18 @@ class GetLinksTest extends Api4TestBase implements TransactionalInterface {
       ->addWhere('api_action', '=', 'create')
       ->setExpandMultiple(TRUE)
       ->execute()->indexBy('path');
-    $this->assertEquals('Add Individual', $links['civicrm/contact/add?reset=1&ct=Individual']['text']);
-    $this->assertEquals('fa-user', $links['civicrm/contact/add?reset=1&ct=Individual']['icon']);
-    $this->assertEquals('Add Organization', $links['civicrm/contact/add?reset=1&ct=Organization']['text']);
-    $this->assertEquals('Add Household', $links['civicrm/contact/add?reset=1&ct=Household']['text']);
+    $this->assertSame('Add Individual', $links['civicrm/contact/add?reset=1&ct=Individual']['text']);
+    $this->assertSame('fa-user', $links['civicrm/contact/add?reset=1&ct=Individual']['icon']);
+    $this->assertSame('Add Organization', $links['civicrm/contact/add?reset=1&ct=Organization']['text']);
+    $this->assertSame('Add Household', $links['civicrm/contact/add?reset=1&ct=Household']['text']);
     $this->assertEquals(['contact_type' => 'Household'], $links['civicrm/contact/add?reset=1&ct=Household']['api_values']);
 
     $links = Contact::getLinks(FALSE)
       ->addWhere('ui_action', 'IN', ['view', 'update', 'delete'])
       ->execute()->indexBy('ui_action');
-    $this->assertEquals('', $links['view']['target']);
-    $this->assertEquals('', $links['update']['target']);
-    $this->assertEquals('crm-popup', $links['delete']['target']);
+    $this->assertSame('', $links['view']['target']);
+    $this->assertSame('', $links['update']['target']);
+    $this->assertSame('crm-popup', $links['delete']['target']);
   }
 
   public function testIndividualLinks(): void {
@@ -75,11 +75,11 @@ class GetLinksTest extends Api4TestBase implements TransactionalInterface {
       ->setExpandMultiple(TRUE)
       ->execute();
     $this->assertStringContainsString('ct=Individual', $links[0]['path']);
-    $this->assertEquals('Add Individual', $links[0]['text']);
-    $this->assertEquals(0, $links[0]['weight']);
+    $this->assertSame('Add Individual', $links[0]['text']);
+    $this->assertSame(0, $links[0]['weight']);
     $this->assertNull($links[0]['api_values']);
     $links = $links->indexBy('text');
-    $this->assertEquals('fa-squirrel', $links['Add Squirrel']['icon']);
+    $this->assertSame('fa-squirrel', $links['Add Squirrel']['icon']);
     $this->assertGreaterThan($links['Add Rabbit']['weight'], $links['Add Squirrel']['weight']);
     $this->assertGreaterThan($links['Add Chipmunk']['weight'], $links['Add Rabbit']['weight']);
     $this->assertStringContainsString('ct=Individual', $links['Add Squirrel']['path']);
@@ -97,7 +97,7 @@ class GetLinksTest extends Api4TestBase implements TransactionalInterface {
       ->execute()->indexBy('ui_action');
     $this->assertGreaterThan(1, $links->count());
     foreach ($links as $link) {
-      $this->assertEquals('Relationship', $link['entity']);
+      $this->assertSame('Relationship', $link['entity']);
     }
     $this->assertStringContainsString('id=1', $links['view']['path']);
     $this->assertStringContainsString('id=1', $links['update']['path']);

@@ -14,22 +14,13 @@ namespace Civi\Api4\Service\Links;
 
 use Civi\API\Event\RespondEvent;
 use Civi\Api4\Utils\CoreUtil;
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 
-/**
- * @service
- * @internal
- */
-class ContactLinksProvider extends \Civi\Core\Service\AutoSubscriber {
+class ContactLinksProvider {
   use LinksProviderTrait;
 
-  public static function getSubscribedEvents(): array {
-    return [
-      'civi.api4.getLinks' => 'alterContactLinks',
-      'civi.api.respond' => 'alterContactLinksResult',
-    ];
-  }
-
+  #[CiviEventListener(event: 'civi.api4.getLinks')]
   public static function alterContactLinks(GenericHookEvent $e): void {
     if (CoreUtil::isContact($e->entity)) {
       foreach ($e->links as $index => $link) {
@@ -41,6 +32,7 @@ class ContactLinksProvider extends \Civi\Core\Service\AutoSubscriber {
     }
   }
 
+  #[CiviEventListener(event: 'civi.api.respond')]
   public static function alterContactLinksResult(RespondEvent $e): void {
     $request = $e->getApiRequest();
     if ($request['version'] == 4 && is_a($request, '\Civi\Api4\Action\GetLinks') && CoreUtil::isContact($request->getEntityName())) {

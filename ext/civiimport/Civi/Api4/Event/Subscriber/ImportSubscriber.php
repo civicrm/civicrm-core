@@ -7,6 +7,7 @@
  */
 namespace Civi\Api4\Event\Subscriber;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi;
 use Civi\API\Event\AuthorizeEvent;
 use Civi\API\Events;
@@ -22,7 +23,6 @@ use Civi\Core\Event\PreEvent;
 use Civi\Core\Service\AutoService;
 use CRM_Core_DAO_AllCoreTables;
 use Civi\Api4\Import;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Civi\API\Exception\UnauthorizedException;
 use CRM_Civiimport_ExtensionUtil as E;
 
@@ -31,23 +31,7 @@ use CRM_Civiimport_ExtensionUtil as E;
  *
  * @service civi.api4.importSubscriber
  */
-class ImportSubscriber extends AutoService implements EventSubscriberInterface {
-
-  /**
-   * Get the events this class listens to.
-   *
-   * @return string[]
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      'hook_civicrm_post' => 'on_hook_civicrm_post',
-      'hook_civicrm_pre' => 'on_hook_civicrm_pre',
-      'civi.api4.entityTypes' => 'on_civi_api4_entityTypes',
-      'civi.api.authorize' => [['onApiAuthorize', Events::W_EARLY]],
-      'api.schema_map.build' => 'on_schema_map_build',
-      'civi.import.bundledActions' => 'getBundledActions',
-    ];
-  }
+class ImportSubscriber extends AutoService {
 
   /**
    * Register each valid import as an entity
@@ -56,6 +40,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
    *
    * @noinspection PhpUnused
    */
+  #[CiviEventListener(event: 'civi.api4.entityTypes')]
   public static function on_civi_api4_entityTypes(GenericHookEvent $event): void {
     $importEntities = Civi\BAO\Import::getImportTables();
     foreach ($importEntities as $userJobID => $table) {
@@ -82,6 +67,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
    *
    * @param \Civi\Api4\Event\SchemaMapBuildEvent $event
    */
+  #[CiviEventListener(event: 'api.schema_map.build')]
   public static function on_schema_map_build(SchemaMapBuildEvent $event): void {
     $schema = $event->getSchemaMap();
     $importEntities = Civi\BAO\Import::getImportTables();
@@ -104,6 +90,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
    *
    * @noinspection PhpUnused
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre')]
   public function on_hook_civicrm_pre(PreEvent $event): void {
     if ($event->entity === 'UserJob' && $event->action === 'edit') {
       if ($this->isTableChange($event)) {
@@ -133,6 +120,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
   /**
    * Callback for hook_civicrm_post().
    */
+  #[CiviEventListener(event: 'hook_civicrm_post')]
   public function on_hook_civicrm_post(PostEvent $event): void {
     if ($event->entity === 'UserJob') {
       if ($event->action === 'delete' || ($this->getImportTableFromEvent($event) && !$this->ImportEntityExists($event))) {
@@ -167,6 +155,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
    * @throws \Civi\API\Exception\UnauthorizedException
    * @noinspection PhpUnused
    */
+  #[CiviEventListener(event: 'civi.api.authorize', priority: Events::W_EARLY)]
   public function onApiAuthorize(AuthorizeEvent $event): void {
     $apiRequest = $event->getApiRequest();
     $entity = $apiRequest['entity'];
@@ -217,6 +206,7 @@ class ImportSubscriber extends AutoService implements EventSubscriberInterface {
       ->count();
   }
 
+  #[CiviEventListener(event: 'civi.import.bundledActions')]
   public function getBundledActions(GenericHookEvent $event): void {
     // for now we check permissions so this always runs as the logged in user ....
     // Tags, send workflow messages are also ones that could be added..

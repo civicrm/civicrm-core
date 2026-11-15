@@ -51,24 +51,24 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
       ->addValue('contact_type', 'Individual')
       ->execute()->first()['id'];
 
-    $jobLogID = civicrm_api3('JobLog', 'create', [
+    $jobLogID = $this->createTestEntity('JobLog', [
       'name' => 'test',
-      'domain_id' => 1,
+      'domain_id' => CRM_Core_Config::domainID(),
     ])['id'];
     $params = ['id' => $jobLogID, 'version' => 3, 'sequential' => 1, 'check_permissions' => 0];
     $args = ['civicrm', 'JobLog', 'get'];
 
     // Check we can load the email without checking perms.
-    $r = civicrm_api('JobLog', 'get', $params);
-    $this->assertEquals(1, $r['count']);
+    $r = $this->callApiV3Success('JobLog', 'get', $params);
+    $this->assertSame(1, $r['count']);
 
     // Check we can still load it with checking permission (because we allow it in hook)
-    $r = civicrm_api('JobLog', 'get', ['check_permissions' => 1] + $params);
-    $this->assertEquals(1, $r['count']);
+    $r = $this->callApiV3Success('JobLog', 'get', ['check_permissions' => 1] + $params);
+    $this->assertSame(1, $r['count']);
 
     // Now check we can load it via the rest endpoint which should enforce permissions.
     $output = CRM_Utils_REST::process($args, $params);
-    $this->assertEquals(1, $output['count']);
+    $this->assertSame(1, $output['count']);
 
     // Now add a chain, naughtily passing in a check_permissions
     // We do not have permission to access this contact.
@@ -78,20 +78,20 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
       'return' => 'display_name',
     ];
     $output = CRM_Utils_REST::process($args, $params);
-    $this->assertEquals($jobLogID, $output['id']);
+    $this->assertSame($jobLogID, $output['id']);
     $chain = $output['values'][0]['api.contact.get'];
-    $this->assertEquals(0, $chain['count'], "Vulnerable.");
+    $this->assertSame(0, $chain['count'], "Vulnerable.");
 
     // There is a different codepath when the chained api call is an array
     // (This is designed for multiple chained create/delete calls, but
     // we can just use get for testing.)
     $params['api.contact.get'] = [$params['api.contact.get']];
     $output = CRM_Utils_REST::process($args, $params);
-    $this->assertEquals($jobLogID, $output['id']);
+    $this->assertSame($jobLogID, $output['id']);
     $chainResult = $output['values'][0]['api.contact.get'];
     $this->assertIsArray($chainResult);
     $this->assertCount(1, $chainResult);
-    $this->assertEquals(0, $chainResult[0]['count'], "Vulnerable.");
+    $this->assertSame(0, $chainResult[0]['count'], "Vulnerable.");
 
     // Try create call AND using different api chain syntax.
     unset($params['api.contact.get']);
@@ -99,8 +99,8 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
       ['contact_type' => 'Individual', 'display_name' => 'Sad Face', 'check_permissions' => 0],
     ];
     $output = CRM_Utils_REST::process($args, $params);
-    $this->assertEquals(1, $output['is_error']);
-    $this->assertEquals('unauthorized', $output['error_code']);
+    $this->assertSame(1, $output['is_error']);
+    $this->assertSame('unauthorized', $output['error_code']);
 
     // Test that a nested chain is also forced to use permissions.
     unset($params['api_contact_create']);
@@ -114,12 +114,12 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
       ],
     ];
     $output = CRM_Utils_REST::process($args, $params);
-    $this->assertEquals($jobLogID, $output['id']);
+    $this->assertSame($jobLogID, $output['id']);
     $chain = $output['values'][0]['api.job_log.get'];
-    $this->assertEquals(1, $chain['count'], "Expected the first chain to work.");
+    $this->assertSame(1, $chain['count'], "Expected the first chain to work.");
     // Check the inner contact.get returned nothing
     $chain = $chain['values'][0]['api.contact.get'];
-    $this->assertEquals(0, $chain['count'], "Vulnerable.");
+    $this->assertSame(0, $chain['count'], "Vulnerable.");
   }
 
   /**

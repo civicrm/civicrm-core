@@ -1,12 +1,14 @@
 <?php
+use Civi\Core\Attribute\CiviEventListener;
+
 /*
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC. All rights reserved.                        |
- |                                                                    |
- | This work is published under the GNU AGPLv3 license with some      |
- | permitted exceptions and without any warranty. For full license    |
- | and copyright information, see https://civicrm.org/licensing       |
- +--------------------------------------------------------------------+
++--------------------------------------------------------------------+
+| Copyright CiviCRM LLC. All rights reserved.                        |
+|                                                                    |
+| This work is published under the GNU AGPLv3 license with some      |
+| permitted exceptions and without any warranty. For full license    |
+| and copyright information, see https://civicrm.org/licensing       |
++--------------------------------------------------------------------+
  */
 
 /**
@@ -14,7 +16,7 @@
  * @package CRM
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
-class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAccount implements \Civi\Core\HookInterface {
+class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAccount {
 
   /**
    * Retrieve DB object and copy to defaults array.
@@ -58,6 +60,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @param \Civi\Core\Event\PreEvent $event
    * @throws CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'hook_civicrm_pre::{self}')]
   public static function self_hook_civicrm_pre(\Civi\Core\Event\PreEvent $event) {
     if ($event->action === 'delete') {
       // Check dependencies before deleting
@@ -101,6 +104,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * Callback for hook_civicrm_post().
    * @param \Civi\Core\Event\PostEvent $event
    */
+  #[CiviEventListener(event: 'hook_civicrm_post::{self}')]
   public static function self_hook_civicrm_post(\Civi\Core\Event\PostEvent $event) {
     CRM_Core_PseudoConstant::flush();
     Civi::cache('metadata')->clear();
@@ -232,9 +236,8 @@ WHERE cft.id = %1
    *
    */
   public static function getfinancialAccountRelations($flip = FALSE) {
-    $params = ['labelColumn' => 'name'];
-    $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
-    $accountRelationships = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', $params);
+    $financialAccountType = array_column(\Civi::entity('FinancialAccount')->getOptions('financial_account_type_id') ?? [], 'name', 'id');
+    $accountRelationships = array_column(\Civi::entity('EntityFinancialAccount')->getOptions('account_relationship') ?? [], 'name', 'id');
     $Links = [
       'Expense Account is' => 'Expenses',
       'Accounts Receivable Account is' => 'Asset',
@@ -295,8 +298,7 @@ WHERE ce.entity_table = 'civicrm_financial_type' AND ce.account_relationship = %
 INNER JOIN civicrm_financial_item fi ON fi.financial_account_id = f.id
 WHERE f.id = %1 AND f.financial_account_type_id IN (%2)
 LIMIT 1";
-    $params = ['labelColumn' => 'name'];
-    $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id', $params);
+    $financialAccountType = array_column(\Civi::entity('FinancialAccount')->getOptions('financial_account_type_id') ?? [], 'name', 'id');
     $params = [
       1 => [$financialAccountId, 'Integer'],
       2 => [

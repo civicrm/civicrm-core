@@ -24,7 +24,7 @@
   cursor: pointer;
 }
 
-#bootstrap-theme crm-entity-tags li .form-inline input[type=color] {
+#bootstrap-theme crm-entity-tags li .form-inline input[type="color"] {
   width: 30px;
   padding: 2px 4px;
 }

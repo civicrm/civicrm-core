@@ -6,6 +6,19 @@ if (!CRM_Core_Component::isEnabled('CiviMail')) {
   return [];
 }
 
+// The oauth-client extension supplies the field which names the connected client.
+$hasOAuth = CRM_Extension_System::singleton()->getManager()->getStatus('oauth-client') === CRM_Extension_Manager::STATUS_INSTALLED;
+$oauthSelect = $hasOAuth ? ['oauth_client_id:label'] : [];
+$oauthColumns = $hasOAuth ? [
+  [
+    'type' => 'field',
+    'key' => 'oauth_client_id:label',
+    'label' => E::ts('Connection'),
+    'sortable' => TRUE,
+    'empty_value' => E::ts('Password'),
+  ],
+] : [];
+
 // This SearchDisplay shows an editable-in-place field for Enabled? for all rows, including the bounce processing mail account, which cannot actually be disabled (you can change it to No, but it won't actually be disabled). So this is FIXME for when we can set rows to edit-in-place conditionally.
 return [
   [
@@ -24,7 +37,7 @@ return [
         'api_entity' => 'MailSettings',
         'api_params' => [
           'version' => 4,
-          'select' => [
+          'select' => array_merge([
             'name',
             'server',
             'username',
@@ -35,7 +48,7 @@ return [
             'source',
             'is_ssl',
             'is_default',
-          ],
+          ], $oauthSelect),
           'orderBy' => [],
           'where' => [
             ['domain_id:name', '=', 'current_domain'],
@@ -135,6 +148,7 @@ return [
               'sortable' => TRUE,
               'editable' => TRUE,
             ],
+            ...$oauthColumns,
             [
               'type' => 'html',
               'key' => 'is_default',

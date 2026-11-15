@@ -11,7 +11,7 @@
     {if $primaryParticipantProfile}
         <div class="crm-group participant_info-group">
       <div class="header-dark">{if $addParticipantProfile}{ts}Participant 1{/ts}{else}{ts}Participant Information{/ts}{/if}</div>
-            {if $primaryParticipantProfile.CustomPre}
+            {if array_key_exists('CustomPre', $primaryParticipantProfile) && $primaryParticipantProfile.CustomPre}
               {assign var="hasValue" value=false}
               {foreach from=$primaryParticipantProfile.CustomPre item=value key=field}
                 {if $value !== ''}
@@ -73,7 +73,7 @@
                 <div class="header-dark">
                     {ts 1=$participantNo}Participant %1{/ts}
                 </div>
-            {if $participant.additionalCustomPre}
+            {if array_key_exists('additionalCustomPre', $participant) && $participant.additionalCustomPre}
               {assign var="hasValue" value=false}
               {foreach from=$participant.additionalCustomPre item=value}
                 {if $value !== ''}
@@ -99,7 +99,7 @@
               {/if}
             {/if}
 
-            {if $participant.additionalCustomPost}
+            {if array_key_exists('additionalCustomPost', $participant) && $participant.additionalCustomPost}
               {foreach from=$participant.additionalCustomPost item=fieldValues key=field}
                 {assign var="hasValue" value=false}
                 {foreach from=$fieldValues item=value}

@@ -28,8 +28,8 @@ class CRM_Queue_ErrorPolicyTest extends CiviUnitTestCase {
       $this->fail('Expected the error to be reported');
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
-      $this->assertEquals(1, $e->errorData['is_error']);
-      $this->assertEquals(0, $e->errorData['is_continue']);
+      $this->assertSame(1, $e->errorData['is_error']);
+      $this->assertSame(0, $e->errorData['is_continue']);
       $this->assertStringContainsString('Ruh-roh', $e->errorData['exception']);
     }
     $this->assertSame($handler, set_error_handler(NULL));

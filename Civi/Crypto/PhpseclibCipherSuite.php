@@ -139,7 +139,7 @@ class PhpseclibCipherSuite implements CipherSuiteInterface {
    *   The concatenation of IV, ciphertext, signature
    */
   protected function encryptThenSign($plainText, $suite, $digest, $masterKey) {
-    list ($encKey, $authKey) = $this->createEncAuthKeys($masterKey);
+    [$encKey, $authKey] = $this->createEncAuthKeys($masterKey);
     $cipher = $this->createCipher($suite, $encKey);
     $blockBytes = $cipher->getBlockLength() >> 3;
     $iv = random_bytes($blockBytes);
@@ -168,7 +168,7 @@ class PhpseclibCipherSuite implements CipherSuiteInterface {
    *   Throws an exception if authentication fails.
    */
   protected function authenticateThenDecrypt($cipherText, $suite, $digest, $masterKey) {
-    list ($encKey, $authKey) = $this->createEncAuthKeys($masterKey);
+    [$encKey, $authKey] = $this->createEncAuthKeys($masterKey);
     $cipher = $this->createCipher($suite, $encKey);
     $blockBytes = $cipher->getBlockLength() >> 3;
     $digestBytes = $this->getDigestBytes($digest);

@@ -36,10 +36,10 @@ class StateTest extends \PHPUnit\Framework\TestCase implements
       'ttl' => 5 * 60 * 60,
     ]);
     $state = \Civi::service('oauth2.state')->load($stateId);
-    $this->assertEquals(123, $state['clientId']);
-    $this->assertEquals('OAuthSysToken', $state['storage']);
+    $this->assertSame(123, $state['clientId']);
+    $this->assertSame('OAuthSysToken', $state['storage']);
     // PHPUnit runs in CLI... so any state we generate is attached to wildcard session.
-    $this->assertEquals(OAuthState::SESSION_WILDCARD, $state['session']);
+    $this->assertSame(OAuthState::SESSION_WILDCARD, $state['session']);
 
     \CRM_Utils_Time::setTime('2025-11-02 06:01:00');
     try {
@@ -69,15 +69,15 @@ class StateTest extends \PHPUnit\Framework\TestCase implements
       'breakfast' => 'green eggs',
     ]);
     $state = \Civi::service('oauth2.state')->load($stateId);
-    $this->assertEquals(123, $state['clientId']);
-    $this->assertEquals('green eggs', $state['breakfast']);
+    $this->assertSame(123, $state['clientId']);
+    $this->assertSame('green eggs', $state['breakfast']);
 
     $state['breakfast'] = 'green eggs and ham';
     \Civi::service('oauth2.state')->store($state, $stateId);
 
     $state2 = \Civi::service('oauth2.state')->load($stateId);
-    $this->assertEquals(123, $state2['clientId']);
-    $this->assertEquals('green eggs and ham', $state2['breakfast']);
+    $this->assertSame(123, $state2['clientId']);
+    $this->assertSame('green eggs and ham', $state2['breakfast']);
   }
 
 }

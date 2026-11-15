@@ -149,8 +149,8 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Core_Form {
       // hidden field to catch the field id in profile
       $this->add('hidden', 'account_type_id', $this->_id);
     }
-    $params['orderColumn'] = 'label';
-    $AccountTypeRelationship = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship', $params);
+    $AccountTypeRelationship = array_column(\Civi::entity('EntityFinancialAccount')->getOptions('account_relationship') ?? [], 'label', 'id');
+    asort($AccountTypeRelationship);
     if (!empty($AccountTypeRelationship)) {
       $element = $this->add('select',
         'account_relationship',

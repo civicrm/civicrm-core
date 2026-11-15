@@ -64,7 +64,7 @@ class CRM_Oembed_Page_OembedDiscoveryTest extends \PHPUnit\Framework\TestCase im
     $pageUrl = $this->getExampleUrl();
 
     $response = $this->client->sendRequest(new Request('GET', (string) $pageUrl));
-    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertSame(200, $response->getStatusCode());
     $responseBody = (string) $response->getBody();
     $doc = \phpQuery::newDocument($responseBody, 'text/html');
 
@@ -78,7 +78,7 @@ class CRM_Oembed_Page_OembedDiscoveryTest extends \PHPUnit\Framework\TestCase im
   public function testShare_default() {
     $shareUrl = $this->getShareUrl();
     $response = $this->client->sendRequest(new Request('GET', (string) $shareUrl));
-    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertSame(200, $response->getStatusCode());
     $responseBody = (string) $response->getBody();
     $doc = \phpQuery::newDocument($responseBody, 'text/html');
 
@@ -93,7 +93,7 @@ class CRM_Oembed_Page_OembedDiscoveryTest extends \PHPUnit\Framework\TestCase im
     $shareUrl = $this->getShareUrl(['maxwidth' => 1024, 'maxheight' => 768]);
 
     $response = $this->client->sendRequest(new Request('GET', (string) $shareUrl));
-    $this->assertEquals(200, $response->getStatusCode());
+    $this->assertSame(200, $response->getStatusCode());
     $responseBody = (string) $response->getBody();
     $doc = \phpQuery::newDocument($responseBody, 'text/html');
 

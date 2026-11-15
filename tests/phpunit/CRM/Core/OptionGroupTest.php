@@ -150,7 +150,7 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
     $testValue = array_search('"Test User" <test_this_domain@example.com>', $optionGroups);
     $result = CRM_Core_OptionGroup::values('from_email_address', FALSE, FALSE, FALSE, " AND value = $testValue");
     $this->assertCount(1, $result);
-    $this->assertEquals('"Test User" <test_this_domain@example.com>', $result[$testValue]);
+    $this->assertSame('"Test User" <test_this_domain@example.com>', $result[$testValue]);
 
     // Test the getDefaultValue function which goes through the same adapter
     $defaultValue = array_search('"Test User" <default_for_domain@example.com>', $optionGroups);

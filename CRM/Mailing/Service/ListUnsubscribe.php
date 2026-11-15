@@ -1,12 +1,14 @@
 <?php
 
+use Civi\Core\Attribute\CiviEventListener;
+
 /**
  * Apply a full range of `List-Unsubscribe` header options.
  *
  * @service civi.mailing.listUnsubscribe
  * @link https://datatracker.ietf.org/doc/html/rfc8058
  */
-class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService implements \Symfony\Component\EventDispatcher\EventSubscriberInterface {
+class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService {
 
   private ?string $urlFlags = NULL;
 
@@ -25,15 +27,10 @@ class CRM_Mailing_Service_ListUnsubscribe extends \Civi\Core\Service\AutoService
     ];
   }
 
-  public static function getSubscribedEvents(): array {
-    return [
-      '&hook_civicrm_alterMailParams' => ['alterMailParams', 1000],
-    ];
-  }
-
   /**
    * @see \CRM_Utils_Hook::alterMailParams()
    */
+  #[CiviEventListener(event: '&hook_civicrm_alterMailParams', priority: 1000)]
   public function alterMailParams(&$params, $context = NULL): void {
     // SMS messages don't have List-Unsubscribe, so bail early.
     if (!array_key_exists('List-Unsubscribe', $params)) {

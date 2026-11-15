@@ -26,7 +26,7 @@ class CRM_Core_Permission_GenericTest extends CiviUnitTestCase {
    */
   public function testAlwaysDenyPermission($providerClass) {
     $provider = new $providerClass();
-    $this->assertEquals(FALSE, $provider->check(CRM_Core_Permission::ALWAYS_DENY_PERMISSION));
+    $this->assertFalse($provider->check(CRM_Core_Permission::ALWAYS_DENY_PERMISSION));
   }
 
   /**
@@ -35,7 +35,7 @@ class CRM_Core_Permission_GenericTest extends CiviUnitTestCase {
    */
   public function testAlwaysAllowPermission($providerClass) {
     $provider = new $providerClass();
-    $this->assertEquals(TRUE, $provider->check(CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION));
+    $this->assertTrue($provider->check(CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION));
   }
 
 }

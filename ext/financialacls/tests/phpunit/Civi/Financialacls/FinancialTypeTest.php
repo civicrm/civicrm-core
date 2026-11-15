@@ -31,7 +31,7 @@ class FinancialTypeTest extends BaseTestClass {
     $financialTypeMessages = array_filter($statusMessages, function ($msg) {
         return str_starts_with($msg['text'], 'Changing the name of a Financial Type');
     });
-    $this->assertEquals(1, count($financialTypeMessages));
+    $this->assertSame(1, count($financialTypeMessages));
   }
 
   /**
@@ -144,7 +144,7 @@ class FinancialTypeTest extends BaseTestClass {
       $this->fail('Missed expected exception');
     }
     catch (\CRM_Core_Exception $e) {
-      $this->assertEquals('You do not have permission to access this page.', $e->getMessage());
+      $this->assertSame('You do not have permission to access this page.', $e->getMessage());
     }
 
     $this->setPermissions([

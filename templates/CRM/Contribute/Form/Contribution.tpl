@@ -282,8 +282,6 @@
               <td class="label">{$form.pcp_made_through_id.label}</td>
               <td>
                 {$form.pcp_made_through_id.html} &nbsp;
-                <div class="description">{ts}Search for the Personal Campaign Page by the fund-raiser's last name or email address.{/ts}</div>
-
                 <div class="spacer"></div>
                 <div class="crm-contribution-form-block-pcp_details">
                   <table class="crm-contribution-form-table-credit_to_pcp">
@@ -306,7 +304,6 @@
           </table>
         </div>
       </details>
-      {include file="CRM/Contribute/Form/PCP.js.tpl"}
     {/if}
     <!-- end of PCP -->
 

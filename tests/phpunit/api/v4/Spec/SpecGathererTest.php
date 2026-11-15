@@ -19,15 +19,17 @@
 
 namespace api\v4\Spec;
 
+use Civi\Api4\Contact;
 use Civi\Api4\Service\Spec\FieldSpec;
 use Civi\Api4\Service\Spec\Provider\Generic\SpecProviderInterface;
+use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\Service\Spec\SpecGatherer;
 use Civi\Api4\Utils\CoreUtil;
 use api\v4\Traits\OptionCleanupTrait;
 use api\v4\Api4TestBase;
 use api\v4\Traits\TableDropperTrait;
+use Civi\Core\Locale;
 use Civi\Test\Invasive;
-use Prophecy\Argument;
 
 /**
  * @group headless
@@ -36,6 +38,13 @@ class SpecGathererTest extends Api4TestBase {
 
   use TableDropperTrait;
   use OptionCleanupTrait;
+
+  private ?Locale $originalLocale = NULL;
+
+  public function tearDown(): void {
+    $this->originalLocale?->apply();
+    parent::tearDown();
+  }
 
   public function testBasicFieldsGathering(): void {
     $gatherer = new SpecGatherer();
@@ -51,19 +60,42 @@ class SpecGathererTest extends Api4TestBase {
   public function testWithSpecProvider(): void {
     $gather = new SpecGatherer();
 
-    $provider = $this->prophesize(SpecProviderInterface::class);
-    $provider->applies('Contact', 'create')->willReturn(TRUE);
-    $provider->modifySpec(Argument::any())->will(function ($args) {
-      /** @var \Civi\Api4\Service\Spec\RequestSpec $spec */
-      $spec = $args[0];
-      $spec->addFieldSpec(new FieldSpec('foo', 'Contact'));
+    $gather->addSpecProvider(new class implements SpecProviderInterface {
+
+      public function modifySpec(RequestSpec $spec): void {
+        $spec->addFieldSpec(new FieldSpec('foo', 'Contact'));
+      }
+
+      public function applies(string $entity, string $action): bool {
+        return $entity === 'Contact' && $action === 'create';
+      }
+
     });
-    $gather->addSpecProvider($provider->reveal());
 
     $spec = Invasive::call([$gather, 'getSpec'], ['Contact', 'create']);
     $fieldNames = $spec->getFieldNames();
 
     $this->assertContains('foo', $fieldNames);
+  }
+
+  public function testFieldTitlesFollowTheActiveLocale(): void {
+    $this->createTestRecord('WordReplacement', [
+      'find_word' => 'Contact ID',
+      'replace_word' => 'Kontakt-ID',
+      'match_type' => 'exactMatch',
+      'language' => 'de_DE',
+    ]);
+    $this->originalLocale = Locale::detect();
+    $idTitle = fn(): string => Contact::getFields(FALSE)
+      ->addWhere('name', '=', 'id')
+      ->execute()
+      ->single()['title'];
+
+    // Built directly: negotiate() falls back to en_US on a site without a de_DE translation.
+    (new Locale(['nominal' => 'de_DE', 'ts' => 'de_DE', 'moneyFormat' => 'de_DE']))->apply();
+    $this->assertSame('Kontakt-ID', $idTitle());
+    Locale::negotiate('en_US')->apply();
+    $this->assertSame('Contact ID', $idTitle());
   }
 
 }

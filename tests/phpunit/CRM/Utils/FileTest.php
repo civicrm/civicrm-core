@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Api4\OptionValue;
+
 /**
  * Class CRM_Utils_FileTest
  * @group headless
@@ -7,7 +9,10 @@
 class CRM_Utils_FileTest extends CiviUnitTestCase {
 
   public function tearDown(): void {
-    $this->callAPISuccess('OptionValue', 'get', ['option_group_id' => 'safe_file_extension', 'value' => 17, 'api.option_value.delete' => ['id' => "\$value.id"]]);
+    OptionValue::delete(FALSE)
+      ->addWhere('option_group_id:name', '=', 'safe_file_extension')
+      ->addWhere('value', '=', 17)
+      ->execute();
     parent::tearDown();
   }
 
@@ -88,7 +93,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $newFile = CRM_Utils_File::duplicate("/tmp/$fileName");
     $this->assertNotEquals("/tmp/$fileName", $newFile);
     $contents = file_get_contents($newFile);
-    $this->assertEquals('test file content', $contents);
+    $this->assertSame('test file content', $contents);
     unlink("/tmp/$fileName");
     unlink($newFile);
   }
@@ -96,14 +101,14 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   public function testCreateDir() {
     foreach ([TRUE, FALSE, 'exception'] as $abortMode) {
       $validNewPath = sys_get_temp_dir() . '/testCreateDir-' . uniqid();
-      $this->assertEquals(TRUE, CRM_Utils_File::createDir($validNewPath, $abortMode), 'Should create directory');
+      $this->assertTrue(CRM_Utils_File::createDir($validNewPath, $abortMode), 'Should create directory');
       $this->assertTrue(is_dir($validNewPath));
       @rmdir($validNewPath);
     }
 
     foreach ([TRUE, FALSE, 'exception'] as $abortMode) {
       $existingPath = __DIR__;
-      $this->assertEquals(NULL, CRM_Utils_File::createDir($existingPath, $abortMode), 'Does not need to create directory');
+      $this->assertNull(CRM_Utils_File::createDir($existingPath, $abortMode), 'Does not need to create directory');
     }
   }
 
@@ -112,7 +117,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $this->assertFalse(is_dir($invalidPath));
 
     // If $abort=FALSE, then it simply returns outcome.
-    $this->assertEquals(FALSE, CRM_Utils_File::createDir($invalidPath, FALSE));
+    $this->assertFalse(CRM_Utils_File::createDir($invalidPath, FALSE));
     $this->assertFalse(is_dir($invalidPath));
 
     // If $abort='exception', then it raises a normal exception.
@@ -399,9 +404,9 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     // Therefore, we have to do that part of the test in a sub-process.
     // If you run directly in the same-process, then (eg) `phpunit` will have trouble writing error-data to JUnit XML files.
     [$exitCode, $stdout, $stderr] = $this->runStaticMethodAsScript(__CLASS__, 'doIsDirWithOpenBasedir', [$a_dir, $open_base_dirs, $input, $expected]);
-    $this->assertEquals('"OK"', trim($stdout), 'doIsDirWithOpenBasedir() should return OK');
-    $this->assertEquals('', trim($stderr), 'doIsDirWithOpenBasedir() should not generate warnings');
-    $this->assertEquals(0, $exitCode, 'doIsDirWithOpenBasedir() should exit normally');
+    $this->assertSame('"OK"', trim($stdout), 'doIsDirWithOpenBasedir() should return OK');
+    $this->assertSame('', trim($stderr), 'doIsDirWithOpenBasedir() should not generate warnings');
+    $this->assertSame(0, $exitCode, 'doIsDirWithOpenBasedir() should exit normally');
 
     unlink("{$a_dir}/isDirTest/ok/ok.txt");
     rmdir("{$a_dir}/isDirTest/ok");
@@ -718,15 +723,15 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * @dataProvider safeFileExtensionExamples
    */
   public function testSafeFileExtensionValidation($extension, $standardInstallCheck, $afterModificationCheck): void {
-    $this->assertEquals($standardInstallCheck, CRM_Utils_File::isExtensionSafe($extension));
-    $optionValue = $this->callAPISuccess('OptionValue', 'create', [
-      'option_group_id' => 'safe_file_extension',
+    $this->assertSame($standardInstallCheck, CRM_Utils_File::isExtensionSafe($extension));
+    $this->createTestEntity('OptionValue', [
+      'option_group_id:name' => 'safe_file_extension',
       'label' => $extension,
       'name' => $extension,
       'value' => 17,
     ]);
     unset(Civi::$statics['CRM_Utils_File']['file_extensions']);
-    $this->assertEquals($standardInstallCheck, CRM_Utils_File::isExtensionSafe($extension));
+    $this->assertSame($afterModificationCheck, CRM_Utils_File::isExtensionSafe($extension));
   }
 
   public function testCleanDir(): void {

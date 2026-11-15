@@ -47,7 +47,7 @@ class MockDateRangeSearchBrowserTest extends Civi\Test\MinkBase {
 
     $lowDate = $this->assertSession()->elementExists('css', 'af-field[name=created_date] input.crm-form-date');
     $lowDate->setValue('01/01/2020');
-    $this->assertEquals('01/01/2020', $lowDate->getValue());
+    $this->assertSame('01/01/2020', $lowDate->getValue());
     $this->assertSession()->elementExists('css', 'button.af-button[type=reset]')->click();
     $this->assertTrue($session->wait(5000, 'document.querySelector("af-field[name=created_date] input.crm-form-date").value === ""'), 'Reset clears the date');
     $this->assertTimeInputs(0, 2);

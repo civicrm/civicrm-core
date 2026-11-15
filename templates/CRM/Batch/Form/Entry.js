@@ -54,36 +54,6 @@ CRM.$(function($) {
     }
   });
 
-  // Could be replaced if there ever is a PCP API.
-  // See templates/CRM/Contribute/Form/PCP.js.tpl
-  var pcpURL = CRM.url('civicrm/ajax/pcp/list', 'json=1&context=contact&reset=1');
-  $('input[name^="pcp_made_through_id"]').each(function() {
-    // Figure out the name of the corresponding pcp_made_through[X] field
-    var thisMadeThroughName = $(this).attr('name').replace('through_id', 'through');
-    $(this).crmSelect2({
-      minimumInputLength: 1,
-      ajax: {
-        url: pcpURL,
-        data: function(term, page) {
-          return {term: term, page_num: page};
-        },
-        results: function(response) {
-          return response;
-        }
-      },
-      initSelection: function(el, callback) {
-        callback({id: $(el).val(), text: $('[name="'+thisMadeThroughName+'"]').val()});
-      }
-    })
-      // This is just a cheap trick to store the name when the form reloads
-      .on('change', function() {
-        var fieldNameVal = $(this).select2('data');
-        if (!fieldNameVal) {
-          fieldNameVal = '';
-        }
-        $('[name="'+thisMadeThroughName+'"]').val(fieldNameVal.text);
-      });
-  });
 
   function showHidePCPRoll() {
     $(this).parents('.crm-grid-cell').children('.pcp_roll_display').toggle($(this).prop('checked'));
@@ -143,16 +113,24 @@ CRM.$(function($) {
 
 function setPaymentBlock(form, memType) {
   var rowID = form.closest('div.crm-grid-row').attr('entity_id');
-  var dataUrl = CRM.url('civicrm/ajax/memType');
 
   if (!memType) {
     memType = cj('select[id="field_' + rowID + '_membership_type_1"]').val();
   }
 
-  cj.post(dataUrl, {mtype: memType}, function (data) {
-    cj('#field_' + rowID + '_financial_type').val(data.financial_type_id);
-    cj('#field_' + rowID + '_total_amount').val(data.total_amount).change();
-  }, 'json');
+  if (!memType) {
+    cj('#field_' + rowID + '_financial_type').val('');
+    cj('#field_' + rowID + '_total_amount').val('').change();
+    return;
+  }
+
+  CRM.api4('MembershipType', 'get', {
+    select: ['financial_type_id', 'minimum_fee'],
+    where: [['id', '=', memType]]
+  }, 0).then((membershipType) => {
+    cj('#field_' + rowID + '_financial_type').val(membershipType.financial_type_id || '');
+    cj('#field_' + rowID + '_total_amount').val(CRM.formatMoney(membershipType.minimum_fee ?? 0, true)).change();
+  });
 }
 
 function hideSendReceipt() {
@@ -414,13 +392,22 @@ function updateContactInfo(blockNo, prefix) {
 
 function setPledgeAmount(form, pledgeID) {
   var rowID = form.closest('div.crm-grid-row').attr('entity_id');
-  var dataUrl = CRM.url('civicrm/ajax/pledgeAmount');
   if (pledgeID) {
-    cj.post(dataUrl, {pid: pledgeID}, function (data) {
-      cj('#field_' + rowID + '_financial_type').val(data.financial_type_id).change();
-      cj('#field_' + rowID + '_total_amount').val(data.amount).change();
-      cj('#field_' + rowID + '_total_amount').attr('readonly', true);
-    }, 'json');
+    CRM.api4('PledgePayment', 'get', {
+      select: ['scheduled_amount', 'pledge_id.financial_type_id'],
+      where: [
+        ['pledge_id', '=', pledgeID],
+        ['status_id:name', 'IN', ['Pending', 'Overdue']],
+      ],
+      orderBy: {scheduled_date: 'ASC'},
+      limit: 1,
+    }).then((payments) => {
+      if (payments.length) {
+        cj('#field_' + rowID + '_financial_type').val(payments[0]['pledge_id.financial_type_id']).change();
+        cj('#field_' + rowID + '_total_amount').val(payments[0].scheduled_amount).change();
+        cj('#field_' + rowID + '_total_amount').attr('readonly', true);
+      }
+    });
   }
   else {
     cj('#field_' + rowID + '_total_amount').val('').change();

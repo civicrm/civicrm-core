@@ -11,6 +11,7 @@
 
 namespace Civi\Authx;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Event\GenericHookEvent;
 use GuzzleHttp\Psr7\Response;
 
@@ -26,6 +27,7 @@ use GuzzleHttp\Psr7\Response;
  */
 class LegacyRestAuthenticator extends Authenticator {
 
+  #[CiviEventListener(event: 'civi.invoke.auth')]
   public function on_civi_invoke_auth(GenericHookEvent $e) {
     // Accept legacy auth (?key=...&api_key=...) for 'civicrm/ajax/rest' and 'civicrm/ajax/api4/*'.
     // The use of `?key=` could clash on some endpoints. Only accept on a small list of endpoints that are compatible with it.

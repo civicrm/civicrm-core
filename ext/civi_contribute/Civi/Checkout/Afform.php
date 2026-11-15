@@ -2,41 +2,24 @@
 
 namespace Civi\Checkout;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Afform\Event\AfformSubmitEvent;
 use Civi\Afform\Event\AfformValidateEvent;
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Service\AutoService;
 use CRM_Contribute_ExtensionUtil as E;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Handle afform integration with Checkout
  *
  * @service civi.checkout.afform
  */
-class Afform extends AutoService implements EventSubscriberInterface {
+class Afform extends AutoService {
 
   public const NO_PAYMENT_PROCESSING = '_none_';
 
   public function isActive(): bool {
     return !!\Civi::settings()->get('contribute_enable_afform_contributions');
-  }
-
-  /**
-   * @return array
-   */
-  public static function getSubscribedEvents(): array {
-    return [
-      // add CheckoutOption modules as dependencies of afCheckout
-      'hook_civicrm_angularModules' => ['onAlterAngularModules', -1010],
-      // provide CheckoutBlock element to FormBuilder
-      'civi.afform.input_types' => ['onAfformInputTypes'],
-      // run validation hook from selected CheckoutOption
-      'civi.afform.validate' => ['validatePaymentFields', 0],
-      // trigger Checkout on submission
-     //  this runs *after* the Contribution is saved at 0
-      'civi.afform.submit' => ['startCheckout', -100],
-    ];
   }
 
   /**
@@ -47,6 +30,7 @@ class Afform extends AutoService implements EventSubscriberInterface {
    * @return void
    * @throws \CRM_Core_Exception
    */
+  #[CiviEventListener(event: 'civi.afform.validate')]
   public function validatePaymentFields(AfformValidateEvent $event) {
     if (!$this->isActive()) {
       return;
@@ -84,6 +68,7 @@ class Afform extends AutoService implements EventSubscriberInterface {
    * Check if Payment Processor is configured. If it is, start CheckoutSession
    * and add response to the afform response
    */
+  #[CiviEventListener(event: 'civi.afform.submit', priority: -100)]
   public function startCheckout(AfformSubmitEvent $event) {
     if (!$this->isActive()) {
       return;
@@ -166,6 +151,7 @@ class Afform extends AutoService implements EventSubscriberInterface {
     }
   }
 
+  #[CiviEventListener(event: 'hook_civicrm_angularModules', priority: -1010)]
   public function onAlterAngularModules(GenericHookEvent $e): void {
     if (!$this->isActive()) {
       // if afform contributions is disabled we de-register afCheckout
@@ -197,6 +183,7 @@ class Afform extends AutoService implements EventSubscriberInterface {
     }
   }
 
+  #[CiviEventListener(event: 'civi.afform.input_types')]
   public function onAfformInputTypes(GenericHookEvent $e) {
     if (!$this->isActive()) {
       return;

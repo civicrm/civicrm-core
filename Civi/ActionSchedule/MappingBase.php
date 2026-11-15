@@ -15,6 +15,7 @@ use Civi\Api4\Contact;
 use Civi\Api4\Service\Spec\RequestSpec;
 use Civi\Api4\Utils\CoreUtil;
 use Civi\Core\Service\AutoSubscriber;
+use Civi\Core\Attribute\CiviEventListener;
 
 /**
  * Base implementation of MappingInterface.
@@ -29,9 +30,9 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
   }
 
   public static function getSubscribedEvents(): array {
-    return [
-      'civi.actionSchedule.getMappings' => 'onRegisterActionMappings',
-    ];
+    // This class no longer uses AutoSubscriber as of https://github.com/civicrm/civicrm-core/pull/37845
+    // Empty getSubscribedEvents() function is retained for backward-compatibility of any extensions using this.
+    return [];
   }
 
   /**
@@ -39,6 +40,7 @@ abstract class MappingBase extends AutoSubscriber implements MappingInterface {
    *
    * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
    */
+  #[CiviEventListener(event: 'civi.actionSchedule.getMappings')]
   public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations): void {
     $registrations->register(new static());
   }

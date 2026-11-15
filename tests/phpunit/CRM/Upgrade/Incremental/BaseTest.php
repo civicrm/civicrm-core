@@ -25,7 +25,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     foreach ($templates as $template) {
       $this->callAPISuccess('MessageTemplate', 'create', ['msg_html' => 'great what a cool member you are', 'id' => $template['id']]);
       $msg_html = $this->callAPISuccessGetValue('MessageTemplate', ['id' => $template['id'], 'return' => 'msg_html']);
-      $this->assertEquals('great what a cool member you are', $msg_html);
+      $this->assertSame('great what a cool member you are', $msg_html);
     }
     $messageTemplateObject = new CRM_Upgrade_Incremental_MessageTemplates('5.69.alpha1');
     $messageTemplateObject->updateTemplates();
@@ -48,14 +48,14 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $upgrader = new CRM_Upgrade_Incremental_MessageTemplates('5.61.0');
     $check = new CRM_Utils_Check_Component_Tokens();
     $message = $check->checkTokens()[0];
-    $this->assertEquals('<p>You are using tokens that have been removed or deprecated.</p><ul><li>Please review your contribution_invoice_receipt message template and remove references to the token {$display_name} as it has been replaced by {contact.display_name}</li></ul></p>', $message->getMessage());
+    $this->assertSame('<p>You are using tokens that have been removed or deprecated.</p><ul><li>Please review your contribution_invoice_receipt message template and remove references to the token {$display_name} as it has been replaced by {contact.display_name}</li></ul></p>', $message->getMessage());
     $upgrader->replaceTokenInTemplate('contribution_invoice_receipt', '$display_name', 'contact.display_name');
     $templates = MessageTemplate::get()->addSelect('msg_html')
       ->addWhere(
         'workflow_name', '=', 'contribution_invoice_receipt'
       )->execute();
     foreach ($templates as $template) {
-      $this->assertEquals('{contact.display_name}', $template['msg_html']);
+      $this->assertSame('{contact.display_name}', $template['msg_html']);
     }
     $messages = $check->checkTokens();
     $this->assertEmpty($messages);
@@ -83,9 +83,9 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $upgrader->replaceTokenInActionSchedule('contribution.status', 'contribution.contribution_status_id:label');
     $templates = ActionSchedule::get()->addSelect('body_html', 'subject', 'body_text')->execute();
     foreach ($templates as $template) {
-      $this->assertEquals('blah {contribution.contribution_status_id:label}', $template['body_html']);
-      $this->assertEquals('blah {contribution.contribution_status_id:label}', $template['body_text']);
-      $this->assertEquals('blah {contribution.contribution_status_id:label}', $template['subject']);
+      $this->assertSame('blah {contribution.contribution_status_id:label}', $template['body_html']);
+      $this->assertSame('blah {contribution.contribution_status_id:label}', $template['body_text']);
+      $this->assertSame('blah {contribution.contribution_status_id:label}', $template['subject']);
     }
   }
 
@@ -111,7 +111,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
         $this->assertStringContainsString('{assign var="greeting" value="{contact.email_greeting_display}"}{if $greeting}<p>{$greeting},</p>{/if}', $msg_html);
       }
       else {
-        $this->assertEquals('great what a silly sausage you are', $msg_html);
+        $this->assertSame('great what a silly sausage you are', $msg_html);
       }
     }
   }

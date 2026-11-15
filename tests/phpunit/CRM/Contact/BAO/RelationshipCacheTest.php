@@ -58,15 +58,15 @@ class CRM_Contact_BAO_RelationshipCacheTest extends CiviUnitTestCase {
 
     $this->assertEquals($relationship_type_id_1, $idx['a_b']['relationship_type_id']);
     $this->assertEquals($contact_id_1, $idx['a_b']['near_contact_id']);
-    $this->assertEquals('Praegustator is', $idx['a_b']['near_relation']);
+    $this->assertSame('Praegustator is', $idx['a_b']['near_relation']);
     $this->assertEquals($contact_id_2, $idx['a_b']['far_contact_id']);
-    $this->assertEquals('Praegustator for', $idx['a_b']['far_relation']);
+    $this->assertSame('Praegustator for', $idx['a_b']['far_relation']);
 
     $this->assertEquals($relationship_type_id_1, $idx['b_a']['relationship_type_id']);
     $this->assertEquals($contact_id_2, $idx['b_a']['near_contact_id']);
-    $this->assertEquals('Praegustator for', $idx['b_a']['near_relation']);
+    $this->assertSame('Praegustator for', $idx['b_a']['near_relation']);
     $this->assertEquals($contact_id_1, $idx['b_a']['far_contact_id']);
-    $this->assertEquals('Praegustator is', $idx['b_a']['far_relation']);
+    $this->assertSame('Praegustator is', $idx['b_a']['far_relation']);
   }
 
 }

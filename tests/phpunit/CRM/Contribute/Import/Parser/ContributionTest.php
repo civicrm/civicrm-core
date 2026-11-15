@@ -61,7 +61,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
   protected function setUp(): void {
     parent::setUp();
-    $this->callApiV3Success('Extension', 'install', ['keys' => 'civiimport']);
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'civiimport')->execute();
     $this->enableBackgroundQueueOriginalValue = Civi::settings()->get('enableBackgroundQueue');
   }
 
@@ -125,16 +125,16 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contributionsOfMainContact = Contribution::get()->addWhere('contact_id', '=', $mainContactID)->execute();
     // Although there are 2 rows in the csv, 1 should fail each time due to conflicting money formats.
     $this->assertCount(1, $contributionsOfMainContact, 'Wrong number of contributions imported');
-    $this->assertEquals(1230.99, $contributionsOfMainContact->first()['total_amount']);
-    $this->assertEquals(1230.99, $contributionsOfMainContact->first()['net_amount']);
-    $this->assertEquals(0, $contributionsOfMainContact->first()['fee_amount']);
+    $this->assertSame(1230.99, $contributionsOfMainContact->first()['total_amount']);
+    $this->assertSame(1230.99, $contributionsOfMainContact->first()['net_amount']);
+    $this->assertSame(0.0, $contributionsOfMainContact->first()['fee_amount']);
 
     $contributionsOfSoftContact = ContributionSoft::get()->addWhere('contact_id', '=', $softCreditContactID)->execute();
     $this->assertCount(1, $contributionsOfSoftContact, 'Contribution Soft not added for primary contact');
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
-    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
-    $this->assertEquals(1, $dataSource->getRowCount([\CRM_Import_Parser::SOFT_CREDIT]));
-    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
+    $this->assertSame(1, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
+    $this->assertSame(1, $dataSource->getRowCount([\CRM_Import_Parser::SOFT_CREDIT]));
+    $this->assertSame(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
   }
 
   /**
@@ -191,12 +191,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $values = ['Contribution.contact_id' => $contactID, 'Contribution.total_amount' => 10, 'Contribution.financial_type_id' => 'Donation', 'Contribution.payment_instrument_id' => 'Check'];
     $this->runImport($values, 'create');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['Contribution.contact_id' => $contactID]);
-    $this->assertEquals('Check', $contribution['payment_instrument']);
+    $this->assertSame('Check', $contribution['payment_instrument']);
 
     $values = ['Contribution.contact_id' => $contactID, 'Contribution.total_amount' => 10, 'Contribution.financial_type_id' => 'Donation', 'Contribution.payment_instrument_id' => 'not at all random'];
     $this->runImport($values, 'create');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'payment_instrument_id' => 'random']);
-    $this->assertEquals('not at all random', $contribution['payment_instrument']);
+    $this->assertSame('not at all random', $contribution['payment_instrument']);
   }
 
   /**
@@ -219,15 +219,15 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ];
     $this->runImport($values, 'create');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['Contribution.contact_id' => $this->ids['Contact']['donor']]);
-    $this->assertEquals('Credit Card', $contribution['payment_instrument']);
+    $this->assertSame('Credit Card', $contribution['payment_instrument']);
     // Changed from 10 to 9 in the hook.
-    $this->assertEquals(9, $contribution['total_amount']);
+    $this->assertSame('9.00', $contribution['total_amount']);
 
     $payment = Payment::get()
       ->addWhere('contribution_id', '=', $contribution['id'])
       ->execute()->single();
-    $this->assertEquals(567, $payment['pan_truncation']);
-    $this->assertEquals(9, $payment['total_amount']);
+    $this->assertSame('567', $payment['pan_truncation']);
+    $this->assertSame(9.0, $payment['total_amount']);
   }
 
   public static function preHook($event): void {
@@ -250,13 +250,13 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
     $this->runImport($values, 'create');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
-    $this->assertEquals('Pending Label**', $contribution['contribution_status']);
+    $this->assertSame('Pending Label**', $contribution['contribution_status']);
 
     $this->addRandomOption('contribution_status');
     $values['Contribution.contribution_status_id'] = 'not at all random';
     $this->runImport($values, 'create');
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 'random']);
-    $this->assertEquals('not at all random', $contribution['contribution_status']);
+    $this->assertSame('not at all random', $contribution['contribution_status']);
 
     $values['Contribution.contribution_status_id'] = 'just say no';
     $this->runImport($values, 'create');
@@ -339,7 +339,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->submitPreviewForm($submittedValues);
     $row = $this->getDataSource()->getRow();
     // a valid status here means it has been able to incorporate the default_value.
-    $this->assertEquals('soft_credit_imported', $row['_status']);
+    $this->assertSame('soft_credit_imported', $row['_status']);
   }
 
   /**
@@ -418,8 +418,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ];
     $this->doUserJobImport($importMappings);
     $row = $this->getDataSource()->getRow();
-    $this->assertEquals('ERROR', $row['_status']);
-    $this->assertEquals('Invalid value for field(s) : Contact Country', $row['_status_message']);
+    $this->assertSame('ERROR', $row['_status']);
+    $this->assertSame('Invalid value for field(s) : Contact Country', $row['_status_message']);
   }
 
   /**
@@ -437,8 +437,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ];
     $this->importCSV('contributions_date_validate.csv', $mapping, ['dateFormats' => 32]);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
-    $this->assertEquals('2019-10-26 00:00:00', $contribution['receive_date']);
-    $this->assertEquals('2019-10-20 00:00:00', $contribution[$this->getCustomFieldName('date')]);
+    $this->assertSame('2019-10-26 00:00:00', $contribution['receive_date']);
+    $this->assertSame('2019-10-20 00:00:00', $contribution[$this->getCustomFieldName('date')]);
   }
 
   /**
@@ -456,7 +456,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     unset(Civi::$statics['CRM_Core_BAO_OptionGroup']);
     $this->runImport($values, 'update');
     $contribution = $this->callAPISuccess('Contribution', 'get', ['contact_id' => $contactID, $this->getCustomFieldName('radio') => 'Red Testing']);
-    $this->assertEquals(5, $contribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['radio']]);
+    $this->assertSame('5', $contribution['values'][$contribution['id']]['custom_' . $this->ids['CustomField']['radio']]);
   }
 
   /**
@@ -477,8 +477,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
       ['name' => 'Contribution.financial_type_id'],
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
-    $this->assertEquals(1, $dataSource->getRowCount([\CRM_Import_Parser::PLEDGE_PAYMENT]), $dataSource->getRow()['_status_message']);
-    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
+    $this->assertSame(1, $dataSource->getRowCount([\CRM_Import_Parser::PLEDGE_PAYMENT]), $dataSource->getRow()['_status_message']);
+    $this->assertSame(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
     $this->callAPISuccessGetSingle('PledgePayment', ['pledge_id' => $pledgeID, 'contribution_id' => $contribution['id']]);
   }
@@ -565,8 +565,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   public function testImportNoMatch() :void {
     $dataSource = $this->importContributionsDotCSV();
     $row = $dataSource->getRow();
-    $this->assertEquals('ERROR', $row['_status']);
-    $this->assertEquals('No matching Contact found', $row['_status_message']);
+    $this->assertSame('ERROR', $row['_status']);
+    $this->assertSame('No matching Contact found', $row['_status_message']);
   }
 
   /**
@@ -592,7 +592,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ]);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     $row = $dataSource->getRow();
-    $this->assertEquals('IMPORTED', $row['_status']);
+    $this->assertSame('IMPORTED', $row['_status']);
 
     // Now update it to 'NEW' and try again using the api to import.
     Import::update($this->userJobID)->setValues(['_status' => 'NEW', '_entity_id' => NULL])
@@ -600,7 +600,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     Import::import($this->userJobID)->execute();
 
     $row = Import::get($this->userJobID)->execute()->first();
-    $this->assertEquals('IMPORTED', $row['_status'], $row['_status_message']);
+    $this->assertSame('IMPORTED', $row['_status'], $row['_status_message']);
   }
 
   /**
@@ -612,11 +612,11 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->individualCreate(['email' => 'mum@example.com']);
     $this->importContributionsDotCSV();
     $contribution = Contribution::get()->execute()->first();
-    $this->assertEquals('Word of mouth', $contribution['source']);
+    $this->assertSame('Word of mouth', $contribution['source']);
     $note = Note::get()
       ->addWhere('entity_id', '=', $contribution['id'])
       ->addWhere('entity_table', '=', 'civicrm_contribution')->execute()->first();
-    $this->assertEquals('Call him back', $note['note']);
+    $this->assertSame('Call him back', $note['note']);
 
     // Now change the note & re-do it. The same note should be updated.
     Note::update()
@@ -627,7 +627,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $note = Note::get()
       ->addWhere('entity_id', '=', $contribution['id'])
       ->addWhere('entity_table', '=', 'civicrm_contribution')->execute()->first();
-    $this->assertEquals('Call him back', $note['note']);
+    $this->assertSame('Call him back', $note['note']);
 
   }
 
@@ -744,7 +744,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->importCSV('contributions.csv', $fieldMappings);
 
     $row = $this->getDataSource()->getRows()[0];
-    $this->assertEquals('IMPORTED', $row[11]);
+    $this->assertSame('IMPORTED', $row[11]);
     $contribution = Contribution::get()->addSelect('source', 'id')->execute()->first();
     $this->assertEmpty($contribution['source']);
 
@@ -763,9 +763,9 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->importCSV('contributions.csv', $fieldMappings, [], 'update');
 
     $row = $this->getDataSource()->getRows()[0];
-    $this->assertEquals('IMPORTED', $row[11]);
+    $this->assertSame('IMPORTED', $row[11]);
     $contribution = Contribution::get()->addSelect('source', 'id')->execute()->first();
-    $this->assertEquals('Call him back', $contribution['source']);
+    $this->assertSame('Call him back', $contribution['source']);
   }
 
   /**
@@ -817,8 +817,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $wrapper->postProcess();
     $this->getPreviewForm($submittedValues)->processForm(\Civi\Test\FormWrapper::PREPROCESSED);
     $row = $this->getDataSource()->getRows()[0];
-    $this->assertEquals('ERROR', $row[10]);
-    $this->assertEquals('Invalid value for field(s) : Contribution Campaign', $row[11]);
+    $this->assertSame('ERROR', $row[10]);
+    $this->assertSame('Invalid value for field(s) : Contribution Campaign', $row[11]);
   }
 
   /**
@@ -841,8 +841,8 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $contactSapphireId = $this->individualCreate($contactSapphireParams);
 
     // make sure we're testing dev/core#3784
-    $this->assertEquals(1, substr($contactRubyId, 0, 1));
-    $this->assertEquals(1, substr($contactSapphireId, 0, 1));
+    $this->assertSame('1', substr($contactRubyId, 0, 1));
+    $this->assertSame('1', substr($contactSapphireId, 0, 1));
 
     $mapping = [
       ['name' => 'Contact.external_identifier'],
@@ -859,12 +859,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
 
     $this->assertCount(1, $contributionsOfRuby, 'Wrong number of contributions imported');
     $this->assertCount(1, $contributionsOfSapphire, 'Wrong number of contributions imported');
-    $this->assertEquals(22222, $contributionsOfRuby->first()['total_amount']);
-    $this->assertEquals(5, $contributionsOfSapphire->first()['total_amount']);
+    $this->assertSame(22222.0, $contributionsOfRuby->first()['total_amount']);
+    $this->assertSame(5.0, $contributionsOfSapphire->first()['total_amount']);
 
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
-    $this->assertEquals(0, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
-    $this->assertEquals(2, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
+    $this->assertSame(0, $dataSource->getRowCount([CRM_Import_Parser::ERROR]));
+    $this->assertSame(2, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
   }
 
   /**
@@ -877,7 +877,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->importCSV('contributions_match_external_id.csv', $this->getRowErrorMapping());
     $rows = (array) Import::get($this->userJobID)->addOrderBy('_id')->execute();
     $this->assertEquals(['ERROR', 'Ruh-roh'], [$rows[0]['_status'], $rows[0]['_status_message']]);
-    $this->assertEquals('IMPORTED', $rows[1]['_status'], $rows[1]['_status_message']);
+    $this->assertSame('IMPORTED', $rows[1]['_status'], $rows[1]['_status_message']);
   }
 
   /**
@@ -889,14 +889,14 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $this->setUpRowErrorImport('import', 'ruby');
     $this->importCSV('contributions_match_external_id.csv', $this->getRowErrorMapping());
     $rows = (array) Import::get($this->userJobID)->addOrderBy('_id')->execute();
-    $this->assertEquals('IMPORTED', $rows[0]['_status'], $rows[0]['_status_message']);
+    $this->assertSame('IMPORTED', $rows[0]['_status'], $rows[0]['_status_message']);
     $this->assertEquals(['ERROR', 'Ruh-roh'], [$rows[1]['_status'], $rows[1]['_status_message']]);
 
     Import::update($this->userJobID)->setValues(['_status' => 'NEW', '_status_message' => '', '_entity_id' => NULL])
       ->addWhere('_id', '>', 0)->execute();
     Import::import($this->userJobID)->execute();
     $rows = (array) Import::get($this->userJobID)->addOrderBy('_id')->execute();
-    $this->assertEquals('IMPORTED', $rows[0]['_status'], $rows[0]['_status_message']);
+    $this->assertSame('IMPORTED', $rows[0]['_status'], $rows[0]['_status_message']);
     $this->assertEquals(['ERROR', 'Ruh-roh'], [$rows[1]['_status'], $rows[1]['_status_message']]);
   }
 
@@ -1052,10 +1052,10 @@ $contributionID,,\"\",3,99,2008-09-20,Donation,Only Contribution ID OK,valid
     $rows = $this->getDataSource()->getRows();
     foreach ($rows as $row) {
       if ($row[8] === 'valid') {
-        $this->assertEquals('IMPORTED', $row[10], $row[11]);
+        $this->assertSame('IMPORTED', $row[10], $row[11]);
       }
       else {
-        $this->assertEquals('ERROR', $row[10], $row[11] . print_r($rows, TRUE));
+        $this->assertSame('ERROR', $row[10], $row[11] . print_r($rows, TRUE));
       }
     }
   }
@@ -1168,7 +1168,7 @@ $contributionID,,\"\",3,99,2008-09-20,Donation,Only Contribution ID OK,valid
     $this->importCSV('contributions_amount_validate.csv', $mapping);
     $dataSource = new CRM_Import_DataSource_CSV($this->userJobID);
     // Check a row imported.
-    $this->assertEquals(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
+    $this->assertSame(1, $dataSource->getRowCount([CRM_Import_Parser::VALID]));
     $this->callAPISuccessGetCount('ContributionSoft', [], 1);
   }
 

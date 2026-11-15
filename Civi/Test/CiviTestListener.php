@@ -39,6 +39,12 @@ else {
     private $tx;
 
     /**
+     * @var int[]|null
+     * @see \Civi\Test\CustomDataCleanup::snapshot()
+     */
+    private $customDataSnapshot;
+
+    /**
      * @var \CRM_Core_TemporaryErrorScope|null
      */
     public $errorScope;
@@ -64,6 +70,7 @@ else {
       }
 
       if ($test instanceof TransactionalInterface) {
+        $this->customDataSnapshot = CustomDataCleanup::snapshot();
         $this->tx = new \CRM_Core_Transaction(TRUE);
         $this->tx->rollback();
       }
@@ -91,6 +98,8 @@ else {
       if ($test instanceof TransactionalInterface) {
         $this->tx->rollback()->commit();
         $this->tx = NULL;
+        CustomDataCleanup::cleanup($this->customDataSnapshot);
+        $this->customDataSnapshot = NULL;
       }
       if ($test instanceof HookInterface) {
         \CRM_Utils_Hook::singleton()->reset();

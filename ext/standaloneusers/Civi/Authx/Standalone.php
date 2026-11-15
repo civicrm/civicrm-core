@@ -11,10 +11,9 @@
 
 namespace Civi\Authx;
 
+use Civi\Core\Attribute\CiviEventListener;
 use Civi\Core\Service\AutoService;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Civi\Standalone\MFA\Base as MFABase;
-use Civi\Standalone\Security;
 use Civi\Standalone\Event\LogoutEvent;
 
 /**
@@ -23,28 +22,34 @@ use Civi\Standalone\Event\LogoutEvent;
  *
  * @service authx_standalone
  */
-class Standalone extends AutoService implements AuthxInterface, EventSubscriberInterface {
+class Standalone extends AutoService implements AuthxInterface {
 
   /**
-   * @inheritdoc
+   * Leave a HTTP "Basic" credential unchecked when MFA is required.
+   *
+   * The password is never verified, so the policy check below rejects the
+   * credential without revealing whether the password was right.
+   *
+   * @param \Civi\Authx\CheckCredentialEvent $check
    */
-  public static function getSubscribedEvents(): array {
-    $events = [];
-    // Priority is for this to be called before the password check.
-    $events['civi.authx.checkCredential'][] = ['disallowBasicAuthIfMFAEnabled', CheckCredential::PRIORITY_BASIC_USER + 1];
-    return $events;
+  #[CiviEventListener(event: 'civi.authx.checkCredential', priority: CheckCredential::PRIORITY_BASIC_USER + 1)]
+  public function skipBasicAuthIfMFAEnabled(CheckCredentialEvent $check): void {
+    if ($check->credFormat === 'Basic' && MFABase::getAvailableClasses()) {
+      $check->stopPropagation();
+    }
   }
 
   /**
    * Disallow HTTP "Basic" credential as `username:password` when MFA is required.
    *
-   * @param \Civi\Authx\CheckCredentialEvent $check
+   * Note this run after ignoreImprovisedFirewall.
+   *
+   * @param \Civi\Authx\CheckPolicyEvent $check
    */
-  public function disallowBasicAuthIfMFAEnabled(CheckCredentialEvent $check): void {
-    if ($check->credFormat === 'Basic') {
-      if (MFABase::getAvailableClasses()) {
-        $check->reject("Basic credentials not supported on systems with MFA enabled.");
-      }
+  #[CiviEventListener(event: 'civi.authx.checkPolicy', priority: -600)]
+  public function disallowBasicAuthIfMFAEnabled(CheckPolicyEvent $check): void {
+    if (str_starts_with((string) $check->target->cred, 'Basic ') && MFABase::getAvailableClasses()) {
+      $check->reject("Basic credentials not supported on systems with MFA enabled.");
     }
   }
 

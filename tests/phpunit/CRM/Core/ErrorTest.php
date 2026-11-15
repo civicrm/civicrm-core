@@ -90,7 +90,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
   public function assertLogRegexp($pattern): void {
     $config = CRM_Core_Config::singleton();
     $logFiles = glob($config->configAndLogDir . '/CiviCRM*.log');
-    $this->assertEquals(1, count($logFiles), 'Expect to find 1 file matching: ' . $config->configAndLogDir . '/CiviCRM*log*/');
+    $this->assertSame(1, count($logFiles), 'Expect to find 1 file matching: ' . $config->configAndLogDir . '/CiviCRM*log*/');
     foreach ($logFiles as $logFile) {
       $this->assertMatchesRegularExpression($pattern, file_get_contents($logFile));
     }
@@ -107,12 +107,12 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
     $log->log('Little lamb');
     $fileName = CRM_Core_Error::generateLogFileName('my-test');
     $config = CRM_Core_Config::singleton();
-    $this->assertEquals($config->configAndLogDir . 'CiviCRM.' . CIVICRM_DOMAIN_ID . '.' . 'my-test.' . CRM_Core_Error::generateLogFileHash($config) . '.log', $fileName);
+    $this->assertEquals($config->configAndLogDir . 'CiviCRM.' . CIVICRM_DOMAIN_ID . '.my-test.' . CRM_Core_Error::generateLogFileHash($config) . '.log', $fileName);
     $fileContents = file_get_contents($fileName);
     // Date format should be ISO
     $this->assertMatchesRegularExpression('/^\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d[+-]\d\d\d\d$/', substr($fileContents, 0, 24));
     // Check the text starts at the expected position
-    $this->assertEquals(26, strpos($fileContents, '[info] Mary had a little lamb'));
+    $this->assertSame(26, strpos($fileContents, '[info] Mary had a little lamb'));
     $this->assertStringContainsString('[info] Little lamb', $fileContents);
   }
 
@@ -128,7 +128,7 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
       CRM_Core_DAO::executeQuery($testData['sql']);
     }
     catch (DBQueryException $e) {
-      $this->assertEquals(0, $e->getCode());
+      $this->assertSame(0, $e->getCode());
       $this->assertInstanceOf('DB_Error', $e->getCause());
       $this->assertEquals($testData['message'], $e->getMessage());
       $this->assertEquals($testData['error_code'], $e->getErrorCode());
@@ -136,6 +136,24 @@ class CRM_Core_ErrorTest extends CiviUnitTestCase {
       $this->assertStringStartsWith($testData['sql'] . ' [nativecode=' . $testData['sql_error_code'], $e->getDebugInfo());
       $this->assertEquals($testData['sql'], $e->getSQL());
       $this->assertStringStartsWith($testData['user_message'], $e->getUserMessage());
+      return;
+    }
+    $this->fail();
+  }
+
+  /**
+   * Long SQL is shortened in the debug log, keeping the database error after it.
+   */
+  public function testDBErrorLogShortensLongSQL(): void {
+    $sql = 'SELECT fake_column FROM civicrm_contact WHERE id IN (' . implode(', ', range(1, 2000)) . ')';
+    try {
+      CRM_Core_DAO::executeQuery($sql);
+    }
+    catch (DBQueryException $e) {
+      $this->assertSame($sql, $e->getSQL());
+      $userInfo = $e->getUserInfo();
+      $this->assertStringContainsString("[nativecode=1054 ** Unknown column 'fake_column'", substr($userInfo, -600));
+      $this->assertLogRegexp('/' . preg_quote(substr($userInfo, 0, 5000) . '...' . substr($userInfo, -600), '/') . '/');
       return;
     }
     $this->fail();

@@ -25,7 +25,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
    * Check method add()
    */
   public function testAdd(): void {
-    list($financialAccount, $financialType, $financialAccountType) = $this->createFinancialAccount(
+    [$financialAccount, $financialType, $financialAccountType] = $this->createFinancialAccount(
       'Revenue',
       'Income Account is'
     );
@@ -43,7 +43,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
    * Check method retrieve()
    */
   public function testRetrieve(): void {
-    list($financialAccount, $financialType, $financialAccountType) = $this->createFinancialAccount(
+    [$financialAccount, $financialType, $financialAccountType] = $this->createFinancialAccount(
       'Asset',
       'Asset Account is'
     );
@@ -66,7 +66,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
    */
   public function testGetInstrumentFinancialAccount(): void {
     $paymentInstrumentValue = 1;
-    list($financialAccount, $financialType, $financialAccountType) = $this->createFinancialAccount(
+    [$financialAccount, $financialType, $financialAccountType] = $this->createFinancialAccount(
       'Asset'
     );
     $optionParams = [
@@ -106,7 +106,7 @@ class CRM_Financial_BAO_FinancialTypeAccountTest extends CiviUnitTestCase {
     }
     catch (Exception $e) {
       $this->assertTrue(TRUE, 'Received expected exception');
-      $this->assertEquals($e->getMessage(), "This financial account cannot have 'Credit/Contra Revenue Account is' relationship.");
+      $this->assertSame("This financial account cannot have 'Credit/Contra Revenue Account is' relationship.", $e->getMessage());
     }
   }
 

@@ -118,7 +118,7 @@ class CRM_Mailing_BAO_MailingJobTest extends CiviUnitTestCase {
       }
     }
     $this->assertNotNull($newJob, 'New child job found');
-    $this->assertEquals('Scheduled', $newJob['status']);
+    $this->assertSame('Scheduled', $newJob['status']);
 
     // Verify recipient was added to civicrm_mailing_event_queue for the new job
     $queuedCount = CRM_Core_DAO::singleValueQuery("
@@ -130,7 +130,7 @@ class CRM_Mailing_BAO_MailingJobTest extends CiviUnitTestCase {
       2 => [$emailID, 'Integer'],
       3 => [$contactID, 'Integer'],
     ]);
-    $this->assertEquals(1, $queuedCount, 'Unqueued recipient should now be present in event queue');
+    $this->assertSame('1', $queuedCount, 'Unqueued recipient should now be present in event queue');
 
     // Second check: no more unqueued recipients
     $reconciledAgain = Invasive::call(['CRM_Mailing_BAO_MailingJob', 'queueMissingRecipients'], [$mailingID, $parentJobID]);

@@ -70,13 +70,13 @@ class CRM_Utils_CheckTest extends CiviUnitTestCase {
     Civi::cache('checks')->set('systemStatusCheckResult', 7, CRM_Utils_Check::CHECK_TIMER);
     unset(Civi::$statics['CRM_Utils_Check']);
     CRM_Utils_Check::checkStatus(['checkDefaultMailbox']);
-    $this->assertEquals(7, Civi::cache('checks')->get('systemStatusCheckResult'));
+    $this->assertSame(7, Civi::cache('checks')->get('systemStatusCheckResult'));
 
     // includeDisabled.
     Civi::cache('checks')->set('systemStatusCheckResult', 7, CRM_Utils_Check::CHECK_TIMER);
     unset(Civi::$statics['CRM_Utils_Check']);
     CRM_Utils_Check::checkStatus([], TRUE);
-    $this->assertEquals(7, Civi::cache('checks')->get('systemStatusCheckResult'));
+    $this->assertSame(7, Civi::cache('checks')->get('systemStatusCheckResult'));
   }
 
   /**
@@ -100,7 +100,7 @@ class CRM_Utils_CheckTest extends CiviUnitTestCase {
     }
     $this->assertEquals(['checkBroken', 'checkHealthy'], array_keys($messages));
     $this->assertStringContainsString('Ruh-roh', $messages['checkBroken']->getMessage());
-    $this->assertEquals(3, $messages['checkBroken']->getLevel());
+    $this->assertSame(3, $messages['checkBroken']->getLevel());
   }
 
   /**
@@ -127,7 +127,7 @@ class CRM_Utils_CheckTest extends CiviUnitTestCase {
     unset(Civi::$statics['CRM_Utils_Check']);
 
     // Cache hit: returned as-is, no recompute.
-    $this->assertEquals(7, CRM_Utils_Check::getMaxSeverity());
+    $this->assertSame(7, CRM_Utils_Check::getMaxSeverity());
 
     // Force: recomputes to the real (lower) value and re-caches it.
     $forced = CRM_Utils_Check::getMaxSeverity(TRUE);

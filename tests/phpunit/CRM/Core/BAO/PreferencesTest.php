@@ -22,8 +22,8 @@ class CRM_Core_BAO_PreferencesTest extends CiviUnitTestCase {
     );
 
     // street_address should be set
-    $this->assertEquals($addressOptions['street_address'], 1, 'Street Address is not set in address options');
-    $this->assertEquals($addressOptions['country'], 1, 'Country is not set in address options');
+    $this->assertSame(1, $addressOptions['street_address'], 'Street Address is not set in address options');
+    $this->assertSame(1, $addressOptions['country'], 'Country is not set in address options');
   }
 
 }

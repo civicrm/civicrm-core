@@ -121,6 +121,47 @@ class CRM_Utils_Mail {
 
     // Previously, CiviCRM bundled patches to change the behavior of 3 specific drivers. Use wrapper/filters to avoid patching.
     $mailer = new CRM_Utils_Mail_FilteredPearMailer($driver, $params, $mailer);
+    // CRM-1367: every message needs a Date header (RFC 5322 requires it; some
+    // MTAs, e.g. qmail with local delivery, never add one themselves). Doing
+    // it here, rather than relying on the pear/mail patch, means it applies
+    // regardless of which code composed the headers.
+    $mailer->addFilter('0100_date', function ($mailer, &$recipients, &$headers, &$body) {
+      if (!array_key_exists('Date', $headers)) {
+        $headers['Date'] = date('r');
+      }
+    });
+    if ($driver === 'mail') {
+      // CRM-5946: Mail_mail::send() never derives the sendmail -f (envelope
+      // sender) argument from the message's own headers, so it falls back
+      // to the server default regardless of Return-Path. Set it here,
+      // rather than relying on the pear/mail patch.
+      $mailer->addFilter('0150_envelope_sender', function ($mailer, &$recipients, &$headers, &$body) {
+        $from = $headers['Return-Path'] ?? NULL;
+        if (empty($from) && !empty($headers['From'])) {
+          $from = CRM_Utils_Mail::pluckEmailFromHeader($headers['From']) ?: $headers['From'];
+        }
+        if (!empty($from)) {
+          $mailer->getDelegate()->_params = '-f' . $from;
+        }
+      });
+    }
+    if ($driver === 'smtp') {
+      // CRM-8744: Net_SMTP::parseResponse() raises a generic, unhelpful
+      // 'Invalid response code received from server' error whenever the
+      // server's response doesn't match what was expected, with no pointer
+      // to how to fix it. Rewrite that specific message here, rather than
+      // relying on the pear/net_smtp patch, so it applies wherever the
+      // result surfaces (including FlexMailer's bulk-send bounce handling).
+      $mailer->addResultFilter('0100_friendly_response_error', function ($mailer, $result, $recipients, $headers, $body) {
+        if (is_a($result, 'PEAR_Error') && $result->getMessage() === 'Invalid response code received from server') {
+          return PEAR::raiseError(
+            'Invalid response code received from SMTP server while sending email.  This is often caused by a misconfiguration in Outbound Email settings. Please verify the settings at Administer CiviCRM >> Global Settings >> Outbound Email (SMTP).',
+            $result->getCode(),
+            PEAR_ERROR_RETURN
+          );
+        }
+      });
+    }
     if (in_array($driver, ['smtp', 'mail', 'sendmail'])) {
       $mailer->addFilter('2000_log', ['CRM_Utils_Mail_Logger', 'filter']);
       $mailer->addFilter('2100_validate', function ($mailer, &$recipients, &$headers, &$body) {
@@ -198,7 +239,7 @@ class CRM_Utils_Mail {
       return FALSE;
     }
 
-    list($headers, $message) = self::setEmailHeaders($params);
+    [$headers, $message] = self::setEmailHeaders($params);
 
     $to = [$params['toEmail']];
     $mailer = \Civi::service('pear_mail');
@@ -275,7 +316,7 @@ class CRM_Utils_Mail {
     CRM_Utils_Hook::alterMailParams($params, 'testEmail');
     $to = $params['toEmail'];
 
-    list($headers, $message) = self::setEmailHeaders($params);
+    [$headers, $message] = self::setEmailHeaders($params);
 
     $from = self::pluckEmailFromHeader($headers['From']);
 
@@ -463,16 +504,16 @@ class CRM_Utils_Mail {
   public static function errorMessage($mailer, $result) {
     $message = '<p>' . ts('An error occurred when CiviCRM attempted to send an email (via %1). If you received this error after submitting on online contribution or event registration - the transaction was completed, but we were unable to send the email receipt.', [
       1 => 'SMTP',
-    ]) . '</p>' . '<p>' . ts('The mail library returned the following error message:') . '<br /><span class="font-red"><strong>' . $result->getMessage() . '</strong></span></p>' . '<p>' . ts('This is probably related to a problem in your Outbound Email Settings (Administer CiviCRM &raquo; System Settings &raquo; Outbound Email), OR the FROM email address specifically configured for your contribution page or event. Possible causes are:') . '</p>';
+    ]) . '</p><p>' . ts('The mail library returned the following error message:') . '<br /><span class="font-red"><strong>' . $result->getMessage() . '</strong></span></p><p>' . ts('This is probably related to a problem in your Outbound Email Settings (Administer CiviCRM &raquo; System Settings &raquo; Outbound Email), OR the FROM email address specifically configured for your contribution page or event. Possible causes are:') . '</p>';
 
     if (is_a($mailer, 'Mail_smtp')) {
-      $message .= '<ul>' . '<li>' . ts('Your SMTP Username or Password are incorrect.') . '</li>' . '<li>' . ts('Your SMTP Server (machine) name is incorrect.') . '</li>' . '<li>' . ts('You need to use a Port other than the default port 25 in your environment.') . '</li>' . '<li>' . ts('Your SMTP server is just not responding right now (it is down for some reason).') . '</li>';
+      $message .= '<ul><li>' . ts('Your SMTP Username or Password are incorrect.') . '</li><li>' . ts('Your SMTP Server (machine) name is incorrect.') . '</li><li>' . ts('You need to use a Port other than the default port 25 in your environment.') . '</li><li>' . ts('Your SMTP server is just not responding right now (it is down for some reason).') . '</li>';
     }
     else {
-      $message .= '<ul>' . '<li>' . ts('Your Sendmail path is incorrect.') . '</li>' . '<li>' . ts('Your Sendmail argument is incorrect.') . '</li>';
+      $message .= '<ul><li>' . ts('Your Sendmail path is incorrect.') . '</li><li>' . ts('Your Sendmail argument is incorrect.') . '</li>';
     }
 
-    $message .= '<li>' . ts('The Site From Email Address configured for this feature may not be a valid sender based on your email service provider rules.') . '</li>' . '</ul>' . '<p>' . ts('Check <a href="%1">this page</a> for more information.', [
+    $message .= '<li>' . ts('The Site From Email Address configured for this feature may not be a valid sender based on your email service provider rules.') . '</li></ul><p>' . ts('Check <a href="%1">this page</a> for more information.', [
       1 => CRM_Utils_System::docURL2('user/advanced-configuration/email-system-configuration', TRUE),
     ]) . '</p>';
 

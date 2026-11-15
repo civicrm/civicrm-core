@@ -240,45 +240,10 @@ class CRM_GCD {
   private $subscriptionHistoryMethod = ['Admin', 'Email'];
 
   /**
-   * private methods
-   *
-   * @param int $size
-   * @return string
-   */
-
-  /**
-   * Get a randomly generated string.
-   *
-   * @param int $size
-   */
-  private function _getRandomString($size = 32) {
-    $string = "";
-
-    // get an ascii code for each character
-    for ($i = 0; $i < $size; $i++) {
-      $random_int = mt_rand(65, 122);
-      if (($random_int < 97) && ($random_int > 90)) {
-        // if ascii code between 90 and 97 substitute with space
-        $random_int = 32;
-      }
-      $random_char = chr($random_int);
-      $string .= $random_char;
-    }
-    return $string;
-  }
-
-  /**
    * @return string
    */
   private function _getRandomChar() {
     return chr(mt_rand(65, 90));
-  }
-
-  /**
-   * @return int
-   */
-  private function getRandomBoolean() {
-    return mt_rand(0, 1);
   }
 
   /**
@@ -297,31 +262,6 @@ class CRM_GCD {
    */
   private function _getRandomIndex(&$array1) {
     return mt_rand(1, count($array1));
-  }
-
-  // country state city combo
-
-  /**
-   * @return array
-   */
-  private function _getRandomCSC() {
-    $array1 = [];
-
-    // $c = array_rand($this->CSC);
-    $c = 1228;
-
-    // the state array now
-    $s = array_rand($this->CSC[$c]);
-
-    // the city
-    $ci = array_rand($this->CSC[$c][$s]);
-    $city = $this->CSC[$c][$s][$ci];
-
-    $array1[] = $c;
-    $array1[] = $s;
-    $array1[] = $city;
-
-    return $array1;
   }
 
   /**
@@ -763,8 +703,8 @@ class CRM_GCD {
       $lastName = $individual->last_name;
 
       // need to name the household and nick name appropriately
-      $contact->household_name = "$firstName $lastName" . "'s home";
-      $contact->nick_name = "$lastName" . "'s home";
+      $contact->household_name = "$firstName $lastName's home";
+      $contact->nick_name = "$lastName's home";
 
       $contact->id = $this->household[($id - 1)];
       // need to update the sort name for the main contact table
@@ -954,9 +894,7 @@ class CRM_GCD {
 
     // some more random skips
     // hack add lat / long for US based addresses
-    list($addressDAO->country_id, $addressDAO->state_province_id, $addressDAO->city,
-      $addressDAO->postal_code, $addressDAO->geo_code_1, $addressDAO->geo_code_2
-    ) = self::getZipCodeInfo();
+    [$addressDAO->country_id, $addressDAO->state_province_id, $addressDAO->city, $addressDAO->postal_code, $addressDAO->geo_code_1, $addressDAO->geo_code_2] = self::getZipCodeInfo();
 
     //$addressDAO->county_id = 1;
 

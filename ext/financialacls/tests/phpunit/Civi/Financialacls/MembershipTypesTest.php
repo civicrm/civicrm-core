@@ -47,7 +47,7 @@ class MembershipTypesTest extends BaseTestClass {
     $this->setPermissions($permissions);
     $page->browse();
     $assigned = \CRM_Core_Smarty::singleton()->getTemplateVars();
-    $this->assertEquals('<span></span>', $assigned['rows'][$types['Go for it']['id']]['action']);
+    $this->assertSame('<span></span>', $assigned['rows'][$types['Go for it']['id']]['action']);
   }
 
   /**

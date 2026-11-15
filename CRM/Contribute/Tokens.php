@@ -61,17 +61,10 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
     if (!array_key_exists('Contribution', \Civi::service('action_object_provider')->getEntities())) {
       return $tokens;
     }
-    $tokens += $this->getRelatedTokensForEntity('Address', 'address_id', ['name', 'id']);
+    $tokens += $this->getRelatedTokensForEntity('Address', 'address_id', ['name', 'id', 'display']);
 
     $tokens['address_id.name']['title'] = ts('Billing Address Name');
-    $tokens['address_id.display'] = [
-      'title' => ts('Billing Address'),
-      'name' => 'address_id.display',
-      'type' => 'mapped',
-      'input_type' => 'Text',
-      'audience' => 'user',
-      'data_type' => 'String',
-    ];
+    $tokens['address_id.display']['title'] = ts('Billing Address');
 
     // Ideally we would derive this from 'usage' - but it looks like adding the usage data
     // was quite a bit of work & didn't leave the energy to implement - esp expose for
@@ -116,6 +109,18 @@ class CRM_Contribute_Tokens extends CRM_Core_EntityTokens {
    */
   public function getDependencies(): array {
     return ['address_id.display' => 'address_id.id'];
+  }
+
+  /**
+   * @param \Civi\Token\Event\TokenValueEvent $e
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getPrefetchFields(\Civi\Token\Event\TokenValueEvent $e): array {
+    $fields = parent::getPrefetchFields($e);
+    // address_id.display is computed dynamically in getFieldValue() so address['name'] can be omitted.
+    return array_diff($fields, ['address_id.display']);
   }
 
 }

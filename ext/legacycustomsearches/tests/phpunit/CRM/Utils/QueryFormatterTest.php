@@ -210,8 +210,7 @@ class CRM_Utils_QueryFormatterTest extends TestCase implements HeadlessInterface
    * @param string $sql
    */
   private function assertSqlIds($expectedRowIds, $sql) {
-    $actualRowIds = CRM_Utils_Array::collect('id',
-      CRM_Core_DAO::executeQuery($sql)->fetchAll());
+    $actualRowIds = array_column(CRM_Core_DAO::executeQuery($sql)->fetchAll(), 'id');
     sort($actualRowIds);
     sort($expectedRowIds);
     $this->assertEquals($expectedRowIds, $actualRowIds);

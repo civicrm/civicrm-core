@@ -14,7 +14,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
   public function setUp(): void {
     parent::setUp();
-    $this->callApiV3Success('Extension', 'disable', ['keys' => 'legacydedupefinder']);
+    \Civi\Api4\Extension::disable(FALSE)->addWhere('key', '=', 'legacydedupefinder')->execute();
   }
 
   /**
@@ -176,8 +176,8 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // The other queries are combined.
     $this->assertCount(1, $queries);
     $query = reset($queries);
-    $this->assertEquals(16, $query['weight']);
-    $this->assertEquals(1, $query['found_rows']);
+    $this->assertSame(16, $query['weight']);
+    $this->assertSame(1, $query['found_rows']);
     $this->assertLike("SELECT civicrm_address .contact_id id1,  16 weight  FROM civicrm_contact t1
           INNER JOIN civicrm_address
           ON t1.id = civicrm_address.contact_id
@@ -215,7 +215,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $result = \CRM_Contact_BAO_Contact::findDuplicates([
       'civicrm_contact' => ['first_name' => 'Bob', 'nick_name' => 'Bob', 'last_name' => 'Smith'],
       'civicrm_address' => ['city' => 'Bobville', 'street_address' => 'sesame street'],
-      'civicrm_phone' => ['phone' => 123],
+      'civicrm_phone' => ['phone' => '123'],
       'rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general'],
       'contact_type' => 'Individual',
     ]);
@@ -224,8 +224,8 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // One combined query & the after we have the first_name & the phone query.
     $this->assertCount(3, $queries);
     $query = reset($queries);
-    $this->assertEquals(15, $query['weight']);
-    $this->assertEquals(1, $query['found_rows']);
+    $this->assertSame(15, $query['weight']);
+    $this->assertSame(1, $query['found_rows']);
     $this->assertLike("SELECT civicrm_address .contact_id id1,  15 weight  FROM civicrm_contact t1
           INNER JOIN civicrm_address
           ON t1.id = civicrm_address.contact_id
@@ -271,7 +271,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     $result = \CRM_Contact_BAO_Contact::findDuplicates([
       'civicrm_contact' => ['first_name' => 'Bob', 'nick_name' => 'Bob', 'last_name' => 'Smith'],
       'civicrm_address' => ['city' => 'Bobville', 'street_address' => 'sesame street'],
-      'civicrm_phone' => ['phone' => 123],
+      'civicrm_phone' => ['phone' => '123'],
       'rule_group_id' => $this->ids['DedupeRuleGroup']['individual_general'],
       'contact_type' => 'Individual',
     ]);
@@ -280,8 +280,8 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
     $this->assertCount(3, $queries);
     $query = reset($queries);
-    $this->assertEquals(10, $query['weight']);
-    $this->assertEquals(0, $query['found_rows']);
+    $this->assertSame(10, $query['weight']);
+    $this->assertSame(0, $query['found_rows']);
   }
 
   /**
@@ -350,7 +350,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    */
   public function testCustomRule(): void {
     $this->setupForGroupDedupe();
-    $this->callApiV3Success('Extension', 'install', ['keys' => 'legacydedupefinder']);
+    \Civi\Api4\Extension::enable(FALSE)->addWhere('key', '=', 'legacydedupefinder')->execute();
 
     $ruleGroup = $this->createRuleGroup();
     foreach (['birth_date', 'first_name', 'last_name'] as $field) {
@@ -366,7 +366,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);
 
     // Make sure it is the same with the extension disabled.
-    $this->callApiV3Success('Extension', 'disable', ['keys' => 'legacydedupefinder']);
+    \Civi\Api4\Extension::disable(FALSE)->addWhere('key', '=', 'legacydedupefinder')->execute();
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->ids['Group']['default']);
     $this->assertCount(4, $foundDupes);
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);
@@ -658,7 +658,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'excluded_contact_ids' => [],
     ];
     if (!empty($dedupeParams['civicrm_phone'])) {
-      $this->assertEquals(123456, $dedupeParams['civicrm_phone']['phone_numeric']);
+      $this->assertSame(123456, $dedupeParams['civicrm_phone']['phone_numeric']);
     }
     foreach ($expectedDedupeParams as $key => $value) {
       $this->assertEquals($value, $dedupeParams[$key]);
@@ -893,7 +893,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'last_name' => 'bob@example.org',
       ],
     ]);
-    $this->assertEquals(1, $matches['count']);
+    $this->assertSame(1, $matches['count']);
 
     // Test again on a non-matched one - apiv3 & 4 again.
     $matches = Contact::getDuplicates(FALSE)
@@ -911,7 +911,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'contact_type' => 'Individual',
       ],
     ]);
-    $this->assertEquals(0, $matches['count']);
+    $this->assertSame(0, $matches['count']);
 
     $matches = $this->callAPISuccess('Contact', 'duplicatecheck', [
       'rule_type' => 'Supervised',
@@ -921,7 +921,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'first_name' => 'Bob',
       ],
     ]);
-    $this->assertEquals(0, $matches['count']);
+    $this->assertSame(0, $matches['count']);
 
     $matches = $this->callAPISuccess('Contact', 'duplicatecheck', [
       'rule_type' => 'Supervised',
@@ -932,7 +932,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'last_name' => '',
       ],
     ]);
-    $this->assertEquals(0, $matches['count']);
+    $this->assertSame(0, $matches['count']);
 
     $matches = Contact::getDuplicates(FALSE)
       ->setDedupeRule('test-rule')
@@ -952,7 +952,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'contact_type' => 'Individual',
       ],
     ]);
-    $this->assertEquals(0, $matches['count']);
+    $this->assertSame(0, $matches['count']);
   }
 
 }

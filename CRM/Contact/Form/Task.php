@@ -38,7 +38,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    * This includes the submitted values of the search form
    * @var array
    */
-  static protected $_searchFormValues;
+  protected static $_searchFormValues;
 
   /**
    * Build all the data structures needed to build the form.
@@ -334,7 +334,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $relID = implode(',', $this->_contactIds);
 
     foreach ($householdRelationshipTypes as $rel => $dnt) {
-      list($id, $direction) = explode('_', $rel, 2);
+      [$id, $direction] = explode('_', $rel, 2);
       // identify the relationship direction
       $contactA = 'contact_id_a';
       $contactB = 'contact_id_b';
@@ -464,7 +464,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
         'search_context' => $this->get('context'),
       ];
 
-      list($smartGroupId, $savedSearchId) = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
+      [$smartGroupId, $savedSearchId] = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
       return [$smartGroupId, $savedSearchId];
     }
 

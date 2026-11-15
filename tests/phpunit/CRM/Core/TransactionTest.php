@@ -189,31 +189,31 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   }
 
   public function testIsActive(): void {
-    $this->assertEquals(FALSE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
+    $this->assertFalse(CRM_Core_Transaction::isActive());
+    $this->assertTrue(CRM_Core_Transaction::willCommit());
     $tx = new CRM_Core_Transaction();
-    $this->assertEquals(TRUE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
+    $this->assertTrue(CRM_Core_Transaction::isActive());
+    $this->assertTrue(CRM_Core_Transaction::willCommit());
     $tx = NULL;
-    $this->assertEquals(FALSE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
+    $this->assertFalse(CRM_Core_Transaction::isActive());
+    $this->assertTrue(CRM_Core_Transaction::willCommit());
   }
 
   public function testIsActive_rollback(): void {
-    $this->assertEquals(FALSE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
+    $this->assertFalse(CRM_Core_Transaction::isActive());
+    $this->assertTrue(CRM_Core_Transaction::willCommit());
 
     $tx = new CRM_Core_Transaction();
-    $this->assertEquals(TRUE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
+    $this->assertTrue(CRM_Core_Transaction::isActive());
+    $this->assertTrue(CRM_Core_Transaction::willCommit());
 
     $tx->rollback();
-    $this->assertEquals(TRUE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(FALSE, CRM_Core_Transaction::willCommit());
+    $this->assertTrue(CRM_Core_Transaction::isActive());
+    $this->assertFalse(CRM_Core_Transaction::willCommit());
 
     $tx = NULL;
-    $this->assertEquals(FALSE, CRM_Core_Transaction::isActive());
-    $this->assertEquals(TRUE, CRM_Core_Transaction::willCommit());
+    $this->assertFalse(CRM_Core_Transaction::isActive());
+    $this->assertTrue(CRM_Core_Transaction::willCommit());
   }
 
   public function testCallback_commit(): void {
@@ -271,6 +271,25 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $tx = NULL;
     $this->assertEquals(['_preRollback', 'dsa', 'hgf'], $this->callbackLog[0]);
     $this->assertEquals(['_postRollback', 'lkj', ';'], $this->callbackLog[1]);
+  }
+
+  public function testCallback_preCommitError(): void {
+    $tx = new CRM_Core_Transaction();
+    $this->createContactWithTransaction('reuse-tx', 'sql-insert', 'implicit-commit');
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, function () {
+      throw new RuntimeException('Pre-commit failed');
+    });
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, [$this, '_postRollback'], ['lkj', ';']);
+
+    try {
+      $tx->commit();
+      $this->fail('The error should reach the caller');
+    }
+    catch (RuntimeException $e) {
+      $this->assertSame('Pre-commit failed', $e->getMessage());
+    }
+    $this->assertContactsExistByOffset([0 => FALSE]);
+    $this->assertEquals([['_postRollback', 'lkj', ';']], $this->callbackLog);
   }
 
   /**
@@ -335,7 +354,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
       $this->fail('The error should reach the caller');
     }
     catch (TypeError $e) {
-      $this->assertEquals('Ruh-roh', $e->getMessage());
+      $this->assertSame('Ruh-roh', $e->getMessage());
     }
     $this->assertContactsExistByOffset([0 => FALSE]);
   }
@@ -448,7 +467,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
     $generalOffset = count($this->cids);
     foreach ($callbacks as $callback) {
-      list ($cbNesting, $cbInsert, $cbOutcome) = $callback;
+      [$cbNesting, $cbInsert, $cbOutcome] = $callback;
       $this->createContactWithTransaction($cbNesting, $cbInsert, $cbOutcome);
     }
 

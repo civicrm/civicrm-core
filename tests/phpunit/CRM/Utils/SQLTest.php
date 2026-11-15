@@ -26,7 +26,7 @@ class CRM_Utils_SQLTest extends CiviUnitTestCase {
       '#ids' => [6, 7, 8],
       '@item' => "it's text",
     ]);
-    $this->assertEquals('FROBNICATE some_table WITH MAX(the(field)) OVER 123 USING ("abc def", "45") OR (6, 7, 8) OR "it\\\'s text"', $sql);
+    $this->assertSame('FROBNICATE some_table WITH MAX(the(field)) OVER 123 USING ("abc def", "45") OR (6, 7, 8) OR "it\\\'s text"', $sql);
   }
 
   public function testInterpolateBad(): void {

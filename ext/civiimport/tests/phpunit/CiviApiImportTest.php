@@ -81,13 +81,13 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     ];
     $userJobID = UserJob::create()->setValues($userJobParameters)->execute()->first()['id'];
     $importFields = Import::getFields($userJobID)->execute();
-    $this->assertEquals('abc', $importFields[0]['table_name']);
-    $this->assertEquals('_id', $importFields[0]['column_name']);
-    $this->assertEquals('amount_given', $importFields[4]['column_name']);
-    $this->assertEquals('abc', $importFields[4]['table_name']);
+    $this->assertSame('abc', $importFields[0]['table_name']);
+    $this->assertSame('_id', $importFields[0]['column_name']);
+    $this->assertSame('amount_given', $importFields[4]['column_name']);
+    $this->assertSame('abc', $importFields[4]['table_name']);
 
     Import::create($userJobID)->setValues([
-      'external_identifier' => 678,
+      'external_identifier' => '678',
       'amount_given' => 80,
       'receive_date' => NULL,
       '_status' => 'NEW',
@@ -96,7 +96,7 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
 
     $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->execute()->first();
     $rowID = $import['_id'];
-    $this->assertEquals('80', $import['amount_given']);
+    $this->assertSame('80', $import['amount_given']);
 
     Import::update($userJobID)->setValues([
       'amount_given' => NULL,
@@ -105,11 +105,11 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     ])->execute();
 
     $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->execute()->first();
-    $this->assertEquals(NULL, $import['amount_given']);
+    $this->assertNull($import['amount_given']);
 
     Import::save($userJobID)->setRecords([
       [
-        'external_identifier' => 999,
+        'external_identifier' => '999',
         'amount_given' => 9,
         '_status' => 'ERROR',
         '_id' => $rowID,
@@ -117,30 +117,30 @@ class CiviApiImportTest extends TestCase implements HeadlessInterface, HookInter
     ])->execute();
 
     $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->addWhere('_id', '=', $rowID)->execute()->first();
-    $this->assertEquals(9, $import['amount_given']);
+    $this->assertSame('9', $import['amount_given']);
 
     Import::save($userJobID)->setRecords([
       [
-        'external_identifier' => 777,
+        'external_identifier' => '777',
         '_id' => $rowID,
         '_status' => 'ERROR',
       ],
     ])->execute();
 
     $import = Import::get($userJobID)->setSelect(['external_identifier', 'amount_given', '_status'])->addWhere('_id', '=', $rowID)->execute()->first();
-    $this->assertEquals(777, $import['external_identifier']);
+    $this->assertSame('777', $import['external_identifier']);
 
     $validate = Import::validate($userJobID)->addWhere('_id', '=', $rowID)->setLimit(1)->execute()->first();
-    $this->assertEquals('Missing required fields: Contribution ID OR Invoice Reference OR Transaction ID OR Financial Type ID', $validate['_status_message']);
-    $this->assertEquals('ERROR', $validate['_status']);
+    $this->assertSame('Missing required fields: Contribution ID OR Invoice Reference OR Transaction ID OR Financial Type ID', $validate['_status_message']);
+    $this->assertSame('ERROR', $validate['_status']);
 
     Import::update($userJobID)->setValues(['financial_type' => 'Donation'])->addWhere('_id', '=', $rowID)->execute();
     $validate = Import::validate($userJobID)->addWhere('_id', '=', $rowID)->setLimit(1)->execute()->first();
-    $this->assertEquals('', $validate['_status_message']);
-    $this->assertEquals('VALID', $validate['_status']);
+    $this->assertSame('', $validate['_status_message']);
+    $this->assertSame('VALID', $validate['_status']);
     $imported = Import::import($userJobID)->addWhere('_id', '=', $rowID)->setLimit(1)->execute()->first();
-    $this->assertEquals('ERROR', $imported['_status']);
-    $this->assertEquals('No matching Contact found', $imported['_status_message']);
+    $this->assertSame('ERROR', $imported['_status']);
+    $this->assertSame('No matching Contact found', $imported['_status_message']);
 
     // Update the table with a new table name & check the api still works.
     // This relies on the change in table name being detected & caches being

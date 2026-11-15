@@ -22,8 +22,8 @@ class CRM_Utils_Check_Component_EnvTest extends CiviUnitTestCase {
     $failRequest = $check->fileExists('https://civicrm.org', 0.001);
     $successRequest = $check->fileExists('https://civicrm.org', 0);
 
-    $this->assertEquals(FALSE, $failRequest, 'Request should fail for minimum timeout.');
-    $this->assertEquals(TRUE, $successRequest, 'Request should not fail for infinite timeout.');
+    $this->assertFalse($failRequest, 'Request should fail for minimum timeout.');
+    $this->assertTrue($successRequest, 'Request should not fail for infinite timeout.');
 
   }
 
@@ -117,9 +117,9 @@ class CRM_Utils_Check_Component_EnvTest extends CiviUnitTestCase {
 
       $this->assertCount(1, $messages);
       $message = $messages[0];
-      $this->assertEquals('checkExtensionTypes_my_legacy_ext', $message->getName());
+      $this->assertSame('checkExtensionTypes_my_legacy_ext', $message->getName());
       $this->assertStringContainsString('extension "my_legacy_ext" uses legacy type "payment"', $message->getMessage());
-      $this->assertEquals('warning', $message->getSeverity());
+      $this->assertSame('warning', $message->getSeverity());
     }
     finally {
       CRM_Extension_System::setSingleton($originalSystem);

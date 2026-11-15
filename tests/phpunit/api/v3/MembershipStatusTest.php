@@ -50,7 +50,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('membership_status', 'get', []);
     // It should be 8 statuses, 7 default from mysql_data
     // plus one test status added in setUp
-    $this->assertEquals(8, $result['count']);
+    $this->assertSame(8, $result['count']);
   }
 
   /**
@@ -61,7 +61,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
       'name' => 'test status',
     ];
     $result = $this->callAPISuccess('membership_status', 'get', $params);
-    $this->assertEquals($result['values'][$this->_membershipStatusID]['name'], "test status", "In line " . __LINE__);
+    $this->assertSame("test status", $result['values'][$this->_membershipStatusID]['name'], "In line " . __LINE__);
   }
 
   /**
@@ -72,7 +72,7 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertGreaterThan(1, $result['count'], "Check more than one exists In line " . __LINE__);
     $params['option.limit'] = 1;
     $result = $this->callAPISuccess('membership_status', 'get', $params);
-    $this->assertEquals(1, $result['count'], "Check only 1 retrieved " . __LINE__);
+    $this->assertSame(1, $result['count'], "Check only 1 retrieved " . __LINE__);
   }
 
   public function testCreateDuplicateName(): void {
@@ -105,14 +105,14 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('membership_status', 'create', $params);
     $id = $result['id'];
     $result = $this->callAPISuccess('membership_status', 'get', $params);
-    $this->assertEquals('test membership status', $result['values'][$id]['name']);
+    $this->assertSame('test membership status', $result['values'][$id]['name']);
     $newParams = [
       'id' => $id,
       'name' => 'renamed',
     ];
     $this->callAPISuccess('MembershipStatus', 'create', $newParams);
     $result = $this->callAPISuccess('MembershipStatus', 'get', ['id' => $id]);
-    $this->assertEquals('renamed', $result['values'][$id]['name']);
+    $this->assertSame('renamed', $result['values'][$id]['name']);
   }
 
   ///////////////// civicrm_membership_status_delete methods

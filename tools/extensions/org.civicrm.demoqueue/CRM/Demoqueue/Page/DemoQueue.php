@@ -7,7 +7,7 @@ require_once 'CRM/Core/Page.php';
  */
 class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
 
-  function run() {
+  public function run() {
     $queueName = 'demoqueue_' . time();
 
     $queue = Civi::queue($queueName, [
@@ -18,15 +18,21 @@ class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
 
     for ($i = 0; $i < 5; $i++) {
       $queue->createItem(new CRM_Queue_Task(
-        ['CRM_Demoqueue_Page_DemoQueue', 'doMyWork'], // callback
-        [$i, "Task $i takes $i second(s)"], // arguments
-        "Task $i" // title
+        // callback
+        ['CRM_Demoqueue_Page_DemoQueue', 'doMyWork'],
+        // arguments
+        [$i, "Task $i takes $i second(s)"],
+        // title
+        "Task $i"
       ));
       if ($i == 2) {
         $queue->createItem(new CRM_Queue_Task(
-          ['CRM_Demoqueue_Page_DemoQueue', 'addMoreWork'], // callback
-          [], // arguments
-          "Add More Work" // title
+          // callback
+          ['CRM_Demoqueue_Page_DemoQueue', 'addMoreWork'],
+          // arguments
+          [],
+          // title
+          "Add More Work"
         ));
       }
     }
@@ -43,7 +49,8 @@ class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
       // Deprecated; only works on AJAX runner // 'onEnd' => ['CRM_Demoqueue_Page_DemoQueue', 'onEnd'],
       'onEndUrl' => CRM_Utils_System::url('civicrm/demo-queue/done'),
     ]);
-    $runner->runAllInteractive(); // does not return
+    // does not return
+    $runner->runAllInteractive();
   }
 
   /**
@@ -53,14 +60,15 @@ class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
    * @param $message
    * @return bool
    */
-  static function doMyWork(CRM_Queue_TaskContext $ctx, $delay, $message) {
+  public static function doMyWork(CRM_Queue_TaskContext $ctx, $delay, $message) {
     sleep(1);
     //sleep($delay);
     //$ctx->log->info($message); // PEAR Log interface
     //$ctx->logy->info($message); // PEAR Log interface -- broken, PHP error
     //CRM_Core_DAO::executeQuery('select from alsdkjfasdf'); // broken, PEAR error
     //throw new Exception('whoz'); // broken, exception
-    return TRUE; // success
+    // success
+    return TRUE;
   }
 
   /**
@@ -68,29 +76,34 @@ class CRM_Demoqueue_Page_DemoQueue extends CRM_Core_Page {
    * @param \CRM_Queue_TaskContext $ctx
    * @return bool
    */
-  static function addMoreWork(CRM_Queue_TaskContext $ctx) {
+  public static function addMoreWork(CRM_Queue_TaskContext $ctx) {
     sleep(1);
     for ($i = 0; $i < 5; $i++) {
       $ctx->queue->createItem(new CRM_Queue_Task(
-        ['CRM_Demoqueue_Page_DemoQueue', 'doMyWork'], // callback
-        [$i, "Extra task $i takes $i second(s)"], // arguments
-        "Extra Task $i" // title
+        // callback
+        ['CRM_Demoqueue_Page_DemoQueue', 'doMyWork'],
+        // arguments
+        [$i, "Extra task $i takes $i second(s)"],
+        // title
+        "Extra Task $i"
       ), [
         'weight' => -1,
       ]);
     }
-    return TRUE; // success
+    // success
+    return TRUE;
   }
 
   /**
    * Handle the final step of the queue
    * @param \CRM_Queue_TaskContext $ctx
    */
-  static function onEnd(CRM_Queue_TaskContext $ctx) {
+  public static function onEnd(CRM_Queue_TaskContext $ctx) {
     //CRM_Utils_System::redirect('civicrm/demo-queue/done');
     CRM_Core_Error::debug_log_message('finished task');
     //$ctx->logy->info($message); // PEAR Log interface -- broken, PHP error
     //CRM_Core_DAO::executeQuery('select from alsdkjfasdf'); // broken, PEAR error
     //throw new Exception('whoz'); // broken, exception
   }
+
 }

@@ -155,17 +155,6 @@ class CRM_Custom_Form_CustomData {
       $subType = str_replace(CRM_Core_DAO::VALUE_SEPARATOR, ',', trim($subType, CRM_Core_DAO::VALUE_SEPARATOR));
     }
 
-    $singleRecord = NULL;
-    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
-      $singleRecord = $form->_groupCount;
-    }
-    $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
-    // when a new record is being added for multivalued custom fields.
-    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
-      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
-      $singleRecord = 'new';
-    }
-
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($type,
       NULL,
       $form->_entityId,
@@ -175,8 +164,7 @@ class CRM_Custom_Form_CustomData {
       $isLoadFromCache,
       $onlySubType,
       FALSE,
-      CRM_Core_Permission::EDIT,
-      $singleRecord
+      CRM_Core_Permission::EDIT
     );
 
     if (property_exists($form, '_customValueCount') && !empty($groupTree)) {
@@ -238,17 +226,6 @@ class CRM_Custom_Form_CustomData {
    */
   public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = TRUE) {
     CRM_Core_Error::deprecatedFunctionWarning('no alternative - maybe copy & paste to your extension');
-    $singleRecord = NULL;
-    if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
-      $singleRecord = $form->_groupCount;
-    }
-    $mode = CRM_Utils_Request::retrieve('mode', 'String', $form);
-    // when a new record is being added for multivalued custom fields.
-    if (isset($form->_groupCount) && $form->_groupCount == 0 && $mode == 'add' &&
-      !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
-      $singleRecord = 'new';
-    }
-
     $groupTree = CRM_Core_BAO_CustomGroup::getTree($form->_type,
       NULL,
       $form->_entityId,
@@ -258,8 +235,7 @@ class CRM_Custom_Form_CustomData {
       $getCachedTree,
       $onlySubType,
       FALSE,
-      CRM_Core_Permission::EDIT,
-      $singleRecord
+      CRM_Core_Permission::EDIT
     );
 
     if (property_exists($form, '_customValueCount') && !empty($groupTree)) {

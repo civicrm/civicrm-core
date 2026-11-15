@@ -88,12 +88,12 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
       'id' => $softContribution['id'],
     ];
     $softContribution = $this->callAPISuccess('contribution_soft', 'get', $params);
-    $this->assertEquals(1, $softContribution['count']);
+    $this->assertSame(1, $softContribution['count']);
     $this->assertEquals($softContribution['values'][$softContribution['id']]['contribution_id'], $this->_contributionId);
     $this->assertEquals($softContribution['values'][$softContribution['id']]['contact_id'], $this->_softIndividual1Id);
-    $this->assertEquals($softContribution['values'][$softContribution['id']]['amount'], '10.00');
-    $this->assertEquals($softContribution['values'][$softContribution['id']]['currency'], 'USD');
-    $this->assertEquals($softContribution['values'][$softContribution['id']]['soft_credit_type_id'], 4);
+    $this->assertSame('10.00', $softContribution['values'][$softContribution['id']]['amount']);
+    $this->assertSame('USD', $softContribution['values'][$softContribution['id']]['currency']);
+    $this->assertSame('4', $softContribution['values'][$softContribution['id']]['soft_credit_type_id']);
 
     //create a second soft contribution on the same hard contribution - we are testing that 'id' gets the right soft contribution id (not the contribution id)
     $p['contact_id'] = $this->_softIndividual2Id;
@@ -101,13 +101,13 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
     // now we have 2 - test getcount
     $softContributionCount = $this->callAPISuccess('contribution_soft', 'getcount', []);
-    $this->assertEquals(2, $softContributionCount);
+    $this->assertSame(2, $softContributionCount);
 
     //check first contribution
     $result = $this->callAPISuccess('contribution_soft', 'get', [
       'id' => $softContribution['id'],
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
     $this->assertEquals($softContribution['id'], $result['id']);
 
     //test id only format - second soft credit
@@ -121,7 +121,7 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contribution_soft', 'get', [
       'contact_id' => $this->_softIndividual2Id,
     ]);
-    $this->assertEquals(1, $result['count']);
+    $this->assertSame(1, $result['count']);
 
     $this->callAPISuccess('contribution_soft', 'Delete', [
       'id' => $softContribution['id'],
@@ -194,9 +194,9 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     $softContribution = $this->callAPISuccess('contribution_soft', 'create', $params);
     $this->assertEquals($softContribution['values'][$softContribution['id']]['contribution_id'], $this->_contributionId);
     $this->assertEquals($softContribution['values'][$softContribution['id']]['contact_id'], $this->_softIndividual1Id);
-    $this->assertEquals($softContribution['values'][$softContribution['id']]['amount'], '10');
-    $this->assertEquals($softContribution['values'][$softContribution['id']]['currency'], 'USD');
-    $this->assertEquals($softContribution['values'][$softContribution['id']]['soft_credit_type_id'], 5);
+    $this->assertSame('10', $softContribution['values'][$softContribution['id']]['amount']);
+    $this->assertSame('USD', $softContribution['values'][$softContribution['id']]['currency']);
+    $this->assertSame('5', $softContribution['values'][$softContribution['id']]['soft_credit_type_id']);
   }
 
   /**
@@ -232,9 +232,9 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     //check against original values
     $this->assertEquals($old_contribution_id, $this->_contributionId);
     $this->assertEquals($old_contact_id, $this->_softIndividual1Id);
-    $this->assertEquals($old_amount, 10.00);
-    $this->assertEquals($old_currency, 'USD');
-    $this->assertEquals($old_soft_credit_type_id, 6);
+    $this->assertSame('10.00', $old_amount);
+    $this->assertSame('USD', $old_currency);
+    $this->assertSame('6', $old_soft_credit_type_id);
     $params = [
       'id' => $softContributionID,
       'contribution_id' => $this->_contributionId,
@@ -253,9 +253,9 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
     //check against original values
     $this->assertEquals($softContribution['values'][$softContributionID]['contribution_id'], $this->_contributionId);
     $this->assertEquals($softContribution['values'][$softContributionID]['contact_id'], $this->_softIndividual1Id);
-    $this->assertEquals($softContribution['values'][$softContributionID]['amount'], 7.00);
-    $this->assertEquals($softContribution['values'][$softContributionID]['currency'], 'CAD');
-    $this->assertEquals($softContribution['values'][$softContributionID]['soft_credit_type_id'], 7);
+    $this->assertSame('7.00', $softContribution['values'][$softContributionID]['amount']);
+    $this->assertSame('CAD', $softContribution['values'][$softContributionID]['currency']);
+    $this->assertSame('7', $softContribution['values'][$softContributionID]['soft_credit_type_id']);
 
     $params = [
       'id' => $softContributionID,

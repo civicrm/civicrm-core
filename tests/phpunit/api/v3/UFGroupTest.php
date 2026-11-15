@@ -228,9 +228,9 @@ class api_v3_UFGroupTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $ufGroup = $this->callAPISuccess('uf_group', 'create', $this->params);
     $params = ['id' => $ufGroup['id']];
-    $this->assertEquals(1, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
+    $this->assertSame(1, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
     $result = $this->callAPISuccess('uf_group', 'delete', $params);
-    $this->assertEquals(0, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
+    $this->assertSame(0, $this->callAPISuccess('uf_group', 'getcount', $params), "in line " . __LINE__);
   }
 
   /**

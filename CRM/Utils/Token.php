@@ -630,11 +630,12 @@ class CRM_Utils_Token {
    *
    * this routine will remove the extra backslashes and braces
    *
-   * @deprecated
+   * @deprecated in 5.43 will be removed around 6.28.
    *
    * @param string $str ref to the string that will be scanned and modified
    */
   public static function unescapeTokens(&$str) {
+    CRM_Core_Error::deprecatedFunctionWarning();
     $str = preg_replace('/\\\\|\{(\{\w+\.\w+\})\}/', '\\1', $str);
   }
 

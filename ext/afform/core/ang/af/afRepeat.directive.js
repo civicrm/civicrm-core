@@ -20,6 +20,7 @@
           $scope.afFieldset = ctrls[0];
           $scope.afJoin = ctrls[1];
           $scope.element = $el;
+          $scope.ts = CRM.ts('org.civicrm.afform');
         },
         controller: function($scope) {
 

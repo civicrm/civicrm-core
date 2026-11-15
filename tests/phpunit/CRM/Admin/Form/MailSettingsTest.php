@@ -117,9 +117,9 @@ class CRM_Admin_Form_MailSettingsTest extends CiviUnitTestCase {
 
     $connection = $form->getTemplateVariable('mailSettingsConnection');
     $this->assertTrue($form->getTemplateVariable('mailSettingsHasInitiators'));
-    $this->assertEquals('Connected as bob@example.org', $connection['status_message']);
-    $this->assertEquals('success', $connection['status_severity']);
-    $this->assertEquals('http://example.org/manage', $connection['manage_url']);
+    $this->assertSame('Connected as bob@example.org', $connection['status_message']);
+    $this->assertSame('success', $connection['status_severity']);
+    $this->assertSame('http://example.org/manage', $connection['manage_url']);
   }
 
   public function testUnconnectedInitiatorReportsNoConnection(): void {
@@ -150,9 +150,9 @@ class CRM_Admin_Form_MailSettingsTest extends CiviUnitTestCase {
     $form->processForm();
 
     $stored = $this->getStored($id);
-    $this->assertEquals('stored-secret', $stored['password'],
+    $this->assertSame('stored-secret', $stored['password'],
       'A field owned by the connection is left alone');
-    $this->assertEquals('bob@example.org', $stored['username'],
+    $this->assertSame('bob@example.org', $stored['username'],
       'Fields not owned by the connection still save');
   }
 
@@ -171,7 +171,7 @@ class CRM_Admin_Form_MailSettingsTest extends CiviUnitTestCase {
     $form = $this->buildForm($id, $this->submittedValues($id));
     $form->processForm();
 
-    $this->assertEquals(1, $this->getStored($id)['is_ssl'],
+    $this->assertTrue($this->getStored($id)['is_ssl'],
       'An absent managed checkbox must not be saved as unchecked');
   }
 
@@ -185,7 +185,7 @@ class CRM_Admin_Form_MailSettingsTest extends CiviUnitTestCase {
     $form = $this->buildForm($id, $values);
     $form->processForm();
 
-    $this->assertEquals('typed-by-hand', $this->getStored($id)['password']);
+    $this->assertSame('typed-by-hand', $this->getStored($id)['password']);
   }
 
 }

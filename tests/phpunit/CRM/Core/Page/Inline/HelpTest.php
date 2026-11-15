@@ -36,7 +36,7 @@ class CRM_Core_Page_Inline_HelpTest extends CiviUnitTestCase {
       $page->run();
     }
     catch (CRM_Core_Exception $e) {
-      $this->assertEquals('File name is not valid', $e->getMessage());
+      $this->assertSame('File name is not valid', $e->getMessage());
       $this->assertFalse($expectedSuccess);
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {

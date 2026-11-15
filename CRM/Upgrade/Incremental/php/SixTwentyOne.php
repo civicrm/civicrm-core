@@ -98,6 +98,26 @@ class CRM_Upgrade_Incremental_php_SixTwentyOne extends CRM_Upgrade_Incremental_B
   }
 
   /**
+   * Upgrade step; adds tasks.
+   *
+   * @param string $rev
+   *   The version number matching this function name
+   */
+  public function upgrade_6_21_beta1($rev): void {
+    $this->addTask('Ensure "MailingAB.created_date" is a timestamp defaulting to now', 'alterSchemaField', 'MailingAB', 'created_date', [
+      'title' => ts('AB Test Created Date'),
+      'sql_type' => 'timestamp',
+      'input_type' => 'Select Date',
+      'description' => ts('When was this item created'),
+      'add' => '4.6',
+      'default' => 'CURRENT_TIMESTAMP',
+      'input_attrs' => [
+        'format_type' => 'mailing',
+      ],
+    ]);
+  }
+
+  /**
    * Keep one StatusPreference per name and domain (the oldest, which is the one
    * the BAO has been updating) and replace the name index with a unique one.
    *

@@ -43,7 +43,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
       'custom_' . $fieldID => $date,
     ];
     $result = CRM_Core_BAO_CustomValueTable::setValues($params);
-    $this->assertEquals($result['is_error'], 0, 'Verify that is_error = 0 (success).');
+    $this->assertSame(0, $result['is_error'], 'Verify that is_error = 0 (success).');
 
     // Check that the date value is stored
     $params = [
@@ -52,7 +52,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($params);
 
-    $this->assertEquals(0, $values['is_error'], 'Verify that is_error = 0 (success).');
+    $this->assertSame(0, $values['is_error'], 'Verify that is_error = 0 (success).');
     $this->assertEquals($values['custom_' . $fieldID . '_1'],
       CRM_Utils_Date::mysqlToIso($date),
       'Verify that the date value is stored for contact ' . $contactID
@@ -99,7 +99,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
       'custom_' . $fieldID => 1,
     ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($params);
-    $this->assertEquals($values['is_error'], 0, 'Verify that is_error = 0 (success).');
+    $this->assertSame(0, $values['is_error'], 'Verify that is_error = 0 (success).');
   }
 
   /**
@@ -136,7 +136,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     ];
     $result = CRM_Core_BAO_CustomValueTable::setValues($params);
 
-    $this->assertEquals($result['is_error'], 0, 'Verify that is_error = 0 (success).');
+    $this->assertSame(0, $result['is_error'], 'Verify that is_error = 0 (success).');
 
     // Check that the YesNo radio value is stored
     $params = [
@@ -145,7 +145,7 @@ class CRM_Core_BAO_CustomValueTableSetGetTest extends CiviUnitTestCase {
     ];
     $values = CRM_Core_BAO_CustomValueTable::getValues($params);
 
-    $this->assertEquals($values['is_error'], 0, 'Verify that is_error = 0 (success).');
+    $this->assertSame(0, $values['is_error'], 'Verify that is_error = 0 (success).');
     $this->assertEquals($values["custom_{$fieldID}_1"], $yesNo,
       'Verify that the boolean value is stored for contact ' . $contactID
     );
