@@ -31,6 +31,17 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
+  /**
+   * getNotifyUrl() passes a NULL query to the CMS as '', as url() does.
+   */
+  public function testGetNotifyUrlNullQuery(): void {
+    $userSystem = $this->getMockBuilder(CRM_Utils_System_UnitTests::class)->onlyMethods(['getNotifyUrl'])->getMock();
+    $userSystem->expects($this->once())->method('getNotifyUrl')
+      ->with('civicrm/payment/ipn/1', $this->identicalTo(''));
+    CRM_Core_Config::singleton()->userSystem = $userSystem;
+    CRM_Utils_System::getNotifyUrl('civicrm/payment/ipn/1', NULL);
+  }
+
   public function testEvalUrl(): void {
     $this->assertFalse(CRM_Utils_System::evalUrl(FALSE));
     $this->assertSame('http://example.com/', CRM_Utils_System::evalUrl('http://example.com/'));

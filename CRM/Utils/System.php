@@ -387,14 +387,18 @@ class CRM_Utils_System {
    *   The Notification URL.
    */
   public static function getNotifyUrl(
-    $path = NULL,
-    $query = NULL,
+    $path = '',
+    $query = '',
     $absolute = FALSE,
     $fragment = NULL,
     $htmlize = NULL,
     $frontend = FALSE,
     $forceBackend = FALSE
   ) {
+    // handle legacy null params
+    $path ??= '';
+    $query ??= '';
+
     $config = CRM_Core_Config::singleton();
     $query = self::makeQueryString($query);
     return $config->userSystem->getNotifyUrl($path, $query, $absolute, $fragment, $frontend, $forceBackend);
