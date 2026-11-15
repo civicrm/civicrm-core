@@ -36,6 +36,10 @@ class FormattingUtil {
    * @throws \CRM_Core_Exception
    */
   public static function formatWriteParams(&$params, $fields) {
+    // An empty 'id' param is not valid
+    if (array_key_exists('id', $params) && \CRM_Utils_System::isNull($params['id'])) {
+      unset($params['id']);
+    }
     foreach ($fields as $name => $field) {
       if (!empty($params[$name])) {
         $value =& $params[$name];

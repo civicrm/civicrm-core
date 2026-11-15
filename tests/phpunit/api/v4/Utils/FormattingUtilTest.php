@@ -68,4 +68,41 @@ class FormattingUtilTest extends Api4TestBase implements TransactionalInterface 
     $this->assertArrayNotHasKey('object_id', $acl);
   }
 
+  /**
+   * @dataProvider getFormatWriteParamsIdExamples
+   * @param mixed $idValue
+   * @param bool $shouldBeUnset
+   */
+  public function testFormatWriteParamsEmptyId($idValue, bool $shouldBeUnset): void {
+    $fields = [
+      'id' => ['name' => 'id', 'data_type' => 'Integer', 'entity' => 'Contact'],
+      'first_name' => ['name' => 'first_name', 'data_type' => 'String', 'entity' => 'Contact'],
+    ];
+    $params = [
+      'id' => $idValue,
+      'first_name' => NULL,
+    ];
+
+    FormattingUtil::formatWriteParams($params, $fields);
+
+    if ($shouldBeUnset) {
+      $this->assertArrayNotHasKey('id', $params);
+    }
+    else {
+      $this->assertSame((int) $idValue, $params['id']);
+    }
+    // Other nullable fields should still be converted to ''
+    $this->assertSame('', $params['first_name']);
+  }
+
+  public static function getFormatWriteParamsIdExamples(): array {
+    return [
+      'null' => [NULL, TRUE],
+      'empty string' => ['', TRUE],
+      'string null' => ['null', TRUE],
+      'valid int' => [123, FALSE],
+      'valid string int' => ['123', FALSE],
+    ];
+  }
+
 }
