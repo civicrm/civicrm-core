@@ -82,7 +82,11 @@ class CoreUtil {
    * Returns TRUE if `entityName` is 'Contact', 'Individual', 'Organization' or 'Household'
    */
   public static function isContact(string $entityName): bool {
-    return $entityName === 'Contact' || in_array($entityName, \CRM_Contact_BAO_ContactType::basicTypes(TRUE), TRUE);
+    if ($entityName === 'Contact') {
+      return TRUE;
+    }
+    $contactTypes = \CRM_Contact_BAO_ContactType::getAllContactTypes();
+    return isset($contactTypes[$entityName]) && !$contactTypes[$entityName]['parent'];
   }
 
   /**
