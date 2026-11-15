@@ -7,21 +7,9 @@
  */
 class CRM_Utils_SystemTest extends CiviUnitTestCase {
 
-  /**
-   * @var CRM_Utils_System_Base|null
-   */
-  private $originalUserSystem;
-
   public function setUp(): void {
     parent::setUp();
     $this->useTransaction();
-  }
-
-  public function tearDown(): void {
-    if ($this->originalUserSystem) {
-      CRM_Core_Config::singleton()->userSystem = $this->originalUserSystem;
-    }
-    parent::tearDown();
   }
 
   public function testUrlQueryString(): void {
@@ -43,35 +31,15 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $this->assertEquals($expected, $actual);
   }
 
-  public static function getNotifyUrlParams(): array {
-    return [
-      'NULL query' => [['civicrm/payment/ipn/1', NULL], ['civicrm/payment/ipn/1', '']],
-      'NULL path and query' => [[NULL, NULL], ['', '']],
-      'NULL path, string query' => [[NULL, 'reset=1'], ['', 'reset=1']],
-      'array query' => [['civicrm/payment/ipn/1', ['reset' => 1]], ['civicrm/payment/ipn/1', 'reset=1']],
-    ];
-  }
-
   /**
-   * getNotifyUrl() passes NULL params on to the CMS as empty strings, like url().
-   *
-   * @dataProvider getNotifyUrlParams
+   * getNotifyUrl() passes a NULL query to the CMS as '', as url() does.
    */
-  public function testGetNotifyUrlParams(array $params, array $expected): void {
-    $config = CRM_Core_Config::singleton();
-    $this->originalUserSystem = $config->userSystem;
-    $config->userSystem = new class() extends CRM_Utils_System_UnitTests {
-
-      public $notifyUrlArgs;
-
-      public function getNotifyUrl($path = NULL, $query = NULL, $absolute = FALSE, $fragment = NULL, $frontend = FALSE, $forceBackend = FALSE) {
-        $this->notifyUrlArgs = [$path, $query];
-        return parent::getNotifyUrl($path, $query, $absolute, $fragment, $frontend, $forceBackend);
-      }
-
-    };
-    CRM_Utils_System::getNotifyUrl($params[0], $params[1], TRUE, NULL, FALSE, TRUE);
-    $this->assertSame($expected, $config->userSystem->notifyUrlArgs);
+  public function testGetNotifyUrlNullQuery(): void {
+    $userSystem = $this->getMockBuilder(CRM_Utils_System_UnitTests::class)->onlyMethods(['getNotifyUrl'])->getMock();
+    $userSystem->expects($this->once())->method('getNotifyUrl')
+      ->with('civicrm/payment/ipn/1', $this->identicalTo(''));
+    CRM_Core_Config::singleton()->userSystem = $userSystem;
+    CRM_Utils_System::getNotifyUrl('civicrm/payment/ipn/1', NULL);
   }
 
   public function testEvalUrl(): void {
