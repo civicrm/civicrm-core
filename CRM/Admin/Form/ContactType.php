@@ -21,11 +21,6 @@
 class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
 
   /**
-   * @var int|null
-   */
-  protected $parentId;
-
-  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -42,12 +37,18 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
       return;
     }
     $this->applyFilter('__ALL__', 'trim');
+
+    $parentId = $this->_action & CRM_Core_Action::UPDATE ?
+      CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $this->_id, 'parent_id') :
+      NULL;
+
     $this->add('text', 'label', ts('Name'),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_ContactType', 'label'),
       TRUE
     );
-    $contactType = $this->add('select', 'parent_id', ts('Basic Contact Type'),
-      CRM_Contact_BAO_ContactType::basicTypePairs(FALSE, 'id')
+    $contactType = $this->add('select2', 'parent_id', ts('Basic Contact Type'),
+      CRM_Contact_BAO_ContactType::basicTypeInfo(),
+      isset($parentId) || ($this->_action & CRM_Core_Action::ADD)
     );
     $enabled = $this->add('advcheckbox', 'is_active', ts('Enabled'));
     if ($this->_action & CRM_Core_Action::UPDATE) {
@@ -56,10 +57,9 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
       $contactTypeName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $this->_id, 'name');
       $this->assign('contactTypeName', $contactTypeName);
 
-      $this->parentId = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $this->_id, 'parent_id');
       // Freeze Enabled field for built-in contact types (parent_id is NULL for these)
       // dev/core#4470 except Household which can be disabled
-      if (is_null($this->parentId) && $contactTypeName != 'Household') {
+      if (is_null($parentId) && $contactTypeName !== 'Household') {
         $enabled->freeze();
       }
     }
@@ -112,6 +112,14 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
     if (!$self->_id && array_key_exists($contactName, $reservedKeyWords)) {
       $errors['label'] = ts('Contact type names should not use reserved keywords.');
     }
+
+    if (!empty($fields['parent_id'])) {
+      $basicTypeIds = array_column(CRM_Contact_BAO_ContactType::basicTypeInfo((bool) $self->_id), 'id');
+      if (!in_array($fields['parent_id'], $basicTypeIds)) {
+        $errors['parent_id'] = ts('Basic Contact Type is not valid.');
+      }
+    }
+
     return empty($errors) ? TRUE : $errors;
   }
 
@@ -130,7 +138,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
       return;
     }
 
-    $params = $this->exportValues();
+    $params = $this->getSubmittedValues();
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;
