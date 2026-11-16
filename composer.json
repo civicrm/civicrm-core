@@ -316,9 +316,6 @@
         "Apply CiviCRM Customisations for the pear:db package": "https://download.civicrm.org/patches/47e125fec0c789b095880fa65c6037210b01179290d5727b22b70fa77333496b/pear_db_civicrm_changes.patch",
         "Don't reselect the database before every statement (pear/DB#51)": "https://download.civicrm.org/patches/1353ff0c33d10b7c1c571173267786aaea4ad22cead599d25031fedbba492017/select-db-once.patch"
       },
-      "pear/mail_mime": {
-        "Apply patch for CRM-3133 wordwrap body to be 750 characters to apply with RFC 2821": "https://download.civicrm.org/patches/38231167f0c789e0b368b38c1499973d562de65e87094b402156a6b928cc4c38/crm_3133.patch"
-      },
       "phpoffice/phpspreadsheet": {
         "Apply backported security packages": "https://download.civicrm.org/patches/929f65845c4348d553997babe80d471ff3ad48237c91f0b9b0055757457bceba/security_patches.patch"
       },

@@ -573,7 +573,7 @@ class CRM_Utils_Mail {
   }
 
   /**
-   * @param $message
+   * @param Mail_mime $message
    * @param array $params
    *
    * @return mixed
@@ -592,7 +592,77 @@ class CRM_Utils_Mail {
       }
       $params = $mimeParams;
     }
+    $html = $message->getHTMLBody();
+    if (is_string($html) && $html !== '') {
+      $message->setHTMLBody(self::wrapLongLines($html, TRUE));
+    }
+    $text = $message->getTXTBody();
+    if (is_string($text) && $text !== '') {
+      $message->setTXTBody(self::wrapLongLines($text));
+    }
     return $message->get($params);
+  }
+
+  /**
+   * Break the long lines of an email body at 750 characters, as wordwrap() does.
+   *
+   * SMTP limits a line to 998 characters (RFC 5321), so the body is wrapped
+   * well below that (CRM-3133).
+   *
+   * In HTML, a line break inside a quoted attribute value, or inside a string
+   * in a <style> block, becomes part of that value. For a CSS value such as
+   * font-family: 'Open Sans', email clients then drop the whole style
+   * (dev/core#6202). So, in HTML, spaces inside those quotes are not used as
+   * break points. A line that would still be over 998 characters is wrapped
+   * at any space, as before.
+   *
+   * @param string $body
+   * @param bool $isHtml
+   * @param int $width
+   *
+   * @return string
+   */
+  public static function wrapLongLines(string $body, bool $isHtml = FALSE, int $width = 750): string {
+    $placeholder = "\x1A";
+    if (!$isHtml || str_contains($body, $placeholder) || !preg_match('/[^\n]{' . ($width + 1) . '}/', $body)) {
+      return wordwrap($body, $width);
+    }
+    $protected = self::protectQuotedSpaces($body, $placeholder);
+    if ($protected === NULL) {
+      return wordwrap($body, $width);
+    }
+    $lines = explode("\n", str_replace($placeholder, ' ', wordwrap($protected, $width)));
+    foreach ($lines as &$line) {
+      if (strlen(rtrim($line, "\r")) > 998) {
+        $line = wordwrap($line, $width);
+      }
+    }
+    unset($line);
+    return implode("\n", $lines);
+  }
+
+  /**
+   * Replace the spaces inside quoted attribute values and <style> strings.
+   *
+   * @param string $html
+   * @param string $placeholder
+   *
+   * @return string|null
+   *   NULL if the HTML could not be parsed.
+   */
+  private static function protectQuotedSpaces(string $html, string $placeholder): ?string {
+    $protect = function (array $match) use ($placeholder): string {
+      return str_replace(' ', $placeholder, $match[0]);
+    };
+    $html = preg_replace_callback('/<[a-zA-Z][^\s\/>]*(?:\s+[^\s=\/>]+(?:\s*=\s*(?:"[^"]*"|\'[^\']*\'|[^\s>]*))?)*\s*\/?>/', function (array $tag) use ($protect): string {
+      return preg_replace_callback('/=\s*(?:"[^"]*"|\'[^\']*\')/', $protect, $tag[0]);
+    }, $html);
+    if ($html === NULL) {
+      return NULL;
+    }
+    return preg_replace_callback('/(<style\b[^>]*>)(.*?)(<\/style\s*>)/is', function (array $block) use ($protect): string {
+      return $block[1] . preg_replace_callback('/"[^"\n]*"|\'[^\'\n]*\'/', $protect, $block[2]) . $block[3];
+    }, $html);
   }
 
   /**
