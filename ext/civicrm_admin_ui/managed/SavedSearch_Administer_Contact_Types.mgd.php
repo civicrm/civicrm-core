@@ -12,21 +12,16 @@ return [
       'values' => [
         'name' => 'Administer_Contact_Types',
         'label' => E::ts('Administer Contact Types'),
-        'form_values' => NULL,
-        'mapping_id' => NULL,
-        'search_custom_id' => NULL,
         'api_entity' => 'ContactType',
         'api_params' => [
           'version' => 4,
-          'select' => ['label', 'description'],
+          'select' => ['label', 'description', 'parent_id', 'is_active'],
           'orderBy' => [],
           'where' => [],
           'groupBy' => [],
           'join' => [],
           'having' => [],
         ],
-        'expires_date' => NULL,
-        'description' => NULL,
       ],
       'match' => ['name'],
     ],
@@ -44,7 +39,7 @@ return [
         'saved_search_id.name' => 'Administer_Contact_Types',
         'type' => 'table',
         'settings' => [
-          'actions' => TRUE,
+          'actions' => FALSE,
           'limit' => 50,
           'classes' => [
             'table',
@@ -59,6 +54,9 @@ return [
           'placeholder' => 5,
           'sort' => [
             ['label', 'ASC'],
+          ],
+          'cssRules' => [
+            ['disabled', 'is_active', '=', FALSE],
           ],
           'columns' => [
             [
@@ -96,7 +94,39 @@ return [
                   'text' => 'Edit',
                   'style' => 'default',
                   'path' => '',
-                  'condition' => [],
+                ],
+                [
+                  'style' => 'default',
+                  'text' => 'Add Subtype',
+                  'icon' => 'fa-plus',
+                  'conditions' => [
+                    ['parent_id', 'IS EMPTY'],
+                  ],
+                  'path' => 'civicrm/admin/options/subtype/edit?action=add&reset=1&parent_id=[id]',
+                  'task' => '',
+                  'entity' => '',
+                  'action' => '',
+                  'join' => '',
+                  'target' => 'crm-popup',
+                ],
+                [
+                  'task' => 'enable',
+                  'entity' => 'ContactType',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-on',
+                  'text' => 'Enable',
+                  'style' => 'default',
+                ],
+                [
+                  'task' => 'disable',
+                  'entity' => 'ContactType',
+                  'target' => 'crm-popup',
+                  'icon' => 'fa-toggle-off',
+                  'text' => 'Disable',
+                  'style' => 'default',
+                  'conditions' => [
+                    ['parent_id', 'IS NOT EMPTY'],
+                  ],
                 ],
                 [
                   'entity' => 'ContactType',
@@ -107,9 +137,8 @@ return [
                   'text' => 'Delete',
                   'style' => 'danger',
                   'path' => '',
-                  'condition' => [
-                    'parent_id:label',
-                    'IS NOT EMPTY',
+                  'conditions' => [
+                    ['parent_id', 'IS NOT EMPTY'],
                   ],
                 ],
               ],
@@ -128,8 +157,9 @@ return [
             ],
           ],
           'hierarchical' => TRUE,
+          'columnMode' => 'custom',
+          'actions_display_mode' => 'menu',
         ],
-        'acl_bypass' => FALSE,
       ],
       'match' => [
         'name',
