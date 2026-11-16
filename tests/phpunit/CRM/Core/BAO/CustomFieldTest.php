@@ -1173,28 +1173,46 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
       'extends' => 'Individual',
       'title' => 'Test Contactcustom Group',
     ])['id'];
-    $fieldId = $this->customFieldCreate([
+    $addText = $this->customFieldCreate([
       'custom_group_id' => $customGroupId,
-      'name' => 'alter_cf_field',
-      'label' => 'Alter CF Field',
+      'name' => 'alter_cf_field_add_text',
+      'label' => 'Alter CF Field Add Text',
     ])['id'];
-    $contactId = $this->individualCreate(['custom_' . $fieldId => 'Test']);
+    $addHtml = $this->customFieldCreate([
+      'custom_group_id' => $customGroupId,
+      'name' => 'alter_cf_field_add_html',
+      'label' => 'Alter CF Field Add HTML',
+    ])['id'];
+    $contactId = $this->individualCreate(['custom_' . $addText => 'Test']);
 
     $this->assertSame('Test', $this->callAPISuccessGetValue('Contact',
-      ['id' => $contactId, 'return' => "custom_{$fieldId}"]
+      ['id' => $contactId, 'return' => "custom_{$addText}"]
     ));
 
     $values = [];
     $fields = [
-      'custom_' . $fieldId => $this->callAPISuccess('Contact', 'getfield', [
-        'name' => 'custom_' . $fieldId,
+      'custom_' . $addText => $this->callAPISuccess('Contact', 'getfield', [
+        'name' => 'custom_' . $addText,
+        'action' => 'get',
+      ])['values'],
+      'custom_' . $addHtml => $this->callAPISuccess('Contact', 'getfield', [
+        'name' => 'custom_' . $addHtml,
         'action' => 'get',
       ])['values'],
     ];
 
     // CRM_Core_BAO_UFGroup::getValues() invokes CRM_Core_BAO_CustomField::displayValue() function.
     CRM_Core_BAO_UFGroup::getValues($contactId, $fields, $values);
-    $this->assertSame('New value', $values['Alter CF Field']);
+
+    // text field
+    $this->assertTrue(str_contains($values['Alter CF Field Add Text'], 'Lisa S'), 'Text value updated');
+    $this->assertTrue(str_contains($values['Alter CF Field Add Text'], 'lisa@simpson.com'), 'Things that look like <html> tags should not be garbled');
+    $this->assertFalse(str_contains($values['Alter CF Field Add Text'], '<'), 'html chars (<>) should be escaped');
+
+    // hooks that declare they add text
+    // should be purified
+    $this->assertTrue(str_contains($values['Alter CF Field Add HTML'], '<b>Important</b>'), 'Regular HTML tags should be preserved');
+    $this->assertFalse(str_contains($values['Alter CF Field Add HTML'], 'onclick'), 'Dodgy HTML should be purified');
   }
 
   /**
@@ -1204,9 +1222,15 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
    * @param array $fieldInfo
    *
    */
-  public function alterCustomFieldDisplayValue(&$displayValue, $value, $entityId, $fieldInfo) {
-    if ($fieldInfo['name'] == 'alter_cf_field') {
-      $displayValue = 'New value';
+  public function alterCustomFieldDisplayValue(&$displayValue, $value, $entityId, $fieldInfo, string &$contentType) {
+    if ($fieldInfo['name'] == 'alter_cf_field_add_text') {
+      // this should be escaped
+      $displayValue = 'Lisa S <lisa@simpson.com>';
+    }
+    if ($fieldInfo['name'] == 'alter_cf_field_add_html') {
+      // this should be purified
+      $displayValue = '<b>Important</b> that this is <button onclick="alert(\'uh oh\')">purified</button>';
+      $contentType = 'html';
     }
   }
 

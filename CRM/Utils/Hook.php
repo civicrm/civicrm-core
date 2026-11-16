@@ -3271,15 +3271,16 @@ abstract class CRM_Utils_Hook {
    * @param mixed $value
    * @param int $entityId
    * @param array $fieldInfo
+   * @param string $contentType
    *
    * @return mixed
    */
-  public static function alterCustomFieldDisplayValue(&$displayValue, $value, $entityId, $fieldInfo) {
+  public static function alterCustomFieldDisplayValue(&$displayValue, $value, $entityId, $fieldInfo, &$contentType = 'text') {
     $null = NULL;
     return self::singleton()->invoke(
-      ['displayValue', 'value', 'entityId', 'fieldInfo'],
-      $displayValue, $value, $entityId, $fieldInfo, $null,
-      $null, 'civicrm_alterCustomFieldDisplayValue'
+      ['displayValue', 'value', 'entityId', 'fieldInfo', 'contentType'],
+      $displayValue, $value, $entityId, $fieldInfo, $contentType, $null,
+      'civicrm_alterCustomFieldDisplayValue'
     );
   }
 
