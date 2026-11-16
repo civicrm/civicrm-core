@@ -114,7 +114,8 @@ class CRM_Standaloneusers_BAO_User extends CRM_Standaloneusers_DAO_User {
       // no one is logged in
       return;
     }
-    if (empty($sess->get('lastAccess')) || (time() - $sess->get('lastAccess')) >= 60) {
+    $lastAccess = $sess->get('lastAccess');
+    if ($lastAccess && (time() - $lastAccess) < 60) {
       // dont update more than once a minute
       return;
     }
