@@ -431,6 +431,16 @@ class CRM_Contact_BAO_Query {
   public $_onlyDeleted = 0;
 
   /**
+   * Titles of the groups the current user may see, keyed by group ID.
+   *
+   * Kept for the lifetime of the query because convertGroupIDStringToLabelString()
+   * runs once per result row.
+   *
+   * @var array|null
+   */
+  private $permissionedGroupTitles;
+
+  /**
    * Class constructor which also does all the work.
    *
    * @param array $params
@@ -6505,7 +6515,8 @@ AND   displayRelType.is_active = 1
   public function convertGroupIDStringToLabelString(&$dao, $val) {
     $groupIDs = explode(',', $val);
     // Note that groups that the user does not have permission to will be excluded (good).
-    $groups = array_intersect_key(CRM_Core_PseudoConstant::group(), array_flip($groupIDs));
+    $this->permissionedGroupTitles ??= CRM_Core_PseudoConstant::group();
+    $groups = array_intersect_key($this->permissionedGroupTitles, array_flip($groupIDs));
     return implode(', ', $groups);
 
   }
