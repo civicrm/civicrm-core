@@ -918,19 +918,4 @@ class ContactGetTest extends Api4TestBase implements TransactionalInterface {
     Contact::get(FALSE)->addWhere('groups', 'IN', ['0) OR 1=1 -- '])->execute();
   }
 
-  /**
-   * Values of the group filter are ids, anything else is rejected.
-   */
-  public function testGroupFilterRejectsNonIntegerValue(): void {
-    $contact = $this->createTestRecord('Contact');
-    $group = $this->createTestRecord('Group');
-    $this->createTestRecord('GroupContact', ['group_id' => $group['id'], 'contact_id' => $contact['id']]);
-
-    $inGroup = Contact::get(FALSE)->addWhere('groups', 'IN', [$group['id']])->execute();
-    $this->assertEquals([$contact['id']], $inGroup->column('id'));
-
-    $this->expectException(\CRM_Core_Exception::class);
-    Contact::get(FALSE)->addWhere('groups', 'IN', ['0) OR 1=1 -- '])->execute();
-  }
-
 }
