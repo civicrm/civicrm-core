@@ -216,7 +216,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     }
 
     // to process Custom data that are appended to URL
-    $getDefaults = CRM_Core_BAO_CustomGroup::extractGetParams($this, "'Contact', 'Individual', 'Contribution'");
+    $getDefaults = CRM_Core_BAO_CustomGroup::extractGetParams($this, ['Contact', 'Individual', 'Contribution']);
     $this->_defaults = array_merge($this->_defaults, $getDefaults);
 
     $config = CRM_Core_Config::singleton();

@@ -10,6 +10,7 @@
  */
 
 use Civi\Api4\PriceField;
+use Civi\Test\ContributionPageTestTrait;
 use Civi\Test\FormTrait;
 use Civi\Test\FormWrapper;
 
@@ -23,6 +24,7 @@ use Civi\Test\FormWrapper;
 class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
 
   use FormTrait;
+  use ContributionPageTestTrait;
 
   /**
    * The id of the contribution page's payment processor.
@@ -36,7 +38,49 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup([], TRUE);
     parent::tearDown();
+  }
+
+  /**
+   * Custom field values passed in the url (&custom_N=...) pre-fill the
+   * contribution page, for fields extending the contact or the contribution.
+   */
+  public function testCustomFieldDefaultsFromUrl(): void {
+    $this->createTestEntity('CustomGroup', [
+      'title' => 'Individual Group',
+      'extends' => 'Individual',
+      'style' => 'Inline',
+    ], 'individual');
+    $selectField = $this->createTestEntity('CustomField', [
+      'custom_group_id' => $this->ids['CustomGroup']['individual'],
+      'label' => 'Marital Status',
+      'html_type' => 'Select',
+      'data_type' => 'String',
+      'option_values' => ['S' => 'Single', 'M' => 'Married'],
+    ], 'select');
+    $this->createTestEntity('CustomGroup', [
+      'title' => 'Contribution Group',
+      'extends' => 'Contribution',
+      'style' => 'Inline',
+    ], 'contribution');
+    $textField = $this->createTestEntity('CustomField', [
+      'custom_group_id' => $this->ids['CustomGroup']['contribution'],
+      'label' => 'Note',
+      'html_type' => 'Text',
+      'data_type' => 'String',
+    ], 'text');
+    $this->contributionPageCreatePaid([]);
+
+    $defaults = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', [], [
+      'reset' => 1,
+      'id' => $this->getContributionPageID(),
+      'custom_' . $selectField['id'] => 'Single',
+      'custom_' . $textField['id'] => 'Hello',
+    ])->processForm(FormWrapper::BUILT)->getDefaultValues();
+
+    $this->assertSame('S', $defaults['custom_' . $selectField['id']]);
+    $this->assertSame('Hello', $defaults['custom_' . $textField['id']]);
   }
 
   /**
