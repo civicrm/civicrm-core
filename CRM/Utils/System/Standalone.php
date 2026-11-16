@@ -393,11 +393,20 @@ class CRM_Utils_System_Standalone extends CRM_Utils_System_Base {
    * @throws \CRM_Core_Exception.
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    $authxLogin = authx_login(['flow' => 'login', 'cred' => 'Basic ' . base64_encode("{$name}:{$password}")]);
+    $cred = [
+      'username' => $name,
+      'password' => $password,
+    ];
+    $user = Civi::service('standaloneusers.security')->loadUser($cred);
 
-    // Note: random_int is more appropriate for cryptographical use than mt_rand
-    // The long number is the max 32 bit value.
-    return [$authxLogin['contactId'], $authxLogin['userId'], random_int(0, 2147483647)];
+    if (Civi::service('standaloneusers.security')->checkPassword($cred, $user)) {
+      // Note: random_int is more appropriate for cryptographical use than mt_rand
+      // The long number is the max 32 bit value.
+      return [$user['contact_id'], $user['uf_id'], random_int(0, 2147483647)];
+    }
+    else {
+      return FALSE;
+    }
   }
 
   /**
