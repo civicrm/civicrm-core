@@ -20,10 +20,10 @@ use Civi\Api4\Service\Spec\RequestSpec;
  *
  * There's no fixed relationship type for "case manager" - each CaseType's
  * XML definition (<CaseRoles>) declares which relationship type/direction
- * plays that role, so it can't be expressed as a plain DB join. This
- * provider resolves the per-case-type role via
- * CRM_Case_XMLProcessor_Process::getCaseManagerRoleId() once per query and
- * bakes the result into a CASE-driven correlated subquery.
+ * plays that role, so it can't be expressed as a plain DB join. Instead,
+ * CaseSchemaMapSubscriber bakes getCaseManagerSubquery() into the cached
+ * APIv4 schema map (which is cleared when case types or relationship types
+ * are saved or deleted).
  *
  * @service
  * @internal

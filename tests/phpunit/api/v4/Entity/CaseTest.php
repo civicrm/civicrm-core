@@ -168,6 +168,84 @@ class CaseTest extends Api4TestBase {
     $this->assertNull($result['case_manager_id']);
   }
 
+  public function testCaseManagerIdUpdatesWhenCaseTypeManagerRoleChanges(): void {
+    $uid = $this->createLoggedInUser();
+    $client = $this->createTestRecord('Contact');
+    $otherManager = $this->createTestRecord('Contact', [
+      'contact_type' => 'Organization',
+      'organization_name' => 'Org Manager',
+    ]);
+
+    $definition = [
+      'activityTypes' => [
+        ['name' => 'Open Case', 'max_instances' => 1],
+        ['name' => 'Follow up'],
+      ],
+      'activitySets' => [
+        [
+          'name' => 'standard_timeline',
+          'label' => 'Standard Timeline',
+          'timeline' => 1,
+          'activityTypes' => [
+            ['name' => 'Open Case', 'status' => 'Completed'],
+          ],
+        ],
+      ],
+      'caseRoles' => [
+        ['name' => 'Parent of', 'creator' => 1, 'manager' => 1],
+        ['name' => 'Employer of'],
+      ],
+    ];
+
+    $caseType = $this->createTestRecord('CaseType', [
+      'title' => 'Test Case Type Role Change',
+      'name' => 'test_case_type_role_change',
+      'definition' => $definition,
+    ]);
+
+    $case = $this->createTestRecord('Case', [
+      'case_type_id' => $caseType['id'],
+      'creator_id' => 'user_contact_id',
+      'contact_id' => $client['id'],
+    ]);
+
+    $employeeRelType = RelationshipType::get(FALSE)
+      ->addWhere('name_a_b', '=', 'Employee of')
+      ->execute()
+      ->single();
+
+    $this->createTestRecord('Relationship', [
+      'contact_id_a' => $client['id'],
+      'contact_id_b' => $otherManager['id'],
+      'relationship_type_id' => $employeeRelType['id'],
+      'case_id' => $case['id'],
+    ]);
+
+    $result = CiviCase::get(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('case_manager_id')
+      ->execute()
+      ->single();
+    $this->assertSame($uid, $result['case_manager_id']);
+
+    // Switch the manager role on the case type; metadata cache should be invalidated.
+    $definition['caseRoles'] = [
+      ['name' => 'Parent of', 'creator' => 1],
+      ['name' => 'Employer of', 'manager' => 1],
+    ];
+    \Civi\Api4\CaseType::update(FALSE)
+      ->addWhere('id', '=', $caseType['id'])
+      ->addValue('definition', $definition)
+      ->execute();
+
+    $updatedResult = CiviCase::get(FALSE)
+      ->addWhere('id', '=', $case['id'])
+      ->addSelect('case_manager_id')
+      ->execute()
+      ->single();
+    $this->assertSame($otherManager['id'], $updatedResult['case_manager_id']);
+  }
+
   public function testCaseRoleFieldsForCaseManager(): void {
     $uid = $this->createLoggedInUser();
     $contactID = $this->createTestRecord('Contact')['id'];
