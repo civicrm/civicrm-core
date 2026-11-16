@@ -141,31 +141,6 @@ class AfformSubmitEvent extends AfformBaseEvent {
   }
 
   /**
-   * Record the action taken ('create' or 'update') on an entity instance.
-   *
-   * @param int $index
-   * @param string $action
-   * @return $this
-   */
-  public function setEntityAction(int $index, string $action): self {
-    $this->entityActions[$this->entityName][$index]['action'] = $action;
-    return $this;
-  }
-
-  /**
-   * Record the action taken ('create' or 'update') on join entity instances.
-   *
-   * @param int $index
-   * @param string $joinEntity
-   * @param array $joinActions
-   * @return $this
-   */
-  public function setJoinActions(int $index, string $joinEntity, array $joinActions): self {
-    $this->entityActions[$this->entityName][$index]['joins'][$joinEntity] = $joinActions;
-    return $this;
-  }
-
-  /**
    * Get submitted values for all entities on the form
    * @return array
    */
