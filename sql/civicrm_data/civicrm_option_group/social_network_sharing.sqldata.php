@@ -9,7 +9,7 @@ return CRM_Core_CodeGen_OptionGroup::create('social_network_sharing', 'a/0085')
       ]
     ),
   ])
-  ->addValueTable(['name', 'value', 'desc', 'is_active'], [
+  ->addValueTable(['name', 'value', 'description', 'is_active'], [
     ['BlueSky', 'bsky', 'Share on Bluesky', 1],
     ['Facebook', 'facebook', 'Share on Facebook', 1],
     ['LinkedIn', 'linkedin', 'Share on LinkedIn', 1],
