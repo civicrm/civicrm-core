@@ -255,7 +255,9 @@ class CRM_Afform_ArrayHtml {
         if (!$this->deepCoding && !$this->isNodeEditable($arr)) {
           $arr['#markup'] = '';
           foreach ($node->childNodes as $child) {
-            $arr['#markup'] .= $this->replaceUnicodeChars($child->ownerDocument->saveXML($child));
+            // dev/core#6938 - <style>/<script> text is a CDATA node, saveXML() would wrap it again on every save
+            $markup = $child instanceof DOMCdataSection ? $child->nodeValue : $child->ownerDocument->saveXML($child);
+            $arr['#markup'] .= $this->replaceUnicodeChars($markup);
           }
         }
         else {
