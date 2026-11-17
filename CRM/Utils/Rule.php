@@ -876,23 +876,6 @@ class CRM_Utils_Rule {
   }
 
   /**
-   * @deprecated
-   * @param mixed $value
-   * @param mixed $actualElementValue
-   *
-   * @return bool
-   */
-  public static function validContact($value, $actualElementValue = NULL) {
-    // @todo When this function is removed (deprecated April 2023), it should also be removed from CRM_Core_Form: https://github.com/civicrm/civicrm-core/blob/0148b09115eeb941cde8e9f6f9484d205750f144/CRM/Core/Form.php#L429
-    CRM_Core_Error::deprecatedFunctionWarning('positiveInteger');
-    if ($actualElementValue) {
-      $value = $actualElementValue;
-    }
-
-    return CRM_Utils_Rule::positiveInteger($value);
-  }
-
-  /**
    * Check the validity of the date (in qf format)
    * note that only a year is valid, or a mon-year is
    * also valid in addition to day-mon-year
