@@ -44,26 +44,13 @@
 
 /* Icon only buttons */
 
-#afGuiEditor .panel-heading .af-gui-canvas-control-buttons button,
-#afGuiEditor .af-gui-remove-entity,
-#bootstrap-theme #afGuiEditor .af-gui-field-select-in-dropdown button /* icon-only buttons */ {
-  padding: 0;
-  margin: 0;
-  max-height: 32px;
-  aspect-ratio: 1 / 1;
-}
 #afGuiEditor .af-gui-field-select-in-dropdown button i.crm-i,
 #afGuiEditor-canvas .af-gui-canvas-control-buttons button.btn-default i.crm-i,
 #afGuiEditor .af-gui-remove-entity i.crm-i {
-  margin: 0;
   border: 0;
-  padding: var(--crm-l-small-2);
-  height: 100%;
+  padding: 0;
   aspect-ratio: 1 / 1;
   min-width: var(--crm-l-reg-4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 /* Panel */
@@ -152,6 +139,9 @@
   padding: 0 !important /* vs buttons.css */;
   background: transparent;
   color: var(--crm-text-color);
+  margin: 0;
+  border: 0;
+  height: auto;
 }
 #afGuiEditor-palette .af-gui-entity-values .form-inline {
   margin-bottom: var(--crm-l-medium);
@@ -348,7 +338,7 @@ af-gui-container > .af-gui-bar,
   transition: opacity 0s;
 }
 #afGuiEditor-canvas .af-entity-selected > .af-gui-bar + label,
-#afGuiEditor .af-entity-selected > .af-gui-bar .af-gui-add-element-button span {
+#afGuiEditor .af-entity-selected > .af-gui-bar span {
   color: var(--crm-primary-text-color);
 }
 #afGuiEditor .af-gui-container.af-gui-dragtarget {
@@ -408,6 +398,11 @@ af-gui-container > .af-gui-bar,
   width: 18px;
   height: 18px;
   color: var(--crm-link-color);
+  i.crm-i {
+    border: 0;
+    background-color: transparent;
+    height: auto;
+  }
 }
 #bootstrap-theme #afGuiEditor .af-gui-button > .btn.disabled .crm-editable-enabled:hover:not(:focus) {
   border-color: var(--crm-layer1-bg-color) !important;

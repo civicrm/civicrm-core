@@ -580,3 +580,9 @@
   min-width: 1rem;
   height: 1.5rem;
 }
+.crm-container .crm-icon-button:has(i.crm-i),
+#bootstrap-theme .crm-icon-button:has(i.crm-i),
+#bootstrap-theme .btn-group-sm > .crm-icon-button:has(i) {
+  /* resets padding on buttons with icons and no text */
+  padding: var(--crm-btn-icon-padding);
+}
