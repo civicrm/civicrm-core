@@ -10,6 +10,9 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
     };
 
     $state = self::loadState(CRM_Utils_Request::retrieve('state', 'String'));
+    if (isset($state['oidc_nonce']) && (isset($_REQUEST['code']) || isset($_REQUEST['error']))) {
+      $state = Civi::service('oauth2.state')->consume(CRM_Utils_Request::retrieve('state', 'String'));
+    }
     if (CRM_Core_Permission::check('manage OAuth client')) {
       $this->assign('state', $state);
       $this->assign('stateJson', $json($state ?? NULL));
@@ -49,7 +52,10 @@ class CRM_OAuth_Page_Return extends CRM_Core_Page {
         if (!isset($state['oidc_nonce'])) {
           throw $e;
         }
-        $this->assign('error', ['error' => 'invalid_token', 'error_description' => ts('The authorization response could not be verified.'), 'error_uri' => NULL]);
+        $this->showError([
+          'error' => 'invalid_token',
+          'error_description' => ts('The authorization response could not be verified.'),
+        ], $state);
         parent::run();
         return;
       }

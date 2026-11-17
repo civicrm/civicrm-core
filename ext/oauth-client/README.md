@@ -19,3 +19,8 @@ The authorization-code flow stores a random nonce in its existing transaction
 state and validates the ID token before storing the token record or invoking
 the token hook. Verified claims are available in `resource_owner`.
 Group mapping and account provisioning remain the responsibility of the caller.
+
+OIDC callback states are consumed under a Core lock before token exchange or
+provider-error handling. Repeated callbacks are rejected before storing tokens
+or invoking login hooks. Invalid ID tokens use the existing OAuth return-error
+hook.
