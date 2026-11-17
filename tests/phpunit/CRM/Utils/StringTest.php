@@ -424,6 +424,8 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
     $strings = [];
     $strings[] = ['O:8:"stdClass":0:{}'];
     $strings[] = ['O:9:"Exception":7:{s:10:"*message";s:3:"abc";s:17:"ExceptionString";s:0:"";s:7:"*code";i:0;s:7:"*file";s:17:"Command line code";s:7:"*line";i:1;s:16:"ExceptionTrace";a:0:{}s:19:"ExceptionPrevious";N;}'];
+    $strings[] = ['a:1:{i:0;O:8:"stdClass":0:{}}'];
+    $strings[] = ['not serialized'];
     return $strings;
   }
 

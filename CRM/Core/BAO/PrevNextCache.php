@@ -302,7 +302,7 @@ FROM   civicrm_prevnext_cache pn
    * @return bool
    */
   public static function is_serialized($string) {
-    return (@CRM_Utils_String::unserialize($string) !== FALSE);
+    return (CRM_Utils_String::unserialize($string) !== FALSE);
   }
 
   /**

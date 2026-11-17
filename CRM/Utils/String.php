@@ -15,9 +15,6 @@
  * @copyright CiviCRM LLC https://civicrm.org/licensing
  */
 
-use function xKerman\Restricted\unserialize;
-use xKerman\Restricted\UnserializeFailedException;
-
 require_once 'HTML/QuickForm/Rule/Email.php';
 
 /**
@@ -938,9 +935,8 @@ class CRM_Utils_String {
   /**
    * Safely unserialize a string of scalar or array values (but not objects!)
    *
-   * Use `xkerman/restricted-unserialize` to unserialize strings using PHP's
-   * serialization format. `restricted-unserialize` works like PHP's built-in
-   * `unserialize` function except that it does not deserialize object instances,
+   * Uses PHP's built-in `unserialize()` with `allowed_classes => FALSE` and
+   * rejects any deserialized objects (including `__PHP_Incomplete_Class`),
    * making it immune to PHP Object Injection {@see https://www.owasp.org/index.php/PHP_Object_Injection}
    * vulnerabilities.
    *
@@ -956,12 +952,23 @@ class CRM_Utils_String {
     if (!is_string($string) || $string === '') {
       return FALSE;
     }
-    try {
-      return unserialize($string);
-    }
-    catch (UnserializeFailedException $e) {
+    $result = @unserialize($string, ['allowed_classes' => FALSE]);
+    if (is_object($result)) {
       return FALSE;
     }
+    // Check that no objects were found (`is_object(__PHP_Incomplete_Class) === TRUE)`
+    if (is_array($result)) {
+      $hasObject = FALSE;
+      array_walk_recursive($result, static function ($value) use (&$hasObject) {
+        if (is_object($value)) {
+          $hasObject = TRUE;
+        }
+      });
+      if ($hasObject) {
+        return FALSE;
+      }
+    }
+    return $result;
   }
 
   /**
