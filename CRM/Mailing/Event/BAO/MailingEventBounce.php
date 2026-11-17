@@ -256,11 +256,11 @@ class CRM_Mailing_Event_BAO_MailingEventBounce extends CRM_Mailing_Event_DAO_Mai
 
     while ($dao->fetch()) {
       if ($dao->threshold && $dao->bounces >= $dao->threshold) {
-        $email = new CRM_Core_BAO_Email();
-        $email->id = $email_id;
-        $email->on_hold = TRUE;
-        $email->hold_date = date('YmdHis');
-        $email->save();
+        \Civi\Api4\Email::update(FALSE)
+          ->addWhere('id', '=', $email_id)
+          ->addValue('on_hold', TRUE)
+          ->addValue('hold_date', 'now')
+          ->execute();
         break;
       }
     }
