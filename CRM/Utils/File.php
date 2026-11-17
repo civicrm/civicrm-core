@@ -578,8 +578,9 @@ class CRM_Utils_File {
 HTACCESS;
       $file = $dir . '.htaccess';
       if ($overwrite || !file_exists($file)) {
-        if (file_put_contents($file, $htaccess) === FALSE) {
-          CRM_Core_Error::movedSiteError($file);
+        $writeResult = file_put_contents($file, $htaccess);
+        if ($writeResult === FALSE) {
+          throw new \CRM_Core_Exception("Error writing {$file}");
         }
       }
     }
