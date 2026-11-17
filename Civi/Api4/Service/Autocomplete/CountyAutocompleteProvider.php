@@ -38,7 +38,13 @@ class CountyAutocompleteProvider {
         ],
         [
           'type' => 'field',
+          'key' => 'name',
+          'rewrite' => '[name], [state_province_id.abbr]',
+        ],
+        [
+          'type' => 'field',
           'key' => 'state_province_id.name',
+          'rewrite' => '[state_province_id.name], [state_province_id.country_id.iso_code]',
         ],
       ],
     ];
