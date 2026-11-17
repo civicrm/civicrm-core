@@ -208,8 +208,8 @@ class StandaloneRouter {
     require_once $this->findVendor() . '/autoload.php';
 
     $info = new SplFileInfo($absFile);
-    $mimeRepository = new \MimeTyper\Repository\MimeDbRepository();
-    header('Content-Type: ' . $mimeRepository->findType($info->getExtension()));
+    $mimeType = \Symfony\Component\Mime\MimeTypes::getDefault()->getMimeTypes($info->getExtension())[0] ?? 'application/octet-stream';
+    header('Content-Type: ' . $mimeType);
     header('Content-Length: ' . $info->getSize());
     readfile($absFile, FALSE);
     return TRUE;
