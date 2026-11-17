@@ -240,6 +240,45 @@ class CRM_Contribute_Form_Contribution_ConfirmTest extends CiviUnitTestCase {
   }
 
   /**
+   * The form must record the payment under the lock a payment processor webhook
+   * takes to record the same charge, so the two can't both record it.
+   */
+  public function testPaymentIsRecordedUnderPaymentCreateLock(): void {
+    $billingLocationTypeID = $this->getLocationTypeID('Billing');
+    $this->createLoggedInUser();
+    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy', 'is_test' => FALSE], 'dummy');
+    $contributionPageID = $this->createContributionPage(['payment_processor' => $paymentProcessorID]);
+
+    $lockFreeWhenRecorded = NULL;
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_post', function ($op, $objectName, $objectId, &$objectRef) use (&$lockFreeWhenRecorded) {
+      if ($objectName === 'FinancialTrxn' && $op === 'create' && !empty($objectRef->is_payment) && $lockFreeWhenRecorded === NULL) {
+        $contributionID = Contribution::get(FALSE)->addSelect('id')->addOrderBy('id', 'DESC')->execute()->first()['id'];
+        $lockFreeWhenRecorded = (int) \Civi::lockManager()->create('data.contribute.paymentCreate.' . $contributionID)->isFree();
+      }
+    });
+
+    $this->submitOnlineContributionForm([
+      'credit_card_number' => '4111111111111111',
+      'cvv2' => '234',
+      'credit_card_exp_date' => [
+        'M' => 2,
+        'Y' => (int) (CRM_Utils_Time::date('Y')) + 1,
+      ],
+      $this->getPriceFieldLabelForContributionPage($contributionPageID) => 60,
+      'credit_card_type' => 'Visa',
+      "email-$billingLocationTypeID" => 'test@test.com',
+      'payment_processor_id' => $paymentProcessorID,
+    ], $contributionPageID);
+
+    $this->assertSame(0, $lockFreeWhenRecorded, 'The payment should be recorded while holding the payment-create lock');
+    $contribution = Contribution::get(FALSE)
+      ->addWhere('contribution_page_id', '=', $contributionPageID)
+      ->addSelect('contribution_status_id:name')
+      ->execute()->single();
+    $this->assertSame('Completed', $contribution['contribution_status_id:name']);
+  }
+
+  /**
    * Test that a brand new contribution created through a contribution page
    * still gets receive_date = now.
    *
