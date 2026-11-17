@@ -20,4 +20,26 @@ class CallbackProvider extends CiviOpenIdProvider {
     parent::__construct($options, $collaborators);
   }
 
+  public static function register(): \Closure {
+    $listener = static function ($event) {
+      $event->providers['callback-race'] = [
+        'name' => 'callback-race',
+        'title' => 'Callback race',
+        'class' => self::class,
+        'pkceMethods' => ['S256'],
+        'options' => [
+          'discovery' => [
+            'issuer' => 'https://id.example.org',
+            'authorization_endpoint' => 'https://id.example.org/authorize',
+            'token_endpoint' => 'https://id.example.org/token',
+            'jwks_uri' => 'https://id.example.org/keys',
+          ],
+        ],
+      ];
+    };
+    \Civi::dispatcher()->addListener('hook_civicrm_oauthProviders', $listener);
+    \Civi::cache('long')->delete('OAuthProvider_list');
+    return $listener;
+  }
+
 }

@@ -24,3 +24,8 @@ OIDC callback states are consumed under a Core lock before token exchange or
 provider-error handling. Repeated callbacks are rejected before storing tokens
 or invoking login hooks. Invalid ID tokens use the existing OAuth return-error
 hook.
+
+The callback regression suite includes real two-process races. Both workers
+preload the same state and synchronize before entering the callback. Three
+start schedules assert one token exchange, one stored token, and one invocation
+of each token/return hook.
