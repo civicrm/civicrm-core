@@ -98,10 +98,15 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     $queryParams = array_diff_key($_GET, $params);
     unset($queryParams['params'], $queryParams['index'], $queryParams[$config->userFrameworkURLVar]);
     if (count($queryParams) > 0) {
-      $allowedParams = civicrm_api4($entity, 'getActions', [
-        'checkPermissions' => FALSE,
-        'where' => [['name', '=', $action]],
-      ], ['params'])->single();
+      try {
+        $allowedParams = civicrm_api4($entity, 'getActions', [
+          'checkPermissions' => FALSE,
+          'where' => [['name', '=', $action]],
+        ], ['params'])->single();
+      }
+      catch (\Civi\API\Exception\NotImplementedException $e) {
+        $allowedParams = [];
+      }
       foreach ($queryParams as $key => $value) {
         if (array_key_exists($key, $allowedParams)) {
           $params[$key] = $value;
