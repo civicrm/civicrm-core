@@ -96,6 +96,10 @@ class CachedGetTest extends Api4TestBase {
       ->selectRowCount()
       ->addWhere('custom_group_id:name', '=', 'LemonPreferences');
 
+    $calls[] = \Civi\Api4\ContactType::get(FALSE)
+      ->addOrderBy('id', 'ASC')
+      ->setLimit(2);
+
     return $calls;
   }
 

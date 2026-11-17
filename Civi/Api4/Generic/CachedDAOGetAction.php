@@ -61,10 +61,10 @@ class CachedDAOGetAction extends \Civi\Api4\Generic\DAOGetAction {
   /**
    * Toggle the in-memory cache
    *
-   * @param bool $useCache
+   * @param bool|null $useCache
    * @return $this
    */
-  public function setUseCache(bool $useCache): CachedDAOGetAction {
+  public function setUseCache(?bool $useCache): CachedDAOGetAction {
     $this->useCache = $useCache;
     return $this;
   }
@@ -77,17 +77,24 @@ class CachedDAOGetAction extends \Civi\Api4\Generic\DAOGetAction {
   }
 
   /**
+   * Determine whether this action will use the in-memory cache.
+   *
+   * @return bool
+   */
+  public function willUseCache(): bool {
+    return $this->useCache !== FALSE && !$this->needDatabase();
+  }
+
+  /**
    * @param \Civi\Api4\Generic\Result $result
    *
    * Decide whether to use self::getFromCache or DAOGetAction::getObjects
    */
   protected function getObjects(Result $result): void {
     // Attempt to use the cache unless explicitly disabled
-    if ($this->useCache !== FALSE) {
-      $this->useCache = !$this->needDatabase();
-    }
-    $this->_debugOutput['useCache'] = $this->useCache;
-    if ($this->useCache) {
+    $useCache = $this->willUseCache();
+    $this->_debugOutput['useCache'] = $useCache;
+    if ($useCache) {
       $this->getFromCache($result);
       return;
     }
@@ -145,7 +152,12 @@ class CachedDAOGetAction extends \Civi\Api4\Generic\DAOGetAction {
    * @return array with known fields as array *keys*
    */
   protected function getCachedFields(): array {
-    return \Civi::entity($this->getEntityName())->getFields();
+    $fields = \Civi::entity($this->getEntityName())->getFields();
+    if (CoreUtil::isType($this->getEntityName(), 'HierarchicalEntity')) {
+      $fields['_depth'] = ['name' => '_depth'];
+      $fields['_descendents'] = ['name' => '_descendents'];
+    }
+    return $fields;
   }
 
   /**
@@ -163,6 +175,10 @@ class CachedDAOGetAction extends \Civi\Api4\Generic\DAOGetAction {
     $values = $this->getCachedRecords();
     $this->formatRawValues($values);
     $this->queryArray($values, $result);
+    // Match DAOGetAction::getObjects() rowCount behavior: when limit is reached without row_count, leave rowCount unset.
+    if ($this->getLimit() && $result->countFetched() >= $this->getLimit() && !in_array('row_count', $this->getSelect())) {
+      $result->rowCount = NULL;
+    }
   }
 
   protected function getCachedRecords(): array {

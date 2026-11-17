@@ -29,6 +29,15 @@ class ContactType extends Generic\DAOEntity {
   use Generic\Traits\ManagedEntity;
   use Generic\Traits\HierarchicalEntity;
 
+  /**
+   * @param bool $checkPermissions
+   * @return Action\ContactType\Get
+   */
+  public static function get($checkPermissions = TRUE) {
+    return (new Action\ContactType\Get(__CLASS__, __FUNCTION__))
+      ->setCheckPermissions($checkPermissions);
+  }
+
   public static function permissions(): array {
     $permissions = parent::permissions();
     $permissions['get'] = ['access CiviCRM'];

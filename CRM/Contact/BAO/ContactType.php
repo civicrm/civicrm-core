@@ -715,7 +715,6 @@ WHERE ($subtypeClause)";
         $parent = $parents[$contactType['parent_id'] ?? ''] ?? NULL;
         $contactType['parent'] = $parent['name'] ?? NULL;
         $contactType['parent_label'] = $parent['label'] ?? NULL;
-        $contactType['icon'] ??= $parent['icon'] ?? NULL;
       }
       $cache->set($cacheKey, $contactTypes);
     }
