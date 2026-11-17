@@ -47,7 +47,7 @@ class RandomSegmentTest extends TestCase implements HeadlessInterface, HookInter
   public function testSearchAppliesContactAcl(): void {
     $contacts = [];
     foreach (['searcher', 'colleague', 'shared', 'colleague_only', 'hidden'] as $name) {
-      $contacts[$name] = $this->createTestEntity('Individual', ['first_name' => $name, 'last_name' => 'Segment'], $name)['id'];
+      $contacts[$name] = $this->createTestEntity('Contact', ['first_name' => $name, 'last_name' => 'Segment'], $name)['id'];
     }
     $groupID = $this->createTestEntity('Group', ['title' => 'Segment source', 'name' => 'segment_source'])['id'];
     foreach (['shared', 'colleague_only', 'hidden'] as $name) {
