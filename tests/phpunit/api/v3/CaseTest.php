@@ -716,7 +716,7 @@ class api_v3_CaseTest extends CiviCaseTestCase {
         'id' => ['!=' => "\$value.id"],
       ],
     ]);
-    $this->assertEquals([$case1['id'], $case2['id']], array_keys(CRM_Utils_Array::rekey($result['api.Case.get']['values'], 'id')));
+    $this->assertEquals([$case1['id'], $case2['id']], array_keys(array_column($result['api.Case.get']['values'], NULL, 'id')));
   }
 
   /**

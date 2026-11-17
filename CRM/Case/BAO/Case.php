@@ -1194,7 +1194,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
         'return' => ['case_type_id', 'case_type_id.name', 'case_type_id.definition', 'contact_id'],
       ]);
       if (!empty($caseInfo['case_type_id.definition']['caseRoles'])) {
-        $caseRoles = CRM_Utils_Array::rekey($caseInfo['case_type_id.definition']['caseRoles'], 'name');
+        $caseRoles = array_column($caseInfo['case_type_id.definition']['caseRoles'], NULL, 'name');
       }
     }
 
