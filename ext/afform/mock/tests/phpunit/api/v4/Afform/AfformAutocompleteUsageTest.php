@@ -425,7 +425,7 @@ EOHTML;
     // Autocompleting with the letter "l" will give 2 matches: Blue & Yellow
     $result = OptionValue::autocomplete()
       ->setFormName('afform:' . $this->formName)
-      ->setFieldName('test_activity_search_display:Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto')
+      ->setFieldName('test_activity_search.test_activity_search_display:Activity_ActivityContact_Contact_01.test_af_autocomplete_search.select_auto')
       ->setInput('l')
       ->execute();
 

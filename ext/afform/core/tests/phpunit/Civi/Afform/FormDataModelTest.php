@@ -140,4 +140,27 @@ class FormDataModelTest extends \PHPUnit\Framework\TestCase implements HeadlessI
     $this->assertSame($original, $parsed, 'AngularJS expression parsing returns original');
   }
 
+  public function testGetSearchDisplay(): void {
+    $html = '<af-form>'
+      . '<div af-fieldset="">'
+      . '<af-field name="state_province_id" />'
+      . '<crm-search-display-table search-name="My_Search" display-name=""></crm-search-display-table>'
+      . '</div>'
+      . '<div af-fieldset="">'
+      . '<af-field name="country_id" />'
+      . '<crm-search-display-table search-name="My_Search" display-name="Table_1"></crm-search-display-table>'
+      . '</div>'
+      . '</af-form>';
+    $parser = new \CRM_Afform_ArrayHtml();
+    $fdm = new FormDataModel($parser->convertHtmlToArray($html));
+
+    $unnamed = $fdm->getSearchDisplay('My_Search');
+    $this->assertSame('My_Search', $unnamed['searchName']);
+    $this->assertArrayHasKey('state_province_id', $unnamed['fields']);
+
+    $named = $fdm->getSearchDisplay('My_Search.Table_1');
+    $this->assertSame('My_Search', $named['searchName']);
+    $this->assertArrayHasKey('country_id', $named['fields']);
+  }
+
 }
