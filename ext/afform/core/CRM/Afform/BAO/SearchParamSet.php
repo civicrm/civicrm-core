@@ -36,8 +36,7 @@ class CRM_Afform_BAO_SearchParamSet extends CRM_Afform_DAO_SearchParamSet implem
   /**
    * A parameter set is written only by someone who may open its form.
    */
-  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
-  public static function checkFormAccessAuthorizeRecord(AuthorizeRecordEvent $e): void {
+  public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $formNames = array_filter([
       $record['afform_name'] ?? NULL,

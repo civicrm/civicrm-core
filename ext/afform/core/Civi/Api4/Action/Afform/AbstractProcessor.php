@@ -779,6 +779,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         $values['fields'] = $this->getForcedDefaultValues($entity['fields']) +
           array_intersect_key($values['fields'] ?? [], $submittableFields) +
           $this->getHiddenDefaultValues($entity['fields']);
+        if (empty($entity['af-repeat']) || !isset($values['extras']) || !is_array($values['extras'])) {
+          unset($values['extras']);
+        }
         // Special handling for file fields
         $formDefaults = $this->getForcedDefaultValues($entity['fields']) + $this->getHiddenDefaultValues($entity['fields']);
         $recordId = $entity['type'] ? ($values['fields'][CoreUtil::getIdFieldName($entity['type'])] ?? NULL) : NULL;
