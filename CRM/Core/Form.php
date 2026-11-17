@@ -448,7 +448,6 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       'fileExists',
       'settingPath',
       'autocomplete',
-      'validContact',
       'email',
       'numberInternational',
     ];
