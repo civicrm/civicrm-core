@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "44d34927b30ec3274c32822610764b0f",
+    "content-hash": "4c92d92d843c458af55ba64934722e1b",
     "packages": [
         {
             "name": "adrienrn/php-mimetyper",
@@ -2745,54 +2745,6 @@
                 "source": "https://github.com/pear/PEAR_Exception"
             },
             "time": "2021-03-21T15:43:46+00:00"
-        },
-        {
-            "name": "pear/validate_finance_creditcard",
-            "version": "0.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pear/Validate_Finance_CreditCard.git",
-                "reference": "f138fb80b2305c1fe7ca33216b895b868396f1e9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pear/Validate_Finance_CreditCard/zipball/f138fb80b2305c1fe7ca33216b895b868396f1e9",
-                "reference": "f138fb80b2305c1fe7ca33216b895b868396f1e9",
-                "shasum": ""
-            },
-            "require": {
-                "pear/pear_exception": "*",
-                "php": ">=5.2.1"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Validate": "./"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "include-path": [
-                "./"
-            ],
-            "license": [
-                "New BSD"
-            ],
-            "authors": [
-                {
-                    "name": "Philippe Jausions",
-                    "email": "Philippe.Jausions@11abacus.com",
-                    "role": "Lead"
-                }
-            ],
-            "description": "Validation class for credit cards.",
-            "support": {
-                "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Validate_Finance_CreditCard",
-                "source": "https://github.com/pear/Validate_Finance_CreditCard"
-            },
-            "time": "2021-05-19T22:03:15+00:00"
         },
         {
             "name": "phlib/xss-sanitizer",

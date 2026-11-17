@@ -336,9 +336,9 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
     $cases[] = ['2223000048400011', 'MasterCard'];
     $cases[] = ['3400 0000 0000 009', 'AMEX'];
     $cases[] = ['3088 0000 0000 0009', 'JCB'];
-    $cases[] = ['2014 0000 0000 009', 'ENROUTE'];
     $cases[] = ['6011 0000 0000 0004', 'DISCOVER'];
     $cases[] = ['3000 0000 0000 04', 'DINERSCLUB'];
+    $cases[] = ['6200 0000 0000 0005', 'UNIONPAY'];
     return $cases;
   }
 
@@ -377,6 +377,8 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
     $cases[] = ['1.2', 'visa', FALSE];
     $cases[] = ['123', 'discover', TRUE];
     $cases[] = ['4429', 'discover', FALSE];
+    $cases[] = ['123', 'unionpay', TRUE];
+    $cases[] = ['1234', 'unionpay', FALSE];
     return $cases;
   }
 

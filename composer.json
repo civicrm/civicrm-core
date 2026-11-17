@@ -87,7 +87,6 @@
     "phlib/xss-sanitizer": "^2.1",
     "phpoffice/phpword": "^1.4",
     "phpseclib/phpseclib": "^3.0",
-    "pear/validate_finance_creditcard": "0.7.0",
     "pear/auth_sasl": "1.2.0",
     "pear/net_smtp": "1.12.*",
     "pear/mail": "^2.0",

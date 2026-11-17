@@ -803,12 +803,49 @@ class CRM_Utils_Rule {
 
   /**
    * @param string $value
-   * @param string $type
+   * @param string|null $type
    *
    * @return bool
    */
-  public static function creditCardNumber($value, $type) {
-    return Validate_Finance_CreditCard::number($value, $type);
+  public static function creditCardNumber($value, $type = NULL) {
+    $cc = str_replace(['-', ' '], '', (string) $value);
+    $len = strlen($cc);
+    if ($len < 13 || $len > 19 || !ctype_digit($cc)) {
+      return FALSE;
+    }
+
+    $sum = 0;
+    $alt = FALSE;
+    for ($i = $len - 1; $i >= 0; $i--) {
+      $n = (int) $cc[$i];
+      if ($alt) {
+        $n *= 2;
+        if ($n > 9) {
+          $n -= 9;
+        }
+      }
+      $sum += $n;
+      $alt = !$alt;
+    }
+    if ($sum % 10 !== 0) {
+      return FALSE;
+    }
+
+    if (is_string($type)) {
+      $regex = match (strtoupper($type)) {
+        'VISA' => '/^4\d{12}(?:\d{3})?(?:\d{3})?$/',
+        'MASTERCARD', 'EUROCARD', 'EUROCARD/MASTERCARD' => '/^(?:5[1-5]\d{14}|2(?:2(?:2[1-9]|[3-9]\d)|[3-6]\d\d|7(?:[01]\d|20))\d{12})$/',
+        'AMEX', 'AMERICANEXPRESS', 'AMERICAN EXPRESS' => '/^3[47]\d{13}$/',
+        'DISCOVER' => '/^(?:6011\d{12}|65\d{14}|64[4-9]\d{13})$/',
+        'DINERS', 'DINERSCLUB', 'DINERS CLUB', 'CARTEBLANCHE', 'CARTE BLANCHE' => '/^3(?:0[0-5]\d{11}|[68]\d{12})$/',
+        'JCB' => '/^(?:35\d{14}|3\d{15}|(?:2131|1800)\d{11})$/',
+        'UNIONPAY' => '/^62\d{14,17}$/',
+        default => NULL,
+      };
+      return $regex !== NULL && preg_match($regex, $cc);
+    }
+
+    return TRUE;
   }
 
   /**
@@ -818,7 +855,12 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function cvv($value, $type) {
-    return Validate_Finance_CreditCard::cvv($value, $type);
+    $digits = match (strtoupper((string) $type)) {
+      'AMEX', 'AMERICANEXPRESS', 'AMERICAN EXPRESS' => 4,
+      'VISA', 'MASTERCARD', 'EUROCARD', 'EUROCARD/MASTERCARD', 'DISCOVER', 'UNIONPAY' => 3,
+      default => NULL,
+    };
+    return $digits !== NULL && strlen((string) $value) === $digits && ctype_digit((string) $value);
   }
 
   /**
