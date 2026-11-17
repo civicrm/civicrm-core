@@ -1132,13 +1132,15 @@ HTACCESS;
   }
 
   /**
-   * Get the extensions that this MimeTpe is for
-   * @param string $mimeType the mime-type we want extensions for
+   * Get the extensions that this MimeType is for
+   * @param string|null $mimeType the mime-type we want extensions for
    * @return array
    */
-  public static function getAcceptableExtensionsForMimeType($mimeType = []) {
-    $mimeRepostory = new \MimeTyper\Repository\ExtendedRepository();
-    return $mimeRepostory->findExtensions($mimeType);
+  public static function getAcceptableExtensionsForMimeType(?string $mimeType = NULL): array {
+    if (!$mimeType) {
+      return [];
+    }
+    return \Symfony\Component\Mime\MimeTypes::getDefault()->getExtensions($mimeType);
   }
 
   /**

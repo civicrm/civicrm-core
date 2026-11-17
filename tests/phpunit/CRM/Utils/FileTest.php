@@ -188,19 +188,19 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
 
   public static function mimeTypeToExtension() {
     $cases = [];
-    $cases[] = ['text/plain', ['txt', 'text', 'conf', 'def', 'list', 'log', 'in', 'ini']];
-    $cases[] = ['image/jpeg', ['jpeg', 'jpg', 'jpe']];
+    $cases[] = ['text/plain', ['txt', 'text', 'conf', 'def', 'list', 'log', 'in', 'ini', 'asc']];
+    $cases[] = ['image/jpeg', ['jpeg', 'jpg', 'jpe', 'jfif']];
     $cases[] = ['image/png', ['png']];
     return $cases;
   }
 
   /**
    * @dataProvider mimeTypeToExtension
-   * @param stirng $mimeType
+   * @param string $mimeType
    * @param array $expectedExtensions
    */
   public function testMimeTypeToExtension($mimeType, $expectedExtensions) {
-    $this->assertEquals($expectedExtensions, CRM_Utils_File::getAcceptableExtensionsForMimeType($mimeType));
+    $this->assertEqualsCanonicalizing($expectedExtensions, CRM_Utils_File::getAcceptableExtensionsForMimeType($mimeType));
   }
 
   /**
