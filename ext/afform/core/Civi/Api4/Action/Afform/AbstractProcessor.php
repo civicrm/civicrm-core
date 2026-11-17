@@ -1187,4 +1187,35 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     return $text;
   }
 
+  private function getTokenValue(string $token): string {
+    $token = \trim($token, '[]');
+    // split Individual1.0.first_name
+    // remember: custom field field names can contain .
+    if (\substr_count($token, '.') < 2) {
+      // invalid token
+      return '';
+    }
+    [$entityName, $index, $field] = explode('.', $token, 3);
+    if ($field === 'id') {
+      return (string) $this->_entityIds[$entityName][$index]['id'];
+    }
+    if (isset($this->_submissionTokenValues[$entityName][$index][$field])) {
+      return (string) $this->_submissionTokenValues[$entityName][$index][$field];
+    }
+    if (isset($this->_entityValues[$entityName][$index]['fields'][$field])) {
+      return (string) $this->_entityValues[$entityName][$index]['fields'][$field];
+    }
+    if (\substr_count($field, '.') >= 2) {
+      // we may have a join token
+      [$joinEntity, $joinIndex, $joinField] = explode('.', $field, 3);
+      if ($joinField === 'id') {
+        return (string) $this->_entityIds[$entityName][$index]['joins'][$joinEntity][$joinIndex]['id'];
+      }
+      if (isset($this->_entityValues[$entityName][$index]['joins'][$joinEntity][$joinIndex][$joinField])) {
+        return (string) $this->_entityValues[$entityName][$index]['joins'][$joinEntity][$joinIndex][$joinField];
+      }
+    }
+    return '';
+  }
+
 }

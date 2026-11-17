@@ -3,6 +3,8 @@ namespace Civi\ext\afform\mock\tests\phpunit\api\v4\Afform;
 
 use api\v4\Afform\AfformUsageTestCase;
 use Civi\Api4\Afform;
+use Civi\Api4\AfformSubmission;
+use Civi\Api4\Contact;
 use Civi\Api4\Email;
 
 /**
