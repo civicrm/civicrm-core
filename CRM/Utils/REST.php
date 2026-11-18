@@ -129,7 +129,8 @@ class CRM_Utils_REST {
       $result = self::error('Could not interpret return values from function.');
     }
 
-    if (!empty($requestParams['json'])) {
+    // An empty params object still asks for JSON.
+    if (!empty($requestParams['json']) || is_array($requestParams['json'] ?? NULL)) {
       if (!empty($requestParams['prettyprint'])) {
         // Don't set content-type header for api explorer output
         return json_encode(array_merge($result), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -305,7 +306,7 @@ class CRM_Utils_REST {
     ];
 
     // `json` holds the call's params, or is a flag such as `1` asking for JSON output.
-    $isOutputFlag = is_string($requestParams['json'] ?? NULL) && !str_starts_with($requestParams['json'], '{');
+    $isOutputFlag = is_scalar($requestParams['json'] ?? NULL) && !str_starts_with(ltrim((string) $requestParams['json']), '{');
     if (!$isOutputFlag) {
       $params = self::retrieveJsonParams() ?? [];
     }

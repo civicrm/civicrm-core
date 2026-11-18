@@ -115,6 +115,11 @@ class CRM_Utils_RequestTest extends CiviUnitTestCase {
     CRM_Utils_Request::retrieveJson('params', 'REQUEST', $this->jsonRequest('{"params": 5}'));
   }
 
+  public function testRetrieveJsonRejectsNullInJsonBody(): void {
+    $this->expectException(CRM_Core_Exception::class);
+    CRM_Utils_Request::retrieveJson('params', 'REQUEST', $this->jsonRequest('{"params": null}'));
+  }
+
   /**
    * Webhook callers read JSON list bodies through exportValues().
    */

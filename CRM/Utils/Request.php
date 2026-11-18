@@ -228,8 +228,11 @@ class CRM_Utils_Request {
    *   If the value or the JSON body is malformed.
    */
   public static function retrieveJson(string $name, string $method = 'REQUEST', ?ServerRequestInterface $request = NULL): ?array {
-    $value = $method === 'GET' ? NULL : (self::getJsonBody($request)[$name] ?? NULL);
-    $value ??= self::retrieve($name, 'String', NULL, FALSE, NULL, $method);
+    $body = $method === 'GET' ? [] : self::getJsonBody($request);
+    if (array_key_exists($name, $body) && $body[$name] === NULL) {
+      throw new CRM_Core_Exception("Malformed JSON in '$name': null.");
+    }
+    $value = $body[$name] ?? self::retrieve($name, 'String', NULL, FALSE, NULL, $method);
     if ($value === NULL || $value === '') {
       return NULL;
     }

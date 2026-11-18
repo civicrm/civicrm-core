@@ -29,6 +29,11 @@ class AjaxJsonBodyTest extends \CiviEndToEndTestCase {
 
   private string $firstName;
 
+  /**
+   * Whether debug_enabled was set explicitly before a test changed it, and to what.
+   */
+  private ?array $originalDebugSetting = NULL;
+
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
     \Civi\Test::e2e()->install(['authx'])->apply();
@@ -43,7 +48,10 @@ class AjaxJsonBodyTest extends \CiviEndToEndTestCase {
   }
 
   public function tearDown(): void {
-    \Civi::settings()->revert('debug_enabled');
+    if ($this->originalDebugSetting) {
+      [$wasExplicit, $value] = $this->originalDebugSetting;
+      $wasExplicit ? \Civi::settings()->set('debug_enabled', $value) : \Civi::settings()->revert('debug_enabled');
+    }
     Contact::delete(FALSE)->addWhere('id', '=', $this->contactId)->setUseTrash(FALSE)->execute();
     parent::tearDown();
   }
@@ -96,6 +104,11 @@ class AjaxJsonBodyTest extends \CiviEndToEndTestCase {
     $this->assertStringContainsString("'params'", $this->decode(400, $response)['error_message']);
   }
 
+  public function testApi4RejectsNullParams(): void {
+    $response = $this->postJson('civicrm/ajax/api4/Contact/get', ['params' => NULL]);
+    $this->assertStringContainsString("'params'", $this->decode(400, $response)['error_message']);
+  }
+
   public function testApi4RejectsNonScalarIndex(): void {
     $response = $this->postJson('civicrm/ajax/api4/Contact/get', ['params' => $this->getParams(), 'index' => ['a' => 1]]);
     $this->assertStringContainsString("'index'", $this->decode(400, $response)['error_message']);
@@ -103,6 +116,7 @@ class AjaxJsonBodyTest extends \CiviEndToEndTestCase {
 
   public function testApi4RejectsJsonWithoutAjaxHeader(): void {
     // Debug mode deliberately lifts the check.
+    $this->originalDebugSetting = [\Civi::settings()->hasExplicit('debug_enabled'), \Civi::settings()->getExplicit('debug_enabled')];
     \Civi::settings()->set('debug_enabled', FALSE);
     $response = $this->createGuzzle(['http_errors' => FALSE])->post('civicrm/ajax/api4/Contact/get', [
       'headers' => ['Content-Type' => 'application/json'],
@@ -152,6 +166,36 @@ class AjaxJsonBodyTest extends \CiviEndToEndTestCase {
     $result = $this->decode(200, $response);
     $this->assertSame(1, $result['is_error']);
     $this->assertSame("Malformed JSON in 'json'.", $result['error_message']);
+  }
+
+  /**
+   * @dataProvider api3Paths
+   */
+  public function testApi3EmptyJsonParamsAnswerInJson(string $path): void {
+    $response = $this->postJson($path, ['entity' => 'Domain', 'action' => 'get', 'json' => new \stdClass()]);
+    $this->assertSame(0, $this->decode(200, $response)['is_error']);
+  }
+
+  public function testApi3NumericJsonFlag(): void {
+    $response = $this->postJson('civicrm/ajax/rest', [
+      'entity' => 'Contact',
+      'action' => 'get',
+      'json' => 1,
+      'first_name' => $this->firstName,
+      'return' => 'id',
+    ]);
+    $result = $this->decode(200, $response);
+    $this->assertSame([$this->contactId], array_map('intval', array_keys($result['values'])));
+  }
+
+  public function testApi3JsonParamsWithLeadingWhitespace(): void {
+    $response = $this->post('civicrm/ajax/rest', http_build_query([
+      'entity' => 'Contact',
+      'action' => 'get',
+      'json' => ' ' . json_encode(['first_name' => $this->firstName, 'return' => 'id']),
+    ]), 'application/x-www-form-urlencoded');
+    $result = $this->decode(200, $response);
+    $this->assertSame([$this->contactId], array_map('intval', array_keys($result['values'])));
   }
 
   public function testApi3MultipleCallsJsonBody(): void {
