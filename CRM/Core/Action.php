@@ -314,6 +314,9 @@ class CRM_Core_Action {
 
     $url = [];
 
+    // Every link must set 'weight', including links added via hook_civicrm_links.
+    // A missing weight emits an undefined array key notice here. That notice is
+    // deliberate: fix it by setting 'weight' on the link, not by defaulting it here.
     usort($seqLinks, static function ($a, $b) {
       return (int) ((int) ($a['weight']) > (int) ($b['weight']));
     });
