@@ -107,7 +107,7 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
 
     if ($participantPayment->find(TRUE)) {
       CRM_Utils_Hook::pre('delete', 'ParticipantPayment', $participantPayment->id, $params);
-      CRM_Contribute_BAO_Contribution::deleteContribution($participantPayment->contribution_id);
+      CRM_Contribute_BAO_Contribution::deleteRecord(['id' => $participantPayment->contribution_id]);
       $participantPayment->delete();
       CRM_Utils_Hook::post('delete', 'ParticipantPayment', $participantPayment->id, $participantPayment);
       return $participantPayment;

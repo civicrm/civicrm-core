@@ -177,7 +177,7 @@ WHERE     pledge_id = %1
       while ($payment->fetch()) {
         //also delete associated contribution.
         if ($payment->contribution_id) {
-          CRM_Contribute_BAO_Contribution::deleteContribution($payment->contribution_id);
+          CRM_Contribute_BAO_Contribution::deleteRecord(['id' => $payment->contribution_id]);
         }
         self::deleteRecord(['id' => $payment->id]);
       }

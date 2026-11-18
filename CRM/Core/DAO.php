@@ -1195,6 +1195,7 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     CRM_Utils_Type::validate($record[$idField], 'Positive');
 
+    $transaction = new CRM_Core_Transaction();
     CRM_Utils_Hook::pre('delete', $entityName, $record[$idField], $record);
     $instance = new $className();
     $instance->$idField = $record[$idField];
@@ -1203,6 +1204,7 @@ class CRM_Core_DAO extends DB_DataObject {
     if (!$instance || !$instance->delete()) {
       throw new CRM_Core_Exception("Could not delete {$entityName} $idField {$record[$idField]}");
     }
+    $transaction->commit();
     // For other operations this hook is passed an incomplete object and hook listeners can load if needed.
     // But that's not possible with delete because it's gone from the database by the time this hook is called.
     // So in this case the object has been pre-loaded so hook listeners have access to the complete record.
