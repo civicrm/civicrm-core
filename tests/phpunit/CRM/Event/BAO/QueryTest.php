@@ -260,4 +260,23 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
     ];
   }
 
+  /**
+   * Test SQL injection prevention in participant_fee_id search parameter.
+   */
+  public function testParticipantFeeIdSqlInjection(): void {
+    $params = [
+      [
+        0 => 'participant_fee_id',
+        1 => '=',
+        2 => ['0) OR (1=1'],
+        3 => 1,
+        4 => 0,
+      ],
+    ];
+    $query = new CRM_Contact_BAO_Query($params, NULL, NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_EVENT);
+    $query->query(FALSE);
+    $this->assertStringNotContainsString('1=1', $query->_whereClause);
+    $this->assertStringContainsString('civicrm_line_item.price_field_value_id IN (0)', $query->_whereClause);
+  }
+
 }

@@ -169,10 +169,15 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
   }
 
   public function getEventFilter(): string {
-    $eventID = array_filter((array) $this->_params['id_value']);
+    $value = $this->_params['id_value'] ?? NULL;
+    if ((is_string($value) || is_numeric($value)) && strlen($value)) {
+      $value = explode(',', $value);
+    }
+    $eventID = array_filter(array_map(fn($v) => is_string($v) ? trim($v) : $v, (array) $value));
     if (empty($eventID)) {
       return '';
     }
+    $eventID = CRM_Utils_Type::escapeAll($eventID, 'Integer');
     return ' AND civicrm_participant.event_id IN ( ' . implode(',', $eventID) . ') ';
   }
 

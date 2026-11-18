@@ -132,4 +132,40 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
     $this->assertTrue(in_array($rows[0]['civicrm_address_city'], ['ABC;DEF', 'DEF;ABC']));
   }
 
+  /**
+   * Test SQL injection via details (T_TEXT field) with 'eq'.
+   */
+  public function testActivityDetailsSqlInjection(): void {
+    $contactID = $this->individualCreate();
+    $this->activityCreate([
+      'source_contact_id' => $contactID,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Test Meeting',
+      'details' => 'Normal meeting details',
+    ]);
+
+    // An injection attempt 'NULL OR 1=1' must not match activities with different details.
+    $input = [
+      'fields' => ['activity_subject', 'details'],
+      'filters' => [
+        'details_op' => 'eq',
+        'details_value' => 'NULL OR 1=1',
+      ],
+    ];
+    $obj = $this->getReportObject('CRM_Report_Form_Activity', $input);
+    $rows = $obj->getResultSet();
+    $this->assertCount(0, $rows);
+
+    // Matching the exact string literal works
+    $this->activityCreate([
+      'source_contact_id' => $contactID,
+      'activity_type_id' => 'Meeting',
+      'subject' => 'Injected String Subject',
+      'details' => 'NULL OR 1=1',
+    ]);
+    $obj = $this->getReportObject('CRM_Report_Form_Activity', $input);
+    $rows = $obj->getResultSet();
+    $this->assertCount(1, $rows);
+  }
+
 }

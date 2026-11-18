@@ -128,8 +128,8 @@ class PageTokenCredential extends AutoService {
 
     // Afform screens are generally built around APIv4. If it's an APIv4 request, then we check whitelist for entities/actions/fields.
     if (preg_match(';^civicrm/ajax/api4/(\w+)/(\w+)/?$;', $route, $m)) {
-      $parsed = $this->retrieveJsonOrNull('params', 'REQUEST');
-      if (empty($parsed)) {
+      $parsed = \CRM_Api4_Page_AJAX::parseRequestParams($m[1], $m[2]);
+      if (!is_array($parsed)) {
         \Civi::log()->warning("Malformed request. APIv4 call requires \"params\" be JSON.");
         return FALSE;
       }

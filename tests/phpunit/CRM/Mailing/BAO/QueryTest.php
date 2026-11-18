@@ -99,4 +99,37 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
     $this->assertSame(3, count($totalTrackableUrlMail), "Accurately display list of unique trackable URLs and who clicked them.");
   }
 
+  /**
+   * Test SQL injection prevention in mailing_id and mailing_bounce_types search parameter.
+   */
+  public function testMailingSqlInjection(): void {
+    $params = [
+      [
+        0 => 'mailing_id',
+        1 => 'IN',
+        2 => ['0) OR (1=1'],
+        3 => 0,
+        4 => 0,
+      ],
+    ];
+    $query = new CRM_Contact_BAO_Query($params);
+    $query->query(FALSE);
+    $this->assertStringNotContainsString('1=1', $query->_whereClause);
+    $this->assertStringContainsString('civicrm_mailing.id IN (0)', $query->_whereClause);
+
+    $params = [
+      [
+        0 => 'mailing_bounce_types',
+        1 => 'IN',
+        2 => ['0) OR (1=1'],
+        3 => 0,
+        4 => 0,
+      ],
+    ];
+    $query = new CRM_Contact_BAO_Query($params);
+    $query->query(FALSE);
+    $this->assertStringNotContainsString('1=1', $query->_whereClause);
+    $this->assertStringContainsString('civicrm_mailing_event_bounce.bounce_type_id IN (0)', $query->_whereClause);
+  }
+
 }

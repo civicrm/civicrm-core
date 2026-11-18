@@ -542,4 +542,57 @@ EOHTML;
     $this->assertSame('LegacyDraftLast', $prefillLegacy['Individual1']['values'][0]['fields']['last_name']);
   }
 
+  /**
+   * Submitted values are escaped when they replace tokens in the confirmation message.
+   */
+  public function testConfirmationMessageEscapesTokenValues(): void {
+    $this->useValues([
+      'layout' => self::NAME_FORM_LAYOUT,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'create_submission' => TRUE,
+      'manual_processing' => TRUE,
+      'confirmation_type' => 'show_confirmation_message',
+      'confirmation_message' => '<p>Thanks [Individual1.0.first_name] [Individual1.0.last_name]!</p>',
+    ]);
+    $values = ['Individual1' => [['fields' => ['first_name' => '<b data-test="1">Jane</b>', 'last_name' => '[Individual1.0.id]']]]];
+
+    $result = Afform::submit()->setName($this->formName)->setValues($values)->execute();
+    $expected = '<p>Thanks &lt;b data-test=&quot;1&quot;&gt;Jane&lt;/b&gt; [Individual1.0.id]!</p>';
+    $this->assertSame($expected, $result[0]['message']);
+
+    // A reviewer processing the stored submission gets the same escaped message.
+    $submission = AfformSubmission::get(FALSE)->addWhere('afform_name', '=', $this->formName)->execute()->single();
+    $result = Afform::submit(FALSE)->setName($this->formName)->setArgs(['sid' => $submission['id']])->setValues($values)->execute();
+    $this->assertStringStartsWith('<p>Thanks &lt;b data-test=&quot;1&quot;&gt;Jane&lt;/b&gt; ', $result[0]['message']);
+    $this->assertStringNotContainsString('<b', $result[0]['message']);
+  }
+
+  /**
+   * Submitted values are URL-encoded when they replace tokens in the redirect.
+   */
+  public function testRedirectEncodesTokenValues(): void {
+    $this->useValues([
+      'layout' => self::NAME_FORM_LAYOUT,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'confirmation_type' => 'redirect_to_url',
+      'redirect' => 'civicrm/thanks?name=[Individual1.0.first_name]&cid=[Individual1.0.id]',
+    ]);
+    $result = Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => [['fields' => ['first_name' => 'Jane&admin=1 #x', 'last_name' => 'Doe']]]])
+      ->execute();
+    $this->assertSame('civicrm/thanks?name=Jane%26admin%3D1%20%23x&cid=' . $result[0]['Individual1'][0]['id'], $result[0]['redirect']);
+  }
+
+  private const NAME_FORM_LAYOUT = <<<EOHTML
+    <af-form ctrl="afform">
+      <af-entity type="Individual" name="Individual1" label="Individual 1" actions="{create: true, update: true}" security="RBAC" />
+      <fieldset af-fieldset="Individual1" class="af-container" af-title="Individual 1">
+        <af-field name="first_name" />
+        <af-field name="last_name" />
+      </fieldset>
+      <button class="af-button btn btn-primary" crm-icon="fa-check" ng-click="afform.submit()">Submit</button>
+    </af-form>
+  EOHTML;
+
 }

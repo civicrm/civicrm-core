@@ -165,6 +165,24 @@ class MockPublicFormTest extends \Civi\AfformMock\FormTestCase {
       'chain' => ['name_me_0' => ['Contact', 'get', []]],
     ]);
     $this->assertMatchesRegularExpression('/JWT specifies a different form or route/', $body, 'Response should have error message');
+
+    // ...nor with sneaky params in the query string, which the API also executes.
+    $response = $this->createGuzzle(['http_errors' => FALSE])->post('civicrm/ajax/api4/Afform/prefill', [
+      'headers' => ['X-Requested-With' => 'XMLHttpRequest'],
+      'query' => ['chain' => ['name_me_0' => ['Contact', 'get', []]]],
+      'form_params' => ['params' => json_encode(['name' => $this->getFormName()])] + $auth,
+    ]);
+    $this->assertEquals(401, $response->getStatusCode(), 'HTTP status code should be 401');
+    $this->assertMatchesRegularExpression('/JWT specifies a different form or route/', (string) $response->getBody());
+
+    // ...nor with sneaky params for an invalid entity/action
+    $response = $this->createGuzzle(['http_errors' => FALSE])->post('civicrm/ajax/api4/Gobblegobble/cookcook', [
+      'headers' => ['X-Requested-With' => 'XMLHttpRequest'],
+      'query' => ['chain' => ['name_me_0' => ['Contact', 'get', []]]],
+      'form_params' => ['params' => json_encode(['name' => $this->getFormName()])] + $auth,
+    ]);
+    $this->assertEquals(401, $response->getStatusCode(), 'HTTP status code should be 401');
+    $this->assertMatchesRegularExpression('/JWT specifies a different form or route/', (string) $response->getBody());
   }
 
   /**

@@ -64,12 +64,14 @@ class SubmitFile extends AbstractProcessor {
     if (empty($_FILES['file'])) {
       throw new \CRM_Core_Exception('File upload required');
     }
+    $this->assertFormFileField();
     // This uploader can be used when saving a draft or during final submission
     if ($this->isDraft()) {
       $draft = $this->getDraft();
     }
     else {
       $entityId = $this->getEntityId();
+      $this->assertEntityActionAllowed();
     }
 
     $fileField = $this->_formDataModel->getField($this->getEntityApiName(), $this->fieldName, 'create');
@@ -123,11 +125,44 @@ class SubmitFile extends AbstractProcessor {
     }
 
     $this->_entityIds = $info['civiAfformSubmission']['data'];
+    $this->_entityActions = $info['civiAfformSubmission']['actions'] ?? [];
   }
 
   private function getEntityApiName(): string {
     $afformEntity = $this->_formDataModel->getEntity($this->modelName);
     return $this->joinEntity ?: $afformEntity['type'];
+  }
+
+  /**
+   * Only allow uploading a file if the target record was created or updated by this submission.
+   */
+  private function assertEntityActionAllowed(): void {
+    $entityIndex = (int) $this->entityIndex;
+    $joinIndex = (int) $this->joinIndex;
+    if ($this->joinEntity) {
+      $actionTaken = $this->_entityActions[$this->modelName][$entityIndex]['joins'][$this->joinEntity][$joinIndex] ?? NULL;
+    }
+    else {
+      $actionTaken = $this->_entityActions[$this->modelName][$entityIndex]['action'] ?? NULL;
+    }
+    if (!in_array($actionTaken, ['create', 'update'], TRUE)) {
+      throw new UnauthorizedException('Entity was not created or updated by this submission.');
+    }
+  }
+
+  /**
+   * Only a file field placed on the form may receive an upload.
+   */
+  private function assertFormFileField(): void {
+    $afformEntity = $this->_formDataModel->getEntity($this->modelName);
+    $formFields = $this->joinEntity ? ($afformEntity['joins'][$this->joinEntity]['fields'] ?? []) : ($afformEntity['fields'] ?? []);
+    $fileFields = self::getFileFields($this->getEntityApiName(), $formFields);
+    if (isset($formFields['image_URL']) && !$this->joinEntity) {
+      $fileFields['image_URL'] = 'image_URL';
+    }
+    if (!isset($fileFields[$this->fieldName])) {
+      throw new UnauthorizedException('Not a file field of this form: ' . $this->fieldName);
+    }
   }
 
   private function getEntityId(): mixed {

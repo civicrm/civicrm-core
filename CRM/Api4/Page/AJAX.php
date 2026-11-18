@@ -62,7 +62,10 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       // Received single-call format
       $entity = $this->urlPath[3];
       $action = $this->urlPath[4];
-      $params = $this->getParamsFromRequest($entity, $action);
+      $params = static::parseRequestParams($entity, $action);
+      if ($params === NULL) {
+        $this->sendMalformedJsonResponse('params');
+      }
       $index = CRM_Utils_Request::getJsonBody()['index'] ?? CRM_Utils_Request::retrieve('index', 'String');
       if (!is_null($index) && !is_string($index) && !is_int($index)) {
         $this->sendBadRequest("Malformed 'index': expected a string or an integer.");
@@ -73,18 +76,38 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
     CRM_Utils_System::sendJSONResponse($response, $this->httpResponseCode);
   }
 
-  private function getParamsFromRequest(string $entity, string $action): array {
+  /**
+   * Examine the request ($_REQUEST, $_GET) to extract any APIv4 `$params`.
+   *
+   * @param string $entity
+   * @param string $action
+   * @return array|null
+   *   NULL if the request parameters have syntactic errors. Otherwise, an array with the params.
+   * @internal
+   *   This may be referenced in civicrm-core but is not intended for third-party usage.
+   */
+  public static function parseRequestParams(string $entity, string $action): ?array {
     $config = CRM_Core_Config::singleton();
-    $params = $this->getJsonInput('params') ?? [];
+    try {
+      $params = CRM_Utils_Request::retrieveJson('params', 'REQUEST') ?? [];
+    }
+    catch (CRM_Core_Exception $e) {
+      return NULL;
+    }
 
     // Add query params if they are not in the params json and if they are allowed by the api action
     $queryParams = array_diff_key($_GET, $params);
     unset($queryParams['params'], $queryParams['index'], $queryParams[$config->userFrameworkURLVar]);
     if (count($queryParams) > 0) {
-      $allowedParams = civicrm_api4($entity, 'getActions', [
-        'checkPermissions' => FALSE,
-        'where' => [['name', '=', $action]],
-      ], ['params'])->single();
+      try {
+        $allowedParams = civicrm_api4($entity, 'getActions', [
+          'checkPermissions' => FALSE,
+          'where' => [['name', '=', $action]],
+        ], ['params'])->single();
+      }
+      catch (\Civi\API\Exception\NotImplementedException $e) {
+        $allowedParams = [];
+      }
       foreach ($queryParams as $key => $value) {
         if (array_key_exists($key, $allowedParams)) {
           $params[$key] = $value;

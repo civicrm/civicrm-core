@@ -1,6 +1,7 @@
 <?php
 namespace api\v4\Afform;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
 use Civi\Api4\OptionValue;
@@ -482,6 +483,41 @@ EOHTML;
       ->execute();
     $this->assertCount(1, $result);
     $this->assertEquals($prefix . ' Normal Event', $result[0]['label']);
+  }
+
+  /**
+   * A field that skips permission checks does so only for the entity it refers to
+   */
+  public function testFieldSecurityDoesNotApplyToOtherEntities(): void {
+    $marker = uniqid(__FUNCTION__);
+    $this->createTestRecord('Individual', ['first_name' => 'A', 'last_name' => $marker]);
+    $this->createTestRecord('Group', ['title' => $marker]);
+
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Activity" name="Activity1" actions="{create: true, update: false}" security="RBAC" />
+  <fieldset af-fieldset="Activity1">
+    <af-field name="subject" />
+    <af-field name="source_contact_id" defn="{security: 'FBAC'}" />
+  </fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    $autocompleteThroughField = fn(string $entity) => civicrm_api4($entity, 'autocomplete', [
+      'formName' => 'afform:' . $this->formName,
+      'fieldName' => 'Activity1:source_contact_id',
+      'input' => $marker,
+    ]);
+    $this->assertCount(1, $autocompleteThroughField('Contact'));
+
+    $this->expectException(UnauthorizedException::class);
+    $autocompleteThroughField('Group');
   }
 
 }

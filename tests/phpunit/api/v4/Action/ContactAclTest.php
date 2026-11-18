@@ -20,12 +20,14 @@
 namespace api\v4\Action;
 
 use api\v4\Api4TestBase;
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Activity;
 use Civi\Api4\Address;
 use Civi\Api4\Contact;
 use Civi\Api4\Dashboard;
 use Civi\Api4\Email;
 use Civi\Api4\Group;
+use Civi\Api4\Household;
 use Civi\Api4\Individual;
 use Civi\Api4\IM;
 use Civi\Api4\LocationType;
@@ -378,6 +380,75 @@ class ContactAclTest extends Api4TestBase implements TransactionalInterface, Hoo
       // Restore lockManager
       \Civi::$statics['Civi\Core\Container']['boot']['lockManager'] = $originalLockManager;
     }
+  }
+
+  public function provideContactEntities(): array {
+    return [
+      'Contact' => [Contact::class, 'Individual'],
+      'Individual' => [Individual::class, 'Individual'],
+      'Organization' => [Organization::class, 'Organization'],
+      'Household' => [Household::class, 'Household'],
+    ];
+  }
+
+  /**
+   * Contact::update and its contact-type facades must all enforce the same ACL
+   * checks when the logged-in user lacks 'edit all contacts'.
+   *
+   * @dataProvider provideContactEntities
+   */
+  public function testContactAndIndividualUpdateAcl(string $entityClass, string $contactType): void {
+    $this->createLoggedInUser();
+    $allowed = $this->createTestEntity($contactType, [
+      'nick_name' => 'Allowed',
+      'source' => 'Initial',
+    ], 'allowed');
+    $disallowed = $this->createTestEntity($contactType, [
+      'nick_name' => 'Disallowed',
+      'source' => 'Initial',
+    ], 'disallowed');
+
+    $this->allowedContacts = [$allowed['id']];
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_aclWhereClause', [$this, 'aclWhereMultipleContacts']);
+
+    // Single-record update on an allowed contact succeeds.
+    $updated = $entityClass::update()
+      ->addWhere('id', '=', $allowed['id'])
+      ->addValue('nick_name', 'UpdatedAllowed')
+      ->execute()
+      ->single();
+    $this->assertSame('UpdatedAllowed', $updated['nick_name']);
+
+    // Single-record update on a disallowed contact is rejected.
+    $error = NULL;
+    try {
+      $entityClass::update()
+        ->addWhere('id', '=', $disallowed['id'])
+        ->addValue('nick_name', 'ShouldFail')
+        ->execute();
+    }
+    catch (UnauthorizedException $e) {
+      $error = $e->getMessage();
+    }
+    $this->assertSame('ACL check failed', $error, "$entityClass::update must reject unauthorized contact.");
+
+    // Batch update only modifies the allowed contact.
+    $batchResult = $entityClass::update()
+      ->addWhere('id', 'IN', [$allowed['id'], $disallowed['id']])
+      ->addValue('source', 'BatchUpdated')
+      ->execute();
+    $this->assertCount(1, $batchResult);
+    $this->assertEquals($allowed['id'], $batchResult->single()['id']);
+
+    $stored = Contact::get(FALSE)
+      ->addWhere('id', 'IN', [$allowed['id'], $disallowed['id']])
+      ->addSelect('id', 'nick_name', 'source')
+      ->execute()
+      ->indexBy('id');
+    $this->assertSame('BatchUpdated', $stored[$allowed['id']]['source']);
+    $this->assertSame('Disallowed', $stored[$disallowed['id']]['nick_name']);
+    $this->assertSame('Initial', $stored[$disallowed['id']]['source']);
   }
 
 }

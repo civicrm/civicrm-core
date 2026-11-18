@@ -264,32 +264,18 @@ class CRM_Activity_BAO_Query {
         break;
 
       case 'activity_taglist':
-        $taglist = $value;
-        $value = [];
-        foreach ($taglist as $val) {
-          if ($val) {
-            $val = explode(',', $val);
-            foreach ($val as $tId) {
-              if (is_numeric($tId)) {
-                $value[] = $tId;
-              }
-            }
-          }
-        }
-
       case 'activity_tags':
+        $tagIDs = CRM_Core_BAO_Query::cleanIDs($value);
+        if (!$tagIDs) {
+          break;
+        }
         $activityTags = CRM_Core_DAO_EntityTag::buildOptions('tag_id', 'get');
-
-        if (!is_array($value)) {
-          $value = explode(',', $value);
-        }
-
         $names = [];
-        foreach ($value as $k => $v) {
-          $names[] = $activityTags[$v];
+        foreach ($tagIDs as $tagID) {
+          $names[] = $activityTags[$tagID] ?? $tagID;
         }
 
-        $query->_where[$grouping][] = "civicrm_activity_tag.tag_id IN (" . implode(",", $value) . ")";
+        $query->_where[$grouping][] = 'civicrm_activity_tag.tag_id IN (' . implode(',', $tagIDs) . ')';
         $query->_qill[$grouping][] = ts('Activity Tag %1', [1 => $op]) . ' ' . implode(' ' . ts('OR') . ' ', $names);
         $query->_tables['civicrm_activity_tag'] = $query->_whereTables['civicrm_activity_tag'] = 1;
         break;

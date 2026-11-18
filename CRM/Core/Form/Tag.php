@@ -135,12 +135,15 @@ class CRM_Core_Form_Tag {
 
     // when form is submitted with tagset values below logic will work and in the case when all tags in a tagset
     // are deleted we will have to set $params[tagset id] = '' which is done by above logic
+    $entityId = CRM_Utils_Type::escape($entityId, 'Positive');
+    $entityTable = CRM_Utils_Type::escape($entityTable, 'String');
     foreach ($params as $parentId => $value) {
+      $parentId = CRM_Utils_Type::escape($parentId, 'Positive');
       $newTagIds = [];
       $tagIds = [];
 
       if ($value) {
-        $tagIds = explode(',', $value);
+        $tagIds = CRM_Utils_Type::escapeAll(explode(',', $value), 'Positive');
         foreach ($tagIds as $tagId) {
           if ($form && $form->_action != CRM_Core_Action::UPDATE || !array_key_exists($tagId, $existingTags)) {
             $newTagIds[] = $tagId;

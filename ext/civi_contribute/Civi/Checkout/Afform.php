@@ -133,7 +133,7 @@ class Afform extends AutoService {
 
     $confirmationUrl = ($afform['confirmation_type'] === 'redirect_to_url') ? $afform['redirect'] : NULL;
     if ($confirmationUrl) {
-      $confirmationUrl = $event->getApiRequest()->replaceTokens($confirmationUrl);
+      $confirmationUrl = $event->getApiRequest()->replaceTokens($confirmationUrl, 'url');
 
       $confirmationUrl = (string) \Civi::url($confirmationUrl)
         ->setPreferFormat('absolute')

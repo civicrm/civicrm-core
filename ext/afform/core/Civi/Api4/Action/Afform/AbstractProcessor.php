@@ -76,6 +76,20 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected $_entityIds = [];
 
   /**
+   * Action taken ('create' or 'update') for each saved entity and join.
+   *
+   * @var array
+   */
+  protected $_entityActions = [];
+
+  /**
+   * Ids of contacts identified by a dedupe rule instead of by the submitter.
+   *
+   * @var int[]
+   */
+  protected $_dedupeMatchedContactIds = [];
+
+  /**
    * Values of each entity that is submitted on the form.
    * Eg. $entityValues['Contribution1'][0]['fields']['field1' => 1, 'field2' => 2]
    *
@@ -90,6 +104,20 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * @var array
    */
   protected $_submissionTokenValues = [];
+
+  /**
+   * Record that a contact was identified by a dedupe rule.
+   */
+  public function addDedupeMatchedContactId(int $contactId): void {
+    $this->_dedupeMatchedContactIds[] = $contactId;
+  }
+
+  /**
+   * A dedupe match shows that the submitter knows the matching values, not that they are this contact.
+   */
+  public function isDedupeMatchedContact(int $contactId): bool {
+    return in_array($contactId, $this->_dedupeMatchedContactIds, TRUE);
+  }
 
   /**
    * Get the submitted values from all the entities on the form
@@ -395,7 +423,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
         $joinInfo = $afEntity['joins'][$joinEntity] ?? [];
         foreach ($joins as $joinIndex => $join) {
           foreach ($join as $fieldName => $fieldValue) {
-            if (!empty($joinInfo['fields'][$fieldName])) {
+            // Only "existing entity" fields may be used to look up a record
+            $fieldDefn = $this->_formDataModel->getField($joinEntity, $fieldName, 'create');
+            if (!empty($joinInfo['fields'][$fieldName]) && !empty($fieldDefn['input_attrs']['autofill'])) {
               $where = [[$fieldName, '=', $fieldValue]];
               $joinResult = \CRM_Utils_Array::first($this->getJoinResult($afEntity, $joinEntity, $joinInfo, $where, 1));
               if ($joinResult) {
@@ -417,9 +447,9 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       'orderBy' => self::getEntityField($joinEntity, 'is_primary') ? ['is_primary' => 'DESC'] : [],
     ]);
     // Validate autocomplete fields
-    if ($joinResult && !empty($entity['joins'][$joinEntity]['fields'][$joinIdField]['defn']['saved_search'])) {
+    if ($joinResult && !empty($join['fields'][$joinIdField]['defn']['saved_search'])) {
       $keys = array_combine(array_keys($joinResult), array_column($joinResult, $joinIdField));
-      $keys = $this->validateBySavedSearch($entity['name'], $joinEntity, $keys, $joinIdField);
+      $keys = $this->validateBySavedSearch($afEntity['name'] . '+' . $joinEntity, $joinEntity, $keys, $joinIdField);
       $joinResult = array_intersect_key($joinResult, $keys);
     }
     return $joinResult;
@@ -756,7 +786,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       if (!$entity['type']) {
         $records = [$records];
       }
-      foreach ($records as $values) {
+      foreach ($records as $recordIndex => $values) {
         if (!is_array($values)) {
           // For "extra" we might have $values['fields'] if we added any extra fields.
           // But, if we have eg. recaptcha we will have $values['recaptcha2'] and might
@@ -779,10 +809,17 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
           unset($values['extras']);
         }
         // Special handling for file fields
+        $formDefaults = $this->getForcedDefaultValues($entity['fields']) + $this->getHiddenDefaultValues($entity['fields']);
+        $recordId = $entity['type'] ? ($values['fields'][CoreUtil::getIdFieldName($entity['type'])] ?? NULL) : NULL;
         foreach ($fileFields as $fileFieldName) {
+          $assertKnownFileId = fn($fileId) => $this->assertKnownFileId($fileId, $entityName, $entity['type'], $recordId, $fileFieldName, $formDefaults[$fileFieldName] ?? NULL);
+          if (!empty($values['fields'][$fileFieldName]) && is_scalar($values['fields'][$fileFieldName])) {
+            $assertKnownFileId($values['fields'][$fileFieldName]);
+          }
           if (isset($values['fields'][$fileFieldName]) && is_array($values['fields'][$fileFieldName])) {
             // Keep file id
             if (isset($values['fields'][$fileFieldName]['id'])) {
+              $assertKnownFileId($values['fields'][$fileFieldName]['id']);
               $values['fields'][$fileFieldName] = $values['fields'][$fileFieldName]['id'];
             }
             // File was deleted
@@ -822,9 +859,16 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
                 elseif (array_key_exists('file_name', $joinValues[$index][$fileFieldName])) {
                   $joinValues[$index][$fileFieldName] = '';
                 }
+                else {
+                  $joinValues[$index][$fileFieldName] = $joinValues[$index][$fileFieldName]['id'] ?? '';
+                }
+              }
+              $idField = CoreUtil::getIdFieldName($joinEntity);
+              if (!empty($joinValues[$index][$fileFieldName]) && is_scalar($joinValues[$index][$fileFieldName])) {
+                $joinDefaults = $this->getForcedDefaultValues($entity['joins'][$joinEntity]['fields'] ?? []) + $this->getHiddenDefaultValues($entity['joins'][$joinEntity]['fields'] ?? []);
+                $this->assertKnownFileId($joinValues[$index][$fileFieldName], $entityName, $joinEntity, $joinValues[$index][$idField] ?? NULL, $fileFieldName, $joinDefaults[$fileFieldName] ?? NULL, $joinEntity);
               }
               // Creating new record, add placeholder value so the file upload will have an id
-              $idField = CoreUtil::getIdFieldName($joinEntity);
               if (empty($joinValues[$index][$idField])) {
                 $joinValues[$index][$fileFieldName] = '';
               }
@@ -857,6 +901,57 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     }
 
     return $entityValues;
+  }
+
+  /**
+   * A file id sent by the client is kept only if the file is already in that field or was uploaded by the current user.
+   *
+   * @param mixed $fileId
+   * @param string $entityName
+   *   Name of the form entity, e.g. 'Individual1'
+   * @param string $apiEntity
+   *   Entity that holds the field: the form entity's type, or the join entity
+   * @param mixed $recordId
+   *   Id of the submitted record, if it exists already
+   * @param string $fieldName
+   * @param mixed $formDefault
+   *   Value the form itself sets for this field
+   * @param string|null $joinEntity
+   * @throws \Civi\API\Exception\UnauthorizedException
+   */
+  protected function assertKnownFileId($fileId, string $entityName, string $apiEntity, $recordId, string $fieldName, $formDefault = NULL, ?string $joinEntity = NULL): void {
+    $fileIdOf = fn($value) => is_array($value) ? ($value['id'] ?? NULL) : $value;
+    $knownIds = [$fileIdOf($formDefault)];
+    // Records loaded for this form
+    foreach ($this->_entityValues[$entityName] ?? [] as $loaded) {
+      $loadedRecords = $joinEntity ? ($loaded['joins'][$joinEntity] ?? []) : [$loaded['fields'] ?? []];
+      foreach ($loadedRecords as $loadedRecord) {
+        $knownIds[] = $fileIdOf($loadedRecord[$fieldName] ?? NULL);
+      }
+    }
+    $isKnown = function () use (&$knownIds, $fileId) {
+      return in_array((string) $fileId, array_map('strval', array_filter($knownIds)), TRUE);
+    };
+    if (!$isKnown() && $recordId) {
+      $stored = civicrm_api4($apiEntity, 'get', [
+        'checkPermissions' => FALSE,
+        'select' => [$fieldName],
+        'where' => [[CoreUtil::getIdFieldName($apiEntity), '=', $recordId]],
+      ])->first();
+      $knownIds[] = $fileIdOf($stored[$fieldName] ?? NULL);
+    }
+    $userId = \CRM_Core_Session::getLoggedInContactID();
+    if (!$isKnown() && $userId) {
+      // A file the user uploaded, e.g. to a draft of this form
+      $knownIds[] = File::get(FALSE)
+        ->addSelect('id')
+        ->addWhere('id', '=', $fileId)
+        ->addWhere('created_id', '=', $userId)
+        ->execute()->first()['id'] ?? NULL;
+    }
+    if (!$isKnown()) {
+      throw new UnauthorizedException(E::ts('File %1 is not attached to this record.', [1 => $fileId]));
+    }
   }
 
   /**
@@ -1003,7 +1098,7 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
       $records = $this->replaceReferences($entityName, $entityValues[$entityName]);
       $records = $this->replaceRelativeDates($entityType, $records);
       $this->fillIdFields($records, $entityName);
-      $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds);
+      $event = new AfformSubmitEvent($this->_afform, $this->_formDataModel, $this, $records, $entityType, $entityName, $this->_entityIds, $this->_entityActions);
       try {
         \Civi::dispatcher()->dispatch('civi.afform.submit', $event);
       }
@@ -1101,16 +1196,17 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
    * Except for special case of JWT submission token [token]
    *
    * @param string $text
+   * @param string $format
+   *   Context the values are inserted into: 'html' or 'url'.
    *
    * @return string
    */
-  public function replaceTokens(string $text): string {
-    $matches = [];
-    preg_match_all('/\[[a-zA-Z0-9_]+\.[0-9]+\.[^]]+]/', $text, $matches);
-
-    foreach ($matches[0] as $token) {
-      $text = str_replace($token, $this->getTokenValue($token), $text);
-    }
+  public function replaceTokens(string $text, string $format = 'html'): string {
+    // Token values are user input: encode them for the context, in a single pass.
+    $text = preg_replace_callback('/\[[a-zA-Z0-9_]+\.[0-9]+\.[^]]+]/', function ($match) use ($format) {
+      $value = $this->getTokenValue($match[0]);
+      return $format === 'url' ? rawurlencode($value) : htmlspecialchars($value);
+    }, $text);
 
     // handle special case of JWT token token
     $text = str_replace('[token]', $this->_response['token'] ?? '', $text);

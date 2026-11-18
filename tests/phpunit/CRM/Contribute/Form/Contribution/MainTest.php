@@ -36,6 +36,10 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
    */
   public function tearDown(): void {
     $this->quickCleanUpFinancialEntities();
+    if (!empty($this->ids['UFGroup'])) {
+      \Civi\Api4\UFJoin::delete(FALSE)->addWhere('uf_group_id', 'IN', $this->ids['UFGroup'])->execute();
+    }
+    $this->cleanupCustomGroups();
     parent::tearDown();
   }
 
@@ -308,6 +312,60 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
     $this->assertEquals([
       $priceSet['priceFieldValueIDs'][$membershipTypeIDTerm] => 1,
     ], $defaults['price_' . $priceSet['priceFieldID']]);
+  }
+
+  /**
+   * A renewal pre-fills membership custom fields from the membership being
+   * renewed, not from the membership sharing its ID with the membership type.
+   */
+  public function testSetDefaultValuesUsesRenewedMembershipCustomData(): void {
+    $customGroup = $this->createTestEntity('CustomGroup', ['title' => 'Renewal data', 'extends' => 'Membership']);
+    $customField = $this->createTestEntity('CustomField', [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Renewal note',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+    ]);
+    $fieldName = 'custom_' . $customField['id'];
+    $membershipTypeID = $this->membershipTypeCreate();
+
+    // Another member's membership gets the same ID as the membership type.
+    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_membership AUTO_INCREMENT = ' . $membershipTypeID);
+    $otherMembershipID = $this->contactMembershipCreate([
+      'contact_id' => $this->individualCreate(),
+      'membership_type_id' => $membershipTypeID,
+      $fieldName => 'other member',
+    ]);
+    $this->assertSame($membershipTypeID, $otherMembershipID);
+
+    $contactID = $this->createLoggedInUser();
+    $this->contactMembershipCreate(['contact_id' => $contactID, 'membership_type_id' => $membershipTypeID, $fieldName => 'own value']);
+
+    $priceSet = $this->createMembershipCheckBoxPriceSet([$membershipTypeID]);
+    $profile = $this->createTestEntity('UFGroup', ['title' => 'Renewal profile', 'group_type' => 'Membership,Individual']);
+    $this->createTestEntity('UFField', [
+      'uf_group_id' => $profile['id'],
+      'field_name' => $fieldName,
+      'label' => 'Renewal note',
+      'field_type' => 'Membership',
+    ]);
+    $contributionPage = $this->contributionPageCreate(['is_pay_later' => 1, 'is_monetary' => 0]);
+    CRM_Price_BAO_PriceSet::addTo('civicrm_contribution_page', $contributionPage['id'], $priceSet['priceSetID']);
+    $this->createTestEntity('MembershipBlock', [
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $contributionPage['id'],
+      'is_active' => TRUE,
+    ]);
+    $this->createTestEntity('UFJoin', [
+      'module' => 'CiviContribute',
+      'weight' => 1,
+      'uf_group_id' => $profile['id'],
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $contributionPage['id'],
+    ]);
+    $form = $this->getTestForm('CRM_Contribute_Form_Contribution_Main', [], ['id' => $contributionPage['id']]);
+    $form->processForm(FormWrapper::BUILT);
+    $this->assertSame('own value', $form->getDefaultValues()[$fieldName]);
   }
 
   /**

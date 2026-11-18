@@ -1354,8 +1354,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    *   Custom field name.
    * @param array $defaults
    *   Associated array of fields.
-   * @param int $contactId
-   *   Contact id.
+   * @param int|null $entityID
+   *   ID of the record the field belongs to, e.g. the membership for a
+   *   membership field. It is a contact ID only for a contact field.
    * @param int $mode
    *   Profile mode.
    * @param mixed $value
@@ -1366,14 +1367,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $customFieldId,
     $elementName,
     &$defaults,
-    $contactId = NULL,
+    ?int $entityID = NULL,
     $mode = NULL,
     $value = NULL
   ) {
     //get the type of custom field
     $customField = self::getFieldObject($customFieldId);
 
-    if (!$contactId) {
+    if (!$entityID) {
       if ($mode == CRM_Profile_Form::MODE_CREATE) {
         $value = $customField->default_value;
       }
@@ -1381,7 +1382,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     else {
       if (!isset($value)) {
         $info = self::getTableColumnGroup($customFieldId);
-        $query = "SELECT {$info[0]}.{$info[1]} as value FROM {$info[0]} WHERE {$info[0]}.entity_id = {$contactId}";
+        $query = "SELECT {$info[0]}.{$info[1]} as value FROM {$info[0]} WHERE {$info[0]}.entity_id = {$entityID}";
         $result = CRM_Core_DAO::executeQuery($query);
         if ($result->fetch()) {
           $value = $result->value;

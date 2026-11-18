@@ -32,6 +32,19 @@ class AfformSubmitEvent extends AfformBaseEvent {
   public $saved = [];
 
   /**
+   * Indexes of records whose id was found by a dedupe rule rather than given by the form.
+   * @var array
+   */
+  public $dedupeMatches = [];
+
+  /**
+   * Action taken ('create' or 'update') for each saved entity and join.
+   *
+   * @var array
+   */
+  private $entityActions;
+
+  /**
    * AfformSubmitEvent constructor.
    *
    * @param array $afform
@@ -41,13 +54,15 @@ class AfformSubmitEvent extends AfformBaseEvent {
    * @param string|null $entityType
    * @param string $entityName
    * @param array $entityIds
+   * @param array $entityActions
    */
-  public function __construct(array $afform, FormDataModel $formDataModel, AbstractProcessor $apiRequest, &$records, ?string $entityType, string $entityName, array &$entityIds) {
+  public function __construct(array $afform, FormDataModel $formDataModel, AbstractProcessor $apiRequest, &$records, ?string $entityType, string $entityName, array &$entityIds, array &$entityActions = []) {
     parent::__construct($afform, $formDataModel, $apiRequest);
     $this->records =& $records;
     $this->entityType = $entityType;
     $this->entityName = $entityName;
     $this->entityIds =& $entityIds;
+    $this->entityActions =& $entityActions;
   }
 
   /**
@@ -77,16 +92,51 @@ class AfformSubmitEvent extends AfformBaseEvent {
   }
 
   /**
-   * Set the saved values
+   * Record that an entity instance has been saved, along with its ID and action taken.
    *
    * @param int $index
    *   Index of the record for which the saved values are set.
    * @param array $savedValues
    *   The saved values. (Probably the return values from the API4 Save action)
+   * @param string|null $action
+   *   Action taken ('create' or 'update'). Auto-detected from `$this->records` if omitted.
    * @return $this
    */
-  public function setSaved(int $index, array $savedValues) {
+  public function setSaved(int $index, array $savedValues, ?string $action = NULL): self {
     $this->saved[$index] = $savedValues;
+    $idField = $this->getIdFieldName();
+    if ($action !== NULL || !isset($this->entityActions[$this->entityName][$index]['action'])) {
+      $action ??= empty($this->records[$index]['fields'][$idField]) ? 'create' : 'update';
+      $this->setEntityAction($index, $action);
+    }
+    if (isset($savedValues[$idField])) {
+      $this->setEntityId($index, $savedValues[$idField]);
+    }
+    return $this;
+  }
+
+  /**
+   * Record the action taken ('create' or 'update') on an entity instance.
+   *
+   * @param int $index
+   * @param string $action
+   * @return $this
+   */
+  public function setEntityAction(int $index, string $action): self {
+    $this->entityActions[$this->entityName][$index]['action'] = $action;
+    return $this;
+  }
+
+  /**
+   * Record the action taken ('create' or 'update') on join entity instances.
+   *
+   * @param int $index
+   * @param string $joinEntity
+   * @param array $joinActions
+   * @return $this
+   */
+  public function setJoinActions(int $index, string $joinEntity, array $joinActions): self {
+    $this->entityActions[$this->entityName][$index]['joins'][$joinEntity] = $joinActions;
     return $this;
   }
 

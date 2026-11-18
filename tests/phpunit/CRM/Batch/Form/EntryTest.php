@@ -214,6 +214,46 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
   }
 
   /**
+   * The entry form refuses a batch the user may not edit and a batch that is
+   * no longer open.
+   *
+   * @dataProvider getRefusedBatches
+   */
+  public function testEntryFormRefusesBatch(string $status, bool $isOwnBatch, array $permissions): void {
+    $this->offsetDefaultPriceSet();
+    $userID = $this->createLoggedInUser();
+    $this->createTestEntity('Batch', [
+      'name' => 'contributions',
+      'type_id:name' => 'Contribution',
+      'status_id:name' => $status,
+      'item_count' => 3,
+      'total' => 4500.45,
+      'data' => '{"values":[]}',
+      'created_id' => $isOwnBatch ? $userID : $this->individualCreate([], 'owner'),
+    ]);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = $permissions;
+    try {
+      $this->getTestForm('CRM_Batch_Form_Entry', $this->getContributionData(), ['id' => $this->ids['Batch']['default']])->processForm();
+      $this->fail('The entry form should refuse this batch.');
+    }
+    catch (CRM_Core_Exception $e) {
+      $this->assertStringContainsString('permission', $e->getMessage());
+    }
+    $this->assertCount(0, Contribution::get(FALSE)->execute());
+    $this->assertSame($status, Batch::get(FALSE)->addWhere('id', '=', $this->ids['Batch']['default'])->addSelect('status_id:name')->execute()->single()['status_id:name']);
+  }
+
+  public static function getRefusedBatches(): array {
+    $clerk = ['access CiviCRM', 'access CiviContribute', 'profile listings and forms'];
+    return [
+      'no batch permission' => ['Open', FALSE, $clerk],
+      'batch of another user' => ['Open', FALSE, array_merge($clerk, ['edit own manual batches'])],
+      'exported batch' => ['Exported', TRUE, array_merge($clerk, ['edit all manual batches'])],
+      'closed batch' => ['Closed', TRUE, array_merge($clerk, ['edit all manual batches'])],
+    ];
+  }
+
+  /**
    *  Test Contribution Import.
    *
    * @param $thousandSeparator
