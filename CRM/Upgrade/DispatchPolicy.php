@@ -47,7 +47,7 @@ class CRM_Upgrade_DispatchPolicy {
     }
 
     // Are there outstanding core version upgrades?
-    $upgradeFinished = !CRM_Core_BAO_Domain::isDBUpdateRequired();
+    $upgradeFinished = !\CRM_Upgrade_Versions::upgradesPending();
 
     return CRM_Upgrade_DispatchPolicy::get($upgradeFinished ? 'upgrade.finish' : 'upgrade.main');
   }

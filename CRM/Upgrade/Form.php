@@ -96,15 +96,11 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    */
   public static function &incrementalPhpObject($version) {
     static $incrementalPhpObject = [];
-
-    $versionParts = explode('.', $version);
-    $versionName = CRM_Utils_EnglishNumber::toCamelCase($versionParts[0]) . CRM_Utils_EnglishNumber::toCamelCase($versionParts[1]);
-
-    if (!array_key_exists($versionName, $incrementalPhpObject)) {
-      $className = "CRM_Upgrade_Incremental_php_{$versionName}";
-      $incrementalPhpObject[$versionName] = new $className();
+    $version = (string) $version;
+    if (!array_key_exists($version, $incrementalPhpObject)) {
+      $incrementalPhpObject[$version] = CRM_Upgrade_Versions::getIncrementalPhpObject($version);
     }
-    return $incrementalPhpObject[$versionName];
+    return $incrementalPhpObject[$version];
   }
 
   /**
@@ -112,22 +108,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    *   ex: ['5.13', '5.14', '5.15']
    */
   public static function incrementalPhpObjectVersions() {
-    $versions = [];
-
-    $phpDir = implode(DIRECTORY_SEPARATOR, [dirname(__FILE__), 'Incremental', 'php']);
-    $phpFiles = glob("$phpDir/*.php");
-    foreach ($phpFiles as $phpFile) {
-      $phpWord = substr(basename($phpFile), 0, -4);
-      if (CRM_Utils_EnglishNumber::isNumeric($phpWord)) {
-        /** @var \CRM_Upgrade_Incremental_Base $instance */
-        $className = 'CRM_Upgrade_Incremental_php_' . $phpWord;
-        $instance = new $className();
-        $versions[] = $instance->getMajorMinor();
-      }
-    }
-
-    usort($versions, 'version_compare');
-    return $versions;
+    return \CRM_Upgrade_Versions::incrementalPhpObjectVersions();
   }
 
   /**
@@ -241,15 +222,7 @@ SET    version = '$version'
    * @throws Exception
    */
   public function getRevisionSequence() {
-    $revList = [];
-
-    foreach (self::incrementalPhpObjectVersions() as $majorMinor) {
-      $phpUpgrader = self::incrementalPhpObject($majorMinor);
-      $revList = array_merge($revList, array_values($phpUpgrader->getRevisionSequence()));
-    }
-
-    usort($revList, 'version_compare');
-    return $revList;
+    return \CRM_Upgrade_Versions::getRevisionSequence();
   }
 
   /**
@@ -315,19 +288,9 @@ SET    version = '$version'
    * @return array(0=>$currentVer, 1=>$latestVer)
    */
   public function getUpgradeVersions() {
-    $latestVer = CRM_Utils_System::version();
-    $currentVer = CRM_Core_BAO_Domain::version(TRUE);
-    if (!$currentVer) {
-      throw new CRM_Core_Exception(ts('Version information missing in civicrm database.'));
-    }
-    elseif (stripos($currentVer, 'upgrade')) {
-      throw new CRM_Core_Exception(ts('Database check failed - the database looks to have been partially upgraded. You may want to reload the database with the backup and try the upgrade process again.'));
-    }
-    if (!$latestVer) {
-      throw new CRM_Core_Exception(ts('Version information missing in civicrm codebase.'));
-    }
-
-    return [$currentVer, $latestVer];
+    $versions = \CRM_Upgrade_Versions::getUpgradeVersions();
+    \CRM_Upgrade_Versions::validateUpgradeVersions($versions[0], $versions[1]);
+    return $versions;
   }
 
   /**
@@ -546,12 +509,8 @@ SET    version = '$version'
     );
     $queue->createItem($task, ['weight' => 0]);
 
-    $revisions = $upgrade->getRevisionSequence();
-    $maxRevision = empty($revisions) ? NULL : end($revisions);
+    $revisions = \CRM_Upgrade_Versions::getRevisionSequence();
     reset($revisions);
-    if (version_compare($latestVer, $maxRevision, '<')) {
-      throw new CRM_Core_Exception("Malformed upgrade sequence.  The incremental update $maxRevision exceeds target version $latestVer");
-    }
 
     foreach ($revisions as $rev) {
       // proceed only if $currentVer < $rev
@@ -937,7 +896,7 @@ SET    version = '$version'
     // Scan through all php files and see if any file is interested in setting pre-upgrade-message
     // based on $currentVer, $latestVer.
     // Please note, at this point upgrade hasn't started executing queries.
-    $revisions = $this->getRevisionSequence();
+    $revisions = \CRM_Upgrade_Versions::getRevisionSequence();
     foreach ($revisions as $rev) {
       if (version_compare($currentVer, $rev) < 0) {
         $versionObject = $this->incrementalPhpObject($rev);
