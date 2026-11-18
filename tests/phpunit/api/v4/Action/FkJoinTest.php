@@ -663,4 +663,20 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals([$payer['id']], $result->column('contact.id'));
   }
 
+  public function testJoinOnSharedForeignKey(): void {
+    $member = $this->createTestRecord('Contact');
+    $this->createTestRecord('Email', ['contact_id' => $member['id'], 'email' => 'member@example.org']);
+    $this->createTestRecord('Contact');
+    $group = $this->createTestRecord('Group');
+    $this->createTestRecord('GroupContact', ['group_id' => $group['id'], 'contact_id' => $member['id']]);
+
+    // Both sides reference Contact, so GroupContact.email_id = Email.id must not be added as a guessed join condition
+    $result = Email::get(FALSE)
+      ->addSelect('email')
+      ->addJoin('GroupContact AS gc', 'INNER', ['gc.contact_id', '=', 'contact_id'])
+      ->addWhere('gc.group_id', '=', $group['id'])
+      ->execute();
+    $this->assertSame(['member@example.org'], $result->column('email'));
+  }
+
 }
