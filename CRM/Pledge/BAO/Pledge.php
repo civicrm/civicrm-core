@@ -220,7 +220,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
     while ($payment->fetch()) {
       // also delete associated contribution.
       if ($payment->contribution_id) {
-        CRM_Contribute_BAO_Contribution::deleteContribution($payment->contribution_id);
+        CRM_Contribute_BAO_Contribution::deleteRecord(['id' => $payment->contribution_id]);
       }
       $payment->delete();
     }

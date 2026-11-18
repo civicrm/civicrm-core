@@ -230,10 +230,8 @@ function civicrm_api3_contribution_delete($params) {
   if (!empty($params['check_permissions']) && !\Civi\Api4\Utils\CoreUtil::checkAccessDelegated('Contribution', 'delete', ['id' => $contributionID], CRM_Core_Session::getLoggedInContactID() ?: 0)) {
     throw new CRM_Core_Exception('You do not have permission to delete this contribution');
   }
-  if (CRM_Contribute_BAO_Contribution::deleteContribution($contributionID)) {
-    return civicrm_api3_create_success([$contributionID => 1]);
-  }
-  throw new CRM_Core_Exception('Could not delete contribution');
+  CRM_Contribute_BAO_Contribution::deleteRecord(['id' => $contributionID]);
+  return civicrm_api3_create_success([$contributionID => 1]);
 }
 
 /**

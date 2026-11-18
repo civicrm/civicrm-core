@@ -698,6 +698,39 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $event->params['invoice_id'] = self::generateInvoiceID();
       }
     }
+    elseif ($event->action === 'delete') {
+      $id = $event->id;
+
+      //delete activity record
+      $params = [
+        'source_record_id' => $id,
+        // activity type id for contribution
+        'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Contribution'),
+      ];
+      CRM_Activity_BAO_Activity::deleteActivity($params);
+
+      //delete billing address if exists for this contribution.
+      self::deleteAddress($id);
+
+      //update pledge and pledge payment, CRM-3961
+      CRM_Pledge_BAO_PledgePayment::resetPledgePayment($id);
+
+      // remove entry from civicrm_price_set_entity, CRM-5095
+      if (CRM_Price_BAO_PriceSet::getFor('civicrm_contribution', $id)) {
+        CRM_Price_BAO_PriceSet::removeFrom('civicrm_contribution', $id);
+      }
+
+      // delete any related financial records.
+      CRM_Core_BAO_FinancialTrxn::deleteFinancialTrxn($id);
+      LineItem::delete(FALSE)->addWhere('contribution_id', '=', $id)->execute();
+
+      //delete note.
+      $note = CRM_Core_BAO_Note::getNote($id, 'civicrm_contribution');
+      $noteId = key($note);
+      if ($noteId) {
+        CRM_Core_BAO_Note::deleteRecord(['id' => $noteId]);
+      }
+    }
   }
 
   /**
@@ -1281,77 +1314,17 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
   }
 
   /**
-   * Delete the indirect records associated with this contribution first.
+   * @deprecated since 6.22 will be removed around 6.34
    *
    * @param int $id
    *
-   * @return mixed|null
-   *   $results no of deleted Contribution on success, false otherwise
+   * @return int
    * @throws \CRM_Core_Exception
    */
   public static function deleteContribution($id) {
-    CRM_Utils_Hook::pre('delete', 'Contribution', $id);
-
-    $transaction = new CRM_Core_Transaction();
-
-    //delete activity record
-    $params = [
-      'source_record_id' => $id,
-      // activity type id for contribution
-      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Contribution'),
-    ];
-
-    CRM_Activity_BAO_Activity::deleteActivity($params);
-
-    //delete billing address if exists for this contribution.
-    self::deleteAddress($id);
-
-    //update pledge and pledge payment, CRM-3961
-    CRM_Pledge_BAO_PledgePayment::resetPledgePayment($id);
-
-    // remove entry from civicrm_price_set_entity, CRM-5095
-    if (CRM_Price_BAO_PriceSet::getFor('civicrm_contribution', $id)) {
-      CRM_Price_BAO_PriceSet::removeFrom('civicrm_contribution', $id);
-    }
-
-    // delete any related financial records.
-    CRM_Core_BAO_FinancialTrxn::deleteFinancialTrxn($id);
-    LineItem::delete(FALSE)->addWhere('contribution_id', '=', $id)->execute();
-
-    //delete note.
-    $note = CRM_Core_BAO_Note::getNote($id, 'civicrm_contribution');
-    $noteId = key($note);
-    if ($noteId) {
-      CRM_Core_BAO_Note::deleteRecord(['id' => $noteId]);
-    }
-
-    $dao = new CRM_Contribute_DAO_Contribution();
-    $dao->id = $id;
-    $results = $dao->delete();
-    $transaction->commit();
-    CRM_Utils_Hook::post('delete', 'Contribution', $dao->id, $dao, $params);
-
-    return $results;
-  }
-
-  /**
-   * Bulk delete multiple records.
-   *
-   * @param array[] $records
-   *
-   * @return static[]
-   * @throws \CRM_Core_Exception
-   */
-  public static function deleteRecords(array $records): array {
-    $results = [];
-    foreach ($records as $record) {
-      if (self::deleteContribution($record['id'])) {
-        $returnObject = new CRM_Contribute_BAO_Contribution();
-        $returnObject->id = $record['id'];
-        $results[] = $returnObject;
-      }
-    }
-    return $results;
+    CRM_Core_Error::deprecatedFunctionWarning('deleteRecord');
+    static::deleteRecord(['id' => $id]);
+    return 1;
   }
 
   /**
@@ -2474,7 +2447,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $contribution->contact_id = $contactId;
     $contribution->find();
     while ($contribution->fetch()) {
-      self::deleteContribution($contribution->id);
+      self::deleteRecord(['id' => $contribution->id]);
     }
   }
 

@@ -1119,7 +1119,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Contribute_BAO_Contribution::deleteContribution($this->_id);
+      CRM_Contribute_BAO_Contribution::deleteRecord(['id' => $this->_id]);
       CRM_Core_Session::singleton()->replaceUserContext(CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$this->_contactID}&selectedChild=contribute"
       ));
