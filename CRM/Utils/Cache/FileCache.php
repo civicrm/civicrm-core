@@ -93,6 +93,13 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
   protected $dirReady = FALSE;
 
   /**
+   * Whether a failure to create the cache directory has been logged.
+   *
+   * @var bool
+   */
+  protected $dirAlerted = FALSE;
+
+  /**
    * Constructor.
    *
    * @param array $config
@@ -540,17 +547,40 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
     // directory itself. Another process may have created it since the first
     // check; that is a success, not a failure.
     if (!is_dir($dir)) {
-      $alertMessage = ts('Failed to create the cache directory. Please update the settings or file permissions.');
-      try {
-        CRM_Core_Session::setStatus($alertMessage);
-      }
-      catch (\Error $e) {
-        echo $alertMessage;
-      }
+      $this->logDirectoryFailure($dir);
       return FALSE;
     }
     $this->dirReady = TRUE;
     return TRUE;
+  }
+
+  /**
+   * Report that the cache directory could not be created.
+   *
+   * This is a system configuration problem, so it belongs in the log rather
+   * than in a status message shown to whichever user triggers the write.
+   * Write through Civi when the container is available; otherwise use PHP's
+   * error log, because the Civi logger may depend on services that are not
+   * booted yet.
+   *
+   * @param string $dir
+   */
+  private function logDirectoryFailure(string $dir): void {
+    if ($this->dirAlerted) {
+      return;
+    }
+    $this->dirAlerted = TRUE;
+    $message = 'Failed to create the cache directory "' . $dir . '". Please update the settings or file permissions.';
+    if (\Civi\Core\Container::isContainerBooted()) {
+      try {
+        \Civi::log()->error($message);
+        return;
+      }
+      catch (\Throwable $e) {
+        // Fall back to PHP's error log; logging must never make a cache write throw.
+      }
+    }
+    error_log($message);
   }
 
   /**
