@@ -11,7 +11,10 @@
 
 declare(strict_types = 1);
 
+use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
+use Civi\Api4\Membership;
+use Civi\Api4\Payment;
 use Civi\Test\ContributionPageTestTrait;
 
 /**
@@ -230,6 +233,19 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertArrayKeyExists($lineItem['contribution_id'], $contributions);
     $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $lineItem['entity_id'], 'return' => 'contact_id']);
     $this->assertEquals($membership['contact_id'], $contributions[$lineItem['contribution_id']]['contact_id']);
+    // The free membership's own contribution is settled by a payment of 0.
+    $this->assertSame('Completed', Contribution::get(FALSE)
+      ->addSelect('contribution_status_id:name')
+      ->addWhere('id', '=', $lineItem['contribution_id'])
+      ->execute()->single()['contribution_status_id:name']);
+    $this->assertSame([0.0], Payment::get(FALSE)
+      ->addWhere('contribution_id', '=', $lineItem['contribution_id'])
+      ->execute()->column('total_amount'));
+    $this->assertTrue(Membership::get(FALSE)
+      ->addSelect('status_id.is_current_member')
+      ->addWhere('id', '=', $lineItem['entity_id'])
+      ->execute()->single()['status_id.is_current_member']);
+    $this->assertCount(2, $mut->getAllMessages());
     $mut->checkMailLog([
       'Dave',
       'Wong',
