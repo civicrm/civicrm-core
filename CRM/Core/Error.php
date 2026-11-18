@@ -968,19 +968,6 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   }
 
   /**
-   * @param $file
-   */
-  public static function movedSiteError($file) {
-    $url = CRM_Utils_System::url('civicrm/admin/setting/updateConfigBackend',
-      'reset=1',
-      TRUE
-    );
-    echo "We could not write $file. Have you moved your site directory or server?<p>";
-    echo "Please fix the setting by running the <a href=\"$url\">update config script</a>";
-    exit();
-  }
-
-  /**
    * Terminate execution abnormally.
    *
    * @param int $code
