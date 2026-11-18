@@ -96,6 +96,11 @@ class AjaxJsonBodyTest extends \CiviEndToEndTestCase {
     $this->assertStringContainsString("'params'", $this->decode(400, $response)['error_message']);
   }
 
+  public function testApi4RejectsNonScalarIndex(): void {
+    $response = $this->postJson('civicrm/ajax/api4/Contact/get', ['params' => $this->getParams(), 'index' => ['a' => 1]]);
+    $this->assertStringContainsString("'index'", $this->decode(400, $response)['error_message']);
+  }
+
   public function testApi4RejectsJsonWithoutAjaxHeader(): void {
     // Debug mode deliberately lifts the check.
     \Civi::settings()->set('debug_enabled', FALSE);
@@ -118,6 +123,35 @@ class AjaxJsonBodyTest extends \CiviEndToEndTestCase {
     $result = $this->decode(200, $response);
     $this->assertSame(0, $result['is_error'], $result['error_message'] ?? '');
     $this->assertSame([$this->contactId], array_map('intval', array_keys($result['values'])));
+  }
+
+  public function testApi3AjaxJsonBody(): void {
+    $response = $this->postJson('civicrm/api/json', [
+      'entity' => 'Contact',
+      'action' => 'get',
+      'json' => ['first_name' => $this->firstName, 'return' => 'id'],
+    ]);
+    $result = $this->decode(200, $response);
+    $this->assertSame(0, $result['is_error'], $result['error_message'] ?? '');
+    // This endpoint always answers sequentially.
+    $this->assertSame([$this->contactId], array_map('intval', array_column($result['values'], 'id')));
+  }
+
+  public static function api3Paths(): array {
+    return [
+      ['civicrm/ajax/rest'],
+      ['civicrm/api/json'],
+    ];
+  }
+
+  /**
+   * @dataProvider api3Paths
+   */
+  public function testApi3ReportsMalformedJson(string $path): void {
+    $response = $this->postJson($path, ['entity' => 'Contact', 'action' => 'get', 'json' => '{"first_name": ']);
+    $result = $this->decode(200, $response);
+    $this->assertSame(1, $result['is_error']);
+    $this->assertSame("Malformed JSON in 'json'.", $result['error_message']);
   }
 
   public function testApi3MultipleCallsJsonBody(): void {

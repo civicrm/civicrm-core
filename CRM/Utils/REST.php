@@ -304,19 +304,10 @@ class CRM_Utils_REST {
       'action' => 1,
     ];
 
-    if (array_key_exists('json', $requestParams) && is_string($requestParams['json']) && str_starts_with($requestParams['json'], '{')) {
-      $params = json_decode($requestParams['json'], TRUE);
-      if ($params === NULL) {
-        CRM_Utils_JSON::output([
-          'is_error' => 1,
-          0 => 'error_message',
-          1 => 'Unable to decode supplied JSON.',
-        ]);
-      }
-    }
-    // Handle POST requests of content-type application/json.
-    elseif (array_key_exists('json', $requestParams) && is_array($requestParams['json'])) {
-      $params = $requestParams['json'];
+    // `json` holds the call's params, or is a flag such as `1` asking for JSON output.
+    $isOutputFlag = is_string($requestParams['json'] ?? NULL) && !str_starts_with($requestParams['json'], '{');
+    if (!$isOutputFlag) {
+      $params = self::retrieveJsonParams() ?? [];
     }
     foreach ($requestParams as $n => $v) {
       if (!array_key_exists($n, $skipVars)) {
@@ -381,9 +372,7 @@ class CRM_Utils_REST {
     if (empty($requestParams['entity'])) {
       CRM_Utils_JSON::output(civicrm_api3_create_error('missing entity entity'));
     }
-    if (!empty($requestParams['json'])) {
-      $params = json_decode($requestParams['json'], TRUE);
-    }
+    $params = self::retrieveJsonParams();
     $entity = CRM_Utils_String::munge($requestParams['entity'] ?? '');
     $action = CRM_Utils_String::munge($requestParams['action'] ?? '');
     if (!is_array($params)) {
@@ -477,6 +466,20 @@ class CRM_Utils_REST {
     echo self::output($result);
 
     CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * @return array|null
+   *   NULL if `json` is absent; a malformed value ends the request with an API error.
+   */
+  private static function retrieveJsonParams(): ?array {
+    try {
+      return CRM_Utils_Request::retrieveJson('json');
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Utils_JSON::output(self::error($e->getMessage()));
+      return NULL;
+    }
   }
 
   /**

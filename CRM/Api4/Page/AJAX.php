@@ -64,6 +64,9 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       $action = $this->urlPath[4];
       $params = $this->getParamsFromRequest($entity, $action);
       $index = CRM_Utils_Request::getJsonBody()['index'] ?? CRM_Utils_Request::retrieve('index', 'String');
+      if (!is_null($index) && !is_string($index) && !is_int($index)) {
+        $this->sendBadRequest("Malformed 'index': expected a string or an integer.");
+      }
       $response = $this->execute($entity, $action, $params, $index);
     }
 
@@ -117,11 +120,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
       $this->sendMalformedJsonResponse('request body');
     }
     if ($unknownKeys) {
-      $this->httpResponseCode = 400;
-      CRM_Utils_System::sendJSONResponse([
-        'error_code' => 400,
-        'error_message' => 'Unknown key(s) in JSON request body: ' . implode(', ', $unknownKeys) . '. Expected: ' . implode(', ', $allowedKeys) . '.',
-      ], $this->httpResponseCode);
+      $this->sendBadRequest('Unknown key(s) in JSON request body: ' . implode(', ', $unknownKeys) . '. Expected: ' . implode(', ', $allowedKeys) . '.');
     }
   }
 
@@ -129,10 +128,14 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
    * A body cut short (e.g. the browser navigating away mid-upload) decodes to NULL.
    */
   private function sendMalformedJsonResponse(string $name): void {
+    $this->sendBadRequest("Malformed JSON in '$name'.");
+  }
+
+  private function sendBadRequest(string $message): void {
     $this->httpResponseCode = 400;
     CRM_Utils_System::sendJSONResponse([
       'error_code' => 400,
-      'error_message' => "Malformed JSON in '$name'.",
+      'error_message' => $message,
     ], $this->httpResponseCode);
   }
 
