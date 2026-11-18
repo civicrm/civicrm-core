@@ -179,6 +179,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
    */
   public function from() {
     $this->buildACLClause('contact_a');
+    $eventTypeGroupID = (int) CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'event_type', 'id', 'name');
     $from = "
         civicrm_participant_payment
         left join civicrm_participant
@@ -194,7 +195,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
         on civicrm_contribution.id = civicrm_participant_payment.contribution_id
 
         left join civicrm_option_value on
-        ( civicrm_option_value.value = civicrm_event.event_type_id AND civicrm_option_value.option_group_id = 14) {$this->_aclFrom}";
+        ( civicrm_option_value.value = civicrm_event.event_type_id AND civicrm_option_value.option_group_id = $eventTypeGroupID) {$this->_aclFrom}";
 
     return $from;
   }
@@ -209,7 +210,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
   public function where($includeContactIDs = FALSE) {
     $clauses = [];
 
-    $clauses[] = "civicrm_participant.status_id in ( 1 )";
+    $clauses[] = "civicrm_participant.status_id = " . CRM_Event_BAO_Participant::getDefaultStatusID();
     $clauses[] = "civicrm_contribution.is_test = 0";
     $clauses[] = "civicrm_contribution.is_template = 0";
     $onLine = $this->_formValues['paid_online'] ?? NULL;
