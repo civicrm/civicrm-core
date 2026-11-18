@@ -1878,24 +1878,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         //CRM-18211: Fix situation where second contribution doesn't exist because it is optional.
         if ($result['contribution_id']) {
           if (($result['result']['payment_status_id'] ?? NULL) == 1) {
-            try {
-              civicrm_api3('contribution', 'completetransaction', [
-                'id' => $result['contribution_id'],
-                'trxn_id' => $result['result']['trxn_id'] ?? NULL,
-                'payment_processor_id' => $this->getPaymentProcessorID(),
-                'is_transactional' => FALSE,
-                'fee_amount' => $result['result']['fee_amount'] ?? NULL,
-                'receive_date' => $this->getExistingContributionID() ? NULL : ($result['result']['receive_date'] ?? NULL),
-                'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
-                'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
-              ]);
-            }
-            catch (CRM_Core_Exception $e) {
-              if ($e->getErrorCode() != 'contribution_completed') {
-                \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::completeTransaction CRM_Core_Exception: ' . $e->getMessage());
-                throw new CRM_Core_Exception('Failed to update contribution in database');
-              }
-            }
+            $this->recordProcessedPayment((int) $result['contribution_id'], $result['result'], $paymentParams);
           }
         }
       }
@@ -2382,27 +2365,53 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (!empty($result['contribution'])) {
         // It seems this line is hit when there is a zero dollar transaction & in tests, not sure when else.
         if (($result['payment_status_id'] ?? NULL) == 1) {
-          try {
-            civicrm_api3('contribution', 'completetransaction', [
-              'id' => $result['contribution']->id,
-              'trxn_id' => $result['trxn_id'] ?? NULL,
-              'payment_processor_id' => $this->getPaymentProcessorID(),
-              'is_transactional' => FALSE,
-              'fee_amount' => $result['fee_amount'] ?? NULL,
-              'receive_date' => $this->getExistingContributionID() ? NULL : ($result['receive_date'] ?? NULL),
-              'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
-              'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
-            ]);
-          }
-          catch (CRM_Core_Exception $e) {
-            if ($e->getErrorCode() != 'contribution_completed') {
-              \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::completeTransaction CRM_Core_Exception: ' . $e->getMessage());
-              throw new CRM_Core_Exception('Failed to update contribution in database');
-            }
-          }
+          $this->recordProcessedPayment((int) $result['contribution']->id, $result, $paymentParams);
         }
       }
       return $result;
+    }
+  }
+
+  /**
+   * Record the payment doPayment() took, completing the contribution.
+   *
+   * Payment::create() serialises with a payment processor webhook recording the
+   * same charge, and returns the webhook's payment if it got there first.
+   *
+   * @param int $contributionID
+   * @param array $paymentResult
+   *   The result of doPayment().
+   * @param array $paymentParams
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function recordProcessedPayment(int $contributionID, array $paymentResult, array $paymentParams): void {
+    $contribution = Contribution::get(FALSE)
+      ->addSelect('contribution_status_id:name', 'balance_amount')
+      ->addWhere('id', '=', $contributionID)
+      ->execute()->single();
+    if ($contribution['contribution_status_id:name'] === 'Completed') {
+      return;
+    }
+    try {
+      CRM_Financial_BAO_Payment::create([
+        'contribution_id' => $contributionID,
+        'total_amount' => $contribution['balance_amount'],
+        'trxn_id' => $paymentResult['trxn_id'] ?? NULL,
+        'trxn_date' => $paymentResult['receive_date'] ?? date('YmdHis'),
+        'fee_amount' => $paymentResult['fee_amount'] ?? NULL,
+        'payment_processor_id' => $this->getPaymentProcessorID(),
+        'card_type_id' => $paymentParams['card_type_id'] ?? NULL,
+        'pan_truncation' => $paymentParams['pan_truncation'] ?? NULL,
+        // NULL leaves the receipt to the contribution page or recurring contribution.
+        'is_send_contribution_notification' => NULL,
+      ]);
+    }
+    catch (CRM_Core_Exception $e) {
+      if ($e->getErrorCode() !== 'contribution_completed') {
+        \Civi::log()->error('CRM_Contribute_Form_Contribution_Confirm::recordProcessedPayment CRM_Core_Exception: ' . $e->getMessage());
+        throw new CRM_Core_Exception('Failed to update contribution in database');
+      }
     }
   }
 
