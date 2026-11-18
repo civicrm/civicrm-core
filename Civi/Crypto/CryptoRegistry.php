@@ -65,7 +65,7 @@ class CryptoRegistry extends AutoService {
    */
   public static function createDefaultRegistry(): CryptoRegistry {
     $registry = new static();
-    $registry->addCipherSuite(new \Civi\Crypto\PhpseclibCipherSuite());
+    $registry->addCipherSuite(new \Civi\Crypto\OpensslCipherSuite());
 
     $registry->addPlainText(['tags' => ['CRED']]);
     if (defined('CIVICRM_CRED_KEYS') && CIVICRM_CRED_KEYS !== '') {
