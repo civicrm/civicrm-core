@@ -9,6 +9,7 @@
  +--------------------------------------------------------------------+
  */
 
+use Civi\Api4\Contribution;
 use Civi\Api4\LineItem;
 use Civi\Api4\Membership;
 use Civi\Api4\MembershipLog;
@@ -255,6 +256,60 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertDBNull('CRM_Price_BAO_LineItem', $membershipId, 'id',
       'entity_id', 'Database check for deleted line item.'
     );
+  }
+
+  /**
+   * Test deleting membership payments with and without preserving contributions.
+   */
+  public function testDeleteMembershipPayment(): void {
+    $contactId = $this->individualCreate();
+    $membership1 = $this->createTestEntity('Membership', [
+      'contact_id' => $contactId,
+      'membership_type_id:name' => 'General',
+      'status_id' => $this->_membershipStatusID,
+    ], 'm1');
+    $contribution1 = $this->createTestEntity('Contribution', [
+      'contact_id' => $contactId,
+      'financial_type_id:name' => 'Member Dues',
+      'total_amount' => 100,
+    ], 'c1');
+    CRM_Member_BAO_MembershipPayment::create([
+      'membership_id' => $membership1['id'],
+      'contribution_id' => $contribution1['id'],
+      'isSkipLineItem' => TRUE,
+    ]);
+
+    CRM_Member_BAO_MembershipPayment::deleteMembershipPayment($membership1['id'], FALSE);
+
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery(
+      'SELECT COUNT(*) FROM civicrm_membership_payment WHERE membership_id = %1',
+      [1 => [$membership1['id'], 'Integer']]
+    ));
+    $this->assertSame(0, Contribution::get(FALSE)->addWhere('id', '=', $contribution1['id'])->execute()->count());
+
+    $membership2 = $this->createTestEntity('Membership', [
+      'contact_id' => $contactId,
+      'membership_type_id:name' => 'General',
+      'status_id' => $this->_membershipStatusID,
+    ], 'm2');
+    $contribution2 = $this->createTestEntity('Contribution', [
+      'contact_id' => $contactId,
+      'financial_type_id:name' => 'Member Dues',
+      'total_amount' => 100,
+    ], 'c2');
+    CRM_Member_BAO_MembershipPayment::create([
+      'membership_id' => $membership2['id'],
+      'contribution_id' => $contribution2['id'],
+      'isSkipLineItem' => TRUE,
+    ]);
+
+    CRM_Member_BAO_MembershipPayment::deleteMembershipPayment($membership2['id'], TRUE);
+
+    $this->assertSame(0, (int) CRM_Core_DAO::singleValueQuery(
+      'SELECT COUNT(*) FROM civicrm_membership_payment WHERE membership_id = %1',
+      [1 => [$membership2['id'], 'Integer']]
+    ));
+    $this->assertSame(1, Contribution::get(FALSE)->addWhere('id', '=', $contribution2['id'])->execute()->count());
   }
 
   /**
