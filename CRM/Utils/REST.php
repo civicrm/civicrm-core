@@ -129,7 +129,8 @@ class CRM_Utils_REST {
       $result = self::error('Could not interpret return values from function.');
     }
 
-    if (!empty($requestParams['json'])) {
+    // An empty params object still asks for JSON.
+    if (!empty($requestParams['json']) || is_array($requestParams['json'] ?? NULL)) {
       if (!empty($requestParams['prettyprint'])) {
         // Don't set content-type header for api explorer output
         return json_encode(array_merge($result), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
@@ -304,19 +305,10 @@ class CRM_Utils_REST {
       'action' => 1,
     ];
 
-    if (array_key_exists('json', $requestParams) && $requestParams['json'][0] == "{") {
-      $params = json_decode($requestParams['json'], TRUE);
-      if ($params === NULL) {
-        CRM_Utils_JSON::output([
-          'is_error' => 1,
-          0 => 'error_message',
-          1 => 'Unable to decode supplied JSON.',
-        ]);
-      }
-    }
-    // Handle POST requests of content-type application/json.
-    elseif (array_key_exists('json', $requestParams) && is_array($requestParams['json'])) {
-      $params = $requestParams['json'];
+    // `json` holds the call's params, or is a flag such as `1` asking for JSON output.
+    $isOutputFlag = is_scalar($requestParams['json'] ?? NULL) && !str_starts_with(ltrim((string) $requestParams['json']), '{');
+    if (!$isOutputFlag) {
+      $params = self::retrieveJsonParams() ?? [];
     }
     foreach ($requestParams as $n => $v) {
       if (!array_key_exists($n, $skipVars)) {
@@ -381,9 +373,7 @@ class CRM_Utils_REST {
     if (empty($requestParams['entity'])) {
       CRM_Utils_JSON::output(civicrm_api3_create_error('missing entity entity'));
     }
-    if (!empty($requestParams['json'])) {
-      $params = json_decode($requestParams['json'], TRUE);
-    }
+    $params = self::retrieveJsonParams();
     $entity = CRM_Utils_String::munge($requestParams['entity'] ?? '');
     $action = CRM_Utils_String::munge($requestParams['action'] ?? '');
     if (!is_array($params)) {
@@ -480,12 +470,32 @@ class CRM_Utils_REST {
   }
 
   /**
+   * @return array|null
+   *   NULL if `json` is absent; a malformed value ends the request with an API error.
+   */
+  private static function retrieveJsonParams(): ?array {
+    try {
+      return CRM_Utils_Request::retrieveJson('json');
+    }
+    catch (CRM_Core_Exception $e) {
+      CRM_Utils_JSON::output(self::error($e->getMessage()));
+      return NULL;
+    }
+  }
+
+  /**
    * Callback for multiple ajax api calls from CRM.api3()
    * @return array
    */
   public static function processMultiple() {
     $output = [];
-    foreach (json_decode($_REQUEST['json'], TRUE) as $key => $call) {
+    try {
+      $calls = CRM_Utils_Request::retrieveJson('json') ?? [];
+    }
+    catch (CRM_Core_Exception $e) {
+      return self::error($e->getMessage());
+    }
+    foreach ($calls as $key => $call) {
       $args = [
         'civicrm',
         $call[0],
