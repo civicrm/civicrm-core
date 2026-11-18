@@ -75,7 +75,6 @@
     "symfony/event-dispatcher": "~4.4 || ~5.4 ||  ~6.0 || ~7.0 || ~8.0",
     "symfony/filesystem": "~4.4 ||  ~5.4 || ~6.0 || ~7.0 || ~8.0",
     "symfony/process": "~4.4 ||  ~5.4 || ~5.0 || ~6.0 || ~7.0 || ~8.0",
-    "symfony/var-dumper": "~4.4 || ~5.1 || ~6.0 || ~7.0 || ~8.0",
     "psr/http-client": "^1.0",
     "psr/log": "~1.0 || ~2.0 || ~3.0",
     "symfony/finder": "~4.4 || ~5.4 || ~6.0 || ~7.0 || ~8.0",
