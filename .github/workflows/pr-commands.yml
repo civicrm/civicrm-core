@@ -231,10 +231,7 @@ jobs:
             echo "Cloning civicrm-buildkit..."
             git clone -b master https://github.com/civicrm/civicrm-buildkit.git $GITHUB_WORKSPACE/civicrm-buildkit
             cd $GITHUB_WORKSPACE/civicrm-buildkit
-            # Prune composer.json to only keep phpcs and coder
-            jq '.require = {"drupal/coder": .require["drupal/coder"], "squizlabs/php_codesniffer": .require["squizlabs/php_codesniffer"]}' composer.json > composer.json.tmp && mv composer.json.tmp composer.json
-            composer install --no-interaction --no-plugins --no-scripts
-            npm install jshint
+            php tools/install.php civilint
             BUILDKIT_DIR=$GITHUB_WORKSPACE/civicrm-buildkit
 
             cd $GITHUB_WORKSPACE
