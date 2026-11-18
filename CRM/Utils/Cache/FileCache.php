@@ -29,6 +29,14 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
   const DEFAULT_PREFIX = '';
 
   /**
+   * Maximum age (in seconds) of an abandoned temporary file.
+   *
+   * Writes go to a temporary file which is then renamed over the real file.
+   * If a process dies before renaming, garbage collection removes the leftover.
+   */
+  const STALE_TEMP_TIMEOUT = 3600;
+
+  /**
    * Max key length to be used for file systems.
    *
    * This applies separately to each folder-part/file-part.
@@ -69,6 +77,20 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    *   Note: expiresCache[$key]===NULL means cache-miss
    */
   protected $expiresCache;
+
+  /**
+   * The resolved cache directory, or NULL if not yet resolved.
+   *
+   * @var string|null
+   */
+  protected $cacheDir = NULL;
+
+  /**
+   * Whether the directory for this cache's prefix has been created.
+   *
+   * @var bool
+   */
+  protected $dirReady = FALSE;
 
   /**
    * Constructor.
@@ -112,7 +134,10 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
     ]);
 
     $key_path = $this->keyPath($key);
-    if (!file_put_contents($this->getCacheFile($key_path), $serialized, LOCK_EX)) {
+    if (!$this->ensureCacheDir()) {
+      return FALSE;
+    }
+    if (!$this->writeAtomically($this->getCacheFile($key_path), $serialized)) {
       return FALSE;
     }
 
@@ -175,6 +200,107 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
   }
 
   /**
+   * Replace a cache file atomically.
+   *
+   * The data is written to a temporary file in the same directory and then
+   * renamed over the target. Readers see either the old or the new file,
+   * never a partial write.
+   *
+   * @param string $path
+   * @param string $data
+   *
+   * @return bool
+   */
+  private function writeAtomically(string $path, string $data): bool {
+    try {
+      $suffix = $this->randomSuffix();
+    }
+    catch (\Throwable $e) {
+      // A cache write is optional. Fail it (a miss) rather than fall back to a
+      // name that is only unique with high probability.
+      return FALSE;
+    }
+    $tempPath = $path . '.' . $suffix . '.tmp';
+
+    // The directory may have been removed by a concurrent clear().
+    if (!$this->writeTempFile($tempPath, $data)) {
+      if (!$this->ensureCacheDir(TRUE) || !$this->writeTempFile($tempPath, $data)) {
+        @unlink($tempPath);
+        return FALSE;
+      }
+    }
+
+    // The rename is the commit point: readers see the old file or the new one,
+    // never a partial write. There is no fsync: a power loss can leave an
+    // empty or stale entry (a miss), which is acceptable for a cache.
+    if ($this->renameFile($tempPath, $path)) {
+      return TRUE;
+    }
+
+    // This is a state check, not an errno check: rename() does not expose
+    // errno. A concurrent clear() removes the temp file, the directory, or
+    // both. If both are still there, the failure is something else
+    // (permissions, a full disk, a directory in place of the target), and
+    // rewriting the temp will not help.
+    if (is_dir(dirname($tempPath)) && file_exists($tempPath)) {
+      @unlink($tempPath);
+      return FALSE;
+    }
+    if (!$this->ensureCacheDir(TRUE) || !$this->writeTempFile($tempPath, $data)) {
+      @unlink($tempPath);
+      return FALSE;
+    }
+    if ($this->renameFile($tempPath, $path)) {
+      return TRUE;
+    }
+
+    @unlink($tempPath);
+    return FALSE;
+  }
+
+  /**
+   * Write a temporary cache file.
+   *
+   * @param string $path
+   * @param string $data
+   *
+   * @return bool
+   *   TRUE if the full payload was written.
+   */
+  private function writeTempFile(string $path, string $data): bool {
+    if (@file_put_contents($path, $data) === strlen($data)) {
+      return TRUE;
+    }
+    @unlink($path);
+    return FALSE;
+  }
+
+  /**
+   * Generate a unique suffix for a temporary file.
+   *
+   * Split out so tests can simulate an unavailable CSPRNG.
+   *
+   * @return string
+   */
+  protected function randomSuffix(): string {
+    return bin2hex(random_bytes(6));
+  }
+
+  /**
+   * Rename a cache file.
+   *
+   * Split out so tests can simulate a failed rename.
+   *
+   * @param string $from
+   * @param string $to
+   *
+   * @return bool
+   */
+  protected function renameFile(string $from, string $to): bool {
+    return @rename($from, $to);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function delete($key) {
@@ -212,16 +338,16 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    * {@inheritdoc}
    */
   public function clear() {
-    $files = \CRM_Utils_File::findFiles($this->getCacheDir() . $this->_prefix, '*.txt', TRUE);
+    $groupDir = $this->getCacheDir() . $this->_prefix;
+    $files = \CRM_Utils_File::findFiles($groupDir, '*.txt', TRUE);
     foreach ($files as $filename) {
-      $path = $this->getCacheDir() . $this->_prefix . $filename;
-      if (file_exists($path)) {
-        if (@unlink($path)) {
-          clearstatcache(FALSE, $path);
-        }
-      }
+      @unlink($groupDir . $filename);
     }
-    @rmdir($this->getCacheDir() . $this->_prefix);
+    foreach (glob($groupDir . '*.tmp') ?: [] as $tempFile) {
+      @unlink($tempFile);
+    }
+    @rmdir($groupDir);
+    $this->dirReady = FALSE;
     $this->valueCache = [];
     $this->expiresCache = [];
 
@@ -233,9 +359,11 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    */
   public function garbageCollection() {
     $garbage_collected = FALSE;
-    $files = \CRM_Utils_File::findFiles($this->getCacheDir(), '*.txt', TRUE);
+    $dir = $this->getCacheDir();
+
+    $files = \CRM_Utils_File::findFiles($dir, '*.txt', TRUE);
     foreach ($files as $filename) {
-      $path = $this->getCacheDir() . '/' . $filename;
+      $path = $dir . '/' . $filename;
       if (!is_file($path)) {
         continue;
       }
@@ -250,6 +378,18 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
         }
       }
     }
+
+    // Remove temporary files left behind by a process that died mid-write.
+    $tempFiles = \CRM_Utils_File::findFiles($dir, '*.tmp', TRUE);
+    foreach ($tempFiles as $filename) {
+      $path = $dir . '/' . $filename;
+      if ((@filemtime($path) ?: 0) < CRM_Utils_Time::time() - self::STALE_TEMP_TIMEOUT) {
+        if (@unlink($path)) {
+          $garbage_collected = TRUE;
+        }
+      }
+    }
+
     return $garbage_collected;
   }
 
@@ -365,9 +505,41 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    *   The main cache directory.
    */
   protected function getCacheDir() {
-    $dir = \Civi::paths()->getPath('[civicrm.private]/filecache');
+    if ($this->cacheDir === NULL) {
+      $this->cacheDir = \Civi::paths()->getPath('[civicrm.private]/filecache');
+    }
+    return $this->cacheDir;
+  }
 
-    if (!is_dir($dir) && !CRM_Utils_File::createDir($dir, FALSE)) {
+  /**
+   * Ensure that the directory for this cache's prefix exists.
+   *
+   * This is only needed when writing; reads tolerate a missing directory (the
+   * entry is simply absent).
+   *
+   * @param bool $force
+   *   Re-check the directory even if it was already created by this instance.
+   *
+   * @return bool
+   */
+  protected function ensureCacheDir(bool $force = FALSE): bool {
+    if ($this->dirReady && !$force) {
+      return TRUE;
+    }
+    $dir = $this->getCacheDir() . $this->_prefix;
+    if ($force) {
+      // PHP caches the last stat result. A concurrent clear() may have removed
+      // the directory since this instance checked it, so force a real stat
+      // instead of trusting the cache.
+      clearstatcache();
+    }
+    if (!is_dir($dir)) {
+      \CRM_Utils_File::createDir($dir, FALSE);
+    }
+    // createDir() returns NULL when the directory already exists, so check the
+    // directory itself. Another process may have created it since the first
+    // check; that is a success, not a failure.
+    if (!is_dir($dir)) {
       $alertMessage = ts('Failed to create the cache directory. Please update the settings or file permissions.');
       try {
         CRM_Core_Session::setStatus($alertMessage);
@@ -375,9 +547,10 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
       catch (\Error $e) {
         echo $alertMessage;
       }
+      return FALSE;
     }
-
-    return $dir;
+    $this->dirReady = TRUE;
+    return TRUE;
   }
 
   /**
@@ -389,9 +562,7 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    *   The full filename path.
    */
   protected function getCacheFile($key_path) {
-    CRM_Utils_File::createDir(self::getCacheDir() . $this->_prefix, FALSE);
-
-    return self::getCacheDir() . $key_path . '.txt';
+    return $this->getCacheDir() . $key_path . '.txt';
   }
 
 }
