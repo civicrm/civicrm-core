@@ -514,6 +514,40 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Marking an overpaid (Pending refund) contribution Completed on the back-office
+   * contribution form records the refund it is owed, not another payment.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPendingRefundCompletedOnContributionFormRecordsRefund(): void {
+    $this->registerParticipantAndPay();
+    $this->submitForm($this->getCheapFeeID());
+    $this->validateContribution($this->_cheapFee, 'Pending refund');
+
+    $this->getTestForm('CRM_Contribute_Form_Contribution', [
+      'total_amount' => $this->_cheapFee,
+      'financial_type_id' => $this->getFinancialTypeID('Event Fee'),
+      'contact_id' => $this->ids['Contact']['individual_0'],
+      'payment_instrument_id' => $this->getPaymentInstrumentID('Check'),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+    ], [
+      'id' => $this->ids['Contribution']['order'],
+      'action' => CRM_Core_Action::UPDATE,
+    ])->processForm();
+
+    $this->validateContribution($this->_cheapFee, 'Completed');
+    $this->assertSame([100.0, -50.0], Payment::get(FALSE)
+      ->addWhere('contribution_id', '=', $this->ids['Contribution']['order'])
+      ->addOrderBy('id')
+      ->execute()->column('total_amount'));
+    $this->assertSame(0.0, Contribution::get(FALSE)
+      ->addSelect('balance_amount')
+      ->addWhere('id', '=', $this->ids['Contribution']['order'])
+      ->execute()->single()['balance_amount']);
+    $this->balanceCheck(50);
+  }
+
+  /**
    * Get the ID for the $50 price field value option.
    *
    * @return int

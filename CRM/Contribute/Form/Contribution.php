@@ -2097,13 +2097,12 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       // process associated membership / participant, CRM-4395
       if ($this->getContributionID() && $this->getAction() & CRM_Core_Action::UPDATE
         && $previousStatus !== 'Completed' && $submittedStatus === 'Completed'
-        && $this->getContributionValue('balance_amount') > 0
+        && (float) $this->getContributionValue('balance_amount') !== 0.0
       ) {
-        // Any transition to Completed is a payment of whatever is still unpaid - route it
-        // through Payment.create rather than letting it fall through to FinancialProcessor's
-        // generic status-change handling below, which has no reliable way to know the correct
-        // amount (and, for some origins eg. Pending refund, no basis to decide the status
-        // change is even valid on its own).
+        // Any transition to Completed settles the balance: a payment of whatever is unpaid, or
+        // a refund of an overpayment (Pending refund). Route it through Payment.create rather
+        // than letting it fall through to FinancialProcessor's generic status-change handling
+        // below, which has no reliable way to know the correct amount.
         // @todo make users use add payment form.
         Payment::create(FALSE)
           ->setNotificationForCompleteOrder(FALSE)
