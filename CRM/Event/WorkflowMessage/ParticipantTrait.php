@@ -183,7 +183,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
 
   public function getIsOnWaitlist(): bool {
     if (!isset($this->isOnWaitlist)) {
-      $this->isOnWaitlist = $this->participant['status_id.class'] === 'Waiting';
+      $this->isOnWaitlist = ($this->participant['status_id.class'] ?? NULL) === 'Waiting';
     }
     return $this->isOnWaitlist;
   }
@@ -192,7 +192,7 @@ trait CRM_Event_WorkflowMessage_ParticipantTrait {
    * @return int
    */
   public function getPrimaryParticipantID(): int {
-    return $this->participant['registered_by_id'] ?: $this->participantID;
+    return ($this->participant['registered_by_id'] ?? NULL) ?: $this->participantID;
   }
 
   /**
