@@ -35,7 +35,7 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
   /**
    * The option group name in display format (capitalized, without underscores...etc)
    *
-   * @var array
+   * @var string
    */
   protected $_gLabel;
 
