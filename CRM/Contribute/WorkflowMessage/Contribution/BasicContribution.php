@@ -355,6 +355,7 @@ United States';
       'price_field_id' => $priceField['id'],
       'price_field_id.label' => $priceField['label'],
       'price_field_value_id' => $priceFieldValue['id'],
+      'entity_table' => 'civicrm_contribution',
       'qty' => $priceField['is_enter_qty'] ? 2 : 1,
       'unit_price' => $priceFieldValue['amount'],
       'line_total' => $priceField['is_enter_qty'] ? ($priceFieldValue['amount'] * 2) : $priceFieldValue['amount'],
