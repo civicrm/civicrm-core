@@ -107,4 +107,32 @@ class CRM_Core_BAO_Query {
     return str_replace(['_high', '_low'], '', $name);
   }
 
+  /**
+   * Get clean integer IDs from a search parameter.
+   *
+   * @param string|array $value
+   *
+   * @return int[]
+   *   Empty if the value is empty. [0], which matches no record, if the value is not
+   *   empty but contains no valid positive integer ID.
+   */
+  public static function cleanIDs($value): array {
+    if (CRM_Utils_System::isNull($value)) {
+      return [];
+    }
+    $tagIDs = [];
+    foreach ((array) $value as $item) {
+      if (!is_scalar($item)) {
+        continue;
+      }
+      foreach (explode(',', (string) $item) as $tagID) {
+        $tagID = trim($tagID);
+        if (CRM_Utils_Rule::positiveInteger($tagID) && $tagID > 0) {
+          $tagIDs[] = (int) $tagID;
+        }
+      }
+    }
+    return $tagIDs ? array_values(array_unique($tagIDs)) : [0];
+  }
+
 }

@@ -3602,7 +3602,10 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * Check contact access.
    * @see \Civi\Api4\Utils\CoreUtil::checkAccessRecord
    */
-  #[CiviEventListener(event: 'civi.api4.authorizeRecord::{self}')]
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::Contact')]
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::Individual')]
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::Organization')]
+  #[CiviEventListener(event: 'civi.api4.authorizeRecord::Household')]
   public static function self_civi_api4_authorizeRecord(AuthorizeRecordEvent $e): void {
     $record = $e->getRecord();
     $userID = $e->getUserID();

@@ -1750,4 +1750,73 @@ civicrm_relationship.is_active = 1 AND
     ];
   }
 
+  /**
+   * Test SQL injection prevention in location_type search parameter.
+   */
+  public function testLocationTypeSqlInjection(): void {
+    $params = [
+      [
+        0 => 'location_type',
+        1 => '=',
+        2 => ['0) OR (1=1'],
+        3 => 1,
+        4 => 0,
+      ],
+    ];
+    $query = new CRM_Contact_BAO_Query($params);
+    $query->query(FALSE);
+    $this->assertStringNotContainsString('1=1', $query->_whereClause);
+    $this->assertStringContainsString('civicrm_address.location_type_id IN (0)', $query->_whereClause);
+  }
+
+  /**
+   * Test SQL injection prevention in the relationship type search parameter.
+   */
+  public function testRelationshipTypeSqlInjection(): void {
+    $relationshipTypeID = $this->getEmployeeRelationshipTypeID();
+    $query = new CRM_Contact_BAO_Query([['relation_type_id', 'IN', ["$relationshipTypeID) OR (1=1_a_b"], 0, 0]]);
+    $query->query(FALSE);
+    $this->assertStringNotContainsString('1=1', $query->_whereClause);
+  }
+
+  /**
+   * Test SQL injection prevention in the relationship target group search parameter.
+   */
+  public function testRelationshipTargetGroupSqlInjection(): void {
+    $query = new CRM_Contact_BAO_Query([
+      ['relation_type_id', 'IN', [$this->getEmployeeRelationshipTypeID() . '_a_b'], 0, 0],
+      ['relation_target_group', 'IN', ['0) OR (1=1'], 0, 0],
+    ]);
+    $query->query(FALSE);
+    $this->assertStringNotContainsString('1=1', $query->_whereClause);
+    $this->assertStringContainsString('civicrm_relationship_group_contact.group_id IN (0)', $query->_whereClause);
+  }
+
+  /**
+   * Test SQL injection prevention in the relationship permission search parameter.
+   */
+  public function testRelationshipPermissionSqlInjection(): void {
+    $this->expectException(CRM_Core_Exception::class);
+    new CRM_Contact_BAO_Query([
+      ['relation_type_id', 'IN', [$this->getEmployeeRelationshipTypeID() . '_a_b'], 0, 0],
+      ['relation_permission', 'IN', ['0) OR (1=1'], 0, 0],
+    ]);
+  }
+
+  /**
+   * Searching by relationship permission still accepts "no permission" (0).
+   */
+  public function testRelationshipPermissionNone(): void {
+    $query = new CRM_Contact_BAO_Query([
+      ['relation_type_id', 'IN', [$this->getEmployeeRelationshipTypeID() . '_a_b'], 0, 0],
+      ['relation_permission', 'IN', ['0', '1'], 0, 0],
+    ]);
+    $query->query(FALSE);
+    $this->assertStringContainsString('civicrm_relationship.is_permission_a_b IN (0,1)', $query->_whereClause);
+  }
+
+  private function getEmployeeRelationshipTypeID(): int {
+    return \Civi\Api4\RelationshipType::get(FALSE)->addWhere('name_a_b', '=', 'Employee of')->execute()->single()['id'];
+  }
+
 }

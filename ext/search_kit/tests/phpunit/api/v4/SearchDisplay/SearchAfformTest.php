@@ -1,6 +1,7 @@
 <?php
 namespace api\v4\SearchDisplay;
 
+use Civi\API\Exception\UnauthorizedException;
 use Civi\Api4\Afform;
 use Civi\Api4\Contact;
 use Civi\Api4\Email;
@@ -349,6 +350,75 @@ class SearchAfformTest extends \PHPUnit\Framework\TestCase implements HeadlessIn
     $params['display'] = 'TestContactEmailDisplay';
     $result = civicrm_api4('SearchDisplay', 'run', $params);
     $this->assertCount(1, $result);
+  }
+
+  /**
+   * With the same display placed twice on a form, a request cannot replace the
+   * literal filter values from the markup with its own.
+   */
+  public function testLiteralFiltersWithTwoInstances(): void {
+    foreach (['allowed_a', 'allowed_b', 'hidden'] as $source) {
+      $this->createTestRecord('Individual', ['last_name' => __FUNCTION__, 'source' => $source], $source);
+    }
+    SavedSearch::create(FALSE)
+      ->setValues([
+        'name' => 'TestTwoInstances',
+        'label' => 'TestTwoInstances',
+        'api_entity' => 'Contact',
+        'api_params' => [
+          'version' => 4,
+          'select' => ['id', 'source'],
+          'where' => [['last_name', '=', __FUNCTION__]],
+        ],
+      ])
+      ->addChain('display', SearchDisplay::create(FALSE)->setValues([
+        'saved_search_id' => '$id',
+        'name' => 'TestTwoInstancesDisplay',
+        'label' => 'TestTwoInstancesDisplay',
+        'type' => 'table',
+        'acl_bypass' => TRUE,
+        'settings' => [
+          'limit' => 20,
+          'pager' => TRUE,
+          'columns' => [['key' => 'source', 'label' => 'Source', 'type' => 'field']],
+        ],
+      ]))
+      ->execute();
+    $layout = '<div>'
+      . '<crm-search-display-table search-name="TestTwoInstances" display-name="TestTwoInstancesDisplay" filters="{source: \'allowed_a\'}"></crm-search-display-table>'
+      . '<crm-search-display-table search-name="TestTwoInstances" display-name="TestTwoInstancesDisplay" filters="{source: \'allowed_b\'}"></crm-search-display-table>'
+      . '</div>';
+    Afform::create(FALSE)
+      ->setLayoutFormat('html')
+      ->setValues([
+        'name' => 'testTwoInstancesForm',
+        'title' => 'Two instances',
+        'type' => 'search',
+        'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+        'layout' => $layout,
+      ])
+      ->execute();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    $params = [
+      'return' => 'page:1',
+      'savedSearch' => 'TestTwoInstances',
+      'display' => 'TestTwoInstancesDisplay',
+      'afform' => 'testTwoInstancesForm',
+    ];
+    foreach (['allowed_a', 'allowed_b'] as $source) {
+      $result = civicrm_api4('SearchDisplay', 'run', $params + ['filters' => ['source' => $source]]);
+      $this->assertSame([$source], array_column(array_column((array) $result, 'data'), 'source'));
+    }
+    foreach ([['source' => 'hidden'], []] as $filters) {
+      try {
+        civicrm_api4('SearchDisplay', 'run', $params + ['filters' => $filters]);
+        $this->fail('Expected the request to be refused');
+      }
+      catch (UnauthorizedException $e) {
+        $this->assertStringContainsString('do not match any instance', $e->getMessage());
+      }
+    }
   }
 
   public function testSearchReferencesToAfform(): void {

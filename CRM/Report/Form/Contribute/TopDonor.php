@@ -282,8 +282,11 @@ class CRM_Report_Form_Contribute_TopDonor extends CRM_Report_Form {
           if (!empty($clause)) {
             if ($fieldName == 'total_range') {
               $value = $this->_params["total_range_value"] ?? NULL;
-              $this->_outerCluase = " WHERE (( @rows := @rows + 1) <= {$value}) ";
-              $this->_groupLimit = " LIMIT {$value}";
+              if ($value !== NULL && $value !== '') {
+                $value = CRM_Utils_Type::escape($value, 'Integer');
+                $this->_outerCluase = " WHERE (( @rows := @rows + 1) <= {$value}) ";
+                $this->_groupLimit = " LIMIT {$value}";
+              }
             }
             else {
               $clauses[] = $clause;

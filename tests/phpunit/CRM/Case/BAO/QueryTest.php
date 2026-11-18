@@ -1,12 +1,155 @@
 <?php
 
 use Civi\Api4\RelationshipType;
+use Civi\Api4\Tag;
 
 /**
  *  Include dataProvider for tests
  * @group headless
  */
 class CRM_Case_BAO_QueryTest extends CiviCaseTestCase {
+
+  public function tearDown(): void {
+    // Child tags before the tag set they belong to.
+    foreach (array_reverse($this->ids['Tag'] ?? []) as $tagID) {
+      Tag::delete(FALSE)->addWhere('id', '=', $tagID)->execute();
+    }
+    parent::tearDown();
+  }
+
+  /**
+   * Create a case tag and a tag set with one child tag, and a tagged and an untagged case.
+   *
+   * With the untagged case, a search which ignores the tag filter returns more
+   * cases than one which applies it.
+   */
+  private function createTaggedCases(): void {
+    $this->createTestEntity('Tag', ['name' => 'case_tag', 'used_for' => ['civicrm_case']], 'case_tag');
+    $this->createTestEntity('Tag', ['name' => 'case_tag_set', 'is_tagset' => TRUE, 'used_for' => ['civicrm_case']], 'case_tag_set');
+    $this->createTestEntity('Tag', ['name' => 'case_tag_in_set', 'parent_id' => $this->ids['Tag']['case_tag_set'], 'used_for' => ['civicrm_case']], 'case_tag_in_set');
+    $this->ids['Case']['tagged'] = $this->callAPISuccess('Case', 'create', [
+      'client_id' => $this->individualCreate([], 'tagged_client'),
+      'case_type_id' => 'housing_support',
+      'status_id' => 'Open',
+      'subject' => 'Case Subject',
+    ])['id'];
+    $this->ids['Case']['untagged'] = $this->callAPISuccess('Case', 'create', [
+      'client_id' => $this->individualCreate([], 'untagged_client'),
+      'case_type_id' => 'housing_support',
+      'status_id' => 'Open',
+      'subject' => 'Case Subject',
+    ])['id'];
+    foreach (['case_tag', 'case_tag_in_set'] as $tag) {
+      $this->createTestEntity('EntityTag', [
+        'entity_table' => 'civicrm_case',
+        'entity_id' => $this->ids['Case']['tagged'],
+        'tag_id' => $this->ids['Tag'][$tag],
+      ], $tag);
+    }
+  }
+
+  /**
+   * Run a case search and return the IDs of the matched cases.
+   *
+   * @param array $params
+   *   Query params, as produced by CRM_Contact_BAO_Query::convertFormValues().
+   *
+   * @return int[]
+   */
+  private function getMatchedCaseIDs(array $params): array {
+    $query = new CRM_Contact_BAO_Query($params, NULL, NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CASE);
+    [, $from, $where] = $query->query();
+    $rows = CRM_Core_DAO::executeQuery("SELECT DISTINCT civicrm_case.id $from $where ORDER BY civicrm_case.id")->fetchAll();
+    return array_map('intval', array_column($rows, 'id'));
+  }
+
+  /**
+   * Convert search form values to query params, as the search form does.
+   */
+  private function convertFormValues(array $formValues): array {
+    return CRM_Contact_BAO_Query::convertFormValues($formValues);
+  }
+
+  /**
+   * Searching by case tag (tag tree) and by a tag in a tag set finds only the tagged case.
+   */
+  public function testSearchByCaseTags(): void {
+    $this->createTaggedCases();
+    $tagID = $this->ids['Tag']['case_tag'];
+    $tagInSetID = $this->ids['Tag']['case_tag_in_set'];
+    $taggedCase = [$this->ids['Case']['tagged']];
+
+    $this->assertEquals($taggedCase, $this->getMatchedCaseIDs($this->convertFormValues(['case_tags' => (string) $tagID])));
+    $this->assertEquals($taggedCase, $this->getMatchedCaseIDs($this->convertFormValues(['case_tags' => "$tagID,$tagInSetID"])));
+    $this->assertEquals($taggedCase, $this->getMatchedCaseIDs([['case_tags', '=', [$tagID => 1], 0, 0]]));
+    $this->assertEquals($taggedCase, $this->getMatchedCaseIDs([['case_taglist', '=', [$this->ids['Tag']['case_tag_set'] => (string) $tagInSetID], 0, 0]]));
+  }
+
+  /**
+   * SQL in the case_tags search value must not reach the query.
+   *
+   * The form field is a plain text input, so the submitted value is
+   * attacker-controlled. An injected tautology would make the search return
+   * every case.
+   */
+  public function testCaseTagsValueIsNotInjectedIntoQuery(): void {
+    $this->createTaggedCases();
+    $tagID = $this->ids['Tag']['case_tag'];
+
+    $params = $this->convertFormValues(['case_tags' => "$tagID,0) OR (1=1"]);
+    $this->assertWhereDoesNotContain('1=1', $params);
+    $this->assertEquals([$this->ids['Case']['tagged']], $this->getMatchedCaseIDs($params));
+
+    $params = $this->convertFormValues(['case_tags' => '0) OR (1=1']);
+    $this->assertWhereDoesNotContain('1=1', $params);
+    $this->assertEquals([], $this->getMatchedCaseIDs($params));
+  }
+
+  /**
+   * SQL in a case tag set value must not reach the query.
+   *
+   * The tag set branch drops non-numeric entries, but used to fall through to
+   * the tag tree branch with the unfiltered last entry when none were numeric.
+   */
+  public function testCaseTaglistValueIsNotInjectedIntoQuery(): void {
+    $this->createTaggedCases();
+    $params = [['case_taglist', '=', [$this->ids['Tag']['case_tag_set'] => '0) OR (1=1'], 0, 0]];
+
+    $this->assertWhereDoesNotContain('1=1', $params);
+    $this->assertEquals([], $this->getMatchedCaseIDs($params));
+  }
+
+  /**
+   * An injected sub-query against an unrelated table must not reach the search.
+   *
+   * This is the mechanism behind blind data extraction: if an attacker-supplied
+   * sub-query against a table the search never joins is evaluated, its truth
+   * leaks through whether rows come back, so the attacker can read arbitrary
+   * data one yes/no question at a time, regardless of CiviCRM permissions.
+   *
+   * The probe here only asks the harmless question "does civicrm_domain id 1
+   * exist" (it always does) versus "does id 999999 exist" (it never does). On
+   * the fixed code the sub-query never reaches the query and neither probe
+   * returns a row; before the fix the two probes return different result sets,
+   * which is what proves the read is possible.
+   */
+  public function testCaseTagsInjectionCannotProbeOtherTables(): void {
+    $this->createTaggedCases();
+    $trueProbe = $this->convertFormValues(['case_tags' => '0) OR (SELECT id FROM civicrm_domain WHERE id = 1) = 1 OR (1=0']);
+    $falseProbe = $this->convertFormValues(['case_tags' => '0) OR (SELECT id FROM civicrm_domain WHERE id = 999999) = 1 OR (1=0']);
+
+    $this->assertWhereDoesNotContain('civicrm_domain', $trueProbe);
+    $this->assertWhereDoesNotContain('civicrm_domain', $falseProbe);
+    // Neither probe may return a case, and the two may not differ (no leak).
+    $this->assertEquals([], $this->getMatchedCaseIDs($trueProbe));
+    $this->assertEquals([], $this->getMatchedCaseIDs($falseProbe));
+  }
+
+  private function assertWhereDoesNotContain(string $needle, array $params): void {
+    $query = new CRM_Contact_BAO_Query($params, NULL, NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CASE);
+    [, , $where] = $query->query();
+    $this->assertStringNotContainsString($needle, $where);
+  }
 
   /**
    * Check that Qill is calculated correctly.

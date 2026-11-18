@@ -31,7 +31,7 @@
         tagIds: this.ids.filter((id) => id !== this.targetId),
         label: this.label,
       }).then(() => {
-        CRM.alert(ts('%1 tags merged into "%2".', {1: this.ids.length, 2: this.label}), ts('Merged'), 'success');
+        CRM.alert(ts('%1 tags merged into "%2".', {1: this.ids.length, 2: CRM.utils.escapeHtml(this.label)}), ts('Merged'), 'success');
         this.close();
       }, (error) => {
         this.running = false;

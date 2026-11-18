@@ -260,11 +260,12 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
           if ($fieldName == 'yid') {
+            $yidValue = CRM_Utils_Type::escape($this->_params['yid_value'], 'Integer');
             $clause = "contribution_civireport.contact_id NOT IN
 (SELECT distinct cont.id FROM civicrm_contact cont, civicrm_contribution contri
  WHERE  cont.id = contri.contact_id AND " .
               self::fiscalYearOffset('contri.receive_date') .
-              " = {$this->_params['yid_value']} AND contri.is_test = 0 AND contri.is_template = 0 )";
+              " = {$yidValue} AND contri.is_test = 0 AND contri.is_template = 0 )";
           }
           elseif (($field['type'] ?? 0) & CRM_Utils_Type::T_DATE
           ) {

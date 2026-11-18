@@ -132,4 +132,19 @@ class CRM_Report_Form_Member_DetailTest extends CiviReportTestCase {
     $this->assertCount(2, $results);
   }
 
+  /**
+   * Test that SQL injection via autorenew_status_id is rejected.
+   */
+  public function testAutorenewStatusIdSqlInjection(): void {
+    $this->expectException(CRM_Core_Exception::class);
+    $obj = new CRM_Report_Form_Member_Detail();
+    $obj->_aliases['civicrm_contribution_recur'] = 'civicrm_contribution_recur';
+    $field = [
+      'name' => 'contribution_status_id',
+      'dbAlias' => 'civicrm_contribution_recur.contribution_status_id',
+      'type' => CRM_Utils_Type::T_INT,
+    ];
+    $obj->whereClause($field, 'in', '0) OR (1=1', NULL, NULL);
+  }
+
 }

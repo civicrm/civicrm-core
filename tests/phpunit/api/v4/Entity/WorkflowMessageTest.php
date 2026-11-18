@@ -89,6 +89,36 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
   }
 
   /**
+   * Rendering with a contact the user may not view is refused.
+   */
+  public function testRenderChecksAccessToReferencedContact(): void {
+    $contactID = $this->createTestRecord('Individual')['id'];
+    $this->createLoggedInUser();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'render templates'];
+
+    try {
+      WorkflowMessage::render()
+        ->setWorkflow('generic')
+        ->setValues(['contactID' => $contactID])
+        ->setMessageTemplate(['msg_subject' => 'x', 'msg_text' => '{contact.hash}'])
+        ->execute();
+      $this->fail('Rendering for a contact the user may not view should fail.');
+    }
+    catch (\CRM_Core_Exception $e) {
+      $this->assertStringContainsString('not visible', $e->getMessage());
+    }
+
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'render templates', 'view all contacts'];
+    $result = WorkflowMessage::render()
+      ->setWorkflow('generic')
+      ->setValues(['contactID' => $contactID])
+      ->setMessageTemplate(['msg_subject' => 'x', 'msg_text' => 'id {contact.id}'])
+      ->execute()
+      ->single();
+    $this->assertSame('id ' . $contactID, $result['text']);
+  }
+
+  /**
    * Test rendering a specific message template by its ID.
    *
    * The template is loaded by its ID rather than the workflow's own default

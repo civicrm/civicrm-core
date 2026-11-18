@@ -52,6 +52,9 @@ class ContactDedupe extends AbstractBehavior {
     }
     // Apply dedupe rule if contact isn't already identified
     foreach ($event->records as $index => $record) {
+      if ($event->getEntityId($index)) {
+        continue;
+      }
       $supportedJoins = ['Address', 'Email', 'Phone', 'IM'];
       $values = $record['fields'] ?? [];
       foreach ($supportedJoins as $joinEntity) {
@@ -66,6 +69,8 @@ class ContactDedupe extends AbstractBehavior {
       ])->first();
       if (!empty($match['id'])) {
         $event->setEntityId($index, $match['id']);
+        $event->dedupeMatches[$index] = TRUE;
+        $event->getApiRequest()->addDedupeMatchedContactId((int) $match['id']);
       }
     }
   }

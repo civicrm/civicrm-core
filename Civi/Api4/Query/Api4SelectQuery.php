@@ -569,6 +569,14 @@ class Api4SelectQuery extends Api4Query {
         elseif ($otherSideField && $this->isUniqueField($joinTable, $joinFieldName)) {
           return TRUE;
         }
+        // 5. Both sides reference the same entity (e.g. Email.contact_id = GroupContact.contact_id)
+        // Counts as explicit like case 4, so the joined entity keeps all its ACL clauses.
+        elseif (!empty($otherSideField['fk_entity']) && !empty($joinEntityFields[$joinFieldName]['fk_entity'])
+          && CoreUtil::getTableName($otherSideField['fk_entity']) === CoreUtil::getTableName($joinEntityFields[$joinFieldName]['fk_entity'])
+          && ($otherSideField['fk_column'] ?? 'id') === ($joinEntityFields[$joinFieldName]['fk_column'] ?? 'id')
+        ) {
+          return TRUE;
+        }
 
         if ($isFK) {
           $aclStack = [$clause[$otherSide], $expr];

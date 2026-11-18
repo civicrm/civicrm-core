@@ -1,6 +1,8 @@
 <?php
 namespace api\v4\Afform;
 
+use Civi\API\Exception\UnauthorizedException;
+use Civi\Api4\Address;
 use Civi\Api4\Afform;
 use Civi\Api4\AfformSubmission;
 use Civi\Api4\Contact;
@@ -12,6 +14,19 @@ use Civi\Api4\Phone;
  * @group headless
  */
 class AfformContactUsageTest extends AfformUsageTestCase {
+
+  /**
+   * @var string|null
+   */
+  private $otherFormName;
+
+  public function tearDown(): void {
+    if ($this->otherFormName) {
+      Afform::revert(FALSE)->addWhere('name', '=', $this->otherFormName)->execute();
+      $this->otherFormName = NULL;
+    }
+    parent::tearDown();
+  }
 
   public static function setUpBeforeClass(): void {
     parent::setUpBeforeClass();
@@ -484,6 +499,115 @@ EOHTML;
     $this->assertSame('New', $result['middle_name']);
   }
 
+  public function testDedupeMatchKeepsStoredJoinRecords(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" data="{}" name="Individual1" actions="{create: true, update: true}" security="FBAC" contact-dedupe="Individual.Unsupervised" />
+  <fieldset af-fieldset="Individual1">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+    <div af-join="Email" data="{is_primary: true}"><af-field name="email" /></div>
+    <div af-join="Address" data="{is_primary: true}"><af-field name="street_address" /></div>
+    <div af-join="Phone"><af-field name="phone" /></div>
+  </fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $email = uniqid('stored') . '@example.org';
+    $contactID = $this->createTestRecord('Individual', ['first_name' => 'Stored', 'last_name' => 'Contact', 'email_primary.email' => $email])['id'];
+    $this->createTestRecord('Address', ['contact_id' => $contactID, 'street_address' => '1 Stored Street', 'is_primary' => TRUE]);
+    $this->createTestRecord('Phone', ['contact_id' => $contactID, 'phone' => '111']);
+    $this->createTestRecord('Phone', ['contact_id' => $contactID, 'phone' => '222']);
+    // Submit as an anonymous visitor, without the administer grant of the test case.
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          [
+            'fields' => ['first_name' => 'Stored', 'last_name' => 'Contact'],
+            'joins' => [
+              'Email' => [['email' => $email]],
+              'Address' => [['street_address' => '']],
+              'Phone' => [['phone' => '333']],
+            ],
+          ],
+        ],
+      ])
+      ->execute();
+
+    $this->assertCount(1, Address::get(FALSE)->addWhere('contact_id', '=', $contactID)->execute(), 'An empty address block removes nothing.');
+    $this->assertCount(2, Phone::get(FALSE)->addWhere('contact_id', '=', $contactID)->execute(), 'A filled phone block removes no other phone.');
+  }
+
+  public function testSubmissionIdFromClientNeedsAccessToTheSubmission(): void {
+    $this->useValues([
+      'layout' => <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="me" actions="{create: true, update: false}" security="FBAC" />
+  <fieldset af-fieldset="me">
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+  </fieldset>
+</af-form>
+EOHTML,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      'create_submission' => TRUE,
+      'manual_processing' => TRUE,
+    ]);
+    $lastName = uniqid(__FUNCTION__);
+    $values = ['me' => [['fields' => ['first_name' => 'Unapproved', 'last_name' => $lastName]]]];
+    $storedData = ['me' => [['fields' => ['first_name' => 'Stored', 'last_name' => $lastName]]]];
+    $ownSubmission = $this->createTestRecord('AfformSubmission', [
+      'afform_name' => $this->formName,
+      'data' => $storedData,
+      'status_id:name' => 'Pending',
+    ]);
+    $otherFormSubmission = $this->createTestRecord('AfformSubmission', [
+      'afform_name' => 'some_other_form',
+      'data' => $storedData,
+      'status_id:name' => 'Pending',
+    ]);
+    $getSubmission = fn(int $id) => AfformSubmission::get(FALSE)
+      ->addWhere('id', '=', $id)
+      ->addSelect('status_id:name', 'data')
+      ->execute()->single();
+    $submitWithSubmissionId = function (int $id) use ($values) {
+      try {
+        Afform::submit()
+          ->setName($this->formName)
+          ->setArgs(['sid' => $id])
+          ->setValues($values)
+          ->execute();
+        return 'processed';
+      }
+      catch (UnauthorizedException $e) {
+        return 'refused';
+      }
+    };
+
+    // An anonymous visitor cannot complete a submission that awaits approval
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+    $this->assertSame('refused', $submitWithSubmissionId($ownSubmission['id']));
+    $this->assertSame('Pending', $getSubmission($ownSubmission['id'])['status_id:name']);
+
+    // Nobody can complete the submission of another form through this one
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer afform'];
+    $this->assertSame('refused', $submitWithSubmissionId($otherFormSubmission['id']));
+    $this->assertSame(['status_id:name' => 'Pending', 'data' => $storedData], array_diff_key($getSubmission($otherFormSubmission['id']), ['id' => 1]));
+    $this->assertCount(0, Contact::get(FALSE)->addWhere('last_name', '=', $lastName)->execute());
+
+    // A form administrator can
+    $this->assertSame('processed', $submitWithSubmissionId($ownSubmission['id']));
+    $this->assertSame('Processed', $getSubmission($ownSubmission['id'])['status_id:name']);
+  }
+
   public function testFormValidationEntityFields(): void {
     $this->useValues([
       'layout' => self::$layouts['updateInfo'],
@@ -783,6 +907,49 @@ EOHTML;
     $this->assertEquals([$contactType], $contact['contact_sub_type']);
   }
 
+  /**
+   * Only a quick-add form takes preset values from the form named as its parent
+   */
+  public function testParentFormValuesOnlyApplyToQuickAddForms(): void {
+    $this->otherFormName = uniqid('otherForm');
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" data="{source: '%s', job_title: '%s'}" name="Individual1" actions="{create: true, update: false}" security="FBAC" />
+  <fieldset af-fieldset="Individual1">
+      <af-field name="first_name" />
+      <af-field name="last_name" />
+  </fieldset>
+</af-form>
+EOHTML;
+    Afform::create(FALSE)
+      ->setLayoutFormat('html')
+      ->setValues([
+        'name' => $this->otherFormName,
+        'title' => 'Other form',
+        'layout' => sprintf($layout, 'Other form', 'Set by other form'),
+        'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+      ])
+      ->execute();
+    $this->useValues([
+      'layout' => sprintf($layout, 'This form', 'Set by this form'),
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $lastName = uniqid(__FUNCTION__);
+
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues(['Individual1' => [['fields' => ['first_name' => 'Jane', 'last_name' => $lastName]]]])
+      ->setArgs([
+        'parentFormName' => "afform:$this->otherFormName",
+        'parentFormFieldName' => 'Individual1:first_name',
+      ])
+      ->execute();
+
+    $contact = $this->getTestRecord('Individual', ['last_name' => $lastName]);
+    $this->assertSame('This form', $contact['source']);
+    $this->assertSame('Set by this form', $contact['job_title']);
+  }
+
   public function testMultipleLocationJoins(): void {
     $homeID = $this->getLocationTypeID('Home');
     $workID = $this->getLocationTypeID('Work');
@@ -923,6 +1090,43 @@ EOHTML;
     $this->assertSame('2', $prefill['Individual1']['values'][0]['joins']['Phone'][1]['phone']);
     $this->assertEquals($phoneValues[1]['id'], $prefill['Individual1']['values'][0]['joins']['Phone'][1]['id']);
 
+  }
+
+  /**
+   * The dedupe rule does not replace a contact that autofill already identified.
+   */
+  public function testDedupeKeepsAutofilledCurrentUser(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" data="{}" name="Individual1" actions="{create: true, update: true}" security="FBAC" autofill="user" contact-dedupe="Individual.Unsupervised" />
+  <fieldset af-fieldset="Individual1">
+    <af-field name="last_name" />
+    <div af-join="Email" data="{is_primary: true}"><af-field name="email" /></div>
+  </fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $userID = $this->createLoggedInUser();
+    $otherEmail = uniqid('other') . '@example.org';
+    $otherID = $this->createTestRecord('Individual', ['last_name' => 'Other', 'email_primary.email' => $otherEmail])['id'];
+    // Drop the administer grant of the test case: the user has only "access CiviCRM".
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
+
+    Afform::submit()
+      ->setName($this->formName)
+      ->setValues([
+        'Individual1' => [
+          ['fields' => ['last_name' => 'Changed'], 'joins' => ['Email' => [['email' => $otherEmail]]]],
+        ],
+      ])
+      ->execute();
+
+    $this->assertSame('Other', Contact::get(FALSE)->addWhere('id', '=', $otherID)->execute()->single()['last_name']);
+    $this->assertSame('Changed', Contact::get(FALSE)->addWhere('id', '=', $userID)->execute()->single()['last_name']);
   }
 
 }

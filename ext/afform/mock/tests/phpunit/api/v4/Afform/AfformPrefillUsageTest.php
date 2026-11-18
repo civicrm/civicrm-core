@@ -111,6 +111,46 @@ EOHTML;
   }
 
   /**
+   * A join record may only be looked up through an "existing entity" field,
+   * not through any other field of the join block.
+   */
+  public function testJoinPrefillIgnoresOrdinaryFields(): void {
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" name="Individual1" actions="{create: true, update: false}" security="FBAC" />
+  <fieldset af-fieldset="Individual1">
+    <af-field name="first_name" />
+    <div af-join="Address">
+      <af-field name="street_address" />
+      <af-field name="city" />
+    </div>
+  </fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+
+    $otherContact = $this->createTestRecord('Individual');
+    $this->createTestRecord('Address', [
+      'contact_id' => $otherContact['id'],
+      'street_address' => '1 Elsewhere Street',
+      'city' => 'Elsewhere',
+    ]);
+
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    $prefill = Afform::prefill()
+      ->setName($this->formName)
+      ->setFillMode('join')
+      ->setArgs(['Individual1' => [['joins' => ['Address' => [['city' => 'Elsewhere']]]]]])
+      ->execute();
+    $this->assertCount(0, $prefill);
+  }
+
+  /**
    * Ensure that Afform restricts autocomplete results when it's set to use a SavedSearch
    */
   public function testPrefillByLocationType(): void {
@@ -354,6 +394,52 @@ EOHTML;
     $this->assertSame('DirectFirst', $fields['first_name']);
     $this->assertSame('DirectLast', $fields['last_name']);
     $this->assertSame('DirectJob', $fields['job_title']);
+  }
+
+  /**
+   * A saved search on the id field of a join limits which records prefill loads.
+   */
+  public function testJoinPrefillHonoursSavedSearch(): void {
+    $city = uniqid('city');
+    $searchName = uniqid('addresses');
+    $this->createTestRecord('SavedSearch', [
+      'name' => $searchName,
+      'label' => $searchName,
+      'api_entity' => 'Address',
+      'api_params' => ['version' => 4, 'select' => ['id', 'street_address'], 'where' => [['city', '=', $city]]],
+    ]);
+    $layout = <<<EOHTML
+<af-form ctrl="afform">
+  <af-entity type="Individual" data="{}" name="Individual1" actions="{create: true, update: true}" security="FBAC" />
+  <fieldset af-fieldset="Individual1">
+    <af-field name="first_name" />
+    <div af-join="Address">
+      <af-field name="id" defn="{input_type: 'EntityRef', saved_search: '$searchName', security: 'FBAC'}" />
+      <af-field name="street_address" />
+    </div>
+  </fieldset>
+</af-form>
+EOHTML;
+    $this->useValues([
+      'layout' => $layout,
+      'permission' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
+    ]);
+    $inside = $this->createTestRecord('Address', ['contact_id' => $this->createTestRecord('Individual')['id'], 'street_address' => '1 Inside Street', 'city' => $city])['id'];
+    $outside = $this->createTestRecord('Address', ['contact_id' => $this->createTestRecord('Individual')['id'], 'street_address' => '2 Outside Street', 'city' => 'Elsewhere'])['id'];
+    // Drop the administer grant of the test case: the visitor has no permissions.
+    \CRM_Core_Config::singleton()->userPermissionTemp = new \CRM_Core_Permission_Temp();
+    \CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+
+    $loaded = [];
+    foreach (['inside' => $inside, 'outside' => $outside] as $key => $id) {
+      $prefill = Afform::prefill()
+        ->setName($this->formName)
+        ->setFillMode('join')
+        ->setArgs(['Individual1' => [['joins' => ['Address' => [['id' => $id]]]]]])
+        ->execute()->indexBy('name');
+      $loaded[$key] = $prefill['Individual1']['values'][0]['joins']['Address'][0]['street_address'] ?? NULL;
+    }
+    $this->assertSame(['inside' => '1 Inside Street', 'outside' => NULL], $loaded);
   }
 
 }

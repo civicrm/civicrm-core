@@ -2944,4 +2944,39 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $activityContact->save();
   }
 
+  /**
+   * Only contact ids from the manual recipient list reach the recipient query.
+   *
+   * @dataProvider getManualRecipientFilters
+   */
+  public function testManualRecipientFilter(array $recipients, string $expectedFilter): void {
+    $schedule = $this->createTestEntity('ActionSchedule', [
+      'title' => 'Manual recipients',
+      'mapping_id:name' => 'activity_type',
+      'entity_value' => [1],
+      'entity_status' => [1],
+      'start_action_date' => 'activity_date_time',
+      'start_action_offset' => 1,
+      'start_action_unit' => 'day',
+      'start_action_condition' => 'before',
+      'recipient' => 'manual',
+      'recipient_manual' => $recipients,
+    ]);
+    $actionSchedule = new CRM_Core_DAO_ActionSchedule();
+    $actionSchedule->id = $schedule['id'];
+    $actionSchedule->find(TRUE);
+    $builder = new \Civi\ActionSchedule\RecipientBuilder('20300101000000', $actionSchedule, CRM_Core_BAO_ActionSchedule::getMapping('activity_type'));
+    $contactFilter = \Civi\Test\Invasive::call([$builder, 'prepareContactFilter'], ['e.id']);
+
+    $this->assertStringContainsString($expectedFilter, $contactFilter->toSQL());
+  }
+
+  public static function getManualRecipientFilters(): array {
+    return [
+      'contact ids' => [[3, 5], '(e.id IN (3,5))'],
+      'sql in the list' => [[3, '0) OR (1=1'], '(e.id IN (3))'],
+      'no contact id at all' => [['0) OR (1=1'], '(e.id IN (0))'],
+    ];
+  }
+
 }
