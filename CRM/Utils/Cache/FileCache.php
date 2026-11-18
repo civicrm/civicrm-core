@@ -37,6 +37,17 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
   const STALE_TEMP_TIMEOUT = 3600;
 
   /**
+   * Grace period (in seconds) before a corrupt file may be removed.
+   *
+   * This is not a rolling-upgrade guarantee. It is a guard for a destructive
+   * read-side action: a file modified moments ago may belong to another
+   * writer that is still filling it in (a process running the previous
+   * release, or a script writing into the directory). Leave it alone for a
+   * few seconds rather than deleting it mid-write.
+   */
+  const CORRUPT_FILE_GRACE = 10;
+
+  /**
    * Max key length to be used for file systems.
    *
    * This applies separately to each folder-part/file-part.
@@ -161,49 +172,70 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
     CRM_Utils_Cache::assertValidKey($key);
 
     $key_path = $this->keyPath($key);
-    if (!isset($this->expiresCache[$key_path]) || time() >= $this->expiresCache[$key_path]) {
-      $path = $this->getCacheFile($key_path);
-      if (!file_exists($path)) {
+    $now = time();
+    if (!isset($this->expiresCache[$key_path]) || $now >= $this->expiresCache[$key_path]) {
+      $item = $this->readItem($this->getCacheFile($key_path));
+      if (!is_array($item)) {
+        unset($this->expiresCache[$key_path], $this->valueCache[$key_path]);
         return $default;
       }
-      $cache = $this->getContents($path);
-      if (!$cache) {
-        return $default;
-      }
-      $item = unserialize($cache);
-      if ($item !== FALSE) {
-        $this->expiresCache[$key_path] = $item['expires'];
-        $this->valueCache[$key_path] = $item['value'];
-      }
+      $this->expiresCache[$key_path] = $item['expires'];
+      $this->valueCache[$key_path] = $item['value'];
     }
 
-    return (isset($this->expiresCache[$key_path]) && time() < $this->expiresCache[$key_path]) ? $this->reobjectify($this->valueCache[$key_path]) : $default;
+    return (isset($this->expiresCache[$key_path]) && $now < $this->expiresCache[$key_path]) ? $this->reobjectify($this->valueCache[$key_path]) : $default;
   }
 
   /**
-   * Get file contents
+   * Read one cache entry from disk.
    *
    * @param string $path
    *
-   * @return string
+   * @return array|false|null
+   *   The entry; FALSE if the file is corrupt and was removed; NULL if the
+   *   file is missing, unreadable, or corrupt but left in place (within the
+   *   grace period or because it could not be removed).
    */
-  protected function getContents($path): string {
-    $contents = '';
-
-    $handle = fopen($path, 'rb');
-    if ($handle) {
-      try {
-        if (flock($handle, LOCK_SH)) {
-          clearstatcache(TRUE, $path);
-          $contents = fread($handle, filesize($path) ?: 1);
-          flock($handle, LOCK_UN);
-        }
-      } finally {
-        fclose($handle);
-      }
+  protected function readItem(string $path): array|false|null {
+    $blob = @file_get_contents($path);
+    if ($blob === FALSE) {
+      return NULL;
     }
 
-    return $contents;
+    // Entries are written with plain serialize(). Anything that does not
+    // decode to an entry is corruption.
+    $item = @unserialize($blob);
+    if (!is_array($item) || !array_key_exists('expires', $item) || !array_key_exists('value', $item)) {
+      return $this->discardCorrupt($path) ? FALSE : NULL;
+    }
+
+    return $item;
+  }
+
+  /**
+   * Remove a corrupt cache file, unless it may still be mid-write.
+   *
+   * The caller read corrupt bytes from this path, but another process may
+   * rename a valid entry over the same path before the unlink below. POSIX
+   * has no compare-and-unlink, so that new entry can be removed too; the cost
+   * is one recomputed cache entry. The grace period keeps the common case
+   * (a writer still filling in the file) from being deleted mid-write.
+   *
+   * A mtime outside a small window around now is treated as stale. That
+   * removes a corrupt file left with a future mtime (clock skew or a restored
+   * file), which would otherwise be protected forever.
+   *
+   * @param string $path
+   *
+   * @return bool
+   *   TRUE if the file was removed.
+   */
+  private function discardCorrupt(string $path): bool {
+    $mtime = @filemtime($path) ?: 0;
+    if (abs(time() - $mtime) <= self::CORRUPT_FILE_GRACE) {
+      return FALSE;
+    }
+    return @unlink($path);
   }
 
   /**
@@ -314,24 +346,19 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
     CRM_Utils_Cache::assertValidKey($key);
     $key_path = $this->keyPath($key);
     $path = $this->getCacheFile($key_path);
-    $success = TRUE;
 
-    if (file_exists($path)) {
-      try {
-        if (@unlink($path)) {
-          clearstatcache(FALSE, $path);
-          unset($this->valueCache[$key_path]);
-          unset($this->expiresCache[$key_path]);
-        }
-        else {
-          $success = FALSE;
-        }
-      }
-      catch (ErrorException) {
-        $success = FALSE;
+    try {
+      // A missing file is not an error (PSR-16 delete() is idempotent).
+      if (!@unlink($path) && file_exists($path)) {
+        return FALSE;
       }
     }
-    return $success;
+    catch (ErrorException) {
+      return FALSE;
+    }
+
+    unset($this->valueCache[$key_path], $this->expiresCache[$key_path]);
+    return TRUE;
   }
 
   /**
@@ -362,7 +389,10 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
   }
 
   /**
-   * {@inheritdoc}
+   * Remove expired entries, corrupt entries, and abandoned temporary files.
+   *
+   * @return bool
+   *   TRUE if anything was removed.
    */
   public function garbageCollection() {
     $garbage_collected = FALSE;
@@ -371,17 +401,18 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
     $files = \CRM_Utils_File::findFiles($dir, '*.txt', TRUE);
     foreach ($files as $filename) {
       $path = $dir . '/' . $filename;
-      if (!is_file($path)) {
+      $item = $this->readItem($path);
+      if ($item === FALSE) {
+        // readItem() removed a corrupt entry.
+        $garbage_collected = TRUE;
         continue;
       }
-      $cache = $this->getContents($path);
-      if (isset($cache)) {
-        $item = CRM_Core_BAO_Cache::decode($cache);
-        if ($item['expires'] < CRM_Utils_Time::time()) {
-          if (@unlink($path)) {
-            clearstatcache(FALSE, $path);
-            $garbage_collected = TRUE;
-          }
+      if ($item === NULL) {
+        continue;
+      }
+      if ($item['expires'] < CRM_Utils_Time::time()) {
+        if (@unlink($path)) {
+          $garbage_collected = TRUE;
         }
       }
     }
@@ -404,23 +435,18 @@ class CRM_Utils_Cache_FileCache implements CRM_Utils_Cache_Interface {
    * Prefetch
    */
   public function prefetch() {
-    $files = \CRM_Utils_File::findFiles($this->getCacheDir() . $this->_prefix, '*.txt', TRUE);
+    $groupDir = $this->getCacheDir() . $this->_prefix;
+    $files = \CRM_Utils_File::findFiles($groupDir, '*.txt', TRUE);
     $this->valueCache = [];
     $this->expiresCache = [];
     foreach ($files as $filename) {
-      $path = $this->getCacheDir() . $this->_prefix . $filename;
-      if (!is_file($path)) {
+      $item = $this->readItem($groupDir . $filename);
+      if (!is_array($item)) {
         continue;
       }
-      $cache = $this->getContents($path);
-      if (isset($cache)) {
-        $item = CRM_Core_BAO_Cache::decode($cache);
-
-        $key = substr($filename, 0, -4);
-        $key_path = $this->_prefix . $key;
-        $this->valueCache[$key_path] = $item['value'];
-        $this->expiresCache[$key_path] = $item['expires'];
-      }
+      $key_path = $this->_prefix . substr($filename, 0, -4);
+      $this->valueCache[$key_path] = $item['value'];
+      $this->expiresCache[$key_path] = $item['expires'];
     }
   }
 

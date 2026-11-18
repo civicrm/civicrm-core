@@ -132,6 +132,22 @@ class CRM_Utils_Cache_FileCacheTest extends CiviUnitTestCase {
     $this->assertSame('bar', $this->createCache()->get('foo'));
   }
 
+  public function testReadsEntryWrittenByOlderVersion(): void {
+    // The format is internal, but deliberately stable so an old and a new
+    // process can read each other's entries. Changing this test means the
+    // format changed and needs a migration/rollout plan.
+    @mkdir($this->groupDir, 0777, TRUE);
+    $entry = [
+      'created' => time(),
+      'expires' => time() + 3600,
+      'value' => 'bar',
+      'key' => 'foo',
+    ];
+    file_put_contents($this->groupDir . 'foo.txt', serialize($entry));
+
+    $this->assertSame('bar', $this->createCache()->get('foo'));
+  }
+
   public function testOrphanTemporaryFileIsIgnoredOnRead(): void {
     $this->createCache()->set('foo', 'bar');
     $orphan = $this->groupDir . 'foo.txt.abcd1234.tmp';
@@ -139,6 +155,19 @@ class CRM_Utils_Cache_FileCacheTest extends CiviUnitTestCase {
 
     $this->assertSame('bar', $this->createCache()->get('foo'));
     $this->assertFileExists($orphan);
+  }
+
+  public function testPrefetchRemovesOldCorruptFile(): void {
+    $cache = $this->createCache();
+    $cache->set('foo', 'bar');
+    $path = $this->groupDir . 'bad.txt';
+    file_put_contents($path, 'not a serialized cache entry');
+    touch($path, time() - 60);
+
+    $cache->prefetch();
+
+    $this->assertFileDoesNotExist($path);
+    $this->assertSame('bar', $cache->get('foo'));
   }
 
   public function testGarbageCollectionRemovesOnlyStaleTemporaryFiles(): void {
@@ -168,6 +197,46 @@ class CRM_Utils_Cache_FileCacheTest extends CiviUnitTestCase {
 
     $this->assertTrue($cache->garbageCollection());
     $this->assertFileDoesNotExist($path);
+  }
+
+  public function testGarbageCollectionReturnsTrueWhenItRemovesACorruptFile(): void {
+    $this->createCache()->set('foo', 'bar');
+    $path = $this->groupDir . 'foo.txt';
+    file_put_contents($path, 'not a serialized cache entry');
+    touch($path, time() - 60);
+
+    $this->assertTrue($this->createCache()->garbageCollection());
+    $this->assertFileDoesNotExist($path);
+  }
+
+  public function testCorruptFileIsTreatedAsMissAndRemoved(): void {
+    $this->createCache()->set('foo', 'bar');
+    $path = $this->groupDir . 'foo.txt';
+    file_put_contents($path, 'not a serialized cache entry');
+    touch($path, time() - 60);
+
+    $this->assertNull($this->createCache()->get('foo'));
+    $this->assertFileDoesNotExist($path);
+  }
+
+  public function testCorruptFileWithFutureMtimeIsRemoved(): void {
+    $this->createCache()->set('foo', 'bar');
+    $path = $this->groupDir . 'foo.txt';
+    file_put_contents($path, 'not a serialized cache entry');
+    touch($path, time() + 3600);
+
+    $this->assertNull($this->createCache()->get('foo'));
+    $this->assertFileDoesNotExist($path);
+  }
+
+  public function testFreshCorruptFileIsNotRemoved(): void {
+    $this->createCache()->set('foo', 'bar');
+    $path = $this->groupDir . 'foo.txt';
+    // A fresh partial file may belong to an older process that is still writing.
+    file_put_contents($path, 'not a serialized cache entry');
+
+    $this->assertNull($this->createCache()->get('foo'));
+    $this->assertFileExists($path);
   }
 
   public function testDeleteIsIdempotent(): void {
