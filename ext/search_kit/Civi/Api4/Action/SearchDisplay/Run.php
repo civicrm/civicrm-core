@@ -67,17 +67,28 @@ class Run extends AbstractRunAction {
 
     switch ($runMode) {
       case 'id':
-        $key = CoreUtil::getIdFieldName($entityName);
-        $index = [$key];
-        // Fallthrough because row_count does the same processing
+        $keyFields = array_values($this->getRowKeyFields());
+        if (!$keyFields) {
+          $result->exchangeArray([]);
+          return;
+        }
+        if (empty($apiParams['having'])) {
+          $apiParams['select'] = [];
+        }
+        foreach ($keyFields as $keyField) {
+          if (!in_array($keyField, $apiParams['select'], TRUE)) {
+            $apiParams['select'][] = $keyField;
+          }
+        }
+        unset($apiParams['orderBy'], $apiParams['limit']);
+        break;
+
       case 'row_count':
         if (empty($apiParams['having'])) {
           $apiParams['select'] = [];
         }
-        // Add row_count to select clause (or `id` if fallthrough from 'id' mode)
-        $key ??= 'row_count';
-        if (!in_array($key, $apiParams['select'], TRUE)) {
-          $apiParams['select'][] = $key;
+        if (!in_array('row_count', $apiParams['select'], TRUE)) {
+          $apiParams['select'][] = 'row_count';
         }
         unset($apiParams['orderBy'], $apiParams['limit']);
         break;
@@ -150,7 +161,17 @@ class Run extends AbstractRunAction {
     $result->rowCount = $apiResult->rowCount;
     $result->debug = $apiResult->debug;
 
-    if (in_array($runMode, ['row_count', 'id', 'draggableWeight'], TRUE)) {
+    if ($runMode === 'id') {
+      $keys = [];
+      foreach ($apiResult as $record) {
+        $rowKey = $this->getRowKey($record);
+        if (isset($rowKey)) {
+          $keys[] = $rowKey;
+        }
+      }
+      $result->exchangeArray(array_values(array_unique($keys)));
+    }
+    elseif (in_array($runMode, ['row_count', 'draggableWeight'], TRUE)) {
       $result->exchangeArray($apiResult->getArrayCopy());
     }
     else {

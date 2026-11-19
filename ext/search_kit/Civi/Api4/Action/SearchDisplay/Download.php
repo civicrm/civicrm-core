@@ -10,10 +10,18 @@ namespace Civi\Api4\Action\SearchDisplay;
  *
  * @method $this setFormat(string $format)
  * @method string getFormat()
+ * @method $this setRowKeys(array $rowKeys)
+ * @method array|null getRowKeys()
  * @package Civi\Api4\Action\SearchDisplay
  */
 class Download extends AbstractRunAction {
   use ResultDataTrait;
+
+  /**
+   * Optional list of row keys to filter the downloaded rows
+   * @var array
+   */
+  protected $rowKeys;
 
   /**
    * @param \Civi\Api4\Result\SearchDisplayRunResult $result
@@ -41,6 +49,7 @@ class Download extends AbstractRunAction {
     $this->augmentSelectClause();
 
     $this->applyFilters();
+    $this->applyRowKeysFilter();
 
     $apiResult = civicrm_api4($entityName, 'get', $apiParams);
 
@@ -58,6 +67,34 @@ class Download extends AbstractRunAction {
       $this->sendHeaders($fileName);
     }
     \CRM_Utils_System::civiExit();
+  }
+
+  /**
+   * Filter query to specific selected row keys if provided.
+   */
+  private function applyRowKeysFilter(): void {
+    if (empty($this->rowKeys)) {
+      return;
+    }
+    $keyFields = array_values($this->getRowKeyFields());
+    if (count($keyFields) === 1) {
+      $this->_apiParams['where'][] = [$keyFields[0], 'IN', $this->rowKeys];
+    }
+    elseif (count($keyFields) > 1) {
+      $orClauses = [];
+      foreach ($this->rowKeys as $rowKey) {
+        $keyParts = explode(',', (string) $rowKey);
+        $andClauses = [];
+        foreach ($keyFields as $idx => $field) {
+          $val = $keyParts[$idx] ?? '';
+          $andClauses[] = $val === '' ? [$field, 'IS NULL'] : [$field, '=', $val];
+        }
+        $orClauses[] = ['AND', $andClauses];
+      }
+      if ($orClauses) {
+        $this->_apiParams['where'][] = ['OR', $orClauses];
+      }
+    }
   }
 
   /**

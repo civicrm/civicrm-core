@@ -43,6 +43,7 @@
         ctrl.rowCount = null;
         ctrl.page = 1;
         ctrl.selectNone();
+        ctrl.taskManager?.resetMetadata();
       }
 
       this.$onInit = function() {
