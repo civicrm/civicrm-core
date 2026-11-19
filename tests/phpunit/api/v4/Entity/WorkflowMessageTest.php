@@ -174,6 +174,40 @@ class WorkflowMessageTest extends Api4TestBase implements TransactionalInterface
     $this->assertMatchesRegularExpression('/Rendered from the non-default template/', $result['text']);
   }
 
+  /**
+   * Contribution examples built from a non-quick-config price set render their lines.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRenderPriceSetContributionExample(): void {
+    $priceSet = $this->createTestRecord('PriceSet', [
+      'title' => 'Example price set',
+      'extends:name' => ['CiviContribute'],
+      'is_quick_config' => FALSE,
+      'financial_type_id:name' => 'Donation',
+    ]);
+    $priceField = $this->createTestRecord('PriceField', [
+      'price_set_id' => $priceSet['id'],
+      'label' => 'Tickets',
+      'html_type' => 'Text',
+      'is_enter_qty' => TRUE,
+    ]);
+    $this->createTestRecord('PriceFieldValue', [
+      'price_field_id' => $priceField['id'],
+      'label' => 'Example ticket',
+      'amount' => 10,
+      'financial_type_id:name' => 'Donation',
+    ]);
+
+    $example = ['workflow' => 'contribution_offline_receipt', 'is_show_line_items' => TRUE];
+    (new \CRM_Contribute_WorkflowMessage_Contribution_BasicContribution())->build($example);
+    $result = WorkflowMessage::render(FALSE)
+      ->setWorkflow('contribution_offline_receipt')
+      ->setValues($example['data']['modelProps'])
+      ->execute()->single();
+    $this->assertStringContainsString('Example ticket', $result['html']);
+  }
+
   public function testRenderExamplesBaseline(): void {
     $examples = $this->getRenderExamples();
     $this->assertTrue(isset($examples['workflow/contribution_recurring_edit/AlexCancelled']));
