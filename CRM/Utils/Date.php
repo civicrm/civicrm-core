@@ -1220,7 +1220,7 @@ class CRM_Utils_Date {
     $selectFrom = $sql['from'] ? "DATE_FORMAT({$sql['from']}, '%Y%m%d%H%i%s')" : 'NULL';
     $selectTo = $sql['to'] ? "DATE_FORMAT({$sql['to']}, '%Y%m%d%H%i%s')" : 'NULL';
 
-    $dao = \CRM_Core_DAO::executeQuery("SELECT $selectFrom AS from_date, $selectTo AS to_date");
+    $dao = \CRM_Core_DAO::executeQuery("SELECT $selectFrom AS `from_date`, $selectTo AS `to_date`");
     $dao->fetch();
 
     $dateRange = [
