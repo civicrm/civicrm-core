@@ -55,6 +55,14 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * to the top level at some point in time
    *
    * @param array $params
+   *   Array of parameters for the pager, including:
+   *   - 'total': int, total number of records across all pages.
+   *   - 'status': string|null, template status message string containing '%%StatusMessage%%'.
+   *   - 'rowCount': int|null, number of records per page.
+   *   - 'pageID': int|null, current page number.
+   *   - 'buttonTop': string|null, name of the form element for the top submit button.
+   *   - 'buttonBottom': string|null, name of the form element for the bottom submit button.
+   *   - 'csvString': string|null, optional CSV download link or string.
    *
    * @return \CRM_Utils_Pager the newly created and initialized pager object
    */
