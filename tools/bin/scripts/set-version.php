@@ -22,7 +22,7 @@ chdir($civicrm_root);
 
 $oldVersion = (string) simplexml_load_file("xml/version.xml")->version_no;
 if (!isVersionValid($oldVersion)) {
-  fatal("failed to read old version from \"xml/version.xml\"\n");
+  fatal("failed to read old version from \"xml/version.xml\"");
 }
 
 /**
@@ -34,7 +34,7 @@ if (!isVersionValid($oldVersion)) {
 extract(parseArgs($argv));
 
 if (!isVersionValid($newVersion)) {
-  fatal("failed to read new version\n");
+  fatal("failed to read new version");
 }
 
 /* *********************************************************************** */
@@ -43,6 +43,11 @@ if (!isVersionValid($newVersion)) {
 syncPackagesBranch($newVersion);
 
 echo "Changing version from $oldVersion to $newVersion...\n";
+
+$latestVersion = exec("cv ev --level=classloader 'echo \CRM_Upgrade_Versions::getLatestVersion();'");
+if (version_compare($newVersion, $latestVersion, '<')) {
+  fatal("db upgrade steps are declared up to {$latestVersion} - cannot set release version lower than this!");
+}
 
 $verName = makeVerName($newVersion);
 $phpFile = initFile("CRM/Upgrade/Incremental/php/{$verName}.php", function () use ($verName, $newVersion) {
@@ -121,7 +126,7 @@ if ($doCommit) {
  */
 function updateFile($file, $callback) {
   if (!file_exists($file)) {
-    die("File does not exist: $file\n");
+    die("File does not exist: $file");
   }
   echo "Update \"$file\"\n";
   $content = file_get_contents($file);
@@ -187,7 +192,9 @@ function isVersionValid($v) {
  * @param $error
  */
 function fatal($error) {
-  echo $error;
+  echo "\n";
+  echo "ERROR: {$error}\n";
+  echo "\n";
   echo "usage: set-version.php <new-version> [<new-date>] [--sql|--no-sql] [--commit|--no-commit]\n";
   echo "  --sql        A placeholder *.sql file will be created.\n";
   echo "  --no-sql     A placeholder *.sql file will not be created.\n";
@@ -236,7 +243,7 @@ function parseArgs($argv) {
           $positional[] = $arg;
         }
         else {
-          fatal("Unrecognized argument: $arg\n");
+          fatal("Unrecognized argument: $arg");
         }
         break;
     }
@@ -248,7 +255,7 @@ function parseArgs($argv) {
   }
 
   if (!isset($parsed['doCommit'])) {
-    fatal("Must specify --commit or --no-commit\n");
+    fatal("Must specify --commit or --no-commit");
   }
 
   return $parsed;
