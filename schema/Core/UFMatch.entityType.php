@@ -23,6 +23,7 @@ return [
         'uf_id' => TRUE,
         'domain_id' => TRUE,
       ],
+      'unique' => TRUE,
       'add' => '5.69',
     ],
     'UI_uf_name_domain_id' => [
