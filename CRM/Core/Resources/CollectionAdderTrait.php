@@ -252,27 +252,19 @@ trait CRM_Core_Resources_CollectionAdderTrait {
    * And from javascript access it at CRM.myNamespace.myString
    *
    * @param string|array $text
+   *   A string, a list of strings, or strings with their plural form or NULL
+   *   as from CRM_Utils_JS::parseStrings().
    * @param string|null $domain
    * @return static
    * @see CRM_Core_Resources_CollectionAdderInterface::addString()
    */
   public function addString($text, $domain = 'civicrm') {
     // TODO: Maybe this should be its own resource type to allow smarter management?
-
-    foreach ((array) $text as $str) {
-      $translated = _ts($str, [
-        'domain' => ($domain == 'civicrm') ? NULL : [$domain, NULL],
-        'raw' => TRUE,
-      ]);
-
-      // We only need to push this string to client if the translation
-      // is actually different from the original
-      if ($translated != $str) {
-        $bucket = $domain == 'civicrm' ? 'strings' : 'strings::' . $domain;
-        $this->addSetting([
-          $bucket => [$str => $translated],
-        ]);
-      }
+    // Only translations that differ from the original are pushed to the client.
+    $translated = CRM_Utils_JS::translateStrings((array) $text, ($domain == 'civicrm') ? NULL : [$domain, NULL]);
+    if ($translated) {
+      $bucket = $domain == 'civicrm' ? 'strings' : 'strings::' . $domain;
+      $this->addSetting([$bucket => $translated]);
     }
     return $this;
   }

@@ -16,6 +16,8 @@ namespace Civi\Angular;
  */
 class ManagerTest extends \CiviUnitTestCase {
 
+  use \CRM_Core_I18n_CatalogTestTrait;
+
   /**
    * @var Manager
    */
@@ -35,6 +37,11 @@ class ManagerTest extends \CiviUnitTestCase {
     $this->createLoggedInUser();
     $this->res = \CRM_Core_Resources::singleton();
     $this->angular = new Manager($this->res);
+  }
+
+  protected function tearDown(): void {
+    $this->resetCatalog();
+    parent::tearDown();
   }
 
   /**
@@ -127,9 +134,22 @@ class ManagerTest extends \CiviUnitTestCase {
    */
   public function testGetStrings(): void {
     $strings = $this->angular->getStrings('crmMailing');
-    $this->assertTrue(in_array('Save Draft', $strings));
-    $this->assertFalse(in_array('wild world', $strings));
+    $this->assertArrayHasKey('Save Draft', $strings);
+    $this->assertArrayNotHasKey('wild world', $strings);
     // If crmMailing changes, feel free to use a different example.
+  }
+
+  /**
+   * A plural in a partial reaches the client in both forms.
+   */
+  public function testGetTranslatedStrings_Plural(): void {
+    $this->useCatalog([
+      "1 Available Dashlet\0%count Available Dashlets" => "1 verfügbares Dashlet\0%count verfügbare Dashlets",
+    ]);
+    $strings = $this->angular->getTranslatedStrings('crmDashboard');
+    $this->assertSame('1 verfügbares Dashlet', $strings['1 Available Dashlet'] ?? NULL);
+    $this->assertSame('%count verfügbare Dashlets', $strings['%count Available Dashlets'] ?? NULL);
+    // If crmDashboard changes, feel free to use a different example.
   }
 
   /**
@@ -139,7 +159,7 @@ class ManagerTest extends \CiviUnitTestCase {
     \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', [$this, 'hook_civicrm_alterAngular']);
 
     $strings = $this->angular->getStrings('crmMailing');
-    $this->assertTrue(in_array('wild world', $strings));
+    $this->assertArrayHasKey('wild world', $strings);
     // If crmMailing changes, feel free to use a different example.
   }
 

@@ -6,6 +6,13 @@
  */
 class CRM_Core_I18n_TsTest extends CiviUnitTestCase {
 
+  use CRM_Core_I18n_CatalogTestTrait;
+
+  protected function tearDown(): void {
+    $this->resetCatalog();
+    parent::tearDown();
+  }
+
   /**
    * Data provider for testTranslateWithArgs
    *
@@ -57,6 +64,23 @@ class CRM_Core_I18n_TsTest extends CiviUnitTestCase {
         'expected' => 'Added a test to 0 items',
       ],
     ];
+  }
+
+  public function testAPluralMissingFromTheFirstDomainComesFromTheNext(): void {
+    $this->useCatalog(
+      ["1 thing\0%count things" => "1 Ding\0%count Dinge"],
+      ['org.example.other' => ['Unrelated' => 'Unbeteiligt']],
+    );
+    $params = ['plural' => '%count things', 'domain' => ['org.example.other', NULL]];
+    $this->assertSame('1 Ding', ts('1 thing', $params + ['count' => 1]));
+    $this->assertSame('2 Dinge', ts('1 thing', $params + ['count' => 2]));
+    $this->assertSame('2 others', ts('1 other', ['plural' => '%count others', 'count' => 2] + $params));
+  }
+
+  public function testRawKeepsTheCountPlaceholderForTheClient(): void {
+    $params = ['plural' => 'Found %count results', 'count' => 2];
+    $this->assertSame('Found 2 results', CRM_Core_I18n::singleton()->crm_translate('Found %count result', $params));
+    $this->assertSame('Found %count results', CRM_Core_I18n::singleton()->crm_translate('Found %count result', $params + ['raw' => TRUE]));
   }
 
   /**
