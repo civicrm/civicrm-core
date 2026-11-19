@@ -256,75 +256,93 @@
         if (conditions[0] === 'NOT') {
           return conditions[1].every((subcondition) => !this.evaluateBooleanExpression(subcondition));
         }
-        return compareConditions(conditions[0], conditions[1], conditions[2]);
+        return compareValues(this.getTokenValue(conditions[0]), conditions[1], conditions[2]);
       };
 
-      const compareConditions = (val1, op, val2) => {
-        const yes = (op !== '!=' && !op.includes('NOT '));
-
-        val1 = this.getTokenValue(val1);
-
+      /**
+       * Clientside implementation of ArrayQueryActionTrait::compareValues
+       *
+       * @see ArrayQueryActionTrait::compareValues
+       * @todo this has stricter type comparison than PHP function - bring into line
+       *
+       * @param {mixed} value
+       * @param {string} op
+       * @param {mixed} expected
+       * @returns boolean
+       */
+      const compareValues = (value, op, expected) => {
         switch (op) {
           case '=':
-          case '!=':
           // Legacy operator, changed to '=', but may still exist on older forms.
           case '==':
             // Case-insensitive string comparisons
-            if (typeof val1 === 'string') {
-              val1 = val1.toLowerCase();
+            if (typeof value === 'string') {
+              value = value.toLowerCase();
             }
-            if (typeof val2 === 'string') {
-              val2 = val2.toLowerCase();
+            if (typeof expected === 'string') {
+              expected = expected.toLowerCase();
             }
-            return angular.equals(val1, val2) === yes;
+            return angular.equals(value, expected);
+
+          case '!=':
+            return !compareValues(value, '=', expected);
 
           case '>':
-            return val1 > val2;
+            return value > expected;
 
           case '<':
-            return val1 < val2;
+            return value < expected;
 
           case '>=':
-            return val1 >= val2;
+            return value >= expected;
 
           case '<=':
-            return val1 <= val2;
+            return value <= expected;
 
           case 'IS EMPTY':
-            return !val1;
+            return !value;
 
           case 'IS NOT EMPTY':
-            return !!val1;
+            return !compareValues(value, 'IS EMPTY', expected);
 
           case 'CONTAINS':
-          case 'NOT CONTAINS':
-            if (Array.isArray(val1)) {
-              return val1.includes(val2) === yes;
-            } else if (typeof val1 === 'string' && typeof val2 === 'string') {
-              return val1.toLowerCase().includes(val2.toLowerCase()) === yes;
+            if (Array.isArray(value)) {
+              return value.includes(expected);
             }
-            return angular.equals(val1, val2) === yes;
+            else if (typeof value === 'string' && typeof expected === 'string') {
+              return value.toLowerCase().includes(expected.toLowerCase());
+            }
+            return angular.equals(value, expected);
+
+          case 'NOT CONTAINS':
+            return !compareValues(value, 'CONTAINS', expected);
 
           case 'IN':
-          case 'NOT IN':
-            if (Array.isArray(val2)) {
-              return val2.includes(val1) === yes;
+            if (Array.isArray(expected)) {
+              return expected.includes(value);
             }
-            return angular.equals(val1, val2) === yes;
+            return angular.equals(value, expected);
+
+          case 'NOT IN':
+            return !compareValues(value, 'IN', expected);
 
           case 'BETWEEN':
-          case 'NOT BETWEEN':
-            if (Array.isArray(val2) && val2.length === 2) {
-              return (val1 >= val2[0] && val1 <= val2[1]) === yes;
+            if (Array.isArray(expected) && expected.length === 2) {
+              return (value >= expected[0] && value <= expected[1]);
             }
             return false;
 
+          case 'NOT BETWEEN':
+            return !compareValues(value, 'BETWEEN', expected);
+
           case 'LIKE':
-          case 'NOT LIKE':
-            if (typeof val1 === 'string' && typeof val2 === 'string') {
-              return likeCompare(val1, val2) === yes;
+            if (typeof value === 'string' && typeof expected === 'string') {
+              return likeCompare(value, expected);
             }
-            return angular.equals(val1, val2) === yes;
+            return angular.equals(value, expected);
+
+          case 'NOT LIKE':
+            return !compareValues(value, 'LIKE', expected);
         }
       };
 
