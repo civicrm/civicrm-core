@@ -328,4 +328,29 @@ class CRM_Utils_Pager extends Pager_Sliding {
     return sprintf('<a class="crm-pager-link action-item crm-hover-button" href="%s" title="%s">%s</a>', $href, $title, $image);
   }
 
+  /**
+   * Return any extra GET/POST args that should be appended to links.
+   *
+   * @return array
+   * @access private
+   */
+  public function _getLinksData() {
+    // This all feels quirky, but it's loyal to the prior implementation.
+    // It's just rewritten/flattened/simplified.
+
+    $qs = (!isset($_GET[$this->_urlVar]) && isset($_POST[$this->_urlVar])) ? $_POST : $_GET;
+
+    foreach (array_intersect($this->_excludeVars, array_keys($qs)) as $key) {
+      unset($qs[$key]);
+    }
+
+    $decode = fn($val) => strtr($val, array_flip(get_html_translation_table(HTML_ENTITIES)));
+    $map = fn($func, $data) => is_array($data) ? array_map($func, $data) : $func($data);
+    foreach ($this->_extraVars ?? [] as $var => $value) {
+      $qs[$var] = $map($decode, $this->_extraVars[$var]);
+    }
+
+    return $qs;
+  }
+
 }
