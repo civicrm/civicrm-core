@@ -129,6 +129,21 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
     return $this->_entityValues;
   }
 
+  /**
+   * Get the ids of the existing records the form loaded for an entity, e.g. from autofill.
+   *
+   * @param string $entityName
+   *   E.g. 'Individual1'.
+   * @return array
+   */
+  public function getEntityIds(string $entityName): array {
+    $apiEntity = $this->_formDataModel->getEntity($entityName)['type'] ?? NULL;
+    if (!$apiEntity) {
+      return [];
+    }
+    return array_column($this->_entityIds[$entityName] ?? [], CoreUtil::getIdFieldName($apiEntity));
+  }
+
   protected array $_response = [];
 
   /**

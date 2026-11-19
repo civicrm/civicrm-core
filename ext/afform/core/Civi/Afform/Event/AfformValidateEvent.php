@@ -88,6 +88,17 @@ class AfformValidateEvent extends AfformBaseEvent {
     return $this->getApiRequest()->getSubmittedValues();
   }
 
+  /**
+   * Get the ids of the existing records being updated for an entity on the form.
+   *
+   * @param string $entityName
+   *   E.g. 'Individual1'.
+   * @return array
+   */
+  public function getEntityIds(string $entityName): array {
+    return $this->getApiRequest()->getEntityIds($entityName);
+  }
+
   public function getEntityFieldDefn(string $entityName, string $fieldName, ?string $joinEntity = NULL): array {
     $cacheKey = "$entityName:$fieldName:" . ($joinEntity ?? '');
     if (array_key_exists($cacheKey, $this->entityFieldDefn)) {
