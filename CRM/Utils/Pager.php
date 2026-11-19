@@ -67,9 +67,7 @@ class CRM_Utils_Pager extends Pager_Sliding {
    * @return \CRM_Utils_Pager the newly created and initialized pager object
    */
   public function __construct($params) {
-    if ($params['status'] === NULL) {
-      $params['status'] = ts('Contacts %%StatusMessage%%');
-    }
+    $params['status'] ??= ts('Contacts %%StatusMessage%%');
 
     $this->initialize($params);
 
