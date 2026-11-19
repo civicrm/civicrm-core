@@ -108,6 +108,11 @@ class GetFromArrayTest extends Api4TestBase {
     $this->assertEquals([2, 6], $result->column('field1'));
 
     $result = MockArrayEntity::get()
+      ->addWhere('field2', '<>', 'yack')
+      ->execute();
+    $this->assertSame([1, 3, 4, 5], $result->column('field1'));
+
+    $result = MockArrayEntity::get()
       ->addWhere('field5', '!=', 'banana')
       ->addWhere('field3', 'IS NOT NULL')
       ->execute();
