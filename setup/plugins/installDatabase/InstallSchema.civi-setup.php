@@ -72,9 +72,7 @@ class InstallSchemaPlugin implements \Symfony\Component\EventDispatcher\EventSub
     $seedLanguage = $model->lang;
     if (!empty($model->loadGenerated)) {
       \Civi\Setup::log()->info(sprintf('[%s] Load sample data', basename(__FILE__)));
-      // At time of writing, `generateSampleData()` is not yet a full replacement for `civicrm_generated.mysql`.
       \Civi\Setup\DbUtil::sourceSQL($model->db, file_get_contents($sqlPath . DIRECTORY_SEPARATOR . 'civicrm_generated.mysql'));
-      // \Civi\Setup\DbUtil::sourceSQL($model->db, \Civi\Setup\SchemaGenerator::generateSampleData($model->srcPath));
     }
     elseif ($seedLanguage) {
       global $tsLocale;
