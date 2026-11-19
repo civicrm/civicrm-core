@@ -134,10 +134,10 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
     $this->assertEquals('1', $contacts[0]['phone.location_type_id']);
   }
 
-  public function testCreateWithFkIsoCode(): void {
+  public function testCreateWithFkCountryName(): void {
     $contact = Contact::create(FALSE)
       ->addValue('first_name', 'Frenchie')
-      ->addValue('address_primary.country_id.iso_code', 'FR')
+      ->addValue('address_primary.country_id.name', 'France')
       ->execute()
       ->first();
     $address = Address::get(FALSE)
@@ -145,8 +145,8 @@ class FkJoinTest extends Api4TestBase implements TransactionalInterface {
       ->addSelect('country_id:name', 'country_id:label')
       ->execute()
       ->first();
-    $this->assertEquals('FR', $address['country_id:name']);
-    $this->assertEquals('France', $address['country_id:label']);
+    $this->assertSame('FR', $address['country_id:name']);
+    $this->assertSame('France', $address['country_id:label']);
   }
 
   public function testImplicitJoinOnExplicitJoin(): void {
